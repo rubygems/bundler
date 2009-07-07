@@ -41,26 +41,41 @@ require "pp"
 # end
 # puts "FINISHED INFLATING: #{Time.now - time}s"
 
+p 1
+
 index = nil
 File.open("dumped", "r") do |f|
   index = Marshal.load(f.read)
 end
 
-require File.expand_path(File.join(File.dirname(__FILE__), "..", "gem_resolver", "lib", "gem_resolver"))
+p 2
+
+t = Time.now
+
+new_index = Hash.new {|h,k| h[k] = {}}
+index.gems.values.each do |spec|
+  new_index[spec.name][spec.version] = spec
+end
+
+puts "DONE in #{Time.now - t}"
+
+p new_index["merb-core"][Gem::Version.new("1.0.12")]
+
+# require File.expand_path(File.join(File.dirname(__FILE__), "..", "gem_resolver", "lib", "gem_resolver"))
 # ENV["GEM_RESOLVER_DEBUG"] = "true"
 
-require "ruby-prof"
-
-RubyProf.start
-
-resolved = GemResolver.resolve([Gem::Dependency.new("rails", "> 0")], index)
-
-result = RubyProf.stop
-
-printer = RubyProf::GraphPrinter.new(result)
-printer.print
-
-pp resolved.all_specs.map {|x| [x.name, x.version]}
+# require "ruby-prof"
+# 
+# RubyProf.start
+# 
+# resolved = GemResolver.resolve([Gem::Dependency.new("rails", "> 0")], index)
+# 
+# result = RubyProf.stop
+# 
+# printer = RubyProf::GraphPrinter.new(result)
+# printer.print
+# 
+# pp resolved.all_specs.map {|x| [x.name, x.version]}
 
 # Gem::SpecFetcher.fetcher.find_matching(dependency) returns
 #   [[["merb-core", #<Gem::Version "1.0.12">, "ruby"], "http://gems.rubyforge.org/"]]
