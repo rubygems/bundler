@@ -2,8 +2,6 @@ require "rubygems"
 require "rubygems/remote_fetcher"
 require "pp"
 
-# $time = 0
-# 
 # module Bundler
 #   class LazySourceIndex
 #     
@@ -29,6 +27,45 @@ require "pp"
 #   end
 # end
 
+class FasterSourceIndex
+  def initialize(index)
+    @index = index
+    @new_index = Hash.new {|h,k| h[k] = {}}
+    @index.gems.values.each do |spec|
+      @new_index[spec.name][spec.version] = spec
+    end
+  end
+
+  def search(dependency)
+    possibilities = @new_index[dependency.name].values
+    possibilities.select do |spec|
+      dependency =~ spec
+    end
+  end
+end
+
+index = nil
+File.open("dumped", "r") do |f|
+  index = Marshal.load(f.read)
+end
+
+index = FasterSourceIndex.new(index)
+
+t = Time.now
+
+ENV["GEM_RESOLVER_DEBUG"] = "true"
+
+list = {
+  "merb-core" => "1.0.12",
+  "merb-haml" => "1.0.12",
+  "merb_datamapper" => "1.0.12"
+}.map {|k,v| Gem::Dependency.new(k, v)}
+
+require File.expand_path(File.join(File.dirname(__FILE__), "..", "gem_resolver", "lib", "gem_resolver"))
+pp GemResolver.resolve(list, index).all_specs.map {|x| x.full_name }
+
+puts "TOTAL: #{Time.now - t}"
+
 # index = Bundler::LazySourceIndex.new
 # pp index.search(Gem::Dependency.new("merb-core", "> 0"))
 
@@ -41,28 +78,8 @@ require "pp"
 # end
 # puts "FINISHED INFLATING: #{Time.now - time}s"
 
-p 1
 
-index = nil
-File.open("dumped", "r") do |f|
-  index = Marshal.load(f.read)
-end
 
-p 2
-
-t = Time.now
-
-new_index = Hash.new {|h,k| h[k] = {}}
-index.gems.values.each do |spec|
-  new_index[spec.name][spec.version] = spec
-end
-
-puts "DONE in #{Time.now - t}"
-
-p new_index["merb-core"][Gem::Version.new("1.0.12")]
-
-# require File.expand_path(File.join(File.dirname(__FILE__), "..", "gem_resolver", "lib", "gem_resolver"))
-# ENV["GEM_RESOLVER_DEBUG"] = "true"
 
 # require "ruby-prof"
 # 
