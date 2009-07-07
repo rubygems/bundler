@@ -28,37 +28,10 @@ describe "Fetcher" do
 
   describe "resolving rails" do
     before(:each) do
-      @tmp    = File.expand_path(File.join(File.dirname(__FILE__), 'tmp'))
       @bundle = @finder.resolve(build_dep('rails', '>= 0'))
 
-      FileUtils.mkdir_p(File.join(@tmp, 'cache'))
-      Dir[File.join(@tmp, 'cache', '*')].each { |file| FileUtils.rm_f(file) }
-    end
-
-    def fixture(gem_name)
-      File.join(File.dirname(__FILE__), 'fixtures', 'gems', "#{gem_name}.gem")
-    end
-
-    def copy(gem_name)
-      FileUtils.cp(fixture(gem_name), File.join(@tmp, 'cache'))
-    end
-
-    def change
-      simple_matcher("change") do |given, matcher|
-        matcher.failure_message = "Expected the block to change, but it didn't"
-        matcher.negative_failure_message = "Expected the block not to change, but it did"
-        retval = yield
-        given.call
-        retval != yield
-      end
-    end
-
-    def be_cached_at(dir)
-      simple_matcher("the bundle should be cached") do |given|
-        given.each do |spec|
-          Dir[File.join(dir, 'cache', "#{spec.name}*.gem")].should have(1).item
-        end
-      end
+      FileUtils.mkdir_p(File.join(tmp_dir, 'cache'))
+      Dir[File.join(tmp_dir, 'cache', '*')].each { |file| FileUtils.rm_f(file) }
     end
 
     it "resolves rails" do
@@ -79,24 +52,24 @@ describe "Fetcher" do
     end
 
     it "can download the bundle" do
-      @bundle.download(@tmp)
-      @bundle.should be_cached_at(@tmp)
+      @bundle.download(tmp_dir)
+      @bundle.should be_cached_at(tmp_dir)
     end
 
     it "does not download the gem if the gem is the same as the cached version" do
       copy("actionmailer-2.3.2")
 
       lambda {
-        @bundle.download(@tmp)
-        @bundle.should be_cached_at(@tmp)
+        @bundle.download(tmp_dir)
+        @bundle.should be_cached_at(tmp_dir)
       }.should_not change { File.mtime(fixture("actionmailer-2.3.2")) }
     end
 
     it "erases any gems in the directory that are not part of the bundle" do
       copy("abstract-1.0.0")
-      @bundle.download(@tmp)
+      @bundle.download(tmp_dir)
 
-      Dir[File.join(@tmp, 'cache', '*.gem')].should have(@bundle.length).items
+      Dir[File.join(tmp_dir, 'cache', '*.gem')].should have(@bundle.length).items
     end
   end
 end
