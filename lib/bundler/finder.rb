@@ -1,4 +1,24 @@
 module Bundler
+  class GemBundle < Array
+    def download(directory)
+      current = Dir[File.join(directory, "cache", "*.gem*")]
+
+      each do |spec|
+        cached = File.join(directory, "cache", "#{spec.full_name}.gem")
+
+        unless File.file?(cached)
+          Gem::RemoteFetcher.fetcher.download(spec, spec.source, directory)
+        end
+
+        current.delete(cached)
+      end
+
+      current.each { |file| File.delete(file) }
+
+      self
+    end
+  end
+
   class Finder
     def initialize(*sources)
       @results = {}
@@ -9,7 +29,7 @@ module Bundler
 
     def resolve(*dependencies)
       resolved = GemResolver.resolve(dependencies, self)
-      resolved && resolved.all_specs
+      resolved && GemBundle.new(resolved.all_specs)
     end
 
     def fetch(source)
