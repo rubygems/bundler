@@ -1,7 +1,6 @@
 require File.join(File.dirname(__FILE__), "spec_helper")
-require "bundler/faster_source_index"
 
-describe "FasterSourceIndex" do
+describe "Finder" do
   before(:all) do
     index = build_index do
       add_spec "activemerchant", "1.4.1" do
@@ -14,7 +13,7 @@ describe "FasterSourceIndex" do
       end
     end
 
-    @faster = FasterSourceIndex.new(index)
+    @faster = Bundler::Finder.new.append(index, "http://foo")
   end
 
   def only_have_specs(*names)
