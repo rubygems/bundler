@@ -34,12 +34,15 @@ class FasterSourceIndex
     @index.gems.values.each do |spec|
       @new_index[spec.name][spec.version] = spec
     end
+    @results = {}
   end
 
   def search(dependency)
-    possibilities = @new_index[dependency.name].values
-    possibilities.select do |spec|
-      dependency =~ spec
+    @results[dependency.hash] ||= begin
+      possibilities = @new_index[dependency.name].values
+      possibilities.select do |spec|
+        dependency =~ spec
+      end.sort_by {|s| s.version }
     end
   end
 end
@@ -53,12 +56,16 @@ index = FasterSourceIndex.new(index)
 
 t = Time.now
 
-ENV["GEM_RESOLVER_DEBUG"] = "true"
+# ENV["GEM_RESOLVER_DEBUG"] = "true"
 
 list = {
-  "merb-core" => "1.0.12",
-  "merb-haml" => "1.0.12",
-  "merb_datamapper" => "1.0.12"
+  "merb-core" => ">= 0",
+  "merb-haml" => ">= 0",
+  "merb_datamapper" => ">= 0"
+
+  # "merb-core" => "1.0.12",
+  # "merb-haml" => "1.0.12",
+  # "merb_datamapper" => "1.0.12"
 }.map {|k,v| Gem::Dependency.new(k, v)}
 
 require File.expand_path(File.join(File.dirname(__FILE__), "..", "gem_resolver", "lib", "gem_resolver"))
