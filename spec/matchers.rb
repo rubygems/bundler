@@ -35,9 +35,11 @@ module Spec
       end
 
       simple_matcher("have load paths") do |given, matcher|
+        actual = `ruby -r#{given} -e 'puts $:'`.split("\n")
+
         flattened_paths.all? do |path|
-          matcher.failure_message = "expected environment load paths to contain '#{path}', but it was:\n  #{given.load_paths.join("\n  ")}"
-          given.load_paths.include?(path)
+          matcher.failure_message = "expected environment load paths to contain '#{path}', but it was:\n  #{actual.join("\n  ")}"
+          actual.include?(path)
         end
       end
     end

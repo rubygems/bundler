@@ -11,14 +11,47 @@ module Bundler
       @gems = Dir[(File.join(path, "cache", "*.gem"))]
     end
 
-    def install(bin_dir = File.join(@path, "bin"))
+    def install(options = {})
+      bin_dir = options[:bin_dir] ||= File.join(@path, "bin")
+
+      specs = Dir[File.join(@path, "specifications", "*.gemspec")]
+      gems  = Dir[File.join(@path, "gems", "*")]
+
       @gems.each do |gem|
-        installer = Gem::Installer.new(gem, :install_dir => @path,
-          :ignore_dependencies => true,
-          :env_shebang => true,
-          :wrappers => true,
-          :bin_dir => bin_dir)
-        installer.install
+        name      = File.basename(gem).gsub(/\.gem$/, '')
+        installed = specs.any? { |g| File.basename(g) == "#{name}.gemspec" } &&
+          gems.any? { |g| File.basename(g) == name }
+
+        unless installed
+          installer = Gem::Installer.new(gem, :install_dir => @path,
+            :ignore_dependencies => true,
+            :env_shebang => true,
+            :wrappers => true,
+            :bin_dir => bin_dir)
+          installer.install
+        end
+
+        # remove this spec
+        specs.delete_if { |g| File.basename(g) == "#{name}.gemspec"}
+        gems.delete_if  { |g| File.basename(g) == name }
+      end
+
+      (specs + gems).each do |path|
+        FileUtils.rm_rf(path)
+      end
+
+      if file = options[:environment_file]
+        create_load_paths_file(file)
+      end
+    end
+
+  private
+
+    def create_load_paths_file(file)
+      File.open(file, "w") do |file|
+        load_paths.each do |path|
+          file.puts "$LOAD_PATH << #{path.inspect}"
+        end
       end
     end
 

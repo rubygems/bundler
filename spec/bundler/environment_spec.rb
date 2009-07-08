@@ -49,17 +49,20 @@ describe "Bundler::Environment" do
 
   describe "installing with non-standard settings" do
     before(:each) do
+      FileUtils.rm_rf(tmp_file("gems"))
+      FileUtils.rm_rf(tmp_file("specifications"))
       @environment = Bundler::Environment.new(tmp_dir)
     end
 
     it "installs the bins in the directory you specify" do
-      @environment.install(tmp_dir)
+      @environment.install(:bin_dir => tmp_dir)
       File.exist?(File.join(tmp_dir, 'rails')).should be_true
     end
 
-    it "dumps an environment to a specified file" do
-      @environment.install
-      @environment.should have_load_paths(tmp_dir,
+    it "creates a ruby file with the load paths at the desired location" do
+      @environment.install(:environment_file => tmp_file('awesome_env.rb'))
+
+      tmp_file('awesome_env.rb').should have_load_paths(tmp_dir,
         "json-1.1.6"            => %w(lib ext bin ext/json/ext),
         "activerecord-2.3.2"    => %w(lib),
         "actionmailer-2.3.2"    => %w(lib),
@@ -69,6 +72,43 @@ describe "Bundler::Environment" do
         "rails-2.3.2"           => %w(lib),
         "rake-0.8.7"            => %w(lib)
       )
+    end
+
+    it "removes any .gemspec files in specifications that are not to be installed" do
+      spec = tmp_file("specifications", "omg.gemspec")
+      FileUtils.mkdir_p(tmp_file("specifications"))
+      FileUtils.touch(spec)
+      @environment.install
+      File.exist?(spec).should be_false
+    end
+
+    it "removes any stray directories in gems that are not to be installed" do
+      dir = tmp_file("gems", "omg")
+      FileUtils.mkdir_p(dir)
+      @environment.install
+      File.exist?(dir).should be_false
+    end
+
+    it "does not modify any .gemspec files that are to be installed if a directory of the same name exists" do
+      dir = tmp_file("gems", "rails-2.3.2")
+      FileUtils.mkdir_p(dir)
+      FileUtils.mkdir_p(tmp_file("specifications"))
+      spec = tmp_file("specifications", "rails-2.3.2.gemspec")
+      FileUtils.touch(spec)
+      lambda { @environment.install }.should_not change { [File.mtime(dir), File.mtime(spec)] }
+    end
+
+    it "deletes a .gemspec file that is to be installed if a directory of the same name does not exist" do
+      spec = tmp_file("specifications", "rails-2.3.2.gemspec")
+      FileUtils.mkdir_p(tmp_file("specifications"))
+      FileUtils.touch(spec)
+      lambda { @environment.install }.should change { File.mtime(spec) }
+    end
+
+    it "deletes a directory that is to be installed if a .gemspec of the same name does not exist" do
+      dir = tmp_file("gems", "rails-2.3.2")
+      FileUtils.mkdir_p(dir)
+      lambda { @environment.install }.should change { File.mtime(dir) }
     end
   end
 end
