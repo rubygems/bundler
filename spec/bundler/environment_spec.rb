@@ -46,4 +46,12 @@ describe "Bundler::Environment" do
       File.exist?(File.join(tmp_dir, 'bin', 'rails')).should be_true
     end
   end
+
+  describe "installing with non-standard bin directory" do
+    it "installs the bins in the directory you specify" do
+      @environment = Bundler::Environment.new(tmp_dir)
+      @environment.install(tmp_dir)
+      File.exist?(File.join(tmp_dir, 'rails')).should be_true
+    end
+  end
 end
