@@ -8,6 +8,18 @@ module Bundler
       end
 
       @path = path
+      @gems = Dir[(File.join(path, "cache", "*.gem"))]
+    end
+
+    def install(bin_dir = File.join(@path, "bin"))
+      @gems.each do |gem|
+        installer = Gem::Installer.new(gem, :install_dir => @path,
+          :ignore_dependencies => true,
+          :env_shebang => true,
+          :wrappers => true,
+          :bin_dir => bin_dir)
+        installer.install
+      end
     end
   end
 end

@@ -1,6 +1,8 @@
 module Bundler
   class GemBundle < Array
     def download(directory)
+      FileUtils.mkdir_p(directory)
+
       current = Dir[File.join(directory, "cache", "*.gem*")]
 
       each do |spec|

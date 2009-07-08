@@ -1,4 +1,5 @@
 require "rubygems/remote_fetcher"
+require "rubygems/installer"
 require "bundler/finder"
 require "bundler/environment"
 require "bundler/gem_specification"
