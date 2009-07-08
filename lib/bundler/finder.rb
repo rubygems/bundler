@@ -23,6 +23,7 @@ module Bundler
 
     def append(index, source)
       index.gems.values.each do |spec|
+        next unless Gem::Platform.match(spec.platform)
         spec.source = source
         @index[spec.name][spec.version] ||= spec
       end

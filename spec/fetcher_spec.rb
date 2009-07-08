@@ -26,6 +26,21 @@ describe "Fetcher" do
     @finder.search(Gem::Dependency.new("merb-core", ">= 0")).size.should == 2
   end
 
+  it "does not include gems that don't match the current platform" do
+    begin
+      Gem.platforms = [Gem::Platform::RUBY]
+      finder = Bundler::Finder.new(@source)
+      finder.search(build_dep("do_sqlite3", "> 0")).should only_have_specs("do_sqlite3-0.9.11")
+
+      # Try out windows
+      Gem.platforms = [Gem::Platform.new("mswin32_60")]
+      finder = Bundler::Finder.new(@source)
+      finder.search(build_dep("do_sqlite3", "> 0")).should only_have_specs("do_sqlite3-0.9.12-x86-mswin32-60")
+    ensure
+      Gem.platforms = nil
+    end
+  end
+
   describe "resolving rails" do
     before(:each) do
       @bundle = @finder.resolve(build_dep('rails', '>= 0'))

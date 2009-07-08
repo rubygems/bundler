@@ -24,6 +24,16 @@ module Spec
         end
       end
     end
+
+    def only_have_specs(*names)
+      simple_matcher("only have spec") do |given, matcher|
+        given_names = given.map{ |s| s.full_name }
+        matcher.failure_message = "expected specs to only contain #{names.inspect} but got: #{given_names.inspect}"
+        names.sort == given_names.sort
+      end
+    end
+
+    alias only_have_spec only_have_specs
   end
 
   module Helpers
