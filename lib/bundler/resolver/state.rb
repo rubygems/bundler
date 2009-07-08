@@ -1,7 +1,7 @@
 module Bundler
   module Resolver
     class State
-      include Search::Node
+      include Search::Node, Inspect
 
       def initialize(depth, engine, path, spec_stack, dep_stack)
         super(depth)
@@ -125,22 +125,22 @@ module Bundler
         logger.add level, "path: #{@path.inspect}"
         logger.add level, "deps: (#{deps.size})"
         deps.map do |dep|
-          logger.add level, dep.gem_resolver_inspect
+          logger.add level, gem_resolver_inspect(dep)
         end
         logger.add level, "remaining_deps: (#{remaining_deps.size})"
         remaining_deps.each do |dep|
-          logger.add level, dep.gem_resolver_inspect
+          logger.add level, gem_resolver_inspect(dep)
         end
         logger.add level, "dep_stack: "
         @dep_stack.each do |path,deps|
           logger.add level, "#{path.inspect} (#{deps.size})"
           deps.each do |dep|
-            logger.add level, "-> #{dep.gem_resolver_inspect}"
+            logger.add level, "-> #{gem_resolver_inspect(dep)}"
           end
         end
         logger.add level, "spec_stack: "
         @spec_stack.each do |path,spec|
-          logger.add level, "#{path.inspect}: #{spec.gem_resolver_inspect}"
+          logger.add level, "#{path.inspect}: #{gem_resolver_inspect(spec)}"
         end
         logger.add level, "^" * 80
       end

@@ -2,8 +2,8 @@ require File.join(File.dirname(__FILE__), "/../spec_helper")
 
 describe "Fetcher" do
   before(:each) do
-    @source = URI.parse("file://#{fixtures1}")
-    @other  = URI.parse("file://#{fixtures2}")
+    @source = URI.parse("file://#{gem_repo1}")
+    @other  = URI.parse("file://#{gem_repo2}")
     @finder = Bundler::Finder.new(@source, @other)
   end
 

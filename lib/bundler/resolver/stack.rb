@@ -65,7 +65,7 @@ module Bundler
       end
 
       def gem_resolver_inspect
-        @data.gem_resolver_inspect
+        Inspect.gem_resolver_inspect(@data)
       end
     end
   end

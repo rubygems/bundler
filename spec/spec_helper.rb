@@ -20,11 +20,11 @@ module Spec
       File.join(tmp_dir, 'cache', "#{gem_name}.gem")
     end
 
-    def fixtures1
+    def gem_repo1
       this_file.join("fixtures", "repository1").expand_path
     end
 
-    def fixtures2
+    def gem_repo2
       this_file.join("fixtures", "repository2").expand_path
     end
 

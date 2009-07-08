@@ -42,7 +42,7 @@ Spec::Matchers.create :match_gems do |expected|
 
     actual.each do |spec|
       unless spec.is_a?(Gem::Specification)
-        @_messages << "#{spec.gem_resolver_inspect} was expected to be a Gem::Specification, but got #{spec.class}"
+        @_messages << "#{gem_resolver_inspect(spec)} was expected to be a Gem::Specification, but got #{spec.class}"
         next
       end
       @dump[spec.name.to_s] ||= []
@@ -50,7 +50,7 @@ Spec::Matchers.create :match_gems do |expected|
     end
 
     if @_messages.any?
-      @_messages.unshift "The gems #{actual.gem_resolver_inspect} were not structured as expected"
+      @_messages.unshift "The gems #{gem_resolver_inspect(actual)} were not structured as expected"
       next false
     end
 

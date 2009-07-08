@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe "Bundler::Environment" do
   before(:all) do
     FileUtils.rm_rf(tmp_dir)
-    @finder = Bundler::Finder.new("file://#{fixtures1}", "file://#{fixtures2}")
+    @finder = Bundler::Finder.new("file://#{gem_repo1}", "file://#{gem_repo2}")
     @bundle = @finder.resolve(build_dep('rails', '>= 0'), build_dep('json', '>= 0'))
     @bundle.download(tmp_dir)
   end
@@ -17,7 +17,7 @@ describe "Bundler::Environment" do
   end
 
   it "raises an ArgumentError if the path does not contain a 'cache' directory" do
-    lambda { Bundler::Environment.new(fixtures1) }.should raise_error(ArgumentError)
+    lambda { Bundler::Environment.new(gem_repo1) }.should raise_error(ArgumentError)
   end
 
   describe "installing" do

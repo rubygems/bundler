@@ -1,6 +1,6 @@
+require 'bundler/resolver/inspect'
 require 'bundler/resolver/search'
 require 'bundler/resolver/engine'
-require 'bundler/resolver/inspects'
 require 'bundler/resolver/stack'
 require 'bundler/resolver/state'
 

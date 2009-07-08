@@ -4,7 +4,7 @@ module Bundler
     end
 
     class Engine
-      include Search
+      include Search, Inspect
 
       def self.resolve(deps, source_index, logger)
         new(deps, source_index, logger).resolve
@@ -12,7 +12,7 @@ module Bundler
 
       def initialize(deps, source_index, logger)
         @deps, @source_index, @logger = deps, source_index, logger
-        logger.debug "searching for #{@deps.gem_resolver_inspect}"
+        logger.debug "searching for #{gem_resolver_inspect(@deps)}"
       end
       attr_reader :deps, :source_index, :logger, :solution
 
