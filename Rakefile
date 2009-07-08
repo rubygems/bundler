@@ -11,15 +11,15 @@ spec = Gem::Specification.new do |s|
   s.email = "Your Email"
   s.homepage = "http://example.com"
   s.description = s.summary = "A gem that provides..."
-  
+
   s.platform = Gem::Platform::RUBY
   s.has_rdoc = true
   s.extra_rdoc_files = ["README", "LICENSE", 'TODO']
   s.summary = ""
-  
+
   # Uncomment this to add a dependency
   # s.add_dependency "foo"
-  
+
   s.require_path = 'lib'
   s.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,spec}/**/*")
 end

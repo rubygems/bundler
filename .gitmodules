@@ -1,3 +1,0 @@
-[submodule "gem_resolver"]
-	path = gem_resolver
-	url = git@github.com:halorgium/gem_resolver.git

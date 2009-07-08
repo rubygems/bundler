@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "Gem::Specification" do
 
@@ -11,7 +11,7 @@ describe "Gem::Specification" do
 
     spec.source.should == URI.parse("http://gems.rubyforge.org")
   end
-  
+
   it "does not consider two gem specs with different sources to be the same" do
     spec1 = Gem::Specification.new do |s|
       s.name    = 'greeter'
@@ -24,7 +24,7 @@ describe "Gem::Specification" do
 
     spec1.should_not == spec2
   end
-  
+
   it "can set a source that is already a URI" do
     source = URI.parse("http://foo")
     spec   = Gem::Specification.new

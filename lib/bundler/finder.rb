@@ -8,7 +8,7 @@ module Bundler
     end
 
     def resolve(*dependencies)
-      resolved = GemResolver.resolve(dependencies, self)
+      resolved = Resolver.resolve(dependencies, self)
       resolved && GemBundle.new(resolved.all_specs)
     end
 

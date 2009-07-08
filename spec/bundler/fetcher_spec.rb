@@ -1,9 +1,9 @@
-require File.join(File.dirname(__FILE__), "spec_helper")
+require File.join(File.dirname(__FILE__), "/../spec_helper")
 
 describe "Fetcher" do
   before(:each) do
-    @source = URI.parse("file://#{File.expand_path(File.dirname(__FILE__))}/fixtures")
-    @other  = URI.parse("file://#{File.expand_path(File.dirname(__FILE__))}/fixtures2")
+    @source = URI.parse("file://#{fixtures1}")
+    @other  = URI.parse("file://#{fixtures2}")
     @finder = Bundler::Finder.new(@source, @other)
   end
 

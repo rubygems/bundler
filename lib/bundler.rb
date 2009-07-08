@@ -1,8 +1,15 @@
+require 'logger'
+require 'set'
+# Required elements of rubygems
 require "rubygems/remote_fetcher"
 require "rubygems/installer"
-require "bundler/gem_bundle"
-require "bundler/finder"
-require "bundler/environment"
-require "bundler/gem_specification"
 
-require File.expand_path(File.join(File.dirname(__FILE__), "..", "gem_resolver", "lib", "gem_resolver"))
+require "bundler/gem_bundle"
+require "bundler/environment"
+require "bundler/finder"
+require "bundler/gem_specification"
+require "bundler/resolver"
+
+module Bundler
+  VERSION = "0.0.1"
+end
