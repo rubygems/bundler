@@ -21,5 +21,17 @@ module Bundler
         installer.install
       end
     end
+
+    def load_paths
+      index = Gem::SourceIndex.from_gems_in(File.join(@path, "specifications"))
+      load_paths = []
+      index.each do |name, spec|
+        spec.require_paths.each do |path|
+          load_paths << File.join(spec.full_gem_path, path)
+        end
+        load_paths << File.join(spec.full_gem_path, spec.bindir) if spec.bindir
+      end
+      load_paths
+    end
   end
 end

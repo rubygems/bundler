@@ -47,11 +47,28 @@ describe "Bundler::Environment" do
     end
   end
 
-  describe "installing with non-standard bin directory" do
-    it "installs the bins in the directory you specify" do
+  describe "installing with non-standard settings" do
+    before(:each) do
       @environment = Bundler::Environment.new(tmp_dir)
+    end
+
+    it "installs the bins in the directory you specify" do
       @environment.install(tmp_dir)
       File.exist?(File.join(tmp_dir, 'rails')).should be_true
+    end
+
+    it "dumps an environment to a specified file" do
+      @environment.install
+      @environment.should have_load_paths(tmp_dir,
+        "json-1.1.6"            => %w(lib ext bin ext/json/ext),
+        "activerecord-2.3.2"    => %w(lib),
+        "actionmailer-2.3.2"    => %w(lib),
+        "actionpack-2.3.2"      => %w(lib),
+        "activeresource-2.3.2"  => %w(lib),
+        "activesupport-2.3.2"   => %w(lib),
+        "rails-2.3.2"           => %w(lib),
+        "rake-0.8.7"            => %w(lib)
+      )
     end
   end
 end

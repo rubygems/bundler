@@ -27,6 +27,20 @@ module Spec
     end
 
     alias only_have_spec only_have_specs
+
+    def have_load_paths(root, gem_load_paths)
+      flattened_paths = []
+      gem_load_paths.each do |gem_name, paths|
+        paths.each { |path| flattened_paths << File.join(root, "gems", gem_name, path) }
+      end
+
+      simple_matcher("have load paths") do |given, matcher|
+        flattened_paths.all? do |path|
+          matcher.failure_message = "expected environment load paths to contain '#{path}', but it was:\n  #{given.load_paths.join("\n  ")}"
+          given.load_paths.include?(path)
+        end
+      end
+    end
   end
 end
 

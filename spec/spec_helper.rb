@@ -16,6 +16,10 @@ module Spec
       this_file.join("fixtures", "tmp")
     end
 
+    def tmp_file(*path)
+      tmp_dir.join(*path)
+    end
+
     def cached(gem_name)
       File.join(tmp_dir, 'cache', "#{gem_name}.gem")
     end
