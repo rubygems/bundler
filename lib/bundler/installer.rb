@@ -1,5 +1,5 @@
 module Bundler
-  class Environment
+  class Installer
     def initialize(path)
       if !File.directory?(path)
         raise ArgumentError, "#{path} is not a directory"

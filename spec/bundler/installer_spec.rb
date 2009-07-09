@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-describe "Bundler::Environment" do
+describe "Bundler::Installer" do
 
   before(:all) do
     @finder = Bundler::Finder.new("file://#{gem_repo1}", "file://#{gem_repo2}")
@@ -14,11 +14,11 @@ describe "Bundler::Environment" do
     end
 
     it "raises an ArgumentError if the path does not exist" do
-      lambda { Bundler::Environment.new(tmp_dir.join("omgomgbadpath")) }.should raise_error(ArgumentError)
+      lambda { Bundler::Installer.new(tmp_dir.join("omgomgbadpath")) }.should raise_error(ArgumentError)
     end
 
     it "raises an ArgumentError if the path does not contain a 'cache' directory" do
-      lambda { Bundler::Environment.new(gem_repo1) }.should raise_error(ArgumentError)
+      lambda { Bundler::Installer.new(gem_repo1) }.should raise_error(ArgumentError)
     end
 
     describe "installing gems" do
@@ -26,7 +26,7 @@ describe "Bundler::Environment" do
       before(:each) do
         FileUtils.rm_rf(tmp_file("gems"))
         FileUtils.rm_rf(tmp_file("specifications"))
-        @environment = Bundler::Environment.new(tmp_dir)
+        @environment = Bundler::Installer.new(tmp_dir)
       end
 
       it "installs the bins in the directory you specify" do
@@ -90,7 +90,7 @@ describe "Bundler::Environment" do
     describe "after installing gems" do
 
       before(:all) do
-        @environment = Bundler::Environment.new(tmp_dir)
+        @environment = Bundler::Installer.new(tmp_dir)
         @environment.install
       end
 
@@ -118,7 +118,7 @@ describe "Bundler::Environment" do
       FileUtils.rm_rf(tmp_dir)
       @bundle = @finder.resolve(build_dep('json', '>= 0'))
       @bundle.download(tmp_dir)
-      Bundler::Environment.new(tmp_dir).install
+      Bundler::Installer.new(tmp_dir).install
       Dir[File.join(tmp_dir, 'gems', "json-*", "**", "*.bundle")].should have_at_least(1).item
     end
 
