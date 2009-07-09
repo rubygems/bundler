@@ -9,7 +9,9 @@ require "bundler/installer"
 require "bundler/finder"
 require "bundler/gem_specification"
 require "bundler/resolver"
+require "bundler/manifest"
+require "bundler/dependency"
 
 module Bundler
-  VERSION = "0.0.1"
+  VERSION = "0.5.0"
 end
