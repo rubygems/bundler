@@ -13,7 +13,7 @@ module Bundler
       return if all_gems_installed?
 
       finder = Finder.new(*sources)
-      unless bundle = finder.resolve(*dependencies)
+      unless bundle = finder.resolve(*gem_dependencies)
         gems = @dependencies.map {|d| "  #{d.to_s}" }.join("\n")
         raise VersionConflict, "No compatible versions could be found for:\n#{gems}"
       end
@@ -28,6 +28,11 @@ module Bundler
     end
 
   private
+  
+    def gem_dependencies
+      @gem_dependencies ||= dependencies.map { |d| d.to_gem_dependency }
+    end
+    
     def all_gems_installed?
       gem_versions = {}
 
@@ -37,7 +42,7 @@ module Bundler
         gem_versions[name] = Gem::Version.new(version)
       end
 
-      ret = @dependencies.all? do |dep|
+      ret = gem_dependencies.all? do |dep|
         dep.version_requirements.satisfied_by?(gem_versions[dep.name])
       end
     end

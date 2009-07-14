@@ -13,6 +13,14 @@ module Bundler
       @require_as   = [ options["require_as"] || name ].flatten
       @environments = [ options["environments"] ].flatten.compact
     end
+    
+    def to_s
+      to_gem_dependency.to_s
+    end
+    
+    def to_gem_dependency
+      @gem_dep ||= Gem::Dependency.new(name, version)
+    end
 
   end
 end

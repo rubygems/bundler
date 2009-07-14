@@ -2,15 +2,15 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "Bundler::Manifest" do
 
-  def dep(name, options = {})
-    Bundler::Dependency.new(name, options)
+  def dep(name, version)
+    Bundler::Dependency.new(name, :version => version)
   end
 
   before(:each) do
     @sources = %W(file://#{gem_repo1} file://#{gem_repo2})
     @deps = []
-    @deps << build_dep("rails", "2.3.2")
-    @deps << build_dep("rack", "0.9.1")
+    @deps << dep("rails", "2.3.2")
+    @deps << dep("rack", "0.9.1")
 
     FileUtils.rm_rf(tmp_dir)
     FileUtils.mkdir_p(tmp_dir)
@@ -67,8 +67,8 @@ describe "Bundler::Manifest" do
     @manifest.install
 
     deps = []
-    deps << build_dep("rails", "2.3.2")
-    deps << build_dep("rack", "1.0.0")
+    deps << dep("rails", "2.3.2")
+    deps << dep("rack", "1.0.0")
 
     manifest = Bundler::Manifest.new(@sources,deps, tmp_dir)
     manifest.install
@@ -83,7 +83,7 @@ describe "Bundler::Manifest" do
   end
 
   it "raises a friendly exception if the manifest doesn't resolve" do
-    @manifest.dependencies << build_dep("active_support", "2.0")
+    @manifest.dependencies << dep("active_support", "2.0")
 
     lambda { @manifest.install }.should raise_error(Bundler::VersionConflict,
       /rails \(= 2\.3\.2.*rack \(= 0\.9\.1.*active_support \(= 2\.0/m)
