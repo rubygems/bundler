@@ -1,3 +1,6 @@
+require "rubygems/source_index"
+require "pathname"
+
 module Bundler
   class VersionConflict < StandardError; end
 
@@ -6,7 +9,7 @@ module Bundler
 
     def initialize(sources, dependencies, path)
       sources.map! {|s| s.is_a?(URI) ? s : URI.parse(s) }
-      @sources, @dependencies, @path = sources, dependencies, path
+      @sources, @dependencies, @path = sources, dependencies, Pathname.new(path)
     end
 
     def fetch
@@ -27,12 +30,26 @@ module Bundler
       installer.install  # options come here
     end
 
+    def activate
+      index = Gem::SourceIndex.from_gems_in(@path.join("specifications"))
+      index.each do |name, spec|
+        $:.unshift File.join(spec.full_gem_path, spec.bindir)
+        spec.require_paths.each {|p| $:.unshift File.join(spec.full_gem_path, p) }
+      end
+    end
+
+    def require_all
+      dependencies.each do |dep|
+        dep.require_as.each {|file| require file }
+      end
+    end
+
   private
-  
+
     def gem_dependencies
       @gem_dependencies ||= dependencies.map { |d| d.to_gem_dependency }
     end
-    
+
     def all_gems_installed?
       gem_versions = {}
 

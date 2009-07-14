@@ -17,6 +17,12 @@ describe "Bundler::Manifest" do
     @manifest = Bundler::Manifest.new(@sources, @deps, tmp_dir)
   end
 
+  after(:each) do
+    Object.send(:remove_const, :VerySimpleForTests) if defined?(VerySimpleForTests)
+    $:.delete_if {|p| p =~ /very-simple/ }
+    $".delete("very-simple.rb")
+  end
+
   it "has a list of sources and dependencies" do
     @manifest.sources.should == @sources
     @manifest.dependencies.should == @deps
@@ -87,6 +93,31 @@ describe "Bundler::Manifest" do
 
     lambda { @manifest.install }.should raise_error(Bundler::VersionConflict,
       /rails \(= 2\.3\.2.*rack \(= 0\.9\.1.*active_support \(= 2\.0/m)
+  end
+
+  describe "runtime" do
+    it "makes gems available via Manifest#activate" do
+      manifest = Bundler::Manifest.new(@sources, [dep("very-simple", "1.0.0")], tmp_dir)
+      manifest.install
+
+      manifest.activate
+      $:.any? do |p|
+        File.expand_path(p) == File.expand_path(tmp_file("gems", "very-simple-1.0", "lib"))
+      end.should be_true
+    end
+
+    it "makes gems available" do
+      manifest = Bundler::Manifest.new(@sources, [dep("very-simple", "1.0.0")], tmp_dir)
+      manifest.install
+
+      manifest.activate
+      manifest.require_all
+
+      $".any? do |f|
+        File.expand_path(f) ==
+          File.expand_path(tmp_file("gems", "very-simple-1.0", "lib", "very-simple.rb"))
+      end
+    end
   end
 
 end
