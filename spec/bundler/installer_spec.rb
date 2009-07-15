@@ -35,9 +35,9 @@ describe "Bundler::Installer" do
       end
 
       it "creates a ruby file with the load paths at the desired location" do
-        @environment.install(:environment_file => tmp_file('awesome_env.rb'))
+        @environment.install
 
-        tmp_file('awesome_env.rb').should have_load_paths(tmp_dir,
+        tmp_file('all_load_paths.rb').should have_load_paths(tmp_dir,
           "activerecord-2.3.2"    => %w(lib),
           "actionmailer-2.3.2"    => %w(lib),
           "actionpack-2.3.2"      => %w(lib),

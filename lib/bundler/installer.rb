@@ -40,9 +40,7 @@ module Bundler
         FileUtils.rm_rf(path)
       end
 
-      if file = options[:environment_file]
-        create_load_paths_file(file)
-      end
+      create_load_paths_file(File.join(@path, "all_load_paths.rb"))
     end
 
   private
@@ -50,7 +48,7 @@ module Bundler
     def create_load_paths_file(file)
       File.open(file, "w") do |file|
         load_paths.each do |path|
-          file.puts "$LOAD_PATH << #{path.inspect}"
+          file.puts "$LOAD_PATH.unshift #{path.inspect}"
         end
       end
     end
@@ -59,10 +57,10 @@ module Bundler
       index = Gem::SourceIndex.from_gems_in(File.join(@path, "specifications"))
       load_paths = []
       index.each do |name, spec|
+        load_paths << File.join(spec.full_gem_path, spec.bindir) if spec.bindir
         spec.require_paths.each do |path|
           load_paths << File.join(spec.full_gem_path, path)
         end
-        load_paths << File.join(spec.full_gem_path, spec.bindir) if spec.bindir
       end
       load_paths
     end

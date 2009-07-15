@@ -38,23 +38,62 @@ describe "Bundler::Dependency" do
     b.require_as.should == ["action_controller", "action_view"]
   end
 
-  it "can take an :environments option" do
-    b = Bundler::Dependency.new("ruby-debug", :environments => "development")
-    b.environments.should == ["development"]
+  # it "can take an :only option" do
+  #   b = Bundler::Dependency.new("ruby-debug", :only => "development")
+  #   b.environments.should == ["development"]
+  # end
+  #
+  # it "can take an :except option" do
+  #   b = Bundler::Dependency.new("ruby-debug", :except => "production")
+  # end
+  #
+  # it "can take an array as the :environments option" do
+  #   b = Bundler::Dependency.new("ruby-debug", :environments => ["development", "test"])
+  #   b.environments.should == ["development", "test"]
+  # end
+  #
+  # it "defaults the :environments option to []" do
+  #   b = Bundler::Dependency.new("rails")
+  #   b.environments.should == []
+  # end
+
+  it "tests whether a dependency is for a specific environment (with :only)" do
+    b = Bundler::Dependency.new("ruby-debug", :only => "development")
+    b.should be_in("development")
+    b.should be_in(:development)
+
+    b.should_not be_in("production")
+    b.should_not be_in(:production)
   end
 
-  it "can take an 'environments' option" do
-    b = Bundler::Dependency.new("ruby-debug", "environments" => "development")
-    b.environments.should == ["development"]
+  it "tests whether a dependency is for a specific environment (with :only => Array)" do
+    b = Bundler::Dependency.new("ruby-debug", :only => ["staging", :production])
+    b.should be_in("staging")
+    b.should be_in(:staging)
+    b.should be_in("production")
+    b.should be_in(:production)
+
+    b.should_not be_in("development")
+    b.should_not be_in(:development)
   end
 
-  it "can take an array as the :environments option" do
-    b = Bundler::Dependency.new("ruby-debug", :environments => ["development", "test"])
-    b.environments.should == ["development", "test"]
+  it "tests whether a dependency is for a specific environment (with :except)" do
+    b = Bundler::Dependency.new("ruby-debug", :except => "development")
+    b.should_not be_in("development")
+    b.should_not be_in(:development)
+
+    b.should be_in("production")
+    b.should be_in(:production)
   end
 
-  it "defaults the :environments option to []" do
-    b = Bundler::Dependency.new("rails")
-    b.environments.should == []
+  it "tests whether a dependency is for a specific environment (with :except => Array)" do
+    b = Bundler::Dependency.new("ruby-debug", :except => ["staging", :production])
+    b.should_not be_in("staging")
+    b.should_not be_in(:staging)
+    b.should_not be_in("production")
+    b.should_not be_in(:production)
+
+    b.should be_in("development")
+    b.should be_in(:development)
   end
 end

@@ -43,6 +43,29 @@ module Spec
         end
       end
     end
+
+    def have_cached_gems(*gems)
+      simple_matcher("have cached gems") do |given, matcher|
+        gems.all? do |name|
+          matcher.failure_message = "Gem #{name} was not cached"
+          File.exists?(File.join(given, "cache", "#{name}.gem"))
+        end
+      end
+    end
+
+    alias have_cached_gem have_cached_gems
+
+    def have_installed_gems(*gems)
+      simple_matcher("have installed gems") do |given, matcher|
+        gems.all? do |name|
+          matcher.failure_message = "Gem #{name} was not installed"
+          File.exists?(File.join(given, "specifications", "#{name}.gemspec")) &&
+          File.directory?(File.join(given, "gems", "#{name}"))
+        end
+      end
+    end
+
+    alias have_installed_gem have_installed_gems
   end
 end
 

@@ -31,17 +31,25 @@ module Bundler
     end
 
     def activate
-      index = Gem::SourceIndex.from_gems_in(@path.join("specifications"))
-      index.each do |name, spec|
-        $:.unshift File.join(spec.full_gem_path, spec.bindir)
-        spec.require_paths.each {|p| $:.unshift File.join(spec.full_gem_path, p) }
-      end
+      require File.join(@path, "all_load_paths")
     end
 
     def require_all
       dependencies.each do |dep|
         dep.require_as.each {|file| require file }
       end
+    end
+
+    def gems_for(environment)
+      deps     = dependencies.select { |d| d.in?(environment) }
+      deps.map! { |d| d.to_gem_dependency }
+      index    = Gem::SourceIndex.from_gems_in(File.join(@path, "specifications"))
+      Resolver.resolve(deps, index).all_specs
+    end
+
+    def environments
+      envs = dependencies.map {|dep| Array(dep.only) + Array(dep.except) }.flatten
+      envs << "minimal"
     end
 
   private
