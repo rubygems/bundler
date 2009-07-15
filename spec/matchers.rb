@@ -69,7 +69,7 @@ module Spec
   end
 end
 
-Spec::Matchers.create :match_gems do |expected|
+Spec::Matchers.define :match_gems do |expected|
   match do |actual|
     @_messages = []
     @dump = {}
@@ -105,34 +105,5 @@ Spec::Matchers.create :match_gems do |expected|
 
   failure_message_for_should do |actual|
     @_messages.join("\n")
-  end
-end
-
-Spec::Matchers.create :have_no_tab_characters do
-  match do |filename|
-    @failing_lines = []
-    File.readlines(filename).each_with_index do |line,number|
-      @failing_lines << number + 1 if line =~ /\t/
-    end
-    @failing_lines.empty?
-  end
-
-  failure_message_for_should do |filename|
-    "The file #{filename} has tab characters on lines #{@failing_lines.join(', ')}"
-  end
-end
-
-Spec::Matchers.create :have_no_extraneous_spaces do
-  match do |filename|
-    @failing_lines = []
-    File.readlines(filename).each_with_index do |line,number|
-      next if line =~ /^\s+#.*\s+\n$/
-      @failing_lines << number + 1 if line =~ /\s+\n$/
-    end
-    @failing_lines.empty?
-  end
-
-  failure_message_for_should do |filename|
-    "The file #{filename} has spaces on the EOL on lines #{@failing_lines.join(', ')}"
   end
 end
