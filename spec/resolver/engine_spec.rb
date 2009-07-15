@@ -85,7 +85,7 @@ describe "Resolving specs" do
   end
 
   it "supports merb-core" do
-    index = Gem.source_index
+    index = Gem::SourceIndex.from_gems_in(gem_repo3.join("specifications"))
 
     deps = [
       build_dep("merb-core", "= 1.0.7.1"),

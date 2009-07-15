@@ -32,6 +32,10 @@ module Spec
       this_file.join("fixtures", "repository2").expand_path
     end
 
+    def gem_repo3
+      this_file.join("fixtures", "repository3").expand_path
+    end
+
     def fixture(gem_name)
       this_file.join("fixtures", "repository1", "gems", "#{gem_name}.gem")
     end
