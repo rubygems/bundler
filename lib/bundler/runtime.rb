@@ -25,7 +25,7 @@ module Bundler
       options = args.last.is_a?(Hash) ? args.pop : {}
       version = args.last
 
-      @dependencies << Dependency.new(name, :version => version)
+      @dependencies << Dependency.new(name, options.merge(:version => version))
     end
 
   end
