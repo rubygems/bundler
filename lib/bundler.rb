@@ -11,6 +11,7 @@ require "bundler/gem_specification"
 require "bundler/resolver"
 require "bundler/manifest"
 require "bundler/dependency"
+require "bundler/runtime"
 
 module Bundler
   VERSION = "0.5.0"

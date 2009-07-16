@@ -5,7 +5,7 @@ module Bundler
   class VersionConflict < StandardError; end
 
   class Manifest
-    attr_reader :sources, :dependencies
+    attr_reader :sources, :dependencies, :path
 
     def initialize(sources, dependencies, path)
       sources.map! {|s| s.is_a?(URI) ? s : URI.parse(s) }
