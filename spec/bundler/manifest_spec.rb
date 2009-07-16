@@ -105,6 +105,8 @@ describe "Bundler::Manifest" do
 
   describe "environments" do
     before(:all) do
+      FileUtils.rm_rf(tmp_dir)
+      FileUtils.mkdir_p(tmp_dir)
       @manifest = Bundler::Manifest.new(@sources,
         [dep("very-simple", "1.0.0", :only => "testing"),
          dep("rack", "1.0.0")], tmp_dir)
@@ -113,7 +115,7 @@ describe "Bundler::Manifest" do
     end
 
     it "can provide a list of environments" do
-      @manifest.environments.should == ["testing", "minimal"]
+      @manifest.environments.should == ["testing", "default"]
     end
 
     it "knows what gems are in an environment" do
@@ -122,6 +124,19 @@ describe "Bundler::Manifest" do
 
       @manifest.gems_for("production").should match_gems(
         "rack" => ["1.0.0"])
+    end
+
+    it "can create load path files for each environment" do
+      tmp_file('environments', 'testing.rb').should have_load_paths(tmp_dir,
+        "very-simple-1.0" => %w(bin lib),
+        "rack-1.0.0"      => %w(bin lib)
+      )
+
+      tmp_file('environments', 'default.rb').should have_load_paths(tmp_dir,
+        "rack-1.0.0" => %w(bin lib)
+      )
+
+      File.exist?(tmp_file('environments', "production.rb")).should be_false
     end
   end
 end

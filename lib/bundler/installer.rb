@@ -39,30 +39,6 @@ module Bundler
       (specs + gems).each do |path|
         FileUtils.rm_rf(path)
       end
-
-      create_load_paths_file(File.join(@path, "all_load_paths.rb"))
-    end
-
-  private
-
-    def create_load_paths_file(file)
-      File.open(file, "w") do |file|
-        load_paths.each do |path|
-          file.puts "$LOAD_PATH.unshift #{path.inspect}"
-        end
-      end
-    end
-
-    def load_paths
-      index = Gem::SourceIndex.from_gems_in(File.join(@path, "specifications"))
-      load_paths = []
-      index.each do |name, spec|
-        load_paths << File.join(spec.full_gem_path, spec.bindir) if spec.bindir
-        spec.require_paths.each do |path|
-          load_paths << File.join(spec.full_gem_path, path)
-        end
-      end
-      load_paths
     end
   end
 end

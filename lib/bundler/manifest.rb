@@ -24,14 +24,15 @@ module Bundler
       bundle.download(@path)
     end
 
-    def install
+    def install(options = {})
       fetch
       installer = Installer.new(@path)
-      installer.install  # options come here
+      installer.install # options come here
+      create_load_paths_files(File.join(@path, "environments"))
     end
 
-    def activate
-      require File.join(@path, "all_load_paths")
+    def activate(environment = "default")
+      require File.join(@path, "environments", "#{environment}.rb")
     end
 
     def require_all
@@ -49,7 +50,7 @@ module Bundler
 
     def environments
       envs = dependencies.map {|dep| Array(dep.only) + Array(dep.except) }.flatten
-      envs << "minimal"
+      envs << "default"
     end
 
   private
@@ -70,6 +71,29 @@ module Bundler
       ret = gem_dependencies.all? do |dep|
         dep.version_requirements.satisfied_by?(gem_versions[dep.name])
       end
+    end
+
+    def create_load_paths_files(path)
+      FileUtils.mkdir_p(path)
+      environments.each do |environment|
+        gem_specs = gems_for(environment)
+        File.open(File.join(path, "#{environment}.rb"), "w") do |file|
+          load_paths_for_specs(gem_specs).each do |load_path|
+            file.puts "$LOAD_PATH.unshift #{load_path.inspect}"
+          end
+        end
+      end
+    end
+
+    def load_paths_for_specs(specs)
+      load_paths = []
+      specs.each do |spec|
+        load_paths << File.join(spec.full_gem_path, spec.bindir) if spec.bindir
+        spec.require_paths.each do |path|
+          load_paths << File.join(spec.full_gem_path, path)
+        end
+      end
+      load_paths
     end
   end
 end

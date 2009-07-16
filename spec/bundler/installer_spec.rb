@@ -34,20 +34,6 @@ describe "Bundler::Installer" do
         File.exist?(File.join(tmp_dir, 'rails')).should be_true
       end
 
-      it "creates a ruby file with the load paths at the desired location" do
-        @environment.install
-
-        tmp_file('all_load_paths.rb').should have_load_paths(tmp_dir,
-          "activerecord-2.3.2"    => %w(lib),
-          "actionmailer-2.3.2"    => %w(lib),
-          "actionpack-2.3.2"      => %w(lib),
-          "activeresource-2.3.2"  => %w(lib),
-          "activesupport-2.3.2"   => %w(lib),
-          "rails-2.3.2"           => %w(lib),
-          "rake-0.8.7"            => %w(lib)
-        )
-      end
-
       it "removes any .gemspec files in specifications that are not to be installed" do
         spec = tmp_file("specifications", "omg.gemspec")
         FileUtils.mkdir_p(tmp_file("specifications"))
