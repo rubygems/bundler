@@ -7,6 +7,11 @@ module Bundler
       builder.to_manifest
     end
 
+    def self.load(path, file)
+      string = File.read(file)
+      build(path, string)
+    end
+
     def initialize(path)
       @path         = path
       @sources      = %w(http://gems.rubyforge.org)

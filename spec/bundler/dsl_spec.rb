@@ -64,6 +64,17 @@ describe "Bundling DSL" do
     manifest.dependencies.first.except.should == ["staging"]
   end
 
+  it "loads the manifest from a file" do
+    File.open(tmp_file("manifest.rb"), 'w') do |file|
+      file.puts <<-DSL
+        gem "rails"
+      DSL
+    end
+
+    manifest = Bundler::ManifestBuilder.load(tmp_dir, tmp_file("manifest.rb"))
+    manifest.dependencies.first.name.should == "rails"
+  end
+
   it "allows specifying an arbitrary number of sources and gems" do
     manifest = build_manifest <<-DSL
       gem "thor"

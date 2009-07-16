@@ -15,4 +15,9 @@ require "bundler/runtime"
 
 module Bundler
   VERSION = "0.5.0"
+
+  def self.run(options = {})
+    manifest = ManifestBuilder.load(options[:path], options[:manifest])
+    manifest.install
+  end
 end

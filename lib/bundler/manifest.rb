@@ -69,6 +69,7 @@ module Bundler
       end
 
       ret = gem_dependencies.all? do |dep|
+        # gem_versions[dep.name] &&
         dep.version_requirements.satisfied_by?(gem_versions[dep.name])
       end
     end

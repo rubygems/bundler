@@ -14,14 +14,16 @@ spec = Gem::Specification.new do |s|
 
   s.platform = Gem::Platform::RUBY
   s.has_rdoc = true
-  s.extra_rdoc_files = ["README", "LICENSE", 'TODO']
+  s.extra_rdoc_files = ["README", "LICENSE"]
   s.summary = ""
 
   # Uncomment this to add a dependency
   # s.add_dependency "foo"
 
+  s.bindir       = "bin"
+  s.executables  = %w( gem_bundler )
   s.require_path = 'lib'
-  s.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,spec}/**/*")
+  s.files = %w(LICENSE README Rakefile) + Dir.glob("{bin,lib,spec}/**/*")
 end
 
 task :default => :spec

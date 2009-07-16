@@ -79,6 +79,11 @@ describe "Bundler::Manifest" do
   end
 
   describe "runtime" do
+    before(:each) do
+      FileUtils.rm_rf(tmp_dir)
+      FileUtils.mkdir_p(tmp_dir)
+    end
+
     it "makes gems available via Manifest#activate" do
       manifest = Bundler::Manifest.new(@sources, [dep("very-simple", "1.0.0")], tmp_dir)
       manifest.install
