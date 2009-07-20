@@ -18,9 +18,9 @@ parser = OptionParser.new do |op|
 end
 parser.parse!
 
-options[:path] = ARGV.shift || File.join(Dir.pwd, "vendor", "gems")
+options[:path] = ARGV.shift || Bundler::CLI.default_path
 
-options[:manifest] ||= "Gemfile"
+options[:manifest] ||= Bundler::CLI.default_manifest
 
 unless File.exist?(options[:manifest])
   puts parser

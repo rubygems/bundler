@@ -39,4 +39,28 @@ describe "Bundler::CLI" do
     @cli.default_path.should == tmp_file("vendor", "gems").to_s
   end
 
+  it "works" do
+    File.open(tmp_file("Gemfile"), 'w') do |file|
+      file.puts <<-DSL
+        sources.clear
+        source "file://#{gem_repo1}"
+        gem "rake"
+      DSL
+    end
+
+    lib = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'lib'))
+    bin = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'bin', 'gem_bundler'))
+
+    Dir.chdir(tmp_dir) do
+      `#{Gem.ruby} -I #{lib} #{bin}`
+    end
+
+    tmp_file("vendor", "gems").should have_cached_gems("rake-0.8.7")
+    tmp_file("vendor", "gems").should have_installed_gems("rake-0.8.7")
+
+    tmp_file('vendor', 'gems', 'environments', 'default.rb').should have_load_paths(tmp_file("vendor", "gems"),
+      "rake-0.8.7" => %w(bin lib)
+    )
+  end
+
 end
