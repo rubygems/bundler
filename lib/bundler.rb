@@ -12,6 +12,7 @@ require "bundler/resolver"
 require "bundler/manifest"
 require "bundler/dependency"
 require "bundler/runtime"
+require "bundler/cli"
 
 module Bundler
   VERSION = "0.5.0"

@@ -1,6 +1,8 @@
 module Bundler
   class ManifestBuilder
 
+    attr_reader :sources
+
     def self.build(path, string)
       builder = new(path)
       builder.instance_eval(string)

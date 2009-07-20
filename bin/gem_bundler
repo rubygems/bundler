@@ -18,23 +18,16 @@ parser = OptionParser.new do |op|
 end
 parser.parse!
 
-options[:path] = ARGV.shift
+options[:path] = ARGV.shift || File.join(Dir.pwd, "vendor", "gems")
 
-unless options[:path]
+options[:manifest] ||= "Gemfile"
+
+unless File.exist?(options[:manifest])
   puts parser
   puts %(
-    [PATH] must be specified
+    MANIFEST (#{options[:manifest]}) must exist
   )
   exit
 end
-
-unless options[:manifest] && File.exist?(options[:manifest])
-  puts parser
-  puts %(
-    MANIFEST must be a valid manifest file
-  )
-  exit
-end
-
 
 Bundler.run(options)

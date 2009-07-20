@@ -101,6 +101,8 @@ describe "Bundling DSL" do
 
   it "can bundle gems in a manifest defined through the DSL" do
     manifest = build_manifest <<-DSL
+      sources.clear
+
       source "file://#{gem_repo1}"
       source "file://#{gem_repo2}"
       gem "merb-core", "= 1.0.12"
@@ -110,7 +112,7 @@ describe "Bundling DSL" do
     gems = %w(
       abstract-1.0.0 activerecord-2.3.2 activesupport-2.3.2 erubis-2.6.4
       extlib-0.9.12 json_pure-1.1.7 merb-core-1.0.12 mime-types-1.16
-      rack-1.0.0 rake-0.8.7 rspec-1.2.7 thor-0.9.9)
+      rack-1.0.0 rake-0.8.7 rspec-1.2.8 thor-0.9.9)
 
     manifest.install
 
