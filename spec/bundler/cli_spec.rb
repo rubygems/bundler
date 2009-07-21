@@ -63,4 +63,7 @@ describe "Bundler::CLI" do
     )
   end
 
+  it "provides a logger object" do
+    Bundler.logger.should be_instance_of(Logger)
+  end
 end

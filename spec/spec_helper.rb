@@ -50,4 +50,9 @@ Spec::Runner.configure do |config|
   config.include Bundler::Resolver::Builders
   config.include Spec::Matchers
   config.include Spec::Helpers
+
+  config.before(:each) do
+    @log_output = StringIO.new
+    Bundler.logger.instance_variable_set("@logdev", Logger::LogDevice.new(@log_output))
+  end
 end

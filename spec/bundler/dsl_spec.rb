@@ -124,4 +124,17 @@ describe "Bundling DSL" do
 
     tmp_file('environments', 'default.rb').should have_load_paths(tmp_dir, load_paths)
   end
+
+  it "outputs a pretty error when an environment is named rubygems" do
+    lambda do
+      build_manifest <<-DSL
+        sources.clear
+
+        gem "extlib", :only => "rubygems"
+      DSL
+    end.should raise_error(SystemExit)
+
+    @log_output.rewind
+    @log_output.read.should =~ /^Gemfile error: 'rubygems' cannot be used as an environment name$/m
+  end
 end

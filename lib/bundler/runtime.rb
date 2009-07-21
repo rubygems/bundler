@@ -7,6 +7,9 @@ module Bundler
       builder = new(path)
       builder.instance_eval(string)
       builder.to_manifest
+    rescue ArgumentError
+      Bundler.logger.error "Gemfile error: 'rubygems' cannot be used as an environment name"
+      exit
     end
 
     def self.load(path, file)
