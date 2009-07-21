@@ -38,24 +38,12 @@ describe "Bundler::Dependency" do
     b.require_as.should == ["action_controller", "action_view"]
   end
 
-  # it "can take an :only option" do
-  #   b = Bundler::Dependency.new("ruby-debug", :only => "development")
-  #   b.environments.should == ["development"]
-  # end
-  #
-  # it "can take an :except option" do
-  #   b = Bundler::Dependency.new("ruby-debug", :except => "production")
-  # end
-  #
-  # it "can take an array as the :environments option" do
-  #   b = Bundler::Dependency.new("ruby-debug", :environments => ["development", "test"])
-  #   b.environments.should == ["development", "test"]
-  # end
-  #
-  # it "defaults the :environments option to []" do
-  #   b = Bundler::Dependency.new("rails")
-  #   b.environments.should == []
-  # end
+  it "disallows the :rubygems environment" do
+    lambda { Bundler::Dependency.new("ruby-debug", :only => "rubygems") }.
+      should raise_error(ArgumentError)
+    lambda { Bundler::Dependency.new("ruby-debug", :except => "rubygems") }.
+      should raise_error(ArgumentError)
+  end
 
   it "tests whether a dependency is for a specific environment (with :only)" do
     b = Bundler::Dependency.new("ruby-debug", :only => "development")

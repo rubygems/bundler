@@ -13,6 +13,10 @@ module Bundler
       @require_as = Array(options["require_as"] || name)
       @only       = Array(options["only"]).map {|e| e.to_s } if options["only"]
       @except     = Array(options["except"]).map {|e| e.to_s } if options["except"]
+
+      if (@only && @only.include?("rubygems")) || (@except && @except.include?("rubygems"))
+        raise ArgumentError, "'rubygems' is not a valid environment name"
+      end
     end
 
     def in?(environment)
