@@ -51,6 +51,12 @@ describe "Bundler::Manifest" do
       @manifest.install
     end
 
+    it "logs 'Done' when done" do
+      @manifest.install
+      @log_output.should have_log_message("Done.")
+    end
+
+
     it "does the full fetching if a gem in the cache does not match the manifest" do
       @manifest.install
 

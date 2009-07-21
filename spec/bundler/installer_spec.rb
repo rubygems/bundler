@@ -96,6 +96,14 @@ describe "Bundler::Installer" do
         File.exist?(File.join(tmp_dir, 'bin', 'rails')).should be_true
       end
     end
+
+    it "outputs a logger message for each gem that is installed" do
+      @environment = Bundler::Installer.new(tmp_dir)
+      @environment.install
+      @bundle.each do |spec|
+        @log_output.should have_log_message("Installing #{spec.full_name}.gem")
+      end
+    end
   end
 
   describe "with native gems" do

@@ -73,6 +73,15 @@ module Spec
     end
 
     alias have_installed_gem have_installed_gems
+
+    def have_log_message(message)
+      simple_matcher("have log message") do |given, matcher|
+        given.rewind
+        log = given.read
+        matcher.failure_message = "Expected logger to contain:\n  #{message}\n\nBut it was:\n  #{log.gsub("\n", "\n  ")}"
+        log =~ /^#{Regexp.escape(message)}$/m
+      end
+    end
   end
 end
 

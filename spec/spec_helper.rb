@@ -51,8 +51,13 @@ Spec::Runner.configure do |config|
   config.include Spec::Matchers
   config.include Spec::Helpers
 
-  config.before(:each) do
+  config.before(:all) do
     @log_output = StringIO.new
     Bundler.logger.instance_variable_set("@logdev", Logger::LogDevice.new(@log_output))
+  end
+
+  config.after(:each) do
+    @log_output.rewind
+    @log_output.string.replace ""
   end
 end

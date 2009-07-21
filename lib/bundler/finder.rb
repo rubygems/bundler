@@ -8,11 +8,15 @@ module Bundler
     end
 
     def resolve(*dependencies)
+      Bundler.logger.info "Calculating dependencies..."
+
       resolved = Resolver.resolve(dependencies, self)
       resolved && GemBundle.new(resolved.all_specs)
     end
 
     def fetch(source)
+      Bundler.logger.info "Updating source: #{source}"
+
       deflated = Gem::RemoteFetcher.fetcher.fetch_path("#{source}/Marshal.4.8.Z")
       inflated = Gem.inflate deflated
 

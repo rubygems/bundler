@@ -30,6 +30,7 @@ module Bundler
       installer.install # options come here
       create_load_paths_files(File.join(@path, "environments"))
       create_fake_rubygems(File.join(@path, "environments"))
+      Bundler.logger.info "Done."
     end
 
     def activate(environment = "default")

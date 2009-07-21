@@ -9,6 +9,7 @@ module Bundler
         cached = File.join(directory, "cache", "#{spec.full_name}.gem")
 
         unless File.file?(cached)
+          Bundler.logger.info "Downloading #{spec.full_name}.gem"
           Gem::RemoteFetcher.fetcher.download(spec, spec.source, directory)
         end
 

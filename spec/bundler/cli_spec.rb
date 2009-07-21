@@ -51,8 +51,9 @@ describe "Bundler::CLI" do
     lib = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'lib'))
     bin = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'bin', 'gem_bundler'))
 
+    output = nil
     Dir.chdir(tmp_dir) do
-      `#{Gem.ruby} -I #{lib} #{bin}`
+      output = `#{Gem.ruby} -I #{lib} #{bin}`
     end
 
     tmp_file("vendor", "gems").should have_cached_gems("rake-0.8.7")
@@ -61,6 +62,14 @@ describe "Bundler::CLI" do
     tmp_file('vendor', 'gems', 'environments', 'default.rb').should have_load_paths(tmp_file("vendor", "gems"),
       "rake-0.8.7" => %w(bin lib)
     )
+
+    [ "Updating source: file:#{gem_repo1}",
+      "Calculating dependencies...",
+      "Downloading rake-0.8.7.gem",
+      "Installing rake-0.8.7.gem",
+      "Done." ].each do |message|
+        output.should =~ /^#{Regexp.escape(message)}$/
+      end
   end
 
   it "provides a logger object" do

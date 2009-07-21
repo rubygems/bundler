@@ -23,6 +23,7 @@ module Bundler
           gems.any? { |g| File.basename(g) == name }
 
         unless installed
+          Bundler.logger.info "Installing #{name}.gem"
           installer = Gem::Installer.new(gem, :install_dir => @path,
             :ignore_dependencies => true,
             :env_shebang => true,

@@ -41,6 +41,11 @@ describe "Fetcher" do
     end
   end
 
+  it "outputs a logger message when updating an index from source" do
+    @log_output.should have_log_message("Updating source: file:#{gem_repo1}")
+    @log_output.should have_log_message("Updating source: file:#{gem_repo2}")
+  end
+
   describe "resolving rails" do
     before(:each) do
       @bundle = @finder.resolve(build_dep('rails', '>= 0'))
@@ -85,6 +90,19 @@ describe "Fetcher" do
       @bundle.download(tmp_dir)
 
       Dir[File.join(tmp_dir, 'cache', '*.gem')].should have(@bundle.length).items
+    end
+
+    it "outputs a logger message when resolving dependencies" do
+      @log_output.should have_log_message("Calculating dependencies...")
+    end
+
+    it "outputs a logger message for each gem it downloads" do
+      @bundle.download(tmp_dir)
+
+      %w(rails-2.3.2 actionpack-2.3.2 actionmailer-2.3.2 activerecord-2.3.2
+         activeresource-2.3.2 activesupport-2.3.2 rake-0.8.7).each do |name|
+        @log_output.should have_log_message("Downloading #{name}.gem")
+      end
     end
   end
 end

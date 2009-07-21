@@ -134,7 +134,6 @@ describe "Bundling DSL" do
       DSL
     end.should raise_error(SystemExit)
 
-    @log_output.rewind
-    @log_output.read.should =~ /^Gemfile error: 'rubygems' cannot be used as an environment name$/m
+    @log_output.should have_log_message("Gemfile error: 'rubygems' cannot be used as an environment name")
   end
 end
