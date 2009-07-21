@@ -27,7 +27,7 @@ module Bundler
     def install(options = {})
       fetch
       installer = Installer.new(@path)
-      installer.install # options come here
+      installer.install(:bin_dir => options[:bin_dir] || CLI.default_bindir)
       create_load_paths_files(File.join(@path, "environments"))
       create_fake_rubygems(File.join(@path, "environments"))
       Bundler.logger.info "Done."

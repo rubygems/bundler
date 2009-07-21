@@ -1,6 +1,8 @@
 module Bundler
   module CLI
 
+    module_function
+
     def default_manifest
       current = Pathname.new(Dir.pwd)
 
@@ -12,13 +14,15 @@ module Bundler
       nil
     end
 
-    module_function :default_manifest
-
     def default_path
+      return unless default_manifest
       Pathname.new(File.dirname(default_manifest)).join("vendor").join("gems").to_s
     end
 
-    module_function :default_path
+    def default_bindir
+      return unless default_manifest
+      Pathname.new(File.dirname(default_manifest)).join("bin").to_s
+    end
 
   end
 end
