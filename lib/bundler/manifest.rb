@@ -29,6 +29,7 @@ module Bundler
       installer = Installer.new(@path)
       installer.install # options come here
       create_load_paths_files(File.join(@path, "environments"))
+      create_fake_rubygems(File.join(@path, "environments"))
     end
 
     def activate(environment = "default")
@@ -79,10 +80,39 @@ module Bundler
       environments.each do |environment|
         gem_specs = gems_for(environment)
         File.open(File.join(path, "#{environment}.rb"), "w") do |file|
+          file.puts <<-RUBY_EVAL
+            module Bundler
+              def self.rubygems_required
+                #{create_gem_stubs(path, gem_specs)}
+              end
+            end
+          RUBY_EVAL
+          file.puts "$LOAD_PATH.unshift File.expand_path(File.dirname(__FILE__))"
           load_paths_for_specs(gem_specs).each do |load_path|
             file.puts "$LOAD_PATH.unshift #{load_path.inspect}"
           end
         end
+      end
+    end
+
+    def create_gem_stubs(path, gem_specs)
+      gem_specs.map do |spec|
+        path = File.expand_path(File.join(path, '..', 'specifications', "#{spec.full_name}.gemspec"))
+        %{
+          Gem.loaded_specs["#{spec.name}"] = eval(File.read("#{path}"))
+        }
+      end.join("\n")
+    end
+
+    def create_fake_rubygems(path)
+      File.open(File.join(path, "rubygems.rb"), "w") do |file|
+        file.puts <<-RUBY_EVAL
+          $:.delete File.expand_path(File.dirname(__FILE__))
+          load "rubygems.rb"
+          if defined?(Bundler) && Bundler.respond_to?(:rubygems_required)
+            Bundler.rubygems_required
+          end
+        RUBY_EVAL
       end
     end
 

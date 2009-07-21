@@ -143,5 +143,34 @@ describe "Bundler::Manifest" do
 
       File.exist?(tmp_file('environments', "production.rb")).should be_false
     end
+
+    it "adds the environments path to the load paths" do
+      tmp_file('environments', 'testing.rb').should have_load_paths(tmp_dir, [
+        "environments"
+      ])
+    end
+
+    it "creates a rubygems.rb file in the environments directory" do
+      File.exist?(tmp_file('environments', 'rubygems.rb')).should be_true
+    end
+
+    it "requires the Rubygems library" do
+      env = tmp_file('environments', 'default.rb')
+      out = `#{Gem.ruby} -r #{env} -r rubygems -e 'puts Gem'`.strip
+      out.should == 'Gem'
+    end
+
+    it "removes the environments path from the load paths after rubygems is required" do
+      env = tmp_file('environments', 'default.rb')
+      out = `#{Gem.ruby} -r #{env} -r rubygems -e 'puts $:'`
+      out.should_not include(tmp_file('environments'))
+    end
+
+    it "Gem.loaded_specs has the gems that are included" do
+      env = tmp_file('environments', 'default.rb')
+      out = `#{Gem.ruby} -r #{env} -r rubygems -e 'puts Gem.loaded_specs.map{|k,v|"\#{k} - \#{v.version}"}'`
+      out = out.split("\n")
+      out.should include("rack - 1.0.0")
+    end
   end
 end

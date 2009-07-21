@@ -30,12 +30,19 @@ module Spec
 
     def have_load_paths(root, gem_load_paths)
       flattened_paths = []
-      gem_load_paths.each do |gem_name, paths|
-        paths.each { |path| flattened_paths << File.join(root, "gems", gem_name, path) }
+
+      if gem_load_paths.is_a?(Hash)
+        gem_load_paths.each do |gem_name, paths|
+          paths.each { |path| flattened_paths << File.join(root, "gems", gem_name, path) }
+        end
+      else
+        gem_load_paths.each do |path|
+          flattened_paths << File.join(root, path)
+        end
       end
 
       simple_matcher("have load paths") do |given, matcher|
-        actual = `ruby -r#{given} -e 'puts $:'`.split("\n")
+        actual = `#{Gem.ruby} -r#{given} -e 'puts $:'`.split("\n")
 
         flattened_paths.all? do |path|
           matcher.failure_message = "expected environment load paths to contain '#{path}', but it was:\n  #{actual.join("\n  ")}"
