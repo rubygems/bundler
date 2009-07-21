@@ -98,9 +98,9 @@ module Bundler
 
     def create_gem_stubs(path, gem_specs)
       gem_specs.map do |spec|
-        path = File.expand_path(File.join(path, '..', 'specifications', "#{spec.full_name}.gemspec"))
+        spec_path = File.expand_path(File.join(path, '..', 'specifications', "#{spec.full_name}.gemspec"))
         %{
-          Gem.loaded_specs["#{spec.name}"] = eval(File.read("#{path}"))
+          Gem.loaded_specs["#{spec.name}"] = eval(File.read("#{spec_path}"))
         }
       end.join("\n")
     end

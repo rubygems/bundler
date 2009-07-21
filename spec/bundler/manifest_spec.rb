@@ -178,5 +178,13 @@ describe "Bundler::Manifest" do
       out = out.split("\n")
       out.should include("rack - 1.0.0")
     end
+
+    it "Gem.loaded_specs has the gems that are included in the testing environment" do
+      env = tmp_file('environments', 'testing.rb')
+      out = `#{Gem.ruby} -r #{env} -r rubygems -e 'puts Gem.loaded_specs.map{|k,v|"\#{k} - \#{v.version}"}'`
+      out = out.split("\n")
+      out.should include("rack - 1.0.0")
+      out.should include("very-simple - 1.0")
+    end
   end
 end
