@@ -93,12 +93,12 @@ module Bundler
         specs = gems_for(environment)
         files = spec_files_for_specs(specs, path)
         load_paths = load_paths_for_specs(specs)
-        create_load_path_file(environment, files, load_paths)
+        create_load_path_file(path, environment, files, load_paths)
       end
     end
 
-    def create_load_path_file(environment, spec_files, load_paths)
-      File.open(path.join("environments", "#{environment}.rb"), "w") do |file|
+    def create_load_path_file(path, environment, spec_files, load_paths)
+      File.open(path.join("#{environment}.rb"), "w") do |file|
         template = File.read(File.join(File.dirname(__FILE__), "templates", "environment.rb"))
         erb = ERB.new(template)
         file.puts erb.result(binding)
@@ -106,14 +106,10 @@ module Bundler
     end
 
     def create_fake_rubygems(path)
-      File.open(File.join(path, "rubygems.rb"), "w") do |file|
-        file.puts <<-RUBY_EVAL
-          $:.delete File.expand_path(File.dirname(__FILE__))
-          load "rubygems.rb"
-          if defined?(Bundler) && Bundler.respond_to?(:rubygems_required)
-            Bundler.rubygems_required
-          end
-        RUBY_EVAL
+      File.open(path.join("rubygems.rb"), "w") do |file|
+        template = File.read(File.join(File.dirname(__FILE__), "templates", "rubygems.rb"))
+        erb = ERB.new(template)
+        file.puts erb.result(binding)
       end
     end
 
