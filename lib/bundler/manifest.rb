@@ -90,28 +90,19 @@ module Bundler
     def create_load_paths_files(path)
       FileUtils.mkdir_p(path)
       environments.each do |environment|
-        gem_specs = gems_for(environment)
-        File.open(path.join("#{environment}.rb"), "w") do |file|
-          file.puts <<-RUBY_EVAL
-module Bundler
-  def self.rubygems_required
-    #{create_gem_stubs(path, gem_specs)}
-  end
-end
-          RUBY_EVAL
-          file.puts "$LOAD_PATH.unshift File.expand_path(File.dirname(__FILE__))"
-          load_paths_for_specs(gem_specs).each do |load_path|
-            file.puts "$LOAD_PATH.unshift #{load_path.inspect}"
-          end
-        end
+        specs = gems_for(environment)
+        files = spec_files_for_specs(specs, path)
+        load_paths = load_paths_for_specs(specs)
+        create_load_path_file(environment, files, load_paths)
       end
     end
 
-    def create_gem_stubs(path, gem_specs)
-      gem_specs.map do |spec|
-        spec_path = path.join('..', 'specifications', "#{spec.full_name}.gemspec").expand_path
-        %{    Gem.loaded_specs["#{spec.name}"] = eval(File.read("#{spec_path}"))}
-      end.join("\n")
+    def create_load_path_file(environment, spec_files, load_paths)
+      File.open(path.join("environments", "#{environment}.rb"), "w") do |file|
+        template = File.read(File.join(File.dirname(__FILE__), "templates", "environment.rb"))
+        erb = ERB.new(template)
+        file.puts erb.result(binding)
+      end
     end
 
     def create_fake_rubygems(path)
@@ -135,6 +126,14 @@ end
         end
       end
       load_paths
+    end
+
+    def spec_files_for_specs(specs, path)
+      files = {}
+      specs.each do |s|
+        files[s.name] = path.join("..", "specifications", "#{s.full_name}.gemspec").expand_path
+      end
+      files
     end
   end
 end

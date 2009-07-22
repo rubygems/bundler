@@ -1,6 +1,7 @@
 require 'pathname'
 require 'logger'
 require 'set'
+require 'erb'
 # Required elements of rubygems
 require "rubygems/remote_fetcher"
 require "rubygems/installer"
