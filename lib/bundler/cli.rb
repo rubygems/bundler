@@ -4,24 +4,35 @@ module Bundler
     module_function
 
     def default_manifest
-      current = Pathname.new(Dir.pwd)
-
-      begin
-        manifest = current.join("Gemfile")
-        return manifest.to_s if File.exist?(manifest)
-        current = current.parent
-      end until current.root?
-      nil
+      return unless root?
+      root.join("Gemfile")
     end
 
     def default_path
-      return unless default_manifest
-      Pathname.new(File.dirname(default_manifest)).join("vendor").join("gems").to_s
+      return unless root?
+      root.join("vendor", "gems")
     end
 
     def default_bindir
-      return unless default_manifest
-      Pathname.new(File.dirname(default_manifest)).join("bin").to_s
+      return unless root?
+      root.join("bin")
+    end
+
+    def root
+      return @root if @root
+
+      current = Pathname.new(Dir.pwd)
+
+      begin
+        @root = current if current.join("Gemfile").exist?
+        current = current.parent
+      end until current.root?
+
+      @root ||= :none
+    end
+
+    def root?
+      root != :none
     end
 
   end

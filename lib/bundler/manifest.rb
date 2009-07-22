@@ -1,5 +1,4 @@
 require "rubygems/source_index"
-require "pathname"
 
 module Bundler
   class VersionConflict < StandardError; end

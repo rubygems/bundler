@@ -1,3 +1,4 @@
+require 'pathname'
 require 'logger'
 require 'set'
 # Required elements of rubygems
