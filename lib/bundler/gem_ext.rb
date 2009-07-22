@@ -3,11 +3,9 @@ module Gem
     def app_script_text(bin_file_name)
       return unless Bundler::CLI.default_path
       path = Pathname.new(Bundler::CLI.default_path).expand_path
-      <<-TEXT
-#{shebang bin_file_name}
-require "#{path.join("environments", "default")}"
-load "#{path.join("gems", @spec.full_name, @spec.bindir, bin_file_name)}"
-      TEXT
+      template = File.read(File.join(File.dirname(__FILE__), "templates", "app_script.rb"))
+      erb = ERB.new(template)
+      erb.result(binding)
     end
   end
 
