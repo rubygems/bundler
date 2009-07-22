@@ -30,8 +30,9 @@ describe "Bundler::Installer" do
       end
 
       it "installs the bins in the directory you specify" do
-        @environment.install(:bin_dir => tmp_dir)
-        File.exist?(File.join(tmp_dir, 'rails')).should be_true
+        FileUtils.mkdir_p tmp_file("omgbinz")
+        @environment.install(:bin_dir => tmp_file("omgbinz"))
+        File.exist?(tmp_file("omgbinz", "rails")).should be_true
       end
 
       it "removes any .gemspec files in specifications that are not to be installed" do

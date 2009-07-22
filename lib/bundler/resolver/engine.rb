@@ -17,6 +17,8 @@ module Bundler
       attr_reader :deps, :source_index, :logger, :solution
 
       def resolve
+        @deps = @deps.sort_by { |dep| @source_index.search(dep).size }
+
         state = State.initial(self, [], Stack.new, Stack.new([[[], @deps.dup]]))
         if solution = search(state)
           logger.info "got the solution with #{solution.all_specs.size} specs"

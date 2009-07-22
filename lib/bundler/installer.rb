@@ -14,6 +14,8 @@ module Bundler
     def install(options = {})
       bin_dir = options[:bin_dir] ||= File.join(@path, "bin")
 
+      Dir[File.join(bin_dir, '*')].each { |file| File.delete(file) }
+
       specs = Dir[File.join(@path, "specifications", "*.gemspec")]
       gems  = Dir[File.join(@path, "gems", "*")]
 

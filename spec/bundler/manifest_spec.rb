@@ -76,6 +76,22 @@ describe "Bundler::Manifest" do
       tmp_dir.should have_installed_gems(*gems)
     end
 
+    it "removes gems that are not needed anymore" do
+      @manifest.install
+      tmp_dir.should have_cached_gem("rack-0.9.1")
+      tmp_dir.should have_installed_gem("rack-0.9.1")
+      tmp_file("bin", "rackup").should be_exist
+
+      deps = @deps.dup
+      deps.pop
+      manifest = Bundler::Manifest.new(@sources, deps, tmp_dir)
+      manifest.install
+
+      tmp_dir.should_not have_cached_gem("rack-0.9.1")
+      tmp_dir.should_not have_installed_gem("rack-0.9.1")
+      tmp_file("bin", "rackup").should_not be_exist
+    end
+
     it "raises a friendly exception if the manifest doesn't resolve" do
       @manifest.dependencies << dep("active_support", "2.0")
 

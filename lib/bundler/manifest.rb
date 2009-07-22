@@ -27,6 +27,7 @@ module Bundler
       fetch
       installer = Installer.new(@path)
       installer.install(:bin_dir => options[:bin_dir] || CLI.default_bindir)
+      cleanup_removed_gems
       create_load_paths_files(File.join(@path, "environments"))
       create_fake_rubygems(File.join(@path, "environments"))
       Bundler.logger.info "Done."
@@ -42,12 +43,14 @@ module Bundler
       end
     end
 
-    def gems_for(environment)
-      deps     = dependencies.select { |d| d.in?(environment) }
-      deps.map! { |d| d.to_gem_dependency }
+    def gems_for(environment = nil)
+      deps     = dependencies
+      deps     = deps.select { |d| d.in?(environment) } if environment
+      deps     = deps.map { |d| d.to_gem_dependency }
       index    = Gem::SourceIndex.from_gems_in(File.join(@path, "specifications"))
       Resolver.resolve(deps, index).all_specs
     end
+    alias gems gems_for
 
     def environments
       envs = dependencies.map {|dep| Array(dep.only) + Array(dep.except) }.flatten
@@ -60,7 +63,7 @@ module Bundler
       @gem_dependencies ||= dependencies.map { |d| d.to_gem_dependency }
     end
 
-    def all_gems_installed?
+    def installed_gems
       gem_versions = {}
 
       Dir[File.join(@path, "cache", "*.gem")].each do |file|
@@ -69,9 +72,30 @@ module Bundler
         gem_versions[name] = Gem::Version.new(version)
       end
 
+      gem_versions
+    end
+
+    def all_gems_installed?
+      gem_versions = installed_gems
+
       gem_dependencies.all? do |dep|
         gem_versions[dep.name] &&
         dep.version_requirements.satisfied_by?(gem_versions[dep.name])
+      end
+    end
+
+    def cleanup_removed_gems
+      manifest_gems = gems
+      installed_gems.each do |name, version|
+        unless manifest_gems.any? {|s| s.name == name && s.version == version }
+          delete(name, version)
+        end
+      end
+    end
+
+    def delete(gem_name, version)
+      Dir[File.join(@path, "{cache,specifications,gems}", "#{gem_name}-#{version}{.gemspec,.gem,}")].each do |file|
+        FileUtils.rm_rf(file)
       end
     end
 
@@ -81,11 +105,11 @@ module Bundler
         gem_specs = gems_for(environment)
         File.open(File.join(path, "#{environment}.rb"), "w") do |file|
           file.puts <<-RUBY_EVAL
-            module Bundler
-              def self.rubygems_required
-                #{create_gem_stubs(path, gem_specs)}
-              end
-            end
+module Bundler
+  def self.rubygems_required
+    #{create_gem_stubs(path, gem_specs)}
+  end
+end
           RUBY_EVAL
           file.puts "$LOAD_PATH.unshift File.expand_path(File.dirname(__FILE__))"
           load_paths_for_specs(gem_specs).each do |load_path|
@@ -98,9 +122,7 @@ module Bundler
     def create_gem_stubs(path, gem_specs)
       gem_specs.map do |spec|
         spec_path = File.expand_path(File.join(path, '..', 'specifications', "#{spec.full_name}.gemspec"))
-        %{
-          Gem.loaded_specs["#{spec.name}"] = eval(File.read("#{spec_path}"))
-        }
+        %{    Gem.loaded_specs["#{spec.name}"] = eval(File.read("#{spec_path}"))}
       end.join("\n")
     end
 
