@@ -85,13 +85,6 @@ describe "Fetcher" do
       }.should_not change { File.mtime(fixture("actionmailer-2.3.2")) }
     end
 
-    it "erases any gems in the directory that are not part of the bundle" do
-      copy("abstract-1.0.0")
-      @bundle.download(tmp_dir)
-
-      Dir[File.join(tmp_dir, 'cache', '*.gem')].should have(@bundle.length).items
-    end
-
     it "outputs a logger message when resolving dependencies" do
       @log_output.should have_log_message("Calculating dependencies...")
     end

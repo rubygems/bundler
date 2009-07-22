@@ -1,20 +1,21 @@
 module Bundler
   class Installer
     def initialize(path)
-      if !File.directory?(path)
+      if !path.directory?
         raise ArgumentError, "#{path} is not a directory"
-      elsif !File.directory?(File.join(path, "cache"))
+      elsif !path.join("cache").directory?
         raise ArgumentError, "#{path} is not a valid environment (it does not contain a cache directory)"
       end
 
       @path = path
-      @gems = Dir[(File.join(path, "cache", "*.gem"))]
+      @gems = Dir[path.join("cache", "*.gem")]
     end
 
     def install(options = {})
-      bin_dir = options[:bin_dir] ||= File.join(@path, "bin")
+      bin_dir = options[:bin_dir] ||= @path.join("bin")
 
-      Dir[File.join(bin_dir, '*')].each { |file| File.delete(file) }
+      # Delete all executables since they will be recreated later
+      Dir[bin_dir.join('*')].each { |file| File.delete(file) }
 
       specs = Dir[File.join(@path, "specifications", "*.gemspec")]
       gems  = Dir[File.join(@path, "gems", "*")]

@@ -28,13 +28,13 @@ module Bundler
       installer = Installer.new(@path)
       installer.install(:bin_dir => options[:bin_dir] || CLI.default_bindir)
       cleanup_removed_gems
-      create_load_paths_files(File.join(@path, "environments"))
-      create_fake_rubygems(File.join(@path, "environments"))
+      create_load_paths_files(@path.join("environments"))
+      create_fake_rubygems(@path.join("environments"))
       Bundler.logger.info "Done."
     end
 
     def activate(environment = "default")
-      require File.join(@path, "environments", "#{environment}.rb")
+      require @path.join("environments", "#{environment}.rb")
     end
 
     def require_all
@@ -47,7 +47,7 @@ module Bundler
       deps     = dependencies
       deps     = deps.select { |d| d.in?(environment) } if environment
       deps     = deps.map { |d| d.to_gem_dependency }
-      index    = Gem::SourceIndex.from_gems_in(File.join(@path, "specifications"))
+      index    = Gem::SourceIndex.from_gems_in(@path.join("specifications"))
       Resolver.resolve(deps, index).all_specs
     end
     alias gems gems_for
@@ -66,7 +66,7 @@ module Bundler
     def all_gems_installed?
       downloaded_gems = {}
 
-      Dir[File.join(@path, "cache", "*.gem")].each do |file|
+      Dir[@path.join("cache", "*.gem")].each do |file|
         file =~ /\/([^\/]+)-([\d\.]+)\.gem$/
         name, version = $1, $2
         downloaded_gems[name] = Gem::Version.new(version)
@@ -91,7 +91,7 @@ module Bundler
       FileUtils.mkdir_p(path)
       environments.each do |environment|
         gem_specs = gems_for(environment)
-        File.open(File.join(path, "#{environment}.rb"), "w") do |file|
+        File.open(path.join("#{environment}.rb"), "w") do |file|
           file.puts <<-RUBY_EVAL
 module Bundler
   def self.rubygems_required
@@ -109,7 +109,7 @@ end
 
     def create_gem_stubs(path, gem_specs)
       gem_specs.map do |spec|
-        spec_path = File.expand_path(File.join(path, '..', 'specifications', "#{spec.full_name}.gemspec"))
+        spec_path = path.join('..', 'specifications', "#{spec.full_name}.gemspec").expand_path
         %{    Gem.loaded_specs["#{spec.name}"] = eval(File.read("#{spec_path}"))}
       end.join("\n")
     end
