@@ -11,18 +11,6 @@ module Bundler
       @sources, @dependencies, @path = sources, dependencies, Pathname.new(path)
     end
 
-    def fetch
-      return if all_gems_installed?
-
-      finder = Finder.new(*sources)
-      unless bundle = finder.resolve(*gem_dependencies)
-        gems = @dependencies.map {|d| "  #{d.to_s}" }.join("\n")
-        raise VersionConflict, "No compatible versions could be found for:\n#{gems}"
-      end
-
-      bundle.download(@path)
-    end
-
     def install(options = {})
       fetch
       installer = Installer.new(@path)
@@ -59,6 +47,18 @@ module Bundler
 
   private
 
+    def fetch
+      return if all_gems_installed?
+
+      finder = Finder.new(*sources)
+      unless bundle = finder.resolve(*gem_dependencies)
+        gems = @dependencies.map {|d| "  #{d.to_s}" }.join("\n")
+        raise VersionConflict, "No compatible versions could be found for:\n#{gems}"
+      end
+
+      bundle.download(@path)
+    end
+
     def gem_dependencies
       @gem_dependencies ||= dependencies.map { |d| d.to_gem_dependency }
     end
@@ -83,6 +83,7 @@ module Bundler
       base = @path.join("{cache,specifications,gems}")
 
       (Dir[base.join("*")] - Dir[base.join("{#{glob}}{.gemspec,.gem,}")]).each do |file|
+        Bundler.logger.info "Deleting #{File.basename(file)}" if File.basename(file) =~ /\.gem$/
         FileUtils.rm_rf(file)
       end
     end

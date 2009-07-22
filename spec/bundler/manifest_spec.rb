@@ -80,7 +80,7 @@ describe "Bundler::Manifest" do
       @manifest.install
       tmp_dir.should have_cached_gem("rack-0.9.1")
       tmp_dir.should have_installed_gem("rack-0.9.1")
-      tmp_file("bin", "rackup").should be_exist
+      tmp_file("bin", "rackup").should exist
 
       deps = @deps.dup
       deps.pop
@@ -89,7 +89,8 @@ describe "Bundler::Manifest" do
 
       tmp_dir.should_not have_cached_gem("rack-0.9.1")
       tmp_dir.should_not have_installed_gem("rack-0.9.1")
-      tmp_file("bin", "rackup").should_not be_exist
+      tmp_file("bin", "rackup").should_not exist
+      @log_output.should have_log_message("Deleting rack-0.9.1.gem")
     end
 
     it "removes stray specfiles" do
