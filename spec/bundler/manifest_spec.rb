@@ -92,6 +92,21 @@ describe "Bundler::Manifest" do
       tmp_file("bin", "rackup").should_not be_exist
     end
 
+    it "removes stray specfiles" do
+      spec = tmp_file("specifications", "omg.gemspec")
+      FileUtils.mkdir_p(tmp_file("specifications"))
+      FileUtils.touch(spec)
+      @manifest.install
+      spec.should_not exist
+    end
+
+    it "removes any stray directories in gems that are not to be installed" do
+      dir = tmp_file("gems", "omg")
+      FileUtils.mkdir_p(dir)
+      @manifest.install
+      dir.should_not exist
+    end
+
     it "raises a friendly exception if the manifest doesn't resolve" do
       @manifest.dependencies << dep("active_support", "2.0")
 

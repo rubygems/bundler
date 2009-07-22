@@ -63,38 +63,26 @@ module Bundler
       @gem_dependencies ||= dependencies.map { |d| d.to_gem_dependency }
     end
 
-    def installed_gems
-      gem_versions = {}
+    def all_gems_installed?
+      downloaded_gems = {}
 
       Dir[File.join(@path, "cache", "*.gem")].each do |file|
         file =~ /\/([^\/]+)-([\d\.]+)\.gem$/
         name, version = $1, $2
-        gem_versions[name] = Gem::Version.new(version)
+        downloaded_gems[name] = Gem::Version.new(version)
       end
 
-      gem_versions
-    end
-
-    def all_gems_installed?
-      gem_versions = installed_gems
-
       gem_dependencies.all? do |dep|
-        gem_versions[dep.name] &&
-        dep.version_requirements.satisfied_by?(gem_versions[dep.name])
+        downloaded_gems[dep.name] &&
+        dep.version_requirements.satisfied_by?(downloaded_gems[dep.name])
       end
     end
 
     def cleanup_removed_gems
-      manifest_gems = gems
-      installed_gems.each do |name, version|
-        unless manifest_gems.any? {|s| s.name == name && s.version == version }
-          delete(name, version)
-        end
-      end
-    end
+      glob = gems.map { |g| g.full_name }.join(',')
+      base = @path.join("{cache,specifications,gems}")
 
-    def delete(gem_name, version)
-      Dir[File.join(@path, "{cache,specifications,gems}", "#{gem_name}-#{version}{.gemspec,.gem,}")].each do |file|
+      (Dir[base.join("*")] - Dir[base.join("{#{glob}}{.gemspec,.gem,}")]).each do |file|
         FileUtils.rm_rf(file)
       end
     end

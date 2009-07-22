@@ -35,21 +35,6 @@ describe "Bundler::Installer" do
         File.exist?(tmp_file("omgbinz", "rails")).should be_true
       end
 
-      it "removes any .gemspec files in specifications that are not to be installed" do
-        spec = tmp_file("specifications", "omg.gemspec")
-        FileUtils.mkdir_p(tmp_file("specifications"))
-        FileUtils.touch(spec)
-        @environment.install
-        File.exist?(spec).should be_false
-      end
-
-      it "removes any stray directories in gems that are not to be installed" do
-        dir = tmp_file("gems", "omg")
-        FileUtils.mkdir_p(dir)
-        @environment.install
-        File.exist?(dir).should be_false
-      end
-
       it "does not modify any .gemspec files that are to be installed if a directory of the same name exists" do
         dir = tmp_file("gems", "rails-2.3.2")
         FileUtils.mkdir_p(dir)

@@ -33,14 +33,6 @@ module Bundler
             :bin_dir => bin_dir)
           installer.install
         end
-
-        # remove this spec
-        specs.delete_if { |g| File.basename(g) == "#{name}.gemspec"}
-        gems.delete_if  { |g| File.basename(g) == name }
-      end
-
-      (specs + gems).each do |path|
-        FileUtils.rm_rf(path)
       end
     end
   end
