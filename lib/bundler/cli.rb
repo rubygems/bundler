@@ -36,7 +36,7 @@ module Bundler
         op.banner = "Usage: gem_bundler [OPTIONS] [PATH]"
 
         op.on("-m", "--manifest MANIFEST") do |manifest|
-          @manifest = manifest
+          @manifest = Pathname.new(manifest)
         end
 
         op.on_tail("-h", "--help", "Show this message") do

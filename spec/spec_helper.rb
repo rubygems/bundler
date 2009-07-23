@@ -56,6 +56,7 @@ module Spec
       path = tmp_file("Gemfile")
       path = args.shift if args.first.is_a?(Pathname)
       str  = args.shift || ""
+      FileUtils.mkdir_p(path.dirname)
       File.open(path, 'w') do |f|
         f.puts str
       end

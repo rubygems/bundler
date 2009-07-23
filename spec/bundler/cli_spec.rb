@@ -61,6 +61,34 @@ describe "Bundler::CLI" do
     end
   end
 
+  describe "it working while specifying the manifest file name" do
+    it "works when the manifest is in the root directory" do
+      build_manifest_file tmp_file('manifest.rb'), <<-Gemfile
+        bundle_path "gems"
+        sources.clear
+        source "file://#{gem_repo1}"
+        gem "rake"
+      Gemfile
+
+      Dir.chdir(tmp_file)
+      Bundler::CLI.run(["-m", tmp_file('manifest.rb').to_s])
+      tmp_file("gems").should have_cached_gems("rake-0.8.7")
+    end
+
+    it "works when the manifest is in a different directory" do
+      build_manifest_file tmp_file('config', 'manifest.rb'), <<-Gemfile
+        bundle_path "../gems"
+        sources.clear
+        source "file://#{gem_repo1}"
+        gem "rake"
+      Gemfile
+
+      Dir.chdir(tmp_file)
+      Bundler::CLI.run(["-m", tmp_file('config', 'manifest.rb').to_s])
+      tmp_file("gems").should have_cached_gems("rake-0.8.7")
+    end
+  end
+
   describe "it working without rubygems" do
     before(:each) do
       build_manifest <<-Gemfile
