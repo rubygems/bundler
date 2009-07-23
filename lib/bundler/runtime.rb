@@ -20,6 +20,18 @@ module Bundler
       @manifest_file = manifest_file
     end
 
+    def bundle_path(path)
+      path = Pathname.new(path)
+      @manifest_file.gem_path = (path.relative? ?
+        @manifest_file.root.join(path) : path).expand_path
+    end
+
+    def bin_path(path)
+      path = Pathname.new(path)
+      @manifest_file.bindir = (path.relative? ?
+        @manifest_file.root.join(path) : path).expand_path
+    end
+
     def source(source)
       @manifest_file.sources << source
     end

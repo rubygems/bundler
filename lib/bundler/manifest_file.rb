@@ -2,7 +2,8 @@ module Bundler
   class DefaultManifestNotFound < StandardError; end
 
   class ManifestFile
-    attr_reader :sources, :dependencies, :gem_path, :bindir
+    attr_reader :sources, :dependencies
+    attr_accessor :gem_path, :bindir
 
     def self.load(filename = nil)
       new(filename).load
@@ -32,11 +33,8 @@ module Bundler
     end
 
     def load_manifest
-      builder = ManifestBuilder.load(self, filename)
-      Manifest.new(sources,
-                   dependencies,
-                   bindir,
-                   gem_path)
+      ManifestBuilder.load(self, filename)
+      Manifest.new(sources, dependencies, bindir, gem_path)
     end
 
     def gem_path
