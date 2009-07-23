@@ -10,10 +10,11 @@ module Bundler
     end
 
     def initialize(filename)
-      @filename      = filename
-      @sources       = %w(http://gems.rubyforge.org)
-      @dependencies  = []
-      @rubygems      = :optional
+      @filename            = filename
+      @sources             = %w(http://gems.rubyforge.org)
+      @dependencies        = []
+      @system_gem_fallback = true
+      @rubygems            = :optional
     end
 
     def load
@@ -30,12 +31,21 @@ module Bundler
     end
 
     def setup_environment
-      manifest.setup_environment
+      unless @system_gem_fallback
+        ENV["GEM_HOME"] = @gem_path
+        ENV["GEM_PATH"] = @gem_path
+      end
+      ENV["PATH"]     = "#{@bindir}:#{ENV["PATH"]}"
+      ENV["RUBYOPT"]  = "-r#{@gem_path}/environments/default #{ENV["RUBYOPT"]}"
     end
 
     def load_manifest
       ManifestBuilder.load(self, filename)
       Manifest.new(sources, dependencies, bindir, gem_path, rubygems)
+    end
+
+    def disable_fallback!
+      @system_gem_fallback = false
     end
 
     def gem_path

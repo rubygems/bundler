@@ -28,13 +28,6 @@ module Bundler
       require @gem_path.join("environments", "#{environment}.rb")
     end
 
-    def setup_environment
-      ENV["GEM_HOME"] = @gem_path
-      ENV["GEM_PATH"] = @gem_path
-      ENV["PATH"]     = "#{@bindir}:#{ENV["PATH"]}"
-      ENV["RUBYOPT"]  = "-r#{@gem_path}/environments/default #{ENV["RUBYOPT"]}"
-    end
-
     def require_all
       dependencies.each do |dep|
         dep.require_as.each {|file| require file }

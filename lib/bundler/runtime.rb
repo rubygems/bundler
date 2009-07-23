@@ -54,5 +54,9 @@ module Bundler
 
       @manifest_file.dependencies << Dependency.new(name, options.merge(:version => version))
     end
+
+    def disable_fallback!
+      @manifest_file.disable_fallback!
+    end
   end
 end
