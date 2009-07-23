@@ -86,8 +86,18 @@ describe "Bundler::CLI" do
     end
 
     it "does not load rubygems when required" do
-      out = `#{tmp_file('bin', 'rake')} -e 'require "rubygems" ; puts Gem rescue puts "No rubygems"'`
-      out.should =~ /No rubygems/
+      out = `#{tmp_file('bin', 'rake')} -e 'require "rubygems" ; puts Gem.respond_to?(:sources)'`
+      out.should =~ /false/
+    end
+
+    it "does not blow up if #gem is used" do
+      out = `#{tmp_file('bin', 'rake')} -e 'gem("merb-core") ; puts "Win!"'`
+      out.should =~ /Win!/
+    end
+
+    it "does not blow up if Gem errors are referred to" do
+      out = `#{tmp_file('bin', 'rake')} -e 'Gem::LoadError ; Gem::Exception ; puts "Win!"'`
+      out.should =~ /Win!/
     end
   end
 
@@ -114,8 +124,8 @@ describe "Bundler::CLI" do
     end
 
     it "does already has rubygems required" do
-      out = `#{tmp_file('bin', 'rake')} -e 'puts Gem'`
-      out.should =~ /Gem/
+      out = `#{tmp_file('bin', 'rake')} -e 'puts Gem.respond_to?(:sources)'`
+      out.should =~ /true/
     end
   end
 end
