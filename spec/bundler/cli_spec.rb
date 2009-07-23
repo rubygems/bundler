@@ -2,9 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "Bundler::CLI" do
   describe "it working" do
-    before(:all) do
-      reset!
-
+    before(:each) do
       build_manifest <<-Gemfile
         sources.clear
         source "file://#{gem_repo1}"
@@ -64,9 +62,7 @@ describe "Bundler::CLI" do
   end
 
   describe "it working without rubygems" do
-    before(:all) do
-      reset!
-
+    before(:each) do
       build_manifest <<-Gemfile
         sources.clear
         source "file://#{gem_repo1}"
@@ -102,9 +98,7 @@ describe "Bundler::CLI" do
   end
 
   describe "it working with requiring rubygems automatically" do
-    before(:all) do
-      reset!
-
+    before(:each) do
       build_manifest <<-Gemfile
         sources.clear
         source "file://#{gem_repo1}"

@@ -2,13 +2,12 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "Bundler::Installer" do
 
-  before(:all) do
+  before(:each) do
     @finder = Bundler::Finder.new("file://#{gem_repo1}", "file://#{gem_repo2}")
   end
 
   describe "without native gems" do
-    before(:all) do
-      FileUtils.rm_rf(tmp_dir)
+    before(:each) do
       @bundle = @finder.resolve(build_dep('rails', '>= 0'))
       @bundle.download(tmp_dir)
     end
@@ -65,7 +64,7 @@ describe "Bundler::Installer" do
 
     describe "after installing gems" do
 
-      before(:all) do
+      before(:each) do
         @environment = Bundler::Installer.install(tmp_dir)
       end
 

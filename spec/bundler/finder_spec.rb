@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "Finder" do
-  before(:all) do
+  before(:each) do
     index = build_index do
       add_spec "activemerchant", "1.4.1" do
         runtime "activesupport", ">= 1.4.1"

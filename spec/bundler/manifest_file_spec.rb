@@ -1,9 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "Bundler::Manifest" do
-  before(:each) do
-    reset!
-  end
 
   it "finds the default manifest file" do
     build_manifest_file

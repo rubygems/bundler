@@ -2,10 +2,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "Bundling DSL" do
 
-  before(:all) do
-    reset!
-  end
-
   it "allows specifying the path to bundle gems to" do
     build_manifest.gem_path.should == tmp_file("vendor", "gems")
   end
@@ -60,13 +56,10 @@ describe "Bundling DSL" do
   end
 
   it "loads the manifest from a file" do
-    File.open(tmp_file("manifest.rb"), 'w') do |file|
-      file.puts <<-DSL
-        gem "rails"
-      DSL
-    end
+    manifest = build_manifest(tmp_file("manifest.rb"), <<-DSL)
+      gem "rails"
+    DSL
 
-    manifest = Bundler::ManifestFile.load(tmp_file("manifest.rb"))
     manifest.dependencies.first.name.should == "rails"
   end
 

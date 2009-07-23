@@ -6,7 +6,7 @@ describe "Bundler::Manifest" do
     Bundler::Dependency.new(name, {:version => version}.merge(options))
   end
 
-  before(:all) do
+  before(:each) do
     @sources = %W(file://#{gem_repo1} file://#{gem_repo2})
     @deps = []
     @deps << dep("rails", "2.3.2")
@@ -16,7 +16,6 @@ describe "Bundler::Manifest" do
   describe "Manifest with dependencies" do
 
     before(:each) do
-      reset!
       @manifest = build_manifest <<-Gemfile
         sources.clear
         source "file://#{gem_repo1}"
@@ -141,10 +140,6 @@ describe "Bundler::Manifest" do
   end
 
   describe "runtime" do
-    before(:each) do
-      FileUtils.rm_rf(tmp_dir)
-      FileUtils.mkdir_p(tmp_dir)
-    end
 
     it "makes gems available via Manifest#activate" do
       m = build_manifest <<-Gemfile
@@ -182,8 +177,7 @@ describe "Bundler::Manifest" do
   end
 
   describe "environments" do
-    before(:all) do
-      reset!
+    before(:each) do
       @manifest = build_manifest <<-Gemfile
         sources.clear
         source "file://#{gem_repo1}"

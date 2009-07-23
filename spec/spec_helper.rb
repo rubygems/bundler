@@ -68,13 +68,13 @@ module Spec
       FileUtils.mkdir_p(path.dirname)
       Dir.chdir(path.dirname) do
         build_manifest_file(path, str)
-        Bundler::ManifestFile.load
+        Bundler::ManifestFile.load(path)
       end
     end
 
     def reset!
-      FileUtils.rm_rf(tmp_dir)
-      FileUtils.mkdir_p(tmp_dir)
+      tmp_dir.rmtree if tmp_dir.exist?
+      tmp_dir.mkdir
     end
   end
 end
@@ -86,14 +86,13 @@ Spec::Runner.configure do |config|
 
   original_wd = Dir.pwd
 
-  config.before(:all) do
+  config.before(:each) do
     @log_output = StringIO.new
     Bundler.logger.instance_variable_set("@logdev", Logger::LogDevice.new(@log_output))
+    reset!
   end
 
   config.after(:each) do
-    @log_output.rewind
-    @log_output.string.replace ""
     Dir.chdir(original_wd)
   end
 end
