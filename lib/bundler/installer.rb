@@ -18,9 +18,6 @@ module Bundler
     end
 
     def install
-      # Delete all executables since they will be recreated later
-      Dir[@bindir.join('*')].each { |file| File.delete(file) }
-
       specs = Dir[File.join(@gem_path, "specifications", "*.gemspec")]
       gems  = Dir[File.join(@gem_path, "gems", "*")]
 

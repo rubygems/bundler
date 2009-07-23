@@ -90,7 +90,8 @@ describe "Bundler::Manifest" do
       tmp_gem_path.should_not have_cached_gem("rack-0.9.1")
       tmp_gem_path.should_not have_installed_gem("rack-0.9.1")
       tmp_bindir("rackup").should_not exist
-      @log_output.should have_log_message("Deleting rack-0.9.1.gem")
+      @log_output.should have_log_message("Deleting gem: rack-0.9.1")
+      @log_output.should have_log_message("Deleting bin file: rackup")
     end
 
     it "removes stray specfiles" do

@@ -89,7 +89,13 @@ module Bundler
       base = @gem_path.join("{cache,specifications,gems}")
 
       (Dir[base.join("*")] - Dir[base.join("{#{glob}}{.gemspec,.gem,}")]).each do |file|
-        Bundler.logger.info "Deleting #{File.basename(file)}" if File.basename(file) =~ /\.gem$/
+        Bundler.logger.info "Deleting gem: #{File.basename(file, ".gem")}" if File.basename(file) =~ /\.gem$/
+        FileUtils.rm_rf(file)
+      end
+
+      glob = gems.map { |g| g.executables }.flatten.join(',')
+      (Dir[@bindir.join("*")] - Dir[@bindir.join("{#{glob}}")]).each do |file|
+        Bundler.logger.info "Deleting bin file: #{File.basename(file)}"
         FileUtils.rm_rf(file)
       end
     end

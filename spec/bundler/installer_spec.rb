@@ -56,6 +56,11 @@ describe "Bundler::Installer" do
         lambda { Bundler::Installer.install(tmp_dir) }.should change { File.mtime(dir) }
       end
 
+      it "keeps bin files for already installed gems" do
+        Bundler::Installer.install(tmp_dir)
+        Bundler::Installer.install(tmp_dir)
+        tmp_file("bin", "rails").should exist
+      end
     end
 
     describe "after installing gems" do
