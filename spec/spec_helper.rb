@@ -13,7 +13,15 @@ module Spec
     end
 
     def tmp_dir
-      this_file.join("fixtures", "tmp")
+      this_file.join("..", "tmp")
+    end
+
+    def tmp_gem_path(*path)
+      tmp_file("vendor", "gems").join(*path)
+    end
+
+    def tmp_bindir(*path)
+      tmp_file("bin").join(*path)
     end
 
     def tmp_file(*path)

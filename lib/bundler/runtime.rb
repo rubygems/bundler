@@ -1,42 +1,38 @@
 module Bundler
+  class ManifestFileNotFound < StandardError; end
+
   class ManifestBuilder
-
-    attr_reader :sources
-
-    def self.build(path, string)
-      builder = new(path)
+    def self.build(manifest_file, string)
+      builder = new(manifest_file)
       builder.instance_eval(string)
-      builder.to_manifest
-    rescue ArgumentError
-      Bundler.logger.error "Gemfile error: 'rubygems' cannot be used as an environment name"
-      exit
+      builder
     end
 
-    def self.load(path, file)
-      string = File.read(file)
-      build(path, string)
+    def self.load(manifest_file, filename)
+      unless File.exist?(filename)
+        raise ManifestFileNotFound, "#{filename.inspect} does not exist"
+      end
+      string = File.read(filename)
+      build(manifest_file, string)
     end
 
-    def initialize(path)
-      @path         = path
-      @sources      = %w(http://gems.rubyforge.org)
-      @dependencies = []
-    end
-
-    def to_manifest
-      Manifest.new(@sources, @dependencies, @path)
+    def initialize(manifest_file)
+      @manifest_file = manifest_file
     end
 
     def source(source)
-      @sources << source
+      @manifest_file.sources << source
+    end
+
+    def sources
+      @manifest_file.sources
     end
 
     def gem(name, *args)
       options = args.last.is_a?(Hash) ? args.pop : {}
       version = args.last
 
-      @dependencies << Dependency.new(name, options.merge(:version => version))
+      @manifest_file.dependencies << Dependency.new(name, options.merge(:version => version))
     end
-
   end
 end

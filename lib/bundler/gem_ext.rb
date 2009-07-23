@@ -1,8 +1,7 @@
 module Gem
   class Installer
     def app_script_text(bin_file_name)
-      return unless Bundler::CLI.default_path
-      path = Pathname.new(Bundler::CLI.default_path).expand_path
+      path = @gem_home
       template = File.read(File.join(File.dirname(__FILE__), "templates", "app_script.rb"))
       erb = ERB.new(template)
       erb.result(binding)

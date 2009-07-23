@@ -1,39 +1,46 @@
+require "optparse"
+
 module Bundler
-  module CLI
-
-    module_function
-
-    def default_manifest
-      return unless root?
-      root.join("Gemfile")
+  class CLI
+    def self.run(args = ARGV)
+      new(args).run
     end
 
-    def default_path
-      return unless root?
-      root.join("vendor", "gems")
+    def initialize(args)
+      @args = args
     end
 
-    def default_bindir
-      return unless root?
-      root.join("bin")
+    def run
+      parser.parse!(@args)
+
+      manifest_file = Bundler::ManifestFile.load(@manifest)
+      if ARGV.empty?
+        manifest_file.install
+      else
+        manifest_file.setup_environment
+        exec(*ARGV)
+      end
+    rescue DefaultManifestNotFound => e
+      Bundler.logger.error "Could not find a Gemfile to use"
+      exit 2
+    rescue InvalidEnvironmentName => e
+      Bundler.logger.error "Gemfile error: #{e.message}"
+      exit
     end
 
-    def root
-      return @root if @root
+    def parser
+      @parser ||= OptionParser.new do |op|
+        op.banner = "Usage: gem_bundler [OPTIONS] [PATH]"
 
-      current = Pathname.new(Dir.pwd)
+        op.on("-m", "--manifest MANIFEST") do |manifest|
+          @manifest = manifest
+        end
 
-      begin
-        @root = current if current.join("Gemfile").exist?
-        current = current.parent
-      end until current.root?
-
-      @root ||= :none
+        op.on_tail("-h", "--help", "Show this message") do
+          puts op
+          exit
+        end
+      end
     end
-
-    def root?
-      root != :none
-    end
-
   end
-end
+  end

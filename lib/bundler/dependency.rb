@@ -1,6 +1,7 @@
 module Bundler
-  class Dependency
+  class InvalidEnvironmentName < StandardError; end
 
+  class Dependency
     attr_reader :name, :version, :require_as, :only, :except
 
     def initialize(name, options = {})
@@ -15,7 +16,7 @@ module Bundler
       @except     = Array(options["except"]).map {|e| e.to_s } if options["except"]
 
       if (@only && @only.include?("rubygems")) || (@except && @except.include?("rubygems"))
-        raise ArgumentError, "'rubygems' is not a valid environment name"
+        raise InvalidEnvironmentName, "'rubygems' is not a valid environment name"
       end
     end
 

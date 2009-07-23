@@ -40,9 +40,9 @@ describe "Bundler::Dependency" do
 
   it "disallows the :rubygems environment" do
     lambda { Bundler::Dependency.new("ruby-debug", :only => "rubygems") }.
-      should raise_error(ArgumentError)
+      should raise_error(Bundler::InvalidEnvironmentName)
     lambda { Bundler::Dependency.new("ruby-debug", :except => "rubygems") }.
-      should raise_error(ArgumentError)
+      should raise_error(Bundler::InvalidEnvironmentName)
   end
 
   it "tests whether a dependency is for a specific environment (with :only)" do

@@ -8,11 +8,14 @@ describe "Bundling DSL" do
   end
 
   def build_manifest(str = "")
-    Bundler::ManifestBuilder.build(tmp_dir, str)
+    File.open(tmp_file("Gemfile"), "w") do |f|
+      f.puts str
+    end
+    Bundler::ManifestFile.load(tmp_file("Gemfile"))
   end
 
   it "allows specifying the path to bundle gems to" do
-    build_manifest.path.should == tmp_dir
+    build_manifest.gem_path.should == tmp_file("vendor", "gems")
   end
 
   it "allows specifying sources" do
@@ -71,7 +74,7 @@ describe "Bundling DSL" do
       DSL
     end
 
-    manifest = Bundler::ManifestBuilder.load(tmp_dir, tmp_file("manifest.rb"))
+    manifest = Bundler::ManifestFile.load(tmp_file("manifest.rb"))
     manifest.dependencies.first.name.should == "rails"
   end
 
@@ -116,13 +119,13 @@ describe "Bundling DSL" do
 
     manifest.install
 
-    tmp_dir.should have_cached_gems(*gems)
-    tmp_dir.should have_installed_gems(*gems)
+    tmp_gem_path.should have_cached_gems(*gems)
+    tmp_gem_path.should have_installed_gems(*gems)
 
     load_paths = {}
     gems.each { |g| load_paths[g] = %w(bin lib) }
 
-    tmp_file('environments', 'default.rb').should have_load_paths(tmp_dir, load_paths)
+    tmp_gem_path('environments', 'default.rb').should have_load_paths(tmp_gem_path, load_paths)
   end
 
   it "outputs a pretty error when an environment is named rubygems" do
@@ -132,8 +135,6 @@ describe "Bundling DSL" do
 
         gem "extlib", :only => "rubygems"
       DSL
-    end.should raise_error(SystemExit)
-
-    @log_output.should have_log_message("Gemfile error: 'rubygems' cannot be used as an environment name")
+    end.should raise_error(Bundler::InvalidEnvironmentName)
   end
 end

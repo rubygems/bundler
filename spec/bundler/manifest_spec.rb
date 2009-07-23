@@ -18,7 +18,7 @@ describe "Bundler::Manifest" do
     before(:each) do
       FileUtils.rm_rf(tmp_dir)
       FileUtils.mkdir_p(tmp_dir)
-      @manifest = Bundler::Manifest.new(@sources, @deps, tmp_dir)
+      @manifest = Bundler::Manifest.new(@sources, @deps, tmp_bindir, tmp_gem_path)
       @saved_load_path, @saved_loaded_features = $:.dup, $".dup
     end
 
@@ -41,8 +41,8 @@ describe "Bundler::Manifest" do
         rake-0.8.7 actionpack-2.3.2
         activeresource-2.3.2 rails-2.3.2)
 
-      tmp_dir.should have_cached_gems(*gems)
-      tmp_dir.should have_installed_gems(*gems)
+      tmp_gem_path.should have_cached_gems(*gems)
+      tmp_gem_path.should have_installed_gems(*gems)
     end
 
     it "skips fetching the source index if all gems are present" do
@@ -64,7 +64,7 @@ describe "Bundler::Manifest" do
       deps << dep("rails", "2.3.2")
       deps << dep("rack", "1.0.0")
 
-      manifest = Bundler::Manifest.new(@sources,deps, tmp_dir)
+      manifest = Bundler::Manifest.new(@sources, deps, tmp_bindir, tmp_gem_path)
       manifest.install
 
       gems = %w(rack-1.0.0 actionmailer-2.3.2
@@ -72,37 +72,37 @@ describe "Bundler::Manifest" do
         rake-0.8.7 actionpack-2.3.2
         activeresource-2.3.2 rails-2.3.2)
 
-      tmp_dir.should have_cached_gems(*gems)
-      tmp_dir.should have_installed_gems(*gems)
+      tmp_gem_path.should have_cached_gems(*gems)
+      tmp_gem_path.should have_installed_gems(*gems)
     end
 
     it "removes gems that are not needed anymore" do
       @manifest.install
-      tmp_dir.should have_cached_gem("rack-0.9.1")
-      tmp_dir.should have_installed_gem("rack-0.9.1")
-      tmp_file("bin", "rackup").should exist
+      tmp_gem_path.should have_cached_gem("rack-0.9.1")
+      tmp_gem_path.should have_installed_gem("rack-0.9.1")
+      tmp_bindir("rackup").should exist
 
       deps = @deps.dup
       deps.pop
-      manifest = Bundler::Manifest.new(@sources, deps, tmp_dir)
+      manifest = Bundler::Manifest.new(@sources, deps, tmp_bindir, tmp_gem_path)
       manifest.install
 
-      tmp_dir.should_not have_cached_gem("rack-0.9.1")
-      tmp_dir.should_not have_installed_gem("rack-0.9.1")
-      tmp_file("bin", "rackup").should_not exist
+      tmp_gem_path.should_not have_cached_gem("rack-0.9.1")
+      tmp_gem_path.should_not have_installed_gem("rack-0.9.1")
+      tmp_bindir("rackup").should_not exist
       @log_output.should have_log_message("Deleting rack-0.9.1.gem")
     end
 
     it "removes stray specfiles" do
-      spec = tmp_file("specifications", "omg.gemspec")
-      FileUtils.mkdir_p(tmp_file("specifications"))
+      spec = tmp_gem_path("specifications", "omg.gemspec")
+      FileUtils.mkdir_p(tmp_gem_path("specifications"))
       FileUtils.touch(spec)
       @manifest.install
       spec.should_not exist
     end
 
     it "removes any stray directories in gems that are not to be installed" do
-      dir = tmp_file("gems", "omg")
+      dir = tmp_gem_path("gems", "omg")
       FileUtils.mkdir_p(dir)
       @manifest.install
       dir.should_not exist
@@ -123,17 +123,17 @@ describe "Bundler::Manifest" do
     end
 
     it "makes gems available via Manifest#activate" do
-      manifest = Bundler::Manifest.new(@sources, [dep("very-simple", "1.0.0")], tmp_dir)
+      manifest = Bundler::Manifest.new(@sources, [dep("very-simple", "1.0.0")], tmp_bindir, tmp_gem_path)
       manifest.install
 
       manifest.activate
       $:.any? do |p|
-        File.expand_path(p) == File.expand_path(tmp_file("gems", "very-simple-1.0", "lib"))
+        File.expand_path(p) == File.expand_path(tmp_gem_path("gems", "very-simple-1.0", "lib"))
       end.should be_true
     end
 
     it "makes gems available" do
-      manifest = Bundler::Manifest.new(@sources, [dep("very-simple", "1.0.0")], tmp_dir)
+      manifest = Bundler::Manifest.new(@sources, [dep("very-simple", "1.0.0")], tmp_bindir, tmp_gem_path)
       manifest.install
 
       manifest.activate
@@ -141,7 +141,7 @@ describe "Bundler::Manifest" do
 
       $".any? do |f|
         File.expand_path(f) ==
-          File.expand_path(tmp_file("gems", "very-simple-1.0", "lib", "very-simple.rb"))
+          File.expand_path(tmp_gem_path("gems", "very-simple-1.0", "lib", "very-simple.rb"))
       end
     end
   end
@@ -152,7 +152,7 @@ describe "Bundler::Manifest" do
       FileUtils.mkdir_p(tmp_dir)
       @manifest = Bundler::Manifest.new(@sources,
         [dep("very-simple", "1.0.0", :only => "testing"),
-         dep("rack", "1.0.0")], tmp_dir)
+         dep("rack", "1.0.0")], tmp_bindir, tmp_gem_path)
 
       @manifest.install
     end
@@ -170,49 +170,49 @@ describe "Bundler::Manifest" do
     end
 
     it "can create load path files for each environment" do
-      tmp_file('environments', 'testing.rb').should have_load_paths(tmp_dir,
+      tmp_gem_path('environments', 'testing.rb').should have_load_paths(tmp_gem_path,
         "very-simple-1.0" => %w(bin lib),
         "rack-1.0.0"      => %w(bin lib)
       )
 
-      tmp_file('environments', 'default.rb').should have_load_paths(tmp_dir,
+      tmp_gem_path('environments', 'default.rb').should have_load_paths(tmp_gem_path,
         "rack-1.0.0" => %w(bin lib)
       )
 
-      File.exist?(tmp_file('environments', "production.rb")).should be_false
+      File.exist?(tmp_gem_path('environments', "production.rb")).should be_false
     end
 
     it "adds the environments path to the load paths" do
-      tmp_file('environments', 'testing.rb').should have_load_paths(tmp_dir, [
+      tmp_gem_path('environments', 'testing.rb').should have_load_paths(tmp_gem_path, [
         "environments"
       ])
     end
 
     it "creates a rubygems.rb file in the environments directory" do
-      File.exist?(tmp_file('environments', 'rubygems.rb')).should be_true
+      File.exist?(tmp_gem_path('environments', 'rubygems.rb')).should be_true
     end
 
     it "requires the Rubygems library" do
-      env = tmp_file('environments', 'default.rb')
+      env = tmp_gem_path('environments', 'default.rb')
       out = `#{Gem.ruby} -r #{env} -r rubygems -e 'puts Gem'`.strip
       out.should == 'Gem'
     end
 
     it "removes the environments path from the load paths after rubygems is required" do
-      env = tmp_file('environments', 'default.rb')
+      env = tmp_gem_path('environments', 'default.rb')
       out = `#{Gem.ruby} -r #{env} -r rubygems -e 'puts $:'`
-      out.should_not include(tmp_file('environments'))
+      out.should_not include(tmp_gem_path('environments'))
     end
 
     it "Gem.loaded_specs has the gems that are included" do
-      env = tmp_file('environments', 'default.rb')
+      env = tmp_gem_path('environments', 'default.rb')
       out = `#{Gem.ruby} -r #{env} -r rubygems -e 'puts Gem.loaded_specs.map{|k,v|"\#{k} - \#{v.version}"}'`
       out = out.split("\n")
       out.should include("rack - 1.0.0")
     end
 
     it "Gem.loaded_specs has the gems that are included in the testing environment" do
-      env = tmp_file('environments', 'testing.rb')
+      env = tmp_gem_path('environments', 'testing.rb')
       out = `#{Gem.ruby} -r #{env} -r rubygems -e 'puts Gem.loaded_specs.map{|k,v|"\#{k} - \#{v.version}"}'`
       out = out.split("\n")
       out.should include("rack - 1.0.0")

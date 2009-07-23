@@ -11,6 +11,7 @@ require "bundler/installer"
 require "bundler/finder"
 require "bundler/gem_ext"
 require "bundler/resolver"
+require "bundler/manifest_file"
 require "bundler/manifest"
 require "bundler/dependency"
 require "bundler/runtime"
@@ -20,11 +21,6 @@ module Bundler
   VERSION = "0.5.0"
 
   class << self
-    def run(options = {})
-      manifest = ManifestBuilder.load(options[:path], options[:manifest])
-      manifest.install
-    end
-
     attr_writer :logger
 
     def logger

@@ -6,23 +6,30 @@ module Bundler
   class Manifest
     attr_reader :sources, :dependencies, :path
 
-    def initialize(sources, dependencies, path)
+    def initialize(sources, dependencies, bindir, gem_path)
       sources.map! {|s| s.is_a?(URI) ? s : URI.parse(s) }
-      @sources, @dependencies, @path = sources, dependencies, Pathname.new(path)
+      @sources, @dependencies, @bindir, @gem_path = sources, dependencies, Pathname.new(bindir.to_s), Pathname.new(gem_path.to_s)
     end
 
-    def install(options = {})
+    def install
       fetch
-      installer = Installer.new(@path)
-      installer.install(:bin_dir => options[:bin_dir] || CLI.default_bindir)
+      installer = Installer.new(@gem_path)
+      installer.install(:bin_dir => @bindir)
       cleanup_removed_gems
-      create_load_paths_files(@path.join("environments"))
-      create_fake_rubygems(@path.join("environments"))
+      create_load_paths_files(@gem_path.join("environments"))
+      create_fake_rubygems(@gem_path.join("environments"))
       Bundler.logger.info "Done."
     end
 
     def activate(environment = "default")
-      require @path.join("environments", "#{environment}.rb")
+      require @gem_path.join("environments", "#{environment}.rb")
+    end
+
+    def setup_environment
+      ENV["GEM_HOME"] = @gem_path
+      ENV["GEM_PATH"] = @gem_path
+      ENV["PATH"]     = "#{@bindir}:#{ENV["PATH"]}"
+      ENV["RUBYOPT"]  = "-r#{@gem_path}/environments/default #{ENV["RUBYOPT"]}"
     end
 
     def require_all
@@ -35,7 +42,7 @@ module Bundler
       deps     = dependencies
       deps     = deps.select { |d| d.in?(environment) } if environment
       deps     = deps.map { |d| d.to_gem_dependency }
-      index    = Gem::SourceIndex.from_gems_in(@path.join("specifications"))
+      index    = Gem::SourceIndex.from_gems_in(@gem_path.join("specifications"))
       Resolver.resolve(deps, index).all_specs
     end
     alias gems gems_for
@@ -56,7 +63,7 @@ module Bundler
         raise VersionConflict, "No compatible versions could be found for:\n#{gems}"
       end
 
-      bundle.download(@path)
+      bundle.download(@gem_path)
     end
 
     def gem_dependencies
@@ -66,7 +73,7 @@ module Bundler
     def all_gems_installed?
       downloaded_gems = {}
 
-      Dir[@path.join("cache", "*.gem")].each do |file|
+      Dir[@gem_path.join("cache", "*.gem")].each do |file|
         file =~ /\/([^\/]+)-([\d\.]+)\.gem$/
         name, version = $1, $2
         downloaded_gems[name] = Gem::Version.new(version)
@@ -80,7 +87,7 @@ module Bundler
 
     def cleanup_removed_gems
       glob = gems.map { |g| g.full_name }.join(',')
-      base = @path.join("{cache,specifications,gems}")
+      base = @gem_path.join("{cache,specifications,gems}")
 
       (Dir[base.join("*")] - Dir[base.join("{#{glob}}{.gemspec,.gem,}")]).each do |file|
         Bundler.logger.info "Deleting #{File.basename(file)}" if File.basename(file) =~ /\.gem$/
