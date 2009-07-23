@@ -13,8 +13,7 @@ module Bundler
 
     def install
       fetch
-      installer = Installer.new(@gem_path)
-      installer.install(:bin_dir => @bindir)
+      Installer.install(@gem_path, @bindir)
       cleanup_removed_gems
       create_load_paths_files(@gem_path.join("environments"))
       create_fake_rubygems(@gem_path.join("environments"))

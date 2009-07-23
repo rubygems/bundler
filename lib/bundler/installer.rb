@@ -1,24 +1,28 @@
 module Bundler
   class Installer
-    def initialize(path)
-      if !path.directory?
-        raise ArgumentError, "#{path} is not a directory"
-      elsif !path.join("cache").directory?
-        raise ArgumentError, "#{path} is not a valid environment (it does not contain a cache directory)"
-      end
-
-      @path = path
-      @gems = Dir[path.join("cache", "*.gem")]
+    def self.install(gem_path, bindir = nil)
+      new(gem_path, bindir).install
     end
 
-    def install(options = {})
-      bin_dir = options[:bin_dir] ||= @path.join("bin")
+    def initialize(gem_path, bindir)
+      if !gem_path.directory?
+        raise ArgumentError, "#{gem_path} is not a directory"
+      elsif !gem_path.join("cache").directory?
+        raise ArgumentError, "#{gem_path} is not a valid environment (it does not contain a cache directory)"
+      end
 
+      @gem_path = gem_path
+
+      @bindir = bindir || gem_path.join("bin")
+      @gems = Dir[@gem_path.join("cache", "*.gem")]
+    end
+
+    def install
       # Delete all executables since they will be recreated later
-      Dir[bin_dir.join('*')].each { |file| File.delete(file) }
+      Dir[@bindir.join('*')].each { |file| File.delete(file) }
 
-      specs = Dir[File.join(@path, "specifications", "*.gemspec")]
-      gems  = Dir[File.join(@path, "gems", "*")]
+      specs = Dir[File.join(@gem_path, "specifications", "*.gemspec")]
+      gems  = Dir[File.join(@gem_path, "gems", "*")]
 
       @gems.each do |gem|
         name      = File.basename(gem).gsub(/\.gem$/, '')
@@ -27,14 +31,15 @@ module Bundler
 
         unless installed
           Bundler.logger.info "Installing #{name}.gem"
-          installer = Gem::Installer.new(gem, :install_dir => @path,
+          installer = Gem::Installer.new(gem, :install_dir => @gem_path,
             :ignore_dependencies => true,
             :env_shebang => true,
             :wrappers => true,
-            :bin_dir => bin_dir)
+            :bin_dir => @bindir)
           installer.install
         end
       end
+      self
     end
   end
 end
