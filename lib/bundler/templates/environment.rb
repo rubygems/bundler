@@ -10,5 +10,3 @@ $LOAD_PATH.unshift File.expand_path(File.dirname(__FILE__))
 <% load_paths.each do |load_path| %>
 $LOAD_PATH.unshift "<%= load_path %>"
 <% end %>
-
-require 'rubygems'
