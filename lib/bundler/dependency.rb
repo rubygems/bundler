@@ -36,5 +36,10 @@ module Bundler
       @gem_dep ||= Gem::Dependency.new(name, version)
     end
 
+    def ==(o)
+      [name, version, require_as, only, except] ==
+        [o.name, o.version, o.require_as, o.only, o.except]
+    end
+
   end
 end

@@ -51,6 +51,31 @@ module Spec
     def copy(gem_name)
       FileUtils.cp(fixture(gem_name), File.join(tmp_dir, 'cache'))
     end
+
+    def build_manifest_file(*args)
+      path = tmp_file("Gemfile")
+      path = args.shift if args.first.is_a?(Pathname)
+      str  = args.shift || ""
+      File.open(path, 'w') do |f|
+        f.puts str
+      end
+    end
+
+    def build_manifest(*args)
+      path = tmp_file("Gemfile")
+      path = args.shift if args.first.is_a?(Pathname)
+      str  = args.shift || ""
+      FileUtils.mkdir_p(path.dirname)
+      Dir.chdir(path.dirname) do
+        build_manifest_file(path, str)
+        Bundler::ManifestFile.load
+      end
+    end
+
+    def reset!
+      FileUtils.rm_rf(tmp_dir)
+      FileUtils.mkdir_p(tmp_dir)
+    end
   end
 end
 
@@ -58,6 +83,8 @@ Spec::Runner.configure do |config|
   config.include Bundler::Resolver::Builders
   config.include Spec::Matchers
   config.include Spec::Helpers
+
+  original_wd = Dir.pwd
 
   config.before(:all) do
     @log_output = StringIO.new
@@ -67,5 +94,6 @@ Spec::Runner.configure do |config|
   config.after(:each) do
     @log_output.rewind
     @log_output.string.replace ""
+    Dir.chdir(original_wd)
   end
 end

@@ -79,7 +79,8 @@ module Spec
         given.rewind
         log = given.read
         matcher.failure_message = "Expected logger to contain:\n  #{message}\n\nBut it was:\n  #{log.gsub("\n", "\n  ")}"
-        log =~ /^#{Regexp.escape(message)}$/m
+        message = /^#{Regexp.escape(message)}$/m unless message.is_a?(Regexp)
+        log =~ message
       end
     end
   end

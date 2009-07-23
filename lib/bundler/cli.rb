@@ -14,17 +14,20 @@ module Bundler
       parser.parse!(@args)
 
       manifest_file = Bundler::ManifestFile.load(@manifest)
-      if ARGV.empty?
+      if @args.empty?
         manifest_file.install
       else
         manifest_file.setup_environment
-        exec(*ARGV)
+        exec(*@args)
       end
     rescue DefaultManifestNotFound => e
       Bundler.logger.error "Could not find a Gemfile to use"
       exit 2
     rescue InvalidEnvironmentName => e
       Bundler.logger.error "Gemfile error: #{e.message}"
+      exit
+    rescue VersionConflict => e
+      Bundler.logger.error e.message
       exit
     end
 

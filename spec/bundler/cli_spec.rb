@@ -3,18 +3,15 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe "Bundler::CLI" do
   describe "it working" do
     before(:all) do
-      FileUtils.rm_rf(tmp_dir)
-      FileUtils.mkdir_p(tmp_dir)
+      reset!
 
-      File.open(tmp_file("Gemfile"), 'w') do |file|
-        file.puts <<-DSL
-          sources.clear
-          source "file://#{gem_repo1}"
-          gem "rake"
-          gem "extlib"
-          gem "rack", :only => :web
-        DSL
-      end
+      build_manifest <<-Gemfile
+        sources.clear
+        source "file://#{gem_repo1}"
+        gem "rake"
+        gem "extlib"
+        gem "rack", :only => :web
+      Gemfile
 
       lib = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'lib'))
       bin = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'bin', 'gem_bundler'))
@@ -22,14 +19,6 @@ describe "Bundler::CLI" do
       Dir.chdir(tmp_dir) do
         @output = `#{Gem.ruby} -I #{lib} #{bin}`
       end
-    end
-
-    before(:each) do
-      @original_pwd = Dir.pwd
-    end
-
-    after(:each) do
-      Dir.chdir(@original_pwd)
     end
 
     it "caches and installs rake" do
@@ -71,6 +60,62 @@ describe "Bundler::CLI" do
         "Done." ].each do |message|
           @output.should =~ /^#{Regexp.escape(message)}$/
         end
+    end
+  end
+
+  describe "it working without rubygems" do
+    before(:all) do
+      reset!
+
+      build_manifest <<-Gemfile
+        sources.clear
+        source "file://#{gem_repo1}"
+        gem "rake"
+        gem "extlib"
+        gem "rack", :only => :web
+
+        disable_rubygems
+      Gemfile
+
+      lib = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'lib'))
+      bin = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'bin', 'gem_bundler'))
+
+      Dir.chdir(tmp_dir) do
+        @output = `#{Gem.ruby} -I #{lib} #{bin}`
+      end
+    end
+
+    it "does not load rubygems when required" do
+      out = `#{tmp_file('bin', 'rake')} -e 'require "rubygems" ; puts Gem rescue puts "No rubygems"'`
+      out.should =~ /No rubygems/
+    end
+  end
+
+  describe "it working with requiring rubygems automatically" do
+    before(:all) do
+      reset!
+
+      build_manifest <<-Gemfile
+        sources.clear
+        source "file://#{gem_repo1}"
+        gem "rake"
+        gem "extlib"
+        gem "rack", :only => :web
+
+        require_rubygems
+      Gemfile
+
+      lib = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'lib'))
+      bin = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'bin', 'gem_bundler'))
+
+      Dir.chdir(tmp_dir) do
+        @output = `#{Gem.ruby} -I #{lib} #{bin}`
+      end
+    end
+
+    it "does already has rubygems required" do
+      out = `#{tmp_file('bin', 'rake')} -e 'puts Gem'`
+      out.should =~ /Gem/
     end
   end
 end

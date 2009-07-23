@@ -32,6 +32,14 @@ module Bundler
         @manifest_file.root.join(path) : path).expand_path
     end
 
+    def disable_rubygems
+      @manifest_file.rubygems = :disable
+    end
+
+    def require_rubygems
+      @manifest_file.rubygems = :require
+    end
+
     def source(source)
       @manifest_file.sources << source
     end

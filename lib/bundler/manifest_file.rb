@@ -3,16 +3,17 @@ module Bundler
 
   class ManifestFile
     attr_reader :sources, :dependencies
-    attr_accessor :gem_path, :bindir
+    attr_accessor :gem_path, :bindir, :rubygems
 
     def self.load(filename = nil)
       new(filename).load
     end
 
     def initialize(filename)
-      @filename = filename
+      @filename      = filename
       @sources       = %w(http://gems.rubyforge.org)
       @dependencies  = []
+      @rubygems      = :optional
     end
 
     def load
@@ -34,7 +35,7 @@ module Bundler
 
     def load_manifest
       ManifestBuilder.load(self, filename)
-      Manifest.new(sources, dependencies, bindir, gem_path)
+      Manifest.new(sources, dependencies, bindir, gem_path, rubygems)
     end
 
     def gem_path

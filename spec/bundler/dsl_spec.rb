@@ -3,15 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe "Bundling DSL" do
 
   before(:all) do
-    FileUtils.rm_rf(tmp_dir)
-    FileUtils.mkdir_p(tmp_dir)
-  end
-
-  def build_manifest(str = "")
-    File.open(tmp_file("Gemfile"), "w") do |f|
-      f.puts str
-    end
-    Bundler::ManifestFile.load(tmp_file("Gemfile"))
+    reset!
   end
 
   it "allows specifying the path to bundle gems to" do
