@@ -42,6 +42,7 @@ module Bundler
 
     def source(source)
       @manifest_file.sources << source
+      @manifest_file.sources.uniq!
     end
 
     def sources

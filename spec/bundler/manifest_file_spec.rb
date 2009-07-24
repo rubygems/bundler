@@ -68,4 +68,15 @@ describe "Bundler::Manifest" do
     Dir.chdir(tmp_file('w0t'))
     Bundler::ManifestFile.load.bindir.should == tmp_file('..', 'cheezeburgerz')
   end
+
+  it "ensures the source sources contains no duplicate" do
+    build_manifest_file <<-Gemfile
+      source "http://gems.rubyforge.org"
+      source "http://gems.github.org"
+      source "http://gems.github.org"
+    Gemfile
+    FileUtils.mkdir_p(tmp_file("baz"))
+    Dir.chdir(tmp_file("baz"))
+    Bundler::ManifestFile.load.sources.should have(2).items
+  end
 end
