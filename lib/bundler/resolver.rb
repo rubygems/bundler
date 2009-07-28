@@ -1,9 +1,21 @@
+# Extending Gem classes to add necessary tracking information
+module Gem
+  class Dependency
+    attr_accessor :required_by
+  end
+  class Specification
+    attr_accessor :required_by
+  end
+end
+
 module Bundler
 
   class Resolver
     def self.resolve(requirements, index = Gem.source_index)
       result = catch(:success) do
-        new(index).resolve(requirements, {})
+        resolver = new(index)
+        resolver.resolve(requirements, {})
+        nil
       end
       result && result.values
     end
@@ -13,7 +25,7 @@ module Bundler
     end
 
     def resolve(reqs, activated)
-      return activated if reqs.empty?
+      throw :success, activated if reqs.empty?
 
       reqs = reqs.sort_by {|dep| @index.search(dep).size }
       activated = activated.dup
@@ -22,20 +34,30 @@ module Bundler
       if existing = activated[current.name]
         if current.version_requirements.satisfied_by?(existing.version)
           resolve(reqs, activated)
+        else
+          throw current.required_by ? current.required_by.name : existing.required_by.name
         end
       else
-        specs = @index.search(current)
-        specs.reverse!
-        specs.each do |spec|
-          activated[spec.name] = spec
-          new_reqs = reqs + spec.dependencies.select do |d|
-            d.type != :development
-          end
-          retval = resolve(new_reqs, activated)
-          throw :success, retval if retval
+        @index.search(current).reverse_each do |spec|
+          resolve_requirement(spec, current, reqs.dup, activated.dup)
         end
-        nil
       end
     end
+
+    def resolve_requirement(spec, requirement, reqs, activated)
+      spec.required_by     = requirement
+      activated[spec.name] = spec
+
+      spec.dependencies.each do |dep|
+        next if dep.type == :development
+        dep.required_by = requirement
+        reqs << dep
+      end
+
+      catch(requirement.name) do
+        resolve(reqs, activated)
+      end
+    end
+
   end
 end
