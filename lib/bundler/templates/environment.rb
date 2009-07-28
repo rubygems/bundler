@@ -28,6 +28,7 @@ end
 
 # Define all the Gem errors for gems that reference them.
 module Gem
+  def self.ruby ; <%= Gem.ruby.inspect %> ; end
   class LoadError < ::LoadError; end
   class Exception < RuntimeError; end
   class CommandLineError < Exception; end

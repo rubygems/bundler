@@ -143,6 +143,11 @@ end
       out = `#{tmp_file('bin', 'rake')} -e 'Gem::LoadError ; Gem::Exception ; puts "Win!"'`
       out.should =~ /Win!/
     end
+
+    it "stubs out Gem.ruby" do
+      out = `#{tmp_file("bin", "rake")} -e 'puts Gem.ruby'`
+      out.should == "#{Gem.ruby}\n"
+    end
   end
 
   describe "it working with requiring rubygems automatically" do
