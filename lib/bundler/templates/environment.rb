@@ -6,6 +6,9 @@ module Bundler
   end
 end
 
+ENV["PATH"]     = "<%= @bindir %>:#{ENV["PATH"]}"
+ENV["RUBYOPT"]  = "-r#{__FILE__} #{ENV["RUBYOPT"]}"
+
 <% if @rubygems == :optional %>
 $LOAD_PATH.unshift File.expand_path(File.dirname(__FILE__))
 <% end %>

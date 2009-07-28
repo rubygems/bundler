@@ -8,6 +8,7 @@ describe "Bundler::CLI" do
         source "file://#{gem_repo1}"
         gem "rake"
         gem "extlib"
+        gem "very-simple"
         gem "rack", :only => :web
       Gemfile
 
@@ -20,7 +21,7 @@ describe "Bundler::CLI" do
     end
 
     it "caches and installs rake" do
-      gems = %w(rake-0.8.7 extlib-0.9.12 rack-0.9.1)
+      gems = %w(rake-0.8.7 extlib-0.9.12 rack-0.9.1 very-simple-1.0)
       tmp_file("vendor", "gems").should have_cached_gems(*gems)
       tmp_file("vendor", "gems").should have_installed_gems(*gems)
     end
@@ -28,13 +29,15 @@ describe "Bundler::CLI" do
     it "creates a default environment file with the appropriate load paths" do
       tmp_file('vendor', 'gems', 'environments', 'default.rb').should have_load_paths(tmp_file("vendor", "gems"),
         "extlib-0.9.12" => %w(lib),
-        "rake-0.8.7" => %w(bin lib)
+        "rake-0.8.7" => %w(bin lib),
+        "very-simple-1.0" => %w(bin lib)
       )
 
       tmp_file('vendor', 'gems', 'environments', 'web.rb').should have_load_paths(tmp_file("vendor", "gems"),
         "extlib-0.9.12" => %w(lib),
         "rake-0.8.7" => %w(bin lib),
-        "rack-0.9.1" => %w(bin lib)
+        "rack-0.9.1" => %w(bin lib),
+        "very-simple-1.0" => %w(bin lib)
       )
     end
 
@@ -43,7 +46,22 @@ describe "Bundler::CLI" do
       out.should include(tmp_file("vendor", "gems", "gems", "rake-0.8.7", "lib").to_s)
       out.should include(tmp_file("vendor", "gems", "gems", "rake-0.8.7", "bin").to_s)
       out.should include(tmp_file("vendor", "gems", "gems", "extlib-0.9.12", "lib").to_s)
+      out.should include(tmp_file("vendor", "gems", "gems", "very-simple-1.0", "lib").to_s)
       out.should_not include(tmp_file("vendor", "gems", "gems", "rack-0.9.1").to_s)
+    end
+
+    it "maintains the correct environment when shelling out" do
+      File.open(tmp_file("Rakefile"), 'w') do |f|
+        f.puts <<-RAKE
+task :hello do
+  exec %{#{Gem.ruby} -e 'require "very-simple" ; puts VerySimpleForTests'}
+end
+        RAKE
+      end
+      Dir.chdir(tmp_dir) do
+        out = `#{tmp_file("bin", "rake")} hello`
+        out.should == "VerySimpleForTests\n"
+      end
     end
 
     it "logs the correct information messages" do
@@ -52,9 +70,11 @@ describe "Bundler::CLI" do
         "Downloading rake-0.8.7.gem",
         "Downloading extlib-0.9.12.gem",
         "Downloading rack-0.9.1.gem",
+        "Downloading very-simple-1.0.gem",
         "Installing rake-0.8.7.gem",
         "Installing extlib-0.9.12.gem",
         "Installing rack-0.9.1.gem",
+        "Installing very-simple-1.0.gem",
         "Done." ].each do |message|
           @output.should =~ /^#{Regexp.escape(message)}$/
         end
