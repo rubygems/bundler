@@ -11,7 +11,7 @@ describe "Resolving specs" do
     ]
 
     solution = Bundler::Resolver.resolve(deps, index)
-    solution.all_specs.should match_gems(
+    solution.should match_gems(
       "bar" => ["2.0.0"]
     )
   end
@@ -34,7 +34,7 @@ describe "Resolving specs" do
     ]
 
     solution = Bundler::Resolver.resolve(deps, index)
-    solution.all_specs.should match_gems(
+    solution.should match_gems(
       "activemerchant" => ["1.4.1"],
       "action_pack" => ["2.3.2"],
       "activesupport" => ["2.3.2"]
@@ -54,7 +54,7 @@ describe "Resolving specs" do
     ]
 
     solution = Bundler::Resolver.resolve(deps, index)
-    solution.all_specs.should match_gems(
+    solution.should match_gems(
       "bar" => ["2.0.0"],
       "foo" => ["1.1"]
     )
@@ -78,7 +78,7 @@ describe "Resolving specs" do
     ]
 
     solution = Bundler::Resolver.resolve(deps, index)
-    solution.all_specs.should match_gems(
+    solution.should match_gems(
       "bar" => ["1.0"],
       "foo" => ["1.0"]
     )
@@ -92,7 +92,7 @@ describe "Resolving specs" do
     ]
 
     solution = Bundler::Resolver.resolve(deps, index)
-    solution.all_specs.should match_gems(
+    solution.should match_gems(
       "merb-core"=>["1.0.7.1"],
       "rake"=>["0.8.7"],
       "thor"=>["0.9.9"],

@@ -33,7 +33,7 @@ module Bundler
       Bundler.logger.info "Calculating dependencies..."
 
       resolved = Resolver.resolve(dependencies, self)
-      resolved && GemBundle.new(resolved.all_specs)
+      resolved && GemBundle.new(resolved)
     end
 
     # Fetches the index from the remote source

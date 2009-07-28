@@ -1,7 +1,7 @@
 $:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
 $:.push File.join(File.dirname(__FILE__))
 require "bundler"
-require "bundler/resolver/builders"
+require "builders"
 require "matchers"
 require "pathname"
 require "pp"
@@ -81,7 +81,7 @@ module Spec
 end
 
 Spec::Runner.configure do |config|
-  config.include Bundler::Resolver::Builders
+  config.include Spec::Builders
   config.include Spec::Matchers
   config.include Spec::Helpers
 

@@ -39,7 +39,7 @@ module Bundler
       deps     = deps.select { |d| d.in?(environment) } if environment
       deps     = deps.map { |d| d.to_gem_dependency }
       index    = Gem::SourceIndex.from_gems_in(@gem_path.join("specifications"))
-      Resolver.resolve(deps, index).all_specs
+      Resolver.resolve(deps, index)
     end
     alias gems gems_for
 
