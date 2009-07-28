@@ -6,26 +6,26 @@ module Bundler
   class Manifest
     attr_reader :sources, :dependencies, :path
 
-    def initialize(sources, dependencies, bindir, gem_path, rubygems)
+    def initialize(sources, dependencies, bindir, repository_path, rubygems)
       sources.map! {|s| s.is_a?(URI) ? s : URI.parse(s) }
       @sources      = sources
       @dependencies = dependencies
       @bindir       = bindir
-      @gem_path     = gem_path
+      @repository   = Repository.new(repository_path)
       @rubygems     = rubygems
     end
 
     def install
       fetch
-      Installer.install(@gem_path, @bindir)
+      @repository.install_cached_gems(:bin_dir => @bindir || @repository.path.join("bin"))
       cleanup_removed_gems
-      create_load_paths_files(@gem_path.join("environments"))
-      create_fake_rubygems(@gem_path.join("environments"))
+      create_load_paths_files(@repository.path.join("environments"))
+      create_fake_rubygems(@repository.path.join("environments"))
       Bundler.logger.info "Done."
     end
 
     def activate(environment = "default")
-      require @gem_path.join("environments", "#{environment}.rb")
+      require @repository.path.join("environments", "#{environment}.rb")
     end
 
     def require_all
@@ -38,8 +38,7 @@ module Bundler
       deps     = dependencies
       deps     = deps.select { |d| d.in?(environment) } if environment
       deps     = deps.map { |d| d.to_gem_dependency }
-      index    = Gem::SourceIndex.from_gems_in(@gem_path.join("specifications"))
-      Resolver.resolve(deps, index)
+      Resolver.resolve(deps, @repository.source_index)
     end
     alias gems gems_for
 
@@ -59,7 +58,7 @@ module Bundler
         raise VersionConflict, "No compatible versions could be found for:\n#{gems}"
       end
 
-      bundle.download(@gem_path)
+      bundle.download(@repository.path)
     end
 
     def gem_dependencies
@@ -69,7 +68,7 @@ module Bundler
     def all_gems_installed?
       downloaded_gems = {}
 
-      Dir[@gem_path.join("cache", "*.gem")].each do |file|
+      Dir[@repository.path.join("cache", "*.gem")].each do |file|
         file =~ /\/([^\/]+)-([\d\.]+)\.gem$/
         name, version = $1, $2
         downloaded_gems[name] = Gem::Version.new(version)
@@ -83,7 +82,7 @@ module Bundler
 
     def cleanup_removed_gems
       glob = gems.map { |g| g.full_name }.join(',')
-      base = @gem_path.join("{cache,specifications,gems}")
+      base = @repository.path.join("{cache,specifications,gems}")
 
       (Dir[base.join("*")] - Dir[base.join("{#{glob}}{.gemspec,.gem,}")]).each do |file|
         Bundler.logger.info "Deleting gem: #{File.basename(file, ".gem")}" if File.basename(file) =~ /\.gem$/

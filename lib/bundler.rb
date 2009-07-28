@@ -7,7 +7,6 @@ require "rubygems/remote_fetcher"
 require "rubygems/installer"
 
 require "bundler/gem_bundle"
-require "bundler/installer"
 require "bundler/finder"
 require "bundler/gem_ext"
 require "bundler/resolver"
@@ -16,6 +15,7 @@ require "bundler/manifest"
 require "bundler/dependency"
 require "bundler/runtime"
 require "bundler/cli"
+require "bundler/repository"
 
 module Bundler
   VERSION = "0.5.0"

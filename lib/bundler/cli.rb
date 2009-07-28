@@ -26,6 +26,9 @@ module Bundler
     rescue InvalidEnvironmentName => e
       Bundler.logger.error "Gemfile error: #{e.message}"
       exit
+    rescue InvalidRepository => e
+      Bundler.logger.error e.message
+      exit
     rescue VersionConflict => e
       Bundler.logger.error e.message
       exit
