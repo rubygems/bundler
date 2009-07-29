@@ -5,6 +5,22 @@ require "builders"
 require "matchers"
 require "pathname"
 require "pp"
+require "rbconfig"
+
+class Pathname
+  def mkdir_p
+    FileUtils.mkdir_p(self)
+  end
+
+  def touch_p
+    dirname.mkdir_p
+    touch
+  end
+
+  def touch
+    FileUtils.touch(self)
+  end
+end
 
 module Spec
   module Helpers
