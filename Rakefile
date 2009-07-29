@@ -5,20 +5,16 @@ require 'date'
 require 'spec/rake/spectask'
 
 spec = Gem::Specification.new do |s|
-  s.name = "bundler"
-  s.version = "0.0.1"
-  s.author = "Your Name"
-  s.email = "Your Email"
-  s.homepage = "http://example.com"
-  s.description = s.summary = "A gem that provides..."
+  s.name    = "bundler"
+  s.version = "0.2"
+  s.author  = "Yehuda Katz"
+  s.email   = "wycats@gmail.com"
+  s.homepage = "http://github.com/wycats/bundler"
+  s.description = s.summary = "An easy way to vendor gem dependencies"
 
   s.platform = Gem::Platform::RUBY
   s.has_rdoc = true
   s.extra_rdoc_files = ["README", "LICENSE"]
-  s.summary = ""
-
-  # Uncomment this to add a dependency
-  # s.add_dependency "foo"
 
   s.bindir       = "bin"
   s.executables  = %w( gem_bundler )
@@ -46,7 +42,7 @@ end
 
 desc "create a gemspec file"
 task :make_spec do
-  File.open("#{GEM}.gemspec", "w") do |file|
+  File.open("#{spec.name}.gemspec", "w") do |file|
     file.puts spec.to_ruby
   end
 end
