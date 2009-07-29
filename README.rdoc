@@ -19,9 +19,10 @@ with the following rake task:
 
 == Usage
 
-Bundler requires a gem manifest file to be created. By default, this should be
-a file named 'Gemfile' located in the root directory of your application. After the manifest has been created, in your shell, cd into your application's
-directory and run 'gem_bundler'. This will start the bundling process.
+Bundler requires a gem manifest file to be created. This should be a file named
+'Gemfile' located in the root directory of your application. After the manifest
+has been created, in your shell, cd into your application's directory and run
+'gem_bundler'. This will start the bundling process.
 
 === Manifest file
 
@@ -111,15 +112,15 @@ to follow.
 * In your rails app, create a Gemfile and specify the gems that your
   application depends on. Make sure to specify rails as well:
 
-  gem "rails", "2.1.2"
-  gem "will_paginate"
+    gem "rails", "2.1.2"
+    gem "will_paginate"
 
-  # Requiring rubygems seems to be the safest way to go currently.
-  require_rubygems
+    # Requiring rubygems seems to be the safest way to go currently.
+    require_rubygems
 
-  # Optionally, you can disable system gems all together and only
-  # use bundled gems.
-  disable_system_gems
+    # Optionally, you can disable system gems all together and only
+    # use bundled gems.
+    disable_system_gems
 
 I would suggest to require_rubygems as of now.
 
@@ -157,5 +158,5 @@ at:
 
 == Known issues
 
-  * Running ruby code with 'gem_bundler ruby my_ruby_script.rb' will require
-    the entire Bundler source code which also requires rubygems.
+* Running ruby code with 'gem_bundler ruby my_ruby_script.rb' will require
+  the entire Bundler source code which also requires rubygems.
