@@ -103,6 +103,47 @@ environment file is default.rb. For example:
 
   ruby -r vendor/gems/environments/default.rb my_ruby_script.rb
 
+=== Using Bundler with Rails today
+
+It should be possible to use Bundler with Rails today. Here are the steps
+to follow.
+
+* In your rails app, create a Gemfile and specify the gems that your
+  application depends on. Make sure to specify rails as well:
+
+  gem "rails", "2.1.2"
+  gem "will_paginate"
+
+  # Requiring rubygems seems to be the safest way to go currently.
+  require_rubygems
+
+  # Optionally, you can disable system gems all together and only
+  # use bundled gems.
+  disable_system_gems
+
+I would suggest to require_rubygems as of now.
+
+* Run gem_bundler
+
+* You can now use rails if you append "gem_bundler" to every call to script/*
+  but that isn't fun.
+
+* At the top of config/boot.rb, add the following line:
+
+  require File.expand_path(File.join(File.dirname(__FILE__), '..', 'vendor', 'gems', 'environments', 'default'))
+
+In theory, this should be enough to get going.
+
+=== To require rubygems or not
+
+Ideally, no gem would assume the presence of rubygems at runtime. Rubygems provides
+enough features so that this isn't necessary. However, there are a number of gems
+that require specific rubygem features.
+
+Bundler will mock out the most common of these features, but it is possible that things
+will not go as intended quite yet. So, if you are brave, try your code without rubygems
+at runtime. Otherwise, add "require_rubygems" to your Gemfile.
+
 == Environments
 
 More to come...
@@ -115,9 +156,6 @@ at:
   http://github.com/wycats/bundler/issues/
 
 == Known issues
-
-  * There are certain complex, but valid dependency combinations that cause
-    Bundler to freeze up.
 
   * Running ruby code with 'gem_bundler ruby my_ruby_script.rb' will require
     the entire Bundler source code which also requires rubygems.
