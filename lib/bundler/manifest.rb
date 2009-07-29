@@ -20,8 +20,7 @@ module Bundler
       fetch
       @repository.install_cached_gems(:bin_dir => @bindir || @repository.path.join("bin"))
       cleanup_removed_gems
-      create_load_paths_files(@repository.path.join("environments"))
-      create_fake_rubygems(@repository.path.join("environments"))
+      create_environment_files(@repository.path.join("environments"))
       Bundler.logger.info "Done."
     end
 
@@ -97,27 +96,19 @@ module Bundler
       end
     end
 
-    def create_load_paths_files(path)
+    def create_environment_files(path)
       FileUtils.mkdir_p(path)
       environments.each do |environment|
         specs = gems_for(environment)
         files = spec_files_for_specs(specs, path)
         load_paths = load_paths_for_specs(specs)
-        create_load_path_file(path, environment, files, load_paths)
+        create_environment_file(path, environment, files, load_paths)
       end
     end
 
-    def create_load_path_file(path, environment, spec_files, load_paths)
+    def create_environment_file(path, environment, spec_files, load_paths)
       File.open(path.join("#{environment}.rb"), "w") do |file|
         template = File.read(File.join(File.dirname(__FILE__), "templates", "environment.rb"))
-        erb = ERB.new(template)
-        file.puts erb.result(binding)
-      end
-    end
-
-    def create_fake_rubygems(path)
-      File.open(path.join("rubygems.rb"), "w") do |file|
-        template = File.read(File.join(File.dirname(__FILE__), "templates", "rubygems.rb"))
         erb = ERB.new(template)
         file.puts erb.result(binding)
       end

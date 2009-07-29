@@ -180,7 +180,6 @@ describe "Bundler::Manifest" do
         sources.clear
         source "file://#{gem_repo1}"
         gem "very-simple"
-        require_rubygems
       Gemfile
 
       m.install
@@ -193,7 +192,6 @@ describe "Bundler::Manifest" do
         sources.clear
         source "file://#{gem_repo1}"
         gem "very-simple"
-        require_rubygems
         disable_system_gems
       Gemfile
 
@@ -242,39 +240,19 @@ describe "Bundler::Manifest" do
       File.exist?(tmp_gem_path('environments', "production.rb")).should be_false
     end
 
-    it "adds the environments path to the load paths" do
-      tmp_gem_path('environments', 'testing.rb').should have_load_paths(tmp_gem_path, [
-        "environments"
-      ])
-    end
-
-    it "creates a rubygems.rb file in the environments directory" do
-      File.exist?(tmp_gem_path('environments', 'rubygems.rb')).should be_true
-    end
-
     it "requires the Rubygems library" do
-      env = tmp_gem_path('environments', 'default.rb')
-      out = `#{Gem.ruby} -r #{env} -r rubygems -e 'puts Gem'`.strip
-      out.should == 'Gem'
-    end
-
-    it "removes the environments path from the load paths after rubygems is required" do
-      env = tmp_gem_path('environments', 'default.rb')
-      out = `#{Gem.ruby} -r #{env} -r rubygems -e 'puts $:'`
-      out.should_not include(tmp_gem_path('environments'))
+      out = run_in_context "puts 'Gem'"
+      out.should == "Gem\n"
     end
 
     it "Gem.loaded_specs has the gems that are included" do
-      env = tmp_gem_path('environments', 'default.rb')
-      out = `#{Gem.ruby} -r #{env} -r rubygems -e 'puts Gem.loaded_specs.map{|k,v|"\#{k} - \#{v.version}"}'`
-      out = out.split("\n")
+      out = run_in_context %'puts Gem.loaded_specs.map{|k,v|"\#{k} - \#{v.version}"}'
       out.should include("rack - 1.0.0")
     end
 
     it "Gem.loaded_specs has the gems that are included in the testing environment" do
       env = tmp_gem_path('environments', 'testing.rb')
-      out = `#{Gem.ruby} -r #{env} -r rubygems -e 'puts Gem.loaded_specs.map{|k,v|"\#{k} - \#{v.version}"}'`
-      out = out.split("\n")
+      out = run_in_context env, %'puts Gem.loaded_specs.map{|k,v|"\#{k} - \#{v.version}"}'
       out.should include("rack - 1.0.0")
       out.should include("very-simple - 1.0")
     end

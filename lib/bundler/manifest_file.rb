@@ -13,8 +13,8 @@ module Bundler
       @filename      = filename
       @sources       = %w(http://gems.rubyforge.org)
       @dependencies  = []
+      @rubygems      = true
       @system_gems   = true
-      @rubygems      = :optional
     end
 
     def load

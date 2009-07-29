@@ -14,16 +14,13 @@ ENV["GEM_PATH"] = "<%= @repository.path %>"
 ENV["PATH"]     = "<%= @bindir %>:#{ENV["PATH"]}"
 ENV["RUBYOPT"]  = "-r#{__FILE__} #{ENV["RUBYOPT"]}"
 
-<% if @rubygems == :optional %>
-$LOAD_PATH.unshift File.expand_path(File.dirname(__FILE__))
-<% end %>
 <% load_paths.each do |load_path| %>
 $LOAD_PATH.unshift "<%= load_path %>"
 <% end %>
-<% if @rubygems == :require %>
+<% if @rubygems %>
 require "rubygems"
 Bundler.rubygems_required
-<% elsif @rubygems == :disable %>
+<% else %>
 $" << "rubygems.rb"
 module Kernel
   def gem(*)

@@ -33,11 +33,7 @@ module Bundler
     end
 
     def disable_rubygems
-      @manifest_file.rubygems = :disable
-    end
-
-    def require_rubygems
-      @manifest_file.rubygems = :require
+      @manifest_file.rubygems = false
     end
 
     def disable_system_gems

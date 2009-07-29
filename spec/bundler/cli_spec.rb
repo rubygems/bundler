@@ -51,17 +51,8 @@ describe "Bundler::CLI" do
     end
 
     it "maintains the correct environment when shelling out" do
-      File.open(tmp_file("Rakefile"), 'w') do |f|
-        f.puts <<-RAKE
-task :hello do
-  exec %{#{Gem.ruby} -e 'require "very-simple" ; puts VerySimpleForTests'}
-end
-        RAKE
-      end
-      Dir.chdir(tmp_dir) do
-        out = `#{tmp_file("bin", "rake")} hello`
-        out.should == "VerySimpleForTests\n"
-      end
+      out = run_in_context "exec %{#{Gem.ruby} -e 'require %{very-simple} ; puts VerySimpleForTests'}"
+      out.should == "VerySimpleForTests\n"
     end
 
     it "logs the correct information messages" do
@@ -78,6 +69,22 @@ end
         "Done." ].each do |message|
           @output.should =~ /^#{Regexp.escape(message)}$/
         end
+    end
+
+    it "already has gems in the loaded_specs" do
+      out = run_in_context "puts Gem.loaded_specs.key?('extlib')"
+      out.should == "true\n"
+    end
+
+    it "does already has rubygems required" do
+      out = run_in_context "puts Gem.respond_to?(:sources)"
+      out.should == "true\n"
+    end
+
+    # TODO: Remove this when rubygems is fixed
+    it "adds the gem to Gem.source_index" do
+      out = run_in_context "puts Gem.source_index.find_name('very-simple').first.version"
+      out.should == "1.0\n"
     end
   end
 
@@ -147,44 +154,6 @@ end
     it "stubs out Gem.ruby" do
       out = `#{tmp_file("bin", "rake")} -e 'puts Gem.ruby'`
       out.should == "#{Gem.ruby}\n"
-    end
-  end
-
-  describe "it working with requiring rubygems automatically" do
-    before(:each) do
-      build_manifest <<-Gemfile
-        sources.clear
-        source "file://#{gem_repo1}"
-        gem "rake"
-        gem "extlib"
-        gem "very-simple"
-        gem "rack", :only => :web
-
-        require_rubygems
-      Gemfile
-
-      lib = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'lib'))
-      bin = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'bin', 'gem_bundler'))
-
-      Dir.chdir(tmp_dir) do
-        @output = `#{Gem.ruby} -I #{lib} #{bin}`
-      end
-    end
-
-    it "already has gems in the loaded_specs" do
-      out = run_in_context "puts Gem.loaded_specs.key?('extlib')"
-      out.should == "true\n"
-    end
-
-    it "does already has rubygems required" do
-      out = run_in_context "puts Gem.respond_to?(:sources)"
-      out.should =~ /true/
-    end
-
-    # TODO: Remove this when rubygems is fixed
-    it "adds the gem to Gem.source_index" do
-      out = run_in_context "puts Gem.source_index.find_name('very-simple').first.version"
-      out.should == "1.0\n"
     end
   end
 end
