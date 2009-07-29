@@ -21,6 +21,7 @@ $LOAD_PATH.unshift "<%= load_path %>"
 <% end %>
 <% if @rubygems == :require %>
 require "rubygems"
+Bundler.rubygems_required
 <% elsif @rubygems == :disable %>
 $" << "rubygems.rb"
 module Kernel

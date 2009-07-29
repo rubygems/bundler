@@ -170,8 +170,13 @@ end
       end
     end
 
+    it "already has gems in the loaded_specs" do
+      out = run_in_context "puts Gem.loaded_specs.key?('extlib')"
+      out.should == "true\n"
+    end
+
     it "does already has rubygems required" do
-      out = `#{tmp_file('bin', 'rake')} -e 'puts Gem.respond_to?(:sources)'`
+      out = run_in_context "puts Gem.respond_to?(:sources)"
       out.should =~ /true/
     end
   end
