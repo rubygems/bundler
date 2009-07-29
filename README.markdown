@@ -119,7 +119,7 @@ to follow.
 
 * In your rails app, create a Gemfile and specify the gems that your
   application depends on. Make sure to specify rails as well:
-  
+
         gem "rails", "2.1.2"
         gem "will_paginate"
 

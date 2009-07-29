@@ -20,7 +20,7 @@ class Gem::Commands::ExecCommand < Gem::Command
     <<-EOF.gsub('      ', '')
       Run in context of a bundle
     EOF
-  end  
+  end
 
   def execute
     Bundler::CLI.run(:exec, options)
