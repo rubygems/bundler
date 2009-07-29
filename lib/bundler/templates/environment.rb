@@ -2,6 +2,7 @@ module Bundler
   def self.rubygems_required
     <% spec_files.each do |name, path| %>
     Gem.loaded_specs["<%= name %>"] = eval(File.read("<%= path %>"))
+    Gem.source_index.add_spec(Gem.loaded_specs["<%= name %>"])
     <% end %>
   end
 end

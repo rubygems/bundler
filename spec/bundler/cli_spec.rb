@@ -157,6 +157,7 @@ end
         source "file://#{gem_repo1}"
         gem "rake"
         gem "extlib"
+        gem "very-simple"
         gem "rack", :only => :web
 
         require_rubygems
@@ -178,6 +179,12 @@ end
     it "does already has rubygems required" do
       out = run_in_context "puts Gem.respond_to?(:sources)"
       out.should =~ /true/
+    end
+
+    # TODO: Remove this when rubygems is fixed
+    it "adds the gem to Gem.source_index" do
+      out = run_in_context "puts Gem.source_index.find_name('very-simple').first.version"
+      out.should == "1.0\n"
     end
   end
 end
