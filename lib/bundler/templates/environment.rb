@@ -1,12 +1,3 @@
-module Bundler
-  def self.rubygems_required
-    <% spec_files.each do |name, path| %>
-    Gem.loaded_specs["<%= name %>"] = eval(File.read("<%= path %>"))
-    Gem.source_index.add_spec(Gem.loaded_specs["<%= name %>"])
-    <% end %>
-  end
-end
-
 <% unless @system_gems %>
 ENV["GEM_HOME"] = "<%= @repository.path %>"
 ENV["GEM_PATH"] = "<%= @repository.path %>"
@@ -17,10 +8,44 @@ ENV["RUBYOPT"]  = "-r#{__FILE__} #{ENV["RUBYOPT"]}"
 <% load_paths.each do |load_path| %>
 $LOAD_PATH.unshift "<%= load_path %>"
 <% end %>
+
 <% if @rubygems %>
 require "rubygems"
-Bundler.rubygems_required
+
+module Bundler
+
+  @bundled_specs = {}
+  <% spec_files.each do |name, path| %>
+  @bundled_specs["<%= name %>"] = eval(File.read("<%= path %>"))
+  @bundled_specs["<%= name %>"].loaded_from = "<%= path %>"
+  <% end %>
+
+  def self.add_specs_to_loaded_specs
+    Gem.loaded_specs.merge! @bundled_specs
+    if Gem.respond_to?(:loaded_stacks)
+      @bundled_specs.keys.each { |name| Gem.loaded_stacks[name] = [] }
+    end
+  end
+
+  def self.add_specs_to_index
+    @bundled_specs.each do |name, spec|
+      Gem.source_index.add_spec spec
+    end
+  end
+
+  add_specs_to_loaded_specs
+  add_specs_to_index
+end
+
+module Gem
+  def source_index.refresh!
+    super
+    Bundler.add_specs_to_index
+  end
+end
+
 <% else %>
+
 $" << "rubygems.rb"
 module Kernel
   def gem(*)
@@ -53,4 +78,5 @@ module Gem
   class VerificationError < Exception; end
   class SystemExitException < SystemExit; end
 end
+
 <% end %>

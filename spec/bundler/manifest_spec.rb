@@ -199,6 +199,35 @@ describe "Bundler::Manifest" do
       out = run_in_context "begin ; require 'rake' ; rescue LoadError ; puts('WIN') ; end"
       out.should == "WIN"
     end
+
+    ["Running with system gems", "Running without system gems"].each_with_index do |desc, i|
+      describe desc do
+        before(:each) do
+          m = build_manifest <<-Gemfile
+            sources.clear
+            source "file://#{gem_repo1}"
+            gem "very-simple"
+            #{'disable_system_gems' if i == 1}
+          Gemfile
+          m.install
+        end
+
+        it "sets loaded_from on the specs" do
+          out = run_in_context "puts(Gem.loaded_specs['very-simple'].loaded_from || 'FAIL')"
+          out.should_not == "FAIL"
+        end
+
+        it "finds the gems in the source_index" do
+          out = run_in_context "puts Gem.source_index.find_name('very-simple').length"
+          out.should == "1"
+        end
+
+        it "still finds the gems in the source_index even if refresh! is called" do
+          out = run_in_context "Gem.source_index.refresh! ; puts Gem.source_index.find_name('very-simple').length"
+          out.should == "1"
+        end
+      end
+    end
   end
 
   describe "environments" do
