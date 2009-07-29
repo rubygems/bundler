@@ -184,7 +184,7 @@ describe "Bundler::Manifest" do
 
       m.install
       out = run_in_context "require 'rake' ; puts Rake"
-      out.should == "Rake\n"
+      out.should == "Rake"
     end
 
     it "it does not work with system gems if system gems have been disabled" do
@@ -197,7 +197,7 @@ describe "Bundler::Manifest" do
 
       m.install
       out = run_in_context "begin ; require 'rake' ; rescue LoadError ; puts('WIN') ; end"
-      out.should == "WIN\n"
+      out.should == "WIN"
     end
   end
 
@@ -242,7 +242,7 @@ describe "Bundler::Manifest" do
 
     it "requires the Rubygems library" do
       out = run_in_context "puts 'Gem'"
-      out.should == "Gem\n"
+      out.should == "Gem"
     end
 
     it "Gem.loaded_specs has the gems that are included" do

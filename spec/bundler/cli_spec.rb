@@ -52,7 +52,7 @@ describe "Bundler::CLI" do
 
     it "maintains the correct environment when shelling out" do
       out = run_in_context "exec %{#{Gem.ruby} -e 'require %{very-simple} ; puts VerySimpleForTests'}"
-      out.should == "VerySimpleForTests\n"
+      out.should == "VerySimpleForTests"
     end
 
     it "logs the correct information messages" do
@@ -73,18 +73,18 @@ describe "Bundler::CLI" do
 
     it "already has gems in the loaded_specs" do
       out = run_in_context "puts Gem.loaded_specs.key?('extlib')"
-      out.should == "true\n"
+      out.should == "true"
     end
 
     it "does already has rubygems required" do
       out = run_in_context "puts Gem.respond_to?(:sources)"
-      out.should == "true\n"
+      out.should == "true"
     end
 
     # TODO: Remove this when rubygems is fixed
     it "adds the gem to Gem.source_index" do
       out = run_in_context "puts Gem.source_index.find_name('very-simple').first.version"
-      out.should == "1.0\n"
+      out.should == "1.0"
     end
   end
 

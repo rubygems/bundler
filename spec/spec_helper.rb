@@ -55,8 +55,7 @@ module Spec
     def run_in_context(*args)
       cmd = args.pop.gsub(/(?=")/, "\\")
       env = args.pop || tmp_file("vendor", "gems", "environments", "default")
-      %x{#{Gem.ruby} -r #{env} -e "#{cmd}"}
-      # system Gem.ruby, "-r", env, "-e", cmd
+      %x{#{Gem.ruby} -r #{env} -e "#{cmd}"}.strip
     end
 
     def build_manifest_file(*args)
