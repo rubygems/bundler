@@ -6,13 +6,14 @@ module Bundler
   class Manifest
     attr_reader :sources, :dependencies, :path
 
-    def initialize(sources, dependencies, bindir, repository_path, rubygems)
+    def initialize(sources, dependencies, bindir, repository_path, rubygems, system_gems)
       sources.map! {|s| s.is_a?(URI) ? s : URI.parse(s) }
       @sources      = sources
       @dependencies = dependencies
       @bindir       = bindir
       @repository   = Repository.new(repository_path)
       @rubygems     = rubygems
+      @system_gems  = system_gems
     end
 
     def install

@@ -6,6 +6,10 @@ module Bundler
   end
 end
 
+<% unless @system_gems %>
+ENV["GEM_HOME"] = "<%= @repository.path %>"
+ENV["GEM_PATH"] = "<%= @repository.path %>"
+<% end %>
 ENV["PATH"]     = "<%= @bindir %>:#{ENV["PATH"]}"
 ENV["RUBYOPT"]  = "-r#{__FILE__} #{ENV["RUBYOPT"]}"
 

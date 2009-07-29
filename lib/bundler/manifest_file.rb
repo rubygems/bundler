@@ -3,18 +3,18 @@ module Bundler
 
   class ManifestFile
     attr_reader :sources, :dependencies
-    attr_accessor :gem_path, :bindir, :rubygems
+    attr_accessor :gem_path, :bindir, :rubygems, :system_gems
 
     def self.load(filename = nil)
       new(filename).load
     end
 
     def initialize(filename)
-      @filename            = filename
-      @sources             = %w(http://gems.rubyforge.org)
-      @dependencies        = []
-      @system_gem_fallback = true
-      @rubygems            = :optional
+      @filename      = filename
+      @sources       = %w(http://gems.rubyforge.org)
+      @dependencies  = []
+      @system_gems   = true
+      @rubygems      = :optional
     end
 
     def load
@@ -31,7 +31,7 @@ module Bundler
     end
 
     def setup_environment
-      unless @system_gem_fallback
+      unless @system_gems
         ENV["GEM_HOME"] = @gem_path
         ENV["GEM_PATH"] = @gem_path
       end
@@ -41,11 +41,7 @@ module Bundler
 
     def load_manifest
       ManifestBuilder.load(self, filename)
-      Manifest.new(sources, dependencies, bindir, gem_path, rubygems)
-    end
-
-    def disable_fallback!
-      @system_gem_fallback = false
+      Manifest.new(sources, dependencies, bindir, gem_path, rubygems, system_gems)
     end
 
     def gem_path

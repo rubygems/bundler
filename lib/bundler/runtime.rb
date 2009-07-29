@@ -40,6 +40,10 @@ module Bundler
       @manifest_file.rubygems = :require
     end
 
+    def disable_system_gems
+      @manifest_file.system_gems = false
+    end
+
     def source(source)
       @manifest_file.sources << source
       @manifest_file.sources.uniq!
@@ -54,10 +58,6 @@ module Bundler
       version = args.last
 
       @manifest_file.dependencies << Dependency.new(name, options.merge(:version => version))
-    end
-
-    def disable_fallback!
-      @manifest_file.disable_fallback!
     end
   end
 end

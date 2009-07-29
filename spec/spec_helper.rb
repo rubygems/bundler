@@ -52,6 +52,13 @@ module Spec
       FileUtils.cp(fixture(gem_name), File.join(tmp_dir, 'cache'))
     end
 
+    def run_in_context(*args)
+      cmd = args.pop.gsub(/(?=")/, "\\")
+      env = args.pop || tmp_file("vendor", "gems", "environments", "default")
+      %x{#{Gem.ruby} -r #{env} -e "#{cmd}"}
+      # system Gem.ruby, "-r", env, "-e", cmd
+    end
+
     def build_manifest_file(*args)
       path = tmp_file("Gemfile")
       path = args.shift if args.first.is_a?(Pathname)

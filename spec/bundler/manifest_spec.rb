@@ -174,6 +174,33 @@ describe "Bundler::Manifest" do
           File.expand_path(tmp_gem_path("gems", "very-simple-1.0", "lib", "very-simple.rb"))
       end
     end
+
+    it "is able to work system gems" do
+      m = build_manifest <<-Gemfile
+        sources.clear
+        source "file://#{gem_repo1}"
+        gem "very-simple"
+        require_rubygems
+      Gemfile
+
+      m.install
+      out = run_in_context "require 'rake' ; puts Rake"
+      out.should == "Rake\n"
+    end
+
+    it "it does not work with system gems if system gems have been disabled" do
+      m = build_manifest <<-Gemfile
+        sources.clear
+        source "file://#{gem_repo1}"
+        gem "very-simple"
+        require_rubygems
+        disable_system_gems
+      Gemfile
+
+      m.install
+      out = run_in_context "begin ; require 'rake' ; rescue LoadError ; puts('WIN') ; end"
+      out.should == "WIN\n"
+    end
   end
 
   describe "environments" do
