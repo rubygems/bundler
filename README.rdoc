@@ -10,6 +10,12 @@ and all child dependencies specified in this manifest. It can manage any update
 to the gem manifest file and update the bundled gems accordingly. It also lets
 you run any ruby code in context of the bundled gem environment.
 
+== Disclaimer
+
+This project is under rapid development. It is usable today, but there will be
+many changes in the near future, including to the Gemfile DSL. We will bump up
+versions with changes though. We greatly appreciate feedback.
+
 == Installation
 
 Bundler has no dependencies. Just clone the git repository and install the gem
@@ -135,7 +141,7 @@ I would suggest to require_rubygems as of now.
 
 In theory, this should be enough to get going.
 
-=== To require rubygems or not
+== To require rubygems or not
 
 Ideally, no gem would assume the presence of rubygems at runtime. Rubygems provides
 enough features so that this isn't necessary. However, there are a number of gems
