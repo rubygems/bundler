@@ -15,7 +15,7 @@ module Bundler
 
       manifest_file = Bundler::ManifestFile.load(@manifest)
       if @args.empty?
-        manifest_file.install
+        manifest_file.install(@update)
       else
         manifest_file.setup_environment
         exec(*@args)
@@ -40,6 +40,10 @@ module Bundler
 
         op.on("-m", "--manifest MANIFEST") do |manifest|
           @manifest = Pathname.new(manifest)
+        end
+
+        op.on("-u", "--update", "Force a remote check for newer gems") do
+          @update = true
         end
 
         op.on_tail("-h", "--help", "Show this message") do

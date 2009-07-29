@@ -26,8 +26,8 @@ module Bundler
       @manifest ||= load_manifest
     end
 
-    def install
-      manifest.install
+    def install(update = false)
+      manifest.install(update)
     end
 
     def setup_environment

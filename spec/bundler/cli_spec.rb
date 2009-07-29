@@ -156,4 +156,31 @@ describe "Bundler::CLI" do
       out.should == "#{Gem.ruby}\n"
     end
   end
+
+  describe "forcing an update" do
+    it "forces checking for remote updates if --update is used" do
+      m = build_manifest <<-Gemfile
+        sources.clear
+        source "file://#{gem_repo1}"
+        source "file://#{gem_repo2}"
+        gem "rack", "0.9.1"
+      Gemfile
+      m.install
+
+      build_manifest <<-Gemfile
+        sources.clear
+        source "file://#{gem_repo1}"
+        source "file://#{gem_repo2}"
+        gem "rack"
+      Gemfile
+
+      lib = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'lib'))
+      bin = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'bin', 'gem_bundler'))
+      Dir.chdir(tmp_dir) do
+        `#{Gem.ruby} -I #{lib} #{bin} --update`
+      end
+      tmp_file("vendor", "gems").should have_cached_gems("rack-1.0.0")
+      tmp_file("vendor", "gems").should have_installed_gems("rack-1.0.0")
+    end
+  end
 end

@@ -16,8 +16,8 @@ module Bundler
       @system_gems  = system_gems
     end
 
-    def install
-      fetch
+    def install(update)
+      fetch(update)
       @repository.install_cached_gems(:bin_dir => @bindir || @repository.path.join("bin"))
       cleanup_removed_gems
       create_environment_files(@repository.path.join("environments"))
@@ -49,8 +49,8 @@ module Bundler
 
   private
 
-    def fetch
-      return if all_gems_installed?
+    def fetch(update)
+      return unless update || !all_gems_installed?
 
       finder = Finder.new(*sources)
       unless bundle = finder.resolve(*gem_dependencies)
