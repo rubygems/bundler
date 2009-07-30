@@ -33,6 +33,7 @@ module Bundler
 
     def install_cached_gem(name, version, options = {})
       cached_gem = cache_path.join("#{name}-#{version}.gem")
+      # TODO: Add a warning if cached_gem is not a file
       if cached_gem.file?
         Bundler.logger.info "Installing #{name}-#{version}.gem"
         installer = Gem::Installer.new(cached_gem.to_s, options.merge(
@@ -58,7 +59,7 @@ module Bundler
     def cached_gems
       cache_files.map do |f|
         full_name = File.basename(f).gsub(/\.gem$/, '')
-        full_name.split(/-(?=[\d.]+$)/)
+        full_name.split(/-(?=[^-]+$)/)
       end
     end
 

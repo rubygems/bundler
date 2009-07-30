@@ -1,10 +1,11 @@
-$:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
-$:.push File.join(File.dirname(__FILE__))
+$:.unshift File.expand_path(File.join(File.dirname(__FILE__)))
+$:.unshift File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
+require "rubygems"
 require "bundler"
-require "builders"
+
+require "spec"
 require "matchers"
-require "pathname"
-require "pp"
+require "builders"
 require "rbconfig"
 
 class Pathname

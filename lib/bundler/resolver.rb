@@ -82,7 +82,13 @@ module Bundler
         # this gem. This is so that if no versions work, we can figure out the best
         # place to backtrack to.
         conflicts = Set.new
-        @index.search(current).reverse_each do |spec|
+
+        # Fetch all gem versions matching the requirement
+        #
+        # TODO: Warn / error when no matching versions are found.
+        matching_versions = @index.search(current)
+
+        matching_versions.reverse_each do |spec|
           conflict = resolve_requirement(spec, current, reqs.dup, activated.dup)
           conflicts << conflict if conflict
         end

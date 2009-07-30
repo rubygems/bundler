@@ -106,6 +106,17 @@ describe "Installing gems" do
       end
     end
 
+    it "works with prerelease gems" do
+      m = build_manifest <<-Gemfile
+        sources.clear
+        source "file://#{gem_repo1}"
+        gem "webrat", "0.4.4.racktest"
+      Gemfile
+      m.install
+      tmp_file("vendor", "gems").should have_cached_gem("webrat-0.4.4.racktest")
+      tmp_file("vendor", "gems").should have_installed_gem("webrat-0.4.4.racktest")
+    end
+
     it "outputs a logger message for each gem that is installed" do
       setup
       @manifest.install
