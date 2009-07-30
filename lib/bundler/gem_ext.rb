@@ -12,8 +12,8 @@ module Gem
     attribute :source
 
     def source=(source)
-      @source = source.is_a?(URI) ? source : URI.parse(source)
-      raise ArgumentError, "The source must be an absolute URI" unless @source.absolute?
+      source = Bundler::Source.new(source) unless source.is_a?(Bundler::Source)
+      @source = source
     end
   end
 end

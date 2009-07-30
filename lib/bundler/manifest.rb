@@ -7,7 +7,6 @@ module Bundler
     attr_reader :sources, :dependencies, :path
 
     def initialize(sources, dependencies, bindir, repository_path, rubygems, system_gems)
-      sources.map! {|s| s.is_a?(URI) ? s : URI.parse(s) }
       @sources      = sources
       @dependencies = dependencies
       @bindir       = bindir
@@ -58,7 +57,7 @@ module Bundler
         raise VersionConflict, "No compatible versions could be found for:\n#{gems}"
       end
 
-      bundle.download(@repository.path)
+      bundle.download(@repository)
     end
 
     def gem_dependencies

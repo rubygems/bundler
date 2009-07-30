@@ -13,10 +13,9 @@ module Bundler
     # ==== Parameters
     # *sources<String>:: URI pointing to the gem repository
     def initialize(*sources)
-      @results = {}
-      @index   = Hash.new { |h,k| h[k] = {} }
-
-      sources.each { |source| fetch(source) }
+      @cache   = {}
+      @index   = {}
+      @sources = sources
     end
 
     # Figures out the best possible configuration of gems that satisfies
@@ -36,39 +35,6 @@ module Bundler
       resolved && GemBundle.new(resolved)
     end
 
-    # Fetches the index from the remote source
-    #
-    # ==== Parameters
-    # source<String>:: URI pointing to the gem repository
-    #
-    # ==== Raises
-    # ArgumentError:: If the source is not a valid gem repository
-    def fetch(source)
-      Bundler.logger.info "Updating source: #{source}"
-
-      deflated = Gem::RemoteFetcher.fetcher.fetch_path("#{source}/Marshal.4.8.Z")
-      inflated = Gem.inflate deflated
-
-      append(Marshal.load(inflated), source)
-    rescue Gem::RemoteFetcher::FetchError => e
-      raise ArgumentError, "#{source} is not a valid source: #{e.message}"
-    end
-
-    # Adds a new gem index linked to a gem source to the over all
-    # gem index that gets searched.
-    #
-    # ==== Parameters
-    # index<Gem::SourceIndex>:: The index to append to the list
-    # source<String>:: The original source
-    def append(index, source)
-      index.gems.values.each do |spec|
-        next unless Gem::Platform.match(spec.platform)
-        spec.source = source
-        @index[spec.name][spec.version] ||= spec
-      end
-      self
-    end
-
     # Searches for a gem that matches the dependency
     #
     # ==== Parameters
@@ -78,12 +44,25 @@ module Bundler
     # [Gem::Specification]:: A collection of gem specifications
     #   matching the search
     def search(dependency)
-      @results[dependency.hash] ||= begin
-        possibilities = @index[dependency.name].values
-        possibilities.select do |spec|
+      @cache[dependency.hash] ||= begin
+        find_by_name(dependency.name).select do |spec|
           dependency =~ spec
         end.sort_by {|s| s.version }
       end
     end
+
+  private
+
+    def find_by_name(name)
+      matches = @index[name] ||= begin
+        versions = {}
+        @sources.reverse_each do |source|
+          versions.merge! source.specs[name] || {}
+        end
+        versions
+      end
+      matches.values
+    end
+
   end
 end

@@ -11,7 +11,7 @@ module Bundler
 
     def initialize(filename)
       @filename      = filename
-      @sources       = %w(http://gems.rubyforge.org)
+      @sources       = [Source.new("http://gems.rubyforge.org")]
       @dependencies  = []
       @rubygems      = true
       @system_gems   = true

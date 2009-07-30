@@ -32,11 +32,6 @@ describe "Bundler::Manifest" do
       $".replace @saved_loaded_features
     end
 
-    it "has a list of sources and dependencies" do
-      @manifest.sources.should == @sources.map { |s| URI.parse(s) }
-      @manifest.dependencies.should == @deps
-    end
-
     it "bundles itself (running all of the steps)" do
       @manifest.install
 

@@ -1,6 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "Finder" do
+  # TODO: Refactor all of these specs
   before(:each) do
     index = build_index do
       add_spec "activemerchant", "1.4.1" do
@@ -13,7 +14,15 @@ describe "Finder" do
       end
     end
 
-    @faster = Bundler::Finder.new.append(index, "http://foo")
+    def index.specs
+      specs = Hash.new{|h,k| h[k] = {}}
+      @gems.values.each do |spec|
+        specs[spec.name][spec.version] = spec
+      end
+      specs
+    end
+
+    @faster = Bundler::Finder.new(index)
   end
 
   it "find the gem given correct search" do

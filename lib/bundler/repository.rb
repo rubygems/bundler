@@ -22,6 +22,14 @@ module Bundler
       (Dir[@path.join("*")] - Dir[@path.join("{cache,doc,gems,environments,specifications}")]).empty?
     end
 
+    def download(spec)
+      FileUtils.mkdir_p(@path)
+
+      unless @path.join("cache", "#{spec.full_name}.gem").file?
+        spec.source.download(spec, @path)
+      end
+    end
+
     # Checks whether a gem is installed
     def install_cached_gems(options = {})
       cached_gems.each do |name, version|
