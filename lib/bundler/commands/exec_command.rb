@@ -4,7 +4,7 @@ class Gem::Commands::ExecCommand < Gem::Command
     super('exec', 'Run a command in context of a gem bundle', {:manifest => nil})
 
     add_option('-m', '--manifest MANIFEST', "Specify the path to the manifest file") do |manifest, options|
-      options[:manifest] = Pathname.new(manifest)
+      options[:manifest] = manifest
     end
   end
 
@@ -23,6 +23,8 @@ class Gem::Commands::ExecCommand < Gem::Command
   end
 
   def execute
+    # Prevent the bundler from getting required unless it is actually being used
+    require 'bundler'
     Bundler::CLI.run(:exec, options)
   end
 

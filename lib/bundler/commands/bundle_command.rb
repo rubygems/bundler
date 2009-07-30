@@ -4,7 +4,7 @@ class Gem::Commands::BundleCommand < Gem::Command
     super('bundle', 'Create a gem bundle based on your Gemfile', {:manifest => nil, :update => false})
 
     add_option('-m', '--manifest MANIFEST', "Specify the path to the manifest file") do |manifest, options|
-      options[:manifest] = Pathname.new(manifest)
+      options[:manifest] = manifest
     end
 
     add_option('-u', '--update', "Force a remote check for newer gems") do
@@ -23,6 +23,8 @@ Bundle stuff
   end
 
   def execute
+    # Prevent the bundler from getting required unless it is actually being used
+    require 'bundler'
     Bundler::CLI.run(:bundle, options)
   end
 

@@ -1,5 +1,4 @@
 require 'rubygems/command_manager'
-require 'bundler'
 require 'bundler/commands/bundle_command'
 require 'bundler/commands/exec_command'
 

@@ -57,7 +57,7 @@ module Bundler
     end
 
     def filename
-      @filename ||= find_manifest_file
+      Pathname.new(@filename ||= find_manifest_file)
     end
 
     def find_manifest_file
