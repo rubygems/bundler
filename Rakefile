@@ -14,10 +14,10 @@ spec = Gem::Specification.new do |s|
 
   s.platform = Gem::Platform::RUBY
   s.has_rdoc = true
-  s.extra_rdoc_files = ["README.rdoc", "LICENSE"]
+  s.extra_rdoc_files = ["README.markdown", "LICENSE"]
 
   s.require_path = 'lib'
-  s.files = %w(LICENSE README.rdoc Rakefile) + Dir.glob("lib/**/*")
+  s.files = %w(LICENSE README.markdown Rakefile) + Dir.glob("lib/**/*")
 end
 
 task :default => :spec
