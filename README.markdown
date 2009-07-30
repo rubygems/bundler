@@ -120,12 +120,12 @@ to follow.
 * In your rails app, create a Gemfile and specify the gems that your
   application depends on. Make sure to specify rails as well:
   
-    gem "rails", "2.1.2"
-    gem "will_paginate"
+        gem "rails", "2.1.2"
+        gem "will_paginate"
 
-    # Optionally, you can disable system gems all together and only
-    # use bundled gems.
-    disable_system_gems
+        # Optionally, you can disable system gems all together and only
+        # use bundled gems.
+        disable_system_gems
 
 * Run `gem bundle`
 
@@ -134,7 +134,7 @@ to follow.
 
 * At the top of `config/boot.rb`, add the following line:
 
-    require File.expand_path(File.join(File.dirname(__FILE__), '..', 'vendor', 'gems', 'environments', 'default'))
+        require File.expand_path(File.join(File.dirname(__FILE__), '..', 'vendor', 'gems', 'environments', 'default'))
 
 In theory, this should be enough to get going.
 
