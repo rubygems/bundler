@@ -16,10 +16,8 @@ spec = Gem::Specification.new do |s|
   s.has_rdoc = true
   s.extra_rdoc_files = ["README.rdoc", "LICENSE"]
 
-  s.bindir       = "bin"
-  s.executables  = %w( gem_bundler )
   s.require_path = 'lib'
-  s.files = %w(LICENSE README.rdoc Rakefile) + Dir.glob("{bin,lib,spec}/**/*")
+  s.files = %w(LICENSE README.rdoc Rakefile) + Dir.glob("lib/**/*")
 end
 
 task :default => :spec

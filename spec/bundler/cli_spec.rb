@@ -12,11 +12,8 @@ describe "Bundler::CLI" do
         gem "rack", :only => :web
       Gemfile
 
-      lib = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'lib'))
-      bin = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'bin', 'gem_bundler'))
-
       Dir.chdir(tmp_dir) do
-        @output = `#{Gem.ruby} -I #{lib} #{bin}`
+        @output = gem_command :bundle
       end
     end
 
@@ -42,7 +39,7 @@ describe "Bundler::CLI" do
     end
 
     it "creates an executable for rake in ./bin" do
-      out = `#{tmp_file('bin', 'rake')} -e 'puts $:'`
+      out = run_in_context "puts $:"
       out.should include(tmp_file("vendor", "gems", "gems", "rake-0.8.7", "lib").to_s)
       out.should include(tmp_file("vendor", "gems", "gems", "rake-0.8.7", "bin").to_s)
       out.should include(tmp_file("vendor", "gems", "gems", "extlib-0.9.12", "lib").to_s)
@@ -98,7 +95,7 @@ describe "Bundler::CLI" do
       Gemfile
 
       Dir.chdir(tmp_file)
-      Bundler::CLI.run(["-m", tmp_file('manifest.rb').to_s])
+      gem_command :bundle, "-m #{tmp_file('manifest.rb')}"
       tmp_file("gems").should have_cached_gems("rake-0.8.7")
     end
 
@@ -111,7 +108,7 @@ describe "Bundler::CLI" do
       Gemfile
 
       Dir.chdir(tmp_file)
-      Bundler::CLI.run(["-m", tmp_file('config', 'manifest.rb').to_s])
+      gem_command :bundle, "-m #{tmp_file('config', 'manifest.rb')}"
       tmp_file("gems").should have_cached_gems("rake-0.8.7")
     end
   end
@@ -128,32 +125,29 @@ describe "Bundler::CLI" do
         disable_rubygems
       Gemfile
 
-      lib = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'lib'))
-      bin = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'bin', 'gem_bundler'))
-
       Dir.chdir(tmp_dir) do
-        @output = `#{Gem.ruby} -I #{lib} #{bin}`
+        @output = gem_command :bundle
       end
     end
 
     it "does not load rubygems when required" do
-      out = `#{tmp_file('bin', 'rake')} -e 'require "rubygems" ; puts Gem.respond_to?(:sources)'`
-      out.should =~ /false/
+      out = run_in_context 'require "rubygems" ; puts Gem.respond_to?(:sources)'
+      out.should == "false"
     end
 
     it "does not blow up if #gem is used" do
-      out = `#{tmp_file('bin', 'rake')} -e 'gem("merb-core") ; puts "Win!"'`
-      out.should =~ /Win!/
+      out = run_in_context 'gem("merb-core") ; puts "Win!"'
+      out.should == "Win!"
     end
 
     it "does not blow up if Gem errors are referred to" do
-      out = `#{tmp_file('bin', 'rake')} -e 'Gem::LoadError ; Gem::Exception ; puts "Win!"'`
-      out.should =~ /Win!/
+      out = run_in_context 'Gem::LoadError ; Gem::Exception ; puts "Win!"'
+      out.should == "Win!"
     end
 
     it "stubs out Gem.ruby" do
-      out = `#{tmp_file("bin", "rake")} -e 'puts Gem.ruby'`
-      out.should == "#{Gem.ruby}\n"
+      out = run_in_context "puts Gem.ruby"
+      out.should == Gem.ruby
     end
   end
 
@@ -174,10 +168,8 @@ describe "Bundler::CLI" do
         gem "rack"
       Gemfile
 
-      lib = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'lib'))
-      bin = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'bin', 'gem_bundler'))
       Dir.chdir(tmp_dir) do
-        `#{Gem.ruby} -I #{lib} #{bin} --update`
+        gem_command :bundle, "--update"
       end
       tmp_file("vendor", "gems").should have_cached_gems("rack-1.0.0")
       tmp_file("vendor", "gems").should have_installed_gems("rack-1.0.0")

@@ -74,6 +74,12 @@ module Spec
       %x{#{Gem.ruby} -r #{env} -e "#{cmd}"}.strip
     end
 
+    def gem_command(command, args = "")
+      args = args.gsub(/(?=")/, "\\")
+      lib  = File.join(File.dirname(__FILE__), '..', 'lib')
+      %x{#{Gem.ruby} -I#{lib} -rubygems -S gem #{command} #{args}}
+    end
+
     def build_manifest_file(*args)
       path = tmp_file("Gemfile")
       path = args.shift if args.first.is_a?(Pathname)

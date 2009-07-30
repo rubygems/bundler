@@ -132,7 +132,7 @@ describe "Bundler::Manifest" do
       Dir.chdir(tmp_dir)
 
       lambda do
-        Bundler::CLI.run([])
+        Bundler::CLI.run(:bundle)
       end.should raise_error(SystemExit)
 
       @log_output.should have_log_message(/rails \(= 2\.3\.2.*rack \(= 0\.9\.1.*active_support \(= 2\.0/m)

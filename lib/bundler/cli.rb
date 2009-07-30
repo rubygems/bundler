@@ -2,24 +2,29 @@ require "optparse"
 
 module Bundler
   class CLI
-    def self.run(args = ARGV)
-      new(args).run
+    def self.run(command, options = {})
+      new(options).run(command)
     end
 
-    def initialize(args)
-      @args = args
+    def initialize(options)
+      @options = options
+      @manifest_file = Bundler::ManifestFile.load(@options[:manifest])
     end
 
-    def run
-      parser.parse!(@args)
+    def bundle
+      @manifest_file.install(@options[:update])
+    end
 
-      manifest_file = Bundler::ManifestFile.load(@manifest)
-      if @args.empty?
-        manifest_file.install(@update)
-      else
-        manifest_file.setup_environment
-        exec(*@args)
-      end
+    def exec
+      @manifest_file.setup_environment
+      # w0t?
+      super(*@options[:args])
+    end
+
+    def run(command)
+
+      send(command)
+
     rescue DefaultManifestNotFound => e
       Bundler.logger.error "Could not find a Gemfile to use"
       exit 2
@@ -34,23 +39,5 @@ module Bundler
       exit
     end
 
-    def parser
-      @parser ||= OptionParser.new do |op|
-        op.banner = "Usage: gem_bundler [OPTIONS] [PATH]"
-
-        op.on("-m", "--manifest MANIFEST") do |manifest|
-          @manifest = Pathname.new(manifest)
-        end
-
-        op.on("-u", "--update", "Force a remote check for newer gems") do
-          @update = true
-        end
-
-        op.on_tail("-h", "--help", "Show this message") do
-          puts op
-          exit
-        end
-      end
-    end
   end
 end

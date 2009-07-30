@@ -1,4 +1,0 @@
-#!/usr/bin/env ruby
-
-require "bundler"
-Bundler::CLI.run
