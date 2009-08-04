@@ -6,7 +6,7 @@ require 'spec/rake/spectask'
 
 spec = Gem::Specification.new do |s|
   s.name    = "bundler"
-  s.version = "0.3.1"
+  s.version = "0.3.2"
   s.author  = "Yehuda Katz"
   s.email   = "wycats@gmail.com"
   s.homepage = "http://github.com/wycats/bundler"
@@ -15,6 +15,8 @@ spec = Gem::Specification.new do |s|
   s.platform = Gem::Platform::RUBY
   s.has_rdoc = true
   s.extra_rdoc_files = ["README.markdown", "LICENSE"]
+
+  s.required_rubygems_version = ">= 1.3.5"
 
   s.require_path = 'lib'
   s.files = %w(LICENSE README.markdown Rakefile) + Dir.glob("lib/**/*")
