@@ -18,6 +18,7 @@ module Bundler
     def install(update)
       fetch(update)
       repository.install_cached_gems(:bin_dir => @bindir || repository.path.join("bin"))
+      # Cleanup incase fetch was a no-op
       repository.cleanup(gems)
       create_environment_files(repository.path.join("environments"))
       Bundler.logger.info "Done."
@@ -34,9 +35,9 @@ module Bundler
     end
 
     def gems_for(environment = nil)
-      deps     = dependencies
-      deps     = deps.select { |d| d.in?(environment) } if environment
-      deps     = deps.map { |d| d.to_gem_dependency }
+      deps = dependencies
+      deps = deps.select { |d| d.in?(environment) } if environment
+      deps = deps.map { |d| d.to_gem_dependency }
       Resolver.resolve(deps, repository.source_index)
     end
     alias gems gems_for
@@ -64,6 +65,11 @@ module Bundler
         raise VersionConflict, "No compatible versions could be found for:\n#{gems}"
       end
 
+      # Cleanup here to remove any gems that could cause problem in the expansion
+      # phase
+      #
+      # TODO: Try to avoid double cleanup
+      repository.cleanup(bundle)
       bundle.download(repository)
     end
 

@@ -51,8 +51,34 @@ module Spec
       end
     end
 
+    def include_cached_gems(*gems)
+      simple_matcher("include cached gems") do |given, matcher|
+        matcher.negative_failure_message = "Gems #{gems.join(", ")} were all cached"
+        gems.all? do |name|
+          matcher.failure_message = "Gem #{name} was not cached"
+          File.exists?(File.join(given, "cache", "#{name}.gem"))
+        end
+      end
+    end
+
+    alias include_cached_gem include_cached_gems
+
+    def include_installed_gems(*gems)
+      simple_matcher("include installed gems") do |given, matcher|
+        matcher.negative_failure_message = "Gems #{gems.join(", ")} were all installed"
+        gems.all? do |name|
+          matcher.failure_message = "Gem #{name} was not installed"
+          File.exists?(File.join(given, "specifications", "#{name}.gemspec")) &&
+          File.directory?(File.join(given, "gems", "#{name}"))
+        end
+      end
+    end
+
+    alias include_installed_gem include_installed_gems
+
     def have_cached_gems(*gems)
       simple_matcher("have cached gems") do |given, matcher|
+        Dir[File.join(given, "cache", "*.gem")].length == gems.length &&
         gems.all? do |name|
           matcher.failure_message = "Gem #{name} was not cached"
           File.exists?(File.join(given, "cache", "#{name}.gem"))
@@ -64,6 +90,8 @@ module Spec
 
     def have_installed_gems(*gems)
       simple_matcher("have installed gems") do |given, matcher|
+        Dir[File.join(given, "specifications", "*.gemspec")].length == gems.length &&
+        Dir[File.join(given, "gems", "*")].length == gems.length &&
         gems.all? do |name|
           matcher.failure_message = "Gem #{name} was not installed"
           File.exists?(File.join(given, "specifications", "#{name}.gemspec")) &&

@@ -80,8 +80,8 @@ describe "Bundler::Manifest" do
 
     it "removes gems that are not needed anymore" do
       @manifest.install
-      tmp_gem_path.should have_cached_gem("rack-0.9.1")
-      tmp_gem_path.should have_installed_gem("rack-0.9.1")
+      tmp_gem_path.should include_cached_gem("rack-0.9.1")
+      tmp_gem_path.should include_installed_gem("rack-0.9.1")
       tmp_bindir("rackup").should exist
 
       m = build_manifest <<-Gemfile
@@ -93,8 +93,8 @@ describe "Bundler::Manifest" do
 
       m.install
 
-      tmp_gem_path.should_not have_cached_gem("rack-0.9.1")
-      tmp_gem_path.should_not have_installed_gem("rack-0.9.1")
+      tmp_gem_path.should_not include_cached_gem("rack-0.9.1")
+      tmp_gem_path.should_not include_installed_gem("rack-0.9.1")
       tmp_bindir("rackup").should_not exist
       @log_output.should have_log_message("Deleting gem: rack-0.9.1")
       @log_output.should have_log_message("Deleting bin file: rackup")

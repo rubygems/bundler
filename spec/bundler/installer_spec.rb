@@ -11,6 +11,9 @@ describe "Installing gems" do
     end
 
     def setup
+      @gems = %w(actionmailer-2.3.2 actionpack-2.3.2 activerecord-2.3.2
+                 activeresource-2.3.2 activesupport-2.3.2 rails-2.3.2
+                 rake-0.8.7)
       @manifest = build_manifest <<-Gemfile
         clear_sources
         source "file://#{gem_repo1}"
@@ -22,21 +25,21 @@ describe "Installing gems" do
     it "creates the bundle directory if it does not exist" do
       setup
       @manifest.install
-      tmp_file("vendor", "gems").should have_cached_gems("rails-2.3.2")
+      tmp_file("vendor", "gems").should have_cached_gems(*@gems)
     end
 
     it "uses the bundle directory if it is empty" do
       tmp_file("vendor", "gems").mkdir_p
       setup
       @manifest.install
-      tmp_file("vendor", "gems").should have_cached_gems("rails-2.3.2")
+      tmp_file("vendor", "gems").should have_cached_gems(*@gems)
     end
 
     it "uses the bundle directory if it is a valid gem repo" do
       %w(cache doc gems environments specifications).each { |dir| tmp_file("vendor", "gems", dir).mkdir_p }
       setup
       @manifest.install
-      tmp_file("vendor", "gems").should have_cached_gems("rails-2.3.2")
+      tmp_file("vendor", "gems").should have_cached_gems(*@gems)
     end
 
     it "does not use the bundle directory if it is not a valid gem repo" do
@@ -114,8 +117,8 @@ describe "Installing gems" do
         gem "webrat", "0.4.4.racktest"
       Gemfile
       m.install
-      tmp_file("vendor", "gems").should have_cached_gem("webrat-0.4.4.racktest")
-      tmp_file("vendor", "gems").should have_installed_gem("webrat-0.4.4.racktest")
+      tmp_file("vendor", "gems").should have_cached_gem("webrat-0.4.4.racktest", "nokogiri-1.3.2")
+      tmp_file("vendor", "gems").should have_installed_gem("webrat-0.4.4.racktest", "nokogiri-1.3.2")
     end
 
     it "outputs a logger message for each gem that is installed" do
