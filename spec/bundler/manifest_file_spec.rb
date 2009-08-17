@@ -79,4 +79,22 @@ describe "Bundler::Manifest" do
     Dir.chdir(tmp_file("baz"))
     Bundler::ManifestFile.load.sources.should have(2).items
   end
+
+  it "inserts new sources before rubyforge" do
+    m = build_manifest <<-Gemfile
+      source "http://gems.github.com"
+    Gemfile
+    m.sources.map{|s| s.uri.to_s}.should ==
+      %w(http://gems.github.com http://gems.rubyforge.org)
+  end
+
+  it "inserts new sources at the end if the default has been removed" do
+    m = build_manifest <<-Gemfile
+      clear_sources
+      source "http://gems.rubyforge.org"
+      source "http://gems.github.com"
+    Gemfile
+    m.sources.map{|s| s.uri.to_s}.should ==
+      %w(http://gems.rubyforge.org http://gems.github.com)
+  end
 end

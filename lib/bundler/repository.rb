@@ -5,8 +5,9 @@ module Bundler
 
     attr_reader :path
 
-    def initialize(path)
-      @path = Pathname.new(path)
+    def initialize(path, bindir = nil)
+      @path   = Pathname.new(path)
+      @bindir = Pathname.new(bindir) || @path.join("bin")
       unless valid?
         raise InvalidRepository, "'#{path}' is not a valid gem repository"
       end
@@ -51,6 +52,25 @@ module Bundler
           :wrappers            => true
         ))
         installer.install
+      end
+    end
+
+    def cleanup(gems)
+      glob = gems.map { |g| g.full_name }.join(',')
+      base = path.join("{cache,specifications,gems}")
+
+      (Dir[base.join("*")] - Dir[base.join("{#{glob}}{.gemspec,.gem,}")]).each do |file|
+        if File.basename(file) =~ /\.gem$/
+          name = File.basename(file, '.gem')
+          Bundler.logger.info "Deleting gem: #{name}"
+        end
+        FileUtils.rm_rf(file)
+      end
+
+      glob = gems.map { |g| g.executables }.flatten.join(',')
+      (Dir[@bindir.join("*")] - Dir[@bindir.join("{#{glob}}")]).each do |file|
+        Bundler.logger.info "Deleting bin file: #{File.basename(file)}"
+        FileUtils.rm_rf(file)
       end
     end
 

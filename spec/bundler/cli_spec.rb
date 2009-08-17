@@ -4,7 +4,7 @@ describe "Bundler::CLI" do
   describe "it working" do
     before(:each) do
       build_manifest <<-Gemfile
-        sources.clear
+        clear_sources
         source "file://#{gem_repo1}"
         gem "rake"
         gem "extlib"
@@ -89,7 +89,7 @@ describe "Bundler::CLI" do
     it "works when the manifest is in the root directory" do
       build_manifest_file tmp_file('manifest.rb'), <<-Gemfile
         bundle_path "gems"
-        sources.clear
+        clear_sources
         source "file://#{gem_repo1}"
         gem "rake"
       Gemfile
@@ -102,7 +102,7 @@ describe "Bundler::CLI" do
     it "works when the manifest is in a different directory" do
       build_manifest_file tmp_file('config', 'manifest.rb'), <<-Gemfile
         bundle_path "../gems"
-        sources.clear
+        clear_sources
         source "file://#{gem_repo1}"
         gem "rake"
       Gemfile
@@ -116,7 +116,7 @@ describe "Bundler::CLI" do
   describe "it working without rubygems" do
     before(:each) do
       build_manifest <<-Gemfile
-        sources.clear
+        clear_sources
         source "file://#{gem_repo1}"
         gem "rake"
         gem "extlib"
@@ -154,7 +154,7 @@ describe "Bundler::CLI" do
   describe "forcing an update" do
     it "forces checking for remote updates if --update is used" do
       m = build_manifest <<-Gemfile
-        sources.clear
+        clear_sources
         source "file://#{gem_repo1}"
         source "file://#{gem_repo2}"
         gem "rack", "0.9.1"
@@ -162,7 +162,7 @@ describe "Bundler::CLI" do
       m.install
 
       build_manifest <<-Gemfile
-        sources.clear
+        clear_sources
         source "file://#{gem_repo1}"
         source "file://#{gem_repo2}"
         gem "rack"

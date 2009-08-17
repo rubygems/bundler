@@ -17,7 +17,7 @@ describe "Fetcher" do
 
   it "raises if the source does not exist" do
     m = build_manifest <<-Gemfile
-      sources.clear
+      clear_sources
       source "file://not/a/gem/source"
       gem "foo"
     Gemfile
@@ -26,7 +26,7 @@ describe "Fetcher" do
 
   it "raises if the source is not available" do
     m = build_manifest <<-Gemfile
-      sources.clear
+      clear_sources
       source "http://localhost"
       gem "foo"
     Gemfile
@@ -35,7 +35,7 @@ describe "Fetcher" do
 
   it "raises if the source is not a gem repository" do
     m = build_manifest <<-Gemfile
-      sources.clear
+      clear_sources
       source "http://google.com/not/a/gem/location"
       gem "foo"
     Gemfile
@@ -64,7 +64,7 @@ describe "Fetcher" do
 
   it "outputs a logger message when updating an index from source" do
     m = build_manifest <<-Gemfile
-      sources.clear
+      clear_sources
       source "file://#{gem_repo1}"
       source "file://#{gem_repo2}"
       gem "very-simple"

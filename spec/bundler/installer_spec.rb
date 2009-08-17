@@ -12,7 +12,7 @@ describe "Installing gems" do
 
     def setup
       @manifest = build_manifest <<-Gemfile
-        sources.clear
+        clear_sources
         source "file://#{gem_repo1}"
         source "file://#{gem_repo2}"
         gem "rails"
@@ -43,13 +43,14 @@ describe "Installing gems" do
       tmp_file("vendor", "gems", "fail").touch_p
       lambda {
         setup
+        @manifest.install
       }.should raise_error(Bundler::InvalidRepository)
     end
 
     it "installs the bins in the directory you specify" do
       tmp_file("omgbinz").mkdir
       m = build_manifest <<-Gemfile
-        sources.clear
+        clear_sources
         source "file://#{gem_repo1}"
         source "file://#{gem_repo2}"
         bin_path "#{tmp_file("omgbinz")}"
@@ -108,7 +109,7 @@ describe "Installing gems" do
 
     it "works with prerelease gems" do
       m = build_manifest <<-Gemfile
-        sources.clear
+        clear_sources
         source "file://#{gem_repo1}"
         gem "webrat", "0.4.4.racktest"
       Gemfile
@@ -133,7 +134,7 @@ describe "Installing gems" do
 
     it "compiles binary gems" do
       m = build_manifest <<-Gemfile
-        sources.clear
+        clear_sources
         source "file://#{gem_repo2}"
         gem "json"
       Gemfile

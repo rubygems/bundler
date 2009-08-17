@@ -2,7 +2,7 @@ module Bundler
   class DefaultManifestNotFound < StandardError; end
 
   class ManifestFile
-    attr_reader :sources, :dependencies
+    attr_reader :dependencies
     attr_accessor :gem_path, :bindir, :rubygems, :system_gems
 
     def self.load(filename = nil)
@@ -10,11 +10,12 @@ module Bundler
     end
 
     def initialize(filename)
-      @filename      = filename
-      @sources       = [Source.new("http://gems.rubyforge.org")]
-      @dependencies  = []
-      @rubygems      = true
-      @system_gems   = true
+      @filename        = filename
+      @default_sources = [Source.new("http://gems.rubyforge.org")]
+      @sources         = []
+      @dependencies    = []
+      @rubygems        = true
+      @system_gems     = true
     end
 
     def load
@@ -28,6 +29,19 @@ module Bundler
 
     def install(update = false)
       manifest.install(update)
+    end
+
+    def sources
+      @sources + @default_sources
+    end
+
+    def add_source(source)
+      @sources << source
+    end
+
+    def clear_sources
+      @sources.clear
+      @default_sources.clear
     end
 
     def setup_environment

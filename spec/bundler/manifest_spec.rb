@@ -17,7 +17,7 @@ describe "Bundler::Manifest" do
 
     before(:each) do
       @manifest = build_manifest <<-Gemfile
-        sources.clear
+        clear_sources
         source "file://#{gem_repo1}"
         source "file://#{gem_repo2}"
         gem "rails", "2.3.2"
@@ -60,7 +60,7 @@ describe "Bundler::Manifest" do
       @manifest.install
 
       m = build_manifest <<-Gemfile
-        sources.clear
+        clear_sources
         source "file://#{gem_repo1}"
         source "file://#{gem_repo2}"
         gem "rails", "2.3.2"
@@ -85,7 +85,7 @@ describe "Bundler::Manifest" do
       tmp_bindir("rackup").should exist
 
       m = build_manifest <<-Gemfile
-        sources.clear
+        clear_sources
         source "file://#{gem_repo1}"
         source "file://#{gem_repo2}"
         gem "rails", "2.3.2"
@@ -117,7 +117,7 @@ describe "Bundler::Manifest" do
 
     it "raises a friendly exception if the manifest doesn't resolve" do
       build_manifest <<-Gemfile
-        sources.clear
+        clear_sources
         source "file://#{gem_repo1}"
         source "file://#{gem_repo2}"
         gem "rails", "2.3.2"
@@ -138,7 +138,7 @@ describe "Bundler::Manifest" do
 
     it "makes gems available via Manifest#activate" do
       m = build_manifest <<-Gemfile
-        sources.clear
+        clear_sources
         source "file://#{gem_repo1}"
         source "file://#{gem_repo2}"
         gem "very-simple", "1.0.0"
@@ -154,7 +154,7 @@ describe "Bundler::Manifest" do
 
     it "makes gems available" do
       m = build_manifest <<-Gemfile
-        sources.clear
+        clear_sources
         source "file://#{gem_repo1}"
         source "file://#{gem_repo2}"
         gem "very-simple", "1.0.0"
@@ -172,7 +172,7 @@ describe "Bundler::Manifest" do
 
     it "is able to work system gems" do
       m = build_manifest <<-Gemfile
-        sources.clear
+        clear_sources
         source "file://#{gem_repo1}"
         gem "very-simple"
       Gemfile
@@ -184,7 +184,7 @@ describe "Bundler::Manifest" do
 
     it "it does not work with system gems if system gems have been disabled" do
       m = build_manifest <<-Gemfile
-        sources.clear
+        clear_sources
         source "file://#{gem_repo1}"
         gem "very-simple"
         disable_system_gems
@@ -199,7 +199,7 @@ describe "Bundler::Manifest" do
       describe desc do
         before(:each) do
           m = build_manifest <<-Gemfile
-            sources.clear
+            clear_sources
             source "file://#{gem_repo1}"
             gem "very-simple"
             #{'disable_system_gems' if i == 1}
@@ -228,7 +228,7 @@ describe "Bundler::Manifest" do
   describe "environments" do
     before(:each) do
       @manifest = build_manifest <<-Gemfile
-        sources.clear
+        clear_sources
         source "file://#{gem_repo1}"
         source "file://#{gem_repo2}"
         gem "very-simple", "1.0.0", :only => "testing"

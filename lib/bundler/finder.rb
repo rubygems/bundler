@@ -18,23 +18,6 @@ module Bundler
       @sources = sources
     end
 
-    # Figures out the best possible configuration of gems that satisfies
-    # the list of passed dependencies and any child dependencies without
-    # causing any gem activation errors.
-    #
-    # ==== Parameters
-    # *dependencies<Gem::Dependency>:: The list of dependencies to resolve
-    #
-    # ==== Returns
-    # <GemBundle>,nil:: If the list of dependencies can be resolved, a
-    #   collection of gemspecs is returned. Otherwise, nil is returned.
-    def resolve(*dependencies)
-      Bundler.logger.info "Calculating dependencies..."
-
-      resolved = Resolver.resolve(dependencies, self)
-      resolved && GemBundle.new(resolved)
-    end
-
     # Searches for a gem that matches the dependency
     #
     # ==== Parameters

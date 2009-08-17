@@ -17,7 +17,7 @@ module Bundler
     end
 
     def initialize(manifest_file)
-      @manifest_file = manifest_file
+      @manifest_file  = manifest_file
     end
 
     def bundle_path(path)
@@ -43,12 +43,12 @@ module Bundler
     def source(source)
       source = Source.new(source)
       unless @manifest_file.sources.include?(source)
-        @manifest_file.sources << source
+        @manifest_file.add_source(source)
       end
     end
 
-    def sources
-      @manifest_file.sources
+    def clear_sources
+      @manifest_file.clear_sources
     end
 
     def gem(name, *args)
