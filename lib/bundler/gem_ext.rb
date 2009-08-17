@@ -15,5 +15,10 @@ module Gem
       source = Bundler::Source.new(source) unless source.is_a?(Bundler::Source)
       @source = source
     end
+
+    # Hack to fix github's strange marshal file
+    def specification_version
+      @specification_version && @specification_version.to_i
+    end
   end
 end
