@@ -85,6 +85,13 @@ describe "Bundler::CLI" do
     end
   end
 
+  describe "error cases" do
+    it "displays a friendly error message when there is no Gemfile" do
+      out = gem_command :bundle
+      out.should == "Could not find a Gemfile to use"
+    end
+  end
+
   describe "it working while specifying the manifest file name" do
     it "works when the manifest is in the root directory" do
       build_manifest_file tmp_file('manifest.rb'), <<-Gemfile
