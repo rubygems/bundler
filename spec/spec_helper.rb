@@ -71,7 +71,7 @@ module Spec
 
     def run_in_context(*args)
       cmd = args.pop.gsub(/(?=")/, "\\")
-      env = args.pop || tmp_file("vendor", "gems", "environments", "default")
+      env = args.pop || tmp_file("vendor", "gems", "environment")
       lib = File.join(File.dirname(__FILE__), '..', 'lib')
       %x{#{Gem.ruby} -I#{lib} -r #{env} -e "#{cmd}"}.strip
     end

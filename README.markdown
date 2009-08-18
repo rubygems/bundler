@@ -110,7 +110,7 @@ run it with the `gem exec` command. For example:
 Yet another way is to manually require the environment file first. This is
 located in `[bundle_path]/environments/default.rb`. For example:
 
-    ruby -r vendor/gems/environments/default.rb my_ruby_script.rb
+    ruby -r vendor/gems/environment.rb my_ruby_script.rb
 
 ### Using Bundler with Rails today
 
@@ -134,7 +134,7 @@ to follow.
 
 * At the top of `config/boot.rb`, add the following line:
 
-        require File.expand_path(File.join(File.dirname(__FILE__), '..', 'vendor', 'gems', 'environments', 'default'))
+        require File.expand_path(File.join(File.dirname(__FILE__), '..', 'vendor', 'gems', 'environment'))
 
 In theory, this should be enough to get going.
 

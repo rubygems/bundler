@@ -36,7 +36,8 @@ describe "Installing gems" do
     end
 
     it "uses the bundle directory if it is a valid gem repo" do
-      %w(cache doc gems environments specifications).each { |dir| tmp_file("vendor", "gems", dir).mkdir_p }
+      %w(cache doc gems specifications).each { |dir| tmp_file("vendor", "gems", dir).mkdir_p }
+      tmp_file("vendor", "gems", "environment.rb").touch
       setup
       @manifest.install
       tmp_file("vendor", "gems").should have_cached_gems(*@gems)

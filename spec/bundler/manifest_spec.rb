@@ -219,8 +219,7 @@ describe "Bundler::Manifest" do
     end
 
     it "Gem.loaded_specs has the gems that are included in the testing environment" do
-      env = tmp_gem_path('environments', 'default.rb')
-      out = run_in_context env, %'puts Gem.loaded_specs.map{|k,v|"\#{k} - \#{v.version}"}'
+      out = run_in_context %'puts Gem.loaded_specs.map{|k,v|"\#{k} - \#{v.version}"}'
       out.should include("rack - 1.0.0")
       out.should include("very-simple - 1.0")
     end

@@ -21,7 +21,7 @@ module Bundler
       repository.install_cached_gems(:bin_dir => @bindir || repository.path.join("bin"))
       # Cleanup incase fetch was a no-op
       repository.cleanup(gems)
-      create_environment_files(repository.path.join("environments"))
+      create_environment_file(repository.path)
       Bundler.logger.info "Done."
     end
 
@@ -35,12 +35,11 @@ module Bundler
       end
     end
 
-    def gems_for(environment = nil)
+    def gems
       deps = dependencies
       deps = deps.map { |d| d.to_gem_dependency }
       Resolver.resolve(deps, repository.source_index)
     end
-    alias gems gems_for
 
     def environments
       envs = dependencies.map {|dep| Array(dep.only) + Array(dep.except) }.flatten
@@ -92,18 +91,13 @@ module Bundler
       end
     end
 
-    def create_environment_files(path)
+    def create_environment_file(path)
       FileUtils.mkdir_p(path)
-      ["default"].each do |environment|
-        specs = gems_for(environment)
-        files = spec_files_for_specs(specs, path)
-        load_paths = load_paths_for_specs(specs)
-        create_environment_file(path, environment, files, load_paths)
-      end
-    end
+      specs = gems
+      spec_files = spec_files_for_specs(specs, path)
+      load_paths = load_paths_for_specs(specs)
 
-    def create_environment_file(path, environment, spec_files, load_paths)
-      File.open(path.join("#{environment}.rb"), "w") do |file|
+      File.open(path.join("environment.rb"), "w") do |file|
         template = File.read(File.join(File.dirname(__FILE__), "templates", "environment.rb"))
         erb = ERB.new(template)
         file.puts erb.result(binding)
@@ -124,7 +118,7 @@ module Bundler
     def spec_files_for_specs(specs, path)
       files = {}
       specs.each do |s|
-        files[s.name] = path.join("..", "specifications", "#{s.full_name}.gemspec").expand_path
+        files[s.name] = path.join("specifications", "#{s.full_name}.gemspec").expand_path
       end
       files
     end

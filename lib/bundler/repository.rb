@@ -20,7 +20,7 @@ module Bundler
     end
 
     def valid?
-      (Dir[@path.join("*")] - Dir[@path.join("{cache,doc,gems,environments,specifications}")]).empty?
+      (Dir[@path.join("*")] - Dir[@path.join("{cache,doc,gems,environment.rb,specifications}")]).empty?
     end
 
     def download(spec)

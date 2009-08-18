@@ -24,7 +24,7 @@ describe "Bundler::CLI" do
     end
 
     it "creates a default environment file with the appropriate load paths" do
-      tmp_file('vendor', 'gems', 'environments', 'default.rb').should have_load_paths(tmp_file("vendor", "gems"),
+      tmp_file('vendor', 'gems', 'environment.rb').should have_load_paths(tmp_file("vendor", "gems"),
         "extlib-0.9.12" => %w(lib),
         "rake-0.8.7" => %w(bin lib),
         "very-simple-1.0" => %w(bin lib),
