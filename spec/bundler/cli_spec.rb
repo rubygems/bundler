@@ -46,6 +46,13 @@ describe "Bundler::CLI" do
       out.should == "Extlib"
     end
 
+    it "runs exec correctly" do
+      Dir.chdir(tmp_dir) do
+        out = gem_command :exec, %[ruby -e 'require "extlib" ; puts Extlib']
+        out.should == "Extlib"
+      end
+    end
+
     it "maintains the correct environment when shelling out" do
       out = run_in_context "exec %{#{Gem.ruby} -e 'require %{very-simple} ; puts VerySimpleForTests'}"
       out.should == "VerySimpleForTests"

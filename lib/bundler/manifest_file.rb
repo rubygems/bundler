@@ -50,7 +50,7 @@ module Bundler
         ENV["GEM_PATH"] = @gem_path
       end
       ENV["PATH"]     = "#{@bindir}:#{ENV["PATH"]}"
-      ENV["RUBYOPT"]  = "-r#{@gem_path}/environments/default #{ENV["RUBYOPT"]}"
+      ENV["RUBYOPT"]  = "-r#{@gem_path}/environment #{ENV["RUBYOPT"]}"
     end
 
     def load_manifest

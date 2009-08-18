@@ -77,7 +77,10 @@ module Spec
     end
 
     def gem_command(command, args = "")
-      args = args.gsub(/(?=")/, "\\")
+      if command == :exec
+        args = args.gsub(/(?=")/, "\\")
+        args = %["#{args}"]
+      end
       lib  = File.join(File.dirname(__FILE__), '..', 'lib')
       %x{#{Gem.ruby} -I#{lib} -rubygems -S gem #{command} #{args}}.strip
     end
