@@ -2,8 +2,8 @@ module Gem
   class Installer
     def app_script_text(bin_file_name)
       path = @gem_home
-      template = File.read(File.join(File.dirname(__FILE__), "templates", "app_script.rb"))
-      erb = ERB.new(template)
+      template = File.read(File.join(File.dirname(__FILE__), "templates", "app_script.erb"))
+      erb = ERB.new(template, nil, '-')
       erb.result(binding)
     end
   end

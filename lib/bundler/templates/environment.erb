@@ -1,32 +1,30 @@
-<% unless @system_gems %>
-ENV["GEM_HOME"] = "<%= @repository.path %>"
-ENV["GEM_PATH"] = "<%= @repository.path %>"
-<% end %>
-ENV["PATH"]     = "<%= @bindir %>:#{ENV["PATH"]}"
-ENV["RUBYOPT"]  = "-r#{__FILE__} #{ENV["RUBYOPT"]}"
-
-<% load_paths.each do |load_path| %>
-$LOAD_PATH.unshift "<%= load_path %>"
-<% end %>
-
-<% if @rubygems %>
-require "rubygems"
-
 module Bundler
+  dir = File.dirname(__FILE__)
 
-  @gemfile = "<%= @filename %>"
+<% unless @system_gems -%>
+  ENV["GEM_HOME"] = dir
+  ENV["GEM_PATH"] = dir
+<% end -%>
+  ENV["PATH"]     = "#{dir}/<%= bindir %>:#{ENV["PATH"]}"
+  ENV["RUBYOPT"]  = "-r#{__FILE__} #{ENV["RUBYOPT"]}"
+
+<% load_paths.each do |load_path| -%>
+  $LOAD_PATH.unshift "#{dir}/<%= load_path %>"
+<% end -%>
+
+  @gemfile = "#{dir}/<%= filename %>"
+
+<% if @rubygems -%>
+  require "rubygems"
 
   @bundled_specs = {}
-  <% spec_files.each do |name, path| %>
-  @bundled_specs["<%= name %>"] = eval(File.read("<%= path %>"))
-  @bundled_specs["<%= name %>"].loaded_from = "<%= path %>"
-  <% end %>
+<% spec_files.each do |name, path| -%>
+  @bundled_specs["<%= name %>"] = eval(File.read("#{dir}/<%= path %>"))
+  @bundled_specs["<%= name %>"].loaded_from = "#{dir}/<%= path %>"
+<% end -%>
 
   def self.add_specs_to_loaded_specs
     Gem.loaded_specs.merge! @bundled_specs
-    if Gem.respond_to?(:loaded_stacks)
-      @bundled_specs.keys.each { |name| Gem.loaded_stacks[name] = [] }
-    end
   end
 
   def self.add_specs_to_index
@@ -37,18 +35,19 @@ module Bundler
 
   add_specs_to_loaded_specs
   add_specs_to_index
+<% end -%>
 end
 
+<% if @rubygems -%>
 module Gem
   def source_index.refresh!
     super
     Bundler.add_specs_to_index
   end
 end
-
-<% else %>
-
+<% else -%>
 $" << "rubygems.rb"
+
 module Kernel
   def gem(*)
     # Silently ignore calls to gem, since, in theory, everything
@@ -80,7 +79,6 @@ module Gem
   class VerificationError < Exception; end
   class SystemExitException < SystemExit; end
 end
-
-<% end %>
+<% end -%>
 
 require "bundler/runtime"

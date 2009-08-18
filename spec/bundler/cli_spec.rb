@@ -41,6 +41,11 @@ describe "Bundler::CLI" do
       out.should include(tmp_file("vendor", "gems", "gems", "rack-0.9.1").to_s)
     end
 
+    it "creates valid executables" do
+      out = `#{tmp_file("bin", "rake")} -e 'require "extlib" ; puts Extlib'`.strip
+      out.should == "Extlib"
+    end
+
     it "maintains the correct environment when shelling out" do
       out = run_in_context "exec %{#{Gem.ruby} -e 'require %{very-simple} ; puts VerySimpleForTests'}"
       out.should == "VerySimpleForTests"

@@ -10,7 +10,7 @@ module Bundler
       @filename     = filename
       @sources      = sources
       @dependencies = dependencies
-      @bindir       = bindir
+      @bindir       = bindir || repository.path.join("bin")
       @path         = path
       @rubygems     = rubygems
       @system_gems  = system_gems
@@ -18,7 +18,7 @@ module Bundler
 
     def install(update)
       fetch(update)
-      repository.install_cached_gems(:bin_dir => @bindir || repository.path.join("bin"))
+      repository.install_cached_gems(:bin_dir => @bindir)
       # Cleanup incase fetch was a no-op
       repository.cleanup(gems)
       create_environment_file(repository.path)
@@ -83,13 +83,16 @@ module Bundler
 
     def create_environment_file(path)
       FileUtils.mkdir_p(path)
-      specs = gems
+
+      specs      = gems
       spec_files = spec_files_for_specs(specs, path)
       load_paths = load_paths_for_specs(specs)
+      bindir     = @bindir.relative_path_from(path).to_s
+      filename   = @filename.relative_path_from(path).to_s
 
       File.open(path.join("environment.rb"), "w") do |file|
-        template = File.read(File.join(File.dirname(__FILE__), "templates", "environment.rb"))
-        erb = ERB.new(template)
+        template = File.read(File.join(File.dirname(__FILE__), "templates", "environment.erb"))
+        erb = ERB.new(template, nil, '-')
         file.puts erb.result(binding)
       end
     end
@@ -97,9 +100,13 @@ module Bundler
     def load_paths_for_specs(specs)
       load_paths = []
       specs.each do |spec|
-        load_paths << File.join(spec.full_gem_path, spec.bindir) if spec.bindir
+        gem_path = Pathname.new(spec.full_gem_path)
+
+        if spec.bindir
+          load_paths << gem_path.join(spec.bindir).relative_path_from(@path).to_s
+        end
         spec.require_paths.each do |path|
-          load_paths << File.join(spec.full_gem_path, path)
+          load_paths << gem_path.join(path).relative_path_from(@path).to_s
         end
       end
       load_paths
@@ -108,7 +115,7 @@ module Bundler
     def spec_files_for_specs(specs, path)
       files = {}
       specs.each do |s|
-        files[s.name] = path.join("specifications", "#{s.full_name}.gemspec").expand_path
+        files[s.name] = File.join("specifications", "#{s.full_name}.gemspec")
       end
       files
     end
