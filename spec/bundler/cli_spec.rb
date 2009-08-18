@@ -27,14 +27,8 @@ describe "Bundler::CLI" do
       tmp_file('vendor', 'gems', 'environments', 'default.rb').should have_load_paths(tmp_file("vendor", "gems"),
         "extlib-0.9.12" => %w(lib),
         "rake-0.8.7" => %w(bin lib),
-        "very-simple-1.0" => %w(bin lib)
-      )
-
-      tmp_file('vendor', 'gems', 'environments', 'web.rb').should have_load_paths(tmp_file("vendor", "gems"),
-        "extlib-0.9.12" => %w(lib),
-        "rake-0.8.7" => %w(bin lib),
-        "rack-0.9.1" => %w(bin lib),
-        "very-simple-1.0" => %w(bin lib)
+        "very-simple-1.0" => %w(bin lib),
+        "rack-0.9.1" => %w(bin lib)
       )
     end
 
@@ -44,7 +38,7 @@ describe "Bundler::CLI" do
       out.should include(tmp_file("vendor", "gems", "gems", "rake-0.8.7", "bin").to_s)
       out.should include(tmp_file("vendor", "gems", "gems", "extlib-0.9.12", "lib").to_s)
       out.should include(tmp_file("vendor", "gems", "gems", "very-simple-1.0", "lib").to_s)
-      out.should_not include(tmp_file("vendor", "gems", "gems", "rack-0.9.1").to_s)
+      out.should include(tmp_file("vendor", "gems", "gems", "rack-0.9.1").to_s)
     end
 
     it "maintains the correct environment when shelling out" do

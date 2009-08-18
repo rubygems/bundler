@@ -136,48 +136,13 @@ describe "Bundler::Manifest" do
 
   describe "runtime" do
 
-    it "makes gems available via Manifest#activate" do
-      m = build_manifest <<-Gemfile
-        clear_sources
-        source "file://#{gem_repo1}"
-        source "file://#{gem_repo2}"
-        gem "very-simple", "1.0.0"
-      Gemfile
-
-      m.install
-      m.manifest.activate
-
-      $:.any? do |p|
-        File.expand_path(p) == File.expand_path(tmp_gem_path("gems", "very-simple-1.0", "lib"))
-      end.should be_true
-    end
-
-    it "makes gems available" do
-      m = build_manifest <<-Gemfile
-        clear_sources
-        source "file://#{gem_repo1}"
-        source "file://#{gem_repo2}"
-        gem "very-simple", "1.0.0"
-      Gemfile
-
-      m.install
-      m.manifest.activate
-      m.manifest.require_all
-
-      $".any? do |f|
-        File.expand_path(f) ==
-          File.expand_path(tmp_gem_path("gems", "very-simple-1.0", "lib", "very-simple.rb"))
-      end
-    end
-
     it "is able to work system gems" do
-      m = build_manifest <<-Gemfile
+      install_manifest <<-Gemfile
         clear_sources
         source "file://#{gem_repo1}"
         gem "very-simple"
       Gemfile
 
-      m.install
       out = run_in_context "require 'rake' ; puts Rake"
       out.should == "Rake"
     end
@@ -243,27 +208,6 @@ describe "Bundler::Manifest" do
       @manifest.environments.should == ["testing", "default"]
     end
 
-    it "knows what gems are in an environment" do
-      @manifest.gems_for("testing").should match_gems(
-        "very-simple" => ["1.0"], "rack" => ["1.0.0"])
-
-      @manifest.gems_for("production").should match_gems(
-        "rack" => ["1.0.0"])
-    end
-
-    it "can create load path files for each environment" do
-      tmp_gem_path('environments', 'testing.rb').should have_load_paths(tmp_gem_path,
-        "very-simple-1.0" => %w(bin lib),
-        "rack-1.0.0"      => %w(bin lib)
-      )
-
-      tmp_gem_path('environments', 'default.rb').should have_load_paths(tmp_gem_path,
-        "rack-1.0.0" => %w(bin lib)
-      )
-
-      File.exist?(tmp_gem_path('environments', "production.rb")).should be_false
-    end
-
     it "requires the Rubygems library" do
       out = run_in_context "puts 'Gem'"
       out.should == "Gem"
@@ -275,7 +219,7 @@ describe "Bundler::Manifest" do
     end
 
     it "Gem.loaded_specs has the gems that are included in the testing environment" do
-      env = tmp_gem_path('environments', 'testing.rb')
+      env = tmp_gem_path('environments', 'default.rb')
       out = run_in_context env, %'puts Gem.loaded_specs.map{|k,v|"\#{k} - \#{v.version}"}'
       out.should include("rack - 1.0.0")
       out.should include("very-simple - 1.0")

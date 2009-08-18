@@ -55,7 +55,7 @@ module Bundler
 
     def load_manifest
       ManifestBuilder.load(self, filename)
-      Manifest.new(sources, dependencies, bindir, gem_path, rubygems, system_gems)
+      Manifest.new(filename, sources, dependencies, bindir, gem_path, rubygems, system_gems)
     end
 
     def gem_path

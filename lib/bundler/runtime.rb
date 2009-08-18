@@ -1,61 +1,46 @@
+require "bundler/dependency"
+
 module Bundler
   class ManifestFileNotFound < StandardError; end
 
+  def self.require(environment = nil)
+    ManifestBuilder.run(@gemfile, environment || :default)
+  end
+
   class ManifestBuilder
-    def self.build(manifest_file, string)
-      builder = new(manifest_file)
-      builder.instance_eval(string)
+    def self.run(gemfile, environment)
+      unless File.exist?(gemfile)
+        raise ManifestFileNotFound, "#{gemfile.inspect} does not exist"
+      end
+
+      builder = new(environment)
+      builder.instance_eval(File.read(gemfile))
       builder
     end
 
-    def self.load(manifest_file, filename)
-      unless File.exist?(filename)
-        raise ManifestFileNotFound, "#{filename.inspect} does not exist"
-      end
-      string = File.read(filename)
-      build(manifest_file, string)
+    def initialize(environment)
+      @environment = environment
     end
 
-    def initialize(manifest_file)
-      @manifest_file  = manifest_file
-    end
+    def bundle_path(*) ; end
 
-    def bundle_path(path)
-      path = Pathname.new(path)
-      @manifest_file.gem_path = (path.relative? ?
-        @manifest_file.root.join(path) : path).expand_path
-    end
+    def bin_path(*) ; end
 
-    def bin_path(path)
-      path = Pathname.new(path)
-      @manifest_file.bindir = (path.relative? ?
-        @manifest_file.root.join(path) : path).expand_path
-    end
+    def disable_rubygems(*) ; end
 
-    def disable_rubygems
-      @manifest_file.rubygems = false
-    end
+    def disable_system_gems(*) ; end
 
-    def disable_system_gems
-      @manifest_file.system_gems = false
-    end
+    def source(*) ; end
 
-    def source(source)
-      source = Source.new(source)
-      unless @manifest_file.sources.include?(source)
-        @manifest_file.add_source(source)
-      end
-    end
+    def clear_sources(*) ; end
 
-    def clear_sources
-      @manifest_file.clear_sources
-    end
-
-    def gem(name, *args)
+    def gem(name, *args, &blk)
       options = args.last.is_a?(Hash) ? args.pop : {}
       version = args.last
 
-      @manifest_file.dependencies << Dependency.new(name, options.merge(:version => version))
+      dep = Dependency.new(name, options.merge(:version => version), &blk)
+      dep.require(@environment)
+      dep
     end
   end
 end

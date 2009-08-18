@@ -14,6 +14,8 @@ require "rubygems"
 
 module Bundler
 
+  @gemfile = "<%= @filename %>"
+
   @bundled_specs = {}
   <% spec_files.each do |name, path| %>
   @bundled_specs["<%= name %>"] = eval(File.read("<%= path %>"))
@@ -80,3 +82,5 @@ module Gem
 end
 
 <% end %>
+
+require "bundler/runtime"

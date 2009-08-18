@@ -4,7 +4,7 @@ module Bundler
   class Dependency
     attr_reader :name, :version, :require_as, :only, :except
 
-    def initialize(name, options = {})
+    def initialize(name, options = {}, &block)
       options.each do |k, v|
         options[k.to_s] = v
       end
@@ -14,6 +14,7 @@ module Bundler
       @require_as = Array(options["require_as"] || name)
       @only       = Array(options["only"]).map {|e| e.to_s } if options["only"]
       @except     = Array(options["except"]).map {|e| e.to_s } if options["except"]
+      @block      = block
 
       if (@only && @only.include?("rubygems")) || (@except && @except.include?("rubygems"))
         raise InvalidEnvironmentName, "'rubygems' is not a valid environment name"
@@ -30,6 +31,16 @@ module Bundler
 
     def to_s
       to_gem_dependency.to_s
+    end
+
+    def require(environment)
+      return unless in?(environment)
+
+      @require_as.each do |file|
+        super(file)
+      end
+
+      @block.call if @block
     end
 
     def to_gem_dependency

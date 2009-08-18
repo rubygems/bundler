@@ -72,7 +72,8 @@ module Spec
     def run_in_context(*args)
       cmd = args.pop.gsub(/(?=")/, "\\")
       env = args.pop || tmp_file("vendor", "gems", "environments", "default")
-      %x{#{Gem.ruby} -r #{env} -e "#{cmd}"}.strip
+      lib = File.join(File.dirname(__FILE__), '..', 'lib')
+      %x{#{Gem.ruby} -I#{lib} -r #{env} -e "#{cmd}"}.strip
     end
 
     def gem_command(command, args = "")
@@ -100,6 +101,12 @@ module Spec
         build_manifest_file(path, str)
         Bundler::ManifestFile.load(path)
       end
+    end
+
+    def install_manifest(*args)
+      m = build_manifest(*args)
+      m.install
+      m
     end
 
     def reset!

@@ -4,9 +4,10 @@ module Bundler
   class VersionConflict < StandardError; end
 
   class Manifest
-    attr_reader :sources, :dependencies, :path
+    attr_reader :filename, :sources, :dependencies, :path
 
-    def initialize(sources, dependencies, bindir, path, rubygems, system_gems)
+    def initialize(filename, sources, dependencies, bindir, path, rubygems, system_gems)
+      @filename     = filename
       @sources      = sources
       @dependencies = dependencies
       @bindir       = bindir
@@ -25,18 +26,17 @@ module Bundler
     end
 
     def activate(environment = "default")
-      require repository.path.join("environments", "#{environment}.rb")
+      require repository.path.join("environments", "#{environment}")
     end
 
     def require_all
       dependencies.each do |dep|
-        dep.require_as.each {|file| require file }
+        dep.require
       end
     end
 
     def gems_for(environment = nil)
       deps = dependencies
-      deps = deps.select { |d| d.in?(environment) } if environment
       deps = deps.map { |d| d.to_gem_dependency }
       Resolver.resolve(deps, repository.source_index)
     end
@@ -94,7 +94,7 @@ module Bundler
 
     def create_environment_files(path)
       FileUtils.mkdir_p(path)
-      environments.each do |environment|
+      ["default"].each do |environment|
         specs = gems_for(environment)
         files = spec_files_for_specs(specs, path)
         load_paths = load_paths_for_specs(specs)

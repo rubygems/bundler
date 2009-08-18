@@ -14,7 +14,7 @@ require "bundler/resolver"
 require "bundler/manifest_file"
 require "bundler/manifest"
 require "bundler/dependency"
-require "bundler/runtime"
+require "bundler/dsl"
 require "bundler/cli"
 require "bundler/repository"
 
