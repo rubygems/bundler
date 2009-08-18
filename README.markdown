@@ -2,6 +2,7 @@
 
     Github:       http://github.com/wycats/bundler
     Mailing list: http://groups.google.com/group/ruby-bundler
+    IRC:          #carlhuda on freenode
 
 ## Intro
 
