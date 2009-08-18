@@ -80,9 +80,35 @@ describe "Bundler::CLI" do
   end
 
   describe "error cases" do
+    before(:each) do
+      Dir.chdir(tmp_dir)
+    end
+
     it "displays a friendly error message when there is no Gemfile" do
       out = gem_command :bundle
       out.should == "Could not find a Gemfile to use"
+    end
+
+    it "fails when a root level gem does not exist" do
+      build_manifest <<-Gemfile
+        clear_sources
+        source "file://#{gem_repo1}"
+        gem "monk"
+      Gemfile
+
+      out = gem_command :bundle
+      out.should include("Could not find gem 'monk (>= 0, runtime)' in any of the sources")
+    end
+
+    it "outputs a warning when a child gem dependency is missing dependencies" do
+      build_manifest <<-Gemfile
+        clear_sources
+        source "file://#{gem_repo1}"
+        gem "treetop"
+      Gemfile
+
+      out = gem_command :bundle
+      out.should include("Could not find gem 'polyglot (>= 0.2.5, runtime)' (required by 'treetop (>= 0, runtime)') in any of the sources")
     end
   end
 

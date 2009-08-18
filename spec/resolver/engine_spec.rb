@@ -115,6 +115,6 @@ describe "Resolving specs" do
       build_dep("a", "= 1.1"),
     ]
 
-    Bundler::Resolver.resolve(deps, index).should be_nil
+    lambda { Bundler::Resolver.resolve(deps, index) }.should raise_error(Bundler::GemNotFound)
   end
 end

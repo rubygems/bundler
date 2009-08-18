@@ -16,6 +16,9 @@ module Bundler
     rescue VersionConflict => e
       Bundler.logger.error e.message
       exit
+    rescue GemNotFound => e
+      Bundler.logger.error e.message
+      exit
     end
 
     def initialize(options)

@@ -19,6 +19,7 @@ module Gem
 end
 
 module Bundler
+  class GemNotFound < StandardError; end
 
   class Resolver
 
@@ -99,6 +100,13 @@ module Bundler
         #
         # TODO: Warn / error when no matching versions are found.
         matching_versions = @index.search(current)
+
+        if matching_versions.empty?
+          if current.required_by.empty?
+            raise GemNotFound, "Could not find gem '#{current}' in any of the sources"
+          end
+          Bundler.logger.warn "Could not find gem '#{current}' (required by '#{current.required_by.last}') in any of the sources"
+        end
 
         matching_versions.reverse_each do |spec|
           conflict = resolve_requirement(spec, current, reqs.dup, activated.dup)

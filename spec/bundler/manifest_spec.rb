@@ -116,6 +116,7 @@ describe "Bundler::Manifest" do
     end
 
     it "raises a friendly exception if the manifest doesn't resolve" do
+      pending
       build_manifest <<-Gemfile
         clear_sources
         source "file://#{gem_repo1}"
