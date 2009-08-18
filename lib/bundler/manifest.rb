@@ -25,16 +25,6 @@ module Bundler
       Bundler.logger.info "Done."
     end
 
-    def activate(environment = "default")
-      require repository.path.join("environments", "#{environment}")
-    end
-
-    def require_all
-      dependencies.each do |dep|
-        dep.require
-      end
-    end
-
     def gems
       deps = dependencies
       deps = deps.map { |d| d.to_gem_dependency }
