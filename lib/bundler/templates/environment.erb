@@ -36,6 +36,8 @@ module Bundler
   add_specs_to_loaded_specs
   add_specs_to_index
 <% end -%>
+
+  require File.join(dir, "bundler", "runtime")
 end
 
 <% if @rubygems -%>
@@ -80,5 +82,3 @@ module Gem
   class SystemExitException < SystemExit; end
 end
 <% end -%>
-
-require "bundler/runtime"

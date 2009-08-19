@@ -22,6 +22,7 @@ module Bundler
       # Cleanup incase fetch was a no-op
       repository.cleanup(gems)
       create_environment_file(repository.path)
+      create_bundler_runtime
       Bundler.logger.info "Done."
     end
 
@@ -118,6 +119,18 @@ module Bundler
         files[s.name] = File.join("specifications", "#{s.full_name}.gemspec")
       end
       files
+    end
+
+    def create_bundler_runtime
+      here  = Pathname.new(__FILE__).dirname
+      there = path.join("bundler")
+
+      Bundler.logger.info "Creating the bundler runtime"
+
+      FileUtils.rm_rf(there)
+      there.mkdir
+      FileUtils.cp(here.join("runtime.rb"), there)
+      FileUtils.cp_r(here.join("runtime"), there)
     end
   end
 end
