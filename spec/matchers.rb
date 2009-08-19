@@ -42,7 +42,7 @@ module Spec
       end
 
       simple_matcher("have load paths") do |given, matcher|
-        actual = `#{Gem.ruby} -r#{given} -e 'puts $:'`.split("\n")
+        actual = run_in_context("puts $:").split("\n")
 
         flattened_paths.all? do |path|
           matcher.failure_message = "expected environment load paths to contain '#{path}', but it was:\n  #{actual.join("\n  ")}"
@@ -50,6 +50,8 @@ module Spec
         end
       end
     end
+
+    alias have_load_path have_load_paths
 
     def include_cached_gems(*gems)
       simple_matcher("include cached gems") do |given, matcher|

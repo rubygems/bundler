@@ -12,7 +12,9 @@ module Gem
     attribute :source
 
     def source=(source)
-      source = Bundler::Source.new(source) unless source.is_a?(Bundler::Source)
+      unless source.is_a?(Bundler::Source)
+        source = Bundler::Source.new(:uri => source)
+      end
       @source = source
     end
 

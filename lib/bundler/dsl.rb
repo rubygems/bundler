@@ -41,7 +41,7 @@ module Bundler
     end
 
     def source(source)
-      source = Source.new(source)
+      source = Source.new(:uri => source)
       unless @manifest_file.sources.include?(source)
         @manifest_file.add_source(source)
       end
@@ -55,7 +55,11 @@ module Bundler
       options = args.last.is_a?(Hash) ? args.pop : {}
       version = args.last
 
-      @manifest_file.dependencies << Dependency.new(name, options.merge(:version => version))
+      dep = Dependency.new(name, options.merge(:version => version))
+
+      
+
+      @manifest_file.dependencies << dep
     end
   end
 end

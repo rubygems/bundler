@@ -10,12 +10,13 @@ module Bundler
     end
 
     def initialize(filename)
-      @filename        = filename
-      @default_sources = [Source.new("http://gems.rubyforge.org")]
-      @sources         = []
-      @dependencies    = []
-      @rubygems        = true
-      @system_gems     = true
+      @filename         = filename
+      @default_sources  = [Source.new(:uri => "http://gems.rubyforge.org")]
+      @sources          = []
+      @priority_sources = []
+      @dependencies     = []
+      @rubygems         = true
+      @system_gems      = true
     end
 
     def load
@@ -32,11 +33,15 @@ module Bundler
     end
 
     def sources
-      @sources + @default_sources
+      @priority_sources + @sources + @default_sources
     end
 
     def add_source(source)
       @sources << source
+    end
+
+    def add_priority_source(source)
+      @priority_sources << source
     end
 
     def clear_sources

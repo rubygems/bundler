@@ -49,20 +49,24 @@ module Spec
       File.join(tmp_dir, 'cache', "#{gem_name}.gem")
     end
 
+    def fixture_dir
+      this_file.join("fixtures")
+    end
+
     def gem_repo1
-      this_file.join("fixtures", "repository1").expand_path
+      fixture_dir.join("repository1").expand_path
     end
 
     def gem_repo2
-      this_file.join("fixtures", "repository2").expand_path
+      fixture_dir.join("repository2").expand_path
     end
 
     def gem_repo3
-      this_file.join("fixtures", "repository3").expand_path
+      fixture_dir.join("repository3").expand_path
     end
 
     def fixture(gem_name)
-      this_file.join("fixtures", "repository1", "gems", "#{gem_name}.gem")
+      fixture_dir.join("repository1", "gems", "#{gem_name}.gem")
     end
 
     def copy(gem_name)
