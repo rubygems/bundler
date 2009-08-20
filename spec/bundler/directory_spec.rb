@@ -26,6 +26,7 @@ describe "Faking gems with directories" do
     it "raises an exception unless the version is specified" do
       lambda do
         install_manifest <<-Gemfile
+          clear_sources
           gem "very-simple", :at => "#{fixture_dir.join("very-simple")}"
         Gemfile
       end.should raise_error
@@ -34,6 +35,7 @@ describe "Faking gems with directories" do
     it "raises an exception unless the version is an exact version" do
       lambda do
         install_manifest <<-Gemfile
+          clear_sources
           gem "very-simple", ">= 0.1.0", :at => "#{fixture_dir.join("very-simple")}"
         Gemfile
       end.should raise_error

@@ -1,116 +1,121 @@
+require "bundler/repository/gem_repository"
+
 module Bundler
   class InvalidRepository < StandardError ; end
 
   class Repository
-
     attr_reader :path
 
-    def initialize(path, bindir = nil)
+    def initialize(path, bindir)
+      FileUtils.mkdir_p(path)
+
       @path   = Pathname.new(path)
-      @bindir = Pathname.new(bindir) || @path.join("bin")
-      unless valid?
-        raise InvalidRepository, "'#{path}' is not a valid gem repository"
-      end
+      @bindir = Pathname.new(bindir)
+      @repo   = Gems.new(@path, @bindir)
     end
 
-    # Returns the source index for all gems installed in the
-    # repository
-    def source_index
-      Gem::SourceIndex.from_gems_in(@path.join("specifications"))
+    def install(dependencies, finder, options = {})
+      fetch(dependencies, finder)
+      expand(options)
+      configure(options)
+      sync
     end
 
-    def valid?
-      (Dir[@path.join("*")] - Dir[@path.join("{cache,doc,gems,bundler,environment.rb,specifications}")]).empty?
+    def gems
+      @repo.gems
     end
 
-    def download(spec)
-      FileUtils.mkdir_p(@path)
-
-      unless @path.join("cache", "#{spec.full_name}.gem").file?
-        spec.source.download(spec, @path)
-      end
+    def download_path_for(type)
+      @path
     end
 
-    # Checks whether a gem is installed
-    def install_cached_gems(options = {})
-      cached_gems.each do |name, version|
-        unless installed?(name, version)
-          install_cached_gem(name, version, options)
-        end
-      end
+  private
+
+    def cleanup(bundle)
+      @repo.cleanup(bundle)
     end
 
-    def install_cached_gem(name, version, options = {})
-      cached_gem = cache_path.join("#{name}-#{version}.gem")
-      # TODO: Add a warning if cached_gem is not a file
-      if cached_gem.file?
-        Bundler.logger.info "Installing #{name}-#{version}.gem"
-        installer = Gem::Installer.new(cached_gem.to_s, options.merge(
-          :install_dir         => @path,
-          :ignore_dependencies => true,
-          :env_shebang         => true,
-          :wrappers            => true
-        ))
-        installer.install
-      end
-    end
-
-    def cleanup(gems)
-      glob = gems.map { |g| g.full_name }.join(',')
-      base = path.join("{cache,specifications,gems}")
-
-      (Dir[base.join("*")] - Dir[base.join("{#{glob}}{.gemspec,.gem,}")]).each do |file|
-        if File.basename(file) =~ /\.gem$/
-          name = File.basename(file, '.gem')
-          Bundler.logger.info "Deleting gem: #{name}"
-        end
-        FileUtils.rm_rf(file)
+    def fetch(dependencies, finder)
+      unless bundle = Resolver.resolve(dependencies, finder)
+        gems = dependencies.map {|d| "  #{d.to_s}" }.join("\n")
+        raise VersionConflict, "No compatible versions could be found for:\n#{gems}"
       end
 
+      # Cleanup here to remove any gems that could cause problem in the expansion
+      # phase
+      #
+      # TODO: Try to avoid double cleanup
+      cleanup(bundle)
+      bundle.download(self)
+    end
+
+    def sync
       glob = gems.map { |g| g.executables }.flatten.join(',')
+
       (Dir[@bindir.join("*")] - Dir[@bindir.join("{#{glob}}")]).each do |file|
         Bundler.logger.info "Deleting bin file: #{File.basename(file)}"
         FileUtils.rm_rf(file)
       end
     end
 
-  private
-
-    def cache_path
-      @path.join("cache")
+    def expand(options)
+      @repo.install_cached_gems(:bin_dir => @bindir)
     end
 
-    def cache_files
-      Dir[cache_path.join("*.gem")]
+    def configure(options)
+      generate_environment(options)
+      generate_runtime(options)
     end
 
-    def cached_gems
-      cache_files.map do |f|
-        full_name = File.basename(f).gsub(/\.gem$/, '')
-        full_name.split(/-(?=[^-]+$)/)
+    def generate_environment(options)
+      FileUtils.mkdir_p(path)
+
+      specs      = gems
+      spec_files = spec_files_for_specs(specs, path)
+      load_paths = load_paths_for_specs(specs)
+      bindir     = @bindir.relative_path_from(path).to_s
+      filename   = options[:manifest].relative_path_from(path).to_s
+
+      File.open(path.join("environment.rb"), "w") do |file|
+        template = File.read(File.join(File.dirname(__FILE__), "templates", "environment.erb"))
+        erb = ERB.new(template, nil, '-')
+        file.puts erb.result(binding)
       end
     end
 
-    def spec_path
-      @path.join("specifications")
+    def load_paths_for_specs(specs)
+      load_paths = []
+      specs.each do |spec|
+        gem_path = Pathname.new(spec.full_gem_path)
+
+        if spec.bindir
+          load_paths << gem_path.join(spec.bindir).relative_path_from(@path).to_s
+        end
+        spec.require_paths.each do |path|
+          load_paths << gem_path.join(path).relative_path_from(@path).to_s
+        end
+      end
+      load_paths
     end
 
-    def spec_files
-      Dir[spec_path.join("*.gemspec")]
+    def spec_files_for_specs(specs, path)
+      files = {}
+      specs.each do |s|
+        files[s.name] = File.join("specifications", "#{s.full_name}.gemspec")
+      end
+      files
     end
 
-    def gem_path
-      @path.join("gems")
-    end
+    def generate_runtime(options)
+      here  = Pathname.new(__FILE__).dirname
+      there = path.join("bundler")
 
-    def gems
-      Dir[gem_path.join("*")]
-    end
+      Bundler.logger.info "Creating the bundler runtime"
 
-    def installed?(name, version)
-      spec_files.any? { |g| File.basename(g) == "#{name}-#{version}.gemspec" } &&
-        gems.any? { |g| File.basename(g) == "#{name}-#{version}" }
+      FileUtils.rm_rf(there)
+      there.mkdir
+      FileUtils.cp(here.join("runtime.rb"), there)
+      FileUtils.cp_r(here.join("runtime"), there)
     end
-
   end
 end

@@ -57,7 +57,15 @@ module Bundler
 
       dep = Dependency.new(name, options.merge(:version => version))
 
-      
+      if options[:at]
+        source = DirectorySource.new(
+          :name     => name,
+          :version  => version,
+          :location => options[:at]
+        )
+
+        @manifest_file.add_priority_source(source)
+      end
 
       @manifest_file.dependencies << dep
     end

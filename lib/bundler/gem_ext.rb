@@ -10,9 +10,10 @@ module Gem
 
   class Specification
     attribute :source
+    attribute :location
 
     def source=(source)
-      unless source.is_a?(Bundler::Source)
+      unless source.is_a?(Bundler::Source) || source.is_a?(Bundler::DirectorySource)
         source = Bundler::Source.new(:uri => source)
       end
       @source = source
@@ -22,5 +23,11 @@ module Gem
     def specification_version
       @specification_version && @specification_version.to_i
     end
+
+    include(Module.new do
+      def full_gem_path
+        @location ? @location : super
+      end
+    end)
   end
 end

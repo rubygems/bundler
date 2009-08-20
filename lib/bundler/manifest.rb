@@ -17,12 +17,7 @@ module Bundler
     end
 
     def install(update)
-      fetch(update)
-      repository.install_cached_gems(:bin_dir => @bindir)
-      # Cleanup incase fetch was a no-op
-      repository.cleanup(gems)
-      create_environment_file(repository.path)
-      create_bundler_runtime
+      repository.install(gem_dependencies, finder, :rubygems => @rubygems, :system_gems => @system_gems, :manifest => @filename)
       Bundler.logger.info "Done."
     end
 
@@ -47,22 +42,6 @@ module Bundler
       @repository ||= Repository.new(@path, @bindir)
     end
 
-    def fetch(update)
-      return unless update || !all_gems_installed?
-
-      unless bundle = Resolver.resolve(gem_dependencies, finder)
-        gems = @dependencies.map {|d| "  #{d.to_s}" }.join("\n")
-        raise VersionConflict, "No compatible versions could be found for:\n#{gems}"
-      end
-
-      # Cleanup here to remove any gems that could cause problem in the expansion
-      # phase
-      #
-      # TODO: Try to avoid double cleanup
-      repository.cleanup(bundle)
-      bundle.download(repository)
-    end
-
     def gem_dependencies
       @gem_dependencies ||= dependencies.map { |d| d.to_gem_dependency }
     end
@@ -79,22 +58,6 @@ module Bundler
       gem_dependencies.all? do |dep|
         downloaded_gems[dep.name] &&
         dep.version_requirements.satisfied_by?(downloaded_gems[dep.name])
-      end
-    end
-
-    def create_environment_file(path)
-      FileUtils.mkdir_p(path)
-
-      specs      = gems
-      spec_files = spec_files_for_specs(specs, path)
-      load_paths = load_paths_for_specs(specs)
-      bindir     = @bindir.relative_path_from(path).to_s
-      filename   = @filename.relative_path_from(path).to_s
-
-      File.open(path.join("environment.rb"), "w") do |file|
-        template = File.read(File.join(File.dirname(__FILE__), "templates", "environment.erb"))
-        erb = ERB.new(template, nil, '-')
-        file.puts erb.result(binding)
       end
     end
 

@@ -80,6 +80,10 @@ module Spec
 
     def have_cached_gems(*gems)
       simple_matcher("have cached gems") do |given, matcher|
+        installed = Dir[File.join(given, "cache", "*.gem")]
+        matcher.failure_message = "The following gems were cached:\n#{installed.join("\n")}\n\n" \
+                                  "Expected:\n#{gems.join("\n")}"
+
         Dir[File.join(given, "cache", "*.gem")].length == gems.length &&
         gems.all? do |name|
           matcher.failure_message = "Gem #{name} was not cached"

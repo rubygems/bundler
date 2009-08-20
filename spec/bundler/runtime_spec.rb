@@ -11,7 +11,7 @@ describe "Bundler runtime" do
       Gemfile
 
       out = run_in_context <<-RUBY
-        Bundler.require
+        Bundler.require_env
         puts VerySimpleForTests
       RUBY
 
@@ -26,7 +26,7 @@ describe "Bundler runtime" do
       Gemfile
 
       out = run_in_context <<-RUBY
-        Bundler.require
+        Bundler.require_env
         puts "\#{ActionController} -- \#{ActionView}"
       RUBY
 
@@ -44,7 +44,7 @@ describe "Bundler runtime" do
 
       out = run_in_context <<-RUBY
         puts "Before"
-        Bundler.require
+        Bundler.require_env
         puts "After"
       RUBY
 
@@ -61,7 +61,7 @@ describe "Bundler runtime" do
       Gemfile
 
       out = run_in_context <<-RUBY
-        Bundler.require :test
+        Bundler.require_env :test
         puts VerySimpleForTests
       RUBY
 
@@ -76,9 +76,9 @@ describe "Bundler runtime" do
       Gemfile
 
       out = run_in_context <<-RUBY
-        Bundler.require      ; puts defined?(VerySimpleForTests)
-        Bundler.require :foo ; puts defined?(VerySimpleForTests)
-        Bundler.require :bar ; puts defined?(VerySimpleForTests)
+        Bundler.require_env      ; puts defined?(VerySimpleForTests)
+        Bundler.require_env :foo ; puts defined?(VerySimpleForTests)
+        Bundler.require_env :bar ; puts defined?(VerySimpleForTests)
       RUBY
 
       out.should == "nil\nnil\nconstant"
@@ -92,14 +92,14 @@ describe "Bundler runtime" do
       Gemfile
 
       out = run_in_context <<-RUBY
-        Bundler.require :bar ; puts defined?(VerySimpleForTests)
-        Bundler.require :foo ; puts defined?(VerySimpleForTests)
+        Bundler.require_env :bar ; puts defined?(VerySimpleForTests)
+        Bundler.require_env :foo ; puts defined?(VerySimpleForTests)
       RUBY
 
       out.should == "nil\nconstant"
 
       out = run_in_context <<-RUBY
-        Bundler.require ; puts defined?(VerySimpleForTests)
+        Bundler.require_env ; puts defined?(VerySimpleForTests)
       RUBY
 
       out.should == "constant"

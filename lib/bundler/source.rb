@@ -22,9 +22,18 @@ module Bundler
       @uri.to_s
     end
 
-    def download(spec, destination)
+    class RubygemsRetardation < StandardError; end
+
+    def download(spec, repository)
       Bundler.logger.info "Downloading #{spec.full_name}.gem"
-      Gem::RemoteFetcher.fetcher.download(spec, uri, destination)
+
+      destination = repository.download_path_for(:gem)
+
+      unless destination.writable?
+        raise RubygemsRetardation
+      end
+
+      Gem::RemoteFetcher.fetcher.download(spec, uri, repository.download_path_for(:gem))
     end
 
   private
@@ -50,15 +59,6 @@ module Bundler
     end
   end
 
-  # HAX
-  class DirectoryGemSpecification < Gem::Specification
-    attr_accessor :location
-
-    def full_gem_path
-      @location
-    end
-  end
-
   class DirectorySource
     def initialize(options)
       @name          = options[:name]
@@ -66,15 +66,17 @@ module Bundler
       @location      = options[:location]
       @require_paths = options[:require_paths] || %w(lib)
     end
-    
+
     def specs
       @specs ||= begin
-        [DirectoryGemSpecification.new do |s|
+        spec = Gem::Specification.new do |s|
           s.name          = @name
-          s.version       = @version
+          s.version       = Gem::Version.new(@version)
           s.location      = @location
           s.require_paths = [@require_paths].flatten
-        end]
+          s.source        = self
+        end
+        { spec.name => { spec.version => spec } }
       end
     end
 
@@ -88,7 +90,10 @@ module Bundler
     end
 
     def download(spec, destination)
-      # NO-OP
+      destination.join("specifications").mkdir
+      File.open(destination.join("specifications", "#{spec.full_name}.gemspec"), 'w') do |f|
+        f.puts spec.to_ruby
+      end
     end
   end
 end

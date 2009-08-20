@@ -1,7 +1,7 @@
 module Bundler
   class ManifestFileNotFound < StandardError; end
 
-  def self.require(environment = nil)
+  def self.require_env(environment = nil)
     ManifestBuilder.run(@gemfile, environment || :default)
   end
 

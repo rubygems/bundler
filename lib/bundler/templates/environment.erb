@@ -1,7 +1,7 @@
 module Bundler
   dir = File.dirname(__FILE__)
 
-<% unless @system_gems -%>
+<% unless options[:system_gems] -%>
   ENV["GEM_HOME"] = dir
   ENV["GEM_PATH"] = dir
 <% end -%>
@@ -14,7 +14,7 @@ module Bundler
 
   @gemfile = "#{dir}/<%= filename %>"
 
-<% if @rubygems -%>
+<% if options[:rubygems] -%>
   require "rubygems"
 
   @bundled_specs = {}
@@ -40,7 +40,7 @@ module Bundler
   require File.join(dir, "bundler", "runtime")
 end
 
-<% if @rubygems -%>
+<% if options[:rubygems] -%>
 module Gem
   def source_index.refresh!
     super
