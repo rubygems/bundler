@@ -15,14 +15,25 @@ module Bundler
     end
 
     def install(dependencies, finder, options = {})
-      fetch(dependencies, finder)
-      expand(options)
+      if options[:update] || !dependencies.all? { |dep| source_index.search(dep).size > 0 }
+        fetch(dependencies, finder)
+        expand(options)
+      else
+        # Remove any gems that are still around if the Gemfile changed without
+        # requiring new gems to be download (e.g. a line in the Gemfile was
+        # removed)
+        cleanup(Resolver.resolve(dependencies, source_index))
+      end
       configure(options)
       sync
     end
 
     def gems
       @repo.gems
+    end
+
+    def source_index
+      @repo.source_index
     end
 
     def download_path_for(type)

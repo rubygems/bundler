@@ -45,9 +45,10 @@ describe "Bundler::Manifest" do
     end
 
     it "skips fetching the source index if all gems are present" do
-      @manifest.install
-      Bundler::Finder.should_not_receive(:new)
-      @manifest.install
+      Dir.chdir(tmp_dir) do
+        gem_command :bundle
+        lambda { gem_command :bundle }.should_not change { File.stat(gem_repo1.join("Marshal.4.8.Z")).atime }
+      end
     end
 
     it "logs 'Done' when done" do
