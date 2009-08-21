@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-describe "Bundler::Manifest" do
+describe "Bundler::Environment" do
 
   def dep(name, version, options = {})
     Bundler::Dependency.new(name, {:version => version}.merge(options))

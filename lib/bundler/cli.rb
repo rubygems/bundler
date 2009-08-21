@@ -23,7 +23,7 @@ module Bundler
 
     def initialize(options)
       @options = options
-      @manifest = Bundler::Manifest.load(@options[:manifest])
+      @manifest = Bundler::Environment.load(@options[:manifest])
     end
 
     def bundle

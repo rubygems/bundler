@@ -4,7 +4,7 @@ module Bundler
   class DefaultManifestNotFound < StandardError; end
   class VersionConflict < StandardError; end
 
-  class Manifest
+  class Environment
     attr_reader :filename, :dependencies
     attr_accessor :rubygems, :system_gems, :gem_path, :bindir
 
