@@ -4,7 +4,6 @@ describe "Faking gems with directories" do
 
   describe "stubbing out a gem with a directory" do
     before(:each) do
-      pending
       install_manifest <<-Gemfile
         clear_sources
         source "file://#{gem_repo1}"
@@ -18,7 +17,17 @@ describe "Faking gems with directories" do
     end
 
     it "sets the lib directory in the load path" do
-      "runtime".should have_load_path(fixture_dir, "very-simple" => "lib")
+      out = run_in_context "puts $:"
+      out.split("\n").should include(fixture_dir.join("very-simple", "lib").to_s)
+    end
+
+    it "does not remove the directory during cleanup" do
+      install_manifest <<-Gemfile
+        clear_sources
+        source "file://#{gem_repo1}"
+      Gemfile
+
+      fixture_dir.join("very-simple").should be_directory
     end
   end
 
@@ -29,7 +38,7 @@ describe "Faking gems with directories" do
           clear_sources
           gem "very-simple", :at => "#{fixture_dir.join("very-simple")}"
         Gemfile
-      end.should raise_error
+      end.should raise_error(ArgumentError, /:at/)
     end
 
     it "raises an exception unless the version is an exact version" do
@@ -38,7 +47,7 @@ describe "Faking gems with directories" do
           clear_sources
           gem "very-simple", ">= 0.1.0", :at => "#{fixture_dir.join("very-simple")}"
         Gemfile
-      end.should raise_error
+      end.should raise_error(ArgumentError, /:at/)
     end
   end
 

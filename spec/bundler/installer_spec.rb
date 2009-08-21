@@ -48,7 +48,7 @@ describe "Installing gems" do
       lambda {
         setup
         @manifest.install
-      }.should raise_error(Bundler::InvalidRepository)
+      }.should_not raise_error
     end
 
     it "installs the bins in the directory you specify" do

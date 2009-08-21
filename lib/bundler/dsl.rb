@@ -58,6 +58,14 @@ module Bundler
       dep = Dependency.new(name, options.merge(:version => version))
 
       if options[:at]
+        raise ArgumentError, "If you use :at, you must specify the gem and version you wish to stand in for" unless version
+
+        begin
+          Gem::Version.new(version)
+        rescue ArgumentError
+          raise ArgumentError, "If you use :at, you must specify a gem and version. You specified #{version} for the version"
+        end
+
         source = DirectorySource.new(
           :name     => name,
           :version  => version,

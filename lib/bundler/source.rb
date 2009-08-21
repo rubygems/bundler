@@ -72,8 +72,7 @@ module Bundler
         spec = Gem::Specification.new do |s|
           s.name          = @name
           s.version       = Gem::Version.new(@version)
-          s.location      = @location
-          s.require_paths = [@require_paths].flatten
+          s.require_paths = Array(@require_paths).map {|p| File.join(@location, p) }
           s.source        = self
         end
         { spec.name => { spec.version => spec } }
@@ -89,9 +88,11 @@ module Bundler
       "#{@name} (#{@version}) Located at: '#{@location}'"
     end
 
-    def download(spec, destination)
-      destination.join("specifications").mkdir
-      File.open(destination.join("specifications", "#{spec.full_name}.gemspec"), 'w') do |f|
+    def download(spec, repository)
+      destination = repository.download_path_for(:directory).join('specifications')
+      destination.mkdir unless destination.exist?
+
+      File.open(destination.join("#{spec.full_name}.gemspec"), 'w') do |f|
         f.puts spec.to_ruby
       end
     end

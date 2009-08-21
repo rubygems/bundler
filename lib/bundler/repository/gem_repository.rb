@@ -1,60 +1,31 @@
 module Bundler
   class Repository
     class Gems
-      attr_reader :path
+      attr_reader :path, :bindir
 
       def initialize(path, bindir)
         @path   = path
         @bindir = bindir
-
-        unless valid?
-          raise InvalidRepository, "'#{path}' is not a valid gem repository"
-        end
       end
 
       # Returns the source index for all gems installed in the
       # repository
       def source_index
-        Gem::SourceIndex.from_gems_in(@path.join("specifications"))
+        index = Gem::SourceIndex.from_gems_in(@path.join("specifications"))
+        index.each { |n, spec| spec.loaded_from = @path.join("specifications", "#{spec.full_name}.gemspec") }
+        index
       end
 
       def gems
         source_index.gems.values
       end
 
-      def valid?
-        (Dir[@path.join("*")] - Dir[@path.join("{cache,doc,gems,bundler,environment.rb,specifications}")]).empty?
-      end
-
-      def download(spec)
-        FileUtils.mkdir_p(@path)
-
-        unless @path.join("cache", "#{spec.full_name}.gem").file?
-          spec.source.download(spec, @path)
-        end
-      end
-
       # Checks whether a gem is installed
-      def install_cached_gems(options = {})
+      def expand(options)
         cached_gems.each do |name, version|
           unless installed?(name, version)
             install_cached_gem(name, version, options)
           end
-        end
-      end
-
-      def install_cached_gem(name, version, options = {})
-        cached_gem = cache_path.join("#{name}-#{version}.gem")
-        # TODO: Add a warning if cached_gem is not a file
-        if cached_gem.file?
-          Bundler.logger.info "Installing #{name}-#{version}.gem"
-          installer = Gem::Installer.new(cached_gem.to_s, options.merge(
-            :install_dir         => @path,
-            :ignore_dependencies => true,
-            :env_shebang         => true,
-            :wrappers            => true
-          ))
-          installer.install
         end
       end
 
@@ -107,6 +78,22 @@ module Bundler
       def installed?(name, version)
         spec_files.any? { |g| File.basename(g) == "#{name}-#{version}.gemspec" } &&
           gem_paths.any? { |g| File.basename(g) == "#{name}-#{version}" }
+      end
+
+      def install_cached_gem(name, version, options = {})
+        cached_gem = cache_path.join("#{name}-#{version}.gem")
+        # TODO: Add a warning if cached_gem is not a file
+        if cached_gem.file?
+          Bundler.logger.info "Installing #{name}-#{version}.gem"
+          installer = Gem::Installer.new(cached_gem.to_s, options.merge(
+            :install_dir         => @path,
+            :ignore_dependencies => true,
+            :env_shebang         => true,
+            :wrappers            => true,
+            :bin_dir             => @bindir
+          ))
+          installer.install
+        end
       end
     end
   end

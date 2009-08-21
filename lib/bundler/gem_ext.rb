@@ -9,8 +9,8 @@ module Gem
   end
 
   class Specification
-    attribute :source
-    attribute :location
+    attr_accessor :source
+    attr_accessor :location
 
     def source=(source)
       unless source.is_a?(Bundler::Source) || source.is_a?(Bundler::DirectorySource)
@@ -24,10 +24,9 @@ module Gem
       @specification_version && @specification_version.to_i
     end
 
-    include(Module.new do
-      def full_gem_path
-        @location ? @location : super
-      end
-    end)
+    alias full_gem_path_without_location full_gem_path
+    def full_gem_path
+      @location ? @location : full_gem_path_without_location
+    end
   end
 end

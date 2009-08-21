@@ -10,7 +10,7 @@ module Bundler
   ENV["RUBYOPT"]  = "-r#{__FILE__} #{ENV["RUBYOPT"]}"
 
 <% load_paths.each do |load_path| -%>
-  $LOAD_PATH.unshift "#{dir}/<%= load_path %>"
+  $LOAD_PATH.unshift File.expand_path("#{dir}/<%= load_path %>")
 <% end -%>
 
   @gemfile = "#{dir}/<%= filename %>"
@@ -20,8 +20,7 @@ module Bundler
 
   @bundled_specs = {}
 <% spec_files.each do |name, path| -%>
-  @bundled_specs["<%= name %>"] = eval(File.read("#{dir}/<%= path %>"))
-  @bundled_specs["<%= name %>"].loaded_from = "#{dir}/<%= path %>"
+  @bundled_specs["<%= name %>"] = eval(File.read("<%= path %>"))
 <% end -%>
 
   def self.add_specs_to_loaded_specs

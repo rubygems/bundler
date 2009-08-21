@@ -1,4 +1,5 @@
 require "bundler/repository/gem_repository"
+require "bundler/repository/directory_repository"
 
 module Bundler
   class InvalidRepository < StandardError ; end
@@ -11,7 +12,11 @@ module Bundler
 
       @path   = Pathname.new(path)
       @bindir = Pathname.new(bindir)
-      @repo   = Gems.new(@path, @bindir)
+
+      @repos = {
+        :gem       => Gems.new(@path, @bindir),
+        :directory => Directory.new(@path.join("dirs"), @bindir)
+      }
     end
 
     def install(dependencies, finder, options = {})
@@ -29,21 +34,39 @@ module Bundler
     end
 
     def gems
-      @repo.gems
+      gems = []
+      each_repo do |repo|
+        gems.concat repo.gems
+      end
+      gems
     end
 
     def source_index
-      @repo.source_index
+      index = Gem::SourceIndex.new
+
+      each_repo do |repo|
+        index.gems.merge!(repo.source_index.gems)
+      end
+
+      index
     end
 
     def download_path_for(type)
-      @path
+      @repos[type].path
     end
 
   private
 
     def cleanup(bundle)
-      @repo.cleanup(bundle)
+      each_repo do |repo|
+        repo.cleanup(bundle)
+      end
+    end
+    
+    def each_repo
+      @repos.each do |k, repo|
+        yield repo
+      end
     end
 
     def fetch(dependencies, finder)
@@ -70,7 +93,9 @@ module Bundler
     end
 
     def expand(options)
-      @repo.install_cached_gems(:bin_dir => @bindir)
+      each_repo do |repo|
+        repo.expand(options)
+      end
     end
 
     def configure(options)
@@ -81,7 +106,7 @@ module Bundler
       FileUtils.mkdir_p(path)
 
       specs      = gems
-      spec_files = spec_files_for_specs(specs, path)
+      spec_files = specs.inject({}) { |hash, spec| hash.merge!(spec.name => spec.loaded_from) }
       load_paths = load_paths_for_specs(specs)
       bindir     = @bindir.relative_path_from(path).to_s
       filename   = options[:manifest].relative_path_from(path).to_s
@@ -97,7 +122,6 @@ module Bundler
       load_paths = []
       specs.each do |spec|
         gem_path = Pathname.new(spec.full_gem_path)
-
         if spec.bindir
           load_paths << gem_path.join(spec.bindir).relative_path_from(@path).to_s
         end
@@ -106,14 +130,6 @@ module Bundler
         end
       end
       load_paths
-    end
-
-    def spec_files_for_specs(specs, path)
-      files = {}
-      specs.each do |s|
-        files[s.name] = File.join("specifications", "#{s.full_name}.gemspec")
-      end
-      files
     end
 
     def require_code(file, dep)
