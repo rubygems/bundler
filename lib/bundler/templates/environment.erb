@@ -1,3 +1,4 @@
+# DO NOT MODIFY THIS FILE
 module Bundler
   dir = File.dirname(__FILE__)
 
@@ -37,7 +38,26 @@ module Bundler
   add_specs_to_index
 <% end -%>
 
-  require File.join(dir, "bundler", "runtime")
+  def self.require_env(env = nil)
+    context = Class.new do
+      def initialize(env) @env = env ; end
+      def method_missing(*) ; end
+      def gem(name, *args)
+        opt = args.last || {}
+        only = opt[:only] || opt["only"]
+        except = opt[:except] || opt["except"]
+        files = opt[:require_as] || opt["require_as"] || name
+
+        return unless !only || [only].flatten.any? {|e| e.to_s == @env }
+        return if except && [except].flatten.any? {|e| e.to_s == @env }
+
+        files.each { |f| require f }
+        yield if block_given?
+        true
+      end
+    end
+    context.new(env && env.to_s).instance_eval(File.read(@gemfile))
+  end
 end
 
 <% if options[:rubygems] -%>

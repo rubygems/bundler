@@ -75,7 +75,6 @@ module Bundler
 
     def configure(options)
       generate_environment(options)
-      generate_runtime(options)
     end
 
     def generate_environment(options)
@@ -117,16 +116,12 @@ module Bundler
       files
     end
 
-    def generate_runtime(options)
-      here  = Pathname.new(__FILE__).dirname
-      there = path.join("bundler")
-
-      Bundler.logger.info "Creating the bundler runtime"
-
-      FileUtils.rm_rf(there)
-      there.mkdir
-      FileUtils.cp(here.join("runtime.rb"), there)
-      FileUtils.cp_r(here.join("runtime"), there)
+    def require_code(file, dep)
+      constraint = case
+      when dep.only   then %{ if #{dep.only.inspect}.include?(env)}
+      when dep.except then %{ unless #{dep.except.inspect}.include?(env)}
+      end
+      "require #{file.inspect}#{constraint}"
     end
   end
 end

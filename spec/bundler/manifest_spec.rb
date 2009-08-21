@@ -205,10 +205,6 @@ describe "Bundler::Environment" do
       @manifest.install
     end
 
-    it "can provide a list of environments" do
-      @manifest.environments.should == ["testing", "default"]
-    end
-
     it "requires the Rubygems library" do
       out = run_in_context "puts 'Gem'"
       out.should == "Gem"

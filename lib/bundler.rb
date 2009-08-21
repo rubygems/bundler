@@ -15,7 +15,7 @@ require "bundler/environment"
 require "bundler/dsl"
 require "bundler/cli"
 require "bundler/repository"
-require "bundler/runtime/dependency"
+require "bundler/dependency"
 
 module Bundler
   VERSION = "0.5.0"

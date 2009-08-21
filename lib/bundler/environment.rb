@@ -75,11 +75,6 @@ module Bundler
       @bindir ||= root.join("bin")
     end
 
-    def environments
-      envs = dependencies.map {|dep| Array(dep.only) + Array(dep.except) }.flatten
-      envs << "default"
-    end
-
     def sources
       @priority_sources + @sources + @default_sources
     end
