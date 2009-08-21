@@ -203,7 +203,6 @@ describe "Bundler::Manifest" do
       Gemfile
 
       @manifest.install
-      @manifest = @manifest.manifest
     end
 
     it "can provide a list of environments" do

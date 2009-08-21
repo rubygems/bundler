@@ -1,7 +1,7 @@
 module Bundler
   class ManifestFileNotFound < StandardError; end
 
-  class ManifestBuilder
+  class Dsl
     def self.build(manifest_file, string)
       builder = new(manifest_file)
       builder.instance_eval(string)

@@ -23,15 +23,15 @@ module Bundler
 
     def initialize(options)
       @options = options
-      @manifest_file = Bundler::ManifestFile.load(@options[:manifest])
+      @manifest = Bundler::Manifest.load(@options[:manifest])
     end
 
     def bundle
-      @manifest_file.install(@options[:update])
+      @manifest.install(@options[:update])
     end
 
     def exec
-      @manifest_file.setup_environment
+      @manifest.setup_environment
       # w0t?
       super(*@options[:args])
     end
