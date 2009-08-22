@@ -13,6 +13,7 @@ describe "Gem::Specification" do
   end
 
   it "does not consider two gem specs with different sources to be the same" do
+    pending "Do we want to keep this?"
     spec1 = Gem::Specification.new do |s|
       s.name    = 'greeter'
       s.version = '1.0'

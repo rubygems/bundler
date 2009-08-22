@@ -20,7 +20,8 @@ module Bundler
 
   @bundled_specs = {}
 <% spec_files.each do |name, path| -%>
-  @bundled_specs["<%= name %>"] = eval(File.read("<%= path %>"))
+  @bundled_specs["<%= name %>"] = eval(File.read("#{dir}/<%= path %>"))
+  @bundled_specs["<%= name %>"].loaded_from = "#{dir}/<%= path %>"
 <% end -%>
 
   def self.add_specs_to_loaded_specs

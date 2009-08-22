@@ -106,10 +106,13 @@ module Bundler
       FileUtils.mkdir_p(path)
 
       specs      = gems
-      spec_files = specs.inject({}) { |hash, spec| hash.merge!(spec.name => spec.loaded_from) }
       load_paths = load_paths_for_specs(specs)
       bindir     = @bindir.relative_path_from(path).to_s
       filename   = options[:manifest].relative_path_from(path).to_s
+      spec_files = specs.inject({}) do |hash, spec|
+        relative = spec.loaded_from.relative_path_from(@path).to_s
+        hash.merge!(spec.name => relative)
+      end
 
       File.open(path.join("environment.rb"), "w") do |file|
         template = File.read(File.join(File.dirname(__FILE__), "templates", "environment.erb"))

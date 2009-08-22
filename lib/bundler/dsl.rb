@@ -2,53 +2,39 @@ module Bundler
   class ManifestFileNotFound < StandardError; end
 
   class Dsl
-    def self.build(manifest_file, string)
-      builder = new(manifest_file)
-      builder.instance_eval(string)
-      builder
-    end
-
-    def self.load(manifest_file, filename)
-      unless File.exist?(filename)
-        raise ManifestFileNotFound, "#{filename.inspect} does not exist"
-      end
-      string = File.read(filename)
-      build(manifest_file, string)
-    end
-
-    def initialize(manifest_file)
-      @manifest_file  = manifest_file
+    def initialize(environment)
+      @environment  = environment
     end
 
     def bundle_path(path)
       path = Pathname.new(path)
-      @manifest_file.gem_path = (path.relative? ?
-        @manifest_file.root.join(path) : path).expand_path
+      @environment.gem_path = (path.relative? ?
+        @environment.root.join(path) : path).expand_path
     end
 
     def bin_path(path)
       path = Pathname.new(path)
-      @manifest_file.bindir = (path.relative? ?
-        @manifest_file.root.join(path) : path).expand_path
+      @environment.bindir = (path.relative? ?
+        @environment.root.join(path) : path).expand_path
     end
 
     def disable_rubygems
-      @manifest_file.rubygems = false
+      @environment.rubygems = false
     end
 
     def disable_system_gems
-      @manifest_file.system_gems = false
+      @environment.system_gems = false
     end
 
     def source(source)
       source = Source.new(:uri => source)
-      unless @manifest_file.sources.include?(source)
-        @manifest_file.add_source(source)
+      unless @environment.sources.include?(source)
+        @environment.add_source(source)
       end
     end
 
     def clear_sources
-      @manifest_file.clear_sources
+      @environment.clear_sources
     end
 
     def gem(name, *args)
@@ -57,7 +43,7 @@ module Bundler
 
       dep = Dependency.new(name, options.merge(:version => version))
 
-      if options[:at]
+      if vendored_at = options[:at]
         raise ArgumentError, "If you use :at, you must specify the gem and version you wish to stand in for" unless version
 
         begin
@@ -66,16 +52,19 @@ module Bundler
           raise ArgumentError, "If you use :at, you must specify a gem and version. You specified #{version} for the version"
         end
 
+        vendored_at = Pathname.new(vendored_at)
+        vendored_at = @environment.filename.dirname.join(vendored_at) if vendored_at.relative?
+
         source = DirectorySource.new(
           :name     => name,
           :version  => version,
-          :location => options[:at]
+          :location => vendored_at
         )
 
-        @manifest_file.add_priority_source(source)
+        @environment.add_priority_source(source)
       end
 
-      @manifest_file.dependencies << dep
+      @environment.dependencies << dep
     end
   end
 end

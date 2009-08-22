@@ -2,32 +2,37 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "Faking gems with directories" do
 
-  describe "stubbing out a gem with a directory" do
-    before(:each) do
-      install_manifest <<-Gemfile
-        clear_sources
-        source "file://#{gem_repo1}"
-        gem "very-simple", "1.0", :at => "#{fixture_dir.join("very-simple")}"
-      Gemfile
-    end
+  2.times do |i|
+    describe "stubbing out a gem with a directory -- #{i}" do
+      before(:each) do
+        path = fixture_dir.join("very-simple")
+        path = path.relative_path_from(tmp_file) if i == 1
 
-    it "does not download the gem" do
-      tmp_gem_path.should_not include_cached_gem("very-simple-1.0")
-      tmp_gem_path.should_not include_installed_gem("very-simple-1.0")
-    end
+        install_manifest <<-Gemfile
+          clear_sources
+          source "file://#{gem_repo1}"
+          gem "very-simple", "1.0", :at => "#{path}"
+        Gemfile
+      end
 
-    it "sets the lib directory in the load path" do
-      out = run_in_context "puts $:"
-      out.split("\n").should include(fixture_dir.join("very-simple", "lib").to_s)
-    end
+      it "does not download the gem" do
+        tmp_gem_path.should_not include_cached_gem("very-simple-1.0")
+        tmp_gem_path.should_not include_installed_gem("very-simple-1.0")
+      end
 
-    it "does not remove the directory during cleanup" do
-      install_manifest <<-Gemfile
-        clear_sources
-        source "file://#{gem_repo1}"
-      Gemfile
+      it "has very-simple in the load path" do
+        out = run_in_context "require 'very-simple' ; puts VerySimpleForTests"
+        out.should == "VerySimpleForTests"
+      end
 
-      fixture_dir.join("very-simple").should be_directory
+      it "does not remove the directory during cleanup" do
+        install_manifest <<-Gemfile
+          clear_sources
+          source "file://#{gem_repo1}"
+        Gemfile
+
+        fixture_dir.join("very-simple").should be_directory
+      end
     end
   end
 

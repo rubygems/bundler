@@ -6,7 +6,7 @@ require 'spec/rake/spectask'
 
 spec = Gem::Specification.new do |s|
   s.name    = "bundler"
-  s.version = "0.5.0"
+  s.version = "0.5.0.pre"
   s.author  = "Yehuda Katz"
   s.email   = "wycats@gmail.com"
   s.homepage = "http://github.com/wycats/bundler"
