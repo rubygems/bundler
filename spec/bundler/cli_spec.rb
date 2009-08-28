@@ -12,19 +12,19 @@ describe "Bundler::CLI" do
         gem "rack", :only => :web
       Gemfile
 
-      Dir.chdir(tmp_dir) do
+      Dir.chdir(bundled_app) do
         @output = gem_command :bundle
       end
     end
 
     it "caches and installs rake" do
       gems = %w(rake-0.8.7 extlib-0.9.12 rack-0.9.1 very-simple-1.0)
-      tmp_file("vendor", "gems").should have_cached_gems(*gems)
-      tmp_file("vendor", "gems").should have_installed_gems(*gems)
+      bundled_app("vendor", "gems").should have_cached_gems(*gems)
+      bundled_app("vendor", "gems").should have_installed_gems(*gems)
     end
 
     it "creates a default environment file with the appropriate load paths" do
-      tmp_file('vendor', 'gems', 'environment.rb').should have_load_paths(tmp_file("vendor", "gems"),
+      bundled_app('vendor', 'gems', 'environment.rb').should have_load_paths(bundled_app("vendor", "gems"),
         "extlib-0.9.12" => %w(lib),
         "rake-0.8.7" => %w(bin lib),
         "very-simple-1.0" => %w(bin lib),
@@ -34,20 +34,20 @@ describe "Bundler::CLI" do
 
     it "creates an executable for rake in ./bin" do
       out = run_in_context "puts $:"
-      out.should include(tmp_file("vendor", "gems", "gems", "rake-0.8.7", "lib").to_s)
-      out.should include(tmp_file("vendor", "gems", "gems", "rake-0.8.7", "bin").to_s)
-      out.should include(tmp_file("vendor", "gems", "gems", "extlib-0.9.12", "lib").to_s)
-      out.should include(tmp_file("vendor", "gems", "gems", "very-simple-1.0", "lib").to_s)
-      out.should include(tmp_file("vendor", "gems", "gems", "rack-0.9.1").to_s)
+      out.should include(bundled_app("vendor", "gems", "gems", "rake-0.8.7", "lib").to_s)
+      out.should include(bundled_app("vendor", "gems", "gems", "rake-0.8.7", "bin").to_s)
+      out.should include(bundled_app("vendor", "gems", "gems", "extlib-0.9.12", "lib").to_s)
+      out.should include(bundled_app("vendor", "gems", "gems", "very-simple-1.0", "lib").to_s)
+      out.should include(bundled_app("vendor", "gems", "gems", "rack-0.9.1").to_s)
     end
 
     it "creates valid executables" do
-      out = `#{tmp_file("bin", "rake")} -e 'require "extlib" ; puts Extlib'`.strip
+      out = `#{bundled_app("bin", "rake")} -e 'require "extlib" ; puts Extlib'`.strip
       out.should == "Extlib"
     end
 
     it "runs exec correctly" do
-      Dir.chdir(tmp_dir) do
+      Dir.chdir(bundled_app) do
         out = gem_command :exec, %[ruby -e 'require "extlib" ; puts Extlib']
         out.should == "Extlib"
       end
@@ -93,7 +93,8 @@ describe "Bundler::CLI" do
 
   describe "error cases" do
     before(:each) do
-      Dir.chdir(tmp_dir)
+      bundled_app.mkdir_p
+      Dir.chdir(bundled_app)
     end
 
     it "displays a friendly error message when there is no Gemfile" do
@@ -126,29 +127,29 @@ describe "Bundler::CLI" do
 
   describe "it working while specifying the manifest file name" do
     it "works when the manifest is in the root directory" do
-      build_manifest_file tmp_file('manifest.rb'), <<-Gemfile
+      build_manifest_file bundled_app('manifest.rb'), <<-Gemfile
         bundle_path "gems"
         clear_sources
         source "file://#{gem_repo1}"
         gem "rake"
       Gemfile
 
-      Dir.chdir(tmp_file)
-      gem_command :bundle, "-m #{tmp_file('manifest.rb')}"
-      tmp_file("gems").should have_cached_gems("rake-0.8.7")
+      Dir.chdir(bundled_app)
+      gem_command :bundle, "-m #{bundled_app('manifest.rb')}"
+      bundled_app("gems").should have_cached_gems("rake-0.8.7")
     end
 
     it "works when the manifest is in a different directory" do
-      build_manifest_file tmp_file('config', 'manifest.rb'), <<-Gemfile
+      build_manifest_file bundled_app('config', 'manifest.rb'), <<-Gemfile
         bundle_path "../gems"
         clear_sources
         source "file://#{gem_repo1}"
         gem "rake"
       Gemfile
 
-      Dir.chdir(tmp_file)
-      gem_command :bundle, "-m #{tmp_file('config', 'manifest.rb')}"
-      tmp_file("gems").should have_cached_gems("rake-0.8.7")
+      Dir.chdir(bundled_app)
+      gem_command :bundle, "-m #{bundled_app('config', 'manifest.rb')}"
+      bundled_app("gems").should have_cached_gems("rake-0.8.7")
     end
   end
 
@@ -164,7 +165,7 @@ describe "Bundler::CLI" do
         disable_rubygems
       Gemfile
 
-      Dir.chdir(tmp_dir) do
+      Dir.chdir(bundled_app) do
         @output = gem_command :bundle
       end
     end
@@ -207,11 +208,11 @@ describe "Bundler::CLI" do
         gem "rack"
       Gemfile
 
-      Dir.chdir(tmp_dir) do
+      Dir.chdir(bundled_app) do
         gem_command :bundle, "--update"
       end
-      tmp_file("vendor", "gems").should have_cached_gems("rack-1.0.0")
-      tmp_file("vendor", "gems").should have_installed_gems("rack-1.0.0")
+      bundled_app("vendor", "gems").should have_cached_gems("rack-1.0.0")
+      bundled_app("vendor", "gems").should have_installed_gems("rack-1.0.0")
     end
   end
 end

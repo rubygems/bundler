@@ -45,7 +45,7 @@ describe "Bundler::Environment" do
     end
 
     it "skips fetching the source index if all gems are present" do
-      Dir.chdir(tmp_dir) do
+      Dir.chdir(bundled_app) do
         gem_command :bundle
         lambda { gem_command :bundle }.should_not change { File.stat(gem_repo1.join("Marshal.4.8.Z")).atime }
       end

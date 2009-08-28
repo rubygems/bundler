@@ -11,4 +11,8 @@ class Pathname
   def touch
     FileUtils.touch(self)
   end
+
+  def cp_r(dest)
+    FileUtils.cp_r(self, dest)
+  end
 end

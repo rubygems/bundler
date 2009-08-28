@@ -1,31 +1,43 @@
 module Spec
   module PathUtils
-    def this_file
-      Pathname.new(__FILE__).dirname.join('..').expand_path
+    def root
+      Pathname.new(__FILE__).dirname.join('..', '..').expand_path
     end
 
-    def tmp_dir
-      this_file.join("..", "tmp")
+    def tmp_path(*path)
+      root.join("tmp", *path).expand_path
+    end
+
+    # def tmp_dir
+    #   this_file.join("..", "tmp")
+    # end
+
+    def bundled_app(*path)
+      tmp_path.join("bundled_app").join(*path)
     end
 
     def tmp_gem_path(*path)
-      tmp_file("vendor", "gems").join(*path)
+      bundled_app("vendor", "gems").join(*path)
     end
 
     def tmp_bindir(*path)
-      tmp_file("bin").join(*path)
+      bundled_app("bin").join(*path)
     end
 
-    def tmp_file(*path)
-      tmp_dir.join(*path)
+    # def tmp_file(*path)
+    #   tmp_dir.join(*path)
+    # end
+
+    def cache_path(*path)
+      bundled_app.join("cache", *path)
     end
 
     def cached(gem_name)
-      File.join(tmp_dir, 'cache', "#{gem_name}.gem")
+      cache_path.join("#{gem_name}.gem")
     end
 
     def fixture_dir
-      this_file.join("fixtures")
+      root.join("spec", "fixtures")
     end
 
     def gem_repo1

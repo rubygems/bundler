@@ -6,7 +6,7 @@ describe "Faking gems with directories" do
     describe "stubbing out a gem with a directory -- #{i}" do
       before(:each) do
         path = fixture_dir.join("very-simple")
-        path = path.relative_path_from(tmp_file) if i == 1
+        path = path.relative_path_from(bundled_app) if i == 1
 
         install_manifest <<-Gemfile
           clear_sources

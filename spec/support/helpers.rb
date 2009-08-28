@@ -2,7 +2,7 @@ module Spec
   module Helpers
     def run_in_context(*args)
       cmd = args.pop.gsub(/(?=")/, "\\")
-      env = args.pop || tmp_file("vendor", "gems", "environment")
+      env = args.pop || bundled_app("vendor", "gems", "environment")
       lib = File.join(File.dirname(__FILE__), '..', '..', 'lib')
       %x{#{Gem.ruby} -I#{lib} -r #{env} -e "#{cmd}"}.strip
     end
@@ -17,7 +17,7 @@ module Spec
     end
 
     def build_manifest_file(*args)
-      path = tmp_file("Gemfile")
+      path = bundled_app("Gemfile")
       path = args.shift if args.first.is_a?(Pathname)
       str  = args.shift || ""
       FileUtils.mkdir_p(path.dirname)
@@ -27,7 +27,7 @@ module Spec
     end
 
     def build_manifest(*args)
-      path = tmp_file("Gemfile")
+      path = bundled_app("Gemfile")
       path = args.shift if args.first.is_a?(Pathname)
       str  = args.shift || ""
       FileUtils.mkdir_p(path.dirname)
@@ -44,8 +44,8 @@ module Spec
     end
 
     def reset!
-      tmp_dir.rmtree if tmp_dir.exist?
-      tmp_dir.mkdir
+      tmp_path.rmtree if tmp_path.exist?
+      tmp_path.mkdir
     end
   end
 end
