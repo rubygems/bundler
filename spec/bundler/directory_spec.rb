@@ -11,7 +11,7 @@ describe "Faking gems with directories" do
         install_manifest <<-Gemfile
           clear_sources
           source "file://#{gem_repo1}"
-          gem "very-simple", "1.0", :at => "#{path}"
+          gem "very-simple", "1.0", :vendored_at => "#{path}"
         Gemfile
       end
 
@@ -41,7 +41,7 @@ describe "Faking gems with directories" do
       lambda do
         install_manifest <<-Gemfile
           clear_sources
-          gem "very-simple", :at => "#{fixture_dir.join("very-simple")}"
+          gem "very-simple", :vendored_at => "#{fixture_dir.join("very-simple")}"
         Gemfile
       end.should raise_error(ArgumentError, /:at/)
     end
@@ -50,7 +50,7 @@ describe "Faking gems with directories" do
       lambda do
         install_manifest <<-Gemfile
           clear_sources
-          gem "very-simple", ">= 0.1.0", :at => "#{fixture_dir.join("very-simple")}"
+          gem "very-simple", ">= 0.1.0", :vendored_at => "#{fixture_dir.join("very-simple")}"
         Gemfile
       end.should raise_error(ArgumentError, /:at/)
     end

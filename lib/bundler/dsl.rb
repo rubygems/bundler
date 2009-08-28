@@ -43,7 +43,7 @@ module Bundler
 
       dep = Dependency.new(name, options.merge(:version => version))
 
-      if vendored_at = options[:at]
+      if vendored_at = options[:vendored_at]
         raise ArgumentError, "If you use :at, you must specify the gem and version you wish to stand in for" unless version
 
         begin
