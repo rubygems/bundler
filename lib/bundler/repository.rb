@@ -62,7 +62,7 @@ module Bundler
         repo.cleanup(bundle)
       end
     end
-    
+
     def each_repo
       @repos.each do |k, repo|
         yield repo
