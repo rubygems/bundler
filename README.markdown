@@ -149,6 +149,11 @@ If the `disable_rubygems` option is used, Bundler will stub out the most common
 of these features, but it is possible that things will not go as intended quite
 yet. So, if you are brave, try your code without rubygems at runtime.
 
+## Known Issues
+
+* When a gem points to a git repository, the git repository will be cloned
+  every time Bundler does a gem dependency resolve.
+
 ## Reporting bugs
 
 Please report all bugs on the github issue tracker for the project located

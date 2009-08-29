@@ -48,6 +48,11 @@ module Spec
       path = tmp_path.join("git", name.to_s)
       path.parent.mkdir_p
       with.cp_r(path)
+      if spec = options[:spec]
+        File.open(path.join("#{name}.gemspec"), 'w') do |file|
+          file.puts spec.to_ruby
+        end
+      end
       Dir.chdir(path) do
         `git init`
         `git add *`

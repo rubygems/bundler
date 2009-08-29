@@ -65,11 +65,16 @@ module Bundler
 
     def gems
       @gems ||= begin
-        spec = Gem::Specification.new do |s|
-          s.name          = @name
-          s.version       = Gem::Version.new(@version)
-          # s.require_paths = Array(@require_paths).map {|p| File.join(@location, p) }
+        spec = Gem::Specification.new
+
+        if actual = Dir[@location.join("*.gemspec")].first
+          # Load the gemspec
+          spec = eval(File.read(actual))
         end
+
+        spec.name = @name
+        spec.version = Gem::Version.new(@version)
+
         { spec.full_name => spec }
       end
     end
@@ -92,18 +97,19 @@ module Bundler
   class GitSource < DirectorySource
     def initialize(options)
       super
-      @uri = options[:uri]
+      @uri      = options[:uri]
     end
 
     def gems
-      specs = super
-      spec  = specs.values.first
-
       FileUtils.mkdir_p(tmp_path.join("gitz"))
-      Bundler.logger.info "Cloning git repository at: #{@uri}"
-      `git clone #{@uri} #{tmp_path.join("gitz", spec.name)}`
 
-      specs
+      # TMP HAX to get the *.gemspec reading to work
+      @location = tmp_path.join("gitz", @name)
+
+      Bundler.logger.info "Cloning git repository at: #{@uri}"
+      `git clone #{@uri} #{@location}`
+
+      super
     end
 
     def download(spec, repository)
