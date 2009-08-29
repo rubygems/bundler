@@ -35,10 +35,10 @@ module Bundler
     # ==== Returns
     # <GemBundle>,nil:: If the list of dependencies can be resolved, a
     #   collection of gemspecs is returned. Otherwise, nil is returned.
-    def self.resolve(requirements, index = Gem.source_index)
+    def self.resolve(requirements, sources)
       Bundler.logger.info "Calculating dependencies..."
 
-      resolver = new(index)
+      resolver = new(sources)
       result = catch(:success) do
         resolver.resolve(requirements, {})
         nil
@@ -46,10 +46,21 @@ module Bundler
       result && GemBundle.new(result.values)
     end
 
-    def initialize(index)
+    def initialize(sources)
       @errors = {}
       @stack  = []
-      @index  = index
+      @specs  = Hash.new { |h,k| h[k] = {} }
+      @cache  = {}
+      @index  = {}
+
+      sources.reverse_each do |source|
+        source.gems.values.each do |spec|
+          # TMP HAX FOR OPTZ
+          spec.source = source
+          next unless Gem::Platform.match(spec.platform)
+          @specs[spec.name][spec.version] = spec
+        end
+      end
     end
 
     def resolve(reqs, activated)
@@ -61,7 +72,7 @@ module Bundler
       # Easiest to resolve is defined by: Is this gem already activated? Otherwise,
       # check the number of child dependencies this requirement has.
       reqs = reqs.sort_by do |req|
-        activated[req.name] ? 0 : @index.search(req).size
+        activated[req.name] ? 0 : search(req).size
       end
 
       activated = activated.dup
@@ -99,7 +110,7 @@ module Bundler
         # Fetch all gem versions matching the requirement
         #
         # TODO: Warn / error when no matching versions are found.
-        matching_versions = @index.search(current)
+        matching_versions = search(current)
 
         if matching_versions.empty?
           if current.required_by.empty?
@@ -159,5 +170,12 @@ module Bundler
       retval
     end
 
+    def search(dependency)
+      @cache[dependency.hash] ||= begin
+        @specs[dependency.name].values.select do |spec|
+          dependency =~ spec
+        end.sort_by {|s| s.version }
+      end
+    end
   end
 end

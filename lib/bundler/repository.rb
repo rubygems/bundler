@@ -19,15 +19,15 @@ module Bundler
       }
     end
 
-    def install(dependencies, finder, options = {})
-      if options[:update] || !dependencies.all? { |dep| source_index.search(dep).size > 0 }
-        fetch(dependencies, finder)
+    def install(dependencies, sources, options = {})
+      if options[:update] || !satisfies?(dependencies)
+        fetch(dependencies, sources)
         expand(options)
       else
         # Remove any gems that are still around if the Gemfile changed without
         # requiring new gems to be download (e.g. a line in the Gemfile was
         # removed)
-        cleanup(Resolver.resolve(dependencies, source_index))
+        cleanup(Resolver.resolve(dependencies, [source_index]))
       end
       configure(options)
       sync
@@ -39,6 +39,11 @@ module Bundler
         gems.concat repo.gems
       end
       gems
+    end
+
+    def satisfies?(dependencies)
+      index = source_index
+      dependencies.all? { |dep| index.search(dep).size > 0 }
     end
 
     def source_index
@@ -73,8 +78,8 @@ module Bundler
       end
     end
 
-    def fetch(dependencies, finder)
-      unless bundle = Resolver.resolve(dependencies, finder)
+    def fetch(dependencies, sources)
+      unless bundle = Resolver.resolve(dependencies, sources)
         gems = dependencies.map {|d| "  #{d.to_s}" }.join("\n")
         raise VersionConflict, "No compatible versions could be found for:\n#{gems}"
       end

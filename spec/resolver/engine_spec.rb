@@ -10,7 +10,7 @@ describe "Resolving specs" do
       build_dep("bar", ">= 1.2.3"),
     ]
 
-    solution = Bundler::Resolver.resolve(deps, index)
+    solution = Bundler::Resolver.resolve(deps, [index])
     solution.should match_gems(
       "bar" => ["2.0.0"]
     )
@@ -33,7 +33,7 @@ describe "Resolving specs" do
       build_dep("action_pack", "= 2.3.2")
     ]
 
-    solution = Bundler::Resolver.resolve(deps, index)
+    solution = Bundler::Resolver.resolve(deps, [index])
     solution.should match_gems(
       "activemerchant" => ["1.4.1"],
       "action_pack" => ["2.3.2"],
@@ -53,7 +53,7 @@ describe "Resolving specs" do
       build_dep("bar", ">= 1.2.3"),
     ]
 
-    solution = Bundler::Resolver.resolve(deps, index)
+    solution = Bundler::Resolver.resolve(deps, [index])
     solution.should match_gems(
       "bar" => ["2.0.0"],
       "foo" => ["1.1"]
@@ -77,7 +77,7 @@ describe "Resolving specs" do
       build_dep("foo", "= 1.0"),
     ]
 
-    solution = Bundler::Resolver.resolve(deps, index)
+    solution = Bundler::Resolver.resolve(deps, [index])
     solution.should match_gems(
       "bar" => ["1.0"],
       "foo" => ["1.0"]
@@ -91,7 +91,7 @@ describe "Resolving specs" do
       build_dep("merb-core", "= 1.0.7.1"),
     ]
 
-    solution = Bundler::Resolver.resolve(deps, index)
+    solution = Bundler::Resolver.resolve(deps, [index])
     solution.should match_gems(
       "merb-core"=>["1.0.7.1"],
       "rake"=>["0.8.7"],
@@ -115,6 +115,6 @@ describe "Resolving specs" do
       build_dep("a", "= 1.1"),
     ]
 
-    lambda { Bundler::Resolver.resolve(deps, index) }.should raise_error(Bundler::GemNotFound)
+    lambda { Bundler::Resolver.resolve(deps, [index]) }.should raise_error(Bundler::GemNotFound)
   end
 end

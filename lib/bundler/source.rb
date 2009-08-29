@@ -14,7 +14,7 @@ module Bundler
       raise ArgumentError, "The source must be an absolute URI" unless @uri.absolute?
     end
 
-    def specs
+    def gems
       @specs ||= fetch_specs
     end
 
@@ -49,15 +49,7 @@ module Bundler
       inflated = Gem.inflate deflated
 
       index = Marshal.load(inflated)
-      specs = Hash.new { |h,k| h[k] = {} }
-
-      index.gems.values.each do |spec|
-        next unless Gem::Platform.match(spec.platform)
-        spec.source = self
-        specs[spec.name][spec.version] = spec
-      end
-
-      specs
+      index.gems
     rescue Gem::RemoteFetcher::FetchError => e
       raise ArgumentError, "#{to_s} is not a valid source: #{e.message}"
     end
@@ -71,15 +63,14 @@ module Bundler
       @require_paths = options[:require_paths] || %w(lib)
     end
 
-    def specs
-      @specs ||= begin
+    def gems
+      @gems ||= begin
         spec = Gem::Specification.new do |s|
           s.name          = @name
           s.version       = Gem::Version.new(@version)
           # s.require_paths = Array(@require_paths).map {|p| File.join(@location, p) }
-          s.source        = self
         end
-        { spec.name => { spec.version => spec } }
+        { spec.full_name => spec }
       end
     end
 

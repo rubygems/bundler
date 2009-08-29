@@ -45,7 +45,7 @@ module Bundler
     end
 
     def install(update = false)
-      repository.install(gem_dependencies, Finder.new(*sources),
+      repository.install(gem_dependencies, sources,
         :rubygems    => rubygems,
         :system_gems => system_gems,
         :manifest    => filename,

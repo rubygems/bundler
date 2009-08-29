@@ -12,13 +12,6 @@ module Gem
     attr_accessor :source
     attr_accessor :location
 
-    def source=(source)
-      unless source.is_a?(Bundler::Source)
-        source = Bundler::GemSource.new(:uri => source)
-      end
-      @source = source
-    end
-
     # Hack to fix github's strange marshal file
     def specification_version
       @specification_version && @specification_version.to_i

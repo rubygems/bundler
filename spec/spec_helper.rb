@@ -1,8 +1,8 @@
 $:.unshift File.expand_path(File.join(File.dirname(__FILE__)))
 $:.unshift File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
+require "pp"
 require "rubygems"
 require "bundler"
-
 require "spec"
 require "rbconfig"
 Dir[File.join(File.dirname(__FILE__), 'support', '*.rb')].each do |file|
@@ -16,6 +16,9 @@ Spec::Runner.configure do |config|
   config.include Spec::PathUtils
 
   original_wd = Dir.pwd
+
+  # No rubygems output messages
+  Gem::DefaultUserInteraction.ui = Gem::SilentUI.new
 
   config.before(:each) do
     @log_output = StringIO.new
