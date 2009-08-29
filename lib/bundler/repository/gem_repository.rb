@@ -42,6 +42,14 @@ module Bundler
         end
       end
 
+      def add_spec(spec)
+        raise NotImplementedError
+      end
+
+      def download_path_for
+        path
+      end
+
     private
 
       def cache_path

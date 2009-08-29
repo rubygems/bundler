@@ -20,6 +20,19 @@ module Bundler
         source_index.gems.values
       end
 
+      def add_spec(spec)
+        destination = path.join('specifications')
+        destination.mkdir unless destination.exist?
+
+        File.open(destination.join("#{spec.full_name}.gemspec"), 'w') do |f|
+          f.puts spec.to_ruby
+        end
+      end
+
+      def download_path_for
+        @path.join("dirs")
+      end
+
       # Checks whether a gem is installed
       def expand(options)
         # raise NotImplementedError

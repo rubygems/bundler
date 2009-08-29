@@ -93,12 +93,7 @@ module Bundler
     end
 
     def download(spec, repository)
-      destination = repository.download_path_for(:directory).join('specifications')
-      destination.mkdir unless destination.exist?
-
-      File.open(destination.join("#{spec.full_name}.gemspec"), 'w') do |f|
-        f.puts spec.to_ruby
-      end
+      repository.add_spec(:directory, spec)
     end
   end
 end

@@ -51,8 +51,12 @@ module Bundler
       index
     end
 
+    def add_spec(type, spec)
+      @repos[type].add_spec(spec)
+    end
+
     def download_path_for(type)
-      @repos[type].path
+      @repos[type].download_path_for
     end
 
   private
