@@ -2,7 +2,7 @@ module Bundler
   # Represents a source of rubygems. Initially, this is only gem repositories, but
   # eventually, this will be git, svn, HTTP
   class Source
-
+    attr_accessor :tmp_path
   end
 
   class GemSource < Source
@@ -95,11 +95,23 @@ module Bundler
       @uri = options[:uri]
     end
 
+    def gems
+      specs = super
+      spec  = specs.values.first
+
+      FileUtils.mkdir_p(tmp_path.join("gitz"))
+      Bundler.logger.info "Cloning git repository at: #{@uri}"
+      `git clone #{@uri} #{tmp_path.join("gitz", spec.name)}`
+
+      specs
+    end
+
     def download(spec, repository)
       dest = repository.download_path_for(:directory).join(spec.name)
       spec.require_paths.map! { |p| File.join(dest, p) }
       repository.add_spec(:directory, spec)
-      `git clone #{@uri} #{dest}`
+      FileUtils.mkdir_p(dest.dirname)
+      FileUtils.mv(tmp_path.join("gitz", spec.name), dest)
     end
   end
 end

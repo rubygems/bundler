@@ -3,11 +3,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe "Getting gems from git" do
 
   before(:each) do
-    path = build_git_repo :very_simple, :with => fixture_dir.join("very-simple")
+    @path = build_git_repo :very_simple, :with => fixture_dir.join("very-simple")
     install_manifest <<-Gemfile
       clear_sources
       source "file://#{gem_repo1}"
-      gem "very-simple", "1.0", :git => "#{path}"
+      gem "very-simple", "1.0", :git => "#{@path}"
     Gemfile
   end
 
@@ -32,5 +32,9 @@ describe "Getting gems from git" do
     Gemfile
 
     tmp_gem_path("dirs", "very-simple").should_not be_directory
+  end
+
+  it "logs that the repo is being cloned" do
+    @log_output.should have_log_message("Cloning git repository at: #{@path}")
   end
 end
