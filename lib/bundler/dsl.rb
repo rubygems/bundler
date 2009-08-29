@@ -43,6 +43,7 @@ module Bundler
 
       dep = Dependency.new(name, options.merge(:version => version))
 
+      # OMG REFACTORZ. KTHX
       if vendored_at = options[:vendored_at]
         raise ArgumentError, "If you use :at, you must specify the gem and version you wish to stand in for" unless version
 
@@ -59,6 +60,22 @@ module Bundler
           :name     => name,
           :version  => version,
           :location => vendored_at
+        )
+
+        @environment.add_priority_source(source)
+      elsif git = options[:git]
+        raise ArgumentError, "If you use :at, you must specify the gem and version you wish to stand in for" unless version
+
+        begin
+          Gem::Version.new(version)
+        rescue ArgumentError
+          raise ArgumentError, "If you use :at, you must specify a gem and version. You specified #{version} for the version"
+        end
+
+        source = GitSource.new(
+          :name => name,
+          :version => version,
+          :uri => git
         )
 
         @environment.add_priority_source(source)

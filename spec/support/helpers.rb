@@ -43,6 +43,19 @@ module Spec
       m
     end
 
+    def build_git_repo(name, options = {})
+      with = options[:with] or raise "Omg, need to specify :with"
+      path = tmp_path.join("git", name.to_s)
+      path.parent.mkdir_p
+      with.cp_r(path)
+      Dir.chdir(path) do
+        `git init`
+        `git add *`
+        `git commit -m "OMG GITZ"`
+      end
+      path
+    end
+
     def reset!
       tmp_path.rmtree if tmp_path.exist?
       tmp_path.mkdir

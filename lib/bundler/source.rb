@@ -76,7 +76,7 @@ module Bundler
         spec = Gem::Specification.new do |s|
           s.name          = @name
           s.version       = Gem::Version.new(@version)
-          s.require_paths = Array(@require_paths).map {|p| File.join(@location, p) }
+          # s.require_paths = Array(@require_paths).map {|p| File.join(@location, p) }
           s.source        = self
         end
         { spec.name => { spec.version => spec } }
@@ -93,7 +93,22 @@ module Bundler
     end
 
     def download(spec, repository)
+      spec.require_paths.map! { |p| File.join(@location, p) }
       repository.add_spec(:directory, spec)
+    end
+  end
+
+  class GitSource < DirectorySource
+    def initialize(options)
+      super
+      @uri = options[:uri]
+    end
+
+    def download(spec, repository)
+      dest = repository.download_path_for(:directory).join(spec.name)
+      spec.require_paths.map! { |p| File.join(dest, p) }
+      repository.add_spec(:directory, spec)
+      `git clone #{@uri} #{dest}`
     end
   end
 end
