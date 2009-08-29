@@ -13,8 +13,8 @@ module Gem
     attr_accessor :location
 
     def source=(source)
-      unless source.is_a?(Bundler::Source) || source.is_a?(Bundler::DirectorySource)
-        source = Bundler::Source.new(:uri => source)
+      unless source.is_a?(Bundler::Source)
+        source = Bundler::GemSource.new(:uri => source)
       end
       @source = source
     end

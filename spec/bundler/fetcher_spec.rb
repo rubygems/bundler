@@ -2,8 +2,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "Fetcher" do
   before(:each) do
-    @source = Bundler::Source.new(:uri => "file://#{gem_repo1}")
-    @other  = Bundler::Source.new(:uri => "file://#{gem_repo2}")
+    @source = Bundler::GemSource.new(:uri => "file://#{gem_repo1}")
+    @other  = Bundler::GemSource.new(:uri => "file://#{gem_repo2}")
     @finder = Bundler::Finder.new(@source, @other)
   end
 
@@ -55,7 +55,7 @@ describe "Fetcher" do
 
       # Try out windows
       Gem.platforms = [Gem::Platform.new("mswin32_60")]
-      finder = Bundler::Finder.new(Bundler::Source.new(:uri => "file://#{gem_repo1}"))
+      finder = Bundler::Finder.new(Bundler::GemSource.new(:uri => "file://#{gem_repo1}"))
       finder.search(build_dep("do_sqlite3", "> 0")).should only_have_specs("do_sqlite3-0.9.12-x86-mswin32-60")
     ensure
       Gem.platforms = nil

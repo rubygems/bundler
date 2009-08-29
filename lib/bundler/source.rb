@@ -2,6 +2,10 @@ module Bundler
   # Represents a source of rubygems. Initially, this is only gem repositories, but
   # eventually, this will be git, svn, HTTP
   class Source
+
+  end
+
+  class GemSource < Source
     attr_reader :uri
 
     def initialize(options)
@@ -59,7 +63,7 @@ module Bundler
     end
   end
 
-  class DirectorySource
+  class DirectorySource < Source
     def initialize(options)
       @name          = options[:name]
       @version       = options[:version]

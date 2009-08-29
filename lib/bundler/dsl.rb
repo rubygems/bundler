@@ -27,7 +27,7 @@ module Bundler
     end
 
     def source(source)
-      source = Source.new(:uri => source)
+      source = GemSource.new(:uri => source)
       unless @environment.sources.include?(source)
         @environment.add_source(source)
       end

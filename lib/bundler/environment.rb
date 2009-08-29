@@ -32,7 +32,7 @@ module Bundler
 
     def initialize(filename) #, sources, dependencies, bindir, path, rubygems, system_gems)
       @filename         = filename
-      @default_sources  = [Source.new(:uri => "http://gems.rubyforge.org")]
+      @default_sources  = [GemSource.new(:uri => "http://gems.rubyforge.org")]
       @sources          = []
       @priority_sources = []
       @dependencies     = []
