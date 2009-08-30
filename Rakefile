@@ -1,8 +1,6 @@
 require 'rubygems' unless ENV['NO_RUBYGEMS']
-require 'rake/gempackagetask'
 require 'rubygems/specification'
 require 'date'
-require 'spec/rake/spectask'
 
 spec = Gem::Specification.new do |s|
   s.name    = "bundler"
@@ -24,15 +22,26 @@ end
 
 task :default => :spec
 
-desc "Run specs"
-Spec::Rake::SpecTask.new do |t|
-  t.spec_files = FileList['spec/**/*_spec.rb'] - FileList['spec/fixtures/**/*_spec.rb']
-  t.spec_opts = %w(-fs --color)
+begin
+  require 'spec/rake/spectask'
+rescue LoadError
+  task(:spec) { $stderr.puts '`gem install rspec` to run specs' }
+else
+  desc "Run specs"
+  Spec::Rake::SpecTask.new do |t|
+    t.spec_files = FileList['spec/**/*_spec.rb'] - FileList['spec/fixtures/**/*_spec.rb']
+    t.spec_opts = %w(-fs --color)
+  end
 end
 
-
-Rake::GemPackageTask.new(spec) do |pkg|
-  pkg.gem_spec = spec
+begin
+  require 'rake/gempackagetask'
+rescue LoadError
+  task(:gem) { $stderr.puts '`gem install rake` to package gems' }
+else
+  Rake::GemPackageTask.new(spec) do |pkg|
+    pkg.gem_spec = spec
+  end
 end
 
 desc "install the gem locally"
