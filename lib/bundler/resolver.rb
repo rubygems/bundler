@@ -20,6 +20,7 @@ end
 
 module Bundler
   class GemNotFound < StandardError; end
+  class VersionConflict < StandardError; end
 
   class Resolver
 
@@ -41,6 +42,8 @@ module Bundler
       resolver = new(sources)
       result = catch(:success) do
         resolver.resolve(requirements, {})
+        output = requirements.map {|d| "  #{d.to_s}" }.join("\n")
+        raise VersionConflict, "No compatible versions could be found for:\n#{output}"
         nil
       end
       result && GemBundle.new(result.values)

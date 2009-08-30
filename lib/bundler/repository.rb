@@ -79,11 +79,7 @@ module Bundler
     end
 
     def fetch(dependencies, sources)
-      unless bundle = Resolver.resolve(dependencies, sources)
-        gems = dependencies.map {|d| "  #{d.to_s}" }.join("\n")
-        raise VersionConflict, "No compatible versions could be found for:\n#{gems}"
-      end
-
+      bundle = Resolver.resolve(dependencies, sources)
       # Cleanup here to remove any gems that could cause problem in the expansion
       # phase
       #
