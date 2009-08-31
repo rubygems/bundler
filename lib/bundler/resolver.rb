@@ -42,8 +42,13 @@ module Bundler
       resolver = new(sources)
       result = catch(:success) do
         resolver.resolve(requirements, {})
-        output = requirements.map {|d| "  #{d.to_s}" }.join("\n")
-        raise VersionConflict, "No compatible versions could be found for:\n#{output}"
+        output = resolver.errors.inject("") do |o, (conflict, (origin, requirement))|
+          o << "  Conflict on: #{conflict.inspect}:\n"
+          o << "    * #{conflict} (#{origin.version}) activated by #{origin.required_by.first}\n"
+          o << "    * #{requirement} required by #{requirement.required_by.first}\n"
+          o << "    All possible versions of origin requirements conflict."
+        end
+        raise VersionConflict, "No compatible versions could be found for required dependencies:\n  #{output}"
         nil
       end
       result && GemBundle.new(result.values)
@@ -91,7 +96,7 @@ module Bundler
           # the remaining requirements.
           resolve(reqs, activated)
         else
-          @errors[existing.name] = { :gem => existing, :requirement => current }
+          @errors[existing.name] = [existing, current]
           # Since the current requirement conflicts with an activated gem, we need
           # to backtrack to the current requirement's parent and try another version
           # of it (maybe the current requirement won't be present anymore). If the

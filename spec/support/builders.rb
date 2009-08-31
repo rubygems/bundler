@@ -14,7 +14,7 @@ module Spec
       spec
     end
 
-    def build_dep(name, requirements, type = :runtime)
+    def build_dep(name, requirements = Gem::Requirement.default, type = :runtime)
       Gem::Dependency.new(name, requirements, type)
     end
 
