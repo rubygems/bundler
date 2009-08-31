@@ -44,8 +44,9 @@ module Spec
     end
 
     def build_git_repo(name, options = {})
+      name = name.to_s
       with = options[:with] or raise "Omg, need to specify :with"
-      path = tmp_path.join("git", name.to_s)
+      path = tmp_path.join("git", name)
       path.parent.mkdir_p
       with.cp_r(path)
       if spec = options[:spec]
@@ -57,6 +58,20 @@ module Spec
         `git init`
         `git add *`
         `git commit -m "OMG GITZ"`
+        `git checkout -b alt`
+        path.join("lib", name).mkdir_p
+        File.open(path.join("lib", name, "in_a_branch.rb"), 'w') do |file|
+          file.puts "OMG_IN_A_BRANCH = 'tagged'"
+        end
+        `git add *`
+        `git commit -m "OMG TAGGING"`
+        `git tag tagz`
+        File.open(path.join("lib", name, "in_a_branch.rb"), 'w') do |file|
+          file.puts "OMG_IN_A_BRANCH = 'branch'"
+        end
+        `git add *`
+        `git commit -m "OMG BRANCHING"`
+        `git checkout master`
       end
       path
     end

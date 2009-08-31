@@ -75,7 +75,9 @@ module Bundler
         source = GitSource.new(
           :name => name,
           :version => version,
-          :uri => git
+          :uri => git,
+          :ref => options[:commit] || options[:tag],
+          :branch => options[:branch]
         )
 
         @environment.add_priority_source(source)

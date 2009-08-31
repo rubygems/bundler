@@ -97,7 +97,9 @@ module Bundler
   class GitSource < DirectorySource
     def initialize(options)
       super
-      @uri      = options[:uri]
+      @uri = options[:uri]
+      @ref = options[:ref]
+      @branch = options[:branch]
     end
 
     def gems
@@ -107,8 +109,12 @@ module Bundler
       @location = tmp_path.join("gitz", @name)
 
       Bundler.logger.info "Cloning git repository at: #{@uri}"
-      `git clone #{@uri} #{@location}`
-
+      `git clone #{@uri} #{@location} --no-hardlinks`
+      if @ref
+        Dir.chdir(@location) { `git checkout #{@ref}` }
+      elsif @branch && @branch != "master"
+        Dir.chdir(@location) { `git checkout origin/#{@branch}` }
+      end
       super
     end
 

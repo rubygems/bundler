@@ -4,7 +4,7 @@ describe "Getting gems from git" do
 
   describe "a simple gem in git" do
     before(:each) do
-      @path = build_git_repo :very_simple, :with => fixture_dir.join("very-simple")
+      @path = build_git_repo "very-simple", :with => fixture_dir.join("very-simple")
       install_manifest <<-Gemfile
         clear_sources
         source "file://#{gem_repo1}"
@@ -47,7 +47,7 @@ describe "Getting gems from git" do
       s.require_paths = ["lib"]
       s.add_dependency "rack", ">= 0.9.1"
     end
-    @path = build_git_repo :very_simple, :with => fixture_dir.join("very-simple"), :spec => spec
+    @path = build_git_repo "very-simple", :with => fixture_dir.join("very-simple"), :spec => spec
 
     install_manifest <<-Gemfile
       clear_sources
@@ -58,6 +58,18 @@ describe "Getting gems from git" do
     tmp_gem_path.should_not include_cached_gem("very-simple-1.0")
     tmp_gem_path.should include_cached_gem("rack-0.9.1")
     tmp_gem_path.should include_installed_gem("rack-0.9.1")
+  end
+
+  it "allows bundling a specific tag" do
+    path = build_git_repo "very-simple", :with => fixture_dir.join("very-simple")
+    install_manifest <<-Gemfile
+      clear_sources
+      source "file://#{gem_repo1}"
+      gem "very-simple", "1.0", :git => "#{path}", :tag => 'tagz'
+    Gemfile
+
+    out = run_in_context "require 'very-simple/in_a_branch' ; puts OMG_IN_A_BRANCH"
+    out.should == "tagged"
   end
 
 end
