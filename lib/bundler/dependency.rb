@@ -12,8 +12,8 @@ module Bundler
       @name       = name
       @version    = options["version"] || ">= 0"
       @require_as = Array(options["require_as"] || name)
-      @only       = Array(options["only"]).map {|e| e.to_s } if options["only"]
-      @except     = Array(options["except"]).map {|e| e.to_s } if options["except"]
+      @only       = options["only"]
+      @except     = options["except"]
       @block      = block
 
       if (@only && @only.include?("rubygems")) || (@except && @except.include?("rubygems"))

@@ -54,17 +54,6 @@ describe "Bundler::Dependency" do
     b.should_not be_in(:production)
   end
 
-  it "tests whether a dependency is for a specific environment (with :only => Array)" do
-    b = Bundler::Dependency.new("ruby-debug", :only => ["staging", :production])
-    b.should be_in("staging")
-    b.should be_in(:staging)
-    b.should be_in("production")
-    b.should be_in(:production)
-
-    b.should_not be_in("development")
-    b.should_not be_in(:development)
-  end
-
   it "tests whether a dependency is for a specific environment (with :except)" do
     b = Bundler::Dependency.new("ruby-debug", :except => "development")
     b.should_not be_in("development")
@@ -72,16 +61,5 @@ describe "Bundler::Dependency" do
 
     b.should be_in("production")
     b.should be_in(:production)
-  end
-
-  it "tests whether a dependency is for a specific environment (with :except => Array)" do
-    b = Bundler::Dependency.new("ruby-debug", :except => ["staging", :production])
-    b.should_not be_in("staging")
-    b.should_not be_in(:staging)
-    b.should_not be_in("production")
-    b.should_not be_in(:production)
-
-    b.should be_in("development")
-    b.should be_in(:development)
   end
 end

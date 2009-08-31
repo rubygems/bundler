@@ -33,6 +33,18 @@ module Bundler
       end
     end
 
+    def only(env)
+      old, @only = @only, _combine_onlys(env)
+      yield
+      @only = old
+    end
+
+    def except(env)
+      old, @except = @except, _combine_excepts(env)
+      yield
+      @except = old
+    end
+
     def clear_sources
       @environment.clear_sources
     end
@@ -40,6 +52,9 @@ module Bundler
     def gem(name, *args)
       options = args.last.is_a?(Hash) ? args.pop : {}
       version = args.last
+
+      options[:only] = _combine_onlys(options[:only] || options["only"])
+      options[:except] = _combine_excepts(options[:except] || options["except"])
 
       dep = Dependency.new(name, options.merge(:version => version))
 
@@ -84,6 +99,22 @@ module Bundler
       end
 
       @environment.dependencies << dep
+    end
+
+  private
+
+    def _combine_onlys(only)
+      return @only unless only
+      only = [only].flatten.compact.uniq.map { |o| o.to_s }
+      only &= @only if @only
+      only
+    end
+
+    def _combine_excepts(except)
+      return @except unless except
+      except = [except].flatten.compact.uniq.map { |o| o.to_s }
+      except |= @except if @except
+      except
     end
   end
 end

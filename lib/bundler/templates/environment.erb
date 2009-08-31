@@ -40,20 +40,43 @@ module Bundler
 
   def self.require_env(env = nil)
     context = Class.new do
-      def initialize(env) @env = env ; end
+      def initialize(env) @env = env && env.to_s ; end
       def method_missing(*) ; end
+      def only(env)
+        old, @only = @only, _combine_onlys(env)
+        yield
+        @only = old
+      end
+      def except(env)
+        old, @except = @except, _combine_excepts(env)
+        yield
+        @except = old
+      end
       def gem(name, *args)
         opt = args.last || {}
-        only = opt[:only] || opt["only"]
-        except = opt[:except] || opt["except"]
+        only = _combine_onlys(opt[:only] || opt["only"])
+        except = _combine_excepts(opt[:except] || opt["except"])
         files = opt[:require_as] || opt["require_as"] || name
 
-        return unless !only || [only].flatten.any? {|e| e.to_s == @env }
-        return if except && [except].flatten.any? {|e| e.to_s == @env }
+        return unless !only || only.any? {|e| e == @env }
+        return if except && except.any? {|e| e == @env }
 
         files.each { |f| require f }
         yield if block_given?
         true
+      end
+      private
+      def _combine_onlys(only)
+        return @only unless only
+        only = [only].flatten.compact.uniq.map { |o| o.to_s }
+        only &= @only if @only
+        only
+      end
+      def _combine_excepts(except)
+        return @except unless except
+        except = [except].flatten.compact.uniq.map { |o| o.to_s }
+        except |= @except if @except
+        except
       end
     end
     context.new(env && env.to_s).instance_eval(File.read(@gemfile))
