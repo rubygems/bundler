@@ -84,4 +84,25 @@ describe "Faking gems with directories" do
     tmp_gem_path.should include_installed_gem("rack-0.9.1")
   end
 
+  it "recursively finds all gemspec files in a directory" do
+    lib_builder("first", "1.0")
+    lib_builder("second", "1.0") do |s|
+      s.add_dependency "first", ">= 0"
+      s.write "lib/second.rb", "require 'first' ; SECOND = 'required'"
+    end
+
+    install_manifest <<-Gemfile
+      clear_sources
+      gem "second", "1.0", :vendored_at => "#{tmp_path('dirs')}"
+    Gemfile
+
+    out = run_in_context <<-RUBY
+      Bundler.require_env
+      puts FIRST
+      puts SECOND
+    RUBY
+
+    out.should == "required\nrequired"
+  end
+
 end

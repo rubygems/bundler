@@ -65,17 +65,22 @@ module Bundler
 
     def gems
       @gems ||= begin
-        spec = Gem::Specification.new
-
-        if actual = Dir[@location.join("*.gemspec")].first
-          # Load the gemspec
-          spec = eval(File.read(actual))
+        default = Gem::Specification.new do |s|
+          s.name = @name
+          s.version = @version
         end
 
-        spec.name = @name
-        spec.version = Gem::Version.new(@version)
+        specs = { default.full_name => default }
 
-        { spec.full_name => spec }
+        # Find any gemspecs
+        Dir[@location.join('**', '*.gemspec')].each do |file|
+          path = Pathname.new(file).relative_path_from(@location).dirname
+          spec = eval(File.read(file))
+          spec.require_paths.map! { |p| path.join(p) }
+          specs[spec.full_name] = spec
+        end
+
+        specs
       end
     end
 

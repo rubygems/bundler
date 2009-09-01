@@ -76,6 +76,41 @@ module Spec
       path
     end
 
+    class LibBuilder
+      def initialize(name, version)
+        @spec = Gem::Specification.new do |s|
+          s.name = name
+          s.version = version
+        end
+        @files = { "lib/#{name}.rb" => "#{name.upcase} = 'required'" }
+      end
+
+      def method_missing(*args, &blk)
+        @spec.send(*args, &blk)
+      end
+
+      def write(file, source)
+        @files[file] = source
+      end
+
+      def _build(path)
+        path ||= tmp_path('dirs', name)
+        @files["#{name}.gemspec"] = @spec.to_ruby
+        @files.each do |file, source|
+          file = path.join(file)
+          file.dirname.mkdir_p
+          File.open(file, 'w') { |f| f.puts source }
+        end
+        self
+      end
+    end
+
+    def lib_builder(name, version, options = {})
+      spec = LibBuilder.new(name, version)
+      yield spec if block_given?
+      spec._build(options[:path] || tmp_path('dirs', name))
+    end
+
     def reset!
       tmp_path.rmtree if tmp_path.exist?
       tmp_path.mkdir
