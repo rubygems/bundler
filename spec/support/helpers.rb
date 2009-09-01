@@ -76,6 +76,12 @@ module Spec
       path
     end
 
+    def gitify(path)
+      Dir.chdir(path) do
+        `git init && git add * && git commit -m "OMG GITZ"`
+      end
+    end
+
     class LibBuilder
       def initialize(name, version)
         @spec = Gem::Specification.new do |s|
@@ -106,9 +112,11 @@ module Spec
     end
 
     def lib_builder(name, version, options = {})
+      path = options[:path] || tmp_path('dirs', name)
       spec = LibBuilder.new(name, version)
       yield spec if block_given?
-      spec._build(options[:path] || tmp_path('dirs', name))
+      spec._build(path)
+      path
     end
 
     def reset!

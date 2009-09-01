@@ -59,18 +59,9 @@ describe "Faking gems with directories" do
   end
 
   it "checks the root directory for a *.gemspec file" do
-    spec = Gem::Specification.new do |s|
-      s.name          = %q{very-simple}
-      s.version       = "1.0"
-      s.require_paths = ["lib"]
+    path = lib_builder("very-simple", "1.0", :path => tmp_path("very-simple")) do |s|
       s.add_dependency "rack", ">= 0.9.1"
-    end
-
-    path = tmp_path("very-simple")
-
-    FileUtils.cp_r(fixture_dir.join("very-simple"), path)
-    File.open(path.join("very-simple.gemspec"), 'w') do |file|
-      file.puts spec.to_ruby
+      s.write "lib/very-simple.rb", "class VerySimpleForTests ; end"
     end
 
     install_manifest <<-Gemfile

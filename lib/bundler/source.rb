@@ -115,6 +115,7 @@ module Bundler
 
       Bundler.logger.info "Cloning git repository at: #{@uri}"
       `git clone #{@uri} #{@location} --no-hardlinks`
+
       if @ref
         Dir.chdir(@location) { `git checkout #{@ref}` }
       elsif @branch && @branch != "master"
@@ -124,11 +125,13 @@ module Bundler
     end
 
     def download(spec, repository)
-      dest = repository.download_path_for(:directory).join(spec.name)
+      dest = repository.download_path_for(:directory).join(@name)
       spec.require_paths.map! { |p| File.join(dest, p) }
       repository.add_spec(:directory, spec)
-      FileUtils.mkdir_p(dest.dirname)
-      FileUtils.mv(tmp_path.join("gitz", spec.name), dest)
+      if spec.name == @name
+        FileUtils.mkdir_p(dest.dirname)
+        FileUtils.mv(tmp_path.join("gitz", spec.name), dest)
+      end
     end
   end
 end

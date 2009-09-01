@@ -60,6 +60,29 @@ describe "Getting gems from git" do
     tmp_gem_path.should include_installed_gem("rack-0.9.1")
   end
 
+  it "recursively finds all gemspec files in a git repository" do
+    lib_builder("first", "1.0", :path => tmp_path("gitz", "first"))
+    lib_builder("second", "1.0", :path => tmp_path("gitz", "second")) do |s|
+      s.add_dependency "first", ">= 0"
+      s.write "lib/second.rb", "require 'first' ; SECOND = 'required'"
+    end
+
+    gitify(tmp_path("gitz"))
+
+    install_manifest <<-Gemfile
+      clear_sources
+      gem "second", "1.0", :git => "#{tmp_path('gitz')}"
+    Gemfile
+
+    out = run_in_context <<-RUBY
+      Bundler.require_env
+      puts FIRST
+      puts SECOND
+    RUBY
+
+    out.should == "required\nrequired"
+  end
+
   it "allows bundling a specific tag" do
     path = build_git_repo "very-simple", :with => fixture_dir.join("very-simple")
     install_manifest <<-Gemfile
