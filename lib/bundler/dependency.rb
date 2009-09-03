@@ -33,11 +33,11 @@ module Bundler
       to_gem_dependency.to_s
     end
 
-    def require(environment)
+    def require_env(environment)
       return unless in?(environment)
 
       @require_as.each do |file|
-        super(file)
+        require file
       end
 
       @block.call if @block

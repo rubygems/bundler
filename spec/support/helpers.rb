@@ -1,10 +1,15 @@
 module Spec
   module Helpers
-    def run_in_context(*args)
-      cmd = args.pop.gsub(/(?=")/, "\\")
-      env = args.pop || bundled_app("vendor", "gems", "environment")
+    def run_in_context(cmd)
+      env = bundled_app("vendor", "gems", "environment")
+      ruby "-r #{env}", cmd
+    end
+
+    def ruby(opts, ruby = nil)
+      ruby, opts = opts, nil unless ruby
+      ruby.gsub!(/(?=")/, "\\")
       lib = File.join(File.dirname(__FILE__), '..', '..', 'lib')
-      %x{#{Gem.ruby} -I#{lib} -r #{env} -e "#{cmd}"}.strip
+      %x{#{Gem.ruby} -I#{lib} #{opts} -e "#{ruby}"}.strip
     end
 
     def gem_command(command, args = "")

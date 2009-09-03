@@ -69,6 +69,10 @@ module Bundler
       ENV["RUBYOPT"]  = "-r#{gem_path}/environment #{ENV["RUBYOPT"]}"
     end
 
+    def require_env(env = nil)
+      dependencies.each { |d| d.require_env(env) }
+    end
+
     def root
       filename.parent
     end
