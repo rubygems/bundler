@@ -107,16 +107,14 @@ module Spec
           file.dirname.mkdir_p
           File.open(file, 'w') { |f| f.puts source }
         end
-        self
+        path
       end
     end
 
     def lib_builder(name, version, options = {})
-      path = options[:path] || tmp_path('dirs', name)
       spec = LibBuilder.new(name, version)
       yield spec if block_given?
-      spec._build(path)
-      path
+      spec._build(options[:path] || tmp_path('dirs', name))
     end
 
     def reset!

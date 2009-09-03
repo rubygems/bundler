@@ -3,7 +3,8 @@ module Bundler
 
   class Dsl
     def initialize(environment)
-      @environment  = environment
+      @environment = environment
+      @sources = Hash.new { |h,k| h[k] = {} }
     end
 
     def bundle_path(path)
@@ -60,42 +61,30 @@ module Bundler
 
       # OMG REFACTORZ. KTHX
       if vendored_at = options[:vendored_at]
-        raise ArgumentError, "If you use :at, you must specify the gem and version you wish to stand in for" unless version
-
-        begin
-          Gem::Version.new(version)
-        rescue ArgumentError
-          raise ArgumentError, "If you use :at, you must specify a gem and version. You specified #{version} for the version"
-        end
-
         vendored_at = Pathname.new(vendored_at)
         vendored_at = @environment.filename.dirname.join(vendored_at) if vendored_at.relative?
 
-        source = DirectorySource.new(
-          :name     => name,
-          :version  => version,
-          :location => vendored_at
-        )
-
-        @environment.add_priority_source(source)
-      elsif git = options[:git]
-        raise ArgumentError, "If you use :at, you must specify the gem and version you wish to stand in for" unless version
-
-        begin
-          Gem::Version.new(version)
-        rescue ArgumentError
-          raise ArgumentError, "If you use :at, you must specify a gem and version. You specified #{version} for the version"
+        @sources[:directory][vendored_at.to_s] ||= begin
+          source = DirectorySource.new(
+            :name     => name,
+            :version  => version,
+            :location => vendored_at
+          )
+          @environment.add_priority_source(source)
+          true
         end
-
-        source = GitSource.new(
-          :name => name,
-          :version => version,
-          :uri => git,
-          :ref => options[:commit] || options[:tag],
-          :branch => options[:branch]
-        )
-
-        @environment.add_priority_source(source)
+      elsif git = options[:git]
+        @sources[:git][git] ||= begin
+          source = GitSource.new(
+            :name    => name,
+            :version => version,
+            :uri     => git,
+            :ref     => options[:commit] || options[:tag],
+            :branch  => options[:branch]
+          )
+          @environment.add_priority_source(source)
+          true
+        end
       end
 
       @environment.dependencies << dep

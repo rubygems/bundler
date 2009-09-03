@@ -65,19 +65,32 @@ module Bundler
 
     def gems
       @gems ||= begin
-        default = Gem::Specification.new do |s|
-          s.name = @name
-          s.version = @version
-        end
+        specs = {}
 
-        specs = { default.full_name => default }
-
-        # Find any gemspecs
+        # Find any gemspec files in the directory and load those specs
         Dir[@location.join('**', '*.gemspec')].each do |file|
           path = Pathname.new(file).relative_path_from(@location).dirname
           spec = eval(File.read(file))
           spec.require_paths.map! { |p| path.join(p) }
           specs[spec.full_name] = spec
+        end
+
+        # If a gemspec for the dependency was not found, add it to the list
+        if specs.keys.grep(/^#{Regexp.escape(@name)}/).empty?
+          case
+          when @version.nil?
+            raise ArgumentError, "If you use :at, you must specify the gem" \
+              "and version you wish to stand in for"
+          when !Gem::Version.correct?(@version)
+            raise ArgumentError, "If you use :at, you must specify a gem and" \
+              "version. You specified #{@version} for the version"
+          end
+
+          default = Gem::Specification.new do |s|
+            s.name = @name
+            s.version = Gem::Version.new(@version) if @version
+          end
+          specs[default.full_name] = default
         end
 
         specs
