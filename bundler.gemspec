@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{bundler}
-  s.version = "0.5.0"
+  s.version = "0.5.1.pre"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 1.3.5") if s.respond_to? :required_rubygems_version=
   s.authors = ["Yehuda Katz"]
-  s.date = %q{2009-09-03}
+  s.date = %q{2009-09-11}
   s.description = %q{An easy way to vendor gem dependencies}
   s.email = %q{wycats@gmail.com}
   s.extra_rdoc_files = ["README.markdown", "LICENSE"]

@@ -12,18 +12,16 @@ and all child dependencies specified in this manifest. It can manage any update
 to the gem manifest file and update the bundled gems accordingly. It also lets
 you run any ruby code in context of the bundled gem environment.
 
-## Disclaimer
-
-This project is under rapid development. It is usable today, but there will be
-many changes in the near future, including to the Gemfile DSL. We will bump up
-versions with changes though. We greatly appreciate feedback.
-
 ## Installation
 
 Bundler has no dependencies. Just clone the git repository and install the gem
 with the following rake task:
 
     rake install
+
+You can also install the gem with
+
+    gem install bundler
 
 ## Usage
 
@@ -50,10 +48,29 @@ information, please refer to Bundler::ManifestBuilder.
     # it can be specified the same way as with rubygems' #gem method.
     gem "rack", "1.0.0"
 
-    # Specify a dependency rspec, but only activate that gem in the "testing"
-    # environment (read more about environments later). :except is also a valid
-    # option to specify environment restrictions.
+    # Specify a dependency rspec, but only require that gem in the "testing"
+    # environment. :except is also a valid option to specify environment
+    # restrictions.
     gem "rspec", :only => :testing
+
+    # Specify a dependency, but specify that it is already present and expanded
+    # at vendor/rspec. Bundler will treat rspec as though it was the rspec gem
+    # for the purpose of gem resolution: if another gem depends on a version
+    # of rspec satisfied by "1.1.6", it will be used.
+    #
+    # If a gemspec is found in the directory, it will be used to specify load
+    # paths and supply additional dependencies.
+    #
+    # Bundler will also recursively search for *.gemspec, and assume that
+    # gemspecs it finds represent gems that are rooted in the same directory
+    # the gemspec is found in.
+    gem "rspec", "1.1.6", :vendored_at => "vendor/rspec"
+
+    # Works exactly like :vendored_at, but first downloads the repo from
+    # git and handles stashing the files for you. As with :vendored_at,
+    # Bundler will automatically use *.gemspec files in the root or anywhere
+    # in the repository.
+    gem "rails", "3.0.pre", :git => "git://github.com/rails/rails.git"
 
     # Add http://gems.github.com as a source that the bundler will use
     # to find gems listed in the manifest. By default,
@@ -84,17 +101,76 @@ information, please refer to Bundler::ManifestBuilder.
     # the ones that have been bundled.
     disable_rubygems
 
+### Gem Resolution
+
+One of the most important things that the bundler does is do a
+dependency resolution on the full list of gems that you specify, all
+at once. This differs from the one-at-a-time dependency resolution that
+Rubygems does, which can result in the following problem:
+
+    # On my system:
+    #   activesupport 3.0.pre
+    #   activesupport 2.3.4
+    #   activemerchant 1.4.2
+    #   rails 2.3.4
+    #
+    # activemerchant 1.4.2 depends on activesupport >= 2.3.2
+
+    gem "activemerchant", "1.4.2"
+    # results in activating activemerchant, as well as
+    # activesupport 3.0.pre, since it is >= 2.3.2
+
+    gem "rails", "2.3.4"
+    # results in:
+    #   can't activate activesupport (= 2.3.4, runtime)
+    #   for ["rails-2.3.4"], already activated
+    #   activesupport-3.0.pre for ["activemerchant-1.4.2"]
+
+This is because activemerchant has a broader dependency, which results
+in the activation of a version of activesupport that does not satisfy
+a more narrow dependency.
+
+Bundler solves this problem by evaluating all dependencies at once,
+so it can detect that all gems *together* require activesupport "2.3.4".
+
 ### Running Bundler
 
 Once a manifest file has been created, the only thing that needs to be done
 is to run the `gem bundle` command anywhere in your application. The script
-will load the manifest file, resole all the dependencies, download all
+will load the manifest file, resolve all the dependencies, download all
 needed gems, and install them into the specified directory.
 
 Every time an update is made to the manifest file, run `gem bundle` again to
 get the changes installed. This will only check the remote sources if your
 currently installed gems do not satisfy the `Gemfile`. If you want to force
 checking for updates on the remote sources, use the `--update` option.
+
+### Remote deploys
+
+When you run `gem bundle`, the following steps occur:
+
+1. Gemfile is read in
+2. The gems specified in the Gemfile are resolved against the gems
+   already in your bundle. If the dependencies resolve, skip to step 5.
+3. If the dependencies in your Gemfile cannot be fully resolved
+   against the gems already in the bundle, the metadata for each
+   source is fetched.
+4. The gems in the Gemfile are resolved against the full list of
+   available gems in all sources, and the resulting gems are downloaded
+5. Each gem that has been downloaded but not yet expanded is expanded
+   into the local directory. This expansion process also installs
+   native gems.
+
+As you can see, if you run gem bundle twice in a row, it will do nothing the
+second time, since the gems obviously resolve against the installed gems,
+and they are all expanded.
+
+This also means that if you run `gem bundle`, and .gitignore the expanded
+copies, leaving only the cached `.gem` files, you can run `gem bundle` again
+on the remote system, and it will only expand out the gems (but not
+resolve or download `.gem` files). This also means that native gems
+will be compiled for the target platform without requiring that the
+`.gem` file itself be downloaded from a remote gem server.
 
 ### Running your application
 
@@ -107,6 +183,9 @@ Another way to run arbitrary ruby code in context of the bundled gems is to
 run it with the `gem exec` command. For example:
 
     gem exec ruby my_ruby_script.rb
+
+You can use `gem exec bash` to enter a shell that will run all binaries in
+the current context.
 
 Yet another way is to manually require the environment file first. This is
 located in `[bundle_path]/environments/default.rb`. For example:
@@ -135,7 +214,7 @@ to follow.
 
 * At the top of `config/boot.rb`, add the following line:
 
-        require File.expand_path(File.join(File.dirname(__FILE__), '..', 'vendor', 'gems', 'environment'))
+    require File.expand_path(File.join(File.dirname(__FILE__), '..', 'vendor', 'gems', 'environment'))
 
 In theory, this should be enough to get going.
 
@@ -143,11 +222,16 @@ In theory, this should be enough to get going.
 
 Ideally, no gem would assume the presence of rubygems at runtime. Rubygems provides
 enough features so that this isn't necessary. However, there are a number of gems
-that require specific rubygem features.
+that require specific rubygems features.
 
 If the `disable_rubygems` option is used, Bundler will stub out the most common
 of these features, but it is possible that things will not go as intended quite
 yet. So, if you are brave, try your code without rubygems at runtime.
+
+This is different from the `disable_system_gems` option, which uses the rubygems
+library, but prevents system gems from being loaded; only gems that are bundled
+will be available to your application. This option guarantees that dependencies
+of your application will be available to a remote system.
 
 ## Known Issues
 
