@@ -33,7 +33,7 @@ module Bundler
         glob = gems.map { |g| g.full_name }.join(',')
         base = path.join("{cache,specifications,gems}")
 
-        (Dir[base.join("*")] - Dir[base.join("{#{glob}}{.gemspec,.gem,}")]).each do |file|
+        (Dir["#{base}/*"] - Dir["#{base}/{#{glob}}{.gemspec,.gem,}"]).each do |file|
           if File.basename(file) =~ /\.gem$/
             name = File.basename(file, '.gem')
             Bundler.logger.info "Deleting gem: #{name}"
@@ -57,7 +57,7 @@ module Bundler
       end
 
       def cache_files
-        Dir[cache_path.join("*.gem")]
+        Dir["#{cache_path}/*.gem"]
       end
 
       def cached_gems
@@ -72,7 +72,7 @@ module Bundler
       end
 
       def spec_files
-        Dir[spec_path.join("*.gemspec")]
+        Dir["#{spec_path}/*.gemspec"]
       end
 
       def gem_path
@@ -80,7 +80,7 @@ module Bundler
       end
 
       def gem_paths
-        Dir[gem_path.join("*")]
+        Dir["#{gem_path}/*"]
       end
 
       def installed?(name, version)

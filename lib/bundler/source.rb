@@ -68,7 +68,7 @@ module Bundler
         specs = {}
 
         # Find any gemspec files in the directory and load those specs
-        Dir[@location.join('**', '*.gemspec')].each do |file|
+        Dir["#{@location}/**/*.gemspec"].each do |file|
           path = Pathname.new(file).relative_path_from(@location).dirname
           spec = eval(File.read(file))
           spec.require_paths.map! { |p| path.join(p) }

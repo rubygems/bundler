@@ -143,7 +143,7 @@ describe "Installing gems" do
         gem "json"
       Gemfile
       m.install
-      Dir[bundled_app('vendor', 'gems', 'gems', 'json-*', '**', "*.#{Config::CONFIG['DLEXT']}")].should have_at_least(1).item
+      Dir["#{bundled_app}/vendor/gems/gems/json-*/**/*.#{Config::CONFIG['DLEXT']}"].should have_at_least(1).item
     end
   end
 end

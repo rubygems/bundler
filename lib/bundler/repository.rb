@@ -91,7 +91,7 @@ module Bundler
     def sync
       glob = gems.map { |g| g.executables }.flatten.join(',')
 
-      (Dir[@bindir.join("*")] - Dir[@bindir.join("{#{glob}}")]).each do |file|
+      (Dir["#{@bindir}/*"] - Dir["#{@bindir}/{#{glob}}"]).each do |file|
         Bundler.logger.info "Deleting bin file: #{File.basename(file)}"
         FileUtils.rm_rf(file)
       end
