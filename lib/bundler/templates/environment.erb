@@ -57,6 +57,7 @@ module Bundler
         only = _combine_onlys(opt[:only] || opt["only"])
         except = _combine_excepts(opt[:except] || opt["except"])
         files = opt[:require_as] || opt["require_as"] || name
+        files = [files] unless files.respond_to?(:each)
 
         return unless !only || only.any? {|e| e == @env }
         return if except && except.any? {|e| e == @env }
