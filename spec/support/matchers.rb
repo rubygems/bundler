@@ -1,7 +1,7 @@
 module Spec
   module Matchers
     def change
-      simple_matcher("change") do |given, matcher|
+      simple_matcher("should change") do |given, matcher|
         matcher.failure_message = "Expected the block to change, but it didn't"
         matcher.negative_failure_message = "Expected the block not to change, but it did"
         retval = yield

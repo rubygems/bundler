@@ -1,6 +1,6 @@
 module Gem
   class Installer
-    undef_method(:app_script_text) if method_defined?(:app_script_text)
+    remove_method(:app_script_text) if method_defined?(:app_script_text)
 
     def app_script_text(bin_file_name)
       path = @gem_home
@@ -14,7 +14,7 @@ module Gem
     attr_accessor :source
     attr_accessor :location
 
-    undef_method(:specification_version) if method_defined?(:specification_version)
+    remove_method(:specification_version) if method_defined?(:specification_version)
 
     # Hack to fix github's strange marshal file
     def specification_version

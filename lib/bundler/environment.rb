@@ -5,7 +5,8 @@ module Bundler
 
   class Environment
     attr_reader :filename, :dependencies
-    attr_accessor :rubygems, :system_gems, :gem_path, :bindir
+    attr_accessor :rubygems, :system_gems
+    attr_writer :gem_path, :bindir
 
     def self.load(gemfile = nil)
       gemfile = gemfile ? Pathname.new(gemfile) : default_manifest_file
