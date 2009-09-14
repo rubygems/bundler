@@ -31,6 +31,7 @@ else
   Spec::Rake::SpecTask.new do |t|
     t.spec_files = FileList['spec/**/*_spec.rb'] - FileList['spec/fixtures/**/*_spec.rb']
     t.spec_opts = %w(-fs --color)
+    t.warning = true
   end
 end
 
