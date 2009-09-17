@@ -1,13 +1,14 @@
 # DO NOT MODIFY THIS FILE
 module Bundler
-  dir = File.dirname(__FILE__)
+ file = File.expand_path(__FILE__)
+ dir = File.dirname(file)
 
 <% unless options[:system_gems] -%>
   ENV["GEM_HOME"] = dir
   ENV["GEM_PATH"] = dir
 <% end -%>
   ENV["PATH"]     = "#{dir}/<%= bindir %>:#{ENV["PATH"]}"
-  ENV["RUBYOPT"]  = "-r#{__FILE__} #{ENV["RUBYOPT"]}"
+  ENV["RUBYOPT"]  = "-r#{file} #{ENV["RUBYOPT"]}"
 
 <% load_paths.each do |load_path| -%>
   $LOAD_PATH.unshift File.expand_path("#{dir}/<%= load_path %>")
