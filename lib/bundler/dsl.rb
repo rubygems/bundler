@@ -5,7 +5,7 @@ module Bundler
     def initialize(environment)
       @environment = environment
       @sources = Hash.new { |h,k| h[k] = {} }
-      @only, @except = [], []
+      @only, @except = nil, nil
     end
 
     def bundle_path(path)
