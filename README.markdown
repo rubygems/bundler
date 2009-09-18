@@ -172,6 +172,14 @@ resolve or download `.gem` files). This also means that native gems
 will be compiled for the target platform without requiring that the
 `.gem` file itself be downloaded from a remote gem server.
 
+Assuming a Rails app with Bundler's standard setup, add something like
+this to your top-level `.gitignore` to only keep the cache:
+
+    vendor/gems/
+    !vendor/gems/cache/
+
+Make sure that you explicitly `git add vendor/gems/cache` before you commit.
+
 ### Running your application
 
 The easiest way to run your application is to start it with an executable
@@ -212,9 +220,9 @@ to follow.
 * You can now use rails if you prepend `gem exec` to every call to `script/*`
   but that isn't fun.
 
-* At the top of `config/boot.rb`, add the following line:
+* At the top of `config/preinitializer.rb`, add the following line:
 
-    require File.expand_path(File.join(File.dirname(__FILE__), '..', 'vendor', 'gems', 'environment'))
+    require "#{RAILS_ROOT}/vendor/gems/environment"
 
 In theory, this should be enough to get going.
 
