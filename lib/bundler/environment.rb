@@ -45,19 +45,12 @@ module Bundler
     end
 
     def install(update = false)
-      begin
-        tmp_path = filename.dirname.join(".tmp")
-        FileUtils.mkdir_p(tmp_path)
-        sources.each { |s| s.tmp_path = tmp_path }
-        repository.install(gem_dependencies, sources,
-          :rubygems    => rubygems,
-          :system_gems => system_gems,
-          :manifest    => filename,
-          :update      => update
-        )
-      ensure
-        FileUtils.rm_rf(tmp_path)
-      end
+      repository.install(gem_dependencies, sources,
+        :rubygems    => rubygems,
+        :system_gems => system_gems,
+        :manifest    => filename,
+        :update      => update
+      )
       Bundler.logger.info "Done."
     end
 

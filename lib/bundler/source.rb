@@ -2,7 +2,7 @@ module Bundler
   # Represents a source of rubygems. Initially, this is only gem repositories, but
   # eventually, this will be git, svn, HTTP
   class Source
-    attr_accessor :tmp_path
+    attr_accessor :repository
   end
 
   class GemSource < Source
@@ -28,16 +28,16 @@ module Bundler
 
     class RubygemsRetardation < StandardError; end
 
-    def download(spec, repository)
+    def download(spec)
       Bundler.logger.info "Downloading #{spec.full_name}.gem"
 
-      destination = repository.download_path_for(:gem)
+      destination = repository.path
 
       unless destination.writable?
         raise RubygemsRetardation
       end
 
-      Gem::RemoteFetcher.fetcher.download(spec, uri, repository.download_path_for(:gem))
+      Gem::RemoteFetcher.fetcher.download(spec, uri, destination)
     end
 
   private
@@ -55,7 +55,46 @@ module Bundler
     end
   end
 
+  class GemDirectorySource < Source
+    attr_reader :location
+
+    def initialize(options)
+      @location = options[:location]
+    end
+
+    def gems
+      @specs ||= fetch_specs
+    end
+
+    def ==(other)
+      location == other.location
+    end
+
+    def to_s
+      location.to_s
+    end
+
+    def download(spec)
+      # raise NotImplementedError
+    end
+
+  private
+
+    def fetch_specs
+      specs = {}
+
+      Dir["#{@location}/*.gem"].each do |gemfile|
+        spec = Gem::Format.from_file_by_path(gemfile).spec
+        specs[spec.full_name] = spec
+      end
+
+      specs
+    end
+  end
+
   class DirectorySource < Source
+    attr_reader :location
+
     def initialize(options)
       @name          = options[:name]
       @version       = options[:version]
@@ -68,10 +107,9 @@ module Bundler
         specs = {}
 
         # Find any gemspec files in the directory and load those specs
-        Dir["#{@location}/**/*.gemspec"].each do |file|
-          path = Pathname.new(file).relative_path_from(@location).dirname
+        Dir["#{location}/**/*.gemspec"].each do |file|
           spec = eval(File.read(file))
-          spec.require_paths.map! { |p| path.join(p) }
+          spec.location = Pathname.new(file).dirname.expand_path
           specs[spec.full_name] = spec
         end
 
@@ -87,8 +125,9 @@ module Bundler
           end
 
           default = Gem::Specification.new do |s|
-            s.name = @name
-            s.version = Gem::Version.new(@version) if @version
+            s.name     = @name
+            s.version  = Gem::Version.new(@version) if @version
+            s.location = location
           end
           specs[default.full_name] = default
         end
@@ -103,12 +142,19 @@ module Bundler
     end
 
     def to_s
-      "#{@name} (#{@version}) Located at: '#{@location}'"
+      "#{@name} (#{@version}) Located at: '#{location}'"
     end
 
-    def download(spec, repository)
-      spec.require_paths.map! { |p| File.join(@location, p) }
-      repository.add_spec(:directory, spec)
+    def download(spec)
+      # repository.download_path_for(:gem)
+      # FileUtils.mkdir_p(repository.download_path_for(:gem).join("gems"))
+      # File.symlink(
+      #   @location.join(spec.location),
+      #   repository.download_path_for(:gem).join("gems", spec.full_name)
+      # )
+      # repository.add_spec(spec)
+
+      # Nothing needed here
     end
   end
 
@@ -120,31 +166,42 @@ module Bundler
       @branch = options[:branch]
     end
 
-    def gems
-      FileUtils.mkdir_p(tmp_path.join("gitz"))
-
+    def location
       # TMP HAX to get the *.gemspec reading to work
-      @location = tmp_path.join("gitz", @name)
+      repository.path.join('dirs', File.basename(@uri, '.git'))
+    end
 
-      Bundler.logger.info "Cloning git repository at: #{@uri}"
-      `git clone #{@uri} #{@location} --no-hardlinks`
+    def gems
+      if location.directory?
+        Bundler.logger.info "Git repository #{@uri} has already been cloned"
+      else
+        FileUtils.mkdir_p(location)
 
-      if @ref
-        Dir.chdir(@location) { `git checkout #{@ref}` }
-      elsif @branch && @branch != "master"
-        Dir.chdir(@location) { `git checkout origin/#{@branch}` }
+        Bundler.logger.info "Cloning git repository at: #{@uri}"
+        `git clone #{@uri} #{location} --no-hardlinks`
+
+        if @ref
+          Dir.chdir(location) { `git checkout #{@ref}` }
+        elsif @branch && @branch != "master"
+          Dir.chdir(location) { `git checkout origin/#{@branch}` }
+        end
       end
       super
     end
 
-    def download(spec, repository)
-      dest = repository.download_path_for(:directory).join(@name)
-      spec.require_paths.map! { |p| File.join(dest, p) }
-      repository.add_spec(:directory, spec)
-      if spec.name == @name
-        FileUtils.mkdir_p(dest.dirname)
-        FileUtils.mv(tmp_path.join("gitz", spec.name), dest)
-      end
+    def download(spec)
+      # dest = repository.download_path_for(:directory).join(@name)
+      # repository.add_spec(spec)
+      # FileUtils.mkdir_p(repository.download_path_for(:gem).join("gems"))
+      # File.symlink(
+      #   dest.join(spec.location),
+      #   repository.download_path_for(:gem).join("gems", spec.full_name)
+      # )
+      # # TMPHAX
+      # if spec.name == @name && !dest.directory?
+      #   FileUtils.mkdir_p(dest.dirname)
+      #   FileUtils.mv(tmp_path.join("gitz", spec.name), dest)
+      # end
     end
   end
 end

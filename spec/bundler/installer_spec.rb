@@ -75,20 +75,6 @@ describe "Installing gems" do
       lambda { @manifest.install }.should_not change { [dir.mtime, spec.mtime] }
     end
 
-    it "deletes a .gemspec file that is to be installed if a directory of the same name does not exist" do
-      spec = bundled_app("vendor", "gems", "specifications", "rails-2.3.2.gemspec")
-      spec.touch_p
-      setup
-      lambda { @manifest.install }.should change { spec.mtime }
-    end
-
-    it "deletes a directory that is to be installed if a .gemspec of the same name does not exist" do
-      dir = bundled_app("vendor", "gems", "gems", "rails-2.3.2")
-      dir.mkdir_p
-      setup
-      lambda { @manifest.install }.should change { dir.mtime }
-    end
-
     it "keeps bin files for already installed gems" do
       setup
       @manifest.install
@@ -126,7 +112,8 @@ describe "Installing gems" do
       setup
       @manifest.install
       @gems.each do |name|
-        @log_output.should have_log_message("Installing #{name}.gem")
+        name, version = name.split("-")
+        @log_output.should have_log_message("Installing #{name} (#{version})")
       end
     end
 

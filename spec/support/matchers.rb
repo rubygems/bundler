@@ -71,15 +71,31 @@ module Spec
     def include_installed_gems(*gems)
       simple_matcher("include installed gems") do |given, matcher|
         matcher.negative_failure_message = "Gems #{gems.join(", ")} were all installed"
-        gems.all? do |name|
-          matcher.failure_message = "Gem #{name} was not installed"
-          File.exists?(File.join(given, "specifications", "#{name}.gemspec")) &&
-          File.directory?(File.join(given, "gems", "#{name}"))
+        missing = []
+        gems.each do |name|
+          missing << name unless given.join("specifications", "#{name}.gemspec").file? &&
+            given.join("gems", name).directory?
         end
+        matcher.failure_message = "Gems #{missing.join(', ')} were not installed"
+        missing.empty?
       end
     end
 
     alias include_installed_gem include_installed_gems
+
+    def include_vendored_dirs(*dirs)
+      simple_matcher("include vendored dirs") do |given, matcher|
+        matcher.negative_failure_message = "Dirs #{dirs.join(", ")} were all vendored"
+        missing = []
+        dirs.each do |name|
+          missing << name unless given.join("dirs", name).directory?
+        end
+        matcher.failure_message = "Dirs #{missing.join(', ')} were not vendored"
+        missing.empty?
+      end
+    end
+
+    alias include_vendored_dir include_vendored_dirs
 
     def have_cached_gems(*gems)
       simple_matcher("have cached gems") do |given, matcher|

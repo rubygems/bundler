@@ -8,18 +8,6 @@ module Bundler
         @bindir = bindir
       end
 
-      # Returns the source index for all gems installed in the
-      # repository
-      def source_index
-        index = Gem::SourceIndex.from_gems_in(@path.join("specifications"))
-        index.each { |n, spec| spec.loaded_from = @path.join("specifications", "#{spec.full_name}.gemspec") }
-        index
-      end
-
-      def gems
-        source_index.gems.values
-      end
-
       # Checks whether a gem is installed
       def expand(options)
         cached_gems.each do |name, version|
@@ -27,23 +15,6 @@ module Bundler
             install_cached_gem(name, version, options)
           end
         end
-      end
-
-      def cleanup(gems)
-        glob = gems.map { |g| g.full_name }.join(',')
-        base = path.join("{cache,specifications,gems}")
-
-        (Dir["#{base}/*"] - Dir["#{base}/{#{glob}}{.gemspec,.gem,}"]).each do |file|
-          if File.basename(file) =~ /\.gem$/
-            name = File.basename(file, '.gem')
-            Bundler.logger.info "Deleting gem: #{name}"
-          end
-          FileUtils.rm_rf(file)
-        end
-      end
-
-      def add_spec(spec)
-        raise NotImplementedError
       end
 
       def download_path_for

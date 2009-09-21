@@ -18,7 +18,8 @@ describe "Faking gems with directories" do
 
         it "does not download the gem" do
           tmp_gem_path.should_not include_cached_gem("very-simple-1.0")
-          tmp_gem_path.should_not include_installed_gem("very-simple-1.0")
+          tmp_gem_path.should     include_installed_gem("very-simple-1.0")
+          tmp_gem_path.should_not include_vendored_dir("very-simple")
         end
 
         it "has very-simple in the load path" do

@@ -75,7 +75,8 @@ describe "Bundler::Environment" do
         rake-0.8.7 actionpack-2.3.2
         activeresource-2.3.2 rails-2.3.2)
 
-      tmp_gem_path.should have_cached_gems(*gems)
+      # Keeps cached gems
+      tmp_gem_path.should have_cached_gems(*(gems + ["rack-0.9.1"]))
       tmp_gem_path.should have_installed_gems(*gems)
     end
 
@@ -94,26 +95,12 @@ describe "Bundler::Environment" do
 
       m.install
 
-      tmp_gem_path.should_not include_cached_gem("rack-0.9.1")
+      # Gem caches are not removed
+      tmp_gem_path.should include_cached_gem("rack-0.9.1")
       tmp_gem_path.should_not include_installed_gem("rack-0.9.1")
       tmp_bindir("rackup").should_not exist
-      @log_output.should have_log_message("Deleting gem: rack-0.9.1")
+      @log_output.should have_log_message("Deleting gem: rack (0.9.1)")
       @log_output.should have_log_message("Deleting bin file: rackup")
-    end
-
-    it "removes stray specfiles" do
-      spec = tmp_gem_path("specifications", "omg.gemspec")
-      FileUtils.mkdir_p(tmp_gem_path("specifications"))
-      FileUtils.touch(spec)
-      @manifest.install
-      spec.should_not exist
-    end
-
-    it "removes any stray directories in gems that are not to be installed" do
-      dir = tmp_gem_path("gems", "omg")
-      FileUtils.mkdir_p(dir)
-      @manifest.install
-      dir.should_not exist
     end
 
     it "raises a friendly exception if the manifest doesn't resolve" do

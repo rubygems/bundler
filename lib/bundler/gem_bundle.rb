@@ -1,8 +1,8 @@
 module Bundler
   class GemBundle < Array
-    def download(repository)
+    def download
       sort_by {|s| s.full_name.downcase }.each do |spec|
-        spec.source.download(spec, repository)
+        spec.source.download(spec)
       end
 
       self

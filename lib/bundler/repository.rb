@@ -13,51 +13,49 @@ module Bundler
       @path   = Pathname.new(path)
       @bindir = Pathname.new(bindir)
 
-      @repos = {
-        :gem       => Gems.new(@path, @bindir),
-        :directory => Directory.new(@path.join("dirs"), @bindir)
-      }
+      @cache = GemDirectorySource.new(:location => @path.join("cache"))
     end
 
     def install(dependencies, sources, options = {})
-      if options[:update] || !satisfies?(dependencies)
-        fetch(dependencies, sources)
-        expand(options)
-      else
-        # Remove any gems that are still around if the Gemfile changed without
-        # requiring new gems to be download (e.g. a line in the Gemfile was
-        # removed)
-        cleanup(Resolver.resolve(dependencies, [source_index]))
+      # TODO: clean this up
+      sources.each { |s| s.repository = self }
+
+      begin
+        valid = Resolver.resolve(dependencies, [source_index])
+      rescue Bundler::GemNotFound
       end
-      configure(options)
-      sync
+
+      if options[:update] || !valid
+        bundle = Resolver.resolve(dependencies, [@cache] + sources)
+        bundle.download
+
+        bundle.each do |spec|
+          spec.loaded_from = @path.join("specifications", "#{spec.full_name}.gemspec")
+          # Do nothing if the gem is already expanded
+          next if @path.join("gems", spec.full_name).directory?
+
+          case spec.source
+          when GemSource, GemDirectorySource
+            expand_gemfile(spec, options)
+          else
+            expand_vendored_gem(spec, options)
+          end
+        end
+
+        valid = bundle
+      end
+      cleanup(valid)
+      configure(valid, options)
     end
 
     def gems
-      gems = []
-      each_repo do |repo|
-        gems.concat repo.gems
-      end
-      gems
-    end
-
-    def satisfies?(dependencies)
-      index = source_index
-      dependencies.all? { |dep| index.search(dep).size > 0 }
+      source_index.gems.values
     end
 
     def source_index
-      index = Gem::SourceIndex.new
-
-      each_repo do |repo|
-        index.gems.merge!(repo.source_index.gems)
-      end
-
+      index = Gem::SourceIndex.from_gems_in(@path.join("specifications"))
+      index.each { |n, spec| spec.loaded_from = @path.join("specifications", "#{spec.full_name}.gemspec") }
       index
-    end
-
-    def add_spec(type, spec)
-      @repos[type].add_spec(spec)
     end
 
     def download_path_for(type)
@@ -66,34 +64,51 @@ module Bundler
 
   private
 
-    def cleanup(bundle)
-      each_repo do |repo|
-        repo.cleanup(bundle)
+    def expand_gemfile(spec, options)
+      Bundler.logger.info "Installing #{spec.name} (#{spec.version})"
+
+      gemfile = @path.join("cache", "#{spec.full_name}.gem").to_s
+
+      installer = Gem::Installer.new(gemfile, options.merge(
+        :install_dir         => @path,
+        :ignore_dependencies => true,
+        :env_shebang         => true,
+        :wrappers            => true,
+        :bin_dir             => @bindir
+      ))
+      installer.install
+    end
+
+    def expand_vendored_gem(spec, options)
+      add_spec(spec)
+      FileUtils.mkdir_p(@path.join("gems"))
+      File.symlink(spec.location, @path.join("gems", spec.full_name))
+    end
+
+    def add_spec(spec)
+      destination = path.join('specifications')
+      destination.mkdir unless destination.exist?
+
+      File.open(destination.join("#{spec.full_name}.gemspec"), 'w') do |f|
+        f.puts spec.to_ruby
       end
     end
 
-    def each_repo
-      @repos.each do |k, repo|
-        yield repo
+    def cleanup(valid)
+      to_delete = gems
+      to_delete.delete_if do |spec|
+        valid.any? { |other| spec.name == other.name && spec.version == other.version }
       end
-    end
 
-    def fetch(dependencies, sources)
-      bundle = Resolver.resolve(dependencies, sources)
-      # Cleanup here to remove any gems that could cause problem in the expansion
-      # phase
-      #
-      # TODO: Try to avoid double cleanup
-      cleanup(bundle)
-      bundle.download(self)
-    end
-
-    def sync
-      glob = gems.map { |g| g.executables }.flatten.join(',')
-
-      (Dir["#{@bindir}/*"] - Dir["#{@bindir}/{#{glob}}"]).each do |file|
-        Bundler.logger.info "Deleting bin file: #{File.basename(file)}"
-        FileUtils.rm_rf(file)
+      to_delete.each do |spec|
+        Bundler.logger.info "Deleting gem: #{spec.name} (#{spec.version})"
+        FileUtils.rm_rf(@path.join("specifications", "#{spec.full_name}.gemspec"))
+        FileUtils.rm_rf(@path.join("gems", spec.full_name))
+        # Cleanup the bin directory
+        spec.executables.each do |bin|
+          Bundler.logger.info "Deleting bin file: #{bin}"
+          FileUtils.rm_rf(@bindir.join(bin))
+        end
       end
     end
 
@@ -103,14 +118,13 @@ module Bundler
       end
     end
 
-    def configure(options)
-      generate_environment(options)
+    def configure(specs, options)
+      generate_environment(specs, options)
     end
 
-    def generate_environment(options)
+    def generate_environment(specs, options)
       FileUtils.mkdir_p(path)
 
-      specs      = gems
       load_paths = load_paths_for_specs(specs)
       bindir     = @bindir.relative_path_from(path).to_s
       filename   = options[:manifest].relative_path_from(path).to_s

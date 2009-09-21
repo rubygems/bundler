@@ -65,10 +65,10 @@ describe "Bundler::CLI" do
         "Downloading extlib-0.9.12.gem",
         "Downloading rack-0.9.1.gem",
         "Downloading very-simple-1.0.gem",
-        "Installing rake-0.8.7.gem",
-        "Installing extlib-0.9.12.gem",
-        "Installing rack-0.9.1.gem",
-        "Installing very-simple-1.0.gem",
+        "Installing rake (0.8.7)",
+        "Installing extlib (0.9.12)",
+        "Installing rack (0.9.1)",
+        "Installing very-simple (1.0)",
         "Done." ].each do |message|
           @output.should =~ /^#{Regexp.escape(message)}$/
         end
@@ -211,7 +211,7 @@ describe "Bundler::CLI" do
       Dir.chdir(bundled_app) do
         gem_command :bundle, "--update"
       end
-      bundled_app("vendor", "gems").should have_cached_gems("rack-1.0.0")
+      bundled_app("vendor", "gems").should include_cached_gems("rack-1.0.0")
       bundled_app("vendor", "gems").should have_installed_gems("rack-1.0.0")
     end
   end
