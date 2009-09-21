@@ -45,11 +45,17 @@ module Bundler
     def fetch_specs
       Bundler.logger.info "Updating source: #{to_s}"
 
-      deflated = Gem::RemoteFetcher.fetcher.fetch_path("#{uri}/Marshal.4.8.Z")
-      inflated = Gem.inflate deflated
+      fetcher = Gem::RemoteFetcher.fetcher
+      main_index = fetcher.fetch_path("#{uri}/specs.4.8.gz")
+      prerelease_index = fetcher.fetch_path("#{uri}/prerelease_specs.4.8.gz")
+      index = Marshal.load(main_index) + Marshal.load(prerelease_index)
 
-      index = Marshal.load(inflated)
-      index.gems
+      gems = {}
+      index.each do |name, version, platform|
+        spec = RemoteSpecification.new(name, version, platform, @uri)
+        gems[spec.full_name] = spec
+      end
+      gems
     rescue Gem::RemoteFetcher::FetchError => e
       raise ArgumentError, "#{to_s} is not a valid source: #{e.message}"
     end

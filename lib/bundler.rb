@@ -16,6 +16,7 @@ require "bundler/dsl"
 require "bundler/cli"
 require "bundler/repository"
 require "bundler/dependency"
+require "bundler/remote_specification"
 
 module Bundler
   VERSION = "0.5.0"

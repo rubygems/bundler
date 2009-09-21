@@ -68,4 +68,16 @@ describe "Fetcher" do
     @log_output.should have_log_message("Updating source: file:#{gem_repo2}")
   end
 
+  it "works with repositories that don't provide Marshal.4.8.Z" do
+    gem_repo1.cp_r(tmp_path.join('bogus_repo'))
+    Dir["#{tmp_path.join('bogus_repo')}/Marshal.*"].each { |f| File.unlink(f) }
+
+    install_manifest <<-Gemfile
+      clear_sources
+      source "file://#{tmp_path.join('bogus_repo')}"
+      gem "rack"
+    Gemfile
+
+    bundled_app.should have_cached_gems("rack-0.9.1")
+  end
 end
