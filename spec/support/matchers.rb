@@ -56,10 +56,13 @@ module Spec
     def include_cached_gems(*gems)
       simple_matcher("include cached gems") do |given, matcher|
         matcher.negative_failure_message = "Gems #{gems.join(", ")} were all cached"
-        gems.all? do |name|
-          matcher.failure_message = "Gem #{name} was not cached"
-          File.exists?(File.join(given, "cache", "#{name}.gem"))
+        missing = []
+        gems.each do |name|
+          missing << name unless given.join("cache", "#{name}.gem").file?
         end
+        cached = Dir["#{given}/cache/*.gem"].map { |name| "    #{File.basename(name, '.gem')}" }.join("\n")
+        matcher.failure_message = "Gems #{missing.join(', ')} were not cached\n  Cached:\n#{cached}"
+        missing.empty?
       end
     end
 
@@ -80,15 +83,17 @@ module Spec
 
     def have_cached_gems(*gems)
       simple_matcher("have cached gems") do |given, matcher|
-        installed = Dir[File.join(given, "cache", "*.gem")]
-        matcher.failure_message = "The following gems were cached:\n#{installed.join("\n")}\n\n" \
-                                  "Expected:\n#{gems.join("\n")}"
+        gems      = gems.sort
+        cache_dir = Dir["#{given}/cache/*.gem"].map { |f| File.basename(f, ".gem") }.sort
 
-        Dir[File.join(given, "cache", "*.gem")].length == gems.length &&
-        gems.all? do |name|
-          matcher.failure_message = "Gem #{name} was not cached"
-          File.exists?(File.join(given, "cache", "#{name}.gem"))
+        unless cache_dir == gems
+          gem_fail = "The gem cache did not match:\n"
+          gem_fail << "  Extra:   #{(cache_dir - gems).join(', ')}\n" if (cache_dir - gems).any?
+          gem_fail << "  Missing: #{(gems - cache_dir).join(', ')}\n" if (gems - cache_dir).any?
         end
+
+        matcher.failure_message = gem_fail
+        !gem_fail
       end
     end
 
@@ -96,13 +101,24 @@ module Spec
 
     def have_installed_gems(*gems)
       simple_matcher("have installed gems") do |given, matcher|
-        Dir[File.join(given, "specifications", "*.gemspec")].length == gems.length &&
-        Dir[File.join(given, "gems", "*")].length == gems.length &&
-        gems.all? do |name|
-          matcher.failure_message = "Gem #{name} was not installed"
-          File.exists?(File.join(given, "specifications", "#{name}.gemspec")) &&
-          File.directory?(File.join(given, "gems", "#{name}"))
+        gems     = gems.sort
+        gem_dir  = Dir["#{given}/gems/*"].map { |f| File.basename(f) }.sort
+        spec_dir = Dir["#{given}/specifications/*.gemspec"].map { |f| File.basename(f, ".gemspec") }.sort
+
+        unless gem_dir == gems
+          gem_fail = "The gem directory did not match:\n"
+          gem_fail << "  Extra:   #{(gem_dir - gems).join(', ')}\n" if (gem_dir - gems).any?
+          gem_fail << "  Missing: #{(gems - gem_dir).join(', ')}\n" if (gems - gem_dir).any?
         end
+
+        unless spec_dir == gems
+          spec_fail = "The spec directory did not match:\n"
+          spec_fail << "  Extra:   #{(spec_dir - gems).join(', ')}\n" if (spec_dir - gems).any?
+          spec_fail << "  Missing: #{(gems - spec_dir).join(', ')}\n" if (gems - spec_dir).any?
+        end
+
+        matcher.failure_message = [gem_fail, spec_fail].compact.join("\n")
+        !gem_fail && !spec_fail
       end
     end
 
