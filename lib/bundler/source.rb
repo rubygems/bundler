@@ -135,10 +135,10 @@ module Bundler
         if specs.keys.grep(/^#{Regexp.escape(@name)}/).empty?
           case
           when @version.nil?
-            raise ArgumentError, "If you use :at, you must specify the gem" \
+            raise ArgumentError, "If you use :at, you must specify the gem " \
               "and version you wish to stand in for"
           when !Gem::Version.correct?(@version)
-            raise ArgumentError, "If you use :at, you must specify a gem and" \
+            raise ArgumentError, "If you use :at, you must specify a gem and " \
               "version. You specified #{@version} for the version"
           end
 
