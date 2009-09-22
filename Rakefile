@@ -1,12 +1,14 @@
+$:.unshift File.join(File.dirname(__FILE__), 'lib')
 require 'rubygems' unless ENV['NO_RUBYGEMS']
 require 'rubygems/specification'
+require 'bundler'
 require 'date'
 
 spec = Gem::Specification.new do |s|
   s.name    = "bundler"
-  s.version = "0.5.1.pre"
-  s.author  = "Yehuda Katz"
-  s.email   = "wycats@gmail.com"
+  s.version = Bundler::VERSION
+  s.authors = ["Yehuda Katz", "Carl Lerche"]
+  s.email   = ["wycats@gmail.com", "clerche@engineyard.com"]
   s.homepage = "http://github.com/wycats/bundler"
   s.description = s.summary = "An easy way to vendor gem dependencies"
 
