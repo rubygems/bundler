@@ -104,12 +104,13 @@ module Bundler
 
       # HAX -- Generate the bin
       bin_dir = @bindir
+      path    = @path
       installer = Gem::Installer.allocate
       installer.instance_eval do
         @spec     = spec
         @bin_dir  = bin_dir
-        @gem_dir  = spec.location
-        @gem_home = spec.location
+        @gem_dir  = path.join("gems", "#{spec.full_name}")
+        @gem_home = path
         @wrappers = true
       end
       installer.generate_bin

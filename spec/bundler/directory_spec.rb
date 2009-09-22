@@ -112,7 +112,7 @@ describe "Faking gems with directories" do
   it "copies bin files to the bin dir" do
     path = lib_builder('very-simple', '1.0', :path => tmp_path("very-simple")) do |s|
       s.executables << 'very_simple'
-      s.write "bin/very_simple", "#!/usr/bin/env ruby\nputs 'OMG'"
+      s.write "bin/very_simple", "#!#{Gem.ruby}\nputs 'OMG'"
     end
 
     install_manifest <<-Gemfile
@@ -121,5 +121,6 @@ describe "Faking gems with directories" do
     Gemfile
 
     tmp_bindir('very_simple').should exist
+    `#{tmp_bindir('very_simple')}`.strip.should == 'OMG'
   end
 end
