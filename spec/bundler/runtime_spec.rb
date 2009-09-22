@@ -76,8 +76,8 @@ describe "Bundler runtime" do
       Gemfile
 
       out = run_in_context <<-RUBY
-        Bundler.require_env      ; puts defined?(VerySimpleForTests)
-        Bundler.require_env :foo ; puts defined?(VerySimpleForTests)
+        Bundler.require_env      ; puts defined?(VerySimpleForTests).inspect
+        Bundler.require_env :foo ; puts defined?(VerySimpleForTests).inspect
         Bundler.require_env :bar ; puts defined?(VerySimpleForTests)
       RUBY
 
@@ -92,7 +92,7 @@ describe "Bundler runtime" do
       Gemfile
 
       out = run_in_context <<-RUBY
-        Bundler.require_env :bar ; puts defined?(VerySimpleForTests)
+        Bundler.require_env :bar ; puts defined?(VerySimpleForTests).inspect
         Bundler.require_env :foo ; puts defined?(VerySimpleForTests)
       RUBY
 

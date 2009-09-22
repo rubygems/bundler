@@ -145,7 +145,7 @@ describe "Bundler::Environment" do
       Gemfile
 
       m.install
-      out = run_in_context "begin ; require 'rake' ; rescue LoadError ; puts('WIN') ; end"
+      out = run_in_context "begin ; require 'spec' ; rescue LoadError ; puts('WIN') ; end"
       out.should == "WIN"
     end
 

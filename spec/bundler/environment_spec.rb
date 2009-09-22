@@ -26,7 +26,7 @@ describe "Bundler::Environment" do
       out = ruby <<-RUBY
         require 'bundler'
         Bundler::Environment.load.require_env
-        puts defined?(Rake)
+        puts defined?(Rake).inspect
       RUBY
       out.should == "nil"
       out = ruby <<-RUBY
