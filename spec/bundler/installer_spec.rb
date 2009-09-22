@@ -64,6 +64,14 @@ describe "Installing gems" do
       bundled_app("omgbinz", "rails").should exist
     end
 
+    it "does not remove any existing bin files" do
+      bundled_app("bin").mkdir_p
+      bundled_app("bin", "hello").touch
+      setup
+      @manifest.install
+      bundled_app("bin", "hello").should exist
+    end
+
     it "does not modify any .gemspec files that are to be installed if a directory of the same name exists" do
       dir  = bundled_app("gems", "rails-2.3.2")
       spec = bundled_app("specifications", "rails-2.3.2.gemspec")

@@ -29,12 +29,10 @@ module Bundler
       end
 
       if options[:cached]
-        local_sources = [@cache] + sources.select { |s| s.can_be_local? }
+        sources = sources.select { |s| s.can_be_local? }
+      end
 
-        bundle = Resolver.resolve(dependencies, local_sources)
-        do_install(bundle, options)
-        valid = bundle
-      elsif options[:update] || !valid
+      if options[:update] || !valid
         bundle = Resolver.resolve(dependencies, [@cache] + sources)
         do_install(bundle, options)
         valid = bundle
@@ -103,6 +101,18 @@ module Bundler
       add_spec(spec)
       FileUtils.mkdir_p(@path.join("gems"))
       File.symlink(spec.location, @path.join("gems", spec.full_name))
+
+      # HAX -- Generate the bin
+      bin_dir = @bindir
+      installer = Gem::Installer.allocate
+      installer.instance_eval do
+        @spec     = spec
+        @bin_dir  = bin_dir
+        @gem_dir  = spec.location
+        @gem_home = spec.location
+        @wrappers = true
+      end
+      installer.generate_bin
     end
 
     def add_spec(spec)
