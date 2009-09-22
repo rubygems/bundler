@@ -179,7 +179,9 @@ module Bundler
     def search(dependency)
       @cache[dependency.hash] ||= begin
         @specs[dependency.name].values.select do |spec|
-          dependency =~ spec
+          match = dependency =~ spec
+          match &= dependency.version_requirements.prerelease? if spec.version.prerelease?
+          match
         end.sort_by {|s| s.version }
       end
     end
