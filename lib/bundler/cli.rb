@@ -27,7 +27,7 @@ module Bundler
     end
 
     def bundle
-      @manifest.install(@options[:update])
+      @manifest.install(@options)
     end
 
     def exec

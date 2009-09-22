@@ -44,12 +44,16 @@ module Bundler
       builder.instance_eval(File.read(filename))
     end
 
-    def install(update = false)
+    def install(options = {})
+      update = options[:update]
+      cached = options[:cached]
+
       repository.install(gem_dependencies, sources,
         :rubygems    => rubygems,
         :system_gems => system_gems,
         :manifest    => filename,
-        :update      => update
+        :update      => update,
+        :cached      => cached
       )
       Bundler.logger.info "Done."
     end

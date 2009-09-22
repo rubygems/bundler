@@ -215,4 +215,49 @@ describe "Bundler::CLI" do
       bundled_app("vendor", "gems").should have_installed_gems("rack-1.0.0")
     end
   end
+
+  describe "bundling from the local cache" do
+    before(:each) do
+      install_manifest <<-Gemfile
+        clear_sources
+        source "file://#{gem_repo1}"
+        gem "rack", "0.9.1"
+      Gemfile
+
+      %w(doc environment.rb gems specifications).each do |f|
+        FileUtils.rm_rf(tmp_gem_path.join(f))
+      end
+    end
+
+    it "only uses the localy cached gems when bundling with --cache" do
+      build_manifest <<-Gemfile
+        clear_sources
+        source "file://#{gem_repo2}"
+        gem "rack"
+      Gemfile
+
+      Dir.chdir(bundled_app) do
+        gem_command :bundle, "--cached"
+        tmp_gem_path.should include_cached_gems("rack-0.9.1")
+        tmp_gem_path.should have_installed_gems("rack-0.9.1")
+      end
+    end
+
+    it "raises an exception when there are missing gems in the cache" do
+      Dir["#{tmp_gem_path}/cache/*"].each { |f| FileUtils.rm_rf(f) }
+
+      build_manifest <<-Gemfile
+        clear_sources
+        source "file://#{gem_repo2}"
+        gem "rack"
+      Gemfile
+
+      Dir.chdir(bundled_app) do
+        out = gem_command :bundle, "--cached"
+        out.should include("Could not find gem 'rack (>= 0, runtime)' in any of the sources")
+        tmp_gem_path.should_not include_cached_gems("rack-0.9.1", "rack-1.0.0")
+        tmp_gem_path.should_not include_installed_gems("rack-0.9.1", "rack-1.0.0")
+      end
+    end
+  end
 end

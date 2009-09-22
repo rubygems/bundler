@@ -25,23 +25,13 @@ module Bundler
       rescue Bundler::GemNotFound
       end
 
-      if options[:update] || !valid
+      if options[:cached]
+        bundle = Resolver.resolve(dependencies, [@cache])
+        do_install(bundle, options)
+        valid = bundle
+      elsif options[:update] || !valid
         bundle = Resolver.resolve(dependencies, [@cache] + sources)
-        bundle.download
-
-        bundle.each do |spec|
-          spec.loaded_from = @path.join("specifications", "#{spec.full_name}.gemspec")
-          # Do nothing if the gem is already expanded
-          next if @path.join("gems", spec.full_name).directory?
-
-          case spec.source
-          when GemSource, GemDirectorySource
-            expand_gemfile(spec, options)
-          else
-            expand_vendored_gem(spec, options)
-          end
-        end
-
+        do_install(bundle, options)
         valid = bundle
       end
       cleanup(valid)
@@ -63,6 +53,23 @@ module Bundler
     end
 
   private
+
+    def do_install(bundle, options)
+      bundle.download
+
+      bundle.each do |spec|
+        spec.loaded_from = @path.join("specifications", "#{spec.full_name}.gemspec")
+        # Do nothing if the gem is already expanded
+        next if @path.join("gems", spec.full_name).directory?
+
+        case spec.source
+        when GemSource, GemDirectorySource
+          expand_gemfile(spec, options)
+        else
+          expand_vendored_gem(spec, options)
+        end
+      end
+    end
 
     def expand_gemfile(spec, options)
       Bundler.logger.info "Installing #{spec.name} (#{spec.version})"

@@ -10,6 +10,10 @@ class Gem::Commands::BundleCommand < Gem::Command
     add_option('-u', '--update', "Force a remote check for newer gems") do
       options[:update] = true
     end
+
+    add_option('--cached', "Only use cached gems when expanding the bundle") do
+      options[:cached] = true
+    end
   end
 
   def usage
