@@ -22,6 +22,9 @@ module Bundler
     rescue InvalidCacheArgument => e
       Bundler.logger.error e.message
       exit 8
+    rescue SourceNotCached => e
+      Bundler.logger.error e.message
+      exit 9
     end
 
     def initialize(options)

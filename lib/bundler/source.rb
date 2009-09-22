@@ -2,7 +2,7 @@ module Bundler
   # Represents a source of rubygems. Initially, this is only gem repositories, but
   # eventually, this will be git, svn, HTTP
   class Source
-    attr_accessor :repository
+    attr_accessor :repository, :local
   end
 
   class GemSource < Source
@@ -12,6 +12,10 @@ module Bundler
       @uri = options[:uri]
       @uri = URI.parse(@uri) unless @uri.is_a?(URI)
       raise ArgumentError, "The source must be an absolute URI" unless @uri.absolute?
+    end
+
+    def can_be_local?
+      false
     end
 
     def gems
@@ -68,6 +72,10 @@ module Bundler
       @location = options[:location]
     end
 
+    def can_be_local?
+      true
+    end
+
     def gems
       @specs ||= fetch_specs
     end
@@ -106,6 +114,10 @@ module Bundler
       @version       = options[:version]
       @location      = options[:location]
       @require_paths = options[:require_paths] || %w(lib)
+    end
+
+    def can_be_local?
+      true
     end
 
     def gems
@@ -152,14 +164,6 @@ module Bundler
     end
 
     def download(spec)
-      # repository.download_path_for(:gem)
-      # FileUtils.mkdir_p(repository.download_path_for(:gem).join("gems"))
-      # File.symlink(
-      #   @location.join(spec.location),
-      #   repository.download_path_for(:gem).join("gems", spec.full_name)
-      # )
-      # repository.add_spec(spec)
-
       # Nothing needed here
     end
   end
@@ -178,9 +182,13 @@ module Bundler
     end
 
     def gems
-      if location.directory?
-        Bundler.logger.info "Git repository #{@uri} has already been cloned"
-      else
+      unless location.directory?
+        # Raise an error if the source should run in local mode,
+        # but it has not been cached yet.
+        if local
+          raise SourceNotCached, "Git repository '#{@uri}' has not been cloned yet"
+        end
+
         FileUtils.mkdir_p(location.dirname)
 
         Bundler.logger.info "Cloning git repository at: #{@uri}"
@@ -196,18 +204,7 @@ module Bundler
     end
 
     def download(spec)
-      # dest = repository.download_path_for(:directory).join(@name)
-      # repository.add_spec(spec)
-      # FileUtils.mkdir_p(repository.download_path_for(:gem).join("gems"))
-      # File.symlink(
-      #   dest.join(spec.location),
-      #   repository.download_path_for(:gem).join("gems", spec.full_name)
-      # )
-      # # TMPHAX
-      # if spec.name == @name && !dest.directory?
-      #   FileUtils.mkdir_p(dest.dirname)
-      #   FileUtils.mv(tmp_path.join("gitz", spec.name), dest)
-      # end
+      # Nothing needed here
     end
   end
 end

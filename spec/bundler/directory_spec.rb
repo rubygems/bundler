@@ -35,6 +35,18 @@ describe "Faking gems with directories" do
 
           fixture_dir.join("very-simple").should be_directory
         end
+
+        it "can bundle --cached" do
+          %w(doc gems specifications environment.rb).each do |file|
+            FileUtils.rm_rf(tmp_gem_path(file))
+          end
+
+          Dir.chdir(bundled_app) do
+            out = gem_command :bundle, "--cached"
+            out = run_in_context "require 'very-simple' ; puts VerySimpleForTests"
+            out.should == "VerySimpleForTests"
+          end
+        end
       end
     end
 

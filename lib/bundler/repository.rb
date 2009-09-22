@@ -18,7 +18,10 @@ module Bundler
 
     def install(dependencies, sources, options = {})
       # TODO: clean this up
-      sources.each { |s| s.repository = self }
+      sources.each do |s|
+        s.repository = self
+        s.local = options[:cached]
+      end
 
       begin
         valid = Resolver.resolve(dependencies, [source_index])
@@ -26,7 +29,9 @@ module Bundler
       end
 
       if options[:cached]
-        bundle = Resolver.resolve(dependencies, [@cache])
+        local_sources = [@cache] + sources.select { |s| s.can_be_local? }
+
+        bundle = Resolver.resolve(dependencies, local_sources)
         do_install(bundle, options)
         valid = bundle
       elsif options[:update] || !valid

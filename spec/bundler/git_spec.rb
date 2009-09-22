@@ -37,6 +37,19 @@ describe "Getting gems from git" do
     it "logs that the repo is being cloned" do
       @log_output.should have_log_message("Cloning git repository at: #{@path}")
     end
+
+    it "can bundle --cached when the git repository has already been cloned" do
+      %w(doc gems specifications environment.rb).each do |file|
+        FileUtils.rm_rf(tmp_gem_path(file))
+      end
+      FileUtils.rm_rf(@path)
+
+      Dir.chdir(bundled_app) do
+        out = gem_command :bundle, "--cached"
+        out = run_in_context "require 'very-simple' ; puts VerySimpleForTests"
+        out.should == "VerySimpleForTests"
+      end
+    end
   end
 
   it "checks the root directory for a *.gemspec file" do
@@ -94,4 +107,21 @@ describe "Getting gems from git" do
     out.should == "tagged"
   end
 
+  it "raises an error if trying to run in --cached mode but the repository has not been cloned" do
+    @path = build_git_repo "very-simple", :with => fixture_dir.join("very-simple")
+    build_manifest <<-Gemfile
+      clear_sources
+      source "file://#{gem_repo1}"
+      gem "very-simple", "1.0", :git => "#{@path}"
+    Gemfile
+
+    Dir.chdir(bundled_app) do
+      out = gem_command :bundle, "--cached"
+      out.should include("Git repository '#{@path}' has not been cloned yet")
+
+      tmp_gem_path.should_not include_cached_gem("very-simple-1.0")
+      tmp_gem_path.should_not include_installed_gem("very-simple-1.0")
+      tmp_gem_path.should_not include_vendored_dir("very-simple")
+    end
+  end
 end

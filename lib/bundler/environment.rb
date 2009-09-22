@@ -3,6 +3,7 @@ require "rubygems/source_index"
 module Bundler
   class DefaultManifestNotFound < StandardError; end
   class InvalidCacheArgument < StandardError; end
+  class SourceNotCached < StandardError; end
 
   class Environment
     attr_reader :filename, :dependencies
