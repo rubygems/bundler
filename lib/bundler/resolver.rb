@@ -37,8 +37,6 @@ module Bundler
     # <GemBundle>,nil:: If the list of dependencies can be resolved, a
     #   collection of gemspecs is returned. Otherwise, nil is returned.
     def self.resolve(requirements, sources)
-      Bundler.logger.info "Calculating dependencies..."
-
       resolver = new(sources)
       result = catch(:success) do
         resolver.resolve(requirements, {})

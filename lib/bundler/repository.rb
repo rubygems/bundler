@@ -30,6 +30,7 @@ module Bundler
       end
 
       if options[:update] || !valid
+        Bundler.logger.info "Calculating dependencies..."
         bundle = Resolver.resolve(dependencies, [@cache] + sources)
         do_install(bundle, options)
         valid = bundle
