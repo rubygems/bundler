@@ -78,6 +78,6 @@ describe "Fetcher" do
       gem "rack"
     Gemfile
 
-    bundled_app.should have_cached_gems("rack-0.9.1")
+    tmp_gem_path.should have_cached_gems("rack-0.9.1")
   end
 end

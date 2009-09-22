@@ -181,7 +181,7 @@ module Bundler
       if location.directory?
         Bundler.logger.info "Git repository #{@uri} has already been cloned"
       else
-        FileUtils.mkdir_p(location)
+        FileUtils.mkdir_p(location.dirname)
 
         Bundler.logger.info "Cloning git repository at: #{@uri}"
         `git clone #{@uri} #{location} --no-hardlinks`
