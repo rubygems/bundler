@@ -70,6 +70,44 @@ module Bundler
     end
   end
 
+  class SystemGemSource < Source
+    def initialize(options)
+      # Nothing to do
+    end
+
+    def can_be_local?
+      false
+    end
+
+    def gems
+      @specs ||= Gem::SourceIndex.from_installed_gems.gems
+    end
+
+    def ==(other)
+      other.is_a?(SystemGemSource)
+    end
+
+    def to_s
+      "system"
+    end
+
+    def download(spec)
+      # gemfile = Pathname.new(local.loaded_from)
+      # gemfile = gemfile.dirname.join('..', 'cache', "#{local.full_name}.gem").expand_path
+      # repository.cache(File.join(Gem.dir, "cache", "#{local.full_name}.gem"))
+      gemfile = Pathname.new(spec.loaded_from)
+      gemfile = gemfile.dirname.join('..', 'cache', "#{spec.full_name}.gem")
+      repository.cache(gemfile)
+    end
+
+  private
+
+    def fetch_specs
+
+    end
+
+  end
+
   class GemDirectorySource < Source
     attr_reader :location
 

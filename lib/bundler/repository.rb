@@ -88,7 +88,7 @@ module Bundler
         next if @path.join("gems", spec.full_name).directory?
 
         case spec.source
-        when GemSource, GemDirectorySource
+        when GemSource, GemDirectorySource, SystemGemSource
           expand_gemfile(spec, options)
         else
           expand_vendored_gem(spec, options)

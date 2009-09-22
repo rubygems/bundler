@@ -77,15 +77,7 @@ describe "Bundler::Environment" do
     Gemfile
     FileUtils.mkdir_p(bundled_app("baz"))
     Dir.chdir(bundled_app("baz"))
-    Bundler::Environment.load.sources.should have(2).items
-  end
-
-  it "inserts new sources before rubyforge" do
-    m = build_manifest <<-Gemfile
-      source "http://gems.github.com"
-    Gemfile
-    m.sources.map{|s| s.uri.to_s}.should ==
-      %w(http://gems.github.com http://gems.rubyforge.org)
+    Bundler::Environment.load.sources.should have(3).items
   end
 
   it "inserts new sources at the end if the default has been removed" do
