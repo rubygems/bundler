@@ -47,6 +47,22 @@ module Bundler
       end
     end
 
+    def prune(dependencies, sources)
+      sources.each do |s|
+        s.repository = self
+        s.local = true
+      end
+
+      sources = sources.select { |s| s.can_be_local? }
+      bundle = Resolver.resolve(dependencies, [@cache] + sources)
+      @cache.gems.each do |name, spec|
+        unless bundle.any? { |s| s.name == spec.name && s.version == spec.version }
+          Bundler.logger.info "Pruning #{spec.name} (#{spec.version}) from the cache"
+          FileUtils.rm @path.join("cache", "#{spec.full_name}.gem")
+        end
+      end
+    end
+
     def gems
       source_index.gems.values
     end

@@ -40,6 +40,14 @@ module Bundler
       @manifest.cache(@options)
     end
 
+    def prune
+      @manifest.prune(@options)
+    end
+
+    def list
+      @manifest.list(@options)
+    end
+
     def exec
       @manifest.setup_environment
       # w0t?

@@ -18,6 +18,14 @@ class Gem::Commands::BundleCommand < Gem::Command
     add_option('--cache GEM', "Specify a path to a .gem file to add to the bundled gem cache") do |gem, options|
       options[:cache] = gem
     end
+
+    add_option('--prune-cache', "Removes all .gem files from the bundle's cache") do
+      options[:prune] = true
+    end
+
+    add_option('--list', "List all gems that are part of the active bundle") do
+      options[:list] = true
+    end
   end
 
   def usage
@@ -35,6 +43,10 @@ Bundle stuff
     require 'bundler'
     if options[:cache]
       Bundler::CLI.run(:cache, options)
+    elsif options[:prune]
+      Bundler::CLI.run(:prune, options)
+    elsif options[:list]
+      Bundler::CLI.run(:list, options)
     else
       Bundler::CLI.run(:bundle, options)
     end

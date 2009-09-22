@@ -90,6 +90,17 @@ module Bundler
       end
     end
 
+    def prune(options = {})
+      repository.prune(gem_dependencies, sources)
+    end
+
+    def list(options = {})
+      Bundler.logger.info "Currently bundled gems:"
+      repository.gems.each do |spec|
+        Bundler.logger.info " * #{spec.name} (#{spec.version})"
+      end
+    end
+
     def setup_environment
       unless system_gems
         ENV["GEM_HOME"] = gem_path
