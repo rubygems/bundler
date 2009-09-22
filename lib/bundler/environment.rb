@@ -11,7 +11,7 @@ module Bundler
     attr_writer :gem_path, :bindir
 
     def self.load(gemfile = nil)
-      gemfile = gemfile ? Pathname.new(gemfile) : default_manifest_file
+      gemfile = gemfile ? Pathname.new(gemfile).expand_path : default_manifest_file
 
       unless gemfile.file?
         raise ManifestFileNotFound, "#{filename.inspect} does not exist"
