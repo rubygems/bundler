@@ -6,19 +6,22 @@ module Bundler
       new(options).run(command)
     rescue DefaultManifestNotFound => e
       Bundler.logger.error "Could not find a Gemfile to use"
-      exit 2
+      exit 3
     rescue InvalidEnvironmentName => e
       Bundler.logger.error "Gemfile error: #{e.message}"
-      exit
+      exit 4
     rescue InvalidRepository => e
       Bundler.logger.error e.message
-      exit 1
+      exit 5
     rescue VersionConflict => e
       Bundler.logger.error e.message
-      exit 1
+      exit 6
     rescue GemNotFound => e
       Bundler.logger.error e.message
-      exit 1
+      exit 7
+    rescue InvalidCacheArgument => e
+      Bundler.logger.error e.message
+      exit 8
     end
 
     def initialize(options)
@@ -28,6 +31,10 @@ module Bundler
 
     def bundle
       @manifest.install(@options)
+    end
+
+    def cache
+      @manifest.cache(@options)
     end
 
     def exec

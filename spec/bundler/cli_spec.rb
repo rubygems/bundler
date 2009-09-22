@@ -260,4 +260,83 @@ describe "Bundler::CLI" do
       end
     end
   end
+
+  describe "caching gems to the bundle" do
+    before(:each) do
+      build_manifest <<-Gemfile
+        clear_sources
+      Gemfile
+    end
+
+    it "adds a single gem to the cache" do
+      build_manifest <<-Gemfile
+        clear_sources
+        gem "rack"
+      Gemfile
+
+      Dir.chdir(bundled_app) do
+        out = gem_command :bundle, "--cache #{gem_repo1('gems', 'rack-0.9.1.gem')}"
+        gem_command :bundle, "--cached"
+        out.should include("Caching: rack-0.9.1.gem")
+        tmp_gem_path.should include_cached_gems("rack-0.9.1")
+        tmp_gem_path.should include_installed_gems("rack-0.9.1")
+      end
+    end
+
+    it "adds a gem directory to the cache" do
+      build_manifest <<-Gemfile
+        clear_sources
+        gem "rack"
+        gem "abstract"
+      Gemfile
+
+      Dir.chdir(bundled_app) do
+        out = gem_command :bundle, "--cache #{gem_repo1('gems')}"
+        gem_command :bundle, "--cached"
+
+        %w(abstract-1.0.0 actionmailer-2.3.2 activerecord-2.3.2 addressable-2.0.2 builder-2.1.2).each do |gemfile|
+          out.should include("Caching: #{gemfile}.gem")
+        end
+        tmp_gem_path.should include_cached_gems("rack-0.9.1", "abstract-1.0.0")
+        tmp_gem_path.should have_installed_gems("rack-0.9.1", "abstract-1.0.0")
+      end
+    end
+
+    it "adds a gem from the local repository" do
+      build_manifest <<-Gemfile
+        clear_sources
+        gem "rspec"
+        disable_system_gems
+      Gemfile
+
+      Dir.chdir(bundled_app) do
+        out = gem_command :bundle, "--cache rspec"
+        gem_command :bundle, "--cached"
+         out = run_in_context "require 'spec' ; puts Spec"
+         out.should == "Spec"
+      end
+    end
+
+    it "outputs an error when trying to cache a gem that doesn't exist." do
+      Dir.chdir(bundled_app) do
+        out = gem_command :bundle, "--cache foo/bar.gem"
+        out.should == "'foo/bar.gem' does not exist."
+      end
+    end
+
+    it "outputs an error when trying to cache a directory that doesn't exist." do
+      Dir.chdir(bundled_app) do
+        out = gem_command :bundle, "--cache foo/bar"
+        out.should == "'foo/bar' does not exist."
+      end
+    end
+
+    it "outputs an error when trying to cache a directory with no gems." do
+      Dir.chdir(bundled_app) do
+        FileUtils.mkdir_p("foo/bar")
+        out = gem_command :bundle, "--cache foo/bar"
+        out.should == "'foo/bar' contains no gemfiles"
+      end
+    end
+  end
 end

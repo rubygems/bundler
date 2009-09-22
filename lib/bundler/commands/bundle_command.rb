@@ -14,6 +14,10 @@ class Gem::Commands::BundleCommand < Gem::Command
     add_option('--cached', "Only use cached gems when expanding the bundle") do
       options[:cached] = true
     end
+
+    add_option('--cache GEM', "Specify a path to a .gem file to add to the bundled gem cache") do |gem, options|
+      options[:cache] = gem
+    end
   end
 
   def usage
@@ -29,7 +33,11 @@ Bundle stuff
   def execute
     # Prevent the bundler from getting required unless it is actually being used
     require 'bundler'
-    Bundler::CLI.run(:bundle, options)
+    if options[:cache]
+      Bundler::CLI.run(:cache, options)
+    else
+      Bundler::CLI.run(:bundle, options)
+    end
   end
 
 end

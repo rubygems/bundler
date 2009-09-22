@@ -2,6 +2,7 @@ require "rubygems/source_index"
 
 module Bundler
   class DefaultManifestNotFound < StandardError; end
+  class InvalidCacheArgument < StandardError; end
 
   class Environment
     attr_reader :filename, :dependencies
@@ -56,6 +57,36 @@ module Bundler
         :cached      => cached
       )
       Bundler.logger.info "Done."
+    end
+
+    def cache(options = {})
+      gemfile = options[:cache]
+
+      if File.extname(gemfile) == ".gem"
+        if !File.exist?(gemfile)
+          raise InvalidCacheArgument, "'#{gemfile}' does not exist."
+        end
+        repository.cache(gemfile)
+      elsif File.directory?(gemfile) || gemfile.include?('/')
+        if !File.directory?(gemfile)
+          raise InvalidCacheArgument, "'#{gemfile}' does not exist."
+        end
+        gemfiles = Dir["#{gemfile}/*.gem"]
+        if gemfiles.empty?
+          raise InvalidCacheArgument, "'#{gemfile}' contains no gemfiles"
+        end
+        repository.cache(*gemfiles)
+      else
+        local = Gem::SourceIndex.from_installed_gems.find_name(gemfile).last
+
+        if !local
+          raise InvalidCacheArgument, "w0t? '#{gemfile}' means nothing to me."
+        end
+
+        gemfile = Pathname.new(local.loaded_from)
+        gemfile = gemfile.dirname.join('..', 'cache', "#{local.full_name}.gem").expand_path
+        repository.cache(File.join(Gem.dir, "cache", "#{local.full_name}.gem"))
+      end
     end
 
     def setup_environment

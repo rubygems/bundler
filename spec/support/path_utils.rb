@@ -40,16 +40,16 @@ module Spec
       root.join("spec", "fixtures")
     end
 
-    def gem_repo1
-      fixture_dir.join("repository1").expand_path
+    def gem_repo1(*path)
+      fixture_dir.join("repository1", *path).expand_path
     end
 
-    def gem_repo2
-      fixture_dir.join("repository2").expand_path
+    def gem_repo2(*path)
+      fixture_dir.join("repository2", *path).expand_path
     end
 
-    def gem_repo3
-      fixture_dir.join("repository3").expand_path
+    def gem_repo3(*path)
+      fixture_dir.join("repository3", *path).expand_path
     end
 
     def fixture(gem_name)

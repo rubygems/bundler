@@ -38,6 +38,14 @@ module Bundler
       configure(valid, options)
     end
 
+    def cache(*gemfiles)
+      FileUtils.mkdir_p(@path.join("cache"))
+      gemfiles.each do |gemfile|
+        Bundler.logger.info "Caching: #{File.basename(gemfile)}"
+        FileUtils.cp(gemfile, @path.join("cache"))
+      end
+    end
+
     def gems
       source_index.gems.values
     end
