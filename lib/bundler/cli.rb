@@ -12,13 +12,13 @@ module Bundler
       exit
     rescue InvalidRepository => e
       Bundler.logger.error e.message
-      exit
+      exit 1
     rescue VersionConflict => e
       Bundler.logger.error e.message
-      exit
+      exit 1
     rescue GemNotFound => e
       Bundler.logger.error e.message
-      exit
+      exit 1
     end
 
     def initialize(options)
