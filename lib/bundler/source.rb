@@ -51,8 +51,13 @@ module Bundler
 
       fetcher = Gem::RemoteFetcher.fetcher
       main_index = fetcher.fetch_path("#{uri}/specs.4.8.gz")
-      prerelease_index = fetcher.fetch_path("#{uri}/prerelease_specs.4.8.gz")
-      index = Marshal.load(main_index) + Marshal.load(prerelease_index)
+      begin
+        prerelease_index = fetcher.fetch_path("#{uri}/prerelease_specs.4.8.gz")
+        index = Marshal.load(main_index) + Marshal.load(prerelease_index)
+      rescue Gem::RemoteFetcher::FetchError
+        Bundler.logger.warn "Source '#{uri}' does not support prerelease gems"
+        index = Marshal.load(main_index)
+      end
 
       gems = {}
       index.each do |name, version, platform|
@@ -126,9 +131,11 @@ module Bundler
 
         # Find any gemspec files in the directory and load those specs
         Dir["#{location}/**/*.gemspec"].each do |file|
-          spec = eval(File.read(file))
-          spec.location = Pathname.new(file).dirname.expand_path
-          specs[spec.full_name] = spec
+          file = Pathname.new(file)
+          if spec = eval(File.read(file)) and validate_gemspec(file, spec)
+            spec.location = file.dirname.expand_path
+            specs[spec.full_name] = spec
+          end
         end
 
         # If a gemspec for the dependency was not found, add it to the list
@@ -152,6 +159,41 @@ module Bundler
 
         specs
       end
+    end
+
+    # Too aggressive apparently.
+    # ===
+    # def validate_gemspec(file, spec)
+    #   file = Pathname.new(file)
+    #   Dir.chdir(file.dirname) do
+    #     spec.validate
+    #   end
+    # rescue Gem::InvalidSpecificationException => e
+    #   file = file.relative_path_from(repository.path)
+    #   Bundler.logger.warn e.message
+    #   Bundler.logger.warn "Gemspec #{spec.name} (#{spec.version}) found at '#{file}' is not valid"
+    #   false
+    # end
+    def validate_gemspec(file, spec)
+      base = file.dirname
+      msg  = "Gemspec for #{spec.name} (#{spec.version}) is invalid:"
+      # Check the require_paths
+      (spec.require_paths || []).each do |path|
+        unless base.join(path).directory?
+          Bundler.logger.warn "#{msg} Missing require path: '#{path}'"
+          return false
+        end
+      end
+
+      # Check the executables
+      (spec.executables || []).each do |exec|
+        unless base.join(spec.bindir, exec).file?
+          Bundler.logger.warn "#{msg} Missing executable: '#{File.join(spec.bindir, exec)}'"
+          return false
+        end
+      end
+
+      true
     end
 
     def ==(other)

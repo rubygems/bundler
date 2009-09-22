@@ -80,4 +80,18 @@ describe "Fetcher" do
 
     tmp_gem_path.should have_cached_gems("rack-0.9.1")
   end
+
+  it "works with repositories that don't provide prerelease_specs.4.8.gz" do
+    gem_repo1.cp_r(tmp_path.join('bogus_repo'))
+    Dir["#{tmp_path.join('bogus_repo')}/prerelease*"].each { |f| File.unlink(f) }
+
+    install_manifest <<-Gemfile
+      clear_sources
+      source "file://#{tmp_path.join('bogus_repo')}"
+      gem "rack"
+    Gemfile
+
+    @log_output.should have_log_message("Source 'file:#{tmp_path.join('bogus_repo')}' does not support prerelease gems")
+    tmp_gem_path.should have_cached_gems("rack-0.9.1")
+  end
 end
