@@ -1,6 +1,3 @@
-require "bundler/repository/gem_repository"
-require "bundler/repository/directory_repository"
-
 module Bundler
   class InvalidRepository < StandardError ; end
 
