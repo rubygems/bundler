@@ -210,6 +210,25 @@ describe "Bundler::CLI" do
     end
   end
 
+  describe "relative paths everywhere" do
+    it "still works when you move the app directory" do
+      install_manifest <<-Gemfile
+        clear_sources
+        source "file://#{gem_repo1}"
+        source "file://#{gem_repo2}"
+        gem "rack"
+      Gemfile
+
+      FileUtils.mv bundled_app, tmp_path("bundled_app2")
+
+      Dir.chdir(tmp_path('bundled_app2')) do
+        out = gem_command :exec, "ruby -e 'Bundler.require_env :default ; puts Rack'"
+        out.should == "Rack"
+        `bin/rackup --version`.strip.should == "Rack 1.0"
+      end
+    end
+  end
+
   describe "forcing an update" do
     it "forces checking for remote updates if --update is used" do
       m = build_manifest <<-Gemfile
