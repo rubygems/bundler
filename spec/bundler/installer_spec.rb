@@ -89,6 +89,24 @@ describe "Installing gems" do
       lambda { @manifest.install }.should_not change { bundled_app("bin", "rails").mtime }
     end
 
+    it "does not remove bin files when updating gems" do
+      install_manifest <<-Gemfile
+        clear_sources
+        source "file://#{gem_repo1}"
+        gem "rack", "0.9.1"
+      Gemfile
+
+      tmp_bindir("rackup").should exist
+
+      install_manifest <<-Gemfile
+        clear_sources
+        source "file://#{gem_repo2}"
+        gem "rack", "1.0.0"
+      Gemfile
+
+      tmp_bindir("rackup").should exist
+    end
+
     it "each thing in the bundle has a directory in gems" do
       setup
       @manifest.install

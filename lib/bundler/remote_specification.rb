@@ -22,6 +22,13 @@ module Bundler
       end
     end
 
+    # Because Rubyforge cannot be trusted to provide valid specifications
+    # once the remote gem is donwloaded, the backend specification will
+    # be swapped out.
+    def __swap__(spec)
+      @specification = spec
+    end
+
     private
 
     def _remote_uri

@@ -145,12 +145,15 @@ module Bundler
         valid.any? { |other| spec.name == other.name && spec.version == other.version }
       end
 
+      valid_executables = valid.map { |s| s.executables }.flatten.compact
+
       to_delete.each do |spec|
         Bundler.logger.info "Deleting gem: #{spec.name} (#{spec.version})"
         FileUtils.rm_rf(@path.join("specifications", "#{spec.full_name}.gemspec"))
         FileUtils.rm_rf(@path.join("gems", spec.full_name))
         # Cleanup the bin directory
         spec.executables.each do |bin|
+          next if valid_executables.include?(bin)
           Bundler.logger.info "Deleting bin file: #{bin}"
           FileUtils.rm_rf(@bindir.join(bin))
         end

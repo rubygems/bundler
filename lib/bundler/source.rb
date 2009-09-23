@@ -41,7 +41,13 @@ module Bundler
         raise RubygemsRetardation
       end
 
+      # Download the gem
       Gem::RemoteFetcher.fetcher.download(spec, uri, destination)
+
+      # Re-read the gemspec from the downloaded gem to correct
+      # any errors that were present in the Rubyforge specification.
+      new_spec = Gem::Format.from_file_by_path(destination.join('cache', "#{spec.full_name}.gem")).spec
+      spec.__swap__(new_spec)
     end
 
   private
