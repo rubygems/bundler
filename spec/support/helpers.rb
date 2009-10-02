@@ -88,11 +88,12 @@ module Spec
     end
 
     class LibBuilder
-      def initialize(name, version)
+      def initialize(name, version, options)
         @spec = Gem::Specification.new do |s|
           s.name = name
           s.version = version
         end
+        @options = options
         @files = { "lib/#{name}.rb" => "#{name.upcase} = 'required'" }
       end
 
@@ -106,7 +107,8 @@ module Spec
 
       def _build(path)
         path ||= tmp_path('dirs', name)
-        @files["#{name}.gemspec"] = @spec.to_ruby
+        path = Pathname.new(path)
+        @files["#{name}.gemspec"] = @spec.to_ruby if @options[:gemspec]
         @files.each do |file, source|
           file = path.join(file)
           file.dirname.mkdir_p
@@ -117,7 +119,9 @@ module Spec
     end
 
     def lib_builder(name, version, options = {})
-      spec = LibBuilder.new(name, version)
+      options[:gemspec] = true unless options.key?(:gemspec)
+
+      spec = LibBuilder.new(name, version, options)
       yield spec if block_given?
       spec._build(options[:path] || tmp_path('dirs', name))
     end
