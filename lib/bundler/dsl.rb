@@ -66,25 +66,23 @@ module Bundler
         vendored_at = @environment.filename.dirname.join(vendored_at) if vendored_at.relative?
 
         @sources[:directory][vendored_at.to_s] ||= begin
-          source = DirectorySource.new(
-            :name     => name,
-            :version  => version,
-            :location => vendored_at
-          )
+          source = DirectorySource.new(:location => vendored_at)
+          source.required_specs << name
+          source.add_spec(".", name, version) if version
           @environment.add_priority_source(source)
-          true
+          source
         end
       elsif git = options[:git]
         @sources[:git][git] ||= begin
           source = GitSource.new(
-            :name    => name,
-            :version => version,
             :uri     => git,
             :ref     => options[:commit] || options[:tag],
             :branch  => options[:branch]
           )
+          source.required_specs << name
+          source.add_spec(".", name, version) if version
           @environment.add_priority_source(source)
-          true
+          source
         end
       end
 

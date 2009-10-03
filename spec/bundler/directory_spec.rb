@@ -57,10 +57,11 @@ describe "Faking gems with directories" do
             clear_sources
             gem "very-simple", :vendored_at => "#{fixture_dir.join("very-simple")}"
           Gemfile
-        end.should raise_error(ArgumentError, /:at/)
+        end.should raise_error(Bundler::DirectorySourceError, /Please explicitly specify a version/)
       end
 
       it "raises an exception unless the version is an exact version" do
+        pending
         lambda do
           install_manifest <<-Gemfile
             clear_sources
@@ -97,7 +98,7 @@ describe "Faking gems with directories" do
 
     install_manifest <<-Gemfile
       clear_sources
-      gem "second", "1.0", :vendored_at => "#{tmp_path('dirs')}"
+      gem "second", :vendored_at => "#{tmp_path('dirs')}"
     Gemfile
 
     out = run_in_context <<-RUBY
@@ -107,6 +108,17 @@ describe "Faking gems with directories" do
     RUBY
 
     out.should == "required\nrequired"
+  end
+
+  it "complains when the gemspec was not found in the directory specified" do
+    lib_builder "first", "1.0"
+
+    lambda {
+      install_manifest <<-Gemfile
+        clear_sources
+        gem "first", "1.0", :vendored_at => "#{tmp_path('dirs')}"
+      Gemfile
+    }.should raise_error(Bundler::DirectorySourceError, /The location you specified for first is/)
   end
 
   it "copies bin files to the bin dir" do

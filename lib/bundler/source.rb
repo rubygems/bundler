@@ -1,4 +1,5 @@
 module Bundler
+  class DirectorySourceError < StandardError; end
   # Represents a source of rubygems. Initially, this is only gem repositories, but
   # eventually, this will be git, svn, HTTP
   class Source
@@ -106,12 +107,6 @@ module Bundler
       repository.cache(gemfile)
     end
 
-  private
-
-    def fetch_specs
-
-    end
-
   end
 
   class GemDirectorySource < Source
@@ -156,13 +151,21 @@ module Bundler
   end
 
   class DirectorySource < Source
-    attr_reader :location
+    attr_reader :location, :specs, :required_specs
 
     def initialize(options)
-      @name          = options[:name]
-      @version       = options[:version]
-      @location      = options[:location]
-      @require_paths = options[:require_paths] || %w(lib)
+      @location       = options[:location]
+      @specs          = {}
+      @required_specs = []
+    end
+
+    def add_spec(path, name, version, require_paths = %w(lib))
+      raise DirectorySourceError, "already have a gem defined for '#{path}'" if @specs[path.to_s]
+      @specs[path.to_s] = Gem::Specification.new do |s|
+        s.name     = name
+        s.version  = Gem::Version.new(version)
+        s.location = "#{location}/#{path}"
+      end
     end
 
     def can_be_local?
@@ -171,67 +174,65 @@ module Bundler
 
     def gems
       @gems ||= begin
-        specs = {}
+        # Locate all gemspecs from the directory
+        specs = locate_gemspecs
+        specs = merge_defined_specs(specs)
 
-        # Find any gemspec files in the directory and load those specs
-        Dir["#{location}/**/*.gemspec"].each do |file|
-          file = Pathname.new(file)
-          if spec = eval(File.read(file)) and validate_gemspec(file, spec)
-            spec.location = file.dirname.expand_path
-            specs[spec.full_name] = spec
+        required_specs.each do |required|
+          unless specs.any? {|k,v| v.name == required }
+            raise DirectorySourceError, "No gemspec for '#{required}' was found in" \
+              " '#{location}'. Please explicitly specify a version."
           end
-        end
-
-        # If a gemspec for the dependency was not found, add it to the list
-        if specs.keys.grep(/^#{Regexp.escape(@name)}/).empty?
-          case
-          when @version.nil?
-            raise ArgumentError, "If you use :at, you must specify the gem " \
-              "and version you wish to stand in for"
-          when !Gem::Version.correct?(@version)
-            raise ArgumentError, "If you use :at, you must specify a gem and " \
-              "version. You specified #{@version} for the version"
-          end
-
-          default = Gem::Specification.new do |s|
-            s.name     = @name
-            s.version  = Gem::Version.new(@version) if @version
-            s.location = location
-          end
-          specs[default.full_name] = default
         end
 
         specs
       end
     end
 
-    # Too aggressive apparently.
-    # ===
-    # def validate_gemspec(file, spec)
-    #   file = Pathname.new(file)
-    #   Dir.chdir(file.dirname) do
-    #     spec.validate
-    #   end
-    # rescue Gem::InvalidSpecificationException => e
-    #   file = file.relative_path_from(repository.path)
-    #   Bundler.logger.warn e.message
-    #   Bundler.logger.warn "Gemspec #{spec.name} (#{spec.version}) found at '#{file}' is not valid"
-    #   false
-    # end
-    def validate_gemspec(file, spec)
-      base = file.dirname
+    def locate_gemspecs
+      Dir["#{location}/**/*.gemspec"].inject({}) do |specs, file|
+        file = Pathname.new(file)
+        if spec = eval(File.read(file)) and validate_gemspec(file.dirname, spec)
+          spec.location = file.dirname.expand_path
+          specs[spec.full_name] = spec
+        end
+        specs
+      end
+    end
+
+    def merge_defined_specs(specs)
+      @specs.each do |path, spec|
+        if existing = specs.values.find { |s| s.name == spec.name }
+          if existing.version != spec.version
+            raise DirectorySourceError, "The version you specified for #{spec.name}" \
+              " is #{spec.version}. The gemspec is #{existing.version}."
+          elsif File.expand_path(existing.location) != File.expand_path(spec.location)
+            raise DirectorySourceError, "The location you specified for #{spec.name}" \
+              " is '#{spec.location}'. The gemspec was found at '#{existing.location}'."
+          end
+        elsif !validate_gemspec(spec.location, spec)
+          raise "Your gem definition is not valid: #{spec}"
+        else
+          specs[spec.full_name] = spec
+        end
+      end
+      specs
+    end
+
+    def validate_gemspec(path, spec)
+      path = Pathname.new(path)
       msg  = "Gemspec for #{spec.name} (#{spec.version}) is invalid:"
       # Check the require_paths
-      (spec.require_paths || []).each do |path|
-        unless base.join(path).directory?
-          Bundler.logger.warn "#{msg} Missing require path: '#{path}'"
+      (spec.require_paths || []).each do |require_path|
+        unless path.join(require_path).directory?
+          Bundler.logger.warn "#{msg} Missing require path: '#{require_path}'"
           return false
         end
       end
 
       # Check the executables
       (spec.executables || []).each do |exec|
-        unless base.join(spec.bindir, exec).file?
+        unless path.join(spec.bindir, exec).file?
           Bundler.logger.warn "#{msg} Missing executable: '#{File.join(spec.bindir, exec)}'"
           return false
         end
