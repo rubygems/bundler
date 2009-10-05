@@ -33,6 +33,20 @@ describe "Bundler DSL" do
     "test".should have_const("Webrat")
   end
 
+  it "supports only blocks with multiple args" do
+    install_manifest <<-Gemfile
+      clear_sources
+      source "file://#{gem_repo1}"
+      only :test, :production do
+        gem "rack"
+      end
+    Gemfile
+
+    "default".should_not have_const("Rack")
+    "test".should have_const("Rack")
+    "production".should have_const("Rack")
+  end
+
   it "supports nesting only blocks" do
     install_manifest <<-Gemfile
       clear_sources
@@ -74,6 +88,20 @@ describe "Bundler DSL" do
     "test".should have_const("ActiveRecord")
     "test".should_not have_const("Spec")
     "test".should_not have_const("Webrat")
+  end
+
+  it "supports except blocks with multiple args" do
+    install_manifest <<-Gemfile
+      clear_sources
+      source "file://#{gem_repo1}"
+      except :test, :production do
+        gem "rack"
+      end
+    Gemfile
+
+    "default".should have_const("Rack")
+    "test".should_not have_const("Rack")
+    "production".should_not have_const("Rack")
   end
 
   it "supports nesting except blocks" do

@@ -35,14 +35,14 @@ module Bundler
       end
     end
 
-    def only(env)
-      old, @only = @only, _combine_only(env)
+    def only(*env)
+      old, @only = @only, _combine_only(env.flatten)
       yield
       @only = old
     end
 
-    def except(env)
-      old, @except = @except, _combine_except(env)
+    def except(*env)
+      old, @except = @except, _combine_except(env.flatten)
       yield
       @except = old
     end
