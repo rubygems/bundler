@@ -2,14 +2,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "Bundler DSL" do
 
-  def have_const(const)
-    simple_matcher "have const" do |given, matcher|
-      matcher.failure_message = "Could not find constant '#{const}' in environment: '#{given}'"
-      out = run_in_context "Bundler.require_env #{given.inspect} ; p !!defined?(#{const})"
-      out == "true"
-    end
-  end
-
   it "supports only blocks" do
     install_manifest <<-Gemfile
       clear_sources

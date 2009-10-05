@@ -42,7 +42,7 @@ module Bundler
   def self.require_env(env = nil)
     context = Class.new do
       def initialize(env) @env = env && env.to_s ; end
-      def method_missing(*) ; end
+      def method_missing(*) ; yield if block_given? ; end
       def only(*env)
         old, @only = @only, _combine_only(env.flatten)
         yield

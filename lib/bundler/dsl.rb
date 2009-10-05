@@ -67,7 +67,7 @@ module Bundler
       dep = Dependency.new(name, options.merge(:version => version))
 
       # OMG REFACTORZ. KTHX
-      if options[:vendored_at]
+      if @directory || options[:vendored_at]
         _handle_vendored_option(name, version, options)
       elsif options[:git]
         _handle_git_option(name, version, options)

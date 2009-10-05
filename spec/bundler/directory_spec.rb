@@ -159,6 +159,21 @@ describe "Faking gems with directories" do
           gem "hi2u", "1.0", :vendored_at => "hi2u"
         end
       Gemfile
+
+      :default.should have_const("OMG")
+      :default.should have_const("HI2U")
+    end
+
+    it "can list vendored gems without :vendored_at" do
+      lib_builder "omg", "1.0", :gemspec => false
+      install_manifest <<-Gemfile
+        clear_sources
+        directory "#{tmp_path}/dirs/omg" do
+          gem "omg", "1.0"
+        end
+      Gemfile
+
+      :default.should have_const("OMG")
     end
 
     it "raises an error when two gems are defined for the same path" do
@@ -173,6 +188,20 @@ describe "Faking gems with directories" do
           end
         Gemfile
       }.should raise_error(Bundler::DirectorySourceError, /There already is a gem defined at/)
+    end
+
+    it "lets you set a directory source without a block" do
+      lib_builder "omg", "1.0"
+      lib_builder "lol", "1.0"
+
+      install_manifest <<-Gemfile
+        clear_sources
+        directory "#{tmp_path}/dirs"
+        gem "omg"
+        gem "lol"
+      Gemfile
+
+      :default.should have_const("Omg")
     end
   end
 
