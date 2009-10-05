@@ -44,37 +44,45 @@ module Bundler
       def initialize(env) @env = env && env.to_s ; end
       def method_missing(*) ; end
       def only(env)
-        old, @only = @only, _combine_onlys(env)
+        old, @only = @only, _combine_only(env)
         yield
         @only = old
       end
       def except(env)
-        old, @except = @except, _combine_excepts(env)
+        old, @except = @except, _combine_except(env)
         yield
         @except = old
       end
       def gem(name, *args)
         opt = args.last || {}
-        only = _combine_onlys(opt[:only] || opt["only"])
-        except = _combine_excepts(opt[:except] || opt["except"])
+        only = _combine_only(opt[:only] || opt["only"])
+        except = _combine_except(opt[:except] || opt["except"])
         files = opt[:require_as] || opt["require_as"] || name
         files = [files] unless files.respond_to?(:each)
 
         return unless !only || only.any? {|e| e == @env }
         return if except && except.any? {|e| e == @env }
 
-        files.each { |f| require f }
+        if files = opt[:require_as] || opt["require_as"]
+          files.each { |f| require f }
+        else
+          begin
+            require name
+          rescue LoadError
+            # Do nothing
+          end
+        end
         yield if block_given?
         true
       end
       private
-      def _combine_onlys(only)
+      def _combine_only(only)
         return @only unless only
         only = [only].flatten.compact.uniq.map { |o| o.to_s }
         only &= @only if @only
         only
       end
-      def _combine_excepts(except)
+      def _combine_except(except)
         return @except unless except
         except = [except].flatten.compact.uniq.map { |o| o.to_s }
         except |= @except if @except

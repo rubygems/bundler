@@ -18,26 +18,6 @@ describe "Bundler::Dependency" do
     b.version.should == "3.0"
   end
 
-  it "defaults the files to require as the gem name" do
-    b = Bundler::Dependency.new("rails")
-    b.require_as.should == ["rails"]
-  end
-
-  it "can take a :require_as option" do
-    b = Bundler::Dependency.new("actionpack", :require_as => "action_controller")
-    b.require_as.should == ["action_controller"]
-  end
-
-  it "can take a 'require_as' option" do
-    b = Bundler::Dependency.new("rails", "require_as" => "omg")
-    b.require_as.should == ["omg"]
-  end
-
-  it "can take an array as the :require_as option" do
-    b = Bundler::Dependency.new("actionpack", :require_as => ["action_controller", "action_view"])
-    b.require_as.should == ["action_controller", "action_view"]
-  end
-
   it "disallows the :rubygems environment" do
     lambda { Bundler::Dependency.new("ruby-debug", :only => "rubygems") }.
       should raise_error(Bundler::InvalidEnvironmentName)

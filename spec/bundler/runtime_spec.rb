@@ -50,6 +50,38 @@ describe "Bundler runtime" do
 
       out.should == "Before\nRequiring\nAfter"
     end
+
+    it "does not raise an exception if the gem does not have a default file to require" do
+      install_manifest <<-Gemfile
+        clear_sources
+        source "file://#{gem_repo1}"
+        gem "rack-test"
+      Gemfile
+
+      out = run_in_context <<-RUBY
+        Bundler.require_env ; puts "Hello"
+      RUBY
+
+      out.should == "Hello"
+    end
+
+    it "raises an error if an explicitly specified require does not exist" do
+      install_manifest <<-Gemfile
+        clear_sources
+        source "file://#{gem_repo1}"
+        gem "rack-test", :require_as => 'rack-test'
+      Gemfile
+
+      out = run_in_context <<-RUBY
+        begin
+          Bundler.require_env
+        rescue LoadError => e
+          puts e.message
+        end
+      RUBY
+
+      out.should include("no such file to load -- rack-test")
+    end
   end
 
   describe "with environments" do

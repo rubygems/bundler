@@ -11,7 +11,7 @@ module Bundler
 
       @name       = name
       @version    = options["version"] || ">= 0"
-      @require_as = Array(options["require_as"] || name)
+      @require_as = options["require_as"]
       @only       = options["only"]
       @except     = options["except"]
       @block      = block
@@ -36,8 +36,14 @@ module Bundler
     def require_env(environment)
       return unless in?(environment)
 
-      @require_as.each do |file|
-        require file
+      if @require_as
+        Array(@require_as).each { |file| require file }
+      else
+        begin
+          require name
+        rescue LoadError
+          # Do nothing
+        end
       end
 
       @block.call if @block
