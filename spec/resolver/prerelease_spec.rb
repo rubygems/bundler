@@ -42,6 +42,18 @@ describe "Resolving specs with prerelease dependencies" do
     resolving(deps).should match_gems "foo" => ["2.0"], "bar" => ["3.0.pre"]
   end
 
+  it "doesn't blow up if there are only prerelease versions for a gem" do
+    @index = build_index do
+      add_spec "first", "1.0" do
+        runtime "second", ">= 0"
+      end
+      add_spec "second", "1.0.pre"
+    end
+
+    deps = [build_dep("first"), build_dep("second", "=1.0.pre")]
+    resolving(deps).should match_gems("first" => ["1.0"], "second" => ["1.0.pre"])
+  end
+
   it "does backtracking" do
     @index = build_index do
       add_spec "first", "1.0" do
@@ -59,25 +71,28 @@ describe "Resolving specs with prerelease dependencies" do
   end
 
   it "resolves well" do
-    pending "Maybe get this working one day" do
-      @index = build_index do
-        add_spec "first", "1.0" do
-          runtime "second", ">= 1.0"
-          runtime "third", ">= 1.0"
-        end
-        add_spec "second", "1.0" do
-          runtime "fourth", ">= 1.0"
-        end
-        add_spec "third", "1.0" do
-          runtime "fourth", ">= 2.0.pre"
-        end
-        add_spec "fourth", "1.0"
-        add_spec "fourth", "2.0.pre"
+    @index = build_index do
+      add_spec "first", "1.0" do
+        runtime "second", ">= 1.0"
+        runtime "third", ">= 1.0"
       end
-
-      deps = [build_dep("first")]
-      resolving(deps).should match_gems("first" => ["1.0"])
+      add_spec "second", "1.0" do
+        runtime "fourth", ">= 1.0"
+      end
+      add_spec "third", "1.0" do
+        runtime "fourth", ">= 2.0.pre"
+      end
+      add_spec "fourth", "1.0"
+      add_spec "fourth", "2.0.pre"
     end
+
+    deps = [build_dep("first")]
+    resolving(deps).should match_gems(
+      "first"  => ["1.0"],
+      "second" => ["1.0"],
+      "third"  => ["1.0"],
+      "fourth" => ["2.0.pre"]
+    )
   end
 
   it "is smart" do

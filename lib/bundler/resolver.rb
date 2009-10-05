@@ -74,11 +74,15 @@ module Bundler
       # gem dependencies have been resolved.
       throw :success, activated if reqs.empty?
 
-      # Sort requirements so that the ones that are easiest to resolve are first.
-      # Easiest to resolve is defined by: Is this gem already activated? Otherwise,
-      # check the number of child dependencies this requirement has.
-      reqs = reqs.sort_by do |req|
-        activated[req.name] ? 0 : search(req).size
+      # Sort dependencies so that the ones that are easiest to resolve are first.
+      # Easiest to resolve is defined by:
+      #   1) Is this gem already activated?
+      #   2) Do the version requirements include prereleased gems?
+      #   3) Sort by number of gems available in the source.
+      reqs = reqs.sort_by do |a|
+        [ activated[a.name] ? 0 : 1,
+          a.version_requirements.prerelease? ? 0 : 1,
+          activated[a.name] ? 0 : search(a).size ]
       end
 
       activated = activated.dup
