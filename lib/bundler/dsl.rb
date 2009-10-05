@@ -61,35 +61,45 @@ module Bundler
       dep = Dependency.new(name, options.merge(:version => version))
 
       # OMG REFACTORZ. KTHX
-      if vendored_at = options[:vendored_at]
-        vendored_at = Pathname.new(vendored_at)
-        vendored_at = @environment.filename.dirname.join(vendored_at) if vendored_at.relative?
-
-        @sources[:directory][vendored_at.to_s] ||= begin
-          source = DirectorySource.new(:location => vendored_at)
-          source.required_specs << name
-          source.add_spec(".", name, version) if version
-          @environment.add_priority_source(source)
-          source
-        end
-      elsif git = options[:git]
-        @sources[:git][git] ||= begin
-          source = GitSource.new(
-            :uri     => git,
-            :ref     => options[:commit] || options[:tag],
-            :branch  => options[:branch]
-          )
-          source.required_specs << name
-          source.add_spec(".", name, version) if version
-          @environment.add_priority_source(source)
-          source
-        end
+      if options[:vendored_at]
+        _handle_vendored_option(name, version, options)
+      elsif options[:git]
+        _handle_git_option(name, version, options)
       end
 
       @environment.dependencies << dep
     end
 
   private
+
+    def _handle_vendored_option(name, version, options)
+      vendored_at = Pathname.new(options[:vendored_at])
+      vendored_at = @environment.filename.dirname.join(vendored_at) if vendored_at.relative?
+
+      @sources[:directory][vendored_at.to_s] ||=
+        _build_directory_source(name, version) do
+          DirectorySource.new(:location => vendored_at)
+        end
+    end
+
+    def _handle_git_option(name, version, options)
+      git = options[:git].to_s
+
+      @sources[:git][git] ||=
+        _build_directory_source(name, version) do
+          ref = options[:commit] || options[:tag]
+          branch = options[:branch]
+          GitSource.new(:uri => git, :ref => ref, :branch => branch)
+        end
+    end
+
+    def _build_directory_source(name, version)
+      source = yield
+      source.required_specs << name
+      source.add_spec(".", name, version) if version
+      @environment.add_priority_source(source)
+      source
+    end
 
     def _combine_onlys(only)
       return @only unless only

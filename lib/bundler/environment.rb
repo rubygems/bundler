@@ -43,7 +43,7 @@ module Bundler
 
       # Evaluate the Gemfile
       builder = Dsl.new(self)
-      builder.instance_eval(File.read(filename))
+      builder.instance_eval(File.read(filename), filename)
     end
 
     def install(options = {})

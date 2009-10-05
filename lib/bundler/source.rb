@@ -164,7 +164,6 @@ module Bundler
       @specs[path.to_s] = Gem::Specification.new do |s|
         s.name     = name
         s.version  = Gem::Version.new(version)
-        s.location = "#{location}/#{path}"
       end
     end
 
@@ -202,13 +201,18 @@ module Bundler
 
     def merge_defined_specs(specs)
       @specs.each do |path, spec|
+        # Set the spec location
+        spec.location = "#{location}/#{path}"
+
         if existing = specs.values.find { |s| s.name == spec.name }
           if existing.version != spec.version
             raise DirectorySourceError, "The version you specified for #{spec.name}" \
               " is #{spec.version}. The gemspec is #{existing.version}."
-          elsif File.expand_path(existing.location) != File.expand_path(spec.location)
-            raise DirectorySourceError, "The location you specified for #{spec.name}" \
-              " is '#{spec.location}'. The gemspec was found at '#{existing.location}'."
+          # Not sure if this is needed
+          # ====
+          # elsif File.expand_path(existing.location) != File.expand_path(spec.location)
+          #   raise DirectorySourceError, "The location you specified for #{spec.name}" \
+          #     " is '#{spec.location}'. The gemspec was found at '#{existing.location}'."
           end
         elsif !validate_gemspec(spec.location, spec)
           raise "Your gem definition is not valid: #{spec}"
