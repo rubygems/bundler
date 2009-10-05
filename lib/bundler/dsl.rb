@@ -5,7 +5,7 @@ module Bundler
     def initialize(environment)
       @environment = environment
       @sources = Hash.new { |h,k| h[k] = {} }
-      @only, @except = nil, nil
+      @only, @except, @directory = nil, nil, nil
     end
 
     def bundle_path(path)
@@ -36,15 +36,21 @@ module Bundler
     end
 
     def only(env)
-      old, @only = @only, _combine_onlys(env)
+      old, @only = @only, _combine_only(env)
       yield
       @only = old
     end
 
     def except(env)
-      old, @except = @except, _combine_excepts(env)
+      old, @except = @except, _combine_except(env)
       yield
       @except = old
+    end
+
+    def directory(path)
+      old, @directory = @directory, _combine_directory(path)
+      yield
+      @directory = old
     end
 
     def clear_sources
@@ -55,8 +61,8 @@ module Bundler
       options = args.last.is_a?(Hash) ? args.pop : {}
       version = args.last
 
-      options[:only] = _combine_onlys(options[:only] || options["only"])
-      options[:except] = _combine_excepts(options[:except] || options["except"])
+      options[:only] = _combine_only(options[:only] || options["only"])
+      options[:except] = _combine_except(options[:except] || options["except"])
 
       dep = Dependency.new(name, options.merge(:version => version))
 
@@ -73,13 +79,17 @@ module Bundler
   private
 
     def _handle_vendored_option(name, version, options)
-      vendored_at = Pathname.new(options[:vendored_at])
+      vendored_at = Pathname.new(_combine_directory(options[:vendored_at]))
       vendored_at = @environment.filename.dirname.join(vendored_at) if vendored_at.relative?
 
-      @sources[:directory][vendored_at.to_s] ||=
-        _build_directory_source(name, version) do
-          DirectorySource.new(:location => vendored_at)
-        end
+      if @sources[:directory][vendored_at.to_s]
+        raise DirectorySourceError, "There already is a gem defined at '#{vendored_at}'"
+      else
+        @sources[:directory][vendored_at.to_s] =
+          _build_directory_source(name, version) do
+            DirectorySource.new(:location => vendored_at)
+          end
+      end
     end
 
     def _handle_git_option(name, version, options)
@@ -101,18 +111,22 @@ module Bundler
       source
     end
 
-    def _combine_onlys(only)
+    def _combine_only(only)
       return @only unless only
       only = [only].flatten.compact.uniq.map { |o| o.to_s }
       only &= @only if @only
       only
     end
 
-    def _combine_excepts(except)
+    def _combine_except(except)
       return @except unless except
       except = [except].flatten.compact.uniq.map { |o| o.to_s }
       except |= @except if @except
       except
+    end
+
+    def _combine_directory(path)
+      File.join(*[@directory, path].compact)
     end
   end
 end

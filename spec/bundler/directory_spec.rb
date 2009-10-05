@@ -136,4 +136,48 @@ describe "Faking gems with directories" do
     tmp_bindir('very_simple').should exist
     `#{tmp_bindir('very_simple')}`.strip.should == 'OMG'
   end
+
+  describe "validating gemspecs" do
+    it "does not use a gemspec if any of the require paths are missing" do
+      install_manifest <<-Gemfile
+      Gemfile
+    end
+  end
+
+  describe "listing gems in a directory" do
+    it "directory can take a block" do
+      ext = bundled_app("externals")
+      ext.mkdir_p
+
+      lib_builder "omg",  "1.0", :gemspec => false, :path => "#{ext}/omg"
+      lib_builder "hi2u", "1.0", :gemspec => false, :path => "#{ext}/hi2u"
+
+      install_manifest <<-Gemfile
+        clear_sources
+        directory "#{ext}" do
+          gem "omg",  "1.0", :vendored_at => "omg"
+          gem "hi2u", "1.0", :vendored_at => "hi2u"
+        end
+      Gemfile
+    end
+
+    it "raises an error when two gems are defined for the same path" do
+      lib_builder "omg", "1.0", :gemspec => false
+
+      lambda {
+        install_manifest <<-Gemfile
+          clear_sources
+          directory "#{tmp_path('dirs')}" do
+            gem "omg", "1.0", :vendored_at => "omg"
+            gem "lol", "1.0", :vendored_at => "omg"
+          end
+        Gemfile
+      }.should raise_error(Bundler::DirectorySourceError, /There already is a gem defined at/)
+    end
+  end
+
+  describe "multiple directory sources" do
+    it "handles the case where two directory sources are nested"
+  end
+
 end
