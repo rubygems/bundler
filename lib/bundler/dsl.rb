@@ -4,7 +4,8 @@ module Bundler
   class Dsl
     def initialize(environment)
       @environment = environment
-      @sources = Hash.new { |h,k| h[k] = {} }
+      @directory_sources = []
+      @git_sources = {}
       @only, @except, @directory = nil, nil, nil
     end
 
@@ -48,9 +49,11 @@ module Bundler
     end
 
     def directory(path)
-      old, @directory = @directory, _combine_directory(path)
-      yield
-      @directory = old
+      raise DirectorySourceError, "cannot nest calls to directory" if @directory
+      @directory = DirectorySource.new(:location => path)
+      @environment.add_priority_source(@directory)
+      yield if block_given?
+      @directory = nil
     end
 
     def clear_sources
@@ -66,7 +69,6 @@ module Bundler
 
       dep = Dependency.new(name, options.merge(:version => version))
 
-      # OMG REFACTORZ. KTHX
       if @directory || options[:vendored_at]
         _handle_vendored_option(name, version, options)
       elsif options[:git]
@@ -79,36 +81,52 @@ module Bundler
   private
 
     def _handle_vendored_option(name, version, options)
-      vendored_at = Pathname.new(_combine_directory(options[:vendored_at]))
-      vendored_at = @environment.filename.dirname.join(vendored_at) if vendored_at.relative?
+      dir, path = _find_directory_source(options[:vendored_at])
 
-      if @sources[:directory][vendored_at.to_s]
-        raise DirectorySourceError, "There already is a gem defined at '#{vendored_at}'"
+      if dir
+        dir.required_specs << name
+        dir.add_spec(path, name, version) if version
       else
-        @sources[:directory][vendored_at.to_s] =
-          _build_directory_source(name, version) do
-            DirectorySource.new(:location => vendored_at)
-          end
+        directory options[:vendored_at] do
+          _handle_vendored_option(name, version, {})
+        end
       end
     end
 
-    def _handle_git_option(name, version, options)
-      git = options[:git].to_s
+    def _find_directory_source(path)
+      if @directory
+        return @directory, Pathname.new(path || '')
+      end
 
-      @sources[:git][git] ||=
-        _build_directory_source(name, version) do
-          ref = options[:commit] || options[:tag]
-          branch = options[:branch]
-          GitSource.new(:uri => git, :ref => ref, :branch => branch)
+      path = @environment.filename.dirname.join(path)
+
+      @directory_sources.each do |s|
+        if s.location.expand_path.to_s < path.expand_path.to_s
+          return s, path.relative_path_from(s.location)
         end
+      end
+
+      nil
     end
 
-    def _build_directory_source(name, version)
-      source = yield
+    def _handle_git_option(name, version, options)
+      git    = options[:git].to_s
+      ref    = options[:commit] || options[:tag]
+      branch = options[:branch]
+
+      if source = @git_sources[git]
+        if source.ref != ref
+          raise GitSourceError, "'#{git}' already specified with ref: #{source.ref}"
+        elsif source.branch != branch
+          raise GitSourceError, "'#{git}' already specified with branch: #{source.branch}"
+        end
+      else
+        source = GitSource.new(:uri => git, :ref => ref, :branch => branch)
+        @environment.add_priority_source(source)
+      end
+
       source.required_specs << name
-      source.add_spec(".", name, version) if version
-      @environment.add_priority_source(source)
-      source
+      source.add_spec('.', name, version) if version
     end
 
     def _combine_only(only)
@@ -123,10 +141,6 @@ module Bundler
       except = [except].flatten.compact.uniq.map { |o| o.to_s }
       except |= @except if @except
       except
-    end
-
-    def _combine_directory(path)
-      File.join(*[@directory, path].compact)
     end
   end
 end

@@ -187,7 +187,7 @@ describe "Faking gems with directories" do
             gem "lol", "1.0", :vendored_at => "omg"
           end
         Gemfile
-      }.should raise_error(Bundler::DirectorySourceError, /There already is a gem defined at/)
+      }.should raise_error(Bundler::DirectorySourceError, /already have a gem defined for/)
     end
 
     it "lets you set a directory source without a block" do
@@ -201,7 +201,7 @@ describe "Faking gems with directories" do
         gem "lol"
       Gemfile
 
-      :default.should have_const("Omg")
+      :default.should have_const("OMG")
     end
   end
 

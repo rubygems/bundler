@@ -1,5 +1,6 @@
 module Bundler
   class DirectorySourceError < StandardError; end
+  class GitSourceError < StandardError ; end
   # Represents a source of rubygems. Initially, this is only gem repositories, but
   # eventually, this will be git, svn, HTTP
   class Source
@@ -154,7 +155,7 @@ module Bundler
     attr_reader :location, :specs, :required_specs
 
     def initialize(options)
-      @location       = options[:location]
+      @location       = Pathname.new(options[:location]).expand_path if options[:location]
       @specs          = {}
       @required_specs = []
     end
@@ -260,6 +261,8 @@ module Bundler
   end
 
   class GitSource < DirectorySource
+    attr_reader :ref, :uri, :branch
+
     def initialize(options)
       super
       @uri = options[:uri]
