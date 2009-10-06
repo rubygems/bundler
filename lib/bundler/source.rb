@@ -289,9 +289,9 @@ module Bundler
         `git clone #{@uri} #{location} --no-hardlinks`
 
         if @ref
-          Dir.chdir(location) { `git checkout #{@ref}` }
+          Dir.chdir(location) { `git checkout --quiet #{@ref}` }
         elsif @branch && @branch != "master"
-          Dir.chdir(location) { `git checkout origin/#{@branch}` }
+          Dir.chdir(location) { `git checkout --quiet origin/#{@branch}` }
         end
       end
       super

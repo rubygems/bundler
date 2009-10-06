@@ -63,7 +63,7 @@ module Spec
         `git init`
         `git add *`
         `git commit -m "OMG GITZ"`
-        `git checkout -b alt`
+        `git checkout --quiet -b alt`
         path.join("lib", name).mkdir_p
         File.open(path.join("lib", name, "in_a_branch.rb"), 'w') do |file|
           file.puts "OMG_IN_A_BRANCH = 'tagged'"
@@ -76,7 +76,7 @@ module Spec
         end
         `git add *`
         `git commit -m "OMG BRANCHING"`
-        `git checkout master`
+        `git checkout --quiet master`
       end
       path
     end
