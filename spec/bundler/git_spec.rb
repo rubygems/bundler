@@ -124,4 +124,70 @@ describe "Getting gems from git" do
       tmp_gem_path.should_not include_vendored_dir("very-simple")
     end
   end
+
+  describe "using a git block" do
+    it "loads the gems specified in the git block" do
+      lib_builder "omg", "1.0"
+      gitify("#{tmp_path}/dirs/omg")
+
+      install_manifest <<-Gemfile
+        clear_sources
+        git "#{tmp_path}/dirs/omg" do
+          gem "omg"
+        end
+      Gemfile
+
+      :default.should have_const("OMG")
+    end
+
+    it "works when the gems don't have gemspecs" do
+      lib_builder "omg", "1.0", :gemspec => false
+      gitify("#{tmp_path}/dirs/omg")
+
+      install_manifest <<-Gemfile
+        clear_sources
+        git "#{tmp_path}/dirs/omg" do
+          gem "omg", "1.0"
+        end
+      Gemfile
+
+      :default.should have_const("OMG")
+    end
+
+    it "works when the gems are not at the root" do
+      lib_builder "omg", "1.0", :gemspec => false
+      gitify("#{tmp_path}/dirs")
+
+      install_manifest <<-Gemfile
+        clear_sources
+        git "#{tmp_path}/dirs" do
+          gem "omg", "1.0", :vendored_at => "omg"
+        end
+      Gemfile
+
+      :default.should have_const("OMG")
+    end
+
+    it "raises an exception when nesting calls to git" do
+      lambda {
+        install_manifest <<-Gemfile
+          git "foo" do
+            git "bar" do
+              gem "omg"
+            end
+          end
+        Gemfile
+      }.should raise_error(Bundler::DirectorySourceError, /cannot nest calls to directory or git/)
+
+      lambda {
+        install_manifest <<-Gemfile
+          directory "foo" do
+            git "bar" do
+              gem "omg"
+            end
+          end
+        Gemfile
+      }.should raise_error(Bundler::DirectorySourceError, /cannot nest calls to directory or git/)
+    end
+  end
 end

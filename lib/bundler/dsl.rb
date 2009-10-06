@@ -6,7 +6,7 @@ module Bundler
       @environment = environment
       @directory_sources = []
       @git_sources = {}
-      @only, @except, @directory = nil, nil, nil
+      @only, @except, @directory, @git = nil, nil, nil, nil
     end
 
     def bundle_path(path)
@@ -49,11 +49,21 @@ module Bundler
     end
 
     def directory(path)
-      raise DirectorySourceError, "cannot nest calls to directory" if @directory
+      raise DirectorySourceError, "cannot nest calls to directory or git" if @directory || @git
       @directory = DirectorySource.new(:location => path)
+      @directory_sources << @directory
       @environment.add_priority_source(@directory)
       yield if block_given?
       @directory = nil
+    end
+
+    def git(uri, options = {})
+      raise DirectorySourceError, "cannot nest calls to directory or git" if @directory || @git
+      @git = GitSource.new(options.merge(:uri => uri))
+      @git_sources[uri] = @git
+      @environment.add_priority_source(@git)
+      yield if block_given?
+      @git = nil
     end
 
     def clear_sources
@@ -69,10 +79,10 @@ module Bundler
 
       dep = Dependency.new(name, options.merge(:version => version))
 
-      if @directory || options[:vendored_at]
-        _handle_vendored_option(name, version, options)
-      elsif options[:git]
+      if @git || options[:git]
         _handle_git_option(name, version, options)
+      elsif @directory || options[:vendored_at]
+        _handle_vendored_option(name, version, options)
       end
 
       @environment.dependencies << dep
@@ -114,19 +124,20 @@ module Bundler
       ref    = options[:commit] || options[:tag]
       branch = options[:branch]
 
-      if source = @git_sources[git]
+      if source = @git || @git_sources[git]
         if source.ref != ref
           raise GitSourceError, "'#{git}' already specified with ref: #{source.ref}"
         elsif source.branch != branch
           raise GitSourceError, "'#{git}' already specified with branch: #{source.branch}"
         end
-      else
-        source = GitSource.new(:uri => git, :ref => ref, :branch => branch)
-        @environment.add_priority_source(source)
-      end
 
-      source.required_specs << name
-      source.add_spec('.', name, version) if version
+        source.required_specs << name
+        source.add_spec(Pathname.new(options[:vendored_at] || '.'), name, version) if version
+      else
+        git(git, :ref => ref, :branch => branch) do
+          _handle_git_option(name, version, options)
+        end
+      end
     end
 
     def _combine_only(only)
