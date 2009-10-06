@@ -93,7 +93,7 @@ describe "Faking gems with directories" do
     lib_builder("first", "1.0")
     lib_builder("second", "1.0") do |s|
       s.add_dependency "first", ">= 0"
-      s.write "lib/second.rb", "require 'first' ; SECOND = 'required'"
+      s.write "lib/second.rb", "require 'first' ; SECOND = '1.0'"
     end
 
     install_manifest <<-Gemfile
@@ -107,7 +107,7 @@ describe "Faking gems with directories" do
       puts SECOND
     RUBY
 
-    out.should == "required\nrequired"
+    out.should == "1.0\n1.0"
   end
 
   it "complains when the gemspec was not found in the directory specified" do
@@ -205,8 +205,18 @@ describe "Faking gems with directories" do
     end
   end
 
-  describe "multiple directory sources" do
-    it "handles the case where two directory sources are nested"
+  it "takes a glob" do
+    lib_builder "omg", "1.0", :path => "#{tmp_path}/dirs/omg-1.0"
+    lib_builder "omg", "2.0", :path => "#{tmp_path}/dirs/omg-2.0"
+    install_manifest <<-Gemfile
+      clear_sources
+      directory "#{tmp_path}/dirs", :glob => "**/*-1*/*.gemspec" do
+        gem "omg"
+      end
+    Gemfile
+
+    out = run_in_context "Bundler.require_env ; puts OMG"
+    out.should == "1.0"
   end
 
 end

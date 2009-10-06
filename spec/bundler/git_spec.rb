@@ -76,7 +76,7 @@ describe "Getting gems from git" do
     lib_builder("first", "1.0", :path => tmp_path("gitz", "first"))
     lib_builder("second", "1.0", :path => tmp_path("gitz", "second")) do |s|
       s.add_dependency "first", ">= 0"
-      s.write "lib/second.rb", "require 'first' ; SECOND = 'required'"
+      s.write "lib/second.rb", "require 'first' ; SECOND = '1.0'"
     end
 
     gitify(tmp_path("gitz"))
@@ -92,7 +92,7 @@ describe "Getting gems from git" do
       puts SECOND
     RUBY
 
-    out.should == "required\nrequired"
+    out.should == "1.0\n1.0"
   end
 
   it "allows bundling a specific tag" do

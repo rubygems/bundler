@@ -155,7 +155,10 @@ module Bundler
     attr_reader :location, :specs, :required_specs
 
     def initialize(options)
-      @location       = Pathname.new(options[:location]).expand_path if options[:location]
+      if options[:location]
+        @location = Pathname.new(options[:location]).expand_path
+      end
+      @glob           = options[:glob] || "**/*.gemspec"
       @specs          = {}
       @required_specs = []
     end
@@ -190,7 +193,7 @@ module Bundler
     end
 
     def locate_gemspecs
-      Dir["#{location}/**/*.gemspec"].inject({}) do |specs, file|
+      Dir["#{location}/#{@glob}"].inject({}) do |specs, file|
         file = Pathname.new(file)
         if spec = eval(File.read(file)) and validate_gemspec(file.dirname, spec)
           spec.location = file.dirname.expand_path

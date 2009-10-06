@@ -48,9 +48,9 @@ module Bundler
       @except = old
     end
 
-    def directory(path)
+    def directory(path, options = {})
       raise DirectorySourceError, "cannot nest calls to directory or git" if @directory || @git
-      @directory = DirectorySource.new(:location => path)
+      @directory = DirectorySource.new(options.merge(:location => path))
       @directory_sources << @directory
       @environment.add_priority_source(@directory)
       yield if block_given?

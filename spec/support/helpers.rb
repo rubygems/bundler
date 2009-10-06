@@ -94,7 +94,7 @@ module Spec
           s.version = version
         end
         @options = options
-        @files = { "lib/#{name}.rb" => "#{name.upcase} = 'required'" }
+        @files = { "lib/#{name}.rb" => "#{name.upcase} = '#{version}'" }
       end
 
       def method_missing(*args, &blk)
