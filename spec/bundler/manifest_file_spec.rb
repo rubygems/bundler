@@ -69,6 +69,21 @@ describe "Bundler::Environment" do
     Bundler::Environment.load.bindir.should == tmp_path('cheezeburgerz')
   end
 
+  it "overwrites existing bin files" do
+    bundled_app('bin').mkdir_p
+    File.open("#{bundled_app}/bin/rackup", 'w') do |f|
+      f.print "omg"
+    end
+
+    install_manifest <<-Gemfile
+      clear_sources
+      source "file://#{gem_repo1}"
+      gem "rack"
+    Gemfile
+
+    File.read("#{bundled_app}/bin/rackup").should_not == "omg"
+  end
+
   it "ensures the source sources contains no duplicate" do
     build_manifest_file <<-Gemfile
       source "http://gems.rubyforge.org"
