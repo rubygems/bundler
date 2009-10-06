@@ -140,6 +140,20 @@ describe "Getting gems from git" do
       :default.should have_const("OMG")
     end
 
+    it "works when specifying a branch" do
+      lib_builder "omg", "1.0"
+      gitify("#{tmp_path}/dirs/omg")
+
+      install_manifest <<-Gemfile
+        clear_sources
+        git "#{tmp_path}/dirs/omg", :branch => :master do
+          gem "omg"
+        end
+      Gemfile
+
+      :default.should have_const("OMG")
+    end
+
     it "works when the gems don't have gemspecs" do
       lib_builder "omg", "1.0", :gemspec => false
       gitify("#{tmp_path}/dirs/omg")

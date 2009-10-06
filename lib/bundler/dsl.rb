@@ -125,9 +125,9 @@ module Bundler
       branch = options[:branch]
 
       if source = @git || @git_sources[git]
-        if source.ref != ref
+        if ref && source.ref != ref
           raise GitSourceError, "'#{git}' already specified with ref: #{source.ref}"
-        elsif source.branch != branch
+        elsif branch && source.branch != branch
           raise GitSourceError, "'#{git}' already specified with branch: #{source.branch}"
         end
 
