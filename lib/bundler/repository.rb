@@ -35,7 +35,9 @@ module Bundler
         do_install(bundle, options)
         valid = bundle
       end
-      cleanup(valid)
+
+      generate_bins(valid, options)
+      cleanup(valid, options)
       configure(valid, options)
     end
 
@@ -96,6 +98,25 @@ module Bundler
       end
     end
 
+    def generate_bins(bundle, options)
+      bundle.each do |spec|
+        # HAX -- Generate the bin
+        bin_dir = @bindir
+        path    = @path
+        installer = Gem::Installer.allocate
+        installer.instance_eval do
+          @spec     = spec
+          @bin_dir  = bin_dir
+          @gem_dir  = path.join("gems", "#{spec.full_name}")
+          @gem_home = path
+          @wrappers = true
+          @format_executable = false
+          @env_shebang = false
+        end
+        installer.generate_bin
+      end
+    end
+
     def expand_gemfile(spec, options)
       Bundler.logger.info "Installing #{spec.name} (#{spec.version})"
 
@@ -115,19 +136,6 @@ module Bundler
       add_spec(spec)
       FileUtils.mkdir_p(@path.join("gems"))
       File.symlink(spec.location, @path.join("gems", spec.full_name))
-
-      # HAX -- Generate the bin
-      bin_dir = @bindir
-      path    = @path
-      installer = Gem::Installer.allocate
-      installer.instance_eval do
-        @spec     = spec
-        @bin_dir  = bin_dir
-        @gem_dir  = path.join("gems", "#{spec.full_name}")
-        @gem_home = path
-        @wrappers = true
-      end
-      installer.generate_bin
     end
 
     def add_spec(spec)
@@ -139,7 +147,7 @@ module Bundler
       end
     end
 
-    def cleanup(valid)
+    def cleanup(valid, options)
       to_delete = gems
       to_delete.delete_if do |spec|
         valid.any? { |other| spec.name == other.name && spec.version == other.version }

@@ -84,6 +84,18 @@ describe "Bundler::Environment" do
     File.read("#{bundled_app}/bin/rackup").should_not == "omg"
   end
 
+  it "recreates the bin files if they are missing" do
+    install_manifest <<-Gemfile
+      clear_sources
+      source "file://#{gem_repo1}"
+      gem "rack"
+    Gemfile
+
+    bundled_app('bin/rackup').delete
+    Dir.chdir(bundled_app) { gem_command :bundle }
+    bundled_app('bin/rackup').should exist
+  end
+
   it "ensures the source sources contains no duplicate" do
     build_manifest_file <<-Gemfile
       source "http://gems.rubyforge.org"
