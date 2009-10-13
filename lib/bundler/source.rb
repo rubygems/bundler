@@ -5,6 +5,19 @@ module Bundler
   # eventually, this will be git, svn, HTTP
   class Source
     attr_accessor :repository, :local
+
+    def initialize(options) ; end
+
+  private
+
+    def process_source_gems(gems)
+      new_gems = Hash.new { |h,k| h[k] = [] }
+      gems.values.each do |spec|
+        spec.source = self
+        new_gems[spec.name] << spec
+      end
+      new_gems
+    end
   end
 
   class GemSource < Source
@@ -67,10 +80,11 @@ module Bundler
         index = Marshal.load(main_index)
       end
 
-      gems = {}
+      gems = Hash.new { |h,k| h[k] = [] }
       index.each do |name, version, platform|
         spec = RemoteSpecification.new(name, version, platform, @uri)
-        gems[spec.full_name] = spec
+        spec.source = self
+        gems[spec.name] << spec
       end
       gems
     rescue Gem::RemoteFetcher::FetchError => e
@@ -79,8 +93,13 @@ module Bundler
   end
 
   class SystemGemSource < Source
+
+    def self.instance
+      @instance ||= new({})
+    end
+
     def initialize(options)
-      # Nothing to do
+      @source = Gem::SourceIndex.from_installed_gems
     end
 
     def can_be_local?
@@ -88,7 +107,7 @@ module Bundler
     end
 
     def gems
-      @specs ||= Gem::SourceIndex.from_installed_gems.gems
+      @gems ||= process_source_gems(@source.gems)
     end
 
     def ==(other)
@@ -100,13 +119,12 @@ module Bundler
     end
 
     def download(spec)
-      # gemfile = Pathname.new(local.loaded_from)
-      # gemfile = gemfile.dirname.join('..', 'cache', "#{local.full_name}.gem").expand_path
-      # repository.cache(File.join(Gem.dir, "cache", "#{local.full_name}.gem"))
       gemfile = Pathname.new(spec.loaded_from)
       gemfile = gemfile.dirname.join('..', 'cache', "#{spec.full_name}.gem")
       repository.cache(gemfile)
     end
+
+  private
 
   end
 
@@ -140,11 +158,12 @@ module Bundler
   private
 
     def fetch_specs
-      specs = {}
+      specs = Hash.new { |h,k| h[k] = [] }
 
       Dir["#{@location}/*.gem"].each do |gemfile|
         spec = Gem::Format.from_file_by_path(gemfile).spec
-        specs[spec.full_name] = spec
+        spec.source = self
+        specs[spec.name] << spec
       end
 
       specs
@@ -188,7 +207,7 @@ module Bundler
           end
         end
 
-        specs
+        process_source_gems(specs)
       end
     end
 

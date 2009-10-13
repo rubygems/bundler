@@ -126,6 +126,27 @@ module Spec
       spec._build(options[:path] || tmp_path('dirs', name))
     end
 
+    def install_gems(*gems)
+      Dir["#{fixture_dir}/*/gems/*.gem"].each do |path|
+        if gems.include?(File.basename(path, ".gem"))
+          `gem install --no-rdoc --no-ri --ignore-dependencies #{path}`
+        end
+      end
+    end
+
+    alias install_gem install_gems
+
+    def system_gems(*gems)
+      system_gem_path.mkdir_p
+
+      gem_home, gem_path = ENV['GEM_HOME'], ENV['GEM_PATH']
+      ENV['GEM_HOME'], ENV['GEM_PATH'] = system_gem_path.to_s, system_gem_path.to_s
+
+      install_gems(*gems)
+      yield
+      ENV['GEM_HOME'], ENV['GEM_PATH'] = gem_home, gem_path
+    end
+
     def reset!
       tmp_path.rmtree if tmp_path.exist?
       tmp_path.mkdir

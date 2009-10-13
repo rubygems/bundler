@@ -79,7 +79,9 @@ module Bundler
 
       dep = Dependency.new(name, options.merge(:version => version))
 
-      if @git || options[:git]
+      if options.key?(:bundle) && !options[:bundle]
+        # We're using system gems for this one
+      elsif @git || options[:git]
         _handle_git_option(name, version, options)
       elsif @directory || options[:vendored_at]
         _handle_vendored_option(name, version, options)

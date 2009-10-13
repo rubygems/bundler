@@ -34,7 +34,7 @@ module Bundler
 
     def initialize(filename) #, sources, dependencies, bindir, path, rubygems, system_gems)
       @filename         = filename
-      @default_sources  = [GemSource.new(:uri => "http://gems.rubyforge.org"), SystemGemSource.new({})]
+      @default_sources  = [GemSource.new(:uri => "http://gems.rubyforge.org"), SystemGemSource.instance]
       @sources          = []
       @priority_sources = []
       @dependencies     = []
@@ -50,12 +50,15 @@ module Bundler
       update = options[:update]
       cached = options[:cached]
 
+      no_bundle = dependencies.select { |dep| !dep.bundle }
+
       repository.install(gem_dependencies, sources,
         :rubygems    => rubygems,
         :system_gems => system_gems,
         :manifest    => filename,
         :update      => update,
-        :cached      => cached
+        :cached      => cached,
+        :no_bundle   => no_bundle.map { |dep| dep.name }
       )
       Bundler.logger.info "Done."
     end

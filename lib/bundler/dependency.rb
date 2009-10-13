@@ -2,7 +2,7 @@ module Bundler
   class InvalidEnvironmentName < StandardError; end
 
   class Dependency
-    attr_reader :name, :version, :require_as, :only, :except
+    attr_reader :name, :version, :require_as, :only, :except, :bundle
 
     def initialize(name, options = {}, &block)
       options.each do |k, v|
@@ -14,6 +14,7 @@ module Bundler
       @require_as = options["require_as"]
       @only       = options["only"]
       @except     = options["except"]
+      @bundle     = options.key?("bundle") ? options["bundle"] : true
       @block      = block
 
       if (@only && @only.include?("rubygems")) || (@except && @except.include?("rubygems"))

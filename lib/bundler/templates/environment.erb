@@ -20,9 +20,14 @@ module Bundler
   require "rubygems"
 
   @bundled_specs = {}
-<% spec_files.each do |name, path| -%>
-  @bundled_specs["<%= name %>"] = eval(File.read("#{dir}/<%= path %>"))
-  @bundled_specs["<%= name %>"].loaded_from = "#{dir}/<%= path %>"
+<% specs.each do |spec| -%>
+<% if options[:no_bundle].include?(spec.name) -%>
+  gem "<%= spec.name %>", "<%= spec.version %>"
+<% else -%>
+<% path = spec_file_for(spec) -%>
+  @bundled_specs["<%= spec.name %>"] = eval(File.read("#{dir}/<%= path %>"))
+  @bundled_specs["<%= spec.name %>"].loaded_from = "#{dir}/<%= path %>"
+<% end -%>
 <% end -%>
 
   def self.add_specs_to_loaded_specs

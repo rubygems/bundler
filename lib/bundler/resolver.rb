@@ -36,8 +36,8 @@ module Bundler
     # ==== Returns
     # <GemBundle>,nil:: If the list of dependencies can be resolved, a
     #   collection of gemspecs is returned. Otherwise, nil is returned.
-    def self.resolve(requirements, sources)
-      resolver = new(sources)
+    def self.resolve(requirements, sources, source_requirements = {})
+      resolver = new(sources, source_requirements)
       result = catch(:success) do
         resolver.resolve(requirements, {})
         output = resolver.errors.inject("") do |o, (conflict, (origin, requirement))|
@@ -49,22 +49,38 @@ module Bundler
         raise VersionConflict, "No compatible versions could be found for required dependencies:\n  #{output}"
         nil
       end
-      result && GemBundle.new(result.values)
+      if result
+        # Order gems in order of dependencies. Every gem's dependency is at
+        # a smaller index in the array.
+        ordered = []
+        result.values.each do |spec1|
+          index = nil
+          place = ordered.detect do |spec2|
+            spec1.dependencies.any? { |d| d.name == spec2.name }
+          end
+          place ?
+            ordered.insert(ordered.index(place), spec1) :
+            ordered << spec1
+        end
+        ordered.reverse
+      end
     end
 
-    def initialize(sources)
+    def initialize(sources, source_requirements)
       @errors = {}
       @stack  = []
-      @specs  = Hash.new { |h,k| h[k] = {} }
+      @specs  = Hash.new { |h,k| h[k] = [] }
+      @by_gem = source_requirements
       @cache  = {}
       @index  = {}
 
-      sources.reverse_each do |source|
-        source.gems.values.each do |spec|
-          # TMP HAX FOR OPTZ
-          spec.source = source
-          next unless Gem::Platform.match(spec.platform)
-          @specs[spec.name][spec.version] = spec
+      sources.each do |source|
+        source.gems.each do |name, specs|
+          # Hack to work with a regular Gem::SourceIndex
+          [specs].flatten.compact.each do |spec|
+            next if @specs[spec.name].any? { |s| s.version == spec.version }
+            @specs[spec.name] << spec
+          end
         end
       end
     end
@@ -182,8 +198,11 @@ module Bundler
 
     def search(dependency)
       @cache[dependency.hash] ||= begin
-        @specs[dependency.name].values.select do |spec|
+        collection = @by_gem[dependency.name].gems if @by_gem[dependency.name]
+        collection ||= @specs
+        collection[dependency.name].select do |spec|
           match = dependency =~ spec
+          match &= Gem::Platform.match(spec.platform)
           match &= dependency.version_requirements.prerelease? if spec.version.prerelease?
           match
         end.sort_by {|s| s.version }

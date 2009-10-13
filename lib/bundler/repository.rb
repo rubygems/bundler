@@ -20,8 +20,13 @@ module Bundler
         s.local = options[:cached]
       end
 
+      source_requirements = {}
+      options[:no_bundle].each do |name|
+        source_requirements[name] = SystemGemSource.instance
+      end
+
       begin
-        valid = Resolver.resolve(dependencies, [source_index])
+        valid = Resolver.resolve(dependencies, [source_index], source_requirements)
       rescue Bundler::GemNotFound
       end
 
@@ -31,7 +36,8 @@ module Bundler
 
       if options[:update] || !valid
         Bundler.logger.info "Calculating dependencies..."
-        bundle = Resolver.resolve(dependencies, [@cache] + sources)
+        bundle = Resolver.resolve(dependencies, [@cache] + sources, source_requirements)
+        download(bundle, options)
         do_install(bundle, options)
         valid = bundle
       end
@@ -81,10 +87,16 @@ module Bundler
 
   private
 
-    def do_install(bundle, options)
-      bundle.download
+    def download(bundle, options)
+      bundle.sort_by {|s| s.full_name.downcase }.each do |spec|
+        next if options[:no_bundle].include?(spec.name)
+        spec.source.download(spec)
+      end
+    end
 
+    def do_install(bundle, options)
       bundle.each do |spec|
+        next if options[:no_bundle].include?(spec.name)
         spec.loaded_from = @path.join("specifications", "#{spec.full_name}.gemspec")
         # Do nothing if the gem is already expanded
         next if @path.join("gems", spec.full_name).directory?
@@ -100,6 +112,7 @@ module Bundler
 
     def generate_bins(bundle, options)
       bundle.each do |spec|
+        next if options[:no_bundle].include?(spec.name)
         # HAX -- Generate the bin
         bin_dir = @bindir
         path    = @path
@@ -181,13 +194,9 @@ module Bundler
     def generate_environment(specs, options)
       FileUtils.mkdir_p(path)
 
-      load_paths = load_paths_for_specs(specs)
+      load_paths = load_paths_for_specs(specs, options)
       bindir     = @bindir.relative_path_from(path).to_s
       filename   = options[:manifest].relative_path_from(path).to_s
-      spec_files = specs.inject({}) do |hash, spec|
-        relative = spec.loaded_from.relative_path_from(@path).to_s
-        hash.merge!(spec.name => relative)
-      end
 
       File.open(path.join("environment.rb"), "w") do |file|
         template = File.read(File.join(File.dirname(__FILE__), "templates", "environment.erb"))
@@ -196,9 +205,10 @@ module Bundler
       end
     end
 
-    def load_paths_for_specs(specs)
+    def load_paths_for_specs(specs, options)
       load_paths = []
       specs.each do |spec|
+        next if options[:no_bundle].include?(spec.name)
         gem_path = Pathname.new(spec.full_gem_path)
         if spec.bindir
           load_paths << gem_path.join(spec.bindir).relative_path_from(@path).to_s
@@ -208,6 +218,10 @@ module Bundler
         end
       end
       load_paths
+    end
+
+    def spec_file_for(spec)
+      spec.loaded_from.relative_path_from(@path).to_s
     end
 
     def require_code(file, dep)

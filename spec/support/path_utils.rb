@@ -56,6 +56,10 @@ module Spec
       fixture_dir.join("repository1", "gems", "#{gem_name}.gem")
     end
 
+    def system_gem_path(*path)
+      tmp_path('system_gems', *path)
+    end
+
     def copy(gem_name)
       FileUtils.cp(fixture(gem_name), File.join(tmp_dir, 'cache'))
     end
