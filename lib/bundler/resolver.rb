@@ -202,7 +202,6 @@ module Bundler
         collection ||= @specs
         collection[dependency.name].select do |spec|
           match = dependency =~ spec
-          match &= Gem::Platform.match(spec.platform)
           match &= dependency.version_requirements.prerelease? if spec.version.prerelease?
           match
         end.sort_by {|s| s.version }

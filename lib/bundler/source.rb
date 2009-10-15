@@ -84,7 +84,7 @@ module Bundler
       index.each do |name, version, platform|
         spec = RemoteSpecification.new(name, version, platform, @uri)
         spec.source = self
-        gems[spec.name] << spec
+        gems[spec.name] << spec if Gem::Platform.match(spec.platform)
       end
       gems
     rescue Gem::RemoteFetcher::FetchError => e
