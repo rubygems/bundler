@@ -27,7 +27,8 @@ module Bundler
 
       # Check to see whether the existing cache meets all the requirements
       begin
-        valid = Resolver.resolve(dependencies, [source_index], source_requirements)
+        valid = nil
+        # valid = Resolver.resolve(dependencies, [source_index], source_requirements)
       rescue Bundler::GemNotFound
       end
 
