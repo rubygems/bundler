@@ -25,6 +25,9 @@ module Bundler
     rescue SourceNotCached => e
       Bundler.logger.error e.message
       exit 9
+    rescue ManifestFileNotFound => e
+      Bundler.logger.error e.message
+      exit 10
     end
 
     def initialize(options)

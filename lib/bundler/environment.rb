@@ -14,7 +14,7 @@ module Bundler
       gemfile = gemfile ? Pathname.new(gemfile).expand_path : default_manifest_file
 
       unless gemfile.file?
-        raise ManifestFileNotFound, "#{filename.inspect} does not exist"
+        raise ManifestFileNotFound, "Manifest file not found: #{gemfile.to_s.inspect}"
       end
 
       new(gemfile)

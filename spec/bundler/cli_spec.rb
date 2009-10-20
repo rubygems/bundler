@@ -125,6 +125,11 @@ describe "Bundler::CLI" do
     end
   end
 
+  it "raises when providing a bad manifest" do
+    out = gem_command :bundle, "-m manifest_not_here"
+    out.should =~ /Manifest file not found: \".*manifest_not_here\"/
+  end
+
   describe "it working while specifying the manifest file name" do
     it "works when the manifest is in the root directory" do
       build_manifest_file bundled_app('manifest.rb'), <<-Gemfile
