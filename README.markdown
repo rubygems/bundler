@@ -180,6 +180,26 @@ this to your top-level `.gitignore` to only keep the cache:
 
 Make sure that you explicitly `git add vendor/gems/cache` before you commit.
 
+### Gems with compile-time options
+
+Some gems require you to pass compile-time options to the gem install command.
+For instance, to install mysql, you might do:
+
+    gem install mysql -- --with-mysql-config=/usr/local/lib/mysql
+
+You can pass these options to the bundler by creating a YAML file containing
+the options in question:
+
+    mysql:
+      mysql-config: /usr/local/lib/mysql
+
+You can then point the bundler at the file:
+
+    gem bundle --build-options build_options.yml
+
+In general, you will want to keep the build options YAML out of version control,
+and provide the appropriate options for the system in question.
+
 ### Running your application
 
 The easiest way to run your application is to start it with an executable
