@@ -53,12 +53,13 @@ module Bundler
       no_bundle = dependencies.select { |dep| !dep.bundle }
 
       repository.install(gem_dependencies, sources,
-        :rubygems    => rubygems,
-        :system_gems => system_gems,
-        :manifest    => filename,
-        :update      => update,
-        :cached      => cached,
-        :no_bundle   => no_bundle.map { |dep| dep.name }
+        :rubygems      => rubygems,
+        :system_gems   => system_gems,
+        :manifest      => filename,
+        :update        => update,
+        :cached        => cached,
+        :build_options => options[:build_options],
+        :no_bundle     => no_bundle.map { |dep| dep.name }
       )
       Bundler.logger.info "Done."
     end

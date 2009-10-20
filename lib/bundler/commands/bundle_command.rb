@@ -26,6 +26,12 @@ class Gem::Commands::BundleCommand < Gem::Command
     add_option('--list', "List all gems that are part of the active bundle") do
       options[:list] = true
     end
+
+    add_option('-b', '--build-options OPTION_FILE', "Specify a path to a yml file with build options for binary gems") do |option_file, options|
+      if File.exist?(option_file)
+        options[:build_options] = YAML.load_file(option_file)
+      end
+    end
   end
 
   def usage

@@ -1,6 +1,49 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "Bundler::CLI" do
+  describe "it compiles gems that take options" do
+    before(:each) do
+      build_manifest <<-Gemfile
+        clear_sources
+        source "file://#{gem_repo1}"
+        gem "very-simple-binary"
+      Gemfile
+    end
+
+    it "fails if the option is not provided" do
+      Dir.chdir(bundled_app) do
+        output = gem_command :bundle, "2>&1"
+      end
+
+      output.should =~ /Failed to build gem native extension/
+    end
+
+    it "passes if a yaml is specified that contains the necessary options" do
+      File.open(bundled_app.join("build.yml"), "w+") do |file|
+        file.puts <<-build_options.gsub(/^          /, '')
+          very-simple-binary:
+            simple: wot
+        build_options
+      end
+
+      Dir.chdir(bundled_app) do
+        @output = gem_command :bundle, "--build-options=build.yml 2>&1"
+      end
+
+      @output.should_not =~ /Failed to build gem native extension/
+
+      ruby_code = <<-RUBY.split("\n").join("; ")
+        require %{very_simple_binary}
+        include VerySimpleBinaryForTests
+        puts working
+      RUBY
+
+      @output = run_in_context "exec %{#{Gem.ruby} -e '#{ruby_code}'}"
+
+      @output.should == "true"
+    end
+  end
+
   describe "it working" do
     before(:each) do
       build_manifest <<-Gemfile

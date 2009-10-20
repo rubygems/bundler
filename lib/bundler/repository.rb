@@ -135,6 +135,10 @@ module Bundler
 
       gemfile = @path.join("cache", "#{spec.full_name}.gem").to_s
 
+      if build_args = options[:build_options][spec.name]
+        Gem::Command.build_args = build_args.map {|k,v| "--with-#{k}=#{v}"}
+      end
+
       installer = Gem::Installer.new(gemfile, options.merge(
         :install_dir         => @path,
         :ignore_dependencies => true,
@@ -143,6 +147,8 @@ module Bundler
         :bin_dir             => @bindir
       ))
       installer.install
+    ensure
+      Gem::Command.build_args = []
     end
 
     def expand_vendored_gem(spec, options)
