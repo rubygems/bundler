@@ -216,7 +216,7 @@ You can use `gem exec bash` to enter a shell that will run all binaries in
 the current context.
 
 Yet another way is to manually require the environment file first. This is
-located in `[bundle_path]/environments/default.rb`. For example:
+located in `[bundle_path]/gems/environment.rb`. For example:
 
     ruby -r vendor/gems/environment.rb my_ruby_script.rb
 
