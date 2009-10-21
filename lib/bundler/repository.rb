@@ -135,7 +135,7 @@ module Bundler
 
       gemfile = @path.join("cache", "#{spec.full_name}.gem").to_s
 
-      if build_args = options[:build_options][spec.name]
+      if build_args = options[:build_options] && options[:build_options][spec.name]
         Gem::Command.build_args = build_args.map {|k,v| "--with-#{k}=#{v}"}
       end
 

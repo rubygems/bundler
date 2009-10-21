@@ -12,10 +12,10 @@ describe "Bundler::CLI" do
 
     it "fails if the option is not provided" do
       Dir.chdir(bundled_app) do
-        output = gem_command :bundle, "2>&1"
+        @output = gem_command :bundle, "2>&1"
       end
 
-      output.should =~ /Failed to build gem native extension/
+      @output.should =~ /Failed to build gem native extension/
     end
 
     it "passes if a yaml is specified that contains the necessary options" do
