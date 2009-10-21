@@ -1,3 +1,8 @@
+if exec = ARGV.index("exec")
+  $command = ARGV[(exec + 1)..-1].join(" ")
+  ARGV.replace ARGV[0..exec]
+end
+
 class Gem::Commands::ExecCommand < Gem::Command
 
   def initialize
