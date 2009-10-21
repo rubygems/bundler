@@ -74,6 +74,11 @@ module Bundler
       options = args.last.is_a?(Hash) ? args.pop : {}
       version = args.last
 
+      if path = options.delete(:vendored_at)
+        options[:path] = path
+        warn "The :vendored_at option is deprecated. Use :path instead.\nFrom #{caller[0]}"
+      end
+
       options[:only] = _combine_only(options[:only] || options["only"])
       options[:except] = _combine_except(options[:except] || options["except"])
 
@@ -83,7 +88,7 @@ module Bundler
         # We're using system gems for this one
       elsif @git || options[:git]
         _handle_git_option(name, version, options)
-      elsif @directory || options[:vendored_at]
+      elsif @directory || options[:path]
         _handle_vendored_option(name, version, options)
       end
 
@@ -93,13 +98,13 @@ module Bundler
   private
 
     def _handle_vendored_option(name, version, options)
-      dir, path = _find_directory_source(options[:vendored_at])
+      dir, path = _find_directory_source(options[:path])
 
       if dir
         dir.required_specs << name
         dir.add_spec(path, name, version) if version
       else
-        directory options[:vendored_at] do
+        directory options[:path] do
           _handle_vendored_option(name, version, {})
         end
       end
@@ -134,7 +139,7 @@ module Bundler
         end
 
         source.required_specs << name
-        source.add_spec(Pathname.new(options[:vendored_at] || '.'), name, version) if version
+        source.add_spec(Pathname.new(options[:path] || '.'), name, version) if version
       else
         git(git, :ref => ref, :branch => branch) do
           _handle_git_option(name, version, options)

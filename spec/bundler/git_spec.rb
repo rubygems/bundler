@@ -175,7 +175,7 @@ describe "Getting gems from git" do
       install_manifest <<-Gemfile
         clear_sources
         git "#{tmp_path}/dirs" do
-          gem "omg", "1.0", :vendored_at => "omg"
+          gem "omg", "1.0", :path => "omg"
         end
       Gemfile
 

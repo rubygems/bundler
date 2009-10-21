@@ -12,7 +12,7 @@ describe "Faking gems with directories" do
           install_manifest <<-Gemfile
             clear_sources
             source "file://#{gem_repo1}"
-            gem "very-simple", "1.0", :vendored_at => "#{path}"
+            gem "very-simple", "1.0", :path => "#{path}"
           Gemfile
         end
 
@@ -55,7 +55,7 @@ describe "Faking gems with directories" do
         lambda do
           install_manifest <<-Gemfile
             clear_sources
-            gem "very-simple", :vendored_at => "#{fixture_dir.join("very-simple")}"
+            gem "very-simple", :path => "#{fixture_dir.join("very-simple")}"
           Gemfile
         end.should raise_error(Bundler::DirectorySourceError, /Please explicitly specify a version/)
       end
@@ -65,7 +65,7 @@ describe "Faking gems with directories" do
         lambda do
           install_manifest <<-Gemfile
             clear_sources
-            gem "very-simple", ">= 0.1.0", :vendored_at => "#{fixture_dir.join("very-simple")}"
+            gem "very-simple", ">= 0.1.0", :path => "#{fixture_dir.join("very-simple")}"
           Gemfile
         end.should raise_error(ArgumentError, /:at/)
       end
@@ -81,7 +81,7 @@ describe "Faking gems with directories" do
     install_manifest <<-Gemfile
       clear_sources
       source "file://#{gem_repo1}"
-      gem "very-simple", "1.0", :vendored_at => "#{path}"
+      gem "very-simple", "1.0", :path => "#{path}"
     Gemfile
 
     tmp_gem_path.should_not include_cached_gem("very-simple-1.0")
@@ -98,7 +98,7 @@ describe "Faking gems with directories" do
 
     install_manifest <<-Gemfile
       clear_sources
-      gem "second", :vendored_at => "#{tmp_path('dirs')}"
+      gem "second", :path => "#{tmp_path('dirs')}"
     Gemfile
 
     out = run_in_context <<-RUBY
@@ -117,7 +117,7 @@ describe "Faking gems with directories" do
     lambda {
       install_manifest <<-Gemfile
         clear_sources
-        gem "first", "1.0", :vendored_at => "#{tmp_path('dirs')}"
+        gem "first", "1.0", :path => "#{tmp_path('dirs')}"
       Gemfile
     }.should raise_error(Bundler::DirectorySourceError, /The location you specified for first is/)
   end
@@ -130,7 +130,7 @@ describe "Faking gems with directories" do
 
     install_manifest <<-Gemfile
       clear_sources
-      gem "very-simple", :vendored_at => "#{tmp_path('very-simple')}"
+      gem "very-simple", :path => "#{tmp_path('very-simple')}"
     Gemfile
 
     tmp_bindir('very_simple').should exist
@@ -155,8 +155,8 @@ describe "Faking gems with directories" do
       install_manifest <<-Gemfile
         clear_sources
         directory "#{ext}" do
-          gem "omg",  "1.0", :vendored_at => "omg"
-          gem "hi2u", "1.0", :vendored_at => "hi2u"
+          gem "omg",  "1.0", :path => "omg"
+          gem "hi2u", "1.0", :path => "hi2u"
         end
       Gemfile
 
@@ -164,7 +164,7 @@ describe "Faking gems with directories" do
       :default.should have_const("HI2U")
     end
 
-    it "can list vendored gems without :vendored_at" do
+    it "can list vendored gems without :path" do
       lib_builder "omg", "1.0", :gemspec => false
       install_manifest <<-Gemfile
         clear_sources
@@ -183,8 +183,8 @@ describe "Faking gems with directories" do
         install_manifest <<-Gemfile
           clear_sources
           directory "#{tmp_path('dirs')}" do
-            gem "omg", "1.0", :vendored_at => "omg"
-            gem "lol", "1.0", :vendored_at => "omg"
+            gem "omg", "1.0", :path => "omg"
+            gem "lol", "1.0", :path => "omg"
           end
         Gemfile
       }.should raise_error(Bundler::DirectorySourceError, /already have a gem defined for/)
