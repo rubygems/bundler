@@ -96,6 +96,15 @@ describe "Bundler::CLI" do
       end
     end
 
+    it "runs exec with options correctly" do
+      Dir.chdir(bundled_app) do
+        out = gem_command :exec, %[ruby --version 2>&1], :no_quote => true
+        puts out
+        out.should_not =~ /version unknown/
+        out.should =~ /patchlevel/
+      end
+    end
+
     it "maintains the correct environment when shelling out" do
       out = run_in_context "exec %{#{Gem.ruby} -e 'require %{very-simple} ; puts VerySimpleForTests'}"
       out.should == "VerySimpleForTests"

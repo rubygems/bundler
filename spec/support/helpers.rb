@@ -12,8 +12,8 @@ module Spec
       %x{#{Gem.ruby} -I#{lib} #{opts} -e "#{ruby}"}.strip
     end
 
-    def gem_command(command, args = "")
-      if command == :exec
+    def gem_command(command, args = "", options = {})
+      if command == :exec && !options[:no_quote]
         args = args.gsub(/(?=")/, "\\")
         args = %["#{args}"]
       end

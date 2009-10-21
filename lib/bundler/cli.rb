@@ -54,7 +54,7 @@ module Bundler
     def exec
       @manifest.setup_environment
       # w0t?
-      super(*@options[:args])
+      super(*$command)
     end
 
     def run(command)
