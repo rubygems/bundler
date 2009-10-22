@@ -32,27 +32,27 @@ module Bundler
 
     def initialize(options)
       @options = options
-      @manifest = Bundler::Environment.load(@options[:manifest])
+      @environment = Bundler::Environment.load(@options[:manifest])
     end
 
     def bundle
-      @manifest.install(@options)
+      @environment.install(@options)
     end
 
     def cache
-      @manifest.cache(@options)
+      @environment.cache(@options)
     end
 
     def prune
-      @manifest.prune(@options)
+      @environment.prune(@options)
     end
 
     def list
-      @manifest.list(@options)
+      @environment.list(@options)
     end
 
     def exec
-      @manifest.setup_environment
+      @environment.setup_environment
       # w0t?
       super(*$command)
     end
