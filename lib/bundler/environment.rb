@@ -10,8 +10,8 @@ module Bundler
     attr_accessor :rubygems, :system_gems
     attr_writer :gem_path, :bindir
 
-    def self.load(gemfile = nil)
-      gemfile = gemfile ? Pathname.new(gemfile).expand_path : default_manifest_file
+    def self.load(file = nil)
+      gemfile = Pathname.new(file || default_manifest_file).expand_path
 
       unless gemfile.file?
         raise ManifestFileNotFound, "Manifest file not found: #{gemfile.to_s.inspect}"
@@ -32,9 +32,9 @@ module Bundler
       raise DefaultManifestNotFound
     end
 
-    def initialize(filename) #, sources, dependencies, bindir, path, rubygems, system_gems)
+    def initialize(filename)
       @filename         = filename
-      @default_sources  = [GemSource.new(:uri => "http://gems.rubyforge.org"), SystemGemSource.instance]
+      @default_sources  = default_sources
       @sources          = []
       @priority_sources = []
       @dependencies     = []
@@ -42,24 +42,20 @@ module Bundler
       @system_gems      = true
 
       # Evaluate the Gemfile
-      builder = Dsl.new(self)
-      builder.instance_eval(File.read(filename), filename)
+      Dsl.evaluate(self, filename)
     end
 
     def install(options = {})
-      update = options[:update]
-      cached = options[:cached]
-
-      no_bundle = dependencies.select { |dep| !dep.bundle }
+      no_bundle = dependencies.map { |dep| !dep.bundle && dep.name }.compact
 
       repository.install(gem_dependencies, sources,
         :rubygems      => rubygems,
         :system_gems   => system_gems,
         :manifest      => filename,
-        :update        => update,
-        :cached        => cached,
+        :update        => options[:update],
+        :cached        => options[:cached],
         :build_options => options[:build_options],
-        :no_bundle     => no_bundle.map { |dep| dep.name }
+        :no_bundle     => no_bundle
       )
       Bundler.logger.info "Done."
     end
@@ -148,6 +144,10 @@ module Bundler
     end
 
   private
+
+    def default_sources
+      [GemSource.new(:uri => "http://gems.rubyforge.org"), SystemGemSource.instance]
+    end
 
     def repository
       @repository ||= Repository.new(gem_path, bindir)

@@ -25,15 +25,16 @@ module Bundler
         source_requirements[name] = SystemGemSource.instance
       end
 
+      # Check to see whether the existing cache meets all the requirements
       begin
         valid = Resolver.resolve(dependencies, [source_index], source_requirements)
       rescue Bundler::GemNotFound
       end
 
-      if options[:cached]
-        sources = sources.select { |s| s.can_be_local? }
-      end
+      sources = only_local(sources) if options[:cached]
 
+      # Check the remote sources if the existing cache does not meet the requirements
+      # or the user passed --update
       if options[:update] || !valid
         Bundler.logger.info "Calculating dependencies..."
         bundle = Resolver.resolve(dependencies, [@cache] + sources, source_requirements)
@@ -61,7 +62,7 @@ module Bundler
         s.local = true
       end
 
-      sources = sources.select { |s| s.can_be_local? }
+      sources = only_local(sources)
       bundle = Resolver.resolve(dependencies, [@cache] + sources)
       @cache.gems.each do |name, spec|
         unless bundle.any? { |s| s.name == spec.name && s.version == spec.version }
@@ -86,6 +87,10 @@ module Bundler
     end
 
   private
+
+    def only_local(sources)
+      sources.select { |s| s.can_be_local? }
+    end
 
     def download(bundle, options)
       bundle.sort_by {|s| s.full_name.downcase }.each do |spec|
@@ -216,14 +221,16 @@ module Bundler
       specs.each do |spec|
         next if options[:no_bundle].include?(spec.name)
         gem_path = Pathname.new(spec.full_gem_path)
-        if spec.bindir
-          load_paths << gem_path.join(spec.bindir).relative_path_from(@path).to_s
-        end
+        load_paths << load_path_for(gem_path, spec.bindir) if spec.bindir
         spec.require_paths.each do |path|
-          load_paths << gem_path.join(path).relative_path_from(@path).to_s
+          load_paths << load_path_for(gem_path, path)
         end
       end
       load_paths
+    end
+
+    def load_path_for(gem_path, path)
+      gem_path.join(path).relative_path_from(@path).to_s
     end
 
     def spec_file_for(spec)

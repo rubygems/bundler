@@ -2,6 +2,11 @@ module Bundler
   class ManifestFileNotFound < StandardError; end
 
   class Dsl
+    def self.evaluate(environment, file)
+      builder = new(environment)
+      builder.instance_eval(File.read(file), file)
+    end
+
     def initialize(environment)
       @environment = environment
       @directory_sources = []
@@ -37,13 +42,13 @@ module Bundler
     end
 
     def only(*env)
-      old, @only = @only, _combine_only(env.flatten)
+      old, @only = @only, _combine_only(env)
       yield
       @only = old
     end
 
     def except(*env)
-      old, @except = @except, _combine_except(env.flatten)
+      old, @except = @except, _combine_except(env)
       yield
       @except = old
     end
@@ -149,14 +154,14 @@ module Bundler
 
     def _combine_only(only)
       return @only unless only
-      only = [only].flatten.compact.uniq.map { |o| o.to_s }
+      only = Array(only).compact.uniq.map { |o| o.to_s }
       only &= @only if @only
       only
     end
 
     def _combine_except(except)
       return @except unless except
-      except = [except].flatten.compact.uniq.map { |o| o.to_s }
+      except = Array(except).compact.uniq.map { |o| o.to_s }
       except |= @except if @except
       except
     end
