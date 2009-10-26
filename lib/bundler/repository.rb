@@ -64,10 +64,12 @@ module Bundler
 
       sources = only_local(sources)
       bundle = Resolver.resolve(dependencies, [@cache] + sources)
-      @cache.gems.each do |name, spec|
-        unless bundle.any? { |s| s.name == spec.name && s.version == spec.version }
-          Bundler.logger.info "Pruning #{spec.name} (#{spec.version}) from the cache"
-          FileUtils.rm @path.join("cache", "#{spec.full_name}.gem")
+      @cache.gems.each do |name, specs|
+        specs.each do |spec|
+          unless bundle.any? { |s| s.name == spec.name && s.version == spec.version }
+            Bundler.logger.info "Pruning #{spec.name} (#{spec.version}) from the cache"
+            FileUtils.rm @path.join("cache", "#{spec.full_name}.gem")
+          end
         end
       end
     end
