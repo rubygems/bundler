@@ -100,6 +100,8 @@ end
 
 <% if options[:rubygems] -%>
 module Gem
+  @loaded_stacks = Hash.new { |h,k| h[k] = [] }
+
   def source_index.refresh!
     super
     Bundler.add_specs_to_index
