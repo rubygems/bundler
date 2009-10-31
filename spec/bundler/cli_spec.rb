@@ -434,4 +434,45 @@ describe "Bundler::CLI" do
       end
     end
   end
+
+  describe "listing outdated gems" do
+    it "shows a message when there are no outdated gems" do
+      m = build_manifest <<-Gemfile
+        clear_sources
+      Gemfile
+      m.install
+      
+      Dir.chdir(bundled_app) do
+        @output = gem_command :bundle, "--list-outdated"
+      end
+      
+      @output.should =~ /All gems are up to date/
+    end
+
+    it "shows all the outdated gems" do
+      m = build_manifest <<-Gemfile
+        clear_sources
+        source "file://#{gem_repo1}"
+        source "file://#{gem_repo2}"
+        gem "rack", "0.9.1"
+        gem "rails"
+      Gemfile
+      m.install
+
+      Dir.chdir(bundled_app) do
+        @output = gem_command :bundle, "--list-outdated"
+      end
+
+      [ "Outdated gems:",
+        " * actionmailer",
+        " * actionpack",
+        " * activerecord",
+        " * activeresource",
+        " * activesupport",
+        " * rack",
+        " * rails"].each do |message|
+          @output.should =~ /^#{Regexp.escape(message)}$/
+        end
+    end
+  end
 end

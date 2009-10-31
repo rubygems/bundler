@@ -51,6 +51,10 @@ module Bundler
       @environment.list(@options)
     end
 
+    def list_outdated
+      @environment.list_outdated(@options)
+    end
+
     def exec
       @environment.setup_environment
       # w0t?

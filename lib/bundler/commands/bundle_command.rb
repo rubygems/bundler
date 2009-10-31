@@ -26,6 +26,10 @@ class Gem::Commands::BundleCommand < Gem::Command
     add_option('--list', "List all gems that are part of the active bundle") do
       options[:list] = true
     end
+    
+    add_option('--list-outdated', "List all outdated gems that are part of the active bundle") do
+      options[:list_outdated] = true
+    end
 
     add_option('-b', '--build-options OPTION_FILE', "Specify a path to a yml file with build options for binary gems") do |option_file, options|
       if File.exist?(option_file)
@@ -53,6 +57,8 @@ Bundle stuff
       Bundler::CLI.run(:prune, options)
     elsif options[:list]
       Bundler::CLI.run(:list, options)
+    elsif options[:list_outdated]
+      Bundler::CLI.run(:list_outdated, options)
     else
       Bundler::CLI.run(:bundle, options)
     end

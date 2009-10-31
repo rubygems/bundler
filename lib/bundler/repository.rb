@@ -76,6 +76,10 @@ module Bundler
       source_index.gems.values
     end
 
+    def outdated_gems(sources)
+      source_index.outdated.sort
+    end
+
     def source_index
       index = Gem::SourceIndex.from_gems_in(@path.join("specifications"))
       index.each { |n, spec| spec.loaded_from = @path.join("specifications", "#{spec.full_name}.gemspec") }
