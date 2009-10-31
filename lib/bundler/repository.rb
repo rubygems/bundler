@@ -76,7 +76,7 @@ module Bundler
       source_index.gems.values
     end
 
-    def outdated_gems(sources)
+    def outdated_gems
       source_index.outdated.sort
     end
 
