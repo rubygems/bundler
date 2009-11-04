@@ -59,7 +59,7 @@ module Bundler
         @except = old
       end
       def gem(name, *args)
-        opt = args.last || {}
+        opt = args.last.is_a?(Hash) ? args.pop : {}
         only = _combine_only(opt[:only] || opt["only"])
         except = _combine_except(opt[:except] || opt["except"])
         files = opt[:require_as] || opt["require_as"] || name
