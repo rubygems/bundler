@@ -69,6 +69,7 @@ module Bundler
         return if except && except.any? {|e| e == @env }
 
         if files = opt[:require_as] || opt["require_as"]
+          files = Array(files)
           files.each { |f| require f }
         else
           begin
@@ -94,7 +95,7 @@ module Bundler
         except
       end
     end
-    context.new(env && env.to_s).instance_eval(File.read(@gemfile))
+    context.new(env && env.to_s).instance_eval(File.read(@gemfile), @gemfile, 1)
   end
 end
 

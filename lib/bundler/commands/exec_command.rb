@@ -1,5 +1,5 @@
 if exec = ARGV.index("exec")
-  $command = ARGV[(exec + 1)..-1].join(" ")
+  $command = ARGV[(exec + 1)..-1]
   ARGV.replace ARGV[0..exec]
 end
 

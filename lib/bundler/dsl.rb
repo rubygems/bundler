@@ -4,7 +4,7 @@ module Bundler
   class Dsl
     def self.evaluate(environment, file)
       builder = new(environment)
-      builder.instance_eval(File.read(file), file)
+      builder.instance_eval(File.read(file.to_s), file.to_s, 1)
     end
 
     def initialize(environment)

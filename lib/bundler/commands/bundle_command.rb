@@ -26,7 +26,7 @@ class Gem::Commands::BundleCommand < Gem::Command
     add_option('--list', "List all gems that are part of the active bundle") do
       options[:list] = true
     end
-    
+
     add_option('--list-outdated', "List all outdated gems that are part of the active bundle") do
       options[:list_outdated] = true
     end

@@ -98,10 +98,8 @@ describe "Bundler::CLI" do
 
     it "runs exec with options correctly" do
       Dir.chdir(bundled_app) do
-        out = gem_command :exec, %[ruby --version 2>&1], :no_quote => true
-        puts out
-        out.should_not =~ /version unknown/
-        out.should =~ /patchlevel/
+        out = gem_command :exec, %[ruby -e 'puts "hello"'], :no_quote => true
+        out.should == "hello"
       end
     end
 
@@ -441,11 +439,11 @@ describe "Bundler::CLI" do
         clear_sources
       Gemfile
       m.install
-      
+
       Dir.chdir(bundled_app) do
         @output = gem_command :bundle, "--list-outdated"
       end
-      
+
       @output.should =~ /All gems are up to date/
     end
 
