@@ -53,7 +53,7 @@ module Bundler
       destination = repository.path
 
       unless destination.writable?
-        raise RubygemsRetardation
+        raise RubygemsRetardation, "destination: #{destination} is not writable"
       end
 
       # Download the gem
