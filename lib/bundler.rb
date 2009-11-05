@@ -19,7 +19,7 @@ require "bundler/dependency"
 require "bundler/remote_specification"
 
 module Bundler
-  VERSION = "0.7.0.pre"
+  VERSION = "0.7.0"
 
   class << self
     attr_writer :logger
