@@ -46,7 +46,14 @@ module Bundler
     end
 
     def install(options = {})
+      if only_envs = options[:only]
+        dependencies.reject! { |d| !only_envs.any? {|env| d.in?(env) } }
+      end
+
       no_bundle = dependencies.map { |dep| !dep.bundle && dep.name }.compact
+
+      update = options[:update]
+      cached = options[:cached]
 
       repository.install(gem_dependencies, sources,
         :rubygems      => rubygems,

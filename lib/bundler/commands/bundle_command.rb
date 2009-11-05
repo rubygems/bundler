@@ -36,6 +36,11 @@ class Gem::Commands::BundleCommand < Gem::Command
         options[:build_options] = YAML.load_file(option_file)
       end
     end
+
+    add_option('--only ENV', "Only expand the given environment.  To specify multiple environments, use --only multiple times.") do |env, options|
+      options[:only] ||= []
+      options[:only] << env
+    end
   end
 
   def usage

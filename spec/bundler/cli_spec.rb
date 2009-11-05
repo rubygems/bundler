@@ -354,6 +354,32 @@ describe "Bundler::CLI" do
     end
   end
 
+  describe "bundling only given environments" do
+    before(:each) do
+      build_manifest <<-Gemfile
+        clear_sources
+        source "file://#{gem_repo1}"
+        gem "extlib"
+        gem "very-simple", :only => :server
+        gem "rack", :only => :test
+      Gemfile
+
+      %w(doc environment.rb gems specifications).each do |f|
+        FileUtils.rm_rf(tmp_gem_path.join(f))
+      end
+    end
+
+    it "install gems for environments specified in --only line" do
+      Dir.chdir(bundled_app) do
+        gem_command :bundle, "--only test"
+        bundled_app('vendor', 'gems', 'environment.rb').should have_load_paths(bundled_app("vendor", "gems"),
+          "extlib-0.9.12" => %w(lib),
+          "rack-0.9.1" => %w(bin lib)
+        )
+      end
+    end
+  end
+
   describe "caching gems to the bundle" do
     before(:each) do
       build_manifest <<-Gemfile
