@@ -291,8 +291,8 @@ module Bundler
     def initialize(options)
       super
       @uri = options[:uri]
-      @ref = options[:ref]
-      @branch = options[:branch]
+      @branch = options[:branch] || 'master'
+      @ref = options[:ref] || "origin/#{@branch}"
     end
 
     def location
@@ -301,24 +301,8 @@ module Bundler
     end
 
     def gems
-      unless location.directory?
-        # Raise an error if the source should run in local mode,
-        # but it has not been cached yet.
-        if local
-          raise SourceNotCached, "Git repository '#{@uri}' has not been cloned yet"
-        end
-
-        FileUtils.mkdir_p(location.dirname)
-
-        Bundler.logger.info "Cloning git repository at: #{@uri}"
-        `git clone #{@uri} #{location} --no-hardlinks`
-
-        if @ref
-          Dir.chdir(location) { `git checkout --quiet #{@ref}` }
-        elsif @branch && @branch != "master"
-          Dir.chdir(location) { `git checkout --quiet origin/#{@branch}` }
-        end
-      end
+      update
+      checkout
       super
     end
 
@@ -329,5 +313,37 @@ module Bundler
     def to_s
       "git: #{uri}"
     end
+
+    private
+      def update
+        if location.directory?
+          fetch
+        else
+          clone
+        end
+      end
+
+      def fetch
+        unless local
+          Bundler.logger.info "Fetching git repository at: #{@uri}"
+          Dir.chdir(location) { `git fetch origin` }
+        end
+      end
+
+      def clone
+        # Raise an error if the source should run in local mode,
+        # but it has not been cached yet.
+        if local
+          raise SourceNotCached, "Git repository '#{@uri}' has not been cloned yet"
+        end
+
+        Bundler.logger.info "Cloning git repository at: #{@uri}"
+        FileUtils.mkdir_p(location.dirname)
+        `git clone #{@uri} #{location} --no-hardlinks`
+      end
+
+      def checkout
+        Dir.chdir(location) { `git checkout --quiet #{@ref}` }
+      end
   end
 end
