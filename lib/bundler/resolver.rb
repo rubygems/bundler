@@ -86,8 +86,7 @@ module Bundler
     end
 
     def debug
-      $debug ||= false
-      puts yield if $debug
+      puts yield if defined?($debug) && $debug
     end
 
     def resolve(reqs, activated)
