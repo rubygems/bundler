@@ -86,6 +86,7 @@ module Bundler
     end
 
     def debug
+      $debug ||= false
       puts yield if $debug
     end
 

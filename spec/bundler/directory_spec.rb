@@ -137,6 +137,23 @@ describe "Faking gems with directories" do
     `#{tmp_bindir('very_simple')}`.strip.should == 'OMG'
   end
 
+  it "always pulls the dependency from the directory even if there is a newer gem available" do
+    path = lib_builder('abstract', '0.5')
+
+    install_manifest <<-Gemfile
+      clear_sources
+      source "file://#{gem_repo1}"
+      gem "abstract", :path => "#{path}"
+    Gemfile
+
+    out = run_in_context <<-RUBY
+      Bundler.require_env
+      puts ABSTRACT
+    RUBY
+
+    out.should == '0.5'
+  end
+
   describe "validating gemspecs" do
     it "does not use a gemspec if any of the require paths are missing" do
       install_manifest <<-Gemfile

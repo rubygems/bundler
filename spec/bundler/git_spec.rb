@@ -182,6 +182,24 @@ describe "Getting gems from git" do
       :default.should have_const("OMG")
     end
 
+    it "always pulls the dependency from git even if there is a newer gem available" do
+      lib_builder "abstract", "0.5"
+      gitify("#{tmp_path}/dirs/abstract")
+
+      install_manifest <<-Gemfile
+        clear_sources
+        source "file://#{gem_repo1}"
+        gem "abstract", :git => "#{tmp_path}/dirs/abstract"
+      Gemfile
+
+      out = run_in_context <<-RUBY
+        Bundler.require_env
+        puts ABSTRACT
+      RUBY
+
+      out.should == '0.5'
+    end
+
     it "raises an exception when nesting calls to git" do
       lambda {
         install_manifest <<-Gemfile

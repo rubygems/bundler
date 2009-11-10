@@ -18,7 +18,7 @@ module Spec
         args = %["#{args}"]
       end
       lib  = File.join(File.dirname(__FILE__), '..', '..', 'lib')
-      %x{#{Gem.ruby} -I#{lib} -rubygems -S gem #{command} #{args}}.strip
+      %x{#{Gem.ruby} -I#{lib} -rubygems -S gem --backtrace #{command} #{args}}.strip
     end
 
     def build_manifest_file(*args)

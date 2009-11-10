@@ -85,8 +85,10 @@ describe "Installing gems" do
 
     it "keeps bin files for already installed gems" do
       setup
+      bundled_app("bin", "rails").should_not exist
       @manifest.install
-      lambda { @manifest.install }.should_not change { bundled_app("bin", "rails").mtime }
+      @manifest.install
+      bundled_app("bin", "rails").should exist
     end
 
     it "does not remove bin files when updating gems" do

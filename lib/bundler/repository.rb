@@ -21,8 +21,9 @@ module Bundler
       end
 
       source_requirements = {}
-      options[:no_bundle].each do |name|
-        source_requirements[name] = SystemGemSource.instance
+      dependencies = dependencies.map do |dep|
+        source_requirements[dep.name] = dep.source if dep.source
+        dep.to_gem_dependency
       end
 
       # Check to see whether the existing cache meets all the requirements

@@ -58,8 +58,9 @@ module Bundler
       @directory = DirectorySource.new(options.merge(:location => path))
       @directory_sources << @directory
       @environment.add_priority_source(@directory)
-      yield if block_given?
+      retval = yield if block_given?
       @directory = nil
+      retval
     end
 
     def git(uri, options = {})
@@ -67,8 +68,9 @@ module Bundler
       @git = GitSource.new(options.merge(:uri => uri))
       @git_sources[uri] = @git
       @environment.add_priority_source(@git)
-      yield if block_given?
+      retval = yield if block_given?
       @git = nil
+      retval
     end
 
     def clear_sources
@@ -90,11 +92,11 @@ module Bundler
       dep = Dependency.new(name, options.merge(:version => version))
 
       if options.key?(:bundle) && !options[:bundle]
-        # We're using system gems for this one
+        dep.source = SystemGemSource.instance
       elsif @git || options[:git]
-        _handle_git_option(name, version, options)
+        dep.source = _handle_git_option(name, version, options)
       elsif @directory || options[:path]
-        _handle_vendored_option(name, version, options)
+        dep.source = _handle_vendored_option(name, version, options)
       end
 
       @environment.dependencies << dep
@@ -108,6 +110,7 @@ module Bundler
       if dir
         dir.required_specs << name
         dir.add_spec(path, name, version) if version
+        dir
       else
         directory options[:path] do
           _handle_vendored_option(name, version, {})
@@ -145,6 +148,7 @@ module Bundler
 
         source.required_specs << name
         source.add_spec(Pathname.new(options[:path] || '.'), name, version) if version
+        source
       else
         git(git, :ref => ref, :branch => branch) do
           _handle_git_option(name, version, options)

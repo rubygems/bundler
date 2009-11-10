@@ -50,12 +50,14 @@ module Bundler
         dependencies.reject! { |d| !only_envs.any? {|env| d.in?(env) } }
       end
 
-      no_bundle = dependencies.map { |dep| !dep.bundle && dep.name }.compact
+      no_bundle = dependencies.map do |dep|
+        dep.source == SystemGemSource.instance && dep.name
+      end.compact
 
       update = options[:update]
       cached = options[:cached]
 
-      repository.install(gem_dependencies, sources,
+      repository.install(dependencies, sources,
         :rubygems      => rubygems,
         :system_gems   => system_gems,
         :manifest      => filename,
