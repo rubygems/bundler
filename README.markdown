@@ -175,6 +175,7 @@ will be compiled for the target platform without requiring that the
 Assuming a Rails app with Bundler's standard setup, add something like
 this to your top-level `.gitignore` to only keep the cache:
 
+    bin/*
     vendor/gems/*
     !vendor/gems/cache/
 
