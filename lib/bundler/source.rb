@@ -69,17 +69,10 @@ module Bundler
 
     def fetch_specs
       Bundler.logger.info "Updating source: #{to_s}"
+      build_gem_index(fetch_main_specs + fetch_prerelease_specs)
+    end
 
-      fetcher = Gem::RemoteFetcher.fetcher
-      main_index = fetcher.fetch_path("#{uri}/specs.4.8.gz")
-      begin
-        prerelease_index = fetcher.fetch_path("#{uri}/prerelease_specs.4.8.gz")
-        index = Marshal.load(main_index) + Marshal.load(prerelease_index)
-      rescue Gem::RemoteFetcher::FetchError
-        Bundler.logger.warn "Source '#{uri}' does not support prerelease gems"
-        index = Marshal.load(main_index)
-      end
-
+    def build_gem_index(index)
       gems = Hash.new { |h,k| h[k] = [] }
       index.each do |name, version, platform|
         spec = RemoteSpecification.new(name, version, platform, @uri)
@@ -87,8 +80,18 @@ module Bundler
         gems[spec.name] << spec if Gem::Platform.match(spec.platform)
       end
       gems
+    end
+
+    def fetch_main_specs
+      Marshal.load(Gem::RemoteFetcher.fetcher.fetch_path("#{uri}/specs.4.8.gz"))
     rescue Gem::RemoteFetcher::FetchError => e
       raise ArgumentError, "#{to_s} is not a valid source: #{e.message}"
+    end
+
+    def fetch_prerelease_specs
+      Marshal.load(Gem::RemoteFetcher.fetcher.fetch_path("#{uri}/prerelease_specs.4.8.gz"))
+    rescue Gem::RemoteFetcher::FetchError
+      Bundler.logger.warn "Source '#{uri}' does not support prerelease gems"
     end
   end
 
