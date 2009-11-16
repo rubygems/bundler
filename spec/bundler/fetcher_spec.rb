@@ -1,10 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "Fetcher" do
-  before(:each) do
-    @source = Bundler::GemSource.new(:uri => "file://#{gem_repo1}")
-    @other  = Bundler::GemSource.new(:uri => "file://#{gem_repo2}")
-  end
 
   it "raises if the source does not exist" do
     m = build_manifest <<-Gemfile
@@ -40,7 +36,6 @@ describe "Fetcher" do
       m = build_manifest <<-Gemfile
         clear_sources
         source "file://#{gem_repo1}"
-        source "file://#{gem_repo2}"
         gem "do_sqlite3"
       Gemfile
 
@@ -60,38 +55,36 @@ describe "Fetcher" do
     m = build_manifest <<-Gemfile
       clear_sources
       source "file://#{gem_repo1}"
-      source "file://#{gem_repo2}"
       gem "very-simple"
     Gemfile
     m.install
     @log_output.should have_log_message("Updating source: file:#{gem_repo1}")
-    @log_output.should have_log_message("Updating source: file:#{gem_repo2}")
   end
 
   it "works with repositories that don't provide Marshal.4.8.Z" do
-    gem_repo1.cp_r(tmp_path.join('bogus_repo'))
-    Dir["#{tmp_path.join('bogus_repo')}/Marshal.*"].each { |f| File.unlink(f) }
+    FileUtils.cp_r gem_repo1, gem_repo2
+    Dir["#{gem_repo2}/Marshal.*"].each { |f| File.unlink(f) }
 
     install_manifest <<-Gemfile
       clear_sources
-      source "file://#{tmp_path.join('bogus_repo')}"
+      source "file://#{gem_repo2}"
       gem "rack"
     Gemfile
 
-    tmp_gem_path.should have_cached_gems("rack-0.9.1")
+    tmp_gem_path.should have_cached_gems("rack-1.0.0")
   end
 
   it "works with repositories that don't provide prerelease_specs.4.8.gz" do
-    gem_repo1.cp_r(tmp_path.join('bogus_repo'))
-    Dir["#{tmp_path.join('bogus_repo')}/prerelease*"].each { |f| File.unlink(f) }
+    FileUtils.cp_r gem_repo1, gem_repo2
+    Dir["#{gem_repo2}/prerelease*"].each { |f| File.unlink(f) }
 
     install_manifest <<-Gemfile
       clear_sources
-      source "file://#{tmp_path.join('bogus_repo')}"
+      source "file://#{gem_repo2}"
       gem "rack"
     Gemfile
 
-    @log_output.should have_log_message("Source 'file:#{tmp_path.join('bogus_repo')}' does not support prerelease gems")
-    tmp_gem_path.should have_cached_gems("rack-0.9.1")
+    @log_output.should have_log_message("Source 'file:#{gem_repo2}' does not support prerelease gems")
+    tmp_gem_path.should have_cached_gems("rack-1.0.0")
   end
 end

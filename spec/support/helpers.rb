@@ -87,49 +87,10 @@ module Spec
       end
     end
 
-    class LibBuilder
-      def initialize(name, version, options)
-        @spec = Gem::Specification.new do |s|
-          s.name = name
-          s.version = version
-        end
-        @options = options
-        @files = { "lib/#{name}.rb" => "#{name.upcase} = '#{version}'" }
-      end
-
-      def method_missing(*args, &blk)
-        @spec.send(*args, &blk)
-      end
-
-      def write(file, source)
-        @files[file] = source
-      end
-
-      def _build(path)
-        path ||= tmp_path('dirs', name)
-        path = Pathname.new(path)
-        @files["#{name}.gemspec"] = @spec.to_ruby if @options[:gemspec]
-        @files.each do |file, source|
-          file = path.join(file)
-          file.dirname.mkdir_p
-          File.open(file, 'w') { |f| f.puts source }
-        end
-        path
-      end
-    end
-
-    def lib_builder(name, version, options = {})
-      options[:gemspec] = true unless options.key?(:gemspec)
-
-      spec = LibBuilder.new(name, version, options)
-      yield spec if block_given?
-      spec._build(options[:path] || tmp_path('dirs', name))
-    end
-
     def install_gems(*gems)
-      Dir["#{fixture_dir}/*/gems/*.gem"].each do |path|
+      Dir["#{tmp_path}/repos/**/*.gem"].each do |path|
         if gems.include?(File.basename(path, ".gem"))
-          `gem install --no-rdoc --no-ri --ignore-dependencies #{path}`
+          gem_command :install, "--no-rdoc --no-ri --ignore-dependencies #{path}"
         end
       end
     end
@@ -148,8 +109,10 @@ module Spec
     end
 
     def reset!
-      tmp_path.rmtree if tmp_path.exist?
-      tmp_path.mkdir
+      Dir["#{tmp_path}/*"].each do |file|
+        FileUtils.rm_rf(file) unless File.basename(file) == "repos"
+      end
+      FileUtils.mkdir_p(tmp_path)
     end
   end
 end

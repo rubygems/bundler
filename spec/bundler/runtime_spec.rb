@@ -12,25 +12,25 @@ describe "Bundler runtime" do
 
       out = run_in_context <<-RUBY
         Bundler.require_env
-        puts VerySimpleForTests
+        puts VERYSIMPLE
       RUBY
 
-      out.should == "VerySimpleForTests"
+      out.should == "1.0"
     end
 
     it "correctly requires the specified files" do
       install_manifest <<-Gemfile
         clear_sources
-        source "file://#{gem_repo2}"
-        gem "actionpack", :require_as => %w(action_controller action_view)
+        source "file://#{gem_repo1}"
+        gem "rspec", :require_as => %w(spec)
       Gemfile
 
       out = run_in_context <<-RUBY
         Bundler.require_env
-        puts "\#{ActionController} -- \#{ActionView}"
+        puts SPEC
       RUBY
 
-      out.should == "ActionController -- ActionView"
+      out.should == "1.2.7"
     end
 
     it "executes blocks at require time" do
@@ -94,10 +94,10 @@ describe "Bundler runtime" do
 
       out = run_in_context <<-RUBY
         Bundler.require_env :test
-        puts VerySimpleForTests
+        puts VERYSIMPLE
       RUBY
 
-      out.should == "VerySimpleForTests"
+      out.should == "1.0"
     end
 
     it "only requires gems in the environments they are exclusive to" do
@@ -108,9 +108,9 @@ describe "Bundler runtime" do
       Gemfile
 
       out = run_in_context <<-RUBY
-        Bundler.require_env      ; puts defined?(VerySimpleForTests).inspect
-        Bundler.require_env :foo ; puts defined?(VerySimpleForTests).inspect
-        Bundler.require_env :bar ; puts defined?(VerySimpleForTests)
+        Bundler.require_env      ; puts defined?(VERYSIMPLE).inspect
+        Bundler.require_env :foo ; puts defined?(VERYSIMPLE).inspect
+        Bundler.require_env :bar ; puts defined?(VERYSIMPLE)
       RUBY
 
       out.should == "nil\nnil\nconstant"
@@ -124,14 +124,14 @@ describe "Bundler runtime" do
       Gemfile
 
       out = run_in_context <<-RUBY
-        Bundler.require_env :bar ; puts defined?(VerySimpleForTests).inspect
-        Bundler.require_env :foo ; puts defined?(VerySimpleForTests)
+        Bundler.require_env :bar ; puts defined?(VERYSIMPLE).inspect
+        Bundler.require_env :foo ; puts defined?(VERYSIMPLE)
       RUBY
 
       out.should == "nil\nconstant"
 
       out = run_in_context <<-RUBY
-        Bundler.require_env ; puts defined?(VerySimpleForTests)
+        Bundler.require_env ; puts defined?(VERYSIMPLE)
       RUBY
 
       out.should == "constant"

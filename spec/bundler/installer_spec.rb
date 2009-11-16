@@ -17,7 +17,6 @@ describe "Installing gems" do
       @manifest = build_manifest <<-Gemfile
         clear_sources
         source "file://#{gem_repo1}"
-        source "file://#{gem_repo2}"
         gem "rails"
       Gemfile
     end
@@ -56,7 +55,6 @@ describe "Installing gems" do
       m = build_manifest <<-Gemfile
         clear_sources
         source "file://#{gem_repo1}"
-        source "file://#{gem_repo2}"
         bin_path "#{bundled_app("omgbinz")}"
         gem "rails"
       Gemfile
@@ -102,7 +100,7 @@ describe "Installing gems" do
 
       install_manifest <<-Gemfile
         clear_sources
-        source "file://#{gem_repo2}"
+        source "file://#{gem_repo1}"
         gem "rack", "1.0.0"
       Gemfile
 
@@ -149,16 +147,6 @@ describe "Installing gems" do
       setup
       @manifest.install
       bundled_app('bin', 'rails').should be_file
-    end
-
-    it "compiles binary gems" do
-      m = build_manifest <<-Gemfile
-        clear_sources
-        source "file://#{gem_repo2}"
-        gem "json"
-      Gemfile
-      m.install
-      Dir["#{bundled_app}/vendor/gems/gems/json-*/**/*.#{Config::CONFIG['DLEXT']}"].should have_at_least(1).item
     end
   end
 end

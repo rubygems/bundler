@@ -6,7 +6,8 @@ describe "Faking gems with directories" do
     2.times do |i|
       describe "stubbing out a gem with a directory -- #{i}" do
         before(:each) do
-          path = fixture_dir.join("very-simple")
+          build_lib "very-simple"
+          path = tmp_path("libs/very-simple-1.0")
           path = path.relative_path_from(bundled_app) if i == 1
 
           install_manifest <<-Gemfile
@@ -23,8 +24,8 @@ describe "Faking gems with directories" do
         end
 
         it "has very-simple in the load path" do
-          out = run_in_context "require 'very-simple' ; puts VerySimpleForTests"
-          out.should == "VerySimpleForTests"
+          out = run_in_context "require 'very-simple' ; puts VERYSIMPLE"
+          out.should == "1.0"
         end
 
         it "does not remove the directory during cleanup" do
@@ -33,7 +34,7 @@ describe "Faking gems with directories" do
             source "file://#{gem_repo1}"
           Gemfile
 
-          fixture_dir.join("very-simple").should be_directory
+          tmp_path("libs/very-simple-1.0").should be_directory
         end
 
         it "can bundle --cached" do
@@ -43,8 +44,8 @@ describe "Faking gems with directories" do
 
           Dir.chdir(bundled_app) do
             out = gem_command :bundle, "--cached"
-            out = run_in_context "require 'very-simple' ; puts VerySimpleForTests"
-            out.should == "VerySimpleForTests"
+            out = run_in_context "require 'very-simple' ; puts VERYSIMPLE"
+            out.should == "1.0"
           end
         end
       end
@@ -52,10 +53,11 @@ describe "Faking gems with directories" do
 
     describe "bad directory stubbing" do
       it "raises an exception unless the version is specified" do
+        build_lib "very-simple"
         lambda do
           install_manifest <<-Gemfile
             clear_sources
-            gem "very-simple", :path => "#{fixture_dir.join("very-simple")}"
+            gem "very-simple", :path => "#{tmp_path}/libs/very-simple-1.0"
           Gemfile
         end.should raise_error(Bundler::DirectorySourceError, /Please explicitly specify a version/)
       end
@@ -73,15 +75,15 @@ describe "Faking gems with directories" do
   end
 
   it "checks the root directory for a *.gemspec file" do
-    path = lib_builder("very-simple", "1.0", :path => tmp_path("very-simple")) do |s|
-      s.add_dependency "rack", ">= 0.9.1"
+    build_lib("very-simple", "1.0", :path => tmp_path("very-simple"), :gemspec => true) do |s|
+      s.add_dependency "rack", "= 0.9.1"
       s.write "lib/very-simple.rb", "class VerySimpleForTests ; end"
     end
 
     install_manifest <<-Gemfile
       clear_sources
       source "file://#{gem_repo1}"
-      gem "very-simple", "1.0", :path => "#{path}"
+      gem "very-simple", "1.0", :path => "#{tmp_path("very-simple")}"
     Gemfile
 
     tmp_gem_path.should_not include_cached_gem("very-simple-1.0")
@@ -90,15 +92,15 @@ describe "Faking gems with directories" do
   end
 
   it "recursively finds all gemspec files in a directory" do
-    lib_builder("first", "1.0")
-    lib_builder("second", "1.0") do |s|
+    build_lib("first", "1.0", :gemspec => true)
+    build_lib("second", "1.0", :gemspec => true) do |s|
       s.add_dependency "first", ">= 0"
       s.write "lib/second.rb", "require 'first' ; SECOND = '1.0'"
     end
 
     install_manifest <<-Gemfile
       clear_sources
-      gem "second", :path => "#{tmp_path('dirs')}"
+      gem "second", :path => "#{tmp_path('libs')}"
     Gemfile
 
     out = run_in_context <<-RUBY
@@ -110,27 +112,15 @@ describe "Faking gems with directories" do
     out.should == "1.0\n1.0"
   end
 
-  it "complains when the gemspec was not found in the directory specified" do
-    pending "Not sure if this is correct behavior"
-    lib_builder "first", "1.0"
-
-    lambda {
-      install_manifest <<-Gemfile
-        clear_sources
-        gem "first", "1.0", :path => "#{tmp_path('dirs')}"
-      Gemfile
-    }.should raise_error(Bundler::DirectorySourceError, /The location you specified for first is/)
-  end
-
   it "copies bin files to the bin dir" do
-    path = lib_builder('very-simple', '1.0', :path => tmp_path("very-simple")) do |s|
+    build_lib('very-simple', '1.0', :gemspec => true) do |s|
       s.executables << 'very_simple'
       s.write "bin/very_simple", "#!#{Gem.ruby}\nputs 'OMG'"
     end
 
     install_manifest <<-Gemfile
       clear_sources
-      gem "very-simple", :path => "#{tmp_path('very-simple')}"
+      gem "very-simple", :path => "#{tmp_path('libs/very-simple-1.0')}"
     Gemfile
 
     tmp_bindir('very_simple').should exist
@@ -138,17 +128,17 @@ describe "Faking gems with directories" do
   end
 
   it "always pulls the dependency from the directory even if there is a newer gem available" do
-    path = lib_builder('abstract', '0.5')
+    build_lib('rack', '0.5', :gemspec => true)
 
     install_manifest <<-Gemfile
       clear_sources
       source "file://#{gem_repo1}"
-      gem "abstract", :path => "#{path}"
+      gem "rack", :path => "#{tmp_path('libs')}"
     Gemfile
 
     out = run_in_context <<-RUBY
       Bundler.require_env
-      puts ABSTRACT
+      puts RACK
     RUBY
 
     out.should == '0.5'
@@ -159,8 +149,8 @@ describe "Faking gems with directories" do
       ext = bundled_app("externals")
       ext.mkdir_p
 
-      lib_builder "omg",  "1.0", :gemspec => false, :path => "#{ext}/omg"
-      lib_builder "hi2u", "1.0", :gemspec => false, :path => "#{ext}/hi2u"
+      build_lib "omg",  "1.0", :path => "#{ext}/omg"
+      build_lib "hi2u", "1.0", :path => "#{ext}/hi2u"
 
       install_manifest <<-Gemfile
         clear_sources
@@ -175,10 +165,10 @@ describe "Faking gems with directories" do
     end
 
     it "can list vendored gems without :path" do
-      lib_builder "omg", "1.0", :gemspec => false
+      build_lib "omg", "1.0"
       install_manifest <<-Gemfile
         clear_sources
-        directory "#{tmp_path}/dirs/omg" do
+        directory "#{tmp_path}/libs/omg-1.0" do
           gem "omg", "1.0"
         end
       Gemfile
@@ -187,12 +177,12 @@ describe "Faking gems with directories" do
     end
 
     it "raises an error when two gems are defined for the same path" do
-      lib_builder "omg", "1.0", :gemspec => false
+      build_lib "omg", "1.0"
 
       lambda {
         install_manifest <<-Gemfile
           clear_sources
-          directory "#{tmp_path('dirs')}" do
+          directory "#{tmp_path}/libs/omg-1.0" do
             gem "omg", "1.0", :path => "omg"
             gem "lol", "1.0", :path => "omg"
           end
@@ -201,12 +191,12 @@ describe "Faking gems with directories" do
     end
 
     it "lets you set a directory source without a block" do
-      lib_builder "omg", "1.0"
-      lib_builder "lol", "1.0"
+      build_lib "omg", "1.0", :gemspec => true
+      build_lib "lol", "1.0", :gemspec => true
 
       install_manifest <<-Gemfile
         clear_sources
-        directory "#{tmp_path}/dirs"
+        directory "#{tmp_path}/libs"
         gem "omg"
         gem "lol"
       Gemfile
@@ -216,11 +206,11 @@ describe "Faking gems with directories" do
   end
 
   it "takes a glob" do
-    lib_builder "omg", "1.0", :path => "#{tmp_path}/dirs/omg-1.0"
-    lib_builder "omg", "2.0", :path => "#{tmp_path}/dirs/omg-2.0"
+    build_lib "omg", "1.0", :gemspec => true
+    build_lib "omg", "2.0", :gemspec => true
     install_manifest <<-Gemfile
       clear_sources
-      directory "#{tmp_path}/dirs", :glob => "**/*-1*/*.gemspec" do
+      directory "#{tmp_path}/libs", :glob => "**/*-1*/*.gemspec" do
         gem "omg"
       end
     Gemfile

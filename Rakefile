@@ -47,6 +47,12 @@ else
   end
 end
 
+desc "mount a ramdisk at ./tmp for faster specs"
+task :ramdisk do
+  sh 'diskutil erasevolume HFS+ "tmpbundler" `hdiutil attach -nomount ram://116543`'
+  File.symlink "/Volumes/tmpbundler", File.expand_path('../tmp', __FILE__)
+end
+
 desc "install the gem locally"
 task :install => [:package] do
   sh %{gem install pkg/#{spec.name}-#{spec.version}}

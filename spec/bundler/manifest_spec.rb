@@ -2,34 +2,15 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "Bundler::Environment" do
 
-  def dep(name, version, options = {})
-    Bundler::Dependency.new(name, {:version => version}.merge(options))
-  end
-
-  before(:each) do
-    @sources = %W(file://#{gem_repo1} file://#{gem_repo2})
-    @deps = []
-    @deps << dep("rails", "2.3.2")
-    @deps << dep("rack", "0.9.1")
-  end
-
   describe "Manifest with dependencies" do
 
-    before(:each) do
+    before :each do
       @manifest = build_manifest <<-Gemfile
         clear_sources
         source "file://#{gem_repo1}"
-        source "file://#{gem_repo2}"
         gem "rails", "2.3.2"
         gem "rack",  "0.9.1"
       Gemfile
-      @saved_load_path, @saved_loaded_features = $:.dup, $".dup
-    end
-
-    after(:each) do
-      Object.send(:remove_const, :VerySimpleForTests) if defined?(VerySimpleForTests)
-      $:.replace @saved_load_path
-      $".replace @saved_loaded_features
     end
 
     it "bundles itself (running all of the steps)" do
@@ -47,7 +28,7 @@ describe "Bundler::Environment" do
     it "skips fetching the source index if all gems are present" do
       Dir.chdir(bundled_app) do
         gem_command :bundle
-        lambda { gem_command :bundle }.should_not change { File.stat(gem_repo1.join("Marshal.4.8.Z")).atime }
+        lambda { sleep 0.1 ; gem_command :bundle }.should_not change { File.stat(gem_repo1.join("Marshal.4.8.Z")).atime }
       end
     end
 
@@ -56,14 +37,12 @@ describe "Bundler::Environment" do
       @log_output.should have_log_message("Done.")
     end
 
-
     it "does the full fetching if a gem in the cache does not match the manifest" do
       @manifest.install
 
       m = build_manifest <<-Gemfile
         clear_sources
         source "file://#{gem_repo1}"
-        source "file://#{gem_repo2}"
         gem "rails", "2.3.2"
         gem "rack",  "1.0.0"
       Gemfile
@@ -89,7 +68,6 @@ describe "Bundler::Environment" do
       m = build_manifest <<-Gemfile
         clear_sources
         source "file://#{gem_repo1}"
-        source "file://#{gem_repo2}"
         gem "rails", "2.3.2"
       Gemfile
 
@@ -129,7 +107,7 @@ describe "Bundler::Environment" do
       install_manifest <<-Gemfile
         clear_sources
         source "file://#{gem_repo1}"
-        gem "very-simple"
+        gem "rack"
       Gemfile
 
       out = run_in_context "require 'rake' ; puts Rake"
@@ -140,7 +118,7 @@ describe "Bundler::Environment" do
       m = build_manifest <<-Gemfile
         clear_sources
         source "file://#{gem_repo1}"
-        gem "very-simple"
+        gem "rack"
         disable_system_gems
       Gemfile
 
@@ -155,24 +133,24 @@ describe "Bundler::Environment" do
           m = build_manifest <<-Gemfile
             clear_sources
             source "file://#{gem_repo1}"
-            gem "very-simple"
+            gem "rake"
             #{'disable_system_gems' if i == 1}
           Gemfile
           m.install
         end
 
         it "sets loaded_from on the specs" do
-          out = run_in_context "puts(Gem.loaded_specs['very-simple'].loaded_from || 'FAIL')"
+          out = run_in_context "puts(Gem.loaded_specs['rake'].loaded_from || 'FAIL')"
           out.should_not == "FAIL"
         end
 
         it "finds the gems in the source_index" do
-          out = run_in_context "puts Gem.source_index.find_name('very-simple').length"
+          out = run_in_context "puts Gem.source_index.find_name('rake').length"
           out.should == "1"
         end
 
         it "still finds the gems in the source_index even if refresh! is called" do
-          out = run_in_context "Gem.source_index.refresh! ; puts Gem.source_index.find_name('very-simple').length"
+          out = run_in_context "Gem.source_index.refresh! ; puts Gem.source_index.find_name('rake').length"
           out.should == "1"
         end
       end
@@ -184,9 +162,8 @@ describe "Bundler::Environment" do
       @manifest = build_manifest <<-Gemfile
         clear_sources
         source "file://#{gem_repo1}"
-        source "file://#{gem_repo2}"
-        gem "very-simple", "1.0.0", :only => "testing"
-        gem "rack",        "1.0.0"
+        gem "rake", :only => "testing"
+        gem "rack", "1.0.0"
       Gemfile
 
       @manifest.install
@@ -205,7 +182,7 @@ describe "Bundler::Environment" do
     it "Gem.loaded_specs has the gems that are included in the testing environment" do
       out = run_in_context %'puts Gem.loaded_specs.map{|k,v|"\#{k} - \#{v.version}"}'
       out.should include("rack - 1.0.0")
-      out.should include("very-simple - 1.0")
+      out.should include("rake - 0.8.7")
     end
   end
 end

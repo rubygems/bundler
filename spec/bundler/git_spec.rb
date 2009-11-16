@@ -2,9 +2,13 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "Getting gems from git" do
 
+  before :each do
+    build_lib "very-simple", :path => "#{tmp_path}/very-simple"
+  end
+
   describe "a simple gem in git" do
     before(:each) do
-      @path = build_git_repo "very-simple", :with => fixture_dir.join("very-simple")
+      @path = build_git_repo "very-simple", :with => tmp_path.join("very-simple")
       install_manifest <<-Gemfile
         clear_sources
         source "file://#{gem_repo1}"
@@ -19,8 +23,8 @@ describe "Getting gems from git" do
     end
 
     it "has very-simple in the load path" do
-      out = run_in_context "require 'very-simple' ; puts VerySimpleForTests"
-      out.should == "VerySimpleForTests"
+      out = run_in_context "require 'very-simple' ; puts VERYSIMPLE"
+      out.should == "1.0"
     end
 
     it "removes the directory during cleanup" do
@@ -46,8 +50,8 @@ describe "Getting gems from git" do
 
       Dir.chdir(bundled_app) do
         out = gem_command :bundle, "--cached"
-        out = run_in_context "require 'very-simple' ; puts VerySimpleForTests"
-        out.should == "VerySimpleForTests"
+        out = run_in_context "require 'very-simple' ; puts VERYSIMPLE"
+        out.should == "1.0"
       end
     end
   end
@@ -68,13 +72,13 @@ describe "Getting gems from git" do
     Gemfile
 
     tmp_gem_path.should_not include_cached_gem("very-simple-1.0")
-    tmp_gem_path.should include_cached_gem("rack-0.9.1")
-    tmp_gem_path.should include_installed_gem("rack-0.9.1")
+    tmp_gem_path.should include_cached_gem("rack-1.0.0")
+    tmp_gem_path.should include_installed_gem("rack-1.0.0")
   end
 
   it "recursively finds all gemspec files in a git repository" do
-    lib_builder("first", "1.0", :path => tmp_path("gitz", "first"))
-    lib_builder("second", "1.0", :path => tmp_path("gitz", "second")) do |s|
+    build_lib("first", "1.0", :path => tmp_path("gitz", "first"), :gemspec => true)
+    build_lib("second", "1.0", :path => tmp_path("gitz", "second"), :gemspec => true) do |s|
       s.add_dependency "first", ">= 0"
       s.write "lib/second.rb", "require 'first' ; SECOND = '1.0'"
     end
@@ -127,7 +131,7 @@ describe "Getting gems from git" do
 
   describe "using a git block" do
     it "loads the gems specified in the git block" do
-      lib_builder "omg", "1.0"
+      build_lib "omg", "1.0", :gemspec => true, :path => "#{tmp_path}/dirs/omg"
       gitify("#{tmp_path}/dirs/omg")
 
       install_manifest <<-Gemfile
@@ -141,7 +145,7 @@ describe "Getting gems from git" do
     end
 
     it "works when specifying a branch" do
-      lib_builder "omg", "1.0"
+      build_lib "omg", "1.0", :gemspec => true, :path => "#{tmp_path}/dirs/omg"
       gitify("#{tmp_path}/dirs/omg")
 
       install_manifest <<-Gemfile
@@ -155,7 +159,7 @@ describe "Getting gems from git" do
     end
 
     it "works when the gems don't have gemspecs" do
-      lib_builder "omg", "1.0", :gemspec => false
+      build_lib "omg", "1.0", :gemspec => false, :path => "#{tmp_path}/dirs/omg"
       gitify("#{tmp_path}/dirs/omg")
 
       install_manifest <<-Gemfile
@@ -169,7 +173,7 @@ describe "Getting gems from git" do
     end
 
     it "works when the gems are not at the root" do
-      lib_builder "omg", "1.0", :gemspec => false
+      build_lib "omg", "1.0", :gemspec => false, :path => "#{tmp_path}/dirs/omg"
       gitify("#{tmp_path}/dirs")
 
       install_manifest <<-Gemfile
@@ -183,7 +187,7 @@ describe "Getting gems from git" do
     end
 
     it "always pulls the dependency from git even if there is a newer gem available" do
-      lib_builder "abstract", "0.5"
+      build_lib "abstract", "0.5", :path => "#{tmp_path}/dirs/abstract", :gemspec => true
       gitify("#{tmp_path}/dirs/abstract")
 
       install_manifest <<-Gemfile

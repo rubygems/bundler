@@ -6,7 +6,6 @@ describe "Bundler DSL" do
     install_manifest <<-Gemfile
       clear_sources
       source "file://#{gem_repo1}"
-      source "file://#{gem_repo2}"
 
       gem "activerecord"
 
@@ -16,13 +15,13 @@ describe "Bundler DSL" do
       end
     Gemfile
 
-    "default".should have_const("ActiveRecord")
-    "default".should_not have_const("Spec")
-    "default".should_not have_const("VerySimpleForTests")
+    "default".should have_const("ACTIVERECORD")
+    "default".should_not have_const("SPEC")
+    "default".should_not have_const("VERYSIMPLE")
 
-    "test".should have_const("ActiveRecord")
-    "test".should have_const("Spec")
-    "test".should have_const("VerySimpleForTests")
+    "test".should have_const("ACTIVERECORD")
+    "test".should have_const("SPEC")
+    "test".should have_const("VERYSIMPLE")
   end
 
   it "supports only blocks with multiple args" do
@@ -34,16 +33,15 @@ describe "Bundler DSL" do
       end
     Gemfile
 
-    "default".should_not have_const("Rack")
-    "test".should have_const("Rack")
-    "production".should have_const("Rack")
+    "default".should_not have_const("RACK")
+    "test".should have_const("RACK")
+    "production".should have_const("RACK")
   end
 
   it "supports nesting only blocks" do
     install_manifest <<-Gemfile
       clear_sources
       source "file://#{gem_repo1}"
-      source "file://#{gem_repo2}"
 
       only [:test, :staging] do
         gem "very-simple"
@@ -53,17 +51,16 @@ describe "Bundler DSL" do
       end
     Gemfile
 
-    "test".should have_const("VerySimpleForTests")
-    "test".should have_const("Spec")
-    "staging".should have_const("VerySimpleForTests")
-    "staging".should_not have_const("Spec")
+    "test".should have_const("VERYSIMPLE")
+    "test".should have_const("SPEC")
+    "staging".should have_const("VERYSIMPLE")
+    "staging".should_not have_const("SPEC")
   end
 
   it "supports except blocks" do
     install_manifest <<-Gemfile
       clear_sources
       source "file://#{gem_repo1}"
-      source "file://#{gem_repo2}"
 
       gem "activerecord"
 
@@ -73,13 +70,13 @@ describe "Bundler DSL" do
       end
     Gemfile
 
-    "default".should have_const("ActiveRecord")
-    "default".should have_const("Spec")
-    "default".should have_const("VerySimpleForTests")
+    "default".should have_const("ACTIVERECORD")
+    "default".should have_const("SPEC")
+    "default".should have_const("VERYSIMPLE")
 
-    "test".should have_const("ActiveRecord")
-    "test".should_not have_const("Spec")
-    "test".should_not have_const("VerySimpleForTests")
+    "test".should have_const("ACTIVERECORD")
+    "test".should_not have_const("SPEC")
+    "test".should_not have_const("VERYSIMPLE")
   end
 
   it "supports except blocks with multiple args" do
@@ -91,16 +88,15 @@ describe "Bundler DSL" do
       end
     Gemfile
 
-    "default".should have_const("Rack")
-    "test".should_not have_const("Rack")
-    "production".should_not have_const("Rack")
+    "default".should have_const("RACK")
+    "test".should_not have_const("RACK")
+    "production".should_not have_const("RACK")
   end
 
   it "supports nesting except blocks" do
     install_manifest <<-Gemfile
       clear_sources
       source "file://#{gem_repo1}"
-      source "file://#{gem_repo2}"
 
       except [:test] do
         gem "very-simple"
@@ -110,11 +106,11 @@ describe "Bundler DSL" do
       end
     Gemfile
 
-    "default".should have_const("Spec")
-    "default".should have_const("VerySimpleForTests")
-    "test".should_not have_const("VerySimpleForTests")
-    "test".should_not have_const("Spec")
-    "omg".should have_const("VerySimpleForTests")
-    "omg".should_not have_const("Spec")
+    "default".should have_const("SPEC")
+    "default".should have_const("VERYSIMPLE")
+    "test".should_not have_const("VERYSIMPLE")
+    "test".should_not have_const("SPEC")
+    "omg".should have_const("VERYSIMPLE")
+    "omg".should_not have_const("SPEC")
   end
 end

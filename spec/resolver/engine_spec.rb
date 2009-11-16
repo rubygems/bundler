@@ -84,28 +84,6 @@ describe "Resolving specs" do
     )
   end
 
-  it "supports merb-core" do
-    index = Gem::SourceIndex.from_gems_in(gem_repo3.join("specifications"))
-
-    deps = [
-      build_dep("merb-core", "= 1.0.7.1"),
-    ]
-
-    solution = Bundler::Resolver.resolve(deps, [index])
-    solution.should match_gems(
-      "merb-core"=>["1.0.7.1"],
-      "rake"=>["0.8.7"],
-      "thor"=>["0.9.9"],
-      "rspec"=>["1.2.2"],
-      "mime-types"=>["1.16"],
-      "abstract"=>["1.0.0"],
-      "rack"=>["1.0.0"],
-      "erubis"=>["2.6.4"],
-      "extlib"=>["0.9.12"],
-      "json_pure"=>["1.1.7"]
-    )
-  end
-
   it "supports impossible situations" do
     index = build_index do
       add_spec "a", "1.0"
