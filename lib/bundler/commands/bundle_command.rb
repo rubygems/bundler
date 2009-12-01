@@ -19,7 +19,7 @@ class Gem::Commands::BundleCommand < Gem::Command
       options[:cache] = gem
     end
 
-    add_option('--prune-cache', "Removes all .gem files from the bundle's cache") do
+    add_option('--prune-cache', "Removes all .gem files that are not a part of the bundle from the cache") do
       options[:prune] = true
     end
 
