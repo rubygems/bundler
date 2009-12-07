@@ -154,13 +154,6 @@ describe "Faking gems with directories" do
     out.should == '0.5'
   end
 
-  describe "validating gemspecs" do
-    it "does not use a gemspec if any of the require paths are missing" do
-      install_manifest <<-Gemfile
-      Gemfile
-    end
-  end
-
   describe "listing gems in a directory" do
     it "directory can take a block" do
       ext = bundled_app("externals")

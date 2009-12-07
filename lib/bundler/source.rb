@@ -214,7 +214,7 @@ module Bundler
     def locate_gemspecs
       Dir["#{location}/#{@glob}"].inject({}) do |specs, file|
         file = Pathname.new(file)
-        if spec = eval(File.read(file)) and validate_gemspec(file.dirname, spec)
+        if spec = eval(File.read(file)) # and validate_gemspec(file.dirname, spec)
           spec.location = file.dirname.expand_path
           specs[spec.full_name] = spec
         end
@@ -237,8 +237,8 @@ module Bundler
           #   raise DirectorySourceError, "The location you specified for #{spec.name}" \
           #     " is '#{spec.location}'. The gemspec was found at '#{existing.location}'."
           end
-        elsif !validate_gemspec(spec.location, spec)
-          raise "Your gem definition is not valid: #{spec}"
+        # elsif !validate_gemspec(spec.location, spec)
+        #   raise "Your gem definition is not valid: #{spec}"
         else
           specs[spec.full_name] = spec
         end
