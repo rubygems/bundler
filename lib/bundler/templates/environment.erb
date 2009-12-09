@@ -121,6 +121,7 @@ end
 # Define all the Gem errors for gems that reference them.
 module Gem
   def self.ruby ; <%= Gem.ruby.inspect %> ; end
+  def self.dir ; @dir ||= File.dirname(File.expand_path(__FILE__)) ; end
   class LoadError < ::LoadError; end
   class Exception < RuntimeError; end
   class CommandLineError < Exception; end
