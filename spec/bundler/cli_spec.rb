@@ -9,6 +9,13 @@ describe "Bundler::CLI" do
         source "file://#{gem_repo1}"
         gem "very_simple_binary"
       Gemfile
+
+      File.open("#{bundled_app}/build.yml", "w+") do |file|
+        file.puts <<-build_options.gsub(/^          /, '')
+          very_simple_binary:
+            simple: wot
+        build_options
+      end
     end
 
     it "fails if the option is not provided" do
@@ -20,13 +27,6 @@ describe "Bundler::CLI" do
     end
 
     it "passes if a yaml is specified that contains the necessary options" do
-      File.open("#{bundled_app}/build.yml", "w+") do |file|
-        file.puts <<-build_options.gsub(/^          /, '')
-          very_simple_binary:
-            simple: wot
-        build_options
-      end
-
       Dir.chdir(bundled_app) do
         @output = gem_command :bundle, "--build-options=build.yml 2>&1"
       end
@@ -38,6 +38,19 @@ describe "Bundler::CLI" do
         puts VerySimpleBinaryInC
       RUBY
 
+      out.should == "VerySimpleBinaryInC"
+    end
+
+    it "does not skip the binary gem if compiling failed in a previous bundle" do
+      Dir.chdir(bundled_app)
+
+      gem_command :bundle, "--backtrace 2>&1" # will fail
+      gem_command :bundle, "--build-options=build.yml 2>&1"
+
+      out = run_in_context <<-RUBY
+        require "very_simple_binary"
+        puts VerySimpleBinaryInC
+      RUBY
       out.should == "VerySimpleBinaryInC"
     end
   end

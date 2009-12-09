@@ -160,6 +160,9 @@ module Bundler
         :bin_dir             => @bindir
       ))
       installer.install
+    rescue Gem::InstallError
+      cleanup_spec(spec)
+      raise
     ensure
       Gem::Command.build_args = []
     end
@@ -189,8 +192,7 @@ module Bundler
 
       to_delete.each do |spec|
         Bundler.logger.info "Deleting gem: #{spec.name} (#{spec.version})"
-        FileUtils.rm_rf(@path.join("specifications", "#{spec.full_name}.gemspec"))
-        FileUtils.rm_rf(@path.join("gems", spec.full_name))
+        cleanup_spec(spec)
         # Cleanup the bin directory
         spec.executables.each do |bin|
           next if valid_executables.include?(bin)
@@ -198,6 +200,11 @@ module Bundler
           FileUtils.rm_rf(@bindir.join(bin))
         end
       end
+    end
+
+    def cleanup_spec(spec)
+      FileUtils.rm_rf(@path.join("specifications", "#{spec.full_name}.gemspec"))
+      FileUtils.rm_rf(@path.join("gems", spec.full_name))
     end
 
     def expand(options)
