@@ -7,7 +7,7 @@ module Bundler
   ENV["GEM_HOME"] = dir
   ENV["GEM_PATH"] = dir
 <% end -%>
-  ENV["PATH"]     = "#{dir}/<%= bindir %>:#{ENV["PATH"]}"
+  ENV["PATH"]     = "#{dir}/<%= bindir %><%= File::PATH_SEPARATOR %>#{ENV["PATH"]}"
   ENV["RUBYOPT"]  = "-r#{file} #{ENV["RUBYOPT"]}"
 
 <% load_paths.each do |load_path| -%>
