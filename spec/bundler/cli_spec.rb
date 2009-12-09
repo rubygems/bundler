@@ -269,6 +269,16 @@ describe "Bundler::CLI" do
       out = run_in_context "puts Gem.dir"
       out.should == "#{bundled_app}/vendor/gems"
     end
+
+    it "stubs out Gem.default_dir" do
+      out = run_in_context "puts Gem.default_dir"
+      out.should == "#{bundled_app}/vendor/gems"
+    end
+
+    it "stubs out Gem.path" do
+      out = run_in_context "puts Gem.path"
+      out.should == "#{bundled_app}/vendor/gems"
+    end
   end
 
   describe "relative paths everywhere" do
