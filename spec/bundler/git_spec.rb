@@ -99,6 +99,18 @@ describe "Getting gems from git" do
     out.should == "1.0\n1.0"
   end
 
+  it "raises exception when git does not contain correct gem version" do
+    build_lib "omg", "1.0.2", :gemspec => true
+    gitify tmp_path("libs")
+
+    lambda do
+      install_manifest <<-Gemfile
+        clear_sources
+        gem "omg", "~> 1.1", :git => "#{tmp_path("libs")}"
+      Gemfile
+    end.should raise_error(Bundler::GemNotFound, /git/)
+  end
+
   it "allows bundling a specific tag" do
     path = build_git_repo "very-simple", :with => fixture_dir.join("very-simple")
     install_manifest <<-Gemfile

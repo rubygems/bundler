@@ -104,12 +104,16 @@ module Bundler
 
   private
 
+    def _version?(version)
+      version && Gem::Version.new(version) rescue false
+    end
+
     def _handle_vendored_option(name, version, options)
       dir, path = _find_directory_source(options[:path])
 
       if dir
         dir.required_specs << name
-        dir.add_spec(path, name, version) if version
+        dir.add_spec(path, name, version) if _version?(version)
         dir
       else
         directory options[:path] do
@@ -147,7 +151,7 @@ module Bundler
         end
 
         source.required_specs << name
-        source.add_spec(Pathname.new(options[:path] || '.'), name, version) if version
+        source.add_spec(Pathname.new(options[:path] || '.'), name, version) if _version?(version)
         source
       else
         git(git, :ref => ref, :branch => branch) do

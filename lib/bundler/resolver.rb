@@ -157,7 +157,8 @@ module Bundler
 
         if matching_versions.empty?
           if current.required_by.empty?
-            raise GemNotFound, "Could not find gem '#{current}' in any of the sources"
+            location = @by_gem[current.name] ? @by_gem[current.name] : "any of the sources"
+            raise GemNotFound, "Could not find gem '#{current}' in #{location}"
           end
           Bundler.logger.warn "Could not find gem '#{current}' (required by '#{current.required_by.last}') in any of the sources"
         end

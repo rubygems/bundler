@@ -274,7 +274,7 @@ module Bundler
     end
 
     def to_s
-      "#{@name} (#{@version}) Located at: '#{location}'"
+      "directory: '#{location}'"
     end
 
     def download(spec)
@@ -321,6 +321,10 @@ module Bundler
 
     def download(spec)
       # Nothing needed here
+    end
+
+    def to_s
+      "git: #{uri}"
     end
   end
 end

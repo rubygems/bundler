@@ -164,6 +164,28 @@ describe "Faking gems with directories" do
       :default.should have_const("HI2U")
     end
 
+    it "directory can specify spermy specifiers" do
+      build_lib "omg", "1.0.2", :gemspec => true
+
+      install_manifest <<-Gemfile
+        clear_sources
+        gem "omg", "~> 1.0.0", :path => "#{tmp_path}/libs"
+      Gemfile
+
+      :default.should have_const("OMG")
+    end
+
+    it "raises exception when directory does not contain correct gem version" do
+      build_lib "omg", "1.0.2", :gemspec => true
+
+      lambda do
+        install_manifest <<-Gemfile
+          clear_sources
+          gem "omg", "~> 1.1", :path => "#{tmp_path}/libs"
+        Gemfile
+      end.should raise_error(Bundler::GemNotFound, /directory/)
+    end
+
     it "can list vendored gems without :path" do
       build_lib "omg", "1.0"
       install_manifest <<-Gemfile
