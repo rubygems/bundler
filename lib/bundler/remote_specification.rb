@@ -32,7 +32,10 @@ module Bundler
     private
 
     def _remote_uri
-      "#{@source_uri}/quick/Marshal.4.8/#{@name}-#{@version}.gemspec.rz"
+      # "#{@source_uri}/quick/Marshal.4.8/#{@name}-#{@version}.gemspec.rz"
+      tuple = [@name, @version, @platform]
+      tuple = tuple - [nil, 'ruby', '']
+      "#{@source_uri}/quick/Marshal.4.8/#{tuple.join("-")}.gemspec.rz"
     end
 
     def _remote_specification

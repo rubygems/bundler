@@ -53,6 +53,10 @@ module Spec
           s.write "lib/platform_specific.rb", "PLATFORM_SPECIFIC = '1.0.0 RUBY'"
         end
 
+        build_gem "only_java" do |s|
+          s.platform = "java"
+        end
+
         build_gem "very-simple"
 
         build_gem "very-simple-prerelease", "1.0.pre"

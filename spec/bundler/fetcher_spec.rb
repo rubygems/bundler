@@ -110,6 +110,19 @@ describe "Fetcher" do
       out.should == "1.0.0 JAVA"
     end
 
+    it "finds the java one when only Java is there" do
+      Gem.platforms = [rb, java]
+
+      install_manifest <<-Gemfile
+        clear_sources
+        source "file://#{gem_repo1}"
+        gem "only_java"
+      Gemfile
+
+      out = run_in_context "Bundler.require_env ; puts ONLY_JAVA"
+      out.should == "1.0"
+    end
+
     it "raises GemNotFound if no gem for corect platform exists when gem dependencies are tied to specific sources" do
       Gem.platforms = [rb]
       system_gems "platform_specific-1.0-java" do
