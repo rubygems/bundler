@@ -91,6 +91,17 @@ describe "Faking gems with directories" do
     tmp_gem_path.should include_installed_gem("rack-0.9.1")
   end
 
+  it "works with prerelease gems" do
+    build_lib "very-simple", "1.0.pre", :gemspec => true
+    install_manifest <<-Gemfile
+      clear_sources
+      gem "very-simple", :path => "#{tmp_path}/libs/very-simple-1.0.pre"
+    Gemfile
+
+    out = run_in_context "Bundler.require_env ; puts VERYSIMPLE"
+    out.should == "1.0.pre"
+  end
+
   it "recursively finds all gemspec files in a directory" do
     build_lib("first", "1.0", :gemspec => true)
     build_lib("second", "1.0", :gemspec => true) do |s|

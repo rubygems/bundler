@@ -222,13 +222,19 @@ module Bundler
 
     def search(dependency)
       @cache[dependency.hash] ||= begin
-        collection = @by_gem[dependency.name].gems if @by_gem[dependency.name]
-        collection ||= @specs
-        collection[dependency.name].select do |spec|
-          match = dependency =~ spec
-          match &= dependency.version_requirements.prerelease? if spec.version.prerelease?
-          match
-        end.sort_by {|s| [s.version, s.platform == 'ruby' ? "\0" : s.platform] }
+        pinned = @by_gem[dependency.name].gems if @by_gem[dependency.name]
+        specs  = (pinned || @specs)[dependency.name]
+
+        wants_prerelease = dependency.version_requirements.prerelease?
+        only_prerelease  = specs.all? {|spec| spec.version.prerelease? }
+
+        found = specs.select { |spec| dependency =~ spec }
+
+        unless wants_prerelease || (pinned && only_prerelease)
+          found.reject! { |spec| spec.version.prerelease? }
+        end
+
+        found.sort_by {|s| [s.version, s.platform == 'ruby' ? "\0" : s.platform] }
       end
     end
   end
