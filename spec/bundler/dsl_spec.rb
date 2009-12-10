@@ -113,4 +113,14 @@ describe "Bundler DSL" do
     "omg".should have_const("VERYSIMPLE")
     "omg".should_not have_const("SPEC")
   end
+
+  it "raises an exception if you provide an invalid key" do
+    lambda do
+      install_manifest <<-Gemfile
+        clear_sources
+
+        gem "very-simple", :version => "1.0"
+      Gemfile
+    end.should raise_error(Bundler::InvalidKey)
+  end
 end

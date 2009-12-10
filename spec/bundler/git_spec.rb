@@ -24,7 +24,7 @@ describe "Getting gems from git" do
 
     it "has very-simple in the load path" do
       out = run_in_context "require 'very-simple' ; puts VERYSIMPLE"
-      out.should == "1.0"
+      out.should == "2.0"
     end
 
     it "removes the directory during cleanup" do
@@ -51,7 +51,7 @@ describe "Getting gems from git" do
       Dir.chdir(bundled_app) do
         out = gem_command :bundle, "--cached"
         out = run_in_context "require 'very-simple' ; puts VERYSIMPLE"
-        out.should == "1.0"
+        out.should == "2.0"
       end
     end
   end
@@ -122,6 +122,31 @@ describe "Getting gems from git" do
     out = run_in_context "require 'very-simple/in_a_branch' ; puts OMG_IN_A_BRANCH"
     out.should == "tagged"
   end
+
+  it "allows bundling a specific branch" do
+    path = build_git_repo "very-simple", :with => fixture_dir.join("very-simple")
+    install_manifest <<-Gemfile
+      clear_sources
+      source "file://#{gem_repo1}"
+      gem "very-simple", "1.0", :git => "#{path}", :branch => 'alt'
+    Gemfile
+
+    out = run_in_context "require 'very-simple/in_a_branch' ; puts OMG_IN_A_BRANCH"
+    out.should == "branch"
+  end
+
+  it "allows bundling a specific ref" do
+    path = build_git_repo "very-simple", :with => fixture_dir.join("very-simple")
+    install_manifest <<-Gemfile
+      clear_sources
+      source "file://#{gem_repo1}"
+      gem "very-simple", "1.0", :git => "#{path}", :ref => 'HEAD'
+    Gemfile
+
+    out = run_in_context "require 'very-simple' ; puts VERYSIMPLE"
+    out.should == "2.0"
+  end
+
 
   it "raises an error if trying to run in --cached mode but the repository has not been cloned" do
     @path = build_git_repo "very-simple", :with => fixture_dir.join("very-simple")

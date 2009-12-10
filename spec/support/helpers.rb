@@ -77,6 +77,11 @@ module Spec
         `git add *`
         `git commit -m "OMG BRANCHING"`
         `git checkout --quiet master`
+        File.open(path.join("lib", "#{name}.rb"), "w") do |file|
+          file.puts "VERYSIMPLE = '2.0'"
+        end
+        `git add *`
+        `git commit -m "OMG HEAD"`
       end
       path
     end
