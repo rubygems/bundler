@@ -38,6 +38,10 @@ module Spec
       tmp_path("repos/2")
     end
 
+    def gem_repo2(*path)
+      tmp_path("repos/3")
+    end
+
     def system_gem_path(*path)
       tmp_path('system_gems', *path)
     end

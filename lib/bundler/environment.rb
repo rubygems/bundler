@@ -171,7 +171,7 @@ module Bundler
     end
 
     def repository
-      @repository ||= Repository.new(gem_path, bindir)
+      @repository ||= Bundle.new(gem_path, bindir)
     end
 
     def gem_dependencies

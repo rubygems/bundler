@@ -84,8 +84,25 @@ module Spec
       end
     end
 
-    def build_repo(path)
+    def build_repo2
+      FileUtils.rm_rf gem_repo2
+      FileUtils.cp_r gem_repo1, gem_repo2
+    end
+
+    def update_repo2
+      update_repo gem_repo2 do
+        build_gem "rack", "1.2" do |s|
+          s.executables = "rackup"
+        end
+      end
+    end
+
+    def build_repo(path, &blk)
       return if File.directory?(path)
+      update_repo(path, &blk)
+    end
+
+    def update_repo(path)
       @_build_path = "#{path}/gems"
       yield
       @_build_path = nil

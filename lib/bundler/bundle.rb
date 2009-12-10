@@ -1,7 +1,7 @@
 module Bundler
   class InvalidRepository < StandardError ; end
 
-  class Repository
+  class Bundle
     attr_reader :path
 
     def initialize(path, bindir)

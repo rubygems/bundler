@@ -185,4 +185,69 @@ describe "Bundler::Environment" do
       out.should include("rake - 0.8.7")
     end
   end
+
+  describe "YAML description" do
+    before :each do
+      pending
+      build_repo2
+    end
+
+    it "it does not pull remote updates if the Gemfile did not change" do
+      install_manifest <<-Gemfile
+        clear_sources
+        source "file://#{gem_repo2}"
+        gem "rack", ">= 1.0"
+      Gemfile
+
+      update_repo2
+
+      Dir.chdir bundled_app
+      gem_command :bundle
+      out = run_in_context "Bundler.require_env ; puts RACK"
+      out.should == "1.0"
+    end
+
+    it "it does not pull remote updates if the Gemfile did not *significantly* change" do
+      install_manifest <<-Gemfile
+        clear_sources
+        source "file://#{gem_repo2}"
+        gem "rack", ">= 1.0"
+      Gemfile
+
+      update_repo2
+
+      install_manifest <<-Gemfile
+        clear_sources
+        source "file://#{gem_repo2}"
+        # Save this newline kthx
+        gem "rack"
+      Gemfile
+
+      Dir.chdir bundled_app
+      gem_command :bundle
+      out = run_in_context "Bundler.require_env ; puts RACK"
+      out.should == "1.0"
+    end
+
+    it "it does pull remote updates if the Gemfile changed" do
+      install_manifest <<-Gemfile
+        clear_sources
+        source "file://#{gem_repo2}"
+        gem "rack", ">= 1.0"
+      Gemfile
+
+      update_repo2
+
+      install_manifest <<-Gemfile
+        clear_sources
+        source "file://#{gem_repo2}"
+        gem "rack"
+      Gemfile
+
+      Dir.chdir bundled_app
+      gem_command :bundle
+      out = run_in_context "Bundler.require_env ; puts RACK"
+      out.should == "1.2"
+    end
+  end
 end

@@ -40,7 +40,7 @@ describe "Fetcher" do
   end
 
   it "works with repositories that don't provide Marshal.4.8.Z" do
-    FileUtils.cp_r gem_repo1, gem_repo2
+    build_repo2
     Dir["#{gem_repo2}/Marshal.*"].each { |f| File.unlink(f) }
 
     install_manifest <<-Gemfile

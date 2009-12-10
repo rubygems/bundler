@@ -14,7 +14,7 @@ require "bundler/resolver"
 require "bundler/environment"
 require "bundler/dsl"
 require "bundler/cli"
-require "bundler/repository"
+require "bundler/bundle"
 require "bundler/dependency"
 require "bundler/remote_specification"
 
