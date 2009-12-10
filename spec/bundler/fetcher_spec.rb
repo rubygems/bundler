@@ -29,28 +29,6 @@ describe "Fetcher" do
     lambda { m.install }.should raise_error(ArgumentError)
   end
 
-  it "does not include gems that don't match the current platform" do
-    pending "Need to update the fixtures for this"
-    begin
-      Gem.platforms = [Gem::Platform::RUBY]
-      m = build_manifest <<-Gemfile
-        clear_sources
-        source "file://#{gem_repo1}"
-        gem "do_sqlite3"
-      Gemfile
-
-      m.install
-      bundled_app.should have_cached_gems("do_sqlite3-0.9.11")
-
-      # Try out windows
-      # Gem.platforms = [Gem::Platform.new("mswin32_60")]
-      # finder = Bundler::Finder.new(Bundler::GemSource.new(:uri => "file://#{gem_repo1}"))
-      # finder.search(build_dep("do_sqlite3", "> 0")).should only_have_specs("do_sqlite3-0.9.12-x86-mswin32-60")
-    ensure
-      Gem.platforms = nil
-    end
-  end
-
   it "outputs a logger message when updating an index from source" do
     m = build_manifest <<-Gemfile
       clear_sources
@@ -86,5 +64,62 @@ describe "Fetcher" do
 
     @log_output.should have_log_message("Source 'file:#{gem_repo2}' does not support prerelease gems")
     tmp_gem_path.should have_cached_gems("rack-1.0.0")
+  end
+
+  describe "platforms" do
+    after :each do
+      Gem.platforms = nil
+    end
+
+    def rb  ; Gem::Platform::RUBY ; end
+    def java  ; Gem::Platform.new [nil, "java", nil]      ; end
+    def linux ; Gem::Platform.new ['x86', 'linux', nil] ; end
+
+    it "installs the gem for the correct platform" do
+      Gem.platforms = [rb]
+      install_manifest <<-Gemfile
+        clear_sources
+        source "file://#{gem_repo1}"
+        gem "platform_specific"
+      Gemfile
+
+      out = run_in_context "Bundler.require_env ; puts PLATFORM_SPECIFIC"
+      out.should == "1.0.0 RUBY"
+    end
+
+    it "raises GemNotFound if no gem for correct platform exists" do
+      Gem.platforms = [linux]
+      lambda do
+        install_manifest <<-Gemfile
+          clear_sources
+          source "file://#{gem_repo1}"
+          gem "platform_specific"
+        Gemfile
+      end.should raise_error(Bundler::GemNotFound)
+    end
+
+    it "selects java one when both are available" do
+      Gem.platforms = [rb, java]
+      install_manifest <<-Gemfile
+        clear_sources
+        source "file://#{gem_repo1}"
+        gem "platform_specific"
+      Gemfile
+
+      out = run_in_context "Bundler.require_env ; puts PLATFORM_SPECIFIC"
+      out.should == "1.0.0 JAVA"
+    end
+
+    it "raises GemNotFound if no gem for corect platform exists when gem dependencies are tied to specific sources" do
+      Gem.platforms = [rb]
+      system_gems "platform_specific-1.0-java" do
+        lambda do
+          install_manifest <<-Gemfile
+            clear_sources
+            gem "platform_specific", :bundle => false
+          Gemfile
+        end.should raise_error(Bundler::GemNotFound)
+      end
+    end
   end
 end

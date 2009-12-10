@@ -78,7 +78,7 @@ module Bundler
         source.gems.each do |name, specs|
           # Hack to work with a regular Gem::SourceIndex
           [specs].flatten.compact.each do |spec|
-            next if @specs[spec.name].any? { |s| s.version == spec.version }
+            next if @specs[spec.name].any? { |s| s.version == spec.version && s.platform == spec.platform }
             @specs[spec.name] << spec
           end
         end
@@ -228,7 +228,7 @@ module Bundler
           match = dependency =~ spec
           match &= dependency.version_requirements.prerelease? if spec.version.prerelease?
           match
-        end.sort_by {|s| s.version }
+        end.sort_by {|s| [s.version, s.platform == 'ruby' ? "\0" : s.platform] }
       end
     end
   end

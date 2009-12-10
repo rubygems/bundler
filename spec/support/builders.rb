@@ -43,6 +43,16 @@ module Spec
           s.write "lib/rack/test.rb", "RACK_TEST = '1.0'"
         end
 
+        build_gem "platform_specific" do |s|
+          s.platform = "java"
+          s.write "lib/platform_specific.rb", "PLATFORM_SPECIFIC = '1.0.0 JAVA'"
+        end
+
+        build_gem "platform_specific" do |s|
+          s.platform = "ruby"
+          s.write "lib/platform_specific.rb", "PLATFORM_SPECIFIC = '1.0.0 RUBY'"
+        end
+
         build_gem "very-simple"
 
         build_gem "very-simple-prerelease", "1.0.pre"
