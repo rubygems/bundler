@@ -128,7 +128,9 @@ module Bundler
       end
     end
 
-    def prune(dependencies, sources)
+    def prune(options = {})
+      dependencies, sources = @environment.gem_dependencies, @environment.sources
+
       sources.each do |s|
         s.repository = self
         s.local = true
@@ -143,6 +145,13 @@ module Bundler
             FileUtils.rm @path.join("cache", "#{spec.full_name}.gem")
           end
         end
+      end
+    end
+
+    def list(options = {})
+      Bundler.logger.info "Currently bundled gems:"
+      gems.each do |spec|
+        Bundler.logger.info " * #{spec.name} (#{spec.version})"
       end
     end
 

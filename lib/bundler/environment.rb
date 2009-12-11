@@ -43,17 +43,6 @@ module Bundler
       Bundler.logger.info "Done."
     end
 
-    def prune(options = {})
-      repository.prune(gem_dependencies, sources)
-    end
-
-    def list(options = {})
-      Bundler.logger.info "Currently bundled gems:"
-      repository.gems.each do |spec|
-        Bundler.logger.info " * #{spec.name} (#{spec.version})"
-      end
-    end
-
     def require_env(env = nil)
       dependencies.each { |d| d.require_env(env) }
     end
@@ -87,6 +76,10 @@ module Bundler
       @default_sources.clear
     end
 
+    def gem_dependencies
+      @gem_dependencies ||= dependencies.map { |d| d.to_gem_dependency }
+    end
+
   private
 
     def default_sources
@@ -95,10 +88,6 @@ module Bundler
 
     def repository
       @repository ||= Bundle.new(self)
-    end
-
-    def gem_dependencies
-      @gem_dependencies ||= dependencies.map { |d| d.to_gem_dependency }
     end
   end
 end

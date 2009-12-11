@@ -461,6 +461,43 @@ describe "Bundler::CLI" do
     end
   end
 
+  describe "pruning the cache" do
+    it "works" do
+      install_manifest <<-Gemfile
+        clear_sources
+        source "file://#{gem_repo1}"
+        gem "rack", "0.9.1"
+      Gemfile
+
+      bundled_app("vendor", "gems").should have_cached_gems("rack-0.9.1")
+
+      install_manifest <<-Gemfile
+        clear_sources
+        source "file://#{gem_repo1}"
+      Gemfile
+
+      bundled_app("vendor", "gems").should have_cached_gems("rack-0.9.1")
+      Dir.chdir bundled_app
+      out = gem_command :bundle, "--prune-cache"
+      puts out
+      bundled_app("vendor", "gems").should_not have_cached_gems("rack-0.9.1")
+    end
+  end
+
+  describe "listing gems" do
+    it "works" do
+      install_manifest <<-Gemfile
+        clear_sources
+        source "file://#{gem_repo1}"
+        gem "rack", "0.9.1"
+      Gemfile
+
+      Dir.chdir bundled_app
+      out = gem_command :bundle, "--list"
+      out.should =~ /rack/
+    end
+  end
+
   describe "listing outdated gems" do
     it "shows a message when there are no outdated gems" do
       m = build_manifest <<-Gemfile

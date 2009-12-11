@@ -45,11 +45,11 @@ module Bundler
     end
 
     def prune
-      @environment.prune(@options)
+      @bundle.prune(@options)
     end
 
     def list
-      @environment.list(@options)
+      @bundle.list(@options)
     end
 
     def list_outdated
