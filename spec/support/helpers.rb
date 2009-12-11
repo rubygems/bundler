@@ -38,7 +38,8 @@ module Spec
       FileUtils.mkdir_p(path.dirname)
       Dir.chdir(path.dirname) do
         build_manifest_file(path, str)
-        Bundler::Dsl.load_gemfile(path)
+        env = Bundler::Dsl.load_gemfile(path)
+        Bundler::Bundle.new(env)
       end
     end
 

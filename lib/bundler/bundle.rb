@@ -4,16 +4,41 @@ module Bundler
   class Bundle
     attr_reader :path
 
-    def initialize(path, bindir)
+    def initialize(env)
+      path   = env.gem_path
+      bindir = env.bindir
+
       FileUtils.mkdir_p(path)
 
+      @environment = env
       @path   = Pathname.new(path)
       @bindir = Pathname.new(bindir)
 
       @cache = GemDirectorySource.new(:location => @path.join("cache"))
     end
 
-    def install(dependencies, sources, options = {})
+    def install(options = {})
+      dependencies = @environment.dependencies
+      sources      = @environment.sources
+
+      # ========== from env
+      if only_envs = options[:only]
+        dependencies.reject! { |d| !only_envs.any? {|env| d.in?(env) } }
+      end
+
+      no_bundle = dependencies.map do |dep|
+        dep.source == SystemGemSource.instance && dep.name
+      end.compact
+
+      update = options[:update]
+      cached = options[:cached]
+
+      options[:rubygems]    = @environment.rubygems
+      options[:system_gems] = @environment.system_gems
+      options[:manifest]    = @environment.filename
+      options[:no_bundle]   = no_bundle
+      # ==========
+
       # TODO: clean this up
       sources.each do |s|
         s.repository = self
@@ -48,9 +73,41 @@ module Bundler
       generate_bins(valid, options)
       cleanup(valid, options)
       configure(valid, options)
+
+      Bundler.logger.info "Done."
     end
 
-    def cache(*gemfiles)
+    def cache(options = {})
+      gemfile = options[:cache]
+
+      if File.extname(gemfile) == ".gem"
+        if !File.exist?(gemfile)
+          raise InvalidCacheArgument, "'#{gemfile}' does not exist."
+        end
+        cache2(gemfile)
+      elsif File.directory?(gemfile) || gemfile.include?('/')
+        if !File.directory?(gemfile)
+          raise InvalidCacheArgument, "'#{gemfile}' does not exist."
+        end
+        gemfiles = Dir["#{gemfile}/*.gem"]
+        if gemfiles.empty?
+          raise InvalidCacheArgument, "'#{gemfile}' contains no gemfiles"
+        end
+        cache2(*gemfiles)
+      else
+        local = Gem::SourceIndex.from_installed_gems.find_name(gemfile).last
+
+        if !local
+          raise InvalidCacheArgument, "w0t? '#{gemfile}' means nothing to me."
+        end
+
+        gemfile = Pathname.new(local.loaded_from)
+        gemfile = gemfile.dirname.join('..', 'cache', "#{local.full_name}.gem").expand_path
+        cache2(gemfile)
+      end
+    end
+
+    def cache2(*gemfiles)
       FileUtils.mkdir_p(@path.join("cache"))
       gemfiles.each do |gemfile|
         Bundler.logger.info "Caching: #{File.basename(gemfile)}"
@@ -92,6 +149,17 @@ module Bundler
 
     def download_path_for(type)
       @repos[type].download_path_for
+    end
+
+    def setup_environment
+      gem_path = @environment.gem_path
+
+      unless @environment.system_gems
+        ENV["GEM_HOME"] = gem_path
+        ENV["GEM_PATH"] = gem_path
+      end
+      ENV["PATH"]     = "#{@environment.bindir}:#{ENV["PATH"]}"
+      ENV["RUBYOPT"]  = "-r#{gem_path}/environment #{ENV["RUBYOPT"]}"
     end
 
   private

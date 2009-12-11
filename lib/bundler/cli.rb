@@ -32,15 +32,16 @@ module Bundler
 
     def initialize(options)
       @options = options
-      @environment = Dsl.load_gemfile(@options[:manifest])
+      environment = Dsl.load_gemfile(@options[:manifest])
+      @bundle = Bundle.new(environment)
     end
 
     def bundle
-      @environment.install(@options)
+      @bundle.install(@options)
     end
 
     def cache
-      @environment.cache(@options)
+      @bundle.cache(@options)
     end
 
     def prune
@@ -56,7 +57,7 @@ module Bundler
     end
 
     def exec
-      @environment.setup_environment
+      @bundle.setup_environment
       # w0t?
       super(*$command)
     end

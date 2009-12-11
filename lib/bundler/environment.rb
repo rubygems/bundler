@@ -43,36 +43,6 @@ module Bundler
       Bundler.logger.info "Done."
     end
 
-    def cache(options = {})
-      gemfile = options[:cache]
-
-      if File.extname(gemfile) == ".gem"
-        if !File.exist?(gemfile)
-          raise InvalidCacheArgument, "'#{gemfile}' does not exist."
-        end
-        repository.cache(gemfile)
-      elsif File.directory?(gemfile) || gemfile.include?('/')
-        if !File.directory?(gemfile)
-          raise InvalidCacheArgument, "'#{gemfile}' does not exist."
-        end
-        gemfiles = Dir["#{gemfile}/*.gem"]
-        if gemfiles.empty?
-          raise InvalidCacheArgument, "'#{gemfile}' contains no gemfiles"
-        end
-        repository.cache(*gemfiles)
-      else
-        local = Gem::SourceIndex.from_installed_gems.find_name(gemfile).last
-
-        if !local
-          raise InvalidCacheArgument, "w0t? '#{gemfile}' means nothing to me."
-        end
-
-        gemfile = Pathname.new(local.loaded_from)
-        gemfile = gemfile.dirname.join('..', 'cache', "#{local.full_name}.gem").expand_path
-        repository.cache(gemfile)
-      end
-    end
-
     def prune(options = {})
       repository.prune(gem_dependencies, sources)
     end
@@ -94,15 +64,6 @@ module Bundler
           Bundler.logger.info " * #{name}"
         end
       end
-    end
-
-    def setup_environment
-      unless system_gems
-        ENV["GEM_HOME"] = gem_path
-        ENV["GEM_PATH"] = gem_path
-      end
-      ENV["PATH"]     = "#{bindir}:#{ENV["PATH"]}"
-      ENV["RUBYOPT"]  = "-r#{gem_path}/environment #{ENV["RUBYOPT"]}"
     end
 
     def require_env(env = nil)
@@ -145,7 +106,7 @@ module Bundler
     end
 
     def repository
-      @repository ||= Bundle.new(gem_path, bindir)
+      @repository ||= Bundle.new(self)
     end
 
     def gem_dependencies
