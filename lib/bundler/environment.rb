@@ -1,7 +1,6 @@
 require "rubygems/source_index"
 
 module Bundler
-  class DefaultManifestNotFound < StandardError; end
   class InvalidCacheArgument < StandardError; end
   class SourceNotCached < StandardError; end
 
@@ -9,28 +8,6 @@ module Bundler
     attr_reader :filename, :dependencies
     attr_accessor :rubygems, :system_gems
     attr_writer :gem_path, :bindir
-
-    def self.load(file = nil)
-      gemfile = Pathname.new(file || default_manifest_file).expand_path
-
-      unless gemfile.file?
-        raise ManifestFileNotFound, "Manifest file not found: #{gemfile.to_s.inspect}"
-      end
-
-      new(gemfile)
-    end
-
-    def self.default_manifest_file
-      current = Pathname.new(Dir.pwd)
-
-      until current.root?
-        filename = current.join("Gemfile")
-        return filename if filename.exist?
-        current = current.parent
-      end
-
-      raise DefaultManifestNotFound
-    end
 
     def initialize(filename)
       @filename         = filename
@@ -40,9 +17,6 @@ module Bundler
       @dependencies     = []
       @rubygems         = true
       @system_gems      = true
-
-      # Evaluate the Gemfile
-      Dsl.evaluate(self, filename)
     end
 
     def install(options = {})

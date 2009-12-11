@@ -32,7 +32,7 @@ module Bundler
 
     def initialize(options)
       @options = options
-      @environment = Bundler::Environment.load(@options[:manifest])
+      @environment = Dsl.load_gemfile(@options[:manifest])
     end
 
     def bundle

@@ -1,11 +1,36 @@
 module Bundler
   class ManifestFileNotFound < StandardError; end
   class InvalidKey < StandardError; end
+  class DefaultManifestNotFound < StandardError; end
 
   class Dsl
-    def self.evaluate(environment, file)
+    def self.load_gemfile(file)
+      gemfile = Pathname.new(file || default_gemfile).expand_path
+
+      unless gemfile.file?
+        raise ManifestFileNotFound, "Manifest file not found: #{gemfile.to_s.inspect}"
+      end
+
+      evaluate(gemfile)
+    end
+
+    def self.default_gemfile
+      current = Pathname.new(Dir.pwd)
+
+      until current.root?
+        filename = current.join("Gemfile")
+        return filename if filename.exist?
+        current = current.parent
+      end
+
+      raise DefaultManifestNotFound
+    end
+
+    def self.evaluate(file)
+      environment = Environment.new(file)
       builder = new(environment)
       builder.instance_eval(File.read(file.to_s), file.to_s, 1)
+      environment
     end
 
     def initialize(environment)
