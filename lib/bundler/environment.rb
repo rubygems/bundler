@@ -54,18 +54,6 @@ module Bundler
       end
     end
 
-    def list_outdated(options={})
-      outdated_gems = repository.outdated_gems
-      if outdated_gems.empty?
-        Bundler.logger.info "All gems are up to date."
-      else
-        Bundler.logger.info "Outdated gems:"
-        outdated_gems.each do |name|
-          Bundler.logger.info " * #{name}"
-        end
-      end
-    end
-
     def require_env(env = nil)
       dependencies.each { |d| d.require_env(env) }
     end

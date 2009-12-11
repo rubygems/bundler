@@ -53,7 +53,7 @@ module Bundler
     end
 
     def list_outdated
-      @environment.list_outdated(@options)
+      @bundle.list_outdated(@options)
     end
 
     def exec

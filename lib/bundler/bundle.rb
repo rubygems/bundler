@@ -115,6 +115,19 @@ module Bundler
       end
     end
 
+    def list_outdated(options={})
+      outdated_gems = source_index.outdated.sort
+
+      if outdated_gems.empty?
+        Bundler.logger.info "All gems are up to date."
+      else
+        Bundler.logger.info "Outdated gems:"
+        outdated_gems.each do |name|
+          Bundler.logger.info " * #{name}"
+        end
+      end
+    end
+
     def prune(dependencies, sources)
       sources.each do |s|
         s.repository = self
@@ -135,10 +148,6 @@ module Bundler
 
     def gems
       source_index.gems.values
-    end
-
-    def outdated_gems
-      source_index.outdated.sort
     end
 
     def source_index
