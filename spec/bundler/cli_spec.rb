@@ -430,10 +430,10 @@ describe "Bundler::CLI" do
         Gemfile
 
         Dir.chdir(bundled_app) do
-          out = gem_command :bundle, "--cache rake"
-          gem_command :bundle, "--cached"
-           out = run_in_context "require 'rake' ; puts RAKE"
-           out.should == "0.8.7"
+          # out = gem_command :bundle, "--cache rake"
+          gem_command :bundle
+          out = run_in_context "require 'rake' ; puts RAKE"
+          out.should == "0.8.7"
         end
       end
     end

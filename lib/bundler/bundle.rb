@@ -2,7 +2,7 @@ module Bundler
   class InvalidRepository < StandardError ; end
 
   class Bundle
-    attr_reader :path
+    attr_reader :path, :environment
 
     def initialize(env)
       path   = env.gem_path
@@ -77,37 +77,7 @@ module Bundler
       Bundler.logger.info "Done."
     end
 
-    def cache(options = {})
-      gemfile = options[:cache]
-
-      if File.extname(gemfile) == ".gem"
-        if !File.exist?(gemfile)
-          raise InvalidCacheArgument, "'#{gemfile}' does not exist."
-        end
-        cache2(gemfile)
-      elsif File.directory?(gemfile) || gemfile.include?('/')
-        if !File.directory?(gemfile)
-          raise InvalidCacheArgument, "'#{gemfile}' does not exist."
-        end
-        gemfiles = Dir["#{gemfile}/*.gem"]
-        if gemfiles.empty?
-          raise InvalidCacheArgument, "'#{gemfile}' contains no gemfiles"
-        end
-        cache2(*gemfiles)
-      else
-        local = Gem::SourceIndex.from_installed_gems.find_name(gemfile).last
-
-        if !local
-          raise InvalidCacheArgument, "w0t? '#{gemfile}' means nothing to me."
-        end
-
-        gemfile = Pathname.new(local.loaded_from)
-        gemfile = gemfile.dirname.join('..', 'cache', "#{local.full_name}.gem").expand_path
-        cache2(gemfile)
-      end
-    end
-
-    def cache2(*gemfiles)
+    def cache(*gemfiles)
       FileUtils.mkdir_p(@path.join("cache"))
       gemfiles.each do |gemfile|
         Bundler.logger.info "Caching: #{File.basename(gemfile)}"
@@ -300,42 +270,10 @@ module Bundler
     end
 
     def configure(specs, options)
-      generate_environment(specs, options)
-    end
-
-    def generate_environment(specs, options)
       FileUtils.mkdir_p(path)
-
-      load_paths = load_paths_for_specs(specs, options)
-      bindir     = @bindir.relative_path_from(path).to_s
-      filename   = options[:manifest].relative_path_from(path).to_s
-
       File.open(path.join("environment.rb"), "w") do |file|
-        template = File.read(File.join(File.dirname(__FILE__), "templates", "environment.erb"))
-        erb = ERB.new(template, nil, '-')
-        file.puts erb.result(binding)
+        file.puts @environment.environment_rb(specs, options)
       end
-    end
-
-    def load_paths_for_specs(specs, options)
-      load_paths = []
-      specs.each do |spec|
-        next if options[:no_bundle].include?(spec.name)
-        gem_path = Pathname.new(spec.full_gem_path)
-        load_paths << load_path_for(gem_path, spec.bindir) if spec.bindir
-        spec.require_paths.each do |path|
-          load_paths << load_path_for(gem_path, path)
-        end
-      end
-      load_paths
-    end
-
-    def load_path_for(gem_path, path)
-      gem_path.join(path).relative_path_from(@path).to_s
-    end
-
-    def spec_file_for(spec)
-      spec.loaded_from.relative_path_from(@path).to_s
     end
 
     def require_code(file, dep)

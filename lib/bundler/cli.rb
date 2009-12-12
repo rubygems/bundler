@@ -41,7 +41,25 @@ module Bundler
     end
 
     def cache
-      @bundle.cache(@options)
+      gemfile = @options[:cache]
+
+      if File.extname(gemfile) == ".gem"
+        if !File.exist?(gemfile)
+          raise InvalidCacheArgument, "'#{gemfile}' does not exist."
+        end
+        @bundle.cache(gemfile)
+      elsif File.directory?(gemfile) || gemfile.include?('/')
+        if !File.directory?(gemfile)
+          raise InvalidCacheArgument, "'#{gemfile}' does not exist."
+        end
+        gemfiles = Dir["#{gemfile}/*.gem"]
+        if gemfiles.empty?
+          raise InvalidCacheArgument, "'#{gemfile}' contains no gemfiles"
+        end
+        @bundle.cache(*gemfiles)
+      else
+        raise InvalidCacheArgument, "w0t? '#{gemfile}' means nothing to me."
+      end
     end
 
     def prune

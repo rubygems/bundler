@@ -19,28 +19,14 @@ module Bundler
       @system_gems      = true
     end
 
-    def install(options = {})
-      if only_envs = options[:only]
-        dependencies.reject! { |d| !only_envs.any? {|env| d.in?(env) } }
-      end
+    def environment_rb(specs, options)
+      load_paths = load_paths_for_specs(specs, options)
+      bindir     = @bindir.relative_path_from(gem_path).to_s
+      filename   = self.filename.relative_path_from(gem_path).to_s
 
-      no_bundle = dependencies.map do |dep|
-        dep.source == SystemGemSource.instance && dep.name
-      end.compact
-
-      update = options[:update]
-      cached = options[:cached]
-
-      repository.install(dependencies, sources,
-        :rubygems      => rubygems,
-        :system_gems   => system_gems,
-        :manifest      => filename,
-        :update        => options[:update],
-        :cached        => options[:cached],
-        :build_options => options[:build_options],
-        :no_bundle     => no_bundle
-      )
-      Bundler.logger.info "Done."
+      template = File.read(File.join(File.dirname(__FILE__), "templates", "environment.erb"))
+      erb = ERB.new(template, nil, '-')
+      erb.result(binding)
     end
 
     def require_env(env = nil)
@@ -60,7 +46,7 @@ module Bundler
     end
 
     def sources
-      @priority_sources + @sources + @default_sources
+      @priority_sources + @sources + @default_sources + [SystemGemSource.instance]
     end
 
     def add_source(source)
@@ -83,11 +69,33 @@ module Bundler
   private
 
     def default_sources
-      [GemSource.new(:uri => "http://gems.rubyforge.org"), SystemGemSource.instance]
+      [GemSource.new(:uri => "http://gems.rubyforge.org")]
     end
 
     def repository
       @repository ||= Bundle.new(self)
+    end
+
+    def load_paths_for_specs(specs, options)
+      load_paths = []
+      specs.each do |spec|
+        next if options[:no_bundle].include?(spec.name)
+        full_gem_path = Pathname.new(spec.full_gem_path)
+        
+        load_paths << load_path_for(full_gem_path, spec.bindir) if spec.bindir
+        spec.require_paths.each do |path|
+          load_paths << load_path_for(full_gem_path, path)
+        end
+      end
+      load_paths
+    end
+
+    def load_path_for(gem_path, path)
+      gem_path.join(path).relative_path_from(self.gem_path).to_s
+    end
+
+    def spec_file_for(spec)
+      spec.loaded_from.relative_path_from(self.gem_path).to_s
     end
   end
 end
