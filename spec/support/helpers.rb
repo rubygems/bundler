@@ -116,7 +116,8 @@ module Spec
 
     def reset!
       Dir["#{tmp_path}/*"].each do |file|
-        FileUtils.rm_rf(file) unless File.basename(file) == "repos"
+        next if %w(repos rg_deps).include?(File.basename(file))
+        FileUtils.rm_rf(file)
       end
       FileUtils.mkdir_p(tmp_path)
     end

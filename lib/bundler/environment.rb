@@ -81,7 +81,7 @@ module Bundler
       specs.each do |spec|
         next if options[:no_bundle].include?(spec.name)
         full_gem_path = Pathname.new(spec.full_gem_path)
-        
+
         load_paths << load_path_for(full_gem_path, spec.bindir) if spec.bindir
         spec.require_paths.each do |path|
           load_paths << load_path_for(full_gem_path, path)

@@ -37,6 +37,19 @@ else
   end
 end
 
+namespace :spec do
+  file "tmp/rg_deps" do
+    repo = File.dirname(__FILE__) + '/tmp/rg_deps'
+    FileUtils.mkdir_p(repo)
+    p repo
+    ENV['GEM_HOME'], ENV['GEM_PATH'] = repo, repo
+    system "gem install builder --no-rdoc --no-ri"
+  end
+
+  desc "Do all setup needed to run the specs"
+  task :setup => "tmp/rg_deps"
+end
+
 begin
   require 'rake/gempackagetask'
 rescue LoadError
