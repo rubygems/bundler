@@ -38,12 +38,6 @@ module Bundler
         s.local = options[:cached]
       end
 
-      source_requirements = {}
-      dependencies = dependencies.map do |dep|
-        source_requirements[dep.name] = dep.source if dep.source
-        dep.to_gem_dependency
-      end
-
       # Check to see whether the existing cache meets all the requirements
       begin
         valid = nil
@@ -57,7 +51,7 @@ module Bundler
       # or the user passed --update
       if update || !valid
         Bundler.logger.info "Calculating dependencies..."
-        bundle = Resolver.resolve(dependencies, [@cache] + sources, source_requirements)
+        bundle = Resolver.resolve(dependencies, [@cache] + sources)
         download(bundle, options)
         do_install(bundle, options)
         valid = bundle

@@ -124,7 +124,7 @@ module Spec
     end
 
     def build_dep(name, requirements = Gem::Requirement.default, type = :runtime)
-      Gem::Dependency.new(name, requirements, type)
+      Bundler::Dependency.new(name, :version => requirements)
     end
 
     def build_lib(name, *args, &blk)
