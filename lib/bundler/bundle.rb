@@ -20,21 +20,16 @@ module Bundler
     def install(options = {})
       dependencies = @environment.dependencies
       sources      = @environment.sources
+      update       = options[:update]
 
       # ========== from env
       if only_envs = options[:only]
         dependencies.reject! { |d| !only_envs.any? {|env| d.in?(env) } }
       end
 
-      no_bundle = dependencies.map do |dep|
+      options[:no_bundle] = dependencies.map do |dep|
         dep.source == SystemGemSource.instance && dep.name
       end.compact
-
-      update = options[:update]
-      cached = options[:cached]
-
-      # options[:manifest]    = @environment.filename
-      options[:no_bundle]   = no_bundle
       # ==========
 
       # TODO: clean this up
@@ -60,7 +55,7 @@ module Bundler
 
       # Check the remote sources if the existing cache does not meet the requirements
       # or the user passed --update
-      if options[:update] || !valid
+      if update || !valid
         Bundler.logger.info "Calculating dependencies..."
         bundle = Resolver.resolve(dependencies, [@cache] + sources, source_requirements)
         download(bundle, options)
