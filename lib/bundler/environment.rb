@@ -66,6 +66,8 @@ module Bundler
       @gem_dependencies ||= dependencies.map { |d| d.to_gem_dependency }
     end
 
+    alias rubygems? rubygems
+
   private
 
     def default_sources

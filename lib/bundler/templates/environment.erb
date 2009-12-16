@@ -16,7 +16,7 @@ module Bundler
 
   @gemfile = "#{dir}/<%= filename %>"
 
-<% if options[:rubygems] -%>
+<% if rubygems? -%>
   require "rubygems"
 
   @bundled_specs = {}
@@ -99,7 +99,7 @@ module Bundler
   end
 end
 
-<% if options[:rubygems] -%>
+<% if rubygems? -%>
 module Gem
   @loaded_stacks = Hash.new { |h,k| h[k] = [] }
 
