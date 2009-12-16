@@ -61,6 +61,7 @@ module Bundler
         # a smaller index in the array.
         ordered = []
         result.values.each do |spec1|
+          spec1.no_bundle = true if source_requirements[spec1.name] == SystemGemSource.instance
           index = nil
           place = ordered.detect do |spec2|
             spec1.dependencies.any? { |d| d.name == spec2.name }

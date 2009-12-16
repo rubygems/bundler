@@ -11,8 +11,9 @@ module Gem
   end
 
   class Specification
-    attr_accessor :source
-    attr_accessor :location
+    attr_accessor :source, :location, :no_bundle
+
+    alias no_bundle? no_bundle
 
     remove_method(:specification_version) if method_defined?(:specification_version)
 

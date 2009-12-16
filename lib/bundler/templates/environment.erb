@@ -21,7 +21,7 @@ module Bundler
 
   @bundled_specs = {}
 <% specs.each do |spec| -%>
-<% if options[:no_bundle].include?(spec.name) -%>
+<% if spec.no_bundle? -%>
   gem "<%= spec.name %>", "<%= spec.version %>"
 <% else -%>
 <% path = spec_file_for(spec) -%>

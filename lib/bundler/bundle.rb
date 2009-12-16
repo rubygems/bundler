@@ -20,16 +20,11 @@ module Bundler
     def install(options = {})
       dependencies = @environment.dependencies
       sources      = @environment.sources
-      update       = options[:update]
 
       # ========== from env
       if only_envs = options[:only]
         dependencies.reject! { |d| !only_envs.any? {|env| d.in?(env) } }
       end
-
-      options[:no_bundle] = dependencies.map do |dep|
-        dep.source == SystemGemSource.instance && dep.name
-      end.compact
       # ==========
 
       # TODO: clean this up
@@ -49,7 +44,7 @@ module Bundler
 
       # Check the remote sources if the existing cache does not meet the requirements
       # or the user passed --update
-      if update || !valid
+      if options[:update] || !valid
         Bundler.logger.info "Calculating dependencies..."
         bundle = Resolver.resolve(dependencies, [@cache] + sources)
         download(bundle, options)
@@ -145,14 +140,14 @@ module Bundler
 
     def download(bundle, options)
       bundle.sort_by {|s| s.full_name.downcase }.each do |spec|
-        next if options[:no_bundle].include?(spec.name)
+        next if spec.no_bundle?
         spec.source.download(spec)
       end
     end
 
     def do_install(bundle, options)
       bundle.each do |spec|
-        next if options[:no_bundle].include?(spec.name)
+        next if spec.no_bundle?
         spec.loaded_from = @path.join("specifications", "#{spec.full_name}.gemspec")
         # Do nothing if the gem is already expanded
         next if @path.join("gems", spec.full_name).directory?
@@ -168,7 +163,7 @@ module Bundler
 
     def generate_bins(bundle, options)
       bundle.each do |spec|
-        next if options[:no_bundle].include?(spec.name)
+        next if spec.no_bundle?
         # HAX -- Generate the bin
         bin_dir = @bindir
         path    = @path
