@@ -3,7 +3,7 @@ module Bundler
  file = File.expand_path(__FILE__)
  dir = File.dirname(file)
 
-<% unless options[:system_gems] -%>
+<% unless system_gems? -%>
   ENV["GEM_HOME"] = dir
   ENV["GEM_PATH"] = dir
 <% end -%>

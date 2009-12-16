@@ -33,7 +33,6 @@ module Bundler
       update = options[:update]
       cached = options[:cached]
 
-      options[:system_gems] = @environment.system_gems
       options[:manifest]    = @environment.filename
       options[:no_bundle]   = no_bundle
       # ==========

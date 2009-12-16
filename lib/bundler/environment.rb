@@ -67,6 +67,7 @@ module Bundler
     end
 
     alias rubygems? rubygems
+    alias system_gems? system_gems
 
   private
 
