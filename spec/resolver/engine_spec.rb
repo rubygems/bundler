@@ -16,6 +16,20 @@ describe "Resolving specs" do
     )
   end
 
+  it "prefers JRuby gems" do
+    index = build_index do
+      add_spec "bar", "2.0.0", [nil, "jruby", nil]
+      add_spec "bar", "2.0.0", [nil, "ruby", nil]
+    end
+
+    deps = [
+      build_dep("bar", ">= 1.2.3"),
+    ]
+
+    solution = Bundler::Resolver.resolve(deps, [index])
+    solution.first.platform.should == Gem::Platform.new([nil, "jruby", nil])
+  end
+
   it "supports a crazy case" do
     index = build_index do
       add_spec "activemerchant", "1.4.1" do

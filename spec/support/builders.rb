@@ -115,10 +115,11 @@ module Spec
       index
     end
 
-    def build_spec(name, version, &block)
+    def build_spec(name, version, platform = nil, &block)
       spec = Gem::Specification.new
       spec.instance_variable_set(:@name, name)
       spec.instance_variable_set(:@version, Gem::Version.new(version))
+      spec.platform = Gem::Platform.new(platform) if platform
       DepBuilder.run(spec, &block) if block_given?
       spec
     end
