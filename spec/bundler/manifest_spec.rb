@@ -115,16 +115,18 @@ describe "Bundler::Environment" do
     end
 
     it "it does not work with system gems if system gems have been disabled" do
-      m = build_manifest <<-Gemfile
-        clear_sources
-        source "file://#{gem_repo1}"
-        gem "rack"
-        disable_system_gems
-      Gemfile
+      system_gems 'rspec-1.2.7' do
+        m = build_manifest <<-Gemfile
+          clear_sources
+          source "file://#{gem_repo1}"
+          gem "rack"
+          disable_system_gems
+        Gemfile
 
-      m.install
-      out = run_in_context "begin ; require 'spec' ; rescue LoadError ; puts('WIN') ; end"
-      out.should == "WIN"
+        m.install
+        out = run_in_context "begin ; require 'spec' ; rescue LoadError ; puts('WIN') ; end"
+        out.should == "WIN"
+      end
     end
 
     ["Running with system gems", "Running without system gems"].each_with_index do |desc, i|

@@ -6,6 +6,15 @@ module Bundler
 <% unless options[:system_gems] -%>
   ENV["GEM_HOME"] = dir
   ENV["GEM_PATH"] = dir
+
+  # handle 1.9 where system gems are always on the load path
+  if defined?(::Gem)
+    $LOAD_PATH.reject! do |p|
+      p != File.dirname(__FILE__) &&
+        Gem.path.any? { |gp| p.include?(gp) }
+    end
+  end
+
 <% end -%>
   ENV["PATH"]     = "#{dir}/<%= bindir %><%= File::PATH_SEPARATOR %>#{ENV["PATH"]}"
   ENV["RUBYOPT"]  = "-r#{file} #{ENV["RUBYOPT"]}"

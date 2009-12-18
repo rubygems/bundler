@@ -77,7 +77,8 @@ module Bundler
       sources.each do |source|
         source.gems.each do |name, specs|
           # Hack to work with a regular Gem::SourceIndex
-          [specs].flatten.compact.each do |spec|
+          specs = [specs] unless specs.is_a?(Array)
+          specs.compact.each do |spec|
             next if @specs[spec.name].any? { |s| s.version == spec.version && s.platform == spec.platform }
             @specs[spec.name] << spec
           end

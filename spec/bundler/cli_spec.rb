@@ -34,7 +34,7 @@ describe "Bundler::CLI" do
       @output.should_not =~ /Failed to build gem native extension/
 
       out = run_in_context <<-RUBY
-        require 'very_simple_binary'
+        require 'very_simple_binary_c'
         puts VerySimpleBinaryInC
       RUBY
 
@@ -48,7 +48,7 @@ describe "Bundler::CLI" do
       gem_command :bundle, "--build-options=build.yml 2>&1"
 
       out = run_in_context <<-RUBY
-        require "very_simple_binary"
+        require "very_simple_binary_c"
         puts VerySimpleBinaryInC
       RUBY
       out.should == "VerySimpleBinaryInC"
@@ -373,7 +373,7 @@ describe "Bundler::CLI" do
         clear_sources
         source "file://#{gem_repo1}"
         gem "activesupport"
-        gem "rake", :only => :server
+        gem "very-simple", :only => :server
         gem "rack", :only => :test
       Gemfile
     end
@@ -386,7 +386,7 @@ describe "Bundler::CLI" do
           out.should == "2.3.2"
 
           out = run_in_context <<-RUBY
-            begin ;require 'rake'
+            begin ;require 'very-simple'
             rescue LoadError ; puts 'awesome' ; end
           RUBY
           out.should == 'awesome'

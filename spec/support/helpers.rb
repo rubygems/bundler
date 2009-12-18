@@ -8,6 +8,7 @@ module Spec
     def ruby(opts, ruby = nil)
       ruby, opts = opts, nil unless ruby
       ruby.gsub!(/(?=")/, "\\")
+      ruby.gsub!('$', '\\$')
       lib = File.join(File.dirname(__FILE__), '..', '..', 'lib')
       %x{#{Gem.ruby} -I#{lib} #{opts} -e "#{ruby}"}.strip
     end
