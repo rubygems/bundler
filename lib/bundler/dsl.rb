@@ -107,7 +107,7 @@ module Bundler
       options = args.last.is_a?(Hash) ? args.pop : {}
       version = args.last
 
-      keys = %w(vendored_at path only except git path bundle require_as tag branch ref).map(&:to_sym)
+      keys = :vendored_at, :path, :only, :except, :git, :path, :bundle, :require_as, :tag, :branch, :ref
       unless (invalid = options.keys - keys).empty?
         raise InvalidKey, "Only #{keys.join(", ")} are valid options to #gem. You used #{invalid.join(", ")}"
       end
