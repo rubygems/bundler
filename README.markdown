@@ -66,6 +66,15 @@ information, please refer to Bundler::ManifestBuilder.
     # the gemspec is found in.
     gem "rspec", "1.1.6", :vendored_at => "vendor/rspec"
 
+    # You can also control what will happen when you run Bundler.require_env
+    # by using the :require_as option, as per the next two examples.
+
+    # Don't auto-require this gem.
+    gem "rspec-rails", "1.2.9", :require_as => nil
+
+    # Require something other than the default.
+    gem "yajl-ruby", "0.6.7", :require_as => "yajl/json_gem"
+
     # Works exactly like :vendored_at, but first downloads the repo from
     # git and handles stashing the files for you. As with :vendored_at,
     # Bundler will automatically use *.gemspec files in the root or anywhere
