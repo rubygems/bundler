@@ -171,7 +171,7 @@ module Bundler
 
     def _handle_git_option(name, version, options)
       git    = options[:git].to_s
-      ref    = options[:commit] || options[:tag]
+      ref    = options[:ref] || options[:tag]
       branch = options[:branch]
 
       if source = @git || @git_sources[git]
