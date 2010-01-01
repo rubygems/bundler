@@ -91,16 +91,6 @@ describe "Bundler::CLI" do
       @manifest.gem_path.join('../../environment.rb').file?.should == true
     end
 
-    it "adds existing bin directories to the load path" do
-      load_paths = run_in_context("require 'rake'; puts $:").split("\n")
-      load_paths.should include(@manifest.gem_path.join('gems/rake-0.8.7/bin').to_s)
-    end
-
-    it "doesn't add non-existant bin directories to the load path'" do
-      load_paths = run_in_context("require 'activesupport'; puts $:").split("\n")
-      load_paths.should_not include(@manifest.gem_path.join('gems/activesupport-2.3.2/bin').to_s)
-    end
-
     it "creates valid executables in ./bin" do
       app_root do
         `bin/rake`.should == "0.8.7\n"
