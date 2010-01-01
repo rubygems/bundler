@@ -57,7 +57,7 @@ describe "Bundler::CLI" do
 
   describe "it working" do
     before :each do
-      build_manifest <<-Gemfile
+      @manifest = build_manifest <<-Gemfile
         clear_sources
         source "file://#{gem_repo1}"
         gem "rake"
@@ -72,8 +72,8 @@ describe "Bundler::CLI" do
 
     it "caches and installs rake" do
       gems = %w(rake-0.8.7 activesupport-2.3.2 rack-1.0.0)
-      bundled_app("vendor", "gems").should have_cached_gems(*gems)
-      bundled_app("vendor", "gems").should have_installed_gems(*gems)
+      @manifest.gem_path.should have_cached_gems(*gems)
+      @manifest.gem_path.should have_installed_gems(*gems)
     end
 
     it "creates a default environment file with the appropriate load paths" do
@@ -85,6 +85,10 @@ describe "Bundler::CLI" do
       RUBY
 
       out.should == "0.8.7 - 2.3.2 - 1.0.0"
+    end
+
+    it "creates a platform-independent environment picker" do
+      @manifest.gem_path.join('../../environment.rb').file?.should == true
     end
 
     it "creates valid executables in ./bin" do
@@ -231,7 +235,7 @@ describe "Bundler::CLI" do
 
   describe "it working without rubygems" do
     before(:each) do
-      build_manifest <<-Gemfile
+      @manifest = build_manifest <<-Gemfile
         clear_sources
         source "file://#{gem_repo1}"
         gem "rake"
@@ -267,17 +271,17 @@ describe "Bundler::CLI" do
 
     it "stubs out Gem.dir" do
       out = run_in_context "puts Gem.dir"
-      out.should == "#{bundled_app}/vendor/gems"
+      out.should == @manifest.gem_path.to_s
     end
 
     it "stubs out Gem.default_dir" do
       out = run_in_context "puts Gem.default_dir"
-      out.should == "#{bundled_app}/vendor/gems"
+      out.should == @manifest.gem_path.to_s
     end
 
     it "stubs out Gem.path" do
       out = run_in_context "puts Gem.path"
-      out.should == "#{bundled_app}/vendor/gems"
+      out.should == @manifest.gem_path.to_s
     end
   end
 
@@ -308,7 +312,7 @@ describe "Bundler::CLI" do
       Gemfile
       m.install
 
-      build_manifest <<-Gemfile
+      m = build_manifest <<-Gemfile
         clear_sources
         source "file://#{gem_repo1}"
         gem "rack"
@@ -317,8 +321,8 @@ describe "Bundler::CLI" do
       Dir.chdir(bundled_app) do
         gem_command :bundle, "--update"
       end
-      bundled_app("vendor", "gems").should include_cached_gems("rack-1.0.0")
-      bundled_app("vendor", "gems").should have_installed_gems("rack-1.0.0")
+      m.gem_path.should include_cached_gems("rack-1.0.0")
+      m.gem_path.should have_installed_gems("rack-1.0.0")
     end
   end
 
@@ -418,7 +422,7 @@ describe "Bundler::CLI" do
     end
 
     it "adds a gem directory to the cache" do
-      build_manifest <<-Gemfile
+      m = build_manifest <<-Gemfile
         clear_sources
         gem "rack"
         gem "activesupport"
@@ -431,8 +435,8 @@ describe "Bundler::CLI" do
         %w(actionmailer-2.3.2 activerecord-2.3.2 rake-0.8.7 rack-0.9.1 rack-1.0.0).each do |gemfile|
           out.should include("Caching: #{gemfile}.gem")
         end
-        tmp_gem_path.should include_cached_gems("rack-1.0.0", "activesupport-2.3.2")
-        tmp_gem_path.should have_installed_gems("rack-1.0.0", "activesupport-2.3.2")
+        m.gem_path.should include_cached_gems("rack-1.0.0", "activesupport-2.3.2")
+        m.gem_path.should have_installed_gems("rack-1.0.0", "activesupport-2.3.2")
       end
     end
 

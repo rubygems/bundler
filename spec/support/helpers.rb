@@ -1,7 +1,8 @@
 module Spec
   module Helpers
     def run_in_context(cmd)
-      env = bundled_app("vendor", "gems", "environment")
+      env = bundled_path.join('environment.rb')
+      raise "Missing environment.rb" unless env.file?
       ruby "-r #{env}", cmd
     end
 

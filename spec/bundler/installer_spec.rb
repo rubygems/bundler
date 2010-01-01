@@ -24,26 +24,27 @@ describe "Installing gems" do
     it "creates the bundle directory if it does not exist" do
       setup
       @manifest.install
-      bundled_app("vendor", "gems").should have_cached_gems(*@gems)
+      @manifest.gem_path.should have_cached_gems(*@gems)
     end
 
     it "uses the bundle directory if it is empty" do
-      bundled_app("vendor", "gems").mkdir_p
+      bundled_path.mkdir_p
       setup
       @manifest.install
-      bundled_app("vendor", "gems").should have_cached_gems(*@gems)
+      @manifest.gem_path.should have_cached_gems(*@gems)
     end
 
     it "uses the bundle directory if it is a valid gem repo" do
-      %w(cache doc gems specifications).each { |dir| bundled_app("vendor", "gems", dir).mkdir_p }
-      bundled_app("vendor", "gems", "environment.rb").touch
+      %w(cache doc specifications).each { |dir| bundled_path.join(dir).mkdir_p }
+      bundled_path.join('gems').mkdir_p
+      bundled_path.join('environment.rb').touch
       setup
       @manifest.install
-      bundled_app("vendor", "gems").should have_cached_gems(*@gems)
+      @manifest.gem_path.should have_cached_gems(*@gems)
     end
 
     it "does not use the bundle directory if it is not a valid gem repo" do
-      bundled_app("vendor", "gems", "fail").touch_p
+      bundled_path.join('fail').touch_p
       lambda {
         setup
         @manifest.install
@@ -71,14 +72,16 @@ describe "Installing gems" do
     end
 
     it "does not modify any .gemspec files that are to be installed if a directory of the same name exists" do
-      dir  = bundled_app("gems", "rails-2.3.2")
-      spec = bundled_app("specifications", "rails-2.3.2.gemspec")
+      dir  = bundled_path.join("gems", "rails-2.3.2")
+      spec = bundled_path.join("specifications", "rails-2.3.2.gemspec")
+      bin  = dir.join("bin", "rails")
 
       dir.mkdir_p
       spec.touch_p
+      bin.touch_p
 
       setup
-      lambda { @manifest.install }.should_not change { [dir.mtime, spec.mtime] }
+      lambda { @manifest.install }.should_not change { [dir.mtime, spec.mtime, bin.mtime] }
     end
 
     it "keeps bin files for already installed gems" do
@@ -111,7 +114,7 @@ describe "Installing gems" do
       setup
       @manifest.install
       @gems.each do |name|
-          bundled_app("vendor", "gems", "gems", name).should be_directory
+        @manifest.gem_path.join('gems', name).should be_directory
       end
     end
 
@@ -119,7 +122,7 @@ describe "Installing gems" do
       setup
       @manifest.install
       @gems.each do |name|
-        bundled_app("vendor", "gems", "specifications", "#{name}.gemspec").should be_file
+        @manifest.gem_path.join("specifications/#{name}.gemspec").should be_file
       end
     end
 
@@ -130,8 +133,8 @@ describe "Installing gems" do
         gem "very-simple-prerelease", "1.0.pre"
       Gemfile
       m.install
-      bundled_app("vendor", "gems").should have_cached_gem("very-simple-prerelease-1.0.pre")
-      bundled_app("vendor", "gems").should have_installed_gem("very-simple-prerelease-1.0.pre")
+      m.gem_path.should have_cached_gem("very-simple-prerelease-1.0.pre")
+      m.gem_path.should have_installed_gem("very-simple-prerelease-1.0.pre")
     end
 
     it "outputs a logger message for each gem that is installed" do

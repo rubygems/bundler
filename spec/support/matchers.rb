@@ -73,8 +73,9 @@ module Spec
         matcher.negative_failure_message = "Gems #{gems.join(", ")} were all installed"
         missing = []
         gems.each do |name|
-          missing << name unless given.join("specifications", "#{name}.gemspec").file? &&
-            given.join("gems", name).directory?
+          unless given.join("specifications", "#{name}.gemspec").file? && given.join("gems", name).directory?
+            missing << name
+          end
         end
         matcher.failure_message = "Gems #{missing.join(', ')} were not installed"
         missing.empty?

@@ -9,6 +9,10 @@ module Bundler
     attr_accessor :rubygems, :system_gems
     attr_writer :gem_path, :bindir
 
+    def self.default_gem_path(root)
+      Pathname.new("#{root}/vendor/gems/#{Gem.ruby_engine}/#{Gem::ConfigMap[:ruby_version]}")
+    end
+
     def initialize(filename)
       @filename         = filename
       @default_sources  = default_sources
@@ -114,7 +118,7 @@ module Bundler
     end
 
     def gem_path
-      @gem_path ||= root.join("vendor", "gems")
+      @gem_path ||= self.class.default_gem_path(root)
     end
 
     def bindir

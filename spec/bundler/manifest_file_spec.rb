@@ -3,11 +3,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe "Bundler::Environment" do
 
   before :each do
-    simple_manifest
+    @manifest = simple_manifest
   end
 
   def simple_manifest(extra = nil)
-    build_manifest_file <<-Gemfile
+    build_manifest <<-Gemfile
       clear_sources
       source "file://#{gem_repo1}"
       gem "rack"
@@ -41,10 +41,10 @@ describe "Bundler::Environment" do
   end
 
   it "sets the default bundle path to vendor/gems" do
-    bundled_app("vendor/gems").should_not exist
+    @manifest.gem_path.should_not exist
     goto :app
     bundle
-    bundled_app("vendor/gems").should exist
+    @manifest.gem_path.should exist
   end
 
   it "allows setting the bundle path in the manifest file" do
