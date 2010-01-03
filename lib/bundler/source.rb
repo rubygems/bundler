@@ -92,6 +92,7 @@ module Bundler
       Marshal.load(Gem::RemoteFetcher.fetcher.fetch_path("#{uri}/prerelease_specs.4.8.gz"))
     rescue Gem::RemoteFetcher::FetchError
       Bundler.logger.warn "Source '#{uri}' does not support prerelease gems"
+      []
     end
   end
 
