@@ -104,14 +104,16 @@ describe "Bundler::Environment" do
   describe "runtime" do
 
     it "is able to work system gems" do
-      install_manifest <<-Gemfile
-        clear_sources
-        source "file://#{gem_repo1}"
-        gem "rack"
-      Gemfile
+      system_gems "rake-0.8.7" do
+        install_manifest <<-Gemfile
+          clear_sources
+          source "file://#{gem_repo1}"
+          gem "rack"
+        Gemfile
 
-      out = run_in_context "require 'rake' ; puts Rake"
-      out.should == "Rake"
+        out = run_in_context "require 'rake' ; puts RAKE"
+        out.should == "0.8.7"
+      end
     end
 
     it "it does not work with system gems if system gems have been disabled" do

@@ -29,30 +29,12 @@ module Bundler
       if only_envs = options[:only]
         dependencies.reject! { |d| !only_envs.any? {|env| d.in?(env) } }
       end
-
-      no_bundle = dependencies.map do |dep|
-        dep.source == SystemGemSource.instance && dep.name
-      end.compact
-
-      update = options[:update]
-      cached = options[:cached]
-
-      options[:rubygems]    = @environment.rubygems
-      options[:system_gems] = @environment.system_gems
-      options[:manifest]    = @environment.filename
-      options[:no_bundle]   = no_bundle
       # ==========
 
       # TODO: clean this up
       sources.each do |s|
         s.repository = self
         s.local = options[:cached]
-      end
-
-      source_requirements = {}
-      dependencies = dependencies.map do |dep|
-        source_requirements[dep.name] = dep.source if dep.source
-        dep.to_gem_dependency
       end
 
       # Check to see whether the existing cache meets all the requirements
@@ -68,7 +50,7 @@ module Bundler
       # or the user passed --update
       if options[:update] || !valid
         Bundler.logger.info "Calculating dependencies..."
-        bundle = Resolver.resolve(dependencies, [@cache] + sources, source_requirements)
+        bundle = Resolver.resolve(dependencies, [@cache] + sources)
         download(bundle, options)
         do_install(bundle, options)
         valid = bundle
@@ -167,14 +149,14 @@ module Bundler
 
     def download(bundle, options)
       bundle.sort_by {|s| s.full_name.downcase }.each do |spec|
-        next if options[:no_bundle].include?(spec.name)
+        next if spec.no_bundle?
         spec.source.download(spec)
       end
     end
 
     def do_install(bundle, options)
       bundle.each do |spec|
-        next if options[:no_bundle].include?(spec.name)
+        next if spec.no_bundle?
         spec.loaded_from = @specs_path.join("#{spec.full_name}.gemspec")
         # Do nothing if the gem is already expanded
         next if @gems_path.join(spec.full_name).directory?
@@ -190,7 +172,7 @@ module Bundler
 
     def generate_bins(bundle, options)
       bundle.each do |spec|
-        next if options[:no_bundle].include?(spec.name)
+        next if spec.no_bundle?
         # HAX -- Generate the bin
         bin_dir = @bindir
         path    = @path

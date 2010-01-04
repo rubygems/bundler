@@ -41,10 +41,10 @@ describe "Bundler::Environment" do
   end
 
   it "sets the default bundle path to vendor/gems" do
-    @manifest.gem_path.should_not exist
+    @manifest.gem_path.join('environment.rb').should_not exist
     goto :app
     bundle
-    @manifest.gem_path.should exist
+    @manifest.gem_path.join('environment.rb').should exist
   end
 
   it "allows setting the bundle path in the manifest file" do

@@ -70,6 +70,9 @@ module Bundler
       @gem_dependencies ||= dependencies.map { |d| d.to_gem_dependency }
     end
 
+    alias rubygems? rubygems
+    alias system_gems? system_gems
+
   private
 
     def default_sources
@@ -83,9 +86,9 @@ module Bundler
     def load_paths_for_specs(specs, options)
       load_paths = []
       specs.each do |spec|
-        next if options[:no_bundle].include?(spec.name)
+        next if spec.no_bundle?
         full_gem_path = Pathname.new(spec.full_gem_path)
-        
+
         load_paths << load_path_for(full_gem_path, spec.bindir) if spec.bindir
         spec.require_paths.each do |path|
           load_paths << load_path_for(full_gem_path, path)
