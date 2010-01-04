@@ -1,7 +1,7 @@
 module Spec
   module PathUtils
     def root
-      Pathname.new(__FILE__).dirname.join('..', '..').expand_path
+      @root ||= Pathname.new(__FILE__).dirname.join('..', '..').expand_path
     end
 
     def tmp_path(*path)
@@ -14,8 +14,12 @@ module Spec
       tmp_path.join("bundled_app").join(*path)
     end
 
+    def bundled_path
+      @bundled_path ||= Bundler::Environment.default_gem_path(tmp_path.join('bundled_app'))
+    end
+
     def tmp_gem_path(*path)
-      bundled_app("vendor", "gems").join(*path)
+      bundled_path.join(*path)
     end
 
     def tmp_bindir(*path)

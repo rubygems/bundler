@@ -69,14 +69,14 @@ module Spec
 
             exit 1 unless with_config("simple")
 
-            extension_name = "very_simple_binary"
+            extension_name = "very_simple_binary_c"
             dir_config extension_name
             create_makefile extension_name
           RUBY
           s.write "ext/very_simple_binary.c", <<-C
             #include "ruby.h"
 
-            void Init_very_simple_binary() {
+            void Init_very_simple_binary_c() {
               rb_define_module("VerySimpleBinaryInC");
             }
           C
@@ -115,10 +115,11 @@ module Spec
       index
     end
 
-    def build_spec(name, version, &block)
+    def build_spec(name, version, platform = nil, &block)
       spec = Gem::Specification.new
       spec.instance_variable_set(:@name, name)
       spec.instance_variable_set(:@version, Gem::Version.new(version))
+      spec.platform = Gem::Platform.new(platform) if platform
       DepBuilder.run(spec, &block) if block_given?
       spec
     end

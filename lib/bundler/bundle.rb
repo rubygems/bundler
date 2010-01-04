@@ -14,7 +14,11 @@ module Bundler
       @path   = Pathname.new(path)
       @bindir = Pathname.new(bindir)
 
-      @cache = GemDirectorySource.new(:location => @path.join("cache"))
+      @cache_path = @path.join('cache')
+      @cache = GemDirectorySource.new(:location => @cache_path)
+
+      @specs_path = @path.join('specifications')
+      @gems_path = @path.join('gems')
     end
 
     def install(options = {})
@@ -78,10 +82,10 @@ module Bundler
     end
 
     def cache(*gemfiles)
-      FileUtils.mkdir_p(@path.join("cache"))
+      FileUtils.mkdir_p(@cache_path)
       gemfiles.each do |gemfile|
         Bundler.logger.info "Caching: #{File.basename(gemfile)}"
-        FileUtils.cp(gemfile, @path.join("cache"))
+        FileUtils.cp(gemfile, @cache_path)
       end
     end
 
@@ -112,7 +116,7 @@ module Bundler
         specs.each do |spec|
           unless bundle.any? { |s| s.name == spec.name && s.version == spec.version }
             Bundler.logger.info "Pruning #{spec.name} (#{spec.version}) from the cache"
-            FileUtils.rm @path.join("cache", "#{spec.full_name}.gem")
+            FileUtils.rm @cache_path.join("#{spec.full_name}.gem")
           end
         end
       end
@@ -129,9 +133,14 @@ module Bundler
       source_index.gems.values
     end
 
+    # TODO: Refactor this
+    def gem_path
+      @environment.gem_path
+    end
+
     def source_index
-      index = Gem::SourceIndex.from_gems_in(@path.join("specifications"))
-      index.each { |n, spec| spec.loaded_from = @path.join("specifications", "#{spec.full_name}.gemspec") }
+      index = Gem::SourceIndex.from_gems_in(@specs_path)
+      index.each { |n, spec| spec.loaded_from = @specs_path.join("#{spec.full_name}.gemspec") }
       index
     end
 
@@ -166,9 +175,9 @@ module Bundler
     def do_install(bundle, options)
       bundle.each do |spec|
         next if options[:no_bundle].include?(spec.name)
-        spec.loaded_from = @path.join("specifications", "#{spec.full_name}.gemspec")
+        spec.loaded_from = @specs_path.join("#{spec.full_name}.gemspec")
         # Do nothing if the gem is already expanded
-        next if @path.join("gems", spec.full_name).directory?
+        next if @gems_path.join(spec.full_name).directory?
 
         case spec.source
         when GemSource, GemDirectorySource, SystemGemSource
@@ -185,11 +194,12 @@ module Bundler
         # HAX -- Generate the bin
         bin_dir = @bindir
         path    = @path
+        gems_path = @gems_path
         installer = Gem::Installer.allocate
         installer.instance_eval do
           @spec     = spec
           @bin_dir  = bin_dir
-          @gem_dir  = path.join("gems", "#{spec.full_name}")
+          @gem_dir  = gems_path.join(spec.full_name)
           @gem_home = path
           @wrappers = true
           @format_executable = false
@@ -202,7 +212,7 @@ module Bundler
     def expand_gemfile(spec, options)
       Bundler.logger.info "Installing #{spec.name} (#{spec.version})"
 
-      gemfile = @path.join("cache", "#{spec.full_name}.gem").to_s
+      gemfile = @cache_path.join("#{spec.full_name}.gem").to_s
 
       if build_args = options[:build_options] && options[:build_options][spec.name]
         Gem::Command.build_args = build_args.map {|k,v| "--with-#{k}=#{v}"}
@@ -225,12 +235,12 @@ module Bundler
 
     def expand_vendored_gem(spec, options)
       add_spec(spec)
-      FileUtils.mkdir_p(@path.join("gems"))
-      File.symlink(spec.location, @path.join("gems", spec.full_name))
+      FileUtils.mkdir_p(@gems_path)
+      File.symlink(spec.location, @gems_path.join(spec.full_name))
     end
 
     def add_spec(spec)
-      destination = path.join('specifications')
+      destination = @specs_path
       destination.mkdir unless destination.exist?
 
       File.open(destination.join("#{spec.full_name}.gemspec"), 'w') do |f|
@@ -259,8 +269,8 @@ module Bundler
     end
 
     def cleanup_spec(spec)
-      FileUtils.rm_rf(@path.join("specifications", "#{spec.full_name}.gemspec"))
-      FileUtils.rm_rf(@path.join("gems", spec.full_name))
+      FileUtils.rm_rf(@specs_path.join("#{spec.full_name}.gemspec"))
+      FileUtils.rm_rf(@gems_path.join(spec.full_name))
     end
 
     def expand(options)
@@ -271,9 +281,16 @@ module Bundler
 
     def configure(specs, options)
       FileUtils.mkdir_p(path)
+
       File.open(path.join("environment.rb"), "w") do |file|
         file.puts @environment.environment_rb(specs, options)
       end
+
+      generate_environment_picker
+    end
+
+    def generate_environment_picker
+      FileUtils.cp("#{File.dirname(__FILE__)}/templates/environment_picker.erb", path.join("../../environment.rb"))
     end
 
     def require_code(file, dep)
