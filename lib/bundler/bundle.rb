@@ -33,7 +33,7 @@ module Bundler
 
       # TODO: clean this up
       sources.each do |s|
-        s.repository = self
+        s.bundle = self
         s.local = options[:cached]
       end
 
@@ -88,7 +88,7 @@ module Bundler
       dependencies, sources = @environment.gem_dependencies, @environment.sources
 
       sources.each do |s|
-        s.repository = self
+        s.bundle = self
         s.local = true
       end
 

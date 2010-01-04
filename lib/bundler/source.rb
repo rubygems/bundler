@@ -4,7 +4,7 @@ module Bundler
   # Represents a source of rubygems. Initially, this is only gem repositories, but
   # eventually, this will be git, svn, HTTP
   class Source
-    attr_accessor :repository, :local
+    attr_accessor :bundle, :local
 
     def initialize(options) ; end
 
@@ -50,7 +50,7 @@ module Bundler
     def download(spec)
       Bundler.logger.info "Downloading #{spec.full_name}.gem"
 
-      destination = repository.path
+      destination = bundle.path
 
       unless destination.writable?
         raise RubygemsRetardation, "destination: #{destination} is not writable"
@@ -125,7 +125,7 @@ module Bundler
     def download(spec)
       gemfile = Pathname.new(spec.loaded_from)
       gemfile = gemfile.dirname.join('..', 'cache', "#{spec.full_name}.gem")
-      repository.cache(gemfile)
+      bundle.cache(gemfile)
     end
 
   private
@@ -298,7 +298,7 @@ module Bundler
 
     def location
       # TMP HAX to get the *.gemspec reading to work
-      repository.path.join('dirs', File.basename(@uri, '.git'))
+      bundle.path.join('dirs', File.basename(@uri, '.git'))
     end
 
     def gems
