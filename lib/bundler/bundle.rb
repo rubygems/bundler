@@ -2,23 +2,69 @@ module Bundler
   class InvalidRepository < StandardError ; end
 
   class Bundle
-    attr_reader :path, :environment
+    attr_reader :gemfile, :environment
 
-    def initialize(env)
-      path   = env.gem_path
-      bindir = env.bindir
+    def self.load(gemfile = nil)
+      gemfile = Pathname.new(gemfile || default_gemfile).expand_path
 
-      FileUtils.mkdir_p(path)
+      unless gemfile.file?
+        raise ManifestFileNotFound, "Manifest file not found: #{gemfile.to_s.inspect}"
+      end
 
-      @environment = env
-      @path   = Pathname.new(path)
-      @bindir = Pathname.new(bindir)
+      new(gemfile)
+    end
 
-      @cache_path = @path.join('cache')
-      @cache = GemDirectorySource.new(:location => @cache_path)
+    def self.default_gemfile
+      current = Pathname.new(Dir.pwd)
 
-      @specs_path = @path.join('specifications')
-      @gems_path = @path.join('gems')
+      until current.root?
+        filename = current.join("Gemfile")
+        return filename if filename.exist?
+        current = current.parent
+      end
+
+      raise DefaultManifestNotFound
+    end
+
+    def self.default_gem_path(root)
+      root.join("vendor/gems/#{Gem.ruby_engine}/#{Gem::ConfigMap[:ruby_version]}")
+    end
+
+    # TODO: passing in the filename is not good
+    def initialize(gemfile)
+      @gemfile = gemfile
+      @environment = Environment.new(self)
+      Dsl.evaluate(gemfile, self, @environment)
+
+      # path   = env.gem_path
+
+      FileUtils.mkdir_p(gem_path)
+
+      @cache_path = gem_path.join('cache')
+      @cache = GemDirectorySource.new(self, :location => @cache_path)
+
+      @specs_path = gem_path.join('specifications')
+      @gems_path  = gem_path.join('gems')
+    end
+
+    def root
+      gemfile.parent
+    end
+
+    def gem_path
+      @gem_path ||= self.class.default_gem_path(root)
+    end
+
+    def gem_path=(path)
+      @gem_path = (path.relative? ? root.join(path) : path).expand_path
+    end
+
+    def bindir
+      @bindir ||= root.join("bin")
+    end
+
+    def bindir=(path)
+      @bindir = (path.relative? ? root.join(path) : path).expand_path
     end
 
     def install(options = {})
@@ -33,7 +79,6 @@ module Bundler
 
       # TODO: clean this up
       sources.each do |s|
-        s.bundle = self
         s.local = options[:cached]
       end
 
@@ -88,7 +133,6 @@ module Bundler
       dependencies, sources = @environment.gem_dependencies, @environment.sources
 
       sources.each do |s|
-        s.bundle = self
         s.local = true
       end
 
@@ -115,11 +159,6 @@ module Bundler
       source_index.gems.values
     end
 
-    # TODO: Refactor this
-    def gem_path
-      @environment.gem_path
-    end
-
     def source_index
       index = Gem::SourceIndex.from_gems_in(@specs_path)
       index.each { |n, spec| spec.loaded_from = @specs_path.join("#{spec.full_name}.gemspec") }
@@ -131,13 +170,11 @@ module Bundler
     end
 
     def setup_environment
-      gem_path = @environment.gem_path
-
       unless @environment.system_gems
         ENV["GEM_HOME"] = gem_path
         ENV["GEM_PATH"] = gem_path
       end
-      ENV["PATH"]     = "#{@environment.bindir}:#{ENV["PATH"]}"
+      ENV["PATH"]     = "#{bindir}:#{ENV["PATH"]}"
       ENV["RUBYOPT"]  = "-r#{gem_path}/environment #{ENV["RUBYOPT"]}"
     end
 
@@ -174,8 +211,8 @@ module Bundler
       bundle.each do |spec|
         next if spec.no_bundle?
         # HAX -- Generate the bin
-        bin_dir = @bindir
-        path    = @path
+        bin_dir = bindir
+        path    = gem_path
         gems_path = @gems_path
         installer = Gem::Installer.allocate
         installer.instance_eval do
@@ -201,11 +238,11 @@ module Bundler
       end
 
       installer = Gem::Installer.new(gemfile, options.merge(
-        :install_dir         => @path,
+        :install_dir         => gem_path,
         :ignore_dependencies => true,
         :env_shebang         => true,
         :wrappers            => true,
-        :bin_dir             => @bindir
+        :bin_dir             => bindir
       ))
       installer.install
     rescue Gem::InstallError
@@ -245,7 +282,7 @@ module Bundler
         spec.executables.each do |bin|
           next if valid_executables.include?(bin)
           Bundler.logger.info "Deleting bin file: #{bin}"
-          FileUtils.rm_rf(@bindir.join(bin))
+          FileUtils.rm_rf(bindir.join(bin))
         end
       end
     end
@@ -262,9 +299,9 @@ module Bundler
     end
 
     def configure(specs, options)
-      FileUtils.mkdir_p(path)
+      FileUtils.mkdir_p(gem_path)
 
-      File.open(path.join("environment.rb"), "w") do |file|
+      File.open(gem_path.join("environment.rb"), "w") do |file|
         file.puts @environment.environment_rb(specs, options)
       end
 
@@ -272,7 +309,7 @@ module Bundler
     end
 
     def generate_environment_picker
-      FileUtils.cp("#{File.dirname(__FILE__)}/templates/environment_picker.erb", path.join("../../environment.rb"))
+      FileUtils.cp("#{File.dirname(__FILE__)}/templates/environment_picker.erb", gem_path.join("../../environment.rb"))
     end
 
     def require_code(file, dep)

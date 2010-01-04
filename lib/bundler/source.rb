@@ -4,9 +4,12 @@ module Bundler
   # Represents a source of rubygems. Initially, this is only gem repositories, but
   # eventually, this will be git, svn, HTTP
   class Source
-    attr_accessor :bundle, :local
+    attr_accessor :local
+    attr_reader   :bundle
 
-    def initialize(options) ; end
+    def initialize(bundle, options)
+      @bundle = bundle
+    end
 
   private
 
@@ -23,7 +26,8 @@ module Bundler
   class GemSource < Source
     attr_reader :uri
 
-    def initialize(options)
+    def initialize(bundle, options)
+      super
       @uri = options[:uri]
       @uri = URI.parse(@uri) unless @uri.is_a?(URI)
       raise ArgumentError, "The source must be an absolute URI" unless @uri.absolute?
@@ -50,7 +54,7 @@ module Bundler
     def download(spec)
       Bundler.logger.info "Downloading #{spec.full_name}.gem"
 
-      destination = bundle.path
+      destination = bundle.gem_path
 
       unless destination.writable?
         raise RubygemsRetardation, "destination: #{destination} is not writable"
@@ -99,10 +103,15 @@ module Bundler
   class SystemGemSource < Source
 
     def self.instance
-      @instance ||= new({})
+      @instance
     end
 
-    def initialize(options)
+    def self.new(*args)
+      @instance ||= super
+    end
+
+    def initialize(bundle, options = {})
+      super
       @source = Gem::SourceIndex.from_installed_gems
     end
 
@@ -135,7 +144,8 @@ module Bundler
   class GemDirectorySource < Source
     attr_reader :location
 
-    def initialize(options)
+    def initialize(bundle, options)
+      super
       @location = options[:location]
     end
 
@@ -177,7 +187,8 @@ module Bundler
   class DirectorySource < Source
     attr_reader :location, :specs, :required_specs
 
-    def initialize(options)
+    def initialize(bundle, options)
+      super
       if options[:location]
         @location = Pathname.new(options[:location]).expand_path
       end
@@ -289,7 +300,7 @@ module Bundler
   class GitSource < DirectorySource
     attr_reader :ref, :uri, :branch
 
-    def initialize(options)
+    def initialize(bundle, options)
       super
       @uri = options[:uri]
       @branch = options[:branch] || 'master'
@@ -298,7 +309,7 @@ module Bundler
 
     def location
       # TMP HAX to get the *.gemspec reading to work
-      bundle.path.join('dirs', File.basename(@uri, '.git'))
+      bundle.gem_path.join('dirs', File.basename(@uri, '.git'))
     end
 
     def gems

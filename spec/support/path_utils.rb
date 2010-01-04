@@ -15,7 +15,7 @@ module Spec
     end
 
     def bundled_path
-      @bundled_path ||= Bundler::Environment.default_gem_path(tmp_path.join('bundled_app'))
+      @bundled_path ||= Bundler::Bundle.default_gem_path(tmp_path.join('bundled_app'))
     end
 
     def tmp_gem_path(*path)

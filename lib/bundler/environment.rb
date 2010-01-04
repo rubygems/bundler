@@ -5,16 +5,11 @@ module Bundler
   class SourceNotCached < StandardError; end
 
   class Environment
-    attr_reader :filename, :dependencies
+    attr_reader   :dependencies
     attr_accessor :rubygems, :system_gems
-    attr_writer :gem_path, :bindir
 
-    def self.default_gem_path(root)
-      Pathname.new("#{root}/vendor/gems/#{Gem.ruby_engine}/#{Gem::ConfigMap[:ruby_version]}")
-    end
-
-    def initialize(filename)
-      @filename         = filename
+    def initialize(bundle)
+      @bundle = bundle # TODO: remove this
       @default_sources  = default_sources
       @sources          = []
       @priority_sources = []
@@ -23,10 +18,14 @@ module Bundler
       @system_gems      = true
     end
 
+    def filename
+      @bundle.gemfile
+    end
+
     def environment_rb(specs, options)
       load_paths = load_paths_for_specs(specs, options)
-      bindir     = @bindir.relative_path_from(gem_path).to_s
-      filename   = self.filename.relative_path_from(gem_path).to_s
+      bindir     = @bundle.bindir.relative_path_from(@bundle.gem_path).to_s
+      filename   = self.filename.relative_path_from(@bundle.gem_path).to_s
 
       template = File.read(File.join(File.dirname(__FILE__), "templates", "environment.erb"))
       erb = ERB.new(template, nil, '-')
@@ -37,20 +36,8 @@ module Bundler
       dependencies.each { |d| d.require_env(env) }
     end
 
-    def root
-      filename.parent
-    end
-
-    def gem_path
-      @gem_path ||= self.class.default_gem_path(root)
-    end
-
-    def bindir
-      @bindir ||= root.join("bin")
-    end
-
     def sources
-      @priority_sources + @sources + @default_sources + [SystemGemSource.instance]
+      @priority_sources + @sources + @default_sources + [SystemGemSource.new(@bundle)]
     end
 
     def add_source(source)
@@ -76,7 +63,7 @@ module Bundler
   private
 
     def default_sources
-      [GemSource.new(:uri => "http://gems.rubyforge.org")]
+      [GemSource.new(@bundle, :uri => "http://gems.rubyforge.org")]
     end
 
     def repository
@@ -98,11 +85,11 @@ module Bundler
     end
 
     def load_path_for(gem_path, path)
-      gem_path.join(path).relative_path_from(self.gem_path).to_s
+      gem_path.join(path).relative_path_from(@bundle.gem_path).to_s
     end
 
     def spec_file_for(spec)
-      spec.loaded_from.relative_path_from(self.gem_path).to_s
+      spec.loaded_from.relative_path_from(@bundle.gem_path).to_s
     end
   end
 end
