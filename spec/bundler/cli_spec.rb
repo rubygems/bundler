@@ -188,7 +188,7 @@ describe "Bundler::CLI" do
 
   describe "it working while specifying the manifest file name" do
     it "works when the manifest is in the root directory" do
-      build_manifest_file bundled_app('manifest.rb'), <<-Gemfile
+      manifest = build_manifest bundled_app('manifest.rb'), <<-Gemfile
         bundle_path "gems"
         clear_sources
         source "file://#{gem_repo1}"
@@ -198,13 +198,13 @@ describe "Bundler::CLI" do
       Dir.chdir(bundled_app) do
         out = gem_command :bundle, "-m #{bundled_app('manifest.rb')}"
         out.should include('Done.')
-        bundled_app("gems").should have_cached_gems("rake-0.8.7")
+        manifest.gem_path.should have_cached_gems("rake-0.8.7")
         tmp_bindir('rake').should exist
       end
     end
 
     it "works when the manifest is in a different directory" do
-      build_manifest_file bundled_app('config', 'manifest.rb'), <<-Gemfile
+      manifest = build_manifest bundled_app('config', 'manifest.rb'), <<-Gemfile
         bundle_path "../gems"
         clear_sources
         source "file://#{gem_repo1}"
@@ -214,7 +214,7 @@ describe "Bundler::CLI" do
       Dir.chdir(bundled_app)
       out = gem_command :bundle, "-m #{bundled_app('config', 'manifest.rb')}"
       out.should include('Done.')
-      bundled_app("gems").should have_cached_gems("rake-0.8.7")
+      manifest.gem_path.should have_cached_gems("rake-0.8.7")
     end
 
     it "works when using a relative path to the manifest file" do

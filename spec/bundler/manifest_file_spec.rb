@@ -54,6 +54,13 @@ describe "Bundler::Environment" do
     bundled_app('gems').should exist
   end
 
+  it "sets the ruby-specific path relative to the bundle_path" do
+    simple_manifest %[bundle_path File.join('..', 'cheezeburgerz')]
+    goto 'w0t'
+    bundle
+    tmp_path("cheezeburgerz", Gem.ruby_engine, Gem::ConfigMap[:ruby_version], "environment.rb").should exist
+  end
+
   it "assumes the bundle_path is relative to the manifest file no matter what the current working dir is" do
     simple_manifest %[bundle_path File.join('..', 'cheezeburgerz')]
     goto 'w0t'

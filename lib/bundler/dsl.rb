@@ -19,7 +19,7 @@ module Bundler
     end
 
     def bundle_path(path)
-      @bundle.gem_path = Pathname.new(path)
+      @bundle.path = Pathname.new(path)
     end
 
     def bin_path(path)

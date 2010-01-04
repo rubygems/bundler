@@ -26,10 +26,6 @@ module Bundler
       raise DefaultManifestNotFound
     end
 
-    def self.default_gem_path(root)
-      root.join("vendor/gems/#{Gem.ruby_engine}/#{Gem::ConfigMap[:ruby_version]}")
-    end
-
     # TODO: passing in the filename is not good
     def initialize(gemfile)
       @gemfile = gemfile
@@ -51,12 +47,16 @@ module Bundler
       gemfile.parent
     end
 
-    def gem_path
-      @gem_path ||= self.class.default_gem_path(root)
+    def path
+      @path ||= root.join("vendor/gems")
     end
 
-    def gem_path=(path)
-      @gem_path = (path.relative? ? root.join(path) : path).expand_path
+    def path=(path)
+      @path = (path.relative? ? root.join(path) : path).expand_path
+    end
+
+    def gem_path
+      path.join("#{Gem.ruby_engine}/#{Gem::ConfigMap[:ruby_version]}")
     end
 
     def bindir
@@ -309,7 +309,7 @@ module Bundler
     end
 
     def generate_environment_picker
-      FileUtils.cp("#{File.dirname(__FILE__)}/templates/environment_picker.erb", gem_path.join("../../environment.rb"))
+      FileUtils.cp("#{File.dirname(__FILE__)}/templates/environment_picker.erb", path.join("environment.rb"))
     end
 
     def require_code(file, dep)
