@@ -353,11 +353,11 @@ module Bundler
       def current_revision
         Dir.chdir(location) { `git rev-parse HEAD`.strip }
       end
-      
+
       def revision_for_ref
         Dir.chdir(location) { `git rev-parse #{@ref}`.strip }
       end
-      
+
       def checkout
         Dir.chdir(location) { `git checkout --quiet #{@ref}` }
       end

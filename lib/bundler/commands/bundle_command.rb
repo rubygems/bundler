@@ -3,6 +3,10 @@ class Gem::Commands::BundleCommand < Gem::Command
   def initialize
     super('bundle', 'Create a gem bundle based on your Gemfile', {:manifest => nil, :update => false})
 
+    add_option('-i', '--init',"Create a Gemfile") do
+      options[:init] = true
+    end
+
     add_option('-m', '--manifest MANIFEST', "Specify the path to the manifest file") do |manifest, options|
       options[:manifest] = manifest
     end
@@ -64,6 +68,13 @@ Bundle stuff
       Bundler::CLI.run(:list, options)
     elsif options[:list_outdated]
       Bundler::CLI.run(:list_outdated, options)
+    elsif options[:init]
+      if File.exists?("Gemfile")
+        Bundler.logger.error "The Gemfile already exists"
+      else
+        FileUtils.cp File.expand_path("../../templates/Gemfile", __FILE__), "Gemfile"
+        Bundler.logger.info "Initialized Gemfile in #{Dir.pwd}"
+      end
     else
       Bundler::CLI.run(:bundle, options)
     end

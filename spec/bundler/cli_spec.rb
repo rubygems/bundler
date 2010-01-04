@@ -2,6 +2,25 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "Bundler::CLI" do
 
+  describe "it creates a new Gemfile with gem bundle --init" do
+    it "creates a Gemfile" do
+      FileUtils.mkdir_p(bundled_app)
+      Dir.chdir(bundled_app) do
+        gem_command :bundle, "--init"
+      end
+      bundled_app.join("Gemfile").should exist
+    end
+
+    it "exits with a warning if a Gemfile already exists" do
+      FileUtils.mkdir_p(bundled_app)
+      Dir.chdir(bundled_app) do
+        FileUtils.touch("Gemfile")
+        output = gem_command :bundle, "--init 2>&1"
+        output.should =~ /already exists/
+      end
+    end
+  end
+
   describe "it compiles gems that take options" do
     before(:each) do
       build_manifest <<-Gemfile
