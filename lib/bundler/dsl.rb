@@ -132,7 +132,7 @@ module Bundler
         return @directory, Pathname.new(path || '')
       end
 
-      path = @environment.filename.dirname.join(path)
+      path = @bundle.gemfile.dirname.join(path)
 
       @directory_sources.each do |s|
         if s.location.expand_path.to_s < path.expand_path.to_s

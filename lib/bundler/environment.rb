@@ -18,14 +18,10 @@ module Bundler
       @system_gems      = true
     end
 
-    def filename
-      @bundle.gemfile
-    end
-
     def environment_rb(specs, options)
       load_paths = load_paths_for_specs(specs, options)
       bindir     = @bundle.bindir.relative_path_from(@bundle.gem_path).to_s
-      filename   = self.filename.relative_path_from(@bundle.gem_path).to_s
+      filename   = @bundle.gemfile.relative_path_from(@bundle.gem_path).to_s
 
       template = File.read(File.join(File.dirname(__FILE__), "templates", "environment.erb"))
       erb = ERB.new(template, nil, '-')
@@ -64,10 +60,6 @@ module Bundler
 
     def default_sources
       [GemSource.new(@bundle, :uri => "http://gems.rubyforge.org")]
-    end
-
-    def repository
-      @repository ||= Bundle.new(self)
     end
 
     def load_paths_for_specs(specs, options)
