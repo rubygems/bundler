@@ -33,7 +33,7 @@ module Bundler
     end
 
     def sources
-      @priority_sources + @sources + @default_sources + [SystemGemSource.new(@bundle)]
+      @priority_sources + [SystemGemSource.new(@bundle)] + @sources + @default_sources
     end
 
     def add_source(source)
