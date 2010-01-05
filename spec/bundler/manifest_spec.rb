@@ -21,8 +21,8 @@ describe "Bundler::Environment" do
         rake-0.8.7 actionpack-2.3.2
         activeresource-2.3.2 rails-2.3.2)
 
-      tmp_gem_path.should have_cached_gems(*gems)
-      tmp_gem_path.should have_installed_gems(*gems)
+      bundled_path.should have_cached_gems(*gems)
+      bundled_path.should have_installed_gems(*gems)
     end
 
     it "skips fetching the source index if all gems are present" do
@@ -104,14 +104,16 @@ describe "Bundler::Environment" do
   describe "runtime" do
 
     it "is able to work system gems" do
-      install_manifest <<-Gemfile
-        clear_sources
-        source "file://#{gem_repo1}"
-        gem "rack"
-      Gemfile
+      system_gems "rake-0.8.7" do
+        install_manifest <<-Gemfile
+          clear_sources
+          source "file://#{gem_repo1}"
+          gem "rack"
+        Gemfile
 
-      out = run_in_context "require 'rake' ; puts Rake"
-      out.should == "Rake"
+        out = run_in_context "require 'rake' ; puts RAKE"
+        out.should == "0.8.7"
+      end
     end
 
     it "it does not work with system gems if system gems have been disabled" do

@@ -4,36 +4,14 @@ module Bundler
   class DefaultManifestNotFound < StandardError; end
 
   class Dsl
-    def self.load_gemfile(file)
-      gemfile = Pathname.new(file || default_gemfile).expand_path
-
-      unless gemfile.file?
-        raise ManifestFileNotFound, "Manifest file not found: #{gemfile.to_s.inspect}"
-      end
-
-      evaluate(gemfile)
-    end
-
-    def self.default_gemfile
-      current = Pathname.new(Dir.pwd)
-
-      until current.root?
-        filename = current.join("Gemfile")
-        return filename if filename.exist?
-        current = current.parent
-      end
-
-      raise DefaultManifestNotFound
-    end
-
-    def self.evaluate(file)
-      environment = Environment.new(file)
-      builder = new(environment)
+    def self.evaluate(file, bundle, environment)
+      builder = new(bundle, environment)
       builder.instance_eval(File.read(file.to_s), file.to_s, 1)
       environment
     end
 
-    def initialize(environment)
+    def initialize(bundle, environment)
+      @bundle = bundle
       @environment = environment
       @directory_sources = []
       @git_sources = {}
@@ -41,15 +19,11 @@ module Bundler
     end
 
     def bundle_path(path)
-      path = Pathname.new(path)
-      @environment.gem_path = (path.relative? ?
-        @environment.root.join(path) : path).expand_path
+      @bundle.path = Pathname.new(path)
     end
 
     def bin_path(path)
-      path = Pathname.new(path)
-      @environment.bindir = (path.relative? ?
-        @environment.root.join(path) : path).expand_path
+      @bundle.bindir = Pathname.new(path)
     end
 
     def disable_rubygems
@@ -61,7 +35,7 @@ module Bundler
     end
 
     def source(source)
-      source = GemSource.new(:uri => source)
+      source = GemSource.new(@bundle, :uri => source)
       unless @environment.sources.include?(source)
         @environment.add_source(source)
       end
@@ -81,7 +55,7 @@ module Bundler
 
     def directory(path, options = {})
       raise DirectorySourceError, "cannot nest calls to directory or git" if @directory || @git
-      @directory = DirectorySource.new(options.merge(:location => path))
+      @directory = DirectorySource.new(@bundle, options.merge(:location => path))
       @directory_sources << @directory
       @environment.add_priority_source(@directory)
       retval = yield if block_given?
@@ -91,7 +65,7 @@ module Bundler
 
     def git(uri, options = {})
       raise DirectorySourceError, "cannot nest calls to directory or git" if @directory || @git
-      @git = GitSource.new(options.merge(:uri => uri))
+      @git = GitSource.new(@bundle, options.merge(:uri => uri))
       @git_sources[uri] = @git
       @environment.add_priority_source(@git)
       retval = yield if block_given?
@@ -123,7 +97,7 @@ module Bundler
       dep = Dependency.new(name, options.merge(:version => version))
 
       if options.key?(:bundle) && !options[:bundle]
-        dep.source = SystemGemSource.instance
+        dep.source = SystemGemSource.new(@bundle)
       elsif @git || options[:git]
         dep.source = _handle_git_option(name, version, options)
       elsif @directory || options[:path]
@@ -158,7 +132,7 @@ module Bundler
         return @directory, Pathname.new(path || '')
       end
 
-      path = @environment.filename.dirname.join(path)
+      path = @bundle.gemfile.dirname.join(path)
 
       @directory_sources.each do |s|
         if s.location.expand_path.to_s < path.expand_path.to_s

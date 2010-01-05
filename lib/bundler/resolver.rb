@@ -36,7 +36,14 @@ module Bundler
     # ==== Returns
     # <GemBundle>,nil:: If the list of dependencies can be resolved, a
     #   collection of gemspecs is returned. Otherwise, nil is returned.
-    def self.resolve(requirements, sources, source_requirements = {})
+    def self.resolve(requirements, sources)
+      source_requirements = {}
+
+      requirements.each do |r|
+        next unless r.source
+        source_requirements[r.name] = r.source
+      end
+
       resolver = new(sources, source_requirements)
       result = catch(:success) do
         resolver.resolve(requirements, {})
@@ -54,6 +61,7 @@ module Bundler
         # a smaller index in the array.
         ordered = []
         result.values.each do |spec1|
+          spec1.no_bundle = true if source_requirements[spec1.name] == SystemGemSource.instance
           index = nil
           place = ordered.detect do |spec2|
             spec1.dependencies.any? { |d| d.name == spec2.name }
@@ -235,7 +243,7 @@ module Bundler
           found.reject! { |spec| spec.version.prerelease? }
         end
 
-        found.sort_by {|s| [s.version, s.platform == 'ruby' ? "\0" : s.platform] }
+        found.sort_by {|s| [s.version, s.platform.to_s == 'ruby' ? "\0" : s.platform.to_s] }
       end
     end
   end

@@ -1,7 +1,7 @@
 module Bundler
   class InvalidEnvironmentName < StandardError; end
 
-  class Dependency
+  class Dependency < Gem::Dependency
     attr_reader :name, :version, :require_as, :only, :except
     attr_accessor :source
 
@@ -10,8 +10,8 @@ module Bundler
         options[k.to_s] = v
       end
 
-      @name       = name
-      @version    = options["version"] || ">= 0"
+      super(name, options["version"] || ">= 0")
+
       @require_as = options["require_as"]
       @only       = options["only"]
       @except     = options["except"]
@@ -31,10 +31,6 @@ module Bundler
       true
     end
 
-    def to_s
-      to_gem_dependency.to_s
-    end
-
     def require_env(environment)
       return unless in?(environment)
 
@@ -51,14 +47,16 @@ module Bundler
       @block.call if @block
     end
 
-    def to_gem_dependency
-      @gem_dep ||= Gem::Dependency.new(name, version)
+    def no_bundle?
+      source == SystemGemSource.instance
     end
 
     def ==(o)
       [name, version, require_as, only, except] ==
         [o.name, o.version, o.require_as, o.only, o.except]
     end
+
+    alias version version_requirements
 
   end
 end

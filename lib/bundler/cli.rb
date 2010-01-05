@@ -32,31 +32,49 @@ module Bundler
 
     def initialize(options)
       @options = options
-      @environment = Dsl.load_gemfile(@options[:manifest])
+      @bundle = Bundle.load(@options[:manifest])
     end
 
     def bundle
-      @environment.install(@options)
+      @bundle.install(@options)
     end
 
     def cache
-      @environment.cache(@options)
+      gemfile = @options[:cache]
+
+      if File.extname(gemfile) == ".gem"
+        if !File.exist?(gemfile)
+          raise InvalidCacheArgument, "'#{gemfile}' does not exist."
+        end
+        @bundle.cache(gemfile)
+      elsif File.directory?(gemfile) || gemfile.include?('/')
+        if !File.directory?(gemfile)
+          raise InvalidCacheArgument, "'#{gemfile}' does not exist."
+        end
+        gemfiles = Dir["#{gemfile}/*.gem"]
+        if gemfiles.empty?
+          raise InvalidCacheArgument, "'#{gemfile}' contains no gemfiles"
+        end
+        @bundle.cache(*gemfiles)
+      else
+        raise InvalidCacheArgument, "w0t? '#{gemfile}' means nothing to me."
+      end
     end
 
     def prune
-      @environment.prune(@options)
+      @bundle.prune(@options)
     end
 
     def list
-      @environment.list(@options)
+      @bundle.list(@options)
     end
 
     def list_outdated
-      @environment.list_outdated(@options)
+      @bundle.list_outdated(@options)
     end
 
     def exec
-      @environment.setup_environment
+      @bundle.setup_environment
       # w0t?
       super(*$command)
     end

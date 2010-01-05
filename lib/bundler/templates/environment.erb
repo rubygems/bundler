@@ -3,7 +3,7 @@ module Bundler
  file = File.expand_path(__FILE__)
  dir = File.dirname(file)
 
-<% unless options[:system_gems] -%>
+<% unless system_gems? -%>
   ENV["GEM_HOME"] = dir
   ENV["GEM_PATH"] = dir
 
@@ -25,12 +25,12 @@ module Bundler
 
   @gemfile = "#{dir}/<%= filename %>"
 
-<% if options[:rubygems] -%>
+<% if rubygems? -%>
   require "rubygems" unless respond_to?(:gem) # 1.9 already has RubyGems loaded
 
   @bundled_specs = {}
 <% specs.each do |spec| -%>
-<% if options[:no_bundle].include?(spec.name) -%>
+<% if spec.no_bundle? -%>
   gem "<%= spec.name %>", "<%= spec.version %>"
 <% else -%>
 <% path = spec_file_for(spec) -%>
@@ -108,7 +108,7 @@ module Bundler
   end
 end
 
-<% if options[:rubygems] -%>
+<% if rubygems? -%>
 module Gem
   @loaded_stacks = Hash.new { |h,k| h[k] = [] }
 

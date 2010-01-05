@@ -1,7 +1,8 @@
 module Spec
   module Helpers
     def run_in_context(cmd)
-      env = bundled_app("vendor", "gems", "environment")
+      env = bundled_path.join('environment.rb')
+      raise "Missing environment.rb" unless env.file?
       ruby "-r #{env}", cmd
     end
 
@@ -39,7 +40,7 @@ module Spec
       FileUtils.mkdir_p(path.dirname)
       Dir.chdir(path.dirname) do
         build_manifest_file(path, str)
-        Bundler::Dsl.load_gemfile(path)
+        Bundler::Bundle.load(path)
       end
     end
 
@@ -116,7 +117,8 @@ module Spec
 
     def reset!
       Dir["#{tmp_path}/*"].each do |file|
-        FileUtils.rm_rf(file) unless File.basename(file) == "repos"
+        next if %w(repos rg_deps).include?(File.basename(file))
+        FileUtils.rm_rf(file)
       end
       FileUtils.mkdir_p(tmp_path)
     end
