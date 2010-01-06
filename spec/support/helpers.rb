@@ -45,6 +45,8 @@ module Spec
     end
 
     def install_manifest(*args)
+      # TODO: Use the CLI directly
+      Bundler.mode = :readwrite
       m = build_manifest(*args)
       m.install
       m

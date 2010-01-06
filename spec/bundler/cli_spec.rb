@@ -486,19 +486,21 @@ describe "Bundler::CLI" do
         clear_sources
         source "file://#{gem_repo1}"
         gem "rack", "0.9.1"
+        gem "rspec"
       Gemfile
 
-      manifest.gem_path.should have_cached_gems("rack-0.9.1")
+      manifest.gem_path.should have_cached_gems("rack-0.9.1", "rspec-1.2.7")
 
       manifest = install_manifest <<-Gemfile
         clear_sources
         source "file://#{gem_repo1}"
+        gem "rspec"
       Gemfile
 
-      manifest.gem_path.should have_cached_gems("rack-0.9.1")
+      manifest.gem_path.should have_cached_gems("rack-0.9.1", "rspec-1.2.7")
       Dir.chdir bundled_app
-      out = gem_command :bundle, "--prune-cache"
-      manifest.gem_path.should_not have_cached_gems("rack-0.9.1")
+      gem_command :bundle, "--prune-cache"
+      manifest.gem_path.should_not include_cached_gems("rack-0.9.1")
     end
   end
 

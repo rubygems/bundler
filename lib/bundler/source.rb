@@ -4,7 +4,6 @@ module Bundler
   # Represents a source of rubygems. Initially, this is only gem repositories, but
   # eventually, this will be git, svn, HTTP
   class Source
-    attr_accessor :local
     attr_reader   :bundle
 
     def initialize(bundle, options)
@@ -33,7 +32,7 @@ module Bundler
       raise ArgumentError, "The source must be an absolute URI" unless @uri.absolute?
     end
 
-    def can_be_local?
+    def local?
       false
     end
 
@@ -115,7 +114,7 @@ module Bundler
       @source = Gem::SourceIndex.from_installed_gems
     end
 
-    def can_be_local?
+    def local?
       false
     end
 
@@ -149,7 +148,7 @@ module Bundler
       @location = options[:location]
     end
 
-    def can_be_local?
+    def local?
       true
     end
 
@@ -205,7 +204,7 @@ module Bundler
       end
     end
 
-    def can_be_local?
+    def local?
       true
     end
 
@@ -307,14 +306,19 @@ module Bundler
       @ref = options[:ref] || "origin/#{@branch}"
     end
 
+    def local?
+      raise SourceNotCached, "Git repository '#{@uri}' has not been cloned yet" unless location.directory?
+      super
+    end
+
     def location
       # TMP HAX to get the *.gemspec reading to work
       bundle.gem_path.join('dirs', File.basename(@uri, '.git'))
     end
 
     def gems
-      update
-      checkout
+      update if Bundler.remote?
+      checkout if Bundler.writable?
       super
     end
 
@@ -336,19 +340,11 @@ module Bundler
       end
 
       def fetch
-        unless local
-          Bundler.logger.info "Fetching git repository at: #{@uri}"
-          Dir.chdir(location) { `git fetch origin` }
-        end
+        Bundler.logger.info "Fetching git repository at: #{@uri}"
+        Dir.chdir(location) { `git fetch origin` }
       end
 
       def clone
-        # Raise an error if the source should run in local mode,
-        # but it has not been cached yet.
-        if local
-          raise SourceNotCached, "Git repository '#{@uri}' has not been cloned yet"
-        end
-
         Bundler.logger.info "Cloning git repository at: #{@uri}"
         FileUtils.mkdir_p(location.dirname)
         `git clone #{@uri} #{location} --no-hardlinks`

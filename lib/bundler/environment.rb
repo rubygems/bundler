@@ -33,7 +33,9 @@ module Bundler
     end
 
     def sources
-      @priority_sources + [SystemGemSource.new(@bundle)] + @sources + @default_sources
+      sources = @priority_sources + [SystemGemSource.new(@bundle)] + @sources + @default_sources
+      sources.reject! {|s| !s.local? } if Bundler.local?
+      sources
     end
 
     def add_source(source)
@@ -47,10 +49,6 @@ module Bundler
     def clear_sources
       @sources.clear
       @default_sources.clear
-    end
-
-    def gem_dependencies
-      @gem_dependencies ||= dependencies.map { |d| d.to_gem_dependency }
     end
 
     alias rubygems? rubygems

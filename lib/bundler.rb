@@ -22,7 +22,7 @@ module Bundler
   VERSION = "0.8.0"
 
   class << self
-    attr_writer :logger
+    attr_writer :logger, :mode
 
     def logger
       @logger ||= begin
@@ -31,5 +31,19 @@ module Bundler
         logger
       end
     end
+
+    def local?
+      @mode == :local
+    end
+
+    def writable?
+      @mode != :readonly
+    end
+
+    def remote?
+      @mode == :readwrite
+    end
   end
+
+  self.mode = :readonly
 end
