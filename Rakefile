@@ -48,6 +48,20 @@ namespace :spec do
 
   desc "Do all setup needed to run the specs"
   task :setup => "tmp/rg_deps"
+
+  desc "Mount a ramdisk at ./tmp for faster specs"
+  task :ramdisk do
+    sh 'diskutil erasevolume HFS+ "tmpbundler" `hdiutil attach -nomount ram://116543`'
+    File.symlink "/Volumes/tmpbundler", File.expand_path('../tmp', __FILE__)
+  end
+end
+
+spec_file = "#{spec.name}.gemspec"
+desc "Create #{spec_file}"
+file spec_file => "Rakefile" do
+  File.open(spec_file, "w") do |file|
+    file.puts spec.to_ruby
+  end
 end
 
 begin
@@ -58,24 +72,10 @@ else
   Rake::GemPackageTask.new(spec) do |pkg|
     pkg.gem_spec = spec
   end
-end
-
-desc "mount a ramdisk at ./tmp for faster specs"
-task :ramdisk do
-  sh 'diskutil erasevolume HFS+ "tmpbundler" `hdiutil attach -nomount ram://116543`'
-  File.symlink "/Volumes/tmpbundler", File.expand_path('../tmp', __FILE__)
+  task :gem => spec_file
 end
 
 desc "install the gem locally"
-task :install => [:package] do
+task :install => :package do
   sh %{gem install pkg/#{spec.name}-#{spec.version}}
 end
-
-desc "create a gemspec file"
-task :make_spec do
-  File.open("#{spec.name}.gemspec", "w") do |file|
-    file.puts spec.to_ruby
-  end
-end
-
-task :gem => :make_spec
