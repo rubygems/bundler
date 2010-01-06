@@ -77,11 +77,6 @@ module Bundler
       end
       # ==========
 
-      # TODO: clean this up
-      sources.each do |s|
-        s.local = options[:cached]
-      end
-
       # Check to see whether the existing cache meets all the requirements
       begin
         valid = nil
@@ -130,11 +125,7 @@ module Bundler
     end
 
     def prune(options = {})
-      dependencies, sources = @environment.gem_dependencies, @environment.sources
-
-      sources.each do |s|
-        s.local = true
-      end
+      dependencies, sources = @environment.dependencies, @environment.sources
 
       sources = only_local(sources)
       bundle = Resolver.resolve(dependencies, [@cache] + sources)
@@ -181,7 +172,7 @@ module Bundler
   private
 
     def only_local(sources)
-      sources.select { |s| s.can_be_local? }
+      sources.select { |s| s.local? }
     end
 
     def download(bundle, options)

@@ -31,6 +31,7 @@ module Bundler
     end
 
     def initialize(options)
+      Bundler.mode = options[:cached] ? :local : :readwrite
       @options = options
       @bundle = Bundle.load(@options[:manifest])
     end
@@ -62,6 +63,7 @@ module Bundler
     end
 
     def prune
+      Bundler.mode = :local
       @bundle.prune(@options)
     end
 
