@@ -333,7 +333,7 @@ module Bundler
     private
       def update
         if location.directory?
-          fetch
+          fetch if @ref && current_revision != @ref
         else
           clone
         end
@@ -350,6 +350,10 @@ module Bundler
         `git clone #{@uri} #{location} --no-hardlinks`
       end
 
+      def current_revision
+        Dir.chdir(location) { `git rev-parse HEAD`.strip }
+      end
+      
       def checkout
         Dir.chdir(location) { `git checkout --quiet #{@ref}` }
       end
