@@ -333,7 +333,7 @@ module Bundler
     private
       def update
         if location.directory?
-          fetch if current_revision != @ref
+          fetch if current_revision != revision_for_ref
         else
           clone
         end
@@ -352,6 +352,10 @@ module Bundler
 
       def current_revision
         Dir.chdir(location) { `git rev-parse HEAD`.strip }
+      end
+      
+      def revision_for_ref
+        Dir.chdir(location) { `git rev-parse #{@ref}`.strip }
       end
       
       def checkout
