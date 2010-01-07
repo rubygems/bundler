@@ -333,7 +333,7 @@ module Bundler
     private
       def update
         if location.directory?
-          fetch if @ref && current_revision != @ref
+          fetch if current_revision != @ref
         else
           clone
         end
