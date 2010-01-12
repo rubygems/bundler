@@ -8,6 +8,10 @@ module Spec
       root.join("tmp", *path)
     end
 
+    def home
+      tmp.join("home")
+    end
+
     def bundled_app(*path)
       tmp.join("bundled_app", *path)
     end

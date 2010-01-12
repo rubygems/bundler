@@ -7,8 +7,11 @@ module Spec
 
       unless File.exist?("#{Path.base_system_gems}")
         FileUtils.mkdir_p(Path.base_system_gems)
+        puts "running `gem install builder --no-rdoc --no-ri`"
         `gem install builder --no-rdoc --no-ri`
       end
+
+      ENV['HOME'] = Path.home
 
       Gem::DefaultUserInteraction.ui = Gem::SilentUI.new
     end

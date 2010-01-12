@@ -6,6 +6,9 @@ module Spec
         FileUtils.rm_rf(dir)
       end
       FileUtils.mkdir_p(tmp)
+      FileUtils.mkdir_p(home)
+      Gem.sources = ["file://#{gem_repo1}/"]
+      Gem.configuration.write
     end
 
     attr_reader :out
@@ -26,11 +29,19 @@ module Spec
       @out = ruby(setup + cmd)
     end
 
+    def lib
+      File.expand_path('../../../lib', __FILE__)
+    end
+
+    def bbl(cmd)
+      bbl = File.expand_path('../../../bin/bbl', __FILE__)
+      @out = %x{#{Gem.ruby} -I#{lib} #{bbl} #{cmd}}
+    end
+
     def ruby(opts, ruby = nil)
       ruby, opts = opts, nil unless ruby
       ruby.gsub!(/(?=")/, "\\")
       ruby.gsub!('$', '\\$')
-      lib = File.join(File.dirname(__FILE__), '..', '..', 'lib')
       %x{#{Gem.ruby} -I#{lib} #{opts} -e "#{ruby}"}.strip
     end
 
@@ -44,16 +55,16 @@ module Spec
       end
     end
 
-    def bubble(*args)
-      path = bundled_app("Gemfile")
-      path = args.shift if Pathname === args.first
-      str  = args.shift || ""
-      FileUtils.mkdir_p(path.dirname)
-      Dir.chdir(path.dirname) do
-        gemfile(path, str)
-        Bubble.load(path)
-      end
-    end
+    # def bubble(*args)
+    #   path = bundled_app("Gemfile")
+    #   path = args.shift if Pathname === args.first
+    #   str  = args.shift || ""
+    #   FileUtils.mkdir_p(path.dirname)
+    #   Dir.chdir(path.dirname) do
+    #     gemfile(path, str)
+    #     Bubble.load(path)
+    #   end
+    # end
 
     def install_gems(*gems)
       Dir["#{gem_repo1}/**/*.gem"].each do |path|

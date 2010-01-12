@@ -1,3 +1,4 @@
+require 'set'
 # This is the latest iteration of the gem dependency resolving algorithm. As of now,
 # it can resolve (as a success of failure) any set of gem dependencies we throw at it
 # in a reasonable amount of time. The most iterations I've seen it take is about 150.
@@ -79,7 +80,7 @@ module Bubble
       @index  = {}
 
       sources.each do |source|
-        source.gems.each do |name, specs|
+        source.specs.each do |name, specs|
           # Hack to work with a regular Gem::SourceIndex
           specs = [specs] unless specs.is_a?(Array)
           specs.compact.each do |spec|

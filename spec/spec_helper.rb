@@ -27,6 +27,7 @@ Spec::Runner.configure do |config|
 
   config.before :each do
     reset!
+    system_gems
   end
 
   config.after :each do
