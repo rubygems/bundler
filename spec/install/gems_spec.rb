@@ -5,13 +5,36 @@ describe "bbl install" do
     in_app_root
   end
 
-  it "works" do
-    gemfile <<-G
-      gem "rack"
+  it "fetches gems" do
+    install_gemfile <<-G
+      gem 'rack'
     G
 
-    bbl :install
-    run "require 'rack'; puts RACK"
-    out.should == "1.0.0"
+    should_be_installed("rack 1.0.0")
+  end
+
+  it "pulls in dependencies" do
+    install_gemfile <<-G
+      gem "rails"
+    G
+
+    should_be_installed "actionpack 2.3.2", "rails 2.3.2"
+  end
+
+  it "does the right version" do
+    install_gemfile <<-G
+      gem "rack", "0.9.1"
+    G
+
+    should_be_installed "rack 0.9.1"
+  end
+
+  it "resolves correctly" do
+    install_gemfile <<-G
+      gem "activemerchant"
+      gem "rails"
+    G
+
+    should_be_installed "activemerchant 1.0", "activesupport 2.3.2", "actionpack 2.3.2"
   end
 end

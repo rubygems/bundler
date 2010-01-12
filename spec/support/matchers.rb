@@ -14,5 +14,13 @@ module Spec
         given.length == args.length && given.all? { |g| args.include?(g.full_name) }
       end
     end
+
+    def should_be_installed(*names)
+      names.each do |name|
+        name, version = name.split(/\s+/)
+        run "require '#{name}'; puts #{Spec::Builders.constantize(name)}"
+        Gem::Version.new(out).should == Gem::Version.new(version)
+      end
+    end
   end
 end

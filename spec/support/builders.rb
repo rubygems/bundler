@@ -1,5 +1,8 @@
 module Spec
   module Builders
+    def self.constantize(name)
+      name.gsub('-', '').upcase
+    end
 
     def build_repo1
       build_repo gem_repo1 do
@@ -29,7 +32,11 @@ module Spec
         build_gem "activeresource", "2.3.2" do |s|
           s.add_dependency "activesupport", "2.3.2"
         end
-        build_gem "activesupport",  "2.3.2"
+        build_gem "activesupport",  %w(2.3.2 2.3.5)
+
+        build_gem "activemerchant" do |s|
+          s.add_dependency "activesupport", ">= 2.0.0"
+        end
 
         build_gem "missing_dep" do |s|
           s.add_dependency "not_here"
@@ -199,7 +206,7 @@ module Spec
           s.summary = "This is just a fake gem for testing"
         end
         @files = {}
-        @default_files = { "lib/#{name}.rb" => "#{name.gsub('-', '').upcase} = '#{version}'" }
+        @default_files = { "lib/#{name}.rb" => "#{Builders.constantize(name)} = '#{version}'" }
       end
 
       def method_missing(*args, &blk)

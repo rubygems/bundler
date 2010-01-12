@@ -55,6 +55,11 @@ module Spec
       end
     end
 
+    def install_gemfile(string)
+      gemfile string
+      bbl :install
+    end
+
     # def bubble(*args)
     #   path = bundled_app("Gemfile")
     #   path = args.shift if Pathname === args.first
