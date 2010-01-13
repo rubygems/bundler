@@ -34,15 +34,10 @@ module Bubble
     # ==== Returns
     # <GemBundle>,nil:: If the list of dependencies can be resolved, a
     #   collection of gemspecs is returned. Otherwise, nil is returned.
-    def self.resolve(requirements, sources)
+    def self.resolve(requirements, index)
       source_requirements = {}
 
-      requirements.each do |r|
-        next unless r.source
-        source_requirements[r.name] = r.source
-      end
-
-      resolver = new(sources, source_requirements)
+      resolver = new(index)
       result = catch(:success) do
         resolver.resolve(requirements, {})
         output = resolver.errors.inject("") do |o, (conflict, (origin, requirement))|
@@ -71,24 +66,10 @@ module Bubble
       end
     end
 
-    def initialize(sources, source_requirements)
+    def initialize(index)
       @errors = {}
       @stack  = []
-      @specs  = Hash.new { |h,k| h[k] = [] }
-      @by_gem = source_requirements
-      @cache  = {}
-      @index  = {}
-
-      sources.each do |source|
-        source.specs.each do |name, specs|
-          # Hack to work with a regular Gem::SourceIndex
-          specs = [specs] unless specs.is_a?(Array)
-          specs.compact.each do |spec|
-            next if @specs[spec.name].any? { |s| s.version == spec.version && s.platform == spec.platform }
-            @specs[spec.name] << spec
-          end
-        end
-      end
+      @index  = index
     end
 
     def debug
@@ -227,21 +208,7 @@ module Bubble
     end
 
     def search(dependency)
-      @cache[dependency.hash] ||= begin
-        pinned = @by_gem[dependency.name].gems if @by_gem[dependency.name]
-        specs  = (pinned || @specs)[dependency.name]
-
-        wants_prerelease = dependency.version_requirements.prerelease?
-        only_prerelease  = specs.all? {|spec| spec.version.prerelease? }
-
-        found = specs.select { |spec| dependency =~ spec }
-
-        unless wants_prerelease || (pinned && only_prerelease)
-          found.reject! { |spec| spec.version.prerelease? }
-        end
-
-        found.sort_by {|s| [s.version, s.platform.to_s == 'ruby' ? "\0" : s.platform.to_s] }
-      end
+      @index.search(dependency)
     end
   end
 end

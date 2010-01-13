@@ -32,6 +32,10 @@ module Spec
       tmp("gems/system")
     end
 
+    def lib_path(*args)
+      tmp("libs", *args)
+    end
+
     extend self
   end
 end

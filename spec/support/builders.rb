@@ -143,6 +143,10 @@ module Spec
       build_with(GemBuilder, name, args, &blk)
     end
 
+    def build_git(name, *args, &block)
+      build_with(GitBuilder, name, args, &block)
+    end
+
   private
 
     def build_with(builder, name, args, &blk)
@@ -226,7 +230,7 @@ module Spec
 
       def _build(options)
         path = options[:path] || _default_path
-        @files["#{name}.gemspec"] = @spec.to_ruby if options[:gemspec]
+        @files["#{name}.gemspec"] = @spec.to_ruby unless options[:gemspec] == false
         unless options[:no_default]
           @files = @default_files.merge(@files)
         end
@@ -241,6 +245,18 @@ module Spec
 
       def _default_path
         @context.tmp('libs', @spec.full_name)
+      end
+    end
+
+    class GitBuilder < LibBuilder
+      def _build(options)
+        path = options[:path] || _default_path
+        super(options.merge(:path => path))
+        Dir.chdir(path) do
+          `git init`
+          `git add *`
+          `git commit -m 'OMG INITIAL COMMIT'`
+        end
       end
     end
 

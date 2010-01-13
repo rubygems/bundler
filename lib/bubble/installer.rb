@@ -12,8 +12,7 @@ module Bubble
 
     def run
       specs.each do |spec|
-        inst = Gem::DependencyInstaller.new(:ignore_dependencies => true)
-        inst.install spec.name, spec.version
+        spec.source.install spec
       end
     end
 
@@ -22,13 +21,19 @@ module Bubble
     end
 
     def specs
-      @specs ||= Resolver.resolve(dependencies, sources)
+      @specs ||= begin
+        index = Index.new
+        sources.reverse_each do |source|
+          index.merge!(source.specs)
+        end
+        Resolver.resolve(dependencies, index)
+      end
     end
 
   private
 
     def sources
-      @sources ||= Gem.sources.map { |s| Source::Rubygems.new(:uri => s) }
+      @definition.sources
     end
 
   end

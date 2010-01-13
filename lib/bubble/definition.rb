@@ -24,10 +24,10 @@ module Bubble
       raise GemfileNotFound, "the default Gemfile was not found"
     end
 
-    attr_reader :dependencies
+    attr_reader :dependencies, :sources
 
     def initialize
-      @dependencies = []
+      @dependencies, @sources = [], Gem.sources.map { |s| Source::Rubygems.new(:uri => s) }
     end
   end
 end

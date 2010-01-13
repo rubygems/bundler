@@ -5,6 +5,7 @@ module Bubble
   # full specification will only be fetched when necesary.
   class RemoteSpecification
     attr_reader :name, :version, :platform
+    attr_accessor :source
 
     def initialize(name, version, platform, source_uri)
       @name     = name

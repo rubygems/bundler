@@ -1,6 +1,6 @@
 require File.expand_path('../../spec_helper', __FILE__)
 
-describe "bbl install" do
+describe "bbl install with gem sources" do
   before :each do
     in_app_root
   end
@@ -30,6 +30,19 @@ describe "bbl install" do
   end
 
   it "resolves correctly" do
+    install_gemfile <<-G
+      gem "activemerchant"
+      gem "rails"
+    G
+
+    should_be_installed "activemerchant 1.0", "activesupport 2.3.2", "actionpack 2.3.2"
+  end
+
+  it "activates gem correctly according to the resolved gems" do
+    install_gemfile <<-G
+      gem "activesupport", "2.3.5"
+    G
+
     install_gemfile <<-G
       gem "activemerchant"
       gem "rails"

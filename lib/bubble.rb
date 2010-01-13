@@ -8,6 +8,7 @@ module Bubble
   autoload :Dependency,          'bubble/dependency'
   autoload :Dsl,                 'bubble/dsl'
   autoload :Environment,         'bubble/environment'
+  autoload :Index,               'bubble/index'
   autoload :Installer,           'bubble/installer'
   autoload :RemoteSpecification, 'bubble/remote_specification'
   autoload :Resolver,            'bubble/resolver'
@@ -18,7 +19,7 @@ module Bubble
   class VersionConflict < StandardError; end
 
   def self.setup(gemfile = nil)
-    # Does nothing yet
+    load(gemfile).setup
   end
 
   def self.load(gemfile = nil)
@@ -28,4 +29,14 @@ module Bubble
   def self.definition(gemfile = nil)
     Definition.from_gemfile(gemfile)
   end
+
+  def self.home
+    Pathname.new(Gem.user_home).join(".bbl")
+  end
+
+  def self.cache
+    home.join("cache")
+  end
+
+
 end
