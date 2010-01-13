@@ -35,7 +35,7 @@ module Spec
 
     def bbl(cmd)
       bbl = File.expand_path('../../../bin/bbl', __FILE__)
-      @out = %x{#{Gem.ruby} -I#{lib} #{bbl} #{cmd}}
+      @out = %x{#{Gem.ruby} -I#{lib} #{bbl} #{cmd}}.strip
     end
 
     def ruby(opts, ruby = nil)

@@ -32,10 +32,14 @@ module Spec
         build_gem "activeresource", "2.3.2" do |s|
           s.add_dependency "activesupport", "2.3.2"
         end
-        build_gem "activesupport",  %w(2.3.2 2.3.5)
+        build_gem "activesupport",  %w(1.2.3 2.3.2 2.3.5)
 
         build_gem "activemerchant" do |s|
           s.add_dependency "activesupport", ">= 2.0.0"
+        end
+
+        build_gem "rails_fail" do |s|
+          s.add_dependency "activesupport", "= 1.2.3"
         end
 
         build_gem "missing_dep" do |s|

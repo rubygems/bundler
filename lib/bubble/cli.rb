@@ -18,9 +18,38 @@ module Bubble
       end
     end
 
+    desc "check", "Checks if the dependencies listed in Gemfile are satisfied by currently installed gems"
+    def check
+      with_rescue do
+        env = Bubble.load
+        # Check top level dependencies
+        missing = env.dependencies.select { |d| env.index.search(d).empty? }
+        if missing.any?
+          puts "The following dependencies are missing"
+          missing.each do |d|
+            puts "  * #{d}"
+          end
+        else
+          env.specs
+          puts "The Gemfile's dependencies are satisfied"
+        end
+      end
+    rescue VersionConflict => e
+      puts e.message
+    end
+
     desc "install", "Install the current environment to the system"
     def install
       Installer.install(Bubble.definition)
+    end
+
+  private
+
+    def with_rescue
+      yield
+    rescue GemfileNotFound => e
+      puts e.message
+      exit 1
     end
   end
 end

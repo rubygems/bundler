@@ -17,13 +17,18 @@ module Bubble
     end
 
     def specs
-      @specs ||= begin
+      @specs ||= Resolver.resolve(dependencies, index)
+    end
+
+    def index
+      @index ||= begin
         index = Index.new
         @definition.sources.reverse_each do |source|
           index.merge! source.local_specs
         end
-        Resolver.resolve(dependencies, index)
+        index
       end
     end
+
   end
 end

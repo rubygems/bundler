@@ -21,7 +21,7 @@ module Bubble
         current = current.parent
       end
 
-      raise GemfileNotFound, "the default Gemfile was not found"
+      raise GemfileNotFound, "The default Gemfile was not found"
     end
 
     attr_reader :dependencies, :sources
