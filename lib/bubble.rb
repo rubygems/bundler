@@ -35,9 +35,11 @@ module Bubble
     Pathname.new(Gem.user_home).join(".bbl")
   end
 
+  def self.install_path
+    home.join("gems")
+  end
+
   def self.cache
     home.join("cache")
   end
-
-
 end

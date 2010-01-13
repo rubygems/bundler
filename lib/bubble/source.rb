@@ -83,17 +83,89 @@ module Bubble
     end
 
     class Git < Path
+      attr_reader :uri, :ref
+
       def initialize(options)
-        @uri = options[:uri]
-        sha = Digest::SHA1.hexdigest(URI.parse(@uri).normalize.to_s.sub(%r{/$}, ''))
-        @location = Bubble.cache.join("git", "#{File.basename(@uri, ".git")}-#{sha}")
-        @branch   = options[:branch] || 'master'
-        @ref      = options[:ref] || "origin/#{@branch}"
+        @glob = options[:glob] || "{,*/}*.gemspec"
+        @uri  = options[:uri]
+        @ref  = options[:ref] || options[:branch] || 'master'
+      end
+
+      def path
+        Bubble.install_path.join("#{base_name}-#{uri_hash}-#{ref}")
       end
 
       def specs
-        FileUtils.mkdir_p(@location.dirname)
-        `git clone #{@uri} #{@location} --bare --no-hardlinks`
+        @specs ||= begin
+          index = Index.new
+          # Start by making sure the git cache is up to date
+          cache
+          # Find all gemspecs in the repo
+          in_cache do
+            out   = %x(git ls-tree -r #{revision}).strip
+            lines = out.split("\n").select { |l| l =~ /\.gemspec$/ }
+            # Loop over the lines and extract the relative path and the
+            # git hash
+            lines.each do |line|
+              next unless line =~ %r{^(\d+) (blob|tree) ([a-zf0-9]+)\t(.*)$}
+              hash, file = $3, $4
+              # Read the gemspec
+              if spec = eval(%x(git cat-file blob #{$3}))
+                spec = Specification.from_gemspec(spec)
+                spec.relative_loaded_from = file
+                spec.source = self
+                index << spec
+              end
+            end
+          end
+          index
+        end
+      end
+
+      def install(spec)
+        @installed ||= begin
+          FileUtils.mkdir_p(path)
+          Dir.chdir(path) do
+            unless File.exist?(".git")
+              %x(git clone --recursive --no-checkout #{cache_path} #{path})
+            end
+            %x(git reset --hard #{revision})
+            %x(git submodule init)
+            %x(git submodule update)
+          end
+          true
+        end
+      end
+
+    private
+
+      def base_name
+        File.basename(uri, ".git")
+      end
+
+      def uri_hash
+        Digest::SHA1.hexdigest(URI.parse(uri).normalize.to_s.sub(%r{/$}, ''))
+      end
+
+      def cache_path
+        @cache_path ||= Bubble.cache.join("git", "#{base_name}-#{uri_hash}")
+      end
+
+      def cache
+        if cache_path.exist?
+          in_cache { `git fetch --quiet #{uri}` }
+        else
+          FileUtils.mkdir_p(cache_path.dirname)
+          `git clone #{uri} #{cache_path} --bare --no-hardlinks`
+        end
+      end
+
+      def revision
+        @revision ||= in_cache { `git rev-parse #{ref}`.strip }
+      end
+
+      def in_cache(&blk)
+        Dir.chdir(cache_path, &blk)
       end
     end
   end
