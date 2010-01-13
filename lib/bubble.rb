@@ -13,6 +13,7 @@ module Bubble
   autoload :RemoteSpecification, 'bubble/remote_specification'
   autoload :Resolver,            'bubble/resolver'
   autoload :Source,              'bubble/source'
+  autoload :Specification,       'bubble/specification'
 
   class GemfileNotFound < StandardError; end
   class GemNotFound     < StandardError; end

@@ -1,14 +1,15 @@
 module Bubble
-  class Specification
-    attr_reader :full_gem_path
-
-    def initialize(specification, full_gem_path)
-      @specification = specification
-      @full_gem_path = full_gem_path
+  class Specification < Gem::Specification
+    def self.from_gemspec(gemspec)
+      spec = allocate
+      gemspec.instance_variables.each do |ivar|
+        spec.instance_variable_set(ivar, gemspec.instance_variable_get(ivar))
+      end
+      spec
     end
 
-    def method_missing(meth, *args, &block)
-      send(meth, *args, &block)
+    def full_gem_path
+      @loaded_from.dirname.expand_path
     end
   end
 end

@@ -27,7 +27,6 @@ module Bubble
 
         wants_prerelease = dependency.version_requirements.prerelease?
         only_prerelease  = specs.all? {|spec| spec.version.prerelease? }
-
         found = specs.select { |spec| dependency =~ spec }
 
         unless wants_prerelease || only_prerelease

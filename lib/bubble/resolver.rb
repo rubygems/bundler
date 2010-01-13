@@ -144,10 +144,10 @@ module Bubble
 
         if matching_versions.empty?
           if current.required_by.empty?
-            location = @by_gem[current.name] ? @by_gem[current.name] : "any of the sources"
+            location = "any of the sources"
             raise GemNotFound, "Could not find gem '#{current}' in #{location}"
           end
-          Bundler.logger.warn "Could not find gem '#{current}' (required by '#{current.required_by.last}') in any of the sources"
+          # Bundler.logger.warn "Could not find gem '#{current}' (required by '#{current.required_by.last}') in any of the sources"
         end
 
         matching_versions.reverse_each do |spec|

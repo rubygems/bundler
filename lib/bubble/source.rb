@@ -66,13 +66,17 @@ module Bubble
           Dir["#{path}/#{@glob}"].each do |file|
             file = Pathname.new(file)
             if spec = eval(File.read(file))
-              spec.location = file.dirname.expand_path
+              spec = Specification.from_gemspec(spec)
+              spec.loaded_from = file
+              spec.source      = self
               index << spec
             end
           end
           index
         end
       end
+
+      alias local_specs specs
 
       def install(spec)
       end
