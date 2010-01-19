@@ -21,18 +21,38 @@ module Bubble
     end
 
     def lock
-      yml = @definition.to_yaml
+      yml = details.to_yaml
       File.open("#{Definition.default_gemfile.dirname}/omg.yml", 'w') do |f|
         f.puts yml
       end
     end
 
     def specs
-      @definition.specs
+      @specs ||= Resolver.resolve(@definition.actual_dependencies, index)
     end
 
     def index
-      @definition.index
+      @index ||= begin
+        index = Index.new
+        sources.reverse_each do |source|
+          index.merge! source.local_specs
+        end
+        index
+      end
+    end
+
+  private
+
+    def sources
+      @definition.sources
+    end
+
+    def details
+      details = {}
+      details["sources"] = sources.map { |s| { s.class.name.split("::").last => s.options} }
+      details["specs"] = specs.map { |s| {s.name => s.version.to_s} }
+      details["dependencies"] = dependencies.map { |d| {d.name => d.version_requirements.to_s} }
+      details
     end
 
   end

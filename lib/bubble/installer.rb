@@ -17,15 +17,11 @@ module Bubble
     end
 
     def dependencies
-      @definition.dependencies
+      @definition.actual_dependencies
     end
 
     def specs
       @specs ||= begin
-        index = Index.new
-        sources.reverse_each do |source|
-          index.merge!(source.specs)
-        end
         Resolver.resolve(dependencies, index)
       end
     end
@@ -34,6 +30,16 @@ module Bubble
 
     def sources
       @definition.sources
+    end
+
+    def index
+      @index ||= begin
+        index = Index.new
+        sources.reverse_each do |source|
+          index.merge!(source.specs)
+        end
+        index
+      end
     end
 
   end

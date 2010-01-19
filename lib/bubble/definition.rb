@@ -23,62 +23,35 @@ module Bubble
     end
 
     def self.from_lock(lockfile)
-      gemfile_definition = from_gemfile(nil)
+      # gemfile_definition = from_gemfile(nil)
       locked_definition = Locked.new(YAML.load_file(lockfile))
-      raise GemfileError unless gemfile_definition.equivalent?(locked_definition)
+      # raise GemfileError unless gemfile_definition.equivalent?(locked_definition)
       locked_definition
     end
 
     attr_reader :dependencies, :sources
+
+    alias actual_dependencies dependencies
 
     def initialize(dependencies, sources)
       @dependencies = dependencies
       @sources = sources
     end
 
-    def equivalent?(other)
-      self.matches?(other) && other.matches?(self)
-      # other.matches?(self)
-    end
+    # def equivalent?(other)
+    #   self.matches?(other) && other.matches?(self)
+    #   # other.matches?(self)
+    # end
 
-    def matches?(other)
-      dependencies.all? do |dep|
-        dep =~ other.specs.find {|spec| spec.name == dep.name }
-      end
-    end
-
-    def specs
-      @specs ||= Resolver.resolve(dependencies, index)
-    end
-
-    def index
-      @index ||= begin
-        index = Index.new
-        sources.reverse_each do |source|
-          index.merge! source.local_specs
-        end
-        index
-      end
-    end
-
-    def to_yaml(options = {})
-      details.to_yaml(options)
-    end
-
-  private
-
-    def details
-      {}.tap do |det|
-        det["sources"] = sources.map { |s| { s.class.name.split("::").last => s.options} }
-        det["specs"] = specs.map { |s| {s.name => s.version.to_s} }
-        det["dependencies"] = dependencies.map { |d| {d.name => d.version_requirements.to_s} }
-      end
-    end
+    # def matches?(other)
+    #   dependencies.all? do |dep|
+    #     dep =~ other.specs.find {|spec| spec.name == dep.name }
+    #   end
+    # end
 
     class Locked < Definition
       def initialize(details)
         @details = details
-        raise GemfileError if specs.any? { |s| s.nil? }
       end
 
       def sources
@@ -88,10 +61,9 @@ module Bubble
         end
       end
 
-      def specs
-        @specs ||= @details["specs"].map do |args|
-          dep = Gem::Dependency.new(*args.to_a.flatten)
-          index.search(dep).first
+      def actual_dependencies
+        @actual_dependencies ||= @details["specs"].map do |args|
+          Gem::Dependency.new(*args.to_a.flatten)
         end
       end
 

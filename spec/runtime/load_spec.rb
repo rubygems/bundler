@@ -40,6 +40,7 @@ describe "Bubble.load" do
 
   describe "when locked" do
     before :each do
+      pending
       system_gems "rack-1.0.0", "activesupport-2.3.2", "activerecord-2.3.2", "activerecord-2.3.1"
     end
 
