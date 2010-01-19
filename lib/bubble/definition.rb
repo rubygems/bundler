@@ -24,40 +24,21 @@ module Bubble
 
     def self.from_lock(lockfile)
       gemfile_definition = from_gemfile(nil)
-
-      details = YAML.load_file(lockfile)
-      sources = details["sources"].map do |args|
-        name, options = args.to_a.flatten
-        Bubble::Source.const_get(name).new(options)
-      end
-
-      dependencies = details["dependencies"].map do |args|
-        Gem::Dependency.new(*args.to_a.flatten)
-      end
-
-      specs = details["specs"].map do |args|
-        Gem::Dependency.new(*args.to_a.flatten)
-      end
-
-      locked_definition = new(dependencies, sources, specs)
-
-      raise GemfileError unless gemfile_definition.matches?(locked_definition) &&
-                                locked_definition.matches?(gemfile_definition)
-
+      locked_definition = Locked.new(YAML.load_file(lockfile))
+      raise GemfileError unless gemfile_definition.equivalent?(locked_definition)
       locked_definition
     end
 
     attr_reader :dependencies, :sources
 
-    def initialize(dependencies, sources, resolved_dependencies = nil)
+    def initialize(dependencies, sources)
       @dependencies = dependencies
       @sources = sources
+    end
 
-      if resolved_dependencies
-        @specs = resolved_dependencies.map do |dep|
-          index.search(dep).first
-        end
-      end
+    def equivalent?(other)
+      self.matches?(other) && other.matches?(self)
+      # other.matches?(self)
     end
 
     def matches?(other)
@@ -91,6 +72,33 @@ module Bubble
         det["sources"] = sources.map { |s| { s.class.name.split("::").last => s.options} }
         det["specs"] = specs.map { |s| {s.name => s.version.to_s} }
         det["dependencies"] = dependencies.map { |d| {d.name => d.version_requirements.to_s} }
+      end
+    end
+
+    class Locked < Definition
+      def initialize(details)
+        @details = details
+        raise GemfileError if specs.any? { |s| s.nil? }
+      end
+
+      def sources
+        @sources ||= @details["sources"].map do |args|
+          name, options = args.to_a.flatten
+          Bubble::Source.const_get(name).new(options)
+        end
+      end
+
+      def specs
+        @specs ||= @details["specs"].map do |args|
+          dep = Gem::Dependency.new(*args.to_a.flatten)
+          index.search(dep).first
+        end
+      end
+
+      def dependencies
+        @dependencies ||= @details["dependencies"].map do |args|
+          Gem::Dependency.new(*args.to_a.flatten)
+        end
       end
     end
   end

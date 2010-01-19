@@ -82,6 +82,7 @@ module Spec
     alias install_gem install_gems
 
     def system_gems(*gems)
+      FileUtils.rm_rf(system_gem_path)
       FileUtils.mkdir_p(system_gem_path)
 
       Gem.clear_paths
@@ -91,8 +92,11 @@ module Spec
 
       install_gems(*gems)
       if block_given?
-        yield
-        ENV['GEM_HOME'], ENV['GEM_PATH'] = gem_home, gem_path
+        begin
+          yield
+        ensure
+          ENV['GEM_HOME'], ENV['GEM_PATH'] = gem_home, gem_path
+        end
       end
     end
   end

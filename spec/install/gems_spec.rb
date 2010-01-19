@@ -50,4 +50,23 @@ describe "bbl install with gem sources" do
 
     should_be_installed "activemerchant 1.0", "activesupport 2.3.2", "actionpack 2.3.2"
   end
+
+  describe "when locked" do
+
+    it "works" do
+      system_gems "rack-1.0.0" do
+        gemfile <<-G
+          gem "rack"
+        G
+
+        bbl :lock
+      end
+
+      system_gems [] do
+        bbl :install
+        should_be_installed "rack 1.0.0"
+      end
+    end
+
+  end
 end
