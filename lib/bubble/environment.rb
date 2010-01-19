@@ -1,5 +1,9 @@
 module Bubble
   class Environment
+    def self.from_gemfile(gemfile)
+      new Definition.from_gemfile(gemfile)
+    end
+
     def initialize(definition)
       @definition = definition
     end
@@ -16,18 +20,19 @@ module Bubble
       @definition.dependencies
     end
 
+    def lock
+      yml = @definition.to_yaml
+      File.open("#{Definition.default_gemfile.dirname}/omg.yml", 'w') do |f|
+        f.puts yml
+      end
+    end
+
     def specs
-      @specs ||= Resolver.resolve(dependencies, index)
+      @definition.specs
     end
 
     def index
-      @index ||= begin
-        index = Index.new
-        @definition.sources.reverse_each do |source|
-          index.merge! source.local_specs
-        end
-        index
-      end
+      @definition.index
     end
 
   end

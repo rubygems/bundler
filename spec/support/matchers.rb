@@ -22,5 +22,7 @@ module Spec
         Gem::Version.new(out).should == Gem::Version.new(version)
       end
     end
+
+    alias should_be_available should_be_installed
   end
 end

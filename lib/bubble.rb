@@ -1,4 +1,5 @@
 require 'pathname'
+require 'yaml'
 require 'bubble/rubygems'
 
 module Bubble
@@ -18,17 +19,23 @@ module Bubble
   class GemfileNotFound < StandardError; end
   class GemNotFound     < StandardError; end
   class VersionConflict < StandardError; end
+  class GemfileError    < StandardError; end
 
   def self.setup(gemfile = nil)
     load(gemfile).setup
   end
 
   def self.load(gemfile = nil)
-    Environment.new(definition(gemfile))
+    Environment.new definition(gemfile)
   end
 
   def self.definition(gemfile = nil)
-    Definition.from_gemfile(gemfile)
+    lockfile = Pathname.new(gemfile || Definition.default_gemfile).dirname.join('omg.yml')
+    if lockfile.exist?
+      Definition.from_lock(lockfile)
+    else
+      Definition.from_gemfile(gemfile)
+    end
   end
 
   def self.home

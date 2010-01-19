@@ -23,7 +23,7 @@ module Spec
         build_gem "actionpack",     "2.3.2" do |s|
           s.add_dependency "activesupport", "2.3.2"
         end
-        build_gem "activerecord",   "2.3.2" do |s|
+        build_gem "activerecord",   ["2.3.1", "2.3.2"] do |s|
           s.add_dependency "activesupport", "2.3.2"
         end
         build_gem "actionmailer",   "2.3.2" do |s|

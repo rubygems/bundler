@@ -2,14 +2,15 @@ module Bubble
   class DslError < StandardError; end
 
   class Dsl
-    def self.evaluate(gemfile, definition)
-      builder = new(definition)
+    def self.evaluate(gemfile)
+      builder = new
       builder.instance_eval(File.read(gemfile.to_s), gemfile.to_s, 1)
-      definition
+      builder.to_definition
     end
 
-    def initialize(definition)
-      @definition = definition
+    def initialize
+      @sources = Gem.sources.map { |s| Source::Rubygems.new(:uri => s) }
+      @dependencies = []
       @git = nil
       @git_sources = {}
     end
@@ -18,7 +19,7 @@ module Bubble
       options = Hash === args.last ? args.pop : {}
       version = args.last || ">= 0"
 
-      @definition.dependencies << Dependency.new(name, version, options)
+      @dependencies << Dependency.new(name, version, options)
     end
 
     def source(source)
@@ -28,7 +29,7 @@ module Bubble
       else source
       end
 
-      @definition.sources << source
+      @sources << source
     end
 
     def path(path, options = {})
@@ -37,6 +38,10 @@ module Bubble
 
     def git(uri, options = {})
       source Source::Git.new(options.merge(:uri => uri))
+    end
+
+    def to_definition
+      Definition.new(@dependencies, @sources)
     end
 
   end

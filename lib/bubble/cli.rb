@@ -8,6 +8,10 @@ Gem.configuration
 
 module Bubble
   class CLI < Thor
+    def self.banner(task)
+      task.formatted_usage(self, false)
+    end
+
     desc "init", "Generates a Gemfile into the current working directory"
     def init
       if File.exist?("Gemfile")
@@ -41,6 +45,11 @@ module Bubble
     desc "install", "Install the current environment to the system"
     def install
       Installer.install(Bubble.definition)
+    end
+
+    desc "lock", "Locks a resolve"
+    def lock
+      Bubble.load.lock
     end
 
   private

@@ -4,9 +4,10 @@ require "digest/sha1"
 module Bubble
   module Source
     class Rubygems
-      attr_reader :uri
+      attr_reader :uri, :options
 
       def initialize(options = {})
+        @options = options
         @uri = options[:uri]
         @uri = URI.parse(@uri) unless @uri.is_a?(URI)
         raise ArgumentError, "The source must be an absolute URI" unless @uri.absolute?
@@ -52,9 +53,10 @@ module Bubble
     end
 
     class Path
-      attr_reader :path
+      attr_reader :path, :options
 
       def initialize(options)
+        @options = options
         @glob = options[:glob] || "{,*/}*.gemspec"
         @path = options[:path]
       end
@@ -86,9 +88,14 @@ module Bubble
       attr_reader :uri, :ref
 
       def initialize(options)
+        @options = options
         @glob = options[:glob] || "{,*/}*.gemspec"
         @uri  = options[:uri]
         @ref  = options[:ref] || options[:branch] || 'master'
+      end
+
+      def to_yaml(options = {})
+        { :uri => @uri.to_s, :ref => @ref, :glob => @glob }.to_yaml
       end
 
       def path
