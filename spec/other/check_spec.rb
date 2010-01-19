@@ -7,6 +7,7 @@ describe "bbl check" do
 
   it "returns success when the Gemfile is satisfied" do
     install_gemfile <<-G
+      source "file://#{gem_repo1}"
       gem "rails"
     G
 
@@ -16,6 +17,7 @@ describe "bbl check" do
 
   it "shows what is missing with the current Gemfile if it is not satisfied" do
     gemfile <<-G
+      source "file://#{gem_repo1}"
       gem "rails"
     G
 
@@ -24,10 +26,17 @@ describe "bbl check" do
   end
 
   it "provides debug information when there is a resolving problem" do
-    install_gemfile "gem 'rails'"
-    install_gemfile "gem 'rails_fail'"
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem 'rails'
+    G
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem 'rails_fail'
+    G
 
     gemfile <<-G
+      source "file://#{gem_repo1}"
       gem "rails"
       gem "rails_fail"
     G

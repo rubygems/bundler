@@ -7,6 +7,7 @@ describe "bbl install with gem sources" do
 
   it "fetches gems" do
     install_gemfile <<-G
+      source "file://#{gem_repo1}"
       gem 'rack'
     G
 
@@ -15,6 +16,7 @@ describe "bbl install with gem sources" do
 
   it "pulls in dependencies" do
     install_gemfile <<-G
+      source "file://#{gem_repo1}"
       gem "rails"
     G
 
@@ -23,6 +25,7 @@ describe "bbl install with gem sources" do
 
   it "does the right version" do
     install_gemfile <<-G
+      source "file://#{gem_repo1}"
       gem "rack", "0.9.1"
     G
 
@@ -31,6 +34,7 @@ describe "bbl install with gem sources" do
 
   it "resolves correctly" do
     install_gemfile <<-G
+      source "file://#{gem_repo1}"
       gem "activemerchant"
       gem "rails"
     G
@@ -40,10 +44,12 @@ describe "bbl install with gem sources" do
 
   it "activates gem correctly according to the resolved gems" do
     install_gemfile <<-G
+      source "file://#{gem_repo1}"
       gem "activesupport", "2.3.5"
     G
 
     install_gemfile <<-G
+      source "file://#{gem_repo1}"
       gem "activemerchant"
       gem "rails"
     G
@@ -51,11 +57,24 @@ describe "bbl install with gem sources" do
     should_be_installed "activemerchant 1.0", "activesupport 2.3.2", "actionpack 2.3.2"
   end
 
+  it "does not reinstall any gem that is already available locally" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "activesupport"
+    G
+
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "activerecord"
+    G
+  end
+
   describe "when locked" do
 
     it "works" do
       system_gems "rack-1.0.0" do
         gemfile <<-G
+          source "file://#{gem_repo1}"
           gem "rack"
         G
 

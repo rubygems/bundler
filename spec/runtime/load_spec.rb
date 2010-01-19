@@ -9,6 +9,7 @@ describe "Bubble.load" do
 
   it "provides a list of the env dependencies" do
     gemfile <<-G
+      source "file://#{gem_repo1}"
       gem "rack"
     G
 
@@ -19,6 +20,7 @@ describe "Bubble.load" do
   it "provides a list of the resolved gems" do
     pending
     gemfile <<-G
+      source "file://#{gem_repo1}"
       gem "rack"
     G
 
@@ -40,18 +42,19 @@ describe "Bubble.load" do
 
   describe "when locked" do
     before :each do
-      pending
       system_gems "rack-1.0.0", "activesupport-2.3.2", "activerecord-2.3.2", "activerecord-2.3.1"
     end
 
     it "raises an exception if the Gemfile adds a dependency" do
       gemfile <<-G
+        source "file://#{gem_repo1}"
         gem "rack"
       G
 
       bbl :lock
 
       gemfile <<-G
+        source "file://#{gem_repo1}"
         gem "rack"
         gem "activerecord"
       G
@@ -61,6 +64,7 @@ describe "Bubble.load" do
 
     it "raises an exception if the Gemfile removes a dependency" do
       gemfile <<-G
+        source "file://#{gem_repo1}"
         gem "rack"
         gem "activerecord"
       G
@@ -68,6 +72,7 @@ describe "Bubble.load" do
       bbl :lock
 
       gemfile <<-G
+        source "file://#{gem_repo1}"
         gem "rack"
       G
 
@@ -76,6 +81,7 @@ describe "Bubble.load" do
 
     it "raises an exception if the Gemfile changes a dependency in an incompatible way" do
       gemfile <<-G
+        source "file://#{gem_repo1}"
         gem "rack"
         gem "activerecord"
       G
@@ -83,6 +89,7 @@ describe "Bubble.load" do
       bbl :lock
 
       gemfile <<-G
+        source "file://#{gem_repo1}"
         gem "rack"
         gem "activerecord", "2.3.1"
       G
@@ -92,6 +99,7 @@ describe "Bubble.load" do
 
     it "raises an exception if the Gemfile replaces a root with a child dep of the root" do
       gemfile <<-G
+        source "file://#{gem_repo1}"
         gem "rack"
         gem "activerecord"
       G
@@ -99,6 +107,7 @@ describe "Bubble.load" do
       bbl :lock
 
       gemfile <<-G
+        source "file://#{gem_repo1}"
         gem "rack"
         gem "activesupport"
       G
@@ -108,6 +117,7 @@ describe "Bubble.load" do
 
     it "works if the Gemfile changes in a compatible way" do
       gemfile <<-G
+        source "file://#{gem_repo1}"
         gem "rack"
         gem "activerecord", "2.3.2"
       G
@@ -115,6 +125,7 @@ describe "Bubble.load" do
       bbl :lock
 
       gemfile <<-G
+        source "file://#{gem_repo1}"
         gem "rack"
         gem "activerecord", ">= 2.0.0"
       G

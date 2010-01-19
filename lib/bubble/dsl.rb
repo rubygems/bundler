@@ -9,7 +9,7 @@ module Bubble
     end
 
     def initialize
-      @sources = Gem.sources.map { |s| Source::Rubygems.new(:uri => s) }
+      @sources = [] # Gem.sources.map { |s| Source::Rubygems.new(:uri => s) }
       @dependencies = []
       @git = nil
       @git_sources = {}

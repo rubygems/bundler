@@ -7,6 +7,7 @@ describe "bbl lock with gems" do
 
   it "locks the gemfile resolve to the versions available at the time" do
     gemfile <<-G
+      source "file://#{gem_repo1}"
       gem "rack"
     G
 
