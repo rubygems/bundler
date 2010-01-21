@@ -9,9 +9,17 @@ module Bubble
     end
 
     def setup
+      # Activate the specs
       specs.each do |spec|
         $LOAD_PATH.unshift *spec.load_paths
         Gem.loaded_specs[spec.name] = spec
+      end
+      # Disable rubygems' gem activation system
+      ::Kernel.class_eval do
+        alias require gem_original_require
+        def gem(*)
+          # Silently ignore calls to gem
+        end
       end
       self
     end
