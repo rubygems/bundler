@@ -58,15 +58,45 @@ describe "bbl install with gem sources" do
   end
 
   it "does not reinstall any gem that is already available locally" do
+    pending
+    build_repo2
+    update_repo gem_repo2 do
+      build_gem "activesupport", "2.3.2" do |s|
+        s.write "lib/activesupport.rb", "ACTIVESUPPORT = 'fail'"
+      end
+    end
     install_gemfile <<-G
-      source "file://#{gem_repo1}"
-      gem "activesupport"
+      source "file://#{gem_repo2}"
+      gem "activesupport", "2.3.2"
     G
 
+    run "require 'activesupport' ; STDERR.puts ACTIVESUPPORT"
+
     install_gemfile <<-G
-      source "file://#{gem_repo1}"
-      gem "activerecord"
+      source "file://#{gem_repo2}"
+      gem "activerecord", "2.3.2"
     G
+
+    should_be_installed "activesupport 2.3.2"
+  end
+
+  describe "with extra sources" do
+
+    it "finds gems in multiple sources" do
+      build_repo2
+      update_repo2
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        source "file://#{gem_repo2}"
+
+        gem "activesupport", "1.2.3"
+        gem "rack", "1.2"
+      G
+
+      should_be_installed "rack 1.2", "activesupport 1.2.3"
+    end
+
   end
 
   describe "when locked" do

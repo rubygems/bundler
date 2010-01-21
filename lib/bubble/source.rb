@@ -18,12 +18,18 @@ module Bubble
       end
 
       def local_specs
-        Index.from_installed_gems
+        @local_specs ||= Index.from_installed_gems
       end
 
       def install(spec)
-        inst = Gem::DependencyInstaller.new(:ignore_dependencies => true)
-        inst.install spec.name, spec.version
+        destination = Gem.dir
+
+        gem_path  = Gem::RemoteFetcher.fetcher.download(spec, uri, destination)
+        installer = Gem::Installer.new gem_path,
+          :install_dir => Gem.dir,
+          :ignore_dependencies => true
+
+        installer.install
       end
 
     private

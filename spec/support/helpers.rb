@@ -81,6 +81,14 @@ module Spec
 
     alias install_gem install_gems
 
+    def with_gem_path_as(path)
+      gem_home, gem_path = ENV['GEM_HOME'], ENV['GEM_PATH']
+      ENV['GEM_HOME'], ENV['GEM_PATH'] = path.to_s, path.to_s
+      yield
+    ensure
+      ENV['GEM_HOME'], ENV['GEM_PATH'] = gem_home, gem_path
+    end
+
     def system_gems(*gems)
       FileUtils.rm_rf(system_gem_path)
       FileUtils.mkdir_p(system_gem_path)

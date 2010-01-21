@@ -117,7 +117,9 @@ module Spec
       @_build_path = "#{path}/gems"
       yield
       @_build_path = nil
-      Dir.chdir(path) { gem_command :generate_index }
+      with_gem_path_as Path.base_system_gems do
+        Dir.chdir(path) { gem_command :generate_index }
+      end
     end
 
     def build_index(&block)
