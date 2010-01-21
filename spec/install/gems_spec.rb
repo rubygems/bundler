@@ -58,19 +58,18 @@ describe "bbl install with gem sources" do
   end
 
   it "does not reinstall any gem that is already available locally" do
-    pending
     build_repo2
-    update_repo gem_repo2 do
-      build_gem "activesupport", "2.3.2" do |s|
-        s.write "lib/activesupport.rb", "ACTIVESUPPORT = 'fail'"
-      end
-    end
+
     install_gemfile <<-G
       source "file://#{gem_repo2}"
       gem "activesupport", "2.3.2"
     G
 
-    run "require 'activesupport' ; STDERR.puts ACTIVESUPPORT"
+    update_repo gem_repo2 do
+      build_gem "activesupport", "2.3.2" do |s|
+        s.write "lib/activesupport.rb", "ACTIVESUPPORT = 'fail'"
+      end
+    end
 
     install_gemfile <<-G
       source "file://#{gem_repo2}"

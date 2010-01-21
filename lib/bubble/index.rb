@@ -21,21 +21,14 @@ module Bubble
       @specs = @specs.dup
     end
 
-    def search(dependency)
-      @cache[dependency.hash] ||= begin
-        specs = @specs[dependency.name]
-
-        wants_prerelease = dependency.version_requirements.prerelease?
-        only_prerelease  = specs.all? {|spec| spec.version.prerelease? }
-        found = specs.select { |spec| dependency =~ spec }
-
-        unless wants_prerelease || only_prerelease
-          found.reject! { |spec| spec.version.prerelease? }
-        end
-
-        found.sort_by {|s| [s.version, s.platform.to_s == 'ruby' ? "\0" : s.platform.to_s] }
+    def search(query)
+      case query
+      when Gem::Specification, RemoteSpecification then search_by_spec(query)
+      else search_by_dependency(query)
       end
     end
+
+    alias [] search
 
     def <<(spec)
       arr = @specs[spec.name]
@@ -63,6 +56,28 @@ module Bubble
 
     def merge(other)
       dup.merge!(other)
+    end
+
+  private
+
+    def search_by_spec(spec)
+      @specs[spec.name].select { |s| s.version == spec.version }
+    end
+
+    def search_by_dependency(dependency)
+      @cache[dependency.hash] ||= begin
+        specs = @specs[dependency.name]
+
+        wants_prerelease = dependency.version_requirements.prerelease?
+        only_prerelease  = specs.all? {|spec| spec.version.prerelease? }
+        found = specs.select { |spec| dependency =~ spec }
+
+        unless wants_prerelease || only_prerelease
+          found.reject! { |spec| spec.version.prerelease? }
+        end
+
+        found.sort_by {|s| [s.version, s.platform.to_s == 'ruby' ? "\0" : s.platform.to_s] }
+      end
     end
 
   end

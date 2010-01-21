@@ -22,6 +22,8 @@ module Bubble
       end
 
       def install(spec)
+        return if local_specs[spec].any?
+
         destination = Gem.dir
 
         gem_path  = Gem::RemoteFetcher.fetcher.download(spec, uri, destination)
