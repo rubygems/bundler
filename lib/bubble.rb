@@ -21,16 +21,17 @@ module Bubble
   class VersionConflict < StandardError; end
   class GemfileError    < StandardError; end
 
-  def self.setup(gemfile = nil)
+  def self.setup(gemfile = default_gemfile)
     load(gemfile).setup
   end
 
-  def self.load(gemfile = nil)
-    Environment.new definition(gemfile)
+  def self.load(gemfile = default_gemfile)
+    root = Pathname.new(gemfile).dirname
+    Environment.new root, definition(gemfile)
   end
 
-  def self.definition(gemfile = nil)
-    lockfile = Pathname.new(gemfile || Definition.default_gemfile).dirname.join('omg.yml')
+  def self.definition(gemfile = default_gemfile)
+    lockfile = Pathname.new(gemfile || default_gemfile).dirname.join('omg.yml')
     if lockfile.exist?
       Definition.from_lock(lockfile)
     else
@@ -49,4 +50,19 @@ module Bubble
   def self.cache
     home.join("cache")
   end
+
+private
+
+  def self.default_gemfile
+    current = Pathname.new(Dir.pwd)
+
+    until current.root?
+      filename = current.join("Gemfile")
+      return filename if filename.exist?
+      current = current.parent
+    end
+
+    raise GemfileNotFound, "The default Gemfile was not found"
+  end
+
 end

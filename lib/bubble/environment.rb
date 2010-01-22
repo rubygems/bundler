@@ -1,6 +1,9 @@
 module Bubble
   class Environment
-    def initialize(definition)
+    attr_reader :root
+
+    def initialize(root, definition)
+      @root = root
       @definition = definition
     end
 
@@ -10,9 +13,9 @@ module Bubble
 
       # Activate the specs
       specs.each do |spec|
-        $LOAD_PATH.unshift *spec.load_paths
         Gem.loaded_specs[spec.name] = spec
       end
+      $LOAD_PATH.unshift *load_paths
       self
     end
 
@@ -21,10 +24,9 @@ module Bubble
     end
 
     def lock
-      yml = details.to_yaml
-      File.open("#{Definition.default_gemfile.dirname}/omg.yml", 'w') do |f|
-        f.puts yml
-      end
+      FileUtils.mkdir_p("#{root}/vendor")
+      write_yml_lock
+      write_rb_lock
     end
 
     def specs
@@ -47,6 +49,10 @@ module Bubble
       @definition.sources
     end
 
+    def load_paths
+      specs.map { |s| s.load_paths }.flatten
+    end
+
     def cripple_rubygems
       # handle 1.9 where system gems are always on the load path
       if defined?(::Gem)
@@ -65,6 +71,21 @@ module Bubble
         def gem(*)
           # Silently ignore calls to gem
         end
+      end
+    end
+
+    def write_rb_lock
+      template = File.read(File.expand_path("../templates/environment.erb", __FILE__))
+      erb = ERB.new(template, nil, '-')
+      File.open("#{root}/vendor/environment.rb", 'w') do |f|
+        f.puts erb.result(binding)
+      end
+    end
+
+    def write_yml_lock
+      yml = details.to_yaml
+      File.open("#{root}/vendor/lock.yml", 'w') do |f|
+        f.puts yml
       end
     end
 
