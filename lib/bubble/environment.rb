@@ -56,10 +56,13 @@ module Bubble
     def cripple_rubygems
       # handle 1.9 where system gems are always on the load path
       if defined?(::Gem)
+        me = File.expand_path("../../", __FILE__)
         $LOAD_PATH.reject! do |p|
           p != File.dirname(__FILE__) &&
             Gem.path.any? { |gp| p.include?(gp) }
         end
+        $LOAD_PATH.unshift me
+        $LOAD_PATH.uniq!
       end
 
       # Disable rubygems' gem activation system

@@ -31,7 +31,8 @@ module Bubble
   end
 
   def self.definition(gemfile = default_gemfile)
-    lockfile = Pathname.new(gemfile || default_gemfile).dirname.join('omg.yml')
+    root = Pathname.new(gemfile).dirname
+    lockfile = root.join("vendor/lock.yml")
     if lockfile.exist?
       Definition.from_lock(lockfile)
     else
