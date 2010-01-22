@@ -39,7 +39,7 @@ module Bubble
   end
 
   def self.home
-    Pathname.new(Gem.user_home).join(".bbl")
+    Pathname.new(Gem.dir).join("bubble")
   end
 
   def self.install_path

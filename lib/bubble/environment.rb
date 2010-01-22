@@ -1,9 +1,5 @@
 module Bubble
   class Environment
-    def self.from_gemfile(gemfile)
-      new Definition.from_gemfile(gemfile)
-    end
-
     def initialize(definition)
       @definition = definition
     end
