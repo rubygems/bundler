@@ -20,5 +20,7 @@ describe "bbl lock with gems" do
     end
   end
 
-  it "includes the ruby version as a dependency of the lock"
+  it "includes the ruby version as a dependency of the lock" do
+    pending
+  end
 end

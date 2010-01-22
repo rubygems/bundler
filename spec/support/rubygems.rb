@@ -3,7 +3,7 @@ module Spec
     def self.setup
       Gem.clear_paths
 
-      ENV['GEM_HOME'] = ENV['GEM_PATH'] = Path.base_system_gems
+      ENV['GEM_HOME'] = ENV['GEM_PATH'] = Path.base_system_gems.to_s
 
       unless File.exist?("#{Path.base_system_gems}")
         FileUtils.mkdir_p(Path.base_system_gems)
@@ -11,7 +11,7 @@ module Spec
         `gem install builder --no-rdoc --no-ri`
       end
 
-      ENV['HOME'] = Path.home
+      ENV['HOME'] = Path.home.to_s
 
       Gem::DefaultUserInteraction.ui = Gem::SilentUI.new
     end

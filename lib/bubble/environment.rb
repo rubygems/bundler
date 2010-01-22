@@ -5,17 +5,13 @@ module Bubble
     end
 
     def setup
+      # Has to happen first
+      cripple_rubygems
+
       # Activate the specs
       specs.each do |spec|
         $LOAD_PATH.unshift *spec.load_paths
         Gem.loaded_specs[spec.name] = spec
-      end
-      # Disable rubygems' gem activation system
-      ::Kernel.class_eval do
-        alias require gem_original_require
-        def gem(*)
-          # Silently ignore calls to gem
-        end
       end
       self
     end
@@ -49,6 +45,27 @@ module Bubble
 
     def sources
       @definition.sources
+    end
+
+    def cripple_rubygems
+      # handle 1.9 where system gems are always on the load path
+      if defined?(::Gem)
+        $LOAD_PATH.reject! do |p|
+          p != File.dirname(__FILE__) &&
+            Gem.path.any? { |gp| p.include?(gp) }
+        end
+      end
+
+      # Disable rubygems' gem activation system
+      ::Kernel.class_eval do
+        if private_method_defined?(:gem_original_require)
+          alias require gem_original_require
+        end
+
+        def gem(*)
+          # Silently ignore calls to gem
+        end
+      end
     end
 
     def details
