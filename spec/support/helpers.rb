@@ -63,17 +63,6 @@ module Spec
       bbl :install
     end
 
-    # def bubble(*args)
-    #   path = bundled_app("Gemfile")
-    #   path = args.shift if Pathname === args.first
-    #   str  = args.shift || ""
-    #   FileUtils.mkdir_p(path.dirname)
-    #   Dir.chdir(path.dirname) do
-    #     gemfile(path, str)
-    #     Bubble.load(path)
-    #   end
-    # end
-
     def install_gems(*gems)
       Dir["#{gem_repo1}/**/*.gem"].each do |path|
         if gems.include?(File.basename(path, ".gem"))
@@ -109,6 +98,10 @@ module Spec
           ENV['GEM_HOME'], ENV['GEM_PATH'] = gem_home, gem_path
         end
       end
+    end
+
+    def revision_for(path)
+      Dir.chdir(path) { `git rev-parse HEAD`.strip }
     end
   end
 end
