@@ -34,12 +34,17 @@ module Gemfile
     end
 
     def index
-      @index ||= begin
-        index = Index.new
-        sources.reverse_each do |source|
-          index.merge! source.local_specs
-        end
-        index
+      @definition.local_index
+    end
+
+    def pack
+      pack_path = "#{root}/vendor/cache/"
+      FileUtils.mkdir_p(pack_path)
+
+      specs.each do |spec|
+        possibilities = Gem.path.map { |p| "#{p}/cache/#{spec.full_name}.gem" }
+        cached_path = possibilities.find { |p| File.exist? p }
+        FileUtils.cp(cached_path, pack_path)
       end
     end
 

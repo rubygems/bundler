@@ -58,14 +58,9 @@ describe "gemfile install with gem sources" do
   end
 
   it "does not reinstall any gem that is already available locally" do
-    build_repo2
+    system_gems "activesupport-2.3.2"
 
-    install_gemfile <<-G
-      source "file://#{gem_repo2}"
-      gem "activesupport", "2.3.2"
-    G
-
-    update_repo gem_repo2 do
+    build_repo2 do
       build_gem "activesupport", "2.3.2" do |s|
         s.write "lib/activesupport.rb", "ACTIVESUPPORT = 'fail'"
       end
@@ -77,6 +72,12 @@ describe "gemfile install with gem sources" do
     G
 
     should_be_installed "activesupport 2.3.2"
+  end
+
+  it "does not hit the remote source if the gemfile can be satisfied locally" do
+    # system_gems "activesupport-2.3.2"
+
+    pending
   end
 
   describe "with extra sources" do

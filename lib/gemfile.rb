@@ -1,3 +1,4 @@
+require 'fileutils'
 require 'pathname'
 require 'yaml'
 require 'gemfile/rubygems'
@@ -50,6 +51,10 @@ module Gemfile
 
   def self.cache
     home.join("cache")
+  end
+
+  def self.root
+    default_gemfile.dirname
   end
 
 private

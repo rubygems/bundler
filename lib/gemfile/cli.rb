@@ -44,12 +44,19 @@ module Gemfile
 
     desc "install", "Install the current environment to the system"
     def install
-      Installer.install(Gemfile.definition)
+      Installer.install(Gemfile.root, Gemfile.definition)
     end
 
     desc "lock", "Locks a resolve"
     def lock
-      Gemfile.load.lock
+      environment = Gemfile.load
+      environment.lock
+    end
+
+    desc "pack", "Packs all the gems to vendor/cache"
+    def pack
+      environment = Gemfile.load
+      environment.pack
     end
 
   private

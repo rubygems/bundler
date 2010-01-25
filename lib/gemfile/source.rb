@@ -1,4 +1,5 @@
 require "rubygems/remote_fetcher"
+require "rubygems/format"
 require "digest/sha1"
 
 module Gemfile
@@ -17,12 +18,8 @@ module Gemfile
         @specs ||= fetch_specs
       end
 
-      def local_specs
-        @local_specs ||= Index.from_installed_gems
-      end
-
       def install(spec)
-        return if local_specs[spec].any?
+        return if Index.from_installed_gems[spec].any?
 
         destination = Gem.dir
 
@@ -60,6 +57,36 @@ module Gemfile
       end
     end
 
+    class GemCache
+      def initialize(options)
+        @path = options[:path]
+      end
+
+      def specs
+        @specs ||= begin
+          index = Index.new
+
+          Dir["#{@path}/*.gem"].each do |gemfile|
+            spec = Gem::Format.from_file_by_path(gemfile).spec
+            spec.source = self
+            index << spec
+          end
+
+          index
+        end
+      end
+
+      def install(spec)
+        destination = Gem.dir
+
+        installer = Gem::Installer.new "#{@path}/#{spec.full_name}.gem",
+          :install_dir => Gem.dir,
+          :ignore_dependencies => true
+
+        installer.install
+      end
+    end
+
     class Path
       attr_reader :path, :options
 
@@ -87,9 +114,6 @@ module Gemfile
       end
 
       alias local_specs specs
-
-      def install(spec)
-      end
     end
 
     class Git < Path

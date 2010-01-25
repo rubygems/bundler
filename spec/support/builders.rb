@@ -95,9 +95,10 @@ module Spec
       end
     end
 
-    def build_repo2
+    def build_repo2(&blk)
       FileUtils.rm_rf gem_repo2
       FileUtils.cp_r gem_repo1, gem_repo2
+      update_repo2(&blk) if block_given?
     end
 
     def update_repo2

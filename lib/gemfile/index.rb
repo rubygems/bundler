@@ -1,7 +1,7 @@
 module Gemfile
   class Index
     def self.from_installed_gems
-      from_gem_index(Gem::SourceIndex.from_installed_gems)
+      @from_installed_gems ||= from_gem_index(Gem::SourceIndex.from_installed_gems)
     end
 
     def self.from_gem_index(gem_index)

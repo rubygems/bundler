@@ -26,6 +26,17 @@ module Gemfile
       @sources = sources
     end
 
+    def local_index
+      @local_index ||= begin
+        index = Index.from_installed_gems
+
+        sources.reverse_each do |source|
+          index.merge! source.local_specs  if source.respond_to?(:local_specs)
+        end
+        index
+      end
+    end
+
     # def equivalent?(other)
     #   self.matches?(other) && other.matches?(self)
     #   # other.matches?(self)

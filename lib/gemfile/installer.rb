@@ -2,17 +2,21 @@ require 'rubygems/dependency_installer'
 
 module Gemfile
   class Installer
-    def self.install(definition)
-      new(definition).run
+    def self.install(root, definition)
+      new(root, definition).run
     end
 
-    def initialize(definition)
+    attr_reader :root
+
+    def initialize(root, definition)
+      @root = root
       @definition = definition
     end
 
     def run
       specs.each do |spec|
-        spec.source.install spec
+        next unless spec.source.respond_to?(:install)
+        spec.source.install(spec)
       end
     end
 
@@ -35,6 +39,11 @@ module Gemfile
     def index
       @index ||= begin
         index = Index.new
+
+        if File.directory?("#{root}/vendor/cache")
+          index.merge! Source::GemCache.new(:path => "#{root}/vendor/cache").specs
+        end
+
         sources.reverse_each do |source|
           index.merge!(source.specs)
         end

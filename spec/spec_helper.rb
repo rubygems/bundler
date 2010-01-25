@@ -28,7 +28,8 @@ Spec::Runner.configure do |config|
 
   config.before :each do
     reset!
-    system_gems
+    system_gems []
+    in_app_root
   end
 
   config.after :each do
