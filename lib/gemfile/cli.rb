@@ -1,12 +1,12 @@
 $:.unshift File.expand_path('../vendor', __FILE__)
 require 'thor'
-require 'bubble'
+require 'gemfile'
 require 'rubygems/config_file'
 
 # Work around a RubyGems bug
 Gem.configuration
 
-module Bubble
+module Gemfile
   class CLI < Thor
     def self.banner(task)
       task.formatted_usage(self, false)
@@ -25,7 +25,7 @@ module Bubble
     desc "check", "Checks if the dependencies listed in Gemfile are satisfied by currently installed gems"
     def check
       with_rescue do
-        env = Bubble.load
+        env = Gemfile.load
         # Check top level dependencies
         missing = env.dependencies.select { |d| env.index.search(d).empty? }
         if missing.any?
@@ -44,12 +44,12 @@ module Bubble
 
     desc "install", "Install the current environment to the system"
     def install
-      Installer.install(Bubble.definition)
+      Installer.install(Gemfile.definition)
     end
 
     desc "lock", "Locks a resolve"
     def lock
-      Bubble.load.lock
+      Gemfile.load.lock
     end
 
   private

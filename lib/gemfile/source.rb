@@ -1,7 +1,7 @@
 require "rubygems/remote_fetcher"
 require "digest/sha1"
 
-module Bubble
+module Gemfile
   module Source
     class Rubygems
       attr_reader :uri, :options
@@ -107,7 +107,7 @@ module Bubble
       end
 
       def path
-        Bubble.install_path.join("#{base_name}-#{uri_hash}-#{ref}")
+        Gemfile.install_path.join("#{base_name}-#{uri_hash}-#{ref}")
       end
 
       def specs
@@ -164,7 +164,7 @@ module Bubble
       end
 
       def cache_path
-        @cache_path ||= Bubble.cache.join("git", "#{base_name}-#{uri_hash}")
+        @cache_path ||= Gemfile.cache.join("git", "#{base_name}-#{uri_hash}")
       end
 
       def cache

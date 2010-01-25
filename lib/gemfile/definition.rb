@@ -1,4 +1,4 @@
-module Bubble
+module Gemfile
   class Definition
     def self.from_gemfile(gemfile)
       gemfile = Pathname.new(gemfile).expand_path
@@ -45,7 +45,7 @@ module Bubble
       def sources
         @sources ||= @details["sources"].map do |args|
           name, options = args.to_a.flatten
-          Bubble::Source.const_get(name).new(options)
+          Gemfile::Source.const_get(name).new(options)
         end
       end
 

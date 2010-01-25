@@ -1,6 +1,6 @@
 require File.expand_path('../../spec_helper', __FILE__)
 
-describe "bbl install with git sources" do
+describe "gemfile install with git sources" do
   before :each do
     in_app_root
   end

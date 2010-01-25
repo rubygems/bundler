@@ -1,6 +1,6 @@
 require File.expand_path('../../spec_helper', __FILE__)
 
-describe "bbl lock with git" do
+describe "gemfile lock with git" do
   it "locks a git source to the current ref" do
     in_app_root
 

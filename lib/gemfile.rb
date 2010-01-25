@@ -1,20 +1,20 @@
 require 'pathname'
 require 'yaml'
-require 'bubble/rubygems'
+require 'gemfile/rubygems'
 
-module Bubble
+module Gemfile
   VERSION = "0.9.0.pre"
 
-  autoload :Definition,          'bubble/definition'
-  autoload :Dependency,          'bubble/dependency'
-  autoload :Dsl,                 'bubble/dsl'
-  autoload :Environment,         'bubble/environment'
-  autoload :Index,               'bubble/index'
-  autoload :Installer,           'bubble/installer'
-  autoload :RemoteSpecification, 'bubble/remote_specification'
-  autoload :Resolver,            'bubble/resolver'
-  autoload :Source,              'bubble/source'
-  autoload :Specification,       'bubble/specification'
+  autoload :Definition,          'gemfile/definition'
+  autoload :Dependency,          'gemfile/dependency'
+  autoload :Dsl,                 'gemfile/dsl'
+  autoload :Environment,         'gemfile/environment'
+  autoload :Index,               'gemfile/index'
+  autoload :Installer,           'gemfile/installer'
+  autoload :RemoteSpecification, 'gemfile/remote_specification'
+  autoload :Resolver,            'gemfile/resolver'
+  autoload :Source,              'gemfile/source'
+  autoload :Specification,       'gemfile/specification'
 
   class GemfileNotFound < StandardError; end
   class GemNotFound     < StandardError; end
@@ -41,7 +41,7 @@ module Bubble
   end
 
   def self.home
-    Pathname.new(Gem.dir).join("bubble")
+    Pathname.new(Gem.dir).join("gemfile")
   end
 
   def self.install_path

@@ -1,6 +1,6 @@
 require File.expand_path('../../spec_helper', __FILE__)
 
-describe "Bubble.load" do
+describe "Gemfile.load" do
 
   before :each do
     in_app_root
@@ -13,7 +13,7 @@ describe "Bubble.load" do
       gem "rack"
     G
 
-    env = Bubble.load
+    env = Gemfile.load
     env.dependencies.should have_dep("rack", ">= 0")
   end
 
@@ -24,20 +24,20 @@ describe "Bubble.load" do
       gem "rack"
     G
 
-    env = Bubble.load
+    env = Gemfile.load
     env.gems.should have_gem("rack-1.0.0")
   end
 
   it "raises an exception if the default gemfile is not found" do
     lambda {
-      Bubble.load
-    }.should raise_error(Bubble::GemfileNotFound, /default/)
+      Gemfile.load
+    }.should raise_error(Gemfile::GemfileNotFound, /default/)
   end
 
   it "raises an exception if a specified gemfile is not found" do
     lambda {
-      Bubble.load("omg.rb")
-    }.should raise_error(Bubble::GemfileNotFound, /omg\.rb/)
+      Gemfile.load("omg.rb")
+    }.should raise_error(Gemfile::GemfileNotFound, /omg\.rb/)
   end
 
   describe "when locked" do
@@ -60,7 +60,7 @@ describe "Bubble.load" do
         gem "activerecord"
       G
 
-      lambda { Bubble.load }.should raise_error(Bubble::GemfileError)
+      lambda { Gemfile.load }.should raise_error(Gemfile::GemfileError)
     end
 
     it "raises an exception if the Gemfile removes a dependency" do
@@ -77,7 +77,7 @@ describe "Bubble.load" do
         gem "rack"
       G
 
-      lambda { Bubble.load }.should raise_error(Bubble::GemfileError)
+      lambda { Gemfile.load }.should raise_error(Gemfile::GemfileError)
     end
 
     it "raises an exception if the Gemfile changes a dependency in an incompatible way" do
@@ -95,7 +95,7 @@ describe "Bubble.load" do
         gem "activerecord", "2.3.1"
       G
 
-      lambda { Bubble.load }.should raise_error(Bubble::GemfileError)
+      lambda { Gemfile.load }.should raise_error(Gemfile::GemfileError)
     end
 
     it "raises an exception if the Gemfile replaces a root with a child dep of the root" do
@@ -113,7 +113,7 @@ describe "Bubble.load" do
         gem "activesupport"
       G
 
-      lambda { Bubble.load }.should raise_error(Bubble::GemfileError)
+      lambda { Gemfile.load }.should raise_error(Gemfile::GemfileError)
     end
 
     it "works if the Gemfile changes in a compatible way" do
@@ -131,7 +131,7 @@ describe "Bubble.load" do
         gem "activerecord", ">= 2.0.0"
       G
 
-      lambda { Bubble.load }.should_not raise_error(Bubble::GemfileError)
+      lambda { Gemfile.load }.should_not raise_error(Gemfile::GemfileError)
     end
   end
 end

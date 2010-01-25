@@ -1,4 +1,4 @@
-module Bubble
+module Gemfile
   class Index
     def self.from_installed_gems
       from_gem_index(Gem::SourceIndex.from_installed_gems)

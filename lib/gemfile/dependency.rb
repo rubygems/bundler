@@ -1,6 +1,6 @@
 require 'rubygems/dependency'
 
-module Bubble
+module Gemfile
   class Dependency < Gem::Dependency
     attr_accessor :source
 

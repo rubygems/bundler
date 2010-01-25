@@ -1,6 +1,6 @@
 require File.expand_path('../../spec_helper', __FILE__)
 
-describe "bbl lock with gems" do
+describe "gemfile lock with gems" do
   before :each do
     in_app_root
     system_gems "rack-0.9.1"

@@ -19,7 +19,7 @@ module Gem
   end
 end
 
-module Bubble
+module Gemfile
   class Resolver
 
     attr_reader :errors

@@ -1,6 +1,6 @@
 require 'rubygems/dependency_installer'
 
-module Bubble
+module Gemfile
   class Installer
     def self.install(definition)
       new(definition).run

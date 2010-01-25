@@ -1,3 +1,0 @@
-require 'bubble/cli'
-
-Bubble::CLI.start

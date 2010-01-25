@@ -1,4 +1,4 @@
-module Bubble
+module Gemfile
   class Specification < Gem::Specification
     attr_accessor :relative_loaded_from
 

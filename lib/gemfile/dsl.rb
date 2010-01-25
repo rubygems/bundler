@@ -1,4 +1,4 @@
-module Bubble
+module Gemfile
   class DslError < StandardError; end
 
   class Dsl

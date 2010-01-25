@@ -28,7 +28,7 @@ module Spec
     end
 
     def run(cmd)
-      setup = "require 'rubygems' ; require 'bubble' ; Bubble.setup\n"
+      setup = "require 'rubygems' ; require 'gemfile' ; Gemfile.setup\n"
       @out = ruby(setup + cmd)
     end
 
@@ -37,8 +37,8 @@ module Spec
     end
 
     def bbl(cmd)
-      bbl = File.expand_path('../../../bin/bbl', __FILE__)
-      @out = %x{#{Gem.ruby} -I#{lib} #{bbl} #{cmd}}.strip
+      gemfile = File.expand_path('../../../bin/gemfile', __FILE__)
+      @out = %x{#{Gem.ruby} -I#{lib} #{gemfile} #{cmd}}.strip
     end
 
     def ruby(opts, ruby = nil)

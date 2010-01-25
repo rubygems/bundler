@@ -1,4 +1,4 @@
-module Bubble
+module Gemfile
   class Environment
     attr_reader :root
 
