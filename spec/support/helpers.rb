@@ -14,8 +14,11 @@ module Spec
     attr_reader :out
 
     def in_app_root(&blk)
-      FileUtils.mkdir_p(bundled_app)
       Dir.chdir(bundled_app, &blk)
+    end
+
+    def in_app_root2(&blk)
+      Dir.chdir(bundled_app2, &blk)
     end
 
     def run_in_context(cmd)
@@ -55,8 +58,8 @@ module Spec
       end
     end
 
-    def install_gemfile(string)
-      gemfile string
+    def install_gemfile(*args)
+      gemfile *args
       bbl :install
     end
 

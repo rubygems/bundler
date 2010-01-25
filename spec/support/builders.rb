@@ -153,6 +153,10 @@ module Spec
       build_with(GitBuilder, name, args, &block)
     end
 
+    def update_git(name, *args, &block)
+      build_with(GitUpdater, name, args, &block)
+    end
+
   private
 
     def build_with(builder, name, args, &blk)
@@ -216,7 +220,6 @@ module Spec
           s.summary = "This is just a fake gem for testing"
         end
         @files = {}
-        @default_files = { "lib/#{name}.rb" => "#{Builders.constantize(name)} = '#{version}'" }
       end
 
       def method_missing(*args, &blk)
@@ -238,7 +241,7 @@ module Spec
         path = options[:path] || _default_path
         @files["#{name}.gemspec"] = @spec.to_ruby unless options[:gemspec] == false
         unless options[:no_default]
-          @files = @default_files.merge(@files)
+          @files = _default_files.merge(@files)
         end
         @files.each do |file, source|
           file = Pathname.new(path).join(file)
@@ -247,6 +250,10 @@ module Spec
         end
         @spec.files = @files.keys
         path
+      end
+
+      def _default_files
+        { "lib/#{name}.rb" => "#{Builders.constantize(name)} = '#{version}'" }
       end
 
       def _default_path
@@ -264,6 +271,22 @@ module Spec
           `git commit -m 'OMG INITIAL COMMIT'`
         end
       end
+    end
+
+    class GitUpdater < LibBuilder
+      def _build(options)
+        path = options[:path] || _default_path
+        Dir.chdir(path) do
+          current_ref = `git rev-parse HEAD`.strip
+          _default_files.each do |path, content|
+            write path, "#{content}\n#{Builders.constantize(name)}_PREV_REF = '#{current_ref}'"
+          end
+          super(options.merge(:path => path))
+          `git add *`
+          `git commit -m "BUMP"`
+        end
+      end
+
     end
 
     class GemBuilder < LibBuilder

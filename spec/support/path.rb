@@ -13,7 +13,17 @@ module Spec
     end
 
     def bundled_app(*path)
-      tmp.join("bundled_app", *path)
+      root = tmp.join("bundled_app")
+      FileUtils.mkdir_p(root)
+      root.join(*path)
+    end
+
+    alias bundled_app1 bundled_app
+
+    def bundled_app2(*path)
+      root = tmp.join("bundled_app2")
+      FileUtils.mkdir_p(root)
+      root.join(*path)
     end
 
     def base_system_gems
