@@ -27,17 +27,19 @@ describe "bbl install with git sources" do
     update_git "foo"
 
     in_app_root2 do
-      install_gemfile <<-G
+      install_gemfile bundled_app2("Gemfile"), <<-G
         git "#{lib_path('foo-1.0')}"
         gem 'foo'
       G
     end
 
-    run <<-RUBY
-      require 'foo'
-      puts "WIN" if defined?(FOO_PREV_REF)
-    RUBY
+    in_app_root do
+      run <<-RUBY
+        require 'foo'
+        puts "WIN" if defined?(FOO_PREV_REF)
+      RUBY
 
-    out.should == "WIN"
+      out.should == "WIN"
+    end
   end
 end

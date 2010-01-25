@@ -275,13 +275,13 @@ module Spec
 
     class GitUpdater < LibBuilder
       def _build(options)
-        path = options[:path] || _default_path
-        Dir.chdir(path) do
+        libpath = options[:path] || _default_path
+        Dir.chdir(libpath) do
           current_ref = `git rev-parse HEAD`.strip
           _default_files.each do |path, content|
             write path, "#{content}\n#{Builders.constantize(name)}_PREV_REF = '#{current_ref}'"
           end
-          super(options.merge(:path => path))
+          super(options.merge(:path => libpath))
           `git add *`
           `git commit -m "BUMP"`
         end

@@ -144,6 +144,7 @@ module Bubble
             unless File.exist?(".git")
               %x(git clone --recursive --no-checkout #{cache_path} #{path})
             end
+            %x(git fetch --quiet)
             %x(git reset --hard #{revision})
             %x(git submodule init)
             %x(git submodule update)
@@ -168,7 +169,7 @@ module Bubble
 
       def cache
         if cache_path.exist?
-          in_cache { `git fetch --quiet #{uri}` }
+          in_cache { `git fetch --quiet #{uri} master:master` }
         else
           FileUtils.mkdir_p(cache_path.dirname)
           `git clone #{uri} #{cache_path} --bare --no-hardlinks`
