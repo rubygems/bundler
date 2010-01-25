@@ -59,7 +59,7 @@ module Spec
     end
 
     def install_gemfile(*args)
-      gemfile *args
+      gemfile(*args)
       bbl :install
     end
 

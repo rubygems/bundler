@@ -102,8 +102,8 @@ module Bubble
         @ref  = options[:ref] || options[:branch] || 'master'
       end
 
-      def to_yaml(options = {})
-        { :uri => @uri.to_s, :ref => @ref, :glob => @glob }.to_yaml
+      def options
+        @options.merge(:ref => revision)
       end
 
       def path

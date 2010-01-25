@@ -15,7 +15,7 @@ module Bubble
       specs.each do |spec|
         Gem.loaded_specs[spec.name] = spec
       end
-      $LOAD_PATH.unshift *load_paths
+      $LOAD_PATH.unshift(*load_paths)
       self
     end
 

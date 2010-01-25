@@ -160,6 +160,7 @@ module Spec
   private
 
     def build_with(builder, name, args, &blk)
+      @_build_path ||= nil
       options  = args.last.is_a?(Hash) ? args.pop : {}
       versions = args.last || "1.0"
 
