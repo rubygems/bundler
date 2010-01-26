@@ -1,4 +1,4 @@
-module Gemfile
+module Bundler
   class Index
     def self.from_installed_gems
       # TODO: Why can't we memoize this? It is being mutated somewhere

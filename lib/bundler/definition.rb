@@ -1,4 +1,4 @@
-module Gemfile
+module Bundler
   class Definition
     def self.from_gemfile(gemfile)
       gemfile = Pathname.new(gemfile).expand_path
@@ -56,7 +56,7 @@ module Gemfile
       def sources
         @sources ||= @details["sources"].map do |args|
           name, options = args.to_a.flatten
-          Gemfile::Source.const_get(name).new(options)
+          Bundler::Source.const_get(name).new(options)
         end
       end
 

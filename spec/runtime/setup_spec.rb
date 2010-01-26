@@ -1,6 +1,6 @@
 require File.expand_path('../../spec_helper', __FILE__)
 
-describe "Gemfile.setup" do
+describe "Bundler.setup" do
 
   before :each do
     in_app_root

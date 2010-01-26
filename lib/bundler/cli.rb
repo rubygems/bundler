@@ -1,12 +1,12 @@
 $:.unshift File.expand_path('../vendor', __FILE__)
 require 'thor'
-require 'gemfile'
+require 'bundler'
 require 'rubygems/config_file'
 
 # Work around a RubyGems bug
 Gem.configuration
 
-module Gemfile
+module Bundler
   class CLI < Thor
     def self.banner(task)
       task.formatted_usage(self, false)
@@ -25,7 +25,7 @@ module Gemfile
     desc "check", "Checks if the dependencies listed in Gemfile are satisfied by currently installed gems"
     def check
       with_rescue do
-        env = Gemfile.load
+        env = Bundler.load
         # Check top level dependencies
         missing = env.dependencies.select { |d| env.index.search(d).empty? }
         if missing.any?
@@ -44,18 +44,18 @@ module Gemfile
 
     desc "install", "Install the current environment to the system"
     def install
-      Installer.install(Gemfile.root, Gemfile.definition)
+      Installer.install(Bundler.root, Bundler.definition)
     end
 
     desc "lock", "Locks a resolve"
     def lock
-      environment = Gemfile.load
+      environment = Bundler.load
       environment.lock
     end
 
     desc "pack", "Packs all the gems to vendor/cache"
     def pack
-      environment = Gemfile.load
+      environment = Bundler.load
       environment.pack
     end
 

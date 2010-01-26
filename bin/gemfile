@@ -1,3 +1,0 @@
-require 'gemfile/cli'
-
-Gemfile::CLI.start

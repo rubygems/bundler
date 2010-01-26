@@ -1,6 +1,6 @@
 require 'rubygems/dependency'
 
-module Gemfile
+module Bundler
   class Dependency < Gem::Dependency
     attr_accessor :source
 

@@ -2,7 +2,7 @@ require "rubygems/remote_fetcher"
 require "rubygems/format"
 require "digest/sha1"
 
-module Gemfile
+module Bundler
   module Source
     class Rubygems
       attr_reader :uri, :options
@@ -131,7 +131,7 @@ module Gemfile
       end
 
       def path
-        Gemfile.install_path.join("#{base_name}-#{uri_hash}-#{ref}")
+        Bundler.install_path.join("#{base_name}-#{uri_hash}-#{ref}")
       end
 
       def specs
@@ -188,7 +188,7 @@ module Gemfile
       end
 
       def cache_path
-        @cache_path ||= Gemfile.cache.join("git", "#{base_name}-#{uri_hash}")
+        @cache_path ||= Bundler.cache.join("git", "#{base_name}-#{uri_hash}")
       end
 
       def cache

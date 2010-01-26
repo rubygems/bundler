@@ -1,6 +1,6 @@
 require 'rubygems/dependency_installer'
 
-module Gemfile
+module Bundler
   class Installer
     def self.install(root, definition)
       new(root, definition).run

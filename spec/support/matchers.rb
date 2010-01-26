@@ -2,7 +2,7 @@ module Spec
   module Matchers
     def have_dep(*args)
       simple_matcher "have dependency" do |given, matcher|
-        dep = Gemfile::Dependency.new(*args)
+        dep = Bundler::Dependency.new(*args)
 
         # given.length == args.length / 2
         given.length == 1 && given.all? { |d| d == dep }

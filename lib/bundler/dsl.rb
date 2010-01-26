@@ -1,4 +1,4 @@
-module Gemfile
+module Bundler
   class DslError < StandardError; end
 
   class Dsl

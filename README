@@ -1,4 +1,4 @@
-gemfile is a replacement for bundler.
+This is a rewrite of bundler to offer more bundling power
 
 It currently lacks output and good exception handling for common cases. This is coming very soon. We wanted to open this so people could take a look at it.
 

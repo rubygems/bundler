@@ -19,7 +19,7 @@ module Gem
   end
 end
 
-module Gemfile
+module Bundler
   class Resolver
 
     attr_reader :errors

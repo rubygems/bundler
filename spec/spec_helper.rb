@@ -3,7 +3,7 @@ $:.unshift File.expand_path('../../lib', __FILE__)
 
 require 'fileutils'
 require 'rubygems'
-require 'gemfile'
+require 'bundler'
 
 Dir["#{File.expand_path('../support', __FILE__)}/*.rb"].each do |file|
   require file

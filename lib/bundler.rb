@@ -1,21 +1,21 @@
 require 'fileutils'
 require 'pathname'
 require 'yaml'
-require 'gemfile/rubygems'
+require 'bundler/rubygems'
 
-module Gemfile
+module Bundler
   VERSION = "0.9.0.pre"
 
-  autoload :Definition,          'gemfile/definition'
-  autoload :Dependency,          'gemfile/dependency'
-  autoload :Dsl,                 'gemfile/dsl'
-  autoload :Environment,         'gemfile/environment'
-  autoload :Index,               'gemfile/index'
-  autoload :Installer,           'gemfile/installer'
-  autoload :RemoteSpecification, 'gemfile/remote_specification'
-  autoload :Resolver,            'gemfile/resolver'
-  autoload :Source,              'gemfile/source'
-  autoload :Specification,       'gemfile/specification'
+  autoload :Definition,          'bundler/definition'
+  autoload :Dependency,          'bundler/dependency'
+  autoload :Dsl,                 'bundler/dsl'
+  autoload :Environment,         'bundler/environment'
+  autoload :Index,               'bundler/index'
+  autoload :Installer,           'bundler/installer'
+  autoload :RemoteSpecification, 'bundler/remote_specification'
+  autoload :Resolver,            'bundler/resolver'
+  autoload :Source,              'bundler/source'
+  autoload :Specification,       'bundler/specification'
 
   class GemfileNotFound < StandardError; end
   class GemNotFound     < StandardError; end

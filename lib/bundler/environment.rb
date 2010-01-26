@@ -1,4 +1,4 @@
-module Gemfile
+module Bundler
   class Environment
     attr_reader :root
 

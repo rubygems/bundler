@@ -1,4 +1,4 @@
-module Gemfile
+module Bundler
   class Specification < Gem::Specification
     attr_accessor :relative_loaded_from
 

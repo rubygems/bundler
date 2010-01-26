@@ -2,22 +2,22 @@ $:.unshift File.expand_path("../lib", __FILE__)
 
 require 'rubygems'
 require 'rubygems/specification'
-require 'gemfile'
+require 'bundler'
 
 spec = Gem::Specification.new do |s|
-  s.name     = "gemfile"
-  s.version  = Gemfile::VERSION
+  s.name     = "bundler"
+  s.version  = Bundler::VERSION
   s.authors  = ["Carl Lerche", "Yehuda Katz"]
   s.email    = ["carlhuda@engineyard.com"]
-  s.homepage = "http://github.com/carlhuda/gemfile"
-  s.summary  = "Gemfiles are fun"
+  s.homepage = "http://github.com/carlhuda/bundler"
+  s.summary  = "Bundles are fun"
 
   s.platform = Gem::Platform::RUBY
 
   s.required_rubygems_version = ">= 1.3.5"
 
   s.files        = Dir.glob("{bin,lib}/**/*") + %w(LICENSE README)
-  s.executables  = ['gemfile']
+  s.executables  = ['bundle']
   s.require_path = 'lib'
 end
 
