@@ -129,4 +129,23 @@ describe "gemfile install with gem sources" do
     end
 
   end
+
+  describe "when packed and locked" do
+    it "does not hit the remote at all" do
+      build_repo2
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "rack"
+      G
+
+      bundle :lock
+      bundle :pack
+
+      system_gems []
+      FileUtils.rm_rf gem_repo2
+
+      bundle :install
+      should_be_installed "rack 1.0.0"
+    end
+  end
 end
