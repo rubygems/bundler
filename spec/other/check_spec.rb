@@ -25,6 +25,17 @@ describe "bundle check" do
     out.should =~ /rails \(>= 0, runtime\)/
   end
 
+  it "shows missing child dependencies" do
+    system_gems "missing_dep-1.0"
+    gemfile <<-G
+      gem "missing_dep"
+    G
+
+    bundle :check
+    out.should include('not_here (>= 0, runtime) not found in any of the sources')
+    out.should include('required by missing_dep (>= 0, runtime)')
+  end
+
   it "provides debug information when there is a resolving problem" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"

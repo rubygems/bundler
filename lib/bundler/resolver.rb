@@ -41,9 +41,14 @@ module Bundler
       result = catch(:success) do
         resolver.resolve(requirements, {})
         output = resolver.errors.inject("") do |o, (conflict, (origin, requirement))|
-          o << "  Conflict on: #{conflict.inspect}:\n"
-          o << "    * #{conflict} (#{origin.version}) activated by #{origin.required_by.first}\n"
-          o << "    * #{requirement} required by #{requirement.required_by.first}\n"
+          if origin
+            o << "  Conflict on: #{conflict.inspect}:\n"
+            o << "    * #{conflict} (#{origin.version}) activated by #{origin.required_by.first}\n"
+            o << "    * #{requirement} required by #{requirement.required_by.first}\n"
+          else
+            o << "  #{requirement} not found in any of the sources\n"
+            o << "      required by #{requirement.required_by.first}\n"
+          end
           o << "    All possible versions of origin requirements conflict."
         end
         raise VersionConflict, "No compatible versions could be found for required dependencies:\n  #{output}"
@@ -146,6 +151,8 @@ module Bundler
           if current.required_by.empty?
             location = "any of the sources"
             raise GemNotFound, "Could not find gem '#{current}' in #{location}"
+          else
+            @errors[current.name] = [nil, current]
           end
         end
 
