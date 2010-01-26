@@ -119,11 +119,11 @@ describe "gemfile install with gem sources" do
           gem "rack"
         G
 
-        bbl :lock
+        bundle :lock
       end
 
       system_gems [] do
-        bbl :install
+        bundle :install
         should_be_installed "rack 1.0.0"
       end
     end

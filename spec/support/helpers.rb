@@ -36,7 +36,7 @@ module Spec
       File.expand_path('../../../lib', __FILE__)
     end
 
-    def bbl(cmd)
+    def bundle(cmd)
       gemfile = File.expand_path('../../../bin/bundle', __FILE__)
       @out = %x{#{Gem.ruby} -I#{lib} #{gemfile} #{cmd}}.strip
     end
@@ -60,7 +60,7 @@ module Spec
 
     def install_gemfile(*args)
       gemfile(*args)
-      bbl :install
+      bundle :install
     end
 
     def install_gems(*gems)

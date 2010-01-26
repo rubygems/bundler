@@ -1,6 +1,6 @@
 require File.expand_path('../../spec_helper', __FILE__)
 
-describe "bbl check" do
+describe "bundle check" do
   before :each do
     in_app_root
   end
@@ -11,7 +11,7 @@ describe "bbl check" do
       gem "rails"
     G
 
-    bbl :check
+    bundle :check
     out.should == "The Gemfile's dependencies are satisfied"
   end
 
@@ -21,7 +21,7 @@ describe "bbl check" do
       gem "rails"
     G
 
-    bbl :check
+    bundle :check
     out.should =~ /rails \(>= 0, runtime\)/
   end
 
@@ -41,12 +41,12 @@ describe "bbl check" do
       gem "rails_fail"
     G
 
-    bbl :check
+    bundle :check
     out.should include('Conflict on: "activesupport"')
   end
 
   it "outputs an error when the default Gemspec is not found" do
-    bbl :check
+    bundle :check
     out.should == "The default Gemfile was not found"
   end
 end

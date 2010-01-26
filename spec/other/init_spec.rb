@@ -6,7 +6,7 @@ describe "gemfile init" do
   end
 
   it "generates a Gemfile" do
-    bbl :init
+    bundle :init
     bundled_app("Gemfile").should exist
   end
 
@@ -16,7 +16,7 @@ describe "gemfile init" do
     G
 
     lambda {
-      bbl :init
+      bundle :init
     }.should_not change { File.read(bundled_app("Gemfile")) }
   end
 end

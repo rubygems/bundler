@@ -11,7 +11,7 @@ describe "gemfile lock with gems" do
   end
 
   it "locks the gemfile resolve to the versions available at the time" do
-    bbl :lock
+    bundle :lock
 
     system_gems "rack-1.0.0", "rack-0.9.1" do
       should_be_available "rack 0.9.1"
@@ -24,13 +24,13 @@ describe "gemfile lock with gems" do
 
   it "creates a lock.yml file in ./vendor" do
     bundled_app("vendor/lock.yml").should_not exist
-    bbl :lock
+    bundle :lock
     bundled_app("vendor/lock.yml").should exist
   end
 
   it "creates an environment.rb file in ./vendor" do
     bundled_app("vendor/environment.rb").should_not exist
-    bbl :lock
+    bundle :lock
     bundled_app("vendor/lock.yml").should exist
   end
 end

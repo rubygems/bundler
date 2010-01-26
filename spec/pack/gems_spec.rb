@@ -8,7 +8,7 @@ describe "gemfile pack with gems" do
       G
 
       system_gems "rack-1.0.0"
-      bbl :pack
+      bundle :pack
     end
 
     it "copies the .gem file to vendor/cache" do
@@ -17,7 +17,7 @@ describe "gemfile pack with gems" do
 
     it "uses the pack as a source when installing gems" do
       system_gems []
-      bbl :install
+      bundle :install
 
       should_be_installed("rack 1.0.0")
     end
@@ -34,10 +34,10 @@ describe "gemfile pack with gems" do
         gem 'foo'
       G
 
-      bbl :pack
+      bundle :pack
 
       system_gems []
-      bbl :install
+      bundle :install
 
       should_be_installed("rack 1.0.0", "foo 1.0")
     end

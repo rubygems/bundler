@@ -11,9 +11,9 @@ describe "gemfile lock with git" do
       gem 'foo'
     G
 
-    bbl :lock
+    bundle :lock
     update_git "foo"
-    bbl :install
+    bundle :install
 
     run <<-RUBY
       require 'foo'

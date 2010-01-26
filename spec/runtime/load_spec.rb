@@ -52,7 +52,7 @@ describe "Bundler.load" do
         gem "rack"
       G
 
-      bbl :lock
+      bundle :lock
 
       gemfile <<-G
         source "file://#{gem_repo1}"
@@ -70,7 +70,7 @@ describe "Bundler.load" do
         gem "activerecord"
       G
 
-      bbl :lock
+      bundle :lock
 
       gemfile <<-G
         source "file://#{gem_repo1}"
@@ -87,7 +87,7 @@ describe "Bundler.load" do
         gem "activerecord"
       G
 
-      bbl :lock
+      bundle :lock
 
       gemfile <<-G
         source "file://#{gem_repo1}"
@@ -105,7 +105,7 @@ describe "Bundler.load" do
         gem "activerecord"
       G
 
-      bbl :lock
+      bundle :lock
 
       gemfile <<-G
         source "file://#{gem_repo1}"
@@ -123,7 +123,7 @@ describe "Bundler.load" do
         gem "activerecord", "2.3.2"
       G
 
-      bbl :lock
+      bundle :lock
 
       gemfile <<-G
         source "file://#{gem_repo1}"
