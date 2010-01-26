@@ -1,0 +1,7 @@
+gemfile is a replacement for bundler.
+
+It currently lacks output and good exception handling for common cases. This is coming very soon. We wanted to open this so people could take a look at it.
+
+More soon.
+
+- carlhuda
