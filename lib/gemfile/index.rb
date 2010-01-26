@@ -1,7 +1,8 @@
 module Gemfile
   class Index
     def self.from_installed_gems
-      @from_installed_gems ||= from_gem_index(Gem::SourceIndex.from_installed_gems)
+      # TODO: Why can't we memoize this? It is being mutated somewhere
+      from_gem_index(Gem::SourceIndex.from_installed_gems)
     end
 
     def self.from_gem_index(gem_index)
@@ -24,6 +25,7 @@ module Gemfile
     def search(query)
       case query
       when Gem::Specification, RemoteSpecification then search_by_spec(query)
+      when String then @specs[query]
       else search_by_dependency(query)
       end
     end

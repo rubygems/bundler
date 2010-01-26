@@ -74,6 +74,17 @@ describe "gemfile install with gem sources" do
     should_be_installed "activesupport 2.3.2"
   end
 
+  it "works when the gemfile specifies gems that only exist in the system" do
+    build_gem "foo", :to_system => true
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack"
+      gem "foo"
+    G
+
+    should_be_installed "rack 1.0.0", "foo 1.0.0"
+  end
+
   it "does not hit the remote source if the gemfile can be satisfied locally" do
     # system_gems "activesupport-2.3.2"
 

@@ -30,12 +30,12 @@ module Spec
       tmp.join("gems/base")
     end
 
-    def gem_repo1
-      tmp("gems/remote1")
+    def gem_repo1(*args)
+      tmp("gems/remote1", *args)
     end
 
-    def gem_repo2
-      tmp("gems/remote2")
+    def gem_repo2(*args)
+      tmp("gems/remote2", *args)
     end
 
     def system_gem_path

@@ -42,6 +42,7 @@ module Gemfile
       FileUtils.mkdir_p(pack_path)
 
       specs.each do |spec|
+        next if spec.source && !spec.source.is_a?(Source::Rubygems)
         possibilities = Gem.path.map { |p| "#{p}/cache/#{spec.full_name}.gem" }
         cached_path = possibilities.find { |p| File.exist? p }
         FileUtils.cp(cached_path, pack_path)

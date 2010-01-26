@@ -64,10 +64,12 @@ module Spec
     end
 
     def install_gems(*gems)
-      Dir["#{gem_repo1}/**/*.gem"].each do |path|
-        if gems.include?(File.basename(path, ".gem"))
-          gem_command :install, "--no-rdoc --no-ri --ignore-dependencies #{path}"
-        end
+      gems.each do |g|
+        path = "#{gem_repo1}/gems/#{g}.gem"
+
+        raise "OMG `#{path}` does not exist!" unless File.exist?(path)
+
+        gem_command :install, "--no-rdoc --no-ri --ignore-dependencies #{path}"
       end
     end
 
@@ -82,6 +84,8 @@ module Spec
     end
 
     def system_gems(*gems)
+      gems = gems.flatten
+
       FileUtils.rm_rf(system_gem_path)
       FileUtils.mkdir_p(system_gem_path)
 

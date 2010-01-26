@@ -38,7 +38,7 @@ module Gemfile
 
     def index
       @index ||= begin
-        index = Index.new
+        index = Index.from_installed_gems
 
         if File.directory?("#{root}/vendor/cache")
           index.merge! Source::GemCache.new(:path => "#{root}/vendor/cache").specs
