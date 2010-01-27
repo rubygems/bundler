@@ -19,27 +19,35 @@ module Bundler
       end
 
       def install(spec)
-        return if Index.from_installed_gems[spec].any?
+        if Index.from_installed_gems[spec].any?
+          Bundler.ui.info "* #{spec.name} (#{spec.version}) is already installed... skipping"
+          return
+        end
 
         destination = Gem.dir
 
+        Bundler.ui.info "* Downloading #{spec.name} (#{spec.version})... "
         gem_path  = Gem::RemoteFetcher.fetcher.download(spec, uri, destination)
+        Bundler.ui.info "Installing... "
         installer = Gem::Installer.new gem_path,
           :install_dir => Gem.dir,
           :ignore_dependencies => true
 
         installer.install
+        Bundler.ui.info "Done."
       end
 
     private
 
       def fetch_specs
         index = Index.new
+        Bundler.ui.info "Source: Fetching remote index for `#{uri}`... "
         (main_specs + prerelease_specs).each do |name, version, platform|
           spec = RemoteSpecification.new(name, version, platform, @uri)
           spec.source = self
           index << spec
         end
+        Bundler.ui.info "done."
         index
       end
 

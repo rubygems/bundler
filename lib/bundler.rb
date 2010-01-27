@@ -16,11 +16,20 @@ module Bundler
   autoload :Resolver,            'bundler/resolver'
   autoload :Source,              'bundler/source'
   autoload :Specification,       'bundler/specification'
+  autoload :UI,                  'bundler/ui'
 
   class GemfileNotFound < StandardError; end
   class GemNotFound     < StandardError; end
   class VersionConflict < StandardError; end
   class GemfileError    < StandardError; end
+
+  def self.ui
+    @ui ||= UI.new
+  end
+
+  def self.ui=(ui)
+    @ui = ui
+  end
 
   def self.setup(gemfile = default_gemfile)
     load(gemfile).setup

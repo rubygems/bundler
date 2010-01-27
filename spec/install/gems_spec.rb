@@ -5,6 +5,15 @@ describe "gemfile install with gem sources" do
     in_app_root
   end
 
+  it "prints output and returns if no dependencies are specified" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+    G
+
+    bundle :install
+    out.should =~ /no dependencies/
+  end
+
   it "fetches gems" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"

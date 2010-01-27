@@ -22,6 +22,11 @@ module Bundler
       end
     end
 
+    def initialize(*)
+      super
+      Bundler.ui = UI::Shell.new(shell)
+    end
+
     desc "check", "Checks if the dependencies listed in Gemfile are satisfied by currently installed gems"
     def check
       with_rescue do
