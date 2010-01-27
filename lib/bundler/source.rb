@@ -19,22 +19,22 @@ module Bundler
       end
 
       def install(spec)
+        Bundler.ui.info "* #{spec.name} (#{spec.version})"
         if Index.from_installed_gems[spec].any?
-          Bundler.ui.info "* #{spec.name} (#{spec.version}) is already installed... skipping"
+          Bundler.ui.info "  * already installed... skipping"
           return
         end
 
         destination = Gem.dir
 
-        Bundler.ui.info "* Downloading #{spec.name} (#{spec.version})... "
+        Bundler.ui.info "  * Downloading..."
         gem_path  = Gem::RemoteFetcher.fetcher.download(spec, uri, destination)
-        Bundler.ui.info "Installing... "
+        Bundler.ui.info "  * Installing..."
         installer = Gem::Installer.new gem_path,
           :install_dir => Gem.dir,
           :ignore_dependencies => true
 
         installer.install
-        Bundler.ui.info "Done."
       end
 
     private
@@ -201,11 +201,14 @@ module Bundler
 
       def cache
         if cache_path.exist?
+          Bundler.ui.info "Source: Updating `#{uri}`... "
           in_cache { `git fetch --quiet #{uri} master:master` }
         else
+          Bundler.ui.info "Source: Cloning `#{uri}`... "
           FileUtils.mkdir_p(cache_path.dirname)
           `git clone #{uri} #{cache_path} --bare --no-hardlinks`
         end
+        Bundler.ui.info "Done."
       end
 
       def revision

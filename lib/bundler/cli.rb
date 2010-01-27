@@ -25,6 +25,7 @@ module Bundler
     def initialize(*)
       super
       Bundler.ui = UI::Shell.new(shell)
+      Gem::DefaultUserInteraction.ui = UI::RGProxy.new(Bundler.ui)
     end
 
     desc "check", "Checks if the dependencies listed in Gemfile are satisfied by currently installed gems"

@@ -33,5 +33,19 @@ module Bundler
         @shell.say(msg, :error)
       end
     end
+
+    class RGProxy < Gem::SilentUI
+      def initialize(ui)
+        @ui = ui
+      end
+
+      def say(message)
+        if message =~ /native extensions/
+          @ui.info "  * #{message}"
+        else
+          @ui.info(message)
+        end
+      end
+    end
   end
 end
