@@ -94,6 +94,19 @@ describe "gemfile install with gem sources" do
     should_be_installed "rack 1.0.0", "foo 1.0.0"
   end
 
+  it "prioritizes local gems over remote gems" do
+    build_gem 'rack', '1.0.0', :to_system => true do |s|
+      s.add_dependency "activesupport", "2.3.5"
+    end
+
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack"
+    G
+
+    should_be_installed "rack 1.0.0", "activesupport 2.3.5"
+  end
+
   it "does not hit the remote source if the gemfile can be satisfied locally" do
     # system_gems "activesupport-2.3.2"
 

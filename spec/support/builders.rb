@@ -300,7 +300,7 @@ module Spec
           FileUtils.mkdir_p(destination)
           Gem::Builder.new(@spec).build
           if opts[:to_system]
-            `gem install #{@spec.full_name}.gem`
+            `gem install --ignore-dependencies #{@spec.full_name}.gem`
           else
             FileUtils.mv("#{@spec.full_name}.gem", opts[:path] || _default_path)
           end
