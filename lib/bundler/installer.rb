@@ -70,14 +70,10 @@ module Bundler
       @index ||= begin
         index = local_index
 
-        if File.directory?("#{root}/vendor/cache")
-          index = index.merge Source::GemCache.new(:path => "#{root}/vendor/cache").specs
-        end
-
-        sources.reverse_each do |source|
+        sources.each do |source|
           specs = source.specs
           Bundler.ui.info "Source: Processing index... "
-          index = index.merge(specs)
+          index = specs.merge(index)
           Bundler.ui.info "Done."
         end
 
@@ -90,11 +86,15 @@ module Bundler
         index = Index.from_installed_gems
 
         if File.directory?("#{root}/vendor/cache")
-          index = index.merge Source::GemCache.new(:path => "#{root}/vendor/cache").specs
+          index = cache_source.specs.merge(index)
         end
 
         index
       end
+    end
+
+    def cache_source
+      Source::GemCache.new(:path => "#{root}/vendor/cache")
     end
 
   end
