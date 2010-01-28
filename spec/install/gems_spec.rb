@@ -133,7 +133,6 @@ describe "gemfile install with gem sources" do
   end
 
   describe "when locked" do
-
     it "works" do
       system_gems "rack-1.0.0" do
         gemfile <<-G
@@ -168,6 +167,21 @@ describe "gemfile install with gem sources" do
 
       bundle :install
       should_be_installed "rack 1.0.0"
+    end
+  end
+
+  describe "when excluding groups" do
+    it "does not install gems from the excluded group" do
+      install_gemfile <<-G, 'without' => 'emo'
+        source "file://#{gem_repo1}"
+        gem "rack"
+        group :emo do
+          gem "activesupport", "2.3.5"
+        end
+      G
+
+      should_be_installed "rack 1.0.0"
+      should_not_be_installed  "activesupport 2.3.5"
     end
   end
 end

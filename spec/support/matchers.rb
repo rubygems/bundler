@@ -24,5 +24,13 @@ module Spec
     end
 
     alias should_be_available should_be_installed
+
+    def should_not_be_installed(*names)
+      names.each do |name|
+        name, version = name.split(/\s+/)
+        run "require '#{name}'; puts #{Spec::Builders.constantize(name)}"
+        Gem::Version.new(out).should_not == Gem::Version.new(version)
+      end
+    end
   end
 end

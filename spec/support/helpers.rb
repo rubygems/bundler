@@ -36,9 +36,10 @@ module Spec
       File.expand_path('../../../lib', __FILE__)
     end
 
-    def bundle(cmd)
+    def bundle(cmd, options = {})
+      args = options.map { |k,v| " --#{k} #{v}"}.join
       gemfile = File.expand_path('../../../bin/bundle', __FILE__)
-      @out = %x{#{Gem.ruby} -I#{lib} #{gemfile} #{cmd}}.strip
+      @out = %x{#{Gem.ruby} -I#{lib} #{gemfile} #{cmd}#{args}}.strip
     end
 
     def ruby(opts, ruby = nil)
@@ -60,6 +61,7 @@ module Spec
 
     def install_gemfile(*args)
       gemfile(*args)
+      opts = args.last.is_a?(Hash) ? args.last : {}
       bundle :install
     end
 

@@ -2,14 +2,12 @@ require 'rubygems/dependency'
 
 module Bundler
   class Dependency < Gem::Dependency
-    attr_accessor :source
+    attr_accessor :source, :group
 
     def initialize(name, version, options = {}, &blk)
-      options.each do |k, v|
-        options[k.to_s] = v
-      end
-
       super(name, version)
+
+      @group = options[:group]
     end
   end
 end

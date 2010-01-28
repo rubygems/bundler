@@ -13,11 +13,20 @@ module Bundler
       @dependencies = []
       @git = nil
       @git_sources = {}
+      @group = nil
     end
 
     def gem(name, *args)
       options = Hash === args.last ? args.pop : {}
       version = args.last || ">= 0"
+
+      # Normalize the options
+      options.each do |k, v|
+        options[k.to_s] = v
+      end
+
+      # Set defaults
+      options["group"] ||= @group
 
       @dependencies << Dependency.new(name, version, options)
     end
@@ -42,6 +51,13 @@ module Bundler
 
     def to_definition
       Definition.new(@dependencies, @sources)
+    end
+
+    def group(name, options = {}, &blk)
+      old, @group = @group, name
+      yield
+    ensure
+      @group = old
     end
 
   end
