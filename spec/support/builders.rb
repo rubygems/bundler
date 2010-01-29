@@ -72,6 +72,10 @@ module Spec
 
         build_gem "very-simple-prerelease", "1.0.pre"
 
+        build_gem "with_development_dependency" do |s|
+          s.add_development_dependency "activesupport", "= 2.3.5"
+        end
+
         build_gem "very_simple_binary" do |s|
           s.require_paths << 'ext'
           s.extensions << "ext/extconf.rb"

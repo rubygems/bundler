@@ -41,6 +41,16 @@ describe "gemfile install with gem sources" do
     should_be_installed "rack 0.9.1"
   end
 
+  it "does not install the development dependency" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "with_development_dependency"
+    G
+
+    should_be_installed "with_development_dependency 1.0.0"
+    should_not_be_installed "activesupport 2.3.5"
+  end
+
   it "resolves correctly" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
