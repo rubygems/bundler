@@ -49,8 +49,9 @@ module Bundler
     end
 
     desc "install", "Install the current environment to the system"
+    method_option :without, :type => :array, :banner => "Exclude gems thar are part of the specified named group"
     def install
-      Installer.install(Bundler.root, Bundler.definition)
+      Installer.install(Bundler.root, Bundler.definition, options)
     end
 
     desc "lock", "Locks a resolve"

@@ -31,8 +31,9 @@ module Bundler
     @ui = ui
   end
 
-  def self.setup(gemfile = default_gemfile)
-    load(gemfile).setup
+  def self.setup(*groups)
+    gemfile = default_gemfile
+    load(gemfile).setup(*groups)
   end
 
   def self.load(gemfile = default_gemfile)

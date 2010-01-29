@@ -10,5 +10,13 @@ module Gem
     def load_paths
       require_paths.map {|p| File.join(full_gem_path, p) }
     end
+    
+    def groups
+      @groups ||= []
+    end
+  end
+
+  class Dependency
+    attr_accessor :group
   end
 end

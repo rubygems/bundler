@@ -7,15 +7,15 @@ module Bundler
       @definition = definition
     end
 
-    def setup
+    def setup(*groups)
       # Has to happen first
       cripple_rubygems
 
       # Activate the specs
-      specs.each do |spec|
+      specs_for(*groups).each do |spec|
         Gem.loaded_specs[spec.name] = spec
+        $LOAD_PATH.unshift(*spec.load_paths)
       end
-      $LOAD_PATH.unshift(*load_paths)
       self
     end
 
@@ -27,6 +27,11 @@ module Bundler
       FileUtils.mkdir_p("#{root}/vendor")
       write_yml_lock
       write_rb_lock
+    end
+
+    def specs_for(*groups)
+      return specs if groups.empty?
+      specs.select { |s| (s.groups & groups).any? }
     end
 
     def specs

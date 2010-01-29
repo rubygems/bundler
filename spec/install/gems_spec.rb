@@ -171,7 +171,7 @@ describe "gemfile install with gem sources" do
   end
 
   describe "when excluding groups" do
-    it "does not install gems from the excluded group" do
+    before :each do
       install_gemfile <<-G, 'without' => 'emo'
         source "file://#{gem_repo1}"
         gem "rack"
@@ -179,9 +179,24 @@ describe "gemfile install with gem sources" do
           gem "activesupport", "2.3.5"
         end
       G
+    end
 
-      should_be_installed "rack 1.0.0"
-      should_not_be_installed  "activesupport 2.3.5"
+    it "installs gems in the default group" do
+      out = ruby <<-G
+        begin ; require 'rubygems' ; require 'rack' ; puts "WIN" ; end
+      G
+      out.should == "WIN"
+    end
+
+    it "does not install gems from the excluded group" do
+      out = ruby <<-G
+        begin ; require 'rubygems' ; require 'activesupport'
+        rescue LoadError
+          puts "WIN"
+        end
+      G
+
+      out.should == 'WIN'
     end
   end
 end

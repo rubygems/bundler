@@ -62,7 +62,7 @@ module Spec
     def install_gemfile(*args)
       gemfile(*args)
       opts = args.last.is_a?(Hash) ? args.last : {}
-      bundle :install
+      bundle :install, opts
     end
 
     def install_gems(*gems)
