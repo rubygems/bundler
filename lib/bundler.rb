@@ -52,7 +52,7 @@ module Bundler
   end
 
   def self.home
-    Pathname.new(Gem.dir).join("gemfile")
+    Pathname.new(Gem.dir).join("bundler")
   end
 
   def self.install_path

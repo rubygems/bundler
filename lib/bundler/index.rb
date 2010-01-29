@@ -19,7 +19,8 @@ module Bundler
     def initialize_copy(o)
       super
       @cache = {}
-      @specs = @specs.dup
+      @specs = Hash.new { |h,k| h[k] = [] }
+      merge!(o)
     end
 
     def search(query)
@@ -58,6 +59,13 @@ module Bundler
 
     def merge(other)
       dup.merge!(other)
+    end
+
+    def freeze
+      @specs.each do |k,v|
+        v.freeze
+      end
+      super
     end
 
   private

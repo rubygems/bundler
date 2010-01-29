@@ -17,6 +17,6 @@ module Gem
   end
 
   class Dependency
-    attr_accessor :group
+    attr_accessor :source, :group
   end
 end

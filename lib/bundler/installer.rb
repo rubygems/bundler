@@ -19,11 +19,9 @@ module Bundler
         return
       end
 
-      without = options[:without] ? options[:without].map {|w| w.to_sym } : []
-
       specs.each do |spec|
         next unless spec.source.respond_to?(:install)
-        next if (spec.groups & without).any?
+        next if (spec.groups & options[:without]).any?
         spec.source.install(spec)
       end
 
@@ -91,9 +89,8 @@ module Bundler
         index = local_index
 
         sources.each do |source|
-          specs = source.specs
           Bundler.ui.info "Source: Processing index... "
-          index = specs.merge(index)
+          index = source.specs.merge(index).freeze
           Bundler.ui.info "Done."
         end
 
@@ -103,10 +100,10 @@ module Bundler
 
     def local_index
       @local_index ||= begin
-        index = Index.from_installed_gems
+        index = Index.from_installed_gems.freeze
 
         if File.directory?("#{root}/vendor/cache")
-          index = cache_source.specs.merge(index)
+          index = cache_source.specs.merge(index).freeze
         end
 
         index

@@ -11,8 +11,6 @@ module Bundler
     def initialize
       @sources = [] # Gem.sources.map { |s| Source::Rubygems.new(:uri => s) }
       @dependencies = []
-      @git = nil
-      @git_sources = {}
       @group = nil
     end
 
@@ -25,8 +23,12 @@ module Bundler
         options[k.to_s] = v
       end
 
-      # Set defaults
+      # Set options
       options["group"] ||= @group
+
+      if options["git"]
+        options["source"] = git(options["git"])
+      end
 
       @dependencies << Dependency.new(name, version, options)
     end
@@ -39,6 +41,7 @@ module Bundler
       end
 
       @sources << source
+      source
     end
 
     def path(path, options = {})

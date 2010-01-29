@@ -149,7 +149,7 @@ module Bundler
 
         if matching_versions.empty?
           if current.required_by.empty?
-            location = "any of the sources"
+            location = current.source ? current.source.to_s : "any of the sources"
             raise GemNotFound, "Could not find gem '#{current}' in #{location}"
           else
             @errors[current.name] = [nil, current]
@@ -213,8 +213,9 @@ module Bundler
       retval
     end
 
-    def search(dependency)
-      @index.search(dependency)
+    def search(dep)
+      index = dep.source ? dep.source.specs : @index
+      index.search(dep)
     end
   end
 end

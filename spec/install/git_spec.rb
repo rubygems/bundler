@@ -66,4 +66,17 @@ describe "gemfile install with git sources" do
       out.should == "WIN"
     end
   end
+
+  describe "pinning" do
+    it "installs from git even if a newer gem is available elsewhere" do
+      build_git "rack", "0.8"
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :git => "#{lib_path('rack-0.8')}"
+      G
+
+      should_be_installed "rack 0.8"
+    end
+  end
 end

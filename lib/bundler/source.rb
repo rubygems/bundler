@@ -48,7 +48,7 @@ module Bundler
           index << spec
         end
         Bundler.ui.info "done."
-        index
+        index.freeze
       end
 
       def main_specs
@@ -80,7 +80,7 @@ module Bundler
             index << spec
           end
 
-          index
+          index.freeze
         end
       end
 
@@ -117,7 +117,7 @@ module Bundler
               index << spec
             end
           end
-          index
+          index.freeze
         end
       end
 
@@ -140,6 +140,10 @@ module Bundler
 
       def path
         Bundler.install_path.join("#{base_name}-#{uri_hash}-#{ref}")
+      end
+
+      def to_s
+        @uri
       end
 
       def specs
@@ -165,7 +169,7 @@ module Bundler
               end
             end
           end
-          index
+          index.freeze
         end
       end
 
