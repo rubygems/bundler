@@ -31,7 +31,9 @@ module Bundler
 
     def specs_for(*groups)
       return specs if groups.empty?
-      specs.select { |s| (s.groups & groups).any? }
+
+      dependencies = @definition.actual_dependencies.select { |d| groups.include?(d.group) }
+      Resolver.resolve(dependencies, index)
     end
 
     def specs

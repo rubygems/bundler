@@ -170,6 +170,40 @@ describe "gemfile install with gem sources" do
     end
   end
 
+  describe "when specifying groups not excluded" do
+    before :each do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+        group :emo do
+          gem "activesupport", "2.3.5"
+        end
+      G
+    end
+
+    it "installs gems in the default group" do
+      out = ruby <<-G
+        begin ; require 'rubygems' ; require 'rack' ; puts "WIN" ; end
+      G
+      out.should == "WIN"
+    end
+
+    it "installs gems in other groups" do
+      out = ruby <<-G
+        begin ; require 'rubygems' ; require 'activesupport' ; puts "WIN" ; end
+      G
+      out.should == "WIN"
+    end
+
+    it "sets up everything if Bundler.setup is used with no groups" do
+      out = run("require 'rack'; puts RACK")
+      out.should == '1.0.0'
+
+      out = run("require 'activesupport'; puts ACTIVESUPPORT")
+      out.should == '2.3.5'
+    end
+  end
+
   describe "when excluding groups" do
     before :each do
       install_gemfile <<-G, 'without' => 'emo'
@@ -197,6 +231,11 @@ describe "gemfile install with gem sources" do
       G
 
       out.should == 'WIN'
+    end
+
+    it "allows Bundler.setup for specific groups" do
+      out = run("require 'rack'; puts RACK", :default)
+      out.should == '1.0.0'
     end
   end
 end

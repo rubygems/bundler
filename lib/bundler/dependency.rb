@@ -7,7 +7,7 @@ module Bundler
     def initialize(name, version, options = {}, &blk)
       super(name, version)
 
-      @group = options["group"]
+      @group = options["group"] || :default
     end
   end
 end

@@ -27,8 +27,9 @@ module Spec
       @out = ruby "-r #{env}", cmd
     end
 
-    def run(cmd)
-      setup = "require 'rubygems' ; require 'bundler' ; Bundler.setup\n"
+    def run(cmd, *args)
+      groups = args.map {|a| a.inspect }.join(", ")
+      setup = "require 'rubygems' ; require 'bundler' ; Bundler.setup(#{groups})\n"
       @out = ruby(setup + cmd)
     end
 
