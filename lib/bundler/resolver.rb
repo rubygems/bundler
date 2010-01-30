@@ -34,10 +34,8 @@ module Bundler
     # ==== Returns
     # <GemBundle>,nil:: If the list of dependencies can be resolved, a
     #   collection of gemspecs is returned. Otherwise, nil is returned.
-    def self.resolve(requirements, index)
-      source_requirements = {}
-
-      resolver = new(index)
+    def self.resolve(requirements, index, source_requirements = {})
+      resolver = new(index, source_requirements)
       result = catch(:success) do
         resolver.resolve(requirements, {})
         output = resolver.errors.inject("") do |o, (conflict, (origin, requirement))|
@@ -71,10 +69,11 @@ module Bundler
       end
     end
 
-    def initialize(index)
+    def initialize(index, source_requirements)
       @errors = {}
       @stack  = []
       @index  = index
+      @source_requirements = source_requirements
     end
 
     def debug
@@ -214,7 +213,7 @@ module Bundler
     end
 
     def search(dep)
-      index = dep.source ? dep.source.specs : @index
+      index = @source_requirements[dep.name] || @index
       index.search(dep)
     end
   end

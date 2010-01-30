@@ -58,7 +58,11 @@ module Bundler
     def resolve_remotely
       index # trigger building the index
       Bundler.ui.info "Resolving dependencies... "
-      specs = Resolver.resolve(dependencies, index)
+      source_requirements = {}
+      dependencies.each do |dep|
+        source_requirements[dep.name] = dep.source.specs if dep.source
+      end
+      specs = Resolver.resolve(dependencies, index, source_requirements)
       Bundler.ui.info "Done."
       specs
     end
