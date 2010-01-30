@@ -67,7 +67,7 @@ describe "gemfile install with git sources" do
     end
   end
 
-  describe "pinning" do
+  describe "specified inline" do
     it "installs from git even if a newer gem is available elsewhere" do
       build_git "rack", "0.8"
 
@@ -78,5 +78,22 @@ describe "gemfile install with git sources" do
 
       should_be_installed "rack 0.8"
     end
+  end
+
+  it "uses a ref if specified" do
+    build_git "foo"
+    @revision = revision_for(lib_path("foo-1.0"))
+    update_git "foo"
+
+    install_gemfile <<-G
+      gem "foo", :git => "#{lib_path('foo-1.0')}", :ref => "#{@revision}"
+    G
+
+    run <<-RUBY
+      require 'foo'
+      puts "WIN" unless defined?(FOO_PREV_REF)
+    RUBY
+
+    out.should == "WIN"
   end
 end

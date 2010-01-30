@@ -15,22 +15,22 @@ module Bundler
     end
 
     def gem(name, *args)
-      options = Hash === args.last ? args.pop : {}
+      opts = Hash === args.last ? args.pop : {}
       version = args.last || ">= 0"
 
       # Normalize the options
-      options.each do |k, v|
-        options[k.to_s] = v
+      opts.each do |k, v|
+        opts[k.to_s] = v
       end
 
       # Set options
-      options["group"] ||= @group
+      opts["group"] ||= @group
 
-      if options["git"]
-        options["source"] = git(options["git"])
+      if opts["git"]
+        opts["source"] = git(opts["git"], :ref => opts["ref"])
       end
 
-      @dependencies << Dependency.new(name, version, options)
+      @dependencies << Dependency.new(name, version, opts)
     end
 
     def source(source)
