@@ -23,6 +23,10 @@ module Bundler
       merge!(o)
     end
 
+    def empty?
+      @specs.values.flatten.empty?
+    end
+
     def search(query)
       case query
       when Gem::Specification, RemoteSpecification then search_by_spec(query)

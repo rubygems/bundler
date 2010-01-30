@@ -104,19 +104,35 @@ module Bundler
         @path = options[:path]
       end
 
+      def default_spec(*args)
+        return @default_spec if args.empty?
+        name, version = *args
+        @default_spec = Specification.new do |s|
+          s.name     = name
+          s.source   = self
+          s.version  = Gem::Version.new(version)
+          s.relative_loaded_from = "#{name}.gemspec"
+        end
+      end
+
       def local_specs
         @local_specs ||= begin
           index = Index.new
 
-          Dir["#{path}/#{@glob}"].each do |file|
-            file = Pathname.new(file)
-            if spec = eval(File.read(file))
-              spec = Specification.from_gemspec(spec)
-              spec.loaded_from = file
-              spec.source      = self
-              index << spec
+          if File.directory?(path)
+            Dir["#{path}/#{@glob}"].each do |file|
+              file = Pathname.new(file)
+              if spec = eval(File.read(file))
+                spec = Specification.from_gemspec(spec)
+                spec.loaded_from = file
+                spec.source      = self
+                index << spec
+              end
             end
+
+            index << default_spec if default_spec && index.empty?
           end
+
           index.freeze
         end
       end
@@ -170,6 +186,9 @@ module Bundler
               end
             end
           end
+
+          index << default_spec if default_spec && index.empty?
+
           index.freeze
         end
       end

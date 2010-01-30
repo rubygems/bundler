@@ -110,4 +110,14 @@ describe "gemfile install with git sources" do
 
     should_be_installed "foo 1.0"
   end
+
+  it "fakes the gem out if there is no gemspec" do
+    build_git "foo", :gemspec => false
+
+    install_gemfile <<-G
+      gem "foo", "1.0", :git => "#{lib_path('foo-1.0')}"
+    G
+
+    should_be_installed("foo 1.0")
+  end
 end

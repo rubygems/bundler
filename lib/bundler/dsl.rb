@@ -15,22 +15,12 @@ module Bundler
     end
 
     def gem(name, *args)
-      opts = Hash === args.last ? args.pop : {}
+      options = Hash === args.last ? args.pop : {}
       version = args.last || ">= 0"
 
-      # Normalize the options
-      opts.each do |k, v|
-        opts[k.to_s] = v
-      end
+      _normalize_options(name, version, options)
 
-      # Set options
-      opts["group"] ||= @group
-
-      if opts["git"]
-        opts["source"] = git(opts["git"], :ref => opts["ref"])
-      end
-
-      @dependencies << Dependency.new(name, version, opts)
+      @dependencies << Dependency.new(name, version, options)
     end
 
     def source(source)
@@ -61,6 +51,31 @@ module Bundler
       yield
     ensure
       @group = old
+    end
+
+  private
+
+    def _version?(version)
+      version && Gem::Version.new(version) rescue false
+    end
+
+    def _normalize_options(name, version, opts)
+      opts.each do |k, v|
+        opts[k.to_s] = v
+      end
+
+      opts["group"] ||= @group
+
+      _normalize_git_options(name, version, opts)
+    end
+
+    def _normalize_git_options(name, version, opts)
+      # Normalize Git options
+      if opts["git"]
+        source  = git(opts["git"], :ref => opts["ref"])
+        source.default_spec name, version if _version?(version)
+        opts["source"] = source
+      end
     end
 
   end
