@@ -46,8 +46,20 @@ module Bundler
       # Return unless all the dependencies have = version requirements
       return unless dependencies.all? { |d| unambiguous?(d) }
 
+      index = local_index
+      sources.each do |source|
+        next unless source.respond_to?(:local_specs)
+        index = source.local_specs.merge(index)
+      end
+
+      source_requirements = {}
+      dependencies.each do |dep|
+        next unless dep.source && dep.source.respond_to?(:local_specs)
+        source_requirements[dep.name] = dep.source.local_specs
+      end
+
       # Run a resolve against the locally available gems
-      specs = Resolver.resolve(dependencies, local_index)
+      specs = Resolver.resolve(dependencies, local_index, source_requirements)
 
       # Simple logic for now. Can improve later.
       specs.length == dependencies.length && specs
@@ -60,8 +72,10 @@ module Bundler
       Bundler.ui.info "Resolving dependencies... "
       source_requirements = {}
       dependencies.each do |dep|
-        source_requirements[dep.name] = dep.source.specs if dep.source
+        next unless dep.source
+        source_requirements[dep.name] = dep.source.specs
       end
+
       specs = Resolver.resolve(dependencies, index, source_requirements)
       Bundler.ui.info "Done."
       specs

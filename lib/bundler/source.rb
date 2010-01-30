@@ -104,8 +104,8 @@ module Bundler
         @path = options[:path]
       end
 
-      def specs
-        @specs ||= begin
+      def local_specs
+        @local_specs ||= begin
           index = Index.new
 
           Dir["#{path}/#{@glob}"].each do |file|
@@ -121,7 +121,8 @@ module Bundler
         end
       end
 
-      alias local_specs specs
+      alias specs local_specs
+
     end
 
     class Git < Path

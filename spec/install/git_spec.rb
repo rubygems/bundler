@@ -96,4 +96,18 @@ describe "gemfile install with git sources" do
 
     out.should == "WIN"
   end
+
+  it "installs from git even if a rubygems gem is present" do
+    build_gem "foo", "1.0", :path => lib_path('fake_foo'), :to_system => true do |s|
+      s.write "lib/foo.rb", "raise 'FAIL'"
+    end
+
+    build_git "foo", "1.0"
+
+    install_gemfile <<-G
+      gem "foo", "1.0", :git => "#{lib_path('foo-1.0')}"
+    G
+
+    should_be_installed "foo 1.0"
+  end
 end
