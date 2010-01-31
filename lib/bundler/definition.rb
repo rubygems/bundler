@@ -30,9 +30,11 @@ module Bundler
       @local_index ||= begin
         index = Index.from_installed_gems
 
-        sources.reverse_each do |source|
-          index.merge! source.local_specs  if source.respond_to?(:local_specs)
+        sources.each do |source|
+          next unless source.respond_to?(:local_specs)
+          index = source.local_specs.merge(index)
         end
+
         index
       end
     end

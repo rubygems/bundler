@@ -37,7 +37,15 @@ module Bundler
     end
 
     def specs
-      @specs ||= Resolver.resolve(@definition.actual_dependencies, index)
+      @specs ||= begin
+        source_requirements = {}
+        dependencies.each do |dep|
+          next unless dep.source && dep.source.respond_to?(:local_specs)
+          source_requirements[dep.name] = dep.source.local_specs
+        end
+
+        Resolver.resolve(@definition.actual_dependencies, index, source_requirements)
+      end
     end
 
     def index

@@ -107,8 +107,9 @@ module Bundler
         index = local_index
 
         sources.each do |source|
+          i = source.specs
           Bundler.ui.info "Source: Processing index... "
-          index = source.specs.merge(index).freeze
+          index = i.merge(index).freeze
           Bundler.ui.info "Done."
         end
 
