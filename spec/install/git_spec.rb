@@ -80,6 +80,8 @@ describe "gemfile install with git sources" do
     end
 
     it "installs dependencies from git even if a newer gem is available elsewhere" do
+      system_gems "rack-1.0.0"
+
       build_lib "rack", "1.0", :path => lib_path('nested/bar') do |s|
         s.write "lib/rack.rb", "puts 'WIN OVERRIDE'"
       end

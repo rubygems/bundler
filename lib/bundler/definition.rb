@@ -28,14 +28,14 @@ module Bundler
 
     def local_index
       @local_index ||= begin
-        index = Index.from_installed_gems
+        index = Index.new
 
         sources.each do |source|
           next unless source.respond_to?(:local_specs)
           index = source.local_specs.merge(index)
         end
 
-        index
+        Index.from_installed_gems.merge(index)
       end
     end
 
