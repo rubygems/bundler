@@ -28,14 +28,17 @@ module Bundler
 
     def configure
       @configured ||= begin
-        self.bundle_path = Pathname.new(ENV['BUNDLE_PATH'] || Gem.dir)
-        point_gem_home(ENV['BUNDLE_PATH'])
+        point_gem_home(env[:bundle_path])
         true
       end
     end
 
     def ui
       @ui ||= UI.new
+    end
+
+    def bundle_path
+      @bundle_path ||= Pathname.new(env[:bundle_path] || Gem.dir)
     end
 
     def setup(*groups)
@@ -87,6 +90,18 @@ module Bundler
       end
 
       raise GemfileNotFound, "The default Gemfile was not found"
+    end
+
+    def env
+      @env ||= begin
+        env    = {}
+        file   = "#{root}/.bundleconfig"
+        config = File.exist?(file) ? YAML.load_file(file) : {}
+        %w(BUNDLE_PATH).each do |key|
+          env[key.downcase.to_sym] = config[key] || ENV[key]
+        end
+        env
+      end
     end
 
     def point_gem_home(path)

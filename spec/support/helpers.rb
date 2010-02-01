@@ -50,6 +50,15 @@ module Spec
       %x{#{Gem.ruby} -I#{lib} #{opts} -e "#{ruby}"}.strip
     end
 
+    def config(config = nil)
+      path = bundled_app('.bundleconfig')
+      return YAML.load_file(path) unless config
+      File.open(path, 'w') do |f|
+        f.puts config.to_yaml
+      end
+      config
+    end
+
     def gemfile(*args)
       path = bundled_app("Gemfile")
       path = args.shift if Pathname === args.first

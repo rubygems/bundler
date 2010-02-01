@@ -187,7 +187,6 @@ describe "gemfile install with gem sources" do
     end
 
     it "installs gems to BUNDLE_PATH from .bundleconfig" do
-      pending
       config "BUNDLE_PATH" => bundled_app("vendor").to_s
 
       bundle :install
