@@ -23,23 +23,23 @@ module Bundler
       @dependencies << Dependency.new(name, version, options)
     end
 
-    def source(source)
+    def source(source, options = {})
       source = case source
       when :gemcutter, :rubygems, :rubyforge then Source::Rubygems.new(:uri => "http://gemcutter.org")
       when String then Source::Rubygems.new(:uri => source)
       else source
       end
 
-      @sources << source
+      options[:prepend] ? @sources.unshift(source) : @sources << source
       source
     end
 
     def path(path, options = {})
-      source Source::Path.new(options.merge(:path => path))
+      source Source::Path.new(options.merge(:path => path)), options
     end
 
     def git(uri, options = {})
-      source Source::Git.new(options.merge(:uri => uri))
+      source Source::Git.new(options.merge(:uri => uri)), options
     end
 
     def to_definition
@@ -66,17 +66,14 @@ module Bundler
 
       opts["group"] ||= @group
 
-      _normalize_git_options(name, version, opts)
-    end
-
-    def _normalize_git_options(name, version, opts)
-      # Normalize Git options
-      if opts["git"]
-        source  = git(opts["git"], :ref => opts["ref"])
-        source.default_spec name, version if _version?(version)
-        opts["source"] = source
+      # Normalize git and path options
+      ["git", "path"].each do |type|
+        if param = opts[type]
+          source = send(type, param, opts.merge(:prepend => true))
+          source.default_spec name, version if _version?(version)
+          opts["source"] = source
+        end
       end
     end
-
   end
 end

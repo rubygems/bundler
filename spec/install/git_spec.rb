@@ -78,6 +78,24 @@ describe "gemfile install with git sources" do
 
       should_be_installed "rack 0.8"
     end
+
+    it "installs dependencies from git even if a newer gem is available elsewhere" do
+      build_lib "rack", "1.0", :path => lib_path('nested/bar') do |s|
+        s.write "lib/rack.rb", "puts 'WIN OVERRIDE'"
+      end
+
+      build_git "foo", :path => lib_path('nested') do |s|
+        s.add_dependency "rack", "= 1.0"
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "foo", :git => "#{lib_path('nested')}"
+      G
+
+      run "require 'rack'"
+      out.should == 'WIN OVERRIDE'
+    end
   end
 
   it "uses a ref if specified" do
