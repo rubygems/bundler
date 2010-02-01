@@ -102,6 +102,7 @@ module Bundler
         @options = options
         @glob = options[:glob] || "{,*/}*.gemspec"
         @path = options[:path]
+        @default_spec = nil
       end
 
       def default_spec(*args)
