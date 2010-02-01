@@ -16,7 +16,7 @@ spec = Gem::Specification.new do |s|
 
   s.required_rubygems_version = ">= 1.3.5"
 
-  s.files        = Dir.glob("{bin,lib}/**/*") + %w(LICENSE README)
+  s.files        = Dir.glob("{bin,lib}/**/*") + %w(LICENSE README.markdown)
   s.executables  = ['bundle']
   s.require_path = 'lib'
 end
