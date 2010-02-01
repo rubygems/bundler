@@ -163,7 +163,38 @@ describe "gemfile install with gem sources" do
         should_be_installed "rack 1.0.0"
       end
     end
+  end
 
+  describe "with BUNDLE_PATH set" do
+    before :each do
+      build_lib "rack", "1.0.0", :to_system => true do |s|
+        s.write "lib/rack.rb", "raise 'FAIL'"
+      end
+
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+    end
+
+    it "installs gems to BUNDLE_PATH" do
+      ENV['BUNDLE_PATH'] = bundled_app('vendor').to_s
+
+      bundle :install
+
+      bundled_app('vendor/gems/rack-1.0.0').should be_directory
+      should_be_installed "rack 1.0.0"
+    end
+
+    it "installs gems to BUNDLE_PATH from .bundleconfig" do
+      pending
+      config "BUNDLE_PATH" => bundled_app("vendor").to_s
+
+      bundle :install
+
+      bundled_app('vendor/gems/rack-1.0.0').should be_directory
+      should_be_installed "rack 1.0.0"
+    end
   end
 
   describe "when packed and locked" do
