@@ -94,8 +94,9 @@ module Spec
 
       Gem.clear_paths
 
-      gem_home, gem_path = ENV['GEM_HOME'], ENV['GEM_PATH']
+      gem_home, gem_path, path = ENV['GEM_HOME'], ENV['GEM_PATH'], ENV['PATH']
       ENV['GEM_HOME'], ENV['GEM_PATH'] = system_gem_path.to_s, system_gem_path.to_s
+      ENV['PATH'] = "#{system_gem_path}/bin:#{ENV['PATH']}"
 
       install_gems(*gems)
       if block_given?
@@ -103,6 +104,7 @@ module Spec
           yield
         ensure
           ENV['GEM_HOME'], ENV['GEM_PATH'] = gem_home, gem_path
+          ENV['PATH'] = path
         end
       end
     end

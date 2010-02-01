@@ -59,4 +59,5 @@ task :gemspec do
   end
 end
 
+task :package => :gemspec
 task :default => [:spec, :gemspec]

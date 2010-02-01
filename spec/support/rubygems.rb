@@ -4,6 +4,7 @@ module Spec
       Gem.clear_paths
 
       ENV['GEM_HOME'] = ENV['GEM_PATH'] = Path.base_system_gems.to_s
+      ENV['PATH'] = "#{Path.system_gem_path}/bin:#{ENV['PATH']}"
 
       unless File.exist?("#{Path.base_system_gems}")
         FileUtils.mkdir_p(Path.base_system_gems)

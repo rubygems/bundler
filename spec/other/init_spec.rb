@@ -1,6 +1,6 @@
 require File.expand_path('../../spec_helper', __FILE__)
 
-describe "gemfile init" do
+describe "bundle init" do
   before :each do
     in_app_root
   end

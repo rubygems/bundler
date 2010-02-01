@@ -3,7 +3,6 @@ require File.expand_path('../../spec_helper', __FILE__)
 describe "Bundler.load" do
 
   before :each do
-    in_app_root
     system_gems "rack-1.0.0"
   end
 

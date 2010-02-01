@@ -8,6 +8,8 @@ Gem.configuration
 
 module Bundler
   class CLI < Thor
+    ARGV = ::ARGV.dup
+
     def self.banner(task)
       task.formatted_usage(self, false)
     end
@@ -71,6 +73,17 @@ module Bundler
     def pack
       environment = Bundler.load
       environment.pack
+    end
+
+    desc "exec", "Run the command in context of the bundle"
+    def exec(*)
+      ARGV.delete('exec')
+      ENV["RUBYOPT"] = %W(
+        -I#{File.expand_path('../..', __FILE__)}
+        -rbundler/setup
+        #{ENV["RUBYOPT"]}
+      ).compact.join(' ')
+      Kernel.exec *ARGV
     end
 
   private
