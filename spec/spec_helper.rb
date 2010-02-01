@@ -20,6 +20,7 @@ Spec::Runner.configure do |config|
   config.include Spec::Matchers
   config.include Spec::Path
   config.include Spec::Rubygems
+  config.include Spec::Platforms
 
   original_wd = Dir.pwd
   original_gem_home = ENV['GEM_HOME']
@@ -35,6 +36,7 @@ Spec::Runner.configure do |config|
   end
 
   config.after :each do
+    Gem.platforms = nil
     Dir.chdir(original_wd)
     ENV['GEM_HOME'] = ENV['GEM_PATH'] = original_gem_home
   end

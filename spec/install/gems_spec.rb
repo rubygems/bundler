@@ -117,10 +117,15 @@ describe "gemfile install with gem sources" do
     should_be_installed "rack 1.0.0", "activesupport 2.3.5"
   end
 
-  it "does not hit the remote source if the gemfile can be satisfied locally" do
-    # system_gems "activesupport-2.3.2"
+  it "installs gems for the correct platform" do
+    Gem.platforms = [rb]
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "platform_specific"
+    G
 
-    pending
+    run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
+    out.should == '1.0.0 RUBY'
   end
 
   describe "with extra sources" do

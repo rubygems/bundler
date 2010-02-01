@@ -43,6 +43,7 @@ module Bundler
         index = Index.new
         Bundler.ui.info "Source: Fetching remote index for `#{uri}`... "
         (main_specs + prerelease_specs).each do |name, version, platform|
+          next unless Gem::Platform.match(platform)
           spec = RemoteSpecification.new(name, version, platform, @uri)
           spec.source = self
           index << spec
