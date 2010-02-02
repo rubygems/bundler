@@ -48,6 +48,8 @@ module Bundler
       end
     end
 
+    alias gems specs
+
     def index
       @definition.local_index
     end

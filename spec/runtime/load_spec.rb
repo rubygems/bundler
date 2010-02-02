@@ -17,7 +17,6 @@ describe "Bundler.load" do
   end
 
   it "provides a list of the resolved gems" do
-    pending
     gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack"
