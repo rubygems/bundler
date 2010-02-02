@@ -23,14 +23,14 @@ describe "gemfile lock with gems" do
   end
 
   it "creates a lock.yml file in ./vendor" do
-    bundled_app("vendor/lock.yml").should_not exist
+    bundled_app("Gemfile.lock").should_not exist
     bundle :lock
-    bundled_app("vendor/lock.yml").should exist
+    bundled_app("Gemfile.lock").should exist
   end
 
   it "creates an environment.rb file in ./vendor" do
     bundled_app("vendor/environment.rb").should_not exist
     bundle :lock
-    bundled_app("vendor/lock.yml").should exist
+    bundled_app("vendor/environment.rb").should exist
   end
 end

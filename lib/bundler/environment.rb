@@ -110,7 +110,7 @@ module Bundler
 
     def write_yml_lock
       yml = details.to_yaml
-      File.open("#{root}/vendor/lock.yml", 'w') do |f|
+      File.open("#{root}/Gemfile.lock", 'w') do |f|
         f.puts yml
       end
     end

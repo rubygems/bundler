@@ -35,7 +35,7 @@ module Bundler
   class GemfileError    < BundlerError; status_code(4)  ; end
 
   class << self
-    attr_accessor :ui, :bundle_path
+    attr_writer :ui, :bundle_path
 
     def configure
       @configured ||= begin
@@ -65,7 +65,7 @@ module Bundler
     def definition(gemfile = default_gemfile)
       configure
       root = Pathname.new(gemfile).dirname
-      lockfile = root.join("vendor/lock.yml")
+      lockfile = root.join("Gemfile.lock")
       if lockfile.exist?
         Definition.from_lock(lockfile)
       else
