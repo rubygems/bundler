@@ -32,22 +32,18 @@ module Bundler
 
     desc "check", "Checks if the dependencies listed in Gemfile are satisfied by currently installed gems"
     def check
-      with_rescue do
-        env = Bundler.load
-        # Check top level dependencies
-        missing = env.dependencies.select { |d| env.index.search(d).empty? }
-        if missing.any?
-          puts "The following dependencies are missing"
-          missing.each do |d|
-            puts "  * #{d}"
-          end
-        else
-          env.specs
-          puts "The Gemfile's dependencies are satisfied"
+      env = Bundler.load
+      # Check top level dependencies
+      missing = env.dependencies.select { |d| env.index.search(d).empty? }
+      if missing.any?
+        puts "The following dependencies are missing"
+        missing.each do |d|
+          puts "  * #{d}"
         end
+      else
+        env.specs
+        puts "The Gemfile's dependencies are satisfied"
       end
-    rescue VersionConflict => e
-      puts e.message
     end
 
     desc "install", "Install the current environment to the system"
@@ -58,9 +54,6 @@ module Bundler
       opts[:without].map! { |g| g.to_sym }
 
       Installer.install(Bundler.root, Bundler.definition, opts)
-    rescue Bundler::GemNotFound => e
-      puts e.message
-      exit 1
     end
 
     desc "lock", "Locks a resolve"
@@ -86,13 +79,5 @@ module Bundler
       Kernel.exec *ARGV
     end
 
-  private
-
-    def with_rescue
-      yield
-    rescue GemfileNotFound => e
-      puts e.message
-      exit 1
-    end
   end
 end

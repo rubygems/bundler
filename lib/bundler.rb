@@ -18,10 +18,21 @@ module Bundler
   autoload :Specification,       'bundler/specification'
   autoload :UI,                  'bundler/ui'
 
-  class GemfileNotFound < StandardError; end
-  class GemNotFound     < StandardError; end
-  class VersionConflict < StandardError; end
-  class GemfileError    < StandardError; end
+  class BundlerError < StandardError
+    def self.status_code(code = nil)
+      return @code unless code
+      @code = code
+    end
+
+    def status_code
+      self.class.status_code
+    end
+  end
+
+  class GemfileNotFound < BundlerError; status_code(10) ; end
+  class GemNotFound     < BundlerError; status_code(7)  ; end
+  class VersionConflict < BundlerError; status_code(6)  ; end
+  class GemfileError    < BundlerError; status_code(4)  ; end
 
   class << self
     attr_accessor :ui, :bundle_path
