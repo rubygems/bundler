@@ -49,7 +49,7 @@ module Bundler
     end
 
     def bundle_path
-      @bundle_path ||= Pathname.new(env[:bundle_path] || Gem.dir)
+      @bundle_path ||= Pathname.new(env[:bundle_path] || Gem.dir).expand_path(root)
     end
 
     def setup(*groups)

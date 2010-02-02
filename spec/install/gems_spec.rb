@@ -194,6 +194,18 @@ describe "gemfile install with gem sources" do
       bundled_app('vendor/gems/rack-1.0.0').should be_directory
       should_be_installed "rack 1.0.0"
     end
+
+    it "installs gems to BUNDLE_PATH relative to root when relative" do
+      ENV['BUNDLE_PATH'] = 'vendor'
+
+      FileUtils.mkdir_p bundled_app('lol')
+      Dir.chdir(bundled_app('lol')) do
+        bundle :install
+      end
+
+      bundled_app('vendor/gems/rack-1.0.0').should be_directory
+      should_be_installed "rack 1.0.0"
+    end
   end
 
   describe "when packed and locked" do
