@@ -62,6 +62,12 @@ module Bundler
       environment.lock
     end
 
+    desc "unlock", "Unlock the bundle. This allows gem versions to be changed"
+    def unlock
+      environment = Bundler.load
+      environment.unlock
+    end
+
     desc "show", "Shows all gems that are part of the bundle."
     def show
       environment = Bundler.load

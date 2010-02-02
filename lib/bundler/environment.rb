@@ -28,7 +28,18 @@ module Bundler
       FileUtils.mkdir_p("#{root}/vendor")
       write_yml_lock
       write_rb_lock
-      Bundler.ui.info("The bundle is locked. Use `bundle show` to list the gems in the environment.")
+      Bundler.ui.info("The bundle is now locked. Use `bundle show` to list the gems in the environment.")
+    end
+
+    def unlock
+      unless locked?
+        Bundler.ui.info("The bundle is not currently locked.")
+        return
+      end
+
+      File.delete("#{root}/vendor/environment.rb")
+      File.delete("#{root}/Gemfile.lock")
+      Bundler.ui.info("The bundle is now unlocked. The dependencies may be changed.")
     end
 
     def locked?
