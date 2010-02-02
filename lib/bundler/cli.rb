@@ -56,10 +56,19 @@ module Bundler
       Installer.install(Bundler.root, Bundler.definition, opts)
     end
 
-    desc "lock", "Locks a resolve"
+    desc "lock", "Locks the bundle to the current set of dependencies, including all child dependencies."
     def lock
       environment = Bundler.load
       environment.lock
+    end
+
+    desc "show", "Shows all gems that are part of the bundle."
+    def show
+      environment = Bundler.load
+      Bundler.ui.info "Gems included by the bundle:"
+      environment.specs.sort_by { |s| s.name }.each do |s|
+        Bundler.ui.info "  * #{s.name} (#{s.version})"
+      end
     end
 
     desc "pack", "Packs all the gems to vendor/cache"

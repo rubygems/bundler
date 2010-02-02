@@ -24,9 +24,15 @@ module Bundler
     end
 
     def lock
+      Bundler.ui.info("The bundle is already locked, relocking.")
       FileUtils.mkdir_p("#{root}/vendor")
       write_yml_lock
       write_rb_lock
+      Bundler.ui.info("The bundle is locked. Use `bundle show` to list the gems in the environment.")
+    end
+
+    def locked?
+      File.exist?("#{root}/Gemfile.lock")
     end
 
     def specs_for(*groups)
