@@ -124,7 +124,9 @@ module Bundler
           if File.directory?(path)
             Dir["#{path}/#{@glob}"].each do |file|
               file = Pathname.new(file)
-              if spec = eval(File.read(file))
+              # Do it in the root of the repo in case they do
+              # assume being in the root
+              if spec = Dir.chdir(path) { eval(File.read(file)) }
                 spec = Specification.from_gemspec(spec)
                 spec.loaded_from = file
                 spec.source      = self
