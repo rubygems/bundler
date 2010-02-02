@@ -186,7 +186,7 @@ describe "gemfile install with gem sources" do
       should_be_installed "rack 1.0.0"
     end
 
-    it "installs gems to BUNDLE_PATH from .bundleconfig" do
+    it "installs gems to BUNDLE_PATH from .bundle/config" do
       config "BUNDLE_PATH" => bundled_app("vendor").to_s
 
       bundle :install
@@ -202,6 +202,13 @@ describe "gemfile install with gem sources" do
       Dir.chdir(bundled_app('lol')) do
         bundle :install
       end
+
+      bundled_app('vendor/gems/rack-1.0.0').should be_directory
+      should_be_installed "rack 1.0.0"
+    end
+
+    it "sets BUNDLE_PATH as the first argument to bundle install" do
+      bundle "install ./vendor"
 
       bundled_app('vendor/gems/rack-1.0.0').should be_directory
       should_be_installed "rack 1.0.0"

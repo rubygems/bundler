@@ -51,8 +51,9 @@ module Spec
     end
 
     def config(config = nil)
-      path = bundled_app('.bundleconfig')
+      path = bundled_app('.bundle/config')
       return YAML.load_file(path) unless config
+      FileUtils.mkdir_p(File.dirname(path))
       File.open(path, 'w') do |f|
         f.puts config.to_yaml
       end

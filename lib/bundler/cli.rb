@@ -48,10 +48,12 @@ module Bundler
 
     desc "install", "Install the current environment to the system"
     method_option :without, :type => :array, :banner => "Exclude gems thar are part of the specified named group"
-    def install
+    def install(path = nil)
       opts = options.dup
       opts[:without] ||= []
       opts[:without].map! { |g| g.to_sym }
+
+      Bundler.settings[:path] = path if path
 
       Installer.install(Bundler.root, Bundler.definition, opts)
     end

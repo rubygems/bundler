@@ -14,6 +14,7 @@ module Bundler
   autoload :Installer,           'bundler/installer'
   autoload :RemoteSpecification, 'bundler/remote_specification'
   autoload :Resolver,            'bundler/resolver'
+  autoload :Settings,            'bundler/settings'
   autoload :Source,              'bundler/source'
   autoload :Specification,       'bundler/specification'
   autoload :UI,                  'bundler/ui'
@@ -39,7 +40,7 @@ module Bundler
 
     def configure
       @configured ||= begin
-        point_gem_home(env[:bundle_path])
+        point_gem_home(settings[:path])
         true
       end
     end
@@ -49,7 +50,7 @@ module Bundler
     end
 
     def bundle_path
-      @bundle_path ||= Pathname.new(env[:bundle_path] || Gem.dir).expand_path(root)
+      @bundle_path ||= Pathname.new(settings[:path] || Gem.dir).expand_path(root)
     end
 
     def setup(*groups)
@@ -89,6 +90,10 @@ module Bundler
       default_gemfile.dirname
     end
 
+    def settings
+      @settings ||= Settings.new(root)
+    end
+
   private
 
     def default_gemfile
@@ -101,18 +106,6 @@ module Bundler
       end
 
       raise GemfileNotFound, "The default Gemfile was not found"
-    end
-
-    def env
-      @env ||= begin
-        env    = {}
-        file   = "#{root}/.bundleconfig"
-        config = File.exist?(file) ? YAML.load_file(file) : {}
-        %w(BUNDLE_PATH).each do |key|
-          env[key.downcase.to_sym] = config[key] || ENV[key]
-        end
-        env
-      end
     end
 
     def point_gem_home(path)
