@@ -19,12 +19,6 @@ module Bundler
       end
 
       def install(spec)
-        Bundler.ui.info "* #{spec.name} (#{spec.version})"
-        if Index.from_installed_gems[spec].any?
-          Bundler.ui.info "  * already installed... skipping"
-          return
-        end
-
         destination = Gem.dir
 
         Bundler.ui.info "  * Downloading..."
@@ -66,6 +60,29 @@ module Bundler
       end
     end
 
+    class SystemGems
+      def specs
+        @specs ||= begin
+          index = Index.new
+
+          Gem::SourceIndex.from_installed_gems.each do |name, spec|
+            spec.source = self
+            index << spec
+          end
+
+          index
+        end
+      end
+
+      def to_s
+        "System gem source"
+      end
+
+      def install(spec)
+        Bundler.ui.info "  * already installed... skipping"
+      end
+    end
+
     class GemCache
       def initialize(options)
         @path = options[:path]
@@ -88,6 +105,7 @@ module Bundler
       def install(spec)
         destination = Gem.dir
 
+        Bundler.ui.info "  * Installing from pack..."
         installer = Gem::Installer.new "#{@path}/#{spec.full_name}.gem",
           :install_dir => Gem.dir,
           :ignore_dependencies => true
@@ -139,6 +157,10 @@ module Bundler
 
           index.freeze
         end
+      end
+
+      def install(spec)
+        Bundler.ui.info "  * Using path `#{path}`..."
       end
 
       alias specs local_specs
@@ -198,7 +220,12 @@ module Bundler
       end
 
       def install(spec)
-        @installed ||= begin
+        Bundler.ui.info "  * Using git `#{uri}`..."
+
+        if @installed
+          Bundler.ui.info "  * Already checked out revision: #{ref}..."
+        else
+          Bundler.ui.info "  * Checking out revision: #{ref}..."
           FileUtils.mkdir_p(path)
           Dir.chdir(path) do
             unless File.exist?(".git")
@@ -209,7 +236,7 @@ module Bundler
             %x(git submodule init)
             %x(git submodule update)
           end
-          true
+          @installed = true
         end
       end
 

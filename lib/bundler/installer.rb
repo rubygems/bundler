@@ -19,9 +19,12 @@ module Bundler
         return
       end
 
-      specs.each do |spec|
-        next unless spec.source.respond_to?(:install)
-        next if (spec.groups & options[:without]).any?
+      specs.sort_by { |s| s.name }.each do |spec|
+        Bundler.ui.info "* #{spec.name} (#{spec.version})"
+        if (spec.groups & options[:without]).any?
+          Bundler.ui.info "  * Not in requested group... skipping."
+          next
+        end
         spec.source.install(spec)
       end
 

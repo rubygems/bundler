@@ -1,14 +1,7 @@
 module Bundler
   class Index
     def self.from_installed_gems
-      # TODO: Why can't we memoize this? It is being mutated somewhere
-      from_gem_index(Gem::SourceIndex.from_installed_gems)
-    end
-
-    def self.from_gem_index(gem_index)
-      index = new
-      gem_index.each { |name, spec| index << spec }
-      index
+      Source::SystemGems.new.specs
     end
 
     def initialize
