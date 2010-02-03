@@ -20,7 +20,7 @@ module Bundler
     end
 
     def dependencies
-      @definition.dependencies
+      @definition.actual_dependencies
     end
 
     def lock
@@ -140,7 +140,13 @@ module Bundler
     def details
       details = {}
       details["sources"] = sources.map { |s| { s.class.name.split("::").last => s.options} }
-      details["specs"] = specs.map { |s| {s.name => s.version.to_s} }
+
+      details["specs"] = specs.map do |s|
+        options = {"version" => s.version.to_s}
+        options["source"] = sources.index(s.source) if sources.include?(s.source)
+        { s.name => options }
+      end
+
       details["dependencies"] = dependencies.map { |d| {d.name => d.version_requirements.to_s} }
       details
     end

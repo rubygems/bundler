@@ -64,13 +64,15 @@ module Bundler
 
       def actual_dependencies
         @actual_dependencies ||= @details["specs"].map do |args|
-          Gem::Dependency.new(*args.to_a.flatten)
+          name, details = args.to_a.flatten
+          details["source"] = sources[details["source"]] if details.include?("source")
+          Bundler::Dependency.new(name, details.delete("version"), details)
         end
       end
 
       def dependencies
         @dependencies ||= @details["dependencies"].map do |args|
-          Gem::Dependency.new(*args.to_a.flatten)
+          Bundler::Dependency.new(*args.to_a.flatten)
         end
       end
     end

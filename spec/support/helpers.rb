@@ -43,6 +43,9 @@ module Spec
       gemfile = File.expand_path('../../../bin/bundle', __FILE__)
       @in, @out, @err = Open3.popen3("#{Gem.ruby} -I#{lib} #{gemfile} #{cmd}#{args}")
       @err = @err.read.strip
+
+      puts @err unless @err.empty?
+
       @out = @out.read.strip
     end
 
