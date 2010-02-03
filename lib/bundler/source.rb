@@ -15,6 +15,10 @@ module Bundler
         raise ArgumentError, "The source must be an absolute URI" unless @uri.absolute?
       end
 
+      def to_s
+        "rubygems repository at `#{uri}`"
+      end
+
       def specs
         @specs ||= fetch_specs
       end
@@ -22,9 +26,9 @@ module Bundler
       def install(spec)
         destination = Gem.dir
 
-        Bundler.ui.info "  * Downloading..."
+        Bundler.ui.debug "  * Downloading..."
         gem_path  = Gem::RemoteFetcher.fetcher.download(spec, uri, destination)
-        Bundler.ui.info "  * Installing..."
+        Bundler.ui.debug "  * Installing..."
         installer = Gem::Installer.new gem_path,
           :install_dir => Gem.dir,
           :ignore_dependencies => true
@@ -36,14 +40,14 @@ module Bundler
 
       def fetch_specs
         index = Index.new
-        Bundler.ui.info "Source: Fetching remote index for `#{uri}`... "
+        Bundler.ui.info "Fetching source index from `#{uri}`... "
         (main_specs + prerelease_specs).each do |name, version, platform|
           next unless Gem::Platform.match(platform)
           spec = RemoteSpecification.new(name, version, platform, @uri)
           spec.source = self
           index << spec
         end
-        Bundler.ui.info "done."
+        Bundler.ui.info "Done."
         index.freeze
       end
 
@@ -76,17 +80,21 @@ module Bundler
       end
 
       def to_s
-        "System gem source"
+        "system gems"
       end
 
       def install(spec)
-        Bundler.ui.info "  * already installed... skipping"
+        Bundler.ui.debug "  * already installed... skipping"
       end
     end
 
     class GemCache
       def initialize(options)
         @path = options["path"]
+      end
+
+      def to_s
+        ".gem files at #{@path}"
       end
 
       def specs
@@ -106,7 +114,7 @@ module Bundler
       def install(spec)
         destination = Gem.dir
 
-        Bundler.ui.info "  * Installing from pack..."
+        Bundler.ui.debug "  * Installing from pack..."
         installer = Gem::Installer.new "#{@path}/#{spec.full_name}.gem",
           :install_dir => Gem.dir,
           :ignore_dependencies => true
@@ -123,6 +131,10 @@ module Bundler
         @glob = options["glob"] || "{,*/}*.gemspec"
         @path = options["path"]
         @default_spec = nil
+      end
+
+      def to_s
+        "source code at #{@path}"
       end
 
       def default_spec(*args)
@@ -161,7 +173,7 @@ module Bundler
       end
 
       def install(spec)
-        Bundler.ui.info "  * Using path `#{path}`..."
+        Bundler.ui.debug "  * Using path `#{path}`..."
       end
 
       alias specs local_specs
@@ -178,16 +190,17 @@ module Bundler
         @ref  = options["ref"] || options["branch"] || 'master'
       end
 
+      def to_s
+        ref = @options["ref"] ? @options["ref"][0..6] : @ref
+        "#{@uri} (at #{ref})"
+      end
+
       def options
         @options.merge("ref" => revision)
       end
 
       def path
         Bundler.install_path.join("#{base_name}-#{uri_hash}-#{ref}")
-      end
-
-      def to_s
-        @uri
       end
 
       def specs
@@ -221,12 +234,12 @@ module Bundler
       end
 
       def install(spec)
-        Bundler.ui.info "  * Using git `#{uri}`..."
+        Bundler.ui.debug "  * Using git `#{uri}`..."
 
         if @installed
-          Bundler.ui.info "  * Already checked out revision: #{ref}..."
+          Bundler.ui.debug "  * Already checked out revision: #{ref}..."
         else
-          Bundler.ui.info "  * Checking out revision: #{ref}..."
+          Bundler.ui.debug "  * Checking out revision: #{ref}..."
           FileUtils.mkdir_p(path)
           Dir.chdir(path) do
             unless File.exist?(".git")
@@ -265,10 +278,10 @@ module Bundler
 
       def cache
         if cache_path.exist?
-          Bundler.ui.info "Source: Updating `#{uri}`... "
+          Bundler.ui.info "Updating `#{uri}`... "
           in_cache { git "fetch --quiet #{uri} master:master" }
         else
-          Bundler.ui.info "Source: Cloning `#{uri}`... "
+          Bundler.ui.info "Fetching `#{uri}`... "
           FileUtils.mkdir_p(cache_path.dirname)
           git "clone #{uri} #{cache_path} --bare --no-hardlinks"
         end

@@ -17,6 +17,10 @@ module Bundler
         @shell = shell
       end
 
+      # TODO: Add debug mode
+      def debug(msg)
+      end
+
       def info(msg)
         @shell.say(msg)
       end
@@ -41,9 +45,9 @@ module Bundler
 
       def say(message)
         if message =~ /native extensions/
-          @ui.info "  * #{message}"
+          @ui.info "with native extensions "
         else
-          @ui.info(message)
+          @ui.debug(message)
         end
       end
     end

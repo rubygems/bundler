@@ -20,15 +20,19 @@ module Bundler
       end
 
       specs.sort_by { |s| s.name }.each do |spec|
-        Bundler.ui.info "* #{spec.name} (#{spec.version})"
+        # unless spec.source.is_a?(Source::SystemGems)
+          Bundler.ui.info "Installing #{spec.name} (#{spec.version}) from #{spec.source} "
+        # end
+
         if (spec.groups & options[:without]).any?
-          Bundler.ui.info "  * Not in requested group... skipping."
+          Bundler.ui.debug "  * Not in requested group... skipping."
           next
         end
         spec.source.install(spec)
+        Bundler.ui.info ""
       end
 
-      Bundler.ui.confirm "You have bundles. Now, go have fun."
+      Bundler.ui.confirm "Your bundle is complete!"
     end
 
     def dependencies
@@ -112,9 +116,9 @@ module Bundler
 
         sources.each do |source|
           i = source.specs
-          Bundler.ui.info "Source: Processing index... "
+          Bundler.ui.debug "Source: Processing index... "
           index = i.merge(index).freeze
-          Bundler.ui.info "Done."
+          Bundler.ui.debug "Done."
         end
 
         index
