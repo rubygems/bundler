@@ -85,7 +85,7 @@ To do this, include the following at the beginning of your code.
 
     begin
       # Require the preresolved locked set of gems.
-      require File.expand_path('../vendor/environment', __FILE__)
+      require File.expand_path('../.bundle/environment', __FILE__)
     rescue LoadError
       # Fallback on doing the resolve at runtime.
       require "rubygems"

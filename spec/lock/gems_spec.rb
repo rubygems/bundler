@@ -29,8 +29,8 @@ describe "gemfile lock with gems" do
   end
 
   it "creates an environment.rb file in ./vendor" do
-    bundled_app("vendor/environment.rb").should_not exist
+    bundled_app(".bundle/environment.rb").should_not exist
     bundle :lock
-    bundled_app("vendor/environment.rb").should exist
+    bundled_app(".bundle/environment.rb").should exist
   end
 end

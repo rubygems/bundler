@@ -25,7 +25,7 @@ module Bundler
 
     def lock
       Bundler.ui.info("The bundle is already locked, relocking.") if locked?
-      FileUtils.mkdir_p("#{root}/vendor")
+      FileUtils.mkdir_p("#{root}/.bundle")
       write_yml_lock
       write_rb_lock
       Bundler.ui.info("The bundle is now locked. Use `bundle show` to list the gems in the environment.")
@@ -37,8 +37,8 @@ module Bundler
         return
       end
 
-      File.delete("#{root}/vendor/environment.rb")
-      File.delete("#{root}/Gemfile.lock")
+      FileUtils.rm_f("#{root}/.bundle/environment.rb")
+      FileUtils.rm_f("#{root}/Gemfile.lock")
       Bundler.ui.info("The bundle is now unlocked. The dependencies may be changed.")
     end
 
@@ -125,7 +125,7 @@ module Bundler
     def write_rb_lock
       template = File.read(File.expand_path("../templates/environment.erb", __FILE__))
       erb = ERB.new(template, nil, '-')
-      File.open("#{root}/vendor/environment.rb", 'w') do |f|
+      File.open("#{root}/.bundle/environment.rb", 'w') do |f|
         f.puts erb.result(binding)
       end
     end
