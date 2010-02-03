@@ -246,17 +246,11 @@ describe "gemfile install with gem sources" do
     end
 
     it "installs gems in the default group" do
-      out = ruby <<-G
-        begin ; require 'rubygems' ; require 'rack' ; puts "WIN" ; end
-      G
-      out.should == "WIN"
+      should_be_installed "rack 1.0.0"
     end
 
     it "installs gems in other groups" do
-      out = ruby <<-G
-        begin ; require 'rubygems' ; require 'activesupport' ; puts "WIN" ; end
-      G
-      out.should == "WIN"
+      should_be_installed "activesupport 2.3.5"
     end
 
     it "sets up everything if Bundler.setup is used with no groups" do
@@ -280,21 +274,11 @@ describe "gemfile install with gem sources" do
     end
 
     it "installs gems in the default group" do
-      out = ruby <<-G
-        begin ; require 'rubygems' ; require 'rack' ; puts "WIN" ; end
-      G
-      out.should == "WIN"
+      should_be_installed "rack 1.0.0", :groups => [:default]
     end
 
     it "does not install gems from the excluded group" do
-      out = ruby <<-G
-        begin ; require 'rubygems' ; require 'activesupport'
-        rescue LoadError
-          puts "WIN"
-        end
-      G
-
-      out.should == 'WIN'
+      should_not_be_installed "activesupport 2.3.5", :groups => [:default]
     end
 
     it "allows Bundler.setup for specific groups" do

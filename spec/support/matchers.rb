@@ -16,9 +16,11 @@ module Spec
     end
 
     def should_be_installed(*names)
+      opts = names.last.is_a?(Hash) ? names.pop : {}
+      groups = opts[:groups] || []
       names.each do |name|
         name, version = name.split(/\s+/)
-        run "require '#{name}'; puts #{Spec::Builders.constantize(name)}"
+        run "require '#{name}'; puts #{Spec::Builders.constantize(name)}", *groups
         Gem::Version.new(out).should == Gem::Version.new(version)
       end
     end
@@ -26,9 +28,11 @@ module Spec
     alias should_be_available should_be_installed
 
     def should_not_be_installed(*names)
+      opts = names.last.is_a?(Hash) ? names.pop : {}
+      groups = opts[:groups] || []
       names.each do |name|
         name, version = name.split(/\s+/)
-        run <<-R
+        run <<-R, *groups
           begin
             require '#{name}'
             puts #{Spec::Builders.constantize(name)}
