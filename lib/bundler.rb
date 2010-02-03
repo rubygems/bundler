@@ -41,7 +41,7 @@ module Bundler
 
     def configure
       @configured ||= begin
-        point_gem_home(settings[:path])
+        configure_gem_home_and_path
         true
       end
     end
@@ -51,7 +51,10 @@ module Bundler
     end
 
     def bundle_path
-      @bundle_path ||= Pathname.new(settings[:path] || Gem.dir).expand_path(root)
+      @bundle_path ||= begin
+        path = settings[:path] || "#{Gem.user_home}/.bundle"
+        Pathname.new(path).expand_path(root)
+      end
     end
 
     def setup(*groups)
@@ -109,10 +112,16 @@ module Bundler
       raise GemfileNotFound, "The default Gemfile was not found"
     end
 
-    def point_gem_home(path)
-      return unless path
-      ENV['GEM_HOME'] = File.expand_path(path, root)
-      ENV['GEM_PATH'] = ''
+    def configure_gem_home_and_path
+      if path = settings[:path]
+        ENV['GEM_HOME'] = File.expand_path(path, root)
+        ENV['GEM_PATH'] = ''
+      else
+        gem_home, gem_path = ENV["GEM_PATH"], ENV["GEM_PATH"]
+        ENV["GEM_PATH"] = [gem_home, gem_path].compact.join(File::PATH_SEPARATOR)
+        ENV["GEM_HOME"] = bundle_path.to_s
+      end
+
       Gem.clear_paths
     end
   end
