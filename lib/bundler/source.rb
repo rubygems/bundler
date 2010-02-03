@@ -1,6 +1,7 @@
 require "rubygems/remote_fetcher"
 require "rubygems/format"
 require "digest/sha1"
+require "open3"
 
 module Bundler
   module Source
@@ -9,7 +10,7 @@ module Bundler
 
       def initialize(options = {})
         @options = options
-        @uri = options[:uri]
+        @uri = options["uri"]
         @uri = URI.parse(@uri) unless @uri.is_a?(URI)
         raise ArgumentError, "The source must be an absolute URI" unless @uri.absolute?
       end
@@ -85,7 +86,7 @@ module Bundler
 
     class GemCache
       def initialize(options)
-        @path = options[:path]
+        @path = options["path"]
       end
 
       def specs
@@ -119,8 +120,8 @@ module Bundler
 
       def initialize(options)
         @options = options
-        @glob = options[:glob] || "{,*/}*.gemspec"
-        @path = options[:path]
+        @glob = options["glob"] || "{,*/}*.gemspec"
+        @path = options["path"]
         @default_spec = nil
       end
 
@@ -172,13 +173,13 @@ module Bundler
 
       def initialize(options)
         @options = options
-        @glob = options[:glob] || "{,*/}*.gemspec"
-        @uri  = options[:uri]
-        @ref  = options[:ref] || options[:branch] || 'master'
+        @glob = options["glob"] || "{,*/}*.gemspec"
+        @uri  = options["uri"]
+        @ref  = options["ref"] || options["branch"] || 'master'
       end
 
       def options
-        @options.merge(:ref => revision)
+        @options.merge("ref" => revision)
       end
 
       def path
@@ -229,18 +230,26 @@ module Bundler
           FileUtils.mkdir_p(path)
           Dir.chdir(path) do
             unless File.exist?(".git")
-              %x(git clone --recursive --no-checkout #{cache_path} #{path})
+              %x(git clone --no-checkout #{cache_path} #{path})
             end
-            %x(git fetch --quiet)
-            %x(git reset --hard #{revision})
-            %x(git submodule init)
-            %x(git submodule update)
+            git "fetch --quiet"
+            git "reset --hard #{revision}"
+            git "submodule init"
+            git "submodule update"
           end
           @installed = true
         end
       end
 
     private
+
+      def git(command)
+        out = %x{git #{command}}
+        if $? != 0
+          raise GitError, "An error has occurred in git. Cannot complete bundling."
+        end
+        out
+      end
 
       def base_name
         File.basename(uri, ".git")
@@ -257,17 +266,17 @@ module Bundler
       def cache
         if cache_path.exist?
           Bundler.ui.info "Source: Updating `#{uri}`... "
-          in_cache { `git fetch --quiet #{uri} master:master` }
+          in_cache { git "fetch --quiet #{uri} master:master" }
         else
           Bundler.ui.info "Source: Cloning `#{uri}`... "
           FileUtils.mkdir_p(cache_path.dirname)
-          `git clone #{uri} #{cache_path} --bare --no-hardlinks`
+          git "clone #{uri} #{cache_path} --bare --no-hardlinks"
         end
         Bundler.ui.info "Done."
       end
 
       def revision
-        @revision ||= in_cache { `git rev-parse #{ref}`.strip }
+        @revision ||= in_cache { git("rev-parse #{ref}").strip }
       end
 
       def in_cache(&blk)

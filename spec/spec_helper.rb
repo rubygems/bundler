@@ -4,7 +4,6 @@ $:.unshift File.expand_path('../../lib', __FILE__)
 require 'fileutils'
 require 'rubygems'
 require 'bundler'
-gem 'rspec', '~> 1.3.0'
 require 'spec'
 
 Dir["#{File.expand_path('../support', __FILE__)}/*.rb"].each do |file|

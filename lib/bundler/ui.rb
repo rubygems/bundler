@@ -30,7 +30,7 @@ module Bundler
       end
 
       def error(msg)
-        @shell.say(msg, :error)
+        @shell.say(msg, :red)
       end
     end
 

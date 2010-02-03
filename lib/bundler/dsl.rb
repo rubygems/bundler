@@ -25,8 +25,8 @@ module Bundler
 
     def source(source, options = {})
       source = case source
-      when :gemcutter, :rubygems, :rubyforge then Source::Rubygems.new(:uri => "http://gemcutter.org")
-      when String then Source::Rubygems.new(:uri => source)
+      when :gemcutter, :rubygems, :rubyforge then Source::Rubygems.new("uri" => "http://gemcutter.org")
+      when String then Source::Rubygems.new("uri" => source)
       else source
       end
 
@@ -34,12 +34,12 @@ module Bundler
       source
     end
 
-    def path(path, options = {})
-      source Source::Path.new(options.merge(:path => path)), options
+    def path(path, options = {}, source_options = {})
+      source Source::Path.new(_normalize_hash(options).merge("path" => path)), source_options
     end
 
-    def git(uri, options = {})
-      source Source::Git.new(options.merge(:uri => uri)), options
+    def git(uri, options = {}, source_options = {})
+      source Source::Git.new(_normalize_hash(options).merge("uri" => uri)), source_options
     end
 
     def to_definition
@@ -59,21 +59,29 @@ module Bundler
       version && Gem::Version.new(version) rescue false
     end
 
-    def _normalize_options(name, version, opts)
+    def _normalize_hash(opts)
       opts.each do |k, v|
+        next if String === k
+        opts.delete(k)
         opts[k.to_s] = v
       end
+    end
 
-      opts["group"] ||= @group
+    def _normalize_options(name, version, opts)
+      _normalize_hash(opts)
+
+      group = opts.delete("group") || @group
 
       # Normalize git and path options
       ["git", "path"].each do |type|
         if param = opts[type]
-          source = send(type, param, opts.merge(:prepend => true))
+          source = send(type, param, opts.dup, :prepend => true)
           source.default_spec name, version if _version?(version)
           opts["source"] = source
         end
       end
+
+      opts["group"] = group
     end
   end
 end

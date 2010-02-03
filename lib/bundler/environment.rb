@@ -81,6 +81,7 @@ module Bundler
         possibilities = Gem.path.map { |p| "#{p}/cache/#{spec.full_name}.gem" }
         cached_path = possibilities.find { |p| File.exist? p }
         Bundler.ui.info "  * #{File.basename(cached_path)}"
+        next if File.expand_path(File.dirname(cached_path)) == File.expand_path(pack_path)
         FileUtils.cp(cached_path, pack_path)
       end
     end

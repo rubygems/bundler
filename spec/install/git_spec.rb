@@ -140,4 +140,13 @@ describe "gemfile install with git sources" do
 
     should_be_installed("foo 1.0")
   end
+
+  it "catches git errors and spits out useful output" do
+    install_gemfile <<-G
+      gem "foo", "1.0", :git => "omgomg"
+    G
+
+    out.should include("An error has occurred in git. Cannot complete bundling.")
+    err.should == "fatal: 'omgomg' does not appear to be a git repository\nfatal: The remote end hung up unexpectedly"
+  end
 end

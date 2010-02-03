@@ -47,7 +47,7 @@ module Bundler
 
     def resolve_locally
       # Return unless all the dependencies have = version requirements
-      return unless dependencies.all? { |d| unambiguous?(d) }
+      return if dependencies.any? { |d| ambiguous?(d) }
 
       index = local_index
       sources.each do |source|
@@ -68,6 +68,7 @@ module Bundler
       specs.length == dependencies.length && specs
     rescue Bundler::GemNotFound
       nil
+      raise if ENV["OMG"]
     end
 
     def resolve_remotely
@@ -101,8 +102,8 @@ module Bundler
       end
     end
 
-    def unambiguous?(dep)
-      dep.version_requirements.requirements.all? { |op,_| op == '=' }
+    def ambiguous?(dep)
+      dep.version_requirements.requirements.any? { |op,_| op != '=' }
     end
 
     def index
@@ -122,18 +123,23 @@ module Bundler
 
     def local_index
       @local_index ||= begin
-        index = Index.from_installed_gems.freeze
+        index = Index.new
+
+        sources.each do |source|
+          next unless source.respond_to?(:local_specs)
+          index = source.local_specs.merge(index)
+        end
 
         if File.directory?("#{root}/vendor/cache")
           index = cache_source.specs.merge(index).freeze
         end
 
-        index
+        Index.from_installed_gems.merge(index)
       end
     end
 
     def cache_source
-      Source::GemCache.new(:path => "#{root}/vendor/cache")
+      Source::GemCache.new("path" => "#{root}/vendor/cache")
     end
 
   end

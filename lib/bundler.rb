@@ -34,6 +34,7 @@ module Bundler
   class GemNotFound     < BundlerError; status_code(7)  ; end
   class VersionConflict < BundlerError; status_code(6)  ; end
   class GemfileError    < BundlerError; status_code(4)  ; end
+  class GitError        < BundlerError; status_code(11) ; end
 
   class << self
     attr_writer :ui, :bundle_path

@@ -58,6 +58,6 @@ describe "bundle check" do
 
   it "outputs an error when the default Gemspec is not found" do
     bundle :check
-    out.should == "The default Gemfile was not found"
+    out.should =~ /The default Gemfile was not found/
   end
 end

@@ -11,7 +11,7 @@ module Spec
       Gem.configuration.write
     end
 
-    attr_reader :out
+    attr_reader :out, :err
 
     def in_app_root(&blk)
       Dir.chdir(bundled_app, &blk)
@@ -38,9 +38,12 @@ module Spec
     end
 
     def bundle(cmd, options = {})
+      require "open3"
       args = options.map { |k,v| " --#{k} #{v}"}.join
       gemfile = File.expand_path('../../../bin/bundle', __FILE__)
-      @out = %x{#{Gem.ruby} -I#{lib} #{gemfile} #{cmd}#{args}}.strip
+      @in, @out, @err = Open3.popen3("#{Gem.ruby} -I#{lib} #{gemfile} #{cmd}#{args}")
+      @err = @err.read.strip
+      @out = @out.read.strip
     end
 
     def ruby(opts, ruby = nil)
