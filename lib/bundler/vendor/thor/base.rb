@@ -8,6 +8,9 @@ require 'thor/task'
 require 'thor/util'
 
 class Thor
+  autoload :Actions,    'thor/actions'
+  autoload :RakeCompat, 'thor/rake_compat'
+
   # Shortcuts for help.
   HELP_MAPPINGS       = %w(-h -? --help -D)
 
@@ -93,6 +96,18 @@ class Thor
 
     module ClassMethods
       attr_accessor :debugging
+
+      def attr_reader(*) #:nodoc:
+        no_tasks { super }
+      end
+
+      def attr_writer(*) #:nodoc:
+        no_tasks { super }
+      end
+
+      def attr_accessor(*) #:nodoc:
+        no_tasks { super }
+      end
 
       # Adds an argument to the class and creates an attr_accessor for it.
       #

@@ -10,10 +10,6 @@ module Bundler
   class CLI < Thor
     ARGV = ::ARGV.dup
 
-    def self.banner(task)
-      task.formatted_usage(self, false)
-    end
-
     desc "init", "Generates a Gemfile into the current working directory"
     def init
       if File.exist?("Gemfile")
