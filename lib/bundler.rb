@@ -117,8 +117,8 @@ module Bundler
         ENV['GEM_HOME'] = File.expand_path(path, root)
         ENV['GEM_PATH'] = ''
       else
-        gem_home, gem_path = ENV["GEM_PATH"], ENV["GEM_PATH"]
-        ENV["GEM_PATH"] = [gem_home, gem_path].compact.join(File::PATH_SEPARATOR)
+        gem_home, gem_path = Gem.dir, Gem.path
+        ENV["GEM_PATH"] = [gem_home, gem_path].flatten.compact.join(File::PATH_SEPARATOR)
         ENV["GEM_HOME"] = bundle_path.to_s
       end
 
