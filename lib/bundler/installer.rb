@@ -25,7 +25,7 @@ module Bundler
         # end
 
         if (spec.groups & options[:without]).any?
-          Bundler.ui.debug "  * Not in requested group... skipping."
+          Bundler.ui.debug "  * Not in requested group; skipping."
           next
         end
         spec.source.install(spec)
@@ -71,7 +71,7 @@ module Bundler
 
     def resolve_remotely
       index # trigger building the index
-      Bundler.ui.info "Resolving dependencies... "
+      Bundler.ui.info "Resolving dependencies"
       source_requirements = {}
       dependencies.each do |dep|
         next unless dep.source
@@ -116,7 +116,7 @@ module Bundler
 
         other_sources.each do |source|
           i = source.specs
-          Bundler.ui.debug "Source: Processing index... "
+          Bundler.ui.debug "Source: Processing index"
           index = i.merge(index).freeze
         end
 
@@ -124,7 +124,7 @@ module Bundler
 
         rg_sources.each do |source|
           i = source.specs
-          Bundler.ui.debug "Source: Processing index... "
+          Bundler.ui.debug "Source: Processing index"
           index = i.merge(index).freeze
         end
 
