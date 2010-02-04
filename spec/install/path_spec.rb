@@ -1,6 +1,6 @@
 require File.expand_path('../../spec_helper', __FILE__)
 
-describe "gemfile install with git sources" do
+describe "gemfile install with explicit source paths" do
   it "fetches gems" do
     build_lib "foo"
 
