@@ -26,9 +26,9 @@ module Bundler
       def install(spec)
         destination = Gem.dir
 
-        Bundler.ui.debug "  * Downloading..."
+        Bundler.ui.debug "  * Downloading"
         gem_path  = Gem::RemoteFetcher.fetcher.download(spec, uri, destination)
-        Bundler.ui.debug "  * Installing..."
+        Bundler.ui.debug "  * Installing"
         installer = Gem::Installer.new gem_path,
           :install_dir => Gem.dir,
           :ignore_dependencies => true
@@ -40,7 +40,7 @@ module Bundler
 
       def fetch_specs
         index = Index.new
-        Bundler.ui.info "Fetching source index from #{uri}... "
+        Bundler.ui.info "Fetching source index from #{uri}"
         (main_specs + prerelease_specs).each do |name, version, platform|
           next unless Gem::Platform.match(platform)
           spec = RemoteSpecification.new(name, version, platform, @uri)
@@ -83,7 +83,7 @@ module Bundler
       end
 
       def install(spec)
-        Bundler.ui.debug "  * already installed... skipping"
+        Bundler.ui.debug "  * already installed; skipping"
       end
     end
 
@@ -113,7 +113,7 @@ module Bundler
       def install(spec)
         destination = Gem.dir
 
-        Bundler.ui.debug "  * Installing from pack..."
+        Bundler.ui.debug "  * Installing from pack"
         installer = Gem::Installer.new "#{@path}/#{spec.full_name}.gem",
           :install_dir => Gem.dir,
           :ignore_dependencies => true
@@ -172,7 +172,7 @@ module Bundler
       end
 
       def install(spec)
-        Bundler.ui.debug "  * Using path #{path}..."
+        Bundler.ui.debug "  * Using path #{path}"
       end
 
       alias specs local_specs
@@ -233,12 +233,12 @@ module Bundler
       end
 
       def install(spec)
-        Bundler.ui.debug "  * Using git #{uri}..."
+        Bundler.ui.debug "  * Using git #{uri}"
 
         if @installed
-          Bundler.ui.debug "  * Already checked out revision: #{ref}..."
+          Bundler.ui.debug "  * Already checked out revision: #{ref}"
         else
-          Bundler.ui.debug "  * Checking out revision: #{ref}..."
+          Bundler.ui.debug "  * Checking out revision: #{ref}"
           FileUtils.mkdir_p(path)
           Dir.chdir(path) do
             unless File.exist?(".git")
@@ -275,10 +275,10 @@ module Bundler
 
       def cache
         if cache_path.exist?
-          Bundler.ui.info "Updating #{uri}... "
+          Bundler.ui.info "Updating #{uri}"
           in_cache { git "fetch --quiet #{uri} master:master" }
         else
-          Bundler.ui.info "Fetching #{uri}... "
+          Bundler.ui.info "Fetching #{uri}"
           FileUtils.mkdir_p(cache_path.dirname)
           git "clone #{uri} #{cache_path} --bare --no-hardlinks"
         end
