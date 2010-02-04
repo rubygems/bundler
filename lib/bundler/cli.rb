@@ -63,6 +63,10 @@ module Bundler
 
       environment = Bundler.load
       environment.lock
+    rescue GemNotFound, VersionConflict => e
+      Bundler.ui.error(e.message)
+      Bundler.ui.info "Run `bundle install` to install missing gems"
+      exit 128
     end
 
     desc "unlock", "Unlock the bundle. This allows gem versions to be changed"
