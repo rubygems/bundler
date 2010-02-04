@@ -63,13 +63,13 @@ such as testing or deployment.
 
 You can specify groups of gems in the Gemfile using the following syntax:
 
-   gem "nokogiri", :group => :test
+    gem "nokogiri", :group => :test
 
-   # or
+    # or
 
-   group :test do
+    group :test do
      gem "webrat"
-   end
+    end
 
 Note that Bundler adds all the gems without an explicit group name to the
 `:default` group.
