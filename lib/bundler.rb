@@ -4,7 +4,7 @@ require 'yaml'
 require 'bundler/rubygems'
 
 module Bundler
-  VERSION = "0.9.0.pre5"
+  VERSION = "0.9.0.pre6"
 
   autoload :Definition,          'bundler/definition'
   autoload :Dependency,          'bundler/dependency'
