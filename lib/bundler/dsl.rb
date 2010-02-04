@@ -9,7 +9,7 @@ module Bundler
     end
 
     def initialize
-      @sources = [] # Gem.sources.map { |s| Source::Rubygems.new(:uri => s) }
+      @sources = []
       @dependencies = []
       @group = nil
     end
