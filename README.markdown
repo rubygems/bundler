@@ -235,11 +235,11 @@ The following Bundler 0.8 APIs are no longer supported:
    explicitly. So `Bundler.require_env(:test)` becomes
    `Bundler.require(:default, :test)`
 
-2. `require 'vendor/gems/environment.rb`: In unlocked
+2. `require 'vendor/gems/environment'`: In unlocked
    mode, where using system gems, this becomes
    `Bundler.setup(:multiple, groups)`. If you don't
    specify any groups, this puts all groups on the load
-   path. In locked, mode, it becomes `require .bundle/environment`
+   path. In locked, mode, it becomes `require '.bundle/environment'`
 
 ## Reporting bugs
 
