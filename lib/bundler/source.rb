@@ -180,7 +180,7 @@ module Bundler
     end
 
     class Git < Path
-      attr_reader :uri, :ref
+      attr_reader :uri, :ref, :options
 
       def initialize(options)
         @options = options
@@ -192,10 +192,6 @@ module Bundler
       def to_s
         ref = @options["ref"] ? @options["ref"][0..6] : @ref
         "#{@uri} (at #{ref})"
-      end
-
-      def options
-        @options.merge("ref" => revision)
       end
 
       def path
@@ -239,16 +235,14 @@ module Bundler
           Bundler.ui.debug "  * Already checked out revision: #{ref}"
         else
           Bundler.ui.debug "  * Checking out revision: #{ref}"
-          FileUtils.mkdir_p(path)
-          Dir.chdir(path) do
-            unless File.exist?(".git")
-              %x(git clone --no-checkout #{cache_path} #{path})
-            end
-            git "fetch --quiet"
-            git "reset --hard #{revision}"
-          end
+          checkout
           @installed = true
         end
+      end
+
+      def lock
+        @ref = @options["ref"] = revision
+        checkout
       end
 
     private
@@ -281,6 +275,17 @@ module Bundler
           Bundler.ui.info "Fetching #{uri}"
           FileUtils.mkdir_p(cache_path.dirname)
           git "clone #{uri} #{cache_path} --bare --no-hardlinks"
+        end
+      end
+
+      def checkout
+        FileUtils.mkdir_p(path)
+        Dir.chdir(path) do
+          unless File.exist?(".git")
+            %x(git clone --no-checkout #{cache_path} #{path})
+          end
+          git "fetch --quiet"
+          git "reset --hard #{revision}"
         end
       end
 

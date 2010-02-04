@@ -7,7 +7,7 @@ module Bundler
     def initialize(name, version, options = {}, &blk)
       super(name, version)
 
-      @group  = options["group"] || :default
+      @groups = Array(options["group"] || :default)
       @source = options["source"]
       @autorequire = options.include?("require") ? options['require'] || [] : [name]
       @autorequire = [@autorequire] unless @autorequire.is_a?(Array)
