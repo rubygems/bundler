@@ -8,6 +8,7 @@ module Bundler
   end
 
   def self.require(*groups)
+    groups = [:default] if groups.empty?
     groups.each do |group|
       AUTOREQUIRES[group].each { |file| Kernel.require file }
     end

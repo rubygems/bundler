@@ -26,6 +26,9 @@ describe "Bundler.require" do
   end
 
   it "requires the gems" do
+    run "Bundler.require"
+    out.should == "two"
+
     run "Bundler.require(:bar)"
     out.should == "baz\nqux"
 
@@ -35,8 +38,14 @@ describe "Bundler.require" do
 
   it "requires the locked gems" do
     bundle :lock
-
     env = bundled_app(".bundle/environment.rb")
+
+    out = ruby("require '#{env}'; Bundler.setup; Bundler.require")
+    out.should == "two"
+
+    out = ruby("require '#{env}'; Bundler.setup(:bar); Bundler.require(:bar)")
+    out.should == "baz\nqux"
+
     out = ruby("require '#{env}'; Bundler.setup(:default, :bar); Bundler.require(:default, :bar)")
     out.should == "two\nbaz\nqux"
   end

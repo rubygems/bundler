@@ -20,6 +20,7 @@ module Bundler
     end
 
     def require(*groups)
+      groups = [:default] if groups.empty?
       autorequires = autorequires_for_groups(*groups)
       groups.each do |group|
         (autorequires[group] || []).each do |path|
