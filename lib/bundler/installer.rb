@@ -53,12 +53,6 @@ module Bundler
       # Return unless all the dependencies have = version requirements
       return if dependencies.any? { |d| ambiguous?(d) }
 
-      index = local_index
-      sources.each do |source|
-        next unless source.respond_to?(:local_specs)
-        index = source.local_specs.merge(index)
-      end
-
       source_requirements = {}
       dependencies.each do |dep|
         next unless dep.source && dep.source.respond_to?(:local_specs)
@@ -118,14 +112,26 @@ module Bundler
           index = cache_source.specs.merge(index).freeze
         end
 
-        sources.each do |source|
+        rg_sources = sources.select { |s| s.is_a?(Source::Rubygems) }
+        other_sources = sources.select { |s| !s.is_a?(Source::Rubygems)   }
+
+        other_sources.each do |source|
           i = source.specs
           Bundler.ui.debug "Source: Processing index... "
           index = i.merge(index).freeze
           Bundler.ui.debug "Done."
         end
 
-        Index.from_installed_gems.merge(index)
+        index = Index.from_installed_gems.merge(index)
+
+        rg_sources.each do |source|
+          i = source.specs
+          Bundler.ui.debug "Source: Processing index... "
+          index = i.merge(index).freeze
+          Bundler.ui.debug "Done."
+        end
+
+        index
       end
     end
 

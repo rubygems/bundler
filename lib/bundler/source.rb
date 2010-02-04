@@ -247,8 +247,6 @@ module Bundler
             end
             git "fetch --quiet"
             git "reset --hard #{revision}"
-            git "submodule init"
-            git "submodule update"
           end
           @installed = true
         end
