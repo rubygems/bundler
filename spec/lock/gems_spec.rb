@@ -60,6 +60,6 @@ describe "gemfile lock with gems" do
     
     bundle :install
     
-    out.should =~ /You changed your Gemfile after locking. Please relock using `gem lock`/
+    out.should =~ /You changed your Gemfile after locking. Please relock using `bundle lock`/
   end
 end
