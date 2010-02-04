@@ -79,7 +79,6 @@ module Bundler
       end
 
       specs = Resolver.resolve(dependencies, index, source_requirements)
-      Bundler.ui.info "Done."
       specs
     end
 
@@ -119,7 +118,6 @@ module Bundler
           i = source.specs
           Bundler.ui.debug "Source: Processing index... "
           index = i.merge(index).freeze
-          Bundler.ui.debug "Done."
         end
 
         index = Index.from_installed_gems.merge(index)
@@ -128,7 +126,6 @@ module Bundler
           i = source.specs
           Bundler.ui.debug "Source: Processing index... "
           index = i.merge(index).freeze
-          Bundler.ui.debug "Done."
         end
 
         index
