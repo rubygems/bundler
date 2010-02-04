@@ -47,7 +47,6 @@ module Bundler
           spec.source = self
           index << spec
         end
-        Bundler.ui.info "Done."
         index.freeze
       end
 
@@ -283,7 +282,6 @@ module Bundler
           FileUtils.mkdir_p(cache_path.dirname)
           git "clone #{uri} #{cache_path} --bare --no-hardlinks"
         end
-        Bundler.ui.info "Done."
       end
 
       def revision
