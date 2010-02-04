@@ -62,6 +62,11 @@ module Bundler
       load(gemfile).setup(*groups)
     end
 
+    def require(*groups)
+      gemfile = default_gemfile
+      load(gemfile).require(*groups)
+    end
+
     def load(gemfile = default_gemfile)
       root = Pathname.new(gemfile).dirname
       Environment.new root, definition(gemfile)
