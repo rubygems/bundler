@@ -20,8 +20,9 @@ module Bundler
     end
 
     def require(*groups)
-      dependencies_for(*groups).each do |dep|
-        dep.autorequire.each do |path|
+      autorequires = autorequires_for_groups(*groups)
+      groups.each do |group|
+        (autorequires[group] || []).each do |path|
           Kernel.require(path)
         end
       end
@@ -55,7 +56,11 @@ module Bundler
     end
 
     def dependencies_for(*groups)
-      @definition.actual_dependencies.select { |d| groups.include?(d.group) }
+      if groups.empty?
+        dependencies
+      else
+        dependencies.select { |d| groups.include?(d.group) }
+      end
     end
 
     def specs_for(*groups)
@@ -164,8 +169,8 @@ module Bundler
       details
     end
 
-    def autorequires_for_groups
-      groups = dependencies.map { |dep| dep.group }.uniq
+    def autorequires_for_groups(*groups)
+      groups = dependencies.map { |dep| dep.group }.uniq if groups.empty?
       groups.inject({}) do |hash, group|
         hash[group] = dependencies_for(group).map { |dep| dep.autorequire }.flatten
         hash
