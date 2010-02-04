@@ -1,3 +1,5 @@
+require "digest/sha1"
+
 module Bundler
   class Definition
     def self.from_gemfile(gemfile)
@@ -13,7 +15,13 @@ module Bundler
     def self.from_lock(lockfile)
       # gemfile_definition = from_gemfile(nil)
       locked_definition = Locked.new(YAML.load_file(lockfile))
-      # raise GemfileError unless gemfile_definition.equivalent?(locked_definition)
+
+      # TODO: Switch to using equivalent?
+      hash = Digest::SHA1.hexdigest(File.read("#{Bundler.root}/Gemfile"))
+      unless locked_definition.hash == hash
+        raise GemfileError, "You changed your Gemfile after locking. Please relock using `gem lock`"
+      end
+
       locked_definition
     end
 
@@ -53,6 +61,10 @@ module Bundler
     class Locked < Definition
       def initialize(details)
         @details = details
+      end
+
+      def hash
+        @details["hash"]
       end
 
       def sources

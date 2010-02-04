@@ -1,3 +1,5 @@
+require "digest/md5"
+
 module Bundler
   class Runtime < Environment
     def setup(*groups)
@@ -159,6 +161,7 @@ module Bundler
 
     def details
       details = {}
+      details["hash"] = Digest::SHA1.hexdigest(File.read("#{root}/Gemfile"))
       details["sources"] = sources.map { |s| { s.class.name.split("::").last => s.options} }
 
       details["specs"] = specs.map do |s|
