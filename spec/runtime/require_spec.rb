@@ -16,13 +16,19 @@ describe "Bundler.require" do
       s.write "lib/three.rb", "puts 'three'"
     end
 
+    build_lib "four", "1.0.0" do |s|
+      s.write "lib/four.rb", "puts 'four'"
+    end
+
     gemfile <<-G
       path "#{lib_path('one-1.0.0')}"
       path "#{lib_path('two-1.0.0')}"
       path "#{lib_path('three-1.0.0')}"
+      path "#{lib_path('four-1.0.0')}"
       gem "one", :group => :bar, :require => %w(baz qux)
       gem "two"
       gem "three", :group => :not
+      gem "four", :require => false
     G
   end
 
