@@ -23,7 +23,9 @@ module Bundler
 
     def require(*groups)
       dependencies_for(*groups).each do |dep|
-        Kernel.require(dep.autorequire)
+        dep.autorequire.each do |path|
+          Kernel.require(path)
+        end
       end
     end
 
@@ -167,7 +169,7 @@ module Bundler
     def autorequires_for_groups
       groups = dependencies.map { |dep| dep.group }.uniq
       groups.inject({}) do |hash, group|
-        hash[group] = dependencies_for(group).map { |dep| dep.autorequire }.compact
+        hash[group] = dependencies_for(group).map { |dep| dep.autorequire }.flatten
         hash
       end
     end
