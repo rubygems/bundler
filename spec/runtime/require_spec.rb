@@ -9,6 +9,7 @@ describe "Bundler.require" do
 
     build_lib "two", "1.0.0" do |s|
       s.write "lib/two.rb", "puts 'two'"
+      s.add_dependency "three", "= 1.0.0"
     end
 
     build_lib "three", "1.0.0" do |s|

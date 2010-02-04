@@ -56,19 +56,12 @@ module Bundler
       File.exist?("#{root}/Gemfile.lock")
     end
 
-    def dependencies_for(*groups)
-      if groups.empty?
-        dependencies
-      else
-        dependencies.select { |d| groups.include?(d.group) }
-      end
-    end
-
     def specs_for(*groups)
       if groups.empty?
         specs
       else
-        Resolver.resolve(dependencies_for(*groups), index)
+        deps = dependencies.select { |d| groups.include?(d.group) }
+        Resolver.resolve(deps, index)
       end
     end
 
@@ -171,10 +164,15 @@ module Bundler
     end
 
     def autorequires_for_groups(*groups)
-      groups = dependencies.map { |dep| dep.group }.uniq if groups.empty?
-      groups.inject({}) do |hash, group|
-        hash[group] = dependencies_for(group).map { |dep| dep.autorequire }.flatten
-        hash
+      autorequires = Hash.new { |h,k| h[k] = [] }
+      @definition.dependencies.each do |dep|
+        autorequires[dep.group].concat dep.autorequire
+      end
+
+      if groups.empty?
+        autorequires
+      else
+        groups.inject({}) { |h,g| h[g] = autorequires[g]; h }
       end
     end
   end
