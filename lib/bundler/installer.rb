@@ -1,16 +1,9 @@
 require 'rubygems/dependency_installer'
 
 module Bundler
-  class Installer
+  class Installer < Environment
     def self.install(root, definition, options)
       new(root, definition).run(options)
-    end
-
-    attr_reader :root
-
-    def initialize(root, definition)
-      @root = root
-      @definition = definition
     end
 
     def run(options)
@@ -80,23 +73,6 @@ module Bundler
 
       specs = Resolver.resolve(dependencies, index, source_requirements)
       specs
-    end
-
-    def group_specs(specs)
-      dependencies.each do |d|
-        spec = specs.find { |s| s.name == d.name }
-        group_spec(specs, spec, d.groups)
-      end
-      specs
-    end
-
-    def group_spec(specs, spec, groups)
-      spec.groups.concat(groups)
-      spec.groups.uniq!
-      spec.dependencies.select { |d| d.type != :development }.each do |d|
-        spec = specs.find { |s| s.name == d.name }
-        group_spec(specs, spec, groups)
-      end
     end
 
     def ambiguous?(dep)

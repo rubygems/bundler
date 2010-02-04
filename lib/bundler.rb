@@ -14,6 +14,7 @@ module Bundler
   autoload :Installer,           'bundler/installer'
   autoload :RemoteSpecification, 'bundler/remote_specification'
   autoload :Resolver,            'bundler/resolver'
+  autoload :Runtime,             'bundler/runtime'
   autoload :Settings,            'bundler/settings'
   autoload :Source,              'bundler/source'
   autoload :Specification,       'bundler/specification'
@@ -69,7 +70,7 @@ module Bundler
 
     def load(gemfile = default_gemfile)
       root = Pathname.new(gemfile).dirname
-      Environment.new root, definition(gemfile)
+      Runtime.new root, definition(gemfile)
     end
 
     def definition(gemfile = default_gemfile)
