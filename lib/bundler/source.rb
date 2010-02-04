@@ -16,7 +16,7 @@ module Bundler
       end
 
       def to_s
-        "rubygems repository at `#{uri}`"
+        "rubygems repository at #{uri}"
       end
 
       def specs
@@ -40,7 +40,7 @@ module Bundler
 
       def fetch_specs
         index = Index.new
-        Bundler.ui.info "Fetching source index from `#{uri}`... "
+        Bundler.ui.info "Fetching source index from #{uri}... "
         (main_specs + prerelease_specs).each do |name, version, platform|
           next unless Gem::Platform.match(platform)
           spec = RemoteSpecification.new(name, version, platform, @uri)
@@ -172,7 +172,7 @@ module Bundler
       end
 
       def install(spec)
-        Bundler.ui.debug "  * Using path `#{path}`..."
+        Bundler.ui.debug "  * Using path #{path}..."
       end
 
       alias specs local_specs
@@ -233,7 +233,7 @@ module Bundler
       end
 
       def install(spec)
-        Bundler.ui.debug "  * Using git `#{uri}`..."
+        Bundler.ui.debug "  * Using git #{uri}..."
 
         if @installed
           Bundler.ui.debug "  * Already checked out revision: #{ref}..."
@@ -275,10 +275,10 @@ module Bundler
 
       def cache
         if cache_path.exist?
-          Bundler.ui.info "Updating `#{uri}`... "
+          Bundler.ui.info "Updating #{uri}... "
           in_cache { git "fetch --quiet #{uri} master:master" }
         else
-          Bundler.ui.info "Fetching `#{uri}`... "
+          Bundler.ui.info "Fetching #{uri}... "
           FileUtils.mkdir_p(cache_path.dirname)
           git "clone #{uri} #{cache_path} --bare --no-hardlinks"
         end
