@@ -10,6 +10,7 @@ module Bundler
       @group  = options["group"] || :default
       @source = options["source"]
       @autorequire = options["require"] || name
+      @autorequire = [@autorequire] unless @autorequire.is_a?(Array)
     end
   end
 end

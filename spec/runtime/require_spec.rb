@@ -4,6 +4,7 @@ describe "Bundler.require" do
   before :each do
     build_lib "one", "1.0.0" do |s|
       s.write "lib/baz.rb", "puts 'WIN'"
+      s.write "lib/qux.rb", "puts 'WIN'"
     end
 
     build_lib "two", "1.0.0" do |s|
@@ -18,7 +19,7 @@ describe "Bundler.require" do
       path "#{lib_path('one-1.0.0')}"
       path "#{lib_path('two-1.0.0')}"
       path "#{lib_path('three-1.0.0')}"
-      gem "one", :group => "bar", :require => "baz"
+      gem "one", :group => "bar", :require => %w(baz qux)
       gem "two", :group => "bar"
       gem "three", :group => "not"
     G
@@ -26,7 +27,7 @@ describe "Bundler.require" do
 
   it "requires the gems" do
     run "Bundler.require('bar')"
-    out.should == "WIN\nWIN"
+    out.should == "WIN\nWIN\nWIN"
   end
 
   it "requires the locked gems" do
@@ -34,6 +35,6 @@ describe "Bundler.require" do
 
     env = bundled_app(".bundle/environment.rb")
     out = ruby("require '#{env}'; Bundler.setup('bar'); Bundler.require('bar')")
-    out.should == "WIN\nWIN"
+    out.should == "WIN\nWIN\nWIN"
   end
 end
