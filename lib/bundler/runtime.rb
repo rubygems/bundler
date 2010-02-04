@@ -44,6 +44,15 @@ module Bundler
       Bundler.ui.info("The bundle is now unlocked. The dependencies may be changed.")
     end
 
+    def lock
+      Bundler.ui.info("The bundle is already locked, relocking.") if locked?
+      sources.each { |s| s.lock if s.respond_to?(:lock) }
+      FileUtils.mkdir_p("#{root}/.bundle")
+      write_yml_lock
+      write_rb_lock
+      Bundler.ui.info("The bundle is now locked. Use `bundle show` to list the gems in the environment.")
+    end
+
     def locked?
       File.exist?("#{root}/Gemfile.lock")
     end
