@@ -22,7 +22,7 @@ repository and install the gem with the following rake task:
 You can also install the gem with
 
     gem install bundler --prerelease
-    
+
 ## Usage
 
 The first thing to do is create a gem manifest file named `Gemfile` at the
@@ -56,6 +56,40 @@ Bundler::Dsl.
     #
     gem "rack", "1.0.0"
 
+### Groups
+
+Applications may have dependencies that are specific to certain environments,
+such as testing or deployment.
+
+You can specify groups of gems in the Gemfile using the following syntax:
+
+   gem "nokogiri", :group => :test
+
+   # or
+
+   group :test do
+     gem "webrat"
+   end
+
+Note that Bundler adds all the gems without an explicit group name to the
+`:default` group.
+
+Groups are involved in a number of scenarios:
+
+1. When installing gems using bundle install, you can choose to leave
+   out any group by specifying `--without {group name}`. This can be
+   helpful if, for instance, you have a gem that you can only compile
+   in certain environments.
+2. When setting up load paths using Bundler.setup, Bundler will, by
+   default, add the load paths for all groups. You can restrict the
+   groups to add by doing `Bundler.setup(:group, :names)`. If you do
+   this, you need to specify the `:default` group if you want it
+   included.
+3. When auto-requiring files using Bundler.require, Bundler will,
+   by default, auto-require just the `:default` group. You can specify
+   a list of groups to auto-require such as 
+   `Bundler.require(:default, :test)`
+
 ### Installing gems
 
 Once the manifest file has been created, the next step is to install all
@@ -71,7 +105,7 @@ again to get the new gems installed.
 
 By default, bundler will only ensure that the activated gems satisfy the
 Gemfile's dependencies. If you install a newer version of a gem and it
-satisfies the dependencies, it will be used instead of the older one. 
+satisfies the dependencies, it will be used instead of the older one.
 
 The command `bundle lock` will lock the bundle to the current set of
 resolved gems. This ensures that, until the lock file is removed, that
@@ -143,6 +177,69 @@ a more narrow dependency.
 
 Bundler solves this problem by evaluating all dependencies at once,
 so it can detect that all gems *together* require activesupport "2.3.4".
+
+## Upgrading from Bundler 0.8 to 0.9 and above
+
+Bundler 0.9 changes a number of APIs in the Gemfile.
+
+### Gemfile Removals
+
+The following Bundler 0.8 APIs are no longer supported:
+
+1. `disable_system_gems`: This is now the default (and only) option
+   for bundler. Bundler uses the system gems you have specified
+   in the Gemfile, and only the system gems you have specified
+   (and their dependencies)
+2. `disable_rubygems`: This is no longer supported. We are looking
+   into ways to get the fastest performance out of each supported
+   scenario, and we will make speed the default where possible.
+3. `clear_sources`: Bundler now defaults to an empty source
+   list. If you want to include Rubygems, you can add the source
+   via source "http://gemcutter.org". If you use bundle init, this
+   source will be automatically added for you in the generated
+   Gemfile
+4. `bundle_path`: You can specify this setting when installing
+   via `bundle install /path/to/bundle`. Bundler will remember
+   where you installed the dependencies to on a particular
+   machine for future installs, loads, setups, etc.
+5. `bin_path`: Bundler no longer generates binaries in the root
+   of your app. You should use `bundle exec` to execute binaries
+   in the current context.
+
+### Gemfile Changes
+
+1. Bundler 0.8 supported :only and :except as APIs for describing
+   groups of gems. Bundler 0.9 supports a single `group` method,
+   which you can use to group gems together. See the above "Group"
+   section for more information.
+
+   This means that `gem "foo", :only => :production` becomes
+   `gem "foo", :group => :production`, and
+   `only :production { gem "foo" }` becomes
+   `group :production { gem "foo" }`
+
+   The short version is: group your gems together logically, and
+   use the available commands to make use of the groups you've
+   created.
+
+2. `:require_as` becomes `:require`
+
+3. `:vendored_at` is fully removed; you should use `:path`
+
+### API Changes
+
+1. `Bundler.require_env(:environment)` becomes 
+   `Bundler.require(:multiple, :groups)`. You must
+   now specify the default group (the default group is the
+   group made up of the gems not assigned to any group) 
+   explicitly. So `Bundler.require_env(:test)` becomes
+   `Bundler.require(:default, :test)`
+
+2. `require 'vendor/gems/environment.rb`: In unlocked
+   mode, where using system gems, this becomes
+   `Bundler.setup(:multiple, groups)`. If you don't
+   specify any groups, this puts all groups on the load
+   path. In locked, mode, it becomes `require .bundle/environment`
 
 ## Reporting bugs
 
