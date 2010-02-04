@@ -42,6 +42,24 @@ describe "gemfile install with git sources" do
     out.should == 'WIN OVERRIDE'
   end
 
+  it "works" do
+    build_gem "foo", "1.0.0", :to_system => true do |s|
+      s.write "lib/foo.rb", "puts 'FAIL'"
+    end
+
+    build_lib "omg", "1.0", :path => lib_path("omg") do |s|
+      s.add_dependency "foo"
+    end
+
+    build_lib "foo", "1.0.0", :path => lib_path("omg/foo")
+
+    install_gemfile <<-G
+      gem "omg", :path => "#{lib_path('omg')}"
+    G
+
+    should_be_installed "foo 1.0"
+  end
+
   describe "when locked" do
     it "keeps source pinning" do
       build_lib "foo", "1.0", :path => lib_path('foo')

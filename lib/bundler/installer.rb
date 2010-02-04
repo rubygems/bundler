@@ -112,7 +112,11 @@ module Bundler
 
     def index
       @index ||= begin
-        index = local_index
+        index = Index.new
+
+        if File.directory?("#{root}/vendor/cache")
+          index = cache_source.specs.merge(index).freeze
+        end
 
         sources.each do |source|
           i = source.specs
@@ -121,7 +125,7 @@ module Bundler
           Bundler.ui.debug "Done."
         end
 
-        index
+        Index.from_installed_gems.merge(index)
       end
     end
 
