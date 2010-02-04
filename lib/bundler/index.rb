@@ -17,7 +17,8 @@ module Bundler
     end
 
     def empty?
-      @specs.values.flatten.empty?
+      each { return false }
+      true
     end
 
     def search(query)
@@ -41,9 +42,9 @@ module Bundler
       spec
     end
 
-    def each
-      @specs.values.flatten.each do |spec|
-        yield spec
+    def each(&blk)
+      @specs.values.each do |specs|
+        specs.each(&blk)
       end
     end
 
