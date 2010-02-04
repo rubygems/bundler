@@ -85,17 +85,17 @@ module Bundler
     def group_specs(specs)
       dependencies.each do |d|
         spec = specs.find { |s| s.name == d.name }
-        group_spec(specs, spec, d.group)
+        group_spec(specs, spec, d.groups)
       end
       specs
     end
 
-    def group_spec(specs, spec, group)
-      spec.groups << group
+    def group_spec(specs, spec, groups)
+      spec.groups.concat(groups)
       spec.groups.uniq!
       spec.dependencies.select { |d| d.type != :development }.each do |d|
         spec = specs.find { |s| s.name == d.name }
-        group_spec(specs, spec, group)
+        group_spec(specs, spec, groups)
       end
     end
 

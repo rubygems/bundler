@@ -61,7 +61,7 @@ module Bundler
       if groups.empty?
         dependencies
       else
-        dependencies.select { |d| groups.include?(d.group) }
+        dependencies.select { |d| (groups & d.groups).any? }
       end
     end
 
@@ -172,7 +172,7 @@ module Bundler
     end
 
     def autorequires_for_groups(*groups)
-      groups = dependencies.map { |dep| dep.group }.uniq if groups.empty?
+      groups = dependencies.map { |dep| dep.groups }.flatten.uniq if groups.empty?
       groups.inject({}) do |hash, group|
         hash[group] = dependencies_for(group).map { |dep| dep.autorequire }.flatten
         hash
