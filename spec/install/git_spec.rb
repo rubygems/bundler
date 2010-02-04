@@ -83,6 +83,13 @@ describe "gemfile install with git sources" do
   end
 
   describe "specified inline" do
+    it "supports private git URLs" do
+      install_gemfile <<-G
+        gem "thingy", :git => "git@example.fkdmn1234fake.com:somebody/thingy.git"
+      G
+      err.should include("connect to host example.fkdmn1234fake.com port 22")
+    end
+
     it "installs from git even if a newer gem is available elsewhere" do
       build_git "rack", "0.8"
 
@@ -162,6 +169,7 @@ describe "gemfile install with git sources" do
     G
 
     out.should include("An error has occurred in git. Cannot complete bundling.")
-    err.should == "fatal: 'omgomg' does not appear to be a git repository\nfatal: The remote end hung up unexpectedly"
+    err.should include("fatal: 'omgomg'")
+    err.should include("fatal: The remote end hung up unexpectedly")
   end
 end
