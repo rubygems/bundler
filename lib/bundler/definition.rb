@@ -4,7 +4,7 @@ module Bundler
       gemfile = Pathname.new(gemfile).expand_path
 
       unless gemfile.file?
-        raise GemfileNotFound, "`#{gemfile}` not found"
+        raise GemfileNotFound, "#{gemfile} not found"
       end
 
       Dsl.evaluate(gemfile)
