@@ -246,4 +246,4 @@ The following Bundler 0.8 APIs are no longer supported:
 Please report all bugs on the github issue tracker for the project located
 at:
 
-    http://github.com/wycats/bundler/issues/
+    http://github.com/carlhuda/bundler/issues/
