@@ -2,11 +2,14 @@ require 'rubygems/dependency'
 
 module Bundler
   class Dependency < Gem::Dependency
+    attr_reader :autorequire
+
     def initialize(name, version, options = {}, &blk)
       super(name, version)
 
       @group  = options["group"] || :default
       @source = options["source"]
+      @autorequire = options["require"] || name
     end
   end
 end

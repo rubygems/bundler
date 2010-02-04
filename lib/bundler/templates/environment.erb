@@ -1,6 +1,18 @@
 # DO NOT MODIFY THIS FILE
 module Bundler
-<% load_paths.each do |path| -%>
-  $LOAD_PATH.unshift "<%= path %>"
-<% end -%>
+  LOAD_PATHS = <%= load_paths.inspect %>
+  AUTOREQUIRES = <%= autorequires_for_groups.inspect %>
+
+  def self.setup(*groups)
+    LOAD_PATHS.each { |path| $LOAD_PATH.unshift path }
+  end
+
+  def self.require(*groups)
+    groups.each do |group|
+      AUTOREQUIRES[group].each { |file| Kernel.require file }
+    end
+  end
+
+  # Setup bundle when it's required.
+  setup
 end
