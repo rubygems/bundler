@@ -159,7 +159,7 @@ module Bundler
         { s.name => options }
       end
 
-      details["dependencies"] = dependencies.map { |d| {d.name => d.version_requirements.to_s} }
+      details["dependencies"] = @definition.dependencies.map { |d| {d.name => d.version_requirements.to_s} }
       details
     end
 
