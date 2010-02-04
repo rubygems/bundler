@@ -33,4 +33,20 @@ describe "gemfile lock with gems" do
     bundle :lock
     bundled_app(".bundle/environment.rb").should exist
   end
+
+  it "relocks if bundle locking twice" do
+    bundle :lock
+
+    should_be_available "rack 0.9.1"
+
+    system_gems "rack-1.0.0", "rack-0.9.1" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", "1.0.0"
+      G
+
+      bundle :lock
+      should_be_available "rack 1.0.0"
+    end
+  end
 end

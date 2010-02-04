@@ -27,7 +27,6 @@ module Bundler
     end
 
     def lock
-      Bundler.ui.info("The bundle is already locked, relocking.") if locked?
       FileUtils.mkdir_p("#{root}/.bundle")
       write_yml_lock
       write_rb_lock

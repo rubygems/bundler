@@ -56,6 +56,11 @@ module Bundler
 
     desc "lock", "Locks the bundle to the current set of dependencies, including all child dependencies."
     def lock
+      if File.exist?("#{Bundler.root}/Gemfile.lock")
+        Bundler.ui.info("The bundle is already locked, relocking.")
+        `rm #{Bundler.root}/Gemfile.lock`
+      end
+
       environment = Bundler.load
       environment.lock
     end
