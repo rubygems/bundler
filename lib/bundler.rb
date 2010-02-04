@@ -31,11 +31,13 @@ module Bundler
     end
   end
 
-  class GemfileNotFound < BundlerError; status_code(10) ; end
-  class GemNotFound     < BundlerError; status_code(7)  ; end
-  class VersionConflict < BundlerError; status_code(6)  ; end
-  class GemfileError    < BundlerError; status_code(4)  ; end
-  class GitError        < BundlerError; status_code(11) ; end
+  class GemfileNotFound  < BundlerError; status_code(10) ; end
+  class GemNotFound      < BundlerError; status_code(7)  ; end
+  class VersionConflict  < BundlerError; status_code(6)  ; end
+  class GemfileError     < BundlerError; status_code(4)  ; end
+  class GitError         < BundlerError; status_code(11) ; end
+  class DeprecatedMethod < BundlerError; status_code(12) ; end
+  class DeprecatedOption < BundlerError; status_code(12) ; end
 
   class << self
     attr_writer :ui, :bundle_path

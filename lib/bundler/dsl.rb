@@ -18,6 +18,7 @@ module Bundler
       options = Hash === args.last ? args.pop : {}
       version = args.last || ">= 0"
 
+      _deprecated_options(options)
       _normalize_options(name, version, options)
 
       @dependencies << Dependency.new(name, version, options)
@@ -53,6 +54,22 @@ module Bundler
       @group = old
     end
 
+    # Deprecated methods
+
+    def self.deprecate(name)
+      define_method(name) do |*|
+        raise DeprecatedMethod, "#{name} is removed. See the README for more information"
+      end
+    end
+
+    deprecate :only
+    deprecate :except
+    deprecate :disable_system_gems
+    deprecate :disable_rubygems
+    deprecate :clear_sources
+    deprecate :bundle_path
+    deprecate :bin_path
+
   private
 
     def _version?(version)
@@ -82,6 +99,18 @@ module Bundler
       end
 
       opts["group"] = group
+    end
+
+    def _deprecated_options(options)
+      if options.include?(:require_as)
+        raise DeprecatedOption, "Please replace :require_as with :require"
+      elsif options.include?(:vendored_at)
+        raise DeprecatedOption, "Please replace :vendored_at with :path"
+      elsif options.include?(:only)
+        raise DeprecatedOption, "Please replace :only with :group"
+      elsif options.include?(:except)
+        raise DeprecatedOption, "The :except option is no longer supported"
+      end
     end
   end
 end
