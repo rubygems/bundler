@@ -109,6 +109,10 @@ module Bundler
   private
 
     def default_gemfile
+      if ENV['BUNDLE_GEMFILE']
+        return Pathname.new(ENV['BUNDLE_GEMFILE'])
+      end
+
       current = Pathname.new(Dir.pwd)
 
       until current.root?

@@ -1,6 +1,23 @@
 require File.expand_path('../../spec_helper', __FILE__)
 
 describe "Bundler.setup" do
+  it "uses BUNDLE_GEMFILE to locate the gemfile if present" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack"
+    G
+
+    gemfile bundled_app('4realz'), <<-G
+      source "file://#{gem_repo1}"
+      gem "activesupport", "2.3.5"
+    G
+
+    ENV['BUNDLE_GEMFILE'] = bundled_app('4realz').to_s
+    bundle :install
+
+    should_be_installed "activesupport 2.3.5"
+  end
+
   describe "cripping rubygems" do
     it "replaces #gem with an alternative that raises when appropriate" do
       install_gemfile <<-G
