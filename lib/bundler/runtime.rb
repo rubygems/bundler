@@ -3,11 +3,12 @@ require "digest/md5"
 module Bundler
   class Runtime < Environment
     def setup(*groups)
+      specs = specs_for(*groups)
       # Has to happen first
-      cripple_rubygems
+      cripple_rubygems(specs)
 
       # Activate the specs
-      specs_for(*groups).each do |spec|
+      specs.each do |spec|
         Gem.loaded_specs[spec.name] = spec
         $LOAD_PATH.unshift(*spec.load_paths)
       end
@@ -118,7 +119,7 @@ module Bundler
       specs.map { |s| s.load_paths }.flatten
     end
 
-    def cripple_rubygems
+    def cripple_rubygems(specs)
       # handle 1.9 where system gems are always on the load path
       if defined?(::Gem)
         me = File.expand_path("../../", __FILE__)
@@ -138,9 +139,31 @@ module Bundler
         end
 
         undef gem
-        def gem(*)
-          # Silently ignore calls to gem
+      end
+
+      ::Kernel.send(:define_method, :gem) do |dep, *reqs|
+        opts = reqs.last.is_a?(Hash) ? reqs.pop : {}
+
+        unless dep.respond_to?(:name) && dep.respond_to?(:version_requirements)
+          dep = Gem::Dependency.new(dep, reqs)
         end
+
+        spec = specs.find  { |s| s.name == dep.name }
+
+        if spec.nil?
+          e = Gem::LoadError.new "#{dep} is not part of the bundle. Add it to Gemfile."
+          e.name = dep.name
+          e.version_requirement = dep.version_requirements
+          raise e
+        elsif dep !~ spec
+          e = Gem::LoadError.new "can't activate #{dep}, already activated #{spec.full_name}. " \
+                                 "Make sure all dependencies are added to Gemfile."
+          e.name = dep.name
+          e.version_requirement = dep.version_requirements
+          raise e
+        end
+
+        true
       end
     end
 
