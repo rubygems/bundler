@@ -60,6 +60,20 @@ describe "gemfile install with git sources" do
     should_be_installed "foo 1.0"
   end
 
+  it "setups up executables" do
+    build_lib "foo" do |s|
+      s.executables = "foobar"
+    end
+
+    install_gemfile <<-G
+      path "#{lib_path('foo-1.0')}"
+      gem 'foo'
+    G
+
+    bundle "exec foobar"
+    out.should == "1.0"
+  end
+
   describe "when locked" do
     it "keeps source pinning" do
       build_lib "foo", "1.0", :path => lib_path('foo')

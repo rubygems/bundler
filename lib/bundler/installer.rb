@@ -21,7 +21,9 @@ module Bundler
           Bundler.ui.debug "  * Not in requested group; skipping."
           next
         end
+
         spec.source.install(spec)
+
         Bundler.ui.info ""
       end
 

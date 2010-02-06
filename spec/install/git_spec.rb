@@ -3,9 +3,9 @@ require File.expand_path('../../spec_helper', __FILE__)
 describe "gemfile install with git sources" do
   describe "when floating on master" do
     before :each do
-      in_app_root
-
-      build_git "foo"
+      build_git "foo" do |s|
+        s.executables = "foobar"
+      end
 
       install_gemfile <<-G
         git "#{lib_path('foo-1.0')}"
@@ -42,6 +42,11 @@ describe "gemfile install with git sources" do
 
         out.should == "WIN"
       end
+    end
+
+    it "setups executables" do
+      bundle "exec foobar"
+      out.should == "1.0"
     end
   end
 

@@ -118,8 +118,11 @@ module Bundler
 
         Bundler.ui.debug "  * Installing from pack"
         installer = Gem::Installer.new "#{@path}/#{spec.full_name}.gem",
-          :install_dir => Gem.dir,
-          :ignore_dependencies => true
+          :install_dir         => Gem.dir,
+          :ignore_dependencies => true,
+          :wrappers            => true,
+          :env_shebang         => true,
+          :bin_dir             => "#{Gem.dir}/bin"
 
         installer.install
       end
@@ -176,9 +179,28 @@ module Bundler
 
       def install(spec)
         Bundler.ui.debug "  * Using path #{path}"
+        generate_bin(spec)
       end
 
       alias specs local_specs
+
+    private
+
+      def generate_bin(spec)
+        # HAX -- Generate the bin
+        bin_dir = "#{Gem.dir}/bin"
+        gem_dir = spec.full_gem_path
+        installer = Gem::Installer.allocate
+        installer.instance_eval do
+          @spec     = spec
+          @bin_dir  = bin_dir
+          @gem_dir  = gem_dir
+          @wrappers = true
+          @env_shebang = false
+          @format_executable = false
+        end
+        installer.generate_bin
+      end
 
     end
 
@@ -241,6 +263,7 @@ module Bundler
           checkout
           @installed = true
         end
+        generate_bin(spec)
       end
 
       def lock
