@@ -48,6 +48,16 @@ describe "gemfile install with git sources" do
       bundle "exec foobar"
       out.should == "1.0"
     end
+
+    it "complains if pinned specs don't exist in the git repo" do
+      build_git "foo"
+
+      install_gemfile <<-G
+        gem "foo", "1.1", :git => "#{lib_path('foo-1.0')}"
+      G
+
+      out.should include("Source contains 'foo' at: 1.0")
+    end
   end
 
   describe "when specifying a revision" do

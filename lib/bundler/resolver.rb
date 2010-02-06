@@ -148,8 +148,23 @@ module Bundler
 
         if matching_versions.empty?
           if current.required_by.empty?
+            if current.source
+              name = current.name
+              versions = @source_requirements[name][name].map { |s| s.version }
+              message  = "Could not find gem '#{current}' in #{current.source}.\n"
+              if versions.any?
+                message << "Source contains '#{current.name}' at: #{versions.join(', ')}"
+              else
+                message << "Source does not contain any versions of '#{current}'"
+              end
+
+              raise GemNotFound, message
+            else
+              raise GemNotFound, "Could not find gem '#{current}' in any of the sources."
+            end
             location = current.source ? current.source.to_s : "any of the sources"
-            raise GemNotFound, "Could not find gem '#{current}' in #{location}"
+            raise GemNotFound, "Could not find gem '#{current}' in #{location}.\n" \
+              "Source contains fo"
           else
             @errors[current.name] = [nil, current]
           end
