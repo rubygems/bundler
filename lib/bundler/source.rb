@@ -30,8 +30,11 @@ module Bundler
         gem_path  = Gem::RemoteFetcher.fetcher.download(spec, uri, destination)
         Bundler.ui.debug "  * Installing"
         installer = Gem::Installer.new gem_path,
-          :install_dir => Gem.dir,
-          :ignore_dependencies => true
+          :install_dir         => Gem.dir,
+          :ignore_dependencies => true,
+          :wrappers            => true,
+          :env_shebang         => true,
+          :bin_dir             => "#{Gem.dir}/bin"
 
         installer.install
       end

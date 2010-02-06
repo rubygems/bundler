@@ -32,4 +32,33 @@ describe "bundle exec" do
 
     out.should == "1.0.0"
   end
+
+  it "handles different versions in different bundles" do
+    build_repo2 do
+      build_gem "rack_two", "1.0.0" do |s|
+        s.executables = "rackup"
+      end
+    end
+
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack", "0.9.1"
+    G
+    
+    Dir.chdir bundled_app2 do
+      install_gemfile bundled_app2('Gemfile'), <<-G
+        source "file://#{gem_repo2}"
+        gem "rack_two", "1.0.0"
+      G
+    end
+
+    bundle "exec rackup"
+
+    out.should == "0.9.1"
+
+    Dir.chdir bundled_app2 do
+      bundle "exec rackup"
+      out.should == "1.0.0"
+    end
+  end
 end

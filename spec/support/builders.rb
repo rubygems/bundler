@@ -110,6 +110,7 @@ module Spec
         build_gem "rack", "1.2" do |s|
           s.executables = "rackup"
         end
+        yield if block_given?
       end
     end
 

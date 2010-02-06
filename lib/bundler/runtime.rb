@@ -3,8 +3,11 @@ require "digest/sha1"
 module Bundler
   class Runtime < Environment
     def setup(*groups)
-      specs = specs_for(*groups)
       # Has to happen first
+      clean_load_path
+
+      specs = specs_for(*groups)
+
       cripple_rubygems(specs)
 
       # Activate the specs
@@ -119,54 +122,6 @@ module Bundler
       specs.map { |s| s.load_paths }.flatten
     end
 
-    def cripple_rubygems(specs)
-      # handle 1.9 where system gems are always on the load path
-      if defined?(::Gem)
-        me = File.expand_path("../../", __FILE__)
-        $LOAD_PATH.reject! do |p|
-          p != File.dirname(__FILE__) &&
-            Gem.path.any? { |gp| p.include?(gp) }
-        end
-        $LOAD_PATH.unshift me
-        $LOAD_PATH.uniq!
-      end
-
-      # Disable rubygems' gem activation system
-      ::Kernel.class_eval do
-        if private_method_defined?(:gem_original_require)
-          alias rubygems_require require
-          alias require gem_original_require
-        end
-
-        undef gem
-      end
-
-      ::Kernel.send(:define_method, :gem) do |dep, *reqs|
-        opts = reqs.last.is_a?(Hash) ? reqs.pop : {}
-
-        unless dep.respond_to?(:name) && dep.respond_to?(:version_requirements)
-          dep = Gem::Dependency.new(dep, reqs)
-        end
-
-        spec = specs.find  { |s| s.name == dep.name }
-
-        if spec.nil?
-          e = Gem::LoadError.new "#{dep} is not part of the bundle. Add it to Gemfile."
-          e.name = dep.name
-          e.version_requirement = dep.version_requirements
-          raise e
-        elsif dep !~ spec
-          e = Gem::LoadError.new "can't activate #{dep}, already activated #{spec.full_name}. " \
-                                 "Make sure all dependencies are added to Gemfile."
-          e.name = dep.name
-          e.version_requirement = dep.version_requirements
-          raise e
-        end
-
-        true
-      end
-    end
-
     def write_rb_lock
       template = File.read(File.expand_path("../templates/environment.erb", __FILE__))
       erb = ERB.new(template, nil, '-')
@@ -213,6 +168,93 @@ module Bundler
         autorequires
       else
         groups.inject({}) { |h,g| h[g] = autorequires[g]; h }
+      end
+    end
+
+    def clean_load_path
+      # handle 1.9 where system gems are always on the load path
+      if defined?(::Gem)
+        me = File.expand_path("../../", __FILE__)
+        $LOAD_PATH.reject! do |p|
+          p != File.dirname(__FILE__) &&
+            Gem.path.any? { |gp| p.include?(gp) }
+        end
+        $LOAD_PATH.unshift me
+        $LOAD_PATH.uniq!
+      end
+    end
+
+    def reverse_rubygems_kernel_mixin
+      # Disable rubygems' gem activation system
+      ::Kernel.class_eval do
+        if private_method_defined?(:gem_original_require)
+          alias rubygems_require require
+          alias require gem_original_require
+        end
+
+        undef gem
+      end
+    end
+
+    def cripple_rubygems(specs)
+      reverse_rubygems_kernel_mixin
+
+      executables = specs.map { |s| s.executables }.flatten
+
+      ::Kernel.send(:define_method, :gem) do |dep, *reqs|
+        if executables.include? File.basename(caller.first.split(':').first)
+          return
+        end
+        opts = reqs.last.is_a?(Hash) ? reqs.pop : {}
+
+        unless dep.respond_to?(:name) && dep.respond_to?(:version_requirements)
+          dep = Gem::Dependency.new(dep, reqs)
+        end
+
+        spec = specs.find  { |s| s.name == dep.name }
+
+        if spec.nil?
+          e = Gem::LoadError.new "#{dep} is not part of the bundle. Add it to Gemfile."
+          e.name = dep.name
+          e.version_requirement = dep.version_requirements
+          raise e
+        elsif dep !~ spec
+          e = Gem::LoadError.new "can't activate #{dep}, already activated #{spec.full_name}. " \
+                                 "Make sure all dependencies are added to Gemfile."
+          e.name = dep.name
+          e.version_requirement = dep.version_requirements
+          raise e
+        end
+
+        true
+      end
+
+      # === Following hacks are to improve on the generated bin wrappers ===
+
+      # Yeah, talk about a hack
+      source_index_class = (class << Gem::SourceIndex ; self ; end)
+      source_index_class.send(:define_method, :from_gems_in) do |*args|
+        source_index = Gem::SourceIndex.new
+        source_index.add_specs *specs
+        source_index
+      end
+
+      # OMG more hacks
+      gem_class = (class << Gem ; self ; end)
+      gem_class.send(:define_method, :bin_path) do |name, *args|
+        exec_name, *reqs = args
+
+        spec = nil
+
+        if exec_name
+          spec = specs.find { |s| s.executables.include?(exec_name) }
+          spec or raise Gem::Exception, "can't find executable #{exec_name}"
+        else
+          spec = specs.find  { |s| s.name == name }
+          exec_name = spec.default_executable or raise Gem::Exception, "no default executable for #{spec.full_name}"
+        end
+
+        File.join(spec.full_gem_path, spec.bindir, exec_name)
       end
     end
   end
