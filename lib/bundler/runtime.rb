@@ -1,4 +1,4 @@
-require "digest/md5"
+require "digest/sha1"
 
 module Bundler
   class Runtime < Environment
@@ -184,7 +184,7 @@ module Bundler
 
     def details
       details = {}
-      details["hash"] = Digest::SHA1.hexdigest(File.read("#{root}/Gemfile"))
+      details["hash"] = gemfile_fingerprint
       details["sources"] = sources.map { |s| { s.class.name.split("::").last => s.options} }
 
       details["specs"] = specs.map do |s|
@@ -195,6 +195,10 @@ module Bundler
 
       details["dependencies"] = @definition.dependencies.map { |d| {d.name => d.version_requirements.to_s} }
       details
+    end
+
+    def gemfile_fingerprint
+      Digest::SHA1.hexdigest(File.read("#{root}/Gemfile"))
     end
 
     def autorequires_for_groups(*groups)

@@ -1,16 +1,27 @@
+require 'digest/sha1'
+
 # DO NOT MODIFY THIS FILE
 module Bundler
+  FINGERPRINT = <%= gemfile_fingerprint.inspect %>
   LOAD_PATHS = <%= load_paths.inspect %>
   AUTOREQUIRES = <%= autorequires_for_groups.inspect %>
 
+  def self.match_fingerprint
+    print = Digest::SHA1.hexdigest(File.read(File.expand_path('../../Gemfile', __FILE__)))
+    unless print == FINGERPRINT
+      abort 'Gemfile changed since you last locked. Please `bundle lock` to relock.'
+    end
+  end
+
   def self.setup(*groups)
+    match_fingerprint
     LOAD_PATHS.each { |path| $LOAD_PATH.unshift path }
   end
 
   def self.require(*groups)
     groups = [:default] if groups.empty?
     groups.each do |group|
-      AUTOREQUIRES[group].each { |file| Kernel.require file }
+      (AUTOREQUIRES[group] || []).each { |file| Kernel.require file }
     end
   end
 
