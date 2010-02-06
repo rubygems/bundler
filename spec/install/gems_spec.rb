@@ -1,10 +1,6 @@
 require File.expand_path('../../spec_helper', __FILE__)
 
 describe "gemfile install with gem sources" do
-  before :each do
-    in_app_root
-  end
-
   it "prints output and returns if no dependencies are specified" do
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -126,6 +122,19 @@ describe "gemfile install with gem sources" do
 
     run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
     out.should == '1.0.0 RUBY'
+  end
+
+  it "works with repositories that don't provide prerelease_specs.4.8.gz" do
+    build_repo2
+    Dir["#{gem_repo2}/prerelease*"].each { |f| File.delete(f) }
+
+    install_gemfile <<-G
+      source "file://#{gem_repo2}"
+      gem "rack"
+    G
+
+    out.should include("Source 'file:#{gem_repo2}' does not support prerelease gems")
+    should_be_installed "rack 1.0.0"
   end
 
   describe "with extra sources" do
