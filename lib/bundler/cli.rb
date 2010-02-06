@@ -43,7 +43,7 @@ module Bundler
     end
 
     desc "install", "Install the current environment to the system"
-    method_option :without, :type => :array, :banner => "Exclude gems thar are part of the specified named group"
+    method_option :without, :type => :array, :banner => "Exclude gems that are part of the specified named group"
     def install(path = nil)
       opts = options.dup
       opts[:without] ||= []
