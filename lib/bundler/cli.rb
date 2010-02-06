@@ -93,11 +93,22 @@ module Bundler
     desc "exec", "Run the command in context of the bundle"
     def exec(*)
       ARGV.delete('exec')
-      ENV["RUBYOPT"] = %W(
-        -I#{File.expand_path('../..', __FILE__)}
-        -rbundler/setup
-        #{ENV["RUBYOPT"]}
-      ).compact.join(' ')
+
+      # Set PATH
+      paths = (ENV['PATH'] || "").split(File::PATH_SEPARATOR)
+      paths.unshift "#{Bundler.bundle_path}/bin"
+      ENV["PATH"] = paths.uniq.join(File::PATH_SEPARATOR)
+
+      # Set BUNDLE_GEMFILE
+      ENV['BUNDLE_GEMFILE'] = Bundler.default_gemfile
+
+      # Set RUBYOPT
+      rubyopt = [ENV["RUBYOPT"]].compact
+      rubyopt.unshift "-rbundler/setup"
+      rubyopt.unshift "-I#{File.expand_path('../..', __FILE__)}"
+      ENV["RUBYOPT"] = rubyopt.join(' ')
+
+      # Run
       Kernel.exec *ARGV
     end
 

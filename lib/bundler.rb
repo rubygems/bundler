@@ -106,8 +106,6 @@ module Bundler
       @settings ||= Settings.new(root)
     end
 
-  private
-
     def default_gemfile
       if ENV['BUNDLE_GEMFILE']
         return Pathname.new(ENV['BUNDLE_GEMFILE'])
@@ -123,6 +121,8 @@ module Bundler
 
       raise GemfileNotFound, "The default Gemfile was not found"
     end
+
+  private
 
     def configure_gem_home_and_path
       if path = settings[:path]
