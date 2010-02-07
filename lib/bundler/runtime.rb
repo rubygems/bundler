@@ -32,17 +32,6 @@ module Bundler
       @definition.actual_dependencies
     end
 
-    def unlock
-      unless locked?
-        Bundler.ui.info("The bundle is not currently locked.")
-        return
-      end
-
-      FileUtils.rm_f("#{root}/.bundle/environment.rb")
-      FileUtils.rm_f("#{root}/Gemfile.lock")
-      Bundler.ui.info("The bundle is now unlocked. The dependencies may be changed.")
-    end
-
     def lock
       Bundler.ui.info("The bundle is already locked, relocking.") if locked?
       sources.each { |s| s.lock if s.respond_to?(:lock) }

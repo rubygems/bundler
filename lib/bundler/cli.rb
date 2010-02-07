@@ -57,9 +57,9 @@ module Bundler
 
     desc "lock", "Locks the bundle to the current set of dependencies, including all child dependencies."
     def lock
-      if File.exist?("#{Bundler.root}/Gemfile.lock")
+      if locked?
         Bundler.ui.info("The bundle is already locked, relocking.")
-        `rm #{Bundler.root}/Gemfile.lock #{Bundler.root}/.bundle/environment.rb`
+        remove_lockfiles
       end
 
       environment = Bundler.load
@@ -72,8 +72,12 @@ module Bundler
 
     desc "unlock", "Unlock the bundle. This allows gem versions to be changed"
     def unlock
-      environment = Bundler.load
-      environment.unlock
+      if locked?
+        remove_lockfiles
+        Bundler.ui.info("The bundle is now unlocked. The dependencies may be changed.")
+      else
+        Bundler.ui.info("The bundle is not currently locked.")
+      end
     end
 
     desc "show", "Shows all gems that are part of the bundle."
@@ -113,5 +117,14 @@ module Bundler
       Kernel.exec *ARGV
     end
 
+    private
+      def locked?
+        File.exist?("#{Bundler.root}/Gemfile.lock") || File.exist?("#{Bundler.root}/.bundle/environment.rb")
+      end
+
+      def remove_lockfiles
+        FileUtils.rm_f "#{Bundler.root}/Gemfile.lock"
+        FileUtils.rm_f "#{Bundler.root}/.bundle/environment.rb"
+      end
   end
 end
