@@ -101,7 +101,7 @@ module Bundler
       ENV["PATH"] = paths.uniq.join(File::PATH_SEPARATOR)
 
       # Set BUNDLE_GEMFILE
-      ENV['BUNDLE_GEMFILE'] = Bundler.default_gemfile
+      ENV['BUNDLE_GEMFILE'] = Bundler.default_gemfile.to_s
 
       # Set RUBYOPT
       rubyopt = [ENV["RUBYOPT"]].compact
