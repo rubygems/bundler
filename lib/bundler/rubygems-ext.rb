@@ -1,5 +1,7 @@
+unless defined? Gem
 require 'rubygems'
 require 'rubygems/specification'
+end
 
 module Gem
   @loaded_stacks = Hash.new { |h,k| h[k] = [] }
