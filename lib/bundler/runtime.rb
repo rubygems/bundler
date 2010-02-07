@@ -32,13 +32,6 @@ module Bundler
       @definition.actual_dependencies
     end
 
-    def lock
-      FileUtils.mkdir_p("#{root}/.bundle")
-      write_yml_lock
-      write_rb_lock
-      Bundler.ui.info("The bundle is now locked. Use `bundle show` to list the gems in the environment.")
-    end
-
     def unlock
       unless locked?
         Bundler.ui.info("The bundle is not currently locked.")
