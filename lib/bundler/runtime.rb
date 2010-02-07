@@ -60,7 +60,7 @@ module Bundler
     end
 
     def locked?
-      File.exist?("#{root}/Gemfile.lock")
+      File.exist?("#{root}/Gemfile.lock") || File.exist?("#{root}/.bundle/environment.rb")
     end
 
     def dependencies_for(*groups)

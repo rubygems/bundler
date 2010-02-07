@@ -58,7 +58,7 @@ module Bundler
     def lock
       if File.exist?("#{Bundler.root}/Gemfile.lock")
         Bundler.ui.info("The bundle is already locked, relocking.")
-        `rm #{Bundler.root}/Gemfile.lock`
+        `rm #{Bundler.root}/Gemfile.lock #{Bundler.root}/.bundle/environment.rb`
       end
 
       environment = Bundler.load
