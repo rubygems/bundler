@@ -36,6 +36,7 @@ module Bundler
         missing.each do |d|
           puts "  * #{d}"
         end
+        exit 1
       else
         env.specs
         puts "The Gemfile's dependencies are satisfied"

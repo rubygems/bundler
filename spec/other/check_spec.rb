@@ -12,6 +12,7 @@ describe "bundle check" do
     G
 
     bundle :check
+    @exitstatus.should == 0 if @exitstatus
     out.should == "The Gemfile's dependencies are satisfied"
   end
 
@@ -22,6 +23,7 @@ describe "bundle check" do
     G
 
     bundle :check
+    @exitstatus.should_not == 0 if @exitstatus
     out.should =~ /rails \(>= 0, runtime\)/
   end
 
@@ -58,6 +60,7 @@ describe "bundle check" do
 
   it "outputs an error when the default Gemspec is not found" do
     bundle :check
+    @exitstatus.should_not == 0 if @exitstatus
     out.should =~ /The default Gemfile was not found/
   end
 end
