@@ -87,7 +87,8 @@ describe "gemfile install with git sources" do
       install_gemfile <<-G
         gem "thingy", :git => "git@example.fkdmn1234fake.com:somebody/thingy.git"
       G
-      err.should include("connect to host example.fkdmn1234fake.com port 22")
+      err.should include("example.fkdmn1234fake.com")
+      err.should include("ssh")
     end
 
     it "installs from git even if a newer gem is available elsewhere" do
