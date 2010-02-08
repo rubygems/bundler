@@ -17,6 +17,9 @@ module Bundler
     def gem(name, *args)
       options = Hash === args.last ? args.pop : {}
       version = args.last || ">= 0"
+      if options[:group]
+        options[:group] = options[:group].to_sym
+      end
 
       _deprecated_options(options)
       _normalize_options(name, version, options)
@@ -48,7 +51,7 @@ module Bundler
     end
 
     def group(name, options = {}, &blk)
-      old, @group = @group, name
+      old, @group = @group, name.to_sym
       yield
     ensure
       @group = old

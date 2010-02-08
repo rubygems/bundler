@@ -24,6 +24,10 @@ describe "Bundler.require" do
       s.write "lib/mofive.rb", "puts 'five'"
     end
 
+    build_lib "six", "1.0.0" do |s|
+      s.write "lib/six.rb", "puts 'six'"
+    end
+
     gemfile <<-G
       path "#{lib_path}"
       gem "one", :group => :bar, :require => %w(baz qux)
@@ -31,6 +35,7 @@ describe "Bundler.require" do
       gem "three", :group => :not
       gem "four", :require => false
       gem "five"
+      gem "six", :group => "string"
     G
   end
 
@@ -43,6 +48,14 @@ describe "Bundler.require" do
 
     run "Bundler.require(:default, :bar)"
     out.should == "two\nbaz\nqux"
+  end
+
+  it "requires the gems with strings as group names" do
+    run 'Bundler.require("bar")'
+    out.should == "baz\nqux"
+
+    run 'Bundler.require(:string)'
+    out.should == "six"
   end
 
   it "requires the locked gems" do
