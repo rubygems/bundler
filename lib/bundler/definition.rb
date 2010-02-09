@@ -83,8 +83,8 @@ module Bundler
       end
 
       def dependencies
-        @dependencies ||= @details["dependencies"].map do |args|
-          Bundler::Dependency.new(*args.to_a.flatten)
+        @dependencies ||= @details["dependencies"].map do |dep, opts|
+          Bundler::Dependency.new(dep, opts.delete("version"), opts)
         end
       end
     end

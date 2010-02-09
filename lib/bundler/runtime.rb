@@ -29,6 +29,10 @@ module Bundler
     end
 
     def dependencies
+      @definition.dependencies
+    end
+
+    def actual_dependencies
       @definition.actual_dependencies
     end
 
@@ -64,7 +68,7 @@ module Bundler
     def specs
       @specs ||= begin
         source_requirements = {}
-        dependencies.each do |dep|
+        actual_dependencies.each do |dep|
           next unless dep.source && dep.source.respond_to?(:local_specs)
           source_requirements[dep.name] = dep.source.local_specs
         end
@@ -130,7 +134,11 @@ module Bundler
         { s.name => options }
       end
 
-      details["dependencies"] = @definition.dependencies.map { |d| {d.name => d.version_requirements.to_s} }
+      details["dependencies"] = @definition.dependencies.inject({}) do |h,d|
+        h.merge!({d.name => {"version" => d.version_requirements.to_s,
+                    "group"   => d.groups,
+                    "require" => d.autorequire}})
+      end
       details
     end
 

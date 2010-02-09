@@ -45,15 +45,47 @@ describe "Bundler.require" do
 
   it "requires the locked gems" do
     bundle :lock
-    env = bundled_app(".bundle/environment.rb")
 
-    out = ruby("require '#{env}'; Bundler.setup; Bundler.require")
+    out = ruby("require 'bundler'; Bundler.setup; Bundler.require")
+    puts out
     out.should == "two"
 
-    out = ruby("require '#{env}'; Bundler.setup(:bar); Bundler.require(:bar)")
+    out = ruby("require 'bundler'; Bundler.setup(:bar); Bundler.require(:bar)")
     out.should == "baz\nqux"
 
-    out = ruby("require '#{env}'; Bundler.setup(:default, :bar); Bundler.require(:default, :bar)")
+    out = ruby("require 'bundler'; Bundler.setup(:default, :bar); Bundler.require(:default, :bar)")
     out.should == "two\nbaz\nqux"
   end
+  
+  describe "requiring the environment directly" do
+    it "requires the locked gems" do
+      bundle :lock
+      env = bundled_app(".bundle/environment.rb")
+
+      out = ruby("require '#{env}'; Bundler.setup; Bundler.require")
+      out.should == "two"
+
+      out = ruby("require '#{env}'; Bundler.setup(:bar); Bundler.require(:bar)")
+      out.should == "baz\nqux"
+
+      out = ruby("require '#{env}'; Bundler.setup(:default, :bar); Bundler.require(:default, :bar)")
+      out.should == "two\nbaz\nqux"
+    end
+  end
+
+  describe "using bundle exec" do
+    it "requires the locked gems" do
+      bundle :lock
+
+      bundle "exec ruby -e 'Bundler.require'"
+      out.should == "two"
+
+      bundle "exec ruby -e 'Bundler.require(:bar)'"
+      out.should == "baz\nqux"
+
+      bundle "exec ruby -e 'Bundler.require(:default, :bar)'"
+      out.should == "two\nbaz\nqux"
+    end
+  end
+
 end

@@ -3,6 +3,7 @@ require 'rubygems/dependency'
 module Bundler
   class Dependency < Gem::Dependency
     attr_reader :autorequire
+    attr_reader :groups
 
     def initialize(name, version, options = {}, &blk)
       super(name, version)
