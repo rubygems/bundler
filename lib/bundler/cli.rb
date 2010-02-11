@@ -105,7 +105,7 @@ module Bundler
       ENV["PATH"] = paths.uniq.join(File::PATH_SEPARATOR)
 
       # Set BUNDLE_GEMFILE
-      ENV['BUNDLE_GEMFILE'] = Bundler.default_gemfile.to_s
+      ENV['BUNDLE_GEMFILE'] = Bundler::SharedHelpers.default_gemfile.to_s
 
       # Set RUBYOPT
       rubyopt = [ENV["RUBYOPT"]].compact
@@ -117,14 +117,15 @@ module Bundler
       Kernel.exec *ARGV
     end
 
-    private
-      def locked?
-        File.exist?("#{Bundler.root}/Gemfile.lock") || File.exist?("#{Bundler.root}/.bundle/environment.rb")
-      end
+  private
 
-      def remove_lockfiles
-        FileUtils.rm_f "#{Bundler.root}/Gemfile.lock"
-        FileUtils.rm_f "#{Bundler.root}/.bundle/environment.rb"
-      end
+    def locked?
+      File.exist?("#{Bundler.root}/Gemfile.lock") || File.exist?("#{Bundler.root}/.bundle/environment.rb")
+    end
+
+    def remove_lockfiles
+      FileUtils.rm_f "#{Bundler.root}/Gemfile.lock"
+      FileUtils.rm_f "#{Bundler.root}/.bundle/environment.rb"
+    end
   end
 end

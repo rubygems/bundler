@@ -107,23 +107,11 @@ module Bundler
       @settings ||= Settings.new(root)
     end
 
-    def default_gemfile
-      if ENV['BUNDLE_GEMFILE']
-        return Pathname.new(ENV['BUNDLE_GEMFILE'])
-      end
-
-      current = Pathname.new(Dir.pwd)
-
-      until current.root?
-        filename = current.join("Gemfile")
-        return filename if filename.exist?
-        current = current.parent
-      end
-
-      raise GemfileNotFound, "The default Gemfile was not found"
-    end
-
   private
+
+    def default_gemfile
+      SharedHelpers.default_gemfile
+    end
 
     def configure_gem_home_and_path
       if path = settings[:path]
