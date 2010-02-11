@@ -1,7 +1,14 @@
 require 'digest/sha1'
 
 # DO NOT MODIFY THIS FILE
+
+<%= shared_helpers %>
+
 module Bundler
+  extend SharedHelpers
+
+  reverse_rubygems_kernel_mixin
+
   FINGERPRINT = <%= gemfile_fingerprint.inspect %>
   LOAD_PATHS = <%= load_paths.inspect %>
   AUTOREQUIRES = <%= autorequires_for_groups.inspect %>

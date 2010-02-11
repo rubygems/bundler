@@ -47,7 +47,6 @@ describe "Bundler.require" do
     bundle :lock
 
     out = ruby("require 'bundler'; Bundler.setup; Bundler.require")
-    puts out
     out.should == "two"
 
     out = ruby("require 'bundler'; Bundler.setup(:bar); Bundler.require(:bar)")

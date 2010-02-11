@@ -21,15 +21,16 @@ module Spec
       Dir.chdir(bundled_app2, &blk)
     end
 
-    def run_in_context(cmd)
-      env = bundled_path.join('environment.rb')
-      raise "Missing environment.rb" unless env.file?
-      @out = ruby "-r #{env}", cmd
-    end
-
     def run(cmd, *args)
+      opts = args.last.is_a?(Hash) ? args.pop : {}
       groups = args.map {|a| a.inspect }.join(", ")
-      setup = "require 'rubygems' ; require 'bundler' ; Bundler.setup(#{groups})\n"
+
+      if opts[:lite_runtime]
+        setup = "require '#{bundled_app(".bundle/environment")}' ; Bundler.setup(#{groups})\n"
+      else
+        setup = "require 'rubygems' ; require 'bundler' ; Bundler.setup(#{groups})\n"
+      end
+
       @out = ruby(setup + cmd)
     end
 

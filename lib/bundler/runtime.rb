@@ -2,6 +2,8 @@ require "digest/sha1"
 
 module Bundler
   class Runtime < Environment
+    include SharedHelpers
+
     def setup(*groups)
       # Has to happen first
       clean_load_path
@@ -109,6 +111,7 @@ module Bundler
     end
 
     def write_rb_lock
+      shared_helpers = File.read(File.expand_path("../shared_helpers.rb", __FILE__))
       template = File.read(File.expand_path("../templates/environment.erb", __FILE__))
       erb = ERB.new(template, nil, '-')
       File.open("#{root}/.bundle/environment.rb", 'w') do |f|
@@ -171,18 +174,6 @@ module Bundler
         end
         $LOAD_PATH.unshift me
         $LOAD_PATH.uniq!
-      end
-    end
-
-    def reverse_rubygems_kernel_mixin
-      # Disable rubygems' gem activation system
-      ::Kernel.class_eval do
-        if private_method_defined?(:gem_original_require)
-          alias rubygems_require require
-          alias require gem_original_require
-        end
-
-        undef gem
       end
     end
 
