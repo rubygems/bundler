@@ -8,7 +8,11 @@ require "rubygems"
 module Bundler
   LOCKED_BY    = '<%= Bundler::VERSION %>'
   FINGERPRINT  = <%= gemfile_fingerprint.inspect %>
-  SPECS        = <%= specs_for_lock_file.inspect %>
+  SPECS        = [
+    <% specs_for_lock_file.each do |spec| -%>
+    <%= spec.inspect %>,
+    <% end -%>
+  ]
   AUTOREQUIRES = <%= autorequires_for_groups.inspect %>
 
   extend SharedHelpers
@@ -35,7 +39,16 @@ module Bundler
   def self.require(*groups)
     groups = [:default] if groups.empty?
     groups.each do |group|
-      (AUTOREQUIRES[group] || []).each { |file| Kernel.require file }
+      (AUTOREQUIRES[group] || []).each do |file, explicit|
+        if explicit
+          Kernel.require file
+        else
+          begin
+            Kernel.require file
+          rescue LoadError
+          end
+        end
+      end
     end
   end
 

@@ -28,11 +28,20 @@ module Bundler
     end
 
     def require(*groups)
+      groups.map! { |g| g.to_sym }
       groups = [:default] if groups.empty?
       autorequires = autorequires_for_groups(*groups)
+
       groups.each do |group|
-        (autorequires[group] || []).each do |path|
-          Kernel.require(path)
+        (autorequires[group] || [[]]).each do |path, explicit|
+          if explicit
+            Kernel.require(path)
+          else
+            begin
+              Kernel.require(path)
+            rescue LoadError
+            end
+          end
         end
       end
     end
@@ -150,9 +159,9 @@ module Bundler
       end
 
       details["dependencies"] = @definition.dependencies.inject({}) do |h,d|
-        h.merge!({d.name => {"version" => d.version_requirements.to_s,
-                    "group"   => d.groups,
-                    "require" => d.autorequire}})
+        h.merge!({d.name => {"version" => d.version_requirements.to_s, "group"   => d.groups} })
+        h[d.name]['require'] = d.autorequire if d.autorequire
+        h
       end
       details
     end
@@ -178,7 +187,15 @@ module Bundler
       autorequires = Hash.new { |h,k| h[k] = [] }
       @definition.dependencies.each do |dep|
         dep.groups.each do |group|
-          autorequires[group].concat dep.autorequire
+          # If there is no autorequire, then rescue from
+          # autorequiring the gems name
+          if dep.autorequire
+            dep.autorequire.each do |file|
+              autorequires[group] << [file, true]
+            end
+          else
+            autorequires[group] << [dep.name, false]
+          end
         end
       end
 

@@ -20,15 +20,17 @@ describe "Bundler.require" do
       s.write "lib/four.rb", "puts 'four'"
     end
 
+    build_lib "five", "1.0.0", :no_default => true do |s|
+      s.write "lib/mofive.rb", "puts 'five'"
+    end
+
     gemfile <<-G
-      path "#{lib_path('one-1.0.0')}"
-      path "#{lib_path('two-1.0.0')}"
-      path "#{lib_path('three-1.0.0')}"
-      path "#{lib_path('four-1.0.0')}"
+      path "#{lib_path}"
       gem "one", :group => :bar, :require => %w(baz qux)
       gem "two"
       gem "three", :group => :not
       gem "four", :require => false
+      gem "five"
     G
   end
 
@@ -55,7 +57,28 @@ describe "Bundler.require" do
     out = ruby("require 'bundler'; Bundler.setup(:default, :bar); Bundler.require(:default, :bar)")
     out.should == "two\nbaz\nqux"
   end
-  
+
+  it "allows requiring gems with non standard names explicitly" do
+    run "Bundler.require ; require 'mofive'"
+    out.should == "two\nfive"
+  end
+
+  it "raises an exception if a require is specified but the file does not exist" do
+    gemfile <<-G
+      path "#{lib_path}"
+      gem "two", :require => 'fail'
+    G
+
+    run <<-R
+      begin
+        Bundler.require
+      rescue LoadError => e
+        puts e.message
+      end
+    R
+    out.should == 'no such file to load -- fail'
+  end
+
   describe "requiring the environment directly" do
     it "requires the locked gems" do
       bundle :lock
@@ -86,5 +109,4 @@ describe "Bundler.require" do
       out.should == "two\nbaz\nqux"
     end
   end
-
 end
