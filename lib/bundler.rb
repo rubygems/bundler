@@ -114,8 +114,8 @@ module Bundler
     end
 
     def configure_gem_home_and_path
-      if path = settings[:path]
-        ENV['GEM_HOME'] = File.expand_path(path, root)
+      if settings[:disable_shared_gems]
+        ENV['GEM_HOME'] = File.expand_path(bundle_path, root)
         ENV['GEM_PATH'] = ''
       else
         gem_home, gem_path = Gem.dir, Gem.path

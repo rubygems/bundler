@@ -44,16 +44,18 @@ module Bundler
     end
 
     desc "install", "Install the current environment to the system"
-    method_option :without, :type => :array, :banner   => "Exclude gems that are part of the specified named group"
-    method_option :relock,  :type => :boolean, :banner => "Unlock, install the gems, and relock"
+    method_option "without", :type => :array,   :banner => "Exclude gems that are part of the specified named group."
+    method_option "relock",  :type => :boolean, :banner => "Unlock, install the gems, and relock."
+    method_option "disable-shared-gems", :type => :boolean, :banner => "Do not use any shared gems, such as the system gem repository."
     def install(path = nil)
-      remove_lockfiles if options[:relock]
-
       opts = options.dup
       opts[:without] ||= []
       opts[:without].map! { |g| g.to_sym }
 
       Bundler.settings[:path] = path if path
+      Bundler.settings[:disable_shared_gems] = '1' if options["disable-shared-gems"]
+
+      remove_lockfiles if options[:relock]
 
       Installer.install(Bundler.root, Bundler.definition, opts)
 

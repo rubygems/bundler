@@ -231,6 +231,46 @@ describe "gemfile install with gem sources" do
       bundled_app('vendor/gems/rack-1.0.0').should be_directory
       should_be_installed "rack 1.0.0"
     end
+
+    it "does not disable system gems when specifying a path to install to" do
+      build_gem "rack", "1.1.0", :to_system => true
+      bundle "install ./vendor"
+
+      bundled_app('vendor/gems/rack-1.1.0').should_not be_directory
+      should_be_installed "rack 1.1.0"
+    end
+  end
+
+  describe "disabling system gems" do
+    before :each do
+      build_gem "rack", "1.0.0", :to_system => true do |s|
+        s.write "lib/rack.rb", "puts 'FAIL'"
+      end
+    end
+
+    it "does not use available system gems" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      bundle "install --disable-shared-gems"
+      should_be_installed "rack 1.0.0"
+    end
+
+    it "remembers to disable system gems after the first time" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      bundle "install vendor/gems --disable-shared-gems"
+      FileUtils.rm_rf bundled_app('vendor/gems')
+      bundle "install"
+
+      bundled_app('vendor/gems/gems/rack-1.0.0').should be_directory
+      should_be_installed "rack 1.0.0"
+    end
   end
 
   describe "when packed and locked" do
