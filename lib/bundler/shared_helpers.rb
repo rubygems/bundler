@@ -16,25 +16,28 @@ module Bundler
     end
 
     def default_gemfile
-      if ENV['BUNDLE_GEMFILE']
-        return Pathname.new(ENV['BUNDLE_GEMFILE'])
-      end
-
-      current = Pathname.new(Dir.pwd)
-
-      until current.root?
-        filename = current.join("Gemfile")
-        return filename if filename.exist?
-        current = current.parent
-      end
-
-      raise GemfileNotFound, "The default Gemfile was not found"
+      gemfile = find_gemfile
+      gemfile or raise GemfileNotFound, "The default Gemfile was not found"
+      Pathname.new(gemfile)
     end
 
     def in_bundle?
-      default_gemfile
-    rescue GemfileNotFound
-      false
+      find_gemfile
+    end
+
+  private
+
+    def find_gemfile
+      return ENV['BUNDLE_GEMFILE'] if ENV['BUNDLE_GEMFILE']
+
+      previous = nil
+      current  = File.expand_path(Dir.pwd)
+
+      until !File.directory?(current) || current == previous
+        filename = File.join(current, 'Gemfile')
+        return filename if File.file?(filename)
+        current, previous = File.expand_path("#{current}/.."), current
+      end
     end
 
     extend self
