@@ -181,6 +181,15 @@ describe "gemfile install with gem sources" do
         should_be_installed "rack 1.0.0"
       end
     end
+
+    it "regenerates .bundle/environment.rb if missing" do
+      bundled_app('.bundle/environment.rb').delete
+      system_gems [] do
+        bundle :install
+        bundled_app('.bundle/environment.rb').should exist
+        should_be_installed "rack 0.9.1"
+      end
+    end
   end
 
   describe "with BUNDLE_PATH set" do
