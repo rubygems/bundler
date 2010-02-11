@@ -2,8 +2,6 @@ module Bundler
   module SharedHelpers
 
     def reverse_rubygems_kernel_mixin
-      require "rubygems"
-
       # Disable rubygems' gem activation system
       ::Kernel.class_eval do
         if private_method_defined?(:gem_original_require)
@@ -37,6 +35,19 @@ module Bundler
         filename = File.join(current, 'Gemfile')
         return filename if File.file?(filename)
         current, previous = File.expand_path("#{current}/.."), current
+      end
+    end
+
+    def clean_load_path
+      # handle 1.9 where system gems are always on the load path
+      if defined?(::Gem)
+        me = File.expand_path("../../", __FILE__)
+        $LOAD_PATH.reject! do |p|
+          next if File.expand_path(p).include?(me)
+          p != File.dirname(__FILE__) &&
+            Gem.path.any? { |gp| p.include?(gp) }
+        end
+        $LOAD_PATH.uniq!
       end
     end
 

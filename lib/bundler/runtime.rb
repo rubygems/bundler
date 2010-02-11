@@ -60,6 +60,7 @@ module Bundler
     end
 
     def specs_for(*groups)
+      groups.map! { |g| g.to_sym }
       if groups.empty?
         specs
       else
@@ -75,7 +76,7 @@ module Bundler
           source_requirements[dep.name] = dep.source.local_specs
         end
 
-        Resolver.resolve(@definition.actual_dependencies, index, source_requirements)
+        group_specs(Resolver.resolve(@definition.actual_dependencies, index, source_requirements))
       end
     end
 
@@ -149,7 +150,20 @@ module Bundler
       Digest::SHA1.hexdigest(File.read("#{root}/Gemfile"))
     end
 
+    def specs_for_lock_file
+      specs.map do |spec|
+        dep  = @definition.dependencies.find { |d| d.name == spec.name }
+        hash = {}
+        hash[:name]       = spec.name
+        hash[:version]    = spec.version.to_s
+        hash[:groups]     = spec.groups
+        hash[:load_paths] = spec.load_paths
+        hash
+      end
+    end
+
     def autorequires_for_groups(*groups)
+      groups.map! { |g| g.to_sym }
       autorequires = Hash.new { |h,k| h[k] = [] }
       @definition.dependencies.each do |dep|
         dep.groups.each do |group|
@@ -164,24 +178,13 @@ module Bundler
       end
     end
 
-    def clean_load_path
-      # handle 1.9 where system gems are always on the load path
-      if defined?(::Gem)
-        me = File.expand_path("../../", __FILE__)
-        $LOAD_PATH.reject! do |p|
-          p != File.dirname(__FILE__) &&
-            Gem.path.any? { |gp| p.include?(gp) }
-        end
-        $LOAD_PATH.unshift me
-        $LOAD_PATH.uniq!
-      end
-    end
-
     def cripple_rubygems(specs)
       reverse_rubygems_kernel_mixin
 
       executables = specs.map { |s| s.executables }.flatten
 
+      # TODO: This is duplicated a bit too much in environment.erb.
+      #       Let's figure out how to improve that.
       ::Kernel.send(:define_method, :gem) do |dep, *reqs|
         if executables.include? File.basename(caller.first.split(':').first)
           return

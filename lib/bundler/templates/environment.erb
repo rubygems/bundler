@@ -1,17 +1,22 @@
-require 'digest/sha1'
-
 # DO NOT MODIFY THIS FILE
+
+require 'digest/sha1'
+require "rubygems"
 
 <%= shared_helpers %>
 
 module Bundler
+  LOCKED_BY    = '<%= Bundler::VERSION %>'
+  FINGERPRINT  = <%= gemfile_fingerprint.inspect %>
+  SPECS        = <%= specs_for_lock_file.inspect %>
+  AUTOREQUIRES = <%= autorequires_for_groups.inspect %>
+
   extend SharedHelpers
 
-  reverse_rubygems_kernel_mixin
-
-  FINGERPRINT = <%= gemfile_fingerprint.inspect %>
-  LOAD_PATHS = <%= load_paths.inspect %>
-  AUTOREQUIRES = <%= autorequires_for_groups.inspect %>
+  def self.cripple_ruby_gems
+    reverse_rubygems_kernel_mixin
+    patch_rubygems
+  end
 
   def self.match_fingerprint
     print = Digest::SHA1.hexdigest(File.read(File.expand_path('../../Gemfile', __FILE__)))
@@ -22,7 +27,9 @@ module Bundler
 
   def self.setup(*groups)
     match_fingerprint
-    LOAD_PATHS.each { |path| $LOAD_PATH.unshift path }
+    SPECS.each do |spec|
+      spec[:load_paths].each { |path| $LOAD_PATH.unshift path }
+    end
   end
 
   def self.require(*groups)
@@ -32,6 +39,25 @@ module Bundler
     end
   end
 
+  def self.patch_rubygems
+    specs = SPECS
+
+    ::Kernel.send(:define_method, :gem) do |dep, *reqs|
+      opts = reqs.last.is_a?(Hash) ? reqs.pop : {}
+
+      dep  = dep.name if dep.respond_to?(:name)
+      unless specs.any?  { |s| s[:name] == dep }
+        e = Gem::LoadError.new "#{dep} is not part of the bundle. Add it to Gemfile."
+        e.name = dep
+        e.version_requirement = reqs
+        raise e
+      end
+
+      true
+    end
+  end
+
   # Setup bundle when it's required.
+  cripple_ruby_gems
   setup
 end

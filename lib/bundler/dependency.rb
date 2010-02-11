@@ -8,7 +8,7 @@ module Bundler
     def initialize(name, version, options = {}, &blk)
       super(name, version)
 
-      @groups = Array(options["group"] || :default)
+      @groups = Array(options["group"] || :default).map { |g| g.to_sym }
       @source = options["source"]
       @autorequire = options.include?("require") ? options['require'] || [] : [name]
       @autorequire = [@autorequire] unless @autorequire.is_a?(Array)
