@@ -58,6 +58,9 @@ module Bundler
       remove_lockfiles if options[:relock]
 
       Installer.install(Bundler.root, Bundler.definition, opts)
+      # Ensures that .bundle/environment.rb exists
+      # TODO: Figure out a less hackish way to do this
+      Bundler.load
 
       lock if options[:relock]
     end

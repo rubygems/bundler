@@ -1,10 +1,6 @@
 require File.expand_path('../../spec_helper', __FILE__)
 
 describe "bundle check" do
-  before :each do
-    in_app_root
-  end
-
   it "returns success when the Gemfile is satisfied" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
@@ -62,5 +58,22 @@ describe "bundle check" do
     bundle :check
     @exitstatus.should_not == 0 if @exitstatus
     out.should =~ /The default Gemfile was not found/
+  end
+
+  describe "when locked" do
+    before :each do
+      system_gems "rack-1.0.0"
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+      bundle "lock"
+    end
+
+    it "rebuilds .bundle/environment.rb " do
+      bundled_app('.bundle/environment.rb').delete
+      bundle :check
+      bundled_app('.bundle/environment.rb').should exist
+    end
   end
 end

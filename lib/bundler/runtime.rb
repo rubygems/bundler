@@ -4,11 +4,14 @@ module Bundler
   class Runtime < Environment
     include SharedHelpers
 
-    def setup(*groups)
+    def initialize(*)
+      super
       if locked? # && !rb_lock_file.exist?
         write_rb_lock
       end
+    end
 
+    def setup(*groups)
       # Has to happen first
       clean_load_path
 
