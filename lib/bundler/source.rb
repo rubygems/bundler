@@ -313,11 +313,10 @@ module Bundler
       end
 
       def checkout
-        FileUtils.mkdir_p(path)
+        unless File.exist?(path + "/.git")
+          %x(git clone --no-checkout #{cache_path} #{path})
+        end
         Dir.chdir(path) do
-          unless File.exist?(".git")
-            %x(git clone --no-checkout #{cache_path} #{path})
-          end
           git "fetch --quiet"
           git "reset --hard #{revision}"
         end
