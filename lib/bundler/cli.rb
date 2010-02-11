@@ -1,6 +1,5 @@
 $:.unshift File.expand_path('../vendor', __FILE__)
 require 'thor'
-require 'bundler'
 require 'rubygems/config_file'
 
 # Work around a RubyGems bug

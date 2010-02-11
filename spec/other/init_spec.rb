@@ -1,10 +1,6 @@
 require File.expand_path('../../spec_helper', __FILE__)
 
 describe "bundle init" do
-  before :each do
-    in_app_root
-  end
-
   it "generates a Gemfile" do
     bundle :init
     bundled_app("Gemfile").should exist

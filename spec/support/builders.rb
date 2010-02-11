@@ -96,6 +96,11 @@ module Spec
             }
           C
         end
+
+        build_gem "bundler", "0.8.1" do |s|
+          s.write "lib/bundler/omg.rb", ""
+          s.write "lib/rubygems_plugin.rb", "require 'bundler/omg' ; puts 'FAIL'"
+        end
       end
     end
 
