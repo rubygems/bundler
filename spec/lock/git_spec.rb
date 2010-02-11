@@ -1,6 +1,6 @@
 require File.expand_path('../../spec_helper', __FILE__)
 
-describe "gemfile lock with git" do
+describe "bundle lock with git" do
   it "doesn't break right after running lock" do
     build_git "foo"
 

@@ -5,6 +5,10 @@ module Bundler
     include SharedHelpers
 
     def setup(*groups)
+      if locked? # && !rb_lock_file.exist?
+        write_rb_lock
+      end
+
       # Has to happen first
       clean_load_path
 
@@ -111,11 +115,15 @@ module Bundler
       specs.map { |s| s.load_paths }.flatten
     end
 
+    def rb_lock_file
+      root.join(".bundle/environment.rb")
+    end
+
     def write_rb_lock
       shared_helpers = File.read(File.expand_path("../shared_helpers.rb", __FILE__))
       template = File.read(File.expand_path("../templates/environment.erb", __FILE__))
       erb = ERB.new(template, nil, '-')
-      File.open("#{root}/.bundle/environment.rb", 'w') do |f|
+      File.open(rb_lock_file, 'w') do |f|
         f.puts erb.result(binding)
       end
     end

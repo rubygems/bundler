@@ -1,8 +1,7 @@
 require File.expand_path('../../spec_helper', __FILE__)
 
-describe "gemfile lock with gems" do
+describe "bundle lock with gems" do
   before :each do
-    in_app_root
     system_gems "rack-0.9.1"
     gemfile <<-G
       source "file://#{gem_repo1}"

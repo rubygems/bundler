@@ -75,4 +75,21 @@ describe "Bundler.setup" do
       out.should == "WIN"
     end
   end
+
+  describe "when locked" do
+    it "regenerates .bundle/environment.rb if it does not exist" do
+      system_gems "rack-1.0.0"
+
+      gemfile <<-G
+        gem "rack"
+      G
+
+      bundle :lock
+
+      bundled_app('.bundle/environment.rb').delete
+
+      should_be_installed "rack 1.0.0"
+      bundled_app('.bundle/environment.rb').should exist
+    end
+  end
 end
