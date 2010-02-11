@@ -157,8 +157,8 @@ describe "gemfile install with gem sources" do
   end
 
   describe "when locked" do
-    it "works" do
-      system_gems "rack-1.0.0" do
+    before(:each) do
+      system_gems "rack-0.9.1" do
         gemfile <<-G
           source "file://#{gem_repo1}"
           gem "rack"
@@ -166,9 +166,18 @@ describe "gemfile install with gem sources" do
 
         bundle :lock
       end
+    end
 
+    it "works" do
       system_gems [] do
         bundle :install
+        should_be_installed "rack 0.9.1"
+      end
+    end
+
+    it "allows --relock to update the dependencies" do
+      system_gems "rack-0.9.1" do
+        bundle "install --relock"
         should_be_installed "rack 1.0.0"
       end
     end
