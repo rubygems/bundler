@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{bundler}
-  s.version = "0.9.5"
+  s.version = "0.9.6"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 1.3.5") if s.respond_to? :required_rubygems_version=
   s.authors = ["Carl Lerche", "Yehuda Katz"]
-  s.date = %q{2010-02-10}
+  s.date = %q{2010-02-12}
   s.default_executable = %q{bundle}
   s.email = ["carlhuda@engineyard.com"]
   s.executables = ["bundle"]
