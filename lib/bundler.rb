@@ -56,7 +56,7 @@ module Bundler
 
     def bundle_path
       @bundle_path ||= begin
-        path = settings[:path] || "#{Gem.user_home}/.bundle"
+        path = settings[:path] || "#{Gem.user_home}/.bundle/#{Gem.ruby_engine}/#{Gem::ConfigMap[:ruby_version]}"
         Pathname.new(path).expand_path(root)
       end
     end

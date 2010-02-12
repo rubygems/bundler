@@ -16,6 +16,7 @@ describe "gemfile install with gem sources" do
       gem 'rack'
     G
 
+    home(".bundle/#{Gem.ruby_engine}/#{Gem::ConfigMap[:ruby_version]}/gems/rack-1.0.0").should exist
     should_be_installed("rack 1.0.0")
   end
 
