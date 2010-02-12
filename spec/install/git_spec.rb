@@ -24,6 +24,10 @@ describe "gemfile install with git sources" do
       out.should == "WIN"
     end
 
+    it "caches the git repo" do
+      default_bundle_path('cache/bundler/git/foo-1.0-2da26eec78721fc54f4cc2709816e1cd504a4e82').should exist
+    end
+
     it "floats on master if no ref is specified" do
       update_git "foo"
 

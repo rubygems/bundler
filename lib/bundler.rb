@@ -96,7 +96,7 @@ module Bundler
     end
 
     def cache
-      home.join("cache")
+      bundle_path.join('cache/bundler')
     end
 
     def root
