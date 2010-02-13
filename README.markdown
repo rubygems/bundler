@@ -111,6 +111,11 @@ The command `bundle lock` will lock the bundle to the current set of
 resolved gems. This ensures that, until the lock file is removed, that
 bundle install and Bundle.setup will always activate the same gems.
 
+When you are distributing your application, you should add the Gemfile.lock
+file to your source control, so that the set of libraries your code will
+run against are fixed. Simply run `bundle install` after checking out or
+deploying your code to ensure your libraries are present.
+
 ### Running the application
 
 Bundler must be required and setup before anything else is required. This
@@ -241,9 +246,14 @@ The following Bundler 0.8 APIs are no longer supported:
    specify any groups, this puts all groups on the load
    path. In locked, mode, it becomes `require '.bundle/environment'`
 
+### Rails 2.3
+
+Using Bundler 0.9 with Rails 2.3 requires adding a preinitializer, and
+making a few changes to boot.rb. The exact changes can be found at
+[http://gist.github.com/302406](http://gist.github.com/302406)
+
 ## Reporting bugs
 
 Please report all bugs on the github issue tracker for the project located
 at:
-
-    http://github.com/carlhuda/bundler/issues/
+[http://github.com/carlhuda/bundler/issues/](http://github.com/carlhuda/bundler/issues/)
