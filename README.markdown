@@ -79,7 +79,7 @@ Groups are involved in a number of scenarios:
 
 1. When installing gems using bundle install, you can choose to leave
    out any group by specifying `--without {group name}`. This can be
-   helpful if, for instance, you have a gem that you can only compile
+   helpful if, for instance, you have a gem that you cannot compile
    in certain environments.
 2. When setting up load paths using Bundler.setup, Bundler will, by
    default, add the load paths for all groups. You can restrict the
@@ -257,6 +257,7 @@ making a few changes to boot.rb. The exact changes can be found at
 ## Further reading
 
 [Using Bundler in Real Life](http://yehudakatz.com/2010/02/09/using-bundler-in-real-life/)
+
 [Bundler 0.9: Heading Toward 1.0](http://yehudakatz.com/2010/02/01/bundler-0-9-heading-toward-1-0/)
 
 ## Reporting bugs
