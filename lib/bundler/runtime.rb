@@ -247,6 +247,7 @@ module Bundler
       source_index_class = (class << Gem::SourceIndex ; self ; end)
       source_index_class.send(:define_method, :from_gems_in) do |*args|
         source_index = Gem::SourceIndex.new
+        source_index.spec_dirs = *args
         source_index.add_specs *specs
         source_index
       end
