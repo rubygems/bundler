@@ -1,6 +1,6 @@
 ## Bundler : A gem to bundle gems
 
-    Github:       http://github.com/wycats/bundler
+    Github:       http://github.com/carlhuda/bundler
     Mailing list: http://groups.google.com/group/ruby-bundler
     IRC:          #carlhuda on freenode
 
@@ -14,14 +14,15 @@ you run any ruby code in context of the bundle's gem environment.
 
 ## Installation
 
-Bundler has no dependencies besides Ruby and RubyGems. Just clone the git
-repository and install the gem with the following rake task:
+Bundler has no dependencies besides Ruby and RubyGems. You can install the
+latest release via RubyGems:
+
+    gem install bundler
+
+If you want to contribute, or need a change that hasn't been released yet,
+just clone the git repository and install the gem with rake:
 
     rake install
-
-You can also install the gem with
-
-    gem install bundler --prerelease
 
 ## Usage
 
@@ -92,14 +93,15 @@ Groups are involved in a number of scenarios:
 
 ### Installing gems
 
-Once the manifest file has been created, the next step is to install all
-the gems needed to satisfy the Gemfile's dependencies. The `bundle install`
-command will do this.
+Once the Gemfile manifest file has been created, the next step is to install
+all the gems needed to satisfy the manifest's dependencies. The command to
+do this is `bundle install`.
 
 This command will load the Gemfile, resolve all the dependencies, download
-all gems that are missing, and install them to the system's RubyGems
-repository. Every time an update is made to the Gemfile, run `bundle install`
-again to get the new gems installed.
+all gems that are missing, and install them to the bundler's gem repository.
+Gems that are already installed into the system RubyGems repository will be
+referenced, rather than installed again. Every time an update is made to the
+Gemfile, run `bundle install` again to install any newly needed gems.
 
 ### Locking dependencies
 
@@ -108,8 +110,8 @@ Gemfile's dependencies. If you install a newer version of a gem and it
 satisfies the dependencies, it will be used instead of the older one.
 
 The command `bundle lock` will lock the bundle to the current set of
-resolved gems. This ensures that, until the lock file is removed, that
-bundle install and Bundle.setup will always activate the same gems.
+resolved gems. This ensures that, until the lock file is removed,
+`bundle install` and `Bundle.setup` will always activate the same gems.
 
 When you are distributing your application, you should add the Gemfile.lock
 file to your source control, so that the set of libraries your code will
@@ -119,14 +121,14 @@ deploying your code to ensure your libraries are present.
 ### Running the application
 
 Bundler must be required and setup before anything else is required. This
-is because it will configure all the load paths and manage rubygems for your.
+is because it will configure all the load paths and manage gems for you.
 To do this, include the following at the beginning of your code.
 
     begin
-      # Require the preresolved locked set of gems.
+      # Try to require the preresolved locked set of gems.
       require File.expand_path('../.bundle/environment', __FILE__)
     rescue LoadError
-      # Fallback on doing the resolve at runtime.
+      # Fall back on doing an unlocked resolve at runtime.
       require "rubygems"
       require "bundler"
       Bundler.setup
@@ -139,17 +141,17 @@ context of the bundle. For example:
 
     bundle exec ruby my_ruby_script.rb
 
-To enter a shell that will run all gem executables (such as rake, rails,
+To enter a shell that will run all gem executables (such as `rake`, `rails`,
 etc... ) use `bundle exec bash` (replacing bash for whatever your favorite
 shell is).
 
 ### Packing the bundle's gems
 
-When sharing or deploying an application, it might be useful to include
+When sharing or deploying an application, you may want to include
 everything necessary to install gem dependencies. `bundle pack` will
 copy .gem files for all of the bundle's dependencies into vendor/cache.
-This way, bundle install can always work no matter what the state of the
-remote sources.
+After that, `bundle install` will always work, since it will install the
+local .gem files, and will not contact any of the remote sources.
 
 ## Gem resolution
 
@@ -242,7 +244,7 @@ The following Bundler 0.8 APIs are no longer supported:
 
 2. `require 'vendor/gems/environment'`: In unlocked
    mode, where using system gems, this becomes
-   `Bundler.setup(:multiple, groups)`. If you don't
+   `Bundler.setup(:multiple, :groups)`. If you don't
    specify any groups, this puts all groups on the load
    path. In locked, mode, it becomes `require '.bundle/environment'`
 
@@ -251,6 +253,11 @@ The following Bundler 0.8 APIs are no longer supported:
 Using Bundler 0.9 with Rails 2.3 requires adding a preinitializer, and
 making a few changes to boot.rb. The exact changes can be found at
 [http://gist.github.com/302406](http://gist.github.com/302406)
+
+## Further reading
+
+[Using Bundler in Real Life](http://yehudakatz.com/2010/02/09/using-bundler-in-real-life/)
+[Bundler 0.9: Heading Toward 1.0](http://yehudakatz.com/2010/02/01/bundler-0-9-heading-toward-1-0/)
 
 ## Reporting bugs
 
