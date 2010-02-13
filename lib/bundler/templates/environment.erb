@@ -53,6 +53,7 @@ module Bundler
   end
 
   def self.patch_rubygems
+    Gem.source_index # ensure RubyGems is fully loaded
     specs = SPECS
 
     ::Kernel.send(:define_method, :gem) do |dep, *reqs|
