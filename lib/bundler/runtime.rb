@@ -135,6 +135,7 @@ module Bundler
       shared_helpers = File.read(File.expand_path("../shared_helpers.rb", __FILE__))
       template = File.read(File.expand_path("../templates/environment.erb", __FILE__))
       erb = ERB.new(template, nil, '-')
+      FileUtils.mkdir_p(rb_lock_file.dirname)
       File.open(rb_lock_file, 'w') do |f|
         f.puts erb.result(binding)
       end

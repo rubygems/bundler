@@ -86,7 +86,7 @@ describe "Bundler.setup" do
 
       bundle :lock
 
-      bundled_app('.bundle/environment.rb').delete
+      bundled_app('.bundle').rmtree
 
       should_be_installed "rack 1.0.0"
       bundled_app('.bundle/environment.rb').should exist
