@@ -28,6 +28,10 @@ describe "Bundler.require" do
       s.write "lib/six.rb", "puts 'six'"
     end
 
+    build_lib "seven", "1.0.0" do |s|
+      s.write "lib/seven.rb", "puts 'seven'"
+    end
+
     gemfile <<-G
       path "#{lib_path}"
       gem "one", :group => :bar, :require => %w(baz qux)
@@ -36,39 +40,62 @@ describe "Bundler.require" do
       gem "four", :require => false
       gem "five"
       gem "six", :group => "string"
+      gem "seven", :group => :not
     G
   end
 
   it "requires the gems" do
+    # default group
     run "Bundler.require"
     out.should == "two"
 
+    # specific group
     run "Bundler.require(:bar)"
     out.should == "baz\nqux"
 
+    # default and specific group
     run "Bundler.require(:default, :bar)"
     out.should == "two\nbaz\nqux"
-  end
 
-  it "requires the gems with strings as group names" do
-    run 'Bundler.require("bar")'
+    # specific group given as a string
+    run "Bundler.require('bar')"
     out.should == "baz\nqux"
 
-    run 'Bundler.require(:string)'
+    # specific group declared as a string
+    run "Bundler.require(:string)"
     out.should == "six"
+
+    # required in resolver order instead of gemfile order
+    run("Bundler.require(:not)")
+    out.should == "seven\nthree"
   end
 
   it "requires the locked gems" do
     bundle :lock
 
+    # default group
     out = ruby("require 'bundler'; Bundler.setup; Bundler.require")
     out.should == "two"
 
+    # specific group
     out = ruby("require 'bundler'; Bundler.setup(:bar); Bundler.require(:bar)")
     out.should == "baz\nqux"
 
+    # default and specific group
     out = ruby("require 'bundler'; Bundler.setup(:default, :bar); Bundler.require(:default, :bar)")
     out.should == "two\nbaz\nqux"
+
+    # specific group given as a string
+    out = ruby("require 'bundler'; Bundler.setup('bar'); Bundler.require('bar')")
+    out.should == "baz\nqux"
+
+    # specific group declared as a string
+    out = ruby("require 'bundler'; Bundler.setup(:string); Bundler.require(:string)")
+    out.should == "six"
+
+    # required in resolver order instead of gemfile order
+    out = ruby("require 'bundler'; Bundler.setup(:not); Bundler.require(:not)")
+    out.should == "seven\nthree"
   end
 
   it "allows requiring gems with non standard names explicitly" do

@@ -186,7 +186,14 @@ module Bundler
     def autorequires_for_groups(*groups)
       groups.map! { |g| g.to_sym }
       autorequires = Hash.new { |h,k| h[k] = [] }
-      @definition.dependencies.each do |dep|
+
+      ordered_deps = []
+      specs_for(*groups).each do |g|
+        dep = @definition.dependencies.find{|d| d.name == g.name }
+        ordered_deps << dep if dep && !ordered_deps.include?(dep)
+      end
+
+      ordered_deps.each do |dep|
         dep.groups.each do |group|
           # If there is no autorequire, then rescue from
           # autorequiring the gems name
