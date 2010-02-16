@@ -184,11 +184,18 @@ so it can detect that all gems *together* require activesupport "2.3.4".
 
 ## Upgrading from Bundler 0.8 to 0.9 and above
 
-Bundler 0.9 changes a number of APIs in the Gemfile.
+Upgrading to Bundler 0.9 from Bundler 0.8 requires upgrading several
+API calls in your Gemfile, and some workarounds if you are using Rails 2.3.
+
+### Rails 2.3
+
+Using Bundler 0.9 with Rails 2.3 requires adding a preinitializer, and
+making a few changes to boot.rb. The exact changes needed can be found at
+[http://gist.github.com/302406](http://gist.github.com/302406).
 
 ### Gemfile Removals
 
-The following Bundler 0.8 APIs are no longer supported:
+Bundler 0.9 removes the following Bundler 0.8 Gemfile APIs:
 
 1. `disable_system_gems`: This is now the default (and only) option
    for bundler. Bundler uses the system gems you have specified
@@ -211,6 +218,8 @@ The following Bundler 0.8 APIs are no longer supported:
    in the current context.
 
 ### Gemfile Changes
+
+Bundler 0.9 changes the following Bundler 0.8 Gemfile APIs:
 
 1. Bundler 0.8 supported :only and :except as APIs for describing
    groups of gems. Bundler 0.9 supports a single `group` method,
@@ -244,12 +253,6 @@ The following Bundler 0.8 APIs are no longer supported:
    `Bundler.setup(:multiple, :groups)`. If you don't
    specify any groups, this puts all groups on the load
    path. In locked, mode, it becomes `require '.bundle/environment'`
-
-### Rails 2.3
-
-Using Bundler 0.9 with Rails 2.3 requires adding a preinitializer, and
-making a few changes to boot.rb. The exact changes needed can be found at
-[http://gist.github.com/302406](http://gist.github.com/302406).
 
 ## More information
 
