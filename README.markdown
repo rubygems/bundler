@@ -1,11 +1,5 @@
 ## Bundler : A gem to bundle gems
 
-    Github:       http://github.com/carlhuda/bundler
-    Mailing list: http://groups.google.com/group/ruby-bundler
-    IRC:          #carlhuda on freenode
-
-## Intro
-
 Bundler is a tool that manages gem dependencies for your ruby application. It
 takes a gem manifest file and is able to fetch, download, and install the gems
 and all child dependencies specified in this manifest. It can manage any update
@@ -13,6 +7,9 @@ to the gem manifest file and update the bundle's gems accordingly. It also lets
 you run any ruby code in context of the bundle's gem environment.
 
 ## Installation
+
+If you are upgrading from Bundler 0.8, be sure to read the upgrade notes
+located at the bottom of this file.
 
 Bundler has no dependencies besides Ruby and RubyGems. You can install the
 latest release via RubyGems:
@@ -251,17 +248,15 @@ The following Bundler 0.8 APIs are no longer supported:
 ### Rails 2.3
 
 Using Bundler 0.9 with Rails 2.3 requires adding a preinitializer, and
-making a few changes to boot.rb. The exact changes can be found at
-[http://gist.github.com/302406](http://gist.github.com/302406)
+making a few changes to boot.rb. The exact changes needed can be found at
+[http://gist.github.com/302406](http://gist.github.com/302406).
 
-## Further reading
+## More information
 
-[Using Bundler in Real Life](http://yehudakatz.com/2010/02/09/using-bundler-in-real-life/)
+Explanations of common Bundler use cases can be found in [Using Bundler in Real Life](http://yehudakatz.com/2010/02/09/using-bundler-in-real-life/). The general philosophy behind Bundler 0.9 is explained at some length in [Bundler 0.9: Heading Toward 1.0](http://yehudakatz.com/2010/02/01/bundler-0-9-heading-toward-1-0/).
 
-[Bundler 0.9: Heading Toward 1.0](http://yehudakatz.com/2010/02/01/bundler-0-9-heading-toward-1-0/)
+Any remaining questions may be directed via email to the [Bundler mailing list](http://groups.google.com/group/ruby-bundler) or via IRC to [#carlhuda](irc://irc.freenode.net/carlhuda) on Freenode.
 
 ## Reporting bugs
 
-Please report all bugs on the github issue tracker for the project located
-at:
-[http://github.com/carlhuda/bundler/issues/](http://github.com/carlhuda/bundler/issues/)
+Please report all bugs on the github issue tracker for the project, located at [http://github.com/carlhuda/bundler/issues/](http://github.com/carlhuda/bundler/issues/).
