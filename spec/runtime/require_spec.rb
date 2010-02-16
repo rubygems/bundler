@@ -30,6 +30,7 @@ describe "Bundler.require" do
 
     build_lib "seven", "1.0.0" do |s|
       s.write "lib/seven.rb", "puts 'seven'"
+      s.add_dependency "three", "= 1.0.0"
     end
 
     gemfile <<-G
@@ -67,7 +68,7 @@ describe "Bundler.require" do
 
     # required in resolver order instead of gemfile order
     run("Bundler.require(:not)")
-    out.should == "seven\nthree"
+    out.should == "three\nseven"
   end
 
   it "requires the locked gems" do
@@ -95,7 +96,7 @@ describe "Bundler.require" do
 
     # required in resolver order instead of gemfile order
     out = ruby("require 'bundler'; Bundler.setup(:not); Bundler.require(:not)")
-    out.should == "seven\nthree"
+    out.should == "three\nseven"
   end
 
   it "allows requiring gems with non standard names explicitly" do
