@@ -44,8 +44,9 @@ module Spec
       gemfile = File.expand_path('../../../bin/bundle', __FILE__)
       input, out, err, waitthread = Open3.popen3("#{Gem.ruby} -I#{lib} #{gemfile} #{cmd}#{args}")
       @err = err.read.strip
-      puts @err unless @err.empty?
+      puts @err if $debug && !err.empty?
       @out = out.read.strip
+      @exitstatus = nil
       @exitstatus = waitthread.value.to_i if waitthread
     end
 
