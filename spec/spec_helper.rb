@@ -37,6 +37,7 @@ Spec::Runner.configure do |config|
 
   config.after :each do
     Gem.platforms = nil
+    Dir.chdir(original_wd)
     # Reset ENV
     ENV['PATH']           = original_path
     ENV['GEM_HOME']       = original_gem_home
