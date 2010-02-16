@@ -236,7 +236,7 @@ module Bundler
             # Loop over the lines and extract the relative path and the
             # git hash
             lines.each do |line|
-              next unless line =~ %r{^(\d+) (blob|tree) ([a-zf0-9]+)\t(.*)$}
+              next unless line =~ %r{^(\d+) (blob|tree) ([a-f0-9]+)\t(.*)$}
               hash, file = $3, $4
               # Read the gemspec
               if spec = eval(%x(git cat-file blob #{$3}))

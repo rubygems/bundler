@@ -80,11 +80,14 @@ module Bundler
     end
 
     def _normalize_hash(opts)
-      opts.each do |k, v|
+      # Cannot modify a hash during an iteration in 1.9
+      opts.keys.each do |k|
         next if String === k
+        v = opts[k]
         opts.delete(k)
         opts[k.to_s] = v
       end
+      opts
     end
 
     def _normalize_options(name, version, opts)

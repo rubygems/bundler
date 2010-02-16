@@ -16,6 +16,7 @@ describe "environment.rb file" do
   it "does not pull in system gems" do
     run <<-R, :lite_runtime => true
       require 'rubygems'
+
       begin;
         require 'rack'
       rescue LoadError

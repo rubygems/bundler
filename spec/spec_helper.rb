@@ -10,7 +10,9 @@ Dir["#{File.expand_path('../support', __FILE__)}/*.rb"].each do |file|
   require file
 end
 
-$debug = false
+$debug    = false
+$show_err = false
+
 Spec::Rubygems.setup
 FileUtils.rm_rf(Spec::Path.gem_repo1)
 
