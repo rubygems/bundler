@@ -172,13 +172,10 @@ module Bundler
     end
 
     def specs_for_lock_file
-      specs.map do |spec|
-        dep  = @definition.dependencies.find { |d| d.name == spec.name }
+      specs.map do |s|
         hash = {}
-        hash[:name]       = spec.name
-        hash[:version]    = spec.version.to_s
-        hash[:groups]     = spec.groups
-        hash[:load_paths] = spec.load_paths
+        hash[:loaded_from] = s.loaded_from.to_s
+        hash[:load_paths]  = s.load_paths
         hash
       end
     end
@@ -211,71 +208,6 @@ module Bundler
         autorequires
       else
         groups.inject({}) { |h,g| h[g] = autorequires[g]; h }
-      end
-    end
-
-    def cripple_rubygems(specs)
-      reverse_rubygems_kernel_mixin
-
-      executables = specs.map { |s| s.executables }.flatten
-
-      # TODO: This is duplicated a bit too much in environment.erb.
-      #       Let's figure out how to improve that.
-      ::Kernel.send(:define_method, :gem) do |dep, *reqs|
-        if executables.include? File.basename(caller.first.split(':').first)
-          return
-        end
-        opts = reqs.last.is_a?(Hash) ? reqs.pop : {}
-
-        unless dep.respond_to?(:name) && dep.respond_to?(:version_requirements)
-          dep = Gem::Dependency.new(dep, reqs)
-        end
-
-        spec = specs.find  { |s| s.name == dep.name }
-
-        if spec.nil?
-          e = Gem::LoadError.new "#{dep} is not part of the bundle. Add it to Gemfile."
-          e.name = dep.name
-          e.version_requirement = dep.version_requirements
-          raise e
-        elsif dep !~ spec
-          e = Gem::LoadError.new "can't activate #{dep}, already activated #{spec.full_name}. " \
-                                 "Make sure all dependencies are added to Gemfile."
-          e.name = dep.name
-          e.version_requirement = dep.version_requirements
-          raise e
-        end
-
-        true
-      end
-
-      # === Following hacks are to improve on the generated bin wrappers ===
-
-      # Yeah, talk about a hack
-      source_index_class = (class << Gem::SourceIndex ; self ; end)
-      source_index_class.send(:define_method, :from_gems_in) do |*args|
-        source_index = Gem::SourceIndex.new
-        source_index.spec_dirs = *args
-        source_index.add_specs(*specs)
-        source_index
-      end
-
-      # OMG more hacks
-      gem_class = (class << Gem ; self ; end)
-      gem_class.send(:define_method, :bin_path) do |name, *args|
-        exec_name, *reqs = args
-
-        spec = nil
-
-        if exec_name
-          spec = specs.find { |s| s.executables.include?(exec_name) }
-          spec or raise Gem::Exception, "can't find executable #{exec_name}"
-        else
-          spec = specs.find  { |s| s.name == name }
-          exec_name = spec.default_executable or raise Gem::Exception, "no default executable for #{spec.full_name}"
-        end
-
-        File.join(spec.full_gem_path, spec.bindir, exec_name)
       end
     end
   end

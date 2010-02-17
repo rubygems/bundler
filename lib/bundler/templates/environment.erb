@@ -8,19 +8,19 @@ require "rubygems"
 module Bundler
   LOCKED_BY    = '<%= Bundler::VERSION %>'
   FINGERPRINT  = <%= gemfile_fingerprint.inspect %>
+  AUTOREQUIRES = <%= autorequires_for_groups.inspect %>
   SPECS        = [
     <% specs_for_lock_file.each do |spec| -%>
     <%= spec.inspect %>,
     <% end -%>
-  ]
-  AUTOREQUIRES = <%= autorequires_for_groups.inspect %>
+  ].map do |hash|
+    spec = eval(File.read(hash[:loaded_from]), binding, hash[:loaded_from])
+    spec.loaded_from = hash[:loaded_from]
+    spec.require_paths = hash[:load_paths]
+    spec
+  end
 
   extend SharedHelpers
-
-  def self.cripple_ruby_gems
-    reverse_rubygems_kernel_mixin
-    patch_rubygems
-  end
 
   def self.match_fingerprint
     print = Digest::SHA1.hexdigest(File.read(File.expand_path('../../Gemfile', __FILE__)))
@@ -32,8 +32,10 @@ module Bundler
   def self.setup(*groups)
     match_fingerprint
     clean_load_path
+    cripple_rubygems(SPECS)
     SPECS.each do |spec|
-      spec[:load_paths].each { |path| $LOAD_PATH.unshift path }
+      Gem.loaded_specs[spec.name] = spec
+      $LOAD_PATH.unshift(*spec.require_paths)
     end
   end
 
@@ -53,30 +55,6 @@ module Bundler
     end
   end
 
-  def self.patch_rubygems
-    Kernel.class_eval do
-      private
-      def gem(*) ; end
-    end
-    Gem.source_index # ensure RubyGems is fully loaded
-    specs = SPECS
-
-    ::Kernel.send(:define_method, :gem) do |dep, *reqs|
-      opts = reqs.last.is_a?(Hash) ? reqs.pop : {}
-
-      dep  = dep.name if dep.respond_to?(:name)
-      unless specs.any?  { |s| s[:name] == dep }
-        e = Gem::LoadError.new "#{dep} is not part of the bundle. Add it to Gemfile."
-        e.name = dep
-        e.version_requirement = reqs
-        raise e
-      end
-
-      true
-    end
-  end
-
   # Setup bundle when it's required.
-  cripple_ruby_gems
   setup
 end
