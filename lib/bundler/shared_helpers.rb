@@ -34,7 +34,7 @@ module Bundler
       until !File.directory?(current) || current == previous
         filename = File.join(current, 'Gemfile')
         return filename if File.file?(filename)
-        current, previous = File.expand_path("#{current}/.."), current
+        current, previous = File.expand_path("..", current), current
       end
     end
 

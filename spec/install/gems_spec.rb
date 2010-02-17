@@ -122,7 +122,7 @@ describe "gemfile install with gem sources" do
     G
 
     run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
-    out.should == '1.0.0 RUBY'
+    out.should == "1.0.0 #{Gem::Platform.local}"
   end
 
   it "works with repositories that don't provide prerelease_specs.4.8.gz" do

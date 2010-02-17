@@ -49,6 +49,7 @@ describe "gemfile install with git sources" do
     end
 
     it "setups executables" do
+      pending_jruby_shebang_fix
       bundle "exec foobar"
       out.should == "1.0"
     end
