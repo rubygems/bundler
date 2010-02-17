@@ -349,6 +349,10 @@ describe "gemfile install with gem sources" do
       should_not_be_installed "activesupport 2.3.5", :groups => [:default]
     end
 
+    it "does not say it installed gems from the excluded group" do
+      out.should_not include("activesupport")
+    end
+
     it "allows Bundler.setup for specific groups" do
       out = run("require 'rack'; puts RACK", :default)
       out.should == '1.0.0'
