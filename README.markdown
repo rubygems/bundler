@@ -54,6 +54,12 @@ Bundler::Dsl.
     #
     gem "rack", "1.0.0"
 
+    # Add a git repository as a source, and add a dependency on a gem
+    # from it
+    git "git://github.com/indirect/rails3-generators.git"
+    gem "rails3-generators"
+    
+
 ### Groups
 
 Applications may have dependencies that are specific to certain environments,
