@@ -104,6 +104,12 @@ module Bundler
       environment.cache
     end
 
+    desc "pack", "Locks the Gemfile and caches all of the gems"
+    def pack
+      lock
+      cache
+    end
+
     desc "exec", "Run the command in context of the bundle"
     def exec(*)
       ARGV.delete('exec')
