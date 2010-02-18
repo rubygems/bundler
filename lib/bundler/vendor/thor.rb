@@ -120,8 +120,8 @@ class Thor
     #   script = MyScript.new(args, options, config)
     #   script.invoke(:task, first_arg, second_arg, third_arg)
     #
-    def start(given_args=ARGV, config={})
-      super do
+    def start(original_args=ARGV, config={})
+      super do |given_args|
         meth = normalize_task_name(given_args.shift)
         task = all_tasks[meth]
 
@@ -145,8 +145,9 @@ class Thor
     # task_name<String>
     #
     def task_help(shell, task_name)
-      task = all_tasks[task_name]
-      raise UndefinedTaskError, "task '#{task_name}' could not be found in namespace '#{self.namespace}'" unless task
+      meth = normalize_task_name(task_name)
+      task = all_tasks[meth]
+      handle_no_task_error(meth) unless task
 
       shell.say "Usage:"
       shell.say "  #{banner(task)}"
@@ -183,6 +184,10 @@ class Thor
       end
     end
 
+    def handle_argument_error(task, error) #:nodoc:
+      raise InvocationError, "#{task.name.inspect} was called incorrectly. Call as #{task.formatted_usage(self, banner_base == "thor").inspect}."
+    end
+
     protected
 
       # The banner for this class. You can customize it if you are invoking the
@@ -191,8 +196,7 @@ class Thor
       # the namespace should be displayed as arguments.
       #
       def banner(task)
-        base = $thor_runner ? "thor" : File.basename($0.split(" ").first)
-        "#{base} #{task.formatted_usage(self, base == "thor")}"
+        "#{banner_base} #{task.formatted_usage(self, banner_base == "thor")}"
       end
 
       def baseclass #:nodoc:

@@ -38,9 +38,8 @@ class Thor
     # config<Hash>:: Configuration for this Thor class.
     #
     def initialize(args=[], options={}, config={})
-      Thor::Arguments.parse(self.class.arguments, args).each do |key, value|
-        send("#{key}=", value)
-      end
+      args = Thor::Arguments.parse(self.class.arguments, args)
+      args.each { |key, value| send("#{key}=", value) }
 
       parse_options = self.class.class_options
 
@@ -52,9 +51,9 @@ class Thor
         array_options, hash_options = [], options
       end
 
-      options = Thor::Options.parse(parse_options, array_options)
-      self.options = Thor::CoreExt::HashWithIndifferentAccess.new(options).merge!(hash_options)
-      self.options.freeze
+      opts = Thor::Options.new(parse_options, hash_options)
+      self.options = opts.parse(array_options)
+      opts.check_unknown! if self.class.check_unknown_options?
     end
 
     class << self
@@ -107,6 +106,16 @@ class Thor
 
       def attr_accessor(*) #:nodoc:
         no_tasks { super }
+      end
+
+      # If you want to raise an error for unknown options, call check_unknown_options!
+      # This is disabled by default to allow dynamic invocations.
+      def check_unknown_options!
+        @check_unknown_options = true
+      end
+
+      def check_unknown_options? #:nodoc:
+        @check_unknown_options || false
       end
 
       # Adds an argument to the class and creates an attr_accessor for it.
@@ -355,7 +364,7 @@ class Thor
       def namespace(name=nil)
         case name
           when nil
-            @namespace ||= Thor::Util.namespace_from_thor_class(self, false)
+            @namespace ||= Thor::Util.namespace_from_thor_class(self)
           else
             @namespace = name.to_s
         end
@@ -366,14 +375,18 @@ class Thor
       def start(given_args=ARGV, config={})
         self.debugging = given_args.include?("--debug")
         config[:shell] ||= Thor::Base.shell.new
-        yield
+        yield(given_args.dup)
       rescue Thor::Error => e
-        if debugging
-          raise e
-        else
-          config[:shell].error e.message
-        end
+        debugging ? (raise e) : config[:shell].error(e.message)
         exit(1) if exit_on_failure?
+      end
+
+      def handle_no_task_error(task) #:nodoc:
+        if self.banner_base == "thor"
+          raise UndefinedTaskError, "Could not find task #{task.inspect} in #{namespace.inspect} namespace."
+        else
+          raise UndefinedTaskError, "Could not find task #{task.inspect}."
+        end
       end
 
       protected
@@ -419,7 +432,6 @@ class Thor
         end
 
         # Raises an error if the word given is a Thor reserved word.
-        #
         def is_thor_reserved_word?(word, type) #:nodoc:
           return false unless THOR_RESERVED_WORDS.include?(word.to_s)
           raise "#{word.inspect} is a Thor reserved word and cannot be defined as #{type}"
@@ -430,7 +442,6 @@ class Thor
         # ==== Parameters
         # name<Symbol>:: The name of the argument.
         # options<Hash>:: Described in both class_option and method_option.
-        #
         def build_option(name, options, scope) #:nodoc:
           scope[name] = Thor::Option.new(name, options[:desc], options[:required],
                                                options[:type], options[:default], options[:banner],
@@ -444,7 +455,6 @@ class Thor
         #
         # ==== Parameters
         # Hash[Symbol => Object]
-        #
         def build_options(options, scope) #:nodoc:
           options.each do |key, value|
             scope[key] = Thor::Option.parse(key, value)
@@ -454,7 +464,6 @@ class Thor
         # Finds a task with the given name. If the task belongs to the current
         # class, just return it, otherwise dup it and add the fresh copy to the
         # current task hash.
-        #
         def find_and_refresh_task(name) #:nodoc:
           task = if task = tasks[name.to_s]
             task
@@ -467,14 +476,12 @@ class Thor
 
         # Everytime someone inherits from a Thor class, register the klass
         # and file into baseclass.
-        #
         def inherited(klass)
           Thor::Base.register_klass_file(klass)
         end
 
         # Fire this callback whenever a method is added. Added methods are
         # tracked as tasks by invoking the create_task method.
-        #
         def method_added(meth)
           meth = meth.to_s
 
@@ -495,7 +502,6 @@ class Thor
 
         # Retrieves a value from superclass. If it reaches the baseclass,
         # returns default.
-        #
         def from_superclass(method, default=nil)
           if self == baseclass || !superclass.respond_to?(method, true)
             default
@@ -506,9 +512,13 @@ class Thor
         end
 
         # A flag that makes the process exit with status 1 if any error happens.
-        #
         def exit_on_failure?
           false
+        end
+
+        # Returns the base for banner.
+        def banner_base
+          @banner_base ||= $thor_runner ? "thor" : File.basename($0.split(" ").first)
         end
 
         # SIGNATURE: Sets the baseclass. This is where the superclass lookup
