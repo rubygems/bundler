@@ -126,6 +126,12 @@ module Bundler
       Kernel.exec *ARGV
     end
 
+    desc "version", "Prints the bundler's version information"
+    def version
+      Bundler.ui.info "Bundler version #{Bundler::VERSION}"
+    end
+    map %w(-v --version) => :version
+
   private
 
     def locked?
