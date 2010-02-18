@@ -151,7 +151,7 @@ shell is).
 ### Packing the bundle's gems
 
 When sharing or deploying an application, you may want to include
-everything necessary to install gem dependencies. `bundle pack` will
+everything necessary to install gem dependencies. `bundle cache` will
 copy .gem files for all of the bundle's dependencies into vendor/cache.
 After that, `bundle install` will always work, since it will install the
 local .gem files, and will not contact any of the remote sources.

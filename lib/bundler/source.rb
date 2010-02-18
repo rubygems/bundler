@@ -112,7 +112,7 @@ module Bundler
       def install(spec)
         destination = Gem.dir
 
-        Bundler.ui.debug "  * Installing from pack"
+        Bundler.ui.debug "  * Installing from cache"
         installer = Gem::Installer.new "#{@path}/#{spec.full_name}.gem",
           :install_dir         => Gem.dir,
           :ignore_dependencies => true,

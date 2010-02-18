@@ -102,9 +102,9 @@ module Bundler
       @definition.local_index
     end
 
-    def pack
-      pack_path = "#{root}/vendor/cache/"
-      FileUtils.mkdir_p(pack_path)
+    def cache
+      cache_path = "#{root}/vendor/cache/"
+      FileUtils.mkdir_p(cache_path)
 
       Bundler.ui.info "Copying .gem files into vendor/cache"
       specs.each do |spec|
@@ -112,8 +112,8 @@ module Bundler
         possibilities = Gem.path.map { |p| "#{p}/cache/#{spec.full_name}.gem" }
         cached_path = possibilities.find { |p| File.exist? p }
         Bundler.ui.info "  * #{File.basename(cached_path)}"
-        next if File.expand_path(File.dirname(cached_path)) == File.expand_path(pack_path)
-        FileUtils.cp(cached_path, pack_path)
+        next if File.expand_path(File.dirname(cached_path)) == File.expand_path(cache_path)
+        FileUtils.cp(cached_path, cache_path)
       end
     end
 

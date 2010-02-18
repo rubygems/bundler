@@ -270,7 +270,7 @@ describe "gemfile install with gem sources" do
     end
   end
 
-  describe "when packed and locked" do
+  describe "when cached and locked" do
     it "does not hit the remote at all" do
       build_repo2
       install_gemfile <<-G
@@ -279,7 +279,7 @@ describe "gemfile install with gem sources" do
       G
 
       bundle :lock
-      bundle :pack
+      bundle :cache
 
       system_gems []
       FileUtils.rm_rf gem_repo2

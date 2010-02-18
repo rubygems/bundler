@@ -98,10 +98,10 @@ module Bundler
       end
     end
 
-    desc "pack", "Packs all the gems to vendor/cache"
-    def pack
+    desc "cache", "Cache all the gems to vendor/cache"
+    def cache
       environment = Bundler.load
-      environment.pack
+      environment.cache
     end
 
     desc "exec", "Run the command in context of the bundle"
