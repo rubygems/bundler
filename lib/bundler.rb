@@ -1,7 +1,7 @@
 require 'fileutils'
 require 'pathname'
 require 'yaml'
-require 'bundler/rubygems-ext'
+require 'bundler/rubygems_ext'
 
 module Bundler
   VERSION = "0.9.7"
