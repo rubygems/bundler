@@ -184,18 +184,22 @@ module Bundler
     private
 
       def generate_bin(spec)
-        # HAX -- Generate the bin
-        bin_dir = "#{Gem.dir}/bin"
-        gem_dir = spec.full_gem_path
-        installer = Gem::Installer.allocate
-        installer.instance_eval do
-          @spec     = spec
-          @bin_dir  = bin_dir
-          @gem_dir  = gem_dir
-          @wrappers = true
-          @env_shebang = false
-          @format_executable = false
+        gem_dir  = spec.full_gem_path
+        gem_file = nil # so we have access once after it's set in the block
+
+        Dir.chdir(gem_dir) do
+          gem_file = Gem::Builder.new(spec).build
         end
+
+        installer = Gem::Installer.new File.join(gem_dir, gem_file),
+          :bin_dir           => "#{Gem.dir}/bin",
+          :wrappers          => true,
+          :env_shebang       => false,
+          :format_executable => false
+
+        installer.instance_eval { @gem_dir = gem_dir }
+
+        installer.build_extensions
         installer.generate_bin
       end
 
