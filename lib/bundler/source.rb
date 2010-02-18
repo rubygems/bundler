@@ -1,4 +1,5 @@
-require "rubygems/remote_fetcher"
+require "uri"
+require "rubygems/spec_fetcher"
 require "rubygems/format"
 require "digest/sha1"
 require "open3"
@@ -44,26 +45,19 @@ module Bundler
       def fetch_specs
         index = Index.new
         Bundler.ui.info "Fetching source index from #{uri}"
-        (main_specs + prerelease_specs).each do |name, version, platform|
-          next unless Gem::Platform.match(platform)
-          spec = RemoteSpecification.new(name, version, platform, @uri)
-          spec.source = self
-          index << spec
+        old, Gem.sources = Gem.sources, ["#{uri}/".squeeze('/')]
+        Gem::SpecFetcher.new.list(true, true).each do |n,v|
+          v.each do |name, version, platform|
+            next unless Gem::Platform.match(platform)
+            spec = RemoteSpecification.new(name, version, platform, @uri)
+            spec.source = self
+            index << spec
+          end
         end
+
         index.freeze
-      end
-
-      def main_specs
-        Marshal.load(Gem::RemoteFetcher.fetcher.fetch_path("#{uri}/specs.4.8.gz"))
-      rescue Gem::RemoteFetcher::FetchError => e
-        raise ArgumentError, "#{to_s} is not a valid source: #{e.message}"
-      end
-
-      def prerelease_specs
-        Marshal.load(Gem::RemoteFetcher.fetcher.fetch_path("#{uri}/prerelease_specs.4.8.gz"))
-      rescue Gem::RemoteFetcher::FetchError
-        Bundler.ui.warn "Source '#{uri}' does not support prerelease gems"
-        []
+      ensure
+        Gem.sources = old
       end
     end
 

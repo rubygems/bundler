@@ -125,19 +125,6 @@ describe "gemfile install with gem sources" do
     out.should == "1.0.0 #{Gem::Platform.local}"
   end
 
-  it "works with repositories that don't provide prerelease_specs.4.8.gz" do
-    build_repo2
-    Dir["#{gem_repo2}/prerelease*"].each { |f| File.delete(f) }
-
-    install_gemfile <<-G
-      source "file://#{gem_repo2}"
-      gem "rack"
-    G
-
-    out.should include("Source 'file:#{gem_repo2}' does not support prerelease gems")
-    should_be_installed "rack 1.0.0"
-  end
-
   describe "with extra sources" do
 
     it "finds gems in multiple sources" do

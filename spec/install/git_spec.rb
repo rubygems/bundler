@@ -25,7 +25,7 @@ describe "gemfile install with git sources" do
     end
 
     it "caches the git repo" do
-      default_bundle_path('cache/bundler/git/foo-1.0-2da26eec78721fc54f4cc2709816e1cd504a4e82').should exist
+      Dir["#{default_bundle_path}/cache/bundler/git/foo-1.0-*"].should have(1).item
     end
 
     it "floats on master if no ref is specified" do
