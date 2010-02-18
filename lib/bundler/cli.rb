@@ -102,6 +102,10 @@ module Bundler
     def cache
       environment = Bundler.load
       environment.cache
+    rescue GemNotFound => e
+      Bundler.ui.error(e.message)
+      Bundler.ui.info "Run `bundle install` to install missing gems."
+      exit 128
     end
 
     desc "pack", "Locks and then caches all of the gems into vendor/cache"
