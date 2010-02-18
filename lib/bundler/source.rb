@@ -11,7 +11,8 @@ module Bundler
 
       def initialize(options = {})
         @options = options
-        @uri = options["uri"]
+        @uri = options["uri"].to_s
+        @uri = "#{uri}/" unless @uri =~ %r'/$'
         @uri = URI.parse(@uri) unless @uri.is_a?(URI)
         raise ArgumentError, "The source must be an absolute URI" unless @uri.absolute?
       end
@@ -45,7 +46,8 @@ module Bundler
       def fetch_specs
         index = Index.new
         Bundler.ui.info "Fetching source index from #{uri}"
-        old, Gem.sources = Gem.sources, ["#{uri}/".squeeze('/')]
+        old, Gem.sources = Gem.sources, ["#{uri}"]
+
         Gem::SpecFetcher.new.list(true, true).each do |n,v|
           v.each do |name, version, platform|
             next unless Gem::Platform.match(platform)

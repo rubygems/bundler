@@ -1,3 +1,6 @@
+require "uri"
+require "rubygems/spec_fetcher"
+
 module Bundler
   # Represents a lazily loaded gem specification, where the full specification
   # is on the source server in rubygems' "quick" index. The proxy object is to
@@ -40,9 +43,7 @@ module Bundler
 
     def _remote_specification
       @specification ||= begin
-        deflated = Gem::RemoteFetcher.fetcher.fetch_path(_remote_uri)
-        inflated = Gem.inflate(deflated)
-        Marshal.load(inflated)
+        Gem::SpecFetcher.new.fetch_spec([@name, @version, @platform], URI(@source_uri.to_s))
       end
     end
 
