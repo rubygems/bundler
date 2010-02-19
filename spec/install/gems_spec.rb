@@ -1,6 +1,6 @@
 require File.expand_path('../../spec_helper', __FILE__)
 
-describe "gemfile install with gem sources" do
+describe "bundle install with gem sources" do
   it "prints output and returns if no dependencies are specified" do
     gemfile <<-G
       source "file://#{gem_repo1}"

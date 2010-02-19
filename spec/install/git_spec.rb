@@ -1,6 +1,6 @@
 require File.expand_path('../../spec_helper', __FILE__)
 
-describe "gemfile install with git sources" do
+describe "bundle install with git sources" do
   describe "when floating on master" do
     before :each do
       build_git "foo" do |s|
@@ -163,10 +163,13 @@ describe "gemfile install with git sources" do
     build_git "foo", :gemspec => false
 
     install_gemfile <<-G
+      source "file://#{gem_repo1}"
       gem "foo", "1.0", :git => "#{lib_path('foo-1.0')}"
+      gem "rails", "2.3.2"
     G
 
     should_be_installed("foo 1.0")
+    should_be_installed("rails 2.3.2")
   end
 
   it "catches git errors and spits out useful output" do

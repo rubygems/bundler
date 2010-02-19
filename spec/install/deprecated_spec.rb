@@ -1,6 +1,6 @@
 require File.expand_path('../../spec_helper', __FILE__)
 
-describe "gemfile install with deprecated features" do
+describe "bundle install with deprecated features" do
   before :each do
     in_app_root
   end
