@@ -33,7 +33,7 @@ This is where you specify all of your application's dependencies. The
 following is an example. For more information, refer to Bundler::Dsl.
 
     # Add :gemcutter as a source that Bundler will use to find gems listed
-    # in the manifest. At least one source should be listed. URLs maybe also
+    # in the manifest. At least one source should be listed. URLs may also
     # be used, such as http://gems.github.com.
     #
     source :gemcutter
