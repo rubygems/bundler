@@ -44,7 +44,7 @@ describe "bundle exec" do
       source "file://#{gem_repo1}"
       gem "rack", "0.9.1"
     G
-    
+
     Dir.chdir bundled_app2 do
       install_gemfile bundled_app2('Gemfile'), <<-G
         source "file://#{gem_repo2}"

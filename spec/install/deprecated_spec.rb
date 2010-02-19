@@ -30,7 +30,7 @@ describe "gemfile install with deprecated features" do
       bundle :install
       out.should =~ /Please replace :#{deprecated}|The :#{deprecated} option is no longer supported/
     end
-    
+
   end
 
 end

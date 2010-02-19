@@ -21,7 +21,7 @@ describe "gemfile install with explicit source paths" do
 
     should_be_installed("foo 1.0")
   end
-  
+
   it "supports relative paths" do
     build_lib "foo"
 
@@ -62,7 +62,7 @@ describe "gemfile install with explicit source paths" do
     build_lib "omg", "1.0", :path => lib_path("omg") do |s|
       s.add_dependency "foo"
     end
-    
+
     build_lib "foo", "1.0.0", :path => lib_path("omg/foo")
 
     install_gemfile <<-G

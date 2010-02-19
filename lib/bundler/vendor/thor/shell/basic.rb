@@ -105,7 +105,7 @@ class Thor
           end
 
           sentence = truncate(sentence, options[:truncate]) if options[:truncate]
-          $stdout.puts sentence  
+          $stdout.puts sentence
         end
       end
 
