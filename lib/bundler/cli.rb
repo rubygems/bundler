@@ -104,7 +104,7 @@ module Bundler
       environment.cache
     end
 
-    desc "pack", "Locks the Gemfile and caches all of the gems"
+    desc "pack", "Locks and then caches all of the gems into vendor/cache"
     def pack
       lock
       cache
