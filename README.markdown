@@ -30,13 +30,11 @@ root directory of your application. This can quickly be done by running
 ### Gemfile
 
 This is where you specify all of your application's dependencies. The
-following is an example. For more information, refer to
-Bundler::Dsl.
+following is an example. For more information, refer to Bundler::Dsl.
 
-    # Add :gemcutter as a source that Bundler will use
-    # to find gems listed in the manifest. At least one source
-    # should be listed. URLs maybe also be used, such as
-    # http://gems.github.com.
+    # Add :gemcutter as a source that Bundler will use to find gems listed
+    # in the manifest. At least one source should be listed. URLs maybe also
+    # be used, such as http://gems.github.com.
     #
     source :gemcutter
 
@@ -54,11 +52,11 @@ Bundler::Dsl.
     #
     gem "rack", "1.0.0"
 
-    # Add a git repository as a source, and add a dependency on a gem
-    # from it
+    # Add a git repository as a source. Valid options include :branch, :tag,
+    # and :ref. Next, add any gems that you want from that repo.
+    #
     git "git://github.com/indirect/rails3-generators.git"
     gem "rails3-generators"
-    
 
 ### Groups
 
