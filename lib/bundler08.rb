@@ -6,20 +6,20 @@ require 'erb'
 require "rubygems/remote_fetcher"
 require "rubygems/installer"
 
-require "bundler/gem_bundle"
-require "bundler/source"
-require "bundler/finder"
-require "bundler/gem_ext"
-require "bundler/resolver"
-require "bundler/environment"
-require "bundler/dsl"
-require "bundler/cli"
-require "bundler/bundle"
-require "bundler/dependency"
-require "bundler/remote_specification"
+require "bundler08/gem_bundle"
+require "bundler08/source"
+require "bundler08/finder"
+require "bundler08/gem_ext"
+require "bundler08/resolver"
+require "bundler08/environment"
+require "bundler08/dsl"
+require "bundler08/cli"
+require "bundler08/bundle"
+require "bundler08/dependency"
+require "bundler08/remote_specification"
 
 module Bundler
-  VERSION = "0.8.1"
+  VERSION = "0.8.2"
 
   class << self
     attr_writer :logger, :mode

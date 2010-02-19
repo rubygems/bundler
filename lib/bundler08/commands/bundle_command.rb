@@ -59,7 +59,7 @@ Bundle stuff
 
   def execute
     # Prevent the bundler from getting required unless it is actually being used
-    require 'bundler'
+    require 'bundler08'
     if options[:cache]
       Bundler::CLI.run(:cache, options)
     elsif options[:prune]

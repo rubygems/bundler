@@ -29,7 +29,7 @@ class Gem::Commands::ExecCommand < Gem::Command
 
   def execute
     # Prevent the bundler from getting required unless it is actually being used
-    require 'bundler'
+    require 'bundler08'
     Bundler::CLI.run(:exec, options)
   end
 
