@@ -153,9 +153,9 @@ module Bundler
       FileUtils.rm_f "#{Bundler.root}/.bundle/environment.rb"
     end
 
-    def self.tasks
+    def self.printable_tasks
       tasks = super.dup
-      tasks.delete("cache")
+      tasks.reject!{|t| t.first =~ /cache/ }
       tasks
     end
 
