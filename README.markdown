@@ -269,3 +269,17 @@ Any remaining questions may be directed via email to the [Bundler mailing list](
 ## Reporting bugs
 
 Please report all bugs on the github issue tracker for the project, located at [http://github.com/carlhuda/bundler/issues/](http://github.com/carlhuda/bundler/issues/).
+
+The best possible scenario is a ticket with a fix for the bug and a test for the fix. If that's not possible, instructions to reproduce the issue are vitally important. If you're not sure exactly how to reproduce the issue that you are seeing, create a gist of the following information and include it in your ticket: 
+
+  - Whether you have locked or not
+  - What version of bundler you are using
+  - Your Gemfile
+  - The command you ran to generate exception(s)
+  - The exception backtrace(s)
+  
+If you are using Rails 2.3, please also include:
+
+  - Your boot.rb file
+  - Your preinitializer.rb file
+  - Your environment.rb file
