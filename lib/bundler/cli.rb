@@ -148,5 +148,12 @@ module Bundler
       FileUtils.rm_f "#{Bundler.root}/Gemfile.lock"
       FileUtils.rm_f "#{Bundler.root}/.bundle/environment.rb"
     end
+
+    def self.tasks
+      tasks = super.dup
+      tasks.delete("cache")
+      tasks
+    end
+
   end
 end
