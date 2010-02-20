@@ -150,27 +150,29 @@ module Bundler
         end
       end
 
-      def local_specs
-        @local_specs ||= begin
-          index = Index.new
+      def load_spec_files
+        index = Index.new
 
-          if File.directory?(path)
-            Dir["#{path}/#{@glob}"].each do |file|
-              file = Pathname.new(file)
-              # Eval the gemspec from its parent directory
-              if spec = Dir.chdir(file.dirname) { eval(File.read(file.basename)) }
-                spec = Specification.from_gemspec(spec)
-                spec.loaded_from = file
-                spec.source      = self
-                index << spec
-              end
+        if File.directory?(path)
+          Dir["#{path}/#{@glob}"].each do |file|
+            file = Pathname.new(file)
+            # Eval the gemspec from its parent directory
+            if spec = Dir.chdir(file.dirname) { eval(File.read(file.basename)) }
+              spec = Specification.from_gemspec(spec)
+              spec.loaded_from = file
+              spec.source = self
+              index << spec
             end
-
-            index << default_spec if default_spec && index.empty?
           end
 
-          index.freeze
+          index << default_spec if default_spec && index.empty?
         end
+
+        index.freeze
+      end
+
+      def local_specs
+        @local_specs ||= load_spec_files
       end
 
       def install(spec)
@@ -236,13 +238,10 @@ module Bundler
       end
 
       def specs
-        @specs ||= begin
-          index = Index.new
-          # Start by making sure the git cache is up to date
-          cache
-          checkout
-          super
-        end
+        # Start by making sure the git cache is up to date
+        cache
+        checkout
+        @specs ||= load_spec_files
       end
 
       def install(spec)
