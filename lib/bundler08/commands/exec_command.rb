@@ -1,4 +1,9 @@
-if exec = ARGV.index("exec")
+combined = [File.basename($0)] + ARGV
+gem_i  = combined.index("gem")
+exec_i = combined.index("exec")
+
+if gem_i && exec_i && gem_i < exec_i
+  exec = ARGV.index("exec")
   $command = ARGV[(exec + 1)..-1]
   ARGV.replace ARGV[0..exec]
 end
