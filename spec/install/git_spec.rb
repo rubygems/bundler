@@ -145,6 +145,48 @@ describe "bundle install with git sources" do
     out.should == "WIN"
   end
 
+  it "correctly handles cases with invalid gemspecs" do
+    build_git "foo" do |s|
+      s.summary = nil
+    end
+
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "foo", :git => "#{lib_path('foo-1.0')}"
+      gem "rails", "2.3.2"
+    G
+
+    should_be_installed "foo 1.0"
+    should_be_installed "rails 2.3.2"
+  end
+
+  it "runs the gemspec in the context of its parent directory" do
+    build_lib "bar", :path => lib_path("foo/bar"), :gemspec => false do |s|
+      s.write "bar.gemspec", <<-G
+        Gem::Specification.new do |s|
+          s.name        = 'bar'
+          s.version     = '1.0'
+          s.summary     = 'Bar'
+          s.files       = Dir["lib/**/*.rb"]
+          STDERR.puts s.files
+        end
+      G
+    end
+
+    build_git "foo", :path => lib_path("foo") do |s|
+      s.write "bin/foo", ""
+    end
+
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "bar", :git => "#{lib_path("foo")}"
+      gem "rails", "2.3.2"
+    G
+
+    should_be_installed "bar 1.0"
+    should_be_installed "rails 2.3.2"
+  end
+
   it "installs from git even if a rubygems gem is present" do
     build_gem "foo", "1.0", :path => lib_path('fake_foo'), :to_system => true do |s|
       s.write "lib/foo.rb", "raise 'FAIL'"

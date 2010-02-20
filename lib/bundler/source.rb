@@ -202,6 +202,18 @@ module Bundler
 
         installer.build_extensions
         installer.generate_bin
+      rescue Gem::InvalidSpecificationException => e
+        Bundler.ui.warn "\n#{spec.name} at #{spec.full_gem_path} did not have a valid gemspec.\n" \
+                        "This prevents bundler from installing bins or native extensions, but " \
+                        "that may not affect its functionality."
+
+        if !spec.extensions.empty? && !spec.emails.empty?
+          Bundler.ui.warn "If you need to use this package without installing it from a gem " \
+                          "repository, please contact #{spec.emails.join(", or ")} and ask them " \
+                          "to modify their .gemspec so it can work with `gem build`."
+        end
+
+        Bundler.ui.warn "The validation message from Rubygems was:\n  #{e.message}"
       end
 
     end
