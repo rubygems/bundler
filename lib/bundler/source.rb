@@ -157,10 +157,8 @@ module Bundler
           if File.directory?(path)
             Dir["#{path}/#{@glob}"].each do |file|
               file = Pathname.new(file)
-              relative_path = file.relative_path_from(Pathname.new(path))
-              # Do it in the root of the repo in case they do
-              # assume being in the root
-              if spec = Dir.chdir(path) { eval(File.read(relative_path)) }
+              # Eval the gemspec from its parent directory
+              if spec = Dir.chdir(file.dirname) { eval(File.read(file.basename)) }
                 spec = Specification.from_gemspec(spec)
                 spec.loaded_from = file
                 spec.source      = self
@@ -242,28 +240,8 @@ module Bundler
           index = Index.new
           # Start by making sure the git cache is up to date
           cache
-          # Find all gemspecs in the repo
-          in_cache do
-            out   = %x(git ls-tree -r #{revision}).strip
-            lines = out.split("\n").select { |l| l =~ /\.gemspec$/ }
-            # Loop over the lines and extract the relative path and the
-            # git hash
-            lines.each do |line|
-              next unless line =~ %r{^(\d+) (blob|tree) ([a-f0-9]+)\t(.*)$}
-              hash, file = $3, $4
-              # Read the gemspec
-              if spec = eval(%x(git cat-file blob #{$3}))
-                spec = Specification.from_gemspec(spec)
-                spec.relative_loaded_from = file
-                spec.source = self
-                index << spec
-              end
-            end
-          end
-
-          index << default_spec if default_spec && index.empty?
-
-          index.freeze
+          checkout
+          super
         end
       end
 

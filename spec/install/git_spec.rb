@@ -162,10 +162,12 @@ describe "bundle install with git sources" do
 
   it "runs the gemspec in the context of its parent directory" do
     build_lib "bar", :path => lib_path("foo/bar"), :gemspec => false do |s|
+      s.write lib_path("foo/bar/lib/version.rb"), %{BAR_VERSION = '1.0'}
       s.write "bar.gemspec", <<-G
+        require 'lib/version'
         Gem::Specification.new do |s|
           s.name        = 'bar'
-          s.version     = '1.0'
+          s.version     = BAR_VERSION
           s.summary     = 'Bar'
           s.files       = Dir["lib/**/*.rb"]
           STDERR.puts s.files
