@@ -104,6 +104,10 @@ Gems that are already installed into the system RubyGems repository will be
 referenced, rather than installed again. Every time an update is made to the
 Gemfile, run `bundle install` again to install any newly needed gems.
 
+If you want to install the gems into the project's folder, like Bundler 0.8
+and earlier did, you can run `bundle install vendor`, and the gems will
+be installed into the `vendor` subdirectory of your project.
+
 ### Locking dependencies
 
 By default, bundler will only ensure that the activated gems satisfy the
