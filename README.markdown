@@ -135,7 +135,12 @@ To do this, include the following at the beginning of your code.
       Bundler.setup
     end
 
-    # Your application requires come here
+    # Your application's requires come here, e.g.
+    # require 'date' # a ruby standard library
+    # require 'rack' # a bundled gem
+
+    # Alternatively, you can require all the bundled libs at once
+    # Bundler.require
 
 The `bundle exec` command provides a way to run arbitrary ruby code in
 context of the bundle. For example:
