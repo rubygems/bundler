@@ -77,6 +77,7 @@ module Bundler
 
     def specs_for(*groups)
       groups = @definition.groups if groups.empty?
+      groups -= Bundler.settings.without
       groups.map! { |g| g.to_sym }
       specs.select { |s| (s.groups & groups).any? }
     end

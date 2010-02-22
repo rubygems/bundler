@@ -108,5 +108,38 @@ describe "Bundler.setup" do
 
       should_be_installed "activesupport 2.3.2", :groups => :default
     end
+
+    it "remembers --without and does not bail on bare Bundler.setup" do
+      install_gemfile <<-G, :without => :rails
+        source "file://#{gem_repo1}"
+        gem "activesupport"
+
+        group :rails do
+          gem "rails", "2.3.2"
+        end
+      G
+
+      install_gems "activesupport-2.3.5"
+
+      should_be_installed "activesupport 2.3.2"
+    end
+
+    it "remembers --without and does not include groups passed to Bundler.setup" do
+      install_gemfile <<-G, :without => :rails
+        source "file://#{gem_repo1}"
+        gem "activesupport"
+
+        group :rack do
+          gem "rack"
+        end
+
+        group :rails do
+          gem "rails", "2.3.2"
+        end
+      G
+
+      should_not_be_installed "activesupport 2.3.2", :groups => :rack
+      should_be_installed "rack 1.0.0", :groups => :rack
+    end
   end
 end

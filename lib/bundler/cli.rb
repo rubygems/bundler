@@ -53,6 +53,7 @@ module Bundler
 
       Bundler.settings[:path] = path if path
       Bundler.settings[:disable_shared_gems] = '1' if options["disable-shared-gems"]
+      Bundler.settings.without = opts[:without]
 
       remove_lockfiles if options[:relock]
 

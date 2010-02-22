@@ -20,6 +20,14 @@ module Bundler
       value
     end
 
+    def without=(array)
+      self[:without] = array.join(":")
+    end
+
+    def without
+      self[:without] ? self[:without].split(":").map { |w| w.to_sym } : []
+    end
+
   private
 
     def config_file

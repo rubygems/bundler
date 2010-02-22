@@ -170,7 +170,6 @@ describe "bundle install with git sources" do
           s.version     = BAR_VERSION
           s.summary     = 'Bar'
           s.files       = Dir["lib/**/*.rb"]
-          STDERR.puts s.files
         end
       G
     end
