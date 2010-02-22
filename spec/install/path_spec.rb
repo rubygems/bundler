@@ -105,5 +105,19 @@ describe "bundle install with explicit source paths" do
 
       should_be_installed "foo 1.0"
     end
+
+    it "works when the path does not have a gemspec" do
+      build_lib "foo", :gemspec => false
+
+      gemfile <<-G
+        gem "foo", "1.0", :path => "#{lib_path('foo-1.0')}"
+      G
+
+      should_be_installed "foo 1.0"
+
+      bundle :lock
+
+      should_be_installed "foo 1.0"
+    end
   end
 end

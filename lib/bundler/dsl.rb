@@ -39,7 +39,7 @@ module Bundler
     end
 
     def path(path, options = {}, source_options = {})
-      source Source::Path.new(_normalize_hash(options).merge("path" => path)), source_options
+      source Source::Path.new(_normalize_hash(options).merge("path" => Pathname.new(path))), source_options
     end
 
     def git(uri, options = {}, source_options = {})
@@ -98,8 +98,8 @@ module Bundler
       # Normalize git and path options
       ["git", "path"].each do |type|
         if param = opts[type]
-          source = send(type, param, opts.dup, :prepend => true)
-          source.default_spec name, version if _version?(version)
+          options = _version?(version) ? opts.merge("name" => name, "version" => version) : opts.dup
+          source = send(type, param, options, :prepend => true)
           opts["source"] = source
         end
       end

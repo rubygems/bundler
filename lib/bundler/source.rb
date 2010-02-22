@@ -130,7 +130,7 @@ module Bundler
         @options = options
         @glob = options["glob"] || "{,*/}*.gemspec"
         @path = options["path"]
-        @default_spec = nil
+        default_spec(options["name"], options["version"]) if options["name"]
       end
 
       def to_s
@@ -221,8 +221,7 @@ module Bundler
       attr_reader :uri, :ref, :options
 
       def initialize(options)
-        @options = options
-        @glob = options["glob"] || "{,*/}*.gemspec"
+        super
         @uri  = options["uri"]
         @ref  = options["ref"] || options["branch"] || 'master'
       end
