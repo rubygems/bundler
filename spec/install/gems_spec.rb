@@ -319,7 +319,7 @@ describe "bundle install with gem sources" do
 
   describe "when excluding groups" do
     before :each do
-      install_gemfile <<-G, 'without' => 'emo'
+      gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
         group :emo do
@@ -329,20 +329,37 @@ describe "bundle install with gem sources" do
     end
 
     it "installs gems in the default group" do
+      bundle :install, :without => "emo"
       should_be_installed "rack 1.0.0", :groups => [:default]
     end
 
     it "does not install gems from the excluded group" do
+      bundle :install, :without => "emo"
       should_not_be_installed "activesupport 2.3.5", :groups => [:default]
     end
 
     it "does not say it installed gems from the excluded group" do
+      bundle :install, :without => "emo"
       out.should_not include("activesupport")
     end
 
     it "allows Bundler.setup for specific groups" do
-      out = run("require 'rack'; puts RACK", :default)
+      bundle :install, :without => "emo"
+      run("require 'rack'; puts RACK", :default)
       out.should == '1.0.0'
+    end
+
+    it "does not effect the resolve" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "activesupport"
+        group :emo do
+          gem "rails", "2.3.2"
+        end
+      G
+
+      bundle :install, :without => "emo"
+      should_be_installed "activesupport 2.3.2", :groups => [:default]
     end
   end
 end

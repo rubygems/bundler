@@ -16,7 +16,7 @@ module Bundler
       FileUtils.mkdir_p(Bundler.bundle_path)
 
       specs.sort_by { |s| s.name }.each do |spec|
-        if (spec.groups & options[:without]).any?
+        if spec.groups & options[:without] == spec.groups
           Bundler.ui.debug "  * Not in requested group; skipping."
           next
         end
