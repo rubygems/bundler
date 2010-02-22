@@ -77,4 +77,22 @@ describe "bundle exec" do
     out.should == "0.9.1"
     should_not_be_installed "rack_middleware 1.0"
   end
+
+  it "handles gems excluded by --without" do
+    build_gem "pg", "1.0.0"
+
+    install_gemfile <<-G, :without => :middleware
+      source "file://#{gem_repo1}"
+      gem "rack"
+
+      group :production do
+        gem "pg"
+      end
+    G
+
+    bundle "exec ruby -e \"require 'rack'; puts Rack\""
+
+    out.should == "Rack"
+    should_not_be_installed "pg 1.0"
+  end
 end
