@@ -3,7 +3,7 @@ module Gem
     remove_method(:app_script_text) if method_defined?(:app_script_text)
 
     def app_script_text(bin_file_name)
-      path = @gem_home
+      path = Pathname.new(@gem_home)
       template = File.read(File.join(File.dirname(__FILE__), "templates", "app_script.erb"))
       erb = ERB.new(template, nil, '-')
       erb.result(binding)
