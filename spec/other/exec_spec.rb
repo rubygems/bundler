@@ -63,7 +63,7 @@ describe "bundle exec" do
   end
 
   it "handles gems installed with --without" do
-    install_gemfile <<-G, :without => :rails
+    install_gemfile <<-G, :without => :middleware
       source "file://#{gem_repo1}"
       gem "rack" # rack 0.9.1 and 1.0 exist
 
@@ -75,5 +75,6 @@ describe "bundle exec" do
     bundle "exec rackup"
     
     out.should == "0.9.1"
+    should_not_be_installed "rack_middleware 1.0"
   end
 end
