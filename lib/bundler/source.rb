@@ -124,29 +124,26 @@ module Bundler
     end
 
     class Path
-      attr_reader :path, :options
+      attr_reader :path, :options, :default_spec
 
       def initialize(options)
         @options = options
         @glob = options["glob"] || "{,*/}*.gemspec"
         @path = options["path"]
-        default_spec(options["name"], options["version"]) if options["name"]
+
+        if options["name"]
+          @default_spec = Specification.new do |s|
+            s.name     = options["name"]
+            s.source   = self
+            s.version  = Gem::Version.new(options["version"])
+            s.summary  = "Fake gemspec for #{options["name"]}"
+            s.relative_loaded_from = "#{options["name"]}.gemspec"
+          end
+        end
       end
 
       def to_s
         "source code at #{@path}"
-      end
-
-      def default_spec(*args)
-        return @default_spec if args.empty?
-        name, version = *args
-        @default_spec = Specification.new do |s|
-          s.name     = name
-          s.source   = self
-          s.version  = Gem::Version.new(version)
-          s.summary  = "Fake gemspec for #{name}"
-          s.relative_loaded_from = "#{name}.gemspec"
-        end
       end
 
       def load_spec_files
