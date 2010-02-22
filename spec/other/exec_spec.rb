@@ -73,7 +73,7 @@ describe "bundle exec" do
     G
 
     bundle "exec rackup"
-    
+
     out.should == "0.9.1"
     should_not_be_installed "rack_middleware 1.0"
   end
