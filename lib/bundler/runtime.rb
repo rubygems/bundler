@@ -6,7 +6,7 @@ module Bundler
 
     def initialize(*)
       super
-      if locked? # && !rb_lock_file.exist?
+      if locked?
         write_rb_lock
       end
     end
@@ -171,7 +171,7 @@ module Bundler
     end
 
     def specs_for_lock_file
-      specs.map do |s|
+      specs_for.map do |s|
         hash = {}
         hash[:loaded_from] = s.loaded_from.to_s
         hash[:load_paths]  = s.load_paths

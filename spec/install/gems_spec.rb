@@ -180,6 +180,50 @@ describe "bundle install with gem sources" do
     end
   end
 
+  describe "when locked and installed with --without" do
+    before(:each) do
+      system_gems "rack-0.9.1" do
+        install_gemfile <<-G, :without => :rack
+          source "file://#{gem_repo1}"
+          gem "rack"
+
+          group :rack do
+            gem "rack_middleware"
+          end
+        G
+
+        bundle :lock
+      end
+    end
+
+    def simulate_new_machine
+      system_gems []
+      FileUtils.rm_rf default_bundle_path
+      FileUtils.rm_rf bundled_app('.bundle')
+    end
+
+    it "uses the correct versions even if --without was used on the original" do
+      should_be_installed "rack 0.9.1"
+      should_not_be_installed "rack_middleware 1.0"
+      simulate_new_machine
+
+      bundle :install
+
+      should_be_installed "rack 0.9.1"
+      should_be_installed "rack_middleware 1.0"
+    end
+
+    it "regenerates the environment.rb if install is called twice on a locked repo" do
+      run "begin; require 'rack_middleware'; rescue LoadError; puts 'WIN'; end", :lite_runtime => true
+      out.should == "WIN"
+
+      bundle :install
+
+      run "require 'rack_middleware'; puts RACK_MIDDLEWARE", :lite_runtime => true
+      out.should == "1.0"
+    end
+  end
+
   describe "with BUNDLE_PATH set" do
     before :each do
       build_lib "rack", "1.0.0", :to_system => true do |s|
