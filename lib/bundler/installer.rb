@@ -16,6 +16,8 @@ module Bundler
       FileUtils.mkdir_p(Bundler.bundle_path)
 
       specs.sort_by { |s| s.name }.each do |spec|
+        spec.source.fetch(spec) if spec.source.respond_to?(:fetch)
+
         if spec.groups & options[:without] == spec.groups
           Bundler.ui.debug "  * Not in requested group; skipping."
           next

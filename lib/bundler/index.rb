@@ -4,6 +4,17 @@ module Bundler
       Source::SystemGems.new.specs
     end
 
+    def self.from_cached_specs(path)
+      index = Index.new
+
+      Dir["#{path}/*.gem"].each do |gemfile|
+        spec = Gem::Format.from_file_by_path(gemfile).spec
+        index << spec
+      end
+
+      index
+    end
+
     def initialize
       @cache = {}
       @specs = Hash.new { |h,k| h[k] = [] }

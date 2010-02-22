@@ -76,12 +76,9 @@ module Bundler
     end
 
     def specs_for(*groups)
+      groups = @definition.groups if groups.empty?
       groups.map! { |g| g.to_sym }
-      if groups.empty?
-        specs
-      else
-        Resolver.resolve(dependencies_for(*groups), index)
-      end
+      specs.select { |s| (s.groups & groups).any? }
     end
 
     def specs

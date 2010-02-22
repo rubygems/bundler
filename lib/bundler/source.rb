@@ -25,13 +25,14 @@ module Bundler
         @specs ||= fetch_specs
       end
 
-      def install(spec)
-        destination = Gem.dir
-
+      def fetch(spec)
         Bundler.ui.debug "  * Downloading"
-        gem_path  = Gem::RemoteFetcher.fetcher.download(spec, uri, destination)
+        Gem::RemoteFetcher.fetcher.download(spec, uri, Gem.dir)
+      end
+
+      def install(spec)
         Bundler.ui.debug "  * Installing"
-        installer = Gem::Installer.new gem_path,
+        installer = Gem::Installer.new gem_path(spec),
           :install_dir         => Gem.dir,
           :ignore_dependencies => true,
           :wrappers            => true,
@@ -42,6 +43,10 @@ module Bundler
       end
 
     private
+
+      def gem_path(spec)
+        "#{Gem.dir}/cache/#{spec.full_name}.gem"
+      end
 
       def fetch_specs
         index = Index.new
@@ -97,15 +102,9 @@ module Bundler
 
       def specs
         @specs ||= begin
-          index = Index.new
-
-          Dir["#{@path}/*.gem"].each do |gemfile|
-            spec = Gem::Format.from_file_by_path(gemfile).spec
-            spec.source = self
-            index << spec
-          end
-
-          index.freeze
+          specs = Index.from_cached_specs(@path)
+          specs.each { |s| s.source = self }
+          specs
         end
       end
 

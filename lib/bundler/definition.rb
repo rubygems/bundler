@@ -13,10 +13,8 @@ module Bundler
     end
 
     def self.from_lock(lockfile)
-      # gemfile_definition = from_gemfile(nil)
       locked_definition = Locked.new(YAML.load_file(lockfile))
 
-      # TODO: Switch to using equivalent?
       hash = Digest::SHA1.hexdigest(File.read("#{Bundler.root}/Gemfile"))
       unless locked_definition.hash == hash
         raise GemfileError, "You changed your Gemfile after locking. Please relock using `bundle lock`"
@@ -43,20 +41,14 @@ module Bundler
           index = source.local_specs.merge(index)
         end
 
-        Index.from_installed_gems.merge(index)
+        index = Index.from_installed_gems.merge(index)
+        Index.from_cached_specs("#{Bundler.bundle_path}/cache").merge(index)
       end
     end
 
-    # def equivalent?(other)
-    #   self.matches?(other) && other.matches?(self)
-    #   # other.matches?(self)
-    # end
-
-    # def matches?(other)
-    #   dependencies.all? do |dep|
-    #     dep =~ other.specs.find {|spec| spec.name == dep.name }
-    #   end
-    # end
+    def groups
+      dependencies.map { |d| d.groups }.flatten.uniq
+    end
 
     class Locked < Definition
       def initialize(details)
