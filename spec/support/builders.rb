@@ -12,6 +12,11 @@ module Spec
         build_gem "rack",           %w(0.9.1 1.0.0) do |s|
           s.executables = "rackup"
         end
+
+        build_gem "rack_middleware", "1.0" do |s|
+          s.add_dependency "rack", "0.9.1"
+        end
+
         build_gem "rails",          "2.3.2" do |s|
           s.executables = "rails"
           s.add_dependency "rake"
