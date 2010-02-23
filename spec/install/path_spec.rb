@@ -34,6 +34,18 @@ describe "bundle install with explicit source paths" do
     should_be_installed("foo 1.0")
   end
 
+  it "expands paths" do
+    build_lib "foo"
+
+    relative_path = lib_path('foo-1.0').relative_path_from(Pathname.new("~").expand_path)
+
+    install_gemfile <<-G
+      gem 'foo', :path => "~/#{relative_path}"
+    G
+
+    should_be_installed("foo 1.0")
+  end
+
   it "installs dependencies from the path even if a newer gem is available elsewhere" do
     system_gems "rack-1.0.0"
 

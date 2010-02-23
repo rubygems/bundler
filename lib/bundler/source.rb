@@ -129,7 +129,10 @@ module Bundler
       def initialize(options)
         @options = options
         @glob = options["glob"] || "{,*/}*.gemspec"
-        @path = options["path"]
+
+        if options["path"]
+          @path = Pathname.new(options["path"]).expand_path(Bundler.root)
+        end
 
         if options["name"]
           @default_spec = Specification.new do |s|
