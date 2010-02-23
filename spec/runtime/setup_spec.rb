@@ -18,6 +18,19 @@ describe "Bundler.setup" do
     should_be_installed "activesupport 2.3.5"
   end
 
+  it "prioritizes gems in BUNDLE_PATH over gems in GEM_HOME" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack", "1.0.0"
+    G
+
+    build_gem "rack", :to_system => true do |s|
+      s.write "lib/rack.rb", "RACK = 'FAIL'"
+    end
+
+    should_be_installed "rack 1.0.0"
+  end
+
   describe "cripping rubygems" do
     it "replaces #gem with an alternative that raises when appropriate" do
       install_gemfile <<-G
