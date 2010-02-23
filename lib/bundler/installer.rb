@@ -83,7 +83,7 @@ module Bundler
     end
 
     def ambiguous?(dep)
-      dep.version_requirements.requirements.any? { |op,_| op != '=' }
+      dep.requirement.requirements.any? { |op,_| op != '=' }
     end
 
     def index

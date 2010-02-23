@@ -37,6 +37,27 @@ else
   end
 end
 
+rubyopt = ENV["RUBYOPT"]
+
+%w(master REL_1_3_5 REL_1_3_6).each do |rg|
+  Spec::Rake::SpecTask.new("spec_#{rg}") do |t|
+    t.spec_files = FileList['spec/**/*_spec.rb']
+    t.spec_opts  = %w(-fs --color)
+    t.warning    = true
+  end
+
+  task "rubygems_#{rg}" do
+    unless File.directory?("tmp/rubygems_#{rg}")
+      system("git clone git://github.com/jbarnette/rubygems.git tmp/rubygems_#{rg} && cd tmp/rubygems_#{rg} && git reset --hard #{rg}")
+    end
+    ENV["RUBYOPT"] = "-I#{File.expand_path("tmp/rubygems_#{rg}/lib")} #{rubyopt}"
+  end
+
+  task "spec_#{rg}" => "rubygems_#{rg}"
+
+  task :ci => "spec_#{rg}"
+end
+
 begin
   require 'rake/gempackagetask'
 rescue LoadError

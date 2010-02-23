@@ -94,24 +94,24 @@ module Bundler
       #   3) Sort by number of gems available in the source.
       reqs = reqs.sort_by do |a|
         [ activated[a.name] ? 0 : 1,
-          a.version_requirements.prerelease? ? 0 : 1,
+          a.requirement.prerelease? ? 0 : 1,
           @errors[a.name]   ? 0 : 1,
           activated[a.name] ? 0 : search(a).size ]
       end
 
       debug { "Activated:\n" + activated.values.map { |a| "  #{a.name} (#{a.version})" }.join("\n") }
-      debug { "Requirements:\n" + reqs.map { |r| "  #{r.name} (#{r.version_requirements})"}.join("\n") }
+      debug { "Requirements:\n" + reqs.map { |r| "  #{r.name} (#{r.requirement})"}.join("\n") }
 
       activated = activated.dup
       # Pull off the first requirement so that we can resolve it
       current   = reqs.shift
 
-      debug { "Attempting:\n  #{current.name} (#{current.version_requirements})"}
+      debug { "Attempting:\n  #{current.name} (#{current.requirement})"}
 
       # Check if the gem has already been activated, if it has, we will make sure
       # that the currently activated gem satisfies the requirement.
       if existing = activated[current.name]
-        if current.version_requirements.satisfied_by?(existing.version)
+        if current.requirement.satisfied_by?(existing.version)
           debug { "    * [SUCCESS] Already activated" }
           @errors.delete(existing.name)
           # Since the current requirement is satisfied, we can continue resolving
@@ -120,7 +120,7 @@ module Bundler
         else
           debug { "    * [FAIL] Already activated" }
           @errors[existing.name] = [existing, current]
-          debug { current.required_by.map {|d| "      * #{d.name} (#{d.version_requirements})" }.join("\n") }
+          debug { current.required_by.map {|d| "      * #{d.name} (#{d.requirement})" }.join("\n") }
           # debug { "    * All current conflicts:\n" + @errors.keys.map { |c| "      - #{c}" }.join("\n") }
           # Since the current requirement conflicts with an activated gem, we need
           # to backtrack to the current requirement's parent and try another version
@@ -199,14 +199,14 @@ module Bundler
 
       activated[spec.name] = spec
       debug { "  Activating: #{spec.name} (#{spec.version})" }
-      debug { spec.required_by.map { |d| "    * #{d.name} (#{d.version_requirements})" }.join("\n") }
+      debug { spec.required_by.map { |d| "    * #{d.name} (#{d.requirement})" }.join("\n") }
 
       # Now, we have to loop through all child dependencies and add them to our
       # array of requirements.
       debug { "    Dependencies"}
       spec.dependencies.each do |dep|
         next if dep.type == :development
-        debug { "    * #{dep.name} (#{dep.version_requirements})" }
+        debug { "    * #{dep.name} (#{dep.requirement})" }
         dep.required_by.replace(requirement.required_by)
         dep.required_by << requirement
         reqs << dep

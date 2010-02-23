@@ -2,7 +2,7 @@ module Spec
   module Helpers
     def reset!
       Dir["#{tmp}/{gems/*,*}"].each do |dir|
-        next if %(base remote1 gems).include?(File.basename(dir))
+        next if %(base remote1 gems rubygems_1_3_5 rubygems_1_3_6 rubygems_master).include?(File.basename(dir))
         FileUtils.rm_rf(dir)
       end
       FileUtils.mkdir_p(tmp)

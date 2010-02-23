@@ -87,7 +87,7 @@ module Bundler
       @cache[dependency.hash] ||= begin
         specs = @specs[dependency.name]
 
-        wants_prerelease = dependency.version_requirements.prerelease?
+        wants_prerelease = dependency.requirement.prerelease?
         only_prerelease  = specs.all? {|spec| spec.version.prerelease? }
         found = specs.select { |spec| dependency =~ spec }
 
