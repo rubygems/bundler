@@ -9,6 +9,7 @@ module Bundler
     end
 
     def initialize
+      @source  = nil
       @sources = []
       @dependencies = []
       @group = nil
@@ -28,22 +29,26 @@ module Bundler
     end
 
     def source(source, options = {})
-      source = case source
+      @source = case source
       when :gemcutter, :rubygems, :rubyforge then Source::Rubygems.new("uri" => "http://gemcutter.org")
       when String then Source::Rubygems.new("uri" => source)
       else source
       end
 
-      options[:prepend] ? @sources.unshift(source) : @sources << source
-      source
+      options[:prepend] ? @sources.unshift(@source) : @sources << @source
+
+      yield if block_given?
+      @source
+    ensure
+      @source = nil
     end
 
-    def path(path, options = {}, source_options = {})
-      source Source::Path.new(_normalize_hash(options).merge("path" => Pathname.new(path))), source_options
+    def path(path, options = {}, source_options = {}, &blk)
+      source Source::Path.new(_normalize_hash(options).merge("path" => Pathname.new(path))), source_options, &blk
     end
 
-    def git(uri, options = {}, source_options = {})
-      source Source::Git.new(_normalize_hash(options).merge("uri" => uri)), source_options
+    def git(uri, options = {}, source_options = {}, &blk)
+      source Source::Git.new(_normalize_hash(options).merge("uri" => uri)), source_options, &blk
     end
 
     def to_definition
@@ -103,6 +108,8 @@ module Bundler
           opts["source"] = source
         end
       end
+
+      opts["source"] ||= @source
 
       opts["group"] = group
     end

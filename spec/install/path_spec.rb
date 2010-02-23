@@ -100,6 +100,22 @@ describe "bundle install with explicit source paths" do
     out.should == "1.0"
   end
 
+  describe "block syntax" do
+    it "pulls all gems from a path block" do
+      build_lib "omg"
+      build_lib "hi2u"
+
+      install_gemfile <<-G
+        path "#{lib_path}" do
+          gem "omg"
+          gem "hi2u"
+        end
+      G
+
+      should_be_installed "omg 1.0", "hi2u 1.0"
+    end
+  end
+
   describe "when locked" do
     it "keeps source pinning" do
       build_lib "foo", "1.0", :path => lib_path('foo')

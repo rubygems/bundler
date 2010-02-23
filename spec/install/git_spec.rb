@@ -128,6 +128,22 @@ describe "bundle install with git sources" do
     end
   end
 
+  describe "block syntax" do
+    it "pulls all gems from a git block" do
+      build_lib "omg", :path => lib_path('hi2u/omg')
+      build_lib "hi2u", :path => lib_path('hi2u')
+
+      install_gemfile <<-G
+        path "#{lib_path('hi2u')}" do
+          gem "omg"
+          gem "hi2u"
+        end
+      G
+
+      should_be_installed "omg 1.0", "hi2u 1.0"
+    end
+  end
+
   it "uses a ref if specified" do
     build_git "foo"
     @revision = revision_for(lib_path("foo-1.0"))
