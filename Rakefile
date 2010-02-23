@@ -19,7 +19,8 @@ spec = Gem::Specification.new do |s|
   s.files        = Dir.glob("{bin,lib}/**/*") + %w(LICENSE README.markdown)
   s.executables  = ['bundle']
   s.require_path = 'lib'
-  s.post_install_message = "Due to a rubygems bug, you must uninstall all older versions of bundler for 0.9 to work"
+  s.post_install_message = "Due to a rubygems bug, you must uninstall older versions of the bundler gem for 0.9 to work.\n" +
+    "If you still need bundler 0.8, install the 'bundler08' gem."
 end
 
 begin
