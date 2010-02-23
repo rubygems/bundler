@@ -55,9 +55,7 @@ module Bundler
 
         fetch_all_specs do |n,v|
           v.each do |name, version, platform|
-            puts "#{name}, #{version}" if name == "will_paginate"
             next unless Gem::Platform.match(platform)
-            puts "  * added" if name == "will_paginate"
             spec = RemoteSpecification.new(name, version, platform, @uri)
             spec.source = self
             index << spec
