@@ -118,10 +118,15 @@ The command `bundle lock` will lock the bundle to the current set of
 resolved gems. This ensures that, until the lock file is removed,
 `bundle install` and `Bundle.setup` will always activate the same gems.
 
-When you are distributing your application, you should add the Gemfile.lock
-file to your source control, so that the set of libraries your code will
-run against are fixed. Simply run `bundle install` after checking out or
-deploying your code to ensure your libraries are present.
+When you are distributing your application, you should add the Gemfile and 
+Gemfile.lock files to your source control, so that the set of libraries your
+code will run against are fixed. Simply run  `bundle install` after checking
+out or deploying your code to ensure your libraries are present.
+
+DO NOT add the .bundle directory to your source control. The files there are
+internal to bundler and vary between machines. If you are using git, you can
+exclude all machine-specific bundler files by adding a single line to your
+.gitignore file containing `.bundle`.
 
 ### Running the application
 
