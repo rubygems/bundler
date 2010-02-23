@@ -16,6 +16,14 @@ module Gem
     def groups
       @groups ||= []
     end
+
+    alias_method :old_dependencies, :dependencies
+
+    def dependencies
+      original = old_dependencies
+      original << Dependency.new("rake", ">= 0") if extensions.any? { |e| e =~ /rakefile|mkrf_conf/i }
+      original
+    end
   end
 
   class Dependency

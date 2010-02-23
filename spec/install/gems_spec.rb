@@ -333,6 +333,18 @@ describe "bundle install with gem sources" do
     end
   end
 
+  describe "native dependencies" do
+    it "installs gems with implicit rake dependencies" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "with_implicit_rake_dep"
+      G
+
+      run "require 'implicit_rake_dep'; puts IMPLICIT_RAKE_DEP"
+      out.should == "YES"
+    end
+  end
+
   describe "when specifying groups not excluded" do
     before :each do
       install_gemfile <<-G

@@ -6,9 +6,6 @@ module Spec
 
     def build_repo1
       build_repo gem_repo1 do
-        build_gem "rake",           "0.8.7" do |s|
-          s.executables = "rake"
-        end
         build_gem "rack",           %w(0.9.1 1.0.0) do |s|
           s.executables = "rackup"
         end
@@ -86,6 +83,19 @@ module Spec
           s.add_development_dependency "activesupport", "= 2.3.5"
         end
 
+        build_gem "with_implicit_rake_dep" do |s|
+          s.extensions << "Rakefile"
+          s.write "Rakefile", <<-RUBY
+            task :default do
+              path = File.expand_path("../lib", __FILE__)
+              FileUtils.mkdir_p(path)
+              File.open("\#{path}/implicit_rake_dep.rb", "w") do |f|
+                f.puts "IMPLICIT_RAKE_DEP = 'YES'"
+              end
+            end
+          RUBY
+        end
+
         build_gem "very_simple_binary" do |s|
           s.require_paths << 'ext'
           s.extensions << "ext/extconf.rb"
@@ -131,6 +141,10 @@ module Spec
 
     def build_repo(path, &blk)
       return if File.directory?(path)
+      # If this is nil, rm -rf tmp
+      rake_path = Dir["#{Path.base_system_gems}/**/rake*.gem"].first
+      FileUtils.mkdir_p("#{path}/gems")
+      FileUtils.cp rake_path, "#{path}/gems/"
       update_repo(path, &blk)
     end
 
