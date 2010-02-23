@@ -109,11 +109,12 @@ module Bundler
       exit 128
     end
 
-    desc "pack", "Locks and then caches all of the gems into vendor/cache"
-    def pack
+    desc "package", "Locks and then caches all of the gems into vendor/cache"
+    def package
       lock
       cache
     end
+    map %w(pack) => :package
 
     desc "exec", "Run the command in context of the bundle"
     def exec(*)
