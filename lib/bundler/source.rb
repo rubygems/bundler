@@ -155,7 +155,7 @@ module Bundler
             # Eval the gemspec from its parent directory
             if spec = Dir.chdir(file.dirname) { eval(File.read(file.basename)) }
               spec = Specification.from_gemspec(spec)
-              spec.loaded_from = file
+              spec.loaded_from = file.to_s
               spec.source = self
               index << spec
             end
