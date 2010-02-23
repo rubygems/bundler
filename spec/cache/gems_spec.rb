@@ -21,6 +21,21 @@ describe "bundle cache with gems" do
 
       should_be_installed("rack 1.0.0")
     end
+
+    it "does not reinstall gems from the cache if they exist on the system" do
+      system_gems "rack-1.0.0"
+      build_gem "rack", "1.0.0", :path => bundled_app('vendor/cache') do |s|
+        s.write "lib/rack.rb", "RACK = 'FAIL'"
+      end
+
+      install_gemfile <<-G
+        gem "rack"
+      G
+
+      puts out
+
+      should_be_installed("rack 1.0.0")
+    end
   end
 
   describe "when there are also git sources" do
