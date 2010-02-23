@@ -53,9 +53,11 @@ module Bundler
         Bundler.ui.info "Fetching source index from #{uri}"
         old, Gem.sources = Gem.sources, ["#{uri}"]
 
-        Gem::SpecFetcher.new.list(true, true).each do |n,v|
+        fetch_all_specs do |n,v|
           v.each do |name, version, platform|
+            puts "#{name}, #{version}" if name == "will_paginate"
             next unless Gem::Platform.match(platform)
+            puts "  * added" if name == "will_paginate"
             spec = RemoteSpecification.new(name, version, platform, @uri)
             spec.source = self
             index << spec
@@ -65,6 +67,11 @@ module Bundler
         index.freeze
       ensure
         Gem.sources = old
+      end
+
+      def fetch_all_specs(&blk)
+        Gem::SpecFetcher.new.list(true, false).each(&blk)
+        Gem::SpecFetcher.new.list(false, true).each(&blk)
       end
     end
 
