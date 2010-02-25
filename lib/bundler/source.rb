@@ -78,7 +78,7 @@ module Bundler
         @specs ||= begin
           index = Index.new
 
-          Gem::SourceIndex.from_installed_gems.reverse.each do |name, spec|
+          Gem::SourceIndex.from_installed_gems.to_a.reverse.each do |name, spec|
             spec.source = self
             index << spec
           end
