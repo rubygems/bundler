@@ -17,13 +17,19 @@ module Gem
       @groups ||= []
     end
 
-    alias_method :old_dependencies, :dependencies
+    module ImplicitRakeDependency
+      def dependencies
+        original = super
+        original << Dependency.new("rake", ">= 0") if implicit_rake_dependency?
+        original
+      end
 
-    def dependencies
-      original = old_dependencies
-      original << Dependency.new("rake", ">= 0") if extensions.any? { |e| e =~ /rakefile|mkrf_conf/i }
-      original
+      private
+        def implicit_rake_dependency?
+          extensions.any? { |e| e =~ /rakefile|mkrf_conf/i }
+        end
     end
+    include ImplicitRakeDependency
   end
 
   class Dependency
