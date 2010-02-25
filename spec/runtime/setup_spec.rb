@@ -173,4 +173,17 @@ describe "Bundler.setup" do
 
     out.should be_empty
   end
+
+  it "ignores empty gem paths" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack"
+    G
+
+    ENV["GEM_HOME"] = ""
+    bundle %{exec ruby -e "require 'set'"}
+
+    err.should be_empty
+  end
+
 end
