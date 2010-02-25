@@ -71,7 +71,6 @@ describe "Bundler.setup" do
 
   describe "with paths" do
     it "activates the gems in the path source" do
-      pending
       system_gems "rack-1.0.0"
 
       build_lib "rack", "1.0.0" do |s|
@@ -154,24 +153,24 @@ describe "Bundler.setup" do
       should_not_be_installed "activesupport 2.3.2", :groups => :rack
       should_be_installed "rack 1.0.0", :groups => :rack
     end
+  end
 
-    # Rubygems returns loaded_from as a string
-    it "has loaded_from as a string on all specs" do
-      build_git "foo"
+  # Rubygems returns loaded_from as a string
+  it "has loaded_from as a string on all specs" do
+    build_git "foo"
 
-      install_gemfile <<-G
-        source "file://#{gem_repo1}"
-        gem "rack"
-        gem "foo", :git => "#{lib_path('foo-1.0')}"
-      G
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack"
+      gem "foo", :git => "#{lib_path('foo-1.0')}"
+    G
 
-      run <<-R
-        Gem.loaded_specs.each do |n, s|
-          puts "FAIL" unless String === s.loaded_from
-        end
-      R
+    run <<-R
+      Gem.loaded_specs.each do |n, s|
+        puts "FAIL" unless String === s.loaded_from
+      end
+    R
 
-      out.should be_empty
-    end
+    out.should be_empty
   end
 end
