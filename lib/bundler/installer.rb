@@ -94,10 +94,6 @@ module Bundler
       @index ||= begin
         index = Index.new
 
-        if File.directory?("#{root}/vendor/cache")
-          index = cache_source.specs.merge(index).freeze
-        end
-
         rg_sources = sources.select { |s| s.is_a?(Source::Rubygems) }
         other_sources = sources.select { |s| !s.is_a?(Source::Rubygems)   }
 
@@ -109,10 +105,14 @@ module Bundler
 
         index = Index.from_installed_gems.merge(index)
 
+        if File.directory?("#{root}/vendor/cache")
+          index = cache_source.specs.merge(index)
+        end
+
         rg_sources.each do |source|
           i = source.specs
           Bundler.ui.debug "Source: Processing index"
-          index = i.merge(index).freeze
+          index = i.merge(index)
         end
 
         index
