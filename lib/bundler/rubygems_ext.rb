@@ -1,6 +1,6 @@
 unless defined? Gem
-require 'rubygems'
-require 'rubygems/specification'
+  require 'rubygems'
+  require 'rubygems/specification'
 end
 
 module Gem
@@ -17,19 +17,17 @@ module Gem
       @groups ||= []
     end
 
-    module ImplicitRakeDependency
-      def dependencies
-        original = super
-        original << Dependency.new("rake", ">= 0") if implicit_rake_dependency?
-        original
-      end
-
-      private
-        def implicit_rake_dependency?
-          extensions.any? { |e| e =~ /rakefile|mkrf_conf/i }
-        end
+    def bundler_dependencies
+      original = dependencies
+      original << Dependency.new("rake", ">= 0") if implicit_rake_dependency?
+      original
     end
-    include ImplicitRakeDependency
+
+  private
+
+    def implicit_rake_dependency?
+      extensions.any? { |e| e =~ /rakefile|mkrf_conf/i }
+    end
   end
 
   class Dependency

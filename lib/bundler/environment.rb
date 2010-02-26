@@ -22,7 +22,7 @@ module Bundler
     def group_spec(specs, spec, groups)
       spec.groups.concat(groups)
       spec.groups.uniq!
-      spec.dependencies.select { |d| d.type != :development }.each do |d|
+      spec.bundler_dependencies.select { |d| d.type != :development }.each do |d|
         spec = specs.find { |s| s.name == d.name }
         group_spec(specs, spec, groups)
       end

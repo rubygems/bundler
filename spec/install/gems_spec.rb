@@ -335,6 +335,7 @@ describe "bundle install with gem sources" do
 
   describe "native dependencies" do
     it "installs gems with implicit rake dependencies" do
+      pending
       install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "with_implicit_rake_dep"

@@ -59,7 +59,7 @@ module Bundler
         result.values.each do |spec1|
           index = nil
           place = ordered.detect do |spec2|
-            spec1.dependencies.any? { |d| d.name == spec2.name }
+            spec1.bundler_dependencies.any? { |d| d.name == spec2.name }
           end
           place ?
             ordered.insert(ordered.index(place), spec1) :
@@ -204,7 +204,7 @@ module Bundler
       # Now, we have to loop through all child dependencies and add them to our
       # array of requirements.
       debug { "    Dependencies"}
-      spec.dependencies.each do |dep|
+      spec.bundler_dependencies.each do |dep|
         next if dep.type == :development
         debug { "    * #{dep.name} (#{dep.requirement})" }
         dep.required_by.replace(requirement.required_by)
