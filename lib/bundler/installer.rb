@@ -7,7 +7,7 @@ module Bundler
     end
 
     def run(options)
-      if dependencies.empty?
+      if actual_dependencies.empty?
         Bundler.ui.warn "The Gemfile specifies no dependencies"
         return
       end
@@ -36,6 +36,10 @@ module Bundler
     end
 
     def dependencies
+      @definition.dependencies
+    end
+
+    def actual_dependencies
       @definition.actual_dependencies
     end
 
@@ -51,19 +55,19 @@ module Bundler
 
     def resolve_locally
       # Return unless all the dependencies have = version requirements
-      return if dependencies.any? { |d| ambiguous?(d) }
+      return if actual_dependencies.any? { |d| ambiguous?(d) }
 
       source_requirements = {}
-      dependencies.each do |dep|
+      actual_dependencies.each do |dep|
         next unless dep.source && dep.source.respond_to?(:local_specs)
         source_requirements[dep.name] = dep.source.local_specs
       end
 
       # Run a resolve against the locally available gems
-      specs = Resolver.resolve(dependencies, local_index, source_requirements)
+      specs = Resolver.resolve(actual_dependencies, local_index, source_requirements)
 
       # Simple logic for now. Can improve later.
-      specs.length == dependencies.length && specs
+      specs.length == actual_dependencies.length && specs
     rescue Bundler::GemNotFound
       nil
       raise if ENV["OMG"]
@@ -73,12 +77,12 @@ module Bundler
       index # trigger building the index
       Bundler.ui.info "Resolving dependencies"
       source_requirements = {}
-      dependencies.each do |dep|
+      actual_dependencies.each do |dep|
         next unless dep.source
         source_requirements[dep.name] = dep.source.specs
       end
 
-      specs = Resolver.resolve(dependencies, index, source_requirements)
+      specs = Resolver.resolve(actual_dependencies, index, source_requirements)
       specs
     end
 

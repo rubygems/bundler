@@ -196,12 +196,6 @@ describe "bundle install with gem sources" do
       end
     end
 
-    def simulate_new_machine
-      system_gems []
-      FileUtils.rm_rf default_bundle_path
-      FileUtils.rm_rf bundled_app('.bundle')
-    end
-
     it "uses the correct versions even if --without was used on the original" do
       should_be_installed "rack 0.9.1"
       should_not_be_installed "rack_middleware 1.0"
@@ -417,6 +411,17 @@ describe "bundle install with gem sources" do
 
       bundle :install, :without => "emo"
       should_be_installed "activesupport 2.3.2", :groups => [:default]
+    end
+
+    it "still works when locked" do
+      bundle :install, :without => "emo"
+      bundle :lock
+
+      simulate_new_machine
+      bundle :install, :without => "emo"
+
+      should_be_installed "rack 1.0.0", :groups => [:default]
+      should_not_be_installed "activesupport 2.3.5", :groups => [:default]
     end
   end
 end

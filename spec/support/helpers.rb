@@ -128,6 +128,12 @@ module Spec
       end
     end
 
+    def simulate_new_machine
+      system_gems []
+      FileUtils.rm_rf default_bundle_path
+      FileUtils.rm_rf bundled_app('.bundle')
+    end
+
     def revision_for(path)
       Dir.chdir(path) { `git rev-parse HEAD`.strip }
     end
