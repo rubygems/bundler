@@ -276,7 +276,17 @@ Bundler 0.9 changes the following Bundler 0.8 Gemfile APIs:
 
 Explanations of common Bundler use cases can be found in [Using Bundler in Real Life](http://yehudakatz.com/2010/02/09/using-bundler-in-real-life/). The general philosophy behind Bundler 0.9 is explained at some length in [Bundler 0.9: Heading Toward 1.0](http://yehudakatz.com/2010/02/01/bundler-0-9-heading-toward-1-0/).
 
-Any remaining questions may be directed via email to the [Bundler mailing list](http://groups.google.com/group/ruby-bundler) or via IRC to [#carlhuda](irc://irc.freenode.net/carlhuda) on Freenode.
+### Deploying to memory-constrained servers
+
+If you are deploying to a server that is very memory-constrained, like
+Dreamhost for example, you should run `bundle package` and check in the
+resulting `Gemfile.lock` and `vendor/cache` directory. Then, when you run
+`bundle install` after deploying, Bundler will not need to do a dependency
+resolution run, which can be very memory-intensive.
+
+### Other questions
+
+Any remaining questions may be asked via IRC in [#carlhuda](irc://irc.freenode.net/carlhuda) on Freenode, or via email on the [Bundler mailing list](http://groups.google.com/group/ruby-bundler).
 
 ## Reporting bugs
 
