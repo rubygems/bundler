@@ -90,12 +90,16 @@ module Bundler
       end
     end
 
-    desc "show", "Shows all gems that are part of the bundle."
-    def show
-      environment = Bundler.load
-      Bundler.ui.info "Gems included by the bundle:"
-      environment.specs.sort_by { |s| s.name }.each do |s|
-        Bundler.ui.info "  * #{s.name} (#{s.version})"
+    desc "show GEM", "Shows all gems that are part of the bundle, or the path to a given gem"
+    def show(gem_name = nil)
+      if gem_name
+        Bundler.ui.info locate_gem(gem_name)
+      else
+        environment = Bundler.load
+        Bundler.ui.info "Gems included by the bundle:"
+        environment.specs.sort_by { |s| s.name }.each do |s|
+          Bundler.ui.info "  * #{s.name} (#{s.version})"
+        end
       end
     end
 
@@ -138,6 +142,14 @@ module Bundler
       Kernel.exec *ARGV
     end
 
+    desc "open GEM", "Opens the source directory of the given bundled gem"
+    def open(name)
+      editor = ENV['EDITOR']
+      return Bundler.ui.info "To open a bundled gem, set $EDITOR" if editor.nil? || editor.empty?
+      command = "#{editor} #{locate_gem(name)}"
+      Bundler.ui.info "Could not run '#{command}'" unless system(command)
+    end
+
     desc "version", "Prints the bundler's version information"
     def version
       Bundler.ui.info "Bundler version #{Bundler::VERSION}"
@@ -155,11 +167,17 @@ module Bundler
       FileUtils.rm_f "#{Bundler.root}/.bundle/environment.rb"
     end
 
-    def self.printable_tasks
-      tasks = super.dup
-      tasks.reject!{|t| t.first =~ /cache/ }
-      tasks
+    def locate_gem(name)
+      spec = Bundler.load.specs.find{|s| s.name == name }
+      raise GemNotFound, "Could not find gem '#{name}' in the current bundle." unless spec
+      spec.full_gem_path
     end
 
+    def self.printable_tasks
+      tasks = super.dup
+      nodoc = /^bundle (cache)/
+      tasks.reject!{|t| t.first =~ nodoc }
+      tasks
+    end
   end
 end

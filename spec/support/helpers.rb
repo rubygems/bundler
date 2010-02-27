@@ -40,9 +40,10 @@ module Spec
 
     def bundle(cmd, options = {})
       require "open3"
+      env = (options.delete(:env) || {}).map{|k,v| "#{k}='#{v}' "}.join
       args = options.map { |k,v| " --#{k} #{v}"}.join
       gemfile = File.expand_path('../../../bin/bundle', __FILE__)
-      input, out, err, waitthread = Open3.popen3("#{Gem.ruby} -I#{lib} #{gemfile} #{cmd}#{args}")
+      input, out, err, waitthread = Open3.popen3("#{env}#{Gem.ruby} -I#{lib} #{gemfile} #{cmd}#{args}")
       @err = err.read.strip
       puts @err if $show_err && !@err.empty?
       @out = out.read.strip
