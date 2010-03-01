@@ -278,11 +278,7 @@ Explanations of common Bundler use cases can be found in [Using Bundler in Real 
 
 ### Deploying to memory-constrained servers
 
-If you are deploying to a server that is very memory-constrained, like
-Dreamhost for example, you should run `bundle package` and check in the
-resulting `Gemfile.lock` and `vendor/cache` directory. Then, when you run
-`bundle install` after deploying, Bundler will not need to do a dependency
-resolution run, which can be very memory-intensive.
+When deploying to a server that is memory-constrained, like Dreamhost, you should run `bundle package` on your local development machine, and then check in the resulting `Gemfile.lock` file and `vendor/cache` directory. The lockfile and cached gems will mean bundler can just install the gems immediately, without contacting any gem servers or using a lot of memory to resolve the dependency tree. On the server, you only need to run `bundle install` after you update your deployed code.
 
 ### Other questions
 
