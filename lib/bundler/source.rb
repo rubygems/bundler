@@ -276,7 +276,7 @@ module Bundler
       end
 
       def base_name
-        File.basename(uri, ".git")
+        File.basename(uri.sub(%r{^(\w+://)?([^/:]+:)},''), ".git")
       end
 
       def uri_hash
