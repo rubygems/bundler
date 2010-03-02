@@ -42,7 +42,7 @@ module Bundler
   def self.require(*groups)
     groups = [:default] if groups.empty?
     groups.each do |group|
-      (AUTOREQUIRES[group] || []).each do |file, explicit|
+      (AUTOREQUIRES[group.to_sym] || []).each do |file, explicit|
         if explicit
           Kernel.require file
         else
