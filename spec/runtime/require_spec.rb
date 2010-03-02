@@ -99,6 +99,42 @@ describe "Bundler.require" do
     out.should == "seven\nthree"
   end
 
+  describe "after loading a locked environment.rb" do
+    before do
+      bundle :lock
+      @env = File.expand_path("../../../.bundle/environment.rb", __FILE__)
+      File.exist?(@env).should be_true
+    end
+
+    def output_from_require(*args)
+      @out = ruby("require '#{@env}'; Bundler.require(#{args.collect { |a| a.inspect }.join(", ")})")
+    end
+
+    it "can require the default group" do
+      output_from_require().should == "two"
+    end
+
+    it "can require some specific group" do
+      output_from_require(:bar).should == "baz\nqux"
+    end
+
+    it "can require the default and some specific group" do
+      output_from_require(:default, :bar).should == "two\nbaz\nqux"
+    end
+
+    it "can require a group as a string" do
+      output_from_require('bar').should == "baz\nqux"
+    end
+
+    it "can require a group that was declared as a string" do
+      output_from_require(:string).should == "six"
+    end
+
+    it "requires in resolver order not gemfile order" do
+      output_from_require(:not).should == "seven\nthree"
+    end
+  end
+
   it "allows requiring gems with non standard names explicitly" do
     run "Bundler.require ; require 'mofive'"
     out.should == "two\nfive"
