@@ -74,65 +74,28 @@ describe "Bundler.require" do
   it "requires the locked gems" do
     bundle :lock
 
+    def locked_require(*args)
+      env = File.expand_path(".bundle/environment.rb", Dir.pwd)
+      @out = ruby("require '#{env}'; Bundler.require(#{args.collect { |a| a.inspect }.join(", ")})")
+    end
+
     # default group
-    out = ruby("require 'bundler'; Bundler.setup; Bundler.require")
-    out.should == "two"
+    locked_require.should == "two"
 
     # specific group
-    out = ruby("require 'bundler'; Bundler.setup(:bar); Bundler.require(:bar)")
-    out.should == "baz\nqux"
+    locked_require(:bar).should == "baz\nqux"
 
     # default and specific group
-    out = ruby("require 'bundler'; Bundler.setup(:default, :bar); Bundler.require(:default, :bar)")
-    out.should == "two\nbaz\nqux"
+    locked_require(:default, :bar).should == "two\nbaz\nqux"
 
     # specific group given as a string
-    out = ruby("require 'bundler'; Bundler.setup('bar'); Bundler.require('bar')")
-    out.should == "baz\nqux"
+    locked_require('bar').should == "baz\nqux"
 
     # specific group declared as a string
-    out = ruby("require 'bundler'; Bundler.setup(:string); Bundler.require(:string)")
-    out.should == "six"
+    locked_require(:string).should == "six"
 
     # required in resolver order instead of gemfile order
-    out = ruby("require 'bundler'; Bundler.setup(:not); Bundler.require(:not)")
-    out.should == "seven\nthree"
-  end
-
-  describe "after loading a locked environment.rb" do
-    before do
-      bundle :lock
-      @env = File.expand_path("../../../.bundle/environment.rb", __FILE__)
-      File.exist?(@env).should be_true
-    end
-
-    def output_from_require(*args)
-      @out = ruby("require '#{@env}'; Bundler.require(#{args.collect { |a| a.inspect }.join(", ")})")
-    end
-
-    it "can require the default group" do
-      output_from_require().should == "two"
-    end
-
-    it "can require some specific group" do
-      output_from_require(:bar).should == "baz\nqux"
-    end
-
-    it "can require the default and some specific group" do
-      output_from_require(:default, :bar).should == "two\nbaz\nqux"
-    end
-
-    it "can require a group as a string" do
-      output_from_require('bar').should == "baz\nqux"
-    end
-
-    it "can require a group that was declared as a string" do
-      output_from_require(:string).should == "six"
-    end
-
-    it "requires in resolver order not gemfile order" do
-      output_from_require(:not).should == "seven\nthree"
-    end
+    locked_require(:not).should == "seven\nthree"
   end
 
   it "allows requiring gems with non standard names explicitly" do
