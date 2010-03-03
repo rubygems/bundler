@@ -16,7 +16,7 @@ spec = Gem::Specification.new do |s|
 
   s.required_rubygems_version = ">= 1.3.6"
 
-  s.files        = Dir.glob("{bin,lib}/**/*") + %w(LICENSE README.markdown)
+  s.files        = Dir.glob("{bin,lib}/**/*") + %w(LICENSE README.markdown ROADMAP.textile)
   s.executables  = ['bundle']
   s.require_path = 'lib'
   s.post_install_message = "Due to a rubygems bug, you must uninstall older versions of the bundler gem for 0.9 to work.\n" +
