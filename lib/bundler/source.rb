@@ -161,7 +161,7 @@ module Bundler
           Dir["#{path}/#{@glob}"].each do |file|
             file = Pathname.new(file)
             # Eval the gemspec from its parent directory
-            if spec = Dir.chdir(file.dirname) { eval(File.read(file.basename)) }
+            if spec = Dir.chdir(file.dirname) { eval(File.read(file.basename), binding, file.expand_path) }
               spec = Specification.from_gemspec(spec)
               spec.loaded_from = file.to_s
               spec.source = self
