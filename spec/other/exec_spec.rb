@@ -77,4 +77,16 @@ describe "bundle exec" do
     out.should == "0.9.1"
     should_not_be_installed "rack_middleware 1.0"
   end
+
+  it "uses .bundle/environment.rb when locked" do
+    gemfile <<-G
+      gem "rack"
+    G
+
+    bundle "lock"
+    File.open(".bundle/environment.rb", 'a') { |f| f.puts "puts 'using environment.rb'" }
+
+    bundle "exec rackup"
+    out.should == "using environment.rb\n1.0.0"
+  end
 end
