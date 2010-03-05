@@ -46,11 +46,14 @@ module Bundler
     method_option "without", :type => :array,   :banner => "Exclude gems that are part of the specified named group."
     method_option "relock",  :type => :boolean, :banner => "Unlock, install the gems, and relock."
     method_option "disable-shared-gems", :type => :boolean, :banner => "Do not use any shared gems, such as the system gem repository."
+    method_option "gemfile", :type => :string, :banner => "Use the specified gemfile instead of Gemfile"
     def install(path = nil)
       opts = options.dup
       opts[:without] ||= []
       opts[:without].map! { |g| g.to_sym }
 
+      # Can't use Bundler.settings for this because settings needs gemfile.dirname
+      ENV['BUNDLE_GEMFILE'] = opts[:gemfile] if opts[:gemfile]
       Bundler.settings[:path] = path if path
       Bundler.settings[:disable_shared_gems] = '1' if options["disable-shared-gems"]
       Bundler.settings.without = opts[:without]
