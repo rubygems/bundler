@@ -132,4 +132,22 @@ describe "Bundler.load" do
       lambda { Bundler.load }.should_not raise_error(Bundler::GemfileError)
     end
   end
+
+  describe "not hurting brittle rubygems" do
+    before :each do
+      system_gems ["activerecord-2.3.2", "activesupport-2.3.2"]
+    end
+
+    it "does not inject #source into the generated YAML of the gem specs" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "activerecord"
+      G
+
+      Bundler.load.specs.each do |spec|
+        spec.to_yaml.should_not =~ /^\s+source:/
+        spec.to_yaml.should_not =~ /^\s+groups:/
+      end
+    end
+  end
 end
