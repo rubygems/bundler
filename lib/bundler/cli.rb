@@ -31,14 +31,21 @@ module Bundler
       # Check top level dependencies
       missing = env.dependencies.select { |d| env.index.search(d).empty? }
       if missing.any?
-        puts "The following dependencies are missing"
+        Bundler.ui.error "The following dependencies are missing"
         missing.each do |d|
-          puts "  * #{d}"
+          Bundler.ui.error "  * #{d}"
         end
+        Bundler.ui.error "Try running `bundle install`"
         exit 1
       else
-        env.specs
-        puts "The Gemfile's dependencies are satisfied"
+        not_installed = env.specs.select { |spec| !spec.loaded_from }
+
+        if not_installed.any?
+          not_installed.each { |s| Bundler.ui.error "#{s.name} (#{s.version}) is cached, but not installed" }
+          Bundler.ui.error "Try running `bundle install`"
+        else
+          Bundler.ui.info "The Gemfile's dependencies are satisfied"
+        end
       end
     end
 

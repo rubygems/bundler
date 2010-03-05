@@ -54,6 +54,25 @@ describe "bundle check" do
     out.should include('Conflict on: "activesupport"')
   end
 
+  it "ensures that gems are actually installed and not just cached" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+      group :foo do
+        gem "rack"
+      end
+    G
+
+    bundle "install --without foo"
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack"
+    G
+
+    bundle "check"
+    out.should include("rack (1.0.0) is cached, but not installed")
+  end
+
   it "outputs an error when the default Gemspec is not found" do
     bundle :check
     @exitstatus.should_not == 0 if @exitstatus
