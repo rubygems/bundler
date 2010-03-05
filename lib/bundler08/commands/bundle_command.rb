@@ -37,6 +37,7 @@ class Gem::Commands::BundleCommand < Gem::Command
 
     add_option('-b', '--build-options OPTION_FILE', "Specify a path to a yml file with build options for binary gems") do |option_file, options|
       if File.exist?(option_file)
+        require 'yaml'
         options[:build_options] = YAML.load_file(option_file)
       end
     end

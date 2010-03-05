@@ -19,7 +19,7 @@ require "bundler08/dependency"
 require "bundler08/remote_specification"
 
 module Bundler
-  VERSION = "0.8.4"
+  VERSION = "0.8.5"
 
   class << self
     attr_writer :logger, :mode
