@@ -228,7 +228,7 @@ module Bundler
       def initialize(options)
         super
         @uri  = options["uri"]
-        @ref  = options["ref"] || options["branch"] || 'master'
+        @ref  = options["ref"] || options["branch"] || options["tag"] || 'master'
       end
 
       def to_s
