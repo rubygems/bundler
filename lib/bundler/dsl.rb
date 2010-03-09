@@ -12,14 +12,14 @@ module Bundler
       @source  = nil
       @sources = []
       @dependencies = []
-      @group = nil
+      @group = [:default]
     end
 
     def gem(name, *args)
       options = Hash === args.last ? args.pop : {}
       version = args.last || ">= 0"
-      if options[:group]
-        options[:group] = options[:group].to_sym
+      if group = options[:groups] || options[:group]
+        options[:group] = group
       end
 
       _deprecated_options(options)
@@ -55,8 +55,8 @@ module Bundler
       Definition.new(@dependencies, @sources)
     end
 
-    def group(name, options = {}, &blk)
-      old, @group = @group, name.to_sym
+    def group(*args, &blk)
+      old, @group = @group, args
       yield
     ensure
       @group = old
