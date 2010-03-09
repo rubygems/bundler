@@ -39,25 +39,28 @@ module Spec
     end
 
     def bundle(cmd, options = {})
-      require "open3"
       env = (options.delete(:env) || {}).map{|k,v| "#{k}='#{v}' "}.join
       args = options.map { |k,v| " --#{k} #{v}"}.join
       gemfile = File.expand_path('../../../bin/bundle', __FILE__)
-      input, out, err, waitthread = Open3.popen3("#{env}#{Gem.ruby} -I#{lib} #{gemfile} #{cmd}#{args}")
-      @err = err.read.strip
-      puts @err if $show_err && !@err.empty?
-      @out = out.read.strip
-      @exitstatus = nil
-      @exitstatus = waitthread.value.to_i if waitthread
+      sys_exec("#{env}#{Gem.ruby} -I#{lib} #{gemfile} #{cmd}#{args}")
     end
 
     def ruby(opts, ruby = nil)
       ruby, opts = opts, nil unless ruby
       ruby.gsub!(/(?=")/, "\\")
       ruby.gsub!('$', '\\$')
-      out = %x{#{Gem.ruby} -I#{lib} #{opts} -e "#{ruby}"}.strip
-      @exitstatus = $?.exitstatus
-      out
+      sys_exec(%'#{Gem.ruby} -I#{lib} #{opts} -e "#{ruby}"')
+    end
+
+    def sys_exec(cmd)
+      require "open3"
+      input, out, err, waitthread = Open3.popen3(cmd)
+      @err = err.read.strip
+      puts @err if $show_err && !@err.empty?
+      @out = out.read.strip
+      @exitstatus = nil
+      @exitstatus = waitthread.value.to_i if waitthread
+      @out
     end
 
     def config(config = nil)

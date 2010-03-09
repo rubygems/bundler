@@ -88,6 +88,19 @@ describe "Bundler.setup" do
     end
   end
 
+  describe "with git" do
+    it "provides a useful exception when the git repo is not checked out yet" do
+      build_git "rack", "1.0.0"
+
+      gemfile <<-G
+        gem "foo", :git => "#{lib_path('rack-1.0.0')}"
+      G
+
+      run "1"
+      err.should include("#{lib_path('rack-1.0.0')} (at master) is not checked out. Please run `bundle install`")
+    end
+  end
+
   describe "when locked" do
     it "regenerates .bundle/environment.rb if it does not exist" do
       system_gems "rack-1.0.0"

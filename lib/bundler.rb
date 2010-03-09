@@ -36,6 +36,7 @@ module Bundler
   class GemNotFound      < BundlerError; status_code(7)  ; end
   class VersionConflict  < BundlerError; status_code(6)  ; end
   class GemfileError     < BundlerError; status_code(4)  ; end
+  class PathError        < BundlerError; status_code(13) ; end
   class GitError         < BundlerError; status_code(11) ; end
   class DeprecatedMethod < BundlerError; status_code(12) ; end
   class DeprecatedOption < BundlerError; status_code(12) ; end

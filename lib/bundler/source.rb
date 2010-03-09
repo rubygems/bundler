@@ -176,6 +176,8 @@ module Bundler
           end
 
           index << default_spec if default_spec && index.empty?
+        else
+          raise PathError, "The path `#{path}` does not exist."
         end
 
         index.freeze
@@ -269,6 +271,12 @@ module Bundler
       def lock
         @ref = @options["ref"] = revision
         checkout
+      end
+
+      def load_spec_files
+        super
+      rescue PathError
+        raise PathError, "#{to_s} is not checked out. Please run `bundle install`"
       end
 
     private

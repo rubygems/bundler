@@ -71,9 +71,8 @@ module Bundler
 
       # Simple logic for now. Can improve later.
       specs.length == actual_dependencies.length && specs
-    rescue Bundler::GemNotFound => e
+    rescue GemNotFound, PathError => e
       nil
-      raise if ENV["OMG"]
     end
 
     def resolve_remotely
