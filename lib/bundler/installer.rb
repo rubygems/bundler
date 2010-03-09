@@ -71,7 +71,7 @@ module Bundler
 
       # Simple logic for now. Can improve later.
       specs.length == actual_dependencies.length && specs
-    rescue Bundler::GemNotFound
+    rescue Bundler::GemNotFound => e
       nil
       raise if ENV["OMG"]
     end
@@ -103,10 +103,11 @@ module Bundler
         other_sources.each do |source|
           i = source.specs
           Bundler.ui.debug "Source: Processing index"
-          index = i.merge(index).freeze
+          index = i.merge(index)
         end
 
         index = Index.from_installed_gems.merge(index)
+        index = Index.from_cached_specs("#{Bundler.bundle_path}/cache").merge(index)
 
         if File.directory?("#{root}/vendor/cache")
           index = cache_source.specs.merge(index)

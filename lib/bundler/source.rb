@@ -107,9 +107,15 @@ module Bundler
 
       def specs
         @specs ||= begin
-          specs = Index.from_cached_specs(@path)
-          specs.each { |s| s.source = self }
-          specs
+          index = Index.new
+
+          Dir["#{@path}/*.gem"].each do |gemfile|
+            spec = Gem::Format.from_file_by_path(gemfile).spec
+            spec.source = self
+            index << spec
+          end
+
+          index
         end
       end
 

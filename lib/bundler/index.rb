@@ -5,14 +5,7 @@ module Bundler
     end
 
     def self.from_cached_specs(path)
-      index = Index.new
-
-      Dir["#{path}/*.gem"].each do |gemfile|
-        spec = Gem::Format.from_file_by_path(gemfile).spec
-        index << spec
-      end
-
-      index
+      Source::GemCache.new("path" => path).specs
     end
 
     def initialize
