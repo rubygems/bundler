@@ -7,7 +7,7 @@ Gem.configuration
 
 module Bundler
   class CLI < Thor
-    ARGV = ::ARGV.dup
+    check_unknown_options! unless ARGV.include?("exec")
 
     desc "init", "Generates a Gemfile into the current working directory"
     def init
