@@ -131,11 +131,12 @@ module Bundler
           index = source.local_specs.merge(index)
         end
 
+        index = Index.from_installed_gems.merge(index)
+
         if File.directory?("#{root}/vendor/cache")
           index = cache_source.specs.merge(index).freeze
         end
 
-        index = Index.from_installed_gems.merge(index)
         Index.from_cached_specs("#{Bundler.bundle_path}/cache").merge(index)
       end
     end

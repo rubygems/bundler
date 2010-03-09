@@ -373,6 +373,24 @@ describe "bundle install with gem sources" do
       bundle :install
       should_be_installed "rack 1.0.0"
     end
+
+    it "does not constantly reinstall the gems" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      bundle "pack"
+
+      build_gem "rack", "1.0.0", :path => bundled_app('vendor/cache') do |s|
+        s.write "lib/rack.rb", "raise 'omg'"
+      end
+
+      bundle "install"
+
+      err.should be_empty
+      should_be_installed "rack 1.0"
+    end
   end
 
   describe "native dependencies" do
