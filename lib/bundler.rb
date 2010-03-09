@@ -4,7 +4,7 @@ require 'yaml'
 require 'bundler/rubygems_ext'
 
 module Bundler
-  VERSION = "0.9.11.pre"
+  VERSION = "0.9.11"
 
   autoload :Definition,          'bundler/definition'
   autoload :Dependency,          'bundler/dependency'
