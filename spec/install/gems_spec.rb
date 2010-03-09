@@ -182,9 +182,10 @@ describe "bundle install with gem sources" do
 
   describe "when locked and installed with --without" do
     before(:each) do
+      build_repo2
       system_gems "rack-0.9.1" do
         install_gemfile <<-G, :without => :rack
-          source "file://#{gem_repo1}"
+          source "file://#{gem_repo2}"
           gem "rack"
 
           group :rack do
@@ -215,6 +216,12 @@ describe "bundle install with gem sources" do
 
       run "require 'rack_middleware'; puts RACK_MIDDLEWARE", :lite_runtime => true
       out.should == "1.0"
+    end
+
+    it "does not hit the remote a second time" do
+      FileUtils.rm_rf gem_repo2
+      bundle "install --without rack"
+      err.should be_empty
     end
   end
 

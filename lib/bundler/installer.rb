@@ -135,7 +135,8 @@ module Bundler
           index = cache_source.specs.merge(index).freeze
         end
 
-        Index.from_installed_gems.merge(index)
+        index = Index.from_installed_gems.merge(index)
+        Index.from_cached_specs("#{Bundler.bundle_path}/cache").merge(index)
       end
     end
 
