@@ -530,6 +530,38 @@ describe "bundle install with gem sources" do
           bundle "install --without lolercoaster"
           should_be_installed "rack 1.0.0", "activesupport 2.3.5"
         end
+
+        describe "with a gem defined multiple times in different groups" do
+          before :each do
+            gemfile <<-G
+              source "file://#{gem_repo1}"
+              gem "rack"
+
+              group :emo do
+                gem "activesupport", "2.3.5"
+              end
+
+              group :lolercoaster do
+                gem "activesupport", "2.3.5"
+              end
+            G
+          end
+
+          it "installs the gem w/ option --without emo" do
+            bundle "install --without emo"
+            should_be_installed "activesupport 2.3.5"
+          end
+
+          it "installs the gem w/ option --without lolercoaster" do
+            bundle "install --without lolercoaster"
+            should_be_installed "activesupport 2.3.5"
+          end
+
+          it "does not install the gem w/ option --without emo lolercoaster" do
+            bundle "install --without emo lolercoaster"
+            should_not_be_installed "activesupport 2.3.5"
+          end
+        end
       end
     end
   end
