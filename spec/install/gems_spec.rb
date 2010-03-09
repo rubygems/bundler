@@ -344,14 +344,20 @@ describe "bundle install with gem sources" do
 
   describe "native dependencies" do
     it "installs gems with implicit rake dependencies" do
-      pending
       install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "with_implicit_rake_dep"
+        gem "another_implicit_rake_dep"
+        gem "rake"
       G
 
-      run "require 'implicit_rake_dep'; puts IMPLICIT_RAKE_DEP"
-      out.should == "YES"
+      run <<-R
+        require 'implicit_rake_dep'
+        require 'another_implicit_rake_dep'
+        puts IMPLICIT_RAKE_DEP
+        puts ANOTHER_IMPLICIT_RAKE_DEP
+      R
+      out.should == "YES\nYES"
     end
   end
 

@@ -68,7 +68,7 @@ describe "Bundler.require" do
 
     # required in resolver order instead of gemfile order
     run("Bundler.require(:not)")
-    out.should == "seven\nthree"
+    out.split("\n").sort.should == ['seven', 'three']
   end
 
   it "requires the locked gems" do
@@ -95,7 +95,7 @@ describe "Bundler.require" do
     locked_require(:string).should == "six"
 
     # required in resolver order instead of gemfile order
-    locked_require(:not).should == "seven\nthree"
+    locked_require(:not).split("\n").sort.should == ['seven', 'three']
   end
 
   it "allows requiring gems with non standard names explicitly" do

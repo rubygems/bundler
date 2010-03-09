@@ -16,18 +16,6 @@ module Gem
     def groups
       @groups ||= []
     end
-
-    def bundler_dependencies
-      original = dependencies
-      original << Dependency.new("rake", ">= 0") if implicit_rake_dependency?
-      original
-    end
-
-  private
-
-    def implicit_rake_dependency?
-      extensions.any? { |e| e =~ /rakefile|mkrf_conf/i }
-    end
   end
 
   class Dependency

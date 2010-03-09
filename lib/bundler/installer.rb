@@ -15,7 +15,10 @@ module Bundler
       # Ensure that BUNDLE_PATH exists
       FileUtils.mkdir_p(Bundler.bundle_path)
 
-      specs.sort_by { |s| s.name }.each do |spec|
+      # Must install gems in the order that the resolver provides
+      # as dependencies might actually affect the installation of
+      # the gem.
+      specs.each do |spec|
         spec.source.fetch(spec) if spec.source.respond_to?(:fetch)
 
         if spec.groups & Bundler.settings.without == spec.groups

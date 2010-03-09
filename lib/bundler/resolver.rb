@@ -53,19 +53,13 @@ module Bundler
         nil
       end
       if result
-        # Order gems in order of dependencies. Every gem's dependency is at
-        # a smaller index in the array.
+        # Dependency ordering was busted anyway. This will be revisted in 0.10
         ordered = []
-        result.values.each do |spec1|
-          index = nil
-          place = ordered.detect do |spec2|
-            spec1.bundler_dependencies.any? { |d| d.name == spec2.name }
-          end
-          place ?
-            ordered.insert(ordered.index(place), spec1) :
-            ordered << spec1
-        end
-        ordered.reverse
+        ordered << result['rake']
+        ordered.concat result.values
+        ordered.compact!
+        ordered.uniq!
+        ordered
       end
     end
 
@@ -204,7 +198,7 @@ module Bundler
       # Now, we have to loop through all child dependencies and add them to our
       # array of requirements.
       debug { "    Dependencies"}
-      spec.bundler_dependencies.each do |dep|
+      spec.dependencies.each do |dep|
         next if dep.type == :development
         debug { "    * #{dep.name} (#{dep.requirement})" }
         dep.required_by.replace(requirement.required_by)
