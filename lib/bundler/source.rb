@@ -62,7 +62,7 @@ module Bundler
           end
         end
 
-        index.freeze
+        index
       ensure
         Gem.sources = old
       end
@@ -180,7 +180,7 @@ module Bundler
           raise PathError, "The path `#{path}` does not exist."
         end
 
-        index.freeze
+        index
       end
 
       def local_specs
@@ -252,7 +252,7 @@ module Bundler
         # Start by making sure the git cache is up to date
         cache
         checkout
-        @specs ||= load_spec_files
+        local_specs
       end
 
       def install(spec)

@@ -52,15 +52,7 @@ module Bundler
         raise VersionConflict, "No compatible versions could be found for required dependencies:\n  #{output}"
         nil
       end
-      if result
-        # Dependency ordering was busted anyway. This will be revisted in 0.10
-        ordered = []
-        ordered << result['rake']
-        ordered.concat result.values
-        ordered.compact!
-        ordered.uniq!
-        ordered
-      end
+      SpecSet.new(result.values)
     end
 
     def initialize(index, source_requirements)

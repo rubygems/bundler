@@ -17,6 +17,7 @@ module Bundler
   autoload :Runtime,             'bundler/runtime'
   autoload :Settings,            'bundler/settings'
   autoload :SharedHelpers,       'bundler/shared_helpers'
+  autoload :SpecSet,             'bundler/spec_set'
   autoload :Source,              'bundler/source'
   autoload :Specification,       'bundler/specification'
   autoload :UI,                  'bundler/ui'

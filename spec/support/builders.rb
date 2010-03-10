@@ -134,6 +134,59 @@ module Spec
           s.write "lib/bundler/omg.rb", ""
           s.write "lib/rubygems_plugin.rb", "require 'bundler/omg' ; puts 'FAIL'"
         end
+
+        # Test comlicated gem dependencies for install
+        build_gem "net_a" do |s|
+          s.add_dependency "net_b"
+          s.add_dependency "net_build_extensions"
+          s.write "lib/rubygems_plugin.rb", <<-R
+            require 'net_b'
+            require 'net_a'
+          R
+        end
+
+        build_gem "net_b" do |s|
+          s.write "lib/rubygems_plugin.rb", <<-G
+            require 'net_b'
+          G
+        end
+
+        build_gem "net_build_extensions" do |s|
+          s.add_dependency "rake"
+          s.extensions << "Rakefile"
+          s.write "Rakefile", <<-RUBY
+            task :default do
+              path = File.expand_path("../lib", __FILE__)
+              FileUtils.mkdir_p(path)
+              File.open("\#{path}/net_build_extensions.rb", "w") do |f|
+                f.puts "NET_BUILD_EXTENSIONS = 'YES'"
+              end
+            end
+          RUBY
+        end
+
+        build_gem "net_c" do |s|
+          s.add_dependency "net_a"
+          s.add_dependency "net_d"
+          s.write "lib/rubygems_plugin.rb", <<-G
+            require 'net_a'
+            require 'net_d'
+            require 'net_c'
+          G
+        end
+
+        build_gem "net_d" do |s|
+          s.write "lib/rubygems_plugin.rb", <<-G
+            require 'net_d'
+          G
+        end
+
+        build_gem "net_e" do |s|
+          s.add_dependency "net_d"
+          s.write "lib/rubygems_plugin.rb", <<-G
+            require 'net_d'
+          G
+        end
       end
     end
 
@@ -275,7 +328,7 @@ module Spec
         @spec.send(*args, &blk)
       end
 
-      def write(file, source)
+      def write(file, source = "")
         @files[file] = source
       end
 

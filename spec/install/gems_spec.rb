@@ -394,7 +394,7 @@ describe "bundle install with gem sources" do
     end
   end
 
-  describe "native dependencies" do
+  describe "install time dependencies" do
     it "installs gems with implicit rake dependencies" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
@@ -410,6 +410,16 @@ describe "bundle install with gem sources" do
         puts ANOTHER_IMPLICIT_RAKE_DEP
       R
       out.should == "YES\nYES"
+    end
+
+    it "works with crazy rubygem plugin stuff" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "net_c"
+        gem "net_e"
+      G
+
+      should_be_installed "net_a 1.0", "net_b 1.0", "net_c 1.0", "net_d 1.0", "net_e 1.0"
     end
   end
 

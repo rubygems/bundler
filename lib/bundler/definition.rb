@@ -32,20 +32,6 @@ module Bundler
       @sources = sources
     end
 
-    def local_index
-      @local_index ||= begin
-        index = Index.new
-
-        sources.each do |source|
-          next unless source.respond_to?(:local_specs)
-          index = source.local_specs.merge(index)
-        end
-
-        index = Index.from_installed_gems.merge(index)
-        Index.from_cached_specs("#{Bundler.bundle_path}/cache").merge(index)
-      end
-    end
-
     def groups
       dependencies.map { |d| d.groups }.flatten.uniq
     end

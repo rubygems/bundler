@@ -97,7 +97,10 @@ module Bundler
     alias gems specs
 
     def index
-      @definition.local_index
+      @index ||= Index.build do |idx|
+        idx.use runtime_gems
+        idx.use Index.system_cached_gems
+      end
     end
 
     def cache
