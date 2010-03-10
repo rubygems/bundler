@@ -26,9 +26,7 @@ module Bundler
           next
         end
 
-        # unless spec.source.is_a?(Source::SystemGems)
-          Bundler.ui.info "Installing #{spec.name} (#{spec.version}) from #{spec.source} "
-        # end
+        Bundler.ui.info "Installing #{spec.name} (#{spec.version}) from #{spec.source} "
 
         spec.source.install(spec)
 
