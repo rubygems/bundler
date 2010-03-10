@@ -208,8 +208,8 @@ API calls in your Gemfile, and some workarounds if you are using Rails 2.3.
 ### Rails 2.3
 
 Using Bundler 0.9 with Rails 2.3 requires adding a preinitializer, and
-making a few changes to boot.rb. The exact changes needed can be found at
-[http://gist.github.com/302406](http://gist.github.com/302406).
+making a few changes to boot.rb. A detailed description of the changes
+needed can be found in [Bundler 0.9 and Rails 2.3.5](http://andre.arko.net/2010/02/13/using-bundler-09-with-rails-235/).
 
 ### Gemfile Removals
 
@@ -274,7 +274,7 @@ Bundler 0.9 changes the following Bundler 0.8 Gemfile APIs:
 
 ## More information
 
-Explanations of common Bundler use cases can be found in [Using Bundler in Real Life](http://yehudakatz.com/2010/02/09/using-bundler-in-real-life/). The general philosophy behind Bundler 0.9 is explained at some length in [Bundler 0.9: Heading Toward 1.0](http://yehudakatz.com/2010/02/01/bundler-0-9-heading-toward-1-0/).
+Explanations of common Bundler use cases can be found in [Using Bundler in Real Life](http://yehudakatz.com/2010/02/09/using-bundler-in-real-life/). The general philosophy behind Bundler 0.9 is explained at some length in [Bundler 0.9: Heading Toward 1.0](http://yehudakatz.com/2010/02/01/bundler-0-9-heading-toward-1-0/). Using Bundler with a Rails 2.3.5 app is explained with more detail in [Bundler 0.9 and Rails 2.3.5](http://andre.arko.net/2010/02/13/using-bundler-09-with-rails-235/).
 
 ### Deploying to memory-constrained servers
 
@@ -292,6 +292,8 @@ The best possible scenario is a ticket with a fix for the bug and a test for the
 
   - Whether you have locked or not
   - What version of bundler you are using
+  - What version of Ruby you are using
+  - Whether you are using RVM, and if so what version
   - Your Gemfile
   - The command you ran to generate exception(s)
   - The exception backtrace(s)
