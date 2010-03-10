@@ -7,7 +7,7 @@ require 'bundler'
 spec = Gem::Specification.new do |s|
   s.name     = "bundler"
   s.version  = Bundler::VERSION
-  s.authors  = ["Carl Lerche", "Yehuda Katz"]
+  s.authors  = ["Carl Lerche", "Yehuda Katz", "André Arko"]
   s.email    = ["carlhuda@engineyard.com"]
   s.homepage = "http://github.com/carlhuda/bundler"
   s.summary  = "Bundles are fun"
