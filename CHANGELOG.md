@@ -1,3 +1,9 @@
+## 0.9.12 (???)
+
+Bugfixes:
+
+  - perform a topological sort on resolved gems (#191)
+
 ## 0.9.11 (March 9, 2010)
 
   - added roadmap with future development plans
