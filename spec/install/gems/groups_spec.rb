@@ -23,7 +23,7 @@ describe "bundle install with gem sources" do
 
       it "sets up everything if Bundler.setup is used with no groups" do
         out = run("require 'rack'; puts RACK")
-        out.should == '1.0.0'
+        check out.should == '1.0.0'
 
         out = run("require 'activesupport'; puts ACTIVESUPPORT")
         out.should == '2.3.5'

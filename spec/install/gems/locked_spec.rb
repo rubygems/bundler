@@ -67,7 +67,7 @@ describe "bundle install with gem sources" do
 
     it "regenerates the environment.rb if install is called twice on a locked repo" do
       run "begin; require 'rack_middleware'; rescue LoadError; puts 'WIN'; end", :lite_runtime => true
-      out.should == "WIN"
+      check out.should == "WIN"
 
       bundle :install
 

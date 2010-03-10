@@ -54,7 +54,7 @@ describe "bundle exec" do
 
     bundle "exec rackup"
 
-    out.should == "0.9.1"
+    check out.should == "0.9.1"
 
     Dir.chdir bundled_app2 do
       bundle "exec rackup"
@@ -74,7 +74,7 @@ describe "bundle exec" do
 
     bundle "exec rackup"
 
-    out.should == "0.9.1"
+    check out.should == "0.9.1"
     should_not_be_installed "rack_middleware 1.0"
   end
 

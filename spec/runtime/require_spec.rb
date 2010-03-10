@@ -48,23 +48,23 @@ describe "Bundler.require" do
   it "requires the gems" do
     # default group
     run "Bundler.require"
-    out.should == "two"
+    check out.should == "two"
 
     # specific group
     run "Bundler.require(:bar)"
-    out.should == "baz\nqux"
+    check out.should == "baz\nqux"
 
     # default and specific group
     run "Bundler.require(:default, :bar)"
-    out.should == "two\nbaz\nqux"
+    check out.should == "two\nbaz\nqux"
 
     # specific group given as a string
     run "Bundler.require('bar')"
-    out.should == "baz\nqux"
+    check out.should == "baz\nqux"
 
     # specific group declared as a string
     run "Bundler.require(:string)"
-    out.should == "six"
+    check out.should == "six"
 
     # required in resolver order instead of gemfile order
     run("Bundler.require(:not)")
@@ -80,19 +80,19 @@ describe "Bundler.require" do
     end
 
     # default group
-    locked_require.should == "two"
+    check locked_require.should == "two"
 
     # specific group
-    locked_require(:bar).should == "baz\nqux"
+    check locked_require(:bar).should == "baz\nqux"
 
     # default and specific group
-    locked_require(:default, :bar).should == "two\nbaz\nqux"
+    check locked_require(:default, :bar).should == "two\nbaz\nqux"
 
     # specific group given as a string
-    locked_require('bar').should == "baz\nqux"
+    check locked_require('bar').should == "baz\nqux"
 
     # specific group declared as a string
-    locked_require(:string).should == "six"
+    check locked_require(:string).should == "six"
 
     # required in resolver order instead of gemfile order
     locked_require(:not).split("\n").sort.should == ['seven', 'three']
@@ -125,10 +125,10 @@ describe "Bundler.require" do
       env = bundled_app(".bundle/environment.rb")
 
       out = ruby("require '#{env}'; Bundler.setup; Bundler.require")
-      out.should == "two"
+      check out.should == "two"
 
       out = ruby("require '#{env}'; Bundler.setup(:bar); Bundler.require(:bar)")
-      out.should == "baz\nqux"
+      check out.should == "baz\nqux"
 
       out = ruby("require '#{env}'; Bundler.setup(:default, :bar); Bundler.require(:default, :bar)")
       out.should == "two\nbaz\nqux"
@@ -140,10 +140,10 @@ describe "Bundler.require" do
       bundle :lock
 
       bundle "exec ruby -e 'Bundler.require'"
-      out.should == "two"
+      check out.should == "two"
 
       bundle "exec ruby -e 'Bundler.require(:bar)'"
-      out.should == "baz\nqux"
+      check out.should == "baz\nqux"
 
       bundle "exec ruby -e 'Bundler.require(:default, :bar)'"
       out.should == "two\nbaz\nqux"
