@@ -1,7 +1,35 @@
 module Bundler
   class Index
+    def self.build
+      i = new
+      yield i
+      i
+    end
+
     def self.from_installed_gems
       Source::SystemGems.new.specs
+    end
+
+    def self.installed_gems
+      from_installed_gems
+    end
+
+    def self.cached_gems
+      build do |idx|
+        idx.use application_cached_gems
+        idx.use system_cached_gems
+      end
+    end
+
+    def self.application_cached_gems
+      path = "#{Bundler.root}/vendor/cache"
+      if File.directory?(path)
+        from_cached_specs(path)
+      end
+    end
+
+    def self.system_cached_gems
+      from_cached_specs("#{Bundler.bundle_path}/cache")
     end
 
     def self.from_cached_specs(path)
@@ -52,6 +80,15 @@ module Bundler
       end
     end
 
+    def use(other)
+      return unless other
+      other.each do |s|
+        next if search_by_spec(s).any?
+        @specs[s.name] << s
+      end
+      self
+    end
+
     def merge!(other)
       other.each do |spec|
         self << spec
@@ -73,7 +110,7 @@ module Bundler
   private
 
     def search_by_spec(spec)
-      @specs[spec.name].select { |s| s.version == spec.version }
+      @specs[spec.name].select { |s| s.version == spec.version && s.platform == spec.platform }
     end
 
     def search_by_dependency(dependency)

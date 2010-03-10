@@ -11,6 +11,16 @@ module Bundler
 
   private
 
+    def runtime_gems
+      @runtime_gems ||= Index.build do |i|
+        sources.each do |s|
+          i.use s.local_specs if s.respond_to?(:local_specs)
+        end
+
+        i.use Index.installed_gems
+      end
+    end
+
     def group_specs(specs)
       dependencies.each do |d|
         spec = specs.find { |s| s.name == d.name }

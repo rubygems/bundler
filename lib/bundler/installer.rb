@@ -91,51 +91,29 @@ module Bundler
     end
 
     def index
-      @index ||= begin
-        index = Index.new
+      @index ||= Index.build do |idx|
+        rubygems, other = sources.partition { |s| Source::Rubygems === s }
 
-        rg_sources = sources.select { |s| s.is_a?(Source::Rubygems) }
-        other_sources = sources.select { |s| !s.is_a?(Source::Rubygems)   }
-
-        other_sources.each do |source|
-          i = source.specs
+        other.each do |source|
           Bundler.ui.debug "Source: Processing index"
-          index = i.merge(index)
+          idx.use source.specs
         end
 
-        index = Index.from_installed_gems.merge(index)
-        index = Index.from_cached_specs("#{Bundler.bundle_path}/cache").merge(index)
+        idx.use Index.installed_gems
+        idx.use Index.cached_gems
 
-        if File.directory?("#{root}/vendor/cache")
-          index = cache_source.specs.merge(index)
-        end
-
-        rg_sources.each do |source|
-          i = source.specs
+        rubygems.each do |source|
           Bundler.ui.debug "Source: Processing index"
-          index = i.merge(index)
+          idx.use source.specs
         end
-
-        index
       end
     end
 
     def local_index
-      @local_index ||= begin
-        index = Index.new
-
-        sources.each do |source|
-          next unless source.respond_to?(:local_specs)
-          index = source.local_specs.merge(index)
-        end
-
-        index = Index.from_installed_gems.merge(index)
-
-        if File.directory?("#{root}/vendor/cache")
-          index = cache_source.specs.merge(index).freeze
-        end
-
-        Index.from_cached_specs("#{Bundler.bundle_path}/cache").merge(index)
+      @local_index ||= Index.build do |idx|
+        idx.use runtime_gems
+        idx.use Index.application_cached_gems # vendor/cache
+        idx.use Index.system_cached_gems      # $GEM_HOME/cache
       end
     end
 
