@@ -286,7 +286,12 @@ Any remaining questions may be asked via IRC in [#carlhuda](irc://irc.freenode.n
 
 ## Reporting bugs
 
-Please report all bugs on the github issue tracker for the project, located at [http://github.com/carlhuda/bundler/issues/](http://github.com/carlhuda/bundler/issues/).
+Before reporting a bug, try these troubleshooting steps:
+
+    rm -rf ~/.bundle/ ~/.gem/ .bundle/ Gemfile.lock
+    bundle install
+
+If you are still having problems, please report bugs to the github issue tracker for the project, located at [http://github.com/carlhuda/bundler/issues/](http://github.com/carlhuda/bundler/issues/).
 
 The best possible scenario is a ticket with a fix for the bug and a test for the fix. If that's not possible, instructions to reproduce the issue are vitally important. If you're not sure exactly how to reproduce the issue that you are seeing, create a gist of the following information and include it in your ticket:
 
