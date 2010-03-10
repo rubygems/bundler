@@ -6,12 +6,8 @@ module Bundler
       i
     end
 
-    def self.from_installed_gems
-      Source::SystemGems.new.specs
-    end
-
     def self.installed_gems
-      from_installed_gems
+      Source::SystemGems.new.specs
     end
 
     def self.cached_gems
@@ -87,24 +83,6 @@ module Bundler
         @specs[s.name] << s
       end
       self
-    end
-
-    def merge!(other)
-      other.each do |spec|
-        self << spec
-      end
-      self
-    end
-
-    def merge(other)
-      dup.merge!(other)
-    end
-
-    def freeze
-      @specs.each do |k,v|
-        v.freeze
-      end
-      super
     end
 
   private
