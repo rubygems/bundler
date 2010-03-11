@@ -118,6 +118,28 @@ describe "Bundler.setup" do
     end
   end
 
+  describe "when cached gems are present" do
+    it "raises a friendly error" do
+      build_gem "rack", :path => bundled_app("vendor/cache")
+
+      gemfile <<-G
+        gem "rack"
+      G
+
+      ruby <<-R
+        require 'rubygems'
+        require 'bundler'
+        begin
+          Bundler.setup
+        rescue Bundler::BundlerError => e
+          puts e.message
+        end
+      R
+
+      out.should == "rack-1.0 is not installed. Try running `bundle install`."
+    end
+  end
+
   describe "when excluding groups" do
     it "doesn't change the resolve if --without is used" do
       install_gemfile <<-G, :without => :rails

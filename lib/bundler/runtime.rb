@@ -21,6 +21,10 @@ module Bundler
 
       # Activate the specs
       specs.each do |spec|
+        unless spec.loaded_from
+          raise GemNotFound, "#{spec.full_name} is not installed. Try running `bundle install`."
+        end
+
         Gem.loaded_specs[spec.name] = spec
         $LOAD_PATH.unshift(*spec.load_paths)
       end
@@ -99,7 +103,7 @@ module Bundler
     def index
       @index ||= Index.build do |idx|
         idx.use runtime_gems
-        idx.use Index.system_cached_gems
+        idx.use Index.cached_gems
       end
     end
 

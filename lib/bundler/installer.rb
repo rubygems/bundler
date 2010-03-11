@@ -112,8 +112,7 @@ module Bundler
     def local_index
       @local_index ||= Index.build do |idx|
         idx.use runtime_gems
-        idx.use Index.application_cached_gems # vendor/cache
-        idx.use Index.system_cached_gems      # $GEM_HOME/cache
+        idx.use Index.cached_gems
       end
     end
 
