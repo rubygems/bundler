@@ -21,7 +21,7 @@ module Bundler
       specs.each do |spec|
         spec.source.fetch(spec) if spec.source.respond_to?(:fetch)
 
-        if spec.groups & Bundler.settings.without == spec.groups
+        unless requested_specs.include?(spec)
           Bundler.ui.debug "  * Not in requested group; skipping."
           next
         end
@@ -49,7 +49,7 @@ module Bundler
     end
 
     def specs
-      @specs ||= group_specs(resolve_locally || resolve_remotely)
+      @specs ||= resolve_locally || resolve_remotely
     end
 
   private

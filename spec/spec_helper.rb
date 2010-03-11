@@ -19,6 +19,7 @@ FileUtils.rm_rf(Spec::Path.gem_repo1)
 Spec::Runner.configure do |config|
   config.include Spec::Builders
   config.include Spec::Helpers
+  config.include Spec::Indexes
   config.include Spec::Matchers
   config.include Spec::Path
   config.include Spec::Rubygems

@@ -4,6 +4,10 @@ module Spec
       name.gsub('-', '').upcase
     end
 
+    def v(version)
+      Gem::Version.new(version)
+    end
+
     def build_repo1
       build_repo gem_repo1 do
         build_gem "rack",           %w(0.9.1 1.0.0) do |s|
@@ -224,18 +228,19 @@ module Spec
     end
 
     def build_index(&block)
-      index = Gem::SourceIndex.new
+      index = Bundler::Index.new
       IndexBuilder.run(index, &block) if block_given?
       index
     end
 
     def build_spec(name, version, platform = nil, &block)
-      spec = Gem::Specification.new
-      spec.instance_variable_set(:@name, name)
-      spec.instance_variable_set(:@version, Gem::Version.new(version))
-      spec.platform = Gem::Platform.new(platform) if platform
-      DepBuilder.run(spec, &block) if block_given?
-      spec
+      Array(version).map do |v|
+        Gem::Specification.new do |s|
+          s.name    = name
+          s.version = Gem::Version.new(v)
+          DepBuilder.run(s, &block) if block_given?
+        end
+      end
     end
 
     def build_dep(name, requirements = Gem::Requirement.default, type = :runtime)
@@ -289,12 +294,20 @@ module Spec
         instance_eval(&block)
       end
 
-      def add_spec(*args, &block)
-        @index.add_spec(build_spec(*args, &block))
+      def gem(*args, &block)
+        build_spec(*args, &block).each do |s|
+          @index << s
+        end
+      end
+
+      def versions(versions)
+        versions.split(/\s+/).each { |version| yield v version }
       end
     end
 
     class DepBuilder
+      include Builders
+
       def self.run(spec, &block)
         new(spec).run(&block)
       end
@@ -310,6 +323,8 @@ module Spec
       def runtime(name, requirements)
         @spec.add_runtime_dependency(name, requirements)
       end
+
+      alias dep runtime
     end
 
     class LibBuilder

@@ -28,28 +28,18 @@ module Bundler
       end
     end
 
-    def specs_for(*groups)
-      groups = @definition.groups if groups.empty?
-      groups -= Bundler.settings.without
-      groups.map! { |g| g.to_sym }
-      specs.select { |s| (s.groups & groups).any? }
+    def requested_specs
+      @requested_specs ||= begin
+        groups = @definition.groups - Bundler.settings.without
+        groups.map! { |g| g.to_sym }
+        groups.any? ? specs_for(groups) : []
+      end
     end
 
-    def group_specs(specs)
-      dependencies.each do |d|
-        spec = specs.find { |s| s.name == d.name }
-        group_spec(specs, spec, d.groups)
-      end
-      specs
-    end
-
-    def group_spec(specs, spec, groups)
-      spec.groups.concat(groups)
-      spec.groups.uniq!
-      spec.dependencies.select { |d| d.type != :development }.each do |d|
-        spec = specs.find { |s| s.name == d.name }
-        group_spec(specs, spec, groups)
-      end
+    def specs_for(groups)
+      deps = dependencies.select { |d| (d.groups & groups).any? }
+      # deps.any? ? specs.for(deps) : specs
+      specs.for(deps)
     end
 
     # ==== Locking
@@ -77,7 +67,7 @@ module Bundler
     end
 
     def specs_for_lock_file
-      specs_for.map do |s|
+      requested_specs.map do |s|
         hash = {}
         hash[:loaded_from] = s.loaded_from.to_s
         hash[:load_paths]  = s.load_paths
@@ -90,7 +80,8 @@ module Bundler
       autorequires = Hash.new { |h,k| h[k] = [] }
 
       ordered_deps = []
-      specs_for(*groups).each do |g|
+      specs = groups.any? ? specs_for(groups) : requested_specs
+      specs.each do |g|
         dep = @definition.dependencies.find{|d| d.name == g.name }
         ordered_deps << dep if dep && !ordered_deps.include?(dep)
       end

@@ -15,7 +15,7 @@ module Bundler
       # Has to happen first
       clean_load_path
 
-      specs = specs_for(*groups)
+      specs = groups.any? ? specs_for(groups) : requested_specs
 
       cripple_rubygems(specs)
 
@@ -83,7 +83,7 @@ module Bundler
           source_requirements[dep.name] = dep.source.local_specs
         end
 
-        group_specs(Resolver.resolve(@definition.actual_dependencies, index, source_requirements))
+        Resolver.resolve(@definition.actual_dependencies, index, source_requirements)
       end
     end
 
