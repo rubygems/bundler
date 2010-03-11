@@ -23,6 +23,7 @@ module Spec
 
     def run(cmd, *args)
       opts = args.last.is_a?(Hash) ? args.pop : {}
+      expect_err = opts.delete(:expect_err)
       groups = args.map {|a| a.inspect }.join(", ")
 
       if opts[:lite_runtime]
@@ -31,7 +32,7 @@ module Spec
         setup = "require 'rubygems' ; require 'bundler' ; Bundler.setup(#{groups})\n"
       end
 
-      @out = ruby(setup + cmd)
+      @out = ruby(setup + cmd, :expect_err => expect_err)
     end
 
     def lib
@@ -39,24 +40,25 @@ module Spec
     end
 
     def bundle(cmd, options = {})
+      expect_err = options.delete(:expect_err)
       env = (options.delete(:env) || {}).map{|k,v| "#{k}='#{v}' "}.join
       args = options.map { |k,v| " --#{k} #{v}"}.join
       gemfile = File.expand_path('../../../bin/bundle', __FILE__)
-      sys_exec("#{env}#{Gem.ruby} -I#{lib} #{gemfile} #{cmd}#{args}")
+      sys_exec("#{env}#{Gem.ruby} -I#{lib} #{gemfile} #{cmd}#{args}", expect_err)
     end
 
-    def ruby(opts, ruby = nil)
-      ruby, opts = opts, nil unless ruby
+    def ruby(ruby, options = {})
+      expect_err = options.delete(:expect_err)
       ruby.gsub!(/(?=")/, "\\")
       ruby.gsub!('$', '\\$')
-      sys_exec(%'#{Gem.ruby} -I#{lib} #{opts} -e "#{ruby}"')
+      sys_exec(%'#{Gem.ruby} -I#{lib} -e "#{ruby}"', expect_err)
     end
 
-    def sys_exec(cmd)
+    def sys_exec(cmd, expect_err = false)
       require "open3"
       input, out, err, waitthread = Open3.popen3(cmd)
       @err = err.read.strip
-      puts @err if $show_err && !@err.empty?
+      puts @err if !expect_err && $show_err && !@err.empty?
       @out = out.read.strip
       @exitstatus = nil
       @exitstatus = waitthread.value.to_i if waitthread

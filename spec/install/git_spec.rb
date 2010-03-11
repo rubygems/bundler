@@ -89,9 +89,12 @@ describe "bundle install with git sources" do
 
   describe "specified inline" do
     it "supports private git URLs" do
-      install_gemfile <<-G
+      gemfile <<-G
         gem "thingy", :git => "git@example.fkdmn1234fake.com:somebody/thingy.git"
       G
+
+      bundle :install, :expect_err => true
+
       err.should include("example.fkdmn1234fake.com")
       err.should include("ssh")
     end
@@ -233,9 +236,11 @@ describe "bundle install with git sources" do
   end
 
   it "catches git errors and spits out useful output" do
-    install_gemfile <<-G
+    gemfile <<-G
       gem "foo", "1.0", :git => "omgomg"
     G
+
+    bundle :install, :expect_err => true
 
     out.should include("An error has occurred in git. Cannot complete bundling.")
     err.should include("fatal: 'omgomg'")

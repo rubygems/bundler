@@ -96,7 +96,7 @@ describe "Bundler.setup" do
         gem "foo", :git => "#{lib_path('rack-1.0.0')}"
       G
 
-      run "1"
+      run "1", :expect_err => true
       err.should include("#{lib_path('rack-1.0.0')} (at master) is not checked out. Please run `bundle install`")
     end
   end
