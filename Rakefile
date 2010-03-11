@@ -36,10 +36,11 @@ else
   end
 end
 
-rubyopt = ENV["RUBYOPT"]
 
+# Rubygems 1.3.5, 1.3.6, and HEAD specs
+rubyopt = ENV["RUBYOPT"]
 %w(master REL_1_3_5 REL_1_3_6).each do |rg|
-  Spec::Rake::SpecTask.new("spec_#{rg}") do |t|
+  Spec::Rake::SpecTask.new("spec_gems_#{rg}") do |t|
     t.spec_files = FileList['spec/**/*_spec.rb']
     t.spec_opts  = %w(-fs --color)
     t.warning    = true
@@ -52,9 +53,33 @@ rubyopt = ENV["RUBYOPT"]
     ENV["RUBYOPT"] = "-I#{File.expand_path("tmp/rubygems_#{rg}/lib")} #{rubyopt}"
   end
 
-  task "spec_#{rg}" => "rubygems_#{rg}"
+  task "spec_gems_#{rg}" => "rubygems_#{rg}"
+  task :ci => "spec_gems_#{rg}"
+end
 
-  task :ci => "spec_#{rg}"
+
+# Ruby 1.8.6, 1.8.7, and 1.9.2 specs
+task "ensure_rvm" do
+  raise "RVM is not available" unless File.exist?(File.expand_path("~/.rvm/scripts/rvm"))
+end
+
+%w(1.8.6-p399 1.8.7-p249 1.9.2-head).each do |ruby|
+  ruby_cmd = File.expand_path("~/.rvm/bin/ruby-#{ruby}")
+
+  Spec::Rake::SpecTask.new("spec_ruby_#{ruby}") do |t|
+    t.spec_files = FileList['spec/**/*_spec.rb']
+    t.spec_opts  = %w(-fs --color)
+    t.warning    = true
+    t.ruby_cmd   = ruby_cmd
+  end
+
+  task "ensure_ruby_#{ruby}" do
+    raise "Could not find Ruby #{ruby} at #{ruby_cmd}" unless File.exist?(ruby_cmd)
+  end
+
+  task "ensure_ruby_#{ruby}" => "ensure_rvm"
+  task "spec_ruby_#{ruby}" => "ensure_ruby_#{ruby}"
+  task :ci => "spec_ruby_#{ruby}"
 end
 
 begin
