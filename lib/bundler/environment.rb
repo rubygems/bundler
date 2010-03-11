@@ -9,6 +9,13 @@ module Bundler
       @definition = definition
     end
 
+    def index
+      @index ||= Index.build do |idx|
+        idx.use runtime_gems
+        idx.use Index.cached_gems
+      end
+    end
+
   private
 
     def runtime_gems

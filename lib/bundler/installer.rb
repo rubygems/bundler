@@ -65,7 +65,7 @@ module Bundler
       end
 
       # Run a resolve against the locally available gems
-      specs = Resolver.resolve(actual_dependencies, local_index, source_requirements)
+      specs = Resolver.resolve(actual_dependencies, index, source_requirements)
 
       # Simple logic for now. Can improve later.
       specs.length == actual_dependencies.length && specs
@@ -74,7 +74,7 @@ module Bundler
     end
 
     def resolve_remotely
-      index # trigger building the index
+      remote_index # trigger building the index
       Bundler.ui.info "Resolving dependencies"
       source_requirements = {}
       actual_dependencies.each do |dep|
@@ -82,7 +82,7 @@ module Bundler
         source_requirements[dep.name] = dep.source.specs
       end
 
-      specs = Resolver.resolve(actual_dependencies, index, source_requirements)
+      specs = Resolver.resolve(actual_dependencies, remote_index, source_requirements)
       specs
     end
 
@@ -90,8 +90,8 @@ module Bundler
       dep.requirement.requirements.any? { |op,_| op != '=' }
     end
 
-    def index
-      @index ||= Index.build do |idx|
+    def remote_index
+      @remote_index ||= Index.build do |idx|
         rubygems, other = sources.partition { |s| Source::Rubygems === s }
 
         other.each do |source|
@@ -108,17 +108,5 @@ module Bundler
         end
       end
     end
-
-    def local_index
-      @local_index ||= Index.build do |idx|
-        idx.use runtime_gems
-        idx.use Index.cached_gems
-      end
-    end
-
-    def cache_source
-      Source::GemCache.new("path" => "#{root}/vendor/cache")
-    end
-
   end
 end

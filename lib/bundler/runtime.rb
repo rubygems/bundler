@@ -100,13 +100,6 @@ module Bundler
 
     alias gems specs
 
-    def index
-      @index ||= Index.build do |idx|
-        idx.use runtime_gems
-        idx.use Index.cached_gems
-      end
-    end
-
     def cache
       cache_path = "#{root}/vendor/cache/"
       FileUtils.mkdir_p(cache_path)
