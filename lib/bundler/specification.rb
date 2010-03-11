@@ -12,7 +12,7 @@ module Bundler
 
     def loaded_from
       return super unless relative_loaded_from
-      source.path.join(relative_loaded_from)
+      source.path.join(relative_loaded_from).to_s
     end
 
     def full_gem_path

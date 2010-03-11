@@ -193,11 +193,13 @@ describe "Bundler.setup" do
   # Rubygems returns loaded_from as a string
   it "has loaded_from as a string on all specs" do
     build_git "foo"
+    build_git "no-gemspec", :gemspec => false
 
     install_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack"
       gem "foo", :git => "#{lib_path('foo-1.0')}"
+      gem "no-gemspec", "1.0", :git => "#{lib_path('no-gemspec-1.0')}"
     G
 
     run <<-R
