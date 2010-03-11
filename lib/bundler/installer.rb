@@ -33,6 +33,10 @@ module Bundler
         Bundler.ui.info ""
       end
 
+      if locked?
+        write_rb_lock
+      end
+
       Bundler.ui.confirm "Your bundle is complete!"
     end
 

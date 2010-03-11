@@ -40,6 +40,8 @@ module Bundler
           :bin_dir             => "#{Gem.dir}/bin"
 
         installer.install
+
+        spec.loaded_from = "#{Gem.dir}/specifications/#{spec.full_name}.gemspec"
       end
 
     private
@@ -131,6 +133,7 @@ module Bundler
           :bin_dir             => "#{Gem.dir}/bin"
 
         installer.install
+        spec.loaded_from = "#{Gem.dir}/specifications/#{spec.full_name}.gemspec"
       end
     end
 
