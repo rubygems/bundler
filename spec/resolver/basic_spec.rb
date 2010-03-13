@@ -10,6 +10,6 @@ describe "Resolving" do
   it "resolves" do
     dep "rack"
 
-    should_resolve_as [gem "rack", "1.1"]
+    should_resolve_as [gem("rack"), "1.1"]
   end
 end
