@@ -28,7 +28,7 @@ describe "bundle exec" do
       gem "rack"
     G
 
-    bundle "exec cd #{tmp('gems')} && rackup"
+    bundle "exec 'cd #{tmp('gems')} && rackup'"
 
     out.should == "1.0.0"
   end
