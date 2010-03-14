@@ -301,7 +301,7 @@ module Spec
       end
 
       def versions(versions)
-        versions.split(/\s+/).each { |version| yield v version }
+        versions.split(/\s+/).each { |version| yield v(version) }
       end
     end
 
