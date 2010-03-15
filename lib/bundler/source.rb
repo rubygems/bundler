@@ -325,7 +325,7 @@ module Bundler
 
       def checkout
         unless File.exist?("#{path}/.git")
-          %x(git clone --no-checkout file://#{cache_path} #{path})
+          %x(git clone --no-checkout "file://#{cache_path}" #{path})
         end
         Dir.chdir(path) do
           git "fetch --quiet"
