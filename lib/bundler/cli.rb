@@ -38,11 +38,12 @@ module Bundler
         Bundler.ui.error "Try running `bundle install`"
         exit 1
       else
-        not_installed = env.specs.select { |spec| !spec.loaded_from }
+        not_installed = env.requested_specs.select { |spec| !spec.loaded_from }
 
         if not_installed.any?
           not_installed.each { |s| Bundler.ui.error "#{s.name} (#{s.version}) is cached, but not installed" }
           Bundler.ui.error "Try running `bundle install`"
+          exit 1
         else
           Bundler.ui.info "The Gemfile's dependencies are satisfied"
         end

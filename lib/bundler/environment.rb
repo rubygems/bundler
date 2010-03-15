@@ -16,6 +16,14 @@ module Bundler
       end
     end
 
+    def requested_specs
+      @requested_specs ||= begin
+        groups = @definition.groups - Bundler.settings.without
+        groups.map! { |g| g.to_sym }
+        groups.any? ? specs_for(groups) : []
+      end
+    end
+
   private
 
     def runtime_gems
@@ -25,14 +33,6 @@ module Bundler
         end
 
         i.use Index.installed_gems
-      end
-    end
-
-    def requested_specs
-      @requested_specs ||= begin
-        groups = @definition.groups - Bundler.settings.without
-        groups.map! { |g| g.to_sym }
-        groups.any? ? specs_for(groups) : []
       end
     end
 
