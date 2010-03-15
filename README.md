@@ -79,7 +79,7 @@ Note that Bundler adds all the gems without an explicit group name to the
 Groups are involved in a number of scenarios:
 
 1. When installing gems using bundle install, you can choose to leave
-   out any group by specifying `--without {group name}`. This can be
+   out any group by specifying `--without group1  group2`. This can be
    helpful if, for instance, you have a gem that you cannot compile
    in certain environments.
 2. When setting up load paths using Bundler.setup, Bundler will, by
