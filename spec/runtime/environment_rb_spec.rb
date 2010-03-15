@@ -3,14 +3,25 @@ require File.expand_path('../../spec_helper', __FILE__)
 describe "environment.rb file" do
   before :each do
     system_gems "rack-1.0.0"
+    build_git "no-gemspec", :gemspec => false
 
     install_gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "activesupport", "2.3.5"
+      gem "no-gemspec", '1.0', :git => "#{lib_path('no-gemspec-1.0')}"
     G
 
     bundle :lock
+  end
+
+  it "works with gems from git that don't have gemspecs" do
+    run <<-R, :lite_runtime => true
+      require 'no-gemspec'
+      puts NOGEMSPEC
+    R
+
+    out.should == "1.0"
   end
 
   it "does not pull in system gems" do
@@ -48,4 +59,5 @@ describe "environment.rb file" do
 
     out.should == "rack is not part of the bundle. Add it to Gemfile."
   end
+
 end
