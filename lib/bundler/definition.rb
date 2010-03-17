@@ -25,7 +25,7 @@ module Bundler
 
     attr_reader :dependencies, :sources
 
-    alias actual_dependencies dependencies
+    alias resolved_dependencies dependencies
 
     def initialize(dependencies, sources)
       @dependencies = dependencies
@@ -52,8 +52,8 @@ module Bundler
         end
       end
 
-      def actual_dependencies
-        @actual_dependencies ||= @details["specs"].map do |args|
+      def resolved_dependencies
+        @resolved_dependencies ||= @details["specs"].map do |args|
           name, details = args.to_a.flatten
           details["source"] = sources[details["source"]] if details.include?("source")
           Bundler::Dependency.new(name, details.delete("version"), details)

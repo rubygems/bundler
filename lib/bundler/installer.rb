@@ -7,7 +7,7 @@ module Bundler
     end
 
     def run(options)
-      if actual_dependencies.empty?
+      if resolved_dependencies.empty?
         Bundler.ui.warn "The Gemfile specifies no dependencies"
         return
       end
@@ -44,8 +44,8 @@ module Bundler
       @definition.dependencies
     end
 
-    def actual_dependencies
-      @definition.actual_dependencies
+    def resolved_dependencies
+      @definition.resolved_dependencies
     end
 
   private
@@ -56,12 +56,12 @@ module Bundler
 
     def resolve_locally
       # Return unless all the dependencies have = version requirements
-      return if actual_dependencies.any? { |d| ambiguous?(d) }
+      return if resolved_dependencies.any? { |d| ambiguous?(d) }
 
       specs = super
 
       # Simple logic for now. Can improve later.
-      specs.length == actual_dependencies.length && specs
+      specs.length == resolved_dependencies.length && specs
     rescue GemNotFound, PathError => e
       nil
     end

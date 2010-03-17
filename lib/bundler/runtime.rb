@@ -54,8 +54,8 @@ module Bundler
       @definition.dependencies
     end
 
-    def actual_dependencies
-      @definition.actual_dependencies
+    def resolved_dependencies
+      @definition.resolved_dependencies
     end
 
     def lock

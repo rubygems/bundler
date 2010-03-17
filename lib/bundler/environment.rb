@@ -42,13 +42,13 @@ module Bundler
 
     def resolve(type, index)
       source_requirements = {}
-      actual_dependencies.each do |dep|
+      resolved_dependencies.each do |dep|
         next unless dep.source && dep.source.respond_to?(type)
         source_requirements[dep.name] = dep.source.send(type)
       end
 
       # Run a resolve against the locally available gems
-      Resolver.resolve(actual_dependencies, index, source_requirements)
+      Resolver.resolve(resolved_dependencies, index, source_requirements)
     end
 
     def resolve_locally
