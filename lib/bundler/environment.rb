@@ -68,9 +68,15 @@ module Bundler
 
     def specs_for_lock_file
       requested_specs.map do |s|
-        hash = {}
-        hash[:loaded_from] = s.loaded_from.to_s
-        hash[:load_paths]  = s.load_paths
+        hash = {
+          :name => s.name,
+          :load_paths => s.load_paths
+        }
+        if s.respond_to?(:virtual) && s.virtual
+          hash[:virtual_spec] = s.to_ruby
+        else
+          hash[:loaded_from] = s.loaded_from.to_s
+        end
         hash
       end
     end

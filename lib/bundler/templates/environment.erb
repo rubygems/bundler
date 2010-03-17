@@ -14,7 +14,8 @@ module Bundler
     <%= spec.inspect %>,
     <% end -%>
   ].map do |hash|
-    spec = eval(File.read(hash[:loaded_from]), binding, hash[:loaded_from])
+    source = hash[:loaded_from] ? File.read(hash[:loaded_from]) : hash[:virtual_spec]
+    spec = eval(source, binding, hash[:loaded_from] || "<virtual spec for '#{hash[:name]}'>")
     spec.loaded_from = hash[:loaded_from]
     spec.require_paths = hash[:load_paths]
     spec
