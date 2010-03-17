@@ -70,6 +70,11 @@ module Bundler
       Installer.install(Bundler.root, Bundler.definition, opts)
 
       lock if options[:relock]
+    rescue GemNotFound => e
+      if Bundler.definition.sources.empty?
+        Bundler.ui.warn "Your Gemfile doesn't have any sources. You can add one with a line like 'source :gemcutter'"
+      end
+      raise e
     end
 
     desc "lock", "Locks the bundle to the current set of dependencies, including all child dependencies."

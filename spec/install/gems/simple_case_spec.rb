@@ -166,6 +166,15 @@ describe "bundle install with gem sources" do
 
       should_be_installed "rack 1.2", "activesupport 1.2.3"
     end
+
+    it "gives a useful error if no sources are set" do
+      install_gemfile <<-G
+        gem "rack"
+      G
+
+      bundle :install, :expect_err => true
+      out.should =~ /Your Gemfile doesn't have any sources/i
+    end
   end
 
   describe "with BUNDLE_PATH set" do
