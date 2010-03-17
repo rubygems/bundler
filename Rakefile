@@ -25,9 +25,7 @@ end
 begin
   require 'spec/rake/spectask'
 rescue LoadError
-  task :spec do
-    $stderr.puts '`gem install rspec` to run specs'
-  end
+  raise 'Run `gem install rspec` to be able to run specs'
 else
   desc "Run specs"
   Spec::Rake::SpecTask.new do |t|
@@ -41,6 +39,7 @@ end
 # Rubygems 1.3.5, 1.3.6, and HEAD specs
 rubyopt = ENV["RUBYOPT"]
 %w(master REL_1_3_6).each do |rg|
+  desc "Run specs with Rubygems #{rg}"
   Spec::Rake::SpecTask.new("spec_gems_#{rg}") do |t|
     t.spec_files = FileList['spec/**/*_spec.rb']
     t.spec_opts  = %w(-fs --color)
@@ -67,6 +66,7 @@ end
 %w(1.8.6-p399 1.8.7-p249 1.9.2-head).each do |ruby|
   ruby_cmd = File.expand_path("~/.rvm/bin/ruby-#{ruby}")
 
+  desc "Run specs on Ruby #{ruby}"
   Spec::Rake::SpecTask.new("spec_ruby_#{ruby}") do |t|
     t.spec_files = FileList['spec/**/*_spec.rb']
     t.spec_opts  = %w(-fs --color)
