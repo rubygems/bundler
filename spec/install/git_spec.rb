@@ -246,4 +246,14 @@ describe "bundle install with git sources" do
     err.should include("fatal: 'omgomg'")
     err.should include("fatal: The remote end hung up unexpectedly")
   end
+
+  it "works when the gem path has spaces in it" do
+    build_git "foo", :path => lib_path('foo space-1.0')
+
+    install_gemfile <<-G
+      gem "foo", :git => "#{lib_path('foo space-1.0')}"
+    G
+
+    should_be_installed "foo 1.0"
+  end
 end
