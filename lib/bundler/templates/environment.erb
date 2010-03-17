@@ -14,8 +14,12 @@ module Bundler
     <%= spec.inspect %>,
     <% end -%>
   ].map do |hash|
-    source = hash[:loaded_from] ? File.read(hash[:loaded_from]) : hash[:virtual_spec]
-    spec = eval(source, binding, hash[:loaded_from] || "<virtual spec for '#{hash[:name]}'>")
+    if hash[:loaded_from]
+      dir = File.dirname(hash[:loaded_from])
+      spec = Dir.chdir(dir){ eval(File.read(hash[:loaded_from]), binding, hash[:loaded_from]) }
+    else
+      spec = eval(hash[:virtual_spec], binding, "<virtual spec for '#{hash[:name]}'>")
+    end
     spec.loaded_from = hash[:loaded_from]
     spec.require_paths = hash[:load_paths]
     spec
