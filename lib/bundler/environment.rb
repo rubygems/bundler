@@ -72,7 +72,7 @@ module Bundler
           :name => s.name,
           :load_paths => s.load_paths
         }
-        if s.respond_to?(:virtual) && s.virtual
+        if s.respond_to?(:relative_loaded_from) && s.relative_loaded_from
           hash[:virtual_spec] = s.to_ruby
         else
           hash[:loaded_from] = s.loaded_from.to_s

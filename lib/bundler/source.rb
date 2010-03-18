@@ -155,7 +155,6 @@ module Bundler
             s.version  = Gem::Version.new(options["version"])
             s.summary  = "Fake gemspec for #{options["name"]}"
             s.relative_loaded_from = "#{options["name"]}.gemspec"
-            s.virtual  = true
           end
         end
       end
