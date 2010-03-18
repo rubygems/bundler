@@ -1,6 +1,6 @@
 module Bundler
   class Specification < Gem::Specification
-    attr_accessor :relative_loaded_from, :virtual
+    attr_accessor :relative_loaded_from
 
     def self.from_gemspec(gemspec)
       spec = allocate
