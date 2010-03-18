@@ -78,15 +78,43 @@ describe "bundle exec" do
     should_not_be_installed "rack_middleware 1.0"
   end
 
-  it "uses .bundle/environment.rb when locked" do
-    gemfile <<-G
-      gem "rack"
-    G
+  describe "when locked" do
+    it "uses .bundle/environment.rb" do
+      gemfile <<-G
+        gem "rack"
+      G
 
-    bundle "lock"
-    File.open(".bundle/environment.rb", 'a') { |f| f.puts "puts 'using environment.rb'" }
+      bundle "lock"
+      File.open(".bundle/environment.rb", 'a') { |f| f.puts "puts 'using environment.rb'" }
 
-    bundle "exec rackup"
-    out.should == "using environment.rb\n1.0.0"
+      bundle "exec rackup"
+      out.should == "using environment.rb\n1.0.0"
+    end
+
+    it "works when running from a random directory" do
+      install_gemfile <<-G
+        gem "rack"
+      G
+
+      bundle "lock"
+      bundle "exec 'cd #{tmp('gems')} && rackup'"
+
+      out.should == "1.0.0"
+    end
+
+    it "works with gems from a path" do
+      build_lib "fizz", :path => home("fizz") do |s|
+        s.executables = "fizz"
+      end
+
+      install_gemfile <<-G
+        gem "fizz", :path => "#{File.expand_path(home("fizz"))}"
+      G
+
+      bundle "lock"
+      bundle "exec fizz"
+      out.should == "1.0"
+    end
   end
+
 end

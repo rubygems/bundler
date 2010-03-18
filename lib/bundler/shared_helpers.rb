@@ -126,7 +126,9 @@ module Bundler
           exec_name = spec.default_executable or raise Gem::Exception, "no default executable for #{spec.full_name}"
         end
 
-        File.join(spec.full_gem_path, spec.bindir, exec_name)
+        gem_bin = File.join(spec.full_gem_path, spec.bindir, exec_name)
+        gem_from_path_bin = File.join(File.dirname(spec.loaded_from), spec.bindir, exec_name)
+        File.exist?(gem_bin) ? gem_bin : gem_from_path_bin
       end
     end
 
