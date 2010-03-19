@@ -21,6 +21,7 @@ describe "bundle install with gem sources" do
     end
 
     it "allows --relock to update the dependencies" do
+      pending "Not supported in 0.10"
       system_gems "rack-0.9.1" do
         bundle "install --relock"
         should_be_installed "rack 1.0.0"

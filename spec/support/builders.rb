@@ -14,6 +14,14 @@ module Spec
           s.executables = "rackup"
         end
 
+        build_gem "sinatra", "0.5" do |s|
+          s.add_dependency "rack", "0.9.1"
+        end
+
+        build_gem "sinatra", %w(0.9 1.0) do |s|
+          s.add_dependency "rack", "1.0"
+        end
+
         build_gem "rack_middleware", "1.0" do |s|
           s.add_dependency "rack", "0.9.1"
         end
