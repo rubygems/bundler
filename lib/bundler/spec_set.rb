@@ -36,7 +36,7 @@ module Bundler
       return if specs[current.name]
       specs[current.name] = true
       current.dependencies.each do |dep|
-        next unless dep.type == :runtime
+        next if dep.type == :development
         append_subgraph(specs, lookup[dep.name])
       end
     end
