@@ -20,12 +20,20 @@ module Bundler
       @requested_specs ||= begin
         groups = @definition.groups - Bundler.settings.without
         groups.map! { |g| g.to_sym }
-        groups.any? ? specs_for(groups) : []
+        specs_for(groups)
       end
     end
 
     def specs
       @specs ||= resolve_locally || resolve_remotely
+    end
+
+    def dependencies
+      @definition.dependencies
+    end
+
+    def resolved_dependencies
+      @definition.resolved_dependencies
     end
 
   private
@@ -65,7 +73,6 @@ module Bundler
 
     def specs_for(groups)
       deps = dependencies.select { |d| (d.groups & groups).any? }
-      # deps.any? ? specs.for(deps) : specs
       specs.for(deps)
     end
 

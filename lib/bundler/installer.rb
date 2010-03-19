@@ -41,14 +41,6 @@ module Bundler
       Bundler.ui.confirm "Your bundle is complete! Use `bundle show gemname` to see where a bundled gem is installed."
     end
 
-    def dependencies
-      @definition.dependencies
-    end
-
-    def resolved_dependencies
-      @definition.resolved_dependencies
-    end
-
   private
 
     def resolve_locally

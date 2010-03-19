@@ -50,14 +50,6 @@ module Bundler
       end
     end
 
-    def dependencies
-      @definition.dependencies
-    end
-
-    def resolved_dependencies
-      @definition.resolved_dependencies
-    end
-
     def lock
       Bundler.ui.info("The bundle is already locked, relocking.") if locked?
       sources.each { |s| s.lock if s.respond_to?(:lock) }
