@@ -19,6 +19,26 @@ describe "bundle install with gem sources" do
       out.should == "YES\nYES"
     end
 
+    it "installs gems with a dependency with no type" do
+      build_repo2
+
+      path = "#{gem_repo2}/#{Gem::MARSHAL_SPEC_DIR}/actionpack-2.3.2.gemspec.rz"
+      spec = Marshal.load(Gem.inflate(File.read(path)))
+      spec.dependencies.each do |d|
+        d.instance_variable_set(:@type, :fail)
+      end
+      File.open(path, 'w') do |f|
+        f.write Gem.deflate(Marshal.dump(spec))
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "actionpack", "2.3.2"
+      G
+
+      should_be_installed "actionpack 2.3.2", "activesupport 2.3.2"
+    end
+
     it "works with crazy rubygem plugin stuff" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
