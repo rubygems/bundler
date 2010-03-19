@@ -121,10 +121,10 @@ module Bundler
         { s.name => options }
       end
 
-      details["dependencies"] = @definition.dependencies.inject({}) do |h,d|
-        info = {"version" => d.requirement.to_s, "group" => d.groups}
+      details["dependencies"] = @definition.dependencies.map do |d|
+        info = {"version" => d.requirement.to_s, "group" => d.groups, "name" => d.name}
         info.merge!("require" => d.autorequire) if d.autorequire
-        h.merge(d.name => info)
+        info
       end
       details
     end

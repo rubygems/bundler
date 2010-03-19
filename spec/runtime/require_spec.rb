@@ -149,4 +149,73 @@ describe "Bundler.require" do
       out.should == "two\nbaz\nqux"
     end
   end
+
+  describe "order" do
+    before(:each) do
+      build_lib "one", "1.0.0" do |s|
+        s.write "lib/one.rb", "Two.two; puts 'one'"
+      end
+
+      build_lib "two", "1.0.0" do |s|
+        s.write "lib/two.rb", <<-TWO
+          module Two
+            def self.two
+              puts 'module_two'
+            end
+          end
+          puts 'two'
+        TWO
+      end
+    end
+
+    it "works when the gems are in the Gemfile in the correct order" do
+      gemfile <<-G
+        path "#{lib_path}"
+        gem "two"
+        gem "one"
+      G
+
+      run "Bundler.require"
+      check out.should == "two\nmodule_two\none"
+    end
+
+    it "fails when the gems are in the Gemfile in the wrong order" do
+      gemfile <<-G
+        path "#{lib_path}"
+        gem "one"
+        gem "two"
+      G
+
+      run "Bundler.require", :expect_err => true
+      check err.should include("uninitialized constant Two")
+    end
+
+    describe "when locked" do
+      it "works when the gems are in the Gemfile in the correct order" do
+        gemfile <<-G
+          path "#{lib_path}"
+          gem "two"
+          gem "one"
+        G
+
+        bundle :lock
+
+        run "Bundler.require"
+        check out.should == "two\nmodule_two\none"
+      end
+
+      it "fails when the gems are in the Gemfile in the wrong order" do
+        gemfile <<-G
+          path "#{lib_path}"
+          gem "one"
+          gem "two"
+        G
+
+        bundle :lock
+
+        run "Bundler.require", :expect_err => true
+        check err.should include("uninitialized constant Two")
+      end
+    end
+  end
 end

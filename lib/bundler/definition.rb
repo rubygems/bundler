@@ -61,8 +61,8 @@ module Bundler
       end
 
       def dependencies
-        @dependencies ||= @details["dependencies"].map do |dep, opts|
-          Bundler::Dependency.new(dep, opts.delete("version"), opts)
+        @dependencies ||= @details["dependencies"].map do |opts|
+          Bundler::Dependency.new(opts.delete("name"), opts.delete("version"), opts)
         end
       end
     end
