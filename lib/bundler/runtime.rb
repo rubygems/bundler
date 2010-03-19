@@ -75,18 +75,6 @@ module Bundler
       end
     end
 
-    def specs
-      @specs ||= begin
-        source_requirements = {}
-        actual_dependencies.each do |dep|
-          next unless dep.source && dep.source.respond_to?(:local_specs)
-          source_requirements[dep.name] = dep.source.local_specs
-        end
-
-        Resolver.resolve(@definition.actual_dependencies, index, source_requirements)
-      end
-    end
-
     alias gems specs
 
     def cache
