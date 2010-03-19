@@ -153,7 +153,14 @@ describe "Bundler.require" do
   describe "order" do
     before(:each) do
       build_lib "one", "1.0.0" do |s|
-        s.write "lib/one.rb", "Two.two; puts 'one'"
+        s.write "lib/one.rb", <<-ONE
+          if defined?(Two)
+            Two.two
+          else
+            puts "two_not_loaded"
+          end
+          puts 'one'
+        ONE
       end
 
       build_lib "two", "1.0.0" do |s|
@@ -186,8 +193,8 @@ describe "Bundler.require" do
         gem "two"
       G
 
-      run "Bundler.require", :expect_err => true
-      check err.should include("uninitialized constant Two")
+      run "Bundler.require"
+      check out.should == "two_not_loaded\none\ntwo"
     end
 
     describe "when locked" do
@@ -213,8 +220,8 @@ describe "Bundler.require" do
 
         bundle :lock
 
-        run "Bundler.require", :expect_err => true
-        check err.should include("uninitialized constant Two")
+        run "Bundler.require"
+        check out.should == "two_not_loaded\none\ntwo"
       end
     end
   end
