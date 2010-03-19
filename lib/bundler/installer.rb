@@ -67,16 +67,7 @@ module Bundler
     end
 
     def resolve_remotely
-      remote_index # trigger building the index
-      Bundler.ui.info "Resolving dependencies"
-      source_requirements = {}
-      actual_dependencies.each do |dep|
-        next unless dep.source
-        source_requirements[dep.name] = dep.source.specs
-      end
-
-      specs = Resolver.resolve(actual_dependencies, remote_index, source_requirements)
-      specs
+      resolve(:specs, remote_index)
     end
 
     def ambiguous?(dep)
