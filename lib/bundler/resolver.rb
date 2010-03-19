@@ -63,7 +63,11 @@ module Bundler
     end
 
     def debug
-      puts yield if defined?($debug) && $debug
+      if ENV['DEBUG_RESOLVER']
+        debug_info = yield
+        debug_info = debug_info.inpsect unless debug_info.is_a?(String)
+        $stderr.puts debug_info
+      end
     end
 
     def resolve(reqs, activated)
@@ -71,7 +75,7 @@ module Bundler
       # gem dependencies have been resolved.
       throw :success, activated if reqs.empty?
 
-      debug { STDIN.gets ; print "\e[2J\e[f" ; "==== Iterating ====\n\n" }
+      debug { print "\e[2J\e[f" ; "==== Iterating ====\n\n" }
 
       # Sort dependencies so that the ones that are easiest to resolve are first.
       # Easiest to resolve is defined by:

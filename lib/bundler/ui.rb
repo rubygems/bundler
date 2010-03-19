@@ -17,8 +17,8 @@ module Bundler
         @shell = shell
       end
 
-      # TODO: Add debug mode
       def debug(msg)
+        @shell.say(msg) if ENV['DEBUG']
       end
 
       def info(msg)
