@@ -24,6 +24,10 @@ module Bundler
       end
     end
 
+    def specs
+      @specs ||= resolve_locally || resolve_remotely
+    end
+
   private
 
     def runtime_gems
@@ -34,6 +38,21 @@ module Bundler
 
         i.use Index.installed_gems
       end
+    end
+
+    def resolve_locally
+      source_requirements = {}
+      actual_dependencies.each do |dep|
+        next unless dep.source && dep.source.respond_to?(:local_specs)
+        source_requirements[dep.name] = dep.source.local_specs
+      end
+
+      # Run a resolve against the locally available gems
+      Resolver.resolve(actual_dependencies, index, source_requirements)
+    end
+
+    def resolve_remotely
+      raise NotImplementedError
     end
 
     def specs_for(groups)

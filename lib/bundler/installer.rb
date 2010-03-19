@@ -48,10 +48,6 @@ module Bundler
       @definition.actual_dependencies
     end
 
-    def specs
-      @specs ||= resolve_locally || resolve_remotely
-    end
-
   private
 
     def sources
@@ -62,14 +58,7 @@ module Bundler
       # Return unless all the dependencies have = version requirements
       return if actual_dependencies.any? { |d| ambiguous?(d) }
 
-      source_requirements = {}
-      actual_dependencies.each do |dep|
-        next unless dep.source && dep.source.respond_to?(:local_specs)
-        source_requirements[dep.name] = dep.source.local_specs
-      end
-
-      # Run a resolve against the locally available gems
-      specs = Resolver.resolve(actual_dependencies, index, source_requirements)
+      specs = super
 
       # Simple logic for now. Can improve later.
       specs.length == actual_dependencies.length && specs
