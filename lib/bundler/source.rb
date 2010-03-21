@@ -315,17 +315,17 @@ module Bundler
       def cache
         if cache_path.exist?
           Bundler.ui.info "Updating #{uri}"
-          in_cache { git "fetch --quiet '#{uri}' master:master" }
+          in_cache { git %|fetch --quiet "#{uri}" master:master| }
         else
           Bundler.ui.info "Fetching #{uri}"
           FileUtils.mkdir_p(cache_path.dirname)
-          git "clone '#{uri}' '#{cache_path}' --bare --no-hardlinks"
+          git %|clone "#{uri}" "#{cache_path}" --bare --no-hardlinks|
         end
       end
 
       def checkout
         unless File.exist?(path.join(".git"))
-          git "clone --no-checkout '#{cache_path}' '#{path}'"
+          git %|clone --no-checkout "#{cache_path}" "#{path}"|
         end
         Dir.chdir(path) do
           git "fetch --quiet"
