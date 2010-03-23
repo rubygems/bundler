@@ -17,7 +17,6 @@ describe "environment.rb file" do
 
     it "works with gems from git that don't have gemspecs" do
       run <<-R, :lite_runtime => true
-        `open '.bundle/environment.rb'`
         require 'no-gemspec'
         puts NOGEMSPEC
       R
