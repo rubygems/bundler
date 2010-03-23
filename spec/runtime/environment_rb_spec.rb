@@ -17,6 +17,7 @@ describe "environment.rb file" do
 
     it "works with gems from git that don't have gemspecs" do
       run <<-R, :lite_runtime => true
+        `open '.bundle/environment.rb'`
         require 'no-gemspec'
         puts NOGEMSPEC
       R
@@ -72,6 +73,37 @@ describe "environment.rb file" do
       R
 
       out.should == "rack is not part of the bundle. Add it to Gemfile."
+    end
+
+    it "sets GEM_HOME appropriately" do
+      run "puts ENV['GEM_HOME']", :lite_runtime => true
+      out.should == default_bundle_path.to_s
+    end
+
+    it "sets GEM_PATH appropriately" do
+      run "puts Gem.path", :lite_runtime => true
+      out.should == default_bundle_path.to_s
+    end
+  end
+
+  describe "with system gems in the bundle" do
+    before :each do
+      system_gems "rack-1.0.0"
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", "1.0.0"
+        gem "activesupport", "2.3.5"
+      G
+
+      bundle :lock
+    end
+
+    it "sets GEM_PATH appropriately" do
+      run "puts Gem.path", :lite_runtime => true
+      paths = out.split("\n")
+      paths.should include(system_gem_path.to_s)
+      paths.should include(default_bundle_path.to_s)
     end
   end
 
