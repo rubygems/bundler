@@ -138,7 +138,7 @@ module Bundler
     end
 
     class Path
-      attr_reader :path, :options, :default_spec
+      attr_reader :path, :options
 
       def initialize(options)
         @options = options
@@ -148,15 +148,8 @@ module Bundler
           @path = Pathname.new(options["path"]).expand_path(Bundler.root)
         end
 
-        if options["name"]
-          @default_spec = Specification.new do |s|
-            s.name     = options["name"]
-            s.source   = self
-            s.version  = Gem::Version.new(options["version"])
-            s.summary  = "Fake gemspec for #{options["name"]}"
-            s.relative_loaded_from = "#{options["name"]}.gemspec"
-          end
-        end
+        @name = options["name"]
+        @version = options["version"]
       end
 
       def to_s
@@ -178,7 +171,19 @@ module Bundler
             end
           end
 
-          index << default_spec if default_spec && index.empty?
+          if index.empty? && @name && @version
+            index << Specification.new do |s|
+              s.name     = @name
+              s.source   = self
+              s.version  = Gem::Version.new(@version)
+              s.summary  = "Fake gemspec for #{@name}"
+              s.relative_loaded_from = "#{@name}.gemspec"
+              if path.join("bin").exist?
+                binaries = path.join("bin").children.map{|c| c.basename.to_s }
+                s.executables = binaries
+              end
+            end
+          end
         else
           raise PathError, "The path `#{path}` does not exist."
         end

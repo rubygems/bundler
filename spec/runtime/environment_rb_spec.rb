@@ -7,15 +7,13 @@ describe "environment.rb file" do
       build_git "no-gemspec", :gemspec => false
 
       install_gemfile <<-G
-        source "file://#{gem_repo1}"
-
-        gem "no-gemspec", '1.0', :git => "#{lib_path('no-gemspec-1.0')}"
+        gem "no-gemspec", "1.0", :git => "#{lib_path('no-gemspec-1.0')}"
       G
 
       bundle :lock
     end
 
-    it "works with gems from git that don't have gemspecs" do
+    it "loads the library via a virtual spec" do
       run <<-R, :lite_runtime => true
         require 'no-gemspec'
         puts NOGEMSPEC

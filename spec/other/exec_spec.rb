@@ -85,36 +85,106 @@ describe "bundle exec" do
       G
 
       bundle "lock"
+      should_be_locked
       File.open(".bundle/environment.rb", 'a') { |f| f.puts "puts 'using environment.rb'" }
 
       bundle "exec rackup"
       out.should == "using environment.rb\n1.0.0"
     end
-
-    it "works when running from a random directory" do
-      install_gemfile <<-G
-        gem "rack"
-      G
-
-      bundle "lock"
-      bundle "exec 'cd #{tmp('gems')} && rackup'"
-
-      out.should == "1.0.0"
-    end
-
-    it "works with gems from a path" do
-      build_lib "fizz", :path => home("fizz") do |s|
-        s.executables = "fizz"
-      end
-
-      install_gemfile <<-G
-        gem "fizz", :path => "#{File.expand_path(home("fizz"))}"
-      G
-
-      bundle "lock"
-      bundle "exec fizz"
-      out.should == "1.0"
-    end
   end
 
+  describe "with gem binaries" do
+    describe "run from a random directory" do
+      before(:each) do
+        install_gemfile <<-G
+          gem "rack"
+        G
+      end
+
+      it "works when unlocked" do
+        bundle "exec 'cd #{tmp('gems')} && rackup'"
+        out.should == "1.0.0"
+      end
+
+      it "works when locked" do
+        bundle "lock"
+        should_be_locked
+        bundle "exec 'cd #{tmp('gems')} && rackup'"
+        out.should == "1.0.0"
+      end
+    end
+
+    describe "from gems bundled via :path" do
+      before(:each) do
+        build_lib "fizz", :path => home("fizz") do |s|
+          s.executables = "fizz"
+        end
+
+        install_gemfile <<-G
+          gem "fizz", :path => "#{File.expand_path(home("fizz"))}"
+        G
+      end
+
+      it "works when unlocked" do
+        bundle "exec fizz"
+        out.should == "1.0"
+      end
+
+      it "works when locked" do
+        bundle "lock"
+        should_be_locked
+        bundle "exec fizz"
+        out.should == "1.0"
+      end
+    end
+
+    describe "from gems bundled via :git" do
+      before(:each) do
+        build_git "fizz_git" do |s|
+          s.executables = "fizz_git"
+        end
+
+        install_gemfile <<-G
+          gem "fizz_git", :git => "#{lib_path('fizz_git-1.0')}"
+        G
+      end
+
+      it "works when unlocked" do
+        bundle "exec fizz_git"
+        out.should == "1.0"
+      end
+
+      it "works when locked" do
+        bundle "lock"
+        should_be_locked
+        bundle "exec fizz_git"
+        out.should == "1.0"
+      end
+    end
+
+    describe "from gems bundled via :git with no gemspec" do
+      before(:each) do
+        build_git "fizz_no_gemspec", :gemspec => false do |s|
+          s.executables = "fizz_no_gemspec"
+        end
+
+        install_gemfile <<-G
+          gem "fizz_no_gemspec", "1.0", :git => "#{lib_path('fizz_no_gemspec-1.0')}"
+        G
+      end
+
+      it "works when unlocked" do
+        bundle "exec fizz_no_gemspec"
+        out.should == "1.0"
+      end
+
+      it "works when locked" do
+        bundle "lock"
+        should_be_locked
+        bundle "exec fizz_no_gemspec"
+        out.should == "1.0"
+      end
+    end
+
+  end
 end

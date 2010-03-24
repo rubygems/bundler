@@ -43,5 +43,9 @@ module Spec
         out.should == "WIN" || Gem::Version.new(out).should_not == Gem::Version.new(version)
       end
     end
+
+    def should_be_locked
+      Pathname.new(".bundle/environment.rb").should exist
+    end
   end
 end
