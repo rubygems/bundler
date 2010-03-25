@@ -18,5 +18,6 @@ module Bundler
     def full_gem_path
       Pathname.new(loaded_from).dirname.expand_path
     end
+
   end
 end
