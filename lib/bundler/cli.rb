@@ -162,10 +162,14 @@ module Bundler
 
     desc "open GEM", "Opens the source directory of the given bundled gem"
     def open(name)
-      editor = ENV['EDITOR']
-      return Bundler.ui.info("To open a bundled gem, set $EDITOR") if editor.nil? || editor.empty?
-      command = "#{editor} #{locate_gem(name)}"
-      Bundler.ui.info "Could not run '#{command}'" unless system(command)
+      editor = [ENV['VISUAL'], ENV['EDITOR']].find{|e| !e.nil? && !e.empty? }
+      if editor
+        command = "#{editor} #{locate_gem(name)}"
+        success = system(command)
+        Bundler.ui.info "Could not run '#{command}'" unless success
+      else
+        Bundler.ui.info("To open a bundled gem, set $EDITOR")
+      end
     end
 
     desc "version", "Prints the bundler's version information"
