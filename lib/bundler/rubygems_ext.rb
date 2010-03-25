@@ -16,6 +16,31 @@ module Gem
     def groups
       @groups ||= []
     end
+
+    def to_gemfile(path = nil)
+      gemfile = "source :gemcutter\n"
+      gemfile << dependencies_to_gemfile(dependencies)
+      gemfile << dependencies_to_gemfile(development_dependencies, :development)
+    end
+
+  private
+
+    def dependencies_to_gemfile(dependencies, group = nil)
+      gemfile = ''
+      if dependencies.any?
+        gemfile << "group #{group} do\n" if group
+        dependencies.each do |dependency|
+          gemfile << '  ' if group
+          gemfile << %|gem "#{dependency.name}"|
+          req = dependency.requirements_list.first
+          gemfile << %|, "#{req}"| if req
+          gemfile << "\n"
+        end
+        gemfile << "end\n" if group
+      end
+      gemfile
+    end
+
   end
 
   class Dependency

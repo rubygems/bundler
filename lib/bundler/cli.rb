@@ -10,9 +10,26 @@ module Bundler
     check_unknown_options! unless ARGV.include?("exec")
 
     desc "init", "Generates a Gemfile into the current working directory"
+    method_option "gemspec", :type => :string, :banner => "Use the specified .gemspec to create the Gemfile"
     def init
+      opts = options.dup
       if File.exist?("Gemfile")
-        puts "Gemfile already exists at #{Dir.pwd}/Gemfile"
+        Bundler.ui.error "Gemfile already exists at #{Dir.pwd}/Gemfile"
+        exit 1
+      end
+
+      if opts[:gemspec]
+        gemspec = File.expand_path(opts[:gemspec])
+        unless File.exist?(gemspec)
+          Bundler.ui.error "Gem specification #{gemspec} doesn't exist"
+          exit 1
+        end
+        spec = Gem::Specification.load(gemspec)
+        puts "Writing new Gemfile to #{Dir.pwd}/Gemfile"
+        File.open('Gemfile', 'w') do |file|
+          file << "# Generated from #{gemspec}\n"
+          file << spec.to_gemfile
+        end
       else
         puts "Writing new Gemfile to #{Dir.pwd}/Gemfile"
         FileUtils.cp(File.expand_path('../templates/Gemfile', __FILE__), 'Gemfile')
