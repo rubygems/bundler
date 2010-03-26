@@ -1,8 +1,29 @@
-## 0.9.12 (???)
+## 0.9.13 (March 23, 2010)
+
+Bugfixes:
+
+  - exec command now finds binaries from gems installed via :path
+  - gem dependencies are pulled in even if their type is nil
+  - paths with spaces have double-quotes to work on Windows
+  - set GEM_PATH in environment.rb so generators work with Rails 2
+
+## 0.9.12 (March 17, 2010)
+
+  - refactoring, internal cleanup, more solid specs
+
+Features:
+
+  - check command takes a --without option
+  - check command exits 1 if the check fails
 
 Bugfixes:
 
   - perform a topological sort on resolved gems (#191)
+  - gems from git work even when paths or repos have spaces (#196)
+  - Specification#loaded_from returns a String, like Gem::Specification (#197)
+  - specs eval from inside the gem directory, even when locked 
+  - virtual gemspecs are now saved in environment.rb for use when loading
+  - unify the Installer's local index and the runtime index (#204)
 
 ## 0.9.11 (March 9, 2010)
 
