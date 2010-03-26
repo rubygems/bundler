@@ -318,7 +318,7 @@ module Bundler
       end
 
       def cache
-        if cache_path.exist?
+        if cached?
           Bundler.ui.info "Updating #{uri}"
           in_cache { git %|fetch --quiet "#{uri}" master:master| }
         else
@@ -342,7 +342,12 @@ module Bundler
         @revision ||= in_cache { git("rev-parse #{ref}").strip }
       end
 
+      def cached?
+        cache_path.exist?
+      end
+
       def in_cache(&blk)
+        cache unless cached?
         Dir.chdir(cache_path, &blk)
       end
     end
