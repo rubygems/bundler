@@ -3,8 +3,10 @@ require 'pathname'
 require 'yaml'
 require 'bundler/rubygems_ext'
 
+
 module Bundler
   VERSION = "0.9.13"
+  ORIGINAL_ENV = ENV.to_hash
 
   autoload :Definition,          'bundler/definition'
   autoload :Dependency,          'bundler/dependency'
@@ -107,6 +109,14 @@ module Bundler
 
     def settings
       @settings ||= Settings.new(root)
+    end
+
+    def with_clean_env
+      bundled_env = ENV.to_hash
+      ENV.replace(ORIGINAL_ENV)
+      yield
+    ensure
+      ENV.replace(bundled_env.to_hash)
     end
 
   private
