@@ -256,4 +256,16 @@ describe "bundle install with git sources" do
 
     should_be_installed "foo 1.0"
   end
+
+  it "notices when you change the repo url in the Gemfile" do
+    build_git "foo_one"
+    build_git "foo_two"
+    install_gemfile %|gem "foo", "1.0", :git => "#{lib_path('foo_one-1.0')}"|
+    gemfile %|gem "foo", "1.0", :git => "#{lib_path('foo_two-1.0')}"|
+    bundle :lock
+
+    err.should be_empty
+    out.should match(/could not find gem 'foo/i)
+    out.should match(/run `bundle install`/i)
+  end
 end
