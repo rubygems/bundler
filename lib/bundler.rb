@@ -99,8 +99,12 @@ module Bundler
       home.join("gems")
     end
 
+    def specs_path
+      bundle_path.join("specifications")
+    end
+
     def cache
-      bundle_path.join('cache/bundler')
+      bundle_path.join("cache/bundler")
     end
 
     def root
