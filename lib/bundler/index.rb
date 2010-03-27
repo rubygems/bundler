@@ -33,9 +33,8 @@ module Bundler
     end
 
     def initialize
-      @priority = 0
-      @cache    = {}
-      @specs    = Hash.new { |h,k| h[k] = [] }
+      @cache = {}
+      @specs = Hash.new { |h,k| h[k] = [] }
     end
 
     def initialize_copy(o)
@@ -79,10 +78,8 @@ module Bundler
 
     def use(other)
       return unless other
-      @priority -= 1
       other.each do |s|
         next if search_by_spec(s).any?
-        s.priority = @priority
         @specs[s.name] << s
       end
       self
@@ -106,7 +103,7 @@ module Bundler
           found.reject! { |spec| spec.version.prerelease? }
         end
 
-        found.sort_by {|s| [s.priority, s.version, s.platform.to_s == 'ruby' ? "\0" : s.platform.to_s] }
+        found.sort_by {|s| [s.version, s.platform.to_s == 'ruby' ? "\0" : s.platform.to_s] }
       end
     end
 

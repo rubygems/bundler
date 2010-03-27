@@ -39,49 +39,6 @@ describe "bundle install with gem sources" do
       should_be_installed "actionpack 2.3.2", "activesupport 2.3.2"
     end
 
-    it "prioritizes local gems over remote gems" do
-      build_gem 'rack', '0.0.1', :to_system => true do |s|
-        s.add_dependency "activesupport", "2.3.5"
-      end
-
-      install_gemfile <<-G
-        source "file://#{gem_repo1}"
-        gem "rack"
-      G
-
-      should_be_installed "rack 0.0.1", "activesupport 2.3.5"
-    end
-
-    it "doesn't do crazy" do
-      system_gems "rack-0.9.1"
-
-      # Remote gems:
-      #  sinatra 0.5 -> depends on rack 0.9.1
-      #  sinatra 0.9 -> depends on rack 1.0.0
-      #  sinatra 1.0 -> depends on rack 1.0.0
-      install_gemfile <<-G
-        source "file://#{gem_repo1}"
-        gem "sinatra"
-      G
-
-      should_be_installed "rack 1.0.0", "sinatra 1.0.0"
-    end
-
-    it "doesn't do more crazy" do
-      system_gems "rack-0.9.1", "sinatra-0.9"
-
-      # Remote gems:
-      #  sinatra 0.5 -> depends on rack 0.9.1
-      #  sinatra 0.9 -> depends on rack 1.0.0
-      #  sinatra 1.0 -> depends on rack 1.0.0
-      install_gemfile <<-G
-        source "file://#{gem_repo1}"
-        gem "sinatra"
-      G
-
-      should_be_installed "rack 1.0.0", "sinatra 0.9"
-    end
-
     it "works with crazy rubygem plugin stuff" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"

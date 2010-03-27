@@ -7,15 +7,10 @@ module Gem
   @loaded_stacks = Hash.new { |h,k| h[k] = [] }
 
   class Specification
-    attr_accessor :source, :location, :priority
+    attr_accessor :source, :location
 
     def load_paths
       require_paths.map {|p| File.join(full_gem_path, p) }
-    end
-
-    def priority
-      @priority = nil unless defined?(@priority)
-      @priority || -1_000_000
     end
 
     def groups
