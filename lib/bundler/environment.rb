@@ -30,6 +30,10 @@ module Bundler
 
   private
 
+    def sources
+      @definition.sources
+    end
+
     def runtime_gems
       @runtime_gems ||= Index.build do |i|
         sources.each do |s|

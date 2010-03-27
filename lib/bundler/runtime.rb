@@ -95,10 +95,6 @@ module Bundler
 
   private
 
-    def sources
-      @definition.sources
-    end
-
     def load_paths
       specs.map { |s| s.load_paths }.flatten
     end

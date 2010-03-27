@@ -80,7 +80,11 @@ module Bundler
         @specs ||= begin
           index = Index.new
 
-          Gem::SourceIndex.from_installed_gems.to_a.reverse.each do |name, spec|
+          system_paths = Gem::SourceIndex.installed_spec_directories
+          system_paths.reject!{|d| d == Bundler.specs_path.to_s }
+
+          system_index = Gem::SourceIndex.from_gems_in(*system_paths)
+          system_index.to_a.reverse.each do |name, spec|
             spec.source = self
             index << spec
           end
@@ -95,6 +99,26 @@ module Bundler
 
       def install(spec)
         Bundler.ui.debug "  * already installed; skipping"
+      end
+    end
+
+    class BundlerGems < SystemGems
+      def specs
+        @specs ||= begin
+          index = Index.new
+
+          bundle_index = Gem::SourceIndex.from_gems_in(Bundler.specs_path)
+          bundle_index.to_a.reverse.each do |name, spec|
+            spec.source = self
+            index << spec
+          end
+
+          index
+        end
+      end
+
+      def to_s
+        "bundler gems"
       end
     end
 
@@ -206,7 +230,7 @@ module Bundler
 
       def generate_bin(spec)
         gem_dir  = spec.full_gem_path
-        gem_file = nil # so we have access once after it's set in the block
+        gem_file = nil # so we have access after it's set in the block
 
         Dir.chdir(gem_dir) do
           gem_file = Gem::Builder.new(spec).build

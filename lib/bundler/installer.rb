@@ -26,18 +26,15 @@ module Bundler
           next
         end
 
-        Bundler.ui.info "Installing #{spec.name} (#{spec.version}) from #{spec.source} "
-
+        Bundler.ui.info "Bundling #{spec.name} (#{spec.version}) from #{spec.source}"
         spec.source.install(spec)
-
-        Bundler.ui.info ""
       end
 
       if locked?
         write_rb_lock
       end
 
-      Bundler.ui.confirm "Your bundle is complete!"
+      Bundler.ui.confirm "Your bundle is complete! Use `bundle show gemname` to see where a bundled gem is installed."
     end
 
     def dependencies
@@ -49,10 +46,6 @@ module Bundler
     end
 
   private
-
-    def sources
-      @definition.sources
-    end
 
     def resolve_locally
       # Return unless all the dependencies have = version requirements
