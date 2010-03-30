@@ -26,7 +26,11 @@ module Bundler
           next
         end
 
-        Bundler.ui.info "Bundling #{spec.name} (#{spec.version}) from #{spec.source}"
+        if [Source::Rubygems, Source::GemCache].include?(spec.source.class)
+          Bundler.ui.info "Installing #{spec.name} (#{spec.version}) from #{spec.source}"
+        else
+          Bundler.ui.info "Using #{spec.name} (#{spec.version}) from #{spec.source}"
+        end
         spec.source.install(spec)
       end
 
