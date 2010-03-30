@@ -143,17 +143,9 @@ module Spec
         build_gem "net_a" do |s|
           s.add_dependency "net_b"
           s.add_dependency "net_build_extensions"
-          s.write "lib/rubygems_plugin.rb", <<-R
-            require 'net_b'
-            require 'net_a'
-          R
         end
 
-        build_gem "net_b" do |s|
-          s.write "lib/rubygems_plugin.rb", <<-G
-            require 'net_b'
-          G
-        end
+        build_gem "net_b"
 
         build_gem "net_build_extensions" do |s|
           s.add_dependency "rake"
@@ -172,24 +164,12 @@ module Spec
         build_gem "net_c" do |s|
           s.add_dependency "net_a"
           s.add_dependency "net_d"
-          s.write "lib/rubygems_plugin.rb", <<-G
-            require 'net_a'
-            require 'net_d'
-            require 'net_c'
-          G
         end
 
-        build_gem "net_d" do |s|
-          s.write "lib/rubygems_plugin.rb", <<-G
-            require 'net_d'
-          G
-        end
+        build_gem "net_d"
 
         build_gem "net_e" do |s|
           s.add_dependency "net_d"
-          s.write "lib/rubygems_plugin.rb", <<-G
-            require 'net_d'
-          G
         end
       end
     end
