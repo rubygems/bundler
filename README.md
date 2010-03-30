@@ -288,7 +288,7 @@ When deploying to a server that is memory-constrained, like Dreamhost, you shoul
 
 ### Other questions
 
-Any remaining questions may be asked via IRC in [#carlhuda](irc://irc.freenode.net/carlhuda) on Freenode, or via email on the [Bundler mailing list](http://groups.google.com/group/ruby-bundler).
+Any remaining questions may be asked via IRC in [#bundler](irc://irc.freenode.net/bundler) on Freenode, or via email on the [Bundler mailing list](http://groups.google.com/group/ruby-bundler).
 
 ## Reporting bugs
 
