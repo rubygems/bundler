@@ -39,14 +39,34 @@ describe "bundle install with gem sources" do
       should_be_installed "actionpack 2.3.2", "activesupport 2.3.2"
     end
 
-    it "works with crazy rubygem plugin stuff" do
-      install_gemfile <<-G
-        source "file://#{gem_repo1}"
-        gem "net_c"
-        gem "net_e"
-      G
+    describe "with crazy rubygem plugin stuff" do
+      it "installs plugins" do
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "net_b"
+        G
 
-      should_be_installed "net_a 1.0", "net_b 1.0", "net_c 1.0", "net_d 1.0", "net_e 1.0"
+        should_be_installed "net_b 1.0"
+      end
+
+      it "installs plugins depended on by other plugins" do
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "net_a"
+        G
+
+        should_be_installed "net_a 1.0", "net_b 1.0"
+      end
+
+      it "installs multiple levels of dependencies" do
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "net_c"
+          gem "net_e"
+        G
+
+        should_be_installed "net_a 1.0", "net_b 1.0", "net_c 1.0", "net_d 1.0", "net_e 1.0"
+      end
     end
   end
 end
