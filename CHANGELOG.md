@@ -21,7 +21,7 @@ Bugfixes:
   - perform a topological sort on resolved gems (#191)
   - gems from git work even when paths or repos have spaces (#196)
   - Specification#loaded_from returns a String, like Gem::Specification (#197)
-  - specs eval from inside the gem directory, even when locked 
+  - specs eval from inside the gem directory, even when locked
   - virtual gemspecs are now saved in environment.rb for use when loading
   - unify the Installer's local index and the runtime index (#204)
 
