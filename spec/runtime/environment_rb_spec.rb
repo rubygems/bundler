@@ -105,7 +105,7 @@ describe "environment.rb file" do
   end
 
   describe "with a gemspec that requires other files" do
-    before(:each) do
+    before :each do
       build_git "bar", :gemspec => false do |s|
         s.write "lib/bar/version.rb", %{BAR_VERSION = '1.0'}
         s.write "bar.gemspec", <<-G
@@ -119,20 +119,22 @@ describe "environment.rb file" do
         G
       end
 
-      install_gemfile <<-G
-        gem "bar", :git => "#{lib_path('bar-1.0')}"
-      G
-      bundle :lock
+      gemfile %|gem "bar", :git => "#{lib_path('bar-1.0')}"|
     end
 
     it "evals each gemspec in the context of its parent directory" do
-
-      run <<-R, :lite_runtime => true
-        require 'bar'
-        puts BAR
-      R
+      bundle :install
+      bundle :lock
+      run "require 'bar'; puts BAR", :lite_runtime => true
       out.should == "1.0"
-    end
+    end if RUBY_VERSION < "1.9"
+
+    it "error if the gemspec tries a relative require" do
+      bundle :install
+      out.should include("was a LoadError")
+      out.should include("bar.gemspec")
+      out.should include("require a relative path")
+    end if RUBY_VERSION >= "1.9"
   end
 
 end
