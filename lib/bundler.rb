@@ -5,7 +5,7 @@ require 'bundler/rubygems_ext'
 
 
 module Bundler
-  VERSION = "0.9.14"
+  VERSION = "0.9.15.pre"
   ORIGINAL_ENV = ENV.to_hash
 
   autoload :Definition,          'bundler/definition'
