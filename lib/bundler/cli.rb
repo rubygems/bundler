@@ -128,7 +128,7 @@ module Bundler
         environment = Bundler.load
         Bundler.ui.info "Gems included by the bundle:"
         environment.specs.sort_by { |s| s.name }.each do |s|
-          Bundler.ui.info "  * #{s.name} (#{s.version})"
+          Bundler.ui.info "  * #{s.name} (#{s.version}#{s.git_version})"
         end
       end
     end

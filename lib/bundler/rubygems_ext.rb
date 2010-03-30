@@ -17,6 +17,14 @@ module Gem
       @groups ||= []
     end
 
+    def git_version
+      Dir.chdir(full_gem_path) do
+        rev = `git rev-parse HEAD`.strip[0...6]
+        branch = `git show-branch --no-color 2>/dev/null`.strip[/\[(.*?)\]/, 1]
+        branch.empty? ? " #{rev}" : " #{branch}-#{rev}"
+      end if File.exist?(File.join(full_gem_path, ".git"))
+    end
+
     def to_gemfile(path = nil)
       gemfile = "source :gemcutter\n"
       gemfile << dependencies_to_gemfile(dependencies)
