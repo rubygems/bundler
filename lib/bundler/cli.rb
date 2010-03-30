@@ -132,6 +132,7 @@ module Bundler
         end
       end
     end
+    map %w(list) => "show"
 
     desc "cache", "Cache all the gems to vendor/cache"
     def cache
