@@ -42,7 +42,12 @@ module Bundler
           if origin
             o << "  Conflict on: #{conflict.inspect}:\n"
             o << "    * #{conflict} (#{origin.version}) activated by #{origin.required_by.first}\n"
-            o << "    * #{requirement} required by #{requirement.required_by.first}\n"
+            o << "    * #{requirement} required"
+            if requirement.required_by.first
+              o << " by #{requirement.required_by.first}\n"
+            else
+              o << " in Gemfile\n"
+            end
           else
             o << "  #{requirement} not found in any of the sources\n"
             o << "      required by #{requirement.required_by.first}\n"
