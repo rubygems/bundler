@@ -7,8 +7,8 @@ describe "bundle check" do
       gem "rails"
     G
 
-    bundle :check
-    @exitstatus.should == 0 if @exitstatus
+    bundle :check, :exit_status => true
+    @exitstatus.should == 0
     out.should == "The Gemfile's dependencies are satisfied"
   end
 
@@ -18,9 +18,9 @@ describe "bundle check" do
       gem "rails"
     G
 
-    bundle :check
-    @exitstatus.should_not == 0 if @exitstatus
-    out.should =~ /rails \(>= 0, runtime\)/
+    bundle :check, :exit_status => true
+    @exitstatus.should == 1
+    out.should include("rails (>= 0, runtime)")
   end
 
   it "shows missing child dependencies" do
@@ -63,9 +63,9 @@ describe "bundle check" do
     G
 
     bundle "install --without foo"
-    bundle "check"
-    @exitstatus.should == 0 if @exitstatus
-    out.should == "The Gemfile's dependencies are satisfied"
+    bundle "check", :exit_status => true
+    @exitstatus.should == 0
+    out.should include("The Gemfile's dependencies are satisfied")
   end
 
   it "ensures that gems are actually installed and not just cached" do
@@ -81,15 +81,15 @@ describe "bundle check" do
       gem "rack"
     G
 
-    bundle "check"
-    @exitstatus.should == 1 if @exitstatus
+    bundle "check", :exit_status => true
     out.should include("rack (1.0.0) is cached, but not installed")
+    @exitstatus.should == 1
   end
 
   it "outputs an error when the default Gemspec is not found" do
-    bundle :check
-    @exitstatus.should_not == 0 if @exitstatus
-    out.should =~ /The default Gemfile was not found/
+    bundle :check, :exit_status => true
+    @exitstatus.should == 10
+    out.should include("The default Gemfile was not found")
   end
 
   describe "when locked" do

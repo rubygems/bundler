@@ -41,10 +41,12 @@ module Spec
 
     def bundle(cmd, options = {})
       expect_err = options.delete(:expect_err)
+      exit_status = options.delete(:exit_status)
       env = (options.delete(:env) || {}).map{|k,v| "#{k}='#{v}' "}.join
       args = options.map { |k,v| " --#{k} #{v}"}.join
       gemfile = File.expand_path('../../../bin/bundle', __FILE__)
-      sys_exec("#{env}#{Gem.ruby} -I#{lib} #{gemfile} #{cmd}#{args}", expect_err)
+      cmd = "#{env}#{Gem.ruby} -I#{lib} #{gemfile} #{cmd}#{args}"
+      exit_status ? sys_status(cmd) : sys_exec(cmd, expect_err)
     end
 
     def ruby(ruby, options = {})
@@ -56,13 +58,17 @@ module Spec
 
     def sys_exec(cmd, expect_err = false)
       require "open3"
-      input, out, err, waitthread = Open3.popen3(cmd)
+      input, out, err = Open3.popen3(cmd)
       @err = err.read.strip
       puts @err if !expect_err && $show_err && !@err.empty?
       @out = out.read.strip
-      @exitstatus = nil
-      @exitstatus = waitthread.value.to_i if waitthread
       @out
+    end
+
+    def sys_status(cmd)
+      @err = nil
+      @out = %x{#{cmd}}.strip
+      @exitstatus = $?.exitstatus
     end
 
     def config(config = nil)
