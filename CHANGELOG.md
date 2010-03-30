@@ -1,3 +1,22 @@
+## 0.9.14 (March 30, 2010)
+
+Features:
+
+  - install command output vastly improved
+    - installation message now accurate, with 'using' and 'installing'
+    - bundler gems no longer listed as 'system gems'
+  - show command output now includes sha and branch name for git gems
+  - init command now takes --gemspec option for bootstrapping gem Gemfiles
+  - Bundler.with_clean_env for shelling out to ruby scripts
+  - show command now aliased as 'list'
+  - VISUAL env var respected for GUI editors
+
+Bugfixes:
+
+  - exec command now finds binaries from gems with no gemspec
+  - note source of Gemfile resolver errors
+  - don't blow up if git urls are changed
+
 ## 0.9.13 (March 23, 2010)
 
 Bugfixes:
