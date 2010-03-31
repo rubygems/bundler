@@ -5,6 +5,11 @@ html {
 }
 
 /* line 26 */
+img {
+  border: 0;
+}
+
+/* line 29 */
 #contents {
   display: -webkit-box;
   display: -moz-box;
@@ -16,22 +21,22 @@ html {
   margin: 0 auto;
 }
 
-/* line 31 */
+/* line 34 */
 #header {
   width: 850px;
 }
-/* line 33 */
+/* line 36 */
 #header h1 {
   text-align: right;
   color: #346B8C;
 }
 
-/* line 37 */
+/* line 40 */
 .contents {
   width: 100%;
 }
 
-/* line 40 */
+/* line 43 */
 h2 {
   padding: 5px;
   margin-top: 30px;
@@ -41,7 +46,7 @@ h2 {
   width: 100%;
 }
 
-/* line 48 */
+/* line 51 */
 .bullet {
   display: -webkit-box;
   display: -moz-box;
@@ -51,14 +56,14 @@ h2 {
   -moz-box-align: center;
   padding: 10px;
 }
-/* line 52 */
+/* line 55 */
 .bullet .description {
   width: 300px;
   margin-right: 20px;
   color: #033;
   text-shadow: #aaaaaa 1px 1px 1px;
 }
-/* line 58 */
+/* line 61 */
 .bullet .description a {
   padding-top: 10px;
   padding-bottom: 5px;
@@ -67,7 +72,7 @@ h2 {
   color: #060;
   text-align: center;
 }
-/* line 66 */
+/* line 69 */
 .bullet pre {
   margin: 0;
   border-radius: 5px;
@@ -77,12 +82,12 @@ h2 {
   -moz-box-flex: 1;
 }
 
-/* line 71 */
+/* line 74 */
 .bullet:not(:nth-of-type(1)) {
   border-top: 1px solid #367F73;
 }
 
-/* line 74 */
+/* line 77 */
 .bullet:not(:nth-last-of-type(1)) {
   border-bottom: 1px solid #35658B;
 }

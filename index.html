@@ -68,6 +68,15 @@
         </div>
         <div class="bullet">
           <div class="description">
+            Put dependencies in a group, so they can
+            be ignored at install time or required
+            together in your application
+            <a href="groups.html">Learn more: Groups</a>
+          </div>
+          <pre class="sunburst">group <span class="Constant"><span class="Constant">:</span>development</span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">&quot;</span>wirble<span class="String">&quot;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;</pre>
+        </div>
+        <div class="bullet">
+          <div class="description">
             Use a gem that is stored in git
             and has a .gemspec at its root. Gemspecs with
             bins or C extensions are supported
