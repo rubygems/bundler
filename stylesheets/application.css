@@ -1,15 +1,27 @@
-/* line 22 */
+/* line 24 */
 html {
+  width: 100%;
   background-color: #eeffff;
   font-family: Helvetica, sans-serif;
 }
 
-/* line 26 */
+/* line 29 */
 img {
   border: 0;
 }
 
-/* line 29 */
+/* line 32 */
+#body {
+  display: -webkit-box;
+  display: -moz-box;
+  -webkit-box-orient: vertical;
+  -moz-box-orient: vertical;
+  -webkit-box-align: center;
+  -moz-box-align: center;
+  width: 100%;
+}
+
+/* line 36 */
 #contents {
   display: -webkit-box;
   display: -moz-box;
@@ -18,25 +30,20 @@ img {
   -webkit-box-align: center;
   -moz-box-align: center;
   width: 850px;
-  margin: 0 auto;
 }
 
-/* line 34 */
-#header {
-  width: 850px;
-}
-/* line 36 */
+/* line 41 */
 #header h1 {
   text-align: right;
   color: #346B8C;
 }
 
-/* line 40 */
+/* line 45 */
 .contents {
-  width: 100%;
+  width: 850px;
 }
 
-/* line 43 */
+/* line 48 */
 h2 {
   padding: 5px;
   margin-top: 30px;
@@ -46,8 +53,9 @@ h2 {
   width: 100%;
 }
 
-/* line 51 */
+/* line 56 */
 .bullet {
+  width: 100%;
   display: -webkit-box;
   display: -moz-box;
   -webkit-box-orient: horizontal;
@@ -56,14 +64,14 @@ h2 {
   -moz-box-align: center;
   padding: 10px;
 }
-/* line 55 */
+/* line 61 */
 .bullet .description {
   width: 300px;
   margin-right: 20px;
   color: #033;
   text-shadow: #aaaaaa 1px 1px 1px;
 }
-/* line 61 */
+/* line 67 */
 .bullet .description a {
   padding-top: 10px;
   padding-bottom: 5px;
@@ -72,7 +80,7 @@ h2 {
   color: #060;
   text-align: center;
 }
-/* line 69 */
+/* line 75 */
 .bullet pre {
   margin: 0;
   border-radius: 5px;
@@ -82,12 +90,12 @@ h2 {
   -moz-box-flex: 1;
 }
 
-/* line 74 */
+/* line 80 */
 .bullet:not(:nth-of-type(1)) {
   border-top: 1px solid #367F73;
 }
 
-/* line 77 */
+/* line 83 */
 .bullet:not(:nth-last-of-type(1)) {
   border-bottom: 1px solid #35658B;
 }
