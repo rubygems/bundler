@@ -12,13 +12,13 @@ html {
   -moz-box-orient: vertical;
   -webkit-box-align: center;
   -moz-box-align: center;
-  width: 800px;
+  width: 850px;
   margin: 0 auto;
 }
 
 /* line 31 */
 #header {
-  width: 800px;
+  width: 850px;
 }
 /* line 33 */
 #header h1 {
