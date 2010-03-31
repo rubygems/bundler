@@ -18,23 +18,33 @@
           <div class="bullet">
             <div class="description">
               Make sure all dependencies in your Gemfile are
-              available to your application. Gems may be
-              installed to system gems or BUNDLE_PATH (defaults
-              to ~/.bundle). Git repos will be checked out
-              to BUNDLE_PATH.
+              available to your application.
             </div>
-            <pre class='sunburst'>$ bundle install&#x000A;</pre>
+            <div class="how">
+              <pre class='sunburst'>$ bundle install</pre>
+              <div class="notes">
+                Gems may be
+                installed to system gems or BUNDLE_PATH (defaults
+                to ~/.bundle). Git repos will be checked out
+                to BUNDLE_PATH.
+              </div>
+            </div>
           </div>
           <div class="bullet">
             <div class="description">
               Install your dependencies to a different location
-              than BUNDLE_PATH. Further bundle commands or
-              calls to Bundler.setup or Bundler.require will
-              remember this location
+              than BUNDLE_PATH.
               <a href="bundler_setup.html">Learn More: Bundler.setup</a>
               <a href="groups.html">Learn More: Bundler.require</a>
             </div>
-            <pre class='sunburst'>$ bundle install /path&#x000A;</pre>
+            <div class="how">
+              <pre class='sunburst'>$ bundle install vendor/bundle</pre>
+              <div class="notes">
+                Further bundle commands or
+                calls to Bundler.setup or Bundler.require will
+                remember this location
+              </div>
+            </div>
           </div>
           <div class="bullet">
             <div class="description">
