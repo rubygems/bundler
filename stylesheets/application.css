@@ -75,12 +75,13 @@ h2 {
 .bullet .description a {
   padding-top: 10px;
   padding-bottom: 5px;
+  padding-right: 30px;
   text-decoration: none;
   display: block;
   color: #060;
   text-align: center;
 }
-/* line 75 */
+/* line 76 */
 .bullet .how {
   display: -webkit-box;
   display: -moz-box;
@@ -91,12 +92,12 @@ h2 {
   -webkit-box-flex: 1;
   -moz-box-flex: 1;
 }
-/* line 78 */
+/* line 79 */
 .bullet .how .notes {
   margin-top: 10px;
   color: #799;
 }
-/* line 82 */
+/* line 83 */
 .bullet pre {
   margin: 0;
   border-radius: 5px;
@@ -106,12 +107,12 @@ h2 {
   -moz-box-flex: 1;
 }
 
-/* line 87 */
+/* line 88 */
 .bullet:not(:nth-of-type(1)) {
   border-top: 1px solid #367F73;
 }
 
-/* line 90 */
+/* line 91 */
 .bullet:not(:nth-last-of-type(1)) {
   border-bottom: 1px solid #35658B;
 }

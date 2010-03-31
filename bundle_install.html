@@ -52,7 +52,27 @@
               you explicitly excluded
               <a href="groups.html">Learn More: Groups</a>
             </div>
-            <pre class='sunburst'>$ bundle install --without development test</pre>
+            <pre class='sunburst'>$ bundle install --without development test&#x000A;</pre>
+          </div>
+          <div class="bullet">
+            <div class="description">
+              Install all gems to BUNDLE_PATH, but ignore
+              gems that are installed in your system. This
+              is especially useful if you're trying to
+              package up an application with all dependencies
+              unpacked.
+            </div>
+            <div class="how">
+              <pre class='sunburst'>$bundle install vendor/bundle --without-shared-gems</pre>
+              <div class="notes">
+                By default, bundler will not try to reinstall
+                gems that are already installed in your system.
+                By specifying --without-shared-gems, you are
+                telling bundler to install all gems into the
+                BUNDLE_PATH, regardless of whether they are
+                already installed in your system
+              </div>
+            </div>
           </div>
         </div>
       </div>

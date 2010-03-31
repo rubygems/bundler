@@ -53,6 +53,7 @@
               When you're ready to share your application
               or deploy it, lock down all the versions of the gems
               you're using
+              <a href="bundle_lock.html">Learn more: bundle lock</a>
             </div>
             <pre class='sunburst'>$ bundle lock&#x000A;$ git add Gemfile.lock&#x000A;</pre>
           </div>
@@ -62,6 +63,7 @@
           <div class="bullet">
             <div class="description">
               Install the required gems
+              <a href="bundle_install.html">Learn More: bundle install</a>
             </div>
             <pre class='sunburst'>$ bundle install&#x000A;</pre>
           </div>
@@ -105,8 +107,16 @@
             <div class="description">
               Install gems to a different location
               (the default is ~/.bundle)
+              <a href="bundle_install.html">Learn More: bundle install</a>
             </div>
-            <pre class='sunburst'>$ bundle install vendor --disable-shared-gems</pre>
+            <div class="how">
+              <pre class='sunburst'>$ bundle install vendor --disable-shared-gems</pre>
+              <div class="notes">
+                By specifying --disable-shared-gems, you are telling
+                bundler to install the gems into vendor, even if
+                they are already installed in the system
+              </div>
+            </div>
           </div>
         </div>
       </div>
