@@ -69,9 +69,10 @@ h2 {
   width: 300px;
   margin-right: 20px;
   color: #033;
+  line-height: 20px;
   text-shadow: #aaaaaa 1px 1px 1px;
 }
-/* line 67 */
+/* line 68 */
 .bullet .description a {
   padding-top: 10px;
   padding-bottom: 5px;
@@ -80,7 +81,7 @@ h2 {
   color: #060;
   text-align: center;
 }
-/* line 75 */
+/* line 76 */
 .bullet pre {
   margin: 0;
   border-radius: 5px;
@@ -90,12 +91,12 @@ h2 {
   -moz-box-flex: 1;
 }
 
-/* line 80 */
+/* line 81 */
 .bullet:not(:nth-of-type(1)) {
   border-top: 1px solid #367F73;
 }
 
-/* line 83 */
+/* line 84 */
 .bullet:not(:nth-last-of-type(1)) {
   border-bottom: 1px solid #35658B;
 }
