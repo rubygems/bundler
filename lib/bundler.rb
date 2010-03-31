@@ -67,33 +67,29 @@ module Bundler
     end
 
     def setup(*groups)
-      gemfile = default_gemfile
-      load(gemfile).setup(*groups)
+      load.setup(*groups)
     end
 
     def require(*groups)
-      gemfile = default_gemfile
-      load(gemfile).require(*groups)
+      load.require(*groups)
     end
 
-    def load(gemfile = default_gemfile)
-      root = Pathname.new(gemfile).dirname
-      Runtime.new root, definition(gemfile)
+    def load
+      Runtime.new root, definition
     end
 
-    def definition(gemfile = default_gemfile)
+    def definition
       configure
-      root = Pathname.new(gemfile).dirname
       lockfile = root.join("Gemfile.lock")
       if lockfile.exist?
         Definition.from_lock(lockfile)
       else
-        Definition.from_gemfile(gemfile)
+        Definition.from_gemfile(default_gemfile)
       end
     end
 
     def home
-      Pathname.new(bundle_path).join("bundler")
+      bundle_path.join("bundler")
     end
 
     def install_path
