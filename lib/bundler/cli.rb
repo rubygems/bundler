@@ -80,7 +80,7 @@ module Bundler
       # Can't use Bundler.settings for this because settings needs gemfile.dirname
       ENV['BUNDLE_GEMFILE'] = opts[:gemfile] if opts[:gemfile]
       Bundler.settings[:path] = path if path
-      Bundler.settings[:disable_shared_gems] = '1' if options["disable-shared-gems"]
+      Bundler.settings[:disable_shared_gems] = '1' if options["disable-shared-gems"] || path
       Bundler.settings.without = opts[:without]
 
       remove_lockfiles if options[:relock]
