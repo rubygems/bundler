@@ -1,0 +1,77 @@
+/* line 22 */
+html {
+  background-color: #eeffff;
+  font-family: Helvetica, sans-serif;
+}
+
+/* line 26 */
+#contents {
+  display: -webkit-box;
+  display: -moz-box;
+  -webkit-box-orient: vertical;
+  -moz-box-orient: vertical;
+  -webkit-box-align: center;
+  -moz-box-align: center;
+  width: 800px;
+  margin: 0 auto;
+}
+
+/* line 31 */
+#header {
+  width: 800px;
+}
+/* line 33 */
+#header h1 {
+  text-align: right;
+  color: #346B8C;
+}
+
+/* line 37 */
+.contents {
+  width: 100%;
+}
+
+/* line 40 */
+h2 {
+  padding: 5px;
+  margin-top: 30px;
+  text-shadow: #aaaaaa 1px 1px 1px;
+  color: #999;
+  border-bottom: 3px solid #999;
+  width: 100%;
+}
+
+/* line 48 */
+.bullet {
+  display: -webkit-box;
+  display: -moz-box;
+  -webkit-box-orient: horizontal;
+  -moz-box-orient: horizontal;
+  -webkit-box-align: center;
+  -moz-box-align: center;
+  padding: 10px;
+}
+/* line 52 */
+.bullet .description {
+  width: 300px;
+  margin-right: 20px;
+}
+/* line 56 */
+.bullet pre {
+  margin: 0;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+}
+
+/* line 61 */
+.bullet:not(:nth-of-type(1)) {
+  border-top: 1px solid #367F73;
+}
+
+/* line 64 */
+.bullet:not(:nth-last-of-type(1)) {
+  border-bottom: 1px solid #35658B;
+}
