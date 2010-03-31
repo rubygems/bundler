@@ -2,8 +2,12 @@
 require 'bundler/shared_helpers'
 
 if Bundler::SharedHelpers.in_bundle?
-  require 'rubygems'
-  require 'bundler'
-
-  Bundler.setup
+  locked_env = Bundler::SharedHelpers.default_gemfile.join("../.bundle/environment.rb")
+  if locked_env.exist?
+    require locked_env
+  else
+    require 'rubygems'
+    require 'bundler'
+    Bundler.setup
+  end
 end

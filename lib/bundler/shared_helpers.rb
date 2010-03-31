@@ -1,3 +1,5 @@
+require 'pathname'
+
 module Gem
   class Dependency
     if !instance_methods.map { |m| m.to_s }.include?("requirement")

@@ -34,7 +34,8 @@ describe "Bundler.load" do
 
   it "raises an exception if a specified gemfile is not found" do
     lambda {
-      Bundler.load("omg.rb")
+      ENV['BUNDLE_GEMFILE'] = "omg.rb"
+      Bundler.load
     }.should raise_error(Bundler::GemfileNotFound, /omg\.rb/)
   end
 

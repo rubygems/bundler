@@ -164,14 +164,9 @@ module Bundler
       ENV['BUNDLE_GEMFILE'] = Bundler::SharedHelpers.default_gemfile.to_s
 
       # Set RUBYOPT
-      locked_env = Bundler.root.join(".bundle/environment.rb")
       rubyopt = [ENV["RUBYOPT"]].compact
-      if locked_env.exist?
-        rubyopt.unshift "-r#{locked_env.to_s}"
-      else
-        rubyopt.unshift "-rbundler/setup"
-        rubyopt.unshift "-I#{File.expand_path('../..', __FILE__)}"
-      end
+      rubyopt.unshift "-rbundler/setup"
+      rubyopt.unshift "-I#{File.expand_path('../..', __FILE__)}"
       ENV["RUBYOPT"] = rubyopt.join(' ')
 
       # Run
