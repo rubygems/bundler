@@ -198,7 +198,7 @@ h2 {
 
 /* line 138 */
 .bullet:not(:nth-of-type(1)) {
-  padding-top: 25px;
+  padding-top: 15px;
   border-top: 1px solid #ddffff;
 }
 
