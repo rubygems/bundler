@@ -109,25 +109,20 @@ h2 {
 
 /* line 81 */
 .bullet {
-  display: -webkit-box;
-  display: -moz-box;
-  -webkit-box-orient: horizontal;
-  -moz-box-orient: horizontal;
-  -webkit-box-align: start;
-  -moz-box-align: start;
   width: 100%;
   padding: 10px;
 }
-/* line 86 */
+/* line 85 */
 .bullet .description {
   text-shadow: #aaaaaa 1px 1px 1px;
-  width: 300px;
+  width: 100%;
   margin-right: 20px;
   color: #003333;
   line-height: 20px;
+  margin-bottom: 10px;
 }
 /* line 93 */
-.bullet .description a {
+.bullet a {
   padding-top: 10px;
   padding-bottom: 5px;
   padding-right: 30px;
