@@ -1,3 +1,5 @@
+require 'pathname'
+
 module Gem
   class Dependency
     if !instance_methods.map { |m| m.to_s }.include?("requirement")
@@ -10,6 +12,7 @@ end
 
 module Bundler
   module SharedHelpers
+    attr_accessor :gem_loaded
 
     def default_gemfile
       gemfile = find_gemfile
@@ -19,6 +22,10 @@ module Bundler
 
     def in_bundle?
       find_gemfile
+    end
+
+    def env_file
+      default_gemfile.dirname.join(".bundle/environment.rb")
     end
 
   private

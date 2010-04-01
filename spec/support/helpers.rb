@@ -79,9 +79,19 @@ module Spec
       path = bundled_app("Gemfile")
       path = args.shift if Pathname === args.first
       str  = args.shift || ""
-      FileUtils.mkdir_p(path.dirname.to_s)
+      path.dirname.mkpath
       File.open(path.to_s, 'w') do |f|
         f.puts str
+      end
+    end
+
+    def env_file(*args)
+      path = bundled_app(".bundle/environment.rb")
+      if args.empty?
+        path
+      else
+        str = args.shift || ""
+        File.open(path, 'w'){|f| f.puts str }
       end
     end
 

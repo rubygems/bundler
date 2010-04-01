@@ -73,7 +73,17 @@ module Bundler
     end
 
     def load
-      Runtime.new root, definition
+      if current_env_file?
+        SharedHelpers.gem_loaded = true
+        Kernel.require env_file
+        Bundler
+      else
+        runtime
+      end
+    end
+
+    def runtime
+      Runtime.new(root, definition)
     end
 
     def definition
@@ -110,6 +120,10 @@ module Bundler
       @settings ||= Settings.new(root)
     end
 
+    def env_file
+      SharedHelpers.env_file
+    end
+
     def with_clean_env
       bundled_env = ENV.to_hash
       ENV.replace(ORIGINAL_ENV)
@@ -135,6 +149,10 @@ module Bundler
       end
 
       Gem.clear_paths
+    end
+
+    def current_env_file?
+      env_file.exist? && (env_file.read(100) =~ /Bundler #{Bundler::VERSION}/)
     end
   end
 end
