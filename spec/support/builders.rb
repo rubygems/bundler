@@ -350,7 +350,7 @@ module Spec
       end
 
       def _default_files
-        { "lib/#{name}.rb" => "#{Builders.constantize(name)} = '#{version}'" }
+        @_default_files ||= { "lib/#{name}.rb" => "#{Builders.constantize(name)} = '#{version}'" }
       end
 
       def _default_path
@@ -373,10 +373,19 @@ module Spec
     class GitUpdater < LibBuilder
       def _build(options)
         libpath = options[:path] || _default_path
+
         Dir.chdir(libpath) do
+          `git checkout master`
+
+          if branch = options[:branch]
+            raise "You can't specify `master` as the branch" if branch == "master"
+            `git branch #{branch}` unless `git branch | grep #{branch}`.any?
+            `git checkout #{branch}`
+          end
+
           current_ref = `git rev-parse HEAD`.strip
-          _default_files.each do |path, content|
-            write path, "#{content}\n#{Builders.constantize(name)}_PREV_REF = '#{current_ref}'"
+          _default_files.keys.each do |path|
+            _default_files[path] << "\n#{Builders.constantize(name)}_PREV_REF = '#{current_ref}'"
           end
           super(options.merge(:path => libpath))
           `git add *`
