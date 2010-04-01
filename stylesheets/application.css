@@ -99,7 +99,6 @@ img {
 
 /* line 73 */
 h2 {
-  text-shadow: #aaaaaa 1px 1px 1px;
   padding: 5px;
   margin-top: 30px;
   color: #999999;
@@ -107,21 +106,20 @@ h2 {
   width: 100%;
 }
 
-/* line 81 */
+/* line 80 */
 .bullet {
   width: 100%;
   padding: 10px;
 }
-/* line 85 */
+/* line 84 */
 .bullet .description {
-  text-shadow: #aaaaaa 1px 1px 1px;
   width: 100%;
   margin-right: 20px;
   color: #003333;
   line-height: 20px;
   margin-bottom: 10px;
 }
-/* line 93 */
+/* line 91 */
 .bullet a {
   padding-top: 10px;
   padding-bottom: 5px;
@@ -131,7 +129,7 @@ h2 {
   color: #006600;
   text-align: center;
 }
-/* line 102 */
+/* line 100 */
 .bullet .how {
   display: -webkit-box;
   display: -moz-box;
@@ -142,12 +140,12 @@ h2 {
   -webkit-box-flex: 1;
   -moz-box-flex: 1;
 }
-/* line 105 */
+/* line 103 */
 .bullet .how .notes {
   margin-top: 10px;
   color: #779999;
 }
-/* line 109 */
+/* line 107 */
 .bullet pre {
   border-radius: 5px;
   -moz-border-radius: 5px;
@@ -157,12 +155,14 @@ h2 {
   margin: 0;
 }
 
-/* line 114 */
+/* line 112 */
 .bullet:not(:nth-of-type(1)) {
+  padding-top: 20px;
   border-top: 1px solid #cceeee;
 }
 
-/* line 117 */
+/* line 116 */
 .bullet:not(:nth-last-of-type(1)) {
+  padding-bottom: 20px;
   border-bottom: 1px solid #99cccc;
 }
