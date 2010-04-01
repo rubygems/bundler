@@ -5,23 +5,11 @@ require 'rubygems'
 require 'rubygems/specification'
 require 'bundler'
 
-spec = Gem::Specification.new do |s|
-  s.name     = "bundler"
-  s.version  = Bundler::VERSION
-  s.authors  = ["Carl Lerche", "Yehuda Katz", "André Arko"]
-  s.email    = ["carlhuda@engineyard.com"]
-  s.homepage = "http://github.com/carlhuda/bundler"
-  s.summary  = "Bundles are fun"
-
-  s.platform = Gem::Platform::RUBY
-
-  s.required_rubygems_version = ">= 1.3.6"
-
-  s.add_development_dependency "rspec"
-
-  s.files        = Dir.glob("{bin,lib}/**/*") + %w(LICENSE README.md ROADMAP.md CHANGELOG.md)
-  s.executables  = ['bundle']
-  s.require_path = 'lib'
+def gemspec
+  @gemspec ||= begin
+    file = File.expand_path('../bundler.gemspec', __FILE__)
+    eval(File.read(file), binding, file)
+  end
 end
 
 begin
@@ -95,8 +83,8 @@ begin
 rescue LoadError
   task(:gem) { $stderr.puts '`gem install rake` to package gems' }
 else
-  Rake::GemPackageTask.new(spec) do |pkg|
-    pkg.gem_spec = spec
+  Rake::GemPackageTask.new(gemspec) do |pkg|
+    pkg.gem_spec = gemspec
   end
   task :gem => :gemspec
 end
@@ -106,12 +94,10 @@ task :install => :package do
   sh %{gem install pkg/#{spec.name}-#{spec.version}}
 end
 
-desc "create a gemspec file"
+desc "validate the gemspec"
 task :gemspec do
-  File.open("#{spec.name}.gemspec", "w") do |file|
-    file.puts spec.to_ruby
-  end
+  gemspec.validate
 end
 
 task :package => :gemspec
-task :default => [:spec, :gemspec]
+task :default => :spec
