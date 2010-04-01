@@ -13,6 +13,11 @@
           </a>
           <h1>The best way to manage your application's dependencies</h1>
         </div>
+        <div id="intro">
+          Bundler manages an <strong>application's dependencies</strong> through it's
+          <strong>entire life</strong> across <strong>many machines</strong>
+          systematically and <strong>repeatably</strong>.
+        </div>
         <h2>Getting Started</h2>
         <div class="contents">
           <div class="bullet">
@@ -63,6 +68,29 @@
             <pre class='sunburst'>$ bundle lock&#x000A;$ git add Gemfile.lock</pre>
             <a href="bundle_lock.html">Learn more: bundle lock</a>
           </div>
+        </div>
+        <h2>Using Bundler with Frameworks</h2>
+        <div class="contents">
+          <div class="bullet">
+            <div class="description">
+              Bundler works out of the box with Rails 3. Once you
+              understand the basics of using bundler, you know
+              everything you need to know.
+              <a href="rails3.html">Using Bundler with Rails 3</a>
+            </div>
+          </div>
+          <div class="bullet">
+            <div class="description">
+              Bundler works with Rails 2.3 with a small change
+              to boot.rb and adding a preinitializer.rb.
+              <a href="rails23.html">Using Bundler with Rails 2.3</a>
+            </div>
+          </div>
+          <!-- .bullet -->
+          <!-- .description -->
+          <!-- Setting up Sinatra to use Bundler is as simple as -->
+          <!-- using Bundler itself. -->
+          <!-- = link("Using Bundler with Sinatra", "sinatra.html") -->
         </div>
         <h2>Checking Out an Application With a Gemfile</h2>
         <div class="contents">

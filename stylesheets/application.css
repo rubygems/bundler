@@ -11,6 +11,11 @@ img {
 }
 
 /* line 30 */
+.intro {
+  width: 100%;
+}
+
+/* line 33 */
 #body {
   display: -webkit-box;
   display: -moz-box;
@@ -21,7 +26,7 @@ img {
   width: 100%;
 }
 
-/* line 34 */
+/* line 37 */
 #contents {
   display: -webkit-box;
   display: -moz-box;
@@ -29,17 +34,35 @@ img {
   -moz-box-orient: vertical;
   -webkit-box-align: justify;
   -moz-box-align: justify;
+  width: 725px;
 }
 
-/* line 38 */
+/* line 41 */
+#intro {
+  border-top: 1px solid #336666;
+  padding-top: 10px;
+  color: #669999;
+  font-size: 18px;
+  line-height: 28px;
+}
+/* line 47 */
+#intro strong {
+  color: #336666;
+}
+
+/* line 50 */
+#header {
+  margin-bottom: 20px;
+}
+/* line 52 */
 #header h1 {
   font-size: 22px;
   text-align: right;
-  padding-right: 37px;
+  padding-right: 43px;
   color: #346b8c;
 }
 
-/* line 44 */
+/* line 58 */
 #footer {
   /* Mozilla (FireFox, Camino) */
   -moz-box-sizing: border-box;
@@ -62,7 +85,7 @@ img {
   width: 100%;
   margin-top: 25px;
 }
-/* line 53 */
+/* line 67 */
 #footer img:first-child {
   /* Webkit (Safari, Chrome) */
   -webkit-box-shadow: blue 0 0 5px;
@@ -71,33 +94,33 @@ img {
   /* CSS3 */
   box-shadow: blue 0 0 5px;
 }
-/* line 56 */
+/* line 70 */
 #footer .spacer {
   -webkit-box-flex: 1;
   -moz-box-flex: 1;
 }
-/* line 59 */
+/* line 73 */
 #footer img {
   display: block;
 }
-/* line 62 */
+/* line 76 */
 #footer p {
   font-family: Helvetica, sans-serif;
   color: #336666;
   font-size: 16px;
 }
-/* line 66 */
+/* line 80 */
 #footer p a {
   text-decoration: none;
   color: #669999;
 }
 
-/* line 70 */
+/* line 84 */
 .contents {
   width: 725px;
 }
 
-/* line 73 */
+/* line 87 */
 h2 {
   font-size: 20px;
   padding: 5px;
@@ -107,20 +130,26 @@ h2 {
   width: 100%;
 }
 
-/* line 81 */
+/* line 95 */
 .bullet {
   width: 100%;
   padding: 8px;
 }
-/* line 85 */
+/* line 99 */
 .bullet .description {
   width: 100%;
   margin-right: 16px;
   color: #003333;
-  line-height: 16px;
+  line-height: 24px;
   margin-bottom: 8px;
 }
-/* line 92 */
+/* line 105 */
+.bullet .description a {
+  display: inline;
+  color: #339933;
+  white-space: pre;
+}
+/* line 110 */
 .bullet a {
   padding-top: 8px;
   padding-bottom: 5px;
@@ -130,7 +159,7 @@ h2 {
   color: #006600;
   text-align: center;
 }
-/* line 101 */
+/* line 119 */
 .bullet .how {
   display: -webkit-box;
   display: -moz-box;
@@ -141,12 +170,12 @@ h2 {
   -webkit-box-flex: 1;
   -moz-box-flex: 1;
 }
-/* line 104 */
+/* line 122 */
 .bullet .how .notes {
   margin-top: 8px;
   color: #779999;
 }
-/* line 108 */
+/* line 126 */
 .bullet pre {
   border-radius: 5px;
   -moz-border-radius: 5px;
@@ -156,13 +185,13 @@ h2 {
   margin: 0;
 }
 
-/* line 113 */
+/* line 131 */
 .bullet:not(:nth-of-type(1)) {
   padding-top: 16px;
   border-top: 1px solid #cceeee;
 }
 
-/* line 117 */
+/* line 135 */
 .bullet:not(:nth-last-of-type(1)) {
   padding-bottom: 16px;
   border-bottom: 1px solid #99cccc;
