@@ -201,7 +201,7 @@ h2 {
 }
 
 /* line 140 */
-.bullet:not(:nth-last-of-type(1)) {
+.bullet {
   padding-bottom: 25px;
   border-bottom: 1px solid #aadddd;
 }
