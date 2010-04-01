@@ -153,7 +153,7 @@ h2 {
 .bullet a {
   padding-top: 8px;
   padding-bottom: 5px;
-  padding-right: 8px;
+  padding-right: 4px;
   text-decoration: none;
   display: block;
   color: #006600;
@@ -173,13 +173,15 @@ h2 {
 /* line 122 */
 .bullet .how .notes {
   margin-top: 15px;
+  padding-right: 4px;
+  padding-left: 4px;
   color: #779999;
 }
-/* line 125 */
+/* line 127 */
 .bullet .how .notes+ a {
   margin-top: 10px;
 }
-/* line 128 */
+/* line 130 */
 .bullet pre {
   border-radius: 5px;
   -moz-border-radius: 5px;
@@ -189,18 +191,18 @@ h2 {
   margin: 0;
 }
 
-/* line 133 */
+/* line 135 */
 .bullet:nth-child(even) {
   background-color: #d9f9f9;
 }
 
-/* line 136 */
+/* line 138 */
 .bullet:not(:nth-of-type(1)) {
   padding-top: 25px;
   border-top: 1px solid #ddffff;
 }
 
-/* line 140 */
+/* line 142 */
 .bullet {
   padding-bottom: 25px;
   border-bottom: 1px solid #aadddd;
