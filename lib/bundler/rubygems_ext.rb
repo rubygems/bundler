@@ -54,10 +54,8 @@ module Gem
   class Dependency
     attr_accessor :source, :groups
 
-    alias :to_yaml_properties_before_crazy to_yaml_properties
-
     def to_yaml_properties
-      to_yaml_properties_before_crazy.reject { |p| ["@source", "@groups"].include?(p.to_s) }
+      instance_variables.reject { |p| ["@source", "@groups"].include?(p.to_s) }
     end
   end
 end
