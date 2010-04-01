@@ -88,6 +88,7 @@ module Bundler
       Installer.install(Bundler.root, Bundler.definition, opts)
 
       lock if options[:relock]
+      cache if Bundler.root.join("vendor/cache").exist?
     rescue GemNotFound => e
       if Bundler.definition.sources.empty?
         Bundler.ui.warn "Your Gemfile doesn't have any sources. You can add one with a line like 'source :gemcutter'"
