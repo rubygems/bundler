@@ -2,10 +2,9 @@ require 'fileutils'
 require 'pathname'
 require 'yaml'
 require 'bundler/rubygems_ext'
-
+require 'bundler/version'
 
 module Bundler
-  VERSION = "0.9.15.pre"
   ORIGINAL_ENV = ENV.to_hash
 
   autoload :Definition,          'bundler/definition'
