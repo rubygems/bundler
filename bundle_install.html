@@ -34,8 +34,6 @@
             <div class="description">
               Install your dependencies to a different location
               than BUNDLE_PATH.
-              <a href="bundler_setup.html">Learn More: Bundler.setup</a>
-              <a href="groups.html">Learn More: Bundler.require</a>
             </div>
             <div class="how">
               <pre class='sunburst'>$ bundle install vendor/bundle</pre>
@@ -44,15 +42,17 @@
                 calls to Bundler.setup or Bundler.require will
                 remember this location
               </div>
+              <a href="bundler_setup.html">Learn More: Bundler.setup</a>
+              <a href="groups.html">Learn More: Bundler.require</a>
             </div>
           </div>
           <div class="bullet">
             <div class="description">
               Install all dependencies, except those in groups
               you explicitly excluded
-              <a href="groups.html">Learn More: Groups</a>
             </div>
-            <pre class='sunburst'>$ bundle install --without development test&#x000A;</pre>
+            <pre class='sunburst'>$ bundle install --without development test</pre>
+            <a href="groups.html">Learn More: Groups</a>
           </div>
           <div class="bullet">
             <div class="description">
