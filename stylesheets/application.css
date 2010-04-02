@@ -1,21 +1,22 @@
-/* line 22 */
+/* line 24 */
 html {
   width: 100%;
-  background-color: #aedee4;
+  background-color: #c6e7ec;
+  padding-top: 10px;
   font-family: Helvetica, sans-serif;
 }
 
-/* line 27 */
+/* line 31 */
 img {
   border: 0;
 }
 
-/* line 30 */
+/* line 34 */
 .intro {
   width: 100%;
 }
 
-/* line 33 */
+/* line 37 */
 #body {
   display: -webkit-box;
   display: -moz-box;
@@ -26,7 +27,7 @@ img {
   width: 100%;
 }
 
-/* line 37 */
+/* line 41 */
 #contents {
   display: -webkit-box;
   display: -moz-box;
@@ -37,24 +38,27 @@ img {
   width: 725px;
 }
 
-/* line 41 */
+/* line 45 */
 #intro {
-  border-top: 1px solid #336666;
-  padding-top: 10px;
-  color: #669999;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  padding: 10px 10px;
+  color: #043042;
   font-size: 18px;
-  line-height: 28px;
+  line-height: 24px;
 }
-/* line 47 */
+/* line 52 */
 #intro strong {
-  color: #336666;
+  color: #041f2a;
 }
 
-/* line 50 */
+/* line 55 */
 #header {
   margin-bottom: 20px;
 }
-/* line 52 */
+/* line 57 */
 #header h1 {
   font-size: 22px;
   text-align: right;
@@ -62,7 +66,7 @@ img {
   color: #346b8c;
 }
 
-/* line 58 */
+/* line 63 */
 #footer {
   /* Mozilla (FireFox, Camino) */
   -moz-box-sizing: border-box;
@@ -81,11 +85,11 @@ img {
   -webkit-box-pack: justify;
   -moz-box-pack: justify;
   padding: 8px 16px;
-  background-color: #bbcccc;
+  background-color: rgba(0, 0, 0, 0.1);
   width: 100%;
   margin-top: 25px;
 }
-/* line 67 */
+/* line 72 */
 #footer img:first-child {
   /* Webkit (Safari, Chrome) */
   -webkit-box-shadow: blue 0 0 5px;
@@ -94,48 +98,69 @@ img {
   /* CSS3 */
   box-shadow: blue 0 0 5px;
 }
-/* line 70 */
+/* line 75 */
+#footer img:last-child {
+  margin-top: -20px;
+  margin-right: -20px;
+}
+/* line 79 */
 #footer .spacer {
   -webkit-box-flex: 1;
   -moz-box-flex: 1;
 }
-/* line 73 */
+/* line 82 */
 #footer img {
   display: block;
 }
-/* line 76 */
+/* line 85 */
 #footer p {
   font-family: Helvetica, sans-serif;
   color: #336666;
   font-size: 16px;
 }
-/* line 80 */
+/* line 89 */
 #footer p a {
   text-decoration: none;
-  color: #669999;
+  color: #0e3f54;
 }
 
-/* line 84 */
+/* line 93 */
 .contents {
   width: 725px;
 }
 
-/* line 87 */
+/* line 96 */
 h2 {
   font-size: 20px;
   padding: 5px;
   margin-top: 24px;
-  color: #999999;
-  border-bottom: 3px solid #999999;
+  color: #0e3f54;
+  border-bottom: 3px solid #0e3f54;
   width: 100%;
+  /* Mozilla (FireFox, Camino) */
+  -moz-box-sizing: border-box;
+  /* Webkit (Safari, Chrome) */
+  -webkit-box-sizing: border-box;
+  /* IE (8) */
+  -ms-box-sizing: border-box;
+  /* CSS3 */
+  box-sizing: border-box;
 }
 
-/* line 95 */
+/* line 105 */
 .bullet {
   width: 100%;
-  padding: 8px;
+  padding: 8px 15px;
+  /* Mozilla (FireFox, Camino) */
+  -moz-box-sizing: border-box;
+  /* Webkit (Safari, Chrome) */
+  -webkit-box-sizing: border-box;
+  /* IE (8) */
+  -ms-box-sizing: border-box;
+  /* CSS3 */
+  box-sizing: border-box;
 }
-/* line 99 */
+/* line 110 */
 .bullet .description {
   width: 100%;
   margin-right: 16px;
@@ -143,23 +168,36 @@ h2 {
   line-height: 24px;
   margin-bottom: 8px;
 }
-/* line 105 */
+/* line 116 */
 .bullet .description a {
   display: inline;
+  padding: 0;
+  background: transparent;
   color: #339933;
   white-space: pre;
 }
-/* line 110 */
-.bullet a {
+/* line 123 */
+.bullet > a {
   padding-top: 8px;
   padding-bottom: 5px;
-  padding-right: 4px;
   text-decoration: none;
   display: block;
-  color: #006600;
-  text-align: right;
+  color: white;
+  margin: 10px 0 0 450px;
+  text-shadow: rgba(0, 0, 0, 0.3) 0 -1px 0;
+  text-align: center;
+  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0%, #6ecf36), color-stop(100%, #4e9326));
+  background-image: -moz-linear-gradient(top, #6ecf36 0%, #4e9326 100%);
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
 }
-/* line 119 */
+/* line 135 */
+.bullet > a:hover {
+  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0%, #4e9326), color-stop(100%, #35641a));
+  background-image: -moz-linear-gradient(top, #4e9326 0%, #35641a 100%);
+}
+/* line 139 */
 .bullet .how {
   display: -webkit-box;
   display: -moz-box;
@@ -169,19 +207,20 @@ h2 {
   -moz-box-align: justify;
   -webkit-box-flex: 1;
   -moz-box-flex: 1;
+  line-height: 24px;
 }
-/* line 122 */
+/* line 143 */
 .bullet .how .notes {
   margin-top: 15px;
   padding-right: 4px;
   padding-left: 4px;
-  color: #446666;
+  color: #003333;
 }
-/* line 127 */
+/* line 148 */
 .bullet .how .notes+ a {
   margin-top: 10px;
 }
-/* line 130 */
+/* line 151 */
 .bullet pre {
   border-radius: 5px;
   -moz-border-radius: 5px;
@@ -191,19 +230,30 @@ h2 {
   margin: 0;
 }
 
-/* line 135 */
+/* line 156 */
 .bullet:nth-child(even) {
-  background-color: #d9f9f9;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-/* line 138 */
+/* line 161 */
 .bullet:not(:nth-of-type(1)) {
   padding-top: 15px;
-  border-top: 1px solid #ddffff;
 }
 
-/* line 142 */
+/* line 164 */
 .bullet {
   padding-bottom: 25px;
-  border-bottom: 1px solid #aadddd;
+}
+
+/* line 169 */
+#credits p {
+  text-align: center;
+  font-size: 8pt;
+  color: #668493;
+}
+/* line 173 */
+#credits p a {
+  color: #2c596b;
 }
