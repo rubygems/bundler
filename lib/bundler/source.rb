@@ -277,7 +277,6 @@ module Bundler
       def initialize(options)
         super
         @uri    = options["uri"]
-        @branch = options["branch"] || "master"
         @ref    = options["ref"] || options["branch"] || options["tag"] || 'master'
       end
 
@@ -354,7 +353,7 @@ module Bundler
       def cache
         if cached?
           Bundler.ui.info "Updating #{uri}"
-          in_cache { git %|fetch --quiet "#{uri}" #{@branch}:#{@branch}| }
+          in_cache { git %|fetch --quiet "#{uri}" refs/heads/*:refs/heads/*| }
         else
           Bundler.ui.info "Fetching #{uri}"
           FileUtils.mkdir_p(cache_path.dirname)
