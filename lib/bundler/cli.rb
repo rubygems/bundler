@@ -44,7 +44,7 @@ module Bundler
 
     desc "check", "Checks if the dependencies listed in Gemfile are satisfied by currently installed gems"
     def check
-      env = Bundler.load
+      env = Bundler.runtime
       # Check top level dependencies
       missing = env.dependencies.select { |d| env.index.search(d).empty? }
       if missing.any?
@@ -103,8 +103,7 @@ module Bundler
         remove_lockfiles
       end
 
-      environment = Bundler.load
-      environment.lock
+      Bundler.runtime.lock
     rescue GemNotFound, VersionConflict => e
       Bundler.ui.error(e.message)
       Bundler.ui.info "Run `bundle install` to install missing gems"
@@ -126,9 +125,8 @@ module Bundler
       if gem_name
         Bundler.ui.info locate_gem(gem_name)
       else
-        environment = Bundler.load
         Bundler.ui.info "Gems included by the bundle:"
-        environment.specs.sort_by { |s| s.name }.each do |s|
+        Bundler.runtime.specs.sort_by { |s| s.name }.each do |s|
           Bundler.ui.info "  * #{s.name} (#{s.version}#{s.git_version})"
         end
       end
@@ -203,7 +201,7 @@ module Bundler
     end
 
     def locate_gem(name)
-      spec = Bundler.load.specs.find{|s| s.name == name }
+      spec = Bundler.runtime.specs.find{|s| s.name == name }
       raise GemNotFound, "Could not find gem '#{name}' in the current bundle." unless spec
       spec.full_gem_path
     end
