@@ -371,16 +371,27 @@ module Spec
     end
 
     class GitUpdater < LibBuilder
+      WINDOWS = Config::CONFIG["host_os"] =~ %r!(msdos|mswin|djgpp|mingw)!
+      NULL    = WINDOWS ? "NUL" : "/dev/null"
+
+      def silently(str)
+        `#{str} 2>#{NULL}`
+      end
+
       def _build(options)
         libpath = options[:path] || _default_path
 
         Dir.chdir(libpath) do
-          `git checkout master`
+          silently "git checkout master"
 
           if branch = options[:branch]
             raise "You can't specify `master` as the branch" if branch == "master"
-            `git branch #{branch}` unless `git branch | grep #{branch}`.any?
-            `git checkout #{branch}`
+
+            unless `git branch | grep #{branch}`.any?
+              silently("git branch #{branch}")
+            end
+
+            silently("git checkout #{branch}")
           end
 
           current_ref = `git rev-parse HEAD`.strip
