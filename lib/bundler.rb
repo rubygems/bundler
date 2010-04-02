@@ -43,6 +43,7 @@ module Bundler
   class DeprecatedMethod < BundlerError; status_code(12) ; end
   class DeprecatedOption < BundlerError; status_code(12) ; end
   class GemspecError     < BundlerError; status_code(14) ; end
+  class InvalidOption    < BundlerError; status_code(15) ; end
 
   class << self
     attr_writer :ui, :bundle_path
