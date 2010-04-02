@@ -98,6 +98,14 @@ module Bundler
     def _normalize_options(name, version, opts)
       _normalize_hash(opts)
 
+      invalid_keys = opts.keys - %w(group git path name branch ref tag require)
+      if invalid_keys.any?
+        plural = invalid_keys.size > 1
+        raise InvalidOption, "You passed #{invalid_keys.join(", ")} " \
+          "#{plural ? 'as options, but they are' : 'as an option, but it is'}" \
+          " invalid"
+      end
+
       group = opts.delete("group") || @group
 
       # Normalize git and path options

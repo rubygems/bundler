@@ -42,6 +42,7 @@ module Bundler
   class GitError         < BundlerError; status_code(11) ; end
   class DeprecatedMethod < BundlerError; status_code(12) ; end
   class DeprecatedOption < BundlerError; status_code(12) ; end
+  class InvalidOption    < BundlerError; status_code(15) ; end
 
   class << self
     attr_writer :ui, :bundle_path
