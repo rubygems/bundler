@@ -18,11 +18,10 @@ module Gem
     end
 
     def git_version
-      Dir.chdir(full_gem_path) do
-        rev = `git rev-parse HEAD`.strip[0...6]
-        branch = `git show-branch --no-color 2>/dev/null`.strip[/\[(.*?)\]/, 1]
-        branch.empty? ? " #{rev}" : " #{branch}-#{rev}"
-      end if File.exist?(File.join(full_gem_path, ".git"))
+      if File.exist?(File.join(full_gem_path, ".git"))
+        rev, branch = full_gem_path.split("-")[2..-1]
+        branch ? " #{branch}-#{rev[0...6]}" : " #{rev[0...6]}"
+      end
     end
 
     def to_gemfile(path = nil)
