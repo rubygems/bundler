@@ -65,4 +65,14 @@ describe "bundle show with a git repo" do
     bundle :show
     out.should include("foo (1.0 omg-#{@revision}")
   end
+
+  it "doesn't print the branch when tied to a ref" do
+    sha = revision_for(lib_path("foo-1.0"))
+    install_gemfile <<-G
+      gem "foo", :git => "#{lib_path('foo-1.0')}", :ref => "#{sha}"
+    G
+
+    bundle :show
+    out.should include("foo (1.0 #{sha[0...6]})")
+  end
 end

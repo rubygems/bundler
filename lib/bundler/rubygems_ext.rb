@@ -19,9 +19,9 @@ module Gem
 
     def git_version
       if @loaded_from && File.exist?(File.join(full_gem_path, ".git"))
-        rev = Dir.chdir(full_gem_path){ `git rev-parse HEAD`.strip }
+        sha = Dir.chdir(full_gem_path){ `git rev-parse HEAD`.strip }
         branch = full_gem_path.split("-")[3]
-        branch ? " #{branch}-#{rev[0...6]}" : " #{rev[0...6]}"
+        (branch && branch != sha) ? " #{branch}-#{sha[0...6]}" : " #{sha[0...6]}"
       end
     end
 
