@@ -168,16 +168,8 @@ h2 {
   line-height: 24px;
   margin-bottom: 8px;
 }
-/* line 116 */
-.bullet .description a {
-  display: inline;
-  padding: 0;
-  background: transparent;
-  color: #339933;
-  white-space: pre;
-}
-/* line 123 */
-.bullet > a {
+/* line 117 */
+.bullet a {
   padding-top: 8px;
   padding-bottom: 5px;
   text-decoration: none;
@@ -192,12 +184,12 @@ h2 {
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
 }
-/* line 135 */
-.bullet > a:hover {
+/* line 129 */
+.bullet a:hover {
   background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0%, #4e9326), color-stop(100%, #35641a));
   background-image: -moz-linear-gradient(top, #4e9326 0%, #35641a 100%);
 }
-/* line 139 */
+/* line 133 */
 .bullet .how {
   display: -webkit-box;
   display: -moz-box;
@@ -209,18 +201,18 @@ h2 {
   -moz-box-flex: 1;
   line-height: 24px;
 }
-/* line 143 */
+/* line 137 */
 .bullet .how .notes {
   margin-top: 15px;
   padding-right: 4px;
   padding-left: 4px;
   color: #003333;
 }
-/* line 148 */
+/* line 142 */
 .bullet .how .notes+ a {
   margin-top: 10px;
 }
-/* line 151 */
+/* line 145 */
 .bullet pre {
   border-radius: 5px;
   -moz-border-radius: 5px;
@@ -230,30 +222,38 @@ h2 {
   margin: 0;
 }
 
-/* line 156 */
+/* line 150 */
 .bullet:nth-child(even) {
   background-color: rgba(0, 0, 0, 0.1);
   border-top: 1px solid rgba(0, 0, 0, 0.1);
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-/* line 161 */
+/* line 155 */
 .bullet:not(:nth-of-type(1)) {
   padding-top: 15px;
 }
 
-/* line 164 */
+/* line 158 */
 .bullet {
   padding-bottom: 25px;
 }
 
-/* line 169 */
+/* line 163 */
 #credits p {
   text-align: center;
   font-size: 8pt;
   color: #668493;
 }
-/* line 173 */
+/* line 167 */
 #credits p a {
   color: #2c596b;
+}
+
+/* line 171 */
+#github img {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: 0;
 }
