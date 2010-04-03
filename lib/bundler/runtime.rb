@@ -64,7 +64,7 @@ module Bundler
       FileUtils.mkdir_p("#{root}/.bundle")
       write_yml_lock
       write_rb_lock
-      Bundler.ui.info("The bundle is now locked. Use `bundle show` to list the gems in the environment.")
+      Bundler.ui.confirm("The bundle is now locked. Use `bundle show` to list the gems in the environment.")
     end
 
     def dependencies_for(*groups)

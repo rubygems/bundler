@@ -86,10 +86,10 @@ describe "bundle check" do
     @exitstatus.should == 1
   end
 
-  it "outputs an error when the default Gemspec is not found" do
+  it "outputs an error when the default Gemfile is not found" do
     bundle :check, :exit_status => true
     @exitstatus.should == 10
-    out.should include("The default Gemfile was not found")
+    out.should include("Could not locate Gemfile")
   end
 
   describe "when locked" do

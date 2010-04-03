@@ -11,7 +11,7 @@ describe "bundle install with deprecated features" do
     G
 
     bundle :install
-    out.should =~ /You passed lib as an option, but it is invalid/
+    out.should =~ /You passed :lib as an option for gem 'rack', but it is invalid/
   end
 
 end

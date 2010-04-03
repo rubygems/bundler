@@ -52,14 +52,14 @@ module Bundler
         missing.each do |d|
           Bundler.ui.error "  * #{d}"
         end
-        Bundler.ui.error "Try running `bundle install`"
+        Bundler.ui.warn "Install missing gems with `bundle install`"
         exit 1
       else
         not_installed = env.requested_specs.select { |spec| !spec.loaded_from }
 
         if not_installed.any?
           not_installed.each { |s| Bundler.ui.error "#{s.name} (#{s.version}) is cached, but not installed" }
-          Bundler.ui.error "Try running `bundle install`"
+          Bundler.ui.warn "Install missing gems with `bundle install`"
           exit 1
         else
           Bundler.ui.info "The Gemfile's dependencies are satisfied"
@@ -138,7 +138,7 @@ module Bundler
       Bundler.runtime.cache
     rescue GemNotFound => e
       Bundler.ui.error(e.message)
-      Bundler.ui.info "Run `bundle install` to install missing gems."
+      Bundler.ui.warn "Run `bundle install` to install missing gems."
       exit 128
     end
 
@@ -172,6 +172,7 @@ module Bundler
         Kernel.exec *ARGV
       rescue Errno::ENOENT
         Bundler.ui.error "bundler: command not found: #{ARGV.first}"
+        Bundler.ui.warn  "Install missing gem binaries with `bundle install`"
       end
     end
 

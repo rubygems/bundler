@@ -16,7 +16,7 @@ module Bundler
 
     def default_gemfile
       gemfile = find_gemfile
-      gemfile or raise GemfileNotFound, "The default Gemfile was not found"
+      gemfile or raise GemfileNotFound, "Could not locate Gemfile"
       Pathname.new(gemfile)
     end
 
