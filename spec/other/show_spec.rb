@@ -39,10 +39,6 @@ end
 describe "bundle show with a git repo" do
   before :each do
     build_git "foo", "1.0"
-    update_git "foo", :branch => "omg" do |s|
-      s.write "lib/foo.rb", "FOO = '1.0.omg'"
-    end
-    update_git "foo" # switch back to master branch
   end
 
   it "prints out git info" do
@@ -50,16 +46,23 @@ describe "bundle show with a git repo" do
       gem "foo", :git => "#{lib_path('foo-1.0')}"
     G
     should_be_installed "foo 1.0"
+
     bundle :show
-    out.should include("foo (1.0 master-")
+    out.should include("foo (1.0 master-#{@revision}")
   end
 
   it "prints out branch names other than master" do
+    update_git "foo", :branch => "omg" do |s|
+      s.write "lib/foo.rb", "FOO = '1.0.omg'"
+    end
+    @revision = revision_for(lib_path("foo-1.0"))[0...6]
+
     install_gemfile <<-G
       gem "foo", :git => "#{lib_path('foo-1.0')}", :branch => "omg"
     G
     should_be_installed "foo 1.0.omg"
+
     bundle :show
-    out.should include("foo (1.0 omg-")
+    out.should include("foo (1.0 omg-#{@revision}")
   end
 end

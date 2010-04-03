@@ -19,7 +19,8 @@ module Gem
 
     def git_version
       if File.exist?(File.join(full_gem_path, ".git"))
-        rev, branch = full_gem_path.split("-")[2..-1]
+        rev = Dir.chdir(full_gem_path){ `git rev-parse HEAD`.strip }
+        branch = full_gem_path.split("-")[3]
         branch ? " #{branch}-#{rev[0...6]}" : " #{rev[0...6]}"
       end
     end
