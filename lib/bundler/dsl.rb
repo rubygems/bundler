@@ -66,7 +66,7 @@ module Bundler
 
     def self.deprecate(name)
       define_method(name) do |*|
-        raise DeprecatedMethod, "#{name} is removed. See the README for more information"
+        raise DeprecatedMethod, "#{name} has been removed from the Gemfile DSL. See the README for more information on upgrading from Bundler 0.8."
       end
     end
 

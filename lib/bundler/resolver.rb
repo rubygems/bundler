@@ -148,18 +148,19 @@ module Bundler
               versions = @source_requirements[name][name].map { |s| s.version }
               message  = "Could not find gem '#{current}' in #{current.source}.\n"
               if versions.any?
-                message << "Source contains '#{current.name}' at: #{versions.join(', ')}"
+                message << "Source contains '#{name}' at: #{versions.join(', ')}"
               else
                 message << "Source does not contain any versions of '#{current}'"
               end
-
-              raise GemNotFound, message
             else
-              raise GemNotFound, "Could not find gem '#{current}' in any of the sources."
+              message = "Could not find gem '#{current}' "
+              if @index.sources.include?(Bundler::Source::Rubygems)
+                message << "in any of the gem sources."
+              else
+                message << "in the gems available on this machine."
+              end
             end
-            location = current.source ? current.source.to_s : "any of the sources"
-            raise GemNotFound, "Could not find gem '#{current}' in #{location}.\n" \
-              "Source contains fo"
+            raise GemNotFound, message
           else
             @errors[current.name] = [nil, current]
           end

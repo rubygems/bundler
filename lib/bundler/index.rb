@@ -68,6 +68,12 @@ module Bundler
       end
     end
 
+    def sources
+      @specs.values.map do |specs|
+        specs.map{|s| s.source.class }
+      end.flatten.uniq
+    end
+
     alias [] search
 
     def <<(spec)

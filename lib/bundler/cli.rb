@@ -106,11 +106,11 @@ module Bundler
       Bundler.runtime.lock
     rescue GemNotFound, VersionConflict => e
       Bundler.ui.error(e.message)
-      Bundler.ui.info "Run `bundle install` to install missing gems"
+      Bundler.ui.warn "Run `bundle install` to install missing gems."
       exit 128
     end
 
-    desc "unlock", "Unlock the bundle. This allows gem versions to be changed"
+    desc "unlock", "Unlock the bundle. This allows gem versions to be changed."
     def unlock
       if locked?
         remove_lockfiles
