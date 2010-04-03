@@ -114,24 +114,7 @@ module Spec
         end
 
         build_gem "very_simple_binary" do |s|
-          s.require_paths << 'ext'
-          s.extensions << "ext/extconf.rb"
-          s.write "ext/extconf.rb", <<-RUBY
-            require "mkmf"
-
-            exit 1 unless with_config("simple")
-
-            extension_name = "very_simple_binary_c"
-            dir_config extension_name
-            create_makefile extension_name
-          RUBY
-          s.write "ext/very_simple_binary.c", <<-C
-            #include "ruby.h"
-
-            void Init_very_simple_binary_c() {
-              rb_define_module("VerySimpleBinaryInC");
-            }
-          C
+          s.add_c_extension
         end
 
         build_gem "bundler", "0.8.1" do |s|
@@ -332,6 +315,27 @@ module Spec
           write "bin/#{file}", "require '#{@name}' ; puts #{@name.upcase}"
         end
         @spec.executables = Array(val)
+      end
+
+      def add_c_extension
+        require_paths << 'ext'
+        extensions << "ext/extconf.rb"
+        write "ext/extconf.rb", <<-RUBY
+          require "mkmf"
+
+          # exit 1 unless with_config("simple")
+
+          extension_name = "very_simple_binary_c"
+          dir_config extension_name
+          create_makefile extension_name
+        RUBY
+        write "ext/very_simple_binary.c", <<-C
+          #include "ruby.h"
+
+          void Init_very_simple_binary_c() {
+            rb_define_module("VerySimpleBinaryInC");
+          }
+        C
       end
 
       def _build(options)
