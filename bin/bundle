@@ -14,4 +14,7 @@ begin
 rescue Bundler::BundlerError => e
   Bundler.ui.error e.message
   exit e.status_code
+rescue Interrupt
+  Bundler.ui.error "\nQuitting..."
+  exit 1
 end
