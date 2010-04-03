@@ -167,8 +167,12 @@ module Bundler
       rubyopt.unshift "-I#{File.expand_path('../..', __FILE__)}"
       ENV["RUBYOPT"] = rubyopt.join(' ')
 
-      # Run
-      Kernel.exec *ARGV
+      begin
+        # Run
+        Kernel.exec *ARGV
+      rescue Errno::ENOENT
+        Bundler.ui.error "bundler: command not found: #{ARGV.first}"
+      end
     end
 
     desc "open GEM", "Opens the source directory of the given bundled gem"
