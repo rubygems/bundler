@@ -9,6 +9,11 @@ if Bundler::SharedHelpers.in_bundle?
   else
     require 'rubygems'
     require 'bundler'
-    Bundler.setup
+    begin
+      Bundler.setup
+    rescue Bundler::BundlerError => e
+      puts "\e[31m#{e.message}\e[0m"
+      exit e.status_code
+    end
   end
 end
