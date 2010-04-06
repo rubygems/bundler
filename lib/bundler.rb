@@ -70,7 +70,7 @@ module Bundler
     end
 
     def require(*groups)
-      load.require(*groups)
+      setup(*groups).require(*groups)
     end
 
     def load

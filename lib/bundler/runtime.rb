@@ -15,7 +15,9 @@ module Bundler
       # Has to happen first
       clean_load_path
 
-      specs = groups.any? ? specs_for(groups) : requested_specs
+      unloaded = groups - (@loaded_groups || [])
+      @loaded_groups = groups | (@loaded_groups || [])
+      specs = unloaded.any? ? specs_for(unloaded) : requested_specs
 
       cripple_rubygems(specs)
 
@@ -26,7 +28,9 @@ module Bundler
         end
 
         Gem.loaded_specs[spec.name] = spec
-        $LOAD_PATH.unshift(*spec.load_paths)
+        spec.load_paths.each do |path|
+          $LOAD_PATH.unshift(path) unless $LOAD_PATH.include?(path)
+        end
       end
       self
     end
