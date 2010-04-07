@@ -37,6 +37,8 @@ module Bundler
         current.resolved_dependencies << td
       end
 
+      current.dependencies.replace(target.dependencies)
+
       current
     end
 

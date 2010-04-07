@@ -11,7 +11,7 @@ describe "bundle install --flex" do
     should_be_locked
   end
 
-  it "allows install even when the lockfile is invalid" do
+  it "installs even when the lockfile is invalid" do
     flex_install_gemfile <<-G
       source "file://#{gem_repo1}"
       gem 'rack'
@@ -30,8 +30,7 @@ describe "bundle install --flex" do
     should_be_locked
   end
 
-  it "does awesome" do
-    pending
+  it "installs added gems without updating previously installed gems" do
     build_repo2
 
     flex_install_gemfile <<-G
