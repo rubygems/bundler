@@ -31,11 +31,12 @@ module Gem
       gemfile << dependencies_to_gemfile(development_dependencies, :development)
     end
 
-    def add_bundler_dependencies
+    def add_bundler_dependencies(*groups)
+      groups = [:default] if groups.empty?
       Bundler.definition.dependencies.each do |dep|
         if dep.groups.include?(:development)
           self.add_development_dependency(dep.name, dep.requirement.to_s)
-        else
+        elsif (dep.groups & groups).any?
           self.add_dependency(dep.name, dep.requirement.to_s)
         end
       end
