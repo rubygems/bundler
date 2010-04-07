@@ -43,7 +43,9 @@ module Spec
       expect_err = options.delete(:expect_err)
       exit_status = options.delete(:exit_status)
       env = (options.delete(:env) || {}).map{|k,v| "#{k}='#{v}' "}.join
-      args = options.map { |k,v| " --#{k} #{v}"}.join
+      args = options.map do |k,v|
+        v == true ? " --#{k}" : " --#{k} #{v}"
+      end.join
       gemfile = File.expand_path('../../../bin/bundle', __FILE__)
       cmd = "#{env}#{Gem.ruby} -I#{lib} #{gemfile} #{cmd}#{args}"
       exit_status ? sys_status(cmd) : sys_exec(cmd, expect_err)
@@ -105,6 +107,12 @@ module Spec
       gemfile(*args)
       opts = args.last.is_a?(Hash) ? args.last : {}
       bundle :install, opts
+    end
+
+    def flex_install_gemfile(*args)
+      gemfile(*args)
+      opts = args.last.is_a?(Hash) ? args.last : {}
+      bundle :flex_install, opts
     end
 
     def install_gems(*gems)
