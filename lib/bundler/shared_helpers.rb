@@ -12,15 +12,20 @@ end
 
 module Bundler
   module SharedHelpers
+    attr_accessor :gem_loaded
 
     def default_gemfile
       gemfile = find_gemfile
-      gemfile or raise GemfileNotFound, "The default Gemfile was not found"
+      gemfile or raise GemfileNotFound, "Could not locate Gemfile"
       Pathname.new(gemfile)
     end
 
     def in_bundle?
       find_gemfile
+    end
+
+    def env_file
+      default_gemfile.dirname.join(".bundle/environment.rb")
     end
 
   private

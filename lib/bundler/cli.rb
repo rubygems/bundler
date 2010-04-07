@@ -44,7 +44,7 @@ module Bundler
 
     desc "check", "Checks if the dependencies listed in Gemfile are satisfied by currently installed gems"
     def check
-      env = Bundler.load
+      env = Bundler.runtime
       # Check top level dependencies
       missing = env.dependencies.select { |d| env.index.search(d).empty? }
       if missing.any?
@@ -52,14 +52,14 @@ module Bundler
         missing.each do |d|
           Bundler.ui.error "  * #{d}"
         end
-        Bundler.ui.error "Try running `bundle install`"
+        Bundler.ui.warn "Install missing gems with `bundle install`"
         exit 1
       else
         not_installed = env.requested_specs.select { |spec| !spec.loaded_from }
 
         if not_installed.any?
           not_installed.each { |s| Bundler.ui.error "#{s.name} (#{s.version}) is cached, but not installed" }
-          Bundler.ui.error "Try running `bundle install`"
+          Bundler.ui.warn "Install missing gems with `bundle install`"
           exit 1
         else
           Bundler.ui.info "The Gemfile's dependencies are satisfied"
@@ -88,6 +88,7 @@ module Bundler
       Installer.install(Bundler.root, Bundler.definition, opts)
 
       lock if options[:relock]
+      cache if Bundler.root.join("vendor/cache").exist?
     rescue GemNotFound => e
       if Bundler.definition.sources.empty?
         Bundler.ui.warn "Your Gemfile doesn't have any sources. You can add one with a line like 'source :gemcutter'"
@@ -102,15 +103,14 @@ module Bundler
         remove_lockfiles
       end
 
-      environment = Bundler.load
-      environment.lock
+      Bundler.runtime.lock
     rescue GemNotFound, VersionConflict => e
       Bundler.ui.error(e.message)
-      Bundler.ui.info "Run `bundle install` to install missing gems"
+      Bundler.ui.warn "Run `bundle install` to install missing gems."
       exit 128
     end
 
-    desc "unlock", "Unlock the bundle. This allows gem versions to be changed"
+    desc "unlock", "Unlock the bundle. This allows gem versions to be changed."
     def unlock
       if locked?
         remove_lockfiles
@@ -125,9 +125,8 @@ module Bundler
       if gem_name
         Bundler.ui.info locate_gem(gem_name)
       else
-        environment = Bundler.load
         Bundler.ui.info "Gems included by the bundle:"
-        environment.specs.sort_by { |s| s.name }.each do |s|
+        Bundler.runtime.specs.sort_by { |s| s.name }.each do |s|
           Bundler.ui.info "  * #{s.name} (#{s.version}#{s.git_version})"
         end
       end
@@ -136,11 +135,10 @@ module Bundler
 
     desc "cache", "Cache all the gems to vendor/cache"
     def cache
-      environment = Bundler.load
-      environment.cache
+      Bundler.runtime.cache
     rescue GemNotFound => e
       Bundler.ui.error(e.message)
-      Bundler.ui.info "Run `bundle install` to install missing gems."
+      Bundler.ui.warn "Run `bundle install` to install missing gems."
       exit 128
     end
 
@@ -169,8 +167,13 @@ module Bundler
       rubyopt.unshift "-I#{File.expand_path('../..', __FILE__)}"
       ENV["RUBYOPT"] = rubyopt.join(' ')
 
-      # Run
-      Kernel.exec *ARGV
+      begin
+        # Run
+        Kernel.exec *ARGV
+      rescue Errno::ENOENT
+        Bundler.ui.error "bundler: command not found: #{ARGV.first}"
+        Bundler.ui.warn  "Install missing gem binaries with `bundle install`"
+      end
     end
 
     desc "open GEM", "Opens the source directory of the given bundled gem"
@@ -203,7 +206,7 @@ module Bundler
     end
 
     def locate_gem(name)
-      spec = Bundler.load.specs.find{|s| s.name == name }
+      spec = Bundler.runtime.specs.find{|s| s.name == name }
       raise GemNotFound, "Could not find gem '#{name}' in the current bundle." unless spec
       spec.full_gem_path
     end

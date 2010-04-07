@@ -29,7 +29,7 @@ describe "Bundler.load" do
   it "raises an exception if the default gemfile is not found" do
     lambda {
       Bundler.load
-    }.should raise_error(Bundler::GemfileNotFound, /default/)
+    }.should raise_error(Bundler::GemfileNotFound, /could not locate gemfile/i)
   end
 
   it "raises an exception if a specified gemfile is not found" do

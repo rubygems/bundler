@@ -6,169 +6,11 @@ and all child dependencies specified in this manifest. It can manage any update
 to the gem manifest file and update the bundle's gems accordingly. It also lets
 you run any ruby code in context of the bundle's gem environment.
 
-## Installation
+## Installation and usage
 
-If you are upgrading from Bundler 0.8, be sure to read the upgrade notes
-located at the bottom of this file.
+See [gembundler.com](http://gembundler.com) for up-to-date installation and usage instructions
 
-Bundler has no dependencies besides Ruby and RubyGems. You can install the
-latest release via RubyGems:
-
-    gem install bundler
-
-If you want to contribute, or need a change that hasn't been released yet,
-just clone the git repository and install the gem with rake:
-
-    rake install
-
-## Usage
-
-The first thing to do is create a gem manifest file named `Gemfile` at the
-root directory of your application. This can quickly be done by running
-`bundle init` in the directory that you wish the Gemfile to be created in.
-
-### Gemfile
-
-This is where you specify all of your application's dependencies. The
-following is an example. For more information, refer to Bundler::Dsl.
-
-    # Add :gemcutter as a source that Bundler will use to find gems listed
-    # in the manifest. At least one source should be listed. URLs may also
-    # be used, such as http://gems.github.com.
-    #
-    source :gemcutter
-
-    # Specify a dependency on rails. When bundler downloads gems,
-    # it will download rails as well as all of rails' dependencies
-    # (such as activerecord, actionpack, etc...)
-    #
-    # At least one dependency must be specified
-    #
-    gem "rails"
-
-    # Specify a dependency on rack v.1.0.0. The version is optional.
-    # If present, it can be specified the same way as with rubygems'
-    # #gem method.
-    #
-    gem "rack", "1.0.0"
-
-    # Add a git repository as a source. Valid options include :branch, :tag,
-    # and :ref. Next, add any gems that you want from that repo.
-    #
-    git "git://github.com/indirect/rails3-generators.git"
-    gem "rails3-generators"
-
-### Groups
-
-Applications may have dependencies that are specific to certain environments,
-such as testing or deployment.
-
-You can specify groups of gems in the Gemfile using the following syntax:
-
-    gem "nokogiri", :group => :test
-
-    # or
-
-    group :test do
-     gem "webrat"
-    end
-
-Note that Bundler adds all the gems without an explicit group name to the
-`:default` group.
-
-Groups are involved in a number of scenarios:
-
-1. When installing gems using bundle install, you can choose to leave
-   out any group by specifying `--without group1  group2`. This can be
-   helpful if, for instance, you have a gem that you cannot compile
-   in certain environments.
-2. When setting up load paths using Bundler.setup, Bundler will, by
-   default, add the load paths for all groups. You can restrict the
-   groups to add by doing `Bundler.setup(:group, :names)`. If you do
-   this, you need to specify the `:default` group if you want it
-   included.
-3. When auto-requiring files using Bundler.require, Bundler will,
-   by default, auto-require just the `:default` group. You can specify
-   a list of groups to auto-require such as
-   `Bundler.require(:default, :test)`
-
-### Installing gems
-
-Once the Gemfile manifest file has been created, the next step is to install
-all the gems needed to satisfy the manifest's dependencies. The command to
-do this is `bundle install`.
-
-This command will load the Gemfile, resolve all the dependencies, download
-all gems that are missing, and install them to the bundler's gem repository.
-Gems that are already installed into the system RubyGems repository will be
-referenced, rather than installed again. Every time an update is made to the
-Gemfile, run `bundle install` again to install any newly needed gems.
-
-If you want to install the gems into the project's folder, like Bundler 0.8
-and earlier did, you can run `bundle install vendor`, and the gems will
-be installed into the `vendor` subdirectory of your project.
-
-### Locking dependencies
-
-By default, bundler will only ensure that the activated gems satisfy the
-Gemfile's dependencies. If you install a newer version of a gem and it
-satisfies the dependencies, it will be used instead of the older one.
-
-The command `bundle lock` will lock the bundle to the current set of
-resolved gems. This ensures that, until the lock file is removed,
-`bundle install` and `Bundle.setup` will always activate the same gems.
-
-When you are distributing your application, you should add the Gemfile and
-Gemfile.lock files to your source control, so that the set of libraries your
-code will run against are fixed. Simply run  `bundle install` after checking
-out or deploying your code to ensure your libraries are present.
-
-DO NOT add the .bundle directory to your source control. The files there are
-internal to bundler and vary between machines. If you are using git, you can
-exclude all machine-specific bundler files by adding a single line to your
-.gitignore file containing `.bundle`.
-
-### Running the application
-
-Bundler must be required and setup before anything else is required. This
-is because it will configure all the load paths and manage gems for you.
-To do this, include the following at the beginning of your code.
-
-    begin
-      # Try to require the preresolved locked set of gems.
-      require File.expand_path('../.bundle/environment', __FILE__)
-    rescue LoadError
-      # Fall back on doing an unlocked resolve at runtime.
-      require "rubygems"
-      require "bundler"
-      Bundler.setup
-    end
-
-    # Your application's requires come here, e.g.
-    # require 'date' # a ruby standard library
-    # require 'rack' # a bundled gem
-
-    # Alternatively, you can require all the bundled libs at once
-    # Bundler.require
-
-The `bundle exec` command provides a way to run arbitrary ruby code in
-context of the bundle. For example:
-
-    bundle exec ruby my_ruby_script.rb
-
-To enter a shell that will run all gem executables (such as `rake`, `rails`,
-etc... ) use `bundle exec bash` (replacing bash for whatever your favorite
-shell is).
-
-### Packing the bundle's gems
-
-When sharing or deploying an application, you may want to include
-everything necessary to install gem dependencies. `bundle package` will
-copy .gem files for all of the bundle's dependencies into vendor/cache.
-After that, `bundle install` will always work, since it will install the
-local .gem files, and will not contact any of the remote sources.
-
-## Gem resolution
+## Gem dependency resolution
 
 One of the most important things that the bundler does is do a
 dependency resolution on the full list of gems that you specify, all
@@ -204,12 +46,6 @@ so it can detect that all gems *together* require activesupport "2.3.4".
 
 Upgrading to Bundler 0.9 from Bundler 0.8 requires upgrading several
 API calls in your Gemfile, and some workarounds if you are using Rails 2.3.
-
-### Rails 2.3
-
-Using Bundler 0.9 with Rails 2.3 requires adding a preinitializer, and
-making a few changes to boot.rb. A detailed description of the changes
-needed can be found in [Bundler 0.9 and Rails 2.3.5](http://andre.arko.net/2010/02/13/using-bundler-09-with-rails-235/).
 
 ### Gemfile Removals
 
@@ -277,10 +113,6 @@ Bundler 0.9 changes the following Bundler 0.8 Gemfile APIs:
 ### Development
 
 For information about future plans and changes that will happen between now and bundler 1.0, see the [ROADMAP](http://github.com/carlhuda/bundler/blob/master/ROADMAP.md). To see what has changed in each version of bundler, starting with 0.9.5, see the [CHANGELOG](http://github.com/carlhuda/bundler/blob/master/CHANGELOG.md).
-
-### Usage
-
-Explanations of common Bundler use cases can be found in [Using Bundler in Real Life](http://yehudakatz.com/2010/02/09/using-bundler-in-real-life/). The general philosophy behind Bundler 0.9 is explained at some length in [Bundler 0.9: Heading Toward 1.0](http://yehudakatz.com/2010/02/01/bundler-0-9-heading-toward-1-0/). Using Bundler with a Rails 2.3.5 app is explained with more detail in [Bundler 0.9 and Rails 2.3.5](http://andre.arko.net/2010/02/13/using-bundler-09-with-rails-235/).
 
 ### Deploying to memory-constrained servers
 

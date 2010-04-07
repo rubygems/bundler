@@ -64,13 +64,20 @@ module Bundler
 
     # Deprecated methods
 
-    def self.deprecate(name)
+    def self.deprecate(name, replacement = nil)
       define_method(name) do |*|
-        raise DeprecatedMethod, "#{name} is removed. See the README for more information"
+        message = "'#{name}' has been removed from the Gemfile DSL, "
+        if replacement
+          message << "and has been replaced with '#{replacement}'."
+        else
+          message << "and is no longer supported."
+        end
+        message << "\nSee the README for more information on upgrading from Bundler 0.8."
+        raise DeprecatedMethod, message
       end
     end
 
-    deprecate :only
+    deprecate :only, :group
     deprecate :except
     deprecate :disable_system_gems
     deprecate :disable_rubygems
@@ -101,9 +108,13 @@ module Bundler
       invalid_keys = opts.keys - %w(group git path name branch ref tag require)
       if invalid_keys.any?
         plural = invalid_keys.size > 1
-        raise InvalidOption, "You passed #{invalid_keys.join(", ")} " \
-          "#{plural ? 'as options, but they are' : 'as an option, but it is'}" \
-          " invalid"
+        message = "You passed #{invalid_keys.map{|k| ':'+k }.join(", ")} "
+        if plural
+          message << "as options for gem '#{name}', but they are invalid."
+        else
+          message << "as an option for gem '#{name}', but it is invalid."
+        end
+        raise InvalidOption, message
       end
 
       group = opts.delete("group") || @group

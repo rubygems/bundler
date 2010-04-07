@@ -1,13 +1,19 @@
 # This is not actually required by the actual library
+# loads the bundled environment
 require 'bundler/shared_helpers'
 
 if Bundler::SharedHelpers.in_bundle?
-  locked_env = Bundler::SharedHelpers.default_gemfile.join("../.bundle/environment.rb")
-  if locked_env.exist?
-    require locked_env
+  env_file = Bundler::SharedHelpers.env_file
+  if env_file.exist?
+    require env_file
   else
     require 'rubygems'
     require 'bundler'
-    Bundler.setup
+    begin
+      Bundler.setup
+    rescue Bundler::BundlerError => e
+      puts "\e[31m#{e.message}\e[0m"
+      exit e.status_code
+    end
   end
 end

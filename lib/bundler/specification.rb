@@ -16,7 +16,7 @@ module Bundler
     end
 
     def full_gem_path
-      Pathname.new(loaded_from).dirname.expand_path
+      Pathname.new(loaded_from).dirname.expand_path.to_s
     end
 
   end

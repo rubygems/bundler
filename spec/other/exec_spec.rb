@@ -133,6 +133,7 @@ describe "bundle exec" do
       it "works when locked" do
         bundle "lock"
         should_be_locked
+
         bundle "exec fizz"
         out.should == "1.0"
       end

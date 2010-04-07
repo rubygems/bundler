@@ -14,7 +14,8 @@ describe "bundle install with deprecated features" do
       G
 
       bundle :install
-      out.should =~ /#{deprecated} is removed. See the README for more information/
+      out.should =~ /'#{deprecated}' has been removed/
+      out.should =~ /See the README for more information/
     end
 
   end

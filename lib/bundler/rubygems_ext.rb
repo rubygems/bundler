@@ -18,11 +18,11 @@ module Gem
     end
 
     def git_version
-      Dir.chdir(full_gem_path) do
-        rev = `git rev-parse HEAD`.strip[0...6]
-        branch = `git show-branch --no-color 2>/dev/null`.strip[/\[(.*?)\]/, 1]
-        branch.empty? ? " #{rev}" : " #{branch}-#{rev}"
-      end if File.exist?(File.join(full_gem_path, ".git"))
+      if @loaded_from && File.exist?(File.join(full_gem_path, ".git"))
+        sha = Dir.chdir(full_gem_path){ `git rev-parse HEAD`.strip }
+        branch = full_gem_path.split("-")[3]
+        (branch && branch != sha) ? " #{branch}-#{sha[0...6]}" : " #{sha[0...6]}"
+      end
     end
 
     def to_gemfile(path = nil)
@@ -31,11 +31,12 @@ module Gem
       gemfile << dependencies_to_gemfile(development_dependencies, :development)
     end
 
-    def add_bundler_dependencies
+    def add_bundler_dependencies(*groups)
+      groups = [:default] if groups.empty?
       Bundler.definition.dependencies.each do |dep|
         if dep.groups.include?(:development)
           self.add_development_dependency(dep.name, dep.requirement.to_s)
-        else
+        elsif (dep.groups & groups).any?
           self.add_dependency(dep.name, dep.requirement.to_s)
         end
       end

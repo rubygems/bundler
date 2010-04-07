@@ -86,10 +86,10 @@ describe "bundle check" do
     @exitstatus.should == 1
   end
 
-  it "outputs an error when the default Gemspec is not found" do
+  it "outputs an error when the default Gemfile is not found" do
     bundle :check, :exit_status => true
     @exitstatus.should == 10
-    out.should include("The default Gemfile was not found")
+    out.should include("Could not locate Gemfile")
   end
 
   describe "when locked" do
@@ -97,15 +97,29 @@ describe "bundle check" do
       system_gems "rack-1.0.0"
       gemfile <<-G
         source "file://#{gem_repo1}"
-        gem "rack"
+        gem "rack", "1.0"
       G
-      bundle "lock"
+      bundle :lock
     end
 
     it "rebuilds .bundle/environment.rb " do
       bundled_app('.bundle/environment.rb').delete
       bundle :check
       bundled_app('.bundle/environment.rb').should exist
+    end
+
+    it "returns success when the Gemfile is satisfied" do
+      bundle :install
+      bundle :check, :exit_status => true
+      @out.should == "The Gemfile's dependencies are satisfied"
+      @exitstatus.should == 0
+    end
+
+    it "shows what is missing with the current Gemfile if it is not satisfied" do
+      simulate_new_machine
+      bundle :check, :exit_status => true
+      @out.should include("rack (= 1.0.0, runtime)")
+      @exitstatus.should == 7
     end
   end
 end
