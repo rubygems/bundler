@@ -1,5 +1,6 @@
 require "digest/sha1"
 
+# TODO: In the 0.10 release, there shouldn't be a locked subclass of Definition
 module Bundler
   class Definition
     def self.from_gemfile(gemfile)
@@ -12,15 +13,31 @@ module Bundler
       Dsl.evaluate(gemfile)
     end
 
-    def self.from_lock(lockfile)
+    def self.from_lock(lockfile, check = true)
       locked_definition = Locked.new(YAML.load_file(lockfile))
 
-      hash = Digest::SHA1.hexdigest(File.read("#{Bundler.root}/Gemfile"))
-      unless locked_definition.hash == hash
-        raise GemfileError, "You changed your Gemfile after locking. Please relock using `bundle lock`"
+      if check
+        hash = Digest::SHA1.hexdigest(File.read("#{Bundler.root}/Gemfile"))
+        unless locked_definition.hash == hash
+          raise GemfileError, "You changed your Gemfile after locking. Please relock using `bundle lock`"
+        end
       end
 
       locked_definition
+    end
+
+    def self.flexdef(gemfile, lockfile)
+      target  = from_gemfile(gemfile)
+      return target unless lockfile.exist?
+
+      current = from_lock(lockfile, false)
+
+      target.dependencies.each do |td|
+        next if current.resolved_dependencies.any? { |cd| td.name == cd.name }
+        current.resolved_dependencies << td
+      end
+
+      current
     end
 
     attr_reader :dependencies, :sources

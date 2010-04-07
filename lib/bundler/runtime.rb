@@ -54,15 +54,6 @@ module Bundler
       end
     end
 
-    def lock
-      Bundler.ui.info("The bundle is already locked, relocking.") if locked?
-      sources.each { |s| s.lock if s.respond_to?(:lock) }
-      FileUtils.mkdir_p("#{root}/.bundle")
-      write_yml_lock
-      write_rb_lock
-      Bundler.ui.confirm("The bundle is now locked. Use `bundle show` to list the gems in the environment.")
-    end
-
     def dependencies_for(*groups)
       if groups.empty?
         dependencies
@@ -91,34 +82,5 @@ module Bundler
 
   private
 
-    def load_paths
-      specs.map { |s| s.load_paths }.flatten
-    end
-
-    def write_yml_lock
-      yml = details.to_yaml
-      File.open("#{root}/Gemfile.lock", 'w') do |f|
-        f.puts yml
-      end
-    end
-
-    def details
-      details = {}
-      details["hash"] = gemfile_fingerprint
-      details["sources"] = sources.map { |s| { s.class.name.split("::").last => s.options} }
-
-      details["specs"] = specs.map do |s|
-        options = {"version" => s.version.to_s}
-        options["source"] = sources.index(s.source) if sources.include?(s.source)
-        { s.name => options }
-      end
-
-      details["dependencies"] = @definition.dependencies.map do |d|
-        info = {"version" => d.requirement.to_s, "group" => d.groups, "name" => d.name}
-        info.merge!("require" => d.autorequire) if d.autorequire
-        info
-      end
-      details
-    end
   end
 end

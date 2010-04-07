@@ -3,7 +3,9 @@ require 'rubygems/dependency_installer'
 module Bundler
   class Installer < Environment
     def self.install(root, definition, options)
-      new(root, definition).run(options)
+      installer = new(root, definition)
+      installer.run(options)
+      installer
     end
 
     def run(options)

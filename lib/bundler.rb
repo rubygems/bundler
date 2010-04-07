@@ -98,6 +98,13 @@ module Bundler
       end
     end
 
+    # TODO: obvious
+    def flexdef
+      configure
+      lockfile = root.join("Gemfile.lock")
+      Definition.flexdef(default_gemfile, lockfile)
+    end
+
     def home
       bundle_path.join("bundler")
     end

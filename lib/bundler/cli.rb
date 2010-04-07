@@ -112,9 +112,7 @@ module Bundler
       Bundler.settings[:disable_shared_gems] = '1' if options["disable-shared-gems"] || path
       Bundler.settings.without = opts[:without]
 
-      Installer.install(Bundler.root, Bundler.definition, opts)
-
-      lock
+      Installer.install(Bundler.root, Bundler.flexdef, opts).lock
       cache if Bundler.root.join("vendor/cache").exist?
     rescue GemNotFound => e
       if Bundler.definition.sources.empty?
