@@ -66,14 +66,25 @@ module Bundler
       def resolved_dependencies
         @resolved_dependencies ||= begin
           if @lockfile
-            deps = @lockfile.resolved_dependencies.dup
-
-            dependencies.each do |d|
-              next if deps.any? { |new_dep| new_dep.name == d.name }
-              deps << d
+            # Build a list of gems that have been removed from the gemfile
+            # but are still listed in the lockfile
+            removed_deps = @lockfile.dependencies.select do |d|
+              dependencies.all? { |d2| d2.name != d.name }
             end
 
-            deps
+            # Take the lockfile, remove the gems that are in the previously
+            # built list of removed gems, and keep what's left over
+            new_deps = @lockfile.resolved_dependencies.reject do |d|
+              removed_deps.any? { |d2| d.name == d2.name }
+            end
+
+            # Add gems that have been added to the gemfile
+            dependencies.each do |d|
+              next if new_deps.any? {|new_dep| new_dep.name == d.name }
+              new_deps << d
+            end
+
+            new_deps
           else
             dependencies
           end
