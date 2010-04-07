@@ -45,7 +45,8 @@ module Spec
     end
 
     def should_be_locked
-      Pathname.new(".bundle/environment.rb").should exist
+      bundled_app("Gemfile.lock").should exist
+      bundled_app(".bundle/environment.rb").should exist
     end
   end
 end
