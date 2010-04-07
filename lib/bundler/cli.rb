@@ -163,9 +163,11 @@ module Bundler
 
       # Set RUBYOPT
       rubyopt = [ENV["RUBYOPT"]].compact
-      rubyopt.unshift "-rbundler/setup"
-      rubyopt.unshift "-I#{File.expand_path('../..', __FILE__)}"
-      ENV["RUBYOPT"] = rubyopt.join(' ')
+      if rubyopt.empty? || rubyopt.first !~ /-rbundler\/setup/
+        rubyopt.unshift "-rbundler/setup"
+        rubyopt.unshift "-I#{File.expand_path('../..', __FILE__)}"
+        ENV["RUBYOPT"] = rubyopt.join(' ')
+      end
 
       begin
         # Run

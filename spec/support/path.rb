@@ -50,6 +50,10 @@ module Spec
       tmp("libs", *args)
     end
 
+    def bundler_path
+      Pathname.new(File.expand_path('../../../lib', __FILE__))
+    end
+
     extend self
   end
 end

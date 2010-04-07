@@ -78,6 +78,19 @@ describe "bundle exec" do
     should_not_be_installed "rack_middleware 1.0"
   end
 
+  it "should not duplicate already exec'ed RUBYOPT or PATH" do
+    install_gemfile <<-G
+      gem "rack"
+    G
+    rubyopt = "-I#{bundler_path} -rbundler/setup"
+
+    bundle "exec 'echo $RUBYOPT'"
+    out.should == rubyopt
+
+    bundle "exec 'echo $RUBYOPT'", :env => {"RUBYOPT" => rubyopt}
+    out.should == rubyopt
+  end
+
   describe "when locked" do
     it "uses .bundle/environment.rb" do
       gemfile <<-G

@@ -1,3 +1,15 @@
+## 0.9.17 (April 7, 2010)
+
+Features:
+
+  - Bundler.require now calls Bundler.setup automatically
+  - Gem::Specification#add_bundler_dependencies added for gemspecs
+
+Bugfixes:
+
+  - Gem paths are not longer duplicated while loading bundler
+  - exec no longer duplicates RUBYOPT if it is already set correctly
+
 ## 0.9.16 (April 3, 2010)
 
 Features:
