@@ -298,9 +298,6 @@ describe "bundle install with git sources" do
     G
     should_be_installed "some_gem_with_a_really_stupidly_long_name_argh 1.0"
 
-    bundle "show some_gem_with_a_really_stupidly_long_name_argh"
-    puts out
-
     bundle "exec stupid"
     out.should == "1.0"
   end
