@@ -14,6 +14,8 @@ module Bundler
     end
 
     def self.from_lock(lockfile, check = true)
+      return nil unless lockfile.exist?
+
       locked_definition = Locked.new(YAML.load_file(lockfile))
 
       if check
@@ -27,19 +29,7 @@ module Bundler
     end
 
     def self.flexdef(gemfile, lockfile)
-      target  = from_gemfile(gemfile)
-      return target unless lockfile.exist?
-
-      current = from_lock(lockfile, false)
-
-      target.dependencies.each do |td|
-        next if current.resolved_dependencies.any? { |cd| td.name == cd.name }
-        current.resolved_dependencies << td
-      end
-
-      current.dependencies.replace(target.dependencies)
-
-      current
+      Flex.new(from_gemfile(gemfile), from_lock(lockfile, false))
     end
 
     attr_reader :dependencies, :sources
@@ -53,6 +43,42 @@ module Bundler
 
     def groups
       dependencies.map { |d| d.groups }.flatten.uniq
+    end
+
+    class Flex
+      def initialize(gemfile, lockfile)
+        @gemfile  = gemfile
+        @lockfile = lockfile
+      end
+
+      def dependencies
+        @gemfile.dependencies
+      end
+
+      def sources
+        @gemfile.sources
+      end
+
+      def groups
+        dependencies.map { |d| d.groups }.flatten.uniq
+      end
+
+      def resolved_dependencies
+        @resolved_dependencies ||= begin
+          if @lockfile
+            deps = @lockfile.resolved_dependencies.dup
+
+            dependencies.each do |d|
+              next if deps.any? { |new_dep| new_dep.name == d.name }
+              deps << d
+            end
+
+            deps
+          else
+            dependencies
+          end
+        end
+      end
     end
 
     class Locked < Definition
