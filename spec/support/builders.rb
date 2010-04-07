@@ -10,8 +10,16 @@ module Spec
 
     def build_repo1
       build_repo gem_repo1 do
-        build_gem "rack",           %w(0.9.1 1.0.0) do |s|
+        build_gem "rack", %w(0.9.1 1.0.0) do |s|
           s.executables = "rackup"
+        end
+
+        build_gem "thin" do |s|
+          s.add_dependency "rack"
+        end
+
+        build_gem "rack-obama" do |s|
+          s.add_dependency "rack"
         end
 
         build_gem "rack_middleware", "1.0" do |s|
@@ -174,10 +182,13 @@ module Spec
 
     def build_repo(path, &blk)
       return if File.directory?(path)
-      # If this is nil, rm -rf tmp
       rake_path = Dir["#{Path.base_system_gems}/**/rake*.gem"].first
-      FileUtils.mkdir_p("#{path}/gems")
-      FileUtils.cp rake_path, "#{path}/gems/"
+      if rake_path
+        FileUtils.mkdir_p("#{path}/gems")
+        FileUtils.cp rake_path, "#{path}/gems/"
+      else
+        abort "You need to `rm -rf #{tmp}`"
+      end
       update_repo(path, &blk)
     end
 
