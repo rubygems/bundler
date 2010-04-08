@@ -117,7 +117,7 @@ describe "bundle flex_install" do
       should_be_installed "rack 1.0.0", 'activesupport 2.3.2'
     end
 
-    it "doesn't fuck up" do
+    it "rebuilds env.rb correctly" do
       build_repo2
       flex_install_gemfile <<-G
         source "file://#{gem_repo2}"
@@ -134,6 +134,26 @@ describe "bundle flex_install" do
 
       bundled_app(".bundle/environment.rb").delete
       should_not_be_installed "activesupport 2.3.5"
+    end
+    
+    it "removes child dependencies" do
+      build_repo2
+      flex_install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem 'rack-obama'
+        gem 'activesupport'
+      G
+
+      should_be_installed "rack 1.0.0", "rack-obama 1.0.0", "activesupport 2.3.5"
+
+      update_repo2
+      flex_install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem 'activesupport'
+      G
+
+      should_be_installed 'activesupport 2.3.5'
+      should_not_be_installed "rack-obama", "rack"
     end
   end
 
