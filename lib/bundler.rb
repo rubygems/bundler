@@ -66,9 +66,11 @@ module Bundler
     end
 
     def setup(*groups)
-      if groups.empty? || @all_groups_loaded
+      return @setup if @setup
+
+      if groups.empty?
         # Load all groups, but only once
-        @all_groups_loaded ||= load.setup
+        @setup = load.setup
       else
         # Figure out which groups haven't been loaded yet
         unloaded = groups - (@completed_groups || [])
@@ -86,7 +88,7 @@ module Bundler
     def load
       @load ||= begin
         if current_env_file?
-          SharedHelpers.gem_loaded = true
+          @gem_loaded = true
           Kernel.require env_file
           Bundler
         else

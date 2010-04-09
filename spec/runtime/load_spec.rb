@@ -1,7 +1,6 @@
 require File.expand_path('../../spec_helper', __FILE__)
 
 describe "Bundler.load" do
-
   before :each do
     system_gems "rack-1.0.0"
     # clear memoized method results
@@ -68,14 +67,43 @@ describe "Bundler.load" do
     end
   end
 
-  describe "not hurting brittle rubygems" do
+  describe "when locked" do
     before :each do
-      system_gems "activerecord-2.3.2", "activesupport-2.3.2"
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+      bundle :lock
     end
 
+    it "loads env.rb instead of the runtime" do
+      ruby <<-R
+        require 'bundler'
+        Bundler.load
+        puts Bundler.instance_eval{ @runtime }
+      R
+      out.should == "nil"
+    end
+
+    it "does not invoke setup inside env.rb" do
+      ruby <<-R, :expect_err => true
+        require 'bundler'
+        Bundler.load
+        if $LOAD_PATH.grep(/rack/i).any?
+          puts "nooo"
+        else
+          puts "hurrah"
+        end
+      R
+
+      out.should == "hurrah"
+    end
+  end
+
+  describe "not hurting brittle rubygems" do
     it "does not inject #source into the generated YAML of the gem specs" do
+      system_gems "activerecord-2.3.2", "activesupport-2.3.2"
       gemfile <<-G
-        source "file://#{gem_repo1}"
         gem "activerecord"
       G
 
@@ -85,4 +113,5 @@ describe "Bundler.load" do
       end
     end
   end
+
 end
