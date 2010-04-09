@@ -4,6 +4,11 @@ describe "Bundler.load" do
 
   before :each do
     system_gems "rack-1.0.0"
+    # clear memoized method results
+    Bundler.instance_eval do
+      @load = nil
+      @runtime = nil
+    end
   end
 
   it "provides a list of the env dependencies" do
@@ -39,9 +44,33 @@ describe "Bundler.load" do
     }.should raise_error(Bundler::GemfileNotFound, /omg\.rb/)
   end
 
+  describe "when called twice" do
+    it "doesn't try to load the runtime twice" do
+      system_gems "rack-1.0.0", "activesupport-2.3.5"
+      gemfile <<-G
+        gem "rack"
+        gem "activesupport", :group => :test
+      G
+
+      ruby <<-R
+        require "bundler"
+        Bundler.setup :default
+        Bundler.require :default
+        puts RACK
+        begin
+          require "activesupport"
+        rescue LoadError
+          puts "no activesupport"
+        end
+      R
+
+      out.split("\n").should == ["1.0.0", "no activesupport"]
+    end
+  end
+
   describe "not hurting brittle rubygems" do
     before :each do
-      system_gems ["activerecord-2.3.2", "activesupport-2.3.2"]
+      system_gems "activerecord-2.3.2", "activesupport-2.3.2"
     end
 
     it "does not inject #source into the generated YAML of the gem specs" do

@@ -72,12 +72,12 @@ module Bundler
       reverse_rubygems_kernel_mixin
 
       executables = specs.map { |s| s.executables }.flatten
+      Gem.source_index # ensure RubyGems is fully loaded
 
-     :: Kernel.class_eval do
+     ::Kernel.class_eval do
         private
         def gem(*) ; end
       end
-      Gem.source_index # ensure RubyGems is fully loaded
 
       ::Kernel.send(:define_method, :gem) do |dep, *reqs|
         if executables.include? File.basename(caller.first.split(':').first)

@@ -1,3 +1,15 @@
+## 0.9.18 (April 8, 2010)
+
+Features:
+
+  - console command that runs irb with bundle (and optional group) already loaded
+
+Bugfixes:
+
+  - Bundler.setup now fully disables system gems, even when unlocked (#266, #246)
+    - fixes Yard, which found plugins in Gem.source_index that it could not load
+    - makes behaviour of `Bundler.require` consistent between locked and unlocked loads
+
 ## 0.9.17 (April 7, 2010)
 
 Features:

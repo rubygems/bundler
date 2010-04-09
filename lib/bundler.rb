@@ -67,7 +67,17 @@ module Bundler
     end
 
     def setup(*groups)
-      load.setup(*groups)
+      if groups.empty? || @all_groups_loaded
+        # Load all groups, but only once
+        @all_groups_loaded ||= load.setup
+      else
+        # Figure out which groups haven't been loaded yet
+        unloaded = groups - (@completed_groups || [])
+        # Record groups that are now loaded
+        @completed_groups = groups | (@completed_groups || [])
+        # Load any groups that are not yet loaded
+        unloaded.any? ? load.setup(*unloaded) : load
+      end
     end
 
     def require(*groups)
@@ -75,17 +85,19 @@ module Bundler
     end
 
     def load
-      if current_env_file?
-        SharedHelpers.gem_loaded = true
-        Kernel.require env_file
-        Bundler
-      else
-        runtime
+      @load ||= begin
+        if current_env_file?
+          SharedHelpers.gem_loaded = true
+          Kernel.require env_file
+          Bundler
+        else
+          runtime
+        end
       end
     end
 
     def runtime
-      Runtime.new(root, definition)
+      @runtime ||= Runtime.new(root, definition)
     end
 
     def definition
@@ -141,16 +153,16 @@ module Bundler
       ENV.replace(bundled_env.to_hash)
     end
 
-  private
-
     def default_gemfile
       SharedHelpers.default_gemfile
     end
 
+  private
+
     def configure_gem_home_and_path
       if settings[:disable_shared_gems]
-        ENV['GEM_HOME'] = File.expand_path(bundle_path, root)
         ENV['GEM_PATH'] = ''
+        ENV['GEM_HOME'] = File.expand_path(bundle_path, root)
       else
         paths = [Gem.dir, Gem.path].flatten.compact.uniq.reject{|p| p.empty? }
         ENV["GEM_PATH"] = paths.join(File::PATH_SEPARATOR)
