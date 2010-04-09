@@ -190,6 +190,16 @@ module Bundler
       end
     end
 
+    desc "console [GROUP]", "Opens an IRB session with the bundle pre-loaded"
+    def console(group = nil)
+      require 'bundler/setup'
+      group ? Bundler.require(:default, group) : Bundler.require
+      ARGV.clear
+
+      require 'irb'
+      IRB.start
+    end
+
     desc "version", "Prints the bundler's version information"
     def version
       Bundler.ui.info "Bundler version #{Bundler::VERSION}"
