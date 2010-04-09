@@ -32,40 +32,59 @@ describe "Bundler.setup" do
   end
 
   describe "cripping rubygems" do
-    it "replaces #gem with an alternative that raises when appropriate" do
-      install_gemfile <<-G
-        source "file://#{gem_repo1}"
-        gem "rack"
-      G
+    describe "by replacing #gem" do
+      before :each do
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rack", "0.9.1"
+        G
+      end
 
-      run <<-R
-        begin
-          gem "activesupport"
-          puts "FAIL"
-        rescue LoadError
-          puts "WIN"
-        end
-      R
+      it "replaces #gem but raises when the gem is missing" do
+        run <<-R
+          begin
+            gem "activesupport"
+            puts "FAIL"
+          rescue LoadError
+            puts "WIN"
+          end
+        R
 
-      out.should == "WIN"
+        out.should == "WIN"
+      end
+
+      it "replaces #gem but raises when the version is wrong" do
+        run <<-R
+          begin
+            gem "rack", "1.0.0"
+            puts "FAIL"
+          rescue LoadError
+            puts "WIN"
+          end
+        R
+
+        out.should == "WIN"
+      end
     end
 
-    it "replaces #gem with an alternative that raises when appropriate 2" do
-      install_gemfile <<-G
-        source "file://#{gem_repo1}"
-        gem "rack", "0.9.1"
-      G
+    describe "by hiding system gems" do
+      before :each do
+        system_gems "activesupport-2.3.5"
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "yard"
+        G
+      end
 
-      run <<-R
-        begin
-          gem "rack", "1.0.0"
-          puts "FAIL"
-        rescue LoadError
-          puts "WIN"
-        end
-      R
+      it "removes system gem repositories from Gem.path" do
+        run "puts Gem.path.join('\n')"
+        out.should == Bundler.bundle_path.to_s
+      end
 
-      out.should == "WIN"
+      it "removes system gems from Gem.source_index" do
+        run "require 'yard'"
+        err.should be_empty
+      end
     end
   end
 

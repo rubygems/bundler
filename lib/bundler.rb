@@ -145,16 +145,16 @@ module Bundler
       ENV.replace(bundled_env.to_hash)
     end
 
-  private
-
     def default_gemfile
       SharedHelpers.default_gemfile
     end
 
+  private
+
     def configure_gem_home_and_path
       if settings[:disable_shared_gems]
-        ENV['GEM_HOME'] = File.expand_path(bundle_path, root)
         ENV['GEM_PATH'] = ''
+        ENV['GEM_HOME'] = File.expand_path(bundle_path, root)
       else
         paths = [Gem.dir, Gem.path].flatten.compact.uniq.reject{|p| p.empty? }
         ENV["GEM_PATH"] = paths.join(File::PATH_SEPARATOR)

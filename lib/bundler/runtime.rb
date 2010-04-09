@@ -18,6 +18,7 @@ module Bundler
       specs = groups.any? ? specs_for(groups) : requested_specs
 
       cripple_rubygems(specs)
+      replace_rubygems_paths
 
       # Activate the specs
       specs.each do |spec|
@@ -126,5 +127,18 @@ module Bundler
       end
       details
     end
+
+    def replace_rubygems_paths
+      Gem.instance_eval do
+        def path
+          [Bundler.bundle_path.to_s]
+        end
+
+        def source_index
+          @source_index ||= Gem::SourceIndex.from_installed_gems
+        end
+      end
+    end
+
   end
 end
