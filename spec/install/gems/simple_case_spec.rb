@@ -280,4 +280,29 @@ describe "bundle install with gem sources" do
       should_be_installed "rack 1.0.0"
     end
   end
+
+  describe "when loading only the default group" do
+    it "should not load all groups" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+        gem "activesupport", :group => :development
+      G
+
+      ruby <<-R
+        require "bundler"
+        Bundler.setup :default
+        Bundler.require :default
+        puts RACK
+        begin
+          require "activesupport"
+        rescue LoadError
+          puts "no activesupport"
+        end
+      R
+
+      out.should include("1.0")
+      out.should include("no activesupport")
+    end
+  end
 end

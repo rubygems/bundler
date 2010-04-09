@@ -66,7 +66,17 @@ module Bundler
     end
 
     def setup(*groups)
-      load.setup(*groups)
+      if groups.empty? || @all_groups_loaded
+        # Load all groups, but only once
+        @all_groups_loaded ||= load.setup
+      else
+        # Figure out which groups haven't been loaded yet
+        unloaded = groups - (@completed_groups || [])
+        # Record groups that are now loaded
+        @completed_groups = groups | (@completed_groups || [])
+        # Load any groups that are not yet loaded
+        unloaded.any? ? load.setup(*unloaded) : load
+      end
     end
 
     def require(*groups)
@@ -74,17 +84,19 @@ module Bundler
     end
 
     def load
-      if current_env_file?
-        SharedHelpers.gem_loaded = true
-        Kernel.require env_file
-        Bundler
-      else
-        runtime
+      @load ||= begin
+        if current_env_file?
+          SharedHelpers.gem_loaded = true
+          Kernel.require env_file
+          Bundler
+        else
+          runtime
+        end
       end
     end
 
     def runtime
-      Runtime.new(root, definition)
+      @runtime ||= Runtime.new(root, definition)
     end
 
     def definition
