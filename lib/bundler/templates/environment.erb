@@ -15,10 +15,10 @@ module Bundler
     <% end -%>
   ].map do |hash|
     if hash[:virtual_spec]
-      spec = eval(hash[:virtual_spec], binding, "<virtual spec for '#{hash[:name]}'>")
+      spec = eval(hash[:virtual_spec], TOPLEVEL_BINDING, "<virtual spec for '#{hash[:name]}'>")
     else
       dir = File.dirname(hash[:loaded_from])
-      spec = Dir.chdir(dir){ eval(File.read(hash[:loaded_from]), binding, hash[:loaded_from]) }
+      spec = Dir.chdir(dir){ eval(File.read(hash[:loaded_from]), TOPLEVEL_BINDING, hash[:loaded_from]) }
     end
     spec.loaded_from = hash[:loaded_from]
     spec.require_paths = hash[:load_paths]

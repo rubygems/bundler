@@ -109,7 +109,10 @@ describe "environment.rb file" do
       build_git "bar", :gemspec => false do |s|
         s.write "lib/bar/version.rb", %{BAR_VERSION = '1.0'}
         s.write "bar.gemspec", <<-G
-          require 'lib/bar/version'
+          lib = File.expand_path('../lib/', __FILE__)
+          $:.unshift lib unless $:.include?(lib)
+          require 'bar/version'
+
           Gem::Specification.new do |s|
             s.name        = 'bar'
             s.version     = BAR_VERSION
@@ -126,12 +129,22 @@ describe "environment.rb file" do
     end
 
     it "evals each gemspec in the context of its parent directory" do
-
-      run <<-R, :lite_runtime => true
+      run <<-RUBY, :lite_runtime => true
         require 'bar'
         puts BAR
-      R
+      RUBY
       out.should == "1.0"
+    end
+
+    it "evals each gemspec with a binding from the top level" do
+      ruby <<-RUBY
+        require 'bundler'
+        def Bundler.require(path)
+          raise "LOSE"
+        end
+        Bundler.load
+      RUBY
+      out.should == ""
     end
   end
 
