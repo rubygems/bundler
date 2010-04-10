@@ -8,6 +8,7 @@ require 'rubygems'
 module Bundler
   LOCKED_BY    = '<%= Bundler::VERSION %>'
   FINGERPRINT  = <%= gemfile_fingerprint.inspect %>
+  HOME         = '<%= Bundler.home %>'
   AUTOREQUIRES = <%= autorequires_for_groups.inspect %>
   SPECS        = [
     <% specs_for_lock_file.each do |spec| -%>
@@ -22,7 +23,11 @@ module Bundler
     end
     spec.loaded_from = hash[:loaded_from]
     spec.require_paths = hash[:load_paths]
-    spec
+    if spec.loaded_from.include?(HOME)
+      Bundler::Specification.from_gemspec(spec)
+    else
+      spec
+    end
   end
 
   extend SharedHelpers

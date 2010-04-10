@@ -51,7 +51,7 @@ describe "Bundler.load" do
         gem "activesupport", :group => :test
       G
 
-      ruby <<-R
+      ruby <<-RUBY
         require "bundler"
         Bundler.setup :default
         Bundler.require :default
@@ -61,7 +61,7 @@ describe "Bundler.load" do
         rescue LoadError
           puts "no activesupport"
         end
-      R
+      RUBY
 
       out.split("\n").should == ["1.0.0", "no activesupport"]
     end
@@ -77,16 +77,16 @@ describe "Bundler.load" do
     end
 
     it "loads env.rb instead of the runtime" do
-      ruby <<-R
+      ruby <<-RUBY
         require 'bundler'
         Bundler.load
         puts Bundler.instance_eval{ @runtime }
-      R
+      RUBY
       out.should == "nil"
     end
 
     it "does not invoke setup inside env.rb" do
-      ruby <<-R, :expect_err => true
+      ruby <<-RUBY, :expect_err => true
         require 'bundler'
         Bundler.load
         if $LOAD_PATH.grep(/rack/i).any?
@@ -94,7 +94,7 @@ describe "Bundler.load" do
         else
           puts "hurrah"
         end
-      R
+      RUBY
 
       out.should == "hurrah"
     end

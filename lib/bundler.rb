@@ -20,7 +20,7 @@ module Bundler
   autoload :SharedHelpers,       'bundler/shared_helpers'
   autoload :SpecSet,             'bundler/spec_set'
   autoload :Source,              'bundler/source'
-  autoload :Specification,       'bundler/specification'
+  autoload :Specification,       'bundler/shared_helpers'
   autoload :UI,                  'bundler/ui'
 
   class BundlerError < StandardError
