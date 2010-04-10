@@ -7,7 +7,6 @@ if Bundler::SharedHelpers.in_bundle?
   if env_file.exist?
     require env_file
   else
-    require 'rubygems'
     require 'bundler'
     begin
       Bundler.setup
