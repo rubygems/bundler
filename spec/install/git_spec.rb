@@ -285,6 +285,28 @@ describe "bundle install with git sources" do
     out.should match(/run `bundle install`/i)
   end
 
+  it "handles repos that have been force-pushed" do
+    build_git "forced", "1.0"
+    install_gemfile <<-G
+      git "#{lib_path('forced-1.0')}"
+      gem 'forced'
+    G
+    should_be_installed "forced 1.0"
+
+
+    update_git "forced" do |s|
+      s.write "lib/forced.rb", "FORCED = '1.1'"
+    end
+    bundle :install
+    should_be_installed "forced 1.1"
+
+    Dir.chdir(lib_path('forced-1.0')) do
+      `git reset --hard head^`
+    end
+    bundle :install
+    should_be_installed "forced 1.0"
+  end
+
   it "handles long gem names and full shas with C extensions" do
     build_git "some_gem_with_a_really_stupidly_long_name_argh" do |s|
       s.executables = "stupid"
