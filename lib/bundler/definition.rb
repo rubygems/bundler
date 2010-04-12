@@ -17,7 +17,7 @@ module Bundler
 
       hash = Digest::SHA1.hexdigest(File.read("#{Bundler.root}/Gemfile"))
       unless locked_definition.hash == hash
-        raise GemfileError, "You changed your Gemfile after locking. Please relock using `bundle lock`"
+        raise GemfileChanged, "You changed your Gemfile after locking. Please relock using `bundle lock`"
       end
 
       locked_definition
