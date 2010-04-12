@@ -1,3 +1,17 @@
+## 0.9.19 (April 12, 2010)
+
+Features:
+
+  - suggest `bundle install --relock` when the Gemfile has changed (#272)
+  - source support for Rubygems servers without prerelease gem indexes (#262)
+
+Bugfixes:
+
+  - don't set up all groups every time Bundler.setup is called while locked (#263)
+  - fix #full_gem_path for git gems while locked (#268)
+  - eval gemspecs at the top level, not inside the Bundler class (#269)
+
+
 ## 0.9.18 (April 8, 2010)
 
 Features:
