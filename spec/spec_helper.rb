@@ -14,7 +14,7 @@ $debug    = false
 $show_err = true
 
 Spec::Rubygems.setup
-Spec::Path.gem_repo1.rmtree
+FileUtils.rm_rf(Spec::Path.gem_repo1)
 
 Spec::Runner.configure do |config|
   config.include Spec::Builders

@@ -79,9 +79,10 @@ module Spec
           s.platform = "java"
         end
 
-        build_gem "very-simple"
+        build_gem "not_released", "1.0.pre"
 
-        build_gem "very-simple-prerelease", "1.0.pre"
+        build_gem "has_prerelease", "1.0"
+        build_gem "has_prerelease", "1.1.pre"
 
         build_gem "with_development_dependency" do |s|
           s.add_development_dependency "activesupport", "= 2.3.5"
@@ -169,6 +170,13 @@ module Spec
       FileUtils.rm_rf gem_repo2
       FileUtils.cp_r gem_repo1, gem_repo2
       update_repo2(&blk) if block_given?
+    end
+
+    def build_repo3
+      build_repo gem_repo3 do
+        build_gem "rack"
+      end
+      FileUtils.rm_rf Dir[gem_repo3("prerelease*")]
     end
 
     def update_repo2

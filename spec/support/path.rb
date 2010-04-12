@@ -42,6 +42,10 @@ module Spec
       tmp("gems/remote2", *args)
     end
 
+    def gem_repo3(*args)
+      tmp("gems/remote3", *args)
+    end
+
     def system_gem_path
       tmp("gems/system")
     end
