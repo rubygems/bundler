@@ -71,7 +71,7 @@ describe "Bundler.load" do
     before :each do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
-        gem "rack"
+        gem "activesupport"
       G
       bundle :lock
     end
@@ -80,23 +80,19 @@ describe "Bundler.load" do
       ruby <<-RUBY
         require 'bundler'
         Bundler.load
-        puts Bundler.instance_eval{ @runtime }
+        puts Bundler.instance_eval{ @runtime }.inspect
       RUBY
       out.should == "nil"
     end
 
     it "does not invoke setup inside env.rb" do
-      ruby <<-RUBY, :expect_err => true
+      ruby <<-RUBY
         require 'bundler'
         Bundler.load
-        if $LOAD_PATH.grep(/rack/i).any?
-          puts "nooo"
-        else
-          puts "hurrah"
-        end
+        puts $LOAD_PATH.grep(/activesupport/i)
       RUBY
 
-      out.should == "hurrah"
+      out.should == ""
     end
   end
 
