@@ -1,5 +1,6 @@
-require 'rubygems'
 require 'pathname'
+require 'rubygems'
+Gem.source_index # ensure Rubygems is fully loaded in Ruby 1.9
 
 module Gem
   class Dependency
