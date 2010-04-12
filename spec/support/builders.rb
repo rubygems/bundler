@@ -407,7 +407,7 @@ module Spec
           if branch = options[:branch]
             raise "You can't specify `master` as the branch" if branch == "master"
 
-            unless `git branch | grep #{branch}`.any?
+            if `git branch | grep #{branch}`.empty?
               silently("git branch #{branch}")
             end
 
