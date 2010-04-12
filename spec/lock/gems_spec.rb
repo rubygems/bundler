@@ -57,8 +57,19 @@ describe "bundle lock with gems" do
       gem "rack", "1.0.0"
     G
 
-    bundle :install
-
+    bundle :check
     out.should =~ /You changed your Gemfile after locking. Please relock using `bundle lock`/
+  end
+
+  it "errors gracefully on install after changing your Gemfile" do
+    bundle :lock
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack", "1.0.0"
+    G
+
+    bundle :install
+    out.should =~ /You changed your Gemfile after locking. Please run `bundle install --relock`/
   end
 end
