@@ -1,4 +1,4 @@
 # A sample Gemfile
-source :gemcutter
-#
+source "http://rubygems.org"
+
 # gem "rails"
