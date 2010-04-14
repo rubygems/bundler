@@ -356,7 +356,15 @@ module Spec
 
       def _build(options)
         path = options[:path] || _default_path
-        @files["#{name}.gemspec"] = @spec.to_ruby unless options[:gemspec] == false
+        case options[:gemspec]
+        when false
+          # do nothing
+        when :yaml
+          @files["#{name}.gemspec"] = @spec.to_yaml
+        else
+          @files["#{name}.gemspec"] = @spec.to_ruby
+        end
+
         unless options[:no_default]
           @files = _default_files.merge(@files)
         end
@@ -429,7 +437,7 @@ module Spec
     class GemBuilder < LibBuilder
 
       def _build(opts)
-        lib_path = super(:path => @context.tmp(".tmp/#{@spec.full_name}"), :no_default => opts[:no_default])
+        lib_path = super(opts.merge(:path => @context.tmp(".tmp/#{@spec.full_name}"), :no_default => opts[:no_default]))
         Dir.chdir(lib_path) do
           destination = opts[:path] || _default_path
           FileUtils.mkdir_p(destination)

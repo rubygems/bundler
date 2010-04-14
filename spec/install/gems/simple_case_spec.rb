@@ -343,4 +343,21 @@ describe "bundle install with gem sources" do
       out.should include("no activesupport")
     end
   end
+
+  describe "when a gem has a YAML gemspec" do
+    before :each do
+      build_repo2 do
+        build_gem "yaml_spec", :gemspec => :yaml
+      end
+    end
+
+    it "still installs correctly" do
+      gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "yaml_spec"
+      G
+      bundle :install
+      err.should be_empty
+    end
+  end
 end

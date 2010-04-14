@@ -193,7 +193,21 @@ module Bundler
           Dir["#{path}/#{@glob}"].each do |file|
             file = Pathname.new(file)
             # Eval the gemspec from its parent directory
-            if spec = Dir.chdir(file.dirname) { eval(File.read(file.basename), binding, file.expand_path.to_s) }
+            spec = Dir.chdir(file.dirname) do
+              begin
+                Gem::Specification.from_yaml(file.basename)
+                # Raises ArgumentError if the file is not valid YAML
+              rescue ArgumentError, Gem::EndOfYAMLException, Gem::Exception
+                begin
+                  eval(File.read(file.basename), TOPLEVEL_BINDING, file.expand_path.to_s)
+                rescue LoadError
+                  raise GemspecError, "There was a LoadError while evaluating #{file.basename}.\n" +
+                    "Does it try to require a relative path? That doesn't work in Ruby 1.9."
+                end
+              end
+            end
+
+            if spec
               spec = Specification.from_gemspec(spec)
               spec.loaded_from = file.to_s
               spec.source = self
