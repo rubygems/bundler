@@ -145,17 +145,14 @@ describe "Bundler.setup" do
         gem "rack"
       G
 
-      ruby <<-R
+      ruby <<-R, :expect_err => true
         require 'rubygems'
         require 'bundler'
-        begin
-          Bundler.setup
-        rescue Bundler::BundlerError => e
-          puts e.message
-        end
+        Bundler.setup
       R
 
-      out.should == "rack-1.0 is not installed. Try running `bundle install`."
+      err.should include("rack-1.0 is cached, but not installed")
+      err.should include("Try running `bundle install`.")
     end
   end
 
@@ -240,6 +237,19 @@ describe "Bundler.setup" do
     bundle %{exec ruby -e "require 'set'"}
 
     err.should be_empty
+  end
+
+  it "doesn't throw a backtrace when gems are missing" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "imaginary"
+    G
+    run <<-R, :expect_err => true
+      Bundler.setup
+    R
+
+    err.should include"Could not find gem 'imaginary")
+    err.should include("Try running `bundle install`")
   end
 
 end

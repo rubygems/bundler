@@ -23,7 +23,7 @@ module Bundler
       # Activate the specs
       specs.each do |spec|
         unless spec.loaded_from
-          raise GemNotFound, "#{spec.full_name} is not installed. Try running `bundle install`."
+          raise GemNotFound, "#{spec.full_name} is cached, but not installed."
         end
 
         Gem.loaded_specs[spec.name] = spec
