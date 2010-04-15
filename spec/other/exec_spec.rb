@@ -91,6 +91,26 @@ describe "bundle exec" do
     out.should == rubyopt
   end
 
+  it "errors nicely when the argument doesn't exist" do
+    install_gemfile <<-G
+      gem "rack"
+    G
+
+    bundle "exec foobarbaz"
+    out.should include("bundler: command not found: foobarbaz")
+    out.should include("Install missing gem binaries with `bundle install`")
+  end
+
+  it "errors nicely when the argument is not executable" do
+    install_gemfile <<-G
+      gem "rack"
+    G
+
+    bundle "exec touch foo"
+    bundle "exec ./foo"
+    out.should include("bundler: not executable: ./foo")
+  end
+
   describe "when locked" do
     before :each do
       gemfile <<-G
