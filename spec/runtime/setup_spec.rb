@@ -248,7 +248,7 @@ describe "Bundler.setup" do
       Bundler.setup
     R
 
-    err.should include"Could not find gem 'imaginary")
+    err.should include("Could not find gem 'imaginary")
     err.should include("Try running `bundle install`")
   end
 
