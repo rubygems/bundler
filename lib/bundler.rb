@@ -66,7 +66,7 @@ module Bundler
       end
     end
 
-    def setup(*groups)
+    def gem_setup(*groups)
       return @setup if @setup
 
       begin
@@ -87,10 +87,12 @@ module Bundler
         exit!
       end
     end
+    alias setup gem_setup unless Bundler.respond_to?(:setup)
 
-    def require(*groups)
+    def gem_require(*groups)
       setup(*groups).require(*groups)
     end
+    alias require gem_require unless Bundler.respond_to?(:require)
 
     def load
       @load ||= begin

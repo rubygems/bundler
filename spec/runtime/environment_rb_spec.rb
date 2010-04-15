@@ -198,4 +198,15 @@ describe "environment.rb file" do
     end
   end
 
+  describe "when Bundler is bundled" do
+    it "doesn't blow up" do
+      install_gemfile <<-G
+        gem "bundler", :path => "#{File.expand_path("..", lib)}"
+      G
+      bundle :lock
+
+      bundle %|exec ruby -e "require 'bundler'; Bundler.setup"|
+      err.should == ""
+    end
+  end
 end
