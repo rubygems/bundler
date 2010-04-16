@@ -1,3 +1,16 @@
+## 0.9.20 (April 15, 2010)
+
+Features:
+
+  - load YAML format gemspecs
+  - no backtraces when calling Bundler.setup if gems are missing
+  - no backtraces when trying to exec a file without the executable bit
+
+Bugfixes:
+
+  - fix infinite recursion in Bundler.setup after loading a bundled Bundler gem
+  - request install instead of lock when env.rb is out of sync with Gemfile.lock
+
 ## 0.9.19 (April 12, 2010)
 
 Features:
