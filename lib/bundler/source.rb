@@ -409,6 +409,7 @@ module Bundler
 
       def checkout
         unless File.exist?(path.join(".git"))
+          FileUtils.mkdir_p(path.dirname)
           git %|clone --no-checkout "#{cache_path}" "#{path}"|
         end
         Dir.chdir(path) do
