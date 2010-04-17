@@ -47,8 +47,7 @@ module Bundler
     gem_print = Digest::SHA1.hexdigest(File.read(File.expand_path('../../Gemfile', __FILE__)))
 
     unless gem_print == lock_print
-      raise "omg wtf"
-      abort 'Gemfile changed since you last locked. Please `bundle lock` to relock.'
+      abort 'Gemfile changed since you last locked. Please run `bundle lock` to relock.'
     end
 
     unless gem_print == FINGERPRINT
