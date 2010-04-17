@@ -1,3 +1,9 @@
+## 0.9.21 (April 16, 2010)
+
+Bugfixes:
+
+  - don't raise 'omg wtf' when lockfile is outdated
+
 ## 0.9.20 (April 15, 2010)
 
 Features:
