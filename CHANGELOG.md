@@ -1,3 +1,36 @@
+## 0.9.21 (April 16, 2010)
+
+Bugfixes:
+
+  - don't raise 'omg wtf' when lockfile is outdated
+
+## 0.9.20 (April 15, 2010)
+
+Features:
+
+  - load YAML format gemspecs
+  - no backtraces when calling Bundler.setup if gems are missing
+  - no backtraces when trying to exec a file without the executable bit
+
+Bugfixes:
+
+  - fix infinite recursion in Bundler.setup after loading a bundled Bundler gem
+  - request install instead of lock when env.rb is out of sync with Gemfile.lock
+
+## 0.9.19 (April 12, 2010)
+
+Features:
+
+  - suggest `bundle install --relock` when the Gemfile has changed (#272)
+  - source support for Rubygems servers without prerelease gem indexes (#262)
+
+Bugfixes:
+
+  - don't set up all groups every time Bundler.setup is called while locked (#263)
+  - fix #full_gem_path for git gems while locked (#268)
+  - eval gemspecs at the top level, not inside the Bundler class (#269)
+
+
 ## 0.9.18 (April 8, 2010)
 
 Features:

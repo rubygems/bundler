@@ -85,7 +85,11 @@ module Bundler
 
       remove_lockfiles if options[:relock]
 
-      Installer.install(Bundler.root, Bundler.definition, opts)
+      begin
+        Installer.install(Bundler.root, Bundler.definition, opts)
+      rescue GemfileChanged
+        raise GemfileChanged, "You changed your Gemfile after locking. Please run `bundle install --relock`."
+      end
 
       lock if options[:relock] || options[:flex]
       cache if Bundler.root.join("vendor/cache").exist?
@@ -197,6 +201,8 @@ module Bundler
       begin
         # Run
         Kernel.exec *ARGV
+      rescue Errno::EACCES
+        Bundler.ui.error "bundler: not executable: #{ARGV.first}"
       rescue Errno::ENOENT
         Bundler.ui.error "bundler: command not found: #{ARGV.first}"
         Bundler.ui.warn  "Install missing gem binaries with `bundle install`"

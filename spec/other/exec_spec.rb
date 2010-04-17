@@ -91,18 +91,46 @@ describe "bundle exec" do
     out.should == rubyopt
   end
 
+  it "errors nicely when the argument doesn't exist" do
+    install_gemfile <<-G
+      gem "rack"
+    G
+
+    bundle "exec foobarbaz"
+    out.should include("bundler: command not found: foobarbaz")
+    out.should include("Install missing gem binaries with `bundle install`")
+  end
+
+  it "errors nicely when the argument is not executable" do
+    install_gemfile <<-G
+      gem "rack"
+    G
+
+    bundle "exec touch foo"
+    bundle "exec ./foo"
+    out.should include("bundler: not executable: ./foo")
+  end
+
   describe "when locked" do
-    it "uses .bundle/environment.rb" do
+    before :each do
       gemfile <<-G
         gem "rack"
       G
 
-      bundle "lock"
+      bundle :lock
       should_be_locked
+    end
+
+    it "uses .bundle/environment.rb" do
       File.open(".bundle/environment.rb", 'a') { |f| f.puts "puts 'using environment.rb'" }
 
       bundle "exec rackup"
       out.should == "using environment.rb\n1.0.0"
+    end
+
+    it "loads the shared helpers successfully" do
+      bundle "exec ruby -e 'puts'"
+      err.should be_empty
     end
   end
 

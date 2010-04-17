@@ -87,9 +87,10 @@ module Spec
           s.platform = "java"
         end
 
-        build_gem "very-simple"
+        build_gem "not_released", "1.0.pre"
 
-        build_gem "very-simple-prerelease", "1.0.pre"
+        build_gem "has_prerelease", "1.0"
+        build_gem "has_prerelease", "1.1.pre"
 
         build_gem "with_development_dependency" do |s|
           s.add_development_dependency "activesupport", "= 2.3.5"
@@ -177,6 +178,13 @@ module Spec
       FileUtils.rm_rf gem_repo2
       FileUtils.cp_r gem_repo1, gem_repo2
       update_repo2(&blk) if block_given?
+    end
+
+    def build_repo3
+      build_repo gem_repo3 do
+        build_gem "rack"
+      end
+      FileUtils.rm_rf Dir[gem_repo3("prerelease*")]
     end
 
     def update_repo2
@@ -359,7 +367,15 @@ module Spec
 
       def _build(options)
         path = options[:path] || _default_path
-        @files["#{name}.gemspec"] = @spec.to_ruby unless options[:gemspec] == false
+        case options[:gemspec]
+        when false
+          # do nothing
+        when :yaml
+          @files["#{name}.gemspec"] = @spec.to_yaml
+        else
+          @files["#{name}.gemspec"] = @spec.to_ruby
+        end
+
         unless options[:no_default]
           @files = _default_files.merge(@files)
         end
@@ -410,7 +426,7 @@ module Spec
           if branch = options[:branch]
             raise "You can't specify `master` as the branch" if branch == "master"
 
-            unless `git branch | grep #{branch}`.any?
+            if `git branch | grep #{branch}`.empty?
               silently("git branch #{branch}")
             end
 
@@ -432,7 +448,7 @@ module Spec
     class GemBuilder < LibBuilder
 
       def _build(opts)
-        lib_path = super(:path => @context.tmp(".tmp/#{@spec.full_name}"), :no_default => opts[:no_default])
+        lib_path = super(opts.merge(:path => @context.tmp(".tmp/#{@spec.full_name}"), :no_default => opts[:no_default]))
         Dir.chdir(lib_path) do
           destination = opts[:path] || _default_path
           FileUtils.mkdir_p(destination)

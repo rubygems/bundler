@@ -70,8 +70,14 @@ module Bundler
       end
 
       def fetch_all_specs(&blk)
+        # Fetch all specs, minus prerelease specs
         Gem::SpecFetcher.new.list(true, false).each(&blk)
-        Gem::SpecFetcher.new.list(false, true).each(&blk)
+        # Then fetch the prerelease specs
+        begin
+          Gem::SpecFetcher.new.list(false, true).each(&blk)
+        rescue Gem::RemoteFetcher::FetchError
+          Bundler.ui.warn "Could not fetch prerelease specs from #{self}"
+        end
       end
     end
 
@@ -187,13 +193,18 @@ module Bundler
           Dir["#{path}/#{@glob}"].each do |file|
             file = Pathname.new(file)
             # Eval the gemspec from its parent directory
-            begin
-              spec = Dir.chdir(file.dirname) do
-                eval(File.read(file.basename), binding, file.expand_path.to_s)
+            spec = Dir.chdir(file.dirname) do
+              begin
+                Gem::Specification.from_yaml(file.basename)
+                # Raises ArgumentError if the file is not valid YAML
+              rescue ArgumentError, Gem::EndOfYAMLException, Gem::Exception
+                begin
+                  eval(File.read(file.basename), TOPLEVEL_BINDING, file.expand_path.to_s)
+                rescue LoadError
+                  raise GemspecError, "There was a LoadError while evaluating #{file.basename}.\n" +
+                    "Does it try to require a relative path? That doesn't work in Ruby 1.9."
+                end
               end
-            rescue LoadError
-              raise GemspecError, "There was a LoadError while evaluating #{file.basename}.\n" +
-                "Does it try to require a relative path? That doesn't work in Ruby 1.9."
             end
 
             if spec
@@ -353,7 +364,7 @@ module Bundler
       def cache
         if cached?
           Bundler.ui.info "Updating #{uri}"
-          in_cache { git %|fetch --quiet "#{uri}" refs/heads/*:refs/heads/*| }
+          in_cache { git %|fetch --force --quiet "#{uri}" refs/heads/*:refs/heads/*| }
         else
           Bundler.ui.info "Fetching #{uri}"
           FileUtils.mkdir_p(cache_path.dirname)
@@ -366,7 +377,7 @@ module Bundler
           git %|clone --no-checkout "#{cache_path}" "#{path}"|
         end
         Dir.chdir(path) do
-          git "fetch --quiet"
+          git "fetch --force --quiet"
           git "reset --hard #{revision}"
         end
       end

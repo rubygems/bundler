@@ -20,7 +20,7 @@ module Bundler
   autoload :SharedHelpers,       'bundler/shared_helpers'
   autoload :SpecSet,             'bundler/spec_set'
   autoload :Source,              'bundler/source'
-  autoload :Specification,       'bundler/specification'
+  autoload :Specification,       'bundler/shared_helpers'
   autoload :UI,                  'bundler/ui'
 
   class BundlerError < StandardError
@@ -38,6 +38,7 @@ module Bundler
   class GemNotFound      < BundlerError; status_code(7)  ; end
   class VersionConflict  < BundlerError; status_code(6)  ; end
   class GemfileError     < BundlerError; status_code(4)  ; end
+  class GemfileChanged   < GemfileError; status_code(4)  ; end
   class PathError        < BundlerError; status_code(13) ; end
   class GitError         < BundlerError; status_code(11) ; end
   class DeprecatedMethod < BundlerError; status_code(12) ; end
@@ -66,28 +67,38 @@ module Bundler
       end
     end
 
-    def setup(*groups)
-      if groups.empty? || @all_groups_loaded
-        # Load all groups, but only once
-        @all_groups_loaded ||= load.setup
-      else
-        # Figure out which groups haven't been loaded yet
-        unloaded = groups - (@completed_groups || [])
-        # Record groups that are now loaded
-        @completed_groups = groups | (@completed_groups || [])
-        # Load any groups that are not yet loaded
-        unloaded.any? ? load.setup(*unloaded) : load
+    def gem_setup(*groups)
+      return @setup if @setup
+
+      begin
+        if groups.empty?
+          # Load all groups, but only once
+          @setup = load.setup
+        else
+          # Figure out which groups haven't been loaded yet
+          unloaded = groups - (@completed_groups || [])
+          # Record groups that are now loaded
+          @completed_groups = groups | (@completed_groups || [])
+          # Load any groups that are not yet loaded
+          unloaded.any? ? load.setup(*unloaded) : load
+        end
+      rescue Bundler::GemNotFound => e
+        STDERR.puts e.message
+        STDERR.puts "Try running `bundle install`."
+        exit!
       end
     end
+    alias setup gem_setup unless Bundler.respond_to?(:setup)
 
-    def require(*groups)
+    def gem_require(*groups)
       setup(*groups).require(*groups)
     end
+    alias require gem_require unless Bundler.respond_to?(:require)
 
     def load
       @load ||= begin
         if current_env_file?
-          SharedHelpers.gem_loaded = true
+          @gem_loaded = true
           Kernel.require env_file
           Bundler
         else
