@@ -271,11 +271,7 @@ module Bundler
 
       def generate_bin(spec)
         gem_dir  = spec.full_gem_path
-        gem_file = nil # so we have access after it's set in the block
-
-        Dir.chdir(gem_dir) do
-          gem_file = Gem::Builder.new(spec).build
-        end
+        gem_file = Dir.chdir(gem_dir){ Gem::Builder.new(spec).build }
 
         installer = Gem::Installer.new File.join(gem_dir, gem_file),
           :bin_dir           => "#{Gem.dir}/bin",
@@ -300,7 +296,7 @@ module Bundler
 
         Bundler.ui.warn "The validation message from Rubygems was:\n  #{e.message}"
       ensure
-        Dir.chdir(gem_dir){ FileUtils.rm_rf(File.join(gem_dir, gem_file)) }
+        Dir.chdir(gem_dir){ FileUtils.rm_rf(gem_file) if gem_file && File.exist?(gem_file) }
       end
 
     end
