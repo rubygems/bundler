@@ -278,6 +278,8 @@ module Bundler
         end
 
         Bundler.ui.warn "The validation message from Rubygems was:\n  #{e.message}"
+      ensure
+        Dir.chdir(gem_dir){ FileUtils.rm_rf(File.join(gem_dir, gem_file)) }
       end
 
     end
