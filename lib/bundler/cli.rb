@@ -84,6 +84,8 @@ module Bundler
 
       Installer.install(Bundler.root, Bundler.definition, opts)
       cache if Bundler.root.join("vendor/cache").exist?
+      Bundler.ui.confirm "Your bundle is complete! " +
+        "Use `bundle show [gemname]` to see where a bundled gem is installed."
     rescue GemNotFound => e
       if Bundler.definition.sources.empty?
         Bundler.ui.warn "Your Gemfile doesn't have any sources. You can add one with a line like 'source :gemcutter'"
@@ -94,11 +96,13 @@ module Bundler
     desc "lock", "Locks the bundle to the current set of dependencies, including all child dependencies."
     def lock
       if locked?
-        Bundler.ui.info("The bundle is already locked, relocking.")
+        Bundler.ui.info("Your bundle is already locked, relocking.")
         remove_lockfiles
       end
 
       Bundler.runtime.lock
+      Bundler.ui.confirm("Your bundle is now locked. " +
+        "Use `bundle show [gemname]` to list the gems in the environment.")
     rescue GemNotFound, VersionConflict => e
       Bundler.ui.error(e.message)
       Bundler.ui.warn "Run `bundle install` to install missing gems."
@@ -109,9 +113,9 @@ module Bundler
     def unlock
       if locked?
         remove_lockfiles
-        Bundler.ui.info("The bundle is now unlocked. The dependencies may be changed.")
+        Bundler.ui.info("Your bundle is now unlocked. The dependencies may be changed.")
       else
-        Bundler.ui.info("The bundle is not currently locked.")
+        Bundler.ui.info("Your bundle is not currently locked.")
       end
     end
 
