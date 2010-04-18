@@ -218,7 +218,27 @@ describe "environment.rb file" do
       bundle :lock
 
       bundle %|exec ruby -e "require 'bundler'; Bundler.setup"|
-      err.should == ""
+      err.should be_empty
+    end
+
+    it "handles polyglot making Kernel#require public :(" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      ruby <<-RUBY
+        require 'rubygems'
+        module Kernel
+          alias polyglot_original_require require
+          def require(*a, &b)
+            polyglot_original_require(*a, &b)
+          end
+        end
+        require 'bundler'
+        Bundler.require(:foo, :bar)
+      RUBY
+      err.should be_empty
     end
   end
 end

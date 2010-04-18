@@ -87,12 +87,12 @@ module Bundler
         exit!
       end
     end
-    alias setup gem_setup unless Bundler.respond_to?(:setup)
+    alias setup gem_setup unless defined?(Bundler::ENV_LOADED)
 
     def gem_require(*groups)
       setup(*groups).require(*groups)
     end
-    alias require gem_require unless Bundler.respond_to?(:require)
+    alias require gem_require unless defined?(Bundler::ENV_LOADED)
 
     def load
       @load ||= begin

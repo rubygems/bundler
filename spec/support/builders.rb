@@ -124,11 +124,11 @@ module Spec
         end
 
         build_gem "yard" do |s|
-          s.write "lib/yard.rb", <<-Y
+          s.write "lib/yard.rb", <<-RUBY
             Gem.source_index.find_name('').each do |gem|
               require gem.name
             end
-          Y
+          RUBY
         end
 
         # Test comlicated gem dependencies for install

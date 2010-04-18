@@ -6,6 +6,7 @@ require 'yaml'
 <%= shared_helpers %>
 
 module Bundler
+  ENV_LOADED   = true
   LOCKED_BY    = '<%= Bundler::VERSION %>'
   FINGERPRINT  = <%= gemfile_fingerprint.inspect %>
   HOME         = '<%= Bundler.home %>'
