@@ -37,8 +37,6 @@ module Bundler
       if locked?
         write_rb_lock
       end
-
-      Bundler.ui.confirm "Your bundle is complete! Use `bundle show gemname` to see where a bundled gem is installed."
     end
 
     def dependencies
