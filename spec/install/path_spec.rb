@@ -84,7 +84,7 @@ describe "bundle install with explicit source paths" do
     should_be_installed "foo 1.0"
   end
 
-  it "setups up executables" do
+  it "sets up executables" do
     pending_jruby_shebang_fix
 
     build_lib "foo" do |s|
@@ -98,6 +98,16 @@ describe "bundle install with explicit source paths" do
 
     bundle "exec foobar"
     out.should == "1.0"
+  end
+
+  it "removes the .gem file after installing" do
+    build_lib "foo"
+
+    install_gemfile <<-G
+      gem 'foo', :path => "#{lib_path('foo-1.0')}"
+    G
+
+    lib_path('foo-1.0').join('foo-1.0.gem').should_not exist
   end
 
   describe "block syntax" do
