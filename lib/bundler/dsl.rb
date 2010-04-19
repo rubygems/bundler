@@ -55,6 +55,11 @@ module Bundler
       Definition.new(@dependencies, @sources)
     end
 
+    # TODO: obvious
+    def to_flex_definition(lockfile)
+      Flex::Definition.new(lockfile, @dependencies, @sources)
+    end
+
     def group(*args, &blk)
       old, @group = @group, args
       yield

@@ -25,6 +25,16 @@ module Gem
       end
     end
 
+    def to_lock
+      out = "  #{name} (#{version})"
+      out << (dependencies.empty? ? "\n" : ":\n")
+      dependencies.sort_by {|d| d.name }.each do |dep|
+        next if dep.type == :development
+        out << "  #{dep.to_lock}\n"
+      end
+      out
+    end
+
     def to_gemfile(path = nil)
       gemfile = "source :gemcutter\n"
       gemfile << dependencies_to_gemfile(dependencies)
@@ -67,6 +77,14 @@ module Gem
 
     def to_yaml_properties
       instance_variables.reject { |p| ["@source", "@groups"].include?(p.to_s) }
+    end
+
+    def to_lock
+      out = "  #{name}"
+      unless requirement == Gem::Requirement.default
+        out << " (#{requirement.to_s})"
+      end
+      out
     end
   end
 end

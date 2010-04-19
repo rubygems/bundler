@@ -5,16 +5,29 @@ require "digest/sha1"
 require "open3"
 
 module Bundler
-  module Source
-    class Rubygems
+  class Source
+    def lockify_options
+      options = @options.reject {|k,v| k == "uri" }
+      return if options.empty?
+
+      @options.sort.map do |option, value|
+        %{#{option}:"#{value}"}
+      end.join(" ")
+    end
+
+    class Rubygems < Source
       attr_reader :uri, :options
 
       def initialize(options = {})
-        @options = options
+        @options = options.reject {|k,v| !k.is_a?(String) }
         @uri = options["uri"].to_s
         @uri = "#{uri}/" unless @uri =~ %r'/$'
         @uri = URI.parse(@uri) unless @uri.is_a?(URI)
         raise ArgumentError, "The source must be an absolute URI" unless @uri.absolute?
+      end
+
+      def to_lock
+        "gem: #{@uri}"
       end
 
       def to_s
@@ -170,9 +183,11 @@ module Bundler
     class Path
       attr_reader :path, :options
 
+      DEFAULT_GLOB = "{,*/}*.gemspec"
+
       def initialize(options)
         @options = options
-        @glob = options["glob"] || "{,*/}*.gemspec"
+        @glob = options["glob"] || DEFAULT_GLOB
 
         if options["path"]
           @path = Pathname.new(options["path"]).expand_path(Bundler.root)
@@ -180,6 +195,12 @@ module Bundler
 
         @name = options["name"]
         @version = options["version"]
+      end
+
+      def to_lock
+        out = "path: #{@path}"
+        out << %{ glob:"#{@glob}"} unless @glob == DEFAULT_GLOB
+        out
       end
 
       def to_s
@@ -287,12 +308,22 @@ module Bundler
 
       def initialize(options)
         super
-        @uri    = options["uri"]
-        @ref    = options["ref"] || options["branch"] || options["tag"] || 'master'
+        @uri = options["uri"]
+        @ref = options["ref"] || options["branch"] || options["tag"] || 'master'
+      end
+
+      def to_lock
+        out = ["git: #{@uri}"]
+        options.sort.each do |key, value|
+          next if key == "uri" || key == "git"
+          value = shortref_for(value) if key == "ref"
+          out << %{#{key}:"#{value}"}
+        end
+        out.join(" ")
       end
 
       def to_s
-        ref = @options["ref"] ? @options["ref"][0..6] : @ref
+        ref = @options["ref"] ? shortref_for(@options["ref"]) : @ref
         "#{@uri} (at #{ref})"
       end
 
@@ -343,6 +374,10 @@ module Bundler
 
       def base_name
         File.basename(uri.sub(%r{^(\w+://)?([^/:]+:)},''), ".git")
+      end
+
+      def shortref_for(ref)
+        ref[0..6]
       end
 
       def uri_hash

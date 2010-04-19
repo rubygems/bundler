@@ -11,6 +11,7 @@ module Bundler
   autoload :Dependency,          'bundler/dependency'
   autoload :Dsl,                 'bundler/dsl'
   autoload :Environment,         'bundler/environment'
+  autoload :Flex,                'bundler/flex'
   autoload :Index,               'bundler/index'
   autoload :Installer,           'bundler/installer'
   autoload :RemoteSpecification, 'bundler/remote_specification'
@@ -125,7 +126,7 @@ module Bundler
     def flexdef
       configure
       lockfile = root.join("Gemfile.lock")
-      Definition.flexdef(default_gemfile, lockfile)
+      Flex::Definition.build(default_gemfile, lockfile)
     end
 
     def home
