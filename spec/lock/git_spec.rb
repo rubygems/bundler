@@ -2,7 +2,9 @@ require "spec_helper"
 
 describe "bundle lock with git" do
   before :each do
-    build_git "foo"
+    build_git "foo" do |s|
+      s.executables = "foo"
+    end
 
     install_gemfile <<-G
       git "#{lib_path('foo-1.0')}"
@@ -26,15 +28,10 @@ describe "bundle lock with git" do
     out.should == "WIN"
   end
 
-  it "provides correct #full_gem_path" do
-    pending
-    rev = revision_for(lib_path("foo-1.0"))
-    gem_path = "foo-1.0-5b89e78c95d2131a78cc39dab852b6266f4bed9d-#{rev}"
-    full_gem_path = Bundler.install_path.join(gem_path).to_s
-
+  it "provides correct #full_gem_path for executables to run" do
     run <<-RUBY
-      puts Bundler::SPECS.map{|s| s.full_gem_path }
+      puts Gem.source_index.find_name('foo').first.full_gem_path
     RUBY
-    out.should == full_gem_path
+    out.should == bundle("show foo")
   end
 end
