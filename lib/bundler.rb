@@ -41,6 +41,7 @@ module Bundler
   class GemfileChanged   < GemfileError; status_code(4)  ; end
   class PathError        < BundlerError; status_code(13) ; end
   class GitError         < BundlerError; status_code(11) ; end
+  class GemspecError     < BundlerError; status_code(14) ; end
   class DeprecatedMethod < BundlerError; status_code(12) ; end
   class DeprecatedOption < BundlerError; status_code(12) ; end
   class InvalidOption    < BundlerError; status_code(15) ; end
