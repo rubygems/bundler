@@ -1,3 +1,3 @@
 module Bundler
-  VERSION = "0.9.21"
+  VERSION = "0.9.21.pre"
 end
