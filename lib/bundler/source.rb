@@ -41,6 +41,7 @@ module Bundler
       def fetch(spec)
         Bundler.ui.debug "  * Downloading"
         uri = @spec_uri_map[[spec.name, spec.version, spec.platform]]
+        spec.fetch_platform
         Gem::RemoteFetcher.fetcher.download(spec, uri, Gem.dir)
       end
 

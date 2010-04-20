@@ -17,6 +17,12 @@ module Bundler
       @source_uri = source_uri
     end
 
+    # Needed before installs, since the arch matters then and quick
+    # specs don't bother to include the arch in the platform string
+    def fetch_platform
+      @platform = _remote_specification.platform
+    end
+
     def full_name
       if platform == Gem::Platform::RUBY or platform.nil? then
         "#{@name}-#{@version}"
@@ -26,7 +32,7 @@ module Bundler
     end
 
     # Because Rubyforge cannot be trusted to provide valid specifications
-    # once the remote gem is donwloaded, the backend specification will
+    # once the remote gem is downloaded, the backend specification will
     # be swapped out.
     def __swap__(spec)
       @specification = spec
@@ -36,6 +42,7 @@ module Bundler
 
     def _remote_specification
       @specification ||= begin
+        Bundler.ui.debug "Fetching spec for #{full_name}"
         Gem::SpecFetcher.new.fetch_spec([@name, @version, @platform], URI(@source_uri.to_s))
       end
     end
