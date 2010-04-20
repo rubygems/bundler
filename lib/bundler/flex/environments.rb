@@ -26,7 +26,7 @@ module Bundler
 
         unless @definition.dependencies.empty?
           output << "dependencies:\n"
-          @definition.dependencies.each do |dependency|
+          @definition.dependencies.sort_by {|d| d.name }.each do |dependency|
             output << dependency.to_lock
           end
           output << "\n"

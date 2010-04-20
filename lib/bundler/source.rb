@@ -313,13 +313,7 @@ module Bundler
       end
 
       def to_lock
-        out = ["git: #{@uri}"]
-        options.sort.each do |key, value|
-          next if key == "uri" || key == "git"
-          value = shortref_for(value) if key == "ref"
-          out << %{#{key}:"#{value}"}
-        end
-        out.join(" ")
+        %{git: #{@uri} ref:"#{shortref_for(options["ref"])}"}
       end
 
       def to_s

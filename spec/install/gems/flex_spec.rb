@@ -1,6 +1,10 @@
 require "spec_helper"
 
 describe "bundle flex_install" do
+  before do
+    pending
+  end
+
   it "installs the gems as expected" do
     flex_install_gemfile <<-G
       source "file://#{gem_repo1}"
@@ -135,7 +139,7 @@ describe "bundle flex_install" do
       bundled_app(".bundle/environment.rb").delete
       should_not_be_installed "activesupport 2.3.5"
     end
-    
+
     it "removes child dependencies" do
       build_repo2
       flex_install_gemfile <<-G
@@ -156,5 +160,4 @@ describe "bundle flex_install" do
       should_not_be_installed "rack-obama", "rack"
     end
   end
-
 end

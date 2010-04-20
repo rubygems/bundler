@@ -23,15 +23,11 @@ module Bundler
         out << " (#{requirement.to_s})"
       end
 
-      if @groups.empty? && !@source
-        out <<  "\n"
+      if @source
+        out << ":\n    #{@source.to_lock}\n"
       else
-        out << ":\n"
+        out << "\n"
       end
-
-      out << "    groups: #{@groups.join(", ")}\n" unless @groups.empty?
-      out << "    #{@source.to_lock}\n" if @source
-      out
     end
   end
 end
