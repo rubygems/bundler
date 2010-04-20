@@ -32,43 +32,23 @@ describe "bundle install with gem sources" do
       err.should be_empty
       should_be_installed "rack 1.0"
     end
-  end
 
-  describe "when cached" do
     it "ignores cached gems for the wrong platform" do
       install_gemfile <<-G
         Gem.platforms = [#{java}]
         source "file://#{gem_repo1}"
         gem "platform_specific"
       G
-      bundle :cache
+      bundle :pack
       simulate_new_machine
 
-      install_gemfile <<-G
+      install_gemfile <<-G, :relock => true
         Gem.platforms = [#{rb}]
         source "file://#{gem_repo1}"
         gem "platform_specific"
       G
-      bundle :install
       run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
       out.should == "1.0.0 RUBY"
-    end
-
-    it "updates the cache during later installs" do
-      cached_gem = bundled_app("vendor/cache/rack-1.0.0.gem")
-      install_gemfile <<-G
-        source "file://#{gem_repo1}"
-        gem "rack"
-      G
-
-      bundle :cache
-      cached_gem.should exist
-
-      FileUtils.rm_rf(cached_gem)
-
-      bundle :install
-      out.should include("Copying .gem files into vendor/cache")
-      cached_gem.should exist
     end
   end
 end

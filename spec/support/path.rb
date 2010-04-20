@@ -30,6 +30,10 @@ module Spec
       root.join(*path)
     end
 
+    def cached_gem(path)
+      bundled_app("vendor/cache/#{path}.gem")
+    end
+
     def base_system_gems
       tmp.join("gems/base")
     end

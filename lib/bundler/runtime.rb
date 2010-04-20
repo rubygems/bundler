@@ -79,7 +79,6 @@ module Bundler
     alias gems specs
 
     def cache
-      cache_path = "#{root}/vendor/cache/"
       FileUtils.mkdir_p(cache_path)
 
       Bundler.ui.info "Copying .gem files into vendor/cache"
@@ -94,10 +93,24 @@ module Bundler
       end
     end
 
+    def prune_cache
+      FileUtils.mkdir_p(cache_path)
+
+      Bundler.ui.info "Removing outdated .gem files from vendor/cache"
+      cache_path.children.each do |gemfile|
+        spec = Gem::Format.from_file_by_path(gemfile).spec
+        gemfile.rmtree unless specs.include?(spec)
+      end
+    end
+
   private
 
     def load_paths
       specs.map { |s| s.load_paths }.flatten
+    end
+
+    def cache_path
+      root.join("vendor/cache")
     end
 
     def write_yml_lock
