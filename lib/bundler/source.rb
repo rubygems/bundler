@@ -26,6 +26,10 @@ module Bundler
         raise ArgumentError, "The source must be an absolute URI" unless @uri.absolute?
       end
 
+      def self.from_lock(uri, options)
+        new("uri" => uri)
+      end
+
       def to_lock
         "gem: #{@uri}"
       end
@@ -195,6 +199,10 @@ module Bundler
 
         @name = options["name"]
         @version = options["version"]
+      end
+
+      def self.from_lock(uri, options)
+        new(options.merge("path" => uri))
       end
 
       def to_lock
