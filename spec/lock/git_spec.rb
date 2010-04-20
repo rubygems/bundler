@@ -29,6 +29,7 @@ describe "bundle lock with git" do
   end
 
   it "provides correct #full_gem_path" do
+    pending
     rev = revision_for(lib_path("foo-1.0"))
     gem_path = "foo-1.0-5b89e78c95d2131a78cc39dab852b6266f4bed9d-#{rev}"
     full_gem_path = Bundler.install_path.join(gem_path).to_s
