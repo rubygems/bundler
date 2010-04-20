@@ -133,8 +133,10 @@ module Bundler
     map %w(list) => "show"
 
     desc "cache", "Cache all the gems to vendor/cache"
+    method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
     def cache
       Bundler.runtime.cache
+      Bundler.runtime.prune_cache unless options[:no_prune]
     rescue GemNotFound => e
       Bundler.ui.error(e.message)
       Bundler.ui.warn "Run `bundle install` to install missing gems."
@@ -142,6 +144,7 @@ module Bundler
     end
 
     desc "package", "Locks and then caches all of the gems into vendor/cache"
+    method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
     def package
       lock
       cache
