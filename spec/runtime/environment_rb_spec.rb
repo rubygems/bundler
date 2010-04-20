@@ -134,6 +134,15 @@ describe "environment.rb file" do
       out.should include("require a relative path")
     end if RUBY_VERSION >= "1.9"
 
+    it "error intelligently if the gemspec has a LoadError" do
+      update_git "bar", :gemspec => false do |s|
+        s.write "bar.gemspec", "require 'foobarbaz'"
+      end
+      bundle :install
+      out.should include("was a LoadError while evaluating bar.gemspec")
+      out.should include("try to require a relative path")
+    end
+
     it "evals each gemspec with a binding from the top level" do
       ruby <<-RUBY
         require 'bundler'
