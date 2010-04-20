@@ -173,6 +173,7 @@ describe "environment.rb file" do
     end
 
     it "tells you to install if lock is outdated" do
+      pending
       gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack", "1.0"
@@ -199,6 +200,7 @@ describe "environment.rb file" do
     end
 
     it "requests regeneration if it's out of sync" do
+      pending
       old_env = File.read(env_file)
       install_gemfile <<-G, :relock => true
         source "file://#{gem_repo1}"

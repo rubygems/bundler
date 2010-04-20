@@ -1,10 +1,6 @@
 require "spec_helper"
 
 describe "bundle flex_install" do
-  before do
-    pending
-  end
-
   it "installs the gems as expected" do
     flex_install_gemfile <<-G
       source "file://#{gem_repo1}"

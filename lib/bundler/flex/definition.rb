@@ -2,7 +2,7 @@
 module Bundler
   module Flex
     class Definition
-      attr_reader :dependencies, :sources
+      attr_reader :dependencies, :sources, :locked_specs
 
       def self.build(gemfile, lockfile)
         gemfile = Pathname.new(gemfile).expand_path
@@ -18,15 +18,28 @@ module Bundler
       end
 
       def initialize(lockfile, dependencies, sources)
-        @lockfile, @dependencies, @sources = lockfile, dependencies, sources
+        @dependencies, @sources = dependencies, sources
+
+        if lockfile && File.exists?(lockfile)
+          locked = LockfileParser.new(File.read(lockfile))
+          @locked_specs = locked.specs
+        else
+          @locked_specs = []
+        end
       end
 
-      alias resolved_dependencies dependencies
+      # TODO: OMG LOL
+      def resolved_dependencies
+        locked_specs_as_deps + dependencies
+      end
 
       def groups
         dependencies.map { |d| d.groups }.flatten.uniq
       end
 
+      def locked_specs_as_deps
+        locked_specs.map { |s| Gem::Dependency.new(s.name, s.version) }
+      end
     end
   end
 end
