@@ -1,4 +1,4 @@
-require File.expand_path('../../spec_helper', __FILE__)
+require "spec_helper"
 
 describe "Bundler.setup" do
   it "uses BUNDLE_GEMFILE to locate the gemfile if present" do

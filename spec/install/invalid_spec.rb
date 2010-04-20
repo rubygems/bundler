@@ -1,4 +1,4 @@
-require File.expand_path('../../spec_helper', __FILE__)
+require "spec_helper"
 
 describe "bundle install with deprecated features" do
   before :each do

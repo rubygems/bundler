@@ -1,4 +1,4 @@
-require File.expand_path('../../spec_helper', __FILE__)
+require "spec_helper"
 
 describe "bundle help" do
   it "complains if older versions of bundler are installed" do

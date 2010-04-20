@@ -1,4 +1,4 @@
-require File.expand_path('../../../spec_helper', __FILE__)
+require "spec_helper"
 
 describe "bundle flex_install" do
   it "installs the gems as expected" do
