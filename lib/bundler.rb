@@ -14,6 +14,7 @@ module Bundler
   autoload :Flex,                'bundler/flex'
   autoload :Index,               'bundler/index'
   autoload :Installer,           'bundler/installer'
+  autoload :LazySpecification,   'bundler/lazy_specification'
   autoload :RemoteSpecification, 'bundler/remote_specification'
   autoload :Resolver,            'bundler/resolver'
   autoload :Runtime,             'bundler/runtime'

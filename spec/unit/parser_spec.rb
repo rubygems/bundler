@@ -35,6 +35,9 @@ describe "lockfile parser" do
     it "has rack listed as a specification" do
       specs = locked.specs
       specs.size.should == 1
+      spec = specs.first
+      spec.name.should == "rack"
+      spec.version.should == "1.0.0"
     end
   end
 end

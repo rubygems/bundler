@@ -3,12 +3,13 @@ require "strscan"
 module Bundler
   module Flex
     class LockfileParser
-      attr_reader :sources, :dependencies
+      attr_reader :sources, :dependencies, :specs
 
       # Do stuff
       def initialize(lockfile)
         @sources = []
         @dependencies = []
+        @specs = []
 
         lockfile.split(/\n+/).each do |line|
           case line
@@ -42,10 +43,10 @@ module Bundler
         TYPES[type].from_lock(source, options)
       end
 
-      NAME_VERSION = '([^\)]+)(?: \(.+\))?:?'
+      NAME_VERSION = '(.*?)(?: \((.*)\))?'
 
       def parse_dependencies(line)
-        if line =~ %r{^  #{NAME_VERSION}$}
+        if line =~ %r{^ {2}#{NAME_VERSION}$}
           name, version = $1, $2
 
           @current = Bundler::Dependency.new(name, version)
@@ -56,10 +57,12 @@ module Bundler
       end
 
       def parse_specs(line)
-        if line =~ %r{^  #{NAME_VERSION}$}
-          @current =
+        if line =~ %r{^ {2}#{NAME_VERSION}$}
+          @current = LazySpecification.new($1, $2)
+          @specs << @current
         else
-
+          line =~ %r{^ {4}#{NAME_VERSION}$}
+          @current.dependencies << Gem::Dependency.new(name, version)
         end
       end
 
