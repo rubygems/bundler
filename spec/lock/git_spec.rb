@@ -1,14 +1,11 @@
 require File.expand_path('../../spec_helper', __FILE__)
 
-describe "bundle lock with git" do
+describe "bundle lock with git gems" do
   before :each do
-    build_git "foo" do |s|
-      s.executables = "foo"
-    end
+    build_git "foo"
 
     install_gemfile <<-G
-      git "#{lib_path('foo-1.0')}"
-      gem 'foo'
+      gem 'foo', :git => "#{lib_path('foo-1.0')}"
     G
 
     bundle :lock
@@ -30,7 +27,7 @@ describe "bundle lock with git" do
     out.should == "WIN"
   end
 
-  it "provides correct #full_gem_path for executables to run" do
+  it "provides correct #full_gem_path" do
     run <<-RUBY
       puts Gem.source_index.find_name('foo').first.full_gem_path
     RUBY
