@@ -138,9 +138,9 @@ describe "environment.rb file" do
 
     it "error intelligently if the gemspec has a LoadError" do
       update_git "bar", :gemspec => false do |s|
-        s.write "bar.gemspec", "require 'foobarbaz'"
+        s.write "bar.gemspec", "require 'doesnotexist'"
       end
-      bundle :install
+      bundle "install --relock"
       out.should include("was a LoadError while evaluating bar.gemspec")
       out.should include("try to require a relative path")
     end
