@@ -152,6 +152,7 @@ module Bundler
 
           Dir["#{@path}/*.gem"].each do |gemfile|
             spec = Gem::Format.from_file_by_path(gemfile).spec
+            next unless Gem::Platform.match(spec.platform)
             spec.source = self
             index << spec
           end
