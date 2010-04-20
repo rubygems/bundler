@@ -115,15 +115,50 @@ describe "bundle install with gem sources" do
       should_be_installed "rack 1.0.0", "activesupport 2.3.5"
     end
 
-    it "installs gems for the correct platform" do
-      Gem.platforms = [rb]
-      install_gemfile <<-G
-        source "file://#{gem_repo1}"
-        gem "platform_specific"
-      G
+    describe "with a gem that installs multiple platforms" do
+      it "installs gems for the local platform as first choice" do
+        install_gemfile <<-G
+          Gem.platforms = [#{rb}, Gem::Platform.local]
+          source "file://#{gem_repo1}"
+          gem "platform_specific"
+        G
 
-      run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
-      out.should == "1.0.0 #{Gem::Platform.local}"
+        run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
+        out.should == "1.0.0 #{Gem::Platform.local}"
+      end
+
+      it "falls back on plain ruby" do
+        install_gemfile <<-G
+          Gem.platforms = [#{rb}, #{linux}]
+          source "file://#{gem_repo1}"
+          gem "platform_specific"
+        G
+
+        run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
+        out.should == "1.0.0 RUBY"
+      end
+
+      it "installs gems for java" do
+        install_gemfile <<-G
+          Gem.platforms = [#{java}]
+          source "file://#{gem_repo1}"
+          gem "platform_specific"
+        G
+
+        run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
+        out.should == "1.0.0 JAVA"
+      end
+
+      it "installs gems for windows" do
+        install_gemfile <<-G
+          Gem.platforms = [#{mswin}]
+          source "file://#{gem_repo1}"
+          gem "platform_specific"
+        G
+
+        run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
+        out.should == "1.0.0 MSWIN"
+      end
     end
 
     it "ensures that gems are actually installed and not just cached" do
