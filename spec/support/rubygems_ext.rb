@@ -9,8 +9,8 @@ module Spec
 
       unless File.exist?("#{Path.base_system_gems}")
         FileUtils.mkdir_p(Path.base_system_gems)
-        puts "running `gem install builder rake --no-rdoc --no-ri`"
-        `gem install builder rake --no-rdoc --no-ri`
+        puts "running `gem install builder rake fakeweb --no-rdoc --no-ri`"
+        `gem install builder rake fakeweb --no-rdoc --no-ri`
       end
 
       ENV['HOME'] = Path.home.to_s

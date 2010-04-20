@@ -123,17 +123,25 @@ module Spec
           s.add_c_extension
         end
 
+        # The bundler 0.8 gem has a rubygems plugin that always loads :(
         build_gem "bundler", "0.8.1" do |s|
           s.write "lib/bundler/omg.rb", ""
           s.write "lib/rubygems_plugin.rb", "require 'bundler/omg' ; puts 'FAIL'"
         end
 
+        # The yard gem iterates over Gem.source_index looking for plugins
         build_gem "yard" do |s|
           s.write "lib/yard.rb", <<-RUBY
             Gem.source_index.find_name('').each do |gem|
               require gem.name
             end
           RUBY
+        end
+
+        # The rcov gem is platform mswin32, but has no arch
+        build_gem "rcov" do |s|
+          s.platform = Gem::Platform.new([nil, "mswin32", nil])
+          s.write "lib/rcov.rb", "RCOV = '1.0.0'"
         end
 
         # Test comlicated gem dependencies for install
