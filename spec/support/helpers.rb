@@ -40,7 +40,7 @@ module Spec
     end
 
     def bundle(cmd, options = {})
-      expect_err = options.delete(:expect_err)
+      expect_err  = options.delete(:expect_err)
       exit_status = options.delete(:exit_status)
 
       env = (options.delete(:env) || {}).map{|k,v| "#{k}='#{v}' "}.join

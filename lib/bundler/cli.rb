@@ -150,15 +150,15 @@ module Bundler
 
     desc "exec", "Run the command in context of the bundle"
     def exec(*)
-      ARGV.delete('exec')
+      ARGV.delete("exec")
 
       # Set PATH
-      paths = (ENV['PATH'] || "").split(File::PATH_SEPARATOR)
+      paths = (ENV["PATH"] || "").split(File::PATH_SEPARATOR)
       paths.unshift "#{Bundler.bundle_path}/bin"
       ENV["PATH"] = paths.uniq.join(File::PATH_SEPARATOR)
 
       # Set BUNDLE_GEMFILE
-      ENV['BUNDLE_GEMFILE'] = Bundler::SharedHelpers.default_gemfile.to_s
+      ENV["BUNDLE_GEMFILE"] = Bundler::SharedHelpers.default_gemfile.to_s
 
       # Set RUBYOPT
       rubyopt = [ENV["RUBYOPT"]].compact
