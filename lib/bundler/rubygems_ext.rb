@@ -36,8 +36,16 @@ module Gem
 
     def to_gemfile(path = nil)
       gemfile = "source :gemcutter\n"
-      gemfile << dependencies_to_gemfile(dependencies)
-      gemfile << dependencies_to_gemfile(development_dependencies, :development)
+      gemfile << dependencies_to_gemfile(nondevelopment_dependencies)
+      unless development_dependencies.empty?
+        gemfile << "\n"
+        gemfile << dependencies_to_gemfile(development_dependencies, :development)
+      end
+      gemfile
+    end
+
+    def nondevelopment_dependencies
+      dependencies - development_dependencies
     end
 
     def add_bundler_dependencies(*groups)
@@ -56,7 +64,7 @@ module Gem
     def dependencies_to_gemfile(dependencies, group = nil)
       gemfile = ''
       if dependencies.any?
-        gemfile << "group #{group} do\n" if group
+        gemfile << "group :#{group} do\n" if group
         dependencies.each do |dependency|
           gemfile << '  ' if group
           gemfile << %|gem "#{dependency.name}"|
