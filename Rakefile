@@ -91,7 +91,7 @@ end
 
 desc "install the gem locally"
 task :install => :package do
-  sh %{gem install pkg/#{spec.name}-#{spec.version}}
+  sh %{gem install pkg/#{gemspec.name}-#{gemspec.version}}
 end
 
 desc "validate the gemspec"
