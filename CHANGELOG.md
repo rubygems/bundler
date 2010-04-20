@@ -1,3 +1,22 @@
+## 0.9.22 (April 20, 2010)
+
+Features:
+
+  - cache command now prunes stale .gem files from vendor/cache
+  - init --gemspec command now generates development dependencies
+  - handle Polyglot's changes to Kernel#require with Bundler::ENV_LOADED (#287)
+  - remove .gem files generated after installing a gem from a :path (#286)
+  - improve install/lock messaging (#284)
+
+Bugfixes:
+
+  - ignore cached gems that are for another platform (#288)
+  - install Windows gems that have no architecture set, like rcov (#277)
+  - exec command while locked now includes the bundler lib in $LOAD_PATH (#293)
+  - fix the `rake install` task
+  - add GemspecError so it can be raised without (further) error (#292)
+  - create a parent directory before cloning for git 1.5 compatibility (#285)
+
 ## 0.9.21 (April 16, 2010)
 
 Bugfixes:
