@@ -136,6 +136,15 @@ describe "environment.rb file" do
       out.should == "1.0"
     end
 
+    it "error intelligently if the gemspec has a LoadError" do
+      update_git "bar", :gemspec => false do |s|
+        s.write "bar.gemspec", "require 'foobarbaz'"
+      end
+      bundle :install
+      out.should include("was a LoadError while evaluating bar.gemspec")
+      out.should include("try to require a relative path")
+    end
+
     it "evals each gemspec with a binding from the top level" do
       ruby <<-RUBY
         require 'bundler'
