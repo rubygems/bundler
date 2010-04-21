@@ -116,6 +116,24 @@ describe "bundle cache" do
       cached_gem("activesupport-2.3.2").should_not exist
     end
 
+    it "doesn't remove gems that are for another platform" do
+      install_gemfile <<-G
+        Gem.platforms = [#{java}]
+        source "file://#{gem_repo1}"
+        gem "platform_specific"
+      G
+      bundle :cache
+      cached_gem("platform_specific-1.0-java").should exist
+
+      simulate_new_machine
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "platform_specific"
+      G
+      cached_gem("platform_specific-1.0-#{Gem::Platform.local}").should exist
+      cached_gem("platform_specific-1.0-java").should exist
+    end
+
     it "doesn't remove gems with mismatched :rubygems_version or :date" do
       cached_gem("rack-1.0.0").rmtree
       build_gem "rack", "1.0.0",
