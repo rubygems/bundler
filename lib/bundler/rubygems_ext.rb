@@ -75,6 +75,8 @@ module Gem
   class Dependency
     attr_accessor :source, :groups
 
+    alias eql? ==
+
     def to_yaml_properties
       instance_variables.reject { |p| ["@source", "@groups"].include?(p.to_s) }
     end

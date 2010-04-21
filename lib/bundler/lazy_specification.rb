@@ -10,5 +10,9 @@ module Bundler
       @version      = version
       @dependencies = []
     end
+
+    def satisfies?(dependency)
+      @name == dependency.name && dependency.requirement.satisfied_by?(Gem::Version.new(@version))
+    end
   end
 end

@@ -118,7 +118,7 @@ module Bundler
       Flex::Installer.install(Bundler.root, Bundler.flexdef, opts)
       cache if Bundler.root.join("vendor/cache").exist?
     rescue GemNotFound => e
-      if Bundler.definition.sources.empty?
+      if Bundler.flexdef.sources.empty?
         Bundler.ui.warn "Your Gemfile doesn't have any sources. You can add one with a line like 'source :gemcutter'"
       end
       raise e

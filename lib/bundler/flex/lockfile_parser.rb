@@ -43,7 +43,7 @@ module Bundler
         TYPES[type].from_lock(source, options)
       end
 
-      NAME_VERSION = '(.*?)(?: \((.*)\))?'
+      NAME_VERSION = '(?! )(.*?)(?: \((.*)\))?:?'
 
       def parse_dependencies(line)
         if line =~ %r{^ {2}#{NAME_VERSION}$}
@@ -62,7 +62,7 @@ module Bundler
           @specs << @current
         else
           line =~ %r{^ {4}#{NAME_VERSION}$}
-          @current.dependencies << Gem::Dependency.new(name, version)
+          @current.dependencies << Gem::Dependency.new($1, $2)
         end
       end
 

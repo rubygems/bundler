@@ -22,9 +22,11 @@ module Bundler
 
         if lockfile && File.exists?(lockfile)
           locked = LockfileParser.new(File.read(lockfile))
-          @locked_specs = locked.specs
+          @locked_deps  = locked.dependencies
+          @locked_specs = SpecSet.new(locked.specs)
         else
-          @locked_specs = []
+          @locked_deps  = []
+          @locked_specs = SpecSet.new([])
         end
       end
 
@@ -37,8 +39,22 @@ module Bundler
         dependencies.map { |d| d.groups }.flatten.uniq
       end
 
+      # We have the dependencies from Gemfile.lock and the dependencies from the
+      # Gemfile. Here, we are finding a list of all dependencies that were
+      # originally present in the Gemfile that still satisfy the requirements
+      # of the dependencies in the Gemfile.lock
+      #
+      # This allows us to add on the *new* requirements in the Gemfile and make
+      # sure that the changes result in a conservative update to the Gemfile.lock.
       def locked_specs_as_deps
-        locked_specs.map { |s| Gem::Dependency.new(s.name, s.version) }
+        deps = @dependencies & @locked_deps
+
+        @dependencies.each do |dep|
+          next if deps.include?(dep)
+          deps << dep if @locked_specs.any? { |s| s.satisfies?(dep) }
+        end
+
+        @locked_specs.for(deps).map { |s| Gem::Dependency.new(s.name, s.version) }
       end
     end
   end
