@@ -130,7 +130,10 @@ module Bundler
     end
 
     class GemCache
+      attr_reader :options
+
       def initialize(options)
+        @options = options
         @path = options["path"]
       end
 

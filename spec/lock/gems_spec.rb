@@ -72,4 +72,12 @@ describe "bundle lock with gems" do
     bundle :install
     out.should =~ /You changed your Gemfile after locking. Please run `bundle install --relock`/
   end
+
+  it "correctly serializes GemCache sources" do
+    gemfile <<-G
+      source Bundler::Source::GemCache.new("path" => "#{tmp}")
+    G
+
+    bundle :lock
+  end
 end
