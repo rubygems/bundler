@@ -92,12 +92,12 @@ module Bundler
     end
 
     def write_rb_lock
-      shared_helpers = File.read(File.expand_path("../shared_helpers.rb", __FILE__))
-      template = File.read(File.expand_path("../templates/environment.erb", __FILE__))
-      erb = ERB.new(template, nil, '-')
       Bundler.env_file.dirname.mkpath
       File.open(Bundler.env_file, 'w') do |f|
-        f.puts erb.result(binding)
+        f.puts <<-RB
+require "rubygems"
+require "bundler/setup"
+        RB
       end
     end
 
