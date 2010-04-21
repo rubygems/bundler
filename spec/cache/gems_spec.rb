@@ -115,6 +115,17 @@ describe "bundle cache" do
       cached_gem("actionpack-2.3.2").should_not exist
       cached_gem("activesupport-2.3.2").should_not exist
     end
+
+    it "doesn't remove gems with mismatched :rubygems_version or :date" do
+      cached_gem("rack-1.0.0").rmtree
+      build_gem "rack", "1.0.0",
+        :path => bundled_app('vendor/cache'),
+        :rubygems_version => "1.3.2"
+      simulate_new_machine
+
+      bundle :install
+      cached_gem("rack-1.0.0").should exist
+    end
   end
 
 end

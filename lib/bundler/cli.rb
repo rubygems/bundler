@@ -72,6 +72,7 @@ module Bundler
     method_option "relock",  :type => :boolean, :banner => "Unlock, install the gems, and relock."
     method_option "disable-shared-gems", :type => :boolean, :banner => "Do not use any shared gems, such as the system gem repository."
     method_option "gemfile", :type => :string, :banner => "Use the specified gemfile instead of Gemfile"
+    method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
     def install(path = nil)
       opts = options.dup
       opts[:without] ||= []
@@ -91,11 +92,11 @@ module Bundler
         raise GemfileChanged, "You changed your Gemfile after locking. " +
           "Please run `bundle install --relock`."
       end
-      Bundler.ui.confirm "Your bundle is complete! " +
-        "Use `bundle show [gemname]` to see where a bundled gem is installed."
 
       lock if options[:relock]
       cache if Bundler.root.join("vendor/cache").exist?
+      Bundler.ui.confirm "Your bundle is complete! " +
+        "Use `bundle show [gemname]` to see where a bundled gem is installed."
     rescue GemNotFound => e
       if Bundler.definition.sources.empty?
         Bundler.ui.warn "Your Gemfile doesn't have any sources. You can add one with a line like 'source :gemcutter'"

@@ -369,6 +369,13 @@ module Spec
 
       def _build(options)
         path = options[:path] || _default_path
+
+        if options[:rubygems_version]
+          @spec.rubygems_version = options[:rubygems_version]
+          def @spec.mark_version; end
+          def @spec.validate; end
+        end
+
         case options[:gemspec]
         when false
           # do nothing
@@ -381,6 +388,7 @@ module Spec
         unless options[:no_default]
           @files = _default_files.merge(@files)
         end
+
         @files.each do |file, source|
           file = Pathname.new(path).join(file)
           FileUtils.mkdir_p(file.dirname)
