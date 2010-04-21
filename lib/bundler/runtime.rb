@@ -6,9 +6,7 @@ module Bundler
 
     def initialize(*)
       super
-      if locked?
-        write_rb_lock
-      end
+      write_rb_lock if locked?
     end
 
     def setup(*groups)

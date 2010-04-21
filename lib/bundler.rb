@@ -97,7 +97,7 @@ module Bundler
 
     def load
       @load ||= begin
-        if current_env_file?
+        if !update_env_file?
           @gem_loaded = true
           Kernel.require env_file
           Bundler
@@ -176,8 +176,17 @@ module Bundler
       Gem.clear_paths
     end
 
-    def current_env_file?
-      env_file.exist? && (env_file.read(100) =~ /Bundler #{Bundler::VERSION}/)
+    def update_env_file?
+      if env_file.exist?
+        outdated = (env_file.read(100) !~ /Bundler #{Bundler::VERSION}/)
+        writable = env_file.writable?
+        if outdated && !writable
+          STDERR.puts "Cannot write to outdated .bundle/environment.rb to update it"
+        end
+        outdated && writable
+      else
+        true
+      end
     end
   end
 end
