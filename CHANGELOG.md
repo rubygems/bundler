@@ -1,3 +1,10 @@
+## 0.9.23 (April 20, 2010)
+
+Bugfixes:
+
+  - cache command no longer prunes gems created by an older rubygems version
+  - cache command no longer prunes gems that are for other platforms
+
 ## 0.9.22 (April 20, 2010)
 
 Features:
