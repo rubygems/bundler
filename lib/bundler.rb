@@ -11,10 +11,10 @@ module Bundler
   autoload :Dependency,          'bundler/dependency'
   autoload :Dsl,                 'bundler/dsl'
   autoload :Environment,         'bundler/environment'
-  autoload :Flex,                'bundler/flex'
   autoload :Index,               'bundler/index'
   autoload :Installer,           'bundler/installer'
   autoload :LazySpecification,   'bundler/lazy_specification'
+  autoload :LockfileParser,      'bundler/lockfile_parser'
   autoload :RemoteSpecification, 'bundler/remote_specification'
   autoload :Resolver,            'bundler/resolver'
   autoload :Runtime,             'bundler/runtime'
@@ -116,18 +116,7 @@ module Bundler
     def definition
       configure
       lockfile = root.join("Gemfile.lock")
-      if lockfile.exist?
-        Definition.from_lock(lockfile)
-      else
-        Definition.from_gemfile(default_gemfile)
-      end
-    end
-
-    # TODO: obvious
-    def flexdef
-      configure
-      lockfile = root.join("Gemfile.lock")
-      Flex::Definition.build(default_gemfile, lockfile)
+      Definition.build(default_gemfile, lockfile)
     end
 
     def home

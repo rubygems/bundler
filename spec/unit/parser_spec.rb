@@ -12,7 +12,7 @@ describe "lockfile parser" do
 
     def locked
       lockfile = File.read(bundled_app('Gemfile.lock'))
-      Bundler::Flex::LockfileParser.new(lockfile)
+      Bundler::LockfileParser.new(lockfile)
     end
 
     it "has the source in it" do

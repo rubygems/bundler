@@ -102,7 +102,7 @@ module Bundler
     end
 
     def gemfile_fingerprint
-      Digest::SHA1.hexdigest(File.read("#{root}/Gemfile"))
+      Digest::SHA1.hexdigest(File.read(Bundler.default_gemfile))
     end
 
     def specs_for_lock_file
@@ -124,29 +124,42 @@ module Bundler
     end
 
     def write_yml_lock
-      yml = details.to_yaml
       File.open("#{root}/Gemfile.lock", 'w') do |f|
-        f.puts yml
+        f.puts details
       end
     end
 
     def details
-      details = {}
-      details["hash"] = gemfile_fingerprint
-      details["sources"] = sources.map { |s| { s.class.name.split("::").last => s.options} }
+      output = ""
 
-      details["specs"] = specs.map do |s|
-        options = {"version" => s.version.to_s}
-        options["source"] = sources.index(s.source) if sources.include?(s.source)
-        { s.name => options }
+      pinned_sources = dependencies.map {|d| d.source }
+      all_sources    = @definition.sources.map {|s| s }
+
+      specified_sources = all_sources - pinned_sources
+
+      unless specified_sources.empty?
+        output << "sources:\n"
+
+        specified_sources.each do |source|
+          output << "  #{source.to_lock}\n"
+        end
+        output << "\n"
       end
 
-      details["dependencies"] = @definition.dependencies.map do |d|
-        info = {"version" => d.requirement.to_s, "group" => d.groups, "name" => d.name}
-        info.merge!("require" => d.autorequire) if d.autorequire
-        info
+      unless @definition.dependencies.empty?
+        output << "dependencies:\n"
+        @definition.dependencies.sort_by {|d| d.name }.each do |dependency|
+          output << dependency.to_lock
+        end
+        output << "\n"
       end
-      details
+
+      output << "specs:\n"
+      specs.sort_by {|s| s.name }.each do |spec|
+        output << spec.to_lock
+      end
+
+      output
     end
 
     def autorequires_for_groups(*groups)
