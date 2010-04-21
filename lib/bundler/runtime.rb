@@ -97,9 +97,12 @@ module Bundler
       FileUtils.mkdir_p(cache_path)
 
       Bundler.ui.info "Removing outdated .gem files from vendor/cache"
-      cache_path.children.each do |gemfile|
-        spec = Gem::Format.from_file_by_path(gemfile).spec
-        gemfile.rmtree unless specs.include?(spec)
+      cache_path.children.each do |gem_path|
+        cached_spec = Gem::Format.from_file_by_path(gem_path).spec
+        unless specs.any?{|s| s.full_name == cached_spec.full_name }
+          Bundler.ui.info "  * #{File.basename(gem_path)}"
+          gem_path.rmtree
+        end
       end
     end
 
