@@ -73,22 +73,16 @@ module Bundler
     def setup(*groups)
       return @setup if @setup
 
-      begin
-        if groups.empty?
-          # Load all groups, but only once
-          @setup = load.setup
-        else
-          # Figure out which groups haven't been loaded yet
-          unloaded = groups - (@completed_groups || [])
-          # Record groups that are now loaded
-          @completed_groups = groups | (@completed_groups || [])
-          # Load any groups that are not yet loaded
-          unloaded.any? ? load.setup(*unloaded) : load
-        end
-      rescue Bundler::GemNotFound => e
-        STDERR.puts e.message
-        STDERR.puts "Try running `bundle install`."
-        exit!
+      if groups.empty?
+        # Load all groups, but only once
+        @setup = load.setup
+      else
+        # Figure out which groups haven't been loaded yet
+        unloaded = groups - (@completed_groups || [])
+        # Record groups that are now loaded
+        @completed_groups = groups | (@completed_groups || [])
+        # Load any groups that are not yet loaded
+        unloaded.any? ? load.setup(*unloaded) : load
       end
     end
 
