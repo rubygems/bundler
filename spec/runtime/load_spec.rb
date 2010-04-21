@@ -76,15 +76,6 @@ describe "Bundler.load" do
       bundle :lock
     end
 
-    it "loads env.rb instead of the runtime" do
-      ruby <<-RUBY
-        require 'bundler'
-        Bundler.load
-        puts Bundler.instance_eval{ @runtime }.inspect
-      RUBY
-      out.should == "nil"
-    end
-
     it "does not invoke setup inside env.rb" do
       ruby <<-RUBY
         require 'bundler'

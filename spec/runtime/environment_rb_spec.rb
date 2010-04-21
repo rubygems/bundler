@@ -162,16 +162,6 @@ describe "environment.rb file" do
       should_be_locked
     end
 
-    it "loads if current" do
-      File.open(env_file, 'a'){|f| f.puts "puts 'using environment.rb'" }
-      ruby <<-R
-        require "rubygems"
-        require "bundler"
-        Bundler.setup
-      R
-      out.should include("using environment.rb")
-    end
-
     it "tells you to install if lock is outdated" do
       pending
       gemfile <<-G
