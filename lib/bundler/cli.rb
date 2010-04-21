@@ -71,6 +71,7 @@ module Bundler
     method_option "without", :type => :array,   :banner => "Exclude gems that are part of the specified named group."
     method_option "disable-shared-gems", :type => :boolean, :banner => "Do not use any shared gems, such as the system gem repository."
     method_option "gemfile", :type => :string, :banner => "Use the specified gemfile instead of Gemfile"
+    method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
     def install(path = nil)
       opts = options.dup
       opts[:without] ||= []
