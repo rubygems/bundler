@@ -82,13 +82,14 @@ describe "bundle exec" do
     install_gemfile <<-G
       gem "rack"
     G
+
     rubyopt = "-I#{bundler_path} -rbundler/setup"
 
     bundle "exec 'echo $RUBYOPT'"
-    out.should == rubyopt
+    out.should have_rubyopts(rubyopt)
 
     bundle "exec 'echo $RUBYOPT'", :env => {"RUBYOPT" => rubyopt}
-    out.should == rubyopt
+    out.should have_rubyopts(rubyopt)
   end
 
   it "errors nicely when the argument doesn't exist" do
