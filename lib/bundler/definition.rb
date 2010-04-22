@@ -34,7 +34,11 @@ module Bundler
 
     # TODO: OMG LOL
     def resolved_dependencies
-      locked_specs_as_deps + dependencies
+      deps = locked_specs_as_deps
+      dependencies.each do |dep|
+        deps << dep unless deps.any? { |d| d.name == dep.name }
+      end
+      deps
     end
 
     def groups
