@@ -404,19 +404,15 @@ describe "bundle install with gem sources" do
         require 'fakeweb'
         FakeWeb.allow_net_connect = false
         files = [ 'specs.4.8.gz',
+                  'prerelease_specs.4.8.gz',
                   'quick/Marshal.4.8/rcov-1.0-mswin32.gemspec.rz',
                   'gems/rcov-1.0-mswin32.gem' ]
         files.each do |file|
           FakeWeb.register_uri(:get, "http://localgemserver.com/\#{file}",
             :body => File.read("#{gem_repo1}/\#{file}"))
         end
-
-        missing = [ 'prerelease_specs.4.8.gz',
-                    'gems/rcov-1.0-x86-mswin32.gem' ]
-        missing.each do |missing|
-          FakeWeb.register_uri(:get, "http://localgemserver.com/\#{missing}",
-            :status => ["404", "Not Found"])
-        end
+        FakeWeb.register_uri(:get, "http://localgemserver.com/gems/rcov-1.0-x86-mswin32.gem",
+          :status => ["404", "Not Found"])
 
         # Try to install gem with nil arch
         source "http://localgemserver.com/"
