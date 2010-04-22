@@ -310,4 +310,22 @@ describe "bundle install with git sources" do
     should_be_installed "forced 1.0"
   end
 
+  it "handles repos with submodules" do
+    build_git "submodule", "1.0"
+    build_git "has_submodule", "1.0" do |s|
+      s.add_dependency "submodule"
+    end
+    Dir.chdir(lib_path('has_submodule-1.0')) do
+      `git submodule add #{lib_path('submodule-1.0')}`
+      `git commit -m "submodulator"`
+    end
+
+    install_gemfile <<-G
+      git "#{lib_path('has_submodule-1.0')}"
+      gem "has_submodule"
+    G
+
+    should_be_installed "has_submodule 1.0"
+  end
+
 end
