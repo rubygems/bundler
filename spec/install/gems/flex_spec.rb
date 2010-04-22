@@ -135,7 +135,7 @@ describe "bundle flex_install" do
       bundled_app(".bundle/environment.rb").delete
       should_not_be_installed "activesupport 2.3.5"
     end
-    
+
     it "removes child dependencies" do
       build_repo2
       flex_install_gemfile <<-G

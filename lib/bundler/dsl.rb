@@ -29,12 +29,16 @@ module Bundler
     end
 
     def source(source, options = {})
-      @source = case source
-      when :gemcutter, :rubygems, :rubyforge then Source::Rubygems.new("uri" => "http://gemcutter.org")
-      when String then Source::Rubygems.new("uri" => source)
-      else source
+      case source
+      when :gemcutter, :rubygems, :rubyforge then
+        rubygems_source "http://rubygems.org"
+        return
+      when String
+        rubygems_source source
+        return
       end
 
+      @source = source
       options[:prepend] ? @sources.unshift(@source) : @sources << @source
 
       yield if block_given?
@@ -86,6 +90,16 @@ module Bundler
     deprecate :bin_path
 
   private
+
+    def rubygems_source(source)
+      @rubygems_source ||= begin
+        s = Source::Rubygems.new
+        @sources << s
+        s
+      end
+
+      @rubygems_source.add_remote source
+    end
 
     def _version?(version)
       version && Gem::Version.new(version) rescue false

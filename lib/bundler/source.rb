@@ -7,18 +7,22 @@ require "open3"
 module Bundler
   module Source
     class Rubygems
-      attr_reader :uri, :options
+      attr_reader :remotes, :options
 
       def initialize(options = {})
         @options = options
-        @uri = options["uri"].to_s
-        @uri = "#{uri}/" unless @uri =~ %r'/$'
-        @uri = URI.parse(@uri) unless @uri.is_a?(URI)
-        raise ArgumentError, "The source must be an absolute URI" unless @uri.absolute?
+        remotes = options["remotes"] || []
+        @remotes = remotes.map { |r| normalize_uri(r) }
+        @spec_uri_map = {}
+      end
+
+      def options
+        { "remotes" => @remotes.map { |r| r.to_s } }
       end
 
       def to_s
-        "rubygems repository at #{uri}"
+        remotes = self.remotes.map { |r| r.to_s }.join(', ')
+        "rubygems repository: #{remotes}"
       end
 
       def specs
@@ -27,6 +31,7 @@ module Bundler
 
       def fetch(spec)
         Bundler.ui.debug "  * Downloading"
+        uri = @spec_uri_map[[spec.name, spec.version, spec.platform]]
         Gem::RemoteFetcher.fetcher.download(spec, uri, Gem.dir)
       end
 
@@ -44,23 +49,42 @@ module Bundler
         spec.loaded_from = "#{Gem.dir}/specifications/#{spec.full_name}.gemspec"
       end
 
+      def add_remote(source)
+        @remotes << normalize_uri(source)
+      end
+
     private
+
+      def normalize_uri(uri)
+        uri = uri.to_s
+        uri = "#{uri}/" unless uri =~ %r'/$'
+        uri = URI(uri)
+        raise ArgumentError, "The source must be an absolute URI" unless uri.absolute?
+        uri
+      end
 
       def gem_path(spec)
         "#{Gem.dir}/cache/#{spec.full_name}.gem"
       end
 
       def fetch_specs
-        index = Index.new
-        Bundler.ui.info "Fetching source index from #{uri}"
-        old, Gem.sources = Gem.sources, ["#{uri}"]
+        index   = Index.new
+        remotes = self.remotes.map { |uri| uri.to_s }
+        Bundler.ui.info "Fetching source index for #{remotes.join(', ')}"
+        old = Gem.sources
 
-        fetch_all_specs do |n,v|
-          v.each do |name, version, platform|
-            next unless Gem::Platform.match(platform)
-            spec = RemoteSpecification.new(name, version, platform, @uri)
-            spec.source = self
-            index << spec
+        remotes.each do |uri|
+          Bundler.ui.info "Fetching source index for #{uri}"
+          Gem.sources = ["#{uri}"]
+          fetch_all_specs do |n,v|
+            v.each do |name, version, platform|
+              next unless Gem::Platform.match(platform)
+              # Temporary hack until this can be figured out better
+              @spec_uri_map[[name, version, platform]] = uri
+              spec = RemoteSpecification.new(name, version, platform, uri)
+              spec.source = self
+              index << spec
+            end
           end
         end
 
