@@ -33,7 +33,7 @@ end
 
 # Rubygems 1.3.5, 1.3.6, and HEAD specs
 rubyopt = ENV["RUBYOPT"]
-%w(master REL_1_3_6).each do |rg|
+%w(master REL_1_3_5 REL_1_3_6).each do |rg|
   desc "Run specs with Rubygems #{rg}"
   Spec::Rake::SpecTask.new("spec_gems_#{rg}") do |t|
     t.spec_files = FileList['spec/**/*_spec.rb']

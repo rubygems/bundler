@@ -1,4 +1,5 @@
 require 'rubygems/dependency'
+require 'bundler/shared_helpers'
 
 module Bundler
   class Dependency < Gem::Dependency
