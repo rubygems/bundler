@@ -6,6 +6,7 @@ if Bundler::SharedHelpers.in_bundle?
   env_file = Bundler::SharedHelpers.env_file
   if env_file.exist?
     require env_file
+    Bundler.setup if Bundler::GEM_LOADED
   else
     require 'bundler'
     begin

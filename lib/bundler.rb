@@ -5,8 +5,6 @@ require 'bundler/rubygems_ext'
 require 'bundler/version'
 
 module Bundler
-  ORIGINAL_ENV = ENV.to_hash
-
   autoload :Definition,          'bundler/definition'
   autoload :Dependency,          'bundler/dependency'
   autoload :Dsl,                 'bundler/dsl'
@@ -22,6 +20,9 @@ module Bundler
   autoload :Source,              'bundler/source'
   autoload :Specification,       'bundler/shared_helpers'
   autoload :UI,                  'bundler/ui'
+
+  GEM_LOADED = true
+  ORIGINAL_ENV = ENV.to_hash
 
   class BundlerError < StandardError
     def self.status_code(code = nil)
@@ -92,7 +93,6 @@ module Bundler
     def load
       @load ||= begin
         if !update_env_file?
-          @gem_loaded = true
           Kernel.require env_file
           Bundler
         else
