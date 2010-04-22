@@ -295,13 +295,15 @@ describe "bundle install with gem sources" do
       end
     end
 
+    it "warns when using --disable-shared-gems when not specifying a bundle path"
+
     it "does not use available system gems" do
       gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
       G
 
-      bundle "install --disable-shared-gems"
+      bundle "install vendor --disable-shared-gems"
       should_be_installed "rack 1.0.0"
     end
 

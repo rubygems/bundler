@@ -13,7 +13,7 @@ module Spec
     end
 
     def default_bundle_path(*path)
-      home(".bundle/#{Gem.ruby_engine}/#{Gem::ConfigMap[:ruby_version]}", *path)
+      system_gem_path(*path)
     end
 
     def bundled_app(*path)
@@ -46,8 +46,8 @@ module Spec
       tmp("gems/remote3", *args)
     end
 
-    def system_gem_path
-      tmp("gems/system")
+    def system_gem_path(*path)
+      tmp("gems/system", *path)
     end
 
     def lib_path(*args)
