@@ -15,6 +15,16 @@ module Spec
       end
     end
 
+    def have_rubyopts(*args)
+      args = args.flatten
+      args = args.first.split(/\s+/) if args.size == 1
+
+      simple_matcher "have options #{args.join(' ')}" do |actual|
+        actual = actual.split(/\s+/) if actual.is_a?(String)
+        args.all? {|arg| actual.include?(arg) } && actual.uniq.size == actual.size
+      end
+    end
+
     def should_be_installed(*names)
       opts = names.last.is_a?(Hash) ? names.pop : {}
       groups = opts[:groups] || []
