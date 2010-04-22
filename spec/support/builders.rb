@@ -134,7 +134,7 @@ module Spec
         build_gem "yard" do |s|
           s.write "lib/yard.rb", <<-Y
             Gem.source_index.find_name('').each do |gem|
-              require gem.name
+              puts gem.full_name
             end
           Y
         end

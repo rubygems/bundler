@@ -161,6 +161,8 @@ module Bundler
         gem_from_path_bin = File.join(File.dirname(spec.loaded_from), spec.bindir, exec_name)
         File.exist?(gem_bin) ? gem_bin : gem_from_path_bin
       end
+
+      Gem.clear_paths
     end
 
     extend self
