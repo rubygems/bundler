@@ -272,7 +272,19 @@ module Bundler
     private
 
       def generate_bin(spec)
-        gem_dir  = spec.full_gem_path
+        gem_dir  = Pathname.new(spec.full_gem_path)
+
+        # Some gem authors put absolute paths in their gemspec
+        # and we have to save them from themselves
+        spec.files = spec.files.map do |p|
+          next if File.directory?(p)
+          begin
+            Pathname.new(p).relative_path_from(gem_dir).to_s
+          rescue ArgumentError
+            p
+          end
+        end.compact
+
         gem_file = Dir.chdir(gem_dir){ Gem::Builder.new(spec).build }
 
         installer = Gem::Installer.new File.join(gem_dir, gem_file),

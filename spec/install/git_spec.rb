@@ -310,20 +310,4 @@ describe "bundle install with git sources" do
     should_be_installed "forced 1.0"
   end
 
-  it "handles long gem names and full shas with C extensions" do
-    build_git "some_gem_with_a_really_stupidly_long_name_argh" do |s|
-      s.executables = "stupid"
-      s.add_c_extension
-    end
-    sha = revision_for(lib_path("some_gem_with_a_really_stupidly_long_name_argh-1.0"))
-    install_gemfile <<-G
-      gem "some_gem_with_a_really_stupidly_long_name_argh",
-        :git => "#{lib_path("some_gem_with_a_really_stupidly_long_name_argh-1.0")}",
-        :ref => "#{sha}"
-    G
-    should_be_installed "some_gem_with_a_really_stupidly_long_name_argh 1.0"
-
-    bundle "exec stupid"
-    out.should == "1.0"
-  end
 end
