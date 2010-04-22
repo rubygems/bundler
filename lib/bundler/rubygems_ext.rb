@@ -10,7 +10,13 @@ module Gem
     attr_accessor :source, :location
 
     def load_paths
-      require_paths.map {|p| File.join(full_gem_path, p) }
+      require_paths.map do |require_path|
+        if require_path.include?(full_gem_path)
+          require_path
+        else
+          File.join(full_gem_path, require_path)
+        end
+      end
     end
 
     def groups
