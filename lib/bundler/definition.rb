@@ -25,6 +25,7 @@ module Bundler
         locked = LockfileParser.new(File.read(lockfile))
         @locked_deps  = locked.dependencies
         @locked_specs = SpecSet.new(locked.specs)
+        @sources = locked.sources
       else
         @locked_deps  = []
         @locked_specs = SpecSet.new([])
