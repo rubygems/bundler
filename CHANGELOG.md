@@ -2,11 +2,20 @@
 
 Features:
 
-  -
+  - fetch submodules for git sources
+  - limit the bundled version of bundler to the same as the one installing
+  - force relative paths in git gemspecs to avoid raising Gem::NameTooLong
+  - serialize GemCache sources correctly, so locking works
+  - raise Bundler::GemNotFound instead of calling exit! inside library code
+  - Rubygems 1.3.5 compatibility for the adventurous, not supported by me :)
 
 Bugfixes:
 
-  -
+  - don't try to regenerate environment.rb if it is read-only
+  - prune outdated gems with the platform "ruby"
+  - prune cache without errors when there are directories or non-gem files
+  - don't re-write environment.rb if running after it has been loaded
+  - do not monkeypatch Specification#load_paths twice when inside a bundle
 
 ## 0.9.23 (April 20, 2010)
 
