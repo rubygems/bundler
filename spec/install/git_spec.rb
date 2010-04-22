@@ -29,6 +29,7 @@ describe "bundle install with git sources" do
     end
 
     it "floats on master if no ref is specified" do
+      pending_bundle_update
       update_git "foo"
 
       in_app_root2 do
@@ -85,6 +86,7 @@ describe "bundle install with git sources" do
     end
 
     it "floats on a branch when :branch is used" do
+      pending_bundle_update
       build_git  "foo", "1.0"
       update_git "foo", :branch => "omg"
 
@@ -286,6 +288,7 @@ describe "bundle install with git sources" do
   end
 
   it "handles repos that have been force-pushed" do
+    pending_bundle_update
     build_git "forced", "1.0"
     install_gemfile <<-G
       git "#{lib_path('forced-1.0')}"

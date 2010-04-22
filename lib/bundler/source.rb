@@ -21,12 +21,12 @@ module Bundler
       end
 
       def self.from_lock(uri, options)
-        new("uri" => uri)
+        new("uri" => URI.unescape(uri))
       end
 
       def to_lock
         # "gem: #{@uri}"
-        "gem: lol"
+        remotes.map {|r| "gem: #{URI.escape(r.to_s)}" }.join("\n  ")
       end
 
       def to_s
@@ -218,11 +218,11 @@ module Bundler
       end
 
       def self.from_lock(uri, options)
-        new(options.merge("path" => uri))
+        new(options.merge("path" => URI.unescape(uri)))
       end
 
       def to_lock
-        out = "path: #{@path}"
+        out = "path: #{URI.escape(@path.to_s)}"
         out << %{ glob:"#{@glob}"} unless @glob == DEFAULT_GLOB
         out
       end
@@ -336,8 +336,12 @@ module Bundler
         @ref = options["ref"] || options["branch"] || options["tag"] || 'master'
       end
 
+      def self.from_lock(uri, options)
+        new(options.merge("uri" => URI.unescape(uri)))
+      end
+
       def to_lock
-        %{git: #{@uri} ref:"#{shortref_for(options["ref"])}"}
+        %{git: #{URI.escape(@uri.to_s)} ref:"#{shortref_for(revision)}"}
       end
 
       def to_s
@@ -346,7 +350,7 @@ module Bundler
       end
 
       def path
-        Bundler.install_path.join("#{base_name}-#{uri_hash}-#{ref}")
+        Bundler.install_path.join("#{base_name}-#{uri_hash}-#{shortref_for(revision)}")
       end
 
       def specs

@@ -22,6 +22,8 @@ module Bundler
           send("parse_#{@state}", line)
         end
       end
+
+      @sources.uniq!
     end
 
   private
@@ -39,7 +41,17 @@ module Bundler
     def parse_source_line(line)
       type, source, option_line = line.match(/^\s+(\w+): ([^\s]*?)(?: (.*))?$/).captures
       options = extract_options(option_line)
-      TYPES[type].from_lock(source, options)
+      # There should only be one instance of a rubygem source
+      if type == 'gem'
+        rg_source.add_remote source
+        rg_source
+      else
+        TYPES[type].from_lock(source, options)
+      end
+    end
+
+    def rg_source
+      @rg_source ||= Source::Rubygems.new
     end
 
     NAME_VERSION = '(?! )(.*?)(?: \((.*)\))?:?'
@@ -52,6 +64,7 @@ module Bundler
         @dependencies << @current
       else
         @current.source = parse_source_line(line)
+        @sources.unshift @current.source
       end
     end
 
