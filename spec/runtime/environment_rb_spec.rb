@@ -261,5 +261,21 @@ describe "environment.rb file" do
       RUBY
       err.should be_empty
     end
+
+    it "does not write out env.rb if env.rb has already been loaded" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "bundler", :path => "#{File.expand_path("..", lib)}"
+        gem "rake"
+      G
+      bundle :lock
+
+      FileUtils.chmod 0444, env_file
+      run <<-RUBY, :lite_runtime => true
+        require 'bundler'
+        Bundler.runtime
+      RUBY
+      env_file.rmtree
+    end
   end
 end
