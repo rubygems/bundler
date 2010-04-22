@@ -145,6 +145,12 @@ describe "bundle cache" do
       bundle :install
       cached_gem("rack-1.0.0").should exist
     end
+
+    it "handles directories and non .gem files in the cache" do
+      bundled_app("vendor/cache/foo").mkdir
+      File.open(bundled_app("vendor/cache/bar"), 'w'){|f| f.write("not a gem") }
+      bundle :cache
+    end
   end
 
 end
