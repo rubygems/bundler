@@ -395,6 +395,8 @@ module Bundler
         Dir.chdir(path) do
           git "fetch --force --quiet"
           git "reset --hard #{revision}"
+          git "submodule init"
+          git "submodule update"
         end
       end
 

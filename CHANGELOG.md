@@ -1,3 +1,13 @@
+## 0.9.24 (April 22, 2010)
+
+Features:
+
+  -
+
+Bugfixes:
+
+  -
+
 ## 0.9.23 (April 20, 2010)
 
 Bugfixes:
