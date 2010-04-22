@@ -137,25 +137,6 @@ describe "Bundler.setup" do
     end
   end
 
-  describe "when cached gems are present" do
-    it "raises a friendly error" do
-      build_gem "rack", :path => bundled_app("vendor/cache")
-
-      gemfile <<-G
-        gem "rack"
-      G
-
-      ruby <<-R, :expect_err => true
-        require 'rubygems'
-        require 'bundler'
-        Bundler.setup
-      R
-
-      err.should include("rack-1.0 is cached, but not installed")
-      err.should include("Try running `bundle install`.")
-    end
-  end
-
   describe "when excluding groups" do
     it "doesn't change the resolve if --without is used" do
       install_gemfile <<-G, :without => :rails
@@ -237,19 +218,6 @@ describe "Bundler.setup" do
     bundle %{exec ruby -e "require 'set'"}
 
     err.should be_empty
-  end
-
-  it "doesn't throw a backtrace when gems are missing" do
-    gemfile <<-G
-      source "file://#{gem_repo1}"
-      gem "imaginary"
-    G
-    run <<-R, :expect_err => true
-      Bundler.setup
-    R
-
-    err.should include("Could not find gem 'imaginary")
-    err.should include("Try running `bundle install`")
   end
 
 end
