@@ -134,7 +134,7 @@ module Spec
         build_gem "yard" do |s|
           s.write "lib/yard.rb", <<-Y
             Gem.source_index.find_name('').each do |gem|
-              require gem.name
+              puts gem.full_name
             end
           Y
         end
@@ -246,7 +246,8 @@ module Spec
     end
 
     def build_git(name, *args, &block)
-      build_with(GitBuilder, name, args, &block)
+      spec = build_with(GitBuilder, name, args, &block)
+      GitReader.new(lib_path(spec.full_name))
     end
 
     def update_git(name, *args, &block)
@@ -259,6 +260,7 @@ module Spec
       @_build_path ||= nil
       options  = args.last.is_a?(Hash) ? args.pop : {}
       versions = args.last || "1.0"
+      spec     = nil
 
       options[:path] ||= @_build_path
 
@@ -267,6 +269,8 @@ module Spec
         yield spec if block_given?
         spec._build(options)
       end
+
+      spec
     end
 
     class IndexBuilder
@@ -431,6 +435,8 @@ module Spec
             end
 
             silently("git checkout #{branch}")
+          elsif tag = options[:tag]
+            `git tag #{tag}`
           end
 
           current_ref = `git rev-parse HEAD`.strip
@@ -441,6 +447,24 @@ module Spec
           `git add *`
           `git commit -m "BUMP"`
         end
+      end
+    end
+
+    class GitReader
+      def initialize(path)
+        @path = path
+      end
+
+      def ref_for(ref, len = nil)
+        ref = git "rev-parse #{ref}"
+        ref = ref[0..len] if len
+        ref
+      end
+
+    private
+
+      def git(cmd)
+        Dir.chdir(@path) { `git #{cmd}`.strip }
       end
 
     end

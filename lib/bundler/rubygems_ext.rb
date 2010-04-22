@@ -20,9 +20,18 @@ module Gem
     def git_version
       if @loaded_from && File.exist?(File.join(full_gem_path, ".git"))
         sha = Dir.chdir(full_gem_path){ `git rev-parse HEAD`.strip }
-        branch = full_gem_path.split("-")[3]
-        (branch && branch != sha) ? " #{branch}-#{sha[0...6]}" : " #{sha[0...6]}"
+        " #{sha[0..6]}"
       end
+    end
+
+    def to_lock
+      out = "  #{name} (#{version})"
+      out << (dependencies.empty? ? "\n" : ":\n")
+      dependencies.sort_by {|d| d.name }.each do |dep|
+        next if dep.type == :development
+        out << "  #{dep.to_lock}\n"
+      end
+      out
     end
 
     def to_gemfile(path = nil)
@@ -65,8 +74,18 @@ module Gem
   class Dependency
     attr_accessor :source, :groups
 
+    alias eql? ==
+
     def to_yaml_properties
       instance_variables.reject { |p| ["@source", "@groups"].include?(p.to_s) }
+    end
+
+    def to_lock
+      out = "  #{name}"
+      unless requirement == Gem::Requirement.default
+        out << " (#{requirement.to_s})"
+      end
+      out
     end
   end
 end

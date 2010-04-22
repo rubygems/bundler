@@ -38,7 +38,7 @@ end
 
 describe "bundle show with a git repo" do
   before :each do
-    build_git "foo", "1.0"
+    @git = build_git "foo", "1.0"
   end
 
   it "prints out git info" do
@@ -48,7 +48,7 @@ describe "bundle show with a git repo" do
     should_be_installed "foo 1.0"
 
     bundle :show
-    out.should include("foo (1.0 master-#{@revision}")
+    out.should include("foo (1.0 #{@git.ref_for('master', 6)}")
   end
 
   it "prints out branch names other than master" do
@@ -63,7 +63,7 @@ describe "bundle show with a git repo" do
     should_be_installed "foo 1.0.omg"
 
     bundle :show
-    out.should include("foo (1.0 omg-#{@revision}")
+    out.should include("foo (1.0 #{@git.ref_for('omg', 6)}")
   end
 
   it "doesn't print the branch when tied to a ref" do
@@ -73,6 +73,6 @@ describe "bundle show with a git repo" do
     G
 
     bundle :show
-    out.should include("foo (1.0 #{sha[0...6]})")
+    out.should include("foo (1.0 #{sha[0..6]})")
   end
 end

@@ -56,7 +56,6 @@ module Bundler
   end
 
   def self.setup(*groups)
-    match_fingerprint
     clean_load_path
     cripple_rubygems(SPECS)
     configure_gem_path_and_home(SPECS)

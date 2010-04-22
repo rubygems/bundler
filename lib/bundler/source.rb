@@ -20,6 +20,15 @@ module Bundler
         { "remotes" => @remotes.map { |r| r.to_s } }
       end
 
+      def self.from_lock(uri, options)
+        new("uri" => URI.unescape(uri))
+      end
+
+      def to_lock
+        # "gem: #{@uri}"
+        remotes.map {|r| "gem: #{URI.escape(r.to_s)}" }.join("\n  ")
+      end
+
       def to_s
         remotes = self.remotes.map { |r| r.to_s }.join(', ')
         "rubygems repository: #{remotes}"
@@ -194,9 +203,11 @@ module Bundler
     class Path
       attr_reader :path, :options
 
+      DEFAULT_GLOB = "{,*/}*.gemspec"
+
       def initialize(options)
         @options = options
-        @glob = options["glob"] || "{,*/}*.gemspec"
+        @glob = options["glob"] || DEFAULT_GLOB
 
         if options["path"]
           @path = Pathname.new(options["path"]).expand_path(Bundler.root)
@@ -204,6 +215,16 @@ module Bundler
 
         @name = options["name"]
         @version = options["version"]
+      end
+
+      def self.from_lock(uri, options)
+        new(options.merge("path" => URI.unescape(uri)))
+      end
+
+      def to_lock
+        out = "path: #{URI.escape(@path.to_s)}"
+        out << %{ glob:"#{@glob}"} unless @glob == DEFAULT_GLOB
+        out
       end
 
       def to_s
@@ -311,17 +332,25 @@ module Bundler
 
       def initialize(options)
         super
-        @uri    = options["uri"]
-        @ref    = options["ref"] || options["branch"] || options["tag"] || 'master'
+        @uri = options["uri"]
+        @ref = options["ref"] || options["branch"] || options["tag"] || 'master'
+      end
+
+      def self.from_lock(uri, options)
+        new(options.merge("uri" => URI.unescape(uri)))
+      end
+
+      def to_lock
+        %{git: #{URI.escape(@uri.to_s)} ref:"#{shortref_for(revision)}"}
       end
 
       def to_s
-        ref = @options["ref"] ? @options["ref"][0..6] : @ref
+        ref = @options["ref"] ? shortref_for(@options["ref"]) : @ref
         "#{@uri} (at #{ref})"
       end
 
       def path
-        Bundler.install_path.join("#{base_name}-#{uri_hash}-#{ref}")
+        Bundler.install_path.join("#{base_name}-#{uri_hash}-#{shortref_for(revision)}")
       end
 
       def specs
@@ -367,6 +396,10 @@ module Bundler
 
       def base_name
         File.basename(uri.sub(%r{^(\w+://)?([^/:]+:)},''), ".git")
+      end
+
+      def shortref_for(ref)
+        ref[0..6]
       end
 
       def uri_hash

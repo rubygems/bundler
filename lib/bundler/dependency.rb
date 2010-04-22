@@ -16,5 +16,18 @@ module Bundler
         @autorequire = Array(options['require'] || [])
       end
     end
+
+    def to_lock
+      out = "  #{name}"
+      unless requirement == Gem::Requirement.default
+        out << " (#{requirement.to_s})"
+      end
+
+      if @source
+        out << ":\n    #{@source.to_lock}\n"
+      else
+        out << "\n"
+      end
+    end
   end
 end

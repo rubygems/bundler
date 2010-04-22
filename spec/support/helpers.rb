@@ -119,11 +119,7 @@ module Spec
       bundle :install, opts
     end
 
-    def flex_install_gemfile(*args)
-      gemfile(*args)
-      opts = args.last.is_a?(Hash) ? args.last : {}
-      bundle :flex_install, opts
-    end
+    alias flex_install_gemfile install_gemfile
 
     def install_gems(*gems)
       gems.each do |g|

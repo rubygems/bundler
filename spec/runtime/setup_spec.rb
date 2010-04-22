@@ -76,14 +76,9 @@ describe "Bundler.setup" do
         G
       end
 
-      it "removes system gem repositories from Gem.path" do
-        run "puts Gem.path.join('\n')"
-        out.should == Bundler.bundle_path.to_s
-      end
-
       it "removes system gems from Gem.source_index" do
         run "require 'yard'"
-        err.should be_empty
+        out.should == "yard-1.0"
       end
     end
   end

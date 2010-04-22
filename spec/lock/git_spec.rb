@@ -8,8 +8,6 @@ describe "bundle lock with git" do
       git "#{lib_path('foo-1.0')}"
       gem 'foo'
     G
-
-    bundle :lock
   end
 
   it "doesn't break right after running lock" do

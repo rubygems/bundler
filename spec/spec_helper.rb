@@ -6,12 +6,20 @@ require 'rubygems'
 require 'bundler'
 require 'spec'
 
+begin
+  require 'differ'
+rescue LoadError
+  abort "You need the `differ' gem installed to run the tests"
+end
+
 Dir["#{File.expand_path('../support', __FILE__)}/*.rb"].each do |file|
   require file
 end
 
 $debug    = false
 $show_err = true
+
+Differ.format = :color
 
 Spec::Rubygems.setup
 FileUtils.rm_rf(Spec::Path.gem_repo1)
@@ -36,6 +44,10 @@ Spec::Runner.configure do |config|
   def check(*args)
     # suppresses ruby warnings about "useless use of == in void context"
     # e.g. check foo.should == bar
+  end
+
+  def pending_bundle_update
+    pending "bundle install does NOT update the git ref anymore. This is a bundle update feature"
   end
 
   config.before :all do

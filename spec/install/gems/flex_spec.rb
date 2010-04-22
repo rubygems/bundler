@@ -25,7 +25,7 @@ describe "bundle flex_install" do
       gem 'rack', '1.0'
     G
 
-    bundle :flex_install
+    bundle :install
     should_be_installed "rack 1.0.0"
     should_be_locked
   end
@@ -118,6 +118,7 @@ describe "bundle flex_install" do
     end
 
     it "rebuilds env.rb correctly" do
+      pending
       build_repo2
       flex_install_gemfile <<-G
         source "file://#{gem_repo2}"
@@ -156,5 +157,4 @@ describe "bundle flex_install" do
       should_not_be_installed "rack-obama", "rack"
     end
   end
-
 end

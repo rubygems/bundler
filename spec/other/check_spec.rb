@@ -117,9 +117,8 @@ describe "bundle check" do
 
     it "shows what is missing with the current Gemfile if it is not satisfied" do
       simulate_new_machine
-      bundle :check, :exit_status => true
-      @out.should include("rack (= 1.0.0, runtime)")
-      @exitstatus.should == 7
+      bundle :check
+      @out.should include("rack (= 1.0")
     end
   end
 end

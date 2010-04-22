@@ -55,8 +55,8 @@ module Bundler
       source Source::Git.new(_normalize_hash(options).merge("uri" => uri)), source_options, &blk
     end
 
-    def to_definition
-      Definition.new(@dependencies, @sources)
+    def to_definition(lockfile)
+      Definition.new(lockfile, @dependencies, @sources)
     end
 
     def group(*args, &blk)
