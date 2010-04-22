@@ -20,7 +20,7 @@ module Spec
       groups = opts[:groups] || []
       names.each do |name|
         name, version = name.split(/\s+/)
-        run "require '#{name}'; puts #{Spec::Builders.constantize(name)}", *groups
+        run "load '#{name}.rb'; puts #{Spec::Builders.constantize(name)}", *groups
         Gem::Version.new(out).should == Gem::Version.new(version)
       end
     end
@@ -36,7 +36,7 @@ module Spec
           begin
             require '#{name}'
             puts #{Spec::Builders.constantize(name)}
-          rescue LoadError
+          rescue LoadError, NameError
             puts "WIN"
           end
         R
