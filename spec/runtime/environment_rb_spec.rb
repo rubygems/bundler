@@ -262,6 +262,21 @@ describe "environment.rb file" do
       err.should be_empty
     end
 
+    it "does not munge a gem's load_paths when they are already munged" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "bundler", :path => "#{File.expand_path("..", lib)}"
+        gem "rake"
+      G
+      bundle :lock
+
+      run <<-RUBY, :lite_runtime => true
+        require 'bundler'
+        puts Gem.source_index.find_name("rake").first.load_paths
+      RUBY
+      out.should == default_bundle_path("gems/rake-0.8.7/lib").to_s
+    end
+
     it "does not write out env.rb if env.rb has already been loaded" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
