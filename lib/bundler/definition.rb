@@ -60,7 +60,13 @@ module Bundler
         deps << dep if @locked_specs.any? { |s| s.satisfies?(dep) }
       end
 
-      @locked_specs.for(deps).map { |s| Gem::Dependency.new(s.name, s.version) }
+      meta_deps = @locked_specs.for(deps).map do |s|
+        dep = Gem::Dependency.new(s.name, s.version)
+        @locked_deps.each do |d|
+          dep.source = d.source if d.name == dep.name
+        end
+        dep
+      end
     end
   end
 end

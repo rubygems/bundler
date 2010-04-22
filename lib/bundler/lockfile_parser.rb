@@ -38,7 +38,7 @@ module Bundler
       @sources << parse_source_line(line)
     end
 
-    def parse_source_line(line)
+    def parse_source_line(line, extra_opts = {})
       type, source, option_line = line.match(/^\s+(\w+): ([^\s]*?)(?: (.*))?$/).captures
       options = extract_options(option_line)
       # There should only be one instance of a rubygem source
@@ -46,7 +46,7 @@ module Bundler
         rg_source.add_remote source
         rg_source
       else
-        TYPES[type].from_lock(source, options)
+        TYPES[type].from_lock(source, extra_opts.merge(options))
       end
     end
 
@@ -60,10 +60,14 @@ module Bundler
       if line =~ %r{^ {2}#{NAME_VERSION}$}
         name, version = $1, $2
 
+        if version =~ /^= (.+)$/
+          @last_version = $1
+        end
+
         @current = Bundler::Dependency.new(name, version)
         @dependencies << @current
       else
-        @current.source = parse_source_line(line)
+        @current.source = parse_source_line(line, "name" => @current.name, "version" => @last_version)
         @sources.unshift @current.source
       end
     end
