@@ -423,4 +423,47 @@ describe "bundle install with gem sources" do
       should_be_installed "rcov 1.0.0"
     end
   end
+
+  describe "bundler dependencies" do
+    before(:each) do
+      build_repo2 do
+        build_gem "rails", "3.0" do |s|
+          s.add_dependency "bundler", "~>0.9.0"
+        end
+        build_gem "bundler", "0.9.1"
+        build_gem "bundler", Bundler::VERSION
+      end
+      ENV["BUNDLER_VERSION"] = "0.9.1"
+    end
+
+    after(:each) do
+      ENV["BUNDLER_VERSION"] = nil
+    end
+
+    it "are forced to the current bundler version" do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "rails", "3.0"
+      G
+      should_be_installed "bundler 0.9.1"
+    end
+
+    it "are not added if not already present" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+      should_not_be_installed "bundler 0.9.1"
+    end
+
+    it "cause a conflict if explicitly requesting a different version" do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "rails", "3.0"
+        gem "bundler", "0.9.2"
+      G
+      out.should =~ /conflict on: "bundler"/i
+    end
+  end
+
 end

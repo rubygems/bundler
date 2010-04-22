@@ -98,8 +98,15 @@ module Bundler
       debug { "Requirements:\n" + reqs.map { |r| "  #{r.name} (#{r.requirement})"}.join("\n") }
 
       activated = activated.dup
-      # Pull off the first requirement so that we can resolve it
-      current   = reqs.shift
+
+      if reqs.first.name == "bundler" && !activated["bundler"]
+        # activate the current version of bundler before other versions
+        bundler_version = ENV["BUNDLER_VERSION"] || Bundler::VERSION
+        current = Gem::Dependency.new("bundler", bundler_version, reqs.first.type)
+      else
+        # Pull off the first requirement so that we can resolve it
+        current = reqs.shift
+      end
 
       debug { "Attempting:\n  #{current.name} (#{current.requirement})"}
 
