@@ -1,3 +1,9 @@
+## 0.10.0
+
+  - No `bundle lock` command. Locking happens automatically on install or update
+  - No .bundle/environment.rb. Require 'bundler/setup' instead.
+  - $BUNDLE_HOME defaults to $GEM_HOME instead of ~/.bundle
+
 ## 0.9.21 (April 16, 2010)
 
 Bugfixes:
