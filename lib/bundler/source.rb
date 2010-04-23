@@ -167,46 +167,6 @@ module Bundler
       end
     end
 
-    class GemCache
-      def initialize(options)
-        @path = options["path"]
-      end
-
-      def to_s
-        ".gem files at #{@path}"
-      end
-
-      def specs
-        @specs ||= begin
-          index = Index.new
-
-          Dir["#{@path}/*.gem"].each do |gemfile|
-            spec = Gem::Format.from_file_by_path(gemfile).spec
-            next unless Gem::Platform.match(spec.platform)
-            spec.source = self
-            index << spec
-          end
-
-          index
-        end
-      end
-
-      def install(spec)
-        destination = Gem.dir
-
-        Bundler.ui.debug "  * Installing from cache"
-        installer = Gem::Installer.new "#{@path}/#{spec.full_name}.gem",
-          :install_dir         => Gem.dir,
-          :ignore_dependencies => true,
-          :wrappers            => true,
-          :env_shebang         => true,
-          :bin_dir             => "#{Gem.dir}/bin"
-
-        installer.install
-        spec.loaded_from = "#{Gem.dir}/specifications/#{spec.full_name}.gemspec"
-      end
-    end
-
     class Path
       attr_reader :path, :options
 
