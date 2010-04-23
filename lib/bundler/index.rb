@@ -6,10 +6,6 @@ module Bundler
       i
     end
 
-    def self.system_gems
-      Source::SystemGems.new.specs
-    end
-
     def self.cached_gems
       build do |idx|
         idx.use application_cached_gems

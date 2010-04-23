@@ -167,29 +167,6 @@ module Bundler
       end
     end
 
-    class SystemGems
-      def specs
-        @specs ||= begin
-          index = Index.new
-
-          Gem::SourceIndex.from_installed_gems.to_a.reverse.each do |name, spec|
-            spec.source = self
-            index << spec
-          end
-
-          index
-        end
-      end
-
-      def to_s
-        "system gems"
-      end
-
-      def install(spec)
-        Bundler.ui.debug "  * already installed; skipping"
-      end
-    end
-
     class GemCache
       def initialize(options)
         @path = options["path"]
