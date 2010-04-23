@@ -4,6 +4,51 @@
   - No .bundle/environment.rb. Require 'bundler/setup' instead.
   - $BUNDLE_HOME defaults to $GEM_HOME instead of ~/.bundle
 
+## 0.9.24 (April 22, 2010)
+
+Features:
+
+  - fetch submodules for git sources
+  - limit the bundled version of bundler to the same as the one installing
+  - force relative paths in git gemspecs to avoid raising Gem::NameTooLong
+  - serialize GemCache sources correctly, so locking works
+  - raise Bundler::GemNotFound instead of calling exit! inside library code
+  - Rubygems 1.3.5 compatibility for the adventurous, not supported by me :)
+
+Bugfixes:
+
+  - don't try to regenerate environment.rb if it is read-only
+  - prune outdated gems with the platform "ruby"
+  - prune cache without errors when there are directories or non-gem files
+  - don't re-write environment.rb if running after it has been loaded
+  - do not monkeypatch Specification#load_paths twice when inside a bundle
+
+## 0.9.23 (April 20, 2010)
+
+Bugfixes:
+
+  - cache command no longer prunes gems created by an older rubygems version
+  - cache command no longer prunes gems that are for other platforms
+
+## 0.9.22 (April 20, 2010)
+
+Features:
+
+  - cache command now prunes stale .gem files from vendor/cache
+  - init --gemspec command now generates development dependencies
+  - handle Polyglot's changes to Kernel#require with Bundler::ENV_LOADED (#287)
+  - remove .gem files generated after installing a gem from a :path (#286)
+  - improve install/lock messaging (#284)
+
+Bugfixes:
+
+  - ignore cached gems that are for another platform (#288)
+  - install Windows gems that have no architecture set, like rcov (#277)
+  - exec command while locked now includes the bundler lib in $LOAD_PATH (#293)
+  - fix the `rake install` task
+  - add GemspecError so it can be raised without (further) error (#292)
+  - create a parent directory before cloning for git 1.5 compatibility (#285)
+
 ## 0.9.21 (April 16, 2010)
 
 Bugfixes:
