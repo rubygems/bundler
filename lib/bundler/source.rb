@@ -7,7 +7,7 @@ require "open3"
 module Bundler
   module Source
     class Rubygems
-      attr_reader :remotes, :options
+      attr_reader :remotes
 
       def initialize(options = {})
         @options = options
