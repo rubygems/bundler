@@ -42,7 +42,7 @@ describe "bundle install with gem sources" do
       bundle :pack
       simulate_new_machine
 
-      install_gemfile <<-G, :relock => true
+      install_gemfile <<-G
         Gem.platforms = [#{rb}]
         source "file://#{gem_repo1}"
         gem "platform_specific"

@@ -93,9 +93,10 @@ describe "bundle cache" do
 
     it "adds and removes when gems are updated" do
       update_repo2
+      bundle :unlock
       bundle :install
-      cached_gem("rack-1.0.0").should_not exist
       cached_gem("rack-1.2").should exist
+      cached_gem("rack-1.0.0").should_not exist
     end
 
     it "adds new gems and dependencies" do
