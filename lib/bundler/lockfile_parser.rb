@@ -7,7 +7,7 @@ module Bundler
     # Do stuff
     def initialize(lockfile)
       @rg_source    = Source::Rubygems.new
-      @sources      = [@rg_source]
+      @sources      = []
       @dependencies = []
       @specs        = []
 
@@ -24,6 +24,7 @@ module Bundler
         end
       end
 
+      @sources << @rg_source
       @sources.uniq!
     end
 
@@ -45,6 +46,7 @@ module Bundler
       # There should only be one instance of a rubygem source
       if type == 'gem'
         @rg_source.add_remote source
+        @sources << @rg_source
         @rg_source
       else
         TYPES[type].from_lock(source, extra_opts.merge(options))

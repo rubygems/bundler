@@ -12,11 +12,8 @@ module Bundler
     def index
       @index ||= Index.build do |idx|
         sources.each do |s|
-          idx.use s.local_specs if s.respond_to?(:local_specs)
+          idx.use s.local_specs
         end
-
-        idx.use Index.system_gems
-        idx.use Index.cached_gems
       end
     end
 

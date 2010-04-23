@@ -11,7 +11,7 @@ module Bundler
     def initialize
       @rubygems_source = Source::Rubygems.new
       @source          = nil
-      @sources         = [@rubygems_source]
+      @sources         = []
       @dependencies    = []
       @group           = [:default]
     end
@@ -57,6 +57,8 @@ module Bundler
     end
 
     def to_definition(lockfile)
+      @sources << @rubygems_source
+      @sources.uniq!
       Definition.new(lockfile, @dependencies, @sources)
     end
 
@@ -94,6 +96,7 @@ module Bundler
 
     def rubygems_source(source)
       @rubygems_source.add_remote source
+      @sources << @rubygems_source
     end
 
     def _version?(version)

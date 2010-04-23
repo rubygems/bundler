@@ -42,6 +42,10 @@ module Bundler
         @specs ||= fetch_specs
       end
 
+      def local_specs
+        @local_specs ||= fetch_local_specs
+      end
+
       def fetch(spec)
         action = @spec_fetch_map[[spec.name, spec.version, spec.platform]]
         action.call if action
@@ -90,6 +94,13 @@ module Bundler
       def fetch_specs
         idx = Index.new
         fetch_remote_specs(idx)
+        fetch_cached_specs(idx)
+        fetch_installed_specs(idx)
+        idx
+      end
+
+      def fetch_local_specs
+        idx = Index.new
         fetch_cached_specs(idx)
         fetch_installed_specs(idx)
         idx
