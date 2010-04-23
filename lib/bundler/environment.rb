@@ -97,28 +97,6 @@ module Bundler
       end
     end
 
-    def gemfile_fingerprint
-      Digest::SHA1.hexdigest(File.read(Bundler.default_gemfile))
-    end
-
-    def specs_for_lock_file
-      requested_specs.map do |s|
-        hash = {
-          :name => s.name,
-          :load_paths => s.load_paths
-        }
-        if s.respond_to?(:relative_loaded_from) && s.relative_loaded_from
-          hash[:virtual_spec] = s.to_ruby
-        end
-        hash[:loaded_from] = s.loaded_from.to_s
-        hash
-      end
-    end
-
-    def load_paths
-      specs.map { |s| s.load_paths }.flatten
-    end
-
     def write_yml_lock
       File.open("#{root}/Gemfile.lock", 'w') do |f|
         f.puts details
