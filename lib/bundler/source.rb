@@ -6,6 +6,7 @@ require "open3"
 
 module Bundler
   module Source
+    # TODO: Refactor this class
     class Rubygems
       attr_reader :remotes
 
@@ -14,6 +15,7 @@ module Bundler
         @remotes = (options["remotes"] || []).map { |r| normalize_uri(r) }
         # @caches  = (options["caches"] || [])
         # Hardcode the paths for now
+        @installed = {}
         @caches = [ "#{Bundler.root}/vendor/cache",
           "#{Bundler.bundle_path}/cache"]
         @spec_fetch_map = {}
@@ -57,6 +59,8 @@ module Bundler
           File.exist?(path)
         end
 
+        return if @installed[spec.full_name]
+
         installer = Gem::Installer.new path,
           :install_dir         => Gem.dir,
           :ignore_dependencies => true,
@@ -87,7 +91,16 @@ module Bundler
         idx = Index.new
         fetch_remote_specs(idx)
         fetch_cached_specs(idx)
+        fetch_installed_specs(idx)
         idx
+      end
+
+      def fetch_installed_specs(idx)
+        Gem::SourceIndex.from_installed_gems.to_a.reverse.each do |name, spec|
+          @installed[spec.full_name] = true
+          spec.source = self
+          idx << spec
+        end
       end
 
       def fetch_cached_specs(idx)
