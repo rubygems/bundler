@@ -8,13 +8,8 @@ module Bundler
 
     def self.installed_gems
       build do |idx|
-        idx.use bundler_gems
         idx.use system_gems
       end
-    end
-
-    def self.bundler_gems
-      Source::BundlerGems.new.specs
     end
 
     def self.system_gems

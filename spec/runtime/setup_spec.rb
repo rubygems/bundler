@@ -19,12 +19,13 @@ describe "Bundler.setup" do
   end
 
   it "prioritizes gems in BUNDLE_PATH over gems in GEM_HOME" do
+    ENV['BUNDLE_PATH'] = bundled_app('.bundle').to_s
     install_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack", "1.0.0"
     G
 
-    build_gem "rack", :to_system => true do |s|
+    build_gem "rack", "1.0", :to_system => true do |s|
       s.write "lib/rack.rb", "RACK = 'FAIL'"
     end
 

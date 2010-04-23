@@ -119,11 +119,7 @@ module Bundler
         @specs ||= begin
           index = Index.new
 
-          system_paths = Gem::SourceIndex.installed_spec_directories
-          system_paths.reject!{|d| d == Bundler.specs_path.to_s }
-
-          system_index = Gem::SourceIndex.from_gems_in(*system_paths)
-          system_index.to_a.reverse.each do |name, spec|
+          Gem::SourceIndex.from_installed_gems.reverse_each do |name, spec|
             spec.source = self
             index << spec
           end
@@ -138,26 +134,6 @@ module Bundler
 
       def install(spec)
         Bundler.ui.debug "  * already installed; skipping"
-      end
-    end
-
-    class BundlerGems < SystemGems
-      def specs
-        @specs ||= begin
-          index = Index.new
-
-          bundle_index = Gem::SourceIndex.from_gems_in(Bundler.specs_path)
-          bundle_index.to_a.reverse.each do |name, spec|
-            spec.source = self
-            index << spec
-          end
-
-          index
-        end
-      end
-
-      def to_s
-        "bundler gems"
       end
     end
 
