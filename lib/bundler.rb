@@ -98,15 +98,7 @@ module Bundler
     alias require gem_require unless Bundler.respond_to?(:require)
 
     def load
-      @load ||= begin
-        if current_env_file?
-          @gem_loaded = true
-          Kernel.require env_file
-          Bundler
-        else
-          runtime
-        end
-      end
+      @load ||= runtime
     end
 
     def runtime
@@ -143,10 +135,6 @@ module Bundler
       @settings ||= Settings.new(root)
     end
 
-    def env_file
-      SharedHelpers.env_file
-    end
-
     def with_clean_env
       bundled_env = ENV.to_hash
       ENV.replace(ORIGINAL_ENV)
@@ -172,10 +160,6 @@ module Bundler
       end
 
       Gem.clear_paths
-    end
-
-    def current_env_file?
-      env_file.exist? && (env_file.read(100) =~ /Bundler #{Bundler::VERSION}/)
     end
   end
 end

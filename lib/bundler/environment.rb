@@ -92,8 +92,9 @@ module Bundler
     end
 
     def write_rb_lock
-      Bundler.env_file.dirname.mkpath
-      File.open(Bundler.env_file, 'w') do |f|
+      env_file = Bundler.default_gemfile.dirname.join(".bundle/environment.rb")
+      env_file.dirname.mkpath
+      File.open(env_file, 'w') do |f|
         f.puts <<-RB
 require "rubygems"
 require "bundler/setup"

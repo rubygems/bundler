@@ -48,10 +48,6 @@ module Bundler
       find_gemfile
     end
 
-    def env_file
-      default_gemfile.dirname.join(".bundle/environment.rb")
-    end
-
   private
 
     def find_gemfile
