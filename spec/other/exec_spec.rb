@@ -85,7 +85,7 @@ describe "bundle exec" do
     rubyopt = "-I#{bundler_path} -rbundler/setup"
 
     bundle "exec 'echo $RUBYOPT'"
-    out.should == rubyopt
+    check out.should == rubyopt
 
     bundle "exec 'echo $RUBYOPT'", :env => {"RUBYOPT" => rubyopt}
     out.should == rubyopt
