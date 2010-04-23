@@ -11,7 +11,11 @@ module Bundler
 
     def index
       @index ||= Index.build do |idx|
-        idx.use runtime_gems
+        sources.each do |s|
+          idx.use s.local_specs if s.respond_to?(:local_specs)
+        end
+
+        idx.use Index.system_gems
         idx.use Index.cached_gems
       end
     end
@@ -49,16 +53,6 @@ module Bundler
 
     def sources
       @definition.sources
-    end
-
-    def runtime_gems
-      @runtime_gems ||= Index.build do |i|
-        sources.each do |s|
-          i.use s.local_specs if s.respond_to?(:local_specs)
-        end
-
-        i.use Index.system_gems
-      end
     end
 
     def resolve(type, index)
