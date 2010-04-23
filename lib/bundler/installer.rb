@@ -63,17 +63,7 @@ module Bundler
 
     def remote_index
       @remote_index ||= Index.build do |idx|
-        rubygems, other = sources.partition { |s| Source::Rubygems === s }
-
-        other.each do |source|
-          Bundler.ui.debug "Source: Processing index"
-          idx.use source.specs
-        end
-
-        rubygems.each do |source|
-          Bundler.ui.debug "Source: Processing index"
-          idx.use source.specs
-        end
+        sources.each { |source| idx.use source.specs }
       end
     end
   end
