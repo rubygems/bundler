@@ -12,7 +12,10 @@ module Bundler
       def initialize(options = {})
         @options = options
         @remotes = (options["remotes"] || []).map { |r| normalize_uri(r) }
-        @caches  = (options["caches"] || [])
+        # @caches  = (options["caches"] || [])
+        # Hardcode the paths for now
+        @caches = [ "#{Bundler.root}/vendor/cache",
+          "#{Bundler.bundle_path}/cache"]
         @spec_fetch_map = {}
       end
 
@@ -39,12 +42,22 @@ module Bundler
 
       def fetch(spec)
         action = @spec_fetch_map[[spec.name, spec.version, spec.platform]]
-        action.call
+        action.call if action
       end
 
       def install(spec)
         Bundler.ui.debug "  * Installing"
-        installer = Gem::Installer.new gem_path(spec),
+        # TODO: Stop doing craz
+        # I'm not going to bother tracking which cache gem the spec
+        # came from, so I'm going to just loop over the caches in
+        # order of priority until I find it
+        path = nil
+        @caches.find do |cache|
+          path = "#{cache}/#{spec.full_name}.gem"
+          File.exist?(path)
+        end
+
+        installer = Gem::Installer.new path,
           :install_dir         => Gem.dir,
           :ignore_dependencies => true,
           :wrappers            => true,
@@ -70,19 +83,22 @@ module Bundler
         uri
       end
 
-      def gem_path(spec)
-        "#{Gem.dir}/cache/#{spec.full_name}.gem"
-      end
-
       def fetch_specs
         idx = Index.new
-        fetch_cached_specs(idx)
         fetch_remote_specs(idx)
+        fetch_cached_specs(idx)
         idx
       end
 
       def fetch_cached_specs(idx)
-        # Nothing yet
+        @caches.each do |path|
+          Dir["#{path}/*.gem"].each do |gemfile|
+            s = Gem::Format.from_file_by_path(gemfile).spec
+            next unless Gem::Platform.match(s.platform)
+            s.source = self
+            idx << s
+          end
+        end
       end
 
       def fetch_remote_specs(index)

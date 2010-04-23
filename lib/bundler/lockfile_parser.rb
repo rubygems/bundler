@@ -6,9 +6,10 @@ module Bundler
 
     # Do stuff
     def initialize(lockfile)
-      @sources = []
+      @rg_source    = Source::Rubygems.new
+      @sources      = [@rg_source]
       @dependencies = []
-      @specs = []
+      @specs        = []
 
       lockfile.split(/\n+/).each do |line|
         case line
@@ -43,15 +44,11 @@ module Bundler
       options = extract_options(option_line)
       # There should only be one instance of a rubygem source
       if type == 'gem'
-        rg_source.add_remote source
-        rg_source
+        @rg_source.add_remote source
+        @rg_source
       else
         TYPES[type].from_lock(source, extra_opts.merge(options))
       end
-    end
-
-    def rg_source
-      @rg_source ||= Source::Rubygems.new
     end
 
     NAME_VERSION = '(?! )(.*?)(?: \((.*)\))?:?'

@@ -9,10 +9,11 @@ module Bundler
     end
 
     def initialize
-      @source  = nil
-      @sources = []
-      @dependencies = []
-      @group = [:default]
+      @rubygems_source = Source::Rubygems.new
+      @source          = nil
+      @sources         = [@rubygems_source]
+      @dependencies    = []
+      @group           = [:default]
     end
 
     def gem(name, *args)
@@ -92,12 +93,6 @@ module Bundler
   private
 
     def rubygems_source(source)
-      @rubygems_source ||= begin
-        s = Source::Rubygems.new
-        @sources << s
-        s
-      end
-
       @rubygems_source.add_remote source
     end
 

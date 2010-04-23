@@ -32,6 +32,10 @@ module Bundler
       end
     end
 
+    def no_sources?
+      sources.length == 1 && sources.first.remotes.empty?
+    end
+
     # TODO: OMG LOL
     def resolved_dependencies
       deps = locked_specs_as_deps

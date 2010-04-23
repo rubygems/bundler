@@ -136,11 +136,12 @@ module Bundler
 
       specified_sources = all_sources - pinned_sources
 
-      unless specified_sources.empty?
+      unless specified_sources.length == 1 && specified_sources.first.remotes.empty?
         output << "sources:\n"
 
         specified_sources.each do |source|
-          output << "  #{source.to_lock}\n"
+          o = source.to_lock
+          output << "  #{source.to_lock}\n" unless o.empty?
         end
         output << "\n"
       end

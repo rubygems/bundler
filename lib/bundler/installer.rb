@@ -71,7 +71,6 @@ module Bundler
         end
 
         idx.use Index.system_gems
-        idx.use Index.cached_gems
 
         rubygems.each do |source|
           Bundler.ui.debug "Source: Processing index"
