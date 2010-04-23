@@ -11,9 +11,9 @@ module Bundler
 
       def initialize(options = {})
         @options = options
-        remotes = options["remotes"] || []
-        @remotes = remotes.map { |r| normalize_uri(r) }
-        @spec_uri_map = {}
+        @remotes = (options["remotes"] || []).map { |r| normalize_uri(r) }
+        @caches  = (options["caches"] || [])
+        @spec_fetch_map = {}
       end
 
       def options
@@ -25,7 +25,6 @@ module Bundler
       end
 
       def to_lock
-        # "gem: #{@uri}"
         remotes.map {|r| "gem: #{URI.escape(r.to_s)}" }.join("\n  ")
       end
 
@@ -39,10 +38,8 @@ module Bundler
       end
 
       def fetch(spec)
-        Bundler.ui.debug "  * Downloading"
-        uri = @spec_uri_map[[spec.name, spec.version, spec.platform]]
-        spec.fetch_platform
-        Gem::RemoteFetcher.fetcher.download(spec, uri, Gem.dir)
+        action = @spec_fetch_map[[spec.name, spec.version, spec.platform]]
+        action.call
       end
 
       def install(spec)
@@ -78,7 +75,17 @@ module Bundler
       end
 
       def fetch_specs
-        index   = Index.new
+        idx = Index.new
+        fetch_cached_specs(idx)
+        fetch_remote_specs(idx)
+        idx
+      end
+
+      def fetch_cached_specs(idx)
+        # Nothing yet
+      end
+
+      def fetch_remote_specs(index)
         remotes = self.remotes.map { |uri| uri.to_s }
         Bundler.ui.info "Fetching source index for #{remotes.join(', ')}"
         old = Gem.sources
@@ -86,24 +93,24 @@ module Bundler
         remotes.each do |uri|
           Bundler.ui.info "Fetching source index for #{uri}"
           Gem.sources = ["#{uri}"]
-          fetch_all_specs do |n,v|
+          fetch_all_remote_specs do |n,v|
             v.each do |name, version, platform|
               next unless Gem::Platform.match(platform)
-              # Temporary hack until this can be figured out better
-              @spec_uri_map[[name, version, platform]] = uri
               spec = RemoteSpecification.new(name, version, platform, uri)
               spec.source = self
+              # Temporary hack until this can be figured out better
+              @spec_fetch_map[[name, version, platform]] = lambda do
+                download_gem_from_uri(spec, uri)
+              end
               index << spec
             end
           end
         end
-
-        index
       ensure
         Gem.sources = old
       end
 
-      def fetch_all_specs(&blk)
+      def fetch_all_remote_specs(&blk)
         # Fetch all specs, minus prerelease specs
         Gem::SpecFetcher.new.list(true, false).each(&blk)
         # Then fetch the prerelease specs
@@ -112,6 +119,11 @@ module Bundler
         rescue Gem::RemoteFetcher::FetchError
           Bundler.ui.warn "Could not fetch prerelease specs from #{self}"
         end
+      end
+
+      def download_gem_from_uri(spec, uri)
+        spec.fetch_platform
+        Gem::RemoteFetcher.fetcher.download(spec, uri, Gem.dir)
       end
     end
 
