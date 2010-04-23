@@ -6,12 +6,6 @@ module Bundler
       i
     end
 
-    def self.installed_gems
-      build do |idx|
-        idx.use system_gems
-      end
-    end
-
     def self.system_gems
       Source::SystemGems.new.specs
     end

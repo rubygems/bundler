@@ -70,7 +70,7 @@ module Bundler
           idx.use source.specs
         end
 
-        idx.use Index.installed_gems
+        idx.use Index.system_gems
         idx.use Index.cached_gems
 
         rubygems.each do |source|

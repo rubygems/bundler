@@ -57,7 +57,7 @@ module Bundler
           i.use s.local_specs if s.respond_to?(:local_specs)
         end
 
-        i.use Index.installed_gems
+        i.use Index.system_gems
       end
     end
 
