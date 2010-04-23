@@ -6,28 +6,6 @@ module Bundler
       i
     end
 
-    def self.cached_gems
-      build do |idx|
-        idx.use application_cached_gems
-        idx.use system_cached_gems
-      end
-    end
-
-    def self.application_cached_gems
-      path = "#{Bundler.root}/vendor/cache"
-      if File.directory?(path)
-        from_cached_specs(path)
-      end
-    end
-
-    def self.system_cached_gems
-      from_cached_specs("#{Bundler.bundle_path}/cache")
-    end
-
-    def self.from_cached_specs(path)
-      Source::GemCache.new("path" => path).specs
-    end
-
     def initialize
       @cache = {}
       @specs = Hash.new { |h,k| h[k] = [] }
