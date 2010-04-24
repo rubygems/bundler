@@ -91,11 +91,7 @@ module Bundler
     end
 
     def load
-      @load ||= runtime
-    end
-
-    def runtime
-      @runtime ||= Runtime.new(root, definition)
+      @load ||= Runtime.new(root, definition)
     end
 
     def definition

@@ -44,7 +44,7 @@ module Bundler
 
     desc "check", "Checks if the dependencies listed in Gemfile are satisfied by currently installed gems"
     def check
-      env = Bundler.runtime
+      env = Bundler.load
       # Check top level dependencies
       missing = env.dependencies.select { |d| env.index.search(d).empty? }
       if missing.any?
@@ -101,7 +101,7 @@ module Bundler
         remove_lockfiles
       end
 
-      Bundler.runtime.lock
+      Bundler.load.lock
       Bundler.ui.confirm("Your bundle is now locked. " +
         "Use `bundle show [gemname]` to list the gems in the environment.")
     rescue GemNotFound, VersionConflict => e
@@ -126,7 +126,7 @@ module Bundler
         Bundler.ui.info locate_gem(gem_name)
       else
         Bundler.ui.info "Gems included by the bundle:"
-        Bundler.runtime.specs.sort_by { |s| s.name }.each do |s|
+        Bundler.load.specs.sort_by { |s| s.name }.each do |s|
           Bundler.ui.info "  * #{s.name} (#{s.version}#{s.git_version})"
         end
       end
@@ -136,8 +136,8 @@ module Bundler
     desc "cache", "Cache all the gems to vendor/cache"
     method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
     def cache
-      Bundler.runtime.cache
-      Bundler.runtime.prune_cache unless options[:no_prune]
+      Bundler.load.cache
+      Bundler.load.prune_cache unless options[:no_prune]
     rescue GemNotFound => e
       Bundler.ui.error(e.message)
       Bundler.ui.warn "Run `bundle install` to install missing gems."
@@ -223,7 +223,7 @@ module Bundler
     end
 
     def locate_gem(name)
-      spec = Bundler.runtime.specs.find{|s| s.name == name }
+      spec = Bundler.load.specs.find{|s| s.name == name }
       raise GemNotFound, "Could not find gem '#{name}' in the current bundle." unless spec
       spec.full_gem_path
     end
