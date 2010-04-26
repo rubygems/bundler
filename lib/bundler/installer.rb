@@ -9,7 +9,7 @@ module Bundler
     end
 
     def run(options)
-      if resolved_dependencies.empty?
+      if dependencies.empty?
         Bundler.ui.warn "The Gemfile specifies no dependencies"
         return
       end

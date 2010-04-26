@@ -9,12 +9,9 @@ module Bundler
       @definition = definition
     end
 
+    # TODO: Remove this method. It's used in cli.rb still
     def index
       @definition.index
-    end
-
-    def remote_index
-      @definition.remote_index
     end
 
     def requested_specs
@@ -33,11 +30,6 @@ module Bundler
       @definition.dependencies
     end
 
-    # TODO: Remove this method
-    def resolved_dependencies
-      @definition.resolver_dependencies
-    end
-
     def lock
       Bundler.ui.info("The bundle is already locked, relocking.") if locked?
       sources.each { |s| s.lock if s.respond_to?(:lock) }
@@ -49,6 +41,7 @@ module Bundler
 
   private
 
+    # TODO: remote this method
     def sources
       @definition.sources
     end
