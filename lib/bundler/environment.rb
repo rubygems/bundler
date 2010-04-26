@@ -26,15 +26,16 @@ module Bundler
     end
 
     def specs
-      @specs ||= resolve_locally || resolve_remotely
+      @definition.specs
     end
 
     def dependencies
       @definition.dependencies
     end
 
+    # TODO: Remove this method
     def resolved_dependencies
-      @definition.resolved_dependencies
+      @definition.resolver_dependencies
     end
 
     def lock
@@ -50,25 +51,6 @@ module Bundler
 
     def sources
       @definition.sources
-    end
-
-    def resolve(type, index)
-      source_requirements = {}
-      resolved_dependencies.each do |dep|
-        next unless dep.source && dep.source.respond_to?(type)
-        source_requirements[dep.name] = dep.source.send(type)
-      end
-
-      # Run a resolve against the locally available gems
-      Resolver.resolve(resolved_dependencies, index, source_requirements)
-    end
-
-    def resolve_locally
-      resolve(:local_specs, index)
-    end
-
-    def resolve_remotely
-      raise NotImplementedError
     end
 
     def specs_for(groups)

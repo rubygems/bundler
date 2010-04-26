@@ -39,26 +39,8 @@ module Bundler
       lock
     end
 
-  private
-
-    def resolve_locally
-      # Return unless all the dependencies have = version requirements
-      return if resolved_dependencies.any? { |d| ambiguous?(d) }
-
-      specs = super
-
-      # Simple logic for now. Can improve later.
-      specs.length == resolved_dependencies.length && specs
-    rescue GemNotFound, PathError => e
-      nil
-    end
-
-    def resolve_remotely
-      resolve(:specs, remote_index)
-    end
-
-    def ambiguous?(dep)
-      dep.requirement.requirements.any? { |op,_| op != '=' }
+    def specs
+      @definition.remote_specs
     end
   end
 end

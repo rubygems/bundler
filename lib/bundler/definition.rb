@@ -32,6 +32,14 @@ module Bundler
       end
     end
 
+    def specs
+      @specs ||= resolve(:local_specs, index)
+    end
+
+    def remote_specs
+      @remote_specs ||= resolve_remote_specs
+    end
+
     def index
       @index ||= Index.build do |idx|
         sources.each do |s|
@@ -51,17 +59,21 @@ module Bundler
     end
 
     # TODO: OMG LOL
-    def resolved_dependencies
-      deps = locked_specs_as_deps
-      dependencies.each do |dep|
-        deps << dep unless deps.any? { |d| d.name == dep.name }
+    def resolver_dependencies
+      @resolver_dependencies ||= begin
+        deps = locked_specs_as_deps
+        dependencies.each do |dep|
+          deps << dep unless deps.any? { |d| d.name == dep.name }
+        end
+        deps
       end
-      deps
     end
 
     def groups
       dependencies.map { |d| d.groups }.flatten.uniq
     end
+
+  private
 
     # We have the dependencies from Gemfile.lock and the dependencies from the
     # Gemfile. Here, we are finding a list of all dependencies that were
@@ -85,6 +97,39 @@ module Bundler
         end
         dep
       end
+    end
+
+    def resolve(type, idx)
+      source_requirements = {}
+      resolver_dependencies.each do |dep|
+        next unless dep.source
+        source_requirements[dep.name] = dep.source.send(type)
+      end
+
+      # Run a resolve against the locally available gems
+      Resolver.resolve(resolver_dependencies, idx, source_requirements)
+    end
+
+    def resolve_remote_specs
+      # An ambiguous dependency is any dependency that does not have
+      # a requirement on an explicit version. If there are any, then
+      # we must do a remote resolve.
+      if resolver_dependencies.any? { |d| ambiguous?(d) }
+        return resolve(:specs, remote_index)
+      end
+
+      # Simple logic for now. Can improve later.
+      if specs.length == resolver_dependencies.length
+        return specs
+      else
+        return resolve(:specs, remote_index)
+      end
+    rescue GemNotFound, PathError => e
+      resolve(:specs, remote_index)
+    end
+
+    def ambiguous?(dep)
+      dep.requirement.requirements.any? { |op,_| op != '=' }
     end
   end
 end
