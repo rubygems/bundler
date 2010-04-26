@@ -10,11 +10,11 @@ module Bundler
     end
 
     def index
-      @index ||= Index.build do |idx|
-        sources.each do |s|
-          idx.use s.local_specs
-        end
-      end
+      @definition.index
+    end
+
+    def remote_index
+      @definition.remote_index
     end
 
     def requested_specs

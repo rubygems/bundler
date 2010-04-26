@@ -60,11 +60,5 @@ module Bundler
     def ambiguous?(dep)
       dep.requirement.requirements.any? { |op,_| op != '=' }
     end
-
-    def remote_index
-      @remote_index ||= Index.build do |idx|
-        sources.each { |source| idx.use source.specs }
-      end
-    end
   end
 end

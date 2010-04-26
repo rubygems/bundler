@@ -32,6 +32,20 @@ module Bundler
       end
     end
 
+    def index
+      @index ||= Index.build do |idx|
+        sources.each do |s|
+          idx.use s.local_specs
+        end
+      end
+    end
+
+    def remote_index
+      @remote_index ||= Index.build do |idx|
+        sources.each { |source| idx.use source.specs }
+      end
+    end
+
     def no_sources?
       sources.length == 1 && sources.first.remotes.empty?
     end
