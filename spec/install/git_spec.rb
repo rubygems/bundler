@@ -276,6 +276,7 @@ describe "bundle install with git sources" do
   end
 
   it "notices when you change the repo url in the Gemfile" do
+    pending "`bundle lock` is deprecated, but this spec might need still be valid and need to be re-written"
     build_git "foo_one"
     build_git "foo_two"
     install_gemfile %|gem "foo", "1.0", :git => "#{lib_path('foo_one-1.0')}"|

@@ -32,7 +32,6 @@ module Bundler
 
     def lock
       Bundler.ui.info("The bundle is already locked, relocking.") if locked?
-      sources.each { |s| s.lock if s.respond_to?(:lock) }
       FileUtils.mkdir_p("#{root}/.bundle")
       write_yml_lock
       write_rb_lock
@@ -40,11 +39,6 @@ module Bundler
     end
 
   private
-
-    # TODO: remote this method
-    def sources
-      @definition.sources
-    end
 
     def specs_for(groups)
       deps = dependencies.select { |d| (d.groups & groups).any? }

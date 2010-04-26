@@ -327,7 +327,7 @@ module Bundler
       end
 
       def path
-        Bundler.install_path.join("#{base_name}-#{uri_hash}-#{shortref_for(revision)}")
+        Bundler.install_path.join("#{base_name}-#{shortref_for(revision)}")
       end
 
       def specs
@@ -348,11 +348,6 @@ module Bundler
           @installed = true
         end
         generate_bin(spec)
-      end
-
-      def lock
-        @ref = @options["ref"] = revision
-        checkout
       end
 
       def load_spec_files
