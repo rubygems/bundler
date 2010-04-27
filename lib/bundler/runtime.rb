@@ -82,7 +82,7 @@ module Bundler
       Bundler.ui.info "Copying .gem files into vendor/cache"
       specs.each do |spec|
         next unless spec.source.is_a?(Source::SystemGems) || spec.source.is_a?(Source::Rubygems)
-        possibilities = Gem.path.map { |p| "#{p}/cache/#{spec.full_name}.gem" }
+        possibilities = Gem.path.map { |p| "#{p.to_s}/cache/#{spec.full_name}.gem" }
         cached_path = possibilities.find { |p| File.exist? p }
         raise GemNotFound, "Missing gem file '#{spec.full_name}.gem'." unless cached_path
         Bundler.ui.info "  * #{File.basename(cached_path)}"
@@ -93,19 +93,18 @@ module Bundler
 
     def prune_cache
       FileUtils.mkdir_p(cache_path)
-
       Bundler.ui.info "Removing outdated .gem files from vendor/cache"
       Pathname.glob(cache_path.join("*.gem").to_s).each do |gem_path|
-        cached_spec = Gem::Format.from_file_by_path(gem_path).spec
+        cached_spec = Gem::Format.from_file_by_path(gem_path.to_s).spec
         next unless Gem::Platform.match(cached_spec.platform)
         unless specs.any?{|s| s.full_name == cached_spec.full_name }
-          Bundler.ui.info "  * #{File.basename(gem_path)}"
+          Bundler.ui.info "  * #{File.basename(gem_path.to_s)}"
           gem_path.rmtree
         end
       end
     end
 
-  private
+    private
 
     def load_paths
       specs.map { |s| s.load_paths }.flatten
