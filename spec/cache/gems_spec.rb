@@ -92,6 +92,7 @@ describe "bundle cache" do
     end
 
     it "adds and removes when gems are updated" do
+      pending_bundle_update
       update_repo2
       bundle :unlock
       bundle :install

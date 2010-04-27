@@ -95,11 +95,10 @@ describe "bundle check" do
   describe "when locked" do
     before :each do
       system_gems "rack-1.0.0"
-      gemfile <<-G
+      install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack", "1.0"
       G
-      bundle :lock
     end
 
     it "rebuilds .bundle/environment.rb " do

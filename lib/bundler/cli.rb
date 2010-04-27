@@ -96,28 +96,12 @@ module Bundler
 
     desc "lock", "Locks the bundle to the current set of dependencies, including all child dependencies."
     def lock
-      if locked?
-        Bundler.ui.info("Your bundle is already locked, relocking.")
-        remove_lockfiles
-      end
-
-      Bundler.load.lock
-      Bundler.ui.confirm("Your bundle is now locked. " +
-        "Use `bundle show [gemname]` to list the gems in the environment.")
-    rescue GemNotFound, VersionConflict => e
-      Bundler.ui.error(e.message)
-      Bundler.ui.warn "Run `bundle install` to install missing gems."
-      exit 128
+      # NOOP, switch to output a deprecation message
     end
 
     desc "unlock", "Unlock the bundle. This allows gem versions to be changed."
     def unlock
-      if locked?
-        remove_lockfiles
-        Bundler.ui.info("Your bundle is now unlocked. The dependencies may be changed.")
-      else
-        Bundler.ui.info("Your bundle is not currently locked.")
-      end
+      # NOOP, switch to output a deprecation message
     end
 
     desc "show GEM", "Shows all gems that are part of the bundle, or the path to a given gem"
@@ -147,7 +131,7 @@ module Bundler
     desc "package", "Locks and then caches all of the gems into vendor/cache"
     method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
     def package
-      lock
+      install
       cache
     end
     map %w(pack) => :package
