@@ -71,33 +71,6 @@ describe "Bundler.require" do
     out.split("\n").sort.should == ['seven', 'three']
   end
 
-  it "requires the locked gems" do
-    bundle :lock
-
-    def locked_require(*args)
-      env = File.expand_path(".bundle/environment.rb", Dir.pwd)
-      @out = ruby("require '#{env}'; Bundler.require(#{args.collect { |a| a.inspect }.join(", ")})")
-    end
-
-    # default group
-    check locked_require.should == "two"
-
-    # specific group
-    check locked_require(:bar).should == "baz\nqux"
-
-    # default and specific group
-    check locked_require(:default, :bar).should == "two\nbaz\nqux"
-
-    # specific group given as a string
-    check locked_require('bar').should == "baz\nqux"
-
-    # specific group declared as a string
-    check locked_require(:string).should == "six"
-
-    # required in resolver order instead of gemfile order
-    locked_require(:not).split("\n").sort.should == ['seven', 'three']
-  end
-
   it "allows requiring gems with non standard names explicitly" do
     run "Bundler.require ; require 'mofive'"
     out.should == "two\nfive"
@@ -117,22 +90,6 @@ describe "Bundler.require" do
       end
     R
     out.should == 'no such file to load -- fail'
-  end
-
-  describe "requiring the environment directly" do
-    it "requires the locked gems" do
-      bundle :lock
-      env = bundled_app(".bundle/environment.rb")
-
-      out = ruby("require '#{env}'; Bundler.setup; Bundler.require")
-      check out.should == "two"
-
-      out = ruby("require '#{env}'; Bundler.setup(:bar); Bundler.require(:bar)")
-      check out.should == "baz\nqux"
-
-      out = ruby("require '#{env}'; Bundler.setup(:default, :bar); Bundler.require(:default, :bar)")
-      out.should == "two\nbaz\nqux"
-    end
   end
 
   describe "using bundle exec" do

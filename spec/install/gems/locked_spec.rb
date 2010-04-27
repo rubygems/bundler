@@ -13,27 +13,11 @@ describe "bundle install with gem sources" do
       end
     end
 
-    it "works" do
-      system_gems [] do
-        bundle :install
-        should_be_installed "rack 0.9.1"
-      end
-    end
-
     it "allows --relock to update the dependencies" do
       pending_bundle_update
       system_gems "rack-0.9.1" do
         bundle "install --relock"
         should_be_installed "rack 1.0.0"
-      end
-    end
-
-    it "regenerates .bundle/environment.rb if missing" do
-      bundled_app('.bundle/environment.rb').delete
-      system_gems [] do
-        bundle :install
-        bundled_app('.bundle/environment.rb').should exist
-        should_be_installed "rack 0.9.1"
       end
     end
   end

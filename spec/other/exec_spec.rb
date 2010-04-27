@@ -112,22 +112,6 @@ describe "bundle exec" do
     out.should include("bundler: not executable: ./foo")
   end
 
-  describe "when locked" do
-    before :each do
-      gemfile <<-G
-        gem "rack"
-      G
-
-      bundle :lock
-      should_be_locked
-    end
-
-    it "loads the shared helpers successfully" do
-      bundle "exec ruby -e 'puts'"
-      err.should be_empty
-    end
-  end
-
   describe "with gem binaries" do
     describe "run from a random directory" do
       before(:each) do
