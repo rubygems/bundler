@@ -4,6 +4,13 @@
   - No .bundle/environment.rb. Require 'bundler/setup' instead.
   - $BUNDLE_HOME defaults to $GEM_HOME instead of ~/.bundle
 
+## 0.9.25 (May 3, 2010)
+
+Bugfixes:
+
+  - Explicitly coerce Pathname objects to Strings for Ruby 1.9
+  - Fix some newline weirdness in output from install command
+
 ## 0.9.24 (April 22, 2010)
 
 Features:
