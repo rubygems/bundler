@@ -30,6 +30,10 @@ module Bundler
       sorted.dup
     end
 
+    def last
+      sorted.last
+    end
+
   private
 
     def append_subgraph(specs, current)

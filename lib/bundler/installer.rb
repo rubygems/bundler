@@ -27,11 +27,12 @@ module Bundler
         end
 
         if [Source::Rubygems, Source::GemCache].include?(spec.source.class)
-          Bundler.ui.info "Installing #{spec.name} (#{spec.version}) from #{spec.source}"
+          Bundler.ui.info "Installing #{spec.name} (#{spec.version}) from #{spec.source} "
         else
-          Bundler.ui.info "Using #{spec.name} (#{spec.version}) from #{spec.source}"
+          Bundler.ui.info "Using #{spec.name} (#{spec.version}) from #{spec.source} "
         end
         spec.source.install(spec)
+        Bundler.ui.info "" unless spec == specs.last
       end
 
       if locked?
