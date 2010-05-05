@@ -198,7 +198,7 @@ module Bundler
       end
 
       def to_lock
-        out = "path: #{URI.escape(@path.to_s)}"
+        out = "path: #{URI.escape(relative_path.to_s)}"
         out << %{ glob:"#{@glob}"} unless @glob == DEFAULT_GLOB
         out
       end
@@ -290,6 +290,14 @@ module Bundler
       end
 
     private
+
+      def relative_path
+        if path.to_s.include?(Bundler.root.to_s)
+          return path.relative_path_from(Bundler.root)
+        end
+
+        path
+      end
 
       def generate_bin(spec)
         gem_dir  = Pathname.new(spec.full_gem_path)

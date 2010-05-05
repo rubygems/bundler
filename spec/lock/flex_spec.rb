@@ -273,4 +273,44 @@ describe "the lockfile format" do
           rack
     G
   end
+
+  it "stores relative paths when the path is provided in a relative fashion" do
+    build_lib "foo", :path => bundled_app('foo')
+
+    install_gemfile <<-G
+      path "foo"
+      gem "foo"
+    G
+
+    lockfile_should_be <<-G
+      sources:
+        path: foo
+
+      dependencies:
+        foo
+
+      specs:
+        foo (1.0)
+    G
+  end
+
+  it "stores relative paths when the path is provided in an absolute fashion but is relative" do
+    build_lib "foo", :path => bundled_app('foo')
+
+    install_gemfile <<-G
+      path File.expand_path("../foo", __FILE__)
+      gem "foo"
+    G
+
+    lockfile_should_be <<-G
+      sources:
+        path: foo
+
+      dependencies:
+        foo
+
+      specs:
+        foo (1.0)
+    G
+  end
 end
