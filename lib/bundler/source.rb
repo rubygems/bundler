@@ -127,7 +127,6 @@ module Bundler
 
       def fetch_remote_specs(index)
         remotes = self.remotes.map { |uri| uri.to_s }
-        Bundler.ui.info "Fetching source index for #{remotes.join(', ')}"
         old = Gem.sources
 
         remotes.each do |uri|
@@ -195,7 +194,7 @@ module Bundler
       end
 
       def to_s
-        "source code at #{@path}"
+        "source at #{@path}"
       end
 
       def load_spec_files
@@ -338,11 +337,9 @@ module Bundler
       end
 
       def install(spec)
-        Bundler.ui.debug "  * Using git #{uri}"
+        Bundler.ui.info "Using #{spec.name} (#{spec.version}) from #{to_s}"
 
-        if @installed
-          Bundler.ui.debug "  * Already checked out revision: #{ref}"
-        else
+        unless @installed
           Bundler.ui.debug "  * Checking out revision: #{ref}"
           checkout
           @installed = true
