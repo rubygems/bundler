@@ -16,8 +16,7 @@ module Bundler
         # @caches  = (options["caches"] || [])
         # Hardcode the paths for now
         @installed = {}
-        @caches = [ "#{Bundler.root}/vendor/cache",
-          "#{Bundler.bundle_path}/cache"]
+        @caches = [ app_cache ] + Gem.path.map { |p| File.expand_path("#{p}/cache") }
         @spec_fetch_map = {}
       end
 
@@ -53,15 +52,8 @@ module Bundler
 
       def install(spec)
         Bundler.ui.info "Installing #{spec.name} (#{spec.version})"
-        # TODO: Stop doing craz
-        # I'm not going to bother tracking which cache gem the spec
-        # came from, so I'm going to just loop over the caches in
-        # order of priority until I find it
-        path = nil
-        @caches.find do |cache|
-          path = "#{cache}/#{spec.full_name}.gem"
-          File.exist?(path)
-        end
+
+        path = cached_gem(spec)
 
         return if @installed[spec.full_name]
 
@@ -77,11 +69,32 @@ module Bundler
         spec.loaded_from = "#{Gem.dir}/specifications/#{spec.full_name}.gemspec"
       end
 
+      def cache(spec)
+        cached_path = cached_gem(spec)
+
+        raise GemNotFound, "Missing gem file '#{spec.full_name}.gem'." unless cached_path
+
+        Bundler.ui.info "  * #{File.basename(cached_path)}"
+
+        return if File.dirname(cached_path) == app_cache
+
+        FileUtils.cp(cached_path, app_cache)
+      end
+
       def add_remote(source)
         @remotes << normalize_uri(source)
       end
 
     private
+
+      def app_cache
+        "#{Bundler.root}/vendor/cache"
+      end
+
+      def cached_gem(spec)
+        possibilities = @caches.map { |p| "#{p}/#{spec.full_name}.gem" }
+        possibilities.find { |p| File.exist?(p) }
+      end
 
       def normalize_uri(uri)
         uri = uri.to_s

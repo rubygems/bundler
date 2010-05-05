@@ -70,13 +70,7 @@ module Bundler
 
       Bundler.ui.info "Copying .gem files into vendor/cache"
       specs.each do |spec|
-        next unless spec.source.is_a?(Source::Rubygems)
-        possibilities = Gem.path.map { |p| "#{p}/cache/#{spec.full_name}.gem" }
-        cached_path = possibilities.find { |p| File.exist? p }
-        raise GemNotFound, "Missing gem file '#{spec.full_name}.gem'." unless cached_path
-        Bundler.ui.info "  * #{File.basename(cached_path)}"
-        next if File.expand_path(File.dirname(cached_path)) == File.expand_path(cache_path)
-        FileUtils.cp(cached_path, cache_path)
+        spec.source.cache(spec) if spec.source.respond_to?(:cache)
       end
     end
 
