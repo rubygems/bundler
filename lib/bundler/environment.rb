@@ -49,18 +49,14 @@ module Bundler
 
     # ==== Locking
 
-    def locked?
-      File.exist?("#{root}/Gemfile.lock")
-    end
-
     def write_rb_lock
       begin
         env_file = Bundler.default_gemfile.dirname.join(".bundle/environment.rb")
         env_file.dirname.mkpath
         File.open(env_file, 'w') do |f|
           f.puts <<-RB
-  require "rubygems"
-  require "bundler/setup"
+require "rubygems"
+require "bundler/setup"
           RB
         end
       rescue Errno::EACCES
