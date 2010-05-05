@@ -107,33 +107,5 @@ module Bundler
 
       output
     end
-
-    def autorequires_for_groups(*groups)
-      groups.map! { |g| g.to_sym }
-      groups = groups.any? ? groups : (@definition.groups - Bundler.settings.without)
-      autorequires = Hash.new { |h,k| h[k] = [] }
-
-      ordered_deps = @definition.dependencies.find_all{|d| (d.groups & groups).any? }
-
-      ordered_deps.each do |dep|
-        dep.groups.each do |group|
-          # If there is no autorequire, then rescue from
-          # autorequiring the gems name
-          if dep.autorequire
-            dep.autorequire.each do |file|
-              autorequires[group] << [file, true]
-            end
-          else
-            autorequires[group] << [dep.name, false]
-          end
-        end
-      end
-
-      if groups.empty?
-        autorequires
-      else
-        groups.inject({}) { |h,g| h[g] = autorequires[g]; h }
-      end
-    end
   end
 end

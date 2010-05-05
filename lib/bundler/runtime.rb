@@ -34,18 +34,23 @@ module Bundler
     def require(*groups)
       groups.map! { |g| g.to_sym }
       groups = [:default] if groups.empty?
-      autorequires = autorequires_for_groups(*groups)
 
-      groups.each do |group|
-        (autorequires[group] || [[]]).each do |path, explicit|
-          if explicit
-            Kernel.require(path)
-          else
-            begin
-              Kernel.require(path)
-            rescue LoadError
-            end
+      @definition.dependencies.each do |dep|
+        # Skip the dependency if it is not in any of the requested
+        # groups
+        next unless (dep.groups & groups).any?
+
+        begin
+          # Loop through all the specified autorequires for the
+          # dependency. If there are none, use the dependency's name
+          # as the autorequire.
+          Array(dep.autorequire || dep.name).each do |file|
+            Kernel.require file
           end
+        rescue LoadError
+          # Only let a LoadError through if the autorequire was explicitly
+          # specified by the user.
+          raise if dep.autorequire
         end
       end
     end

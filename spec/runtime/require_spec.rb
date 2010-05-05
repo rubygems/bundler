@@ -56,7 +56,7 @@ describe "Bundler.require" do
 
     # default and specific group
     run "Bundler.require(:default, :bar)"
-    check out.should == "two\nbaz\nqux"
+    check out.should == "baz\nqux\ntwo"
 
     # specific group given as a string
     run "Bundler.require('bar')"
@@ -103,7 +103,7 @@ describe "Bundler.require" do
       check out.should == "baz\nqux"
 
       bundle "exec ruby -e 'Bundler.require(:default, :bar)'"
-      out.should == "two\nbaz\nqux"
+      out.should == "baz\nqux\ntwo"
     end
   end
 
