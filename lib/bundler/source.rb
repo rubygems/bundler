@@ -266,6 +266,12 @@ module Bundler
 
       alias specs local_specs
 
+      def cache(spec)
+        unless path.to_s.index(Bundler.root.to_s) == 0
+          Bundler.ui.warn "  * #{spec.name} at `#{path}` will not be cached."
+        end
+      end
+
     private
 
       def generate_bin(spec)
