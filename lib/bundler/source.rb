@@ -52,7 +52,7 @@ module Bundler
       end
 
       def install(spec)
-        Bundler.ui.debug "  * Installing"
+        Bundler.ui.info "Installing #{spec.name} (#{spec.version})"
         # TODO: Stop doing craz
         # I'm not going to bother tracking which cache gem the spec
         # came from, so I'm going to just loop over the caches in
@@ -252,7 +252,7 @@ module Bundler
       end
 
       def install(spec)
-        Bundler.ui.debug "  * Using path #{path}"
+        Bundler.ui.info "Using #{spec.name} (#{spec.version}) from #{to_s}"
         generate_bin(spec)
       end
 
