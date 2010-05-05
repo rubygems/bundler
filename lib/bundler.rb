@@ -117,7 +117,11 @@ module Bundler
     end
 
     def root
-      default_gemfile.dirname
+      default_gemfile.dirname.expand_path
+    end
+
+    def app_cache
+      root.join("vendor/cache")
     end
 
     def settings

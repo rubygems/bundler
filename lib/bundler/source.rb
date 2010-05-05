@@ -16,7 +16,7 @@ module Bundler
         # @caches  = (options["caches"] || [])
         # Hardcode the paths for now
         @installed = {}
-        @caches = [ app_cache ] + Gem.path.map { |p| File.expand_path("#{p}/cache") }
+        @caches = [ Bundler.app_cache ] + Gem.path.map { |p| File.expand_path("#{p}/cache") }
         @spec_fetch_map = {}
       end
 
@@ -76,9 +76,9 @@ module Bundler
 
         Bundler.ui.info "  * #{File.basename(cached_path)}"
 
-        return if File.dirname(cached_path) == app_cache
+        return if File.dirname(cached_path) == Bundler.app_cache.to_s
 
-        FileUtils.cp(cached_path, app_cache)
+        FileUtils.cp(cached_path, Bundler.app_cache)
       end
 
       def add_remote(source)
@@ -86,10 +86,6 @@ module Bundler
       end
 
     private
-
-      def app_cache
-        "#{Bundler.root}/vendor/cache"
-      end
 
       def cached_gem(spec)
         possibilities = @caches.map { |p| "#{p}/#{spec.full_name}.gem" }
