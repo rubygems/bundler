@@ -27,7 +27,7 @@ else
     t.spec_opts  = %w(-fs --color)
     t.warning    = true
   end
-  task :spec => :clear_tmp
+  task :spec
 end
 
 
