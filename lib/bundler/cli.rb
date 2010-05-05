@@ -83,7 +83,7 @@ module Bundler
       Bundler.settings[:disable_shared_gems] = '1' if options["disable-shared-gems"] || path
       Bundler.settings.without = opts[:without]
 
-      Installer.install(Bundler.root, Bundler.definition, opts)
+      Installer.install(Bundler.root, Bundler.definition, [], opts)
       cache if Bundler.root.join("vendor/cache").exist?
       Bundler.ui.confirm "Your bundle is complete! " +
         "Use `bundle show [gemname]` to see where a bundled gem is installed."
@@ -92,6 +92,12 @@ module Bundler
         Bundler.ui.warn "Your Gemfile doesn't have any sources. You can add one with a line like 'source :gemcutter'"
       end
       raise e
+    end
+
+    desc "update", "update the current environment"
+    def update(*gems)
+      gems = Bundler.definition.specs.map { |s| s.name } if gems.empty?
+      Installer.install(Bundler.root, Bundler.definition, gems, {})
     end
 
     desc "lock", "Locks the bundle to the current set of dependencies, including all child dependencies."

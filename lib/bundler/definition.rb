@@ -19,7 +19,7 @@ module Bundler
     end
 
     def initialize(lockfile, dependencies, sources)
-      @dependencies, @sources = dependencies, sources
+      @dependencies, @sources, @unlock = dependencies, sources, []
 
       if lockfile && File.exists?(lockfile)
         locked = LockfileParser.new(File.read(lockfile))
@@ -32,7 +32,13 @@ module Bundler
       end
     end
 
+    def unlock!(gems)
+      raise "Specs already loaded" if @specs
+      @unlock.concat(gems)
+    end
+
     def resolve_remotely!
+      raise "Specs already loaded" if @specs
       @specs = resolve_remote_specs
     end
 
@@ -90,7 +96,7 @@ module Bundler
         deps << dep if @locked_specs.any? { |s| s.satisfies?(dep) }
       end
 
-      meta_deps = @locked_specs.for(deps).map do |s|
+      @locked_specs.for(deps, @unlock).map do |s|
         dep = Gem::Dependency.new(s.name, s.version)
         @locked_deps.each do |d|
           dep.source = d.source if d.name == dep.name

@@ -16,11 +16,11 @@ module Bundler
       @specs.length
     end
 
-    def for(deps)
+    def for(deps, skip = [])
       specs = {}
       deps.each do |dep|
         current = lookup[dep.respond_to?(:name) ? dep.name : dep]
-        append_subgraph(specs, current)
+        append_subgraph(specs, current, skip)
       end
 
       sorted.select { |s| specs[s.name] }
@@ -32,12 +32,12 @@ module Bundler
 
   private
 
-    def append_subgraph(specs, current)
-      return if specs[current.name]
+    def append_subgraph(specs, current, skip)
+      return if specs[current.name] || skip.include?(current.name)
       specs[current.name] = true
       current.dependencies.each do |dep|
         next if dep.type == :development
-        append_subgraph(specs, lookup[dep.name])
+        append_subgraph(specs, lookup[dep.name], skip)
       end
     end
 

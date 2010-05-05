@@ -2,17 +2,20 @@ require 'rubygems/dependency_installer'
 
 module Bundler
   class Installer < Environment
-    def self.install(root, definition, options)
+    def self.install(root, definition, unlock, options)
       installer = new(root, definition)
-      installer.run(options)
+      installer.run(unlock, options)
       installer
     end
 
-    def run(options)
+    def run(unlocked_gems, options)
       if dependencies.empty?
         Bundler.ui.warn "The Gemfile specifies no dependencies"
         return
       end
+
+      # Unlock any requested gems
+      @definition.unlock!(unlocked_gems)
 
       # Since we are installing, we can resolve the definition
       # using remote specs
