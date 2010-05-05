@@ -19,7 +19,7 @@ describe "bundle check" do
     G
 
     bundle :check, :exit_status => true
-    check @exitstatus.should == 1
+    check @exitstatus.should > 0
     out.should include("rails (>= 0, runtime)")
   end
 

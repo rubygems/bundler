@@ -144,6 +144,7 @@ describe "environment.rb file" do
     end
 
     it "evals each gemspec with a binding from the top level" do
+      pending "What does this test even mean?"
       ruby <<-RUBY
         require 'bundler'
         def Bundler.require(path)
