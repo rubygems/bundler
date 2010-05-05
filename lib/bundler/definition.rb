@@ -32,12 +32,12 @@ module Bundler
       end
     end
 
-    def specs
-      @specs ||= resolve(:local_specs, index)
+    def resolve_remotely!
+      @specs = resolve_remote_specs
     end
 
-    def remote_specs
-      @remote_specs ||= resolve_remote_specs
+    def specs
+      @specs ||= resolve(:local_specs, index)
     end
 
     def index

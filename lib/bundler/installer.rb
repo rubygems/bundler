@@ -14,6 +14,10 @@ module Bundler
         return
       end
 
+      # Since we are installing, we can resolve the definition
+      # using remote specs
+      @definition.resolve_remotely!
+
       # Ensure that BUNDLE_PATH exists
       FileUtils.mkdir_p(Bundler.bundle_path)
 
@@ -37,10 +41,6 @@ module Bundler
       end
 
       lock
-    end
-
-    def specs
-      @definition.remote_specs
     end
   end
 end
