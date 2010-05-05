@@ -158,4 +158,17 @@ describe "bundle install with explicit source paths" do
       should_be_installed "foo 1.0"
     end
   end
+
+  it "installs executable stubs" do
+    build_lib "foo" do |s|
+      s.executables = ['foo']
+    end
+
+    install_gemfile <<-G
+      gem "foo", :path => "#{lib_path('foo-1.0')}"
+    G
+
+    bundle "exec foo"
+    out.should == "1.0"
+  end
 end

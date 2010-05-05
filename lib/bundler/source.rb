@@ -1,4 +1,5 @@
 require "uri"
+require "rubygems/installer"
 require "rubygems/spec_fetcher"
 require "rubygems/format"
 require "digest/sha1"
@@ -259,9 +260,25 @@ module Bundler
         @local_specs ||= load_spec_files
       end
 
+      class Installer < Gem::Installer
+        def initialize(spec)
+          @spec              = spec
+          @bin_dir           = "#{Gem.dir}/bin"
+          @gem_dir           = spec.full_gem_path
+          @wrappers          = true
+          @env_shebang       = true
+          @format_executable = false
+        end
+      end
+
       def install(spec)
         Bundler.ui.info "Using #{spec.name} (#{spec.version}) from #{to_s}"
-        generate_bin(spec)
+        # Let's be honest, when we're working from a path, we can't
+        # really expect native extensions to work because the whole point
+        # is to just be able to modify what's in that path and go. So, let's
+        # not put ourselfs through the pain of actually trying to generate
+        # the full gem.
+        Installer.new(spec).generate_bin
       end
 
       alias specs local_specs
