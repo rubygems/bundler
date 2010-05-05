@@ -16,9 +16,9 @@ module Bundler
       @specs.length
     end
 
-    def for(*deps)
+    def for(deps)
       specs = {}
-      deps.flatten.each do |dep|
+      deps.each do |dep|
         current = lookup[dep.respond_to?(:name) ? dep.name : dep]
         append_subgraph(specs, current)
       end
