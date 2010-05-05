@@ -9,6 +9,8 @@ module Bundler
   class CLI < Thor
     check_unknown_options! unless ARGV.include?("exec")
 
+    default_task :install
+
     desc "init", "Generates a Gemfile into the current working directory"
     method_option "gemspec", :type => :string, :banner => "Use the specified .gemspec to create the Gemfile"
     def init
