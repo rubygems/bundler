@@ -28,8 +28,7 @@ describe "bundle install with git sources" do
       Dir["#{default_bundle_path}/cache/bundler/git/foo-1.0-*"].should have(1).item
     end
 
-    it "floats on master if no ref is specified" do
-      pending_bundle_update
+    it "does not update the git source implicitly" do
       update_git "foo"
 
       in_app_root2 do
@@ -42,10 +41,10 @@ describe "bundle install with git sources" do
       in_app_root do
         run <<-RUBY
           require 'foo'
-          puts "WIN" if defined?(FOO_PREV_REF)
+          puts "fail" if defined?(FOO_PREV_REF)
         RUBY
 
-        out.should == "WIN"
+        out.should be_empty
       end
     end
 
