@@ -70,6 +70,14 @@ module Bundler
       end
     end
 
+    def bin_path
+      @bin_path ||= begin
+        path = settings[:bin] || "#{Gem.user_home}/.bundler/bin"
+        FileUtils.mkdir_p(path)
+        Pathname.new(path).expand_path
+      end
+    end
+
     def setup(*groups)
       return @setup if @setup
 

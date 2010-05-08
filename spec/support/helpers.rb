@@ -64,6 +64,14 @@ module Spec
       sys_exec(%'#{Gem.ruby} -I#{lib} -e "#{ruby}"', expect_err)
     end
 
+    def gembin(cmd)
+      lib = File.expand_path("../../../lib", __FILE__)
+      old, ENV['RUBYOPT'] = ENV['RUBYOPT'], "#{ENV['RUBYOPT']} -I#{lib}"
+      sys_exec(cmd)
+    ensure
+      ENV['RUBYOPT'] = old
+    end
+
     def sys_exec(cmd, expect_err = false)
       require "open3"
       @in, @out, @err = Open3.popen3(cmd)
@@ -151,7 +159,6 @@ module Spec
 
       gem_home, gem_path, path = ENV['GEM_HOME'], ENV['GEM_PATH'], ENV['PATH']
       ENV['GEM_HOME'], ENV['GEM_PATH'] = system_gem_path.to_s, system_gem_path.to_s
-      ENV['PATH'] = "#{system_gem_path}/bin:#{ENV['PATH']}"
 
       install_gems(*gems)
       if block_given?

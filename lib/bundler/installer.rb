@@ -36,9 +36,21 @@ module Bundler
         end
 
         spec.source.install(spec)
+        generate_bundler_executable_stubs(spec)
       end
 
       lock
     end
+
+  private
+
+    def generate_bundler_executable_stubs(spec)
+      spec.executables.each do |executable|
+        File.open "#{Bundler.bin_path}/#{executable}", 'w', 0755 do |f|
+          f.puts File.read(File.expand_path('../templates/Executable', __FILE__))
+        end
+      end
+    end
+
   end
 end

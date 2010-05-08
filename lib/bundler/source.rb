@@ -149,7 +149,9 @@ module Bundler
               spec.source = self
               # Temporary hack until this can be figured out better
               @spec_fetch_map[[name, version, platform]] = lambda do
-                download_gem_from_uri(spec, uri)
+                path = download_gem_from_uri(spec, uri)
+                s = Gem::Format.from_file_by_path(path).spec
+                spec.__swap__(s)
               end
               index << spec
             end
@@ -173,6 +175,7 @@ module Bundler
       def download_gem_from_uri(spec, uri)
         spec.fetch_platform
         Gem::RemoteFetcher.fetcher.download(spec, uri, Gem.dir)
+        "#{Gem.dir}/cache/#{spec.full_name}.gem"
       end
     end
 
