@@ -32,7 +32,7 @@ module Bundler
           Bundler.ui.info "Using #{spec.name} (#{spec.version}) from #{spec.source} "
         end
         spec.source.install(spec)
-        Bundler.ui.info "" unless spec == specs.last
+        Bundler.ui.info ""
       end
 
       if locked?
