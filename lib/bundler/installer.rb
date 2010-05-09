@@ -33,6 +33,7 @@ module Bundler
         # end
 
         spec.source.install(spec)
+        Bundler.ui.info ""
         generate_bundler_executable_stubs(spec)
         FileUtils.rm_rf(Bundler.tmp)
       end
