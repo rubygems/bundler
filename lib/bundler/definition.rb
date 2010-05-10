@@ -45,7 +45,7 @@ module Bundler
         # Add all the spec names that are part of the source to unlock
         @unlock.concat locked_specs.
           select { |s| s.source == source }.
-          map  { |s| s.name }
+          map    { |s| s.name }
 
         # Remove duplicate spec names
         @unlock.uniq!

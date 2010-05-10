@@ -99,12 +99,15 @@ module Bundler
     desc "update", "update the current environment"
     method_option "source", :type => :array, :banner => "Update a specific source (and all gems associated with it)"
     def update(*gems)
-      gems = Bundler.definition.locked_specs.map { |s| s.name } if gems.empty?
-      # Installer.install(Bundler.root, Bundler.definition, gems, {})
+      sources = Array(options[:source])
+
+      if gems.empty? && sources.empty?
+        gems = Bundler.definition.locked_specs.map { |s| s.name }
+      end
 
       Installer.install Bundler.root, Bundler.definition do |i|
         i.unlock_gems    gems
-        i.unlock_sources options[:source]
+        i.unlock_sources sources
       end
     end
 
