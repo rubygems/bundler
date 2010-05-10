@@ -259,8 +259,9 @@ module Spec
     end
 
     def build_git(name, *args, &block)
+      opts = Hash === args.last ? args.last : {}
       spec = build_with(GitBuilder, name, args, &block)
-      GitReader.new(lib_path(spec.full_name))
+      GitReader.new(opts[:path] || lib_path(spec.full_name))
     end
 
     def update_git(name, *args, &block)
@@ -472,6 +473,8 @@ module Spec
     end
 
     class GitReader
+      attr_reader :path
+
       def initialize(path)
         @path = path
       end

@@ -3,7 +3,7 @@ require "spec_helper"
 describe "bundle update" do
   describe "git sources" do
     before :each do
-      build_git "foo", :path => lib_path("foo") do |s|
+      @git = build_git "foo", :path => lib_path("foo") do |s|
         s.executables = "foobar"
       end
 
@@ -14,7 +14,8 @@ describe "bundle update" do
     end
 
     it "updates the source" do
-      pending "Needs to be implemented"
+      update_git "foo", :path => @git.path
+
       bundle "update --source foo"
 
       in_app_root do

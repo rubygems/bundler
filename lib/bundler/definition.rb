@@ -25,16 +25,31 @@ module Bundler
         locked = LockfileParser.new(File.read(lockfile))
         @locked_deps  = locked.dependencies
         @locked_specs = SpecSet.new(locked.specs)
-        @sources = locked.sources
+        @sources      = locked.sources
       else
         @locked_deps  = []
         @locked_specs = SpecSet.new([])
       end
     end
 
-    def unlock!(gems)
+    def unlock!(what_to_unlock)
       raise "Specs already loaded" if @specs
-      @unlock.concat(gems)
+
+      # Set the gems to unlock
+      @unlock.concat(what_to_unlock[:gems])
+      # Find the gems associated with specific sources and unlock them
+      what_to_unlock[:sources].each do |source_name|
+        source = sources.find { |s| s.name == source_name }
+        source.unlock! if source.respond_to?(:unlock!)
+
+        # Add all the spec names that are part of the source to unlock
+        @unlock.concat locked_specs.
+          select { |s| s.source == source }.
+          map  { |s| s.name }
+
+        # Remove duplicate spec names
+        @unlock.uniq!
+      end
     end
 
     def resolve_remotely!

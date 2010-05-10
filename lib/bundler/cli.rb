@@ -85,7 +85,7 @@ module Bundler
       Bundler.settings[:disable_shared_gems] = '1' if options["disable-shared-gems"] || path
       Bundler.settings.without = opts[:without]
 
-      Installer.install(Bundler.root, Bundler.definition, [], opts)
+      Installer.install(Bundler.root, Bundler.definition, opts)
       cache if Bundler.root.join("vendor/cache").exist?
       Bundler.ui.confirm "Your bundle is complete! " +
         "Use `bundle show [gemname]` to see where a bundled gem is installed."
@@ -97,9 +97,15 @@ module Bundler
     end
 
     desc "update", "update the current environment"
+    method_option "source", :type => :array, :banner => "Update a specific source (and all gems associated with it)"
     def update(*gems)
       gems = Bundler.definition.locked_specs.map { |s| s.name } if gems.empty?
-      Installer.install(Bundler.root, Bundler.definition, gems, {})
+      # Installer.install(Bundler.root, Bundler.definition, gems, {})
+
+      Installer.install Bundler.root, Bundler.definition do |i|
+        i.unlock_gems    gems
+        i.unlock_sources options[:source]
+      end
     end
 
     desc "lock", "Locks the bundle to the current set of dependencies, including all child dependencies."

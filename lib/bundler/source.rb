@@ -21,6 +21,12 @@ module Bundler
         @spec_fetch_map = {}
       end
 
+      # Not really needed, but it seems good to implement this method for interface
+      # consistency. Source name is mostly used to identify Path & Git sources
+      def name
+        ":gems"
+      end
+
       def options
         { "remotes" => @remotes.map { |r| r.to_s } }
       end
@@ -217,6 +223,10 @@ module Bundler
         "source at #{@path}"
       end
 
+      def name
+        File.basename(@path.to_s)
+      end
+
       def load_spec_files
         index = Index.new
 
@@ -358,8 +368,9 @@ module Bundler
 
       def initialize(options)
         super
-        @uri = options["uri"]
-        @ref = options["ref"] || options["branch"] || options["tag"] || 'master'
+        @uri      = options["uri"]
+        @ref      = options["ref"] || options["branch"] || options["tag"] || 'master'
+        @revision = options["revision"]
       end
 
       def self.from_lock(options)
@@ -369,7 +380,10 @@ module Bundler
       def to_lock
         out = "GIT\n"
         out << "  remote: #{@uri}\n"
-        out << "  ref: #{shortref_for(revision)}\n"
+        out << "  revision: #{shortref_for(revision)}\n"
+        %w(ref branch tag).each do |opt|
+          out << "  #{opt}: #{options[opt]}\n" if options[opt]
+        end
         out << "  glob: #{@glob}\n" unless @glob == DEFAULT_GLOB
         out << "  specs:\n"
       end
@@ -379,8 +393,16 @@ module Bundler
         "#{@uri} (at #{ref})"
       end
 
+      def name
+        File.basename(@uri, '.git')
+      end
+
       def path
         Bundler.install_path.join("#{base_name}-#{shortref_for(revision)}")
+      end
+
+      def unlock!
+        @revision = nil
       end
 
       def specs
