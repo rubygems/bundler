@@ -98,7 +98,7 @@ module Bundler
 
     desc "update", "update the current environment"
     def update(*gems)
-      gems = Bundler.definition.specs.map { |s| s.name } if gems.empty?
+      gems = Bundler.definition.locked_specs.map { |s| s.name } if gems.empty?
       Installer.install(Bundler.root, Bundler.definition, gems, {})
     end
 

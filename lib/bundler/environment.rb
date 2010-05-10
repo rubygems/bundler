@@ -66,42 +66,35 @@ require "bundler/setup"
 
     def write_yml_lock
       File.open("#{root}/Gemfile.lock", 'w') do |f|
-        f.puts details
+        f.puts lock_content
       end
     end
 
-    def details
-      output = ""
+    def lock_content
+      out = ""
 
-      pinned_sources = dependencies.map {|d| d.source }
-      all_sources    = @definition.sources.map {|s| s }
-
-      specified_sources = all_sources - pinned_sources
-
-      unless specified_sources.length == 1 && specified_sources.first.remotes.empty?
-        output << "sources:\n"
-
-        specified_sources.each do |source|
-          o = source.to_lock
-          output << "  #{source.to_lock}\n" unless o.empty?
+      @definition.sources.each do |source|
+        # Add the source header
+        out << source.to_lock
+        # Find all specs for this source
+        specs.
+          select  { |s| s.source == source }.
+          sort_by { |s| s.name }.
+          each do |spec|
+            out << spec.to_lock
         end
-        output << "\n"
+        out << "\n"
       end
 
-      unless @definition.dependencies.empty?
-        output << "dependencies:\n"
-        @definition.dependencies.sort_by {|d| d.name }.each do |dependency|
-          output << dependency.to_lock
-        end
-        output << "\n"
+      out << "DEPENDENCIES\n"
+
+      @definition.dependencies.
+        sort_by { |d| d.name }.
+        each do |dep|
+          out << dep.to_lock
       end
 
-      output << "specs:\n"
-      specs.sort_by {|s| s.name }.each do |spec|
-        output << spec.to_lock
-      end
-
-      output
+      out
     end
   end
 end

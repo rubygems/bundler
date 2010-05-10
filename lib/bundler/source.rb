@@ -25,12 +25,16 @@ module Bundler
         { "remotes" => @remotes.map { |r| r.to_s } }
       end
 
-      def self.from_lock(uri, options)
-        new("uri" => URI.unescape(uri))
+      def self.from_lock(options)
+        s = new(options)
+        Array(options["remote"]).each { |r| s.add_remote(r) }
+        s
       end
 
       def to_lock
-        remotes.map {|r| "gem: #{URI.escape(r.to_s)}" }.join("\n  ")
+        out = "GEM\n"
+        out << remotes.map {|r| "  remote: #{r}\n" }.join
+        out << "  specs:\n"
       end
 
       def to_s
@@ -181,6 +185,8 @@ module Bundler
 
     class Path
       attr_reader :path, :options
+      # Kind of a hack, but needed for the lock file parser
+      attr_accessor :name, :version
 
       DEFAULT_GLOB = "{,*/}*.gemspec"
 
@@ -196,14 +202,15 @@ module Bundler
         @version = options["version"]
       end
 
-      def self.from_lock(uri, options)
-        new(options.merge("path" => URI.unescape(uri)))
+      def self.from_lock(options)
+        new(options.merge("path" => options.delete("remote")))
       end
 
       def to_lock
-        out = "path: #{URI.escape(relative_path.to_s)}"
-        out << %{ glob:"#{@glob}"} unless @glob == DEFAULT_GLOB
-        out
+        out = "PATH\n"
+        out << "  remote: #{relative_path}\n"
+        out << "  glob: #{@glob}\n" unless @glob == DEFAULT_GLOB
+        out << "  specs:\n"
       end
 
       def to_s
@@ -355,12 +362,16 @@ module Bundler
         @ref = options["ref"] || options["branch"] || options["tag"] || 'master'
       end
 
-      def self.from_lock(uri, options)
-        new(options.merge("uri" => URI.unescape(uri)))
+      def self.from_lock(options)
+        new(options.merge("uri" => options.delete("remote")))
       end
 
       def to_lock
-        %{git: #{URI.escape(@uri.to_s)} ref:"#{shortref_for(revision)}"}
+        out = "GIT\n"
+        out << "  remote: #{@uri}\n"
+        out << "  ref: #{shortref_for(revision)}\n"
+        out << "  glob: #{@glob}\n" unless @glob == DEFAULT_GLOB
+        out << "  specs:\n"
       end
 
       def to_s

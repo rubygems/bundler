@@ -103,9 +103,11 @@ module Bundler
     end
 
     def definition
-      configure
-      lockfile = root.join("Gemfile.lock")
-      Definition.build(default_gemfile, lockfile)
+      @definition ||= begin
+        configure
+        lockfile = root.join("Gemfile.lock")
+        Definition.build(default_gemfile, lockfile)
+      end
     end
 
     def home

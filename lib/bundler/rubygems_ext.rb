@@ -31,12 +31,13 @@ module Gem
     end
 
     def to_lock
-      out = "  #{name} (#{version})"
-      out << (dependencies.empty? ? "\n" : ":\n")
+      out = "    #{name} (#{version})\n"
+
       dependencies.sort_by {|d| d.name }.each do |dep|
         next if dep.type == :development
-        out << "  #{dep.to_lock}\n"
+        out << "    #{dep.to_lock}\n"
       end
+
       out
     end
 

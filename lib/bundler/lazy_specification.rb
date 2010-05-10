@@ -4,11 +4,13 @@ require "rubygems/spec_fetcher"
 module Bundler
   class LazySpecification
     attr_reader :name, :version, :dependencies
+    attr_accessor :source
 
     def initialize(name, version)
       @name         = name
       @version      = version
       @dependencies = []
+      @source       = nil
     end
 
     def satisfies?(dependency)

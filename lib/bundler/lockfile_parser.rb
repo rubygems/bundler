@@ -4,92 +4,82 @@ module Bundler
   class LockfileParser
     attr_reader :sources, :dependencies, :specs
 
-    # Do stuff
     def initialize(lockfile)
-      @rg_source    = Source::Rubygems.new
       @sources      = []
       @dependencies = []
       @specs        = []
+      @state        = :source
 
       lockfile.split(/\n+/).each do |line|
-        case line
-        when "sources:"
-          @state = :source
-        when "dependencies:"
-          @state = :dependencies
-        when "specs:"
-          @state = :specs
+        if line == "DEPENDENCIES"
+          @state = :dependency
         else
           send("parse_#{@state}", line)
         end
       end
-
-      @sources << @rg_source
-      @sources.uniq!
     end
 
   private
 
     TYPES = {
-      "git"  => Bundler::Source::Git,
-      "gem"  => Bundler::Source::Rubygems,
-      "path" => Bundler::Source::Path
+      "GIT"  => Bundler::Source::Git,
+      "GEM"  => Bundler::Source::Rubygems,
+      "PATH" => Bundler::Source::Path
     }
 
     def parse_source(line)
-      @sources << parse_source_line(line)
-    end
-
-    def parse_source_line(line, extra_opts = {})
-      type, source, option_line = line.match(/^\s+(\w+): ([^\s]*?)(?: (.*))?$/).captures
-      options = extract_options(option_line)
-      # There should only be one instance of a rubygem source
-      if type == 'gem'
-        @rg_source.add_remote source
-        @sources << @rg_source
-        @rg_source
+      case line
+      when "GIT", "GEM", "PATH"
+        @current_source = nil
+        @opts, @type = {}, line
+      when "  specs:"
+        @current_source = TYPES[@type].from_lock(@opts)
+        @sources << @current_source
+      when /^  ([a-z]+): (.*)$/i
+        if @opts[$1]
+          @opts[$1] = Array(@opts[$1])
+          @opts[$1] << $2
+        else
+          @opts[$1] = $2
+        end
       else
-        TYPES[type].from_lock(source, extra_opts.merge(options))
+        parse_spec(line)
       end
     end
 
-    NAME_VERSION = '(?! )(.*?)(?: \((.*)\))?:?'
+    NAME_VERSION = '(?! )(.*?)(?: \((.*)\))?'
 
-    def parse_dependencies(line)
-      if line =~ %r{^ {2}#{NAME_VERSION}$}
-        name, version = $1, $2
+    def parse_dependency(line)
+      if line =~ %r{^ {2}#{NAME_VERSION}(!)?$}
+        name, version, pinned = $1, $2, $3
 
-        if version =~ /^= (.+)$/
-          @last_version = $1
+        dep = Bundler::Dependency.new(name, version)
+
+        if pinned
+          dep.source = @specs.find { |s| s.name == dep.name }.source
+
+          # Path sources need to know what the default name / version
+          # to use in the case that there are no gemspecs present. A fake
+          # gemspec is created based on the version set on the dependency
+          # TODO: Use the version from the spec instead of from the dependency
+          if version =~ /^= (.+)$/ && dep.source.is_a?(Bundler::Source::Path)
+            dep.source.name    = name
+            dep.source.version = $1
+          end
         end
 
-        @current = Bundler::Dependency.new(name, version)
-        @dependencies << @current
-      else
-        @current.source = parse_source_line(line, "name" => @current.name, "version" => @last_version)
-        @sources.unshift @current.source
+        @dependencies << dep
       end
     end
 
-    def parse_specs(line)
-      if line =~ %r{^ {2}#{NAME_VERSION}$}
-        @current = LazySpecification.new($1, $2)
-        @specs << @current
-      else
-        line =~ %r{^ {4}#{NAME_VERSION}$}
-        @current.dependencies << Gem::Dependency.new($1, $2)
+    def parse_spec(line)
+      if line =~ %r{^ {4}#{NAME_VERSION}$}
+        @current_spec = LazySpecification.new($1, $2)
+        @current_spec.source = @current_source
+        @specs << @current_spec
+      elsif line =~ %r{^ {6}#{NAME_VERSION}$}
+        @current_spec.dependencies << Gem::Dependency.new($1, $2)
       end
-    end
-
-    def extract_options(line)
-      options = {}
-      return options unless line
-
-      line.scan(/(\w+):"((?:|.*?[^\\])(?:\\\\)*)" ?/) do |k,v|
-        options[k] = v
-      end
-
-      options
     end
   end
 end
