@@ -1,49 +1,6 @@
 require "spec_helper"
 
 describe "the lockfile format" do
-  before :each do
-    pending
-  end
-
-  it "generates a simple lockfile for a single source, gem" do
-    flex_install_gemfile <<-G
-      source "file://#{gem_repo1}"
-
-      gem "rack"
-    G
-
-    lockfile_should_be <<-G
-      sources:
-        gem: file:#{gem_repo1}/
-
-      dependencies:
-        rack
-
-      specs:
-        rack (1.0.0)
-    G
-  end
-
-  it "generates a simple lockfile for a single source, gem with dependencies" do
-    flex_install_gemfile <<-G
-      source "file://#{gem_repo1}"
-
-      gem "rack-obama"
-    G
-
-    lockfile_should_be <<-G
-      sources:
-        gem: file:#{gem_repo1}/
-
-      dependencies:
-        rack-obama
-
-      specs:
-        rack (1.0.0)
-        rack-obama (1.0):
-          rack
-    G
-  end
 
   def be_with_diff(expected)
     # Trim the leading spaces
@@ -58,7 +15,45 @@ describe "the lockfile format" do
 
   def lockfile_should_be(expected)
     lock = File.read(bundled_app("Gemfile.lock"))
-    expected.should be_with_diff(lock)
+    lock.should be_with_diff(expected)
+  end
+
+  it "generates a simple lockfile for a single source, gem" do
+    flex_install_gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "rack"
+    G
+
+    lockfile_should_be <<-G
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          rack (1.0.0)
+
+      DEPENDENCIES
+        rack
+    G
+  end
+
+  it "generates a simple lockfile for a single source, gem with dependencies" do
+    flex_install_gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "rack-obama"
+    G
+
+    lockfile_should_be <<-G
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          rack (1.0.0)
+          rack-obama (1.0)
+            rack
+
+      DEPENDENCIES
+        rack-obama
+    G
   end
 
   it "generates a simple lockfile for a single source, gem with a version requirement" do
@@ -69,16 +64,15 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      sources:
-        gem: file:#{gem_repo1}/
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          rack (1.0.0)
+          rack-obama (1.0)
+            rack
 
-      dependencies:
+      DEPENDENCIES
         rack-obama (>= 1.0)
-
-      specs:
-        rack (1.0.0)
-        rack-obama (1.0):
-          rack
     G
   end
 
@@ -90,12 +84,17 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      dependencies:
-        foo:
-          git: #{lib_path("foo-1.0")} ref:"#{git.ref_for('master', 6)}"
+      GIT
+        remote: #{lib_path("foo-1.0")}
+        ref: #{git.ref_for('master', 6)}
+        specs:
+          foo (1.0)
 
-      specs:
-        foo (1.0)
+      GEM
+        specs:
+
+      DEPENDENCIES
+        foo!
     G
   end
 
@@ -108,14 +107,17 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      sources:
-        git: #{lib_path('foo-1.0')} ref:"#{git.ref_for('master', 6)}"
+      GIT
+        remote: #{lib_path('foo-1.0')}
+        ref: #{git.ref_for('master', 6)}
+        specs:
+          foo (1.0)
 
-      dependencies:
+      GEM
+        specs:
+
+      DEPENDENCIES
         foo
-
-      specs:
-        foo (1.0)
     G
   end
 
@@ -128,12 +130,17 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      dependencies:
-        foo:
-          git: #{lib_path("foo-1.0")} ref:"#{git.ref_for('omg', 6)}"
+      GIT
+        remote: #{lib_path("foo-1.0")}
+        ref: #{git.ref_for('omg', 6)}
+        specs:
+          foo (1.0)
 
-      specs:
-        foo (1.0)
+      GEM
+        specs:
+
+      DEPENDENCIES
+        foo!
     G
   end
 
@@ -146,12 +153,17 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      dependencies:
-        foo:
-          git: #{lib_path("foo-1.0")} ref:"#{git.ref_for('omg', 6)}"
+      GIT
+        remote: #{lib_path("foo-1.0")}
+        ref: #{git.ref_for('omg', 6)}
+        specs:
+          foo (1.0)
 
-      specs:
-        foo (1.0)
+      GEM
+        specs:
+
+      DEPENDENCIES
+        foo!
     G
   end
 
@@ -163,12 +175,16 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      dependencies:
-        foo:
-          path: #{lib_path("foo-1.0")}
+      PATH
+        remote: #{lib_path("foo-1.0")}
+        specs:
+          foo (1.0)
 
-      specs:
-        foo (1.0)
+      GEM
+        specs:
+
+      DEPENDENCIES
+        foo!
     G
   end
 
@@ -182,23 +198,22 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      sources:
-        gem: file:#{gem_repo1}/
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          actionpack (2.3.2)
+            activesupport (= 2.3.2)
+          activesupport (2.3.2)
+          rack (1.0.0)
+          rack-obama (1.0)
+            rack
+          thin (1.0)
+            rack
 
-      dependencies:
+      DEPENDENCIES
         actionpack
         rack-obama
         thin
-
-      specs:
-        actionpack (2.3.2):
-          activesupport (= 2.3.2)
-        activesupport (2.3.2)
-        rack (1.0.0)
-        rack-obama (1.0):
-          rack
-        thin (1.0):
-          rack
     G
   end
 
@@ -210,29 +225,28 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      sources:
-        gem: file:#{gem_repo1}/
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          actionmailer (2.3.2)
+            activesupport (= 2.3.2)
+          actionpack (2.3.2)
+            activesupport (= 2.3.2)
+          activerecord (2.3.2)
+            activesupport (= 2.3.2)
+          activeresource (2.3.2)
+            activesupport (= 2.3.2)
+          activesupport (2.3.2)
+          rails (2.3.2)
+            actionmailer (= 2.3.2)
+            actionpack (= 2.3.2)
+            activerecord (= 2.3.2)
+            activeresource (= 2.3.2)
+            rake
+          rake (0.8.7)
 
-      dependencies:
+      DEPENDENCIES
         rails
-
-      specs:
-        actionmailer (2.3.2):
-          activesupport (= 2.3.2)
-        actionpack (2.3.2):
-          activesupport (= 2.3.2)
-        activerecord (2.3.2):
-          activesupport (= 2.3.2)
-        activeresource (2.3.2):
-          activesupport (= 2.3.2)
-        activesupport (2.3.2)
-        rails (2.3.2):
-          actionmailer (= 2.3.2)
-          actionpack (= 2.3.2)
-          activerecord (= 2.3.2)
-          activeresource (= 2.3.2)
-          rake
-        rake (0.8.7)
     G
   end
 
@@ -244,16 +258,15 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      sources:
-        gem: file:#{gem_repo1}/
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          rack (1.0.0)
+          rack-obama (1.0)
+            rack
 
-      dependencies:
+      DEPENDENCIES
         rack-obama (>= 1.0)
-
-      specs:
-        rack (1.0.0)
-        rack-obama (1.0):
-          rack
     G
   end
 
@@ -265,16 +278,15 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      sources:
-        gem: file:#{gem_repo1}/
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          rack (1.0.0)
+          rack-obama (1.0)
+            rack
 
-      dependencies:
+      DEPENDENCIES
         rack-obama (>= 1.0)
-
-      specs:
-        rack (1.0.0)
-        rack-obama (1.0):
-          rack
     G
   end
 
@@ -287,14 +299,16 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      sources:
-        path: foo
+      PATH
+        remote: foo
+        specs:
+          foo (1.0)
 
-      dependencies:
+      GEM
+        specs:
+
+      DEPENDENCIES
         foo
-
-      specs:
-        foo (1.0)
     G
   end
 
@@ -307,14 +321,16 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      sources:
-        path: foo
+      PATH
+        remote: foo
+        specs:
+          foo (1.0)
 
-      dependencies:
+      GEM
+        specs:
+
+      DEPENDENCIES
         foo
-
-      specs:
-        foo (1.0)
     G
   end
 end
