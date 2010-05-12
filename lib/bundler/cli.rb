@@ -85,8 +85,10 @@ module Bundler
       "Do not use any shared gems, such as the system gem repository."
     method_option "gemfile", :type => :string, :banner =>
       "Use the specified gemfile instead of Gemfile"
-    method_option "no-prune",  :type => :boolean, :banner =>
+    method_option "no-prune", :type => :boolean, :banner =>
       "Don't remove stale gems from the cache."
+    method_option "no-cache", :type => :boolean, :banner =>
+      "Don't update the existing gem cache."
     def install(path = nil)
       opts = options.dup
       opts[:without] ||= []
