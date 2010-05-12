@@ -72,6 +72,7 @@ module Bundler
     method_option "relock",  :type => :boolean, :banner => "Unlock, install the gems, and relock."
     method_option "disable-shared-gems", :type => :boolean, :banner => "Do not use any shared gems, such as the system gem repository."
     method_option "gemfile", :type => :string, :banner => "Use the specified gemfile instead of Gemfile"
+    method_option "no-cache",  :type => :boolean, :banner => "Don't update the existing gem cache."
     method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
     def install(path = nil)
       opts = options.dup
@@ -94,7 +95,7 @@ module Bundler
       end
 
       lock if options[:relock]
-      cache if Bundler.root.join("vendor/cache").exist?
+      cache if Bundler.root.join("vendor/cache").exist? && !options[:no_cache]
       Bundler.ui.confirm "Your bundle is complete! " +
         "Use `bundle show [gemname]` to see where a bundled gem is installed."
     rescue GemNotFound => e
