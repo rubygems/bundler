@@ -6,3 +6,4 @@
   - Interactive mode for bundle (install) to work out conflicts
   - bundle irb / bundle ruby / bundle [whatever] -> bundle exec
   - Make bundle (install) work when sudo might be needed
+  - Generate a bundle stub into the application
