@@ -1,3 +1,5 @@
+require 'pathname'
+
 unless defined? Gem
   require 'rubygems'
   require 'rubygems/specification'
@@ -7,7 +9,22 @@ module Gem
   @loaded_stacks = Hash.new { |h,k| h[k] = [] }
 
   class Specification
-    attr_accessor :source, :location
+    attr_accessor :source, :location, :relative_loaded_from
+
+    alias_method :rg_full_gem_path, :full_gem_path
+    alias_method :rg_loaded_from,   :loaded_from
+
+    def full_gem_path
+      source.respond_to?(:path) ?
+        Pathname.new(loaded_from).dirname.expand_path.to_s :
+        rg_full_gem_path
+    end
+
+    def loaded_from
+      relative_loaded_from ?
+        source.path.join(relative_loaded_from).to_s :
+        rg_loaded_from
+    end
 
     def load_paths
       require_paths.map do |require_path|

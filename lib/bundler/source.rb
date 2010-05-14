@@ -249,7 +249,6 @@ module Bundler
             end
 
             if spec
-              spec = Specification.from_gemspec(spec)
               spec.loaded_from = file.to_s
               spec.source = self
               index << spec
@@ -257,7 +256,7 @@ module Bundler
           end
 
           if index.empty? && @name && @version
-            index << Specification.new do |s|
+            index << Gem::Specification.new do |s|
               s.name     = @name
               s.source   = self
               s.version  = Gem::Version.new(@version)
