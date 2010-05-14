@@ -131,7 +131,7 @@ module Bundler
       end
     end
 
-    desc "show GEM", "Shows all gems that are part of the bundle, or the path to a given gem"
+    desc "show [GEM]", "Shows all gems that are part of the bundle, or the path to a given gem"
     def show(gem_name = nil)
       if gem_name
         Bundler.ui.info locate_gem(gem_name)
