@@ -57,7 +57,7 @@ module Bundler
       end
 
       def fetch(spec)
-        action = @spec_fetch_map[[spec.name, spec.version, spec.platform]]
+        action = @spec_fetch_map[spec.full_name]
         action.call if action
       end
 
@@ -158,7 +158,7 @@ module Bundler
               spec = RemoteSpecification.new(name, version, platform, uri)
               spec.source = self
               # Temporary hack until this can be figured out better
-              @spec_fetch_map[[name, version, platform]] = lambda do
+              @spec_fetch_map[spec.full_name] = lambda do
                 path = download_gem_from_uri(spec, uri)
                 s = Gem::Format.from_file_by_path(path).spec
                 spec.__swap__(s)
