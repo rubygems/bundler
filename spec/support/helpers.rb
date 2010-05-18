@@ -3,7 +3,11 @@ module Spec
     def reset!
       Dir["#{tmp}/{gems/*,*}"].each do |dir|
         next if %(base remote1 gems rubygems_1_3_5 rubygems_1_3_6 rubygems_master).include?(File.basename(dir))
-        FileUtils.rm_rf(dir)
+        if File.owned?(dir)
+          FileUtils.rm_rf(dir)
+        else
+          `sudo rm -rf #{dir}`
+        end
       end
       FileUtils.mkdir_p(tmp)
       FileUtils.mkdir_p(home)

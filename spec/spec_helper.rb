@@ -32,6 +32,7 @@ Spec::Runner.configure do |config|
   config.include Spec::Path
   config.include Spec::Rubygems
   config.include Spec::Platforms
+  config.include Spec::Sudo
 
   original_wd       = Dir.pwd
   original_path     = ENV['PATH']

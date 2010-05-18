@@ -134,6 +134,10 @@ module Bundler
       root.join("vendor/cache")
     end
 
+    def tmp
+      "#{Gem.user_home}/.bundler/tmp"
+    end
+
     def settings
       @settings ||= Settings.new(root)
     end
@@ -148,6 +152,19 @@ module Bundler
 
     def default_gemfile
       SharedHelpers.default_gemfile
+    end
+
+    def requires_sudo?
+      case
+      when File.writable?(bundle_path) ||
+           `which sudo 2>NUL`.empty? ||
+           File.owned?(bundle_path)
+        false
+      else
+        true
+      end
+    rescue Errno::ENOENT
+      false
     end
 
   private

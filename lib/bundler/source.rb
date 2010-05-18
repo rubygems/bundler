@@ -68,14 +68,23 @@ module Bundler
 
         return if @installed[spec.full_name]
 
+        install_path = Bundler.requires_sudo? ? Bundler.tmp : Gem.dir
+
         installer = Gem::Installer.new path,
-          :install_dir         => Gem.dir,
+          :install_dir         => install_path,
           :ignore_dependencies => true,
           :wrappers            => true,
           :env_shebang         => true,
-          :bin_dir             => "#{Gem.dir}/bin"
+          :bin_dir             => "#{install_path}/bin"
 
         installer.install
+
+        # SUDO HAX
+        if Bundler.requires_sudo?
+          `sudo mkdir -p #{Gem.dir}/gems #{Gem.dir}/specifications`
+          `sudo mv #{Bundler.tmp}/gems/#{spec.full_name} #{Gem.dir}/gems/`
+          `sudo mv #{Bundler.tmp}/specifications/#{spec.full_name}.gemspec #{Gem.dir}/specifications/`
+        end
 
         spec.loaded_from = "#{Gem.dir}/specifications/#{spec.full_name}.gemspec"
       end
@@ -184,8 +193,19 @@ module Bundler
 
       def download_gem_from_uri(spec, uri)
         spec.fetch_platform
-        Gem::RemoteFetcher.fetcher.download(spec, uri, Gem.dir)
-        "#{Gem.dir}/cache/#{spec.full_name}.gem"
+
+        download_path = Bundler.requires_sudo? ? Bundler.tmp : Gem.dir
+        gem_path = "#{Gem.dir}/cache/#{spec.full_name}.gem"
+
+        FileUtils.mkdir_p("#{download_path}/cache")
+        Gem::RemoteFetcher.fetcher.download(spec, uri, download_path)
+
+        if Bundler.requires_sudo?
+          `sudo mkdir -p #{Gem.dir}/cache`
+          `sudo mv #{Bundler.tmp}/cache/#{spec.full_name}.gem #{gem_path}`
+        end
+
+        gem_path
       end
     end
 
