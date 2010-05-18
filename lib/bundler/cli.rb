@@ -7,11 +7,22 @@ Gem.configuration
 
 module Bundler
   class CLI < Thor
+    def initialize(*)
+      super
+      Bundler.ui = UI::Shell.new(shell)
+      Gem::DefaultUserInteraction.ui = UI::RGProxy.new(Bundler.ui)
+    end
+
     check_unknown_options! unless ARGV.include?("exec")
 
     default_task :install
 
     desc "init", "Generates a Gemfile into the current working directory"
+    long_desc <<-D
+      Init generates a default Gemfile in the current working directory. When adding a
+      Gemfile to a gem with a gemspec, the --gemspec option will automatically add each
+      dependency listed in the gemspec file to the newly created Gemfile.
+    D
     method_option "gemspec", :type => :string, :banner => "Use the specified .gemspec to create the Gemfile"
     def init
       opts = options.dup
@@ -38,13 +49,12 @@ module Bundler
       end
     end
 
-    def initialize(*)
-      super
-      Bundler.ui = UI::Shell.new(shell)
-      Gem::DefaultUserInteraction.ui = UI::RGProxy.new(Bundler.ui)
-    end
-
     desc "check", "Checks if the dependencies listed in Gemfile are satisfied by currently installed gems"
+    long_desc <<-D
+      Check searches the local machine for each of the gems requested in the Gemfile. If
+      all gems are found, Bundler prints a success message and exits with a status of 0.
+      If not, the first missing gem is listed and Bundler exits status 1.
+    D
     def check
       env = Bundler.load
       # Check top level dependencies
@@ -70,10 +80,24 @@ module Bundler
     end
 
     desc "install", "Install the current environment to the system"
-    method_option "without", :type => :array,   :banner => "Exclude gems that are part of the specified named group."
-    method_option "disable-shared-gems", :type => :boolean, :banner => "Do not use any shared gems, such as the system gem repository."
-    method_option "gemfile", :type => :string, :banner => "Use the specified gemfile instead of Gemfile"
-    method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
+    long_desc <<-D
+      Install will install all of the gems in the current bundle, making them available
+      for use. In a freshly checked out repository, this command will give you the same
+      gem versions as the last person who updated the Gemfile and ran `bundle update`.
+
+      Passing [DIR] to install (e.g. vendor) will cause the unpacked gems to be installed
+      into the [DIR] directory rather than into system gems.
+
+      If the bundle has already been installed, bundler will tell you so and then exit.
+    D
+    method_option "without", :type => :array, :banner =>
+      "Exclude gems that are part of the specified named group."
+    method_option "disable-shared-gems", :type => :boolean, :banner =>
+      "Do not use any shared gems, such as the system gem repository."
+    method_option "gemfile", :type => :string, :banner =>
+      "Use the specified gemfile instead of Gemfile"
+    method_option "no-prune",  :type => :boolean, :banner =>
+      "Don't remove stale gems from the cache."
     def install(path = nil)
       opts = options.dup
       opts[:without] ||= []
@@ -97,6 +121,11 @@ module Bundler
     end
 
     desc "update", "update the current environment"
+    long_desc <<-D
+      Update will install the newest versions of the gems listed in the Gemfile. Use
+      update when you have changed the Gemfile, or if you want to get the newest
+      possible versions of the gems in the bundle.
+    D
     method_option "source", :type => :array, :banner => "Update a specific source (and all gems associated with it)"
     def update(*gems)
       sources = Array(options[:source])
@@ -121,7 +150,11 @@ module Bundler
       # NOOP, switch to output a deprecation message
     end
 
-    desc "show GEM", "Shows all gems that are part of the bundle, or the path to a given gem"
+    desc "show [GEM]", "Shows all gems that are part of the bundle, or the path to a given gem"
+    long_desc <<-D
+      Show lists the names and versions of all gems that are required by your Gemfile.
+      Calling show with [GEM] will list the exact location of that gem on your machine.
+    D
     def show(gem_name = nil)
       if gem_name
         Bundler.ui.info locate_gem(gem_name)
@@ -147,13 +180,25 @@ module Bundler
 
     desc "package", "Locks and then caches all of the gems into vendor/cache"
     method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
+    long_desc <<-D
+      The package command will copy the .gem files for every gem in the bundle into the
+      directory ./vendor/cache. If you then check that directory into your source
+      control repository, others who check out your source will be able to install the
+      bundle without having to download any additional gems.
+    D
     def package
       install
+      # TODO: move cache contents here now that all bundles are locked
       cache
     end
     map %w(pack) => :package
 
     desc "exec", "Run the command in context of the bundle"
+    long_desc <<-D
+      Exec runs a command, providing it access to the gems in the bundle. While using
+      bundle exec you can require and call the bundled gems as if they were installed
+      into the systemwide Rubygems repository.
+    D
     def exec(*)
       ARGV.delete("exec")
 
@@ -175,7 +220,7 @@ module Bundler
 
       begin
         # Run
-        Kernel.exec *ARGV
+        Kernel.exec(*ARGV)
       rescue Errno::EACCES
         Bundler.ui.error "bundler: not executable: #{ARGV.first}"
       rescue Errno::ENOENT
