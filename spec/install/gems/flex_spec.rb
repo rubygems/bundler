@@ -133,7 +133,6 @@ describe "bundle flex_install" do
         gem 'rack'
       G
 
-      bundled_app(".bundle/environment.rb").delete
       should_not_be_installed "activesupport 2.3.5"
     end
 

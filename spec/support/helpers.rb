@@ -27,7 +27,7 @@ module Spec
       groups = args.map {|a| a.inspect }.join(", ")
 
       if opts[:lite_runtime]
-        setup = "require '#{bundled_app(".bundle/environment")}' ; Bundler.setup(#{groups})\n"
+        setup = "require 'rubygems' ; require 'bundler/setup' ; Bundler.setup(#{groups})\n"
       else
         setup = "require 'rubygems' ; require 'bundler' ; Bundler.setup(#{groups})\n"
       end
@@ -108,16 +108,6 @@ module Spec
       path.dirname.mkpath
       File.open(path.to_s, 'w') do |f|
         f.puts str
-      end
-    end
-
-    def env_file(*args)
-      path = bundled_app(".bundle/environment.rb")
-      if args.empty?
-        path
-      else
-        str = args.shift || ""
-        File.open(path, 'w'){|f| f.puts str }
       end
     end
 

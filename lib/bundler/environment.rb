@@ -31,9 +31,7 @@ module Bundler
     end
 
     def lock
-      FileUtils.mkdir_p("#{root}/.bundle")
       write_yml_lock
-      write_rb_lock
     end
 
     def update(*gems)
@@ -48,21 +46,6 @@ module Bundler
     end
 
     # ==== Locking
-
-    def write_rb_lock
-      begin
-        env_file = Bundler.default_gemfile.dirname.join(".bundle/environment.rb")
-        env_file.dirname.mkpath
-        File.open(env_file, 'w') do |f|
-          f.puts <<-RB
-require "rubygems"
-require "bundler/setup"
-          RB
-        end
-      rescue Errno::EACCES
-        Bundler.ui.warn "Cannot write .bundle/environment.rb file"
-      end
-    end
 
     def write_yml_lock
       File.open("#{root}/Gemfile.lock", 'w') do |f|

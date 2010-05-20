@@ -239,11 +239,6 @@ module Bundler
 
   private
 
-    def remove_lockfiles
-      FileUtils.rm_f "#{Bundler.root}/Gemfile.lock"
-      FileUtils.rm_f "#{Bundler.root}/.bundle/environment.rb"
-    end
-
     def locate_gem(name)
       spec = Bundler.load.specs.find{|s| s.name == name }
       raise GemNotFound, "Could not find gem '#{name}' in the current bundle." unless spec

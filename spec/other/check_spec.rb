@@ -101,12 +101,6 @@ describe "bundle check" do
       G
     end
 
-    it "rebuilds .bundle/environment.rb " do
-      bundled_app('.bundle/environment.rb').delete
-      bundle :check
-      bundled_app('.bundle/environment.rb').should exist
-    end
-
     it "returns success when the Gemfile is satisfied" do
       bundle :install
       bundle :check, :exit_status => true
