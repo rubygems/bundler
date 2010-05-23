@@ -142,12 +142,12 @@ module Bundler
 
     desc "lock", "Locks the bundle to the current set of dependencies, including all child dependencies."
     def lock
-      # NOOP, switch to output a deprecation message
+      Bundler.ui.warn "Lock is deprecated. Your bundle is now locked whenever you run `bundle install`."
     end
 
     desc "unlock", "Unlock the bundle. This allows gem versions to be changed."
     def unlock
-      # NOOP, switch to output a deprecation message
+      Bundler.ui.warn "Unlock is deprecated. To update to newer gem versions, use `bundle update`."
     end
 
     desc "show [GEM]", "Shows all gems that are part of the bundle, or the path to a given gem"
