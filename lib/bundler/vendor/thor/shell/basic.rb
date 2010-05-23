@@ -109,6 +109,34 @@ class Thor
         end
       end
 
+      # Prints a long string, word-wrapping the text to the current width of the
+      # terminal display. Ideal for printing heredocs.
+      #
+      # ==== Parameters
+      # String
+      #
+      # ==== Options
+      # ident<Integer>:: Indent each line of the printed paragraph by ident value.
+      #
+      def print_wrapped(message, options={})
+        ident = options[:ident] || 0
+        width = terminal_width - ident
+        paras = message.split("\n\n")
+
+        paras.map! do |unwrapped|
+          unwrapped.strip.gsub(/\n/, " ").squeeze(" ").
+          gsub(/.{1,#{width}}(?:\s|\Z)/){($& + 5.chr).
+          gsub(/\n\005/,"\n").gsub(/\005/,"\n")}
+        end
+
+        paras.each do |para|
+          para.split("\n").each do |line|
+            $stdout.puts line.insert(0, " " * ident)
+          end
+          $stdout.puts unless para == paras.last
+        end
+      end
+
       # Deals with file collision and returns true if the file should be
       # overwriten and false otherwise. If a block is given, it uses the block
       # response as the content for the diff.

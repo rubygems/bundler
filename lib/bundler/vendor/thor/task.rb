@@ -1,11 +1,11 @@
 class Thor
-  class Task < Struct.new(:name, :description, :usage, :options)
+  class Task < Struct.new(:name, :description, :long_description, :usage, :options)
     FILE_REGEXP = /^#{Regexp.escape(File.dirname(__FILE__))}/
 
     # A dynamic task that handles method missing scenarios.
     class Dynamic < Task
       def initialize(name, options=nil)
-        super(name.to_s, "A dynamically-generated task", name.to_s, options)
+        super(name.to_s, "A dynamically-generated task", name.to_s, name.to_s, options)
       end
 
       def run(instance, args=[])
@@ -17,8 +17,8 @@ class Thor
       end
     end
 
-    def initialize(name, description, usage, options=nil)
-      super(name.to_s, description, usage, options || {})
+    def initialize(name, description, long_description, usage, options=nil)
+      super(name.to_s, description, long_description, usage, options || {})
     end
 
     def initialize_copy(other) #:nodoc:
@@ -39,7 +39,7 @@ class Thor
         instance.class.handle_no_task_error(name) : (raise e)
     end
 
-    # Returns the formatted usage by injecting given required arguments 
+    # Returns the formatted usage by injecting given required arguments
     # and required options into the given usage.
     def formatted_usage(klass, namespace=true)
       namespace = klass.namespace unless namespace == false

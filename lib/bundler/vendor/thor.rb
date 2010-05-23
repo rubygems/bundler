@@ -35,6 +35,20 @@ class Thor
       end
     end
 
+    # Defines the long description of the next task.
+    #
+    # ==== Parameters
+    # long description<String>
+    #
+    def long_desc(long_description, options={})
+      if options[:for]
+        task = find_and_refresh_task(options[:for])
+        task.long_description = long_description if long_description
+      else
+        @long_desc = long_description
+      end
+    end
+
     # Maps an input to a task. If you define:
     #
     #   map "-T" => "list"
@@ -153,7 +167,12 @@ class Thor
       shell.say "  #{banner(task)}"
       shell.say
       class_options_help(shell, nil => task.options.map { |_, o| o })
-      shell.say task.description
+      if task.long_description
+        shell.say "Description:"
+        shell.print_wrapped(task.long_description, :ident => 2)
+      else
+        shell.say task.description
+      end
     end
 
     # Prints help information for this class.
@@ -205,8 +224,8 @@ class Thor
 
       def create_task(meth) #:nodoc:
         if @usage && @desc
-          tasks[meth.to_s] = Thor::Task.new(meth, @desc, @usage, method_options)
-          @usage, @desc, @method_options = nil
+          tasks[meth.to_s] = Thor::Task.new(meth, @desc, @long_desc, @usage, method_options)
+          @usage, @desc, @long_desc, @method_options = nil
           true
         elsif self.all_tasks[meth.to_s] || meth.to_sym == :method_missing
           true
