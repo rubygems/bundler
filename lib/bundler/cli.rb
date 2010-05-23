@@ -46,7 +46,7 @@ module Bundler
 
     desc "check", "Checks if the dependencies listed in Gemfile are satisfied by currently installed gems"
     def check
-      env = Bundler.load
+      env = Bundler.environment
       # Check top level dependencies
       missing = env.dependencies.select { |d| env.index.search(d).empty? }
       if missing.any?

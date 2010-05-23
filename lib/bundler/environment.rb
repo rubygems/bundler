@@ -48,8 +48,9 @@ module Bundler
     # ==== Locking
 
     def write_yml_lock
-      File.open("#{root}/Gemfile.lock", 'w') do |f|
-        f.puts lock_content
+      contents = lock_content
+      File.open(root.join('Gemfile.lock'), 'w') do |f|
+        f.puts contents
       end
     end
 

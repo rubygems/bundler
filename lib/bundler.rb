@@ -103,6 +103,10 @@ module Bundler
       @load ||= Runtime.new(root, definition)
     end
 
+    def environment
+      Bundler::Environment.new(root, definition)
+    end
+
     def definition
       @definition ||= begin
         configure
