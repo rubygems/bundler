@@ -12,16 +12,20 @@ module Bundler
 
     def []=(key, value)
       key = "BUNDLE_#{key.to_s.upcase}"
-      @config[key] = value
-      FileUtils.mkdir_p(config_file.dirname)
-      File.open(config_file, 'w') do |f|
-        f.puts @config.to_yaml
+      unless @config[key] == value
+        @config[key] = value
+        FileUtils.mkdir_p(config_file.dirname)
+        File.open(config_file, 'w') do |f|
+          f.puts @config.to_yaml
+        end
       end
       value
     end
 
     def without=(array)
-      self[:without] = array.join(":")
+      unless array.empty? && without.empty?
+        self[:without] = array.join(":")
+      end
     end
 
     def without

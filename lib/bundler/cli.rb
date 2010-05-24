@@ -56,7 +56,7 @@ module Bundler
       If not, the first missing gem is listed and Bundler exits status 1.
     D
     def check
-      env = Bundler.load
+      env = Bundler.environment
       # Check top level dependencies
       missing = env.dependencies.select { |d| env.index.search(d).empty? }
       if missing.any?
@@ -257,12 +257,32 @@ module Bundler
     end
     map %w(-v --version) => :version
 
-  private
+    desc 'viz', "Generates a visual dependency graph"
+    method_option :file, :type => :string, :default => 'gem_graph.png', :aliases => '-f', :banner => "Show the version with each gem name."
+    method_option :version, :type => :boolean, :default => false, :aliases => '-v', :banner => "Show the version with each gem name."
+    method_option :requirements, :type => :boolean, :default => false, :aliases => '-r', :banner => "Show the requirement for each dependency."
+    def viz
+      output_file = File.expand_path(options[:file])
+      graph = Graph.new( Bundler.load )
 
-    def remove_lockfiles
-      FileUtils.rm_f "#{Bundler.root}/Gemfile.lock"
-      FileUtils.rm_f "#{Bundler.root}/.bundle/environment.rb"
+      begin
+        graph.viz(output_file, options[:version], options[:requirements])
+        Bundler.ui.info output_file
+      rescue LoadError => e
+        Bundler.ui.error e.inspect
+        Bundler.ui.warn "Make sure you have the graphviz ruby gem"
+        Bundler.ui.warn "'gem install ruby-graphviz'"
+      rescue StandardError => e
+        if e.message.start_with? 'GraphViz not installed or dot not in PATH.'
+          Bundler.ui.error e.message
+          Bundler.ui.warn "The ruby graphviz gem requires GraphViz to be installed"
+        else
+          raise
+        end
+      end
     end
+
+  private
 
     def locate_gem(name)
       spec = Bundler.load.specs.find{|s| s.name == name }

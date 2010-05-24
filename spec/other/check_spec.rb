@@ -92,6 +92,34 @@ describe "bundle check" do
     out.should include("Could not locate Gemfile")
   end
 
+  it "should not crash when called multiple times on a new machine" do
+    gemfile <<-G
+    gem 'rails', '3.0.0.beta3'
+    gem 'paperclip', :git => 'git://github.com/thoughtbot/paperclip.git'
+    G
+
+    simulate_new_machine
+    bundle :check
+    @err.should == ""
+    bundle :check
+    @err.should == ""
+    bundle :check
+    @err.should == ""
+  end
+
+  it "should return the same result when called multiple times on a new machine" do
+    gemfile <<-G
+    gem 'rails', '3.0.0.beta3'
+    gem 'haml'
+    G
+
+    simulate_new_machine
+    bundle :check
+    last_out = @out
+    bundle :check
+    @out.should == last_out
+  end
+
   describe "when locked" do
     before :each do
       system_gems "rack-1.0.0"
@@ -99,12 +127,6 @@ describe "bundle check" do
         source "file://#{gem_repo1}"
         gem "rack", "1.0"
       G
-    end
-
-    it "rebuilds .bundle/environment.rb " do
-      bundled_app('.bundle/environment.rb').delete
-      bundle :check
-      bundled_app('.bundle/environment.rb').should exist
     end
 
     it "returns success when the Gemfile is satisfied" do
@@ -117,6 +139,7 @@ describe "bundle check" do
     it "shows what is missing with the current Gemfile if it is not satisfied" do
       simulate_new_machine
       bundle :check
+      should be_true out.start_with?("The following dependencies are missing")
       out.should include("rack (= 1.0")
     end
   end

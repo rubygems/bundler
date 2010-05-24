@@ -11,6 +11,7 @@ module Bundler
   autoload :Dependency,          'bundler/dependency'
   autoload :Dsl,                 'bundler/dsl'
   autoload :Environment,         'bundler/environment'
+  autoload :Graph,               'bundler/graph'
   autoload :Index,               'bundler/index'
   autoload :Installer,           'bundler/installer'
   autoload :LazySpecification,   'bundler/lazy_specification'
@@ -100,6 +101,10 @@ module Bundler
 
     def load
       @load ||= Runtime.new(root, definition)
+    end
+
+    def environment
+      Bundler::Environment.new(root, definition)
     end
 
     def definition
