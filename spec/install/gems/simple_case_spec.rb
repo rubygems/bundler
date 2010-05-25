@@ -470,8 +470,8 @@ describe "bundle install with gem sources" do
   end
 
   describe_sudo "it working when $GEM_HOME is owned by root" do
-    pending "specs should never require user intervention. plus this passes even if it times out."
     it "installs gems" do
+      pending "specs should never require user intervention. plus this passes even if it times out."
       install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem 'rack'
