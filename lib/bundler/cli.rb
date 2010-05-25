@@ -270,10 +270,10 @@ module Bundler
         Bundler.ui.info output_file
       rescue LoadError => e
         Bundler.ui.error e.inspect
-        Bundler.ui.warn "Make sure you have the graphviz ruby gem"
-        Bundler.ui.warn "'gem install ruby-graphviz'"
+        Bundler.ui.warn "Make sure you have the graphviz ruby gem. You can install it with:"
+        Bundler.ui.warn "`gem install ruby-graphviz`"
       rescue StandardError => e
-        if e.message.start_with? 'GraphViz not installed or dot not in PATH.'
+        if e.message =~ /GraphViz not installed or dot not in PATH/
           Bundler.ui.error e.message
           Bundler.ui.warn "The ruby graphviz gem requires GraphViz to be installed"
         else

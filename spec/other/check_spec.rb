@@ -139,7 +139,7 @@ describe "bundle check" do
     it "shows what is missing with the current Gemfile if it is not satisfied" do
       simulate_new_machine
       bundle :check
-      should be_true out.start_with?("The following dependencies are missing")
+      out.should match(/The following dependencies are missing/)
       out.should include("rack (= 1.0")
     end
   end
