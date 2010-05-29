@@ -4,6 +4,7 @@ if defined?(Gem::QuickLoader)
   # Gem Prelude makes me a sad panda :'(
   Gem::QuickLoader.load_full_rubygems_library
 end
+
 require 'rubygems'
 require 'rubygems/specification'
 
