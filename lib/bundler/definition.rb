@@ -94,6 +94,33 @@ module Bundler
       dependencies.map { |d| d.groups }.flatten.uniq
     end
 
+    def to_lock
+      out = ""
+
+      sources.each do |source|
+        # Add the source header
+        out << source.to_lock
+        # Find all specs for this source
+        specs.
+          select  { |s| s.source == source }.
+          sort_by { |s| s.name }.
+          each do |spec|
+            out << spec.to_lock
+        end
+        out << "\n"
+      end
+
+      out << "DEPENDENCIES\n"
+
+      dependencies.
+        sort_by { |d| d.name }.
+        each do |dep|
+          out << dep.to_lock
+      end
+
+      out
+    end
+
   private
 
     # We have the dependencies from Gemfile.lock and the dependencies from the

@@ -48,37 +48,9 @@ module Bundler
     # ==== Locking
 
     def write_yml_lock
-      contents = lock_content
       File.open(root.join('Gemfile.lock'), 'w') do |f|
-        f.puts contents
+        f.puts @definition.to_lock
       end
-    end
-
-    def lock_content
-      out = ""
-
-      @definition.sources.each do |source|
-        # Add the source header
-        out << source.to_lock
-        # Find all specs for this source
-        specs.
-          select  { |s| s.source == source }.
-          sort_by { |s| s.name }.
-          each do |spec|
-            out << spec.to_lock
-        end
-        out << "\n"
-      end
-
-      out << "DEPENDENCIES\n"
-
-      @definition.dependencies.
-        sort_by { |d| d.name }.
-        each do |dep|
-          out << dep.to_lock
-      end
-
-      out
     end
   end
 end
