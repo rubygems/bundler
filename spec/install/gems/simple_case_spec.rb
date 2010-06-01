@@ -118,7 +118,7 @@ describe "bundle install with gem sources" do
     describe "with a gem that installs multiple platforms" do
       it "installs gems for the local platform as first choice" do
         install_gemfile <<-G
-          Gem.platforms = [#{rb}, Gem::Platform.local]
+          Gem.platforms = [Gem::Platform.new('#{rb}'), Gem::Platform.local]
           source "file://#{gem_repo1}"
           gem "platform_specific"
         G
@@ -129,7 +129,7 @@ describe "bundle install with gem sources" do
 
       it "falls back on plain ruby" do
         install_gemfile <<-G
-          Gem.platforms = [#{rb}, #{linux}]
+          Gem.platforms = [Gem::Platform.new('#{rb}'), Gem::Platform.new('#{linux}')]
           source "file://#{gem_repo1}"
           gem "platform_specific"
         G
@@ -140,7 +140,7 @@ describe "bundle install with gem sources" do
 
       it "installs gems for java" do
         install_gemfile <<-G
-          Gem.platforms = [#{java}]
+          Gem.platforms = [Gem::Platform.new('#{java}')]
           source "file://#{gem_repo1}"
           gem "platform_specific"
         G
@@ -151,7 +151,7 @@ describe "bundle install with gem sources" do
 
       it "installs gems for windows" do
         install_gemfile <<-G
-          Gem.platforms = [#{mswin}]
+          Gem.platforms = [Gem::Platform.new('#{mswin}')]
           source "file://#{gem_repo1}"
           gem "platform_specific"
         G
@@ -419,7 +419,7 @@ describe "bundle install with gem sources" do
 
         # Try to install gem with nil arch
         source "http://localgemserver.com/"
-        Gem.platforms = [#{mswin}]
+        Gem.platforms = [Gem::Platform.new('#{mswin}')]
         gem "rcov"
       G
       bundle :install

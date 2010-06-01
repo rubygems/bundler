@@ -121,7 +121,7 @@ describe "bundle cache" do
 
     it "doesn't remove gems that are for another platform" do
       install_gemfile <<-G
-        Gem.platforms = [#{java}]
+        Gem.platforms = [Gem::Platform.new('#{java}')]
         source "file://#{gem_repo1}"
         gem "platform_specific"
       G

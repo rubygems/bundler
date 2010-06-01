@@ -35,7 +35,7 @@ describe "bundle install with gem sources" do
 
     it "ignores cached gems for the wrong platform" do
       install_gemfile <<-G
-        Gem.platforms = [#{java}]
+        Gem.platforms = [Gem::Platform.new('#{java}')]
         source "file://#{gem_repo1}"
         gem "platform_specific"
       G
@@ -43,7 +43,7 @@ describe "bundle install with gem sources" do
       simulate_new_machine
 
       install_gemfile <<-G
-        Gem.platforms = [#{rb}]
+        Gem.platforms = [Gem::Platform.new('#{rb}')]
         source "file://#{gem_repo1}"
         gem "platform_specific"
       G
