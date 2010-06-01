@@ -31,6 +31,9 @@ describe "the lockfile format" do
         specs:
           rack (1.0.0)
 
+      PLATFORMS
+        #{Gem::Platform.local}
+
       DEPENDENCIES
         rack
     G
@@ -51,6 +54,9 @@ describe "the lockfile format" do
           rack-obama (1.0)
             rack
 
+      PLATFORMS
+        #{Gem::Platform.local}
+
       DEPENDENCIES
         rack-obama
     G
@@ -70,6 +76,9 @@ describe "the lockfile format" do
           rack (1.0.0)
           rack-obama (1.0)
             rack
+
+      PLATFORMS
+        #{Gem::Platform.local}
 
       DEPENDENCIES
         rack-obama (>= 1.0)
@@ -93,6 +102,9 @@ describe "the lockfile format" do
       GEM
         specs:
 
+      PLATFORMS
+        #{Gem::Platform.local}
+
       DEPENDENCIES
         foo!
     G
@@ -115,6 +127,9 @@ describe "the lockfile format" do
 
       GEM
         specs:
+
+      PLATFORMS
+        #{Gem::Platform.local}
 
       DEPENDENCIES
         foo
@@ -140,6 +155,9 @@ describe "the lockfile format" do
       GEM
         specs:
 
+      PLATFORMS
+        #{Gem::Platform.local}
+
       DEPENDENCIES
         foo!
     G
@@ -164,6 +182,9 @@ describe "the lockfile format" do
       GEM
         specs:
 
+      PLATFORMS
+        #{Gem::Platform.local}
+
       DEPENDENCIES
         foo!
     G
@@ -184,6 +205,9 @@ describe "the lockfile format" do
 
       GEM
         specs:
+
+      PLATFORMS
+        #{Gem::Platform.local}
 
       DEPENDENCIES
         foo!
@@ -211,6 +235,9 @@ describe "the lockfile format" do
             rack
           thin (1.0)
             rack
+
+      PLATFORMS
+        #{Gem::Platform.local}
 
       DEPENDENCIES
         actionpack
@@ -247,6 +274,9 @@ describe "the lockfile format" do
             rake
           rake (0.8.7)
 
+      PLATFORMS
+        #{Gem::Platform.local}
+
       DEPENDENCIES
         rails
     G
@@ -267,6 +297,9 @@ describe "the lockfile format" do
           rack-obama (1.0)
             rack
 
+      PLATFORMS
+        #{Gem::Platform.local}
+
       DEPENDENCIES
         rack-obama (>= 1.0)
     G
@@ -286,6 +319,9 @@ describe "the lockfile format" do
           rack (1.0.0)
           rack-obama (1.0)
             rack
+
+      PLATFORMS
+        #{Gem::Platform.local}
 
       DEPENDENCIES
         rack-obama (>= 1.0)
@@ -309,6 +345,9 @@ describe "the lockfile format" do
       GEM
         specs:
 
+      PLATFORMS
+        #{Gem::Platform.local}
+
       DEPENDENCIES
         foo
     G
@@ -331,8 +370,48 @@ describe "the lockfile format" do
       GEM
         specs:
 
+      PLATFORMS
+        #{Gem::Platform.local}
+
       DEPENDENCIES
         foo
+    G
+  end
+
+  it "keeps existing platforms in the lockfile" do
+    lockfile <<-G
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          rack (1.0.0)
+
+      PLATFORMS
+        universal-java-1.6
+
+      DEPENDENCIES
+        rack
+    G
+
+    flex_install_gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "rack"
+    G
+
+    platforms = ['universal-java-1.6', Gem::Platform.local.to_s].sort
+
+    lockfile_should_be <<-G
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          rack (1.0.0)
+
+      PLATFORMS
+        #{platforms[0]}
+        #{platforms[1]}
+
+      DEPENDENCIES
+        rack
     G
   end
 end

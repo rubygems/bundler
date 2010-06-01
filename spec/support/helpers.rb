@@ -115,6 +115,20 @@ module Spec
       end
     end
 
+    def lockfile(*args)
+      path = bundled_app("Gemfile.lock")
+      path = args.shift if Pathname === args.first
+      str  = args.shift || ""
+
+      # Trim the leading spaces
+      spaces = str[/\A\s+/, 0] || ""
+      str.gsub!(/^#{spaces}/, '')
+
+      File.open(path.to_s, 'w') do |f|
+        f.puts str
+      end
+    end
+
     def install_gemfile(*args)
       gemfile(*args)
       opts = args.last.is_a?(Hash) ? args.last : {}

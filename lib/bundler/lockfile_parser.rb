@@ -2,9 +2,10 @@ require "strscan"
 
 module Bundler
   class LockfileParser
-    attr_reader :sources, :dependencies, :specs
+    attr_reader :sources, :dependencies, :specs, :platforms
 
     def initialize(lockfile)
+      @platforms    = []
       @sources      = []
       @dependencies = []
       @specs        = []
@@ -13,6 +14,8 @@ module Bundler
       lockfile.split(/\n+/).each do |line|
         if line == "DEPENDENCIES"
           @state = :dependency
+        elsif line == "PLATFORMS"
+          @state = :platform
         else
           send("parse_#{@state}", line)
         end
@@ -79,6 +82,12 @@ module Bundler
         @specs << @current_spec
       elsif line =~ %r{^ {6}#{NAME_VERSION}$}
         @current_spec.dependencies << Gem::Dependency.new($1, $2)
+      end
+    end
+
+    def parse_platform(line)
+      if line =~ /^  (.*)$/
+        @platforms << Gem::Platform.new($1)
       end
     end
   end

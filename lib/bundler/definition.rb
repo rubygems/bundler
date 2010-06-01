@@ -3,7 +3,7 @@ require "digest/sha1"
 # TODO: In the 0.10 release, there shouldn't be a locked subclass of Definition
 module Bundler
   class Definition
-    attr_reader :dependencies, :sources, :locked_specs
+    attr_reader :dependencies, :sources, :locked_specs, :platforms
 
     def self.build(gemfile, lockfile)
       gemfile = Pathname.new(gemfile).expand_path
@@ -23,10 +23,12 @@ module Bundler
 
       if lockfile && File.exists?(lockfile)
         locked = LockfileParser.new(File.read(lockfile))
+        @platforms    = locked.platforms
         @locked_deps  = locked.dependencies
         @locked_specs = SpecSet.new(locked.specs)
         @sources      = locked.sources
       else
+        @platforms    = []
         @locked_deps  = []
         @locked_specs = SpecSet.new([])
       end
@@ -97,7 +99,7 @@ module Bundler
     def to_lock
       out = ""
 
-      sources.each do |source|
+      sorted_sources.each do |source|
         # Add the source header
         out << source.to_lock
         # Find all specs for this source
@@ -110,6 +112,18 @@ module Bundler
         out << "\n"
       end
 
+      out << "PLATFORMS\n"
+
+      # Add the current platform
+      platforms = @platforms.dup
+      platforms << Gem::Platform.local
+      platforms.uniq!
+
+      platforms.map { |p| p.to_s }.sort.each do |p|
+        out << "  #{p}\n"
+      end
+
+      out << "\n"
       out << "DEPENDENCIES\n"
 
       dependencies.
@@ -122,6 +136,13 @@ module Bundler
     end
 
   private
+
+    def sorted_sources
+      sources.sort_by do |s|
+        # Place GEM at the top
+        [ s.is_a?(Source::Rubygems) ? 1 : 0, s.to_s ]
+      end
+    end
 
     # We have the dependencies from Gemfile.lock and the dependencies from the
     # Gemfile. Here, we are finding a list of all dependencies that were
