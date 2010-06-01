@@ -147,7 +147,6 @@ module Bundler
         @caches.each do |path|
           Dir["#{path}/*.gem"].each do |gemfile|
             s = Gem::Format.from_file_by_path(gemfile).spec
-            next unless Gem::Platform.match(s.platform)
             s.source = self
             idx << s
           end
@@ -163,7 +162,6 @@ module Bundler
           Gem.sources = ["#{uri}"]
           fetch_all_remote_specs do |n,v|
             v.each do |name, version, platform|
-              next unless Gem::Platform.match(platform)
               spec = RemoteSpecification.new(name, version, platform, uri)
               spec.source = self
               # Temporary hack until this can be figured out better

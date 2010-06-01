@@ -77,7 +77,7 @@ module Bundler
 
         wants_prerelease = dependency.requirement.prerelease?
         only_prerelease  = specs.all? {|spec| spec.version.prerelease? }
-        found = specs.select { |spec| dependency =~ spec }
+        found = specs.select { |spec| dependency =~ spec && Gem::Platform.match(spec.platform) }
 
         unless wants_prerelease || only_prerelease
           found.reject! { |spec| spec.version.prerelease? }
