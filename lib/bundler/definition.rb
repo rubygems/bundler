@@ -18,6 +18,18 @@ module Bundler
       builder.to_definition(lockfile)
     end
 
+=begin
+    How does the new system work?
+    ===
+    * Load information from Gemfile and Lockfile
+    * Invalidate stale locked specs
+      * All specs from stale source are stale
+      * All specs that are reachable only through a stale
+        dependency are stale.
+    * If all fresh dependencies are satisfied by the locked
+      specs, then we can try to resolve locally.
+=end
+
     def initialize(lockfile, dependencies, sources)
       @dependencies, @sources, @unlock = dependencies, sources, []
 
@@ -108,8 +120,9 @@ module Bundler
 
       # Add the current platform
       platforms = @platforms.dup
-      platforms << Gem::Platform.local
-      platforms.uniq!
+      platforms << Gem::Platform.local unless @platforms.any? do |p|
+        p == Gem::Platform.local
+      end
 
       platforms.map { |p| p.to_s }.sort.each do |p|
         out << "  #{p}\n"
@@ -132,14 +145,18 @@ module Bundler
     def converge
       common = @locked_sources & @sources
       fresh  = @sources - common
-      stale  = @locked_sources - common
-
-      @locked_specs.each do |s|
-        next unless stale.include?(s.source)
-        @unlock << s.name
-      end
+      # stale  = @locked_sources - common
 
       @sources = common + fresh
+
+      @locked_specs.each do |s|
+        if source = @sources.find { |source| s.source == source }
+          s.source = source
+        else
+          @unlock << s.name
+        end
+      end
+
       @dependencies.each do |dep|
         if dep.source && source = @sources.find { |s| dep.source == s }
           dep.source == source
@@ -192,28 +209,17 @@ module Bundler
 
       # Run a resolve against the locally available gems
       specs = Resolver.resolve(dependencies, idx, source_requirements, locked_specs)
-      specs.each do |spec|
-        next unless spec.is_a?(LazySpecification)
+      specs.__materialize__ do |spec|
         spec.__materialize__(spec.source.send(type))
       end
       specs
     end
 
+    # TODO: Improve this logic
     def resolve_remote_specs
-      # An ambiguous dependency is any dependency that does not have
-      # a requirement on an explicit version. If there are any, then
-      # we must do a remote resolve.
-      if dependencies.any? { |d| ambiguous?(d) }
-        return resolve(:specs, remote_index)
-      end
-
-      # Simple logic for now. Can improve later.
-      if specs.length == dependencies.length
-        return specs
-      else
-        return resolve(:specs, remote_index)
-      end
-    rescue GemNotFound, PathError => e
+      locked_specs.for(dependencies) # Will raise on fail
+      specs
+    rescue #InvalidSpecSet, GemNotFound, PathError
       resolve(:specs, remote_index)
     end
 

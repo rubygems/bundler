@@ -16,6 +16,7 @@ module Bundler
       @specs.length
     end
 
+    # TODO: Handle platform filtering
     def for(deps, skip = [])
       specs = {}
       deps.each do |dep|
@@ -23,11 +24,19 @@ module Bundler
         append_subgraph(specs, current, skip)
       end
 
-      sorted.select { |s| specs[s.name] }
+      SpecSet.new(sorted.select { |s| specs[s.name] })
     end
 
     def to_a
       sorted.dup
+    end
+
+    def __materialize__
+      @lookup = nil
+      @specs.map! do |s|
+        next s unless s.is_a?(LazySpecification)
+        yield s
+      end
     end
 
   private
@@ -42,12 +51,15 @@ module Bundler
     end
 
     def sorted
-      @sorted ||= ([lookup['rake']] + tsort).compact.uniq
+      rake = @specs.find { |s| s.name == 'rake' }
+      @sorted ||= ([rake] + tsort).compact.uniq
     end
 
     def lookup
       @lookup ||= Hash.new do |h,k|
-        h[k] = @specs.find { |s| s.name == k }
+        v = @specs.find { |s| s.name == k }
+        raise InvalidSpecSet, "SpecSet is missing '#{k}'" unless v
+        h[k] = v
       end
     end
 

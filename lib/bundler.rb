@@ -50,6 +50,9 @@ module Bundler
   class GemspecError     < BundlerError; status_code(14) ; end
   class InvalidOption    < BundlerError; status_code(15) ; end
 
+  # Internal errors, should be rescued
+  class InvalidSpecSet < StandardError; end
+
   class << self
     attr_writer :ui, :bundle_path
 

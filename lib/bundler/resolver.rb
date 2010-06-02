@@ -40,23 +40,7 @@ module Bundler
         activated = {}
         base.each { |s| activated[s.name] = s }
         resolver.resolve(requirements, activated)
-        output = resolver.errors.inject("") do |o, (conflict, (origin, requirement))|
-          if origin
-            o << "  Conflict on: #{conflict.inspect}:\n"
-            o << "    * #{conflict} (#{origin.version}) activated by #{origin.required_by.first}\n"
-            o << "    * #{requirement} required"
-            if requirement.required_by.first
-              o << " by #{requirement.required_by.first}\n"
-            else
-              o << " in Gemfile\n"
-            end
-          else
-            o << "  #{requirement} not found in any of the sources\n"
-            o << "      required by #{requirement.required_by.first}\n"
-          end
-          o << "    All possible versions of origin requirements conflict."
-        end
-        raise VersionConflict, "No compatible versions could be found for required dependencies:\n  #{output}"
+        raise VersionConflict, "No compatible versions could be found for required dependencies:\n  #{resolver.error_message}"
         nil
       end
       SpecSet.new(result.values)
@@ -131,11 +115,20 @@ module Bundler
           # of it (maybe the current requirement won't be present anymore). If the
           # current requirement is a root level requirement, we need to jump back to
           # where the conflicting gem was activated.
-          parent = current.required_by.last || existing.required_by.last
+          parent = current.required_by.last
+          # `existing` could not respond to required_by if it is part of the base set
+          # of specs that was passed to the resolver (aka, instance of LazySpecification)
+          parent ||= existing.required_by.last if existing.respond_to?(:required_by)
           # We track the spot where the current gem was activated because we need
           # to keep a list of every spot a failure happened.
           debug { "    -> Jumping to: #{parent.name}" }
-          throw parent.name, existing.required_by.last.name
+          if parent
+            throw parent.name, existing.respond_to?(:required_by) && existing.required_by.last.name
+          else
+            # The original set of dependencies conflict with the base set of specs
+            # passed to the resolver. This is by definition an impossible resolve.
+            raise VersionConflict, "No compatible versions could be found for required dependencies:\n  #{error_message}"
+          end
         end
       else
         # There are no activated gems for the current requirement, so we are going
@@ -235,6 +228,29 @@ module Bundler
     def search(dep)
       index = @source_requirements[dep.name] || @index
       index.search(dep)
+    end
+
+    def error_message
+      output = errors.inject("") do |o, (conflict, (origin, requirement))|
+        if origin
+          o << "  Conflict on: #{conflict.inspect}:\n"
+          if origin.respond_to?(:required_by) && required_by = origin.required_by.first
+            o << "    * #{conflict} (#{origin.version}) activated by #{required_by}\n"
+          else
+            o << "    * #{conflict} (#{origin.version}) in Gemfile.lock\n"
+          end
+          o << "    * #{requirement} required"
+          if requirement.required_by.first
+            o << " by #{requirement.required_by.first}\n"
+          else
+            o << " in Gemfile\n"
+          end
+        else
+          o << "  #{requirement} not found in any of the sources\n"
+          o << "      required by #{requirement.required_by.first}\n"
+        end
+        o << "    All possible versions of origin requirements conflict."
+      end
     end
   end
 end

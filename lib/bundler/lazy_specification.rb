@@ -29,6 +29,7 @@ module Bundler
     def __materialize__(index)
       @specification = index.search(self).first
       raise "Could not materialize #{full_name}" unless @specification
+      @specification
     end
 
     def respond_to?(*args)
@@ -39,7 +40,7 @@ module Bundler
 
     def method_missing(method, *args, &blk)
       if Gem::Specification.new.respond_to?(method)
-        raise "LazySpecification has not been materialized yet" unless @specification
+        raise "LazySpecification has not been materialized yet (calling :#{method} #{args.inspect})" unless @specification
         @specification.send(method, *args, &blk)
       else
         super

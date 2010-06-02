@@ -131,12 +131,14 @@ module Bundler
       sources = Array(options[:source])
 
       if gems.empty? && sources.empty?
-        gems = Bundler.definition.locked_specs.map { |s| s.name }
-      end
-
-      Installer.install Bundler.root, Bundler.definition do |i|
-        i.unlock_gems    gems
-        i.unlock_sources sources
+        # We're doing a full update
+        FileUtils.rm Bundler.root.join("Gemfile.lock")
+        Installer.install Bundler.root, Bundler.definition
+      else
+        Installer.install Bundler.root, Bundler.definition do |i|
+          i.unlock_gems    gems
+          i.unlock_sources sources
+        end
       end
     end
 
