@@ -414,4 +414,28 @@ describe "the lockfile format" do
         rack
     G
   end
+
+  it "persists the spec's platform to the lockfile" do
+    build_gem "platform_specific", "1.0.0", :to_system => true do |s|
+      s.platform = Gem::Platform.local
+    end
+
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "platform_specific"
+    G
+
+    lockfile_should_be <<-G
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          platform_specific (1.0.0-#{Gem::Platform.local})
+
+      PLATFORMS
+        #{Gem::Platform.local}
+
+      DEPENDENCIES
+        platform_specific
+    G
+  end
 end

@@ -34,10 +34,12 @@ module Bundler
     # ==== Returns
     # <GemBundle>,nil:: If the list of dependencies can be resolved, a
     #   collection of gemspecs is returned. Otherwise, nil is returned.
-    def self.resolve(requirements, index, source_requirements = {})
+    def self.resolve(requirements, index, source_requirements = {}, base = [])
       resolver = new(index, source_requirements)
       result = catch(:success) do
-        resolver.resolve(requirements, {})
+        activated = {}
+        base.each { |s| activated[s.name] = s }
+        resolver.resolve(requirements, activated)
         output = resolver.errors.inject("") do |o, (conflict, (origin, requirement))|
           if origin
             o << "  Conflict on: #{conflict.inspect}:\n"

@@ -3,7 +3,7 @@ require "digest/sha1"
 # TODO: In the 0.10 release, there shouldn't be a locked subclass of Definition
 module Bundler
   class Definition
-    attr_reader :dependencies, :sources, :locked_specs, :platforms
+    attr_reader :dependencies, :sources, :platforms
 
     def self.build(gemfile, lockfile)
       gemfile = Pathname.new(gemfile).expand_path
@@ -48,7 +48,7 @@ module Bundler
         source.unlock! if source.respond_to?(:unlock!)
 
         # Add all the spec names that are part of the source to unlock
-        @unlock.concat locked_specs.
+        @unlock.concat @locked_specs.
           select { |s| s.source == source }.
           map    { |s| s.name }
 
@@ -82,17 +82,6 @@ module Bundler
 
     def no_sources?
       sources.length == 1 && sources.first.remotes.empty?
-    end
-
-    # TODO: OMG LOL
-    def resolver_dependencies
-      @resolver_dependencies ||= begin
-        deps = locked_specs_as_deps
-        dependencies.each do |dep|
-          deps << dep unless deps.any? { |d| d.name == dep.name }
-        end
-        deps
-      end
     end
 
     def groups
@@ -172,21 +161,16 @@ module Bundler
     #
     # This allows us to add on the *new* requirements in the Gemfile and make
     # sure that the changes result in a conservative update to the Gemfile.lock.
-    def locked_specs_as_deps
+    def locked_specs
       deps = []
+
       @dependencies.each do |dep|
         if in_locked_deps?(dep) || satisfies_locked_spec?(dep)
           deps << dep
         end
       end
 
-      @locked_specs.for(deps, @unlock).map do |s|
-        dep = Gem::Dependency.new(s.name, s.version)
-        @locked_deps.each do |d|
-          dep.source = d.source if d.name == dep.name
-        end
-        dep
-      end
+      @locked_specs.for(deps, @unlock)
     end
 
     def in_locked_deps?(dep)
@@ -201,25 +185,30 @@ module Bundler
 
     def resolve(type, idx)
       source_requirements = {}
-      resolver_dependencies.each do |dep|
+      dependencies.each do |dep|
         next unless dep.source
         source_requirements[dep.name] = dep.source.send(type)
       end
 
       # Run a resolve against the locally available gems
-      Resolver.resolve(resolver_dependencies, idx, source_requirements)
+      specs = Resolver.resolve(dependencies, idx, source_requirements, locked_specs)
+      specs.each do |spec|
+        next unless spec.is_a?(LazySpecification)
+        spec.__materialize__(spec.source.send(type))
+      end
+      specs
     end
 
     def resolve_remote_specs
       # An ambiguous dependency is any dependency that does not have
       # a requirement on an explicit version. If there are any, then
       # we must do a remote resolve.
-      if resolver_dependencies.any? { |d| ambiguous?(d) }
+      if dependencies.any? { |d| ambiguous?(d) }
         return resolve(:specs, remote_index)
       end
 
       # Simple logic for now. Can improve later.
-      if specs.length == resolver_dependencies.length
+      if specs.length == dependencies.length
         return specs
       else
         return resolve(:specs, remote_index)

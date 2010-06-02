@@ -10,6 +10,7 @@ module Spec
         return unless Sudo.sudo?
         describe(*args) do
           before :each do
+            pending "sudo tests are broken"
             chown_system_gems
           end
 

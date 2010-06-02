@@ -48,7 +48,11 @@ module Gem
     end
 
     def to_lock
-      out = "    #{name} (#{version})\n"
+      if platform == Gem::Platform::RUBY or platform.nil?
+        out = "    #{name} (#{version})\n"
+      else
+        out = "    #{name} (#{version}-#{platform})\n"
+      end
 
       dependencies.sort_by {|d| d.name }.each do |dep|
         next if dep.type == :development

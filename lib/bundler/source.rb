@@ -301,6 +301,7 @@ module Bundler
               s.name     = @name
               s.source   = self
               s.version  = Gem::Version.new(@version)
+              s.platform = Gem::Platform::RUBY
               s.summary  = "Fake gemspec for #{@name}"
               s.relative_loaded_from = "#{@name}.gemspec"
               if path.join("bin").exist?

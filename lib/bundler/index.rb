@@ -25,7 +25,7 @@ module Bundler
 
     def search(query)
       case query
-      when Gem::Specification, RemoteSpecification then search_by_spec(query)
+      when Gem::Specification, RemoteSpecification, LazySpecification then search_by_spec(query)
       when String then @specs[query]
       else search_by_dependency(query)
       end
@@ -68,7 +68,9 @@ module Bundler
   private
 
     def search_by_spec(spec)
-      @specs[spec.name].select { |s| s.version == spec.version && s.platform == spec.platform }
+      @specs[spec.name].select do |s|
+        s.version == spec.version && s.platform == spec.platform
+      end
     end
 
     def search_by_dependency(dependency)

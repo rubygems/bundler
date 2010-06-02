@@ -50,7 +50,7 @@ module Bundler
       end
     end
 
-    NAME_VERSION = '(?! )(.*?)(?: \((.*)\))?'
+    NAME_VERSION = '(?! )(.*?)(?: \(([^-]*)(?:-(.*))?\))?'
 
     def parse_dependency(line)
       if line =~ %r{^ {2}#{NAME_VERSION}(!)?$}
@@ -77,7 +77,9 @@ module Bundler
 
     def parse_spec(line)
       if line =~ %r{^ {4}#{NAME_VERSION}$}
-        @current_spec = LazySpecification.new($1, $2)
+        name, version = $1, Gem::Version.new($2)
+        platform = $3 ? Gem::Platform.new($3) : Gem::Platform::RUBY
+        @current_spec = LazySpecification.new(name, version, platform)
         @current_spec.source = @current_source
         @specs << @current_spec
       elsif line =~ %r{^ {6}#{NAME_VERSION}$}
