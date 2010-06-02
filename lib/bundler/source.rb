@@ -21,6 +21,16 @@ module Bundler
         @spec_fetch_map = {}
       end
 
+      def hash
+        Rubygems.hash
+      end
+
+      def eql?(o)
+        Rubygems === o
+      end
+
+      alias == eql?
+
       # Not really needed, but it seems good to implement this method for interface
       # consistency. Source name is mostly used to identify Path & Git sources
       def name
@@ -241,6 +251,19 @@ module Bundler
         "source at #{@path}"
       end
 
+      def hash
+        self.class.hash
+      end
+
+      def eql?(o)
+        Path === o     &&
+        path == o.path &&
+        name == o.name &&
+        version == o.version
+      end
+
+      alias == eql?
+
       def name
         File.basename(@path.to_s)
       end
@@ -404,6 +427,16 @@ module Bundler
         out << "  glob: #{@glob}\n" unless @glob == DEFAULT_GLOB
         out << "  specs:\n"
       end
+
+      def eql?(o)
+        Git === o            &&
+        uri == o.uri         &&
+        ref == o.ref         &&
+        name == o.name       &&
+        version == o.version
+      end
+
+      alias == eql?
 
       def to_s
         ref = @options["ref"] ? shortref_for(@options["ref"]) : @ref

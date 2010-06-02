@@ -23,15 +23,18 @@ module Bundler
 
       if lockfile && File.exists?(lockfile)
         locked = LockfileParser.new(File.read(lockfile))
-        @platforms    = locked.platforms
-        @locked_deps  = locked.dependencies
-        @locked_specs = SpecSet.new(locked.specs)
-        @sources      = locked.sources
+        @platforms      = locked.platforms
+        @locked_deps    = locked.dependencies
+        @locked_specs   = SpecSet.new(locked.specs)
+        @locked_sources = locked.sources
       else
-        @platforms    = []
-        @locked_deps  = []
-        @locked_specs = SpecSet.new([])
+        @platforms      = []
+        @locked_deps    = []
+        @locked_specs   = SpecSet.new([])
+        @locked_sources = []
       end
+
+      converge
     end
 
     def unlock!(what_to_unlock)
@@ -137,6 +140,24 @@ module Bundler
 
   private
 
+    def converge
+      common = @locked_sources & @sources
+      fresh  = @sources - common
+      stale  = @locked_sources - common
+
+      @locked_specs.each do |s|
+        next unless stale.include?(s.source)
+        @unlock << s.name
+      end
+
+      @sources = common + fresh
+      @dependencies.each do |dep|
+        if dep.source && source = @sources.find { |s| dep.source == s }
+          dep.source == source
+        end
+      end
+    end
+
     def sorted_sources
       sources.sort_by do |s|
         # Place GEM at the top
@@ -152,11 +173,11 @@ module Bundler
     # This allows us to add on the *new* requirements in the Gemfile and make
     # sure that the changes result in a conservative update to the Gemfile.lock.
     def locked_specs_as_deps
-      deps = @dependencies & @locked_deps
-
+      deps = []
       @dependencies.each do |dep|
-        next if deps.include?(dep)
-        deps << dep if @locked_specs.any? { |s| s.satisfies?(dep) }
+        if in_locked_deps?(dep) || satisfies_locked_spec?(dep)
+          deps << dep
+        end
       end
 
       @locked_specs.for(deps, @unlock).map do |s|
@@ -166,6 +187,16 @@ module Bundler
         end
         dep
       end
+    end
+
+    def in_locked_deps?(dep)
+      @locked_deps.any? do |d|
+        dep == d && dep.source == d.source
+      end
+    end
+
+    def satisfies_locked_spec?(dep)
+      @locked_specs.any? { |s| s.satisfies?(dep) }
     end
 
     def resolve(type, idx)
