@@ -56,10 +56,10 @@ module Bundler
       source Source::Git.new(_normalize_hash(options).merge("uri" => uri)), source_options, &blk
     end
 
-    def to_definition(lockfile)
+    def to_definition(lockfile, unlock)
       @sources << @rubygems_source
       @sources.uniq!
-      Definition.new(lockfile, @dependencies, @sources)
+      Definition.new(lockfile, @dependencies, @sources, unlock)
     end
 
     def group(*args, &blk)

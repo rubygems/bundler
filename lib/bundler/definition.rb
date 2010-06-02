@@ -3,9 +3,10 @@ require "digest/sha1"
 # TODO: In the 0.10 release, there shouldn't be a locked subclass of Definition
 module Bundler
   class Definition
-    attr_reader :dependencies, :sources, :platforms
+    attr_reader :dependencies, :locked_specs, :platforms
 
-    def self.build(gemfile, lockfile)
+    def self.build(gemfile, lockfile, unlock)
+      unlock ||= {}
       gemfile = Pathname.new(gemfile).expand_path
 
       unless gemfile.file?
@@ -15,7 +16,7 @@ module Bundler
       # TODO: move this back into DSL
       builder = Dsl.new
       builder.instance_eval(File.read(gemfile.to_s), gemfile.to_s, 1)
-      builder.to_definition(lockfile)
+      builder.to_definition(lockfile, unlock)
     end
 
 =begin
@@ -30,8 +31,8 @@ module Bundler
       specs, then we can try to resolve locally.
 =end
 
-    def initialize(lockfile, dependencies, sources)
-      @dependencies, @sources, @unlock = dependencies, sources, []
+    def initialize(lockfile, dependencies, sources, unlock)
+      @dependencies, @sources, @unlock = dependencies, sources, unlock
 
       if lockfile && File.exists?(lockfile)
         locked = LockfileParser.new(File.read(lockfile))
@@ -49,26 +50,6 @@ module Bundler
       converge
     end
 
-    def unlock!(what_to_unlock)
-      raise "Specs already loaded" if @specs
-
-      # Set the gems to unlock
-      @unlock.concat(what_to_unlock[:gems])
-      # Find the gems associated with specific sources and unlock them
-      what_to_unlock[:sources].each do |source_name|
-        source = sources.find { |s| s.name == source_name }
-        source.unlock! if source.respond_to?(:unlock!)
-
-        # Add all the spec names that are part of the source to unlock
-        @unlock.concat @locked_specs.
-          select { |s| s.source == source }.
-          map    { |s| s.name }
-
-        # Remove duplicate spec names
-        @unlock.uniq!
-      end
-    end
-
     def resolve_remotely!
       raise "Specs already loaded" if @specs
       @specs = resolve_remote_specs
@@ -80,7 +61,7 @@ module Bundler
 
     def index
       @index ||= Index.build do |idx|
-        sources.each do |s|
+        @sources.each do |s|
           idx.use s.local_specs
         end
       end
@@ -88,12 +69,12 @@ module Bundler
 
     def remote_index
       @remote_index ||= Index.build do |idx|
-        sources.each { |source| idx.use source.specs }
+        @sources.each { |source| idx.use source.specs }
       end
     end
 
     def no_sources?
-      sources.length == 1 && sources.first.remotes.empty?
+      @sources.length == 1 && @sources.first.remotes.empty?
     end
 
     def groups
@@ -143,42 +124,27 @@ module Bundler
   private
 
     def converge
-      common = @locked_sources & @sources
-      fresh  = @sources - common
-      # stale  = @locked_sources - common
+      converge_sources
+      converge_dependencies
+      converge_locked_specs
+    end
 
-      @sources = common + fresh
-
-      @locked_specs.each do |s|
-        if source = @sources.find { |source| s.source == source }
-          s.source = source
-        else
-          @unlock << s.name
-        end
+    def converge_sources
+      @sources = (@locked_sources & @sources) | @sources
+      @sources.each do |source|
+        source.unlock! if source.respond_to?(:unlock!) && (@unlock[:sources] || []).include?(source.name)
       end
+    end
 
-      @dependencies.each do |dep|
+    def converge_dependencies
+      (@dependencies + @locked_deps).each do |dep|
         if dep.source && source = @sources.find { |s| dep.source == s }
-          dep.source == source
+          dep.source = source
         end
       end
     end
 
-    def sorted_sources
-      sources.sort_by do |s|
-        # Place GEM at the top
-        [ s.is_a?(Source::Rubygems) ? 1 : 0, s.to_s ]
-      end
-    end
-
-    # We have the dependencies from Gemfile.lock and the dependencies from the
-    # Gemfile. Here, we are finding a list of all dependencies that were
-    # originally present in the Gemfile that still satisfy the requirements
-    # of the dependencies in the Gemfile.lock
-    #
-    # This allows us to add on the *new* requirements in the Gemfile and make
-    # sure that the changes result in a conservative update to the Gemfile.lock.
-    def locked_specs
+    def converge_locked_specs
       deps = []
 
       @dependencies.each do |dep|
@@ -187,7 +153,15 @@ module Bundler
         end
       end
 
-      @locked_specs.for(deps, @unlock)
+      @locked_specs = @locked_specs.for(deps, @unlock[:gems] || [])
+
+      @locked_specs.each do |s|
+        s.source = @sources.find { |source| s.source == source }
+      end
+
+      @locked_specs.delete_if do |s|
+        s.source.nil? || (@unlock[:sources] || []).include?(s.name)
+      end
     end
 
     def in_locked_deps?(dep)
@@ -198,6 +172,13 @@ module Bundler
 
     def satisfies_locked_spec?(dep)
       @locked_specs.any? { |s| s.satisfies?(dep) }
+    end
+
+    def sorted_sources
+      @sources.sort_by do |s|
+        # Place GEM at the top
+        [ s.is_a?(Source::Rubygems) ? 1 : 0, s.to_s ]
+      end
     end
 
     def resolve(type, idx)
@@ -221,10 +202,6 @@ module Bundler
       specs
     rescue #InvalidSpecSet, GemNotFound, PathError
       resolve(:specs, remote_index)
-    end
-
-    def ambiguous?(dep)
-      dep.requirement.requirements.any? { |op,_| op != '=' }
     end
   end
 end

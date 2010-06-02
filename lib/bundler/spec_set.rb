@@ -31,8 +31,15 @@ module Bundler
       sorted.dup
     end
 
+    def delete_if(&blk)
+      @lookup = nil
+      @sorted = nil
+      @specs.delete_if(&blk)
+    end
+
     def __materialize__
       @lookup = nil
+      @sorted = nil
       @specs.map! do |s|
         next s unless s.is_a?(LazySpecification)
         yield s

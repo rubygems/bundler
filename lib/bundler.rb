@@ -110,11 +110,12 @@ module Bundler
       Bundler::Environment.new(root, definition)
     end
 
-    def definition
+    def definition(unlock = nil)
+      @definition = nil if unlock
       @definition ||= begin
         configure
         lockfile = root.join("Gemfile.lock")
-        Definition.build(default_gemfile, lockfile)
+        Definition.build(default_gemfile, lockfile, unlock)
       end
     end
 

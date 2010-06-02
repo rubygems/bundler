@@ -133,13 +133,11 @@ module Bundler
       if gems.empty? && sources.empty?
         # We're doing a full update
         FileUtils.rm Bundler.root.join("Gemfile.lock")
-        Installer.install Bundler.root, Bundler.definition
       else
-        Installer.install Bundler.root, Bundler.definition do |i|
-          i.unlock_gems    gems
-          i.unlock_sources sources
-        end
+        Bundler.definition(:gems => gems, :sources => sources)
       end
+
+      Installer.install Bundler.root, Bundler.definition
     end
 
     desc "lock", "Locks the bundle to the current set of dependencies, including all child dependencies."
