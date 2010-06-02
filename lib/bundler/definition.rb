@@ -1,6 +1,5 @@
 require "digest/sha1"
 
-# TODO: In the 0.10 release, there shouldn't be a locked subclass of Definition
 module Bundler
   class Definition
     attr_reader :dependencies, :locked_specs, :platforms
