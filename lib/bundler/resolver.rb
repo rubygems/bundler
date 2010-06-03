@@ -7,20 +7,108 @@ require 'set'
 
 # Extending Gem classes to add necessary tracking information
 module Gem
-  class Dependency
-    def required_by
-      @required_by ||= []
+  class Platform
+    def hash
+      Platform.hash
     end
+    alias eql? ==
   end
   class Specification
     def required_by
       @required_by ||= []
     end
+    def match_platform(p)
+      platform.nil? or p == platform or (p != Gem::Platform::RUBY and p =~ platform)
+    end
+  end
+  class Dependency
+    def required_by
+      @required_by ||= []
+    end
+    alias eql? ==
   end
 end
 
 module Bundler
   class Resolver
+    RUBY  = Gem::Platform.new('ruby')
+    JAVA  = Gem::Platform.new('java')
+    MSWIN = Gem::Platform.new('mswin32')
+    MING  = Gem::Platform.new('mingw32')
+
+    class DepProxy
+
+      undef to_s
+      undef type
+
+      attr_reader :required_by, :__platform, :dep
+
+      def initialize(dep, platform)
+        @dep, @__platform, @required_by = dep, platform, []
+      end
+
+    private
+
+      def method_missing(*args)
+        @dep.send(*args)
+      end
+
+    end
+
+    class SpecGroup < Array
+      attr_reader :activated, :required_by
+
+      def initialize(a)
+        super
+        @required_by  = []
+        @activated    = []
+        @dependencies = {}
+
+        [RUBY, JAVA, MSWIN, MING].each do |p|
+          deps = []
+          spec = find { |s| s.match_platform(p) }
+          deps = spec.dependencies.select { |d| d.type != :development } if spec
+          @dependencies[p] = deps
+        end
+      end
+
+      def initialize_copy(o)
+        super
+        @required_by = o.required_by.dup
+        @activated   = o.activated.dup
+      end
+
+      def to_specs
+        @activated.map do |p|
+          find { |s| s.match_platform(p) }
+        end.compact
+      end
+
+      def activate_platform(req, platforms)
+        platforms -= @activated
+        deps = dependencies_for(platforms) - dependencies_for(@activated)
+        @activated.concat platforms
+        deps.map { |d| DepProxy.new(d, req.__platform) }
+      end
+
+      def name
+        @name ||= first.name
+      end
+
+      def version
+        @version ||= first.version
+      end
+
+    private
+
+      def dependencies_for(platforms)
+        deps = []
+        platforms.each do |p|
+          deps |= @dependencies[p]
+        end
+        deps
+      end
+    end
 
     attr_reader :errors
 
@@ -34,22 +122,25 @@ module Bundler
     # ==== Returns
     # <GemBundle>,nil:: If the list of dependencies can be resolved, a
     #   collection of gemspecs is returned. Otherwise, nil is returned.
-    def self.resolve(requirements, index, source_requirements = {}, base = [])
-      resolver = new(index, source_requirements)
+    def self.resolve(requirements, index, source_requirements = {}, base = [], platforms = [])
+      resolver = new(index, source_requirements, platforms.any? ? platforms : [RUBY])
       result = catch(:success) do
         activated = {}
-        base.each { |s| activated[s.name] = s }
-        resolver.resolve(requirements, activated)
-        raise VersionConflict, "No compatible versions could be found for required dependencies:\n  #{resolver.error_message}"
+        # base.each { |s| activated[s.name] = s }
+        requirements = requirements.dup
+        base.each { |s| requirements << Gem::Dependency.new(s.name, s.version) }
+        resolver.resolve(requirements.map { |d| DepProxy.new(d, nil) }, activated)
+        raise resolver.version_conflict
         nil
       end
-      SpecSet.new(result.values)
+      SpecSet.new(result)
     end
 
-    def initialize(index, source_requirements)
+    def initialize(index, source_requirements, platforms)
       @errors = {}
       @stack  = []
       @index  = index
+      @platforms = platforms
       @source_requirements = source_requirements
     end
 
@@ -61,10 +152,14 @@ module Bundler
       end
     end
 
+    def successify(activated)
+      activated.values.map { |s| s.to_specs }.flatten.compact
+    end
+
     def resolve(reqs, activated)
       # If the requirements are empty, then we are in a success state. Aka, all
       # gem dependencies have been resolved.
-      throw :success, activated if reqs.empty?
+      throw :success, successify(activated) if reqs.empty?
 
       debug { print "\e[2J\e[f" ; "==== Iterating ====\n\n" }
 
@@ -85,14 +180,8 @@ module Bundler
 
       activated = activated.dup
 
-      if reqs.first.name == "bundler" && !activated["bundler"]
-        # activate the current version of bundler before other versions
-        bundler_version = ENV["BUNDLER_VERSION"] || Bundler::VERSION
-        current = Gem::Dependency.new("bundler", bundler_version, reqs.first.type)
-      else
-        # Pull off the first requirement so that we can resolve it
-        current = reqs.shift
-      end
+      # Pull off the first requirement so that we can resolve it
+      current = reqs.shift
 
       debug { "Attempting:\n  #{current.name} (#{current.requirement})"}
 
@@ -104,6 +193,12 @@ module Bundler
           @errors.delete(existing.name)
           # Since the current requirement is satisfied, we can continue resolving
           # the remaining requirements.
+
+          # I have no idea if this is the right way to do it, but let's see if it works
+          # The current requirement might activate some other platforms, so let's try
+          # adding those requirements here.
+          reqs.concat existing.activate_platform(current, Array(current.__platform || @platforms))
+
           resolve(reqs, activated)
         else
           debug { "    * [FAIL] Already activated" }
@@ -127,7 +222,7 @@ module Bundler
           else
             # The original set of dependencies conflict with the base set of specs
             # passed to the resolver. This is by definition an impossible resolve.
-            raise VersionConflict, "No compatible versions could be found for required dependencies:\n  #{error_message}"
+            raise version_conflict
           end
         end
       else
@@ -168,8 +263,8 @@ module Bundler
           end
         end
 
-        matching_versions.reverse_each do |spec|
-          conflict = resolve_requirement(spec, current, reqs.dup, activated.dup)
+        matching_versions.reverse_each do |spec_group|
+          conflict = resolve_requirement(spec_group, current, reqs.dup, activated.dup)
           conflicts << conflict if conflict
         end
         # If the current requirement is a root level gem and we have conflicts, we
@@ -189,20 +284,22 @@ module Bundler
       end
     end
 
-    def resolve_requirement(spec, requirement, reqs, activated)
+    def resolve_requirement(spec_group, requirement, reqs, activated)
       # We are going to try activating the spec. We need to keep track of stack of
       # requirements that got us to the point of activating this gem.
-      spec.required_by.replace requirement.required_by
-      spec.required_by << requirement
+      spec_group.required_by.replace requirement.required_by
+      spec_group.required_by << requirement
 
-      activated[spec.name] = spec
+      activated[spec_group.name] = spec_group
       debug { "  Activating: #{spec.name} (#{spec.version})" }
       debug { spec.required_by.map { |d| "    * #{d.name} (#{d.requirement})" }.join("\n") }
+
+      dependencies = spec_group.activate_platform(requirement, Array(requirement.__platform || @platforms))
 
       # Now, we have to loop through all child dependencies and add them to our
       # array of requirements.
       debug { "    Dependencies"}
-      spec.dependencies.each do |dep|
+      dependencies.each do |dep|
         next if dep.type == :development
         debug { "    * #{dep.name} (#{dep.requirement})" }
         dep.required_by.replace(requirement.required_by)
@@ -227,7 +324,27 @@ module Bundler
 
     def search(dep)
       index = @source_requirements[dep.name] || @index
-      index.search(dep)
+      results = index.search_for_all_platforms(dep.dep)
+      if results.any?
+        version = results.first.version
+        nested  = [[]]
+        results.each do |spec|
+          if spec.version != version
+            nested << []
+            version = spec.version
+          end
+          nested.last << spec
+        end
+        nested.map { |a| SpecGroup.new(a) }
+      else
+        []
+      end
+    end
+
+    def version_conflict
+      VersionConflict.new(
+        errors.keys,
+        "No compatible versions could be found for required dependencies:\n  #{error_message}")
     end
 
     def error_message

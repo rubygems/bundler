@@ -39,7 +39,6 @@ module Bundler
 
   class GemfileNotFound  < BundlerError; status_code(10) ; end
   class GemNotFound      < BundlerError; status_code(7)  ; end
-  class VersionConflict  < BundlerError; status_code(6)  ; end
   class GemfileError     < BundlerError; status_code(4)  ; end
   class GemfileChanged   < GemfileError; status_code(4)  ; end
   class PathError        < BundlerError; status_code(13) ; end
@@ -49,6 +48,17 @@ module Bundler
   class DeprecatedOption < BundlerError; status_code(12) ; end
   class GemspecError     < BundlerError; status_code(14) ; end
   class InvalidOption    < BundlerError; status_code(15) ; end
+
+  class VersionConflict  < BundlerError
+    attr_reader :conflicts
+
+    def initialize(conflicts, msg = nil)
+      super(msg)
+      @conflicts = conflicts
+    end
+
+    status_code(6)
+  end
 
   # Internal errors, should be rescued
   class InvalidSpecSet < StandardError; end

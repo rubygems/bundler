@@ -8,6 +8,10 @@ module Spec
       Gem::Version.new(version)
     end
 
+    def pl(platform)
+      Gem::Platform.new(pl)
+    end
+
     def build_repo1
       build_repo gem_repo1 do
         build_gem "rack", %w(0.9.1 1.0.0) do |s|
@@ -239,8 +243,9 @@ module Spec
     def build_spec(name, version, platform = nil, &block)
       Array(version).map do |v|
         Gem::Specification.new do |s|
-          s.name    = name
-          s.version = Gem::Version.new(v)
+          s.name     = name
+          s.version  = Gem::Version.new(v)
+          s.platform = platform
           DepBuilder.run(s, &block) if block_given?
         end
       end
@@ -305,6 +310,19 @@ module Spec
       def gem(*args, &block)
         build_spec(*args, &block).each do |s|
           @index << s
+        end
+      end
+
+      def platforms(platforms)
+        platforms.split(/\s+/).each do |platform|
+          platform = 'x86-mswin32' if platform == 'mswin32'
+          platform = Gem::Platform.new(platform)
+          if String === platform
+            class << platform
+              alias =~ ==
+            end
+          end
+          yield Gem::Platform.new(platform)
         end
       end
 

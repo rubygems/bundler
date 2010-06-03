@@ -1,14 +1,35 @@
 module Spec
   module Indexes
     def dep(name, reqs = nil)
+      @deps ||= []
       @deps << Bundler::Dependency.new(name, :version => reqs)
     end
 
-    def should_resolve_as(specs)
-      got = Bundler::Resolver.resolve(@deps, @index)
-      got = got.map { |s| s.full_name }
+    def platform(*args)
+      @platforms ||= []
+      @platforms.concat args.map { |p| Gem::Platform.new(p) }
+    end
 
-      got.should == specs.flatten.map { |s| s.full_name }
+    alias platforms platform
+
+    def resolve
+      Bundler::Resolver.resolve(@deps, @index, {}, [], @platforms || ['ruby'])
+    end
+
+    def should_resolve_as(specs)
+      got = resolve
+      got = got.map { |s| s.full_name }.sort
+
+      got.should == specs.sort
+    end
+
+    def should_conflict_on(names)
+      begin
+        got = resolve
+        flunk "The resolve succeeded with: #{got.map { |s| s.full_name }.sort.inspect}"
+      rescue Bundler::VersionConflict => e
+        names.sort.should == e.conflicts.sort
+      end
     end
 
     def gem(*args, &blk)
@@ -28,8 +49,8 @@ module Spec
             if version >= v('3.0.0.beta')
               dep "rack", '~> 1.1'
               dep "rack-mount", ">= 0.5"
-            elsif version > v('2.3.5') then dep "rack", '~> 1.0'
-            elsif version > v('2.0.0') then dep "rack", '~> 0.9'
+            elsif version > v('2.3')   then dep "rack", '~> 1.0.0'
+            elsif version > v('2.0.0') then dep "rack", '~> 0.9.0'
             end
           end
           gem "activerecord", version do
@@ -57,6 +78,18 @@ module Spec
               dep "railties",      version
             end
           end
+        end
+
+        versions '1.0 1.2 1.2.1 1.2.2 1.3 1.3.0.1 1.3.5 1.4.0 1.4.2 1.4.2.1' do |version|
+          platforms "ruby java mswin32" do |platform|
+            gem "nokogiri", version, platform do
+              dep "weakling", ">= 0.0.3" if platform =~ 'java'
+            end
+          end
+        end
+
+        versions '0.0.1 0.0.2 0.0.3' do |version|
+          gem "weakling", version #, pl('java')
         end
 
         # --- Rails related
