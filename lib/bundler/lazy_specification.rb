@@ -7,11 +7,12 @@ module Bundler
     attr_accessor :source
 
     def initialize(name, version, platform, source = nil)
-      @name         = name
-      @version      = version
-      @dependencies = []
-      @platform     = platform
-      @source       = source
+      @name          = name
+      @version       = version
+      @dependencies  = []
+      @platform      = platform
+      @source        = source
+      @specification = nil
     end
 
     def full_name

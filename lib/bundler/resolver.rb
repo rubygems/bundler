@@ -18,14 +18,15 @@ module Gem
       @required_by ||= []
     end
     def match_platform(p)
-      platform.nil? or p == platform or (p != Gem::Platform::RUBY and p =~ platform)
+      platform.nil? or p == platform or
+      (p != Gem::Platform::RUBY and p =~ platform) or
+      (p == Gem::Platform::RUBY and platform.to_generic == Gem::Platform::RUBY)
     end
   end
   class Dependency
     def required_by
       @required_by ||= []
     end
-    alias eql? ==
   end
 end
 
@@ -66,7 +67,7 @@ module Bundler
 
         ALL.each do |p|
           deps = []
-          spec = find { |s| s.match_platform(p) }
+          spec = reverse.find { |s| s.match_platform(p) }
           deps = spec.dependencies.select { |d| d.type != :development } if spec
           @dependencies[p] = deps
         end
@@ -80,7 +81,7 @@ module Bundler
 
       def to_specs
         @activated.map do |p|
-          if s = find { |s| s.match_platform(p) }
+          if s = reverse.find { |s| s.match_platform(p) }
             lazy_spec = LazySpecification.new(s.name, s.version, p, s.source)
             lazy_spec.dependencies.replace s.dependencies
             lazy_spec

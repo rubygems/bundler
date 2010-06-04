@@ -13,7 +13,8 @@ module Spec
     alias platforms platform
 
     def resolve
-      Bundler::Resolver.resolve(@deps, @index, {}, [], @platforms || ['ruby'])
+      @platforms ||= ['ruby']
+      Bundler::Resolver.resolve(@deps, @index, {}, [], @platforms)
     end
 
     def should_resolve_as(specs)
