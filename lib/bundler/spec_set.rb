@@ -20,7 +20,8 @@ module Bundler
     def for(deps, skip = [])
       specs = {}
       deps.each do |dep|
-        current = lookup[dep.respond_to?(:name) ? dep.name : dep]
+        name = dep.respond_to?(:name) ? dep.name : dep
+        current = lookup[name].first
         append_subgraph(specs, current, skip)
       end
 
@@ -49,11 +50,13 @@ module Bundler
   private
 
     def append_subgraph(specs, current, skip)
+      raise InvalidSpecSet unless current
       return if specs[current.name] || skip.include?(current.name)
       specs[current.name] = true
       current.dependencies.each do |dep|
         next if dep.type == :development
-        append_subgraph(specs, lookup[dep.name], skip)
+        s = lookup[dep.name].first
+        append_subgraph(specs, s, skip)
       end
     end
 
@@ -63,10 +66,12 @@ module Bundler
     end
 
     def lookup
-      @lookup ||= Hash.new do |h,k|
-        v = @specs.find { |s| s.name == k }
-        raise InvalidSpecSet, "SpecSet is missing '#{k}'" unless v
-        h[k] = v
+      @lookup ||= begin
+        lookup = Hash.new { |h,k| h[k] = [] }
+        @specs.each do |s|
+          lookup[s.name] << s
+        end
+        lookup
       end
     end
 
@@ -77,7 +82,7 @@ module Bundler
     def tsort_each_child(s)
       s.dependencies.sort_by { |d| d.name }.each do |d|
         next if d.type == :development
-        yield lookup[d.name]
+        lookup[d.name].each { |s| yield s }
       end
     end
   end
