@@ -37,12 +37,12 @@ module Bundler
         locked = LockfileParser.new(File.read(lockfile))
         @platforms      = locked.platforms
         @locked_deps    = locked.dependencies
-        @locked_specs   = SpecSet.new(locked.specs)
+        @last_resolve   = SpecSet.new(locked.specs)
         @locked_sources = locked.sources
       else
         @platforms      = []
         @locked_deps    = []
-        @locked_specs   = SpecSet.new([])
+        @last_resolve   = SpecSet.new([])
         @locked_sources = []
       end
 
@@ -61,9 +61,9 @@ module Bundler
       @specs ||= resolve_local_specs
     end
 
-    def locked_specs
-      resolve_local_specs unless @locked_specs
-      @locked_specs
+    def last_resolve
+      resolve_local_specs unless @specs
+      @last_resolve
     end
 
     def index
@@ -95,7 +95,7 @@ module Bundler
         # Add the source header
         out << source.to_lock
         # Find all specs for this source
-        locked_specs.
+        last_resolve.
           select  { |s| s.source == source }.
           sort_by { |s| s.name }.
           each do |spec|
@@ -154,15 +154,17 @@ module Bundler
         end
       end
 
-      @locked_specs = @locked_specs.for(deps, @unlock[:gems] || [])
+      converged = @last_resolve.for(deps, @unlock[:gems] || []).to_a
 
-      @locked_specs.each do |s|
+      converged.each do |s|
         s.source = @sources.find { |source| s.source == source }
       end
 
-      @locked_specs.delete_if do |s|
+      converged.delete_if do |s|
         s.source.nil? || (@unlock[:sources] || []).include?(s.name)
       end
+
+      @last_resolve = SpecSet.new(converged)
     end
 
     def in_locked_deps?(dep)
@@ -172,7 +174,7 @@ module Bundler
     end
 
     def satisfies_locked_spec?(dep)
-      @locked_specs.any? { |s| s.satisfies?(dep) }
+      @last_resolve.any? { |s| s.satisfies?(dep) }
     end
 
     def sorted_sources
@@ -190,21 +192,21 @@ module Bundler
       end
 
       # Run a resolve against the locally available gems
-      resolve = Resolver.resolve(dependencies, idx, source_requirements, @locked_specs, platforms)
+      resolve = Resolver.resolve(dependencies, idx, source_requirements, @last_resolve, platforms)
       [resolve, resolve.__materialize__(type)]
     end
 
     def resolve_local_specs
-      @locked_specs, @specs = resolve(:local_specs, index)
+      @last_resolve, @specs = resolve(:local_specs, index)
       @specs
     end
 
     # TODO: Improve this logic
     def resolve_remote_specs
-      raise "lol" unless @locked_specs.valid_for?(dependencies)
+      raise "lol" unless @last_resolve.valid_for?(dependencies)
       resolve_local_specs
     rescue #InvalidSpecSet, GemNotFound, PathError
-      @locked_specs, @specs = resolve(:specs, remote_index)
+      @last_resolve, @specs = resolve(:specs, remote_index)
       @specs
     end
   end
