@@ -27,6 +27,21 @@ module Bundler
       @name == dependency.name && dependency.requirement.satisfied_by?(Gem::Version.new(@version))
     end
 
+    def to_lock
+      if platform == Gem::Platform::RUBY or platform.nil?
+        out = "    #{name} (#{version})\n"
+      else
+        out = "    #{name} (#{version}-#{platform})\n"
+      end
+
+      dependencies.sort_by {|d| d.name }.each do |dep|
+        next if dep.type == :development
+        out << "    #{dep.to_lock}\n"
+      end
+
+      out
+    end
+
     def __materialize__(index)
       @specification = index.search(Gem::Dependency.new(name, version)).last
       raise "Could not materialize #{full_name}" unless @specification

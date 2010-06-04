@@ -430,7 +430,7 @@ describe "the lockfile format" do
       GEM
         remote: file:#{gem_repo1}/
         specs:
-          platform_specific (1.0.0-universal-java-16)
+          platform_specific (1.0-java)
 
       PLATFORMS
         java

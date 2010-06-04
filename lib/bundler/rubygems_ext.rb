@@ -47,21 +47,6 @@ module Gem
       end
     end
 
-    def to_lock
-      if platform == Gem::Platform::RUBY or platform.nil?
-        out = "    #{name} (#{version})\n"
-      else
-        out = "    #{name} (#{version}-#{platform})\n"
-      end
-
-      dependencies.sort_by {|d| d.name }.each do |dep|
-        next if dep.type == :development
-        out << "    #{dep.to_lock}\n"
-      end
-
-      out
-    end
-
     def to_gemfile(path = nil)
       gemfile = "source :gemcutter\n"
       gemfile << dependencies_to_gemfile(nondevelopment_dependencies)

@@ -28,6 +28,16 @@ module Bundler
       SpecSet.new(sorted.select { |s| specs[s.name] })
     end
 
+    def valid_for?(deps)
+      deps = deps.dup
+      until deps.empty?
+        specs = lookup[deps.shift.name]
+        return false unless specs.any?
+        specs.each { |s| deps.concat s.dependencies }
+      end
+      true
+    end
+
     def to_a
       sorted.dup
     end
@@ -38,19 +48,18 @@ module Bundler
       @specs.delete_if(&blk)
     end
 
-    def __materialize__
-      @lookup = nil
-      @sorted = nil
-      @specs.map! do |s|
+    def __materialize__(type)
+      materialized = @specs.map do |s|
         next s unless s.is_a?(LazySpecification)
-        yield s
+        s.__materialize__(s.source.send(type))
       end
+      SpecSet.new(materialized)
     end
 
   private
 
     def append_subgraph(specs, current, skip)
-      raise InvalidSpecSet unless current
+      return unless current
       return if specs[current.name] || skip.include?(current.name)
       specs[current.name] = true
       current.dependencies.each do |dep|

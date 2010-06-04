@@ -2,7 +2,7 @@ require "digest/sha1"
 
 module Bundler
   class Definition
-    attr_reader :dependencies, :locked_specs, :platforms
+    attr_reader :dependencies, :platforms
 
     def self.build(gemfile, lockfile, unlock)
       unlock ||= {}
@@ -58,7 +58,12 @@ module Bundler
     end
 
     def specs
-      @specs ||= resolve(:local_specs, index)
+      @specs ||= resolve_local_specs
+    end
+
+    def locked_specs
+      resolve_local_specs unless @locked_specs
+      @locked_specs
     end
 
     def index
@@ -90,7 +95,7 @@ module Bundler
         # Add the source header
         out << source.to_lock
         # Find all specs for this source
-        specs.
+        locked_specs.
           select  { |s| s.source == source }.
           sort_by { |s| s.name }.
           each do |spec|
@@ -185,19 +190,22 @@ module Bundler
       end
 
       # Run a resolve against the locally available gems
-      specs = Resolver.resolve(dependencies, idx, source_requirements, locked_specs, platforms)
-      specs.__materialize__ do |spec|
-        spec.__materialize__(spec.source.send(type))
-      end
-      specs
+      resolve = Resolver.resolve(dependencies, idx, source_requirements, @locked_specs, platforms)
+      [resolve, resolve.__materialize__(type)]
+    end
+
+    def resolve_local_specs
+      @locked_specs, @specs = resolve(:local_specs, index)
+      @specs
     end
 
     # TODO: Improve this logic
     def resolve_remote_specs
-      locked_specs.for(dependencies) # Will raise on fail
-      specs
+      raise "lol" unless @locked_specs.valid_for?(dependencies)
+      resolve_local_specs
     rescue #InvalidSpecSet, GemNotFound, PathError
-      resolve(:specs, remote_index)
+      @locked_specs, @specs = resolve(:specs, remote_index)
+      @specs
     end
   end
 end
