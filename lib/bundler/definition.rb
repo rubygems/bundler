@@ -33,6 +33,8 @@ module Bundler
     def initialize(lockfile, dependencies, sources, unlock)
       @dependencies, @sources, @unlock = dependencies, sources, unlock
       @specs = nil
+      @unlock[:gems] ||= []
+      @unlock[:sources] ||= []
 
       if lockfile && File.exists?(lockfile)
         locked = LockfileParser.new(File.read(lockfile))
@@ -134,7 +136,7 @@ module Bundler
     def converge_sources
       @sources = (@locked_sources & @sources) | @sources
       @sources.each do |source|
-        source.unlock! if source.respond_to?(:unlock!) && (@unlock[:sources] || []).include?(source.name)
+        source.unlock! if source.respond_to?(:unlock!) && @unlock[:sources].include?(source.name)
       end
     end
 
@@ -155,17 +157,18 @@ module Bundler
         end
       end
 
-      converged = @last_resolve.for(deps, @unlock[:gems] || []).to_a
+      converged = []
+      @last_resolve.each do |s|
+        if source = @sources.find { |src| s.source == src }
+          s.source = source
+        end
 
-      converged.each do |s|
-        s.source = @sources.find { |source| s.source == source }
+        next if s.source.nil? || @unlock[:sources].include?(s.name)
+
+        converged << s
       end
 
-      converged.delete_if do |s|
-        s.source.nil? || (@unlock[:sources] || []).include?(s.name)
-      end
-
-      @last_resolve = SpecSet.new(converged)
+      @last_resolve = SpecSet.new(converged).for(deps, @unlock[:gems])
     end
 
     def in_locked_deps?(dep)
