@@ -67,9 +67,10 @@ module Bundler
 
         ALL.each do |p|
           deps = []
-          spec = reverse.find { |s| s.match_platform(p) }
-          deps = spec.dependencies.select { |d| d.type != :development } if spec
-          @dependencies[p] = deps
+          if spec = reverse.find { |s| s.match_platform(p) }
+            deps = spec.dependencies.select { |d| d.type != :development }
+            @dependencies[p] = deps
+          end
         end
       end
 
@@ -81,9 +82,9 @@ module Bundler
 
       def to_specs
         @activated.map do |p|
-          if s = reverse.find { |s| s.match_platform(p) }
-            lazy_spec = LazySpecification.new(s.name, s.version, p, s.source)
-            lazy_spec.dependencies.replace s.dependencies
+          if deps = @dependencies[p]
+            lazy_spec = LazySpecification.new(name, version, p, source)
+            lazy_spec.dependencies.replace deps
             lazy_spec
           end
         end.compact
@@ -104,12 +105,16 @@ module Bundler
         @version ||= first.version
       end
 
+      def source
+        @source ||= first.source
+      end
+
     private
 
       def dependencies_for(platforms)
         deps = []
         platforms.each do |p|
-          deps |= @dependencies[p]
+          deps |= @dependencies[p] || []
         end
         deps
       end

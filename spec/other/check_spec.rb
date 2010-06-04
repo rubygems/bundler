@@ -99,12 +99,10 @@ describe "bundle check" do
     G
 
     simulate_new_machine
-    bundle :check
-    @err.should == ""
-    bundle :check
-    @err.should == ""
-    bundle :check
-    @err.should == ""
+    10.times do
+      bundle :check
+      @err.should == ""
+    end
   end
 
   it "should return the same result when called multiple times on a new machine" do
