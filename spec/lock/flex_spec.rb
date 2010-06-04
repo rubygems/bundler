@@ -32,7 +32,7 @@ describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        #{Gem::Platform.local}
+        #{Gem::Platform.local.to_generic}
 
       DEPENDENCIES
         rack
@@ -55,7 +55,7 @@ describe "the lockfile format" do
             rack
 
       PLATFORMS
-        #{Gem::Platform.local}
+        #{Gem::Platform.local.to_generic}
 
       DEPENDENCIES
         rack-obama
@@ -78,7 +78,7 @@ describe "the lockfile format" do
             rack
 
       PLATFORMS
-        #{Gem::Platform.local}
+        #{Gem::Platform.local.to_generic}
 
       DEPENDENCIES
         rack-obama (>= 1.0)
@@ -103,7 +103,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{Gem::Platform.local}
+        #{Gem::Platform.local.to_generic}
 
       DEPENDENCIES
         foo!
@@ -129,7 +129,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{Gem::Platform.local}
+        #{Gem::Platform.local.to_generic}
 
       DEPENDENCIES
         foo
@@ -156,7 +156,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{Gem::Platform.local}
+        #{Gem::Platform.local.to_generic}
 
       DEPENDENCIES
         foo!
@@ -183,7 +183,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{Gem::Platform.local}
+        #{Gem::Platform.local.to_generic}
 
       DEPENDENCIES
         foo!
@@ -207,7 +207,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{Gem::Platform.local}
+        #{Gem::Platform.local.to_generic}
 
       DEPENDENCIES
         foo!
@@ -237,7 +237,7 @@ describe "the lockfile format" do
             rack
 
       PLATFORMS
-        #{Gem::Platform.local}
+        #{Gem::Platform.local.to_generic}
 
       DEPENDENCIES
         actionpack
@@ -275,7 +275,7 @@ describe "the lockfile format" do
           rake (0.8.7)
 
       PLATFORMS
-        #{Gem::Platform.local}
+        #{Gem::Platform.local.to_generic}
 
       DEPENDENCIES
         rails
@@ -298,7 +298,7 @@ describe "the lockfile format" do
             rack
 
       PLATFORMS
-        #{Gem::Platform.local}
+        #{Gem::Platform.local.to_generic}
 
       DEPENDENCIES
         rack-obama (>= 1.0)
@@ -321,7 +321,7 @@ describe "the lockfile format" do
             rack
 
       PLATFORMS
-        #{Gem::Platform.local}
+        #{Gem::Platform.local.to_generic}
 
       DEPENDENCIES
         rack-obama (>= 1.0)
@@ -346,7 +346,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{Gem::Platform.local}
+        #{Gem::Platform.local.to_generic}
 
       DEPENDENCIES
         foo
@@ -371,7 +371,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{Gem::Platform.local}
+        #{Gem::Platform.local.to_generic}
 
       DEPENDENCIES
         foo
@@ -386,7 +386,7 @@ describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        universal-java-1.6
+        java
 
       DEPENDENCIES
         rack
@@ -398,7 +398,7 @@ describe "the lockfile format" do
       gem "rack"
     G
 
-    platforms = ['universal-java-1.6', Gem::Platform.local.to_s].sort
+    platforms = ['java', Gem::Platform.local.to_generic.to_s].sort
 
     lockfile_should_be <<-G
       GEM
@@ -417,10 +417,11 @@ describe "the lockfile format" do
 
   it "persists the spec's platform to the lockfile" do
     build_gem "platform_specific", "1.0.0", :to_system => true do |s|
-      s.platform = Gem::Platform.local
+      s.platform = Gem::Platform.new('universal-java-16')
     end
 
     install_gemfile <<-G
+      Gem.platforms = [Gem::Platform::RUBY, Gem::Platform.new('universal-java-16')]
       source "file://#{gem_repo1}"
       gem "platform_specific"
     G
@@ -429,10 +430,10 @@ describe "the lockfile format" do
       GEM
         remote: file:#{gem_repo1}/
         specs:
-          platform_specific (1.0.0-#{Gem::Platform.local})
+          platform_specific (1.0.0-universal-java-16)
 
       PLATFORMS
-        #{Gem::Platform.local}
+        java
 
       DEPENDENCIES
         platform_specific

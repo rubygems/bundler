@@ -31,10 +31,10 @@ end
 
 module Bundler
   class Resolver
-    RUBY  = Gem::Platform.new('ruby')
-    JAVA  = Gem::Platform.new('java')
-    MSWIN = Gem::Platform.new('mswin32')
-    MING  = Gem::Platform.new('mingw32')
+    ALL = [ Gem::Platform::RUBY,
+            Gem::Platform::JAVA,
+            Gem::Platform::MSWIN,
+            Gem::Platform::MING]
 
     class DepProxy
 
@@ -64,7 +64,7 @@ module Bundler
         @activated    = []
         @dependencies = {}
 
-        [RUBY, JAVA, MSWIN, MING].each do |p|
+        ALL.each do |p|
           deps = []
           spec = find { |s| s.match_platform(p) }
           deps = spec.dependencies.select { |d| d.type != :development } if spec
@@ -80,7 +80,11 @@ module Bundler
 
       def to_specs
         @activated.map do |p|
-          find { |s| s.match_platform(p) }
+          if s = find { |s| s.match_platform(p) }
+            lazy_spec = LazySpecification.new(s.name, s.version, p, s.source)
+            lazy_spec.dependencies.replace s.dependencies
+            lazy_spec
+          end
         end.compact
       end
 
@@ -123,7 +127,7 @@ module Bundler
     # <GemBundle>,nil:: If the list of dependencies can be resolved, a
     #   collection of gemspecs is returned. Otherwise, nil is returned.
     def self.resolve(requirements, index, source_requirements = {}, base = [], platforms = [])
-      resolver = new(index, source_requirements, platforms.any? ? platforms : [RUBY])
+      resolver = new(index, source_requirements, platforms.any? ? platforms : [Gem::Platform::RUBY])
       result = catch(:success) do
         activated = {}
         # base.each { |s| activated[s.name] = s }

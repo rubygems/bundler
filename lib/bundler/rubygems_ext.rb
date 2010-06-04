@@ -124,4 +124,20 @@ module Gem
       out
     end
   end
+
+  class Platform
+    JAVA  = Gem::Platform.new('java')
+    MSWIN = Gem::Platform.new('mswin32')
+    MING  = Gem::Platform.new('mingw32')
+
+    class << RUBY
+      def to_generic ; self ; end
+    end
+
+    GENERICS = [JAVA, MSWIN, MING, RUBY]
+
+    def to_generic
+      GENERICS.find { |p| self =~ p } || RUBY
+    end
+  end
 end

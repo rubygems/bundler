@@ -46,6 +46,9 @@ module Bundler
         @locked_sources = []
       end
 
+      current_platform = Gem.platforms.map { |p| p.to_generic }.compact.last
+      @platforms |= [current_platform]
+
       converge
     end
 
@@ -97,12 +100,6 @@ module Bundler
       end
 
       out << "PLATFORMS\n"
-
-      # Add the current platform
-      platforms = @platforms.dup
-      platforms << Gem::Platform.local unless @platforms.any? do |p|
-        p == Gem::Platform.local
-      end
 
       platforms.map { |p| p.to_s }.sort.each do |p|
         out << "  #{p}\n"
@@ -188,7 +185,7 @@ module Bundler
       end
 
       # Run a resolve against the locally available gems
-      specs = Resolver.resolve(dependencies, idx, source_requirements, locked_specs)
+      specs = Resolver.resolve(dependencies, idx, source_requirements, locked_specs, platforms)
       specs.__materialize__ do |spec|
         spec.__materialize__(spec.source.send(type))
       end

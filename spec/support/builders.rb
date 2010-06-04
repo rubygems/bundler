@@ -319,6 +319,7 @@ module Spec
           platform = Gem::Platform.new(platform)
           if String === platform
             class << platform
+              undef =~
               alias =~ ==
             end
           end

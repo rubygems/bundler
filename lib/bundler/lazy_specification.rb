@@ -6,12 +6,12 @@ module Bundler
     attr_reader :name, :version, :dependencies, :platform
     attr_accessor :source
 
-    def initialize(name, version, platform)
+    def initialize(name, version, platform, source = nil)
       @name         = name
       @version      = version
       @dependencies = []
       @platform     = platform
-      @source       = nil
+      @source       = source
     end
 
     def full_name
@@ -27,7 +27,7 @@ module Bundler
     end
 
     def __materialize__(index)
-      @specification = index.search(self).first
+      @specification = index.search(Gem::Dependency.new(name, version)).last
       raise "Could not materialize #{full_name}" unless @specification
       @specification
     end
