@@ -7,20 +7,9 @@ require 'set'
 
 # Extending Gem classes to add necessary tracking information
 module Gem
-  class Platform
-    def hash
-      Platform.hash
-    end
-    alias eql? ==
-  end
   class Specification
     def required_by
       @required_by ||= []
-    end
-    def match_platform(p)
-      platform.nil? or p == platform or
-      (p != Gem::Platform::RUBY and p =~ platform) or
-      (p == Gem::Platform::RUBY and platform.to_generic == Gem::Platform::RUBY)
     end
   end
   class Dependency
@@ -109,6 +98,10 @@ module Bundler
         @source ||= first.source
       end
 
+      def for?(platforms)
+        Array(platforms).all? { |p| @dependencies[p] || @dependencies[Gem::Platform::RUBY] }
+      end
+
     private
 
       def dependencies_for(platforms)
@@ -133,7 +126,8 @@ module Bundler
     # <GemBundle>,nil:: If the list of dependencies can be resolved, a
     #   collection of gemspecs is returned. Otherwise, nil is returned.
     def self.resolve(requirements, index, source_requirements = {}, base = [], platforms = [])
-      resolver = new(index, source_requirements, platforms.any? ? platforms : [Gem::Platform::RUBY])
+      base = SpecSet.new(base) unless base.is_a?(SpecSet)
+      resolver = new(index, source_requirements, platforms.any? ? platforms : [Gem::Platform::RUBY], base)
       result = catch(:success) do
         resolver.start(requirements, base)
         raise resolver.version_conflict
@@ -142,9 +136,10 @@ module Bundler
       SpecSet.new(result)
     end
 
-    def initialize(index, source_requirements, platforms)
+    def initialize(index, source_requirements, platforms, base)
       @errors = {}
       @stack  = []
+      @base   = base
       @index  = index
       @platforms = platforms
       @source_requirements = source_requirements
@@ -341,7 +336,8 @@ module Bundler
 
     def search(dep)
       index = @source_requirements[dep.name] || @index
-      results = index.search_for_all_platforms(dep.dep)
+      results = index.search_for_all_platforms(dep.dep) + @base[dep.name]
+
       if results.any?
         version = results.first.version
         nested  = [[]]
@@ -352,7 +348,7 @@ module Bundler
           end
           nested.last << spec
         end
-        nested.map { |a| SpecGroup.new(a) }
+        nested.map { |a| SpecGroup.new(a) }.select { |sg| sg.for?(dep.__platform || @platforms) }
       else
         []
       end

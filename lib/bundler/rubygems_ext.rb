@@ -72,6 +72,12 @@ module Gem
       end
     end
 
+    def match_platform(p)
+      platform.nil? or p == platform or
+      (p != Gem::Platform::RUBY and p =~ platform) or
+      (p == Gem::Platform::RUBY and platform.to_generic == Gem::Platform::RUBY)
+    end
+
   private
 
     def dependencies_to_gemfile(dependencies, group = nil)
@@ -120,6 +126,12 @@ module Gem
     end
 
     GENERICS = [JAVA, MSWIN, MING, RUBY]
+
+    def hash
+      Platform.hash
+    end
+
+    alias eql? ==
 
     def to_generic
       GENERICS.find { |p| self =~ p } || RUBY
