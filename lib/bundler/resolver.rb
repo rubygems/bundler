@@ -130,11 +130,7 @@ module Bundler
     def self.resolve(requirements, index, source_requirements = {}, base = [], platforms = [])
       resolver = new(index, source_requirements, platforms.any? ? platforms : [Gem::Platform::RUBY])
       result = catch(:success) do
-        activated = {}
-        # base.each { |s| activated[s.name] = s }
-        requirements = requirements.dup
-        base.each { |s| requirements << Gem::Dependency.new(s.name, s.version) }
-        resolver.resolve(requirements.map { |d| DepProxy.new(d, nil) }, activated)
+        resolver.start(requirements, base)
         raise resolver.version_conflict
         nil
       end
@@ -159,6 +155,17 @@ module Bundler
 
     def successify(activated)
       activated.values.map { |s| s.to_specs }.flatten.compact
+    end
+
+    def start(reqs, base)
+      activated = {}
+      reqs = reqs.map { |d| DepProxy.new(d, nil) }
+
+      base.each do |s|
+        reqs << DepProxy.new(Gem::Dependency.new(s.name, s.version), nil)
+      end
+
+      resolve(reqs, activated)
     end
 
     def resolve(reqs, activated)
