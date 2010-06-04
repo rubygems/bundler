@@ -32,6 +32,7 @@ module Bundler
 
     def initialize(lockfile, dependencies, sources, unlock)
       @dependencies, @sources, @unlock = dependencies, sources, unlock
+      @specs = nil
 
       if lockfile && File.exists?(lockfile)
         locked = LockfileParser.new(File.read(lockfile))
@@ -193,7 +194,7 @@ module Bundler
 
       # Run a resolve against the locally available gems
       resolve = Resolver.resolve(dependencies, idx, source_requirements, @last_resolve, platforms)
-      [resolve, resolve.__materialize__(type)]
+      [resolve, resolve.materialize(type, dependencies)]
     end
 
     def resolve_local_specs

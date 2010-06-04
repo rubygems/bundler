@@ -18,22 +18,38 @@ module Bundler
 
     # TODO: Handle platform filtering
     def for(deps, skip = [])
-      specs = {}
-      deps.each do |dep|
-        name = dep.respond_to?(:name) ? dep.name : dep
-        current = lookup[name].first
-        append_subgraph(specs, current, skip)
+      handled = {}
+      deps = deps.map { |d| d.respond_to?(:name) ? d.name : d }
+
+      until deps.empty?
+        dep = deps.shift
+        next if handled[dep] || skip.include?(dep)
+        specs = lookup[dep]
+        next if specs.empty?
+        specs.each do |s|
+          handled[s.name] = true
+          s.dependencies.each  do |d|
+            next if d.type == :development
+            deps << d.name
+          end
+        end
       end
 
-      SpecSet.new(sorted.select { |s| specs[s.name] })
+      SpecSet.new(sorted.select { |s| handled[s.name] })
     end
 
     def valid_for?(deps)
       deps = deps.dup
+      handled = {}
+
       until deps.empty?
-        specs = lookup[deps.shift.name]
-        return false unless specs.any?
-        specs.each { |s| deps.concat s.dependencies }
+        dep = deps.shift
+        unless dep.type == :development || handled[dep.name]
+          specs = lookup[dep.name]
+          return false unless specs.any?
+          handled[dep.name] = true
+          specs.each { |s| deps.concat s.dependencies }
+        end
       end
       true
     end
@@ -48,7 +64,7 @@ module Bundler
       @specs.delete_if(&blk)
     end
 
-    def __materialize__(type)
+    def materialize(type, deps)
       materialized = @specs.map do |s|
         next s unless s.is_a?(LazySpecification)
         s.__materialize__(s.source.send(type))
@@ -57,17 +73,6 @@ module Bundler
     end
 
   private
-
-    def append_subgraph(specs, current, skip)
-      return unless current
-      return if specs[current.name] || skip.include?(current.name)
-      specs[current.name] = true
-      current.dependencies.each do |dep|
-        next if dep.type == :development
-        s = lookup[dep.name].first
-        append_subgraph(specs, s, skip)
-      end
-    end
 
     def sorted
       rake = @specs.find { |s| s.name == 'rake' }
