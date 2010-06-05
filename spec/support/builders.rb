@@ -9,7 +9,7 @@ module Spec
     end
 
     def pl(platform)
-      Gem::Platform.new(pl)
+      Gem::Platform.new(platform)
     end
 
     def build_repo1
