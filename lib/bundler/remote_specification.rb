@@ -7,6 +7,8 @@ module Bundler
   # be seeded with what we're given from the source's abbreviated index - the
   # full specification will only be fetched when necesary.
   class RemoteSpecification
+    include Gem::MatchPlatform
+
     attr_reader :name, :version, :platform
     attr_accessor :source
 
@@ -42,7 +44,6 @@ module Bundler
 
     def _remote_specification
       @specification ||= begin
-        Bundler.ui.debug "Fetching spec for #{full_name}"
         Gem::SpecFetcher.new.fetch_spec([@name, @version, @platform], URI(@source_uri.to_s))
       end
     end

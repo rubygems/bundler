@@ -52,14 +52,11 @@ module Bundler
         super
         @required_by  = []
         @activated    = []
-        @dependencies = {}
+        @dependencies = nil
+        @specs        = {}
 
         ALL.each do |p|
-          deps = []
-          if spec = reverse.find { |s| s.match_platform(p) }
-            deps = spec.dependencies.select { |d| d.type != :development }
-            @dependencies[p] = deps
-          end
+          @specs[p] = reverse.find { |s| s.match_platform(p) }
         end
       end
 
@@ -70,20 +67,27 @@ module Bundler
       end
 
       def to_specs
-        @activated.map do |p|
-          if deps = @dependencies[p]
-            lazy_spec = LazySpecification.new(name, version, p, source)
-            lazy_spec.dependencies.replace deps
-            lazy_spec
+        specs = {}
+
+        @activated.each do |p|
+          if s = @specs[p]
+            platform = Gem::Platform.new(s.platform).to_generic
+            next if specs[platform]
+
+            lazy_spec = LazySpecification.new(name, version, platform, source)
+            lazy_spec.dependencies.replace s.dependencies
+            specs[platform] = lazy_spec
           end
-        end.compact
+        end
+        specs.values
       end
 
-      def activate_platform(req, platforms)
-        platforms -= @activated
-        deps = dependencies_for(platforms) - dependencies_for(@activated)
-        @activated.concat platforms
-        deps.map { |d| DepProxy.new(d, req.__platform) }
+      def activate_platform(platform)
+        unless @activated.include?(platform)
+          @activated << platform
+          return __dependencies[platform] || []
+        end
+        []
       end
 
       def name
@@ -98,18 +102,26 @@ module Bundler
         @source ||= first.source
       end
 
-      def for?(platforms)
-        Array(platforms).all? { |p| @dependencies[p] || @dependencies[Gem::Platform::RUBY] }
+      def for?(platform)
+        @specs[platform]
       end
 
     private
 
-      def dependencies_for(platforms)
-        deps = []
-        platforms.each do |p|
-          deps |= @dependencies[p] || []
+      def __dependencies
+        @dependencies ||= begin
+          dependencies = {}
+          ALL.each do |p|
+            if spec = @specs[p]
+              dependencies[p] = []
+              spec.dependencies.each do |dep|
+                next if dep.type == :development
+                dependencies[p] << DepProxy.new(dep, p)
+              end
+            end
+          end
+          dependencies
         end
-        deps
       end
     end
 
@@ -158,14 +170,18 @@ module Bundler
     end
 
     def start(reqs, base)
-      activated = {}
-      reqs = reqs.map { |d| DepProxy.new(d, nil) }
+      activated    = {}
+      requirements = []
 
-      base.each do |s|
-        reqs << DepProxy.new(Gem::Dependency.new(s.name, s.version), nil)
+      @platforms.each do |p|
+        reqs.each { |d| requirements << DepProxy.new(d, p) }
       end
 
-      resolve(reqs, activated)
+      base.each do |s|
+        requirements << DepProxy.new(Gem::Dependency.new(s.name, s.version), s.platform)
+      end
+
+      resolve(requirements, activated)
     end
 
     def resolve(reqs, activated)
@@ -209,7 +225,7 @@ module Bundler
           # I have no idea if this is the right way to do it, but let's see if it works
           # The current requirement might activate some other platforms, so let's try
           # adding those requirements here.
-          reqs.concat existing.activate_platform(current, Array(current.__platform || @platforms))
+          reqs.concat existing.activate_platform(current.__platform)
 
           resolve(reqs, activated)
         else
@@ -306,7 +322,7 @@ module Bundler
       debug { "  Activating: #{spec.name} (#{spec.version})" }
       debug { spec.required_by.map { |d| "    * #{d.name} (#{d.requirement})" }.join("\n") }
 
-      dependencies = spec_group.activate_platform(requirement, Array(requirement.__platform || @platforms))
+      dependencies = spec_group.activate_platform(requirement.__platform)
 
       # Now, we have to loop through all child dependencies and add them to our
       # array of requirements.
@@ -348,7 +364,7 @@ module Bundler
           end
           nested.last << spec
         end
-        nested.map { |a| SpecGroup.new(a) }.select { |sg| sg.for?(dep.__platform || @platforms) }
+        nested.map { |a| SpecGroup.new(a) }.select { |sg| sg.for?(dep.__platform) }
       else
         []
       end

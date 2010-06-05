@@ -3,6 +3,8 @@ require "rubygems/spec_fetcher"
 
 module Bundler
   class LazySpecification
+    include Gem::MatchPlatform
+
     attr_reader :name, :version, :dependencies, :platform
     attr_accessor :source
 
@@ -25,12 +27,6 @@ module Bundler
 
     def satisfies?(dependency)
       @name == dependency.name && dependency.requirement.satisfied_by?(Gem::Version.new(@version))
-    end
-
-    def match_platform(p)
-      platform.nil? or p == platform or
-      (p != Gem::Platform::RUBY and p =~ platform) or
-      (p == Gem::Platform::RUBY and platform.to_generic == Gem::Platform::RUBY)
     end
 
     def to_lock

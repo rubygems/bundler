@@ -34,7 +34,7 @@ module Spec
     end
 
     def gem(*args, &blk)
-      build_spec(*args, &blk)
+      build_spec(*args, &blk).first
     end
 
     def an_awesome_index

@@ -10,3 +10,7 @@
 
   - SpecSet#for should be smart about platforms since it could
     have invalid platforms in the set.
+  - Only support platforms: ruby, java, mswin32, and mingw32
+
+  - Handle resolving with invalid base spec sets (for example, expiring sources)
+  - Lazilyfy SpecGroup @dependencies

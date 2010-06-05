@@ -8,11 +8,21 @@ end
 module Gem
   @loaded_stacks = Hash.new { |h,k| h[k] = [] }
 
+  module MatchPlatform
+    def match_platform(p)
+      platform.nil? or p == platform or
+      (p != Gem::Platform::RUBY and p =~ platform) or
+      Gem::Platform::RUBY == platform
+    end
+  end
+
   class Specification
     attr_accessor :source, :location, :relative_loaded_from
 
     alias_method :rg_full_gem_path, :full_gem_path
     alias_method :rg_loaded_from,   :loaded_from
+
+    include MatchPlatform
 
     def full_gem_path
       source.respond_to?(:path) ?
@@ -72,12 +82,6 @@ module Gem
       end
     end
 
-    def match_platform(p)
-      platform.nil? or p == platform or
-      (p != Gem::Platform::RUBY and p =~ platform) or
-      (p == Gem::Platform::RUBY and platform.to_generic == Gem::Platform::RUBY)
-    end
-
   private
 
     def dependencies_to_gemfile(dependencies, group = nil)
@@ -119,7 +123,7 @@ module Gem
   class Platform
     JAVA  = Gem::Platform.new('java')
     MSWIN = Gem::Platform.new('mswin32')
-    MING  = Gem::Platform.new('mingw32')
+    MING  = Gem::Platform.new('x86-mingw32')
 
     class << RUBY
       def to_generic ; self ; end
