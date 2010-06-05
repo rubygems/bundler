@@ -141,7 +141,7 @@ module Bundler
       base = SpecSet.new(base) unless base.is_a?(SpecSet)
       resolver = new(index, source_requirements, platforms.any? ? platforms : [Gem::Platform::RUBY], base)
       result = catch(:success) do
-        resolver.start(requirements, base)
+        resolver.start(requirements)
         raise resolver.version_conflict
         nil
       end
@@ -169,16 +169,12 @@ module Bundler
       activated.values.map { |s| s.to_specs }.flatten.compact
     end
 
-    def start(reqs, base)
+    def start(reqs)
       activated    = {}
       requirements = []
 
       @platforms.each do |p|
         reqs.each { |d| requirements << DepProxy.new(d, p) }
-      end
-
-      base.each do |s|
-        requirements << DepProxy.new(Gem::Dependency.new(s.name, s.version), s.platform)
       end
 
       resolve(requirements, activated)
@@ -351,8 +347,16 @@ module Bundler
     end
 
     def search(dep)
-      index = @source_requirements[dep.name] || @index
-      results = index.search_for_all_platforms(dep.dep) + @base[dep.name]
+      results = @base[dep.name]
+
+      if results.any?
+        d = Gem::Dependency.new(dep.name, results.first.version)
+      else
+        d = dep.dep
+      end
+
+      index = @source_requirements[d.name] || @index
+      results = index.search_for_all_platforms(d) + results
 
       if results.any?
         version = results.first.version
