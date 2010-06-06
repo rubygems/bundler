@@ -330,7 +330,9 @@ describe "bundle install with gem sources" do
       end
     end
 
-    it "warns when using --disable-shared-gems when not specifying a bundle path"
+    it "warns when using --disable-shared-gems when not specifying a bundle path" do
+      pending
+    end
 
     it "does not use available system gems" do
       gemfile <<-G

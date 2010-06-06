@@ -35,7 +35,7 @@ module Spec
         got = resolve
         flunk "The resolve succeeded with: #{got.map { |s| s.full_name }.sort.inspect}"
       rescue Bundler::VersionConflict => e
-        names.sort.should == e.conflicts.sort
+        Array(names).sort.should == e.conflicts.sort
       end
     end
 

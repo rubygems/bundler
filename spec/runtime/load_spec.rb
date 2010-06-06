@@ -78,6 +78,7 @@ describe "Bundler.load" do
       bundle :lock
     end
 
+    # This is obviously not true on 1.9 thanks to the AWEOME! gem prelude :'(
     it "does not invoke setup inside env.rb" do
       ruby <<-RUBY
         require 'bundler'
@@ -86,7 +87,7 @@ describe "Bundler.load" do
       RUBY
 
       out.should == ""
-    end
+    end if RUBY_VERSION < "1.9"
   end
 
   describe "not hurting brittle rubygems" do

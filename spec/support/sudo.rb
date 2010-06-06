@@ -2,7 +2,7 @@ module Spec
   module Sudo
     def self.sudo?
       @which_sudo ||= `which sudo`.strip
-      @which_sudo.any?
+      !@which_sudo.empty?
     end
 
     module Describe

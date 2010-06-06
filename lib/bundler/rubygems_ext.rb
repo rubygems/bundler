@@ -1,15 +1,14 @@
 require 'pathname'
 
-unless defined? Gem
-  require 'rubygems'
-  require 'rubygems/specification'
+if defined?(Gem::QuickLoader)
+  # Gem Prelude makes me a sad panda :'(
+  Gem::QuickLoader.load_full_rubygems_library
 end
+require 'rubygems'
+require 'rubygems/specification'
 
 module Bundler
   class DepProxy
-
-    undef to_s
-    undef type
 
     attr_reader :required_by, :__platform, :dep
 
@@ -26,6 +25,14 @@ module Bundler
     end
 
     alias eql? ==
+
+    def type
+      @dep.type
+    end
+
+    def to_s
+      @dep.to_s
+    end
 
   private
 

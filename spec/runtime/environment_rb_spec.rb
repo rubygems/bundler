@@ -125,14 +125,7 @@ describe "environment.rb file" do
       bundle :lock
       run "require 'bar'; puts BAR", :lite_runtime => true
       out.should == "1.0"
-    end if RUBY_VERSION < "1.9"
-
-    it "error if the gemspec tries a relative require" do
-      bundle :install
-      out.should include("was a LoadError")
-      out.should include("bar.gemspec")
-      out.should include("require a relative path")
-    end if RUBY_VERSION >= "1.9"
+    end
 
     it "error intelligently if the gemspec has a LoadError" do
       update_git "bar", :gemspec => false do |s|
@@ -179,7 +172,9 @@ describe "environment.rb file" do
       err.should include("Please run `bundle lock` to relock.")
     end
 
-    it "regenerates if from an old bundler"
+    it "regenerates if from an old bundler" do
+      pending
+    end
 
     it "requests regeneration if it's out of sync" do
       pending
