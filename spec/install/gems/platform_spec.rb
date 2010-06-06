@@ -87,15 +87,27 @@ end
 
 # TODO: Don't make the tests hardcoded to a platform
 describe "bundle install with platform conditionals" do
-  it "works" do
+  it "installs gems tagged w/ the current platform" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
 
-      platforms :ruby do
+      platforms :#{local_tag} do
         gem "nokogiri"
       end
     G
 
     should_be_installed "nokogiri 1.4.2"
+  end
+
+  it "doesn't install gems tagged w/ a different platform" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      platforms :#{not_local_tag} do
+        gem "nokogiri"
+      end
+    G
+
+    should_not_be_installed "nokogiri"
   end
 end

@@ -40,6 +40,11 @@ module Bundler
       platforms
     end
 
+    def current_platform?
+      return true if @platforms.empty?
+      @platforms.any? { |p| send("#{p}?") }
+    end
+
     def to_lock
       out = "  #{name}"
 
@@ -50,6 +55,28 @@ module Bundler
       out << '!' if source
 
       out << "\n"
+    end
+
+  private
+
+    def ruby?
+      !mswin? && (!defined?(RUBY_ENGINE) || RUBY_ENGINE == "ruby" || RUBY_ENGINE == "rbx")
+    end
+
+    def ruby_18?
+      ruby? && RUBY_VERSION < "1.9"
+    end
+
+    def ruby_19?
+      ruby? && RUBY_VERSION >= "1.9"
+    end
+
+    def jruby?
+      RUBY_ENGINE == "jruby"
+    end
+
+    def mswin?
+      # w0t?
     end
   end
 end

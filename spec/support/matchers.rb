@@ -53,7 +53,11 @@ module Spec
             puts "WIN"
           end
         R
-        out.should == "WIN" || Gem::Version.new(out).should_not == Gem::Version.new(version)
+        if version.nil? || out == "WIN"
+          out.should == "WIN"
+        else
+          Gem::Version.new(out).should_not == Gem::Version.new(version)
+        end
       end
     end
 
