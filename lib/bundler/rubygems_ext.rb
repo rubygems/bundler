@@ -5,14 +5,45 @@ unless defined? Gem
   require 'rubygems/specification'
 end
 
+module Bundler
+  class DepProxy
+
+    undef to_s
+    undef type
+
+    attr_reader :required_by, :__platform, :dep
+
+    def initialize(dep, platform)
+      @dep, @__platform, @required_by = dep, platform, []
+    end
+
+    def hash
+      @hash ||= dep.hash
+    end
+
+    def ==(o)
+      dep == o.dep && __platform == o.__platform
+    end
+
+    alias eql? ==
+
+  private
+
+    def method_missing(*args)
+      @dep.send(*args)
+    end
+
+  end
+end
+
 module Gem
   @loaded_stacks = Hash.new { |h,k| h[k] = [] }
 
   module MatchPlatform
     def match_platform(p)
+      Gem::Platform::RUBY == platform or
       platform.nil? or p == platform or
-      (p != Gem::Platform::RUBY and p =~ platform) or
-      Gem::Platform::RUBY == platform
+      Gem::Platform.new(platform).to_generic == p
     end
   end
 
@@ -125,6 +156,8 @@ module Gem
     MSWIN = Gem::Platform.new('mswin32')
     MING  = Gem::Platform.new('x86-mingw32')
 
+    GENERIC_CACHE = {}
+
     class << RUBY
       def to_generic ; self ; end
     end
@@ -132,13 +165,13 @@ module Gem
     GENERICS = [JAVA, MSWIN, MING, RUBY]
 
     def hash
-      Platform.hash
+      @cpu.hash + @os.hash + @version.hash
     end
 
     alias eql? ==
 
     def to_generic
-      GENERICS.find { |p| self =~ p } || RUBY
+      GENERIC_CACHE[self] ||= GENERICS.find { |p| self =~ p } || RUBY
     end
   end
 end

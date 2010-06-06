@@ -26,25 +26,6 @@ module Bundler
             Gem::Platform::MSWIN,
             Gem::Platform::MING]
 
-    class DepProxy
-
-      undef to_s
-      undef type
-
-      attr_reader :required_by, :__platform, :dep
-
-      def initialize(dep, platform)
-        @dep, @__platform, @required_by = dep, platform, []
-      end
-
-    private
-
-      def method_missing(*args)
-        @dep.send(*args)
-      end
-
-    end
-
     class SpecGroup < Array
       attr_reader :activated, :required_by
 

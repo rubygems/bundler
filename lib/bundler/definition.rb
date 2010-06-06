@@ -52,6 +52,10 @@ module Bundler
       current_platform = Gem.platforms.map { |p| p.to_generic }.compact.last
       @platforms |= [current_platform]
 
+      @dependencies.each do |dependency|
+        dependency.platforms.replace @platforms
+      end
+
       converge
     end
 

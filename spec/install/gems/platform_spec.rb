@@ -69,7 +69,7 @@ describe "bundle install across platforms" do
       gem "nokogiri"
     G
 
-    should_be_installed "nokogiri 1.4.2 JAVA", "weakling 0.0.3"
+    should_be_installed "nokogiri 1.4.2 JAVA", "weakling 0.0.3", :platform => "java"
 
     simulate_new_machine
 

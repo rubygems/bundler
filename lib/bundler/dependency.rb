@@ -5,6 +5,7 @@ module Bundler
   class Dependency < Gem::Dependency
     attr_reader :autorequire
     attr_reader :groups
+    attr_reader :platforms
 
     def initialize(name, version, options = {}, &blk)
       super(name, version)
@@ -12,6 +13,7 @@ module Bundler
       @autorequire = nil
       @groups      = Array(options["group"] || :default).map { |g| g.to_sym }
       @source      = options["source"]
+      @platforms   = []
 
       if options.key?('require')
         @autorequire = Array(options['require'] || [])
