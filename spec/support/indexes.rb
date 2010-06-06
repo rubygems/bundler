@@ -14,7 +14,10 @@ module Spec
 
     def resolve
       @platforms ||= ['ruby']
-      Bundler::Resolver.resolve(@deps, @index, {}, [], @platforms)
+      @deps.each do |d|
+        d.platforms.replace @platforms
+      end
+      Bundler::Resolver.resolve(@deps, @index)
     end
 
     def should_resolve_as(specs)

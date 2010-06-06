@@ -200,7 +200,7 @@ module Bundler
       end
 
       # Run a resolve against the locally available gems
-      resolve = Resolver.resolve(dependencies, idx, source_requirements, @last_resolve, platforms)
+      resolve = Resolver.resolve(dependencies, idx, source_requirements, @last_resolve)
       [resolve, resolve.materialize(type, dependencies)]
     end
 

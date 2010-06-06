@@ -118,9 +118,9 @@ module Bundler
     # ==== Returns
     # <GemBundle>,nil:: If the list of dependencies can be resolved, a
     #   collection of gemspecs is returned. Otherwise, nil is returned.
-    def self.resolve(requirements, index, source_requirements = {}, base = [], platforms = [])
+    def self.resolve(requirements, index, source_requirements = {}, base = [])
       base = SpecSet.new(base) unless base.is_a?(SpecSet)
-      resolver = new(index, source_requirements, platforms.any? ? platforms : [Gem::Platform::RUBY], base)
+      resolver = new(index, source_requirements, base)
       result = catch(:success) do
         resolver.start(requirements)
         raise resolver.version_conflict
@@ -129,12 +129,11 @@ module Bundler
       SpecSet.new(result)
     end
 
-    def initialize(index, source_requirements, platforms, base)
+    def initialize(index, source_requirements, base)
       @errors = {}
       @stack  = []
       @base   = base
       @index  = index
-      @platforms = platforms
       @source_requirements = source_requirements
     end
 
@@ -154,8 +153,10 @@ module Bundler
       activated    = {}
       requirements = []
 
-      @platforms.each do |p|
-        reqs.each { |d| requirements << DepProxy.new(d, p) }
+      reqs.each do |d|
+        d.platforms.each do |p|
+          requirements << DepProxy.new(d, p)
+        end
       end
 
       resolve(requirements, activated)
