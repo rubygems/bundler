@@ -9,7 +9,7 @@ describe "bundle install across platforms" do
           rack (0.9.1)
 
       PLATFORMS
-        #{not_local.first}
+        #{not_local}
 
       DEPENDENCIES
         rack
