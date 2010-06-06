@@ -14,10 +14,13 @@ module Spec
 
     def resolve
       @platforms ||= ['ruby']
+      deps = []
       @deps.each do |d|
-        d.platforms.replace @platforms
+        @platforms.each do |p|
+          deps << Bundler::DepProxy.new(d, p)
+        end
       end
-      Bundler::Resolver.resolve(@deps, @index)
+      Bundler::Resolver.resolve(deps, @index)
     end
 
     def should_resolve_as(specs)

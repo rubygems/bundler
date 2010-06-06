@@ -52,10 +52,6 @@ module Bundler
       current_platform = Gem.platforms.map { |p| p.to_generic }.compact.last
       @platforms |= [current_platform]
 
-      @dependencies.each do |dependency|
-        dependency.platforms.replace @platforms
-      end
-
       converge
     end
 
@@ -66,6 +62,11 @@ module Bundler
 
     def specs
       @specs ||= resolve_local_specs
+    end
+
+    def specs_for(groups)
+      deps = dependencies.select { |d| (d.groups & groups).any? }
+      specs.for(expand_dependencies(deps))
     end
 
     def last_resolve
@@ -172,7 +173,9 @@ module Bundler
         converged << s
       end
 
-      @last_resolve = SpecSet.new(converged).for(deps, @unlock[:gems])
+      resolve = SpecSet.new(converged)
+      resolve = resolve.for(expand_dependencies(deps), @unlock[:gems])
+      @last_resolve = resolve
     end
 
     def in_locked_deps?(dep)
@@ -183,6 +186,20 @@ module Bundler
 
     def satisfies_locked_spec?(dep)
       @last_resolve.any? { |s| s.satisfies?(dep) }
+    end
+
+    def expanded_dependencies
+      @expanded_dependencies ||= expand_dependencies(dependencies)
+    end
+
+    def expand_dependencies(dependencies)
+      deps = []
+      dependencies.each do |dep|
+        dep.gem_platforms(@platforms).each do |p|
+          deps << DepProxy.new(dep, p)
+        end
+      end
+      deps
     end
 
     def sorted_sources
@@ -200,8 +217,8 @@ module Bundler
       end
 
       # Run a resolve against the locally available gems
-      resolve = Resolver.resolve(dependencies, idx, source_requirements, @last_resolve)
-      [resolve, resolve.materialize(type, dependencies)]
+      resolve = Resolver.resolve(expanded_dependencies, idx, source_requirements, @last_resolve)
+      [resolve, resolve.materialize(type, expanded_dependencies)]
     end
 
     def resolve_local_specs
@@ -211,7 +228,7 @@ module Bundler
 
     # TODO: Improve this logic
     def resolve_remote_specs
-      raise "lol" unless @last_resolve.valid_for?(dependencies)
+      raise "lol" unless @last_resolve.valid_for?(expanded_dependencies)
       resolve_local_specs
     rescue #InvalidSpecSet, GemNotFound, PathError
       @last_resolve, @specs = resolve(:specs, remote_index)

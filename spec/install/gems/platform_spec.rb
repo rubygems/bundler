@@ -84,3 +84,18 @@ describe "bundle install across platforms" do
     should_not_be_installed "weakling"
   end
 end
+
+# TODO: Don't make the tests hardcoded to a platform
+describe "bundle install with platform conditionals" do
+  it "works" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      platforms :ruby do
+        gem "nokogiri"
+      end
+    G
+
+    should_be_installed "nokogiri 1.4.2"
+  end
+end

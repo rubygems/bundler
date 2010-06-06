@@ -13,7 +13,7 @@ module Bundler
       # Has to happen first
       clean_load_path
 
-      specs = groups.any? ? specs_for(groups) : requested_specs
+      specs = groups.any? ? @definition.specs_for(groups) : requested_specs
 
       cripple_rubygems(specs)
 

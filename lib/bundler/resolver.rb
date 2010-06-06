@@ -151,15 +151,8 @@ module Bundler
 
     def start(reqs)
       activated    = {}
-      requirements = []
 
-      reqs.each do |d|
-        d.platforms.each do |p|
-          requirements << DepProxy.new(d, p)
-        end
-      end
-
-      resolve(requirements, activated)
+      resolve(reqs, activated)
     end
 
     def resolve(reqs, activated)

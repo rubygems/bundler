@@ -18,7 +18,7 @@ module Bundler
       @requested_specs ||= begin
         groups = @definition.groups - Bundler.settings.without
         groups.map! { |g| g.to_sym }
-        specs_for(groups)
+        @definition.specs_for(groups)
       end
     end
 
@@ -39,11 +39,6 @@ module Bundler
     end
 
   private
-
-    def specs_for(groups)
-      deps = dependencies.select { |d| (d.groups & groups).any? }
-      specs.for(deps)
-    end
 
     # ==== Locking
 

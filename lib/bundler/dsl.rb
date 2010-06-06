@@ -8,12 +8,15 @@ module Bundler
       builder.to_definition
     end
 
+    VALID_PLATFORMS = [:ruby_18, :ruby_19, :ruby, :jruby, :mswin]
+
     def initialize
       @rubygems_source = Source::Rubygems.new
       @source          = nil
       @sources         = []
       @dependencies    = []
       @groups          = []
+      @platforms       = []
     end
 
     def gem(name, *args)
@@ -67,6 +70,13 @@ module Bundler
       yield
     ensure
       args.each { @groups.pop }
+    end
+
+    def platforms(*platforms)
+      @platforms.concat platforms
+      yield
+    ensure
+      platforms.each { @platforms.pop }
     end
 
     # Deprecated methods
@@ -133,6 +143,14 @@ module Bundler
       groups.concat Array(opts.delete("group"))
       groups = [:default] if groups.empty?
 
+      platforms = @platforms.dup
+      platforms.concat Array(opts.delete("platforms"))
+      platforms.map! { |p| p.to_sym }
+      platforms.each do |p|
+        next if VALID_PLATFORMS.include?(p)
+        raise DslError, "`#{p}` is not a valid platform. The available options are: #{VALID_PLATFORMS.inspect}"
+      end
+
       # Normalize git and path options
       ["git", "path"].each do |type|
         if param = opts[type]
@@ -144,6 +162,7 @@ module Bundler
 
       opts["source"] ||= @source
 
+      opts["platforms"] = @platforms.dup
       opts["group"] = groups
     end
 

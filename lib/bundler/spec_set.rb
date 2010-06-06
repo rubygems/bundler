@@ -17,13 +17,7 @@ module Bundler
     end
 
     def for(dependencies, skip = [], check = false)
-      handled, deps, specs = {}, [], []
-
-      dependencies.each do |d|
-        d.platforms.each do |p|
-          deps << DepProxy.new(d, p)
-        end
-      end
+      handled, deps, specs = {}, dependencies.dup, []
 
       until deps.empty?
         dep = deps.shift
