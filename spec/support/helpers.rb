@@ -29,11 +29,14 @@ module Spec
       opts = args.last.is_a?(Hash) ? args.pop : {}
       expect_err = opts.delete(:expect_err)
       groups = args.map {|a| a.inspect }.join(", ")
+      platform = opts[:platform]
 
       if opts[:lite_runtime]
         setup = "require 'rubygems' ; require 'bundler/setup' ; Bundler.setup(#{groups})\n"
       else
-        setup = "require 'rubygems' ; require 'bundler' ; Bundler.setup(#{groups})\n"
+        setup  = "require 'rubygems' ; "
+        setup << "Gem.platforms = [Gem::Platform::RUBY, Gem::Platform.new('#{platform}')] ; " if platform
+        setup = "require 'bundler' ; Bundler.setup(#{groups})\n"
       end
 
       @out = ruby(setup + cmd, :expect_err => expect_err)

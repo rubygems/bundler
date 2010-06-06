@@ -159,9 +159,7 @@ module Bundler
 
       converged = []
       @last_resolve.each do |s|
-        if source = @sources.find { |src| s.source == src }
-          s.source = source
-        end
+        s.source = @sources.find { |src| s.source == src }
 
         next if s.source.nil? || @unlock[:sources].include?(s.name)
 

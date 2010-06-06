@@ -27,11 +27,14 @@ module Spec
 
     def should_be_installed(*names)
       opts = names.last.is_a?(Hash) ? names.pop : {}
-      groups = opts[:groups] || []
+      groups = Array(opts[:groups])
+      groups << opts
       names.each do |name|
-        name, version = name.split(/\s+/)
+        name, version, platform = name.split(/\s+/)
         run "load '#{name}.rb'; puts #{Spec::Builders.constantize(name)}", *groups
-        Gem::Version.new(out).should == Gem::Version.new(version)
+        actual_version, actual_platform = out.split(/\s+/)
+        Gem::Version.new(actual_version).should == Gem::Version.new(version)
+        platform.should == actual_platform
       end
     end
 

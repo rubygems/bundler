@@ -96,6 +96,15 @@ module Spec
           s.platform = "java"
         end
 
+        build_gem "nokogiri", "1.4.2"
+        build_gem "nokogiri", "1.4.2" do |s|
+          s.platform = "java"
+          s.write "lib/nokogiri.rb", "NOKOGIRI = '1.4.2 JAVA'"
+          s.add_dependency "weakling", ">= 0.0.3"
+        end
+
+        build_gem "weakling", "0.0.3"
+
         build_gem "not_released", "1.0.pre"
 
         build_gem "has_prerelease", "1.0"

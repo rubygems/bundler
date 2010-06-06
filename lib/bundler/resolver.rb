@@ -356,7 +356,8 @@ module Bundler
       end
 
       index = @source_requirements[d.name] || @index
-      results = index.search_for_all_platforms(d) + results
+      # results = index.search_for_all_platforms(d) + results
+      results += index.search_for_all_platforms(d)
 
       if results.any?
         version = results.first.version
