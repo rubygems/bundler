@@ -66,7 +66,7 @@ module Bundler
 
     def specs_for(groups)
       deps = dependencies.select { |d| (d.groups & groups).any? }
-      deps.delete_if { |d| !d.current_platform? }
+      deps.delete_if { |d| !d.should_include? }
       specs.for(expand_dependencies(deps))
     end
 

@@ -17,6 +17,7 @@ module Bundler
       @dependencies    = []
       @groups          = []
       @platforms       = []
+      @env             = nil
     end
 
     def gem(name, *args)
@@ -77,6 +78,13 @@ module Bundler
       yield
     ensure
       platforms.each { @platforms.pop }
+    end
+
+    def env(name)
+      @env, old = name, @env
+      yield
+    ensure
+      @env = old
     end
 
     # Deprecated methods
@@ -160,10 +168,10 @@ module Bundler
         end
       end
 
-      opts["source"] ||= @source
-
+      opts["source"]  ||= @source
+      opts["env"]     ||= @env
       opts["platforms"] = @platforms.dup
-      opts["group"] = groups
+      opts["group"]     = groups
     end
 
     def _deprecated_options(options)

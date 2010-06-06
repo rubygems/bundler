@@ -22,6 +22,7 @@ module Bundler
       @groups      = Array(options["group"] || :default).map { |g| g.to_sym }
       @source      = options["source"]
       @platforms   = Array(options["platforms"])
+      @env         = options["env"]
 
       if options.key?('require')
         @autorequire = Array(options['require'] || [])
@@ -38,6 +39,21 @@ module Bundler
         platforms |= [platform]
       end
       platforms
+    end
+
+    def should_include?
+      current_env? && current_platform?
+    end
+
+    def current_env?
+      return true unless @env
+      if Hash === @env
+        @env.all? do |key, val|
+          ENV[key.to_s] && (String === val ? ENV[key.to_s] == val : ENV[key.to_s] =~ val)
+        end
+      else
+        ENV[@env.to_s]
+      end
     end
 
     def current_platform?

@@ -70,5 +70,6 @@ Spec::Runner.configure do |config|
     ENV['GEM_PATH']       = original_gem_home
     ENV['BUNDLE_PATH']    = nil
     ENV['BUNDLE_GEMFILE'] = nil
+    ENV['BUNDLER_TEST']   = nil
   end
 end
