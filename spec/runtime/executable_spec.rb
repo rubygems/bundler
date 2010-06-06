@@ -66,4 +66,13 @@ describe "Running commands" do
       out.should == '2.0'
     end
   end
+
+  it "don't bundle da bundla" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "bundler"
+    G
+
+    home(".bundler/bin/bundle").should_not exist
+  end
 end

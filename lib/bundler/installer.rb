@@ -44,6 +44,7 @@ module Bundler
 
     def generate_bundler_executable_stubs(spec)
       spec.executables.each do |executable|
+        next if executable == "bundle"
         File.open "#{Bundler.bin_path}/#{executable}", 'w', 0755 do |f|
           f.puts File.read(File.expand_path('../templates/Executable', __FILE__))
         end

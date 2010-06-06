@@ -144,6 +144,11 @@ module Spec
           s.add_c_extension
         end
 
+        build_gem "bundler", "0.9" do |s|
+          s.executables = "bundle"
+          s.write "bin/bundle", "puts 'FAIL'"
+        end
+
         # The bundler 0.8 gem has a rubygems plugin that always loads :(
         build_gem "bundler", "0.8.1" do |s|
           s.write "lib/bundler/omg.rb", ""
