@@ -316,7 +316,7 @@ describe "bundle install with git sources" do
       s.add_dependency "submodule"
     end
     Dir.chdir(lib_path('has_submodule-1.0')) do
-      `git submodule add #{lib_path('submodule-1.0')}`
+      `git submodule add #{lib_path('submodule-1.0')} submodule-1.0`
       `git commit -m "submodulator"`
     end
 
