@@ -64,6 +64,18 @@ module Bundler
       @specs ||= resolve_local_specs
     end
 
+    def requested_specs
+      @requested_specs ||= begin
+        groups = self.groups - Bundler.settings.without
+        groups.map! { |g| g.to_sym }
+        specs_for(groups)
+      end
+    end
+
+    def current_dependencies
+      dependencies.reject { |d| !d.should_include? }
+    end
+
     def specs_for(groups)
       deps = dependencies.select { |d| (d.groups & groups).any? }
       deps.delete_if { |d| !d.should_include? }

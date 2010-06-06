@@ -82,7 +82,7 @@ module Bundler
       @env.specs.each { |spec| @nodes[spec.name] = GraphNode.new(spec.name, spec.version) }
 
       # For gems in Gemfile, add details
-      @env.dependencies.each do |dependency|
+      @env.current_dependencies.each do |dependency|
         node = @nodes[dependency.name]
         node.is_user = true
 

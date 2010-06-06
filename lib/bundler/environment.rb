@@ -15,11 +15,7 @@ module Bundler
     end
 
     def requested_specs
-      @requested_specs ||= begin
-        groups = @definition.groups - Bundler.settings.without
-        groups.map! { |g| g.to_sym }
-        @definition.specs_for(groups)
-      end
+      @definition.requested_specs
     end
 
     def specs
@@ -28,6 +24,10 @@ module Bundler
 
     def dependencies
       @definition.dependencies
+    end
+
+    def current_dependencies
+      @definition.current_dependencies
     end
 
     def lock
