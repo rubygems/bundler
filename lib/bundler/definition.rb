@@ -57,11 +57,11 @@ module Bundler
 
     def resolve_remotely!
       raise "Specs already loaded" if @specs
-      @specs = resolve_remote_specs
+      @specs = resolve(:specs, remote_index)
     end
 
     def specs
-      @specs ||= resolve_local_specs
+      @specs ||= resolve(:local_specs, index)
     end
 
     def requested_specs
@@ -83,7 +83,7 @@ module Bundler
     end
 
     def last_resolve
-      resolve_local_specs unless @specs
+      specs
       @last_resolve
     end
 
@@ -222,6 +222,12 @@ module Bundler
       end
     end
 
+    def requested_dependencies
+      groups = self.groups - Bundler.settings.without
+      groups.map! { |g| g.to_sym }
+      dependencies.reject { |d| !d.should_include? || (d.groups & groups).empty? }
+    end
+
     def resolve(type, idx)
       source_requirements = {}
       dependencies.each do |dep|
@@ -230,22 +236,8 @@ module Bundler
       end
 
       # Run a resolve against the locally available gems
-      resolve = Resolver.resolve(expanded_dependencies, idx, source_requirements, @last_resolve)
-      [resolve, resolve.materialize(type, expanded_dependencies)]
-    end
-
-    def resolve_local_specs
-      @last_resolve, @specs = resolve(:local_specs, index)
-      @specs
-    end
-
-    # TODO: Improve this logic
-    def resolve_remote_specs
-      raise "lol" unless @last_resolve.valid_for?(expanded_dependencies)
-      resolve_local_specs
-    rescue #InvalidSpecSet, GemNotFound, PathError
-      @last_resolve, @specs = resolve(:specs, remote_index)
-      @specs
+      @last_resolve = Resolver.resolve(expanded_dependencies, idx, source_requirements, @last_resolve)
+      @last_resolve.materialize(type, expand_dependencies(requested_dependencies))
     end
   end
 end

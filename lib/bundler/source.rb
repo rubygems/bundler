@@ -140,7 +140,6 @@ module Bundler
 
       def fetch_local_specs
         idx = Index.new
-        fetch_cached_specs(idx)
         fetch_installed_specs(idx)
         idx
       end

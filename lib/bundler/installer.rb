@@ -27,10 +27,10 @@ module Bundler
       specs.each do |spec|
         spec.source.fetch(spec) if spec.source.respond_to?(:fetch)
 
-        unless requested_specs.include?(spec)
-          Bundler.ui.debug "  * Not in requested group; skipping."
-          next
-        end
+        # unless requested_specs.include?(spec)
+        #   Bundler.ui.debug "  * Not in requested group; skipping."
+        #   next
+        # end
 
         spec.source.install(spec)
         generate_bundler_executable_stubs(spec)
