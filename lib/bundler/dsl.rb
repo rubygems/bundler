@@ -13,7 +13,7 @@ module Bundler
       @source          = nil
       @sources         = []
       @dependencies    = []
-      @group           = [:default]
+      @groups          = []
     end
 
     def gem(name, *args)
@@ -63,10 +63,10 @@ module Bundler
     end
 
     def group(*args, &blk)
-      old, @group = @group, args
+      @groups.concat args
       yield
     ensure
-      @group = old
+      args.each { @groups.pop }
     end
 
     # Deprecated methods
@@ -129,7 +129,9 @@ module Bundler
         raise InvalidOption, message
       end
 
-      group = opts.delete("group") || @group
+      groups = @groups.dup
+      groups.concat Array(opts.delete("group"))
+      groups = [:default] if groups.empty?
 
       # Normalize git and path options
       ["git", "path"].each do |type|
@@ -142,7 +144,7 @@ module Bundler
 
       opts["source"] ||= @source
 
-      opts["group"] = group
+      opts["group"] = groups
     end
 
     def _deprecated_options(options)

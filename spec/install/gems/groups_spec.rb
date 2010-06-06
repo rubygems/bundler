@@ -151,6 +151,40 @@ describe "bundle install with gem sources" do
           end
         end
       end
+
+      describe "nesting groups" do
+        before :each do
+          gemfile <<-G
+            source "file://#{gem_repo1}"
+            gem "rack"
+            group :emo do
+              group :lolercoaster do
+                gem "activesupport", "2.3.5"
+              end
+            end
+          G
+        end
+
+        it "installs gems in the default group" do
+          bundle :install, :without => "emo lolercoaster"
+          should_be_installed "rack 1.0.0"
+        end
+
+        it "installs the gem if any of its groups are installed" do
+          bundle "install --without emo"
+          should_be_installed "rack 1.0.0", "activesupport 2.3.5"
+        end
+
+        it "works when locked as well" do
+          bundle "install --without emo"
+          bundle "lock"
+
+          simulate_new_machine
+
+          bundle "install --without lolercoaster"
+          should_be_installed "rack 1.0.0", "activesupport 2.3.5"
+        end
+      end
     end
   end
 end
