@@ -328,4 +328,30 @@ describe "bundle install with git sources" do
     should_be_installed "has_submodule 1.0"
   end
 
+  it "handles implicity updates when modifying the source info" do
+    git = build_git "foo"
+
+    install_gemfile <<-G
+      git "#{lib_path('foo-1.0')}" do
+        gem "foo"
+      end
+    G
+
+    update_git "foo"
+    update_git "foo"
+
+    install_gemfile <<-G
+      git "#{lib_path('foo-1.0')}", :ref => "#{git.ref_for('head^')}" do
+        gem "foo"
+      end
+    G
+
+    run <<-RUBY
+      require 'foo'
+      puts "WIN" if FOO_PREV_REF == '#{git.ref_for("head^^")}'
+    RUBY
+
+    out.should == "WIN"
+  end
+
 end
