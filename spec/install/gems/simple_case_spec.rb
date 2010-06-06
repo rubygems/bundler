@@ -129,7 +129,7 @@ describe "bundle install with gem sources" do
 
       it "falls back on plain ruby" do
         install_gemfile <<-G
-          Gem.platforms = [Gem::Platform.new('#{rb}'), Gem::Platform.new('#{linux}')]
+          Gem.platforms = [Gem::Platform.new('#{rb}'), Gem::Platform.new('#{not_local}')]
           source "file://#{gem_repo1}"
           gem "platform_specific"
         G
