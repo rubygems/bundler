@@ -88,7 +88,7 @@ module Bundler
     end
 
     def jruby?
-      RUBY_ENGINE == "jruby"
+      defined?(RUBY_ENGINE) && RUBY_ENGINE == "jruby"
     end
 
     def mswin?
