@@ -72,7 +72,7 @@ module Bundler
         if missing_specs
           missing_specs << s unless spec
         else
-          raise "Could not materialize #{s.full_name}" unless spec
+          raise GemNotFound, "Could not find #{s.full_name} in any of the sources" unless spec
         end
         spec if spec
       end
