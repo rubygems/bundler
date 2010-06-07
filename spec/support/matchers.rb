@@ -34,7 +34,7 @@ module Spec
         run "load '#{name}.rb'; puts #{Spec::Builders.constantize(name)}", *groups
         actual_version, actual_platform = out.split(/\s+/)
         Gem::Version.new(actual_version).should == Gem::Version.new(version)
-        platform.should == actual_platform
+        actual_platform.should == platform
       end
     end
 

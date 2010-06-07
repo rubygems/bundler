@@ -83,7 +83,7 @@ module Bundler
 
     def search_by_spec(spec)
       @specs[spec.name].select do |s|
-        s.version == spec.version && s.platform == spec.platform
+        s.version == spec.version && Gem::Platform.new(s.platform) == Gem::Platform.new(spec.platform)
       end
     end
 

@@ -16,7 +16,7 @@ module Bundler
       @specs.length
     end
 
-    def for(dependencies, skip = [], check = false)
+    def for(dependencies, skip = [], check = false, match_current_platform = false)
       handled, deps, specs = {}, dependencies.dup, []
 
       until deps.empty?
@@ -24,7 +24,9 @@ module Bundler
         next if handled[dep] || skip.include?(dep.name)
 
         spec = lookup[dep.name].find do |s|
-          s.match_platform(dep.__platform)
+          match_current_platform ?
+            Gem::Platform.match(s.platform) :
+            s.match_platform(dep.__platform)
         end
 
         handled[dep] = true
@@ -34,7 +36,8 @@ module Bundler
 
           spec.dependencies.each do |d|
             next if d.type == :development
-            deps << DepProxy.new(d, dep.__platform)
+            d = DepProxy.new(d, dep.__platform) unless match_current_platform
+            deps << d
           end
         elsif check
           return false
@@ -62,10 +65,10 @@ module Bundler
     end
 
     def materialize(deps)
-      materialized = self.for(deps, []).to_a
+      materialized = self.for(deps, [], false, true).to_a
       materialized.map! do |s|
         next s unless s.is_a?(LazySpecification)
-        s.__materialize__(s.source.specs)
+        s.__materialize__
       end
       SpecSet.new(materialized)
     end

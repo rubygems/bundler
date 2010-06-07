@@ -44,8 +44,8 @@ module Bundler
       out
     end
 
-    def __materialize__(index)
-      @specification = index.search(Gem::Dependency.new(name, version)).last
+    def __materialize__
+      @specification = source[self]
       raise "Could not materialize #{full_name}" unless @specification
       @specification
     end

@@ -30,6 +30,8 @@ describe "bundle install across platforms" do
         remote: file:#{gem_repo1}
         specs:
           platform_specific (1.0)
+          platform_specific (1.0-java)
+          platform_specific (1.0-x86-mswin32)
 
       PLATFORMS
         ruby

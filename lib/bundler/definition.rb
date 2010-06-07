@@ -234,7 +234,7 @@ module Bundler
         # Run a resolve against the locally available gems
         @last_resolve = Resolver.resolve(expanded_dependencies, index, source_requirements, @last_resolve)
       end
-      @last_resolve.materialize(expand_dependencies(requested_dependencies))
+      @last_resolve.materialize(requested_dependencies)
     end
   end
 end
