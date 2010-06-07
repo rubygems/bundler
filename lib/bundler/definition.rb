@@ -65,6 +65,12 @@ module Bundler
       @specs ||= resolve.materialize(requested_dependencies)
     end
 
+    def missing_specs
+      missing = []
+      resolve.materialize(requested_dependencies, missing)
+      missing
+    end
+
     def requested_specs
       @requested_specs ||= begin
         groups = self.groups - Bundler.settings.without

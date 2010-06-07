@@ -82,7 +82,7 @@ describe "bundle check" do
     G
 
     bundle "check", :exit_status => true
-    out.should include("rack (1.0.0) is cached, but not installed")
+    out.should include("* rack (1.0.0)")
     @exitstatus.should == 1
   end
 
@@ -174,8 +174,8 @@ describe "bundle check" do
     it "shows what is missing with the current Gemfile if it is not satisfied" do
       simulate_new_machine
       bundle :check
-      out.should match(/The following dependencies are missing/)
-      out.should include("rack (= 1.0")
+      out.should match(/The following gems are missing/)
+      out.should include("* rack (1.0")
     end
   end
 end

@@ -64,13 +64,19 @@ module Bundler
       lookup.dup
     end
 
-    def materialize(deps)
+    def materialize(deps, missing_specs = nil)
       materialized = self.for(deps, [], false, true).to_a
       materialized.map! do |s|
         next s unless s.is_a?(LazySpecification)
-        s.__materialize__
+        spec = s.__materialize__
+        if missing_specs
+          missing_specs << s unless spec
+        else
+          raise "Could not materialize #{s.full_name}" unless spec
+        end
+        spec if spec
       end
-      SpecSet.new(materialized)
+      SpecSet.new(materialized.compact)
     end
 
     def names

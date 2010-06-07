@@ -46,8 +46,6 @@ module Bundler
 
     def __materialize__
       @specification = source[self]
-      raise "Could not materialize #{full_name}" unless @specification
-      @specification
     end
 
     def respond_to?(*args)

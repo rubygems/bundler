@@ -56,11 +56,11 @@ module Bundler
       If not, the first missing gem is listed and Bundler exits status 1.
     D
     def check
-      env = Bundler.environment
-      not_installed = env.requested_specs.select { |spec| !spec.loaded_from }
+      not_installed = Bundler.definition.missing_specs
 
       if not_installed.any?
-        not_installed.each { |s| Bundler.ui.error "#{s.name} (#{s.version}) is cached, but not installed" }
+        Bundler.ui.error "The following gems are missing"
+        not_installed.each { |s| Bundler.ui.error " * #{s.name} (#{s.version})" }
         Bundler.ui.warn "Install missing gems with `bundle install`"
         exit 1
       else
