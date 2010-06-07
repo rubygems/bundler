@@ -49,16 +49,11 @@ module Bundler
 
       def to_specs
         specs = {}
-
-        @activated.each do |p|
-          if s = @specs[p]
-            platform = Gem::Platform.new(s.platform).to_generic
-            next if specs[platform]
-
-            lazy_spec = LazySpecification.new(name, version, platform, source)
-            lazy_spec.dependencies.replace s.dependencies
-            specs[platform] = lazy_spec
-          end
+        each do |s|
+          next if specs[s.platform]
+          lazy_spec = LazySpecification.new(s.name, s.version, s.platform, s.source)
+          lazy_spec.dependencies.replace s.dependencies
+          specs[s.platform] = lazy_spec
         end
         specs.values
       end
