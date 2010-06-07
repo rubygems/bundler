@@ -14,11 +14,15 @@ module Bundler
       def initialize(options = {})
         @options = options
         @remotes = (options["remotes"] || []).map { |r| normalize_uri(r) }
-        # @caches  = (options["caches"] || [])
+        @allow_remote = false
         # Hardcode the paths for now
         @installed = {}
         @caches = [ Bundler.app_cache ] + Gem.path.map { |p| File.expand_path("#{p}/cache") }
         @spec_fetch_map = {}
+      end
+
+      def remote!
+        @allow_remote = true
       end
 
       def hash
@@ -59,11 +63,7 @@ module Bundler
       end
 
       def specs
-        @specs ||= fetch_specs
-      end
-
-      def local_specs
-        @local_specs ||= fetch_local_specs
+        @specs ||= @allow_remote ? fetch_specs : fetch_local_specs
       end
 
       def fetch(spec)
@@ -227,12 +227,18 @@ module Bundler
         @options = options
         @glob = options["glob"] || DEFAULT_GLOB
 
+        @allow_remote = false
+
         if options["path"]
           @path = Pathname.new(options["path"]).expand_path(Bundler.root)
         end
 
         @name = options["name"]
         @version = options["version"]
+      end
+
+      def remote!
+        @allow_remote = true
       end
 
       def self.from_lock(options)
@@ -456,9 +462,11 @@ module Bundler
       end
 
       def specs
+        if @allow_remote
         # Start by making sure the git cache is up to date
-        cache
-        checkout
+          cache
+          checkout
+        end
         local_specs
       end
 

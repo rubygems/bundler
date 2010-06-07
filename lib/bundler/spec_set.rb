@@ -61,11 +61,11 @@ module Bundler
       lookup.dup
     end
 
-    def materialize(type, deps)
+    def materialize(deps)
       materialized = self.for(deps, []).to_a
       materialized.map! do |s|
         next s unless s.is_a?(LazySpecification)
-        s.__materialize__(s.source.send(type))
+        s.__materialize__(s.source.specs)
       end
       SpecSet.new(materialized)
     end
