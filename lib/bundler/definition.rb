@@ -229,14 +229,16 @@ module Bundler
     end
 
     def resolve(type, idx)
-      source_requirements = {}
-      dependencies.each do |dep|
-        next unless dep.source
-        source_requirements[dep.name] = dep.source.send(type)
-      end
+      unless @last_resolve.valid_for?(expanded_dependencies)
+        source_requirements = {}
+        dependencies.each do |dep|
+          next unless dep.source
+          source_requirements[dep.name] = dep.source.send(type)
+        end
 
-      # Run a resolve against the locally available gems
-      @last_resolve = Resolver.resolve(expanded_dependencies, idx, source_requirements, @last_resolve)
+        # Run a resolve against the locally available gems
+        @last_resolve = Resolver.resolve(expanded_dependencies, idx, source_requirements, @last_resolve)
+      end
       @last_resolve.materialize(type, expand_dependencies(requested_dependencies))
     end
   end
