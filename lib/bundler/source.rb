@@ -26,7 +26,9 @@ module Bundler
       end
 
       def [](spec)
-        specs[spec].first
+        installed_specs[spec].first ||
+        cached_specs[spec].first    ||
+        remote_specs[spec].first
       end
 
       def hash
@@ -67,7 +69,7 @@ module Bundler
       end
 
       def specs
-        @specs ||= @allow_remote ? fetch_specs : fetch_local_specs
+        @specs ||= @allow_remote ? fetch_specs : installed_specs
       end
 
       def fetch(spec)
@@ -135,60 +137,66 @@ module Bundler
       end
 
       def fetch_specs
-        idx = Index.new
-        fetch_remote_specs(idx)
-        fetch_cached_specs(idx)
-        fetch_installed_specs(idx)
-        idx
-      end
-
-      def fetch_local_specs
-        idx = Index.new
-        fetch_installed_specs(idx)
-        idx
-      end
-
-      def fetch_installed_specs(idx)
-        Gem::SourceIndex.from_installed_gems.to_a.reverse.each do |name, spec|
-          @installed[spec.full_name] = true
-          spec.source = self
-          idx << spec
+        Index.build do |idx|
+          idx.use installed_specs
+          idx.use cached_specs
+          idx.use remote_specs
         end
       end
 
-      def fetch_cached_specs(idx)
-        @caches.each do |path|
-          Dir["#{path}/*.gem"].each do |gemfile|
-            s = Gem::Format.from_file_by_path(gemfile).spec
-            s.source = self
-            idx << s
+      def installed_specs
+        @installed_specs ||= begin
+          idx = Index.new
+          Gem::SourceIndex.from_installed_gems.to_a.reverse.each do |name, spec|
+            @installed[spec.full_name] = true
+            spec.source = self
+            idx << spec
           end
+          idx
         end
       end
 
-      def fetch_remote_specs(index)
-        remotes = self.remotes.map { |uri| uri.to_s }
-        old = Gem.sources
-
-        remotes.each do |uri|
-          Bundler.ui.info "Fetching source index for #{uri}"
-          Gem.sources = ["#{uri}"]
-          fetch_all_remote_specs do |n,v|
-            v.each do |name, version, platform|
-              spec = RemoteSpecification.new(name, version, platform, uri)
-              spec.source = self
-              # Temporary hack until this can be figured out better
-              @spec_fetch_map[spec.full_name] = lambda do
-                path = download_gem_from_uri(spec, uri)
-                s = Gem::Format.from_file_by_path(path).spec
-                spec.__swap__(s)
-              end
-              index << spec
+      def cached_specs
+        @cached_specs ||= begin
+          idx = Index.new
+          @caches.each do |path|
+            Dir["#{path}/*.gem"].each do |gemfile|
+              s = Gem::Format.from_file_by_path(gemfile).spec
+              s.source = self
+              idx << s
             end
           end
+          idx
         end
-      ensure
-        Gem.sources = old
+      end
+
+      def remote_specs
+        @remote_specs ||= begin
+          idx     = Index.new
+          remotes = self.remotes.map { |uri| uri.to_s }
+          old     = Gem.sources
+
+          remotes.each do |uri|
+            Bundler.ui.info "Fetching source index for #{uri}"
+            Gem.sources = ["#{uri}"]
+            fetch_all_remote_specs do |n,v|
+              v.each do |name, version, platform|
+                spec = RemoteSpecification.new(name, version, platform, uri)
+                spec.source = self
+                # Temporary hack until this can be figured out better
+                @spec_fetch_map[spec.full_name] = lambda do
+                  path = download_gem_from_uri(spec, uri)
+                  s = Gem::Format.from_file_by_path(path).spec
+                  spec.__swap__(s)
+                end
+                idx << spec
+              end
+            end
+          end
+          idx
+        ensure
+          Gem.sources = old
+        end
       end
 
       def fetch_all_remote_specs(&blk)
