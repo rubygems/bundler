@@ -57,25 +57,14 @@ module Bundler
     D
     def check
       env = Bundler.environment
-      # Check top level dependencies
-      missing = env.dependencies.select { |d| env.index.search(d).empty? }
-      if missing.any?
-        Bundler.ui.error "The following dependencies are missing"
-        missing.each do |d|
-          Bundler.ui.error "  * #{d}"
-        end
+      not_installed = env.requested_specs.select { |spec| !spec.loaded_from }
+
+      if not_installed.any?
+        not_installed.each { |s| Bundler.ui.error "#{s.name} (#{s.version}) is cached, but not installed" }
         Bundler.ui.warn "Install missing gems with `bundle install`"
         exit 1
       else
-        not_installed = env.requested_specs.select { |spec| !spec.loaded_from }
-
-        if not_installed.any?
-          not_installed.each { |s| Bundler.ui.error "#{s.name} (#{s.version}) is cached, but not installed" }
-          Bundler.ui.warn "Install missing gems with `bundle install`"
-          exit 1
-        else
-          Bundler.ui.info "The Gemfile's dependencies are satisfied"
-        end
+        Bundler.ui.info "The Gemfile's dependencies are satisfied"
       end
     end
 

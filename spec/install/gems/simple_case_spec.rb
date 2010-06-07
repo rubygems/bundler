@@ -162,6 +162,7 @@ describe "bundle install with gem sources" do
     end
 
     it "ensures that gems are actually installed and not just cached" do
+      pending "Is this even true anymore when not running bundle pack?"
       build_repo2
       gemfile <<-G
         source "file://#{gem_repo2}"

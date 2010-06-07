@@ -62,7 +62,7 @@ module Bundler
     end
 
     def specs
-      @specs ||= resolve
+      @specs ||= resolve.materialize(requested_dependencies)
     end
 
     def requested_specs
@@ -83,9 +83,21 @@ module Bundler
       specs.for(expand_dependencies(deps))
     end
 
-    def last_resolve
-      specs
-      @last_resolve
+    def resolve
+      @resolve ||= begin
+        if @last_resolve.valid_for?(expanded_dependencies)
+          @last_resolve
+        else
+          source_requirements = {}
+          dependencies.each do |dep|
+            next unless dep.source
+            source_requirements[dep.name] = dep.source.specs
+          end
+
+          # Run a resolve against the locally available gems
+          Resolver.resolve(expanded_dependencies, index, source_requirements, @last_resolve)
+        end
+      end
     end
 
     def index
@@ -111,7 +123,7 @@ module Bundler
         # Add the source header
         out << source.to_lock
         # Find all specs for this source
-        last_resolve.
+        resolve.
           select  { |s| s.source == source }.
           sort_by { |s| [s.name, s.platform.to_s == 'ruby' ? "\0" : s.platform.to_s] }.
           each do |spec|
@@ -221,20 +233,6 @@ module Bundler
       groups = self.groups - Bundler.settings.without
       groups.map! { |g| g.to_sym }
       dependencies.reject { |d| !d.should_include? || (d.groups & groups).empty? }
-    end
-
-    def resolve
-      unless @last_resolve.valid_for?(expanded_dependencies)
-        source_requirements = {}
-        dependencies.each do |dep|
-          next unless dep.source
-          source_requirements[dep.name] = dep.source.specs
-        end
-
-        # Run a resolve against the locally available gems
-        @last_resolve = Resolver.resolve(expanded_dependencies, index, source_requirements, @last_resolve)
-      end
-      @last_resolve.materialize(requested_dependencies)
     end
   end
 end
