@@ -319,15 +319,10 @@ module Bundler
     def search(dep)
       results = @base[dep.name]
 
-      if results.any?
-        d = Gem::Dependency.new(dep.name, results.first.version)
-      else
-        d = dep.dep
+      if results.empty?
+        index = @source_requirements[dep.name] || @index
+        results = index.search_for_all_platforms(dep.dep)
       end
-
-      index = @source_requirements[d.name] || @index
-      # results = index.search_for_all_platforms(d) + results
-      results += index.search_for_all_platforms(d)
 
       if results.any?
         version = results.first.version

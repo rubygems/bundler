@@ -49,19 +49,6 @@ describe "bundle install across platforms" do
   end
 
   it "works with gems that have different dependencies" do
-    lockfile <<-G
-      GEM
-        remote: file:#{gem_repo1}
-        specs:
-          nokogiri (1.4.2)
-
-      PLATFORMS
-        ruby
-
-      DEPENDENCIES
-        platform_specific
-    G
-
     install_gemfile <<-G
       Gem.platforms = [Gem::Platform::RUBY, Gem::Platform.new('#{java}')]
       source "file://#{gem_repo1}"
