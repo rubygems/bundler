@@ -99,12 +99,16 @@ module Bundler
 
         # SUDO HAX
         if Bundler.requires_sudo?
-          `sudo mkdir -p #{Gem.dir}/gems #{Gem.dir}/specifications`
-          `sudo mv #{Bundler.tmp}/gems/#{spec.full_name} #{Gem.dir}/gems/`
-          `sudo mv #{Bundler.tmp}/specifications/#{spec.full_name}.gemspec #{Gem.dir}/specifications/`
+          sudo "mkdir -p #{Gem.dir}/gems #{Gem.dir}/specifications"
+          sudo "mv #{Bundler.tmp}/gems/#{spec.full_name} #{Gem.dir}/gems/"
+          sudo "mv #{Bundler.tmp}/specifications/#{spec.full_name}.gemspec #{Gem.dir}/specifications/"
         end
 
         spec.loaded_from = "#{Gem.dir}/specifications/#{spec.full_name}.gemspec"
+      end
+
+      def sudo(str)
+        `sudo -E #{str}`
       end
 
       def cache(spec)
@@ -222,8 +226,8 @@ module Bundler
         Gem::RemoteFetcher.fetcher.download(spec, uri, download_path)
 
         if Bundler.requires_sudo?
-          `sudo mkdir -p #{Gem.dir}/cache`
-          `sudo mv #{Bundler.tmp}/cache/#{spec.full_name}.gem #{gem_path}`
+          sudo "mkdir -p #{Gem.dir}/cache"
+          sudo "mv #{Bundler.tmp}/cache/#{spec.full_name}.gem #{gem_path}"
         end
 
         gem_path
@@ -510,7 +514,12 @@ module Bundler
     private
 
       def git(command)
-        out = %x{git #{command}}
+        if Bundler.requires_sudo?
+          out = %x{sudo -E git #{command}}
+        else
+          out = %x{git #{command}}
+        end
+
         if $? != 0
           raise GitError, "An error has occurred in git. Cannot complete bundling."
         end

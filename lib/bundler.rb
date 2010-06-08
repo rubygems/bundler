@@ -174,10 +174,13 @@ module Bundler
       SharedHelpers.default_gemfile
     end
 
+    WINDOWS = Config::CONFIG["host_os"] =~ %r!(msdos|mswin|djgpp|mingw)!
+    NULL    = WINDOWS ? "NUL" : "/dev/null"
+
     def requires_sudo?
       case
       when File.writable?(bundle_path) ||
-           `which sudo 2>NUL`.empty? ||
+           `which sudo 2>#{NULL}`.empty? ||
            File.owned?(bundle_path)
         false
       else
