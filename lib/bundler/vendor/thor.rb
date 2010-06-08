@@ -136,7 +136,15 @@ class Thor
     #
     def start(original_args=ARGV, config={})
       super do |given_args|
-        meth = normalize_task_name(given_args.shift)
+        meth = given_args.first.to_s
+
+        if !meth.empty? && (map[meth] || meth !~ /^\-/)
+          given_args.shift
+        else
+          meth = nil
+        end
+
+        meth = normalize_task_name(meth)
         task = all_tasks[meth]
 
         if task
