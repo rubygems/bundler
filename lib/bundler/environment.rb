@@ -1,5 +1,3 @@
-require 'erb'
-
 module Bundler
   class Environment
     attr_reader :root
