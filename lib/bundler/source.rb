@@ -79,21 +79,22 @@ module Bundler
       end
 
       def install(spec)
-        Bundler.ui.info "Installing #{spec.name} (#{spec.version}) "
-
         path = cached_gem(spec)
 
-        return if @installed[spec.full_name]
+        if @installed[spec.full_name]
+          Bundler.ui.info "Using #{spec.name} (#{spec.version}) "
+          return
+        else
+          Bundler.ui.info "Installing #{spec.name} (#{spec.version}) "
+        end
 
         install_path = Bundler.requires_sudo? ? Bundler.tmp : Gem.dir
-
         installer = Gem::Installer.new path,
           :install_dir         => install_path,
           :ignore_dependencies => true,
           :wrappers            => true,
           :env_shebang         => true,
           :bin_dir             => "#{install_path}/bin"
-
         installer.install
 
         # SUDO HAX
