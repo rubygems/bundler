@@ -1,5 +1,3 @@
-# This is not actually required by the actual library
-# loads the bundled environment
 require 'bundler/shared_helpers'
 
 if Bundler::SharedHelpers.in_bundle?
