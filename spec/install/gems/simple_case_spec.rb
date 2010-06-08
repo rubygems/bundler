@@ -439,11 +439,6 @@ describe "bundle install with gem sources" do
         build_gem "bundler", "0.9.1"
         build_gem "bundler", Bundler::VERSION
       end
-      ENV["BUNDLER_VERSION"] = "0.9.1"
-    end
-
-    after(:each) do
-      ENV["BUNDLER_VERSION"] = nil
     end
 
     it "are forced to the current bundler version" do
