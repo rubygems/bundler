@@ -87,7 +87,7 @@ describe "bundle cache" do
     it "re-caches during install" do
       cached_gem("rack-1.0.0").rmtree
       bundle :install
-      out.should include("Copying .gem files into vendor/cache")
+      out.should include("Updating .gem files in vendor/cache")
       cached_gem("rack-1.0.0").should exist
     end
 
