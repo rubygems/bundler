@@ -79,7 +79,7 @@ module Bundler
       end
 
       def install(spec)
-        Bundler.ui.info "Installing #{spec.name} (#{spec.version})"
+        Bundler.ui.info "Installing #{spec.name} (#{spec.version}) "
 
         path = cached_gem(spec)
 
@@ -359,11 +359,11 @@ module Bundler
       end
 
       def install(spec)
-        Bundler.ui.info "Using #{spec.name} (#{spec.version}) from #{to_s}"
+        Bundler.ui.info "Using #{spec.name} (#{spec.version}) from #{to_s} "
         # Let's be honest, when we're working from a path, we can't
         # really expect native extensions to work because the whole point
         # is to just be able to modify what's in that path and go. So, let's
-        # not put ourselfs through the pain of actually trying to generate
+        # not put ourselves through the pain of actually trying to generate
         # the full gem.
         Installer.new(spec).generate_bin
       end
@@ -492,7 +492,7 @@ module Bundler
       end
 
       def install(spec)
-        Bundler.ui.info "Using #{spec.name} (#{spec.version}) from #{to_s}"
+        Bundler.ui.info "Using #{spec.name} (#{spec.version}) from #{to_s} "
 
         unless @installed
           Bundler.ui.debug "  * Checking out revision: #{ref}"
