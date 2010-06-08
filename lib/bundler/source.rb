@@ -66,7 +66,7 @@ module Bundler
 
       def to_s
         remotes = self.remotes.map { |r| r.to_s }.join(', ')
-        "rubygems repository: #{remotes}"
+        "rubygems repository #{remotes}"
       end
 
       def specs
@@ -201,13 +201,17 @@ module Bundler
       end
 
       def fetch_all_remote_specs(&blk)
-        # Fetch all specs, minus prerelease specs
-        Gem::SpecFetcher.new.list(true, false).each(&blk)
-        # Then fetch the prerelease specs
         begin
-          Gem::SpecFetcher.new.list(false, true).each(&blk)
+          # Fetch all specs, minus prerelease specs
+          Gem::SpecFetcher.new.list(true, false).each(&blk)
+          # Then fetch the prerelease specs
+          begin
+            Gem::SpecFetcher.new.list(false, true).each(&blk)
+          rescue Gem::RemoteFetcher::FetchError
+            Bundler.ui.warn "Could not fetch prerelease specs from #{self}"
+          end
         rescue Gem::RemoteFetcher::FetchError
-          Bundler.ui.warn "Could not fetch prerelease specs from #{self}"
+          Bundler.ui.warn "Could not reach #{self}"
         end
       end
 
