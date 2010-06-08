@@ -124,6 +124,7 @@ module Bundler
       @definition = nil if unlock
       @definition ||= begin
         configure
+        upgrade_lockfile
         lockfile = root.join("Gemfile.lock")
         Definition.build(default_gemfile, lockfile, unlock)
       end
@@ -200,5 +201,29 @@ module Bundler
 
       Gem.clear_paths
     end
+
+    def upgrade_lockfile
+      lockfile = root.join("Gemfile.lock")
+      if lockfile.exist? && lockfile.read(3) == "---"
+        Bundler.ui.warn "Updating Gemfile.lock from 0.9 format to 1.0 format..."
+
+        lock = YAML.load_file(lockfile)
+
+        source_uris = lock["sources"].map{|s| s["Rubygems"]["uri"] }
+        sources = [Bundler::Source::Rubygems.new({"remotes" => source_uris})]
+
+        deps = lock["dependencies"].map do |name, opts|
+          version = opts.delete("version")
+          Bundler::Dependency.new(name, version, opts)
+        end
+
+        definition = Bundler::Definition.new(nil, deps, sources, {})
+
+        File.open(lockfile, 'w') do |f|
+          f.write definition.to_lock
+        end
+      end
+    end
+
   end
 end
