@@ -29,3 +29,8 @@
   - We will reduce open bug count to 0 for the final 1.0 release.
   - Some additional features that require more thought. For details,
     see http://github.com/carlhuda/bundler/issues/labels/1.0
+
+# 1.1
+
+  - Stop upgrading 0.9 lockfiles
+  - Delete vestigial gems installed into ~/.bundle/ by 0.9
