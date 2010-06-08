@@ -117,8 +117,7 @@ describe "bundle flex_install" do
       should_be_installed "rack 1.0.0", 'activesupport 2.3.2'
     end
 
-    it "rebuilds env.rb correctly" do
-      pending
+    it "removes top level dependencies when removed from the Gemfile while leaving other dependencies intact" do
       build_repo2
       flex_install_gemfile <<-G
         source "file://#{gem_repo2}"

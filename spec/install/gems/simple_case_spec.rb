@@ -331,10 +331,6 @@ describe "bundle install with gem sources" do
       end
     end
 
-    it "warns when using --disable-shared-gems when not specifying a bundle path" do
-      pending
-    end
-
     it "does not use available system gems" do
       gemfile <<-G
         source "file://#{gem_repo1}"
@@ -434,7 +430,7 @@ describe "bundle install with gem sources" do
     before(:each) do
       build_repo2 do
         build_gem "rails", "3.0" do |s|
-          s.add_dependency "bundler", "~>0.9.0"
+          s.add_dependency "bundler", ">= 0.9.0.pre"
         end
         build_gem "bundler", "0.9.1"
         build_gem "bundler", Bundler::VERSION
@@ -446,7 +442,8 @@ describe "bundle install with gem sources" do
         source "file://#{gem_repo2}"
         gem "rails", "3.0"
       G
-      should_be_installed "bundler 0.9.1"
+
+      should_be_installed "bundler #{Bundler::VERSION}"
     end
 
     it "are not added if not already present" do
@@ -458,7 +455,6 @@ describe "bundle install with gem sources" do
     end
 
     it "cause a conflict if explicitly requesting a different version" do
-      pending "I have a headache"
       install_gemfile <<-G
         source "file://#{gem_repo2}"
         gem "rails", "3.0"

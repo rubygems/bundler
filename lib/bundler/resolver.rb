@@ -181,7 +181,13 @@ module Bundler
 
       # Check if the gem has already been activated, if it has, we will make sure
       # that the currently activated gem satisfies the requirement.
-      if existing = activated[current.name]
+      if existing = activated[current.name] or current.name == 'bundler'
+        # Force the current
+        if current.name == 'bundler' && !existing
+          existing = search(DepProxy.new(Gem::Dependency.new('bundler', VERSION), Gem::Platform::RUBY)).first
+          activated[current.name] = existing
+        end
+
         if current.requirement.satisfied_by?(existing.version)
           debug { "    * [SUCCESS] Already activated" }
           @errors.delete(existing.name)
