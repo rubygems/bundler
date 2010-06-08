@@ -86,7 +86,7 @@ module Bundler
 
     def bin_path
       @bin_path ||= begin
-        path = settings[:bin] || "#{Gem.user_home}/.bundler/bin"
+        path = settings[:bin] || "#{Gem.user_home}/.bundle/bin"
         FileUtils.mkdir_p(path)
         Pathname.new(path).expand_path
       end
