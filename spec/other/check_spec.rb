@@ -136,9 +136,10 @@ describe "bundle check" do
     G
 
     simulate_new_machine
-    10.times do
+    3.times do |i|
       bundle :check
       @err.should == ""
+      sleep 0.2 # Dunno why this is needed
     end
   end
 

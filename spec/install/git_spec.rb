@@ -112,6 +112,7 @@ describe "bundle install with git sources" do
 
       bundle :install, :expect_err => true
 
+      puts err unless err.empty? # This spec fails randomly every so often
       err.should include("example.fkdmn1234fake.com")
       err.should include("ssh")
     end

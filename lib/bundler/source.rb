@@ -435,6 +435,7 @@ module Bundler
         @uri      = options["uri"]
         @ref      = options["ref"] || options["branch"] || options["tag"] || 'master'
         @revision = options["revision"]
+        @update   = false
       end
 
       def self.from_lock(options)
@@ -480,10 +481,11 @@ module Bundler
       end
 
       def specs
-        if @allow_remote
+        if @allow_remote && !@update
         # Start by making sure the git cache is up to date
           cache
           checkout
+          @update = true
         end
         local_specs
       end
