@@ -85,6 +85,31 @@ describe "the lockfile format" do
     G
   end
 
+  it "parses lockfiles w/ crazy shit" do
+    flex_install_gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "net-sftp"
+    G
+
+    lockfile_should_be <<-G
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          net-sftp (1.1.1)
+            net-ssh (>= 1.0.0, < 1.99.0)
+          net-ssh (1.0)
+
+      PLATFORMS
+        ruby
+
+      DEPENDENCIES
+        net-sftp
+    G
+
+    should_be_installed "net-sftp 1.1.1", "net-ssh 1.0.0"
+  end
+
   it "generates a simple lockfile for a single pinned source, gem with a version requirement" do
     git = build_git "foo"
 

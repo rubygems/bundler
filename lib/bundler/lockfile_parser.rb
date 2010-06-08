@@ -83,7 +83,10 @@ module Bundler
         @current_spec.source = @current_source
         @specs << @current_spec
       elsif line =~ %r{^ {6}#{NAME_VERSION}$}
-        @current_spec.dependencies << Gem::Dependency.new($1, $2)
+        name, version = $1, $2
+        version = version.split(',').map { |d| d.strip } if version
+        dep = Gem::Dependency.new(name, version)
+        @current_spec.dependencies << dep
       end
     end
 

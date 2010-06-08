@@ -170,6 +170,11 @@ module Spec
           s.write "lib/rcov.rb", "RCOV = '1.0.0'"
         end
 
+        build_gem "net-ssh"
+        build_gem "net-sftp", "1.1.1" do |s|
+          s.add_dependency "net-ssh", ">= 1.0.0", "< 1.99.0"
+        end
+
         # Test comlicated gem dependencies for install
         build_gem "net_a" do |s|
           s.add_dependency "net_b"
