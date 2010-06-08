@@ -255,9 +255,14 @@ module Bundler
     map %w(-v --version) => :version
 
     desc 'viz', "Generates a visual dependency graph"
-    method_option :file, :type => :string, :default => 'gem_graph.png', :aliases => '-f', :banner => "Show the version with each gem name."
-    method_option :version, :type => :boolean, :default => false, :aliases => '-v', :banner => "Show the version with each gem name."
-    method_option :requirements, :type => :boolean, :default => false, :aliases => '-r', :banner => "Show the requirement for each dependency."
+    long_desc <<-D
+      Viz generates a PNG file of the current Gemfile as a dependency graph.
+      Viz requires the ruby-graphviz gem (and its dependencies).
+      The associated gems must also be installed via 'bundle install'.
+    D
+    method_option :file, :type => :string, :default => 'gem_graph.png', :aliases => '-f', :banner => "The name to use for the generated png file."
+    method_option :version, :type => :boolean, :default => false, :aliases => '-v', :banner => "Set to show each gem version."
+    method_option :requirements, :type => :boolean, :default => false, :aliases => '-r', :banner => "Set to show the version of each required dependency."
     def viz
       output_file = File.expand_path(options[:file])
       graph = Graph.new( Bundler.load )
