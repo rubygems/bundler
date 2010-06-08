@@ -68,7 +68,7 @@ module Bundler
     def cache
       FileUtils.mkdir_p(cache_path)
 
-      Bundler.ui.info "Copying .gem files into vendor/cache"
+      Bundler.ui.info "Updating .gem files in vendor/cache"
       specs.each do |spec|
         spec.source.cache(spec) if spec.source.respond_to?(:cache)
       end
