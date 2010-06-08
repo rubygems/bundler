@@ -31,21 +31,14 @@ module Bundler
     end
 
     def lock
-      write_yml_lock
+      File.open(root.join('Gemfile.lock'), 'w') do |f|
+        f.puts @definition.to_lock
+      end
     end
 
     def update(*gems)
       # Nothing
     end
 
-  private
-
-    # ==== Locking
-
-    def write_yml_lock
-      File.open(root.join('Gemfile.lock'), 'w') do |f|
-        f.puts @definition.to_lock
-      end
-    end
   end
 end
