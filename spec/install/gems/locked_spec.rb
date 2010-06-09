@@ -1,27 +1,6 @@
 require "spec_helper"
 
 describe "bundle install with gem sources" do
-  describe "when locked" do
-    before(:each) do
-      system_gems "rack-0.9.1" do
-        gemfile <<-G
-          source "file://#{gem_repo1}"
-          gem "rack"
-        G
-
-        bundle :lock
-      end
-    end
-
-    it "allows --relock to update the dependencies" do
-      pending_bundle_update
-      system_gems "rack-0.9.1" do
-        bundle "install --relock"
-        should_be_installed "rack 1.0.0"
-      end
-    end
-  end
-
   describe "when locked and installed with --without" do
     before(:each) do
       build_repo2
