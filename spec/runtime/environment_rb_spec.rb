@@ -117,7 +117,9 @@ describe "environment.rb file" do
         G
       end
 
-      gemfile %|gem "bar", :git => "#{lib_path('bar-1.0')}"|
+      gemfile <<-G
+        gem "bar", :git => "#{lib_path('bar-1.0')}"
+      G
     end
 
     it "evals each gemspec in the context of its parent directory" do
@@ -137,7 +139,8 @@ describe "environment.rb file" do
     end
 
     it "evals each gemspec with a binding from the top level" do
-      pending "What does this test even mean?"
+      bundle "install"
+
       ruby <<-RUBY
         require 'bundler'
         def Bundler.require(path)
@@ -145,51 +148,9 @@ describe "environment.rb file" do
         end
         Bundler.load
       RUBY
+
       err.should be_empty
       out.should be_empty
-    end
-  end
-
-  describe "versioning" do
-    before :each do
-      install_gemfile <<-G
-        source "file://#{gem_repo1}"
-        gem "rack"
-      G
-      bundle :lock
-      should_be_locked
-    end
-
-    it "tells you to install if lock is outdated" do
-      pending
-      gemfile <<-G
-        source "file://#{gem_repo1}"
-        gem "rack", "1.0"
-      G
-      run "puts 'lockfile current'", :lite_runtime => true, :expect_err => true
-      out.should_not include("lockfile current")
-      err.should include("Gemfile changed since you last locked.")
-      err.should include("Please run `bundle lock` to relock.")
-    end
-
-    it "regenerates if from an old bundler" do
-      pending
-    end
-
-    it "requests regeneration if it's out of sync" do
-      pending
-      old_env = File.read(env_file)
-      install_gemfile <<-G, :relock => true
-        source "file://#{gem_repo1}"
-        gem "activesupport"
-      G
-      should_be_locked
-
-      env_file(old_env)
-      run "puts 'fingerprints synced'", :lite_runtime => true, :expect_err => true
-      out.should_not include("fingerprints synced")
-      err.should include("out of date")
-      err.should include("`bundle install`")
     end
   end
 

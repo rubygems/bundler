@@ -116,22 +116,6 @@ describe "Bundler.setup" do
     end
   end
 
-  describe "when locked" do
-    it "regenerates .bundle/environment.rb if it does not exist" do
-      pending "Need to look into this. It probably requires more work after the 0.10 changes."
-      system_gems "rack-1.0.0"
-
-      gemfile <<-G
-        gem "rack"
-      G
-
-      bundle :lock
-
-      should_be_installed "rack 1.0.0"
-      bundled_app('.bundle/environment.rb').should exist
-    end
-  end
-
   describe "when excluding groups" do
     it "doesn't change the resolve if --without is used" do
       install_gemfile <<-G, :without => :rails

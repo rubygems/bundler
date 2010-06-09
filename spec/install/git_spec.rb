@@ -257,25 +257,26 @@ describe "bundle install with git sources" do
   end
 
   it "handles repos that have been force-pushed" do
-    pending_bundle_update
     build_git "forced", "1.0"
+
     install_gemfile <<-G
       git "#{lib_path('forced-1.0')}"
       gem 'forced'
     G
     should_be_installed "forced 1.0"
 
-
     update_git "forced" do |s|
       s.write "lib/forced.rb", "FORCED = '1.1'"
     end
-    bundle :install
+
+    bundle "update"
     should_be_installed "forced 1.1"
 
     Dir.chdir(lib_path('forced-1.0')) do
       `git reset --hard HEAD^`
     end
-    bundle :install
+
+    bundle "update"
     should_be_installed "forced 1.0"
   end
 

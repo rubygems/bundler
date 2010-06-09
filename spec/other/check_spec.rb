@@ -87,7 +87,6 @@ describe "bundle check" do
   end
 
   it "ignores missing gems restricted to other platforms" do
-    pending
     system_gems "rack-1.0.0"
 
     gemfile <<-G
@@ -115,12 +114,38 @@ describe "bundle check" do
     G
 
     bundle :check
-    puts out
     out.should == "The Gemfile's dependencies are satisfied"
   end
 
   it "works with env conditionals" do
-    pending
+    system_gems "rack-1.0.0"
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack"
+      env :NOT_GOING_TO_BE_SET do
+        gem "activesupport"
+      end
+    G
+
+    lockfile <<-G
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          activesupport (2.3.5)
+          rack (1.0.0)
+
+      PLATFORMS
+        #{local}
+        #{not_local}
+
+      DEPENDENCIES
+        rack
+        activesupport
+    G
+
+    bundle :check
+    out.should == "The Gemfile's dependencies are satisfied"
   end
 
   it "outputs an error when the default Gemfile is not found" do
