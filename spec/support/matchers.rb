@@ -31,7 +31,8 @@ module Spec
       groups << opts
       names.each do |name|
         name, version, platform = name.split(/\s+/)
-        run "load '#{name}.rb'; puts #{Spec::Builders.constantize(name)}", *groups
+        version_const = name == 'bundler' ? 'Bundler::VERSION' : Spec::Builders.constantize(name)
+        run "require '#{name}.rb'; puts #{version_const}", *groups
         actual_version, actual_platform = out.split(/\s+/)
         Gem::Version.new(actual_version).should == Gem::Version.new(version)
         actual_platform.should == platform

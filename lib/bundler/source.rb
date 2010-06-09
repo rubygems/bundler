@@ -150,10 +150,22 @@ module Bundler
         @installed_specs ||= begin
           idx = Index.new
           Gem::SourceIndex.from_installed_gems.to_a.reverse.each do |name, spec|
+            next if name == 'bundler'
             @installed[spec.full_name] = true
             spec.source = self
             idx << spec
           end
+          # Always have bundler locally
+          bundler = Gem::Specification.new do |s|
+            s.name     = 'bundler'
+            s.version  = VERSION
+            s.platform = Gem::Platform::RUBY
+            s.source   = self
+            # TODO: Remove this
+            s.loaded_from = 'w0t'
+          end
+          @installed[bundler.full_name] = true
+          idx << bundler
           idx
         end
       end
@@ -163,6 +175,7 @@ module Bundler
           idx = Index.new
           @caches.each do |path|
             Dir["#{path}/*.gem"].each do |gemfile|
+              next if name == 'bundler'
               s = Gem::Format.from_file_by_path(gemfile).spec
               s.source = self
               idx << s
@@ -183,6 +196,7 @@ module Bundler
             Gem.sources = ["#{uri}"]
             fetch_all_remote_specs do |n,v|
               v.each do |name, version, platform|
+                next if name == 'bundler'
                 spec = RemoteSpecification.new(name, version, platform, uri)
                 spec.source = self
                 # Temporary hack until this can be figured out better

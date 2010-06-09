@@ -129,6 +129,9 @@ module Bundler
       end
 
       Installer.install Bundler.root, Bundler.definition
+      cache if Bundler.root.join("vendor/cache").exist?
+      Bundler.ui.confirm "Your bundle is updated! " +
+        "Use `bundle show [gemname]` to see where a bundled gem is installed."
     end
 
     desc "lock", "Locks the bundle to the current set of dependencies, including all child dependencies."
