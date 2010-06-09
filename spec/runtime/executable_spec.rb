@@ -68,6 +68,10 @@ describe "Running commands" do
   end
 
   it "don't bundle da bundla" do
+    build_gem "bundler", Bundler::VERSION, :to_system => true do |s|
+      s.executables = "bundle"
+    end
+
     install_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "bundler"
