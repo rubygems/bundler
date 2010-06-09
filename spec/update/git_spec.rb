@@ -38,5 +38,24 @@ describe "bundle update" do
 
       should_be_installed "foo 1.1"
     end
+
+    it "notices when you change the repo url in the Gemfile" do
+      build_git "foo", :path => lib_path("foo_one")
+      build_git "foo", :path => lib_path("foo_two")
+
+      install_gemfile <<-G
+        gem "foo", "1.0", :git => "#{lib_path('foo_one')}"
+      G
+
+      FileUtils.rm_rf lib_path("foo_one")
+
+      install_gemfile <<-G
+        gem "foo", "1.0", :git => "#{lib_path('foo_two')}"
+      G
+
+      err.should be_empty
+      out.should include("Fetching #{lib_path}/foo_two")
+      out.should include("Your bundle is complete!")
+    end
   end
 end
