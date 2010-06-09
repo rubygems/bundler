@@ -146,7 +146,11 @@ module Bundler
           index = Index.new
 
           Dir["#{@path}/*.gem"].each do |gemfile|
-            spec = Gem::Format.from_file_by_path(gemfile).spec
+            begin
+              spec = Gem::Format.from_file_by_path(gemfile).spec
+            rescue Zlib::GzipFile::Error
+              raise GemspecError, "Zlib error while reading #{gemfile}. Chances are good that it is corrupted, and you need to delete it."
+            end
             next unless Gem::Platform.match(spec.platform)
             spec.source = self
             index << spec
