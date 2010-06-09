@@ -323,6 +323,27 @@ describe "bundle install with gem sources" do
     end
   end
 
+  describe "when requesting a quite install via --quiet" do
+    it "should be quiet if there are no warnings" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem 'rack'
+      G
+
+      bundle :install, :quiet => true
+      out.should == ""
+    end
+
+    it "should still display warnings" do
+      gemfile <<-G
+        gem 'rack'
+      G
+
+      bundle :install, :quiet => true
+      out.should =~ /doesn't have any sources/
+    end
+  end
+
   describe "when disabling system gems" do
     before :each do
       build_gem "rack", "1.0.0", :to_system => true do |s|

@@ -15,18 +15,19 @@ module Bundler
     class Shell < UI
       def initialize(shell)
         @shell = shell
+        @quiet = false
       end
 
       def debug(msg)
-        @shell.say(msg) if ENV['DEBUG']
+        @shell.say(msg) if ENV['DEBUG'] && !@quiet
       end
 
       def info(msg)
-        @shell.say(msg)
+        @shell.say(msg) if !@quiet
       end
 
       def confirm(msg)
-        @shell.say(msg, :green)
+        @shell.say(msg, :green) if !@quiet
       end
 
       def warn(msg)
@@ -35,6 +36,10 @@ module Bundler
 
       def error(msg)
         @shell.say(msg, :red)
+      end
+
+      def be_quiet!
+        @quiet = true
       end
     end
 

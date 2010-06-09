@@ -89,6 +89,8 @@ module Bundler
       "Don't remove stale gems from the cache."
     method_option "no-cache", :type => :boolean, :banner =>
       "Don't update the existing gem cache."
+    method_option "quiet", :type => :boolean, :banner =>
+      "Only output warnings and errors."
     def install(path = nil)
       opts = options.dup
       opts[:without] ||= []
@@ -99,6 +101,7 @@ module Bundler
       Bundler.settings[:path] = path if path
       Bundler.settings[:disable_shared_gems] = '1' if options["disable-shared-gems"] || path
       Bundler.settings.without = opts[:without]
+      Bundler.ui.be_quiet! if opts[:quiet]
 
       Installer.install(Bundler.root, Bundler.definition, opts)
       cache if Bundler.root.join("vendor/cache").exist?
