@@ -16,7 +16,6 @@ module Bundler
         @remotes = (options["remotes"] || []).map { |r| normalize_uri(r) }
         @allow_remote = false
         # Hardcode the paths for now
-        @installed = {}
         @caches = [ Bundler.app_cache ] + Gem.path.map { |p| File.expand_path("#{p}/cache") }
         @spec_fetch_map = {}
       end
@@ -81,12 +80,12 @@ module Bundler
       def install(spec)
         path = cached_gem(spec)
 
-        if @installed[spec.full_name]
+        if installed_specs[spec].any?
           Bundler.ui.info "Using #{spec.name} (#{spec.version}) "
           return
-        else
-          Bundler.ui.info "Installing #{spec.name} (#{spec.version}) "
         end
+
+        Bundler.ui.info "Installing #{spec.name} (#{spec.version}) "
 
         install_path = Bundler.requires_sudo? ? Bundler.tmp : Gem.dir
         installer = Gem::Installer.new path,
@@ -141,7 +140,7 @@ module Bundler
       def fetch_specs
         Index.build do |idx|
           idx.use installed_specs
-          idx.use cached_specs
+          # idx.use cached_specs
           idx.use remote_specs
         end
       end
@@ -151,7 +150,6 @@ module Bundler
           idx = Index.new
           Gem::SourceIndex.from_installed_gems.to_a.reverse.each do |name, spec|
             next if name == 'bundler'
-            @installed[spec.full_name] = true
             spec.source = self
             idx << spec
           end
@@ -164,7 +162,6 @@ module Bundler
             # TODO: Remove this
             s.loaded_from = 'w0t'
           end
-          @installed[bundler.full_name] = true
           idx << bundler
           idx
         end
