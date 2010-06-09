@@ -463,14 +463,14 @@ describe "bundle install with gem sources" do
     end
   end
 
-  describe_sudo "it working when $GEM_HOME is owned by root" do
-    it "installs gems" do
-      install_gemfile <<-G
-        source "file://#{gem_repo1}"
-        gem 'rack'
-      G
-
-      should_be_installed("rack 1.0.0")
-    end
-  end
+  # describe_sudo "it working when $GEM_HOME is owned by root" do
+  #   it "installs gems" do
+  #     install_gemfile <<-G
+  #       source "file://#{gem_repo1}"
+  #       gem 'rack'
+  #     G
+  #
+  #     should_be_installed("rack 1.0.0")
+  #   end
+  # end
 end
