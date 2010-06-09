@@ -86,17 +86,21 @@ describe "bundle install with git sources" do
   end
 
   describe "specified inline" do
-    it "supports private git URLs" do
-      gemfile <<-G
-        gem "thingy", :git => "git@example.fkdmn1234fake.com:somebody/thingy.git"
-      G
-
-      bundle :install, :expect_err => true
-
-      puts err unless err.empty? # This spec fails randomly every so often
-      err.should include("example.fkdmn1234fake.com")
-      err.should include("ssh")
-    end
+    # TODO: Figure out how to write this test so that it is not flaky depending
+    #       on the current network situation.
+    # it "supports private git URLs" do
+    #   gemfile <<-G
+    #     gem "thingy", :git => "git@notthere.fallingsnow.net:somebody/thingy.git"
+    #   G
+    #
+    #   bundle :install, :expect_err => true
+    #
+    #   # p out
+    #   # p err
+    #   puts err unless err.empty? # This spec fails randomly every so often
+    #   err.should include("notthere.fallingsnow.net")
+    #   err.should include("ssh")
+    # end
 
     it "installs from git even if a newer gem is available elsewhere" do
       build_git "rack", "0.8"
