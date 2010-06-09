@@ -156,29 +156,18 @@ describe "bundle check" do
 
   it "should not crash when called multiple times on a new machine" do
     gemfile <<-G
-    gem 'rails', '3.0.0.beta3'
-    gem 'paperclip', :git => 'git://github.com/thoughtbot/paperclip.git'
+      gem 'rails', '3.0.0.beta3'
+      gem 'paperclip', :git => 'git://github.com/thoughtbot/paperclip.git'
     G
 
     simulate_new_machine
+    bundle "check"
+    last_out = out
     3.times do |i|
       bundle :check
-      @err.should == ""
-      sleep 0.2 # Dunno why this is needed
+      out.should == last_out
+      err.should be_empty
     end
-  end
-
-  it "should return the same result when called multiple times on a new machine" do
-    gemfile <<-G
-    gem 'rails', '3.0.0.beta3'
-    gem 'haml'
-    G
-
-    simulate_new_machine
-    bundle :check
-    last_out = @out
-    bundle :check
-    @out.should == last_out
   end
 
   describe "when locked" do
