@@ -48,8 +48,8 @@ Spec::Runner.configure do |config|
     # e.g. check foo.should == bar
   end
 
-  def pending_bundle_update
-    pending "bundle install does NOT update the git ref anymore. This is a bundle update feature"
+  def pending_cache_fixes
+    pending "pending fixing the cache stuff"
   end
 
   config.before :all do

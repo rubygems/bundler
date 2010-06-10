@@ -17,6 +17,7 @@ describe "bundle cache" do
     end
 
     it "uses the cache as a source when installing gems" do
+      pending_cache_fixes
       system_gems []
       bundle :install
 
@@ -36,6 +37,7 @@ describe "bundle cache" do
     end
 
     it "does not reinstall gems from the cache if they exist in the bundle" do
+      pending_cache_fixes
       system_gems []
       install_gemfile <<-G
         gem "rack"
@@ -52,6 +54,7 @@ describe "bundle cache" do
 
   describe "when there are also git sources" do
     it "still works" do
+      pending_cache_fixes
       build_git "foo"
       system_gems "rack-1.0.0"
 

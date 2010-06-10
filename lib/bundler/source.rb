@@ -26,9 +26,8 @@ module Bundler
 
       def [](spec)
         installed_specs[spec].first ||
-        @allow_remote && (
-          cached_specs[spec].first  ||
-          remote_specs[spec].first)
+        (@allow_remote && (
+          remote_specs[spec].first))
       end
 
       def hash

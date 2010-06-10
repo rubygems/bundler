@@ -3,6 +3,7 @@ require "spec_helper"
 describe "bundle install with gem sources" do
   describe "when cached and locked" do
     it "does not hit the remote at all" do
+      pending_cache_fixes
       build_repo2
       install_gemfile <<-G
         source "file://#{gem_repo2}"
