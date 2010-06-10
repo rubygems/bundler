@@ -131,7 +131,7 @@ module Bundler
         # Find all specs for this source
         resolve.
           select  { |s| s.source == source }.
-          sort_by { |s| [s.name, s.platform.to_s == 'ruby' ? "\0" : s.platform.to_s] }.
+          sort_by { |s| s.name }.
           each do |spec|
             out << spec.to_lock
         end
@@ -201,7 +201,7 @@ module Bundler
 
       resolve = SpecSet.new(converged)
       resolve = resolve.for(expand_dependencies(deps), @unlock[:gems])
-      @last_resolve.select!(resolve.names)
+      @last_resolve = resolve
     end
 
     def in_locked_deps?(dep)

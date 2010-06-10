@@ -24,12 +24,6 @@ module Bundler
         @allow_remote = true
       end
 
-      def [](spec)
-        installed_specs[spec].first ||
-        (@allow_remote && (
-          remote_specs[spec].first))
-      end
-
       def hash
         Rubygems.hash
       end
@@ -348,10 +342,6 @@ module Bundler
         end
 
         index
-      end
-
-      def [](spec)
-        specs[spec].first
       end
 
       def local_specs

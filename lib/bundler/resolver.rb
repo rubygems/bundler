@@ -49,11 +49,16 @@ module Bundler
 
       def to_specs
         specs = {}
-        each do |s|
-          next if specs[s.platform]
-          lazy_spec = LazySpecification.new(s.name, s.version, s.platform, s.source)
-          lazy_spec.dependencies.replace s.dependencies
-          specs[s.platform] = lazy_spec
+
+        @activated.each do |p|
+          if s = @specs[p]
+            platform = Gem::Platform.new(s.platform).to_generic
+            next if specs[platform]
+
+            lazy_spec = LazySpecification.new(name, version, platform, source)
+            lazy_spec.dependencies.replace s.dependencies
+            specs[platform] = lazy_spec
+          end
         end
         specs.values
       end
@@ -146,7 +151,11 @@ module Bundler
     end
 
     def start(reqs)
-      activated    = {}
+      activated = {}
+
+      @base.each do |s|
+        STDERR.puts " * #{s.full_name}" if ENV['DEBUGZ']
+      end
 
       resolve(reqs, activated)
     end
@@ -335,12 +344,13 @@ module Bundler
     end
 
     def search(dep)
-      results = @base[dep.name]
-
-      if results.empty?
-        index = @source_requirements[dep.name] || @index
-        results = index.search_for_all_platforms(dep.dep)
+      if base = @base[dep.name] and base.any?
+        d = Gem::Dependency.new(base.first.name, base.first.version)
+      else
+        d = dep.dep
       end
+      index = @source_requirements[d.name] || @index
+      results = @base[d.name] + index.search_for_all_platforms(d)
 
       if results.any?
         version = results.first.version

@@ -12,11 +12,7 @@ module Spec
 
     alias platforms platform
 
-    def resolve(deps)
-      Bundler::Resolver.resolve(deps, @index)
-    end
-
-    def should_resolve_as(specs)
+    def resolve
       @platforms ||= ['ruby']
       deps = []
       @deps.each do |d|
@@ -24,24 +20,19 @@ module Spec
           deps << Bundler::DepProxy.new(d, p)
         end
       end
+      Bundler::Resolver.resolve(deps, @index)
+    end
 
-      got = resolve(deps).for(deps)
+    def should_resolve_as(specs)
+      got = resolve
       got = got.map { |s| s.full_name }.sort
 
       got.should == specs.sort
     end
 
     def should_conflict_on(names)
-      @platforms ||= ['ruby']
-      deps = []
-      @deps.each do |d|
-        @platforms.each do |p|
-          deps << Bundler::DepProxy.new(d, p)
-        end
-      end
-
       begin
-        got = resolve(deps).for(deps)
+        got = resolve
         flunk "The resolve succeeded with: #{got.map { |s| s.full_name }.sort.inspect}"
       rescue Bundler::VersionConflict => e
         Array(names).sort.should == e.conflicts.sort

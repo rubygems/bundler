@@ -45,7 +45,7 @@ module Bundler
     end
 
     def __materialize__
-      @specification = source[self]
+      @specification = source.specs.search(Gem::Dependency.new(name, version)).last
     end
 
     def respond_to?(*args)

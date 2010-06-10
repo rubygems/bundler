@@ -79,18 +79,6 @@ module Bundler
       SpecSet.new(materialized.compact)
     end
 
-    def names
-      lookup.keys
-    end
-
-    def select!(names)
-      @lookup = nil
-      @sorted = nil
-
-      @specs.delete_if { |s| !names.include?(s.name) }
-      self
-    end
-
   private
 
     def sorted
