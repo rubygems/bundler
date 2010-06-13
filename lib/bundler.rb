@@ -93,7 +93,7 @@ module Bundler
     end
 
     def setup(*groups)
-      return @setup if @setup
+      return @setup if defined?(@setup) && @setup
 
       if groups.empty?
         # Load all groups, but only once
