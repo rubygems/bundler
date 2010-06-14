@@ -138,8 +138,6 @@ module Spec
       bundle :install, opts
     end
 
-    alias flex_install_gemfile install_gemfile
-
     def install_gems(*gems)
       gems.each do |g|
         path = "#{gem_repo1}/gems/#{g}.gem"

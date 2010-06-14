@@ -19,7 +19,7 @@ describe "the lockfile format" do
   end
 
   it "generates a simple lockfile for a single source, gem" do
-    flex_install_gemfile <<-G
+    install_gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack"
@@ -40,7 +40,7 @@ describe "the lockfile format" do
   end
 
   it "generates a simple lockfile for a single source, gem with dependencies" do
-    flex_install_gemfile <<-G
+    install_gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack-obama"
@@ -63,7 +63,7 @@ describe "the lockfile format" do
   end
 
   it "generates a simple lockfile for a single source, gem with a version requirement" do
-    flex_install_gemfile <<-G
+    install_gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack-obama", ">= 1.0"
@@ -86,7 +86,7 @@ describe "the lockfile format" do
   end
 
   it "parses lockfiles w/ crazy shit" do
-    flex_install_gemfile <<-G
+    install_gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "net-sftp"
@@ -113,7 +113,7 @@ describe "the lockfile format" do
   it "generates a simple lockfile for a single pinned source, gem with a version requirement" do
     git = build_git "foo"
 
-    flex_install_gemfile <<-G
+    install_gemfile <<-G
       gem "foo", :git => "#{lib_path("foo-1.0")}"
     G
 
@@ -138,7 +138,7 @@ describe "the lockfile format" do
   it "serializes global git sources" do
     git = build_git "foo"
 
-    flex_install_gemfile <<-G
+    install_gemfile <<-G
       git "#{lib_path('foo-1.0')}"
       gem "foo"
     G
@@ -165,7 +165,7 @@ describe "the lockfile format" do
     git = build_git "foo"
     update_git "foo", :branch => "omg"
 
-    flex_install_gemfile <<-G
+    install_gemfile <<-G
       gem "foo", :git => "#{lib_path("foo-1.0")}", :branch => "omg"
     G
 
@@ -192,7 +192,7 @@ describe "the lockfile format" do
     git = build_git "foo"
     update_git "foo", :tag => "omg"
 
-    flex_install_gemfile <<-G
+    install_gemfile <<-G
       gem "foo", :git => "#{lib_path("foo-1.0")}", :tag => "omg"
     G
 
@@ -218,7 +218,7 @@ describe "the lockfile format" do
   it "serializes pinned path sources to the lockfile" do
     build_lib "foo"
 
-    flex_install_gemfile <<-G
+    install_gemfile <<-G
       gem "foo", :path => "#{lib_path("foo-1.0")}"
     G
 
@@ -240,7 +240,7 @@ describe "the lockfile format" do
   end
 
   it "lists gems alphabetically" do
-    flex_install_gemfile <<-G
+    install_gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "thin"
@@ -272,7 +272,7 @@ describe "the lockfile format" do
   end
 
   it "order dependencies of dependencies in alphabetical order" do
-    flex_install_gemfile <<-G
+    install_gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rails"
@@ -308,7 +308,7 @@ describe "the lockfile format" do
   end
 
   it "does not add the :require option to the lockfile" do
-    flex_install_gemfile <<-G
+    install_gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack-obama", ">= 1.0", :require => "rack/obama"
@@ -331,7 +331,7 @@ describe "the lockfile format" do
   end
 
   it "does not add the :group option to the lockfile" do
-    flex_install_gemfile <<-G
+    install_gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack-obama", ">= 1.0", :group => :test
@@ -417,7 +417,7 @@ describe "the lockfile format" do
         rack
     G
 
-    flex_install_gemfile <<-G
+    install_gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack"

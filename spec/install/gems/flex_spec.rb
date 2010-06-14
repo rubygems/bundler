@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe "bundle flex_install" do
   it "installs the gems as expected" do
-    flex_install_gemfile <<-G
+    install_gemfile <<-G
       source "file://#{gem_repo1}"
       gem 'rack'
     G
@@ -12,7 +12,7 @@ describe "bundle flex_install" do
   end
 
   it "installs even when the lockfile is invalid" do
-    flex_install_gemfile <<-G
+    install_gemfile <<-G
       source "file://#{gem_repo1}"
       gem 'rack'
     G
@@ -33,7 +33,7 @@ describe "bundle flex_install" do
   it "keeps child dependencies at the same version" do
     build_repo2
 
-    flex_install_gemfile <<-G
+    install_gemfile <<-G
       source "file://#{gem_repo2}"
       gem "rack-obama"
     G
@@ -41,7 +41,7 @@ describe "bundle flex_install" do
     should_be_installed "rack 1.0.0", "rack-obama 1.0.0"
 
     update_repo2
-    flex_install_gemfile <<-G
+    install_gemfile <<-G
       source "file://#{gem_repo2}"
       gem "rack-obama", "1.0"
     G
@@ -53,14 +53,14 @@ describe "bundle flex_install" do
     it "installs added gems without updating previously installed gems" do
       build_repo2
 
-      flex_install_gemfile <<-G
+      install_gemfile <<-G
         source "file://#{gem_repo2}"
         gem 'rack'
       G
 
       update_repo2
 
-      flex_install_gemfile <<-G
+      install_gemfile <<-G
         source "file://#{gem_repo2}"
         gem 'rack'
         gem 'activesupport', '2.3.5'
@@ -72,14 +72,14 @@ describe "bundle flex_install" do
     it "keeps child dependencies pinned" do
       build_repo2
 
-      flex_install_gemfile <<-G
+      install_gemfile <<-G
         source "file://#{gem_repo2}"
         gem "rack-obama"
       G
 
       update_repo2
 
-      flex_install_gemfile <<-G
+      install_gemfile <<-G
         source "file://#{gem_repo2}"
         gem "rack-obama"
         gem "thin"
@@ -92,7 +92,7 @@ describe "bundle flex_install" do
   describe "removing gems" do
     it "removes gems without changing the versions of remaining gems" do
       build_repo2
-      flex_install_gemfile <<-G
+      install_gemfile <<-G
         source "file://#{gem_repo2}"
         gem 'rack'
         gem 'activesupport', '2.3.5'
@@ -100,7 +100,7 @@ describe "bundle flex_install" do
 
       update_repo2
 
-      flex_install_gemfile <<-G
+      install_gemfile <<-G
         source "file://#{gem_repo2}"
         gem 'rack'
       G
@@ -108,7 +108,7 @@ describe "bundle flex_install" do
       should_be_installed "rack 1.0.0"
       should_not_be_installed "activesupport 2.3.5"
 
-      flex_install_gemfile <<-G
+      install_gemfile <<-G
         source "file://#{gem_repo2}"
         gem 'rack'
         gem 'activesupport', '2.3.2'
@@ -119,7 +119,7 @@ describe "bundle flex_install" do
 
     it "removes top level dependencies when removed from the Gemfile while leaving other dependencies intact" do
       build_repo2
-      flex_install_gemfile <<-G
+      install_gemfile <<-G
         source "file://#{gem_repo2}"
         gem 'rack'
         gem 'activesupport', '2.3.5'
@@ -127,7 +127,7 @@ describe "bundle flex_install" do
 
       update_repo2
 
-      flex_install_gemfile <<-G
+      install_gemfile <<-G
         source "file://#{gem_repo2}"
         gem 'rack'
       G
@@ -137,7 +137,7 @@ describe "bundle flex_install" do
 
     it "removes child dependencies" do
       build_repo2
-      flex_install_gemfile <<-G
+      install_gemfile <<-G
         source "file://#{gem_repo2}"
         gem 'rack-obama'
         gem 'activesupport'
@@ -146,7 +146,7 @@ describe "bundle flex_install" do
       should_be_installed "rack 1.0.0", "rack-obama 1.0.0", "activesupport 2.3.5"
 
       update_repo2
-      flex_install_gemfile <<-G
+      install_gemfile <<-G
         source "file://#{gem_repo2}"
         gem 'activesupport'
       G
