@@ -1,4 +1,4 @@
-### Note: the master branch is currently unstable while 0.10 is being worked on.<br>The current stable version of bundler is in the branch named `v0.9`.
+### Note: the master branch is currently unstable while 1.0 is in beta.<br>The current stable version of bundler is in the branch named `v0.9`.
 
 ## Bundler : A gem to bundle gems
 
