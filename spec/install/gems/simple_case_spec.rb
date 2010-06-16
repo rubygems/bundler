@@ -467,6 +467,44 @@ describe "bundle install with gem sources" do
         E
       out.should == nice_error
     end
+
+    it "causes a conflict if child dependencies conflict" do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "activemerchant"
+        gem "rails_fail"
+      G
+
+      nice_error = <<-E.strip.gsub(/^ {8}/, '')
+        Fetching source index for file:/Users/carlhuda/Developer/Source/bundler/tmp/gems/remote2/
+        Bundler could not find compatible versions for gem "activesupport":
+          In Gemfile:
+            activemerchant depends on
+              activesupport (>= 2.0.0)
+
+            rails_fail depends on
+              activesupport (1.2.3)
+      E
+      out.should == nice_error
+    end
+
+    it "causes a conflict if a child dependency conflicts with the Gemfile" do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "rails_fail"
+        gem "activesupport", "2.3.5"
+      G
+
+      nice_error = <<-E.strip.gsub(/^ {8}/, '')
+        Fetching source index for file:/Users/carlhuda/Developer/Source/bundler/tmp/gems/remote2/
+        Bundler could not find compatible versions for gem "activesupport":
+          In Gemfile:
+            rails_fail depends on
+              activesupport (= 1.2.3)
+
+            activesupport (2.3.5)
+      E
+      out.should == nice_error
     end
 
     it "can install dependencies even if " do
@@ -483,14 +521,4 @@ describe "bundle install with gem sources" do
     end
   end
 
-  # describe_sudo "it working when $GEM_HOME is owned by root" do
-  #   it "installs gems" do
-  #     install_gemfile <<-G
-  #       source "file://#{gem_repo1}"
-  #       gem 'rack'
-  #     G
-  #
-  #     should_be_installed("rack 1.0.0")
-  #   end
-  # end
 end

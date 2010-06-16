@@ -365,6 +365,14 @@ module Bundler
       end
     end
 
+    def clean_req(req)
+      if req.to_s.include?(">= 0")
+        req.to_s.gsub(/ \(.*?\)$/, '')
+      else
+        req.to_s.gsub(/\, (runtime|development)\)$/, ')')
+      end
+    end
+
     def version_conflict
       VersionConflict.new(errors.keys, error_message)
     end
@@ -373,24 +381,27 @@ module Bundler
       output = errors.inject("") do |o, (conflict, (origin, requirement))|
         o << "Bundler could not find compatible versions for gem #{conflict.inspect}:\n"
 
-        req_string = requirement.to_s.gsub(/\, (runtime|development)\)$/, ')')
+
         if origin
 
+          o << "  In Gemfile:\n"
           if requirement.required_by.first
-            o << "  #{requirement.required_by.first}\n"
-            o << "    #{req_string}\n"
+            o << "    #{clean_req(requirement.required_by.first)} depends on\n"
+            o << "      #{clean_req(requirement)}\n"
           else
-            o << "  In Gemfile:\n"
-            o << "    #{req_string}\n"
+            o << "    #{clean_req(requirement)}\n"
           end
           o << "\n"
 
-          if origin.respond_to?(:required_by) && required_by = origin.required_by.first
-            o << "  #{required_by} depends on\n"
-            o << "    #{conflict} (#{origin.version})\n"
+          unless origin.respond_to?(:required_by) && required_by = origin.required_by.first
+            o << "  In snapshot (Gemfile.lock):\n"
+          end
+
+          if origin.required_by.first && origin.required_by.first.name != origin.name
+            o << "    #{clean_req(origin.required_by.first)} depends on\n"
+            o << "      #{origin.name} (#{origin.version})\n"
           else
-            o << "  In snapshot (Gemfile.lock):\n "
-            o << "    #{conflict} (#{origin.version})\n"
+            o << "    #{origin.name} (#{origin.version})\n"
           end
 
         else
@@ -402,16 +413,16 @@ module Bundler
 
             o << "  In Gemfile:\n"
             if requirement.required_by.first
-              o << "    #{requirement.required_by.first}\n"
-              o << "      #{req_string}\n"
+              o << "    #{clean_req(requirement.required_by.first)}\n"
+              o << "      #{clean_req(requirement)}\n"
             else
-              o << "    #{req_string}\n"
+              o << "    #{clean_req(requirement)}\n"
             end
             o << "\nRunning `bundle update` will try to resolve the conflict between your Gemfile and snapshot.\n"
 
           else
-            o << "Could not find the gem #{req_string}\n"
-            o << "  required by #{requirement.required_by.first}\n"
+            o << "Could not find the gem #{clean_req(requirement)}\n"
+            o << "  required by #{clean_req(requirement.required_by.first)}\n"
           end
 
         end
