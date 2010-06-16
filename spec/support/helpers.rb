@@ -46,10 +46,11 @@ module Spec
     def bundle(cmd, options = {})
       expect_err  = options.delete(:expect_err)
       exit_status = options.delete(:exit_status)
+      options["no-color"] = true unless options.key?("no-color")
 
       env = (options.delete(:env) || {}).map{|k,v| "#{k}='#{v}' "}.join
       args = options.map do |k,v|
-        v == true ? " --#{k}" : " --#{k} #{v}"
+        v == true ? " --#{k}" : " --#{k} #{v}" if v
       end.join
       gemfile = File.expand_path('../../../bin/bundle', __FILE__)
       cmd = "#{env}#{Gem.ruby} -I#{lib} #{gemfile} #{cmd}#{args}"

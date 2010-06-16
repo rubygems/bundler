@@ -9,13 +9,16 @@ module Bundler
   class CLI < Thor
     def initialize(*)
       super
-      Bundler.ui = UI::Shell.new(shell)
+      use_shell = options["no-color"] ? Thor::Shell::Basic.new : shell
+
+      Bundler.ui = UI::Shell.new(use_shell)
       Gem::DefaultUserInteraction.ui = UI::RGProxy.new(Bundler.ui)
     end
 
     check_unknown_options! unless ARGV.include?("exec")
 
     default_task :install
+    class_option "no-color", :type => :boolean, :banner => "Disable colorization in output"
 
     desc "init", "Generates a Gemfile into the current working directory"
     long_desc <<-D
