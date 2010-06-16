@@ -31,8 +31,8 @@ module Bundler
       end
     end
 
-    def search_for_all_platforms(dependency)
-      specs = @specs[dependency.name]
+    def search_for_all_platforms(dependency, base = [])
+      specs = @specs[dependency.name] + base
 
       wants_prerelease = dependency.requirement.prerelease?
       only_prerelease  = specs.all? {|spec| spec.version.prerelease? }
