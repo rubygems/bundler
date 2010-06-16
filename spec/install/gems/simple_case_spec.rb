@@ -449,13 +449,24 @@ describe "bundle install with gem sources" do
       should_not_be_installed "bundler 0.9.1"
     end
 
-    it "cause a conflict if explicitly requesting a different version" do
+    it "causes a conflict if explicitly requesting a different version" do
       install_gemfile <<-G
         source "file://#{gem_repo2}"
         gem "rails", "3.0"
         gem "bundler", "0.9.2"
       G
-      out.should =~ /conflict on: "bundler"/i
+
+      nice_error = <<-E.strip.gsub(/^ {8}/, '')
+        Fetching source index for file:/Users/carlhuda/Developer/Source/bundler/tmp/gems/remote2/
+        Bundler could not find compatible versions for gem "bundler":
+          In Gemfile:
+            bundler (= 0.9.2)
+
+          In snapshot (Gemfile.lock):
+            bundler (1.0.0.beta.1)
+        E
+      out.should == nice_error
+    end
     end
 
     it "can install dependencies even if " do

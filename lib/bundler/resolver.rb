@@ -366,31 +366,36 @@ module Bundler
     end
 
     def version_conflict
-      VersionConflict.new(
-        errors.keys,
-        "No compatible versions could be found for required dependencies:\n  #{error_message}")
+      VersionConflict.new(errors.keys, error_message)
     end
 
     def error_message
       output = errors.inject("") do |o, (conflict, (origin, requirement))|
+        req_string = requirement.to_s.gsub(/\, (runtime|development)\)$/, ')')
         if origin
-          o << "  Conflict on: #{conflict.inspect}:\n"
-          if origin.respond_to?(:required_by) && required_by = origin.required_by.first
-            o << "    * #{conflict} (#{origin.version}) activated by #{required_by}\n"
-          else
-            o << "    * #{conflict} (#{origin.version}) in Gemfile.lock\n"
-          end
-          o << "    * #{requirement} required"
+          o << "Bundler could not find compatible versions for gem #{conflict.inspect}:\n"
+
           if requirement.required_by.first
-            o << " by #{requirement.required_by.first}\n"
+            o << "  #{requirement.required_by.first}\n"
+            o << "    #{req_string}\n"
           else
-            o << " in Gemfile\n"
+            o << "  In Gemfile:\n"
+            o << "    #{req_string}\n"
           end
+          o << "\n"
+
+          if origin.respond_to?(:required_by) && required_by = origin.required_by.first
+            o << "  #{required_by} depends on\n"
+            o << "    #{conflict} (#{origin.version})\n"
+          else
+            o << "  In snapshot (Gemfile.lock):\n "
+            o << "    #{conflict} (#{origin.version})\n"
+          end
+
         else
-          o << "  #{requirement} not found in any of the sources\n"
+          o << "  #{req_string} could not be found in any of the sources\n"
           o << "      required by #{requirement.required_by.first}\n"
         end
-        o << "    All possible versions of origin requirements conflict."
       end
     end
   end
