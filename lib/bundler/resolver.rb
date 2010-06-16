@@ -342,7 +342,7 @@ module Bundler
 
     def search(dep)
       if base = @base[dep.name] and base.any?
-        d = Gem::Dependency.new(base.first.name, base.first.version)
+        d = Gem::Dependency.new(base.first.name, *[dep.requirement, base.first.version].flatten)
       else
         d = dep.dep
       end
@@ -371,9 +371,10 @@ module Bundler
 
     def error_message
       output = errors.inject("") do |o, (conflict, (origin, requirement))|
+        o << "Bundler could not find compatible versions for gem #{conflict.inspect}:\n"
+
         req_string = requirement.to_s.gsub(/\, (runtime|development)\)$/, ')')
         if origin
-          o << "Bundler could not find compatible versions for gem #{conflict.inspect}:\n"
 
           if requirement.required_by.first
             o << "  #{requirement.required_by.first}\n"
@@ -393,8 +394,26 @@ module Bundler
           end
 
         else
-          o << "  #{req_string} could not be found in any of the sources\n"
-          o << "      required by #{requirement.required_by.first}\n"
+
+          if @base[conflict].any?
+            locked = @base[conflict].first
+            o << "  In snapshot (Gemfile.lock):\n"
+            o << "    #{conflict} (#{locked.version})\n\n"
+
+            o << "  In Gemfile:\n"
+            if requirement.required_by.first
+              o << "    #{requirement.required_by.first}\n"
+              o << "      #{req_string}\n"
+            else
+              o << "    #{req_string}\n"
+            end
+            o << "\nRunning `bundle update` will try to resolve the conflict between your Gemfile and snapshot.\n"
+
+          else
+            o << "Could not find the gem #{req_string}\n"
+            o << "  required by #{requirement.required_by.first}\n"
+          end
+
         end
       end
     end

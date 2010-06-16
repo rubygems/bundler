@@ -155,4 +155,59 @@ describe "bundle flex_install" do
       should_not_be_installed "rack-obama", "rack"
     end
   end
+
+  describe "when Gemfile conflicts with lockfile" do
+    before(:each) do
+      build_repo2
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "rack_middleware"
+      G
+
+      should_be_installed "rack_middleware 1.0", "rack 0.9.1"
+
+      build_repo2
+      update_repo2 do
+        build_gem "rack-obama", "2.0" do |s|
+          s.add_dependency "rack", "=1.2"
+        end
+        build_gem "rack_middleware", "2.0" do |s|
+          s.add_dependency "rack", ">=1.0"
+        end
+      end
+
+      gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "rack-obama", "2.0"
+        gem "rack_middleware"
+      G
+    end
+
+    it "does not install gems whose dependencies are not met" do
+      bundle :install
+      ruby <<-RUBY
+        require 'bundler/setup'
+      RUBY
+      out.should =~ /could not find gem 'rack-obama/i
+    end
+
+    it "suggests bundle update when the Gemfile requires different versions than the lock" do
+      nice_error = <<-E.strip.gsub(/^ {8}/, '')
+        Fetching source index for file:/Users/carlhuda/Developer/Source/bundler/tmp/gems/remote2/
+        Bundler could not find compatible versions for gem "rack":
+          In snapshot (Gemfile.lock):
+            rack (0.9.1)
+
+          In Gemfile:
+            rack-obama (= 2.0, runtime)
+              rack (= 1.2)
+
+        Running `bundle update` will try to resolve the conflict between your Gemfile and snapshot.
+      E
+
+      bundle :install
+      out.should == nice_error
+    end
+
+  end
 end
