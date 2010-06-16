@@ -30,8 +30,9 @@ describe "bundle check" do
     G
 
     bundle :check
-    out.should include('not_here (>= 0, runtime) not found in any of the sources')
-    out.should include('required by missing_dep (>= 0, runtime)')
+    puts out
+    out.should include(%{Could not find the gem 'not_here'})
+    out.should include(%{required by gem 'missing_dep'})
   end
 
   it "provides debug information when there is a resolving problem" do
@@ -51,7 +52,7 @@ describe "bundle check" do
     G
 
     bundle :check
-    out.should include('Conflict on: "activesupport"')
+    out.should include(%{could not find compatible versions for gem "activesupport"})
   end
 
   it "remembers --without option from install" do

@@ -379,11 +379,9 @@ module Bundler
 
     def error_message
       output = errors.inject("") do |o, (conflict, (origin, requirement))|
-        o << "Bundler could not find compatible versions for gem #{conflict.inspect}:\n"
-
-
         if origin
 
+          o << "Bundler could not find compatible versions for gem #{conflict.inspect}:\n"
           o << "  In Gemfile:\n"
           if requirement.required_by.first
             o << "    #{clean_req(requirement.required_by.first)} depends on\n"
@@ -399,17 +397,18 @@ module Bundler
 
           if origin.required_by.first && origin.required_by.first.name != origin.name
             o << "    #{clean_req(origin.required_by.first)} depends on\n"
-            o << "      #{origin.name} (#{origin.version})\n"
+            o << "      #{origin.name} (#{clean_req(origin.version)})\n"
           else
-            o << "    #{origin.name} (#{origin.version})\n"
+            o << "    #{origin.name} (#{clean_req(origin.version)})\n"
           end
 
         else
 
           if @base[conflict].any?
+            o << "Bundler could not find compatible versions for gem #{conflict.inspect}:\n"
             locked = @base[conflict].first
             o << "  In snapshot (Gemfile.lock):\n"
-            o << "    #{conflict} (#{locked.version})\n\n"
+            o << "    #{conflict} (#{clean_req(locked.version)})\n\n"
 
             o << "  In Gemfile:\n"
             if requirement.required_by.first
@@ -419,10 +418,8 @@ module Bundler
               o << "    #{clean_req(requirement)}\n"
             end
             o << "\nRunning `bundle update` will try to resolve the conflict between your Gemfile and snapshot.\n"
-
           else
-            o << "Could not find the gem #{clean_req(requirement)}\n"
-            o << "  required by #{clean_req(requirement.required_by.first)}\n"
+            o << "Could not find the gem '#{clean_req(requirement)}', required by gem '#{clean_req(requirement.required_by.first)}'\n"
           end
 
         end

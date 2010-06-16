@@ -46,7 +46,7 @@ module Spec
     def bundle(cmd, options = {})
       expect_err  = options.delete(:expect_err)
       exit_status = options.delete(:exit_status)
-      options["no-color"] = true unless options.key?("no-color")
+      options["no-color"] = true unless options.key?("no-color") || cmd.to_s[0..3] == "exec"
 
       env = (options.delete(:env) || {}).map{|k,v| "#{k}='#{v}' "}.join
       args = options.map do |k,v|
