@@ -2,3 +2,4 @@
 tmp
 pkg
 *.gem
+*.rbc
