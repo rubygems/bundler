@@ -199,10 +199,11 @@ describe "bundle flex_install" do
             rack (0.9.1)
 
           In Gemfile:
-            rack-obama (= 2.0)
+            rack-obama (= 2.0) depends on
               rack (= 1.2)
 
-        Running `bundle update` will try to resolve the conflict between your Gemfile and snapshot.
+        Running `bundle update` will rebuild your snapshot from scratch, using only
+        the gems in your Gemfile, which may resolve the conflict.
       E
 
       bundle :install

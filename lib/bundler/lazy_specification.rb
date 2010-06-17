@@ -52,6 +52,10 @@ module Bundler
       super || @specification.respond_to?(*args)
     end
 
+    def to_s
+      "#{name} (#{version})"
+    end
+
   private
 
     def method_missing(method, *args, &blk)

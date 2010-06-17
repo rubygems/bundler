@@ -87,6 +87,10 @@ module Bundler
         @specs[platform]
       end
 
+      def to_s
+        "#{name} (#{version})"
+      end
+
     private
 
       def __dependencies
@@ -377,49 +381,65 @@ module Bundler
       VersionConflict.new(errors.keys, error_message)
     end
 
+    # For a given conflicted requirement, print out what exactly went wrong
+    def gem_message(requirement)
+      m = ""
+
+      # A requirement that is required by itself is actually in the Gemfile, and does
+      # not "depend on" itself
+      if requirement.required_by.first && requirement.required_by.first.name != requirement.name
+        m << "    #{clean_req(requirement.required_by.first)} depends on\n"
+        m << "      #{clean_req(requirement)}\n"
+      else
+        m << "    #{clean_req(requirement)}\n"
+      end
+      m << "\n"
+    end
+
     def error_message
       output = errors.inject("") do |o, (conflict, (origin, requirement))|
+
+        # origin is the SpecSet of specs from the Gemfile that is conflicted with
         if origin
 
-          o << "Bundler could not find compatible versions for gem #{conflict.inspect}:\n"
+          o << %{Bundler could not find compatible versions for gem "#{origin.name}":\n}
           o << "  In Gemfile:\n"
-          if requirement.required_by.first
-            o << "    #{clean_req(requirement.required_by.first)} depends on\n"
-            o << "      #{clean_req(requirement)}\n"
-          else
-            o << "    #{clean_req(requirement)}\n"
-          end
-          o << "\n"
 
+          o << gem_message(requirement)
+
+          # If the origin is a LockfileParser, it does not respond_to :required_by
           unless origin.respond_to?(:required_by) && required_by = origin.required_by.first
             o << "  In snapshot (Gemfile.lock):\n"
           end
 
-          if origin.required_by.first && origin.required_by.first.name != origin.name
-            o << "    #{clean_req(origin.required_by.first)} depends on\n"
-            o << "      #{origin.name} (#{clean_req(origin.version)})\n"
-          else
-            o << "    #{origin.name} (#{clean_req(origin.version)})\n"
-          end
+          o << gem_message(origin)
 
+        # origin is nil if the required gem and version cannot be found in any of
+        # the specified sources
         else
 
-          if @base[conflict].any?
+          # if the gem cannot be found because of a version conflict between lockfile and gemfile,
+          # print a useful error that suggests running `bundle update`, which may fix things
+          #
+          # @base is a SpecSet of the gems in the lockfile
+          # conflict is the name of the gem that could not be found
+          if locked = @base[conflict].first
             o << "Bundler could not find compatible versions for gem #{conflict.inspect}:\n"
-            locked = @base[conflict].first
             o << "  In snapshot (Gemfile.lock):\n"
-            o << "    #{conflict} (#{clean_req(locked.version)})\n\n"
+            o << "    #{clean_req(locked)}\n\n"
 
             o << "  In Gemfile:\n"
-            if requirement.required_by.first
-              o << "    #{clean_req(requirement.required_by.first)}\n"
-              o << "      #{clean_req(requirement)}\n"
-            else
-              o << "    #{clean_req(requirement)}\n"
-            end
-            o << "\nRunning `bundle update` will try to resolve the conflict between your Gemfile and snapshot.\n"
+            o << gem_message(requirement)
+            o << "Running `bundle update` will rebuild your snapshot from scratch, using only\n"
+            o << "the gems in your Gemfile, which may resolve the conflict.\n"
+
+          # the rest of the time, the gem cannot be found because it does not exist in the known sources
           else
-            o << "Could not find the gem '#{clean_req(requirement)}', required by gem '#{clean_req(requirement.required_by.first)}'\n"
+            if requirement.required_by.first
+              o << "Could not find gem '#{clean_req(requirement)}', required by '#{clean_req(requirement.required_by.first)}', in any of the sources\n"
+            else
+              o << "Could not find gem '#{clean_req(requirement)} in any of the sources\n"
+            end
           end
 
         end

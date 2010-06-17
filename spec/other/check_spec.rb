@@ -30,9 +30,8 @@ describe "bundle check" do
     G
 
     bundle :check
-    puts out
-    out.should include(%{Could not find the gem 'not_here'})
-    out.should include(%{required by gem 'missing_dep'})
+    out.should include(%{Could not find gem 'not_here'})
+    out.should include(%{required by 'missing_dep'})
   end
 
   it "provides debug information when there is a resolving problem" do
