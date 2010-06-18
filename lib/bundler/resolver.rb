@@ -125,11 +125,12 @@ module Bundler
     end
 
     def initialize(index, source_requirements, base)
-      @errors = {}
-      @stack  = []
-      @base   = base
-      @index  = index
-      @source_requirements = source_requirements
+      @errors               = {}
+      @stack                = []
+      @base                 = base
+      @index                = index
+      @missing_gems         = Hash.new(0)
+      @source_requirements  = source_requirements
     end
 
     def debug
@@ -259,6 +260,17 @@ module Bundler
             end
             raise GemNotFound, message
           else
+            if @missing_gems[current] >= 5
+              msg = "When trying to resolve #{current.required_by.last}, \n" \
+                    "Bundler could not find its dependency \n" \
+                    "#{current} in any source\n"
+
+              raise Bundler::GemNotFound, msg
+            end
+
+            @missing_gems[current] += 1
+
+            debug { "    Could not find #{current} by #{current.required_by.last}" }
             @errors[current.name] = [nil, current]
           end
         end
@@ -291,8 +303,8 @@ module Bundler
       spec_group.required_by << requirement
 
       activated[spec_group.name] = spec_group
-      debug { "  Activating: #{spec.name} (#{spec.version})" }
-      debug { spec.required_by.map { |d| "    * #{d.name} (#{d.requirement})" }.join("\n") }
+      debug { "  Activating: #{spec_group.name} (#{spec_group.version})" }
+      debug { spec_group.required_by.map { |d| "    * #{d.name} (#{d.requirement})" }.join("\n") }
 
       dependencies = spec_group.activate_platform(requirement.__platform)
 
