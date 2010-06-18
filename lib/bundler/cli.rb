@@ -188,9 +188,11 @@ module Bundler
         Kernel.exec *ARGV
       rescue Errno::EACCES
         Bundler.ui.error "bundler: not executable: #{ARGV.first}"
+        exit 1
       rescue Errno::ENOENT
         Bundler.ui.error "bundler: command not found: #{ARGV.first}"
         Bundler.ui.warn  "Install missing gem binaries with `bundle install`"
+        exit 1
       end
     end
 
