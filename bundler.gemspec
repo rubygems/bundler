@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Carl Lerche", "Yehuda Katz", "André Arko"]
   s.email       = ["carlhuda@engineyard.com"]
-  s.homepage    = "http://github.com/carlhuda/bundler"
+  s.homepage    = "http://gembundler.com"
   s.summary     = "The best way to manage your application's dependencies"
   s.description = "Bundler manages an application's dependencies through its entire life, across many machines, systematically and repeatably"
 
