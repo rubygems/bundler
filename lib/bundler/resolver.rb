@@ -39,7 +39,11 @@ module Bundler
       result = catch(:success) do
         resolver.resolve(requirements, {})
         output = resolver.errors.inject("") do |o, (conflict, (origin, requirement))|
-          if origin
+          if conflict == "bundler"
+            o << (requirement.required_by.first ? "Gem #{requirement.required_by.first}" : "The Gemfile")
+            o << " requires #{requirement}.\n\n"
+            o << "Upgrade to #{requirement} to continue installing this Gemfile."
+          elsif origin
             o << "  Conflict on: #{conflict.inspect}:\n"
             o << "    * #{conflict} (#{origin.version}) activated by #{origin.required_by.first}\n"
             o << "    * #{requirement} required"
@@ -52,7 +56,6 @@ module Bundler
             o << "  #{requirement} not found in any of the sources\n"
             o << "      required by #{requirement.required_by.first}\n"
           end
-          o << "    All possible versions of origin requirements conflict."
         end
         raise VersionConflict, "No compatible versions could be found for required dependencies:\n  #{output}"
         nil
