@@ -301,7 +301,7 @@ describe "bundle install with git sources" do
     should_be_installed "forced 1.1"
 
     Dir.chdir(lib_path('forced-1.0')) do
-      `git reset --hard head^`
+      `git reset --hard HEAD^`
     end
     bundle :install
     should_be_installed "forced 1.0"
