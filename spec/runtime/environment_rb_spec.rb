@@ -204,6 +204,11 @@ describe "environment.rb file" do
     end
 
     it "warns you if it's from an old bundler but read-only" do
+      if Process.euid == 0
+        pending "this test cannot succeed as root"
+        return
+      end
+
       env_file(env_file.read.gsub("by Bundler #{Bundler::VERSION}", "by Bundler 0.9.0"))
       FileUtils.chmod 0444, env_file
       ruby <<-R, :expect_err => true
