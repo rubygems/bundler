@@ -79,6 +79,10 @@ module Bundler
       SpecSet.new(materialized.compact)
     end
 
+    def merge(set)
+      SpecSet.new(sorted + set.to_a)
+    end
+
   private
 
     def sorted

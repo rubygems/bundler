@@ -33,8 +33,7 @@ module Spec
       if opts[:lite_runtime]
         setup = "require 'rubygems' ; require 'bundler/setup' ; Bundler.setup(#{groups})\n"
       else
-        setup  = "require 'rubygems' ; "
-        setup = "require 'bundler' ; Bundler.setup(#{groups})\n"
+        setup = "require 'rubygems' ; require 'bundler' ; Bundler.setup(#{groups})\n"
       end
 
       @out = ruby(setup + cmd, :expect_err => expect_err)

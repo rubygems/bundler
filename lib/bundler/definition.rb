@@ -32,6 +32,7 @@ module Bundler
 
     def initialize(lockfile, dependencies, sources, unlock)
       @dependencies, @sources, @unlock = dependencies, sources, unlock
+      @remote = false
       @specs = nil
       @unlock[:gems] ||= []
       @unlock[:sources] ||= []
@@ -57,6 +58,7 @@ module Bundler
 
     def resolve_remotely!
       raise "Specs already loaded" if @specs
+      @remote = true
       @sources.each { |s| s.remote! }
       specs
     end
@@ -101,7 +103,7 @@ module Bundler
           end
 
           # Run a resolve against the locally available gems
-          Resolver.resolve(expanded_dependencies, index, source_requirements, @last_resolve)
+          @last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, @last_resolve)
         end
       end
     end
@@ -200,7 +202,7 @@ module Bundler
       end
 
       resolve = SpecSet.new(converged)
-      resolve = resolve.for(expand_dependencies(deps), @unlock[:gems])
+      resolve = resolve.for(expand_dependencies(deps, true), @unlock[:gems])
       @last_resolve = resolve
     end
 
@@ -215,14 +217,14 @@ module Bundler
     end
 
     def expanded_dependencies
-      @expanded_dependencies ||= expand_dependencies(dependencies)
+      @expanded_dependencies ||= expand_dependencies(dependencies, @remote)
     end
 
-    def expand_dependencies(dependencies)
+    def expand_dependencies(dependencies, remote = false)
       deps = []
       dependencies.each do |dep|
         dep.gem_platforms(@platforms).each do |p|
-          deps << DepProxy.new(dep, p)
+          deps << DepProxy.new(dep, p) if remote || p == Gem::Platform.local.to_generic
         end
       end
       deps

@@ -60,6 +60,30 @@ describe "Bundler.setup with multi platform stuff" do
   end
 
   it "will add the resolve for the current platform" do
-    pending
+    lockfile <<-G
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          nokogiri (1.4.2-java)
+            weakling (= 0.0.3)
+          weakling (0.0.3)
+
+      PLATFORMS
+        java
+
+      DEPENDENCIES
+        nokogiri
+    G
+
+    system_gems "nokogiri-1.4.2", "platform_specific-1.0-x86-darwin-100"
+
+    gemfile <<-G
+      Gem.platforms = [Gem::Platform::RUBY, Gem::Platform.new("x86-darwin-100")]
+      source "file://#{gem_repo1}"
+      gem "nokogiri"
+      gem "platform_specific"
+    G
+
+    should_be_installed "nokogiri 1.4.2", "platform_specific 1.0 x86-darwin-100"
   end
 end
