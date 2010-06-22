@@ -1,8 +1,13 @@
 #!/usr/bin/env ruby
 
 # Check if an older version of bundler is installed
+mybasedir = __FILE__.gsub(/\/bin\/bundle/, '')
+
 require 'bundler'
 $:.each do |path|
+  # ignore the directory we're running from, in the tests
+  path = path.gsub(%r"^#{mybasedir}", '')
+
   if path =~ %r'/bundler-0\.(\d+)' && $1.to_i < 9
     abort "Please remove older versions of bundler. This can be done by running `gem cleanup bundler`."
   end
