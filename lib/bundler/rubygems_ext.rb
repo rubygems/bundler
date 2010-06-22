@@ -26,7 +26,7 @@ module Gem
     def git_version
       if @loaded_from && File.exist?(File.join(full_gem_path, ".git"))
         sha = Dir.chdir(full_gem_path){ `git rev-parse HEAD`.strip }
-        branch = full_gem_path.split("-")[3]
+        branch = full_gem_path.match(/gems\/.*/).to_s.split("-")[3]
         (branch && branch != sha) ? " #{branch}-#{sha[0...6]}" : " #{sha[0...6]}"
       end
     end
