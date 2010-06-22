@@ -34,21 +34,24 @@ describe "bundle install with gem sources" do
     end
 
     it "ignores cached gems for the wrong platform" do
-      install_gemfile <<-G
-        Gem.platforms = [Gem::Platform.new('#{java}')]
-        source "file://#{gem_repo1}"
-        gem "platform_specific"
-      G
-      bundle :pack
+      simulate_platform "java" do
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "platform_specific"
+        G
+        bundle :pack
+      end
+
       simulate_new_machine
 
-      install_gemfile <<-G
-        Gem.platforms = [Gem::Platform.new('#{rb}')]
-        source "file://#{gem_repo1}"
-        gem "platform_specific"
-      G
-      run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
-      out.should == "1.0.0 RUBY"
+      simulate_platform "ruby" do
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "platform_specific"
+        G
+        run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
+        out.should == "1.0.0 RUBY"
+      end
     end
   end
 end

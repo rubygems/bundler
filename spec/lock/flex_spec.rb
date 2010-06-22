@@ -447,8 +447,9 @@ describe "the lockfile format" do
       end
     end
 
+    simulate_platform "ruby"
+
     install_gemfile <<-G
-      Gem.platforms = [Gem::Platform::RUBY]
       source "file://#{gem_repo1}"
       gem "omg_platform"
     G

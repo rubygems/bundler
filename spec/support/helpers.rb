@@ -29,13 +29,11 @@ module Spec
       opts = args.last.is_a?(Hash) ? args.pop : {}
       expect_err = opts.delete(:expect_err)
       groups = args.map {|a| a.inspect }.join(", ")
-      platform = opts[:platform]
 
       if opts[:lite_runtime]
         setup = "require 'rubygems' ; require 'bundler/setup' ; Bundler.setup(#{groups})\n"
       else
         setup  = "require 'rubygems' ; "
-        setup << "Gem.platforms = [Gem::Platform::RUBY, Gem::Platform.new('#{platform}')] ; " if platform
         setup = "require 'bundler' ; Bundler.setup(#{groups})\n"
       end
 
@@ -184,6 +182,13 @@ module Spec
       system_gems []
       FileUtils.rm_rf default_bundle_path
       FileUtils.rm_rf bundled_app('.bundle')
+    end
+
+    def simulate_platform(platform)
+      old, ENV['BUNDLER_SPEC_PLATFORM'] = ENV['BUNDLER_SPEC_PLATFORM'], platform.to_s
+      yield if block_given?
+    ensure
+      ENV['BUNDLER_SPEC_PLATFORM'] = old if block_given?
     end
 
     def revision_for(path)

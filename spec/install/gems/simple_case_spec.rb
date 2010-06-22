@@ -118,7 +118,6 @@ describe "bundle install with gem sources" do
     describe "with a gem that installs multiple platforms" do
       it "installs gems for the local platform as first choice" do
         install_gemfile <<-G
-          Gem.platforms = [Gem::Platform.new('#{rb}'), Gem::Platform.local]
           source "file://#{gem_repo1}"
           gem "platform_specific"
         G
@@ -128,8 +127,8 @@ describe "bundle install with gem sources" do
       end
 
       it "falls back on plain ruby" do
+        simulate_platform "foo-bar-baz"
         install_gemfile <<-G
-          Gem.platforms = [Gem::Platform.new('#{rb}'), Gem::Platform.new('foo-bar-baz')]
           source "file://#{gem_repo1}"
           gem "platform_specific"
         G
@@ -139,8 +138,8 @@ describe "bundle install with gem sources" do
       end
 
       it "installs gems for java" do
+        simulate_platform "java"
         install_gemfile <<-G
-          Gem.platforms = [Gem::Platform.new('#{java}')]
           source "file://#{gem_repo1}"
           gem "platform_specific"
         G
@@ -150,8 +149,9 @@ describe "bundle install with gem sources" do
       end
 
       it "installs gems for windows" do
+        simulate_platform mswin
+
         install_gemfile <<-G
-          Gem.platforms = [Gem::Platform.new('#{mswin}')]
           source "file://#{gem_repo1}"
           gem "platform_specific"
         G
@@ -420,6 +420,8 @@ describe "bundle install with gem sources" do
 
   describe "when the gem has an architecture in its platform" do
     it "still installs correctly" do
+      simulate_platform mswin
+
       gemfile <<-G
         # Set up pretend http gem server with FakeWeb
         $LOAD_PATH.unshift '#{Dir[base_system_gems.join("gems/fakeweb*/lib")].first}'
@@ -438,7 +440,6 @@ describe "bundle install with gem sources" do
 
         # Try to install gem with nil arch
         source "http://localgemserver.com/"
-        Gem.platforms = [Gem::Platform.new('#{mswin}')]
         gem "rcov"
       G
       bundle :install

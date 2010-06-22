@@ -118,19 +118,22 @@ describe "bundle cache" do
     end
 
     it "doesn't remove gems that are for another platform" do
-      install_gemfile <<-G
-        Gem.platforms = [Gem::Platform.new('#{java}')]
-        source "file://#{gem_repo1}"
-        gem "platform_specific"
-      G
-      bundle :cache
-      cached_gem("platform_specific-1.0-java").should exist
+      simulate_platform "java" do
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "platform_specific"
+        G
+
+        bundle :cache
+        cached_gem("platform_specific-1.0-java").should exist
+      end
 
       simulate_new_machine
       install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "platform_specific"
       G
+
       cached_gem("platform_specific-1.0-#{Gem::Platform.local}").should exist
       cached_gem("platform_specific-1.0-java").should exist
     end

@@ -40,8 +40,8 @@ describe "bundle install across platforms" do
         platform_specific
     G
 
+    simulate_platform "java"
     install_gemfile <<-G
-      Gem.platforms = [Gem::Platform::RUBY, Gem::Platform.new('#{java}')]
       source "file://#{gem_repo1}"
 
       gem "platform_specific"
@@ -51,19 +51,19 @@ describe "bundle install across platforms" do
   end
 
   it "works with gems that have different dependencies" do
+    simulate_platform "java"
     install_gemfile <<-G
-      Gem.platforms = [Gem::Platform::RUBY, Gem::Platform.new('#{java}')]
       source "file://#{gem_repo1}"
 
       gem "nokogiri"
     G
 
-    should_be_installed "nokogiri 1.4.2 JAVA", "weakling 0.0.3", :platform => "java"
+    should_be_installed "nokogiri 1.4.2 JAVA", "weakling 0.0.3"
 
     simulate_new_machine
 
+    simulate_platform "ruby"
     install_gemfile <<-G
-      Gem.platforms = [Gem::Platform::RUBY]
       source "file://#{gem_repo1}"
 
       gem "nokogiri"

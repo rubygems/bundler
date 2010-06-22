@@ -23,6 +23,7 @@ Differ.format = :color
 
 Spec::Rubygems.setup
 FileUtils.rm_rf(Spec::Path.gem_repo1)
+ENV['RUBYOPT'] = "-I#{Spec::Path.root}/spec/support/rubygems_hax"
 
 Spec::Runner.configure do |config|
   config.include Spec::Builders
@@ -62,7 +63,6 @@ Spec::Runner.configure do |config|
   end
 
   config.after :each do
-    Gem.platforms = nil
     Dir.chdir(original_wd)
     # Reset ENV
     ENV['PATH']           = original_path
@@ -71,5 +71,6 @@ Spec::Runner.configure do |config|
     ENV['BUNDLE_PATH']    = nil
     ENV['BUNDLE_GEMFILE'] = nil
     ENV['BUNDLER_TEST']   = nil
+    ENV['BUNDLER_SPEC_PLATFORM'] = nil
   end
 end
