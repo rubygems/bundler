@@ -1,5 +1,7 @@
 module Bundler
   class Index
+    include Enumerable
+
     def self.build
       i = new
       yield i
@@ -77,6 +79,12 @@ module Bundler
         @specs[s.name] << s
       end
       self
+    end
+
+    def ==(o)
+      all? do |s|
+        s2 = o[s].first and (s.dependencies & s2.dependencies).empty?
+      end
     end
 
   private

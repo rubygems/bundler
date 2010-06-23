@@ -171,4 +171,35 @@ describe "bundle install with explicit source paths" do
     bundle "exec foo"
     out.should == "1.0"
   end
+
+  describe "when the gem version in the path is updated" do
+    before :each do
+      build_lib "foo", "1.0", :path => lib_path("foo") do |s|
+        s.add_dependency "bar"
+      end
+      build_lib "bar", "1.0", :path => lib_path("foo/bar")
+
+      install_gemfile <<-G
+        gem "foo", :path => "#{lib_path('foo')}"
+      G
+    end
+
+    it "unlocks all gems when the top level gem is updated" do
+      build_lib "foo", "2.0", :path => lib_path("foo") do |s|
+        s.add_dependency "bar"
+      end
+
+      bundle "install"
+
+      should_be_installed "foo 2.0", "bar 1.0"
+    end
+
+    it "unlocks all gems when a child dependency gem is updated" do
+      build_lib "bar", "2.0", :path => lib_path("foo/bar")
+
+      bundle "install"
+
+      should_be_installed "foo 1.0", "bar 2.0"
+    end
+  end
 end

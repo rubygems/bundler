@@ -203,6 +203,9 @@ module Bundler
         s.source = @sources.find { |src| s.source == src }
 
         next if s.source.nil? || @unlock[:sources].include?(s.name)
+        # If the spec is from a path source and it doesn't exist anymore
+        # then we just unlock it.
+        next if s.source.instance_of?(Source::Path) && s.source.specs[s].empty?
 
         converged << s
       end
