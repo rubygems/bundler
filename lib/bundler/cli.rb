@@ -91,6 +91,8 @@ module Bundler
       "Don't update the existing gem cache."
     method_option "quiet", :type => :boolean, :banner =>
       "Only output warnings and errors."
+    method_option "local", :type => :boolean, :banner =>
+      "Do not attempt to fetch gems remotely and use the gem cache instead"
     def install(path = nil)
       opts = options.dup
       opts[:without] ||= []

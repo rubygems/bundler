@@ -48,10 +48,6 @@ Spec::Runner.configure do |config|
     # e.g. check foo.should == bar
   end
 
-  def pending_cache_fixes
-    pending "pending fixing the cache stuff"
-  end
-
   config.before :all do
     build_repo1
   end

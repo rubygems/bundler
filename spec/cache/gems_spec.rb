@@ -17,9 +17,8 @@ describe "bundle cache" do
     end
 
     it "uses the cache as a source when installing gems" do
-      pending_cache_fixes
       system_gems []
-      bundle :install
+      bundle "install --local"
 
       should_be_installed("rack 1.0.0")
     end
@@ -37,9 +36,9 @@ describe "bundle cache" do
     end
 
     it "does not reinstall gems from the cache if they exist in the bundle" do
-      pending_cache_fixes
-      system_gems []
-      install_gemfile <<-G
+      system_gems "rack-1.0.0"
+
+      gemfile <<-G
         gem "rack"
       G
 
@@ -47,18 +46,18 @@ describe "bundle cache" do
         s.write "lib/rack.rb", "RACK = 'FAIL'"
       end
 
-      bundle :install
+      bundle "install --local"
       should_be_installed("rack 1.0.0")
     end
   end
 
   describe "when there are also git sources" do
     it "still works" do
-      pending_cache_fixes
       build_git "foo"
       system_gems "rack-1.0.0"
 
       install_gemfile <<-G
+        source "file://#{gem_repo1}"
         git "#{lib_path("foo-1.0")}"
         gem 'rack'
         gem 'foo'
@@ -67,7 +66,7 @@ describe "bundle cache" do
       bundle :cache
 
       system_gems []
-      bundle :install
+      bundle "install --local"
 
       should_be_installed("rack 1.0.0", "foo 1.0")
     end

@@ -16,7 +16,9 @@ module Bundler
 
       # Since we are installing, we can resolve the definition
       # using remote specs
-      @definition.resolve_remotely!
+      options["local"] ?
+        @definition.resolve_with_cache! :
+        @definition.resolve_remotely!
 
       # Ensure that BUNDLE_PATH exists
       FileUtils.mkdir_p(Bundler.bundle_path)

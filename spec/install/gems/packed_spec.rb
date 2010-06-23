@@ -3,7 +3,6 @@ require "spec_helper"
 describe "bundle install with gem sources" do
   describe "when cached and locked" do
     it "does not hit the remote at all" do
-      pending_cache_fixes
       build_repo2
       install_gemfile <<-G
         source "file://#{gem_repo2}"
@@ -14,7 +13,7 @@ describe "bundle install with gem sources" do
       simulate_new_machine
       FileUtils.rm_rf gem_repo2
 
-      bundle :install
+      bundle "install --local"
       should_be_installed "rack 1.0.0"
     end
 

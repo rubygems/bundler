@@ -15,6 +15,7 @@ module Bundler
         @options = options
         @remotes = (options["remotes"] || []).map { |r| normalize_uri(r) }
         @allow_remote = false
+        @allow_cached = false
         # Hardcode the paths for now
         @caches = [ Bundler.app_cache ] + Gem.path.map { |p| File.expand_path("#{p}/cache") }
         @spec_fetch_map = {}
@@ -22,6 +23,10 @@ module Bundler
 
       def remote!
         @allow_remote = true
+      end
+
+      def cached!
+        @allow_cached = true
       end
 
       def hash
@@ -62,7 +67,7 @@ module Bundler
       end
 
       def specs
-        @specs ||= @allow_remote ? fetch_specs : installed_specs
+        @specs ||= fetch_specs
       end
 
       def fetch(spec)
@@ -133,8 +138,8 @@ module Bundler
       def fetch_specs
         Index.build do |idx|
           idx.use installed_specs
-          # idx.use cached_specs
-          idx.use remote_specs
+          idx.use cached_specs if @allow_cached
+          idx.use remote_specs if @allow_remote
         end
       end
 
@@ -249,6 +254,7 @@ module Bundler
         @options = options
         @glob = options["glob"] || DEFAULT_GLOB
 
+        @allow_cached = false
         @allow_remote = false
 
         if options["path"]
@@ -261,6 +267,10 @@ module Bundler
 
       def remote!
         @allow_remote = true
+      end
+
+      def cached!
+        @allow_cached = true
       end
 
       def self.from_lock(options)
@@ -484,8 +494,9 @@ module Bundler
         @revision = nil
       end
 
+      # TODO: actually cache git specs
       def specs
-        if @allow_remote && !@update
+        if (@allow_remote || @allow_cached) && !@update
         # Start by making sure the git cache is up to date
           cache
           checkout

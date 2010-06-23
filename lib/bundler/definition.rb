@@ -56,6 +56,12 @@ module Bundler
       converge
     end
 
+    def resolve_with_cache!
+      raise "Specs already loaded" if @specs
+      @sources.each { |s| s.cached! }
+      specs
+    end
+
     def resolve_remotely!
       raise "Specs already loaded" if @specs
       @remote = true
