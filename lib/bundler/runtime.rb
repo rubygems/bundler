@@ -32,9 +32,8 @@ module Bundler
         end
 
         Gem.loaded_specs[spec.name] = spec
-        spec.load_paths.each do |path|
-          $LOAD_PATH.unshift(path) unless $LOAD_PATH.include?(path)
-        end
+        load_paths = spec.load_paths.reject {|path| $LOAD_PATH.include?(path)}
+        $LOAD_PATH.unshift(*load_paths)
       end
       self
     end
