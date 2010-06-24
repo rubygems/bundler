@@ -40,7 +40,6 @@ module Bundler
   class GemfileNotFound  < BundlerError; status_code(10) ; end
   class GemNotFound      < BundlerError; status_code(7)  ; end
   class GemfileError     < BundlerError; status_code(4)  ; end
-  class GemfileChanged   < GemfileError; status_code(4)  ; end
   class PathError        < BundlerError; status_code(13) ; end
   class GitError         < BundlerError; status_code(11) ; end
   class GemspecError     < BundlerError; status_code(14) ; end
