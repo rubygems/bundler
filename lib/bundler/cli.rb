@@ -89,8 +89,8 @@ module Bundler
 
       begin
         Installer.install(Bundler.root, Bundler.definition, opts)
-      rescue GemfileChanged
-        raise GemfileChanged, "You changed your Gemfile after locking. " +
+      rescue Bundler::GemfileChanged
+        raise Bundler::GemfileChanged, "You changed your Gemfile after locking. " +
           "Please run `bundle install --relock`."
       end
 
