@@ -57,7 +57,7 @@ describe "bundle install from an existing gemspec" do
     G
 
     should_be_installed "bar 1.0.0"
-    should_be_installed "bar-dev 1.0.0"
+    should_be_installed "bar-dev 1.0.0", :groups => :development
   end
 
   it "should use a specific group for development dependencies" do
