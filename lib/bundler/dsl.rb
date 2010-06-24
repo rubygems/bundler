@@ -23,7 +23,7 @@ module Bundler
     def gemspec(opts)
       path              = opts[:path] || '.'
       name              = opts[:name] || '*'
-      development_group = opts[:development_group] || :developement
+      development_group = opts[:development_group] || :development
       gemspecs = Dir[File.join(path, "#{name}.gemspec")]
       case gemspecs.size
       when 1

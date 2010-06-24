@@ -64,7 +64,7 @@ describe "bundle install from an existing gemspec" do
     build_lib("foo", :path => tmp.join("foo")) do |s|
       s.write("foo2.gemspec", "")
       s.add_dependency "bar", "=1.0.0"
-      s.add_development_dependency "bar-dev", '=1.0.0', :groups => :development
+      s.add_development_dependency "bar-dev", '=1.0.0'
     end
 
     install_gemfile(<<-G, :expect_err => true)
