@@ -20,6 +20,29 @@ module Bundler
       @env             = nil
     end
 
+    def gemspec(opts)
+      path              = opts[:path] || '.'
+      name              = opts[:name] || '*'
+      development_group = opts[:development_group] || :developement
+      gemspecs = Dir[File.join(path, "#{name}.gemspec")]
+      case gemspecs.size
+      when 1
+        spec = Gem::Specification.load(gemspecs.first)
+        spec.runtime_dependencies.each do |dep|
+          gem dep.name, dep.requirement.to_s
+        end
+        group(development_group) do
+          spec.development_dependencies.each do |dep|
+            gem dep.name, dep.requirement.to_s
+          end
+        end
+      when 0
+        raise InvalidOption, "There are no gemspecs at #{path}."
+      else
+        raise InvalidOption, "There are multiple gemspecs at #{path}. Please use the :name option to specify which one."
+      end
+    end
+
     def gem(name, *args)
       options = Hash === args.last ? args.pop : {}
       version = args.last || ">= 0"
