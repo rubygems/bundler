@@ -23,6 +23,14 @@ module Bundler
           raise GemNotFound, "#{spec.full_name} is missing. Run `bundle` to get it."
         end
 
+        if activated_spec = Gem.loaded_specs[spec.name] and activated_spec.version != spec.version
+          e = Gem::LoadError.new "You have already activated #{activated_spec.name} #{activated_spec.version}, " \
+                                 "but your Gemfile requires #{spec.name} #{spec.version}. Consider using bundle exec."
+          e.name = spec.name
+          e.version_requirement = Gem::Requirement.new(spec.version.to_s)
+          raise e
+        end
+
         Gem.loaded_specs[spec.name] = spec
         spec.load_paths.each do |path|
           $LOAD_PATH.unshift(path) unless $LOAD_PATH.include?(path)

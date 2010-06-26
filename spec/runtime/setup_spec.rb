@@ -166,6 +166,33 @@ describe "Bundler.setup" do
     end
   end
 
+  describe "preactivated gems" do
+    it "raises an exception if a pre activated gem conflicts with the bundle" do
+      system_gems "thin-1.0", "rack-1.0.0"
+      build_gem "thin", "1.1", :to_system => true do |s|
+        s.add_dependency "rack"
+      end
+
+      gemfile <<-G
+        gem "thin", "1.0"
+      G
+
+      ruby <<-R
+        require 'rubygems'
+        gem "thin"
+        require 'bundler'
+        begin
+          Bundler.setup
+          puts "FAIL"
+        rescue Gem::LoadError => e
+          puts e.message
+        end
+      R
+
+      out.should == "You have already activated thin 1.1, but your Gemfile requires thin 1.0. Consider using bundle exec."
+    end
+  end
+
   # Rubygems returns loaded_from as a string
   it "has loaded_from as a string on all specs" do
     build_git "foo"
