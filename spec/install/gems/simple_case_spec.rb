@@ -161,32 +161,6 @@ describe "bundle install with gem sources" do
       end
     end
 
-    it "ensures that gems are actually installed and not just cached" do
-      build_repo2
-      gemfile <<-G
-        source "file://#{gem_repo2}"
-        group :foo do
-          gem "rack"
-        end
-      G
-
-      bundle "install --without foo"
-
-      gemfile <<-G
-        source "file://#{gem_repo2}"
-        gem "rack"
-      G
-
-      update_repo gem_repo2 do
-        build_gem "rack" do |s|
-          s.write "lib/rack.rb", "raise 'omgomgomg'"
-        end
-      end
-
-      bundle "install"
-      should_be_installed "rack 1.0.0"
-    end
-
     it "finds gems in multiple sources" do
       build_repo2
       update_repo2
