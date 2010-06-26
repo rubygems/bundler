@@ -483,6 +483,19 @@ describe "bundle install with gem sources" do
       G
       out.should =~ /conflict on: "bundler"/i
     end
+
+    it "can install dependencies even if " do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "rails", "3.0"
+      G
+
+      simulate_bundler_version "10.0.0"
+      #simulate_new_machine
+
+      bundle "check"
+      out.should == "The Gemfile's dependencies are satisfied"
+    end
   end
 
   # describe_sudo "it working when $GEM_HOME is owned by root" do

@@ -190,6 +190,7 @@ module Bundler
       if existing = activated[current.name] or current.name == 'bundler'
         # Force the current
         if current.name == 'bundler' && !existing
+          # TODO: handle existing still == nil
           existing = search(DepProxy.new(Gem::Dependency.new('bundler', VERSION), Gem::Platform::RUBY)).first
           activated[current.name] = existing
         end

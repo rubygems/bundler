@@ -141,6 +141,7 @@ module Bundler
           select  { |s| s.source == source }.
           sort_by { |s| s.name }.
           each do |spec|
+            next if spec.name == 'bundler'
             out << spec.to_lock
         end
         out << "\n"
