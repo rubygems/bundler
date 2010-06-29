@@ -4,6 +4,6 @@ end
 
 if ENV['BUNDLER_SPEC_VERSION']
   module Bundler
-    VERSION = ENV['BUNDLER_SPEC_VERSION']
+    VERSION = ENV['BUNDLER_SPEC_VERSION'].dup
   end
 end
