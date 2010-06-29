@@ -193,7 +193,7 @@ describe "bundle flex_install" do
 
     it "suggests bundle update when the Gemfile requires different versions than the lock" do
       nice_error = <<-E.strip.gsub(/^ {8}/, '')
-        Fetching source index for file:/Users/carlhuda/Developer/Source/bundler/tmp/gems/remote2/
+        Fetching source index for file:#{gem_repo2}/
         Bundler could not find compatible versions for gem "rack":
           In snapshot (Gemfile.lock):
             rack (0.9.1)
