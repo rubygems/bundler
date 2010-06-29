@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>Bundler: The best way to manage Ruby applications</title>
-    <link href="stylesheets/application.css" media="all" rel="stylesheet" type="text/css"/><link href="stylesheets/sunburst.css" media="all" rel="stylesheet" type="text/css"/>
+    <link href="../stylesheets/application.css" media="all" rel="stylesheet" type="text/css"/><link href="../stylesheets/sunburst.css" media="all" rel="stylesheet" type="text/css"/>
     <link href="/images/favicon.png" rel="shortcut icon" type="image/png" />
   </head>
   <body>
@@ -10,7 +10,7 @@
       <div id="contents">
         <div id="header">
           <a href="/">
-            <img alt="The best way to manage your application's dependencies" src="images/gembundler.png" width="725"/>
+            <img alt="The best way to manage your application's dependencies" src="../images/gembundler.png" width="725"/>
           </a>
         </div>
         <div id="intro">
@@ -66,7 +66,7 @@
               at once as well
             </div>
             <pre class="sunburst">group <span class="Constant"><span class="Constant">:</span>development</span>, <span class="Constant"><span class="Constant">:</span>test</span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">&quot;</span>wirble<span class="String">&quot;</span></span>&#x000A;  gem <span class="String"><span class="String">&quot;</span>ruby-debug<span class="String">&quot;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;</pre>
-            <a href="groups.html">Learn More: Groups</a>
+            <a href="./groups.html">Learn More: Groups</a>
           </div>
           <div class="bullet">
             <div class="description">
@@ -82,48 +82,11 @@
               </div>
             </div>
           </div>
-          <div class="bullet">
-            <div class="description">
-              Don't forget that non-Rails commands must
-              be executed with bundle exec
-            </div>
-            <pre class='sunburst'>$ bundle exec cucumber&#x000A;</pre>
-          </div>
-        </div>
-        <h2>Sharing</h2>
-        <div class="contents">
-          <div class="bullet">
-            <div class="description">
-              When you're ready to share your application,
-              lock down your dependencies to the specific
-              versions you are using now. This will ensure
-              that other machines use exactly these gems,
-              and are not affected by new releases of gems
-              in the interim
-            </div>
-            <pre class='sunburst'>$ bundle lock&#x000A;$ git add Gemfile.lock</pre>
-            <a href="bundle_lock.html">Learn More: bundle lock</a>
-          </div>
-          <div class="bullet">
-            <div class="description">
-              After locking your dependencies you may not
-              modify the Gemfile without unlocking first
-            </div>
-            <pre class='sunburst'>$ bundle unlock&#x000A;</pre>
-          </div>
-          <div class="bullet">
-            <div class="description">
-              If you've updated your Gemfile and want to
-              install the new gems and re-lock once the new
-              gems are finished installing
-            </div>
-            <pre class='sunburst'>$ bundle install --relock</pre>
-          </div>
         </div>
       </div>
     </div>
     <div id="footer">
-      <img alt="Emocow" src="images/emocow.png"/>
+      <img alt="Emocow" src="../images/emocow.png"/>
       <div class="spacer"></div>
       <div id="navigation">
         <p>
@@ -160,7 +123,7 @@
         </p>
       </div>
       <div class="spacer"></div>
-      <img alt="Bundler small" src="images/bundler-small.png"/>
+      <img alt="Bundler small" src="../images/bundler-small.png"/>
     </div>
     <div id="credits">
       <p>Bundler icon and logo designed by <a href="http://twitter.com/johnneiner">John Neiner</a> and donated by <a href="http://pixelgraphics.us">Pixel Graphic Design Studio</a></p>
@@ -169,8 +132,8 @@
       <img alt="Fork me on GitHub" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" />
     </a>
     <div id="versions">
-      <a class="current" href="v0.9/index.html">v0.9</a>
-      <a class="" href="v1.0/index.html">v1.0</a>
+      <a class="" href="../v0.9/index.html">v0.9</a>
+      <a class="current" href="../v1.0/index.html">v1.0</a>
     </div>
     <script type="text/javascript">
       //<![CDATA[
