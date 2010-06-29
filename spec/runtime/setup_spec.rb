@@ -166,30 +166,34 @@ describe "Bundler.setup" do
     end
   end
 
-  describe "preactivated gems" do
-    it "raises an exception if a pre activated gem conflicts with the bundle" do
-      system_gems "thin-1.0", "rack-1.0.0"
-      build_gem "thin", "1.1", :to_system => true do |s|
-        s.add_dependency "rack"
-      end
-
-      gemfile <<-G
-        gem "thin", "1.0"
-      G
-
-      ruby <<-R
-        require 'rubygems'
-        gem "thin"
-        require 'bundler'
-        begin
-          Bundler.setup
-          puts "FAIL"
-        rescue Gem::LoadError => e
-          puts e.message
+  # Unfortunately, gem_prelude does not record the information about
+  # activated gems, so this test cannot work on 1.9 :(
+  if RUBY_VERSION < "1.9"
+    describe "preactivated gems" do
+      it "raises an exception if a pre activated gem conflicts with the bundle" do
+        system_gems "thin-1.0", "rack-1.0.0"
+        build_gem "thin", "1.1", :to_system => true do |s|
+          s.add_dependency "rack"
         end
-      R
 
-      out.should == "You have already activated thin 1.1, but your Gemfile requires thin 1.0. Consider using bundle exec."
+        gemfile <<-G
+          gem "thin", "1.0"
+        G
+
+        ruby <<-R
+          require 'rubygems'
+          gem "thin"
+          require 'bundler'
+          begin
+            Bundler.setup
+            puts "FAIL"
+          rescue Gem::LoadError => e
+            puts e.message
+          end
+        R
+
+        out.should == "You have already activated thin 1.1, but your Gemfile requires thin 1.0. Consider using bundle exec."
+      end
     end
   end
 
