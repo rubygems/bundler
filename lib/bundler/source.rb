@@ -105,7 +105,7 @@ module Bundler
       end
 
       def sudo(str)
-        `sudo -p 'Bundler requires your password to install to your system gems location\nPassword: ' -E #{str}`
+        `sudo -p 'Enter your password to install the bundled RubyGems to your system: ' -E #{str}`
       end
 
       def cache(spec)
