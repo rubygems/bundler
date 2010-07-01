@@ -177,16 +177,29 @@ module Bundler
     NULL    = WINDOWS ? "NUL" : "/dev/null"
 
     def requires_sudo?
+      path = bundle_path
+      path = path.parent until path.exist?
+
       case
-      when File.writable?(bundle_path) ||
+      when File.writable?(path) ||
            `which sudo 2>#{NULL}`.empty? ||
-           File.owned?(bundle_path)
+           File.owned?(path)
         false
       else
         true
       end
-    rescue Errno::ENOENT
-      false
+    end
+
+    def mkdir_p(path)
+      if requires_sudo?
+        sudo "mkdir -p '#{path}'"
+      else
+        FileUtils.mkdir_p(path)
+      end
+    end
+
+    def sudo(str)
+      `sudo -p 'Enter your password to install the bundled RubyGems to your system: ' -E #{str}`
     end
 
   private

@@ -21,7 +21,7 @@ module Bundler
         @definition.resolve_remotely!
 
       # Ensure that BUNDLE_PATH exists
-      FileUtils.mkdir_p(Bundler.bundle_path)
+      Bundler.mkdir_p(Bundler.bundle_path)
 
       # Must install gems in the order that the resolver provides
       # as dependencies might actually affect the installation of

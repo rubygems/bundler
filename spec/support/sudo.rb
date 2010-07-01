@@ -2,7 +2,7 @@ module Spec
   module Sudo
     def self.sudo?
       @which_sudo ||= `which sudo`.strip
-      !@which_sudo.empty?
+      !@which_sudo.empty? && ENV['BUNDLER_SUDO_TESTS']
     end
 
     module Describe
@@ -10,7 +10,6 @@ module Spec
         return unless Sudo.sudo?
         describe(*args) do
           before :each do
-            pending "sudo tests are broken"
             chown_system_gems
           end
 
@@ -33,6 +32,8 @@ module Spec
     end
 
     def chown_system_gems
+      FileUtils.mkdir_p tmp('owned_by_root')
+      sudo "chown -R root #{tmp('owned_by_root')}"
       sudo "chown -R root #{system_gem_path}"
     end
   end

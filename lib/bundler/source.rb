@@ -97,15 +97,15 @@ module Bundler
         # SUDO HAX
         if Bundler.requires_sudo?
           sudo "mkdir -p #{Gem.dir}/gems #{Gem.dir}/specifications"
-          sudo "mv #{Bundler.tmp}/gems/#{spec.full_name} #{Gem.dir}/gems/"
-          sudo "mv #{Bundler.tmp}/specifications/#{spec.full_name}.gemspec #{Gem.dir}/specifications/"
+          sudo "cp -R #{Bundler.tmp}/gems/#{spec.full_name} #{Gem.dir}/gems/"
+          sudo "cp -R #{Bundler.tmp}/specifications/#{spec.full_name}.gemspec #{Gem.dir}/specifications/"
         end
 
         spec.loaded_from = "#{Gem.dir}/specifications/#{spec.full_name}.gemspec"
       end
 
       def sudo(str)
-        `sudo -p 'Enter your password to install the bundled RubyGems to your system: ' -E #{str}`
+        Bundler.sudo(str)
       end
 
       def cache(spec)
@@ -568,7 +568,7 @@ module Bundler
           in_cache { git %|fetch --force --quiet "#{uri}" refs/heads/*:refs/heads/*| }
         else
           Bundler.ui.info "Fetching #{uri}"
-          FileUtils.mkdir_p(cache_path.dirname)
+          Bundler.mkdir_p(cache_path.dirname)
           git %|clone "#{uri}" "#{cache_path}" --bare --no-hardlinks|
         end
       end
