@@ -446,10 +446,11 @@ module Bundler
 
       def initialize(options)
         super
-        @uri      = options["uri"]
-        @ref      = options["ref"] || options["branch"] || options["tag"] || 'master'
-        @revision = options["revision"]
-        @update   = false
+        @uri        = options["uri"]
+        @ref        = options["ref"] || options["branch"] || options["tag"] || 'master'
+        @revision   = options["revision"]
+        @submodules = options["submodules"]
+        @update     = false
       end
 
       def self.from_lock(options)
@@ -460,7 +461,7 @@ module Bundler
         out = "GIT\n"
         out << "  remote: #{@uri}\n"
         out << "  revision: #{shortref_for(revision)}\n"
-        %w(ref branch tag).each do |opt|
+        %w(ref branch tag submodules).each do |opt|
           out << "  #{opt}: #{options[opt]}\n" if options[opt]
         end
         out << "  glob: #{@glob}\n" unless @glob == DEFAULT_GLOB
@@ -580,8 +581,11 @@ module Bundler
         Dir.chdir(path) do
           git "fetch --force --quiet"
           git "reset --hard #{revision}"
-          git "submodule init"
-          git "submodule update"
+
+          if @submodules
+            git "submodule init"
+            git "submodule update"
+          end
         end
       end
 

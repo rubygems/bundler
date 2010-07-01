@@ -284,6 +284,25 @@ describe "bundle install with git sources" do
     should_be_installed "forced 1.0"
   end
 
+  it "ignores submodules if :submodule is not passed" do
+    build_git "submodule", "1.0"
+    build_git "has_submodule", "1.0" do |s|
+      s.add_dependency "submodule"
+    end
+    Dir.chdir(lib_path('has_submodule-1.0')) do
+      `git submodule add #{lib_path('submodule-1.0')} submodule-1.0`
+      `git commit -m "submodulator"`
+    end
+
+    install_gemfile <<-G, :expect_err => true
+      git "#{lib_path('has_submodule-1.0')}"
+      gem "has_submodule"
+    G
+
+    should_not_be_installed "has_submodule 1.0", :expect_err => true
+    err.should =~ /Could not find gem 'submodule'/
+  end
+
   it "handles repos with submodules" do
     build_git "submodule", "1.0"
     build_git "has_submodule", "1.0" do |s|
@@ -295,7 +314,7 @@ describe "bundle install with git sources" do
     end
 
     install_gemfile <<-G
-      git "#{lib_path('has_submodule-1.0')}"
+      git "#{lib_path('has_submodule-1.0')}", :submodules => true
       gem "has_submodule"
     G
 

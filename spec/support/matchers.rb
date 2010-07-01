@@ -43,10 +43,10 @@ module Spec
 
     def should_not_be_installed(*names)
       opts = names.last.is_a?(Hash) ? names.pop : {}
-      groups = opts[:groups] || []
+      groups = Array(opts[:groups]) || []
       names.each do |name|
         name, version = name.split(/\s+/)
-        run <<-R, *groups
+        run <<-R, *(groups + [opts])
           begin
             require '#{name}'
             puts #{Spec::Builders.constantize(name)}

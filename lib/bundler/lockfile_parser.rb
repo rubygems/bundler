@@ -39,11 +39,17 @@ module Bundler
         @current_source = TYPES[@type].from_lock(@opts)
         @sources << @current_source
       when /^  ([a-z]+): (.*)$/i
-        if @opts[$1]
-          @opts[$1] = Array(@opts[$1])
-          @opts[$1] << $2
+        value = $2
+        value = true if value == "true"
+        value = false if value == "false"
+
+        key = $1
+
+        if @opts[key]
+          @opts[key] = Array(@opts[key])
+          @opts[key] << value
         else
-          @opts[$1] = $2
+          @opts[key] = value
         end
       else
         parse_spec(line)
