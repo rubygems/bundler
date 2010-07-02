@@ -468,6 +468,16 @@ describe "bundle install with gem sources" do
       out.should == nice_error
     end
 
+    it "includes bundler in the bundle when it's a child dependency" do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "rails", "3.0"
+      G
+
+      run "begin; gem 'bundler'; puts 'WIN'; rescue Gem::LoadError; puts 'FAIL'; end"
+      out.should == "WIN"
+    end
+
     it "causes a conflict if child dependencies conflict" do
       install_gemfile <<-G
         source "file://#{gem_repo2}"
