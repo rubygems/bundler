@@ -230,4 +230,22 @@ describe "Bundler.setup" do
     err.should be_empty
   end
 
+  it "should prepend gemspec require paths to $LOAD_PATH in order" do
+    update_repo2 do
+      build_gem("requirepaths") do |s|
+        s.write("lib/rq.rb", "puts 'yay'")
+        s.write("src/rq.rb", "puts 'nooo'")
+        s.require_paths = ["lib", "src"]
+      end
+    end
+
+    install_gemfile <<-G
+      source "file://#{gem_repo2}"
+      gem "requirepaths", :require => nil
+    G
+
+    run "require 'rq'"
+    out.should == "yay"
+  end
+
 end
