@@ -77,6 +77,7 @@ module Bundler
 
       Bundler.ui.info "Updating .gem files in vendor/cache"
       specs.each do |spec|
+        next if spec.name == 'bundler'
         spec.source.cache(spec) if spec.source.respond_to?(:cache)
       end
     end

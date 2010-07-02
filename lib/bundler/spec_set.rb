@@ -18,6 +18,7 @@ module Bundler
 
     def for(dependencies, skip = [], check = false, match_current_platform = false)
       handled, deps, specs = {}, dependencies.dup, []
+      skip << 'bundler'
 
       until deps.empty?
         dep = deps.shift
@@ -44,6 +45,10 @@ module Bundler
         end
       end
 
+      if spec = lookup['bundler'].first
+        specs << spec
+      end
+
       check ? true : SpecSet.new(specs)
     end
 
@@ -54,6 +59,13 @@ module Bundler
     def [](key)
       key = key.name if key.respond_to?(:name)
       lookup[key].reverse
+    end
+
+    def []=(key, value)
+      @specs << value
+      @lookup = nil
+      @sorted = nil
+      value
     end
 
     def to_a

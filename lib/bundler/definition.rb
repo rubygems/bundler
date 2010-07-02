@@ -70,7 +70,15 @@ module Bundler
     end
 
     def specs
-      @specs ||= resolve.materialize(requested_dependencies)
+      @specs ||= begin
+        specs = resolve.materialize(requested_dependencies)
+
+        unless specs["bundler"].any?
+          specs["bundler"] = index.search(Gem::Dependency.new('bundler', VERSION)).last
+        end
+
+        specs
+      end
     end
 
     def missing_specs

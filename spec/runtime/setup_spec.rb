@@ -79,7 +79,7 @@ describe "Bundler.setup" do
 
       it "removes system gems from Gem.source_index" do
         run "require 'yard'"
-        out.should == "yard-1.0"
+        out.should == "bundler-#{Bundler::VERSION}\nyard-1.0"
       end
     end
   end

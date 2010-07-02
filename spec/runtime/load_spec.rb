@@ -29,7 +29,7 @@ describe "Bundler.load" do
     G
 
     env = Bundler.load
-    env.gems.should have_gem("rack-1.0.0")
+    env.gems.should have_gem("rack-1.0.0", "bundler-#{Bundler::VERSION}")
   end
 
   it "raises an exception if the default gemfile is not found" do

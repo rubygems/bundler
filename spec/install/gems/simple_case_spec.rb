@@ -478,6 +478,16 @@ describe "bundle install with gem sources" do
       out.should == "WIN"
     end
 
+    it "allows gem 'bundler' when Bundler is not in the Gemfile or its dependencies" do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "rack"
+      G
+
+      run "begin; gem 'bundler'; puts 'WIN'; rescue Gem::LoadError => e; puts e.backtrace; end"
+      out.should == "WIN"
+    end
+
     it "causes a conflict if child dependencies conflict" do
       install_gemfile <<-G
         source "file://#{gem_repo2}"
