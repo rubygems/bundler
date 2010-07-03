@@ -74,7 +74,8 @@ module Bundler
         specs = resolve.materialize(requested_dependencies)
 
         unless specs["bundler"].any?
-          specs["bundler"] = index.search(Gem::Dependency.new('bundler', VERSION)).last
+          bundler = index.search(Gem::Dependency.new('bundler', VERSION)).last
+          specs["bundler"] = bundler if bundler
         end
 
         specs

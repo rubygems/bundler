@@ -146,27 +146,29 @@ module Bundler
       def installed_specs
         @installed_specs ||= begin
           idx = Index.new
-          Gem::SourceIndex.from_installed_gems.to_a.reverse.each do |name, spec|
-            next if name == 'bundler'
+          have_bundler = false
+          Gem::SourceIndex.from_installed_gems.to_a.reverse.each do |dont_use_this_var, spec|
+            next if spec.name == 'bundler' && spec.version.to_s != VERSION
+            have_bundler = true if spec.name == 'bundler'
             spec.source = self
             idx << spec
           end
-          # Always have bundler locally
-          unless bundler = Gem.loaded_specs['bundler']
-            # We're running bundler directly from the source
-            # so, let's create a fake gemspec for it (it's a path)
-            # gemspec
 
-            bundler = Gem::Specification.new do |s|
-              s.name     = 'bundler'
-              s.version  = VERSION
-              s.platform = Gem::Platform::RUBY
-              s.source   = self
-              # TODO: Remove this
-              s.loaded_from = 'w0t'
-            end
+          # Always have bundler locally
+          unless have_bundler
+           # We're running bundler directly from the source
+           # so, let's create a fake gemspec for it (it's a path)
+           # gemspec
+           bundler = Gem::Specification.new do |s|
+             s.name     = 'bundler'
+             s.version  = VERSION
+             s.platform = Gem::Platform::RUBY
+             s.source   = self
+             # TODO: Remove this
+             s.loaded_from = 'w0t'
+           end
+           idx << bundler
           end
-          idx << bundler
           idx
         end
       end
