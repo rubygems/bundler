@@ -29,6 +29,9 @@ module Bundler
     end
 
     def lock
+      env_file = root.join('.bundle/environment.rb')
+      env_file.rmtree if env_file.exist?
+
       File.open(root.join('Gemfile.lock'), 'w') do |f|
         f.puts @definition.to_lock
       end
