@@ -250,7 +250,7 @@ describe "bundle install with gem sources" do
 
       bundle :install
 
-      bundled_app('vendor/gems/rack-1.0.0').should be_directory
+      vendored_gems('gems/rack-1.0.0').should be_directory
       should_be_installed "rack 1.0.0"
     end
 
@@ -269,7 +269,7 @@ describe "bundle install with gem sources" do
     it "sets BUNDLE_PATH as the first argument to bundle install" do
       bundle "install ./vendor"
 
-      bundled_app('vendor/gems/rack-1.0.0').should be_directory
+      vendored_gems('gems/rack-1.0.0').should be_directory
       should_be_installed "rack 1.0.0"
     end
 
@@ -278,7 +278,7 @@ describe "bundle install with gem sources" do
       build_gem "rack", "1.1.0", :to_system => true
       bundle "install ./vendor"
 
-      bundled_app('vendor/gems/rack-1.0.0').should be_directory
+      vendored_gems('gems/rack-1.0.0').should be_directory
       should_be_installed "rack 1.0.0"
     end
   end
@@ -341,11 +341,11 @@ describe "bundle install with gem sources" do
         gem "rack"
       G
 
-      bundle "install vendor/gems --disable-shared-gems"
-      FileUtils.rm_rf bundled_app('vendor/gems')
+      bundle "install vendor --disable-shared-gems"
+      FileUtils.rm_rf bundled_app('vendor')
       bundle "install"
 
-      bundled_app('vendor/gems/gems/rack-1.0.0').should be_directory
+      vendored_gems('gems/rack-1.0.0').should be_directory
       should_be_installed "rack 1.0.0"
     end
   end

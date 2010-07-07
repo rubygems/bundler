@@ -77,10 +77,8 @@ module Bundler
     end
 
     def bundle_path
-      @bundle_path ||= begin
-        path = settings[:path] || Gem.dir
-        Pathname.new(path).expand_path(root)
-      end
+      # STDERR.puts settings.path
+      @bundle_path ||= Pathname.new(settings.path).expand_path(root)
     end
 
     def bin_path

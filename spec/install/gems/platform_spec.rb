@@ -72,6 +72,19 @@ describe "bundle install across platforms" do
     should_be_installed "nokogiri 1.4.2"
     should_not_be_installed "weakling"
   end
+
+  it "fetches gems again after changing the version of Ruby" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "rack", "1.0.0"
+    G
+
+    bundle "install ./vendor"
+
+    engine = defined?(RUBY_ENGINE) ? RUBY_ENGINE : "ruby"
+    bundled_app("vendor/#{engine}/#{RUBY_VERSION}/gems/rack-1.0.0").should exist
+  end
 end
 
 # TODO: Don't make the tests hardcoded to a platform
