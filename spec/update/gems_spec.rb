@@ -33,3 +33,19 @@ describe "bundle update" do
     end
   end
 end
+
+describe "bundle update without a Gemfile.lock" do
+  it "should not explode" do
+    build_repo2
+
+    gemfile <<-G
+      source "file://#{gem_repo2}"
+
+      gem "rack", "1.0"
+    G
+
+    bundle "update"
+
+    should_be_installed "rack 1.0.0"
+  end
+end
