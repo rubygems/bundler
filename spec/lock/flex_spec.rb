@@ -465,4 +465,32 @@ describe "the lockfile format" do
         platform_specific
     G
   end
+
+  it "does not add duplicate gems" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack"
+    G
+
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack"
+      gem "activesupport"
+    G
+
+    lockfile_should_be <<-G
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          activesupport (2.3.5)
+          rack (1.0.0)
+
+      PLATFORMS
+        ruby
+
+      DEPENDENCIES
+        activesupport
+        rack
+    G
+  end
 end

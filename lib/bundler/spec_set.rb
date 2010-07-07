@@ -92,7 +92,12 @@ module Bundler
     end
 
     def merge(set)
-      SpecSet.new(sorted + set.to_a)
+      arr = sorted.dup
+      set.each do |s|
+        next if arr.any? { |s2| s2.name == s.name && s2.version == s.version && s2.platform == s.platform }
+        arr << s
+      end
+      SpecSet.new(arr)
     end
 
   private
