@@ -483,7 +483,7 @@ describe "bundle install with gem sources" do
         gem "rack"
       G
 
-      puts out
+      should_be_installed "multiple_versioned_deps 1.0.0"
     end
 
     it "includes bundler in the bundle when it's a child dependency" do
