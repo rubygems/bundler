@@ -468,6 +468,24 @@ describe "bundle install with gem sources" do
       out.should == nice_error
     end
 
+    it "works for gems with multiple versions in its dependencies" do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+
+        gem "multiple_versioned_deps"
+      G
+
+
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+
+        gem "multiple_versioned_deps"
+        gem "rack"
+      G
+
+      puts out
+    end
+
     it "includes bundler in the bundle when it's a child dependency" do
       install_gemfile <<-G
         source "file://#{gem_repo2}"

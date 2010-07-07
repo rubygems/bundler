@@ -344,7 +344,7 @@ module Bundler
 
     def search(dep)
       if base = @base[dep.name] and base.any?
-        d = Gem::Dependency.new(base.first.name, *[dep.requirement, base.first.version].flatten)
+        d = Gem::Dependency.new(base.first.name, *[dep.requirement.as_list, base.first.version].flatten)
       else
         d = dep.dep
       end
