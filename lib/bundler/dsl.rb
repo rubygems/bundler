@@ -44,6 +44,10 @@ module Bundler
     end
 
     def gem(name, *args)
+      if name.is_a?(Symbol)
+        raise GemfileError, %{You need to specify gem names as Strings. Use 'gem "#{name.to_s}"' instead.}
+      end
+
       options = Hash === args.last ? args.pop : {}
       version = args.last || ">= 0"
       if group = options[:groups] || options[:group]
