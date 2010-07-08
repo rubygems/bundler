@@ -82,8 +82,23 @@ describe "bundle install across platforms" do
 
     bundle "install ./vendor"
 
-    engine = defined?(RUBY_ENGINE) ? RUBY_ENGINE : "ruby"
-    bundled_app("vendor/#{engine}/#{RUBY_VERSION}/gems/rack-1.0.0").should exist
+    vendored_gems("gems/rack-1.0.0").should exist
+  end
+
+  it "works after switching Rubies" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "rack", "1.0.0"
+    G
+
+    bundle "install ./vendor"
+
+    new_version = Gem::ConfigMap[:ruby_version] == "1.8" ? "1.9.1" : "1.8"
+    FileUtils.mv(vendored_gems, bundled_app("vendor/#{Gem.ruby_engine}/#{new_version}"))
+
+    bundle "install ./vendor"
+    vendored_gems("gems/rack-1.0.0").should exist
   end
 end
 

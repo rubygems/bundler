@@ -30,9 +30,8 @@ module Spec
       root.join(*path)
     end
 
-    def vendored_gems(path)
-      engine = defined?(RUBY_ENGINE) ? RUBY_ENGINE : "ruby"
-      bundled_app("vendor/#{engine}/#{RUBY_VERSION}/#{path}")
+    def vendored_gems(path = nil)
+      bundled_app("vendor/#{Gem.ruby_engine}/#{Gem::ConfigMap[:ruby_version]}/#{path}")
     end
 
     def cached_gem(path)

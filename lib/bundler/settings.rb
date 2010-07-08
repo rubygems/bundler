@@ -38,8 +38,7 @@ module Bundler
       return path if path
 
       if path = self[:path]
-        engine = defined?(RUBY_ENGINE) ? RUBY_ENGINE : "ruby"
-        "#{path}/#{engine}/#{RUBY_VERSION}"
+        "#{path}/#{Gem.ruby_engine}/#{Gem::ConfigMap[:ruby_version]}"
       else
         Gem.dir
       end
