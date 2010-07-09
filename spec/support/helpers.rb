@@ -72,7 +72,7 @@ module Spec
     def gembin(cmd)
       lib = File.expand_path("../../../lib", __FILE__)
       old, ENV['RUBYOPT'] = ENV['RUBYOPT'], "#{ENV['RUBYOPT']} -I#{lib}"
-      sys_exec(cmd)
+      sys_exec(bundled_app("bin/#{cmd}"))
     ensure
       ENV['RUBYOPT'] = old
     end

@@ -1,3 +1,4 @@
+require 'erb'
 require 'rubygems/dependency_installer'
 
 module Bundler
@@ -46,13 +47,16 @@ module Bundler
   private
 
     def generate_bundler_executable_stubs(spec)
+      bin_path = Bundler.bin_path
+      template = File.read(File.expand_path('../templates/Executable', __FILE__))
+      relative_gemfile_path = Bundler.default_gemfile.relative_path_from(bin_path)
+
       spec.executables.each do |executable|
         next if executable == "bundle"
-        File.open "#{Bundler.bin_path}/#{executable}", 'w', 0755 do |f|
-          f.puts File.read(File.expand_path('../templates/Executable', __FILE__))
+        File.open "#{bin_path}/#{executable}", 'w', 0755 do |f|
+          f.puts ERB.new(template, nil, '-').result(binding)
         end
       end
     end
-
   end
 end

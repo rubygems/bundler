@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe "Running commands" do
+describe "Running bin/* commands" do
   it "runs the bundled command when in the bundle" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
@@ -15,7 +15,7 @@ describe "Running commands" do
     out.should == "1.0.0"
   end
 
-  it "runs the system command when out of the bundle" do
+  it "runs the bundled command when out of the bundle" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack"
@@ -27,7 +27,7 @@ describe "Running commands" do
 
     Dir.chdir(tmp) do
       gembin "rackup"
-      out.should == "2.0"
+      out.should == "1.0.0"
     end
   end
 
@@ -48,25 +48,6 @@ describe "Running commands" do
     out.should == '1.0'
   end
 
-  it "blows up when running outside of the directory" do
-    build_lib "rack", :path => lib_path("rack") do |s|
-      s.executables = 'rackup'
-    end
-
-    install_gemfile <<-G
-      gem "rack", :path => "#{lib_path('rack')}"
-    G
-
-    build_gem 'rack', '2.0', :to_system => true do |s|
-      s.executables = 'rackup'
-    end
-
-    Dir.chdir(tmp) do
-      gembin "rackup"
-      out.should == '2.0'
-    end
-  end
-
   it "don't bundle da bundla" do
     build_gem "bundler", Bundler::VERSION, :to_system => true do |s|
       s.executables = "bundle"
@@ -77,6 +58,6 @@ describe "Running commands" do
       gem "bundler"
     G
 
-    home(".bundler/bin/bundle").should_not exist
+    bundled_app("bin/bundle").should_not exist
   end
 end
