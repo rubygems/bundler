@@ -80,6 +80,17 @@ module Bundler
     end
 
     def git(uri, options = {}, source_options = {}, &blk)
+      unless block_given?
+        msg = "You can no longer specify a git source by itself. Instead, \n" \
+              "either use the :git option on a gem, or specify the gems that \n" \
+              "bundler should find in the git source by passing a block to \n" \
+              "the git method, like: \n\n" \
+              "  git 'git://github.com/rails/rails.git' do\n" \
+              "    gem 'rails'\n" \
+              "  end"
+        raise DeprecatedError, msg
+      end
+
       source Source::Git.new(_normalize_hash(options).merge("uri" => uri)), source_options, &blk
     end
 
@@ -121,7 +132,7 @@ module Bundler
           message << "and is no longer supported."
         end
         message << "\nSee the README for more information on upgrading from Bundler 0.8."
-        raise DeprecatedMethod, message
+        raise DeprecatedError, message
       end
     end
 
@@ -186,7 +197,7 @@ module Bundler
       ["git", "path"].each do |type|
         if param = opts[type]
           options = _version?(version) ? opts.merge("name" => name, "version" => version) : opts.dup
-          source = send(type, param, options, :prepend => true)
+          source = send(type, param, options, :prepend => true) {}
           opts["source"] = source
         end
       end
@@ -199,13 +210,13 @@ module Bundler
 
     def _deprecated_options(options)
       if options.include?(:require_as)
-        raise DeprecatedOption, "Please replace :require_as with :require"
+        raise DeprecatedError, "Please replace :require_as with :require"
       elsif options.include?(:vendored_at)
-        raise DeprecatedOption, "Please replace :vendored_at with :path"
+        raise DeprecatedError, "Please replace :vendored_at with :path"
       elsif options.include?(:only)
-        raise DeprecatedOption, "Please replace :only with :group"
+        raise DeprecatedError, "Please replace :only with :group"
       elsif options.include?(:except)
-        raise DeprecatedOption, "The :except option is no longer supported"
+        raise DeprecatedError, "The :except option is no longer supported"
       end
     end
   end

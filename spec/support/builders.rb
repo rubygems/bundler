@@ -216,6 +216,8 @@ module Spec
         build_gem "net_e" do |s|
           s.add_dependency "net_d"
         end
+
+        build_gem "foo"
       end
     end
 

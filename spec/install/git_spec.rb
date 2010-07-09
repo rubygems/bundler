@@ -8,8 +8,10 @@ describe "bundle install with git sources" do
       end
 
       install_gemfile <<-G
-        git "#{lib_path('foo-1.0')}"
-        gem 'foo'
+        source "file://#{gem_repo1}"
+        git "#{lib_path('foo-1.0')}" do
+          gem 'foo'
+        end
       G
     end
 
@@ -33,8 +35,9 @@ describe "bundle install with git sources" do
 
       in_app_root2 do
         install_gemfile bundled_app2("Gemfile"), <<-G
-          git "#{lib_path('foo-1.0')}"
-          gem 'foo'
+          git "#{lib_path('foo-1.0')}" do
+            gem 'foo'
+          end
         G
       end
 
@@ -72,8 +75,9 @@ describe "bundle install with git sources" do
       update_git "foo"
 
       install_gemfile <<-G
-        git "#{lib_path('foo-1.0')}", :ref => "#{@revision}"
-        gem "foo"
+        git "#{lib_path('foo-1.0')}", :ref => "#{@revision}" do
+          gem "foo"
+        end
       G
 
       run <<-RUBY
@@ -264,8 +268,9 @@ describe "bundle install with git sources" do
     build_git "forced", "1.0"
 
     install_gemfile <<-G
-      git "#{lib_path('forced-1.0')}"
-      gem 'forced'
+      git "#{lib_path('forced-1.0')}" do
+        gem 'forced'
+      end
     G
     should_be_installed "forced 1.0"
 
@@ -295,8 +300,9 @@ describe "bundle install with git sources" do
     end
 
     install_gemfile <<-G, :expect_err => true
-      git "#{lib_path('has_submodule-1.0')}"
-      gem "has_submodule"
+      git "#{lib_path('has_submodule-1.0')}" do
+        gem "has_submodule"
+      end
     G
 
     should_not_be_installed "has_submodule 1.0", :expect_err => true
@@ -314,8 +320,9 @@ describe "bundle install with git sources" do
     end
 
     install_gemfile <<-G
-      git "#{lib_path('has_submodule-1.0')}", :submodules => true
-      gem "has_submodule"
+      git "#{lib_path('has_submodule-1.0')}", :submodules => true do
+        gem "has_submodule"
+      end
     G
 
     should_be_installed "has_submodule 1.0"

@@ -139,8 +139,9 @@ describe "the lockfile format" do
     git = build_git "foo"
 
     install_gemfile <<-G
-      git "#{lib_path('foo-1.0')}"
-      gem "foo"
+      git "#{lib_path('foo-1.0')}" do
+        gem "foo"
+      end
     G
 
     lockfile_should_be <<-G
@@ -157,7 +158,7 @@ describe "the lockfile format" do
         #{Gem::Platform.local.to_generic}
 
       DEPENDENCIES
-        foo
+        foo!
     G
   end
 

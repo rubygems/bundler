@@ -10,8 +10,9 @@ describe "bundle update" do
 
       install_gemfile <<-G
         source "file://#{gem_repo2}"
-        git "#{lib_path('foo')}"
-        gem 'foo'
+        git "#{lib_path('foo')}" do
+          gem 'foo'
+        end
         gem 'rack'
       G
     end

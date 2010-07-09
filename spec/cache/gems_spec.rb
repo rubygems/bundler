@@ -58,9 +58,10 @@ describe "bundle cache" do
 
       install_gemfile <<-G
         source "file://#{gem_repo1}"
-        git "#{lib_path("foo-1.0")}"
+        git "#{lib_path("foo-1.0")}" do
+          gem 'foo'
+        end
         gem 'rack'
-        gem 'foo'
       G
 
       bundle :cache

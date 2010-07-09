@@ -7,8 +7,9 @@ describe "bundle update" do
       update_git "foo", :branch => "omg"
 
       install_gemfile <<-G
-        git "#{lib_path('foo-1.0')}", :branch => "omg"
-        gem 'foo'
+        git "#{lib_path('foo-1.0')}", :branch => "omg" do
+          gem 'foo'
+        end
       G
 
       update_git "foo", :branch => "omg" do |s|
