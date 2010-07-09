@@ -38,7 +38,7 @@ module Bundler
       return path if path
 
       if path = self[:path]
-        "#{path}/#{Gem.ruby_engine}/#{Gem::ConfigMap[:ruby_version]}"
+        "#{path}/#{Bundler.ruby_scope}"
       else
         Gem.dir
       end

@@ -126,6 +126,14 @@ module Bundler
       end
     end
 
+    def ruby_scope
+      "#{Gem.ruby_engine}/#{Gem::ConfigMap[:ruby_version]}"
+    end
+
+    def user_bundle_path
+      Pathname.new(Gem.user_home).join(".bundler")
+    end
+
     def home
       bundle_path.join("bundler")
     end
@@ -151,7 +159,7 @@ module Bundler
     end
 
     def tmp
-      "#{Gem.user_home}/.bundler/tmp"
+      user_bundle_path.join("tmp")
     end
 
     def settings

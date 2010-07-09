@@ -496,7 +496,15 @@ module Bundler
       end
 
       def path
-        Bundler.install_path.join("#{base_name}-#{shortref_for(revision)}")
+        @install_path ||= begin
+          git_scope = "#{base_name}-#{shortref_for(revision)}"
+
+          if Bundler.requires_sudo?
+            Bundler.user_bundle_path.join(Bundler.ruby_scope).join(git_scope)
+          else
+            Bundler.install_path.join(git_scope)
+          end
+        end
       end
 
       def unlock!
@@ -534,11 +542,7 @@ module Bundler
     private
 
       def git(command)
-        if Bundler.requires_sudo?
-          out = %x{sudo -E git #{command}}
-        else
-          out = %x{git #{command}}
-        end
+        out = %x{git #{command}}
 
         if $? != 0
           raise GitError, "An error has occurred in git. Cannot complete bundling."
@@ -567,7 +571,15 @@ module Bundler
       end
 
       def cache_path
-        @cache_path ||= Bundler.cache.join("git", "#{base_name}-#{uri_hash}")
+        @cache_path ||= begin
+          git_scope = "#{base_name}-#{uri_hash}"
+
+          if Bundler.requires_sudo?
+            Bundler.user_bundle_path.join("cache/git", git_scope)
+          else
+            Bundler.cache.join("git", git_scope)
+          end
+        end
       end
 
       def cache
