@@ -7,6 +7,11 @@ module Bundler
       @definition = definition
     end
 
+    def inspect
+      puts
+      @definition.to_lock
+    end
+
     # TODO: Remove this method. It's used in cli.rb still
     def index
       @definition.index
