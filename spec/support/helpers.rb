@@ -79,7 +79,7 @@ module Spec
 
     def sys_exec(cmd, expect_err = false)
       require "open3"
-      @in, @out, @err = Open3.popen3(cmd)
+      @in, @out, @err = Open3.popen3(cmd.to_s)
 
       yield @in if block_given?
 
