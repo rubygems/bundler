@@ -37,7 +37,7 @@ module Bundler
 
         spec.source.install(spec)
         Bundler.ui.info ""
-        generate_bundler_executable_stubs(spec)
+        generate_bundler_executable_stubs(spec) if Bundler.settings[:bin]
         FileUtils.rm_rf(Bundler.tmp)
       end
 

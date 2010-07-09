@@ -2,10 +2,12 @@ require "spec_helper"
 
 describe "Running bin/* commands" do
   it "runs the bundled command when in the bundle" do
-    install_gemfile <<-G
+    gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack"
     G
+
+    bundle "install --binstubs"
 
     build_gem "rack", "2.0", :to_system => true do |s|
       s.executables = "rackup"
@@ -16,10 +18,12 @@ describe "Running bin/* commands" do
   end
 
   it "runs the bundled command when out of the bundle" do
-    install_gemfile <<-G
+    gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack"
     G
+
+    bundle "install --binstubs"
 
     build_gem "rack", "2.0", :to_system => true do |s|
       s.executables = "rackup"
@@ -36,9 +40,11 @@ describe "Running bin/* commands" do
       s.executables = 'rackup'
     end
 
-    install_gemfile <<-G
+    gemfile <<-G
       gem "rack", :path => "#{lib_path('rack')}"
     G
+
+    bundle "install --binstubs"
 
     build_gem 'rack', '2.0', :to_system => true do |s|
       s.executables = 'rackup'
@@ -53,11 +59,43 @@ describe "Running bin/* commands" do
       s.executables = "bundle"
     end
 
-    install_gemfile <<-G
+    gemfile <<-G
       source "file://#{gem_repo1}"
       gem "bundler"
     G
 
+    bundle "install --binstubs"
+
     bundled_app("bin/bundle").should_not exist
+  end
+
+  it "does not generate bin stubs if the option was not specified" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack"
+    G
+
+    bundle "install"
+
+    bundled_app("bin/rackup").should_not exist
+  end
+
+  it "remembers that the option was specified" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "activesupport"
+    G
+
+    bundle "install --binstubs"
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "activesupport"
+      gem "rack"
+    G
+
+    bundle "install"
+
+    bundled_app("bin/rackup").should exist
   end
 end
