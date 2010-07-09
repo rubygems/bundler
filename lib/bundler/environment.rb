@@ -8,8 +8,7 @@ module Bundler
     end
 
     def inspect
-      puts
-      @definition.to_lock
+      @definition.to_lock.inspect
     end
 
     # TODO: Remove this method. It's used in cli.rb still
