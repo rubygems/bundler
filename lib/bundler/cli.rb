@@ -1,5 +1,6 @@
 $:.unshift File.expand_path('../vendor', __FILE__)
 require 'thor'
+require 'thor/actions'
 require 'rubygems/config_file'
 
 # Work around a RubyGems bug
@@ -7,6 +8,9 @@ Gem.configuration
 
 module Bundler
   class CLI < Thor
+
+    include Thor::Actions
+
     def initialize(*)
       super
       use_shell = options["no-color"] ? Thor::Shell::Basic.new : shell
@@ -408,6 +412,32 @@ module Bundler
           raise
         end
       end
+    end
+
+    desc "gem GEM", "Creates a skeleton for creating a rubygem"
+    def gem(name)
+      target = File.join(Dir.pwd, name)
+      if File.exist?(name)
+        Bundler.ui.error "File already exists at #{File.join(Dir.pwd, name)}"
+        exit 1
+      end
+
+      constant_name = name.split('_').map{|p| p.capitalize}.join
+      constant_name = constant_name.split('-').map{|q| q.capitalize}.join('::') if constant_name =~ /-/
+      FileUtils.mkdir_p(File.join(target, 'lib', name))
+      opts = {:name => name, :constant_name => constant_name}
+      template(File.join('newgem', 'Gemfile.tt'),                     File.join(target, 'Gemfile'),                 opts)
+      template(File.join('newgem', 'Rakefile.tt'),                    File.join(target, 'Rakefile'),                opts)
+      template(File.join('newgem', 'gitignore.tt'),                   File.join(target, '.gitignore'),              opts)
+      template(File.join('newgem', 'newgem.gemspec.tt'),              File.join(target, "#{name}.gemspec"),         opts)
+      template(File.join('newgem', 'lib', 'newgem.rb.tt'),            File.join(target, 'lib', "#{name}.rb"),       opts)
+      template(File.join('newgem', 'lib', 'newgem', 'version.rb.tt'), File.join(target, 'lib', name, 'version.rb'), opts)
+      Bundler.ui.info "Initializating git repo in #{target}"
+      Dir.chdir(target) { `git init`; `git add .` }
+    end
+
+    def self.source_root
+      File.expand_path(File.join(File.dirname(__FILE__), 'templates'))
     end
 
   private
