@@ -2,7 +2,7 @@ require "digest/sha1"
 
 module Bundler
   class Definition
-    attr_reader :dependencies, :platforms
+    attr_reader :dependencies, :platforms, :sources
 
     def self.build(gemfile, lockfile, unlock)
       unlock ||= {}
