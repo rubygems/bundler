@@ -588,7 +588,7 @@ module Bundler
           in_cache { git %|fetch --force --quiet "#{uri}" refs/heads/*:refs/heads/*| }
         else
           Bundler.ui.info "Fetching #{uri}"
-          Bundler.mkdir_p(cache_path.dirname)
+          FileUtils.mkdir_p(cache_path.dirname)
           git %|clone "#{uri}" "#{cache_path}" --bare --no-hardlinks|
         end
       end
