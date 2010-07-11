@@ -185,15 +185,9 @@ module Bundler
     def requires_sudo?
       path = bundle_path
       path = path.parent until path.exist?
+      sudo_present = !`which sudo 2>#{NULL}`.empty?
 
-      case
-      when File.writable?(path) ||
-           `which sudo 2>#{NULL}`.empty? ||
-           File.owned?(path)
-        false
-      else
-        true
-      end
+      !File.writable?(path) && sudo_present
     end
 
     def mkdir_p(path)
