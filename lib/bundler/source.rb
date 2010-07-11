@@ -367,13 +367,13 @@ module Bundler
       end
 
       class Installer < Gem::Installer
-        def initialize(spec)
+        def initialize(spec, options = {})
           @spec              = spec
           @bin_dir           = "#{Gem.dir}/bin"
           @gem_dir           = spec.full_gem_path
-          @wrappers          = true
-          @env_shebang       = true
-          @format_executable = false
+          @wrappers          = options[:wrappers] || true
+          @env_shebang       = options[:env_shebang] || true
+          @format_executable = options[:format_executable] || false
         end
       end
 
@@ -421,14 +421,7 @@ module Bundler
 
         gem_file = Dir.chdir(gem_dir){ Gem::Builder.new(spec).build }
 
-        installer = Gem::Installer.new File.join(gem_dir, gem_file),
-          :bin_dir           => "#{Gem.dir}/bin",
-          :wrappers          => true,
-          :env_shebang       => false,
-          :format_executable => false
-
-        installer.instance_eval { @gem_dir = gem_dir }
-
+        installer = Installer.new(spec, :env_shebang => false)
         installer.build_extensions
         installer.generate_bin
       rescue Gem::InvalidSpecificationException => e
