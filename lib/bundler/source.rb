@@ -100,6 +100,9 @@ module Bundler
           sudo "mkdir -p #{Gem.dir}/gems #{Gem.dir}/specifications"
           sudo "cp -R #{Bundler.tmp}/gems/#{spec.full_name} #{Gem.dir}/gems/"
           sudo "cp -R #{Bundler.tmp}/specifications/#{spec.full_name}.gemspec #{Gem.dir}/specifications/"
+          spec.executables.each do |exe|
+            Bundler.sudo "cp -R #{Bundler.tmp}/bin/#{exe} #{Gem.dir}/bin/"
+          end
         end
 
         spec.loaded_from = "#{Gem.dir}/specifications/#{spec.full_name}.gemspec"
