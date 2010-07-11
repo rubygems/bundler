@@ -86,12 +86,13 @@ module Bundler
         Bundler.ui.info "Installing #{spec.name} (#{spec.version}) "
 
         install_path = Bundler.requires_sudo? ? Bundler.tmp : Gem.dir
-        installer = Gem::Installer.new path,
-          :install_dir         => install_path,
-          :ignore_dependencies => true,
-          :wrappers            => true,
-          :env_shebang         => true,
-          :bin_dir             => "#{install_path}/bin"
+        options = { :install_dir         => install_path,
+                    :ignore_dependencies => true,
+                    :wrappers            => true,
+                    :env_shebang         => true }
+        options.merge!(:bin_dir => "#{install_path}/bin") unless spec.executables.nil? || spec.executables.empty?
+
+        installer = Gem::Installer.new path, options
         installer.install
 
         # SUDO HAX
