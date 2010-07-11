@@ -373,11 +373,24 @@ module Bundler
       class Installer < Gem::Installer
         def initialize(spec, options = {})
           @spec              = spec
-          @bin_dir           = "#{Gem.dir}/bin"
+          @bin_dir           = Bundler.requires_sudo? ? "#{Bundler.tmp}/bin" : "#{Gem.dir}/bin"
           @gem_dir           = spec.full_gem_path
           @wrappers          = options[:wrappers] || true
           @env_shebang       = options[:env_shebang] || true
           @format_executable = options[:format_executable] || false
+        end
+
+        def generate_bin
+          return if spec.executables.nil? || spec.executables.empty?
+
+          FileUtils.mkdir_p("#{Bundler.tmp}/bin") if Bundler.requires_sudo?
+          super
+          if Bundler.requires_sudo?
+            Bundler.mkdir_p "#{Gem.dir}/bin"
+            spec.executables.each do |exe|
+              Bundler.sudo "cp -R #{Bundler.tmp}/bin/#{exe} #{Gem.dir}/bin/"
+            end
+          end
         end
       end
 
