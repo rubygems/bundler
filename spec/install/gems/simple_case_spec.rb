@@ -11,6 +11,30 @@ describe "bundle install with gem sources" do
       out.should =~ /no dependencies/
     end
 
+    it "does not make a lockfile if the install fails" do
+      install_gemfile <<-G, :expect_err => true
+        raise StandardError, "FAIL"
+      G
+
+      err.should =~ /FAIL \(StandardError\)/
+      bundled_app("Gemfile.lock").should_not exist
+    end
+
+    it "doesn't delete the lockfile if one already exists" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem 'rack'
+      G
+
+      lockfile = File.read(bundled_app("Gemfile.lock"))
+
+      install_gemfile <<-G, :expect_err => true
+        raise StandardError, "FAIL"
+      G
+
+      File.read(bundled_app("Gemfile.lock")).should == lockfile
+    end
+
     it "fetches gems" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"

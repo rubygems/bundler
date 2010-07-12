@@ -1,6 +1,67 @@
 require "spec_helper"
 
 describe "Bundler.setup" do
+  it "raises if the Gemfile was not yet installed" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack"
+    G
+
+    ruby <<-R
+      require 'rubygems'
+      require 'bundler'
+
+      begin
+        Bundler.setup
+        puts "FAIL"
+      rescue Bundler::GemNotFound
+        puts "WIN"
+      end
+    R
+
+    out.should == "WIN"
+  end
+
+  it "doesn't create a Gemfile.lock if the setup fails" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack"
+    G
+
+    ruby <<-R, :expect_err => true
+      require 'rubygems'
+      require 'bundler'
+
+      Bundler.setup
+    R
+
+    bundled_app("Gemfile.lock").should_not exist
+  end
+
+  it "doesn't change the Gemfile.lock if the setup fails" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack"
+    G
+
+    lockfile = File.read(bundled_app("Gemfile.lock"))
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack"
+      gem "nosuchgem", "10.0"
+    G
+
+    ruby <<-R, :expect_err => true
+      require 'rubygems'
+      require 'bundler'
+
+      Bundler.setup
+    R
+
+    File.read(bundled_app("Gemfile.lock")).should == lockfile
+  end
+
   it "uses BUNDLE_GEMFILE to locate the gemfile if present" do
     gemfile <<-G
       source "file://#{gem_repo1}"
