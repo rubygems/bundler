@@ -136,6 +136,38 @@ describe "bundle install with git sources" do
       run "require 'rack'"
       out.should == 'WIN OVERRIDE'
     end
+
+    it "correctly unlocks when changing to a git source" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", "0.9.1"
+      G
+
+      build_git "rack", :path => lib_path("rack")
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", "1.0.0", :git => "#{lib_path('rack')}"
+      G
+
+      should_be_installed "rack 1.0.0"
+    end
+
+    it "correctly unlocks when changing to a git source without versions" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      build_git "rack", "1.2", :path => lib_path("rack")
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :git => "#{lib_path('rack')}"
+      G
+
+      should_be_installed "rack 1.2"
+    end
   end
 
   describe "block syntax" do

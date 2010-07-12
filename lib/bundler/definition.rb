@@ -232,7 +232,7 @@ module Bundler
     end
 
     def satisfies_locked_spec?(dep)
-      @last_resolve.any? { |s| s.satisfies?(dep) }
+      @last_resolve.any? { |s| s.satisfies?(dep) && (!dep.source || s.source == dep.source) }
     end
 
     def expanded_dependencies
