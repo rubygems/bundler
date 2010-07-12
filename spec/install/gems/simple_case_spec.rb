@@ -244,6 +244,16 @@ describe "bundle install with gem sources" do
       G
     end
 
+    it "installs gems to a path if one is specified" do
+      ENV["BUNDLE_PATH"] = bundled_app("vendor2").to_s
+
+      bundle "install vendor"
+
+      vendored_gems("gems/rack-1.0.0").should be_directory
+      bundled_app("vendor2").should_not be_directory
+      should_be_installed "rack 1.0.0"
+    end
+
     it "installs gems to BUNDLE_PATH" do
       ENV['BUNDLE_PATH'] = bundled_app('vendor').to_s
 

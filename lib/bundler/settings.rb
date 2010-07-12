@@ -35,7 +35,7 @@ module Bundler
     def path
       path = ENV[key_for(:path)]
 
-      return path if path
+      return path if path && !@config.key?(key_for(:path))
 
       if path = self[:path]
         "#{path}/#{Bundler.ruby_scope}"
