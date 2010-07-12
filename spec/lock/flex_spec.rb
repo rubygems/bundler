@@ -8,7 +8,8 @@ describe "the lockfile format" do
     expected.gsub!(/^#{spaces}/, '')
 
     simple_matcher "should be" do |given, m|
-      m.failure_message = "The lockfile did not match what you expected:\n===============\n" << Differ.diff_by_line(expected, given).to_s << "\n===============\n"
+      m.failure_message = "The lockfile did not match.\n=== Expected:\n" <<
+        expected << "\n=== Got:\n" << given << "\n===========\n"
       expected == given
     end
   end
