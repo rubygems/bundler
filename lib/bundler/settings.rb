@@ -32,6 +32,7 @@ module Bundler
       self[:without] ? self[:without].split(":").map { |w| w.to_sym } : []
     end
 
+    # @config["BUNDLE_PATH"] should be prioritized over ENV["BUNDLE_PATH"]
     def path
       path = ENV[key_for(:path)]
 
