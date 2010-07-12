@@ -199,7 +199,7 @@ module Bundler
     end
 
     def sudo(str)
-      `sudo -p 'Enter your password to install the bundled RubyGems to your system: ' -E #{str}`
+      `sudo -p 'Enter your password to install the bundled RubyGems to your system: ' #{str}`
     end
 
   private
