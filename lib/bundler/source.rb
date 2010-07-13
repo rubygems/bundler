@@ -544,7 +544,8 @@ module Bundler
       end
 
       def load_spec_files
-        super if cache_path.exist?
+        return super if cache_path.exist?
+        raise PathError
       rescue PathError
         raise PathError, "#{to_s} is not checked out. Please run `bundle install`"
       end

@@ -15,11 +15,21 @@ module Bundler
         return
       end
 
+      if Bundler.root.join("Gemfile.lock").exist? && !options["update"]
+        begin
+          missing_specs = Definition.build(Bundler.default_gemfile, Bundler.root.join("Gemfile.lock"), nil).missing_specs
+          local = true unless missing_specs.any?
+        rescue BundlerError
+        end
+      end
+
       # Since we are installing, we can resolve the definition
       # using remote specs
-      options["local"] ?
-        @definition.resolve_with_cache! :
-        @definition.resolve_remotely!
+      unless local
+        options["local"] ?
+          @definition.resolve_with_cache! :
+          @definition.resolve_remotely!
+      end
 
       # Ensure that BUNDLE_PATH exists
       Bundler.mkdir_p(Bundler.bundle_path)

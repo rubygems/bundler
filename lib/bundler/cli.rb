@@ -139,7 +139,7 @@ module Bundler
         Bundler.definition(:gems => gems, :sources => sources)
       end
 
-      Installer.install Bundler.root, Bundler.definition
+      Installer.install Bundler.root, Bundler.definition, "update" => true
       cache if Bundler.root.join("vendor/cache").exist?
       Bundler.ui.confirm "Your bundle is updated! " +
         "Use `bundle show [gemname]` to see where a bundled gem is installed."
