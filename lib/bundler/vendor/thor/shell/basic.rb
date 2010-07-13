@@ -43,7 +43,7 @@ class Thor
         if force_new_line
           $stdout.puts(spaces + message)
         else
-          $stdout.print(spaces + message)
+      $stdout.print(spaces + message)
         end
         $stdout.flush
       end

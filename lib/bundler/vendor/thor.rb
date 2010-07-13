@@ -305,6 +305,7 @@ class Thor
           def help(task = nil, subcommand = true); super; end
         RUBY
       end
+
   end
 
   include Thor::Base
