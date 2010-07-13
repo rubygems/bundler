@@ -1,5 +1,4 @@
 require 'rbconfig'
-require 'thor/shell/color'
 
 class Thor
   module Base
@@ -7,7 +6,9 @@ class Thor
     # it will use a colored log, otherwise it will use a basic one without color.
     #
     def self.shell
-      @shell ||= if Config::CONFIG['host_os'] =~ /mswin|mingw/
+      @shell ||= if ENV['THOR_SHELL'] && ENV['THOR_SHELL'].size > 0
+        Thor::Shell.const_get(ENV['THOR_SHELL'])
+      elsif Config::CONFIG['host_os'] =~ /mswin|mingw/
         Thor::Shell::Basic
       else
         Thor::Shell::Color
@@ -23,6 +24,10 @@ class Thor
 
   module Shell
     SHELL_DELEGATED_METHODS = [:ask, :yes?, :no?, :say, :say_status, :print_table]
+
+    autoload :Basic, 'thor/shell/basic'
+    autoload :Color, 'thor/shell/color'
+    autoload :HTML,  'thor/shell/HTML'
 
     # Add shell to initialize config values.
     #

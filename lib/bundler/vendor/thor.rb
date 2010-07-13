@@ -1,6 +1,5 @@
 require 'thor/base'
 
-# TODO: Update thor to allow for git-style CLI (git bisect run)
 class Thor
   class << self
     # Sets the default task when thor is executed without an explicit task to be called.
@@ -135,6 +134,7 @@ class Thor
     #   script.invoke(:task, first_arg, second_arg, third_arg)
     #
     def start(original_args=ARGV, config={})
+      @@original_args = original_args
       super do |given_args|
         meth = given_args.first.to_s
 
@@ -188,8 +188,8 @@ class Thor
     # ==== Parameters
     # shell<Thor::Shell>
     #
-    def help(shell)
-      list = printable_tasks
+    def help(shell, subcommand = false)
+      list = printable_tasks(true, subcommand)
       Thor::Util.thor_classes_in(self).each do |klass|
         list += klass.printable_tasks(false)
       end
@@ -202,17 +202,24 @@ class Thor
     end
 
     # Returns tasks ready to be printed.
-    def printable_tasks(all=true)
+    def printable_tasks(all = true, subcommand = false)
       (all ? all_tasks : tasks).map do |_, task|
         item = []
-        item << banner(task)
+        item << banner(task, false, subcommand)
         item << (task.description ? "# #{task.description.gsub(/\s+/m,' ')}" : "")
         item
       end
     end
 
-    def handle_argument_error(task, error) #:nodoc:
-      raise InvocationError, "#{task.name.inspect} was called incorrectly. Call as #{task.formatted_usage(self, banner_base == "thor").inspect}."
+    def subcommands
+      @@subcommands ||= {}
+    end
+
+    def subcommand(subcommand, subcommand_class)
+      subcommand = subcommand.to_s
+      subcommands[subcommand] = subcommand_class
+      subcommand_class.subcommand_help subcommand
+      define_method(subcommand) { |*_| subcommand_class.start(subcommand_args) }
     end
 
     protected
@@ -222,8 +229,8 @@ class Thor
       # the task that is going to be invoked and a boolean which indicates if
       # the namespace should be displayed as arguments.
       #
-      def banner(task)
-        "#{banner_base} #{task.formatted_usage(self, banner_base == "thor")}"
+      def banner(task, namespace = nil, subcommand = false)
+        "#{$0} #{task.formatted_usage(self, $thor_runner, subcommand)}"
       end
 
       def baseclass #:nodoc:
@@ -254,10 +261,21 @@ class Thor
       # If a map can't be found use the sent name or the default task.
       #
       def normalize_task_name(meth) #:nodoc:
-        mapping = map[meth.to_s]
-        meth = mapping || meth || default_task
+        meth = map[meth.to_s] || meth || default_task
         meth.to_s.gsub('-','_') # treat foo-bar > foo_bar
       end
+
+      def subcommand_help(cmd)
+        desc "help [COMMAND]", "Describe subcommands or one specific subcommand"
+        class_eval <<-RUBY
+          def help(task = nil, subcommand = true); super; end
+        RUBY
+      end
+
+  end
+
+  def subcommand_args
+    @@original_args[1..-1]
   end
 
   include Thor::Base
@@ -265,7 +283,7 @@ class Thor
   map HELP_MAPPINGS => :help
 
   desc "help [TASK]", "Describe available tasks or one specific task"
-  def help(task=nil)
-    task ? self.class.task_help(shell, task) : self.class.help(shell)
+  def help(task = nil, subcommand = false)
+    task ? self.class.task_help(shell, task) : self.class.help(shell, subcommand)
   end
 end

@@ -41,15 +41,15 @@ class Thor
 
     # Returns the formatted usage by injecting given required arguments
     # and required options into the given usage.
-    def formatted_usage(klass, namespace=true)
+    def formatted_usage(klass, namespace = true, subcommand = false)
       namespace = klass.namespace unless namespace == false
 
-      # Add namespace
-      formatted = if namespace
-        "#{namespace.gsub(/^(default|thor:runner:)/,'')}:"
-      else
-        ""
+      if namespace
+        formatted = "#{namespace.gsub(/^(default)/,'')}:"
+        formatted.sub!(/.$/, ' ') if subcommand
       end
+
+      formatted ||= ""
 
       # Add usage with required arguments
       formatted << if klass && !klass.arguments.empty?
@@ -89,8 +89,11 @@ class Thor
       end
 
       def handle_argument_error?(instance, error, caller)
-        not_debugging?(instance) && error.message =~ /wrong number of arguments/ &&
-          sans_backtrace(error.backtrace, caller).empty?
+        not_debugging?(instance) && error.message =~ /wrong number of arguments/ && begin
+          saned = sans_backtrace(error.backtrace, caller)
+          # Ruby 1.9 always include the called method in the backtrace
+          saned.empty? || (saned.size == 1 && RUBY_VERSION >= "1.9")
+        end
       end
 
       def handle_no_method_error?(instance, error, caller)
