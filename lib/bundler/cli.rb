@@ -96,7 +96,7 @@ module Bundler
       "Only output warnings and errors."
     method_option "local", :type => :boolean, :banner =>
       "Do not attempt to fetch gems remotely and use the gem cache instead"
-    method_option "binstubs", :type => :boolean, :banner =>
+    method_option "binstubs", :type => :string, :lazy_default => "bin", :banner =>
       "Generate bin stubs for bundled gems to ./bin"
     def install(path = nil)
       opts = options.dup
@@ -106,7 +106,7 @@ module Bundler
       # Can't use Bundler.settings for this because settings needs gemfile.dirname
       ENV['BUNDLE_GEMFILE'] = opts[:gemfile] if opts[:gemfile]
       Bundler.settings[:path] = path if path
-      Bundler.settings[:bin] = 'bin' if opts[:binstubs]
+      Bundler.settings[:bin] = opts["binstubs"] if opts[:binstubs]
       Bundler.settings[:disable_shared_gems] = '1' if options["disable-shared-gems"] || path
       Bundler.settings.without = opts[:without]
       Bundler.ui.be_quiet! if opts[:quiet]
