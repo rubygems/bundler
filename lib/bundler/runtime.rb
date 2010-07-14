@@ -85,11 +85,12 @@ module Bundler
     def prune_cache
       FileUtils.mkdir_p(cache_path)
 
+      resolve = @definition.resolve
+
       Bundler.ui.info "Removing outdated .gem files from vendor/cache"
       Pathname.glob(cache_path.join("*.gem").to_s).each do |gem_path|
-        cached_spec = Gem::Format.from_file_by_path(gem_path).spec
-        next unless Gem::Platform.match(cached_spec.platform)
-        unless specs.any?{|s| s.full_name == cached_spec.full_name }
+        cached  = Gem::Format.from_file_by_path(gem_path).spec
+        unless resolve.any?{|s| s.name == cached.name && s.version == cached.version }
           Bundler.ui.info "  * #{File.basename(gem_path)}"
           gem_path.rmtree
         end

@@ -179,6 +179,19 @@ module Spec
       end
     end
 
+    def cache_gems(*gems)
+      gems = gems.flatten
+
+      FileUtils.rm_rf("#{bundled_app}/vendor/cache")
+      FileUtils.mkdir_p("#{bundled_app}/vendor/cache")
+
+      gems.each do |g|
+        path = "#{gem_repo1}/gems/#{g}.gem"
+        raise "OMG `#{path}` does not exist!" unless File.exist?(path)
+        FileUtils.cp(path, "#{bundled_app}/vendor/cache")
+      end
+    end
+
     def simulate_new_machine
       system_gems []
       FileUtils.rm_rf default_bundle_path
