@@ -20,6 +20,17 @@ describe "bundle update" do
       bundle "update"
       should_be_installed "rack 1.2", "rack-obama 1.0", "activesupport 3.0"
     end
+
+    it "doesn't delete the Gemfile.lock file if something goes wrong" do
+      gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "activesupport"
+        gem "rack-obama"
+        exit!
+      G
+      bundle "update"
+      bundled_app("Gemfile.lock").should exist
+    end
   end
 
   describe "with a top level dependency" do

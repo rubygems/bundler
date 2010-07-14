@@ -34,21 +34,23 @@ module Bundler
       @dependencies, @sources, @unlock = dependencies, sources, unlock
       @remote = false
       @specs = nil
-      @unlock[:gems] ||= []
-      @unlock[:sources] ||= []
 
-      if lockfile && File.exists?(lockfile)
+      if lockfile && File.exists?(lockfile) && unlock != true
         locked = LockfileParser.new(File.read(lockfile))
         @platforms      = locked.platforms
         @locked_deps    = locked.dependencies
         @last_resolve   = SpecSet.new(locked.specs)
         @locked_sources = locked.sources
       else
+        @unlock         = {}
         @platforms      = []
         @locked_deps    = []
         @last_resolve   = SpecSet.new([])
         @locked_sources = []
       end
+
+      @unlock[:gems] ||= []
+      @unlock[:sources] ||= []
 
       current_platform = Gem.platforms.map { |p| p.to_generic }.compact.last
       @platforms |= [current_platform]

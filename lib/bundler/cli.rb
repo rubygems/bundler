@@ -134,7 +134,7 @@ module Bundler
 
       if gems.empty? && sources.empty?
         # We're doing a full update
-        FileUtils.rm_f Bundler.root.join("Gemfile.lock")
+        Bundler.definition(true)
       else
         Bundler.definition(:gems => gems, :sources => sources)
       end
