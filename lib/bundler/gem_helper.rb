@@ -1,8 +1,6 @@
 module Bundler
   class GemHelper
 
-    VERSION_REGEXP = /V(ERSION|ersion)\s*=\s*(["'])(.*?)\2/
-
     def self.install_tasks
       dir = caller.find{|c| /Rakefile:/}[/^(.*?)\/Rakefile:/, 1]
       GemHelper.new(dir).install
@@ -33,18 +31,6 @@ module Bundler
       end
     end
 
-    protected
-    def built_gem_path
-      Dir[File.join(base, "#{name}-*.gem")].sort_by{|f| File.mtime(f)}.last
-    end
-
-    def interpolate_name
-      gemspecs = Dir[File.join(base, "*.gemspec")]
-      raise "Unable to determine name from existing gemspec." unless gemspecs.size == 1
-
-      File.basename(gemspecs.first)[/^(.*)\.gemspec$/, 1]
-    end
-
     def build_gem
       file_name = nil
       sh("gem build #{spec_path}") {
@@ -65,9 +51,24 @@ module Bundler
       guard_already_tagged
       tag_version {
         git_push
-        built_gem_path = build_gem
-        sh("gem push #{built_gem_path}")
+        rubygem_push(build_gem)
       }
+    end
+
+    protected
+    def rubygem_push(path)
+      sh("gem push #{path}")
+    end
+
+    def built_gem_path
+      Dir[File.join(base, "#{name}-*.gem")].sort_by{|f| File.mtime(f)}.last
+    end
+
+    def interpolate_name
+      gemspecs = Dir[File.join(base, "*.gemspec")]
+      raise "Unable to determine name from existing gemspec." unless gemspecs.size == 1
+
+      File.basename(gemspecs.first)[/^(.*)\.gemspec$/, 1]
     end
 
     def git_push
@@ -96,7 +97,8 @@ module Bundler
     end
 
     def current_version
-      File.read(version_file_path)[VERSION_REGEXP, 3]
+      raise("Version file could not be found at #{version_file_path}") unless File.exist?(version_file_path)
+      File.read(version_file_path)[/V(ERSION|ersion)\s*=\s*(["'])(.*?)\2/, 3]
     end
 
     def version_file_path
