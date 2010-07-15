@@ -86,13 +86,22 @@ module Bundler
       FileUtils.mkdir_p(cache_path)
 
       resolve = @definition.resolve
+      cached  = Dir["#{cache_path}/*.gem"]
 
-      Bundler.ui.info "Removing outdated .gem files from vendor/cache"
-      Pathname.glob(cache_path.join("*.gem").to_s).each do |gem_path|
-        cached  = Gem::Format.from_file_by_path(gem_path).spec
-        unless resolve.any?{|s| s.name == cached.name && s.version == cached.version }
-          Bundler.ui.info "  * #{File.basename(gem_path)}"
-          gem_path.rmtree
+      cached = cached.delete_if do |path|
+        spec = Gem::Format.from_file_by_path(path).spec
+
+        resolve.any? do |s|
+          s.name == spec.name && s.version == spec.version
+        end
+      end
+
+      if cached.any?
+        Bundler.ui.info "Removing outdated .gem files from vendor/cache"
+
+        cached.each do |path|
+          Bundler.ui.info "  * #{File.basename(path)}"
+          File.delete(path)
         end
       end
     end

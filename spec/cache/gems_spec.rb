@@ -157,6 +157,16 @@ describe "bundle cache" do
       File.open(bundled_app("vendor/cache/bar"), 'w'){|f| f.write("not a gem") }
       bundle :cache
     end
+
+    it "does not say that it is removing gems when it isn't actually doing so" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+      bundle "cache"
+      bundle "install"
+      out.should_not =~ /removing/i
+    end
   end
 
 end

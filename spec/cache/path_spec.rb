@@ -10,7 +10,7 @@ describe "bundle cache" do
       G
 
       bundle "cache"
-      out.should == "Updating .gem files in vendor/cache\nRemoving outdated .gem files from vendor/cache"
+      out.should == "Updating .gem files in vendor/cache"
     end
 
     it "warns when the path is outside of the bundle" do
