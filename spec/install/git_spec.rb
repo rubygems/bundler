@@ -386,4 +386,16 @@ describe "bundle install with git sources" do
     out.should == "WIN"
   end
 
+  it "does not to a remote fetch if the revision is cached locally" do
+    build_git "foo"
+
+    install_gemfile <<-G
+      gem "foo", :git => "#{lib_path('foo-1.0')}"
+    G
+
+    FileUtils.rm_rf(lib_path('foo-1.0'))
+
+    bundle "install"
+    out.should_not =~ /updating/i
+  end
 end

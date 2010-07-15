@@ -595,6 +595,7 @@ module Bundler
 
       def cache
         if cached?
+          return if has_revision_cached?
           Bundler.ui.info "Updating #{uri}"
           in_cache { git %|fetch --force --quiet "#{uri}" refs/heads/*:refs/heads/*| }
         else
@@ -618,6 +619,12 @@ module Bundler
             git "submodule update"
           end
         end
+      end
+
+      def has_revision_cached?
+        return unless @revision
+        git %|cat-file -t #{@revision}|
+        $? == 0
       end
 
       def revision
