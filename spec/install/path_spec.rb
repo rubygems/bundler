@@ -84,6 +84,64 @@ describe "bundle install with explicit source paths" do
     should_be_installed "foo 1.0"
   end
 
+  it "supports gemspec syntax" do
+    build_lib "foo", "1.0", :path => lib_path("foo") do |s|
+      s.add_dependency "rack", "1.0"
+    end
+
+    gemfile = <<-G
+      source "file://#{gem_repo1}"
+      gemspec
+    G
+
+    File.open(lib_path("foo/Gemfile"), "w") {|f| f.puts gemfile }
+
+    Dir.chdir(lib_path("foo")) do
+      bundle "install"
+      should_be_installed "foo 1.0"
+      should_be_installed "rack 1.0"
+    end
+  end
+
+  it "supports gemspec syntax with an alternative path" do
+    build_lib "foo", "1.0", :path => lib_path("foo") do |s|
+      s.add_dependency "rack", "1.0"
+    end
+
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gemspec :path => "#{lib_path("foo")}"
+    G
+
+    should_be_installed "foo 1.0"
+    should_be_installed "rack 1.0"
+  end
+
+  it "raises if there are multiple gemspecs" do
+    build_lib "foo", "1.0", :path => lib_path("foo") do |s|
+      s.write "bar.gemspec"
+    end
+
+    install_gemfile <<-G, :exit_status => true
+      gemspec :path => "#{lib_path("foo")}"
+    G
+
+    @exitstatus.should == 15
+    out.should =~ /There are multiple gemspecs/
+  end
+
+  it "allows :name to be specified to resolve ambiguity" do
+    build_lib "foo", "1.0", :path => lib_path("foo") do |s|
+      s.write "bar.gemspec"
+    end
+
+    install_gemfile <<-G, :exit_status => true
+      gemspec :path => "#{lib_path("foo")}", :name => "foo"
+    G
+
+    should_be_installed "foo 1.0"
+  end
+
   it "sets up executables" do
     pending_jruby_shebang_fix
 

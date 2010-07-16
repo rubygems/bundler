@@ -20,14 +20,16 @@ module Bundler
       @env             = nil
     end
 
-    def gemspec(opts)
+    def gemspec(opts = nil)
       path              = opts && opts[:path] || '.'
       name              = opts && opts[:name] || '*'
       development_group = opts && opts[:development_group] || :development
       gemspecs = Dir[File.join(path, "#{name}.gemspec")]
+
       case gemspecs.size
       when 1
         spec = Gem::Specification.load(gemspecs.first)
+        gem spec.name, :path => path
         spec.runtime_dependencies.each do |dep|
           gem dep.name, dep.requirement.to_s
         end
