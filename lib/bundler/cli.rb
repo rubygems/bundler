@@ -172,7 +172,7 @@ module Bundler
     end
     map %w(list) => "show"
 
-    desc "cache", "Cache all the gems to vendor/cache"
+    desc "cache", "Cache all the gems to vendor/cache", :hide => true
     method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
     def cache
       Bundler.load.cache
@@ -301,13 +301,6 @@ module Bundler
         return File.expand_path('../../../', __FILE__)
       end
       spec.full_gem_path
-    end
-
-    def self.printable_tasks
-      tasks = super.dup
-      nodoc = /^bundle (cache)/
-      tasks.reject!{|t| t.first =~ nodoc }
-      tasks
     end
   end
 end
