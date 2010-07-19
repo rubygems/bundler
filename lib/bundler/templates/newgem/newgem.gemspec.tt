@@ -2,7 +2,7 @@
 lib = File.expand_path('../lib/', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
-require <%="#{config[:name]}/version".inspect%>
+require File.join(lib, <%=config[:name].inspect%>, 'version')
 
 Gem::Specification.new do |s|
   s.name        = <%=config[:name].inspect%>
