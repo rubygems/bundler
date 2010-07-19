@@ -256,7 +256,7 @@ describe "bundle install with gem sources" do
     end
   end
 
-  describe "when BUNDLE_PATH is set" do
+  describe "when BUNDLE_PATH or the global path config is set" do
     before :each do
       build_lib "rack", "1.0.0", :to_system => true do |s|
         s.write "lib/rack.rb", "raise 'FAIL'"
@@ -268,23 +268,44 @@ describe "bundle install with gem sources" do
       G
     end
 
-    it "installs gems to a path if one is specified" do
-      ENV["BUNDLE_PATH"] = bundled_app("vendor2").to_s
-
-      bundle "install vendor"
-
-      vendored_gems("gems/rack-1.0.0").should be_directory
-      bundled_app("vendor2").should_not be_directory
-      should_be_installed "rack 1.0.0"
+    def set_bundle_path(type, location)
+      if type == :env
+        ENV["BUNDLE_PATH"] = location
+      elsif type == :global
+        bundle "config path #{location}"
+      end
     end
 
-    it "installs gems to BUNDLE_PATH" do
-      ENV['BUNDLE_PATH'] = bundled_app('vendor').to_s
+    [:env, :global].each do |type|
+      it "installs gems to a path if one is specified" do
+        set_bundle_path(type, bundled_app("vendor2").to_s)
+        bundle "install vendor"
 
-      bundle :install
+        vendored_gems("gems/rack-1.0.0").should be_directory
+        bundled_app("vendor2").should_not be_directory
+        should_be_installed "rack 1.0.0"
+      end
 
-      bundled_app('vendor/gems/rack-1.0.0').should be_directory
-      should_be_installed "rack 1.0.0"
+      it "installs gems to BUNDLE_PATH" do
+        set_bundle_path(type, bundled_app("vendor").to_s)
+
+        bundle :install
+
+        bundled_app('vendor/gems/rack-1.0.0').should be_directory
+        should_be_installed "rack 1.0.0"
+      end
+
+      it "installs gems to BUNDLE_PATH relative to root when relative" do
+        set_bundle_path(type, "vendor")
+
+        FileUtils.mkdir_p bundled_app('lol')
+        Dir.chdir(bundled_app('lol')) do
+          bundle :install
+        end
+
+        bundled_app('vendor/gems/rack-1.0.0').should be_directory
+        should_be_installed "rack 1.0.0"
+      end
     end
 
     it "installs gems to BUNDLE_PATH from .bundle/config" do
@@ -293,18 +314,6 @@ describe "bundle install with gem sources" do
       bundle :install
 
       vendored_gems('gems/rack-1.0.0').should be_directory
-      should_be_installed "rack 1.0.0"
-    end
-
-    it "installs gems to BUNDLE_PATH relative to root when relative" do
-      ENV['BUNDLE_PATH'] = 'vendor'
-
-      FileUtils.mkdir_p bundled_app('lol')
-      Dir.chdir(bundled_app('lol')) do
-        bundle :install
-      end
-
-      bundled_app('vendor/gems/rack-1.0.0').should be_directory
       should_be_installed "rack 1.0.0"
     end
 

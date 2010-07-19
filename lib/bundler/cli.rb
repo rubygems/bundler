@@ -15,7 +15,7 @@ module Bundler
       Gem::DefaultUserInteraction.ui = UI::RGProxy.new(Bundler.ui)
     end
 
-    check_unknown_options! unless ARGV.include?("exec")
+    check_unknown_options! unless ARGV.include?("exec") || ARGV.include?("config")
 
     default_task :install
     class_option "no-color", :type => :boolean, :banner => "Disable colorization in output"
@@ -231,6 +231,48 @@ module Bundler
       rescue Errno::ENOENT
         Bundler.ui.error "bundler: command not found: #{ARGV.first}"
         Bundler.ui.warn  "Install missing gem binaries with `bundle install`"
+      end
+    end
+
+    desc "config NAME [VALUE]", "retrieve or set a configuration value"
+    long_desc <<-D
+      Retrieves or sets a configuration value. If only parameter is provided, retrieve the value. If two parameters are provided, replace the
+      existing value with the newly provided one.
+
+      By default, setting a configuration value sets it for all projects
+      on the machine. If you want to set the configuration for a specific
+      project, use the --local flag.
+
+      If a global setting is superceded by local configuration, this command
+      will show the current value, as well as any superceded values and
+      where they were specified.
+    D
+    def config(name, *values)
+      locations = Bundler.settings.locations(name)
+
+      if values.empty?
+        # TODO: Say something more useful here
+        locations.each do |location, value|
+          if value
+            Bundler.ui.info "#{location}: #{value}"
+          end
+        end
+      else
+        if local = locations[:local]
+          Bundler.ui.info "Your application has set #{name} to #{local.inspect}. This will override the " \
+            "system value you are currently setting"
+        end
+
+        if global = locations[:global]
+          Bundler.ui.info "You are replacing the current system value of #{name}, which is currently #{global}"
+        end
+
+        if env = locations[:env]
+          Bundler.ui.info "You have set a bundler environment variable for #{env}. This will take precedence " \
+            "over the system value you are setting"
+        end
+
+        Bundler.settings.set_global(name, values.join(" "))
       end
     end
 
