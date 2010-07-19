@@ -71,8 +71,12 @@ module Bundler
       end
 
       def fetch(spec)
-        action = @spec_fetch_map[spec.full_name]
-        action.call if action
+        spec, uri = @spec_fetch_map[spec.full_name]
+        if spec
+          path = download_gem_from_uri(spec, uri)
+          s = Gem::Format.from_file_by_path(path).spec
+          spec.__swap__(s)
+        end
       end
 
       def install(spec)
@@ -196,7 +200,6 @@ module Bundler
       def remote_specs
         @remote_specs ||= begin
           idx     = Index.new
-          remotes = self.remotes.map { |uri| uri.to_s }
           old     = Gem.sources
 
           remotes.each do |uri|
@@ -207,12 +210,7 @@ module Bundler
                 next if name == 'bundler'
                 spec = RemoteSpecification.new(name, version, platform, uri)
                 spec.source = self
-                # Temporary hack until this can be figured out better
-                @spec_fetch_map[spec.full_name] = lambda do
-                  path = download_gem_from_uri(spec, uri)
-                  s = Gem::Format.from_file_by_path(path).spec
-                  spec.__swap__(s)
-                end
+                @spec_fetch_map[spec.full_name] = [spec, uri]
                 idx << spec
               end
             end
