@@ -175,8 +175,9 @@ module Bundler
     desc "cache", "Cache all the gems to vendor/cache", :hide => true
     method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
     def cache
-      Bundler.load.cache
-      Bundler.load.prune_cache unless options[:no_prune]
+      environment = Bundler.load
+      environment.cache
+      environment.prune_cache unless options[:no_prune]
     rescue GemNotFound => e
       Bundler.ui.error(e.message)
       Bundler.ui.warn "Run `bundle install` to install missing gems."

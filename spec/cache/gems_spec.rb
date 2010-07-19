@@ -68,6 +68,7 @@ describe "bundle cache" do
 
       system_gems []
       bundle "install --local"
+      puts out
 
       should_be_installed("rack 1.0.0", "foo 1.0")
     end
