@@ -49,10 +49,22 @@ describe "bundle cache" do
       bundle "install --local"
       should_be_installed("rack 1.0.0")
     end
+
+    it "creates a lockfile" do
+      cache_gems "rack-1.0.0"
+
+      gemfile <<-G
+        gem "rack"
+      G
+
+      bundle "cache"
+
+      bundled_app("Gemfile.lock").should exist
+    end
   end
 
   describe "when there are also git sources" do
-    it "still works" do
+    before do
       build_git "foo"
       system_gems "rack-1.0.0"
 
@@ -63,13 +75,23 @@ describe "bundle cache" do
         end
         gem 'rack'
       G
+    end
 
+    it "still works" do
       bundle :cache
 
       system_gems []
       bundle "install --local"
 
       should_be_installed("rack 1.0.0", "foo 1.0")
+    end
+
+    it "should not explode if the lockfile is not present" do
+      FileUtils.rm(bundled_app("Gemfile.lock"))
+
+      bundle :cache
+
+      bundled_app("Gemfile.lock").should exist
     end
   end
 

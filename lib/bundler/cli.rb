@@ -67,6 +67,7 @@ module Bundler
         Bundler.ui.warn "Install missing gems with `bundle install`"
         exit 1
       else
+        Bundler.load.lock
         Bundler.ui.info "The Gemfile's dependencies are satisfied"
       end
     end
@@ -161,6 +162,8 @@ module Bundler
       Calling show with [GEM] will list the exact location of that gem on your machine.
     D
     def show(gem_name = nil)
+      Bundler.load.lock
+
       if gem_name
         Bundler.ui.info locate_gem(gem_name)
       else
@@ -177,6 +180,7 @@ module Bundler
     def cache
       Bundler.load.cache
       Bundler.load.prune_cache unless options[:no_prune]
+      Bundler.load.lock
     rescue GemNotFound => e
       Bundler.ui.error(e.message)
       Bundler.ui.warn "Run `bundle install` to install missing gems."

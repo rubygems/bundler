@@ -6,7 +6,6 @@ module Bundler
 
     def initialize(*)
       super
-      lock
     end
 
     def setup(*groups)
@@ -35,6 +34,9 @@ module Bundler
         load_paths = spec.load_paths.reject {|path| $LOAD_PATH.include?(path)}
         $LOAD_PATH.unshift(*load_paths)
       end
+
+      lock
+
       self
     end
 

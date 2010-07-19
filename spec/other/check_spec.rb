@@ -12,6 +12,19 @@ describe "bundle check" do
     out.should == "The Gemfile's dependencies are satisfied"
   end
 
+  it "creates a Gemfile.lock if one did not exist" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rails"
+    G
+
+    FileUtils.rm("Gemfile.lock")
+
+    bundle "check"
+
+    bundled_app("Gemfile.lock").should exist
+  end
+
   it "shows what is missing with the current Gemfile if it is not satisfied" do
     gemfile <<-G
       source "file://#{gem_repo1}"
