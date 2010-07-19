@@ -623,7 +623,7 @@ module Bundler
 
       def has_revision_cached?
         return unless @revision
-        git %|cat-file -t #{@revision}|
+        in_cache { git %|cat-file -t #{@revision}| }
         $? == 0
       end
 
