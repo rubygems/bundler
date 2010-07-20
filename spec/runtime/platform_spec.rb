@@ -50,8 +50,8 @@ describe "Bundler.setup with multi platform stuff" do
 
     system_gems "nokogiri-1.4.2"
 
+    simulate_platform "x86-darwin-10"
     gemfile <<-G
-      Gem.platforms = [Gem::Platform::RUBY, Gem::Platform.new("x86-darwin-10")]
       source "file://#{gem_repo1}"
       gem "nokogiri"
     G
@@ -77,8 +77,9 @@ describe "Bundler.setup with multi platform stuff" do
 
     system_gems "nokogiri-1.4.2", "platform_specific-1.0-x86-darwin-100"
 
+    simulate_platform "x86-darwin-100"
+
     gemfile <<-G
-      Gem.platforms = [Gem::Platform::RUBY, Gem::Platform.new("x86-darwin-100")]
       source "file://#{gem_repo1}"
       gem "nokogiri"
       gem "platform_specific"

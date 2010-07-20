@@ -258,7 +258,7 @@ module Bundler
     class Path
       attr_reader :path, :options
       # Kind of a hack, but needed for the lock file parser
-      attr_accessor :version
+      attr_accessor :name, :version
 
       DEFAULT_GLOB = "{,*/}*.gemspec"
 

@@ -194,9 +194,7 @@ module Bundler
     def converge_dependencies
       (@dependencies + @locked_deps).each do |dep|
         if dep.source
-          source = @sources.find { |s| dep.source == s }
-          raise "Something went wrong, there is no matching source" unless source
-          dep.source = source
+          dep.source = @sources.find { |s| dep.source == s }
         end
       end
     end

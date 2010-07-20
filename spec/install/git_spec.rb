@@ -360,7 +360,7 @@ describe "bundle install with git sources" do
     should_be_installed "has_submodule 1.0"
   end
 
-  it "handles implicity updates when modifying the source info" do
+  it "handles implicit updates when modifying the source info" do
     git = build_git "foo"
 
     install_gemfile <<-G

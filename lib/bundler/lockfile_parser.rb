@@ -60,11 +60,11 @@ module Bundler
 
     def parse_dependency(line)
       if line =~ %r{^ {2}#{NAME_VERSION}(!)?$}
-        name, version, pinned = $1, $2, $3
+        name, version, pinned = $1, $2, $4
 
         dep = Bundler::Dependency.new(name, version)
 
-        if pinned
+        if pinned && dep.name != 'bundler'
           dep.source = @specs.find { |s| s.name == dep.name }.source
 
           # Path sources need to know what the default name / version
