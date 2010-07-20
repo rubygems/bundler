@@ -185,7 +185,9 @@ module Bundler
     end
 
     def converge_sources
-      @sources = (@locked_sources & @sources) | @sources
+      @sources.map! do |source|
+        @locked_sources.find { |s| s == source } || source
+      end
       @sources.each do |source|
         source.unlock! if source.respond_to?(:unlock!) && @unlock[:sources].include?(source.name)
       end
