@@ -495,4 +495,25 @@ describe "the lockfile format" do
         rack
     G
   end
+
+  it "works correctly with multiple version dependencies" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack", "> 0.9", "< 1.0"
+    G
+
+    lockfile_should_be <<-G
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          rack (0.9.1)
+
+      PLATFORMS
+        ruby
+
+      DEPENDENCIES
+        rack (> 0.9, < 1.0)
+    G
+
+  end
 end

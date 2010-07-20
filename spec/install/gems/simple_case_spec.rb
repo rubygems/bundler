@@ -45,6 +45,26 @@ describe "bundle install with gem sources" do
       should_be_installed("rack 1.0.0")
     end
 
+    it "fetches gems when multiple versions are specified" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem 'rack', "> 0.9", "< 1.0"
+      G
+
+      default_bundle_path("gems/rack-0.9.1").should exist
+      should_be_installed("rack 0.9.1")
+    end
+
+    it "fetches gems when multiple versions are specified take 2" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem 'rack', "< 1.0", "> 0.9"
+      G
+
+      default_bundle_path("gems/rack-0.9.1").should exist
+      should_be_installed("rack 0.9.1")
+    end
+
     it "raises an appropriate error when gems are specified using symbols" do
       status = install_gemfile(<<-G, :exit_status => true)
         source "file://#{gem_repo1}"

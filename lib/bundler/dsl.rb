@@ -51,7 +51,7 @@ module Bundler
       end
 
       options = Hash === args.last ? args.pop : {}
-      version = args.last || ">= 0"
+      version = args || [">= 0"]
       if group = options[:groups] || options[:group]
         options[:group] = group
       end
@@ -202,7 +202,7 @@ module Bundler
       # Normalize git and path options
       ["git", "path"].each do |type|
         if param = opts[type]
-          options = _version?(version) ? opts.merge("name" => name, "version" => version) : opts.dup
+          options = _version?(version.first) ? opts.merge("name" => name, "version" => version.first) : opts.dup
           source = send(type, param, options, :prepend => true) {}
           opts["source"] = source
         end
