@@ -113,7 +113,7 @@ module Bundler
       Bundler.ui.be_quiet! if opts[:quiet]
 
       Installer.install(Bundler.root, Bundler.definition, opts)
-      cache if Bundler.root.join("vendor/cache").exist?
+      Bundler.load.cache if Bundler.root.join("vendor/cache").exist?
       Bundler.ui.confirm "Your bundle is complete! " +
         "Use `bundle show [gemname]` to see where a bundled gem is installed."
     rescue GemNotFound => e
@@ -141,7 +141,7 @@ module Bundler
       end
 
       Installer.install Bundler.root, Bundler.definition, "update" => true
-      cache if Bundler.root.join("vendor/cache").exist?
+      Bundler.load.cache if Bundler.root.join("vendor/cache").exist?
       Bundler.ui.confirm "Your bundle is updated! " +
         "Use `bundle show [gemname]` to see where a bundled gem is installed."
     end
@@ -178,8 +178,9 @@ module Bundler
     desc "cache", "Cache all the gems to vendor/cache", :hide => true
     method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
     def cache
+      Bundler.definition.resolve_with_cache!
       Bundler.load.cache
-      Bundler.load.prune_cache unless options[:no_prune]
+      Bundler.settings[:no_prune] = true if options[:no_prune]
       Bundler.load.lock
     rescue GemNotFound => e
       Bundler.ui.error(e.message)
@@ -198,7 +199,7 @@ module Bundler
     def package
       install
       # TODO: move cache contents here now that all bundles are locked
-      cache
+      Bundler.load.cache
     end
     map %w(pack) => :package
 

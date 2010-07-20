@@ -553,12 +553,18 @@ module Bundler
     private
 
       def git(command)
-        out = %x{git #{command}}
+        if allow_git_ops?
+          out = %x{git #{command}}
 
-        if $? != 0
-          raise GitError, "An error has occurred in git. Cannot complete bundling."
+          if $? != 0
+            raise GitError, "An error has occurred in git. Cannot complete bundling."
+          end
+          out
+        else
+          raise GitError, "Bundler is trying to run a `git #{command}` at runtime. You probably need to run `bundle install`. However, " \
+                          "this error message could probably be more useful. Please submit a ticket at http://github.com/carlhuda/bundler/issues " \
+                          "with steps to reproduce as well as the following\n\nCALLER: #{caller.join("\n")}"
         end
-        out
       end
 
       def base_name
@@ -627,8 +633,18 @@ module Bundler
         $? == 0
       end
 
+      def allow_git_ops?
+        @allow_remote || @allow_cached
+      end
+
       def revision
-        @revision ||= in_cache { git("rev-parse #{ref}").strip }
+        @revision ||= begin
+          if allow_git_ops?
+            in_cache { git("rev-parse #{ref}").strip }
+          else
+            raise GitError, "The git source #{uri} is not yet checked out. Please run `bundle install` before trying to start your application"
+          end
+        end
       end
 
       def cached?

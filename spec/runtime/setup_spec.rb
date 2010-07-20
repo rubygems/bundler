@@ -179,15 +179,61 @@ describe "Bundler.setup" do
   end
 
   describe "with git" do
-    it "provides a useful exception when the git repo is not checked out yet" do
+    before do
       build_git "rack", "1.0.0"
 
       gemfile <<-G
-        gem "foo", :git => "#{lib_path('rack-1.0.0')}"
+        gem "rack", :git => "#{lib_path('rack-1.0.0')}"
       G
+    end
 
+    it "provides a useful exception when the git repo is not checked out yet" do
       run "1", :expect_err => true
       err.should include("#{lib_path('rack-1.0.0')} (at master) is not checked out. Please run `bundle install`")
+    end
+
+    it "does not hit the git binary if the lockfile is available and up to date" do
+      bundle "install"
+
+      break_git!
+
+      ruby <<-R
+        require 'rubygems'
+        require 'bundler'
+
+        begin
+          Bundler.setup
+          puts "WIN"
+        rescue Exception => e
+          puts "FAIL"
+        end
+      R
+
+      out.should == "WIN"
+    end
+
+    it "provides a good exception if the lockfile is unavailable" do
+      bundle "install"
+
+      FileUtils.rm(bundled_app("Gemfile.lock"))
+
+      break_git!
+
+      ruby <<-R
+        require "rubygems"
+        require "bundler"
+
+        begin
+          Bundler.setup
+          puts "FAIL"
+        rescue Bundler::GitError => e
+          puts e.message
+        end
+      R
+
+      run "puts 'FAIL'", :expect_err => true
+
+      err.should_not include "This is not the git you are looking for"
     end
   end
 

@@ -336,9 +336,9 @@ describe "bundle install with git sources" do
         gem "has_submodule"
       end
     G
+    out.should =~ /Could not find gem 'submodule'/
 
     should_not_be_installed "has_submodule 1.0", :expect_err => true
-    err.should =~ /Could not find gem 'submodule'/
   end
 
   it "handles repos with submodules" do

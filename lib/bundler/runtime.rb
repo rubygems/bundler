@@ -4,10 +4,6 @@ module Bundler
   class Runtime < Environment
     include SharedHelpers
 
-    def initialize(*)
-      super
-    end
-
     def setup(*groups)
       # Has to happen first
       clean_load_path
@@ -82,6 +78,7 @@ module Bundler
         next if spec.name == 'bundler'
         spec.source.cache(spec) if spec.source.respond_to?(:cache)
       end
+      prune_cache unless Bundler.settings[:no_prune]
     end
 
     def prune_cache

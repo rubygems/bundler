@@ -157,6 +157,15 @@ module Spec
       ENV['GEM_HOME'], ENV['GEM_PATH'] = gem_home, gem_path
     end
 
+    def break_git!
+      FileUtils.mkdir_p(tmp("broken_path"))
+      File.open(tmp("broken_path/git"), "w", 0755) do |f|
+        f.puts "#!/usr/bin/env ruby\nSTDERR.puts 'This is not the git you are looking for'\nexit 1"
+      end
+
+      ENV["PATH"] = "#{tmp("broken_path")}:#{ENV["PATH"]}"
+    end
+
     def system_gems(*gems)
       gems = gems.flatten
 
