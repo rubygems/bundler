@@ -12,6 +12,10 @@ describe "bundle cache with multiple platforms" do
       platforms :jruby do
         gem "activesupport", "2.3.5"
       end
+
+      platforms :mri do
+        gem "activerecord", "2.3.2"
+      end
     G
 
     lockfile <<-G
@@ -20,6 +24,7 @@ describe "bundle cache with multiple platforms" do
         specs:
           rack (1.0.0)
           activesupport (2.3.5)
+          activerecord (2.3.2)
 
       PLATFORMS
         ruby
@@ -28,14 +33,16 @@ describe "bundle cache with multiple platforms" do
       DEPENDENCIES
         rack (1.0.0)
         activesupport (2.3.5)
+        activerecord (2.3.2)
     G
   end
 
   it "does not delete gems for other platforms" do
-    cache_gems "rack-1.0.0", "activesupport-2.3.5"
+    cache_gems "rack-1.0.0", "activesupport-2.3.5", "activerecord-2.3.2"
     bundle "install"
 
     bundled_app("vendor/cache/rack-1.0.0.gem").should exist
     bundled_app("vendor/cache/activesupport-2.3.5.gem").should exist
+    bundled_app("vendor/cache/activerecord-2.3.2.gem").should exist
   end
 end

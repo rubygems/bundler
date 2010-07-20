@@ -8,7 +8,7 @@ module Bundler
       builder.to_definition
     end
 
-    VALID_PLATFORMS = [:ruby_18, :ruby_19, :ruby, :jruby, :mswin]
+    VALID_PLATFORMS = [:ruby, :ruby_18, :ruby_19, :mri, :mri_18, :mri19, :jruby, :mswin]
 
     def initialize
       @rubygems_source = Source::Rubygems.new
