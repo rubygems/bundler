@@ -523,7 +523,7 @@ module Bundler
 
       # TODO: actually cache git specs
       def specs
-        if (@allow_remote || @allow_cached) && !@update
+        if allow_git_ops? && !@update
         # Start by making sure the git cache is up to date
           cache
           checkout
@@ -537,7 +537,7 @@ module Bundler
 
         unless @installed
           Bundler.ui.debug "  * Checking out revision: #{ref}"
-          checkout
+          checkout if allow_git_ops?
           @installed = true
         end
         generate_bin(spec)

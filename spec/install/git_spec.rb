@@ -398,4 +398,16 @@ describe "bundle install with git sources" do
     bundle "install"
     out.should_not =~ /updating/i
   end
+
+  it "doesn't blow up if bundle install is run twice in a row" do
+    build_git "foo"
+
+    gemfile <<-G
+      gem "foo", :git => "#{lib_path('foo-1.0')}"
+    G
+
+    bundle "install"
+    bundle "install", :exit_status => true
+    exitstatus.should == 0
+  end
 end

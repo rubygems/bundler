@@ -15,7 +15,7 @@ module Spec
       Gem.configuration.write
     end
 
-    attr_reader :out, :err
+    attr_reader :out, :err, :exitstatus
 
     def in_app_root(&blk)
       Dir.chdir(bundled_app, &blk)
