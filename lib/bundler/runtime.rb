@@ -52,18 +52,19 @@ module Bundler
         # groups
         next unless (dep.groups & groups).any?
 
-        file = nil
+        required_file = nil
 
         begin
           # Loop through all the specified autorequires for the
           # dependency. If there are none, use the dependency's name
           # as the autorequire.
           Array(dep.autorequire || dep.name).each do |file|
+            required_file = file
             Kernel.require file
           end
         rescue LoadError => e
           REGEXPS.find { |r| r =~ e.message }
-          raise if dep.autorequire || $1 != file
+          raise if dep.autorequire || $1 != required_file
         end
       end
     end
