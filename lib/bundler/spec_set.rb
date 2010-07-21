@@ -127,7 +127,7 @@ module Bundler
     def tsort_each_child(s)
       s.dependencies.sort_by { |d| d.name }.each do |d|
         next if d.type == :development
-        lookup[d.name].each { |s| yield s }
+        lookup[d.name].each { |s2| yield s2 }
       end
     end
   end
