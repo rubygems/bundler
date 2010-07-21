@@ -143,6 +143,35 @@ describe "Bundler.require" do
       check out.should == "two\nmodule_two\none"
     end
 
+    describe "a gem with different requires for different envs" do
+      before(:each) do
+        build_gem "multi_gem", :to_system => true do |s|
+          s.write "lib/one.rb", "puts 'ONE'"
+          s.write "lib/two.rb", "puts 'TWO'"
+        end
+
+        install_gemfile <<-G
+          gem "multi_gem", :require => "one", :group => :one
+          gem "multi_gem", :require => "two", :group => :two
+        G
+      end
+
+      it "requires both with Bundler.require(both)" do
+        run "Bundler.require(:one, :two)"
+        out.should == "ONE\nTWO"
+      end
+
+      it "requires one with Bundler.require(:one)" do
+        run "Bundler.require(:one)"
+        out.should == "ONE"
+      end
+
+      it "requires :two with Bundler.require(:two)" do
+        run "Bundler.require(:two)"
+        out.should == "TWO"
+      end
+    end
+
     it "fails when the gems are in the Gemfile in the wrong order" do
       gemfile <<-G
         path "#{lib_path}"

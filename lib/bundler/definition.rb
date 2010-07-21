@@ -167,10 +167,13 @@ module Bundler
       out << "\n"
       out << "DEPENDENCIES\n"
 
+      handled = []
       dependencies.
         sort_by { |d| d.name }.
         each do |dep|
+          next if handled.include?(dep.name)
           out << dep.to_lock
+          handled << dep.name
       end
 
       out

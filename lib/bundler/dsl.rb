@@ -59,6 +59,21 @@ module Bundler
       _deprecated_options(options)
       _normalize_options(name, version, options)
 
+      dep = Dependency.new(name, version, options)
+
+      if current = @dependencies.find { |d| d.name == dep.name }
+        if current.requirement != dep.requirement
+          raise DslError, "You cannot specify the same gem twice with different version requirements. " \
+                          "You specified: #{current.name} (#{current.requirement}) and " \
+                          "#{dep.name} (#{dep.requirement})"
+        end
+
+        if current.source != dep.source
+          raise DslError, "You cannot specify the same gem twice coming from different sources. You " \
+                          "specified that #{dep.name} (#{dep.requirement}) should come from " \
+                          "#{current.source || 'an unspecfied source'} and #{dep.source}"
+        end
+      end
       @dependencies << Dependency.new(name, version, options)
     end
 

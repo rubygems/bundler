@@ -496,6 +496,92 @@ describe "the lockfile format" do
     G
   end
 
+  it "does not add duplicate dependencies" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack"
+      gem "rack"
+    G
+
+    lockfile_should_be <<-G
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          rack (1.0.0)
+
+      PLATFORMS
+        ruby
+
+      DEPENDENCIES
+        rack
+    G
+  end
+
+  it "does not add duplicate dependencies with versions" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack", "1.0"
+      gem "rack", "1.0"
+    G
+
+    lockfile_should_be <<-G
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          rack (1.0.0)
+
+      PLATFORMS
+        ruby
+
+      DEPENDENCIES
+        rack (= 1.0)
+    G
+  end
+
+  it "does not add duplicate dependencies in different groups" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack", "1.0", :group => :one
+      gem "rack", "1.0", :group => :two
+    G
+
+    lockfile_should_be <<-G
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          rack (1.0.0)
+
+      PLATFORMS
+        ruby
+
+      DEPENDENCIES
+        rack (= 1.0)
+    G
+  end
+
+  it "raises if two different versions are used" do
+    install_gemfile <<-G, :expect_err => true
+      source "file://#{gem_repo1}"
+      gem "rack", "1.0"
+      gem "rack", "1.1"
+    G
+
+    bundled_app("Gemfile.lock").should_not exist
+    err.should include "rack (= 1.0) and rack (= 1.1)"
+  end
+
+
+  it "raises if two different versions are used" do
+    install_gemfile <<-G, :expect_err => true
+      source "file://#{gem_repo1}"
+      gem "rack"
+      gem "rack", :git => "git://hubz.com"
+    G
+
+    bundled_app("Gemfile.lock").should_not exist
+    err.should include "rack (>= 0) should come from an unspecfied source and git://hubz.com (at master)"
+  end
+
   it "works correctly with multiple version dependencies" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
