@@ -36,6 +36,13 @@ module Bundler
       self
     end
 
+    REGEXPS = [
+      /^no such file to load -- (.+)$/i,
+      /^Missing \w+ (?:file\s*)?([^\s]+.rb)$/i,
+      /^Missing API definition file in (.+)$/i,
+      /^cannot load such file -- (.+)$/i,
+    ]
+
     def require(*groups)
       groups.map! { |g| g.to_sym }
       groups = [:default] if groups.empty?
@@ -45,6 +52,8 @@ module Bundler
         # groups
         next unless (dep.groups & groups).any?
 
+        file = nil
+
         begin
           # Loop through all the specified autorequires for the
           # dependency. If there are none, use the dependency's name
@@ -52,10 +61,9 @@ module Bundler
           Array(dep.autorequire || dep.name).each do |file|
             Kernel.require file
           end
-        rescue LoadError
-          # Only let a LoadError through if the autorequire was explicitly
-          # specified by the user.
-          raise if dep.autorequire
+        rescue LoadError => e
+          REGEXPS.find { |r| r =~ e.message }
+          raise if dep.autorequire || $1 != file
         end
       end
     end

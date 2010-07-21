@@ -210,5 +210,20 @@ describe "Bundler.require" do
         check out.should == "two_not_loaded\none\ntwo"
       end
     end
+
+    describe "with busted gems" do
+      it "should be busted" do
+        build_gem "busted_require", :to_system => true do |s|
+          s.write "lib/busted_require.rb", "require 'no_such_file_omg'"
+        end
+
+        install_gemfile <<-G
+          gem "busted_require"
+        G
+
+        run "Bundler.require", :expect_err => true
+        err.should include("no such file to load -- no_such_file_omg")
+      end
+    end
   end
 end
