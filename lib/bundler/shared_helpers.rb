@@ -121,6 +121,10 @@ module Bundler
       gem_class.send(:define_method, :bin_path) do |name, *args|
         exec_name, *reqs = args
 
+        if exec_name == 'bundle'
+          return ENV['BUNDLE_BIN_PATH']
+        end
+
         spec = nil
 
         if exec_name

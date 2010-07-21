@@ -212,21 +212,7 @@ module Bundler
     def exec(*)
       ARGV.delete("exec")
 
-      # Set PATH
-      paths = (ENV["PATH"] || "").split(File::PATH_SEPARATOR)
-      paths.unshift "#{Bundler.bundle_path}/bin"
-      ENV["PATH"] = paths.uniq.join(File::PATH_SEPARATOR)
-
-      # Set BUNDLE_GEMFILE
-      ENV["BUNDLE_GEMFILE"] = Bundler::SharedHelpers.default_gemfile.to_s
-
-      # Set RUBYOPT
-      rubyopt = [ENV["RUBYOPT"]].compact
-      if rubyopt.empty? || rubyopt.first !~ /-rbundler\/setup/
-        rubyopt.unshift "-rbundler/setup"
-        rubyopt.unshift "-I#{File.expand_path('../..', __FILE__)}"
-        ENV["RUBYOPT"] = rubyopt.join(' ')
-      end
+      Bundler.setup
 
       begin
         # Run

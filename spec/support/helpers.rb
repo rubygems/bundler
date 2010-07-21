@@ -64,8 +64,7 @@ module Spec
 
     def ruby(ruby, options = {})
       expect_err = options.delete(:expect_err)
-      ruby.gsub!(/(?=")/, "\\")
-      ruby.gsub!('$', '\\$')
+      ruby.gsub!(/["`\$]/) {|m| "\\#{m}" }
       sys_exec(%'#{Gem.ruby} -I#{lib} -e "#{ruby}"', expect_err)
     end
 
