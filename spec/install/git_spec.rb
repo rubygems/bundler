@@ -410,4 +410,28 @@ describe "bundle install with git sources" do
     bundle "install", :exit_status => true
     exitstatus.should == 0
   end
+
+  describe "switching sources" do
+    it "doesn't explode when switching Path to Git sources" do
+      build_gem "foo", "1.0", :to_system => true do |s|
+        s.write "lib/foo.rb", "raise 'fail'"
+      end
+      build_lib "foo", "1.0", :path => lib_path('bar/foo')
+      build_git "bar", "1.0", :path => lib_path('bar') do |s|
+        s.add_dependency 'foo'
+      end
+
+      install_gemfile <<-G
+        source "http://#{gem_repo1}"
+        gem "bar", :path => "#{lib_path('bar')}"
+      G
+
+      install_gemfile <<-G
+        source "http://#{gem_repo1}"
+        gem "bar", :git => "#{lib_path('bar')}"
+      G
+
+      should_be_installed "foo 1.0", "bar 1.0"
+    end
+  end
 end

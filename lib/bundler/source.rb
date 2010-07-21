@@ -305,7 +305,7 @@ module Bundler
       end
 
       def eql?(o)
-        Path === o     &&
+        o.instance_of?(Path) &&
         path == o.path &&
         name == o.name &&
         version == o.version
