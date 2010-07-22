@@ -204,9 +204,16 @@ module Bundler
       end
     end
 
+    # Remove elements from the locked specs that are expired. This will most
+    # commonly happen if the Gemfile has changed since the lockfile was last
+    # generated
     def converge_locked_specs
       deps = []
 
+      # Build a list of dependencies that are the same in the Gemfile
+      # and Gemfile.lock. If the Gemfile modified a dependency, but
+      # the gem in the Gemfile.lock still satisfies it, this is fine
+      # too.
       @dependencies.each do |dep|
         if in_locked_deps?(dep) || satisfies_locked_spec?(dep)
           deps << dep
@@ -217,10 +224,22 @@ module Bundler
       @last_resolve.each do |s|
         s.source = @sources.find { |src| s.source == src }
 
+        # Don't add a spec to the list if its source is expired. For example,
+        # if you change a Git gem to Rubygems.
         next if s.source.nil? || @unlock[:sources].include?(s.name)
         # If the spec is from a path source and it doesn't exist anymore
         # then we just unlock it.
-        next if s.source.instance_of?(Source::Path) && s.source.specs[s].empty?
+
+        # Path sources have special logic
+        if s.source.instance_of?(Source::Path)
+          other = s.source.specs[s].first
+
+          # If the spec is no longer in the path source, unlock it. This
+          # commonly happens if the version changed in the gemspec
+          next unless other
+          # If the dependencies of the path source have changed, unlock it
+          next unless s.dependencies.sort == other.dependencies.sort
+        end
 
         converged << s
       end

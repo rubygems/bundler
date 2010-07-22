@@ -261,6 +261,27 @@ describe "bundle install with explicit source paths" do
     end
   end
 
+  describe "when dependencies in the path are updated" do
+    before :each do
+      build_lib "foo", "1.0", :path => lib_path("foo")
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "foo", :path => "#{lib_path('foo')}"
+      G
+    end
+
+    it "gets dependencies that are updated in the path" do
+      build_lib "foo", "1.0", :path => lib_path("foo") do |s|
+        s.add_dependency "rack"
+      end
+
+      bundle "install"
+
+      should_be_installed "rack 1.0.0"
+    end
+  end
+
   describe "switching sources" do
     it "doesn't switch pinned git sources to rubygems when pinning the parent gem to a path source" do
       build_gem "foo", "1.0", :to_system => true do |s|
