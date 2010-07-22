@@ -369,4 +369,19 @@ describe "Bundler.setup" do
     out.should == "yay"
   end
 
+  it "ignores Gem.refresh" do
+    system_gems "rack-1.0.0"
+
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "activesupport"
+    G
+
+    run <<-R
+      Gem.refresh
+      puts Gem.source_index.find_name("rack").inspect
+    R
+
+    out.should == "[]"
+  end
 end

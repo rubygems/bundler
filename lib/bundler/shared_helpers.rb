@@ -118,6 +118,7 @@ module Bundler
 
       # OMG more hacks
       gem_class = (class << Gem ; self ; end)
+      gem_class.send(:define_method, :refresh) { }
       gem_class.send(:define_method, :bin_path) do |name, *args|
         exec_name, *reqs = args
 
