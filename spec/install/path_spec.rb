@@ -304,5 +304,32 @@ describe "bundle install with explicit source paths" do
 
       should_be_installed "foo 1.0", "bar 1.0"
     end
+
+    it "switches the source when the gem existed in rubygems and the path was already being used for another gem" do
+      build_lib "foo", "1.0", :path => lib_path("foo")
+      build_gem "bar", "1.0", :to_system => true do |s|
+        s.write "lib/bar.rb", "raise 'fail'"
+      end
+
+      install_gemfile <<-G
+        source "http://#{gem_repo1}"
+        gem "bar"
+        path "#{lib_path('foo')}" do
+          gem "foo"
+        end
+      G
+
+      build_lib "bar", "1.0", :path => lib_path("foo/bar")
+
+      install_gemfile <<-G
+        source "http://#{gem_repo1}"
+        path "#{lib_path('foo')}" do
+          gem "foo"
+          gem "bar"
+        end
+      G
+
+      should_be_installed "bar 1.0"
+    end
   end
 end
