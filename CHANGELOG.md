@@ -1,4 +1,44 @@
-## 0.10.0
+## 1.0.0.beta.9 (July 21, 2010)
+
+  - Fix install failure when switching from a path to git source
+  - Fix `bundle exec bundle *` in a bundle with --disable-shared-gems
+  - Fix `bundle *` from inside a bundle with --disable-shared-gem
+  - Shim Gem.refresh. This is used by Unicorn
+  - Fix install failure when a path's dependencies changed
+
+## 1.0.0.beta.8 (July 20, 2010)
+
+  - Fix a Beta 7 bug involving Ruby 1.9
+
+## 1.0.0.beta.7 (July 20, 2010, yanked)
+
+  - Running `bundle install` twice in a row with a git source always crashed
+
+## 1.0.0.beta.6 (July 20, 2010, yanked)
+
+  - Create executables with bundle install --binstubs
+  - You can customize the location (default is app/bin) with --binstubs other/location
+  - Fix a bug where the Gemfile.lock would be deleted even if the update was exited
+  - Fix a bug where cached gems for other platforms were sometimes deleted
+  - Clean up output when nothing was deleted from cache (it previously said
+    "Removing outdated gems ...")
+  - Improve performance of bundle install if the git gem was already checked out,
+    and the revision being used already exists locally
+  - Fix bundle show bundler in some cases
+  - Fix bugs with bundle update
+  - Don't ever run git commands at runtime (fixes a number of common passenger issues)
+  - Fixes an obscure bug where switching the source of a gem could fail to correctly
+    change the source of its dependencies
+  - Support multiple version dependencies in the Gemfile
+    (gem "rails", ">= 3.0.0.beta1", "<= 3.0.0")
+  - Raise an exception for ambiguous uses of multiple declarations of the same gem
+    (for instance, with different versions or sources).
+  - Fix cases where the same dependency appeared several times in the Gemfile.lock
+  - Fix a bug where require errors were being swallowed during Bundler.require
+
+## BACKFILL COMING
+
+## 1.0.0.beta.1
 
   - No `bundle lock` command. Locking happens automatically on install or update
   - No .bundle/environment.rb. Require 'bundler/setup' instead.
