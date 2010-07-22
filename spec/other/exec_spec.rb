@@ -229,7 +229,7 @@ describe "bundle exec" do
         require "bundler"
         Bundler.setup
         puts `bundle check`
-        puts $?
+        puts $?.exitstatus
       R
 
       out.should include("satisfied")
