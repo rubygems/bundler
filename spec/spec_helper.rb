@@ -51,6 +51,10 @@ Spec::Runner.configure do |config|
   end
 
   config.after :each do
+    # clean up open pipes
+    @in_p.close  if @in_p
+    @out_p.close if @out_p
+    @err_p.close if @err_p
     Dir.chdir(original_wd)
     # Reset ENV
     ENV['PATH']           = original_path
