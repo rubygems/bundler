@@ -460,7 +460,7 @@ module Bundler
     end
 
     class Git < Path
-      attr_reader :uri, :ref, :options
+      attr_reader :uri, :ref, :options, :submodules
 
       def initialize(options)
         super
@@ -491,7 +491,8 @@ module Bundler
         uri == o.uri         &&
         ref == o.ref         &&
         name == o.name       &&
-        version == o.version
+        version == o.version &&
+        submodules == o.submodules
       end
 
       alias == eql?

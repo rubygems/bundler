@@ -72,5 +72,67 @@ describe "bundle update" do
       out.should include("Fetching #{lib_path}/foo_two")
       out.should include("Your bundle is complete!")
     end
+
+    describe "with submodules" do
+      before :each do
+        build_gem "submodule", :to_system => true do |s|
+          s.write "lib/submodule.rb", "puts 'GEM'"
+        end
+
+        build_git "submodule", "1.0" do |s|
+          s.write "lib/submodule.rb", "puts 'GIT'"
+        end
+
+        build_git "has_submodule", "1.0" do |s|
+          s.add_dependency "submodule"
+        end
+
+        Dir.chdir(lib_path('has_submodule-1.0')) do
+          `git submodule add #{lib_path('submodule-1.0')} submodule-1.0`
+          `git commit -m "submodulator"`
+        end
+      end
+
+      it "it unlocks the source when submodules is added to a git source" do
+        install_gemfile <<-G
+          git "#{lib_path('has_submodule-1.0')}" do
+            gem "has_submodule"
+          end
+        G
+
+        run "require 'submodule'"
+        out.should == 'GEM'
+
+        install_gemfile <<-G
+          git "#{lib_path('has_submodule-1.0')}", :submodules => true do
+            gem "has_submodule"
+          end
+        G
+
+        run "require 'submodule'"
+        out.should == 'GIT'
+      end
+
+      it "it unlocks the source when submodules is removed from git source" do
+        pending "This would require actually removing the submodule from the clone"
+        install_gemfile <<-G
+          git "#{lib_path('has_submodule-1.0')}", :submodules => true do
+            gem "has_submodule"
+          end
+        G
+
+        run "require 'submodule'"
+        out.should == 'GIT'
+
+        install_gemfile <<-G
+          git "#{lib_path('has_submodule-1.0')}" do
+            gem "has_submodule"
+          end
+        G
+
+        run "require 'submodule'"
+        out.should == 'GEM'
+      end
+    end
   end
 end
