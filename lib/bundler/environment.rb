@@ -36,11 +36,7 @@ module Bundler
     end
 
     def lock
-      contents = @definition.to_lock
-
-      File.open(root.join('Gemfile.lock'), 'w') do |f|
-        f.puts contents
-      end
+      @definition.lock(root.join('Gemfile.lock'))
     end
 
     def update(*gems)

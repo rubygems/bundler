@@ -35,6 +35,14 @@ describe "bundle install with gem sources" do
       File.read(bundled_app("Gemfile.lock")).should == lockfile
     end
 
+    it "does not touch the lockfile if nothing changed" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      lambda { run '1' }.should_not change { File.mtime(bundled_app('Gemfile.lock')) }
+    end
     it "fetches gems" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"

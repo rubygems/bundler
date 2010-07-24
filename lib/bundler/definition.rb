@@ -36,9 +36,11 @@ module Bundler
       @dependencies, @sources, @unlock = dependencies, sources, unlock
       @remote = false
       @specs = nil
+      @lockfile_contents = ""
 
       if lockfile && File.exists?(lockfile) && unlock != true
-        locked = LockfileParser.new(File.read(lockfile))
+        @lockfile_contents = File.read(lockfile)
+        locked = LockfileParser.new(@lockfile_contents)
         @platforms      = locked.platforms
         @locked_deps    = locked.dependencies
         @last_resolve   = SpecSet.new(locked.specs)
@@ -141,6 +143,16 @@ module Bundler
 
     def groups
       dependencies.map { |d| d.groups }.flatten.uniq
+    end
+
+    def lock(file)
+      contents = to_lock
+
+      return if @lockfile_contents == contents
+
+      File.open(file, 'w') do |f|
+        f.puts contents
+      end
     end
 
     def to_lock
