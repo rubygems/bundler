@@ -244,11 +244,15 @@ module Bundler
       values.shift # remove the name
 
       unless name
-        Bundler.ui.info "Settings are listed in order of priority. The top value will be used.\n\n"
+        Bundler.ui.confirm "Settings are listed in order of priority. The top value will be used.\n"
 
         Bundler.settings.all.each do |setting|
           Bundler.ui.confirm "#{setting}"
-          with_padding { Bundler.ui.info(Bundler.settings.pretty_values_for(setting)) }
+          with_padding do
+            Bundler.settings.pretty_values_for(setting).each do |line|
+              Bundler.ui.info line
+            end
+          end
           Bundler.ui.confirm ""
         end
         return
@@ -256,7 +260,9 @@ module Bundler
 
       if values.empty?
         Bundler.ui.confirm "Settings for `#{name}` in order of priority. The top value will be used"
-        with_padding { Bundler.ui.info Bundler.settings.pretty_values_for(name) }
+        with_padding do
+          Bundler.settings.pretty_values_for(name).each { |line| Bundler.ui.info line }
+        end
       else
         locations = Bundler.settings.locations(name)
 

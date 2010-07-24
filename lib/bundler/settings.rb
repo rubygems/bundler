@@ -55,10 +55,8 @@ module Bundler
         locations << "Set for the current user (#{global_config_file}): #{@global_config[key].inspect}"
       end
 
-      return "You have not configured a value for `#{exposed_key}`" if locations.empty?
-      return "#{locations.first}\n" if locations.size == 1
-
-      locations.map {|l| "#{l}\n" }
+      return ["You have not configured a value for `#{exposed_key}`"] if locations.empty?
+      locations
     end
 
     def without=(array)
