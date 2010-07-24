@@ -45,7 +45,14 @@ module Bundler
         #   next
         # end
 
-        spec.source.install(spec)
+        begin
+          old_args = Gem::Command.build_args
+          Gem::Command.build_args = [Bundler.settings["build.#{spec.name}"]]
+          spec.source.install(spec)
+        ensure
+          Gem::Command.build_args = old_args
+        end
+
         Bundler.ui.info ""
         generate_bundler_executable_stubs(spec) if Bundler.settings[:bin]
         FileUtils.rm_rf(Bundler.tmp)

@@ -238,17 +238,28 @@ module Bundler
       will show the current value, as well as any superceded values and
       where they were specified.
     D
-    def config(name, *values)
-      locations = Bundler.settings.locations(name)
+    def config(name = nil, *args)
+      values = ARGV.dup
+      values.shift # remove config
+      values.shift # remove the name
+
+      unless name
+        Bundler.ui.info "Settings are listed in order of priority. The top value will be used.\n\n"
+
+        Bundler.settings.all.each do |setting|
+          Bundler.ui.confirm "#{setting}"
+          with_padding { Bundler.ui.info(Bundler.settings.pretty_values_for(setting)) }
+          Bundler.ui.confirm ""
+        end
+        return
+      end
 
       if values.empty?
-        # TODO: Say something more useful here
-        locations.each do |location, value|
-          if value
-            Bundler.ui.info "#{location}: #{value}"
-          end
-        end
+        Bundler.ui.confirm "Settings for `#{name}` in order of priority. The top value will be used"
+        with_padding { Bundler.ui.info Bundler.settings.pretty_values_for(name) }
       else
+        locations = Bundler.settings.locations(name)
+
         if local = locations[:local]
           Bundler.ui.info "Your application has set #{name} to #{local.inspect}. This will override the " \
             "system value you are currently setting"

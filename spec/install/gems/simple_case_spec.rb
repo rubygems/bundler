@@ -300,7 +300,7 @@ describe "bundle install with gem sources" do
       if type == :env
         ENV["BUNDLE_PATH"] = location
       elsif type == :global
-        bundle "config path #{location}"
+        bundle "config path #{location}", "no-color" => nil
       end
     end
 
@@ -314,7 +314,7 @@ describe "bundle install with gem sources" do
         should_be_installed "rack 1.0.0"
       end
 
-      it "installs gems to BUNDLE_PATH" do
+      it "installs gems to BUNDLE_PATH with #{type}" do
         set_bundle_path(type, bundled_app("vendor").to_s)
 
         bundle :install

@@ -1,3 +1,5 @@
+require "set"
+
 module Bundler
   class Settings
     def initialize(root)
@@ -19,14 +21,44 @@ module Bundler
       set_key(key, value, @global_config, global_config_file)
     end
 
-    def locations(key)
-      key = key_for(key)
+    def all
+      env_keys = ENV.keys.select { |k| k =~ /BUNDLE_.*/ }
+      keys = @global_config.keys | @local_config.keys | env_keys
 
+      keys.map do |key|
+        key.sub(/^BUNDLE_/, '').gsub(/__/, ".").downcase
+      end
+    end
+
+    def locations(key)
       locations = {}
-      locations[:local]  = @local_config[key]
-      locations[:env]    = ENV[key]
-      locations[:global] = @global_config[key]
+
+      locations[:local]  = @local_config[key] if @local_config.key?(key)
+      locations[:env]    = ENV[key] if ENV[key]
+      locations[:global] = @global_config[key] if @global_config.key?(key)
       locations
+    end
+
+    def pretty_values_for(exposed_key)
+      key = key_for(exposed_key)
+
+      locations = []
+      if @local_config.key?(key)
+        locations << "Set for your local app (#{local_config_file}): #{@local_config[key].inspect}"
+      end
+
+      if value = ENV[key]
+        locations << "Set via $#{key_for(key)}: #{value.inspect}"
+      end
+
+      if @global_config.key?(key)
+        locations << "Set for the current user (#{global_config_file}): #{@global_config[key].inspect}"
+      end
+
+      return "You have not configured a value for `#{exposed_key}`" if locations.empty?
+      return "#{locations.first}\n" if locations.size == 1
+
+      locations.map {|l| "#{l}\n" }
     end
 
     def without=(array)
@@ -52,6 +84,10 @@ module Bundler
     end
 
   private
+    def key_for(key)
+      key = key.to_s.sub(".", "__").upcase
+      "BUNDLE_#{key}"
+    end
 
     def set_key(key, value, hash, file)
       key = key_for(key)
@@ -62,10 +98,6 @@ module Bundler
         File.open(file, "w") { |f| f.puts hash.to_yaml }
       end
       value
-    end
-
-    def key_for(key)
-      "BUNDLE_#{key.to_s.upcase}"
     end
 
     def global_config_file
