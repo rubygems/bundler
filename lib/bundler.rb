@@ -208,7 +208,7 @@ module Bundler
       if settings[:disable_shared_gems]
         ENV['GEM_PATH'] = ''
         ENV['GEM_HOME'] = File.expand_path(bundle_path, root)
-      else
+      elsif Gem.dir != bundle_path.to_s
         paths = [Gem.dir, Gem.path].flatten.compact.uniq.reject{|p| p.empty? }
         ENV["GEM_PATH"] = paths.join(File::PATH_SEPARATOR)
         ENV["GEM_HOME"] = bundle_path.to_s
