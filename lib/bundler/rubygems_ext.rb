@@ -8,60 +8,14 @@ end
 require 'rubygems'
 require 'rubygems/specification'
 
-module Bundler
-  class DepProxy
-
-    attr_reader :required_by, :__platform, :dep
-
-    def initialize(dep, platform)
-      @dep, @__platform, @required_by = dep, platform, []
-    end
-
-    def hash
-      @hash ||= dep.hash
-    end
-
-    def ==(o)
-      dep == o.dep && __platform == o.__platform
-    end
-
-    alias eql? ==
-
-    def type
-      @dep.type
-    end
-
-    def to_s
-      @dep.to_s
-    end
-
-  private
-
-    def method_missing(*args)
-      @dep.send(*args)
-    end
-
-  end
-end
-
 module Gem
   @loaded_stacks = Hash.new { |h,k| h[k] = [] }
-
-  module MatchPlatform
-    def match_platform(p)
-      Gem::Platform::RUBY == platform or
-      platform.nil? or p == platform or
-      Gem::Platform.new(platform).to_generic == p
-    end
-  end
 
   class Specification
     attr_accessor :source, :location, :relative_loaded_from
 
     alias_method :rg_full_gem_path, :full_gem_path
     alias_method :rg_loaded_from,   :loaded_from
-
-    include MatchPlatform
 
     def full_gem_path
       source.respond_to?(:path) ?
@@ -169,22 +123,81 @@ module Gem
     MSWIN = Gem::Platform.new('mswin32')
     MING  = Gem::Platform.new('x86-mingw32')
 
-    GENERIC_CACHE = {}
-
-    class << RUBY
-      def to_generic ; self ; end
-    end
-
-    GENERICS = [JAVA, MSWIN, MING, RUBY]
-
     def hash
       @cpu.hash + @os.hash + @version.hash
     end
 
     alias eql? ==
+  end
+end
 
-    def to_generic
-      GENERIC_CACHE[self] ||= GENERICS.find { |p| self =~ p } || RUBY
+module Bundler
+  class DepProxy
+
+    attr_reader :required_by, :__platform, :dep
+
+    def initialize(dep, platform)
+      @dep, @__platform, @required_by = dep, platform, []
     end
+
+    def hash
+      @hash ||= dep.hash
+    end
+
+    def ==(o)
+      dep == o.dep && __platform == o.__platform
+    end
+
+    alias eql? ==
+
+    def type
+      @dep.type
+    end
+
+    def to_s
+      @dep.to_s
+    end
+
+  private
+
+    def method_missing(*args)
+      @dep.send(*args)
+    end
+
+  end
+
+  module GemHelpers
+
+    GENERIC_CACHE = {}
+    GENERICS = [
+      Gem::Platform::JAVA,
+      Gem::Platform::MSWIN,
+      Gem::Platform::MING,
+      Gem::Platform::RUBY
+    ]
+
+    def generic(p)
+      if p == Gem::Platform::RUBY
+        return p
+      end
+
+      GENERIC_CACHE[p] ||= GENERICS.find { |p2| p =~ p2 } || Gem::Platform::RUBY
+    end
+  end
+
+  module MatchPlatform
+    include GemHelpers
+
+    def match_platform(p)
+      Gem::Platform::RUBY == platform or
+      platform.nil? or p == platform or
+      generic(Gem::Platform.new(platform)) == p
+    end
+  end
+end
+
+module Gem
+  class Specification
+    include Bundler::MatchPlatform
   end
 end

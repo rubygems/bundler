@@ -3,7 +3,7 @@ require "rubygems/spec_fetcher"
 
 module Bundler
   class LazySpecification
-    include Gem::MatchPlatform
+    include MatchPlatform
 
     attr_reader :name, :version, :dependencies, :platform
     attr_accessor :source

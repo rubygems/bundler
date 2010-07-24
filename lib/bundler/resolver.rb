@@ -27,6 +27,8 @@ module Bundler
             Gem::Platform::MING]
 
     class SpecGroup < Array
+      include GemHelpers
+
       attr_reader :activated, :required_by
 
       def initialize(a)
@@ -52,7 +54,7 @@ module Bundler
 
         @activated.each do |p|
           if s = @specs[p]
-            platform = Gem::Platform.new(s.platform).to_generic
+            platform = generic(Gem::Platform.new(s.platform))
             next if specs[platform]
 
             lazy_spec = LazySpecification.new(name, version, platform, source)

@@ -1,6 +1,7 @@
 require "spec_helper"
 
 describe "the lockfile format" do
+  include Bundler::GemHelpers
 
   def be_with_diff(expected)
     # Trim the leading spaces
@@ -33,7 +34,7 @@ describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        #{Gem::Platform.local.to_generic}
+        #{generic(Gem::Platform.local)}
 
       DEPENDENCIES
         rack
@@ -56,7 +57,7 @@ describe "the lockfile format" do
             rack
 
       PLATFORMS
-        #{Gem::Platform.local.to_generic}
+        #{generic(Gem::Platform.local)}
 
       DEPENDENCIES
         rack-obama
@@ -79,7 +80,7 @@ describe "the lockfile format" do
             rack
 
       PLATFORMS
-        #{Gem::Platform.local.to_generic}
+        #{generic(Gem::Platform.local)}
 
       DEPENDENCIES
         rack-obama (>= 1.0)
@@ -129,7 +130,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{Gem::Platform.local.to_generic}
+        #{generic(Gem::Platform.local)}
 
       DEPENDENCIES
         foo!
@@ -156,7 +157,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{Gem::Platform.local.to_generic}
+        #{generic(Gem::Platform.local)}
 
       DEPENDENCIES
         foo!
@@ -183,7 +184,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{Gem::Platform.local.to_generic}
+        #{generic(Gem::Platform.local)}
 
       DEPENDENCIES
         foo!
@@ -210,7 +211,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{Gem::Platform.local.to_generic}
+        #{generic(Gem::Platform.local)}
 
       DEPENDENCIES
         foo!
@@ -234,7 +235,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{Gem::Platform.local.to_generic}
+        #{generic(Gem::Platform.local)}
 
       DEPENDENCIES
         foo!
@@ -264,7 +265,7 @@ describe "the lockfile format" do
             rack
 
       PLATFORMS
-        #{Gem::Platform.local.to_generic}
+        #{generic(Gem::Platform.local)}
 
       DEPENDENCIES
         actionpack
@@ -302,7 +303,7 @@ describe "the lockfile format" do
           rake (0.8.7)
 
       PLATFORMS
-        #{Gem::Platform.local.to_generic}
+        #{generic(Gem::Platform.local)}
 
       DEPENDENCIES
         rails
@@ -325,7 +326,7 @@ describe "the lockfile format" do
             rack
 
       PLATFORMS
-        #{Gem::Platform.local.to_generic}
+        #{generic(Gem::Platform.local)}
 
       DEPENDENCIES
         rack-obama (>= 1.0)
@@ -348,7 +349,7 @@ describe "the lockfile format" do
             rack
 
       PLATFORMS
-        #{Gem::Platform.local.to_generic}
+        #{generic(Gem::Platform.local)}
 
       DEPENDENCIES
         rack-obama (>= 1.0)
@@ -373,7 +374,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{Gem::Platform.local.to_generic}
+        #{generic(Gem::Platform.local)}
 
       DEPENDENCIES
         foo
@@ -398,7 +399,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{Gem::Platform.local.to_generic}
+        #{generic(Gem::Platform.local)}
 
       DEPENDENCIES
         foo
@@ -425,7 +426,7 @@ describe "the lockfile format" do
       gem "rack"
     G
 
-    platforms = ['java', Gem::Platform.local.to_generic.to_s].sort
+    platforms = ['java', generic(Gem::Platform.local).to_s].sort
 
     lockfile_should_be <<-G
       GEM

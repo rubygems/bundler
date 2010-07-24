@@ -2,6 +2,8 @@ require "digest/sha1"
 
 module Bundler
   class Definition
+    include GemHelpers
+
     attr_reader :dependencies, :platforms, :sources
 
     def self.build(gemfile, lockfile, unlock)
@@ -52,7 +54,7 @@ module Bundler
       @unlock[:gems] ||= []
       @unlock[:sources] ||= []
 
-      current_platform = Gem.platforms.map { |p| p.to_generic }.compact.last
+      current_platform = Gem.platforms.map { |p| generic(p) }.compact.last
       @platforms |= [current_platform]
 
       converge
@@ -267,7 +269,7 @@ module Bundler
       deps = []
       dependencies.each do |dep|
         dep.gem_platforms(@platforms).each do |p|
-          deps << DepProxy.new(dep, p) if remote || p == Gem::Platform.local.to_generic
+          deps << DepProxy.new(dep, p) if remote || p == generic(Gem::Platform.local)
         end
       end
       deps

@@ -1,5 +1,7 @@
 module Spec
   module Platforms
+    include Bundler::GemHelpers
+
     def rb
       Gem::Platform::RUBY
     end
@@ -25,11 +27,11 @@ module Spec
     end
 
     def local
-      Gem::Platform.local.to_generic
+      generic(Gem::Platform.local)
     end
 
     def not_local
-      all_platforms.find { |p| p != Gem::Platform.local.to_generic }
+      all_platforms.find { |p| p != generic(Gem::Platform.local) }
     end
 
     def local_tag

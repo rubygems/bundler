@@ -7,8 +7,10 @@ describe "Gem::Specification#match_platform" do
   end
 end
 
-describe "Gem::Platform#to_generic" do
+describe "Bundler::GemHelpers#generic" do
+  include Bundler::GemHelpers
+
   it "works" do
-    pl('x86-darwin-10').to_generic.should == pl('ruby')
+    generic(pl('x86-darwin-10')).should == pl('ruby')
   end
 end

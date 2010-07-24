@@ -7,7 +7,7 @@ module Bundler
   # be seeded with what we're given from the source's abbreviated index - the
   # full specification will only be fetched when necesary.
   class RemoteSpecification
-    include Gem::MatchPlatform
+    include MatchPlatform
 
     attr_reader :name, :version, :platform
     attr_accessor :source
