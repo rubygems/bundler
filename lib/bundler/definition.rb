@@ -38,13 +38,21 @@ module Bundler
       @specs = nil
       @lockfile_contents = ""
 
-      if lockfile && File.exists?(lockfile) && unlock != true
+      if lockfile && File.exists?(lockfile)
         @lockfile_contents = File.read(lockfile)
         locked = LockfileParser.new(@lockfile_contents)
         @platforms      = locked.platforms
-        @locked_deps    = locked.dependencies
-        @last_resolve   = SpecSet.new(locked.specs)
-        @locked_sources = locked.sources
+
+        if unlock != true
+          @locked_deps    = locked.dependencies
+          @last_resolve   = SpecSet.new(locked.specs)
+          @locked_sources = locked.sources
+        else
+          @unlock         = {}
+          @locked_deps    = []
+          @last_resolve   = SpecSet.new([])
+          @locked_sources = []
+        end
       else
         @unlock         = {}
         @platforms      = []
