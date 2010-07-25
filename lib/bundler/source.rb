@@ -329,7 +329,7 @@ module Bundler
               begin
                 Gem::Specification.from_yaml(file.basename)
                 # Raises ArgumentError if the file is not valid YAML
-              rescue ArgumentError, Gem::EndOfYAMLException, Gem::Exception
+              rescue ArgumentError, SyntaxError, Gem::EndOfYAMLException, Gem::Exception
                 begin
                   eval(File.read(file.basename), TOPLEVEL_BINDING, file.expand_path.to_s)
                 rescue LoadError
