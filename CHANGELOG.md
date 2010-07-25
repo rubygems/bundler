@@ -1,3 +1,18 @@
+## 1.0.0.beta.10 (July 25, 2010)
+
+  - Last release before 1.0.0.rc.1
+  - Added :mri as a valid platform (platforms :mri { gem "ruby-debug" })
+  - Fix `bundle install` immediately after modifying the :submodule option
+  - Don't write to Gemfile.lock if nothing has changed, fixing situations
+    where bundle install was run with a different user than the app
+    itself
+  - Fix a bug where other platforms were being wiped on `bundle update`
+  - Don't ask for root password on `bundle install` if not needed
+  - Avoid setting `$GEM_HOME` where not needed
+  - First solid pass of `bundle config`
+  - Add build options
+    - `bundle config build.mysql --with-mysql-config=/path/to/config`
+
 ## 1.0.0.beta.9 (July 21, 2010)
 
   - Fix install failure when switching from a path to git source
