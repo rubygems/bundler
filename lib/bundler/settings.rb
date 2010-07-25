@@ -1,5 +1,3 @@
-require "set"
-
 module Bundler
   class Settings
     def initialize(root)
