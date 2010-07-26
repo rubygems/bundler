@@ -281,7 +281,7 @@ describe "bundle install with git sources" do
 
     bundle :install, :expect_err => true
 
-    out.should include("An error has occurred in git. Cannot complete bundling.")
+    out.should include("An error has occurred in git")
     err.should include("fatal: 'omgomg'")
     err.should include("fatal: The remote end hung up unexpectedly")
   end
@@ -432,6 +432,34 @@ describe "bundle install with git sources" do
       G
 
       should_be_installed "foo 1.0", "bar 1.0"
+    end
+  end
+
+  describe "bundle install after the remote has been updated" do
+    it "installs" do
+      build_git "valim"
+
+      install_gemfile <<-G
+        gem "valim", :git => "file://#{lib_path("valim-1.0")}"
+      G
+
+      old_revision = revision_for(lib_path("valim-1.0"))
+      update_git "valim"
+      new_revision = revision_for(lib_path("valim-1.0"))
+
+      lockfile = File.read(bundled_app("Gemfile.lock"))
+      File.open(bundled_app("Gemfile.lock"), "w") do |file|
+        file.puts lockfile.gsub(/revision: #{old_revision[0..6]}/, "revision: #{new_revision[0..6]}")
+      end
+
+      bundle "install"
+
+      run <<-R
+        require "valim"
+        puts VALIM_PREV_REF
+      R
+
+      out.should == old_revision
     end
   end
 end

@@ -559,7 +559,7 @@ module Bundler
           out = %x{git #{command}}
 
           if $? != 0
-            raise GitError, "An error has occurred in git. Cannot complete bundling."
+            raise GitError, "An error has occurred in git when running `git #{command}. Cannot complete bundling."
           end
           out
         else
@@ -631,8 +631,10 @@ module Bundler
 
       def has_revision_cached?
         return unless @revision
-        in_cache { git %|cat-file -t #{@revision}| }
-        $? == 0
+        in_cache { git %|rev-parse --verify --quiet #{@revision}| }
+        true
+      rescue GitError
+        false
       end
 
       def allow_git_ops?
