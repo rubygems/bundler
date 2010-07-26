@@ -1,3 +1,7 @@
+## 1.0.0.rc.1 (July 26, 2010)
+
+  - Fixed a bug with `bundle install` on multiple machines and git
+
 ## 1.0.0.beta.10 (July 25, 2010)
 
   - Last release before 1.0.0.rc.1
