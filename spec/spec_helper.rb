@@ -4,7 +4,7 @@ $:.unshift File.expand_path('../../lib', __FILE__)
 require 'fileutils'
 require 'rubygems'
 require 'bundler'
-require 'spec'
+require 'rspec'
 
 Dir["#{File.expand_path('../support', __FILE__)}/*.rb"].each do |file|
   require file
@@ -17,7 +17,7 @@ Spec::Rubygems.setup
 FileUtils.rm_rf(Spec::Path.gem_repo1)
 ENV['RUBYOPT'] = "-I#{Spec::Path.root}/spec/support/rubygems_hax"
 
-Spec::Runner.configure do |config|
+RSpec.configure do |config|
   config.include Spec::Builders
   config.include Spec::Helpers
   config.include Spec::Indexes

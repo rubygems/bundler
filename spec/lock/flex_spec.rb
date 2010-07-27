@@ -3,15 +3,17 @@ require "spec_helper"
 describe "the lockfile format" do
   include Bundler::GemHelpers
 
-  def be_with_diff(expected)
-    # Trim the leading spaces
+  RSpec::Matchers.define :be_with_diff do |expected|
     spaces = expected[/\A\s+/, 0] || ""
     expected.gsub!(/^#{spaces}/, '')
 
-    simple_matcher "should be" do |given, m|
-      m.failure_message = "The lockfile did not match.\n=== Expected:\n" <<
-        expected << "\n=== Got:\n" << given << "\n===========\n"
-      expected == given
+    failure_message_for_should do |actual|
+      "The lockfile did not match.\n=== Expected:\n" <<
+        expected << "\n=== Got:\n" << actual << "\n===========\n"
+    end
+
+    match do |actual|
+      expected == actual
     end
   end
 

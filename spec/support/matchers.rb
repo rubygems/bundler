@@ -1,25 +1,26 @@
 module Spec
   module Matchers
-    def have_dep(*args)
-      simple_matcher "have dependency" do |given, matcher|
-        dep = Bundler::Dependency.new(*args)
+    RSpec::Matchers.define :have_dep do |*args|
+      dep = Bundler::Dependency.new(*args)
 
-        # given.length == args.length / 2
-        given.length == 1 && given.all? { |d| d == dep }
+      match do |actual|
+        actual.length == 1 && actual.all? { |d| d == dep }
       end
     end
 
-    def have_gem(*args)
-      simple_matcher "have gem" do |given, matcher|
-        given.length == args.length && given.all? { |g| args.include?(g.full_name) }
+    RSpec::Matchers.define :have_gem do |*args|
+      match do |actual|
+        actual.length == args.length && actual.all? { |a| args.include?(a.full_name) }
       end
     end
 
-    def have_rubyopts(*args)
+    RSpec::Matchers.define :have_rubyopts do |*args|
       args = args.flatten
       args = args.first.split(/\s+/) if args.size == 1
 
-      simple_matcher "have options #{args.join(' ')}" do |actual|
+      #failure_message_for_should "Expected RUBYOPT to have options #{args.join(" ")}. It was #{ENV["RUBYOPT"]}"
+
+      match do |actual|
         actual = actual.split(/\s+/) if actual.is_a?(String)
         args.all? {|arg| actual.include?(arg) } && actual.uniq.size == actual.size
       end
