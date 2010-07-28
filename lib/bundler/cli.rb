@@ -116,6 +116,13 @@ module Bundler
       Bundler.load.cache if Bundler.root.join("vendor/cache").exist?
       Bundler.ui.confirm "Your bundle is complete! " +
         "Use `bundle show [gemname]` to see where a bundled gem is installed."
+
+      if path
+        Bundler.ui.warn ""
+        Bundler.ui.warn "Your bundle was installed to `#{path}`. If you meant to install\n" \
+                        "it to your system, please remove the `#{path}` directory and run\n" \
+                        "`bundle install --system`"
+      end
     rescue GemNotFound => e
       if Bundler.definition.no_sources?
         Bundler.ui.warn "Your Gemfile doesn't have any sources. You can add one with a line like 'source :gemcutter'"

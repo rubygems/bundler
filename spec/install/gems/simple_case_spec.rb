@@ -414,6 +414,16 @@ describe "bundle install with gem sources" do
       should_be_installed "rack 1.0.0"
     end
 
+    it "prints a warning to let the user know what has happened" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      bundle "install vendor --disable-shared-gems"
+      out.should include("Your bundle was installed to `vendor`")
+    end
+
     it "remembers to disable system gems after the first time" do
       gemfile <<-G
         source "file://#{gem_repo1}"
