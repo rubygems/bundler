@@ -99,13 +99,21 @@ module Bundler
       "Do not attempt to fetch gems remotely and use the gem cache instead"
     method_option "binstubs", :type => :string, :lazy_default => "bin", :banner =>
       "Generate bin stubs for bundled gems to ./bin"
+    method_option "system", :type => :boolean
     def install(path = nil)
       opts = options.dup
       opts[:without] ||= []
       opts[:without].map! { |g| g.to_sym }
 
+      if path && options[:system]
+        Bundler.ui.error "You have specified both a path to install your gems to, \n" \
+                         "as well as --system. Please choose."
+        exit 1
+      end
+
       # Can't use Bundler.settings for this because settings needs gemfile.dirname
       ENV['BUNDLE_GEMFILE'] = opts[:gemfile] if opts[:gemfile]
+      Bundler.settings[:path] = nil if options[:system]
       Bundler.settings[:path] = path if path
       Bundler.settings[:bin] = opts["binstubs"] if opts[:binstubs]
       Bundler.settings[:disable_shared_gems] = '1' if options["disable-shared-gems"] || path

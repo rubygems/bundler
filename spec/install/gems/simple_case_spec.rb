@@ -221,6 +221,34 @@ describe "bundle install with gem sources" do
       end
     end
 
+    describe "doing bundle install foo" do
+      before do
+        gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rack"
+        G
+      end
+
+      it "works" do
+        bundle "install vendor"
+        should_be_installed "rack 1.0"
+      end
+
+      it "allows running bundle install --system without deleting foo" do
+        bundle "install vendor"
+        bundle "install --system"
+        FileUtils.rm_rf(bundled_app("vendor"))
+        should_be_installed "rack 1.0"
+      end
+
+      it "allows running bundle install --system after deleting foo" do
+        bundle "install vendor"
+        FileUtils.rm_rf(bundled_app("vendor"))
+        bundle "install --system"
+        should_be_installed "rack 1.0"
+      end
+    end
+
     it "finds gems in multiple sources" do
       build_repo2
       update_repo2
@@ -376,7 +404,7 @@ describe "bundle install with gem sources" do
     end
   end
 
-  describe "when requesting a quite install via --quiet" do
+  describe "when requesting a quiet install via --quiet" do
     it "should be quiet if there are no warnings" do
       gemfile <<-G
         source "file://#{gem_repo1}"
@@ -402,34 +430,29 @@ describe "bundle install with gem sources" do
       build_gem "rack", "1.0.0", :to_system => true do |s|
         s.write "lib/rack.rb", "puts 'FAIL'"
       end
-    end
 
-    it "does not use available system gems" do
       gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
       G
+    end
 
+    it "does not use available system gems" do
       bundle "install vendor --disable-shared-gems"
       should_be_installed "rack 1.0.0"
     end
 
     it "prints a warning to let the user know what has happened" do
-      gemfile <<-G
-        source "file://#{gem_repo1}"
-        gem "rack"
-      G
-
       bundle "install vendor --disable-shared-gems"
       out.should include("Your bundle was installed to `vendor`")
     end
 
-    it "remembers to disable system gems after the first time" do
-      gemfile <<-G
-        source "file://#{gem_repo1}"
-        gem "rack"
-      G
+    it "disallows install foo --system" do
+      bundle "install vendor --disable-shared-gems --system"
+      out.should include("Please choose.")
+    end
 
+    it "remembers to disable system gems after the first time" do
       bundle "install vendor --disable-shared-gems"
       FileUtils.rm_rf bundled_app('vendor')
       bundle "install"
