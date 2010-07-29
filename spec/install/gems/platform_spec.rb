@@ -116,6 +116,16 @@ describe "bundle install with platform conditionals" do
     should_be_installed "nokogiri 1.4.2"
   end
 
+  it "installs gems tagged w/ the current platform" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "nokogiri", :platforms => :#{local_tag}
+    G
+
+    should_be_installed "nokogiri 1.4.2"
+  end
+
   it "doesn't install gems tagged w/ a different platform" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
