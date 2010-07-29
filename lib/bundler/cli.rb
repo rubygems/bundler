@@ -100,12 +100,13 @@ module Bundler
     method_option "binstubs", :type => :string, :lazy_default => "bin", :banner =>
       "Generate bin stubs for bundled gems to ./bin"
     method_option "system", :type => :boolean
+    method_option "production", :type => :boolean
     def install(path = nil)
       opts = options.dup
       opts[:without] ||= []
       opts[:without].map! { |g| g.to_sym }
 
-      if path && options[:system]
+      if (path || opts[:production]) && options[:system]
         Bundler.ui.error "You have specified both a path to install your gems to, \n" \
                          "as well as --system. Please choose."
         exit 1
@@ -121,12 +122,17 @@ module Bundler
         exit 1
       end
 
+      if opts[:production] && Bundler.root.join("vendor/cache").exist?
+        opts["local"] = true
+      end
+
       # Can't use Bundler.settings for this because settings needs gemfile.dirname
       ENV['BUNDLE_GEMFILE'] = opts[:gemfile] if opts[:gemfile]
       Bundler.settings[:path] = nil if options[:system]
+      Bundler.settings[:path] = "vendor/bundle" if options[:production]
       Bundler.settings[:path] = path if path
       Bundler.settings[:bin] = opts["binstubs"] if opts[:binstubs]
-      Bundler.settings[:disable_shared_gems] = '1' if path
+      Bundler.settings[:disable_shared_gems] = '1' if Bundler.settings[:path]
       Bundler.settings.without = opts[:without]
       Bundler.ui.be_quiet! if opts[:quiet]
 
@@ -135,11 +141,11 @@ module Bundler
       Bundler.ui.confirm "Your bundle is complete! " +
         "Use `bundle show [gemname]` to see where a bundled gem is installed."
 
+      Bundler.ui.confirm "\nYour bundle was installed to `#{Bundler.settings[:path]}`" if Bundler.settings[:path]
+
       if path
-        Bundler.ui.warn ""
-        Bundler.ui.warn "Your bundle was installed to `#{path}`. If you meant to install\n" \
-                        "it to your system, please remove the `#{path}` directory and run\n" \
-                        "`bundle install --system`"
+        Bundler.ui.warn "\nIf you meant to install it to your system, please remove the\n" \
+                        "`#{path}` directory and run `bundle install --system`"
       end
     rescue GemNotFound => e
       if Bundler.definition.no_sources?
@@ -256,8 +262,7 @@ module Bundler
       existing value with the newly provided one.
 
       By default, setting a configuration value sets it for all projects
-      on the machine. If you want to set the configuration for a specific
-      project, use the --local flag.
+      on the machine.
 
       If a global setting is superceded by local configuration, this command
       will show the current value, as well as any superceded values and

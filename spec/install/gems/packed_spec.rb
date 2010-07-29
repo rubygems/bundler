@@ -17,6 +17,21 @@ describe "bundle install with gem sources" do
       should_be_installed "rack 1.0.0"
     end
 
+    it "does not hit the remote at all" do
+      build_repo2
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "rack"
+      G
+
+      bundle :pack
+      simulate_new_machine
+      FileUtils.rm_rf gem_repo2
+
+      bundle "install --production"
+      should_be_installed "rack 1.0.0"
+    end
+
     it "does not reinstall already-installed gems" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"

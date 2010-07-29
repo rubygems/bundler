@@ -437,6 +437,13 @@ describe "bundle install with gem sources" do
       G
     end
 
+    it "behaves like bundle install vendor/bundle with --production" do
+      bundle "install --production"
+      out.should include("Your bundle was installed to `vendor/bundle`")
+      should_be_installed "rack 1.0.0"
+      bundled_app("vendor/bundle").should exist
+    end
+
     it "prints a warning if you try to use --disable-shared-gems" do
       bundle "install vendor --disable-shared-gems"
       out.should include "The disable-shared-gem option is no longer available"
