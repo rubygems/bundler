@@ -68,6 +68,25 @@ describe "bundle install with git sources" do
     end
   end
 
+  describe "with an empty git block" do
+    before do
+      build_git "foo"
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+
+        git "#{lib_path("foo-1.0")}" do
+          # this page left intentionally blank
+        end
+      G
+    end
+
+    it "does not explode" do
+      bundle "install"
+      should_be_installed "rack 1.0"
+    end
+  end
+
   describe "when specifying a revision" do
     it "works" do
       build_git "foo"

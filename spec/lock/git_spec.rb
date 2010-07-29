@@ -31,4 +31,5 @@ describe "bundle lock with git gems" do
     RUBY
     out.should == bundle("show foo")
   end
+
 end
