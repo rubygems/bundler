@@ -67,7 +67,8 @@ module Bundler
       current_platform = Gem.platforms.map { |p| generic(p) }.compact.last
       @platforms |= [current_platform]
 
-      converge
+      converge_sources
+      converge_dependencies
     end
 
     def resolve_with_cache!
@@ -122,6 +123,7 @@ module Bundler
 
     def resolve
       @resolve ||= begin
+        converge_locked_specs
         if @last_resolve.valid_for?(expanded_dependencies)
           @last_resolve
         else
@@ -203,16 +205,11 @@ module Bundler
 
   private
 
-    def converge
-      converge_sources
-      converge_dependencies
-      converge_locked_specs
-    end
-
     def converge_sources
       @sources.map! do |source|
         @locked_sources.find { |s| s == source } || source
       end
+
       @sources.each do |source|
         source.unlock! if source.respond_to?(:unlock!) && @unlock[:sources].include?(source.name)
       end
@@ -237,8 +234,12 @@ module Bundler
       # the gem in the Gemfile.lock still satisfies it, this is fine
       # too.
       @dependencies.each do |dep|
-        if in_locked_deps?(dep) || satisfies_locked_spec?(dep)
+        locked_dep = @locked_deps.find { |d| dep == d }
+
+        if in_locked_deps?(dep, locked_dep) || satisfies_locked_spec?(dep)
           deps << dep
+        elsif dep.source.is_a?(Source::Path) && (!locked_dep || dep.source != locked_dep.source)
+          dep.source.specs.each { |s| @unlock[:gems] << s.name }
         end
       end
 
@@ -271,10 +272,8 @@ module Bundler
       @last_resolve = resolve
     end
 
-    def in_locked_deps?(dep)
-      @locked_deps.any? do |d|
-        dep == d && dep.source == d.source
-      end
+    def in_locked_deps?(dep, d)
+      d && dep.source == d.source
     end
 
     def satisfies_locked_spec?(dep)

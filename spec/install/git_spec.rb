@@ -433,6 +433,27 @@ describe "bundle install with git sources" do
 
       should_be_installed "foo 1.0", "bar 1.0"
     end
+
+    it "doesn't explode when switching Gem to Git source" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack-obama"
+        gem "rack", "1.0.0"
+      G
+
+      build_git "rack", "1.0" do |s|
+        s.write "lib/new_file.rb", "puts 'USING GIT'"
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack-obama"
+        gem "rack", "1.0.0", :git => "#{lib_path("rack-1.0")}"
+      G
+
+      run "require 'new_file'"
+      out.should == "USING GIT"
+    end
   end
 
   describe "bundle install after the remote has been updated" do
