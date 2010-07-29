@@ -1,6 +1,4 @@
 module Bundler
-  class DslError < StandardError; end
-
   class Dsl
     def self.evaluate(gemfile)
       builder = new

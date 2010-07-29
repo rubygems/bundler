@@ -563,26 +563,26 @@ describe "the lockfile format" do
   end
 
   it "raises if two different versions are used" do
-    install_gemfile <<-G, :expect_err => true
+    install_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack", "1.0"
       gem "rack", "1.1"
     G
 
     bundled_app("Gemfile.lock").should_not exist
-    err.should include "rack (= 1.0) and rack (= 1.1)"
+    out.should include "rack (= 1.0) and rack (= 1.1)"
   end
 
 
   it "raises if two different versions are used" do
-    install_gemfile <<-G, :expect_err => true
+    install_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack"
       gem "rack", :git => "git://hubz.com"
     G
 
     bundled_app("Gemfile.lock").should_not exist
-    err.should include "rack (>= 0) should come from an unspecfied source and git://hubz.com (at master)"
+    out.should include "rack (>= 0) should come from an unspecfied source and git://hubz.com (at master)"
   end
 
   it "works correctly with multiple version dependencies" do

@@ -28,12 +28,7 @@ module Bundler
 
   class BundlerError < StandardError
     def self.status_code(code = nil)
-      return @code unless code
-      @code = code
-    end
-
-    def status_code
-      self.class.status_code
+      define_method(:status_code) { code }
     end
   end
 
@@ -45,7 +40,8 @@ module Bundler
   class GemspecError     < BundlerError; status_code(14) ; end
   class DeprecatedError  < BundlerError; status_code(12) ; end
   class GemspecError     < BundlerError; status_code(14) ; end
-  class InvalidOption    < BundlerError; status_code(15) ; end
+  class DslError         < BundlerError; status_code(15) ; end
+  class InvalidOption    < DslError                      ; end
 
   class VersionConflict  < BundlerError
     attr_reader :conflicts
