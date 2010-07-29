@@ -437,23 +437,28 @@ describe "bundle install with gem sources" do
       G
     end
 
-    it "does not use available system gems" do
+    it "prints a warning if you try to use --disable-shared-gems" do
       bundle "install vendor --disable-shared-gems"
+      out.should include "The disable-shared-gem option is no longer available"
+    end
+
+    it "does not use available system gems" do
+      bundle "install vendor"
       should_be_installed "rack 1.0.0"
     end
 
     it "prints a warning to let the user know what has happened" do
-      bundle "install vendor --disable-shared-gems"
+      bundle "install vendor"
       out.should include("Your bundle was installed to `vendor`")
     end
 
     it "disallows install foo --system" do
-      bundle "install vendor --disable-shared-gems --system"
+      bundle "install vendor --system"
       out.should include("Please choose.")
     end
 
     it "remembers to disable system gems after the first time" do
-      bundle "install vendor --disable-shared-gems"
+      bundle "install vendor"
       FileUtils.rm_rf bundled_app('vendor')
       bundle "install"
 

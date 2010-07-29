@@ -86,7 +86,7 @@ module Bundler
     method_option "without", :type => :array, :banner =>
       "Exclude gems that are part of the specified named group."
     method_option "disable-shared-gems", :type => :boolean, :banner =>
-      "Do not use any shared gems, such as the system gem repository."
+      "This option is deprecated. Please do not use it."
     method_option "gemfile", :type => :string, :banner =>
       "Use the specified gemfile instead of Gemfile"
     method_option "no-prune", :type => :boolean, :banner =>
@@ -111,12 +111,22 @@ module Bundler
         exit 1
       end
 
+      if opts["disable-shared-gems"]
+        # TODO: Update this message to reference --path
+        Bundler.ui.error "The disable-shared-gem option is no longer available.\n\n" \
+                         "Instead, use `bundle install` to install to your system,\n" \
+                         "or `bundle install path/to/gems` to install to an isolated\n" \
+                         "location. Bundler will resolve relative paths relative to\n" \
+                         "your `Gemfile`."
+        exit 1
+      end
+
       # Can't use Bundler.settings for this because settings needs gemfile.dirname
       ENV['BUNDLE_GEMFILE'] = opts[:gemfile] if opts[:gemfile]
       Bundler.settings[:path] = nil if options[:system]
       Bundler.settings[:path] = path if path
       Bundler.settings[:bin] = opts["binstubs"] if opts[:binstubs]
-      Bundler.settings[:disable_shared_gems] = '1' if options["disable-shared-gems"] || path
+      Bundler.settings[:disable_shared_gems] = '1' if path
       Bundler.settings.without = opts[:without]
       Bundler.ui.be_quiet! if opts[:quiet]
 
