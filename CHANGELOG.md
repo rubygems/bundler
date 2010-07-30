@@ -1,3 +1,51 @@
+## 1.0.0.rc.2 (July 29, 2010)
+
+  - `bundle install path` was causing confusion, so we now print
+    a clarifying warning. The preferred way to install to a path
+    (which will not print the warning) is
+    `bundle install --path path/to/install`.
+  - `bundle install --system` installs to the default system
+    location ($BUNDLE_PATH or $GEM_HOME) even if you previously
+    used `bundle install --path`
+  - completely remove `--disable-shared-gems`. If you install to
+    system, you will not be isolated, while if you install to
+    another path, you will be isolated from gems installed to
+    the system. This was mostly an internal option whose naming
+    and semantics were extremely confusing.
+  - Add a `--production` option to `bundle install`:
+    - by default, installs to `vendor/bundle`. This can be
+      overridden with the `--path` option
+    - uses `--local` if `vendor/cache` is found. This will
+      guarantee that Bundler does not attempt to connect to
+      Rubygems and will use the gems cached in `vendor/cache`
+      instead
+    - Raises an exception if a Gemfile.lock is not found
+    - Raises an exception if you modify your Gemfile in development
+      but do not check in an updated Gemfile.lock
+  - Fixes a bug where switching a source from Rubygems to git
+    would always say "the git source is not checked out" when
+    running `bundle install`
+
+NOTE: We received several reports of "the git source has not
+been checked out. Please run bundle install". As far as we
+can tell, these problems have two possible causes:
+
+1. `bundle install ~/.bundle` in one user, but actually running
+   the application as another user. Never install gems to a
+   directory scoped to a user (`~` or `$HOME`) in deployment.
+2. A bug that happened when changing a gem to a git source.
+
+To mitigate several common causes of `(1)`, please use the
+new `--production` flag. This flag is simply a roll-up of
+the best practices we have been encouraging people to use
+for deployment.
+
+If you want to share gems across deployments, and you use
+Capistrano, symlink release_path/current/vendor/bundle to
+release_path/shared/bundled_gems. This will keep deployments
+snappy while maintaining the benefits of clean, deploy-time
+isolation.
+
 ## 1.0.0.rc.1 (July 26, 2010)
 
   - Fixed a bug with `bundle install` on multiple machines and git
