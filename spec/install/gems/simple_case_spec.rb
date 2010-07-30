@@ -438,6 +438,7 @@ describe "bundle install with gem sources" do
     end
 
     it "behaves like bundle install vendor/bundle with --production" do
+      bundle "install"
       bundle "install --production"
       out.should include("Your bundle was installed to `vendor/bundle`")
       should_be_installed "rack 1.0.0"
@@ -449,28 +450,30 @@ describe "bundle install with gem sources" do
       out.should include "The disable-shared-gem option is no longer available"
     end
 
-    it "does not use available system gems" do
-      bundle "install vendor"
-      should_be_installed "rack 1.0.0"
-    end
+    ["install vendor", "install --path vendor"].each do |install|
+      it "does not use available system gems with bundle #{install}" do
+        bundle install
+        should_be_installed "rack 1.0.0"
+      end
 
-    it "prints a warning to let the user know what has happened" do
-      bundle "install vendor"
-      out.should include("Your bundle was installed to `vendor`")
-    end
+      it "prints a warning to let the user know what has happened with bundle #{install}" do
+        bundle install
+        out.should include("Your bundle was installed to `vendor`")
+      end
 
-    it "disallows install foo --system" do
-      bundle "install vendor --system"
-      out.should include("Please choose.")
-    end
+      it "disallows #{install} --system" do
+        bundle "#{install} --system"
+        out.should include("Please choose.")
+      end
 
-    it "remembers to disable system gems after the first time" do
-      bundle "install vendor"
-      FileUtils.rm_rf bundled_app('vendor')
-      bundle "install"
+      it "remembers to disable system gems after the first time with bundle #{install}" do
+        bundle install
+        FileUtils.rm_rf bundled_app('vendor')
+        bundle "install"
 
-      vendored_gems('gems/rack-1.0.0').should be_directory
-      should_be_installed "rack 1.0.0"
+        vendored_gems('gems/rack-1.0.0').should be_directory
+        should_be_installed "rack 1.0.0"
+      end
     end
   end
 

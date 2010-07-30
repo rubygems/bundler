@@ -99,24 +99,34 @@ module Bundler
       "Do not attempt to fetch gems remotely and use the gem cache instead"
     method_option "binstubs", :type => :string, :lazy_default => "bin", :banner =>
       "Generate bin stubs for bundled gems to ./bin"
-    method_option "system", :type => :boolean
-    method_option "production", :type => :boolean
+    method_option "path", :type => :string, :banner =>
+      "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
+    method_option "system", :type => :boolean, :banner =>
+      "Install to the system location ($BUNDLE_PATH or $GEM_HOME) even if the bundle was previously installed somewhere else for this application"
+    method_option "production", :type => :boolean, :banner =>
+      "Install using defaults tuned for deployment environments"
     def install(path = nil)
       opts = options.dup
       opts[:without] ||= []
       opts[:without].map! { |g| g.to_sym }
 
-      if (path || opts[:production]) && options[:system]
+      if (path || options[:path] || options[:production]) && options[:system]
         Bundler.ui.error "You have specified both a path to install your gems to, \n" \
                          "as well as --system. Please choose."
         exit 1
       end
 
+      if path && options[:path]
+        Bundler.ui.error "You have specified a path via `bundle install #{path}` as well as\n" \
+                         "by `bundle install --path #{options[:path]}`. These options are\n" \
+                         "equivalent, so please use one or the other."
+        exit 1
+      end
+
       if opts["disable-shared-gems"]
-        # TODO: Update this message to reference --path
         Bundler.ui.error "The disable-shared-gem option is no longer available.\n\n" \
                          "Instead, use `bundle install` to install to your system,\n" \
-                         "or `bundle install path/to/gems` to install to an isolated\n" \
+                         "or `bundle install --path path/to/gems` to install to an isolated\n" \
                          "location. Bundler will resolve relative paths relative to\n" \
                          "your `Gemfile`."
         exit 1
@@ -141,6 +151,7 @@ module Bundler
       Bundler.settings[:path] = nil if options[:system]
       Bundler.settings[:path] = "vendor/bundle" if options[:production]
       Bundler.settings[:path] = path if path
+      Bundler.settings[:path] = options[:path] if options[:path]
       Bundler.settings[:bin] = opts["binstubs"] if opts[:binstubs]
       Bundler.settings[:disable_shared_gems] = '1' if Bundler.settings[:path]
       Bundler.settings.without = opts[:without]
