@@ -122,8 +122,18 @@ module Bundler
         exit 1
       end
 
-      if opts[:production] && Bundler.root.join("vendor/cache").exist?
-        opts["local"] = true
+      if opts[:production]
+        Bundler.production = true
+
+        unless Bundler.root.join("Gemfile.lock").exist?
+          raise ProductionError, "The --production flag requires a Gemfile.lock. Please\n" \
+                                 "make sure you have checked your Gemfile.lock into version\n" \
+                                 "control before deploying."
+        end
+
+        if Bundler.root.join("vendor/cache").exist?
+          opts["local"] = true
+        end
       end
 
       # Can't use Bundler.settings for this because settings needs gemfile.dirname

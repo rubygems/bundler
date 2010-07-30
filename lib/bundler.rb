@@ -41,6 +41,7 @@ module Bundler
   class DeprecatedError  < BundlerError; status_code(12) ; end
   class GemspecError     < BundlerError; status_code(14) ; end
   class DslError         < BundlerError; status_code(15) ; end
+  class ProductionError  < BundlerError; status_code(16) ; end
   class InvalidOption    < DslError                      ; end
 
   class VersionConflict  < BundlerError
@@ -65,6 +66,14 @@ module Bundler
         configure_gem_home_and_path
         true
       end
+    end
+
+    def production?
+      @production
+    end
+
+    def production=(value)
+      @production = value
     end
 
     def ui

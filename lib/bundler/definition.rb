@@ -67,6 +67,10 @@ module Bundler
       current_platform = Gem.platforms.map { |p| generic(p) }.compact.last
       @platforms |= [current_platform]
 
+      if Bundler.production?
+        ensure_equivalent_gemfile_and_lockfile
+      end
+
       converge_sources
       converge_dependencies
     end
@@ -204,6 +208,68 @@ module Bundler
     end
 
   private
+    def ensure_equivalent_gemfile_and_lockfile
+      changes = false
+
+      msg = "You have modified your Gemfile in development but did not check\n" \
+            "the resulting snapshot (Gemfile.lock) into version control"
+
+      added =   []
+      deleted = []
+      changed = []
+
+      if @locked_sources != @sources
+        new_sources = @sources - @locked_sources
+        deleted_sources = @locked_sources - @sources
+
+        if new_sources.any?
+          added.concat new_sources.map { |source| "* source: #{source}" }
+        end
+
+        if deleted_sources.any?
+          deleted.concat deleted_sources.map { |source| "* source: #{source}" }
+        end
+
+        changes = true
+      end
+
+      both_sources = Hash.new { |h,k| h[k] = ["no specified source", "no specified source"] }
+      @dependencies.each { |d| both_sources[d.name][0] = d.source if d.source }
+      @locked_deps.each  { |d| both_sources[d.name][1] = d.source if d.source }
+      both_sources.delete_if { |k,v| v[0] == v[1] }
+
+      if @dependencies != @locked_deps
+        new_deps = @dependencies - @locked_deps
+        deleted_deps = @locked_deps - @dependencies
+
+        if new_deps.any?
+          added.concat new_deps.map { |d| "* #{pretty_dep(d)}" }
+        end
+
+        if deleted_deps.any?
+          deleted.concat deleted_deps.map { |d| "* #{pretty_dep(d)}" }
+        end
+
+        both_sources.each do |name, sources|
+          changed << "* #{name} from `#{sources[0]}` to `#{sources[1]}`"
+        end
+
+        changes = true
+      end
+
+      msg << "\n\nYou have added to the Gemfile:\n"     << added.join("\n") if added.any?
+      msg << "\n\nYou have deleted from the Gemfile:\n" << deleted.join("\n") if deleted.any?
+      msg << "\n\nYou have changed in the Gemfile:\n"   << changed.join("\n") if changed.any?
+
+      raise ProductionError, msg if added.any? || deleted.any? || changed.any?
+    end
+
+    def pretty_dep(dep, source = false)
+      msg  = "#{dep.name}"
+      msg << " (#{dep.requirement})" unless dep.requirement == Gem::Requirement.default
+      msg << " from the `#{dep.source}` source" if source && dep.source
+      msg
+    end
 
     def converge_sources
       @sources.map! do |source|
