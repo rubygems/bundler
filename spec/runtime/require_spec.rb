@@ -227,3 +227,35 @@ describe "Bundler.require" do
     end
   end
 end
+
+describe "Bundler.require with platform specific dependencies" do
+  it "does not require the gems that are pinned to other platforms" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      platforms :#{not_local_tag} do
+        gem "fail", :require => "omgomg"
+      end
+
+      gem "rack", "1.0.0"
+    G
+
+    run "Bundler.require", :expect_err => true
+    err.should be_empty
+  end
+
+  it "requires gems pinned to multiple platforms, including the current one" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      platforms :#{not_local_tag}, :#{local_tag} do
+        gem "rack", :require => "rack"
+      end
+    G
+
+    run "Bundler.require; puts RACK", :expect_err => true
+
+    out.should == "1.0.0"
+    err.should be_empty
+  end
+end
