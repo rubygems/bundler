@@ -25,6 +25,18 @@ describe "bundle check" do
     bundled_app("Gemfile.lock").should exist
   end
 
+  it "prints a generic error if the missing gems are unresolvable" do
+    system_gems ["rails-2.3.2"]
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rails"
+    G
+
+    bundle :check
+    out.should include("Your Gemfile's dependencies could not be satisfied")
+  end
+
   it "shows what is missing with the current Gemfile if it is not satisfied" do
     gemfile <<-G
       source "file://#{gem_repo1}"

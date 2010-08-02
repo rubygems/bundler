@@ -59,7 +59,13 @@ module Bundler
       If not, the first missing gem is listed and Bundler exits status 1.
     D
     def check
-      not_installed = Bundler.definition.missing_specs
+      begin
+        not_installed = Bundler.definition.missing_specs
+      rescue GemNotFound, VersionConflict
+        Bundler.ui.error "Your Gemfile's dependencies could not be satisfied"
+        Bundler.ui.warn  "Install missing gems with `bundle install`"
+        exit 1
+      end
 
       if not_installed.any?
         Bundler.ui.error "The following gems are missing"
