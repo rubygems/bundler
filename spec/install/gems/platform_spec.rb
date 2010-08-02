@@ -73,6 +73,21 @@ describe "bundle install across platforms" do
     should_not_be_installed "weakling"
   end
 
+  it "works the other way with gems that have different dependencies" do
+    simulate_platform "ruby"
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "nokogiri"
+    G
+
+    simulate_platform "java"
+    ENV['OMG'] = '1'
+    bundle "install"
+
+    should_be_installed "nokogiri 1.4.2 JAVA", "weakling 0.0.3"
+  end
+
   it "fetches gems again after changing the version of Ruby" do
     gemfile <<-G
       source "file://#{gem_repo1}"

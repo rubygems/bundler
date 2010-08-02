@@ -65,6 +65,7 @@ module Bundler
       @unlock[:sources] ||= []
 
       current_platform = Gem.platforms.map { |p| generic(p) }.compact.last
+      @new_platform = !@platforms.include?(current_platform)
       @platforms |= [current_platform]
 
       if Bundler.production?
@@ -101,6 +102,10 @@ module Bundler
       end
     end
 
+    def new_platform?
+      @new_platform
+    end
+
     def missing_specs
       missing = []
       resolve.materialize(requested_dependencies, missing)
@@ -128,7 +133,7 @@ module Bundler
     def resolve
       @resolve ||= begin
         converge_locked_specs
-        if @last_resolve.valid_for?(expanded_dependencies)
+        if !new_platform? && @last_resolve.valid_for?(expanded_dependencies)
           @last_resolve
         else
           source_requirements = {}

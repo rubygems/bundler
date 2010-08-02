@@ -17,8 +17,8 @@ module Bundler
 
       if Bundler.root.join("Gemfile.lock").exist? && !options["update"]
         begin
-          missing_specs = Definition.build(Bundler.default_gemfile, Bundler.root.join("Gemfile.lock"), nil).missing_specs
-          local = true unless missing_specs.any?
+          tmpdef = Definition.build(Bundler.default_gemfile, Bundler.root.join("Gemfile.lock"), nil)
+          local = true unless tmpdef.new_platform? || tmpdef.missing_specs.any?
         rescue BundlerError
         end
       end
