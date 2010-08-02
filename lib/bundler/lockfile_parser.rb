@@ -66,7 +66,8 @@ module Bundler
         dep = Bundler::Dependency.new(name, version)
 
         if pinned && dep.name != 'bundler'
-          dep.source = @specs.find { |s| s.name == dep.name }.source
+          spec = @specs.find { |s| s.name == dep.name }
+          dep.source = spec.source if spec
 
           # Path sources need to know what the default name / version
           # to use in the case that there are no gemspecs present. A fake

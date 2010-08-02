@@ -139,6 +139,42 @@ describe "the lockfile format" do
     G
   end
 
+  it "does not assplode when a platform specific dependency is present and the Gemfile has not been resolved on that platform" do
+    build_lib "omg", :path => lib_path('omg')
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      platforms :#{not_local_tag} do
+        gem "omg", :path => "#{lib_path('omg')}"
+      end
+
+      gem "rack"
+    G
+
+    lockfile <<-L
+      GIT
+        remote: git://github.com/nex3/haml.git
+        revision: 8a2271f
+        specs:
+
+      GEM
+        remote: file://#{gem_repo1}/
+        specs:
+          rack (1.0.0)
+
+      PLATFORMS
+        #{not_local}
+
+      DEPENDENCIES
+        omg!
+        rack
+    L
+
+    bundle "install"
+    should_be_installed "rack 1.0.0"
+  end
+
   it "serializes global git sources" do
     git = build_git "foo"
 

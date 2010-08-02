@@ -331,9 +331,17 @@ module Bundler
               rescue ArgumentError, SyntaxError, Gem::EndOfYAMLException, Gem::Exception
                 begin
                   eval(File.read(file.basename), TOPLEVEL_BINDING, file.expand_path.to_s)
-                rescue LoadError
-                  raise GemspecError, "There was a LoadError while evaluating #{file.basename}.\n" +
-                    "Does it try to require a relative path? That doesn't work in Ruby 1.9."
+                rescue LoadError => e
+                  original_line = e.backtrace.find { |line| line.include?(file.to_s) }
+                  msg  = "There was a LoadError while evaluating #{file.basename}:\n  #{e.message}"
+                  msg << " from\n  #{original_line}" if original_line
+                  msg << "\n"
+
+                  if RUBY_VERSION >= "1.9.0"
+                    msg << "\nDoes it try to require a relative path? That doesn't work in Ruby 1.9."
+                  end
+
+                  raise GemspecError, msg
                 end
               end
             end
