@@ -126,42 +126,6 @@ class Thor
       build_option(name, options, scope)
     end
 
-    # Parses the task and options from the given args, instantiate the class
-    # and invoke the task. This method is used when the arguments must be parsed
-    # from an array. If you are inside Ruby and want to use a Thor class, you
-    # can simply initialize it:
-    #
-    #   script = MyScript.new(args, options, config)
-    #   script.invoke(:task, first_arg, second_arg, third_arg)
-    #
-    def start(original_args=ARGV, config={})
-      @@original_args = original_args
-
-      super do |given_args|
-        meth = given_args.first.to_s
-
-        if !meth.empty? && (map[meth] || meth !~ /^\-/)
-          given_args.shift
-        else
-          meth = nil
-        end
-
-        meth = normalize_task_name(meth)
-        task = all_tasks[meth]
-
-        if task
-          args, opts = Thor::Options.split(given_args)
-          config.merge!(:task_options => task.options)
-        else
-          args, opts = given_args, {}
-        end
-
-        task ||= Thor::DynamicTask.new(meth)
-        trailing = args[Range.new(arguments.size, -1)]
-        new(args, opts, config).invoke(task, trailing || [])
-      end
-    end
-
     # Prints help information for the given task.
     #
     # ==== Parameters
@@ -215,17 +179,72 @@ class Thor
     end
 
     def subcommands
-      @@subcommands ||= {}
+      @subcommands ||= from_superclass(:subcommands, [])
     end
 
     def subcommand(subcommand, subcommand_class)
-      subcommand = subcommand.to_s
-      subcommands[subcommand] = subcommand_class
+      self.subcommands << subcommand.to_s
       subcommand_class.subcommand_help subcommand
-      define_method(subcommand) { |*_| subcommand_class.start(subcommand_args) }
+      define_method(subcommand) { |*args| invoke subcommand_class, args }
+    end
+
+    # Extend check unknown options to accept a hash of conditions.
+    #
+    # === Parameters
+    # options<Hash>: A hash containing :only and/or :except keys
+    def check_unknown_options!(options={})
+      @check_unknown_options ||= Hash.new
+      options.each do |key, value|
+        if value
+          @check_unknown_options[key] = Array(value)
+        else
+          @check_unknown_options.delete(key)
+        end
+      end 
+      @check_unknown_options
+    end
+
+    # Overwrite check_unknown_options? to take subcommands and options into account.
+    def check_unknown_options?(config) #:nodoc:
+      options = check_unknown_options
+      return false unless options
+
+      task = config[:current_task]
+      return true unless task
+
+      name = task.name
+
+      if subcommands.include?(name)
+        false
+      elsif options[:except]
+        !options[:except].include?(name.to_sym)
+      elsif options[:only]
+        options[:only].include?(name.to_sym)
+      else
+        true
+      end
     end
 
     protected
+
+      # The method responsible for dispatching given the args.
+      def dispatch(meth, given_args, given_opts, config) #:nodoc:
+        meth ||= retrieve_task_name(given_args)
+        task = all_tasks[normalize_task_name(meth)]
+
+        if task
+          args, opts = Thor::Options.split(given_args)
+        else
+          args, opts = given_args, nil
+          task = Thor::DynamicTask.new(meth)
+        end
+
+        opts = given_opts || opts || []
+        config.merge!(:current_task => task, :task_options => task.options)
+
+        trailing = args[Range.new(arguments.size, -1)]
+        new(args, opts, config).invoke_task(task, trailing || [])
+      end
 
       # The banner for this class. You can customize it if you are invoking the
       # thor class by another ways which is not the Thor::Runner. It receives
@@ -233,7 +252,8 @@ class Thor
       # the namespace should be displayed as arguments.
       #
       def banner(task, namespace = nil, subcommand = false)
-        "#{$0} #{task.formatted_usage(self, $thor_runner, subcommand)}"
+        base = File.basename($0).split(" ").first
+        "#{base} #{task.formatted_usage(self, $thor_runner, subcommand)}"
       end
 
       def baseclass #:nodoc:
@@ -243,10 +263,10 @@ class Thor
       def create_task(meth) #:nodoc:
         if @usage && @desc
           base_class = @hide ? Thor::HiddenTask : Thor::Task
-          tasks[meth.to_s] = base_class.new(meth, @desc, @long_desc, @usage, method_options)
+          tasks[meth] = base_class.new(meth, @desc, @long_desc, @usage, method_options)
           @usage, @desc, @long_desc, @method_options, @hide = nil
           true
-        elsif self.all_tasks[meth.to_s] || meth.to_sym == :method_missing
+        elsif self.all_tasks[meth] || meth == "method_missing"
           true
         else
           puts "[WARNING] Attempted to create task #{meth.inspect} without usage or description. " <<
@@ -261,9 +281,19 @@ class Thor
         @method_options = nil
       end
 
+      # Retrieve the task name from given args.
+      def retrieve_task_name(args) #:nodoc:
+        meth = args.first.to_s unless args.empty?
+
+        if meth && (map[meth] || meth !~ /^\-/)
+          args.shift
+        else
+          nil
+        end
+      end
+
       # Receives a task name (can be nil), and try to get a map from it.
       # If a map can't be found use the sent name or the default task.
-      #
       def normalize_task_name(meth) #:nodoc:
         meth = map[meth.to_s] || meth || default_task
         meth.to_s.gsub('-','_') # treat foo-bar > foo_bar
@@ -275,11 +305,6 @@ class Thor
           def help(task = nil, subcommand = true); super; end
         RUBY
       end
-
-  end
-
-  def subcommand_args
-    @@original_args[1..-1]
   end
 
   include Thor::Base
