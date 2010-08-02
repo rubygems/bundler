@@ -135,11 +135,13 @@ If you are still having problems, please report bugs to the github issue tracker
 
 The best possible scenario is a ticket with a fix for the bug and a test for the fix. If that's not possible, instructions to reproduce the issue are vitally important. If you're not sure exactly how to reproduce the issue that you are seeing, create a gist of the following information and include it in your ticket:
 
-  - Whether you have locked or not
   - What version of bundler you are using
   - What version of Ruby you are using
   - Whether you are using RVM, and if so what version
   - Your Gemfile
+  - Your Gemfile.lock
+  - If you are on 0.9, whether you have locked or not
+  - If you are on 1.0, the result of `bundle config`
   - The command you ran to generate exception(s)
   - The exception backtrace(s)
 
