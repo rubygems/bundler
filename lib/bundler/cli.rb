@@ -58,7 +58,10 @@ module Bundler
       all gems are found, Bundler prints a success message and exits with a status of 0.
       If not, the first missing gem is listed and Bundler exits status 1.
     D
+    method_option "gemfile", :type => :string, :banner =>
+      "Use the specified gemfile instead of Gemfile"
     def check
+      ENV['BUNDLE_GEMFILE'] = File.expand_path(options[:gemfile]) if options[:gemfile]
       begin
         not_installed = Bundler.definition.missing_specs
       rescue GemNotFound, VersionConflict

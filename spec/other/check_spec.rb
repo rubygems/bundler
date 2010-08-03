@@ -12,6 +12,17 @@ describe "bundle check" do
     out.should == "The Gemfile's dependencies are satisfied"
   end
 
+  it "works with the --gemfile flag when not in the directory" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rails"
+    G
+
+    Dir.chdir tmp
+    bundle "check --gemfile bundled_app/Gemfile"
+    out.should == "The Gemfile's dependencies are satisfied"
+  end
+
   it "creates a Gemfile.lock if one did not exist" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
