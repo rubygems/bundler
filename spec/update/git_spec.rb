@@ -35,6 +35,7 @@ describe "bundle update" do
       out.should include("Using activesupport (3.0) from #{lib_path('rails')} (at master)")
       should_be_installed "rails 3.0", "activesupport 3.0"
     end
+
     it "floats on a branch when :branch is used and the source is specified in the update" do
       build_git  "foo", "1.0", :path => lib_path("foo")
       update_git "foo", :branch => "omg", :path => lib_path("foo")
@@ -50,6 +51,26 @@ describe "bundle update" do
       end
 
       bundle "update --source foo"
+
+      should_be_installed "foo 1.1"
+    end
+
+    it "floats on master when updating all gems that are pinned to the source even if you have child dependencies" do
+      build_git "foo", :path => lib_path('foo')
+      build_gem "bar", :to_system => true do |s|
+        s.add_dependency "foo"
+      end
+
+      install_gemfile <<-G
+        gem "foo", :git => "#{lib_path('foo')}"
+        gem "bar"
+      G
+
+      update_git "foo", :path => lib_path('foo') do |s|
+        s.write "lib/foo.rb", "FOO = '1.1'"
+      end
+
+      bundle "update foo"
 
       should_be_installed "foo 1.1"
     end

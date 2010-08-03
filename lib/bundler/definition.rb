@@ -310,6 +310,11 @@ module Bundler
         if in_locked_deps?(dep, locked_dep) || satisfies_locked_spec?(dep)
           deps << dep
         elsif dep.source.is_a?(Source::Path) && (!locked_dep || dep.source != locked_dep.source)
+          @last_resolve.each do |s|
+            @unlock[:gems] << s.name if s.source == dep.source
+          end
+
+          dep.source.unlock! if dep.source.respond_to?(:unlock!)
           dep.source.specs.each { |s| @unlock[:gems] << s.name }
         end
       end
@@ -340,6 +345,17 @@ module Bundler
 
       resolve = SpecSet.new(converged)
       resolve = resolve.for(expand_dependencies(deps, true), @unlock[:gems])
+      diff    = @last_resolve.to_a - resolve.to_a
+
+      # Now, we unlock any sources that do not have anymore gems pinned to it
+      @sources.each do |source|
+        next unless source.respond_to?(:unlock!)
+
+        unless resolve.any? { |s| s.source == source }
+          source.unlock! if diff.any? { |s| s.source == source }
+        end
+      end
+
       @last_resolve = resolve
     end
 
