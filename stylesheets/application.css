@@ -41,9 +41,12 @@ img {
 /* line 50 */
 #intro {
   background: rgba(0, 0, 0, 0.1);
-  border-radius: 5px;
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
+  -o-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -khtml-border-radius: 5px;
+  border-radius: 5px;
   padding: 10px 10px;
   color: #043042;
   font-size: 18px;
@@ -68,13 +71,9 @@ img {
 
 /* line 68 */
 #footer {
-  /* Mozilla (FireFox, Camino) */
   -moz-box-sizing: border-box;
-  /* Webkit (Safari, Chrome) */
   -webkit-box-sizing: border-box;
-  /* IE (8) */
   -ms-box-sizing: border-box;
-  /* CSS3 */
   box-sizing: border-box;
   display: -webkit-box;
   display: -moz-box;
@@ -91,11 +90,9 @@ img {
 }
 /* line 77 */
 #footer img:first-child {
-  /* Webkit (Safari, Chrome) */
-  -webkit-box-shadow: blue 0 0 5px;
-  /* Gecko (Firefox, Camino) */
   -moz-box-shadow: blue 0 0 5px;
-  /* CSS3 */
+  -webkit-box-shadow: blue 0 0 5px;
+  -o-box-shadow: blue 0 0 5px;
   box-shadow: blue 0 0 5px;
 }
 /* line 80 */
@@ -147,13 +144,9 @@ h2 {
   color: #0e3f54;
   border-bottom: 3px solid #0e3f54;
   width: 100%;
-  /* Mozilla (FireFox, Camino) */
   -moz-box-sizing: border-box;
-  /* Webkit (Safari, Chrome) */
   -webkit-box-sizing: border-box;
-  /* IE (8) */
   -ms-box-sizing: border-box;
-  /* CSS3 */
   box-sizing: border-box;
 }
 
@@ -161,13 +154,9 @@ h2 {
 .bullet {
   width: 100%;
   padding: 8px 15px;
-  /* Mozilla (FireFox, Camino) */
   -moz-box-sizing: border-box;
-  /* Webkit (Safari, Chrome) */
   -webkit-box-sizing: border-box;
-  /* IE (8) */
   -ms-box-sizing: border-box;
-  /* CSS3 */
   box-sizing: border-box;
 }
 /* line 118 */
@@ -190,9 +179,12 @@ h2 {
   text-align: center;
   background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0%, #6ecf36), color-stop(100%, #4e9326));
   background-image: -moz-linear-gradient(top, #6ecf36 0%, #4e9326 100%);
-  border-radius: 5px;
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
+  -o-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -khtml-border-radius: 5px;
+  border-radius: 5px;
 }
 /* line 137 */
 .bullet a:hover {
@@ -219,14 +211,17 @@ h2 {
   color: #003333;
 }
 /* line 150 */
-.bullet .how .notes+ a {
+.bullet .how .notes + a {
   margin-top: 10px;
 }
 /* line 153 */
 .bullet pre {
-  border-radius: 5px;
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
+  -o-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -khtml-border-radius: 5px;
+  border-radius: 5px;
   -webkit-box-flex: 1;
   -moz-box-flex: 1;
   margin: 0;
@@ -275,9 +270,12 @@ h2 {
   left: 0;
   padding: 0.4em;
   background: rgba(0, 0, 0, 0.1);
-  border-bottom-right-radius: 10px;
   -moz-border-radius-bottomright: 10px;
   -webkit-border-bottom-right-radius: 10px;
+  -o-border-bottom-right-radius: 10px;
+  -ms-border-bottom-right-radius: 10px;
+  -khtml-border-bottom-right-radius: 10px;
+  border-bottom-right-radius: 10px;
 }
 /* line 192 */
 #versions a {

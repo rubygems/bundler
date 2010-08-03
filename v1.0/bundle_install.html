@@ -23,24 +23,23 @@
             <div class="how">
               <pre class='sunburst'>$ bundle install</pre>
               <div class="notes">
-                Gems may be
-                installed to system gems or BUNDLE_PATH (defaults
-                to ~/.bundle). Git repos will be checked out
-                to BUNDLE_PATH.
+                Gems may be installed to system gems or <code>BUNDLE_PATH</code>
+                (which defaults to <code>~/.bundle</code>). Git repos will
+                be checked out into to <code>BUNDLE_PATH</code> as well.
               </div>
             </div>
           </div>
           <div class="bullet">
             <div class="description">
-              Install your dependencies to a different location
-              than BUNDLE_PATH.
+              Install your dependencies, even gems that are already installed
+              to your system gems, to a location other than <code>BUNDLE_PATH</code>.
+              In this case, all gems will be installed to <code>vendor/bundle</code>.
             </div>
             <div class="how">
               <pre class='sunburst'>$ bundle install vendor/bundle</pre>
               <div class="notes">
-                Further bundle commands or
-                calls to Bundler.setup or Bundler.require will
-                remember this location
+                Further bundle commands or calls to Bundler.setup or Bundler.require will
+                remember this location.
               </div>
               <a href="./bundler_setup.html">Learn More: Bundler.setup</a>
               <a href="./groups.html">Learn More: Bundler.require</a>
@@ -48,31 +47,19 @@
           </div>
           <div class="bullet">
             <div class="description">
-              Install all dependencies, except those in groups
-              you explicitly excluded
+              Install all dependencies except those in groups
+              that are explicitly excluded.
             </div>
             <pre class='sunburst'>$ bundle install --without development test</pre>
             <a href="./groups.html">Learn More: Groups</a>
           </div>
           <div class="bullet">
             <div class="description">
-              Install all gems to BUNDLE_PATH, but ignore
-              gems that are installed in your system. This
-              is especially useful if you're trying to
-              package up an application with all dependencies
-              unpacked.
+              Install all dependencies to <code>vendor/bundle</code>, using cached gems in
+              <code>vendor/cache</code> if they are present.
             </div>
-            <div class="how">
-              <pre class='sunburst'>$bundle install vendor/bundle --disable-shared-gems</pre>
-              <div class="notes">
-                By default, bundler will not try to reinstall
-                gems that are already installed in your system.
-                By specifying --without-shared-gems, you are
-                telling bundler to install all gems into the
-                BUNDLE_PATH, regardless of whether they are
-                already installed in your system
-              </div>
-            </div>
+            <pre class='sunburst'>$ bundle install --deployment</pre>
+            <a href="./deploying.html">Learn More: Deploying</a>
           </div>
         </div>
       </div>
@@ -86,8 +73,6 @@
           <a href="./index.html">home</a>
           /
           <a href="./bundle_install.html">install</a>
-          /
-          <a href="./bundle_lock.html">lock</a>
           /
           <a href="./bundle_package.html">package</a>
         </p>

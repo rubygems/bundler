@@ -21,20 +21,25 @@
               but ignore the .bundle folder, which is specific
               to each machine.
             </div>
-            <pre class='sunburst'>$ echo ".bundle\n" >> .gitignore&#x000A;$ git add Gemfile Gemfile.lock .gitignore&#x000A;$ git commit -m "Add bundler"&#x000A;</pre>
+            <pre class='sunburst'>$ echo ".bundle\n" >> .gitignore&#x000A;$ git add Gemfile Gemfile.lock .gitignore&#x000A;$ git commit -m "Add Bundler support"&#x000A;</pre>
           </div>
           <div class="bullet">
             <div class="description">
               In your deploy script, after updating to the latest
-              code, install your bundle to ensure all your
-              dependencies are met.
+              code, install your bundle to the <code>vendor/bundle</code>
+              directory, ensuring all your dependencies are met.
             </div>
             <div class="how">
-              <pre class='sunburst'>$ bundle install</pre>
+              <pre class='sunburst'>$ bundle install --deployment</pre>
               <div class="notes">
                 Start your application servers as usual, and your
                 application will use your bundled environment
                 just like it does locally in development.
+              </div>
+              <div class="notes">
+                If you have run <code>bundle package</code>, the cached
+                gems will be used automatically.
+                <a href="./bundle_package.html">Learn More: Packing</a>
               </div>
             </div>
           </div>
@@ -50,8 +55,6 @@
           <a href="./index.html">home</a>
           /
           <a href="./bundle_install.html">install</a>
-          /
-          <a href="./bundle_lock.html">lock</a>
           /
           <a href="./bundle_package.html">package</a>
         </p>
