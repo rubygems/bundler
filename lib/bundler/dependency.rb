@@ -1,5 +1,6 @@
 require 'rubygems/dependency'
 require 'bundler/shared_helpers'
+require 'bundler/rubygems_ext'
 
 module Bundler
   class Dependency < Gem::Dependency
@@ -16,7 +17,7 @@ module Bundler
       :mri_19  => Gem::Platform::RUBY,
       :jruby   => Gem::Platform::JAVA,
       :mswin   => Gem::Platform::MSWIN
-    }
+    }.freeze
 
     def initialize(name, version, options = {}, &blk)
       super(name, version)

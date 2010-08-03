@@ -1,3 +1,5 @@
+require 'bundler/dependency'
+
 module Bundler
   class Dsl
     def self.evaluate(gemfile)
@@ -6,7 +8,7 @@ module Bundler
       builder.to_definition
     end
 
-    VALID_PLATFORMS = [:ruby, :ruby_18, :ruby_19, :mri, :mri_18, :mri_19, :jruby, :mswin]
+    VALID_PLATFORMS = Bundler::Dependency::PLATFORM_MAP.keys.freeze
 
     def initialize
       @rubygems_source = Source::Rubygems.new
