@@ -209,6 +209,35 @@ describe "bundle flex_install" do
       bundle :install
       out.should == nice_error
     end
+  end
 
+  describe "subtler cases" do
+    before :each do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+        gem "rack-obama"
+      G
+
+      gemfile <<-G
+        source "file:://#{gem_repo1}"
+        gem "rack", "0.9.1"
+        gem "rack-obama"
+      G
+    end
+
+    it "does something" do
+      lambda {
+        bundle "install"
+      }.should_not change { File.read(bundled_app('Gemfile.lock')) }
+
+      out.should include('rack = 0.9.1')
+      out.should include('locked at 1.0.0')
+      out.should include('bundle update rack')
+    end
+
+    it "should work when you update" do
+      bundle "update rack"
+    end
   end
 end
