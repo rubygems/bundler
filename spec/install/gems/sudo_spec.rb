@@ -26,7 +26,7 @@ describe "when using sudo" do
       FileUtils.mkdir_p bundle_path
       sudo "chown -R root #{bundle_path}"
 
-      ENV['BUNDLE_PATH'] = bundle_path
+      ENV['BUNDLE_PATH'] = bundle_path.to_s
       install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack", '1.0'
