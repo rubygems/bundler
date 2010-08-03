@@ -68,9 +68,7 @@ module Bundler
       @new_platform = !@platforms.include?(current_platform)
       @platforms |= [current_platform]
 
-      if Bundler.production?
-        ensure_equivalent_gemfile_and_lockfile
-      end
+      ensure_equivalent_gemfile_and_lockfile if Bundler.deploy
 
       converge_sources
       converge_dependencies

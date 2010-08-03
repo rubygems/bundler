@@ -457,9 +457,9 @@ describe "bundle install with gem sources" do
       G
     end
 
-    it "behaves like bundle install vendor/bundle with --production" do
+    it "behaves like bundle install vendor/bundle with --deploy" do
       bundle "install"
-      bundle "install --production"
+      bundle "install --deploy"
       out.should include("Your bundle was installed to `vendor/bundle`")
       should_be_installed "rack 1.0.0"
       bundled_app("vendor/bundle").should exist

@@ -28,7 +28,7 @@ describe "bundle install with gem sources" do
       simulate_new_machine
       FileUtils.rm_rf gem_repo2
 
-      bundle "install --production"
+      bundle "install --deploy"
       should_be_installed "rack 1.0.0"
     end
 

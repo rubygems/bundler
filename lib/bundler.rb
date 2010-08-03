@@ -60,20 +60,13 @@ module Bundler
 
   class << self
     attr_writer :ui, :bundle_path
+    attr_accessor :deploy
 
     def configure
       @configured ||= begin
         configure_gem_home_and_path
         true
       end
-    end
-
-    def production?
-      @production
-    end
-
-    def production=(value)
-      @production = value
     end
 
     def ui
