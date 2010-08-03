@@ -36,7 +36,7 @@ module Bundler
     end
 
     def lock
-      @definition.lock(root.join('Gemfile.lock'))
+      @definition.lock(Bundler.default_lockfile)
     end
 
     def update(*gems)

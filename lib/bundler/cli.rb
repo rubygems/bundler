@@ -141,7 +141,7 @@ module Bundler
       if opts[:production]
         Bundler.production = true
 
-        unless Bundler.root.join("Gemfile.lock").exist?
+        unless Bundler.default_lockfile.exist?
           raise ProductionError, "The --production flag requires a Gemfile.lock. Please\n" \
                                  "make sure you have checked your Gemfile.lock into version\n" \
                                  "control before deploying."
@@ -153,7 +153,7 @@ module Bundler
       end
 
       # Can't use Bundler.settings for this because settings needs gemfile.dirname
-      ENV['BUNDLE_GEMFILE'] = opts[:gemfile] if opts[:gemfile]
+      ENV['BUNDLE_GEMFILE'] = File.expand_path(opts[:gemfile]) if opts[:gemfile]
       Bundler.settings[:path] = nil if options[:system]
       Bundler.settings[:path] = "vendor/bundle" if options[:production]
       Bundler.settings[:path] = path if path

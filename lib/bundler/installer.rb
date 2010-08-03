@@ -15,9 +15,9 @@ module Bundler
         return
       end
 
-      if Bundler.root.join("Gemfile.lock").exist? && !options["update"]
+      if Bundler.default_lockfile.exist? && !options["update"]
         begin
-          tmpdef = Definition.build(Bundler.default_gemfile, Bundler.root.join("Gemfile.lock"), nil)
+          tmpdef = Definition.build(Bundler.default_gemfile, Bundler.default_lockfile, nil)
           local = true unless tmpdef.new_platform? || tmpdef.missing_specs.any?
         rescue BundlerError
         end

@@ -20,6 +20,26 @@ describe "bundle install with gem sources" do
       bundled_app("Gemfile.lock").should_not exist
     end
 
+    it "creates a Gemfile.lock" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      bundled_app('Gemfile.lock').should exist
+    end
+
+    it "creates lock files based on the Gemfile name" do
+      gemfile bundled_app('OmgFile'), <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", "1.0"
+      G
+
+      bundle 'install --gemfile OmgFile'
+
+      bundled_app("OmgFile.lock").should exist
+    end
+
     it "doesn't delete the lockfile if one already exists" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"

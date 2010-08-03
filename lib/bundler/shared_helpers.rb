@@ -22,6 +22,10 @@ module Bundler
       Pathname.new(gemfile)
     end
 
+    def default_lockfile
+      Pathname.new("#{default_gemfile}.lock")
+    end
+
     def in_bundle?
       find_gemfile
     end
