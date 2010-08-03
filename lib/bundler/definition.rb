@@ -131,18 +131,14 @@ module Bundler
     def resolve
       @resolve ||= begin
         converge_locked_specs
-        if !new_platform? && @last_resolve.valid_for?(expanded_dependencies)
-          @last_resolve
-        else
-          source_requirements = {}
-          dependencies.each do |dep|
-            next unless dep.source
-            source_requirements[dep.name] = dep.source.specs
-          end
-
-          # Run a resolve against the locally available gems
-          @last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, @last_resolve)
+        source_requirements = {}
+        dependencies.each do |dep|
+          next unless dep.source
+          source_requirements[dep.name] = dep.source.specs
         end
+
+        # Run a resolve against the locally available gems
+        @last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, @last_resolve)
       end
     end
 
