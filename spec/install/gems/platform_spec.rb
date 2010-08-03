@@ -82,7 +82,6 @@ describe "bundle install across platforms" do
     G
 
     simulate_platform "java"
-    ENV['OMG'] = '1'
     bundle "install"
 
     should_be_installed "nokogiri 1.4.2 JAVA", "weakling 0.0.3"
