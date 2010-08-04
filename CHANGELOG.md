@@ -1,4 +1,4 @@
-## 1.0.0.rc.2 (August 3, 2010)
+## 1.0.0.rc.3 (August 3, 2010)
 
 Features:
 
