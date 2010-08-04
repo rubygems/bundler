@@ -50,7 +50,7 @@ describe "Bundler::GemHelper tasks" do
 
     it "pushes" do
       @helper.should_receive(:rubygem_push).with(bundled_app('test/pkg/test-0.0.0.gem').to_s)
-      Dir.chdir(@app) { 
+      Dir.chdir(@app) {
         `git init --bare #{gem_repo1}`
         `git remote add origin file://#{gem_repo1}`
         `git commit -a -m"initial commit"`
