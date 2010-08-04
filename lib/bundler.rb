@@ -157,7 +157,7 @@ module Bundler
     end
 
     def tmp
-      user_bundle_path.join("tmp")
+      user_bundle_path.join("tmp", Process.pid.to_s)
     end
 
     def settings
