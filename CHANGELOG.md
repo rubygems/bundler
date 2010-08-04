@@ -1,3 +1,21 @@
+## 1.0.0.rc.2 (August 3, 2010)
+
+Features:
+
+  - Deprecate --production flag for --deployment, since the former
+    was causing confusion with the :production group
+  - Add --gemfile option to `bundle check`
+  - Reduce memory usage of `bundle install` by 2-4x
+  - Improve message from `bundle check` under various conditions
+  - Better error when a changed Gemfile conflicts with Gemfile.lock
+
+Bugfixes:
+
+  - Create bin/ directory if it is missing, then install binstubs
+  - Error nicely on the edge case of a pinned gem with no spec
+  - Do not require gems for other platforms
+  - Update git sources along with the gems they contain
+
 ## 1.0.0.rc.2 (July 29, 2010)
 
   - `bundle install path` was causing confusion, so we now print
