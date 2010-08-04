@@ -1,3 +1,9 @@
+## 1.0.0.rc.4
+
+Features:
+
+  - `bundle gem NAME` command to generate a new gem with Gemfile
+
 ## 1.0.0.rc.3 (August 3, 2010)
 
 Features:

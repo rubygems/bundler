@@ -1,5 +1,4 @@
 source :gemcutter
 
-# Specify your dependencies in <%=config[:name]%>.gemspec
-#
+# Specify your gem's dependencies in <%=config[:name]%>.gemspec
 gemspec

@@ -20,12 +20,12 @@ module Bundler
         build_gem
       end
 
-      desc 'Install your gem into the pkg directory'
+      desc 'Build your gem and install it to system gems'
       task 'install' do
         install_gem
       end
 
-      desc 'Push your gem to rubygems'
+      desc 'Tag your version in git and push to Rubygems'
       task 'push' do
         push_gem
       end
@@ -77,7 +77,9 @@ module Bundler
     end
 
     def guard_already_tagged
-      sh('git tag').split(/\n/).include?(current_version_tag) and raise("This tag has already been committed to the repo.")
+      if sh('git tag').split(/\n/).include?(current_version_tag)
+        raise("This tag has already been committed to the repo.")
+      end
     end
 
     def guard_clean
@@ -97,7 +99,9 @@ module Bundler
     end
 
     def current_version
-      raise("Version file could not be found at #{version_file_path}") unless File.exist?(version_file_path)
+      unless File.exist?(version_file_path)
+        raise("Version file could not be found at #{version_file_path}")
+      end
       File.read(version_file_path)[/V(ERSION|ersion)\s*=\s*(["'])(.*?)\2/, 3]
     end
 
@@ -116,7 +120,7 @@ module Bundler
 
     def sh_with_code(cmd, &block)
       output = ''
-      Dir.chdir(base) { 
+      Dir.chdir(base) {
         output = `#{cmd}`
         block.call if block and $? == 0
       }

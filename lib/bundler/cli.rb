@@ -8,7 +8,6 @@ Gem.configuration
 
 module Bundler
   class CLI < Thor
-
     include Thor::Actions
 
     def initialize(*)
