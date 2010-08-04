@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe "install with --deploy" do
+describe "install with --deployment" do
   before do
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -9,8 +9,8 @@ describe "install with --deploy" do
   end
 
   it "fails without a lockfile" do
-    bundle "install --deploy"
-    out.should include("The --deploy flag requires a Gemfile.lock")
+    bundle "install --deployment"
+    out.should include("The --deployment flag requires a Gemfile.lock")
   end
 
   describe "with an existing lockfile" do
@@ -19,7 +19,7 @@ describe "install with --deploy" do
     end
 
     it "works if you didn't change anything" do
-      bundle "install --deploy", :exit_status => true
+      bundle "install --deployment", :exit_status => true
       exitstatus.should == 0
     end
 
@@ -30,7 +30,7 @@ describe "install with --deploy" do
         gem "rack-obama"
       G
 
-      bundle "install --deploy"
+      bundle "install --deployment"
       out.should include("You have modified your Gemfile")
       out.should include("You have added to the Gemfile")
       out.should include("* rack-obama")
@@ -44,7 +44,7 @@ describe "install with --deploy" do
         gem "activesupport"
       G
 
-      bundle "install --deploy"
+      bundle "install --deployment"
       out.should include("You have modified your Gemfile")
       out.should include("You have added to the Gemfile:\n* activesupport\n\n")
       out.should include("You have deleted from the Gemfile:\n* rack")
@@ -57,7 +57,7 @@ describe "install with --deploy" do
         gem "rack", :git => "git://hubz.com"
       G
 
-      bundle "install --deploy"
+      bundle "install --deployment"
       out.should include("You have modified your Gemfile")
       out.should include("You have added to the Gemfile:\n* source: git://hubz.com (at master)")
       out.should_not include("You have changed in the Gemfile")
@@ -76,7 +76,7 @@ describe "install with --deploy" do
         gem "rack"
       G
 
-      bundle "install --deploy"
+      bundle "install --deployment"
       out.should include("You have modified your Gemfile")
       out.should include("You have deleted from the Gemfile:\n* source: #{lib_path("rack-1.0")} (at master)")
       out.should_not include("You have added to the Gemfile")
@@ -99,7 +99,7 @@ describe "install with --deploy" do
         gem "foo", :git => "#{lib_path("rack")}"
       G
 
-      bundle "install --deploy"
+      bundle "install --deployment"
       out.should include("You have modified your Gemfile")
       out.should include("You have changed in the Gemfile:\n* rack from `no specified source` to `#{lib_path("rack")} (at master)`")
       out.should_not include("You have added to the Gemfile")

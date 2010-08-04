@@ -112,22 +112,22 @@ module Bundler
       "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
     method_option "system", :type => :boolean, :banner =>
       "Install to the system location ($BUNDLE_PATH or $GEM_HOME) even if the bundle was previously installed somewhere else for this application"
-    method_option "deploy", :type => :boolean, :banner =>
+    method_option "deployment", :type => :boolean, :banner =>
       "Install using defaults tuned for deployment environments"
     method_option "production", :type => :boolean, :banner =>
-      "Deprecated, please use --deploy instead"
+      "Deprecated, please use --deployment instead"
     def install(path = nil)
       opts = options.dup
       opts[:without] ||= []
       opts[:without].map! { |g| g.to_sym }
 
       if opts[:production]
-        opts[:deploy] = true
+        opts[:deployment] = true
         Bundler.ui.warn "The --production option is deprecated, and will be removed in " \
-                        "the final release of Bundler 1.0. Please use --deploy instead."
+                        "the final release of Bundler 1.0. Please use --deployment instead."
       end
 
-      if (path || opts[:path] || opts[:deploy]) && opts[:system]
+      if (path || opts[:path] || opts[:deployment]) && opts[:system]
         Bundler.ui.error "You have specified both a path to install your gems to, \n" \
                          "as well as --system. Please choose."
         exit 1
@@ -149,12 +149,12 @@ module Bundler
         exit 1
       end
 
-      if opts[:deploy]
-        Bundler.deploy = true
+      if opts[:deployment]
+        Bundler.deployment = true
 
         unless Bundler.default_lockfile.exist?
-          raise ProductionError, "The --deploy flag requires a Gemfile.lock. Please make sure " \
-                                 "you have checked your Gemfile.lock into version control " \
+          raise ProductionError, "The --deployment flag requires a Gemfile.lock. Please make " \
+                                 "sure you have checked your Gemfile.lock into version control " \
                                  "before deploying."
         end
 
@@ -166,7 +166,7 @@ module Bundler
       # Can't use Bundler.settings for this because settings needs gemfile.dirname
       ENV['BUNDLE_GEMFILE'] = File.expand_path(opts[:gemfile]) if opts[:gemfile]
       Bundler.settings[:path] = nil if opts[:system]
-      Bundler.settings[:path] = "vendor/bundle" if opts[:deploy]
+      Bundler.settings[:path] = "vendor/bundle" if opts[:deployment]
       Bundler.settings[:path] = path if path
       Bundler.settings[:path] = opts[:path] if opts[:path]
       Bundler.settings[:bin] = opts["binstubs"] if opts[:binstubs]

@@ -60,7 +60,7 @@ module Bundler
 
   class << self
     attr_writer :ui, :bundle_path
-    attr_accessor :deploy
+    attr_accessor :deployment
 
     def configure
       @configured ||= begin
