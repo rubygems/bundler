@@ -45,6 +45,31 @@ describe "bundle update" do
   end
 end
 
+describe "bundle update in more complicated situations" do
+  before :each do
+    build_repo2
+  end
+
+  it "will eagerly unlock dependencies of a specified gem" do
+    install_gemfile <<-G
+      source "file://#{gem_repo2}"
+
+      gem "thin"
+      gem "rack-obama"
+    G
+
+    update_repo2 do
+      build_gem "thin" , '2.0' do |s|
+        s.add_dependency "rack"
+      end
+    end
+
+    bundle "update thin"
+    puts out
+    should_be_installed "thin 2.0", "rack 1.2", "rack-obama 1.0"
+  end
+end
+
 describe "bundle update without a Gemfile.lock" do
   it "should not explode" do
     build_repo2

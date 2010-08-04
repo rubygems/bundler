@@ -34,8 +34,8 @@ module Bundler
 
     def initialize(lockfile, dependencies, sources, unlock)
       @dependencies, @sources, @unlock = dependencies, sources, unlock
-      @remote = false
-      @specs = nil
+      @remote            = false
+      @specs             = nil
       @lockfile_contents = ""
 
       if lockfile && File.exists?(lockfile)
@@ -45,19 +45,19 @@ module Bundler
 
         if unlock != true
           @locked_deps    = locked.dependencies
-          @last_resolve   = SpecSet.new(locked.specs)
+          @locked_specs   = SpecSet.new(locked.specs)
           @locked_sources = locked.sources
         else
           @unlock         = {}
           @locked_deps    = []
-          @last_resolve   = SpecSet.new([])
+          @locked_specs   = SpecSet.new([])
           @locked_sources = []
         end
       else
         @unlock         = {}
         @platforms      = []
         @locked_deps    = []
-        @last_resolve   = SpecSet.new([])
+        @locked_specs   = SpecSet.new([])
         @locked_sources = []
       end
 
@@ -69,6 +69,9 @@ module Bundler
       @platforms |= [current_platform]
 
       ensure_equivalent_gemfile_and_lockfile if Bundler.deployment
+
+      eager_unlock = expand_dependencies(@unlock[:gems])
+      @unlock[:gems] = @locked_specs.for(eager_unlock).map { |s| s.name }
 
       converge_sources
       converge_dependencies
@@ -98,6 +101,14 @@ module Bundler
 
         specs
       end
+    end
+
+    def new_specs
+      specs - @locked_specs
+    end
+
+    def removed_specs
+      @locked_specs - specs
     end
 
     def new_platform?
@@ -130,7 +141,7 @@ module Bundler
 
     def resolve
       @resolve ||= begin
-        converge_locked_specs
+        last_resolve = converge_locked_specs
         source_requirements = {}
         dependencies.each do |dep|
           next unless dep.source
@@ -138,7 +149,7 @@ module Bundler
         end
 
         # Run a resolve against the locally available gems
-        @last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, @last_resolve)
+        last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve)
       end
     end
 
@@ -304,7 +315,7 @@ module Bundler
         if in_locked_deps?(dep, locked_dep) || satisfies_locked_spec?(dep)
           deps << dep
         elsif dep.source.is_a?(Source::Path) && (!locked_dep || dep.source != locked_dep.source)
-          @last_resolve.each do |s|
+          @locked_specs.each do |s|
             @unlock[:gems] << s.name if s.source == dep.source
           end
 
@@ -314,7 +325,7 @@ module Bundler
       end
 
       converged = []
-      @last_resolve.each do |s|
+      @locked_specs.each do |s|
         s.source = @sources.find { |src| s.source == src }
 
         # Don't add a spec to the list if its source is expired. For example,
@@ -339,7 +350,7 @@ module Bundler
 
       resolve = SpecSet.new(converged)
       resolve = resolve.for(expand_dependencies(deps, true), @unlock[:gems])
-      diff    = @last_resolve.to_a - resolve.to_a
+      diff    = @locked_specs.to_a - resolve.to_a
 
       # Now, we unlock any sources that do not have anymore gems pinned to it
       @sources.each do |source|
@@ -350,7 +361,7 @@ module Bundler
         end
       end
 
-      @last_resolve = resolve
+      resolve
     end
 
     def in_locked_deps?(dep, d)
@@ -358,7 +369,7 @@ module Bundler
     end
 
     def satisfies_locked_spec?(dep)
-      @last_resolve.any? { |s| s.satisfies?(dep) && (!dep.source || s.source == dep.source) }
+      @locked_specs.any? { |s| s.satisfies?(dep) && (!dep.source || s.source == dep.source) }
     end
 
     def expanded_dependencies
@@ -368,6 +379,7 @@ module Bundler
     def expand_dependencies(dependencies, remote = false)
       deps = []
       dependencies.each do |dep|
+        dep = Dependency.new(dep, ">= 0") unless dep.respond_to?(:name)
         dep.gem_platforms(@platforms).each do |p|
           deps << DepProxy.new(dep, p) if remote || p == generic(Gem::Platform.local)
         end
