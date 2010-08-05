@@ -124,7 +124,6 @@ module Bundler
       output = ''
       Dir.chdir(base) {
         stdin, stdout, stderr = *Open3.popen3(cmd)
-        #stdin.close
         if $? == 0
           output = stdout.read
           block.call if block
