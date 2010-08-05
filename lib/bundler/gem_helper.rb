@@ -1,3 +1,5 @@
+require 'open3'
+
 module Bundler
   class GemHelper
 
@@ -121,8 +123,12 @@ module Bundler
     def sh_with_code(cmd, &block)
       output = ''
       Dir.chdir(base) {
-        output = `#{cmd}`
-        block.call if block and $? == 0
+        stdin, stdout, stderr = *Open3.popen3(cmd)
+        #stdin.close
+        if $? == 0
+          output = stdout.read
+          block.call if block
+        end
       }
       [output, $?]
     end
