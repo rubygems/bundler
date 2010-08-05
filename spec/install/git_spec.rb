@@ -66,6 +66,36 @@ describe "bundle install with git sources" do
 
       out.should include("Source contains 'foo' at: 1.0")
     end
+
+    it "still works after moving the application directory" do
+      bundle "install vendor"
+      FileUtils.mv bundled_app, tmp('bundled_app.bck')
+
+      Dir.chdir tmp('bundled_app.bck')
+      should_be_installed "foo 1.0"
+    end
+
+    it "can still install after moving the application directory" do
+      bundle "install vendor"
+      FileUtils.mv bundled_app, tmp('bundled_app.bck')
+
+      update_git "foo", "1.1", :path => lib_path("foo-1.0")
+
+      Dir.chdir tmp('bundled_app.bck')
+      gemfile tmp('bundled_app.bck/Gemfile'), <<-G
+        source "file://#{gem_repo1}"
+        git "#{lib_path('foo-1.0')}" do
+          gem 'foo'
+        end
+
+        gem "rack", "1.0"
+      G
+
+      bundle "update foo"
+
+      should_be_installed "foo 1.1", "rack 1.0"
+    end
+
   end
 
   describe "with an empty git block" do
