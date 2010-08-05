@@ -65,7 +65,6 @@ describe "bundle update in more complicated situations" do
     end
 
     bundle "update thin"
-    puts out
     should_be_installed "thin 2.0", "rack 1.2", "rack-obama 1.0"
   end
 end
