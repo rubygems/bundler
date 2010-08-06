@@ -107,7 +107,7 @@ module Bundler
     end
 
     def local_config_file
-      Pathname.new("#{@root}/.bundle/config")
+      Pathname.new("#{@root}/config")
     end
   end
 end

@@ -153,6 +153,12 @@ module Bundler
       default_gemfile.dirname.expand_path
     end
 
+    def app_config_path
+      ENV['BUNDLE_APP_CONFIG'] ?
+        Pathname.new(ENV['BUNDLE_APP_CONFIG']).expand_path(root) :
+        root.join('.bundle')
+    end
+
     def app_cache
       root.join("vendor/cache")
     end
@@ -162,7 +168,7 @@ module Bundler
     end
 
     def settings
-      @settings ||= Settings.new(root)
+      @settings ||= Settings.new(app_config_path)
     end
 
     def with_clean_env
