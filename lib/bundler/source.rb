@@ -147,7 +147,7 @@ module Bundler
       def fetch_specs
         Index.build do |idx|
           idx.use installed_specs
-          idx.use cached_specs if @allow_cached
+          idx.use cached_specs if @allow_cached || @allow_remote
           idx.use remote_specs if @allow_remote
         end
       end

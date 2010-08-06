@@ -17,6 +17,17 @@ describe "bundle cache" do
     end
 
     it "uses the cache as a source when installing gems" do
+      build_gem "omg", :path => bundled_app('vendor/cache')
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "omg"
+      G
+
+      should_be_installed "omg 1.0.0"
+    end
+
+    it "uses the cache as a source when installing gems with --local" do
       system_gems []
       bundle "install --local"
 
