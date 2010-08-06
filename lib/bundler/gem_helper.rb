@@ -2,7 +2,6 @@ require 'open3'
 
 module Bundler
   class GemHelper
-
     def self.install_tasks
       dir = caller.find{|c| /Rakefile:/}[/^(.*?)\/Rakefile:/, 1]
       GemHelper.new(dir).install
