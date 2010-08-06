@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe "install with --deployment" do
+describe "install with --deployment or --frozen" do
   before do
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -8,9 +8,14 @@ describe "install with --deployment" do
     G
   end
 
-  it "fails without a lockfile" do
+  it "fails without a lockfile and says that --deployment requires a lock" do
     bundle "install --deployment"
     out.should include("The --deployment flag requires a Gemfile.lock")
+  end
+
+  it "fails without a lockfile and says that --frozen requires a lock" do
+    bundle "install --frozen"
+    out.should include("The --frozen flag requires a Gemfile.lock")
   end
 
   describe "with an existing lockfile" do
@@ -18,12 +23,17 @@ describe "install with --deployment" do
       bundle "install"
     end
 
-    it "works if you didn't change anything" do
+    it "works with the --deployment flag if you didn't change anything" do
       bundle "install --deployment", :exit_status => true
       exitstatus.should == 0
     end
 
-    it "explodes if you make a change and don't check in the lockfile" do
+    it "works with the --frozen flag if you didn't change anything" do
+      bundle "install --frozen", :exit_status => true
+      exitstatus.should == 0
+    end
+
+    it "explodes with the --deployment flag if you make a change and don't check in the lockfile" do
       gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
@@ -31,6 +41,21 @@ describe "install with --deployment" do
       G
 
       bundle "install --deployment"
+      out.should include("You have modified your Gemfile")
+      out.should include("You have added to the Gemfile")
+      out.should include("* rack-obama")
+      out.should_not include("You have deleted from the Gemfile")
+      out.should_not include("You have changed in the Gemfile")
+    end
+
+    it "explodes with the --frozen flag if you make a change and don't check in the lockfile" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+        gem "rack-obama"
+      G
+
+      bundle "install --frozen"
       out.should include("You have modified your Gemfile")
       out.should include("You have added to the Gemfile")
       out.should include("* rack-obama")

@@ -115,6 +115,8 @@ module Bundler
       "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
     method_option "system", :type => :boolean, :banner =>
       "Install to the system location ($BUNDLE_PATH or $GEM_HOME) even if the bundle was previously installed somewhere else for this application"
+    method_option "frozen", :type => :boolean, :banner =>
+      "Do not allow the Gemfile.lock to be updated after this install"
     method_option "deployment", :type => :boolean, :banner =>
       "Install using defaults tuned for deployment environments"
     method_option "production", :type => :boolean, :banner =>
@@ -152,11 +154,12 @@ module Bundler
         exit 1
       end
 
-      if opts[:deployment]
+      if opts[:deployment] || opts[:frozen]
         Bundler.frozen = true
 
         unless Bundler.default_lockfile.exist?
-          raise ProductionError, "The --deployment flag requires a Gemfile.lock. Please make " \
+          flag = opts[:deployment] ? '--deployment' : '--frozen'
+          raise ProductionError, "The #{flag} flag requires a Gemfile.lock. Please make " \
                                  "sure you have checked your Gemfile.lock into version control " \
                                  "before deploying."
         end
