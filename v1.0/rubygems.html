@@ -14,57 +14,58 @@
           </a>
         </div>
         <h2>Using Bundler with Rubygem gemspecs</h2>
-        <!-- TODO: write this section, using Gemfile's #gemspec method -->
-        <!-- .contents -->
-        <!-- .bullet -->
-        <!-- .description -->
-        <!-- If you already have a gem with a gemspec, you can generate a Gemfile for your gem. -->
-        <!-- .how -->
-        <!-- :highlight_plain -->
-        <!-- $ bundle init --gemspec -->
-        <!-- .notes -->
-        <!-- If you are creating a new gem, simply create a new Gemfile. -->
-        <!--
-        -->
-        <!-- .bullet -->
-        <!-- .description -->
-        <!-- Gems in the default group are regular dependencies, and gems in the :development group are -->
-        <!-- development dependencies. Gems in other groups will not be included in the gemspec. -->
-        <!-- :highlight_ruby -->
-        <!-- source :rubyforge -->
-        <!-- gem "json" -->
-        <!--
-        -->
-        <!-- group :development do -->
-        <!-- gem "rspec" -->
-        <!-- end -->
-        <!--
-        -->
-        <!-- group :debugging do -->
-        <!-- gem "ruby-debug" -->
-        <!-- gem "awsome_print" -->
-        <!-- end -->
-        <!--
-        -->
-        <!-- .bullet -->
-        <!-- .description -->
-        <!-- Inside your gemspec, load bundler and replace all of the dependency calls with a single call to -->
-        <!-- \#add_bundler_dependencies. -->
-        <!-- :highlight_ruby -->
-        <!-- require 'bundler' -->
-        <!-- Gem::Specification.new do |s| -->
-        <!-- # [...] -->
-        <!-- s.add_bundler_dependencies -->
-        <!-- end -->
-        <!--
-        -->
-        <!-- .bullet -->
-        <!-- .description -->
-        <!-- That's it! You can now build your gem. -->
-        <!-- :highlight_plain -->
-        <!-- $ gem build my_gem.gemspec -->
-        <!--
-        -->
+        <div class="contents">
+          <div class="bullet">
+            <div class="description">
+              If you're creating a gem from scratch, you can use bundler's built in gem skeleton to create a base gem for you to edit.
+            </div>
+            <div class="how">
+              <pre class='sunburst'>$ bundle gem my_gem</pre>
+              <div class="notes">
+                This will create a new directory named <code>my_gem</code> with your new gem skeleton.
+              </div>
+            </div>
+          </div>
+          <div class="bullet">
+            <div class="description">
+              If you already have a gem with a gemspec, you can generate a Gemfile for your gem.
+            </div>
+            <div class="how">
+              <pre class='sunburst'>$ bundle init</pre>
+              <div class="notes">
+                Then, add the following to your new Gemfile
+                <pre class="sunburst">gemspec&#x000A;</pre>
+              </div>
+            </div>
+          </div>
+          <div class="bullet">
+            <div class="description">
+              Runtime dependencies in your gemspec are treated like base dependencies, and development dependencies are added by default to the group, <code>:development</code>. You can change that group with the <code>:development_group</code> option
+            </div>
+            <pre class="sunburst">gemspec <span class="Constant"><span class="Constant">:</span>development_group</span> =&gt; <span class="Constant"><span class="Constant">:</span>dev</span>&#x000A;</pre>
+          </div>
+          <div class="bullet">
+            <div class="description">
+              As well, you can point to a specific gemspec using <code>:path</code>. If your gemspec is in <code>/gemspec/path</code>, use
+              <pre class="sunburst">gemspec <span class="Constant"><span class="Constant">:</span>path</span> =&gt; <span class="String"><span class="String">'</span>/gemspec/path<span class="String">'</span></span>&#x000A;</pre>
+            </div>
+          </div>
+          <div class="bullet">
+            <div class="description">
+              If you have multiple gemspecs in the same directory, specify which one you'd like to reference using <code>:name</code>
+              <pre class="sunburst">gemspec <span class="Constant"><span class="Constant">:</span>name</span> =&gt; <span class="String"><span class="String">'</span>my_awesome_gem<span class="String">'</span></span>&#x000A;</pre>
+              <div class="notes">
+                This will use <code>my_awesome_gem.gemspec</code>
+              </div>
+            </div>
+          </div>
+          <div class="bullet">
+            <div class="description">
+              That's it! Use bundler when developing your gem, and otherwise, use gemspecs normally!
+            </div>
+            <pre class='sunburst'>$ gem build my_gem.gemspec</pre>
+          </div>
+        </div>
       </div>
     </div>
     <div id="footer">
