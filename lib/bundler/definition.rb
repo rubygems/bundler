@@ -218,6 +218,7 @@ module Bundler
     end
 
   private
+
     def ensure_equivalent_gemfile_and_lockfile
       changes = false
 
