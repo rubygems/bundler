@@ -68,8 +68,6 @@ module Bundler
       @new_platform = !@platforms.include?(current_platform)
       @platforms |= [current_platform]
 
-      ensure_equivalent_gemfile_and_lockfile if Bundler.frozen
-
       eager_unlock = expand_dependencies(@unlock[:gems])
       @unlock[:gems] = @locked_specs.for(eager_unlock).map { |s| s.name }
 
@@ -141,15 +139,19 @@ module Bundler
 
     def resolve
       @resolve ||= begin
-        last_resolve = converge_locked_specs
-        source_requirements = {}
-        dependencies.each do |dep|
-          next unless dep.source
-          source_requirements[dep.name] = dep.source.specs
-        end
+        if Bundler.settings[:frozen]
+          @locked_specs
+        else
+          last_resolve = converge_locked_specs
+          source_requirements = {}
+          dependencies.each do |dep|
+            next unless dep.source
+            source_requirements[dep.name] = dep.source.specs
+          end
 
-        # Run a resolve against the locally available gems
-        last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve)
+          # Run a resolve against the locally available gems
+          last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve)
+        end
       end
     end
 
@@ -173,6 +175,11 @@ module Bundler
       contents = to_lock
 
       return if @lockfile_contents == contents
+
+      if Bundler.settings[:frozen]
+        # TODO: Warn here if we got here.
+        return
+      end
 
       File.open(file, 'w') do |f|
         f.puts contents
@@ -216,8 +223,6 @@ module Bundler
 
       out
     end
-
-  private
 
     def ensure_equivalent_gemfile_and_lockfile
       changes = false
@@ -274,6 +279,8 @@ module Bundler
 
       raise ProductionError, msg if added.any? || deleted.any? || changed.any?
     end
+
+  private
 
     def pretty_dep(dep, source = false)
       msg  = "#{dep.name}"

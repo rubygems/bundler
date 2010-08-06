@@ -155,7 +155,7 @@ module Bundler
       end
 
       if opts[:deployment] || opts[:frozen]
-        Bundler.frozen = true
+        Bundler.settings[:frozen] = '1'
 
         unless Bundler.default_lockfile.exist?
           flag = opts[:deployment] ? '--deployment' : '--frozen'

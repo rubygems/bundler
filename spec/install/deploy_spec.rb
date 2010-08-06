@@ -48,6 +48,22 @@ describe "install with --deployment or --frozen" do
       out.should_not include("You have changed in the Gemfile")
     end
 
+    it "can have --frozen set via an environment variable" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+        gem "rack-obama"
+      G
+
+      ENV['BUNDLE_FROZEN'] = '1'
+      bundle "install"
+      out.should include("You have modified your Gemfile")
+      out.should include("You have added to the Gemfile")
+      out.should include("* rack-obama")
+      out.should_not include("You have deleted from the Gemfile")
+      out.should_not include("You have changed in the Gemfile")
+    end
+
     it "explodes with the --frozen flag if you make a change and don't check in the lockfile" do
       gemfile <<-G
         source "file://#{gem_repo1}"
@@ -129,6 +145,18 @@ describe "install with --deployment or --frozen" do
       out.should include("You have changed in the Gemfile:\n* rack from `no specified source` to `#{lib_path("rack")} (at master)`")
       out.should_not include("You have added to the Gemfile")
       out.should_not include("You have deleted from the Gemfile")
+    end
+
+    it "remembers that the bundle is frozen at runtime" do
+      bundle "install --deployment"
+
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", "1.0.0"
+        gem "rack-obama"
+      G
+
+      should_be_installed "rack 1.0.0"
     end
   end
 end

@@ -10,6 +10,10 @@ module Bundler
     end
 
     def run(options)
+      if Bundler.settings[:frozen]
+        @definition.ensure_equivalent_gemfile_and_lockfile
+      end
+
       if dependencies.empty?
         Bundler.ui.warn "The Gemfile specifies no dependencies"
         return
