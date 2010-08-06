@@ -68,7 +68,7 @@ module Bundler
       @new_platform = !@platforms.include?(current_platform)
       @platforms |= [current_platform]
 
-      ensure_equivalent_gemfile_and_lockfile if Bundler.deployment
+      ensure_equivalent_gemfile_and_lockfile if Bundler.frozen
 
       eager_unlock = expand_dependencies(@unlock[:gems])
       @unlock[:gems] = @locked_specs.for(eager_unlock).map { |s| s.name }

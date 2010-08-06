@@ -153,7 +153,7 @@ module Bundler
       end
 
       if opts[:deployment]
-        Bundler.deployment = true
+        Bundler.frozen = true
 
         unless Bundler.default_lockfile.exist?
           raise ProductionError, "The --deployment flag requires a Gemfile.lock. Please make " \

@@ -61,7 +61,7 @@ module Bundler
 
   class << self
     attr_writer :ui, :bundle_path
-    attr_accessor :deployment
+    attr_accessor :frozen
 
     def configure
       @configured ||= begin
