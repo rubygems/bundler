@@ -195,7 +195,10 @@ module Bundler
         # Find all specs for this source
         resolve.
           select  { |s| s.source == source }.
-          sort_by { |s| s.name }.
+          # This needs to be sorted by full name so that
+          # gems with the same name, but different platform
+          # are ordered consistantly
+          sort_by { |s| s.full_name }.
           each do |spec|
             next if spec.name == 'bundler'
             out << spec.to_lock
