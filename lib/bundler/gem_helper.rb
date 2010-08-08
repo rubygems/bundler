@@ -2,9 +2,9 @@ require 'open3'
 
 module Bundler
   class GemHelper
-    def self.install_tasks
+    def self.install_tasks(opts = nil)
       dir = caller.find{|c| /Rakefile:/}[/^(.*?)\/Rakefile:/, 1]
-      GemHelper.new(dir).install
+      GemHelper.new(dir, opts && opts[:name]).install
     end
 
     attr_reader :spec_path, :base, :name
@@ -16,17 +16,17 @@ module Bundler
     end
 
     def install
-      desc 'Build your gem into the pkg directory'
+      desc "Build #{name}-#{current_version}.gem into the pkg directory"
       task 'build' do
         build_gem
       end
 
-      desc 'Build your gem and install it to system gems'
+      desc "Build and install #{name}-#{current_version}.gem into system gems"
       task 'install' do
         install_gem
       end
 
-      desc 'Tag your version in git and push to Rubygems'
+      desc "Create tag #{current_version_tag} and build and push #{name}-#{current_version}.gem to Rubygems"
       task 'push' do
         push_gem
       end
