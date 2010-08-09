@@ -3,6 +3,20 @@
 Features:
 
   - `bundle gem NAME` command to generate a new gem with Gemfile
+  - Bundle config file location can be specified by BUNDLE_APP_CONFIG
+  - Add --frozen to disable updating the Gemfile.lock at runtime
+  - Basic Capistrano task now added as 'bundler/capistrano'
+
+Bugfixes:
+
+  - Multiple bundler process no longer share a tmp directory
+  - `bundle update GEM` always updates dependencies of GEM as well
+  - Deleting the cache directory no longer causes errors
+  - Moving the bundle after installation no longer causes git errors
+  - Bundle path is now correctly remembered on a read-only filesystem
+  - Gem binaries are installed to Gem.bindir, not #{Gem.dir}/bin
+  - Fetch gems from vendor/cache, even without --local
+  - Sort lockfile by platform as well as spec
 
 ## 1.0.0.rc.3 (August 3, 2010)
 
