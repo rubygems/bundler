@@ -135,8 +135,12 @@ module Bundler
       default_gemfile.dirname
     end
 
+    def app_config_path
+      SharedHelpers.app_config_path
+    end
+
     def settings
-      @settings ||= Settings.new(root)
+      @settings ||= Settings.new(app_config_path)
     end
 
     def env_file

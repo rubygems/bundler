@@ -61,7 +61,7 @@ module Bundler
 
     def lock
       sources.each { |s| s.lock if s.respond_to?(:lock) }
-      FileUtils.mkdir_p("#{root}/.bundle")
+      FileUtils.mkdir_p(Bundler.app_config_path.to_s)
       write_yml_lock
       write_rb_lock
     end

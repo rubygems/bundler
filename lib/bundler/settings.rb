@@ -1,7 +1,7 @@
 module Bundler
   class Settings
-    def initialize(root)
-      @root   = root
+    def initialize(app_config_path)
+      @dir    = app_config_path.to_s
       @config = File.exist?(config_file) ? YAML.load_file(config_file) : {}
     end
 
@@ -31,7 +31,7 @@ module Bundler
   private
 
     def config_file
-      Pathname.new("#{@root}/.bundle/config")
+      Pathname.new("#{@dir}/config")
     end
   end
 end

@@ -48,7 +48,13 @@ module Bundler
     end
 
     def env_file
-      default_gemfile.dirname.join(".bundle/environment.rb")
+      app_config_path.join("environment.rb")
+    end
+
+    def app_config_path
+      ENV['BUNDLE_APP_CONFIG'] ?
+        Pathname.new(ENV['BUNDLE_APP_CONFIG']) :
+        default_gemfile.dirname.join(".bundle")
     end
 
   private

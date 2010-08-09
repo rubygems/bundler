@@ -250,6 +250,28 @@ describe "bundle install with gem sources" do
     end
   end
 
+  describe "when BUNDLE_APP_CONFIG is set" do
+    before :each do
+      build_lib "rack", "1.0.0", :to_system => true do |s|
+        s.write "lib/rack.rb", "raise 'FAIL'"
+      end
+
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+    end
+
+    it "writes the config file to that directory" do
+      ENV['BUNDLE_APP_CONFIG'] = bundled_app('bundler').to_s
+
+      bundle :install
+
+      bundled_app('bundler').should be_directory
+      bundled_app('bundler/config').should be_file
+    end
+  end
+
   describe "when BUNDLE_PATH is set" do
     before :each do
       build_lib "rack", "1.0.0", :to_system => true do |s|

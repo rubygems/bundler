@@ -227,12 +227,12 @@ module Bundler
   private
 
     def locked?
-      File.exist?("#{Bundler.root}/Gemfile.lock") || File.exist?("#{Bundler.root}/.bundle/environment.rb")
+      File.exist?("#{Bundler.root}/Gemfile.lock") || File.exist?("#{Bundler.app_config_path}/environment.rb")
     end
 
     def remove_lockfiles
       FileUtils.rm_f "#{Bundler.root}/Gemfile.lock"
-      FileUtils.rm_f "#{Bundler.root}/.bundle/environment.rb"
+      FileUtils.rm_f "#{Bundler.app_config_path}/environment.rb"
     end
 
     def locate_gem(name)
