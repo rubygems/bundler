@@ -11,7 +11,7 @@ module Bundler
 
     def initialize(base, name = nil)
       @base = base
-      @name = name || interpolate_name
+      @name = name || determine_name or raise("Cannot automatically determine the name of your gem. Use :name => 'gemname' in #install_tasks to manually set it.")
       @spec_path = File.join(@base, "#{@name}.gemspec")
     end
 
@@ -34,7 +34,8 @@ module Bundler
 
     def build_gem
       file_name = nil
-      sh("gem build #{spec_path}") {
+      sh("gem build #{spec_path}") { |out, err|
+        raise err if err[/ERROR/]
         file_name = File.basename(built_gem_path)
         FileUtils.mkdir_p(File.join(base, 'pkg'))
         FileUtils.mv(built_gem_path, 'pkg')
@@ -65,11 +66,11 @@ module Bundler
       Dir[File.join(base, "#{name}-*.gem")].sort_by{|f| File.mtime(f)}.last
     end
 
-    def interpolate_name
+    def determine_name
       gemspecs = Dir[File.join(base, "*.gemspec")]
       raise "Unable to determine name from existing gemspec." unless gemspecs.size == 1
 
-      File.basename(gemspecs.first)[/^(.*)\.gemspec$/, 1]
+      Gem::Specification.load(File.basename(gemspecs.first)[/^.*\.gemspec$/]).name
     end
 
     def git_push
@@ -125,7 +126,7 @@ module Bundler
         stdin, stdout, stderr = *Open3.popen3(cmd)
         if $? == 0
           output = stdout.read
-          block.call if block
+          block.call(output, stderr.read) if block
         end
       }
       [output, $?]
