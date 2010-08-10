@@ -70,7 +70,7 @@ module Bundler
       gemspecs = Dir[File.join(base, "*.gemspec")]
       raise "Unable to determine name from existing gemspec." unless gemspecs.size == 1
 
-      Gem::Specification.load(File.basename(gemspecs.first)[/^.*\.gemspec$/]).name
+      Gem::Specification.load(File.join(base, File.basename(gemspecs.first)[/^.*\.gemspec$/])).name
     end
 
     def git_push
