@@ -194,7 +194,7 @@ module Bundler
       path = path.parent until path.exist?
       sudo_present = !`which sudo 2>#{NULL}`.empty?
 
-      !settings.path && !File.writable?(path) && sudo_present
+      settings.allow_sudo? && !File.writable?(path) && sudo_present
     end
 
     def mkdir_p(path)

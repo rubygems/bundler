@@ -83,6 +83,10 @@ module Bundler
       end
     end
 
+    def allow_sudo?
+      !@local_config.key?(key_for(:path))
+    end
+
   private
     def key_for(key)
       key = key.to_s.sub(".", "__").upcase
