@@ -5,6 +5,7 @@ Features:
   - `bundle gem NAME` command to generate a new gem with Gemfile
   - Bundle config file location can be specified by BUNDLE_APP_CONFIG
   - Add --frozen to disable updating the Gemfile.lock at runtime
+    (default with --deployment)
   - Basic Capistrano task now added as 'bundler/capistrano'
 
 Bugfixes:
