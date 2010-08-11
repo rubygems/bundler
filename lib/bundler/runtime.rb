@@ -81,7 +81,7 @@ module Bundler
     alias gems specs
 
     def cache
-      FileUtils.mkdir_p(cache_path)
+      FileUtils.mkdir_p(cache_path) unless File.exist?(cache_path)
 
       Bundler.ui.info "Updating .gem files in vendor/cache"
       specs.each do |spec|
@@ -92,7 +92,7 @@ module Bundler
     end
 
     def prune_cache
-      FileUtils.mkdir_p(cache_path)
+      FileUtils.mkdir_p(cache_path) unless File.exist?(cache_path)
 
       resolve = @definition.resolve
       cached  = Dir["#{cache_path}/*.gem"]

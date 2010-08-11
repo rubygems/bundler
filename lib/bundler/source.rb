@@ -242,7 +242,7 @@ module Bundler
         download_path = Bundler.requires_sudo? ? Bundler.tmp : Gem.dir
         gem_path = "#{Gem.dir}/cache/#{spec.full_name}.gem"
 
-        FileUtils.mkdir_p("#{download_path}/cache")
+        FileUtils.mkdir_p("#{download_path}/cache") unless File.exist?("#{download_path}/cache")
         Gem::RemoteFetcher.fetcher.download(spec, uri, download_path)
 
         if Bundler.requires_sudo?
@@ -391,10 +391,14 @@ module Bundler
         def generate_bin
           return if spec.executables.nil? || spec.executables.empty?
 
-          FileUtils.mkdir_p("#{Bundler.tmp}/bin") if Bundler.requires_sudo?
-          super
           if Bundler.requires_sudo?
-            Bundler.mkdir_p "#{Gem.dir}/bin"
+            FileUtils.mkdir_p("#{Bundler.tmp}/bin") unless File.exist?("#{Bundler.tmp}/bin")
+          end
+
+          super
+
+          if Bundler.requires_sudo?
+            Bundler.mkdir_p("#{Gem.dir}/bin") unless File.exist?("#{Gem.dir}/bin")
             spec.executables.each do |exe|
               Bundler.sudo "cp -R #{Bundler.tmp}/bin/#{exe} #{Gem.dir}/bin/"
             end
@@ -614,14 +618,14 @@ module Bundler
           in_cache { git %|fetch --force --quiet "#{uri}" refs/heads/*:refs/heads/*| }
         else
           Bundler.ui.info "Fetching #{uri}"
-          FileUtils.mkdir_p(cache_path.dirname)
+          FileUtils.mkdir_p(cache_path.dirname) unless File.exist?(cache_path.dirname)
           git %|clone "#{uri}" "#{cache_path}" --bare --no-hardlinks|
         end
       end
 
       def checkout
         unless File.exist?(path.join(".git"))
-          FileUtils.mkdir_p(path.dirname)
+          FileUtils.mkdir_p(path.dirname) unless File.exist?(path.dirname)
           git %|clone --no-checkout "#{cache_path}" "#{path}"|
         end
         Dir.chdir(path) do
