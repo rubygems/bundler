@@ -1,3 +1,14 @@
+## 1.0.0.rc.5
+
+Features:
+
+  - Make the Capistrano task more concise.
+
+Bugfixes:
+
+  - Fix a regression with determining whether or not to use sudo
+  - Allow using the --gemfile flag with the --deployment flag
+
 ## 1.0.0.rc.4
 
 Features:
