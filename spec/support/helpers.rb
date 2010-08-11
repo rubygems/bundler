@@ -4,7 +4,7 @@ module Spec
       @in_p, @out_p, @err_p = nil, nil, nil
       Dir["#{tmp}/{gems/*,*}"].each do |dir|
         next if %(base remote1 gems rubygems_1_3_5 rubygems_1_3_6 rubygems_master).include?(File.basename(dir))
-        if File.owned?(dir)
+        unless ENV['BUNDLER_SUDO_TESTS']
           FileUtils.rm_rf(dir)
         else
           `sudo rm -rf #{dir}`

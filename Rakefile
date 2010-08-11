@@ -12,11 +12,13 @@ def gemspec
   end
 end
 
+def sudo?
+  ENV['BUNDLER_SUDO_TESTS']
+end
+
 begin
   require 'rspec/core/rake_task'
-rescue LoadError
-  raise 'Run `gem install rspec` to be able to run specs'
-else
+
   task :clear_tmp do
     FileUtils.rm_rf(File.expand_path("../tmp", __FILE__))
   end
@@ -27,6 +29,25 @@ else
     t.warning    = true
   end
   task :spec
+
+  namespace :spec do
+    task :sudo do
+      ENV['BUNDLER_SUDO_TESTS'] = '1'
+    end
+
+    task :clean do
+      if sudo?
+        system "sudo rm -rf #{File.expand_path('../tmp', __FILE__)}"
+      else
+        rm_rf 'tmp'
+      end
+    end
+
+    desc "Run the full spec suite including SUDO tests"
+    task :full => ["sudo", "clean", "spec"]
+  end
+rescue LoadError
+  raise 'Run `gem install rspec` to be able to run specs'
 end
 
 
