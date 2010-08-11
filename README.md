@@ -1,5 +1,3 @@
-### Note: the master branch is currently unstable while 1.0 is in beta.<br>The current stable version of bundler is in the branch named `v0.9`.
-
 ## Bundler : A gem to bundle gems
 
 Bundler is a tool that manages gem dependencies for your ruby application. It
@@ -11,38 +9,6 @@ you run any ruby code in context of the bundle's gem environment.
 ## Installation and usage
 
 See [gembundler.com](http://gembundler.com) for up-to-date installation and usage instructions
-
-## Gem dependency resolution
-
-One of the most important things that the bundler does is do a
-dependency resolution on the full list of gems that you specify, all
-at once. This differs from the one-at-a-time dependency resolution that
-Rubygems does, which can result in the following problem:
-
-    # On my system:
-    #   activesupport 3.0.pre
-    #   activesupport 2.3.4
-    #   activemerchant 1.4.2
-    #   rails 2.3.4
-    #
-    # activemerchant 1.4.2 depends on activesupport >= 2.3.2
-
-    gem "activemerchant", "1.4.2"
-    # results in activating activemerchant, as well as
-    # activesupport 3.0.pre, since it is >= 2.3.2
-
-    gem "rails", "2.3.4"
-    # results in:
-    #   can't activate activesupport (= 2.3.4, runtime)
-    #   for ["rails-2.3.4"], already activated
-    #   activesupport-3.0.pre for ["activemerchant-1.4.2"]
-
-This is because activemerchant has a broader dependency, which results
-in the activation of a version of activesupport that does not satisfy
-a more narrow dependency.
-
-Bundler solves this problem by evaluating all dependencies at once,
-so it can detect that all gems *together* require activesupport "2.3.4".
 
 ## Upgrading from Bundler 0.8 to 0.9 and above
 
@@ -114,39 +80,12 @@ Bundler 0.9 changes the following Bundler 0.8 Gemfile APIs:
 
 ### Development
 
-For information about future plans and changes that will happen between now and bundler 1.0, see the [ROADMAP](http://github.com/carlhuda/bundler/blob/master/ROADMAP.md). To see what has changed in each version of bundler, starting with 0.9.5, see the [CHANGELOG](http://github.com/carlhuda/bundler/blob/master/CHANGELOG.md).
-
-### Deploying to memory-constrained servers
-
-When deploying to a server that is memory-constrained, like Dreamhost, you should run `bundle package` on your local development machine, and then check in the resulting `Gemfile.lock` file and `vendor/cache` directory. The lockfile and cached gems will mean bundler can just install the gems immediately, without contacting any gem servers or using a lot of memory to resolve the dependency tree. On the server, you only need to run `bundle install` after you update your deployed code.
+For information about future plans and changes that will happen in the future, see the [ROADMAP](http://github.com/carlhuda/bundler/blob/master/ROADMAP.md). To see what has changed in each version of bundler, starting with 0.9.5, see the [CHANGELOG](http://github.com/carlhuda/bundler/blob/master/CHANGELOG.md).
 
 ### Other questions
 
 Any remaining questions may be asked via IRC in [#bundler](irc://irc.freenode.net/bundler) on Freenode, or via email on the [Bundler mailing list](http://groups.google.com/group/ruby-bundler).
 
-## Reporting bugs
+### Issues
 
-Before reporting a bug, try these troubleshooting steps:
-
-    rm -rf ~/.bundle/ ~/.gem/ .bundle/ Gemfile.lock
-    bundle install
-
-If you are still having problems, please report bugs to the github issue tracker for the project, located at [http://github.com/carlhuda/bundler/issues/](http://github.com/carlhuda/bundler/issues/).
-
-The best possible scenario is a ticket with a fix for the bug and a test for the fix. If that's not possible, instructions to reproduce the issue are vitally important. If you're not sure exactly how to reproduce the issue that you are seeing, create a gist of the following information and include it in your ticket:
-
-  - What version of bundler you are using
-  - What version of Ruby you are using
-  - Whether you are using RVM, and if so what version
-  - Your Gemfile
-  - Your Gemfile.lock
-  - If you are on 0.9, whether you have locked or not
-  - If you are on 1.0, the result of `bundle config`
-  - The command you ran to generate exception(s)
-  - The exception backtrace(s)
-
-If you are using Rails 2.3, please also include:
-
-  - Your boot.rb file
-  - Your preinitializer.rb file
-  - Your environment.rb file
+See [ISSUES](http://github.com/carlhuda/bundler/blob/master/ISSUES.md).
