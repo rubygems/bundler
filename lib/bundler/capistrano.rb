@@ -9,7 +9,8 @@ Capistrano::Configuration.instance(:must_exist).load do
 
   namespace :bundle do
     task :install do
-      run "bundle install --gemfile #{release_path}/Gemfile --path #{fetch(:bundle_dir, "#{shared_path}/bundle")} --deployment --without development test"
+      bundle_dir = fetch(:bundle_dir, "#{shared_path}/bundle")
+      run "bundle install --gemfile #{release_path}/Gemfile --path #{bundle_dir} --deployment --without development test"
     end
   end
 end
