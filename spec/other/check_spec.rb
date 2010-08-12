@@ -18,7 +18,7 @@ describe "bundle check" do
       gem "rails"
     G
 
-    Dir.chdir tmp
+    chdir tmp
     bundle "check --gemfile bundled_app/Gemfile"
     out.should == "The Gemfile's dependencies are satisfied"
   end
@@ -29,7 +29,7 @@ describe "bundle check" do
       gem "rails"
     G
 
-    FileUtils.rm("Gemfile.lock")
+    rm("Gemfile.lock")
 
     bundle "check"
 

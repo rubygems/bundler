@@ -64,7 +64,7 @@ describe "install with --deployment or --frozen" do
         gem "rack-obama"
       G
 
-      ENV['BUNDLE_FROZEN'] = '1'
+      env['BUNDLE_FROZEN'] = '1'
       bundle "install"
       out.should include("You have modified your Gemfile")
       out.should include("You have added to the Gemfile")

@@ -71,7 +71,7 @@ describe "bundle install with git sources" do
       bundle "install vendor"
       FileUtils.mv bundled_app, tmp('bundled_app.bck')
 
-      Dir.chdir tmp('bundled_app.bck')
+      chdir tmp('bundled_app.bck')
       should_be_installed "foo 1.0"
     end
 
@@ -81,7 +81,7 @@ describe "bundle install with git sources" do
 
       update_git "foo", "1.1", :path => lib_path("foo-1.0")
 
-      Dir.chdir tmp('bundled_app.bck')
+      chdir tmp('bundled_app.bck')
       gemfile tmp('bundled_app.bck/Gemfile'), <<-G
         source "file://#{gem_repo1}"
         git "#{lib_path('foo-1.0')}" do

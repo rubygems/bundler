@@ -260,7 +260,7 @@ module Spec
       yield
       @_build_path = nil
       with_gem_path_as Path.base_system_gems do
-        Dir.chdir(path) { gem_command :generate_index }
+        chdir(path) { gem_command :generate_index }
       end
     end
 
@@ -476,10 +476,10 @@ module Spec
       def _build(options)
         path = options[:path] || _default_path
         super(options.merge(:path => path))
-        Dir.chdir(path) do
-          `git init`
-          `git add *`
-          `git commit -m 'OMG INITIAL COMMIT'`
+        @context.chdir(path) do
+          @context.sys_exec "git init"
+          @context.sys_exec "git add *"
+          @context.sys_exec "git commit -m 'OMG INITIAL COMMIT'"
         end
       end
     end
@@ -489,34 +489,34 @@ module Spec
       NULL    = WINDOWS ? "NUL" : "/dev/null"
 
       def silently(str)
-        `#{str} 2>#{NULL}`
+        @context.sys_exec "#{str} 2>#{NULL}"
       end
 
       def _build(options)
         libpath = options[:path] || _default_path
 
-        Dir.chdir(libpath) do
+        @context.chdir(libpath) do
           silently "git checkout master"
 
           if branch = options[:branch]
             raise "You can't specify `master` as the branch" if branch == "master"
 
-            if `git branch | grep #{branch}`.empty?
+            if @context.sys_exec("git branch | grep #{branch}").empty?
               silently("git branch #{branch}")
             end
 
             silently("git checkout #{branch}")
           elsif tag = options[:tag]
-            `git tag #{tag}`
+            @context.sys_exec("git tag #{tag}")
           end
 
-          current_ref = `git rev-parse HEAD`.strip
+          current_ref = context.sys_exec("git rev-parse HEAD").strip
           _default_files.keys.each do |path|
             _default_files[path] << "\n#{Builders.constantize(name)}_PREV_REF = '#{current_ref}'"
           end
           super(options.merge(:path => libpath))
-          `git add *`
-          `git commit -m "BUMP"`
+          @context.sys_exec("git add *")
+          @context.sys_exec("git commit -m \"BUMP\"")
         end
       end
     end
@@ -537,7 +537,7 @@ module Spec
     private
 
       def git(cmd)
-        Dir.chdir(@path) { `git #{cmd}`.strip }
+        @context.chdir(@path) { @context.sys_exec("git #{cmd}").strip }
       end
 
     end
@@ -546,14 +546,21 @@ module Spec
 
       def _build(opts)
         lib_path = super(opts.merge(:path => @context.tmp(".tmp/#{@spec.full_name}"), :no_default => opts[:no_default]))
-        Dir.chdir(lib_path) do
+        @context.chdir(lib_path) do
           destination = opts[:path] || _default_path
           FileUtils.mkdir_p(destination)
-          Gem::Builder.new(@spec).build
+
+          gemspec_path = "#{lib_path}/#{@spec.full_name}.omg.gemspec"
+          File.open(gemspec_path, "w") do |file|
+            file.puts @spec.to_ruby
+          end
+
+          @context.gem_command "build #{gemspec_path}"
+
           if opts[:to_system]
-            `gem install --ignore-dependencies #{@spec.full_name}.gem`
+            @context.sys_exec "gem install --ignore-dependencies #{@spec.full_name}.gem"
           else
-            FileUtils.mv("#{@spec.full_name}.gem", opts[:path] || _default_path)
+            FileUtils.mv("#{@context.pwd}/#{@spec.full_name}.gem", opts[:path] || _default_path)
           end
         end
       end

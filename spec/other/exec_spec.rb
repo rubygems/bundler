@@ -45,21 +45,20 @@ describe "bundle exec" do
       gem "rack", "0.9.1"
     G
 
-    Dir.chdir bundled_app2 do
-      install_gemfile bundled_app2('Gemfile'), <<-G
-        source "file://#{gem_repo2}"
-        gem "rack_two", "1.0.0"
-      G
-    end
+    chdir bundled_app2
+    install_gemfile bundled_app2('Gemfile'), <<-G
+      source "file://#{gem_repo2}"
+      gem "rack_two", "1.0.0"
+    G
 
+    chdir bundled_app
     bundle "exec rackup"
 
     check out.should == "0.9.1"
 
-    Dir.chdir bundled_app2 do
-      bundle "exec rackup"
-      out.should == "1.0.0"
-    end
+    chdir bundled_app2
+    bundle "exec rackup"
+    out.should == "1.0.0"
   end
 
   it "handles gems installed with --without" do

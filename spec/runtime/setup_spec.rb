@@ -87,14 +87,14 @@ describe "Bundler.setup" do
       gem "activesupport", "2.3.5"
     G
 
-    ENV['BUNDLE_GEMFILE'] = bundled_app('4realz').to_s
+    env['BUNDLE_GEMFILE'] = bundled_app('4realz').to_s
     bundle :install
 
     should_be_installed "activesupport 2.3.5"
   end
 
   it "prioritizes gems in BUNDLE_PATH over gems in GEM_HOME" do
-    ENV['BUNDLE_PATH'] = bundled_app('.bundle').to_s
+    env['BUNDLE_PATH'] = bundled_app('.bundle').to_s
     install_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack", "1.0.0"
@@ -246,14 +246,14 @@ describe "Bundler.setup" do
       begin
         bundle "install vendor"
 
-        Dir["**/*"].each do |f|
+        Dir["#{pwd}/**/*"].each do |f|
           File.directory?(f) ?
             File.chmod(0555, f) :
             File.chmod(0444, f)
         end
         should_be_installed "rack 1.0.0"
       ensure
-        Dir["**/*"].each do |f|
+        Dir["#{pwd}/**/*"].each do |f|
           File.directory?(f) ?
             File.chmod(0755, f) :
             File.chmod(0644, f)
@@ -370,7 +370,7 @@ describe "Bundler.setup" do
       gem "rack"
     G
 
-    ENV["GEM_HOME"] = ""
+    env["GEM_HOME"] = ""
     bundle %{exec ruby -e "require 'set'"}
 
     err.should be_empty

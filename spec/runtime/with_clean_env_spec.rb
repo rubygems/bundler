@@ -3,13 +3,28 @@ require "spec_helper"
 describe "Bundler.with_clean_env" do
 
   it "should reset and restore the environment" do
-    gem_path = ENV['GEM_PATH']
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack"
+    G
 
-    Bundler.with_clean_env do
-      `echo $GEM_PATH`.strip.should_not == gem_path
-    end
+    bundle "install --path vendor"
+    puts out
 
-    ENV['GEM_PATH'].should == gem_path
+    env["GEM_HOME"] = "omg"
+
+    run <<-RUBY
+      puts ENV['GEM_HOME']
+
+      Bundler.with_clean_env do
+        puts `echo $GEM_HOME`.strip
+      end
+
+      puts ENV['GEM_HOME'].strip
+    RUBY
+
+    home = File.expand_path(vendored_gems)
+    out.should == "#{home}\nomg\n#{home}"
   end
 
 end

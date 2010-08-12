@@ -25,7 +25,7 @@ describe "bundle install with explicit source paths" do
   it "supports relative paths" do
     build_lib "foo"
 
-    relative_path = lib_path('foo-1.0').relative_path_from(Pathname.new(Dir.pwd))
+    relative_path = lib_path('foo-1.0').relative_path_from(Pathname.new(pwd))
 
     install_gemfile <<-G
       gem 'foo', :path => "#{relative_path}"

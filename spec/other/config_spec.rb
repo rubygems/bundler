@@ -9,7 +9,7 @@ describe ".bundle/config" do
   end
 
   it "can be moved with an environment variable" do
-    ENV['BUNDLE_APP_CONFIG'] = tmp('foo/bar').to_s
+    env['BUNDLE_APP_CONFIG'] = tmp('foo/bar').to_s
     bundle "install vendor"
 
     bundled_app('.bundle').should_not exist
@@ -21,7 +21,7 @@ describe ".bundle/config" do
     FileUtils.mkdir_p bundled_app('omg')
     Dir.chdir bundled_app('omg')
 
-    ENV['BUNDLE_APP_CONFIG'] = "../foo"
+    env['BUNDLE_APP_CONFIG'] = "../foo"
     bundle "install vendor"
 
     bundled_app(".bundle").should_not exist
@@ -31,7 +31,7 @@ describe ".bundle/config" do
 
   it "removes environment.rb from BUNDLE_APP_CONFIG's path" do
     FileUtils.mkdir_p(tmp('foo/bar'))
-    ENV['BUNDLE_APP_CONFIG'] = tmp('foo/bar').to_s
+    env['BUNDLE_APP_CONFIG'] = tmp('foo/bar').to_s
     bundle "install"
     FileUtils.touch tmp('foo/bar/environment.rb')
     should_be_installed "rack 1.0.0"

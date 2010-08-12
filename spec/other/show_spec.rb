@@ -9,7 +9,7 @@ describe "bundle show" do
   end
 
   it "creates a Gemfile.lock if one did not exist" do
-    FileUtils.rm("Gemfile.lock")
+    rm("Gemfile.lock")
 
     bundle "show"
 
@@ -17,7 +17,7 @@ describe "bundle show" do
   end
 
   it "creates a Gemfile.lock if one did not exist and we're doing bundle show rails" do
-    FileUtils.rm("Gemfile.lock")
+    rm("Gemfile.lock")
 
     bundle "show rails"
 

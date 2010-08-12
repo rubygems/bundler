@@ -18,8 +18,8 @@ describe "Bundler.load" do
       gem "rack"
     G
 
-    env = Bundler.load
-    env.dependencies.should have_dep("rack", ">= 0")
+    run "deps = Bundler.load.dependencies; puts deps.any? { |d| d == Gem::Dependency.new('rack', '>=0') }"
+    out.should == "true"
   end
 
   it "provides a list of the resolved gems" do
@@ -28,8 +28,8 @@ describe "Bundler.load" do
       gem "rack"
     G
 
-    env = Bundler.load
-    env.gems.should have_gem("rack-1.0.0", "bundler-#{Bundler::VERSION}")
+    run "gems = Bundler.load.gems; puts gems.length && gems.any? { |a| a.full_name == 'rack-1.0.0' }"
+    out.should == "true"
   end
 
   it "raises an exception if the default gemfile is not found" do
@@ -39,10 +39,9 @@ describe "Bundler.load" do
   end
 
   it "raises an exception if a specified gemfile is not found" do
-    lambda {
-      ENV['BUNDLE_GEMFILE'] = "omg.rb"
-      Bundler.load
-    }.should raise_error(Bundler::GemfileNotFound, /omg\.rb/)
+    env['BUNDLE_GEMFILE'] = "omg.rb"
+    run "Bundler.load", :expect_err => true
+    err.should =~ /omg\.rb/
   end
 
   describe "when called twice" do
@@ -97,10 +96,8 @@ describe "Bundler.load" do
         gem "activerecord"
       G
 
-      Bundler.load.specs.each do |spec|
-        spec.to_yaml.should_not =~ /^\s+source:/
-        spec.to_yaml.should_not =~ /^\s+groups:/
-      end
+      run "specs = Bundler.load.specs; puts specs.all? { |s| s.to_yaml !~ /^\s+(source|groups):/ }"
+      out.should == "true"
     end
   end
 

@@ -4,7 +4,7 @@ module Spec
       @in_p, @out_p, @err_p = nil, nil, nil
       Dir["#{tmp}/{gems/*,*}"].each do |dir|
         next if %(base remote1 gems rubygems_1_3_5 rubygems_1_3_6 rubygems_master).include?(File.basename(dir))
-        unless ENV['BUNDLER_SUDO_TESTS']
+        unless env['BUNDLER_SUDO_TESTS']
           FileUtils.rm_rf(dir)
         else
           `sudo rm -rf #{dir}`
@@ -24,6 +24,25 @@ module Spec
 
     def in_app_root2(&blk)
       Dir.chdir(bundled_app2, &blk)
+    end
+
+    def chdir(dir)
+      old_dir, @__current_dir__ = @__current_dir__, dir
+      yield if block_given?
+    ensure
+      @__current_dir__ = old_dir if block_given?
+    end
+
+    def pwd
+      @__current_dir__
+    end
+
+    def env
+      @__env__ ||= {}
+    end
+
+    def rm(file)
+      FileUtils.rm("#{@__current_dir__}/#{file}")
     end
 
     def run(cmd, *args)
@@ -71,16 +90,16 @@ module Spec
 
     def gembin(cmd)
       lib = File.expand_path("../../../lib", __FILE__)
-      old, ENV['RUBYOPT'] = ENV['RUBYOPT'], "#{ENV['RUBYOPT']} -I#{lib}"
+      old, env['RUBYOPT'] = env['RUBYOPT'], "#{env['RUBYOPT']} -I#{lib}"
       cmd = bundled_app("bin/#{cmd}") unless cmd.to_s.include?("/")
       sys_exec(cmd.to_s)
     ensure
-      ENV['RUBYOPT'] = old
+      env['RUBYOPT'] = old
     end
 
     def sys_exec(cmd, expect_err = false)
       require "open3"
-      @in_p, @out_p, @err_p = Open3.popen3(cmd.to_s)
+      @in_p, @out_p, @err_p = Open3.popen3(command(cmd))
 
       yield @in_p if block_given?
 
@@ -93,8 +112,13 @@ module Spec
 
     def sys_status(cmd)
       @err = nil
-      @out = %x{#{cmd}}.strip
+      @out = %x{#{command(cmd)}}.strip
       @exitstatus = $?.exitstatus
+    end
+
+    def command(cmd)
+      env_string = self.env.map { |k,v| "#{k}=#{v}" }.join(" ")
+      "cd #{@__current_dir__} && #{env_string} #{cmd}"
     end
 
     def config(config = nil)
@@ -150,11 +174,11 @@ module Spec
     alias install_gem install_gems
 
     def with_gem_path_as(path)
-      gem_home, gem_path = ENV['GEM_HOME'], ENV['GEM_PATH']
-      ENV['GEM_HOME'], ENV['GEM_PATH'] = path.to_s, path.to_s
+      gem_home, gem_path = env['GEM_HOME'], env['GEM_PATH']
+      env['GEM_HOME'], env['GEM_PATH'] = path.to_s, path.to_s
       yield
     ensure
-      ENV['GEM_HOME'], ENV['GEM_PATH'] = gem_home, gem_path
+      env['GEM_HOME'], env['GEM_PATH'] = gem_home, gem_path
     end
 
     def break_git!
@@ -163,7 +187,7 @@ module Spec
         f.puts "#!/usr/bin/env ruby\nSTDERR.puts 'This is not the git you are looking for'\nexit 1"
       end
 
-      ENV["PATH"] = "#{tmp("broken_path")}:#{ENV["PATH"]}"
+      env["PATH"] = "#{tmp("broken_path")}:#{env["PATH"]}"
     end
 
     def system_gems(*gems)
@@ -174,16 +198,16 @@ module Spec
 
       Gem.clear_paths
 
-      gem_home, gem_path, path = ENV['GEM_HOME'], ENV['GEM_PATH'], ENV['PATH']
-      ENV['GEM_HOME'], ENV['GEM_PATH'] = system_gem_path.to_s, system_gem_path.to_s
+      gem_home, gem_path, path = env['GEM_HOME'], env['GEM_PATH'], env['PATH']
+      env['GEM_HOME'], env['GEM_PATH'] = system_gem_path.to_s, system_gem_path.to_s
 
       install_gems(*gems)
       if block_given?
         begin
           yield
         ensure
-          ENV['GEM_HOME'], ENV['GEM_PATH'] = gem_home, gem_path
-          ENV['PATH'] = path
+          env['GEM_HOME'], env['GEM_PATH'] = gem_home, gem_path
+          env['PATH'] = path
         end
       end
     end
@@ -208,17 +232,17 @@ module Spec
     end
 
     def simulate_platform(platform)
-      old, ENV['BUNDLER_SPEC_PLATFORM'] = ENV['BUNDLER_SPEC_PLATFORM'], platform.to_s
+      old, env['BUNDLER_SPEC_PLATFORM'] = env['BUNDLER_SPEC_PLATFORM'], platform.to_s
       yield if block_given?
     ensure
-      ENV['BUNDLER_SPEC_PLATFORM'] = old if block_given?
+      env['BUNDLER_SPEC_PLATFORM'] = old if block_given?
     end
 
     def simulate_bundler_version(version)
-      old, ENV['BUNDLER_SPEC_VERSION'] = ENV['BUNDLER_SPEC_VERSION'], version.to_s
+      old, env['BUNDLER_SPEC_VERSION'] = env['BUNDLER_SPEC_VERSION'], version.to_s
       yield if block_given?
     ensure
-      ENV['BUNDLER_SPEC_VERSION'] = old if block_given?
+      env['BUNDLER_SPEC_VERSION'] = old if block_given?
     end
 
     def revision_for(path)
