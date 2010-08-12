@@ -46,54 +46,54 @@ begin
     desc "Run the full spec suite including SUDO tests"
     task :full => ["sudo", "clean", "spec"]
   end
-rescue LoadError
-  raise 'Run `gem install rspec` to be able to run specs'
-end
 
-
-# Rubygems 1.3.5, 1.3.6, and HEAD specs
-rubyopt = ENV["RUBYOPT"]
-%w(master REL_1_3_5 REL_1_3_6).each do |rg|
-  desc "Run specs with Rubygems #{rg}"
-  RSpec::Core::RakeTask.new("spec_gems_#{rg}") do |t|
-    t.spec_opts  = %w(-fs --color)
-    t.warning    = true
-  end
-
-  task "rubygems_#{rg}" do
-    unless File.directory?("tmp/rubygems_#{rg}")
-      system("git clone git://github.com/jbarnette/rubygems.git tmp/rubygems_#{rg} && cd tmp/rubygems_#{rg} && git reset --hard #{rg}")
+  # Rubygems 1.3.5, 1.3.6, and HEAD specs
+  rubyopt = ENV["RUBYOPT"]
+  %w(master REL_1_3_5 REL_1_3_6).each do |rg|
+    desc "Run specs with Rubygems #{rg}"
+    RSpec::Core::RakeTask.new("spec_gems_#{rg}") do |t|
+      t.spec_opts  = %w(-fs --color)
+      t.warning    = true
     end
-    ENV["RUBYOPT"] = "-I#{File.expand_path("tmp/rubygems_#{rg}/lib")} #{rubyopt}"
+
+    task "rubygems_#{rg}" do
+      unless File.directory?("tmp/rubygems_#{rg}")
+        system("git clone git://github.com/jbarnette/rubygems.git tmp/rubygems_#{rg} && cd tmp/rubygems_#{rg} && git reset --hard #{rg}")
+      end
+      ENV["RUBYOPT"] = "-I#{File.expand_path("tmp/rubygems_#{rg}/lib")} #{rubyopt}"
+    end
+
+    task "spec_gems_#{rg}" => "rubygems_#{rg}"
+    task :ci => "spec_gems_#{rg}"
   end
 
-  task "spec_gems_#{rg}" => "rubygems_#{rg}"
-  task :ci => "spec_gems_#{rg}"
-end
-
-
-# Ruby 1.8.6, 1.8.7, and 1.9.2 specs
-task "ensure_rvm" do
-  raise "RVM is not available" unless File.exist?(File.expand_path("~/.rvm/scripts/rvm"))
-end
-
-%w(1.8.6-p399 1.8.7-p249 1.9.2-head).each do |ruby|
-  ruby_cmd = File.expand_path("~/.rvm/bin/ruby-#{ruby}")
-
-  desc "Run specs on Ruby #{ruby}"
-  RSpec::Core::RakeTask.new("spec_ruby_#{ruby}") do |t|
-    t.spec_opts  = %w(-fs --color)
-    t.warning    = true
-    #t.ruby_cmd   = ruby_cmd
+  # Ruby 1.8.6, 1.8.7, and 1.9.2 specs
+  task "ensure_rvm" do
+    raise "RVM is not available" unless File.exist?(File.expand_path("~/.rvm/scripts/rvm"))
   end
 
-  task "ensure_ruby_#{ruby}" do
-    raise "Could not find Ruby #{ruby} at #{ruby_cmd}" unless File.exist?(ruby_cmd)
-  end
+  %w(1.8.6-p399 1.8.7-p249 1.9.2-head).each do |ruby|
+    ruby_cmd = File.expand_path("~/.rvm/bin/ruby-#{ruby}")
 
-  task "ensure_ruby_#{ruby}" => "ensure_rvm"
-  task "spec_ruby_#{ruby}" => "ensure_ruby_#{ruby}"
-  task :ci => "spec_ruby_#{ruby}"
+    desc "Run specs on Ruby #{ruby}"
+    RSpec::Core::RakeTask.new("spec_ruby_#{ruby}") do |t|
+      t.spec_opts  = %w(-fs --color)
+      t.warning    = true
+      #t.ruby_cmd   = ruby_cmd
+    end
+
+    task "ensure_ruby_#{ruby}" do
+      raise "Could not find Ruby #{ruby} at #{ruby_cmd}" unless File.exist?(ruby_cmd)
+    end
+
+    task "ensure_ruby_#{ruby}" => "ensure_rvm"
+    task "spec_ruby_#{ruby}" => "ensure_ruby_#{ruby}"
+    task :ci => "spec_ruby_#{ruby}"
+  end
+rescue LoadError
+  task :spec do
+    abort "Run `gem install rspec` to be able to run specs"
+  end
 end
 
 begin
