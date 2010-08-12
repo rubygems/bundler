@@ -1,3 +1,5 @@
+require "spec_helper"
+
 describe "The library itself" do
   def check_for_tab_characters(filename)
     failing_lines = []
@@ -42,5 +44,12 @@ describe "The library itself" do
       end
     end
     error_messages.compact.should be_well_formed
+  end
+
+  it "can still be built" do
+    Dir.chdir(root) do
+      `gem build bundler.gemspec`
+      $?.should == 0
+    end
   end
 end
