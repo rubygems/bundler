@@ -18,7 +18,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       bundle_without variable
 
         set :bundle_gemfile, "Gemfile"
-        set :bundle_dir,     "vendor/bundle"
+        set :bundle_dir,     fetch(:shared_path)+"/bundle"
         set :bundle_without, [:development, :test]
     DESC
     task :install, :except => { :no_release => true } do
@@ -26,12 +26,12 @@ Capistrano::Configuration.instance(:must_exist).load do
       bundle_without     = [*fetch(:bundle_without,   [:development, :test])].compact
       bundle_install_env = fetch(:bundle_install_env, "--deployment")
       bundle_gemfile     = fetch(:bundle_gemfile,     "Gemfile")
-      args = [
-        "--gemfile #{fetch(:latest_release)}/#{bundle_gemfile}",
-        ("--path #{bundle_dir}" unless bundle_dir.to_s.empty?),
-        "#{bundle_install_env}",
-        ("--without #{bundle_without.join(" ")}" unless bundle_without.empty?)
-      ].compact
+
+      args = ["--gemfile #{fetch(:latest_release)}/#{bundle_gemfile}"]
+      args << "--path #{bundle_dir}" unless bundle_dir.to_s.empty?
+      args << "#{bundle_install_env}"
+      args << "--without #{bundle_without.join(" ")}" unless bundle_without.empty?
+
       run "bundle install #{args.join(' ')}"
     end
   end
