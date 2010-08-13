@@ -96,6 +96,33 @@ rescue LoadError
   end
 end
 
+namespace :man do
+  directory "lib/bundler/man"
+
+  Dir["man/*.ronn"].each do |ronn|
+    basename = File.basename(ronn, ".ronn")
+    roff = "lib/bundler/man/#{basename}"
+
+    file roff => ["lib/bundler/man", ronn] do
+      sh "ronn --roff --pipe #{ronn} > #{roff}"
+    end
+
+    file "#{roff}.txt" => roff do
+      sh "groff -Wall -mtty-char -mandoc -Tascii #{roff} | col -b > #{roff}.txt"
+    end
+
+    task :build => "#{roff}.txt"
+  end
+end
+
+desc "Build the man pages"
+task :build => "man:build"
+
+desc "Clean up from the built man pages"
+task :clean do
+  rm_rf "lib/bundler/man"
+end
+
 begin
   require 'rake/gempackagetask'
 rescue LoadError

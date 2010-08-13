@@ -4,3 +4,5 @@ tmp
 pkg
 *.gem
 *.rbc
+
+lib/bundler/man
