@@ -99,7 +99,7 @@ module Bundler
       unless hash[key] == value
         hash[key] = value
         hash.delete(key) if value.nil?
-        FileUtils.mkdir_p(file.dirname) unless File.exist?(file.dirname)
+        FileUtils.mkdir_p(file.dirname)
         File.open(file, "w") { |f| f.puts hash.to_yaml }
       end
       value

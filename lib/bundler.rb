@@ -82,7 +82,7 @@ module Bundler
       @bin_path ||= begin
         path = settings[:bin] || "bin"
         path = Pathname.new(path).expand_path(root)
-        FileUtils.mkdir_p(path) unless File.exist?(path)
+        FileUtils.mkdir_p(path)
         Pathname.new(path).expand_path
       end
     end
@@ -202,7 +202,7 @@ module Bundler
         sudo "mkdir -p '#{path}'"
       else
         FileUtils.mkdir_p(path)
-      end unless File.exist?(path)
+      end
     end
 
     def sudo(str)
