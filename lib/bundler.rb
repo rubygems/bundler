@@ -199,7 +199,7 @@ module Bundler
 
     def mkdir_p(path)
       if requires_sudo?
-        sudo "mkdir -p '#{path}'"
+        sudo "mkdir -p '#{path}'" unless File.exist?(path)
       else
         FileUtils.mkdir_p(path)
       end

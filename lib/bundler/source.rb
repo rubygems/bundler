@@ -391,7 +391,9 @@ module Bundler
         def generate_bin
           return if spec.executables.nil? || spec.executables.empty?
 
-          FileUtils.mkdir_p("#{Bundler.tmp}/bin") if Bundler.requires_sudo?
+          if Bundler.requires_sudo?
+            FileUtils.mkdir_p("#{Bundler.tmp}/bin") unless File.exist?("#{Bundler.tmp}/bin")
+          end
           super
           if Bundler.requires_sudo?
             Bundler.mkdir_p "#{Gem.dir}/bin"
