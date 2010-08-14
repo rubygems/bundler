@@ -97,7 +97,8 @@ describe "bundle exec" do
       gem "rack"
     G
 
-    bundle "exec foobarbaz"
+    bundle "exec foobarbaz", :exit_status => true
+    @exitstatus.should == 127
     out.should include("bundler: command not found: foobarbaz")
     out.should include("Install missing gem binaries with `bundle install`")
   end
@@ -108,7 +109,8 @@ describe "bundle exec" do
     G
 
     bundle "exec touch foo"
-    bundle "exec ./foo"
+    bundle "exec ./foo", :exit_status => true
+    @exitstatus.should == 126
     out.should include("bundler: not executable: ./foo")
   end
 
