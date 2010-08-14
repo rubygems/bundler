@@ -67,7 +67,7 @@ We divide `bundle` subcommands into primary commands and utilities.
 * `bundle gem(1)`:
   Create a simple gem, suitable for development with bundler
 
-## OBSOLOETE
+## OBSOLETE
 
 These commands are obsolete and should no longer be used
 
