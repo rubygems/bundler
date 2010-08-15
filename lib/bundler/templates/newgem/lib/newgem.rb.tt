@@ -1,3 +1,7 @@
-module <%=config[:constant_name]%>
-  # Your code goes here...
-end
+<%- config[:constant_array].each_with_index do |c,i| -%>
+<%= '  '*i %>module <%= c %>
+<%- end -%>
+<%= '  '*config[:constant_array].size %># Your code goes here...
+<%- config[:constant_array].size.downto(0) do |i| -%>
+<%= '  '*i %>end
+<%- end -%>

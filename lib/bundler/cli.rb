@@ -430,8 +430,9 @@ module Bundler
 
       constant_name = name.split('_').map{|p| p.capitalize}.join
       constant_name = constant_name.split('-').map{|q| q.capitalize}.join('::') if constant_name =~ /-/
+      constant_array = constant_name.split('::')
       FileUtils.mkdir_p(File.join(target, 'lib', name))
-      opts = {:name => name, :constant_name => constant_name}
+      opts = {:name => name, :constant_name => constant_name, :constant_array => constant_array}
       template(File.join('newgem', 'Gemfile.tt'),                     File.join(target, 'Gemfile'),                 opts)
       template(File.join('newgem', 'Rakefile.tt'),                    File.join(target, 'Rakefile'),                opts)
       template(File.join('newgem', 'gitignore.tt'),                   File.join(target, '.gitignore'),              opts)
