@@ -72,11 +72,11 @@ defaults optimized for deployment, use the `--deployment` flag.
 
 1. A `Gemfile.lock` is required.
 
-   To ensure that the same versions of the gems you developed with 
+   To ensure that the same versions of the gems you developed with
    and tested with are also used in deployments, a `Gemfile.lock`
    is required.
 
-   This is mainly to ensure that you remember to check your 
+   This is mainly to ensure that you remember to check your
    `Gemfile.lock` into version control.
 
 2. The `Gemfile.lock` must be up to date
@@ -140,7 +140,7 @@ However, you can explicitly tell bundler to skip installing
 certain groups with the `--without` option. This option takes
 a space-separated list of groups.
 
-While the `--without` option will skip _installing_ the gems in the 
+While the `--without` option will skip _installing_ the gems in the
 specified groups, it will still _download_ those gems and use them to
 resolve the dependencies of every gem in your `Gemfile`.
 
@@ -260,7 +260,7 @@ Let's take a look at an example. Here's your original `Gemfile`:
 
 In this case, both `actionpack` and `activemerchant` depend on
 `activesupport`. The `actionpack` gem depends on `activesupport 2.3.8`
-and `rack ~> 1.1.0`, while the `activemerchant` gem depends on 
+and `rack ~> 1.1.0`, while the `activemerchant` gem depends on
 `activesupport >= 2.3.2`, `braintree >= 2.0.0`, and `builder >= 2.0.0`.
 
 When the dependencies are first resolved, Bundler will select

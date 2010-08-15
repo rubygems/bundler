@@ -87,7 +87,7 @@ list of groups separated by spaces.
     bundle install --without development test
 
 After running `bundle install --without test`, bundler will remember that you excluded
-the test group in the last installation. The next time you run `bundle install`, 
+the test group in the last installation. The next time you run `bundle install`,
 without any `--without option`, bundler will recall it.
 
 Also, calling `Bundler.setup` with no parameters, or calling `require "bundler/setup"`
@@ -101,7 +101,7 @@ groups. For more details, see [Understanding Bundler](http://gembundler.com/v1.0
 
 ### PLATFORMS (:platforms)
 
-If a gem should only be used in a particular platform or set of platforms, you can 
+If a gem should only be used in a particular platform or set of platforms, you can
 specify them. Platforms are essentially identical to groups, except that you do not
 need to use the `--without` install-time flag to exclude groups of gems for other
 platforms.
