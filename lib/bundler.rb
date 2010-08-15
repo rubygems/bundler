@@ -38,7 +38,6 @@ module Bundler
   class GemfileError     < BundlerError; status_code(4)  ; end
   class PathError        < BundlerError; status_code(13) ; end
   class GitError         < BundlerError; status_code(11) ; end
-  class GemspecError     < BundlerError; status_code(14) ; end
   class DeprecatedError  < BundlerError; status_code(12) ; end
   class GemspecError     < BundlerError; status_code(14) ; end
   class DslError         < BundlerError; status_code(15) ; end
