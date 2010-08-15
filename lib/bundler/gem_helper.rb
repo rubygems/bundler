@@ -101,10 +101,18 @@ module Bundler
     end
 
     def current_version
-      unless File.exist?(version_file_path)
-        raise("Version file could not be found at #{version_file_path}")
+      file = [version_file_path, library_file_path].find{|p| File.exist?(p) }
+      version = File.read(file)[/V(?i:ersion)\s*=\s*(["'])(.*?)\1/, 2]
+
+      unless version
+        raise("Version could not be found in lib/#{name}/version.rb")
+      else
+        version
       end
-      File.read(version_file_path)[/V(ERSION|ersion)\s*=\s*(["'])(.*?)\2/, 3]
+    end
+
+    def library_file_path
+      File.join(base, 'lib', "#{name}.rb")
     end
 
     def version_file_path
