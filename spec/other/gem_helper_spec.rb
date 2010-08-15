@@ -30,7 +30,7 @@ describe "Bundler::GemHelper tasks" do
       bundle 'gem test'
       @app = bundled_app("test")
       gemspec = File.read("#{@app.to_s}/test.gemspec")
-      File.open("#{@app.to_s}/test.gemspec", 'w') {|f| f << gemspec.gsub(/TODO/, '')}
+      File.open("#{@app.to_s}/test.gemspec", 'w'){|f| f << gemspec.gsub('TODO: ', '') }
       @helper = Bundler::GemHelper.new(@app.to_s)
     end
 
@@ -41,7 +41,8 @@ describe "Bundler::GemHelper tasks" do
 
     it "installs" do
       @helper.install_gem
-      should_be_installed("test 0.0.1")
+      bundled_app('test/pkg/test-0.0.1.gem').should exist
+      %x{gem list}.should include("test (0.0.1)")
     end
 
     it "shouldn't push if there are uncommitted files" do
