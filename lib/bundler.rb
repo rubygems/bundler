@@ -208,6 +208,32 @@ module Bundler
       `sudo -p 'Enter your password to install the bundled RubyGems to your system: ' #{str}`
     end
 
+    def load_gemspec(file)
+      path = Pathname.new(file)
+      # Eval the gemspec from its parent directory
+      Dir.chdir(path.dirname) do
+        begin
+          Gem::Specification.from_yaml(path.basename)
+          # Raises ArgumentError if the file is not valid YAML
+        rescue ArgumentError, SyntaxError, Gem::EndOfYAMLException, Gem::Exception
+          begin
+            eval(File.read(path.basename), TOPLEVEL_BINDING, path.expand_path.to_s)
+          rescue LoadError => e
+            original_line = e.backtrace.find { |line| line.include?(path.to_s) }
+            msg  = "There was a LoadError while evaluating #{path.basename}:\n  #{e.message}"
+            msg << " from\n  #{original_line}" if original_line
+            msg << "\n"
+
+            if RUBY_VERSION >= "1.9.0"
+              msg << "\nDoes it try to require a relative path? That doesn't work in Ruby 1.9."
+            end
+
+            raise GemspecError, msg
+          end
+        end
+      end
+    end
+
   private
 
     def configure_gem_home_and_path
