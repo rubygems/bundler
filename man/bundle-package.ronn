@@ -11,6 +11,12 @@ Copy all of the `.gem` files needed to run the application into the
 `vendor/cache` directory. In the future, when running `bundle install(1)`,
 use the gems in the cache in preference to the ones on `rubygems.org`.
 
+## GIT AND PATH GEMS
+
+In Bundler 1.0, the `bundle package` command only packages `.gem` files,
+not gems specified using the `:git` or `:path` options. This will likely
+change in the future.
+
 ## REMOTE FETCHING
 
 By default, if you simply run `bundle install(1)` after running
