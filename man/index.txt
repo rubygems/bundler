@@ -1,6 +1,6 @@
-Gemfile(5)         gemfile.5.ronn
-bundle-install     bundle-install.ronn
-bundle-update      bundle-update.ronn
-bundle-package     bundle-package.ronn
-bundle-exec        bundle-exec.ronn
-bundle-config      bundle-config.ronn
+Gemfile(5)         gemfile.5
+bundle-install     bundle-install.1
+bundle-update      bundle-update.1
+bundle-package     bundle-package.1
+bundle-exec        bundle-exec.1
+bundle-config      bundle-config.1
