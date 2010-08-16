@@ -1,0 +1,90 @@
+bundle-config(1) -- Set bundler configuration options
+=====================================================
+
+## SYNOPSIS
+
+`bundle config` [<name> [<value>]]
+
+## DESCRIPTION
+
+This command allows you to interact with bundler's configuration system.
+Bundler retrieves its configuration from the local application (`app/.bundle/config),
+environment variables, and the user's home directory (`~/.bundle/config),
+in that order of priority.
+
+Executing `bundle config` with no parameters will print a list of all
+bundler configuration for the current bundle, and where that configuration
+was set.
+
+Executing `bundle config <name>` will print the value of that configuration
+setting, and where it was set.
+
+Executing `bundle config <name> <value>` will set that configuration to the
+value specified for all bundles executed as the current user. The configuration
+will be stored in `~/.bundle/config`.
+
+## BUILD OPTIONS
+
+You can use `bundle config` to give bundler the flags to pass to the gem
+installer every time bundler tries to install a particular gem.
+
+A very common example, the `mysql` gem, requires Snow Leopard users to
+pass configuration flags to `gem install` to specify where to find the
+`mysql_config` executable.
+
+    gem install mysql -- --with-mysql-config=/usr/local/mysql/bin/mysql_config
+
+Since the specific location of that executable can change from machine
+to machine, you can specify these flags on a per-machine basis.
+
+    bundle config build.mysql --with-mysql-config=/usr/local/mysql/bin/mysql_config
+
+After running this command, every time bundler needs to install the
+`mysql` gem, it will pass along the flags you specified.
+
+## CONFIGURATION KEYS
+
+Configuration keys in bundler have two forms: the canonical form and the
+environment variable form.
+
+For instance, passing the `--without` flag to `bundle install(1)` prevents
+Bundler from installing certain groups specified in the `Gemfile(1)`. Bundler
+persists this value in `app/.bundle/config` so that calls to `Bundler.setup`
+do not try to find gems from the `Gemfile` that you didn't install. Additionally,
+subsequent calls to `bundle install(1)` remember this setting and skip those
+groups.
+
+The canonical form of this configuration is `"without"`. To convert the canonical
+form to the environment variable form, capitalize it, and prepend `BUNDLE_`. The
+environment variable form of `"without"` is `BUNDLE_WITHOUT`.
+
+## LIST OF AVAILABLE KEYS
+
+The following is a list of all configuration keys and their purpose. You can
+learn more about their operation in `bundle install(1)`.
+
+* `path` (`BUNDLE_PATH`):
+  The location on disk to install gems. Defaults to `$GEM_HOME` in development
+  and `vendor/bundler` when `--deployment` is used
+* `frozen` (`BUNDLE_FROZEN`):
+  Disallow changes to the `Gemfile`. Defaults to `true` when `--deployment`
+  is used.
+* `without` (`BUNDLE_WITHOUT`):
+  A `:`-separated list of groups whose gems bundler should not install
+* `bin` (`BUNDLE_BIN`):
+  Install executables from gems in the bundle to the specified directory.
+  Defaults to `false`.
+* `gemfile` (`BUNDLE_GEMFILE`):
+  The name of the file that bundler should use as the `Gemfile`. This location
+  of this file also sets the root of the project, which is used to resolve
+  relative paths in the `Gemfile`, among other things. By default, bundler
+  will search up from the current working directory until it finds a
+  `Gemfile`.
+
+In general, you should set these settings per-application by using the applicable
+flag to the `bundle install(1)` command.
+
+You can set them globally either via environment variables or `bundle config`,
+whichever is preferable for your setup. If you use both, environment variables
+will take preference over global settings.
+
