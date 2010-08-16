@@ -1,6 +1,5 @@
 # -*- encoding: utf-8 -*-
-$LOAD_PATH.unshift File.expand_path('../lib', __FILE__)
-require '<%=config[:name]%>/version'
+require File.expand_path("../lib/<%=config[:name]%>/version", __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = <%=config[:name].inspect%>
