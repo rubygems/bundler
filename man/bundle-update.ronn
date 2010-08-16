@@ -9,7 +9,7 @@ bundle-update(1) -- Update your gems to the latest available versions
 
 Update the gems specified (all gems, if none are specified), ignoring
 the previously installed gems specified in the `Gemfile.lock`. In
-general, you should use `bundle install(1)` to install the same exact
+general, you should use [bundle install(1)][bundle-install] to install the same exact
 gems and versions across machines.
 
 You would use `bundle update` to explicitly update the version of a
@@ -35,7 +35,7 @@ Consider the following Gemfile(5):
     gem "rails", "3.0.0.rc"
     gem "nokogiri"
 
-When you run `bundle install(1)` the first time, bundler will resolve
+When you run [bundle install(1)][bundle-install] the first time, bundler will resolve
 all of the dependencies, all the way down, and install what you need:
 
     Fetching source index for http://rubygems.org/
@@ -69,11 +69,11 @@ all of the dependencies, all the way down, and install what you need:
 
 As you can see, even though you have just two gems in the Gemfile(5), your application
 actually needs 25 different gems in order to run. Bundler remembers the exact versions
-it installed in `Gemfile.lock`. The next time you run `bundle install(1)`, bundler skips
+it installed in `Gemfile.lock`. The next time you run [bundle install(1)][bundle-install], bundler skips
 the dependency resolution and installs the same gems as it installed last time.
 
 After checking in the `Gemfile.lock` into version control and cloning it on another
-machine, running `bundle install(1)` will _still_ install the gems that you installed
+machine, running [bundle install(1)][bundle-install] will _still_ install the gems that you installed
 last time. You don't need to worry that a new release of `erubis` or `mail` changes
 the gems you use.
 
@@ -132,9 +132,9 @@ In this case, the two gems have their own set of dependencies, but they share
 dependencies of that gem, including those that are also dependencies of another gem.
 
 In this scenario, updating the `thin` version manually in the Gemfile(5),
-and then running `bundle install(1)` will only update `daemons` and `eventmachine`,
+and then running [bundle install(1)][bundle-install] will only update `daemons` and `eventmachine`,
 but not `rack`. For more information, see the `CONSERVATIVE UPDATING` section
-of `bundle install(1)`.
+of [bundle install(1)][bundle-install].
 
 ## RECOMMENDED WORKFLOW
 
@@ -165,7 +165,7 @@ use the following workflow:
 
     $ git add Gemfile.lock
 
-* If `bundle install(1)` reports a conflict, manually update the specific
+* If [bundle install(1)][bundle-install] reports a conflict, manually update the specific
   gems that you changed in the Gemfile(5)
 
     $ bundle update rails thin

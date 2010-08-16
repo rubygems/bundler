@@ -12,7 +12,7 @@ This command executes the command, making all gems specified in the
 
 Essentially, if you would normally have run something like
 `rspec spec/my_spec.rb`, and you want to use the gems specified
-in the `Gemfile(5)` and installed via `bundle install(1)`, you
+in the `Gemfile(5)` and installed via [bundle install(1)][bundle-install], you
 should run `bundle exec rspec spec/my_spec.rb`.
 
 Note that `bundle exec` does not require that an executable is
@@ -20,7 +20,7 @@ available on your shell's `$PATH`.
 
 ## BUNDLE INSTALL --BINSTUBS
 
-If you use the `--binstubs` flag in `bundle install(1)`, Bundler will
+If you use the `--binstubs` flag in [bundle install(1)][bundle-install], Bundler will
 automatically create a directory (which defaults to `app_root/bin`)
 containing all of the executables available from gems in the bundle.
 
@@ -72,10 +72,10 @@ If you had that version of gemcutter installed (even if
 you _also_ had a newer version without this problem), Rubygems
 would activate `gemcutter 0.5` and `json_pure <latest>`.
 
-If your `Gemfile(5)` also contained `json_pure` (or a gem
+If your Gemfile(5) also contained `json_pure` (or a gem
 with a dependency on `json_pure`), the latest version on
 your system might conflict with the version in your
-`Gemfile(5)`, or the snapshot version in your `Gemfile.lock`.
+Gemfile(5), or the snapshot version in your `Gemfile.lock`.
 
 If this happens, bundler will say:
 

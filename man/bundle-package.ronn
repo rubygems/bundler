@@ -8,7 +8,7 @@ bundle-package(1) -- Package your needed `.gem` files into your application
 ## DESCRIPTION
 
 Copy all of the `.gem` files needed to run the application into the
-`vendor/cache` directory. In the future, when running `bundle install(1)`,
+`vendor/cache` directory. In the future, when running [bundle install(1)][bundle-install],
 use the gems in the cache in preference to the ones on `rubygems.org`.
 
 ## GIT AND PATH GEMS
@@ -19,8 +19,8 @@ change in the future.
 
 ## REMOTE FETCHING
 
-By default, if you simply run `bundle install(1)` after running
-`bundle package(1)`, bundler will still connect to `rubygems.org`
+By default, if you simply run [bundle install(1)][bundle-install] after running
+[bundle package(1)][bundle-package], bundler will still connect to `rubygems.org`
 to check whether a platform-specific gem exists for any of the gems
 in `vendor/cache`.
 
