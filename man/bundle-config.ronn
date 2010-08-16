@@ -48,7 +48,7 @@ Configuration keys in bundler have two forms: the canonical form and the
 environment variable form.
 
 For instance, passing the `--without` flag to `bundle install(1)` prevents
-Bundler from installing certain groups specified in the `Gemfile(1)`. Bundler
+Bundler from installing certain groups specified in the Gemfile(5). Bundler
 persists this value in `app/.bundle/config` so that calls to `Bundler.setup`
 do not try to find gems from the `Gemfile` that you didn't install. Additionally,
 subsequent calls to `bundle install(1)` remember this setting and skip those

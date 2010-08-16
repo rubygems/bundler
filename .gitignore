@@ -6,3 +6,7 @@ pkg
 *.rbc
 
 lib/bundler/man
+
+man/*
+!man/*.ronn
+!man/index.txt
