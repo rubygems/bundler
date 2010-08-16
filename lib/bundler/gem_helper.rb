@@ -92,7 +92,7 @@ module Bundler
     end
 
     def tag_version
-      sh "git tag #{current_version_tag}"
+      sh "git tag -am 'Version #{current_version}' #{current_version_tag}"
       yield if block_given?
     rescue
       sh "git tag -d #{current_version_tag}"
