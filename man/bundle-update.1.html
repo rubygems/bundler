@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv='content-type' value='text/html;charset=utf8'>
+  <meta name='generator' value='Ronn/v0.7.3 (http://github.com/rtomayko/ronn/tree/0.7.3)'>
+  <title>bundle-update(1) - Update your gems to the latest available versions</title>
+  <style type='text/css' media='all'>
+  /* style: man */
+  body#manpage {margin:0}
+  .mp {max-width:100ex;padding:0 9ex 1ex 4ex}
+  .mp p,.mp pre,.mp ul,.mp ol,.mp dl {margin:0 0 20px 0}
+  .mp h2 {margin:10px 0 0 0}
+  .mp > p,.mp > pre,.mp > ul,.mp > ol,.mp > dl {margin-left:8ex}
+  .mp h3 {margin:0 0 0 4ex}
+  .mp dt {margin:0;clear:left}
+  .mp dt.flush {float:left;width:8ex}
+  .mp dd {margin:0 0 0 9ex}
+  .mp h1,.mp h2,.mp h3,.mp h4 {clear:left}
+  .mp pre {margin-bottom:20px}
+  .mp pre+h2,.mp pre+h3 {margin-top:22px}
+  .mp h2+pre,.mp h3+pre {margin-top:5px}
+  .mp img {display:block;margin:auto}
+  .mp h1.man-title {display:none}
+  .mp,.mp code,.mp pre,.mp tt,.mp kbd,.mp samp,.mp h3,.mp h4 {font-family:monospace;font-size:14px;line-height:1.42857142857143}
+  .mp h2 {font-size:16px;line-height:1.25}
+  .mp h1 {font-size:20px;line-height:2}
+  .mp {text-align:justify;background:#fff}
+  .mp,.mp code,.mp pre,.mp pre code,.mp tt,.mp kbd,.mp samp {color:#131211}
+  .mp h1,.mp h2,.mp h3,.mp h4 {color:#030201}
+  .mp u {text-decoration:underline}
+  .mp code,.mp strong,.mp b {font-weight:bold;color:#131211}
+  .mp em,.mp var {font-style:italic;color:#232221;text-decoration:none}
+  .mp a,.mp a:link,.mp a:hover,.mp a code,.mp a pre,.mp a tt,.mp a kbd,.mp a samp {color:#0000ff}
+  .mp b.man-ref {font-weight:normal;color:#434241}
+  .mp pre {padding:0 4ex}
+  .mp pre code {font-weight:normal;color:#434241}
+  .mp h2+pre,h3+pre {padding-left:0}
+  ol.man-decor,ol.man-decor li {margin:3px 0 10px 0;padding:0;float:left;width:33%;list-style-type:none;text-transform:uppercase;color:#999;letter-spacing:1px}
+  ol.man-decor {width:100%}
+  ol.man-decor li.tl {text-align:left}
+  ol.man-decor li.tc {text-align:center;letter-spacing:4px}
+  ol.man-decor li.tr {text-align:right;float:right}
+  </style>
+</head>
+<!--
+  The following styles are deprecated and will be removed at some point:
+  div#man, div#man ol.man, div#man ol.head, div#man ol.man.
+
+  The .man-page, .man-decor, .man-head, .man-foot, .man-title, and
+  .man-navigation should be used instead.
+-->
+<body id='manpage'>
+  <div class='mp' id='man'>
+
+  <div class='man-navigation' style='display:none'>
+    <a href="#NAME">NAME</a>
+    <a href="#SYNOPSIS">SYNOPSIS</a>
+    <a href="#DESCRIPTION">DESCRIPTION</a>
+    <a href="#OPTIONS">OPTIONS</a>
+    <a href="#UPDATING-ALL-GEMS">UPDATING ALL GEMS</a>
+    <a href="#UPDATING-A-LIST-OF-GEMS">UPDATING A LIST OF GEMS</a>
+    <a href="#OVERLAPPING-DEPENDENCIES">OVERLAPPING DEPENDENCIES</a>
+    <a href="#RECOMMENDED-WORKFLOW">RECOMMENDED WORKFLOW</a>
+    </div>
+
+  <ol class='man-decor man-head man head'>
+    <li class='tl'>bundle-update(1)</li>
+    <li class='tc'></li>
+    <li class='tr'>bundle-update(1)</li>
+  </ol>
+
+  <h2 id="NAME">NAME</h2>
+<p class="man-name">
+  <code>bundle-update</code> - <span class="man-whatis">Update your gems to the latest available versions</span>
+</p>
+
+<h2 id="SYNOPSIS">SYNOPSIS</h2>
+
+<p><code>bundle update</code> <var>*gems</var> [--source=NAME]</p>
+
+<h2 id="DESCRIPTION">DESCRIPTION</h2>
+
+<p>Update the gems specified (all gems, if none are specified), ignoring
+the previously installed gems specified in the <code>Gemfile.lock</code>. In
+general, you should use <a href="bundle-install.1.html">bundle install(1)</a> to install the same exact
+gems and versions across machines.</p>
+
+<p>You would use <code>bundle update</code> to explicitly update the version of a
+gem.</p>
+
+<h2 id="OPTIONS">OPTIONS</h2>
+
+<dl>
+<dt><code>--source=&lt;name></code></dt><dd>The name of a <code>:git</code> or <code>:path</code> source used in the <a href="gemfile.5.html" class="man-ref">Gemfile<span class="s">(5)</span></a>. For
+instance, with a <code>:git</code> source of <code>http://github.com/rails/rails.git</code>,
+you would call <code>bundle update --source rails</code></dd>
+</dl>
+
+
+<h2 id="UPDATING-ALL-GEMS">UPDATING ALL GEMS</h2>
+
+<p>If you run <code>bundle update</code> with no parameters, bundler will ignore
+any previously installed gems and resolve all dependencies again
+based on the latest versions of all gems available in the sources.</p>
+
+<p>Consider the following <a href="gemfile.5.html" class="man-ref">Gemfile<span class="s">(5)</span></a>:</p>
+
+<pre><code>source "http://rubygems.org"
+
+gem "rails", "3.0.0.rc"
+gem "nokogiri"
+</code></pre>
+
+<p>When you run <a href="bundle-install.1.html">bundle install(1)</a> the first time, bundler will resolve
+all of the dependencies, all the way down, and install what you need:</p>
+
+<pre><code>Fetching source index for http://rubygems.org/
+Installing rake (0.8.7)
+Installing abstract (1.0.0)
+Installing activesupport (3.0.0.rc)
+Installing builder (2.1.2)
+Installing i18n (0.4.1)
+Installing activemodel (3.0.0.rc)
+Installing erubis (2.6.6)
+Installing rack (1.2.1)
+Installing rack-mount (0.6.9)
+Installing rack-test (0.5.4)
+Installing tzinfo (0.3.22)
+Installing actionpack (3.0.0.rc)
+Installing mime-types (1.16)
+Installing polyglot (0.3.1)
+Installing treetop (1.4.8)
+Installing mail (2.2.5)
+Installing actionmailer (3.0.0.rc)
+Installing arel (0.4.0)
+Installing activerecord (3.0.0.rc)
+Installing activeresource (3.0.0.rc)
+Installing bundler (1.0.0.rc.3)
+Installing nokogiri (1.4.3.1) with native extensions
+Installing thor (0.14.0)
+Installing railties (3.0.0.rc)
+Installing rails (3.0.0.rc)
+
+Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.
+</code></pre>
+
+<p>As you can see, even though you have just two gems in the <a href="gemfile.5.html" class="man-ref">Gemfile<span class="s">(5)</span></a>, your application
+actually needs 25 different gems in order to run. Bundler remembers the exact versions
+it installed in <code>Gemfile.lock</code>. The next time you run <a href="bundle-install.1.html">bundle install(1)</a>, bundler skips
+the dependency resolution and installs the same gems as it installed last time.</p>
+
+<p>After checking in the <code>Gemfile.lock</code> into version control and cloning it on another
+machine, running <a href="bundle-install.1.html">bundle install(1)</a> will <em>still</em> install the gems that you installed
+last time. You don't need to worry that a new release of <code>erubis</code> or <code>mail</code> changes
+the gems you use.</p>
+
+<p>However, from time to time, you might want to update the gems you are using to the
+newest versions that still match the gems in your <a href="gemfile.5.html" class="man-ref">Gemfile<span class="s">(5)</span></a>.</p>
+
+<p>To do this, run <code>bundle update</code>, which will ignore the <code>Gemfile.lock</code>, and resolve
+all the dependencies again. Keep in mind that this process can result in a significantly
+different set of the 25 gems, based on the requirements of new gems that the gem
+authors released since the last time you ran <code>bundle update</code>.</p>
+
+<h2 id="UPDATING-A-LIST-OF-GEMS">UPDATING A LIST OF GEMS</h2>
+
+<p>Sometimes, you want to update a single gem in the <a href="gemfile.5.html" class="man-ref">Gemfile<span class="s">(5)</span></a>, and leave the rest of the
+gems that you specified locked to the versions in the <code>Gemfile.lock</code>.</p>
+
+<p>For instance, in the scenario above, imagine that <code>nokogiri</code> releases version <code>1.4.4</code>, and
+you want to update it <em>without</em> updating Rails and all of its dependencies. To do this,
+run <code>bundle update nokogiri</code>.</p>
+
+<p>Bundler will update <code>nokogiri</code> and any of its dependencies, but leave alone Rails and
+its dependencies.</p>
+
+<h2 id="OVERLAPPING-DEPENDENCIES">OVERLAPPING DEPENDENCIES</h2>
+
+<p>Sometimes, multiple gems declared in your <a href="gemfile.5.html" class="man-ref">Gemfile<span class="s">(5)</span></a> are satisfied by the same
+second-level dependency. For instance, consider the case of <code>thin</code> and
+<code>rack-perftools-profiler</code>.</p>
+
+<pre><code>source "http://rubygems.org"
+
+gem "thin"
+gem "rack-perftools-profiler"
+</code></pre>
+
+<p>The <code>thin</code> gem depends on <code>rack &gt;= 1.0</code>, while <code>rack-perftools-profiler</code> depends
+on <code>rack ~&gt; 1.0</code>. If you run bundle install, you get:</p>
+
+<pre><code>Fetching source index for http://rubygems.org/
+Installing daemons (1.1.0)
+Installing eventmachine (0.12.10) with native extensions
+Installing open4 (1.0.1)
+Installing perftools.rb (0.4.7) with native extensions
+Installing rack (1.2.1)
+Installing rack-perftools_profiler (0.0.2)
+Installing thin (1.2.7) with native extensions
+Using bundler (1.0.0.rc.3)
+</code></pre>
+
+<p>In this case, the two gems have their own set of dependencies, but they share
+<code>rack</code> in common. If you run <code>bundle update thin</code>, bundler will update <code>daemons</code>,
+<code>eventmachine</code> and <code>rack</code>, which are dependencies of <code>thin</code>, but not <code>open4</code> or
+<code>perftools.rb</code>, which are dependencies of <code>rack-perftools_profiler</code>. Note that
+<code>bundle update thin</code> will update <code>rack</code> even though it's <em>also</em> a dependency of
+<code>rack-perftools_profiler</code>.</p>
+
+<p><code>In short</code>, when you update a gem using <code>bundle update</code>, bundler will update all
+dependencies of that gem, including those that are also dependencies of another gem.</p>
+
+<p>In this scenario, updating the <code>thin</code> version manually in the <a href="gemfile.5.html" class="man-ref">Gemfile<span class="s">(5)</span></a>,
+and then running <a href="bundle-install.1.html">bundle install(1)</a> will only update <code>daemons</code> and <code>eventmachine</code>,
+but not <code>rack</code>. For more information, see the <code>CONSERVATIVE UPDATING</code> section
+of <a href="bundle-install.1.html">bundle install(1)</a>.</p>
+
+<h2 id="RECOMMENDED-WORKFLOW">RECOMMENDED WORKFLOW</h2>
+
+<p>In general, when working with an application managed with bundler, you should
+use the following workflow:</p>
+
+<ul>
+<li><p>After you create your <a href="gemfile.5.html" class="man-ref">Gemfile<span class="s">(5)</span></a> for the first time, run</p>
+
+<p>  $ bundle install</p></li>
+<li><p>Check the resulting <code>Gemfile.lock</code> into version control</p>
+
+<p>  $ git add Gemfile.lock</p></li>
+<li><p>When checking out this repository on another development machine, run</p>
+
+<p>  $ bundle install</p></li>
+<li><p>When checking out this repository on a deployment machine, run</p>
+
+<p>  $ bundle install --deployment</p></li>
+<li><p>After changing the <a href="gemfile.5.html" class="man-ref">Gemfile<span class="s">(5)</span></a> to reflect a new or update dependency, run</p>
+
+<p>  $ bundle install</p></li>
+<li><p>Make sure to check the updated <code>Gemfile.lock</code> into version control</p>
+
+<p>  $ git add Gemfile.lock</p></li>
+<li><p>If <a href="bundle-install.1.html">bundle install(1)</a> reports a conflict, manually update the specific
+gems that you changed in the <a href="gemfile.5.html" class="man-ref">Gemfile<span class="s">(5)</span></a></p>
+
+<p>  $ bundle update rails thin</p></li>
+<li><p>If you want to update all the gems to the latest possible versions that
+still match the gems listed in the <a href="gemfile.5.html" class="man-ref">Gemfile<span class="s">(5)</span></a>, run</p>
+
+<p>  $ bundle update</p></li>
+</ul>
+
+
+
+  <ol class='man-decor man-foot man foot'>
+    <li class='tl'></li>
+    <li class='tc'>August 2010</li>
+    <li class='tr'>bundle-update(1)</li>
+  </ol>
+
+  </div>
+</body>
+</html>
