@@ -9,27 +9,25 @@ Capistrano::Configuration.instance(:must_exist).load do
   namespace :bundle do
     desc <<-DESC
       Install the current Bundler environment. By default, gems will be \
-      installed to the shared/bundle path. However, you can specify a \
-      different directory via the bundle_dir variable. You can also specify \
-      the file name and path to the Gemfile using the bundle_gemfile \
-      variable. By default, gems in the development and test group will not \
-      be installed. If you want these gems to be installed or want \
-      additional named groups to be excluded, you can specify the \
-      bundle_without variable
+      installed to the shared/bundle path. Gems in the development and \
+      test group will not be installed. The install command is executed \
+      with the --deployment and --quiet flags. You can override any of \
+      these defaults by setting the variables shown below.
 
-        set :bundle_gemfile, "Gemfile"
-        set :bundle_dir,     fetch(:shared_path)+"/bundle"
-        set :bundle_without, [:development, :test]
+        set :bundle_gemfile,      "Gemfile"
+        set :bundle_dir,          fetch(:shared_path)+"/bundle"
+        set :bundle_flags,       "--deployment --quiet"
+        set :bundle_without,      [:development, :test]
     DESC
     task :install, :except => { :no_release => true } do
-      bundle_dir         = fetch(:bundle_dir,         "#{fetch(:shared_path)}/bundle")
-      bundle_without     = [*fetch(:bundle_without,   [:development, :test])].compact
-      bundle_install_env = fetch(:bundle_install_env, "--deployment")
-      bundle_gemfile     = fetch(:bundle_gemfile,     "Gemfile")
+      bundle_dir     = fetch(:bundle_dir,         " #{fetch(:shared_path)}/bundle")
+      bundle_without = [*fetch(:bundle_without,   [:development, :test])].compact
+      bundle_flags   = fetch(:bundle_flags, "--deployment --quiet")
+      bundle_gemfile = fetch(:bundle_gemfile,     "Gemfile")
 
       args = ["--gemfile #{fetch(:latest_release)}/#{bundle_gemfile}"]
       args << "--path #{bundle_dir}" unless bundle_dir.to_s.empty?
-      args << "#{bundle_install_env}"
+      args << bundle_flags.to_s
       args << "--without #{bundle_without.join(" ")}" unless bundle_without.empty?
 
       run "bundle install #{args.join(' ')}"
