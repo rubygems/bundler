@@ -1,3 +1,4 @@
+require 'rbconfig'
 require 'fileutils'
 require 'pathname'
 require 'yaml'
@@ -185,7 +186,7 @@ module Bundler
       SharedHelpers.default_lockfile
     end
 
-    WINDOWS = Config::CONFIG["host_os"] =~ %r!(msdos|mswin|djgpp|mingw)!
+    WINDOWS = RbConfig::CONFIG["host_os"] =~ %r!(msdos|mswin|djgpp|mingw)!
     NULL    = WINDOWS ? "NUL" : "/dev/null"
 
     def requires_sudo?
