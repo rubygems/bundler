@@ -66,5 +66,24 @@ module Spec
     def should_be_locked
       bundled_app("Gemfile.lock").should exist
     end
+
+    RSpec::Matchers.define :be_with_diff do |expected|
+      spaces = expected[/\A\s+/, 0] || ""
+      expected.gsub!(/^#{spaces}/, '')
+
+      failure_message_for_should do |actual|
+        "The lockfile did not match.\n=== Expected:\n" <<
+          expected << "\n=== Got:\n" << actual << "\n===========\n"
+      end
+
+      match do |actual|
+        expected == actual
+      end
+    end
+
+    def lockfile_should_be(expected)
+      lock = File.read(bundled_app("Gemfile.lock"))
+      lock.should be_with_diff(expected)
+    end
   end
 end
