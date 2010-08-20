@@ -6,6 +6,17 @@ require 'rubygems'
 require 'bundler'
 require 'rspec'
 
+# Require the correct version of popen for the current platform
+if RbConfig::CONFIG['host_os'] =~ /mingw|mswin/
+  begin
+    require 'win32/open3'
+  rescue LoadError
+    abort "Run `gem install win32-open3` to be able to run specs"
+  end
+else
+  require 'open3'
+end
+
 Dir["#{File.expand_path('../support', __FILE__)}/*.rb"].each do |file|
   require file
 end

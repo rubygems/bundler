@@ -79,7 +79,6 @@ module Spec
     end
 
     def sys_exec(cmd, expect_err = false)
-      require "open3"
       @in_p, @out_p, @err_p = Open3.popen3(cmd.to_s)
 
       yield @in_p if block_given?
