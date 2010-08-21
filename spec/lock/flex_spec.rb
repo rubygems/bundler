@@ -105,7 +105,7 @@ describe "the lockfile format" do
     lockfile_should_be <<-G
       GIT
         remote: #{lib_path("foo-1.0")}
-        revision: #{git.ref_for('master', 6)}
+        revision: #{git.ref_for('master')}
         specs:
           foo (1.0)
 
@@ -168,7 +168,7 @@ describe "the lockfile format" do
     lockfile_should_be <<-G
       GIT
         remote: #{lib_path('foo-1.0')}
-        revision: #{git.ref_for('master', 6)}
+        revision: #{git.ref_for('master')}
         specs:
           foo (1.0)
 
@@ -194,7 +194,7 @@ describe "the lockfile format" do
     lockfile_should_be <<-G
       GIT
         remote: #{lib_path("foo-1.0")}
-        revision: #{git.ref_for('omg', 6)}
+        revision: #{git.ref_for('omg')}
         branch: omg
         specs:
           foo (1.0)
@@ -221,7 +221,7 @@ describe "the lockfile format" do
     lockfile_should_be <<-G
       GIT
         remote: #{lib_path("foo-1.0")}
-        revision: #{git.ref_for('omg', 6)}
+        revision: #{git.ref_for('omg')}
         tag: omg
         specs:
           foo (1.0)
