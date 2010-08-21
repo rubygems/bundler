@@ -465,7 +465,7 @@ module Bundler
       def to_lock
         out = "GIT\n"
         out << "  remote: #{@uri}\n"
-        out << "  revision: #{shortref_for(revision)}\n"
+        out << "  revision: #{revision}\n"
         %w(ref branch tag submodules).each do |opt|
           out << "  #{opt}: #{options[opt]}\n" if options[opt]
         end
@@ -485,7 +485,7 @@ module Bundler
       alias == eql?
 
       def to_s
-        ref = @options["ref"] ? shortref_for(@options["ref"]) : @ref
+        ref = @options["ref"] ? shortref_for_display(@options["ref"]) : @ref
         "#{@uri} (at #{ref})"
       end
 
@@ -495,7 +495,7 @@ module Bundler
 
       def path
         @install_path ||= begin
-          git_scope = "#{base_name}-#{shortref_for(revision)}"
+          git_scope = "#{base_name}-#{shortref_for_path(revision)}"
 
           if Bundler.requires_sudo?
             Bundler.user_bundle_path.join(Bundler.ruby_scope).join(git_scope)
@@ -558,8 +558,12 @@ module Bundler
         File.basename(uri.sub(%r{^(\w+://)?([^/:]+:)},''), ".git")
       end
 
-      def shortref_for(ref)
+      def shortref_for_display(ref)
         ref[0..6]
+      end
+
+      def shortref_for_path(ref)
+        ref[0..11]
       end
 
       def uri_hash
