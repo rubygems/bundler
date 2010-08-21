@@ -1,7 +1,7 @@
 module Spec
   module Path
     def root
-      @root ||= Pathname.new(File.expand_path("../../..", __FILE__).sub(/.*\s.*/m, '"\&"'))
+      @root ||= Pathname.new(File.expand_path("../../..", __FILE__))
     end
 
     def tmp(*path)
