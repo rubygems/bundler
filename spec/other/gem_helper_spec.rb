@@ -7,7 +7,7 @@ describe "Bundler::GemHelper tasks" do
       bundle 'gem test'
       app = bundled_app("test")
       helper = Bundler::GemHelper.new(app.to_s)
-      helper.name.should == 'test'
+      helper.gemspec.name.should == 'test'
     end
 
     it "should fail when there is no gemspec" do

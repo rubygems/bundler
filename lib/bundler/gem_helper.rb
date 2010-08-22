@@ -7,30 +7,28 @@ module Bundler
       GemHelper.new(dir, opts && opts[:name]).install
     end
 
-    attr_reader :spec_path, :base, :name, :gemspec
+    attr_reader :spec_path, :base, :gemspec
 
     def initialize(base, name = nil)
       @base = base
       gemspecs = name ? [File.join(base, "#{name}.gemspec")] : Dir[File.join(base, "*.gemspec")]
       raise "Unable to determine name from existing gemspec. Use :name => 'gemname' in #install_tasks to manually set it." unless gemspecs.size == 1
-
       @spec_path = gemspecs.first
       @gemspec = Bundler.load_gemspec(@spec_path)
-      @name = @gemspec.name
     end
 
     def install
-      desc "Build #{name}-#{current_version}.gem into the pkg directory"
+      desc "Build #{name}-#{version}.gem into the pkg directory"
       task 'build' do
         build_gem
       end
 
-      desc "Build and install #{name}-#{current_version}.gem into system gems"
+      desc "Build and install #{name}-#{version}.gem into system gems"
       task 'install' do
         install_gem
       end
 
-      desc "Create tag #{current_version_tag} and build and push #{name}-#{current_version}.gem to Rubygems"
+      desc "Create tag #{version_tag} and build and push #{name}-#{version}.gem to Rubygems"
       task 'push' do
         push_gem
       end
@@ -76,7 +74,7 @@ module Bundler
     end
 
     def guard_already_tagged
-      if sh('git tag').split(/\n/).include?(current_version_tag)
+      if sh('git tag').split(/\n/).include?(version_tag)
         raise("This tag has already been committed to the repo.")
       end
     end
@@ -90,19 +88,23 @@ module Bundler
     end
 
     def tag_version
-      sh "git tag -am 'Version #{current_version}' #{current_version_tag}"
+      sh "git tag -am 'Version #{version}' #{version_tag}"
       yield if block_given?
     rescue
-      sh "git tag -d #{current_version_tag}"
+      sh "git tag -d #{version_tag}"
       raise
     end
 
-    def current_version
+    def version
       gemspec.version
     end
 
-    def current_version_tag
-      "v#{current_version}"
+    def version_tag
+      "v#{version}"
+    end
+
+    def name
+      gemspec.name
     end
 
     def sh(cmd, &block)
