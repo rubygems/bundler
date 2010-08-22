@@ -7,12 +7,16 @@ module Bundler
       GemHelper.new(dir, opts && opts[:name]).install
     end
 
-    attr_reader :spec_path, :base, :name
+    attr_reader :spec_path, :base, :name, :gemspec
 
     def initialize(base, name = nil)
       @base = base
-      @name = name || determine_name or raise("Cannot automatically determine the name of your gem. Use :name => 'gemname' in #install_tasks to manually set it.")
-      @spec_path = File.join(@base, "#{@name}.gemspec")
+      gemspecs = name ? [File.join(base, "#{name}.gemspec")] : Dir[File.join(base, "*.gemspec")]
+      raise "Unable to determine name from existing gemspec. Use :name => 'gemname' in #install_tasks to manually set it." unless gemspecs.size == 1
+
+      @spec_path = gemspecs.first
+      @gemspec = Bundler.load_gemspec(@spec_path)
+      @name = @gemspec.name
     end
 
     def install
@@ -66,12 +70,6 @@ module Bundler
       Dir[File.join(base, "#{name}-*.gem")].sort_by{|f| File.mtime(f)}.last
     end
 
-    def determine_name
-      gemspecs = Dir[File.join(base, "*.gemspec")]
-      raise "Unable to determine name from existing gemspec." unless gemspecs.size == 1
-      Bundler.load_gemspec(gemspecs.first).name
-    end
-
     def git_push
       sh "git push --all"
       sh "git push --tags"
@@ -100,22 +98,7 @@ module Bundler
     end
 
     def current_version
-      file = [version_file_path, library_file_path].find{|p| File.exist?(p) }
-      version = File.read(file)[/V(?i:ersion)\s*=\s*(["'])(.*?)\1/, 2]
-
-      unless version
-        raise("Version could not be found in lib/#{name}/version.rb")
-      else
-        version
-      end
-    end
-
-    def library_file_path
-      File.join(base, 'lib', "#{name}.rb")
-    end
-
-    def version_file_path
-      File.join(base, 'lib', name, 'version.rb')
+      gemspec.version
     end
 
     def current_version_tag
