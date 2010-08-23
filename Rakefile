@@ -136,7 +136,6 @@ namespace :vendor do
     rm_rf "lib/bundler/vendor"
   end
 end
-task :build => "vendor:build"
 
 begin
   require 'rake/gempackagetask'
@@ -163,7 +162,7 @@ desc "Build the gem"
 task :gem => [:gemspec, :build] do
   mkdir_p "pkg"
   sh "gem build bundler.gemspec"
-  mv "#{gemspec.full_name}.gem pkg"
+  mv "#{gemspec.full_name}.gem", "pkg"
 end
 
 desc "Install bundler"
