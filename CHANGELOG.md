@@ -1,3 +1,21 @@
+## 1.0.0.rc.6
+
+Features:
+
+  - Much better documentation for most of the commands and Gemfile
+    format
+
+Bugfixe:
+
+  - Don't attempt to create directories if they already exist
+  - Fix the capistrano task so that it actually runs
+  - Update the Gemfile template to reference rubygems.org instead
+    of :gemcutter
+  - bundle exec should exit with a non zero exit code when the gem
+    binary does not exist or the file is not executable.
+  - Expand paths in Gemfile relative to the Gemfile and not the current
+    working directory.
+
 ## 1.0.0.rc.5
 
 Features:
