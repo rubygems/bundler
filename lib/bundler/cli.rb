@@ -23,6 +23,38 @@ module Bundler
     default_task :install
     class_option "no-color", :type => :boolean, :banner => "Disable colorization in output"
 
+    def help(cli = nil)
+      case cli
+      when "gemfile" then command = "gemfile.5"
+      when nil       then command = "bundle"
+      else command = "bundle-#{command}"
+      end
+
+      manpages = %w(
+          bundle
+          bundle-config
+          bundle-exec
+          bundle-install
+          bundle-package
+          bundle-update
+          gemfile.5)
+
+      if manpages.include?(command)
+        root = File.expand_path("../man", __FILE__)
+
+        if have_groff?
+          groff   = "groff -Wall -mtty-char -mandoc -Tascii"
+          pager   = ENV['MANPAGER'] || ENV['PAGER'] || 'more'
+
+          Kernel.exec "#{groff} #{root}/#{command} | #{pager}"
+        else
+          puts File.read("#{root}/#{command}.txt")
+        end
+      else
+        super
+      end
+    end
+
     desc "init", "Generates a Gemfile into the current working directory"
     long_desc <<-D
       Init generates a default Gemfile in the current working directory. When adding a
@@ -448,6 +480,11 @@ module Bundler
     end
 
   private
+
+    def have_groff?
+      `which groff 2>#{NULL}`
+      $? == 0
+    end
 
     def locate_gem(name)
       spec = Bundler.load.specs.find{|s| s.name == name }

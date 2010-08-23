@@ -28,7 +28,7 @@ begin
     t.spec_opts  = %w(-fs --color)
     t.warning    = true
   end
-  task :spec
+  task :spec => :build
 
   namespace :spec do
     task :sudo do
@@ -146,7 +146,7 @@ else
   Rake::GemPackageTask.new(gemspec) do |pkg|
     pkg.gem_spec = gemspec
   end
-  task :gem => :gemspec
+  task :gem => [:build, :gemspec]
 end
 
 desc "install the gem locally"
@@ -159,5 +159,14 @@ task :gemspec do
   gemspec.validate
 end
 
-task :package => :gemspec
-task :default => :spec
+desc "Build the gem"
+task :gem => [:gemspec, :build] do
+  mkdir_p "pkg"
+  sh "gem build bundler.gemspec"
+  mv "#{gemspec.full_name}.gem pkg"
+end
+
+desc "Install bundler"
+task :install => :gem do
+  sh "gem install pkg/#{gemspec.full_name}.gem"
+end

@@ -168,6 +168,19 @@ module Spec
       ENV["PATH"] = "#{tmp("broken_path")}:#{ENV["PATH"]}"
     end
 
+    def fake_groff!
+      FileUtils.mkdir_p(tmp("fake_groff"))
+      File.open(tmp("fake_groff/groff"), "w", 0755) do |f|
+        f.puts "#!/usr/bin/env ruby\nputs ARGV.inspect\n"
+      end
+
+      ENV["PATH"] = "#{tmp("fake_groff")}:#{ENV["PATH"]}"
+    end
+
+    def kill_path!
+      ENV["PATH"] = ""
+    end
+
     def system_gems(*gems)
       gems = gems.flatten
 
