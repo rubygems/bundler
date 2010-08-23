@@ -123,6 +123,21 @@ task :clean do
   rm_rf "lib/bundler/man"
 end
 
+namespace :vendor do
+  desc "Build the vendor dir"
+  task :build => :clean do
+    sh "git clone git://github.com/wycats/thor.git lib/bundler/vendor/tmp"
+    sh "mv lib/bundler/vendor/tmp/lib/* lib/bundler/vendor/"
+    rm_rf "lib/bundler/vendor/tmp"
+  end
+
+  desc "Clean the vendor dir"
+  task :clean do
+    rm_rf "lib/bundler/vendor"
+  end
+end
+task :build => "vendor:build"
+
 begin
   require 'rake/gempackagetask'
 rescue LoadError
