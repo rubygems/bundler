@@ -45,6 +45,11 @@ module Bundler
   class ProductionError  < BundlerError; status_code(16) ; end
   class InvalidOption    < DslError                      ; end
 
+
+  WINDOWS = RbConfig::CONFIG["host_os"] =~ %r!(msdos|mswin|djgpp|mingw)!
+  NULL    = WINDOWS ? "NUL" : "/dev/null"
+
+
   class VersionConflict  < BundlerError
     attr_reader :conflicts
 
@@ -185,9 +190,6 @@ module Bundler
     def default_lockfile
       SharedHelpers.default_lockfile
     end
-
-    WINDOWS = RbConfig::CONFIG["host_os"] =~ %r!(msdos|mswin|djgpp|mingw)!
-    NULL    = WINDOWS ? "NUL" : "/dev/null"
 
     def requires_sudo?
       path = bundle_path
