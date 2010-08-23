@@ -27,7 +27,7 @@ module Bundler
       case cli
       when "gemfile" then command = "gemfile.5"
       when nil       then command = "bundle"
-      else command = "bundle-#{command}"
+      else command = "bundle-#{cli}"
       end
 
       manpages = %w(
