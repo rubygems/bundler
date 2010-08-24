@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = ">= 1.3.6"
   s.rubyforge_project         = "bundler"
 
+  s.add_development_dependency "ronn"
   s.add_development_dependency "rspec"
 
   s.files        = Dir.glob("{bin,lib}/**/*") + %w(LICENSE README.md ROADMAP.md CHANGELOG.md ISSUES.md)
