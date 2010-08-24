@@ -2,14 +2,16 @@
 
 ## Troubleshooting
 
-Before reporting a bug, try these troubleshooting steps:
+Instructions for common Bundler use-cases can be found on the [Bundler documentation site](http://gembundler.com/v1.0/). Detailed information about each Bundler command, including help with common problems, can be found in the [Bundler man pages](http://gembundler.com/man/bundle.1.html).
+
+After reading the documentation, try these troubleshooting steps:
 
     rm -rf ~/.bundle/ ~/.gem/ .bundle/ Gemfile.lock
     bundle install
 
-## Reporting bugs
+## Reporting unresolved problems
 
-If you are still having problems, please report bugs to the [Bundler issue tracker](http://github.com/carlhuda/bundler/issues/).
+If you are still having problems, please report issues to the [Bundler issue tracker](http://github.com/carlhuda/bundler/issues/).
 
 Instructions that allow the Bundler team to reproduce your issue are vitally important. When you report a bug, please create a gist of the following information and include a link in your ticket:
 

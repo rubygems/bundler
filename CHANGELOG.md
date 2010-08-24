@@ -5,7 +5,7 @@ Features:
   - Much better documentation for most of the commands and Gemfile
     format
 
-Bugfixe:
+Bugfixes:
 
   - Don't attempt to create directories if they already exist
   - Fix the capistrano task so that it actually runs
