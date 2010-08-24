@@ -18,10 +18,10 @@ For help with common problems, see [ISSUES](http://github.com/carlhuda/bundler/b
 
 To see what has changed in each version of bundler, starting with 0.9.5, see the [CHANGELOG](http://github.com/carlhuda/bundler/blob/master/CHANGELOG.md). For information about changes that will happen in the future, see the [ROADMAP](http://github.com/carlhuda/bundler/blob/master/ROADMAP.md).
 
-### Other questions
-
-Any remaining questions may be asked via IRC in [#bundler](irc://irc.freenode.net/bundler) on Freenode, or via email on the [Bundler mailing list](http://groups.google.com/group/ruby-bundler).
-
 ## Upgrading from Bundler 0.8 to 0.9 and above
 
 See [UPGRADING](http://github.com/carlhuda/bundler/blob/master/UPGRADING.md).
+
+## Other questions
+
+Feel free to chat with the Bundler core team (and many other users) on IRC in the  [#bundler](irc://irc.freenode.net/bundler) channel on Freenode, or via email on the [Bundler mailing list](http://groups.google.com/group/ruby-bundler).
