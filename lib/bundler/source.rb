@@ -608,7 +608,7 @@ module Bundler
           git %|clone --no-checkout "#{cache_path}" "#{path}"|
         end
         Dir.chdir(path) do
-          git "fetch --force --quiet '#{cache_path}'"
+          git %|fetch --force --quiet "#{cache_path}"|
           git "reset --hard #{revision}"
 
           if @submodules
