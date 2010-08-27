@@ -26,6 +26,14 @@ describe "Bundler::GemHelper tasks" do
   end
 
   context "gem management" do
+    def mock_confirm_message(message)
+      Bundler.ui.should_receive(:confirm).with(message)
+    end
+
+    def mock_build_message
+      mock_confirm_message "test 0.0.1 built to pkg/test-0.0.1.gem"
+    end
+
     before(:each) do
       bundle 'gem test'
       @app = bundled_app("test")
@@ -34,12 +42,19 @@ describe "Bundler::GemHelper tasks" do
       @helper = Bundler::GemHelper.new(@app.to_s)
     end
 
+    it "uses a shell UI for output" do
+      Bundler.ui.should be_a(Bundler::UI::Shell)
+    end
+
     it "builds" do
+      mock_build_message
       @helper.build_gem
       bundled_app('test/pkg/test-0.0.1.gem').should exist
     end
 
     it "installs" do
+      mock_build_message
+      mock_confirm_message "test (0.0.1) installed"
       @helper.install_gem
       bundled_app('test/pkg/test-0.0.1.gem').should exist
       %x{gem list}.should include("test (0.0.1)")
@@ -50,6 +65,10 @@ describe "Bundler::GemHelper tasks" do
     end
 
     it "pushes" do
+      mock_build_message
+      mock_confirm_message /Tagged [\da-f]+ with v0.0.1/
+      mock_confirm_message "Pushed git commits and tags"
+
       @helper.should_receive(:rubygem_push).with(bundled_app('test/pkg/test-0.0.1.gem').to_s)
       Dir.chdir(@app) {
         `git init --bare #{gem_repo1}`
