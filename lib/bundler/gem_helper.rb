@@ -1,4 +1,6 @@
+$:.unshift File.expand_path('../vendor', __FILE__)
 require 'open3'
+require 'thor'
 
 module Bundler
   class GemHelper
@@ -10,6 +12,7 @@ module Bundler
     attr_reader :spec_path, :base, :gemspec
 
     def initialize(base, name = nil)
+      Bundler.ui = UI::Shell.new(Thor::Shell::Color.new)
       @base = base
       gemspecs = name ? [File.join(base, "#{name}.gemspec")] : Dir[File.join(base, "*.gemspec")]
       raise "Unable to determine name from existing gemspec. Use :name => 'gemname' in #install_tasks to manually set it." unless gemspecs.size == 1
@@ -42,12 +45,14 @@ module Bundler
         FileUtils.mkdir_p(File.join(base, 'pkg'))
         FileUtils.mv(built_gem_path, 'pkg')
       }
+      Bundler.ui.confirm "#{name} #{version} built to pkg/#{file_name}"
       File.join(base, 'pkg', file_name)
     end
 
     def install_gem
       built_gem_path = build_gem
       sh("gem install #{built_gem_path}")
+      Bundler.ui.confirm "#{name} (#{version}) installed"
     end
 
     def push_gem
@@ -63,6 +68,7 @@ module Bundler
     protected
     def rubygem_push(path)
       sh("gem push #{path}")
+      Bundler.ui.confirm "Pushed #{name} #{version} to rubygems.org"
     end
 
     def built_gem_path
@@ -72,6 +78,7 @@ module Bundler
     def git_push
       sh "git push"
       sh "git push --tags"
+      Bundler.ui.confirm "Pushed git commits and tags"
     end
 
     def guard_already_tagged
@@ -90,10 +97,15 @@ module Bundler
 
     def tag_version
       sh "git tag -am 'Version #{version}' #{version_tag}"
+      Bundler.ui.confirm "Tagged #{tagged_sha} with #{version_tag}"
       yield if block_given?
     rescue
       sh "git tag -d #{version_tag}"
       raise
+    end
+
+    def tagged_sha
+      sh("git show-ref --tags #{version_tag}").split(' ').first[0, 8]
     end
 
     def version
