@@ -38,6 +38,9 @@ RSpec.configure do |config|
   config.include Spec::Platforms
   config.include Spec::Sudo
 
+  config.filter_run :focus => true
+  config.run_all_when_everything_filtered = true
+
   original_wd       = Dir.pwd
   original_path     = ENV['PATH']
   original_gem_home = ENV['GEM_HOME']
