@@ -53,9 +53,10 @@ module Bundler
     def push_gem
       guard_clean
       guard_already_tagged
+      built_gem_path = build_gem
       tag_version {
         git_push
-        rubygem_push(build_gem)
+        rubygem_push(built_gem_path)
       }
     end
 
@@ -69,7 +70,7 @@ module Bundler
     end
 
     def git_push
-      sh "git push --all"
+      sh "git push"
       sh "git push --tags"
     end
 
