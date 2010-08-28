@@ -61,10 +61,10 @@ describe "Bundler::GemHelper tasks" do
     end
 
     it "shouldn't push if there are uncommitted files" do
-      proc { @helper.push_gem }.should raise_error(/files that need to be committed/)
+      proc { @helper.release_gem }.should raise_error(/files that need to be committed/)
     end
 
-    it "pushes" do
+    it "releases" do
       mock_build_message
       mock_confirm_message /Tagged [\da-f]+ with v0.0.1/
       mock_confirm_message "Pushed git commits and tags"
@@ -75,7 +75,7 @@ describe "Bundler::GemHelper tasks" do
         `git remote add origin file://#{gem_repo1}`
         `git commit -a -m"initial commit"`
       }
-      @helper.push_gem
+      @helper.release_gem
     end
   end
 end

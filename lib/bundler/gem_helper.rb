@@ -32,8 +32,8 @@ module Bundler
       end
 
       desc "Create tag #{version_tag} and build and push #{name}-#{version}.gem to Rubygems"
-      task 'push' do
-        push_gem
+      task 'release' do
+        release_gem
       end
     end
 
@@ -55,7 +55,7 @@ module Bundler
       Bundler.ui.confirm "#{name} (#{version}) installed"
     end
 
-    def push_gem
+    def release_gem
       guard_clean
       guard_already_tagged
       built_gem_path = build_gem
