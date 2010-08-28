@@ -44,8 +44,8 @@ module Bundler
         file_name = File.basename(built_gem_path)
         FileUtils.mkdir_p(File.join(base, 'pkg'))
         FileUtils.mv(built_gem_path, 'pkg')
+        Bundler.ui.confirm "#{name} #{version} built to pkg/#{file_name}"
       }
-      Bundler.ui.confirm "#{name} #{version} built to pkg/#{file_name}"
       File.join(base, 'pkg', file_name)
     end
 
@@ -100,6 +100,7 @@ module Bundler
       Bundler.ui.confirm "Tagged #{tagged_sha} with #{version_tag}"
       yield if block_given?
     rescue
+      Bundler.ui.error "Untagged #{tagged_sha} with #{version_tag} due to error"
       sh "git tag -d #{version_tag}"
       raise
     end
