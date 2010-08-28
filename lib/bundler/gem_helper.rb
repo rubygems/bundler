@@ -51,8 +51,12 @@ module Bundler
 
     def install_gem
       built_gem_path = build_gem
-      sh("gem install #{built_gem_path}")
-      Bundler.ui.confirm "#{name} (#{version}) installed"
+      out, err, code = sh_with_code("gem install #{built_gem_path}")
+      if err[/ERROR/]
+        Bundler.ui.error err
+      else
+        Bundler.ui.confirm "#{name} (#{version}) installed"
+      end
     end
 
     def release_gem
@@ -122,20 +126,20 @@ module Bundler
     end
 
     def sh(cmd, &block)
-      output, code = sh_with_code(cmd, &block)
-      code == 0 ? output : raise(output)
+      out, err, code = sh_with_code(cmd, &block)
+      code == 0 ? out : raise(out.empty? ? err : out)
     end
 
     def sh_with_code(cmd, &block)
-      output = ''
+      outbuf, errbuf = '', ''
       Dir.chdir(base) {
         stdin, stdout, stderr = *Open3.popen3(cmd)
         if $? == 0
-          output = stdout.read
-          block.call(output, stderr.read) if block
+          outbuf, errbuf = stdout.read, stderr.read
+          block.call(outbuf, stderr.read) if block
         end
       }
-      [output, $?]
+      [outbuf, errbuf, $?]
     end
   end
 end
