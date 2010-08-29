@@ -519,7 +519,7 @@ describe "bundle install with git sources" do
 
       lockfile = File.read(bundled_app("Gemfile.lock"))
       File.open(bundled_app("Gemfile.lock"), "w") do |file|
-        file.puts lockfile.gsub(/revision: #{old_revision[0..6]}/, "revision: #{new_revision[0..6]}")
+        file.puts lockfile.gsub(/revision: #{old_revision}/, "revision: #{new_revision}")
       end
 
       bundle "install"
