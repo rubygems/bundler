@@ -129,6 +129,13 @@ module Bundler
         @remotes << normalize_uri(source)
       end
 
+      def merge_remotes(source)
+        @remotes = []
+        source.remotes.each do |r|
+          add_remote r.to_s
+        end
+      end
+
     private
 
       def cached_gem(spec)

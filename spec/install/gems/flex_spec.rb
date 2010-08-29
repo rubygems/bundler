@@ -220,7 +220,7 @@ describe "bundle flex_install" do
       G
 
       gemfile <<-G
-        source "file:://#{gem_repo1}"
+        source "file://#{gem_repo1}"
         gem "rack", "0.9.1"
         gem "rack-obama"
       G
@@ -238,6 +238,35 @@ describe "bundle flex_install" do
 
     it "should work when you update" do
       bundle "update rack"
+    end
+  end
+
+  describe "when adding a new source" do
+    it "updates the lockfile" do
+      build_repo2
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        source "file://#{gem_repo2}"
+        gem "rack"
+      G
+
+      lockfile_should_be <<-L
+      GEM
+        remote: file:#{gem_repo1}/
+        remote: file:#{gem_repo2}/
+        specs:
+          rack (1.0.0)
+
+      PLATFORMS
+        ruby
+
+      DEPENDENCIES
+        rack
+      L
     end
   end
 end
