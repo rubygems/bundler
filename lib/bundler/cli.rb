@@ -77,7 +77,7 @@ module Bundler
         end
         spec = Gem::Specification.load(gemspec)
         puts "Writing new Gemfile to #{Dir.pwd}/Gemfile"
-        File.open('Gemfile', 'w') do |file|
+        File.open('Gemfile', 'wb') do |file|
           file << "# Generated from #{gemspec}\n"
           file << spec.to_gemfile
         end

@@ -16,7 +16,7 @@ module Bundler
 
       # TODO: move this back into DSL
       builder = Dsl.new
-      builder.instance_eval(File.read(gemfile.to_s), gemfile.to_s, 1)
+      builder.instance_eval(File.read(gemfile.to_s, :mode => "rb"), gemfile.to_s, 1)
       builder.to_definition(lockfile, unlock)
     end
 
@@ -39,7 +39,7 @@ module Bundler
       @lockfile_contents = ""
 
       if lockfile && File.exists?(lockfile)
-        @lockfile_contents = File.read(lockfile)
+        @lockfile_contents = File.read(lockfile, :mode => "rb")
         locked = LockfileParser.new(@lockfile_contents)
         @platforms      = locked.platforms
 
@@ -181,7 +181,7 @@ module Bundler
         return
       end
 
-      File.open(file, 'w') do |f|
+      File.open(file, 'wb') do |f|
         f.puts contents
       end
     end

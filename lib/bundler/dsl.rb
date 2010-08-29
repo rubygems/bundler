@@ -4,7 +4,7 @@ module Bundler
   class Dsl
     def self.evaluate(gemfile)
       builder = new
-      builder.instance_eval(File.read(gemfile.to_s), gemfile.to_s, 1)
+      builder.instance_eval(File.read(gemfile.to_s, :mode => "rb"), gemfile.to_s, 1)
       builder.to_definition
     end
 
