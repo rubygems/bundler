@@ -1,3 +1,25 @@
+## 1.0.0
+
+Features
+
+  - You can now define `:bundle_cmd` in the capistrano task
+
+Bugfixes:
+
+  - Various bugfixes to the built-in rake helpers
+  - Fix a bug where shortrefs weren't unique enough and were
+    therfore colliding
+  - Fix a small bug involving checking whether a local git
+    clone is up to date
+  - Correctly handle explicit '=' dependencies with gems
+    pinned to a git source
+  - Fix an issue with Windows-generated lockfiles by reading
+    and writing the lockfile in binary mode
+  - Fix an issue with shelling out to git in Windows by
+    using double quotes around paths
+  - Detect new Rubygems sources in the Gemfile and update
+    the lockfile
+
 ## 1.0.0.rc.6
 
 Features:
