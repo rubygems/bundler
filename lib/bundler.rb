@@ -211,6 +211,10 @@ module Bundler
       `sudo -p 'Enter your password to install the bundled RubyGems to your system: ' #{str}`
     end
 
+    def read_file(file)
+      File.open(file, "rb") { |file| file.read }
+    end
+
     def load_gemspec(file)
       path = Pathname.new(file)
       # Eval the gemspec from its parent directory
