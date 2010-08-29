@@ -293,6 +293,13 @@ module Bundler
     end
 
     def converge_sources
+      locked_gem = @locked_sources.find { |s| Source::Rubygems === s }
+      actual_gem = @sources.find { |s| Source::Rubygems === s }
+
+      if locked_gem && actual_gem
+        locked_gem.merge_remotes actual_gem
+      end
+
       @sources.map! do |source|
         @locked_sources.find { |s| s == source } || source
       end
