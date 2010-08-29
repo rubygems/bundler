@@ -620,7 +620,7 @@ module Bundler
 
       def has_revision_cached?
         return unless @revision
-        in_cache { git %|rev-parse --verify --quiet #{@revision}| }
+        in_cache { git %|cat-file -e #{@revision}| }
         true
       rescue GitError
         false
