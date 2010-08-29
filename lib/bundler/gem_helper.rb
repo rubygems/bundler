@@ -80,9 +80,14 @@ module Bundler
     end
 
     def git_push
-      sh "git push"
-      sh "git push --tags"
+      perform_git_push
+      perform_git_push ' --tags'
       Bundler.ui.confirm "Pushed git commits and tags"
+    end
+
+    def perform_git_push(options = '')
+      out, err, code = sh_with_code "git push --quiet#{options}"
+      raise err unless err == ''
     end
 
     def guard_already_tagged

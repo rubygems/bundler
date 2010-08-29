@@ -70,6 +70,9 @@ describe "Bundler::GemHelper tasks" do
       mock_confirm_message "Pushed git commits and tags"
 
       @helper.should_receive(:rubygem_push).with(bundled_app('test/pkg/test-0.0.1.gem').to_s)
+      @helper.should_receive(:perform_git_push).with(no_args).once
+      @helper.should_receive(:perform_git_push).with(' --tags').once
+
       Dir.chdir(@app) {
         `git init --bare #{gem_repo1}`
         `git remote add origin file://#{gem_repo1}`
