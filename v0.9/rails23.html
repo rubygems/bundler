@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>Bundler: The best way to manage Ruby applications</title>
-    <link href="/stylesheets/application.css" media="all" rel="stylesheet" type="text/css"/><link href="/stylesheets/sunburst.css" media="all" rel="stylesheet" type="text/css"/>
+    <link href="../stylesheets/application.css" media="all" rel="stylesheet" type="text/css"/><link href="../stylesheets/sunburst.css" media="all" rel="stylesheet" type="text/css"/>
     <link href="/images/favicon.png" rel="shortcut icon" type="image/png" />
   </head>
   <body>
@@ -10,7 +10,7 @@
       <div id="contents">
         <div id="header">
           <a href="/">
-            <img alt="The best way to manage your application's dependencies" src="images/gembundler.png" width="725"/>
+            <img alt="The best way to manage your application's dependencies" src="../images/gembundler.png" width="725"/>
           </a>
         </div>
         <div id="intro">
@@ -37,7 +37,7 @@
               Create a new file, <code>config/preinitializer.rb</code>,
               and insert the following
             </div>
-            <pre class="sunburst"><span class="Keyword">begin</span>&#x000A;  <span class="Keyword">require</span> <span class="String"><span class="String">&quot;</span>rubygems<span class="String">&quot;</span></span>&#x000A;  <span class="Keyword">require</span> <span class="String"><span class="String">&quot;</span>bundler<span class="String">&quot;</span></span>&#x000A;<span class="Keyword">rescue</span> <span class="Variable">LoadError</span>&#x000A;  <span class="Keyword">raise</span> <span class="String"><span class="String">&quot;</span>Could not load the bundler gem. Install it with `gem install bundler`.<span class="String">&quot;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;&#x000A;<span class="Keyword">if</span> <span class="Support">Gem</span>::<span class="Entity">Version</span>.<span class="Entity">new</span>(<span class="Support">Bundler</span>::<span class="Entity">VERSION</span>) <span class="Keyword">&lt;=</span> <span class="Support">Gem</span>::<span class="Entity">Version</span>.<span class="Entity">new</span>(<span class="String"><span class="String">&quot;</span>0.9.24<span class="String">&quot;</span></span>)&#x000A;  <span class="Keyword">raise</span> <span class="Variable">RuntimeError</span>, <span class="String"><span class="String">&quot;</span>Your bundler version is too old for Rails 2.3.<span class="String">&quot;</span></span> <span class="Keyword">+</span>&#x000A;   <span class="String"><span class="String">&quot;</span>Run `gem install bundler` to upgrade.<span class="String">&quot;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;&#x000A;<span class="Keyword">begin</span>&#x000A;<span class="Comment">  <span class="Comment">#</span> Set up load paths for all bundled gems</span>&#x000A;  <span class="Variable">ENV</span>[<span class="String"><span class="String">&quot;</span>BUNDLE_GEMFILE<span class="String">&quot;</span></span>] <span class="Keyword">=</span> <span class="Support">File</span>.<span class="Entity">expand_path</span>(<span class="String"><span class="String">&quot;</span>../../Gemfile<span class="String">&quot;</span></span>, <span class="Variable">__FILE__</span>)&#x000A;  <span class="Support">Bundler</span>.<span class="Entity">setup</span>&#x000A;<span class="Keyword">rescue</span> <span class="Support">Bundler</span>::<span class="Entity">GemNotFound</span>&#x000A;  <span class="Keyword">raise</span> <span class="Variable">RuntimeError</span>, <span class="String"><span class="String">&quot;</span>Bundler couldn't find some gems.<span class="String">&quot;</span></span> <span class="Keyword">+</span>&#x000A;    <span class="String"><span class="String">&quot;</span>Did you run `bundle install`?<span class="String">&quot;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;</pre>
+            <pre class="sunburst"><span class="Keyword">begin</span>&#x000A;  <span class="Keyword">require</span> <span class="String"><span class="String">&quot;</span>rubygems<span class="String">&quot;</span></span>&#x000A;  <span class="Keyword">require</span> <span class="String"><span class="String">&quot;</span>bundler<span class="String">&quot;</span></span>&#x000A;<span class="Keyword">rescue</span> <span class="Variable">LoadError</span>&#x000A;  <span class="Keyword">raise</span> <span class="String"><span class="String">&quot;</span>Could not load the bundler gem. Install it with `gem install bundler`.<span class="String">&quot;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;&#x000A;<span class="Keyword">if</span> <span class="Support">Gem</span>::<span class="Entity">Version</span>.<span class="Entity">new</span>(<span class="Support">Bundler</span>::<span class="Entity">VERSION</span>) <span class="Keyword">&lt;=</span> <span class="Support">Gem</span>::<span class="Entity">Version</span>.<span class="Entity">new</span>(<span class="String"><span class="String">&quot;</span>0.9.24<span class="String">&quot;</span></span>)&#x000A;  <span class="Keyword">raise</span> <span class="Variable">RuntimeError</span>, <span class="String"><span class="String">&quot;</span>Your bundler version is too old.<span class="String">&quot;</span></span> <span class="Keyword">+</span>&#x000A;   <span class="String"><span class="String">&quot;</span>Run `gem install bundler` to upgrade.<span class="String">&quot;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;&#x000A;<span class="Keyword">begin</span>&#x000A;<span class="Comment">  <span class="Comment">#</span> Set up load paths for all bundled gems</span>&#x000A;  <span class="Variable">ENV</span>[<span class="String"><span class="String">&quot;</span>BUNDLE_GEMFILE<span class="String">&quot;</span></span>] <span class="Keyword">=</span> <span class="Support">File</span>.<span class="Entity">expand_path</span>(<span class="String"><span class="String">&quot;</span>../../Gemfile<span class="String">&quot;</span></span>, <span class="Variable">__FILE__</span>)&#x000A;  <span class="Support">Bundler</span>.<span class="Entity">setup</span>&#x000A;<span class="Keyword">rescue</span> <span class="Support">Bundler</span>::<span class="Entity">GemNotFound</span>&#x000A;  <span class="Keyword">raise</span> <span class="Variable">RuntimeError</span>, <span class="String"><span class="String">&quot;</span>Bundler couldn't find some gems.<span class="String">&quot;</span></span> <span class="Keyword">+</span>&#x000A;    <span class="String"><span class="String">&quot;</span>Did you run `bundle install`?<span class="String">&quot;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;</pre>
           </div>
           <div class="bullet">
             <div class="description">
@@ -47,7 +47,7 @@
               Rails itself and at least one source
             </div>
             <pre class="sunburst">source <span class="Constant"><span class="Constant">:</span>gemcutter</span>&#x000A;gem <span class="String"><span class="String">&quot;</span>rails<span class="String">&quot;</span></span>, <span class="String"><span class="String">&quot;</span>~&gt; 2.3.5<span class="String">&quot;</span></span>&#x000A;gem <span class="String"><span class="String">&quot;</span>sqlite3-ruby<span class="String">&quot;</span></span>, <span class="Constant"><span class="Constant">:</span>require</span> =&gt; <span class="String"><span class="String">&quot;</span>sqlite3<span class="String">&quot;</span></span>&#x000A;&#x000A;<span class="Comment"><span class="Comment">#</span> bundler requires these gems in all environments</span>&#x000A;<span class="Comment"><span class="Comment">#</span> gem &quot;nokogiri&quot;, &quot;1.4.2&quot;</span>&#x000A;<span class="Comment"><span class="Comment">#</span> gem &quot;geokit&quot;</span>&#x000A;&#x000A;group <span class="Constant"><span class="Constant">:</span>development</span> <span class="Keyword">do</span>&#x000A;<span class="Comment">  <span class="Comment">#</span> bundler requires these gems in development</span>&#x000A;<span class="Comment">  <span class="Comment">#</span> gem &quot;rails-footnotes&quot;</span>&#x000A;<span class="Keyword">end</span>&#x000A;&#x000A;group <span class="Constant"><span class="Constant">:</span>test</span> <span class="Keyword">do</span>&#x000A;<span class="Comment">  <span class="Comment">#</span> bundler requires these gems while running tests</span>&#x000A;<span class="Comment">  <span class="Comment">#</span> gem &quot;rspec&quot;</span>&#x000A;<span class="Comment">  <span class="Comment">#</span> gem &quot;faker&quot;</span>&#x000A;<span class="Keyword">end</span>&#x000A;</pre>
-            <a href="./groups.html">Learn More: Groups</a>
+            <a href="../groups.html">Learn More: Groups</a>
           </div>
           <div class="bullet">
             <div class="description">
@@ -56,13 +56,20 @@
               on, you can follow the instructions in the Rails 3 guide
             </div>
             <pre class='sunburst'>$ rake db:migrate</pre>
-            <a href="rails3.html#shared_with_23">Learn More: Rails 3</a>
+            <a href="../rails3.html#shared_with_23">Learn More: Rails 3</a>
+          </div>
+          <div class="bullet">
+            <div class="description">
+              Don't forget that non-Rails commands must
+              be executed with bundle exec
+            </div>
+            <pre class='sunburst'>$ bundle exec cucumber</pre>
           </div>
         </div>
       </div>
     </div>
     <div id="footer">
-      <img alt="Emocow" src="images/emocow.png"/>
+      <img alt="Emocow" src="../images/emocow.png"/>
       <div class="spacer"></div>
       <div id="navigation">
         <p>
@@ -99,7 +106,7 @@
         </p>
       </div>
       <div class="spacer"></div>
-      <img alt="Bundler small" src="images/bundler-small.png"/>
+      <img alt="Bundler small" src="../images/bundler-small.png"/>
     </div>
     <div id="credits">
       <p>Bundler icon and logo designed by <a href="http://twitter.com/johnneiner">John Neiner</a> and donated by <a href="http://pixelgraphics.us">Pixel Graphic Design Studio</a></p>
@@ -108,8 +115,8 @@
       <img alt="Fork me on GitHub" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" />
     </a>
     <div id="versions">
-      <a class="current" href="v0.9/index.html">v0.9</a>
-      <a class="" href="v1.0/index.html">v1.0</a>
+      <a class="current" href="../v0.9/index.html">v0.9</a>
+      <a class="" href="../v1.0/index.html">v1.0</a>
     </div>
     <script type="text/javascript">
       //<![CDATA[
