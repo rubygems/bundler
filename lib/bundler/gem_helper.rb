@@ -136,7 +136,7 @@ module Bundler
         stdin, stdout, stderr = *Open3.popen3(cmd)
         if $? == 0
           outbuf, errbuf = stdout.read, stderr.read
-          block.call(outbuf, stderr.read) if block
+          block.call(outbuf, errbuf) if block
         end
       }
       [outbuf, errbuf, $?]
