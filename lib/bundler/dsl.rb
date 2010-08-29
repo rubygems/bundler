@@ -173,10 +173,6 @@ module Bundler
       @sources << @rubygems_source
     end
 
-    def _version?(version)
-      version && Gem::Version.new(version) rescue false
-    end
-
     def _normalize_hash(opts)
       # Cannot modify a hash during an iteration in 1.9
       opts.keys.each do |k|
@@ -218,7 +214,11 @@ module Bundler
       # Normalize git and path options
       ["git", "path"].each do |type|
         if param = opts[type]
-          options = _version?(version.first) ? opts.merge("name" => name, "version" => version.first) : opts.dup
+          if version.first && version.first =~ /^\s*=?\s*(\d[^\s]*)\s*$/
+            options = opts.merge("name" => name, "version" => $1)
+          else
+            options = opts.dup
+          end
           source = send(type, param, options, :prepend => true) {}
           opts["source"] = source
         end

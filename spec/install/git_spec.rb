@@ -532,4 +532,21 @@ describe "bundle install with git sources" do
       out.should == old_revision
     end
   end
+
+  describe "bundle install --deployment with git sources" do
+    it "works" do
+      build_git "valim", :path => lib_path('valim')
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+
+        gem "valim", "= 1.0", :git => "#{lib_path('valim')}"
+      G
+
+      simulate_new_machine
+
+      bundle "install --deployment", :exit_status => true
+      exitstatus.should == 0
+    end
+  end
 end
