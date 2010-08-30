@@ -37,8 +37,8 @@ describe "Bundler::GemHelper tasks" do
     before(:each) do
       bundle 'gem test'
       @app = bundled_app("test")
-      gemspec = File.read("#{@app.to_s}/test.gemspec")
-      File.open("#{@app.to_s}/test.gemspec", 'w'){|f| f << gemspec.gsub('TODO: ', '') }
+      @gemspec = File.read("#{@app.to_s}/test.gemspec")
+      File.open("#{@app.to_s}/test.gemspec", 'w'){|f| f << @gemspec.gsub('TODO: ', '') }
       @helper = Bundler::GemHelper.new(@app.to_s)
     end
 
@@ -46,39 +46,62 @@ describe "Bundler::GemHelper tasks" do
       Bundler.ui.should be_a(Bundler::UI::Shell)
     end
 
-    it "builds" do
-      mock_build_message
-      @helper.build_gem
-      bundled_app('test/pkg/test-0.0.1.gem').should exist
+    describe 'build' do
+      it "builds" do
+        mock_build_message
+        @helper.build_gem
+        bundled_app('test/pkg/test-0.0.1.gem').should exist
+      end
+
+      it "raises an appropriate error when the build fails" do
+        # break the gemspec by adding back the TODOs...
+        File.open("#{@app.to_s}/test.gemspec", 'w'){|f| f << @gemspec }
+        proc { @helper.build_gem }.should raise_error(/TODO/)
+      end
     end
 
-    it "installs" do
-      mock_build_message
-      mock_confirm_message "test (0.0.1) installed"
-      @helper.install_gem
-      bundled_app('test/pkg/test-0.0.1.gem').should exist
-      %x{gem list}.should include("test (0.0.1)")
+    describe 'install' do
+      it "installs" do
+        mock_build_message
+        mock_confirm_message "test (0.0.1) installed"
+        @helper.install_gem
+        bundled_app('test/pkg/test-0.0.1.gem').should exist
+        %x{gem list}.should include("test (0.0.1)")
+      end
     end
 
-    it "shouldn't push if there are uncommitted files" do
-      proc { @helper.release_gem }.should raise_error(/files that need to be committed/)
-    end
+    describe 'release' do
+      it "shouldn't push if there are uncommitted files" do
+        proc { @helper.release_gem }.should raise_error(/files that need to be committed/)
+      end
 
-    it "releases" do
-      mock_build_message
-      mock_confirm_message /Tagged [\da-f]+ with v0.0.1/
-      mock_confirm_message "Pushed git commits and tags"
+      it 'raises an appropriate error if there is no git remote' do
+        Bundler.ui.stub(:confirm => nil, :error => nil) # silence messages
 
-      @helper.should_receive(:rubygem_push).with(bundled_app('test/pkg/test-0.0.1.gem').to_s)
-      @helper.should_receive(:perform_git_push).with(no_args).once
-      @helper.should_receive(:perform_git_push).with(' --tags').once
+        Dir.chdir(@app) {
+          `git init --bare #{gem_repo1}`
+          `git commit -a -m "initial commit"`
+        }
 
-      Dir.chdir(@app) {
-        `git init --bare #{gem_repo1}`
-        `git remote add origin file://#{gem_repo1}`
-        `git commit -a -m"initial commit"`
-      }
-      @helper.release_gem
+        proc { @helper.release_gem }.should raise_error(/No destination configured to push to/)
+      end
+
+      it "releases" do
+        mock_build_message
+        mock_confirm_message /Tagged [\da-f]+ with v0.0.1/
+        mock_confirm_message "Pushed git commits and tags"
+
+        @helper.should_receive(:rubygem_push).with(bundled_app('test/pkg/test-0.0.1.gem').to_s)
+
+        Dir.chdir(@app) {
+          `git init --bare #{gem_repo1}`
+          `git remote add origin file://#{gem_repo1}`
+          `git commit -a -m "initial commit"`
+          Open3.popen3("git push origin master") # use popen3 to silence output...
+          `git commit -a -m "another commit"`
+        }
+        @helper.release_gem
+      end
     end
   end
 end
