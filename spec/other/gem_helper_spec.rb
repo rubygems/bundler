@@ -68,6 +68,15 @@ describe "Bundler::GemHelper tasks" do
         bundled_app('test/pkg/test-0.0.1.gem').should exist
         %x{gem list}.should include("test (0.0.1)")
       end
+
+      it "raises an appropriate error when the install fails" do
+        @helper.should_receive(:build_gem) do
+          # write an invalid gem file, so we can simulate install failure...
+          FileUtils.mkdir_p(File.join(@app.to_s, 'pkg'))
+          File.open("#{@app.to_s}/pkg/test-0.0.1.gem", 'w'){|f| f << "not actually a gem"}
+        end
+        proc { @helper.install_gem }.should raise_error
+      end
     end
 
     describe 'release' do
