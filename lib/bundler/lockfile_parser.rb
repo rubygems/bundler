@@ -11,7 +11,7 @@ module Bundler
       @specs        = []
       @state        = :source
 
-      lockfile.split(/\n+/).each do |line|
+      lockfile.split(/(\r?\n)+/).each do |line|
         if line == "DEPENDENCIES"
           @state = :dependency
         elsif line == "PLATFORMS"
