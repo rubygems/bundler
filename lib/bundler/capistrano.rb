@@ -16,20 +16,20 @@ Capistrano::Configuration.instance(:must_exist).load do
       can not find the 'bundle' cmd then you can override the bundle_cmd \
       variable to specifiy which one it should use.
 
-        set :bundle_gemfile,      "Gemfile"
+        set :bundle_gemfile,      fetch(:latest_release)+"/Gemfile"
         set :bundle_dir,          fetch(:shared_path)+"/bundle"
         set :bundle_flags,       "--deployment --quiet"
         set :bundle_without,      [:development, :test]
         set :bundle_cmd,          "bundle" # e.g. change to "/opt/ruby/bin/bundle"
     DESC
     task :install, :except => { :no_release => true } do
-      bundle_dir     = fetch(:bundle_dir,         " #{fetch(:shared_path)}/bundle")
-      bundle_without = [*fetch(:bundle_without,   [:development, :test])].compact
-      bundle_flags   = fetch(:bundle_flags, "--deployment --quiet")
-      bundle_gemfile = fetch(:bundle_gemfile,     "Gemfile")
       bundle_cmd     = fetch(:bundle_cmd, "bundle")
+      bundle_flags   = fetch(:bundle_flags, "--deployment --quiet")
+      bundle_without = [*fetch(:bundle_without, [:development, :test])].compact
+      bundle_dir     = (fetch(:bundle_dir, nil)     || fetch(:shared_path)+"/bundle")
+      bundle_gemfile = (fetch(:bundle_gemfile, nil) || fetch(:latest_release)+"/Gemfile")
 
-      args = ["--gemfile #{fetch(:latest_release)}/#{bundle_gemfile}"]
+      args = ["--gemfile #{bundle_gemfile}"]
       args << "--path #{bundle_dir}" unless bundle_dir.to_s.empty?
       args << bundle_flags.to_s
       args << "--without #{bundle_without.join(" ")}" unless bundle_without.empty?
