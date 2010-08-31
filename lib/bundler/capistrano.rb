@@ -17,13 +17,13 @@ Capistrano::Configuration.instance(:must_exist).load do
       variable to specifiy which one it should use.
 
         set :bundle_gemfile,      fetch(:latest_release)+"/Gemfile"
-        set :bundle_dir,          fetch(:shared_path)+"/bundle"
+        set :bundle_dir,          fetch(:shared_path)+"/bundled_gems"
         set :bundle_flags,       "--deployment --quiet"
         set :bundle_without,      [:development, :test]
         set :bundle_cmd,          "bundle" # e.g. change to "/opt/ruby/bin/bundle"
     DESC
     task :install, :except => { :no_release => true } do
-      bundle_dir     = fetch(:bundle_dir, "#{fetch(:shared_path)}/bundle")
+      bundle_dir     = fetch(:bundle_dir, "#{fetch(:shared_path)}/bundled_gems")
       bundle_without = [*fetch(:bundle_without, [:development, :test])].compact
       bundle_flags   = fetch(:bundle_flags, "--deployment --quiet")
       bundle_gemfile = (fetch(:bundle_gemfile, nil) || fetch(:latest_release)+"/Gemfile")
