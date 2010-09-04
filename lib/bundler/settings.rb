@@ -62,7 +62,7 @@ module Bundler
     end
 
     def without=(array)
-      unless array.empty? && without.empty?
+      unless array.empty?
         self[:without] = array.join(":")
       end
     end
