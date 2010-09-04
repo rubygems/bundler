@@ -50,7 +50,7 @@ module Bundler
       end
 
       if value = ENV[key]
-        locations << "Set via $#{key_for(key)}: #{value.inspect}"
+        locations << "Set via #{key}: #{value.inspect}"
       end
 
       if @global_config.key?(key)
