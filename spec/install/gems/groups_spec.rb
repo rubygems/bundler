@@ -86,6 +86,13 @@ describe "bundle install with gem sources" do
           should_be_installed "rack 1.0.0", :groups => [:default]
           should_not_be_installed "activesupport 2.3.5", :groups => [:default]
         end
+
+        it "still works when BUNDLE_WITHOUT is set" do
+          bundle :install, :env => {"BUNDLE_WITHOUT" => "emo"}
+          out.should_not include("activesupport")
+          should_be_installed "rack 1.0.0", :groups => [:default]
+          should_not_be_installed "activesupport 2.3.5", :groups => [:default]
+        end
       end
 
       describe "with gems assigned to multiple groups" do
