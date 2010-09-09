@@ -11,16 +11,18 @@ Gem::Specification.new do |s|
   s.authors     = ["Carl Lerche", "Yehuda Katz", "André Arko"]
   s.email       = ["carlhuda@engineyard.com"]
   s.homepage    = "http://gembundler.com"
-  s.summary     = "The best way to manage your application's dependencies"
-  s.description = "Bundler manages an application's dependencies through its entire life, across many machines, systematically and repeatably"
+  s.summary     = %q{The best way to manage your application's dependencies}
+  s.description = %q{Bundler manages an application's dependencies through its entire life, across many machines, systematically and repeatably}
 
-  s.required_rubygems_version = ">= 1.3.6"
+  s.required_rubygems_version = [">= 1.3.6", "< 2.0"]
   s.rubyforge_project         = "bundler"
 
   s.add_development_dependency "ronn"
   s.add_development_dependency "rspec"
 
-  s.files        = Dir.glob("{bin,lib}/**/*") + %w(LICENSE README.md ROADMAP.md CHANGELOG.md ISSUES.md)
-  s.executables  = ['bundle']
-  s.require_path = 'lib'
+  s.files              = `git ls-files`.split("\n")
+  s.test_files         = `git ls-files -- {test,spec,features}/*`.split("\n")
+  s.executables        = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+  s.default_executable = "bundle"
+  s.require_paths      = ["lib"]
 end
