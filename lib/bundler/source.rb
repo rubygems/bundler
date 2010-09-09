@@ -180,8 +180,7 @@ module Bundler
              s.version  = VERSION
              s.platform = Gem::Platform::RUBY
              s.source   = self
-             # TODO: Remove this
-             s.loaded_from = 'w0t'
+             s.loaded_from = File.expand_path("..", __FILE__)
            end
            idx << bundler
           end
