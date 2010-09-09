@@ -57,6 +57,10 @@ module Bundler
         options[:group] = group
       end
 
+      if platform = options[:platforms] || options[:platform]
+        options[:platforms] = platform
+      end
+
       _deprecated_options(options)
       _normalize_options(name, version, options)
 
