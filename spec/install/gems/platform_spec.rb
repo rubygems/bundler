@@ -94,7 +94,7 @@ describe "bundle install across platforms" do
       gem "rack", "1.0.0"
     G
 
-    bundle "install ./vendor"
+    bundle "install --path vendor"
 
     vendored_gems("gems/rack-1.0.0").should exist
   end
@@ -106,7 +106,7 @@ describe "bundle install across platforms" do
       gem "rack", "1.0.0"
     G
 
-    bundle "install ./vendor"
+    bundle "install --path vendor"
 
     new_version = Gem::ConfigMap[:ruby_version] == "1.8" ? "1.9.1" : "1.8"
     FileUtils.mv(vendored_gems, bundled_app("vendor/#{Gem.ruby_engine}/#{new_version}"))
@@ -130,6 +130,21 @@ describe "bundle install with platform conditionals" do
     should_be_installed "nokogiri 1.4.2"
   end
 
+  it "does not install gems tagged w/ another platform" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "rack"
+
+      platforms :#{not_local_tag} do
+        gem "nokogiri"
+      end
+    G
+
+    should_be_installed     "rack 1.0"
+    should_not_be_installed "nokogiri 1.4.2"
+  end
+
   it "installs gems tagged w/ the current platform" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
@@ -150,5 +165,17 @@ describe "bundle install with platform conditionals" do
     G
 
     should_not_be_installed "nokogiri"
+  end
+
+  it "does not install gems tagged w/ another platform" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "rack"
+      gem "nokogiri", :platforms => :#{not_local_tag}
+    G
+
+    should_be_installed     "rack 1.0"
+    should_not_be_installed "nokogiri 1.4.2"
   end
 end
