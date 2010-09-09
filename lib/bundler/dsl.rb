@@ -18,6 +18,10 @@ module Bundler
       @groups          = []
       @platforms       = []
       @env             = nil
+      
+      if Bundler.settings[:workspace]
+        path Bundler.settings[:workspace], {}, :prepend => true
+      end
     end
 
     def gemspec(opts = nil)
@@ -223,7 +227,27 @@ module Bundler
           opts["source"] = source
         end
       end
-
+      
+      if param = Bundler.settings["workspaces.#{name}"]
+        if param =~ /^git\:/
+          type = "git"
+        else
+          if param =~ /^file\:\/\/(.+)$/
+            param = $1
+          end
+          type = "path"
+        end
+        
+        if version.first && version.first =~ /^\s*=?\s*(\d[^\s]*)\s*$/
+          options = opts.merge("name" => name, "version" => $1)
+        else
+          options = opts.dup
+        end
+        
+        source = send(type, param, options, :prepend => true) {}
+        opts["source"] = source
+      end
+      
       opts["source"]  ||= @source
       opts["env"]     ||= @env
       opts["platforms"] = @platforms.dup
