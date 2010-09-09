@@ -172,7 +172,7 @@ module Bundler
     GENERICS = [
       Gem::Platform::JAVA,
       Gem::Platform::MSWIN,
-      Gem::Platform::MING,
+      Gem::Platform::MINGW,
       Gem::Platform::RUBY
     ]
 
