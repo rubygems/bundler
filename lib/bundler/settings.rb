@@ -94,8 +94,6 @@ module Bundler
     end
 
     def set_key(key, value, hash, file)
-      puts [key, value, hash, file].inspect
-      exit
       key = key_for(key)
 
       unless hash[key] == value
