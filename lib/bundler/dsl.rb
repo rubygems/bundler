@@ -226,7 +226,7 @@ module Bundler
 
       opts["source"]  ||= @source
       opts["env"]     ||= @env
-      opts["platforms"] = @platforms.dup
+      opts["platforms"] = platforms.dup
       opts["group"]     = groups
     end
 
