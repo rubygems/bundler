@@ -121,7 +121,7 @@ module Gem
   class Platform
     JAVA  = Gem::Platform.new('java')
     MSWIN = Gem::Platform.new('mswin32')
-    MING  = Gem::Platform.new('x86-mingw32')
+    MINGW = Gem::Platform.new('mingw32')
 
     def hash
       @cpu.hash ^ @os.hash ^ @version.hash
