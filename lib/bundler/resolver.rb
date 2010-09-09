@@ -24,7 +24,7 @@ module Bundler
     ALL = [ Gem::Platform::RUBY,
             Gem::Platform::JAVA,
             Gem::Platform::MSWIN,
-            Gem::Platform::MING]
+            Gem::Platform::MINGW ]
 
     class SpecGroup < Array
       include GemHelpers
