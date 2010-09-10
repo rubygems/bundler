@@ -42,7 +42,7 @@ module Bundler
       if manpages.include?(command)
         root = File.expand_path("../man", __FILE__)
 
-        if have_groff?
+        if have_groff? && root !~ %r{^file:/.+!/META-INF/jruby.home/.+}
           groff   = "groff -Wall -mtty-char -mandoc -Tascii"
           pager   = ENV['MANPAGER'] || ENV['PAGER'] || 'more'
 
