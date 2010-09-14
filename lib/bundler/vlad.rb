@@ -2,6 +2,7 @@
 #
 # Just add "require 'bundler/vlad'" in your Vlad deploy.rb, and
 # Bundler will be activated after each new deployment.
+require 'bundler/deployment'
 
 namespace :vlad do
   namespace :bundle do
@@ -15,24 +16,13 @@ namespace :vlad do
       variable to specifiy which one it should use.
 
         set :bundle_gemfile,      "Gemfile"
-        set :bundle_dir,          File.join(shared_path, 'bundle')
+        set :bundle_dir,          File.join(fetch(:shared_path), 'bundle')
         set :bundle_flags,        "--deployment --quiet"
         set :bundle_without,      [:development, :test]
         set :bundle_cmd,          "bundle" # e.g. change to "/opt/ruby/bin/bundle"
     DESC
     remote_task :install, :roles => :app do
-      bundle_dir     = Rake::RemoteTask.fetch(:bundle_dir, File.join(shared_path, 'bundle'))
-      bundle_without = [*Rake::RemoteTask.fetch(:bundle_without, [:development, :test])].compact
-      bundle_flags   = Rake::RemoteTask.fetch(:bundle_flags, "--deployment --quiet")
-      bundle_gemfile = Rake::RemoteTask.fetch(:bundle_gemfile, "Gemfile")
-      bundle_cmd     = Rake::RemoteTask.fetch(:bundle_cmd, "bundle")
-      
-      args = ["--gemfile #{File.join(current_release, bundle_gemfile)}"]
-      args << "--path #{bundle_dir}" unless bundle_dir.to_s.empty?
-      args << bundle_flags.to_s
-      args << "--without #{bundle_without.join(" ")}" unless bundle_without.empty?
-      
-      run "#{bundle_cmd} install #{args.join(' ')}"
+      Bundler::Deployment.install_bundle(Rake::RemoteTask)
     end
   end
 end
