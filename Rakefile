@@ -25,8 +25,8 @@ begin
 
   desc "Run specs"
   RSpec::Core::RakeTask.new do |t|
-    t.spec_opts  = %w(-fs --color)
-    t.warning    = true
+    t.rspec_opts  = %w(-fs --color)
+    t.ruby_opts = %w(-w)
   end
   task :spec => :build
 
@@ -52,8 +52,8 @@ begin
   %w(master REL_1_3_5 REL_1_3_6).each do |rg|
     desc "Run specs with Rubygems #{rg}"
     RSpec::Core::RakeTask.new("spec_gems_#{rg}") do |t|
-      t.spec_opts  = %w(-fs --color)
-      t.warning    = true
+      t.rspec_opts  = %w(-fs --color)
+      t.ruby_opts = %w(-w)
     end
 
     task "rubygems_#{rg}" do
@@ -77,8 +77,8 @@ begin
 
     desc "Run specs on Ruby #{ruby}"
     RSpec::Core::RakeTask.new("spec_ruby_#{ruby}") do |t|
-      t.spec_opts  = %w(-fs --color)
-      t.warning    = true
+      t.rspec_opts  = %w(-fs --color)
+      t.ruby_opts = %w(-w)
       #t.ruby_cmd   = ruby_cmd
     end
 
