@@ -25,9 +25,10 @@ begin
 
   desc "Run specs"
   RSpec::Core::RakeTask.new do |t|
-    t.spec_opts  = %w(-fs --color)
-    t.warning    = true
+    t.rspec_opts = %w(-fs --color)
+    t.ruby_opts  = %w(-w)
   end
+
   task :spec => :build
 
   namespace :spec do
@@ -52,8 +53,8 @@ begin
   %w(master REL_1_3_5 REL_1_3_6).each do |rg|
     desc "Run specs with Rubygems #{rg}"
     RSpec::Core::RakeTask.new("spec_gems_#{rg}") do |t|
-      t.spec_opts  = %w(-fs --color)
-      t.warning    = true
+      t.rspec_opts = %w(-fs --color)
+      t.ruby_opts  = %w(-w)
     end
 
     task "rubygems_#{rg}" do
@@ -77,9 +78,8 @@ begin
 
     desc "Run specs on Ruby #{ruby}"
     RSpec::Core::RakeTask.new("spec_ruby_#{ruby}") do |t|
-      t.spec_opts  = %w(-fs --color)
-      t.warning    = true
-      #t.ruby_cmd   = ruby_cmd
+      t.rspec_opts = %w(-fs --color)
+      t.ruby_opts  = %w(-w)
     end
 
     task "ensure_ruby_#{ruby}" do
@@ -170,3 +170,5 @@ desc "Install bundler"
 task :install => :gem do
   sh "gem install pkg/#{gemspec.full_name}.gem"
 end
+
+task :default => :spec
