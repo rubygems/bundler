@@ -136,7 +136,6 @@ namespace :vendor do
     rm_rf "lib/bundler/vendor"
   end
 end
-task :build => "vendor:build"
 
 begin
   require 'rake/gempackagetask'
