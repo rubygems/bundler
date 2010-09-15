@@ -10,7 +10,7 @@ module Bundler
           these defaults by setting the variables shown below. If the bundle \
           cmd cannot be found then you can override the bundle_cmd variable \
           to specifiy which one it should use.
-        
+
             set :bundle_gemfile,      "Gemfile"
             set :bundle_dir,          File.join(fetch(:shared_path), 'bundle')
             set :bundle_flags,        "--deployment --quiet"
