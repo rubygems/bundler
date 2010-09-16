@@ -455,11 +455,6 @@ module Bundler
     desc "gem GEM_NAME", "Creates a skeleton for creating a rubygem"
     def gem(name)
       target = File.join(Dir.pwd, name)
-      if File.exist?(name)
-        Bundler.ui.error "File already exists at #{File.join(Dir.pwd, name)}"
-        exit 1
-      end
-
       constant_name = name.split('_').map{|p| p.capitalize}.join
       constant_name = constant_name.split('-').map{|q| q.capitalize}.join('::') if constant_name =~ /-/
       constant_array = constant_name.split('::')
