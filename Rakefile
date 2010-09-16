@@ -92,7 +92,7 @@ begin
   end
 rescue LoadError
   task :spec do
-    abort "Run `gem install rspec` to be able to run specs"
+    abort "Run `gem install rspec --pre` to be able to run specs"
   end
 end
 
