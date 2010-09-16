@@ -394,7 +394,7 @@ module Bundler
       end
     end
 
-    desc "open GEM", "Opens the source directory of the given bundled gem"
+    desc "open GEM_NAME", "Opens the source directory of the given bundled gem"
     def open(name)
       editor = [ENV['BUNDLER_EDITOR'], ENV['VISUAL'], ENV['EDITOR']].find{|e| !e.nil? && !e.empty? }
       if editor
@@ -452,7 +452,7 @@ module Bundler
       end
     end
 
-    desc "gem GEM", "Creates a skeleton for creating a rubygem"
+    desc "gem GEM_NAME", "Creates a skeleton for creating a rubygem"
     def gem(name)
       target = File.join(Dir.pwd, name)
       if File.exist?(name)
