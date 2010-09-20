@@ -209,7 +209,7 @@ module Bundler
       Bundler.settings[:path] = "vendor/bundle" if opts[:deployment]
       Bundler.settings[:path] = path if path
       Bundler.settings[:path] = opts[:path] if opts[:path]
-      Bundler.settings[:bin] = opts["binstubs"] if opts[:binstubs]
+      Bundler.settings[:bin] = opts[:binstubs] if opts[:binstubs]
       Bundler.settings[:disable_shared_gems] = '1' if Bundler.settings[:path]
       Bundler.settings.without = opts[:without] unless opts[:without].empty?
       Bundler.ui.be_quiet! if opts[:quiet]
