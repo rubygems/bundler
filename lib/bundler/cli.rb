@@ -398,9 +398,12 @@ module Bundler
     def open(name)
       editor = [ENV['BUNDLER_EDITOR'], ENV['VISUAL'], ENV['EDITOR']].find{|e| !e.nil? && !e.empty? }
       if editor
-        command = "#{editor} #{locate_gem(name)}"
-        success = system(command)
-        Bundler.ui.info "Could not run '#{command}'" unless success
+        gem_path = locate_gem(name)
+        Dir.chdir(gem_path) do
+          command = "#{editor} #{gem_path}"
+          success = system(command)
+          Bundler.ui.info "Could not run '#{command}'" unless success
+        end
       else
         Bundler.ui.info("To open a bundled gem, set $EDITOR or $BUNDLER_EDITOR")
       end
