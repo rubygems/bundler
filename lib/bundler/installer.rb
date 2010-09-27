@@ -71,6 +71,7 @@ module Bundler
       bin_path = Bundler.bin_path
       template = File.read(File.expand_path('../templates/Executable', __FILE__))
       relative_gemfile_path = Bundler.default_gemfile.relative_path_from(bin_path)
+      ruby_command = Thor::Util.ruby_command
 
       spec.executables.each do |executable|
         next if executable == "bundle"
