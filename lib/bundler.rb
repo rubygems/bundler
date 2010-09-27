@@ -4,6 +4,7 @@ require 'pathname'
 require 'yaml'
 require 'bundler/rubygems_ext'
 require 'bundler/version'
+require 'bunder/fix_gzip_error'
 
 module Bundler
   ORIGINAL_ENV = ENV.to_hash
