@@ -7,7 +7,7 @@ describe "bundle install from an existing gemspec" do
     build_gem "bar-dev", :to_system => true
   end
 
-  it "should install runtime and development dependecies" do
+  it "should install runtime and development dependencies" do
     build_lib("foo", :path => tmp.join("foo")) do |s|
       s.write("Gemfile", "source :rubygems\ngemspec")
       s.add_dependency "bar", "=1.0.0"
