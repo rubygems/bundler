@@ -253,6 +253,7 @@ module Bundler
         ENV["GEM_HOME"] = bundle_path.to_s
       end
 
+      FileUtils.mkdir_p bundle_path.to_s
       Gem.clear_paths
     end
 
