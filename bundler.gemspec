@@ -20,9 +20,9 @@ Gem::Specification.new do |s|
   s.add_development_dependency "ronn"
   s.add_development_dependency "rspec"
 
-  s.files              = `git ls-files`.split("\n")
+  s.files              = `git ls-files`.split("\n") + Dir.glob("lib/bundler/man/**/*")
   s.test_files         = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.executables        = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+  s.executables        = %w(bundle)
   s.default_executable = "bundle"
   s.require_paths      = ["lib"]
 end
