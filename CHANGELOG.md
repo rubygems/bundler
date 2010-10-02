@@ -1,6 +1,28 @@
-## 1.0.0
+## 1.0.1 (October 1, 2010)
 
-Features
+Features:
+
+  - Vlad deployment recipe, `require 'bundler/vlad'`
+  - Prettier bundle graphs
+  - Improved gem skeleton for `bundle gem`
+  - Prompt on file clashes when generating a gem
+  - Option to generate binary with gem skeleton
+  - Allow subclassing of GemHelper for custom tasks
+  - Chdir to gem directory during `bundle open`
+
+Bugfixes:
+
+  - Allow gemspec requirements with a list of versions
+  - Accept lockfiles with windows line endings
+  - Respect BUNDLE_WITHOUT env var
+  - Allow `gem "foo", :platform => :jruby`
+  - Specify loaded_from path in fake gemspec
+  - Flesh out gem_helper tasks, raise errors correctly
+  - Respect RBConfig::CONFIG['ruby_install_name'] in binstubs
+
+## 1.0.0 (August 29, 2010)
+
+Features:
 
   - You can now define `:bundle_cmd` in the capistrano task
 
@@ -20,7 +42,7 @@ Bugfixes:
   - Detect new Rubygems sources in the Gemfile and update
     the lockfile
 
-## 1.0.0.rc.6
+## 1.0.0.rc.6 (August 23, 2010)
 
 Features:
 
@@ -38,7 +60,7 @@ Bugfixes:
   - Expand paths in Gemfile relative to the Gemfile and not the current
     working directory.
 
-## 1.0.0.rc.5
+## 1.0.0.rc.5 (August 10, 2010)
 
 Features:
 
@@ -49,7 +71,7 @@ Bugfixes:
   - Fix a regression with determining whether or not to use sudo
   - Allow using the --gemfile flag with the --deployment flag
 
-## 1.0.0.rc.4
+## 1.0.0.rc.4 (August 9, 2010)
 
 Features:
 
