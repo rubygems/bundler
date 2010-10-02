@@ -1,3 +1,9 @@
+## 1.0.2 (October 2, 2010)
+
+Bugfixes:
+
+  - Actually include the man pages in the gem, so help works
+
 ## 1.0.1 (October 1, 2010)
 
 Features:
