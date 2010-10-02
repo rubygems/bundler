@@ -1,22 +1,21 @@
 # -*- encoding: utf-8 -*-
-require File.expand_path("../lib/<%=config[:name]%>/version", __FILE__)
+$:.push File.expand_path("../lib", __FILE__)
+require "<%=config[:name]%>/version"
 
 Gem::Specification.new do |s|
   s.name        = <%=config[:name].inspect%>
   s.version     = <%=config[:constant_name]%>::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.authors     = []
-  s.email       = []
+  s.authors     = ["TODO: Write your name"]
+  s.email       = ["TODO: Write your email address"]
   s.homepage    = "http://rubygems.org/gems/<%=config[:name]%>"
-  s.summary     = "TODO: Write a gem summary"
-  s.description = "TODO: Write a gem description"
+  s.summary     = %q{TODO: Write a gem summary}
+  s.description = %q{TODO: Write a gem description}
 
-  s.required_rubygems_version = ">= 1.3.6"
-  s.rubyforge_project         = <%=config[:name].inspect%>
+  s.rubyforge_project = <%=config[:name].inspect%>
 
-  s.add_development_dependency "bundler", ">= <%=Bundler::VERSION%>"
-
-  s.files        = `git ls-files`.split("\n")
-  s.executables  = `git ls-files`.split("\n").map{|f| f =~ /^bin\/(.*)/ ? $1 : nil}.compact
-  s.require_path = 'lib'
+  s.files         = `git ls-files`.split("\n")
+  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
+  s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+  s.require_paths = ["lib"]
 end

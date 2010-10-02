@@ -132,7 +132,7 @@ for deployment.
 
 If you want to share gems across deployments, and you use
 Capistrano, symlink release_path/current/vendor/bundle to
-release_path/shared/bundled_gems. This will keep deployments
+release_path/shared/bundle. This will keep deployments
 snappy while maintaining the benefits of clean, deploy-time
 isolation.
 

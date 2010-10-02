@@ -42,7 +42,7 @@ module Bundler
       if manpages.include?(command)
         root = File.expand_path("../man", __FILE__)
 
-        if have_groff?
+        if have_groff? && root !~ %r{^file:/.+!/META-INF/jruby.home/.+}
           groff   = "groff -Wall -mtty-char -mandoc -Tascii"
           pager   = ENV['MANPAGER'] || ENV['PAGER'] || 'more'
 
@@ -211,7 +211,7 @@ module Bundler
       Bundler.settings[:path] = opts[:path] if opts[:path]
       Bundler.settings[:bin] = opts["binstubs"] if opts[:binstubs]
       Bundler.settings[:disable_shared_gems] = '1' if Bundler.settings[:path]
-      Bundler.settings.without = opts[:without]
+      Bundler.settings.without = opts[:without] unless opts[:without].empty?
       Bundler.ui.be_quiet! if opts[:quiet]
 
       Installer.install(Bundler.root, Bundler.definition, opts)
@@ -398,9 +398,12 @@ module Bundler
     def open(name)
       editor = [ENV['BUNDLER_EDITOR'], ENV['VISUAL'], ENV['EDITOR']].find{|e| !e.nil? && !e.empty? }
       if editor
-        command = "#{editor} #{locate_gem(name)}"
-        success = system(command)
-        Bundler.ui.info "Could not run '#{command}'" unless success
+        gem_path = locate_gem(name)
+        Dir.chdir(gem_path) do
+          command = "#{editor} #{gem_path}"
+          success = system(command)
+          Bundler.ui.info "Could not run '#{command}'" unless success
+        end
       else
         Bundler.ui.info("To open a bundled gem, set $EDITOR or $BUNDLER_EDITOR")
       end
@@ -453,24 +456,23 @@ module Bundler
     end
 
     desc "gem GEM", "Creates a skeleton for creating a rubygem"
+    method_option :bin, :type => :boolean, :default => false, :aliases => '-b', :banner => "Generate a binary for your library."
     def gem(name)
       target = File.join(Dir.pwd, name)
-      if File.exist?(name)
-        Bundler.ui.error "File already exists at #{File.join(Dir.pwd, name)}"
-        exit 1
-      end
-
       constant_name = name.split('_').map{|p| p.capitalize}.join
       constant_name = constant_name.split('-').map{|q| q.capitalize}.join('::') if constant_name =~ /-/
       constant_array = constant_name.split('::')
       FileUtils.mkdir_p(File.join(target, 'lib', name))
       opts = {:name => name, :constant_name => constant_name, :constant_array => constant_array}
-      template(File.join('newgem', 'Gemfile.tt'),                     File.join(target, 'Gemfile'),                 opts)
-      template(File.join('newgem', 'Rakefile.tt'),                    File.join(target, 'Rakefile'),                opts)
-      template(File.join('newgem', 'gitignore.tt'),                   File.join(target, '.gitignore'),              opts)
-      template(File.join('newgem', 'newgem.gemspec.tt'),              File.join(target, "#{name}.gemspec"),         opts)
-      template(File.join('newgem', 'lib', 'newgem.rb.tt'),            File.join(target, 'lib', "#{name}.rb"),       opts)
-      template(File.join('newgem', 'lib', 'newgem', 'version.rb.tt'), File.join(target, 'lib', name, 'version.rb'), opts)
+      template(File.join("newgem/Gemfile.tt"),               File.join(target, "Gemfile"),                opts)
+      template(File.join("newgem/Rakefile.tt"),              File.join(target, "Rakefile"),               opts)
+      template(File.join("newgem/gitignore.tt"),             File.join(target, ".gitignore"),             opts)
+      template(File.join("newgem/newgem.gemspec.tt"),        File.join(target, "#{name}.gemspec"),        opts)
+      template(File.join("newgem/lib/newgem.rb.tt"),         File.join(target, "lib/#{name}.rb"),         opts)
+      template(File.join("newgem/lib/newgem/version.rb.tt"), File.join(target, "lib/#{name}/version.rb"), opts)
+      if options[:bin]
+        template(File.join("newgem/bin/newgem.tt"),          File.join(target, 'bin', name),              opts)
+      end
       Bundler.ui.info "Initializating git repo in #{target}"
       Dir.chdir(target) { `git init`; `git add .` }
     end

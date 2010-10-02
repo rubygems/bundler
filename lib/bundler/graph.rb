@@ -1,7 +1,7 @@
 module Bundler
   class Graph
 
-    USER_OPTIONS = {:style => 'filled, bold', :fillcolor => '#cccccc'}.freeze
+    USER_OPTIONS = {:style => 'filled', :fillcolor => '#B9B9D5'}.freeze
 
     def initialize(env)
       @env = env
@@ -21,7 +21,7 @@ module Bundler
       require 'graphviz'
       populate
 
-      graph_viz = GraphViz::new('Gemfile', {:concentrate => true, :dpi => 65 } )
+      graph_viz = GraphViz::new('Gemfile', {:concentrate => true, :normalize => true, :nodesep => 0.55})
       graph_viz.edge[:fontname] = graph_viz.node[:fontname] = 'Arial, Helvetica, SansSerif'
       graph_viz.edge[:fontsize] = 12
 
@@ -38,7 +38,7 @@ module Bundler
 
       group_nodes = {}
       @groups.each do |name, dependencies|
-        group_nodes[name] = graph_viz.add_node(name.to_s, { :shape => 'folder', :fontsize => 16 }.merge(USER_OPTIONS))
+        group_nodes[name] = graph_viz.add_node(name.to_s, { :shape => 'box3d', :fontsize => 16 }.merge(USER_OPTIONS))
         dependencies.each do |dependency|
           options = { :weight => 2 }
           if show_dependency_requirements && (dependency.requirement.to_s != ">= 0")

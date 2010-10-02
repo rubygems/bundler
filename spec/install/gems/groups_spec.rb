@@ -52,6 +52,13 @@ describe "bundle install with gem sources" do
           should_not_be_installed "activesupport 2.3.5", :groups => [:default]
         end
 
+        it "does not install gems from the previously excluded group" do
+          bundle :install, :without => "emo"
+          should_not_be_installed "activesupport 2.3.5"
+          bundle :install
+          should_not_be_installed "activesupport 2.3.5"
+        end
+
         it "does not say it installed gems from the excluded group" do
           bundle :install, :without => "emo"
           out.should_not include("activesupport")
@@ -85,6 +92,18 @@ describe "bundle install with gem sources" do
 
           should_be_installed "rack 1.0.0", :groups => [:default]
           should_not_be_installed "activesupport 2.3.5", :groups => [:default]
+        end
+
+        it "still works when BUNDLE_WITHOUT is set" do
+          ENV["BUNDLE_WITHOUT"] = "emo"
+
+          bundle :install
+          out.should_not include("activesupport")
+
+          should_be_installed "rack 1.0.0", :groups => [:default]
+          should_not_be_installed "activesupport 2.3.5", :groups => [:default]
+
+          ENV["BUNDLE_WITHOUT"] = nil
         end
       end
 

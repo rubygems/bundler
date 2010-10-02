@@ -7,7 +7,7 @@ describe "bundle install from an existing gemspec" do
     build_gem "bar-dev", :to_system => true
   end
 
-  it "should install runtime and development dependecies" do
+  it "should install runtime and development dependencies" do
     build_lib("foo", :path => tmp.join("foo")) do |s|
       s.write("Gemfile", "source :rubygems\ngemspec")
       s.add_dependency "bar", "=1.0.0"
@@ -20,6 +20,22 @@ describe "bundle install from an existing gemspec" do
 
     should_be_installed "bar 1.0.0"
     should_be_installed "bar-dev 1.0.0", :groups => :development
+  end
+
+  it "should handle a list of requirements" do
+    build_gem "baz", "1.0", :to_system => true
+    build_gem "baz", "1.1", :to_system => true
+
+    build_lib("foo", :path => tmp.join("foo")) do |s|
+      s.write("Gemfile", "source :rubygems\ngemspec")
+      s.add_dependency "baz", ">= 1.0", "< 1.1"
+    end
+    install_gemfile <<-G
+      source "file://#{gem_repo2}"
+      gemspec :path => '#{tmp.join("foo")}'
+    G
+
+    should_be_installed "baz 1.0"
   end
 
   it "should raise if there are no gemspecs available" do

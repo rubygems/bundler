@@ -50,7 +50,7 @@ module Bundler
       end
 
       if value = ENV[key]
-        locations << "Set via $#{key_for(key)}: #{value.inspect}"
+        locations << "Set via #{key}: #{value.inspect}"
       end
 
       if @global_config.key?(key)
@@ -62,7 +62,7 @@ module Bundler
     end
 
     def without=(array)
-      unless array.empty? && without.empty?
+      unless array.empty?
         self[:without] = array.join(":")
       end
     end

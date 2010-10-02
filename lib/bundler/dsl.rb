@@ -32,11 +32,11 @@ module Bundler
         spec = Gem::Specification.load(gemspecs.first)
         gem spec.name, :path => path
         spec.runtime_dependencies.each do |dep|
-          gem dep.name, dep.requirement.to_s
+          gem dep.name, *dep.requirement.as_list
         end
         group(development_group) do
           spec.development_dependencies.each do |dep|
-            gem dep.name, dep.requirement.to_s
+            gem dep.name, *dep.requirement.as_list
           end
         end
       when 0

@@ -1,4 +1,4 @@
-# coding:utf-8
+# -*- encoding: utf-8 -*-
 $:.unshift File.expand_path("../lib", __FILE__)
 
 require 'rubygems'
@@ -135,6 +135,17 @@ namespace :vendor do
   task :clean do
     rm_rf "lib/bundler/vendor"
   end
+end
+
+begin
+  require 'rake/gempackagetask'
+rescue LoadError
+  task(:gem) { $stderr.puts '`gem install rake` to package gems' }
+else
+  Rake::GemPackageTask.new(gemspec) do |pkg|
+    pkg.gem_spec = gemspec
+  end
+  task :gem => [:build, :gemspec]
 end
 
 desc "install the gem locally"

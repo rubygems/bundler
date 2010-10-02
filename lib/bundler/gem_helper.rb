@@ -6,7 +6,7 @@ module Bundler
   class GemHelper
     def self.install_tasks(opts = nil)
       dir = caller.find{|c| /Rakefile:/}[/^(.*?)\/Rakefile:/, 1]
-      GemHelper.new(dir, opts && opts[:name]).install
+      self.new(dir, opts && opts[:name]).install
     end
 
     attr_reader :spec_path, :base, :gemspec
@@ -52,11 +52,8 @@ module Bundler
     def install_gem
       built_gem_path = build_gem
       out, err, code = sh_with_code("gem install #{built_gem_path}")
-      if err[/ERROR/]
-        Bundler.ui.error err
-      else
-        Bundler.ui.confirm "#{name} (#{version}) installed"
-      end
+      raise err if err[/ERROR/]
+      Bundler.ui.confirm "#{name} (#{version}) installed"
     end
 
     def release_gem
