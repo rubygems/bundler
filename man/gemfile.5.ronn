@@ -240,6 +240,25 @@ In the case of the `git` block form, the `:ref`, `:branch`, `:tag`,
 and `:submodules` options may be passed to the `git` method, and
 all gems in the block will inherit those options.
 
+## GEMSPEC (#gemspec)
+
+If you wish to use Bundler to help install dependencies for a gem while it is
+being developed, use the `gemspec` method to pull in the dependencies listed in
+the `.gemspec` file.
+
+The `gemspec` method adds any runtime dependencies as gem requirements in the
+default group. It also adds development dependencies as gem requirements in the
+`development` group. Finally, it adds a gem requirement on your project (`:path
+=> '.'`). In conjunction with `Bundler.setup`, this allows you to require project
+files in your test code as you would if the project were installed as a gem; you
+need not manipulate the load path manually or require project files via relative
+paths.
+
+The `gemspec` method supports optional `:path`, `:name`, and `:development_group`
+options, which control where bundler looks for the `.gemspec`, what named
+`.gemspec` it uses (if more than one is present), and which group development
+dependencies are included in.
+
 ## SOURCE PRIORITY
 
 When attempting to locate a gem to satisfy a gem requirement,
