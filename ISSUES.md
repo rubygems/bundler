@@ -6,7 +6,7 @@ Instructions for common Bundler use-cases can be found on the [Bundler documenta
 
 After reading the documentation, try these troubleshooting steps:
 
-    rm -rf ~/.bundle/ ~/.gem/ .bundle/ Gemfile.lock
+    rm -rf ~/.bundle/ ~/.gem/ .bundle/ vendor/cache/ Gemfile.lock
     bundle install
 
 ## Reporting unresolved problems
