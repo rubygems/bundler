@@ -124,7 +124,7 @@ module Gem
     MING  = Gem::Platform.new('x86-mingw32')
 
     def hash
-      @cpu.hash + @os.hash + @version.hash
+      @cpu.hash ^ @os.hash ^ @version.hash
     end
 
     alias eql? ==
