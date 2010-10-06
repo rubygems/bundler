@@ -227,7 +227,7 @@ module Bundler
       end
     rescue GemNotFound => e
       if Bundler.definition.no_sources?
-        Bundler.ui.warn "Your Gemfile doesn't have any sources. You can add one with a line like 'source :gemcutter'"
+        Bundler.ui.warn "Your Gemfile doesn't have any sources. You can add one with a line like 'source :rubygems'"
       end
       raise e
     end
