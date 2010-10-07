@@ -276,7 +276,8 @@ module Bundler
         @allow_remote = false
 
         if options["path"]
-          @path = Pathname.new(options["path"]).expand_path(Bundler.root)
+          @path = Pathname.new(options["path"])
+          @path = @path.expand_path(Bundler.root) unless @path.relative? and @path.to_s =~ %r{^..}
         end
 
         @name = options["name"]
