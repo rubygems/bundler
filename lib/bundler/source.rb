@@ -600,7 +600,7 @@ module Bundler
         if cached?
           return if has_revision_cached?
           Bundler.ui.info "Updating #{uri}"
-          in_cache { git %|fetch --force --quiet "#{uri}" refs/heads/*:refs/heads/*| }
+          in_cache { git %|fetch --force --quiet --tags "#{uri}" refs/heads/*:refs/heads/*| }
         else
           Bundler.ui.info "Fetching #{uri}"
           FileUtils.mkdir_p(cache_path.dirname)
@@ -614,7 +614,7 @@ module Bundler
           git %|clone --no-checkout "#{cache_path}" "#{path}"|
         end
         Dir.chdir(path) do
-          git %|fetch --force --quiet "#{cache_path}"|
+          git %|fetch --force --quiet --tags "#{cache_path}"|
           git "reset --hard #{revision}"
 
           if @submodules
