@@ -94,8 +94,6 @@ describe "Bundler.require" do
 
   describe "using bundle exec" do
     it "requires the locked gems" do
-      bundle :lock
-
       bundle "exec ruby -e 'Bundler.require'"
       check out.should == "two"
 
@@ -181,34 +179,6 @@ describe "Bundler.require" do
 
       run "Bundler.require"
       check out.should == "two_not_loaded\none\ntwo"
-    end
-
-    describe "when locked" do
-      it "works when the gems are in the Gemfile in the correct order" do
-        gemfile <<-G
-          path "#{lib_path}"
-          gem "two"
-          gem "one"
-        G
-
-        bundle :lock
-
-        run "Bundler.require"
-        check out.should == "two\nmodule_two\none"
-      end
-
-      it "fails when the gems are in the Gemfile in the wrong order" do
-        gemfile <<-G
-          path "#{lib_path}"
-          gem "one"
-          gem "two"
-        G
-
-        bundle :lock
-
-        run "Bundler.require"
-        check out.should == "two_not_loaded\none\ntwo"
-      end
     end
 
     describe "with busted gems" do

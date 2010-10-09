@@ -69,26 +69,21 @@ describe "Bundler.load" do
     end
   end
 
-  describe "when locked" do
-    before :each do
-      install_gemfile <<-G
-        source "file://#{gem_repo1}"
-        gem "activesupport"
-      G
-      bundle :lock
-    end
+  # This is obviously not true on 1.9 thanks to the AWEOME! gem prelude :'(
+  it "does not invoke setup inside env.rb" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "activesupport"
+    G
 
-    # This is obviously not true on 1.9 thanks to the AWEOME! gem prelude :'(
-    it "does not invoke setup inside env.rb" do
-      ruby <<-RUBY
-        require 'bundler'
-        Bundler.load
-        puts $LOAD_PATH.grep(/activesupport/i)
-      RUBY
+    ruby <<-RUBY
+      require 'bundler'
+      Bundler.load
+      puts $LOAD_PATH.grep(/activesupport/i)
+    RUBY
 
-      out.should == ""
-    end if RUBY_VERSION < "1.9"
-  end
+    out.should == ""
+  end if RUBY_VERSION < "1.9"
 
   describe "not hurting brittle rubygems" do
     it "does not inject #source into the generated YAML of the gem specs" do
