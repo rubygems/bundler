@@ -63,6 +63,7 @@ describe "bundle install with gem sources" do
 
       lambda { run '1' }.should_not change { File.mtime(bundled_app('Gemfile.lock')) }
     end
+
     it "fetches gems" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
