@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe "environment.rb file", :focus => true do
+describe "environment.rb file" do
 
   describe "with git gems that don't have gemspecs" do
     before :each do
@@ -83,8 +83,6 @@ describe "environment.rb file", :focus => true do
         gem "rack", "1.0.0"
         gem "activesupport", "2.3.5"
       G
-
-      bundle :lock
     end
 
     it "sets GEM_PATH appropriately" do

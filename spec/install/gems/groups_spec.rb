@@ -83,9 +83,8 @@ describe "bundle install with gem sources" do
           should_be_installed "activesupport 2.3.2", :groups => [:default]
         end
 
-        it "still works when locked" do
+        it "still works on a different machine and excludes gems" do
           bundle :install, :without => "emo"
-          bundle :lock
 
           simulate_new_machine
           bundle :install, :without => "emo"

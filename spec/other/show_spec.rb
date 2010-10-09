@@ -38,23 +38,6 @@ describe "bundle show" do
     bundle "show missing"
     out.should =~ /could not find gem 'missing'/i
   end
-
-  describe "while locked" do
-    before :each do
-      bundle :lock
-    end
-
-    it "prints path if gem exists in bundle" do
-      bundle "show rails"
-      out.should == default_bundle_path('gems', 'rails-2.3.2').to_s
-    end
-
-    it "complains if gem not in bundle" do
-      bundle "show missing"
-      out.should =~ /could not find gem 'missing'/i
-    end
-  end
-
 end
 
 describe "bundle show with a git repo" do

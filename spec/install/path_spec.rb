@@ -184,37 +184,31 @@ describe "bundle install with explicit source paths" do
     end
   end
 
-  describe "when locked" do
-    it "keeps source pinning" do
-      build_lib "foo", "1.0", :path => lib_path('foo')
-      build_lib "omg", "1.0", :path => lib_path('omg')
-      build_lib "foo", "1.0", :path => lib_path('omg/foo') do |s|
-        s.write "lib/foo.rb", "puts 'FAIL'"
-      end
-
-      install_gemfile <<-G
-        gem "foo", :path => "#{lib_path('foo')}"
-        gem "omg", :path => "#{lib_path('omg')}"
-      G
-
-      bundle :lock
-
-      should_be_installed "foo 1.0"
+  it "keeps source pinning" do
+    build_lib "foo", "1.0", :path => lib_path('foo')
+    build_lib "omg", "1.0", :path => lib_path('omg')
+    build_lib "foo", "1.0", :path => lib_path('omg/foo') do |s|
+      s.write "lib/foo.rb", "puts 'FAIL'"
     end
 
-    it "works when the path does not have a gemspec" do
-      build_lib "foo", :gemspec => false
+    install_gemfile <<-G
+      gem "foo", :path => "#{lib_path('foo')}"
+      gem "omg", :path => "#{lib_path('omg')}"
+    G
 
-      gemfile <<-G
-        gem "foo", "1.0", :path => "#{lib_path('foo-1.0')}"
-      G
+    should_be_installed "foo 1.0"
+  end
 
-      should_be_installed "foo 1.0"
+  it "works when the path does not have a gemspec" do
+    build_lib "foo", :gemspec => false
 
-      bundle :lock
+    gemfile <<-G
+      gem "foo", "1.0", :path => "#{lib_path('foo-1.0')}"
+    G
 
-      should_be_installed "foo 1.0"
-    end
+    should_be_installed "foo 1.0"
+
+    should_be_installed "foo 1.0"
   end
 
   it "installs executable stubs" do
