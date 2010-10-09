@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.rubyforge_project         = "bundler"
 
   s.add_development_dependency "ronn"
-  s.add_development_dependency "rspec"
+  s.add_development_dependency "rspec", "2.0.0.rc"
 
   s.files              = `git ls-files`.split("\n") + Dir.glob("lib/bundler/man/**/*")
   s.test_files         = `git ls-files -- {test,spec,features}/*`.split("\n")
