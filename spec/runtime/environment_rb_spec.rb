@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe "environment.rb file" do
+describe "environment.rb file", :focus => true do
 
   describe "with git gems that don't have gemspecs" do
     before :each do
@@ -9,12 +9,10 @@ describe "environment.rb file" do
       install_gemfile <<-G
         gem "no-gemspec", "1.0", :git => "#{lib_path('no-gemspec-1.0')}"
       G
-
-      bundle :lock
     end
 
     it "loads the library via a virtual spec" do
-      run <<-R, :lite_runtime => true
+      run <<-R
         require 'no-gemspec'
         puts NOGEMSPEC
       R
@@ -32,12 +30,10 @@ describe "environment.rb file" do
 
         gem "activesupport", "2.3.5"
       G
-
-      bundle :lock
     end
 
     it "does not pull in system gems" do
-      run <<-R, :lite_runtime => true
+      run <<-R
         require 'rubygems'
 
         begin;
@@ -51,7 +47,7 @@ describe "environment.rb file" do
     end
 
     it "provides a gem method" do
-      run <<-R, :lite_runtime => true
+      run <<-R
         gem 'activesupport'
         require 'activesupport'
         puts ACTIVESUPPORT
@@ -61,7 +57,7 @@ describe "environment.rb file" do
     end
 
     it "raises an exception if gem is used to invoke a system gem not in the bundle" do
-      run <<-R, :lite_runtime => true
+      run <<-R
         begin
           gem 'rack'
         rescue LoadError => e
@@ -73,7 +69,7 @@ describe "environment.rb file" do
     end
 
     it "sets GEM_HOME appropriately" do
-      run "puts ENV['GEM_HOME']", :lite_runtime => true
+      run "puts ENV['GEM_HOME']"
       out.should == default_bundle_path.to_s
     end
   end
@@ -92,7 +88,7 @@ describe "environment.rb file" do
     end
 
     it "sets GEM_PATH appropriately" do
-      run "puts Gem.path", :lite_runtime => true
+      run "puts Gem.path"
       paths = out.split("\n")
       paths.should include(system_gem_path.to_s)
       paths.should include(default_bundle_path.to_s)
@@ -124,8 +120,7 @@ describe "environment.rb file" do
 
     it "evals each gemspec in the context of its parent directory" do
       bundle :install
-      bundle :lock
-      run "require 'bar'; puts BAR", :lite_runtime => true
+      run "require 'bar'; puts BAR"
       out.should == "1.0"
     end
 
@@ -161,7 +156,6 @@ describe "environment.rb file" do
       install_gemfile <<-G
         gem "bundler", :path => "#{File.expand_path("..", lib)}"
       G
-      bundle :lock
 
       bundle %|exec ruby -e "require 'bundler'; Bundler.setup"|
       err.should be_empty
