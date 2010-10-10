@@ -5,7 +5,7 @@
 require 'bundler/deployment'
 
 Capistrano::Configuration.instance(:must_exist).load do
-  after "deploy:update_code", "bundle:install"
+  after "deploy:update_code", "bundle:install --without development --without test"
 
   Bundler::Deployment.define_task(self, :task, :except => { :no_release => true })
 end
