@@ -53,9 +53,6 @@ module Bundler
 
       options = Hash === args.last ? args.pop : {}
       version = args || [">= 0"]
-      if group = options[:groups] || options[:group]
-        options[:group] = group
-      end
 
       _deprecated_options(options)
       _normalize_options(name, version, options)
@@ -187,7 +184,7 @@ module Bundler
     def _normalize_options(name, version, opts)
       _normalize_hash(opts)
 
-      invalid_keys = opts.keys - %w(group git path name branch ref tag require submodules platforms)
+      invalid_keys = opts.keys - %w(group groups git path name branch ref tag require submodules platforms)
       if invalid_keys.any?
         plural = invalid_keys.size > 1
         message = "You passed #{invalid_keys.map{|k| ':'+k }.join(", ")} "
@@ -200,6 +197,7 @@ module Bundler
       end
 
       groups = @groups.dup
+      opts["group"] = opts.delete("groups") || opts["group"]
       groups.concat Array(opts.delete("group"))
       groups = [:default] if groups.empty?
 
