@@ -503,7 +503,7 @@ describe "bundle install with gem sources" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
-        gem "activesupport", :group => :development
+        gem "activesupport", :groups => :development
       G
 
       ruby <<-R
