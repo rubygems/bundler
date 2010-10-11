@@ -132,6 +132,7 @@ module Bundler
     ensure
       platforms.each { @platforms.pop }
     end
+    alias_method :platform, :platforms
 
     def env(name)
       @env, old = name, @env
@@ -184,7 +185,7 @@ module Bundler
     def _normalize_options(name, version, opts)
       _normalize_hash(opts)
 
-      invalid_keys = opts.keys - %w(group groups git path name branch ref tag require submodules platforms)
+      invalid_keys = opts.keys - %w(group groups git path name branch ref tag require submodules platform platforms)
       if invalid_keys.any?
         plural = invalid_keys.size > 1
         message = "You passed #{invalid_keys.map{|k| ':'+k }.join(", ")} "
@@ -202,6 +203,7 @@ module Bundler
       groups = [:default] if groups.empty?
 
       platforms = @platforms.dup
+      opts["platforms"] = opts["platform"] || opts["platforms"]
       platforms.concat Array(opts.delete("platforms"))
       platforms.map! { |p| p.to_sym }
       platforms.each do |p|
