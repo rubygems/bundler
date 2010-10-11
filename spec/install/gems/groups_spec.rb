@@ -183,6 +183,11 @@ describe "bundle install with gem sources" do
             bundle "install --without emo lolercoaster"
             should_not_be_installed "activesupport 2.3.5"
           end
+
+          it "does not install the gem w/ option --without 'emo lolercoaster'" do
+            bundle "install --without 'emo lolercoaster'"
+            should_not_be_installed "activesupport 2.3.5"
+          end
         end
       end
 

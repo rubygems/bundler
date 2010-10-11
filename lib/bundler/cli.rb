@@ -156,7 +156,11 @@ module Bundler
     def install(path = nil)
       opts = options.dup
       opts[:without] ||= []
-      opts[:without].map! { |g| g.to_sym }
+      if opts[:without].size == 1
+        opts[:without].map!{|g| g.split(" ") }
+        opts[:without].flatten!
+      end
+      opts[:without].map!{|g| g.to_sym }
 
 
       ENV['BUNDLE_GEMFILE'] = File.expand_path(opts[:gemfile]) if opts[:gemfile]
