@@ -18,7 +18,7 @@ describe "install with --deployment or --frozen" do
     out.should include("The --frozen flag requires a Gemfile.lock")
   end
 
-  it "works after you try to deploy without a lock", :focus => true do
+  it "works after you try to deploy without a lock" do
     bundle "install --deployment"
     bundle :install, :exit_status => true
     exitstatus.should == 0
