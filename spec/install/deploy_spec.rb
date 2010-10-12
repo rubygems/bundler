@@ -18,6 +18,13 @@ describe "install with --deployment or --frozen" do
     out.should include("The --frozen flag requires a Gemfile.lock")
   end
 
+  it "works after you try to deploy without a lock", :focus => true do
+    bundle "install --deployment"
+    bundle :install, :exit_status => true
+    exitstatus.should == 0
+    should_be_installed "rack 1.0"
+  end
+
   it "still works if you are not in the app directory and specify --gemfile" do
     bundle "install"
     Dir.chdir tmp
