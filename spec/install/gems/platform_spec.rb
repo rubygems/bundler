@@ -116,9 +116,8 @@ describe "bundle install across platforms" do
   end
 end
 
-# TODO: Don't make the tests hardcoded to a platform
 describe "bundle install with platform conditionals" do
-  it "installs gems tagged w/ the current platform" do
+  it "installs gems tagged w/ the current platforms" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
 
@@ -130,7 +129,7 @@ describe "bundle install with platform conditionals" do
     should_be_installed "nokogiri 1.4.2"
   end
 
-  it "does not install gems tagged w/ another platform" do
+  it "does not install gems tagged w/ another platforms" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
 
@@ -145,37 +144,52 @@ describe "bundle install with platform conditionals" do
     should_not_be_installed "nokogiri 1.4.2"
   end
 
-  it "installs gems tagged w/ the current platform" do
-    install_gemfile <<-G
-      source "file://#{gem_repo1}"
-
-      gem "nokogiri", :platforms => :#{local_tag}
-    G
-
-    should_be_installed "nokogiri 1.4.2"
-  end
-
-  it "doesn't install gems tagged w/ a different platform" do
-    install_gemfile <<-G
-      source "file://#{gem_repo1}"
-
-      platforms :#{not_local_tag} do
-        gem "nokogiri"
-      end
-    G
-
-    should_not_be_installed "nokogiri"
-  end
-
   it "does not install gems tagged w/ another platform" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack"
-      gem "nokogiri", :platforms => :#{not_local_tag}
+
+      platform :#{not_local_tag} do
+        gem "nokogiri"
+      end
     G
 
     should_be_installed     "rack 1.0"
+    should_not_be_installed "nokogiri 1.4.2"
+  end
+
+  it "installs gems tagged w/ the current platforms inline" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "nokogiri", :platforms => :#{local_tag}
+    G
+    should_be_installed "nokogiri 1.4.2"
+  end
+
+  it "does not install gems tagged w/ another platforms inline" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack"
+      gem "nokogiri", :platforms => :#{not_local_tag}
+    G
+    should_be_installed     "rack 1.0"
+    should_not_be_installed "nokogiri 1.4.2"
+  end
+
+  it "installs gems tagged w/ the current platform inline" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "nokogiri", :platform => :#{local_tag}
+    G
+    should_be_installed "nokogiri 1.4.2"
+  end
+
+  it "doesn't install gems tagged w/ another platform inline" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "nokogiri", :platform => :#{not_local_tag}
+    G
     should_not_be_installed "nokogiri 1.4.2"
   end
 end

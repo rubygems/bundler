@@ -10,6 +10,7 @@ describe "bundle install with gem sources" do
           group :emo do
             gem "activesupport", "2.3.5"
           end
+          gem "thin", :groups => [:emo]
         G
       end
 
@@ -17,8 +18,19 @@ describe "bundle install with gem sources" do
         should_be_installed "rack 1.0.0"
       end
 
-      it "installs gems in other groups" do
+      it "installs gems in a group block into that group" do
         should_be_installed "activesupport 2.3.5"
+
+        run("require 'activesupport'; puts ACTIVESUPPORT",
+          :default, :expect_err => true)
+        @err.should =~ /no such file to load -- activesupport/
+      end
+
+      it "installs gems with inline :groups into those groups" do
+        should_be_installed "thin 1.0"
+
+        run("require 'thin'; puts THIN", :default, :expect_err => true)
+        @err.should =~ /no such file to load -- thin/
       end
 
       it "sets up everything if Bundler.setup is used with no groups" do
@@ -27,6 +39,9 @@ describe "bundle install with gem sources" do
 
         out = run("require 'activesupport'; puts ACTIVESUPPORT")
         out.should == '2.3.5'
+
+        out = run("require 'thin'; puts THIN")
+        out.should == '1.0'
       end
     end
 
@@ -165,6 +180,11 @@ describe "bundle install with gem sources" do
 
           it "does not install the gem w/ option --without emo lolercoaster" do
             bundle "install --without emo lolercoaster"
+            should_not_be_installed "activesupport 2.3.5"
+          end
+
+          it "does not install the gem w/ option --without 'emo lolercoaster'" do
+            bundle "install --without 'emo lolercoaster'"
             should_not_be_installed "activesupport 2.3.5"
           end
         end

@@ -276,7 +276,8 @@ module Bundler
         @allow_remote = false
 
         if options["path"]
-          @path = Pathname.new(options["path"]).expand_path(Bundler.root)
+          @path = Pathname.new(options["path"])
+          @path = @path.expand_path(Bundler.root) unless @path.relative?
         end
 
         @name = options["name"]
@@ -326,8 +327,10 @@ module Bundler
       def load_spec_files
         index = Index.new
 
-        if File.directory?(path)
-          Dir["#{path}/#{@glob}"].each do |file|
+        expanded_path = path.expand_path
+
+        if File.directory?(expanded_path)
+          Dir["#{expanded_path}/#{@glob}"].each do |file|
             spec = Bundler.load_gemspec(file)
             if spec
               spec.loaded_from = file.to_s
@@ -344,14 +347,14 @@ module Bundler
               s.platform = Gem::Platform::RUBY
               s.summary  = "Fake gemspec for #{@name}"
               s.relative_loaded_from = "#{@name}.gemspec"
-              if path.join("bin").exist?
-                binaries = path.join("bin").children.map{|c| c.basename.to_s }
+              if expanded_path.join("bin").exist?
+                binaries = expanded_path.join("bin").children.map{|c| c.basename.to_s }
                 s.executables = binaries
               end
             end
           end
         else
-          raise PathError, "The path `#{path}` does not exist."
+          raise PathError, "The path `#{expanded_path}` does not exist."
         end
 
         index
@@ -600,7 +603,7 @@ module Bundler
         if cached?
           return if has_revision_cached?
           Bundler.ui.info "Updating #{uri}"
-          in_cache { git %|fetch --force --quiet "#{uri}" refs/heads/*:refs/heads/*| }
+          in_cache { git %|fetch --force --quiet --tags "#{uri}" refs/heads/*:refs/heads/*| }
         else
           Bundler.ui.info "Fetching #{uri}"
           FileUtils.mkdir_p(cache_path.dirname)
@@ -614,7 +617,7 @@ module Bundler
           git %|clone --no-checkout "#{cache_path}" "#{path}"|
         end
         Dir.chdir(path) do
-          git %|fetch --force --quiet "#{cache_path}"|
+          git %|fetch --force --quiet --tags "#{cache_path}"|
           git "reset --hard #{revision}"
 
           if @submodules

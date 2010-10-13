@@ -156,7 +156,11 @@ module Bundler
     def install(path = nil)
       opts = options.dup
       opts[:without] ||= []
-      opts[:without].map! { |g| g.to_sym }
+      if opts[:without].size == 1
+        opts[:without].map!{|g| g.split(" ") }
+        opts[:without].flatten!
+      end
+      opts[:without].map!{|g| g.to_sym }
 
 
       ENV['BUNDLE_GEMFILE'] = File.expand_path(opts[:gemfile]) if opts[:gemfile]
@@ -190,8 +194,6 @@ module Bundler
       end
 
       if opts[:deployment] || opts[:frozen]
-        Bundler.settings[:frozen] = '1'
-
         unless Bundler.default_lockfile.exist?
           flag = opts[:deployment] ? '--deployment' : '--frozen'
           raise ProductionError, "The #{flag} flag requires a Gemfile.lock. Please make " \
@@ -202,6 +204,8 @@ module Bundler
         if Bundler.root.join("vendor/cache").exist?
           opts[:local] = true
         end
+
+        Bundler.settings[:frozen] = '1'
       end
 
       # Can't use Bundler.settings for this because settings needs gemfile.dirname
@@ -227,7 +231,7 @@ module Bundler
       end
     rescue GemNotFound => e
       if Bundler.definition.no_sources?
-        Bundler.ui.warn "Your Gemfile doesn't have any sources. You can add one with a line like 'source :gemcutter'"
+        Bundler.ui.warn "Your Gemfile doesn't have any sources. You can add one with a line like 'source :rubygems'"
       end
       raise e
     end

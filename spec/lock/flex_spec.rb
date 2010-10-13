@@ -375,7 +375,7 @@ describe "the lockfile format" do
     G
   end
 
-  it "stores relative paths when the path is provided in a relative fashion" do
+  it "stores relative paths when the path is provided in a relative fashion and in Gemfile dir" do
     build_lib "foo", :path => bundled_app('foo')
 
     install_gemfile <<-G
@@ -386,6 +386,31 @@ describe "the lockfile format" do
     lockfile_should_be <<-G
       PATH
         remote: foo
+        specs:
+          foo (1.0)
+
+      GEM
+        specs:
+
+      PLATFORMS
+        #{generic(Gem::Platform.local)}
+
+      DEPENDENCIES
+        foo
+    G
+  end
+
+  it "stores relative paths when the path is provided in a relative fashion and is above Gemfile dir" do
+    build_lib "foo", :path => bundled_app(File.join('..', 'foo'))
+
+    install_gemfile <<-G
+      path "../foo"
+      gem "foo"
+    G
+
+    lockfile_should_be <<-G
+      PATH
+        remote: ../foo
         specs:
           foo (1.0)
 

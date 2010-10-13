@@ -40,6 +40,7 @@ RSpec.configure do |config|
 
   config.filter_run :focus => true
   config.run_all_when_everything_filtered = true
+  config.alias_example_to :fit, :focus => true
 
   original_wd       = Dir.pwd
   original_path     = ENV['PATH']
