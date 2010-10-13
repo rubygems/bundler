@@ -212,7 +212,7 @@ module Bundler
     end
 
     def read_file(file)
-      File.open(file, "rb") { |file| file.read }
+      File.open(file, "rb") { |f| f.read }
     end
 
     def load_gemspec(file)
