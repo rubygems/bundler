@@ -76,11 +76,6 @@ module Bundler
       executables = specs.map { |s| s.executables }.flatten
       Gem.source_index # ensure RubyGems is fully loaded
 
-     ::Kernel.class_eval do
-        private
-        def gem(*) ; end
-      end
-
       ::Kernel.send(:define_method, :gem) do |dep, *reqs|
         if executables.include? File.basename(caller.first.split(':').first)
           return
@@ -113,6 +108,7 @@ module Bundler
 
       # Yeah, talk about a hack
       source_index_class = (class << Gem::SourceIndex ; self ; end)
+      source_index_class.send(:remove_method, :from_gems_in)
       source_index_class.send(:define_method, :from_gems_in) do |*args|
         source_index = Gem::SourceIndex.new
         source_index.spec_dirs = *args
@@ -122,7 +118,9 @@ module Bundler
 
       # OMG more hacks
       gem_class = (class << Gem ; self ; end)
+      gem_class.send(:remove_method, :refresh)
       gem_class.send(:define_method, :refresh) { }
+      gem_class.send(:remove_method, :bin_path)
       gem_class.send(:define_method, :bin_path) do |name, *args|
         exec_name, *reqs = args
 
