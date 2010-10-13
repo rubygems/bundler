@@ -471,12 +471,12 @@ describe "bundle install with git sources" do
       end
 
       install_gemfile <<-G
-        source "http://#{gem_repo1}"
+        source "file://#{gem_repo1}"
         gem "bar", :path => "#{lib_path('bar')}"
       G
 
       install_gemfile <<-G
-        source "http://#{gem_repo1}"
+        source "file://#{gem_repo1}"
         gem "bar", :git => "#{lib_path('bar')}"
       G
 
