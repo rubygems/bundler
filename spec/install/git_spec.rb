@@ -331,7 +331,8 @@ describe "bundle install with git sources" do
     bundle :install, :expect_err => true
 
     out.should include("An error has occurred in git")
-    err.should include("fatal: 'omgomg'")
+    err.should include("fatal")
+    err.should include("omgomg")
     err.should include("fatal: The remote end hung up unexpectedly")
   end
 
