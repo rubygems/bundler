@@ -119,10 +119,10 @@ code {
 }
 /* line 94 */
 #footer img:first-child {
-  -moz-box-shadow: blue 0 0 5px;
-  -webkit-box-shadow: blue 0 0 5px;
-  -o-box-shadow: blue 0 0 5px;
-  box-shadow: blue 0 0 5px;
+  -moz-box-shadow: blue 0 0 5px 0;
+  -webkit-box-shadow: blue 0 0 5px 0;
+  -o-box-shadow: blue 0 0 5px 0;
+  box-shadow: blue 0 0 5px 0;
 }
 /* line 97 */
 #footer img:last-child {
@@ -237,6 +237,7 @@ ul.bullet a:last-child {
   text-align: center;
   background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0%, #6ecf36), color-stop(100%, #4e9326));
   background-image: -moz-linear-gradient(top, #6ecf36 0%, #4e9326 100%);
+  background-image: linear-gradient(top, #6ecf36 0%, #4e9326 100%);
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
   -o-border-radius: 5px;
@@ -248,6 +249,7 @@ ul.bullet a:last-child {
 .bullet a:hover {
   background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0%, #4e9326), color-stop(100%, #35641a));
   background-image: -moz-linear-gradient(top, #4e9326 0%, #35641a 100%);
+  background-image: linear-gradient(top, #4e9326 0%, #35641a 100%);
 }
 /* line 170 */
 .bullet .how {

@@ -59,6 +59,7 @@
     <a href="#SOURCES-source-">SOURCES (#source)</a>
     <a href="#GEMS-gem-">GEMS (#gem)</a>
     <a href="#BLOCK-FORM-OF-GIT-PATH-GROUP-and-PLATFORMS">BLOCK FORM OF GIT, PATH, GROUP and PLATFORMS</a>
+    <a href="#GEMSPEC-gemspec-">GEMSPEC (#gemspec)</a>
     <a href="#SOURCE-PRIORITY">SOURCE PRIORITY</a>
     </div>
 
@@ -322,6 +323,25 @@ end
 and <code>:submodules</code> options may be passed to the <code>git</code> method, and
 all gems in the block will inherit those options.</p>
 
+<h2 id="GEMSPEC-gemspec-">GEMSPEC (#gemspec)</h2>
+
+<p>If you wish to use Bundler to help install dependencies for a gem while it is
+being developed, use the <code>gemspec</code> method to pull in the dependencies listed in
+the <code>.gemspec</code> file.</p>
+
+<p>The <code>gemspec</code> method adds any runtime dependencies as gem requirements in the
+default group. It also adds development dependencies as gem requirements in the
+<code>development</code> group. Finally, it adds a gem requirement on your project (<code>:path
+=&gt; '.'</code>). In conjunction with <code>Bundler.setup</code>, this allows you to require project
+files in your test code as you would if the project were installed as a gem; you
+need not manipulate the load path manually or require project files via relative
+paths.</p>
+
+<p>The <code>gemspec</code> method supports optional <code>:path</code>, <code>:name</code>, and <code>:development_group</code>
+options, which control where bundler looks for the <code>.gemspec</code>, what named
+<code>.gemspec</code> it uses (if more than one is present), and which group development
+dependencies are included in.</p>
+
 <h2 id="SOURCE-PRIORITY">SOURCE PRIORITY</h2>
 
 <p>When attempting to locate a gem to satisfy a gem requirement,
@@ -341,7 +361,7 @@ declared in the <code>Gemfile</code>.</li>
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'></li>
-    <li class='tc'>September 2010</li>
+    <li class='tc'>October 2010</li>
     <li class='tr'>Gemfile(5)</li>
   </ol>
 
