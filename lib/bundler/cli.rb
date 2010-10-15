@@ -230,6 +230,10 @@ module Bundler
                         "`#{path}` directory and run `bundle install --system`"
       end
     rescue GemNotFound => e
+      if opts[:local]
+        Bundler.ui.warn "Some gems seem to be missing from your vendor/cache directory."
+      end
+
       if Bundler.definition.no_sources?
         Bundler.ui.warn "Your Gemfile doesn't have any sources. You can add one with a line like 'source :rubygems'"
       end
