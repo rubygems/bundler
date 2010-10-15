@@ -20,7 +20,9 @@
         </div>
         <br />
         <div id="standalone">
-          <h2>Bundler's Purpose and Rationale</h2>
+          <h2 id="bundlers-purpose-and-rationale">
+            Bundler's Purpose and Rationale
+          </h2>
           <p>
             We designed bundler to make it easy to share your code across a number of development,
             staging and production machines. Of course, you know how to share your own application
@@ -64,7 +66,7 @@
             any needed gems to your system, bundler writes a snapshot of all of the gems and
             versions that it installed to <code>Gemfile.lock</code>.
           </p>
-          <h2>
+          <h2 id="setting-up-your-application-to-use-bundler">
             Setting Up Your Application to Use Bundler
           </h2>
           <p>
@@ -108,7 +110,9 @@
             larger <code>Gemfile</code>s, using <code>Bundler.require</code> allows you to skip
             repeating a large stack of requirements.
           </p>
-          <h2>Grouping Your Dependencies</h2>
+          <h2 id="grouping-your-dependencies">
+            Grouping Your Dependencies
+          </h2>
           <p>
             You'll sometimes have groups of gems that only make sense in particular environments.
             For instance, you might develop your app (at an early stage) using SQLite, but deploy it
@@ -158,7 +162,9 @@
             place in your app. You might do this because requiring a certain gem takes some time,
             and you don't need it every time you boot your application.
           </p>
-          <h2>Checking Your Code into Version Control</h2>
+          <h2 id="checking-your-code-into-version-control">
+            Checking Your Code into Version Control
+          </h2>
           <p>
             After developing your application for a while, check in the application together with
             the <code>Gemfile</code> and <code>Gemfile.lock</code> snapshot. Now, your repository
@@ -191,7 +197,9 @@
             in that folder and checked in to your source control. This is an <strong>optional</strong>
             step, and not recommended, due to the increase in size of your source control repository.
           </p>
-          <h2>Sharing Your Application With Other Developers</h2>
+          <h2 id="sharing-your-application-with-other-developers">
+            Sharing Your Application With Other Developers
+          </h2>
           <p>
             When your co-developers (or you on another machine) check out your code, it will come
             with the exact versions of all the third-party code your application used on the machine
@@ -209,7 +217,9 @@
             relieves a large maintenance burden from application developers, because all machines
             always run the exact same third-party code.
           </p>
-          <h2>Updating a Dependency</h2>
+          <h2 id="updating-a-dependency">
+            Updating a Dependency
+          </h2>
           <p>
             Of course, at some point, you might want to update the version of a particular
             dependency your application relies on. For instance, you might want to update
@@ -277,7 +287,9 @@
             to boot, and bundler will print out an error instructing you to run <code>bundle
             install</code>.
           </p>
-          <h2>Updating a Gem Without Modifying the Gemfile</h2>
+          <h2 id="updating-a-gem-without-modyfying-the-gemfile">
+            Updating a Gem Without Modifying the Gemfile
+          </h2>
           <p>
             Sometimes, you want to update a dependency without modifying the Gemfile. For example,
             you might want to update to the latest version of <code>rack-cache</code>. Because you
@@ -310,7 +322,9 @@
             number of the third-party packages you depend on have released new versions since you
             last did a full update.
           </p>
-          <h2>Deploying Your Application</h2>
+          <h2 id="deploying-your-application">
+            Deploying Your Application
+          </h2>
           <p>
             When you run <code>bundle install</code>, bundler will (by default), install your gems
             to your system repository of gems. This means that they will show up in <code>gem
@@ -380,7 +394,9 @@
             successfully booted your application (or run your tests) since the last time you changed
             your <code>Gemfile</code>.
           </p>
-          <h2>FAQ: Why Can't I Just Specify Only <code>=</code> Dependencies?</h2>
+          <h2 id="faq-1">
+            FAQ: Why Can't I Just Specify Only <code>=</code> Dependencies?
+          </h2>
           <p>
             <strong>Q:</strong> I understand the value of locking my gems down to specific versions,
             but why can't I just specify <code>=</code> versions for all my dependencies in the
@@ -405,7 +421,9 @@
             version number, while still getting the benefits of ensuring that your application
             always runs with exactly the same versions of all third-party code.
           </p>
-          <h2>FAQ: Why Can't I Just Submodule Everything?</h2>
+          <h2 id="faq-2">
+            FAQ: Why Can't I Just Submodule Everything?
+          </h2>
           <p>
             <strong>Q:</strong> I don't understand why I need bundler to manage my gems in this
             manner. Why can't I just get the gems I need and stick them in submodules, then put each
@@ -435,7 +453,9 @@
             Bottom line: even though it might seem simpler at first glance, it is decidedly
             significantly more complex.
           </p>
-          <h2>FAQ: Why Is Bundler Downloading Gems From <code>--without</code> Groups?</h2>
+          <h2 id="faq-3">
+            FAQ: Why Is Bundler Downloading Gems From <code>--without</code> Groups?
+          </h2>
           <p>
             <strong>Q:</strong> I ran <code>bundle install --without production</code> and bundler
             is still downloading the gems in the <code>:production</code> group. Why?
@@ -481,7 +501,9 @@
             the possibility of a difficult **installation** process for a gem that you only use in
             production (or in development).
           </p>
-          <h2>FAQ: I Have a C Extension That Requires Special Flags to Install</h2>
+          <h2 id="faq-4">
+            FAQ: I Have a C Extension That Requires Special Flags to Install
+          </h2>
           <p>
             <strong>Q</strong>: I have a C extension gem, such as <code>mysql</code>, which requires
             special flags in order to compile and install. How can I pass these flags into the
@@ -503,7 +525,9 @@
             a result, once you specify the necessary build flags for a gem, you can successfully
             install that gem as many times as necessary.
           </p>
-          <h2>Summary</h2>
+          <h2 id="summary">
+            Summary
+          </h2>
           <h2>A Simple Bundler Workflow</h2>
           <ul>
             <li>
@@ -571,7 +595,9 @@
               <pre class='sunburst'>$ bundle install --deployment&#x000A;</pre>
             </li>
           </ul>
-          <h2>Notes</h2>
+          <h2 id="notes">
+            Notes
+          </h2>
           <p>
             [1] For instance, if <code>rails 3.0.0</code> depended on <code>rack 2.0</code>, that
             gem would still satisfy the requirement of <code>rack-cache</code>, which declares
