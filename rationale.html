@@ -15,11 +15,12 @@
           </a>
         </div>
         <div id="intro">
-          If you just want to know our recommended workflow, and don't care about the rationale, feel free to jump to the summary below.
+          If you just want to know our recommended workflow, and don't care about the rationale, feel
+          free to jump to the summary below.
         </div>
         <br />
         <div id="standalone">
-          <h1>Bundler's Purpose and Rationale</h1>
+          <h2>Bundler's Purpose and Rationale</h2>
           <p>
             We designed bundler to make it easy to share your code across a number of development,
             staging and production machines. Of course, you know how to share your own application
@@ -34,8 +35,9 @@
           <pre class="sunburst">source <span class="String"><span class="String">&quot;</span>http://rubygems.org<span class="String">&quot;</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">&quot;</span>rails<span class="String">&quot;</span></span>, <span class="String"><span class="String">&quot;</span>3.0.0.rc<span class="String">&quot;</span></span>&#x000A;gem <span class="String"><span class="String">&quot;</span>rack-cache<span class="String">&quot;</span></span>&#x000A;gem <span class="String"><span class="String">&quot;</span>nokogiri<span class="String">&quot;</span></span>, <span class="String"><span class="String">&quot;</span>~&gt; 1.4.2<span class="String">&quot;</span></span>&#x000A;</pre>
           <p>
             This <code>Gemfile</code> says a few things. First, it says that bundler should look for gems
-            declared in the <code>Gemfile</code> at <code>http://rubygems.org</code>. You can declare multiple
-            Rubygems sources, and bundler will look for gems in the order you declared the sources.
+            declared in the <code>Gemfile</code> at <code>http://rubygems.org</code>. You can declare
+            multiple Rubygems sources, and bundler will look for gems in the order you declared the
+            sources.
           </p>
           <p>
             Next, you declare a few dependencies:
@@ -50,11 +52,11 @@
           </p>
           <pre class='sunburst'>$ bundle install    # <code>bundle</code> is a shortcut for <code>bundle install</code>&#x000A;</pre>
           <p>
-            Bundler will connect to <code>rubygems.org</code> (and any other sources that you declared), and
-            find a list of all of the required gems that meet the requirements you specified. Because all of
-            the gems in your <code>Gemfile</code> have dependencies of their own (and some of those have their
-            own dependencies), running <code>bundle install</code> on the <code>Gemfile</code> above will
-            install quite a few gems.
+            Bundler will connect to <code>rubygems.org</code> (and any other sources that you declared),
+            and find a list of all of the required gems that meet the requirements you specified. Because
+            all of the gems in your <code>Gemfile</code> have dependencies of their own (and some of
+            those have their own dependencies), running <code>bundle install</code> on the
+            <code>Gemfile</code> above will install quite a few gems.
           </p>
           <pre class='sunburst'>$ bundle install&#x000A;Fetching source index for http://gemcutter.org/&#x000A;Using rake (0.8.7)&#x000A;Using abstract (1.0.0)&#x000A;Installing activesupport (3.0.0.rc)&#x000A;Using builder (2.1.2)&#x000A;Using i18n (0.4.1)&#x000A;Installing activemodel (3.0.0.rc)&#x000A;Using erubis (2.6.6)&#x000A;Using rack (1.2.1)&#x000A;Installing rack-mount (0.6.9)&#x000A;Using rack-test (0.5.4)&#x000A;Using tzinfo (0.3.22)&#x000A;Installing actionpack (3.0.0.rc)&#x000A;Using mime-types (1.16)&#x000A;Using polyglot (0.3.1)&#x000A;Using treetop (1.4.8)&#x000A;Using mail (2.2.5)&#x000A;Installing actionmailer (3.0.0.rc)&#x000A;Using arel (0.4.0)&#x000A;Installing activerecord (3.0.0.rc)&#x000A;Installing activeresource (3.0.0.rc)&#x000A;Using bundler (1.0.0.rc.3)&#x000A;Installing nokogiri (1.4.3.1) with native extensions&#x000A;Installing rack-cache (0.5.2)&#x000A;Installing thor (0.14.0)&#x000A;Installing railties (3.0.0.rc)&#x000A;Installing rails (3.0.0.rc)&#x000A;Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.&#x000A;</pre>
           <p>
@@ -62,9 +64,9 @@
             any needed gems to your system, bundler writes a snapshot of all of the gems and
             versions that it installed to <code>Gemfile.lock</code>.
           </p>
-          <h1>
+          <h2>
             Setting Up Your Application to Use Bundler
-          </h1>
+          </h2>
           <p>
             Bundler makes sure that Ruby can find all of the gems in the <code>Gemfile</code>
             (and all of their dependencies). If your app is a Rails 3 app, your default application
@@ -106,7 +108,7 @@
             larger <code>Gemfile</code>s, using <code>Bundler.require</code> allows you to skip
             repeating a large stack of requirements.
           </p>
-          <h1>Grouping Your Dependencies</h1>
+          <h2>Grouping Your Dependencies</h2>
           <p>
             You'll sometimes have groups of gems that only make sense in particular environments.
             For instance, you might develop your app (at an early stage) using SQLite, but deploy it
@@ -156,7 +158,7 @@
             place in your app. You might do this because requiring a certain gem takes some time,
             and you don't need it every time you boot your application.
           </p>
-          <h1>Checking Your Code into Version Control</h1>
+          <h2>Checking Your Code into Version Control</h2>
           <p>
             After developing your application for a while, check in the application together with
             the <code>Gemfile</code> and <code>Gemfile.lock</code> snapshot. Now, your repository
@@ -177,7 +179,19 @@
             The next time you run <code>bundle install</code> on the same machine, bundler will see
             that it already has all of the dependencies you need, and skip the installation process.
           </p>
-          <h1>Sharing Your Application With Other Developers</h1>
+          <p>
+            Do not check in the <code>.bundle</code> directory, or any of the files inside it. Those
+            files are specific to each particular machine, and are used to persist installation options
+            between runs of the <code>bundle install</code> command.
+          </p>
+          <p>
+            If you have run <code>bundle pack</code>, the gems (although not the git gems) required
+            by your bundle will be downloaded into <code>vendor/cache</code>. Bundler can run without
+            connecting to the internet (or the Rubygems server) if all the gems you need are present
+            in that folder and checked in to your source control. This is an <strong>optional</strong>
+            step, and not recommended, due to the increase in size of your source control repository.
+          </p>
+          <h2>Sharing Your Application With Other Developers</h2>
           <p>
             When your co-developers (or you on another machine) check out your code, it will come
             with the exact versions of all the third-party code your application used on the machine
@@ -195,7 +209,7 @@
             relieves a large maintenance burden from application developers, because all machines
             always run the exact same third-party code.
           </p>
-          <h1>Updating a Dependency</h1>
+          <h2>Updating a Dependency</h2>
           <p>
             Of course, at some point, you might want to update the version of a particular
             dependency your application relies on. For instance, you might want to update
@@ -263,7 +277,7 @@
             to boot, and bundler will print out an error instructing you to run <code>bundle
             install</code>.
           </p>
-          <h1>Updating a Gem Without Modifying the Gemfile</h1>
+          <h2>Updating a Gem Without Modifying the Gemfile</h2>
           <p>
             Sometimes, you want to update a dependency without modifying the Gemfile. For example,
             you might want to update to the latest version of <code>rack-cache</code>. Because you
@@ -296,7 +310,7 @@
             number of the third-party packages you depend on have released new versions since you
             last did a full update.
           </p>
-          <h1>Deploying Your Application</h1>
+          <h2>Deploying Your Application</h2>
           <p>
             When you run <code>bundle install</code>, bundler will (by default), install your gems
             to your system repository of gems. This means that they will show up in <code>gem
@@ -331,6 +345,11 @@
               Bundler will not use gems already installed to your system, even if they exist.
             </li>
             <li>
+              If you have run <code>bundle pack</code>, checked in the <code>vendor/cache</code>
+              directory, and do not have any git gems, Bundler will not contact the internet while
+              installing your bundle.
+            </li>
+            <li>
               Bundler will require a <code>Gemfile.lock</code> snapshot, and fail if you did not
               provide one.
             </li>
@@ -361,7 +380,7 @@
             successfully booted your application (or run your tests) since the last time you changed
             your <code>Gemfile</code>.
           </p>
-          <h1>FAQ: Why Can't I Just Specify Only <code>=</code> Dependencies?</h1>
+          <h2>FAQ: Why Can't I Just Specify Only <code>=</code> Dependencies?</h2>
           <p>
             <strong>Q:</strong> I understand the value of locking my gems down to specific versions,
             but why can't I just specify <code>=</code> versions for all my dependencies in the
@@ -386,7 +405,7 @@
             version number, while still getting the benefits of ensuring that your application
             always runs with exactly the same versions of all third-party code.
           </p>
-          <h1>FAQ: Why Can't I Just Submodule Everything?</h1>
+          <h2>FAQ: Why Can't I Just Submodule Everything?</h2>
           <p>
             <strong>Q:</strong> I don't understand why I need bundler to manage my gems in this
             manner. Why can't I just get the gems I need and stick them in submodules, then put each
@@ -416,7 +435,7 @@
             Bottom line: even though it might seem simpler at first glance, it is decidedly
             significantly more complex.
           </p>
-          <h1>FAQ: Why Is Bundler Downloading Gems From <code>--without</code> Groups?</h1>
+          <h2>FAQ: Why Is Bundler Downloading Gems From <code>--without</code> Groups?</h2>
           <p>
             <strong>Q:</strong> I ran <code>bundle install --without production</code> and bundler
             is still downloading the gems in the <code>:production</code> group. Why?
@@ -462,7 +481,7 @@
             the possibility of a difficult **installation** process for a gem that you only use in
             production (or in development).
           </p>
-          <h1>FAQ: I Have a C Extension That Requires Special Flags to Install</h1>
+          <h2>FAQ: I Have a C Extension That Requires Special Flags to Install</h2>
           <p>
             <strong>Q</strong>: I have a C extension gem, such as <code>mysql</code>, which requires
             special flags in order to compile and install. How can I pass these flags into the
@@ -484,7 +503,7 @@
             a result, once you specify the necessary build flags for a gem, you can successfully
             install that gem as many times as necessary.
           </p>
-          <h1>Summary</h1>
+          <h2>Summary</h2>
           <h2>A Simple Bundler Workflow</h2>
           <ul>
             <li>
@@ -552,7 +571,7 @@
               <pre class='sunburst'>$ bundle install --deployment&#x000A;</pre>
             </li>
           </ul>
-          <h1>Notes</h1>
+          <h2>Notes</h2>
           <p>
             [1] For instance, if <code>rails 3.0.0</code> depended on <code>rack 2.0</code>, that
             gem would still satisfy the requirement of <code>rack-cache</code>, which declares
