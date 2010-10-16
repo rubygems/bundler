@@ -472,6 +472,13 @@ describe "bundle install with gem sources" do
     end
 
     ["install vendor", "install --path vendor"].each do |install|
+      if install == "install vendor"
+        it "displays the deprecation warning for path as an argument to install" do
+          bundle install
+          out.should include("The path argument to `bundle install` is deprecated.")
+        end
+      end
+
       it "does not use available system gems with bundle #{install}" do
         bundle install
         should_be_installed "rack 1.0.0"
