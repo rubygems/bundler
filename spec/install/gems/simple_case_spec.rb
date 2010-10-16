@@ -95,7 +95,7 @@ describe "bundle install with gem sources" do
     end
 
     it "raises an appropriate error when gems are specified using symbols" do
-      status = install_gemfile(<<-G, :exit_status => true)
+      status = install_gemfile(<<-G, :exitstatus => true)
         source "file://#{gem_repo1}"
         gem :rack
       G

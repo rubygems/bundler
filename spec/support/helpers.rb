@@ -46,7 +46,7 @@ module Spec
 
     def bundle(cmd, options = {})
       expect_err  = options.delete(:expect_err)
-      exit_status = options.delete(:exit_status)
+      exitstatus = options.delete(:exitstatus)
       options["no-color"] = true unless options.key?("no-color") || cmd.to_s[0..3] == "exec"
 
       env = (options.delete(:env) || {}).map{|k,v| "#{k}='#{v}' "}.join
@@ -56,7 +56,7 @@ module Spec
       gemfile = File.expand_path('../../../bin/bundle', __FILE__)
       cmd = "#{env}#{Gem.ruby} -I#{lib} #{gemfile} #{cmd}#{args}"
 
-      if exit_status
+      if exitstatus
         sys_status(cmd)
       else
         sys_exec(cmd, expect_err){|i| yield i if block_given? }

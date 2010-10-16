@@ -97,7 +97,7 @@ describe "bundle exec" do
       gem "rack"
     G
 
-    bundle "exec foobarbaz", :exit_status => true
+    bundle "exec foobarbaz", :exitstatus => true
     @exitstatus.should == 127
     out.should include("bundler: command not found: foobarbaz")
     out.should include("Install missing gem binaries with `bundle install`")
@@ -109,7 +109,7 @@ describe "bundle exec" do
     G
 
     bundle "exec touch foo"
-    bundle "exec ./foo", :exit_status => true
+    bundle "exec ./foo", :exitstatus => true
     @exitstatus.should == 126
     out.should include("bundler: not executable: ./foo")
   end
@@ -221,7 +221,7 @@ describe "bundle exec" do
     end
 
     it "does not explode with --disable-shared-gems" do
-      bundle "exec bundle check", :exit_status => true
+      bundle "exec bundle check", :exitstatus => true
       exitstatus.should == 0
     end
 
