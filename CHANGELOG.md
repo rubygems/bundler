@@ -1,6 +1,22 @@
-## 1.0.2 (October 2, 2010)
+## 1.0.3 (October 15, 2010)
 
 Bugfixes:
+
+  - Use bitwise or in #hash to reduce the chance of overflow
+  - `bundle update` now works with :git + :tag updates
+  - Record relative :path options in the Gemfile.lock
+  - :groups option on gem method in Gemfile now works
+  - Add #platform method and :platform option to Gemfile DSL
+  - --without now accepts a quoted, space-separated list
+  - Installing after --deployment with no lock is now possible
+  - Binstubs can now be symlinked
+  - Print warning if cache for --local install is missing gems
+  - Improve output when installing to a path
+  - The tests all pass! Yay!
+
+## 1.0.2 (October 2, 2010)
+
+Bugfix:
 
   - Actually include the man pages in the gem, so help works
 
