@@ -19,8 +19,13 @@ begin
     t.rspec_opts = %w(-fs --color)
     t.ruby_opts  = %w(-w)
   end
-
   task :spec => :build
+
+  namespace :ci do
+    desc "Run specs without color"
+    RSpec::Core::RakeTask.new(:spec)
+    task :spec => :build
+  end
 
   namespace :spec do
     task :set_sudo do
@@ -37,6 +42,12 @@ begin
 
     desc "Run the spec suite with the sudo tests"
     task :sudo => ["set_sudo", "clean", "spec"]
+
+    desc "Install dependencies to run the specs"
+    task :deps do
+      sh "gem install ronn --no-ri --no-rdoc"
+      sh "gem install rspec --pre --no-ri --no-rdoc"
+    end
 
     namespace :rubygems do
       # Rubygems 1.3.5, 1.3.6, and HEAD specs
