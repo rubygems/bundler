@@ -461,7 +461,7 @@ describe "bundle install with gem sources" do
     it "behaves like bundle install vendor/bundle with --deployment" do
       bundle "install"
       bundle "install --deployment"
-      out.should include("Your bundle was installed to `vendor/bundle`")
+      out.should include("It was installed into ./vendor/bundle")
       should_be_installed "rack 1.0.0"
       bundled_app("vendor/bundle").should exist
     end
@@ -479,7 +479,7 @@ describe "bundle install with gem sources" do
 
       it "prints a warning to let the user know what has happened with bundle #{install}" do
         bundle install
-        out.should include("Your bundle was installed to `vendor`")
+        out.should include("It was installed into ./vendor")
       end
 
       it "disallows #{install} --system" do
