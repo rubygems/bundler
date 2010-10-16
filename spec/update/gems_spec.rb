@@ -84,3 +84,29 @@ describe "bundle update without a Gemfile.lock" do
     should_be_installed "rack 1.0.0"
   end
 end
+
+describe "bundle update when a gem depends on a newer version of bundler" do
+  before(:each) do
+    build_repo2 do
+      build_gem "rails", "3.0.1" do |s|
+        s.add_dependency "bundler", Bundler::VERSION.succ
+      end
+    end
+
+    gemfile <<-G
+      source "file://#{gem_repo2}"
+      gem "rails", "3.0.1"
+    G
+  end
+
+  it "should not explode" do
+    bundle "update"
+    err.should be_empty
+  end
+
+  it "should explain that bundler conflicted" do
+    bundle "update"
+    out.should_not =~ /In snapshot/
+    out.should =~ /Current Bundler version/
+  end
+end

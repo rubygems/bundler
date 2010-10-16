@@ -198,8 +198,9 @@ module Bundler
         # Force the current
         if current.name == 'bundler' && !existing
           existing = search(DepProxy.new(Gem::Dependency.new('bundler', VERSION), Gem::Platform::RUBY)).first
-          activated['bundler'] = existing
           raise GemNotFound, %Q{Bundler could not find gem "bundler" (#{VERSION})} unless existing
+          existing.required_by << existing
+          activated['bundler'] = existing
         end
 
         if current.requirement.satisfied_by?(existing.version)
@@ -230,9 +231,9 @@ module Bundler
           parent ||= existing.required_by.last if existing.respond_to?(:required_by)
           # We track the spot where the current gem was activated because we need
           # to keep a list of every spot a failure happened.
-          debug { "    -> Jumping to: #{parent.name}" }
           if parent
-            throw parent.name, existing.respond_to?(:required_by) && existing.required_by.last.name
+            debug { "    -> Jumping to: #{parent.name}" }
+            throw parent.name, existing.respond_to?(:required_by) && existing.required_by.last && existing.required_by.last.name
           else
             # The original set of dependencies conflict with the base set of specs
             # passed to the resolver. This is by definition an impossible resolve.
@@ -413,8 +414,11 @@ module Bundler
 
           o << gem_message(requirement)
 
+          # If the origin is "bundler", the conflict is us
+          if origin.name == "bundler"
+            o << "  Current Bundler version:\n"
           # If the origin is a LockfileParser, it does not respond_to :required_by
-          unless origin.respond_to?(:required_by) && required_by = origin.required_by.first
+          elsif !(origin.respond_to?(:required_by) && origin.required_by.first)
             o << "  In snapshot (Gemfile.lock):\n"
           end
 
