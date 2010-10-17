@@ -418,7 +418,7 @@ module Bundler
           if origin.name == "bundler"
             o << "  Current Bundler version:\n"
           # If the origin is a LockfileParser, it does not respond_to :required_by
-          elsif !(origin.respond_to?(:required_by) && origin.required_by.first)
+          elsif !origin.respond_to?(:required_by) || !(required_by = origin.required_by.first)
             o << "  In snapshot (Gemfile.lock):\n"
           end
 
