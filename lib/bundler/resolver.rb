@@ -417,12 +417,19 @@ module Bundler
           # If the origin is "bundler", the conflict is us
           if origin.name == "bundler"
             o << "  Current Bundler version:\n"
+            newer_bundler_required = requirement.requirement > Gem::Requirement.new(origin.version)
           # If the origin is a LockfileParser, it does not respond_to :required_by
           elsif !origin.respond_to?(:required_by) || !(required_by = origin.required_by.first)
             o << "  In snapshot (Gemfile.lock):\n"
           end
 
           o << gem_message(origin)
+
+          # If the bundle wants a newer bundler than the running bundler, explain
+          if origin.name == "bundler" && newer_bundler_required
+            o << "Your version of Bundler is older than the one requested by the Gemfile.\n"
+            o << "Perhaps you need to update Bundler by running `gem install bundler`."
+          end
 
         # origin is nil if the required gem and version cannot be found in any of
         # the specified sources
@@ -453,6 +460,7 @@ module Bundler
           end
 
         end
+        o
       end
     end
   end

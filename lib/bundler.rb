@@ -49,7 +49,7 @@ module Bundler
   WINDOWS = RbConfig::CONFIG["host_os"] =~ %r!(msdos|mswin|djgpp|mingw)!
   NULL    = WINDOWS ? "NUL" : "/dev/null"
 
-
+  # Internal errors, should be rescued
   class VersionConflict  < BundlerError
     attr_reader :conflicts
 
@@ -61,7 +61,6 @@ module Bundler
     status_code(6)
   end
 
-  # Internal errors, should be rescued
   class InvalidSpecSet < StandardError; end
 
   class << self
