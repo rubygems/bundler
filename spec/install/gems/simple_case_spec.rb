@@ -601,7 +601,7 @@ describe "bundle install with gem sources" do
         source "file://#{gem_repo1}"
         gem "rack"
       G
-      should_not_be_installed "bundler 0.9.1"
+      should_not_be_installed "bundler #{Bundler::VERSION}"
     end
 
     it "causes a conflict if explicitly requesting a different version" do
