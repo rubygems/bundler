@@ -231,7 +231,7 @@ module Bundler
           parent ||= existing.required_by.last if existing.respond_to?(:required_by)
           # We track the spot where the current gem was activated because we need
           # to keep a list of every spot a failure happened.
-          if parent
+          if parent && parent.name != 'bundler'
             debug { "    -> Jumping to: #{parent.name}" }
             throw parent.name, existing.respond_to?(:required_by) && existing.required_by.last && existing.required_by.last.name
           else
