@@ -617,7 +617,7 @@ describe "bundle install with gem sources" do
           In Gemfile:
             bundler (= 0.9.2)
 
-          In snapshot (Gemfile.lock):
+          Current Bundler version:
             bundler (#{Bundler::VERSION})
         E
       out.should == nice_error
