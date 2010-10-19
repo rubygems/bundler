@@ -95,7 +95,7 @@ describe "bundle install with gem sources" do
     end
 
     it "raises an appropriate error when gems are specified using symbols" do
-      status = install_gemfile(<<-G, :exit_status => true)
+      status = install_gemfile(<<-G, :exitstatus => true)
         source "file://#{gem_repo1}"
         gem :rack
       G
@@ -461,7 +461,7 @@ describe "bundle install with gem sources" do
     it "behaves like bundle install vendor/bundle with --deployment" do
       bundle "install"
       bundle "install --deployment"
-      out.should include("Your bundle was installed to `vendor/bundle`")
+      out.should include("It was installed into ./vendor/bundle")
       should_be_installed "rack 1.0.0"
       bundled_app("vendor/bundle").should exist
     end
@@ -472,6 +472,13 @@ describe "bundle install with gem sources" do
     end
 
     ["install vendor", "install --path vendor"].each do |install|
+      if install == "install vendor"
+        it "displays the deprecation warning for path as an argument to install" do
+          bundle install
+          out.should include("The path argument to `bundle install` is deprecated.")
+        end
+      end
+
       it "does not use available system gems with bundle #{install}" do
         bundle install
         should_be_installed "rack 1.0.0"
@@ -479,7 +486,7 @@ describe "bundle install with gem sources" do
 
       it "prints a warning to let the user know what has happened with bundle #{install}" do
         bundle install
-        out.should include("Your bundle was installed to `vendor`")
+        out.should include("It was installed into ./vendor")
       end
 
       it "disallows #{install} --system" do
@@ -594,7 +601,7 @@ describe "bundle install with gem sources" do
         source "file://#{gem_repo1}"
         gem "rack"
       G
-      should_not_be_installed "bundler 0.9.1"
+      should_not_be_installed "bundler #{Bundler::VERSION}"
     end
 
     it "causes a conflict if explicitly requesting a different version" do
@@ -610,7 +617,7 @@ describe "bundle install with gem sources" do
           In Gemfile:
             bundler (= 0.9.2)
 
-          In snapshot (Gemfile.lock):
+          Current Bundler version:
             bundler (#{Bundler::VERSION})
         E
       out.should == nice_error

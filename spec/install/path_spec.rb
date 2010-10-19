@@ -122,7 +122,7 @@ describe "bundle install with explicit source paths" do
       s.write "bar.gemspec"
     end
 
-    install_gemfile <<-G, :exit_status => true
+    install_gemfile <<-G, :exitstatus => true
       gemspec :path => "#{lib_path("foo")}"
     G
 
@@ -135,7 +135,7 @@ describe "bundle install with explicit source paths" do
       s.write "bar.gemspec"
     end
 
-    install_gemfile <<-G, :exit_status => true
+    install_gemfile <<-G, :exitstatus => true
       gemspec :path => "#{lib_path("foo")}", :name => "foo"
     G
 

@@ -457,7 +457,7 @@ describe "bundle install with git sources" do
     G
 
     bundle "install"
-    bundle "install", :exit_status => true
+    bundle "install", :exitstatus => true
     exitstatus.should == 0
   end
 
@@ -546,7 +546,7 @@ describe "bundle install with git sources" do
 
       simulate_new_machine
 
-      bundle "install --deployment", :exit_status => true
+      bundle "install --deployment", :exitstatus => true
       exitstatus.should == 0
     end
   end

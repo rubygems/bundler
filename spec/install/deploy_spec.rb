@@ -20,7 +20,7 @@ describe "install with --deployment or --frozen" do
 
   it "works after you try to deploy without a lock" do
     bundle "install --deployment"
-    bundle :install, :exit_status => true
+    bundle :install, :exitstatus => true
     exitstatus.should == 0
     should_be_installed "rack 1.0"
   end
@@ -40,12 +40,12 @@ describe "install with --deployment or --frozen" do
     end
 
     it "works with the --deployment flag if you didn't change anything" do
-      bundle "install --deployment", :exit_status => true
+      bundle "install --deployment", :exitstatus => true
       exitstatus.should == 0
     end
 
     it "works with the --frozen flag if you didn't change anything" do
-      bundle "install --frozen", :exit_status => true
+      bundle "install --frozen", :exitstatus => true
       exitstatus.should == 0
     end
 

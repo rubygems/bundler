@@ -1,6 +1,7 @@
 $:.unshift File.expand_path('../vendor', __FILE__)
 require 'open3'
 require 'thor'
+require 'bundler'
 
 module Bundler
   class GemHelper

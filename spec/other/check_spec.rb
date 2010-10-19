@@ -7,7 +7,7 @@ describe "bundle check" do
       gem "rails"
     G
 
-    bundle :check, :exit_status => true
+    bundle :check, :exitstatus => true
     check @exitstatus.should == 0
     out.should == "The Gemfile's dependencies are satisfied"
   end
@@ -54,7 +54,7 @@ describe "bundle check" do
       gem "rails"
     G
 
-    bundle :check, :exit_status => true
+    bundle :check, :exitstatus => true
     check @exitstatus.should > 0
     out.should include("could not be satisfied")
   end
@@ -88,7 +88,7 @@ describe "bundle check" do
     G
 
     bundle "install --without foo"
-    bundle "check", :exit_status => true
+    bundle "check", :exitstatus => true
     check @exitstatus.should == 0
     out.should include("The Gemfile's dependencies are satisfied")
   end
@@ -106,7 +106,7 @@ describe "bundle check" do
       gem "rack"
     G
 
-    bundle "check", :exit_status => true
+    bundle "check", :exitstatus => true
     out.should include("* rack (1.0.0)")
     @exitstatus.should == 1
   end
@@ -174,7 +174,7 @@ describe "bundle check" do
   end
 
   it "outputs an error when the default Gemfile is not found" do
-    bundle :check, :exit_status => true
+    bundle :check, :exitstatus => true
     check @exitstatus.should == 10
     out.should include("Could not locate Gemfile")
   end
@@ -206,7 +206,7 @@ describe "bundle check" do
 
     it "returns success when the Gemfile is satisfied" do
       bundle :install
-      bundle :check, :exit_status => true
+      bundle :check, :exitstatus => true
       check @exitstatus.should == 0
       out.should == "The Gemfile's dependencies are satisfied"
     end

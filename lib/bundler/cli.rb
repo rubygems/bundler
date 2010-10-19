@@ -220,16 +220,27 @@ module Bundler
 
       Installer.install(Bundler.root, Bundler.definition, opts)
       Bundler.load.cache if Bundler.root.join("vendor/cache").exist?
-      Bundler.ui.confirm "Your bundle is complete! " +
-        "Use `bundle show [gemname]` to see where a bundled gem is installed."
 
-      Bundler.ui.confirm "\nYour bundle was installed to `#{Bundler.settings[:path]}`" if Bundler.settings[:path]
+      if Bundler.settings[:path]
+        relative_path = Bundler.settings[:path]
+        relative_path = "./" + relative_path unless relative_path[0] == ?/
+        Bundler.ui.confirm "Your bundle is complete! " +
+          "It was installed into #{relative_path}"
+      else
+        Bundler.ui.confirm "Your bundle is complete! " +
+          "Use `bundle show [gemname]` to see where a bundled gem is installed."
+      end
 
       if path
-        Bundler.ui.warn "\nIf you meant to install it to your system, please remove the\n" \
-                        "`#{path}` directory and run `bundle install --system`"
+        Bundler.ui.warn "The path argument to `bundle install` is deprecated. " +
+          "It will be removed in version 1.1. " +
+          "Please use `bundle install --path #{path}` instead."
       end
     rescue GemNotFound => e
+      if opts[:local]
+        Bundler.ui.warn "Some gems seem to be missing from your vendor/cache directory."
+      end
+
       if Bundler.definition.no_sources?
         Bundler.ui.warn "Your Gemfile doesn't have any sources. You can add one with a line like 'source :rubygems'"
       end
