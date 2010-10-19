@@ -127,6 +127,9 @@ module Bundler
         FileUtils.rm(bin)
       end
 
+      git_dirs = Dir["#{Gem.dir}/bundler/gems/*"]
+      stale_git_dirs = git_dirs - specs.collect {|spec| spec.full_gem_path }
+
       gem_dirs = Dir["#{Gem.dir}/gems/*"]
       stale_gem_dirs = gem_dirs - specs.collect {|spec| spec.full_gem_path }
 
@@ -134,12 +137,23 @@ module Bundler
         full_name = Pathname.new(gem_dir).basename.to_s
 
         FileUtils.rm_rf(gem_dir)
-        FileUtils.rm("#{Gem.dir}/specifications/#{full_name}.gemspec")
+        specification_file = "#{Gem.dir}/specifications/#{full_name}.gemspec"
+        FileUtils.rm(specification_file) if File.exists?(specification_file)
 
         parts   = full_name.split('-')
         name    = parts[0..-2].join('-')
         version = parts.last
         "#{name} (#{version})"
+      end + stale_git_dirs.collect do |gem_dir|
+        full_name = Pathname.new(gem_dir).basename.to_s
+
+        FileUtils.rm_rf(gem_dir)
+
+        parts    = full_name.split('-')
+        name     = parts[0..-3].join('-')
+        revision = parts[-1]
+        version  = parts[-2]
+        "#{name} (#{version} #{revision})"
       end
     end
 
