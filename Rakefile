@@ -43,12 +43,6 @@ begin
     desc "Run the spec suite with the sudo tests"
     task :sudo => ["set_sudo", "clean", "spec"]
 
-    desc "Install dependencies to run the specs"
-    task :deps do
-      sh "gem install ronn --no-ri --no-rdoc"
-      sh "gem install rspec --pre --no-ri --no-rdoc"
-    end
-
     namespace :rubygems do
       # Rubygems 1.3.5, 1.3.6, and HEAD specs
       rubyopt = ENV["RUBYOPT"]
@@ -100,7 +94,15 @@ begin
 
 rescue LoadError
   task :spec do
-    abort "Run `gem install rspec --pre` to be able to run specs"
+    abort "Run `rake spec:deps` to be able to run specs"
+  end
+end
+
+namespace :spec do
+  desc "Ensure spec dependencies are installed"
+  task :deps do
+    sh "gem list ronn | (grep 'ronn' 1> /dev/null) || gem install ronn --no-ri --no-rdoc"
+    sh "gem list rspec | (grep 'rspec (2.0' 1> /dev/null) || gem install rspec --pre --no-ri --no-rdoc"
   end
 end
 
