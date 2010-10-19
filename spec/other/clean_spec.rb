@@ -29,6 +29,8 @@ describe "bundle clean" do
     vendored_gems("specifications/thin-1.0.gemspec").should exist
     vendored_gems("specifications/rack-1.0.0.gemspec").should exist
     vendored_gems("specifications/foo-1.0.gemspec").should_not exist
+
+    vendored_gems("bin/rackup").should exist
   end
 
   it "removes old version of gem if unused" do
@@ -60,6 +62,8 @@ describe "bundle clean" do
     vendored_gems("specifications/foo-1.0.gemspec").should exist
     vendored_gems("specifications/rack-1.0.0.gemspec").should exist
     vendored_gems("specifications/rack-0.9.1.gemspec").should_not exist
+
+    vendored_gems("bin/rackup").should exist
   end
 
   it "removes new version of gem if unused" do
@@ -91,6 +95,8 @@ describe "bundle clean" do
     vendored_gems("specifications/foo-1.0.gemspec").should exist
     vendored_gems("specifications/rack-0.9.1.gemspec").should exist
     vendored_gems("specifications/rack-1.0.0.gemspec").should_not exist
+
+    vendored_gems("bin/rackup").should exist
   end
 
   it "remove gems in bundle without groups" do

@@ -116,8 +116,20 @@ module Bundler
     end
 
     def clean
+      gem_bins = Dir["#{Gem.dir}/bin/*"]
+      stale_gem_bins = gem_bins - specs.collect do |spec|
+        spec.executables.collect do |executable|
+          "#{Gem.dir}/#{spec.bindir}/#{executable}"
+        end
+      end.flatten
+
+      stale_gem_bins.each do |bin|
+        FileUtils.rm(bin)
+      end
+
       gem_dirs = Dir["#{Gem.dir}/gems/*"]
       stale_gem_dirs = gem_dirs - specs.collect {|spec| spec.full_gem_path }
+
       stale_gem_dirs.collect do |gem_dir|
         full_name = Pathname.new(gem_dir).basename.to_s
 
