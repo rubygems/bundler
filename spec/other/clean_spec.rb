@@ -191,4 +191,17 @@ describe "bundle clean" do
 
     vendored_gems("bin/rackup").should exist
   end
+
+  it "displays an error when used without --path" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "rack", "1.0.0"
+    G
+
+    bundle :install
+    bundle :clean
+
+    out.should == "Can only use bundle clean when --path is set"
+  end
 end

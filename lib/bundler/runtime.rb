@@ -116,6 +116,7 @@ module Bundler
     end
 
     def clean
+      return false if Bundler.settings[:path] == nil
       gem_bins = Dir["#{Gem.dir}/bin/*"]
       stale_gem_bins = gem_bins - specs.collect do |spec|
         spec.executables.collect do |executable|
