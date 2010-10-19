@@ -23,7 +23,10 @@ begin
 
   namespace :ci do
     desc "Run specs without color"
-    RSpec::Core::RakeTask.new(:spec)
+    RSpec::Core::RakeTask.new(:spec) do |t|
+      t.rspec_opts = %w(-fs)
+      t.ruby_opts  = %w(-w)
+    end
     task :spec => :build
   end
 
