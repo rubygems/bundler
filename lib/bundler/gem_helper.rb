@@ -5,7 +5,7 @@ require 'thor'
 module Bundler
   class GemHelper
     def self.install_tasks(opts = nil)
-      dir = caller.find{|c| /Rakefile:/}[/^(.*?)\/Rakefile:/, 1]
+      dir = File.dirname(Rake.application.rakefile_location)
       self.new(dir, opts && opts[:name]).install
     end
 
