@@ -159,5 +159,36 @@ describe "bundle clean" do
     vendored_gems("bin/rackup").should exist
   end
 
-  it "throws an error when used without --path"
+  it "removes old git gems" do
+    build_git "foo"
+    revision = revision_for(lib_path("foo-1.0"))
+
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "rack", "1.0.0"
+      git "#{lib_path('foo-1.0')}" do
+        gem "foo"
+      end
+    G
+
+    bundle "install --path vendor"
+
+    update_git "foo"
+    revision2 = revision_for(lib_path("foo-1.0"))
+
+    bundle :update
+    bundle :install
+    bundle :clean
+
+    out.should == "Removing foo (1.0 #{revision[0..11]})"
+
+    vendored_gems("gems/rack-1.0.0").should exist
+    vendored_gems("bundler/gems/foo-1.0-#{revision[0..11]}").should_not exist
+    vendored_gems("bundler/gems/foo-1.0-#{revision2[0..11]}").should exist
+
+    vendored_gems("specifications/rack-1.0.0.gemspec").should exist
+
+    vendored_gems("bin/rackup").should exist
+  end
 end
