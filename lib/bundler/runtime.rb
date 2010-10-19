@@ -115,6 +115,22 @@ module Bundler
       end
     end
 
+    def clear
+      gem_dirs = Dir["#{Gem.dir}/gems/*"]
+      stale_gem_dirs = gem_dirs - specs.collect {|spec| spec.full_gem_path }
+      stale_gem_dirs.collect do |gem_dir|
+        full_name = Pathname.new(gem_dir).basename.to_s
+
+        FileUtils.rm_rf(gem_dir)
+        FileUtils.rm("#{Gem.dir}/specifications/#{full_name}.gemspec")
+
+        parts   = full_name.split('-')
+        name    = parts[0..-2].join('-')
+        version = parts.last
+        "#{name} (#{version})"
+      end
+    end
+
   private
 
     def cache_path

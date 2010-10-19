@@ -496,6 +496,13 @@ module Bundler
       File.expand_path(File.join(File.dirname(__FILE__), 'templates'))
     end
 
+    desc "clean", "Cleans up unused gems in your bundler directory"
+    def clean
+      Bundler.load.clear.each do |gem|
+        Bundler.ui.info "Removing #{gem}"
+      end
+    end
+
   private
 
     def have_groff?
