@@ -498,7 +498,7 @@ module Bundler
 
     desc "clean", "Cleans up unused gems in your bundler directory"
     def clean
-      Bundler.load.clear.each do |gem|
+      Bundler.load.clean.each do |gem|
         Bundler.ui.info "Removing #{gem}"
       end
     end
