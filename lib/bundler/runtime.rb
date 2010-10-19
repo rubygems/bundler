@@ -115,7 +115,7 @@ module Bundler
       end
     end
 
-    def clear
+    def clean
       gem_dirs = Dir["#{Gem.dir}/gems/*"]
       stale_gem_dirs = gem_dirs - specs.collect {|spec| spec.full_gem_path }
       stale_gem_dirs.collect do |gem_dir|
