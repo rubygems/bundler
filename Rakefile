@@ -9,6 +9,7 @@ end
 
 begin
   require 'rspec/core/rake_task'
+  require 'ronn'
 
   desc "Run specs"
   RSpec::Core::RakeTask.new do |t|
@@ -93,7 +94,7 @@ begin
 
 rescue LoadError
   task :spec do
-    abort "Run `rake spec:deps` to be able to run specs"
+    abort "Run `rake spec:deps` to be able to run the specs"
   end
 end
 
