@@ -1,5 +1,4 @@
 $:.unshift File.expand_path('../vendor', __FILE__)
-require 'open3'
 require 'thor'
 require 'bundler'
 
@@ -40,8 +39,8 @@ module Bundler
 
     def build_gem
       file_name = nil
-      sh("gem build #{spec_path}") { |out, err|
-        raise err if !out[/Successfully/]
+      sh("gem build #{spec_path}") { |out, code|
+        raise out unless out[/Successfully/]
         file_name = File.basename(built_gem_path)
         FileUtils.mkdir_p(File.join(base, 'pkg'))
         FileUtils.mv(built_gem_path, 'pkg')
@@ -52,8 +51,8 @@ module Bundler
 
     def install_gem
       built_gem_path = build_gem
-      out, err, code = sh_with_code("gem install #{built_gem_path}")
-      raise err if err[/ERROR/]
+      out, code = sh_with_code("gem install #{built_gem_path}")
+      raise "Couldn't install gem, run `gem install #{built_gem_path}' for more detailed output" unless out[/Successfully installed/]
       Bundler.ui.confirm "#{name} (#{version}) installed"
     end
 
@@ -69,7 +68,8 @@ module Bundler
 
     protected
     def rubygem_push(path)
-      sh("gem push #{path}")
+      out, status = sh("gem push #{path}")
+      raise "Gem push failed due to lack of RubyGems.org credentials." if out[/Enter your RubyGems.org credentials/]
       Bundler.ui.confirm "Pushed #{name} #{version} to rubygems.org"
     end
 
@@ -84,8 +84,9 @@ module Bundler
     end
 
     def perform_git_push(options = '')
-      out, err, code = sh_with_code "git push --quiet#{options}"
-      raise err unless err == ''
+      cmd = "git push --quiet#{options}"
+      out, code = sh_with_code(cmd)
+      raise "Couldn't git push. `#{cmd}' failed with the following output:\n\n#{out}\n" unless code == 0
     end
 
     def guard_already_tagged
@@ -129,20 +130,19 @@ module Bundler
     end
 
     def sh(cmd, &block)
-      out, err, code = sh_with_code(cmd, &block)
-      code == 0 ? out : raise(out.empty? ? err : out)
+      out, code = sh_with_code(cmd, &block)
+      code == 0 ? out : raise(out.empty? ? "Running `#{cmd}' failed. Run this command directly for more detailed output." : out)
     end
 
     def sh_with_code(cmd, &block)
-      outbuf, errbuf = '', ''
+      outbuf = ''
       Dir.chdir(base) {
-        stdin, stdout, stderr = *Open3.popen3(cmd)
+        outbuf = `#{cmd} 2>&1`
         if $? == 0
-          outbuf, errbuf = stdout.read, stderr.read
-          block.call(outbuf, errbuf) if block
+          block.call(outbuf) if block
         end
       }
-      [outbuf, errbuf, $?]
+      [outbuf, $?]
     end
   end
 end
