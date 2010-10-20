@@ -10,10 +10,6 @@ end
 begin
   require 'rspec/core/rake_task'
 
-  task :clear_tmp do
-    FileUtils.rm_rf(File.expand_path("../tmp", __FILE__))
-  end
-
   desc "Run specs"
   RSpec::Core::RakeTask.new do |t|
     t.rspec_opts = %w(-fs --color)
