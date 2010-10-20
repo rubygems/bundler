@@ -16,7 +16,7 @@ begin
     t.rspec_opts = %w(-fs --color)
     t.ruby_opts  = %w(-w)
   end
-  task :spec => :build
+  task :spec => "man:build"
 
   namespace :ci do
     desc "Run specs without color"
@@ -24,7 +24,7 @@ begin
       t.rspec_opts = %w(-fs)
       t.ruby_opts  = %w(-w)
     end
-    task :spec => :build
+    task :spec => "man:build"
   end
 
   namespace :spec do
@@ -121,11 +121,11 @@ namespace :man do
       sh "groff -Wall -mtty-char -mandoc -Tascii #{roff} | col -b > #{roff}.txt"
     end
 
-    task :build_pages => "#{roff}.txt"
+    task :build_all_pages => "#{roff}.txt"
   end
 
   desc "Build the man pages"
-  task :build => "man:build_pages"
+  task :build => "man:build_all_pages"
 
   desc "Clean up from the built man pages"
   task :clean do
@@ -146,7 +146,5 @@ namespace :vendor do
     rm_rf "lib/bundler/vendor"
   end
 end
-
-task :build => "man:build"
 
 task :default => :spec
