@@ -28,6 +28,9 @@ begin
   end
 
   namespace :spec do
+    desc "Run the spec suite with the sudo tests"
+    task :sudo => ["set_sudo", "clean", "spec"]
+
     task :set_sudo do
       ENV['BUNDLER_SUDO_TESTS'] = '1'
     end
@@ -39,9 +42,6 @@ begin
         rm_rf 'tmp'
       end
     end
-
-    desc "Run the spec suite with the sudo tests"
-    task :sudo => ["set_sudo", "clean", "spec"]
 
     namespace :rubygems do
       # Rubygems 1.3.5, 1.3.6, and HEAD specs
