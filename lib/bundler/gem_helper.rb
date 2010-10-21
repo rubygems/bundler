@@ -100,7 +100,8 @@ module Bundler
     end
 
     def clean?
-      sh("git ls-files -dm").split("\n").size.zero?
+      out, code = sh_with_code("git diff --exit-code")
+      code == 0
     end
 
     def tag_version
