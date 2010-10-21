@@ -106,16 +106,12 @@ module Bundler
 
     def tag_version
       sh "git tag -am 'Version #{version}' #{version_tag}"
-      Bundler.ui.confirm "Tagged #{tagged_sha} with #{version_tag}"
+      Bundler.ui.confirm "Tagged #{version_tag}"
       yield if block_given?
     rescue
-      Bundler.ui.error "Untagged #{tagged_sha} with #{version_tag} due to error"
+      Bundler.ui.error "Untagged #{version_tag} due to error"
       sh "git tag -d #{version_tag}"
       raise
-    end
-
-    def tagged_sha
-      sh("git show-ref --tags #{version_tag}").split(' ').first[0, 8]
     end
 
     def version

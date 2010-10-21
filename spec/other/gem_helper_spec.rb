@@ -97,7 +97,7 @@ describe "Bundler::GemHelper tasks" do
 
       it "releases" do
         mock_build_message
-        mock_confirm_message /Tagged [\da-f]+ with v0.0.1/
+        mock_confirm_message /Tagged v0.0.1/
         mock_confirm_message "Pushed git commits and tags"
 
         @helper.should_receive(:rubygem_push).with(bundled_app('test/pkg/test-0.0.1.gem').to_s)
