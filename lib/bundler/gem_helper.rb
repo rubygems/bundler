@@ -39,7 +39,7 @@ module Bundler
 
     def build_gem
       file_name = nil
-      sh("gem build #{spec_path}") { |out, code|
+      sh("gem build -V #{spec_path}") { |out, code|
         raise out unless out[/Successfully/]
         file_name = File.basename(built_gem_path)
         FileUtils.mkdir_p(File.join(base, 'pkg'))
