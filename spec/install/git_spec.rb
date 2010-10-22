@@ -139,7 +139,7 @@ describe "bundle install with git sources" do
       out.should == "WIN"
     end
 
-    fit "works when the revision is a symbol" do
+    it "works when the revision is a symbol" do
       install_gemfile <<-G
         git "#{lib_path('foo-1.0')}", :ref => #{@revision.to_sym.inspect} do
           gem "foo"
