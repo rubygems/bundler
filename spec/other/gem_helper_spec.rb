@@ -88,8 +88,6 @@ describe "Bundler::GemHelper tasks" do
         Bundler.ui.stub(:confirm => nil, :error => nil) # silence messages
 
         Dir.chdir(@app) {
-          `mkdir #{gem_repo1}`
-          `cd #{gem_repo1}`
           `git init --bare`
           `git commit -a -m "initial commit"`
         }
