@@ -1,12 +1,19 @@
+# system crap
 .DS_Store
 .*.swp
+
+# files created by running the specs
 tmp
+
+# built gems
 pkg
 *.gem
+
+# rubinius bytecode
 *.rbc
 
+# output from ronn
 lib/bundler/man
 
-man/*
-!man/*.ronn
-!man/index.txt
+# output from ci_reporter
+spec/reports
