@@ -2,10 +2,10 @@ require 'bundler/dependency'
 
 module Bundler
   class Dsl
-    def self.evaluate(gemfile)
+    def self.evaluate(gemfile, lockfile, unlock)
       builder = new
       builder.instance_eval(Bundler.read_file(gemfile.to_s), gemfile.to_s, 1)
-      builder.to_definition
+      builder.to_definition(lockfile, unlock)
     end
 
     VALID_PLATFORMS = Bundler::Dependency::PLATFORM_MAP.keys.freeze

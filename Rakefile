@@ -9,25 +9,28 @@ end
 
 begin
   require 'rspec/core/rake_task'
-
-  task :clear_tmp do
-    FileUtils.rm_rf(File.expand_path("../tmp", __FILE__))
-  end
+  require 'ronn'
 
   desc "Run specs"
   RSpec::Core::RakeTask.new do |t|
     t.rspec_opts = %w(-fs --color)
     t.ruby_opts  = %w(-w)
   end
-  task :spec => :build
+  task :spec => "man:build"
 
   namespace :ci do
     desc "Run specs without color"
-    RSpec::Core::RakeTask.new(:spec)
-    task :spec => :build
+    RSpec::Core::RakeTask.new(:spec) do |t|
+      t.rspec_opts = %w(-fs)
+      t.ruby_opts  = %w(-w)
+    end
+    task :spec => "man:build"
   end
 
   namespace :spec do
+    desc "Run the spec suite with the sudo tests"
+    task :sudo => ["set_sudo", "clean", "spec"]
+
     task :set_sudo do
       ENV['BUNDLER_SUDO_TESTS'] = '1'
     end
@@ -38,15 +41,6 @@ begin
       else
         rm_rf 'tmp'
       end
-    end
-
-    desc "Run the spec suite with the sudo tests"
-    task :sudo => ["set_sudo", "clean", "spec"]
-
-    desc "Install dependencies to run the specs"
-    task :deps do
-      sh "gem install ronn --no-ri --no-rdoc"
-      sh "gem install rspec --pre --no-ri --no-rdoc"
     end
 
     namespace :rubygems do
@@ -100,7 +94,15 @@ begin
 
 rescue LoadError
   task :spec do
-    abort "Run `gem install rspec --pre` to be able to run specs"
+    abort "Run `rake spec:deps` to be able to run the specs"
+  end
+end
+
+namespace :spec do
+  desc "Ensure spec dependencies are installed"
+  task :deps do
+    sh "gem list ronn | (grep 'ronn' 1> /dev/null) || gem install ronn --no-ri --no-rdoc"
+    sh "gem list rspec | (grep 'rspec (2.0' 1> /dev/null) || gem install rspec --no-ri --no-rdoc"
   end
 end
 
@@ -119,11 +121,11 @@ namespace :man do
       sh "groff -Wall -mtty-char -mandoc -Tascii #{roff} | col -b > #{roff}.txt"
     end
 
-    task :build_pages => "#{roff}.txt"
+    task :build_all_pages => "#{roff}.txt"
   end
 
   desc "Build the man pages"
-  task :build => "man:build_pages"
+  task :build => "man:build_all_pages"
 
   desc "Clean up from the built man pages"
   task :clean do
@@ -144,7 +146,5 @@ namespace :vendor do
     rm_rf "lib/bundler/vendor"
   end
 end
-
-task :build => "man:build"
 
 task :default => :spec

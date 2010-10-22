@@ -14,10 +14,7 @@ module Bundler
         raise GemfileNotFound, "#{gemfile} not found"
       end
 
-      # TODO: move this back into DSL
-      builder = Dsl.new
-      builder.instance_eval(Bundler.read_file(gemfile.to_s), gemfile.to_s, 1)
-      builder.to_definition(lockfile, unlock)
+      Dsl.evaluate(gemfile, lockfile, unlock)
     end
 
 =begin
@@ -93,7 +90,8 @@ module Bundler
         specs = resolve.materialize(requested_dependencies)
 
         unless specs["bundler"].any?
-          bundler = index.search(Gem::Dependency.new('bundler', VERSION)).last
+          local = Bundler.settings[:frozen] ? rubygems_index : index
+          bundler = local.search(Gem::Dependency.new('bundler', VERSION)).last
           specs["bundler"] = bundler if bundler
         end
 
@@ -158,6 +156,14 @@ module Bundler
     def index
       @index ||= Index.build do |idx|
         @sources.each do |s|
+          idx.use s.specs
+        end
+      end
+    end
+
+    def rubygems_index
+      @rubygems_index ||= Index.build do |idx|
+        @sources.find_all{|s| s.is_a?(Source::Rubygems) }.each do |s|
           idx.use s.specs
         end
       end

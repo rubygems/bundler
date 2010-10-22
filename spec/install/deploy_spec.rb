@@ -34,6 +34,25 @@ describe "install with --deployment or --frozen" do
     should_be_installed "rack 1.0"
   end
 
+  it "works if you exclude a group with a git gem" do
+    build_git "foo"
+    gemfile <<-G
+      group :test do
+        gem "foo", :git => "#{lib_path('foo-1.0')}"
+      end
+    G
+    bundle :install
+    bundle "install --deployment --without test", :exitstatus => true
+    exitstatus.should == 0
+  end
+
+  it "works when you bundle exec bundle" do
+    bundle :install
+    bundle "install --deployment"
+    bundle "exec bundle check", :exitstatus => true
+    exitstatus.should == 0
+  end
+
   describe "with an existing lockfile" do
     before do
       bundle "install"
