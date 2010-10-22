@@ -461,9 +461,9 @@ module Bundler
       def initialize(options)
         super
         @uri        = options["uri"]
-        @ref        = options["ref"] || options["branch"] || options["tag"] || 'master'
-        @revision   = options["revision"]
-        @submodules = options["submodules"]
+        @ref        = (options["ref"] || options["branch"] || options["tag"] || 'master').to_s
+        @revision   = options["revision"].to_s
+        @submodules = options["submodules"].to_s
         @update     = false
       end
 
@@ -494,8 +494,8 @@ module Bundler
       alias == eql?
 
       def to_s
-        ref = @options["ref"] ? shortref_for_display(@options["ref"]) : @ref
-        "#{@uri} (at #{ref})"
+        ref = options["ref"] ? shortref_for_display(options["ref"]) : ref
+        "#{uri} (at #{ref})"
       end
 
       def name
@@ -568,11 +568,11 @@ module Bundler
       end
 
       def shortref_for_display(ref)
-        ref[0..6]
+        ref.to_s[0..6]
       end
 
       def shortref_for_path(ref)
-        ref[0..11]
+        ref.to_s[0..11]
       end
 
       def uri_hash
