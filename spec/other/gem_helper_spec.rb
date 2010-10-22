@@ -87,12 +87,17 @@ describe "Bundler::GemHelper tasks" do
       it 'raises an appropriate error if there is no git remote' do
         Bundler.ui.stub(:confirm => nil, :error => nil) # silence messages
 
-        Dir.chdir(@app) {
+        Dir.chdir(gem_repo1) {
           `git init --bare`
+        }
+        Dir.chdir(@app) {
+          `git init`
+          `git config user.email "you@example.com"`
+          `git config user.name "name"`
           `git commit -a -m "initial commit"`
         }
 
-        proc { @helper.release_gem }.should raise_error(/No destination configured to push to/)
+        proc { @helper.release_gem }.should raise_error
       end
 
       it "releases" do
@@ -102,8 +107,13 @@ describe "Bundler::GemHelper tasks" do
 
         @helper.should_receive(:rubygem_push).with(bundled_app('test/pkg/test-0.0.1.gem').to_s)
 
+        Dir.chdir(gem_repo1) {
+          `git init --bare`
+        }
         Dir.chdir(@app) {
-          `git init --bare #{gem_repo1}`
+          `git init`
+          `git config user.email "you@example.com"`
+          `git config user.name "name"`
           `git remote add origin file://#{gem_repo1}`
           `git commit -a -m "initial commit"`
           Open3.popen3("git push origin master") # use popen3 to silence output...

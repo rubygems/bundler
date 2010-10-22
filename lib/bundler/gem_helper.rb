@@ -84,7 +84,7 @@ module Bundler
     end
 
     def perform_git_push(options = '')
-      cmd = "git push --quiet#{options}"
+      cmd = "git push #{options}"
       out, code = sh_with_code(cmd)
       raise "Couldn't git push. `#{cmd}' failed with the following output:\n\n#{out}\n" unless code == 0
     end
@@ -110,7 +110,7 @@ module Bundler
       yield if block_given?
     rescue
       Bundler.ui.error "Untagged #{version_tag} due to error"
-      sh "git tag -d #{version_tag}"
+      sh_with_code "git tag -d #{version_tag}"
       raise
     end
 
