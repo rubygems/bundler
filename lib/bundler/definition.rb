@@ -14,10 +14,7 @@ module Bundler
         raise GemfileNotFound, "#{gemfile} not found"
       end
 
-      # TODO: move this back into DSL
-      builder = Dsl.new
-      builder.instance_eval(Bundler.read_file(gemfile.to_s), gemfile.to_s, 1)
-      builder.to_definition(lockfile, unlock)
+      Dsl.evaluate(gemfile, lockfile, unlock)
     end
 
 =begin
