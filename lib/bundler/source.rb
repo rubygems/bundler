@@ -460,10 +460,14 @@ module Bundler
 
       def initialize(options)
         super
+
+        # stringify options that could be set as symbols
+        %w(ref branch tag revision).each{|k| options[k] = options[k].to_s if options[k] }
+
         @uri        = options["uri"]
-        @ref        = (options["ref"] || options["branch"] || options["tag"] || 'master').to_s
-        @revision   = options["revision"].to_s
-        @submodules = options["submodules"].to_s
+        @ref        = options["ref"] || options["branch"] || options["tag"] || 'master'
+        @revision   = options["revision"]
+        @submodules = options["submodules"]
         @update     = false
       end
 
@@ -494,8 +498,8 @@ module Bundler
       alias == eql?
 
       def to_s
-        ref = options["ref"] ? shortref_for_display(options["ref"]) : ref
-        "#{uri} (at #{ref})"
+        sref = options["ref"] ? shortref_for_display(options["ref"]) : ref
+        "#{uri} (at #{sref})"
       end
 
       def name
@@ -568,11 +572,11 @@ module Bundler
       end
 
       def shortref_for_display(ref)
-        ref.to_s[0..6]
+        ref[0..6]
       end
 
       def shortref_for_path(ref)
-        ref.to_s[0..11]
+        ref[0..11]
       end
 
       def uri_hash
