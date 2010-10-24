@@ -45,6 +45,16 @@ describe "Bundler.load" do
     }.should raise_error(Bundler::GemfileNotFound, /omg\.rb/)
   end
 
+  it "does not find a Gemfile above the testing directory" do
+    bundler_gemfile = tmp.join("../Gemfile")
+    unless File.exists?(bundler_gemfile)
+      FileUtils.touch(bundler_gemfile)
+      @remove_bundler_gemfile = true
+    end
+    lambda { Bundler.load }.should raise_error(Bundler::GemfileNotFound)
+    bundler_gemfile.rmtree if @remove_bundler_gemfile
+  end
+
   describe "when called twice" do
     it "doesn't try to load the runtime twice" do
       system_gems "rack-1.0.0", "activesupport-2.3.5"

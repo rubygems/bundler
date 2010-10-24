@@ -39,6 +39,10 @@ module Bundler
       current  = File.expand_path(Dir.pwd)
 
       until !File.directory?(current) || current == previous
+        # avoid stepping above the tmp directory when testing
+        return nil if File.file?(File.join(current, 'bundler.gemspec'))
+
+        # otherwise return the Gemfile if it's there
         filename = File.join(current, 'Gemfile')
         return filename if File.file?(filename)
         current, previous = File.expand_path("..", current), current
