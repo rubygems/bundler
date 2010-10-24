@@ -499,12 +499,7 @@ module Bundler
     desc "clean", "Cleans up unused gems in your bundler directory"
     def clean
       clean_output = Bundler.load.clean
-      if clean_output.is_a?(Array)
-        clean_output.each do |gem|
-          Bundler.ui.info "Removing #{gem}"
-        end
-      else
-
+      if !clean_output
         Bundler.ui.error "Can only use bundle clean when --path is set"
       end
     end

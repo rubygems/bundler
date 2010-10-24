@@ -142,7 +142,11 @@ module Bundler
         parts   = full_name.split('-')
         name    = parts[0..-2].join('-')
         version = parts.last
-        "#{name} (#{version})"
+        output  = "#{name} (#{version})"
+
+        Bundler.ui.info "Removing #{output}"
+
+        output
       end + stale_git_dirs.collect do |gem_dir|
         full_name = Pathname.new(gem_dir).basename.to_s
 
@@ -152,7 +156,11 @@ module Bundler
         name     = parts[0..-3].join('-')
         revision = parts[-1]
         version  = parts[-2]
-        "#{name} (#{version} #{revision})"
+        output   = "#{name} (#{version} #{revision})"
+
+        Bundler.ui.info "Removing #{output}"
+
+        output
       end
     end
 
