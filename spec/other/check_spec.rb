@@ -173,6 +173,19 @@ describe "bundle check" do
     out.should == "The Gemfile's dependencies are satisfied"
   end
 
+  it "does not find a Gemfile outside of the source directory (when testing)" do
+    created_fake_gemfile = false
+    fake_gemfile_path = tmp.join('..', '..', 'Gemfile')
+    unless File.exists? fake_gemfile_path
+      FileUtils.touch(fake_gemfile_path)
+      created_fake_gemfile = true
+    end
+    bundle :check, :exitstatus => true
+    check @exitstatus.should == 10
+    out.should include("Could not locate Gemfile")
+    FileUtils.rm fake_gemfile_path if created_fake_gemfile
+  end
+
   it "outputs an error when the default Gemfile is not found" do
     bundle :check, :exitstatus => true
     check @exitstatus.should == 10
