@@ -12,47 +12,58 @@ describe "Bundler.load" do
     end
   end
 
-  it "provides a list of the env dependencies" do
-    gemfile <<-G
-      source "file://#{gem_repo1}"
-      gem "rack"
-    G
-
-    env = Bundler.load
-    env.dependencies.should have_dep("rack", ">= 0")
-  end
-
-  it "provides a list of the resolved gems" do
-    gemfile <<-G
-      source "file://#{gem_repo1}"
-      gem "rack"
-    G
-
-    env = Bundler.load
-    env.gems.should have_gem("rack-1.0.0", "bundler-#{Bundler::VERSION}")
-  end
-
-  it "raises an exception if the default gemfile is not found" do
-    lambda {
-      Bundler.load
-    }.should raise_error(Bundler::GemfileNotFound, /could not locate gemfile/i)
-  end
-
-  it "raises an exception if a specified gemfile is not found" do
-    lambda {
-      ENV['BUNDLE_GEMFILE'] = "omg.rb"
-      Bundler.load
-    }.should raise_error(Bundler::GemfileNotFound, /omg\.rb/)
-  end
-
-  it "does not find a Gemfile above the testing directory" do
-    bundler_gemfile = tmp.join("../Gemfile")
-    unless File.exists?(bundler_gemfile)
-      FileUtils.touch(bundler_gemfile)
-      @remove_bundler_gemfile = true
+  describe "with a gemfile" do
+    before(:each) do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
     end
-    lambda { Bundler.load }.should raise_error(Bundler::GemfileNotFound)
-    bundler_gemfile.rmtree if @remove_bundler_gemfile
+
+    it "provides a list of the env dependencies" do
+      Bundler.load.dependencies.should have_dep("rack", ">= 0")
+    end
+
+    it "provides a list of the resolved gems" do
+      Bundler.load.gems.should have_gem("rack-1.0.0", "bundler-#{Bundler::VERSION}")
+    end
+
+    it "ignores blank BUNDLE_GEMFILEs" do
+      lambda {
+        ENV['BUNDLE_GEMFILE'] = ""
+        Bundler.load
+      }.should_not raise_error(Bundler::GemfileNotFound)
+    end
+
+  end
+
+  describe "without a gemfile" do
+    it "raises an exception if the default gemfile is not found" do
+      lambda {
+        Bundler.load
+      }.should raise_error(Bundler::GemfileNotFound, /could not locate gemfile/i)
+    end
+
+    it "raises an exception if a specified gemfile is not found" do
+      lambda {
+        ENV['BUNDLE_GEMFILE'] = "omg.rb"
+        Bundler.load
+      }.should raise_error(Bundler::GemfileNotFound, /omg\.rb/)
+    end
+
+    it "does not find a Gemfile above the testing directory" do
+      bundler_gemfile = tmp.join("../Gemfile")
+      unless File.exists?(bundler_gemfile)
+        FileUtils.touch(bundler_gemfile)
+        @remove_bundler_gemfile = true
+      end
+      begin
+        lambda { Bundler.load }.should raise_error(Bundler::GemfileNotFound)
+      ensure
+        bundler_gemfile.rmtree if @remove_bundler_gemfile
+      end
+    end
+
   end
 
   describe "when called twice" do
@@ -78,22 +89,6 @@ describe "Bundler.load" do
       out.split("\n").should == ["1.0.0", "no activesupport"]
     end
   end
-
-  # This is obviously not true on 1.9 thanks to the AWEOME! gem prelude :'(
-  it "does not invoke setup inside env.rb" do
-    install_gemfile <<-G
-      source "file://#{gem_repo1}"
-      gem "activesupport"
-    G
-
-    ruby <<-RUBY
-      require 'bundler'
-      Bundler.load
-      puts $LOAD_PATH.grep(/activesupport/i)
-    RUBY
-
-    out.should == ""
-  end if RUBY_VERSION < "1.9"
 
   describe "not hurting brittle rubygems" do
     it "does not inject #source into the generated YAML of the gem specs" do
