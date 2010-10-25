@@ -94,35 +94,26 @@ describe "bundle update" do
       out.should include("Your bundle is complete!")
     end
 
+
     it "fetches tags from the remote" do
-      bare_mock_remote_git = build_bare_git lib_path("remote")
-      remote_name = 'bar'
-
-      update_git "foo", :path => @git.path,
-        :remote => {:cmd => 'add', :name => remote_name, :args => "file://#{bare_mock_remote_git.path}"}
-
-      update_git "foo", :path => @git.path,
-        :remote => {:cmd => 'push', :name => remote_name}
+      build_git "foo"
+      @remote = build_git("bar", :bare => true)
+      update_git "foo", :remote => @remote.path
+      update_git "foo", :push => "master"
 
       install_gemfile <<-G
-        source "file://#{gem_repo2}"
-        gem 'foo', :git => "#{lib_path('remote')}"
-        gem 'rack'
+        gem 'foo', :git => "#{@remote.path}"
       G
 
-      update_git "foo", :path => @git.path, :branch => "bas"
-      update_git "foo", :path => @git.path, :remote => {:cmd => 'push', :name => remote_name, :ref => 'bas'}
-      update_git "foo", :path => @git.path, :tag => "fubar"
-      update_git "foo", :path => @git.path, :remote => {:cmd => 'push', :name => remote_name, :ref => 'fubar'}
-      update_git "foo", :path => @git.path, :remote => {:cmd => 'push', :name => remote_name, :ref => ':bas'}
+      # Create a new tag on the remote that needs fetching
+      update_git "foo", :tag => "fubar"
+      update_git "foo", :push => "fubar"
 
       gemfile <<-G
-        source "file://#{gem_repo2}"
-        gem 'foo', :git => "#{lib_path('remote')}", :tag => "fubar"
-        gem 'rack'
+        gem 'foo', :git => "#{@remote.path}", :tag => "fubar"
       G
 
-      bundle("update", :exitstatus => true)
+      bundle "update", :exitstatus => true
       exitstatus.should == 0
     end
 

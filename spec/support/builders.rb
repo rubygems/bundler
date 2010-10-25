@@ -294,20 +294,15 @@ module Spec
     end
 
     def build_git(name, *args, &block)
-      opts = Hash === args.last ? args.last : {}
-      spec = build_with(GitBuilder, name, args, &block)
+      opts = args.last.is_a?(Hash) ? args.last : {}
+      builder = opts[:bare] ? GitBareBuilder : GitBuilder
+      spec = build_with(builder, name, args, &block)
       GitReader.new(opts[:path] || lib_path(spec.full_name))
     end
 
-    def build_bare_git(path)
-      builder = GitBareBuilder.new(path).build
-      GitReader.new(builder.path)
-    end
-
     def update_git(name, *args, &block)
-      options  = args.last.is_a?(Hash) ? args.last : {}
-      builder = options.has_key?(:remote) ? GitRemote : GitUpdater
-      build_with(builder, name, args, &block)
+      opts = args.last.is_a?(Hash) ? args.last : {}
+      build_with(GitUpdater, name, args, &block)
     end
 
   private
@@ -491,29 +486,13 @@ module Spec
       end
     end
 
-    class GitBareBuilder
-      WINDOWS = Config::CONFIG["host_os"] =~ %r!(msdos|mswin|djgpp|mingw)!
-      NULL    = WINDOWS ? "NUL" : "/dev/null"
-
-      attr_reader :path
-
-      def initialize(path)
-        @path = path
-      end
-
-      def silently(str)
-        `#{str} 2>#{NULL}`
-      end
-
-      def build
-        FileUtils.rm_rf(@path)
-        FileUtils.mkdir_p(@path)
-
-        Dir.chdir(@path) do
-          silently("git init --bare")
+    class GitBareBuilder < LibBuilder
+      def _build(options)
+        path = options[:path] || _default_path
+        super(options.merge(:path => path))
+        Dir.chdir(path) do
+          `git init --bare`
         end
-
-        self
       end
     end
 
@@ -541,6 +520,10 @@ module Spec
             silently("git checkout #{branch}")
           elsif tag = options[:tag]
             `git tag #{tag}`
+          elsif options[:remote]
+            silently("git remote add origin file://#{options[:remote]}")
+          elsif options[:push]
+            silently("git push origin #{options[:push]}")
           end
 
           current_ref = `git rev-parse HEAD`.strip
@@ -550,25 +533,6 @@ module Spec
           super(options.merge(:path => libpath))
           `git add *`
           `git commit -m "BUMP"`
-        end
-      end
-    end
-
-    class GitRemote < GitUpdater
-      def _build(options)
-        lib_path = options[:path] || _default_path
-        remote_options = options.delete(:remote)
-
-        super
-
-        cmd = remote_options[:cmd]
-
-        Dir.chdir(lib_path) do
-          if cmd == 'push'
-            silently("git push #{remote_options[:name]} #{remote_options[:ref] || 'master'}")
-          else
-            silently("git remote #{cmd} #{remote_options[:name]} #{remote_options[:args]}")
-          end
         end
       end
     end
