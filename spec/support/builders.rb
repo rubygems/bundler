@@ -301,7 +301,6 @@ module Spec
     end
 
     def update_git(name, *args, &block)
-      opts = args.last.is_a?(Hash) ? args.last : {}
       build_with(GitUpdater, name, args, &block)
     end
 
