@@ -6,7 +6,19 @@ Instructions for common Bundler use-cases can be found on the [Bundler documenta
 
 After reading the documentation, try these troubleshooting steps:
 
-    rm -rf ~/.bundle/ ~/.gem/ .bundle/ vendor/cache/ Gemfile.lock
+    # remove user-specific gems and git repos
+    rm -rf ~/.bundle/ ~/.gem/
+
+    # remove project-specific settings and git repos
+    rm -rf .bundle/
+
+    # remove project-specific cached .gem files
+    rm -rf vendor/cache/
+
+    # remove the saved resolve of the Gemfile
+    rm -rf Gemfile.lock
+
+    # try to install one more time
     bundle install
 
 ## Reporting unresolved problems
