@@ -126,7 +126,7 @@ describe "bundle install with explicit source paths" do
       gemspec :path => "#{lib_path("foo")}"
     G
 
-    @exitstatus.should == 15
+    check exitstatus.should == 15
     out.should =~ /There are multiple gemspecs/
   end
 

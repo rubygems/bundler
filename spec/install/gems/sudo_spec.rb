@@ -17,7 +17,7 @@ describe "when using sudo" do
       G
 
       system_gem_path("gems/rack-1.0.0").should exist
-      system_gem_path("gems/rack-1.0.0").stat.uid.should == 0
+      check system_gem_path("gems/rack-1.0.0").stat.uid.should == 0
       should_be_installed "rack 1.0"
     end
 
@@ -33,7 +33,7 @@ describe "when using sudo" do
       G
 
       bundle_path.join("gems/rack-1.0.0").should exist
-      bundle_path.join("gems/rack-1.0.0").stat.uid.should == 0
+      check bundle_path.join("gems/rack-1.0.0").stat.uid.should == 0
       should_be_installed "rack 1.0"
     end
 

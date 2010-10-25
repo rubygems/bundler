@@ -21,7 +21,7 @@ describe "install with --deployment or --frozen" do
   it "works after you try to deploy without a lock" do
     bundle "install --deployment"
     bundle :install, :exitstatus => true
-    exitstatus.should == 0
+    check exitstatus.should == 0
     should_be_installed "rack 1.0"
   end
 

@@ -122,7 +122,7 @@ describe "bundle update" do
         G
 
         run "require 'submodule'"
-        out.should == 'GEM'
+        check out.should == 'GEM'
 
         install_gemfile <<-G
           git "#{lib_path('has_submodule-1.0')}", :submodules => true do
@@ -143,7 +143,7 @@ describe "bundle update" do
         G
 
         run "require 'submodule'"
-        out.should == 'GIT'
+        check out.should == 'GIT'
 
         install_gemfile <<-G
           git "#{lib_path('has_submodule-1.0')}" do

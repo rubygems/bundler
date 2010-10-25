@@ -190,7 +190,7 @@ describe "bundle check" do
     last_out = out
     3.times do |i|
       bundle :check
-      out.should == last_out
+      check out.should == last_out
       err.should be_empty
     end
   end

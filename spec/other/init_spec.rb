@@ -32,9 +32,9 @@ describe "bundle init" do
 
     gemfile = bundled_app("Gemfile").read
     gemfile.should =~ /source :gemcutter/
-    gemfile.scan(/gem "rack", "= 1.0.1"/).size.should == 1
-    gemfile.scan(/gem "rspec", "= 1.2"/).size.should == 1
-    gemfile.scan(/group :development/).size.should == 1
+    check gemfile.scan(/gem "rack", "= 1.0.1"/).size.should == 1
+    check gemfile.scan(/gem "rspec", "= 1.2"/).size.should == 1
+    check gemfile.scan(/group :development/).size.should == 1
   end
 
 end

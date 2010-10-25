@@ -38,7 +38,7 @@ describe "bundle install with gem sources" do
         check out.should == '1.0.0'
 
         out = run("require 'activesupport'; puts ACTIVESUPPORT")
-        out.should == '2.3.5'
+        check out.should == '2.3.5'
 
         out = run("require 'thin'; puts THIN")
         out.should == '1.0'
