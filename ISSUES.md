@@ -9,6 +9,9 @@ After reading the documentation, try these troubleshooting steps:
     # remove user-specific gems and git repos
     rm -rf ~/.bundle/ ~/.gem/
 
+    # remove system-wide git repos and git checkouts
+    rm -rf $GEM_HOME/bundler/ $GEM_HOME/cache/bundler/
+
     # remove project-specific settings and git repos
     rm -rf .bundle/
 
