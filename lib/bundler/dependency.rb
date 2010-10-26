@@ -108,7 +108,7 @@ module Bundler
     end
 
     def mswin?
-      # w0t?
+      !!(RBConfig::CONFIG["host_os"] =~ /mswin/)
     end
   end
 end
