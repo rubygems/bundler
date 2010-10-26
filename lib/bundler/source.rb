@@ -327,7 +327,7 @@ module Bundler
       def load_spec_files
         index = Index.new
 
-        expanded_path = path.expand_path
+        expanded_path = path.expand_path(Bundler.root)
 
         if File.directory?(expanded_path)
           Dir["#{expanded_path}/#{@glob}"].each do |file|
