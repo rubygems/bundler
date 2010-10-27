@@ -39,9 +39,11 @@ RSpec.configure do |config|
   config.include Spec::Platforms
   config.include Spec::Sudo
 
-  config.filter_run :focused => true
-  config.run_all_when_everything_filtered = true
-  config.alias_example_to :fit, :focused => true
+  unless ENV['BUNDLE_SPEC_CI']
+    config.filter_run :focused => true
+    config.run_all_when_everything_filtered = true
+    config.alias_example_to :fit, :focused => true
+  end
 
   original_wd       = Dir.pwd
   original_path     = ENV['PATH']
