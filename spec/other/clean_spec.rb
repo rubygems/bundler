@@ -161,6 +161,9 @@ shared_examples_for "bundle clean" do
     vendored_gems("bin/rackup").should exist
   end
 
+end
+
+share_examples_for "bundle clean without --path" do
   it "displays an error when used without --path" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
@@ -209,6 +212,7 @@ describe "clean" do
     end
 
     it_behaves_like "bundle clean"
+    it_behaves_like "bundle clean without --path"
 
     context "without groups" do
       def bundle_command
@@ -226,10 +230,27 @@ describe "clean" do
     end
 
     it_behaves_like "bundle clean"
+    it_behaves_like "bundle clean without --path"
 
     context "without groups" do
       def bundle_command
         bundle "install --clean --without test_group"
+      end
+
+      it_behaves_like "bundle clean without groups"
+    end
+  end
+
+  describe "bundle install --deployment" do
+    def bundle_command
+      bundle "install --deployment --path vendor"
+    end
+
+    it_behaves_like "bundle clean"
+
+    context "without groups" do
+      def bundle_command
+        bundle "install --deployment --path vendor --without test_group"
       end
 
       it_behaves_like "bundle clean without groups"
