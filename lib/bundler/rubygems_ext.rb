@@ -181,7 +181,7 @@ module Bundler
         return p
       end
 
-      GENERIC_CACHE[p] ||= GENERICS.find { |p2| p.os == p2.os } || Gem::Platform::RUBY
+      GENERIC_CACHE[p] ||= GENERICS.find { |p2| p.respond_to? :os ? p.os == p2.os : p == p2 } || Gem::Platform::RUBY
     end
   end
 
