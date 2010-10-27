@@ -177,11 +177,14 @@ module Bundler
     ]
 
     def generic(p)
-      if p == Gem::Platform::RUBY
-        return p
-      end
+      return p if p == Gem::Platform::RUBY
 
-      GENERIC_CACHE[p] ||= GENERICS.find { |p2| p.respond_to? :os ? p.os == p2.os : p == p2 } || Gem::Platform::RUBY
+      GENERIC_CACHE[p] ||= begin
+        found = GENERICS.find do |p2|
+          p.os == p2.os if p2.is_a?(Gem::Platform)
+        end
+        found || Gem::Platform::RUBY
+      end
     end
   end
 
