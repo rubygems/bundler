@@ -225,7 +225,7 @@ describe "Bundler.require with platform specific dependencies" do
 
     run "Bundler.require; puts RACK", :expect_err => true
 
-    out.should == "1.0.0"
+    check out.should == "1.0.0"
     err.should be_empty
   end
 end

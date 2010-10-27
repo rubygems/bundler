@@ -34,7 +34,7 @@ describe "bundle install with explicit source paths" do
     should_be_installed("foo 1.0")
   end
 
-  it "expands paths" do
+  fit "expands paths" do
     build_lib "foo"
 
     relative_path = lib_path('foo-1.0').relative_path_from(Pathname.new('~').expand_path)
@@ -44,6 +44,19 @@ describe "bundle install with explicit source paths" do
     G
 
     should_be_installed("foo 1.0")
+  end
+
+  fit "expands paths relative to Bundler.root" do
+    build_lib "foo", :path => bundled_app("foo-1.0")
+
+    install_gemfile <<-G
+      gem 'foo', :path => "./foo-1.0"
+    G
+
+    bundled_app("subdir").mkpath
+    Dir.chdir(bundled_app("subdir")) do
+      should_be_installed("foo 1.0")
+    end
   end
 
   it "installs dependencies from the path even if a newer gem is available elsewhere" do
@@ -126,7 +139,7 @@ describe "bundle install with explicit source paths" do
       gemspec :path => "#{lib_path("foo")}"
     G
 
-    @exitstatus.should == 15
+    check exitstatus.should == 15
     out.should =~ /There are multiple gemspecs/
   end
 

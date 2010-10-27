@@ -18,7 +18,7 @@ module Bundler
 
     def default_gemfile
       gemfile = find_gemfile
-      gemfile or raise GemfileNotFound, "Could not locate Gemfile"
+      raise GemfileNotFound, "Could not locate Gemfile" unless gemfile
       Pathname.new(gemfile)
     end
 
@@ -33,12 +33,19 @@ module Bundler
   private
 
     def find_gemfile
-      return ENV['BUNDLE_GEMFILE'] if ENV['BUNDLE_GEMFILE']
+      given = ENV['BUNDLE_GEMFILE']
+      return given if given && !given.empty?
 
       previous = nil
       current  = File.expand_path(Dir.pwd)
 
       until !File.directory?(current) || current == previous
+        if ENV['BUNDLE_SPEC_RUN']
+          # avoid stepping above the tmp directory when testing
+          return nil if File.file?(File.join(current, 'bundler.gemspec'))
+        end
+
+        # otherwise return the Gemfile if it's there
         filename = File.join(current, 'Gemfile')
         return filename if File.file?(filename)
         current, previous = File.expand_path("..", current), current

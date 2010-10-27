@@ -30,13 +30,7 @@ module Spec
       opts = args.last.is_a?(Hash) ? args.pop : {}
       expect_err = opts.delete(:expect_err)
       groups = args.map {|a| a.inspect }.join(", ")
-
-      if opts[:lite_runtime]
-        setup = "require 'rubygems' ; require 'bundler/setup' ; Bundler.setup(#{groups})\n"
-      else
-        setup = "require 'rubygems' ; require 'bundler' ; Bundler.setup(#{groups})\n"
-      end
-
+      setup = "require 'rubygems' ; require 'bundler' ; Bundler.setup(#{groups})\n"
       @out = ruby(setup + cmd, :expect_err => expect_err)
     end
 

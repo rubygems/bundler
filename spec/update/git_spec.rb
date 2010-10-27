@@ -94,6 +94,29 @@ describe "bundle update" do
       out.should include("Your bundle is complete!")
     end
 
+
+    it "fetches tags from the remote" do
+      build_git "foo"
+      @remote = build_git("bar", :bare => true)
+      update_git "foo", :remote => @remote.path
+      update_git "foo", :push => "master"
+
+      install_gemfile <<-G
+        gem 'foo', :git => "#{@remote.path}"
+      G
+
+      # Create a new tag on the remote that needs fetching
+      update_git "foo", :tag => "fubar"
+      update_git "foo", :push => "fubar"
+
+      gemfile <<-G
+        gem 'foo', :git => "#{@remote.path}", :tag => "fubar"
+      G
+
+      bundle "update", :exitstatus => true
+      exitstatus.should == 0
+    end
+
     describe "with submodules" do
       before :each do
         build_gem "submodule", :to_system => true do |s|
@@ -122,7 +145,7 @@ describe "bundle update" do
         G
 
         run "require 'submodule'"
-        out.should == 'GEM'
+        check out.should == 'GEM'
 
         install_gemfile <<-G
           git "#{lib_path('has_submodule-1.0')}", :submodules => true do
@@ -143,7 +166,7 @@ describe "bundle update" do
         G
 
         run "require 'submodule'"
-        out.should == 'GIT'
+        check out.should == 'GIT'
 
         install_gemfile <<-G
           git "#{lib_path('has_submodule-1.0')}" do

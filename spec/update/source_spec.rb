@@ -47,4 +47,5 @@ describe "bundle update" do
       should_be_installed "rack 1.0"
     end
   end
+
 end

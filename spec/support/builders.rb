@@ -294,8 +294,9 @@ module Spec
     end
 
     def build_git(name, *args, &block)
-      opts = Hash === args.last ? args.last : {}
-      spec = build_with(GitBuilder, name, args, &block)
+      opts = args.last.is_a?(Hash) ? args.last : {}
+      builder = opts[:bare] ? GitBareBuilder : GitBuilder
+      spec = build_with(builder, name, args, &block)
       GitReader.new(opts[:path] || lib_path(spec.full_name))
     end
 
@@ -484,6 +485,16 @@ module Spec
       end
     end
 
+    class GitBareBuilder < LibBuilder
+      def _build(options)
+        path = options[:path] || _default_path
+        super(options.merge(:path => path))
+        Dir.chdir(path) do
+          `git init --bare`
+        end
+      end
+    end
+
     class GitUpdater < LibBuilder
       WINDOWS = Config::CONFIG["host_os"] =~ %r!(msdos|mswin|djgpp|mingw)!
       NULL    = WINDOWS ? "NUL" : "/dev/null"
@@ -508,6 +519,10 @@ module Spec
             silently("git checkout #{branch}")
           elsif tag = options[:tag]
             `git tag #{tag}`
+          elsif options[:remote]
+            silently("git remote add origin file://#{options[:remote]}")
+          elsif options[:push]
+            silently("git push origin #{options[:push]}")
           end
 
           current_ref = `git rev-parse HEAD`.strip
