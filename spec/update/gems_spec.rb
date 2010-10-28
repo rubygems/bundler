@@ -21,6 +21,57 @@ describe "bundle update" do
       should_be_installed "rack 1.2", "rack-obama 1.0", "activesupport 3.0"
     end
 
+    it "doesn't change existing Gemfile.lock LF EOL" do
+      update_repo2 do
+        build_gem "activesupport", "3.0"
+      end
+
+      bundled_app("Gemfile.lock").should exist
+      lockfile = File.read(bundled_app("Gemfile.lock"))
+      lockfile = lockfile.gsub(/\r\n/, "\n") if lockfile.match("\r\n")
+      File.open(bundled_app("Gemfile.lock"), 'wb') do |f|
+        f.puts lockfile
+      end
+      lockfile.should_not match("\r\n")
+      bundle "update"
+      File.read(bundled_app("Gemfile.lock")).should_not match("\r\n")
+      should_be_installed "rack 1.2", "rack-obama 1.0", "activesupport 3.0"
+    end
+
+    it "doesn't change existing Gemfile.lock CRLF EOL" do
+      update_repo2 do
+        build_gem "activesupport", "3.0"
+      end
+
+      bundled_app("Gemfile.lock").should exist
+      lockfile = File.read(bundled_app("Gemfile.lock"))
+      lockfile = lockfile.gsub(/\n/, "\r\n") unless lockfile.match("\r\n")
+      File.open(bundled_app("Gemfile.lock"), 'wb') do |f|
+        f.puts lockfile
+      end
+      lockfile.should match("\r\n")
+      bundle "update"
+      File.read(bundled_app("Gemfile.lock")).should match("\r\n")
+      should_be_installed "rack 1.2", "rack-obama 1.0", "activesupport 3.0"
+    end
+
+    it "creates Gemfile.lock EOL as LF by default" do
+      update_repo2 do
+        build_gem "activesupport", "3.0"
+      end
+
+      FileUtils.rm(bundled_app("Gemfile.lock"))
+      bundled_app("Gemfile.lock").should_not exist
+
+      bundle "update"
+
+      bundled_app("Gemfile.lock").should exist
+      lockfile = File.read(bundled_app("Gemfile.lock"))
+      lockfile.should_not match("\r\n")
+
+      should_be_installed "rack 1.2", "rack-obama 1.0", "activesupport 3.0"
+    end
+
     it "doesn't delete the Gemfile.lock file if something goes wrong" do
       gemfile <<-G
         source "file://#{gem_repo2}"
