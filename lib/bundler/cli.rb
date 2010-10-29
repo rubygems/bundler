@@ -153,8 +153,6 @@ module Bundler
       "Install using defaults tuned for deployment environments"
     method_option "production", :type => :boolean, :banner =>
       "Deprecated, please use --deployment instead"
-    method_option "clean", :type => :boolean, :banner =>
-      "Cleans up unused gems in your bundler directory"
     def install(path = nil)
       opts = options.dup
       opts[:without] ||= []
@@ -210,10 +208,6 @@ module Bundler
         Bundler.settings[:frozen] = '1'
       end
 
-      if opts[:clean]
-        Bundler.settings[:clean] = '1'
-      end
-
       # Can't use Bundler.settings for this because settings needs gemfile.dirname
       Bundler.settings[:path] = nil if opts[:system]
       Bundler.settings[:path] = "vendor/bundle" if opts[:deployment]
@@ -226,10 +220,6 @@ module Bundler
 
       Installer.install(Bundler.root, Bundler.definition, opts)
       Bundler.load.cache if Bundler.root.join("vendor/cache").exist?
-
-      if Bundler.settings[:clean]
-        clean
-      end
 
       if Bundler.settings[:path]
         relative_path = Bundler.settings[:path]
