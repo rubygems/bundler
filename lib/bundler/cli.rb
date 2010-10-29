@@ -12,10 +12,7 @@ module Bundler
 
     def initialize(*)
       super
-      use_shell = options["no-color"] ? Thor::Shell::Basic.new : shell
-
-      Bundler.ui = UI::Shell.new(use_shell)
-      Gem::DefaultUserInteraction.ui = UI::RGProxy.new(Bundler.ui)
+      plain_shell(options["no-color"])
     end
 
     check_unknown_options! unless ARGV.include?("exec") || ARGV.include?("config")
@@ -162,8 +159,9 @@ module Bundler
       end
       opts[:without].map!{|g| g.to_sym }
 
-
       ENV['BUNDLE_GEMFILE'] = File.expand_path(opts[:gemfile]) if opts[:gemfile]
+
+      plain_shell(true) if opts[:deployment]
 
       if opts[:production]
         opts[:deployment] = true
@@ -511,5 +509,12 @@ module Bundler
       end
       spec.full_gem_path
     end
+
+    def plain_shell(disable_color)
+      use_shell = disable_color ? Thor::Shell::Basic.new : shell
+      Bundler.ui = UI::Shell.new(use_shell)
+      Gem::DefaultUserInteraction.ui = UI::RGProxy.new(Bundler.ui)
+    end
+
   end
 end
