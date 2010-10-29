@@ -208,7 +208,6 @@ module Bundler
         end
 
         Bundler.settings[:frozen] = '1'
-        Bundler.settings[:clean] = '1'
       end
 
       if opts[:clean]
