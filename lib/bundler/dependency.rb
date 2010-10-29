@@ -16,7 +16,8 @@ module Bundler
       :mri_18  => Gem::Platform::RUBY,
       :mri_19  => Gem::Platform::RUBY,
       :jruby   => Gem::Platform::JAVA,
-      :mswin   => Gem::Platform::MSWIN
+      :mswin   => Gem::Platform::MSWIN,
+      :mingw   => Gem::Platform::MINGW
     }.freeze
 
     def initialize(name, version, options = {}, &blk)
@@ -108,7 +109,11 @@ module Bundler
     end
 
     def mswin?
-      # w0t?
+      Bundler::WINDOWS
+    end
+
+    def mingw?
+      Bundler::WINDOWS
     end
   end
 end

@@ -251,19 +251,19 @@ describe "bundle install with gem sources" do
       end
 
       it "works" do
-        bundle "install vendor"
+        bundle "install --path vendor"
         should_be_installed "rack 1.0"
       end
 
       it "allows running bundle install --system without deleting foo" do
-        bundle "install vendor"
+        bundle "install --path vendor"
         bundle "install --system"
         FileUtils.rm_rf(bundled_app("vendor"))
         should_be_installed "rack 1.0"
       end
 
       it "allows running bundle install --system after deleting foo" do
-        bundle "install vendor"
+        bundle "install --path vendor"
         FileUtils.rm_rf(bundled_app("vendor"))
         bundle "install --system"
         should_be_installed "rack 1.0"
@@ -356,7 +356,7 @@ describe "bundle install with gem sources" do
     [:env, :global].each do |type|
       it "installs gems to a path if one is specified" do
         set_bundle_path(type, bundled_app("vendor2").to_s)
-        bundle "install vendor"
+        bundle "install --path vendor/bundle"
 
         vendored_gems("gems/rack-1.0.0").should be_directory
         bundled_app("vendor2").should_not be_directory
@@ -386,7 +386,7 @@ describe "bundle install with gem sources" do
     end
 
     it "installs gems to BUNDLE_PATH from .bundle/config" do
-      config "BUNDLE_PATH" => bundled_app("vendor").to_s
+      config "BUNDLE_PATH" => bundled_app("vendor/bundle").to_s
 
       bundle :install
 
@@ -395,7 +395,7 @@ describe "bundle install with gem sources" do
     end
 
     it "sets BUNDLE_PATH as the first argument to bundle install" do
-      bundle "install ./vendor"
+      bundle "install --path ./vendor/bundle"
 
       vendored_gems('gems/rack-1.0.0').should be_directory
       should_be_installed "rack 1.0.0"
@@ -404,7 +404,7 @@ describe "bundle install with gem sources" do
     it "disables system gems when passing a path to install" do
       # This is so that vendored gems can be distributed to others
       build_gem "rack", "1.1.0", :to_system => true
-      bundle "install ./vendor"
+      bundle "install --path ./vendor/bundle"
 
       vendored_gems('gems/rack-1.0.0').should be_directory
       should_be_installed "rack 1.0.0"
@@ -467,12 +467,12 @@ describe "bundle install with gem sources" do
     end
 
     it "prints a warning if you try to use --disable-shared-gems" do
-      bundle "install vendor --disable-shared-gems"
+      bundle "install --path vendor --disable-shared-gems"
       out.should include "The disable-shared-gem option is no longer available"
     end
 
-    ["install vendor", "install --path vendor"].each do |install|
-      if install == "install vendor"
+    ["install vendor/bundle", "install --path vendor/bundle"].each do |install|
+      if install == "install vendor/bundle"
         it "displays the deprecation warning for path as an argument to install" do
           bundle install
           out.should include("The path argument to `bundle install` is deprecated.")

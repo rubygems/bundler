@@ -217,7 +217,7 @@ describe "bundle exec" do
         gem "rack"
       G
 
-      bundle "install vendor --disable-shared-gems"
+      bundle "install --path vendor/bundle --disable-shared-gems"
     end
 
     it "does not explode with --disable-shared-gems" do
