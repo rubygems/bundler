@@ -9,7 +9,7 @@ describe "bundle clean" do
       gem "foo"
     G
 
-    bundle "install --path vendor"
+    bundle "install --path vendor/bundle"
 
     install_gemfile <<-G
       source "file://#{gem_repo1}"
@@ -41,7 +41,7 @@ describe "bundle clean" do
       gem "foo"
     G
 
-    bundle "install --path vendor"
+    bundle "install --path vendor/bundle"
 
     install_gemfile <<-G
       source "file://#{gem_repo1}"
@@ -74,7 +74,7 @@ describe "bundle clean" do
       gem "foo"
     G
 
-    bundle "install --path vendor"
+    bundle "install --path vendor/bundle"
 
     install_gemfile <<-G
       source "file://#{gem_repo1}"
@@ -110,7 +110,7 @@ describe "bundle clean" do
       end
     G
 
-    bundle "install --path vendor"
+    bundle "install --path vendor/bundle"
     bundle "install --without test_group"
     bundle :clean
 
@@ -138,7 +138,7 @@ describe "bundle clean" do
       end
     G
 
-    bundle "install --path vendor"
+    bundle "install --path vendor/bundle"
 
     install_gemfile <<-G
       source "file://#{gem_repo1}"
@@ -172,7 +172,7 @@ describe "bundle clean" do
       end
     G
 
-    bundle "install --path vendor"
+    bundle "install --path vendor/bundle"
 
     update_git "foo"
     revision2 = revision_for(lib_path("foo-1.0"))
