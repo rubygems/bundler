@@ -124,9 +124,9 @@ module Bundler
     # ==== Returns
     # <GemBundle>,nil:: If the list of dependencies can be resolved, a
     #   collection of gemspecs is returned. Otherwise, nil is returned.
-    def self.resolve(requirements, index, source_requirements = {}, base = [])
+    def self.resolve(requirements, index, source_requirements = {}, base = [], sort = true)
       base = SpecSet.new(base) unless base.is_a?(SpecSet)
-      resolver = new(index, source_requirements, base)
+      resolver = new(index, source_requirements, base, sort)
       result = catch(:success) do
         resolver.start(requirements)
         raise resolver.version_conflict
@@ -135,13 +135,14 @@ module Bundler
       SpecSet.new(result)
     end
 
-    def initialize(index, source_requirements, base)
+    def initialize(index, source_requirements, base, sort)
       @errors               = {}
       @stack                = []
       @base                 = base
       @index                = index
       @missing_gems         = Hash.new(0)
       @source_requirements  = source_requirements
+      @sort                 = sort
     end
 
     def debug
@@ -174,12 +175,14 @@ module Bundler
       #   1) Is this gem already activated?
       #   2) Do the version requirements include prereleased gems?
       #   3) Sort by number of gems available in the source.
+      # This is a pretty expensive operation, so we skip it when the bundle is
+      # locked and sorting isn't necessary.
       reqs = reqs.sort_by do |a|
         [ activated[a.name] ? 0 : 1,
           a.requirement.prerelease? ? 0 : 1,
           @errors[a.name]   ? 0 : 1,
           activated[a.name] ? 0 : search(a).size ]
-      end
+      end if @sort
 
       debug { "Activated:\n" + activated.values.map { |a| "  #{a.name} (#{a.version})" }.join("\n") }
       debug { "Requirements:\n" + reqs.map { |r| "  #{r.name} (#{r.requirement})"}.join("\n") }
