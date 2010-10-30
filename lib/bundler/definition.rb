@@ -50,12 +50,14 @@ module Bundler
           @locked_specs   = SpecSet.new([])
           @locked_sources = []
         end
+        @lockfile_exists = true
       else
         @unlock         = {}
         @platforms      = []
         @locked_deps    = []
         @locked_specs   = SpecSet.new([])
         @locked_sources = []
+        @lockfile_exists = false
       end
 
       @unlock[:gems] ||= []
@@ -148,7 +150,7 @@ module Bundler
           end
 
           # Run a resolve against the locally available gems
-          last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve)
+          last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve, !@lockfile_exists)
         end
       end
     end
