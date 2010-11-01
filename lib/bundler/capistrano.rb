@@ -7,5 +7,9 @@ require 'bundler/deployment'
 Capistrano::Configuration.instance(:must_exist).load do
   after "deploy:update_code", "bundle:install"
 
-  Bundler::Deployment.define_task(self, :task, :except => { :no_release => true })
+  bundle_roles = self[:bundle_roles]
+  opts = {:except => { :no_release => true }}
+  opts[:roles] = bundle_roles if bundle_roles
+
+  Bundler::Deployment.define_task(self, :task, opts)
 end
