@@ -16,6 +16,12 @@ module Bundler
             set :bundle_flags,        "--deployment --quiet"
             set :bundle_without,      [:development, :test]
             set :bundle_cmd,          "bundle" # e.g. change to "/opt/ruby/bin/bundle"
+
+          Additionally, you can specify on which roles "bundle:install" will be run.
+            set :bundle_roles,        [:app, :batch]
+
+          By default, bundle:install is run on every role that is not set to \
+          :no_release => true
         DESC
         send task_method, :install, opts do
           bundle_cmd     = context.fetch(:bundle_cmd, "bundle")
