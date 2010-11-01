@@ -15,7 +15,8 @@ module Bundler
             set :bundle_dir,          File.join(fetch(:shared_path), 'bundle')
             set :bundle_flags,        "--deployment --quiet"
             set :bundle_without,      [:development, :test]
-            set :bundle_cmd,          "bundle" # e.g. change to "/opt/ruby/bin/bundle"
+            set :bundle_cmd,          "bundle" # e.g. "/opt/ruby/bin/bundle"
+            set :bundle_roles,        {:except => {:no_release => true}} # e.g. [:app, :batch]
         DESC
         send task_method, :install, opts do
           bundle_cmd     = context.fetch(:bundle_cmd, "bundle")
