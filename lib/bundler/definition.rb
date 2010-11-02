@@ -189,13 +189,11 @@ module Bundler
         return
       end
 
-      # The lock file contents are always generated with LF EOL characters
-      # Convert LF to CRLF if the existing file has them (Windows /w git config core.autocrlf=true)
-      contents = contents.gsub(/\n/, "\r\n") if File.exists?(file) && File.read(file).match("\r\n")
+      # Convert to \r\n if the existing lock has them
+      # i.e., Windows with `git config core.autocrlf=true`
+      contents.gsub!(/\n/, "\r\n") if @lockfile_contents.match("\r\n")
 
-      File.open(file, 'wb') do |f|
-        f.puts contents
-      end
+      File.open(file, 'wb'){|f| f.puts(contents) }
     end
 
     def to_lock
