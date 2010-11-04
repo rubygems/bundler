@@ -311,12 +311,12 @@ describe "bundle install with explicit source paths" do
       end
 
       install_gemfile <<-G
-        source "http://#{gem_repo1}"
+        source "file://#{gem_repo1}"
         gem "bar", :git => "#{lib_path('bar')}"
       G
 
       install_gemfile <<-G
-        source "http://#{gem_repo1}"
+        source "file://#{gem_repo1}"
         gem "bar", :path => "#{lib_path('bar')}"
       G
 
@@ -330,7 +330,7 @@ describe "bundle install with explicit source paths" do
       end
 
       install_gemfile <<-G
-        source "http://#{gem_repo1}"
+        source "file://#{gem_repo1}"
         gem "bar"
         path "#{lib_path('foo')}" do
           gem "foo"
@@ -340,7 +340,7 @@ describe "bundle install with explicit source paths" do
       build_lib "bar", "1.0", :path => lib_path("foo/bar")
 
       install_gemfile <<-G
-        source "http://#{gem_repo1}"
+        source "file://#{gem_repo1}"
         path "#{lib_path('foo')}" do
           gem "foo"
           gem "bar"
