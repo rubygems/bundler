@@ -148,7 +148,9 @@ module Bundler
           end
 
           # Run a resolve against the locally available gems
-          last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve)
+          local = Resolver.resolve(expanded_dependencies,
+            index, source_requirements, last_resolve, unlocked?)
+          last_resolve.merge(local)
         end
       end
     end
@@ -187,9 +189,11 @@ module Bundler
         return
       end
 
-      File.open(file, 'wb') do |f|
-        f.puts contents
-      end
+      # Convert to \r\n if the existing lock has them
+      # i.e., Windows with `git config core.autocrlf=true`
+      contents.gsub!(/\n/, "\r\n") if @lockfile_contents.match("\r\n")
+
+      File.open(file, 'wb'){|f| f.puts(contents) }
     end
 
     def to_lock
@@ -422,6 +426,10 @@ module Bundler
       groups = self.groups - Bundler.settings.without
       groups.map! { |g| g.to_sym }
       dependencies.reject { |d| !d.should_include? || (d.groups & groups).empty? }
+    end
+
+    def unlocked?
+      @lockfile_contents.empty?
     end
   end
 end

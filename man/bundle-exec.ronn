@@ -56,6 +56,19 @@ It also modifies Rubygems:
   making system executables work
 * Add all gems in the bundle into Gem.loaded_specs
 
+### Shelling out
+
+When shelling out (using the `system` or backticks methods,
+for example), Bundler's environment changes will propogate to
+the subshell environment. If you desire to shell out without
+Bundler's environment changes, simply employ the `with_clean_env`
+method. It will restore all environment variables to what they
+were before Bundler was activated. For example:
+
+    Bundler.with_clean_env do
+      `brew install wget`
+    end
+
 ## RUBYGEMS PLUGINS
 
 At present, the Rubygems plugin system requires all files

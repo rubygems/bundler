@@ -647,4 +647,37 @@ describe "the lockfile format" do
     G
 
   end
+
+  context "line endings" do
+    before(:each) do
+      build_repo2
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "rack"
+      G
+    end
+
+    it "generates Gemfile.lock with \\n line endings" do
+      File.read(bundled_app("Gemfile.lock")).should_not match("\r\n")
+      should_be_installed "rack 1.0"
+    end
+
+    it "preserves Gemfile.lock \\n line endings" do
+      update_repo2
+
+      bundle "update"
+      File.read(bundled_app("Gemfile.lock")).should_not match("\r\n")
+      should_be_installed "rack 1.2"
+    end
+
+    it "preserves Gemfile.lock \\n\\r line endings" do
+      update_repo2
+      win_lock = File.read(bundled_app("Gemfile.lock")).gsub(/\n/, "\r\n")
+      File.open(bundled_app("Gemfile.lock"), "wb"){|f| f.puts(win_lock) }
+
+      bundle "update"
+      File.read(bundled_app("Gemfile.lock")).should match("\r\n")
+      should_be_installed "rack 1.2"
+    end
+  end
 end
