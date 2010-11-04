@@ -57,9 +57,9 @@ module Bundler
       if defined?(::Gem)
         me = File.expand_path("../../", __FILE__)
         $LOAD_PATH.reject! do |p|
-          next if File.expand_path(p).include?(me)
+          next if File.expand_path(p) =~ /^#{me}/
           p != File.dirname(__FILE__) &&
-            Gem.path.any? { |gp| p.include?(gp) }
+            Gem.path.any?{|gp| p =~ /^#{gp}/ }
         end
         $LOAD_PATH.uniq!
       end
