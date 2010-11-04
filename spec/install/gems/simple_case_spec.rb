@@ -547,35 +547,6 @@ describe "bundle install with gem sources" do
     end
   end
 
-  describe "when the gem has an architecture in its platform" do
-    it "still installs correctly" do
-      simulate_platform mswin
-
-      gemfile <<-G
-        # Set up pretend http gem server with FakeWeb
-        $LOAD_PATH.unshift '#{Dir[base_system_gems.join("gems/fakeweb*/lib")].first}'
-        require 'fakeweb'
-        FakeWeb.allow_net_connect = false
-        files = [ 'specs.4.8.gz',
-                  'prerelease_specs.4.8.gz',
-                  'quick/Marshal.4.8/rcov-1.0-mswin32.gemspec.rz',
-                  'gems/rcov-1.0-mswin32.gem' ]
-        files.each do |file|
-          FakeWeb.register_uri(:get, "http://localgemserver.com/\#{file}",
-            :body => File.read("#{gem_repo1}/\#{file}"))
-        end
-        FakeWeb.register_uri(:get, "http://localgemserver.com/gems/rcov-1.0-x86-mswin32.gem",
-          :status => ["404", "Not Found"])
-
-        # Try to install gem with nil arch
-        source "http://localgemserver.com/"
-        gem "rcov"
-      G
-      bundle :install
-      should_be_installed "rcov 1.0.0"
-    end
-  end
-
   describe "bundler dependencies" do
     before(:each) do
       build_repo2 do

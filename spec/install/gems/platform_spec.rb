@@ -193,3 +193,19 @@ describe "bundle install with platform conditionals" do
     should_not_be_installed "nokogiri 1.4.2"
   end
 end
+
+describe "when a gem has an architecture in its platform" do
+  it "still installs correctly" do
+    simulate_platform mswin
+
+    gemfile <<-G
+      # Try to install gem with nil arch
+      source "http://localgemserver.test/"
+      gem "rcov"
+    G
+
+    bundle :install, :fakeweb => "windows"
+    should_be_installed "rcov 1.0.0"
+  end
+end
+

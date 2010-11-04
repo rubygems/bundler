@@ -43,12 +43,16 @@ module Spec
       exitstatus = options.delete(:exitstatus)
       options["no-color"] = true unless options.key?("no-color") || cmd.to_s[0..3] == "exec"
 
+      bundle_bin = File.expand_path('../../../bin/bundle', __FILE__)
+      fake_file = options.delete(:fakeweb)
+      fakeweb = fake_file ? "-r#{File.expand_path('../fakeweb/'+fake_file+'.rb', __FILE__)}" : nil
+
       env = (options.delete(:env) || {}).map{|k,v| "#{k}='#{v}' "}.join
       args = options.map do |k,v|
         v == true ? " --#{k}" : " --#{k} #{v}" if v
       end.join
-      gemfile = File.expand_path('../../../bin/bundle', __FILE__)
-      cmd = "#{env}#{Gem.ruby} -I#{lib} #{gemfile} #{cmd}#{args}"
+
+      cmd = "#{env}#{Gem.ruby} -I#{lib} #{fakeweb} #{bundle_bin} #{cmd}#{args}"
 
       if exitstatus
         sys_status(cmd)

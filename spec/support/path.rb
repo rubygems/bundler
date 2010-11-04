@@ -1,3 +1,5 @@
+require 'pathname'
+
 module Spec
   module Path
     def root
