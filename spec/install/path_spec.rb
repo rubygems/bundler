@@ -59,6 +59,17 @@ describe "bundle install with explicit source paths" do
     end
   end
 
+  it "expands paths when comparing locked paths to Gemfile paths" do
+    build_lib "foo", :path => bundled_app("foo-1.0")
+
+    install_gemfile <<-G
+      gem 'foo', :path => File.expand_path("../foo-1.0", __FILE__)
+    G
+
+    bundle "install --frozen", :exitstatus => true
+    exitstatus.should == 0
+  end
+
   it "installs dependencies from the path even if a newer gem is available elsewhere" do
     system_gems "rack-1.0.0"
 
