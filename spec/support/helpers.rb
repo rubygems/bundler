@@ -46,13 +46,15 @@ module Spec
       bundle_bin = File.expand_path('../../../bin/bundle', __FILE__)
       fake_file = options.delete(:fakeweb)
       fakeweb = fake_file ? "-r#{File.expand_path('../fakeweb/'+fake_file+'.rb', __FILE__)}" : nil
+      artifice_file = options.delete(:artifice)
+      artifice = artifice_file ? "-r#{File.expand_path('../artifice/'+artifice_file+'.rb', __FILE__)}" : nil
 
       env = (options.delete(:env) || {}).map{|k,v| "#{k}='#{v}' "}.join
       args = options.map do |k,v|
         v == true ? " --#{k}" : " --#{k} #{v}" if v
       end.join
 
-      cmd = "#{env}#{Gem.ruby} -I#{lib} #{fakeweb} #{bundle_bin} #{cmd}#{args}"
+      cmd = "#{env}#{Gem.ruby} -I#{lib} #{fakeweb} #{artifice} #{bundle_bin} #{cmd}#{args}"
 
       if exitstatus
         sys_status(cmd)

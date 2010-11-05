@@ -7,7 +7,7 @@ describe "gemcutter's dependency API" do
       gem "rack"
     G
 
-    bundle :install, :fakeweb => "endpoint"
+    bundle :install, :artifice => "endpoint"
     should_be_installed "rack 1.0.0"
   end
 
