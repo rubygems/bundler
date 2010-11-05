@@ -20,7 +20,7 @@ module Bundler
 
     default_task :install
     class_option "no-color", :type => :boolean, :banner => "Disable colorization in output"
-    class_option "verbose",  :type => :boolean, :banner => "Enable verbose output mode", :aliases => "-v"
+    class_option "verbose",  :type => :boolean, :banner => "Enable verbose output mode", :aliases => "-V"
 
     def help(cli = nil)
       case cli
