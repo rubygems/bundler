@@ -13,12 +13,14 @@ module Bundler
     def initialize(*)
       super
       plain_shell(options["no-color"])
+      ENV["DEBUG"] = "true" if options["verbose"]
     end
 
     check_unknown_options! unless ARGV.include?("exec") || ARGV.include?("config")
 
     default_task :install
     class_option "no-color", :type => :boolean, :banner => "Disable colorization in output"
+    class_option "verbose",  :type => :boolean, :banner => "Enable verbose output mode", :aliases => "-v"
 
     def help(cli = nil)
       case cli
