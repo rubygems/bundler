@@ -211,7 +211,8 @@ module Bundler
           remotes.each do |uri|
             Bundler.ui.info "Fetching source index for #{uri}"
             Gem.sources = ["#{uri}"]
-            fetch_dependency_remote_specs(dependencies, uri) do |n,v|
+            gem_names = dependencies.map {|d| d.name }
+            fetch_remote_specs(gem_names, uri) do |n,v|
               v.each do |name, version, platform|
                 next if name == 'bundler'
                 spec = RemoteSpecification.new(name, version, platform, uri)
@@ -227,21 +228,34 @@ module Bundler
         end
       end
 
-      def fetch_dependency_remote_specs(dependencies, uri, &blk)
-        return fetch_all_remote_specs(&blk) unless dependencies && uri.scheme != "file"
-
+      def fetch_remote_specs(gem_names, uri, full_dependency_list = [], last_spec_list = [], &blk)
         require 'open-uri'
-        gem_names = dependencies.map{|d| d.name }
-        marshalled_deps = open("#{uri}api/v1/dependencies?gems=#{gem_names.join(",")}").read
-        deps_list = Marshal.load(marshalled_deps)
+        return fetch_all_remote_specs(&blk) unless gem_names && uri.scheme != "file"
 
-        spec_list = deps_list.map do |s|
-          [s[:name], Gem::Version.new(s[:number]), s[:platform]]
-        end
+        query_list = gem_names - full_dependency_list
+        Bundler.ui.debug "Query List: #{query_list.inspect}"
+        return {uri => last_spec_list}.each(&blk) if query_list.empty?
 
-        {uri => spec_list}.each(&blk)
+        spec_list, deps_list = fetch_dependency_remote_specs(query_list, uri, &blk)
+        returned_gems = spec_list.map {|spec| spec.first }.uniq
+
+        fetch_remote_specs(deps_list, uri, full_dependency_list + returned_gems, spec_list + last_spec_list, &blk)
       rescue OpenURI::HTTPError
         fetch_all_remote_specs(&blk)
+      end
+
+      def fetch_dependency_remote_specs(gem_names, uri, &blk)
+        marshalled_deps = open("#{uri}api/v1/dependencies?gems=#{gem_names.join(",")}").read
+        gem_list = Marshal.load(marshalled_deps)
+
+        spec_list = gem_list.map do |s|
+          [s[:name], Gem::Version.new(s[:number]), s[:platform]]
+        end
+        deps_list = gem_list.map do |s|
+          s[:dependencies].collect {|d| d.first }
+        end.flatten.uniq
+
+        [spec_list, deps_list]
       end
 
       def fetch_all_remote_specs(&blk)
