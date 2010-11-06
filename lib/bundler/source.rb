@@ -266,7 +266,7 @@ module Bundler
       attr_writer   :name
       attr_accessor :version
 
-      DEFAULT_GLOB = "{,*/}*.gemspec"
+      DEFAULT_GLOB = "{,*,*/*}.gemspec"
 
       def initialize(options)
         @options = options
