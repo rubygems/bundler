@@ -193,7 +193,7 @@ module Bundler
           idx = Index.new
           @caches.each do |path|
             Dir["#{path}/*.gem"].each do |gemfile|
-              next if gemfile =~ /bundler-.*?\.gem/
+              next if gemfile =~ /bundler\-[\d\.]+?\.gem/
 
               # Try to skip decompressing the gem to get at the gemspec if possible
               cached_gemspec = gemfile.gsub(%r{cache/(.*?)\.gem}, 'specifications/\1.gemspec')
