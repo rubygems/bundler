@@ -193,8 +193,14 @@ module Bundler
           idx = Index.new
           @caches.each do |path|
             Dir["#{path}/*.gem"].each do |gemfile|
-              s = Gem::Format.from_file_by_path(gemfile).spec
               next if gemfile =~ /bundler-.*?\.gem/
+
+              begin
+                s ||= Gem::Format.from_file_by_path(gemfile).spec
+              rescue Gem::Package::FormatError
+                raise GemspecError, "Could not read gem at #{gemfile}. It may be corrupted."
+              end
+
               s.source = self
               idx << s
             end
