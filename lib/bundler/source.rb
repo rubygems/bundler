@@ -193,8 +193,8 @@ module Bundler
           idx = Index.new
           @caches.each do |path|
             Dir["#{path}/*.gem"].each do |gemfile|
-              next if name == 'bundler'
               s = Gem::Format.from_file_by_path(gemfile).spec
+              next if gemfile =~ /bundler-.*?\.gem/
               s.source = self
               idx << s
             end
