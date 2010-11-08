@@ -195,6 +195,10 @@ module Bundler
             Dir["#{path}/*.gem"].each do |gemfile|
               next if gemfile =~ /bundler-.*?\.gem/
 
+              # Try to skip decompressing the gem to get at the gemspec if possible
+              cached_gemspec = gemfile.gsub(%r{cache/(.*?)\.gem}, 'specifications/\1.gemspec')
+              s = Gem::Specification.load(cached_gemspec) if File.exist?(cached_gemspec)
+
               begin
                 s ||= Gem::Format.from_file_by_path(gemfile).spec
               rescue Gem::Package::FormatError
