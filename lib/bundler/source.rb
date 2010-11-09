@@ -240,6 +240,9 @@ module Bundler
         returned_gems = spec_list.map {|spec| spec.first }.uniq
 
         fetch_remote_specs(deps_list, uri, full_dependency_list + returned_gems, spec_list + last_spec_list, &blk)
+      # fall back to the legacy index in the following cases
+      # 1.) Gemcutter Endpoint doesn't return a 200
+      # 2.) Marshal blob doesn't load properly
       rescue OpenURI::HTTPError, TypeError
         fetch_all_remote_specs(&blk)
       end
