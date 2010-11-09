@@ -211,7 +211,10 @@ module Bundler
           remotes.each do |uri|
             Bundler.ui.info "Fetching source index for #{uri}"
             Gem.sources = ["#{uri}"]
-            gem_names = dependencies.map {|d| d.name }
+            gem_names =
+              if dependencies
+                dependencies.map {|d| d.name }
+              end
             fetch_remote_specs(gem_names, uri) do |n,v|
               v.each do |name, version, platform|
                 next if name == 'bundler'
