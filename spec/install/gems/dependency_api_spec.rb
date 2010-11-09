@@ -39,4 +39,31 @@ describe "gemcutter's dependency API" do
     bundle :install, :fakeweb => "windows"
     should_be_installed "rcov 1.0.0"
   end
+
+  it "falls back when hitting the Gemcutter Dependency Limit" do
+    gemfile <<-G
+      source "http://localgemserver.test"
+      gem "activesupport"
+      gem "actionpack"
+      gem "actionmailer"
+      gem "activeresource"
+      gem "thin"
+      gem "rack"
+      gem "rails"
+    G
+    bundle :install, :artifice => "endpoint"
+
+    [
+      ["activesupport", "2.3.2"],
+      ["actionpack", "2.3.2"],
+      ["actionmailer", "2.3.2"],
+      ["activeresource", "2.3.2"],
+      ["activesupport", "2.3.2"],
+      ["thin", "1.0.0"],
+      ["rack", "1.0.0"],
+      ["rails", "2.3.2"]
+    ].each do |gem, version|
+      should_be_installed "#{gem} #{version}"
+    end
+  end
 end

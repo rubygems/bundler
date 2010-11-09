@@ -12,6 +12,8 @@ require 'artifice'
 require 'sinatra/base'
 
 class Endpoint < Sinatra::Base
+  DEPENDENCY_LIMIT = 55
+
   helpers do
     def dependencies_for(gem_names)
       require 'rubygems'
@@ -30,6 +32,14 @@ class Endpoint < Sinatra::Base
     end
   end
 
+  get "/specs.4.8.gz" do
+    File.read("#{gem_repo1}/specs.4.8.gz")
+  end
+
+  get "/prerelease_specs.4.8.gz" do
+    File.read("#{gem_repo1}/prerelease_specs.4.8.gz")
+  end
+
   get "/quick/Marshal.4.8/:id" do
     File.read("#{gem_repo1}/quick/Marshal.4.8/#{params[:id]}")
   end
@@ -39,7 +49,12 @@ class Endpoint < Sinatra::Base
   end
 
   get "/api/v1/dependencies" do
-    Marshal.dump(dependencies_for(params[:gems]))
+    if params[:gems].size <= DEPENDENCY_LIMIT
+      Marshal.dump(dependencies_for(params[:gems]))
+    else
+      status 413
+      "Too many gems to resolve, please request less than #{DEPENDENCY_LIMIT} gems"
+    end
   end
 end
 
