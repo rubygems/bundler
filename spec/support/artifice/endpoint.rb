@@ -1,4 +1,3 @@
-# Pull the
 require File.expand_path("../../path.rb", __FILE__)
 include Spec::Path
 
