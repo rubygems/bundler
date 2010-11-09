@@ -66,4 +66,14 @@ describe "gemcutter's dependency API" do
       should_be_installed "#{gem} #{version}"
     end
   end
+
+  it "falls back when Gemcutter API doesn't return proper Marshal format" do
+    gemfile <<-G
+      source "http://localgemserver.test"
+      gem "rack"
+    G
+
+    bundle :install, :artifice => "endpoint_marshal_fail"
+    should_be_installed "rack 1.0.0"
+  end
 end

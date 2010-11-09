@@ -240,7 +240,7 @@ module Bundler
         returned_gems = spec_list.map {|spec| spec.first }.uniq
 
         fetch_remote_specs(deps_list, uri, full_dependency_list + returned_gems, spec_list + last_spec_list, &blk)
-      rescue OpenURI::HTTPError
+      rescue OpenURI::HTTPError, TypeError
         fetch_all_remote_specs(&blk)
       end
 
