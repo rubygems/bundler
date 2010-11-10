@@ -153,6 +153,20 @@ describe "bundle cache" do
       cached_gem("activesupport-2.3.2").should_not exist
     end
 
+    it "removes .gems when gem changes to git source" do
+      build_git "rack"
+
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "rack", :git => "#{lib_path("rack-1.0")}"
+        gem "actionpack"
+      G
+      cached_gem("rack-1.0.0").should_not exist
+      cached_gem("actionpack-2.3.2").should exist
+      cached_gem("activesupport-2.3.2").should exist
+    end
+
+
     it "doesn't remove gems that are for another platform" do
       simulate_platform "java" do
         install_gemfile <<-G

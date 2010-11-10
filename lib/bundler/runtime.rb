@@ -101,7 +101,7 @@ module Bundler
         spec = Gem::Format.from_file_by_path(path).spec
 
         resolve.any? do |s|
-          s.name == spec.name && s.version == spec.version
+          s.name == spec.name && s.version == spec.version && !s.source.is_a?(Bundler::Source::Git)
         end
       end
 
