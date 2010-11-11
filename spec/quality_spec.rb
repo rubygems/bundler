@@ -50,6 +50,9 @@ describe "The library itself" do
     Dir.chdir(root) do
       `gem build bundler.gemspec`
       $?.should == 0
+
+      # clean up the .gem generated
+      system("rm bundler-#{Bundler::VERSION}.gem")
     end
   end
 end
