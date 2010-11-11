@@ -39,12 +39,6 @@ module Bundler
 
       alias == eql?
 
-      # Not really needed, but it seems good to implement this method for interface
-      # consistency. Source name is mostly used to identify Path & Git sources
-      def name
-        ":gems"
-      end
-
       def options
         { "remotes" => @remotes.map { |r| r.to_s } }
       end
@@ -62,9 +56,10 @@ module Bundler
       end
 
       def to_s
-        remotes = self.remotes.map { |r| r.to_s }.join(', ')
-        "rubygems repository #{remotes}"
+        remote_names = self.remotes.map { |r| r.to_s }.join(', ')
+        "rubygems repository #{remote_names}"
       end
+      alias_method :name :to_s
 
       def specs
         @specs ||= fetch_specs
