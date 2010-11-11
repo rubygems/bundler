@@ -191,8 +191,7 @@
         <div class="contents">
           <div class="bullet">
             <div class="description">
-              On your deployment box, install the required gems for your application into your
-              application's directory
+              On your deployment box, install your app's dependencies to an isolated directory
             </div>
             <pre class='sunburst'>$ bundle install --deployment</pre>
             <div class="notes">
@@ -201,20 +200,7 @@
               gems are installed to <code>vendor/bundle</code> by default
               and your <code>Gemfile.lock</code> must be up to date.
             </div>
-          </div>
-          <div class="bullet">
-            <div class="description">
-              Alternatively, use the built-in Capistrano recipe to quickly and easily
-              deploy your application. If you do, you no longer need to run bundle install
-              yourself, as Capistrano now does it for you automatically
-            </div>
-            <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">&quot;</span>bundler/capistrano<span class="String">&quot;</span></span>&#x000A;</pre>
-            <div class="notes">
-              This recipe will symlink your <code>vendor/bundle</code> to
-              <code>shared/vendor_bundle</code>, speeding up deployments
-              by sharing downloaded gems across deployments, but not
-              between applications.
-            </div>
+            <a href="./deploying.html">Learn More: deploying</a>
           </div>
         </div>
         <h2 id="digging-further">

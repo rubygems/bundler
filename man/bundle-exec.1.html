@@ -133,6 +133,20 @@ making system executables work</li>
 </ul>
 
 
+<h3 id="Shelling-out">Shelling out</h3>
+
+<p>When shelling out (using the <code>system</code> or backticks methods,
+for example), Bundler's environment changes will propogate to
+the subshell environment. If you desire to shell out without
+Bundler's environment changes, simply employ the <code>with_clean_env</code>
+method. It will restore all environment variables to what they
+were before Bundler was activated. For example:</p>
+
+<pre><code>Bundler.with_clean_env do
+  `brew install wget`
+end
+</code></pre>
+
 <h2 id="RUBYGEMS-PLUGINS">RUBYGEMS PLUGINS</h2>
 
 <p>At present, the Rubygems plugin system requires all files
@@ -179,7 +193,7 @@ that you aren't using (<code>gem uninstall gem_name</code>).</p>
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'></li>
-    <li class='tc'>August 2010</li>
+    <li class='tc'>November 2010</li>
     <li class='tr'>bundle-exec(1)</li>
   </ol>
 
