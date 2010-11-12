@@ -181,7 +181,7 @@ module Bundler
 
       GENERIC_CACHE[p] ||= begin
         found = GENERICS.find do |p2|
-          p.os == p2.os if p2.is_a?(Gem::Platform)
+          p2.is_a?(Gem::Platform) && p.os == p2.os
         end
         found || Gem::Platform::RUBY
       end
