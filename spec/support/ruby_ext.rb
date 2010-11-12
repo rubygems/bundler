@@ -1,5 +1,5 @@
 class IO
-  def read_available_bytes(chunk_size = 1024, select_timeout = 5)
+  def read_available_bytes(chunk_size = 16384, select_timeout = 0.02)
     buffer = []
 
     return "" if closed? || eof?
@@ -7,8 +7,9 @@ class IO
     # just does not work on windows
     while true
       begin
+        IO.select([self], nil, nil, select_timeout)
+        break if eof? # stop raising :-(
         buffer << self.readpartial(chunk_size)
-        sleep 0.1
       rescue(EOFError)
         break
       end
