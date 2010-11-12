@@ -113,7 +113,7 @@ module Bundler
     end
 
     def mingw?
-      Bundler::WINDOWS
+      Bundler::WINDOWS && Gem::Platform.local.os == "mingw32"
     end
   end
 end
