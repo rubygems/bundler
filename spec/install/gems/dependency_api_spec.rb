@@ -18,14 +18,13 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :artifice => "endpoint"
-    [
+    should_be_installed(
       "rails 2.3.2",
       "actionpack 2.3.2",
       "activerecord 2.3.2",
       "actionmailer 2.3.2",
       "activeresource 2.3.2",
-      "activesupport 2.3.2"
-    ].each {|gem| should_be_installed gem }
+      "activesupport 2.3.2")
   end
 
   it "falls back when the API errors out" do
@@ -53,18 +52,15 @@ describe "gemcutter's dependency API" do
     G
     bundle :install, :artifice => "endpoint"
 
-    [
-      ["activesupport", "2.3.2"],
-      ["actionpack", "2.3.2"],
-      ["actionmailer", "2.3.2"],
-      ["activeresource", "2.3.2"],
-      ["activesupport", "2.3.2"],
-      ["thin", "1.0.0"],
-      ["rack", "1.0.0"],
-      ["rails", "2.3.2"]
-    ].each do |gem, version|
-      should_be_installed "#{gem} #{version}"
-    end
+    should_be_installed(
+      "activesupport 2.3.2",
+      "actionpack 2.3.2",
+      "actionmailer 2.3.2",
+      "activeresource 2.3.2",
+      "activesupport 2.3.2",
+      "thin 1.0.0",
+      "rack 1.0.0",
+      "rails 2.3.2")
   end
 
   it "falls back when Gemcutter API doesn't return proper Marshal format" do
