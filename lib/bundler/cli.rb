@@ -162,6 +162,7 @@ module Bundler
       opts[:without].map!{|g| g.to_sym }
 
       ENV['BUNDLE_GEMFILE'] = File.expand_path(opts[:gemfile]) if opts[:gemfile]
+      ENV['RB_USER_INSTALL'] = '1' if Bundler::FREEBSD
 
       plain_shell(true) if opts[:deployment]
 
