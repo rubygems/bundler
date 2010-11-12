@@ -38,7 +38,7 @@ describe "The library itself" do
     error_messages = []
     Dir.chdir(File.expand_path("../..", __FILE__)) do
       `git ls-files`.split("\n").each do |filename|
-        next if filename =~ /\.gitmodules|\.marshal|fixtures/
+        next if filename =~ /\.gitmodules|\.marshal|fixtures|vendor/
         error_messages << check_for_tab_characters(filename)
         error_messages << check_for_extra_spaces(filename)
       end
