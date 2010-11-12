@@ -21,10 +21,7 @@ end
 
 module Bundler
   class Resolver
-    ALL = [ Gem::Platform::RUBY,
-            Gem::Platform::JAVA,
-            Gem::Platform::MSWIN,
-            Gem::Platform::MINGW ]
+    ALL = Bundler::Dependency::PLATFORM_MAP.values.uniq.freeze
 
     class SpecGroup < Array
       include GemHelpers
