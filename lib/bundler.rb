@@ -191,11 +191,14 @@ module Bundler
     end
 
     def requires_sudo?
+      return @requires_sudo if @checked_for_sudo
+
       path = bundle_path
       path = path.parent until path.exist?
-      sudo_present = !`which sudo 2>#{NULL}`.empty?
+      sudo_present = !(`which sudo 2>#{NULL}` rescue '').empty?
 
-      settings.allow_sudo? && !File.writable?(path) && sudo_present
+      @checked_for_sudo = true
+      @requires_sudo = settings.allow_sudo? && !File.writable?(path) && sudo_present
     end
 
     def mkdir_p(path)
