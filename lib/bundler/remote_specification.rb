@@ -12,11 +12,11 @@ module Bundler
     attr_reader :name, :version, :platform
     attr_accessor :source
 
-    def initialize(name, version, platform, source_uri)
-      @name     = name
-      @version  = version
-      @platform = platform
-      @source_uri = source_uri
+    def initialize(name, version, platform, spec_fetcher)
+      @name         = name
+      @version      = version
+      @platform     = platform
+      @spec_fetcher = spec_fetcher
     end
 
     # Needed before installs, since the arch matters then and quick
@@ -43,9 +43,7 @@ module Bundler
   private
 
     def _remote_specification
-      @specification ||= begin
-        Gem::SpecFetcher.new.fetch_spec([@name, @version, @platform], URI(@source_uri.to_s))
-      end
+      @specification ||= @spec_fetcher.fetch_spec([@name, @version, @platform])
     end
 
     def method_missing(method, *args, &blk)

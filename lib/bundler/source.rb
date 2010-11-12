@@ -14,10 +14,11 @@ module Bundler
       def initialize(options = {})
         @options = options
         @remotes = (options["remotes"] || []).map { |r| normalize_uri(r) }
+        @fetchers = {}
         @allow_remote = false
         @allow_cached = false
-        # Hardcode the paths for now
-        @caches = [ Bundler.app_cache ] + Gem.path.map { |p| File.expand_path("#{p}/cache") }
+
+        @caches = [ Bundler.app_cache ] + Gem.path.map{ |p| File.expand_path("#{p}/cache") }
         @spec_fetch_map = {}
       end
 
@@ -210,15 +211,16 @@ module Bundler
 
           remotes.each do |uri|
             Bundler.ui.info "Fetching source index for #{uri}"
-            Gem.sources = ["#{uri}"]
+
+            @fetchers[uri] = Bundler::Fetcher.new(uri)
             gem_names =
               if dependencies
                 dependencies.map {|d| d.name }
               end
-            fetch_remote_specs(gem_names, uri) do |n,v|
+            @fetchers[uri].fetch_remote_specs(gem_names, uri) do |n,v|
               v.each do |name, version, platform|
                 next if name == 'bundler'
-                spec = RemoteSpecification.new(name, version, platform, uri)
+                spec = RemoteSpecification.new(name, version, platform, @fetchers[uri])
                 spec.source = self
                 @spec_fetch_map[spec.full_name] = [spec, uri]
                 idx << spec
@@ -228,54 +230,6 @@ module Bundler
           idx
         ensure
           Gem.sources = old
-        end
-      end
-
-      def fetch_remote_specs(gem_names, uri, full_dependency_list = [], last_spec_list = [], &blk)
-        require 'open-uri'
-        return fetch_all_remote_specs(&blk) unless gem_names && uri.scheme != "file"
-
-        query_list = gem_names - full_dependency_list
-        Bundler.ui.debug "Query List: #{query_list.inspect}"
-        return {uri => last_spec_list}.each(&blk) if query_list.empty?
-
-        spec_list, deps_list = fetch_dependency_remote_specs(query_list, uri, &blk)
-        returned_gems = spec_list.map {|spec| spec.first }.uniq
-
-        fetch_remote_specs(deps_list, uri, full_dependency_list + returned_gems, spec_list + last_spec_list, &blk)
-      # fall back to the legacy index in the following cases
-      # 1.) Gemcutter Endpoint doesn't return a 200
-      # 2.) Marshal blob doesn't load properly
-      rescue OpenURI::HTTPError, TypeError
-        fetch_all_remote_specs(&blk)
-      end
-
-      def fetch_dependency_remote_specs(gem_names, uri, &blk)
-        marshalled_deps = open("#{uri}api/v1/dependencies?gems=#{gem_names.join(",")}").read
-        gem_list = Marshal.load(marshalled_deps)
-
-        spec_list = gem_list.map do |s|
-          [s[:name], Gem::Version.new(s[:number]), s[:platform]]
-        end
-        deps_list = gem_list.map do |s|
-          s[:dependencies].collect {|d| d.first }
-        end.flatten.uniq
-
-        [spec_list, deps_list]
-      end
-
-      def fetch_all_remote_specs(&blk)
-        begin
-          # Fetch all specs, minus prerelease specs
-          Gem::SpecFetcher.new.list(true, false).each(&blk)
-          # Then fetch the prerelease specs
-          begin
-            Gem::SpecFetcher.new.list(false, true).each(&blk)
-          rescue Gem::RemoteFetcher::FetchError
-            Bundler.ui.warn "Could not fetch prerelease specs from #{self}"
-          end
-        rescue Gem::RemoteFetcher::FetchError
-          Bundler.ui.warn "Could not reach #{self}"
         end
       end
 
