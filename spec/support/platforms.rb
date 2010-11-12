@@ -22,8 +22,12 @@ module Spec
       Gem::Platform.new(['x86', 'mswin32', nil])
     end
 
+    def mingw
+      Gem::Platform.new(['x86', 'mingw32', nil])
+    end
+
     def all_platforms
-      [rb, java, linux, mswin]
+      [rb, java, linux, mswin, mingw]
     end
 
     def local
