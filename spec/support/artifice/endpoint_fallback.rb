@@ -20,4 +20,3 @@ class EndpointFallback < Endpoint
 end
 
 Artifice.activate_with(EndpointFallback)
-
