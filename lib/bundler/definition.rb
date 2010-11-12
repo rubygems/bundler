@@ -158,7 +158,7 @@ module Bundler
     def index
       @index ||= Index.build do |idx|
         @sources.each do |s|
-          idx.use s.specs
+          idx.use s.specs(@dependencies)
         end
       end
     end

@@ -66,8 +66,8 @@ module Bundler
         "rubygems repository #{remotes}"
       end
 
-      def specs
-        @specs ||= fetch_specs
+      def specs(dependencies = nil)
+        @specs ||= fetch_specs(dependencies)
       end
 
       def fetch(spec)
@@ -151,11 +151,11 @@ module Bundler
         uri
       end
 
-      def fetch_specs
+      def fetch_specs(dependencies = nil)
         Index.build do |idx|
           idx.use installed_specs
           idx.use cached_specs if @allow_cached || @allow_remote
-          idx.use remote_specs if @allow_remote
+          idx.use remote_specs(dependencies) if @allow_remote
         end
       end
 
@@ -203,7 +203,7 @@ module Bundler
         end
       end
 
-      def remote_specs
+      def remote_specs(dependencies = nil)
         @remote_specs ||= begin
           idx     = Index.new
           old     = Gem.sources
@@ -211,7 +211,7 @@ module Bundler
           remotes.each do |uri|
             Bundler.ui.info "Fetching source index for #{uri}"
             Gem.sources = ["#{uri}"]
-            fetch_all_remote_specs do |n,v|
+            fetch_dependency_remote_specs(dependencies, uri) do |n,v|
               v.each do |name, version, platform|
                 next if name == 'bundler'
                 spec = RemoteSpecification.new(name, version, platform, uri)
@@ -225,6 +225,23 @@ module Bundler
         ensure
           Gem.sources = old
         end
+      end
+
+      def fetch_dependency_remote_specs(dependencies, uri, &blk)
+        return fetch_all_remote_specs(&blk) unless dependencies && uri.scheme != "file"
+
+        require 'open-uri'
+        gem_names = dependencies.map{|d| d.name }
+        marshalled_deps = open("#{uri}api/v1/dependencies?gems=#{gem_names.join(",")}").read
+        deps_list = Marshal.load(marshalled_deps)
+
+        spec_list = deps_list.map do |s|
+          [s[:name], Gem::Version.new(s[:number]), s[:platform]]
+        end
+
+        {uri => spec_list}.each(&blk)
+      rescue OpenURI::HTTPError
+        fetch_all_remote_specs(&blk)
       end
 
       def fetch_all_remote_specs(&blk)
@@ -360,7 +377,7 @@ module Bundler
         index
       end
 
-      def local_specs
+      def local_specs(*)
         @local_specs ||= load_spec_files
       end
 
@@ -523,7 +540,7 @@ module Bundler
       end
 
       # TODO: actually cache git specs
-      def specs
+      def specs(*)
         if allow_git_ops? && !@update
         # Start by making sure the git cache is up to date
           cache
