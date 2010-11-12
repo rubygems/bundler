@@ -2,14 +2,14 @@ require "spec_helper"
 
 describe "bundle clean" do
   it "removes unused gems that are different" do
-    install_gemfile <<-G
+    gemfile = <<-G
       source "file://#{gem_repo1}"
 
       gem "thin"
       gem "foo"
     G
 
-    bundle "install --path vendor/bundle"
+    install_gemfile(gemfile, :path => "vendor/bundle")
 
     install_gemfile <<-G
       source "file://#{gem_repo1}"
@@ -17,7 +17,6 @@ describe "bundle clean" do
       gem "thin"
     G
 
-    bundle :install
     bundle :clean
 
     out.should == "Removing foo (1.0)"
@@ -34,14 +33,14 @@ describe "bundle clean" do
   end
 
   it "removes old version of gem if unused" do
-    install_gemfile <<-G
+    gemfile = <<-G
       source "file://#{gem_repo1}"
 
       gem "rack", "0.9.1"
       gem "foo"
     G
 
-    bundle "install --path vendor/bundle"
+    install_gemfile(gemfile, :path => "vendor/bundle")
 
     install_gemfile <<-G
       source "file://#{gem_repo1}"
@@ -50,7 +49,6 @@ describe "bundle clean" do
       gem "foo"
     G
 
-    bundle :install
     bundle :clean
 
     out.should == "Removing rack (0.9.1)"
@@ -67,14 +65,14 @@ describe "bundle clean" do
   end
 
   it "removes new version of gem if unused" do
-    install_gemfile <<-G
+    gemfile = <<-G
       source "file://#{gem_repo1}"
 
       gem "rack", "1.0.0"
       gem "foo"
     G
 
-    bundle "install --path vendor/bundle"
+    install_gemfile(gemfile, :path => "vendor/bundle")
 
     install_gemfile <<-G
       source "file://#{gem_repo1}"
@@ -83,7 +81,6 @@ describe "bundle clean" do
       gem "foo"
     G
 
-    bundle :install
     bundle :clean
 
     out.should == "Removing rack (1.0.0)"
@@ -100,7 +97,7 @@ describe "bundle clean" do
   end
 
   it "remove gems in bundle without groups" do
-    install_gemfile <<-G
+    gemfile = <<-G
       source "file://#{gem_repo1}"
 
       gem "foo"
@@ -110,7 +107,7 @@ describe "bundle clean" do
       end
     G
 
-    bundle "install --path vendor/bundle"
+    install_gemfile(gemfile, :path => "vendor/bundle")
     bundle "install --without test_group"
     bundle :clean
 
@@ -129,7 +126,7 @@ describe "bundle clean" do
     build_git "foo"
     @revision = revision_for(lib_path("foo-1.0"))
 
-    install_gemfile <<-G
+    gemfile = <<-G
       source "file://#{gem_repo1}"
 
       gem "rack", "1.0.0"
@@ -138,7 +135,7 @@ describe "bundle clean" do
       end
     G
 
-    bundle "install --path vendor/bundle"
+    install_gemfile(gemfile, :path => "vendor/bundle")
 
     install_gemfile <<-G
       source "file://#{gem_repo1}"
@@ -146,7 +143,6 @@ describe "bundle clean" do
       gem "rack", "1.0.0"
     G
 
-    bundle :install
     bundle :clean
 
     out.should == "Removing foo (1.0 #{@revision[0..11]})"
@@ -163,7 +159,7 @@ describe "bundle clean" do
     build_git "foo"
     revision = revision_for(lib_path("foo-1.0"))
 
-    install_gemfile <<-G
+    gemfile = <<-G
       source "file://#{gem_repo1}"
 
       gem "rack", "1.0.0"
@@ -172,7 +168,7 @@ describe "bundle clean" do
       end
     G
 
-    bundle "install --path vendor/bundle"
+    install_gemfile(gemfile, :path => "vendor/bundle")
 
     update_git "foo"
     revision2 = revision_for(lib_path("foo-1.0"))
@@ -199,7 +195,6 @@ describe "bundle clean" do
       gem "rack", "1.0.0"
     G
 
-    bundle :install
     bundle :clean
 
     out.should == "Can only use bundle clean when --path is set"
