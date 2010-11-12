@@ -20,14 +20,22 @@
             <div class="description">
               Make sure all dependencies in your Gemfile are available to your application.
             </div>
-            <pre class='sunburst'>$ bundle install</pre>
+            <pre class='sunburst'>$ bundle install [--system]</pre>
             <div class="notes">
-              Gems will be installed to your default system location for gems. If your
-              system gems are stored in a root-owned location (such as in Mac OSX),
-              bundle will ask for your root password to install them there.
-              While installing gems, Bundler will check <code>vendor/cache</code> and then
-              your system's gems. If a gem isn't cached or installed, Bundler will try to
-              install it from the sources you have declared in your Gemfile.
+              <p>
+                Gems will be installed to your default system location for gems. If your
+                system gems are stored in a root-owned location (such as in Mac OSX),
+                bundle will ask for your root password to install them there.
+              </p>
+              <p>
+                While installing gems, Bundler will check <code>vendor/cache</code> and then
+                your system's gems. If a gem isn't cached or installed, Bundler will try to
+                install it from the sources you have declared in your Gemfile.
+              </p>
+              <p>
+                The <code>--system</code> option is the default. Pass it to switch back after
+                using the <code>--path</code> option as described below.
+              </p>
             </div>
           </div>
           <div class="bullet">
