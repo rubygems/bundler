@@ -3,7 +3,7 @@ bundle(1) -- Ruby Dependency Management
 
 ## SYNOPSIS
 
-`bundle` [--no-color] COMMAND [ARGS]
+`bundle` COMMAND [--no-color] [--verbose] [ARGS]
 
 ## DESCRIPTION
 
@@ -17,6 +17,9 @@ started, and Gemfile(5) for more information on the `Gemfile` format.
 
 * `--no-color`:
   Prints all output without color
+
+* `--verbose`:
+  Prints out additional logging information
 
 ## BUNDLE COMMANDS
 
