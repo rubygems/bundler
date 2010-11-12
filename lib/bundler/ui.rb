@@ -3,6 +3,9 @@ module Bundler
     def warn(message)
     end
 
+    def debug(message)
+    end
+
     def error(message)
     end
 
