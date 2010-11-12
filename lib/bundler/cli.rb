@@ -500,8 +500,7 @@ module Bundler
   private
 
     def have_groff?
-      `which groff 2>#{NULL}`
-      $? == 0
+      system("which groff 2>#{NULL}") rescue false
     end
 
     def locate_gem(name)
