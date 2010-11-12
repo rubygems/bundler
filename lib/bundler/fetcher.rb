@@ -2,6 +2,8 @@ require 'uri'
 require 'net/http/persistent'
 
 module Bundler
+  class HTTPError < Exception; end
+
   class Fetcher
     def initialize(remote_uri)
       @remote_uri = remote_uri
@@ -14,7 +16,6 @@ module Bundler
       spec_file_name = "#{spec.join '-'}.gemspec.rz"
 
       uri = URI.parse("#{@remote_uri}#{Gem::MARSHAL_SPEC_DIR}#{spec_file_name}")
-      Bundler.ui.debug "Fetching spec from: #{uri}"
 
       spec_rz = (uri.scheme == "file") ? Gem.read_binary(uri.path) : fetch(uri)
       Marshal.load Gem.inflate(spec_rz)
@@ -35,19 +36,37 @@ module Bundler
     # fall back to the legacy index in the following cases
     # 1.) Gemcutter Endpoint doesn't return a 200
     # 2.) Marshal blob doesn't load properly
-    rescue OpenURI::HTTPError, TypeError
+    rescue HTTPError, TypeError => e
+      Bundler.ui.debug "Error #{e.class} from Gemcutter Dependency Endpoint API: #{e.message}"
+      Bundler.ui.debug e.backtrace
       fetch_all_remote_specs(&blk)
     end
 
   private
 
     def fetch(uri)
-      @@connection.request(uri).body
+      Bundler.ui.debug "Fetching from: #{uri}"
+      response = @@connection.request(uri)
+      case response
+      when Net::HTTPRedirection
+        Bundler.ui.debug("HTTP Redirection")
+        uri = URI.parse(response["location"])
+        fetch(uri)
+      when Net::HTTPSuccess
+        Bundler.ui.debug("HTTP Success")
+        response.body
+      else
+        Bundler.ui.debug("HTTP Error")
+        raise HTTPError
+      end
     end
 
     # fetch from Gemcutter Dependency Endpoint API
     def fetch_dependency_remote_specs(gem_names, &blk)
-      marshalled_deps = @@connection.request("#{@remote_uri}api/v1/dependencies?gems=#{gem_names.join(",")}").body
+      Bundler.ui.debug "Query Gemcutter Dependency Endpoint API: #{gem_names.join(' ')}"
+      uri = URI.parse("#{@remote_uri}api/v1/dependencies?gems=#{gem_names.join(",")}")
+      Bundler.ui.debug "Gemcutter Dependency Endpoint URI: #{uri.to_s}"
+      marshalled_deps = fetch(uri)
       gem_list = Marshal.load(marshalled_deps)
 
       spec_list = gem_list.map do |s|
@@ -62,6 +81,7 @@ module Bundler
 
     # fetch from modern index: specs.4.8.gz
     def fetch_all_remote_specs(&blk)
+      Bundler.ui.debug "Fetching modern index"
       Gem.sources = ["#{@remote_uri}"]
       begin
         # Fetch all specs, minus prerelease specs

@@ -217,7 +217,7 @@ module Bundler
               if dependencies
                 dependencies.map {|d| d.name }
               end
-            @fetchers[uri].fetch_remote_specs(gem_names, uri) do |n,v|
+            @fetchers[uri].fetch_remote_specs(gem_names) do |n,v|
               v.each do |name, version, platform|
                 next if name == 'bundler'
                 spec = RemoteSpecification.new(name, version, platform, @fetchers[uri])

@@ -50,7 +50,7 @@ describe "gemcutter's dependency API" do
       gem "rack"
       gem "rails"
     G
-    bundle :install, :artifice => "endpoint"
+    bundle :install, :artifice => "endpoint_fallback"
 
     should_be_installed(
       "activesupport 2.3.2",
