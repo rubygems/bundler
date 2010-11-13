@@ -40,12 +40,6 @@ module Bundler
 
       alias == eql?
 
-      # Not really needed, but it seems good to implement this method for interface
-      # consistency. Source name is mostly used to identify Path & Git sources
-      def name
-        ":gems"
-      end
-
       def options
         { "remotes" => @remotes.map { |r| r.to_s } }
       end
@@ -63,9 +57,10 @@ module Bundler
       end
 
       def to_s
-        remotes = self.remotes.map { |r| r.to_s }.join(', ')
-        "rubygems repository #{remotes}"
+        remote_names = self.remotes.map { |r| r.to_s }.join(', ')
+        "rubygems repository #{remote_names}"
       end
+      alias_method :name, :to_s
 
       def specs(dependencies = nil)
         @specs ||= fetch_specs(dependencies)
@@ -194,8 +189,18 @@ module Bundler
           idx = Index.new
           @caches.each do |path|
             Dir["#{path}/*.gem"].each do |gemfile|
-              next if name == 'bundler'
-              s = Gem::Format.from_file_by_path(gemfile).spec
+              next if gemfile =~ /bundler\-[\d\.]+?\.gem/
+
+              # Try to skip decompressing the gem to get at the gemspec if possible
+              cached_gemspec = gemfile.gsub(%r{cache/(.*?)\.gem}, 'specifications/\1.gemspec')
+              s = Gem::Specification.load(cached_gemspec) if File.exist?(cached_gemspec)
+
+              begin
+                s ||= Gem::Format.from_file_by_path(gemfile).spec
+              rescue Gem::Package::FormatError
+                raise GemspecError, "Could not read gem at #{gemfile}. It may be corrupted."
+              end
+
               s.source = self
               idx << s
             end

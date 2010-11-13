@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe "Resolving platform craziness" do
-  describe "with semi real cases" do
+  describe "with cross-platform gems" do
     before :each do
       @index = an_awesome_index
     end
@@ -13,18 +13,43 @@ describe "Resolving platform craziness" do
       should_resolve_as %w(nokogiri-1.4.2 nokogiri-1.4.2-java weakling-0.0.3)
     end
 
-    it "doesn't pull gems when it doesn't exist for the current platform" do
+    it "doesn't pull gems that don't exist for the current platform" do
       dep "nokogiri"
       platforms "ruby"
 
       should_resolve_as %w(nokogiri-1.4.2)
     end
 
-    it "doesn't pulls gems when the version is available for all requested platforms" do
+    it "doesn't pull gems when the version is available for all requested platforms" do
       dep "nokogiri"
       platforms "mswin32"
 
       should_resolve_as %w(nokogiri-1.4.2.1-x86-mswin32)
+    end
+  end
+
+  describe "with mingw32" do
+
+    before :each do
+      @index = build_index do
+        platforms "mingw32 mswin32" do |platform|
+          gem "thin", "1.2.7", platform
+        end
+      end
+    end
+
+    it "finds mswin gems" do
+      # win32 is hardcoded to get CPU x86 in rubygems
+      platforms "mswin32"
+      dep "thin"
+      should_resolve_as %w(thin-1.2.7-x86-mswin32)
+    end
+
+    it "finds mingw gems" do
+      # mingw is _not_ hardcoded to add CPU x86 in rubygems
+      platforms "x86-mingw32"
+      dep "thin"
+      should_resolve_as %w(thin-1.2.7-x86-mingw32)
     end
   end
 
@@ -47,7 +72,7 @@ describe "Resolving platform craziness" do
       end
     end
 
-    it "does something" do
+    it "reports on the conflict" do
       platforms "ruby", "java"
       dep "foo"
 

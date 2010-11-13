@@ -6,6 +6,7 @@ if Bundler::SharedHelpers.in_bundle?
     Bundler.setup
   rescue Bundler::BundlerError => e
     puts "\e[31m#{e.message}\e[0m"
+    puts e.backtrace.join("\n") if ENV["DEBUG"]
     exit e.status_code
   end
 

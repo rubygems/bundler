@@ -1,3 +1,28 @@
+## 1.0.4 (November 12, 2010)
+
+Bugfixes:
+
+  - Expand relative :paths from Bundler.root (eg ./foogem)
+  - Allow git gems in --without groups while --frozen
+  - Allow gem :ref to be a symbol as well as a string
+  - Fix exception when Gemfile needs a newer Bundler version
+  - Explanation when the current Bundler version conflicts
+  - Explicit error message if Gemfile needs newer Bundler
+  - Ignore an empty string BUNDLE_GEMFILE
+  - Skeleton gemspec now works with older versions of git
+  - Fix shell quoting and ref fetching in GemHelper
+  - Disable colored output in --deployment
+  - Preserve line endings in lock file
+
+Features:
+
+  - Add support for 'mingw32' platform (aka RubyInstaller)
+  - Large speed increase when Gemfile.lock is already present
+  - Huge speed increase when many (100+) system gems are present
+  - Significant expansion of ISSUES, man pages, and docs site
+  - Remove Open3 from GemHelper (now it works on Windows™®©)
+  - Allow setting roles in built-in cap and vlad tasks
+
 ## 1.0.3 (October 15, 2010)
 
 Bugfixes:

@@ -21,10 +21,7 @@ end
 
 module Bundler
   class Resolver
-    ALL = [ Gem::Platform::RUBY,
-            Gem::Platform::JAVA,
-            Gem::Platform::MSWIN,
-            Gem::Platform::MINGW ]
+    ALL = Bundler::Dependency::PLATFORM_MAP.values.uniq.freeze
 
     class SpecGroup < Array
       include GemHelpers
@@ -236,7 +233,8 @@ module Bundler
           # to keep a list of every spot a failure happened.
           if parent && parent.name != 'bundler'
             debug { "    -> Jumping to: #{parent.name}" }
-            throw parent.name, existing.respond_to?(:required_by) && existing.required_by.last && existing.required_by.last.name
+            required_by = existing.respond_to?(:required_by) && existing.required_by.last
+            throw parent.name, required_by && required_by.name
           else
             # The original set of dependencies conflict with the base set of specs
             # passed to the resolver. This is by definition an impossible resolve.

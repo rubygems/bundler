@@ -29,9 +29,10 @@ module Spec
     def run(cmd, *args)
       opts = args.last.is_a?(Hash) ? args.pop : {}
       expect_err = opts.delete(:expect_err)
+      env = opts.delete(:env)
       groups = args.map {|a| a.inspect }.join(", ")
       setup = "require 'rubygems' ; require 'bundler' ; Bundler.setup(#{groups})\n"
-      @out = ruby(setup + cmd, :expect_err => expect_err)
+      @out = ruby(setup + cmd, :expect_err => expect_err, :env => env)
     end
 
     def lib
@@ -65,8 +66,9 @@ module Spec
 
     def ruby(ruby, options = {})
       expect_err = options.delete(:expect_err)
+      env = (options.delete(:env) || {}).map{|k,v| "#{k}='#{v}' "}.join
       ruby.gsub!(/["`\$]/) {|m| "\\#{m}" }
-      sys_exec(%'#{Gem.ruby} -I#{lib} -e "#{ruby}"', expect_err)
+      sys_exec(%{#{env}#{Gem.ruby} -I#{lib} -e "#{ruby}"}, expect_err)
     end
 
     def gembin(cmd)

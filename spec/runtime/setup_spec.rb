@@ -156,6 +156,14 @@ describe "Bundler.setup" do
         run "require 'yard'"
         out.should == "bundler-#{Bundler::VERSION}\nyard-1.0"
       end
+
+      context "when the ruby stdlib is a substring of Gem.path" do
+        it "does not reject the stdlib from $LOAD_PATH" do
+          substring = "/" + $LOAD_PATH.find{|p| p =~ /vendor_ruby/ }.split("/")[2]
+          run "puts 'worked!'", :env => {"GEM_PATH" => substring}
+          out.should == "worked!"
+        end
+      end
     end
   end
 

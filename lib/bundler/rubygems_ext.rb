@@ -121,7 +121,7 @@ module Gem
   class Platform
     JAVA  = Gem::Platform.new('java')
     MSWIN = Gem::Platform.new('mswin32')
-    MINGW = Gem::Platform.new('mingw32')
+    MINGW = Gem::Platform.new('x86-mingw32')
 
     def hash
       @cpu.hash ^ @os.hash ^ @version.hash
@@ -181,7 +181,7 @@ module Bundler
 
       GENERIC_CACHE[p] ||= begin
         found = GENERICS.find do |p2|
-          p.os == p2.os if p2.is_a?(Gem::Platform)
+          p2.is_a?(Gem::Platform) && p.os == p2.os
         end
         found || Gem::Platform::RUBY
       end

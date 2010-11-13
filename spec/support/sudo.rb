@@ -1,7 +1,7 @@
 module Spec
   module Sudo
     def self.present?
-      @which_sudo ||= `which sudo`.strip
+      @which_sudo ||= `which sudo`.strip rescue ''
       !@which_sudo.empty? && ENV['BUNDLER_SUDO_TESTS']
     end
 

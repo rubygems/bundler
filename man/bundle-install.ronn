@@ -3,9 +3,12 @@ bundle-install(1) -- Install the dependencies specified in your Gemfile
 
 ## SYNOPSIS
 
-`bundle install` [--local] [--quiet] [--gemfile=GEMFILE] [--system]
-                 [--deployment] [--frozen] [--path]
-                 [--binstubs[=DIRECTORY]] [--without=GROUP1[ GROUP2...]]
+`bundle install` [--gemfile=GEMFILE]
+                 [--path PATH] [--system]
+                 [--without=GROUP1[ GROUP2...]]
+                 [--local] [--deployment]
+                 [--binstubs[=DIRECTORY]]
+                 [--quiet]
 
 ## DESCRIPTION
 

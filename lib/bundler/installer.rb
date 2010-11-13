@@ -53,6 +53,7 @@ module Bundler
           old_args = Gem::Command.build_args
           Gem::Command.build_args = [Bundler.settings["build.#{spec.name}"]]
           spec.source.install(spec)
+          Bundler.ui.debug "from #{spec.loaded_from} "
         ensure
           Gem::Command.build_args = old_args
         end

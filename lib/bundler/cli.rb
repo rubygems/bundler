@@ -12,13 +12,17 @@ module Bundler
 
     def initialize(*)
       super
-      plain_shell(options["no-color"])
+      the_shell = (options["no-color"] ? Thor::Shell::Basic.new : shell)
+      Bundler.ui = UI::Shell.new(the_shell)
+      Bundler.ui.debug! if options["verbose"]
+      Gem::DefaultUserInteraction.ui = UI::RGProxy.new(Bundler.ui)
     end
 
     check_unknown_options! unless ARGV.include?("exec") || ARGV.include?("config")
 
     default_task :install
     class_option "no-color", :type => :boolean, :banner => "Disable colorization in output"
+    class_option "verbose",  :type => :boolean, :banner => "Enable verbose output mode", :aliases => "-V"
 
     def help(cli = nil)
       case cli
@@ -160,8 +164,10 @@ module Bundler
       opts[:without].map!{|g| g.to_sym }
 
       ENV['BUNDLE_GEMFILE'] = File.expand_path(opts[:gemfile]) if opts[:gemfile]
+      ENV['RB_USER_INSTALL'] = '1' if Bundler::FREEBSD
 
-      plain_shell(true) if opts[:deployment]
+      # Just disable color in deployment mode
+      Bundler.ui.shell = Thor::Shell::Basic.new if opts[:deployment]
 
       if opts[:production]
         opts[:deployment] = true
@@ -491,8 +497,7 @@ module Bundler
   private
 
     def have_groff?
-      `which groff 2>#{NULL}`
-      $? == 0
+      system("which groff 2>&1 >#{NULL}") rescue false
     end
 
     def locate_gem(name)
@@ -502,12 +507,6 @@ module Bundler
         return File.expand_path('../../../', __FILE__)
       end
       spec.full_gem_path
-    end
-
-    def plain_shell(disable_color)
-      use_shell = disable_color ? Thor::Shell::Basic.new : shell
-      Bundler.ui = UI::Shell.new(use_shell)
-      Gem::DefaultUserInteraction.ui = UI::RGProxy.new(Bundler.ui)
     end
 
   end

@@ -346,14 +346,7 @@ module Spec
 
       def platforms(platforms)
         platforms.split(/\s+/).each do |platform|
-          platform = 'x86-mswin32' if platform == 'mswin32'
-          platform = Gem::Platform.new(platform)
-          if String === platform
-            class << platform
-              undef =~
-              alias =~ ==
-            end
-          end
+          platform.gsub!(/^(mswin32)$/, 'x86-\1')
           yield Gem::Platform.new(platform)
         end
       end
