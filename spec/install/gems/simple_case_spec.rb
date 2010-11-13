@@ -471,37 +471,28 @@ describe "bundle install with gem sources" do
       out.should include "The disable-shared-gem option is no longer available"
     end
 
-    ["install vendor/bundle", "install --path vendor/bundle"].each do |install|
-      if install == "install vendor/bundle"
-        it "displays the deprecation warning for path as an argument to install" do
-          bundle install
-          out.should include("The path argument to `bundle install` is deprecated.")
-        end
-      end
+    it "does not use available system gems with bundle --path vendor/bundle" do
+      bundle "install --path vendor/bundle"
+      should_be_installed "rack 1.0.0"
+    end
 
-      it "does not use available system gems with bundle #{install}" do
-        bundle install
-        should_be_installed "rack 1.0.0"
-      end
+    it "prints a warning to let the user know what has happened with bundle --path vendor/bundle" do
+      bundle "install --path vendor/bundle"
+      out.should include("It was installed into ./vendor")
+    end
 
-      it "prints a warning to let the user know what has happened with bundle #{install}" do
-        bundle install
-        out.should include("It was installed into ./vendor")
-      end
+    it "disallows --path vendor/bundle --system" do
+      bundle "install --path vendor/bundle --system"
+      out.should include("Please choose.")
+    end
 
-      it "disallows #{install} --system" do
-        bundle "#{install} --system"
-        out.should include("Please choose.")
-      end
+    it "remembers to disable system gems after the first time with bundle --path vendor/bundle" do
+      bundle "install --path vendor/bundle"
+      FileUtils.rm_rf bundled_app('vendor')
+      bundle "install"
 
-      it "remembers to disable system gems after the first time with bundle #{install}" do
-        bundle install
-        FileUtils.rm_rf bundled_app('vendor')
-        bundle "install"
-
-        vendored_gems('gems/rack-1.0.0').should be_directory
-        should_be_installed "rack 1.0.0"
-      end
+      vendored_gems('gems/rack-1.0.0').should be_directory
+      should_be_installed "rack 1.0.0"
     end
   end
 

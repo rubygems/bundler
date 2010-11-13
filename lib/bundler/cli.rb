@@ -150,7 +150,7 @@ module Bundler
       "Install using defaults tuned for deployment environments"
     method_option "production", :type => :boolean, :banner =>
       "Deprecated, please use --deployment instead"
-    def install(path = nil)
+    def install
       opts = options.dup
       opts[:without] ||= []
       if opts[:without].size == 1
@@ -169,16 +169,9 @@ module Bundler
                         "the final release of Bundler 1.0. Please use --deployment instead."
       end
 
-      if (path || opts[:path] || opts[:deployment]) && opts[:system]
+      if (opts[:path] || opts[:deployment]) && opts[:system]
         Bundler.ui.error "You have specified both a path to install your gems to, \n" \
                          "as well as --system. Please choose."
-        exit 1
-      end
-
-      if path && opts[:path]
-        Bundler.ui.error "You have specified a path via `bundle install #{path}` as well as\n" \
-                         "by `bundle install --path #{options[:path]}`. These options are\n" \
-                         "equivalent, so please use one or the other."
         exit 1
       end
 
@@ -209,7 +202,6 @@ module Bundler
       # Can't use Bundler.settings for this because settings needs gemfile.dirname
       Bundler.settings[:path] = nil if opts[:system]
       Bundler.settings[:path] = "vendor/bundle" if opts[:deployment]
-      Bundler.settings[:path] = path if path
       Bundler.settings[:path] = opts[:path] if opts[:path]
       Bundler.settings[:bin] = opts["binstubs"] if opts[:binstubs]
       Bundler.settings[:disable_shared_gems] = '1' if Bundler.settings[:path]
@@ -227,12 +219,6 @@ module Bundler
       else
         Bundler.ui.confirm "Your bundle is complete! " +
           "Use `bundle show [gemname]` to see where a bundled gem is installed."
-      end
-
-      if path
-        Bundler.ui.warn "The path argument to `bundle install` is deprecated. " +
-          "It will be removed in version 1.1. " +
-          "Please use `bundle install --path #{path}` instead."
       end
     rescue GemNotFound => e
       if opts[:local]
