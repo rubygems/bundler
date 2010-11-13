@@ -12,7 +12,7 @@ module Bundler
     attr_reader :spec_path, :base, :gemspec
 
     def initialize(base, name = nil)
-      Bundler.ui = UI::Shell.new(Thor::Shell::Color.new)
+      Bundler.ui = UI::Shell.new(Thor::Base.shell)
       @base = base
       gemspecs = name ? [File.join(base, "#{name}.gemspec")] : Dir[File.join(base, "*.gemspec")]
       raise "Unable to determine name from existing gemspec. Use :name => 'gemname' in #install_tasks to manually set it." unless gemspecs.size == 1
