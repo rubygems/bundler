@@ -13,7 +13,7 @@ begin
   Bundler::CLI.start
 rescue Bundler::BundlerError => e
   Bundler.ui.error e.message
-  Bundler.ui.error e.backtrace.join("\n") if ENV["DEBUG"]
+  Bundler.ui.debug e.backtrace.join("\n")
   exit e.status_code
 rescue Interrupt
   Bundler.ui.error "\nQuitting..."
