@@ -137,6 +137,7 @@ module Bundler
       @stack                = []
       @base                 = base
       @index                = index
+      @gems_size            = {}
       @missing_gems         = Hash.new(0)
       @source_requirements  = source_requirements
     end
@@ -175,7 +176,7 @@ module Bundler
         [ activated[a.name] ? 0 : 1,
           a.requirement.prerelease? ? 0 : 1,
           @errors[a.name]   ? 0 : 1,
-          activated[a.name] ? 0 : search(a).size ]
+          activated[a.name] ? 0 : gems_size(a) ]
       end
 
       debug { "Activated:\n" + activated.values.map { |a| "  #{a.name} (#{a.version})" }.join("\n") }
@@ -347,6 +348,10 @@ module Bundler
       # block.
       @stack.slice!(length..-1)
       retval
+    end
+
+    def gems_size(dep)
+      @gems_size[dep] ||= search(dep).size
     end
 
     def search(dep)
