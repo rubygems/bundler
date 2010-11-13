@@ -1,3 +1,9 @@
+## 1.0.5 (November 13, 2010)
+
+Bugfixes:
+
+  - Fix regression disabling all operations that employ sudo
+
 ## 1.0.4 (November 12, 2010)
 
 Bugfixes:

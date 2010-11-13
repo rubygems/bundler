@@ -25,7 +25,7 @@ describe "bundle help" do
   it "simply outputs the txt file when there is no groff on the path" do
     kill_path!
 
-    bundle "help install"
+    bundle "help install", :expect_err => true
     out.should =~ /BUNDLE-INSTALL/
   end
 
