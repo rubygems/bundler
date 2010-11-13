@@ -124,6 +124,12 @@ There are a number of `Gemfile` platforms:
     JRuby
   * `mswin`:
     Windows
+  * `mingw`:
+    Windows 'mingw32' platform (aka RubyInstaller)
+  * `mingw_18`:
+    _mingw_ `AND` version 1.8
+  * `mingw_19`:
+    _mingw_ `AND` version 1.9
 
 As with groups, you can specify one or more platforms:
 

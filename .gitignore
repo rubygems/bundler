@@ -17,3 +17,6 @@ lib/bundler/man
 
 # output from ci_reporter
 spec/reports
+
+# Netbeans
+nbproject
