@@ -503,7 +503,7 @@ module Bundler
   private
 
     def have_groff?
-      system("which groff 2>&1 >#{NULL}") rescue false
+      !(`which groff` rescue '').empty?
     end
 
     def locate_gem(name)
