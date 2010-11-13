@@ -530,7 +530,7 @@ module Bundler
       # TODO: actually cache git specs
       def specs
         if allow_git_ops? && !@update
-        # Start by making sure the git cache is up to date
+          # Start by making sure the git cache is up to date
           cache
           checkout
           @update = true
