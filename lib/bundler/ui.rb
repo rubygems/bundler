@@ -19,10 +19,11 @@ module Bundler
       def initialize(shell)
         @shell = shell
         @quiet = false
+        @debug = ENV['DEBUG']
       end
 
       def debug(msg)
-        @shell.say(msg) if ENV['DEBUG'] && !@quiet
+        @shell.say(msg) if @debug && !@quiet
       end
 
       def info(msg)
@@ -43,6 +44,10 @@ module Bundler
 
       def be_quiet!
         @quiet = true
+      end
+
+      def debug!
+        @debug = true
       end
     end
 
