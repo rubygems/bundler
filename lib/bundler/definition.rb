@@ -232,6 +232,11 @@ module Bundler
           handled << dep.name
       end
 
+      out << "\n"
+      out << "METADATA\n"
+
+      out << "  version: #{Bundler::VERSION}\n"
+
       out
     end
 
