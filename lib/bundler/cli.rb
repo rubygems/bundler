@@ -12,8 +12,10 @@ module Bundler
 
     def initialize(*)
       super
-      plain_shell(options["no-color"])
-      ENV["DEBUG"] = "true" if options["verbose"]
+      the_shell = options["no-color"] ? Thor::Shell::Basic.new : shell
+      Bundler.ui = UI::Shell.new(the_shell)
+      Bundler.ui.debug! if options["verbose"]
+      Gem::DefaultUserInteraction.ui = UI::RGProxy.new(Bundler.ui)
     end
 
     check_unknown_options! unless ARGV.include?("exec") || ARGV.include?("config")
@@ -510,12 +512,6 @@ module Bundler
         return File.expand_path('../../../', __FILE__)
       end
       spec.full_gem_path
-    end
-
-    def plain_shell(disable_color)
-      use_shell = disable_color ? Thor::Shell::Basic.new : shell
-      Bundler.ui = UI::Shell.new(use_shell)
-      Gem::DefaultUserInteraction.ui = UI::RGProxy.new(Bundler.ui)
     end
 
   end
