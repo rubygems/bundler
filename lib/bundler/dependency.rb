@@ -17,7 +17,9 @@ module Bundler
       :mri_19  => Gem::Platform::RUBY,
       :jruby   => Gem::Platform::JAVA,
       :mswin   => Gem::Platform::MSWIN,
-      :mingw   => Gem::Platform::MINGW
+      :mingw   => Gem::Platform::MINGW,
+      :mingw_18   => Gem::Platform::MINGW,
+      :mingw_19   => Gem::Platform::MINGW
     }.freeze
 
     def initialize(name, version, options = {}, &blk)
@@ -115,5 +117,14 @@ module Bundler
     def mingw?
       Bundler::WINDOWS && Gem::Platform.local.os == "mingw32"
     end
+
+    def mingw_18?
+      mingw? && RUBY_VERSION < "1.9"
+    end
+
+    def mingw_19?
+      mingw? && RUBY_VERSION >= "1.9"
+    end
+
   end
 end
