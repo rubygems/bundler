@@ -72,4 +72,14 @@ describe "gemcutter's dependency API" do
     bundle :install, :artifice => "endpoint_marshal_fail"
     should_be_installed "rack 1.0.0"
   end
+
+  it "timeouts when Bundler::Fetcher redirects to much" do
+    gemfile <<-G
+      source "http://localgemserver.test"
+      gem "rack"
+    G
+
+    bundle :install, :artifice => "endpoint_redirect"
+    out.should match(/Too many redirects/)
+  end
 end

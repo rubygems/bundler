@@ -5,6 +5,8 @@ module Bundler
   class HTTPError < BundlerError; end
 
   class Fetcher
+    REDIRECT_LIMIT = 5
+
     def initialize(remote_uri)
       @remote_uri = remote_uri
       @@connection ||= Net::HTTP::Persistent.new
@@ -44,14 +46,16 @@ module Bundler
 
   private
 
-    def fetch(uri)
+    def fetch(uri, counter = 0)
+      raise HTTPError, "Too many redirects" if counter >= REDIRECT_LIMIT
+
       Bundler.ui.debug "Fetching from: #{uri}"
       response = @@connection.request(uri)
       case response
       when Net::HTTPRedirection
         Bundler.ui.debug("HTTP Redirection")
         uri = URI.parse(response["location"])
-        fetch(uri)
+        fetch(uri, counter + 1)
       when Net::HTTPSuccess
         Bundler.ui.debug("HTTP Success")
         response.body
