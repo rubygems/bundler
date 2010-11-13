@@ -2,8 +2,6 @@ require 'uri'
 require 'net/http/persistent'
 
 module Bundler
-  class HTTPError < BundlerError; end
-
   class Fetcher
     REDIRECT_LIMIT = 5
 
