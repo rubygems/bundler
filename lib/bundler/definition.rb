@@ -340,7 +340,7 @@ module Bundler
 
         if in_locked_deps?(dep, locked_dep) || satisfies_locked_spec?(dep)
           deps << dep
-        elsif dep.source.is_a?(Source::Path) && (!locked_dep || dep.source != locked_dep.source)
+        elsif dep.source.is_a?(Source::Path) && dep.current_platform? && (!locked_dep || dep.source != locked_dep.source)
           @locked_specs.each do |s|
             @unlock[:gems] << s.name if s.source == dep.source
           end
@@ -383,7 +383,7 @@ module Bundler
         next unless source.respond_to?(:unlock!)
 
         unless resolve.any? { |s| s.source == source }
-          source.unlock! if diff.any? { |s| s.source == source }
+          source.unlock! if !diff.empty? && diff.any? { |s| s.source == source }
         end
       end
 

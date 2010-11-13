@@ -175,4 +175,18 @@ describe "bundle install with platform conditionals" do
     G
     should_not_be_installed "nokogiri 1.4.2"
   end
+
+  it "does not blow up on sources with all platform-excluded specs" do
+    git = build_git "foo"
+
+    install_gemfile <<-G
+      platform :#{not_local_tag} do
+        gem "foo", :git => "#{lib_path('foo-1.0')}"
+      end
+    G
+
+    bundle :show, :exitstatus => true
+    exitstatus.should == 0
+  end
+
 end
