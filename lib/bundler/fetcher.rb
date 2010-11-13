@@ -2,7 +2,7 @@ require 'uri'
 require 'net/http/persistent'
 
 module Bundler
-  class HTTPError < Exception; end
+  class HTTPError < BundlerError; end
 
   class Fetcher
     def initialize(remote_uri)

@@ -45,6 +45,7 @@ module Bundler
   class DslError         < BundlerError; status_code(15) ; end
   class ProductionError  < BundlerError; status_code(16) ; end
   class InvalidOption    < DslError                      ; end
+  class HTTPError        < BundlerError; status_code(17) ; end
 
 
   WINDOWS = RbConfig::CONFIG["host_os"] =~ %r!(msdos|mswin|djgpp|mingw)!
