@@ -16,6 +16,8 @@ module Bundler
     end
 
     class Shell < UI
+      attr_writer :shell
+
       def initialize(shell)
         @shell = shell
         @quiet = false

@@ -12,7 +12,7 @@ module Bundler
 
     def initialize(*)
       super
-      the_shell = options["no-color"] ? Thor::Shell::Basic.new : shell
+      the_shell = (options["no-color"] ? Thor::Shell::Basic.new : shell)
       Bundler.ui = UI::Shell.new(the_shell)
       Bundler.ui.debug! if options["verbose"]
       Gem::DefaultUserInteraction.ui = UI::RGProxy.new(Bundler.ui)
@@ -166,7 +166,8 @@ module Bundler
       ENV['BUNDLE_GEMFILE'] = File.expand_path(opts[:gemfile]) if opts[:gemfile]
       ENV['RB_USER_INSTALL'] = '1' if Bundler::FREEBSD
 
-      plain_shell(true) if opts[:deployment]
+      # Just disable color in deployment mode
+      Bundler.ui.shell = Thor::Shell::Basic.new if opts[:deployment]
 
       if opts[:production]
         opts[:deployment] = true
