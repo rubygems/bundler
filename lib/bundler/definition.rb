@@ -148,9 +148,7 @@ module Bundler
           end
 
           # Run a resolve against the locally available gems
-          local = Resolver.resolve(expanded_dependencies,
-            index, source_requirements, last_resolve, unlocked?)
-          last_resolve.merge(local)
+          last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve)
         end
       end
     end
@@ -426,10 +424,6 @@ module Bundler
       groups = self.groups - Bundler.settings.without
       groups.map! { |g| g.to_sym }
       dependencies.reject { |d| !d.should_include? || (d.groups & groups).empty? }
-    end
-
-    def unlocked?
-      @lockfile_contents.empty?
     end
   end
 end
