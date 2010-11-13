@@ -132,25 +132,8 @@ describe "bundle install with platform conditionals" do
   it "does not install gems tagged w/ another platforms" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
-
       gem "rack"
-
       platforms :#{not_local_tag} do
-        gem "nokogiri"
-      end
-    G
-
-    should_be_installed     "rack 1.0"
-    should_not_be_installed "nokogiri 1.4.2"
-  end
-
-  it "does not install gems tagged w/ another platform" do
-    install_gemfile <<-G
-      source "file://#{gem_repo1}"
-
-      gem "rack"
-
-      platform :#{not_local_tag} do
         gem "nokogiri"
       end
     G
