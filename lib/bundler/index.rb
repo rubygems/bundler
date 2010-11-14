@@ -38,7 +38,7 @@ module Bundler
 
       wants_prerelease = dependency.requirement.prerelease?
       only_prerelease  = specs.all? {|spec| spec.version.prerelease? }
-      found = specs.select { |spec| spec_satisfies_dependency?(spec, dependency) }
+      found = specs.select { |spec| dependency.matches_spec?(spec) }
 
       unless wants_prerelease || only_prerelease
         found.reject! { |spec| spec.version.prerelease? }
@@ -95,18 +95,13 @@ module Bundler
       end
     end
 
-    def spec_satisfies_dependency?(spec, dep)
-      return false unless dep.name === spec.name
-      dep.requirement.satisfied_by?(spec.version)
-    end
-
     def search_by_dependency(dependency)
       @cache[dependency.hash] ||= begin
         specs = @specs[dependency.name]
 
         wants_prerelease = dependency.requirement.prerelease?
         only_prerelease  = specs.all? {|spec| spec.version.prerelease? }
-        found = specs.select { |spec| dependency =~ spec && Gem::Platform.match(spec.platform) }
+        found = specs.select { |spec| dependency.matches_spec?(spec) && Gem::Platform.match(spec.platform) }
 
         unless wants_prerelease || only_prerelease
           found.reject! { |spec| spec.version.prerelease? }
