@@ -13,11 +13,12 @@ module Bundler
       @state        = :source
 
       lockfile.split(/(\r?\n)+/).each do |line|
-        if line == "DEPENDENCIES"
+        case line
+        when "DEPENDENCIES"
           @state = :dependency
-        elsif line == "PLATFORMS"
+        when "PLATFORMS"
           @state = :platform
-        elsif line == "METADATA"
+        when "METADATA"
           @state = :metadata
         else
           send("parse_#{@state}", line)
