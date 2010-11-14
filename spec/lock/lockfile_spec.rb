@@ -753,27 +753,26 @@ describe "the lockfile format" do
     end
   end
 
-  it "rewrites the lock file when it's missing/coming from an older version fo bundler" do
+  it "adds bundler version to the lock if it's missing" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack"
     G
 
-    lock_file = <<-G
-GEM
-  remote: file:#{gem_repo1}/
-  specs:
-    rack (1.0.0)
+    lockfile <<-G
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          rack (1.0.0)
 
-PLATFORMS
-  #{generic(Gem::Platform.local)}
+      PLATFORMS
+        #{generic(Gem::Platform.local)}
 
-DEPENDENCIES
-  rack
+      DEPENDENCIES
+        rack
     G
 
-    File.open(bundled_app('Gemfile.lock'), 'w') {|file| file.write(lock_file) }
     bundle :install
 
     lockfile_should_be <<-G

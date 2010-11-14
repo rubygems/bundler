@@ -220,8 +220,7 @@ module Bundler
         out << "  #{p}\n"
       end
 
-      out << "\n"
-      out << "DEPENDENCIES\n"
+      out << "\nDEPENDENCIES\n"
 
       handled = []
       dependencies.
@@ -232,8 +231,7 @@ module Bundler
           handled << dep.name
       end
 
-      out << "\n"
-      out << "METADATA\n"
+      out << "\nMETADATA\n"
 
       out << "  version: #{Bundler::VERSION}\n"
 
