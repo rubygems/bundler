@@ -8,6 +8,9 @@ module Bundler
       i
     end
 
+    attr_reader :specs
+    protected   :specs
+
     def initialize
       @cache = {}
       @specs = Hash.new { |h,k| h[k] = [] }
@@ -17,7 +20,10 @@ module Bundler
       super
       @cache = {}
       @specs = Hash.new { |h,k| h[k] = [] }
-      merge!(o)
+
+      o.specs.each do |name, array|
+        @specs[name] = array.dup
+      end
     end
 
     def empty?
@@ -38,7 +44,7 @@ module Bundler
 
       wants_prerelease = dependency.requirement.prerelease?
       only_prerelease  = specs.all? {|spec| spec.version.prerelease? }
-      found = specs.select { |spec| spec_satisfies_dependency?(spec, dependency) }
+      found = specs.select { |spec| dependency.matches_spec?(spec) }
 
       unless wants_prerelease || only_prerelease
         found.reject! { |spec| spec.version.prerelease? }
@@ -59,7 +65,7 @@ module Bundler
       arr = @specs[spec.name]
 
       arr.delete_if do |s|
-        s.version == spec.version && s.platform == spec.platform
+        same_version?(s.version, spec.version) && s.platform == spec.platform
       end
 
       arr << spec
@@ -91,8 +97,14 @@ module Bundler
 
     def search_by_spec(spec)
       @specs[spec.name].select do |s|
-        s.version == spec.version && Gem::Platform.new(s.platform) == Gem::Platform.new(spec.platform)
+        same_version?(s.version, spec.version) && Gem::Platform.new(s.platform) == Gem::Platform.new(spec.platform)
       end
+    end
+
+    def same_version?(a, b)
+      regex = /^(.*?)(?:\.0)*$/
+
+      ret = a.to_s[regex, 1] == b.to_s[regex, 1]
     end
 
     def spec_satisfies_dependency?(spec, dep)
@@ -106,7 +118,7 @@ module Bundler
 
         wants_prerelease = dependency.requirement.prerelease?
         only_prerelease  = specs.all? {|spec| spec.version.prerelease? }
-        found = specs.select { |spec| dependency =~ spec && Gem::Platform.match(spec.platform) }
+        found = specs.select { |spec| dependency.matches_spec?(spec) && Gem::Platform.match(spec.platform) }
 
         unless wants_prerelease || only_prerelease
           found.reject! { |spec| spec.version.prerelease? }

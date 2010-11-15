@@ -266,6 +266,9 @@ describe "bundle flex_install" do
 
       DEPENDENCIES
         rack
+
+      METADATA
+        version: #{Bundler::VERSION}
       L
     end
   end

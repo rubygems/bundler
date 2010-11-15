@@ -116,6 +116,20 @@ module Gem
       end
       out
     end
+
+    def matches_spec?(spec)
+      # name can be a Regexp, so use ===
+      return false unless name === spec.name
+      return true  if requirement.none?
+
+      requirement.satisfied_by?(spec.version)
+    end unless allocate.respond_to?(:matches_spec?)
+  end
+
+  class Requirement
+    def none?
+      @none ||= (to_s == ">= 0")
+    end unless allocate.respond_to?(:none?)
   end
 
   class Platform

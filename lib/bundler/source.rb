@@ -159,7 +159,7 @@ module Bundler
         @installed_specs ||= begin
           idx = Index.new
           have_bundler = false
-          Gem::SourceIndex.from_installed_gems.to_a.reverse.each do |dont_use_this_var, spec|
+          Gem.source_index.to_a.reverse.each do |dont_use_this_var, spec|
             next if spec.name == 'bundler' && spec.version.to_s != VERSION
             have_bundler = true if spec.name == 'bundler'
             spec.source = self
@@ -186,27 +186,24 @@ module Bundler
 
       def cached_specs
         @cached_specs ||= begin
-          idx = Index.new
-          @caches.each do |path|
-            Dir["#{path}/*.gem"].each do |gemfile|
-              next if gemfile =~ /bundler\-[\d\.]+?\.gem/
+          idx = installed_specs.dup
 
-              # Try to skip decompressing the gem to get at the gemspec if possible
-              cached_gemspec = gemfile.gsub(%r{cache/(.*?)\.gem}, 'specifications/\1.gemspec')
-              s = Gem::Specification.load(cached_gemspec) if File.exist?(cached_gemspec)
+          path = Bundler.app_cache
+          Dir["#{path}/*.gem"].each do |gemfile|
+            next if gemfile =~ /bundler\-[\d\.]+?\.gem/
 
-              begin
-                s ||= Gem::Format.from_file_by_path(gemfile).spec
-              rescue Gem::Package::FormatError
-                raise GemspecError, "Could not read gem at #{gemfile}. It may be corrupted."
-              end
-
-              s.source = self
-              idx << s
+            begin
+              s ||= Gem::Format.from_file_by_path(gemfile).spec
+            rescue Gem::Package::FormatError
+              raise GemspecError, "Could not read gem at #{gemfile}. It may be corrupted."
             end
+
+            s.source = self
+            idx << s
           end
-          idx
         end
+
+        idx
       end
 
       def remote_specs(dependencies = nil)
@@ -521,7 +518,7 @@ module Bundler
       # TODO: actually cache git specs
       def specs(*)
         if allow_git_ops? && !@update
-        # Start by making sure the git cache is up to date
+          # Start by making sure the git cache is up to date
           cache
           checkout
           @update = true
