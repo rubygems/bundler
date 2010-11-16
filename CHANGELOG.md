@@ -1,4 +1,4 @@
-## 1.0.6 (November 15, 2010)
+## 1.0.6 (November 16, 2010)
 
 Bugfixes:
 
