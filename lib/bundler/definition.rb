@@ -4,7 +4,7 @@ module Bundler
   class Definition
     include GemHelpers
 
-    attr_reader :dependencies, :platforms, :sources
+    attr_reader :dependencies, :platforms, :sources, :version
 
     def self.build(gemfile, lockfile, unlock)
       unlock ||= {}
@@ -34,10 +34,12 @@ module Bundler
       @remote            = false
       @specs             = nil
       @lockfile_contents = ""
+      @version           = nil
 
       if lockfile && File.exists?(lockfile)
         @lockfile_contents = Bundler.read_file(lockfile)
         locked = LockfileParser.new(@lockfile_contents)
+        @version        = locked.metadata["version"]
         @platforms      = locked.platforms
 
         if unlock != true

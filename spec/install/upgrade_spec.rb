@@ -26,7 +26,7 @@ describe "bundle install for the first time with v1.0" do
 end
 
 describe "bundle install from older version of bundler than lockfile" do
-  fit "warns user of out of date bundler" do
+  it "warns user of out of date bundler" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack"
