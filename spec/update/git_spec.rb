@@ -189,7 +189,7 @@ describe "bundle update" do
       lib_path("foo-1.0").join(".git").rmtree
 
       bundle :update, :expect_err => true
-      out.should include(lib_path("foo-1.0"))
+      out.should include(lib_path("foo-1.0").to_s)
     end
 
   end
