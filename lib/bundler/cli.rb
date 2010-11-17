@@ -154,6 +154,8 @@ module Bundler
       "Install using defaults tuned for deployment environments"
     method_option "production", :type => :boolean, :banner =>
       "Deprecated, please use --deployment instead"
+    method_option "standalone", :type => :array, :lazy_default => [], :banner =>
+      "Make a bundle that can work without the Bundler runtime"
     def install
       opts = options.dup
       opts[:without] ||= []
@@ -210,8 +212,13 @@ module Bundler
       Bundler.settings[:path] = "vendor/bundle" if opts[:deployment]
       Bundler.settings[:path] = opts[:path] if opts[:path]
       Bundler.settings[:bin] = opts["binstubs"] if opts[:binstubs]
+      Bundler.settings[:path]   = nil if opts[:system]
+      Bundler.settings[:path]   = "vendor/bundle" if opts[:deployment]
+      Bundler.settings[:path]   = opts[:path] if opts[:path]
+      Bundler.settings[:path] ||= "bundle" if opts[:standalone]
+      Bundler.settings[:bin]    = opts["binstubs"] if opts[:binstubs]
       Bundler.settings[:disable_shared_gems] = '1' if Bundler.settings[:path]
-      Bundler.settings.without = opts[:without] unless opts[:without].empty?
+      Bundler.settings.without  = opts[:without] unless opts[:without].empty?
       Bundler.ui.be_quiet! if opts[:quiet]
 
       Installer.install(Bundler.root, Bundler.definition, opts)

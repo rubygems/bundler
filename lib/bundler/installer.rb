@@ -64,6 +64,7 @@ module Bundler
       end
 
       lock
+      generate_standalone(options[:standalone]) if options[:standalone]
     end
 
   private
@@ -79,6 +80,37 @@ module Bundler
         File.open "#{bin_path}/#{executable}", 'w', 0755 do |f|
           f.puts ERB.new(template, nil, '-').result(binding)
         end
+      end
+    end
+
+    def generate_standalone(groups)
+      path = Bundler.settings[:path]
+      bundler_path = File.join(path, "bundler")
+      FileUtils.mkdir_p(bundler_path)
+
+      paths = []
+
+      if groups.empty?
+        specs = Bundler.definition.requested_specs
+      else
+        specs = Bundler.definition.specs_for groups.map { |g| g.to_sym }
+      end
+
+      specs.each do |spec|
+        next if spec.name == "bundler"
+
+        spec.require_paths.each do |path|
+          full_path = File.join(spec.full_gem_path, path)
+          paths << Pathname.new(full_path).relative_path_from(Bundler.root)
+        end
+      end
+
+      File.open File.join(bundler_path, "setup.rb"), "w" do |file|
+        lines = paths.map do |path|
+          %{$:.unshift "#{path}"}
+        end
+
+        file.puts lines.join("\n")
       end
     end
   end

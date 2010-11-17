@@ -68,7 +68,8 @@ module Spec
       expect_err = options.delete(:expect_err)
       env = (options.delete(:env) || {}).map{|k,v| "#{k}='#{v}' "}.join
       ruby.gsub!(/["`\$]/) {|m| "\\#{m}" }
-      sys_exec(%{#{env}#{Gem.ruby} -I#{lib} -e "#{ruby}"}, expect_err)
+      lib_option = options[:no_lib] ? "" : " -I#{lib}"
+      sys_exec(%{#{env}#{Gem.ruby}#{lib_option} -e "#{ruby}"}, expect_err)
     end
 
     def gembin(cmd)
