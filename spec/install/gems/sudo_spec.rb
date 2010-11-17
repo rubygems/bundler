@@ -1,10 +1,6 @@
 require "spec_helper"
 
-describe "when using sudo" do
-  before :each do
-    pending "set BUNDLER_SUDO_TESTS to run sudo specs" unless test_sudo?
-  end
-
+describe "when using sudo", :sudo => true do
   describe "and GEM_HOME is owned by root" do
     before :each do
       chown_system_gems_to_root

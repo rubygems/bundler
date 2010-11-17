@@ -5,10 +5,6 @@ module Spec
       !@which_sudo.empty? && ENV['BUNDLER_SUDO_TESTS']
     end
 
-    def test_sudo?
-      Sudo.present?
-    end
-
     def sudo(cmd)
       raise "sudo not present" unless Sudo.present?
       sys_exec("sudo #{cmd}")

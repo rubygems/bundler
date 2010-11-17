@@ -40,6 +40,7 @@ RSpec.configure do |config|
   config.include Spec::Sudo
 
   config.filter_run :focused => true unless ENV['CI']
+  config.filter_run_excluding :sudo => true unless Spec::Sudo.present?
   config.run_all_when_everything_filtered = true
   config.alias_example_to :fit, :focused => true
 
@@ -81,3 +82,4 @@ RSpec.configure do |config|
     ENV['BUNDLE_APP_CONFIG']     = nil
   end
 end
+
