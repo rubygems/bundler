@@ -24,7 +24,7 @@ begin
     namespace :ci do
       desc "Run specs with Hudson output"
       RSpec::Core::RakeTask.new(:spec)
-      task :spec => ["ci:setup:rspec", "man:build"]
+      task :spec => ["ci:setup:rspec", "man:build", "spec:set_sudo"]
     end
 
   rescue LoadError
