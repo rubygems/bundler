@@ -130,8 +130,6 @@ module Bundler
     D
     method_option "without", :type => :array, :banner =>
       "Exclude gems that are part of the specified named group."
-    method_option "disable-shared-gems", :type => :boolean, :banner =>
-      "This option is deprecated. Please do not use it."
     method_option "gemfile", :type => :string, :banner =>
       "Use the specified gemfile instead of Gemfile"
     method_option "no-prune", :type => :boolean, :banner =>
@@ -152,8 +150,6 @@ module Bundler
       "Do not allow the Gemfile.lock to be updated after this install"
     method_option "deployment", :type => :boolean, :banner =>
       "Install using defaults tuned for deployment environments"
-    method_option "production", :type => :boolean, :banner =>
-      "Deprecated, please use --deployment instead"
     method_option "standalone", :type => :array, :lazy_default => [], :banner =>
       "Make a bundle that can work without the Bundler runtime"
     def install
@@ -171,24 +167,9 @@ module Bundler
       # Just disable color in deployment mode
       Bundler.ui.shell = Thor::Shell::Basic.new if opts[:deployment]
 
-      if opts[:production]
-        opts[:deployment] = true
-        Bundler.ui.warn "The --production option is deprecated, and will be removed in " \
-                        "the final release of Bundler 1.0. Please use --deployment instead."
-      end
-
       if (opts[:path] || opts[:deployment]) && opts[:system]
         Bundler.ui.error "You have specified both a path to install your gems to, \n" \
                          "as well as --system. Please choose."
-        exit 1
-      end
-
-      if opts["disable-shared-gems"]
-        Bundler.ui.error "The disable-shared-gem option is no longer available.\n\n" \
-                         "Instead, use `bundle install` to install to your system,\n" \
-                         "or `bundle install --path path/to/gems` to install to an isolated\n" \
-                         "location. Bundler will resolve relative paths relative to\n" \
-                         "your `Gemfile`."
         exit 1
       end
 
@@ -208,10 +189,6 @@ module Bundler
       end
 
       # Can't use Bundler.settings for this because settings needs gemfile.dirname
-      Bundler.settings[:path] = nil if opts[:system]
-      Bundler.settings[:path] = "vendor/bundle" if opts[:deployment]
-      Bundler.settings[:path] = opts[:path] if opts[:path]
-      Bundler.settings[:bin] = opts["binstubs"] if opts[:binstubs]
       Bundler.settings[:path]   = nil if opts[:system]
       Bundler.settings[:path]   = "vendor/bundle" if opts[:deployment]
       Bundler.settings[:path]   = opts[:path] if opts[:path]
@@ -265,16 +242,6 @@ module Bundler
       Bundler.load.cache if Bundler.root.join("vendor/cache").exist?
       Bundler.ui.confirm "Your bundle is updated! " +
         "Use `bundle show [gemname]` to see where a bundled gem is installed."
-    end
-
-    desc "lock", "Locks the bundle to the current set of dependencies, including all child dependencies."
-    def lock
-      Bundler.ui.warn "Lock is deprecated. Your bundle is now locked whenever you run `bundle install`."
-    end
-
-    desc "unlock", "Unlock the bundle. This allows gem versions to be changed."
-    def unlock
-      Bundler.ui.warn "Unlock is deprecated. To update to newer gem versions, use `bundle update`."
     end
 
     desc "show [GEM]", "Shows all gems that are part of the bundle, or the path to a given gem"
