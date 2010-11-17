@@ -134,7 +134,7 @@ module Bundler
     private
 
       def cached_gem(spec)
-        possibilities = @caches.map { |p| "#{p}/#{spec.full_name}.gem" }
+        possibilities = @caches.map { |p| "#{p}/#{spec.file_name}" }
         possibilities.find { |p| File.exist?(p) }
       end
 
