@@ -21,9 +21,6 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack
-
-      METADATA
-        version: #{Bundler::VERSION}
     G
   end
 
@@ -47,9 +44,6 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack-obama
-
-      METADATA
-        version: #{Bundler::VERSION}
     G
   end
 
@@ -73,9 +67,6 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack-obama (>= 1.0)
-
-      METADATA
-        version: #{Bundler::VERSION}
     G
   end
 
@@ -99,9 +90,6 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         net-sftp
-
-      METADATA
-        version: #{Bundler::VERSION}
     G
 
     should_be_installed "net-sftp 1.1.1", "net-ssh 1.0.0"
@@ -129,9 +117,6 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         foo!
-
-      METADATA
-        version: #{Bundler::VERSION}
     G
   end
 
@@ -165,9 +150,6 @@ describe "the lockfile format" do
       DEPENDENCIES
         omg!
         rack
-
-      METADATA
-        version: #{Bundler::VERSION}
     L
 
     bundle "install"
@@ -198,9 +180,6 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         foo!
-
-      METADATA
-        version: #{Bundler::VERSION}
     G
   end
 
@@ -228,9 +207,6 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         foo!
-
-      METADATA
-        version: #{Bundler::VERSION}
     G
   end
 
@@ -258,9 +234,6 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         foo!
-
-      METADATA
-        version: #{Bundler::VERSION}
     G
   end
 
@@ -285,9 +258,6 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         foo!
-
-      METADATA
-        version: #{Bundler::VERSION}
     G
   end
 
@@ -320,9 +290,6 @@ describe "the lockfile format" do
         actionpack
         rack-obama
         thin
-
-      METADATA
-        version: #{Bundler::VERSION}
     G
   end
 
@@ -359,9 +326,6 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rails
-
-      METADATA
-        version: #{Bundler::VERSION}
     G
   end
 
@@ -385,9 +349,6 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack-obama (>= 1.0)
-
-      METADATA
-        version: #{Bundler::VERSION}
     G
   end
 
@@ -411,9 +372,6 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack-obama (>= 1.0)
-
-      METADATA
-        version: #{Bundler::VERSION}
     G
   end
 
@@ -439,9 +397,6 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         foo
-
-      METADATA
-        version: #{Bundler::VERSION}
     G
   end
 
@@ -467,9 +422,6 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         foo
-
-      METADATA
-        version: #{Bundler::VERSION}
     G
   end
 
@@ -495,9 +447,6 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         foo
-
-      METADATA
-        version: #{Bundler::VERSION}
     G
   end
 
@@ -535,9 +484,6 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack
-
-      METADATA
-        version: #{Bundler::VERSION}
     G
   end
 
@@ -564,9 +510,6 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         platform_specific
-
-      METADATA
-        version: #{Bundler::VERSION}
     G
   end
 
@@ -595,9 +538,6 @@ describe "the lockfile format" do
       DEPENDENCIES
         activesupport
         rack
-
-      METADATA
-        version: #{Bundler::VERSION}
     G
   end
 
@@ -619,9 +559,6 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack
-
-      METADATA
-        version: #{Bundler::VERSION}
     G
   end
 
@@ -643,9 +580,6 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack (= 1.0)
-
-      METADATA
-        version: #{Bundler::VERSION}
     G
   end
 
@@ -667,9 +601,6 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack (= 1.0)
-
-      METADATA
-        version: #{Bundler::VERSION}
     G
   end
 
@@ -713,9 +644,6 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack (> 0.9, < 1.0)
-
-      METADATA
-        version: #{Bundler::VERSION}
     G
 
   end
@@ -751,44 +679,5 @@ describe "the lockfile format" do
       File.read(bundled_app("Gemfile.lock")).should match("\r\n")
       should_be_installed "rack 1.2"
     end
-  end
-
-  it "adds bundler version to the lock if it's missing" do
-    install_gemfile <<-G
-      source "file://#{gem_repo1}"
-
-      gem "rack"
-    G
-
-    lockfile <<-G
-      GEM
-        remote: file:#{gem_repo1}/
-        specs:
-          rack (1.0.0)
-
-      PLATFORMS
-        #{generic(Gem::Platform.local)}
-
-      DEPENDENCIES
-        rack
-    G
-
-    bundle :install
-
-    lockfile_should_be <<-G
-      GEM
-        remote: file:#{gem_repo1}/
-        specs:
-          rack (1.0.0)
-
-      PLATFORMS
-        #{generic(Gem::Platform.local)}
-
-      DEPENDENCIES
-        rack
-
-      METADATA
-        version: #{Bundler::VERSION}
-    G
   end
 end
