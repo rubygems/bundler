@@ -1,3 +1,10 @@
+## 1.0.7 (November 17, 2010)
+
+Bugfixes:
+
+  - Remove Bundler version from the lockfile because it broke
+    backwards compatibility with 1.0.0-1.0.5. Sorry. :(
+
 ## 1.0.6 (November 16, 2010)
 
 Bugfixes:
