@@ -2,7 +2,11 @@ module Spec
   module Sudo
     def self.present?
       @which_sudo ||= (`which sudo`.chomp rescue '')
-      !@which_sudo.empty? && ENV['BUNDLER_SUDO_TESTS']
+      !@which_sudo.empty?
+    end
+
+    def self.test_sudo?
+      present? && ENV['BUNDLER_SUDO_TESTS']
     end
 
     def sudo(cmd)
