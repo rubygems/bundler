@@ -45,7 +45,7 @@ module Bundler
 
         if have_groff? && root !~ %r{^file:/.+!/META-INF/jruby.home/.+}
           groff   = "groff -Wall -mtty-char -mandoc -Tascii"
-          pager   = ENV['MANPAGER'] || ENV['PAGER'] || 'more'
+          pager   = ENV['MANPAGER'] || ENV['PAGER'] || 'less'
 
           Kernel.exec "#{groff} #{root}/#{command} | #{pager}"
         else
