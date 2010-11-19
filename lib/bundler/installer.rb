@@ -106,11 +106,9 @@ module Bundler
       end
 
       File.open File.join(bundler_path, "setup.rb"), "w" do |file|
-        lines = paths.map do |path|
-          %{$:.unshift "#{path}"}
+        paths.map do |path|
+          file.puts %{$:.unshift "#{path}"}
         end
-
-        file.puts lines.join("\n")
       end
     end
   end
