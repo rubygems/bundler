@@ -87,7 +87,15 @@ module Bundler
       path = Bundler.settings[:path]
       bundler_path = File.join(path, "bundler")
       FileUtils.mkdir_p(bundler_path)
+      template = File.read(File.expand_path('../templates/setup.rb.erb', __FILE__))
+      load_paths            =  standalone_setup_load_paths(groups)
+      required_dependencies =  Bundler.setup(groups).dependencies
+      File.open File.join(bundler_path, "setup.rb"), "w", 0755 do |f|
+        f.puts ERB.new(template, nil, '-').result(binding)
+      end
+    end
 
+    def standalone_setup_load_paths(groups)
       paths = []
 
       if groups.empty?
@@ -105,13 +113,8 @@ module Bundler
         end
       end
 
-      File.open File.join(bundler_path, "setup.rb"), "w" do |file|
-        lines = paths.map do |path|
-          %{$:.unshift "#{path}"}
-        end
-
-        file.puts lines.join("\n")
-      end
+      paths
     end
+
   end
 end

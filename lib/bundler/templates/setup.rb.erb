@@ -1,0 +1,37 @@
+<%= load_paths.map { |path| %Q{$:.unshift "#{path}"} }.join("\n") %>
+
+module Bundler
+  REGEXPS = [
+    /^no such file to load -- (.+)$/i,
+    /^Missing \w+ (?:file\s*)?([^\s]+.rb)$/i,
+    /^Missing API definition file in (.+)$/i,
+    /^cannot load such file -- (.+)$/i,
+  ]
+
+  DEPENDENCIES = [
+    <%- required_dependencies.each do |dep| %>
+      { :name => <%= dep.name.inspect %>,
+        :autorequire => <%= dep.autorequire.inspect %>,
+        :groups => <%= dep.groups.inspect %>
+      },
+    <% end -%>
+  ].freeze
+
+  def self.require(*groups)
+    required_file = nil
+    DEPENDENCIES.select do |dep|
+      (dep[:groups] & groups.map(&:to_sym)).any?
+    end.each do |dep|
+      begin
+        Array(dep[:autorequire] || dep[:name]).each do |file|
+          required_file = file
+          Kernel.require file
+        end
+      rescue LoadError => e
+        REGEXPS.find { |r| r =~ e.message }
+        raise if dep[:autorequire] || $1 != required_file
+      end
+    end
+  end
+
+end

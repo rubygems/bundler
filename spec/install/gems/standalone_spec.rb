@@ -45,6 +45,42 @@ describe "bundle install --standalone" do
     end
   end
 
+  describe "with gems and requires" do
+    before do
+      install_gemfile <<-G, :standalone => true
+        source "file://#{gem_repo1}"
+        gem "rails", :require => 'actionpack'
+      G
+    end
+
+    it "requires the gems on Bundler.require" do
+      ruby <<-RUBY, :no_lib => true
+        $:.unshift File.expand_path("bundle")
+        require "bundler/setup"
+
+        Bundler.require(:default)
+        puts ACTIONPACK
+      RUBY
+
+      out.should == "2.3.2"
+    end
+
+    it "works on a different system" do
+      FileUtils.mv(bundled_app, "#{bundled_app}2")
+      Dir.chdir("#{bundled_app}2")
+
+      ruby <<-RUBY, :no_lib => true
+        $:.unshift File.expand_path("bundle")
+        require "bundler/setup"
+
+        Bundler.require(:default)
+        puts ACTIONPACK
+      RUBY
+
+      out.should == "2.3.2"
+    end
+  end
+
   describe "with a combination of gems and git repos" do
     before do
       build_git "devise", "1.0"
@@ -77,6 +113,18 @@ describe "bundle install --standalone" do
 
       out.should == "1.0\n2.3.2"
     end
+
+    it "require the gems available without bundler on Bundler.require" do
+      ruby <<-RUBY, :no_lib => true
+        $:.unshift File.expand_path("bundle")
+        require "bundler/setup"
+
+        Bundler.require(:default)
+        puts DEVISE
+      RUBY
+
+      out.should == "1.0"
+    end
   end
 
   describe "with groups" do
@@ -88,8 +136,8 @@ describe "bundle install --standalone" do
         gem "rails"
 
         group :test do
-          gem "rspec"
-          gem "rack-test"
+          gem "rspec", :require => "spec"
+          gem "rack-test", :require => "rack/test"
         end
       G
     end
@@ -110,6 +158,19 @@ describe "bundle install --standalone" do
       out.should == "2.3.2\n1.2.7\n1.0"
     end
 
+    it "make Bundler.require to require the gems" do
+      ruby <<-RUBY, :no_lib => true
+        $:.unshift File.expand_path("bundle")
+        require "bundler/setup"
+
+        Bundler.require(:default,:test)
+        puts SPEC
+        puts RACK_TEST
+      RUBY
+
+      out.should == "1.2.7\n1.0"
+    end
+
     it "allows creating a standalone file with limited groups" do
       bundle "install --standalone default"
 
@@ -123,6 +184,19 @@ describe "bundle install --standalone" do
       RUBY
 
       out.should == "2.3.2"
+      err.should =~ /no such file to load.*spec/
+    end
+
+    it "makes Bundler.require throw load error on unbundled groups" do
+      bundle "install --standalone default"
+
+      ruby <<-RUBY, :no_lib => true, :expect_err => true
+        $:.unshift File.expand_path("bundle")
+        require "bundler/setup"
+
+        Bundler.require(:default,:test)
+      RUBY
+
       err.should =~ /no such file to load.*spec/
     end
 
