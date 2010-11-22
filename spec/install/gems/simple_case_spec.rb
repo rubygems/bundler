@@ -466,11 +466,6 @@ describe "bundle install with gem sources" do
       bundled_app("vendor/bundle").should exist
     end
 
-    it "prints a warning if you try to use --disable-shared-gems" do
-      bundle "install --path vendor --disable-shared-gems"
-      out.should include "The disable-shared-gem option is no longer available"
-    end
-
     it "does not use available system gems with bundle --path vendor/bundle" do
       bundle "install --path vendor/bundle"
       should_be_installed "rack 1.0.0"
