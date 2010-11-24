@@ -83,7 +83,7 @@ module Bundler
 
       # For gems in Gemfile, add details
       @env.current_dependencies.each do |dependency|
-        node = @nodes[dependency.name]
+        next unless node = @nodes[dependency.name]
         node.is_user = true
 
         dependency.groups.each do |group|
