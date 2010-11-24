@@ -59,7 +59,7 @@ module Bundler
         end
 
         Bundler.ui.info ""
-        generate_bundler_executable_stubs(spec) if Bundler.settings[:bin]
+        generate_bundler_executable_stubs(spec) if Bundler.settings[:bin] || options[:standalone]
         FileUtils.rm_rf(Bundler.tmp)
       end
 
@@ -74,11 +74,12 @@ module Bundler
       template = File.read(File.expand_path('../templates/Executable', __FILE__))
       relative_gemfile_path = Bundler.default_gemfile.relative_path_from(bin_path)
       ruby_command = Thor::Util.ruby_command
-
       spec.executables.each do |executable|
         next if executable == "bundle"
-        File.open "#{bin_path}/#{executable}", 'w', 0755 do |f|
-          f.puts ERB.new(template, nil, '-').result(binding)
+        begin
+          FileUtils.copy(Gem.bin_path(spec.name,executable), "#{bin_path}/#{executable}")
+        rescue Gem::GemNotFoundException
+          FileUtils.copy(File.expand_path("../bin/#{executable}", spec.loaded_from), "#{bin_path}/#{executable}")
         end
       end
     end
