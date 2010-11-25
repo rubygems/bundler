@@ -48,9 +48,8 @@ module Spec
       args = options.map do |k,v|
         v == true ? " --#{k}" : " --#{k} #{v}" if v
       end.join
-      gemfile = File.expand_path('../../../bin/bundle', __FILE__)
-      cmd = "#{env}#{Gem.ruby} -I#{lib} #{gemfile} #{cmd}#{args}"
-
+      bin_bundle = File.expand_path('../../../bin/bundle', __FILE__)
+      cmd = "#{env}#{Gem.ruby} -I#{lib} #{bin_bundle} #{cmd}#{args}"
       if exitstatus
         sys_status(cmd)
       else
