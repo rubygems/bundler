@@ -126,7 +126,7 @@ describe "bundle install with gem sources" do
         gem "with_development_dependency"
       G
 
-      should_be_installed "with_development_dependency 1.0.0"
+      should_be_installed "with_development_dependency 1.0"
       should_not_be_installed "activesupport 2.3.5"
     end
 
@@ -180,7 +180,7 @@ describe "bundle install with gem sources" do
         gem "foo"
       G
 
-      should_be_installed "rack 1.0.0", "foo 1.0.0"
+      should_be_installed "rack 1.0.0", "foo 1.0"
     end
 
     it "prioritizes local gems over remote gems" do
@@ -252,21 +252,21 @@ describe "bundle install with gem sources" do
 
       it "works" do
         bundle "install --path vendor"
-        should_be_installed "rack 1.0"
+        should_be_installed "rack 1.0.0"
       end
 
       it "allows running bundle install --system without deleting foo" do
         bundle "install --path vendor"
         bundle "install --system"
         FileUtils.rm_rf(bundled_app("vendor"))
-        should_be_installed "rack 1.0"
+        should_be_installed "rack 1.0.0"
       end
 
       it "allows running bundle install --system after deleting foo" do
         bundle "install --path vendor"
         FileUtils.rm_rf(bundled_app("vendor"))
         bundle "install --system"
-        should_be_installed "rack 1.0"
+        should_be_installed "rack 1.0.0"
       end
     end
 
@@ -638,7 +638,7 @@ describe "bundle install with gem sources" do
         gem "rack"
       G
 
-      should_be_installed "multiple_versioned_deps 1.0.0"
+      should_be_installed "multiple_versioned_deps 1.0"
     end
 
     it "includes bundler in the bundle when it's a child dependency" do
