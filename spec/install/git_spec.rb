@@ -23,7 +23,7 @@ describe "bundle install with git sources" do
         puts "WIN" unless defined?(FOO_PREV_REF)
       RUBY
 
-      out.should == "WIN"
+      out.should match /WIN/
     end
 
     it "caches the git repo" do
@@ -54,7 +54,7 @@ describe "bundle install with git sources" do
     it "setups executables" do
       pending_jruby_shebang_fix
       bundle "exec foobar"
-      out.should == "1.0"
+      out.should match /1.0/
     end
 
     it "complains if pinned specs don't exist in the git repo" do
@@ -136,7 +136,7 @@ describe "bundle install with git sources" do
         puts "WIN" unless defined?(FOO_PREV_REF)
       RUBY
 
-      out.should == "WIN"
+      out.should match /WIN/
     end
 
     it "works when the revision is a symbol" do
@@ -145,14 +145,14 @@ describe "bundle install with git sources" do
           gem "foo"
         end
       G
-      check err.should == ""
+      check err.should match //
 
       run <<-RUBY
         require 'foo'
         puts "WIN" unless defined?(FOO_PREV_REF)
       RUBY
 
-      out.should == "WIN"
+      out.should match /WIN/
     end
   end
 
@@ -201,7 +201,7 @@ describe "bundle install with git sources" do
       G
 
       run "require 'rack'"
-      out.should == 'WIN OVERRIDE'
+      out.should match /WIN OVERRIDE/
     end
 
     it "correctly unlocks when changing to a git source" do
@@ -267,7 +267,7 @@ describe "bundle install with git sources" do
       puts "WIN" unless defined?(FOO_PREV_REF)
     RUBY
 
-    out.should == "WIN"
+    out.should match /WIN/
   end
 
   it "correctly handles cases with invalid gemspecs" do
@@ -451,7 +451,7 @@ describe "bundle install with git sources" do
       puts "WIN" if FOO_PREV_REF == '#{git.ref_for("HEAD^^")}'
     RUBY
 
-    out.should == "WIN"
+    out.should match /WIN/
   end
 
   it "does not to a remote fetch if the revision is cached locally" do
@@ -464,7 +464,7 @@ describe "bundle install with git sources" do
     FileUtils.rm_rf(lib_path('foo-1.0'))
 
     bundle "install"
-    out.should_not =~ /updating/i
+    out.should_not match /updating/i
   end
 
   it "doesn't blow up if bundle install is run twice in a row" do
@@ -520,7 +520,7 @@ describe "bundle install with git sources" do
       G
 
       run "require 'new_file'"
-      out.should == "USING GIT"
+      out.should match /USING GIT/
     end
   end
 
@@ -548,7 +548,7 @@ describe "bundle install with git sources" do
         puts VALIM_PREV_REF
       R
 
-      out.should == old_revision
+      out.should match /#{old_revision}/
     end
   end
 

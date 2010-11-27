@@ -204,7 +204,7 @@ describe "bundle install with gem sources" do
         G
 
         run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
-        out.should == "1.0.0 #{Gem::Platform.local}"
+        out.should match /1.0.0 #{Gem::Platform.local}/
       end
 
       it "falls back on plain ruby" do
@@ -433,7 +433,7 @@ describe "bundle install with gem sources" do
       G
 
       bundle :install, :quiet => true
-      out.should == ""
+      out.should match ""
     end
 
     it "should still display warnings" do
@@ -648,7 +648,7 @@ describe "bundle install with gem sources" do
       G
 
       run "begin; gem 'bundler'; puts 'WIN'; rescue Gem::LoadError; puts 'FAIL'; end"
-      out.should == "WIN"
+      out.should match /WIN/
     end
 
     it "allows gem 'bundler' when Bundler is not in the Gemfile or its dependencies" do
@@ -658,7 +658,7 @@ describe "bundle install with gem sources" do
       G
 
       run "begin; gem 'bundler'; puts 'WIN'; rescue Gem::LoadError => e; puts e.backtrace; end"
-      out.should == "WIN"
+      out.should match /WIN/
     end
 
     it "causes a conflict if child dependencies conflict" do
@@ -710,7 +710,7 @@ describe "bundle install with gem sources" do
       #simulate_new_machine
 
       bundle "check"
-      out.should == "The Gemfile's dependencies are satisfied"
+      out.should match /The Gemfile's dependencies are satisfied/
     end
   end
 

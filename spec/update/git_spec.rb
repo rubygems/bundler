@@ -145,7 +145,7 @@ describe "bundle update" do
         G
 
         run "require 'submodule'"
-        check out.should == 'GEM'
+        check out.should match /GEM/
 
         install_gemfile <<-G
           git "#{lib_path('has_submodule-1.0')}", :submodules => true do
@@ -154,7 +154,7 @@ describe "bundle update" do
         G
 
         run "require 'submodule'"
-        out.should == 'GIT'
+        out.should match /GIT/
       end
 
       it "it unlocks the source when submodules is removed from git source" do
@@ -166,7 +166,7 @@ describe "bundle update" do
         G
 
         run "require 'submodule'"
-        check out.should == 'GIT'
+        check out.should match /GIT/
 
         install_gemfile <<-G
           git "#{lib_path('has_submodule-1.0')}" do
@@ -175,7 +175,7 @@ describe "bundle update" do
         G
 
         run "require 'submodule'"
-        out.should == 'GEM'
+        out.should match /GEM/
       end
     end
 

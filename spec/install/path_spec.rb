@@ -87,7 +87,7 @@ describe "bundle install with explicit source paths" do
     G
 
     run "require 'rack'"
-    out.should == 'WIN OVERRIDE'
+    out.should match /WIN OVERRIDE/
   end
 
   it "works" do
@@ -179,7 +179,7 @@ describe "bundle install with explicit source paths" do
     G
 
     bundle "exec foobar"
-    out.should == "1.0"
+    out.should match /1.0/
   end
 
   it "removes the .gem file after installing" do
@@ -245,7 +245,7 @@ describe "bundle install with explicit source paths" do
     G
 
     bundle "exec foo"
-    out.should == "1.0"
+    out.should match /1.0/
   end
 
   describe "when the gem version in the path is updated" do

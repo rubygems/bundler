@@ -16,7 +16,7 @@ describe "Running bin/* commands" do
     end
 
     gembin "rackup"
-    out.should == "1.0.0"
+    out.should match /\n1.0.0\Z/
   end
 
   it "allows the location of the gem stubs to be specified" do
@@ -26,14 +26,14 @@ describe "Running bin/* commands" do
     bundled_app("gbin/rackup").should exist
 
     gembin bundled_app("gbin/rackup")
-    out.should == "1.0.0"
+    out.should match /\n1.0.0\Z/
   end
 
   it "allows absolute paths as a specification of where to install bin stubs" do
     bundle "install --binstubs #{tmp}/bin"
 
     gembin tmp("bin/rackup")
-    out.should == "1.0.0"
+    out.should match /\n1.0.0\Z/
   end
 
   it "runs the bundled command when out of the bundle" do
@@ -45,7 +45,7 @@ describe "Running bin/* commands" do
 
     Dir.chdir(tmp) do
       gembin "rackup"
-      out.should == "1.0.0"
+      out.should match /\n1.0.0\Z/
     end
   end
 
@@ -65,7 +65,7 @@ describe "Running bin/* commands" do
     end
 
     gembin "rackup"
-    out.should == '1.0'
+    out.should match /\n1.0.0\Z/
   end
 
   it "don't bundle da bundla" do

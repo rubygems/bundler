@@ -9,7 +9,7 @@ describe "bundle check" do
 
     bundle :check, :exitstatus => true
     check @exitstatus.should == 0
-    out.should == "The Gemfile's dependencies are satisfied"
+    out.should match /\nThe Gemfile's dependencies are satisfied\Z/
   end
 
   it "works with the --gemfile flag when not in the directory" do
@@ -20,7 +20,7 @@ describe "bundle check" do
 
     Dir.chdir tmp
     bundle "check --gemfile bundled_app/Gemfile"
-    out.should == "The Gemfile's dependencies are satisfied"
+    out.should match /\nThe Gemfile's dependencies are satisfied\Z/
   end
 
   it "creates a Gemfile.lock if one did not exist" do
@@ -139,7 +139,7 @@ describe "bundle check" do
     G
 
     bundle :check
-    out.should == "The Gemfile's dependencies are satisfied"
+    out.should match /\nThe Gemfile's dependencies are satisfied\Z/
   end
 
   it "works with env conditionals" do
@@ -170,7 +170,7 @@ describe "bundle check" do
     G
 
     bundle :check
-    out.should == "The Gemfile's dependencies are satisfied"
+    out.should match /\nThe Gemfile's dependencies are satisfied\Z/
   end
 
   it "outputs an error when the default Gemfile is not found" do

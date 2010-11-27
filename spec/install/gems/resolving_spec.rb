@@ -16,7 +16,7 @@ describe "bundle install with gem sources" do
         puts IMPLICIT_RAKE_DEP
         puts ANOTHER_IMPLICIT_RAKE_DEP
       R
-      out.should == "YES\nYES"
+      out.should match /YES\nYES/
     end
 
     it "installs gems with a dependency with no type" do

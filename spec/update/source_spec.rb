@@ -28,7 +28,7 @@ describe "bundle update" do
           puts "WIN" if defined?(FOO_PREV_REF)
         RUBY
 
-        out.should == "WIN"
+        out.should match /WIN/
       end
     end
 

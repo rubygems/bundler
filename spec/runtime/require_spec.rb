@@ -48,23 +48,23 @@ describe "Bundler.require" do
   it "requires the gems" do
     # default group
     run "Bundler.require"
-    check out.should == "two"
+    check out.should match /\ntwo\Z/
 
     # specific group
     run "Bundler.require(:bar)"
-    check out.should == "baz\nqux"
+    check out.should match /\nbaz\nqux\Z/
 
     # default and specific group
     run "Bundler.require(:default, :bar)"
-    check out.should == "baz\nqux\ntwo"
+    check out.should match /\nbaz\nqux\ntwo\Z/
 
     # specific group given as a string
     run "Bundler.require('bar')"
-    check out.should == "baz\nqux"
+    check out.should match /\nbaz\nqux\Z/
 
     # specific group declared as a string
     run "Bundler.require(:string)"
-    check out.should == "six"
+    check out.should match /\nsix\Z/
 
     # required in resolver order instead of gemfile order
     run("Bundler.require(:not)")
@@ -73,7 +73,7 @@ describe "Bundler.require" do
 
   it "allows requiring gems with non standard names explicitly" do
     run "Bundler.require ; require 'mofive'"
-    out.should == "two\nfive"
+    out.should match /\ntwo\nfive\Z/
   end
 
   it "raises an exception if a require is specified but the file does not exist" do
@@ -89,19 +89,19 @@ describe "Bundler.require" do
         puts e.message
       end
     R
-    out.should == 'no such file to load -- fail'
+    out.should match /\nno such file to load -- fail\Z/
   end
 
   describe "using bundle exec" do
     it "requires the locked gems" do
       bundle "exec ruby -e 'Bundler.require'"
-      check out.should == "two"
+      check out.should match /\ntwo\Z/
 
       bundle "exec ruby -e 'Bundler.require(:bar)'"
-      check out.should == "baz\nqux"
+      check out.should match /\nbaz\nqux\Z/
 
       bundle "exec ruby -e 'Bundler.require(:default, :bar)'"
-      out.should == "baz\nqux\ntwo"
+      out.should match /\nbaz\nqux\ntwo\Z/
     end
   end
 
@@ -138,7 +138,7 @@ describe "Bundler.require" do
       G
 
       run "Bundler.require"
-      check out.should == "two\nmodule_two\none"
+      check out.should match /\ntwo\nmodule_two\none\Z/
     end
 
     describe "a gem with different requires for different envs" do
@@ -156,17 +156,17 @@ describe "Bundler.require" do
 
       it "requires both with Bundler.require(both)" do
         run "Bundler.require(:one, :two)"
-        out.should == "ONE\nTWO"
+        out.should match /\nONE\nTWO\Z/
       end
 
       it "requires one with Bundler.require(:one)" do
         run "Bundler.require(:one)"
-        out.should == "ONE"
+        out.should match /\nONE\Z/
       end
 
       it "requires :two with Bundler.require(:two)" do
         run "Bundler.require(:two)"
-        out.should == "TWO"
+        out.should match /\nTWO\Z/
       end
     end
 
@@ -178,7 +178,7 @@ describe "Bundler.require" do
       G
 
       run "Bundler.require"
-      check out.should == "two_not_loaded\none\ntwo"
+      check out.should match /\ntwo_not_loaded\none\ntwo\Z/
     end
 
     describe "with busted gems" do
@@ -225,7 +225,7 @@ describe "Bundler.require with platform specific dependencies" do
 
     run "Bundler.require; puts RACK", :expect_err => true
 
-    check out.should == "1.0.0"
+    check out.should match /\n1.0.0\Z/
     err.should be_empty
   end
 end

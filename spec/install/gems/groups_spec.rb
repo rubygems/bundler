@@ -35,13 +35,13 @@ describe "bundle install with gem sources" do
 
       it "sets up everything if Bundler.setup is used with no groups" do
         out = run("require 'rack'; puts RACK")
-        check out.should == '1.0.0'
+        out.should match /1.0.0/
 
         out = run("require 'activesupport'; puts ACTIVESUPPORT")
-        check out.should == '2.3.5'
+        out.should match /2.3.5/
 
         out = run("require 'thin'; puts THIN")
-        out.should == '1.0'
+        out.should match /1.0/
       end
     end
 
@@ -82,7 +82,7 @@ describe "bundle install with gem sources" do
         it "allows Bundler.setup for specific groups" do
           bundle :install, :without => "emo"
           run("require 'rack'; puts RACK", :default)
-          out.should == '1.0.0'
+          out.should match /1.0.0/
         end
 
         it "does not effect the resolve" do

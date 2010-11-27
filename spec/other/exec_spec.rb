@@ -173,14 +173,14 @@ describe "bundle exec" do
 
       it "works when unlocked" do
         bundle "exec fizz_git"
-        out.should == "1.0"
+        out.should match /1.0/
       end
 
       it "works when locked" do
         bundle "lock"
         should_be_locked
         bundle "exec fizz_git"
-        out.should == "1.0"
+        out.should match /1.0/
       end
     end
 
@@ -197,14 +197,14 @@ describe "bundle exec" do
 
       it "works when unlocked" do
         bundle "exec fizz_no_gemspec"
-        out.should == "1.0"
+        out.should match /1.0/
       end
 
       it "works when locked" do
         bundle "lock"
         should_be_locked
         bundle "exec fizz_no_gemspec"
-        out.should == "1.0"
+        out.should match /1.0/
       end
     end
 
