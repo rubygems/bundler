@@ -214,19 +214,19 @@ describe "bundle install with gem sources" do
           gem "platform_specific"
         G
 
-        run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
-        out.should == "1.0.0 RUBY"
+        should_be_installed "platform_specific 1.0.0 ruby", :check_platform => true
       end
 
       it "installs gems for java" do
-        simulate_platform "java"
+        simulate_platform java
         install_gemfile <<-G
           source "file://#{gem_repo1}"
           gem "platform_specific"
         G
 
-        run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
-        out.should == "1.0.0 JAVA"
+#        run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
+#        out.should match /1.0.0 JAVA/
+        should_be_installed "platform_specific 1.0.0 #{java}", :check_platform => true
       end
 
       it "installs gems for windows" do
@@ -237,8 +237,9 @@ describe "bundle install with gem sources" do
           gem "platform_specific"
         G
 
-        run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
-        out.should == "1.0.0 MSWIN"
+#        run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
+#        out.should match /1.0.0 MSWIN/
+          should_be_installed "platform_specific 1.0.0 #{mswin}", :check_platform => true
       end
     end
 
