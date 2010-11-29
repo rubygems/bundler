@@ -481,12 +481,12 @@ describe "Bundler.setup" do
         end
       R
 
-      out.should == "rack is not part of the bundle. Add it to Gemfile."
+      out.should match /\nrack is not part of the bundle. Add it to Gemfile.\Z/
     end
 
     it "sets GEM_HOME appropriately" do
       run "puts ENV['GEM_HOME']"
-      out.should == default_bundle_path.to_s
+      out.should match /\n#{default_bundle_path.to_s}\Z/
     end
   end
 

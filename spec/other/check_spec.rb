@@ -208,7 +208,7 @@ describe "bundle check" do
       bundle :install
       bundle :check, :exitstatus => true
       check @exitstatus.should == 0
-      out.should == "The Gemfile's dependencies are satisfied"
+      out.should match /\nThe Gemfile's dependencies are satisfied\Z/
     end
 
     it "shows what is missing with the current Gemfile if it is not satisfied" do

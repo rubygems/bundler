@@ -47,7 +47,7 @@ describe "bundle install with git sources" do
           puts "fail" if defined?(FOO_PREV_REF)
         RUBY
 
-        out.should be_empty
+        out.should match /\n\Z/
       end
     end
 
