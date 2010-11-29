@@ -84,9 +84,7 @@ describe "bundle install across platforms" do
     simulate_platform java
     bundle "install"
 
-    pending "gemspec count is ..." do
-      should_be_installed "nokogiri 1.4.2 #{java}", "weakling 0.0.3", :gemspec_count => 7, :check_platform => true
-    end
+    should_be_installed "nokogiri 1.4.2 #{java}", "weakling 0.0.3 ruby", :gemspec_count => 2, :check_platform => true
   end
 
   it "fetches gems again after changing the version of Ruby" do
