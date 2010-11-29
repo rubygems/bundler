@@ -40,6 +40,7 @@ module Spec
       end
     end
 
+    alias should_be_activated should_be_installed
     alias should_be_available should_be_installed
 
     def should_not_be_installed(*names)
