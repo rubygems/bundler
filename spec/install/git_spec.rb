@@ -93,7 +93,7 @@ describe "bundle install with git sources" do
 
       bundle "update foo"
 
-      should_be_installed "foo 1.1", "rack 1.0"
+      should_be_installed "foo 1.1", "rack 1.0", :gemspec_count => 2
     end
 
   end
@@ -249,7 +249,7 @@ describe "bundle install with git sources" do
         end
       G
 
-      should_be_installed "omg 1.0", "hi2u 1.0"
+      should_be_installed "omg 1.0", "hi2u 1.0", :gemspec_count => 2
     end
   end
 
@@ -281,8 +281,8 @@ describe "bundle install with git sources" do
       gem "rails", "2.3.2"
     G
 
-    should_be_installed "foo 1.0"
-    should_be_installed "rails 2.3.2"
+    should_be_installed "foo 1.0", :gemspec_count => 8
+    should_be_installed "rails 2.3.2", :gemspec_count => 8
   end
 
   it "runs the gemspec in the context of its parent directory" do
@@ -310,8 +310,8 @@ describe "bundle install with git sources" do
       gem "rails", "2.3.2"
     G
 
-    should_be_installed "bar 1.0"
-    should_be_installed "rails 2.3.2"
+    should_be_installed "bar 1.0", :gemspec_count => 8
+    should_be_installed "rails 2.3.2", :gemspec_count => 8
   end
 
   it "installs from git even if a rubygems gem is present" do
@@ -337,8 +337,8 @@ describe "bundle install with git sources" do
       gem "rails", "2.3.2"
     G
 
-    should_be_installed("foo 1.0")
-    should_be_installed("rails 2.3.2")
+    should_be_installed "foo 1.0", :gemspec_count => 8
+    should_be_installed "rails 2.3.2", :gemspec_count => 8
   end
 
   it "catches git errors and spits out useful output" do
@@ -425,7 +425,7 @@ describe "bundle install with git sources" do
       end
     G
 
-    should_be_installed "has_submodule 1.0"
+    should_be_installed "has_submodule 1.0", :gemspec_count => 2
   end
 
   it "handles implicit updates when modifying the source info" do
@@ -499,7 +499,7 @@ describe "bundle install with git sources" do
         gem "bar", :git => "#{lib_path('bar')}"
       G
 
-      should_be_installed "foo 1.0", "bar 1.0"
+      should_be_installed "foo 1.0", "bar 1.0", :gemspec_count => 2
     end
 
     it "doesn't explode when switching Gem to Git source" do

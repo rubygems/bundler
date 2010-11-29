@@ -92,7 +92,7 @@ describe "the lockfile format" do
         net-sftp
     G
 
-    should_be_installed "net-sftp 1.1.1", "net-ssh 1.0.0"
+    should_be_installed "net-sftp 1.1.1", "net-ssh 1.0.0", :gemspec_count => 2
   end
 
   it "generates a simple lockfile for a single pinned source, gem with a version requirement" do

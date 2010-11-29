@@ -36,7 +36,7 @@ describe "bundle install with gem sources" do
         gem "actionpack", "2.3.2"
       G
 
-      should_be_installed "actionpack 2.3.2", "activesupport 2.3.2"
+      should_be_installed "actionpack 2.3.2", "activesupport 2.3.2", :gemspec_count => 2
     end
 
     describe "with crazy rubygem plugin stuff" do

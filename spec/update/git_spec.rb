@@ -33,7 +33,7 @@ describe "bundle update" do
 
       bundle "update rails"
       out.should include("Using activesupport (3.0) from #{lib_path('rails')} (at master)")
-      should_be_installed "rails 3.0", "activesupport 3.0"
+      should_be_installed "rails 3.0", "activesupport 3.0", :gemspec_count => 2
     end
 
     it "floats on a branch when :branch is used and the source is specified in the update" do
@@ -72,7 +72,7 @@ describe "bundle update" do
 
       bundle "update foo"
 
-      should_be_installed "foo 1.1"
+      should_be_installed "foo 1.1", :gemspec_count => 2
     end
 
     it "notices when you change the repo url in the Gemfile" do

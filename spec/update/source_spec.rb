@@ -36,7 +36,7 @@ describe "bundle update" do
       update_git "foo", "2.0", :path => @git.path
 
       bundle "update --source foo"
-      should_be_installed "foo 2.0"
+      should_be_installed "foo 2.0", :gemspec_count => 2
     end
 
     it "leaves all other gems frozen" do
@@ -44,7 +44,7 @@ describe "bundle update" do
       update_git "foo", :path => @git.path
 
       bundle "update --source foo"
-      should_be_installed "rack 1.0"
+      should_be_installed "rack 1.0", :gemspec_count => 2
     end
   end
 

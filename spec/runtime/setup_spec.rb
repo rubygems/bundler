@@ -315,8 +315,8 @@ describe "Bundler.setup" do
         end
       G
 
-      should_not_be_installed "activesupport 2.3.2", :groups => :rack
-      should_be_installed "rack 1.0.0", :groups => :rack
+      should_not_be_installed "activesupport 2.3.2", :groups => :rack, :gemspec_count => 2
+      should_be_installed "rack 1.0.0", :groups => :rack, :gemspec_count => 2
     end
   end
 

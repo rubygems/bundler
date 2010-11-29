@@ -108,7 +108,7 @@ describe "bundle install with gem sources" do
         gem "rails"
       G
 
-      should_be_installed "actionpack 2.3.2", "rails 2.3.2"
+      should_be_installed "actionpack 2.3.2", "rails 2.3.2", :gemspec_count => 7
     end
 
     it "does the right version" do
@@ -137,7 +137,7 @@ describe "bundle install with gem sources" do
         gem "rails"
       G
 
-      should_be_installed "activemerchant 1.0", "activesupport 2.3.2", "actionpack 2.3.2"
+      should_be_installed "activemerchant 1.0", "activesupport 2.3.2", "actionpack 2.3.2", :gemspec_count => 7
     end
 
     it "activates gem correctly according to the resolved gems" do
@@ -152,7 +152,7 @@ describe "bundle install with gem sources" do
         gem "rails"
       G
 
-      should_be_installed "activemerchant 1.0", "activesupport 2.3.2", "actionpack 2.3.2"
+      should_be_installed "activemerchant 1.0", "activesupport 2.3.2", "actionpack 2.3.2", :gemspec_count => 7
     end
 
     it "does not reinstall any gem that is already available locally" do
@@ -169,7 +169,7 @@ describe "bundle install with gem sources" do
         gem "activerecord", "2.3.2"
       G
 
-      should_be_installed "activesupport 2.3.2"
+      should_be_installed "activesupport 2.3.2", :gemspec_count => 2
     end
 
     it "works when the gemfile specifies gems that only exist in the system" do
@@ -180,7 +180,7 @@ describe "bundle install with gem sources" do
         gem "foo"
       G
 
-      should_be_installed "rack 1.0.0", "foo 1.0"
+      should_be_installed "rack 1.0.0", "foo 1.0", :gemspec_count => 2
     end
 
     it "prioritizes local gems over remote gems" do
@@ -193,7 +193,7 @@ describe "bundle install with gem sources" do
         gem "rack"
       G
 
-      should_be_installed "rack 1.0.0", "activesupport 2.3.5"
+      should_be_installed "rack 1.0.0", "activesupport 2.3.5", :gemspec_count => 2
     end
 
     describe "with a gem that installs multiple platforms" do
@@ -282,7 +282,7 @@ describe "bundle install with gem sources" do
         gem "rack", "1.2"
       G
 
-      should_be_installed "rack 1.2", "activesupport 1.2.3"
+      should_be_installed "rack 1.2", "activesupport 1.2.3", :gemspec_count => 2
     end
 
     it "gives a useful error if no sources are set" do
@@ -593,7 +593,7 @@ describe "bundle install with gem sources" do
         gem "rails", "3.0"
       G
 
-      should_be_installed "bundler #{Bundler::VERSION}"
+      should_be_installed "bundler #{Bundler::VERSION}", :gemspec_count => 2
     end
 
     it "are not added if not already present" do
@@ -638,7 +638,7 @@ describe "bundle install with gem sources" do
         gem "rack"
       G
 
-      should_be_installed "multiple_versioned_deps 1.0"
+      should_be_installed "multiple_versioned_deps 1.0", :gemspec_count => 3
     end
 
     it "includes bundler in the bundle when it's a child dependency" do
@@ -736,8 +736,7 @@ describe "bundle install with gem sources" do
 
       bundle :install
 
-      should_be_installed "rack 0.9.1"
-      should_be_installed "rack_middleware 1.0"
+      should_be_installed "rack 0.9.1", "rack_middleware 1.0", :gemspec_count => 2
     end
 
     it "does not hit the remote a second time" do

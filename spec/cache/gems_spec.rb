@@ -94,7 +94,7 @@ describe "bundle cache" do
       system_gems []
       bundle "install --local"
 
-      should_be_installed("rack 1.0.0", "foo 1.0")
+      should_be_installed "rack 1.0.0", "foo 1.0", :gemspec_count => 2
     end
 
     it "should not explode if the lockfile is not present" do

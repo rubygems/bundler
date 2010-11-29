@@ -15,11 +15,11 @@ describe "bundle install with gem sources" do
       end
 
       it "installs gems in the default group" do
-        should_be_installed "rack 1.0.0"
+        should_be_installed "rack 1.0.0", :gemspec_count => 3
       end
 
       it "installs gems in a group block into that group" do
-        should_be_installed "activesupport 2.3.5"
+        should_be_installed "activesupport 2.3.5", :gemspec_count => 3
 
         run("require 'activesupport'; puts ACTIVESUPPORT",
           :default, :expect_err => true)
@@ -27,7 +27,7 @@ describe "bundle install with gem sources" do
       end
 
       it "installs gems with inline :groups into those groups" do
-        should_be_installed "thin 1.0"
+        should_be_installed "thin 1.0", :gemspec_count => 3
 
         run("require 'thin'; puts THIN", :default, :expect_err => true)
         @err.should =~ /no such file to load -- thin/
@@ -139,7 +139,7 @@ describe "bundle install with gem sources" do
 
         it "installs the gem if any of its groups are installed" do
           bundle "install --without emo"
-          should_be_installed "rack 1.0.0", "activesupport 2.3.5"
+          should_be_installed "rack 1.0.0", "activesupport 2.3.5", :gemspec_count => 2
         end
 
         it "works when locked as well" do
@@ -149,7 +149,7 @@ describe "bundle install with gem sources" do
           simulate_new_machine
 
           bundle "install --without lolercoaster"
-          should_be_installed "rack 1.0.0", "activesupport 2.3.5"
+          should_be_installed "rack 1.0.0", "activesupport 2.3.5", :gemspec_count => 2
         end
 
         describe "with a gem defined multiple times in different groups" do
@@ -170,12 +170,12 @@ describe "bundle install with gem sources" do
 
           it "installs the gem w/ option --without emo" do
             bundle "install --without emo"
-            should_be_installed "activesupport 2.3.5"
+            should_be_installed "activesupport 2.3.5", :gemspec_count => 2
           end
 
           it "installs the gem w/ option --without lolercoaster" do
             bundle "install --without lolercoaster"
-            should_be_installed "activesupport 2.3.5"
+            should_be_installed "activesupport 2.3.5", :gemspec_count => 2
           end
 
           it "does not install the gem w/ option --without emo lolercoaster" do
@@ -210,7 +210,7 @@ describe "bundle install with gem sources" do
 
         it "installs the gem if any of its groups are installed" do
           bundle "install --without emo"
-          should_be_installed "rack 1.0.0", "activesupport 2.3.5"
+          should_be_installed "rack 1.0.0", "activesupport 2.3.5", :gemspec_count => 2
         end
 
         it "works when locked as well" do
@@ -220,7 +220,7 @@ describe "bundle install with gem sources" do
           simulate_new_machine
 
           bundle "install --without lolercoaster"
-          should_be_installed "rack 1.0.0", "activesupport 2.3.5"
+          should_be_installed "rack 1.0.0", "activesupport 2.3.5", :gemspec_count => 2
         end
       end
     end
