@@ -65,7 +65,7 @@ describe "Running bin/* commands" do
     end
 
     gembin "rackup"
-    out.should match /\n1.0.0\Z/
+    out.should match /\n1.0\Z/
   end
 
   it "don't bundle da bundla" do

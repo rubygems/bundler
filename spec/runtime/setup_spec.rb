@@ -369,7 +369,7 @@ describe "Bundler.setup" do
       end
     R
 
-    out.should be_empty
+    out.should match /^\{(.*)\}\Z/
   end
 
   it "ignores empty gem paths" do
@@ -415,7 +415,7 @@ describe "Bundler.setup" do
       puts Gem.source_index.find_name("rack").inspect
     R
 
-    out.should match /\n[]\Z/
+    out.should match /\n\[\]\Z/
   end
 
   describe "with git gems that don't have gemspecs" do

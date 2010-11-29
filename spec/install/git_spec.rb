@@ -47,7 +47,7 @@ describe "bundle install with git sources" do
           puts "fail" if defined?(FOO_PREV_REF)
         RUBY
 
-        out.should match /\n\Z/
+        out.should match /^\{(.*)\}\Z/
       end
     end
 
@@ -404,7 +404,7 @@ describe "bundle install with git sources" do
         gem "has_submodule"
       end
     G
-    out.should =~ /Could not find gem 'submodule'/
+    out.should match /Could not find gem 'submodule'/
 
     should_not_be_installed "has_submodule 1.0", :expect_err => true
   end
