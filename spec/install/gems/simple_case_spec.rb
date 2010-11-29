@@ -137,7 +137,7 @@ describe "bundle install with gem sources" do
         gem "rails"
       G
 
-      should_be_installed "activemerchant 1.0", "activesupport 2.3.2", "actionpack 2.3.2", :gemspec_count => 7
+      should_be_installed "activemerchant 1.0", "activesupport 2.3.2", "actionpack 2.3.2", :gemspec_count => 8
     end
 
     it "activates gem correctly according to the resolved gems" do
@@ -152,7 +152,7 @@ describe "bundle install with gem sources" do
         gem "rails"
       G
 
-      should_be_installed "activemerchant 1.0", "activesupport 2.3.2", "actionpack 2.3.2", :gemspec_count => 7
+      should_be_installed "activemerchant 1.0", "activesupport 2.3.2", "actionpack 2.3.2", :gemspec_count => 8
     end
 
     it "does not reinstall any gem that is already available locally" do
