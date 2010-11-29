@@ -204,7 +204,7 @@ describe "bundle install with gem sources" do
         G
 
         run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
-        out.should match /1.0.0 #{Gem::Platform.local}/
+        out.should match( /1.0.0 #{Gem::Platform.local}/)
       end
 
       it "falls back on plain ruby" do
@@ -621,7 +621,7 @@ describe "bundle install with gem sources" do
           Current Bundler version:
             bundler (#{Bundler::VERSION})
         E
-      out.should == nice_error
+      out.should match(/^#{::Regexp.quote(nice_error)}\n/)
     end
 
     it "works for gems with multiple versions in its dependencies" do
@@ -649,7 +649,7 @@ describe "bundle install with gem sources" do
       G
 
       run "begin; gem 'bundler'; puts 'WIN'; rescue Gem::LoadError; puts 'FAIL'; end"
-      out.should match /WIN/
+      out.should match(/WIN/)
     end
 
     it "allows gem 'bundler' when Bundler is not in the Gemfile or its dependencies" do
@@ -659,7 +659,7 @@ describe "bundle install with gem sources" do
       G
 
       run "begin; gem 'bundler'; puts 'WIN'; rescue Gem::LoadError => e; puts e.backtrace; end"
-      out.should match /WIN/
+      out.should match(/WIN/)
     end
 
     it "causes a conflict if child dependencies conflict" do
@@ -679,7 +679,7 @@ describe "bundle install with gem sources" do
             rails_fail depends on
               activesupport (1.2.3)
       E
-      out.should == nice_error
+      out.should match(/^#{::Regexp.quote(nice_error)}\n/)
     end
 
     it "causes a conflict if a child dependency conflicts with the Gemfile" do
@@ -698,7 +698,7 @@ describe "bundle install with gem sources" do
 
             activesupport (2.3.5)
       E
-      out.should == nice_error
+      out.should match(/^#{::Regexp.quote(nice_error)}\n/)
     end
 
     it "can install dependencies even if " do
@@ -711,7 +711,7 @@ describe "bundle install with gem sources" do
       #simulate_new_machine
 
       bundle "check"
-      out.should match /The Gemfile's dependencies are satisfied/
+      out.should match(/The Gemfile's dependencies are satisfied/)
     end
   end
 
