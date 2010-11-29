@@ -58,7 +58,7 @@ describe "bundle install across platforms" do
       gem "nokogiri"
     G
 
-    should_be_installed "nokogiri 1.4.2 #{java}", "weakling 0.0.3", :gemspec_count => 2, :check_platform => true
+    should_be_installed "nokogiri 1.4.2 #{java}", "weakling 0.0.3 ruby", :gemspec_count => 2, :check_platform => true
 
     simulate_new_machine
 
