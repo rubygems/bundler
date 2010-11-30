@@ -258,6 +258,8 @@ module Bundler
       possible versions of the gems in the bundle.
     D
     method_option "source", :type => :array, :banner => "Update a specific source (and all gems associated with it)"
+    method_option "local", :type => :boolean, :banner =>
+      "Do not attempt to fetch gems remotely and use the gem cache instead"
     def update(*gems)
       sources = Array(options[:source])
 
@@ -268,7 +270,8 @@ module Bundler
         Bundler.definition(:gems => gems, :sources => sources)
       end
 
-      Installer.install Bundler.root, Bundler.definition, "update" => true
+      opts = {"update" => true, "local" => options[:local]}
+      Installer.install Bundler.root, Bundler.definition, opts
       Bundler.load.cache if Bundler.root.join("vendor/cache").exist?
       Bundler.ui.confirm "Your bundle is updated! " +
         "Use `bundle show [gemname]` to see where a bundled gem is installed."
