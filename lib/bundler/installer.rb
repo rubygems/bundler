@@ -37,6 +37,8 @@ module Bundler
 
       # Ensure that BUNDLE_PATH exists
       Bundler.mkdir_p(Bundler.bundle_path) unless File.exist?(Bundler.bundle_path)
+      # Ensure that user defined BUNDLE_INSTALL_PATH exists
+      Bundler.mkdir_p(Bundler.bundle_install_path) unless File.exist?(Bundler.bundle_install_path)
 
       # Must install gems in the order that the resolver provides
       # as dependencies might actually affect the installation of

@@ -2,8 +2,7 @@ module Bundler
   class Settings
     def initialize(root)
       @root   = root
-      @local_config = File.exist?(local_config_file) ? YAML.load_file(local_config_file) : {}
-      @global_config = File.exist?(global_config_file) ? YAML.load_file(global_config_file) : {}
+      load_config_files
     end
 
     def [](key)
@@ -73,14 +72,41 @@ module Bundler
 
     # @local_config["BUNDLE_PATH"] should be prioritized over ENV["BUNDLE_PATH"]
     def path
+      return install_path if install_path?
       path = ENV[key_for(:path)] || @global_config[key_for(:path)]
       return path if path && !@local_config.key?(key_for(:path))
-
       if path = self[:path]
         "#{path}/#{Bundler.ruby_scope}"
       else
         Gem.dir
       end
+    end
+
+    def install_path?
+      Bundler.settings.all.each do |set|
+      end
+      if Bundler.settings[:install_path]
+        true
+      else
+        false
+      end
+    end
+
+    # @local_config["BUNDLE_INSTALL_PATH"] should be prioritized over ENV["BUNDLE_INSTALL_PATH"]
+    def install_path
+      load_config_files
+      ipath = ENV[key_for(:install_path)] || @global_config[key_for(:install_path)] #if self.install_path?
+      return ipath if ipath && !@local_config.key?(key_for(:install_path))
+      if Bundler.settings[:install_path] #&& !ipath.nil?
+        ipath || Bundler.settings[:install_path]
+      else
+        Gem.dir
+      end
+    end
+
+    def cli
+      @cli = ::Bundler::CLI.new
+      @cli
     end
 
     def allow_sudo?
@@ -112,6 +138,11 @@ module Bundler
 
     def local_config_file
       Pathname.new("#{@root}/config")
+    end
+
+    def load_config_files
+      @local_config = File.exist?(local_config_file) ? YAML.load_file(local_config_file) : {}
+      @global_config = File.exist?(global_config_file) ? YAML.load_file(global_config_file) : {}
     end
   end
 end

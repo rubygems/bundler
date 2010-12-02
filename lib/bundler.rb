@@ -83,6 +83,24 @@ module Bundler
       @bundle_path ||= Pathname.new(settings.path).expand_path(root)
     end
 
+    def bundle_install_path
+      if install_path?
+        @bundle_install_path = install_path
+      else
+        @bundle_install_path ||= Pathname.new(@settings.install_path).expand_path(root)
+      end
+    end
+
+    def install_path
+      install_path? ?
+        Pathname.new(configure_install_path) :
+        home.join("gems")
+    end
+
+    def install_path?
+      @settings.install_path?
+    end
+
     def bin_path
       @bin_path ||= begin
         path = settings[:bin] || "bin"
@@ -139,10 +157,6 @@ module Bundler
 
     def home
       bundle_path.join("bundler")
-    end
-
-    def install_path
-      home.join("gems")
     end
 
     def specs_path
@@ -267,6 +281,14 @@ module Bundler
         lockfile.rmtree
       end
     end
-
+    def configure_install_path
+      if @settings.install_path?
+        @settings[:install_path] = @settings.install_path
+      else
+        @settings[:install_path] = home.join("gems")
+      end
+      $stderr.puts "configure_install_path settings: #{@settings[:install_path]}"
+      @settings[:install_path]
+    end
   end
 end
