@@ -5,15 +5,9 @@ require 'bundler'
 module Bundler
   class GemHelper
     def self.install_tasks(opts = nil)
-      puts "Rake.application.rakefile: #{Rake.application.rakefile}"
-      puts "caller.join(\n): #{caller.join('\n')}"
-      puts "Rake.application.rakefile_location: #{Rake.application.rakefile_location}"
-      puts "Rake.application.find_rakefile_location: " + Rake.application.find_rakefile_location.inspect
-      dir = caller.find{|c| /Rakefile:/}[/^(.*?)\/Rakefile:/, 1]
-#      dir = Rake.application.find_rakefile_location[1]
-#      rakefile = Rake.application.rakefile
-#      dir = caller.find{|c| /#{rakefile}:/}[/^(.*?)\/#{rakefile}:/, 1]
-#      dir = caller.find{|c| /Rakefile:/}[/^(.*?)\/Rakefile:/, 1]
+      pwd = Dir.pwd
+      dir = Rake.application.find_rakefile_location[1]
+      Dir.chdir(pwd)
       self.new(dir, opts && opts[:name]).install
     end
 
