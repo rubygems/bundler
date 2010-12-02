@@ -46,10 +46,12 @@ module Spec
 
       env = (options.delete(:env) || {}).map{|k,v| "#{k}='#{v}' "}.join
       args = options.map do |k,v|
+        k = k.to_s.gsub('_','-') if k.is_a?(Symbol)
         v == true ? " --#{k}" : " --#{k} #{v}" if v
       end.join
       bin_bundle = File.expand_path('../../../bin/bundle', __FILE__)
       cmd = "#{env}#{Gem.ruby} -I#{lib} #{bin_bundle} #{cmd}#{args}"
+      $stderr.puts "Bundler cmd: #{cmd}"
       if exitstatus
         sys_status(cmd)
       else

@@ -115,7 +115,7 @@ module Bundler
 
   private
     def key_for(key)
-      key = key.to_s.sub(".", "__").upcase
+      key = key.to_s.sub(".", "__").upcase.sub("-", "_")
       "BUNDLE_#{key}"
     end
 
