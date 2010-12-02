@@ -244,7 +244,7 @@ describe "Bundler's full install path can point anywhere" do
           G
           bundle "install", @env
           Dir.chdir(@installed_path) do
-            bundle 'show rack'  # TODO This should point to the installed path
+            bundle 'show rack'
             out.should match /Could not locate Gemfile/
           end
         end
