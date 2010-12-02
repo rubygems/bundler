@@ -48,9 +48,8 @@ module Spec
       args = options.map do |k,v|
         v == true ? " --#{k}" : " --#{k} #{v}" if v
       end.join
-      gemfile = File.expand_path('../../../bin/bundle', __FILE__)
-      cmd = "#{env}#{Gem.ruby} -I#{lib} #{gemfile} #{cmd}#{args}"
-
+      bin_bundle = File.expand_path('../../../bin/bundle', __FILE__)
+      cmd = "#{env}#{Gem.ruby} -I#{lib} #{bin_bundle} #{cmd}#{args}"
       if exitstatus
         sys_status(cmd)
       else
@@ -105,6 +104,13 @@ module Spec
       config
     end
 
+    def clean_config
+      tpath = FileUtils.rm_rf(tmp('.bundle/config'))
+      lpath = FileUtils.rm_rf(bundled_app('.bundle/config'))
+      gpath = FileUtils.rm_rf(home('.bundle/config'))
+      tpath || lpath || gpath
+    end
+
     def gemfile(*args)
       path = bundled_app("Gemfile")
       path = args.shift if Pathname === args.first
@@ -132,6 +138,7 @@ module Spec
     def install_gemfile(*args)
       gemfile(*args)
       opts = args.last.is_a?(Hash) ? args.last : {}
+      opts['verbose'] = true
       bundle :install, opts
     end
 

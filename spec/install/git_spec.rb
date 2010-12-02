@@ -23,7 +23,7 @@ describe "bundle install with git sources" do
         puts "WIN" unless defined?(FOO_PREV_REF)
       RUBY
 
-      out.should == "WIN"
+      out.should match /WIN/
     end
 
     it "caches the git repo" do
@@ -47,14 +47,14 @@ describe "bundle install with git sources" do
           puts "fail" if defined?(FOO_PREV_REF)
         RUBY
 
-        out.should be_empty
+        out.should match /^\{(.*)\}\Z/
       end
     end
 
     it "setups executables" do
       pending_jruby_shebang_fix
       bundle "exec foobar"
-      out.should == "1.0"
+      out.should match /1.0/
     end
 
     it "complains if pinned specs don't exist in the git repo" do
@@ -93,7 +93,7 @@ describe "bundle install with git sources" do
 
       bundle "update foo"
 
-      should_be_installed "foo 1.1", "rack 1.0"
+      should_be_installed "foo 1.1", "rack 1.0", :gemspec_count => 2
     end
 
   end
@@ -136,7 +136,7 @@ describe "bundle install with git sources" do
         puts "WIN" unless defined?(FOO_PREV_REF)
       RUBY
 
-      out.should == "WIN"
+      out.should match /WIN/
     end
 
     it "works when the revision is a symbol" do
@@ -145,14 +145,14 @@ describe "bundle install with git sources" do
           gem "foo"
         end
       G
-      check err.should == ""
+      check err.should be_empty
 
       run <<-RUBY
         require 'foo'
         puts "WIN" unless defined?(FOO_PREV_REF)
       RUBY
 
-      out.should == "WIN"
+      out.should match /WIN/
     end
   end
 
@@ -201,7 +201,7 @@ describe "bundle install with git sources" do
       G
 
       run "require 'rack'"
-      out.should == 'WIN OVERRIDE'
+      out.should match /WIN OVERRIDE/
     end
 
     it "correctly unlocks when changing to a git source" do
@@ -249,7 +249,7 @@ describe "bundle install with git sources" do
         end
       G
 
-      should_be_installed "omg 1.0", "hi2u 1.0"
+      should_be_installed "omg 1.0", "hi2u 1.0", :gemspec_count => 2
     end
   end
 
@@ -267,7 +267,7 @@ describe "bundle install with git sources" do
       puts "WIN" unless defined?(FOO_PREV_REF)
     RUBY
 
-    out.should == "WIN"
+    out.should match /WIN/
   end
 
   it "correctly handles cases with invalid gemspecs" do
@@ -281,8 +281,8 @@ describe "bundle install with git sources" do
       gem "rails", "2.3.2"
     G
 
-    should_be_installed "foo 1.0"
-    should_be_installed "rails 2.3.2"
+    should_be_installed "foo 1.0", :gemspec_count => 8
+    should_be_installed "rails 2.3.2", :gemspec_count => 8
   end
 
   it "runs the gemspec in the context of its parent directory" do
@@ -310,8 +310,8 @@ describe "bundle install with git sources" do
       gem "rails", "2.3.2"
     G
 
-    should_be_installed "bar 1.0"
-    should_be_installed "rails 2.3.2"
+    should_be_installed "bar 1.0", :gemspec_count => 8
+    should_be_installed "rails 2.3.2", :gemspec_count => 8
   end
 
   it "installs from git even if a rubygems gem is present" do
@@ -337,8 +337,8 @@ describe "bundle install with git sources" do
       gem "rails", "2.3.2"
     G
 
-    should_be_installed("foo 1.0")
-    should_be_installed("rails 2.3.2")
+    should_be_installed "foo 1.0", :gemspec_count => 8
+    should_be_installed "rails 2.3.2", :gemspec_count => 8
   end
 
   it "catches git errors and spits out useful output" do
@@ -404,7 +404,7 @@ describe "bundle install with git sources" do
         gem "has_submodule"
       end
     G
-    out.should =~ /Could not find gem 'submodule'/
+    out.should match /Could not find gem 'submodule'/
 
     should_not_be_installed "has_submodule 1.0", :expect_err => true
   end
@@ -425,7 +425,7 @@ describe "bundle install with git sources" do
       end
     G
 
-    should_be_installed "has_submodule 1.0"
+    should_be_installed "has_submodule 1.0", :gemspec_count => 2
   end
 
   it "handles implicit updates when modifying the source info" do
@@ -451,7 +451,7 @@ describe "bundle install with git sources" do
       puts "WIN" if FOO_PREV_REF == '#{git.ref_for("HEAD^^")}'
     RUBY
 
-    out.should == "WIN"
+    out.should match /WIN/
   end
 
   it "does not to a remote fetch if the revision is cached locally" do
@@ -464,7 +464,7 @@ describe "bundle install with git sources" do
     FileUtils.rm_rf(lib_path('foo-1.0'))
 
     bundle "install"
-    out.should_not =~ /updating/i
+    out.should_not match /updating/i
   end
 
   it "doesn't blow up if bundle install is run twice in a row" do
@@ -499,7 +499,7 @@ describe "bundle install with git sources" do
         gem "bar", :git => "#{lib_path('bar')}"
       G
 
-      should_be_installed "foo 1.0", "bar 1.0"
+      should_be_installed "foo 1.0", "bar 1.0", :gemspec_count => 2
     end
 
     it "doesn't explode when switching Gem to Git source" do
@@ -520,7 +520,7 @@ describe "bundle install with git sources" do
       G
 
       run "require 'new_file'"
-      out.should == "USING GIT"
+      out.should match /USING GIT/
     end
   end
 
@@ -548,7 +548,7 @@ describe "bundle install with git sources" do
         puts VALIM_PREV_REF
       R
 
-      out.should == old_revision
+      out.should match /#{old_revision}/
     end
   end
 

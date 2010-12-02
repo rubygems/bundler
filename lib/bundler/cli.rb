@@ -146,6 +146,8 @@ module Bundler
       "Generate bin stubs for bundled gems to ./bin"
     method_option "path", :type => :string, :banner =>
       "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
+    method_option "install_path", :type => :string, :banner =>
+      "Specify a different install path than the system default ($BUNDLE_PATH/ruby/1.9.1/gems or $GEM_HOME/...). Bundler will remember this value for future installs on this machine"
     method_option "system", :type => :boolean, :banner =>
       "Install to the system location ($BUNDLE_PATH or $GEM_HOME) even if the bundle was previously installed somewhere else for this application"
     method_option "frozen", :type => :boolean, :banner =>
@@ -165,6 +167,7 @@ module Bundler
 
       ENV['BUNDLE_GEMFILE'] = File.expand_path(opts[:gemfile]) if opts[:gemfile]
       ENV['RB_USER_INSTALL'] = '1' if Bundler::FREEBSD
+      ENV['BUNDLE_INSTALL_PATH'] = File.expand_path(opts[:install_path]) if opts[:install_path]
 
       # Just disable color in deployment mode
       Bundler.ui.shell = Thor::Shell::Basic.new if opts[:deployment]
@@ -185,6 +188,19 @@ module Bundler
         Bundler.ui.error "You have specified a path via `bundle install #{path}` as well as\n" \
                          "by `bundle install --path #{options[:path]}`. These options are\n" \
                          "equivalent, so please use one or the other."
+        exit 1
+      end
+
+      if (path || opts[:install_path] || opts[:deployment]) && opts[:system]
+        Bundler.ui.error "You have specified both a install path to install your gems to, \n" \
+                         "as well as --system. Please choose."
+        exit 1
+      end
+
+      if path && opts[:install_path]
+        Bundler.ui.error "You have specified a install_path via `bundle install #{path}` as well as\n" \
+                         "by `bundle install --install_path #{options[:install_path]}`. These options\n" \
+                         "contradict, so please use one or the other."
         exit 1
       end
 
@@ -211,12 +227,12 @@ module Bundler
 
         Bundler.settings[:frozen] = '1'
       end
-
       # Can't use Bundler.settings for this because settings needs gemfile.dirname
       Bundler.settings[:path] = nil if opts[:system]
       Bundler.settings[:path] = "vendor/bundle" if opts[:deployment]
       Bundler.settings[:path] = path if path
       Bundler.settings[:path] = opts[:path] if opts[:path]
+      Bundler.settings[:install_path] = opts[:install_path] if opts[:install_path] || ENV['BUNDLE_INSTALL_PATH']
       Bundler.settings[:bin] = opts["binstubs"] if opts[:binstubs]
       Bundler.settings[:disable_shared_gems] = '1' if Bundler.settings[:path]
       Bundler.settings.without = opts[:without] unless opts[:without].empty?

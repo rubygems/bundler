@@ -22,7 +22,7 @@ describe "bundle lock with git gems" do
       puts "WIN" unless defined?(FOO_PREV_REF)
     RUBY
 
-    out.should == "WIN"
+    out.should match /WIN/
   end
 
   it "provides correct #full_gem_path" do

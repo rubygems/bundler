@@ -80,6 +80,19 @@ RSpec.configure do |config|
     ENV['BUNDLER_SPEC_PLATFORM'] = nil
     ENV['BUNDLER_SPEC_VERSION']  = nil
     ENV['BUNDLE_APP_CONFIG']     = nil
+    ENV['BUNDLE_INSTALL_PATH']   = nil
+  end
+
+  def capture(stream)
+    begin
+      stream = stream.to_s
+      eval "$#{stream} = StringIO.new"
+      yield
+      result = eval("$#{stream}").string
+    ensure
+      eval("$#{stream} = #{stream.upcase}")
+    end
+
+    result
   end
 end
-

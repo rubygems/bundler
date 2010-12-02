@@ -26,12 +26,12 @@ describe "bundle show" do
 
   it "prints path if gem exists in bundle" do
     bundle "show rails"
-    out.should == default_bundle_path('gems', 'rails-2.3.2').to_s
+    out.should match /\n#{default_bundle_path('gems', 'rails-2.3.2').to_s}\Z/
   end
 
   it "prints the path to the running bundler" do
     bundle "show bundler"
-    out.should == File.expand_path('../../../', __FILE__)
+    out.should match /\n#{File.expand_path('../../../', __FILE__)}\Z/
   end
 
   it "complains if gem not in bundle" do
