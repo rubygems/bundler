@@ -51,7 +51,7 @@ module Spec
       end.join
       bin_bundle = File.expand_path('../../../bin/bundle', __FILE__)
       cmd = "#{env}#{Gem.ruby} -I#{lib} #{bin_bundle} #{cmd}#{args}"
-      $stderr.puts "Bundler cmd: #{cmd}"
+      $stderr.puts "Bundler cmd: #{cmd}" if ENV['BUNDLE_DEBUG']
       if exitstatus
         sys_status(cmd)
       else
