@@ -1,6 +1,33 @@
 require 'pathname'
 require Pathname(__FILE__).ascend { |d| h=d+'spec_helper.rb'; break h if h.file? }
 
+describe "Bundler config " do
+  context "with a Gemfile" do
+    it "recognizes the install-path setting in a config file" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+      config({'BUNDLE_INSTALL_PATH' => 'found_installed_path'})
+      Dir.chdir(bundled_app('.bundle')) do
+        puts Dir.pwd
+        bundle "config install-path", "no-color" => false
+        out.should match /Settings for `install-path`(.+)\n(.+)found_installed_path/
+      end
+    end
+  end
+  context "without a Gemfile" do
+    it "only complains about the missing Gemfile" do
+      config({'BUNDLE_INSTALL_PATH' => 'found_installed_path'})
+      Dir.chdir(bundled_app('.bundle')) do
+        puts Dir.pwd
+        bundle "config install-path", "no-color" => false
+        out.should match /Settings for `install-path`(.+)\n(.+)Could not locate Gemfile/
+      end
+    end
+  end
+end
+
 describe "Bundler's full install path can point anywhere" do
 
   {:global => 'global Bundler install_path config', :env => 'environment variable BUNDLE_INSTALL_PATH'}.each do |type, desc|
@@ -83,45 +110,10 @@ describe "Bundler's full install path can point anywhere" do
       end
     end
 
-    describe "installing the Gemfile library" do
-      describe "when the #{desc} is set" do
-        before :each do
-          build_lib "rack", "1.0.0", :to_system => true do |s|
-            s.write "lib/rack.rb", "raise 'FAIL'"
-          end
-          @install_folder = [Array.new(6){rand(50).chr}.join].pack("m").chomp
-          env = {}
-          env['gemfile']    = bundled_app.to_s
-          env = env.merge set_bundle_install_path(type, @install_folder)
-          ipath             = build_install_path(@install_folder)
-          @installed_path   = File.join(ipath, 'gems','rack-1.0.0','lib')
-          gemfile <<-G
-            source "file://#{gem_repo1}"
-            gem "rack"
-          G
-          bundle "install", env
-          puts "This is err: #{err.inspect}\nThis is out: #{out.inspect}"
-        end
-
-        after :each do
-          clean_config
-        end
-
-        it "outputs an error when Gemfile is pointed to but is not installed" do
-          puts "Should bundle check"
-          bundle "config gemfile", :exitstatus => true
-          puts "This is err: #{err.inspect}\nThis is out: #{out.inspect}"
-          bundle :check, :exitstatus => true, 'gemfile' => bundled_app.to_s
-          check @exitstatus.should == 0
-          out.should match /The Gemfile's dependencies are satisfied/
-        end
-      end
-    end
-
     describe "requiring the installed library" do
       describe "when the #{desc} is set" do
         before :each do
-          build_lib "rack", "1.0.0", :to_system => false do |s|
+          build_lib "rack", "1.0.0", :to_system => true do |s|
             s.write "lib/rack.rb", "raise 'FAIL'"
           end
           @install_folder = [Array.new(6){rand(50).chr}.join].pack("m").chomp
@@ -134,6 +126,7 @@ describe "Bundler's full install path can point anywhere" do
             source "file://#{gem_repo1}"
             gem "rack"
           G
+          bundle "install", @env
         end
 
         after :each do
@@ -141,50 +134,61 @@ describe "Bundler's full install path can point anywhere" do
         end
 
         it "installs nothing to the typical vendor path" do
-          bundle "install", @env
           vendored_gems("gems/rack-1.0.0").should_not be_directory
         end
 
         it "installs nothing to the typical Bundler app path" do
-          bundle "install", @env
           bundled_app("gems/rack-1.0.0").should_not be_directory
         end
 
         it "installs nothing to the typical Bundler app vendor path" do
-          bundle "install", @env
           bundled_app('vendor/gems/rack-1.0.0').should_not be_directory
         end
 
         it "installs nothing to the typical Bundler app system gem path" do
-          bundle "install", @env
           system_gem_path('gems/rack-1.0.0').should_not be_directory
         end
 
         it "installs nothing to the install folder under the typical Bundler app path" do
-          bundle "install", @env
           bundled_app("#{@install_folder}/gems/rack-1.0.0").should_not be_directory
         end
 
         it "installs to the install path directly" do
-          $stdout.puts("working dir: #{Dir.pwd}\nDir contents: #{Dir.glob(File.join(Dir.pwd,'**','*'))}")
-          bundle "install", @env
-          puts "Output: #{out.inspect}"
-#          Dir.chdir(bundled_app.to_s) do
-#            bundle 'show rack'  # TODO This shoulkd point to the installed path
-#          end
-#          puts "Output 2: #{out.inspect}"
-          puts @installed_path
-          puts Dir.exists? @installed_path
-          $stdout.puts("install dir: #{build_install_path(@install_folder)}\nDir contents: #{Dir.glob(File.join(build_install_path(@install_folder),'**','*'))}")
-          Pathname.new(@installed_path).should be_directory
+          Dir.entries(@installed_path).size.should == 3
         end
+
+        it "installs to the install path directly" do
+          Dir.chdir(@installed_path.to_s) do
+            bundle 'show rack'  # TODO This should point to the installed path
+            puts out.inspect
+          end
+#          puts "Output 2: #{out.inspect}"
+#          puts @installed_path
+#          puts Dir.exists? @installed_path
+#          $stdout.puts("install dir: #{build_install_path(@install_folder)}\nDir contents: #{Dir.glob(File.join(build_install_path(@install_folder),'**','*'))}")
+#          Pathname.new(@installed_path).should be_directory
+        end
+
+##    it "installs gems's contents to BUNDLE_INSTALL_PATH relative to root when relative" do
+##      set_bundle_install_path(type, "../#{@install_path}")
+##
+##      FileUtils.mkdir_p bundled_app('lol')
+##      Dir.chdir(bundled_app('lol')) do
+##        bundle :install
+##      end
+##
+##      bundled_app('vendor/gems/rack-1.0.0').should_not be_directory
+##      puts File.expand_path(File.join(bundled_app("#{@install_path}"),"**", "*"))
+##      bundled_app("../#{@install_path}/gems/rack-1.0.0").should be_directory
+##      should_be_installed "rack 1.0.0"
+##    end
 
 #        it "necessitates the full path be given to require the library" do
 #          opts = set_bundle_install_path(type, @install_folder)
 #          should_be_installed "rack 1.0.0", opts
 #        end
 
-        it "installs gems' contents to BUNDLE_INSTALL_PATH with #{type}" do
+#        it "installs gems' contents to BUNDLE_INSTALL_PATH with #{type}" do
 #          set_bundle_install_path(type, bundled_app(@install_path).to_s)
 #
 #          bundle :install
@@ -194,8 +198,56 @@ describe "Bundler's full install path can point anywhere" do
 #          puts Dir.glob(File.join(bundled_app("#{@install_path}").to_s,"**", "*"))
 #          bundled_app("#{@install_path}/gems/rack-1.0.0").should be_directory
 #          should_be_installed "rack 1.0.0"
-        end
+#        end
 
+      end
+    end
+
+    describe "Bundler show <gem>" do
+      context "with a Gemfile" do
+        it "shows the installed location of an bundled gem is the given install-path" do
+          build_lib "rack", "1.0.0", :to_system => true do |s|
+            s.write "lib/rack.rb", "raise 'FAIL'"
+          end
+          @install_folder = [Array.new(6){rand(50).chr}.join].pack("m").chomp
+          @env = {'no-color' => false}
+          @env['gemfile']    = bundled_app.to_s
+          @env = @env.merge set_bundle_install_path(type, @install_folder, @env)
+          ipath           = build_install_path(@install_folder)
+          @installed_path   = File.join(ipath, 'gems','rack-1.0.0','lib')
+          gemfile <<-G
+            source "file://#{gem_repo1}"
+            gem "rack"
+          G
+          bundle "install", @env
+          pending "show needs to return the install-path" do
+            bundle 'show rack'  # TODO This should point to the installed path
+            out.should match /Some success message/
+          end
+        end
+      end
+
+      context "without a Gemfile" do
+        it "complains about the missing Gemfile" do
+          build_lib "rack", "1.0.0", :to_system => true do |s|
+            s.write "lib/rack.rb", "raise 'FAIL'"
+          end
+          @install_folder = [Array.new(6){rand(50).chr}.join].pack("m").chomp
+          @env = {'no-color' => false}
+          @env['gemfile']    = bundled_app.to_s
+          @env = @env.merge set_bundle_install_path(type, @install_folder, @env)
+          ipath           = build_install_path(@install_folder)
+          @installed_path   = File.join(ipath, 'gems','rack-1.0.0','lib')
+          gemfile <<-G
+            source "file://#{gem_repo1}"
+            gem "rack"
+          G
+          bundle "install", @env
+          Dir.chdir(@installed_path) do
+            bundle 'show rack'  # TODO This should point to the installed path
+            out.should match /Could not locate Gemfile/
+          end
+        end
       end
     end
 
