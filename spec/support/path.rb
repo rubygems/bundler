@@ -78,16 +78,12 @@ module Spec
     def set_bundle_install_path(type, location, opts = {})
       path = make_install_path(location)
       if type == :env
-        STDERR.puts "Environment: #{:env} path: #{path}"
         hsh = { 'BUNDLE_INSTALL_PATH' => path }
         hsh['BUNDLE_GEMFILE'] = opts['gemfile'] if opts['gemfile']
         hsh={:env => hsh, :exitstatus => true }
       elsif type == :global
-        STDERR.puts "Environment: #{:global} path: #{path}, opts: #{opts.inspect}"
         bundle("config gemfile #{opts['gemfile']}", {'no-color' => false}) if opts['gemfile']
         bundle("config install-path #{path}", {'no-color' => false})
-        puts File.read('/usr/src/bundler/tmp/.bundle/config')  if File.exists?('/usr/src/bundler/tmp/.bundle/config')
-        puts File.read('/usr/src/bundler/tmp/home/.bundle/config') if File.exists?('/usr/src/bundler/tmp/home/.bundle/config')
         hsh={:install_path => path}
       end
       hsh

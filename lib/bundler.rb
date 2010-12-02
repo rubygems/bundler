@@ -287,7 +287,6 @@ module Bundler
       else
         @settings[:install_path] = home.join("gems")
       end
-      $stderr.puts "configure_install_path settings: #{@settings[:install_path]}"
       @settings[:install_path]
     end
   end
