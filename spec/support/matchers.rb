@@ -26,17 +26,59 @@ module Spec
       end
     end
 
+    def parse_spec_set_output
+      out_ary         = out.split(/\n/) # captures the output from spec_set's materialize method
+      gem_specs_ary   = out_ary.grep(/spec_set_gemspec/)
+      loaded_gemspecs = gem_specs_ary.collect do |gst|
+        nv = gst[/\{\:spec_set_gemspec => (.*)\}/, 1]
+        n = nv[/\{\:name => ['](\S*)['],/, 1] if nv
+        v = nv[/\:version => ['](\S*)['],/, 1] if nv
+        p = nv[/\:platform => ['](\S*)[']\}/, 1] if nv
+        (n && v) ? {:name => n, :version => v, :platform => p} : nil
+      end
+      loaded_gemspecs.delete_if{ |gs| gs.nil? }
+    end
+
+    def check_gemspec_version_platform(gsh, opts, platform, version)
+      check Gem::Version.new(gsh[:version]).should == Gem::Version.new(version) if opts[:check_version]
+      gsh[:platform].should == platform if opts[:check_platform]
+    end
+
+    def gemspec_count(opts)
+      ( opts[:gemspec_count] || 1 )
+    end
+
+    def check_gemspecs(name, version, platform, opts = {})
+      loaded_gemspecs = parse_spec_set_output
+      if loaded_gemspecs.size == gemspec_count(opts)
+        loaded_gemspecs.each do |gsh|
+          if gsh[:name] =~ /#{name}/
+            check_gemspec_version_platform(gsh, opts, platform, version)
+          end
+        end
+      else
+        loaded_gemspecs.size.should == gemspec_count(opts) if loaded_gemspecs.size > 0
+        check_gemspec_version_platform(loaded_gemspecs[0], opts, platform, version)
+      end
+    end
+
     def should_be_installed(*names)
+      cmd = ""
       opts = names.last.is_a?(Hash) ? names.pop : {}
       groups = Array(opts[:groups])
       groups << opts
       names.each do |name|
         name, version, platform = name.split(/\s+/)
         version_const = name == 'bundler' ? 'Bundler::VERSION' : Spec::Builders.constantize(name)
-        run "require '#{name}.rb'; puts #{version_const}", *groups
-        actual_version, actual_platform = out.split(/\s+/)
-        check Gem::Version.new(actual_version).should == Gem::Version.new(version)
-        actual_platform.should == platform
+        env = ""
+        if opts[:install_path]
+          name, env = File.join(opts[:install_path],name), "ENV['BUNDLE_INSTALL_PATH']='#{opts[:install_path]}'"
+          cmd << " #{env};"
+        end
+        cmd << " require '#{name}';"
+        cmd << " puts #{version_const}; "
+        run cmd, *groups
+        check_gemspecs(name, version, platform, opts)
       end
     end
 
@@ -56,10 +98,11 @@ module Spec
             puts "WIN"
           end
         R
-        if version.nil? || out match /WIN/
-          out.should match /WIN/
+        if version.nil? || out[/WIN/]
+          opts[:check_version] = false
+          out.should match(/WIN/)
         else
-          Gem::Version.new(out).should_not == Gem::Version.new(version)
+          check_gemspecs(name, version, platform, opts)
         end
       end
     end
