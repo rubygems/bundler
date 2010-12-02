@@ -9,7 +9,7 @@ module Bundler
     def self.build(gemfile, lockfile, unlock)
       unlock ||= {}
       gemfile = Pathname.new(gemfile).expand_path
-
+      gemfile = gemfile + 'Gemfile' unless gemfile.file?
       unless gemfile.file?
         raise GemfileNotFound, "#{gemfile} not found"
       end
