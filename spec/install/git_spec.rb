@@ -525,20 +525,21 @@ describe "bundle install with git sources" do
   end
 
   describe "bundle install after the remote has been updated" do
-    it "installs" do
-      build_git "valim"
+    before(:each) do
+      @git = build_git "valim", :path => lib_path('valim-1.0')
+      @old_revision = @git.ref_for('HEAD') # revision_for(lib_path("foo-1.0"))
+      update_git "valim"
+      @new_revision = @git.ref_for('HEAD')
+    end
 
+    it "installs" do
       install_gemfile <<-G
         gem "valim", :git => "file://#{lib_path("valim-1.0")}"
       G
 
-      old_revision = revision_for(lib_path("valim-1.0"))
-      update_git "valim"
-      new_revision = revision_for(lib_path("valim-1.0"))
-
       lockfile = File.read(bundled_app("Gemfile.lock"))
       File.open(bundled_app("Gemfile.lock"), "w") do |file|
-        file.puts lockfile.gsub(/revision: #{old_revision}/, "revision: #{new_revision}")
+        file.puts lockfile.gsub(/revision: #{@old_revision}/, "revision: #{@new_revision}")
       end
 
       bundle "install"
@@ -548,8 +549,19 @@ describe "bundle install with git sources" do
         puts VALIM_PREV_REF
       R
 
-      out.should match /#{old_revision}/
+      out.should match /#{@old_revision}/
     end
+
+    it "installs to Bundler's typical system gem path" do
+      install_gemfile <<-G
+        git "#{lib_path('valim-1.0')}", :ref => "#{@old_revision}" do
+          gem "foo"
+        end
+      G
+
+      system_gem_path("bundler/gems/valim-1.0-#{@git.ref_for('HEAD^', 11)}").should be_directory
+    end
+
   end
 
   describe "bundle install --deployment with git sources" do
