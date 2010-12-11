@@ -530,6 +530,7 @@ describe "bundle install with git sources" do
       @old_revision = @git.ref_for('HEAD') # revision_for(lib_path("foo-1.0"))
       update_git "valim"
       @new_revision = @git.ref_for('HEAD')
+      @uri_hash = Digest::SHA1.hexdigest(lib_path('valim-1.0').to_s)
     end
 
     it "installs" do
@@ -560,6 +561,14 @@ describe "bundle install with git sources" do
       G
 
       system_gem_path("bundler/gems/valim-1.0-#{@git.ref_for('HEAD^', 11)}").should be_directory
+    it "installs a cache to Bundler's typical system gem path with URI digest decoration" do
+      install_gemfile <<-G
+        git "#{lib_path('valim-1.0')}", :ref => "#{@old_revision}" do
+          gem "foo"
+        end
+      G
+
+      system_gem_path("cache/bundler/git/valim-1.0-#{@uri_hash}").should be_directory
     end
 
   end
