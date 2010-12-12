@@ -186,7 +186,7 @@ module Bundler
     def _normalize_options(name, version, opts)
       _normalize_hash(opts)
 
-      invalid_keys = opts.keys - %w(group groups git path name branch ref tag require submodules platform platforms)
+      invalid_keys = opts.keys - %w(group groups git git_decorate decorate path name branch ref tag require submodules platform platforms)
       if invalid_keys.any?
         plural = invalid_keys.size > 1
         message = "You passed #{invalid_keys.map{|k| ':'+k }.join(", ")} "
