@@ -591,4 +591,132 @@ describe "bundle install with git sources" do
       exitstatus.should == 0
     end
   end
+
+  describe "when floating on master (undecorated)" do
+    before :each do
+      build_git "foo" do |s|
+        s.executables = "foobar"
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        git "#{lib_path('foo-1.0')}" do
+          gem 'foo'
+        end
+      G
+    end
+
+    it "complains if pinned specs don't exist in the git repo" do
+      build_git "foo"
+
+      install_gemfile <<-G
+        gem "foo", "1.1", :git => "#{lib_path('foo-1.0')}", :git_decorate => false
+      G
+
+      #pending("default Git decorate false") do
+        out.should include("Source contains 'foo' at: 1.0")
+      #end
+    end
+  end
+
+  describe "block syntax (undecorated)" do
+    it "handles implicit updates when modifying the source info" do
+      git = build_git "foo"
+
+      install_gemfile <<-G
+        git "#{lib_path('foo-1.0')}" do
+          gem "foo"
+        end
+      G
+
+      update_git "foo"
+      update_git "foo"
+
+      install_gemfile <<-G
+        git "#{lib_path('foo-1.0')}", :ref => "#{git.ref_for('HEAD^')}", :decorate => false do
+          gem "foo"
+        end
+      G
+
+      run <<-RUBY
+        require 'foo'
+        puts "WIN" if FOO_PREV_REF == '#{git.ref_for("HEAD^^")}'
+      RUBY
+
+        out.should match /WIN/
+    end
+  end
+
+  describe "when specifying a revision and undecorated folder names" do
+    before(:each) do
+      @git = build_git "foo"
+      @revision = @git.ref_for('HEAD', 11) # revision_for(lib_path("foo-1.0"))
+      update_git "foo"
+      @uri_hash = Digest::SHA1.hexdigest(lib_path("foo-1.0").to_s)
+    end
+
+    it "installs nothing to Bundler's typical decorated system gem path" do
+      install_gemfile <<-G
+        git "#{lib_path('foo-1.0')}", :ref => "#{@revision}", :decorate => true do
+          gem "foo"
+        end
+      G
+
+      system_gem_path("bundler/gems/foo-1.0-#{@git.ref_for('HEAD^', 11)}").should_not be_directory
+    end
+
+    it "installs to Bundler's typical system gem path without any Git hash decoration" do
+      install_gemfile <<-G
+        git "#{lib_path('foo-1.0')}", :ref => "#{@revision}", :decorate => true do
+          gem "foo"
+        end
+      G
+
+      system_gem_path("bundler/gems/foo-1.0").should be_directory
+    end
+
+    it "installs a cache to Bundler's typical system gem path with a full URI hash decoration" do
+      install_gemfile <<-G
+        git "#{lib_path('foo-1.0')}", :ref => "#{@revision}", :decorate => true do
+          gem "foo"
+        end
+      G
+
+      system_gem_path("cache/bundler/git/foo-1.0-#{@uri_hash}").should be_directory
+    end
+
+    it "works" do
+      install_gemfile <<-G
+        git "#{lib_path('foo-1.0')}", :ref => "#{@revision}", :decorate => false do
+          gem "foo"
+        end
+      G
+
+      run <<-RUBY
+        require 'foo'
+        puts "WIN" unless defined?(FOO_PREV_REF)
+      RUBY
+
+      out.should match /WIN/
+      should_be_installed "foo 1.0", :check_version => true
+    end
+
+
+    it "works when the revision is a symbol" do
+      install_gemfile <<-G
+        git "#{lib_path('foo-1.0')}", :ref => #{@revision.to_sym.inspect}, :decorate => false do
+          gem "foo"
+        end
+      G
+      check err.should be_empty
+
+      run <<-RUBY
+        require 'foo'
+        puts "WIN" unless defined?(FOO_PREV_REF)
+      RUBY
+      puts lib_path.entries
+      out.should match /WIN/
+    end
+  end
+
 end
