@@ -464,12 +464,14 @@ module Bundler
         super
 
         # stringify options that could be set as symbols
-        %w(ref branch tag revision).each{|k| options[k] = options[k].to_s if options[k] }
+        %w(ref branch tag revision decorate overwrite).each{|k| options[k] = options[k].to_s if options[k] }
 
         @uri        = options["uri"]
         @ref        = options["ref"] || options["branch"] || options["tag"] || 'master'
         @revision   = options["revision"]
         @submodules = options["submodules"]
+        @decorate   = ( options["decorate"].kind_of?(FalseClass) || options["git_decorate"].kind_of?(FalseClass) ) ? false : true
+        @overwrite  = options["overwrite"].kind_of?(FalseClass) ? false : true  # TODO Maybe - currently no spec fails without this...
         @update     = false
       end
 
@@ -499,6 +501,44 @@ module Bundler
 
       alias == eql?
 
+      def decorate?
+        @allow_cached = true
+        ref =  @options["ref"]
+        repo_matched = false
+        cache_matched = false
+        if cached? && ref
+          Dir.chdir(@options['uri']) do
+              @decorate = @options['uri'][/-#{shortref_for_path(ref.to_s)}/] ? true : false
+            git('rev-list --all') do |rev|
+              rev.split(/\n/).each do |r|
+                break(repo_matched = true) if r[/#{shortref_for_path(ref.to_s)}/]
+              end
+            end
+          end
+          Dir.chdir(cache_path) do
+            git('rev-list --all') do |rev|
+              rev.split(/\n/).each do |r|
+                break(cache_matched = true) if r[/#{shortref_for_path(ref.to_s)}/]
+              end
+            end
+          end
+        end
+        if repo_matched || cache_matched
+          @allow_cached = true
+        else
+          @allow_cached = false
+        end
+        @decorate
+      end
+
+      def overwrite?
+        @overwrite
+      end
+
+      def git_scope()
+        decorate? ? "#{base_name}-#{shortref_for_path(revision)}" : "#{base_name}"
+      end
+
       def to_s
         sref = options["ref"] ? shortref_for_display(options["ref"]) : ref
         "#{uri} (at #{sref})"
@@ -510,8 +550,6 @@ module Bundler
 
       def path
         @install_path ||= begin
-          git_scope = "#{base_name}-#{shortref_for_path(revision)}"
-
           if Bundler.requires_sudo?
             Bundler.user_bundle_path.join(Bundler.ruby_scope).join(git_scope)
           else
@@ -554,11 +592,10 @@ module Bundler
 
     private
 
-      def git(command)
+      def git(command, &block)
         if allow_git_ops?
-          out = %x{git #{command}}
-
-          if $? != 0
+          out, status = sh_with_code("git #{command}", &block)
+          if status != 0
             raise GitError, "An error has occurred in git when running `git #{command}`. Cannot complete bundling."
           end
           out
@@ -567,6 +604,18 @@ module Bundler
                           "this error message could probably be more useful. Please submit a ticket at http://github.com/carlhuda/bundler/issues " \
                           "with steps to reproduce as well as the following\n\nCALLER: #{caller.join("\n")}"
         end
+      end
+
+      def sh_with_code(cmd, base=Dir.pwd, &block)
+        outbuf = ''
+        Bundler.ui.debug(cmd)
+        Dir.chdir(base) {
+          outbuf = %x{#{cmd}}
+          if $? == 0
+            block.call(outbuf) if block
+          end
+        }
+        [outbuf, $?]
       end
 
       def base_name
