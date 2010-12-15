@@ -29,6 +29,10 @@ module Bundler
 
       # Since we are installing, we can resolve the definition
       # using remote specs
+      if @definition.sources[0].kind_of?(::Bundler::Source::Git) && Dir.exists?(@definition.sources[0].uri)
+        local = false
+        options["local"] = true
+      end
       unless local
         options["local"] ?
           @definition.resolve_with_cache! :

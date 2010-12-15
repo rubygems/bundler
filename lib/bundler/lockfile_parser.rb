@@ -87,7 +87,7 @@ module Bundler
       if line =~ %r{^ {4}#{NAME_VERSION}$}
         name, version = $1, Gem::Version.new($2)
         platform = $3 ? Gem::Platform.new($3) : Gem::Platform::RUBY
-        @current_spec = LazySpecification.new(name, version, platform)
+        @current_spec = @current_source ? LazySpecification.new(name, version, platform, @current_source) : LazySpecification.new(name, version, platform)
         @current_spec.source = @current_source
         @specs << @current_spec
       elsif line =~ %r{^ {6}#{NAME_VERSION}$}

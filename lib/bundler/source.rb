@@ -131,6 +131,10 @@ module Bundler
         end
       end
 
+      def decorate?
+        #true
+      end
+
     private
 
       def cached_gem(spec)
@@ -410,6 +414,10 @@ module Bundler
         end
       end
 
+      def decorate?
+        #true
+      end
+
     private
 
       def relative_path
@@ -501,20 +509,53 @@ module Bundler
 
       alias == eql?
 
+      def initial_install?
+        # initial bundle install - seen before creating lockfile
+        if ( @options['git'] && @options['git'][/#{@options['uri']}/] && @options['revision'].nil? )
+          ret = true
+        elsif (@options['git'] && @options['git'][/#{@options['uri']}/] && @options['ref'] && @options['ref'].size == 40 )
+          ret = true
+        end
+        ret
+      end
+
+      def subsequent_install?
+        # subsequent bundle install - seen while parsing lockfile
+        ( @options['uri'] && @options['uri'][/git\:\/\//] && @options['revision'] && @options['git'].nil? )
+      end
+
       def decorate?
+        if cached? && initial_install?
+           $stderr.puts "Init. new URI: #{Bundler.install_path}/#{name} Dir exists?: #{Dir.exist?("#{Bundler.install_path}/#{name}")}"
+          if Dir.exist?("#{Bundler.install_path}/#{name}")
+            @options['uri'] = "#{Bundler.install_path}/#{name}"
+          end
+        end
+
+        if cached? && subsequent_install?
+
+          if Dir.exist?("#{Bundler.install_path}/#{name}")
+            @options['git'] = @options['uri']
+            @options['uri'] = "#{Bundler.install_path}/#{name}"
+            @options['ref'] = @options['revision']
+            #@options['git_decorate'] = false
+          end
+        end
+
         @allow_cached = true
         ref =  @options["ref"]
         repo_matched = false
         cache_matched = false
-        if cached? && ref
+        if ref && Dir.exists?(@options['uri'])
           Dir.chdir(@options['uri']) do
-              @decorate = @options['uri'][/-#{shortref_for_path(ref.to_s)}/] ? true : false
             git('rev-list --all') do |rev|
               rev.split(/\n/).each do |r|
                 break(repo_matched = true) if r[/#{shortref_for_path(ref.to_s)}/]
               end
             end
           end
+        end
+        if cached? && ref
           Dir.chdir(cache_path) do
             git('rev-list --all') do |rev|
               rev.split(/\n/).each do |r|
@@ -523,10 +564,24 @@ module Bundler
             end
           end
         end
+        #TODO The above don't seem to contain the rev hash bundler passes around.  So we make a weaker test.
+        # If the path exists and it is a git repo.
+        repo_matched = Dir.exists?(File.join(@options['uri'],'.git'))
+        cache_matched = cached?
         if repo_matched || cache_matched
           @allow_cached = true
         else
           @allow_cached = false
+        end
+        if @options['git_decorate'].nil? # && @options['decorate'].nil?
+          if repo_matched
+            @decorate = @options['uri'][/-#{shortref_for_path(ref.to_s)}/] ? true : false
+          end
+          # @options['git_decorate'] = @decorate
+          # @options['decorate'] = @decorate
+        else
+          @decorate = @options['git_decorate']
+          $stderr.puts "Decorate set to: #{@decorate}"
         end
         @decorate
       end

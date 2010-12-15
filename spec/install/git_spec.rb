@@ -657,7 +657,7 @@ describe "bundle install with git sources" do
 
     it "installs nothing to Bundler's typical decorated system gem path" do
       install_gemfile <<-G
-        git "#{lib_path('foo-1.0')}", :ref => "#{@revision}", :decorate => true do
+        git "#{lib_path('foo-1.0')}", :ref => "#{@revision}", :decorate => false do
           gem "foo"
         end
       G
@@ -667,7 +667,7 @@ describe "bundle install with git sources" do
 
     it "installs to Bundler's typical system gem path without any Git hash decoration" do
       install_gemfile <<-G
-        git "#{lib_path('foo-1.0')}", :ref => "#{@revision}", :decorate => true do
+        git "#{lib_path('foo-1.0')}", :ref => "#{@revision}", :decorate => false do
           gem "foo"
         end
       G
@@ -677,7 +677,7 @@ describe "bundle install with git sources" do
 
     it "installs a cache to Bundler's typical system gem path with a full URI hash decoration" do
       install_gemfile <<-G
-        git "#{lib_path('foo-1.0')}", :ref => "#{@revision}", :decorate => true do
+        git "#{lib_path('foo-1.0')}", :ref => "#{@revision}", :decorate => false do
           gem "foo"
         end
       G
