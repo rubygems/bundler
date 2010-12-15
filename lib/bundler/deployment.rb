@@ -9,7 +9,7 @@ module Bundler
         role_default = "[:app]"
       end
 
-      roles = context.fetch(:bundle_roles, nil)
+      roles = context.fetch(:bundle_roles, false)
       opts[:roles] = roles if roles
 
       context.send :namespace, :bundle do
