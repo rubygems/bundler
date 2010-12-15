@@ -101,9 +101,7 @@ describe "bundle cache" do
       FileUtils.rm(bundled_app("Gemfile.lock"))
 
       bundle :cache
-      pending("Bundler::Source::Git#decorate? method triggers this failure") do
-        bundled_app("Gemfile.lock").should exist
-      end
+      bundled_app("Gemfile.lock").should exist
     end
   end
 
