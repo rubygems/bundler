@@ -34,10 +34,4 @@ describe "bundle install with deprecated features" do
 
   end
 
-  it "reports that --production is deprecated" do
-    gemfile %{gem "rack"}
-    bundle "install --production"
-    out.should =~ /--production option is deprecated/
-  end
-
 end
