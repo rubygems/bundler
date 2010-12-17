@@ -178,5 +178,19 @@ describe "bundle update" do
         out.should == 'GEM'
       end
     end
+
+    it "errors with a message when the .git repo is gone" do
+      build_git "foo", "1.0"
+
+      install_gemfile <<-G
+        gem "foo", :git => "#{lib_path('foo-1.0')}"
+      G
+
+      lib_path("foo-1.0").join(".git").rmtree
+
+      bundle :update, :expect_err => true
+      out.should include(lib_path("foo-1.0").to_s)
+    end
+
   end
 end

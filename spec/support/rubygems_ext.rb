@@ -9,8 +9,11 @@ module Spec
 
       unless File.exist?("#{Path.base_system_gems}")
         FileUtils.mkdir_p(Path.base_system_gems)
-        puts "running `gem install builder rake fakeweb artifice sinatra --no-rdoc --no-ri`"
-        `gem install builder rake fakeweb artifice sinatra --no-rdoc --no-ri`
+        puts "running `gem install rake fakeweb artifice sinatra --no-rdoc --no-ri`"
+        `gem install rake fakeweb artifice sinatra --no-rdoc --no-ri`
+        # 3.0.0 breaks 1.9.2 specs
+        puts "running `gem install builder --version 2.1.2 --no-rdoc --no-ri`"
+        `gem install builder --version 2.1.2 --no-rdoc --no-ri`
       end
 
       ENV['HOME'] = Path.home.to_s

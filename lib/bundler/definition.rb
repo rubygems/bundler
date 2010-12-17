@@ -220,7 +220,8 @@ module Bundler
         out << "  #{p}\n"
       end
 
-      out << "\nDEPENDENCIES\n"
+      out << "\n"
+      out << "DEPENDENCIES\n"
 
       handled = []
       dependencies.
@@ -230,10 +231,6 @@ module Bundler
           out << dep.to_lock
           handled << dep.name
       end
-
-      out << "\nMETADATA\n"
-
-      out << "  version: #{Bundler::VERSION}\n"
 
       out
     end
