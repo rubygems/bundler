@@ -128,11 +128,12 @@ other steps in `bundle install` must be performed as the current user:
 Of these three, the first two could theoretically be performed by
 `chown`ing the resulting files to `$SUDO_USER`. The third, however,
 can only be performed by actually invoking the `git` command as
-the current user.
+the current user. Therefore, git gems are downloaded and installed
+into `~/.bundle` rather than $GEM_HOME or $BUNDLE_PATH.
 
 As a result, you should run `bundle install` as the current user,
-and bundler will ask for your password if it is needed to perform
-the final step.
+and bundler will ask for your password if it is needed to put the
+gems into their final location.
 
 ## INSTALLING GROUPS
 
