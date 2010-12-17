@@ -32,9 +32,6 @@ module Bundler
         spec = Gem::Specification.load(gemspecs.first)
         raise InvalidOption, "There was an error loading the gemspec at #{gemspecs.first}." unless spec
         gem spec.name, :path => path
-        spec.runtime_dependencies.each do |dep|
-          gem dep.name, *dep.requirement.as_list
-        end
         group(development_group) do
           spec.development_dependencies.each do |dep|
             gem dep.name, *dep.requirement.as_list
