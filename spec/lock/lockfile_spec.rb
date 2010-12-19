@@ -104,6 +104,7 @@ describe "the lockfile format" do
 
     lockfile_should_be <<-G
       GIT
+        folder: #{system_gem_path("bundler/gems/foo-1.0-#{git.ref_for('HEAD', 11)}")}
         remote: #{lib_path("foo-1.0")}
         revision: #{git.ref_for('master')}
         specs:
@@ -135,6 +136,7 @@ describe "the lockfile format" do
 
     lockfile <<-L
       GIT
+        folder: #{system_gem_path("bundler/gems/foo-1.0")}
         remote: git://github.com/nex3/haml.git
         revision: 8a2271f
         specs:
@@ -167,6 +169,7 @@ describe "the lockfile format" do
 
     lockfile_should_be <<-G
       GIT
+        folder: #{system_gem_path("bundler/gems/foo-1.0-#{git.ref_for('HEAD', 11)}")}
         remote: #{lib_path('foo-1.0')}
         revision: #{git.ref_for('master')}
         specs:
@@ -193,6 +196,7 @@ describe "the lockfile format" do
 
     lockfile_should_be <<-G
       GIT
+        folder: #{system_gem_path("bundler/gems/foo-1.0-#{git.ref_for('HEAD', 11)}")}
         remote: #{lib_path("foo-1.0")}
         revision: #{git.ref_for('omg')}
         branch: omg
@@ -220,6 +224,7 @@ describe "the lockfile format" do
 
     lockfile_should_be <<-G
       GIT
+        folder: #{system_gem_path("bundler/gems/foo-1.0-#{git.ref_for('omg', 11)}")}
         remote: #{lib_path("foo-1.0")}
         revision: #{git.ref_for('omg')}
         tag: omg
