@@ -553,14 +553,14 @@ describe "bundle install with git sources" do
       out.should match /#{@old_revision}/
     end
 
-    it "installs to Bundler's typical system gem path without an 11 digit hash decoration" do
+    it "installs to Bundler's typical system gem path with an 11 digit hash decoration" do
       install_gemfile <<-G
         git "#{lib_path('valim-1.0')}", :ref => "#{@old_revision}" do
           gem "foo"
         end
       G
 
-      system_gem_path("bundler/gems/valim-1.0").should be_directory
+      system_gem_path("bundler/gems/valim-1.0-#{@git.ref_for('HEAD^',11)}").should be_directory
     end
 
     it "installs a cache to Bundler's typical system gem path with URI digest decoration" do
