@@ -19,7 +19,7 @@ describe "Bundler.setup" do
       end
     R
 
-    out.should == "WIN"
+    out.should match /WIN\Z/
   end
 
   it "doesn't create a Gemfile.lock if the setup fails" do
