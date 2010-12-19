@@ -18,6 +18,7 @@ module Bundler
       @groups          = []
       @platforms       = []
       @env             = nil
+      @decorate        = nil
     end
 
     def gemspec(opts = nil)
@@ -229,6 +230,8 @@ module Bundler
       opts["env"]     ||= @env
       opts["platforms"] = platforms.dup
       opts["group"]     = groups
+      opts["decorate"]  ||= true
+      opts["git_decorate"] ||= true
     end
 
     def _deprecated_options(options)
