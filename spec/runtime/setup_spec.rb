@@ -240,8 +240,7 @@ describe "Bundler.setup" do
       R
 
       run "puts 'FAIL'", :expect_err => true
-
-      err.should_not include "This is not the git you are looking for"
+      err.should match /#{lib_path('rack-1.0.0')} \(at master\) is not checked out. Please run `bundle install` \(Bundler::GitError\)/
     end
 
     it "works even when the cache directory has been deleted" do
