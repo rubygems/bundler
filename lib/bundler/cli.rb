@@ -146,7 +146,7 @@ module Bundler
       "Generate bin stubs for bundled gems to ./bin"
     method_option "path", :type => :string, :banner =>
       "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
-    method_option "install_path", :type => :string, :banner =>
+    method_option "install-path", :type => :string, :banner =>
       "Specify a different install path than the system default ($BUNDLE_PATH/ruby/1.9.1/gems or $GEM_HOME/...). Bundler will remember this value for future installs on this machine"
     method_option "system", :type => :boolean, :banner =>
       "Install to the system location ($BUNDLE_PATH or $GEM_HOME) even if the bundle was previously installed somewhere else for this application"
@@ -165,9 +165,13 @@ module Bundler
       end
       opts[:without].map!{|g| g.to_sym }
 
+      if opts['install-path']
+        opts[:install_path] = opts.delete('install-path')
+        ENV['BUNDLE_INSTALL_PATH'] = File.expand_path(opts[:install_path])
+      end
+
       ENV['BUNDLE_GEMFILE'] = File.expand_path(opts[:gemfile]) if opts[:gemfile]
       ENV['RB_USER_INSTALL'] = '1' if Bundler::FREEBSD
-      ENV['BUNDLE_INSTALL_PATH'] = File.expand_path(opts[:install_path]) if opts[:install_path]
 
       # Just disable color in deployment mode
       Bundler.ui.shell = Thor::Shell::Basic.new if opts[:deployment]
