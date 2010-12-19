@@ -7,6 +7,7 @@ module Bundler
     attr_reader :autorequire
     attr_reader :groups
     attr_reader :platforms
+    attr_reader :decorate
 
     PLATFORM_MAP = {
       :ruby     => Gem::Platform::RUBY,
@@ -30,6 +31,7 @@ module Bundler
       @source      = options["source"]
       @platforms   = Array(options["platforms"])
       @env         = options["env"]
+      @decorate   = options["decorate"].kind_of?(FalseClass) || options["git_decorate"].kind_of?(FalseClass) ? false : true
 
       if options.key?('require')
         @autorequire = Array(options['require'] || [])
