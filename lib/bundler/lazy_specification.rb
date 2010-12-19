@@ -15,7 +15,7 @@ module Bundler
       @platform      = platform
       @source        = source
       @specification = nil
-      @decorate      = source.decorate? # source ? source.decorate? : true # (source.kind_of?(::Bundler::Source::Git) ? source.decorate? : true)
+      @decorate      = source.nil? ? true : source.decorate? # source ? source.decorate? : true # (source.kind_of?(::Bundler::Source::Git) ? source.decorate? : true)
     end
 
     def full_name
