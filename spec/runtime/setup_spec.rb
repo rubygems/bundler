@@ -19,7 +19,7 @@ describe "Bundler.setup" do
       end
     R
 
-    out.should match /WIN\Z/
+    out.should match /\AWIN\Z/
   end
 
   it "doesn't create a Gemfile.lock if the setup fails" do
@@ -217,7 +217,7 @@ describe "Bundler.setup" do
         end
       R
 
-      out.should match /WIN/
+      out.should match /\AFAIL\Z/
     end
 
     it "provides a good exception if the lockfile is unavailable" do
@@ -369,7 +369,7 @@ describe "Bundler.setup" do
       end
     R
 
-    out.should match /^\{(.*)\}\Z/
+    out.should_not match /\AFAIL\Z/
   end
 
   it "ignores empty gem paths" do
@@ -433,7 +433,7 @@ describe "Bundler.setup" do
         puts NOGEMSPEC
       R
 
-      out.should match /1.0/
+      out.should match /\n1.0\Z/
     end
   end
 
