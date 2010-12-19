@@ -594,7 +594,7 @@ describe "bundle install with git sources" do
 
   describe "when floating on master (undecorated)" do
     before :each do
-      build_git "foo" do |s|
+      @git=build_git "foo" do |s|
         s.executables = "foobar"
       end
 
@@ -614,7 +614,9 @@ describe "bundle install with git sources" do
       G
 
       #pending("default Git decorate false") do
-        out.should include("Source contains 'foo' at: 1.0")
+      out.should include("Source contains 'foo' at: 1.0")
+      system_gem_path("bundler/gems/foo-1.0-#{@git.ref_for('HEAD', 11)}").should_not be_directory
+      system_gem_path("bundler/gems/foo-1.0").should be_directory
       #end
     end
   end
@@ -650,14 +652,15 @@ describe "bundle install with git sources" do
   describe "when specifying a revision and undecorated folder names" do
     before(:each) do
       @git = build_git "foo"
-      @revision = @git.ref_for('HEAD', 11) # revision_for(lib_path("foo-1.0"))
+      @revision = @git.ref_for('HEAD') # revision_for(lib_path("foo-1.0"))
+      @ref = @git.ref_for('HEAD', 11)
       update_git "foo"
       @uri_hash = Digest::SHA1.hexdigest(lib_path("foo-1.0").to_s)
     end
 
     it "installs nothing to Bundler's typical decorated system gem path" do
       install_gemfile <<-G
-        git "#{lib_path('foo-1.0')}", :ref => "#{@revision}", :decorate => false do
+        git "#{lib_path('foo-1.0')}", :ref => "#{@ref}", :decorate => false do
           gem "foo"
         end
       G
@@ -667,7 +670,7 @@ describe "bundle install with git sources" do
 
     it "installs to Bundler's typical system gem path without any Git hash decoration" do
       install_gemfile <<-G
-        git "#{lib_path('foo-1.0')}", :ref => "#{@revision}", :decorate => false do
+        git "#{lib_path('foo-1.0')}", :ref => "#{@ref}", :decorate => false do
           gem "foo"
         end
       G
@@ -677,7 +680,7 @@ describe "bundle install with git sources" do
 
     it "installs a cache to Bundler's typical system gem path with a full URI hash decoration" do
       install_gemfile <<-G
-        git "#{lib_path('foo-1.0')}", :ref => "#{@revision}", :decorate => false do
+        git "#{lib_path('foo-1.0')}", :ref => "#{@ref}", :decorate => false do
           gem "foo"
         end
       G
@@ -687,7 +690,7 @@ describe "bundle install with git sources" do
 
     it "works" do
       install_gemfile <<-G
-        git "#{lib_path('foo-1.0')}", :ref => "#{@revision}", :decorate => false do
+        git "#{lib_path('foo-1.0')}", :ref => "#{@ref}", :decorate => false do
           gem "foo"
         end
       G
@@ -704,7 +707,7 @@ describe "bundle install with git sources" do
 
     it "works when the revision is a symbol" do
       install_gemfile <<-G
-        git "#{lib_path('foo-1.0')}", :ref => #{@revision.to_sym.inspect}, :decorate => false do
+        git "#{lib_path('foo-1.0')}", :ref => #{@ref.to_sym.inspect}, :decorate => false do
           gem "foo"
         end
       G
@@ -716,6 +719,81 @@ describe "bundle install with git sources" do
       RUBY
       puts lib_path.entries
       out.should match /WIN/
+    end
+
+    it "adds the install_path to the lockfile" do
+      install_gemfile <<-G
+        git "#{lib_path('foo-1.0')}", :ref => #{@ref.to_sym.inspect}, :decorate => false do
+          gem "foo"
+        end
+      G
+
+      lockfile_should_be <<-L
+      GIT
+        folder: #{system_gem_path("bundler/gems/foo-1.0")}
+        remote: #{lib_path('foo-1.0')}
+        revision: #{@git.ref_for('HEAD^')}
+        ref: #{@ref}
+        specs:
+          foo (1.0)
+
+      GEM
+        specs:
+
+      PLATFORMS
+        ruby
+
+      DEPENDENCIES
+        foo!
+      L
+    end
+
+    describe "when adding a new git source without decoration" do
+      it "updates the lockfile" do
+        git2 = build_git "valim", :path => lib_path('valim')
+
+        install_gemfile <<-G
+          git "#{lib_path('foo-1.0')}", :ref => #{@ref.to_sym.inspect}, :decorate => false do
+            gem "foo"
+          end
+        G
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+
+          gem "valim", "= 1.0", :git => "#{lib_path('valim')}",  :git_decorate => false
+          git "#{lib_path('foo-1.0')}", :ref => #{@ref.to_sym.inspect}, :decorate => false do
+            gem "foo"
+          end
+        G
+
+        lockfile_should_be <<-L
+        GIT
+          folder: #{system_gem_path("bundler/gems/foo-1.0")}
+          remote: #{lib_path('foo-1.0')}
+          revision: #{@git.ref_for('HEAD^')}
+          ref: #{@ref}
+          specs:
+            foo (1.0)
+
+        GIT
+          folder: #{system_gem_path("bundler/gems/valim")}
+          remote: #{lib_path('valim')}
+          revision: #{git2.ref_for('HEAD')}
+          specs:
+            valim (1.0)
+
+        GEM
+          remote: file:#{gem_repo1}/
+          specs:
+
+        PLATFORMS
+          ruby
+
+        DEPENDENCIES
+          foo!
+          valim (= 1.0)!
+        L
+      end
     end
   end
 
