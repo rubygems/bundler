@@ -749,6 +749,7 @@ module Bundler
             Bundler.cache.join("git", git_scope)
           end
         end
+        @cache_path
       end
 
       def cache
