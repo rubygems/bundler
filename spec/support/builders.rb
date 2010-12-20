@@ -479,9 +479,10 @@ module Spec
 
     class GitBuilder < LibBuilder
       def _build(options)
-        path = options[:path] || _default_path
-        super(options.merge(:path => path))
-        Dir.chdir(path) do
+        git_uri_to_path(options[:path])
+        @path ||= _default_path
+        super(options.merge(:path => @path))
+        Dir.chdir(@path) do
           `git init`
           `git add *`
           `git commit -m 'OMG INITIAL COMMIT'`
@@ -491,9 +492,10 @@ module Spec
 
     class GitBareBuilder < LibBuilder
       def _build(options)
-        path = options[:path] || _default_path
-        super(options.merge(:path => path))
-        Dir.chdir(path) do
+        git_uri_to_path(options[:path])
+        @path ||= _default_path
+        super(options.merge(:path => @path))
+        Dir.chdir(@path) do
           `git init --bare`
         end
       end
