@@ -244,5 +244,19 @@ module Spec
     def revision_for(path)
       Dir.chdir(path) { `git rev-parse HEAD`.strip }
     end
+
+    # modelled on the Bundler::Git::Source private method.
+    def uri_hash(uri)
+      $stderr.puts "helper cache hash uri in: #{uri.inspect}"
+      tu = URI.parse(uri.sub(%r{/\Z},'')).normalize
+      if tu.scheme
+         input = "#{tu.host}#{tu.path}"
+      else
+        input = uri  # assume it is still an ssh/git URI
+      end
+      $stderr.puts "helper cache hash uri to hexdigest: #{input.inspect}"
+      Digest::SHA1.hexdigest(input)
+    end
+
   end
 end
