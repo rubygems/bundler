@@ -1,3 +1,4 @@
+require 'uri'
 module Spec
   module Builders
     def self.constantize(name)
