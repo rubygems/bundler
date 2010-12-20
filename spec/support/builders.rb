@@ -298,7 +298,7 @@ module Spec
       opts = args.last.is_a?(Hash) ? args.last : {}
       builder = opts[:bare] ? GitBareBuilder : GitBuilder
       spec = build_with(builder, name, args, &block)
-      GitReader.new(opts[:path] || lib_path(spec.full_name))
+      GitReader.new(opts[:path] || "file://#{lib_path(spec.full_name).to_s}/.git")
     end
 
     def update_git(name, *args, &block)
