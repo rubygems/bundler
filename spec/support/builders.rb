@@ -465,6 +465,15 @@ module Spec
       def _default_path
         @context.tmp('libs', @spec.full_name)
       end
+
+      def git_uri_to_path(uri_in)
+        return _default_path if uri_in.nil?
+        tu = URI.parse(uri_in.to_s)
+        if tu.scheme && tu.scheme[/file/]
+          uri_out = Pathname.new(tu.path)
+        end
+        @path = uri_out && uri_out.to_s[/(.*)\/\.git/] ? uri_out.parent : uri_in
+      end
     end
 
     class GitBuilder < LibBuilder
