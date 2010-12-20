@@ -586,18 +586,18 @@ module Bundler
         cache_matched = false
         if rev && Dir.exists?(@options['uri'])
           Dir.chdir(@options['uri']) do
-            git('rev-list --all') do |rev|
-              rev.split(/\n/).each do |r|
-                break(repo_matched = true) if r[/#{shortref_for_path(rev.to_s)}/]
+            git('rev-list --all') do |rla|
+              rla.split(/\n/).each do |rli|
+                break(repo_matched = true) if rli[/#{shortref_for_path(rev.to_s)}/]
               end
             end
           end
         end
         if cached? && rev
           Dir.chdir(cache_path) do
-            git('rev-list --all') do |rev|
-              rev.split(/\n/).each do |r|
-                break(cache_matched = true) if r[/#{shortref_for_path(rev.to_s)}/]
+            git('rev-list --all') do |rla|
+              rla.split(/\n/).each do |rli|
+                break(cache_matched = true) if rli[/#{shortref_for_path(rev.to_s)}/]
               end
             end
           end
