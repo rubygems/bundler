@@ -712,7 +712,10 @@ module Bundler
       end
 
       def base_name
-        File.basename(uri.sub(%r{^(\w+://)?([^/:]+:)},''), ".git")
+        upath = git_uri_to_path(uri)
+        bn = upath.parent.basename if upath.to_s[/\/\.git/]
+        bn = upath.basename('.git') if upath.to_s[/[[:alnum:]]\.git/]
+        bn
       end
 
       def shortref_for_display(ref)
