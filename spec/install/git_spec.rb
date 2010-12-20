@@ -105,7 +105,7 @@ describe "bundle install with git sources" do
         source "file://#{gem_repo1}"
         gem "rack"
 
-        git "#{lib_path("foo-1.0")}" do
+        git "file://#{lib_path("foo-1.0")}/.git" do
           # this page left intentionally blank
         end
       G
@@ -441,16 +441,15 @@ describe "bundle install with git sources" do
   end
 
   it "handles implicit updates when modifying the source info" do
-    git = build_git "foo"
-
+    git = build_git "foo", "1.0", :path => "file://#{lib_path('foo-1.0')}/.git"
     install_gemfile <<-G
       git "file://#{lib_path('foo-1.0')}/.git" do
         gem "foo"
       end
     G
 
-    update_git "foo"
-    update_git "foo"
+    update_git "foo", :path => "file://#{lib_path('foo-1.0')}/.git"
+    update_git "foo", :path => "file://#{lib_path('foo-1.0')}/.git"
 
     install_gemfile <<-G
       git "file://#{lib_path('foo-1.0')}/.git", :ref => "#{git.ref_for('HEAD^')}" do
@@ -467,7 +466,7 @@ describe "bundle install with git sources" do
   end
 
   it "does not to a remote fetch if the revision is cached locally" do
-    build_git "foo"
+    build_git "foo", "1.0", :path => "file://#{lib_path('foo-1.0')}/.git"
 
     install_gemfile <<-G
       gem "foo", :git => "file://#{lib_path('foo-1.0')}/.git"
@@ -480,7 +479,7 @@ describe "bundle install with git sources" do
   end
 
   it "doesn't blow up if bundle install is run twice in a row" do
-    build_git "foo"
+    build_git "foo", "1.0", :path => "file://#{lib_path('foo-1.0')}/.git"
 
     gemfile <<-G
       gem "foo", :git => "file://#{lib_path('foo-1.0')}/.git"
@@ -635,7 +634,7 @@ describe "bundle install with git sources" do
 
   describe "block syntax (undecorated)" do
     it "handles implicit updates when modifying the source info" do
-      git = build_git "foo"
+      git = build_git "foo", "1.0", :path => "file://#{lib_path('foo-1.0')}/.git"
 
       install_gemfile <<-G
         git "file://#{lib_path('foo-1.0')}/.git" do
@@ -663,7 +662,7 @@ describe "bundle install with git sources" do
 
   describe "when specifying a revision and undecorated folder names" do
     before(:each) do
-      @git = build_git "foo"
+      @git = build_git "foo", "1.0", :path => "file://#{lib_path('foo-1.0')}/.git"
       @revision = @git.ref_for('HEAD') # revision_for(lib_path("foo-1.0"))
       @ref = @git.ref_for('HEAD', 11)
       update_git "foo"

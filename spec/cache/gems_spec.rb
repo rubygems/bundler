@@ -81,7 +81,7 @@ describe "bundle cache" do
 
       install_gemfile <<-G
         source "file://#{gem_repo1}"
-        git "#{lib_path("foo-1.0")}" do
+        git "file://#{lib_path("foo-1.0")}/.git" do
           gem 'foo'
         end
         gem 'rack'
@@ -157,7 +157,7 @@ describe "bundle cache" do
 
       install_gemfile <<-G
         source "file://#{gem_repo2}"
-        gem "rack", :git => "#{lib_path("rack-1.0")}"
+        gem "rack", :git => "file://#{lib_path("rack-1.0")}/.git"
         gem "actionpack"
       G
       cached_gem("rack-1.0.0").should_not exist

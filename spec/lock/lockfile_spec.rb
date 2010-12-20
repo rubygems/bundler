@@ -96,16 +96,16 @@ describe "the lockfile format" do
   end
 
   it "generates a simple lockfile for a single pinned source, gem with a version requirement" do
-    git = build_git "foo"
+    git = build_git "foo", "1.0", :path => "file://#{lib_path('foo-1.0')}/.git"
 
     install_gemfile <<-G
-      gem "foo", :git => "#{lib_path("foo-1.0")}"
+      gem "foo", :git => "file://#{lib_path("foo-1.0")}/.git"
     G
 
     lockfile_should_be <<-G
       GIT
         folder: #{system_gem_path("bundler/gems/foo-1.0-#{git.ref_for('HEAD', 11)}")}
-        remote: #{lib_path("foo-1.0")}
+        remote: file://#{lib_path("foo-1.0")}/.git
         revision: #{git.ref_for('master')}
         specs:
           foo (1.0)
@@ -159,10 +159,10 @@ describe "the lockfile format" do
   end
 
   it "serializes global git sources" do
-    git = build_git "foo"
+    git = build_git "foo", "1.0", :path => "file://#{lib_path('foo-1.0')}/.git"
 
     install_gemfile <<-G
-      git "#{lib_path('foo-1.0')}" do
+      git "file://#{lib_path('foo-1.0')}/.git" do
         gem "foo"
       end
     G
@@ -170,7 +170,7 @@ describe "the lockfile format" do
     lockfile_should_be <<-G
       GIT
         folder: #{system_gem_path("bundler/gems/foo-1.0-#{git.ref_for('HEAD', 11)}")}
-        remote: #{lib_path('foo-1.0')}
+        remote: file://#{lib_path('foo-1.0')}/.git
         revision: #{git.ref_for('master')}
         specs:
           foo (1.0)
@@ -187,17 +187,17 @@ describe "the lockfile format" do
   end
 
   it "generates a lockfile with a ref for a single pinned source, git gem with a branch requirement" do
-    git = build_git "foo"
+    git = build_git "foo", "1.0", :path => "file://#{lib_path('foo-1.0')}/.git"
     update_git "foo", :branch => "omg"
 
     install_gemfile <<-G
-      gem "foo", :git => "#{lib_path("foo-1.0")}", :branch => "omg"
+      gem "foo", :git => "file://#{lib_path("foo-1.0")}/.git", :branch => "omg"
     G
 
     lockfile_should_be <<-G
       GIT
         folder: #{system_gem_path("bundler/gems/foo-1.0-#{git.ref_for('HEAD', 11)}")}
-        remote: #{lib_path("foo-1.0")}
+        remote: file://#{lib_path("foo-1.0")}/.git
         revision: #{git.ref_for('omg')}
         branch: omg
         specs:
@@ -215,17 +215,17 @@ describe "the lockfile format" do
   end
 
   it "generates a lockfile with a ref for a single pinned source, git gem with a tag requirement" do
-    git = build_git "foo"
+    git = build_git "foo", "1.0", :path => "file://#{lib_path('foo-1.0')}/.git"
     update_git "foo", :tag => "omg"
 
     install_gemfile <<-G
-      gem "foo", :git => "#{lib_path("foo-1.0")}", :tag => "omg"
+      gem "foo", :git => "file://#{lib_path("foo-1.0")}/.git", :tag => "omg"
     G
 
     lockfile_should_be <<-G
       GIT
         folder: #{system_gem_path("bundler/gems/foo-1.0-#{git.ref_for('omg', 11)}")}
-        remote: #{lib_path("foo-1.0")}
+        remote: file://#{lib_path("foo-1.0")}/.git
         revision: #{git.ref_for('omg')}
         tag: omg
         specs:

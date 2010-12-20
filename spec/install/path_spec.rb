@@ -310,7 +310,7 @@ describe "bundle install with explicit source paths" do
 
       install_gemfile <<-G
         source "file://#{gem_repo1}"
-        gem "bar", :git => "#{lib_path('bar')}"
+        gem "bar", :git => "file://#{lib_path('bar')}/.git"
       G
 
       install_gemfile <<-G

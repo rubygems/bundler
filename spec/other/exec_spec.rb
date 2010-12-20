@@ -167,7 +167,7 @@ describe "bundle exec" do
         end
 
         install_gemfile <<-G
-          gem "fizz_git", :git => "#{lib_path('fizz_git-1.0')}"
+          gem "fizz_git", :git => "file://#{lib_path('fizz_git-1.0')}/.git"
         G
       end
 
@@ -191,7 +191,7 @@ describe "bundle exec" do
         end
 
         install_gemfile <<-G
-          gem "fizz_no_gemspec", "1.0", :git => "#{lib_path('fizz_no_gemspec-1.0')}"
+          gem "fizz_no_gemspec", "1.0", :git => "file://#{lib_path('fizz_no_gemspec-1.0')}/.git"
         G
       end
 

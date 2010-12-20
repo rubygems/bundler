@@ -7,7 +7,7 @@ describe "bundle update" do
       update_git "foo", :branch => "omg"
 
       install_gemfile <<-G
-        git "#{lib_path('foo-1.0')}", :branch => "omg" do
+        git "file://#{lib_path('foo-1.0')}/.git", :branch => "omg" do
           gem 'foo'
         end
       G
@@ -23,16 +23,16 @@ describe "bundle update" do
 
     it "updates correctly when you have like craziness" do
       build_lib "activesupport", "3.0", :path => lib_path("rails/activesupport")
-      build_git "rails", "3.0", :path => lib_path("rails") do |s|
+      build_git "rails", "3.0", :path => "file://#{lib_path('rails')}/.git" do |s|
         s.add_dependency "activesupport", "= 3.0"
       end
 
       install_gemfile <<-G
-        gem "rails", :git => "#{lib_path('rails')}"
+        gem "rails", :git => "file://#{lib_path('rails')}/.git"
       G
 
       bundle "update rails"
-      out.should include("Using activesupport (3.0) from #{lib_path('rails')} (at master)")
+      out.should include("Using activesupport (3.0) from file://#{lib_path('rails')}/.git (at master)")
       should_be_installed "rails 3.0", "activesupport 3.0", :gemspec_count => 2
     end
 
@@ -41,7 +41,7 @@ describe "bundle update" do
       update_git "foo", :branch => "omg", :path => lib_path("foo")
 
       install_gemfile <<-G
-        git "#{lib_path('foo')}", :branch => "omg" do
+        git "file://#{lib_path('foo')}/.git", :branch => "omg" do
           gem 'foo'
         end
       G
@@ -56,17 +56,17 @@ describe "bundle update" do
     end
 
     it "floats on master when updating all gems that are pinned to the source even if you have child dependencies" do
-      build_git "foo", :path => lib_path('foo')
+      build_git "foo", :path => "file://#{lib_path('foo')}/.git"
       build_gem "bar", :to_system => true do |s|
         s.add_dependency "foo"
       end
 
       install_gemfile <<-G
-        gem "foo", :git => "#{lib_path('foo')}"
+        gem "foo", :git => "file://#{lib_path('foo')}/.git"
         gem "bar"
       G
 
-      update_git "foo", :path => lib_path('foo') do |s|
+      update_git "foo", :path => "file://#{lib_path('foo')}/.git" do |s|
         s.write "lib/foo.rb", "FOO = '1.1'"
       end
 
@@ -76,41 +76,41 @@ describe "bundle update" do
     end
 
     it "notices when you change the repo url in the Gemfile" do
-      build_git "foo", :path => lib_path("foo_one")
-      build_git "foo", :path => lib_path("foo_two")
+      build_git "foo", :path => "file://#{lib_path('foo_one')}/.git"
+      build_git "foo", :path => "file://#{lib_path('foo_two')}/.git"
 
       install_gemfile <<-G
-        gem "foo", "1.0", :git => "#{lib_path('foo_one')}"
+        gem "foo", "1.0", :git => "file://#{lib_path('foo_one')}/.git"
       G
 
       FileUtils.rm_rf lib_path("foo_one")
 
       install_gemfile <<-G
-        gem "foo", "1.0", :git => "#{lib_path('foo_two')}"
+        gem "foo", "1.0", :git => "file://#{lib_path('foo_two')}/.git"
       G
 
       err.should be_empty
-      out.should include("Fetching #{lib_path}/foo_two")
+      out.should include("Fetching file://#{lib_path}/foo_two/.git")
       out.should include("Your bundle is complete!")
     end
 
 
     it "fetches tags from the remote" do
-      build_git "foo"
-      @remote = build_git("bar", :bare => true)
-      update_git "foo", :remote => @remote.path
-      update_git "foo", :push => "master"
+      build_git "foo", :path => "file://#{lib_path('foo')}/.git"
+      @remote = build_git("bar", '1.0', :path => "file://#{lib_path('bar-1.0').to_s}/.git")
+      update_git "foo", :remote => "file://#{@remote.path.to_s}/.git", :path => "file://#{lib_path('foo')}/.git"
+      update_git "foo", :push => "master", :path => "file://#{lib_path('foo')}/.git"
 
       install_gemfile <<-G
-        gem 'foo', :git => "#{@remote.path}"
+        gem 'foo', :git => "file://#{@remote.path.to_s}/.git"
       G
 
       # Create a new tag on the remote that needs fetching
-      update_git "foo", :tag => "fubar"
-      update_git "foo", :push => "fubar"
+      update_git "foo", :tag => "fubar", :path => "file://#{lib_path('foo')}/.git"
+      update_git "foo", :push => "fubar", :path => "file://#{lib_path('foo')}/.git"
 
       gemfile <<-G
-        gem 'foo', :git => "#{@remote.path}", :tag => "fubar"
+        gem 'foo', :git => "file://#{@remote.path.to_s}/.git", :tag => "fubar"
       G
 
       bundle "update", :exitstatus => true
@@ -139,7 +139,7 @@ describe "bundle update" do
 
       it "it unlocks the source when submodules is added to a git source" do
         install_gemfile <<-G
-          git "#{lib_path('has_submodule-1.0')}" do
+          git "file://#{lib_path('has_submodule-1.0')}/.git" do
             gem "has_submodule"
           end
         G
@@ -148,7 +148,7 @@ describe "bundle update" do
         check out.should match /GEM/
 
         install_gemfile <<-G
-          git "#{lib_path('has_submodule-1.0')}", :submodules => true do
+          git "file://#{lib_path('has_submodule-1.0')}/.git", :submodules => true do
             gem "has_submodule"
           end
         G
@@ -160,7 +160,7 @@ describe "bundle update" do
       it "it unlocks the source when submodules is removed from git source" do
         pending "This would require actually removing the submodule from the clone"
         install_gemfile <<-G
-          git "#{lib_path('has_submodule-1.0')}", :submodules => true do
+          git "file://#{lib_path('has_submodule-1.0')}/.git", :submodules => true do
             gem "has_submodule"
           end
         G
@@ -169,7 +169,7 @@ describe "bundle update" do
         check out.should match /GIT/
 
         install_gemfile <<-G
-          git "#{lib_path('has_submodule-1.0')}" do
+          git "file://#{lib_path('has_submodule-1.0')}/.git" do
             gem "has_submodule"
           end
         G
@@ -183,7 +183,7 @@ describe "bundle update" do
       build_git "foo", "1.0"
 
       install_gemfile <<-G
-        gem "foo", :git => "#{lib_path('foo-1.0')}"
+        gem "foo", :git => "file://#{lib_path('foo-1.0')}/.git"
       G
 
       lib_path("foo-1.0").join(".git").rmtree
