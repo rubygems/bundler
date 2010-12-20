@@ -9,7 +9,7 @@ describe "bundle install with git sources" do
 
       install_gemfile <<-G
         source "file://#{gem_repo1}"
-        git "#{lib_path('foo-1.0')}" do
+        git "file://#{lib_path('foo-1.0')}/.git" do
           gem 'foo'
         end
       G
@@ -35,7 +35,7 @@ describe "bundle install with git sources" do
 
       in_app_root2 do
         install_gemfile bundled_app2("Gemfile"), <<-G
-          git "#{lib_path('foo-1.0')}" do
+          git "file://#{lib_path('foo-1.0')}/.git" do
             gem 'foo'
           end
         G
@@ -61,7 +61,7 @@ describe "bundle install with git sources" do
       build_git "foo"
 
       install_gemfile <<-G
-        gem "foo", "1.1", :git => "#{lib_path('foo-1.0')}"
+        gem "foo", "1.1", :git => "file://#{lib_path('foo-1.0')}/.git"
       G
 
       out.should include("Source contains 'foo' at: 1.0")
@@ -84,7 +84,7 @@ describe "bundle install with git sources" do
       Dir.chdir tmp('bundled_app.bck')
       gemfile tmp('bundled_app.bck/Gemfile'), <<-G
         source "file://#{gem_repo1}"
-        git "#{lib_path('foo-1.0')}" do
+        git "file://#{lib_path('foo-1.0')}/.git" do
           gem 'foo'
         end
 
@@ -126,7 +126,7 @@ describe "bundle install with git sources" do
 
     it "works" do
       install_gemfile <<-G
-        git "#{lib_path('foo-1.0')}", :ref => "#{@revision}" do
+        git "file://#{lib_path('foo-1.0')}/.git", :ref => "#{@revision}" do
           gem "foo"
         end
       G
@@ -141,7 +141,7 @@ describe "bundle install with git sources" do
 
     it "works when the revision is a symbol" do
       install_gemfile <<-G
-        git "#{lib_path('foo-1.0')}", :ref => #{@revision.to_sym.inspect} do
+        git "file://#{lib_path('foo-1.0')}/.git", :ref => #{@revision.to_sym.inspect} do
           gem "foo"
         end
       G
@@ -178,7 +178,7 @@ describe "bundle install with git sources" do
 
       install_gemfile <<-G
         source "file://#{gem_repo1}"
-        gem "rack", :git => "#{lib_path('rack-0.8')}"
+        gem "rack", :git => "file://#{lib_path('rack-0.8')}/.git"
       G
 
       should_be_installed "rack 0.8"
@@ -191,13 +191,13 @@ describe "bundle install with git sources" do
         s.write "lib/rack.rb", "puts 'WIN OVERRIDE'"
       end
 
-      build_git "foo", :path => lib_path('nested') do |s|
+      build_git "foo", :path => "file://#{lib_path('nested')}/.git" do |s|
         s.add_dependency "rack", "= 1.0"
       end
 
       install_gemfile <<-G
         source "file://#{gem_repo1}"
-        gem "foo", :git => "#{lib_path('nested')}"
+        gem "foo", :git => "file://#{lib_path('nested')}/.git"
       G
 
       run "require 'rack'"
@@ -210,11 +210,11 @@ describe "bundle install with git sources" do
         gem "rack", "0.9.1"
       G
 
-      build_git "rack", :path => lib_path("rack")
+      build_git "rack", :path => "file://#{lib_path('rack')}/.git"
 
       install_gemfile <<-G
         source "file://#{gem_repo1}"
-        gem "rack", "1.0.0", :git => "#{lib_path('rack')}"
+        gem "rack", "1.0.0", :git => "file://#{lib_path('rack')}/.git"
       G
 
       should_be_installed "rack 1.0.0"
@@ -226,11 +226,11 @@ describe "bundle install with git sources" do
         gem "rack"
       G
 
-      build_git "rack", "1.2", :path => lib_path("rack")
+      build_git "rack", "1.2", :path => "file://#{lib_path('rack')}/.git"
 
       install_gemfile <<-G
         source "file://#{gem_repo1}"
-        gem "rack", :git => "#{lib_path('rack')}"
+        gem "rack", :git => "file://#{lib_path('rack')}/.git"
       G
 
       should_be_installed "rack 1.2"
@@ -259,7 +259,7 @@ describe "bundle install with git sources" do
     update_git "foo"
 
     install_gemfile <<-G
-      gem "foo", :git => "#{lib_path('foo-1.0')}", :ref => "#{@revision}"
+      gem "foo", :git => "file://#{lib_path('foo-1.0')}/.git", :ref => "#{@revision}"
     G
 
     run <<-RUBY
@@ -277,7 +277,7 @@ describe "bundle install with git sources" do
 
     install_gemfile <<-G
       source "file://#{gem_repo1}"
-      gem "foo", :git => "#{lib_path('foo-1.0')}"
+      gem "foo", :git => "file://#{lib_path('foo-1.0')}/.git"
       gem "rails", "2.3.2"
     G
 
@@ -300,13 +300,13 @@ describe "bundle install with git sources" do
       G
     end
 
-    build_git "foo", :path => lib_path("foo") do |s|
+    build_git "foo", :path => "file://#{lib_path('foo')}/.git" do |s|
       s.write "bin/foo", ""
     end
 
     install_gemfile <<-G
       source "file://#{gem_repo1}"
-      gem "bar", :git => "#{lib_path("foo")}"
+      gem "bar", :git => "file://#{lib_path("foo")}/.git"
       gem "rails", "2.3.2"
     G
 
@@ -322,7 +322,7 @@ describe "bundle install with git sources" do
     build_git "foo", "1.0"
 
     install_gemfile <<-G
-      gem "foo", "1.0", :git => "#{lib_path('foo-1.0')}"
+      gem "foo", "1.0", :git => "file://#{lib_path('foo-1.0')}/.git"
     G
 
     should_be_installed "foo 1.0"
@@ -333,7 +333,7 @@ describe "bundle install with git sources" do
 
     install_gemfile <<-G
       source "file://#{gem_repo1}"
-      gem "foo", "1.0", :git => "#{lib_path('foo-1.0')}"
+      gem "foo", "1.0", :git => "file://#{lib_path('foo-1.0')}/.git"
       gem "rails", "2.3.2"
     G
 
@@ -343,7 +343,7 @@ describe "bundle install with git sources" do
 
   it "catches git errors and spits out useful output" do
     gemfile <<-G
-      gem "foo", "1.0", :git => "omgomg"
+      gem "foo", "1.0", :git => "file:///omgomg/.git"
     G
 
     bundle :install, :expect_err => true
@@ -354,21 +354,33 @@ describe "bundle install with git sources" do
     err.should include("fatal: The remote end hung up unexpectedly")
   end
 
-  it "works when the gem path has spaces in it" do
-    build_git "foo", :path => lib_path('foo space-1.0')
-
-    install_gemfile <<-G
-      gem "foo", :git => "#{lib_path('foo space-1.0')}"
-    G
-
-    should_be_installed "foo 1.0"
-  end
+    #TODO Handling spaces with URI.parse is tricky given URI.escape is deprecated in favor of CGI.escape
+    #it "works when the gem path has escaped spaces in it" do
+    #  build_git "foo", :path => "file://#{lib_path('foo%20space-1.0')}/.git"
+    #
+    #  install_gemfile <<-G
+    #    gem "foo", :git => "file://#{lib_path('foo%20space-1.0')}/.git"
+    #  G
+    #
+    #  should_be_installed "foo 1.0"
+    #end
+    #
+    #it "fails when the gem path has unescaped spaces in it" do
+    #  build_git "foo", :path => "file://#{lib_path('foo%20space-1.0')}/.git"
+    #
+    #  lambda do
+    #    install_gemfile <<-G
+    #      gem "foo", :git => "file://#{lib_path('foo space-1.0')}/.git"
+    #    G end.should raise_error(Error, ".*")
+    #
+    #  should_not_be_installed "foo 1.0"
+    #end
 
   it "handles repos that have been force-pushed" do
     build_git "forced", "1.0"
 
     install_gemfile <<-G
-      git "#{lib_path('forced-1.0')}" do
+      git "file://#{lib_path('forced-1.0')}/.git" do
         gem 'forced'
       end
     G
@@ -400,7 +412,7 @@ describe "bundle install with git sources" do
     end
 
     install_gemfile <<-G, :expect_err => true
-      git "#{lib_path('has_submodule-1.0')}" do
+      git "file://#{lib_path('has_submodule-1.0')}/.git" do
         gem "has_submodule"
       end
     G
@@ -420,7 +432,7 @@ describe "bundle install with git sources" do
     end
 
     install_gemfile <<-G
-      git "#{lib_path('has_submodule-1.0')}", :submodules => true do
+      git "file://#{lib_path('has_submodule-1.0')}/.git", :submodules => true do
         gem "has_submodule"
       end
     G
@@ -432,7 +444,7 @@ describe "bundle install with git sources" do
     git = build_git "foo"
 
     install_gemfile <<-G
-      git "#{lib_path('foo-1.0')}" do
+      git "file://#{lib_path('foo-1.0')}/.git" do
         gem "foo"
       end
     G
@@ -441,7 +453,7 @@ describe "bundle install with git sources" do
     update_git "foo"
 
     install_gemfile <<-G
-      git "#{lib_path('foo-1.0')}", :ref => "#{git.ref_for('HEAD^')}" do
+      git "file://#{lib_path('foo-1.0')}/.git", :ref => "#{git.ref_for('HEAD^')}" do
         gem "foo"
       end
     G
@@ -458,7 +470,7 @@ describe "bundle install with git sources" do
     build_git "foo"
 
     install_gemfile <<-G
-      gem "foo", :git => "#{lib_path('foo-1.0')}"
+      gem "foo", :git => "file://#{lib_path('foo-1.0')}/.git"
     G
 
     FileUtils.rm_rf(lib_path('foo-1.0'))
@@ -471,7 +483,7 @@ describe "bundle install with git sources" do
     build_git "foo"
 
     gemfile <<-G
-      gem "foo", :git => "#{lib_path('foo-1.0')}"
+      gem "foo", :git => "file://#{lib_path('foo-1.0')}/.git"
     G
 
     bundle "install"
@@ -485,7 +497,7 @@ describe "bundle install with git sources" do
         s.write "lib/foo.rb", "raise 'fail'"
       end
       build_lib "foo", "1.0", :path => lib_path('bar/foo')
-      build_git "bar", "1.0", :path => lib_path('bar') do |s|
+      build_git "bar", "1.0", :path => "file://#{lib_path('bar')}/.git" do |s|
         s.add_dependency 'foo'
       end
 
@@ -496,7 +508,7 @@ describe "bundle install with git sources" do
 
       install_gemfile <<-G
         source "file://#{gem_repo1}"
-        gem "bar", :git => "#{lib_path('bar')}"
+        gem "bar", :git => "file://#{lib_path('bar')}/.git"
       G
 
       should_be_installed "foo 1.0", "bar 1.0", :gemspec_count => 2
@@ -516,7 +528,7 @@ describe "bundle install with git sources" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack-obama"
-        gem "rack", "1.0.0", :git => "#{lib_path("rack-1.0")}"
+        gem "rack", "1.0.0", :git => "file://#{lib_path("rack-1.0")}/.git"
       G
 
       run "require 'new_file'"
@@ -526,16 +538,16 @@ describe "bundle install with git sources" do
 
   describe "bundle install after the remote has been updated" do
     before(:each) do
-      @git = build_git "valim", :path => lib_path('valim-1.0')
+      @git = build_git "valim", :path => "file://#{lib_path('valim-1.0')}/.git"
       @old_revision = @git.ref_for('HEAD') # revision_for(lib_path("foo-1.0"))
       update_git "valim"
       @new_revision = @git.ref_for('HEAD')
-      @uri_hash = Digest::SHA1.hexdigest(lib_path('valim-1.0').to_s)
+      @uri_hash = uri_hash(lib_path('valim-1.0/.git').to_s)
     end
 
     it "installs" do
       install_gemfile <<-G
-        gem "valim", :git => "file://#{lib_path("valim-1.0")}"
+        gem "valim", :git => "file://#{lib_path("valim-1.0")}/.git"
       G
 
       lockfile = File.read(bundled_app("Gemfile.lock"))
@@ -555,7 +567,7 @@ describe "bundle install with git sources" do
 
     it "installs to Bundler's typical system gem path with an 11 digit hash decoration" do
       install_gemfile <<-G
-        git "#{lib_path('valim-1.0')}", :ref => "#{@old_revision}" do
+        git "file://#{lib_path('valim-1.0')}/.git", :ref => "#{@old_revision}" do
           gem "foo"
         end
       G
@@ -565,24 +577,24 @@ describe "bundle install with git sources" do
 
     it "installs a cache to Bundler's typical system gem path with URI digest decoration" do
       install_gemfile <<-G
-        git "#{lib_path('valim-1.0')}", :ref => "#{@old_revision}" do
+        git "file://#{lib_path('valim-1.0')}/.git", :ref => "#{@old_revision}" do
           gem "foo"
         end
       G
-
-      system_gem_path("cache/bundler/git/valim-1.0-#{@uri_hash}").should be_directory
+      sgp = system_gem_path("cache/bundler/git/valim-1.0-#{@uri_hash}")
+      sgp.should be_directory
     end
 
   end
 
   describe "bundle install --deployment with git sources" do
     it "works" do
-      build_git "valim", :path => lib_path('valim')
+      build_git "valim", :path => "file://#{lib_path('valim')}/.git"
 
       install_gemfile <<-G
         source "file://#{gem_repo1}"
 
-        gem "valim", "= 1.0", :git => "#{lib_path('valim')}"
+        gem "valim", "= 1.0", :git => "file://#{lib_path('valim')}/.git"
       G
 
       simulate_new_machine
@@ -600,7 +612,7 @@ describe "bundle install with git sources" do
 
       install_gemfile <<-G
         source "file://#{gem_repo1}"
-        git "#{lib_path('foo-1.0')}" do
+        git "file://#{lib_path('foo-1.0')}/.git" do
           gem 'foo'
         end
       G
@@ -610,7 +622,7 @@ describe "bundle install with git sources" do
       build_git "foo"
 
       install_gemfile <<-G
-        gem "foo", "1.1", :git => "#{lib_path('foo-1.0')}", :git_decorate => false
+        gem "foo", "1.1", :git => "file://#{lib_path('foo-1.0')}/.git", :git_decorate => false
       G
 
       #pending("default Git decorate false") do
@@ -626,7 +638,7 @@ describe "bundle install with git sources" do
       git = build_git "foo"
 
       install_gemfile <<-G
-        git "#{lib_path('foo-1.0')}" do
+        git "file://#{lib_path('foo-1.0')}/.git" do
           gem "foo"
         end
       G
@@ -635,7 +647,7 @@ describe "bundle install with git sources" do
       update_git "foo"
 
       install_gemfile <<-G
-        git "#{lib_path('foo-1.0')}", :ref => "#{git.ref_for('HEAD^')}", :decorate => false do
+        git "file://#{lib_path('foo-1.0')}/.git", :ref => "#{git.ref_for('HEAD^')}", :decorate => false do
           gem "foo"
         end
       G
@@ -655,12 +667,12 @@ describe "bundle install with git sources" do
       @revision = @git.ref_for('HEAD') # revision_for(lib_path("foo-1.0"))
       @ref = @git.ref_for('HEAD', 11)
       update_git "foo"
-      @uri_hash = Digest::SHA1.hexdigest(lib_path("foo-1.0").to_s)
+      @uri_hash = uri_hash(lib_path("foo-1.0/.git").to_s)
     end
 
     it "installs nothing to Bundler's typical decorated system gem path" do
       install_gemfile <<-G
-        git "#{lib_path('foo-1.0')}", :ref => "#{@ref}", :decorate => false do
+        git "file://#{lib_path('foo-1.0')}/.git", :ref => "#{@ref}", :decorate => false do
           gem "foo"
         end
       G
@@ -670,7 +682,7 @@ describe "bundle install with git sources" do
 
     it "installs to Bundler's typical system gem path without any Git hash decoration" do
       install_gemfile <<-G
-        git "#{lib_path('foo-1.0')}", :ref => "#{@ref}", :decorate => false do
+        git "file://#{lib_path('foo-1.0')}/.git", :ref => "#{@ref}", :decorate => false do
           gem "foo"
         end
       G
@@ -680,7 +692,7 @@ describe "bundle install with git sources" do
 
     it "installs a cache to Bundler's typical system gem path with a full URI hash decoration" do
       install_gemfile <<-G
-        git "#{lib_path('foo-1.0')}", :ref => "#{@ref}", :decorate => false do
+        git "file://#{lib_path('foo-1.0')}/.git", :ref => "#{@ref}", :decorate => false do
           gem "foo"
         end
       G
@@ -690,7 +702,7 @@ describe "bundle install with git sources" do
 
     it "works" do
       install_gemfile <<-G
-        git "#{lib_path('foo-1.0')}", :ref => "#{@ref}", :decorate => false do
+        git "file://#{lib_path('foo-1.0')}/.git", :ref => "#{@ref}", :decorate => false do
           gem "foo"
         end
       G
@@ -707,7 +719,7 @@ describe "bundle install with git sources" do
 
     it "works when the revision is a symbol" do
       install_gemfile <<-G
-        git "#{lib_path('foo-1.0')}", :ref => #{@ref.to_sym.inspect}, :decorate => false do
+        git "file://#{lib_path('foo-1.0')}/.git", :ref => #{@ref.to_sym.inspect}, :decorate => false do
           gem "foo"
         end
       G
@@ -723,7 +735,7 @@ describe "bundle install with git sources" do
 
     it "adds the install_path to the lockfile" do
       install_gemfile <<-G
-        git "#{lib_path('foo-1.0')}", :ref => #{@ref.to_sym.inspect}, :decorate => false do
+        git "file://#{lib_path('foo-1.0')}/.git", :ref => #{@ref.to_sym.inspect}, :decorate => false do
           gem "foo"
         end
       G
@@ -731,7 +743,7 @@ describe "bundle install with git sources" do
       lockfile_should_be <<-L
       GIT
         folder: #{system_gem_path("bundler/gems/foo-1.0")}
-        remote: #{lib_path('foo-1.0')}
+        remote: file://#{lib_path('foo-1.0')}/.git
         revision: #{@git.ref_for('HEAD^')}
         ref: #{@ref}
         specs:
@@ -750,18 +762,18 @@ describe "bundle install with git sources" do
 
     describe "when adding a new git source without decoration" do
       it "updates the lockfile" do
-        git2 = build_git "valim", :path => lib_path('valim')
+        git2 = build_git "valim", :path => "file://#{lib_path('valim')}/.git"
 
         install_gemfile <<-G
-          git "#{lib_path('foo-1.0')}", :ref => #{@ref.to_sym.inspect}, :decorate => false do
+          git "file://#{lib_path('foo-1.0')}/.git", :ref => #{@ref.to_sym.inspect}, :decorate => false do
             gem "foo"
           end
         G
         install_gemfile <<-G
           source "file://#{gem_repo1}"
 
-          gem "valim", "= 1.0", :git => "#{lib_path('valim')}",  :git_decorate => false
-          git "#{lib_path('foo-1.0')}", :ref => #{@ref.to_sym.inspect}, :decorate => false do
+          gem "valim", "= 1.0", :git => "file://#{lib_path('valim')}/.git",  :git_decorate => false
+          git "file://#{lib_path('foo-1.0')}/.git", :ref => #{@ref.to_sym.inspect}, :decorate => false do
             gem "foo"
           end
         G
@@ -769,7 +781,7 @@ describe "bundle install with git sources" do
         lockfile_should_be <<-L
         GIT
           folder: #{system_gem_path("bundler/gems/foo-1.0")}
-          remote: #{lib_path('foo-1.0')}
+          remote: file://#{lib_path('foo-1.0')}/.git
           revision: #{@git.ref_for('HEAD^')}
           ref: #{@ref}
           specs:
@@ -777,7 +789,7 @@ describe "bundle install with git sources" do
 
         GIT
           folder: #{system_gem_path("bundler/gems/valim")}
-          remote: #{lib_path('valim')}
+          remote: file://#{lib_path('valim')}/.git
           revision: #{git2.ref_for('HEAD')}
           specs:
             valim (1.0)
