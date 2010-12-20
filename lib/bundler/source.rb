@@ -727,10 +727,11 @@ module Bundler
       end
 
       def uri_hash
-        if uri =~ %r{^\w+://(\w+@)?}
+        tu = URI.parse(uri.sub(%r{/\Z},'')).normalize
+        if tu.scheme
           # Downcase the domain component of the URI
           # and strip off a trailing slash, if one is present
-          input = URI.parse(uri).normalize.to_s.sub(%r{/$},'')
+           input = "#{tu.host}#{tu.path}"
         else
           # If there is no URI scheme, assume it is an ssh/git URI
           input = uri
