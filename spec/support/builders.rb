@@ -510,7 +510,9 @@ module Spec
       end
 
       def _build(options)
-        libpath = options[:path] || _default_path
+        git_uri_to_path(options[:path])
+        @path ||= _default_path
+        libpath = @path
 
         Dir.chdir(libpath) do
           silently "git checkout master"
