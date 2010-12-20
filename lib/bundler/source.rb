@@ -807,6 +807,20 @@ module Bundler
         cache unless cached?
         Dir.chdir(cache_path, &blk)
       end
+
+      def git_uri_to_path(uri_in)
+        begin
+          return _default_path if uri_in.nil?
+          tu = URI.parse(uri_in.to_s)
+          if tu.scheme && tu.scheme[/file/]
+            uri_out = Pathname.new(tu.path)
+          end
+        ensure
+          path = uri_out && uri_out.to_s[/(.*)\/\.git/] ? uri_out.parent : uri_in
+          path
+        end
+      end
+
     end
 
   end
