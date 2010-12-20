@@ -818,11 +818,11 @@ module Bundler
         begin
           return _default_path if uri_in.nil?
           tu = URI.parse(uri_in.to_s)
-          if tu.scheme && tu.scheme[/file/]
-            uri_out = Pathname.new(tu.path)
+          if tu.scheme && ( tu.scheme[/file/] || tu.scheme[/git/] )   # ltd to files for the moment
+            uri_out = Pathname.new("#{tu.path}")
           end
         ensure
-          path = uri_out && uri_out.to_s[/(.*)\/\.git/] ? uri_out.parent : uri_in
+          path = uri_out && ( uri_out.to_s[/(.*)\.git/]) ? uri_out.parent : uri_in.to_s
           path
         end
       end
