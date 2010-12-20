@@ -713,9 +713,9 @@ module Bundler
 
       def base_name
         upath = git_uri_to_path(uri)
-        bn = upath.parent.basename if upath.to_s[/\/\.git/]
-        bn = upath.basename('.git') if upath.to_s[/[[:alnum:]]\.git/]
-        bn
+        bn = upath.parent.basename if upath.to_s[/\/\.git/] #&& upath.kind_of?(Pathname)
+        bn = upath.basename('.git') if upath.to_s[/[[:alnum:]]\.git/] #&& !upath.kind_of?(Pathname)
+        bn.to_s
       end
 
       def shortref_for_display(ref)
@@ -817,9 +817,14 @@ module Bundler
       def git_uri_to_path(uri_in)
         begin
           return _default_path if uri_in.nil?
-          tu = URI.parse(uri_in.to_s)
-          if tu.scheme && ( tu.scheme[/file/] || tu.scheme[/git/] )   # ltd to files for the moment
-            uri_out = Pathname.new("#{tu.path}")
+          scp = uri_in.strip[/\A(\w+)@(.*)/,2]
+          tu = scp ? URI.split(scp.to_s) : URI.split(uri_in.to_s)
+          case
+            when tu[0] && tu[5] then # scheme + path
+              uri_out = Pathname.new("#{tu[5]}")
+            when tu[0] && tu[6] then # scheme + opaque
+              uri_out = Pathname.new("#{tu[6]}")
+            else
           end
         ensure
           path = uri_out && ( uri_out.to_s[/(.*)\.git/]) ? uri_out.parent : uri_in.to_s
