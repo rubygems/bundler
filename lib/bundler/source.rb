@@ -517,6 +517,8 @@ module Bundler
         # initial bundle install - seen before creating lockfile
         if ( @options['git'] && @options['git'][/#{@options['uri']}/] && @options['revision'].nil? )
           ret = true
+        elsif ( @options['git'] && @options['git'][/#{@options['uri']}/] )
+            ret = true
         elsif (@options['git'] && @options['git'][/#{@options['uri']}/] && @options['ref'] && @options['ref'].size == 40 )
           ret = true
         end
@@ -555,10 +557,9 @@ module Bundler
 
       def decorate?
         @options['git'] = @options['uri'] if @options['uri'][/git\:\/\//] && @options['git'].nil?
-        ref =  @options["ref"]
+        rev =  @options["revision"]
 
         if cached? && initial_install?
-          # $stderr.puts "Init. new URI: #{Bundler.install_path}/#{name} Dir exists?: #{Dir.exist?("#{Bundler.install_path}/#{name}")}"
           if Dir.exist?("#{Bundler.install_path}/#{base_name}")
             @options['uri'] = "#{Bundler.install_path}/#{base_name}"
           end
@@ -566,7 +567,7 @@ module Bundler
 
         if cached? && lockfile_folder? #subsequent_install?
           plain = Dir.exist?("#{Bundler.install_path}/#{base_name}")
-          dec = Dir.exist?(@options['folder']) && @options['folder'][/#{shortref_for_path(ref.to_s)}/]
+          dec = Dir.exist?(@options['folder']) && @options['folder'][/#{shortref_for_path(rev.to_s)}/]
           if plain && !dec
             #@options['uri'] = "#{Bundler.install_path}/#{name}"
             #@options['ref'] = @options['revision'] unless @options['ref']
@@ -583,20 +584,20 @@ module Bundler
         @allow_cached = true
         repo_matched = false
         cache_matched = false
-        if ref && Dir.exists?(@options['uri'])
+        if rev && Dir.exists?(@options['uri'])
           Dir.chdir(@options['uri']) do
             git('rev-list --all') do |rev|
               rev.split(/\n/).each do |r|
-                break(repo_matched = true) if r[/#{shortref_for_path(ref.to_s)}/]
+                break(repo_matched = true) if r[/#{shortref_for_path(rev.to_s)}/]
               end
             end
           end
         end
-        if cached? && ref
+        if cached? && rev
           Dir.chdir(cache_path) do
             git('rev-list --all') do |rev|
               rev.split(/\n/).each do |r|
-                break(cache_matched = true) if r[/#{shortref_for_path(ref.to_s)}/]
+                break(cache_matched = true) if r[/#{shortref_for_path(rev.to_s)}/]
               end
             end
           end
