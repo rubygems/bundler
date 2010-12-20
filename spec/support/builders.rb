@@ -547,8 +547,17 @@ module Spec
     class GitReader
       attr_reader :path
 
-      def initialize(path)
-        @path = path
+      def initialize(path_in)
+        git_uri_to_path(path_in)
+      end
+
+      def git_uri_to_path(path_in)
+        tu = URI.parse(path_in.to_s)
+        if tu.scheme && ( tu.scheme[/file/] || tu.scheme[/git/] )
+          path_in = Pathname.new(tu.path)
+        end
+        @path = path_in && path_in.to_s[/(.*)\/\.git/] ? path_in.parent : ""
+        @path
       end
 
       def ref_for(ref, len = nil)
