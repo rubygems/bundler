@@ -428,8 +428,9 @@ module Spec
       end
 
       def _build(options)
-        path = options[:path] || _default_path
-
+        git_uri_to_path(options[:path])
+        @path ||= _default_path
+        path = @path
         if options[:rubygems_version]
           @spec.rubygems_version = options[:rubygems_version]
           def @spec.mark_version; end
