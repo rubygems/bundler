@@ -536,12 +536,6 @@ module Bundler
         res
       end
 
-      def debug_decorate(res)
-        $stderr.puts("#{res} - #{@decorate.inspect}: #{@options['folder']}")
-        $stderr.puts("       #{@options['uri']}")
-        $stderr.puts("       #{Bundler.install_path}/#{base_name}")
-        $stderr.puts "Bundler.settings.all: #{Bundler.settings.all.inspect}"
-      end
 
       def lockfile_folder?
         # subsequent bundle install - seen while parsing lockfile
