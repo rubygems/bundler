@@ -298,11 +298,38 @@ module Spec
       opts = args.last.is_a?(Hash) ? args.last : {}
       builder = opts[:bare] ? GitBareBuilder : GitBuilder
       spec = build_with(builder, name, args, &block)
-      GitReader.new(opts[:path] || "file://#{lib_path(spec.full_name).to_s}/.git")
+      op = opts[:path].to_s[/\Afile/] ? opts[:path] : "file://#{opts[:path].to_s}/.git"
+      GitReader.new(op || "file://#{lib_path(spec.full_name).to_s}/.git")
     end
 
     def update_git(name, *args, &block)
       build_with(GitUpdater, name, args, &block)
+    end
+
+    def git(command, &block)
+      if allow_git_ops?
+        out, status = sh_with_code("git #{command}", &block)
+        if status != 0
+          raise GitError, "Bundler builder: An error has occurred in git when running `git #{command}`. Cannot complete bundling."
+        end
+        out
+      else
+        raise GitError, "Bundler builder: trying to run a `git #{command}` at runtime. You probably need to run `bundle install`. However, " \
+                        "this error message could probably be more useful. Please submit a ticket at http://github.com/carlhuda/bundler/issues " \
+                        "with steps to reproduce as well as the following\n\nCALLER: #{caller.join("\n")}"
+      end
+    end
+
+    def sh_with_code(cmd, base=Dir.pwd, &block)
+      outbuf = ''
+      Bundler.ui.debug(cmd)
+      Dir.chdir(base) {
+        outbuf = %x{#{cmd}}
+        if $? == 0
+          block.call(outbuf) if block
+        end
+      }
+      [outbuf, $?]
     end
 
   private
@@ -429,8 +456,8 @@ module Spec
 
       def _build(options)
         git_uri_to_path(options[:path])
-        @path ||= _default_path
-        path = @path
+        @bldpath ||= _default_path
+        path = @bldpath
         if options[:rubygems_version]
           @spec.rubygems_version = options[:rubygems_version]
           def @spec.mark_version; end
@@ -473,16 +500,16 @@ module Spec
         if tu.scheme && tu.scheme[/file/]
           uri_out = Pathname.new(tu.path)
         end
-        @path = uri_out && uri_out.to_s[/(.*)\/\.git/] ? uri_out.parent : uri_in
+        @bldpath = uri_out && uri_out.to_s[/(.*)\/\.git/] ? uri_out.parent : uri_in
       end
     end
 
     class GitBuilder < LibBuilder
       def _build(options)
         git_uri_to_path(options[:path])
-        @path ||= _default_path
-        super(options.merge(:path => @path))
-        Dir.chdir(@path) do
+        @bldpath ||= _default_path
+        super(options.merge(:path => @bldpath))
+        Dir.chdir(@bldpath) do
           `git init`
           `git add *`
           `git commit -m 'OMG INITIAL COMMIT'`
@@ -493,9 +520,9 @@ module Spec
     class GitBareBuilder < LibBuilder
       def _build(options)
         git_uri_to_path(options[:path])
-        @path ||= _default_path
-        super(options.merge(:path => @path))
-        Dir.chdir(@path) do
+        @bldpath ||= _default_path
+        super(options.merge(:path => @bldpath))
+        Dir.chdir(@bldpath) do
           `git init --bare`
         end
       end
@@ -511,9 +538,8 @@ module Spec
 
       def _build(options)
         git_uri_to_path(options[:path])
-        @path ||= _default_path
-        libpath = @path
-
+        @bldpath ||= _default_path
+        libpath = @bldpath
         Dir.chdir(libpath) do
           silently "git checkout master"
 
@@ -537,7 +563,7 @@ module Spec
           _default_files.keys.each do |path|
             _default_files[path] << "\n#{Builders.constantize(name)}_PREV_REF = '#{current_ref}'"
           end
-          super(options.merge(:path => libpath))
+          super(options.merge(:path => "file://#{libpath}/.git"))
           `git add *`
           `git commit -m "BUMP"`
         end
@@ -556,8 +582,8 @@ module Spec
         if tu.scheme && ( tu.scheme[/file/] || tu.scheme[/git/] )
           path_in = Pathname.new(tu.path)
         end
-        @path = path_in && path_in.to_s[/(.*)\/\.git/] ? path_in.parent : ""
-        @path
+        @bldpath = path_in && path_in.to_s[/(.*)\/\.git/] ? path_in.parent : ""
+        @path=@bldpath
       end
 
       def ref_for(ref, len = nil)
@@ -569,7 +595,7 @@ module Spec
     private
 
       def git(cmd)
-        Dir.chdir(@path) { `git #{cmd}`.strip }
+        Dir.chdir(@bldpath) { `git #{cmd}`.strip }
       end
 
     end
