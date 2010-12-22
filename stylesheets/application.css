@@ -203,6 +203,29 @@ ul.bullet a:last-child {
 }
 
 /* line 141 */
+.notes {
+  font-size: 90%;
+  line-height: 150%;
+  margin-top: 15px;
+  margin-bottom: 8px;
+  padding-right: 4px;
+  padding-left: 4px;
+  color: #006666;
+}
+/* line 149 */
+.notes + a {
+  margin-top: 10px;
+}
+/* line 151 */
+.notes + pre {
+  margin-top: 10px;
+}
+/* line 153 */
+.notes + .description {
+  margin-top: 20px;
+}
+
+/* line 156 */
 .bullet {
   width: 100%;
   padding: 8px 15px;
@@ -217,7 +240,7 @@ ul.bullet a:last-child {
   -webkit-box-align: justify;
   -moz-box-align: justify;
 }
-/* line 147 */
+/* line 162 */
 .bullet .description {
   width: 100%;
   margin-right: 16px;
@@ -225,7 +248,7 @@ ul.bullet a:last-child {
   line-height: 24px;
   margin-bottom: 8px;
 }
-/* line 154 */
+/* line 169 */
 .bullet a {
   padding-top: 8px;
   padding-bottom: 5px;
@@ -245,13 +268,13 @@ ul.bullet a:last-child {
   -khtml-border-radius: 5px;
   border-radius: 5px;
 }
-/* line 166 */
+/* line 181 */
 .bullet a:hover {
   background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0%, #4e9326), color-stop(100%, #35641a));
   background-image: -moz-linear-gradient(top, #4e9326 0%, #35641a 100%);
   background-image: linear-gradient(top, #4e9326 0%, #35641a 100%);
 }
-/* line 170 */
+/* line 185 */
 .bullet .how {
   display: -webkit-box;
   display: -moz-box;
@@ -263,40 +286,18 @@ ul.bullet a:last-child {
   -moz-box-flex: 1;
   line-height: 24px;
 }
-/* line 174 */
-.bullet .notes {
-  font-size: 90%;
-  line-height: 150%;
-  margin-top: 15px;
-  margin-bottom: 8px;
-  padding-right: 4px;
-  padding-left: 4px;
-  color: #006666;
-}
-/* line 182 */
-.bullet .notes + a {
-  margin-top: 10px;
-}
-/* line 184 */
-.bullet .notes + pre {
-  margin-top: 10px;
-}
-/* line 186 */
-.bullet .notes + .description {
-  margin-top: 20px;
-}
-/* line 189 */
+/* line 190 */
 .bullet pre {
   -webkit-box-flex: 1;
   -moz-box-flex: 1;
   margin: 0;
 }
-/* line 193 */
+/* line 194 */
 .bullet code {
   background-color: rgba(0, 0, 0, 0.1);
 }
 
-/* line 196 */
+/* line 197 */
 pre {
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
@@ -306,35 +307,35 @@ pre {
   border-radius: 5px;
 }
 
-/* line 199 */
+/* line 200 */
 .bullet:nth-child(even) {
   background-color: rgba(0, 0, 0, 0.1);
   border-top: 1px solid rgba(0, 0, 0, 0.1);
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-/* line 204 */
+/* line 205 */
 .bullet:not(:nth-of-type(1)) {
   padding-top: 15px;
 }
 
-/* line 207 */
+/* line 208 */
 .bullet {
   padding-bottom: 25px;
 }
 
-/* line 212 */
+/* line 213 */
 #credits p {
   text-align: center;
   font-size: 8pt;
   color: #668493;
 }
-/* line 216 */
+/* line 217 */
 #credits p a {
   color: #2c596b;
 }
 
-/* line 220 */
+/* line 221 */
 #github img {
   position: absolute;
   top: 0;
@@ -342,7 +343,7 @@ pre {
   border: 0;
 }
 
-/* line 226 */
+/* line 227 */
 #versions {
   position: absolute;
   top: 0;
@@ -356,13 +357,13 @@ pre {
   -khtml-border-bottom-right-radius: 10px;
   border-bottom-right-radius: 10px;
 }
-/* line 233 */
+/* line 234 */
 #versions a {
   text-decoration: none;
   color: #0e3f54;
   padding: 0.1em 0.25em;
 }
-/* line 236 */
+/* line 237 */
 #versions a.current {
   font-weight: bold;
 }

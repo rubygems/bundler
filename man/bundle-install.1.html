@@ -199,11 +199,12 @@ other steps in <code>bundle install</code> must be performed as the current user
 <p>Of these three, the first two could theoretically be performed by
 <code>chown</code>ing the resulting files to <code>$SUDO_USER</code>. The third, however,
 can only be performed by actually invoking the <code>git</code> command as
-the current user.</p>
+the current user. Therefore, git gems are downloaded and installed
+into <code>~/.bundle</code> rather than $GEM_HOME or $BUNDLE_PATH.</p>
 
 <p>As a result, you should run <code>bundle install</code> as the current user,
-and bundler will ask for your password if it is needed to perform
-the final step.</p>
+and bundler will ask for your password if it is needed to put the
+gems into their final location.</p>
 
 <h2 id="INSTALLING-GROUPS">INSTALLING GROUPS</h2>
 
@@ -386,7 +387,7 @@ does not work, run <a href="bundle-update.1.html">bundle update(1)</a>.</p>
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'></li>
-    <li class='tc'>November 2010</li>
+    <li class='tc'>December 2010</li>
     <li class='tr'>bundle-install(1)</li>
   </ol>
 
