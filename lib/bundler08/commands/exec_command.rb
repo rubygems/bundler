@@ -1,4 +1,4 @@
-combined = [File.basename($0)] + ARGV
+combined = [File.basename($0 ? $0 : "")] + ARGV
 gem_i  = combined.index("gem")
 exec_i = combined.index("exec")
 
