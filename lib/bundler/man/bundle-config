@@ -1,0 +1,92 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "BUNDLE\-CONFIG" "1" "September 2010" "" ""
+.
+.SH "NAME"
+\fBbundle\-config\fR \- Set bundler configuration options
+.
+.SH "SYNOPSIS"
+\fBbundle config\fR [\fIname\fR [\fIvalue\fR]]
+.
+.SH "DESCRIPTION"
+This command allows you to interact with bundler\'s configuration system\. Bundler retrieves its configuration from the local application (\fBapp/\.bundle/config\fR), environment variables, and the user\'s home directory (\fB~/\.bundle/config\fR), in that order of priority\.
+.
+.P
+Executing \fBbundle config\fR with no parameters will print a list of all bundler configuration for the current bundle, and where that configuration was set\.
+.
+.P
+Executing \fBbundle config <name>\fR will print the value of that configuration setting, and where it was set\.
+.
+.P
+Executing \fBbundle config <name> <value>\fR will set that configuration to the value specified for all bundles executed as the current user\. The configuration will be stored in \fB~/\.bundle/config\fR\.
+.
+.SH "BUILD OPTIONS"
+You can use \fBbundle config\fR to give bundler the flags to pass to the gem installer every time bundler tries to install a particular gem\.
+.
+.P
+A very common example, the \fBmysql\fR gem, requires Snow Leopard users to pass configuration flags to \fBgem install\fR to specify where to find the \fBmysql_config\fR executable\.
+.
+.IP "" 4
+.
+.nf
+
+gem install mysql \-\- \-\-with\-mysql\-config=/usr/local/mysql/bin/mysql_config
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Since the specific location of that executable can change from machine to machine, you can specify these flags on a per\-machine basis\.
+.
+.IP "" 4
+.
+.nf
+
+bundle config build\.mysql \-\-with\-mysql\-config=/usr/local/mysql/bin/mysql_config
+.
+.fi
+.
+.IP "" 0
+.
+.P
+After running this command, every time bundler needs to install the \fBmysql\fR gem, it will pass along the flags you specified\.
+.
+.SH "CONFIGURATION KEYS"
+Configuration keys in bundler have two forms: the canonical form and the environment variable form\.
+.
+.P
+For instance, passing the \fB\-\-without\fR flag to bundle install(1) \fIbundle\-install\.1\.html\fR prevents Bundler from installing certain groups specified in the Gemfile(5)\. Bundler persists this value in \fBapp/\.bundle/config\fR so that calls to \fBBundler\.setup\fR do not try to find gems from the \fBGemfile\fR that you didn\'t install\. Additionally, subsequent calls to bundle install(1) \fIbundle\-install\.1\.html\fR remember this setting and skip those groups\.
+.
+.P
+The canonical form of this configuration is \fB"without"\fR\. To convert the canonical form to the environment variable form, capitalize it, and prepend \fBBUNDLE_\fR\. The environment variable form of \fB"without"\fR is \fBBUNDLE_WITHOUT\fR\.
+.
+.SH "LIST OF AVAILABLE KEYS"
+The following is a list of all configuration keys and their purpose\. You can learn more about their operation in bundle install(1) \fIbundle\-install\.1\.html\fR\.
+.
+.TP
+\fBpath\fR (\fBBUNDLE_PATH\fR)
+The location on disk to install gems\. Defaults to \fB$GEM_HOME\fR in development and \fBvendor/bundler\fR when \fB\-\-deployment\fR is used
+.
+.TP
+\fBfrozen\fR (\fBBUNDLE_FROZEN\fR)
+Disallow changes to the \fBGemfile\fR\. Defaults to \fBtrue\fR when \fB\-\-deployment\fR is used\.
+.
+.TP
+\fBwithout\fR (\fBBUNDLE_WITHOUT\fR)
+A \fB:\fR\-separated list of groups whose gems bundler should not install
+.
+.TP
+\fBbin\fR (\fBBUNDLE_BIN\fR)
+Install executables from gems in the bundle to the specified directory\. Defaults to \fBfalse\fR\.
+.
+.TP
+\fBgemfile\fR (\fBBUNDLE_GEMFILE\fR)
+The name of the file that bundler should use as the \fBGemfile\fR\. This location of this file also sets the root of the project, which is used to resolve relative paths in the \fBGemfile\fR, among other things\. By default, bundler will search up from the current working directory until it finds a \fBGemfile\fR\.
+.
+.P
+In general, you should set these settings per\-application by using the applicable flag to the bundle install(1) \fIbundle\-install\.1\.html\fR command\.
+.
+.P
+You can set them globally either via environment variables or \fBbundle config\fR, whichever is preferable for your setup\. If you use both, environment variables will take preference over global settings\.

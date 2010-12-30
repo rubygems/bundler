@@ -1,0 +1,1 @@
+ACTIVEMERCHANT = '1.0'

@@ -1,0 +1,2 @@
+      source "file:///home/hone/Projects/heroku_work/bundler/tmp/gems/remote1"
+      gem "rack"

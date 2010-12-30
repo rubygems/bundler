@@ -1,0 +1,7 @@
+            task :default do
+              path = File.expand_path("../lib", __FILE__)
+              FileUtils.mkdir_p(path)
+              File.open("#{path}/net_build_extensions.rb", "w") do |f|
+                f.puts "NET_BUILD_EXTENSIONS = 'YES'"
+              end
+            end

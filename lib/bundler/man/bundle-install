@@ -1,0 +1,283 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "BUNDLE\-INSTALL" "1" "November 2010" "" ""
+.
+.SH "NAME"
+\fBbundle\-install\fR \- Install the dependencies specified in your Gemfile
+.
+.SH "SYNOPSIS"
+\fBbundle install\fR [\-\-gemfile=GEMFILE]
+.
+.IP "" 4
+.
+.nf
+
+             [\-\-path PATH] [\-\-system]
+             [\-\-without=GROUP1[ GROUP2\.\.\.]]
+             [\-\-local] [\-\-deployment]
+             [\-\-binstubs[=DIRECTORY]]
+             [\-\-quiet]
+.
+.fi
+.
+.IP "" 0
+.
+.SH "DESCRIPTION"
+Install the gems specified in your Gemfile(5)\. If this is the first time you run bundle install (and a \fBGemfile\.lock\fR does not exist), bundler will fetch all remote sources, resolve dependencies and install all needed gems\.
+.
+.P
+If a \fBGemfile\.lock\fR does exist, and you have not updated your Gemfile(5), bundler will fetch all remote sources, but use the dependencies specified in the \fBGemfile\.lock\fR instead of resolving dependencies\.
+.
+.P
+If a \fBGemfile\.lock\fR does exist, and you have updated your Gemfile(5), bundler will use the dependencies in the \fBGemfile\.lock\fR for all gems that you did not update, but will re\-resolve the dependencies of gems that you did update\. You can find more information about this update process below under \fICONSERVATIVE UPDATING\fR\.
+.
+.SH "OPTIONS"
+.
+.TP
+\fB\-\-gemfile=<gemfile>\fR
+The location of the Gemfile(5) that bundler should use\. This defaults to a gemfile in the current working directory\. In general, bundler will assume that the location of the Gemfile(5) is also the project root, and will look for the \fBGemfile\.lock\fR and \fBvendor/cache\fR relative to it\.
+.
+.TP
+\fB\-\-path=<path>\fR
+The location to install the gems in the bundle to\. This defaults to the gem home, which is the location that \fBgem install\fR installs gems to\. This means that, by default, gems installed without a \fB\-\-path\fR setting will show up in \fBgem list\fR\. This setting is a \fIremembered option\fR\.
+.
+.TP
+\fB\-\-system\fR
+Installs the gems in the bundle to the system location\. This overrides any previous \fIremembered\fR use of \fB\-\-path\fR\.
+.
+.TP
+\fB\-\-without=<list>\fR
+A space\-separated list of groups to skip installing\. This is a \fIremembered option\fR\.
+.
+.TP
+\fB\-\-local\fR
+Do not attempt to connect to \fBrubygems\.org\fR, instead using just the gems located in \fBvendor/cache\fR\. Note that if a more appropriate platform\-specific gem exists on \fBrubygems\.org\fR, this will bypass the normal lookup\.
+.
+.TP
+\fB\-\-deployment\fR
+Switches bundler\'s defaults into \fIdeployment mode\fR\.
+.
+.TP
+\fB\-\-binstubs[=<directory>]\fR
+Create a directory (defaults to \fBbin\fR) containing an executable that runs in the context of the bundle\. For instance, if the \fBrails\fR gem comes with a \fBrails\fR executable, this flag will create a \fBbin/rails\fR executable that ensures that all dependencies used come from the bundled gems\.
+.
+.SH "DEPLOYMENT MODE"
+Bundler\'s defaults are optimized for development\. To switch to defaults optimized for deployment, use the \fB\-\-deployment\fR flag\.
+.
+.IP "1." 4
+A \fBGemfile\.lock\fR is required\.
+.
+.IP
+To ensure that the same versions of the gems you developed with and tested with are also used in deployments, a \fBGemfile\.lock\fR is required\.
+.
+.IP
+This is mainly to ensure that you remember to check your \fBGemfile\.lock\fR into version control\.
+.
+.IP "2." 4
+The \fBGemfile\.lock\fR must be up to date
+.
+.IP
+In development, you can modify your Gemfile(5) and re\-run \fBbundle install\fR to \fIconservatively update\fR your \fBGemfile\.lock\fR snapshot\.
+.
+.IP
+In deployment, your \fBGemfile\.lock\fR should be up\-to\-date with changes made in your Gemfile(5)\.
+.
+.IP "3." 4
+Gems are installed to \fBvendor/bundle\fR not your default system location
+.
+.IP
+In development, it\'s convenient to share the gems used in your application with other applications and other scripts run on the system\.
+.
+.IP
+In deployment, isolation is a more important default\. In addition, the user deploying the application may not have permission to install gems to the system, or the web server may not have permission to read them\.
+.
+.IP
+As a result, \fBbundle install \-\-deployment\fR installs gems to the \fBvendor/bundle\fR directory in the application\. This may be overridden using the \fB\-\-path\fR option\.
+.
+.IP "" 0
+.
+.SH "SUDO USAGE"
+By default, bundler installs gems to the same location as \fBgem install\fR\.
+.
+.P
+In some cases, that location may not be writable by your Unix user\. In that case, bundler will stage everything in a temporary directory, then ask you for your \fBsudo\fR password in order to copy the gems into their system location\.
+.
+.P
+From your perspective, this is identical to installing them gems directly into the system\.
+.
+.P
+You should never use \fBsudo bundle install\fR\. This is because several other steps in \fBbundle install\fR must be performed as the current user:
+.
+.IP "\(bu" 4
+Updating your \fBGemfile\.lock\fR
+.
+.IP "\(bu" 4
+Updating your \fBvendor/cache\fR, if necessary
+.
+.IP "\(bu" 4
+Checking out private git repositories using your user\'s SSH keys
+.
+.IP "" 0
+.
+.P
+Of these three, the first two could theoretically be performed by \fBchown\fRing the resulting files to \fB$SUDO_USER\fR\. The third, however, can only be performed by actually invoking the \fBgit\fR command as the current user\.
+.
+.P
+As a result, you should run \fBbundle install\fR as the current user, and bundler will ask for your password if it is needed to perform the final step\.
+.
+.SH "INSTALLING GROUPS"
+By default, \fBbundle install\fR will install all gems in all groups in your Gemfile(5), except those declared for a different platform\.
+.
+.P
+However, you can explicitly tell bundler to skip installing certain groups with the \fB\-\-without\fR option\. This option takes a space\-separated list of groups\.
+.
+.P
+While the \fB\-\-without\fR option will skip \fIinstalling\fR the gems in the specified groups, it will still \fIdownload\fR those gems and use them to resolve the dependencies of every gem in your Gemfile(5)\.
+.
+.P
+This is so that installing a different set of groups on another machine (such as a production server) will not change the gems and versions that you have already developed and tested against\.
+.
+.P
+\fBBundler offers a rock\-solid guarantee that the third\-party code you are running in development and testing is also the third\-party code you are running in production\. You can choose to exclude some of that code in different environments, but you will never be caught flat\-footed by different versions of third\-party code being used in different environments\.\fR
+.
+.P
+For a simple illustration, consider the following Gemfile(5):
+.
+.IP "" 4
+.
+.nf
+
+source "http://rubygems\.org"
+
+gem "sinatra"
+
+group :production do
+  gem "rack\-perftools\-profiler"
+end
+.
+.fi
+.
+.IP "" 0
+.
+.P
+In this case, \fBsinatra\fR depends on any version of Rack (\fB>= 1\.0\fR, while \fBrack\-perftools\-profiler\fR depends on 1\.x (\fB~> 1\.0\fR)\.
+.
+.P
+When you run \fBbundle install \-\-without production\fR in development, we look at the dependencies of \fBrack\-perftools\-profiler\fR as well\. That way, you do not spend all your time developing against Rack 2\.0, using new APIs unavailable in Rack 1\.x, only to have bundler switch to Rack 1\.2 when the \fBproduction\fR group \fIis\fR used\.
+.
+.P
+This should not cause any problems in practice, because we do not attempt to \fBinstall\fR the gems in the excluded groups, and only evaluate as part of the dependency resolution process\.
+.
+.P
+This also means that you cannot include different versions of the same gem in different groups, because doing so would result in different sets of dependencies used in development and production\. Because of the vagaries of the dependency resolution process, this usually affects more than just the gems you list in your Gemfile(5), and can (surprisingly) radically change the gems you are using\.
+.
+.SH "REMEMBERED OPTIONS"
+Some options (marked above in the \fIOPTIONS\fR section) are remembered between calls to \fBbundle install\fR, and by the Bundler runtime\.
+.
+.P
+For instance, if you run \fBbundle install \-\-without test\fR, a subsequent call to \fBbundle install\fR that does not include a \fB\-\-without\fR flag will remember your previous choice\.
+.
+.P
+In addition, a call to \fBBundler\.setup\fR will not attempt to make the gems in those groups available on the Ruby load path, as they were not installed\.
+.
+.P
+The settings that are remembered are:
+.
+.TP
+\fB\-\-deployment\fR
+At runtime, this remembered setting will also result in Bundler raising an exception if the \fBGemfile\.lock\fR is out of date\.
+.
+.TP
+\fB\-\-path\fR
+Subsequent calls to \fBbundle install\fR will install gems to the directory originally passed to \fB\-\-path\fR\. The Bundler runtime will look for gems in that location\. You can revert this option by running \fBbundle install \-\-system\fR\.
+.
+.TP
+\fB\-\-binstubs\fR
+Bundler will update the executables every subsequent call to \fBbundle install\fR\.
+.
+.TP
+\fB\-\-without\fR
+As described above, Bundler will skip the gems specified by \fB\-\-without\fR in subsequent calls to \fBbundle install\fR\. The Bundler runtime will also not try to make the gems in the skipped groups available\.
+.
+.SH "THE GEMFILE\.LOCK"
+When you run \fBbundle install\fR, Bundler will persist the full names and versions of all gems that you used (including dependencies of the gems specified in the Gemfile(5)) into a file called \fBGemfile\.lock\fR\.
+.
+.P
+Bundler uses this file in all subsequent calls to \fBbundle install\fR, which guarantees that you always use the same exact code, even as your application moves across machines\.
+.
+.P
+Because of the way dependency resolution works, even a seemingly small change (for instance, an update to a point\-release of a dependency of a gem in your Gemfile(5)) can result in radically different gems being needed to satisfy all dependencies\.
+.
+.P
+As a result, you \fBSHOULD\fR check your \fBGemfile\.lock\fR into version control\. If you do not, every machine that checks out your repository (including your production server) will resolve all dependencies again, which will result in different versions of third\-party code being used if \fBany\fR of the gems in the Gemfile(5) or any of their dependencies have been updated\.
+.
+.SH "CONSERVATIVE UPDATING"
+When you make a change to the Gemfile(5) and then run \fBbundle install\fR, Bundler will update only the gems that you modified\.
+.
+.P
+In other words, if a gem that you \fBdid not modify\fR worked before you called \fBbundle install\fR, it will continue to use the exact same versions of all dependencies as it used before the update\.
+.
+.P
+Let\'s take a look at an example\. Here\'s your original Gemfile(5):
+.
+.IP "" 4
+.
+.nf
+
+source "http://rubygems\.org"
+
+gem "actionpack", "2\.3\.8"
+gem "activemerchant"
+.
+.fi
+.
+.IP "" 0
+.
+.P
+In this case, both \fBactionpack\fR and \fBactivemerchant\fR depend on \fBactivesupport\fR\. The \fBactionpack\fR gem depends on \fBactivesupport 2\.3\.8\fR and \fBrack ~> 1\.1\.0\fR, while the \fBactivemerchant\fR gem depends on \fBactivesupport >= 2\.3\.2\fR, \fBbraintree >= 2\.0\.0\fR, and \fBbuilder >= 2\.0\.0\fR\.
+.
+.P
+When the dependencies are first resolved, Bundler will select \fBactivesupport 2\.3\.8\fR, which satisfies the requirements of both gems in your Gemfile(5)\.
+.
+.P
+Next, you modify your Gemfile(5) to:
+.
+.IP "" 4
+.
+.nf
+
+source "http://rubygems\.org"
+
+gem "actionpack", "3\.0\.0\.rc"
+gem "activemerchant"
+.
+.fi
+.
+.IP "" 0
+.
+.P
+The \fBactionpack 3\.0\.0\.rc\fR gem has a number of new dependencies, and updates the \fBactivesupport\fR dependency to \fB= 3\.0\.0\.rc\fR and the \fBrack\fR dependency to \fB~> 1\.2\.1\fR\.
+.
+.P
+When you run \fBbundle install\fR, Bundler notices that you changed the \fBactionpack\fR gem, but not the \fBactivemerchant\fR gem\. It evaluates the gems currently being used to satisfy its requirements:
+.
+.TP
+\fBactivesupport 2\.3\.8\fR
+also used to satisfy a dependency in \fBactivemerchant\fR, which is not being updated
+.
+.TP
+\fBrack ~> 1\.1\.0\fR
+not currently being used to satify another dependency
+.
+.P
+Because you did not explicitly ask to update \fBactivemerchant\fR, you would not expect it to suddenly stop working after updating \fBactionpack\fR\. However, satisfying the new \fBactivesupport 3\.0\.0\.rc\fR dependency of actionpack requires updating one of its dependencies\.
+.
+.P
+Even though \fBactivemerchant\fR declares a very loose dependency that theoretically matches \fBactivesupport 3\.0\.0\.rc\fR, bundler treats gems in your Gemfile(5) that have not changed as an atomic unit together with their dependencies\. In this case, the \fBactivemerchant\fR dependency is treated as \fBactivemerchant 1\.7\.1 + activesupport 2\.3\.8\fR, so \fBbundle install\fR will report that it cannot update \fBactionpack\fR\.
+.
+.P
+To explicitly update \fBactionpack\fR, including its dependencies which other gems in the Gemfile(5) still depend on, run \fBbundle update actionpack\fR (see \fBbundle update(1)\fR)\.
+.
+.P
+\fBSummary\fR: In general, after making a change to the Gemfile(5) , you should first try to run \fBbundle install\fR, which will guarantee that no other gems in the Gemfile(5) are impacted by the change\. If that does not work, run bundle update(1) \fIbundle\-update\.1\.html\fR\.

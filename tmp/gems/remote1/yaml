@@ -1,0 +1,3535 @@
+--- !ruby/object:Gem::SourceIndex
+gems:
+  actionmailer-2.3.2: !ruby/object:Gem::Specification 
+    name: actionmailer
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 2
+      - 3
+      - 2
+      version: 2.3.2
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: 
+    - !ruby/object:Gem::Dependency 
+      name: activesupport
+      prerelease: false
+      requirement: &id001 !ruby/object:Gem::Requirement 
+        none: false
+        requirements: 
+        - - "="
+          - !ruby/object:Gem::Version 
+            segments: 
+            - 2
+            - 3
+            - 2
+            version: 2.3.2
+      type: :runtime
+      version_requirements: *id001
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  actionpack-2.3.2: !ruby/object:Gem::Specification 
+    name: actionpack
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 2
+      - 3
+      - 2
+      version: 2.3.2
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: 
+    - !ruby/object:Gem::Dependency 
+      name: activesupport
+      prerelease: false
+      requirement: &id001 !ruby/object:Gem::Requirement 
+        none: false
+        requirements: 
+        - - "="
+          - !ruby/object:Gem::Version 
+            segments: 
+            - 2
+            - 3
+            - 2
+            version: 2.3.2
+      type: :runtime
+      version_requirements: *id001
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  activemerchant-1.0: !ruby/object:Gem::Specification 
+    name: activemerchant
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 0
+      version: "1.0"
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: 
+    - !ruby/object:Gem::Dependency 
+      name: activesupport
+      prerelease: false
+      requirement: &id001 !ruby/object:Gem::Requirement 
+        none: false
+        requirements: 
+        - - ">="
+          - !ruby/object:Gem::Version 
+            segments: 
+            - 2
+            - 0
+            - 0
+            version: 2.0.0
+      type: :runtime
+      version_requirements: *id001
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  activerecord-2.3.1: !ruby/object:Gem::Specification 
+    name: activerecord
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 2
+      - 3
+      - 1
+      version: 2.3.1
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: 
+    - !ruby/object:Gem::Dependency 
+      name: activesupport
+      prerelease: false
+      requirement: &id001 !ruby/object:Gem::Requirement 
+        none: false
+        requirements: 
+        - - "="
+          - !ruby/object:Gem::Version 
+            segments: 
+            - 2
+            - 3
+            - 2
+            version: 2.3.2
+      type: :runtime
+      version_requirements: *id001
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  activerecord-2.3.2: !ruby/object:Gem::Specification 
+    name: activerecord
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 2
+      - 3
+      - 2
+      version: 2.3.2
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: 
+    - !ruby/object:Gem::Dependency 
+      name: activesupport
+      prerelease: false
+      requirement: &id001 !ruby/object:Gem::Requirement 
+        none: false
+        requirements: 
+        - - "="
+          - !ruby/object:Gem::Version 
+            segments: 
+            - 2
+            - 3
+            - 2
+            version: 2.3.2
+      type: :runtime
+      version_requirements: *id001
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  activeresource-2.3.2: !ruby/object:Gem::Specification 
+    name: activeresource
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 2
+      - 3
+      - 2
+      version: 2.3.2
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: 
+    - !ruby/object:Gem::Dependency 
+      name: activesupport
+      prerelease: false
+      requirement: &id001 !ruby/object:Gem::Requirement 
+        none: false
+        requirements: 
+        - - "="
+          - !ruby/object:Gem::Version 
+            segments: 
+            - 2
+            - 3
+            - 2
+            version: 2.3.2
+      type: :runtime
+      version_requirements: *id001
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  activesupport-1.2.3: !ruby/object:Gem::Specification 
+    name: activesupport
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 2
+      - 3
+      version: 1.2.3
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: []
+    
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  activesupport-2.3.2: !ruby/object:Gem::Specification 
+    name: activesupport
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 2
+      - 3
+      - 2
+      version: 2.3.2
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: []
+    
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  activesupport-2.3.5: !ruby/object:Gem::Specification 
+    name: activesupport
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 2
+      - 3
+      - 5
+      version: 2.3.5
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: []
+    
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  another_implicit_rake_dep-1.0: !ruby/object:Gem::Specification 
+    name: another_implicit_rake_dep
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 0
+      version: "1.0"
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: []
+    
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: 
+    - Rakefile
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  bundler-0.8.1: !ruby/object:Gem::Specification 
+    name: bundler
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 0
+      - 8
+      - 1
+      version: 0.8.1
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: []
+    
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  bundler-0.9: !ruby/object:Gem::Specification 
+    name: bundler
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 0
+      - 9
+      version: "0.9"
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: []
+    
+    description: ""
+    email: 
+    executables: 
+    - bundle
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  foo-1.0: !ruby/object:Gem::Specification 
+    name: foo
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 0
+      version: "1.0"
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: []
+    
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  has_prerelease-1.0: !ruby/object:Gem::Specification 
+    name: has_prerelease
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 0
+      version: "1.0"
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: []
+    
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  has_prerelease-1.1.pre: !ruby/object:Gem::Specification 
+    name: has_prerelease
+    version: !ruby/object:Gem::Version 
+      prerelease: true
+      segments: 
+      - 1
+      - 1
+      - pre
+      version: 1.1.pre
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: []
+    
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">"
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 1
+          - 3
+          - 1
+          version: 1.3.1
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  missing_dep-1.0: !ruby/object:Gem::Specification 
+    name: missing_dep
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 0
+      version: "1.0"
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: 
+    - !ruby/object:Gem::Dependency 
+      name: not_here
+      prerelease: false
+      requirement: &id001 !ruby/object:Gem::Requirement 
+        none: false
+        requirements: 
+        - - ">="
+          - !ruby/object:Gem::Version 
+            segments: 
+            - 0
+            version: "0"
+      type: :runtime
+      version_requirements: *id001
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  multiple_versioned_deps-1.0: !ruby/object:Gem::Specification 
+    name: multiple_versioned_deps
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 0
+      version: "1.0"
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: 
+    - !ruby/object:Gem::Dependency 
+      name: weakling
+      prerelease: false
+      requirement: &id001 !ruby/object:Gem::Requirement 
+        none: false
+        requirements: 
+        - - ">="
+          - !ruby/object:Gem::Version 
+            segments: 
+            - 0
+            - 0
+            - 1
+            version: 0.0.1
+        - - <
+          - !ruby/object:Gem::Version 
+            segments: 
+            - 0
+            - 1
+            version: "0.1"
+      type: :runtime
+      version_requirements: *id001
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  net-sftp-1.1.1: !ruby/object:Gem::Specification 
+    name: net-sftp
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 1
+      - 1
+      version: 1.1.1
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: 
+    - !ruby/object:Gem::Dependency 
+      name: net-ssh
+      prerelease: false
+      requirement: &id001 !ruby/object:Gem::Requirement 
+        none: false
+        requirements: 
+        - - ">="
+          - !ruby/object:Gem::Version 
+            segments: 
+            - 1
+            - 0
+            - 0
+            version: 1.0.0
+        - - <
+          - !ruby/object:Gem::Version 
+            segments: 
+            - 1
+            - 99
+            - 0
+            version: 1.99.0
+      type: :runtime
+      version_requirements: *id001
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  net-ssh-1.0: !ruby/object:Gem::Specification 
+    name: net-ssh
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 0
+      version: "1.0"
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: []
+    
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  net_a-1.0: !ruby/object:Gem::Specification 
+    name: net_a
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 0
+      version: "1.0"
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: 
+    - !ruby/object:Gem::Dependency 
+      name: net_b
+      prerelease: false
+      requirement: &id001 !ruby/object:Gem::Requirement 
+        none: false
+        requirements: 
+        - - ">="
+          - !ruby/object:Gem::Version 
+            segments: 
+            - 0
+            version: "0"
+      type: :runtime
+      version_requirements: *id001
+    - !ruby/object:Gem::Dependency 
+      name: net_build_extensions
+      prerelease: false
+      requirement: &id002 !ruby/object:Gem::Requirement 
+        none: false
+        requirements: 
+        - - ">="
+          - !ruby/object:Gem::Version 
+            segments: 
+            - 0
+            version: "0"
+      type: :runtime
+      version_requirements: *id002
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  net_b-1.0: !ruby/object:Gem::Specification 
+    name: net_b
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 0
+      version: "1.0"
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: []
+    
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  net_build_extensions-1.0: !ruby/object:Gem::Specification 
+    name: net_build_extensions
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 0
+      version: "1.0"
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: 
+    - !ruby/object:Gem::Dependency 
+      name: rake
+      prerelease: false
+      requirement: &id001 !ruby/object:Gem::Requirement 
+        none: false
+        requirements: 
+        - - ">="
+          - !ruby/object:Gem::Version 
+            segments: 
+            - 0
+            version: "0"
+      type: :runtime
+      version_requirements: *id001
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: 
+    - Rakefile
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  net_c-1.0: !ruby/object:Gem::Specification 
+    name: net_c
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 0
+      version: "1.0"
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: 
+    - !ruby/object:Gem::Dependency 
+      name: net_a
+      prerelease: false
+      requirement: &id001 !ruby/object:Gem::Requirement 
+        none: false
+        requirements: 
+        - - ">="
+          - !ruby/object:Gem::Version 
+            segments: 
+            - 0
+            version: "0"
+      type: :runtime
+      version_requirements: *id001
+    - !ruby/object:Gem::Dependency 
+      name: net_d
+      prerelease: false
+      requirement: &id002 !ruby/object:Gem::Requirement 
+        none: false
+        requirements: 
+        - - ">="
+          - !ruby/object:Gem::Version 
+            segments: 
+            - 0
+            version: "0"
+      type: :runtime
+      version_requirements: *id002
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  net_d-1.0: !ruby/object:Gem::Specification 
+    name: net_d
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 0
+      version: "1.0"
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: []
+    
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  net_e-1.0: !ruby/object:Gem::Specification 
+    name: net_e
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 0
+      version: "1.0"
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: 
+    - !ruby/object:Gem::Dependency 
+      name: net_d
+      prerelease: false
+      requirement: &id001 !ruby/object:Gem::Requirement 
+        none: false
+        requirements: 
+        - - ">="
+          - !ruby/object:Gem::Version 
+            segments: 
+            - 0
+            version: "0"
+      type: :runtime
+      version_requirements: *id001
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  nokogiri-1.4.2: !ruby/object:Gem::Specification 
+    name: nokogiri
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 4
+      - 2
+      version: 1.4.2
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: []
+    
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  nokogiri-1.4.2-java: !ruby/object:Gem::Specification 
+    name: nokogiri
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 4
+      - 2
+      version: 1.4.2
+    platform: java
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: 
+    - !ruby/object:Gem::Dependency 
+      name: weakling
+      prerelease: false
+      requirement: &id001 !ruby/object:Gem::Requirement 
+        none: false
+        requirements: 
+        - - ">="
+          - !ruby/object:Gem::Version 
+            segments: 
+            - 0
+            - 0
+            - 3
+            version: 0.0.3
+      type: :runtime
+      version_requirements: *id001
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  not_released-1.0.pre: !ruby/object:Gem::Specification 
+    name: not_released
+    version: !ruby/object:Gem::Version 
+      prerelease: true
+      segments: 
+      - 1
+      - 0
+      - pre
+      version: 1.0.pre
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: []
+    
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">"
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 1
+          - 3
+          - 1
+          version: 1.3.1
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  only_java-1.0-java: !ruby/object:Gem::Specification 
+    name: only_java
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 0
+      version: "1.0"
+    platform: java
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: []
+    
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  platform_specific-1.0: !ruby/object:Gem::Specification 
+    name: platform_specific
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 0
+      version: "1.0"
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: []
+    
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  platform_specific-1.0-x86-darwin-100: !ruby/object:Gem::Specification 
+    name: platform_specific
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 0
+      version: "1.0"
+    platform: x86-darwin-100
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: []
+    
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  platform_specific-1.0-x86-mswin32: !ruby/object:Gem::Specification 
+    name: platform_specific
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 0
+      version: "1.0"
+    platform: x86-mswin32
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: []
+    
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  platform_specific-1.0-x86_64-linux: !ruby/object:Gem::Specification 
+    name: platform_specific
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 0
+      version: "1.0"
+    platform: x86_64-linux
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: []
+    
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  platform_specific-1.0-java: !ruby/object:Gem::Specification 
+    name: platform_specific
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 0
+      version: "1.0"
+    platform: java
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: []
+    
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  rack-0.9.1: !ruby/object:Gem::Specification 
+    name: rack
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 0
+      - 9
+      - 1
+      version: 0.9.1
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: []
+    
+    description: ""
+    email: 
+    executables: 
+    - rackup
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  rack-1.0.0: !ruby/object:Gem::Specification 
+    name: rack
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 0
+      - 0
+      version: 1.0.0
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: []
+    
+    description: ""
+    email: 
+    executables: 
+    - rackup
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  rack-obama-1.0: !ruby/object:Gem::Specification 
+    name: rack-obama
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 0
+      version: "1.0"
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: 
+    - !ruby/object:Gem::Dependency 
+      name: rack
+      prerelease: false
+      requirement: &id001 !ruby/object:Gem::Requirement 
+        none: false
+        requirements: 
+        - - ">="
+          - !ruby/object:Gem::Version 
+            segments: 
+            - 0
+            version: "0"
+      type: :runtime
+      version_requirements: *id001
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  rack-test-1.0: !ruby/object:Gem::Specification 
+    name: rack-test
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 0
+      version: "1.0"
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: []
+    
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  rack_middleware-1.0: !ruby/object:Gem::Specification 
+    name: rack_middleware
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 0
+      version: "1.0"
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: 
+    - !ruby/object:Gem::Dependency 
+      name: rack
+      prerelease: false
+      requirement: &id001 !ruby/object:Gem::Requirement 
+        none: false
+        requirements: 
+        - - "="
+          - !ruby/object:Gem::Version 
+            segments: 
+            - 0
+            - 9
+            - 1
+            version: 0.9.1
+      type: :runtime
+      version_requirements: *id001
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  rails-2.3.2: !ruby/object:Gem::Specification 
+    name: rails
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 2
+      - 3
+      - 2
+      version: 2.3.2
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: 
+    - !ruby/object:Gem::Dependency 
+      name: rake
+      prerelease: false
+      requirement: &id001 !ruby/object:Gem::Requirement 
+        none: false
+        requirements: 
+        - - ">="
+          - !ruby/object:Gem::Version 
+            segments: 
+            - 0
+            version: "0"
+      type: :runtime
+      version_requirements: *id001
+    - !ruby/object:Gem::Dependency 
+      name: actionpack
+      prerelease: false
+      requirement: &id002 !ruby/object:Gem::Requirement 
+        none: false
+        requirements: 
+        - - "="
+          - !ruby/object:Gem::Version 
+            segments: 
+            - 2
+            - 3
+            - 2
+            version: 2.3.2
+      type: :runtime
+      version_requirements: *id002
+    - !ruby/object:Gem::Dependency 
+      name: activerecord
+      prerelease: false
+      requirement: &id003 !ruby/object:Gem::Requirement 
+        none: false
+        requirements: 
+        - - "="
+          - !ruby/object:Gem::Version 
+            segments: 
+            - 2
+            - 3
+            - 2
+            version: 2.3.2
+      type: :runtime
+      version_requirements: *id003
+    - !ruby/object:Gem::Dependency 
+      name: actionmailer
+      prerelease: false
+      requirement: &id004 !ruby/object:Gem::Requirement 
+        none: false
+        requirements: 
+        - - "="
+          - !ruby/object:Gem::Version 
+            segments: 
+            - 2
+            - 3
+            - 2
+            version: 2.3.2
+      type: :runtime
+      version_requirements: *id004
+    - !ruby/object:Gem::Dependency 
+      name: activeresource
+      prerelease: false
+      requirement: &id005 !ruby/object:Gem::Requirement 
+        none: false
+        requirements: 
+        - - "="
+          - !ruby/object:Gem::Version 
+            segments: 
+            - 2
+            - 3
+            - 2
+            version: 2.3.2
+      type: :runtime
+      version_requirements: *id005
+    description: ""
+    email: 
+    executables: 
+    - rails
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  rails_fail-1.0: !ruby/object:Gem::Specification 
+    name: rails_fail
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 0
+      version: "1.0"
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: 
+    - !ruby/object:Gem::Dependency 
+      name: activesupport
+      prerelease: false
+      requirement: &id001 !ruby/object:Gem::Requirement 
+        none: false
+        requirements: 
+        - - "="
+          - !ruby/object:Gem::Version 
+            segments: 
+            - 1
+            - 2
+            - 3
+            version: 1.2.3
+      type: :runtime
+      version_requirements: *id001
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  rake-0.8.7: !ruby/object:Gem::Specification 
+    name: rake
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 0
+      - 8
+      - 7
+      version: 0.8.7
+    platform: ruby
+    authors: 
+    - Jim Weirich
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2009-05-14 23:00:00 -05:00
+    default_executable: rake
+    dependencies: []
+    
+    description: Rake is a Make-like program implemented in Ruby. Tasks and dependencies are specified in standard Ruby syntax.
+    email: jim@weirichhouse.org
+    executables: 
+    - rake
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: http://rake.rubyforge.org
+    licenses: 
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          version: "0"
+      version: 
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          version: "0"
+      version: 
+    requirements: []
+    
+    rubyforge_project: rake
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 2
+    summary: Ruby based make-like utility.
+    test_files: []
+    
+  rcov-1.0-mswin32: !ruby/object:Gem::Specification 
+    name: rcov
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 0
+      version: "1.0"
+    platform: mswin32
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: []
+    
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  rspec-1.2.7: !ruby/object:Gem::Specification 
+    name: rspec
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 2
+      - 7
+      version: 1.2.7
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: []
+    
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  thin-1.0: !ruby/object:Gem::Specification 
+    name: thin
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 0
+      version: "1.0"
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: 
+    - !ruby/object:Gem::Dependency 
+      name: rack
+      prerelease: false
+      requirement: &id001 !ruby/object:Gem::Requirement 
+        none: false
+        requirements: 
+        - - ">="
+          - !ruby/object:Gem::Version 
+            segments: 
+            - 0
+            version: "0"
+      type: :runtime
+      version_requirements: *id001
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  very_simple_binary-1.0: !ruby/object:Gem::Specification 
+    name: very_simple_binary
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 0
+      version: "1.0"
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: []
+    
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: 
+    - ext/extconf.rb
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    - ext
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  weakling-0.0.3: !ruby/object:Gem::Specification 
+    name: weakling
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 0
+      - 0
+      - 3
+      version: 0.0.3
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: []
+    
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  with_development_dependency-1.0: !ruby/object:Gem::Specification 
+    name: with_development_dependency
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 0
+      version: "1.0"
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: 
+    - !ruby/object:Gem::Dependency 
+      name: activesupport
+      prerelease: false
+      requirement: &id001 !ruby/object:Gem::Requirement 
+        none: false
+        requirements: 
+        - - "="
+          - !ruby/object:Gem::Version 
+            segments: 
+            - 2
+            - 3
+            - 5
+            version: 2.3.5
+      type: :development
+      version_requirements: *id001
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  with_implicit_rake_dep-1.0: !ruby/object:Gem::Specification 
+    name: with_implicit_rake_dep
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 0
+      version: "1.0"
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: []
+    
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: 
+    - Rakefile
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    
+  yard-1.0: !ruby/object:Gem::Specification 
+    name: yard
+    version: !ruby/object:Gem::Version 
+      prerelease: false
+      segments: 
+      - 1
+      - 0
+      version: "1.0"
+    platform: ruby
+    authors: []
+    
+    autorequire: 
+    bindir: bin
+    cert_chain: []
+    
+    date: 2010-11-24 00:00:00 -06:00
+    default_executable: 
+    dependencies: []
+    
+    description: ""
+    email: 
+    executables: []
+    
+    extensions: []
+    
+    extra_rdoc_files: []
+    
+    files: []
+    
+    has_rdoc: true
+    homepage: 
+    licenses: []
+    
+    post_install_message: 
+    rdoc_options: []
+    
+    require_paths: 
+    - lib
+    required_ruby_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    required_rubygems_version: !ruby/object:Gem::Requirement 
+      none: false
+      requirements: 
+      - - ">="
+        - !ruby/object:Gem::Version 
+          segments: 
+          - 0
+          version: "0"
+    requirements: []
+    
+    rubyforge_project: 
+    rubygems_version: 1.3.7
+    signing_key: 
+    specification_version: 3
+    summary: This is just a fake gem for testing
+    test_files: []
+    

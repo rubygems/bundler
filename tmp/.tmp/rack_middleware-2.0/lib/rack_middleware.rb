@@ -1,0 +1,1 @@
+RACK_MIDDLEWARE = '2.0'

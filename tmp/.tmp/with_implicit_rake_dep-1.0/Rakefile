@@ -1,0 +1,7 @@
+            task :default do
+              path = File.expand_path("../lib", __FILE__)
+              FileUtils.mkdir_p(path)
+              File.open("#{path}/implicit_rake_dep.rb", "w") do |f|
+                f.puts "IMPLICIT_RAKE_DEP = 'YES'"
+              end
+            end

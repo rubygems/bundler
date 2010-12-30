@@ -123,22 +123,30 @@ code {
   -webkit-box-shadow: blue 0 0 5px 0;
   -o-box-shadow: blue 0 0 5px 0;
   box-shadow: blue 0 0 5px 0;
+  margin-right: 10px;
 }
-/* line 97 */
+/* line 98 */
+#footer img:nth-child(2) {
+  -moz-box-shadow: blue 0 0 5px 0;
+  -webkit-box-shadow: blue 0 0 5px 0;
+  -o-box-shadow: blue 0 0 5px 0;
+  box-shadow: blue 0 0 5px 0;
+}
+/* line 101 */
 #footer img:last-child {
   margin-top: -20px;
   margin-right: -20px;
 }
-/* line 101 */
+/* line 105 */
 #footer .spacer {
   -webkit-box-flex: 1;
   -moz-box-flex: 1;
 }
-/* line 104 */
+/* line 108 */
 #footer img {
   display: block;
 }
-/* line 107 */
+/* line 111 */
 #footer #navigation {
   display: -webkit-box;
   display: -moz-box;
@@ -147,25 +155,25 @@ code {
   -webkit-box-align: center;
   -moz-box-align: center;
 }
-/* line 110 */
+/* line 114 */
 #footer #navigation p {
   font-family: Helvetica, sans-serif;
   color: #336666;
   font-size: 16px;
   margin: 0;
 }
-/* line 115 */
+/* line 119 */
 #footer #navigation p a {
   text-decoration: none;
   color: #0e3f54;
 }
 
-/* line 118 */
+/* line 122 */
 .contents {
   width: 725px;
 }
 
-/* line 121 */
+/* line 125 */
 h2 {
   font-size: 20px;
   padding: 5px;
@@ -179,7 +187,7 @@ h2 {
   box-sizing: border-box;
 }
 
-/* line 130 */
+/* line 134 */
 ul.bullet {
   display: -webkit-box;
   display: -moz-box;
@@ -190,19 +198,19 @@ ul.bullet {
   -webkit-box-pack: justify;
   -moz-box-pack: justify;
 }
-/* line 134 */
+/* line 138 */
 ul.bullet a {
   margin-left: 0;
   margin-right: 10px;
   -webkit-box-flex: 1;
   -moz-box-flex: 1;
 }
-/* line 138 */
+/* line 142 */
 ul.bullet a:last-child {
   margin-right: 0;
 }
 
-/* line 141 */
+/* line 145 */
 .notes {
   font-size: 90%;
   line-height: 150%;
@@ -212,20 +220,20 @@ ul.bullet a:last-child {
   padding-left: 4px;
   color: #006666;
 }
-/* line 149 */
+/* line 153 */
 .notes + a {
   margin-top: 10px;
 }
-/* line 151 */
+/* line 155 */
 .notes + pre {
   margin-top: 10px;
 }
-/* line 153 */
+/* line 157 */
 .notes + .description {
   margin-top: 20px;
 }
 
-/* line 156 */
+/* line 160 */
 .bullet {
   width: 100%;
   padding: 8px 15px;
@@ -240,7 +248,7 @@ ul.bullet a:last-child {
   -webkit-box-align: justify;
   -moz-box-align: justify;
 }
-/* line 162 */
+/* line 166 */
 .bullet .description {
   width: 100%;
   margin-right: 16px;
@@ -248,7 +256,7 @@ ul.bullet a:last-child {
   line-height: 24px;
   margin-bottom: 8px;
 }
-/* line 169 */
+/* line 173 */
 .bullet a {
   padding-top: 8px;
   padding-bottom: 5px;
@@ -268,13 +276,13 @@ ul.bullet a:last-child {
   -khtml-border-radius: 5px;
   border-radius: 5px;
 }
-/* line 181 */
+/* line 185 */
 .bullet a:hover {
   background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0%, #4e9326), color-stop(100%, #35641a));
   background-image: -moz-linear-gradient(top, #4e9326 0%, #35641a 100%);
   background-image: linear-gradient(top, #4e9326 0%, #35641a 100%);
 }
-/* line 185 */
+/* line 189 */
 .bullet .how {
   display: -webkit-box;
   display: -moz-box;
@@ -286,18 +294,18 @@ ul.bullet a:last-child {
   -moz-box-flex: 1;
   line-height: 24px;
 }
-/* line 190 */
+/* line 194 */
 .bullet pre {
   -webkit-box-flex: 1;
   -moz-box-flex: 1;
   margin: 0;
 }
-/* line 194 */
+/* line 198 */
 .bullet code {
   background-color: rgba(0, 0, 0, 0.1);
 }
 
-/* line 197 */
+/* line 201 */
 pre {
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
@@ -307,35 +315,35 @@ pre {
   border-radius: 5px;
 }
 
-/* line 200 */
+/* line 204 */
 .bullet:nth-child(even) {
   background-color: rgba(0, 0, 0, 0.1);
   border-top: 1px solid rgba(0, 0, 0, 0.1);
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-/* line 205 */
+/* line 209 */
 .bullet:not(:nth-of-type(1)) {
   padding-top: 15px;
 }
 
-/* line 208 */
+/* line 212 */
 .bullet {
   padding-bottom: 25px;
 }
 
-/* line 213 */
+/* line 217 */
 #credits p {
   text-align: center;
   font-size: 8pt;
   color: #668493;
 }
-/* line 217 */
+/* line 221 */
 #credits p a {
   color: #2c596b;
 }
 
-/* line 221 */
+/* line 225 */
 #github img {
   position: absolute;
   top: 0;
@@ -343,7 +351,7 @@ pre {
   border: 0;
 }
 
-/* line 227 */
+/* line 231 */
 #versions {
   position: absolute;
   top: 0;
@@ -357,13 +365,13 @@ pre {
   -khtml-border-bottom-right-radius: 10px;
   border-bottom-right-radius: 10px;
 }
-/* line 234 */
+/* line 238 */
 #versions a {
   text-decoration: none;
   color: #0e3f54;
   padding: 0.1em 0.25em;
 }
-/* line 237 */
+/* line 241 */
 #versions a.current {
   font-weight: bold;
 }

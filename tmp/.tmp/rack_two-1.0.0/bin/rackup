@@ -1,0 +1,1 @@
+require 'rack_two' ; puts RACK_TWO

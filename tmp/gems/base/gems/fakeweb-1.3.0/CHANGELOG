@@ -1,0 +1,215 @@
+fakeweb (1.3.0)
+
+* improve response header registration so you can pass an array to set a header
+  more than once [Myron Marston]
+
+* fix an exception when the response's :body option was set to nil [Chris Zingel]
+
+* fix that stubbed requests weren't mutating the Net::HTTP request object to set
+  the body and content-length, like real requests do [Chris Kampmeier]
+
+* add FakeWeb.last_request [Chris Kampmeier]
+
+* assigning a String or Regexp to FakeWeb.allow_net_connect= sets a whitelist
+  for outbound requests [Dan Dofter, Tim Carey-Smith, Ben Woosley]
+
+
+fakeweb (1.2.8)
+
+* support Pathname objects where a filename is expected [Chris Kampmeier]
+
+* fix compatibility with Ruby 1.9.2 [Chris Kampmeier]
+
+* simplify storage of FakeWeb::VERSION [Josh Peek, Woody Peterson, Ben Woosley]
+
+
+fakeweb (1.2.7)
+
+* revert to sorting query params before matching requests against regexps,
+  instead of the 1.2.6 behavior that tried every possible order combination;
+  that was factorial-time, which made matching hang for requests with long query
+  strings [Jason Wadsworth, David Dollar, Blaine Cook]
+
+* print a warning when FakeWeb is loaded before RightHttpConnection or after
+  Samuel, other libs that patch Net::HTTP [Chris Kampmeier, Ben Brinckerhoff]
+
+
+fakeweb (1.2.6)
+
+* fix that query params in a regex would have to be sorted for it to ever match
+  a request URI [Chris Kampmeier, Ben Hall]
+
+* improve regex handling so registration with an explicit port (like
+  /example.com:80/) matches a request that uses an implied port
+  (like "http://example.com/") [Chris Kampmeier, Dan Dofter]
+
+* refactor URI registry to reduce duplication; now about twice as fast at
+  handling requests [Chris Kampmeier]
+
+* Add FakeWeb::VERSION so you can programmatically determine what version of
+  FakeWeb is loaded without using RubyGems [Chris Kampmeier, Chris Wanstrath]
+
+
+fakeweb (1.2.5)
+
+* fix handling of userinfo strings that contain percent-encoded unsafe
+  characters [Chris Kampmeier, Ken Mayer]
+
+* fix that exact matches against strings/URIs with the :any method had a lower
+  precedence than regex matches using a real HTTP method (exact matches now
+  always take precedence) [Chris Kampmeier]
+
+* change request handling to raise an exception when more than one registered
+  regex matches a request URI [Chris Kampmeier]
+
+
+fakeweb (1.2.4)
+
+* add experimental support for matching URIs via regular expressions
+  [Jacqui Maher, Tiago Albineli Motta, Peter Wagene]
+
+* fix an exception when registering with the :response option and a string that
+  is the same as the name of a directory in the current path [Chris Kampmeier]
+
+* DEPRECATION: Calling FakeWeb.register_uri with a :string or :file option is
+  now deprecated. Both options have been replaced with a unified :body option,
+  since they supply the response body (as opposed to :response, which supplies
+  the full response including headers) [Chris Kampmeier]
+
+* add support for specifying HTTP headers as options to FakeWeb.register_uri
+  when using the :string or :file response types, since those methods only
+  specify a response body [David Michael, Chris Kampmeier]
+
+* DEPRECATION: Calling FakeWeb.register_uri and FakeWeb.registered_uri? without
+  an HTTP method as the first argument is now deprecated. To match against any
+  HTTP method (the pre-1.2.0 behavior), use :any [Chris Kampmeier]
+
+
+fakeweb (1.2.3)
+
+* fix the #http_version of :file and :string responses, which was returning the
+  request URI instead of something sensible like "1.0" [Chris Kampmeier]
+
+* add method aliases in the Net::HTTP patch to eliminate warnings when running
+  with -w [Joshua Clingenpeel]
+
+* fix that removing the redefinition of OpenURI::HTTPError in 1.2.0 caused
+  :exception responses to raise when OpenURI isn't available [Chris Kampmeier]
+
+* fix registering an :exception response with classes that require arguments for
+  instantiation, like Interrupt's subclasses [Chris Kampmeier]
+
+
+fakeweb (1.2.2)
+
+* fix that HTTP Digest and OAuth requests could raise URI::InvalidURIErrors
+  [Bill Kocik, Chris Kampmeier]
+
+
+fakeweb (1.2.1)
+
+* fix that query parameters are handled correctly when registering with a URI
+  object [Anselmo Alves, Chris Kampmeier]
+
+* fix an exception when registering with the :response option and a string
+  containing "\0" [Jonathan Baudanza, Chris Kampmeier]
+
+* fix that trailing slashes were considered significant for requests to the root
+  of a domain [Chris Kampmeier]
+
+* add support for HTTP basic authentication via userinfo strings in URIs
+  [Michael Bleigh]
+
+
+fakeweb (1.2.0)
+
+* add lib/fakeweb.rb so you can require "fakeweb" as well [Chris Kampmeier]
+
+* fix compatibility with Ruby 1.9.1 [Chris Kampmeier]
+
+* fix that newlines in file-based responses could be doubled in the response
+  object's body [Mark Menard, Chris Kampmeier]
+
+* fix unnecessary munging of the transfer-encoding header, which improves
+  compatibility with mechanize [Mark Menard]
+
+* fix a test and the RCov dependency to be compatible with JRuby [Mark Menard]
+
+* remove an unnecessary redefinition of OpenURI::HTTPError [Josh Nichols]
+
+* rearrange implementation code into separate files, one per class [Josh Nichols]
+
+* fix a bug where FakeWeb.response_for would raise if the request wasn't
+  registered [Chris Kampmeier]
+
+* add HTTP method support, so FakeWeb takes both the URI and method into
+  account for registration, requests, and responses. Backwards-compatible with
+  the old method signatures, which didn't have a method param. [Chris Kampmeier]
+
+* start work on Ruby 1.9 compatibility [Chris Kampmeier]
+
+* add FakeWeb.allow_net_connect= to enable/disable the pass-through to
+  Net::HTTP for unregistered URIs [Mislav Marohnić, Chris Kampmeier]
+
+* remove setup.rb, since most people use RubyGems [Mislav Marohnić]
+
+* fix that 'http://example.com/?' (empty query) matches a registered
+  'http://example.com/', and vice-versa [Mislav Marohnić]
+
+* improve the test suite to not rely on an internet connection [Chris Kampmeier]
+
+* use `rake test` instead of `rake tests` [Josh Nichols]
+
+* fix an incompatibility with Ruby 1.8.6 p36 where you'd get "Errno::EINTR:
+  Interrupted system call" exceptions in Socket#sysread for any non-faked
+  request [Chris Kampmeier]
+
+* response rotation: you can now optionally call FakeWeb.register_uri with an
+  array of options hashes; these are used, in order, to respond to
+  repeated requests (to repeat a response more than once before rotating, use
+  the :times option). Once you run out of responses, further requests always
+  receive the last response. [Michael Shapiro]
+
+* add support for Net::HTTP's undocumented full-URI request style (fixes
+  URI::InvalidURIErrors that you might see in older libraries) [Chris Kampmeier]
+
+* sort query params before storing internally, so that
+  http://example.com/?a=1&b=2 and http://example.com/?b=2&a=1 are considered the
+  same URL (although this is technically incorrect, it's much more
+  convenient--most web apps work that way, and Net::HTTP's use of a hash to pass
+  query params means that the order in which FakeWeb stores them can be
+  unpredictable) [Chris Kampmeier]
+
+* add support for ports in URLs, so that http://example.com/ and
+  http://example.com:3000/ are not the same [Chris Kampmeier]
+
+* fix for non-faked SSL requests failing with "Unable to create local socket"
+  [Chris Kampmeier]
+
+* update Rakefile to fix warning about deprecated code [Chris Kampmeier]
+
+
+fakeweb (1.1.2)
+
+* add required dependencies to GemSpec to ensure that tests pass in firebrigade
+  (http://firebrigade.seattlerb.org/) [Blaine Cook]
+
+
+fakeweb (1.1.1)
+
+* fix for non-existence of :string method on File as presented by open-uri
+  [Blaine Cook]
+
+* fix for curl example test - google redirects to ccTLDs for those outside US
+  [Blaine Cook]
+
+
+fakeweb (1.1.0)
+
+* update code to correspond to ruby 1.8.4 (breaks compatibility with ruby 1.8.2)
+  [Blaine Cook]
+
+
+fakeweb (1.0.0)
+
+  * initial import [Blaine Cook]

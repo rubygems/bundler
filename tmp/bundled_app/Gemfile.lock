@@ -1,0 +1,10 @@
+GEM
+  remote: file:/home/hone/Projects/heroku_work/bundler/tmp/gems/remote1/
+  specs:
+    rack (1.0.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  rack

@@ -1,0 +1,5 @@
+Autotest.add_hook :initialize do |autotest|
+  %w(.git vendor).each do |directory|
+    autotest.add_exception(directory)
+  end
+end

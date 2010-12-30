@@ -1,0 +1,5 @@
+.DS_Store
+.yardoc
+/coverage
+/doc
+/pkg

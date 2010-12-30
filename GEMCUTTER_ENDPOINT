@@ -1,0 +1,32 @@
+02:40 <carllerche> http://github.com/carlhuda/bundler/blob/master/lib/bundler/index.rb
+02:40 <carllerche> that is the class that bundler uses to track specification indexes
+02:41 <carllerche> http://github.com/carlhuda/bundler/blob/master/lib/bundler/definition.rb#L158
+02:41 <carllerche> that's how they are built
+02:41 <carllerche> the issue is that, indexes are merged at definition time
+02:41 <carllerche> which means, that an index needs to know all of it's specifications before being merged
+02:41 <hone> I was just kidding
+02:42 <carllerche> you can look into it if you want :P
+02:42 <carllerche> i'll answer questions
+02:42 <carllerche> and help
+02:42 <carllerche> basically, instead of merging indexes at build time
+02:42 <carllerche> merging needs to be lazy
+02:43 <carllerche> so, an index needs to know it's fallback
+02:43 <carllerche> and build a chain like that
+02:43 <carllerche> http://github.com/carlhuda/bundler/blob/master/lib/bundler/index.rb#L28
+02:43 <carllerche> search is a big API entry point
+02:43 <carllerche> an index is searched (and a spec is returned) from there
+02:44 <carllerche> indexes are created in gem sources: http://github.com/carlhuda/bundler/blob/master/lib/bundler/source.rb
+02:44 <carllerche> so, you can see the Rubygem source there
+02:44 <carllerche> you initialize it w/ the remote URL
+02:44 <carllerche> (usually just http://rubygems.org)
+02:44 <carllerche> we fall back on RubyGems' api for fetching information
+02:45 <carllerche> Source#specs returns an instance of Index
+02:45 <carllerche> http://github.com/carlhuda/bundler/blob/master/lib/bundler/source.rb#L69
+02:45 <carllerche> this is where the remote rubygems specs are fetched
+02:45 <carllerche> http://github.com/carlhuda/bundler/blob/master/lib/bundler/source.rb#L154
+02:45 <carllerche> you can see that specs are being merged in at build time
+02:46 <carllerche> basically, i bet that the #use API can be modified
+02:46 <carllerche> I think that the new RG endpoint can be implemented by modifying only Index and Source::Rubygems
+02:47 <hone> man so many links crap dude
+02:47 <carllerche> so, the main thing is that the bundler queries an instance of Index with a query, and the instance of Index returns an array of gem 
+                   specifications
