@@ -60,7 +60,7 @@ begin
     namespace :rubygems do
       # Rubygems 1.3.5, 1.3.6, and HEAD specs
       rubyopt = ENV["RUBYOPT"]
-      %w(master REL_1_3_5 REL_1_3_6).each do |rg|
+      %w(master v1.3.5 v1.3.6).each do |rg|
         desc "Run specs with Rubygems #{rg}"
         RSpec::Core::RakeTask.new(rg) do |t|
           t.rspec_opts = %w(-fs --color)
