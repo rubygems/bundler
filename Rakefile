@@ -69,7 +69,7 @@ begin
 
         task "clone_rubygems_#{rg}" do
           unless File.directory?("tmp/rubygems_#{rg}")
-            system("git clone git://github.com/jbarnette/rubygems.git tmp/rubygems_#{rg} && cd tmp/rubygems_#{rg} && git reset --hard #{rg}")
+            system("git clone git://github.com/rubygems/rubygems.git tmp/rubygems_#{rg} && cd tmp/rubygems_#{rg} && git reset --hard #{rg}")
           end
           ENV["RUBYOPT"] = "-I#{File.expand_path("tmp/rubygems_#{rg}/lib")} #{rubyopt}"
         end
