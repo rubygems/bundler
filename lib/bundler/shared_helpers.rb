@@ -96,15 +96,24 @@ module Bundler
         spec = specs.find  { |s| s.name == dep.name }
 
         if spec.nil?
+
           e = Gem::LoadError.new "#{dep.name} is not part of the bundle. Add it to Gemfile."
           e.name = dep.name
-          e.version_requirement = dep.requirement
+          if e.respond_to?(:requirement=)
+            e.requirement = dep.requirement
+          else
+            e.version_requirement = dep.requirement
+          end
           raise e
         elsif dep !~ spec
           e = Gem::LoadError.new "can't activate #{dep}, already activated #{spec.full_name}. " \
                                  "Make sure all dependencies are added to Gemfile."
           e.name = dep.name
-          e.version_requirement = dep.requirement
+          if e.respond_to?(:requirement=)
+            e.requirement = dep.requirement
+          else
+            e.version_requirement = dep.requirement
+          end
           raise e
         end
 
