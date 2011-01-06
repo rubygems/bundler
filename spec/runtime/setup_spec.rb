@@ -107,7 +107,7 @@ describe "Bundler.setup" do
     should_be_installed "rack 1.0.0"
   end
 
-  describe "cripping rubygems" do
+  describe "crippling rubygems" do
     describe "by replacing #gem" do
       before :each do
         install_gemfile <<-G
