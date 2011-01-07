@@ -101,13 +101,15 @@ module Bundler
 
         spec.require_paths.each do |path|
           full_path = File.join(spec.full_gem_path, path)
-          paths << Pathname.new(full_path).relative_path_from(Bundler.root)
+          paths << Pathname.new(full_path).relative_path_from(Bundler.root.join("bundle/bundler"))
         end
       end
 
+      lines = ["path = File.expand_path('..', __FILE__)"]
+
       File.open File.join(bundler_path, "setup.rb"), "w" do |file|
-        lines = paths.map do |path|
-          %{$:.unshift "#{path}"}
+        paths.each do |path|
+          lines << %{$:.unshift File.expand_path("\#{path}/#{path}")}
         end
 
         file.puts lines.join("\n")
