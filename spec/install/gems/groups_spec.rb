@@ -43,6 +43,17 @@ describe "bundle install with gem sources" do
         out = run("require 'thin'; puts THIN")
         out.should == '1.0'
       end
+
+      it "sets up multiple groups paths if Bundler.setup call is repeated" do
+        out = run(<<-R, :emo).split
+          require 'thin'; puts THIN
+          Bundler.setup(:default)
+          require 'rack'; puts RACK
+          Bundler.setup(:emo)
+          require 'activesupport'; puts ACTIVESUPPORT
+        R
+        out.should == ['1.0', '1.0.0', '2.3.5']
+      end
     end
 
     describe "installing --without" do

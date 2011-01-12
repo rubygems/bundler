@@ -99,12 +99,10 @@ module Bundler
         # Load all groups, but only once
         @setup = load.setup
       else
-        # Figure out which groups haven't been loaded yet
-        unloaded = groups - (@completed_groups || [])
-        # Record groups that are now loaded
+        # Record groups that should now be loaded
         @completed_groups = groups | (@completed_groups || [])
-        # Load any groups that are not yet loaded
-        unloaded.any? ? load.setup(*unloaded) : load
+        # Load all groups that should be loaded
+        load.setup(*@completed_groups)
       end
     end
 
