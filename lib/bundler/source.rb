@@ -558,7 +558,7 @@ module Bundler
         if allow_git_ops?
           out = %x{git #{command}}
 
-          if $? != 0
+          if $?.exitstatus != 0
             raise GitError, "An error has occurred in git when running `git #{command}`. Cannot complete bundling."
           end
           out
