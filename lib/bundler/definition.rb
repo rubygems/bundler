@@ -151,16 +151,24 @@ module Bundler
             source_requirements[dep.name] = dep.source.specs
           end
 
-          # Run a resolve against the locally available gems
-          last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve)
-        end
+          # Only run a resolve against the locally available gems if Gemfile has changed
+          # since the last resolve
+          return last_resolve unless gemfile_changed?
+
+          # If it's changed, update hash and rerun resolve
+          Bundler.settings[:gemfile_hash] = gemfile_hash
+          last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve)        end
       end
+    end
+
+    def gemfile_changed?
+      Digest::MD5.hexdigest(File.read(Bundler.default_gemfile)) == Bundler.settings[:gemfile_hash] 
     end
 
     def index
       @index ||= Index.build do |idx|
         @sources.each do |s|
-          idx.use s.specs(@dependencies)
+          idx.use s.specs
         end
       end
     end
