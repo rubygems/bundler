@@ -43,6 +43,17 @@ describe "bundle install with gem sources" do
         out = run("require 'thin'; puts THIN")
         out.should == '1.0'
       end
+
+      it "removes old groups when new groups are set up" do
+        out = run("Bundler.setup(:default); require 'thin'; puts THIN", :emo, :expect_err => true)
+        @err.should =~ /no such file to load -- thin/i
+      end
+
+      it "sets up old groups when they have previously been removed" do
+        out = run("Bundler.setup(:default); Bundler.setup(:default, :emo);" +
+          "require 'thin'; puts THIN", :emo)
+        out.should == '1.0'
+      end
     end
 
     describe "installing --without" do
