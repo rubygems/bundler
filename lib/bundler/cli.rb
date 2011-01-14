@@ -223,7 +223,7 @@ module Bundler
       Bundler.ui.be_quiet! if opts[:quiet]
 
       Installer.install(Bundler.root, Bundler.definition, opts)
-      Bundler.load.cache if Bundler.root.join("vendor/cache").exist?
+      Bundler.load.cache if Bundler.root.join("vendor/cache").exist? && !options[:no_cache]
 
       if Bundler.settings[:path]
         relative_path = Bundler.settings[:path]
