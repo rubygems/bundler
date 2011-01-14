@@ -430,8 +430,7 @@ module Bundler
 
     desc "console [GROUP]", "Opens an IRB session with the bundle pre-loaded"
     def console(group = nil)
-      require 'bundler/setup'
-      group ? Bundler.require(:default, group) : Bundler.require
+      group ? Bundler.require(:default, *(group.split.map! {|g| g.to_sym })) : Bundler.require
       ARGV.clear
 
       require 'irb'
