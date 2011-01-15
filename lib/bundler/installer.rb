@@ -105,14 +105,12 @@ module Bundler
         end
       end
 
-      lines = ["path = File.expand_path('..', __FILE__)"]
 
       File.open File.join(bundler_path, "setup.rb"), "w" do |file|
+        file.puts "path = File.expand_path('..', __FILE__)"
         paths.each do |path|
-          lines << %{$:.unshift File.expand_path("\#{path}/#{path}")}
+          file.puts %{$:.unshift File.expand_path("\#{path}/#{path}")}
         end
-
-        file.puts lines.join("\n")
       end
     end
   end
