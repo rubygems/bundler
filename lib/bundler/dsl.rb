@@ -29,7 +29,7 @@ module Bundler
 
       case gemspecs.size
       when 1
-        spec = Gem::Specification.load(gemspecs.first)
+        spec = Bundler.load_gemspec(gemspecs.first)
         raise InvalidOption, "There was an error loading the gemspec at #{gemspecs.first}." unless spec
         gem spec.name, :path => path
         group(development_group) do
