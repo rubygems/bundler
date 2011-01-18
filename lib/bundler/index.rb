@@ -104,7 +104,7 @@ module Bundler
     def same_version?(a, b)
       regex = /^(.*?)(?:\.0)*$/
 
-      ret = a.to_s[regex, 1] == b.to_s[regex, 1]
+      a.to_s[regex, 1] == b.to_s[regex, 1]
     end
 
     def spec_satisfies_dependency?(spec, dep)

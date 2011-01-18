@@ -49,7 +49,7 @@ describe "The library itself" do
   it "can still be built" do
     Dir.chdir(root) do
       `gem build bundler.gemspec`
-      $?.should == 0
+      check $?.should == 0
 
       # clean up the .gem generated
       system("rm bundler-#{Bundler::VERSION}.gem")

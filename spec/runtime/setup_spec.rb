@@ -68,7 +68,7 @@ describe "Bundler.setup" do
       gem "rack"
     G
 
-    lockfile = File.read(bundled_app("Gemfile.lock"))
+    File.read(bundled_app("Gemfile.lock"))
 
     FileUtils.rm(bundled_app("Gemfile.lock"))
 
