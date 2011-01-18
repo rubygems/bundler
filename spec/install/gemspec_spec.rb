@@ -93,4 +93,16 @@ describe "bundle install from an existing gemspec" do
     should_be_installed "bar-dev 1.0.0", :groups => :dev
   end
 
+  it "should evaluate the gemspec in its directory" do
+    build_lib("foo", :path => tmp.join("foo"))
+    File.open(tmp.join("foo/foo.gemspec"), "w") do |s|
+      s.write "raise 'ahh' unless Dir.pwd == '#{tmp.join("foo")}'"
+    end
+
+    install_gemfile <<-G, :expect_err => true
+      gemspec :path => '#{tmp.join("foo")}'
+    G
+    @err.should_not match(/ahh/)
+  end
+
 end
