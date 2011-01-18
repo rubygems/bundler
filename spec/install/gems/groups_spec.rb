@@ -45,7 +45,7 @@ describe "bundle install with gem sources" do
       end
 
       it "removes old groups when new groups are set up" do
-        out = run <<-RUBY, :emo, :expect_err => true
+        run <<-RUBY, :emo, :expect_err => true
           Bundler.setup(:default)
           require 'thin'; puts THIN
         RUBY
