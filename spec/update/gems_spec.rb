@@ -43,6 +43,15 @@ describe "bundle update" do
       should_be_installed "rack 1.2", "rack-obama 1.0", "activesupport 2.3.5"
     end
   end
+
+  describe "with --local option" do
+    it "doesn't hit repo2" do
+      FileUtils.rm_rf(gem_repo2)
+
+      bundle "update --local"
+      out.should_not match(/Fetching source index/)
+    end
+  end
 end
 
 describe "bundle update in more complicated situations" do
