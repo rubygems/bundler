@@ -69,7 +69,7 @@ describe "bundle install with gem sources" do
       end
     end
 
-    fit "does not update the cache if --no-cache is passed" do
+    it "does not update the cache if --no-cache is passed" do
       gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
