@@ -93,6 +93,8 @@ module Bundler
     end
 
     def setup(*groups)
+      groups.map! { |g| g.to_sym }
+
       if groups.empty?
         # Load all groups, but only once
         @setup ||= load.setup
