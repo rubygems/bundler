@@ -1,6 +1,65 @@
 require "spec_helper"
 
 describe "Bundler.setup" do
+  describe "with no arguments" do
+    it "makes all groups available" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :group => :test
+      G
+
+      ruby <<-RUBY
+        require 'rubygems'
+        require 'bundler'
+        Bundler.setup
+
+        require 'rack'
+        puts RACK
+      RUBY
+      err.should == ""
+      out.should == "1.0.0"
+    end
+  end
+
+  describe "when called with groups" do
+    before(:each) do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :group => :test
+      G
+    end
+
+    it "doesn't make all groups available" do
+      ruby <<-RUBY
+        require 'rubygems'
+        require 'bundler'
+        Bundler.setup(:default)
+
+        begin
+          require 'rack'
+        rescue LoadError
+          puts "WIN"
+        end
+      RUBY
+      err.should == ""
+      out.should == "WIN"
+    end
+
+    it "leaves all groups available if they were already" do
+      ruby <<-RUBY
+        require 'rubygems'
+        require 'bundler'
+        Bundler.setup
+        Bundler.setup(:default)
+
+        require 'rack'
+        puts RACK
+      RUBY
+      err.should == ""
+      out.should == "1.0.0"
+    end
+  end
+
   it "raises if the Gemfile was not yet installed" do
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -611,8 +670,8 @@ describe "Bundler.setup" do
         Bundler.load
       RUBY
 
-      err.should be_empty
-      out.should be_empty
+      err.should == ""
+      out.should == ""
     end
   end
 
