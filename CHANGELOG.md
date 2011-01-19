@@ -1,3 +1,11 @@
+## 1.0.9 (January 19, 2010)
+
+Bugfixes:
+
+  - Fix a bug where Bundler.require could remove gems from the load
+    path. In Rails apps with a default application.rb, this removed
+    all gems in groups other than :default and Rails.env.
+
 ## 1.0.8 (January 18, 2010)
 
 Features:
