@@ -1,6 +1,7 @@
 $:.unshift File.expand_path('../vendor', __FILE__)
 require 'thor'
 require 'thor/actions'
+require 'rubygems/user_interaction'
 require 'rubygems/config_file'
 
 # Work around a RubyGems bug

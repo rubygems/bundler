@@ -1,6 +1,12 @@
 require 'rbconfig'
 require 'fileutils'
 require 'pathname'
+
+begin
+  require 'psych'
+rescue LoadError
+end
+
 require 'yaml'
 require 'bundler/rubygems_ext'
 require 'bundler/version'

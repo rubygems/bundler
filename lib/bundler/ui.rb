@@ -1,3 +1,5 @@
+require 'rubygems/user_interaction'
+
 module Bundler
   class UI
     def warn(message)
