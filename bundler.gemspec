@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.name        = "bundler"
   s.version     = Bundler::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.authors     = ["Carl Lerche", "Yehuda Katz", "André Arko"]
+  s.authors     = ["Carl Lerche", "Yehuda Katz", "André Arko", "Terence Lee"]
   s.email       = ["carlhuda@engineyard.com"]
   s.homepage    = "http://gembundler.com"
   s.summary     = %q{The best way to manage your application's dependencies}

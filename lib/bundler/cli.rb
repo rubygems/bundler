@@ -45,7 +45,7 @@ module Bundler
 
         if have_groff? && root !~ %r{^file:/.+!/META-INF/jruby.home/.+}
           groff   = "groff -Wall -mtty-char -mandoc -Tascii"
-          pager   = ENV['MANPAGER'] || ENV['PAGER'] || 'more'
+          pager   = ENV['MANPAGER'] || ENV['PAGER'] || 'less'
 
           Kernel.exec "#{groff} #{root}/#{command} | #{pager}"
         else
@@ -199,7 +199,7 @@ module Bundler
       Bundler.ui.be_quiet! if opts[:quiet]
 
       Installer.install(Bundler.root, Bundler.definition, opts)
-      Bundler.load.cache if Bundler.root.join("vendor/cache").exist?
+      Bundler.load.cache if Bundler.root.join("vendor/cache").exist? && !options["no-cache"]
 
       if Bundler.settings[:path]
         relative_path = Bundler.settings[:path]
@@ -228,6 +228,8 @@ module Bundler
       possible versions of the gems in the bundle.
     D
     method_option "source", :type => :array, :banner => "Update a specific source (and all gems associated with it)"
+    method_option "local", :type => :boolean, :banner =>
+      "Do not attempt to fetch gems remotely and use the gem cache instead"
     def update(*gems)
       sources = Array(options[:source])
 
@@ -238,7 +240,8 @@ module Bundler
         Bundler.definition(:gems => gems, :sources => sources)
       end
 
-      Installer.install Bundler.root, Bundler.definition, "update" => true
+      opts = {"update" => true, "local" => options[:local]}
+      Installer.install Bundler.root, Bundler.definition, opts
       Bundler.load.cache if Bundler.root.join("vendor/cache").exist?
       Bundler.ui.confirm "Your bundle is updated! " +
         "Use `bundle show [gemname]` to see where a bundled gem is installed."
@@ -390,8 +393,7 @@ module Bundler
 
     desc "console [GROUP]", "Opens an IRB session with the bundle pre-loaded"
     def console(group = nil)
-      require 'bundler/setup'
-      group ? Bundler.require(:default, group) : Bundler.require
+      group ? Bundler.require(:default, *(group.split.map! {|g| g.to_sym })) : Bundler.require
       ARGV.clear
 
       require 'irb'

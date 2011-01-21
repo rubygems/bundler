@@ -95,16 +95,18 @@ module Bundler
     end
 
     def setup(*groups)
-      return @setup if defined?(@setup) && @setup
+      # Just return if all groups are already loaded
+      return @setup if defined?(@setup)
 
       if groups.empty?
         # Load all groups, but only once
         @setup = load.setup
       else
+        @completed_groups ||= []
         # Figure out which groups haven't been loaded yet
-        unloaded = groups - (@completed_groups || [])
+        unloaded = groups - @completed_groups
         # Record groups that are now loaded
-        @completed_groups = groups | (@completed_groups || [])
+        @completed_groups = groups
         # Load any groups that are not yet loaded
         unloaded.any? ? load.setup(*unloaded) : load
       end

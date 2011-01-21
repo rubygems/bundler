@@ -26,7 +26,7 @@ $show_err = true
 
 Spec::Rubygems.setup
 FileUtils.rm_rf(Spec::Path.gem_repo1)
-ENV['RUBYOPT'] = "-I#{Spec::Path.root}/spec/support/rubygems_hax"
+ENV['RUBYOPT'] = "#{ENV['RUBYOPT']} -r#{Spec::Path.root}/spec/support/rubygems_hax/platform.rb"
 ENV['BUNDLE_SPEC_RUN'] = "true"
 
 RSpec.configure do |config|

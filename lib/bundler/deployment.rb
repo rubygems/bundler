@@ -1,7 +1,7 @@
 module Bundler
   class Deployment
     def self.define_task(context, task_method = :task, opts = {})
-      if context.is_a?(Capistrano::Configuration)
+      if defined?(Capistrano) && context.is_a?(Capistrano::Configuration)
         context_name = "capistrano"
         role_default = "{:except => {:no_release => true}}"
       else
@@ -9,7 +9,7 @@ module Bundler
         role_default = "[:app]"
       end
 
-      roles = context.fetch(:bundle_roles, nil)
+      roles = context.fetch(:bundle_roles, false)
       opts[:roles] = roles if roles
 
       context.send :namespace, :bundle do
