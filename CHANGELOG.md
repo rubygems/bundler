@@ -1,4 +1,4 @@
-## 1.0.9 (January 19, 2010)
+## 1.0.9 (January 19, 2011)
 
 Bugfixes:
 
@@ -6,7 +6,7 @@ Bugfixes:
     path. In Rails apps with a default application.rb, this removed
     all gems in groups other than :default and Rails.env.
 
-## 1.0.8 (January 18, 2010)
+## 1.0.8 (January 18, 2011)
 
 Features:
 
