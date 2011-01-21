@@ -1,10 +1,28 @@
+## 1.1.pre (January 21, 2010)
+
+Features:
+
+  - Add bundle clean. Removes unused gems from --path directory
+  - Initial Gemcutter Endpoint API work, BAI Fetching source index
+  - Added bundle install --standalone
+  - Ignore Gemfile.lock when buliding new gems
+  - Make it possible to override a .gemspec dependency's source in the
+    Gemfile
+
+Removed:
+
+  - Removed bundle lock
+  - Removed bundle install <path>
+  - Removed bundle install --production
+  - Removed bundle install --disable-shared-gems
+
 ## 1.0.9 (January 19, 2010)
 
 Bugfixes:
 
   - Fix a bug where Bundler.require could remove gems from the load
     path. In Rails apps with a default application.rb, this removed
-    all gems in groups other than :default and Rails.env.
+    all gems in groups other than :default and Rails.env
 
 ## 1.0.8 (January 18, 2010)
 
