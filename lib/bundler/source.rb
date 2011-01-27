@@ -560,9 +560,8 @@ module Bundler
           out = %x{git #{command}}
 
           if $?.exitstatus != 0
-            msg = "Git error: " +
-              "command `git #{command}` in directory #{Dir.pwd} has failed.\n" +
-              "Cannot complete bundling."
+            msg = "Git error: command `git #{command}` in directory #{Dir.pwd} has failed."
+            msg << "\nIf this error persists you could try removing the cache directory '#{cache_path}'" if cached?
             raise GitError, msg
           end
           out
