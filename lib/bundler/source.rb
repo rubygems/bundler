@@ -560,7 +560,9 @@ module Bundler
           out = %x{git #{command}}
 
           if $?.exitstatus != 0
-            raise GitError, "An error has occurred in git when running `git #{command}`. Cannot complete bundling."
+            error_message = "An error has occurred in git when running `git #{command}`. Cannot complete bundling."
+            error_message << "\nIf this error persists you could try removing the cache directory '#{cache_path}'" if cached?
+            raise GitError, error_message
           end
           out
         else
