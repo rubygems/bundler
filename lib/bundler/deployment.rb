@@ -45,7 +45,7 @@ module Bundler
           args << bundle_flags.to_s
           args << "--without #{bundle_without.join(" ")}" unless bundle_without.empty?
 
-          run "#{bundle_cmd} install #{args.join(' ')}"
+          run "cd #{context.fetch(:current_release)}; #{bundle_cmd} install #{args.join(' ')}"
         end
       end
     end
