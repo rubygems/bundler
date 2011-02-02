@@ -1,6 +1,12 @@
 require 'rbconfig'
 require 'fileutils'
 require 'pathname'
+
+begin
+  require 'psych'
+rescue LoadError
+end
+
 require 'yaml'
 require 'bundler/rubygems_ext'
 require 'bundler/version'
@@ -226,12 +232,13 @@ module Bundler
       path = Pathname.new(file)
       # Eval the gemspec from its parent directory
       Dir.chdir(path.dirname.to_s) do
+        contents = File.read(path.basename.to_s)
         begin
-          Gem::Specification.from_yaml(path.basename.to_s)
+          Gem::Specification.from_yaml(contents)
           # Raises ArgumentError if the file is not valid YAML
         rescue ArgumentError, SyntaxError, Gem::EndOfYAMLException, Gem::Exception
           begin
-            eval(File.read(path.basename.to_s), TOPLEVEL_BINDING, path.expand_path.to_s)
+            eval(contents, TOPLEVEL_BINDING, path.expand_path.to_s)
           rescue LoadError => e
             original_line = e.backtrace.find { |line| line.include?(path.to_s) }
             msg  = "There was a LoadError while evaluating #{path.basename}:\n  #{e.message}"

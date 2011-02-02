@@ -16,6 +16,13 @@ Removed:
   - Removed bundle install --production
   - Removed bundle install --disable-shared-gems
 
+## 1.0.10 (February 1, 2011)
+
+Bugfixes:
+
+  - Fix a regression loading YAML gemspecs from :git and :path gems
+  - Requires, namespaces, etc. to work with changes in Rubygems 1.5
+
 ## 1.0.9 (January 19, 2011)
 
 Bugfixes:

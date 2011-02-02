@@ -1,3 +1,5 @@
+require 'rubygems/user_interaction'
+
 module Bundler
   class UI
     def warn(message)
@@ -53,9 +55,10 @@ module Bundler
       end
     end
 
-    class RGProxy < Gem::SilentUI
+    class RGProxy < ::Gem::SilentUI
       def initialize(ui)
         @ui = ui
+        super()
       end
 
       def say(message)

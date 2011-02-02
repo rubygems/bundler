@@ -1,3 +1,5 @@
+require 'rubygems/user_interaction'
+
 module Spec
   module Rubygems
     def self.setup

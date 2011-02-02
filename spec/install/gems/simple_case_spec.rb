@@ -531,6 +531,15 @@ describe "bundle install with gem sources" do
       bundle :install
       err.should be_empty
     end
+
+    it "still installs correctly when using path" do
+      build_lib 'yaml_spec', :gemspec => :yaml
+
+      install_gemfile <<-G
+        gem 'yaml_spec', :path => "#{lib_path('yaml_spec-1.0')}"
+      G
+      err.should == ""
+    end
   end
 
   describe "bundler dependencies" do
