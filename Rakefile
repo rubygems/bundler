@@ -71,7 +71,8 @@ begin
           unless File.directory?("tmp/rubygems")
             system("git clone git://github.com/rubygems/rubygems.git tmp/rubygems")
           end
-          system("cd tmp/rubygems && git remote update && git reset --hard origin/#{rg}")
+          system("cd tmp/rubygems && git checkout #{rg}")
+          system("git pull") if rg == "master"
           ENV["RUBYOPT"] = "-I#{File.expand_path("tmp/rubygems/lib")} #{rubyopt}"
         end
 
