@@ -1,3 +1,9 @@
+## 1.1.pre.1 (February 2, 2011)
+
+Bugfixes:
+
+  - Compatibility with changes made by Rubygems 1.5
+
 ## 1.1.pre (January 21, 2011)
 
 Features:
