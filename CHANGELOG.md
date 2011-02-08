@@ -1,3 +1,40 @@
+## 1.0.10 (February 1, 2011)
+
+Bugfixes:
+
+  - Fix a regression loading YAML gemspecs from :git and :path gems
+  - Requires, namespaces, etc. to work with changes in Rubygems 1.5
+
+## 1.0.9 (January 19, 2011)
+
+Bugfixes:
+
+  - Fix a bug where Bundler.require could remove gems from the load
+    path. In Rails apps with a default application.rb, this removed
+    all gems in groups other than :default and Rails.env.
+
+## 1.0.8 (January 18, 2011)
+
+Features:
+
+  - Allow overriding gemspec() deps with :git deps
+  - Add --local option to `bundle update`
+  - Ignore Gemfile.lock in newly generated gems
+  - Use `less` as help pager instead of `more`
+  - Run `bundle exec rake` instead of `rake` in Capistrano tasks
+
+Bugfixes:
+
+  - Fix --no-cache option for `bundle install`
+  - Allow Vlad deploys to work without Capistrano gem installed
+  - Fix group arguments to `bundle console`
+  - Allow groups to be loaded even if other groups were loaded
+  - Evaluate gemspec() gemspecs in their directory not the cwd
+  - Count on Rake to chdir to the right place in GemHelper
+  - Change Pathnames to Strings for MacRuby
+  - Check git process exit status correctly
+  - Fix some warnings in 1.9.3-trunk (thanks tenderlove)
+
 ## 1.0.7 (November 17, 2010)
 
 Bugfixes:
@@ -289,8 +326,6 @@ isolation.
     (for instance, with different versions or sources).
   - Fix cases where the same dependency appeared several times in the Gemfile.lock
   - Fix a bug where require errors were being swallowed during Bundler.require
-
-## BACKFILL COMING
 
 ## 1.0.0.beta.1
 

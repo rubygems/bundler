@@ -177,7 +177,7 @@ describe "bundle install with platform conditionals" do
   end
 
   it "does not blow up on sources with all platform-excluded specs" do
-    git = build_git "foo"
+    build_git "foo"
 
     install_gemfile <<-G
       platform :#{not_local_tag} do

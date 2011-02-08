@@ -529,7 +529,7 @@ module Spec
     end
 
     class GitUpdater < LibBuilder
-      WINDOWS = Config::CONFIG["host_os"] =~ %r!(msdos|mswin|djgpp|mingw)!
+      WINDOWS = RbConfig::CONFIG["host_os"] =~ %r!(msdos|mswin|djgpp|mingw)!
       NULL    = WINDOWS ? "NUL" : "/dev/null"
 
       def silently(str)

@@ -1,6 +1,65 @@
 require "spec_helper"
 
 describe "Bundler.setup" do
+  describe "with no arguments" do
+    it "makes all groups available" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :group => :test
+      G
+
+      ruby <<-RUBY
+        require 'rubygems'
+        require 'bundler'
+        Bundler.setup
+
+        require 'rack'
+        puts RACK
+      RUBY
+      err.should == ""
+      out.should == "1.0.0"
+    end
+  end
+
+  describe "when called with groups" do
+    before(:each) do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :group => :test
+      G
+    end
+
+    it "doesn't make all groups available" do
+      ruby <<-RUBY
+        require 'rubygems'
+        require 'bundler'
+        Bundler.setup(:default)
+
+        begin
+          require 'rack'
+        rescue LoadError
+          puts "WIN"
+        end
+      RUBY
+      err.should == ""
+      out.should == "WIN"
+    end
+
+    it "leaves all groups available if they were already" do
+      ruby <<-RUBY
+        require 'rubygems'
+        require 'bundler'
+        Bundler.setup
+        Bundler.setup(:default)
+
+        require 'rack'
+        puts RACK
+      RUBY
+      err.should == ""
+      out.should == "1.0.0"
+    end
+  end
+
   it "raises if the Gemfile was not yet installed" do
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -68,7 +127,7 @@ describe "Bundler.setup" do
       gem "rack"
     G
 
-    lockfile = File.read(bundled_app("Gemfile.lock"))
+    File.read(bundled_app("Gemfile.lock"))
 
     FileUtils.rm(bundled_app("Gemfile.lock"))
 
@@ -107,7 +166,7 @@ describe "Bundler.setup" do
     should_be_installed "rack 1.0.0"
   end
 
-  describe "cripping rubygems" do
+  describe "crippling rubygems" do
     describe "by replacing #gem" do
       before :each do
         install_gemfile <<-G
@@ -129,6 +188,19 @@ describe "Bundler.setup" do
         out.should match /\nWIN\Z/
       end
 
+      it "version_requirement is now deprecated in rubygems 1.4.0+ when gem is missing" do
+        run <<-R, :expect_err => true
+          begin
+            gem "activesupport"
+            puts "FAIL"
+          rescue LoadError
+            puts "WIN"
+          end
+        R
+
+        err.should be_empty
+      end
+
       it "replaces #gem but raises when the version is wrong" do
         run <<-R
           begin
@@ -140,6 +212,19 @@ describe "Bundler.setup" do
         R
 
         out.should match /\nWIN\Z/
+      end
+
+      it "version_requirement is now deprecated in rubygesm 1.4.0+  when the version is wrong" do
+        run <<-R, :expect_err => true
+          begin
+            gem "rack", "1.0.0"
+            puts "FAIL"
+          rescue LoadError
+            puts "WIN"
+          end
+        R
+
+        err.should be_empty
       end
     end
 
@@ -346,6 +431,31 @@ describe "Bundler.setup" do
         R
 
         out.should == "You have already activated thin 1.1, but your Gemfile requires thin 1.0. Consider using bundle exec."
+      end
+
+      it "version_requirement is now deprecated in rubygems 1.4.0+" do
+        system_gems "thin-1.0", "rack-1.0.0"
+        build_gem "thin", "1.1", :to_system => true do |s|
+          s.add_dependency "rack"
+        end
+
+        gemfile <<-G
+          gem "thin", "1.0"
+        G
+
+        ruby <<-R, :expect_err => true
+          require 'rubygems'
+          gem "thin"
+          require 'bundler'
+          begin
+            Bundler.setup
+            puts "FAIL"
+          rescue Gem::LoadError => e
+            puts e.message
+          end
+        R
+
+        err.should be_empty
       end
     end
   end
@@ -559,8 +669,8 @@ describe "Bundler.setup" do
         Bundler.load
       RUBY
 
-      err.should be_empty
-      out.should be_empty
+      err.should == ""
+      out.should == ""
     end
   end
 

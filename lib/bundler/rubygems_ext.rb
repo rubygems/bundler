@@ -105,6 +105,12 @@ module Gem
 
     alias eql? ==
 
+    def encode_with(coder)
+      to_yaml_properties.each do |ivar|
+        coder[ivar.to_s.sub(/^@/, '')] = instance_variable_get(ivar)
+      end
+    end
+
     def to_yaml_properties
       instance_variables.reject { |p| ["@source", "@groups"].include?(p.to_s) }
     end

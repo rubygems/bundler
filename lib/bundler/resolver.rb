@@ -415,7 +415,7 @@ module Bundler
     end
 
     def error_message
-      output = errors.inject("") do |o, (conflict, (origin, requirement))|
+      errors.inject("") do |o, (conflict, (origin, requirement))|
 
         # origin is the SpecSet of specs from the Gemfile that is conflicted with
         if origin
@@ -430,7 +430,7 @@ module Bundler
             o << "  Current Bundler version:\n"
             newer_bundler_required = requirement.requirement > Gem::Requirement.new(origin.version)
           # If the origin is a LockfileParser, it does not respond_to :required_by
-          elsif !origin.respond_to?(:required_by) || !(required_by = origin.required_by.first)
+          elsif !origin.respond_to?(:required_by) || !(origin.required_by.first)
             o << "  In snapshot (Gemfile.lock):\n"
           end
 

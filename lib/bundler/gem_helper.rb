@@ -4,11 +4,10 @@ require 'bundler'
 
 module Bundler
   class GemHelper
-    def self.install_tasks(opts = nil)
-      pwd = Dir.pwd
-      dir = Rake.application.find_rakefile_location[1]
+    def self.install_tasks(opts = {})
+      dir = opts[:dir] || Dir.pwd
+      self.new(dir, opts[:name]).install
       Dir.chdir(pwd)
-      self.new(dir, opts && opts[:name]).install
     end
 
     attr_reader :spec_path, :base, :gemspec

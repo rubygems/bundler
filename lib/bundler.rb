@@ -1,6 +1,12 @@
 require 'rbconfig'
 require 'fileutils'
 require 'pathname'
+
+begin
+  require 'psych'
+rescue LoadError
+end
+
 require 'yaml'
 require 'bundler/rubygems_ext'
 require 'bundler/version'
@@ -111,16 +117,18 @@ module Bundler
     end
 
     def setup(*groups)
-      return @setup if defined?(@setup) && @setup
+      # Just return if all groups are already loaded
+      return @setup if defined?(@setup)
 
       if groups.empty?
         # Load all groups, but only once
         @setup = load.setup
       else
+        @completed_groups ||= []
         # Figure out which groups haven't been loaded yet
-        unloaded = groups - (@completed_groups || [])
+        unloaded = groups - @completed_groups
         # Record groups that are now loaded
-        @completed_groups = groups | (@completed_groups || [])
+        @completed_groups = groups
         # Load any groups that are not yet loaded
         unloaded.any? ? load.setup(*unloaded) : load
       end
@@ -235,13 +243,14 @@ module Bundler
     def load_gemspec(file)
       path = Pathname.new(file)
       # Eval the gemspec from its parent directory
-      Dir.chdir(path.dirname) do
+      Dir.chdir(path.dirname.to_s) do
+        contents = File.read(path.basename.to_s)
         begin
-          Gem::Specification.from_yaml(path.basename)
+          Gem::Specification.from_yaml(contents)
           # Raises ArgumentError if the file is not valid YAML
         rescue ArgumentError, SyntaxError, Gem::EndOfYAMLException, Gem::Exception
           begin
-            eval(File.read(path.basename), TOPLEVEL_BINDING, path.expand_path.to_s)
+            eval(contents, TOPLEVEL_BINDING, path.expand_path.to_s)
           rescue LoadError => e
             original_line = e.backtrace.find { |line| line.include?(path.to_s) }
             msg  = "There was a LoadError while evaluating #{path.basename}:\n  #{e.message}"
