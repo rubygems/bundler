@@ -58,7 +58,7 @@ describe "bundle install with gem sources" do
           Bundler.setup(:default, :emo)
           require 'thin'; puts THIN
         RUBY
-        out.should == '1.0'
+        out.should match /\n1.0\Z/
       end
     end
 

@@ -17,7 +17,7 @@ describe "Bundler.setup" do
         puts RACK
       RUBY
       err.should == ""
-      out.should == "1.0.0"
+      out.should match /\n1.0.0\Z/
     end
   end
 
@@ -42,7 +42,7 @@ describe "Bundler.setup" do
         end
       RUBY
       err.should == ""
-      out.should == "WIN"
+      out.should match /\nWIN\Z/
     end
 
     it "leaves all groups available if they were already" do
@@ -56,7 +56,7 @@ describe "Bundler.setup" do
         puts RACK
       RUBY
       err.should == ""
-      out.should == "1.0.0"
+      out.should match /\n1.0.0\Z/
     end
   end
 
