@@ -323,7 +323,7 @@ module Bundler
       alias == eql?
 
       def name
-        File.basename(@path.to_s)
+        File.basename(path.expand_path(Bundler.root).to_s)
       end
 
       def load_spec_files
