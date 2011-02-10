@@ -253,7 +253,7 @@ module Spec
       else
         input = uri  # assume it is still an ssh/git URI
       end
-      Digest::SHA1.hexdigest(input)
+      ::Digest::SHA1.hexdigest(input)
     end
 
   end
