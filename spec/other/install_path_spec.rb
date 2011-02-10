@@ -155,22 +155,6 @@ describe "Bundler's full install path can point anywhere" do
           Dir.entries(@installed_path).size.should == 3
         end
 
-        it "installs gems's contents to BUNDLE_INSTALL_PATH relative to root when relative" do
-          env = set_bundle_install_path(type, "../#{@install_path}")
-
-          FileUtils.mkdir_p bundled_app('lol')
-          Dir.chdir(bundled_app('lol')) do
-            bundle :install
-          end
-
-          bundled_app('vendor/gems/rack-1.0.0').should_not be_directory
-          should_be_installed "rack 1.0.0", env
-        end
-
-        it "necessitates the full path be given to require the library" do
-          env = set_bundle_install_path(type, @install_folder)
-          should_be_installed "rack 1.0.0", env
-        end
       end
     end
 
