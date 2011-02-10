@@ -37,20 +37,36 @@ describe "bundle with git sources" do
     source  = Bundler::Source::Git.new("uri" => "ssh://user@host.xz:port/~user/path/to/repo.git/")
     source.send(:base_name).should == "repo"
   end
+  it "base_name should parse a Git repository location described with SSH URI syntax with username expansion" do
+    source  = Bundler::Source::Git.new("uri" => "ssh://user@host.xz/~user/path/to/repo.git/")
+    source.send(:base_name).should == "repo"
+  end
+  it "base_name should parse a Git repository location described with SSH URI syntax with username expansion" do
+    source  = Bundler::Source::Git.new("uri" => "ssh://user@host.xz/path/to/repo.git/")
+    source.send(:base_name).should == "repo"
+  end
   it "base_name should parse a Git repository location described with Git URI syntax with username expansion" do
     source  = Bundler::Source::Git.new("uri" => "git://host.xz:port/~user/path/to/repo.git/")
     source.send(:base_name).should == "repo"
   end
   it "base_name should parse a Git repository location described with SCP URI syntax with username expansion" do
-    source  = Bundler::Source::Git.new("uri" => "user@host.xz:/~user/path/to/repo.git/")
+    source  = Bundler::Source::Git.new("uri" => "user@host.xz:/path/to/repo/.git/")
+    source.send(:base_name).should == "repo"
+  end
+  it "base_name should parse a Git repository location described with SCP URI syntax with username expansion" do
+    source  = Bundler::Source::Git.new("uri" => "user@host.xz:~user/path/to/repo/.git/")
     source.send(:base_name).should == "repo"
   end
   it "base_name should parse a Git repository location described with File URI syntax with hostname" do
-    source  = Bundler::Source::Git.new("uri" => "file://host.name.org/path/to/repo.git/")
+    source  = Bundler::Source::Git.new("uri" => "file://host.name.org/path/to/repo/.git")
     source.send(:base_name).should == "repo"
   end
   it "base_name should parse a Git repository location described with File URI syntax without hostname" do
-    source  = Bundler::Source::Git.new("uri" => "file:///path/to/repo.git/")
+    source  = Bundler::Source::Git.new("uri" => "file:///path/to/repo/.git/")
+    source.send(:base_name).should == "repo"
+  end
+  it "base_name should parse a Git repository location described with File URI syntax without hostname" do
+    source  = Bundler::Source::Git.new("uri" => "file:///path/to/repo/.git")
     source.send(:base_name).should == "repo"
   end
 end
