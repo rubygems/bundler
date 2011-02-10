@@ -45,31 +45,35 @@ describe "Bundler.require" do
     G
   end
 
-  it "requires the gems" do
-    # default group
-    run "Bundler.require"
-    check out.should match /\ntwo\Z/
+  describe "requires gems" do
+    it "recognizes the default group" do
+      run "Bundler.require"
+      check out.should match /\ntwo\Z/
+    end
 
-    # specific group
-    run "Bundler.require(:bar)"
-    check out.should match /\nbaz\nqux\Z/
+    it "specific group" do
+      run "Bundler.require(:bar)"
+      check out.should match /\nbaz\nqux\Z/
+    end
 
-    # default and specific group
-    run "Bundler.require(:default, :bar)"
-    check out.should match /\nbaz\nqux\ntwo\Z/
+    it "recognizes the default and specific group" do
+      run "Bundler.require(:default, :bar)"
+      check out.should match /\nbaz\nqux\ntwo\Z/
+    end
 
-    # specific group given as a string
-    run "Bundler.require('bar')"
-    check out.should match /\nbaz\nqux\Z/
+    it "recognizes the specific group given as a string" do
+      run "Bundler.require('bar')"
+      check out.should match /\nbaz\nqux\Z/
+    end
 
-    # specific group declared as a string
-    run "Bundler.require(:string)"
-    check out.should match /\nsix\Z/
+    it "recognizes the specific group declared as a string" do
+      run "Bundler.require(:string)"
+      check out.should match /\nsix\Z/
+    end
 
-    # required in resolver order instead of gemfile order
-    run("Bundler.require(:not)")
-    pending "A regexp to match specific gemspec order" do
-      out.split("\n").sort.should == ['seven', 'three']
+    it "recognizes the required in resolver order instead of gemfile order" do
+      run("Bundler.require(:not)")
+      out.split("\n").sort[0...2].should == ['seven', 'three']
     end
   end
 
