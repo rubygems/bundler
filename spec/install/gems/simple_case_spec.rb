@@ -224,8 +224,6 @@ describe "bundle install with gem sources" do
           gem "platform_specific"
         G
 
-#        run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
-#        out.should match /1.0.0 JAVA/
         should_be_installed "platform_specific 1.0.0 #{java}", :check_platform => true
       end
 
@@ -237,8 +235,6 @@ describe "bundle install with gem sources" do
           gem "platform_specific"
         G
 
-#        run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
-#        out.should match /1.0.0 MSWIN/
           should_be_installed "platform_specific 1.0.0 #{mswin}", :check_platform => true
       end
     end
