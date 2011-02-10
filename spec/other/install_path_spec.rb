@@ -155,84 +155,21 @@ describe "Bundler's full install path can point anywhere" do
           Dir.entries(@installed_path).size.should == 3
         end
 
-##    it "installs gems's contents to BUNDLE_INSTALL_PATH relative to root when relative" do
-##      set_bundle_install_path(type, "../#{@install_path}")
-##
-##      FileUtils.mkdir_p bundled_app('lol')
-##      Dir.chdir(bundled_app('lol')) do
-##        bundle :install
-##      end
-##
-##      bundled_app('vendor/gems/rack-1.0.0').should_not be_directory
-##      puts File.expand_path(File.join(bundled_app("#{@install_path}"),"**", "*"))
-##      bundled_app("../#{@install_path}/gems/rack-1.0.0").should be_directory
-##      should_be_installed "rack 1.0.0"
-##    end
+        it "installs gems's contents to BUNDLE_INSTALL_PATH relative to root when relative" do
+          env = set_bundle_install_path(type, "../#{@install_path}")
 
-#        it "necessitates the full path be given to require the library" do
-#          opts = set_bundle_install_path(type, @install_folder)
-#          should_be_installed "rack 1.0.0", opts
-#        end
-
-#        it "installs gems' contents to BUNDLE_INSTALL_PATH with #{type}" do
-#          set_bundle_install_path(type, bundled_app(@install_path).to_s)
-#
-#          bundle :install
-#
-          # bundled_app('vendor/gems/rack-1.0.0').should_not be_directory
-#          puts File.expand_path(File.join(bundled_app("#{@install_path}").to_s,"**", "*"))
-#          puts Dir.glob(File.join(bundled_app("#{@install_path}").to_s,"**", "*"))
-#          bundled_app("#{@install_path}/gems/rack-1.0.0").should be_directory
-#          should_be_installed "rack 1.0.0"
-#        end
-
-      end
-    end
-
-    describe "Bundler show <gem>" do
-      context "with a Gemfile" do
-        it "shows the installed location of an bundled gem is the given install-path" do
-          build_lib "rack", "1.0.0", :to_system => true do |s|
-            s.write "lib/rack.rb", "raise 'FAIL'"
+          FileUtils.mkdir_p bundled_app('lol')
+          Dir.chdir(bundled_app('lol')) do
+            bundle :install
           end
-          install_folder = [Array.new(6){rand(50).chr}.join].pack("m").chomp
-          env = {'no-color' => true}
-          env['gemfile']    = bundled_app.to_s
-          env = env.merge set_bundle_install_path(type, install_folder, env)
-          ipath           = build_install_path(install_folder)
-          installed_path   = File.join(ipath, 'gems','rack-1.0.0','lib')
-          gemfile <<-G
-            source "file://#{gem_repo1}"
-            gem "rack"
-          G
-          bundle "install", env
-          pending "show needs to return the install-path" do
-            bundle 'show rack'  # TODO This should point to the installed path
-            out.should match /Some success message/
-          end
+
+          bundled_app('vendor/gems/rack-1.0.0').should_not be_directory
+          should_be_installed "rack 1.0.0", env
         end
-      end
 
-      context "without a Gemfile" do
-        it "complains about the missing Gemfile" do
-          build_lib "rack", "1.0.0", :to_system => true do |s|
-            s.write "lib/rack.rb", "raise 'FAIL'"
-          end
-          install_folder = [Array.new(6){rand(50).chr}.join].pack("m").chomp
-          env = {'no-color' => true}
-          env['gemfile']    = bundled_app.to_s
-          env = env.merge set_bundle_install_path(type, install_folder, env)
-          ipath           = build_install_path(install_folder)
-          installed_path   = File.join(ipath, 'gems','rack-1.0.0','lib')
-          gemfile <<-G
-            source "file://#{gem_repo1}"
-            gem "rack"
-          G
-          bundle "install", env
-          Dir.chdir(installed_path) do
-            bundle 'show rack'
-            out.should match /Could not locate Gemfile/
-          end
+        it "necessitates the full path be given to require the library" do
+          env = set_bundle_install_path(type, @install_folder)
+          should_be_installed "rack 1.0.0", env
         end
       end
     end
