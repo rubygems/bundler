@@ -134,7 +134,7 @@ module Bundler
     method_option "disable-shared-gems", :type => :boolean, :banner =>
       "This option is deprecated. Please do not use it."
     method_option "gemfile", :type => :string, :banner =>
-      "Use the specified gemfile instead of Gemfile"
+      "Specify a different path than the current folder, and/or use the specified gemfile name instead of Gemfile."
     method_option "no-prune", :type => :boolean, :banner =>
       "Don't remove stale gems from the cache."
     method_option "no-cache", :type => :boolean, :banner =>
