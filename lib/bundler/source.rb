@@ -336,7 +336,6 @@ module Bundler
 
         expanded_path = path.expand_path(Bundler.root)
 
-#$stderr.puts "expanded_path: #{File.directory?(expanded_path)} #{expanded_path.inspect}"
         if File.directory?(expanded_path)
           Dir["#{expanded_path}/#{@glob}"].each do |file|
             spec = Bundler.load_gemspec(file)
@@ -364,7 +363,6 @@ module Bundler
         else
           raise PathError, "The path `#{expanded_path}` does not exist."
         end
-# $stderr.puts "index: #{index.inspect}"
 
         index
       end
@@ -482,7 +480,6 @@ module Bundler
         @revision   = options["revision"]
         @submodules = options["submodules"]
         @decorate   = options["decorate"].kind_of?(FalseClass) || options["git_decorate"].kind_of?(FalseClass) ? false : true
-# $stderr.puts("Git Source options['decorate']: #{options['decorate']} - options['git_decorate']: #{options['git_decorate']} @decorate: #{@decorate}")
         @overwrite  = options["overwrite"].kind_of?(FalseClass) ? false : true  # TODO Maybe - currently no spec fails without this...
         @update     = false
       end
@@ -528,13 +525,7 @@ module Bundler
 
       def subsequent_install?
         # subsequent bundle install - seen while parsing lockfile
-        res = @options['uri'] && @options['uri'][/git\:\/\//] && @options['revision'] && @options['git'].nil?
-        if res
-          debug_decorate(res)
-        else
-          debug_decorate(res)
-        end
-        res
+        @options['uri'] && @options['uri'][/git\:\/\//] && @options['revision'] && @options['git'].nil?
       end
 
 
@@ -542,10 +533,8 @@ module Bundler
         # subsequent bundle install - seen while parsing lockfile
         if @options['folder']
           res = true
-#          debug_decorate(res)
         else
           res = false
-#          debug_decorate(res)
         end
         res
       end
@@ -564,15 +553,12 @@ module Bundler
           plain = Dir.exist?("#{Bundler.install_path}/#{base_name}")
           dec = Dir.exist?(@options['folder']) && @options['folder'][/#{shortref_for_path(rev.to_s)}/]
           if plain && !dec
-            #@options['uri'] = "#{Bundler.install_path}/#{name}"
-            #@options['ref'] = @options['revision'] unless @options['ref']
             @options['git_decorate'] = false
             @decorate = false
           elsif dec
             @options['git_decorate'] = true
             @decorate = true
           end
-# $stderr.puts "plain && !dec: #{plain && !dec} dec: #{dec}"
           @decorate
         end
 
@@ -606,16 +592,6 @@ module Bundler
         else
           @allow_cached = false
         end
-        if @options['git_decorate'].nil? # && @options['decorate'].nil?
-          if repo_matched
-            #@decorate = @options['uri'][/-#{shortref_for_path(ref.to_s)}/] ? true : false
-          end
-          # @options['git_decorate'] = @decorate
-          # @options['decorate'] = @decorate
-        else
-          #@decorate = @options['git_decorate']
-        end
-# $stderr.puts "Decorate set to: #{@decorate}"
         @decorate
       end
 
