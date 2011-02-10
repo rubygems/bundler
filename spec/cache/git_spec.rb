@@ -31,7 +31,7 @@ describe "bundle cache" do
       G
 
       bundle "cache"
-      pending do
+      pending "resolution of Bundler issue #67 (Github)" do
         bundled_app("vendor/cache/foo-1.0.0.gem").should exist
       end
     end
