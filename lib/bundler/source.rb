@@ -317,7 +317,6 @@ module Bundler
       def eql?(o)
         o.instance_of?(Path) &&
         path.expand_path(Bundler.root) == o.path.expand_path(Bundler.root) &&
-        name == o.name &&
         version == o.version
       end
 
