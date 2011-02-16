@@ -5,7 +5,7 @@ describe "bundle lock with git gems" do
     build_git "foo"
 
     install_gemfile <<-G
-      gem 'foo', :git => "#{lib_path('foo-1.0')}"
+      gem 'foo', :git => "file://#{lib_path('foo-1.0')}/.git"
     G
   end
 
@@ -22,7 +22,7 @@ describe "bundle lock with git gems" do
       puts "WIN" unless defined?(FOO_PREV_REF)
     RUBY
 
-    out.should == "WIN"
+    out.should match /WIN/
   end
 
   it "provides correct #full_gem_path" do

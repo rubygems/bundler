@@ -86,7 +86,7 @@ describe "Bundler.load" do
         end
       RUBY
 
-      out.split("\n").should == ["1.0.0", "no activesupport"]
+      out.should match /\n1.0.0\nno activesupport\Z/
     end
   end
 

@@ -15,6 +15,7 @@ module Bundler
       @platform      = platform
       @source        = source
       @specification = nil
+      @decorate      = source.nil? ? true : source.decorate? # source ? source.decorate? : true # (source.kind_of?(::Bundler::Source::Git) ? source.decorate? : true)
     end
 
     def full_name
@@ -46,6 +47,7 @@ module Bundler
 
     def __materialize__
       @specification = source.specs.search(Gem::Dependency.new(name, version)).last
+      @specification
     end
 
     def respond_to?(*args)

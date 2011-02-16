@@ -145,7 +145,7 @@ module Bundler
     def debug
       if ENV['DEBUG_RESOLVER']
         debug_info = yield
-        debug_info = debug_info.inpsect unless debug_info.is_a?(String)
+        debug_info = debug_info.inspect unless debug_info.is_a?(String)
         $stderr.puts debug_info
       end
     end
@@ -193,9 +193,11 @@ module Bundler
       # that the currently activated gem satisfies the requirement.
       existing = activated[current.name]
       if existing || current.name == 'bundler'
+        debug { "  Gem has already been activated:\n  #{current.name} (#{existing})"}
         # Force the current
         if current.name == 'bundler' && !existing
           existing = search(DepProxy.new(Gem::Dependency.new('bundler', VERSION), Gem::Platform::RUBY)).first
+          debug { "  Force the current:\n  #{current.name} (#{existing})"}
           raise GemNotFound, %Q{Bundler could not find gem "bundler" (#{VERSION})} unless existing
           existing.required_by << existing
           activated['bundler'] = existing
@@ -253,7 +255,9 @@ module Bundler
         matching_versions = search(current)
 
         if matching_versions.empty?
+          debug { "  No matching versions:\n  #{current.inspect}"}
           if current.required_by.empty?
+            debug { "    No required_by:\n  #{@base.inspect}"}
             if base = @base[current.name] and !base.empty?
               version = base.first.version
               message = "You have requested:\n" \
@@ -261,18 +265,21 @@ module Bundler
                     "The bundle currently has #{current.name} locked at #{version}.\n" \
                     "Try running `bundle update #{current.name}`"
             elsif current.source
+              debug { "    Current source:\n  #{current.source} (#{current.name})"}
               name = current.name
               versions = @source_requirements[name][name].map { |s| s.version }
               message  = "Could not find gem '#{current}' in #{current.source}.\n"
               if versions.any?
+                debug { "      Versions:\n  #{current.source} (#{current.name})"}
                 message << "Source contains '#{name}' at: #{versions.join(', ')}"
               else
+                debug { "      No versions"}
                 message << "Source does not contain any versions of '#{current}'"
               end
             else
               message = "Could not find gem '#{current}' "
               if @index.sources.include?(Bundler::Source::Rubygems)
-                message << "in any of the gem sources listed in your Gemfile."
+                message << "in any of the gem sources listed in your Gemfile (or Gemfile.lock)."
               else
                 message << "in the gems available on this machine."
               end
@@ -320,6 +327,7 @@ module Bundler
 
       activated[spec_group.name] = spec_group
       debug { "  Activating: #{spec_group.name} (#{spec_group.version})" }
+      debug { "              #{spec_group.inspect}\n              #{requirement.inspect}\n              #{reqs.inspect}" }
       debug { spec_group.required_by.map { |d| "    * #{d.name} (#{d.requirement})" }.join("\n") }
 
       dependencies = spec_group.activate_platform(requirement.__platform)

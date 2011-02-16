@@ -20,10 +20,9 @@ Gem::Specification.new do |s|
   s.add_development_dependency "ronn"
   s.add_development_dependency "rspec", "2.0.0.rc"
 
-  # Man files are required because they are ignored by git
-  man_files            = Dir.glob("lib/bundler/man/**/*")
-  s.files              = `git ls-files`.split("\n") + man_files
-  s.test_files         = `git ls-files -- {test,spec,features}/*`.split("\n")
+  misc_files           = %w(bundler.gemspec CHANGELOG.md ISSUES.md LICENSE Rakefile README.md UPGRADING.md)
+  s.files              = Dir.glob('{bin,lib,man}/**/*') + misc_files
+  s.test_files         = Dir.glob('test,spec,features/**/*')
   s.executables        = %w(bundle)
   s.default_executable = "bundle"
   s.require_paths      = ["lib"]

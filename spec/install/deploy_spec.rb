@@ -38,7 +38,7 @@ describe "install with --deployment or --frozen" do
     build_git "foo"
     gemfile <<-G
       group :test do
-        gem "foo", :git => "#{lib_path('foo-1.0')}"
+        gem "foo", :git => "file://#{lib_path('foo-1.0')}/.git"
       end
     G
     bundle :install
@@ -144,7 +144,7 @@ describe "install with --deployment or --frozen" do
 
       install_gemfile <<-G
         source "file://#{gem_repo1}"
-        gem "rack", :git => "#{lib_path("rack-1.0")}"
+        gem "rack", :git => "file://#{lib_path("rack-1.0")}/.git"
       G
 
       gemfile <<-G
@@ -154,7 +154,7 @@ describe "install with --deployment or --frozen" do
 
       bundle "install --deployment"
       out.should include("You have modified your Gemfile")
-      out.should include("You have deleted from the Gemfile:\n* source: #{lib_path("rack-1.0")} (at master)")
+      out.should include("You have deleted from the Gemfile:\n* source: file://#{lib_path("rack-1.0")}/.git (at master)")
       out.should_not include("You have added to the Gemfile")
       out.should_not include("You have changed in the Gemfile")
     end
@@ -165,19 +165,19 @@ describe "install with --deployment or --frozen" do
 
       install_gemfile <<-G
         source "file://#{gem_repo1}"
-        gem "rack", :git => "#{lib_path("rack")}"
-        gem "foo", :git => "#{lib_path("rack")}"
+        gem "rack", :git => "file://#{lib_path("rack")}/.git"
+        gem "foo", :git => "file://#{lib_path("rack")}/.git"
       G
 
       gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
-        gem "foo", :git => "#{lib_path("rack")}"
+        gem "foo", :git => "file://#{lib_path("rack")}/.git"
       G
 
       bundle "install --deployment"
       out.should include("You have modified your Gemfile")
-      out.should include("You have changed in the Gemfile:\n* rack from `no specified source` to `#{lib_path("rack")} (at master)`")
+      out.should include("You have changed in the Gemfile:\n* rack from `no specified source` to `file://#{lib_path("rack")}/.git (at master)`")
       out.should_not include("You have added to the Gemfile")
       out.should_not include("You have deleted from the Gemfile")
     end

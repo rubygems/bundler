@@ -76,6 +76,14 @@ module Bundler
       lookup.dup
     end
 
+    def spec_check(spec)
+      if spec
+        # in the spec's match on this string to see that correct gems have been installed, awaits GH issue #881
+        puts "{:spec_set_gemspec => {:name => '#{spec.name}', :version => '#{spec.version}', :platform => '#{spec.platform}'}}" if Bundler.settings["spec_run"]
+        spec
+      end
+    end
+
     def materialize(deps, missing_specs = nil)
       materialized = self.for(deps, [], false, true).to_a
       materialized.map! do |s|
@@ -86,7 +94,7 @@ module Bundler
         else
           raise GemNotFound, "Could not find #{s.full_name} in any of the sources" unless spec
         end
-        spec if spec
+        spec_check(spec)
       end
       SpecSet.new(materialized.compact)
     end

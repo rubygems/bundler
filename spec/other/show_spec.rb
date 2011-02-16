@@ -26,12 +26,12 @@ describe "bundle show" do
 
   it "prints path if gem exists in bundle" do
     bundle "show rails"
-    out.should == default_bundle_path('gems', 'rails-2.3.2').to_s
+    out.should match /\n#{default_bundle_path('gems', 'rails-2.3.2').to_s}\Z/
   end
 
   it "prints the path to the running bundler" do
     bundle "show bundler"
-    out.should == File.expand_path('../../../', __FILE__)
+    out.should match /\n#{File.expand_path('../../../', __FILE__)}\Z/
   end
 
   it "complains if gem not in bundle" do
@@ -47,7 +47,7 @@ describe "bundle show with a git repo" do
 
   it "prints out git info" do
     install_gemfile <<-G
-      gem "foo", :git => "#{lib_path('foo-1.0')}"
+      gem "foo", :git => "file://#{lib_path('foo-1.0')}/.git"
     G
     should_be_installed "foo 1.0"
 
@@ -62,7 +62,7 @@ describe "bundle show with a git repo" do
     @revision = revision_for(lib_path("foo-1.0"))[0...6]
 
     install_gemfile <<-G
-      gem "foo", :git => "#{lib_path('foo-1.0')}", :branch => "omg"
+      gem "foo", :git => "file://#{lib_path('foo-1.0')}/.git", :branch => "omg"
     G
     should_be_installed "foo 1.0.omg"
 
@@ -73,7 +73,7 @@ describe "bundle show with a git repo" do
   it "doesn't print the branch when tied to a ref" do
     sha = revision_for(lib_path("foo-1.0"))
     install_gemfile <<-G
-      gem "foo", :git => "#{lib_path('foo-1.0')}", :ref => "#{sha}"
+      gem "foo", :git => "file://#{lib_path('foo-1.0')}/.git", :ref => "#{sha}"
     G
 
     bundle :show

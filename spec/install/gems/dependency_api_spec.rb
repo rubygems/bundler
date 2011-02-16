@@ -24,7 +24,7 @@ describe "gemcutter's dependency API" do
       "activerecord 2.3.2",
       "actionmailer 2.3.2",
       "activeresource 2.3.2",
-      "activesupport 2.3.2")
+      "activesupport 2.3.2", :gemspec_count => 7)
   end
 
   it "falls back when the API errors out" do
@@ -60,7 +60,7 @@ describe "gemcutter's dependency API" do
       "activesupport 2.3.2",
       "thin 1.0.0",
       "rack 1.0.0",
-      "rails 2.3.2")
+      "rails 2.3.2", :gemspec_count => 9)
   end
 
   it "falls back when Gemcutter API doesn't return proper Marshal format" do
@@ -78,7 +78,7 @@ describe "gemcutter's dependency API" do
       source "http://localgemserver.test"
       gem "rack"
     G
-
+    # TODO: Fix me hedgehog
     bundle :install, :artifice => "endpoint_redirect"
     out.should match(/Too many redirects/)
   end

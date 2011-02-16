@@ -44,7 +44,6 @@ module Spec
       exitstatus = options.delete(:exitstatus)
       options["no-color"] = true unless options.key?("no-color") || cmd.to_s[0..3] == "exec"
 
-      bundle_bin = File.expand_path('../../../bin/bundle', __FILE__)
       fake_file = options.delete(:fakeweb)
       fakeweb = fake_file ? "-r#{File.expand_path('../fakeweb/'+fake_file+'.rb', __FILE__)}" : nil
       artifice_file = options.delete(:artifice)
@@ -52,11 +51,12 @@ module Spec
 
       env = (options.delete(:env) || {}).map{|k,v| "#{k}='#{v}' "}.join
       args = options.map do |k,v|
+        k = k.to_s.gsub('_','-') if k.is_a?(Symbol)
         v == true ? " --#{k}" : " --#{k} #{v}" if v
       end.join
-
-      cmd = "#{env}#{Gem.ruby} -I#{lib} #{fakeweb} #{artifice} #{bundle_bin} #{cmd}#{args}"
-
+      bin_bundle = File.expand_path('../../../bin/bundle', __FILE__)
+      cmd = "#{env}#{Gem.ruby} -I#{lib} #{fakeweb} #{artifice} #{bin_bundle} #{cmd}#{args}"
+      $stderr.puts "Bundler cmd: #{cmd}" if ENV['BUNDLE_DEBUG']
       if exitstatus
         sys_status(cmd)
       else
@@ -112,6 +112,13 @@ module Spec
       config
     end
 
+    def clean_config
+      tpath = FileUtils.rm_rf(tmp('.bundle/config'))
+      lpath = FileUtils.rm_rf(bundled_app('.bundle/config'))
+      gpath = FileUtils.rm_rf(home('.bundle/config'))
+      tpath || lpath || gpath
+    end
+
     def gemfile(*args)
       path = bundled_app("Gemfile")
       path = args.shift if Pathname === args.first
@@ -139,6 +146,7 @@ module Spec
     def install_gemfile(*args)
       gemfile(*args)
       opts = args.last.is_a?(Hash) ? args.last : {}
+      opts['verbose'] = true
       bundle :install, opts
     end
 
@@ -242,5 +250,17 @@ module Spec
     def revision_for(path)
       Dir.chdir(path) { `git rev-parse HEAD`.strip }
     end
+
+    # modelled on the Bundler::Git::Source private method.
+    def uri_hash(uri)
+      tu = URI.parse(uri.sub(%r{/\Z},'')).normalize
+      if tu.scheme
+         input = "#{tu.host}#{tu.path}"
+      else
+        input = uri  # assume it is still an ssh/git URI
+      end
+      ::Digest::SHA1.hexdigest(input)
+    end
+
   end
 end

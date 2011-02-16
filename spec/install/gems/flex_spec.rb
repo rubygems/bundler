@@ -38,7 +38,7 @@ describe "bundle flex_install" do
       gem "rack-obama"
     G
 
-    should_be_installed "rack 1.0.0", "rack-obama 1.0.0"
+    should_be_installed "rack 1.0.0", "rack-obama 1.0.0", :gemspec_count => 2
 
     update_repo2
     install_gemfile <<-G
@@ -46,7 +46,7 @@ describe "bundle flex_install" do
       gem "rack-obama", "1.0"
     G
 
-    should_be_installed "rack 1.0.0", "rack-obama 1.0.0"
+    should_be_installed "rack 1.0.0", "rack-obama 1.0.0", :gemspec_count => 2
   end
 
   describe "adding new gems" do
@@ -66,7 +66,7 @@ describe "bundle flex_install" do
         gem 'activesupport', '2.3.5'
       G
 
-      should_be_installed "rack 1.0.0", 'activesupport 2.3.5'
+      should_be_installed "rack 1.0.0", 'activesupport 2.3.5', :gemspec_count => 2
     end
 
     it "keeps child dependencies pinned" do
@@ -85,7 +85,7 @@ describe "bundle flex_install" do
         gem "thin"
       G
 
-      should_be_installed "rack 1.0.0", 'rack-obama 1.0', 'thin 1.0'
+      should_be_installed "rack 1.0.0", 'rack-obama 1.0', 'thin 1.0', :gemspec_count => 3
     end
   end
 
@@ -114,7 +114,7 @@ describe "bundle flex_install" do
         gem 'activesupport', '2.3.2'
       G
 
-      should_be_installed "rack 1.0.0", 'activesupport 2.3.2'
+      should_be_installed "rack 1.0.0", 'activesupport 2.3.2', :gemspec_count => 2
     end
 
     it "removes top level dependencies when removed from the Gemfile while leaving other dependencies intact" do
@@ -143,7 +143,7 @@ describe "bundle flex_install" do
         gem 'activesupport'
       G
 
-      should_be_installed "rack 1.0.0", "rack-obama 1.0.0", "activesupport 2.3.5"
+      should_be_installed "rack 1.0.0", "rack-obama 1.0.0", "activesupport 2.3.5", :gemspec_count => 3
 
       update_repo2
       install_gemfile <<-G
@@ -164,7 +164,7 @@ describe "bundle flex_install" do
         gem "rack_middleware"
       G
 
-      should_be_installed "rack_middleware 1.0", "rack 0.9.1"
+      should_be_installed "rack_middleware 1.0", "rack 0.9.1", :gemspec_count => 2
 
       build_repo2
       update_repo2 do

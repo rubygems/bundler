@@ -10,7 +10,7 @@ describe "bundle install --standalone" do
     end
 
     it "still makes the gems available to normal bundler" do
-      should_be_installed "actionpack 2.3.2", "rails 2.3.2"
+      should_be_installed "actionpack 2.3.2", "rails 2.3.2", :gemspec_count => 7
     end
 
     it "generates a bundle/bundler/setup.rb" do
@@ -52,12 +52,12 @@ describe "bundle install --standalone" do
       install_gemfile <<-G, :standalone => true
         source "file://#{gem_repo1}"
         gem "rails"
-        gem "devise", :git => "#{lib_path('devise-1.0')}"
+        gem "devise", :git => "file://#{lib_path('devise-1.0')}/.git"
       G
     end
 
     it "still makes the gems available to normal bundler" do
-      should_be_installed "actionpack 2.3.2", "rails 2.3.2", "devise 1.0"
+      should_be_installed "actionpack 2.3.2", "rails 2.3.2", "devise 1.0", :gemspec_count => 8
     end
 
     it "generates a bundle/bundler/setup.rb" do

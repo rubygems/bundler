@@ -81,7 +81,7 @@ describe "bundle cache" do
 
       install_gemfile <<-G
         source "file://#{gem_repo1}"
-        git "#{lib_path("foo-1.0")}" do
+        git "file://#{lib_path("foo-1.0")}/.git" do
           gem 'foo'
         end
         gem 'rack'
@@ -94,14 +94,13 @@ describe "bundle cache" do
       system_gems []
       bundle "install --local"
 
-      should_be_installed("rack 1.0.0", "foo 1.0")
+      should_be_installed "rack 1.0.0", "foo 1.0", :gemspec_count => 2
     end
 
     it "should not explode if the lockfile is not present" do
       FileUtils.rm(bundled_app("Gemfile.lock"))
 
       bundle :cache
-
       bundled_app("Gemfile.lock").should exist
     end
   end
@@ -158,7 +157,7 @@ describe "bundle cache" do
 
       install_gemfile <<-G
         source "file://#{gem_repo2}"
-        gem "rack", :git => "#{lib_path("rack-1.0")}"
+        gem "rack", :git => "file://#{lib_path("rack-1.0")}/.git"
         gem "actionpack"
       G
       cached_gem("rack-1.0.0").should_not exist

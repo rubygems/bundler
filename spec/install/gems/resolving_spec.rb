@@ -16,7 +16,7 @@ describe "bundle install with gem sources" do
         puts IMPLICIT_RAKE_DEP
         puts ANOTHER_IMPLICIT_RAKE_DEP
       R
-      out.should == "YES\nYES"
+      out.should match /YES\nYES/
     end
 
     it "installs gems with a dependency with no type" do
@@ -36,7 +36,7 @@ describe "bundle install with gem sources" do
         gem "actionpack", "2.3.2"
       G
 
-      should_be_installed "actionpack 2.3.2", "activesupport 2.3.2"
+      should_be_installed "actionpack 2.3.2", "activesupport 2.3.2", :gemspec_count => 2
     end
 
     describe "with crazy rubygem plugin stuff" do
@@ -55,7 +55,9 @@ describe "bundle install with gem sources" do
           gem "net_a"
         G
 
-        should_be_installed "net_a 1.0", "net_b 1.0"
+        pending "This gemspec_count is currently 4 not 2" do
+          should_be_installed "net_a 1.0", "net_b 1.0", :gemspec_count => 2
+        end
       end
 
       it "installs multiple levels of dependencies" do
@@ -65,7 +67,9 @@ describe "bundle install with gem sources" do
           gem "net_e"
         G
 
-        should_be_installed "net_a 1.0", "net_b 1.0", "net_c 1.0", "net_d 1.0", "net_e 1.0"
+        pending "This gemspec_count is currently 7 not 5" do
+          should_be_installed "net_a 1.0", "net_b 1.0", "net_c 1.0", "net_d 1.0", "net_e 1.0", :gemspec_count => 5
+        end
       end
     end
   end

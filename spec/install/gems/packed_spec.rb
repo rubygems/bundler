@@ -65,7 +65,7 @@ describe "bundle install with gem sources" do
           gem "platform_specific"
         G
         run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
-        out.should == "1.0.0 RUBY"
+        out.should match /1.0.0 RUBY/
       end
     end
 

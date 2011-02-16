@@ -87,7 +87,7 @@ describe "bundle install with explicit source paths" do
     G
 
     run "require 'rack'"
-    out.should == 'WIN OVERRIDE'
+    out.should match /WIN OVERRIDE/
   end
 
   it "works" do
@@ -105,7 +105,7 @@ describe "bundle install with explicit source paths" do
       gem "omg", :path => "#{lib_path('omg')}"
     G
 
-    should_be_installed "foo 1.0"
+    should_be_installed "foo 1.0", :gemspec_count => 2
   end
 
   it "supports gemspec syntax" do
@@ -122,8 +122,7 @@ describe "bundle install with explicit source paths" do
 
     Dir.chdir(lib_path("foo")) do
       bundle "install"
-      should_be_installed "foo 1.0"
-      should_be_installed "rack 1.0"
+      should_be_installed "rack 1.0", "foo 1.0", :gemspec_count => 2
     end
   end
 
@@ -137,8 +136,7 @@ describe "bundle install with explicit source paths" do
       gemspec :path => "#{lib_path("foo")}"
     G
 
-    should_be_installed "foo 1.0"
-    should_be_installed "rack 1.0"
+    should_be_installed "rack 1.0", "foo 1.0", :gemspec_count => 2
   end
 
   it "raises if there are multiple gemspecs" do
@@ -179,7 +177,7 @@ describe "bundle install with explicit source paths" do
     G
 
     bundle "exec foobar"
-    out.should == "1.0"
+    out.should match /1.0/
   end
 
   it "removes the .gem file after installing" do
@@ -204,7 +202,7 @@ describe "bundle install with explicit source paths" do
         end
       G
 
-      should_be_installed "omg 1.0", "hi2u 1.0"
+      should_be_installed "omg 1.0", "hi2u 1.0", :gemspec_count => 2
     end
   end
 
@@ -220,7 +218,7 @@ describe "bundle install with explicit source paths" do
       gem "omg", :path => "#{lib_path('omg')}"
     G
 
-    should_be_installed "foo 1.0"
+    should_be_installed "foo 1.0", :gemspec_count => 2
   end
 
   it "works when the path does not have a gemspec" do
@@ -245,7 +243,7 @@ describe "bundle install with explicit source paths" do
     G
 
     bundle "exec foo"
-    out.should == "1.0"
+    out.should match /1.0/
   end
 
   describe "when the gem version in the path is updated" do
@@ -267,7 +265,7 @@ describe "bundle install with explicit source paths" do
 
       bundle "install"
 
-      should_be_installed "foo 2.0", "bar 1.0"
+      should_be_installed "foo 2.0", "bar 1.0", :gemspec_count => 2
     end
 
     it "unlocks all gems when a child dependency gem is updated" do
@@ -275,7 +273,7 @@ describe "bundle install with explicit source paths" do
 
       bundle "install"
 
-      should_be_installed "foo 1.0", "bar 2.0"
+      should_be_installed "foo 1.0", "bar 2.0", :gemspec_count => 2
     end
   end
 
@@ -296,7 +294,7 @@ describe "bundle install with explicit source paths" do
 
       bundle "install"
 
-      should_be_installed "rack 1.0.0"
+      should_be_installed "rack 1.0.0", :gemspec_count => 2
     end
   end
 
@@ -312,7 +310,7 @@ describe "bundle install with explicit source paths" do
 
       install_gemfile <<-G
         source "file://#{gem_repo1}"
-        gem "bar", :git => "#{lib_path('bar')}"
+        gem "bar", :git => "file://#{lib_path('bar')}/.git"
       G
 
       install_gemfile <<-G
@@ -320,7 +318,7 @@ describe "bundle install with explicit source paths" do
         gem "bar", :path => "#{lib_path('bar')}"
       G
 
-      should_be_installed "foo 1.0", "bar 1.0"
+      should_be_installed "foo 1.0", "bar 1.0", :gemspec_count => 2
     end
 
     it "switches the source when the gem existed in rubygems and the path was already being used for another gem" do
@@ -347,7 +345,7 @@ describe "bundle install with explicit source paths" do
         end
       G
 
-      should_be_installed "bar 1.0"
+      should_be_installed "bar 1.0", :gemspec_count => 2
     end
   end
 end

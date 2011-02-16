@@ -4,12 +4,12 @@ module Bundler
   class Definition
     include GemHelpers
 
-    attr_reader :dependencies, :platforms, :sources
+    attr_reader :dependencies, :platforms, :sources, :folders
 
     def self.build(gemfile, lockfile, unlock)
       unlock ||= {}
       gemfile = Pathname.new(gemfile).expand_path
-
+      gemfile = gemfile + 'Gemfile' unless gemfile.file?
       unless gemfile.file?
         raise GemfileNotFound, "#{gemfile} not found"
       end
@@ -33,11 +33,13 @@ module Bundler
       @dependencies, @sources, @unlock = dependencies, sources, unlock
       @remote            = false
       @specs             = nil
+      @folders           = []
       @lockfile_contents = ""
 
       if lockfile && File.exists?(lockfile)
         @lockfile_contents = Bundler.read_file(lockfile)
         locked = LockfileParser.new(@lockfile_contents)
+        @folders << @lockfile_contents.scan(/  folder: (.*)$/).flatten if @lockfile_contents[/  folder: (.*)/,1]
         @platforms      = locked.platforms
 
         if unlock != true

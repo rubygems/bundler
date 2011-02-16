@@ -3,8 +3,10 @@ bundle-install(1) -- Install the dependencies specified in your Gemfile
 
 ## SYNOPSIS
 
-`bundle install` [--gemfile=GEMFILE]
-                 [--path PATH] [--system]
+`bundle install` [--gemfile GEMFILE]
+                 [--path PATH]
+                 [--install-path PATH]
+                 [--system]
                  [--without=GROUP1[ GROUP2...]]
                  [--local] [--deployment]
                  [--binstubs[=DIRECTORY]]
@@ -29,19 +31,28 @@ update process below under [CONSERVATIVE UPDATING][].
 
 ## OPTIONS
 
-* `--gemfile=<gemfile>`:
-  The location of the Gemfile(5) that bundler should use. This defaults
-  to a gemfile in the current working directory. In general, bundler
-  will assume that the location of the Gemfile(5) is also the project
+* `--gemfile=<gemfile>[<fullfilepath>]`:
+  The location of the Gemfile(5), or the full file path to a file
+  with a name other than Gemfile(5), that bundler should use. This defaults
+  to a file named Gemfile(5) in the current working directory. In general,
+  bundler will assume that the location of any Gemfile(5) is also the project
   root, and will look for the `Gemfile.lock` and `vendor/cache` relative
   to it.
 
 * `--path=<path>`:
-  The location to install the gems in the bundle to. This defaults
-  to the gem home, which is the location that `gem install` installs
-  gems to. This means that, by default, gems installed without a
+  The location to install the gems in the bundle underneath.
+  The actual path is extended with, for example ruby/1.9.1/gems.
+  This defaults to the gem home, which is the location that `gem install`
+  installs gems to. This means that, by default, gems installed without a
   `--path` setting will show up in `gem list`. This setting is a
   [remembered option][REMEMBERED OPTIONS].
+
+* `--install-path=<path>`:
+  Specify a different path than the system default:
+  $BUNDLE_PATH/ruby/1.9.1/gems or $GEM_HOME/....
+  This option provides more control than the path option, which extends the
+  given path to include Ruby implementation and version data.
+  This setting is a [remembered option][REMEMBERED OPTIONS].
 
 * `--system`:
   Installs the gems in the bundle to the system location. This

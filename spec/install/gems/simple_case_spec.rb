@@ -108,7 +108,7 @@ describe "bundle install with gem sources" do
         gem "rails"
       G
 
-      should_be_installed "actionpack 2.3.2", "rails 2.3.2"
+      should_be_installed "actionpack 2.3.2", "rails 2.3.2", :gemspec_count => 7
     end
 
     it "does the right version" do
@@ -126,7 +126,7 @@ describe "bundle install with gem sources" do
         gem "with_development_dependency"
       G
 
-      should_be_installed "with_development_dependency 1.0.0"
+      should_be_installed "with_development_dependency 1.0"
       should_not_be_installed "activesupport 2.3.5"
     end
 
@@ -137,7 +137,7 @@ describe "bundle install with gem sources" do
         gem "rails"
       G
 
-      should_be_installed "activemerchant 1.0", "activesupport 2.3.2", "actionpack 2.3.2"
+      should_be_installed "activemerchant 1.0", "activesupport 2.3.2", "actionpack 2.3.2", :gemspec_count => 8
     end
 
     it "activates gem correctly according to the resolved gems" do
@@ -152,7 +152,7 @@ describe "bundle install with gem sources" do
         gem "rails"
       G
 
-      should_be_installed "activemerchant 1.0", "activesupport 2.3.2", "actionpack 2.3.2"
+      should_be_installed "activemerchant 1.0", "activesupport 2.3.2", "actionpack 2.3.2", :gemspec_count => 8
     end
 
     it "does not reinstall any gem that is already available locally" do
@@ -169,7 +169,7 @@ describe "bundle install with gem sources" do
         gem "activerecord", "2.3.2"
       G
 
-      should_be_installed "activesupport 2.3.2"
+      should_be_installed "activesupport 2.3.2", :gemspec_count => 2
     end
 
     it "works when the gemfile specifies gems that only exist in the system" do
@@ -180,7 +180,7 @@ describe "bundle install with gem sources" do
         gem "foo"
       G
 
-      should_be_installed "rack 1.0.0", "foo 1.0.0"
+      should_be_installed "rack 1.0.0", "foo 1.0", :gemspec_count => 2
     end
 
     it "prioritizes local gems over remote gems" do
@@ -193,7 +193,7 @@ describe "bundle install with gem sources" do
         gem "rack"
       G
 
-      should_be_installed "rack 1.0.0", "activesupport 2.3.5"
+      should_be_installed "rack 1.0.0", "activesupport 2.3.5", :gemspec_count => 2
     end
 
     describe "with a gem that installs multiple platforms" do
@@ -204,7 +204,7 @@ describe "bundle install with gem sources" do
         G
 
         run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
-        out.should == "1.0.0 #{Gem::Platform.local}"
+        out.should match( /1.0.0 #{Gem::Platform.local}/)
       end
 
       it "falls back on plain ruby" do
@@ -214,19 +214,17 @@ describe "bundle install with gem sources" do
           gem "platform_specific"
         G
 
-        run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
-        out.should == "1.0.0 RUBY"
+        should_be_installed "platform_specific 1.0.0 ruby", :check_platform => true
       end
 
       it "installs gems for java" do
-        simulate_platform "java"
+        simulate_platform java
         install_gemfile <<-G
           source "file://#{gem_repo1}"
           gem "platform_specific"
         G
 
-        run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
-        out.should == "1.0.0 JAVA"
+        should_be_installed "platform_specific 1.0.0 #{java}", :check_platform => true
       end
 
       it "installs gems for windows" do
@@ -237,8 +235,7 @@ describe "bundle install with gem sources" do
           gem "platform_specific"
         G
 
-        run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
-        out.should == "1.0.0 MSWIN"
+          should_be_installed "platform_specific 1.0.0 #{mswin}", :check_platform => true
       end
     end
 
@@ -252,21 +249,21 @@ describe "bundle install with gem sources" do
 
       it "works" do
         bundle "install --path vendor"
-        should_be_installed "rack 1.0"
+        should_be_installed "rack 1.0.0"
       end
 
       it "allows running bundle install --system without deleting foo" do
         bundle "install --path vendor"
         bundle "install --system"
         FileUtils.rm_rf(bundled_app("vendor"))
-        should_be_installed "rack 1.0"
+        should_be_installed "rack 1.0.0"
       end
 
       it "allows running bundle install --system after deleting foo" do
         bundle "install --path vendor"
         FileUtils.rm_rf(bundled_app("vendor"))
         bundle "install --system"
-        should_be_installed "rack 1.0"
+        should_be_installed "rack 1.0.0"
       end
     end
 
@@ -282,7 +279,7 @@ describe "bundle install with gem sources" do
         gem "rack", "1.2"
       G
 
-      should_be_installed "rack 1.2", "activesupport 1.2.3"
+      should_be_installed "rack 1.2", "activesupport 1.2.3", :gemspec_count => 2
     end
 
     it "gives a useful error if no sources are set" do
@@ -433,7 +430,7 @@ describe "bundle install with gem sources" do
       G
 
       bundle :install, :quiet => true
-      out.should == ""
+      out.should match ""
     end
 
     it "should still display warnings" do
@@ -559,7 +556,7 @@ describe "bundle install with gem sources" do
         gem "rails", "3.0"
       G
 
-      should_be_installed "bundler #{Bundler::VERSION}"
+      should_be_installed "bundler #{Bundler::VERSION}", :gemspec_count => 2
     end
 
     it "are not added if not already present" do
@@ -579,6 +576,7 @@ describe "bundle install with gem sources" do
 
       nice_error = <<-E.strip.gsub(/^ {8}/, '')
         Fetching source index for file:#{gem_repo2}/
+        Fetching modern index
         Bundler could not find compatible versions for gem "bundler":
           In Gemfile:
             bundler (= 0.9.2)
@@ -586,7 +584,7 @@ describe "bundle install with gem sources" do
           Current Bundler version:
             bundler (#{Bundler::VERSION})
         E
-      out.should == nice_error
+      out.should match(/^#{::Regexp.quote(nice_error)}\n/)
     end
 
     it "works for gems with multiple versions in its dependencies" do
@@ -604,7 +602,7 @@ describe "bundle install with gem sources" do
         gem "rack"
       G
 
-      should_be_installed "multiple_versioned_deps 1.0.0"
+      should_be_installed "multiple_versioned_deps 1.0", :gemspec_count => 3
     end
 
     it "includes bundler in the bundle when it's a child dependency" do
@@ -614,7 +612,7 @@ describe "bundle install with gem sources" do
       G
 
       run "begin; gem 'bundler'; puts 'WIN'; rescue Gem::LoadError; puts 'FAIL'; end"
-      out.should == "WIN"
+      out.should match(/WIN/)
     end
 
     it "allows gem 'bundler' when Bundler is not in the Gemfile or its dependencies" do
@@ -624,7 +622,7 @@ describe "bundle install with gem sources" do
       G
 
       run "begin; gem 'bundler'; puts 'WIN'; rescue Gem::LoadError => e; puts e.backtrace; end"
-      out.should == "WIN"
+      out.should match(/WIN/)
     end
 
     it "causes a conflict if child dependencies conflict" do
@@ -636,6 +634,7 @@ describe "bundle install with gem sources" do
 
       nice_error = <<-E.strip.gsub(/^ {8}/, '')
         Fetching source index for file:#{gem_repo2}/
+        Fetching modern index
         Bundler could not find compatible versions for gem "activesupport":
           In Gemfile:
             activemerchant depends on
@@ -644,7 +643,7 @@ describe "bundle install with gem sources" do
             rails_fail depends on
               activesupport (1.2.3)
       E
-      out.should == nice_error
+      out.should match(/^#{::Regexp.quote(nice_error)}\n/)
     end
 
     it "causes a conflict if a child dependency conflicts with the Gemfile" do
@@ -656,6 +655,7 @@ describe "bundle install with gem sources" do
 
       nice_error = <<-E.strip.gsub(/^ {8}/, '')
         Fetching source index for file:#{gem_repo2}/
+        Fetching modern index
         Bundler could not find compatible versions for gem "activesupport":
           In Gemfile:
             rails_fail depends on
@@ -663,7 +663,7 @@ describe "bundle install with gem sources" do
 
             activesupport (2.3.5)
       E
-      out.should == nice_error
+      out.should match(/^#{::Regexp.quote(nice_error)}\n/)
     end
 
     it "can install dependencies even if " do
@@ -676,7 +676,7 @@ describe "bundle install with gem sources" do
       #simulate_new_machine
 
       bundle "check"
-      out.should == "The Gemfile's dependencies are satisfied"
+      out.should match(/The Gemfile's dependencies are satisfied/)
     end
   end
 
@@ -702,8 +702,7 @@ describe "bundle install with gem sources" do
 
       bundle :install
 
-      should_be_installed "rack 0.9.1"
-      should_be_installed "rack_middleware 1.0"
+      should_be_installed "rack 0.9.1", "rack_middleware 1.0", :gemspec_count => 2
     end
 
     it "does not hit the remote a second time" do

@@ -18,8 +18,8 @@ describe "bundle install from an existing gemspec" do
       gemspec :path => '#{tmp.join("foo")}'
     G
 
-    should_be_installed "bar 1.0.0"
-    should_be_installed "bar-dev 1.0.0", :groups => :development
+    should_be_installed "bar 1.0.0", :gemspec_count => 3
+    should_be_installed "bar-dev 1.0.0", :groups => :development, :gemspec_count => 3
   end
 
   it "should handle a list of requirements" do
@@ -35,7 +35,7 @@ describe "bundle install from an existing gemspec" do
       gemspec :path => '#{tmp.join("foo")}'
     G
 
-    should_be_installed "baz 1.0"
+    should_be_installed "baz 1.0", :gemspec_count => 2
   end
 
   it "should raise if there are no gemspecs available" do
@@ -72,8 +72,8 @@ describe "bundle install from an existing gemspec" do
       gemspec :path => '#{tmp.join("foo")}', :name => 'foo'
     G
 
-    should_be_installed "bar 1.0.0"
-    should_be_installed "bar-dev 1.0.0", :groups => :development
+    should_be_installed "bar 1.0.0", :gemspec_count => 3
+    should_be_installed "bar-dev 1.0.0", :groups => :development, :gemspec_count => 3
   end
 
   it "should use a specific group for development dependencies" do
@@ -88,9 +88,9 @@ describe "bundle install from an existing gemspec" do
       gemspec :path => '#{tmp.join("foo")}', :name => 'foo', :development_group => :dev
     G
 
-    should_be_installed "bar 1.0.0"
-    should_not_be_installed "bar-dev 1.0.0", :groups => :development
-    should_be_installed "bar-dev 1.0.0", :groups => :dev
+    should_be_installed "bar 1.0.0", :gemspec_count => 3
+    should_not_be_installed "bar-dev 1.0.0", :groups => :development, :gemspec_count => 3
+    should_be_installed "bar-dev 1.0.0", :groups => :dev, :gemspec_count => 3
   end
 
   it "should evaluate the gemspec in its directory" do

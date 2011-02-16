@@ -18,6 +18,7 @@ module Bundler
       @groups          = []
       @platforms       = []
       @env             = nil
+      @decorate        = nil
     end
 
     def gemspec(opts = nil)
@@ -97,6 +98,7 @@ module Bundler
     end
 
     def git(uri, options = {}, source_options = {}, &blk)
+      @uri = uri
       unless block_given?
         msg = "You can no longer specify a git source by itself. Instead, \n" \
               "either use the :git option on a gem, or specify the gems that \n" \
@@ -107,7 +109,15 @@ module Bundler
               "  end"
         raise DeprecatedError, msg
       end
-
+      unless git_url?
+        msg = "You can no longer give the URI\n" \
+              "#{@uri}\n" \
+              "Instead, either use the git:// protocol, or if some other protocol, specify the trailing .git like: \n\n" \
+              "  git 'file:///rails/.git' do\n" \
+              "    gem 'rails'\n" \
+              "  end"
+        raise DeprecatedError, msg
+      end
       source Source::Git.new(_normalize_hash(options).merge("uri" => uri)), source_options, &blk
     end
 
@@ -183,7 +193,7 @@ module Bundler
     def _normalize_options(name, version, opts)
       _normalize_hash(opts)
 
-      invalid_keys = opts.keys - %w(group groups git path name branch ref tag require submodules platform platforms)
+      invalid_keys = opts.keys - %w(group groups git git_decorate decorate path name branch ref tag require submodules platform platforms)
       if invalid_keys.any?
         plural = invalid_keys.size > 1
         message = "You passed #{invalid_keys.map{|k| ':'+k }.join(", ")} "
@@ -226,9 +236,12 @@ module Bundler
       opts["env"]     ||= @env
       opts["platforms"] = platforms.dup
       opts["group"]     = groups
+      opts["decorate"]  ||= true
+      opts["git_decorate"] ||= true
     end
 
     def _deprecated_options(options)
+      @uri = options[:git] if options[:git]
       if options.include?(:require_as)
         raise DeprecatedError, "Please replace :require_as with :require"
       elsif options.include?(:vendored_at)
@@ -237,7 +250,19 @@ module Bundler
         raise DeprecatedError, "Please replace :only with :group"
       elsif options.include?(:except)
         raise DeprecatedError, "The :except option is no longer supported"
+      elsif !git_url? && !@uri.nil?
+        msg = "You can no longer give the URI\n" \
+              "#{@uri}\n" \
+              "Instead, either use the git:// protocol, or if some other protocol, specify the trailing .git like: \n\n" \
+              "  git 'file:///rails/.git' do\n" \
+              "    gem 'rails'\n" \
+              "  end"
+        raise DeprecatedError, msg
       end
+    end
+
+    def git_url?
+      @uri =~ /^git:\/\// || @uri =~ /\.git$/  || @uri =~ /\.git\/$/
     end
   end
 end

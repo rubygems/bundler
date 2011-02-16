@@ -18,7 +18,7 @@ describe "bundle update" do
       end
 
       bundle "update"
-      should_be_installed "rack 1.2", "rack-obama 1.0", "activesupport 3.0"
+      should_be_installed "rack 1.2", "rack-obama 1.0", "activesupport 3.0", :gemspec_count => 3
     end
 
     it "doesn't delete the Gemfile.lock file if something goes wrong" do
@@ -40,7 +40,7 @@ describe "bundle update" do
       end
 
       bundle "update rack-obama"
-      should_be_installed "rack 1.2", "rack-obama 1.0", "activesupport 2.3.5"
+      should_be_installed "rack 1.2", "rack-obama 1.0", "activesupport 2.3.5", :gemspec_count => 3
     end
   end
 
@@ -74,7 +74,7 @@ describe "bundle update in more complicated situations" do
     end
 
     bundle "update thin"
-    should_be_installed "thin 2.0", "rack 1.2", "rack-obama 1.0"
+    should_be_installed "thin 2.0", "rack 1.2", "rack-obama 1.0", :gemspec_count => 3
   end
 end
 

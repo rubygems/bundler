@@ -132,7 +132,7 @@ module Bundler
     method_option "without", :type => :array, :banner =>
       "Exclude gems that are part of the specified named group."
     method_option "gemfile", :type => :string, :banner =>
-      "Use the specified gemfile instead of Gemfile"
+      "Specify a different path than the current folder, and/or use the specified gemfile name instead of Gemfile."
     method_option "no-prune", :type => :boolean, :banner =>
       "Don't remove stale gems from the cache."
     method_option "no-cache", :type => :boolean, :banner =>
@@ -145,6 +145,8 @@ module Bundler
       "Generate bin stubs for bundled gems to ./bin"
     method_option "path", :type => :string, :banner =>
       "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
+    method_option "install-path", :type => :string, :banner =>
+      "Specify a different install path than the system default ($BUNDLE_PATH/ruby/1.9.1/gems or $GEM_HOME/...). Bundler will remember this value for future installs on this machine"
     method_option "system", :type => :boolean, :banner =>
       "Install to the system location ($BUNDLE_PATH or $GEM_HOME) even if the bundle was previously installed somewhere else for this application"
     method_option "frozen", :type => :boolean, :banner =>
@@ -162,6 +164,11 @@ module Bundler
       end
       opts[:without].map!{|g| g.to_sym }
 
+      if opts['install-path']
+        opts[:install_path] = opts.delete('install-path')
+        ENV['BUNDLE_INSTALL_PATH'] = File.expand_path(opts[:install_path])
+      end
+
       ENV['BUNDLE_GEMFILE'] = File.expand_path(opts[:gemfile]) if opts[:gemfile]
       ENV['RB_USER_INSTALL'] = '1' if Bundler::FREEBSD
 
@@ -170,6 +177,12 @@ module Bundler
 
       if (opts[:path] || opts[:deployment]) && opts[:system]
         Bundler.ui.error "You have specified both a path to install your gems to, \n" \
+                         "as well as --system. Please choose."
+        exit 1
+      end
+
+      if (opts[:install_path] || opts[:deployment]) && opts[:system]
+        Bundler.ui.error "You have specified both a install path to install your gems to, \n" \
                          "as well as --system. Please choose."
         exit 1
       end
@@ -188,12 +201,12 @@ module Bundler
 
         Bundler.settings[:frozen] = '1'
       end
-
       # Can't use Bundler.settings for this because settings needs gemfile.dirname
-      Bundler.settings[:path]   = nil if opts[:system]
-      Bundler.settings[:path]   = "vendor/bundle" if opts[:deployment]
-      Bundler.settings[:path]   = opts[:path] if opts[:path]
+      Bundler.settings[:path] = nil if opts[:system]
+      Bundler.settings[:path] = "vendor/bundle" if opts[:deployment]
+      Bundler.settings[:path] = opts[:path] if opts[:path]
       Bundler.settings[:path] ||= "bundle" if opts[:standalone]
+      Bundler.settings[:install_path] = opts[:install_path] if opts[:install_path] || ENV['BUNDLE_INSTALL_PATH']
       Bundler.settings[:bin]    = opts["binstubs"] if opts[:binstubs]
       Bundler.settings[:disable_shared_gems] = '1' if Bundler.settings[:path]
       Bundler.settings.without  = opts[:without] unless opts[:without].empty?
@@ -203,7 +216,7 @@ module Bundler
       Bundler.load.cache if Bundler.root.join("vendor/cache").exist? && !options["no-cache"]
 
       if Bundler.settings[:path]
-        relative_path = Bundler.settings[:path]
+        relative_path = Bundler.settings[:install_path] ? Bundler.settings[:install_path] : Bundler.settings[:path]
         relative_path = "./" + relative_path unless relative_path[0] == ?/
         Bundler.ui.confirm "Your bundle is complete! " +
           "It was installed into #{relative_path}"

@@ -18,6 +18,15 @@ module Spec
       system_gem_path(*path)
     end
 
+    def build_install_path(*path)
+      tmp.join(*path)
+    end
+
+    def make_install_path(*path)
+      root = build_install_path(*path)
+      Dir.exists?(root) ? root.expand_path : FileUtils.mkdir_p(root)[0]
+    end
+
     def bundled_app(*path)
       root = tmp.join("bundled_app")
       FileUtils.mkdir_p(root)
@@ -66,6 +75,20 @@ module Spec
 
     def bundler_path
       Pathname.new(File.expand_path('../../../lib', __FILE__))
+    end
+
+    def set_bundle_install_path(type, location, opts = {})
+      path = make_install_path(location)
+      if type == :env
+        hsh = { 'BUNDLE_INSTALL_PATH' => path }
+        hsh['BUNDLE_GEMFILE'] = opts['gemfile'] if opts['gemfile']
+        hsh={:env => hsh, :exitstatus => true }
+      elsif type == :global
+        bundle("config gemfile #{opts['gemfile']}", {'no-color' => false}) if opts['gemfile']
+        bundle("config install-path #{path}", {'no-color' => false})
+        hsh={:install_path => path}
+      end
+      hsh
     end
 
     extend self

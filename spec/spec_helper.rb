@@ -5,6 +5,7 @@ require 'fileutils'
 require 'rubygems'
 require 'bundler'
 require 'rspec'
+require 'digest/sha1'
 
 # Require the correct version of popen for the current platform
 if RbConfig::CONFIG['host_os'] =~ /mingw|mswin/
@@ -80,6 +81,19 @@ RSpec.configure do |config|
     ENV['BUNDLER_SPEC_PLATFORM'] = nil
     ENV['BUNDLER_SPEC_VERSION']  = nil
     ENV['BUNDLE_APP_CONFIG']     = nil
+    ENV['BUNDLE_INSTALL_PATH']   = nil
+  end
+
+  def capture(stream)
+    begin
+      stream = stream.to_s
+      eval "$#{stream} = StringIO.new"
+      yield
+      result = eval("$#{stream}").string
+    ensure
+      eval("$#{stream} = #{stream.upcase}")
+    end
+
+    result
   end
 end
-

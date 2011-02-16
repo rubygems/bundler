@@ -85,6 +85,6 @@ describe "Bundler.setup with multi platform stuff" do
       gem "platform_specific"
     G
 
-    should_be_installed "nokogiri 1.4.2", "platform_specific 1.0 x86-darwin-100"
+    should_be_installed "nokogiri 1.4.2", "platform_specific 1.0 x86-darwin-100", :gemspec_count => 2
   end
 end

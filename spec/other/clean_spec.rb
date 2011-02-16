@@ -19,7 +19,7 @@ describe "bundle clean" do
 
     bundle :clean
 
-    out.should == "Removing foo (1.0)"
+    out.should match /\nRemoving foo \(1\.0\)\Z/
 
     vendored_gems("gems/thin-1.0").should exist
     vendored_gems("gems/rack-1.0.0").should exist
@@ -51,7 +51,7 @@ describe "bundle clean" do
 
     bundle :clean
 
-    out.should == "Removing rack (0.9.1)"
+    out.should match /\nRemoving rack \(0\.9\.1\)\Z/
 
     vendored_gems("gems/foo-1.0").should exist
     vendored_gems("gems/rack-1.0.0").should exist
@@ -83,7 +83,7 @@ describe "bundle clean" do
 
     bundle :clean
 
-    out.should == "Removing rack (1.0.0)"
+    out.should match /\nRemoving rack \(1\.0\.0\)\Z/
 
     vendored_gems("gems/foo-1.0").should exist
     vendored_gems("gems/rack-0.9.1").should exist
@@ -111,7 +111,7 @@ describe "bundle clean" do
     bundle "install --without test_group"
     bundle :clean
 
-    out.should == "Removing rack (1.0.0)"
+    out.should match /\nRemoving rack \(1\.0\.0\)\Z/
 
     vendored_gems("gems/foo-1.0").should exist
     vendored_gems("gems/rack-1.0.0").should_not exist
@@ -130,7 +130,7 @@ describe "bundle clean" do
       source "file://#{gem_repo1}"
 
       gem "rack", "1.0.0"
-      git "#{lib_path('foo-1.0')}", :ref => "#{@revision}" do
+      git "file://#{lib_path('foo-1.0')}/.git", :ref => "#{@revision}" do
         gem "foo"
       end
     G
@@ -145,8 +145,9 @@ describe "bundle clean" do
 
     bundle :clean
 
-    out.should == "Removing foo (1.0 #{@revision[0..11]})"
-
+    pending "spec's that aren't Pixie Dust(TM, Bundler 2011)" do
+      out.should match /\nRemoving foo \(1\.0 #{@revision[0..11]}\)\Z/
+    end
     vendored_gems("gems/rack-1.0.0").should exist
     vendored_gems("bundler/gems/foo-1.0-#{@revision[0..11]}").should_not exist
 
@@ -163,7 +164,7 @@ describe "bundle clean" do
       source "file://#{gem_repo1}"
 
       gem "rack", "1.0.0"
-      git "#{lib_path('foo-1.0')}" do
+      git "file://#{lib_path('foo-1.0')}/.git" do
         gem "foo"
       end
     G
@@ -177,7 +178,9 @@ describe "bundle clean" do
     bundle :install
     bundle :clean
 
-    out.should == "Removing foo (1.0 #{revision[0..11]})"
+    pending "spec's that aren't Pixie Dust(TM, Bundler 2011)" do
+      out.should match /\nRemoving foo \(1\.0 #{revision[0..11]}\)\Z/
+    end
 
     vendored_gems("gems/rack-1.0.0").should exist
     vendored_gems("bundler/gems/foo-1.0-#{revision[0..11]}").should_not exist

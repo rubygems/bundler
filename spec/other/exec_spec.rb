@@ -11,7 +11,7 @@ describe "bundle exec" do
     G
 
     bundle "exec rackup"
-    out.should == "0.9.1"
+    should_be_activated "rack 0.9.1"
   end
 
   it "works when the bins are in ~/.bundle" do
@@ -20,7 +20,7 @@ describe "bundle exec" do
     G
 
     bundle "exec rackup"
-    out.should == "1.0.0"
+    should_be_activated "rack 1.0.0"
   end
 
   it "works when running from a random directory" do
@@ -30,7 +30,7 @@ describe "bundle exec" do
 
     bundle "exec 'cd #{tmp('gems')} && rackup'"
 
-    out.should == "1.0.0"
+    should_be_activated "rack 1.0.0"
   end
 
   it "handles different versions in different bundles" do
@@ -54,11 +54,11 @@ describe "bundle exec" do
 
     bundle "exec rackup"
 
-    check out.should == "0.9.1"
+    should_be_activated "rack_two 1.0.0"
 
     Dir.chdir bundled_app2 do
       bundle "exec rackup"
-      out.should == "1.0.0"
+      out.should match /\n1.0.0\Z/
     end
   end
 
@@ -74,7 +74,7 @@ describe "bundle exec" do
 
     bundle "exec rackup"
 
-    check out.should == "0.9.1"
+    should_be_activated "rack 0.9.1"
     should_not_be_installed "rack_middleware 1.0"
   end
 
@@ -124,14 +124,14 @@ describe "bundle exec" do
 
       it "works when unlocked" do
         bundle "exec 'cd #{tmp('gems')} && rackup'"
-        out.should == "1.0.0"
+        should_be_activated "rack 1.0.0"
       end
 
       it "works when locked" do
         bundle "lock"
         should_be_locked
         bundle "exec 'cd #{tmp('gems')} && rackup'"
-        out.should == "1.0.0"
+        should_be_activated "rack 1.0.0"
       end
     end
 
@@ -148,7 +148,7 @@ describe "bundle exec" do
 
       it "works when unlocked" do
         bundle "exec fizz"
-        out.should == "1.0"
+        should_be_activated "fizz 1.0"
       end
 
       it "works when locked" do
@@ -156,7 +156,7 @@ describe "bundle exec" do
         should_be_locked
 
         bundle "exec fizz"
-        out.should == "1.0"
+        should_be_activated "fizz 1.0"
       end
     end
 
@@ -167,20 +167,20 @@ describe "bundle exec" do
         end
 
         install_gemfile <<-G
-          gem "fizz_git", :git => "#{lib_path('fizz_git-1.0')}"
+          gem "fizz_git", :git => "file://#{lib_path('fizz_git-1.0')}/.git"
         G
       end
 
       it "works when unlocked" do
         bundle "exec fizz_git"
-        out.should == "1.0"
+        out.should match /1.0/
       end
 
       it "works when locked" do
         bundle "lock"
         should_be_locked
         bundle "exec fizz_git"
-        out.should == "1.0"
+        out.should match /1.0/
       end
     end
 
@@ -191,20 +191,20 @@ describe "bundle exec" do
         end
 
         install_gemfile <<-G
-          gem "fizz_no_gemspec", "1.0", :git => "#{lib_path('fizz_no_gemspec-1.0')}"
+          gem "fizz_no_gemspec", "1.0", :git => "file://#{lib_path('fizz_no_gemspec-1.0')}/.git"
         G
       end
 
       it "works when unlocked" do
         bundle "exec fizz_no_gemspec"
-        out.should == "1.0"
+        out.should match /1.0/
       end
 
       it "works when locked" do
         bundle "lock"
         should_be_locked
         bundle "exec fizz_no_gemspec"
-        out.should == "1.0"
+        out.should match /1.0/
       end
     end
 
