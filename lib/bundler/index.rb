@@ -35,7 +35,9 @@ module Bundler
       case query
       when Gem::Specification, RemoteSpecification, LazySpecification then search_by_spec(query)
       when String then @specs[query]
-      else search_by_dependency(query)
+      when Gem::Dependency then search_by_dependency(query)
+      else
+        raise "You can't search for a #{query.inspect}."
       end
     end
 
