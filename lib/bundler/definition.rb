@@ -141,6 +141,10 @@ module Bundler
           @locked_specs
         else
           last_resolve = converge_locked_specs
+
+          # Record the specs available in each gem's source, so that those
+          # specs will be available later when the resolver knows where to
+          # look for that gemspec (or its dependencies)
           source_requirements = {}
           dependencies.each do |dep|
             next unless dep.source
