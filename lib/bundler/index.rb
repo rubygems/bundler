@@ -34,15 +34,19 @@ module Bundler
     def search(query)
       case query
       when Gem::Specification, RemoteSpecification, LazySpecification then search_by_spec(query)
-      when String then @specs[query]
+      when String then specs_by_name(query)
       when Gem::Dependency then search_by_dependency(query)
       else
         raise "You can't search for a #{query.inspect}."
       end
     end
 
+    def specs_by_name(name)
+      @specs[name]
+    end
+
     def search_for_all_platforms(dependency, base = [])
-      specs = @specs[dependency.name] + base
+      specs = specs_by_name(dependency.name) + base
 
       wants_prerelease = dependency.requirement.prerelease?
       only_prerelease  = specs.all? {|spec| spec.version.prerelease? }
@@ -56,7 +60,7 @@ module Bundler
     end
 
     def sources
-      @specs.values.map do |specs|
+      specs.values.map do |specs|
         specs.map{|s| s.source.class }
       end.flatten.uniq
     end
@@ -64,7 +68,7 @@ module Bundler
     alias [] search
 
     def <<(spec)
-      arr = @specs[spec.name]
+      arr = specs_by_name(spec.name)
 
       arr.delete_if do |s|
         same_version?(s.version, spec.version) && s.platform == spec.platform
@@ -75,7 +79,7 @@ module Bundler
     end
 
     def each(&blk)
-      @specs.values.each do |specs|
+      specs.values.each do |specs|
         specs.each(&blk)
       end
     end
@@ -98,7 +102,7 @@ module Bundler
   private
 
     def search_by_spec(spec)
-      @specs[spec.name].select do |s|
+      specs_by_name(spec.name).select do |s|
         same_version?(s.version, spec.version) && Gem::Platform.new(s.platform) == Gem::Platform.new(spec.platform)
       end
     end
@@ -116,7 +120,7 @@ module Bundler
 
     def search_by_dependency(dependency)
       @cache[dependency.hash] ||= begin
-        specs = @specs[dependency.name]
+        specs = specs_by_name(dependency.name)
 
         wants_prerelease = dependency.requirement.prerelease?
         only_prerelease  = specs.all? {|spec| spec.version.prerelease? }
