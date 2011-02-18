@@ -61,8 +61,12 @@ module Bundler
 
     def sources
       specs.values.map do |specs|
-        specs.map{|s| s.source.class }
+        specs.map{|s| s.source }
       end.flatten.uniq
+    end
+
+    def source_types
+      sources.map{|s| s.class }.uniq
     end
 
     alias [] search

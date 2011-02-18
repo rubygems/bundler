@@ -271,7 +271,7 @@ module Bundler
               end
             else
               message = "Could not find gem '#{current}' "
-              if @index.sources.include?(Bundler::Source::Rubygems)
+              if @index.source_types.include?(Bundler::Source::Rubygems)
                 message << "in any of the gem sources listed in your Gemfile."
               else
                 message << "in the gems available on this machine."
