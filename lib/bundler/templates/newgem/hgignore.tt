@@ -1,0 +1,4 @@
+glob: *.gem
+relre: ^\.bundle/
+glob: Gemfile.lock
+relre: ^pkg/
