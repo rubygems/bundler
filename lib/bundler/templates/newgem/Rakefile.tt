@@ -1,4 +1,8 @@
 #!/usr/bin/env rake
 
 require 'bundler'
+<% if config[:hg]%>
+Bundler::GemHelperMercurial.install_tasks
+<% else %>
 Bundler::GemHelper.install_tasks
+<% end %>
