@@ -1,4 +1,9 @@
-glob: *.gem
-relre: ^\.bundle/
-glob: Gemfile.lock
-relre: ^pkg/
+syntax: glob 
+
+*.gem
+Gemfile.lock
+
+syntax: regexp
+
+^\.bundle/
+^pkg/
