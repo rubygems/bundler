@@ -8,9 +8,15 @@ Gem::Specification.new do |gem|
   gem.summary       = %q{TODO: Write a gem summary}
   gem.homepage      = ''
 
+<% if config[:hg] %>
+  gem.executables   = `hg locate bin/*`.split("\n").map{ |f| File.basename(f) }
+  gem.files         = `hg locate`.split("\n")
+  gem.test_files    = `hg locate {test,spec,features}/*`.split("\n")
+<% else %>
   gem.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   gem.files         = `git ls-files`.split("\n")
   gem.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
+<% end %>
   gem.name          = <%=config[:name].inspect%>
   gem.require_paths = ['lib']
   gem.version       = <%=config[:constant_name]%>::VERSION
