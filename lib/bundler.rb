@@ -19,6 +19,7 @@ module Bundler
   autoload :Dsl,                 'bundler/dsl'
   autoload :Environment,         'bundler/environment'
   autoload :GemHelper,           'bundler/gem_helper'
+  autoload :GemHelperMercurial,  'bundler/gem_helper_mercurial'
   autoload :Graph,               'bundler/graph'
   autoload :Index,               'bundler/index'
   autoload :Installer,           'bundler/installer'

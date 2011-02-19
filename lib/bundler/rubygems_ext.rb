@@ -44,9 +44,13 @@ module Gem
     end
 
     def git_version
-      if @loaded_from && File.exist?(File.join(full_gem_path, ".git"))
-        sha = Dir.chdir(full_gem_path){ `git rev-parse HEAD`.strip }
-        " #{sha[0..6]}"
+      if @loaded_from
+        if File.exist?(File.join(full_gem_path, ".git"))
+          sha = Dir.chdir(full_gem_path){ `git rev-parse HEAD`.strip }
+          " #{sha[0..6]}"
+        elsif File.exist?(File.join(full_gem_path, '.hg'))
+          " #{$1}" if  /\b\d+:(\w{12})\b/ =~ `hg summary`
+        end
       end
     end
 
