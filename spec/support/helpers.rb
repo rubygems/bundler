@@ -240,7 +240,14 @@ module Spec
     end
 
     def revision_for(path)
-      Dir.chdir(path) { `git rev-parse HEAD`.strip }
+      Dir.chdir(path) do
+        if File.exist? '.git'
+          `git rev-parse HEAD`.strip
+        else
+          `hg log -r tip --style=default` =~ /\b\d+:(\w{12})$/
+          $1
+        end
+      end
     end
   end
 end

@@ -8,6 +8,7 @@ require "open3"
 
 module Bundler
   module Source
+    autoload :Mercurial, 'bundler/mercurial'
     # TODO: Refactor this class
     class Rubygems
       attr_reader :remotes

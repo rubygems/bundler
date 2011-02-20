@@ -304,6 +304,17 @@ module Spec
       build_with(GitUpdater, name, args, &block)
     end
 
+    def build_hg(name, *args, &block)
+      opts = args.last.is_a?(Hash) ? args.last : {}
+      builder = opts[:bare] ? HgBareBuilder : HgBuilder
+      spec = build_with(builder, name, args, &block)
+      HgReader.new(opts[:path] || lib_path(spec.full_name))
+    end
+
+    def update_hg(name, *args, &block)
+      build_with(HgUpdater, name, args, &block)
+    end
+
   private
 
     def build_with(builder, name, args, &blk)
@@ -570,5 +581,88 @@ module Spec
         @context.gem_repo1('gems')
       end
     end
+
+    class HgBareBuilder < LibBuilder
+      def _build(options)
+        path = options[:path] || _default_path
+        super(options.merge(:path => path))
+        Dir.chdir(path) do
+          `hg init .`
+          open('.hg/hgrc','a') { |f| f << "[ui]\nusername= Me The Tester <me@tester.org>\n"}
+        end
+      end
+    end
+
+    class HgBuilder < HgBareBuilder
+      def _build(options)
+        path = options[:path] || _default_path
+        super(options.merge(:path => path))
+        Dir.chdir(path) do
+          `hg add *`
+          `hg commit -m 'OMG INITIAL COMMIT'`
+        end
+      end
+    end
+
+    class HgUpdater < LibBuilder
+      WINDOWS = RbConfig::CONFIG["host_os"] =~ %r!(msdos|mswin|djgpp|mingw)!
+      NULL    = WINDOWS ? "NUL" : "/dev/null"
+
+      def silently(str)
+        `#{str} 2>#{NULL}`
+      end
+
+      def _build(options)
+        libpath = options[:path] || _default_path
+
+        Dir.chdir(libpath) do
+          silently "hg update -C default"
+
+          if branch = options[:branch]
+            raise "You can't specify `default` as the branch" if branch == "default"
+
+            if `hg branches | grep #{branch}`.empty?
+              silently("hg branch #{branch}")
+              silently("hg commit -m 'branching'")
+            end
+
+            silently("hg update -C #{branch}")
+          elsif tag = options[:tag]
+            `hg tag #{tag}`
+          elsif options[:remote]
+            open('.hg/hgrc','a') {|f| f << "[paths]\ndefault = #{options[:remote]}\n"}
+          elsif options[:push]
+            silently("hg push #{options[:push]}")
+          end
+
+          `hg log -r tip --style=default` =~ /\b\d+:(\w{12})$/
+          current_ref = $1
+          _default_files.keys.each do |path|
+            _default_files[path] << "\n#{Builders.constantize(name)}_PREV_REF = '#{current_ref}'"
+          end
+          super(options.merge(:path => libpath))
+          `hg addremove`
+          `hg commit -m "BUMP"`
+        end
+      end
+    end
+
+    class HgReader
+      attr_reader :path
+
+      def initialize(path)
+        @path = path
+      end
+
+      def ref_for(ref, len = nil)
+        Dir.chdir(@path) do
+          `hg log -r #{ref} --style=default` =~ /\b\d+:(\w{12})$/
+          ref = $1
+          ref = ref[0..len] if len
+          ref
+        end
+      end
+    end
+
   end
 end
