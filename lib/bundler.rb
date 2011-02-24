@@ -185,12 +185,19 @@ module Bundler
       @settings ||= Settings.new(app_config_path)
     end
 
-    def with_clean_env
+    def with_original_env
       bundled_env = ENV.to_hash
       ENV.replace(ORIGINAL_ENV)
       yield
     ensure
       ENV.replace(bundled_env.to_hash)
+    end
+
+    def with_clean_env
+      with_original_env do
+        ENV.delete_if { |k,_| k[0,7] == 'BUNDLE_' }
+        yield
+      end
     end
 
     def default_gemfile
