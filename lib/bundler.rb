@@ -200,6 +200,14 @@ module Bundler
       end
     end
 
+    def clean_system(*args)
+      with_clean_env { Kernel.system(*args) }
+    end
+
+    def clean_exec(*args)
+      with_clean_env { Kernel.exec(*args) }
+    end
+
     def default_gemfile
       SharedHelpers.default_gemfile
     end
