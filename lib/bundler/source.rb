@@ -350,8 +350,9 @@ module Bundler
               s.summary  = "Fake gemspec for #{@name}"
               s.relative_loaded_from = "#{@name}.gemspec"
               if expanded_path.join("bin").exist?
-                binaries = expanded_path.join("bin").children.map{|c| c.basename.to_s }
-                s.executables = binaries
+                binaries = expanded_path.join("bin").children
+                binaries.reject! &:directory?
+                s.executables = binaries.map{|c| c.basename.to_s }
               end
             end
           end
