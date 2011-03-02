@@ -8,16 +8,18 @@ module Bundler
       i
     end
 
-    attr_reader :specs
+    attr_reader :specs, :sources
     protected   :specs
 
     def initialize
+      @sources = []
       @cache = {}
       @specs = Hash.new { |h,k| h[k] = [] }
     end
 
     def initialize_copy(o)
       super
+      @sources = @sources.dup
       @cache = {}
       @specs = Hash.new { |h,k| h[k] = [] }
 
