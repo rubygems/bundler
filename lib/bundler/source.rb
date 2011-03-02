@@ -559,7 +559,10 @@ module Bundler
           out = %x{git #{command}}
 
           if $?.exitstatus != 0
-            raise GitError, "An error has occurred in git when running `git #{command}`. Cannot complete bundling."
+            msg = "Git error: " +
+              "command `git #{command}` in directory #{Dir.pwd} has failed.\n" +
+              "Cannot complete bundling."
+            raise GitError, msg
           end
           out
         else
