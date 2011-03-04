@@ -71,8 +71,10 @@ begin
           unless File.directory?("tmp/rubygems")
             system("git clone git://github.com/rubygems/rubygems.git tmp/rubygems")
           end
-          system("cd tmp/rubygems && git checkout #{rg}")
-          system("git pull origin master") if rg == "master"
+          Dir.chdir("tmp/rubygems") do
+            system("git checkout #{rg}")
+            system("git pull origin master") if rg == "master"
+          end
           ENV["RUBYOPT"] = "-I#{File.expand_path("tmp/rubygems/lib")} #{rubyopt}"
         end
 
