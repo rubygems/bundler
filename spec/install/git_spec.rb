@@ -341,14 +341,14 @@ describe "bundle install with git sources" do
     should_be_installed("rails 2.3.2")
   end
 
-  it "catches git errors and spits out useful output" do
+  fit "catches git errors and spits out useful output" do
     gemfile <<-G
       gem "foo", "1.0", :git => "omgomg"
     G
 
     bundle :install, :expect_err => true
 
-    out.should include("An error has occurred in git")
+    out.should include("Git error:")
     err.should include("fatal")
     err.should include("omgomg")
     err.should include("fatal: The remote end hung up unexpectedly")
