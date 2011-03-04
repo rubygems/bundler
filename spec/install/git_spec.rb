@@ -341,7 +341,7 @@ describe "bundle install with git sources" do
     should_be_installed("rails 2.3.2")
   end
 
-  fit "catches git errors and spits out useful output" do
+  it "catches git errors and spits out useful output" do
     gemfile <<-G
       gem "foo", "1.0", :git => "omgomg"
     G
