@@ -55,9 +55,10 @@ module Bundler
       end
     end
 
-    class RGProxy < Gem::SilentUI
+    class RGProxy < ::Gem::SilentUI
       def initialize(ui)
         @ui = ui
+        super()
       end
 
       def say(message)

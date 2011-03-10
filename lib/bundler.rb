@@ -200,7 +200,7 @@ module Bundler
     end
 
     def requires_sudo?
-      return @requires_sudo if @checked_for_sudo
+      return @requires_sudo if defined?(@checked_for_sudo) && @checked_for_sudo
 
       path = bundle_path
       path = path.parent until path.exist?

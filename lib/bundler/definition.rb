@@ -367,8 +367,10 @@ module Bundler
           # If the spec is no longer in the path source, unlock it. This
           # commonly happens if the version changed in the gemspec
           next unless other
+
+          deps2 = other.dependencies.select { |d| d.type != :development }
           # If the dependencies of the path source have changed, unlock it
-          next unless s.dependencies.sort == other.dependencies.sort
+          next unless s.dependencies.sort == deps2.sort
         end
 
         converged << s

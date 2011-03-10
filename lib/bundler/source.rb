@@ -317,7 +317,6 @@ module Bundler
       def eql?(o)
         o.instance_of?(Path) &&
         path.expand_path(Bundler.root) == o.path.expand_path(Bundler.root) &&
-        name == o.name &&
         version == o.version
       end
 
@@ -560,9 +559,11 @@ module Bundler
           out = %x{git #{command}}
 
           if $?.exitstatus != 0
-            error_message = "An error has occurred in git when running `git #{command}`. Cannot complete bundling."
-            error_message << "\nIf this error persists you could try removing the cache directory '#{cache_path}'" if cached?
-            raise GitError, error_message
+            msg = "Git error: " +
+              "command `git #{command}` in directory #{Dir.pwd} has failed.\n" +
+              "Cannot complete bundling."
+            msg << "\nIf this error persists you could try removing the cache directory '#{cache_path}'" if cached?
+            raise GitError, msg
           end
           out
         else

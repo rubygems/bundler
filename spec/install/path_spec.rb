@@ -141,6 +141,47 @@ describe "bundle install with explicit source paths" do
     should_be_installed "rack 1.0"
   end
 
+  it "doesn't automatically unlock dependencies when using the gemspec syntax" do
+    build_lib "foo", "1.0", :path => lib_path("foo") do |s|
+      s.add_dependency "rack", ">= 1.0"
+    end
+
+    Dir.chdir lib_path("foo")
+
+    install_gemfile lib_path("foo/Gemfile"), <<-G
+      source "file://#{gem_repo1}"
+      gemspec
+    G
+
+    build_gem "rack", "1.0.1", :to_system => true
+
+    bundle "install"
+
+    should_be_installed "foo 1.0"
+    should_be_installed "rack 1.0"
+  end
+
+  it "doesn't automatically unlock dependencies when using the gemspec syntax and the gem has development dependencies" do
+    build_lib "foo", "1.0", :path => lib_path("foo") do |s|
+      s.add_dependency "rack", ">= 1.0"
+      s.add_development_dependency "activesupport"
+    end
+
+    Dir.chdir lib_path("foo")
+
+    install_gemfile lib_path("foo/Gemfile"), <<-G
+      source "file://#{gem_repo1}"
+      gemspec
+    G
+
+    build_gem "rack", "1.0.1", :to_system => true
+
+    bundle "install"
+
+    should_be_installed "foo 1.0"
+    should_be_installed "rack 1.0"
+  end
+
   it "raises if there are multiple gemspecs" do
     build_lib "foo", "1.0", :path => lib_path("foo") do |s|
       s.write "bar.gemspec"
