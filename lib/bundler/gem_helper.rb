@@ -2,6 +2,13 @@ $:.unshift File.expand_path('../vendor', __FILE__)
 require 'thor'
 require 'bundler'
 
+begin
+  # Support Rake > 0.8.7
+  require 'rake/dsl_definition'
+  include Rake::DSL
+rescue LoadError
+end
+
 module Bundler
   class GemHelper
     def self.install_tasks(opts = {})
