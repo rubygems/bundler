@@ -137,7 +137,7 @@ module Bundler
 
     def resolve
       @resolve ||= begin
-        if Bundler.settings[:frozen]
+        if Bundler.settings[:frozen] || lock_current?
           @locked_specs
         else
           last_resolve = converge_locked_specs
@@ -151,24 +151,24 @@ module Bundler
             source_requirements[dep.name] = dep.source.specs
           end
 
-          # Only run a resolve against the locally available gems if Gemfile has changed
-          # since the last resolve
-          return last_resolve unless gemfile_changed?
-
-          # If it's changed, update hash and rerun resolve
           Bundler.settings[:gemfile_hash] = gemfile_hash
-          last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve)        end
+          last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve)
+        end
       end
     end
 
-    def gemfile_changed?
-      Digest::MD5.hexdigest(File.read(Bundler.default_gemfile)) == Bundler.settings[:gemfile_hash] 
+    def gemfile_hash
+      Digest::MD5.hexdigest(Bundler.default_gemfile.read)
+    end
+
+    def lock_current?
+      Bundler.settings[:gemfile_hash] == gemfile_hash && Bundler.default_lockfile.exist?
     end
 
     def index
       @index ||= Index.build do |idx|
         @sources.each do |s|
-          idx.use s.specs
+          idx.use s.specs(@dependencies)
         end
       end
     end

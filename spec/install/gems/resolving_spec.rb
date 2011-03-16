@@ -69,4 +69,33 @@ describe "bundle install with gem sources" do
       end
     end
   end
+
+  context "Gemfile hashing" do
+    before do
+      build_lib('foo')
+      install_gemfile <<-G, :expect_err => true
+        source "file://#{gem_repo1}"
+        gem "foo", :path => "#{lib_path('foo-1.0')}"
+      G
+    end
+
+    it "when Gemfile changes it reruns the resolver" do
+      install_gemfile <<-G, :expect_err => true, :env => {"DEBUG_RESOLVER" => true }
+        gem "foo", :path => "#{lib_path('foo-1.0')}"
+      G
+      err.should_not == ""
+    end
+
+    it "if the Gemfile has not changed don't rerun the resolver" do
+      bundle :install, :env => {"DEBUG_RESOLVER" => true }
+      err.should == ""
+    end
+
+    it "if the Gemfile.lock does not exist, generate one" do
+      bundled_app('Gemfile.lock').rmtree
+
+      bundle :install, :expect_err => true, :env => {"DEBUG_RESOLVER" => true }
+      err.should_not == ""
+    end
+  end
 end
