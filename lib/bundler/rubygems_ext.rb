@@ -118,7 +118,8 @@ module Gem
     def to_lock
       out = "  #{name}"
       unless requirement == Gem::Requirement.default
-        out << " (#{requirement.to_s})"
+        reqs = requirement.requirements.map{|o,v| "#{o} #{v}" }
+        out << " (#{reqs.join(', ')})"
       end
       out
     end
