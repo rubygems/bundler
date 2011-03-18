@@ -9,6 +9,8 @@ module Bundler
     attr_reader :platforms
 
     PLATFORM_MAP = {
+      :darwin   => Gem::Platform::RUBY,
+      :linux    => Gem::Platform::RUBY,
       :ruby     => Gem::Platform::RUBY,
       :ruby_18  => Gem::Platform::RUBY,
       :ruby_19  => Gem::Platform::RUBY,
@@ -20,8 +22,6 @@ module Bundler
       :mingw    => Gem::Platform::MINGW,
       :mingw_18 => Gem::Platform::MINGW,
       :mingw_19 => Gem::Platform::MINGW
-      :darwin   => Gem::Platform::DARWIN,
-      :linux    => Gem::Platform::LINUX
     }.freeze
 
     def initialize(name, version, options = {}, &blk)
