@@ -130,6 +130,10 @@ There are a number of `Gemfile` platforms:
     _mingw_ `AND` version 1.8
   * `mingw_19`:
     _mingw_ `AND` version 1.9
+  * `linux`:
+    Linux platform
+  * `darwin`:
+    Darwin platform (aka Mac OS X)
 
 As with groups, you can specify one or more platforms:
 
