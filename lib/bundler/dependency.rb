@@ -20,6 +20,8 @@ module Bundler
       :mingw    => Gem::Platform::MINGW,
       :mingw_18 => Gem::Platform::MINGW,
       :mingw_19 => Gem::Platform::MINGW
+      :darwin   => Gem::Platform::DARWIN,
+      :linux    => Gem::Platform::LINUX
     }.freeze
 
     def initialize(name, version, options = {}, &blk)
@@ -125,6 +127,14 @@ module Bundler
 
     def mingw_19?
       mingw? && RUBY_VERSION >= "1.9"
+    end
+
+    def darwin?
+      RUBY_PLATFORM.downcase.include?("darwin")
+    end
+
+    def linux?
+      RUBY_PLATFORM.downcase.include?("linux")
     end
 
   end
