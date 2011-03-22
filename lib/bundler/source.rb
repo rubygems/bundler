@@ -602,7 +602,7 @@ module Bundler
           return if has_revision_cached?
           Bundler.ui.info "Updating #{uri}"
           in_cache do
-            git %|fetch --force --quiet --tags "#{uri}" refs/heads/*:refs/heads/*|
+            git %|fetch --force --quiet --tags "#{uri}" "refs/heads/*:refs/heads/*"|
           end
         else
           Bundler.ui.info "Fetching #{uri}"
