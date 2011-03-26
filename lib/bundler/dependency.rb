@@ -72,7 +72,10 @@ module Bundler
       out = "  #{name}"
 
       unless requirement == Gem::Requirement.default
-        reqs = requirement.requirements.map{|o,v| "#{o} #{v}" }
+        # rubygems 1.5 + 1.6 compatibility requires us sorting this by hand
+        reqs = requirement.requirements.map { |a| Gem::Requirement.new a.join(' ') }
+        reqs.sort!
+        reqs.map! { |r| r.to_s }
         out << " (#{reqs.join(', ')})"
       end
 
