@@ -75,6 +75,7 @@ module Bundler
         # rubygems 1.5 + 1.6 compatibility requires us sorting this by hand
         reqs = requirement.requirements.map { |a| Gem::Requirement.new a.join(' ') }
         reqs.sort!
+        reqs.reverse!
         reqs.map! { |r| r.to_s }
         out << " (#{reqs.join(', ')})"
       end
