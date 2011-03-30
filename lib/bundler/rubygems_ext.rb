@@ -124,6 +124,7 @@ module Gem
       out
     end
 
+    # Backport of performance enhancement added to Rubygems 1.4
     def matches_spec?(spec)
       # name can be a Regexp, so use ===
       return false unless name === spec.name
@@ -134,6 +135,7 @@ module Gem
   end
 
   class Requirement
+    # Backport of performance enhancement added to Rubygems 1.4
     def none?
       @none ||= (to_s == ">= 0")
     end unless allocate.respond_to?(:none?)
