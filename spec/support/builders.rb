@@ -217,6 +217,11 @@ module Spec
           s.add_dependency "net_d"
         end
 
+        build_gem "like-capistrano" do |s|
+          s.add_dependency "net-scp"
+          s.add_dependency "net-scp", ">= 1.0.0"
+        end
+
         build_gem "foo"
       end
     end
