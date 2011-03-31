@@ -225,7 +225,7 @@ module Bundler
 
       handled = []
       dependencies.
-        sort_by { |d| d.name }.
+        sort_by { |d| d.to_s }.
         each do |dep|
           next if handled.include?(dep.name)
           out << dep.to_lock
