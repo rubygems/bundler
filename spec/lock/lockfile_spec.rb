@@ -332,23 +332,23 @@ describe "the lockfile format" do
   it "orders dependencies according to version" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
-
-      gem 'like-capistrano'
+      gem 'double_deps'
     G
 
     lockfile_should_be <<-G
       GEM
         remote: file:#{gem_repo1}/
         specs:
-          capistrano (2.5.20)
-            net-scp
-            net-scp (>= 1.0.0)
+          double_deps (1.0)
+            net-ssh (>= 1.0.0)
+            net-ssh
+          net-ssh (1.0)
 
       PLATFORMS
-      #{generic(Gem::Platform.local)}
+        #{generic(Gem::Platform.local)}
 
       DEPENDENCIES
-        capistrano
+        double_deps
     G
   end
 
