@@ -8,8 +8,8 @@ Gem::Specification.new do |s|
   s.name        = "bundler"
   s.version     = Bundler::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.authors     = ["Carl Lerche", "Yehuda Katz", "André Arko", "Terence Lee"]
-  s.email       = ["carlhuda@engineyard.com"]
+  s.authors     = ["André Arko", "Terence Lee", "Carl Lerche", "Yehuda Katz"]
+  s.email       = ["andre@arko.net"]
   s.homepage    = "http://gembundler.com"
   s.summary     = %q{The best way to manage your application's dependencies}
   s.description = %q{Bundler manages an application's dependencies through its entire life, across many machines, systematically and repeatably}
@@ -25,6 +25,5 @@ Gem::Specification.new do |s|
   s.files              = `git ls-files`.split("\n") + man_files
   s.test_files         = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables        = %w(bundle)
-  s.default_executable = "bundle"
   s.require_paths      = ["lib"]
 end
