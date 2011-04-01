@@ -123,13 +123,22 @@ module Bundler
       # === Following hacks are to improve on the generated bin wrappers ===
 
       # Yeah, talk about a hack
-      source_index_class = (class << Gem::SourceIndex ; self ; end)
-      source_index_class.send(:remove_method, :from_gems_in)
-      source_index_class.send(:define_method, :from_gems_in) do |*args|
-        source_index = Gem::SourceIndex.new
-        source_index.spec_dirs = *args
-        source_index.add_specs(*specs)
-        source_index
+      if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.7.0')
+        Gem::SourceIndex.send(:define_method, :initialize) do |*args|
+          @gems = {}
+          spec_dirs = *args
+          add_specs(*specs)
+        end
+      else
+        # Rubygems versions lower than 1.7 use SourceIndex#from_gems_in
+        source_index_class = (class << Gem::SourceIndex ; self ; end)
+        source_index_class.send(:remove_method, :from_gems_in)
+        source_index_class.send(:define_method, :from_gems_in) do |*args|
+          source_index = Gem::SourceIndex.new
+          source_index.spec_dirs = *args
+          source_index.add_specs(*specs)
+          source_index
+        end
       end
 
       # OMG more hacks
