@@ -205,13 +205,19 @@ module Bundler
         Bundler.settings[:frozen] = '1'
       end
 
+      # When install is called with --no-deployment, disable deployment mode
+      if opts[:deployment] == false
+        Bundler.settings.delete(:frozen)
+        opts[:system] = true
+      end
+
       # Can't use Bundler.settings for this because settings needs gemfile.dirname
       Bundler.settings[:path] = nil if opts[:system]
       Bundler.settings[:path] = "vendor/bundle" if opts[:deployment]
       Bundler.settings[:path] = path if path
       Bundler.settings[:path] = opts[:path] if opts[:path]
       Bundler.settings[:bin] = opts["binstubs"] if opts[:binstubs]
-      Bundler.settings[:disable_shared_gems] = '1' if Bundler.settings[:path]
+      Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? '1' : nil
       Bundler.settings.without = opts[:without] unless opts[:without].empty?
       Bundler.ui.be_quiet! if opts[:quiet]
 
