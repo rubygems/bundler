@@ -60,6 +60,7 @@ update process below under [CONSERVATIVE UPDATING][].
 
 * `--deployment`:
   Switches bundler's defaults into [deployment mode][DEPLOYMENT MODE].
+  Do not use this flag on development machines.
 
 * `--binstubs[=<directory>]`:
   Create a directory (defaults to `bin`) containing an executable
@@ -72,6 +73,8 @@ update process below under [CONSERVATIVE UPDATING][].
 
 Bundler's defaults are optimized for development. To switch to
 defaults optimized for deployment, use the `--deployment` flag.
+Do not activate deployment mode on development machines, as it
+will cause in an error when the Gemfile is modified.
 
 1. A `Gemfile.lock` is required.
 
