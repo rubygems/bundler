@@ -153,8 +153,6 @@ module Bundler
       "Do not allow the Gemfile.lock to be updated after this install"
     method_option "deployment", :type => :boolean, :banner =>
       "Install using defaults tuned for deployment environments"
-    method_option "production", :type => :boolean, :banner =>
-      "Deprecated, please use --deployment instead"
     def install(path = nil)
       opts = options.dup
       opts[:without] ||= []
@@ -169,12 +167,6 @@ module Bundler
 
       # Just disable color in deployment mode
       Bundler.ui.shell = Thor::Shell::Basic.new if opts[:deployment]
-
-      if opts[:production]
-        opts[:deployment] = true
-        Bundler.ui.warn "The --production option is deprecated, and will be removed in " \
-                        "the final release of Bundler 1.0. Please use --deployment instead."
-      end
 
       if (path || opts[:path] || opts[:deployment]) && opts[:system]
         Bundler.ui.error "You have specified both a path to install your gems to, \n" \
