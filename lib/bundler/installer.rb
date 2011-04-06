@@ -11,7 +11,7 @@ module Bundler
 
     def run(options)
       if Bundler.settings[:frozen]
-        @definition.ensure_equivalent_gemfile_and_lockfile
+        @definition.ensure_equivalent_gemfile_and_lockfile(options[:deployment])
       end
 
       if dependencies.empty?

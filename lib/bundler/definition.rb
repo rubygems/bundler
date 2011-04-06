@@ -235,12 +235,17 @@ module Bundler
       out
     end
 
-    def ensure_equivalent_gemfile_and_lockfile
+    def ensure_equivalent_gemfile_and_lockfile(explicit_flag = false)
       changes = false
 
       msg = "You are trying to install in deployment mode after changing\n" \
             "your Gemfile. Run `bundle install` elsewhere and add the\n" \
             "updated Gemfile.lock to version control."
+
+      unless explicit_flag
+        msg += "\n\nIf this is a development machine, remove the Gemfile " \
+               "freeze \nby running `bundle install --no-deployment`."
+      end
 
       added =   []
       deleted = []
