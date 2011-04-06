@@ -238,8 +238,9 @@ module Bundler
     def ensure_equivalent_gemfile_and_lockfile
       changes = false
 
-      msg = "You have modified your Gemfile in development but did not check\n" \
-            "the resulting snapshot (Gemfile.lock) into version control"
+      msg = "You are trying to install in deployment mode after changing\n" \
+            "your Gemfile. Run `bundle install` elsewhere and add the\n" \
+            "updated Gemfile.lock to version control."
 
       added =   []
       deleted = []
@@ -287,6 +288,7 @@ module Bundler
       msg << "\n\nYou have added to the Gemfile:\n"     << added.join("\n") if added.any?
       msg << "\n\nYou have deleted from the Gemfile:\n" << deleted.join("\n") if deleted.any?
       msg << "\n\nYou have changed in the Gemfile:\n"   << changed.join("\n") if changed.any?
+      msg << "\n"
 
       raise ProductionError, msg if added.any? || deleted.any? || changed.any?
     end
