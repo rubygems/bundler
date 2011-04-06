@@ -76,7 +76,7 @@ describe "install with --deployment or --frozen" do
       G
 
       bundle "install --deployment"
-      out.should include("You have modified your Gemfile")
+      out.should include("deployment mode")
       out.should include("You have added to the Gemfile")
       out.should include("* rack-obama")
       out.should_not include("You have deleted from the Gemfile")
@@ -92,7 +92,7 @@ describe "install with --deployment or --frozen" do
 
       ENV['BUNDLE_FROZEN'] = '1'
       bundle "install"
-      out.should include("You have modified your Gemfile")
+      out.should include("deployment mode")
       out.should include("You have added to the Gemfile")
       out.should include("* rack-obama")
       out.should_not include("You have deleted from the Gemfile")
@@ -107,7 +107,7 @@ describe "install with --deployment or --frozen" do
       G
 
       bundle "install --frozen"
-      out.should include("You have modified your Gemfile")
+      out.should include("deployment mode")
       out.should include("You have added to the Gemfile")
       out.should include("* rack-obama")
       out.should_not include("You have deleted from the Gemfile")
@@ -121,7 +121,7 @@ describe "install with --deployment or --frozen" do
       G
 
       bundle "install --deployment"
-      out.should include("You have modified your Gemfile")
+      out.should include("deployment mode")
       out.should include("You have added to the Gemfile:\n* activesupport\n\n")
       out.should include("You have deleted from the Gemfile:\n* rack")
       out.should_not include("You have changed in the Gemfile")
@@ -134,7 +134,7 @@ describe "install with --deployment or --frozen" do
       G
 
       bundle "install --deployment"
-      out.should include("You have modified your Gemfile")
+      out.should include("deployment mode")
       out.should include("You have added to the Gemfile:\n* source: git://hubz.com (at master)")
       out.should_not include("You have changed in the Gemfile")
     end
@@ -153,7 +153,7 @@ describe "install with --deployment or --frozen" do
       G
 
       bundle "install --deployment"
-      out.should include("You have modified your Gemfile")
+      out.should include("deployment mode")
       out.should include("You have deleted from the Gemfile:\n* source: #{lib_path("rack-1.0")} (at master)")
       out.should_not include("You have added to the Gemfile")
       out.should_not include("You have changed in the Gemfile")
@@ -176,7 +176,7 @@ describe "install with --deployment or --frozen" do
       G
 
       bundle "install --deployment"
-      out.should include("You have modified your Gemfile")
+      out.should include("deployment mode")
       out.should include("You have changed in the Gemfile:\n* rack from `no specified source` to `#{lib_path("rack")} (at master)`")
       out.should_not include("You have added to the Gemfile")
       out.should_not include("You have deleted from the Gemfile")
