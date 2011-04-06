@@ -239,7 +239,7 @@ module Bundler
       changes = false
 
       msg = "You have modified your Gemfile in development but did not check\n" \
-            "the resulting snapshot (Gemfile.lock) into version control"
+            "the resulting snapshot (Gemfile.lock) into git"
 
       added =   []
       deleted = []
