@@ -126,7 +126,8 @@ overrides any previous <a href="#REMEMBERED-OPTIONS" title="REMEMBERED OPTIONS" 
 the gems located in <code>vendor/cache</code>. Note that if a more
 appropriate platform-specific gem exists on <code>rubygems.org</code>,
 this will bypass the normal lookup.</p></dd>
-<dt><code>--deployment</code></dt><dd><p>Switches bundler's defaults into <a href="#DEPLOYMENT-MODE" title="DEPLOYMENT MODE" data-bare-link="true">deployment mode</a>.</p></dd>
+<dt><code>--deployment</code></dt><dd><p>Switches bundler's defaults into <a href="#DEPLOYMENT-MODE" title="DEPLOYMENT MODE" data-bare-link="true">deployment mode</a>.
+Do not use this flag on development machines.</p></dd>
 <dt><code>--binstubs[=&lt;directory>]</code></dt><dd><p>Create a directory (defaults to <code>bin</code>) containing an executable
 that runs in the context of the bundle. For instance, if the
 <code>rails</code> gem comes with a <code>rails</code> executable, this flag will create
@@ -138,7 +139,9 @@ come from the bundled gems.</p></dd>
 <h2 id="DEPLOYMENT-MODE">DEPLOYMENT MODE</h2>
 
 <p>Bundler's defaults are optimized for development. To switch to
-defaults optimized for deployment, use the <code>--deployment</code> flag.</p>
+defaults optimized for deployment, use the <code>--deployment</code> flag.
+Do not activate deployment mode on development machines, as it
+will cause in an error when the Gemfile is modified.</p>
 
 <ol>
 <li><p>A <code>Gemfile.lock</code> is required.</p>
@@ -387,7 +390,7 @@ does not work, run <a href="bundle-update.1.html">bundle update(1)</a>.</p>
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'></li>
-    <li class='tc'>December 2010</li>
+    <li class='tc'>April 2011</li>
     <li class='tr'>bundle-install(1)</li>
   </ol>
 
