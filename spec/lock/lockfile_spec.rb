@@ -340,8 +340,8 @@ describe "the lockfile format" do
         remote: file:#{gem_repo1}/
         specs:
           double_deps (1.0)
-            net-ssh (>= 1.0.0)
             net-ssh
+            net-ssh (>= 1.0.0)
           net-ssh (1.0)
 
       PLATFORMS
