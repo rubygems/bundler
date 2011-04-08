@@ -126,7 +126,7 @@ module Bundler
       if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.7.0')
         Gem::SourceIndex.send(:define_method, :initialize) do |*args|
           @gems = {}
-          spec_dirs = *args
+          self.spec_dirs = *args
           add_specs(*specs)
         end
       else
