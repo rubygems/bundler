@@ -223,6 +223,17 @@ describe "bundle install with explicit source paths" do
     out.should == "1.0"
   end
 
+  it "handles directories in bin/" do
+    build_lib "foo"
+    lib_path("foo-1.0").join("foo.gemspec").rmtree
+    lib_path("foo-1.0").join("bin/performance").mkpath
+
+    install_gemfile <<-G
+      gem 'foo', '1.0', :path => "#{lib_path('foo-1.0')}"
+    G
+    err.should == ""
+  end
+
   it "removes the .gem file after installing" do
     build_lib "foo"
 
