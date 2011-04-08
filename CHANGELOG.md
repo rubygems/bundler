@@ -1,3 +1,20 @@
+## 1.0.12 (April 8, 2011)
+
+Features:
+
+  - Add --no-deployment option to `install` for disabling it on dev machines
+  - Better error message when git fails and cache is present (@parndt)
+  - Honor :bundle_cmd in cap `rake` command (@voidlock, @cgriego)
+
+Bugfixes:
+
+  - Compatibility with Rubygems 1.7 and Rails 2.3 and vendored gems (@evan)
+  - Fix changing gem order in lock (@gucki)
+  - Remove color escape sequences when displaying man pages (@bgreenlee)
+  - Fix creating GEM_HOME on both JRuby 1.5 and 1.6 (@nickseiger)
+  - Fix gems without a gemspec and directories in bin/ (@epall)
+  - Fix --no-prune option for `bundle install` (@cmeiklejohn)
+
 ## 1.0.11 (April 1, 2011)
 
 Features:
