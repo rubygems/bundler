@@ -8,7 +8,7 @@ Features:
 
 Bugfixes:
 
-  - Compatibility with Rubygems 1.7 and Rails 2.3 and vendored gems (@evan)
+  - Compatibility with Rubygems 1.7 and Rails 2.3 and vendored gems (@evanphx)
   - Fix changing gem order in lock (@gucki)
   - Remove color escape sequences when displaying man pages (@bgreenlee)
   - Fix creating GEM_HOME on both JRuby 1.5 and 1.6 (@nickseiger)
