@@ -202,7 +202,7 @@ module Bundler
     end
 
     def requires_sudo?
-      return @requires_sudo if @checked_for_sudo
+      return @requires_sudo if defined?(@checked_for_sudo) && @checked_for_sudo
 
       path = bundle_path
       path = path.parent until path.exist?
@@ -267,7 +267,9 @@ module Bundler
         ENV["GEM_HOME"] = bundle_path.to_s
       end
 
-      FileUtils.mkdir_p bundle_path.to_s
+      # TODO: This mkdir_p is only needed for JRuby <= 1.5 and should go away (GH #602)
+      FileUtils.mkdir_p bundle_path.to_s rescue nil
+
       Gem.clear_paths
     end
 

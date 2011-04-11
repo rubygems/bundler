@@ -308,14 +308,13 @@ module Bundler
       def eql?(o)
         o.instance_of?(Path) &&
         path.expand_path(Bundler.root) == o.path.expand_path(Bundler.root) &&
-        name == o.name &&
         version == o.version
       end
 
       alias == eql?
 
       def name
-        File.basename(@path.to_s)
+        File.basename(path.expand_path(Bundler.root).to_s)
       end
 
       def load_spec_files
@@ -342,8 +341,9 @@ module Bundler
               s.summary  = "Fake gemspec for #{@name}"
               s.relative_loaded_from = "#{@name}.gemspec"
               if expanded_path.join("bin").exist?
-                binaries = expanded_path.join("bin").children.map{|c| c.basename.to_s }
-                s.executables = binaries
+                binaries = expanded_path.join("bin").children
+                binaries.reject!{|p| File.directory?(p) }
+                s.executables = binaries.map{|c| c.basename.to_s }
               end
             end
           end
@@ -551,7 +551,9 @@ module Bundler
           out = %x{git #{command}}
 
           if $?.exitstatus != 0
-            raise GitError, "An error has occurred in git when running `git #{command}`. Cannot complete bundling."
+            msg = "Git error: command `git #{command}` in directory #{Dir.pwd} has failed."
+            msg << "\nIf this error persists you could try removing the cache directory '#{cache_path}'" if cached?
+            raise GitError, msg
           end
           out
         else
@@ -602,7 +604,7 @@ module Bundler
           return if has_revision_cached?
           Bundler.ui.info "Updating #{uri}"
           in_cache do
-            git %|fetch --force --quiet --tags "#{uri}" refs/heads/*:refs/heads/*|
+            git %|fetch --force --quiet --tags "#{uri}" "refs/heads/*:refs/heads/*"|
           end
         else
           Bundler.ui.info "Fetching #{uri}"
