@@ -162,6 +162,7 @@ module Bundler
       end
       opts[:without].map!{|g| g.to_sym }
 
+      # Can't use Bundler.settings for this because settings needs gemfile.dirname
       ENV['BUNDLE_GEMFILE'] = File.expand_path(opts[:gemfile]) if opts[:gemfile]
       ENV['RB_USER_INSTALL'] = '1' if Bundler::FREEBSD
 
@@ -211,7 +212,6 @@ module Bundler
         opts[:system] = true
       end
 
-      # Can't use Bundler.settings for this because settings needs gemfile.dirname
       Bundler.settings[:path] = nil if opts[:system]
       Bundler.settings[:path] = "vendor/bundle" if opts[:deployment]
       Bundler.settings[:path] = path if path
