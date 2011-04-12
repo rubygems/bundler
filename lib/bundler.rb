@@ -85,7 +85,6 @@ module Bundler
     end
 
     def bundle_path
-      # STDERR.puts settings.path
       @bundle_path ||= Pathname.new(settings.path).expand_path(root)
     end
 
