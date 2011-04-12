@@ -76,18 +76,18 @@ module Bundler
     def source(source, options = {})
       case source
       when :gemcutter, :rubygems, :rubyforge then
-        rubygems_source "http://rubygems.org"
+        @rubygems_source.add_remote "http://rubygems.org"
         return
       when String
-        rubygems_source source
+        @rubygems_source.add_remote source
         return
+      else
+        @source = source
+        options[:prepend] ? @sources.unshift(@source) : @sources << @source
+
+        yield if block_given?
+        return @source
       end
-
-      @source = source
-      options[:prepend] ? @sources.unshift(@source) : @sources << @source
-
-      yield if block_given?
-      @source
     ensure
       @source = nil
     end
