@@ -64,22 +64,6 @@ module Gem
       dependencies - development_dependencies
     end
 
-    def add_bundler_dependencies(*groups)
-      Bundler.ui.warn "#add_bundler_dependencies is deprecated and will " \
-        "be removed in Bundler 1.0. Instead, please use the #gemspec method " \
-        "in your Gemfile, which will pull in any dependencies specified in " \
-        "your gemspec"
-
-      groups = [:default] if groups.empty?
-      Bundler.definition.dependencies.each do |dep|
-        if dep.groups.include?(:development)
-          self.add_development_dependency(dep.name, dep.requirement.to_s)
-        elsif (dep.groups & groups).any?
-          self.add_dependency(dep.name, dep.requirement.to_s)
-        end
-      end
-    end
-
   private
 
     def dependencies_to_gemfile(dependencies, group = nil)
