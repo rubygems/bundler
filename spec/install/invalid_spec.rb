@@ -23,7 +23,7 @@ describe "bundle install to a dead symlink" do
     end
   end
 
-  fit "reports the symlink is dead" do
+  it "reports the symlink is dead" do
     gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack"
