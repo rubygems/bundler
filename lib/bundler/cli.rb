@@ -241,7 +241,7 @@ module Bundler
           "Please use `bundle install --path #{path}` instead."
       end
     rescue GemNotFound => e
-      if opts[:local]
+      if opts[:local] && Bundler.app_cache.exist?
         Bundler.ui.warn "Some gems seem to be missing from your vendor/cache directory."
       end
 
