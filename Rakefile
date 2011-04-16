@@ -60,7 +60,7 @@ begin
     namespace :rubygems do
       # Rubygems 1.3.5, 1.3.6, and HEAD specs
       rubyopt = ENV["RUBYOPT"]
-      %w(master v1.3.6 v1.3.7 v1.4.0 v1.4.1 v1.5.0).each do |rg|
+      %w(master v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.1 v1.7.2).each do |rg|
         desc "Run specs with Rubygems #{rg}"
         RSpec::Core::RakeTask.new(rg) do |t|
           t.rspec_opts = %w(-fs --color)
@@ -71,8 +71,11 @@ begin
           unless File.directory?("tmp/rubygems")
             system("git clone git://github.com/rubygems/rubygems.git tmp/rubygems")
           end
-          system("cd tmp/rubygems && git checkout #{rg}")
-          system("git pull") if rg == "master"
+          Dir.chdir("tmp/rubygems") do
+            system("git remote update")
+            system("git checkout #{rg}")
+            system("git pull origin master") if rg == "master"
+          end
           ENV["RUBYOPT"] = "-I#{File.expand_path("tmp/rubygems/lib")} #{rubyopt}"
         end
 

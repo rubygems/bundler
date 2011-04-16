@@ -141,6 +141,10 @@ module Bundler
           @locked_specs
         else
           last_resolve = converge_locked_specs
+
+          # Record the specs available in each gem's source, so that those
+          # specs will be available later when the resolver knows where to
+          # look for that gemspec (or its dependencies)
           source_requirements = {}
           dependencies.each do |dep|
             next unless dep.source
@@ -225,7 +229,7 @@ module Bundler
 
       handled = []
       dependencies.
-        sort_by { |d| d.name }.
+        sort_by { |d| d.to_s }.
         each do |dep|
           next if handled.include?(dep.name)
           out << dep.to_lock
@@ -235,11 +239,17 @@ module Bundler
       out
     end
 
-    def ensure_equivalent_gemfile_and_lockfile
+    def ensure_equivalent_gemfile_and_lockfile(explicit_flag = false)
       changes = false
 
-      msg = "You have modified your Gemfile in development but did not check\n" \
-            "the resulting snapshot (Gemfile.lock) into version control"
+      msg = "You are trying to install in deployment mode after changing\n" \
+            "your Gemfile. Run `bundle install` elsewhere and add the\n" \
+            "updated Gemfile.lock to version control."
+
+      unless explicit_flag
+        msg += "\n\nIf this is a development machine, remove the Gemfile " \
+               "freeze \nby running `bundle install --no-deployment`."
+      end
 
       added =   []
       deleted = []
@@ -287,6 +297,7 @@ module Bundler
       msg << "\n\nYou have added to the Gemfile:\n"     << added.join("\n") if added.any?
       msg << "\n\nYou have deleted from the Gemfile:\n" << deleted.join("\n") if deleted.any?
       msg << "\n\nYou have changed in the Gemfile:\n"   << changed.join("\n") if changed.any?
+      msg << "\n"
 
       raise ProductionError, msg if added.any? || deleted.any? || changed.any?
     end
@@ -367,8 +378,10 @@ module Bundler
           # If the spec is no longer in the path source, unlock it. This
           # commonly happens if the version changed in the gemspec
           next unless other
+
+          deps2 = other.dependencies.select { |d| d.type != :development }
           # If the dependencies of the path source have changed, unlock it
-          next unless s.dependencies.sort == other.dependencies.sort
+          next unless s.dependencies.sort == deps2.sort
         end
 
         converged << s

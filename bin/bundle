@@ -19,4 +19,9 @@ rescue Interrupt => e
   Bundler.ui.error "\nQuitting..."
   Bundler.ui.debug e.backtrace.join("\n")
   exit 1
+rescue Exception => e
+  Bundler.ui.error "Unfortunately, a fatal error has occurred. " +
+    "Please report this error to the Bundler issue tracker at " +
+    "https://github.com/carlhuda/bundler/issues so that we can fix it. Thanks!"
+  raise e
 end

@@ -118,11 +118,13 @@ module Gem
     def to_lock
       out = "  #{name}"
       unless requirement == Gem::Requirement.default
-        out << " (#{requirement.to_s})"
+        reqs = requirement.requirements.map{|o,v| "#{o} #{v}" }
+        out << " (#{reqs.join(', ')})"
       end
       out
     end
 
+    # Backport of performance enhancement added to Rubygems 1.4
     def matches_spec?(spec)
       # name can be a Regexp, so use ===
       return false unless name === spec.name
@@ -133,6 +135,7 @@ module Gem
   end
 
   class Requirement
+    # Backport of performance enhancement added to Rubygems 1.4
     def none?
       @none ||= (to_s == ">= 0")
     end unless allocate.respond_to?(:none?)

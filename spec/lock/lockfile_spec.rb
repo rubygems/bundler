@@ -329,6 +329,29 @@ describe "the lockfile format" do
     G
   end
 
+  it "orders dependencies according to version" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem 'double_deps'
+    G
+
+    lockfile_should_be <<-G
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          double_deps (1.0)
+            net-ssh
+            net-ssh (>= 1.0.0)
+          net-ssh (1.0)
+
+      PLATFORMS
+        #{generic(Gem::Platform.local)}
+
+      DEPENDENCIES
+        double_deps
+    G
+  end
+
   it "does not add the :require option to the lockfile" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
