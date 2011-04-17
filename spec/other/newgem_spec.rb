@@ -2,8 +2,19 @@ require "spec_helper"
 
 describe "bundle gem" do
   before :each do
+    @git_name = `git config --global user.name`.chomp
+    `git config --global user.name "Bundler User"`
+    @git_email = `git config --global user.email`.chomp
+    `git config --global user.email user@example.com`
     bundle 'gem test-gem'
   end
+
+  after :each do
+    `git config --global user.name "#{@git_name}"`
+    `git config --global user.email #{@git_email}`
+  end
+
+  let(:generated_gem) { Bundler::GemHelper.new(bundled_app("test-gem").to_s) }
 
   it "generates a gem skeleton" do
     bundled_app("test-gem/test-gem.gemspec").should exist
@@ -20,5 +31,33 @@ describe "bundle gem" do
   it "nests constants so they work" do
     bundled_app("test-gem/lib/test-gem/version.rb").read.should =~ /module Test\n  module Gem/
     bundled_app("test-gem/lib/test-gem.rb").read.should =~ /module Test\n  module Gem/
+  end
+
+  context "git config user.{name,email} present" do
+    it "sets gemspec author to git user.name if available" do
+      generated_gem.gemspec.authors.first.should == "Bundler User"
+    end
+
+    it "sets gemspec email to git user.email if available" do
+      generated_gem.gemspec.email.first.should == "user@example.com"
+    end
+  end
+
+  context "git config user.{name,email} is not set" do
+    before :each do
+      `git config --global --unset user.name`
+      `git config --global --unset user.email`
+      reset!
+      in_app_root
+      bundle 'gem test-gem'
+    end
+
+    it "sets gemspec author to default message if git user.name is not set or empty" do
+      generated_gem.gemspec.authors.first.should == "TODO: Write your name"
+    end
+
+    it "sets gemspec email to default message if git user.email is not set or empty" do
+      generated_gem.gemspec.email.first.should == "TODO: Write your email address"
+    end
   end
 end
