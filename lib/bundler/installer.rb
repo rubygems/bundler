@@ -105,13 +105,61 @@ module Bundler
         end
       end
 
-
       File.open File.join(bundler_path, "setup.rb"), "w" do |file|
-        file.puts "path = File.expand_path('..', __FILE__)"
-        paths.each do |path|
-          file.puts %{$:.unshift File.expand_path("\#{path}/#{path}")}
-        end
+        file.puts generate_standalone_load_paths_setup(paths)
+        file.puts generate_standalone_bundle_require(groups)
       end
+    end
+
+    def generate_standalone_load_paths_setup(paths)
+      setup = "path = File.join(File.dirname(__FILE__),'..')\n"
+      paths.each do |path|
+        setup << %{$:.unshift File.expand_path("\#{path}/#{path}")\n}
+      end
+      setup
+    end
+
+    def generate_standalone_bundle_require(groups)
+      required_groups = [:default] if groups.empty?
+      required_dependencies = Bundler.definition.dependencies.select do |dep|
+        ((dep.groups & required_groups).any? && dep.current_platform?)
+      end
+      required_dependencies.map! do |dep|
+        %Q{Struct::Dependency.new(#{dep.name.inspect},#{dep.autorequire.inspect})}
+      end
+      """
+module Bundler
+  REGEXPS = [
+    /^no such file to load -- (.+)$/i,
+    /^Missing \w+ (?:file\s*)?([^\s]+.rb)$/i,
+    /^Missing API definition file in (.+)$/i,
+    /^cannot load such file -- (.+)$/i,
+  ]
+
+  def self.dependencies
+    Struct.new('Dependency', :name, :autorequire)
+    [
+      #{required_dependencies.join(",\n      ")}
+    ]
+  end
+
+  def self.require(*groups)
+    dependencies.each do |dep|
+      required_file = nil
+      begin
+        Array(dep.autorequire || dep.name).each do |file|
+          required_file = file
+          Kernel.require file
+        end
+      rescue LoadError => e
+        REGEXPS.find { |r| r =~ e.message }
+        raise if dep.autorequire || $1 != required_file
+      end
+    end
+  end
+
+end
+"""
     end
   end
 end
