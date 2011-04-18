@@ -9,6 +9,7 @@ end
 
 require 'yaml'
 require 'bundler/rubygems_ext'
+require 'bundler/rubygems_integration'
 require 'bundler/version'
 
 module Bundler
@@ -137,11 +138,11 @@ module Bundler
     end
 
     def ruby_scope
-      "#{Gem.ruby_engine}/#{Gem::ConfigMap[:ruby_version]}"
+      "#{Bundler.rubygems.ruby_engine}/#{Gem::ConfigMap[:ruby_version]}"
     end
 
     def user_bundle_path
-      Pathname.new(Gem.user_home).join(".bundler")
+      Pathname.new(Bundler.rubygems.user_home).join(".bundler")
     end
 
     def home
@@ -258,8 +259,9 @@ module Bundler
       if settings[:disable_shared_gems]
         ENV['GEM_PATH'] = ''
         ENV['GEM_HOME'] = File.expand_path(bundle_path, root)
-      elsif Gem.dir != bundle_path.to_s
-        paths = [Gem.dir, Gem.path].flatten.compact.uniq.reject{|p| p.empty? }
+      elsif Bundler.rubygems.gem_dir != bundle_path.to_s
+        possibles = [Bundler.rubygems.gem_dir, Bundler.rubygems.gem_path]
+        paths = possibles.flatten.compact.uniq.reject { |p| p.empty? }
         ENV["GEM_PATH"] = paths.join(File::PATH_SEPARATOR)
         ENV["GEM_HOME"] = bundle_path.to_s
       end
@@ -267,7 +269,7 @@ module Bundler
       # TODO: This mkdir_p is only needed for JRuby <= 1.5 and should go away (GH #602)
       FileUtils.mkdir_p bundle_path.to_s rescue nil
 
-      Gem.clear_paths
+      Bundler.rubygems.clear_paths
     end
 
     def upgrade_lockfile

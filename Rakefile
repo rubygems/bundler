@@ -76,12 +76,26 @@ begin
             system("git checkout #{rg}")
             system("git pull origin master") if rg == "master"
           end
+          puts "Running bundler specs against rubygems '#{rg}'"
           ENV["RUBYOPT"] = "-I#{File.expand_path("tmp/rubygems/lib")} #{rubyopt}"
         end
 
         task rg => "clone_rubygems_#{rg}"
         task "rubygems:all" => rg
       end
+
+      desc "Run specs under a Rubygems checkout (set RG=path)"
+      RSpec::Core::RakeTask.new("co") do |t|
+        t.rspec_opts = %w(-fs --color)
+        t.ruby_opts  = %w(-w)
+      end
+
+      task "setup_co" do
+        ENV["RUBYOPT"] = "-I#{File.expand_path ENV['RG']} #{rubyopt}"
+      end
+
+      task "co" => "setup_co"
+      task "rubygems:all" => "co"
     end
 
     namespace :ruby do

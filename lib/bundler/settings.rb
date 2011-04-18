@@ -79,7 +79,7 @@ module Bundler
       if path = self[:path]
         "#{path}/#{Bundler.ruby_scope}"
       else
-        Gem.dir
+        Bundler.rubygems.gem_dir
       end
     end
 
@@ -106,7 +106,7 @@ module Bundler
     end
 
     def global_config_file
-      file = ENV["BUNDLE_CONFIG"] || File.join(Gem.user_home, ".bundle/config")
+      file = ENV["BUNDLE_CONFIG"] || File.join(Bundler.rubygems.user_home, ".bundle/config")
       Pathname.new(file)
     end
 
