@@ -44,14 +44,6 @@ module Bundler
       end
     end
 
-    def github(repo_name, *args)
-      options = Hash === args.last ? args.pop : {}
-      options[:github] = repo_name
-      args << options
-
-      gem(repo_name.split("/").last, *args)
-    end
-
     def gem(name, *args)
       if name.is_a?(Symbol)
         raise GemfileError, %{You need to specify gem names as Strings. Use 'gem "#{name.to_s}"' instead.}
