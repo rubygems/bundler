@@ -55,6 +55,9 @@ We divide `bundle` subcommands into primary commands and utilities.
 * `bundle show(1)`:
   Show the source location of a particular gem in the bundle
 
+* `bundle outdated(1)`:
+  Show all of the outdated gems in the current bundle
+
 * `bundle console(1)`:
   Start an IRB session in the context of the current bundle
 

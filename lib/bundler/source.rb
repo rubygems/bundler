@@ -76,6 +76,18 @@ module Bundler
         end
       end
 
+      def outdated(spec)
+        installed_spec = installed_specs[spec.name]
+        installed_spec = installed_spec.first
+
+        if installed_spec && spec.version == installed_spec.version
+          Bundler.ui.debug "Up to date: #{spec.name} (#{installed_spec.version}) "
+          return
+        end
+
+        Bundler.ui.info "#{spec.name} (#{spec.version} > #{installed_spec.version}) "
+      end
+
       def install(spec)
         path = cached_gem(spec)
 
