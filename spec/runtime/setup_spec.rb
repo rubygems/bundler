@@ -166,7 +166,7 @@ describe "Bundler.setup" do
     should_be_installed "rack 1.0.0"
   end
 
-  describe "crippling rubygems" do
+  describe "integrate with rubygems" do
     describe "by replacing #gem" do
       before :each do
         install_gemfile <<-G
@@ -522,7 +522,7 @@ describe "Bundler.setup" do
 
     run <<-R
       Gem.refresh
-      puts Gem.source_index.find_name("rack").inspect
+      puts Bundler.rubygems.find_name("rack").inspect
     R
 
     out.should == "[]"

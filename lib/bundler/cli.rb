@@ -4,9 +4,6 @@ require 'thor/actions'
 require 'rubygems/user_interaction'
 require 'rubygems/config_file'
 
-# Work around a RubyGems bug
-Gem.configuration
-
 module Bundler
   class CLI < Thor
     include Thor::Actions
@@ -16,7 +13,7 @@ module Bundler
       the_shell = (options["no-color"] ? Thor::Shell::Basic.new : shell)
       Bundler.ui = UI::Shell.new(the_shell)
       Bundler.ui.debug! if options["verbose"]
-      Gem::DefaultUserInteraction.ui = UI::RGProxy.new(Bundler.ui)
+      Bundler.rubygems.ui = UI::RGProxy.new(Bundler.ui)
     end
 
     check_unknown_options! unless ARGV.include?("exec") || ARGV.include?("config")
