@@ -111,14 +111,6 @@ module Bundler
       source Source::Git.new(_normalize_hash(options).merge("uri" => uri)), source_options, &blk
     end
 
-    def github(repo_name, *args)
-      options = Hash === args.last ? args.pop : {}
-      options[:github] = repo_name
-      args << options
-
-      gem(repo_name.split("/").last, *args)
-    end
-
     def to_definition(lockfile, unlock)
       @sources << @rubygems_source
       @sources.uniq!
@@ -215,12 +207,6 @@ module Bundler
       platforms.each do |p|
         next if VALID_PLATFORMS.include?(p)
         raise DslError, "`#{p}` is not a valid platform. The available options are: #{VALID_PLATFORMS.inspect}"
-      end
-
-      # Convert github option into git option
-      if github = opts.delete(:github)
-        github = "#{github}/#{github}" unless github.include?("/")
-        opts[:git] = "git://github.com/#{github}.git"
       end
 
       # Normalize git and path options
