@@ -10,6 +10,14 @@ module Bundler
     end
 
     def run(options)
+      # Create the BUNDLE_PATH directory
+      begin
+        Bundler.bundle_path.mkpath unless Bundler.bundle_path.exist?
+      rescue Errno::EEXIST
+        raise PathError, "Could not install to path `#{Bundler.settings[:path]}` " +
+          "because of an invalid symlink. Remove the symlink so the directory can be created."
+      end
+
       if Bundler.settings[:frozen]
         @definition.ensure_equivalent_gemfile_and_lockfile(options[:deployment])
       end
@@ -35,9 +43,6 @@ module Bundler
           @definition.resolve_remotely!
       end
 
-      # Ensure that BUNDLE_PATH exists
-      Bundler.mkdir_p(Bundler.bundle_path) unless File.exist?(Bundler.bundle_path)
-
       # Must install gems in the order that the resolver provides
       # as dependencies might actually affect the installation of
       # the gem.
@@ -49,13 +54,9 @@ module Bundler
         #   next
         # end
 
-        begin
-          old_args = Gem::Command.build_args
-          Gem::Command.build_args = [Bundler.settings["build.#{spec.name}"]]
+        Bundler.rubygems.with_build_args [Bundler.settings["build.#{spec.name}"]] do
           spec.source.install(spec)
           Bundler.ui.debug "from #{spec.loaded_from} "
-        ensure
-          Gem::Command.build_args = old_args
         end
 
         Bundler.ui.info ""

@@ -4,9 +4,6 @@ require 'thor/actions'
 require 'rubygems/user_interaction'
 require 'rubygems/config_file'
 
-# Work around a RubyGems bug
-Gem.configuration
-
 module Bundler
   class CLI < Thor
     include Thor::Actions
@@ -16,7 +13,7 @@ module Bundler
       the_shell = (options["no-color"] ? Thor::Shell::Basic.new : shell)
       Bundler.ui = UI::Shell.new(the_shell)
       Bundler.ui.debug! if options["verbose"]
-      Gem::DefaultUserInteraction.ui = UI::RGProxy.new(Bundler.ui)
+      Bundler.rubygems.ui = UI::RGProxy.new(Bundler.ui)
     end
 
     check_unknown_options! unless ARGV.include?("exec") || ARGV.include?("config")
@@ -162,6 +159,7 @@ module Bundler
       end
       opts[:without].map!{|g| g.to_sym }
 
+      # Can't use Bundler.settings for this because settings needs gemfile.dirname
       ENV['BUNDLE_GEMFILE'] = File.expand_path(opts[:gemfile]) if opts[:gemfile]
       ENV['RB_USER_INSTALL'] = '1' if Bundler::FREEBSD
 
@@ -219,7 +217,7 @@ module Bundler
           "Use `bundle show [gemname]` to see where a bundled gem is installed."
       end
     rescue GemNotFound => e
-      if opts[:local]
+      if opts[:local] && Bundler.app_cache.exist?
         Bundler.ui.warn "Some gems seem to be missing from your vendor/cache directory."
       end
 

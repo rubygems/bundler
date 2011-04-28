@@ -11,7 +11,7 @@ module Bundler
       specs = groups.any? ? @definition.specs_for(groups) : requested_specs
 
       setup_environment
-      cripple_rubygems(specs)
+      Bundler.rubygems.replace_entrypoints(specs)
 
       # Activate the specs
       specs.each do |spec|
@@ -19,7 +19,7 @@ module Bundler
           raise GemNotFound, "#{spec.full_name} is missing. Run `bundle` to get it."
         end
 
-        if activated_spec = Gem.loaded_specs[spec.name] and activated_spec.version != spec.version
+        if activated_spec = Bundler.rubygems.loaded_specs(spec.name) and activated_spec.version != spec.version
           e = Gem::LoadError.new "You have already activated #{activated_spec.name} #{activated_spec.version}, " \
                                  "but your Gemfile requires #{spec.name} #{spec.version}. Consider using bundle exec."
           e.name = spec.name
@@ -31,7 +31,7 @@ module Bundler
           raise e
         end
 
-        Gem.loaded_specs[spec.name] = spec
+        Bundler.rubygems.mark_loaded(spec)
         load_paths = spec.load_paths.reject {|path| $LOAD_PATH.include?(path)}
         $LOAD_PATH.unshift(*load_paths)
       end
@@ -102,7 +102,7 @@ module Bundler
       cached  = Dir["#{cache_path}/*.gem"]
 
       cached = cached.delete_if do |path|
-        spec = Gem::Format.from_file_by_path(path).spec
+        spec = Bundler.rubygems.spec_from_gem path
 
         resolve.any? do |s|
           s.name == spec.name && s.version == spec.version && !s.source.is_a?(Bundler::Source::Git)
@@ -176,7 +176,7 @@ module Bundler
 
     def setup_environment
       begin
-        ENV["BUNDLE_BIN_PATH"] = Gem.bin_path("bundler", "bundle", VERSION)
+        ENV["BUNDLE_BIN_PATH"] = Bundler.rubygems.bin_path("bundler", "bundle", VERSION)
       rescue Gem::GemNotFoundException
         ENV["BUNDLE_BIN_PATH"] = File.expand_path("../../../bin/bundle", __FILE__)
       end

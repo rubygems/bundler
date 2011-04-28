@@ -83,7 +83,8 @@ describe "bundle exec" do
       gem "rack"
     G
 
-    rubyopt = "-I#{bundler_path} -rbundler/setup"
+    rubyopt = ENV['RUBYOPT']
+    rubyopt = "-I#{bundler_path} -rbundler/setup #{rubyopt}"
 
     bundle "exec 'echo $RUBYOPT'"
     out.should have_rubyopts(rubyopt)
