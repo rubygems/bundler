@@ -182,14 +182,6 @@ module Bundler
       end
     end
 
-    # Replace the method that finds all specs on the system
-    # and replace it with one that just returns out static view.
-    def stub_load_all_spec(specs)
-      sc = (class << Gem::Specification; self; end)
-      sc.send(:remove_method, :load_all_specs)
-      sc.send(:define_method, :load_all_specs) { specs }
-    end
-
     # Used to make bin stubs that are not created by bundler work
     # under bundler. The new Gem.bin_path only considers gems in
     # +specs+
@@ -244,12 +236,17 @@ module Bundler
 
     class Modern < RubygemsIntegration
       def stub_rubygems(specs)
-        stub_load_all_spec(specs)
+        Gem::Specification.all = specs
+
+        Gem.post_reset {
+          Gem::Specification.all = specs
+        }
+
         stub_source_index170(specs)
       end
 
       def all_specs
-        Gem::Specification.all
+        Gem::Specification.to_a
       end
 
       def find_name(name)
@@ -289,7 +286,7 @@ module Bundler
   end
 
   if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.7.0')
-    if Gem::Specification.respond_to? :load_all_specs
+    if Gem::Specification.respond_to? :all=
       @rubygems = RubygemsIntegration::Modern.new
     else
       @rubygems = RubygemsIntegration::Transitional.new
