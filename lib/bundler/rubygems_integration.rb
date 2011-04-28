@@ -5,16 +5,6 @@ module Bundler
       configuration
     end
 
-    def is_19?
-      false
-    end
-
-    # Make sure that rubygems has fully loaded (1.9 partially loads
-    # sometimes)
-    def fully_load!
-      Gem.source_index if is_19?
-    end
-
     def loaded_specs(name)
       Gem.loaded_specs[name]
     end
