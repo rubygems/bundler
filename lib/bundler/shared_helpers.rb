@@ -3,8 +3,6 @@ require 'rubygems'
 
 require 'bundler/rubygems_integration'
 
-Bundler.rubygems.fully_load!
-
 module Gem
   class Dependency
     if !instance_methods.map { |m| m.to_s }.include?("requirement")
