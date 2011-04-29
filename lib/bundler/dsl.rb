@@ -183,7 +183,7 @@ module Bundler
     def _normalize_options(name, version, opts)
       _normalize_hash(opts)
 
-      invalid_keys = opts.keys - %w(group groups git path name branch ref tag require submodules platform platforms)
+      invalid_keys = opts.keys - %w(group groups git github path name branch ref tag require submodules platform platforms)
       if invalid_keys.any?
         plural = invalid_keys.size > 1
         message = "You passed #{invalid_keys.map{|k| ':'+k }.join(", ")} "
@@ -209,7 +209,11 @@ module Bundler
         raise DslError, "`#{p}` is not a valid platform. The available options are: #{VALID_PLATFORMS.inspect}"
       end
 
-      # Normalize git and path options
+      if github = opts.delete(:github)
+        github = "#{github}/#{github}" unless github.include?("/")
+        opts["git"] = "git://github.com/#{github}.git"
+      end
+
       ["git", "path"].each do |type|
         if param = opts[type]
           if version.first && version.first =~ /^\s*=?\s*(\d[^\s]*)\s*$/
