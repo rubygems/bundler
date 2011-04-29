@@ -272,6 +272,33 @@ module Bundler
     end
     map %w(list) => "show"
 
+    desc "outdated", "Returns a list of installed gems that are outdated."
+    long_desc <<-D
+      Outdated lists the names and versions of all gems that are outdated when compared to the source.
+      Calling outdated with [GEM [GEM]] will check only the given gems.
+    D
+    method_option "source", :type => :array, :banner => "Check against a specific source"
+    method_option "local", :type => :boolean, :banner =>
+      "Do not attempt to fetch gems remotely and use the gem cache instead"
+    def outdated(*gems)
+      sources = Array(options[:source])
+
+      if gems.empty? && sources.empty?
+        # We're doing a full update
+        definition = Bundler.definition(true)
+      else
+        definition = Bundler.definition(:gems => gems, :sources => sources)
+      end
+
+      options["local"] ? definition.resolve_with_cache! : definition.resolve_remotely!
+
+      definition.specs.each do |spec|
+        spec.source.fetch(spec) if spec.source.respond_to?(:fetch)
+        spec.source.outdated(spec)
+        Bundler.ui.debug "from #{spec.loaded_from} "
+      end
+    end
+
     desc "cache", "Cache all the gems to vendor/cache", :hide => true
     method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
     def cache
