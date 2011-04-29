@@ -1,3 +1,10 @@
+## 1.1.pre.2 (April 28, 2011)
+
+Features:
+
+  - Add :github option to Gemfile DSL for easy git repos
+  - Merge all fixes from 1.0.12 and 1.0.13
+
 ## 1.1.pre.1 (February 2, 2011)
 
 Bugfixes:
