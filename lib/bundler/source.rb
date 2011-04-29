@@ -180,6 +180,7 @@ module Bundler
              s.version  = VERSION
              s.platform = Gem::Platform::RUBY
              s.source   = self
+             s.authors  = ["bundler team"]
              s.loaded_from = File.expand_path("..", __FILE__)
            end
            idx << bundler
@@ -353,6 +354,7 @@ module Bundler
               s.platform = Gem::Platform::RUBY
               s.summary  = "Fake gemspec for #{@name}"
               s.relative_loaded_from = "#{@name}.gemspec"
+              s.authors  = ["no one"]
               if expanded_path.join("bin").exist?
                 binaries = expanded_path.join("bin").children
                 binaries.reject!{|p| File.directory?(p) }

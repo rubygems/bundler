@@ -322,6 +322,9 @@ module Spec
 
       Array(versions).each do |version|
         spec = builder.new(self, name, version)
+        if !spec.authors or spec.authors.empty?
+          spec.authors = ["no one"]
+        end
         yield spec if block_given?
         spec._build(options)
       end
@@ -454,6 +457,8 @@ module Spec
           @files = _default_files.merge(@files)
         end
 
+        @spec.authors = ["no one"]
+
         @files.each do |file, source|
           file = Pathname.new(path).join(file)
           FileUtils.mkdir_p(file.dirname)
@@ -563,6 +568,11 @@ module Spec
         Dir.chdir(lib_path) do
           destination = opts[:path] || _default_path
           FileUtils.mkdir_p(destination)
+
+          if !@spec.authors or @spec.authors.empty?
+            @spec.authors = ["that guy"]
+          end
+
           Gem::Builder.new(@spec).build
           if opts[:to_system]
             `gem install --ignore-dependencies #{@spec.full_name}.gem`
