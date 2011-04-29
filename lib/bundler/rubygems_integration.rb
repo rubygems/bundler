@@ -58,7 +58,7 @@ module Bundler
     end
 
     def gem_path
-      Gem.path.to_s
+      Gem.path
     end
 
     def marshal_spec_dir
