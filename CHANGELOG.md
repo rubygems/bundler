@@ -1,3 +1,11 @@
+## 1.0.13 (April 28, 2011)
+
+Features:
+
+  - Compatibility with Rubygems master (soon to be v1.8)
+  - Check for Rubygems features before overriding them
+  - Informative error when --path points to a broken symlink
+
 ## 1.0.12 (April 8, 2011)
 
 Features:
