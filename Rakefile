@@ -71,12 +71,16 @@ begin
           unless File.directory?("tmp/rubygems")
             system("git clone git://github.com/rubygems/rubygems.git tmp/rubygems")
           end
+          hash = nil
+
           Dir.chdir("tmp/rubygems") do
             system("git remote update")
             system("git checkout #{rg}")
             system("git pull origin master") if rg == "master"
+            hash = `git rev-parse HEAD`.strip
           end
-          puts "Running bundler specs against rubygems '#{rg}'"
+
+          puts "Running bundler specs against rubygems '#{rg}' at #{hash}"
           ENV["RUBYOPT"] = "-I#{File.expand_path("tmp/rubygems/lib")} #{rubyopt}"
         end
 
