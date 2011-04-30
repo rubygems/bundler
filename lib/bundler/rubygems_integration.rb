@@ -5,16 +5,6 @@ module Bundler
       configuration
     end
 
-    def is_19?
-      false
-    end
-
-    # Make sure that rubygems has fully loaded (1.9 partially loads
-    # sometimes)
-    def fully_load!
-      Gem.source_index if is_19?
-    end
-
     def loaded_specs(name)
       Gem.loaded_specs[name]
     end
@@ -68,7 +58,8 @@ module Bundler
     end
 
     def gem_path
-      Gem.path.to_s
+      # Convert Gem::FS from Rubygems >= 1.8 into strings
+      Gem.path.map{|p| p.to_s }
     end
 
     def marshal_spec_dir
