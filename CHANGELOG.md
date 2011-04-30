@@ -1,3 +1,17 @@
+## 1.1.pre.3 (master branch)
+
+Features:
+
+  - Add `bundle outdated` to show outdated gems (@joelmoss)
+  - Remove BUNDLE_* from `Bundler.with_clean_env` (@wuputah)
+  - Add Bundler.clean_system, and clean_exec (@wuputah)
+  - Use git config for gem author name and email (@krekoten)
+
+Bugfixes:
+
+  - Fix error calling Bundler.rubygems.gem_path
+  - Fix error when Gem.path returns Gem::FS instead of String
+
 ## 1.1.pre.2 (April 28, 2011)
 
 Features:
