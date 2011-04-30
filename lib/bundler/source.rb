@@ -105,7 +105,7 @@ module Bundler
           sudo "cp -R #{Bundler.tmp}/gems/#{spec.full_name} #{Bundler.rubygems.gem_dir}/gems/"
           sudo "cp -R #{Bundler.tmp}/specifications/#{spec.full_name}.gemspec #{Bundler.rubygems.gem_dir}/specifications/"
           spec.executables.each do |exe|
-            sudo "mkdir -p #{Bundler.rubygems.bindir}"
+            sudo "mkdir -p #{Bundler.rubygems.gem_bindir}"
             sudo "cp -R #{Bundler.tmp}/bin/#{exe} #{Bundler.rubygems.gem_bindir}"
           end
         end
