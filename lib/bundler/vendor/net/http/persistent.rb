@@ -393,7 +393,7 @@ class Net::HTTP::Persistent
 
   ##
   # Shuts down all connections for +thread+.
-  # 
+  #
   # Uses the current thread by default.
   #
   # If you've used Net::HTTP::Persistent across multiple threads you should
@@ -427,7 +427,7 @@ class Net::HTTP::Persistent
   # connections!  Call #shutdown at the appropriate time instead!
   #
   # Use this method only as a last resort!
-  
+
   def shutdown_in_all_threads
     Thread.list.each do |thread|
       shutdown thread
