@@ -2,9 +2,14 @@
 
 Features:
 
-  - Compatibility with Rubygems master (soon to be v1.8)
-  - Check for Rubygems features before overriding them
+  - Compatibility with Rubygems master (soon to be v1.8) (@evanphx)
   - Informative error when --path points to a broken symlink
+  - Support Rake 0.9 and greater (@e2)
+  - Output full errors for non-TTYs e.g. pow (@josh)
+
+Bugfixes:
+
+  - Allow spaces in gem path names for gem tasks (@rslifka)
 
 ## 1.0.12 (April 8, 2011)
 
