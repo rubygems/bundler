@@ -58,7 +58,8 @@ module Bundler
     end
 
     def gem_path
-      Gem.path
+      # Convert Gem::FS from Rubygems >= 1.8 into strings
+      Gem.path.map{|p| p.to_s }
     end
 
     def marshal_spec_dir
