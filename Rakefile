@@ -145,7 +145,7 @@ begin
       end
 
       file "#{roff}.txt" => roff do
-        sh "groff -Wall -mtty-char -mandoc -Tascii #{roff} | col -b > #{roff}.txt"
+        sh "groff -Wall -mtty-char -mandoc -Tascii #{roff} > #{roff}.txt"
       end
 
       task :build_all_pages => "#{roff}.txt"
