@@ -8,8 +8,8 @@ def sudo?
 end
 
 begin
+  # set up rspec tasks
   require 'rspec/core/rake_task'
-  require 'ronn'
 
   desc "Run specs"
   RSpec::Core::RakeTask.new do |t|
@@ -129,6 +129,38 @@ begin
 
   end
 
+
+  # set up man tasks that use ronn
+  require 'ronn'
+
+  namespace :man do
+    directory "lib/bundler/man"
+
+    Dir["man/*.ronn"].each do |ronn|
+      basename = File.basename(ronn, ".ronn")
+      roff = "lib/bundler/man/#{basename}"
+
+      file roff => ["lib/bundler/man", ronn] do
+        sh "ronn --roff --pipe #{ronn} > #{roff}"
+      end
+
+      file "#{roff}.txt" => roff do
+        sh "groff -Wall -mtty-char -mandoc -Tascii #{roff} | col -b > #{roff}.txt"
+      end
+
+      task :build_all_pages => "#{roff}.txt"
+    end
+
+    desc "Build the man pages"
+    task :build => "man:build_all_pages"
+
+    desc "Clean up from the built man pages"
+    task :clean do
+      rm_rf "lib/bundler/man"
+    end
+  end
+
+
 rescue LoadError
   task :spec do
     abort "Run `rake spec:deps` to be able to run the specs"
@@ -142,33 +174,6 @@ rescue LoadError
     end
   end
 
-end
-
-namespace :man do
-  directory "lib/bundler/man"
-
-  Dir["man/*.ronn"].each do |ronn|
-    basename = File.basename(ronn, ".ronn")
-    roff = "lib/bundler/man/#{basename}"
-
-    file roff => ["lib/bundler/man", ronn] do
-      sh "ronn --roff --pipe #{ronn} > #{roff}"
-    end
-
-    file "#{roff}.txt" => roff do
-      sh "groff -Wall -mtty-char -mandoc -Tascii #{roff} | col -b > #{roff}.txt"
-    end
-
-    task :build_all_pages => "#{roff}.txt"
-  end
-
-  desc "Build the man pages"
-  task :build => "man:build_all_pages"
-
-  desc "Clean up from the built man pages"
-  task :clean do
-    rm_rf "lib/bundler/man"
-  end
 end
 
 namespace :vendor do

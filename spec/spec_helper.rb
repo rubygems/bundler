@@ -39,8 +39,13 @@ RSpec.configure do |config|
   config.include Spec::Platforms
   config.include Spec::Sudo
 
+  if Spec::Sudo.test_sudo?
+    config.filter_run :sudo => true
+  else
+    config.filter_run_excluding :sudo => true
+  end
+
   config.filter_run :focused => true unless ENV['CI']
-  config.filter_run_excluding :sudo => true unless Spec::Sudo.test_sudo?
   config.run_all_when_everything_filtered = true
   config.alias_example_to :fit, :focused => true
 
