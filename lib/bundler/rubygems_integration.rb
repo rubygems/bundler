@@ -14,7 +14,7 @@ module Bundler
     end
 
     def path(obj)
-      Gem::Path.path(obj)
+      obj.to_s
     end
 
     def platforms
@@ -58,8 +58,9 @@ module Bundler
     end
 
     def gem_path
-      # Convert Gem::FS from Rubygems >= 1.8 into strings
-      Gem.path.map{|p| p.to_s }
+      # Make sure that Gem.path is an array of Strings, not some
+      # internal Rubygems object
+      Gem.path.map { |x| x.to_s }
     end
 
     def marshal_spec_dir
@@ -251,10 +252,6 @@ module Bundler
         stub_source_index137(specs)
       end
 
-      def path(obj)
-        obj.to_s
-      end
-
       def all_specs
         Gem.source_index.all_gems.values
       end
@@ -267,10 +264,6 @@ module Bundler
     class Transitional < Legacy
       def stub_rubygems(specs)
         stub_source_index170(specs)
-      end
-
-      def path(obj)
-        obj.to_s
       end
     end
 

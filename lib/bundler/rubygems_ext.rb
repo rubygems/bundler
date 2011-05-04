@@ -39,6 +39,11 @@ module Gem
       end
     end
 
+    # RubyGems 1.8+ used only.
+    def gem_dir
+      full_gem_path
+    end
+
     def groups
       @groups ||= []
     end
