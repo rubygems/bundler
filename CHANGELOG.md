@@ -1,4 +1,4 @@
-## 1.1.pre.3 (master branch)
+## 1.1.pre.3 (4 May, 2011)
 
 Features:
 
