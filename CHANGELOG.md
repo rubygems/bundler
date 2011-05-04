@@ -1,4 +1,4 @@
-## 1.0.13 (April 30, 2011)
+## 1.0.13 (May 4, 2011)
 
 Features:
 
@@ -10,6 +10,8 @@ Features:
 Bugfixes:
 
   - Allow spaces in gem path names for gem tasks (@rslifka)
+  - Have cap run bundle install from release_path (@martinjagusch)
+  - Quote git refspec so zsh doesn't expand it (@goneflyin)
 
 ## 1.0.12 (April 8, 2011)
 
