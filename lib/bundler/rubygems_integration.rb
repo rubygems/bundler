@@ -14,7 +14,7 @@ module Bundler
     end
 
     def path(obj)
-      Gem::Path.path(obj)
+      obj.to_s
     end
 
     def platforms
@@ -252,10 +252,6 @@ module Bundler
         stub_source_index137(specs)
       end
 
-      def path(obj)
-        obj.to_s
-      end
-
       def all_specs
         Gem.source_index.all_gems.values
       end
@@ -268,10 +264,6 @@ module Bundler
     class Transitional < Legacy
       def stub_rubygems(specs)
         stub_source_index170(specs)
-      end
-
-      def path(obj)
-        obj.to_s
       end
     end
 
