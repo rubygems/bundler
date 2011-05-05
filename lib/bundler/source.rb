@@ -10,7 +10,7 @@ module Bundler
   module Source
     # TODO: Refactor this class
     class Rubygems
-      attr_reader :remotes
+      attr_reader :remotes, :caches
 
       def initialize(options = {})
         @options = options
@@ -19,8 +19,8 @@ module Bundler
         @allow_remote = false
         @allow_cached = false
 
-        @caches = [ Bundler.app_cache ]
-        @caches << Bundler.rubygems.gem_path.map{|p| File.expand_path("#{p}/cache") }
+        @caches = [ Bundler.app_cache ] +
+          Bundler.rubygems.gem_path.map{|p| File.expand_path("#{p}/cache") }
 
         @spec_fetch_map = {}
       end
