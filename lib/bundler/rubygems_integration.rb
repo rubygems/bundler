@@ -265,6 +265,10 @@ module Bundler
       def stub_rubygems(specs)
         stub_source_index170(specs)
       end
+
+      def all_specs
+        Gem.source_index.to_a.map { |x| x[1] }
+      end
     end
 
   end
