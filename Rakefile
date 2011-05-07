@@ -129,7 +129,6 @@ begin
 
   end
 
-
   # set up man tasks that use ronn
   require 'ronn'
 

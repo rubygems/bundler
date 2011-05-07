@@ -12,17 +12,17 @@ See [gembundler.com](http://gembundler.com) for up-to-date installation and usag
 
 ### Troubleshooting
 
-For help with common problems, see [ISSUES](http://github.com/carlhuda/bundler/blob/master/ISSUES.md).
+For help with common problems, see [ISSUES](https://github.com/carlhuda/bundler/blob/master/ISSUES.md).
 
 ### Development
 
-To see what has changed in recent versions of bundler, see the [CHANGELOG](http://github.com/carlhuda/bundler/blob/master/CHANGELOG.md).
+To see what has changed in recent versions of bundler, see the [CHANGELOG](https://github.com/carlhuda/bundler/blob/master/CHANGELOG.md).
 
 The `master` branch contains our current progress towards version 1.1. Because of that, please submit bugfix pull requests against the `1-0-stable` branch.
 
 ### Upgrading from Bundler 0.8 to 0.9 and above
 
-See [UPGRADING](http://github.com/carlhuda/bundler/blob/master/UPGRADING.md).
+See [UPGRADING](https://github.com/carlhuda/bundler/blob/master/UPGRADING.md).
 
 ### Other questions
 
