@@ -253,7 +253,7 @@ module Bundler
       end
 
       def all_specs
-        Gem.source_index.all_gems.values
+        Gem.source_index.gems.values
       end
 
       def find_name(name)
