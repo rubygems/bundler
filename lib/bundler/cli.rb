@@ -216,6 +216,9 @@ module Bundler
         Bundler.ui.confirm "Your bundle is complete! " +
           "Use `bundle show [gemname]` to see where a bundled gem is installed."
       end
+      Installer.post_install_messages.to_a.each do |name, msg|
+        Bundler.ui.confirm "Post-install message from #{name}:\n#{msg}"
+      end
     rescue GemNotFound => e
       if opts[:local] && Bundler.app_cache.exist?
         Bundler.ui.warn "Some gems seem to be missing from your vendor/cache directory."

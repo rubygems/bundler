@@ -3,6 +3,10 @@ require 'rubygems/dependency_installer'
 
 module Bundler
   class Installer < Environment
+    class << self
+      attr_accessor :post_install_messages
+    end
+
     def self.install(root, definition, options = {})
       installer = new(root, definition)
       installer.run(options)
@@ -46,6 +50,7 @@ module Bundler
       # Must install gems in the order that the resolver provides
       # as dependencies might actually affect the installation of
       # the gem.
+      Installer.post_install_messages = {}
       specs.each do |spec|
         spec.source.fetch(spec) if spec.source.respond_to?(:fetch)
 
@@ -56,6 +61,7 @@ module Bundler
 
         Bundler.rubygems.with_build_args [Bundler.settings["build.#{spec.name}"]] do
           spec.source.install(spec)
+          Installer.post_install_messages[spec.name] = spec.post_install_message
           Bundler.ui.debug "from #{spec.loaded_from} "
         end
 
