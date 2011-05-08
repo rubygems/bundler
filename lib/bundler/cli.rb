@@ -94,8 +94,12 @@ module Bundler
     D
     method_option "gemfile", :type => :string, :banner =>
       "Use the specified gemfile instead of Gemfile"
+    method_option "path", :type => :string, :banner =>
+      "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
     def check
       ENV['BUNDLE_GEMFILE'] = File.expand_path(options[:gemfile]) if options[:gemfile]
+
+      Bundler.settings[:path] = File.expand_path(options[:path]) if options[:path]
       begin
         not_installed = Bundler.definition.missing_specs
       rescue GemNotFound, VersionConflict

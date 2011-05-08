@@ -195,6 +195,30 @@ describe "bundle check" do
     end
   end
 
+  context "--path" do
+    before do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rails"
+      G
+      bundle "install --path vendor/bundle"
+
+      FileUtils.rm_rf(bundled_app(".bundle"))
+    end
+
+    it "returns success" do
+      bundle "check --path vendor/bundle", :exitstatus => true
+      check @exitstatus.should == 0
+      out.should == "The Gemfile's dependencies are satisfied"
+    end
+
+    it "should write to .bundle/config" do
+      bundle "check --path vendor/bundle", :exitstatus => true
+      bundle "check", :exitstatus => true
+      check @exitstatus.should == 1
+    end
+  end
+
   describe "when locked" do
     before :each do
       system_gems "rack-1.0.0"
