@@ -16,14 +16,17 @@ module Spec
       build_repo gem_repo1 do
         build_gem "rack", %w(0.9.1 1.0.0) do |s|
           s.executables = "rackup"
+          s.post_install_message = "Rack's post install message"
         end
 
         build_gem "thin" do |s|
           s.add_dependency "rack"
+          s.post_install_message = "Thin's post install message"
         end
 
         build_gem "rack-obama" do |s|
           s.add_dependency "rack"
+          s.post_install_message = "Rack-obama's post install message"
         end
 
         build_gem "rack_middleware", "1.0" do |s|
