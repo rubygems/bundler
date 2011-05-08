@@ -61,7 +61,6 @@ module Bundler
 
         Bundler.rubygems.with_build_args [Bundler.settings["build.#{spec.name}"]] do
           spec.source.install(spec)
-          Installer.post_install_messages[spec.name] = spec.post_install_message
           Bundler.ui.debug "from #{spec.loaded_from} "
         end
 
