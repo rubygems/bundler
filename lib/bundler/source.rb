@@ -110,6 +110,10 @@ module Bundler
         installer = Gem::Installer.new path, options
         installer.install
 
+        if spec.post_install_message
+          Installer.post_install_messages[spec.name] = spec.post_install_message
+        end
+
         # SUDO HAX
         if Bundler.requires_sudo?
           sudo "mkdir -p #{Bundler.rubygems.gem_dir}/gems #{Bundler.rubygems.gem_dir}/specifications"
