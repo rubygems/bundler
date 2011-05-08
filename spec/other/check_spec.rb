@@ -215,7 +215,7 @@ describe "bundle check" do
     it "should write to .bundle/config" do
       bundle "check --path vendor/bundle", :exitstatus => true
       bundle "check", :exitstatus => true
-      check @exitstatus.should == 1
+      check @exitstatus.should == 0
     end
   end
 
