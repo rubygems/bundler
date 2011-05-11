@@ -1,0 +1,9 @@
+syntax: glob 
+
+*.gem
+Gemfile.lock
+
+syntax: regexp
+
+^\.bundle/
+^pkg/
