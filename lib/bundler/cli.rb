@@ -439,6 +439,13 @@ module Bundler
       require 'irb'
       IRB.start
     end
+    
+    desc "benchmark [GROUP]", "Displays the time taken for each each gem to be loaded into the environment"
+    def benchmark(group = nil)
+      Bundler.ui.debug!
+      Bundler.ui.debug "Gem require times as included by bundle:"
+      group ? Bundler.require(:default, *(group.split.map! {|g| g.to_sym })) : Bundler.require
+    end
 
     desc "version", "Prints the bundler's version information"
     def version
