@@ -1,0 +1,20 @@
+bundle-benchmark(1) -- Display the time taken for each gem to be loaded
+=======================================================================
+
+## SYNOPSIS
+
+`bundle benchmark` [group]
+
+## DESCRIPTION
+
+This command loads all your required dependencies as per Bundler.setup, and
+displays the total time spent in requiring each gem and its dependencies.
+
+Use this command to track down problems with excessive boot time in your 
+application, or to optimize specific groups in your Gemfile for fast setup.
+
+## GROUP OPTION
+
+To test the load times for gems in a specific group, pass the group as an
+argument to `bundle benchmark`. Omitting this option loads all dependencies
+in your Gemfile.
