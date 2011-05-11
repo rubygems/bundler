@@ -7,7 +7,7 @@ module Bundler
 
     def initialize(remote_uri)
       @remote_uri = remote_uri
-      @@connection ||= Net::HTTP::Persistent.new
+      @@connection ||= Net::HTTP::Persistent.new nil, :ENV
     end
 
     # fetch a gem specification
