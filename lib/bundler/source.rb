@@ -633,6 +633,7 @@ module Bundler
           FileUtils.mkdir_p(path.dirname)
           FileUtils.rm_rf(path)
           git %|clone --no-checkout "#{cache_path}" "#{path}"|
+          File.chmod((0777 & ~File.umask), path)
         end
         Dir.chdir(path) do
           git %|fetch --force --quiet --tags "#{cache_path}"|
