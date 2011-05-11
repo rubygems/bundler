@@ -19,7 +19,7 @@ module Gem
 
     def full_gem_path
       source.respond_to?(:path) ?
-        Pathname.new(loaded_from).dirname.expand_path.to_s :
+        Pathname.new(loaded_from).dirname.expand_path(Bundler.root).to_s :
         rg_full_gem_path
     end
 
