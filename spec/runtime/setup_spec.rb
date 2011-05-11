@@ -528,6 +528,39 @@ describe "Bundler.setup" do
     out.should == "[]"
   end
 
+  describe 'when a vendored gem specification uses the :path option' do
+    it 'should resolve paths relative to the Gemfile' do
+      path = bundled_app(File.join('vendor', 'foo'))
+      build_lib "foo", :path => path
+
+      # If the .gemspec exists, then Bundler handles the path differently.
+      # See Source::Path.load_spec_files for details.
+      FileUtils.rm(File.join(path, 'foo.gemspec'))
+
+      # Note: If the version is not specified (and the .gemspec is missing),
+      # then Bundler won't find the vendored gem at all.
+      install_gemfile <<-G
+        gem 'foo', '1.2.3', :path => 'vendor/foo'
+      G
+
+
+      Dir.chdir(bundled_app.dirname) do
+        # By default, Bundler looks for the Gemfile in the pwd.  Since we've
+        # changed the pwd, override that default by setting BUNDLE_GEMFILE.
+        ENV['BUNDLE_GEMFILE'] = bundled_app('Gemfile')
+
+        # Bundler will resolve relative paths during setup, so for this spec
+        # we must call Bundler.setup after changing the pwd.
+        Bundler.setup
+
+        # We should be able to load the gem regardless of the pwd.
+        expect {
+          require 'foo'
+        }.to_not raise_error
+      end
+    end
+  end
+
   describe "with git gems that don't have gemspecs" do
     before :each do
       build_git "no-gemspec", :gemspec => false
@@ -683,38 +716,6 @@ describe "Bundler.setup" do
 
       bundle %|exec ruby -e "require 'bundler'; Bundler.setup"|
       err.should be_empty
-    end
-  end
-
-  describe 'when a vendored gem specification uses the :path option' do
-    it 'should resolve paths relative to the Gemfile' do
-      path = bundled_app(File.join('vendor', 'foo'))
-      build_lib "foo", :path => path
-
-      # If the .gemspec exists, then Bundler handles the path differently.
-      # See Source::Path.load_spec_files for details.
-      FileUtils.rm(File.join(path, 'foo.gemspec'))
-
-      # Note: If the version is not specified (and the .gemspec is missing),
-      # then Bundler won't find the vendored gem at all.
-      install_gemfile <<-G
-        gem 'foo', '1.2.3', :path => 'vendor/foo'
-      G
-
-      Dir.chdir(bundled_app.dirname) do
-        # By default, Bundler looks for the Gemfile in the pwd.  Since we've
-        # changed the pwd, override that default by setting BUNDLE_GEMFILE.
-        ENV['BUNDLE_GEMFILE'] = bundled_app('Gemfile')
-
-        # Bundler will resolve relative paths during setup, so for this spec
-        # we must call Bundler.setup after changing the pwd.
-        Bundler.setup
-
-        # We should be able to load the gem regardless of the pwd.
-        expect {
-          require 'foo'
-        }.to_not raise_error
-      end
     end
   end
 
