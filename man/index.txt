@@ -4,3 +4,4 @@ bundle-update      bundle-update.1
 bundle-package     bundle-package.1
 bundle-exec        bundle-exec.1
 bundle-config      bundle-config.1
+bundle-benchmark   bundle-benchmark.1
