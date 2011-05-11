@@ -8,6 +8,7 @@ bundle-install(1) -- Install the dependencies specified in your Gemfile
                  [--without=GROUP1[ GROUP2...]]
                  [--local] [--deployment]
                  [--binstubs[=DIRECTORY]]
+                 [--standalone[=GROUP1[ GROUP2...]]]
                  [--quiet]
 
 ## DESCRIPTION
@@ -68,6 +69,12 @@ update process below under [CONSERVATIVE UPDATING][].
   `rails` gem comes with a `rails` executable, this flag will create
   a `bin/rails` executable that ensures that all dependencies used
   come from the bundled gems.
+
+* `--standalone[=<list>]`:
+  Make a bundle that can work without Ruby Gems or Bundler at runtime.
+  It takes a space separated list of groups to install. It creates a
+  `bundle` directory and installs the bundle there. It also generates
+  a `bundle/bundler/setup.rb` file to replace Bundler's own setup.
 
 ## DEPLOYMENT MODE
 
