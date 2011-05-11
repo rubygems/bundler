@@ -64,8 +64,10 @@ module Bundler
           # dependency. If there are none, use the dependency's name
           # as the autorequire.
           Array(dep.autorequire || dep.name).each do |file|
+            start = Time.now.to_f if Bundler.ui.debugging?
             required_file = file
             Kernel.require file
+            Bundler.ui.debug "  * #{file} (#{((Time.now.to_f-start)*1000.0).round} ms)" if Bundler.ui.debugging?
           end
         rescue LoadError => e
           REGEXPS.find { |r| r =~ e.message }
