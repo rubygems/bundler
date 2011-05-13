@@ -10,7 +10,7 @@ bundle-benchmark(1) -- Display the time taken for each gem to be loaded
 This command loads all your required dependencies as per Bundler.setup, and
 displays the total time spent in requiring each gem and its dependencies.
 
-Use this command to track down problems with excessive boot time in your 
+Use this command to track down problems with excessive boot time in your
 application, or to optimize specific groups in your Gemfile for fast setup.
 
 ## GROUP OPTION

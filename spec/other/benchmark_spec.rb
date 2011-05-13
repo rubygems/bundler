@@ -10,7 +10,6 @@ describe "bundle benchmark" do
 
   it "prints out the require times for each gem" do
     bundle :benchmark
-    
     out.should =~ / \* rails \(\d+ ms\)/
   end
 end
