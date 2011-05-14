@@ -53,26 +53,28 @@ module Bundler
       groups = [:default] if groups.empty?
 
       @definition.dependencies.each do |dep|
-        # Skip the dependency if it is not in any of the requested
-        # groups
-        next unless ((dep.groups & groups).any? && dep.current_platform?)
+        # Only require the dependency if it is not in any of the 
+        # requested groups
+        require_dependency(dep) if ((dep.groups & groups).any? && dep.current_platform?)
+      end
+    end
 
-        required_file = nil
+    def require_dependency(dependency)
+      required_file = nil
 
-        begin
-          # Loop through all the specified autorequires for the
-          # dependency. If there are none, use the dependency's name
-          # as the autorequire.
-          Array(dep.autorequire || dep.name).each do |file|
-            start = Time.now.to_f if Bundler.ui.debugging?
-            required_file = file
-            Kernel.require file
-            Bundler.ui.debug "  * #{file} (#{((Time.now.to_f-start)*1000.0).round} ms)" if Bundler.ui.debugging?
-          end
-        rescue LoadError => e
-          REGEXPS.find { |r| r =~ e.message }
-          raise if dep.autorequire || $1 != required_file
+      begin
+        # Loop through all the specified autorequires for the
+        # dependency. If there are none, use the dependency's name
+        # as the autorequire.
+        Array(dependency.autorequire || dependency.name).each do |file|
+          start = Time.now.to_f if Bundler.ui.debugging?
+          required_file = file
+          Kernel.require file
+          Bundler.ui.debug "  * #{file} (#{((Time.now.to_f-start)*1000.0).round} ms)" if Bundler.ui.debugging?
         end
+      rescue LoadError => e
+        REGEXPS.find { |r| r =~ e.message }
+        raise if dependency.autorequire || $1 != required_file
       end
     end
 
