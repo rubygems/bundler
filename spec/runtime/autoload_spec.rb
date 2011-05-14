@@ -3,38 +3,38 @@ require "spec_helper"
 describe "Bundler.autoload" do
   before :each do
     build_lib "one", "1.0.0" do |s|
-      s.write "lib/baz.rb", "module Baz; end"
-      s.write "lib/qux.rb", "module Qux; end"
+      s.write "lib/baz.rb", "module Baz; end; puts Baz"
+      s.write "lib/qux.rb", "module Qux; end; puts Qux"
     end
 
     build_lib "two", "1.0.0" do |s|
-      s.write "lib/two.rb", "module Two; end"
+      s.write "lib/two.rb", "module Two; end; puts Two"
       s.add_dependency "three", "= 1.0.0"
     end
 
     build_lib "three", "1.0.0" do |s|
-      s.write "lib/three.rb", "module Three; end"
+      s.write "lib/three.rb", "module Three; end; puts Three"
       s.add_dependency "seven", "= 1.0.0"
     end
 
     build_lib "four", "1.0.0" do |s|
-      s.write "lib/four.rb", "module Four; end; puts 'four'"
+      s.write "lib/four.rb", "module Four; end; puts Four"
     end
 
     build_lib "five", "1.0.0", :no_default => true do |s|
-      s.write "lib/mofive.rb", "module Five; end"
+      s.write "lib/mofive.rb", "module Five; end; puts Five"
     end
 
     build_lib "six", "1.0.0" do |s|
-      s.write "lib/six.rb", "module Six; end"
+      s.write "lib/six.rb", "module Six; end; puts Six"
     end
 
     build_lib "seven", "1.0.0" do |s|
-      s.write "lib/seven.rb", "module Seven; end"
+      s.write "lib/seven.rb", "module Seven; end; puts Seven"
     end
     
     build_lib "eight", "1.0.0" do |s|
-      s.write "lib/ate.rb", "module Eight; end"
+      s.write "lib/ate.rb", "module Eight; end; puts Eight"
     end
 
     gemfile <<-G
@@ -54,15 +54,12 @@ describe "Bundler.autoload" do
     run %Q{
       #{command};
       
-      loaded = []
       [:Baz, :Qux, :Two, :Three, :Four, :Five, :Six, :Seven, :Eight].each do |sym|
         begin
-          loaded << Object.const_get(sym)
+          Object.const_get(sym)
         rescue
         end
       end
-      
-      puts loaded
     }
   end
 
@@ -129,10 +126,11 @@ describe "Bundler.autoload" do
       path "#{lib_path}"
       gem "two",  :autoload => false, :require => false
       gem "four", :autoload => false
+      gem "six",  :require => false
     G
     
     run 'Bundler.autoload'
-    check out.should == 'four'
+    check out.should == 'Four'
   end
   
 end
