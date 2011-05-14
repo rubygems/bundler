@@ -129,8 +129,23 @@ describe "Bundler.autoload" do
       gem "six",  :require => false
     G
     
-    run 'Bundler.autoload'
-    check out.should == 'Four'
+    run "Bundler.autoload"
+    check out.should == "Four"
+    
+    run_and_load_all "Bundler.autoload"
+    check out.should == "Four"
+  end
+  
+  it "should support multiple gems autoloading from the same symbol" do
+    gemfile <<-G
+      path "#{lib_path}"
+      gem "two"
+      gem "four",  :autoload => :Two
+      gem "six",   :autoload => [:Six, :Two]
+    G
+    
+    run "Bundler.autoload; Two"
+    out.split("\n").sort.should == ['Four', 'Six', 'Two']
   end
   
 end

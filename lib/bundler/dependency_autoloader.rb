@@ -1,6 +1,6 @@
 module Bundler
   module DependencyAutoloader
-    @registered_symbols = {}
+    @registered_symbols = Hash.new { |h,k| h[k] = [] }
     
     class << self
       
@@ -12,7 +12,7 @@ module Bundler
       # necessary.
       def register_dependency(runtime, dependency, symbols)
         symbols.each do |symbol|
-          registered_symbols[symbol.to_sym] = [runtime, dependency]
+          registered_symbols[symbol.to_sym] << [runtime, dependency]
         end
         
         inject_hooks!
@@ -31,8 +31,9 @@ module Bundler
             orig_const_missing = instance_method :const_missing
             define_method(:const_missing) do |sym|
               if ::Bundler::DependencyAutoloader.registered_symbols.include? sym
-                runtime, dependency = ::Bundler::DependencyAutoloader.registered_symbols[sym]
-                runtime.require_dependency(dependency)
+                ::Bundler::DependencyAutoloader.registered_symbols[sym].each do |runtime, dependency|
+                  runtime.require_dependency(dependency)
+                end
                 
                 # If we made it this far, the require was successful.  Now we need to return the
                 # constant to fulfill our contract.
