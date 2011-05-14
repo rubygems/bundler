@@ -36,7 +36,7 @@ module Bundler
                 
                 # If we made it this far, the require was successful.  Now we need to return the
                 # constant to fulfill our contract.
-                return Object.const_get(sym, false) if Object.const_defined?(sym, false)
+                return Object.const_get(sym) if Object.const_defined?(sym)
               end
               
               orig_const_missing.bind(self).call(sym)

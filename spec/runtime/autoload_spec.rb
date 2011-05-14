@@ -119,7 +119,9 @@ describe "Bundler.autoload" do
         puts e.message
       end
     R
-    out.should == "no such file to load -- boom\nuninitialized constant Object::Five"
+    
+    # 1.9.2 is "Object::Five", while 1.8.7 is "Five"
+    out.should match /no such file to load -- boom\nuninitialized constant (Object::)?Five/
   end
   
   it "should require gems that are autoload: false, but not require: false" do
