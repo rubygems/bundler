@@ -16,7 +16,7 @@ module Bundler
 
     def confirm(message)
     end
-    
+
     def debugging?
       false
     end
@@ -33,7 +33,7 @@ module Bundler
       def debug(msg)
         @shell.say(msg) if debugging?
       end
-      
+
       def debugging?
         @debug && !@quiet
       end

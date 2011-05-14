@@ -66,7 +66,7 @@ We divide `bundle` subcommands into primary commands and utilities.
 
 * `bundle viz(1)`:
   Generate a visual representation of your dependencies
-  
+
 * `bundle benchmark(1)`:
   Display the time taken for each each gem to be loaded into the environment
 
