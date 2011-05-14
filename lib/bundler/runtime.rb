@@ -86,6 +86,9 @@ module Bundler
         return require_dependency(dependency)
       end
       
+      # Short circuit if we have nothing to require
+      return if dependency.autorequire && dependency.autorequire.empty?
+      
       # Either the dependency has a set of symbols defined, or we try to guess from its name
       symbols = Array(dependency.autoload_symbols || dependency.name.split(/[_\-]/).each {|w| w.capitalize!}.join)
       
