@@ -53,6 +53,12 @@ module Bundler
         require_dependency(dep)
       end
     end
+    
+    def autoload(*groups)
+      each_loadable_dependency(*groups) do |dep|
+        autoload_dependency(dep)
+      end
+    end
 
     def require_dependency(dependency)
       required_file = nil
@@ -71,6 +77,19 @@ module Bundler
         REGEXPS.find { |r| r =~ e.message }
         raise if dependency.autorequire || $1 != required_file
       end
+    end
+    
+    def autoload_dependency(dependency)
+      # If we explicitly disabled autoload, but did not explicitly disable require, go ahead and
+      # require the gem
+      if dependency.autorequire.nil? && dependency.autoload_symbols && dependency.autoload_symbols.empty?
+        return require_dependency(dependency)
+      end
+      
+      # Either the dependency has a set of symbols defined, or we try to guess from its name
+      symbols = Array(dependency.autoload_symbols || dependency.name.split(/[_\-]/).each {|w| w.capitalize!}.join)
+      
+      DependencyAutoloader.register_dependency(self, dependency, symbols)
     end
 
     def each_loadable_dependency(*groups)
