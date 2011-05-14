@@ -49,13 +49,8 @@ module Bundler
     ]
 
     def require(*groups)
-      groups.map! { |g| g.to_sym }
-      groups = [:default] if groups.empty?
-
-      @definition.dependencies.each do |dep|
-        # Only require the dependency if it is not in any of the 
-        # requested groups
-        require_dependency(dep) if ((dep.groups & groups).any? && dep.current_platform?)
+      each_loadable_dependency(*groups) do |dep|
+        require_dependency(dep)
       end
     end
 
@@ -75,6 +70,17 @@ module Bundler
       rescue LoadError => e
         REGEXPS.find { |r| r =~ e.message }
         raise if dependency.autorequire || $1 != required_file
+      end
+    end
+
+    def each_loadable_dependency(*groups)
+      groups.map! { |g| g.to_sym }
+      groups = [:default] if groups.empty?
+
+      @definition.dependencies.each do |dep|
+        # Only require the dependency if it is not in any of the 
+        # requested groups
+        yield(dep) if ((dep.groups & groups).any? && dep.current_platform?)
       end
     end
 
