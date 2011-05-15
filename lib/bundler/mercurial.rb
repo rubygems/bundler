@@ -198,7 +198,7 @@ module Bundler
               $1
             end
           else
-            raise GitError, "The git source #{uri} is not yet checked out. Please run `bundle install` before trying to start your application"
+            raise GitError, "The hg source #{uri} is not yet checked out. Please run `bundle install` before trying to start your application"
           end
         end
       end

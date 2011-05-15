@@ -49,7 +49,7 @@ module Gem
           sha = Dir.chdir(full_gem_path){ `git rev-parse HEAD`.strip }
           " #{sha[0..6]}"
         elsif File.exist?(File.join(full_gem_path, '.hg'))
-          " #{$1}" if  /\b\d+:(\w{12})\b/ =~ `hg summary`
+          " #{$1}" if  /\b\d+:(\w{12})\b/ =~ Dir.chdir(full_gem_path){`hg summary`}
         end
       end
     end
