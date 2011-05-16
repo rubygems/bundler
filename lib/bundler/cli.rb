@@ -290,19 +290,23 @@ module Bundler
     def outdated(*gems)
       sources = Array(options[:source])
 
+      current_specs = Bundler.load.specs
+
       if gems.empty? && sources.empty?
         # We're doing a full update
         definition = Bundler.definition(true)
       else
         definition = Bundler.definition(:gems => gems, :sources => sources)
       end
-
+      
       options["local"] ? definition.resolve_with_cache! : definition.resolve_remotely!
-
-      definition.specs.each do |spec|
-        spec.source.fetch(spec) if spec.source.respond_to?(:fetch)
-        spec.source.outdated(spec)
-        Bundler.ui.debug "from #{spec.loaded_from} "
+      
+      definition.specs.each do |s|
+        cs = current_specs.find{|spec| spec.name == s.name }
+        if cs.version != s.version || cs.git_version != s.git_version
+          Bundler.ui.info "  * #{s.name} (#{s.version}#{s.git_version} > #{cs.version}#{cs.git_version}) "
+        end
+        Bundler.ui.debug "from #{s.loaded_from} "
       end
     end
 
