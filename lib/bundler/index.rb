@@ -47,18 +47,26 @@ module Bundler
       @specs[name]
     end
 
-    def search_for_all_platforms(dependency, base = [])
-      specs = specs_by_name(dependency.name) + base
+    def search_by_dependency(dependency, base = nil)
+      @cache[dependency.hash] ||= begin
+        specs = specs_by_name(dependency.name) + (base || [])
+        found = specs.select do |spec|
+          if base # allow all platforms when searching from a lockfile
+            dependency.matches_spec?(spec)
+          else
+            dependency.matches_spec?(spec) && Gem::Platform.match(spec.platform)
+          end
+        end
 
-      wants_prerelease = dependency.requirement.prerelease?
-      only_prerelease  = specs.all? {|spec| spec.version.prerelease? }
-      found = specs.select { |spec| dependency.matches_spec?(spec) }
+        wants_prerelease = dependency.requirement.prerelease?
+        only_prerelease  = specs.all? {|spec| spec.version.prerelease? }
 
-      unless wants_prerelease || only_prerelease
-        found.reject! { |spec| spec.version.prerelease? }
+        unless wants_prerelease || only_prerelease
+          found.reject! { |spec| spec.version.prerelease? }
+        end
+
+        found.sort_by {|s| [s.version, s.platform.to_s == 'ruby' ? "\0" : s.platform.to_s] }
       end
-
-      found.sort_by {|s| [s.version, s.platform.to_s == 'ruby' ? "\0" : s.platform.to_s] }
     end
 
     def sources
@@ -124,19 +132,5 @@ module Bundler
       dep.requirement.satisfied_by?(spec.version)
     end
 
-    def search_by_dependency(dependency)
-      @cache[dependency.hash] ||= begin
-        specs = specs_by_name(dependency.name)
-        found = specs.select { |spec| dependency.matches_spec?(spec) && Gem::Platform.match(spec.platform) }
-
-        wants_prerelease = dependency.requirement.prerelease?
-        only_prerelease  = specs.all? {|spec| spec.version.prerelease? }
-        unless wants_prerelease || only_prerelease
-          found.reject! { |spec| spec.version.prerelease? }
-        end
-
-        found.sort_by {|s| [s.version, s.platform.to_s == 'ruby' ? "\0" : s.platform.to_s] }
-      end
-    end
   end
 end
