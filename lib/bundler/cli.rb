@@ -319,6 +319,8 @@ module Bundler
         end
         Bundler.ui.debug "from #{s.loaded_from}"
       end
+
+      Bundler.ui.info ""
     end
 
     desc "cache", "Cache all the gems to vendor/cache", :hide => true
