@@ -195,7 +195,7 @@ module Bundler
 
           path = Bundler.app_cache
           Dir["#{path}/*.gem"].each do |gemfile|
-            next if gemfile =~ /bundler\-[\d\.]+?\.gem/
+            next if gemfile =~ /^bundler\-[\d\.]+?\.gem/
 
             begin
               s ||= Bundler.rubygems.spec_from_gem(gemfile)
