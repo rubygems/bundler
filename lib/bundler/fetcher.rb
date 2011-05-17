@@ -47,8 +47,13 @@ module Bundler
     def fetch(uri, counter = 0)
       raise HTTPError, "Too many redirects" if counter >= REDIRECT_LIMIT
 
-      Bundler.ui.debug "Fetching from: #{uri}"
-      response = @@connection.request(uri)
+      begin
+        Bundler.ui.debug "Fetching from: #{uri}"
+        response = @@connection.request(uri)
+      rescue SocketError, Timeout
+        raise Bundler::HTTPError, "Network error while fetching #{uri}"
+      end
+
       case response
       when Net::HTTPRedirection
         Bundler.ui.debug("HTTP Redirection")
