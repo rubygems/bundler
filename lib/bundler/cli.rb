@@ -439,7 +439,7 @@ module Bundler
       require 'irb'
       IRB.start
     end
-    
+
     desc "benchmark [GROUP]", "Displays the time taken for each gem to be loaded into the environment"
     def benchmark(group = nil)
       Bundler.ui.debug!
