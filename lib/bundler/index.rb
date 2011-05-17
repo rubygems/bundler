@@ -38,7 +38,7 @@ module Bundler
     def search(query)
       results = local_search(query)
       @sources.each do |source|
-        results << source.search(query)
+        results += source.search(query)
       end
       results
     end
