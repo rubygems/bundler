@@ -300,13 +300,24 @@ module Bundler
       end
       
       options["local"] ? definition.resolve_with_cache! : definition.resolve_remotely!
-      
+
+      Bundler.ui.info "Outdated gems included in the bundle:"
       definition.specs.each do |s|
-        cs = current_specs.find{|spec| spec.name == s.name }
-        if cs.version != s.version || cs.git_version != s.git_version
-          Bundler.ui.info "  * #{s.name} (#{s.version}#{s.git_version} > #{cs.version}#{cs.git_version}) "
+        next if !gems.empty? && !gems.include?(s.name)
+        
+        s.source.fetch(s) if s.source.respond_to?(:fetch)
+        
+        if s.git_version
+          cs = current_specs.find {|spec| spec.name == s.name }
+        else
+          cs = s
+          s = definition.index[cs.name].sort_by { |b| b.version }.last
         end
-        Bundler.ui.debug "from #{s.loaded_from} "
+
+        if Gem::Version.new(s.version) > Gem::Version.new(cs.version) || cs.git_version != s.git_version
+          Bundler.ui.info "  * #{s.name} (#{s.version}#{s.git_version} > #{cs.version}#{cs.git_version})"
+        end
+        Bundler.ui.debug "from #{s.loaded_from}"
       end
     end
 
