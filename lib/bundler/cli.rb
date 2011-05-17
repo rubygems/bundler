@@ -289,7 +289,6 @@ module Bundler
       "Do not attempt to fetch gems remotely and use the gem cache instead"
     def outdated(*gems)
       sources = Array(options[:source])
-
       current_specs = Bundler.load.specs
 
       if gems.empty? && sources.empty?
@@ -298,7 +297,6 @@ module Bundler
       else
         definition = Bundler.definition(:gems => gems, :sources => sources)
       end
-      
       options["local"] ? definition.resolve_with_cache! : definition.resolve_remotely!
 
       Bundler.ui.info "Outdated gems included in the bundle:"
