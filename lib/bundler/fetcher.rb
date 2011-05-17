@@ -91,10 +91,10 @@ module Bundler
         begin
           Gem::SpecFetcher.new.list(false, true).each(&blk)
         rescue Gem::RemoteFetcher::FetchError
-          Bundler.ui.warn "Could not fetch prerelease specs from #{self}"
+          Bundler.ui.warn "Could not fetch prerelease specs from #{@remote_uri}"
         end
       rescue Gem::RemoteFetcher::FetchError
-        Bundler.ui.warn "Could not reach #{self}"
+        raise Bundler::HTTPError, "Could not reach #{@remote_uri}"
       end
     end
   end
