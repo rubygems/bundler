@@ -33,7 +33,17 @@ module Bundler
       true
     end
 
+    # Search this index's specs, and any source indexes that this index knows
+    # about, returning all of the results.
     def search(query)
+      results = local_search(query)
+      @sources.each do |source|
+        results << source.search(query)
+      end
+      results
+    end
+
+    def local_search(query)
       case query
       when Gem::Specification, RemoteSpecification, LazySpecification then search_by_spec(query)
       when String then specs_by_name(query)
@@ -67,12 +77,6 @@ module Bundler
 
         found.sort_by {|s| [s.version, s.platform.to_s == 'ruby' ? "\0" : s.platform.to_s] }
       end
-    end
-
-    def sources
-      specs.values.map do |specs|
-        specs.map{|s| s.source }
-      end.flatten.uniq
     end
 
     def source_types
@@ -111,6 +115,11 @@ module Bundler
       all? do |s|
         s2 = o[s].first and (s.dependencies & s2.dependencies).empty?
       end
+    end
+
+    def add_source(source)
+      raise ArgumentError, "Source must be an index, not #{source.class}" unless source.is_a?(Index)
+      @sources << source
     end
 
   private

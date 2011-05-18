@@ -160,7 +160,7 @@ module Bundler
     def index
       @index ||= Index.build do |idx|
         @sources.each do |s|
-          idx.use s.specs
+          idx.add_source s.specs
         end
       end
     end
@@ -169,9 +169,8 @@ module Bundler
     # spec, even if (say) a git gem is not checked out.
     def rubygems_index
       @rubygems_index ||= Index.build do |idx|
-        @sources.find_all{|s| s.is_a?(Source::Rubygems) }.each do |s|
-          idx.use s.specs
-        end
+        rubygems = @sources.find{|s| s.is_a?(Source::Rubygems) }
+        idx.add_source(rubygems)
       end
     end
 
