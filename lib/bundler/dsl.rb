@@ -164,11 +164,6 @@ module Bundler
 
   private
 
-    def rubygems_source(source)
-      @rubygems_source.add_remote source
-      @sources << @rubygems_source
-    end
-
     def _normalize_hash(opts)
       # Cannot modify a hash during an iteration in 1.9
       opts.keys.each do |k|
