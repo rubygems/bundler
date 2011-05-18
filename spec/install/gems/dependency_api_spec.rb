@@ -73,7 +73,7 @@ describe "gemcutter's dependency API" do
     should_be_installed "rack 1.0.0"
   end
 
-  it "timeouts when Bundler::Fetcher redirects to much" do
+  it "timeouts when Bundler::Fetcher redirects too much" do
     gemfile <<-G
       source "http://localgemserver.test"
       gem "rack"
