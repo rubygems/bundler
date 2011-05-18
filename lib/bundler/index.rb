@@ -35,47 +35,21 @@ module Bundler
 
     # Search this index's specs, and any source indexes that this index knows
     # about, returning all of the results.
-    def search(query)
-      results = local_search(query)
+    def search(query, base = nil)
+      results = local_search(query, base)
       @sources.each do |source|
-        results += source.search(query)
+        results += source.search(query, base)
       end
       results
     end
 
-    def local_search(query)
+    def local_search(query, base = nil)
       case query
       when Gem::Specification, RemoteSpecification, LazySpecification then search_by_spec(query)
       when String then specs_by_name(query)
-      when Gem::Dependency then search_by_dependency(query)
+      when Gem::Dependency then search_by_dependency(query, base)
       else
         raise "You can't search for a #{query.inspect}."
-      end
-    end
-
-    def specs_by_name(name)
-      @specs[name]
-    end
-
-    def search_by_dependency(dependency, base = nil)
-      @cache[dependency.hash] ||= begin
-        specs = specs_by_name(dependency.name) + (base || [])
-        found = specs.select do |spec|
-          if base # allow all platforms when searching from a lockfile
-            dependency.matches_spec?(spec)
-          else
-            dependency.matches_spec?(spec) && Gem::Platform.match(spec.platform)
-          end
-        end
-
-        wants_prerelease = dependency.requirement.prerelease?
-        only_prerelease  = specs.all? {|spec| spec.version.prerelease? }
-
-        unless wants_prerelease || only_prerelease
-          found.reject! { |spec| spec.version.prerelease? }
-        end
-
-        found.sort_by {|s| [s.version, s.platform.to_s == 'ruby' ? "\0" : s.platform.to_s] }
       end
     end
 
@@ -126,6 +100,32 @@ module Bundler
     end
 
   private
+
+    def specs_by_name(name)
+      @specs[name]
+    end
+
+    def search_by_dependency(dependency, base = nil)
+      @cache[dependency.hash] ||= begin
+        specs = specs_by_name(dependency.name) + (base || [])
+        found = specs.select do |spec|
+          if base # allow all platforms when searching from a lockfile
+            dependency.matches_spec?(spec)
+          else
+            dependency.matches_spec?(spec) && Gem::Platform.match(spec.platform)
+          end
+        end
+
+        wants_prerelease = dependency.requirement.prerelease?
+        only_prerelease  = specs.all? {|spec| spec.version.prerelease? }
+
+        unless wants_prerelease || only_prerelease
+          found.reject! { |spec| spec.version.prerelease? }
+        end
+
+        found.sort_by {|s| [s.version, s.platform.to_s == 'ruby' ? "\0" : s.platform.to_s] }
+      end
+    end
 
     def search_by_spec(spec)
       specs_by_name(spec.name).select do |s|
