@@ -160,11 +160,13 @@ module Bundler
     def index
       @index ||= Index.build do |idx|
         @sources.each do |s|
-          idx.use s.specs(@dependencies)
+          idx.use s.specs
         end
       end
     end
 
+    # used when frozen is enabled so we can find the bundler
+    # spec, even if (say) a git gem is not checked out.
     def rubygems_index
       @rubygems_index ||= Index.build do |idx|
         @sources.find_all{|s| s.is_a?(Source::Rubygems) }.each do |s|
