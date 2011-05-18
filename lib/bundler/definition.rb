@@ -170,7 +170,7 @@ module Bundler
     def rubygems_index
       @rubygems_index ||= Index.build do |idx|
         rubygems = @sources.find{|s| s.is_a?(Source::Rubygems) }
-        idx.add_source(rubygems)
+        idx.add_source rubygems.specs
       end
     end
 
