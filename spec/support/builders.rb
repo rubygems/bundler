@@ -487,6 +487,8 @@ module Spec
         Dir.chdir(path) do
           `git init`
           `git add *`
+          `git config user.email "lol@wut.com"`
+          `git config user.name "lolwut"`
           `git commit -m 'OMG INITIAL COMMIT'`
         end
       end
