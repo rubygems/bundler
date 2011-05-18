@@ -29,6 +29,7 @@ module Bundler
       Bundler.ui.debug "Query List: #{query_list.inspect}"
       return {@remote_uri => last_spec_list}.each(&blk) if query_list.empty?
 
+      Bundler.ui.info "Fetching dependency information from the API at #{@remote_uri}"
       spec_list, deps_list = fetch_dependency_remote_specs(query_list, &blk)
       returned_gems = spec_list.map {|spec| spec.first }.uniq
 
@@ -87,6 +88,7 @@ module Bundler
 
     # fetch from modern index: specs.4.8.gz
     def fetch_all_remote_specs(&blk)
+      Bundler.ui.info "Fetching source index for #{@remote_uri}"
       Bundler.ui.debug "Fetching modern index"
       Gem.sources = ["#{@remote_uri}"]
       begin

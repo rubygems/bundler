@@ -220,7 +220,6 @@ module Bundler
           old     = Bundler.rubygems.sources
 
           remotes.each do |uri|
-            Bundler.ui.info "Fetching source index for #{uri}"
 
             @fetchers[uri] = Bundler::Fetcher.new(uri)
             gem_names =

@@ -1,23 +1,27 @@
 require "spec_helper"
 
 describe "gemcutter's dependency API" do
+  let(:source_uri) { "http://localgemserver.test" }
+
   it "should use the API" do
     gemfile <<-G
-      source "http://localgemserver.test"
+      source "#{source_uri}"
       gem "rack"
     G
 
     bundle :install, :artifice => "endpoint"
+    out.should include("Fetching dependency information from the API at #{source_uri}")
     should_be_installed "rack 1.0.0"
   end
 
   it "should handle nested dependencies" do
     gemfile <<-G
-      source "http://localgemserver.test"
+      source "#{source_uri}"
       gem "rails"
     G
 
     bundle :install, :artifice => "endpoint"
+    out.should include("Fetching dependency information from the API at #{source_uri}")
     should_be_installed(
       "rails 2.3.2",
       "actionpack 2.3.2",
@@ -31,17 +35,18 @@ describe "gemcutter's dependency API" do
     simulate_platform mswin
 
     gemfile <<-G
-      source "http://localgemserver.test/"
+      source "#{source_uri}"
       gem "rcov"
     G
 
     bundle :install, :fakeweb => "windows"
+    out.should include("Fetching source index for #{source_uri}")
     should_be_installed "rcov 1.0.0"
   end
 
   it "falls back when hitting the Gemcutter Dependency Limit" do
     gemfile <<-G
-      source "http://localgemserver.test"
+      source "#{source_uri}"
       gem "activesupport"
       gem "actionpack"
       gem "actionmailer"
@@ -51,6 +56,7 @@ describe "gemcutter's dependency API" do
       gem "rails"
     G
     bundle :install, :artifice => "endpoint_fallback"
+    out.should include("Fetching source index for #{source_uri}")
 
     should_be_installed(
       "activesupport 2.3.2",
@@ -65,17 +71,18 @@ describe "gemcutter's dependency API" do
 
   it "falls back when Gemcutter API doesn't return proper Marshal format" do
     gemfile <<-G
-      source "http://localgemserver.test"
+      source "#{source_uri}"
       gem "rack"
     G
 
     bundle :install, :artifice => "endpoint_marshal_fail"
+    out.should include("Fetching source index for #{source_uri}")
     should_be_installed "rack 1.0.0"
   end
 
   it "timeouts when Bundler::Fetcher redirects too much" do
     gemfile <<-G
-      source "http://localgemserver.test"
+      source "#{source_uri}"
       gem "rack"
     G
 
