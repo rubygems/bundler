@@ -117,9 +117,12 @@ module Bundler
       end
     end
 
-    def add_source(source)
-      raise ArgumentError, "Source must be an index, not #{source.class}" unless source.is_a?(Index)
-      @sources << source
+    def add_source(index)
+      if index.is_a?(Index)
+        @sources << index unless @sources.include?(index)
+      else
+        raise ArgumentError, "Source must be an index, not #{index.class}"
+      end
     end
 
   private
