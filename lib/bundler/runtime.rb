@@ -49,30 +49,60 @@ module Bundler
     ]
 
     def require(*groups)
+      each_loadable_dependency(*groups) do |dep|
+        require_dependency(dep)
+      end
+    end
+    
+    def autoload(*groups)
+      each_loadable_dependency(*groups) do |dep|
+        autoload_dependency(dep)
+      end
+    end
+
+    def require_dependency(dependency)
+      required_file = nil
+
+      begin
+        # Loop through all the specified autorequires for the
+        # dependency. If there are none, use the dependency's name
+        # as the autorequire.
+        Array(dependency.autorequire || dependency.name).each do |file|
+          start = Time.now.to_f if Bundler.ui.debugging?
+          required_file = file
+          Kernel.require file
+          Bundler.ui.debug "  * #{file} (#{((Time.now.to_f-start)*1000.0).round} ms)" if Bundler.ui.debugging?
+        end
+      rescue LoadError => e
+        REGEXPS.find { |r| r =~ e.message }
+        raise if dependency.autorequire || $1 != required_file
+      end
+    end
+    
+    def autoload_dependency(dependency)
+      # If we explicitly disabled autoload, but did not explicitly disable require, go ahead and
+      # require the gem
+      if dependency.autorequire.nil? && dependency.autoload_symbols && dependency.autoload_symbols.empty?
+        return require_dependency(dependency)
+      end
+      
+      # Short circuit if we have nothing to require
+      return if dependency.autorequire && dependency.autorequire.empty?
+      
+      # Either the dependency has a set of symbols defined, or we try to guess from its name
+      symbols = Array(dependency.autoload_symbols || dependency.name.split(/[_\-]/).each {|w| w.capitalize!}.join)
+      
+      DependencyAutoloader.register_dependency(self, dependency, symbols)
+    end
+
+    def each_loadable_dependency(*groups)
       groups.map! { |g| g.to_sym }
       groups = [:default] if groups.empty?
 
       @definition.dependencies.each do |dep|
-        # Skip the dependency if it is not in any of the requested
-        # groups
-        next unless ((dep.groups & groups).any? && dep.current_platform?)
-
-        required_file = nil
-
-        begin
-          # Loop through all the specified autorequires for the
-          # dependency. If there are none, use the dependency's name
-          # as the autorequire.
-          Array(dep.autorequire || dep.name).each do |file|
-            start = Time.now.to_f if Bundler.ui.debugging?
-            required_file = file
-            Kernel.require file
-            Bundler.ui.debug "  * #{file} (#{((Time.now.to_f-start)*1000.0).round} ms)" if Bundler.ui.debugging?
-          end
-        rescue LoadError => e
-          REGEXPS.find { |r| r =~ e.message }
-          raise if dep.autorequire || $1 != required_file
-        end
+        # Only require the dependency if it is not in any of the 
+        # requested groups
+        yield(dep) if ((dep.groups & groups).any? && dep.current_platform?)
       end
     end
 

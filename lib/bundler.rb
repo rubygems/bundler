@@ -15,26 +15,27 @@ require 'bundler/version'
 module Bundler
   ORIGINAL_ENV = ENV.to_hash
 
-  autoload :Definition,          'bundler/definition'
-  autoload :Dependency,          'bundler/dependency'
-  autoload :Dsl,                 'bundler/dsl'
-  autoload :Environment,         'bundler/environment'
-  autoload :Fetcher,             'bundler/fetcher'
-  autoload :GemHelper,           'bundler/gem_helper'
-  autoload :Graph,               'bundler/graph'
-  autoload :Index,               'bundler/index'
-  autoload :Installer,           'bundler/installer'
-  autoload :LazySpecification,   'bundler/lazy_specification'
-  autoload :LockfileParser,      'bundler/lockfile_parser'
-  autoload :RemoteSpecification, 'bundler/remote_specification'
-  autoload :Resolver,            'bundler/resolver'
-  autoload :Runtime,             'bundler/runtime'
-  autoload :Settings,            'bundler/settings'
-  autoload :SharedHelpers,       'bundler/shared_helpers'
-  autoload :SpecSet,             'bundler/spec_set'
-  autoload :Source,              'bundler/source'
-  autoload :Specification,       'bundler/shared_helpers'
-  autoload :UI,                  'bundler/ui'
+  autoload :Definition,           'bundler/definition'
+  autoload :Dependency,           'bundler/dependency'
+  autoload :DependencyAutoloader, 'bundler/dependency_autoloader'
+  autoload :Dsl,                  'bundler/dsl'
+  autoload :Environment,          'bundler/environment'
+  autoload :Fetcher,              'bundler/fetcher'
+  autoload :GemHelper,            'bundler/gem_helper'
+  autoload :Graph,                'bundler/graph'
+  autoload :Index,                'bundler/index'
+  autoload :Installer,            'bundler/installer'
+  autoload :LazySpecification,    'bundler/lazy_specification'
+  autoload :LockfileParser,       'bundler/lockfile_parser'
+  autoload :RemoteSpecification,  'bundler/remote_specification'
+  autoload :Resolver,             'bundler/resolver'
+  autoload :Runtime,              'bundler/runtime'
+  autoload :Settings,             'bundler/settings'
+  autoload :SharedHelpers,        'bundler/shared_helpers'
+  autoload :SpecSet,              'bundler/spec_set'
+  autoload :Source,               'bundler/source'
+  autoload :Specification,        'bundler/shared_helpers'
+  autoload :UI,                   'bundler/ui'
 
   class BundlerError < StandardError
     def self.status_code(code = nil)
@@ -120,6 +121,10 @@ module Bundler
 
     def require(*groups)
       setup(*groups).require(*groups)
+    end
+
+    def autoload(*groups)
+      setup(*groups).autoload(*groups)
     end
 
     def load
