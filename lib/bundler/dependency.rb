@@ -109,7 +109,7 @@ module Bundler
     end
 
     def rbx?
-      ruby? && RUBY_ENGINE == "rbx"
+      ruby? && defined?(RUBY_ENGINE) && RUBY_ENGINE == "rbx"
     end
 
     def jruby?
