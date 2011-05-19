@@ -5,7 +5,6 @@ require "<%=config[:name]%>/version"
 Gem::Specification.new do |s|
   s.name        = <%=config[:name].inspect%>
   s.version     = <%=config[:constant_name]%>::VERSION
-  s.platform    = Gem::Platform::RUBY
   s.authors     = ["TODO: Write your name"]
   s.email       = ["TODO: Write your email address"]
   s.homepage    = ""
