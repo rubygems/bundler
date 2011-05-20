@@ -93,7 +93,8 @@ module Bundler
 
     def add_source(index)
       if index.is_a?(Index)
-        @sources << index unless @sources.include?(index)
+        @sources << index
+        @sources.uniq! # need to use uniq! here instead of checking for the item before adding
       else
         raise ArgumentError, "Source must be an index, not #{index.class}"
       end
