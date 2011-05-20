@@ -48,5 +48,16 @@ describe "bundle outdated" do
       out.should include("foo (1.0")
     end
   end
+  
+  describe "with pre-release gems" do
+    it "ignores pre-release versions" do
+      update_repo2 do
+        build_gem "activesupport", "3.0.0.beta"
+      end
+
+      bundle "outdated"
+      out.should_not include("activesupport (3.0 > 2.3.5)")
+    end
+  end
 
 end
