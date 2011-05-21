@@ -87,10 +87,12 @@ module Bundler
       @ui ||= UI.new
     end
 
+    # Returns absolute path of where gems are installed on the filesystem.
     def bundle_path
       @bundle_path ||= Pathname.new(settings.path).expand_path(root)
     end
 
+    # Returns absolute location of where binstubs are installed to.
     def bin_path
       @bin_path ||= begin
         path = settings[:bin] || "bin"
