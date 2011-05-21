@@ -32,6 +32,7 @@ Instructions that allow the Bundler team to reproduce your issue are vitally imp
 
   - What version of bundler you are using
   - What version of Ruby you are using
+  - What version of Rubygems you are using
   - Whether you are using RVM, and if so what version
   - Your Gemfile
   - Your Gemfile.lock
