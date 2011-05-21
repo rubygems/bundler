@@ -38,6 +38,14 @@ module Bundler
     # to that which is specified in Gemfile.lock, or if there are any missing specs for the gems.
     #
     # Fifthly, Bundler resolves the dependencies either through a cache of gems or by remote.
+    # This then leads into the gems being installed, along with stubs for their executables,
+    # but only if the --binstubs option has been passed or Bundler.options[:bin] has been set
+    # earlier. 
+    # 
+    # Sixthly, a new Gemfile.lock is created from the installed gems to ensure that the next time
+    # that a user runs `bundle install` they will receive any updates from this process.
+    # 
+    # Finally: TODO add documentation for how the standalone process works.
     def run(options)
       # Create the BUNDLE_PATH directory
       begin
