@@ -7,12 +7,26 @@ module Bundler
       attr_accessor :post_install_messages
     end
 
+    # Begins the installation process for Bundler.
+    # For more information see the #run method on this class.
     def self.install(root, definition, options = {})
       installer = new(root, definition)
       installer.run(options)
       installer
     end
 
+    # Runs the install procedures for a specific Gemfile.
+    #
+    # First, this method will check to see if Bundler.bundle_path exists 
+    # and if not then will create it. This is usually the location of gems
+    # on the system, be it RVM or at a system path.
+    # 
+    # Second, it checks if Bundler has been configured to be "frozen"
+    # Frozen ensures that the Gemfile and the Gemfile.lock file are matching.
+    # This stops a situation where a developer may update the Gemfile but may not run
+    # `bundle install`, which leads to the Gemfile.lock file not being correctly updated.
+    # If this file is not correctly updated then any other developer running
+    # `bundle install` will potentially not install the correct gems.
     def run(options)
       # Create the BUNDLE_PATH directory
       begin
