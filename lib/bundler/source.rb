@@ -225,15 +225,7 @@ module Bundler
             @fetchers[uri] = Bundler::Fetcher.new(uri)
             gem_names = dependencies && dependencies.map{|d| d.name }
 
-            @fetchers[uri].fetch_remote_specs(gem_names) do |n,v|
-              v.each do |name, version, platform|
-                next if name == 'bundler'
-                spec = RemoteSpecification.new(name, version, platform, @fetchers[uri])
-                spec.source = self
-                @spec_fetch_map[spec.full_name] = [spec, uri]
-                idx << spec
-              end
-            end
+            idx.use @fetchers[uri].specs(gem_names, self, @spec_fetch_map)
           end
           idx
         ensure
