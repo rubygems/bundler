@@ -17,16 +17,27 @@ module Bundler
 
     # Runs the install procedures for a specific Gemfile.
     #
-    # First, this method will check to see if Bundler.bundle_path exists 
+    # Firstly, this method will check to see if Bundler.bundle_path exists 
     # and if not then will create it. This is usually the location of gems
     # on the system, be it RVM or at a system path.
     # 
-    # Second, it checks if Bundler has been configured to be "frozen"
+    # Secondly, it checks if Bundler has been configured to be "frozen"
     # Frozen ensures that the Gemfile and the Gemfile.lock file are matching.
     # This stops a situation where a developer may update the Gemfile but may not run
     # `bundle install`, which leads to the Gemfile.lock file not being correctly updated.
     # If this file is not correctly updated then any other developer running
     # `bundle install` will potentially not install the correct gems.
+    #
+    # Thirdly, Bundler checks if there are any dependencies specified in the Gemfile using 
+    # Bundler::Environment#dependencies. If there are no dependencies specified then
+    # Bundler returns a warning message stating so and this method returns.
+    #
+    # Fourthly, Bundler checks if the default lockfile (Gemfile.lock) exists, and if so
+    # then proceeds to set up a defintion based on the default gemfile (Gemfile) and the
+    # default lock file (Gemfile.lock). However, this is not the case if the platform is different
+    # to that which is specified in Gemfile.lock, or if there are any missing specs for the gems.
+    #
+    # Fifthly, Bundler resolves the dependencies either through a cache of gems or by remote.
     def run(options)
       # Create the BUNDLE_PATH directory
       begin
