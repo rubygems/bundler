@@ -284,6 +284,7 @@ module Bundler
       Outdated lists the names and versions of all gems that are outdated when compared to the source.
       Calling outdated with [GEM [GEM]] will check only the given gems.
     D
+    method_option "all", :type => :boolean, :banner => "Check for and include pre-release gems"
     method_option "source", :type => :array, :banner => "Check against a specific source"
     method_option "local", :type => :boolean, :banner =>
       "Do not attempt to fetch gems remotely and use the gem cache instead"
@@ -309,7 +310,13 @@ module Bundler
           current = current_specs.find{|s| spec.name == s.name }
         else
           current = spec
-          spec = definition.index[current.name].sort_by{|b| b.version }.last
+          spec = definition.index[current.name].sort_by{|b| b.version }
+
+          if !options[:all] && spec.size > 1
+            spec = spec.delete_if{|b| b.respond_to?(:version) && b.version.prerelease? }
+          end
+
+          spec = spec.last
         end
 
         gem_outdated = Gem::Version.new(spec.version) > Gem::Version.new(current.version)
