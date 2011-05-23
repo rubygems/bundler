@@ -90,15 +90,22 @@ module Bundler
       uri = URI.parse("#{@remote_uri}api/v1/dependencies?gems=#{gem_names.join(",")}")
       marshalled_deps = fetch(uri)
       gem_list = Marshal.load(marshalled_deps)
+      deps_list = []
 
       spec_list = gem_list.map do |s|
-        [s[:name], Gem::Version.new(s[:number]), s[:platform]]
-      end
-      deps_list = gem_list.map do |s|
-        s[:dependencies].collect {|d| d.first }
-      end.flatten.uniq
+        dependencies = s[:dependencies].map do |d|
+          name, requirement = d
+          dep = Gem::Dependency.new(name, requirement)
 
-      [spec_list, deps_list]
+          deps_list << dep.name
+
+          dep
+        end
+
+        [s[:name], Gem::Version.new(s[:number]), s[:platform], dependencies]
+      end
+
+      [spec_list, deps_list.uniq]
     end
 
     # fetch from modern index: specs.4.8.gz
