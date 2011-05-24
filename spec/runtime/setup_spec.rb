@@ -16,8 +16,8 @@ describe "Bundler.setup" do
         require 'rack'
         puts RACK
       RUBY
-      err.should == ""
-      out.should == "1.0.0"
+      err.should eq("")
+      out.should eq("1.0.0")
     end
   end
 
@@ -41,8 +41,8 @@ describe "Bundler.setup" do
           puts "WIN"
         end
       RUBY
-      err.should == ""
-      out.should == "WIN"
+      err.should eq("")
+      out.should eq("WIN")
     end
 
     it "leaves all groups available if they were already" do
@@ -55,8 +55,8 @@ describe "Bundler.setup" do
         require 'rack'
         puts RACK
       RUBY
-      err.should == ""
-      out.should == "1.0.0"
+      err.should eq("")
+      out.should eq("1.0.0")
     end
   end
 
@@ -692,8 +692,8 @@ describe "Bundler.setup" do
         Bundler.load
       RUBY
 
-      err.should == ""
-      out.should == ""
+      err.should eq("")
+      out.should eq("")
     end
   end
 
