@@ -3,6 +3,11 @@ module Bundler
     def initialize
       # Work around a RubyGems bug
       configuration
+
+      # Cache Gem.dir and Gem.bindir because Rubygems 1.8 treats them as globals,
+      # changing them anytime you use Gem::Installer#install.
+      gem_dir
+      gem_bindir
     end
 
     def loaded_specs(name)
@@ -46,11 +51,14 @@ module Bundler
     end
 
     def gem_dir
-      Gem.dir.to_s
+      # We cache this because Rubygems 1.8 changes Gem.dir every time
+      # a gem is installed, and we need the original.
+      @gem_dir ||= Gem.dir
     end
 
     def gem_bindir
-      Gem.bindir
+      # We cache this for the same reason we cache gem_dir.
+      @gem_bindir ||= Gem.bindir
     end
 
     def user_home
