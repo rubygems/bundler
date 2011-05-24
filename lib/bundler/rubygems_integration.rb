@@ -224,6 +224,29 @@ module Bundler
       Gem.clear_paths
     end
 
+    # Rubygems versions 1.3.6 through 1.6.2
+    class Legacy < RubygemsIntegration
+      def stub_rubygems(specs)
+        stub_source_index137(specs)
+      end
+
+      def all_specs
+        Gem.source_index.gems.values
+      end
+
+      def find_name(name)
+        Gem.source_index.find_name(name)
+      end
+    end
+
+    # Rubygems 1.7
+    class Transitional < Legacy
+      def stub_rubygems(specs)
+        stub_source_index170(specs)
+      end
+    end
+
+    # Rubygems 1.8
     class Modern < RubygemsIntegration
       def stub_rubygems(specs)
         Gem::Specification.all = specs
@@ -243,25 +266,6 @@ module Bundler
         Gem::Specification.find_all_by_name name
       end
 
-    end
-
-    class Legacy < RubygemsIntegration
-      def stub_rubygems(specs)
-        stub_source_index137(specs)
-      end
-
-      def all_specs
-        Gem.source_index.gems.values
-      end
-
-      def find_name(name)
-        Gem.source_index.find_name(name)
-      end
-    end
-
-    class Transitional < Legacy
-      def stub_rubygems(specs)
-        stub_source_index170(specs)
       end
     end
 
@@ -269,11 +273,14 @@ module Bundler
 
   if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.7.0')
     if Gem::Specification.respond_to? :all=
+      # >= 1.8
       @rubygems = RubygemsIntegration::Modern.new
     else
+      # 1.7.x
       @rubygems = RubygemsIntegration::Transitional.new
     end
   else
+    # < 1.7.0
     @rubygems = RubygemsIntegration::Legacy.new
   end
 
