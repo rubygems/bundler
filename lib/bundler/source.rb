@@ -80,14 +80,13 @@ module Bundler
       end
 
       def install(spec)
-        path = cached_gem(spec)
-
         if installed_specs[spec].any?
           Bundler.ui.info "Using #{spec.name} (#{spec.version}) "
           return
         end
 
         Bundler.ui.info "Installing #{spec.name} (#{spec.version}) "
+        path = cached_gem(spec)
 
         install_path = Bundler.requires_sudo? ? Bundler.tmp : Bundler.rubygems.gem_dir
         options = { :install_dir         => install_path,
@@ -140,7 +139,11 @@ module Bundler
 
       def cached_gem(spec)
         possibilities = @caches.map { |p| "#{p}/#{spec.file_name}" }
-        possibilities.find { |p| File.exist?(p) }
+        cached_gem = possibilities.find { |p| File.exist?(p) }
+        unless cached_gem
+          raise Bundler::GemNotFound, "Could not find #{spec.file_name} for installation"
+        end
+        cached_gem
       end
 
       def normalize_uri(uri)
