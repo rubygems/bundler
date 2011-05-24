@@ -73,6 +73,11 @@ module Bundler
       Gem.bin_path(gem, bin, ver)
     end
 
+    def preserve_paths
+      # this is a no-op outside of Rubygems 1.8
+      yield
+    end
+
     def ui=(obj)
       Gem::DefaultUserInteraction.ui = obj
     end
@@ -266,6 +271,13 @@ module Bundler
         Gem::Specification.find_all_by_name name
       end
 
+      # Rubygems 1.8 changes Gem.dir when you call Gem::Installer#install with
+      # an :install_path option. I guess this makes sense for them, but we have
+      # to change it back for our sudo mode to work.
+      def preserve_paths
+        old_dir, old_path = gem_dir, gem_path
+        yield
+        Gem.use_paths(old_dir, old_path)
       end
     end
 
