@@ -3,10 +3,6 @@ $:.unshift File.expand_path("../lib", __FILE__)
 require 'bundler/gem_helper'
 Bundler::GemHelper.install_tasks
 
-def sudo?
-  ENV['BUNDLER_SUDO_TESTS']
-end
-
 begin
   # set up rspec tasks
   require 'rspec/core/rake_task'
@@ -42,19 +38,20 @@ begin
   end
 
   namespace :spec do
+    task :clean do
+      rm_rf 'tmp'
+    end
+
     desc "Run the spec suite with the sudo tests"
-    task :sudo => ["set_sudo", "clean", "spec"]
+    task :sudo => ["set_sudo", "spec", "clean_sudo"]
 
     task :set_sudo do
       ENV['BUNDLER_SUDO_TESTS'] = '1'
     end
 
-    task :clean do
-      if sudo?
-        system "sudo rm -rf #{File.expand_path('../tmp', __FILE__)}"
-      else
-        rm_rf 'tmp'
-      end
+    task :clean_sudo do
+      puts "Cleaning up sudo test files..."
+      system "sudo rm -rf #{File.expand_path('../tmp/sudo_gem_home', __FILE__)}"
     end
 
     namespace :rubygems do
@@ -69,7 +66,7 @@ begin
 
         # Create tasks like spec:rubygems:v1.8.3:sudo to run the sudo specs
         namespace rg do
-          task :sudo => ["set_sudo", rg]
+          task :sudo => ["set_sudo", rg, "clean_sudo"]
         end
 
         task "clone_rubygems_#{rg}" do
