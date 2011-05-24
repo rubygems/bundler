@@ -10,6 +10,7 @@ describe "when using sudo", :sudo => true do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack", '1.0'
+        gem "thin"
       G
 
       system_gem_path("gems/rack-1.0.0").should exist
