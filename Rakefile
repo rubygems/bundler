@@ -67,6 +67,11 @@ begin
           t.ruby_opts  = %w(-w)
         end
 
+        # Create tasks like spec:rubygems:v1.8.3:sudo to run the sudo specs
+        namespace rg do
+          task :sudo => ["set_sudo", rg]
+        end
+
         task "clone_rubygems_#{rg}" do
           unless File.directory?("tmp/rubygems")
             system("git clone git://github.com/rubygems/rubygems.git tmp/rubygems")
