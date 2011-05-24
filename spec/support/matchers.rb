@@ -35,7 +35,7 @@ module Spec
         version_const = name == 'bundler' ? 'Bundler::VERSION' : Spec::Builders.constantize(name)
         run "require '#{name}.rb'; puts #{version_const}", *groups
         actual_version, actual_platform = out.split(/\s+/)
-        check Gem::Version.new(actual_version).should == Gem::Version.new(version)
+        Gem::Version.new(actual_version).should eq(Gem::Version.new(version))
         actual_platform.should == platform
       end
     end

@@ -54,7 +54,7 @@ describe "bundle exec" do
 
     bundle "exec rackup"
 
-    check out.should == "0.9.1"
+    out.should eq("0.9.1")
 
     Dir.chdir bundled_app2 do
       bundle "exec rackup"
@@ -74,7 +74,7 @@ describe "bundle exec" do
 
     bundle "exec rackup"
 
-    check out.should == "0.9.1"
+    out.should eq("0.9.1")
     should_not_be_installed "rack_middleware 1.0"
   end
 
@@ -99,7 +99,7 @@ describe "bundle exec" do
     G
 
     bundle "exec foobarbaz", :exitstatus => true
-    check exitstatus.should == 127
+    exitstatus.should eq(127)
     out.should include("bundler: command not found: foobarbaz")
     out.should include("Install missing gem binaries with `bundle install`")
   end
@@ -111,7 +111,7 @@ describe "bundle exec" do
 
     bundle "exec touch foo"
     bundle "exec ./foo", :exitstatus => true
-    check exitstatus.should == 126
+    exitstatus.should eq(126)
     out.should include("bundler: not executable: ./foo")
   end
 

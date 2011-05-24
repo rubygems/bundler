@@ -145,7 +145,7 @@ describe "bundle install with git sources" do
           gem "foo"
         end
       G
-      check err.should == ""
+      err.should eq("")
 
       run <<-RUBY
         require 'foo'

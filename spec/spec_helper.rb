@@ -57,11 +57,6 @@ RSpec.configure do |config|
     pending "JRuby executables do not have a proper shebang" if RUBY_PLATFORM == "java"
   end
 
-  def check(*args)
-    # suppresses ruby warnings about "useless use of == in void context"
-    # e.g. check foo.should == bar
-  end
-
   config.before :all do
     build_repo1
   end

@@ -48,23 +48,23 @@ describe "Bundler.require" do
   it "requires the gems" do
     # default group
     run "Bundler.require"
-    check out.should == "two"
+    out.should eq("two")
 
     # specific group
     run "Bundler.require(:bar)"
-    check out.should == "baz\nqux"
+    out.should eq("baz\nqux")
 
     # default and specific group
     run "Bundler.require(:default, :bar)"
-    check out.should == "baz\nqux\ntwo"
+    out.should eq("baz\nqux\ntwo")
 
     # specific group given as a string
     run "Bundler.require('bar')"
-    check out.should == "baz\nqux"
+    out.should eq("baz\nqux")
 
     # specific group declared as a string
     run "Bundler.require(:string)"
-    check out.should == "six"
+    out.should eq("six")
 
     # required in resolver order instead of gemfile order
     run("Bundler.require(:not)")
@@ -95,10 +95,10 @@ describe "Bundler.require" do
   describe "using bundle exec" do
     it "requires the locked gems" do
       bundle "exec ruby -e 'Bundler.require'"
-      check out.should == "two"
+      out.should eq("two")
 
       bundle "exec ruby -e 'Bundler.require(:bar)'"
-      check out.should == "baz\nqux"
+      out.should eq("baz\nqux")
 
       bundle "exec ruby -e 'Bundler.require(:default, :bar)'"
       out.should == "baz\nqux\ntwo"
@@ -138,7 +138,7 @@ describe "Bundler.require" do
       G
 
       run "Bundler.require"
-      check out.should == "two\nmodule_two\none"
+      out.should eq("two\nmodule_two\none")
     end
 
     describe "a gem with different requires for different envs" do
@@ -178,7 +178,7 @@ describe "Bundler.require" do
       G
 
       run "Bundler.require"
-      check out.should == "two_not_loaded\none\ntwo"
+      out.should eq("two_not_loaded\none\ntwo")
     end
 
     describe "with busted gems" do
@@ -225,7 +225,7 @@ describe "Bundler.require with platform specific dependencies" do
 
     run "Bundler.require; puts RACK", :expect_err => true
 
-    check out.should == "1.0.0"
+    out.should eq("1.0.0")
     err.should be_empty
   end
 end
