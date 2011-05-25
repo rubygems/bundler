@@ -2,7 +2,9 @@
 
 ## Troubleshooting
 
-Instructions for common Bundler use-cases can be found on the [Bundler documentation site](http://gembundler.com/v1.0/). Detailed information about each Bundler command, including help with common problems, can be found in the [Bundler man pages](http://gembundler.com/man/bundle.1.html).
+Instructions for common Bundler use-cases can be found on the [Bundler documentation site](http://gembundler.com/v1.0/).
+
+Detailed information about each Bundler command, including help with common problems, can be found in the [Bundler man pages](http://gembundler.com/man/bundle.1.html).
 
 After reading the documentation, try these troubleshooting steps:
 
@@ -26,23 +28,23 @@ After reading the documentation, try these troubleshooting steps:
 
 ## Reporting unresolved problems
 
-If you are still having problems, please report issues to the [Bundler issue tracker](http://github.com/carlhuda/bundler/issues/).
+Instructions that allow the Bundler team to reproduce your issue are vitally important. When you report a bug, please include the following information:
 
-Instructions that allow the Bundler team to reproduce your issue are vitally important. When you report a bug, please create a gist of the following information and include a link in your ticket:
-
-  - What version of bundler you are using
-  - What version of Ruby you are using
-  - What version of Rubygems you are using
-  - Whether you are using RVM, and if so what version
+  - The command you ran
+  - Exception backtrace(s), if any
   - Your Gemfile
   - Your Gemfile.lock
-  - If you are on 0.9, whether you have locked or not
-  - If you are on 1.0, the result of `bundle config`
-  - The command you ran to generate exception(s)
-  - The exception backtrace(s)
+  - Your Bundler configuration settings (run `bundle config`)
+  - What version of bundler you are using (run `bundle -v`)
+  - What version of Ruby you are using (run `ruby -v`)
+  - What version of Rubygems you are using (run `gem -v`)
+  - Whether you are using RVM, and if so what version (run `rvm -v`)
+
 
 If you are using Rails 2.3, please also include:
 
   - Your boot.rb file
   - Your preinitializer.rb file
   - Your environment.rb file
+
+[Create a gist](https://gist.github.com) containing all of that information, then visit the [Bundler issue tracker](https://github.com/carlhuda/bundler) and create a new ticket describing your problem and linking to your gist.
