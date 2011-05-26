@@ -1,5 +1,15 @@
 # Bundler Issues
 
+## Frequently encountered issues
+
+### REE and Zlib::GzipFile::Error
+
+Ruby Enterprise Edition users may see a `Zlib::GzipFile::Error` while installing gems. It is due to [a bug in REE](http://code.google.com/p/rubyenterpriseedition/issues/detail?id=45). You may be able to resolve the issue by upgrading REE, or changing to a different interpreter.
+
+### Rake activation error
+
+Anyone who has installed the Spork gem may see activation errors while running `rake` directly. This is because installing Spork would [install the newest rake using a mkmf file](https://github.com/timcharper/spork/issues/119). To resolve the issue, update your Gemfile to include either the newest version of Rake or the newest version of Spork (which no longer installs Rake).
+
 ## Troubleshooting
 
 Instructions for common Bundler use-cases can be found on the [Bundler documentation site](http://gembundler.com/v1.0/).
