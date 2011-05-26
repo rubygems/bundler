@@ -45,7 +45,7 @@ module Bundler
 
     def local_search(query, base = nil)
       case query
-      when Gem::Specification, RemoteSpecification, LazySpecification then search_by_spec(query)
+      when Gem::Specification, RemoteSpecification, LazySpecification, EndpointSpecification then search_by_spec(query)
       when String then specs_by_name(query)
       when Gem::Dependency then search_by_dependency(query, base)
       else

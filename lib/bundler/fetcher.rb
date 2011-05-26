@@ -2,6 +2,7 @@ require 'uri'
 require 'net/http/persistent'
 
 module Bundler
+  # Handles all the fetching with the rubygems server
   class Fetcher
     REDIRECT_LIMIT = 5
 
@@ -25,9 +26,14 @@ module Bundler
     def specs(gem_names, source, spec_fetch_map)
       index = Index.new
 
-      fetch_remote_specs(gem_names)[@remote_uri].each do |name, version, platform|
+      fetch_remote_specs(gem_names)[@remote_uri].each do |name, version, platform, dependencies|
         next if name == 'bundler'
-        spec = RemoteSpecification.new(name, version, platform, self)
+        spec = nil
+        if dependencies
+          spec = EndpointSpecification.new(name, version, platform, dependencies)
+        else
+          spec = RemoteSpecification.new(name, version, platform, self)
+        end
         spec.source = source
         spec_fetch_map[spec.full_name] = [spec, @remote_uri]
         index << spec
