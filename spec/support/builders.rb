@@ -32,7 +32,7 @@ module Spec
 
         build_gem "rails",          "2.3.2" do |s|
           s.executables = "rails"
-          s.add_dependency "rake"
+          s.add_dependency "rake",           "0.8.7"
           s.add_dependency "actionpack",     "2.3.2"
           s.add_dependency "activerecord",   "2.3.2"
           s.add_dependency "actionmailer",   "2.3.2"
