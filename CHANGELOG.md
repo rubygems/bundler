@@ -1,3 +1,24 @@
+## 1.0.14 (May 27, 2011)
+
+Features:
+
+  - Rubinius platform :rbx (@rkbodenner)
+  - Include gem rake tasks with "require 'bundler/gem_tasks" (@indirect)
+  - Include user name and email from git config in new gemspec (@ognevsky)
+
+Bugfixes:
+
+  - Set file permissions after checking out git repos (@tissak)
+  - Remove deprecated call to Gem::SourceIndex#all_gems (@mpj)
+  - Require the version file in new gemspecs (@rubiii)
+  - Allow relative paths from the Gemfile in gems with no gemspec (@mbirk)
+  - Install gems that contain 'bundler', e.g. guard-bundler (@hone)
+  - Display installed path correctly on Windows (@tadman)
+  - Escape quotes in git URIs (@mheffner)
+  - Improve Rake 0.9 support (@quix)
+  - Handle certain directories already existing (@raggi)
+  - Escape filenames containing regex characters (@indirect)
+
 ## 1.0.13 (May 4, 2011)
 
 Features:
