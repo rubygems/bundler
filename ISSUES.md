@@ -8,7 +8,7 @@ Ruby Enterprise Edition users may see a `Zlib::GzipFile::Error` while installing
 
 ### Rake activation error
 
-Anyone who has installed the Spork gem may see activation errors while running `rake` directly. This is because installing Spork would [install the newest rake using a mkmf file](https://github.com/timcharper/spork/issues/119). To resolve the issue, update your Gemfile to include either the newest version of Rake or the newest version of Spork (which no longer installs Rake).
+Anyone who has installed the Spork gem may see activation errors while running `rake` directly. This is because old versions of Spork would [install the newest rake using a mkmf file](https://github.com/timcharper/spork/issues/119). To resolve the issue, update the Spork version requirement in your Gemfile to at least `"~>0.8.5"` or `"~>0.9.0.rc8"`.
 
 ## Troubleshooting
 
