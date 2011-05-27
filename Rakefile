@@ -1,7 +1,6 @@
 # -*- encoding: utf-8 -*-
 $:.unshift File.expand_path("../lib", __FILE__)
-require 'bundler/gem_helper'
-Bundler::GemHelper.install_tasks
+require 'bundler/gem_tasks'
 
 begin
   # set up rspec tasks
