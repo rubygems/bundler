@@ -31,6 +31,16 @@ describe "gemcutter's dependency API" do
       "activesupport 2.3.2")
   end
 
+  it "should handle multiple gem dependencies on the same gem" do
+    gemfile <<-G
+      source "#{source_uri}"
+      gem "net-sftp"
+    G
+
+    bundle :install, :artifice => "endpoint"
+    should_be_installed "net-sftp 1.1.1"
+  end
+
   it "falls back when the API errors out" do
     simulate_platform mswin
 

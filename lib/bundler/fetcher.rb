@@ -101,7 +101,7 @@ module Bundler
       spec_list = gem_list.map do |s|
         dependencies = s[:dependencies].map do |d|
           name, requirement = d
-          dep = Gem::Dependency.new(name, requirement)
+          dep = Gem::Dependency.new(name, requirement.split(", "))
 
           deps_list << dep.name
 
