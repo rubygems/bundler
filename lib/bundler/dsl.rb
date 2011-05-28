@@ -112,7 +112,6 @@ module Bundler
     end
 
     def to_definition(lockfile, unlock)
-      @rubygems_source.dependencies = @dependencies
       @sources << @rubygems_source unless @sources.include?(@rubygems_source)
       Definition.new(lockfile, @dependencies, @sources, unlock)
     end

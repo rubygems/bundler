@@ -160,6 +160,7 @@ module Bundler
     def index
       @index ||= Index.build do |idx|
         @sources.each do |s|
+          s.dependencies = @dependencies if s.is_a?(Bundler::Source::Rubygems)
           idx.add_source s.specs
         end
       end
