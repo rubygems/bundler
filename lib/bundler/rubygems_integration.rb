@@ -270,10 +270,12 @@ module Bundler
       def find_name(name)
         Gem::Specification.find_all_by_name name
       end
+    end
 
-      # Rubygems 1.8 changes Gem.dir when you call Gem::Installer#install with
-      # an :install_path option. I guess this makes sense for them, but we have
-      # to change it back for our sudo mode to work.
+    class AlmostModern < Modern
+      # Rubygems [>= 1.8.0, < 1.8.5] has a bug that changes Gem.dir whenever
+      # you call Gem::Installer#install with an :install_dir set. We have to
+      # change it back for our sudo mode to work.
       def preserve_paths
         old_dir, old_path = gem_dir, gem_path
         yield
@@ -283,16 +285,13 @@ module Bundler
 
   end
 
-  if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.7.0')
-    if Gem::Specification.respond_to? :all=
-      # >= 1.8
-      @rubygems = RubygemsIntegration::Modern.new
-    else
-      # 1.7.x
-      @rubygems = RubygemsIntegration::Transitional.new
-    end
-  else
-    # < 1.7.0
+  if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.8.5')
+    @rubygems = RubygemsIntegration::Modern.new
+  elsif Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.8.0')
+    @rubygems = RubygemsIntegration::AlmostModern.new
+  elsif Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.7.0')
+    @rubygems = RubygemsIntegration::Transitional.new
+  else # Rubygems 1.3.6 through 1.6.2
     @rubygems = RubygemsIntegration::Legacy.new
   end
 
