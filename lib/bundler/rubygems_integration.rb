@@ -272,7 +272,7 @@ module Bundler
       end
     end
 
-    # Rubygems 1.8
+    # Rubygems 1.8.5
     class Modern < RubygemsIntegration
       def stub_rubygems(specs)
         Gem::Specification.all = specs
@@ -293,6 +293,7 @@ module Bundler
       end
     end
 
+    # Rubygems 1.8.0 to 1.8.4
     class AlmostModern < Modern
       # Rubygems [>= 1.8.0, < 1.8.5] has a bug that changes Gem.dir whenever
       # you call Gem::Installer#install with an :install_dir set. We have to
