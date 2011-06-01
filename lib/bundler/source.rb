@@ -608,11 +608,11 @@ module Bundler
         Digest::SHA1.hexdigest(input)
       end
 
-      # Escape the URI for shell commands. To support a single quote
-      # within the URI we must end the string, escape the quote and
+      # Escape an argument for shell commands. To support a single quote
+      # within the argument we must end the string, escape the quote and
       # restart.
-      def uri_escaped
-        "'#{uri.gsub("'") {|s| "'\\''"}}'"
+      def escape(string)
+        "'#{string.to_s.gsub("'") {|s| "'\\''"}}'"
       end
 
       def cache_path
@@ -632,12 +632,12 @@ module Bundler
           return if has_revision_cached?
           Bundler.ui.info "Updating #{uri}"
           in_cache do
-            git %|fetch --force --quiet --tags #{uri_escaped} "refs/heads/*:refs/heads/*"|
+            git %|--git-dir #{escape Dir.pwd} fetch --force --quiet --tags #{escape uri} "refs/heads/*:refs/heads/*"|
           end
         else
           Bundler.ui.info "Fetching #{uri}"
           FileUtils.mkdir_p(cache_path.dirname)
-          git %|clone #{uri_escaped} "#{cache_path}" --bare --no-hardlinks|
+          git %|clone #{escape uri} "#{cache_path}" --bare --no-hardlinks|
         end
       end
 
@@ -648,20 +648,19 @@ module Bundler
           git %|clone --no-checkout "#{cache_path}" "#{path}"|
           File.chmod((0777 & ~File.umask), path)
         end
-        Dir.chdir(path) do
-          git %|fetch --force --quiet --tags "#{cache_path}"|
-          git "reset --hard #{revision}"
+        dir_opts = %|--git-dir #{escape path}/.git --work-tree #{escape path}|
+        git %|#{dir_opts} fetch --force --quiet --tags "#{cache_path}"|
+        git "#{dir_opts} reset --hard #{revision}"
 
-          if @submodules
-            git "submodule init"
-            git "submodule update"
-          end
+        if @submodules
+          git "#{dir_opts} submodule init"
+          git "#{dir_opts} submodule update"
         end
       end
 
       def has_revision_cached?
         return unless @revision
-        in_cache { git %|cat-file -e #{@revision}| }
+        in_cache { git %|--git-dir #{escape Dir.pwd} cat-file -e #{@revision}| }
         true
       rescue GitError
         false
