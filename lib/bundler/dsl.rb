@@ -111,6 +111,21 @@ module Bundler
       source Source::Git.new(_normalize_hash(options).merge("uri" => uri)), source_options, &blk
     end
 
+    def hg(uri, options = {}, source_options = {}, &blk)
+      unless block_given?
+        msg = "You can no longer specify a hg source by itself. Instead, \n" \
+              "either use the :hg option on a gem, or specify the gems that \n" \
+              "bundler should find in the hg source by passing a block to \n" \
+              "the hg method, like: \n\n" \
+              "  hg 'http://bitbucket.org/nolith/eusplazio' do\n" \
+              "    gem 'eusplazio'\n" \
+              "  end"
+        raise DeprecatedError, msg
+      end
+
+      source Source::Mercurial.new(_normalize_hash(options).merge("uri" => uri)), source_options, &blk
+    end
+
     def to_definition(lockfile, unlock)
       @sources << @rubygems_source
       @sources.uniq!
@@ -183,7 +198,7 @@ module Bundler
     def _normalize_options(name, version, opts)
       _normalize_hash(opts)
 
-      invalid_keys = opts.keys - %w(group groups git github path name branch ref tag require submodules platform platforms)
+      invalid_keys = opts.keys - %w(group groups git github path name branch ref tag require submodules platform platforms hg)
       if invalid_keys.any?
         plural = invalid_keys.size > 1
         message = "You passed #{invalid_keys.map{|k| ':'+k }.join(", ")} "
@@ -214,7 +229,7 @@ module Bundler
         opts["git"] = "git://github.com/#{github}.git"
       end
 
-      ["git", "path"].each do |type|
+      ["git", "path", "hg"].each do |type|
         if param = opts[type]
           if version.first && version.first =~ /^\s*=?\s*(\d[^\s]*)\s*$/
             options = opts.merge("name" => name, "version" => $1)
