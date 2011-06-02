@@ -189,6 +189,8 @@ module Bundler
         # must be approved by the rubygems team itself!
         #
         # This is your warning. If you use this and don't have approval
+        # we can't protect you.
+        #
         Deprecate.skip_during do
           self.spec_dirs = *args
           add_specs(*specs)
