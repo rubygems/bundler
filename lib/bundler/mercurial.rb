@@ -136,6 +136,13 @@ module Bundler
         Digest::SHA1.hexdigest(input)
       end
 
+      # Escape the URI for shell commands. To support a single quote
+      # within the URI we must end the string, escape the quote and
+      # restart.
+      def uri_escaped
+        "'#{uri.gsub("'") {|s| "'\\''"}}'"
+      end
+
       def cache_path
         @cache_path ||= begin
           hg_scope = "#{base_name}-#{uri_hash}"
@@ -153,12 +160,12 @@ module Bundler
           return if has_revision_cached?
           Bundler.ui.info "Updating #{uri}"
           in_cache do
-            hg %|pull -q "#{uri}"|
+            hg %|pull -q #{uri_escaped}|
           end
         else
           Bundler.ui.info "Fetching #{uri}"
           FileUtils.mkdir_p(cache_path.dirname)
-          hg %|clone --noupdate "#{uri}" "#{cache_path}"|
+          hg %|clone --noupdate #{uri_escaped} "#{cache_path}"|
         end
       end
 
