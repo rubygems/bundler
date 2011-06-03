@@ -59,12 +59,11 @@ module Bundler
   private
 
     def method_missing(method, *args, &blk)
-      if Gem::Specification.new.respond_to?(method)
-        raise "LazySpecification has not been materialized yet (calling :#{method} #{args.inspect})" unless @specification
-        @specification.send(method, *args, &blk)
-      else
-        super
-      end
+      raise "LazySpecification has not been materialized yet (calling :#{method} #{args.inspect})" unless @specification
+
+      return super unless respond_to?(method)
+
+      @specification.send(method, *args, &blk)
     end
 
   end
