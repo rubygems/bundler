@@ -185,7 +185,7 @@ module Bundler
         return unless @revision
         in_cache do
           if hg(%|-q log --style=compact|).split("\n").map() { |line| line[-12..13]}.include? @revision
-            return true 
+            return true
           end
         end
         false
