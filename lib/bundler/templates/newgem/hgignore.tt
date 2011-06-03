@@ -1,4 +1,4 @@
-syntax: glob 
+syntax: glob
 
 *.gem
 Gemfile.lock
