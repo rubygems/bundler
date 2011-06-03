@@ -629,10 +629,13 @@ module Spec
             silently("hg update -C #{branch}")
           elsif tag = options[:tag]
             `hg tag #{tag}`
+            `hg tag push_#{tag}` #in hg a tag is recorded into a commit, pushing to a tag will not send the tag label
           elsif options[:remote]
             open('.hg/hgrc','a') {|f| f << "[paths]\ndefault = #{options[:remote]}\n"}
           elsif options[:push]
-            silently("hg push #{options[:push]}")
+            commit = options[:push]
+            commit = "push_#{commit}" unless `hg tags | grep #{commit}`.empty?
+            silently("hg push -r #{commit}")
           end
 
           `hg log -r tip --style=default` =~ /\b\d+:(\w{12})$/
