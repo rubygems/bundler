@@ -47,10 +47,19 @@ module Bundler
       return fetch_all_remote_specs unless gem_names && @remote_uri.scheme != "file"
 
       query_list = gem_names - full_dependency_list
-      Bundler.ui.debug "Query List: #{query_list.inspect}"
-      return {@remote_uri => last_spec_list} if query_list.empty?
+      # only display the message on the first run
+      if full_dependency_list.empty?
+        Bundler.ui.info "Fetching dependency information from the API at #{@remote_uri}", false
+      else
+        Bundler.ui.info ".", false
+      end
 
-      Bundler.ui.info "Fetching dependency information from the API at #{@remote_uri}"
+      Bundler.ui.debug "Query List: #{query_list.inspect}"
+      if query_list.empty?
+        Bundler.ui.info "\n"
+        return {@remote_uri => last_spec_list}
+      end
+
       spec_list, deps_list = fetch_dependency_remote_specs(query_list)
       returned_gems = spec_list.map {|spec| spec.first }.uniq
 

@@ -21,7 +21,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :artifice => "endpoint"
-    out.should include("Fetching dependency information from the API at #{source_uri}")
+    out.should include("Fetching dependency information from the API at #{source_uri}/...")
     should_be_installed(
       "rails 2.3.2",
       "actionpack 2.3.2",
