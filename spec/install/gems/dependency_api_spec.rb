@@ -89,4 +89,19 @@ describe "gemcutter's dependency API" do
     bundle :install, :artifice => "endpoint_redirect"
     out.should match(/Too many redirects/)
   end
+
+  it "passes basic authentication details" do
+    uri = URI.parse(source_uri)
+    uri.user = "hello"
+    uri.password = "there"
+
+    gemfile <<-G
+      source "#{uri}"
+      gem "rack"
+    G
+
+    bundle :install, :artifice => "endpoint_basic_authentication"
+    out.should include("Fetching dependency information from the API at #{uri}")
+    should_be_installed "rack 1.0.0"
+  end
 end
