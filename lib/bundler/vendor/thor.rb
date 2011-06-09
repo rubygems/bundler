@@ -311,8 +311,31 @@ class Thor
       # Receives a task name (can be nil), and try to get a map from it.
       # If a map can't be found use the sent name or the default task.
       def normalize_task_name(meth) #:nodoc:
-        meth = map[meth.to_s] || meth || default_task
+        meth = map[meth.to_s] || find_subcommand_and_update_argv(meth) || meth || default_task
         meth.to_s.gsub('-','_') # treat foo-bar > foo_bar
+      end
+
+      # terrible hack that overwrites ARGV
+      def find_subcommand_and_update_argv(subcmd_name) #:nodoc:
+        cmd = find_subcommand(subcmd_name)
+        ARGV[0] = cmd if cmd
+        cmd
+      end
+
+      def find_subcommand(subcmd_name)
+        possibilities = find_subcommand_possibilities subcmd_name
+        if possibilities.size > 1
+          raise "Ambiguous subcommand #{subcmd_name} matches [#{possibilities.join(', ')}]"
+        elsif possibilities.size < 1
+          return nil
+        end
+
+        possibilities.first
+      end
+
+      def find_subcommand_possibilities(subcmd_name)
+        len = subcmd_name.length
+        all_tasks.map {|t| t.first}.select { |n| subcmd_name == n[0, len] }
       end
 
       def subcommand_help(cmd)
