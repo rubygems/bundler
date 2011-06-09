@@ -49,6 +49,7 @@ Instructions that allow the Bundler team to reproduce your issue are vitally imp
   - What version of Ruby you are using (run `ruby -v`)
   - What version of Rubygems you are using (run `gem -v`)
   - Whether you are using RVM, and if so what version (run `rvm -v`)
+  - Whether you have the `rubygems-bundler` gem, which can break gem binares
 
 
 If you are using Rails 2.3, please also include:
