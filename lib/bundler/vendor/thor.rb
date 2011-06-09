@@ -317,6 +317,7 @@ class Thor
 
       # terrible hack that overwrites ARGV
       def find_subcommand_and_update_argv(subcmd_name) #:nodoc:
+        return unless subcmd_name
         cmd = find_subcommand(subcmd_name)
         ARGV[0] = cmd if cmd
         cmd
