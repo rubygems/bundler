@@ -608,11 +608,17 @@ module Bundler
         Digest::SHA1.hexdigest(input)
       end
 
-      # Escape the URI for shell commands. To support a single quote
-      # within the URI we must end the string, escape the quote and
-      # restart.
+      # Escape the URI for git commands
       def uri_escaped
-        "'#{uri.gsub("'") {|s| "'\\''"}}'"
+        if Bundler::WINDOWS
+          # Windows quoting requires double quotes only, with double quotes
+          # inside the string escaped by being doubled.
+          '"' + uri.gsub('"') {|s| '""'} + '"'
+        else
+          # Bash requires single quoted strings, with the single quotes escaped
+          # by ending the string, escaping the quote, and restarting the string.
+          "'" + uri.gsub("'") {|s| "'\\''"} + "'"
+        end
       end
 
       def cache_path
