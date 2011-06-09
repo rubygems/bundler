@@ -85,7 +85,9 @@ class Thor
     end
 
     def check_unknown!
-      raise UnknownArgumentError, "Unknown switches '#{@unknown.join(', ')}'" unless @unknown.empty?
+      unless ARGV.include?("exec") || ARGV.include?("config")
+        raise UnknownArgumentError, "Unknown switches '#{@unknown.join(', ')}'" unless @unknown.empty?
+      end
     end
 
     protected
