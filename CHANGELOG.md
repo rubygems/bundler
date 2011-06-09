@@ -1,3 +1,13 @@
+## 1.0.15 (June 9, 2011)
+
+Features:
+
+  - Improved Rubygems integration, removed many deprecation notices
+
+Bugfixes:
+
+  - Escape URL arguments to git correctly on Windows (1.0.14 regression)
+
 ## 1.0.14 (May 27, 2011)
 
 Features:
