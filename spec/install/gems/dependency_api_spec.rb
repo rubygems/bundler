@@ -137,4 +137,22 @@ describe "gemcutter's dependency API" do
     out.should include("Fetching source index for #{source_uri}")
     should_be_installed "rack 1.0.0"
   end
+
+  it "fetches again when more dependencies are found in subsequent sources" do
+    build_repo2 do
+      build_gem "back_deps" do |s|
+        s.add_dependency "foo"
+      end
+      FileUtils.rm_rf Dir[gem_repo2("gems/foo-*.gem")]
+    end
+
+    gemfile <<-G
+      source "#{source_uri}"
+      source "#{source_uri}/extra"
+      gem "back_deps"
+    G
+
+    bundle :install, :artifice => "endpoint_extra"
+    should_be_installed "back_deps 1.0"
+  end
 end

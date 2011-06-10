@@ -13,9 +13,9 @@ require 'sinatra/base'
 class Endpoint < Sinatra::Base
 
   helpers do
-    def dependencies_for(gem_names)
+    def dependencies_for(gem_names, marshal = gem_repo1("Marshal.4.8"))
       require 'rubygems'
-      Marshal.load(File.open(gem_repo1("Marshal.4.8")).read).map do |gem, spec|
+      Marshal.load(File.open(marshal).read).map do |gem, spec|
         if gem_names.include?(spec.name)
           {
             :name         => spec.name,
