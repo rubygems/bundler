@@ -123,7 +123,7 @@ module Bundler
         if executables.include? File.basename(caller.first.split(':').first)
           return
         end
-        opts = reqs.last.is_a?(Hash) ? reqs.pop : {}
+        reqs.pop if reqs.last.is_a?(Hash)
 
         unless dep.respond_to?(:name) && dep.respond_to?(:requirement)
           dep = Gem::Dependency.new(dep, reqs)
