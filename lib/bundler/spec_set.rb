@@ -80,6 +80,7 @@ module Bundler
       materialized = self.for(deps, [], false, true).to_a
       materialized.map! do |s|
         next s unless s.is_a?(LazySpecification)
+        s.source.dependencies = deps if s.source.respond_to?(:dependencies=)
         spec = s.__materialize__
         if missing_specs
           missing_specs << s unless spec
