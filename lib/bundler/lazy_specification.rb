@@ -59,6 +59,8 @@ module Bundler
   private
 
     def method_missing(method, *args, &blk)
+      return super if method == :to_ary
+
       raise "LazySpecification has not been materialized yet (calling :#{method} #{args.inspect})" unless @specification
 
       return super unless respond_to?(method)
