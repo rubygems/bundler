@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ## 1.1.pre.4 (5 May, 2011)
 
 Bugfixes:
