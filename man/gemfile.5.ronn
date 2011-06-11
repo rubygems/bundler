@@ -120,6 +120,8 @@ There are a number of `Gemfile` platforms:
     _mri_ `AND` version 1.8
   * `mri_19`:
     _mri_ `AND` version 1.9
+  * `rbx`:
+    Same as _ruby_, but only Rubinius (not MRI)
   * `jruby`:
     JRuby
   * `mswin`:

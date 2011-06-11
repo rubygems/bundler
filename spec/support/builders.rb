@@ -35,7 +35,7 @@ module Spec
 
         build_gem "rails",          "2.3.2" do |s|
           s.executables = "rails"
-          s.add_dependency "rake"
+          s.add_dependency "rake",           "0.8.7"
           s.add_dependency "actionpack",     "2.3.2"
           s.add_dependency "activerecord",   "2.3.2"
           s.add_dependency "actionmailer",   "2.3.2"
@@ -487,6 +487,8 @@ module Spec
         Dir.chdir(path) do
           `git init`
           `git add *`
+          `git config user.email "lol@wut.com"`
+          `git config user.name "lolwut"`
           `git commit -m 'OMG INITIAL COMMIT'`
         end
       end

@@ -79,24 +79,26 @@ module Bundler
       end
 
       def install(spec)
-        path = cached_gem(spec)
-
         if installed_specs[spec].any?
           Bundler.ui.info "Using #{spec.name} (#{spec.version}) "
           return
         end
 
         Bundler.ui.info "Installing #{spec.name} (#{spec.version}) "
+        path = cached_gem(spec)
 
-        install_path = Bundler.requires_sudo? ? Bundler.tmp : Bundler.rubygems.gem_dir
-        options = { :install_dir         => install_path,
-                    :ignore_dependencies => true,
-                    :wrappers            => true,
-                    :env_shebang         => true }
-        options.merge!(:bin_dir => "#{install_path}/bin") unless spec.executables.nil? || spec.executables.empty?
+        Bundler.rubygems.preserve_paths do
 
-        installer = Gem::Installer.new path, options
-        installer.install
+          install_path = Bundler.requires_sudo? ? Bundler.tmp : Bundler.rubygems.gem_dir
+          options = { :install_dir         => install_path,
+                      :ignore_dependencies => true,
+                      :wrappers            => true,
+                      :env_shebang         => true }
+          options.merge!(:bin_dir => "#{install_path}/bin") unless spec.executables.nil? || spec.executables.empty?
+
+          installer = Gem::Installer.new path, options
+          installer.install
+        end
 
         if spec.post_install_message
           Installer.post_install_messages[spec.name] = spec.post_install_message
@@ -143,7 +145,11 @@ module Bundler
 
       def cached_gem(spec)
         possibilities = @caches.map { |p| "#{p}/#{spec.file_name}" }
-        possibilities.find { |p| File.exist?(p) }
+        cached_gem = possibilities.find { |p| File.exist?(p) }
+        unless cached_gem
+          raise Bundler::GemNotFound, "Could not find #{spec.file_name} for installation"
+        end
+        cached_gem
       end
 
       def normalize_uri(uri)
@@ -198,7 +204,7 @@ module Bundler
 
           path = Bundler.app_cache
           Dir["#{path}/*.gem"].each do |gemfile|
-            next if gemfile =~ /bundler\-[\d\.]+?\.gem/
+            next if gemfile =~ /^bundler\-[\d\.]+?\.gem/
 
             begin
               s ||= Bundler.rubygems.spec_from_gem(gemfile)
@@ -594,6 +600,19 @@ module Bundler
         Digest::SHA1.hexdigest(input)
       end
 
+      # Escape the URI for git commands
+      def uri_escaped
+        if Bundler::WINDOWS
+          # Windows quoting requires double quotes only, with double quotes
+          # inside the string escaped by being doubled.
+          '"' + uri.gsub('"') {|s| '""'} + '"'
+        else
+          # Bash requires single quoted strings, with the single quotes escaped
+          # by ending the string, escaping the quote, and restarting the string.
+          "'" + uri.gsub("'") {|s| "'\\''"} + "'"
+        end
+      end
+
       def cache_path
         @cache_path ||= begin
           git_scope = "#{base_name}-#{uri_hash}"
@@ -611,12 +630,12 @@ module Bundler
           return if has_revision_cached?
           Bundler.ui.info "Updating #{uri}"
           in_cache do
-            git %|fetch --force --quiet --tags "#{uri}" "refs/heads/*:refs/heads/*"|
+            git %|fetch --force --quiet --tags #{uri_escaped} "refs/heads/*:refs/heads/*"|
           end
         else
           Bundler.ui.info "Fetching #{uri}"
           FileUtils.mkdir_p(cache_path.dirname)
-          git %|clone "#{uri}" "#{cache_path}" --bare --no-hardlinks|
+          git %|clone #{uri_escaped} "#{cache_path}" --bare --no-hardlinks|
         end
       end
 
@@ -625,6 +644,7 @@ module Bundler
           FileUtils.mkdir_p(path.dirname)
           FileUtils.rm_rf(path)
           git %|clone --no-checkout "#{cache_path}" "#{path}"|
+          File.chmod((0777 & ~File.umask), path)
         end
         Dir.chdir(path) do
           git %|fetch --force --quiet --tags "#{cache_path}"|

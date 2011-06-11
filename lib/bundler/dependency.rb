@@ -15,6 +15,7 @@ module Bundler
       :mri      => Gem::Platform::RUBY,
       :mri_18   => Gem::Platform::RUBY,
       :mri_19   => Gem::Platform::RUBY,
+      :rbx      => Gem::Platform::RUBY,
       :jruby    => Gem::Platform::JAVA,
       :mswin    => Gem::Platform::MSWIN,
       :mingw    => Gem::Platform::MINGW,
@@ -105,6 +106,10 @@ module Bundler
 
     def mri_19?
       mri? && RUBY_VERSION >= "1.9"
+    end
+
+    def rbx?
+      ruby? && defined?(RUBY_ENGINE) && RUBY_ENGINE == "rbx"
     end
 
     def jruby?

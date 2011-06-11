@@ -1,6 +1,4 @@
-$:.unshift File.expand_path('../vendor', __FILE__)
-require 'thor'
-require 'thor/actions'
+require 'bundler/vendored_thor'
 require 'rubygems/user_interaction'
 require 'rubygems/config_file'
 
@@ -212,8 +210,7 @@ module Bundler
       Bundler.load.cache if Bundler.root.join("vendor/cache").exist? && !options["no-cache"]
 
       if Bundler.settings[:path]
-        relative_path = Bundler.settings[:path]
-        relative_path = "./" + relative_path unless relative_path[0] == ?/
+        relative_path = File.expand_path(Bundler.settings[:path]).sub(/^#{File.expand_path('.')}/, '.')
         Bundler.ui.confirm "Your bundle is complete! " +
           "It was installed into #{relative_path}"
       else
