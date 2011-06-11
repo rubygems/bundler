@@ -1,3 +1,21 @@
+## 1.1.pre.5 (June 11, 2011)
+
+Bugfixes:
+
+  - Fix LazySpecification on Ruby 1.9 (@dpiddy, #1232)
+  - Fix HTTP proxy support (@leobessa, #878)
+
+Features:
+
+  - Speed up `install --deployment` by using the API endpoint
+  - Support Basic HTTP Auth for the API endpoint (@dpiddy, #1229)
+  - Add `install --full-index` to disable the API endpoint, just in case
+  - Significantly speed up install by removing unneeded gemspec fetches
+  - `outdated` command shows outdated gems (@joelmoss, #1130)
+  - Print gem post install messages (@csquared, #1155)
+  - Reduce memory use by removing Specification.new inside method_missing (@tenderlove, #1222)
+  - Allow `check --path`
+
 ## 1.1.pre.4 (May 5, 2011)
 
 Bugfixes:
