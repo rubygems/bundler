@@ -68,6 +68,7 @@ module Bundler
     # 1.) Gemcutter Endpoint doesn't return a 200
     # 2.) Marshal blob doesn't load properly
     rescue HTTPError, TypeError => e
+      Bundler.ui.info "\nError using the API"
       Bundler.ui.debug "Error #{e.class} from Gemcutter Dependency Endpoint API: #{e.message}"
       Bundler.ui.debug e.backtrace
       fetch_all_remote_specs
