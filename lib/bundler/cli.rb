@@ -1,6 +1,4 @@
-$:.unshift File.expand_path('../vendor', __FILE__)
-require 'thor'
-require 'thor/actions'
+require 'bundler/vendored_thor'
 require 'rubygems/user_interaction'
 require 'rubygems/config_file'
 

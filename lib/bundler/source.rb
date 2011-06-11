@@ -608,11 +608,17 @@ module Bundler
         Digest::SHA1.hexdigest(input)
       end
 
-      # Escape an argument for shell commands. To support a single quote
-      # within the argument we must end the string, escape the quote and
-      # restart.
+      # Escape an argument for shell commands.
       def escape(string)
-        "'#{string.to_s.gsub("'") {|s| "'\\''"}}'"
+        if Bundler::WINDOWS
+          # Windows quoting requires double quotes only, with double quotes
+          # inside the string escaped by being doubled.
+          '"' + string.gsub('"') {|s| '""'} + '"'
+        else
+          # Bash requires single quoted strings, with the single quotes escaped
+          # by ending the string, escaping the quote, and restarting the string.
+          "'" + string.gsub("'") {|s| "'\\''"} + "'"
+        end
       end
 
       def cache_path
