@@ -613,11 +613,11 @@ module Bundler
         if Bundler::WINDOWS
           # Windows quoting requires double quotes only, with double quotes
           # inside the string escaped by being doubled.
-          '"' + string.gsub('"') {|s| '""'} + '"'
+          '"' + string.to_s.gsub('"') {|s| '""'} + '"'
         else
           # Bash requires single quoted strings, with the single quotes escaped
           # by ending the string, escaping the quote, and restarting the string.
-          "'" + string.gsub("'") {|s| "'\\''"} + "'"
+          "'" + string.to_s.gsub("'") {|s| "'\\''"} + "'"
         end
       end
 
@@ -637,9 +637,8 @@ module Bundler
         if cached?
           return if has_revision_cached?
           Bundler.ui.info "Updating #{uri}"
-          in_cache do
-            git %|--git-dir #{escape Dir.pwd} fetch --force --quiet --tags #{escape uri} "refs/heads/*:refs/heads/*"|
-          end
+          cache unless cached?
+          git %|--git-dir #{escape cache_path} fetch --force --quiet --tags #{escape uri} "refs/heads/*:refs/heads/*"|
         else
           Bundler.ui.info "Fetching #{uri}"
           FileUtils.mkdir_p(cache_path.dirname)
@@ -666,7 +665,8 @@ module Bundler
 
       def has_revision_cached?
         return unless @revision
-        in_cache { git %|--git-dir #{escape Dir.pwd} cat-file -e #{@revision}| }
+        cache unless cached?
+        git %|--git-dir #{escape cache_path} cat-file -e #{@revision}|
         true
       rescue GitError
         false
@@ -679,7 +679,8 @@ module Bundler
       def revision
         @revision ||= begin
           if allow_git_ops?
-            in_cache { git("rev-parse #{ref}").strip }
+            cache unless cached?
+            git("--git-dir #{escape cache_path} rev-parse #{ref}").strip
           else
             raise GitError, "The git source #{uri} is not yet checked out. Please run `bundle install` before trying to start your application"
           end
@@ -688,11 +689,6 @@ module Bundler
 
       def cached?
         cache_path.exist?
-      end
-
-      def in_cache(&blk)
-        cache unless cached?
-        Dir.chdir(cache_path, &blk)
       end
     end
 
