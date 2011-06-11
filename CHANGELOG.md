@@ -79,7 +79,6 @@ Bugfixes:
   - Improve Rake 0.9 support (@quix)
   - Handle certain directories already existing (@raggi)
   - Escape filenames containing regex characters (@indirect)
->>>>>>> 1-0-stable
 
 ## 1.0.13 (May 4, 2011)
 
