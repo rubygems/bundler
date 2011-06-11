@@ -348,6 +348,10 @@ class Net::HTTP::Persistent
       req.add_field(*pair)
     end
 
+    if uri.user or uri.password
+      req.basic_auth uri.user, uri.password
+    end
+
     req.add_field 'Connection', 'keep-alive'
     req.add_field 'Keep-Alive', @keep_alive
 
