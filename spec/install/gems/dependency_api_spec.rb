@@ -53,6 +53,21 @@ describe "gemcutter's dependency API" do
     should_be_installed "rack 1.0.0"
   end
 
+  it "passes basic authentication details" do
+    uri = URI.parse(source_uri)
+    uri.user = "hello"
+    uri.password = "there"
+
+    gemfile <<-G
+      source "#{uri}"
+      gem "rack"
+    G
+
+    bundle :install, :artifice => "endpoint_basic_authentication"
+    out.should include("Fetching dependency information from the API at #{uri}")
+    should_be_installed "rack 1.0.0"
+  end
+
   it "falls back when the API errors out" do
     simulate_platform mswin
 
@@ -121,6 +136,5 @@ describe "gemcutter's dependency API" do
     bundle "install --full-index", :artifice => "endpoint"
     out.should include("Fetching source index for #{source_uri}")
     should_be_installed "rack 1.0.0"
-
   end
 end

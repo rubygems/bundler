@@ -93,8 +93,10 @@ module Bundler
       case response
       when Net::HTTPRedirection
         Bundler.ui.debug("HTTP Redirection")
-        uri = URI.parse(response["location"])
-        fetch(uri, counter + 1)
+        new_uri = URI.parse(response["location"])
+        new_uri.user = uri.user
+        new_uri.password = uri.password
+        fetch(new_uri, counter + 1)
       when Net::HTTPSuccess
         Bundler.ui.debug("HTTP Success")
         response.body
