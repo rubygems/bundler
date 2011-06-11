@@ -1,10 +1,10 @@
-## 1.1.pre.4 (5 May, 2011)
+## 1.1.pre.4 (May 5, 2011)
 
 Bugfixes:
 
   - Fix bug that could prevent installing new gems
 
-## 1.1.pre.3 (4 May, 2011)
+## 1.1.pre.3 (May 4, 2011)
 
 Features:
 
