@@ -111,4 +111,16 @@ describe "gemcutter's dependency API" do
     bundle :install, :artifice => "endpoint_redirect"
     out.should match(/Too many redirects/)
   end
+
+  it "should use the modern index when the --full-index" do
+    gemfile <<-G
+      source "#{source_uri}"
+      gem "rack"
+    G
+
+    bundle "install --full-index", :artifice => "endpoint"
+    out.should include("Fetching source index for #{source_uri}")
+    should_be_installed "rack 1.0.0"
+
+  end
 end

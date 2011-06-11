@@ -152,6 +152,8 @@ module Bundler
       "Install using defaults tuned for deployment environments"
     method_option "standalone", :type => :array, :lazy_default => [], :banner =>
       "Make a bundle that can work without the Bundler runtime"
+    method_option "full-index", :tpye => :boolean, :banner =>
+      "Use the rubygems modern index instead of the API endpoint"
     def install
       opts = options.dup
       opts[:without] ||= []
@@ -205,6 +207,8 @@ module Bundler
       Bundler.settings[:disable_shared_gems] = '1' if Bundler.settings[:path]
       Bundler.settings.without  = opts[:without] unless opts[:without].empty?
       Bundler.ui.be_quiet! if opts[:quiet]
+
+      Bundler::Fetcher.disable_endpoint = opts["full-index"]
 
       Installer.install(Bundler.root, Bundler.definition, opts)
       Bundler.load.cache if Bundler.root.join("vendor/cache").exist? && !options["no-cache"]

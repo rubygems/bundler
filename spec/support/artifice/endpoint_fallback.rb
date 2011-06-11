@@ -5,10 +5,6 @@ Artifice.deactivate
 class EndpointFallback < Endpoint
   DEPENDENCY_LIMIT = 60
 
-  get "/specs.4.8.gz" do
-    File.read("#{gem_repo1}/specs.4.8.gz")
-  end
-
   get "/api/v1/dependencies" do
     if params[:gems].size <= DEPENDENCY_LIMIT
       Marshal.dump(dependencies_for(params[:gems]))

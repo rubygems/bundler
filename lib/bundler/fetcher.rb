@@ -6,6 +6,10 @@ module Bundler
   class Fetcher
     REDIRECT_LIMIT = 5
 
+    class << self
+      attr_accessor :disable_endpoint
+    end
+
     def initialize(remote_uri)
       @remote_uri = remote_uri
       @@connection ||= Net::HTTP::Persistent.new nil, :ENV
@@ -44,7 +48,7 @@ module Bundler
 
     # fetch index
     def fetch_remote_specs(gem_names, full_dependency_list = [], last_spec_list = [])
-      return fetch_all_remote_specs unless gem_names && @remote_uri.scheme != "file"
+      return fetch_all_remote_specs if !gem_names || @remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
 
       query_list = gem_names - full_dependency_list
       # only display the message on the first run
