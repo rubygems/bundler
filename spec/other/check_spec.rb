@@ -208,14 +208,14 @@ describe "bundle check" do
 
     it "returns success" do
       bundle "check --path vendor/bundle", :exitstatus => true
-      check @exitstatus.should == 0
+      @exitstatus.should eq(0)
       out.should == "The Gemfile's dependencies are satisfied"
     end
 
     it "should write to .bundle/config" do
       bundle "check --path vendor/bundle", :exitstatus => true
       bundle "check", :exitstatus => true
-      check @exitstatus.should == 0
+      @exitstatus.should eq(0)
     end
   end
 
