@@ -21,7 +21,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :artifice => "endpoint"
-    out.should include("Fetching dependency information from the API at #{source_uri}")
+    out.should include("Fetching dependency information from the API at #{source_uri}/...")
     should_be_installed(
       "rails 2.3.2",
       "actionpack 2.3.2",
@@ -29,6 +29,28 @@ describe "gemcutter's dependency API" do
       "actionmailer 2.3.2",
       "activeresource 2.3.2",
       "activesupport 2.3.2")
+  end
+
+  it "should handle multiple gem dependencies on the same gem" do
+    gemfile <<-G
+      source "#{source_uri}"
+      gem "net-sftp"
+    G
+
+    bundle :install, :artifice => "endpoint"
+    should_be_installed "net-sftp 1.1.1"
+  end
+
+  it "should use the endpoint when using --deployment" do
+    gemfile <<-G
+      source "#{source_uri}"
+      gem "rack"
+    G
+    bundle :install, :artifice => "endpoint"
+
+    bundle "install --deployment", :artifice => "endpoint"
+    out.should include("Fetching dependency information from the API at #{source_uri}")
+    should_be_installed "rack 1.0.0"
   end
 
   it "falls back when the API errors out" do

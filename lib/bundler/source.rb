@@ -11,6 +11,7 @@ module Bundler
     # TODO: Refactor this class
     class Rubygems
       attr_reader :remotes, :caches
+      attr_accessor :dependencies
 
       def initialize(options = {})
         @options = options
@@ -65,8 +66,8 @@ module Bundler
       end
       alias_method :name, :to_s
 
-      def specs(dependencies = nil)
-        @specs ||= fetch_specs(dependencies)
+      def specs
+        @specs ||= fetch_specs
       end
 
       def fetch(spec)
@@ -74,7 +75,7 @@ module Bundler
         if spec
           path = download_gem_from_uri(spec, uri)
           s = Bundler.rubygems.spec_from_gem(path)
-          spec.__swap__(s)
+          spec.__swap__(s) if spec.is_a?(RemoteSpecification)
         end
       end
 
@@ -160,11 +161,11 @@ module Bundler
         uri
       end
 
-      def fetch_specs(dependencies = nil)
+      def fetch_specs
         Index.build do |idx|
           idx.use installed_specs
           idx.use cached_specs if @allow_cached || @allow_remote
-          idx.use remote_specs(dependencies) if @allow_remote
+          idx.use remote_specs if @allow_remote
         end
       end
 
@@ -220,7 +221,7 @@ module Bundler
         idx
       end
 
-      def remote_specs(dependencies = nil)
+      def remote_specs
         @remote_specs ||= begin
           idx     = Index.new
           old     = Bundler.rubygems.sources
@@ -228,19 +229,9 @@ module Bundler
           remotes.each do |uri|
 
             @fetchers[uri] = Bundler::Fetcher.new(uri)
-            gem_names =
-              if dependencies
-                dependencies.map {|d| d.name }
-              end
-            @fetchers[uri].fetch_remote_specs(gem_names) do |n,v|
-              v.each do |name, version, platform|
-                next if name == 'bundler'
-                spec = RemoteSpecification.new(name, version, platform, @fetchers[uri])
-                spec.source = self
-                @spec_fetch_map[spec.full_name] = [spec, uri]
-                idx << spec
-              end
-            end
+            gem_names = dependencies && dependencies.map{|d| d.name }
+
+            idx.use @fetchers[uri].specs(gem_names, self, @spec_fetch_map)
           end
           idx
         ensure

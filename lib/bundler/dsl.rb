@@ -112,8 +112,7 @@ module Bundler
     end
 
     def to_definition(lockfile, unlock)
-      @sources << @rubygems_source
-      @sources.uniq!
+      @sources << @rubygems_source unless @sources.include?(@rubygems_source)
       Definition.new(lockfile, @dependencies, @sources, unlock)
     end
 
@@ -163,11 +162,6 @@ module Bundler
     deprecate :bin_path
 
   private
-
-    def rubygems_source(source)
-      @rubygems_source.add_remote source
-      @sources << @rubygems_source
-    end
 
     def _normalize_hash(opts)
       # Cannot modify a hash during an iteration in 1.9
