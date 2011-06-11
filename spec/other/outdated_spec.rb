@@ -50,7 +50,7 @@ describe "bundle outdated" do
   end
 
   describe "pre-release gems" do
-    context "without the --all option" do
+    context "without the --pre option" do
       it "ignores pre-release versions" do
         update_repo2 do
           build_gem "activesupport", "3.0.0.beta"
@@ -61,13 +61,13 @@ describe "bundle outdated" do
       end
     end
 
-    describe "with the --all option" do
+    describe "with the --pre option" do
       it "includes pre-release versions" do
         update_repo2 do
           build_gem "activesupport", "3.0.0.beta"
         end
 
-        bundle "outdated --all"
+        bundle "outdated --pre"
         out.should include("activesupport (3.0.0.beta > 2.3.5)")
       end
     end
