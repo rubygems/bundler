@@ -5,6 +5,7 @@ require 'fileutils'
 require 'rubygems'
 require 'bundler'
 require 'rspec'
+require 'uri'
 
 # Require the correct version of popen for the current platform
 if RbConfig::CONFIG['host_os'] =~ /mingw|mswin/
@@ -55,11 +56,6 @@ RSpec.configure do |config|
 
   def pending_jruby_shebang_fix
     pending "JRuby executables do not have a proper shebang" if RUBY_PLATFORM == "java"
-  end
-
-  def check(*args)
-    # suppresses ruby warnings about "useless use of == in void context"
-    # e.g. check foo.should == bar
   end
 
   config.before :all do

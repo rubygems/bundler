@@ -2,19 +2,19 @@ require 'rubygems/user_interaction'
 
 module Bundler
   class UI
-    def warn(message)
+    def warn(message, newline = nil)
     end
 
-    def debug(message)
+    def debug(message, newline = nil)
     end
 
-    def error(message)
+    def error(message, newline = nil)
     end
 
-    def info(message)
+    def info(message, newline = nil)
     end
 
-    def confirm(message)
+    def confirm(message, newline = nil)
     end
 
     def debugging?
@@ -30,28 +30,28 @@ module Bundler
         @debug = ENV['DEBUG']
       end
 
-      def debug(msg)
-        @shell.say(msg) if debugging?
+      def debug(msg, newline = nil)
+        tell_me(msg, nil, newline) if debugging?
       end
 
       def debugging?
         @debug && !@quiet
       end
 
-      def info(msg)
-        @shell.say(msg) if !@quiet
+      def info(msg, newline = nil)
+        tell_me(msg, nil, newline) if !@quiet
       end
 
-      def confirm(msg)
-        @shell.say(msg, :green) if !@quiet
+      def confirm(msg, newline = nil)
+        tell_me(msg, :green, newline) if !@quiet
       end
 
-      def warn(msg)
-        @shell.say(msg, :yellow)
+      def warn(msg, newline = nil)
+        tell_me(msg, :yellow, newline)
       end
 
-      def error(msg)
-        @shell.say(msg, :red)
+      def error(msg, newline = nil)
+        tell_me(msg, :red, newline)
       end
 
       def be_quiet!
@@ -60,6 +60,12 @@ module Bundler
 
       def debug!
         @debug = true
+      end
+
+      private
+      # valimism
+      def tell_me(msg, color = nil, newline = nil)
+        newline.nil? ? @shell.say(msg) : @shell.say(msg, nil, newline)
       end
     end
 

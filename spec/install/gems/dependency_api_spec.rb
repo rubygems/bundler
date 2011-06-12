@@ -21,7 +21,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :artifice => "endpoint"
-    out.should include("Fetching dependency information from the API at #{source_uri}")
+    out.should include("Fetching dependency information from the API at #{source_uri}/...")
     should_be_installed(
       "rails 2.3.2",
       "actionpack 2.3.2",
@@ -29,6 +29,43 @@ describe "gemcutter's dependency API" do
       "actionmailer 2.3.2",
       "activeresource 2.3.2",
       "activesupport 2.3.2")
+  end
+
+  it "should handle multiple gem dependencies on the same gem" do
+    gemfile <<-G
+      source "#{source_uri}"
+      gem "net-sftp"
+    G
+
+    bundle :install, :artifice => "endpoint"
+    should_be_installed "net-sftp 1.1.1"
+  end
+
+  it "should use the endpoint when using --deployment" do
+    gemfile <<-G
+      source "#{source_uri}"
+      gem "rack"
+    G
+    bundle :install, :artifice => "endpoint"
+
+    bundle "install --deployment", :artifice => "endpoint"
+    out.should include("Fetching dependency information from the API at #{source_uri}")
+    should_be_installed "rack 1.0.0"
+  end
+
+  it "passes basic authentication details" do
+    uri = URI.parse(source_uri)
+    uri.user = "hello"
+    uri.password = "there"
+
+    gemfile <<-G
+      source "#{uri}"
+      gem "rack"
+    G
+
+    bundle :install, :artifice => "endpoint_basic_authentication"
+    out.should include("Fetching dependency information from the API at #{uri}")
+    should_be_installed "rack 1.0.0"
   end
 
   it "falls back when the API errors out" do
@@ -40,7 +77,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :fakeweb => "windows"
-    out.should include("Fetching source index for #{source_uri}")
+    out.should include("\nError using the API\nFetching source index for #{source_uri}")
     should_be_installed "rcov 1.0.0"
   end
 
@@ -56,7 +93,7 @@ describe "gemcutter's dependency API" do
       gem "rails"
     G
     bundle :install, :artifice => "endpoint_fallback"
-    out.should include("Fetching source index for #{source_uri}")
+    out.should include("\nError using the API\nFetching source index for #{source_uri}")
 
     should_be_installed(
       "activesupport 2.3.2",
@@ -76,7 +113,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :artifice => "endpoint_marshal_fail"
-    out.should include("Fetching source index for #{source_uri}")
+    out.should include("\nError using the API\nFetching source index for #{source_uri}")
     should_be_installed "rack 1.0.0"
   end
 
@@ -88,5 +125,16 @@ describe "gemcutter's dependency API" do
 
     bundle :install, :artifice => "endpoint_redirect"
     out.should match(/Too many redirects/)
+  end
+
+  it "should use the modern index when the --full-index" do
+    gemfile <<-G
+      source "#{source_uri}"
+      gem "rack"
+    G
+
+    bundle "install --full-index", :artifice => "endpoint"
+    out.should include("Fetching source index for #{source_uri}")
+    should_be_installed "rack 1.0.0"
   end
 end

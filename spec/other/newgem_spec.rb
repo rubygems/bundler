@@ -60,4 +60,8 @@ describe "bundle gem" do
       generated_gem.gemspec.email.first.should == "TODO: Write your email address"
     end
   end
+
+  it "requires the version file" do
+    bundled_app("test-gem/lib/test-gem.rb").read.should =~ /require "test-gem\/version"/
+  end
 end

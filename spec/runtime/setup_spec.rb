@@ -16,8 +16,8 @@ describe "Bundler.setup" do
         require 'rack'
         puts RACK
       RUBY
-      err.should == ""
-      out.should == "1.0.0"
+      err.should eq("")
+      out.should eq("1.0.0")
     end
   end
 
@@ -41,8 +41,8 @@ describe "Bundler.setup" do
           puts "WIN"
         end
       RUBY
-      err.should == ""
-      out.should == "WIN"
+      err.should eq("")
+      out.should eq("WIN")
     end
 
     it "leaves all groups available if they were already" do
@@ -55,8 +55,8 @@ describe "Bundler.setup" do
         require 'rack'
         puts RACK
       RUBY
-      err.should == ""
-      out.should == "1.0.0"
+      err.should eq("")
+      out.should eq("1.0.0")
     end
   end
 
@@ -528,6 +528,28 @@ describe "Bundler.setup" do
     out.should == "[]"
   end
 
+  describe "when a vendored gem specification uses the :path option" do
+    it "should resolve paths relative to the Gemfile" do
+      path = bundled_app(File.join('vendor', 'foo'))
+      build_lib "foo", :path => path
+
+      # If the .gemspec exists, then Bundler handles the path differently.
+      # See Source::Path.load_spec_files for details.
+      FileUtils.rm(File.join(path, 'foo.gemspec'))
+
+      install_gemfile <<-G
+        gem 'foo', '1.2.3', :path => 'vendor/foo'
+      G
+
+      Dir.chdir(bundled_app.parent) do
+        run <<-R, :env => {"BUNDLE_GEMFILE" => bundled_app('Gemfile')}
+          require 'foo'
+        R
+      end
+      err.should == ""
+    end
+  end
+
   describe "with git gems that don't have gemspecs" do
     before :each do
       build_git "no-gemspec", :gemspec => false
@@ -670,8 +692,8 @@ describe "Bundler.setup" do
         Bundler.load
       RUBY
 
-      err.should == ""
-      out.should == ""
+      err.should eq("")
+      out.should eq("")
     end
   end
 
@@ -685,4 +707,5 @@ describe "Bundler.setup" do
       err.should be_empty
     end
   end
+
 end

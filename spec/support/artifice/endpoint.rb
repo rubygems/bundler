@@ -45,6 +45,10 @@ class Endpoint < Sinatra::Base
   get "/api/v1/dependencies" do
     Marshal.dump(dependencies_for(params[:gems]))
   end
+
+  get "/specs.4.8.gz" do
+    File.read("#{gem_repo1}/specs.4.8.gz")
+  end
 end
 
 Artifice.activate_with(Endpoint)

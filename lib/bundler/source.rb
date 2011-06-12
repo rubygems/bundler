@@ -12,6 +12,7 @@ module Bundler
     # TODO: Refactor this class
     class Rubygems
       attr_reader :remotes, :caches
+      attr_accessor :dependencies
 
       def initialize(options = {})
         @options = options
@@ -66,8 +67,8 @@ module Bundler
       end
       alias_method :name, :to_s
 
-      def specs(dependencies = nil)
-        @specs ||= fetch_specs(dependencies)
+      def specs
+        @specs ||= fetch_specs
       end
 
       def fetch(spec)
@@ -75,29 +76,31 @@ module Bundler
         if spec
           path = download_gem_from_uri(spec, uri)
           s = Bundler.rubygems.spec_from_gem(path)
-          spec.__swap__(s)
+          spec.__swap__(s) if spec.is_a?(RemoteSpecification)
         end
       end
 
       def install(spec)
-        path = cached_gem(spec)
-
         if installed_specs[spec].any?
           Bundler.ui.info "Using #{spec.name} (#{spec.version}) "
           return
         end
 
         Bundler.ui.info "Installing #{spec.name} (#{spec.version}) "
+        path = cached_gem(spec)
 
-        install_path = Bundler.requires_sudo? ? Bundler.tmp : Bundler.rubygems.gem_dir
-        options = { :install_dir         => install_path,
-                    :ignore_dependencies => true,
-                    :wrappers            => true,
-                    :env_shebang         => true }
-        options.merge!(:bin_dir => "#{install_path}/bin") unless spec.executables.nil? || spec.executables.empty?
+        Bundler.rubygems.preserve_paths do
 
-        installer = Gem::Installer.new path, options
-        installer.install
+          install_path = Bundler.requires_sudo? ? Bundler.tmp : Bundler.rubygems.gem_dir
+          options = { :install_dir         => install_path,
+                      :ignore_dependencies => true,
+                      :wrappers            => true,
+                      :env_shebang         => true }
+          options.merge!(:bin_dir => "#{install_path}/bin") unless spec.executables.nil? || spec.executables.empty?
+
+          installer = Gem::Installer.new path, options
+          installer.install
+        end
 
         if spec.post_install_message
           Installer.post_install_messages[spec.name] = spec.post_install_message
@@ -144,7 +147,11 @@ module Bundler
 
       def cached_gem(spec)
         possibilities = @caches.map { |p| "#{p}/#{spec.file_name}" }
-        possibilities.find { |p| File.exist?(p) }
+        cached_gem = possibilities.find { |p| File.exist?(p) }
+        unless cached_gem
+          raise Bundler::GemNotFound, "Could not find #{spec.file_name} for installation"
+        end
+        cached_gem
       end
 
       def normalize_uri(uri)
@@ -155,11 +162,11 @@ module Bundler
         uri
       end
 
-      def fetch_specs(dependencies = nil)
+      def fetch_specs
         Index.build do |idx|
           idx.use installed_specs
           idx.use cached_specs if @allow_cached || @allow_remote
-          idx.use remote_specs(dependencies) if @allow_remote
+          idx.use remote_specs if @allow_remote
         end
       end
 
@@ -199,7 +206,7 @@ module Bundler
 
           path = Bundler.app_cache
           Dir["#{path}/*.gem"].each do |gemfile|
-            next if gemfile =~ /bundler\-[\d\.]+?\.gem/
+            next if gemfile =~ /^bundler\-[\d\.]+?\.gem/
 
             begin
               s ||= Bundler.rubygems.spec_from_gem(gemfile)
@@ -215,7 +222,7 @@ module Bundler
         idx
       end
 
-      def remote_specs(dependencies = nil)
+      def remote_specs
         @remote_specs ||= begin
           idx     = Index.new
           old     = Bundler.rubygems.sources
@@ -223,19 +230,9 @@ module Bundler
           remotes.each do |uri|
 
             @fetchers[uri] = Bundler::Fetcher.new(uri)
-            gem_names =
-              if dependencies
-                dependencies.map {|d| d.name }
-              end
-            @fetchers[uri].fetch_remote_specs(gem_names) do |n,v|
-              v.each do |name, version, platform|
-                next if name == 'bundler'
-                spec = RemoteSpecification.new(name, version, platform, @fetchers[uri])
-                spec.source = self
-                @spec_fetch_map[spec.full_name] = [spec, uri]
-                idx << spec
-              end
-            end
+            gem_names = dependencies && dependencies.map{|d| d.name }
+
+            idx.use @fetchers[uri].specs(gem_names, self, @spec_fetch_map)
           end
           idx
         ensure
@@ -595,6 +592,19 @@ module Bundler
         Digest::SHA1.hexdigest(input)
       end
 
+      # Escape the URI for git commands
+      def uri_escaped
+        if Bundler::WINDOWS
+          # Windows quoting requires double quotes only, with double quotes
+          # inside the string escaped by being doubled.
+          '"' + uri.gsub('"') {|s| '""'} + '"'
+        else
+          # Bash requires single quoted strings, with the single quotes escaped
+          # by ending the string, escaping the quote, and restarting the string.
+          "'" + uri.gsub("'") {|s| "'\\''"} + "'"
+        end
+      end
+
       def cache_path
         @cache_path ||= begin
           git_scope = "#{base_name}-#{uri_hash}"
@@ -612,12 +622,12 @@ module Bundler
           return if has_revision_cached?
           Bundler.ui.info "Updating #{uri}"
           in_cache do
-            git %|fetch --force --quiet --tags "#{uri}" "refs/heads/*:refs/heads/*"|
+            git %|fetch --force --quiet --tags #{uri_escaped} "refs/heads/*:refs/heads/*"|
           end
         else
           Bundler.ui.info "Fetching #{uri}"
           FileUtils.mkdir_p(cache_path.dirname)
-          git %|clone "#{uri}" "#{cache_path}" --bare --no-hardlinks|
+          git %|clone #{uri_escaped} "#{cache_path}" --bare --no-hardlinks|
         end
       end
 
@@ -626,6 +636,7 @@ module Bundler
           FileUtils.mkdir_p(path.dirname)
           FileUtils.rm_rf(path)
           git %|clone --no-checkout "#{cache_path}" "#{path}"|
+          File.chmod((0777 & ~File.umask), path)
         end
         Dir.chdir(path) do
           git %|fetch --force --quiet --tags "#{cache_path}"|

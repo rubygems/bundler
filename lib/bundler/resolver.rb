@@ -361,7 +361,7 @@ module Bundler
         d = dep.dep
       end
       index = @source_requirements[d.name] || @index
-      results = index.search_by_dependency(d, @base[d.name])
+      results = index.search(d, @base[d.name])
 
       if results.any?
         version = results.first.version

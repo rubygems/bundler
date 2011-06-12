@@ -1,5 +1,9 @@
 require "spec_helper"
 
+if defined?(Encoding)
+  Encoding.default_external = "UTF-8"
+end
+
 describe "The library itself" do
   def check_for_tab_characters(filename)
     failing_lines = []
@@ -49,7 +53,7 @@ describe "The library itself" do
   it "can still be built" do
     Dir.chdir(root) do
       `gem build bundler.gemspec`
-      check $?.should == 0
+      $?.should eq(0)
 
       # clean up the .gem generated
       system("rm bundler-#{Bundler::VERSION}.gem")

@@ -1,6 +1,4 @@
-$:.unshift File.expand_path('../vendor', __FILE__)
-require 'thor'
-require 'thor/actions'
+require 'bundler/vendored_thor'
 require 'rubygems/user_interaction'
 require 'rubygems/config_file'
 
@@ -154,6 +152,8 @@ module Bundler
       "Install using defaults tuned for deployment environments"
     method_option "standalone", :type => :array, :lazy_default => [], :banner =>
       "Make a bundle that can work without the Bundler runtime"
+    method_option "full-index", :tpye => :boolean, :banner =>
+      "Use the rubygems modern index instead of the API endpoint"
     def install
       opts = options.dup
       opts[:without] ||= []
@@ -208,12 +208,13 @@ module Bundler
       Bundler.settings.without  = opts[:without] unless opts[:without].empty?
       Bundler.ui.be_quiet! if opts[:quiet]
 
+      Bundler::Fetcher.disable_endpoint = opts["full-index"]
+
       Installer.install(Bundler.root, Bundler.definition, opts)
       Bundler.load.cache if Bundler.root.join("vendor/cache").exist? && !options["no-cache"]
 
       if Bundler.settings[:path]
-        relative_path = Bundler.settings[:path]
-        relative_path = "./" + relative_path unless relative_path[0] == ?/
+        relative_path = File.expand_path(Bundler.settings[:path]).sub(/^#{File.expand_path('.')}/, '.')
         Bundler.ui.confirm "Your bundle is complete! " +
           "It was installed into #{relative_path}"
       else
@@ -465,13 +466,6 @@ module Bundler
 
       require 'irb'
       IRB.start
-    end
-
-    desc "benchmark [GROUP]", "Displays the time taken for each gem to be loaded into the environment"
-    def benchmark(group = nil)
-      Bundler.ui.debug!
-      Bundler.ui.debug "Gem require times as included by bundle:"
-      group ? Bundler.require(:default, *(group.split.map! {|g| g.to_sym })) : Bundler.require
     end
 
     desc "version", "Prints the bundler's version information"

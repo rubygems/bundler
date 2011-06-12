@@ -1,10 +1,28 @@
-## 1.1.pre.4 (5 May, 2011)
+## 1.1.pre.5 (June 11, 2011)
+
+Bugfixes:
+
+  - Fix LazySpecification on Ruby 1.9 (@dpiddy, #1232)
+  - Fix HTTP proxy support (@leobessa, #878)
+
+Features:
+
+  - Speed up `install --deployment` by using the API endpoint
+  - Support Basic HTTP Auth for the API endpoint (@dpiddy, #1229)
+  - Add `install --full-index` to disable the API endpoint, just in case
+  - Significantly speed up install by removing unneeded gemspec fetches
+  - `outdated` command shows outdated gems (@joelmoss, #1130)
+  - Print gem post install messages (@csquared, #1155)
+  - Reduce memory use by removing Specification.new inside method_missing (@tenderlove, #1222)
+  - Allow `check --path`
+
+## 1.1.pre.4 (May 5, 2011)
 
 Bugfixes:
 
   - Fix bug that could prevent installing new gems
 
-## 1.1.pre.3 (4 May, 2011)
+## 1.1.pre.3 (May 4, 2011)
 
 Features:
 
@@ -48,6 +66,37 @@ Removed:
   - Removed bundle install <path>
   - Removed bundle install --production
   - Removed bundle install --disable-shared-gems
+=======
+## 1.0.15 (June 9, 2011)
+
+Features:
+
+  - Improved Rubygems integration, removed many deprecation notices
+
+Bugfixes:
+
+  - Escape URL arguments to git correctly on Windows (1.0.14 regression)
+
+## 1.0.14 (May 27, 2011)
+
+Features:
+
+  - Rubinius platform :rbx (@rkbodenner)
+  - Include gem rake tasks with "require 'bundler/gem_tasks" (@indirect)
+  - Include user name and email from git config in new gemspec (@ognevsky)
+
+Bugfixes:
+
+  - Set file permissions after checking out git repos (@tissak)
+  - Remove deprecated call to Gem::SourceIndex#all_gems (@mpj)
+  - Require the version file in new gemspecs (@rubiii)
+  - Allow relative paths from the Gemfile in gems with no gemspec (@mbirk)
+  - Install gems that contain 'bundler', e.g. guard-bundler (@hone)
+  - Display installed path correctly on Windows (@tadman)
+  - Escape quotes in git URIs (@mheffner)
+  - Improve Rake 0.9 support (@quix)
+  - Handle certain directories already existing (@raggi)
+  - Escape filenames containing regex characters (@indirect)
 
 ## 1.0.13 (May 4, 2011)
 
