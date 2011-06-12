@@ -20,7 +20,7 @@ describe "Bundler::GemHelperMercurial tasks" do
       File.exist?("#{app.to_s}/.hgignore").should be_false
       File.exist?("#{app.to_s}/.gitignore").should be_true
       rakefile = File.open("#{app.to_s}/Rakefile", 'r') {|f| f.readlines.map() {|line| line.strip}}
-      rakefile.should include("Bundler::GemHelper.install_tasks")
+      rakefile.should include("require 'bundler/gem_tasks'")
       rakefile.should_not include("Bundler::GemHelperMercurial.install_tasks")
     end
   end
