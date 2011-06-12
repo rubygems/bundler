@@ -94,8 +94,6 @@ class Thor
     end
 
     module ClassMethods
-      attr_accessor :debugging
-
       def attr_reader(*) #:nodoc:
         no_tasks { super }
       end
@@ -384,12 +382,27 @@ class Thor
       #   script.invoke(:task, first_arg, second_arg, third_arg)
       #
       def start(given_args=ARGV, config={})
-        self.debugging = given_args.delete("--debug")
         config[:shell] ||= Thor::Base.shell.new
         dispatch(nil, given_args.dup, nil, config)
       rescue Thor::Error => e
-        debugging ? (raise e) : config[:shell].error(e.message)
+        ENV["THOR_DEBUG"] == "1" ? (raise e) : config[:shell].error(e.message)
         exit(1) if exit_on_failure?
+      end
+
+      # Allows to use private methods from parent in child classes as tasks.
+      #
+      # ==== Paremeters
+      #   names<Array>:: Method names to be used as tasks
+      #
+      # ==== Examples
+      #
+      #   public_task :foo
+      #   public_task :foo, :bar, :baz
+      #
+      def public_task(*names)
+        names.each do |name|
+          class_eval "def #{name}(*); super end"
+        end
       end
 
       def handle_no_task_error(task) #:nodoc:
@@ -529,6 +542,13 @@ class Thor
         # A flag that makes the process exit with status 1 if any error happens.
         def exit_on_failure?
           false
+        end
+
+        #
+        # The basename of the program invoking the thor class.
+        #
+        def basename
+          File.basename($0).split(' ').first
         end
 
         # SIGNATURE: Sets the baseclass. This is where the superclass lookup

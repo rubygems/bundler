@@ -21,7 +21,7 @@ class Thor
     #   directory "doc"
     #
     # It will create a doc directory in the destination with the following
-    # files (assuming that the app_name is "blog"):
+    # files (assuming that the `app_name` method returns the value "blog"):
     #
     #   doc/
     #     components/
@@ -70,7 +70,7 @@ class Thor
           lookup = config[:recursive] ? File.join(source, '**') : source
           lookup = File.join(lookup, '{*,.[a-z]*}')
 
-          Dir[lookup].each do |file_source|
+          Dir[lookup].sort.each do |file_source|
             next if File.directory?(file_source)
             file_destination = File.join(given_destination, file_source.gsub(source, '.'))
             file_destination.gsub!('/./', '/')

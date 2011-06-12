@@ -18,6 +18,23 @@ class Thor
       end
     end
 
+    # Registers another Thor subclass as a command.
+    #
+    # ==== Parameters
+    # klass<Class>:: Thor subclass to register
+    # command<String>:: Subcommand name to use
+    # usage<String>:: Short usage for the subcommand
+    # description<String>:: Description for the subcommand
+    def register(klass, subcommand_name, usage, description, options={})
+      if klass <= Thor::Group
+        desc usage, description, options
+        define_method(subcommand_name) { invoke klass }
+      else
+        desc usage, description, options
+        subcommand subcommand_name, klass
+      end
+    end
+
     # Defines the usage and the description of the next task.
     #
     # ==== Parameters
@@ -252,8 +269,7 @@ class Thor
       # the namespace should be displayed as arguments.
       #
       def banner(task, namespace = nil, subcommand = false)
-        base = File.basename($0).split(" ").first
-        "#{base} #{task.formatted_usage(self, $thor_runner, subcommand)}"
+        "#{basename} #{task.formatted_usage(self, $thor_runner, subcommand)}"
       end
 
       def baseclass #:nodoc:
@@ -305,7 +321,6 @@ class Thor
           def help(task = nil, subcommand = true); super; end
         RUBY
       end
-
   end
 
   include Thor::Base
