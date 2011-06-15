@@ -118,7 +118,7 @@ describe "Bundler::GemHelper tasks" do
           `git config user.name "name"`
           `git remote add origin file://#{gem_repo1}`
           `git commit -a -m "initial commit"`
-          Open3.popen3("git push origin master") # use popen3 to silence output...
+          sys_exec("git push origin master")
           `git commit -a -m "another commit"`
         }
         @helper.release_gem
