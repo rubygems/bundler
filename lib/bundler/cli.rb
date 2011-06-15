@@ -308,7 +308,7 @@ module Bundler
 
         spec.source.fetch(spec) if spec.source.respond_to?(:fetch)
 
-        if spec.git_version
+        if spec.source.is_a?(Bundler::Source::Git)
           current = current_specs.find{|s| spec.name == s.name }
         else
           current = spec
