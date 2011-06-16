@@ -362,9 +362,9 @@ module Bundler
               s.relative_loaded_from = "#{@name}.gemspec"
               s.authors  = ["no one"]
               if expanded_path.join("bin").exist?
-                binaries = expanded_path.join("bin").children
-                binaries.reject!{|p| File.directory?(p) }
-                s.executables = binaries.map{|c| c.basename.to_s }
+                executables = expanded_path.join("bin").children
+                executables.reject!{|p| File.directory?(p) }
+                s.executables = executables.map{|c| c.basename.to_s }
               end
             end
           end
