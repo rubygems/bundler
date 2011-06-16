@@ -101,7 +101,7 @@ describe "bundle exec" do
     bundle "exec foobarbaz", :exitstatus => true
     exitstatus.should eq(127)
     out.should include("bundler: command not found: foobarbaz")
-    out.should include("Install missing gem binaries with `bundle install`")
+    out.should include("Install missing gem executables with `bundle install`")
   end
 
   it "errors nicely when the argument is not executable" do
@@ -115,7 +115,7 @@ describe "bundle exec" do
     out.should include("bundler: not executable: ./foo")
   end
 
-  describe "with gem binaries" do
+  describe "with gem executables" do
     describe "run from a random directory" do
       before(:each) do
         install_gemfile <<-G
