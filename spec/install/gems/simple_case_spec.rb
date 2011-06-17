@@ -293,6 +293,13 @@ describe "bundle install with gem sources" do
       bundle :install, :expect_err => true
       out.should =~ /Your Gemfile doesn't have any sources/i
     end
+
+    it "creates a Gemfile.lock on a blank Gemfile" do
+      install_gemfile <<-G
+      G
+
+      File.exists?(bundled_app("Gemfile.lock")).should be_true
+    end
   end
 
   describe "when prerelease gems are available" do

@@ -28,6 +28,7 @@ module Bundler
 
       if dependencies.empty?
         Bundler.ui.warn "The Gemfile specifies no dependencies"
+        lock
         return
       end
 
