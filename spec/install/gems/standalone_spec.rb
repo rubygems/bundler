@@ -159,4 +159,66 @@ describe "bundle install --standalone" do
       err.should =~ /no such file to load.*spec/
     end
   end
+
+  describe "with gemcutter's dependency API" do
+    let(:source_uri) { "http://localgemserver.test" }
+
+    describe "simple gems" do
+      before do
+        gemfile <<-G
+          source "#{source_uri}"
+          gem "rails"
+        G
+      end
+
+      it "should run without errors" do
+        bundle "install --standalone", :artifice => "endpoint", :exitstatus => true
+
+        @exitstatus.should == 0
+      end
+
+      it "still makes the gems available to normal bundler" do
+        bundle "install --standalone", :artifice => "endpoint"
+
+        should_be_installed "actionpack 2.3.2", "rails 2.3.2"
+      end
+
+      it "generates a bundle/bundler/setup.rb" do
+        bundle "install --standalone", :artifice => "endpoint"
+
+        bundled_app("bundle/bundler/setup.rb").should exist
+      end
+
+      it "makes the gems available without bundler" do
+        bundle "install --standalone", :artifice => "endpoint"
+
+        ruby <<-RUBY, :no_lib => true
+          $:.unshift File.expand_path("bundle")
+          require "bundler/setup"
+
+          require "actionpack"
+          puts ACTIONPACK
+        RUBY
+
+        out.should == "2.3.2"
+      end
+
+      it "works on a different system" do
+        bundle "install --standalone", :artifice => "endpoint"
+
+        FileUtils.mv(bundled_app, "#{bundled_app}2")
+        Dir.chdir("#{bundled_app}2")
+
+        ruby <<-RUBY, :no_lib => true
+          $:.unshift File.expand_path("bundle")
+          require "bundler/setup"
+
+          require "actionpack"
+          puts ACTIONPACK
+        RUBY
+
+        out.should == "2.3.2"
+      end
+    end
+  end
 end
