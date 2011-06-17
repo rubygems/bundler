@@ -197,6 +197,18 @@ describe "bundle clean" do
 
     bundle :clean
 
-    out.should == "Can only use bundle clean when --path is set"
+    out.should == "Can only use bundle clean when --path is set or use --force"
+  end
+
+  it "does not display an error when used without --path and with --force" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "rack", "1.0.0"
+    G
+
+    bundle :clean, :force => true
+
+    out.should_not == "Can only use bundle clean when --path is set or use --force"
   end
 end
