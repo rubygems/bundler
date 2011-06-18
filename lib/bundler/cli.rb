@@ -310,6 +310,7 @@ module Bundler
 
         if spec.source.is_a?(Bundler::Source::Git)
           current = current_specs.find{|s| spec.name == s.name }
+          next if current.nil?
         else
           current = spec
           spec = definition.index[current.name].sort_by{|b| b.version }
