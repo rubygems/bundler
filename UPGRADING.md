@@ -61,8 +61,8 @@ Bundler 0.9 removes the following Bundler 0.8 Gemfile APIs:
    via `bundle install /path/to/bundle`. Bundler will remember
    where you installed the dependencies to on a particular
    machine for future installs, loads, setups, etc.
-5. `bin_path`: Bundler no longer generates binaries in the root
-   of your app. You should use `bundle exec` to execute binaries
+5. `bin_path`: Bundler no longer generates executables in the root
+   of your app. You should use `bundle exec` to execute executables
    in the current context.
 
 ### Gemfile Changes

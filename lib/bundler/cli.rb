@@ -347,7 +347,7 @@ module Bundler
         exit 126
       rescue Errno::ENOENT
         Bundler.ui.error "bundler: command not found: #{ARGV.first}"
-        Bundler.ui.warn  "Install missing gem binaries with `bundle install`"
+        Bundler.ui.warn  "Install missing gem executables with `bundle install`"
         exit 127
       end
     end
