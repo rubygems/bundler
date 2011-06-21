@@ -585,7 +585,7 @@ module Bundler
       end
 
       def base_name
-        afterSub = uri.sub(%r{^(\w+://)?([^/:]+:)?(//\w*/)?(\w*/)*},'')
+        File.basename(uri.sub(%r{^(\w+://)?([^/:]+:)?(//\w*/)?(\w*/)*},''),".git")
       end
 
       def shortref_for_display(ref)
