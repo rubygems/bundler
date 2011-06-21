@@ -12,5 +12,4 @@ describe "bundle cache with network share git" do
 	source.send(:base_name).should == "Undetermined"
   end
  end
-
-
+ 

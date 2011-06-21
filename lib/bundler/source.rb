@@ -586,10 +586,10 @@ module Bundler
 
       def base_name
         val = File.basename(uri.sub(%r{^(\w+://)?([^/:]+:)},''), ".git")
-		if(val == "/")
-			val = "Undetermined"
-		end
-		return val
+        if(val == "/")
+            val = "Undetermined"
+            end
+        return val
       end
 
       def shortref_for_display(ref)
