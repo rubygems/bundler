@@ -40,12 +40,12 @@ module Bundler
           bundle_gemfile = context.fetch(:bundle_gemfile, "Gemfile")
           bundle_without = [*context.fetch(:bundle_without, [:development, :test])].compact
 
-          args = ["--gemfile #{File.join(context.fetch(:current_release), bundle_gemfile)}"]
+          args = ["--gemfile #{File.join(context.fetch(:release_path), bundle_gemfile)}"]
           args << "--path #{bundle_dir}" unless bundle_dir.to_s.empty?
           args << bundle_flags.to_s
           args << "--without #{bundle_without.join(" ")}" unless bundle_without.empty?
 
-          run "cd #{context.fetch(:current_release)} && #{bundle_cmd} install #{args.join(' ')}"
+          run "cd #{context.fetch(:release_path)} && #{bundle_cmd} install #{args.join(' ')}"
         end
       end
     end
