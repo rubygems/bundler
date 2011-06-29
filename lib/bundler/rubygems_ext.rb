@@ -40,6 +40,7 @@ module Gem
     end
 
     # RubyGems 1.8+ used only.
+    remove_method :gem_dir
     def gem_dir
       full_gem_path
     end
@@ -151,6 +152,7 @@ module Gem
     MSWIN = Gem::Platform.new('mswin32')
     MINGW = Gem::Platform.new('x86-mingw32')
 
+    remove_method :hash
     def hash
       @cpu.hash ^ @os.hash ^ @version.hash
     end
