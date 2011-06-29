@@ -24,18 +24,22 @@ module Bundler
 
     def install
       desc "Build #{name}-#{version}.gem into the pkg directory"
-      task 'build' do
+      task 'build' => :check_clean do
         build_gem
       end
 
       desc "Build and install #{name}-#{version}.gem into system gems"
-      task 'install' do
+      task 'install' => :check_clean do
         install_gem
       end
 
       desc "Create tag #{version_tag} and build and push #{name}-#{version}.gem to Rubygems"
-      task 'release' do
+      task 'release' => :check_clean do
         release_gem
+      end
+
+      task "check_clean" do
+        check_clean
       end
     end
 
@@ -66,6 +70,11 @@ module Bundler
         git_push
         rubygem_push(built_gem_path)
       }
+    end
+
+    def check_clean
+      out, _ = sh_with_code("git status --porcelain")
+      raise "Not clean status. Commit your changes before building a gem" unless out.strip.empty?
     end
 
     protected
