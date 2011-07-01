@@ -54,7 +54,7 @@ describe "bundle exec" do
 
     bundle "exec rackup"
 
-    check out.should == "0.9.1"
+    out.should eq("0.9.1")
 
     Dir.chdir bundled_app2 do
       bundle "exec rackup"
@@ -74,7 +74,7 @@ describe "bundle exec" do
 
     bundle "exec rackup"
 
-    check out.should == "0.9.1"
+    out.should eq("0.9.1")
     should_not_be_installed "rack_middleware 1.0"
   end
 
@@ -83,7 +83,8 @@ describe "bundle exec" do
       gem "rack"
     G
 
-    rubyopt = "-I#{bundler_path} -rbundler/setup"
+    rubyopt = ENV['RUBYOPT']
+    rubyopt = "-I#{bundler_path} -rbundler/setup #{rubyopt}"
 
     bundle "exec 'echo $RUBYOPT'"
     out.should have_rubyopts(rubyopt)
@@ -98,9 +99,9 @@ describe "bundle exec" do
     G
 
     bundle "exec foobarbaz", :exitstatus => true
-    check exitstatus.should == 127
+    exitstatus.should eq(127)
     out.should include("bundler: command not found: foobarbaz")
-    out.should include("Install missing gem binaries with `bundle install`")
+    out.should include("Install missing gem executables with `bundle install`")
   end
 
   it "errors nicely when the argument is not executable" do
@@ -110,11 +111,11 @@ describe "bundle exec" do
 
     bundle "exec touch foo"
     bundle "exec ./foo", :exitstatus => true
-    check exitstatus.should == 126
+    exitstatus.should eq(126)
     out.should include("bundler: not executable: ./foo")
   end
 
-  describe "with gem binaries" do
+  describe "with gem executables" do
     describe "run from a random directory" do
       before(:each) do
         install_gemfile <<-G

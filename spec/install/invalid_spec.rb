@@ -15,3 +15,21 @@ describe "bundle install with deprecated features" do
   end
 
 end
+
+describe "bundle install to a dead symlink" do
+  before do
+    in_app_root do
+      `ln -s /tmp/idontexist bundle`
+    end
+  end
+
+  it "reports the symlink is dead" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack"
+    G
+
+    bundle "install --path bundle"
+    out.should =~ /invalid symlink/
+  end
+end

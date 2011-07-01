@@ -4,6 +4,8 @@ require 'bundler'
 
 module Bundler
   class GemHelper
+    include Rake::DSL if defined? Rake::DSL
+
     def self.install_tasks(opts = {})
       dir = opts[:dir] || Dir.pwd
       self.new(dir, opts[:name]).install
@@ -39,7 +41,7 @@ module Bundler
 
     def build_gem
       file_name = nil
-      sh("gem build #{spec_path}") { |out, code|
+      sh("gem build '#{spec_path}'") { |out, code|
         raise out unless out[/Successfully/]
         file_name = File.basename(built_gem_path)
         FileUtils.mkdir_p(File.join(base, 'pkg'))
@@ -51,7 +53,7 @@ module Bundler
 
     def install_gem
       built_gem_path = build_gem
-      out, _ = sh_with_code("gem install #{built_gem_path}")
+      out, _ = sh_with_code("gem install '#{built_gem_path}'")
       raise "Couldn't install gem, run `gem install #{built_gem_path}' for more detailed output" unless out[/Successfully installed/]
       Bundler.ui.confirm "#{name} (#{version}) installed"
     end
@@ -68,9 +70,12 @@ module Bundler
 
     protected
     def rubygem_push(path)
-      out, _ = sh("gem push #{path}")
-      raise "Gem push failed due to lack of RubyGems.org credentials." if out[/Enter your RubyGems.org credentials/]
-      Bundler.ui.confirm "Pushed #{name} #{version} to rubygems.org"
+      if Pathname.new("~/.gem/credentials").expand_path.exist?
+        sh("gem push '#{path}'")
+        Bundler.ui.confirm "Pushed #{name} #{version} to rubygems.org"
+      else
+        raise "Your rubygems.org credentials aren't set. Run `gem push` to set them."
+      end
     end
 
     def built_gem_path

@@ -21,4 +21,8 @@ describe "bundle gem" do
     bundled_app("test-gem/lib/test-gem/version.rb").read.should =~ /module Test\n  module Gem/
     bundled_app("test-gem/lib/test-gem.rb").read.should =~ /module Test\n  module Gem/
   end
+
+  it "requires the version file" do
+    bundled_app("test-gem/lib/test-gem.rb").read.should =~ /require "test-gem\/version"/
+  end
 end

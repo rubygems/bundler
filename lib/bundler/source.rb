@@ -17,8 +17,12 @@ module Bundler
         @remotes = (options["remotes"] || []).map { |r| normalize_uri(r) }
         @allow_remote = false
         @allow_cached = false
+
         # Hardcode the paths for now
-        @caches = [ Bundler.app_cache ] + Gem.path.map { |p| File.expand_path("#{p}/cache") }
+        @caches = [ Bundler.app_cache ] + Bundler.rubygems.gem_path.map do |x|
+          File.expand_path("#{x}/cache")
+        end
+
         @spec_fetch_map = {}
       end
 
@@ -70,43 +74,45 @@ module Bundler
         spec, uri = @spec_fetch_map[spec.full_name]
         if spec
           path = download_gem_from_uri(spec, uri)
-          s = Gem::Format.from_file_by_path(path).spec
+          s = Bundler.rubygems.spec_from_gem(path)
           spec.__swap__(s)
         end
       end
 
       def install(spec)
-        path = cached_gem(spec)
-
         if installed_specs[spec].any?
           Bundler.ui.info "Using #{spec.name} (#{spec.version}) "
           return
         end
 
         Bundler.ui.info "Installing #{spec.name} (#{spec.version}) "
+        path = cached_gem(spec)
 
-        install_path = Bundler.requires_sudo? ? Bundler.tmp : Gem.dir
-        options = { :install_dir         => install_path,
-                    :ignore_dependencies => true,
-                    :wrappers            => true,
-                    :env_shebang         => true }
-        options.merge!(:bin_dir => "#{install_path}/bin") unless spec.executables.nil? || spec.executables.empty?
+        Bundler.rubygems.preserve_paths do
 
-        installer = Gem::Installer.new path, options
-        installer.install
+          install_path = Bundler.requires_sudo? ? Bundler.tmp : Bundler.rubygems.gem_dir
+          options = { :install_dir         => install_path,
+                      :ignore_dependencies => true,
+                      :wrappers            => true,
+                      :env_shebang         => true }
+          options.merge!(:bin_dir => "#{install_path}/bin") unless spec.executables.nil? || spec.executables.empty?
+
+          installer = Gem::Installer.new path, options
+          installer.install
+        end
 
         # SUDO HAX
         if Bundler.requires_sudo?
-          sudo "mkdir -p #{Gem.dir}/gems #{Gem.dir}/specifications"
-          sudo "cp -R #{Bundler.tmp}/gems/#{spec.full_name} #{Gem.dir}/gems/"
-          sudo "cp -R #{Bundler.tmp}/specifications/#{spec.full_name}.gemspec #{Gem.dir}/specifications/"
+          sudo "mkdir -p #{Bundler.rubygems.gem_dir}/gems #{Bundler.rubygems.gem_dir}/specifications"
+          sudo "cp -R #{Bundler.tmp}/gems/#{spec.full_name} #{Bundler.rubygems.gem_dir}/gems/"
+          sudo "cp -R #{Bundler.tmp}/specifications/#{spec.full_name}.gemspec #{Bundler.rubygems.gem_dir}/specifications/"
           spec.executables.each do |exe|
-            sudo "mkdir -p #{Gem.bindir}"
-            sudo "cp -R #{Bundler.tmp}/bin/#{exe} #{Gem.bindir}"
+            sudo "mkdir -p #{Bundler.rubygems.gem_bindir}"
+            sudo "cp -R #{Bundler.tmp}/bin/#{exe} #{Bundler.rubygems.gem_bindir}"
           end
         end
 
-        spec.loaded_from = "#{Gem.dir}/specifications/#{spec.full_name}.gemspec"
+        spec.loaded_from = "#{Bundler.rubygems.gem_dir}/specifications/#{spec.full_name}.gemspec"
       end
 
       def sudo(str)
@@ -136,7 +142,11 @@ module Bundler
 
       def cached_gem(spec)
         possibilities = @caches.map { |p| "#{p}/#{spec.file_name}" }
-        possibilities.find { |p| File.exist?(p) }
+        cached_gem = possibilities.find { |p| File.exist?(p) }
+        unless cached_gem
+          raise Bundler::GemNotFound, "Could not find #{spec.file_name} for installation"
+        end
+        cached_gem
       end
 
       def normalize_uri(uri)
@@ -159,7 +169,7 @@ module Bundler
         @installed_specs ||= begin
           idx = Index.new
           have_bundler = false
-          Gem.source_index.to_a.reverse.each do |dont_use_this_var, spec|
+          Bundler.rubygems.all_specs.reverse.each do |spec|
             next if spec.name == 'bundler' && spec.version.to_s != VERSION
             have_bundler = true if spec.name == 'bundler'
             spec.source = self
@@ -176,6 +186,7 @@ module Bundler
              s.version  = VERSION
              s.platform = Gem::Platform::RUBY
              s.source   = self
+             s.authors  = ["bundler team"]
              s.loaded_from = File.expand_path("..", __FILE__)
            end
            idx << bundler
@@ -190,10 +201,10 @@ module Bundler
 
           path = Bundler.app_cache
           Dir["#{path}/*.gem"].each do |gemfile|
-            next if gemfile =~ /bundler\-[\d\.]+?\.gem/
+            next if gemfile =~ /^bundler\-[\d\.]+?\.gem/
 
             begin
-              s ||= Gem::Format.from_file_by_path(gemfile).spec
+              s ||= Bundler.rubygems.spec_from_gem(gemfile)
             rescue Gem::Package::FormatError
               raise GemspecError, "Could not read gem at #{gemfile}. It may be corrupted."
             end
@@ -209,7 +220,7 @@ module Bundler
       def remote_specs
         @remote_specs ||= begin
           idx     = Index.new
-          old     = Gem.sources
+          old     = Bundler.rubygems.sources
 
           remotes.each do |uri|
             Bundler.ui.info "Fetching source index for #{uri}"
@@ -226,7 +237,7 @@ module Bundler
           end
           idx
         ensure
-          Gem.sources = old
+          Bundler.rubygems.sources = old
         end
       end
 
@@ -248,14 +259,14 @@ module Bundler
       def download_gem_from_uri(spec, uri)
         spec.fetch_platform
 
-        download_path = Bundler.requires_sudo? ? Bundler.tmp : Gem.dir
-        gem_path = "#{Gem.dir}/cache/#{spec.full_name}.gem"
+        download_path = Bundler.requires_sudo? ? Bundler.tmp : Bundler.rubygems.gem_dir
+        gem_path = "#{Bundler.rubygems.gem_dir}/cache/#{spec.full_name}.gem"
 
         FileUtils.mkdir_p("#{download_path}/cache")
-        Gem::RemoteFetcher.fetcher.download(spec, uri, download_path)
+        Bundler.rubygems.download_gem(spec, uri, download_path)
 
         if Bundler.requires_sudo?
-          sudo "mkdir -p #{Gem.dir}/cache"
+          sudo "mkdir -p #{Bundler.rubygems.gem_dir}/cache"
           sudo "mv #{Bundler.tmp}/cache/#{spec.full_name}.gem #{gem_path}"
         end
 
@@ -323,7 +334,7 @@ module Bundler
       alias == eql?
 
       def name
-        File.basename(@path.to_s)
+        File.basename(path.expand_path(Bundler.root).to_s)
       end
 
       def load_spec_files
@@ -349,9 +360,11 @@ module Bundler
               s.platform = Gem::Platform::RUBY
               s.summary  = "Fake gemspec for #{@name}"
               s.relative_loaded_from = "#{@name}.gemspec"
+              s.authors  = ["no one"]
               if expanded_path.join("bin").exist?
-                binaries = expanded_path.join("bin").children.map{|c| c.basename.to_s }
-                s.executables = binaries
+                executables = expanded_path.join("bin").children
+                executables.reject!{|p| File.directory?(p) }
+                s.executables = executables.map{|c| c.basename.to_s }
               end
             end
           end
@@ -369,8 +382,8 @@ module Bundler
       class Installer < Gem::Installer
         def initialize(spec, options = {})
           @spec              = spec
-          @bin_dir           = Bundler.requires_sudo? ? "#{Bundler.tmp}/bin" : "#{Gem.dir}/bin"
-          @gem_dir           = spec.full_gem_path
+          @bin_dir           = Bundler.requires_sudo? ? "#{Bundler.tmp}/bin" : "#{Bundler.rubygems.gem_dir}/bin"
+          @gem_dir           = Bundler.rubygems.path(spec.full_gem_path)
           @wrappers          = options[:wrappers] || true
           @env_shebang       = options[:env_shebang] || true
           @format_executable = options[:format_executable] || false
@@ -384,9 +397,9 @@ module Bundler
           end
           super
           if Bundler.requires_sudo?
-            Bundler.mkdir_p "#{Gem.dir}/bin"
+            Bundler.mkdir_p "#{Bundler.rubygems.gem_dir}/bin"
             spec.executables.each do |exe|
-              Bundler.sudo "cp -R #{Bundler.tmp}/bin/#{exe} #{Gem.dir}/bin/"
+              Bundler.sudo "cp -R #{Bundler.tmp}/bin/#{exe} #{Bundler.rubygems.gem_dir}/bin/"
             end
           end
         end
@@ -559,9 +572,8 @@ module Bundler
           out = %x{git #{command}}
 
           if $?.exitstatus != 0
-            msg = "Git error: " +
-              "command `git #{command}` in directory #{Dir.pwd} has failed.\n" +
-              "Cannot complete bundling."
+            msg = "Git error: command `git #{command}` in directory #{Dir.pwd} has failed."
+            msg << "\nIf this error persists you could try removing the cache directory '#{cache_path}'" if cached?
             raise GitError, msg
           end
           out
@@ -573,7 +585,7 @@ module Bundler
       end
 
       def base_name
-        File.basename(uri.sub(%r{^(\w+://)?([^/:]+:)},''), ".git")
+        File.basename(uri.sub(%r{^(\w+://)?([^/:]+:)?(//\w*/)?(\w*/)*},''),".git")
       end
 
       def shortref_for_display(ref)
@@ -596,6 +608,19 @@ module Bundler
         Digest::SHA1.hexdigest(input)
       end
 
+      # Escape the URI for git commands
+      def uri_escaped
+        if Bundler::WINDOWS
+          # Windows quoting requires double quotes only, with double quotes
+          # inside the string escaped by being doubled.
+          '"' + uri.gsub('"') {|s| '""'} + '"'
+        else
+          # Bash requires single quoted strings, with the single quotes escaped
+          # by ending the string, escaping the quote, and restarting the string.
+          "'" + uri.gsub("'") {|s| "'\\''"} + "'"
+        end
+      end
+
       def cache_path
         @cache_path ||= begin
           git_scope = "#{base_name}-#{uri_hash}"
@@ -613,12 +638,12 @@ module Bundler
           return if has_revision_cached?
           Bundler.ui.info "Updating #{uri}"
           in_cache do
-            git %|fetch --force --quiet --tags "#{uri}" "refs/heads/*:refs/heads/*"|
+            git %|fetch --force --quiet --tags #{uri_escaped} "refs/heads/*:refs/heads/*"|
           end
         else
           Bundler.ui.info "Fetching #{uri}"
           FileUtils.mkdir_p(cache_path.dirname)
-          git %|clone "#{uri}" "#{cache_path}" --bare --no-hardlinks|
+          git %|clone #{uri_escaped} "#{cache_path}" --bare --no-hardlinks|
         end
       end
 
@@ -627,6 +652,7 @@ module Bundler
           FileUtils.mkdir_p(path.dirname)
           FileUtils.rm_rf(path)
           git %|clone --no-checkout "#{cache_path}" "#{path}"|
+          File.chmod((0777 & ~File.umask), path)
         end
         Dir.chdir(path) do
           git %|fetch --force --quiet --tags "#{cache_path}"|

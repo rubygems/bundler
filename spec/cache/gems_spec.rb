@@ -214,6 +214,17 @@ describe "bundle cache" do
       bundle "install"
       out.should_not =~ /removing/i
     end
+
+    it "should install gems with the name bundler in them (that aren't bundler)" do
+      build_gem "foo-bundler", "1.0",
+        :path => bundled_app('vendor/cache')
+
+      install_gemfile <<-G
+        gem "foo-bundler"
+      G
+
+      should_be_installed "foo-bundler 1.0"
+    end
   end
 
 end

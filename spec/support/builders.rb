@@ -32,7 +32,7 @@ module Spec
 
         build_gem "rails",          "2.3.2" do |s|
           s.executables = "rails"
-          s.add_dependency "rake"
+          s.add_dependency "rake",           "0.8.7"
           s.add_dependency "actionpack",     "2.3.2"
           s.add_dependency "activerecord",   "2.3.2"
           s.add_dependency "actionmailer",   "2.3.2"
@@ -322,6 +322,9 @@ module Spec
 
       Array(versions).each do |version|
         spec = builder.new(self, name, version)
+        if !spec.authors or spec.authors.empty?
+          spec.authors = ["no one"]
+        end
         yield spec if block_given?
         spec._build(options)
       end
@@ -454,6 +457,8 @@ module Spec
           @files = _default_files.merge(@files)
         end
 
+        @spec.authors = ["no one"]
+
         @files.each do |file, source|
           file = Pathname.new(path).join(file)
           FileUtils.mkdir_p(file.dirname)
@@ -479,6 +484,8 @@ module Spec
         Dir.chdir(path) do
           `git init`
           `git add *`
+          `git config user.email "lol@wut.com"`
+          `git config user.name "lolwut"`
           `git commit -m 'OMG INITIAL COMMIT'`
         end
       end
@@ -563,6 +570,11 @@ module Spec
         Dir.chdir(lib_path) do
           destination = opts[:path] || _default_path
           FileUtils.mkdir_p(destination)
+
+          if !@spec.authors or @spec.authors.empty?
+            @spec.authors = ["that guy"]
+          end
+
           Gem::Builder.new(@spec).build
           if opts[:to_system]
             `gem install --ignore-dependencies #{@spec.full_name}.gem`

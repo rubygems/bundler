@@ -10,10 +10,11 @@ describe "when using sudo", :sudo => true do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack", '1.0'
+        gem "thin"
       G
 
       system_gem_path("gems/rack-1.0.0").should exist
-      check system_gem_path("gems/rack-1.0.0").stat.uid.should == 0
+      system_gem_path("gems/rack-1.0.0").stat.uid.should eq(0)
       should_be_installed "rack 1.0"
     end
 
@@ -29,7 +30,7 @@ describe "when using sudo", :sudo => true do
       G
 
       bundle_path.join("gems/rack-1.0.0").should exist
-      check bundle_path.join("gems/rack-1.0.0").stat.uid.should == 0
+      bundle_path.join("gems/rack-1.0.0").stat.uid.should eq(0)
       should_be_installed "rack 1.0"
     end
 

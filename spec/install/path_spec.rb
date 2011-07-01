@@ -191,7 +191,7 @@ describe "bundle install with explicit source paths" do
       gemspec :path => "#{lib_path("foo")}"
     G
 
-    check exitstatus.should == 15
+    exitstatus.should eq(15)
     out.should =~ /There are multiple gemspecs/
   end
 
@@ -221,6 +221,17 @@ describe "bundle install with explicit source paths" do
 
     bundle "exec foobar"
     out.should == "1.0"
+  end
+
+  it "handles directories in bin/" do
+    build_lib "foo"
+    lib_path("foo-1.0").join("foo.gemspec").rmtree
+    lib_path("foo-1.0").join("bin/performance").mkpath
+
+    install_gemfile <<-G
+      gem 'foo', '1.0', :path => "#{lib_path('foo-1.0')}"
+    G
+    err.should == ""
   end
 
   it "removes the .gem file after installing" do

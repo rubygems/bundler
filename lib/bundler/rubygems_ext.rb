@@ -19,7 +19,7 @@ module Gem
 
     def full_gem_path
       source.respond_to?(:path) ?
-        Pathname.new(loaded_from).dirname.expand_path.to_s :
+        Pathname.new(loaded_from).dirname.expand_path(Bundler.root).to_s :
         rg_full_gem_path
     end
 
@@ -37,6 +37,11 @@ module Gem
           File.join(full_gem_path, require_path)
         end
       end
+    end
+
+    # RubyGems 1.8+ used only.
+    def gem_dir
+      full_gem_path
     end
 
     def groups

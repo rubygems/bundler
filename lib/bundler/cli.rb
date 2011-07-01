@@ -1,11 +1,6 @@
-$:.unshift File.expand_path('../vendor', __FILE__)
-require 'thor'
-require 'thor/actions'
+require 'bundler/vendored_thor'
 require 'rubygems/user_interaction'
 require 'rubygems/config_file'
-
-# Work around a RubyGems bug
-Gem.configuration
 
 module Bundler
   class CLI < Thor
@@ -16,10 +11,10 @@ module Bundler
       the_shell = (options["no-color"] ? Thor::Shell::Basic.new : shell)
       Bundler.ui = UI::Shell.new(the_shell)
       Bundler.ui.debug! if options["verbose"]
-      Gem::DefaultUserInteraction.ui = UI::RGProxy.new(Bundler.ui)
+      Bundler.rubygems.ui = UI::RGProxy.new(Bundler.ui)
     end
 
-    check_unknown_options! unless ARGV.include?("exec") || ARGV.include?("config")
+    check_unknown_options!
 
     default_task :install
     class_option "no-color", :type => :boolean, :banner => "Disable colorization in output"
@@ -162,6 +157,7 @@ module Bundler
       end
       opts[:without].map!{|g| g.to_sym }
 
+      # Can't use Bundler.settings for this because settings needs gemfile.dirname
       ENV['BUNDLE_GEMFILE'] = File.expand_path(opts[:gemfile]) if opts[:gemfile]
       ENV['RB_USER_INSTALL'] = '1' if Bundler::FREEBSD
 
@@ -211,7 +207,6 @@ module Bundler
         opts[:system] = true
       end
 
-      # Can't use Bundler.settings for this because settings needs gemfile.dirname
       Bundler.settings[:path] = nil if opts[:system]
       Bundler.settings[:path] = "vendor/bundle" if opts[:deployment]
       Bundler.settings[:path] = path if path
@@ -226,8 +221,7 @@ module Bundler
       Bundler.load.cache if Bundler.root.join("vendor/cache").exist? && !options["no-cache"]
 
       if Bundler.settings[:path]
-        relative_path = Bundler.settings[:path]
-        relative_path = "./" + relative_path unless relative_path[0] == ?/
+        relative_path = File.expand_path(Bundler.settings[:path]).sub(/^#{File.expand_path('.')}/, '.')
         Bundler.ui.confirm "Your bundle is complete! " +
           "It was installed into #{relative_path}"
       else
@@ -241,7 +235,7 @@ module Bundler
           "Please use `bundle install --path #{path}` instead."
       end
     rescue GemNotFound => e
-      if opts[:local]
+      if opts[:local] && Bundler.app_cache.exist?
         Bundler.ui.warn "Some gems seem to be missing from your vendor/cache directory."
       end
 
@@ -353,7 +347,7 @@ module Bundler
         exit 126
       rescue Errno::ENOENT
         Bundler.ui.error "bundler: command not found: #{ARGV.first}"
-        Bundler.ui.warn  "Install missing gem binaries with `bundle install`"
+        Bundler.ui.warn  "Install missing gem executables with `bundle install`"
         exit 127
       end
     end
@@ -483,8 +477,12 @@ module Bundler
       constant_name = name.split('_').map{|p| p.capitalize}.join
       constant_name = constant_name.split('-').map{|q| q.capitalize}.join('::') if constant_name =~ /-/
       constant_array = constant_name.split('::')
+      git_author_name = `git config user.name`.chomp
+      git_author_email = `git config user.email`.chomp
+      author_name = git_author_name.empty? ? "TODO: Write your name" : git_author_name
+      author_email = git_author_email.empty? ? "TODO: Write your email address" : git_author_email
       FileUtils.mkdir_p(File.join(target, 'lib', name))
-      opts = {:name => name, :constant_name => constant_name, :constant_array => constant_array}
+      opts = {:name => name, :constant_name => constant_name, :constant_array => constant_array, :author_name => author_name, :author_email => author_email}
       template(File.join("newgem/Gemfile.tt"),               File.join(target, "Gemfile"),                opts)
       template(File.join("newgem/Rakefile.tt"),              File.join(target, "Rakefile"),               opts)
       template(File.join("newgem/gitignore.tt"),             File.join(target, ".gitignore"),             opts)

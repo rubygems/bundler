@@ -185,10 +185,10 @@ describe "bundle flex_install" do
 
     it "does not install gems whose dependencies are not met" do
       bundle :install
-      ruby <<-RUBY
+      ruby <<-RUBY, :expect_err => true
         require 'bundler/setup'
       RUBY
-      out.should =~ /could not find gem 'rack-obama/i
+      err.should =~ /could not find gem 'rack-obama/i
     end
 
     it "suggests bundle update when the Gemfile requires different versions than the lock" do

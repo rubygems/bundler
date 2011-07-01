@@ -18,6 +18,23 @@ class Thor
       end
     end
 
+    # Registers another Thor subclass as a command.
+    #
+    # ==== Parameters
+    # klass<Class>:: Thor subclass to register
+    # command<String>:: Subcommand name to use
+    # usage<String>:: Short usage for the subcommand
+    # description<String>:: Description for the subcommand
+    def register(klass, subcommand_name, usage, description, options={})
+      if klass <= Thor::Group
+        desc usage, description, options
+        define_method(subcommand_name) { invoke klass }
+      else
+        desc usage, description, options
+        subcommand subcommand_name, klass
+      end
+    end
+
     # Defines the usage and the description of the next task.
     #
     # ==== Parameters
@@ -252,8 +269,7 @@ class Thor
       # the namespace should be displayed as arguments.
       #
       def banner(task, namespace = nil, subcommand = false)
-        base = File.basename($0).split(" ").first
-        "#{base} #{task.formatted_usage(self, $thor_runner, subcommand)}"
+        "#{basename} #{task.formatted_usage(self, $thor_runner, subcommand)}"
       end
 
       def baseclass #:nodoc:
@@ -295,8 +311,32 @@ class Thor
       # Receives a task name (can be nil), and try to get a map from it.
       # If a map can't be found use the sent name or the default task.
       def normalize_task_name(meth) #:nodoc:
-        meth = map[meth.to_s] || meth || default_task
+        meth = map[meth.to_s] || find_subcommand_and_update_argv(meth) || meth || default_task
         meth.to_s.gsub('-','_') # treat foo-bar > foo_bar
+      end
+
+      # terrible hack that overwrites ARGV
+      def find_subcommand_and_update_argv(subcmd_name) #:nodoc:
+        return unless subcmd_name
+        cmd = find_subcommand(subcmd_name)
+        ARGV[0] = cmd if cmd
+        cmd
+      end
+
+      def find_subcommand(subcmd_name)
+        possibilities = find_subcommand_possibilities subcmd_name
+        if possibilities.size > 1
+          raise "Ambiguous subcommand #{subcmd_name} matches [#{possibilities.join(', ')}]"
+        elsif possibilities.size < 1
+          return nil
+        end
+
+        possibilities.first
+      end
+
+      def find_subcommand_possibilities(subcmd_name)
+        len = subcmd_name.length
+        all_tasks.map {|t| t.first}.select { |n| subcmd_name == n[0, len] }
       end
 
       def subcommand_help(cmd)
@@ -305,7 +345,6 @@ class Thor
           def help(task = nil, subcommand = true); super; end
         RUBY
       end
-
   end
 
   include Thor::Base

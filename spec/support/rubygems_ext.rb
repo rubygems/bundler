@@ -12,7 +12,9 @@ module Spec
       unless File.exist?("#{Path.base_system_gems}")
         FileUtils.mkdir_p(Path.base_system_gems)
         puts "running `gem install rake fakeweb --no-rdoc --no-ri`"
-        `gem install rake fakeweb --no-rdoc --no-ri`
+        `gem install fakeweb --no-rdoc --no-ri`
+        # Rake version has to be consistent for tests to pass
+        `gem install rake --version 0.8.7 --no-rdoc --no-ri`
         # 3.0.0 breaks 1.9.2 specs
         puts "running `gem install builder --version 2.1.2 --no-rdoc --no-ri`"
         `gem install builder --version 2.1.2 --no-rdoc --no-ri`

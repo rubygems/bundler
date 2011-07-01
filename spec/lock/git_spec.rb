@@ -27,7 +27,7 @@ describe "bundle lock with git gems" do
 
   it "provides correct #full_gem_path" do
     run <<-RUBY
-      puts Gem.source_index.find_name('foo').first.full_gem_path
+      puts Bundler.rubygems.find_name('foo').first.full_gem_path
     RUBY
     out.should == bundle("show foo")
   end

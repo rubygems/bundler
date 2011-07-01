@@ -318,7 +318,7 @@ describe "the lockfile format" do
             actionpack (= 2.3.2)
             activerecord (= 2.3.2)
             activeresource (= 2.3.2)
-            rake
+            rake (= 0.8.7)
           rake (0.8.7)
 
       PLATFORMS

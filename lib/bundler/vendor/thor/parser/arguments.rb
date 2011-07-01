@@ -28,7 +28,7 @@ class Thor
       @switches = arguments
 
       arguments.each do |argument|
-        if argument.default
+        if argument.default != nil
           @assigns[argument.human_name] = argument.default
         elsif argument.required?
           @non_assigned_required << argument
@@ -94,7 +94,7 @@ class Thor
         hash = {}
 
         while current_is_value? && peek.include?(?:)
-          key, value = shift.split(':')
+          key, value = shift.split(':',2)
           hash[key] = value
         end
         hash

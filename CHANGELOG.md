@@ -1,3 +1,66 @@
+## 1.0.15 (June 9, 2011)
+
+Features:
+
+  - Improved Rubygems integration, removed many deprecation notices
+
+Bugfixes:
+
+  - Escape URL arguments to git correctly on Windows (1.0.14 regression)
+
+## 1.0.14 (May 27, 2011)
+
+Features:
+
+  - Rubinius platform :rbx (@rkbodenner)
+  - Include gem rake tasks with "require 'bundler/gem_tasks" (@indirect)
+  - Include user name and email from git config in new gemspec (@ognevsky)
+
+Bugfixes:
+
+  - Set file permissions after checking out git repos (@tissak)
+  - Remove deprecated call to Gem::SourceIndex#all_gems (@mpj)
+  - Require the version file in new gemspecs (@rubiii)
+  - Allow relative paths from the Gemfile in gems with no gemspec (@mbirk)
+  - Install gems that contain 'bundler', e.g. guard-bundler (@hone)
+  - Display installed path correctly on Windows (@tadman)
+  - Escape quotes in git URIs (@mheffner)
+  - Improve Rake 0.9 support (@quix)
+  - Handle certain directories already existing (@raggi)
+  - Escape filenames containing regex characters (@indirect)
+
+## 1.0.13 (May 4, 2011)
+
+Features:
+
+  - Compatibility with Rubygems master (soon to be v1.8) (@evanphx)
+  - Informative error when --path points to a broken symlink
+  - Support Rake 0.9 and greater (@e2)
+  - Output full errors for non-TTYs e.g. pow (@josh)
+
+Bugfixes:
+
+  - Allow spaces in gem path names for gem tasks (@rslifka)
+  - Have cap run bundle install from release_path (@martinjagusch)
+  - Quote git refspec so zsh doesn't expand it (@goneflyin)
+
+## 1.0.12 (April 8, 2011)
+
+Features:
+
+  - Add --no-deployment option to `install` for disabling it on dev machines
+  - Better error message when git fails and cache is present (@parndt)
+  - Honor :bundle_cmd in cap `rake` command (@voidlock, @cgriego)
+
+Bugfixes:
+
+  - Compatibility with Rubygems 1.7 and Rails 2.3 and vendored gems (@evanphx)
+  - Fix changing gem order in lock (@gucki)
+  - Remove color escape sequences when displaying man pages (@bgreenlee)
+  - Fix creating GEM_HOME on both JRuby 1.5 and 1.6 (@nickseiger)
+  - Fix gems without a gemspec and directories in bin/ (@epall)
+  - Fix --no-prune option for `bundle install` (@cmeiklejohn)
+
 ## 1.0.11 (April 1, 2011)
 
 Features:

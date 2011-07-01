@@ -145,7 +145,7 @@ describe "bundle install with git sources" do
           gem "foo"
         end
       G
-      check err.should == ""
+      err.should eq("")
 
       run <<-RUBY
         require 'foo'
@@ -351,7 +351,6 @@ describe "bundle install with git sources" do
     out.should include("Git error:")
     err.should include("fatal")
     err.should include("omgomg")
-    err.should include("fatal: The remote end hung up unexpectedly")
   end
 
   it "works when the gem path has spaces in it" do
