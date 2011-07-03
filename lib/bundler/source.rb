@@ -433,8 +433,11 @@ module Bundler
         gem_file = Dir.chdir(gem_dir){ Gem::Builder.new(spec).build }
 
         installer = Installer.new(spec, :env_shebang => false)
+        run_hooks(:pre_install, installer)
         installer.build_extensions
+        run_hooks(:post_build, installer)
         installer.generate_bin
+        run_hooks(:post_install, installer)
       rescue Gem::InvalidSpecificationException => e
         Bundler.ui.warn "\n#{spec.name} at #{spec.full_gem_path} did not have a valid gemspec.\n" \
                         "This prevents bundler from installing bins or native extensions, but " \
@@ -451,6 +454,18 @@ module Bundler
         Dir.chdir(gem_dir){ FileUtils.rm_rf(gem_file) if gem_file && File.exist?(gem_file) }
       end
 
+      def run_hooks(type, installer)
+        hooks_meth = "#{type}_hooks"
+        return unless Gem.respond_to?(hooks_meth)
+        Gem.send(hooks_meth).each do |hook|
+          result = hook.call(installer)
+          if result == false
+            location = " at #{$1}" if hook.inspect =~ /@(.*:\d+)/
+            message = "#{type} hook#{location} failed for #{installer.spec.full_name}"
+            raise Gem::InstallError, message
+          end
+        end
+      end
     end
 
     class Git < Path

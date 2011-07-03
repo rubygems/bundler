@@ -45,17 +45,18 @@ module Spec
       options["no-color"] = true unless options.key?("no-color") || cmd.to_s[0..3] == "exec"
 
       bundle_bin = File.expand_path('../../../bin/bundle', __FILE__)
-      fake_file = options.delete(:fakeweb)
-      fakeweb = fake_file ? "-r#{File.expand_path('../fakeweb/'+fake_file+'.rb', __FILE__)}" : nil
-      artifice_file = options.delete(:artifice)
-      artifice = artifice_file ? "-r#{File.expand_path('../artifice/'+artifice_file+'.rb', __FILE__)}" : nil
+
+      requires = options.delete(:requires) || []
+      requires << File.expand_path('../fakeweb/'+options.delete(:fakeweb)+'.rb', __FILE__) if options.key?(:fakeweb)
+      requires << File.expand_path('../artifice/'+options.delete(:artifice)+'.rb', __FILE__) if options.key?(:artifice)
+      requires_str = requires.map{|r| "-r#{r}"}.join(" ")
 
       env = (options.delete(:env) || {}).map{|k,v| "#{k}='#{v}' "}.join
       args = options.map do |k,v|
         v == true ? " --#{k}" : " --#{k} #{v}" if v
       end.join
 
-      cmd = "#{env}#{Gem.ruby} -I#{lib} #{fakeweb} #{artifice} #{bundle_bin} #{cmd}#{args}"
+      cmd = "#{env}#{Gem.ruby} -I#{lib} #{requires_str} #{bundle_bin} #{cmd}#{args}"
 
       if exitstatus
         sys_status(cmd)
