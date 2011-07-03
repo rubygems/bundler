@@ -567,4 +567,63 @@ describe "bundle install with git sources" do
       exitstatus.should == 0
     end
   end
+
+  describe "gem install hooks" do
+    it "runs pre-install hooks" do
+      build_git "foo"
+      gemfile <<-G
+        gem "foo", :git => "#{lib_path('foo-1.0')}"
+      G
+
+      File.open(lib_path("install_hooks.rb"), "w") do |h|
+        h.write <<-H
+          require 'rubygems'
+          Gem.pre_install_hooks << lambda do |inst|
+            STDERR.puts "Ran pre-install hook: \#{inst.spec.full_name}"
+          end
+        H
+      end
+
+      bundle :install, :requires => [lib_path('install_hooks.rb')]
+      err.should == "Ran pre-install hook: foo-1.0"
+    end
+
+    it "runs post-install hooks" do
+      build_git "foo"
+      gemfile <<-G
+        gem "foo", :git => "#{lib_path('foo-1.0')}"
+      G
+
+      File.open(lib_path("install_hooks.rb"), "w") do |h|
+        h.write <<-H
+          require 'rubygems'
+          Gem.post_install_hooks << lambda do |inst|
+            STDERR.puts "Ran post-install hook: \#{inst.spec.full_name}"
+          end
+        H
+      end
+
+      bundle :install, :requires => [lib_path('install_hooks.rb')]
+      err.should == "Ran post-install hook: foo-1.0"
+    end
+
+    it "complains if the install hook fails" do
+      build_git "foo"
+      gemfile <<-G
+        gem "foo", :git => "#{lib_path('foo-1.0')}"
+      G
+
+      File.open(lib_path("install_hooks.rb"), "w") do |h|
+        h.write <<-H
+          require 'rubygems'
+          Gem.pre_install_hooks << lambda do |inst|
+            false
+          end
+        H
+      end
+
+      bundle :install, :requires => [lib_path('install_hooks.rb')]
+      err.should include("failed for foo-1.0")
+    end
+  end
 end
