@@ -55,6 +55,9 @@ This defaults to the name of the gem itself. For instance, these are identical:
     gem "nokogiri"
     gem "nokogiri", :require => "nokogiri"
 
+Specify `:require => false` to prevent bundler from requiring the gem, but still
+install it and maintain dependencies.
+
 ### GROUPS (:group or :groups)
 
 Each _gem_ `MAY` specify membership in one or more groups. Any _gem_ that does
