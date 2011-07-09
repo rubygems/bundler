@@ -118,7 +118,7 @@ describe "Bundler::GemHelper tasks" do
           `git config user.name "name"`
           `git remote add origin file://#{gem_repo1}`
           `git commit -a -m "initial commit"`
-          sys_exec("git push origin master")
+          sys_exec("git push origin master", true)
           `git commit -a -m "another commit"`
         }
         @helper.release_gem
