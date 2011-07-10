@@ -1,6 +1,20 @@
 require "spec_helper"
 
 describe "bundle clean" do
+  def should_have_gems(*gems)
+    gems.each do |g|
+      vendored_gems("gems/#{g}").should exist
+      vendored_gems("specifications/#{g}.gemspec").should exist
+      vendored_gems("cache/#{g}.gem").should exist
+    end
+  end
+
+  def should_not_have_gem(rubygem)
+    vendored_gems("gems/#{rubygem}").should_not exist
+    vendored_gems("specifications/#{rubygem}.gemspec").should_not exist
+    vendored_gems("cache/#{rubygem}.gem").should_not exist
+  end
+
   it "removes unused gems that are different" do
     gemfile = <<-G
       source "file://#{gem_repo1}"
@@ -21,13 +35,8 @@ describe "bundle clean" do
 
     out.should == "Removing foo (1.0)"
 
-    vendored_gems("gems/thin-1.0").should exist
-    vendored_gems("gems/rack-1.0.0").should exist
-    vendored_gems("gems/foo-1.0").should_not exist
-
-    vendored_gems("specifications/thin-1.0.gemspec").should exist
-    vendored_gems("specifications/rack-1.0.0.gemspec").should exist
-    vendored_gems("specifications/foo-1.0.gemspec").should_not exist
+    should_have_gems 'thin-1.0', 'rack-1.0.0'
+    should_not_have_gem 'foo-1.0'
 
     vendored_gems("bin/rackup").should exist
   end
@@ -53,13 +62,8 @@ describe "bundle clean" do
 
     out.should == "Removing rack (0.9.1)"
 
-    vendored_gems("gems/foo-1.0").should exist
-    vendored_gems("gems/rack-1.0.0").should exist
-    vendored_gems("gems/rack-0.9.1").should_not exist
-
-    vendored_gems("specifications/foo-1.0.gemspec").should exist
-    vendored_gems("specifications/rack-1.0.0.gemspec").should exist
-    vendored_gems("specifications/rack-0.9.1.gemspec").should_not exist
+    should_have_gems 'foo-1.0', 'rack-1.0.0'
+    should_not_have_gem 'rack-0.9.1'
 
     vendored_gems("bin/rackup").should exist
   end
@@ -85,13 +89,8 @@ describe "bundle clean" do
 
     out.should == "Removing rack (1.0.0)"
 
-    vendored_gems("gems/foo-1.0").should exist
-    vendored_gems("gems/rack-0.9.1").should exist
-    vendored_gems("gems/rack-1.0.0").should_not exist
-
-    vendored_gems("specifications/foo-1.0.gemspec").should exist
-    vendored_gems("specifications/rack-0.9.1.gemspec").should exist
-    vendored_gems("specifications/rack-1.0.0.gemspec").should_not exist
+    should_have_gems 'foo-1.0', 'rack-0.9.1'
+    should_not_have_gem 'rack-1.0.0'
 
     vendored_gems("bin/rackup").should exist
   end
@@ -113,11 +112,8 @@ describe "bundle clean" do
 
     out.should == "Removing rack (1.0.0)"
 
-    vendored_gems("gems/foo-1.0").should exist
-    vendored_gems("gems/rack-1.0.0").should_not exist
-
-    vendored_gems("specifications/foo-1.0.gemspec").should exist
-    vendored_gems("specifications/rack-1.0.0.gemspec").should_not exist
+    should_have_gems 'foo-1.0'
+    should_not_have_gem 'rack-1.0.0'
 
     vendored_gems("bin/rackup").should_not exist
   end
