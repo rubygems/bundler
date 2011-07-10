@@ -142,6 +142,8 @@ module Bundler
         FileUtils.rm_rf(gem_dir)
         specification_file = "#{Gem.dir}/specifications/#{full_name}.gemspec"
         FileUtils.rm(specification_file) if File.exists?(specification_file)
+        gem_file = "#{Gem.dir}/cache/#{full_name}.gem"
+        FileUtils.rm(gem_file) if File.exists?(gem_file)
 
         parts   = full_name.split('-')
         name    = parts[0..-2].join('-')
