@@ -50,6 +50,7 @@ Instructions that allow the Bundler team to reproduce your issue are vitally imp
   - What version of Rubygems you are using (run `gem -v`)
   - Whether you are using RVM, and if so what version (run `rvm -v`)
   - Whether you have the `rubygems-bundler` gem, which can break gem binares
+  - Whether you have the `open_gem` gem, which can cause rake activation conflicts
 
 
 If you are using Rails 2.3, please also include:
