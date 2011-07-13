@@ -1,19 +1,16 @@
 require 'tsort'
+require 'forwardable'
 
 module Bundler
   class SpecSet
+    extend Forwardable
     include TSort, Enumerable
+
+    def_delegators :@specs, :<<, :length, :add, :remove
+    def_delegators :sorted, :each
 
     def initialize(specs)
       @specs = specs.sort_by { |s| s.name }
-    end
-
-    def each
-      sorted.each { |s| yield s }
-    end
-
-    def length
-      @specs.length
     end
 
     def for(dependencies, skip = [], check = false, match_current_platform = false)
@@ -66,6 +63,10 @@ module Bundler
       @lookup = nil
       @sorted = nil
       value
+    end
+
+    def sort!
+      self
     end
 
     def to_a
