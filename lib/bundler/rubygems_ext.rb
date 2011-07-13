@@ -40,7 +40,7 @@ module Gem
     end
 
     # RubyGems 1.8+ used only.
-    remove_method :gem_dir rescue nil
+    remove_method :gem_dir if instance_methods(false).include?(:gem_dir)
     def gem_dir
       full_gem_path
     end
@@ -152,7 +152,7 @@ module Gem
     MSWIN = Gem::Platform.new('mswin32')
     MINGW = Gem::Platform.new('x86-mingw32')
 
-    remove_method :hash rescue nil
+    remove_method :hash if instance_methods(false).include?(:hash) 
     def hash
       @cpu.hash ^ @os.hash ^ @version.hash
     end
