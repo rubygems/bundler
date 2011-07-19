@@ -34,7 +34,7 @@ module Bundler
         gem spec.name, :path => path
         group(development_group) do
           spec.development_dependencies.each do |dep|
-            gem dep.name, *dep.requirement.as_list, :type => :development
+            gem dep.name, *(dep.requirement.as_list + [:type => :development])
           end
         end
       when 0
