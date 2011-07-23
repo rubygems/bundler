@@ -8,6 +8,34 @@ module Bundler
 
     class << self
       attr_accessor :disable_endpoint
+
+      @@spec_fetch_map ||= {}
+
+      def fetch(spec)
+        spec, uri = @@spec_fetch_map[spec.full_name]
+        if spec
+          path = download_gem_from_uri(spec, uri)
+          s = Bundler.rubygems.spec_from_gem(path)
+          spec.__swap__(s) if spec.is_a?(RemoteSpecification)
+        end
+      end
+
+      def download_gem_from_uri(spec, uri)
+        spec.fetch_platform
+
+        download_path = Bundler.requires_sudo? ? Bundler.tmp : Bundler.rubygems.gem_dir
+        gem_path = "#{Bundler.rubygems.gem_dir}/cache/#{spec.full_name}.gem"
+
+        FileUtils.mkdir_p("#{download_path}/cache")
+        Bundler.rubygems.download_gem(spec, uri, download_path)
+
+        if Bundler.requires_sudo?
+          sudo "mkdir -p #{Bundler.rubygems.gem_dir}/cache"
+          sudo "mv #{Bundler.tmp}/cache/#{spec.full_name}.gem #{gem_path}"
+        end
+
+        gem_path
+      end
     end
 
     def initialize(remote_uri)
@@ -27,7 +55,7 @@ module Bundler
     end
 
     # return the specs in the bundler format as an index
-    def specs(gem_names, source, spec_fetch_map)
+    def specs(gem_names, source)
       index = Index.new
 
       fetch_remote_specs(gem_names)[@remote_uri].each do |name, version, platform, dependencies|
@@ -39,7 +67,7 @@ module Bundler
           spec = RemoteSpecification.new(name, version, platform, self)
         end
         spec.source = source
-        spec_fetch_map[spec.full_name] = [spec, @remote_uri]
+        @@spec_fetch_map[spec.full_name] = [spec, @remote_uri]
         index << spec
       end
 

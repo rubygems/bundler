@@ -53,7 +53,7 @@ module Bundler
       # the gem.
       Installer.post_install_messages = {}
       specs.each do |spec|
-        spec.source.fetch(spec) if spec.source.respond_to?(:fetch)
+        Bundler::Fetcher.fetch(spec) if spec.source.is_a?(Bundler::Source::Rubygems)
 
         # unless requested_specs.include?(spec)
         #   Bundler.ui.debug "  * Not in requested group; skipping."

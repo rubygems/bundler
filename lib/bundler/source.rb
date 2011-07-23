@@ -22,8 +22,6 @@ module Bundler
 
         @caches = [ Bundler.app_cache ] +
           Bundler.rubygems.gem_path.map{|p| File.expand_path("#{p}/cache") }
-
-        @spec_fetch_map = {}
       end
 
       def remote!
@@ -68,15 +66,6 @@ module Bundler
 
       def specs
         @specs ||= fetch_specs
-      end
-
-      def fetch(spec)
-        spec, uri = @spec_fetch_map[spec.full_name]
-        if spec
-          path = download_gem_from_uri(spec, uri)
-          s = Bundler.rubygems.spec_from_gem(path)
-          spec.__swap__(s) if spec.is_a?(RemoteSpecification)
-        end
       end
 
       def install(spec)
@@ -231,7 +220,7 @@ module Bundler
             @fetchers[uri] = Bundler::Fetcher.new(uri)
             gem_names = dependencies && dependencies.map{|d| d.name }
 
-            idx.use @fetchers[uri].specs(gem_names, self, @spec_fetch_map)
+            idx.use @fetchers[uri].specs(gem_names, self)
           end
           idx
         ensure
@@ -239,22 +228,6 @@ module Bundler
         end
       end
 
-      def download_gem_from_uri(spec, uri)
-        spec.fetch_platform
-
-        download_path = Bundler.requires_sudo? ? Bundler.tmp : Bundler.rubygems.gem_dir
-        gem_path = "#{Bundler.rubygems.gem_dir}/cache/#{spec.full_name}.gem"
-
-        FileUtils.mkdir_p("#{download_path}/cache")
-        Bundler.rubygems.download_gem(spec, uri, download_path)
-
-        if Bundler.requires_sudo?
-          sudo "mkdir -p #{Bundler.rubygems.gem_dir}/cache"
-          sudo "mv #{Bundler.tmp}/cache/#{spec.full_name}.gem #{gem_path}"
-        end
-
-        gem_path
-      end
     end
 
     class Path
