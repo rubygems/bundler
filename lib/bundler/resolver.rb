@@ -279,15 +279,10 @@ module Bundler
             end
             raise GemNotFound, message
           else
-            if @missing_gems[current] >= 5
-              message =  "Bundler could not find find gem #{current.required_by.last},"
-              message << "which is required by gem #{current}."
-              raise GemNotFound, message
-            end
-            @missing_gems[current] += 1
-
-            debug { "    Could not find #{current} by #{current.required_by.last}" }
             @errors[current.name] = [nil, current]
+            message =  "Bundler could not find gem '#{clean_req(current)}', "
+            message << "which is required by gem '#{clean_req(current.required_by.last)}.'"
+            raise GemNotFound, message
           end
         end
 
