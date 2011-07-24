@@ -28,6 +28,10 @@ module Bundler
       end
     end
 
+    def inspect
+      "<Index sources=#{sources.map{|s| s.inspect}} specs.size=#{specs.size}>"
+    end
+
     def empty?
       each { return false }
       true
