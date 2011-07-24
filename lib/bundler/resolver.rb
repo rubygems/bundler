@@ -137,7 +137,7 @@ module Bundler
       @stack                = []
       @base                 = base
       @index                = index
-      @gems_size            = {}
+      @deps_for             = {}
       @missing_gems         = Hash.new(0)
       @source_requirements  = source_requirements
     end
@@ -351,10 +351,12 @@ module Bundler
     end
 
     def gems_size(dep)
-      @gems_size[dep] ||= search(dep).size
+      search(dep).size
     end
 
     def search(dep)
+      return @deps_for[dep.to_s] if @deps_for[dep.to_s]
+
       if base = @base[dep.name] and base.any?
         d = Gem::Dependency.new(base.first.name, *[dep.requirement.as_list, base.first.version].flatten)
       else
@@ -373,10 +375,11 @@ module Bundler
           end
           nested.last << spec
         end
-        nested.map { |a| SpecGroup.new(a) }.select { |sg| sg.for?(dep.__platform) }
+        deps = nested.map{|a| SpecGroup.new(a) }.select{|sg| sg.for?(dep.__platform) }
       else
-        []
+        deps = []
       end
+      @deps_for[dep.to_s] = deps
     end
 
     def clean_req(req)
