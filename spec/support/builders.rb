@@ -33,6 +33,8 @@ module Spec
           s.add_dependency "rack", "0.9.1"
         end
 
+        build_gem "rake", "0.8.7"
+
         build_gem "rails",          "2.3.2" do |s|
           s.executables = "rails"
           s.add_dependency "rake",           "0.8.7"
