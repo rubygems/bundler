@@ -248,11 +248,11 @@ module Bundler
         conflicts = Set.new
 
         # Fetch all gem versions matching the requirement
-        #
-        # TODO: Warn / error when no matching versions are found.
         matching_versions = search(current)
 
+        # If we found no versions that match the current requirement
         if matching_versions.empty?
+          # If this is a top-level Gemfile requirement
           if current.required_by.empty?
             if base = @base[current.name] and !base.empty?
               version = base.first.version
@@ -278,6 +278,7 @@ module Bundler
               end
             end
             raise GemNotFound, message
+          # This is not a top-level Gemfile requirement
           else
             @errors[current.name] = [nil, current]
             message =  "Bundler could not find gem '#{clean_req(current)}', "
