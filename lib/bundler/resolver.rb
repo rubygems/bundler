@@ -281,9 +281,6 @@ module Bundler
           # This is not a top-level Gemfile requirement
           else
             @errors[current.name] = [nil, current]
-            message =  "Bundler could not find gem '#{clean_req(current)}', "
-            message << "which is required by gem '#{clean_req(current.required_by.last)}.'"
-            raise GemNotFound, message
           end
         end
 
@@ -455,7 +452,8 @@ module Bundler
           # the rest of the time, the gem cannot be found because it does not exist in the known sources
           else
             if requirement.required_by.first
-              o << "Could not find gem '#{clean_req(requirement)}', required by '#{clean_req(requirement.required_by.first)}', in any of the sources\n"
+              o << "Could not find gem '#{clean_req(requirement)}', which is required by "
+              o << "gem '#{clean_req(requirement.required_by.first)}', in any of the sources."
             else
               o << "Could not find gem '#{clean_req(requirement)} in any of the sources\n"
             end
