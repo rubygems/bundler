@@ -40,6 +40,7 @@ module Bundler
 
     def initialize(remote_uri)
       @remote_uri = remote_uri
+      @has_api    = true # will be set to false if the rubygems index is ever fetched
       @@connection ||= Net::HTTP::Persistent.new nil, :ENV
     end
 
@@ -160,6 +161,7 @@ module Bundler
 
     # fetch from modern index: specs.4.8.gz
     def fetch_all_remote_specs
+      @has_api = false
       Bundler.ui.info "Fetching source index for #{@remote_uri}"
       Bundler.ui.debug "Fetching modern index"
       Gem.sources = ["#{@remote_uri}"]
