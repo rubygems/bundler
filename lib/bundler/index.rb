@@ -80,6 +80,13 @@ module Bundler
       end
     end
 
+    def unmet_dependencies
+      dependency_names = specs.values.map do |s|
+        s.dependencies.map{|d| d.name }
+      end.flatten.uniq
+      dependency_names.select{|name| !specs_by_name(name) }
+    end
+
     def use(other)
       return unless other
       other.each do |s|

@@ -159,9 +159,18 @@ module Bundler
 
     def index
       @index ||= Index.build do |idx|
-        @sources.each do |s|
+        other_sources = @sources.find_all{|s| !s.is_a?(Bundler::Source::Rubygems) }
+        rubygems_sources = @sources.find_all{|s| s.is_a?(Bundler::Source::Rubygems) }
+
+        other_sources.each do |s|
+          source_index = s.specs
+          @dependencies += source_index.unmet_dependencies
+          idx.add_source source_index
+        end
+
+        rubygems_sources.each do |s|
           s.dependencies = @dependencies if s.is_a?(Bundler::Source::Rubygems)
-          idx.add_source s.specs
+          idx.add_source source_index
         end
       end
     end
