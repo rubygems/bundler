@@ -170,7 +170,7 @@ module Bundler
 
         rubygems_sources.each do |s|
           s.dependencies = @dependencies if s.is_a?(Bundler::Source::Rubygems)
-          idx.add_source source_index
+          idx.add_source s.specs
         end
       end
     end

@@ -81,8 +81,10 @@ module Bundler
     end
 
     def unmet_dependencies
-      dependency_names = specs.values.map do |s|
-        s.dependencies.map{|d| d.name }
+      dependency_names = specs.values.map do |array_of_s|
+        array_of_s.map do |s|
+          s.dependencies.map{|d| d.name }
+        end
       end.flatten.uniq
       dependency_names.select{|name| !specs_by_name(name) }
     end
