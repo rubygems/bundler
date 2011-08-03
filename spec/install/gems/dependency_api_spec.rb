@@ -68,6 +68,22 @@ describe "gemcutter's dependency API" do
     should_be_installed "rack 1.0.0"
   end
 
+  it "handles git dependencies that are in rubygems" do
+      build_git "foo" do |s|
+        s.executables = "foobar"
+        s.add_dependency "rails", "2.3.2"
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        git "#{lib_path('foo-1.0')}" do
+          gem 'foo'
+        end
+      G
+
+      should_be_installed("rails 2.3.2")
+  end
+
   it "falls back when the API errors out" do
     simulate_platform mswin
 
