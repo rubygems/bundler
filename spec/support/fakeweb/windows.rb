@@ -6,8 +6,6 @@ files = [ 'specs.4.8.gz',
           'quick/Marshal.4.8/rcov-1.0-mswin32.gemspec.rz',
           'gems/rcov-1.0-mswin32.gem' ]
 
-gemspecs = Dir["#{gem_repo1}/quick/Marshal.4.8/*.gemspec.rz"]
-
 # Set up pretend http gem server with FakeWeb
 $LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/fakeweb*/lib")].first}"
 require 'fakeweb'
@@ -18,11 +16,6 @@ files.each do |file|
   FakeWeb.register_uri(:get, "http://localgemserver.test/#{file}",
     :body => File.read("#{gem_repo1}/#{file}"))
 end
-gemspecs.each do |gemspec|
-  FakeWeb.register_uri(:get, "http://localgemserver.test/quick/Marshal.4.8/#{File.basename(gemspec)}",
-    :body => File.read(gemspec))
-end
-
 FakeWeb.register_uri(:get, "http://localgemserver.test/gems/rcov-1.0-x86-mswin32.gem",
   :status => ["404", "Not Found"])
 
