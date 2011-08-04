@@ -222,12 +222,17 @@ module Bundler
             idx.use @fetchers[uri].specs(dependency_names, self)
           end
 
-          # need to fetch again for cross repo deps
-          unmet_dependency_names = idx.unmet_dependency_names
+          # don't need to fetch all specifications for every gem/version on
+          # the rubygems repo if there's no api endpoints to search over
+          api_fetchers = @fetchers.values.select {|fetcher| fetcher.has_api }
+          if api_fetchers.any?
+            # this will fetch all the specifications on the rubygems repo
+            unmet_dependency_names = idx.unmet_dependency_names
 
-          if unmet_dependency_names.any?
-            @fetchers.values.select {|fetcher| fetcher.has_api }.each do |fetcher|
-              idx.use fetcher.specs(unmet_dependency_names, self)
+            if unmet_dependency_names.any?
+              @fetchers.values.select {|fetcher| fetcher.has_api }.each do |fetcher|
+                idx.use fetcher.specs(unmet_dependency_names, self)
+              end
             end
           end
 
