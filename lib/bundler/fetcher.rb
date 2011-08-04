@@ -6,6 +6,8 @@ module Bundler
   class Fetcher
     REDIRECT_LIMIT = 5
 
+    attr_reader :has_api
+
     class << self
       attr_accessor :disable_endpoint
 

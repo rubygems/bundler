@@ -222,6 +222,16 @@ module Bundler
 
             idx.use @fetchers[uri].specs(gem_names, self)
           end
+
+          # need to fetch again for cross repo deps
+          unmet_dependencies = idx.unmet_dependencies
+
+          if unmet_dependencies.any?
+            @fetchers.values.select {|fetcher| fetcher.has_api }.each do |fetcher|
+              idx.use fetcher.specs(unmet_dependencies, self)
+            end
+          end
+
           idx
         ensure
           Bundler.rubygems.sources = old
