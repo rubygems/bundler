@@ -11,7 +11,7 @@ module Bundler
     # TODO: Refactor this class
     class Rubygems
       attr_reader :remotes, :caches
-      attr_accessor :dependencies
+      attr_accessor :dependency_names
 
       def initialize(options = {})
         @options = options
@@ -218,17 +218,16 @@ module Bundler
           remotes.each do |uri|
 
             @fetchers[uri] = Bundler::Fetcher.new(uri)
-            gem_names = dependencies && dependencies.map{|d| d.name }
 
-            idx.use @fetchers[uri].specs(gem_names, self)
+            idx.use @fetchers[uri].specs(dependency_names, self)
           end
 
           # need to fetch again for cross repo deps
-          unmet_dependencies = idx.unmet_dependencies
+          unmet_dependency_names = idx.unmet_dependency_names
 
-          if unmet_dependencies.any?
+          if unmet_dependency_names.any?
             @fetchers.values.select {|fetcher| fetcher.has_api }.each do |fetcher|
-              idx.use fetcher.specs(unmet_dependencies, self)
+              idx.use fetcher.specs(unmet_dependency_names, self)
             end
           end
 

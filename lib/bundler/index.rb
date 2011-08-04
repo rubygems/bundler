@@ -80,7 +80,8 @@ module Bundler
       end
     end
 
-    def unmet_dependencies
+    # returns a list of the dependencies
+    def unmet_dependency_names
       dependency_names = specs.values.map do |array_of_s|
         array_of_s.map do |s|
           s.dependencies.map{|d| d.name }
