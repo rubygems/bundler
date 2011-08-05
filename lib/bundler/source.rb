@@ -10,6 +10,8 @@ module Bundler
   module Source
     # TODO: Refactor this class
     class Rubygems
+      FORCE_MODERN_INDEX_LIMIT = 100 # threshold for switching back to the modern index instead of fetching every spec
+
       attr_reader :remotes, :caches
       attr_accessor :dependency_names
 
@@ -215,25 +217,33 @@ module Bundler
           idx     = Index.new
           old     = Bundler.rubygems.sources
 
+          sources = {}
           remotes.each do |uri|
+            fetcher          = Bundler::Fetcher.new(uri)
+            specs            = fetcher.specs(dependency_names, self)
+            sources[fetcher] = specs.size
 
-            @fetchers[uri] = Bundler::Fetcher.new(uri)
-
-            idx.use @fetchers[uri].specs(dependency_names, self)
+            idx.use specs
           end
 
           # don't need to fetch all specifications for every gem/version on
           # the rubygems repo if there's no api endpoints to search over
-          api_fetchers = @fetchers.values.select {|fetcher| fetcher.has_api }
-          if api_fetchers.any?
+          # or it has too many specs to fetch
+          fetchers              = sources.keys
+          api_fetchers          = fetchers.select {|fetcher| fetcher.has_api }
+          modern_index_fetchers = fetchers - api_fetchers
+          if api_fetchers.any? && modern_index_fetchers.all? {|fetcher| sources[fetcher] < FORCE_MODERN_INDEX_LIMIT }
             # this will fetch all the specifications on the rubygems repo
             unmet_dependency_names = idx.unmet_dependency_names
 
             if unmet_dependency_names.any?
-              @fetchers.values.select {|fetcher| fetcher.has_api }.each do |fetcher|
+              api_fetchers.each do |fetcher|
                 idx.use fetcher.specs(unmet_dependency_names, self)
               end
             end
+          else
+            Bundler::Fetcher.disable_endpoint = true
+            api_fetchers.each {|fetcher| idx.use fetcher.specs([], self) }
           end
 
           idx

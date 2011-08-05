@@ -99,6 +99,12 @@ module Bundler
       self
     end
 
+    def size
+      @sources.inject(@specs.size) do |size, source|
+        size += source.size
+      end
+    end
+
     def ==(o)
       all? do |s|
         s2 = o[s].first and (s.dependencies & s2.dependencies).empty?
