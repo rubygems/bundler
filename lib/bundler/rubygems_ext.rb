@@ -157,6 +157,21 @@ module Gem
 
     alias eql? ==
   end
+
+  # fix bug in Rubygems < 1.4 by forcing calculation of @segments
+  if Gem::Version.new(Gem::VERSION) < Gem::Version.new("1.4.0")
+    class Version
+      def segments # :nodoc:
+        unless @segments_generated
+          @segments = @version.scan(/[0-9]+|[a-z]+/i).map do |s|
+            /^\\\\d+$/ =~ s ? s.to_i : s
+          end
+        end
+        @segments_generated = true
+        @segments
+      end
+    end
+  end
 end
 
 module Bundler
