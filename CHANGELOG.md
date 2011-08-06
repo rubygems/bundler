@@ -1,3 +1,18 @@
+## 1.1.pre.6 (Aug 6, 2011)
+
+Bugfixes:
+
+  - Fix cross repository dependencies (#1138)
+  - Fix git dependency fetching from API endpoint (#1254)
+  - Fixes for bundle outdated (@joelmoss, #1238)
+
+Features:
+
+  - Implement `to_ary` to avoid calls to method_missing (@tenderlove, #1274)
+  - bundle clean removes old .gem files (@cldwalker, #1293)
+  - Correcly identify missing child dependency in error message
+  - Run pre-install, post-build, and post-install gem hooks for git gems (@warhammerkid, #1120)
+
 ## 1.1.pre.5 (June 11, 2011)
 
 Bugfixes:
