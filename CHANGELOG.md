@@ -5,6 +5,7 @@ Bugfixes:
   - Fix cross repository dependencies (#1138)
   - Fix git dependency fetching from API endpoint (#1254)
   - Fixes for bundle outdated (@joelmoss, #1238)
+  - Fix bundle standalone when using the endpoint (#1240)
 
 Features:
 
@@ -12,6 +13,7 @@ Features:
   - bundle clean removes old .gem files (@cldwalker, #1293)
   - Correcly identify missing child dependency in error message
   - Run pre-install, post-build, and post-install gem hooks for git gems (@warhammerkid, #1120)
+  - create Gemfile.lock for empty Gemfile (#1218)
 
 ## 1.1.pre.5 (June 11, 2011)
 
