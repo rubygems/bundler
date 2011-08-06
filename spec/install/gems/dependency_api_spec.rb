@@ -195,4 +195,17 @@ describe "gemcutter's dependency API" do
     bundle :install, :artifice => "endpoint_extra_missing"
     should_be_installed "back_deps 1.0"
   end
+
+  it "uses the endpoint if all sources support it" do
+    gemfile <<-G
+      source "#{source_uri}"
+
+      gem 'foo'
+    G
+
+    bundle :install, :artifice => "endpoint_api_missing"
+    puts @out
+    puts @err
+    should_be_installed "foo 1.0"
+  end
 end
