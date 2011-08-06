@@ -2,7 +2,7 @@
 
 Features:
 
-  - documentation for gem ..., :require => false (@kmayer, #1292)
+  - documentation for `gem ..., :require => false` (@kmayer, #1292)
   - Work around File.basename not working on Windows network share paths like "\\Somewhere\gitrepo" (@mtscout6, #1253)
 
   - gems provide "executables", they are rarely also binaries (@fxn, #1242)
@@ -14,7 +14,7 @@ Features:
 Bugfixes:
 
   - Fix for bundle package with rubygems 1.3.x (@dburt, #1202)
-  - Fix bundle install --without on kiji (@tmm1, #1287)
+  - Fix `bundle install --without` on kiji (@tmm1, #1287)
   - Get rid of warning in ruby 1.9.3 (@smartinez87, #1231)
 
 ## 1.0.15 (June 9, 2011)
