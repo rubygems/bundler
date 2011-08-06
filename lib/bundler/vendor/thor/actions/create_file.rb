@@ -18,7 +18,7 @@ class Thor
     #     "vhost.name = #{hostname}"
     #   end
     #
-    #   create_file "config/apach.conf", "your apache config"
+    #   create_file "config/apache.conf", "your apache config"
     #
     def create_file(destination, *args, &block)
       config = args.last.is_a?(Hash) ? args.pop : {}
@@ -27,7 +27,7 @@ class Thor
     end
     alias :add_file :create_file
 
-    # AddFile is a subset of Template, which instead of rendering a file with
+    # CreateFile is a subset of Template, which instead of rendering a file with
     # ERB, it gets the content from the user.
     #
     class CreateFile < EmptyDirectory #:nodoc:

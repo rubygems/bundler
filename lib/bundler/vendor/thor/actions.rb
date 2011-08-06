@@ -1,10 +1,12 @@
 require 'fileutils'
 require 'uri'
 require 'thor/core_ext/file_binary_read'
-
-Dir[File.join(File.dirname(__FILE__), "actions", "*.rb")].each do |action|
-  require action
-end
+require 'thor/actions/create_file'
+require 'thor/actions/create_link'
+require 'thor/actions/directory'
+require 'thor/actions/empty_directory'
+require 'thor/actions/file_manipulation'
+require 'thor/actions/inject_into_file'
 
 class Thor
   module Actions
@@ -158,13 +160,23 @@ class Thor
     #
     def inside(dir='', config={}, &block)
       verbose = config.fetch(:verbose, false)
+      pretend = options[:pretend]
 
       say_status :inside, dir, verbose
       shell.padding += 1 if verbose
       @destination_stack.push File.expand_path(dir, destination_root)
 
-      FileUtils.mkdir_p(destination_root) unless File.exist?(destination_root)
-      FileUtils.cd(destination_root) { block.arity == 1 ? yield(destination_root) : yield }
+      # If the directory doesnt exist and we're not pretending
+      if !File.exist?(destination_root) && !pretend
+        FileUtils.mkdir_p(destination_root)
+      end
+
+      if pretend
+        # In pretend mode, just yield down to the block
+        block.arity == 1 ? yield(destination_root) : yield
+      else
+        FileUtils.cd(destination_root) { block.arity == 1 ? yield(destination_root) : yield }
+      end
 
       @destination_stack.pop
       shell.padding -= 1 if verbose
@@ -210,7 +222,7 @@ class Thor
     #
     # ==== Parameters
     # command<String>:: the command to be executed.
-    # config<Hash>:: give :verbose => false to not log the status. Specify :with
+    # config<Hash>:: give :verbose => false to not log the status, :capture => true to hide to output. Specify :with
     #                to append an executable to command executation.
     #
     # ==== Example
@@ -231,7 +243,10 @@ class Thor
       end
 
       say_status :run, desc, config.fetch(:verbose, true)
-      `#{command}` unless options[:pretend]
+
+      unless options[:pretend]
+        config[:capture] ? `#{command}` : system("#{command}")
+      end
     end
 
     # Executes a ruby script (taking into account WIN32 platform quirks).
@@ -251,8 +266,9 @@ class Thor
     # ==== Parameters
     # task<String>:: the task to be invoked
     # args<Array>:: arguments to the task
-    # config<Hash>:: give :verbose => false to not log the status. Other options
-    #                are given as parameter to Thor.
+    # config<Hash>:: give :verbose => false to not log the status, :capture => true to hide to output.
+    #                Other options are given as parameter to Thor.
+    #
     #
     # ==== Examples
     #
@@ -266,12 +282,13 @@ class Thor
       config  = args.last.is_a?(Hash) ? args.pop : {}
       verbose = config.key?(:verbose) ? config.delete(:verbose) : true
       pretend = config.key?(:pretend) ? config.delete(:pretend) : false
+      capture = config.key?(:capture) ? config.delete(:capture) : false
 
       args.unshift task
       args.push Thor::Options.to_switches(config)
       command = args.join(' ').strip
 
-      run command, :with => :thor, :verbose => verbose, :pretend => pretend
+      run command, :with => :thor, :verbose => verbose, :pretend => pretend, :capture => capture
     end
 
     protected

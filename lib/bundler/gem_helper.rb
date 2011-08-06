@@ -69,9 +69,12 @@ module Bundler
 
     protected
     def rubygem_push(path)
-      out, _ = sh("gem push '#{path}'")
-      raise "Gem push failed due to lack of RubyGems.org credentials." if out[/Enter your RubyGems.org credentials/]
-      Bundler.ui.confirm "Pushed #{name} #{version} to rubygems.org"
+      if Pathname.new("~/.gem/credentials").expand_path.exist?
+        sh("gem push '#{path}'")
+        Bundler.ui.confirm "Pushed #{name} #{version} to rubygems.org"
+      else
+        raise "Your rubygems.org credentials aren't set. Run `gem push` to set them."
+      end
     end
 
     def built_gem_path

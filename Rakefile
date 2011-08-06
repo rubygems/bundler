@@ -40,7 +40,7 @@ begin
     end
 
     namespace :rubygems do
-      # Rubygems 1.3.5, 1.3.6, and HEAD specs
+      # Rubygems specs by version
       rubyopt = ENV["RUBYOPT"]
       %w(master v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.3).each do |rg|
         desc "Run specs with Rubygems #{rg}"
@@ -95,7 +95,7 @@ begin
         raise "RVM is not available" unless File.exist?(File.expand_path("~/.rvm/scripts/rvm"))
       end
 
-      %w(1.8.6-p399 1.8.7-p302 1.9.2-p0).each do |ruby|
+      %w(1.8.6-p420 1.8.7-p334 1.9.2-p180).each do |ruby|
         ruby_cmd = File.expand_path("~/.rvm/bin/ruby-#{ruby}")
 
         desc "Run specs on Ruby #{ruby}"

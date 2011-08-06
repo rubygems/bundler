@@ -154,10 +154,15 @@ module Bundler
       end
     end
 
-    def same_version?(a, b)
-      regex = /^(.*?)(?:\.0)*$/
-
-      a.to_s[regex, 1] == b.to_s[regex, 1]
+    if RUBY_VERSION < '1.9'
+      def same_version?(a, b)
+        regex = /^(.*?)(?:\.0)*$/
+        a.to_s[regex, 1] == b.to_s[regex, 1]
+      end
+    else
+      def same_version?(a, b)
+        a == b
+      end
     end
 
     def spec_satisfies_dependency?(spec, dep)

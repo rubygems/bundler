@@ -342,9 +342,9 @@ module Bundler
               s.relative_loaded_from = "#{@name}.gemspec"
               s.authors  = ["no one"]
               if expanded_path.join("bin").exist?
-                binaries = expanded_path.join("bin").children
-                binaries.reject!{|p| File.directory?(p) }
-                s.executables = binaries.map{|c| c.basename.to_s }
+                executables = expanded_path.join("bin").children
+                executables.reject!{|p| File.directory?(p) }
+                s.executables = executables.map{|c| c.basename.to_s }
               end
             end
           end
@@ -580,7 +580,7 @@ module Bundler
       end
 
       def base_name
-        File.basename(uri.sub(%r{^(\w+://)?([^/:]+:)},''), ".git")
+        File.basename(uri.sub(%r{^(\w+://)?([^/:]+:)?(//\w*/)?(\w*/)*},''),".git")
       end
 
       def shortref_for_display(ref)

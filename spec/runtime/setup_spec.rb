@@ -214,7 +214,7 @@ describe "Bundler.setup" do
         out.should == "WIN"
       end
 
-      it "version_requirement is now deprecated in rubygesm 1.4.0+  when the version is wrong" do
+      it "version_requirement is now deprecated in rubygems 1.4.0+ when the version is wrong" do
         run <<-R, :expect_err => true
           begin
             gem "rack", "1.0.0"

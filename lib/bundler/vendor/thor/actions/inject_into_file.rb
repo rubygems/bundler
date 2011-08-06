@@ -15,14 +15,14 @@ class Thor
     #
     # ==== Examples
     #
-    #   inject_into_file "config/environment.rb", "config.gem :thor", :after => "Rails::Initializer.run do |config|\n"
+    #   insert_into_file "config/environment.rb", "config.gem :thor", :after => "Rails::Initializer.run do |config|\n"
     #
-    #   inject_into_file "config/environment.rb", :after => "Rails::Initializer.run do |config|\n" do
+    #   insert_into_file "config/environment.rb", :after => "Rails::Initializer.run do |config|\n" do
     #     gems = ask "Which gems would you like to add?"
     #     gems.split(" ").map{ |gem| "  config.gem :#{gem}" }.join("\n")
     #   end
     #
-    def inject_into_file(destination, *args, &block)
+    def insert_into_file(destination, *args, &block)
       if block_given?
         data, config = block, args.shift
       else
@@ -30,6 +30,7 @@ class Thor
       end
       action InjectIntoFile.new(self, destination, data, config)
     end
+    alias_method :inject_into_file, :insert_into_file
 
     class InjectIntoFile < EmptyDirectory #:nodoc:
       attr_reader :replacement, :flag, :behavior
@@ -76,12 +77,16 @@ class Thor
       protected
 
         def say_status(behavior)
-          status = if flag == /\A/
-            behavior == :invoke ? :prepend : :unprepend
-          elsif flag == /\z/
-            behavior == :invoke ? :append : :unappend
+          status = if behavior == :invoke
+            if flag == /\A/
+               :prepend
+            elsif flag == /\z/
+              :append
+            else
+              :insert
+            end
           else
-            behavior == :invoke ? :inject : :deinject
+            :subtract
           end
 
           super(status, config[:verbose])

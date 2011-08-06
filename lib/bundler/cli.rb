@@ -14,7 +14,7 @@ module Bundler
       Bundler.rubygems.ui = UI::RGProxy.new(Bundler.ui)
     end
 
-    check_unknown_options! unless ARGV.include?("exec") || ARGV.include?("config")
+    check_unknown_options!
 
     default_task :install
     class_option "no-color", :type => :boolean, :banner => "Disable colorization in output"
@@ -158,10 +158,10 @@ module Bundler
       opts = options.dup
       opts[:without] ||= []
       if opts[:without].size == 1
-        opts[:without].map!{|g| g.split(" ") }
+        opts[:without] = opts[:without].map{|g| g.split(" ") }
         opts[:without].flatten!
       end
-      opts[:without].map!{|g| g.to_sym }
+      opts[:without] = opts[:without].map{|g| g.to_sym }
 
       # Can't use Bundler.settings for this because settings needs gemfile.dirname
       ENV['BUNDLE_GEMFILE'] = File.expand_path(opts[:gemfile]) if opts[:gemfile]
@@ -382,7 +382,7 @@ module Bundler
         exit 126
       rescue Errno::ENOENT
         Bundler.ui.error "bundler: command not found: #{ARGV.first}"
-        Bundler.ui.warn  "Install missing gem binaries with `bundle install`"
+        Bundler.ui.warn  "Install missing gem executables with `bundle install`"
         exit 127
       end
     end
