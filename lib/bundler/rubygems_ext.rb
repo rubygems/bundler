@@ -158,7 +158,7 @@ module Gem
     alias eql? ==
   end
 
-  # fix bug in Rubygems < 1.4 by forcing calculation of @segments
+  # fix bug in Rubygems < 1.4 by backporting the segment code
   if Gem::Version.new(Gem::VERSION) < Gem::Version.new("1.4.0")
     class Version
       def segments # :nodoc:
