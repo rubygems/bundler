@@ -250,7 +250,17 @@ module Bundler
       Gem.clear_paths
     end
 
-    # Rubygems versions 1.3.6 through 1.6.2
+    # This backports the correct segment generation code from Rubygems 1.4+
+    # by monkeypatching it into the method in Rubygems 1.3.6 and 1.3.7.
+    def backport_segment_generation
+      Gem::Version.send(:define_method, :segments) do
+        @segments ||= @version.scan(/[0-9]+|[a-z]+/i).map do |s|
+          /^\d+$/ =~ s ? s.to_i : s
+        end
+      end
+    end
+
+    # Rubygems 1.4 through 1.6
     class Legacy < RubygemsIntegration
       def stub_rubygems(specs)
         stub_source_index137(specs)
@@ -262,6 +272,14 @@ module Bundler
 
       def find_name(name)
         Gem.source_index.find_name(name)
+      end
+    end
+
+    # Rubygems versions 1.3.6 and 1.3.7
+    class Ancient < Legacy
+      def initialize
+        super
+        backport_segment_generation
       end
     end
 
@@ -313,8 +331,10 @@ module Bundler
     @rubygems = RubygemsIntegration::AlmostModern.new
   elsif Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.7.0')
     @rubygems = RubygemsIntegration::Transitional.new
-  else # Rubygems 1.3.6 through 1.6.2
+  elsif Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.4.0')
     @rubygems = RubygemsIntegration::Legacy.new
+  else # Rubygems 1.3.6 and 1.3.7
+    @rubygems = RubygemsIntegration::Ancient.new
   end
 
   class << self

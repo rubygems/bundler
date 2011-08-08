@@ -158,16 +158,6 @@ module Gem
     alias eql? ==
   end
 
-  # fix bug in Rubygems < 1.4 by backporting the segment code
-  if Gem::Version.new(Gem::VERSION) < Gem::Version.new("1.4.0")
-    class Version
-      def segments # :nodoc:
-        @segments ||= @version.scan(/[0-9]+|[a-z]+/i).map do |s|
-          /^\d+$/ =~ s ? s.to_i : s
-        end
-      end
-    end
-  end
 end
 
 module Bundler
