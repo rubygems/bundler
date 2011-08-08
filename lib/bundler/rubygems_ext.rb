@@ -162,14 +162,9 @@ module Gem
   if Gem::Version.new(Gem::VERSION) < Gem::Version.new("1.4.0")
     class Version
       def segments # :nodoc:
-        @segments_generated ||= false
-        unless @segments_generated
-          @segments ||= @version.scan(/[0-9a-z]+/i).map do |s|
-            /^\d+$/ =~ s ? s.to_i : s
-          end
+        @segments ||= @version.scan(/[0-9]+|[a-z]+/i).map do |s|
+          /^\d+$/ =~ s ? s.to_i : s
         end
-        @segments_generated = true
-        @segments
       end
     end
   end
