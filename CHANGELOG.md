@@ -84,6 +84,13 @@ Removed:
   - Removed bundle install --production
   - Removed bundle install --disable-shared-gems
 
+## 1.0.17 (Aug 8, 2011)
+
+Bugfixes:
+
+  - Fix rake issues with rubygems 1.3.x (#1342)
+  - Fixed invalid byte sequence error while installing gem on Ruby 1.9 (#1341)
+
 ## 1.0.16 (Aug 8, 2011)
 
 Features:
