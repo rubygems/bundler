@@ -1,3 +1,9 @@
+## 1.1.pre.7 (Aug 8, 2011)
+
+Bugfixes:
+
+  - Fixed invalid byte sequence error while installing gem on Ruby 1.9 (#1341)
+
 ## 1.1.pre.6 (Aug 8, 2011)
 
 Bugfixes:
