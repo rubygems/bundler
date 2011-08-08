@@ -32,8 +32,8 @@ module Bundler
         Bundler.rubygems.download_gem(spec, uri, download_path)
 
         if Bundler.requires_sudo?
-          sudo "mkdir -p #{Bundler.rubygems.gem_dir}/cache"
-          sudo "mv #{Bundler.tmp}/cache/#{spec.full_name}.gem #{gem_path}"
+          Bundler.sudo "mkdir -p #{Bundler.rubygems.gem_dir}/cache"
+          Bundler.sudo "mv #{Bundler.tmp}/cache/#{spec.full_name}.gem #{gem_path}"
         end
 
         gem_path
