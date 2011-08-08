@@ -4,6 +4,7 @@ Features:
 
   - Performance fix for MRI 1.9 (@efficientcloud, #1288)
   - Shortcuts (like `bundle i`) for all commands (@amatsuda)
+  - Correcly identify missing child dependency in error message
 
 Bugfixes:
 
