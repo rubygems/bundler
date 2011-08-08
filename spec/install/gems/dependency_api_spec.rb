@@ -204,8 +204,6 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :artifice => "endpoint_api_missing"
-    puts @out
-    puts @err
     should_be_installed "foo 1.0"
   end
 end
