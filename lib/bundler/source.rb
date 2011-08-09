@@ -85,8 +85,8 @@ module Bundler
           options = { :install_dir         => install_path,
                       :ignore_dependencies => true,
                       :wrappers            => true,
-                      :env_shebang         => true }
-          options.merge!(:bin_dir => "#{install_path}/bin") unless spec.executables.nil? || spec.executables.empty?
+                      :env_shebang         => true,
+                      :bin_dir             => "#{install_path}/bin" }
 
           installer = Gem::Installer.new path, options
           installer.install
