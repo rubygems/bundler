@@ -24,7 +24,8 @@ module Bundler
     }.freeze
 
     def initialize(name, version, options = {}, &blk)
-      super(name, version)
+      type = options["type"] || :runtime
+      super(name, version, type)
 
       @autorequire = nil
       @groups      = Array(options["group"] || :default).map { |g| g.to_sym }
