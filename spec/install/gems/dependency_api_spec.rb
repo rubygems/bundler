@@ -100,7 +100,6 @@ describe "gemcutter's dependency API" do
     bundle :install, :artifice => "endpoint"
 
     bundle "install --deployment", :artifice => "endpoint"
-    puts @out
 
     should_be_installed("rails 2.3.2")
   end
