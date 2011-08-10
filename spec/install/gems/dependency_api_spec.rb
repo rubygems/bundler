@@ -74,12 +74,14 @@ describe "gemcutter's dependency API" do
       s.add_dependency "rails", "2.3.2"
     end
 
-    install_gemfile <<-G
-      source "file://#{gem_repo1}"
-      git "#{lib_path('foo-1.0')}" do
+    gemfile <<-G
+      source "#{source_uri}"
+      git "file:///#{lib_path('foo-1.0')}" do
         gem 'foo'
       end
     G
+
+    bundle :install, :artifice => "endpoint"
 
     should_be_installed("rails 2.3.2")
   end
