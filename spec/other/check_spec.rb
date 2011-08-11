@@ -179,6 +179,12 @@ describe "bundle check" do
     out.should include("Could not locate Gemfile")
   end
 
+  it "does not output fatal error message" do
+    bundle :check, :exitstatus => true
+    @exitstatus.should eq(10)
+    out.should_not include("Unfortunately, a fatal error has occurred. ")
+  end
+
   it "should not crash when called multiple times on a new machine" do
     gemfile <<-G
       gem 'rails', '3.0.0.beta3'
