@@ -223,9 +223,12 @@ module Bundler
       path = bundle_path
       path = path.parent until path.exist?
       sudo_present = !(`which sudo` rescue '').empty?
+      bin_dir = Pathname.new(Bundler.rubygems.gem_bindir)
+      bin_dir = bin_dir.parent until bin_dir.exist?
 
       @checked_for_sudo = true
-      @requires_sudo = settings.allow_sudo? && !File.writable?(path) && sudo_present
+      can_write_gems = !File.writable?(path) || !File.writable?(bin_dir)
+      @requires_sudo = settings.allow_sudo? && can_write_gems && sudo_present
     end
 
     def mkdir_p(path)

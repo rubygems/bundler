@@ -226,4 +226,16 @@ describe "gemcutter's dependency API" do
     bundle :install, :artifice => "endpoint_api_missing"
     should_be_installed "foo 1.0"
   end
+
+  it "should install when EndpointSpecification with a bin dir owned by root", :sudo => true do
+    sys_exec "mkdir -p #{system_gem_path("bin")}"
+    sudo "chown -R root #{system_gem_path("bin")}"
+
+    gemfile <<-G
+        source "#{source_uri}"
+        gem "rails"
+    G
+    bundle :install, :artifice => "endpoint"
+    should_be_installed "rails 2.3.2"
+  end
 end
