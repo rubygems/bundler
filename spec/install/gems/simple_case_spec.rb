@@ -302,21 +302,6 @@ describe "bundle install with gem sources" do
     end
   end
 
-  describe "EndpointSpecification with a bin dir owned by root" do
-    it "should install" do
-      # This is not working, we need to fake or set a bin dir
-      # owned by root in order to reproduce the issue
-      File.stub(:writable?).with(Gem.bindir(Bundler.rubygems.gem_dir)).and_return(false)
-
-      gemfile <<-G
-        source "http://localgemserver.test"
-        gem "rack"
-      G
-      bundle :install, :artifice => "endpoint"
-      should_be_installed "rack 1.0"
-    end
-  end
-
   describe "when prerelease gems are available" do
     it "finds prereleases" do
       install_gemfile <<-G
