@@ -149,11 +149,17 @@ module Bundler
       end
 
       def fetch_specs
-        Index.build do |idx|
-          idx.use installed_specs
-          idx.use cached_specs if @allow_cached || @allow_remote
-          idx.use remote_specs if @allow_remote
+        # remote_specs usually generates a way larger Index than the other
+        # sources, and large_idx.use small_idx is way faster than
+        # small_idx.use large_idx.
+        if @allow_remote
+          idx = remote_specs.dup
+        else
+          idx = Index.new
         end
+        idx.use(cached_specs, :override_dupes) if @allow_cached || @allow_remote
+        idx.use(installed_specs, :override_dupes)
+        idx
       end
 
       def installed_specs
@@ -256,7 +262,7 @@ module Bundler
       attr_writer   :name
       attr_accessor :version
 
-      DEFAULT_GLOB = "{,*/}*.gemspec"
+      DEFAULT_GLOB = "{,*,*/*}.gemspec"
 
       def initialize(options)
         @options = options

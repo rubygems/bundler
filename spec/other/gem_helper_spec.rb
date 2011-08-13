@@ -10,6 +10,14 @@ describe "Bundler::GemHelper tasks" do
       helper.gemspec.name.should == 'test'
     end
 
+    it "interpolates the name for a hidden gemspec" do
+      bundle 'gem test'
+      app = bundled_app("test")
+      FileUtils.mv app.join('test.gemspec'), app.join('.gemspec')
+      helper = Bundler::GemHelper.new(app.to_s)
+      helper.gemspec.name.should == 'test'
+    end
+
     it "should fail when there is no gemspec" do
       bundle 'gem test'
       app = bundled_app("test")

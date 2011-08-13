@@ -91,6 +91,19 @@ Removed:
   - Removed bundle install --production
   - Removed bundle install --disable-shared-gems
 
+## 1.0.18 (Aug 12, 2011)
+
+Bugfixes:
+
+  - Fixes rake 0.9.x warning (@mtylty, #1333)
+
+Features:
+
+  - Run the bundle install earlier in a Capistrano deployment (@cgriego, #1300)
+  - Support hidden gemspec (@trans, @cldwalker, #827)
+  - Make fetch_specs faster (@zeha, #1294)
+  - Allow overriding development deps loaded by #gemspec (@lgierth, #1245)
+
 ## 1.0.17 (Aug 8, 2011)
 
 Bugfixes:

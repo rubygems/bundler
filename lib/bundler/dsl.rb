@@ -22,7 +22,7 @@ module Bundler
 
     def gemspec(opts = nil)
       path              = opts && opts[:path] || '.'
-      name              = opts && opts[:name] || '*'
+      name              = opts && opts[:name] || '{,*}'
       development_group = opts && opts[:development_group] || :development
       path              = File.expand_path(path, Bundler.default_gemfile.dirname)
       gemspecs = Dir[File.join(path, "#{name}.gemspec")]
@@ -34,7 +34,7 @@ module Bundler
         gem spec.name, :path => path
         group(development_group) do
           spec.development_dependencies.each do |dep|
-            gem dep.name, *dep.requirement.as_list
+            gem dep.name, *(dep.requirement.as_list + [:type => :development])
           end
         end
       when 0
@@ -57,20 +57,34 @@ module Bundler
 
       dep = Dependency.new(name, version, options)
 
+      # if there's already a dependency with this name we try to prefer one
       if current = @dependencies.find { |d| d.name == dep.name }
         if current.requirement != dep.requirement
-          raise DslError, "You cannot specify the same gem twice with different version requirements. " \
-                          "You specified: #{current.name} (#{current.requirement}) and " \
-                          "#{dep.name} (#{dep.requirement})"
+          if current.type == :development
+            @dependencies.delete current
+          elsif dep.type == :development
+            return
+          else
+            raise DslError, "You cannot specify the same gem twice with different version requirements. " \
+                            "You specified: #{current.name} (#{current.requirement}) and " \
+                            "#{dep.name} (#{dep.requirement})"
+          end
         end
 
         if current.source != dep.source
-          raise DslError, "You cannot specify the same gem twice coming from different sources. You " \
-                          "specified that #{dep.name} (#{dep.requirement}) should come from " \
-                          "#{current.source || 'an unspecfied source'} and #{dep.source}"
+          if current.type == :development
+            @dependencies.delete current
+          elsif dep.type == :development
+            return
+          else
+            raise DslError, "You cannot specify the same gem twice coming from different sources. You " \
+                            "specified that #{dep.name} (#{dep.requirement}) should come from " \
+                            "#{current.source || 'an unspecfied source'} and #{dep.source}"
+          end
         end
       end
-      @dependencies << Dependency.new(name, version, options)
+
+      @dependencies << dep
     end
 
     def source(source, options = {})
@@ -177,7 +191,7 @@ module Bundler
     def _normalize_options(name, version, opts)
       _normalize_hash(opts)
 
-      invalid_keys = opts.keys - %w(group groups git github path name branch ref tag require submodules platform platforms)
+      invalid_keys = opts.keys - %w(group groups git github path name branch ref tag require submodules platform platforms type)
       if invalid_keys.any?
         plural = invalid_keys.size > 1
         message = "You passed #{invalid_keys.map{|k| ':'+k }.join(", ")} "

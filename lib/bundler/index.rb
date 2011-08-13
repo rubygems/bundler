@@ -90,10 +90,13 @@ module Bundler
       dependency_names.select{|name| specs_by_name(name).empty? }
     end
 
-    def use(other)
+    def use(other, override_dupes = false)
       return unless other
       other.each do |s|
-        next if search_by_spec(s).any?
+        if (dupes = search_by_spec(s)) && dupes.any?
+          next unless override_dupes
+          @specs[s.name] -= dupes
+        end
         @specs[s.name] << s
       end
       self
