@@ -52,7 +52,7 @@ module Bundler
 
     private
     def local_specification_path
-      "#{installation_path}/specifications/#{full_name}.gemspec"
+      "#{base_dir}/specifications/#{full_name}.gemspec"
     end
   end
 end

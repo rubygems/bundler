@@ -260,8 +260,21 @@ module Bundler
       end
     end
 
+    # This backports base_dir which replaces installation path
+    # Rubygems 1.8+
+    def backport_base_dir
+      Gem::Specification.send(:define_method, :base_dir) do
+        installation_path
+      end
+    end
+
     # Rubygems 1.4 through 1.6
     class Legacy < RubygemsIntegration
+      def initialize
+        super
+        backport_base_dir
+      end
+
       def stub_rubygems(specs)
         stub_source_index137(specs)
       end
