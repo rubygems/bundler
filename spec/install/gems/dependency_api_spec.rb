@@ -227,6 +227,26 @@ describe "gemcutter's dependency API" do
     should_be_installed "foo 1.0"
   end
 
+  it "fetches again when more dependencies are found in subsequent sources using --deployment" do
+    build_repo2 do
+      build_gem "back_deps" do |s|
+        s.add_dependency "foo"
+      end
+      FileUtils.rm_rf Dir[gem_repo2("gems/foo-*.gem")]
+    end
+
+    gemfile <<-G
+      source "#{source_uri}"
+      source "#{source_uri}/extra"
+      gem "back_deps"
+    G
+
+    bundle :install, :artifice => "endpoint_extra"
+
+    bundle "install --deployment", :artifice => "endpoint_extra"
+    should_be_installed "back_deps 1.0"
+  end
+
   it "should install when EndpointSpecification with a bin dir owned by root", :sudo => true do
     sys_exec "mkdir -p #{system_gem_path("bin")}"
     sudo "chown -R root #{system_gem_path("bin")}"
