@@ -145,7 +145,7 @@ module Bundler
     def debug
       if ENV['DEBUG_RESOLVER']
         debug_info = yield
-        debug_info = debug_info.inpsect unless debug_info.is_a?(String)
+        debug_info = debug_info.inspect unless debug_info.is_a?(String)
         $stderr.puts debug_info
       end
     end
