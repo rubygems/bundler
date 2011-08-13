@@ -1,7 +1,8 @@
-## 1.0.18 (Aug 12, 2011)
+## 1.0.18 (Aug 13, 2011)
 
 Bugfixes:
 
+  - Fix typo in DEBUG_RESOLVER (@geemus)
   - Fixes rake 0.9.x warning (@mtylty, #1333)
 
 Features:
