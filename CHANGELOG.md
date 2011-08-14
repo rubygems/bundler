@@ -5,6 +5,7 @@ Bugfixes:
   - Fix `bundle check` to not print fatal error message (@cldwalker, #1347)
   - Fix require_sudo when Gem.bindir isn't writeable (#1352)
   - Fix not asking Gemcutter API for dependency chain of git gems in --deployment (#1254)
+  - Fix `install --binstubs` when using --path (#1332)
 
 ## 1.1.pre.7 (Aug 8, 2011)
 
