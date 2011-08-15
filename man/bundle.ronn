@@ -66,12 +66,6 @@ We divide `bundle` subcommands into primary commands and utilities.
 
 * `bundle viz(1)`:
   Generate a visual representation of your dependencies
-<<<<<<< HEAD
-
-* `bundle benchmark(1)`:
-  Display the time taken for each each gem to be loaded into the environment
-=======
->>>>>>> parent of e547c86... Add documentation for the benchmark CLI utility
 
 * `bundle init(1)`:
   Generate a simple `Gemfile`, placed in the current directory
