@@ -125,25 +125,27 @@ module Bundler
       gem_bins             = Dir["#{Gem.dir}/bin/*"]
       git_dirs             = Dir["#{Gem.dir}/bundler/gems/*"]
       gem_dirs             = Dir["#{Gem.dir}/gems/*"]
+      gem_files            = Dir["#{Gem.dir}/cache/*.gem"]
+      gemspec_files        = Dir["#{Gem.dir}/specifications/*.gemspec"]
       spec_gem_paths       = specs.collect {|spec| spec.full_gem_path }
       spec_gem_executables = specs.collect do |spec|
         spec.executables.collect do |executable|
           "#{Gem.dir}/#{spec.bindir}/#{executable}"
         end
       end.flatten
-      stale_gem_bins = gem_bins - spec_gem_executables
-      stale_git_dirs = git_dirs - spec_gem_paths
-      stale_gem_dirs = gem_dirs - spec_gem_paths
+      spec_cache_paths     = specs.collect {|spec| spec.cache_file }
+      spec_gemspec_paths   = specs.collect {|spec| spec.spec_file }
+      stale_gem_bins       = gem_bins - spec_gem_executables
+      stale_git_dirs       = git_dirs - spec_gem_paths
+      stale_gem_dirs       = gem_dirs - spec_gem_paths
+      stale_gem_files      = gem_files - spec_cache_paths
+      stale_gemspec_files  = gemspec_files - spec_gemspec_paths
 
       stale_gem_bins.each {|bin| FileUtils.rm(bin) }
-      stale_gem_dirs.collect do |gem_dir|
+      output = stale_gem_dirs.collect do |gem_dir|
         full_name = Pathname.new(gem_dir).basename.to_s
 
         FileUtils.rm_rf(gem_dir)
-        specification_file = "#{Gem.dir}/specifications/#{full_name}.gemspec"
-        FileUtils.rm(specification_file) if File.exists?(specification_file)
-        gem_file = "#{Gem.dir}/cache/#{full_name}.gem"
-        FileUtils.rm(gem_file) if File.exists?(gem_file)
 
         parts   = full_name.split('-')
         name    = parts[0..-2].join('-')
@@ -168,6 +170,11 @@ module Bundler
 
         output
       end
+
+      stale_gem_files.each {|file| FileUtils.rm(file) if File.exists?(file) }
+      stale_gemspec_files.each {|file| FileUtils.rm(file) if File.exists?(file) }
+
+      output
     end
 
   private

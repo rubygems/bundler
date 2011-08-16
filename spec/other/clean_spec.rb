@@ -197,4 +197,33 @@ describe "bundle clean" do
 
     out.should == "Can only use bundle clean when --path is set"
   end
+
+  # handling bundle clean upgrade path from the pre's
+  it "removes .gem/.gemspec file even if there's no corresponding gem dir is already moved" do
+    gemfile = <<-G
+      source "file://#{gem_repo1}"
+
+      gem "thin"
+      gem "foo"
+    G
+
+    install_gemfile(gemfile, :path => "vendor/bundle")
+
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "foo"
+    G
+
+    FileUtils.rm(vendored_gems("bin/rackup"))
+    FileUtils.rm_rf(vendored_gems("gems/thin-1.0"))
+    FileUtils.rm_rf(vendored_gems("gems/rack-1.0.0"))
+
+    bundle :clean
+
+    should_not_have_gems 'thin-1.0', 'rack-1.0'
+    should_have_gems 'foo-1.0'
+
+    vendored_gems("bin/rackup").should_not exist
+  end
 end
