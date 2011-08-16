@@ -268,11 +268,33 @@ module Bundler
       end
     end
 
+    def backport_cache_file
+      Gem::Specification.send(:define_method, :cache_dir) do
+        @cache_dir ||= File.join base_dir, "cache"
+      end
+
+      Gem::Specification.send(:define_method, :cache_file) do
+        @cache_file ||= File.join cache_dir, "#{full_name}.gem"
+      end
+    end
+
+    def backport_spec_file
+      Gem::Specification.send(:define_method, :spec_dir) do
+        @spec_dir ||= File.join base_dir, "specifications"
+      end
+
+      Gem::Specification.send(:define_method, :spec_file) do
+        @spec_file ||= File.join spec_dir, "#{full_name}.gemspec"
+      end
+    end
+
     # Rubygems 1.4 through 1.6
     class Legacy < RubygemsIntegration
       def initialize
         super
         backport_base_dir
+        backport_cache_file
+        backport_spec_file
       end
 
       def stub_rubygems(specs)
