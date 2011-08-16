@@ -128,21 +128,26 @@ module Bundler
       gem_files            = Dir["#{Gem.dir}/cache/*.gem"]
       gemspec_files        = Dir["#{Gem.dir}/specifications/*.gemspec"]
       spec_gem_paths       = []
+      spec_git_paths       = []
       spec_gem_executables = []
       spec_cache_paths     = []
       spec_gemspec_paths   = []
       specs.each do |spec|
         spec_gem_paths << spec.full_gem_path
+        # need to check here in case gems are nested like for the rails git repo
+        md = %r{(.+bundler/gems/.+-[a-f0-9]{12})}.match(spec.full_gem_path)
+        spec_git_paths << md[1] if md
         spec_gem_executables << spec.executables.collect do |executable|
           "#{Gem.dir}/#{spec.bindir}/#{executable}"
         end
         spec_cache_paths << spec.cache_file
         spec_gemspec_paths << spec.spec_file
       end
+      spec_gem_paths.uniq!
       spec_gem_executables.flatten!
 
       stale_gem_bins       = gem_bins - spec_gem_executables
-      stale_git_dirs       = git_dirs - spec_gem_paths
+      stale_git_dirs       = git_dirs - spec_git_paths
       stale_gem_dirs       = gem_dirs - spec_gem_paths
       stale_gem_files      = gem_files - spec_cache_paths
       stale_gemspec_files  = gemspec_files - spec_gemspec_paths

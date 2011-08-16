@@ -186,6 +186,24 @@ describe "bundle clean" do
     vendored_gems("bin/rackup").should exist
   end
 
+  it "does not remove nested gems in a git repo" do
+    build_lib "activesupport", "3.0", :path => lib_path("rails/activesupport")
+    build_git "rails", "3.0", :path => lib_path("rails") do |s|
+      s.add_dependency "activesupport", "= 3.0"
+    end
+    revision = revision_for(lib_path("rails"))
+
+    gemfile <<-G
+      gem "activesupport", :git => "#{lib_path('rails')}", :ref => '#{revision}'
+    G
+
+    bundle "install --path vendor/bundle"
+    bundle :clean
+    out.should == ""
+
+    vendored_gems("bundler/gems/rails-#{revision[0..11]}").should exist
+  end
+
   it "displays an error when used without --path" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
