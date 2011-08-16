@@ -122,13 +122,13 @@ describe "bundle clean" do
 
   it "removes unused git gems" do
     build_git "foo"
-    @revision = revision_for(lib_path("foo-1.0"))
+    revision = revision_for(lib_path("foo-1.0"))
 
     gemfile = <<-G
       source "file://#{gem_repo1}"
 
       gem "rack", "1.0.0"
-      git "#{lib_path('foo-1.0')}", :ref => "#{@revision}" do
+      git "#{lib_path('foo-1.0')}", :ref => "#{revision}" do
         gem "foo"
       end
     G
@@ -143,10 +143,10 @@ describe "bundle clean" do
 
     bundle :clean
 
-    out.should == "Removing foo (1.0 #{@revision[0..11]})"
+    out.should == "Removing foo (1.0 #{revision[0..11]})"
 
     vendored_gems("gems/rack-1.0.0").should exist
-    vendored_gems("bundler/gems/foo-1.0-#{@revision[0..11]}").should_not exist
+    vendored_gems("bundler/gems/foo-1.0-#{revision[0..11]}").should_not exist
 
     vendored_gems("specifications/rack-1.0.0.gemspec").should exist
 
