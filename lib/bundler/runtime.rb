@@ -127,14 +127,20 @@ module Bundler
       gem_dirs             = Dir["#{Gem.dir}/gems/*"]
       gem_files            = Dir["#{Gem.dir}/cache/*.gem"]
       gemspec_files        = Dir["#{Gem.dir}/specifications/*.gemspec"]
-      spec_gem_paths       = specs.collect {|spec| spec.full_gem_path }
-      spec_gem_executables = specs.collect do |spec|
-        spec.executables.collect do |executable|
+      spec_gem_paths       = []
+      spec_gem_executables = []
+      spec_cache_paths     = []
+      spec_gemspec_paths   = []
+      specs.each do |spec|
+        spec_gem_paths << spec.full_gem_path
+        spec_gem_executables << spec.executables.collect do |executable|
           "#{Gem.dir}/#{spec.bindir}/#{executable}"
         end
-      end.flatten
-      spec_cache_paths     = specs.collect {|spec| spec.cache_file }
-      spec_gemspec_paths   = specs.collect {|spec| spec.spec_file }
+        spec_cache_paths << spec.cache_file
+        spec_gemspec_paths << spec.spec_file
+      end
+      spec_gem_executables.flatten!
+
       stale_gem_bins       = gem_bins - spec_gem_executables
       stale_git_dirs       = git_dirs - spec_gem_paths
       stale_gem_dirs       = gem_dirs - spec_gem_paths
