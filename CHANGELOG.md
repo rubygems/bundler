@@ -1,3 +1,14 @@
+## 1.1.pre.9
+
+Bugfixes:
+
+  - Fix `clean` to handle nested gems in a git repo (#1329)
+  - Fix conflict from revert of benchmark tool (@boffbowsh, #1355)
+
+Features:
+
+  - `clean` will now clean up all old .gem and .gemspec files, cleaning up older pres
+
 ## 1.1.pre.8 (Aug 13, 2011)
 
 Bugfixes:
