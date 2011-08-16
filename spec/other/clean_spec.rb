@@ -9,10 +9,12 @@ describe "bundle clean" do
     end
   end
 
-  def should_not_have_gem(rubygem)
-    vendored_gems("gems/#{rubygem}").should_not exist
-    vendored_gems("specifications/#{rubygem}.gemspec").should_not exist
-    vendored_gems("cache/#{rubygem}.gem").should_not exist
+  def should_not_have_gems(*gems)
+    gems.each do |g|
+      vendored_gems("gems/#{g}").should_not exist
+      vendored_gems("specifications/#{g}.gemspec").should_not exist
+      vendored_gems("cache/#{g}.gem").should_not exist
+    end
   end
 
   it "removes unused gems that are different" do
@@ -36,7 +38,7 @@ describe "bundle clean" do
     out.should == "Removing foo (1.0)"
 
     should_have_gems 'thin-1.0', 'rack-1.0.0'
-    should_not_have_gem 'foo-1.0'
+    should_not_have_gems 'foo-1.0'
 
     vendored_gems("bin/rackup").should exist
   end
@@ -63,7 +65,7 @@ describe "bundle clean" do
     out.should == "Removing rack (0.9.1)"
 
     should_have_gems 'foo-1.0', 'rack-1.0.0'
-    should_not_have_gem 'rack-0.9.1'
+    should_not_have_gems 'rack-0.9.1'
 
     vendored_gems("bin/rackup").should exist
   end
@@ -90,7 +92,7 @@ describe "bundle clean" do
     out.should == "Removing rack (1.0.0)"
 
     should_have_gems 'foo-1.0', 'rack-0.9.1'
-    should_not_have_gem 'rack-1.0.0'
+    should_not_have_gems 'rack-1.0.0'
 
     vendored_gems("bin/rackup").should exist
   end
@@ -113,7 +115,7 @@ describe "bundle clean" do
     out.should == "Removing rack (1.0.0)"
 
     should_have_gems 'foo-1.0'
-    should_not_have_gem 'rack-1.0.0'
+    should_not_have_gems 'rack-1.0.0'
 
     vendored_gems("bin/rackup").should_not exist
   end
