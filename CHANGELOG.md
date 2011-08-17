@@ -4,6 +4,7 @@ Bugfixes:
 
   - Fix `clean` to handle nested gems in a git repo (#1329)
   - Fix conflict from revert of benchmark tool (@boffbowsh, #1355)
+  - Fix fatal error when unable to connect to gem source (#1269)
 
 Features:
 
