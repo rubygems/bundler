@@ -117,7 +117,7 @@ module Bundler
       begin
         Bundler.ui.debug "Fetching from: #{uri}"
         response = @@connection.request(uri)
-      rescue SocketError, Timeout
+      rescue SocketError, Timeout, Net::HTTP::Persistent::Error
         raise Bundler::HTTPError, "Network error while fetching #{uri}"
       end
 

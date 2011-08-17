@@ -300,6 +300,17 @@ describe "bundle install with gem sources" do
 
       File.exists?(bundled_app("Gemfile.lock")).should be_true
     end
+
+    it "gracefully handles error when rubygems server is unavailable" do
+      install_gemfile <<-G
+        source "http://localhost:9384"
+
+        gem 'foo'
+      G
+
+      bundle :install
+      out.should include("Could not reach http://localhost:9384/")
+    end
   end
 
   describe "when prerelease gems are available" do
