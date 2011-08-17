@@ -167,14 +167,6 @@ module Bundler
       end
     end
 
-    deprecate :only, :group
-    deprecate :except
-    deprecate :disable_system_gems
-    deprecate :disable_rubygems
-    deprecate :clear_sources
-    deprecate :bundle_path
-    deprecate :bin_path
-
   private
 
     def _normalize_hash(opts)
@@ -241,15 +233,6 @@ module Bundler
     end
 
     def _deprecated_options(options)
-      if options.include?(:require_as)
-        raise DeprecatedError, "Please replace :require_as with :require"
-      elsif options.include?(:vendored_at)
-        raise DeprecatedError, "Please replace :vendored_at with :path"
-      elsif options.include?(:only)
-        raise DeprecatedError, "Please replace :only with :group"
-      elsif options.include?(:except)
-        raise DeprecatedError, "The :except option is no longer supported"
-      end
     end
   end
 end

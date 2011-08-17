@@ -5,8 +5,7 @@ describe "bundle install with deprecated features" do
     in_app_root
   end
 
-  %w( only except disable_system_gems disable_rubygems
-      clear_sources bundle_path bin_path ).each do |deprecated|
+  %w().each do |deprecated|
 
     it "reports that #{deprecated} is deprecated" do
       gemfile <<-G
@@ -21,7 +20,7 @@ describe "bundle install with deprecated features" do
   end
 
 
-  %w( require_as vendored_at only except ).each do |deprecated|
+  %w().each do |deprecated|
 
     it "reports that :#{deprecated} is deprecated" do
       gemfile <<-G
