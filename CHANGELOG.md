@@ -9,6 +9,7 @@ Bugfixes:
 Features:
 
   - `clean` will now clean up all old .gem and .gemspec files, cleaning up older pres
+  - remove deprecations from DSL (#1119)
 
 ## 1.1.pre.8 (Aug 13, 2011)
 
