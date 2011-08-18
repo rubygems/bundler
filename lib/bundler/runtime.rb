@@ -63,13 +63,26 @@ module Bundler
           # Loop through all the specified autorequires for the
           # dependency. If there are none, use the dependency's name
           # as the autorequire.
-          Array(dep.autorequire || dep.name).each do |file|
-            required_file = file
-            Kernel.require file
+          if dep.autorequire
+            dep.autorequire.each do |file|
+              required_file = file
+              Kernel.require file
+            end
+          else
+            required_file = dep.name
+            Kernel.require required_file
           end
         rescue LoadError => e
           REGEXPS.find { |r| r =~ e.message }
           raise if dep.autorequire || $1 != required_file
+
+          begin
+            namespaced_file = dep.name.gsub('-', '/')
+            Kernel.require namespaced_file
+          rescue LoadError
+            REGEXPS.find { |r| r =~ e.message }
+            raise if dep.autorequire || $1 != namespaced_file
+          end if dep.name.include?('-')
         end
       end
     end

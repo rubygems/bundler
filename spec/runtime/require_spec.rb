@@ -76,6 +76,24 @@ describe "Bundler.require" do
     out.should == "two\nfive"
   end
 
+end
+
+describe "Bundler.require" do
+
+  it "requires gems that use dashes to indicate namespaces" do
+    build_lib "name-spaces", "1.0.0", :no_default => true do |s|
+      s.write "lib/name/spaces.rb", "puts 'worked'"
+    end
+
+    gemfile <<-G
+      gem "name-spaces", :path => "#{lib_path}"
+    G
+
+    run "Bundler.require"
+    out.should == 'worked'
+  end
+
+
   it "raises an exception if a require is specified but the file does not exist" do
     gemfile <<-G
       path "#{lib_path}"
