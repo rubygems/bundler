@@ -479,6 +479,14 @@ module Bundler
       IRB.start
     end
 
+    desc "grep PATTERN", "..."
+    def grep(pattern)
+      Bundler.load.lock
+      Bundler.load.specs.sort_by { |s| s.name }.each do |s|
+        system("grep #{pattern.inspect} #{s.full_gem_path} --recursive --color=auto -o")
+      end
+    end
+
     desc "version", "Prints the bundler's version information"
     def version
       Bundler.ui.info "Bundler version #{Bundler::VERSION}"
