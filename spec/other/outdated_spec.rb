@@ -61,7 +61,7 @@ describe "bundle outdated" do
       end
     end
 
-    describe "with the --pre option" do
+    context "with the --pre option" do
       it "includes pre-release versions" do
         update_repo2 do
           build_gem "activesupport", "3.0.0.beta"
@@ -69,6 +69,23 @@ describe "bundle outdated" do
 
         bundle "outdated --pre"
         out.should include("activesupport (3.0.0.beta > 2.3.5)")
+      end
+    end
+    
+    context "when current gem is a pre-release" do
+      it "includes the gem" do
+        update_repo2 do
+          build_gem "activesupport", "3.0.0.beta.1"
+          build_gem "activesupport", "3.0.0.beta.2"
+        end
+        
+        install_gemfile <<-G
+          source "file://#{gem_repo2}"
+          gem "activesupport", "3.0.0.beta.1"
+        G
+        
+        bundle "outdated"
+        out.should include("activesupport (3.0.0.beta.2 > 3.0.0.beta.1)")
       end
     end
   end
