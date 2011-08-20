@@ -1,3 +1,4 @@
+$:.push File.expand_path("../lib", __FILE__)
 require "<%=config[:name]%>/version"
 
 Gem::Specification.new do |s|
