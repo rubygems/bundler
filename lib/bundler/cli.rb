@@ -308,7 +308,7 @@ module Bundler
       else
         Bundler.ui.info "Outdated gems included in the bundle:"
       end
-      
+
       out_count = 0
       definition.specs.each do |spec|
         next if !gems.empty? && !gems.include?(spec.name)
