@@ -8,11 +8,6 @@ module Bundler
   class GemHelper
     include Rake::DSL if defined? Rake::DSL
 
-    def self.install_tasks(opts = {})
-      dir = opts[:dir] || Dir.pwd
-      self.new(dir, opts[:name]).install_tasks
-    end
-
     attr_reader :spec_path, :base, :gemspec
 
     def initialize(base, name = nil)

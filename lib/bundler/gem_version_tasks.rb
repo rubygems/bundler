@@ -10,7 +10,7 @@ module Bundler
       self.new(dir, opts[:name]).version_tasks
     end
 
-    VERSION_ASSIGNMENT_REGEXP = /\A\s*?VERSION\s*?=\s*?['"](.*?)['"]\s*?\z/mx
+    VERSION_ASSIGNMENT_REGEXP = /\A\s*?VERSION\s*?=\s*?['"](.*?)['"]/mx
 
     def version_tasks
       desc "Handle gem version"
@@ -43,11 +43,11 @@ module Bundler
       puts "New version is now #{new_version}"
     end
 
-    protected
+    #protected
 
     def incremented_version bit_to_increment
       hash = {}
-      hash[:major], hash[:minor], hash[:patch] = version.split('.')
+      hash[:major], hash[:minor], hash[:patch] = version.to_s.split('.')
       hash[bit_to_increment] = hash[bit_to_increment].to_i + 1
       "#{hash[:major]}.#{hash[:minor]}.#{hash[:patch]}"
     end
@@ -59,13 +59,17 @@ module Bundler
     end
 
     def lines_of_version_file
-      @content_of_version_file ||= File.readlines(version_file)
+      array = File.readlines(version_file)
+      raise ArgumentError, "Wtf" if array.empty?
+      array
     end
 
     def version_file
-      file_array = Dir['*/**/version.rb']
+      return @version_file if defined? @version_file
+      file_array = Dir[File.join(base, '*/**/version.rb')]
       raise_too_many_files_found if file_array.size > 1
-      file_array.first
+      raise_no_file_found if file_array.empty?
+      @version_file = file_array.first
     end
 
     def is_line_with_version_assignment? line
@@ -73,7 +77,11 @@ module Bundler
     end
 
     def raise_too_many_files_found
-      raise ArgumentError, "There are two files called version.rb and I do not know which one to use. Override the version_file method in your Rakefile and provide the correct path."
+      raise ArgumentError, "There are more than one file called version.rb and I do not know which one to use. Override the version_file method in your Rakefile and provide the correct path."
+    end
+
+    def raise_no_file_found
+      raise ArgumentError, "No file named 'version.rb' was found. Please use bundler to initialize the gem version."
     end
 
   end
