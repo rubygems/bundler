@@ -38,6 +38,12 @@ describe "bundle show" do
     bundle "show missing"
     out.should =~ /could not find gem 'missing'/i
   end
+
+  it "prints path of all gems in bundle" do
+    bundle "show --paths"
+    out.should include(default_bundle_path('gems', 'rake-0.8.7'))
+    out.should include(default_bundle_path('gems', 'rails-2.3.2'))
+  end
 end
 
 describe "bundle show with a git repo" do
