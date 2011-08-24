@@ -155,7 +155,7 @@ class Thor
       rescue Exception => e
         $stderr.puts "WARNING: unable to load thorfile #{path.inspect}: #{e.message}"
         if debug
-          $stderr.puts *e.backtrace
+          $stderr.puts(*e.backtrace)
         else
           $stderr.puts e.backtrace.first
         end
