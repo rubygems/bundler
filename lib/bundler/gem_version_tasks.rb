@@ -39,11 +39,12 @@ module Bundler
     end
 
     def change_version_to(new_version)
-      File.open(version_file, 'w') { |f| f << new_version_file(new_version) }
+      new_file = new_version_file(new_version)
+      File.open(version_file, 'w') { |f| f << new_file }
       puts "New version is now #{new_version}"
     end
 
-    #protected
+    protected
 
     def incremented_version bit_to_increment
       hash = {}
