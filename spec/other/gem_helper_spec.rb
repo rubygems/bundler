@@ -75,6 +75,22 @@ describe "Bundler::GemHelper tasks" do
       version_file_should_match "3.5.8"
     end
 
+    it "only changes the version number in the version file" do
+      original_file = File.readlines(version_rb)
+      original_file.map! { |x| x[/VERSION/] ? "  VERSION = \"0.0.1\" #I am a comment\n" : x}
+      File.open(version_rb, 'w') { |f|f << original_file.join}
+
+      @helper.change_version_to "1.2.3"
+      new_file = File.readlines(version_rb)
+
+      original_file_diff = original_file - new_file
+      new_file_diff = new_file - original_file
+      original_file_diff.size.should == 1
+      new_file_diff.size.should == 1
+      new_file_diff.first.should == "  VERSION = \"1.2.3\" #I am a comment\n"
+
+    end
+
   end
 
   context "gem management" do

@@ -41,7 +41,7 @@ module Bundler
     def change_version_to(new_version)
       new_file = new_version_file(new_version)
       File.open(version_file, 'w') { |f| f << new_file }
-      puts "New version is now #{new_version}"
+      Bundler.ui.confirm "New version is now #{new_version}"
     end
 
     protected
@@ -54,8 +54,10 @@ module Bundler
     end
 
     def new_version_file new_version
+      version_gsub = '\1' + new_version + '\1'
       lines_of_version_file.map do |line|
         is_line_with_version_assignment?(line) ? %Q{  VERSION = "#{new_version}"\n} : line
+        is_line_with_version_assignment?(line) ? line.gsub(/(["']).*?["']/, version_gsub) : line
       end.join
     end
 
