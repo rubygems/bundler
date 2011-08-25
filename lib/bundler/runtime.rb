@@ -69,7 +69,18 @@ module Bundler
           end
         rescue LoadError => e
           REGEXPS.find { |r| r =~ e.message }
-          raise if dep.autorequire || $1 != required_file
+
+          if dep.name.include?('-')
+            begin
+              namespaced_file = dep.name.gsub('-', '/')
+              Kernel.require namespaced_file
+            rescue LoadError
+              REGEXPS.find { |r| r =~ e.message }
+              raise if dep.autorequire || $1 != namespaced_file
+            end
+          else
+            raise if dep.autorequire || $1 != required_file
+          end
         end
       end
     end
