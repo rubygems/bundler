@@ -247,6 +247,17 @@ describe "gemcutter's dependency API" do
     should_be_installed "back_deps 1.0"
   end
 
+  it "does not refetch if the only unmet dependency is bundler" do
+    gemfile <<-G
+      source "#{source_uri}"
+
+      gem "bundler_dep"
+    G
+
+    bundle :install, :artifice => "endpoint"
+    out.split("Fetching dependency information from the API").size.should == 2
+  end
+
   it "should install when EndpointSpecification with a bin dir owned by root", :sudo => true do
     sys_exec "mkdir -p #{system_gem_path("bin")}"
     sudo "chown -R root #{system_gem_path("bin")}"

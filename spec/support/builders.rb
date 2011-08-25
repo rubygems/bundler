@@ -167,6 +167,10 @@ module Spec
           s.write "lib/rubygems_plugin.rb", "require 'bundler/omg' ; puts 'FAIL'"
         end
 
+        build_gem "bundler_dep" do |s|
+          s.add_dependency "bundler"
+        end
+
         # The yard gem iterates over Gem.source_index looking for plugins
         build_gem "yard" do |s|
           s.write "lib/yard.rb", <<-Y
