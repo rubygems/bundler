@@ -493,7 +493,7 @@ module Bundler
         template(File.join("newgem/bin/newgem.tt"),          File.join(target, 'bin', name),              opts)
       end
       Bundler.ui.info "Initializating git repo in #{target}"
-      Dir.chdir(target) { `git init`; `git add .` }
+      Dir.chdir(target) { `git init`; `git add .`; `git commit -m 'initial commit'` }
     end
 
     def self.source_root
