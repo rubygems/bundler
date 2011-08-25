@@ -1,8 +1,18 @@
+before_script: rake spec:deps
+script: rake spec:travis
 rvm:
-  - 1.8.6
   - 1.8.7
   - 1.9.2
-  - jruby
-  - rbx
-  - ree
-  - ruby-head
+env:
+  - RG=v1.3.6
+  - RG=v1.3.7
+  - RG=v1.4.2
+  - RG=v1.5.3
+  - RG=v1.6.2
+  - RG=v1.7.2
+  - RG=v1.8.7
+  - RG=master
+notifications:
+  email:
+    - travis-ci@andrearko.com
+    - hone02@gmail.com
