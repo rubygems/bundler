@@ -238,6 +238,7 @@ module Bundler
             # this will fetch all the specifications on the rubygems repo
             unmet_dependency_names = idx.unmet_dependency_names
 
+            Bundler.ui.debug "Unmet Dependencies: #{unmet_dependency_names}"
             if unmet_dependency_names.any?
               api_fetchers.each do |fetcher|
                 idx.use fetcher.specs(unmet_dependency_names, self)
