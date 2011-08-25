@@ -17,15 +17,15 @@ module Bundler
       namespace 'version' do
         desc "Bump major version number"
         task "bump:major" do
-          increment :major
+          bump :major
         end
         desc "Bump minor version number"
         task "bump:minor" do
-          increment :minor
+          bump :minor
         end
         desc "Bump patch version number"
         task "bump:patch" do
-          increment :patch
+          bump :patch
         end
         desc "write out a specified version (rake version:write[\"x.y.z\"])"
         task "write", :version do |task, args|
@@ -34,8 +34,30 @@ module Bundler
       end
     end
 
-    def increment bit_to_increment
-      change_version_to incremented_version(bit_to_increment)
+    def bump bit_to_increment
+      method = "bump_#{bit_to_increment.to_s}".to_sym
+      change_version_to send(method)
+    end
+
+    def bump_major
+      hash = {}
+      hash[:major], hash[:minor], hash[:patch] = version.to_s.split('.')
+      hash[:major] = hash[:major].to_i + 1
+      "#{hash[:major]}.0.0"
+    end
+
+    def bump_minor
+      hash = {}
+      hash[:major], hash[:minor], hash[:patch] = version.to_s.split('.')
+      hash[:minor] = hash[:minor].to_i + 1
+      "#{hash[:major]}.#{hash[:minor]}.0"
+    end
+
+    def bump_patch
+      hash = {}
+      hash[:major], hash[:minor], hash[:patch] = version.to_s.split('.')
+      hash[:patch] = hash[:patch].to_i + 1
+      "#{hash[:major]}.#{hash[:minor]}.#{hash[:patch]}"
     end
 
     def change_version_to(new_version)
@@ -46,41 +68,26 @@ module Bundler
 
     protected
 
-    def incremented_version bit_to_increment
-      hash = {}
-      hash[:major], hash[:minor], hash[:patch] = version.to_s.split('.')
-      hash[bit_to_increment] = hash[bit_to_increment].to_i + 1
-      "#{hash[:major]}.#{hash[:minor]}.#{hash[:patch]}"
-    end
-
     def new_version_file new_version
       version_gsub = '\1' + new_version + '\1'
       lines_of_version_file.map do |line|
-        is_line_with_version_assignment?(line) ? %Q{  VERSION = "#{new_version}"\n} : line
         is_line_with_version_assignment?(line) ? line.gsub(/(["']).*?["']/, version_gsub) : line
       end.join
     end
 
     def lines_of_version_file
-      array = File.readlines(version_file)
-      raise ArgumentError, "Wtf" if array.empty?
-      array
+      File.readlines(version_file)
     end
 
     def version_file
       return @version_file if defined? @version_file
-      file_array = Dir[File.join(base, '*/**/version.rb')]
-      raise_too_many_files_found if file_array.size > 1
+      file_array = Dir[File.join(base, 'lib', name, 'version.rb')]
       raise_no_file_found if file_array.empty?
       @version_file = file_array.first
     end
 
     def is_line_with_version_assignment? line
       !!(line[VERSION_ASSIGNMENT_REGEXP])
-    end
-
-    def raise_too_many_files_found
-      raise ArgumentError, "There are more than one file called version.rb and I do not know which one to use. Override the version_file method in your Rakefile and provide the correct path."
     end
 
     def raise_no_file_found

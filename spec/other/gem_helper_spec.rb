@@ -56,18 +56,18 @@ describe "Bundler::GemHelper tasks" do
     end
 
     it "increases the patch by one" do
-      @helper.increment :patch
+      @helper.bump :patch
       version_file_should_match "0.0.2"
     end
 
     it "increases the patch by one" do
-      @helper.increment :minor
-      version_file_should_match "0.1.1"
+      @helper.bump :minor
+      version_file_should_match "0.1.0"
     end
 
     it "increases the major by one" do
-      @helper.increment :major
-      version_file_should_match "1.0.1"
+      @helper.bump :major
+      version_file_should_match "1.0.0"
     end
 
     it "writes whatever version you want" do
@@ -88,7 +88,6 @@ describe "Bundler::GemHelper tasks" do
       original_file_diff.size.should == 1
       new_file_diff.size.should == 1
       new_file_diff.first.should == "  VERSION = \"1.2.3\" #I am a comment\n"
-
     end
 
   end
