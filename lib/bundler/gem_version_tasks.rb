@@ -13,6 +13,7 @@ module Bundler
     VERSION_ASSIGNMENT_REGEXP = /\A\s*?VERSION\s*?=\s*?['"](.*?)['"]/mx
 
     def version_tasks
+      return unless File.exists? version_file
       desc "Handle gem version"
       namespace 'version' do
         desc "Bump major version number"
@@ -29,35 +30,25 @@ module Bundler
         end
         desc "write out a specified version (rake version:write[\"x.y.z\"])"
         task "write", :version do |task, args|
-          change_version_to(args.version)
+          change_version_to args.version
         end
       end
     end
 
     def bump bit_to_increment
-      method = "bump_#{bit_to_increment.to_s}".to_sym
-      change_version_to send(method)
-    end
-
-    def bump_major
       hash = {}
       hash[:major], hash[:minor], hash[:patch] = version.to_s.split('.')
-      hash[:major] = hash[:major].to_i + 1
-      "#{hash[:major]}.0.0"
-    end
+      hash[bit_to_increment] = hash[bit_to_increment].to_i + 1
+      version = case bit_to_increment
+                  when :major
+                    "#{hash[:major]}.0.0"
+                  when :minor
+                    "#{hash[:major]}.#{hash[:minor]}.0"
+                  when :patch
+                    "#{hash[:major]}.#{hash[:minor]}.#{hash[:patch]}"
+                end
 
-    def bump_minor
-      hash = {}
-      hash[:major], hash[:minor], hash[:patch] = version.to_s.split('.')
-      hash[:minor] = hash[:minor].to_i + 1
-      "#{hash[:major]}.#{hash[:minor]}.0"
-    end
-
-    def bump_patch
-      hash = {}
-      hash[:major], hash[:minor], hash[:patch] = version.to_s.split('.')
-      hash[:patch] = hash[:patch].to_i + 1
-      "#{hash[:major]}.#{hash[:minor]}.#{hash[:patch]}"
+      change_version_to version
     end
 
     def change_version_to(new_version)
@@ -80,10 +71,7 @@ module Bundler
     end
 
     def version_file
-      return @version_file if defined? @version_file
-      file_array = Dir[File.join(base, 'lib', name, 'version.rb')]
-      raise_no_file_found if file_array.empty?
-      @version_file = file_array.first
+      File.join(base, 'lib', name, 'version.rb')
     end
 
     def is_line_with_version_assignment? line
