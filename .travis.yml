@@ -12,7 +12,7 @@ env:
   - RG=v1.5.3
   - RG=v1.6.2
   - RG=v1.7.2
-  - RG=v1.8.7
+  - RG=v1.8.10
   - RG=master
 notifications:
   email:
