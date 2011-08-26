@@ -77,7 +77,7 @@ begin
           ENV["RUBYOPT"] = "-I#{File.expand_path("tmp/rubygems/lib")} #{rubyopt}"
         end
 
-        task rg => "clone_rubygems_#{rg}"
+        task rg => ["clone_rubygems_#{rg}", "man:build"]
         task "rubygems:all" => rg
       end
 
