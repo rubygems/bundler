@@ -255,7 +255,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :artifice => "endpoint"
-    out.split("Fetching dependency information from the API").size.should == 2
+    out.scan(/Fetching dependency information from the API/).size.should == 1
   end
 
   it "should install when EndpointSpecification with a bin dir owned by root", :sudo => true do
