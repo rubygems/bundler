@@ -205,7 +205,7 @@ module Bundler
       gem_class = (class << Gem ; self ; end)
       gem_class.send(:remove_method, :bin_path)
       gem_class.send(:define_method, :bin_path) do |name, *args|
-        exec_name, *reqs = args
+        exec_name = args.first
 
         if exec_name == 'bundle'
           return ENV['BUNDLE_BIN_PATH']
