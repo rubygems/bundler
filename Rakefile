@@ -42,7 +42,9 @@ begin
     desc "Run the tests on Travis CI against a rubygem version (using ENV['RG'])"
     task "travis" do
       puts "\n\e[1;33m[Travis CI] Running bundler specs against rubygems #{ENV['RG']}\e[m\n\n"
-      Rake::Task["spec:rubygems:#{ENV['RG']}"].invoke
+      specs = Rake::Task["spec:rubygems:#{ENV['RG']}"].invoke
+      sudos = Rake::Task["spec:rubygems:#{ENV['RG']}:sudo"].invoke
+      specs && sudos
     end
 
     namespace :rubygems do
