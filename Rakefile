@@ -114,11 +114,13 @@ begin
       end
     end
 
-    desc "Run the tests on Travis CI against a rubygem version (using ENV['RG'])"
+    desc "Run the tests on Travis CI against a rubygem version (using ENV['RGV'])"
     task "travis" do
-      puts "\n\e[1;33m[Travis CI] Running bundler specs against rubygems #{ENV['RG']}\e[m\n\n"
-      specs = Rake::Task["spec:rubygems:#{ENV['RG']}"].invoke
-      sudos = Rake::Task["spec:rubygems:#{ENV['RG']}:sudo"].invoke
+      rg = ENV['RGV'] || 'master'
+      puts "\n\e[1;33m[Travis CI] Running bundler sudo specs against rubygems #{rg}\e[m\n\n"
+      sudos = Rake::Task["spec:rubygems:#{rg}:sudo"].invoke
+      puts "\n\e[1;33m[Travis CI] Running bundler specs against rubygems #{rg}\e[m\n\n"
+      specs = Rake::Task["spec:rubygems:#{rg}"].invoke
       specs && sudos
     end
   end
@@ -171,16 +173,6 @@ begin
       end
       task :deps => "spec:deps"
     end
-  end
-
-  desc "Run the tests on Travis CI against a rubygem version (using ENV['RGV'])"
-  task "travis" do
-    rg = ENV['RGV'] || 'master'
-    puts "\n\e[1;33m[Travis CI] Running bundler sudo specs against rubygems #{rg}\e[m\n\n"
-    sudos = Rake::Task["spec:rubygems:#{rg}:sudo"].invoke
-    puts "\n\e[1;33m[Travis CI] Running bundler specs against rubygems #{rg}\e[m\n\n"
-    specs = Rake::Task["spec:rubygems:#{rg}"].invoke
-    specs && sudos
   end
 
 rescue LoadError
