@@ -50,7 +50,7 @@ module Bundler
     end
 
     def gem_bindir
-      Gem.bindir
+      File.join Gem.dir, "bin"
     end
 
     def user_home
