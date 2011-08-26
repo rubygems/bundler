@@ -17,4 +17,3 @@ env:
 notifications:
   email:
     - travis-ci@andrearko.com
-    - hone02@gmail.com
