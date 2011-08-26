@@ -1,5 +1,5 @@
 before_script:
-  - sudo apt-get install groff -v
+  - sudo apt-get install groff -y
   - rake spec:deps
 script: rake spec:travis
 rvm:
