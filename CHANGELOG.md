@@ -6,6 +6,7 @@ Bugfixes:
   - Fix conflict from revert of benchmark tool (@boffbowsh, #1355)
   - Fix fatal error when unable to connect to gem source (#1269)
   - Fix `outdated` to find pre-release gems that are installed. (#1359)
+  - Fix color for ui. (#1374)
 
 Features:
 
