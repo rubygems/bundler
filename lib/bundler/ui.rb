@@ -65,7 +65,7 @@ module Bundler
       private
       # valimism
       def tell_me(msg, color = nil, newline = nil)
-        newline.nil? ? @shell.say(msg) : @shell.say(msg, nil, newline)
+        newline.nil? ? @shell.say(msg, color) : @shell.say(msg, color, newline)
       end
     end
 
