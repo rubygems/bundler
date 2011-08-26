@@ -39,9 +39,9 @@ begin
       system "sudo rm -rf #{File.expand_path('../tmp/sudo_gem_home', __FILE__)}"
     end
 
-    desc "Run the tests on Travis CI against a rubygem version (using ENV['RG'])"
+    desc "Run the tests on Travis CI against a rubygem version (using ENV['RGV'])"
     task "travis" => "spec:deps" do
-      rg = ENV['RG'] || 'master'
+      rg = ENV['RGV'] || 'master'
       puts "\n\e[1;33m[Travis CI] Running bundler sudo specs against rubygems #{rg}\e[m\n\n"
       sudos = Rake::Task["spec:rubygems:#{rg}:sudo"].invoke
       puts "\n\e[1;33m[Travis CI] Running bundler specs against rubygems #{rg}\e[m\n\n"
