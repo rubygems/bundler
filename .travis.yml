@@ -1,4 +1,4 @@
-before_script: 
+before_script:
   - sudo apt-get install groff -y
   - rake spec:deps
 script: rake spec:travis
