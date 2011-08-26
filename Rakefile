@@ -39,16 +39,6 @@ begin
       system "sudo rm -rf #{File.expand_path('../tmp/sudo_gem_home', __FILE__)}"
     end
 
-    desc "Run the tests on Travis CI against a rubygem version (using ENV['RGV'])"
-    task "travis" => "spec:deps" do
-      rg = ENV['RGV'] || 'master'
-      puts "\n\e[1;33m[Travis CI] Running bundler sudo specs against rubygems #{rg}\e[m\n\n"
-      sudos = Rake::Task["spec:rubygems:#{rg}:sudo"].invoke
-      puts "\n\e[1;33m[Travis CI] Running bundler specs against rubygems #{rg}\e[m\n\n"
-      specs = Rake::Task["spec:rubygems:#{rg}"].invoke
-      specs && sudos
-    end
-
     namespace :rubygems do
       # Rubygems specs by version
       rubyopt = ENV["RUBYOPT"]
@@ -174,6 +164,16 @@ begin
       end
       task :deps => "spec:deps"
     end
+  end
+
+  desc "Run the tests on Travis CI against a rubygem version (using ENV['RGV'])"
+  task "travis" do
+    rg = ENV['RGV'] || 'master'
+    puts "\n\e[1;33m[Travis CI] Running bundler sudo specs against rubygems #{rg}\e[m\n\n"
+    sudos = Rake::Task["spec:rubygems:#{rg}:sudo"].invoke
+    puts "\n\e[1;33m[Travis CI] Running bundler specs against rubygems #{rg}\e[m\n\n"
+    specs = Rake::Task["spec:rubygems:#{rg}"].invoke
+    specs && sudos
   end
 
 rescue LoadError
