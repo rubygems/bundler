@@ -733,7 +733,7 @@ describe "bundle install with gem sources" do
 
   describe "when Gem.bindir is hardcoded to a root-owned directory" do
     # On OS X, Gem.bindir is hardcoded to /usr/bin. :(
-    fit "installs binstubs into Gem.dir+'/bin' instead" do
+    it "installs binstubs into Gem.dir+'/bin' instead" do
       Pathname.new("/usr/bin").should_not be_writable
 
       gemfile <<-G
