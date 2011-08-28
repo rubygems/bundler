@@ -730,4 +730,24 @@ describe "bundle install with gem sources" do
       err.should be_empty
     end
   end
+
+  describe "when Gem.bindir is hardcoded to a root-owned directory" do
+    # On OS X, Gem.bindir is hardcoded to /usr/bin. :(
+    fit "installs binstubs into Gem.dir+'/bin' instead" do
+      Pathname.new("/usr/bin").should_not be_writable
+
+      gemfile <<-G
+        require 'rubygems'
+        def Gem.bindir(dir=Gem.dir); "/usr/bin"; end
+
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      bundle :install
+      should_be_installed "rack 1.0.0"
+      system_gem_path("bin/rackup").should exist
+    end
+  end
+
 end

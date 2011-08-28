@@ -50,6 +50,11 @@ module Bundler
     end
 
     def gem_bindir
+      # We use Gem.dir/bin because on OS X, Gem.bindir is hardcoded to return
+      # /usr/bin, a directory owned by root. Users who chown Gem.dir need bins
+      # to be installed where they have permissions. Furthermore, the official
+      # solution to change the bindir is adding -n to .gemrc, but Rubygems does
+      # not honor the -n option in either Gem.bindir or Installer.new.bindir.
       File.join Gem.dir, "bin"
     end
 

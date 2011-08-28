@@ -78,18 +78,16 @@ module Bundler
 
         Bundler.ui.info "Installing #{spec.name} (#{spec.version}) "
         path = cached_gem(spec)
+        install_path = Bundler.requires_sudo? ? Bundler.tmp : Bundler.rubygems.gem_dir
 
         Bundler.rubygems.preserve_paths do
-
-          install_path = Bundler.requires_sudo? ? Bundler.tmp : Bundler.rubygems.gem_dir
-          options = { :install_dir         => install_path,
-                      :ignore_dependencies => true,
-                      :wrappers            => true,
-                      :env_shebang         => true }
-          options.merge!(:bin_dir => "#{install_path}/bin") unless spec.executables.nil? || spec.executables.empty?
-
-          installer = Gem::Installer.new path, options
-          installer.install
+          Gem::Installer.new(path,
+            :install_dir         => install_path,
+            :ignore_dependencies => true,
+            :wrappers            => true,
+            :env_shebang         => true,
+            :bin_dir => "#{install_path}/bin"
+          ).install
         end
 
         if spec.post_install_message
