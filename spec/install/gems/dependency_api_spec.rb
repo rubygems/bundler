@@ -263,8 +263,8 @@ describe "gemcutter's dependency API" do
     sudo "chown -R root #{system_gem_path("bin")}"
 
     gemfile <<-G
-        source "#{source_uri}"
-        gem "rails"
+      source "#{source_uri}"
+      gem "rails"
     G
     bundle :install, :artifice => "endpoint"
     should_be_installed "rails 2.3.2"
