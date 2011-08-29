@@ -50,7 +50,7 @@ begin
     namespace :rubygems do
       # Rubygems specs by version
       rubyopt = ENV["RUBYOPT"]
-      %w(master v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.7).each do |rg|
+      %w(master v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.10).each do |rg|
         desc "Run specs with Rubygems #{rg}"
         RSpec::Core::RakeTask.new(rg) do |t|
           t.rspec_opts = %w(-fs --color)
@@ -122,6 +122,15 @@ begin
       end
     end
 
+    desc "Run the tests on Travis CI against a rubygem version (using ENV['RGV'])"
+    task "travis" do
+      rg = ENV['RGV'] || 'master'
+      puts "\n\e[1;33m[Travis CI] Running bundler sudo specs against rubygems #{rg}\e[m\n\n"
+      sudos = Rake::Task["spec:rubygems:#{rg}:sudo"].invoke
+      puts "\n\e[1;33m[Travis CI] Running bundler specs against rubygems #{rg}\e[m\n\n"
+      specs = Rake::Task["spec:rubygems:#{rg}"].invoke
+      specs && sudos
+    end
   end
 
   namespace :man do

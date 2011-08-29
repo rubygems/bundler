@@ -117,7 +117,7 @@ Removed:
   - Removed bundle install --production
   - Removed bundle install --disable-shared-gems
 
-## 1.0.18 (Aug 13, 2011)
+## 1.0.18 (Aug 16, 2011)
 
 Bugfixes:
 

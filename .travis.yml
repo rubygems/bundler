@@ -7,25 +7,24 @@ rvm:
   - 1.8.7
   - 1.9.2
 env:
-  - RG=v1.3.6
-  - RG=v1.3.7
-  - RG=v1.4.2
-  - RG=v1.5.3
-  - RG=v1.6.2
-  - RG=v1.7.2
-  - RG=v1.8.7
-  - RG=master
+  - RGV=v1.3.6
+  - RGV=v1.3.7
+  - RGV=v1.4.2
+  - RGV=v1.5.3
+  - RGV=v1.6.2
+  - RGV=v1.7.2
+  - RGV=v1.8.10
+  - RGV=master
 
 matrix:
   exclude:
     - rvm: 1.9.2
-      env: RG=v1.3.6
+      env: RGV=v1.3.6
     - rvm: 1.9.2
-      env: RG=v1.3.7
+      env: RGV=v1.3.7
     - rvm: 1.9.2
-      env: RG=v1.4.2
+      env: RGV=v1.4.2
 
 notifications:
   email:
     - travis-ci@andrearko.com
-    - hone02@gmail.com
