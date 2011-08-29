@@ -25,6 +25,7 @@ describe "Bundler.setup" do
     before(:each) do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
+        gem "yard"
         gem "rack", :group => :test
       G
     end
@@ -57,6 +58,24 @@ describe "Bundler.setup" do
       RUBY
       err.should eq("")
       out.should eq("1.0.0")
+    end
+
+    it "leaves :default available if setup is called twice" do
+      ruby <<-RUBY
+        require 'rubygems'
+        require 'bundler'
+        Bundler.setup(:default)
+        Bundler.setup(:default, :test)
+
+        begin
+          require 'yard'
+          puts "WIN"
+        rescue LoadError
+          puts "FAIL"
+        end
+      RUBY
+      err.should eq("")
+      out.should match("WIN")
     end
   end
 

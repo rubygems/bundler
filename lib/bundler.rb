@@ -111,8 +111,7 @@ module Bundler
         unloaded = groups - @completed_groups
         # Record groups that are now loaded
         @completed_groups = groups
-        # Load any groups that are not yet loaded
-        unloaded.any? ? load.setup(*unloaded) : load
+        unloaded.any? ? load.setup(*groups) : load
       end
     end
 
