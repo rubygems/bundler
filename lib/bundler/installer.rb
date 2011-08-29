@@ -47,6 +47,8 @@ module Bundler
       # as dependencies might actually affect the installation of
       # the gem.
       specs.each do |spec|
+        puts
+        puts "  Currently processing '#{spec.name}'..."
         spec.source.fetch(spec) if spec.source.respond_to?(:fetch)
 
         # unless requested_specs.include?(spec)
