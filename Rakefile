@@ -121,6 +121,7 @@ begin
       puts "\n\e[1;33m[Travis CI] Running bundler sudo specs against rubygems #{rg}\e[m\n\n"
       sudos = Rake::Task["spec:rubygems:#{rg}:sudo"].invoke
 
+      Rake::Task["spec:rubygems:#{rg}"].reenable
       Rake::Task["spec"].reenable
 
       puts "\n\e[1;33m[Travis CI] Running bundler specs against rubygems #{rg}\e[m\n\n"
