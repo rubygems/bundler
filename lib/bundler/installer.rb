@@ -47,23 +47,26 @@ module Bundler
       # as dependencies might actually affect the installation of
       # the gem.
       specs.each do |spec|
-        puts
-        puts "  Currently processing '#{spec.name}'..."
-        spec.source.fetch(spec) if spec.source.respond_to?(:fetch)
+        begin
+          spec.source.fetch(spec) if spec.source.respond_to?(:fetch)
 
-        # unless requested_specs.include?(spec)
-        #   Bundler.ui.debug "  * Not in requested group; skipping."
-        #   next
-        # end
+          # unless requested_specs.include?(spec)
+          #   Bundler.ui.debug "  * Not in requested group; skipping."
+          #   next
+          # end
 
-        Bundler.rubygems.with_build_args [Bundler.settings["build.#{spec.name}"]] do
-          spec.source.install(spec)
-          Bundler.ui.debug "from #{spec.loaded_from} "
+          Bundler.rubygems.with_build_args [Bundler.settings["build.#{spec.name}"]] do
+            spec.source.install(spec)
+            Bundler.ui.debug "from #{spec.loaded_from} "
+          end
+
+          Bundler.ui.info ""
+          generate_bundler_executable_stubs(spec) if Bundler.settings[:bin]
+          FileUtils.rm_rf(Bundler.tmp)
+        rescue Exception
+          puts "Error: '#{$!.message}', when installing #{spec.name}"
+          raise
         end
-
-        Bundler.ui.info ""
-        generate_bundler_executable_stubs(spec) if Bundler.settings[:bin]
-        FileUtils.rm_rf(Bundler.tmp)
       end
 
       lock
