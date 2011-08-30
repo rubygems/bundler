@@ -18,11 +18,11 @@ env:
 
 matrix:
   exclude:
-    - rmv: 1.9.2
+    - rvm: 1.9.2
       env: RGV=v1.3.6
-    - rmv: 1.9.2
+    - rvm: 1.9.2
       env: RGV=v1.3.7
-    - rmv: 1.9.2
+    - rvm: 1.9.2
       env: RGV=v1.4.2
 
 notifications:
