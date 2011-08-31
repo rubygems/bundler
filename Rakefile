@@ -2,6 +2,13 @@
 $:.unshift File.expand_path("../lib", __FILE__)
 require 'bundler/gem_tasks'
 
+def safe_task(&block)
+  yield
+  true
+rescue
+  false
+end
+
 namespace :spec do
   desc "Ensure spec dependencies are installed"
   task :deps do
@@ -117,11 +124,18 @@ begin
     desc "Run the tests on Travis CI against a rubygem version (using ENV['RGV'])"
     task "travis" do
       rg = ENV['RGV'] || 'master'
-      puts "\n\e[1;33m[Travis CI] Running bundler sudo specs against rubygems #{rg}\e[m\n\n"
-      sudos = Rake::Task["spec:rubygems:#{rg}:sudo"].invoke
+
       puts "\n\e[1;33m[Travis CI] Running bundler specs against rubygems #{rg}\e[m\n\n"
-      specs = Rake::Task["spec:rubygems:#{rg}"].invoke
-      specs && sudos
+      specs = safe_task { Rake::Task["spec:rubygems:#{rg}"].invoke }
+
+      Rake::Task["spec:rubygems:#{rg}"].reenable
+
+      puts "\n\e[1;33m[Travis CI] Running bundler sudo specs against rubygems #{rg}\e[m\n\n"
+      sudos = safe_task { Rake::Task["spec:rubygems:#{rg}:sudo"].invoke }
+
+      unless specs && sudos
+        fail "Bundler tests failed, please review the log for more information"
+      end
     end
   end
 
