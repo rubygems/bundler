@@ -35,7 +35,7 @@ describe "bundle clean" do
 
     bundle :clean
 
-    out.should == "Removing foo (1.0)"
+    out.should be == "Removing foo (1.0)"
 
     should_have_gems 'thin-1.0', 'rack-1.0.0'
     should_not_have_gems 'foo-1.0'
@@ -62,7 +62,7 @@ describe "bundle clean" do
 
     bundle :clean
 
-    out.should == "Removing rack (0.9.1)"
+    out.should be == "Removing rack (0.9.1)"
 
     should_have_gems 'foo-1.0', 'rack-1.0.0'
     should_not_have_gems 'rack-0.9.1'
@@ -89,7 +89,7 @@ describe "bundle clean" do
 
     bundle :clean
 
-    out.should == "Removing rack (1.0.0)"
+    out.should be == "Removing rack (1.0.0)"
 
     should_have_gems 'foo-1.0', 'rack-0.9.1'
     should_not_have_gems 'rack-1.0.0'
@@ -112,7 +112,7 @@ describe "bundle clean" do
     bundle "install --without test_group"
     bundle :clean
 
-    out.should == "Removing rack (1.0.0)"
+    out.should be == "Removing rack (1.0.0)"
 
     should_have_gems 'foo-1.0'
     should_not_have_gems 'rack-1.0.0'
@@ -143,7 +143,7 @@ describe "bundle clean" do
 
     bundle :clean
 
-    out.should == "Removing foo (1.0 #{revision[0..11]})"
+    out.should be == "Removing foo (1.0 #{revision[0..11]})"
 
     vendored_gems("gems/rack-1.0.0").should exist
     vendored_gems("bundler/gems/foo-1.0-#{revision[0..11]}").should_not exist
@@ -175,7 +175,7 @@ describe "bundle clean" do
     bundle :install
     bundle :clean
 
-    out.should == "Removing foo (1.0 #{revision[0..11]})"
+    out.should be == "Removing foo (1.0 #{revision[0..11]})"
 
     vendored_gems("gems/rack-1.0.0").should exist
     vendored_gems("bundler/gems/foo-1.0-#{revision[0..11]}").should_not exist
@@ -199,7 +199,7 @@ describe "bundle clean" do
 
     bundle "install --path vendor/bundle"
     bundle :clean
-    out.should == ""
+    out.should be == ""
 
     vendored_gems("bundler/gems/rails-#{revision[0..11]}").should exist
   end

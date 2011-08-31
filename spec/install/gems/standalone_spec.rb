@@ -26,7 +26,7 @@ describe "bundle install --standalone" do
         puts ACTIONPACK
       RUBY
 
-      out.should == "2.3.2"
+      out.should be == "2.3.2"
     end
 
     it "works on a different system" do
@@ -41,7 +41,7 @@ describe "bundle install --standalone" do
         puts ACTIONPACK
       RUBY
 
-      out.should == "2.3.2"
+      out.should be == "2.3.2"
     end
   end
 
@@ -75,7 +75,7 @@ describe "bundle install --standalone" do
         puts ACTIONPACK
       RUBY
 
-      out.should == "1.0\n2.3.2"
+      out.should be == "1.0\n2.3.2"
     end
   end
 
@@ -107,7 +107,7 @@ describe "bundle install --standalone" do
         puts RACK_TEST
       RUBY
 
-      out.should == "2.3.2\n1.2.7\n1.0"
+      out.should be == "2.3.2\n1.2.7\n1.0"
     end
 
     it "allows creating a standalone file with limited groups" do
@@ -122,7 +122,7 @@ describe "bundle install --standalone" do
         require "spec"
       RUBY
 
-      out.should == "2.3.2"
+      out.should be == "2.3.2"
       err.should =~ /no such file to load.*spec/
     end
 
@@ -138,7 +138,7 @@ describe "bundle install --standalone" do
         require "spec"
       RUBY
 
-      out.should == "2.3.2"
+      out.should be == "2.3.2"
       err.should =~ /no such file to load.*spec/
     end
 
@@ -155,7 +155,7 @@ describe "bundle install --standalone" do
         require "spec"
       RUBY
 
-      out.should == "2.3.2"
+      out.should be == "2.3.2"
       err.should =~ /no such file to load.*spec/
     end
   end
@@ -174,7 +174,7 @@ describe "bundle install --standalone" do
       it "should run without errors" do
         bundle "install --standalone", :artifice => "endpoint", :exitstatus => true
 
-        @exitstatus.should == 0
+        @exitstatus.should be == 0
       end
 
       it "still makes the gems available to normal bundler" do
@@ -200,7 +200,7 @@ describe "bundle install --standalone" do
           puts ACTIONPACK
         RUBY
 
-        out.should == "2.3.2"
+        out.should be == "2.3.2"
       end
 
       it "works on a different system" do
@@ -217,7 +217,7 @@ describe "bundle install --standalone" do
           puts ACTIONPACK
         RUBY
 
-        out.should == "2.3.2"
+        out.should be == "2.3.2"
       end
     end
   end
