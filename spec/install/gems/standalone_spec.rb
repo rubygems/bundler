@@ -45,6 +45,29 @@ describe "bundle install --standalone" do
     end
   end
 
+  describe "with install path" do
+    before do
+      install_gemfile <<-G, :standalone => true, :path => "test/root"
+        source "file://#{gem_repo1}"
+        gem "rails"
+      G
+    end
+
+    it "includes the correct paths to the load path" do
+      setup_path = bundled_app("test/root/bundler/setup.rb")
+      setup_path.should exist
+
+      tweaked_setup_content = setup_path.read.gsub("$:.", "").gsub("__FILE__", "'#{setup_path}'")
+      load_paths = []
+      load_paths.instance_eval tweaked_setup_content
+
+      load_paths.each do |path|
+        Pathname.new(path).should exist
+      end
+    end
+
+  end
+
   describe "with a combination of gems and git repos" do
     before do
       build_git "devise", "1.0"
