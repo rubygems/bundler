@@ -97,7 +97,7 @@ module Bundler
                       :env_shebang         => true }
           options.merge!(:bin_dir => "#{install_path}/bin") unless spec.executables.nil? || spec.executables.empty?
 
-          installer = Gem::Installer.new path, options
+          installer = Bundler::GemInstaller.new path, options
           installer.install
         end
 

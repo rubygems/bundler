@@ -20,6 +20,7 @@ module Bundler
   autoload :Dsl,                 'bundler/dsl'
   autoload :Environment,         'bundler/environment'
   autoload :GemHelper,           'bundler/gem_helper'
+  autoload :GemInstaller,        'bundler/gem_installer'
   autoload :Graph,               'bundler/graph'
   autoload :Index,               'bundler/index'
   autoload :Installer,           'bundler/installer'
