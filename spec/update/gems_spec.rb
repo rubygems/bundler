@@ -115,7 +115,8 @@ describe "bundle update when a gem depends on a newer version of bundler" do
 
   it "should explain that bundler conflicted" do
     bundle "update"
-    out.should_not =~ /In snapshot/
-    out.should =~ /Current Bundler version/
+    out.should_not =~ /in snapshot/i
+    out.should =~ /current Bundler version/i
+    out.should =~ /perhaps you need to update bundler/i
   end
 end
