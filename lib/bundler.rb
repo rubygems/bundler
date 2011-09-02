@@ -22,6 +22,7 @@ module Bundler
   autoload :Environment,           'bundler/environment'
   autoload :Fetcher,               'bundler/fetcher'
   autoload :GemHelper,             'bundler/gem_helper'
+  autoload :GemInstaller,          'bundler/gem_installer'
   autoload :Graph,                 'bundler/graph'
   autoload :Index,                 'bundler/index'
   autoload :Installer,             'bundler/installer'

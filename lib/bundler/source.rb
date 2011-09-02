@@ -81,7 +81,7 @@ module Bundler
         install_path = Bundler.requires_sudo? ? Bundler.tmp : Bundler.rubygems.gem_dir
 
         Bundler.rubygems.preserve_paths do
-          Gem::Installer.new(path,
+          Bundler::GemInstaller.new(path,
             :install_dir         => install_path,
             :ignore_dependencies => true,
             :wrappers            => true,

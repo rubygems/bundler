@@ -604,7 +604,7 @@ describe "bundle install with gem sources" do
           Current Bundler version:
             bundler (#{Bundler::VERSION})
         E
-      out.should == nice_error
+      out.should include(nice_error)
     end
 
     it "works for gems with multiple versions in its dependencies" do
