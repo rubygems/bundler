@@ -40,7 +40,12 @@ module Bundler
           bundle_gemfile = context.fetch(:bundle_gemfile, "Gemfile")
           bundle_without = [*context.fetch(:bundle_without, [:development, :test])].compact
 
-          args = ["--gemfile #{File.join(context.fetch(:current_release), bundle_gemfile)}"]
+          
+          begin
+            args = ["--gemfile #{File.join(context.fetch(:current_release), bundle_gemfile)}"]
+          rescue TypeError
+            raise PathError, "Could not find remote Gemfile in /current dir. Please, make the first deploy."
+          end
           args << "--path #{bundle_dir}" unless bundle_dir.to_s.empty?
           args << bundle_flags.to_s
           args << "--without #{bundle_without.join(" ")}" unless bundle_without.empty?
