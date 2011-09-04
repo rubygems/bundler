@@ -147,8 +147,20 @@ module Bundler
 
       spec_list = gem_list.map do |s|
         dependencies = s[:dependencies].map do |d|
-          name, requirement = d
-          dep = Gem::Dependency.new(name, requirement.split(", "))
+          begin
+            name, requirement = d
+            dep = Gem::Dependency.new(name, requirement.split(", "))
+          rescue ArgumentError => e
+            if e.message.include?('Illformed requirement ["#<YAML::Syck::DefaultKey')
+              puts # we shouldn't print the error message on the "fetching info" status line
+              raise GemspecError, %{Unfortunately, the gem #{s[:name]} (#{s[:number]}) } +
+                %{has an invalid gemspec. As a result, Bundler cannot install this Gemfile. } +
+                %{Please ask the gem author to yank the bad version to fix this issue. For } +
+                %{more information, see http://bit.ly/illformed-requirement.}
+            else
+              raise e
+            end
+          end
 
           deps_list << dep.name
 
