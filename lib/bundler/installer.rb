@@ -63,8 +63,10 @@ module Bundler
           Bundler.ui.info ""
           generate_bundler_executable_stubs(spec) if Bundler.settings[:bin]
           FileUtils.rm_rf(Bundler.tmp)
-        rescue Exception
-          puts "Error: '#{$!.message}', when installing #{spec.name}"
+        rescue Exception => e
+          Bundler.ui.warn "#{e.class}: #{e.message}"
+          Bundler.ui.error "An error (#{e.message}) occured while installing #{spec.name} (#{spec.version})"
+          Bundler.ui.error "Bundler can not continue. Try manually installing the gem, to determine if this is a Bundler specfic issue or issue with the gem itself"
           raise
         end
       end
