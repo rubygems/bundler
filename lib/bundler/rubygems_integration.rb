@@ -180,6 +180,7 @@ module Bundler
     end
 
     def stub_source_index170(specs)
+      Gem::SourceIndex.send(:alias_method, :old_initialize, :initialize)
       Gem::SourceIndex.send(:define_method, :initialize) do |*args|
         @gems = {}
         # You're looking at this thinking: Oh! This is how I make those
@@ -205,7 +206,7 @@ module Bundler
       gem_class = (class << Gem ; self ; end)
       gem_class.send(:remove_method, :bin_path)
       gem_class.send(:define_method, :bin_path) do |name, *args|
-        exec_name, *reqs = args
+        exec_name, = args
 
         if exec_name == 'bundle'
           return ENV['BUNDLE_BIN_PATH']
