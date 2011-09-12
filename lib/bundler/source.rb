@@ -385,7 +385,7 @@ module Bundler
         @local_specs ||= load_spec_files
       end
 
-      class Installer < Gem::Installer
+      class Installer < Bundler::GemInstaller
         def initialize(spec, options = {})
           @spec              = spec
           @bin_dir           = Bundler.requires_sudo? ? "#{Bundler.tmp}/bin" : "#{Bundler.rubygems.gem_dir}/bin"
