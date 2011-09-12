@@ -33,6 +33,12 @@ describe "bundle exec" do
     out.should == "1.0.0"
   end
 
+  it "works when exec'ing something else" do
+    install_gemfile 'gem "rack"'
+    bundle "exec echo exec"
+    out.should == "exec"
+  end
+
   it "handles different versions in different bundles" do
     build_repo2 do
       build_gem "rack_two", "1.0.0" do |s|

@@ -210,7 +210,7 @@ module Bundler
       gem_class = (class << Gem ; self ; end)
       gem_class.send(:remove_method, :bin_path)
       gem_class.send(:define_method, :bin_path) do |name, *args|
-        exec_name, *reqs = args
+        exec_name = args.first
 
         if exec_name == 'bundle'
           return ENV['BUNDLE_BIN_PATH']
@@ -259,9 +259,14 @@ module Bundler
     # by monkeypatching it into the method in Rubygems 1.3.6 and 1.3.7.
     def backport_segment_generation
       Gem::Version.send(:define_method, :segments) do
-        @segments ||= @version.scan(/[0-9]+|[a-z]+/i).map do |s|
-          /^\d+$/ =~ s ? s.to_i : s
+        @segments_generated ||= false
+        unless @segments_generated
+          @segments ||= @version.scan(/[0-9a-z]+/i).map do |s|
+            /^\d+$/ =~ s ? s.to_i : s
+          end
         end
+        @segments_generated = true
+        @segments
       end
     end
 

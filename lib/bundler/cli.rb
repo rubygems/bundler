@@ -380,7 +380,7 @@ module Bundler
       into the systemwide Rubygems repository.
     D
     def exec(*)
-      ARGV.delete("exec")
+      ARGV.shift # remove "exec"
 
       Bundler.setup
 

@@ -123,6 +123,7 @@ Bugfixes:
 
   - Fix typo in DEBUG_RESOLVER (@geemus)
   - Fixes rake 0.9.x warning (@mtylty, #1333)
+  - Fix `bundle cache` again for rubygems 1.3.x
 
 Features:
 
