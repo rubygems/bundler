@@ -100,4 +100,4 @@ Bundler 0.9 changes the following Bundler 0.8 Gemfile APIs:
    mode, where using system gems, this becomes
    `Bundler.setup(:multiple, :groups)`. If you don't
    specify any groups, this puts all groups on the load
-   path. In locked, mode, it becomes `require '.bundle/environment'`
+   path. In locked mode, it becomes `require '.bundle/environment'`
