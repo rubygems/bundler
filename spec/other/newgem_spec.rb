@@ -25,4 +25,22 @@ describe "bundle gem" do
   it "requires the version file" do
     bundled_app("test-gem/lib/test-gem.rb").read.should =~ /require "test-gem\/version"/
   end
+
+  it "runs rake without problems" do
+    system_gems ["rake-0.8.7"]
+
+    rakefile = <<-RAKEFILE
+      task :default do
+        puts 'SUCCESS'
+      end
+RAKEFILE
+    File.open(bundled_app("test-gem/Rakefile"), 'w') do |file|
+      file.puts rakefile
+    end
+
+    Dir.chdir(bundled_app("test-gem")) do
+      sys_exec("rake")
+      out.should include("SUCCESS")
+    end
+  end
 end
