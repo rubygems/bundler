@@ -4,9 +4,11 @@ module Bundler
       if defined?(Capistrano) && context.is_a?(Capistrano::Configuration)
         context_name = "capistrano"
         role_default = "{:except => {:no_release => true}}"
+        error_type = ::Capistrano::CommandError
       else
         context_name = "vlad"
         role_default = "[:app]"
+        error_type = ::Rake::CommandFailedError
       end
 
       roles = context.fetch(:bundle_roles, false)
@@ -39,13 +41,16 @@ module Bundler
           bundle_dir     = context.fetch(:bundle_dir, File.join(context.fetch(:shared_path), 'bundle'))
           bundle_gemfile = context.fetch(:bundle_gemfile, "Gemfile")
           bundle_without = [*context.fetch(:bundle_without, [:development, :test])].compact
-
-          args = ["--gemfile #{File.join(context.fetch(:current_release), bundle_gemfile)}"]
+          current_release = context.fetch(:current_release)
+          if current_release.to_s.empty?
+            raise error_type.new("Cannot detect current release path - make sure you have deployed at least once.")
+          end
+          args = ["--gemfile #{File.join(current_release, bundle_gemfile)}"]
           args << "--path #{bundle_dir}" unless bundle_dir.to_s.empty?
           args << bundle_flags.to_s
           args << "--without #{bundle_without.join(" ")}" unless bundle_without.empty?
 
-          run "cd #{context.fetch(:current_release)} && #{bundle_cmd} install #{args.join(' ')}"
+          run "cd #{current_release} && #{bundle_cmd} install #{args.join(' ')}"
         end
       end
     end
