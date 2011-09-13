@@ -490,6 +490,7 @@ module Bundler
         @revision   = options["revision"]
         @submodules = options["submodules"]
         @update     = false
+        @installed  = nil
       end
 
       def self.from_lock(options)
