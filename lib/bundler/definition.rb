@@ -180,16 +180,16 @@ module Bundler
     def lock(file)
       contents = to_lock
 
+      # Convert to \r\n if the existing lock has them
+      # i.e., Windows with `git config core.autocrlf=true`
+      contents.gsub!(/\n/, "\r\n") if @lockfile_contents.match("\r\n")
+
       return if @lockfile_contents == contents
 
       if Bundler.settings[:frozen]
         # TODO: Warn here if we got here.
         return
       end
-
-      # Convert to \r\n if the existing lock has them
-      # i.e., Windows with `git config core.autocrlf=true`
-      contents.gsub!(/\n/, "\r\n") if @lockfile_contents.match("\r\n")
 
       File.open(file, 'wb'){|f| f.puts(contents) }
     end
