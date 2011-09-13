@@ -1,4 +1,18 @@
-## 1.0.18 (Aug 16, 2011)
+## 1.0.19.rc (September 13, 2011)
+
+Features:
+
+	- Compatability with Rubygems 1.8.10 installer changes
+	- Report gem installation failures clearly (@rwilcox, #1380)
+	- Useful error for cap and vlad on first deploy (@nexmat, @kirs)
+
+Bugfixes:
+
+	- `exec` now works when the command contains 'exec'
+  - Only touch lock after changes on Windows (@robertwahler, #1358)
+	- Keep load paths when #setup is called multiple times (@radsaq, #1379)
+
+## 1.0.18 (August 16, 2011)
 
 Bugfixes:
 
@@ -13,14 +27,14 @@ Features:
   - Make fetch_specs faster (@zeha, #1294)
   - Allow overriding development deps loaded by #gemspec (@lgierth, #1245)
 
-## 1.0.17 (Aug 8, 2011)
+## 1.0.17 (August 8, 2011)
 
 Bugfixes:
 
   - Fix rake issues with rubygems 1.3.x (#1342)
   - Fixed invalid byte sequence error while installing gem on Ruby 1.9 (#1341)
 
-## 1.0.16 (Aug 8, 2011)
+## 1.0.16 (August 8, 2011)
 
 Features:
 
