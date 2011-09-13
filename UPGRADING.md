@@ -33,7 +33,7 @@ your deploy.rb file to run Bundler automatically as part of deploying:
     require 'bundler/capistrano'
 
 For more details on deploying using bundler, see the documentation
-for the bundler cap task, and the [documentation on deploying](http://gembundler.com/v1.0/deploying.html).
+for the bundler cap task, and the [documentation on deploying](http://gembundler.com/deploying.html).
 
 
 ## Bundler 0.8 to 0.9 and above
@@ -100,4 +100,4 @@ Bundler 0.9 changes the following Bundler 0.8 Gemfile APIs:
    mode, where using system gems, this becomes
    `Bundler.setup(:multiple, :groups)`. If you don't
    specify any groups, this puts all groups on the load
-   path. In locked, mode, it becomes `require '.bundle/environment'`
+   path. In locked mode, it becomes `require '.bundle/environment'`
