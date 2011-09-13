@@ -671,13 +671,18 @@ describe "the lockfile format" do
 
   end
 
-  context "line endings" do
+  describe "line endings" do
+    def set_lockfile_mtime_to_known_value
+      time = Time.local(2000, 1, 1, 0, 0, 0)
+      File.utime(time, time, bundled_app('Gemfile.lock'))
+    end
     before(:each) do
       build_repo2
       install_gemfile <<-G
         source "file://#{gem_repo2}"
         gem "rack"
       G
+      set_lockfile_mtime_to_known_value
     end
 
     it "generates Gemfile.lock with \\n line endings" do
@@ -685,22 +690,51 @@ describe "the lockfile format" do
       should_be_installed "rack 1.0"
     end
 
-    it "preserves Gemfile.lock \\n line endings" do
-      update_repo2
+    context "during updates" do
 
-      bundle "update"
-      File.read(bundled_app("Gemfile.lock")).should_not match("\r\n")
-      should_be_installed "rack 1.2"
+      it "preserves Gemfile.lock \\n line endings" do
+        update_repo2
+
+        lambda { bundle "update" }.should change { File.mtime(bundled_app('Gemfile.lock')) }
+        File.read(bundled_app("Gemfile.lock")).should_not match("\r\n")
+        should_be_installed "rack 1.2"
+      end
+
+      it "preserves Gemfile.lock \\n\\r line endings" do
+        update_repo2
+        win_lock = File.read(bundled_app("Gemfile.lock")).gsub(/\n/, "\r\n")
+        File.open(bundled_app("Gemfile.lock"), "wb"){|f| f.puts(win_lock) }
+        set_lockfile_mtime_to_known_value
+
+        lambda { bundle "update" }.should change { File.mtime(bundled_app('Gemfile.lock')) }
+        File.read(bundled_app("Gemfile.lock")).should match("\r\n")
+        should_be_installed "rack 1.2"
+      end
     end
 
-    it "preserves Gemfile.lock \\n\\r line endings" do
-      update_repo2
-      win_lock = File.read(bundled_app("Gemfile.lock")).gsub(/\n/, "\r\n")
-      File.open(bundled_app("Gemfile.lock"), "wb"){|f| f.puts(win_lock) }
+    context "when nothing changes" do
 
-      bundle "update"
-      File.read(bundled_app("Gemfile.lock")).should match("\r\n")
-      should_be_installed "rack 1.2"
+      it "preserves Gemfile.lock \\n line endings" do
+        lambda { ruby <<-RUBY
+                   require 'rubygems'
+                   require 'bundler'
+                   Bundler.setup
+                 RUBY
+               }.should_not change { File.mtime(bundled_app('Gemfile.lock')) }
+      end
+
+      it "preserves Gemfile.lock \\n\\r line endings" do
+        win_lock = File.read(bundled_app("Gemfile.lock")).gsub(/\n/, "\r\n")
+        File.open(bundled_app("Gemfile.lock"), "wb"){|f| f.puts(win_lock) }
+        set_lockfile_mtime_to_known_value
+
+        lambda { ruby <<-RUBY
+                   require 'rubygems'
+                   require 'bundler'
+                   Bundler.setup
+                 RUBY
+               }.should_not change { File.mtime(bundled_app('Gemfile.lock')) }
+      end
     end
   end
 end
