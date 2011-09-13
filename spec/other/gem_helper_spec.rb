@@ -33,6 +33,65 @@ describe "Bundler::GemHelper tasks" do
     end
   end
 
+  context "version management" do
+
+    def version_rb
+      File.join(@app.to_s, 'lib', 'test', 'version.rb')
+    end
+
+    def version_file_should_match version_string
+      version_regex = Regexp.escape(version_string)
+
+      version_file = File.readlines version_rb
+
+      version_lines = version_file.grep(/VERSION/)
+      version_lines.size.should == 1
+      version_lines.first.should match version_regex
+    end
+
+    before :each do
+      bundle 'gem test'
+      @app = bundled_app 'test'
+      @helper = Bundler::GemHelper.new(@app.to_s)
+    end
+
+    it "increases the patch by one" do
+      @helper.bump :patch
+      version_file_should_match "0.0.2"
+    end
+
+    it "increases the patch by one" do
+      @helper.bump :minor
+      version_file_should_match "0.1.0"
+    end
+
+    it "increases the major by one" do
+      @helper.bump :major
+      version_file_should_match "1.0.0"
+    end
+
+    it "writes whatever version you want" do
+      @helper.change_version_to "3.5.8"
+      version_file_should_match "3.5.8"
+    end
+
+    it "only changes the version number in the version file" do
+      original_file = File.readlines(version_rb)
+      original_file.map! { |x| x[/VERSION/] ? "  VERSION = \"0.0.1\" #I am a comment\n" : x}
+      File.open(version_rb, 'w') { |f|f << original_file.join}
+
+      @helper.change_version_to "1.2.3"
+      new_file = File.readlines(version_rb)
+
+      original_file_diff = original_file - new_file
+      new_file_diff = new_file - original_file
+      original_file_diff.size.should == 1
+      new_file_diff.size.should == 1
+      new_file_diff.first.should == "  VERSION = \"1.2.3\" #I am a comment\n"
+    end
+
+  end
+
   context "gem management" do
     def mock_confirm_message(message)
       Bundler.ui.should_receive(:confirm).with(message)
