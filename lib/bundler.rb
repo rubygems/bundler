@@ -37,7 +37,7 @@ module Bundler
   autoload :UI,                  'bundler/ui'
 
   class BundlerError < StandardError
-    def self.status_code(code = nil)
+    def self.status_code(code)
       define_method(:status_code) { code }
     end
   end
@@ -45,6 +45,7 @@ module Bundler
   class GemfileNotFound  < BundlerError; status_code(10) ; end
   class GemNotFound      < BundlerError; status_code(7)  ; end
   class GemfileError     < BundlerError; status_code(4)  ; end
+  class InstallError     < BundlerError; status_code(5)  ; end
   class PathError        < BundlerError; status_code(13) ; end
   class GitError         < BundlerError; status_code(11) ; end
   class DeprecatedError  < BundlerError; status_code(12) ; end
