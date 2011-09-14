@@ -138,7 +138,8 @@ describe "bundle clean" do
 
     bundle :clean
 
-    vendored_gems("cache/bundler/git/foo-1.0-#{Digest::SHA1.hexdigest(git_path)}").should exist
+    digest = Digest::SHA1.hexdigest(git_path.to_s)
+    vendored_gems("cache/bundler/git/foo-1.0-#{digest}").should exist
   end
 
   it "removes unused git gems" do
@@ -169,7 +170,8 @@ describe "bundle clean" do
 
     vendored_gems("gems/rack-1.0.0").should exist
     vendored_gems("bundler/gems/foo-1.0-#{revision[0..11]}").should_not exist
-    vendored_gems("cache/bundler/git/foo-1.0-#{Digest::SHA1.hexdigest(git_path)}").should_not exist
+    digest = Digest::SHA1.hexdigest(git_path.to_s)
+    vendored_gems("cache/bundler/git/foo-1.0-#{digest}").should_not exist
 
     vendored_gems("specifications/rack-1.0.0.gemspec").should exist
 
