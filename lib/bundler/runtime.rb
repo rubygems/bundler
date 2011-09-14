@@ -135,11 +135,13 @@ module Bundler
 
       gem_bins             = Dir["#{Gem.dir}/bin/*"]
       git_dirs             = Dir["#{Gem.dir}/bundler/gems/*"]
+      git_cache_dirs       = Dir["#{Gem.dir}/cache/bundler/git/*"]
       gem_dirs             = Dir["#{Gem.dir}/gems/*"]
       gem_files            = Dir["#{Gem.dir}/cache/*.gem"]
       gemspec_files        = Dir["#{Gem.dir}/specifications/*.gemspec"]
       spec_gem_paths       = []
       spec_git_paths       = []
+      spec_git_cache_dirs  = []
       spec_gem_executables = []
       spec_cache_paths     = []
       spec_gemspec_paths   = []
@@ -153,12 +155,14 @@ module Bundler
         end
         spec_cache_paths << spec.cache_file
         spec_gemspec_paths << spec.spec_file
+        spec_git_cache_dirs << spec.source.cache_path.to_s if spec.source.is_a?(Bundler::Source::Git)
       end
       spec_gem_paths.uniq!
       spec_gem_executables.flatten!
 
       stale_gem_bins       = gem_bins - spec_gem_executables
       stale_git_dirs       = git_dirs - spec_git_paths
+      stale_git_cache_dirs = git_cache_dirs - spec_git_cache_dirs
       stale_gem_dirs       = gem_dirs - spec_gem_paths
       stale_gem_files      = gem_files - spec_cache_paths
       stale_gemspec_files  = gemspec_files - spec_gemspec_paths
@@ -195,6 +199,7 @@ module Bundler
 
       stale_gem_files.each {|file| FileUtils.rm(file) if File.exists?(file) }
       stale_gemspec_files.each {|file| FileUtils.rm(file) if File.exists?(file) }
+      stale_git_cache_dirs.each {|dir| FileUtils.rm_rf(dir) if File.exists?(dir) }
 
       output
     end

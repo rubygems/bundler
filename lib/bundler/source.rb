@@ -562,6 +562,17 @@ module Bundler
         raise GitError, "#{to_s} is not checked out. Please run `bundle install`"
       end
 
+      def cache_path
+        @cache_path ||= begin
+          git_scope = "#{base_name}-#{uri_hash}"
+
+          if Bundler.requires_sudo?
+            Bundler.user_bundle_path.join("cache/git", git_scope)
+          else
+            Bundler.cache.join("git", git_scope)
+          end
+        end
+      end
     private
 
       def git(command)
@@ -615,18 +626,6 @@ module Bundler
           # Bash requires single quoted strings, with the single quotes escaped
           # by ending the string, escaping the quote, and restarting the string.
           "'" + uri.gsub("'") {|s| "'\\''"} + "'"
-        end
-      end
-
-      def cache_path
-        @cache_path ||= begin
-          git_scope = "#{base_name}-#{uri_hash}"
-
-          if Bundler.requires_sudo?
-            Bundler.user_bundle_path.join("cache/git", git_scope)
-          else
-            Bundler.cache.join("git", git_scope)
-          end
         end
       end
 
