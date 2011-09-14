@@ -67,11 +67,12 @@ module Bundler
         Bundler.ui.debug "from #{spec.loaded_from} "
       end
 
-      # newline after installing, some gems say "with native extensions"
+      # newline comes after installing, some gems say "with native extensions"
       Bundler.ui.info ""
       generate_bundler_executable_stubs(spec) if Bundler.settings[:bin]
       FileUtils.rm_rf(Bundler.tmp)
     rescue Exception => e
+      Bundler.ui.info ""
       Bundler.ui.warn "#{e.class}: #{e.message}"
       msg = "An error occured while installing #{spec.name} (#{spec.version}),"
       msg << " and Bundler cannot continue.\nMake sure that `gem install"
