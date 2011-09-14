@@ -2,15 +2,15 @@
 
 Features:
 
-	- Compatability with Rubygems 1.8.10 installer changes
-	- Report gem installation failures clearly (@rwilcox, #1380)
-	- Useful error for cap and vlad on first deploy (@nexmat, @kirs)
+  - Compatability with Rubygems 1.8.10 installer changes
+  - Report gem installation failures clearly (@rwilcox, #1380)
+  - Useful error for cap and vlad on first deploy (@nexmat, @kirs)
 
 Bugfixes:
 
-	- `exec` now works when the command contains 'exec'
+  - `exec` now works when the command contains 'exec'
   - Only touch lock after changes on Windows (@robertwahler, #1358)
-	- Keep load paths when #setup is called multiple times (@radsaq, #1379)
+  - Keep load paths when #setup is called multiple times (@radsaq, #1379)
 
 ## 1.0.18 (August 16, 2011)
 
