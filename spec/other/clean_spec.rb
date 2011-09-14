@@ -120,15 +120,37 @@ describe "bundle clean" do
     vendored_gems("bin/rackup").should_not exist
   end
 
-  it "removes unused git gems" do
+  it "does not remove cached git dir if it's being used" do
     build_git "foo"
     revision = revision_for(lib_path("foo-1.0"))
+    git_path = lib_path('foo-1.0')
 
     gemfile = <<-G
       source "file://#{gem_repo1}"
 
       gem "rack", "1.0.0"
-      git "#{lib_path('foo-1.0')}", :ref => "#{revision}" do
+      git "#{git_path}", :ref => "#{revision}" do
+        gem "foo"
+      end
+    G
+
+    install_gemfile(gemfile, :path => "vendor/bundle")
+
+    bundle :clean
+
+    vendored_gems("cache/bundler/git/foo-1.0-#{Digest::SHA1.hexdigest(git_path)}").should exist
+  end
+
+  it "removes unused git gems" do
+    build_git "foo"
+    revision = revision_for(lib_path("foo-1.0"))
+    git_path = lib_path('foo-1.0')
+
+    gemfile = <<-G
+      source "file://#{gem_repo1}"
+
+      gem "rack", "1.0.0"
+      git "#{git_path}", :ref => "#{revision}" do
         gem "foo"
       end
     G
@@ -147,6 +169,7 @@ describe "bundle clean" do
 
     vendored_gems("gems/rack-1.0.0").should exist
     vendored_gems("bundler/gems/foo-1.0-#{revision[0..11]}").should_not exist
+    vendored_gems("cache/bundler/git/foo-1.0-#{Digest::SHA1.hexdigest(git_path)}").should_not exist
 
     vendored_gems("specifications/rack-1.0.0.gemspec").should exist
 
