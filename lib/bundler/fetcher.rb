@@ -145,22 +145,23 @@ module Bundler
       gem_list = Marshal.load(marshalled_deps)
       deps_list = []
 
+      gem_list, broken_list = gem_list.partition do |s|
+        s[:dependencies].all? {|d| d.last['#<YAML::Syck::DefaultKey'].nil? }
+      end
+
+      puts if broken_list.any? # don't print the error message on the "fetching info" line
+
+      broken_list.each do |s|
+        Bundler.ui.warn %{The gem '#{s[:name]}-#{s[:number]}' has an invalid gemspec, and } +
+          %{won't be considered for dependency resolution. Please ask the gem author to } +
+          %{yank it. For more information, see http://bit.ly/illformed-requirement.}
+      end
+
       spec_list = gem_list.map do |s|
         dependencies = s[:dependencies].map do |d|
-          begin
-            name, requirement = d
-            dep = Gem::Dependency.new(name, requirement.split(", "))
-          rescue ArgumentError => e
-            if e.message.include?('Illformed requirement ["#<YAML::Syck::DefaultKey')
-              puts # we shouldn't print the error message on the "fetching info" status line
-              raise GemspecError, %{Unfortunately, the gem #{s[:name]} (#{s[:number]}) } +
-                %{has an invalid gemspec. As a result, Bundler cannot install this Gemfile. } +
-                %{Please ask the gem author to yank the bad version to fix this issue. For } +
-                %{more information, see http://bit.ly/illformed-requirement.}
-            else
-              raise e
-            end
-          end
+          name, requirement = d
+
+          dep = Gem::Dependency.new(name, requirement.split(", "))
 
           deps_list << dep.name
 
