@@ -20,6 +20,8 @@ module Bundler
       @env             = nil
     end
 
+    attr_accessor :dependencies
+
     def gemspec(opts = nil)
       path              = opts && opts[:path] || '.'
       name              = opts && opts[:name] || '{,*}'
