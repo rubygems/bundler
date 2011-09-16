@@ -209,7 +209,7 @@ module Bundler
         raise DslError, "`#{p}` is not a valid platform. The available options are: #{VALID_PLATFORMS.inspect}"
       end
 
-      if github = opts.delete(:github)
+      if github = opts.delete("github")
         github = "#{github}/#{github}" unless github.include?("/")
         opts["git"] = "git://github.com/#{github}.git"
       end
