@@ -71,15 +71,8 @@ module Bundler
     end
 
     def to_lock
-      out = "  #{name}"
-
-      unless requirement == Gem::Requirement.default
-        reqs = requirement.requirements.map{|o,v| "#{o} #{v}" }
-        out << " (#{reqs.join(', ')})"
-      end
-
+      out = super
       out << '!' if source
-
       out << "\n"
     end
 
