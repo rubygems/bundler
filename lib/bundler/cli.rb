@@ -155,7 +155,7 @@ module Bundler
     method_option "full-index", :tpye => :boolean, :banner =>
       "Use the rubygems modern index instead of the API endpoint"
     method_option "clean", :type => :boolean, :default => true, :banner =>
-      "Don't run bundle clean automatically after clean"
+      "Run bundle clean automatically after clean"
     def install
       opts = options.dup
       opts[:without] ||= []
@@ -249,7 +249,7 @@ module Bundler
     method_option "local", :type => :boolean, :banner =>
       "Do not attempt to fetch gems remotely and use the gem cache instead"
     method_option "clean", :type => :boolean, :default => true, :banner =>
-      "Don't run bundle clean automatically after clean"
+      "Run bundle clean automatically after clean"
     def update(*gems)
       sources = Array(options[:source])
 
