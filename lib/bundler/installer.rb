@@ -91,9 +91,9 @@ module Bundler
     end
 
     def generate_standalone(groups)
-      path = Bundler.settings[:path]
-      bundler_path = File.join(path, "bundler")
-      FileUtils.mkdir_p(bundler_path)
+      path = Pathname.new(File.expand_path(Bundler.settings[:path]))
+      bundler_path = path.join("bundler")
+      FileUtils.mkdir_p(bundler_path.to_s)
 
       paths = []
 
@@ -108,12 +108,11 @@ module Bundler
 
         spec.require_paths.each do |path|
           full_path = File.join(spec.full_gem_path, path)
-          paths << Pathname.new(full_path).relative_path_from(Bundler.root.join("bundle/bundler"))
+          paths << Pathname.new(full_path).relative_path_from(bundler_path)
         end
       end
 
-
-      File.open File.join(bundler_path, "setup.rb"), "w" do |file|
+      bundler_path.join("setup.rb").open "w" do |file|
         file.puts "path = File.expand_path('..', __FILE__)"
         paths.each do |path|
           file.puts %{$:.unshift File.expand_path("\#{path}/#{path}")}
