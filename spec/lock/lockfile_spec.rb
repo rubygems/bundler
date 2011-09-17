@@ -70,10 +70,9 @@ describe "the lockfile format" do
     G
   end
 
-  it "parses lockfiles w/ crazy shit" do
+  it "generates lockfiles with multiple requirements" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
-
       gem "net-sftp"
     G
 
