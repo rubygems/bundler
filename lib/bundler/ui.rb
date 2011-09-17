@@ -30,14 +30,6 @@ module Bundler
         @debug = ENV['DEBUG']
       end
 
-      def debug(msg, newline = nil)
-        tell_me(msg, nil, newline) if debugging?
-      end
-
-      def debugging?
-        @debug && !@quiet
-      end
-
       def info(msg, newline = nil)
         tell_me(msg, nil, newline) if !@quiet
       end
@@ -58,8 +50,16 @@ module Bundler
         @quiet = true
       end
 
+      def debugging?
+        @debug && !@quiet
+      end
+
       def debug!
         @debug = true
+      end
+
+      def debug(msg, newline = nil)
+        tell_me(msg, nil, newline) if debugging?
       end
 
       private
