@@ -334,9 +334,9 @@ module Bundler
       length = @stack.length
       @stack << requirement.name
       retval = catch(requirement.name) do
-        @deps_for = {}
         resolve(reqs, activated)
       end
+
       # Since we're doing a lot of throw / catches. A push does not necessarily match
       # up to a pop. So, we simply slice the stack back to what it was before the catch
       # block.
@@ -349,14 +349,16 @@ module Bundler
     end
 
     def search(dep)
-      return @deps_for[dep.to_s] if @deps_for[dep.to_s]
-
       if base = @base[dep.name] and base.any?
         reqs = [dep.requirement.as_list, base.first.version.to_s].flatten.compact
         d = Gem::Dependency.new(base.first.name, *reqs)
       else
         d = dep.dep
       end
+
+      key = "#{d}-#{dep.__platform}"
+      return @deps_for[key] if @deps_for[key]
+
       index = @source_requirements[d.name] || @index
       results = index.search(d, @base[d.name])
 
@@ -374,7 +376,8 @@ module Bundler
       else
         deps = []
       end
-      @deps_for[dep.to_s] = deps
+
+      @deps_for[key] = deps
     end
 
     def clean_req(req)
