@@ -200,7 +200,7 @@ describe "bundle clean" do
     update_git "foo"
     revision2 = revision_for(lib_path("foo-1.0"))
 
-    bundle :update
+    bundle "update --no-clean"
     bundle :clean
 
     out.should be == "Removing foo (1.0 #{revision[0..11]})"
@@ -333,5 +333,42 @@ describe "bundle clean" do
 
     should_have_gems 'rack-1.0.0'
     should_not_have_gems 'thin-1.0'
+  end
+
+  it "cleans on bundle update with --path" do
+    build_repo2
+
+    gemfile <<-G
+      source "file://#{gem_repo2}"
+
+      gem "foo"
+    G
+    bundle "install --path vendor/bundle"
+
+    update_repo2 do
+      build_gem 'foo', '1.0.1'
+    end
+
+    bundle :update
+    should_not_have_gems 'foo-1.0'
+  end
+
+  it "does not clean on bundle update when using --system" do
+    build_repo2
+
+    gemfile <<-G
+      source "file://#{gem_repo2}"
+
+      gem "foo"
+    G
+    bundle "install"
+
+    update_repo2 do
+      build_gem 'foo', '1.0.1'
+    end
+    bundle :update
+
+    sys_exec "gem list"
+    out.should include("foo (1.0.1, 1.0)")
   end
 end

@@ -248,6 +248,8 @@ module Bundler
     method_option "source", :type => :array, :banner => "Update a specific source (and all gems associated with it)"
     method_option "local", :type => :boolean, :banner =>
       "Do not attempt to fetch gems remotely and use the gem cache instead"
+    method_option "clean", :type => :boolean, :default => true, :banner =>
+      "Don't run bundle clean automatically after clean"
     def update(*gems)
       sources = Array(options[:source])
 
@@ -261,6 +263,7 @@ module Bundler
       opts = {"update" => true, "local" => options[:local]}
       Installer.install Bundler.root, Bundler.definition, opts
       Bundler.load.cache if Bundler.root.join("vendor/cache").exist?
+      clean if options["clean"] && Bundler.settings[:path]
       Bundler.ui.confirm "Your bundle is updated! " +
         "Use `bundle show [gemname]` to see where a bundled gem is installed."
     end
