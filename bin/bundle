@@ -1,15 +1,13 @@
 #!/usr/bin/env ruby
-
-# Check if an older version of bundler is installed
-require 'bundler'
-$:.each do |path|
-  if path =~ %r'/bundler-0.(\d+)' && $1.to_i < 9
-    abort "Please remove older versions of bundler. This can be done by running `gem cleanup bundler`."
-  end
-end
-require 'bundler/cli'
-
 begin
+  require 'bundler'
+  # Check if an older version of bundler is installed
+  $:.each do |path|
+    if path =~ %r'/bundler-0.(\d+)' && $1.to_i < 9
+      abort "Please remove 0.8 versions of bundler. This can be done by running `gem cleanup bundler`."
+    end
+  end
+  require 'bundler/cli'
   Bundler::CLI.start
 rescue Bundler::BundlerError => e
   Bundler.ui.error e.message
