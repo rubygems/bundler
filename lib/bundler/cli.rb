@@ -154,6 +154,8 @@ module Bundler
       "Make a bundle that can work without the Bundler runtime"
     method_option "full-index", :tpye => :boolean, :banner =>
       "Use the rubygems modern index instead of the API endpoint"
+    method_option "clean", :type => :boolean, :default => true, :banner =>
+      "Don't run bundle clean automatically after clean"
     def install
       opts = options.dup
       opts[:without] ||= []
@@ -205,6 +207,11 @@ module Bundler
       Bundler.settings[:bin]    = opts["binstubs"] if opts[:binstubs]
       Bundler.settings[:no_prune] = true if opts["no-prune"]
       Bundler.settings[:disable_shared_gems] = '1' if Bundler.settings[:path]
+      if opts["clean"] && Bundler.settings[:path]
+        Bundler.settings[:clean] = true
+      else
+        Bundler.settings[:clean] = false
+      end
       Bundler.settings.without  = opts[:without] unless opts[:without].empty?
       Bundler.ui.be_quiet! if opts[:quiet]
 
@@ -224,6 +231,8 @@ module Bundler
       Installer.post_install_messages.to_a.each do |name, msg|
         Bundler.ui.confirm "Post-install message from #{name}:\n#{msg}"
       end
+
+      clean if Bundler.settings[:clean]
     rescue GemNotFound => e
       if opts[:local] && Bundler.app_cache.exist?
         Bundler.ui.warn "Some gems seem to be missing from your vendor/cache directory."

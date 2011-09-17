@@ -18,14 +18,14 @@ describe "bundle clean" do
   end
 
   it "removes unused gems that are different" do
-    gemfile = <<-G
+    gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "thin"
       gem "foo"
     G
 
-    install_gemfile(gemfile, :path => "vendor/bundle")
+    bundle "install --path vendor/bundle --no-clean"
 
     install_gemfile <<-G
       source "file://#{gem_repo1}"
@@ -44,14 +44,14 @@ describe "bundle clean" do
   end
 
   it "removes old version of gem if unused" do
-    gemfile = <<-G
+    gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack", "0.9.1"
       gem "foo"
     G
 
-    install_gemfile(gemfile, :path => "vendor/bundle")
+    bundle "install --path vendor/bundle --no-clean"
 
     install_gemfile <<-G
       source "file://#{gem_repo1}"
@@ -71,14 +71,14 @@ describe "bundle clean" do
   end
 
   it "removes new version of gem if unused" do
-    gemfile = <<-G
+    gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack", "1.0.0"
       gem "foo"
     G
 
-    install_gemfile(gemfile, :path => "vendor/bundle")
+    bundle "install --path vendor/bundle --no-clean"
 
     install_gemfile <<-G
       source "file://#{gem_repo1}"
@@ -98,7 +98,7 @@ describe "bundle clean" do
   end
 
   it "remove gems in bundle without groups" do
-    gemfile = <<-G
+    gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "foo"
@@ -108,7 +108,7 @@ describe "bundle clean" do
       end
     G
 
-    install_gemfile(gemfile, :path => "vendor/bundle")
+    bundle "install --path vendor/bundle --no-clean"
     bundle "install --without test_group"
     bundle :clean
 
@@ -125,7 +125,7 @@ describe "bundle clean" do
     revision = revision_for(lib_path("foo-1.0"))
     git_path = lib_path('foo-1.0')
 
-    gemfile = <<-G
+    gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack", "1.0.0"
@@ -134,7 +134,7 @@ describe "bundle clean" do
       end
     G
 
-    install_gemfile(gemfile, :path => "vendor/bundle")
+    bundle "install --path vendor/bundle --no-clean"
 
     bundle :clean
 
@@ -147,7 +147,7 @@ describe "bundle clean" do
     revision = revision_for(lib_path("foo-1.0"))
     git_path = lib_path('foo-1.0')
 
-    gemfile = <<-G
+    gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack", "1.0.0"
@@ -156,7 +156,7 @@ describe "bundle clean" do
       end
     G
 
-    install_gemfile(gemfile, :path => "vendor/bundle")
+    bundle "install --path vendor/bundle --no-clean"
 
     install_gemfile <<-G
       source "file://#{gem_repo1}"
@@ -182,7 +182,7 @@ describe "bundle clean" do
     build_git "foo"
     revision = revision_for(lib_path("foo-1.0"))
 
-    gemfile = <<-G
+    gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack", "1.0.0"
@@ -191,7 +191,7 @@ describe "bundle clean" do
       end
     G
 
-    install_gemfile(gemfile, :path => "vendor/bundle")
+    bundle "install --path vendor/bundle --no-clean"
 
     update_git "foo"
     revision2 = revision_for(lib_path("foo-1.0"))
@@ -222,7 +222,7 @@ describe "bundle clean" do
       gem "activesupport", :git => "#{lib_path('rails')}", :ref => '#{revision}'
     G
 
-    bundle "install --path vendor/bundle"
+    bundle "install --path vendor/bundle --no-clean"
     bundle :clean
     out.should be == ""
 
@@ -243,14 +243,14 @@ describe "bundle clean" do
 
   # handling bundle clean upgrade path from the pre's
   it "removes .gem/.gemspec file even if there's no corresponding gem dir is already moved" do
-    gemfile = <<-G
+    gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "thin"
       gem "foo"
     G
 
-    install_gemfile(gemfile, :path => "vendor/bundle")
+    bundle "install --path vendor/bundle --no-clean"
 
     install_gemfile <<-G
       source "file://#{gem_repo1}"
@@ -268,5 +268,69 @@ describe "bundle clean" do
     should_have_gems 'foo-1.0'
 
     vendored_gems("bin/rackup").should_not exist
+  end
+
+  it "does not call clean automatically when using system gems" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "thin"
+      gem "rack"
+    G
+    bundle :install
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "rack"
+    G
+    bundle :install
+
+    sys_exec "gem list"
+    out.should include("rack (1.0.0)")
+    out.should include("thin (1.0)")
+
+    bundle_config = YAML.load_file(bundled_app(".bundle/config"))
+    bundle_config["BUNDLE_CLEAN"].should == false
+  end
+
+  it "--clean should override the bundle setting" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "thin"
+      gem "rack"
+    G
+    bundle "install --path vendor/bundle --no-clean"
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "rack"
+    G
+    bundle "install --clean"
+
+    should_have_gems 'rack-1.0.0'
+    should_not_have_gems 'thin-1.0'
+  end
+
+  it "clean automatically on --path" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "thin"
+      gem "rack"
+    G
+    bundle "install --path vendor/bundle"
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "rack"
+    G
+    bundle "install"
+
+    should_have_gems 'rack-1.0.0'
+    should_not_have_gems 'thin-1.0'
   end
 end
