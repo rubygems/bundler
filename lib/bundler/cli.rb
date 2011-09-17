@@ -473,6 +473,7 @@ module Bundler
     desc "gem GEM", "Creates a skeleton for creating a rubygem"
     method_option :bin, :type => :boolean, :default => false, :aliases => '-b', :banner => "Generate a binary for your library."
     def gem(name)
+      name = name.chomp("/") # remove trailing slash if present
       target = File.join(Dir.pwd, name)
       constant_name = name.split('_').map{|p| p.capitalize}.join
       constant_name = constant_name.split('-').map{|q| q.capitalize}.join('::') if constant_name =~ /-/
