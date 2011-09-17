@@ -19,6 +19,7 @@ module Bundler
     default_task :install
     class_option "no-color", :type => :boolean, :banner => "Disable colorization in output"
     class_option "verbose",  :type => :boolean, :banner => "Enable verbose output mode", :aliases => "-V"
+    class_option "force",    :type => :boolean, :banner => "Force", :aliases => "-f"
 
     def help(cli = nil)
       case cli
@@ -559,9 +560,9 @@ module Bundler
 
     desc "clean", "Cleans up unused gems in your bundler directory"
     def clean
-      clean_output = Bundler.load.clean
+      clean_output = Bundler.load.clean(options[:force])
       if !clean_output
-        Bundler.ui.error "Can only use bundle clean when --path is set"
+        Bundler.ui.error "Can only use bundle clean when --path is set or use --force"
       end
     end
 

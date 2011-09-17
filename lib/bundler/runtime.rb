@@ -130,8 +130,8 @@ module Bundler
       end
     end
 
-    def clean
-      return false if Bundler.settings[:path] == nil
+    def clean(force = false)
+      return false if !force && Bundler.settings[:path] == nil
 
       gem_bins             = Dir["#{Gem.dir}/bin/*"]
       git_dirs             = Dir["#{Gem.dir}/bundler/gems/*"]
