@@ -154,6 +154,8 @@ module Bundler
       "Make a bundle that can work without the Bundler runtime"
     method_option "full-index", :tpye => :boolean, :banner =>
       "Use the rubygems modern index instead of the API endpoint"
+    method_option "clean", :type => :boolean, :default => true, :banner =>
+      "Run bundle clean automatically after clean"
     def install
       opts = options.dup
       opts[:without] ||= []
@@ -224,6 +226,8 @@ module Bundler
       Installer.post_install_messages.to_a.each do |name, msg|
         Bundler.ui.confirm "Post-install message from #{name}:\n#{msg}"
       end
+
+      clean if opts["clean"] && Bundler.settings[:path]
     rescue GemNotFound => e
       if opts[:local] && Bundler.app_cache.exist?
         Bundler.ui.warn "Some gems seem to be missing from your vendor/cache directory."
@@ -244,6 +248,8 @@ module Bundler
     method_option "source", :type => :array, :banner => "Update a specific source (and all gems associated with it)"
     method_option "local", :type => :boolean, :banner =>
       "Do not attempt to fetch gems remotely and use the gem cache instead"
+    method_option "clean", :type => :boolean, :default => true, :banner =>
+      "Run bundle clean automatically after clean"
     def update(*gems)
       sources = Array(options[:source])
 
@@ -258,6 +264,7 @@ module Bundler
       Gem.load_plugins # rubygems plugins can hook into the gem install process
       Installer.install Bundler.root, Bundler.definition, opts
       Bundler.load.cache if Bundler.root.join("vendor/cache").exist?
+      clean if options["clean"] && Bundler.settings[:path]
       Bundler.ui.confirm "Your bundle is updated! " +
         "Use `bundle show [gemname]` to see where a bundled gem is installed."
     end
