@@ -12,6 +12,7 @@ Bugfixes:
 Features:
 
   - `clean` will now clean up all old .gem and .gemspec files, cleaning up older pres
+  - `clean` will be automatically run after (#1420, #1425)
   - remove deprecations from DSL (#1119)
   - autorequire tries directories for gems with dashed names (#1205)
 
