@@ -303,6 +303,7 @@ describe "bundle install with gem sources" do
 
     it "gracefully handles error when rubygems server is unavailable" do
       install_gemfile <<-G
+        source "file://#{gem_repo1}"
         source "http://localhost:9384"
 
         gem 'foo'
@@ -310,6 +311,7 @@ describe "bundle install with gem sources" do
 
       bundle :install
       out.should include("Could not reach http://localhost:9384/")
+      out.should_not include("file://")
     end
   end
 
