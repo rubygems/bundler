@@ -4,7 +4,9 @@ begin
   # Check if an older version of bundler is installed
   $:.each do |path|
     if path =~ %r'/bundler-0.(\d+)' && $1.to_i < 9
-      abort "Please remove 0.8 versions of bundler. This can be done by running `gem cleanup bundler`."
+      err = "Please remove Bundler 0.8 versions."
+      err << "This can be done by running `gem cleanup bundler`."
+      abort(err)
     end
   end
   require 'bundler/cli'
