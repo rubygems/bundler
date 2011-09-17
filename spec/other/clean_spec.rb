@@ -27,11 +27,12 @@ describe "bundle clean" do
 
     bundle "install --path vendor/bundle --no-clean"
 
-    install_gemfile <<-G
+    gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "thin"
     G
+    bundle "install --no-clean"
 
     bundle :clean
 
@@ -53,12 +54,13 @@ describe "bundle clean" do
 
     bundle "install --path vendor/bundle --no-clean"
 
-    install_gemfile <<-G
+    gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack", "1.0.0"
       gem "foo"
     G
+    bundle "install --no-clean"
 
     bundle :clean
 
@@ -80,12 +82,13 @@ describe "bundle clean" do
 
     bundle "install --path vendor/bundle --no-clean"
 
-    install_gemfile <<-G
+    gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack", "0.9.1"
       gem "foo"
     G
+    bundle "install --no-clean"
 
     bundle :clean
 
@@ -109,7 +112,7 @@ describe "bundle clean" do
     G
 
     bundle "install --path vendor/bundle --no-clean"
-    bundle "install --without test_group"
+    bundle "install --without test_group --no-clean"
     bundle :clean
 
     out.should be == "Removing rack (1.0.0)"
@@ -158,11 +161,12 @@ describe "bundle clean" do
 
     bundle "install --path vendor/bundle --no-clean"
 
-    install_gemfile <<-G
+    gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack", "1.0.0"
     G
+    bundle "install --no-clean"
 
     bundle :clean
 
@@ -197,7 +201,6 @@ describe "bundle clean" do
     revision2 = revision_for(lib_path("foo-1.0"))
 
     bundle :update
-    bundle :install
     bundle :clean
 
     out.should be == "Removing foo (1.0 #{revision[0..11]})"
@@ -252,11 +255,12 @@ describe "bundle clean" do
 
     bundle "install --path vendor/bundle --no-clean"
 
-    install_gemfile <<-G
+    gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "foo"
     G
+    bundle "install --no-clean"
 
     FileUtils.rm(vendored_gems("bin/rackup"))
     FileUtils.rm_rf(vendored_gems("gems/thin-1.0"))
@@ -289,9 +293,6 @@ describe "bundle clean" do
     sys_exec "gem list"
     out.should include("rack (1.0.0)")
     out.should include("thin (1.0)")
-
-    bundle_config = YAML.load_file(bundled_app(".bundle/config"))
-    bundle_config["BUNDLE_CLEAN"].should == false
   end
 
   it "--clean should override the bundle setting" do
