@@ -334,6 +334,7 @@ module Bundler
       length = @stack.length
       @stack << requirement.name
       retval = catch(requirement.name) do
+        @deps_for = {}
         resolve(reqs, activated)
       end
       # Since we're doing a lot of throw / catches. A push does not necessarily match
