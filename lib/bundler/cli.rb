@@ -559,9 +559,10 @@ module Bundler
 
     desc "clean", "Cleans up unused gems in your bundler directory"
     def clean
-      clean_output = Bundler.load.clean
-      if !clean_output
+      if Bundler.settings[:path] == nil
         Bundler.ui.error "Can only use bundle clean when --path is set"
+      else
+        Bundler.load.clean
       end
     end
 
