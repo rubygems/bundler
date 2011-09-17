@@ -142,6 +142,20 @@ describe "bundle install --standalone" do
       err.should =~ /no such file to load.*spec/
     end
 
+    it "allows --path to change the location of the standalone bundle" do
+      bundle "install --standalone --path path/to/bundle"
+
+      ruby <<-RUBY, :no_lib => true, :expect_err => false
+        $:.unshift File.expand_path("path/to/bundle")
+        require "bundler/setup"
+
+        require "actionpack"
+        puts ACTIONPACK
+      RUBY
+
+      out.should == "2.3.2"
+    end
+
     it "allows remembered --without to limit the groups used in a standalone" do
       bundle "install --without test"
       bundle "install --standalone"

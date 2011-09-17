@@ -91,8 +91,8 @@ module Bundler
     end
 
     def generate_standalone(groups)
-      path = Bundler.settings[:path]
-      bundler_path = File.join(path, "bundler")
+      standalone_path = Bundler.settings[:path]
+      bundler_path = File.join(standalone_path, "bundler")
       FileUtils.mkdir_p(bundler_path)
 
       paths = []
@@ -108,7 +108,7 @@ module Bundler
 
         spec.require_paths.each do |path|
           full_path = File.join(spec.full_gem_path, path)
-          paths << Pathname.new(full_path).relative_path_from(Bundler.root.join("bundle/bundler"))
+          paths << Pathname.new(full_path).relative_path_from(Bundler.root.join(bundler_path))
         end
       end
 
