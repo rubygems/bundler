@@ -241,7 +241,7 @@ describe "bundle clean" do
 
     bundle :clean
 
-    out.should == "Can only use bundle clean when --path is set"
+    out.should == "Can only use bundle clean when --path is set or --force is set"
   end
 
   # handling bundle clean upgrade path from the pre's
@@ -370,5 +370,28 @@ describe "bundle clean" do
 
     sys_exec "gem list"
     out.should include("foo (1.0.1, 1.0)")
+  end
+
+  it "cleans system gems when --force is used" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "foo"
+      gem "rack"
+    G
+    bundle :install
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "rack"
+    G
+    bundle :install
+    bundle "clean --force"
+
+    out.should eq("Removing foo (1.0)")
+    sys_exec "gem list"
+    out.should_not include("foo (1.0)")
+    out.should include("rack (1.0.0)")
   end
 end
