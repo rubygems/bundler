@@ -278,7 +278,7 @@ module Bundler
       Show lists the names and versions of all gems that are required by your Gemfile.
       Calling show with [GEM] will list the exact location of that gem on your machine.
     D
-    method_option "paths", :type => :boolean, 
+    method_option "paths", :type => :boolean,
       :banner => "List the paths of all gems that are required by your Gemfile."
     def show(gem_name = nil)
       Bundler.load.lock
