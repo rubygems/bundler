@@ -615,16 +615,16 @@ module Bundler
         Digest::SHA1.hexdigest(input)
       end
 
-      # Escape the URI for git commands
-      def uri_escaped
+      # Escape an argument for shell commands.
+      def escape(arg)
         if Bundler::WINDOWS
           # Windows quoting requires double quotes only, with double quotes
           # inside the string escaped by being doubled.
-          '"' + uri.gsub('"') {|s| '""'} + '"'
+          '"' + arg.to_s.gsub('"') {|s| '""'} + '"'
         else
           # Bash requires single quoted strings, with the single quotes escaped
           # by ending the string, escaping the quote, and restarting the string.
-          "'" + uri.gsub("'") {|s| "'\\''"} + "'"
+          "'" + arg.to_s.gsub("'") {|s| "'\\''"} + "'"
         end
       end
 
@@ -644,13 +644,12 @@ module Bundler
         if cached?
           return if has_revision_cached?
           Bundler.ui.info "Updating #{uri}"
-          in_cache do
-            git %|fetch --force --quiet --tags #{uri_escaped} "refs/heads/*:refs/heads/*"|
-          end
+          cache unless cached?
+          git %|--git-dir #{escape cache_path} fetch --force --quiet --tags #{escape uri} "refs/heads/*:refs/heads/*"|
         else
           Bundler.ui.info "Fetching #{uri}"
           FileUtils.mkdir_p(cache_path.dirname)
-          git %|clone #{uri_escaped} "#{cache_path}" --bare --no-hardlinks|
+          git %|clone #{escape uri} "#{cache_path}" --bare --no-hardlinks|
         end
       end
 
@@ -661,20 +660,20 @@ module Bundler
           git %|clone --no-checkout "#{cache_path}" "#{path}"|
           File.chmod((0777 & ~File.umask), path)
         end
-        Dir.chdir(path) do
-          git %|fetch --force --quiet --tags "#{cache_path}"|
-          git "reset --hard #{revision}"
+        dir_opts = %|--git-dir #{escape path}/.git --work-tree #{escape path}|
+        git %|#{dir_opts} fetch --force --quiet --tags "#{cache_path}"|
+        git "#{dir_opts} reset --hard #{revision}"
 
-          if @submodules
-            git "submodule init"
-            git "submodule update"
-          end
+        if @submodules
+          git "#{dir_opts} submodule init"
+          git "#{dir_opts} submodule update"
         end
       end
 
       def has_revision_cached?
         return unless @revision
-        in_cache { git %|cat-file -e #{@revision}| }
+        cache unless cached?
+        git %|--git-dir #{escape cache_path} cat-file -e #{@revision}|
         true
       rescue GitError
         false
@@ -687,7 +686,8 @@ module Bundler
       def revision
         @revision ||= begin
           if allow_git_ops?
-            in_cache { git("rev-parse #{ref}").strip }
+            cache unless cached?
+            git("--git-dir #{escape cache_path} rev-parse #{ref}").strip
           else
             raise GitError, "The git source #{uri} is not yet checked out. Please run `bundle install` before trying to start your application"
           end
@@ -696,11 +696,6 @@ module Bundler
 
       def cached?
         cache_path.exist?
-      end
-
-      def in_cache(&blk)
-        cache unless cached?
-        Dir.chdir(cache_path, &blk)
       end
     end
 
