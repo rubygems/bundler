@@ -150,12 +150,11 @@ module Bundler
       "Install using defaults tuned for deployment environments"
     def install(path = nil)
       opts = options.dup
-      opts[:without] ||= []
-      if opts[:without].size == 1
-        opts[:without] = opts[:without].map{|g| g.split(" ") }
+      if opts[:without]
+        opts[:without].map!{|g| g.split(" ") }
         opts[:without].flatten!
+        opts[:without].map!{|g| g.to_sym }
       end
-      opts[:without] = opts[:without].map{|g| g.to_sym }
 
       # Can't use Bundler.settings for this because settings needs gemfile.dirname
       ENV['BUNDLE_GEMFILE'] = File.expand_path(opts[:gemfile]) if opts[:gemfile]
@@ -214,7 +213,7 @@ module Bundler
       Bundler.settings[:bin] = opts["binstubs"] if opts[:binstubs]
       Bundler.settings[:no_prune] = true if opts["no-prune"]
       Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? '1' : nil
-      Bundler.settings.without = opts[:without] unless opts[:without].empty?
+      Bundler.settings.without = opts[:without]
       Bundler.ui.be_quiet! if opts[:quiet]
 
       Installer.install(Bundler.root, Bundler.definition, opts)
