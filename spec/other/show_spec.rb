@@ -38,6 +38,19 @@ describe "bundle show" do
     bundle "show missing"
     out.should =~ /could not find gem 'missing'/i
   end
+  
+  it "prints path of all gems in bundle" do
+    bundle "show --paths"
+    out.should == %w(actionmailer-2.3.2 actionpack-2.3.2 activerecord-2.3.2
+                     activeresource-2.3.2 activesupport-2.3.2 bundler-1.0.18
+                     rails-2.3.2 rake-0.8.7).map { |name| 
+                       if name == 'bundler-1.0.18'
+                         File.expand_path('../../../', __FILE__)
+                       else 
+                         default_bundle_path('gems', name)
+                       end.to_s
+                  }.join("\n")
+  end
 end
 
 describe "bundle show with a git repo" do
