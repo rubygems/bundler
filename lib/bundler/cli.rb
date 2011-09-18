@@ -568,11 +568,13 @@ module Bundler
     end
 
     desc "clean", "Cleans up unused gems in your bundler directory"
+    method_option "force", :type => :boolean, :default => false, :banner =>
+      "forces clean even if --path is set"
     def clean
-      if Bundler.settings[:path] == nil
-        Bundler.ui.error "Can only use bundle clean when --path is set"
-      else
+      if Bundler.settings[:path] || options[:force]
         Bundler.load.clean
+      else
+        Bundler.ui.error "Can only use bundle clean when --path is set or --force is set"
       end
     end
 
