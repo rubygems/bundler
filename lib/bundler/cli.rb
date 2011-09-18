@@ -475,8 +475,8 @@ module Bundler
     def gem(name)
       name = name.chomp("/") # remove trailing slash if present
       target = File.join(Dir.pwd, name)
-      constant_name = name.split('_').map{|p| p.capitalize}.join
-      constant_name = constant_name.split('-').map{|q| q.capitalize}.join('::') if constant_name =~ /-/
+      constant_name = name.split('_').map{|p| p[0..0].upcase + p[1..-1] }.join
+      constant_name = constant_name.split('-').map{|q| q[0..0].upcase + q[1..-1] }.join('::') if constant_name =~ /-/
       constant_array = constant_name.split('::')
       git_author_name = `git config user.name`.chomp
       git_author_email = `git config user.email`.chomp
