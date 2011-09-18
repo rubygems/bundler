@@ -22,7 +22,8 @@ Gem::Specification.new do |s|
 
   # Man files are required because they are ignored by git
   man_files            = Dir.glob("lib/bundler/man/**/*")
-  s.files              = `git ls-files`.split("\n") + man_files
+  git_files            = `git ls-files`.split("\n") rescue ''
+  s.files              = git_files + man_files
   s.test_files         = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables        = %w(bundle)
   s.require_paths      = ["lib"]
