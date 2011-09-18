@@ -3,7 +3,8 @@ require 'fileutils'
 require 'pathname'
 
 begin
-  require 'psych'
+  # Pull in Psych if we can, but not if Syck is already loaded
+  require 'psych' unless defined?(YAML)
 rescue LoadError
 end
 
