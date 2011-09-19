@@ -79,6 +79,10 @@ module Bundler
       generate_bundler_executable_stubs(spec) if Bundler.settings[:bin]
       FileUtils.rm_rf(Bundler.tmp)
     rescue Exception => e
+      # install hook failed
+      raise e if e.is_a?(Gem::InstallError)
+
+      # other failure, likely a native extension build failure
       Bundler.ui.info ""
       Bundler.ui.warn "#{e.class}: #{e.message}"
       msg = "An error occured while installing #{spec.name} (#{spec.version}),"
