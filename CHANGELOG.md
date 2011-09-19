@@ -1,4 +1,4 @@
-## 1.1.pre.9
+## 1.1.pre.9 (Sep 18, 2011)
 
 Bugfixes:
 
@@ -8,13 +8,20 @@ Bugfixes:
   - Fix `outdated` to find pre-release gems that are installed. (#1359)
   - Fix color for ui. (#1374)
   - Fix installing to user-owned system gems on OS X
+  - Fix caching issue in the resolver (#1353, #1421)
+  - Fix :github DSL option
 
 Features:
 
   - `clean` will now clean up all old .gem and .gemspec files, cleaning up older pres
-  - `clean` will be automatically run after (#1420, #1425)
+  - `clean` will be automatically run after bundle install and update when using `--path` (#1420, #1425)
+  - `clean` now takes a `--force` option (#1247, #1426)
+  - `clean` will clean up cached git dirs in bundle clean (#1390)
   - remove deprecations from DSL (#1119)
   - autorequire tries directories for gems with dashed names (#1205)
+  - adds a `--paths` flag to `bundle show` to list all the paths of bundled gems (@tiegz, #1360)
+  - load rubygems plugins in the bundle binary (@tpope, #1364)
+  - make `--standalone` respect `--path` (@cowboyd, #1361)
 
 ## 1.1.pre.8 (Aug 13, 2011)
 
