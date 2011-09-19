@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ## 1.1.pre.9
 
 Bugfixes:
@@ -119,8 +118,6 @@ Removed:
   - Removed bundle install --production
   - Removed bundle install --disable-shared-gems
 
-## 1.0.18 (Aug 16, 2011)
-=======
 ## 1.0.20.rc (September 18, 2011)
 
 Features:
@@ -152,7 +149,6 @@ Bugfixes:
   - Keep load paths when #setup is called multiple times (@radsaq, #1379)
 
 ## 1.0.18 (August 16, 2011)
->>>>>>> 1-0-stable
 
 Bugfixes:
 
