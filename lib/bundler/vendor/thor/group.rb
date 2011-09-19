@@ -187,9 +187,9 @@ class Thor::Group
         human_name = value.respond_to?(:classify) ? value.classify : value
 
         group_options[human_name] ||= []
-        group_options[human_name] += klass.class_options.values.select do |class_option|
-          base_options[class_option.name.to_sym].nil? && class_option.group.nil? &&
-          !group_options.values.flatten.any? { |i| i.name == class_option.name }
+        group_options[human_name] += klass.class_options.values.select do |option|
+          base_options[option.name.to_sym].nil? && option.group.nil? &&
+          !group_options.values.flatten.any? { |i| i.name == option.name }
         end
 
         yield klass if block_given?
@@ -220,14 +220,10 @@ class Thor::Group
         args, opts = Thor::Options.split(given_args)
         opts = given_opts || opts
 
-        instance = new(args, opts, config)
-        yield instance if block_given?
-        args = instance.args
-
         if task
-          instance.invoke_task(all_tasks[task])
+          new(args, opts, config).invoke_task(all_tasks[task])
         else
-          instance.invoke_all
+          new(args, opts, config).invoke_all
         end
       end
 

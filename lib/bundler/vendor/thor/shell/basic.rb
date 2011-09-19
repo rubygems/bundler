@@ -5,10 +5,10 @@ class Thor
     class Basic
       attr_accessor :base, :padding
 
-      # Initialize base, mute and padding to nil.
+      # Initialize base and padding to nil.
       #
       def initialize #:nodoc:
-        @base, @mute, @padding = nil, false, 0
+        @base, @padding = nil, 0
       end
 
       # Mute everything that's inside given block
