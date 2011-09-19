@@ -37,6 +37,30 @@ module Bundler
       task 'release' do
         release_gem
       end
+
+      namespace 'version' do
+        namespace 'bump' do
+          desc "Bumps major version to #{bump_major}"
+          task :major do
+            update_to bump_major
+          end
+
+          desc "Bumps minor version to #{bump_minor}"
+          task :minor do
+            update_to bump_minor
+          end
+
+          desc "Bumps patch version to #{bump_patch}"
+          task :patch do
+            update_to bump_patch
+          end
+        end
+
+        desc "Sets version to [version]"
+        task :set, :version do |t, args|
+          update_to args[:version]
+        end
+      end
     end
 
     def build_gem
@@ -122,6 +146,11 @@ module Bundler
       gemspec.version
     end
 
+    def full_version
+      major, minor, patch, build = version.version.split '.'
+      return major.to_i, minor.to_i, patch.to_i, build
+    end
+
     def version_tag
       "v#{version}"
     end
@@ -146,6 +175,29 @@ module Bundler
         end
       }
       [outbuf, $?]
+    end
+
+    def bump_major
+      major, minor, patch, build = full_version
+      [major + 1, minor && 0, patch && 0].compact.join '.'
+    end
+
+    def bump_minor
+      major, minor, patch, build = full_version
+      [major, minor + 1, patch && 0].compact.join '.'
+    end
+
+    def bump_patch
+      major, minor, patch, build = full_version
+      [major, minor, patch + 1].compact.join '.'
+    end
+
+    def update_to(new_version)
+      target = File.join(Dir.pwd, "lib", gemspec.name, "version.rb")
+      content = File.binread(target)
+      content.gsub!(version.version, new_version)
+      File.open(target, 'wb') { |file| file.write(content) }
+      Bundler.ui.confirm "Version set to #{new_version}"
     end
   end
 end
