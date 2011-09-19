@@ -19,7 +19,7 @@ class Thor
                            action add_file create_file in_root inside run run_ruby_script)
 
   module Base
-    attr_accessor :options
+    attr_accessor :options, :parent_options, :args
 
     # It receives arguments in an Array and two hashes, one for options and
     # other for configuration.
@@ -38,22 +38,43 @@ class Thor
     # config<Hash>:: Configuration for this Thor class.
     #
     def initialize(args=[], options={}, config={})
-      args = Thor::Arguments.parse(self.class.arguments, args)
-      args.each { |key, value| send("#{key}=", value) }
-
       parse_options = self.class.class_options
+
+      # The start method splits inbound arguments at the first argument
+      # that looks like an option (starts with - or --). It then calls
+      # new, passing in the two halves of the arguments Array as the
+      # first two parameters.
 
       if options.is_a?(Array)
         task_options  = config.delete(:task_options) # hook for start
         parse_options = parse_options.merge(task_options) if task_options
         array_options, hash_options = options, {}
       else
+        # Handle the case where the class was explicitly instantiated
+        # with pre-parsed options.
         array_options, hash_options = [], options
       end
 
+      # Let Thor::Options parse the options first, so it can remove
+      # declared options from the array. This will leave us with
+      # a list of arguments that weren't declared.
       opts = Thor::Options.new(parse_options, hash_options)
       self.options = opts.parse(array_options)
+
+      # If unknown options are disallowed, make sure that none of the
+      # remaining arguments looks like an option.
       opts.check_unknown! if self.class.check_unknown_options?(config)
+
+      # Add the remaining arguments from the options parser to the
+      # arguments passed in to initialize. Then remove any positional
+      # arguments declared using #argument (this is primarily used
+      # by Thor::Group). Tis will leave us with the remaining
+      # positional arguments.
+      thor_args = Thor::Arguments.new(self.class.arguments)
+      thor_args.parse(args + opts.remaining).each { |k,v| send("#{k}=", v) }
+      args = thor_args.remaining
+
+      @args = args
     end
 
     class << self
@@ -405,8 +426,8 @@ class Thor
         end
       end
 
-      def handle_no_task_error(task) #:nodoc:
-        if $thor_runner
+      def handle_no_task_error(task, has_namespace = $thor_runner) #:nodoc:
+        if has_namespace
           raise UndefinedTaskError, "Could not find task #{task.inspect} in #{namespace.inspect} namespace."
         else
           raise UndefinedTaskError, "Could not find task #{task.inspect}."
@@ -506,6 +527,7 @@ class Thor
         # and file into baseclass.
         def inherited(klass)
           Thor::Base.register_klass_file(klass)
+          klass.instance_variable_set(:@no_tasks, false)
         end
 
         # Fire this callback whenever a method is added. Added methods are

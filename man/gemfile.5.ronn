@@ -280,5 +280,5 @@ bundler uses the following priority order:
      repository otherwise declared. This results in bundler prioritizing the
      ActiveSupport gem from the Rails git repository over ones from
      `rubygems.org`
-  3. The sources specified via `source`, in the order in which they were
-     declared in the `Gemfile`.
+  3. The sources specified via `source`, searching each source in your `Gemfile`
+     from last added to first added.

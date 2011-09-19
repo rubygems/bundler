@@ -174,7 +174,12 @@ module Spec
         # The yard gem iterates over Gem.source_index looking for plugins
         build_gem "yard" do |s|
           s.write "lib/yard.rb", <<-Y
-            Gem.source_index.find_name('').each do |gem|
+            if Gem::Version.new(Gem::VERSION) >= Gem::Version.new("1.8.10")
+              specs = Gem::Specification
+            else
+              specs = Gem.source_index.find_name('')
+            end
+            specs.each do |gem|
               puts gem.full_name
             end
           Y

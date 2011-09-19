@@ -136,6 +136,20 @@ describe "bundle install with gem sources" do
 
           ENV["BUNDLE_WITHOUT"] = nil
         end
+
+        it "clears without when passed an empty list" do
+          bundle :install, :without => "emo"
+
+          bundle 'install --without ""'
+          should_be_installed "activesupport 2.3.5"
+        end
+
+        it "doesn't clear without when nothing is passed" do
+          bundle :install, :without => "emo"
+
+          bundle :install
+          should_not_be_installed "activesupport 2.3.5"
+        end
       end
 
       describe "with gems assigned to multiple groups" do

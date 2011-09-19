@@ -158,12 +158,11 @@ module Bundler
       "Run bundle clean automatically after clean"
     def install
       opts = options.dup
-      opts[:without] ||= []
-      if opts[:without].size == 1
-        opts[:without] = opts[:without].map{|g| g.split(" ") }
+      if opts[:without]
+        opts[:without].map!{|g| g.split(" ") }
         opts[:without].flatten!
+        opts[:without].map!{|g| g.to_sym }
       end
-      opts[:without] = opts[:without].map{|g| g.to_sym }
 
       # Can't use Bundler.settings for this because settings needs gemfile.dirname
       ENV['BUNDLE_GEMFILE'] = File.expand_path(opts[:gemfile]) if opts[:gemfile]
@@ -206,8 +205,8 @@ module Bundler
       Bundler.settings[:path] ||= "bundle" if opts[:standalone]
       Bundler.settings[:bin]    = opts["binstubs"] if opts[:binstubs]
       Bundler.settings[:no_prune] = true if opts["no-prune"]
-      Bundler.settings[:disable_shared_gems] = '1' if Bundler.settings[:path]
-      Bundler.settings.without  = opts[:without] unless opts[:without].empty?
+      Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? '1' : nil
+      Bundler.settings.without = opts[:without]
       Bundler.ui.be_quiet! if opts[:quiet]
 
       Bundler::Fetcher.disable_endpoint = opts["full-index"]
@@ -536,9 +535,10 @@ module Bundler
     desc "gem GEM", "Creates a skeleton for creating a rubygem"
     method_option :bin, :type => :boolean, :default => false, :aliases => '-b', :banner => "Generate a binary for your library."
     def gem(name)
+      name = name.chomp("/") # remove trailing slash if present
       target = File.join(Dir.pwd, name)
-      constant_name = name.split('_').map{|p| p.capitalize}.join
-      constant_name = constant_name.split('-').map{|q| q.capitalize}.join('::') if constant_name =~ /-/
+      constant_name = name.split('_').map{|p| p[0..0].upcase + p[1..-1] }.join
+      constant_name = constant_name.split('-').map{|q| q[0..0].upcase + q[1..-1] }.join('::') if constant_name =~ /-/
       constant_array = constant_name.split('::')
       FileUtils.mkdir_p(File.join(target, 'lib', name))
       git_user_name = `git config user.name`.chomp

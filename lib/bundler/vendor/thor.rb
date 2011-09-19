@@ -5,7 +5,7 @@ class Thor
     # Sets the default task when thor is executed without an explicit task to be called.
     #
     # ==== Parameters
-    # meth<Symbol>:: name of the defaut task
+    # meth<Symbol>:: name of the default task
     #
     def default_task(meth=nil)
       case meth
@@ -108,6 +108,8 @@ class Thor
       @method_options
     end
 
+    alias options method_options
+
     # Adds an option to the set of method options. If :for is given as option,
     # it allows you to change the options from a previous defined task.
     #
@@ -142,6 +144,8 @@ class Thor
 
       build_option(name, options, scope)
     end
+
+    alias option method_option
 
     # Prints help information for the given task.
     #
@@ -202,7 +206,11 @@ class Thor
     def subcommand(subcommand, subcommand_class)
       self.subcommands << subcommand.to_s
       subcommand_class.subcommand_help subcommand
-      define_method(subcommand) { |*args| invoke subcommand_class, args }
+
+      define_method(subcommand) do |*args|
+        args, opts = Thor::Arguments.split(args)
+        invoke subcommand_class, args, opts
+      end
     end
 
     # Extend check unknown options to accept a hash of conditions.
@@ -259,8 +267,11 @@ class Thor
         opts = given_opts || opts || []
         config.merge!(:current_task => task, :task_options => task.options)
 
+        instance = new(args, opts, config)
+        yield instance if block_given?
+        args = instance.args
         trailing = args[Range.new(arguments.size, -1)]
-        new(args, opts, config).invoke_task(task, trailing || [])
+        instance.invoke_task(task, trailing || [])
       end
 
       # The banner for this class. You can customize it if you are invoking the
@@ -300,7 +311,6 @@ class Thor
       # Retrieve the task name from given args.
       def retrieve_task_name(args) #:nodoc:
         meth = args.first.to_s unless args.empty?
-
         if meth && (map[meth] || meth !~ /^\-/)
           args.shift
         else
@@ -308,35 +318,45 @@ class Thor
         end
       end
 
-      # Receives a task name (can be nil), and try to get a map from it.
-      # If a map can't be found use the sent name or the default task.
+      # receives a (possibly nil) task name and returns a name that is in
+      # the tasks hash. In addition to normalizing aliases, this logic
+      # will determine if a shortened command is an unambiguous prefix of
+      # a task or alias.
+      #
+      # +normalize_task_name+ also converts names like +animal-prison+
+      # into +animal_prison+.
       def normalize_task_name(meth) #:nodoc:
-        meth = map[meth.to_s] || find_subcommand_and_update_argv(meth) || meth || default_task
-        meth.to_s.gsub('-','_') # treat foo-bar > foo_bar
-      end
+        return default_task.to_s.gsub('-', '_') unless meth
 
-      # terrible hack that overwrites ARGV
-      def find_subcommand_and_update_argv(subcmd_name) #:nodoc:
-        return unless subcmd_name
-        cmd = find_subcommand(subcmd_name)
-        ARGV[0] = cmd if cmd
-        cmd
-      end
-
-      def find_subcommand(subcmd_name)
-        possibilities = find_subcommand_possibilities subcmd_name
+        possibilities = find_task_possibilities(meth)
         if possibilities.size > 1
-          raise "Ambiguous subcommand #{subcmd_name} matches [#{possibilities.join(', ')}]"
+          raise ArgumentError, "Ambiguous task #{meth} matches [#{possibilities.join(', ')}]"
         elsif possibilities.size < 1
-          return nil
+          meth = meth || default_task
+        elsif map[meth]
+          meth = map[meth]
+        else
+          meth = possibilities.first
         end
 
-        possibilities.first
+        meth.to_s.gsub('-','_') # treat foo-bar as foo_bar
       end
 
-      def find_subcommand_possibilities(subcmd_name)
-        len = subcmd_name.length
-        all_tasks.map {|t| t.first}.select { |n| subcmd_name == n[0, len] }
+      # this is the logic that takes the task name passed in by the user
+      # and determines whether it is an unambiguous prefix of a task or
+      # alias name.
+      def find_task_possibilities(meth)
+        len = meth.to_s.length
+        possibilities = all_tasks.merge(map).keys.select { |n| meth == n[0, len] }.sort
+        unique_possibilities = possibilities.map { |k| map[k] || k }.uniq
+
+        if possibilities.include?(meth)
+          [meth]
+        elsif unique_possibilities.size == 1
+          unique_possibilities
+        else
+          possibilities
+        end
       end
 
       def subcommand_help(cmd)

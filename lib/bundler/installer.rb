@@ -53,21 +53,7 @@ module Bundler
       # the gem.
       Installer.post_install_messages = {}
       specs.each do |spec|
-        Bundler::Fetcher.fetch(spec) if spec.source.is_a?(Bundler::Source::Rubygems)
-
-        # unless requested_specs.include?(spec)
-        #   Bundler.ui.debug "  * Not in requested group; skipping."
-        #   next
-        # end
-
-        Bundler.rubygems.with_build_args [Bundler.settings["build.#{spec.name}"]] do
-          spec.source.install(spec)
-          Bundler.ui.debug "from #{spec.loaded_from} "
-        end
-
-        Bundler.ui.info ""
-        generate_bundler_executable_stubs(spec) if Bundler.settings[:bin]
-        FileUtils.rm_rf(Bundler.tmp)
+        install_gem_from_spec(spec)
       end
 
       lock
@@ -75,6 +61,31 @@ module Bundler
     end
 
   private
+
+    def install_gem_from_spec(spec)
+      # Download the gem to get the spec, because some specs that are returned
+      # by rubygems.org are broken and wrong.
+      Bundler::Fetcher.fetch(spec) if spec.source.is_a?(Bundler::Source::Rubygems)
+
+      # Fetch the build settings, if there are any
+      settings = Bundler.settings["build.#{spec.name}"]
+      Bundler.rubygems.with_build_args [settings] do
+        spec.source.install(spec)
+        Bundler.ui.debug "from #{spec.loaded_from} "
+      end
+
+      # newline comes after installing, some gems say "with native extensions"
+      Bundler.ui.info ""
+      generate_bundler_executable_stubs(spec) if Bundler.settings[:bin]
+      FileUtils.rm_rf(Bundler.tmp)
+    rescue Exception => e
+      Bundler.ui.info ""
+      Bundler.ui.warn "#{e.class}: #{e.message}"
+      msg = "An error occured while installing #{spec.name} (#{spec.version}),"
+      msg << " and Bundler cannot continue.\nMake sure that `gem install"
+      msg << " #{spec.name} -v '#{spec.version}'` succeeds before bundling."
+      raise Bundler::InstallError, msg
+    end
 
     def generate_bundler_executable_stubs(spec)
       bin_path = Bundler.bin_path

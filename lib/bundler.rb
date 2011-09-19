@@ -3,7 +3,8 @@ require 'fileutils'
 require 'pathname'
 
 begin
-  require 'psych'
+  # Pull in Psych if we can, but not if Syck is already loaded
+  require 'psych' unless defined?(YAML)
 rescue LoadError
 end
 
@@ -39,7 +40,7 @@ module Bundler
   autoload :UI,                    'bundler/ui'
 
   class BundlerError < StandardError
-    def self.status_code(code = nil)
+    def self.status_code(code)
       define_method(:status_code) { code }
     end
   end
@@ -47,6 +48,7 @@ module Bundler
   class GemfileNotFound  < BundlerError; status_code(10) ; end
   class GemNotFound      < BundlerError; status_code(7)  ; end
   class GemfileError     < BundlerError; status_code(4)  ; end
+  class InstallError     < BundlerError; status_code(5)  ; end
   class PathError        < BundlerError; status_code(13) ; end
   class GitError         < BundlerError; status_code(11) ; end
   class DeprecatedError  < BundlerError; status_code(12) ; end
@@ -115,8 +117,7 @@ module Bundler
         unloaded = groups - @completed_groups
         # Record groups that are now loaded
         @completed_groups = groups
-        # Load any groups that are not yet loaded
-        unloaded.any? ? load.setup(*unloaded) : load
+        unloaded.any? ? load.setup(*groups) : load
       end
     end
 

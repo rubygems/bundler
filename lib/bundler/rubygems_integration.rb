@@ -185,6 +185,7 @@ module Bundler
     end
 
     def stub_source_index170(specs)
+      Gem::SourceIndex.send(:alias_method, :old_initialize, :initialize)
       Gem::SourceIndex.send(:define_method, :initialize) do |*args|
         @gems = {}
         # You're looking at this thinking: Oh! This is how I make those

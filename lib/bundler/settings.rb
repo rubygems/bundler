@@ -62,9 +62,7 @@ module Bundler
     end
 
     def without=(array)
-      unless array.empty?
-        self[:without] = array.join(":")
-      end
+      self[:without] = (array.empty? ? nil : array.join(":")) if array
     end
 
     def without
@@ -95,6 +93,7 @@ module Bundler
 
     def set_key(key, value, hash, file)
       key = key_for(key)
+      puts key.inspect
 
       unless hash[key] == value
         hash[key] = value

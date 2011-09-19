@@ -31,6 +31,13 @@ describe "Bundler::GemHelper tasks" do
       File.open(File.join(app.to_s, 'test2.gemspec'), 'w') {|f| f << ''}
       proc { Bundler::GemHelper.new(app.to_s) }.should raise_error(/Unable to determine name/)
     end
+
+    it "handles namespaces and converting to CamelCase" do
+      bundle 'gem test-foo_bar'
+      lib = bundled_app('test-foo_bar').join('lib/test-foo_bar.rb').read
+      lib.should include("module Test")
+      lib.should include("module FooBar")
+    end
   end
 
   context "gem management" do

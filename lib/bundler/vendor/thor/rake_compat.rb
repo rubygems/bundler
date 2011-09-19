@@ -1,4 +1,5 @@
 require 'rake'
+require 'rake/dsl_definition'
 
 class Thor
   # Adds a compatibility layer to your Thor classes which allows you to use
@@ -16,6 +17,8 @@ class Thor
   #   end
   #
   module RakeCompat
+    include Rake::DSL if defined?(Rake::DSL)
+
     def self.rake_classes
       @rake_classes ||= []
     end
@@ -29,12 +32,12 @@ class Thor
   end
 end
 
-class Object #:nodoc:
-  alias :rake_task :task
-  alias :rake_namespace :namespace
+# override task on (main), for compatibility with Rake 0.9
+self.instance_eval do
+  alias rake_namespace namespace
 
-  def task(*args, &block)
-    task = rake_task(*args, &block)
+  def task(*)
+    task = super
 
     if klass = Thor::RakeCompat.rake_classes.last
       non_namespaced_name = task.name.split(':').last
@@ -43,7 +46,8 @@ class Object #:nodoc:
       description << task.arg_names.map{ |n| n.to_s.upcase }.join(' ')
       description.strip!
 
-      klass.desc description, task.comment || non_namespaced_name
+      klass.desc description, Rake.application.last_description || non_namespaced_name
+      Rake.application.last_description = nil
       klass.send :define_method, non_namespaced_name do |*args|
         Rake::Task[task.name.to_sym].invoke(*args)
       end
@@ -52,7 +56,7 @@ class Object #:nodoc:
     task
   end
 
-  def namespace(name, &block)
+  def namespace(name)
     if klass = Thor::RakeCompat.rake_classes.last
       const_name = Thor::Util.camel_case(name.to_s).to_sym
       klass.const_set(const_name, Class.new(Thor))
@@ -60,7 +64,8 @@ class Object #:nodoc:
       Thor::RakeCompat.rake_classes << new_klass
     end
 
-    rake_namespace(name, &block)
+    super
     Thor::RakeCompat.rake_classes.pop
   end
 end
+
