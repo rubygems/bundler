@@ -6,9 +6,9 @@ begin
   # Pull in Psych if we can, but not if Syck is already loaded
   require 'psych' unless defined?(YAML)
 rescue LoadError
+  require 'yaml'
 end
 
-require 'yaml'
 require 'bundler/rubygems_ext'
 require 'bundler/rubygems_integration'
 require 'bundler/version'
