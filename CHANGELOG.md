@@ -1,16 +1,5 @@
 ## 1.1.pre.9 (Sep 18, 2011)
 
-Bugfixes:
-
-  - Fix `clean` to handle nested gems in a git repo (#1329)
-  - Fix conflict from revert of benchmark tool (@boffbowsh, #1355)
-  - Fix fatal error when unable to connect to gem source (#1269)
-  - Fix `outdated` to find pre-release gems that are installed. (#1359)
-  - Fix color for ui. (#1374)
-  - Fix installing to user-owned system gems on OS X
-  - Fix caching issue in the resolver (#1353, #1421)
-  - Fix :github DSL option
-
 Features:
 
   - `clean` will now clean up all old .gem and .gemspec files, cleaning up older pres
@@ -22,6 +11,17 @@ Features:
   - adds a `--paths` flag to `bundle show` to list all the paths of bundled gems (@tiegz, #1360)
   - load rubygems plugins in the bundle binary (@tpope, #1364)
   - make `--standalone` respect `--path` (@cowboyd, #1361)
+
+Bugfixes:
+
+  - Fix `clean` to handle nested gems in a git repo (#1329)
+  - Fix conflict from revert of benchmark tool (@boffbowsh, #1355)
+  - Fix fatal error when unable to connect to gem source (#1269)
+  - Fix `outdated` to find pre-release gems that are installed. (#1359)
+  - Fix color for ui. (#1374)
+  - Fix installing to user-owned system gems on OS X
+  - Fix caching issue in the resolver (#1353, #1421)
+  - Fix :github DSL option
 
 ## 1.1.pre.8 (Aug 13, 2011)
 
