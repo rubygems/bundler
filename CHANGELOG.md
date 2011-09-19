@@ -130,7 +130,6 @@ Removed:
 Features:
 
   - Rescue interrupts to `bundle` while loading bundler.rb (#1395)
-  - Pass git directory paths instead of cd'ing (@tigris, #1213)
   - Allow clearing without groups by passing `--without ''` (#1259)
 
 Bugfixes:
