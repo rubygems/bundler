@@ -4,8 +4,9 @@ require 'pathname'
 
 begin
   # Pull in Psych if we can, but not if Syck is already loaded
-  require 'psych' unless defined?(YAML)
+  require 'psych' unless defined?(::YAML)
 rescue LoadError
+ensure
   require 'yaml'
 end
 
