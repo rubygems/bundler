@@ -79,7 +79,7 @@ module Bundler
   private
 
     def ruby?
-      !mswin? && (!defined?(RUBY_ENGINE) || RUBY_ENGINE == "ruby" || RUBY_ENGINE == "rbx")
+      !mswin? && (!defined?(RUBY_ENGINE) || RUBY_ENGINE == "ruby" || RUBY_ENGINE == "rbx" || RUBY_ENGINE == "maglev")
     end
 
     def ruby_18?
@@ -108,6 +108,10 @@ module Bundler
 
     def jruby?
       defined?(RUBY_ENGINE) && RUBY_ENGINE == "jruby"
+    end
+
+    def maglev?
+      defined?(RUBY_ENGINE) && RUBY_ENGINE == "maglev"
     end
 
     def mswin?
