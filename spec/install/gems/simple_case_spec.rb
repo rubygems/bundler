@@ -471,6 +471,18 @@ describe "bundle install with gem sources" do
       out.should include "The disable-shared-gem option is no longer available"
     end
 
+    it "handles paths with regex characters in them" do
+      dir = bundled_app("bun++dle")
+      dir.mkpath
+
+      Dir.chdir(dir) do
+        bundle "install --path vendor/bundle"
+        out.should include("installed into ./vendor/bundle")
+      end
+
+      dir.rmtree
+    end
+
     ["install vendor/bundle", "install --path vendor/bundle"].each do |install|
       if install == "install vendor/bundle"
         it "displays the deprecation warning for path as an argument to install" do
