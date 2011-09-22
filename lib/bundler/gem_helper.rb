@@ -40,25 +40,25 @@ module Bundler
 
       namespace 'version' do
         namespace 'bump' do
-          desc "Bumps major version to #{bump_major}"
-          task :major do
-            update_to bump_major
+          desc "Bumps patch version to #{bump_patch}"
+          task :patch do
+            update_to(bump_patch)
           end
 
           desc "Bumps minor version to #{bump_minor}"
           task :minor do
-            update_to bump_minor
+            update_to(bump_minor)
           end
 
-          desc "Bumps patch version to #{bump_patch}"
-          task :patch do
-            update_to bump_patch
+          desc "Bumps major version to #{bump_major}"
+          task :major do
+            update_to(bump_major)
           end
         end
 
         desc "Sets version to [version]"
         task :set, :version do |t, args|
-          update_to args[:version]
+          update_to(args[:version])
         end
       end
     end
@@ -90,6 +90,34 @@ module Bundler
         git_push
         rubygem_push(built_gem_path)
       }
+    end
+
+    def bump_patch
+      major, minor, patch, build = full_version
+      [major, minor, patch + 1].compact.join '.'
+    end
+
+    def bump_minor
+      major, minor, patch, build = full_version
+      [major, minor + 1, patch && 0].compact.join '.'
+    end
+
+    def bump_major
+      major, minor, patch, build = full_version
+      [major + 1, minor && 0, patch && 0].compact.join '.'
+    end
+
+    def update_to(new_version)
+      target = File.join(base, "lib", gemspec.name, "version.rb")
+      content = File.binread(target)
+      content.gsub!(version.version, new_version)
+      File.open(target, 'wb') { |file| file.write(content) }
+      Bundler.ui.confirm "Version set to #{new_version}"
+    end
+
+    def reload_version
+      eval(File.binread(File.join(base, "lib", gemspec.name, "version.rb")), TOPLEVEL_BINDING)
+      @gemspec = Bundler.load_gemspec(@spec_path)
     end
 
     protected
@@ -175,29 +203,6 @@ module Bundler
         end
       }
       [outbuf, $?]
-    end
-
-    def bump_major
-      major, minor, patch, build = full_version
-      [major + 1, minor && 0, patch && 0].compact.join '.'
-    end
-
-    def bump_minor
-      major, minor, patch, build = full_version
-      [major, minor + 1, patch && 0].compact.join '.'
-    end
-
-    def bump_patch
-      major, minor, patch, build = full_version
-      [major, minor, patch + 1].compact.join '.'
-    end
-
-    def update_to(new_version)
-      target = File.join(Dir.pwd, "lib", gemspec.name, "version.rb")
-      content = File.binread(target)
-      content.gsub!(version.version, new_version)
-      File.open(target, 'wb') { |file| file.write(content) }
-      Bundler.ui.confirm "Version set to #{new_version}"
     end
   end
 end

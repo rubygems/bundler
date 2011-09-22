@@ -87,6 +87,7 @@ describe "Bundler::GemHelper tasks" do
         end
         proc { @helper.install_gem }.should raise_error
       end
+
     end
 
     describe 'release' do
@@ -130,6 +131,46 @@ describe "Bundler::GemHelper tasks" do
           `git commit -a -m "another commit"`
         }
         @helper.release_gem
+      end
+    end
+
+    describe 'version' do
+      before :each do
+        @app = bundled_app("test")
+        @helper = Bundler::GemHelper.new(@app.to_s)
+        @helper.reload_version
+      end
+
+      it "is correct initially" do
+        @helper.gemspec.version.version.should == '0.0.1'
+      end
+
+      it "can be set with arbirary number" do
+        mock_confirm_message "Version set to 2.3.4.rc5"
+        @helper.update_to("2.3.4.rc5")
+        @helper.reload_version
+        @helper.gemspec.version.version.should == '2.3.4.rc5'
+      end
+
+      it "bumps patch" do
+        mock_confirm_message "Version set to 0.0.2"
+        @helper.update_to(@helper.bump_patch)
+        @helper.reload_version
+        @helper.gemspec.version.version.should == '0.0.2'
+      end
+
+      it "bumps minor" do
+        mock_confirm_message "Version set to 0.1.0"
+        @helper.update_to(@helper.bump_minor)
+        @helper.reload_version
+        @helper.gemspec.version.version.should == '0.1.0'
+      end
+
+      it "bumps major" do
+        mock_confirm_message "Version set to 1.0.0"
+        @helper.update_to(@helper.bump_major)
+        @helper.reload_version
+        @helper.gemspec.version.version.should == '1.0.0'
       end
     end
   end

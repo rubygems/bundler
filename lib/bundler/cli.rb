@@ -482,7 +482,7 @@ module Bundler
       author_name = git_author_name.empty? ? "TODO: Write your name" : git_author_name
       author_email = git_author_email.empty? ? "TODO: Write your email address" : git_author_email
       FileUtils.mkdir_p(File.join(target, 'lib', name))
-      opts = {:name => name, :constant_name => constant_name, :constant_array => constant_array, :author_name => author_name, :author_email => author_email}
+      opts = {:name => name, :constant_name => constant_name, :constant_array => constant_array, :author_name => author_name, :author_email => author_email, :version => "0.0.1"}
       template(File.join("newgem/Gemfile.tt"),               File.join(target, "Gemfile"),                opts)
       template(File.join("newgem/Rakefile.tt"),              File.join(target, "Rakefile"),               opts)
       template(File.join("newgem/gitignore.tt"),             File.join(target, ".gitignore"),             opts)
