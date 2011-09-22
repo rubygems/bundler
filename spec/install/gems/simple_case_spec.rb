@@ -636,7 +636,7 @@ describe "bundle install with gem sources" do
         Fetching source index for file:#{gem_repo2}/
         Bundler could not find compatible versions for gem "bundler":
           In Gemfile:
-            bundler (= 0.9.2)
+            bundler (= 0.9.2) ruby
 
           Current Bundler version:
             bundler (#{Bundler::VERSION})
@@ -693,10 +693,10 @@ describe "bundle install with gem sources" do
         Fetching source index for file:#{gem_repo2}/
         Bundler could not find compatible versions for gem "activesupport":
           In Gemfile:
-            activemerchant depends on
-              activesupport (>= 2.0.0)
+            activemerchant (>= 0) ruby depends on
+              activesupport (>= 2.0.0) ruby
 
-            rails_fail depends on
+            rails_fail (>= 0) ruby depends on
               activesupport (1.2.3)
       E
       out.should == nice_error
@@ -713,8 +713,8 @@ describe "bundle install with gem sources" do
         Fetching source index for file:#{gem_repo2}/
         Bundler could not find compatible versions for gem "activesupport":
           In Gemfile:
-            rails_fail depends on
-              activesupport (= 1.2.3)
+            rails_fail (>= 0) ruby depends on
+              activesupport (= 1.2.3) ruby
 
             activesupport (2.3.5)
       E
