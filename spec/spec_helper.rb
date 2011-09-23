@@ -1,6 +1,13 @@
 $:.unshift File.expand_path('..', __FILE__)
 $:.unshift File.expand_path('../../lib', __FILE__)
 
+begin
+  require 'psych'
+rescue LoadError
+ensure
+  require 'yaml'
+end
+
 require 'fileutils'
 require 'rubygems'
 require 'bundler'
