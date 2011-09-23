@@ -148,6 +148,8 @@ module Bundler
       "Do not allow the Gemfile.lock to be updated after this install"
     method_option "deployment", :type => :boolean, :banner =>
       "Install using defaults tuned for deployment environments"
+    method_option "force-native", :type => :boolean, :banner =>
+      "Override the freezing behavior of --deployment or --frozen in cases where Gemfile.lock was generated on a different platform"
     def install(path = nil)
       opts = options.dup
       if opts[:without]
@@ -198,6 +200,10 @@ module Bundler
         end
 
         Bundler.settings[:frozen] = '1'
+      end
+
+      if opts['force-native'] && Definition.build(Bundler.default_gemfile, Bundler.default_lockfile, nil).new_platform?
+        Bundler.settings.delete(:frozen)
       end
 
       # When install is called with --no-deployment, disable deployment mode

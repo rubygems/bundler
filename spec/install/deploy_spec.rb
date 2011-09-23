@@ -194,4 +194,56 @@ describe "install with --deployment or --frozen" do
       should_be_installed "rack 1.0.0"
     end
   end
+
+  describe "bundling with --deployment on a plaform other than Gemfile.lock" do
+    before do
+      #TODO: make the "x86-mingw32 / x86-darwin-10" determined dynamically
+      # also, make a warning about this test not working if running on windows?
+
+      p gem_repo1
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", "1.0.0"
+        gem "platform_specific"
+      G
+
+      lockfile <<-G
+        GEM
+          remote: file:#{gem_repo1}/
+          specs:
+            rack (1.0.0)
+            platform_specific (1.0-x86-mswin32)
+
+        PLATFORMS
+          x86-mingw32
+
+        DEPENDENCIES
+          rack (1.0.0)
+          platform_specific
+      G
+    end
+
+    it "skips the gem with the wrong platform" do
+      bundle "install --deployment"
+
+      should_be_installed "rack 1.0.0"
+      should_not_be_installed "platform_specific"
+
+      vendored_gems("gems/rack-1.0.0").should exist
+    end
+
+    it "installs a native version of the gem with --force-native flag" do
+      bundle "install --deployment --force-native"
+      # bundle "install --path vendor/bundle"
+
+      puts out
+
+      should_be_installed "rack 1.0.0"
+      should_be_installed "platform_specific 1.0 x86-darwin-10"
+
+      vendored_gems("gems/rack-1.0.0").should exist
+      vendored_gems("gems/platform_specific-1.0-x86-darwin-10").should exist
+    end
+
+  end
 end
