@@ -733,22 +733,22 @@ describe "bundle install with gem sources" do
     end
   end
 
-  describe "when Gem.bindir is hardcoded to a root-owned directory" do
-    # On OS X, Gem.bindir is hardcoded to /usr/bin. :(
-    it "installs binstubs into Gem.dir+'/bin' instead" do
+  describe "when system_bindir is set" do
+    # On OS X, Gem.bindir defaults to /usr/bin, so system_bindir is useful if
+    # you want to avoid sudo installs for system gems with OS X's default ruby
+    it "overrides Gem.bindir" do
       Pathname.new("/usr/bin").should_not be_writable
-
       gemfile <<-G
         require 'rubygems'
-        def Gem.bindir(dir=Gem.dir); "/usr/bin"; end
-
+        def Gem.bindir; "/usr/bin"; end
         source "file://#{gem_repo1}"
         gem "rack"
       G
 
+      config "BUNDLE_SYSTEM_BINDIR" => system_gem_path('altbin').to_s
       bundle :install
       should_be_installed "rack 1.0.0"
-      system_gem_path("bin/rackup").should exist
+      system_gem_path("altbin/rackup").should exist
     end
   end
 

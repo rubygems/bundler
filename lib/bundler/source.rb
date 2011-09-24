@@ -86,7 +86,7 @@ module Bundler
             :ignore_dependencies => true,
             :wrappers            => true,
             :env_shebang         => true,
-            :bin_dir => "#{install_path}/bin"
+            :bin_dir             => Bundler.system_bindir
           ).install
         end
 
@@ -100,8 +100,8 @@ module Bundler
           Bundler.sudo "cp -R #{Bundler.tmp}/gems/#{spec.full_name} #{Bundler.rubygems.gem_dir}/gems/"
           Bundler.sudo "cp -R #{Bundler.tmp}/specifications/#{spec.full_name}.gemspec #{Bundler.rubygems.gem_dir}/specifications/"
           spec.executables.each do |exe|
-            Bundler.sudo "mkdir -p #{Bundler.rubygems.gem_bindir}"
-            Bundler.sudo "cp -R #{Bundler.tmp}/bin/#{exe} #{Bundler.rubygems.gem_bindir}"
+            Bundler.sudo "mkdir -p #{Bundler.system_bindir}"
+            Bundler.sudo "cp -R #{Bundler.tmp}/bin/#{exe} #{Bundler.system_bindir}"
           end
         end
 
