@@ -78,15 +78,21 @@ module Bundler
 
         Bundler.ui.info "Installing #{spec.name} (#{spec.version}) "
         path = cached_gem(spec)
-        install_path = Bundler.requires_sudo? ? Bundler.tmp : Bundler.rubygems.gem_dir
+        if Bundler.requires_sudo?
+          install_path = Bundler.tmp
+          bin_path     = install_path.join("bin")
+        else
+          install_path = Bundler.rubygems.gem_dir
+          bin_path     = Bundler.system_bindir
+        end
 
         Bundler.rubygems.preserve_paths do
           Bundler::GemInstaller.new(path,
-            :install_dir         => install_path,
+            :install_dir         => install_path.to_s,
+            :bin_dir             => bin_path.to_s,
             :ignore_dependencies => true,
             :wrappers            => true,
-            :env_shebang         => true,
-            :bin_dir             => Bundler.system_bindir
+            :env_shebang         => true
           ).install
         end
 
@@ -96,11 +102,12 @@ module Bundler
 
         # SUDO HAX
         if Bundler.requires_sudo?
-          Bundler.sudo "mkdir -p #{Bundler.rubygems.gem_dir}/gems #{Bundler.rubygems.gem_dir}/specifications"
+          Bundler.mkdir_p "#{Bundler.rubygems.gem_dir}/gems"
+          Bundler.mkdir_p "#{Bundler.rubygems.gem_dir}/specifications"
           Bundler.sudo "cp -R #{Bundler.tmp}/gems/#{spec.full_name} #{Bundler.rubygems.gem_dir}/gems/"
           Bundler.sudo "cp -R #{Bundler.tmp}/specifications/#{spec.full_name}.gemspec #{Bundler.rubygems.gem_dir}/specifications/"
           spec.executables.each do |exe|
-            Bundler.sudo "mkdir -p #{Bundler.system_bindir}"
+            Bundler.mkdir_p Bundler.system_bindir
             Bundler.sudo "cp -R #{Bundler.tmp}/bin/#{exe} #{Bundler.system_bindir}"
           end
         end

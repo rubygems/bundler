@@ -32,7 +32,7 @@ module Bundler
         Bundler.rubygems.download_gem(spec, uri, download_path)
 
         if Bundler.requires_sudo?
-          Bundler.sudo "mkdir -p #{Bundler.rubygems.gem_dir}/cache"
+          Bundler.mkdir_p "#{Bundler.rubygems.gem_dir}/cache"
           Bundler.sudo "mv #{Bundler.tmp}/cache/#{spec.full_name}.gem #{gem_path}"
         end
 
