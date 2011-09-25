@@ -221,11 +221,11 @@ module Bundler
 
     def system_bindir
       # Gem.bindir doesn't always return the location that Rubygems will install
-      # system binaries. If you add a '-n foo' option to your .gemrc, Rubygems will
+      # system binaries. If you put '-n foo' in your .gemrc, Rubygems will
       # install binstubs there instead. Unfortunately, Rubygems doesn't expose
       # that directory at all, so rather than parse .gemrc ourselves, we allow
       # the directory to be set as well, via `bundle config bindir foo`.
-      Bundler.settings[:system_bindir] || Gem.bindir
+      Bundler.settings[:system_bindir] || Bundler.rubygems.gem_bindir
     end
 
     def requires_sudo?
@@ -238,8 +238,8 @@ module Bundler
       bin_dir = bin_dir.parent until bin_dir.exist?
 
       @checked_for_sudo = true
-      can_write_gems = !File.writable?(path) || !File.writable?(bin_dir)
-      @requires_sudo = settings.allow_sudo? && can_write_gems && sudo_present
+      sudo_gems = !File.writable?(path) || !File.writable?(bin_dir)
+      @requires_sudo = settings.allow_sudo? && sudo_gems && sudo_present
     end
 
     def mkdir_p(path)
