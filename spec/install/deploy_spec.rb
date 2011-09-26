@@ -231,8 +231,8 @@ describe "install with --deployment or --frozen" do
       vendored_gems("gems/rack-1.0.0").should exist
     end
 
-    it "installs a native version of the gem with --force-native flag" do
-      bundle "install --deployment --force-native"
+    it "installs a native version of the gem with --cross-platform flag" do
+      bundle "install --deployment --cross-platform"
 
       should_be_installed "rack 1.0.0"
       should_be_installed "platform_specific 1.0 #{@native_plaform}"

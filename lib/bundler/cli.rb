@@ -147,8 +147,8 @@ module Bundler
     method_option "frozen", :type => :boolean, :banner =>
       "Do not allow the Gemfile.lock to be updated after this install"
     method_option "deployment", :type => :boolean, :banner =>
-      "Install using defaults tuned for deployment environments"
-    method_option "force-native", :type => :boolean, :banner =>
+      "Install using defaults tuned for deployment environments. Bundle with --deployment --cross-platform if your Gemfile.lock may have been generated on a different platform."
+    method_option "cross-platform", :type => :boolean, :banner =>
       "Override the freezing behavior of --deployment or --frozen in cases where Gemfile.lock was generated on a different platform"
     def install(path = nil)
       opts = options.dup
@@ -202,10 +202,6 @@ module Bundler
         Bundler.settings[:frozen] = '1'
       end
 
-      if opts['force-native'] && Definition.build(Bundler.default_gemfile, Bundler.default_lockfile, nil).new_platform?
-        Bundler.settings.delete(:frozen)
-      end
-
       # When install is called with --no-deployment, disable deployment mode
       if opts[:deployment] == false
         Bundler.settings.delete(:frozen)
@@ -221,6 +217,11 @@ module Bundler
       Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? '1' : nil
       Bundler.settings.without = opts[:without]
       Bundler.ui.be_quiet! if opts[:quiet]
+
+      # BEWARE of things that modify Bundler.settings beyond this point (Bundler.definition has already been built)
+      if opts['cross-platform'] && Bundler.definition.new_platform? 
+        Bundler.settings.delete(:frozen) #this one is ok because it's not used in the building of definition
+      end
 
       Installer.install(Bundler.root, Bundler.definition, opts)
       Bundler.load.cache if Bundler.root.join("vendor/cache").exist? && !options["no-cache"]
