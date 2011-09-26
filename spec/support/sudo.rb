@@ -1,7 +1,7 @@
 module Spec
   module Sudo
     def self.present?
-      @which_sudo ||= (`which sudo 2> /dev/null`.chomp rescue '')
+      @which_sudo ||= (`which sudo`.chomp rescue '')
       !@which_sudo.empty?
     end
 
