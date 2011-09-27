@@ -1,3 +1,14 @@
+## 1.0.20 (September 27, 2011)
+
+Features:
+
+  - Add platform :maglev (@timfel, #1444)
+
+Bugfixes:
+
+  - Ensure yaml is required even if psych is found
+  - Handle directory names that contain invalid regex characters
+
 ## 1.0.20.rc (September 18, 2011)
 
 Features:
