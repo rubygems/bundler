@@ -1,3 +1,9 @@
+## 1.1.pre.10 (Sep 27, 2011)
+
+Features:
+
+  - `config system_bindir foo` added, works like "-n foo" in your .gemrc file
+
 ## 1.1.pre.9 (Sep 18, 2011)
 
 Features:
