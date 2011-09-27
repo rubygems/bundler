@@ -491,6 +491,18 @@ describe "bundle install with gem sources" do
       should_be_installed "rack 1.0.0"
     end
 
+    it "handles paths with regex characters in them" do
+      dir = bundled_app("bun++dle")
+      dir.mkpath
+
+      Dir.chdir(dir) do
+        bundle "install --path vendor/bundle"
+        out.should include("installed into ./vendor/bundle")
+      end
+
+      dir.rmtree
+    end
+
     it "prints a warning to let the user know what has happened with bundle --path vendor/bundle" do
       bundle "install --path vendor/bundle"
       out.should include("It was installed into ./vendor")
@@ -601,7 +613,7 @@ describe "bundle install with gem sources" do
         Fetching source index for file:#{gem_repo2}/
         Bundler could not find compatible versions for gem "bundler":
           In Gemfile:
-            bundler (= 0.9.2)
+            bundler (= 0.9.2) ruby
 
           Current Bundler version:
             bundler (#{Bundler::VERSION})
@@ -658,10 +670,10 @@ describe "bundle install with gem sources" do
         Fetching source index for file:#{gem_repo2}/
         Bundler could not find compatible versions for gem "activesupport":
           In Gemfile:
-            activemerchant depends on
-              activesupport (>= 2.0.0)
+            activemerchant (>= 0) ruby depends on
+              activesupport (>= 2.0.0) ruby
 
-            rails_fail depends on
+            rails_fail (>= 0) ruby depends on
               activesupport (1.2.3)
       E
       out.should == nice_error
@@ -678,8 +690,8 @@ describe "bundle install with gem sources" do
         Fetching source index for file:#{gem_repo2}/
         Bundler could not find compatible versions for gem "activesupport":
           In Gemfile:
-            rails_fail depends on
-              activesupport (= 1.2.3)
+            rails_fail (>= 0) ruby depends on
+              activesupport (= 1.2.3) ruby
 
             activesupport (2.3.5)
       E

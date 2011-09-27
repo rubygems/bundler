@@ -179,15 +179,15 @@ module Bundler
           activated[a.name] ? 0 : gems_size(a) ]
       end
 
-      debug { "Activated:\n" + activated.values.map { |a| "  #{a.name} (#{a.version})" }.join("\n") }
-      debug { "Requirements:\n" + reqs.map { |r| "  #{r.name} (#{r.requirement})"}.join("\n") }
+      debug { "Activated:\n" + activated.values.map {|a| "  #{a}" }.join("\n") }
+      debug { "Requirements:\n" + reqs.map {|r| "  #{r}"}.join("\n") }
 
       activated = activated.dup
 
       # Pull off the first requirement so that we can resolve it
       current = reqs.shift
 
-      debug { "Attempting:\n  #{current.name} (#{current.requirement})"}
+      debug { "Attempting:\n  #{current}"}
 
       # Check if the gem has already been activated, if it has, we will make sure
       # that the currently activated gem satisfies the requirement.

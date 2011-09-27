@@ -170,7 +170,7 @@ module Bundler
     end
 
     def to_s
-      @dep.to_s
+      "#{name} (#{requirement}) #{__platform}"
     end
 
   private
