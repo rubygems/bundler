@@ -18,7 +18,7 @@ module Bundler
         if spec
           path = download_gem_from_uri(spec, uri)
           s = Bundler.rubygems.spec_from_gem(path)
-          spec.__swap__(s) if spec.is_a?(RemoteSpecification)
+          spec.__swap__(s)
         end
       end
 
