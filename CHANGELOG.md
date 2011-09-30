@@ -1,3 +1,9 @@
+## 1.0.21.rc (September 29, 2011)
+
+Bugfixes:
+
+  - Load Psych unless Syck is defined, because 1.9.2 defines YAML
+
 ## 1.0.20 (September 27, 2011)
 
 Features:
@@ -6,7 +12,7 @@ Features:
 
 Bugfixes:
 
-  - Ensure yaml is required even if psych is found
+  - Ensure YAML is required even if Psych is found
   - Handle directory names that contain invalid regex characters
 
 ## 1.0.20.rc (September 18, 2011)
