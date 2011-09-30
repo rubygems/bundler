@@ -42,6 +42,17 @@ module Bundler
       end
     end
 
+    # needed for bundle clean
+    def bindir
+      if @remote_specification
+        @remote_specification.bindir
+      elsif _local_specification
+        _local_specification.bindir
+      else
+        super
+      end
+    end
+
     def _local_specification
       eval(File.read(local_specification_path)) if @loaded_from && File.exists?(local_specification_path)
     end
