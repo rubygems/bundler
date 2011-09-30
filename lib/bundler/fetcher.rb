@@ -83,8 +83,9 @@ module Bundler
 
       query_list = gem_names - full_dependency_list
       # only display the message on the first run
-      if full_dependency_list.empty?
+   if !@fetching_first_print
         Bundler.ui.info "Fetching dependency information from the API at #{strip_user_pass_from_uri(@remote_uri)}", false
+        @fetching_first_print = true
       else
         Bundler.ui.info ".", false
       end
@@ -92,6 +93,7 @@ module Bundler
       Bundler.ui.debug "Query List: #{query_list.inspect}"
       if query_list.empty?
         Bundler.ui.info "\n"
+        @fetching_first_print = false
         return {@remote_uri => last_spec_list}
       end
 
