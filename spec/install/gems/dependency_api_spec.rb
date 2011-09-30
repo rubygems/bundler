@@ -281,4 +281,26 @@ describe "gemcutter's dependency API" do
     gembin "rackup"
     out.should == "1.0.0"
   end
+
+  it "installs the bins when using --path and uses autoclean" do
+    gemfile <<-G
+      source "#{source_uri}"
+      gem "rack"
+    G
+
+    bundle "install --path vendor/bundle", :artifice => "endpoint"
+
+    vendored_gems("bin/rackup").should exist
+  end
+
+  it "installs the bins when using --path and uses bundle clean" do
+    gemfile <<-G
+      source "#{source_uri}"
+      gem "rack"
+    G
+
+    bundle "install --path vendor/bundle --no-clean", :artifice => "endpoint"
+
+    vendored_gems("bin/rackup").should exist
+  end
 end
