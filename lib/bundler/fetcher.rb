@@ -86,12 +86,12 @@ module Bundler
       Bundler.ui.debug "Query List: #{query_list.inspect}"
 
       if query_list.empty?
+        Bundler.ui.info ""
         return {@remote_uri => last_spec_list}
       end
 
       # only display the message on the first run
       if @fetched_from[@remote_uri].nil?
-        Bundler.ui.info ""
         Bundler.ui.info "Fetching dependency information from the API at #{strip_user_pass_from_uri(@remote_uri)}", false
         @fetched_from[@remote_uri] = true
       else
