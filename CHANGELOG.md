@@ -1,3 +1,7 @@
+## 1.0.21 (September 30, 2011)
+
+  - No changes from RC
+
 ## 1.0.21.rc (September 29, 2011)
 
 Bugfixes:
