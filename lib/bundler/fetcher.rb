@@ -44,6 +44,7 @@ module Bundler
       @remote_uri = remote_uri
       @has_api    = true # will be set to false if the rubygems index is ever fetched
       @@connection ||= Net::HTTP::Persistent.new nil, :ENV
+      @fetched_from = {}
     end
 
     # fetch a gem specification
@@ -82,19 +83,19 @@ module Bundler
       return fetch_all_remote_specs if !gem_names || @remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
 
       query_list = gem_names - full_dependency_list
-      # only display the message on the first run
-   if !@fetching_first_print
-        Bundler.ui.info "Fetching dependency information from the API at #{strip_user_pass_from_uri(@remote_uri)}", false
-        @fetching_first_print = true
-      else
-        Bundler.ui.info ".", false
+      Bundler.ui.debug "Query List: #{query_list.inspect}"
+
+      if query_list.empty?
+        return {@remote_uri => last_spec_list}
       end
 
-      Bundler.ui.debug "Query List: #{query_list.inspect}"
-      if query_list.empty?
-        Bundler.ui.info "\n"
-        @fetching_first_print = false
-        return {@remote_uri => last_spec_list}
+      # only display the message on the first run
+      if @fetched_from[@remote_uri].nil?
+        Bundler.ui.info ""
+        Bundler.ui.info "Fetching dependency information from the API at #{strip_user_pass_from_uri(@remote_uri)}", false
+        @fetched_from[@remote_uri] = true
+      else
+        Bundler.ui.info ".", false
       end
 
       spec_list, deps_list = fetch_dependency_remote_specs(query_list)
