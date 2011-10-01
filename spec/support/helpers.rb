@@ -1,5 +1,11 @@
 module Spec
   module Helpers
+    def loadpath_msg
+      require 'haxx'
+    rescue LoadError => e
+      e.message.sub 'haxx', '%s'
+    end
+
     def reset!
       @in_p, @out_p, @err_p = nil, nil, nil
       Dir["#{tmp}/{gems/*,*}"].each do |dir|
