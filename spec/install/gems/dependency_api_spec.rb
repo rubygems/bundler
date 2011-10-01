@@ -289,39 +289,47 @@ describe "gemcutter's dependency API" do
     vendored_gems("bin/rackup").should exist
   end
 
-  it "passes basic authentication details and strips out creds" do
-    uri = URI.parse(source_uri)
-    uri.user = "hello"
-    uri.password = "there"
+  context "when using basic authentication" do
+    let(:user)     { "user" }
+    let(:password) { "pass" }
+    let(:basic_auth_source_uri) do
+      uri          = URI.parse(source_uri)
+      uri.user     = user
+      uri.password = password
 
-    gemfile <<-G
-      source "#{uri}"
-      gem "rack"
-    G
+      uri
+    end
 
-    bundle :install, :artifice => "endpoint_basic_authentication"
-    out.should_not include("hello:there")
-    should_be_installed "rack 1.0.0"
-  end
+    it "passes basic authentication details and strips out creds" do
+      gemfile <<-G
+        source "#{basic_auth_source_uri}"
+        gem "rack"
+      G
 
-  it "strips http basic authentication creds for modern index" do
-    gemfile <<-G
-      source "http://user:pass@localgameserver.test"
-      gem "rack"
-    G
+      bundle :install, :artifice => "endpoint_basic_authentication"
+      out.should_not include("#{user}:#{password}")
+      should_be_installed "rack 1.0.0"
+    end
 
-    bundle :install, :artifice => "endopint_marshal_fail_basic_authentication"
-    out.should_not include("user:pass")
-    should_be_installed "rack 1.0.0"
-  end
+    it "strips http basic authentication creds for modern index" do
+      gemfile <<-G
+        source "#{basic_auth_source_uri}"
+        gem "rack"
+      G
 
-  it "strips http basic auth creds when it can't reach the server" do
-    gemfile <<-G
-      source "http://user:pass@foo.com"
-      gem "rack"
-    G
+      bundle :install, :artifice => "endopint_marshal_fail_basic_authentication"
+      out.should_not include("#{user}:#{password}")
+      should_be_installed "rack 1.0.0"
+    end
 
-    bundle :install, :artifice => "endpoint_500"
-    out.should_not include("user:pass")
+    it "strips http basic auth creds when it can't reach the server" do
+      gemfile <<-G
+        source "#{basic_auth_source_uri}"
+        gem "rack"
+      G
+
+      bundle :install, :artifice => "endpoint_500"
+      out.should_not include("#{user}:#{password}")
+    end
   end
 end
