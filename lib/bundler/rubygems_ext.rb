@@ -7,6 +7,7 @@ end
 
 require 'rubygems'
 require 'rubygems/specification'
+require 'bundler/match_platform'
 
 module Gem
   @loaded_stacks = Hash.new { |h,k| h[k] = [] }
@@ -143,79 +144,10 @@ module Gem
 
     alias eql? ==
   end
-
-end
-
-module Bundler
-  class DepProxy
-
-    attr_reader :required_by, :__platform, :dep
-
-    def initialize(dep, platform)
-      @dep, @__platform, @required_by = dep, platform, []
-    end
-
-    def hash
-      @hash ||= dep.hash
-    end
-
-    def ==(o)
-      dep == o.dep && __platform == o.__platform
-    end
-
-    alias eql? ==
-
-    def type
-      @dep.type
-    end
-
-    def to_s
-      "#{name} (#{requirement}) #{__platform}"
-    end
-
-  private
-
-    def method_missing(*args)
-      @dep.send(*args)
-    end
-
-  end
-
-  module GemHelpers
-
-    GENERIC_CACHE = {}
-    GENERICS = [
-      Gem::Platform::JAVA,
-      Gem::Platform::MSWIN,
-      Gem::Platform::MINGW,
-      Gem::Platform::RUBY
-    ]
-
-    def generic(p)
-      return p if p == Gem::Platform::RUBY
-
-      GENERIC_CACHE[p] ||= begin
-        found = GENERICS.find do |p2|
-          p2.is_a?(Gem::Platform) && p.os == p2.os
-        end
-        found || Gem::Platform::RUBY
-      end
-    end
-  end
-
-  module MatchPlatform
-    include GemHelpers
-
-    def match_platform(p)
-      Gem::Platform::RUBY == platform or
-      platform.nil? or p == platform or
-      generic(Gem::Platform.new(platform)) == p
-    end
-  end
 end
 
 module Gem
   class Specification
-    include Bundler::MatchPlatform
+    include ::Bundler::MatchPlatform
   end
 end
