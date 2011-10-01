@@ -53,21 +53,6 @@ describe "gemcutter's dependency API" do
     should_be_installed "rack 1.0.0"
   end
 
-  it "passes basic authentication details" do
-    uri = URI.parse(source_uri)
-    uri.user = "hello"
-    uri.password = "there"
-
-    gemfile <<-G
-      source "#{uri}"
-      gem "rack"
-    G
-
-    bundle :install, :artifice => "endpoint_basic_authentication"
-    out.should include("Fetching dependency information from the API at #{uri}")
-    should_be_installed "rack 1.0.0"
-  end
-
   it "handles git dependencies that are in rubygems" do
     build_git "foo" do |s|
       s.executables = "foobar"
@@ -302,5 +287,41 @@ describe "gemcutter's dependency API" do
     bundle "install --path vendor/bundle --no-clean", :artifice => "endpoint"
 
     vendored_gems("bin/rackup").should exist
+  end
+
+  it "passes basic authentication details and strips out creds" do
+    uri = URI.parse(source_uri)
+    uri.user = "hello"
+    uri.password = "there"
+
+    gemfile <<-G
+      source "#{uri}"
+      gem "rack"
+    G
+
+    bundle :install, :artifice => "endpoint_basic_authentication"
+    out.should_not include("hello:there")
+    should_be_installed "rack 1.0.0"
+  end
+
+  it "strips http basic authentication creds for modern index" do
+    gemfile <<-G
+      source "http://user:pass@localgameserver.test"
+      gem "rack"
+    G
+
+    bundle :install, :artifice => "endopint_marshal_fail_basic_authentication"
+    out.should_not include("user:pass")
+    should_be_installed "rack 1.0.0"
+  end
+
+  it "strips http basic auth creds when it can't reach the server" do
+    gemfile <<-G
+      source "http://user:pass@foo.com"
+      gem "rack"
+    G
+
+    bundle :install, :artifice => "endpoint_500"
+    out.should_not include("user:pass")
   end
 end
