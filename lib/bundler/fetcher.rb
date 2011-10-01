@@ -84,7 +84,7 @@ module Bundler
       query_list = gem_names - full_dependency_list
       # only display the message on the first run
       if full_dependency_list.empty?
-        Bundler.ui.info "Fetching dependency information from the API at #{@remote_uri}", false
+        Bundler.ui.info "Fetching dependency information from the API at #{strip_user_pass_from_uri(@remote_uri)}", false
       else
         Bundler.ui.info ".", false
       end
@@ -176,7 +176,7 @@ module Bundler
     # fetch from modern index: specs.4.8.gz
     def fetch_all_remote_specs
       @has_api = false
-      Bundler.ui.info "Fetching source index for #{@remote_uri}"
+      Bundler.ui.info "Fetching source index for #{strip_user_pass_from_uri(@remote_uri)}"
       Bundler.ui.debug "Fetching modern index"
       Gem.sources = ["#{@remote_uri}"]
       spec_list = Hash.new { |h,k| h[k] = [] }
@@ -187,13 +187,21 @@ module Bundler
         begin
           Gem::SpecFetcher.new.list(false, true).each {|k, v| spec_list[k] += v }
         rescue Gem::RemoteFetcher::FetchError
-          Bundler.ui.warn "Could not fetch prerelease specs from #{@remote_uri}"
+          Bundler.ui.warn "Could not fetch prerelease specs from #{strip_user_pass_from_uri(@remote_uri)}"
         end
       rescue Gem::RemoteFetcher::FetchError
-        raise Bundler::HTTPError, "Could not reach #{@remote_uri}"
+        raise Bundler::HTTPError, "Could not reach #{strip_user_pass_from_uri(@remote_uri)}"
       end
 
       return spec_list
+    end
+
+    def strip_user_pass_from_uri(uri)
+      uri_dup = uri.dup
+      uri_dup.user = "****" if uri_dup.user
+      uri_dup.password = "****" if uri_dup.password
+
+      uri_dup
     end
   end
 end
