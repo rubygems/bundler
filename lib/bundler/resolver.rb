@@ -364,28 +364,25 @@ module Bundler
         d = dep.dep
       end
 
-      key = "#{d}-#{dep.__platform}"
-      return @deps_for[key] if @deps_for[key]
+      @deps_for[d.hash] ||= begin
+        index = @source_requirements[d.name] || @index
+        results = index.search(d, @base[d.name])
 
-      index = @source_requirements[d.name] || @index
-      results = index.search(d, @base[d.name])
-
-      if results.any?
-        version = results.first.version
-        nested  = [[]]
-        results.each do |spec|
-          if spec.version != version
-            nested << []
-            version = spec.version
+        if results.any?
+          version = results.first.version
+          nested  = [[]]
+          results.each do |spec|
+            if spec.version != version
+              nested << []
+              version = spec.version
+            end
+            nested.last << spec
           end
-          nested.last << spec
+          deps = nested.map{|a| SpecGroup.new(a) }.select{|sg| sg.for?(dep.__platform) }
+        else
+          deps = []
         end
-        deps = nested.map{|a| SpecGroup.new(a) }.select{|sg| sg.for?(dep.__platform) }
-      else
-        deps = []
       end
-
-      @deps_for[key] = deps
     end
 
     def clean_req(req)
