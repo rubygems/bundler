@@ -119,11 +119,15 @@ describe "bundle install --standalone" do
 
         require "actionpack"
         puts ACTIONPACK
-        require "spec"
+        begin
+          require "spec"
+        rescue LoadError => e
+          $stderr.puts "ZOMG LOAD ERROR" if e.message.include?("-- spec")
+        end
       RUBY
 
       out.should be == "2.3.2"
-      err.should =~ /no such file to load.*spec/
+      err.should == "ZOMG LOAD ERROR"
     end
 
     it "allows --without to limit the groups used in a standalone" do
@@ -135,11 +139,15 @@ describe "bundle install --standalone" do
 
         require "actionpack"
         puts ACTIONPACK
-        require "spec"
+        begin
+          require "spec"
+        rescue LoadError => e
+          $stderr.puts "ZOMG LOAD ERROR" if e.message.include?("-- spec")
+        end
       RUBY
 
       out.should be == "2.3.2"
-      err.should =~ /no such file to load.*spec/
+      err.should == "ZOMG LOAD ERROR"
     end
 
     it "allows --path to change the location of the standalone bundle" do
@@ -166,11 +174,15 @@ describe "bundle install --standalone" do
 
         require "actionpack"
         puts ACTIONPACK
-        require "spec"
+        begin
+          require "spec"
+        rescue LoadError => e
+          $stderr.puts "ZOMG LOAD ERROR" if e.message.include?("-- spec")
+        end
       RUBY
 
       out.should be == "2.3.2"
-      err.should =~ /no such file to load.*spec/
+      err.should == "ZOMG LOAD ERROR"
     end
   end
 

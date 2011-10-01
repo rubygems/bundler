@@ -86,10 +86,11 @@ describe "Bundler.require" do
       begin
         Bundler.require
       rescue LoadError => e
-        puts e.message
+        puts "ZOMG ERROR" if e.message.include?("-- fail")
       end
     R
-    out.should == 'no such file to load -- fail'
+
+    out.should == "ZOMG ERROR"
   end
 
   describe "using bundle exec" do
@@ -191,8 +192,14 @@ describe "Bundler.require" do
           gem "busted_require"
         G
 
-        run "Bundler.require", :expect_err => true
-        err.should include("no such file to load -- no_such_file_omg")
+        run <<-R
+          begin
+            Bundler.require
+          rescue LoadError => e
+            puts 'ZOMG ERROR' if e.message.include?("-- no_such_file_omg")
+          end
+        R
+        out.should == 'ZOMG ERROR'
       end
     end
   end
