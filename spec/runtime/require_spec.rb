@@ -82,14 +82,12 @@ describe "Bundler.require" do
       gem "two", :require => 'fail'
     G
 
-    run <<-R
-      begin
-        Bundler.require
-      rescue LoadError => e
-        puts e.message
-      end
-    R
-    out.should == 'no such file to load -- fail'
+    Process.waitpid fork {
+      Bundler.setup
+      lambda { Bundler.require }.should raise_error(LoadError)
+    }
+
+    $?.should be_success
   end
 
   describe "using bundle exec" do

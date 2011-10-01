@@ -18,12 +18,12 @@ describe "bundle install with gem sources" do
         should_be_installed "rack 1.0.0"
       end
 
-      it "installs gems in a group block into that group" do
+      fit "installs gems in a group block into that group" do
         should_be_installed "activesupport 2.3.5"
 
         run("require 'activesupport'; puts ACTIVESUPPORT",
           :default, :expect_err => true)
-        @err.should =~ /no such file to load -- activesupport/
+        @err.should =~ /#{loadpath_msg % "activesupport"}/
       end
 
       it "installs gems with inline :groups into those groups" do
