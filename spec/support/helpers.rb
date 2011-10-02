@@ -35,6 +35,19 @@ module Spec
       @out = ruby(setup + cmd, :expect_err => expect_err, :env => env)
     end
 
+    def load_error_run(ruby, gem, *args)
+      cmd = <<-R
+        begin
+          #{ruby}
+        rescue LoadError => e
+          $stderr.puts "ZOMG LOAD ERROR" if e.message.include?("-- #{gem}")
+        end
+      R
+      opts = args.last.is_a?(Hash) ? args.pop : {}
+      opts.merge!(:expect_err => true)
+      run(cmd, *args, opts)
+    end
+
     def lib
       File.expand_path('../../../lib', __FILE__)
     end
@@ -71,6 +84,17 @@ module Spec
       ruby.gsub!(/["`\$]/) {|m| "\\#{m}" }
       lib_option = options[:no_lib] ? "" : " -I#{lib}"
       sys_exec(%{#{env}#{Gem.ruby}#{lib_option} -e "#{ruby}"}, expect_err)
+    end
+
+    def load_error_ruby(ruby, gem, opts = {})
+      cmd = <<-R
+        begin
+          #{ruby}
+        rescue LoadError => e
+          $stderr.puts "ZOMG LOAD ERROR"# if e.message.include?("-- #{gem}")
+        end
+      R
+      ruby(cmd, opts.merge(:expect_err => true))
     end
 
     def gembin(cmd)

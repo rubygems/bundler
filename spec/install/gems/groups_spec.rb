@@ -21,13 +21,9 @@ describe "bundle install with gem sources" do
       it "installs gems in a group block into that group" do
         should_be_installed "activesupport 2.3.5"
 
-        run <<-R, :default, :expect_err => true
-          begin
-            require 'activesupport'
-            puts ACTIVESUPPORT
-          rescue LoadError => e
-            $stderr.puts "ZOMG LOAD ERROR" if e.message.include?("-- activesupport")
-          end
+        load_error_run <<-R, 'activesupport', :default
+          require 'activesupport'
+          puts ACTIVESUPPORT
         R
 
         err.should == "ZOMG LOAD ERROR"
@@ -36,13 +32,9 @@ describe "bundle install with gem sources" do
       it "installs gems with inline :groups into those groups" do
         should_be_installed "thin 1.0"
 
-        run <<-R, :default, :expect_err => true
-          begin
-            require 'thin'
-            puts THIN
-          rescue LoadError => e
-            $stderr.puts "ZOMG LOAD ERROR" if e.message.include?("-- thin")
-          end
+        load_error_run <<-R, 'thin', :default
+          require 'thin'
+          puts THIN
         R
 
         err.should == "ZOMG LOAD ERROR"
@@ -60,14 +52,10 @@ describe "bundle install with gem sources" do
       end
 
       it "removes old groups when new groups are set up" do
-        run <<-RUBY, :emo, :expect_err => true
+        load_error_run <<-RUBY, 'thin', :emo
           Bundler.setup(:default)
-          begin
-            require 'thin'
-            puts THIN
-          rescue LoadError => e
-            $stderr.puts "ZOMG LOAD ERROR" if e.message.include?("-- thin")
-          end
+          require 'thin'
+          puts THIN
         RUBY
 
         err.should == "ZOMG LOAD ERROR"

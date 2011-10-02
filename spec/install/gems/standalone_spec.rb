@@ -113,17 +113,13 @@ describe "bundle install --standalone" do
     it "allows creating a standalone file with limited groups" do
       bundle "install --standalone default"
 
-      ruby <<-RUBY, :no_lib => true, :expect_err => true
+      load_error_ruby <<-RUBY, 'spec', :no_lib => true
         $:.unshift File.expand_path("bundle")
         require "bundler/setup"
 
         require "actionpack"
         puts ACTIONPACK
-        begin
-          require "spec"
-        rescue LoadError => e
-          $stderr.puts "ZOMG LOAD ERROR" if e.message.include?("-- spec")
-        end
+        require "spec"
       RUBY
 
       out.should be == "2.3.2"
@@ -133,17 +129,13 @@ describe "bundle install --standalone" do
     it "allows --without to limit the groups used in a standalone" do
       bundle "install --standalone --without test"
 
-      ruby <<-RUBY, :no_lib => true, :expect_err => true
+      load_error_ruby <<-RUBY, 'spec', :no_lib => true
         $:.unshift File.expand_path("bundle")
         require "bundler/setup"
 
         require "actionpack"
         puts ACTIONPACK
-        begin
-          require "spec"
-        rescue LoadError => e
-          $stderr.puts "ZOMG LOAD ERROR" if e.message.include?("-- spec")
-        end
+        require "spec"
       RUBY
 
       out.should be == "2.3.2"
@@ -168,17 +160,13 @@ describe "bundle install --standalone" do
       bundle "install --without test"
       bundle "install --standalone"
 
-      ruby <<-RUBY, :no_lib => true, :expect_err => true
+      load_error_ruby <<-RUBY, 'spec', :no_lib => true
         $:.unshift File.expand_path("bundle")
         require "bundler/setup"
 
         require "actionpack"
         puts ACTIONPACK
-        begin
-          require "spec"
-        rescue LoadError => e
-          $stderr.puts "ZOMG LOAD ERROR" if e.message.include?("-- spec")
-        end
+        require "spec"
       RUBY
 
       out.should be == "2.3.2"
