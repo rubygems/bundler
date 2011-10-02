@@ -56,7 +56,10 @@ This defaults to the name of the gem itself. For instance, these are identical:
     gem "nokogiri", :require => "nokogiri"
 
 Specify `:require => false` to prevent bundler from requiring the gem, but still
-install it and maintain dependencies.
+install it and maintain dependencies. And `:require` also accepts an array for
+_gems_ with several files to require.
+
+    gem "redis", :require => ["redis/connection/hiredis", "redis"]
 
 ### GROUPS (:group or :groups)
 
