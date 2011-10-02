@@ -45,21 +45,18 @@ Each _gem_ `MAY` have one or more version specifiers.
 
 ### REQUIRE AS (:require)
 
-Each _gem_ `MAY` specify its main file, which should be used when autorequiring
-(`Bundler.require`).
+Each _gem_ `MAY` specify files that should be used when autorequiring via
+`Bundler.require`. You may pass an array with multiple files, or `false` to
+prevent any file from being autorequired.
 
     gem "sqlite3-ruby", :require => "sqlite3"
+    gem "redis", :require => ["redis/connection/hiredis", "redis"]
+    gem "webmock", :require => false
 
-This defaults to the name of the gem itself. For instance, these are identical:
+The argument defaults to the name of the gem. For example, these are identical:
 
     gem "nokogiri"
     gem "nokogiri", :require => "nokogiri"
-
-Specify `:require => false` to prevent bundler from requiring the gem, but still
-install it and maintain dependencies. And `:require` also accepts an array for
-_gems_ with several files to require.
-
-    gem "redis", :require => ["redis/connection/hiredis", "redis"]
 
 ### GROUPS (:group or :groups)
 
