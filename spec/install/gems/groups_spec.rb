@@ -21,16 +21,23 @@ describe "bundle install with gem sources" do
       it "installs gems in a group block into that group" do
         should_be_installed "activesupport 2.3.5"
 
-        run("require 'activesupport'; puts ACTIVESUPPORT",
-          :default, :expect_err => true)
-        @err.should =~ /no such file to load -- activesupport/
+        load_error_run <<-R, 'activesupport', :default
+          require 'activesupport'
+          puts ACTIVESUPPORT
+        R
+
+        err.should == "ZOMG LOAD ERROR"
       end
 
       it "installs gems with inline :groups into those groups" do
         should_be_installed "thin 1.0"
 
-        run("require 'thin'; puts THIN", :default, :expect_err => true)
-        @err.should =~ /no such file to load -- thin/
+        load_error_run <<-R, 'thin', :default
+          require 'thin'
+          puts THIN
+        R
+
+        err.should == "ZOMG LOAD ERROR"
       end
 
       it "sets up everything if Bundler.setup is used with no groups" do
@@ -45,11 +52,13 @@ describe "bundle install with gem sources" do
       end
 
       it "removes old groups when new groups are set up" do
-        run <<-RUBY, :emo, :expect_err => true
+        load_error_run <<-RUBY, 'thin', :emo
           Bundler.setup(:default)
-          require 'thin'; puts THIN
+          require 'thin'
+          puts THIN
         RUBY
-        @err.should =~ /no such file to load -- thin/i
+
+        err.should == "ZOMG LOAD ERROR"
       end
 
       it "sets up old groups when they have previously been removed" do
