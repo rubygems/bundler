@@ -130,7 +130,7 @@ module Bundler
     end
 
     def search_by_dependency(dependency, base = nil)
-      @cache[dependency.hash] ||= begin
+      @cache[dependency.hash^base.hash] ||= begin
         specs = specs_by_name(dependency.name) + (base || [])
         found = specs.select do |spec|
           if base # allow all platforms when searching from a lockfile

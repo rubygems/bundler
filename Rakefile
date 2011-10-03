@@ -34,6 +34,13 @@ begin
       rm_rf 'tmp'
     end
 
+    desc "Run the real-world spec suite (reequires internet)"
+    task :realworld => ["set_realworld", "spec"]
+
+    task :set_realworld do
+      ENV['BUNDLER_REALWORLD_TESTS'] = '1'
+    end
+
     desc "Run the spec suite with the sudo tests"
     task :sudo => ["set_sudo", "spec", "clean_sudo"]
 
@@ -59,6 +66,7 @@ begin
         # Create tasks like spec:rubygems:v1.8.3:sudo to run the sudo specs
         namespace rg do
           task :sudo => ["set_sudo", rg, "clean_sudo"]
+          task :realworld => ["set_realworld", rg]
         end
 
         task "clone_rubygems_#{rg}" do
@@ -97,7 +105,7 @@ begin
     end
 
     desc "Run the tests on Travis CI against a rubygem version (using ENV['RGV'])"
-    task "travis" do
+    task :travis do
       rg = ENV['RGV'] || 'master'
 
       puts "\n\e[1;33m[Travis CI] Running bundler specs against rubygems #{rg}\e[m\n\n"
@@ -108,7 +116,12 @@ begin
       puts "\n\e[1;33m[Travis CI] Running bundler sudo specs against rubygems #{rg}\e[m\n\n"
       sudos = safe_task { Rake::Task["spec:rubygems:#{rg}:sudo"].invoke }
 
-      unless specs && sudos
+      Rake::Task["spec:rubygems:#{rg}"].reenable
+
+      puts "\n\e[1;33m[Travis CI] Running bundler real world specs against rubygems #{rg}\e[m\n\n"
+      realworld = safe_task { Rake::Task["spec:rubygems:#{rg}:realworld"].invoke }
+
+      unless specs && sudos && realworld
         fail "Bundler tests failed, please review the log for more information"
       end
     end
