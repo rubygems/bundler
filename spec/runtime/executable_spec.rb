@@ -36,6 +36,16 @@ describe "Running bin/* commands" do
     out.should == "1.0.0"
   end
 
+  it "uses the default ruby install name when shebang is not specified" do
+   bundle "install --binstubs"
+   File.open("bin/rackup").gets.should == "#!/usr/bin/env #{RbConfig::CONFIG['ruby_install_name']}\n"
+  end
+
+  it "allows the name of the shebang executable to be specified" do
+    bundle "install --binstubs --shebang ruby-foo"
+    File.open("bin/rackup").gets.should == "#!/usr/bin/env ruby-foo\n"
+  end
+
   it "runs the bundled command when out of the bundle" do
     bundle "install --binstubs"
 

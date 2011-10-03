@@ -142,6 +142,8 @@ module Bundler
       "Do not attempt to fetch gems remotely and use the gem cache instead"
     method_option "binstubs", :type => :string, :lazy_default => "bin", :banner =>
       "Generate bin stubs for bundled gems to ./bin"
+    method_option "shebang", :type => :string, :banner =>
+      "Specify a different shebang executable name than the default (usually 'ruby')"
     method_option "path", :type => :string, :banner =>
       "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
     method_option "system", :type => :boolean, :banner =>
@@ -204,6 +206,7 @@ module Bundler
       Bundler.settings[:path]   = opts[:path] if opts[:path]
       Bundler.settings[:path] ||= "bundle" if opts[:standalone]
       Bundler.settings[:bin]    = opts["binstubs"] if opts[:binstubs]
+      Bundler.settings[:shebang] = opts["shebang"] if opts[:shebang]
       Bundler.settings[:no_prune] = true if opts["no-prune"]
       Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? '1' : nil
       Bundler.settings.without = opts[:without]
