@@ -96,31 +96,6 @@ begin
       task "rubygems:all" => "co"
     end
 
-    namespace :ruby do
-      # Ruby 1.8.6, 1.8.7, and 1.9.2 specs
-      task "ensure_rvm" do
-        raise "RVM is not available" unless File.exist?(File.expand_path("~/.rvm/scripts/rvm"))
-      end
-
-      %w(1.8.6-p420 1.8.7-p334 1.9.2-p180).each do |ruby|
-        ruby_cmd = File.expand_path("~/.rvm/bin/ruby-#{ruby}")
-
-        desc "Run specs on Ruby #{ruby}"
-        RSpec::Core::RakeTask.new(ruby) do |t|
-          t.rspec_opts = %w(-fs --color)
-          t.ruby_opts  = %w(-w)
-        end
-
-        task "ensure_ruby_#{ruby}" do
-          raise "Could not find Ruby #{ruby} at #{ruby_cmd}" unless File.exist?(ruby_cmd)
-        end
-
-        task "ensure_ruby_#{ruby}" => "ensure_rvm"
-        task ruby => "ensure_ruby_#{ruby}"
-        task "ruby:all" => ruby
-      end
-    end
-
     desc "Run the tests on Travis CI against a rubygem version (using ENV['RGV'])"
     task "travis" do
       rg = ENV['RGV'] || 'master'
