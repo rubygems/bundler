@@ -45,7 +45,8 @@ module Spec
       R
       opts = args.last.is_a?(Hash) ? args.pop : {}
       opts.merge!(:expect_err => true)
-      run(cmd, *args, opts)
+      args += [opts]
+      run(cmd, *args)
     end
 
     def lib
