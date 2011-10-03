@@ -100,11 +100,14 @@ module Bundler
 
       fetch_remote_specs(deps_list, full_dependency_list + returned_gems, spec_list + last_spec_list)
     # fall back to the legacy index in the following cases
-    # 1.) Gemcutter Endpoint doesn't return a 200
-    # 2.) Marshal blob doesn't load properly
+    # 1. Gemcutter Endpoint doesn't return a 200
+    # 2. Marshal blob doesn't load properly
+    # 3. One of the YAML gemspecs has the Syck::DefaultKey problem
     rescue HTTPError, TypeError => e
-      Bundler.ui.info "\nError using the API"
-      Bundler.ui.debug "Error #{e.class} from Gemcutter Dependency Endpoint API: #{e.message}"
+      if @remote_uri.to_s.include?("rubygems.org")
+        Bundler.ui.info "\nError #{e.class} during request to dependency API"
+      end
+      Bundler.ui.debug "Error #{e.class} from gem server dependency API: #{e.message}"
       Bundler.ui.debug e.backtrace
       fetch_all_remote_specs
     end
