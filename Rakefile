@@ -34,6 +34,13 @@ begin
       rm_rf 'tmp'
     end
 
+    desc "Run the real-world spec suite (reequires internet)"
+    task :realworld => ["set_realworld", "spec"]
+
+    task :set_realworld do
+      ENV['BUNDLER_REALWORLD_TESTS'] = '1'
+    end
+
     desc "Run the spec suite with the sudo tests"
     task :sudo => ["set_sudo", "spec", "clean_sudo"]
 
