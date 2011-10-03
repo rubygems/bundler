@@ -610,7 +610,7 @@ describe "bundle install with gem sources" do
       G
 
       nice_error = <<-E.strip.gsub(/^ {8}/, '')
-        Fetching source index for file:#{gem_repo2}/
+        Fetching source index from file:#{gem_repo2}/
         Bundler could not find compatible versions for gem "bundler":
           In Gemfile:
             bundler (= 0.9.2) ruby
@@ -667,7 +667,7 @@ describe "bundle install with gem sources" do
       G
 
       nice_error = <<-E.strip.gsub(/^ {8}/, '')
-        Fetching source index for file:#{gem_repo2}/
+        Fetching source index from file:#{gem_repo2}/
         Bundler could not find compatible versions for gem "activesupport":
           In Gemfile:
             activemerchant (>= 0) ruby depends on
@@ -687,7 +687,7 @@ describe "bundle install with gem sources" do
       G
 
       nice_error = <<-E.strip.gsub(/^ {8}/, '')
-        Fetching source index for file:#{gem_repo2}/
+        Fetching source index from file:#{gem_repo2}/
         Bundler could not find compatible versions for gem "activesupport":
           In Gemfile:
             rails_fail (>= 0) ruby depends on

@@ -17,7 +17,7 @@ module Bundler
     def confirm(message, newline = nil)
     end
 
-    def debugging?
+    def debug?
       false
     end
 
@@ -50,8 +50,9 @@ module Bundler
         @quiet = true
       end
 
-      def debugging?
-        @debug && !@quiet
+      def debug?
+        # needs to be false instead of nil to be newline param to other methods
+        !!@debug && !@quiet
       end
 
       def debug!
@@ -59,7 +60,7 @@ module Bundler
       end
 
       def debug(msg, newline = nil)
-        tell_me(msg, nil, newline) if debugging?
+        tell_me(msg, nil, newline) if debug?
       end
 
       private

@@ -61,7 +61,36 @@ module Bundler
     def specs(gem_names, source)
       index = Index.new
 
-      fetch_remote_specs(gem_names)[@remote_uri].each do |name, version, platform, dependencies|
+      if !gem_names || @remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
+        Bundler.ui.info "Fetching source index from #{strip_user_pass_from_uri(@remote_uri)}"
+        specs = fetch_all_remote_specs
+      else
+        Bundler.ui.info "Fetching gem metadata from #{strip_user_pass_from_uri(@remote_uri)}", Bundler.ui.debug?
+        begin
+          specs = fetch_remote_specs(gem_names)
+        # fall back to the legacy index in the following cases
+        # 1. Gemcutter Endpoint doesn't return a 200
+        # 2. Marshal blob doesn't load properly
+        # 3. One of the YAML gemspecs has the Syck::DefaultKey problem
+        rescue HTTPError, TypeError => e
+          # new line now that the dots are over
+          Bundler.ui.info "" unless Bundler.ui.debug?
+
+          if @remote_uri.to_s.include?("rubygems.org")
+            Bundler.ui.info "Error #{e.class} during request to dependency API"
+          end
+          Bundler.ui.debug e.message
+          Bundler.ui.debug e.backtrace
+
+          Bundler.ui.info "Fetching full source index from #{strip_user_pass_from_uri(@remote_uri)}"
+          specs = fetch_all_remote_specs
+        else
+          # new line now that the dots are over
+          Bundler.ui.info "" unless Bundler.ui.debug?
+        end
+      end
+
+      specs[@remote_uri].each do |name, version, platform, dependencies|
         next if name == 'bundler'
         spec = nil
         if dependencies
@@ -79,39 +108,21 @@ module Bundler
 
     # fetch index
     def fetch_remote_specs(gem_names, full_dependency_list = [], last_spec_list = [])
-      return fetch_all_remote_specs if !gem_names || @remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
-
       query_list = gem_names - full_dependency_list
+
       # only display the message on the first run
-      if full_dependency_list.empty?
-        Bundler.ui.info "Fetching dependency information from the API at #{strip_user_pass_from_uri(@remote_uri)}", false
+      if Bundler.ui.debug?
+        Bundler.ui.debug "Query List: #{query_list.inspect}"
       else
         Bundler.ui.info ".", false
       end
 
-      Bundler.ui.debug "Query List: #{query_list.inspect}"
-      if query_list.empty?
-        Bundler.ui.info "\n"
-        return {@remote_uri => last_spec_list}
-      end
+      return {@remote_uri => last_spec_list} if query_list.empty?
 
       spec_list, deps_list = fetch_dependency_remote_specs(query_list)
       returned_gems = spec_list.map {|spec| spec.first }.uniq
 
       fetch_remote_specs(deps_list, full_dependency_list + returned_gems, spec_list + last_spec_list)
-    # fall back to the legacy index in the following cases
-    # 1. Gemcutter Endpoint doesn't return a 200
-    # 2. Marshal blob doesn't load properly
-    # 3. One of the YAML gemspecs has the Syck::DefaultKey problem
-    rescue HTTPError, TypeError => e
-      if @remote_uri.to_s.include?("rubygems.org")
-        Bundler.ui.info "\nError #{e.class} during request to dependency API"
-      else
-        Bundler.ui.info "" # need a newline since we're done fetching
-      end
-      Bundler.ui.debug "Error #{e.class} from gem server dependency API: #{e.message}"
-      Bundler.ui.debug e.backtrace
-      fetch_all_remote_specs
     end
 
   private
@@ -181,8 +192,6 @@ module Bundler
     # fetch from modern index: specs.4.8.gz
     def fetch_all_remote_specs
       @has_api = false
-      Bundler.ui.info "Fetching source index for #{strip_user_pass_from_uri(@remote_uri)}"
-      Bundler.ui.debug "Fetching modern index"
       Gem.sources = ["#{@remote_uri}"]
       spec_list = Hash.new { |h,k| h[k] = [] }
       begin
@@ -192,7 +201,7 @@ module Bundler
         begin
           Gem::SpecFetcher.new.list(false, true).each {|k, v| spec_list[k] += v }
         rescue Gem::RemoteFetcher::FetchError
-          Bundler.ui.warn "Could not fetch prerelease specs from #{strip_user_pass_from_uri(@remote_uri)}"
+          Bundler.ui.debug "Could not fetch prerelease specs from #{strip_user_pass_from_uri(@remote_uri)}"
         end
       rescue Gem::RemoteFetcher::FetchError
         raise Bundler::HTTPError, "Could not reach #{strip_user_pass_from_uri(@remote_uri)}"
