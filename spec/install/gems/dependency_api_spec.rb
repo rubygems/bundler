@@ -194,8 +194,8 @@ describe "gemcutter's dependency API" do
     bundle :install, :artifice => "endpoint_extra"
 
     output = <<OUTPUT
-Fetching dependency information from the API at http://localgemserver.test/.
-Fetching dependency information from the API at http://localgemserver.test/extra/
+Fetching gem metadata from http://localgemserver.test/..
+Fetching gem metadata from http://localgemserver.test/extra/.
 OUTPUT
     out.should include(output)
   end
