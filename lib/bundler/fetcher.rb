@@ -62,13 +62,32 @@ module Bundler
       index = Index.new
 
       if !gem_names || @remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
-        Bundler.ui.info "Fetching source index for #{strip_user_pass_from_uri(@remote_uri)}"
+        Bundler.ui.info "Fetching source index from #{strip_user_pass_from_uri(@remote_uri)}"
         specs = fetch_all_remote_specs
       else
         Bundler.ui.info "Fetching gem metadata from #{strip_user_pass_from_uri(@remote_uri)}", Bundler.ui.debug?
-        specs = fetch_remote_specs(gem_names)
-        # new line now that the dots are over
-        Bundler.ui.info "" unless Bundler.ui.debug?
+        begin
+          specs = fetch_remote_specs(gem_names)
+        # fall back to the legacy index in the following cases
+        # 1. Gemcutter Endpoint doesn't return a 200
+        # 2. Marshal blob doesn't load properly
+        # 3. One of the YAML gemspecs has the Syck::DefaultKey problem
+        rescue HTTPError, TypeError => e
+          # new line now that the dots are over
+          Bundler.ui.info "" unless Bundler.ui.debug?
+
+          if @remote_uri.to_s.include?("rubygems.org")
+            Bundler.ui.info "Error #{e.class} during request to dependency API"
+          end
+          Bundler.ui.debug e.message
+          Bundler.ui.debug e.backtrace
+
+          Bundler.ui.info "Fetching full source index from #{strip_user_pass_from_uri(@remote_uri)}"
+          specs = fetch_all_remote_specs
+        else
+          # new line now that the dots are over
+          Bundler.ui.info "" unless Bundler.ui.debug?
+        end
       end
 
       specs[@remote_uri].each do |name, version, platform, dependencies|
@@ -104,19 +123,6 @@ module Bundler
       returned_gems = spec_list.map {|spec| spec.first }.uniq
 
       fetch_remote_specs(deps_list, full_dependency_list + returned_gems, spec_list + last_spec_list)
-    # fall back to the legacy index in the following cases
-    # 1. Gemcutter Endpoint doesn't return a 200
-    # 2. Marshal blob doesn't load properly
-    # 3. One of the YAML gemspecs has the Syck::DefaultKey problem
-    rescue HTTPError, TypeError => e
-      if @remote_uri.to_s.include?("rubygems.org")
-        Bundler.ui.info "\nError #{e.class} during request to dependency API"
-      else
-        Bundler.ui.info "" # need a newline since we're done fetching
-      end
-      Bundler.ui.debug "Error #{e.class} from gem server dependency API: #{e.message}"
-      Bundler.ui.debug e.backtrace
-      fetch_all_remote_specs
     end
 
   private

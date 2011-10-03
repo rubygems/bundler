@@ -10,7 +10,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :artifice => "endpoint"
-    out.should include("Fetching dependency information from the API at #{source_uri}")
+    out.should include("Fetching gem metadata from #{source_uri}")
     should_be_installed "rack 1.0.0"
   end
 
@@ -21,7 +21,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :artifice => "endpoint"
-    out.should include("Fetching dependency information from the API at #{source_uri}/...")
+    out.should include("Fetching gem metadata from #{source_uri}/...")
     should_be_installed(
       "rails 2.3.2",
       "actionpack 2.3.2",
@@ -49,7 +49,7 @@ describe "gemcutter's dependency API" do
     bundle :install, :artifice => "endpoint"
 
     bundle "install --deployment", :artifice => "endpoint"
-    out.should include("Fetching dependency information from the API at #{source_uri}")
+    out.should include("Fetching gem metadata from #{source_uri}")
     should_be_installed "rack 1.0.0"
   end
 
@@ -98,7 +98,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :fakeweb => "windows"
-    out.should include("\nFetching source index for #{source_uri}")
+    out.should include("\nFetching full source index from #{source_uri}")
     should_be_installed "rcov 1.0.0"
   end
 
@@ -114,7 +114,7 @@ describe "gemcutter's dependency API" do
       gem "rails"
     G
     bundle :install, :artifice => "endpoint_fallback"
-    out.should include("\nFetching source index for #{source_uri}")
+    out.should include("\nFetching full source index from #{source_uri}")
 
     should_be_installed(
       "activesupport 2.3.2",
@@ -134,7 +134,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :artifice => "endpoint_marshal_fail"
-    out.should include("\nFetching source index for #{source_uri}")
+    out.should include("\nFetching full source index from #{source_uri}")
     should_be_installed "rack 1.0.0"
   end
 
@@ -155,7 +155,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle "install --full-index", :artifice => "endpoint"
-    out.should include("Fetching source index for #{source_uri}")
+    out.should include("Fetching source index from #{source_uri}")
     should_be_installed "rack 1.0.0"
   end
 
@@ -263,7 +263,7 @@ OUTPUT
     G
 
     bundle :install, :artifice => "endpoint"
-    out.scan(/Fetching dependency information from the API/).size.should == 1
+    out.should include("Fetching gem metadata from #{source_uri}")
   end
 
   it "should install when EndpointSpecification with a bin dir owned by root", :sudo => true do
