@@ -106,6 +106,8 @@ module Bundler
     rescue HTTPError, TypeError => e
       if @remote_uri.to_s.include?("rubygems.org")
         Bundler.ui.info "\nError #{e.class} during request to dependency API"
+      else
+        Bundler.ui.info "" # need a newline since we're done fetching
       end
       Bundler.ui.debug "Error #{e.class} from gem server dependency API: #{e.message}"
       Bundler.ui.debug e.backtrace

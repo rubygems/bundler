@@ -98,7 +98,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :fakeweb => "windows"
-    out.should include("\nError using the API\nFetching source index for #{source_uri}")
+    out.should include("\nFetching source index for #{source_uri}")
     should_be_installed "rcov 1.0.0"
   end
 
@@ -114,7 +114,7 @@ describe "gemcutter's dependency API" do
       gem "rails"
     G
     bundle :install, :artifice => "endpoint_fallback"
-    out.should include("\nError using the API\nFetching source index for #{source_uri}")
+    out.should include("\nFetching source index for #{source_uri}")
 
     should_be_installed(
       "activesupport 2.3.2",
@@ -134,7 +134,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :artifice => "endpoint_marshal_fail"
-    out.should include("\nError using the API\nFetching source index for #{source_uri}")
+    out.should include("\nFetching source index for #{source_uri}")
     should_be_installed "rack 1.0.0"
   end
 
