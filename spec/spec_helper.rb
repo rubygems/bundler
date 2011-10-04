@@ -53,6 +53,12 @@ RSpec.configure do |config|
     config.filter_run_excluding :sudo => true
   end
 
+  if ENV['BUNDLER_REALWORLD_TESTS']
+    config.filter_run :realworld => true
+  else
+    config.filter_run_excluding :realworld => true
+  end
+
   config.filter_run :focused => true unless ENV['CI']
   config.run_all_when_everything_filtered = true
   config.alias_example_to :fit, :focused => true
