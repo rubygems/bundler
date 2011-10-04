@@ -1,3 +1,22 @@
+## 1.1.rc1 (Oct 3, 2011)
+
+Features:
+
+  - add `--shebang` option to bundle install (@bensie, #1467)
+  - build passes on ruby 1.9.3rc1 (#1458, #1469)
+  - hide basic auth credentials for custom sources (#1440, #1463)
+
+Bugfixes:
+
+  - fix index search result caching (#1446, #1466)
+  - fix fetcher prints multiple times during install (#1445, #1462)
+  - don't mention API errors from non-rubygems.org sources
+  - fix autoclean so it doesn't remove bins that are used (#1459, #1460)
+
+Documentation:
+
+  - add :require => [...] to the gemfile(5) manpage (@nono, #1468)
+
 ## 1.1.pre.10 (Sep 27, 2011)
 
 Features:
