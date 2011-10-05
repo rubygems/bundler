@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
+require 'bundler'
 begin
-  require 'bundler'
   # Check if an older version of bundler is installed
   $:.each do |path|
     if path =~ %r'/bundler-0.(\d+)' && $1.to_i < 9
