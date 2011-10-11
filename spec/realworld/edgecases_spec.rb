@@ -9,4 +9,14 @@ describe "real world edgecases", :realworld => true do
       err.should eq("")
     end
   end
+
+  # https://github.com/carlhuda/bundler/issues/1202
+  it "bundle cache works with rubygems 1.3.7 and pre gems" do
+    install_gemfile <<-G
+      source :rubygems
+      gem "rack", "1.3.0.beta2"
+    G
+    bundle :cache
+    out.should_not include("Removing outdated .gem files from vendor/cache")
+  end
 end
