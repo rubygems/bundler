@@ -255,14 +255,9 @@ module Bundler
     # by monkeypatching it into the method in Rubygems 1.3.6 and 1.3.7.
     def backport_segment_generation
       Gem::Version.send(:define_method, :segments) do
-        @segments_generated ||= false
-        unless @segments_generated
-          @segments ||= @version.scan(/[0-9a-z]+/i).map do |s|
-            /^\d+$/ =~ s ? s.to_i : s
-          end
+        @segments ||= @version.scan(/[0-9]+|[a-z]+/i).map do |s|
+          /^\d+$/ =~ s ? s.to_i : s
         end
-        @segments_generated = true
-        @segments
       end
     end
 
