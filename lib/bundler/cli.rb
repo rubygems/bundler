@@ -612,13 +612,19 @@ module Bundler
     def readme(name)
       gem_path = locate_gem(name)
       file = Dir.glob(File.join(gem_path, "{README,readme,Readme,ReadMe}*")).first
-      if file
-        command = "less #{file}"
-        success = system(command)
-        Bundler.ui.info "Could not run '#{command}'" unless success
-      else
-        Bundler.ui.info "No README found for '#{name}'" 
-      end
+
+      Bundler.ui.info "No README found for '#{name}'" unless show_file(file)
+    end
+
+    desc "changelog GEM", "Prints the changelog of the given bundled gem"
+    def changelog(name)
+      gem_path = locate_gem(name)
+
+      file = Dir.glob(File.join(gem_path, "*")).select do |f|
+        File.file?(f) && File.basename(f) =~ /^(history|changelog|changes)/i
+      end.first
+
+      Bundler.ui.info "No changelog found for '#{name}'" unless show_file(file)
     end
 
     desc "open GEM", "Opens the source directory of the given bundled gem"
@@ -892,6 +898,18 @@ module Bundler
         reject{|s| s.to_s.empty? }.join(" and ")
       group_str = (groups.size == 1) ? "group" : "groups"
       "Gems in the #{group_str} #{group_list} were not installed."
+    end
+
+    def show_file(file)
+      success = false
+
+      if file
+        command = "less #{file}"
+        success = system(command)
+        Bundler.ui.info "Could not run '#{command}'" unless success
+      end
+
+      success
     end
 
   end
