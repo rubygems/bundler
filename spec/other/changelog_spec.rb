@@ -1,11 +1,5 @@
 require "spec_helper"
 
-def make_changelog(fname)
-  File.open File.join(default_bundle_path('gems', 'rails-2.3.2'), fname), "w" do |f|
-    f.puts "This is the contents of the changelog file"
-  end
-end
-
 describe "bundle changelog" do
   before :each do
     install_gemfile <<-G
@@ -16,24 +10,18 @@ describe "bundle changelog" do
 
   describe "searches for different changelog files" do
 
-    it "prints the file CHANGELOG.md" do
-      make_changelog "CHANGELOG.md"
-      bundle "changelog rails"
-      out.should eq("This is the contents of the changelog file")
-    end
+    [ "CHANGELOG.md", "history.rdoc", "changes.txt", "changeLog" ].each do |changelog|
 
-    it "prints the file history.rdoc" do
-      make_changelog "history.rdoc"
-      bundle "changelog rails"
-      out.should eq("This is the contents of the changelog file")
-    end
+      it "prints the file CHANGELOG.md" do
+        File.open File.join(default_bundle_path('gems', 'rails-2.3.2'), changelog), "w" do |f|
+          f.puts "This is the contents of the changelog file"
+        end
 
-    it "prints the file changes.txt" do
-      make_changelog "changes.txt"
-      bundle "changelog rails"
-      out.should eq("This is the contents of the changelog file")
-    end
+        bundle "changelog rails"
+        out.should eq("This is the contents of the changelog file")
+      end
 
+    end
   end
 
   it "complains if a changelog wasn't found" do

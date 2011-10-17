@@ -1,11 +1,5 @@
 require "spec_helper"
 
-def make_readme(fname)
-  File.open File.join(default_bundle_path('gems', 'rails-2.3.2'), fname), "w" do |f|
-    f.puts "This is the contents of the readme file"
-  end
-end
-
 describe "bundle readme" do
   before :each do
     install_gemfile <<-G
@@ -16,24 +10,18 @@ describe "bundle readme" do
 
   describe "searches for different readme files" do
 
-    it "prints the file README" do
-      make_readme "README"
-      bundle "readme rails"
-      out.should eq("This is the contents of the readme file")
-    end
+    [ "README", "README.txt", "ReadMe.MARKDOWN", "readme" ].each do |readme|
 
-    it "prints the file README.txt" do
-      make_readme "README.txt"
-      bundle "readme rails"
-      out.should eq("This is the contents of the readme file")
-    end
+      it "prints the file README" do
+        File.open File.join(default_bundle_path('gems', 'rails-2.3.2'), readme), "w" do |f|
+          f.puts "This is the contents of the readme file"
+        end
 
-    it "prints the file ReadMe.MARKDOWN" do
-      make_readme "ReadMe.MARKDOWN"
-      bundle "readme rails"
-      out.should eq("This is the contents of the readme file")
-    end
+        bundle "readme rails"
+        out.should eq("This is the contents of the readme file")
+      end
 
+    end
   end
 
   it "complains if a readme wasn't found" do
