@@ -1,11 +1,5 @@
 require "spec_helper"
 
-def make_changelog(fname)
-  File.open File.join(default_bundle_path('gems', 'rails-2.3.2'), fname), "w" do |f|
-    f.puts "This is the contents of the changelog file"
-  end
-end
-
 describe "bundle changelog" do
   before :each do
     install_gemfile <<-G
