@@ -608,6 +608,19 @@ module Bundler
       end
     end
 
+    desc "readme GEM", "Prints out the README file of the given bundled gem"
+    def readme(name)
+      gem_path = locate_gem(name)
+      file = Dir.glob(File.join(gem_path, "{README,readme,Readme,ReadMe}*")).first
+      if file
+        command = "less #{file}"
+        success = system(command)
+        Bundler.ui.info "Could not run '#{command}'" unless success
+      else
+        Bundler.ui.info "No README found for '#{name}'" 
+      end
+    end
+
     desc "open GEM", "Opens the source directory of the given bundled gem"
     def open(name)
       editor = [ENV['BUNDLER_EDITOR'], ENV['VISUAL'], ENV['EDITOR']].find{|e| !e.nil? && !e.empty? }
