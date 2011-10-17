@@ -912,5 +912,17 @@ module Bundler
       success
     end
 
+    def show_file(file)
+      success = false
+
+      if file
+        command = "less #{file}"
+        success = system(command)
+        Bundler.ui.info "Could not run '#{command}'" unless success
+      end
+
+      success
+    end
+
   end
 end
