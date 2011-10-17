@@ -67,6 +67,12 @@ We divide `bundle` subcommands into primary commands and utilities.
 * `bundle open(1)`:
   Open an installed gem in the editor
 
+* `bundle readme(1)`:
+  Show the readme file of a particular gem in the bundle
+
+* `bundle changelog(1)`:
+  Show the changelog of a bundled gem
+
 * `bundle viz(1)`:
   Generate a visual representation of your dependencies
 
