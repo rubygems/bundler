@@ -10,7 +10,7 @@ end
 begin
   # Pull in Psych if we can, but not if Syck is already loaded
   require 'psych' unless defined?(Syck)
-rescue
+rescue LoadError
 end
 
 require 'yaml'
