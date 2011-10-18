@@ -3,9 +3,14 @@ require 'fileutils'
 require 'pathname'
 
 begin
+  gem 'psych'
+rescue Gem::LoadError
+end
+
+begin
   # Pull in Psych if we can, but not if Syck is already loaded
   require 'psych' unless defined?(Syck)
-rescue LoadError
+rescue
 end
 
 require 'yaml'
