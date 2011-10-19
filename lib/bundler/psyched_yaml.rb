@@ -2,7 +2,7 @@
 begin
   gem 'psych'
 rescue Gem::LoadError
-end
+end if defined?(Gem)
 
 # Psych could be a stdlib
 begin
