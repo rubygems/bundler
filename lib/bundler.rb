@@ -1,19 +1,7 @@
 require 'rbconfig'
 require 'fileutils'
 require 'pathname'
-
-begin
-  gem 'psych'
-rescue Gem::LoadError
-end
-
-begin
-  # Pull in Psych if we can, but not if Syck is already loaded
-  require 'psych' unless defined?(Syck)
-rescue LoadError
-end
-
-require 'yaml'
+require 'bundler/psyched_yaml'
 require 'bundler/rubygems_ext'
 require 'bundler/rubygems_integration'
 require 'bundler/version'
