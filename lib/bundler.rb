@@ -271,7 +271,7 @@ module Bundler
             msg << " from\n  #{original_line}" if original_line
             msg << "\n"
 
-            if RUBY_VERSION >= "1.9.0"
+            if RUBY_VERSION >= "1.9"
               msg << "\nDoes it try to require a relative path? That doesn't work in Ruby 1.9."
             end
 

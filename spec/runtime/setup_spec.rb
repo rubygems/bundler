@@ -697,7 +697,7 @@ describe "Bundler.setup" do
       out.should include("was a LoadError while evaluating bar.gemspec")
       out.should include("foobarbaz")
       out.should include("bar.gemspec:1")
-      out.should include("try to require a relative path") if RUBY_VERSION >= "1.9.0"
+      out.should include("try to require a relative path") if RUBY_VERSION >= "1.9"
     end
 
     it "evals each gemspec with a binding from the top level" do
