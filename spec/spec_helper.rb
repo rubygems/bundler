@@ -52,6 +52,10 @@ RSpec.configure do |config|
     config.filter_run_excluding :realworld => true
   end
 
+  if RUBY_VERSION < "1.9"
+    config.filter_run_excluding :ruby => "1.9"
+  end
+
   config.filter_run :focused => true unless ENV['CI']
   config.run_all_when_everything_filtered = true
   config.alias_example_to :fit, :focused => true
