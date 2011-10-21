@@ -151,6 +151,11 @@ module Bundler
         spec_gem_executables << spec.executables.collect do |executable|
           "#{Gem.dir}/#{spec.bindir}/#{executable}"
         end
+		if Bundler::WINDOWS
+          spec_gem_executables << spec.executables.collect do |executable|
+            "#{Gem.dir}/#{spec.bindir}/#{executable}.bat"
+          end
+        end
         spec_cache_paths << spec.cache_file
         spec_gemspec_paths << spec.spec_file
         spec_git_cache_dirs << spec.source.cache_path.to_s if spec.source.is_a?(Bundler::Source::Git)
