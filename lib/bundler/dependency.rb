@@ -16,6 +16,8 @@ module Bundler
       :mri_18   => Gem::Platform::RUBY,
       :mri_19   => Gem::Platform::RUBY,
       :rbx      => Gem::Platform::RUBY,
+      :mac      => Gem::Platform::RUBY,
+      :linux    => Gem::Platform::RUBY,
       :jruby    => Gem::Platform::JAVA,
       :mswin    => Gem::Platform::MSWIN,
       :mingw    => Gem::Platform::MINGW,
@@ -104,6 +106,14 @@ module Bundler
 
     def rbx?
       ruby? && defined?(RUBY_ENGINE) && RUBY_ENGINE == "rbx"
+    end
+
+    def mac?
+      Bundler::MAC && Gem::Platform.local.os == "darwin"
+    end
+
+    def linux?
+      Bundler::LINUX && Gem::Platform.local.os == "linux"
     end
 
     def jruby?
