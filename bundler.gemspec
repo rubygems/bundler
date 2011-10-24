@@ -5,17 +5,19 @@ $:.unshift lib unless $:.include?(lib)
 require 'bundler/version'
 
 Gem::Specification.new do |s|
-  s.name        = "bundler"
+  s.name        = "mpapis-bundler"
   s.version     = Bundler::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["André Arko", "Terence Lee", "Carl Lerche", "Yehuda Katz"]
   s.email       = ["andre@arko.net"]
   s.homepage    = "http://gembundler.com"
-  s.summary     = %q{The best way to manage your application's dependencies}
-  s.description = %q{Bundler manages an application's dependencies through its entire life, across many machines, systematically and repeatably}
+  s.summary     = %q{rubygems-plugin fork! The best way to manage your application's dependencies}
+  s.description = %q{rubygems-plugin fork! Bundler manages an application's dependencies through its entire life, across many machines, systematically and repeatably}
 
   s.required_rubygems_version = ">= 1.3.6"
   s.rubyforge_project         = "bundler"
+
+  s.add_dependency('rubygems-bundler', '>= 0.2.7')
 
   s.add_development_dependency "ronn"
   s.add_development_dependency "rspec"
