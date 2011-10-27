@@ -225,13 +225,47 @@ module Bundler
           old     = Bundler.rubygems.sources
 
           sources = {}
+          spec_names = {}
           remotes.each do |uri|
             fetcher          = Bundler::Fetcher.new(uri)
             specs            = fetcher.specs(dependency_names, self)
             sources[fetcher] = specs.size
 
+            if fetcher.has_api
+              spec_names[fetcher] = specs.map {|spec| spec.name }.uniq
+            end
+
             idx.use specs
           end
+
+          # Check for nested dependencies that may not have been
+          # loaded against one or more of the remotes.
+          # This will do nothing if there is only 1 remote.
+          begin
+            again = false
+            all_spec_names = spec_names.values.flatten.uniq
+            spec_names.each do |fetcher, names|
+              # skip if fetcher is running in legacy mode
+              next unless fetcher.has_api
+
+              to_check = all_spec_names - names
+              next if to_check.empty?
+
+              specs = fetcher.specs(to_check, self)
+              next if specs.empty?
+
+              idx.use specs
+
+              # skip the rest if we have fallen back on the legacy index
+              next unless fetcher.has_api
+
+              new_spec_names = specs.map {|spec| spec.name }
+              spec_names[fetcher] = (names + new_spec_names + to_check).uniq
+
+              # determine if we need to go another round
+              again ||= (new_spec_names - all_spec_names).any?
+            end
+          end while again
 
           # don't need to fetch all specifications for every gem/version on
           # the rubygems repo if there's no api endpoints to search over
