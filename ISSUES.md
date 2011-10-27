@@ -1,15 +1,5 @@
 # Bundler Issues
 
-## Frequently encountered issues
-
-### REE and Zlib::GzipFile::Error
-
-Ruby Enterprise Edition users may see a `Zlib::GzipFile::Error` while installing gems. It is due to [a bug in REE](http://code.google.com/p/rubyenterpriseedition/issues/detail?id=45). You may be able to resolve the issue by upgrading REE, or changing to a different interpreter.
-
-### Rake activation error
-
-Anyone who has installed the Spork gem may see activation errors while running `rake` directly. This is because old versions of Spork would [install the newest rake using a mkmf file](https://github.com/timcharper/spork/issues/119). To resolve the issue, update the Spork version requirement in your Gemfile to at least `"~>0.8.5"` or `"~>0.9.0.rc8"`.
-
 ## Troubleshooting
 
 Instructions for common Bundler use-cases can be found on the [Bundler documentation site](http://gembundler.com/v1.0/).
@@ -35,6 +25,21 @@ After reading the documentation, try these troubleshooting steps:
 
     # try to install one more time
     bundle install
+
+## Frequently encountered issues
+
+### Heroku errors
+
+Open a ticket with Heroku. If the issue somehow turns out to be with Bundler itself, the Heroku support team will forward the details of your issue to us.
+
+### REE and Zlib::GzipFile::Error
+
+Ruby Enterprise Edition users may see a `Zlib::GzipFile::Error` while installing gems. It is due to [a bug in REE](http://code.google.com/p/rubyenterpriseedition/issues/detail?id=45). You may be able to resolve the issue by upgrading REE, or changing to a different interpreter.
+
+### Rake activation error
+
+Anyone who has installed the Spork gem may see activation errors while running `rake` directly. This is because old versions of Spork would [install the newest rake using a mkmf file](https://github.com/timcharper/spork/issues/119). To resolve the issue, update the Spork version requirement in your Gemfile to at least `"~>0.8.5"` or `"~>0.9.0.rc8"`.
+
 
 ## Reporting unresolved problems
 
