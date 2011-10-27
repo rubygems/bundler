@@ -394,4 +394,34 @@ describe "bundle clean" do
     out.should_not include("foo (1.0)")
     out.should include("rack (1.0.0)")
   end
+
+  it "cleans git gems with a 7 length git revision" do
+    build_git "foo"
+    revision = revision_for(lib_path("foo-1.0"))
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "foo", :git => "#{lib_path('foo-1.0')}"
+    G
+
+    bundle "install --path vendor/bundle --no-clean"
+
+    # mimic 7 length git revisions in Gemfile.lock
+    gemfile_lock = File.read(bundled_app('Gemfile.lock')).split("\n")
+    gemfile_lock.each_with_index do |line, index|
+      gemfile_lock[index] = line[0..(11 + 7)] if line.include?("  revision:")
+    end
+    File.open(bundled_app('Gemfile.lock'), 'w') do |file|
+      file.print gemfile_lock.join("\n")
+    end
+
+    bundle "install --path vendor/bundle --no-clean"
+
+    bundle :clean
+
+    out.should_not include("Removing foo (1.0 #{revision[0..6]})")
+
+    vendored_gems("bundler/gems/foo-1.0-#{revision[0..6]}").should exist
+  end
 end
