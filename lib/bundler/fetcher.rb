@@ -172,7 +172,7 @@ module Bundler
               raise GemspecError, %{Unfortunately, the gem #{s[:name]} (#{s[:number]}) } +
                 %{has an invalid gemspec. As a result, Bundler cannot install this Gemfile. } +
                 %{Please ask the gem author to yank the bad version to fix this issue. For } +
-                %{more information, see http://bit.ly/illformed-requirement.}
+                %{more information, see http://bit.ly/syck-defaultkey.}
             else
               raise e
             end
