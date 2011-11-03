@@ -208,7 +208,6 @@ module Bundler
       path = path.parent until path.exist?
       sudo_present = in_path("sudo") 
 
-
       @checked_for_sudo = true
       @requires_sudo = settings.allow_sudo? && !File.writable?(path) && sudo_present
     end
