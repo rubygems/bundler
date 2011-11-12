@@ -154,6 +154,16 @@ module Bundler
       @env = old
     end
 
+    def method_missing(name, *args)
+      call = caller[0].split ':'
+      line = call[1]
+      content = Bundler.read_file(call[0]).lines.to_a[line.to_i - 1]
+
+      raise GemfileError, "The Gemfile doesn't support the method `#{name}`.\n" \
+                          "Please check your Gemfile's syntax at line #{line}:\n\n" \
+                          "    #{content}"
+    end
+
     # Deprecated methods
 
     def self.deprecate(name, replacement = nil)
