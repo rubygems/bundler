@@ -87,7 +87,7 @@ module Bundler
     end
 
     def ruby_19?
-      ruby? && RUBY_VERSION >= "1.9"
+      ruby? && RUBY_VERSION >= "1.9" && RUBY_VERSION < "2.0"
     end
 
     def mri?
@@ -99,7 +99,7 @@ module Bundler
     end
 
     def mri_19?
-      mri? && RUBY_VERSION >= "1.9"
+      mri? && RUBY_VERSION >= "1.9" && RUBY_VERSION < "2.0"
     end
 
     def rbx?
