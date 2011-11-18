@@ -232,6 +232,30 @@ module Spec
       end
     end
 
+    def realworld_system_gems(*gems)
+      gems = gems.flatten
+
+      FileUtils.rm_rf(system_gem_path)
+      FileUtils.mkdir_p(system_gem_path)
+
+      Gem.clear_paths
+
+      gem_home, gem_path, path = ENV['GEM_HOME'], ENV['GEM_PATH'], ENV['PATH']
+      ENV['GEM_HOME'], ENV['GEM_PATH'] = system_gem_path.to_s, system_gem_path.to_s
+
+      gems.each do |gem|
+        gem_command :install, "--no-rdoc --no-ri #{gem}"
+      end
+      if block_given?
+        begin
+          yield
+        ensure
+          ENV['GEM_HOME'], ENV['GEM_PATH'] = gem_home, gem_path
+          ENV['PATH'] = path
+        end
+      end
+    end
+
     def cache_gems(*gems)
       gems = gems.flatten
 
