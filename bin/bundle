@@ -22,8 +22,11 @@ rescue Interrupt => e
 rescue SystemExit => e
   exit e.status
 rescue Exception => e
-  Bundler.ui.error "Unfortunately, a fatal error has occurred. " +
-    "Please report this error to the Bundler issue tracker at " +
-    "https://github.com/carlhuda/bundler/issues so that we can fix it. Thanks!"
+  unless e.is_a?(ArgumentError) && e.message =~ /Illformed requirement/
+    # don't display the standard error if Rubygems finds an unparseable gem requirement 
+    Bundler.ui.error "Unfortunately, a fatal error has occurred. " +
+      "Please report this error to the Bundler issue tracker at " +
+      "https://github.com/carlhuda/bundler/issues so that we can fix it. Thanks!"
+  end
   raise e
 end
