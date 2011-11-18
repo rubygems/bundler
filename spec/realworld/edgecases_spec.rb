@@ -34,4 +34,17 @@ describe "real world edgecases", :realworld => true do
     out.should include("activemodel (3.0.5)")
   end
 
+  # https://github.com/carlhuda/bundler/issues/1500
+  it "does not fail install because of gem plugins" do
+    realworld_system_gems("open_gem --version 1.4.2", "rake --version 0.9.2")
+    gemfile <<-G
+      source :rubygems
+
+      gem 'rack', '1.0.0'
+    G
+
+    bundle "install --path vendor/bundle", :expect_err => true
+    err.should_not include("Could not find rake")
+    err.should be_empty
+  end
 end
