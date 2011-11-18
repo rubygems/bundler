@@ -213,6 +213,8 @@ module Bundler
       Bundler.ui.be_quiet! if opts[:quiet]
 
       Bundler::Fetcher.disable_endpoint = opts["full-index"]
+      # rubygems plugins sometimes hook into the gem install process
+      Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins)
 
       Installer.install(Bundler.root, Bundler.definition, opts)
       Bundler.load.cache if Bundler.root.join("vendor/cache").exist? && !options["no-cache"]
@@ -264,6 +266,9 @@ module Bundler
       end
 
       opts = {"update" => true, "local" => options[:local]}
+      # rubygems plugins sometimes hook into the gem install process
+      Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins)
+
       Installer.install Bundler.root, Bundler.definition, opts
       Bundler.load.cache if Bundler.root.join("vendor/cache").exist?
       clean if options["clean"] && Bundler.settings[:path]
