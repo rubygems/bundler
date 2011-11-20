@@ -149,7 +149,7 @@ module Bundler
         md = %r{(.+bundler/gems/.+-[a-f0-9]{7,12})}.match(spec.full_gem_path)
         spec_git_paths << md[1] if md
         spec_gem_executables << spec.executables.collect do |executable|
-          "#{Gem.dir}/#{spec.bindir}/#{executable}"
+          "#{Gem.bindir}/#{executable}"
         end
         spec_cache_paths << spec.cache_file
         spec_gemspec_paths << spec.spec_file

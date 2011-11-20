@@ -421,7 +421,7 @@ module Spec
 
       def executables=(val)
         Array(val).each do |file|
-          write "bin/#{file}", "require '#{@name}' ; puts #{@name.upcase}"
+          write "#{@spec.bindir}/#{file}", "require '#{@name}' ; puts #{@name.upcase}"
         end
         @spec.executables = Array(val)
       end
