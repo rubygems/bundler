@@ -424,4 +424,26 @@ describe "bundle clean" do
 
     vendored_gems("bundler/gems/foo-1.0-#{revision[0..6]}").should exist
   end
+
+  it "when using --force on system gems, it doesn't remove binaries" do
+    build_repo2
+    update_repo2 do
+      build_gem 'bindir' do |s|
+        s.bindir = "exe"
+        s.executables = "foo"
+      end
+    end
+
+    gemfile <<-G
+      source "file://#{gem_repo2}"
+
+      gem "bindir"
+    G
+    bundle :install
+    bundle "clean --force"
+
+    sys_status "foo"
+    @existstatus.should_not == 0
+    out.should == "1.0"
+  end
 end
