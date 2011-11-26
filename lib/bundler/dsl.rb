@@ -89,6 +89,22 @@ module Bundler
       @dependencies << dep
     end
 
+    def ungem(name, *args)
+      if name.is_a?(Symbol)
+        raise GemfileError, %{You need to specify gem names as Strings. Use 'ungem "#{name.to_s}"' instead.}
+      end
+      
+      options = Hash === args.last ? args.pop : {}
+      version = args || [">= 0"]
+
+      _deprecated_options(options)
+      _normalize_options(name, version, options)
+
+      dep = Dependency.new(name, version, options)
+      
+      @dependencies.reject! { |d| dep =~ d }
+    end
+
     def source(source, options = {})
       case source
       when :gemcutter, :rubygems, :rubyforge then
