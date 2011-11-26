@@ -12,8 +12,8 @@ end
 namespace :spec do
   desc "Ensure spec dependencies are installed"
   task :deps do
-    sh "gem list ronn | (grep 'ronn' 1> /dev/null) || gem install ronn --no-ri --no-rdoc"
-    sh "gem list rspec | (grep 'rspec (2.' 1> /dev/null) || gem install rspec --no-ri --no-rdoc"
+    sh "#{Bundler::GemHelper.gem_cmd} list ronn | (grep 'ronn' 1> /dev/null) || gem install ronn --no-ri --no-rdoc"
+    sh "#{Bundler::GemHelper.gem_cmd} list rspec | (grep 'rspec (2.' 1> /dev/null) || gem install rspec --no-ri --no-rdoc"
   end
 end
 
@@ -171,7 +171,7 @@ begin
 
       desc "Install CI dependencies"
       task :deps do
-        sh "gem list ci_reporter | (grep 'ci_reporter' 1> /dev/null) || gem install ci_reporter --no-ri --no-rdoc"
+        sh "#{Bundler::GemHelper.gem_cmd} list ci_reporter | (grep 'ci_reporter' 1> /dev/null) || gem install ci_reporter --no-ri --no-rdoc"
       end
       task :deps => "spec:deps"
     end

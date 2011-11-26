@@ -290,7 +290,7 @@ describe "bundle clean" do
     G
     bundle :install
 
-    sys_exec "gem list"
+    sys_exec "#{Bundler::GemHelper.gem_cmd} list"
     out.should include("rack (1.0.0)")
     out.should include("thin (1.0)")
   end
@@ -368,7 +368,7 @@ describe "bundle clean" do
     end
     bundle :update
 
-    sys_exec "gem list"
+    sys_exec "#{Bundler::GemHelper.gem_cmd} list"
     out.should include("foo (1.0.1, 1.0)")
   end
 
@@ -390,7 +390,7 @@ describe "bundle clean" do
     bundle "clean --force"
 
     out.should eq("Removing foo (1.0)")
-    sys_exec "gem list"
+    sys_exec "#{Bundler::GemHelper.gem_cmd} list"
     out.should_not include("foo (1.0)")
     out.should include("rack (1.0.0)")
   end

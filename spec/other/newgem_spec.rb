@@ -78,6 +78,7 @@ RAKEFILE
     end
 
     Dir.chdir(bundled_app("test-gem")) do
+      rake_cmd = Gem::Platform.match('macruby') ? 'macrake' : 'rake'
       sys_exec("rake")
       out.should include("SUCCESS")
     end
