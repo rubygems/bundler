@@ -1,6 +1,11 @@
 require 'bundler/vendored_thor'
 require 'rubygems/user_interaction'
 require 'rubygems/config_file'
+begin
+  require 'diff/lcs'
+  require 'diff/lcs/string'
+rescue LoadError => e
+end
 
 module Bundler
   class CLI < Thor
@@ -590,11 +595,27 @@ module Bundler
 
     def locate_gem(name)
       spec = Bundler.load.specs.find{|s| s.name == name }
+      unless spec
+        candidates = candidate_specs(name)
+        spec = choose_from_candidates(candidates) unless candidates.empty?
+      end
       raise GemNotFound, "Could not find gem '#{name}' in the current bundle." unless spec
       if spec.name == 'bundler'
         return File.expand_path('../../../', __FILE__)
       end
       spec.full_gem_path
+    end
+
+    def choose_from_candidates(specs)
+      Bundler.ui.warn 'Did you mean:'
+      specs.each.with_index {|spec,i| Bundler.ui.warn '%d. %s-%s' % [ i+1, spec.name, spec.version ] }
+      Bundler.ui.warn '> ', false
+      chosen = STDIN.gets.to_i
+      chosen > 0 ? specs[chosen-1] : nil
+    end
+
+    def candidate_specs(name)
+      name.respond_to?(:lcs) ? Bundler.load.specs.sort_by{|spec| -name.lcs(spec.name).size*2.0/(name.size + spec.name.size) }.first(3) : []
     end
 
   end
