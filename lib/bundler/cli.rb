@@ -158,6 +158,8 @@ module Bundler
       "Use the rubygems modern index instead of the API endpoint"
     method_option "clean", :type => :boolean, :default => true, :banner =>
       "Run bundle clean automatically after clean"
+    method_option "platform", :type => :string, :banner =>
+      "Force the use of the specified platform instead of runtime detected platform"
     def install
       opts = options.dup
       if opts[:without]
@@ -193,6 +195,8 @@ module Bundler
 
         Bundler.settings[:frozen] = '1'
       end
+
+      Bundler.settings[:platform] = opts[:platform] if opts[:platform]
 
       # When install is called with --no-deployment, disable deployment mode
       if opts[:deployment] == false
