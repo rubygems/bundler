@@ -579,6 +579,7 @@ module Bundler
         Bundler.load.clean
       else
         Bundler.ui.error "Can only use bundle clean when --path is set or --force is set"
+        exit 1
       end
     end
 

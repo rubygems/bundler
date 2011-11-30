@@ -239,8 +239,9 @@ describe "bundle clean" do
       gem "rack", "1.0.0"
     G
 
-    bundle :clean
+    bundle :clean, :exitstatus => true
 
+    exitstatus.should eq(1)
     out.should == "Can only use bundle clean when --path is set or --force is set"
   end
 
@@ -440,10 +441,12 @@ describe "bundle clean" do
       gem "bindir"
     G
     bundle :install
+
     bundle "clean --force"
 
     sys_status "foo"
-    @existstatus.should_not == 0
+
+    exitstatus.should == 0
     out.should == "1.0"
   end
 end

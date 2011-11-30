@@ -6,6 +6,7 @@ require 'rubygems'
 require 'bundler'
 require 'rspec'
 require 'uri'
+require 'digest/sha1'
 
 # Require the correct version of popen for the current platform
 if RbConfig::CONFIG['host_os'] =~ /mingw|mswin/
@@ -95,4 +96,3 @@ RSpec.configure do |config|
     ENV['BUNDLE_APP_CONFIG']     = nil
   end
 end
-
