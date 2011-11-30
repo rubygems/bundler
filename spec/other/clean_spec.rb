@@ -441,10 +441,12 @@ describe "bundle clean" do
       gem "bindir"
     G
     bundle :install
+
     bundle "clean --force"
 
     sys_status "foo"
-    @exitstatus.should_not == 0
+
+    exitstatus.should == 0
     out.should == "1.0"
   end
 end
