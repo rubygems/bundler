@@ -287,17 +287,20 @@ module Bundler
       if settings[:disable_shared_gems]
         ENV['GEM_PATH'] = ''
         ENV['GEM_HOME'] = File.expand_path(bundle_path, root)
+        # TODO: This mkdir_p is only needed for JRuby <= 1.5 and should go away (GH #602)
+        FileUtils.mkdir_p bundle_path.to_s rescue nil
+
+        Bundler.rubygems.clear_paths
       elsif Bundler.rubygems.gem_dir != bundle_path.to_s
         possibles = [Bundler.rubygems.gem_dir, Bundler.rubygems.gem_path]
         paths = possibles.flatten.compact.uniq.reject { |p| p.empty? }
         ENV["GEM_PATH"] = paths.join(File::PATH_SEPARATOR)
         ENV["GEM_HOME"] = bundle_path.to_s
+        # TODO: This mkdir_p is only needed for JRuby <= 1.5 and should go away (GH #602)
+        FileUtils.mkdir_p bundle_path.to_s rescue nil
+
+        Bundler.rubygems.clear_paths
       end
-
-      # TODO: This mkdir_p is only needed for JRuby <= 1.5 and should go away (GH #602)
-      FileUtils.mkdir_p bundle_path.to_s rescue nil
-
-      Bundler.rubygems.clear_paths
     end
 
     def upgrade_lockfile
