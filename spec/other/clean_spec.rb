@@ -146,9 +146,9 @@ describe "bundle clean" do
   end
 
   it "removes unused git gems" do
-    build_git "foo"
-    revision = revision_for(lib_path("foo-1.0"))
-    git_path = lib_path('foo-1.0')
+    build_git "foo", :path => lib_path("foo")
+    git_path = lib_path('foo')
+    revision = revision_for(git_path)
 
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -170,12 +170,12 @@ describe "bundle clean" do
 
     bundle :clean
 
-    out.should eq("Removing foo (1.0 #{revision[0..11]})")
+    out.should eq("Removing foo (#{revision[0..11]})")
 
     vendored_gems("gems/rack-1.0.0").should exist
-    vendored_gems("bundler/gems/foo-1.0-#{revision[0..11]}").should_not exist
+    vendored_gems("bundler/gems/foo-#{revision[0..11]}").should_not exist
     digest = Digest::SHA1.hexdigest(git_path.to_s)
-    vendored_gems("cache/bundler/git/foo-1.0-#{digest}").should_not exist
+    vendored_gems("cache/bundler/git/foo-#{digest}").should_not exist
 
     vendored_gems("specifications/rack-1.0.0.gemspec").should exist
 
@@ -183,31 +183,31 @@ describe "bundle clean" do
   end
 
   it "removes old git gems" do
-    build_git "foo"
-    revision = revision_for(lib_path("foo-1.0"))
+    build_git "foo-bar", :path => lib_path("foo-bar")
+    revision = revision_for(lib_path("foo-bar"))
 
     gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack", "1.0.0"
-      git "#{lib_path('foo-1.0')}" do
-        gem "foo"
+      git "#{lib_path('foo-bar')}" do
+        gem "foo-bar"
       end
     G
 
     bundle "install --path vendor/bundle --no-clean"
 
-    update_git "foo"
-    revision2 = revision_for(lib_path("foo-1.0"))
+    update_git "foo", :path => lib_path("foo-bar")
+    revision2 = revision_for(lib_path("foo-bar"))
 
     bundle "update --no-clean"
     bundle :clean
 
-    out.should eq("Removing foo (1.0 #{revision[0..11]})")
+    out.should eq("Removing foo-bar (#{revision[0..11]})")
 
     vendored_gems("gems/rack-1.0.0").should exist
-    vendored_gems("bundler/gems/foo-1.0-#{revision[0..11]}").should_not exist
-    vendored_gems("bundler/gems/foo-1.0-#{revision2[0..11]}").should exist
+    vendored_gems("bundler/gems/foo-bar-#{revision[0..11]}").should_not exist
+    vendored_gems("bundler/gems/foo-bar-#{revision2[0..11]}").should exist
 
     vendored_gems("specifications/rack-1.0.0.gemspec").should exist
 

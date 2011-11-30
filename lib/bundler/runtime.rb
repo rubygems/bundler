@@ -185,10 +185,9 @@ module Bundler
         FileUtils.rm_rf(gem_dir)
 
         parts    = full_name.split('-')
-        name     = parts[0..-3].join('-')
+        name     = parts[0..-2].join('-')
         revision = parts[-1]
-        version  = parts[-2]
-        output   = "#{name} (#{version} #{revision})"
+        output   = "#{name} (#{revision})"
 
         Bundler.ui.info "Removing #{output}"
 
