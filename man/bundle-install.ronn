@@ -10,6 +10,7 @@ bundle-install(1) -- Install the dependencies specified in your Gemfile
                  [--binstubs[=DIRECTORY]]
                  [--standalone[=GROUP1[ GROUP2...]]]
                  [--quiet]
+                 [--shebang EXECUTABLE]
 
 ## DESCRIPTION
 
@@ -75,6 +76,10 @@ update process below under [CONSERVATIVE UPDATING][].
   It takes a space separated list of groups to install. It creates a
   `bundle` directory and installs the bundle there. It also generates
   a `bundle/bundler/setup.rb` file to replace Bundler's own setup.
+
+* `--shebang=<executable>`:
+  Sets a different executable than the default ruby install name
+  on the shebang line.
 
 ## DEPLOYMENT MODE
 
