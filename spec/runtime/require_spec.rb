@@ -89,6 +89,37 @@ describe "Bundler.require" do
     err.should == "ZOMG LOAD ERROR"
   end
 
+  describe "with namespaced gems" do
+    before :each do
+      build_lib "jquery-rails", "1.0.0" do |s|
+        s.write "lib/jquery/rails.rb", "puts 'jquery/rails'"
+      end
+      lib_path('jquery-rails-1.0.0/lib/jquery-rails.rb').rmtree
+    end
+
+    it "requires gem names that are namespaced" do
+      gemfile <<-G
+        path '#{lib_path}'
+        gem 'jquery-rails'
+      G
+
+      run "Bundler.require"
+      out.should eq("jquery/rails")
+    end
+
+    it "does not mangle explictly given requires" do
+      gemfile <<-G
+        path "#{lib_path}"
+        gem 'jquery-rails', :require => 'jquery-rails'
+      G
+
+      load_error_run <<-R, 'jquery-rails'
+        Bundler.require
+      R
+      err.should == "ZOMG LOAD ERROR"
+    end
+  end
+
   describe "using bundle exec" do
     it "requires the locked gems" do
       bundle "exec ruby -e 'Bundler.require'"
