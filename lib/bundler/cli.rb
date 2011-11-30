@@ -156,7 +156,7 @@ module Bundler
       "Make a bundle that can work without the Bundler runtime"
     method_option "full-index", :tpye => :boolean, :banner =>
       "Use the rubygems modern index instead of the API endpoint"
-    method_option "clean", :type => :boolean, :default => true, :banner =>
+    method_option "clean", :type => :boolean, :default => false, :banner =>
       "Run bundle clean automatically after install"
     def install
       opts = options.dup

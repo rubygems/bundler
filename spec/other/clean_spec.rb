@@ -316,7 +316,7 @@ describe "bundle clean" do
     should_not_have_gems 'thin-1.0'
   end
 
-  it "clean automatically on --path" do
+  it "doesn't clean automatically on --path" do
     gemfile <<-G
       source "file://#{gem_repo1}"
 
@@ -333,7 +333,7 @@ describe "bundle clean" do
     bundle "install"
 
     should_have_gems 'rack-1.0.0'
-    should_not_have_gems 'thin-1.0'
+    should_have_gems 'thin-1.0'
   end
 
   it "cleans on bundle update with --path" do
