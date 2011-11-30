@@ -21,7 +21,11 @@ rescue Interrupt => e
   exit 1
 rescue SystemExit => e
   exit e.status
+rescue LoadError, Gem::InstallError, Gem::Installer::ExtensionBuildError => e
+  # known errors, something went wrong outside Bundler
+  raise e
 rescue Exception => e
+  # unknown errors, hopefully we can fix them
   Bundler.ui.error "Unfortunately, a fatal error has occurred. " +
     "Please report this error to the Bundler issue tracker at " +
     "https://github.com/carlhuda/bundler/issues so that we can fix it. Thanks!"
