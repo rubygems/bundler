@@ -232,7 +232,7 @@ module Bundler
         Bundler.ui.confirm "Post-install message from #{name}:\n#{msg}"
       end
 
-      clean if opts["clean"] && Bundler.settings[:path]
+      clean if opts["clean"] && Bundler.settings[:path] && !Bundler.settings[:frozen]
     rescue GemNotFound => e
       if opts[:local] && Bundler.app_cache.exist?
         Bundler.ui.warn "Some gems seem to be missing from your vendor/cache directory."

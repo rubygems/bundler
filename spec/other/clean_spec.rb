@@ -449,4 +449,35 @@ describe "bundle clean" do
     exitstatus.should == 0
     out.should == "1.0"
   end
+
+  it "does not clean when using --deployment" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "thin"
+      gem "foo"
+    G
+
+    bundle "install --path vendor/bundle --no-clean"
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "thin"
+    G
+    bundle "install --no-clean"
+    bundle "install --deployment"
+
+    out.should_not include("Removing foo (1.0)")
+    should_have_gems 'thin-1.0', 'rack-1.0.0', 'foo-1.0'
+    vendored_gems("bin/rackup").should exist
+
+    # check that it still doesn't clean and uses Bundler.settings
+    bundle "install"
+
+    out.should_not include("Removing foo (1.0)")
+    should_have_gems 'thin-1.0', 'rack-1.0.0', 'foo-1.0'
+    vendored_gems("bin/rackup").should exist
+
+  end
 end
