@@ -154,7 +154,7 @@ module Bundler
       "Install using defaults tuned for deployment environments"
     method_option "standalone", :type => :array, :lazy_default => [], :banner =>
       "Make a bundle that can work without the Bundler runtime"
-    method_option "full-index", :tpye => :boolean, :banner =>
+    method_option "full-index", :type => :boolean, :banner =>
       "Use the rubygems modern index instead of the API endpoint"
     method_option "clean", :type => :boolean, :default => true, :banner =>
       "Run bundle clean automatically after install"
