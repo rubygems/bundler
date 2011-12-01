@@ -121,6 +121,16 @@ describe "bundle exec" do
     out.should include("bundler: not executable: ./foo")
   end
 
+  it "errors nicely when no arguments are passed" do
+    install_gemfile <<-G
+      gem "rack"
+    G
+
+    bundle "exec", :exitstatus => true
+    # exitstatus.should eq(128)
+    out.should include("bundle exec needs a command to run")
+  end
+
   describe "with gem executables" do
     describe "run from a random directory" do
       before(:each) do
