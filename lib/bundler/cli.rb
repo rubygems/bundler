@@ -559,6 +559,7 @@ module Bundler
       }
       template(File.join("newgem/Gemfile.tt"),               File.join(target, "Gemfile"),                opts)
       template(File.join("newgem/Rakefile.tt"),              File.join(target, "Rakefile"),               opts)
+      template(File.join("newgem/LICENSE.tt"),               File.join(target, "LICENSE"),                opts)
       template(File.join("newgem/gitignore.tt"),             File.join(target, ".gitignore"),             opts)
       template(File.join("newgem/newgem.gemspec.tt"),        File.join(target, "#{name}.gemspec"),        opts)
       template(File.join("newgem/lib/newgem.rb.tt"),         File.join(target, "lib/#{name}.rb"),         opts)
