@@ -246,14 +246,14 @@ module Bundler
       end
     end
 
-    def which(binary)
-      if File.executable? binary
-        binary
+    def which(executable)
+      if File.executable?(executable)
+        executable
       else
         path = ENV['PATH'].split(File::PATH_SEPARATOR).find { |path|
-          File.executable? File.join(path, binary)
+          File.executable?(File.join(path, executable))
         }
-        path && File.expand_path(binary, path)
+        path && File.expand_path(executable, path)
       end
     end
 
