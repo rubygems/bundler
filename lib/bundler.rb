@@ -229,7 +229,7 @@ module Bundler
 
       path = bundle_path
       path = path.parent until path.exist?
-      sudo_present = !(`which sudo` rescue '').empty?
+      sudo_present = which "sudo"
       bin_dir = Pathname.new(Bundler.system_bindir)
       bin_dir = bin_dir.parent until bin_dir.exist?
 
@@ -243,6 +243,17 @@ module Bundler
         sudo "mkdir -p '#{path}'" unless File.exist?(path)
       else
         FileUtils.mkdir_p(path)
+      end
+    end
+
+    def which(binary)
+      if File.executable? binary
+        binary
+      else
+        path = ENV['PATH'].split(File::PATH_SEPARATOR).find { |path|
+          File.executable? File.join(path, binary)
+        }
+        path && File.expand_path(binary, path)
       end
     end
 
