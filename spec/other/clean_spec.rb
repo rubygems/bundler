@@ -32,7 +32,7 @@ describe "bundle clean" do
 
       gem "thin"
     G
-    bundle "install --no-clean"
+    bundle "install"
 
     bundle :clean
 
@@ -60,7 +60,7 @@ describe "bundle clean" do
       gem "rack", "1.0.0"
       gem "foo"
     G
-    bundle "install --no-clean"
+    bundle "install"
 
     bundle :clean
 
@@ -88,7 +88,7 @@ describe "bundle clean" do
       gem "rack", "0.9.1"
       gem "foo"
     G
-    bundle "install --no-clean"
+    bundle "install"
 
     bundle :clean
 
@@ -111,8 +111,8 @@ describe "bundle clean" do
       end
     G
 
-    bundle "install --path vendor/bundle --no-clean"
-    bundle "install --without test_group --no-clean"
+    bundle "install --path vendor/bundle"
+    bundle "install --without test_group"
     bundle :clean
 
     out.should eq("Removing rack (1.0.0)")
@@ -137,7 +137,7 @@ describe "bundle clean" do
       end
     G
 
-    bundle "install --path vendor/bundle --no-clean"
+    bundle "install --path vendor/bundle"
 
     bundle :clean
 
@@ -159,14 +159,14 @@ describe "bundle clean" do
       end
     G
 
-    bundle "install --path vendor/bundle --no-clean"
+    bundle "install --path vendor/bundle"
 
     gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack", "1.0.0"
     G
-    bundle "install --no-clean"
+    bundle "install"
 
     bundle :clean
 
@@ -195,12 +195,12 @@ describe "bundle clean" do
       end
     G
 
-    bundle "install --path vendor/bundle --no-clean"
+    bundle "install --path vendor/bundle"
 
     update_git "foo", :path => lib_path("foo-bar")
     revision2 = revision_for(lib_path("foo-bar"))
 
-    bundle "update --no-clean"
+    bundle "update"
     bundle :clean
 
     out.should eq("Removing foo-bar (#{revision[0..11]})")
@@ -225,7 +225,7 @@ describe "bundle clean" do
       gem "activesupport", :git => "#{lib_path('rails')}", :ref => '#{revision}'
     G
 
-    bundle "install --path vendor/bundle --no-clean"
+    bundle "install --path vendor/bundle"
     bundle :clean
     out.should eq("")
 
@@ -254,14 +254,14 @@ describe "bundle clean" do
       gem "foo"
     G
 
-    bundle "install --path vendor/bundle --no-clean"
+    bundle "install --path vendor/bundle"
 
     gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "foo"
     G
-    bundle "install --no-clean"
+    bundle "install"
 
     FileUtils.rm(vendored_gems("bin/rackup"))
     FileUtils.rm_rf(vendored_gems("gems/thin-1.0"))
@@ -296,27 +296,27 @@ describe "bundle clean" do
     out.should include("thin (1.0)")
   end
 
-  it "--clean should override the bundle setting" do
+  xit "--clean should override the bundle setting" do
     gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "thin"
       gem "rack"
     G
-    bundle "install --path vendor/bundle --no-clean"
+    bundle "install --path vendor/bundle --clean"
 
     gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack"
     G
-    bundle "install --clean"
+    bundle "install"
 
     should_have_gems 'rack-1.0.0'
     should_not_have_gems 'thin-1.0'
   end
 
-  it "clean automatically on --path" do
+  xit "clean automatically on --path" do
     gemfile <<-G
       source "file://#{gem_repo1}"
 
@@ -336,7 +336,7 @@ describe "bundle clean" do
     should_not_have_gems 'thin-1.0'
   end
 
-  it "cleans on bundle update with --path" do
+  xit "cleans on bundle update with --path" do
     build_repo2
 
     gemfile <<-G
@@ -354,7 +354,7 @@ describe "bundle clean" do
     should_not_have_gems 'foo-1.0'
   end
 
-  it "does not clean on bundle update when using --system" do
+  xit "does not clean on bundle update when using --system" do
     build_repo2
 
     gemfile <<-G
@@ -406,7 +406,7 @@ describe "bundle clean" do
       gem "foo", :git => "#{lib_path('foo-1.0')}"
     G
 
-    bundle "install --path vendor/bundle --no-clean"
+    bundle "install --path vendor/bundle"
 
     # mimic 7 length git revisions in Gemfile.lock
     gemfile_lock = File.read(bundled_app('Gemfile.lock')).split("\n")
@@ -417,7 +417,7 @@ describe "bundle clean" do
       file.print gemfile_lock.join("\n")
     end
 
-    bundle "install --path vendor/bundle --no-clean"
+    bundle "install --path vendor/bundle"
 
     bundle :clean
 
@@ -465,7 +465,7 @@ describe "bundle clean" do
 
       gem "thin"
     G
-    bundle "install --no-clean"
+    bundle "install"
     bundle "install --deployment"
 
     out.should_not include("Removing foo (1.0)")
