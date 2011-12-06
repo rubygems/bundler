@@ -296,7 +296,7 @@ describe "bundle clean" do
     out.should include("thin (1.0)")
   end
 
-  xit "--clean should override the bundle setting" do
+  it "--clean should override the bundle setting on install" do
     gemfile <<-G
       source "file://#{gem_repo1}"
 
@@ -316,7 +316,27 @@ describe "bundle clean" do
     should_not_have_gems 'thin-1.0'
   end
 
-  xit "clean automatically on --path" do
+  it "--clean should override the bundle setting on update" do
+    build_repo2
+
+    gemfile <<-G
+      source "file://#{gem_repo2}"
+
+      gem "foo"
+    G
+    bundle "install --path vendor/bundle --clean"
+
+    update_repo2 do
+      build_gem 'foo', '1.0.1'
+    end
+
+    bundle "update"
+
+    should_have_gems 'foo-1.0.1'
+    should_not_have_gems 'foo-1.0'
+  end
+
+  it "does not clean automatically on --path" do
     gemfile <<-G
       source "file://#{gem_repo1}"
 
@@ -332,11 +352,10 @@ describe "bundle clean" do
     G
     bundle "install"
 
-    should_have_gems 'rack-1.0.0'
-    should_not_have_gems 'thin-1.0'
+    should_have_gems 'rack-1.0.0', 'thin-1.0'
   end
 
-  xit "cleans on bundle update with --path" do
+  it "does not clean on bundle update with --path" do
     build_repo2
 
     gemfile <<-G
@@ -351,10 +370,10 @@ describe "bundle clean" do
     end
 
     bundle :update
-    should_not_have_gems 'foo-1.0'
+    should_have_gems 'foo-1.0', 'foo-1.0.1'
   end
 
-  xit "does not clean on bundle update when using --system" do
+  it "does not clean on bundle update when using --system" do
     build_repo2
 
     gemfile <<-G
@@ -448,36 +467,5 @@ describe "bundle clean" do
 
     exitstatus.should == 0
     out.should == "1.0"
-  end
-
-  it "does not clean when using --deployment" do
-    gemfile <<-G
-      source "file://#{gem_repo1}"
-
-      gem "thin"
-      gem "foo"
-    G
-
-    bundle "install --path vendor/bundle --no-clean"
-
-    gemfile <<-G
-      source "file://#{gem_repo1}"
-
-      gem "thin"
-    G
-    bundle "install"
-    bundle "install --deployment"
-
-    out.should_not include("Removing foo (1.0)")
-    should_have_gems 'thin-1.0', 'rack-1.0.0', 'foo-1.0'
-    vendored_gems("bin/rackup").should exist
-
-    # check that it still doesn't clean and uses Bundler.settings
-    bundle "install"
-
-    out.should_not include("Removing foo (1.0)")
-    should_have_gems 'thin-1.0', 'rack-1.0.0', 'foo-1.0'
-    vendored_gems("bin/rackup").should exist
-
   end
 end

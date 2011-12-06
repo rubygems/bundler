@@ -156,7 +156,7 @@ module Bundler
       "Make a bundle that can work without the Bundler runtime"
     method_option "full-index", :type => :boolean, :banner =>
       "Use the rubygems modern index instead of the API endpoint"
-    method_option "clean", :type => :boolean, :default => false, :banner =>
+    method_option "clean", :type => :boolean, :banner =>
       "Run bundle clean automatically after install"
     def install
       opts = options.dup
@@ -211,6 +211,7 @@ module Bundler
       Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? '1' : nil
       Bundler.settings.without = opts[:without]
       Bundler.ui.be_quiet! if opts[:quiet]
+      Bundler.settings[:clean] = opts[:clean] if opts[:clean]
 
       Bundler::Fetcher.disable_endpoint = opts["full-index"]
       # rubygems plugins sometimes hook into the gem install process
@@ -232,7 +233,7 @@ module Bundler
         Bundler.ui.confirm "Post-install message from #{name}:\n#{msg}"
       end
 
-      clean if opts["clean"] && Bundler.settings[:path] && !Bundler.settings[:frozen]
+      clean if Bundler.settings[:clean] && Bundler.settings[:path]
     rescue GemNotFound => e
       if opts[:local] && Bundler.app_cache.exist?
         Bundler.ui.warn "Some gems seem to be missing from your vendor/cache directory."
@@ -253,8 +254,6 @@ module Bundler
     method_option "source", :type => :array, :banner => "Update a specific source (and all gems associated with it)"
     method_option "local", :type => :boolean, :banner =>
       "Do not attempt to fetch gems remotely and use the gem cache instead"
-    method_option "clean", :type => :boolean, :default => false, :banner =>
-      "Run bundle clean automatically after update"
     def update(*gems)
       sources = Array(options[:source])
 
@@ -271,7 +270,7 @@ module Bundler
 
       Installer.install Bundler.root, Bundler.definition, opts
       Bundler.load.cache if Bundler.root.join("vendor/cache").exist?
-      clean if options["clean"] && Bundler.settings[:path]
+      clean if Bundler.settings[:clean] && Bundler.settings[:path]
       Bundler.ui.confirm "Your bundle is updated! " +
         "Use `bundle show [gemname]` to see where a bundled gem is installed."
     end
