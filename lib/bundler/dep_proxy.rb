@@ -21,6 +21,14 @@ module Bundler
       @dep.type
     end
 
+    def name
+      @dep.name
+    end
+
+    def requirement
+      @dep.requirement
+    end
+
     def to_s
       "#{name} (#{requirement}) #{__platform}"
     end
