@@ -3,12 +3,7 @@
 Features:
 
   - Added README.md to `newgem` (@ognevsky, #1574)
-  - Search $PATH for a binary rather than shelling out to `which` (@tenderlove, #1573)
   - Added LICENSE (MIT) to newgem (@ognevsky, #1571)
-  - do not clear RG cache unless we actually modify GEM_PATH and GEM_HOME- use `Gem.load_env_plugins` instead of `Gem.load_env_plugins` (#1500, #1543)- use Gem.bindir for bundle clean (#1544, #1532)@jjb, 1522 (@tenderlove, #1567)
-  - `newgem` now uses https://rubygems.org (#1562)
-  - `bundle init` now uses https://rubygems.org (@jjb, #1522)
-  - `bundle install/update` does not autoclean when using --path for semver
 
 Bugfixes:
 
@@ -19,6 +14,11 @@ Bugfixes:
   - differentiate Ruby 2.0 (trunk) from Ruby 1.9 (@tenderlove, #1539)
   - `bundle clean` handles 7 length git hash for bundle clean (#1490, #1491)
   - fix Psych loading issues
+  - Search $PATH for a binary rather than shelling out to `which` (@tenderlove, #1573)
+  - do not clear RG cache unless we actually modify GEM_PATH and GEM_HOME- use `Gem.load_env_plugins` instead of `Gem.load_env_plugins` (#1500, #1543)
+  - `newgem` now uses https://rubygems.org (#1562)
+  - `bundle init` now uses https://rubygems.org (@jjb, #1522)
+  - `bundle install/update` does not autoclean when using --path for semver
 
 Documentation:
 
