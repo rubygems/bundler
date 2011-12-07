@@ -7,7 +7,7 @@ Features:
 
 Bugfixes:
 
-  - only auto-namespace requires for implied requires (#1531) 
+  - only auto-namespace requires for implied requires (#1531)
   - fix bundle clean output for git repos (#1473)
   - use Gem.bindir for bundle clean (#1544, #1532)
   - use `Gem.load_env_plugins` instead of `Gem.load_env_plugins` (#1500, #1543)
