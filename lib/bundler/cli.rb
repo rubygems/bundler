@@ -331,7 +331,7 @@ module Bundler
 
       out_count = 0
       # Loop through the current specs
-      current_specs.each do |current_spec|      
+      current_specs.each do |current_spec|
         next if !gems.empty? && !gems.include?(current_spec.name)
 
         active_spec = definition.index[current_spec.name].sort_by { |b| b.version }
