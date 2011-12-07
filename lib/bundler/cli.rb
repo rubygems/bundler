@@ -330,35 +330,28 @@ module Bundler
       end
 
       out_count = 0
-      definition.specs.each do |spec|
-        next if !gems.empty? && !gems.include?(spec.name)
+      # Loop through the current specs
+      current_specs.each do |current_spec|      
+        next if !gems.empty? && !gems.include?(current_spec.name)
 
-        spec.source.fetch(spec) if spec.source.respond_to?(:fetch)
+        active_spec = definition.index[current_spec.name].sort_by { |b| b.version }
 
-        if spec.source.is_a?(Bundler::Source::Git)
-          current = current_specs.find{|s| spec.name == s.name }
-          next if current.nil?
-        else
-          current = spec
-          spec = definition.index[current.name].sort_by{|b| b.version }
-
-          if !current.version.prerelease? && !options[:pre] && spec.size > 1
-            spec = spec.delete_if{|b| b.respond_to?(:version) && b.version.prerelease? }
-          end
-
-          spec = spec.last
-          next if spec.nil?
+        if !current_spec.version.prerelease? && !options[:pre] && active_spec.size > 1
+          active_spec = active_spec.delete_if { |b| b.respond_to?(:version) && b.version.prerelease? }
         end
 
-        gem_outdated = Gem::Version.new(spec.version) > Gem::Version.new(current.version)
-        git_outdated = current.git_version != spec.git_version
+        active_spec = active_spec.last
+        next if active_spec.nil?
+
+        gem_outdated = Gem::Version.new(active_spec.version) > Gem::Version.new(current_spec.version)
+        git_outdated = current_spec.git_version != active_spec.git_version
         if gem_outdated || git_outdated
-          spec_version    = "#{spec.version}#{spec.git_version}"
-          current_version = "#{current.version}#{current.git_version}"
-          Bundler.ui.info "  * #{spec.name} (#{spec_version} > #{current_version})"
+          spec_version    = "#{active_spec.version}#{active_spec.git_version}"
+          current_version = "#{current_spec.version}#{current_spec.git_version}"
+          Bundler.ui.info "  * #{active_spec.name} (#{spec_version} > #{current_version})"
           out_count += 1
         end
-        Bundler.ui.debug "from #{spec.loaded_from}"
+        Bundler.ui.debug "from #{active_spec.loaded_from}"
       end
 
       Bundler.ui.info "  Your bundle is up to date!" if out_count < 1
