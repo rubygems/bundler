@@ -567,6 +567,31 @@ describe "Bundler.setup" do
       end
       err.should == ""
     end
+
+    it "should make sure the Bundler.root is really included in the path relative to the Gemfile" do
+      relative_path = File.join('vendor', Dir.pwd[1..-1], 'foo')
+      absolute_path = bundled_app(relative_path)
+      FileUtils.mkdir_p(absolute_path)
+      build_lib "foo", :path => absolute_path
+
+      # If the .gemspec exists, then Bundler handles the path differently.
+      # See Source::Path.load_spec_files for details.
+      FileUtils.rm(File.join(absolute_path, 'foo.gemspec'))
+
+      gemfile <<-G
+        gem 'foo', '1.2.3', :path => '#{relative_path}'
+      G
+
+      bundle :install
+
+      Dir.chdir(bundled_app.parent) do
+        run <<-R, :env => {"BUNDLE_GEMFILE" => bundled_app('Gemfile')}
+          require 'foo'
+        R
+      end
+
+      err.should == ""
+    end
   end
 
   describe "with git gems that don't have gemspecs" do
