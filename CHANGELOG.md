@@ -1,3 +1,10 @@
+## 1.1.rc.3 (Dec 8, 2011)
+
+Bugfixes:
+
+  - fix relative_path so it checks Bundler.root is actually in the beginning of the path (#1582)
+  - fix bundle outdated doesn't list all gems (@joelmoss, #1521)
+
 ## 1.1.rc.2 (Dec 6, 2011)
 
 Features:
