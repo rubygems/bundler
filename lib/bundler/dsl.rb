@@ -92,7 +92,7 @@ module Bundler
     def source(source, options = {})
       case source
       when :gemcutter, :rubygems, :rubyforge then
-        @rubygems_source.add_remote "https://rubygems.org"
+        @rubygems_source.add_remote "http://rubygems.org"
         return
       when String
         @rubygems_source.add_remote source
