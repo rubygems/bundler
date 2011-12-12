@@ -507,16 +507,17 @@ module Bundler
       Viz requires the ruby-graphviz gem (and its dependencies).
       The associated gems must also be installed via 'bundle install'.
     D
-    method_option :file, :type => :string, :default => 'gem_graph.png', :aliases => '-f', :banner => "The name to use for the generated png file."
+    method_option :file, :type => :string, :default => 'gem_graph', :aliases => '-f', :banner => "The name to use for the generated file. see format option"
     method_option :version, :type => :boolean, :default => false, :aliases => '-v', :banner => "Set to show each gem version."
     method_option :requirements, :type => :boolean, :default => false, :aliases => '-r', :banner => "Set to show the version of each required dependency."
+    method_option :format, :type => :string, :default => "png", :aliases => '-F', :banner => "This is output format option. Supported format is png, jpg, svg, dot ..."
     def viz
       output_file = File.expand_path(options[:file])
-      graph = Graph.new( Bundler.load )
+      output_format = options[:format]
+      graph = Graph.new(Bundler.load, output_file, options[:version], options[:requirements], options[:format])
 
       begin
-        graph.viz(output_file, options[:version], options[:requirements])
-        Bundler.ui.info output_file
+        graph.viz
       rescue LoadError => e
         Bundler.ui.error e.inspect
         Bundler.ui.warn "Make sure you have the graphviz ruby gem. You can install it with:"
