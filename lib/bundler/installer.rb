@@ -53,7 +53,7 @@ module Bundler
       # the gem.
       Installer.post_install_messages = {}
       specs.each do |spec|
-        install_gem_from_spec(spec)
+        install_gem_from_spec(spec, options[:standalone])
       end
 
       lock
@@ -62,7 +62,7 @@ module Bundler
 
   private
 
-    def install_gem_from_spec(spec)
+    def install_gem_from_spec(spec, standalone = false)
       # Download the gem to get the spec, because some specs that are returned
       # by rubygems.org are broken and wrong.
       Bundler::Fetcher.fetch(spec) if spec.source.is_a?(Bundler::Source::Rubygems)
@@ -76,7 +76,10 @@ module Bundler
 
       # newline comes after installing, some gems say "with native extensions"
       Bundler.ui.info ""
-      generate_bundler_executable_stubs(spec) if Bundler.settings[:bin]
+      if Bundler.settings[:bin]
+        standalone ? generate_standalone_bundler_executable_stubs(spec) : generate_bundler_executable_stubs(spec)
+      end
+
       FileUtils.rm_rf(Bundler.tmp)
     rescue Exception => e
       # install hook failed
@@ -93,12 +96,27 @@ module Bundler
 
     def generate_bundler_executable_stubs(spec)
       bin_path = Bundler.bin_path
-      template = File.read(File.expand_path('../templates/Executable', __FILE__))
+      template = File.read(File.expand_path("../templates/Executable", __FILE__))
       relative_gemfile_path = Bundler.default_gemfile.relative_path_from(bin_path)
       ruby_command = Thor::Util.ruby_command
 
       spec.executables.each do |executable|
         next if executable == "bundle"
+        File.open "#{bin_path}/#{executable}", 'w', 0755 do |f|
+          f.puts ERB.new(template, nil, '-').result(binding)
+        end
+      end
+    end
+
+    def generate_standalone_bundler_executable_stubs(spec)
+      bin_path = Bundler.bin_path
+      template = File.read(File.expand_path("../templates/Executable.standalone", __FILE__))
+      ruby_command = Thor::Util.ruby_command
+
+      spec.executables.each do |executable|
+        next if executable == "bundle"
+        standalone_path = Pathname(Bundler.settings[:path]).expand_path.relative_path_from(bin_path)
+        executable_path = Pathname(spec.full_gem_path).join(spec.bindir, executable).relative_path_from(Bundler.root)
         File.open "#{bin_path}/#{executable}", 'w', 0755 do |f|
           f.puts ERB.new(template, nil, '-').result(binding)
         end

@@ -235,4 +235,20 @@ describe "bundle install --standalone" do
       end
     end
   end
+
+  describe "with --binstubs" do
+    before do
+      install_gemfile <<-G, :standalone => true, :binstubs => true
+        source "file://#{gem_repo1}"
+        gem "rails"
+      G
+    end
+
+    it "creates stubs that use the standalone load path" do
+      should_be_installed "actionpack 2.3.2", "rails 2.3.2"
+      Dir.chdir(bundled_app) do
+        `bin/rails -v`.chomp.should eql "2.3.2"
+      end
+    end
+  end
 end
