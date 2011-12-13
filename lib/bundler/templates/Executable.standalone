@@ -9,4 +9,4 @@
 $:.unshift File.expand_path '../<%= standalone_path %>', __FILE__
 
 require 'bundler/setup'
-load '<%= executable_path %>'
+load File.expand_path '../<%= executable_path %>', __FILE__

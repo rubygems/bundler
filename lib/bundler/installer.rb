@@ -116,7 +116,7 @@ module Bundler
       spec.executables.each do |executable|
         next if executable == "bundle"
         standalone_path = Pathname(Bundler.settings[:path]).expand_path.relative_path_from(bin_path)
-        executable_path = Pathname(spec.full_gem_path).join(spec.bindir, executable).relative_path_from(Bundler.root)
+        executable_path = Pathname(spec.full_gem_path).join(spec.bindir, executable).relative_path_from(bin_path)
         File.open "#{bin_path}/#{executable}", 'w', 0755 do |f|
           f.puts ERB.new(template, nil, '-').result(binding)
         end
