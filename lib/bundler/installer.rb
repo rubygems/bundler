@@ -96,7 +96,7 @@ module Bundler
 
     def generate_bundler_executable_stubs(spec)
       bin_path = Bundler.bin_path
-      template = File.read(File.expand_path("../templates/Executable", __FILE__))
+      template = File.read(File.expand_path('../templates/Executable', __FILE__))
       relative_gemfile_path = Bundler.default_gemfile.relative_path_from(bin_path)
       ruby_command = Thor::Util.ruby_command
 
@@ -110,7 +110,7 @@ module Bundler
 
     def generate_standalone_bundler_executable_stubs(spec)
       bin_path = Bundler.bin_path
-      template = File.read(File.expand_path("../templates/Executable.standalone", __FILE__))
+      template = File.read(File.expand_path('../templates/Executable.standalone', __FILE__))
       ruby_command = Thor::Util.ruby_command
 
       spec.executables.each do |executable|
