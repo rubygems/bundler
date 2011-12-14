@@ -52,7 +52,7 @@ module Bundler
       end
 
       options = Hash === args.last ? args.pop : {}
-      version = args || [">= 0"]
+      version = args
 
       _deprecated_options(options)
       _normalize_options(name, version, options)
