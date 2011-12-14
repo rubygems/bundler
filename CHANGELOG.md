@@ -1,3 +1,9 @@
+## 1.1.rc.5 (Dec 14, 2011)
+
+Bugfixes:
+
+  - Fix ASCII encoding errors with gem (rerelease with ruby 1.8)
+
 ## 1.1.rc.4 (Dec 14, 2011)
 
 Features:
