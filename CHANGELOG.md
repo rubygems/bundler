@@ -1,3 +1,14 @@
+## 1.1.rc.4 (Dec 14, 2011)
+
+Features:
+
+  - `bundle viz` has the option to output a DOT file instead of a PNG (@hirochachacha, #683)
+
+Bugfixes:
+
+  - Ensure binstubs generated when using --standalone point to the standalonde bundle (@cowboyd, #1588)
+  - fix `bundle viz` (@hirochachacha, #1586)
+
 ## 1.1.rc.3 (Dec 8, 2011)
 
 Bugfixes:
