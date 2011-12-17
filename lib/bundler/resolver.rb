@@ -156,6 +156,7 @@ module Bundler
 
     def start(reqs)
       activated = {}
+      @gems_size = Hash[reqs.map { |r| [r, gems_size(r)] }]
 
       resolve(reqs, activated)
     end
@@ -176,7 +177,7 @@ module Bundler
         [ activated[a.name] ? 0 : 1,
           a.requirement.prerelease? ? 0 : 1,
           @errors[a.name]   ? 0 : 1,
-          activated[a.name] ? 0 : gems_size(a) ]
+          activated[a.name] ? 0 : @gems_size[a] ]
       end
 
       debug { "Activated:\n" + activated.values.map {|a| "  #{a}" }.join("\n") }
@@ -210,7 +211,13 @@ module Bundler
           # I have no idea if this is the right way to do it, but let's see if it works
           # The current requirement might activate some other platforms, so let's try
           # adding those requirements here.
-          reqs.concat existing.activate_platform(current.__platform)
+          dependencies = existing.activate_platform(current.__platform)
+          reqs.concat dependencies
+
+          dependencies.each do |dep|
+            next if dep.type == :development
+            @gems_size[dep] = gems_size(dep)
+          end
 
           resolve(reqs, activated)
         else
@@ -325,6 +332,7 @@ module Bundler
         debug { "    * #{dep.name} (#{dep.requirement})" }
         dep.required_by.replace(requirement.required_by)
         dep.required_by << requirement
+        @gems_size[dep] = gems_size(dep)
         reqs << dep
       end
 
