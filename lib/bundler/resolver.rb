@@ -216,7 +216,7 @@ module Bundler
 
           dependencies.each do |dep|
             next if dep.type == :development
-            @gems_size[dep] = gems_size(dep)
+            @gems_size[dep] ||= gems_size(dep)
           end
 
           resolve(reqs, activated)
@@ -332,7 +332,7 @@ module Bundler
         debug { "    * #{dep.name} (#{dep.requirement})" }
         dep.required_by.replace(requirement.required_by)
         dep.required_by << requirement
-        @gems_size[dep] = gems_size(dep)
+        @gems_size[dep] ||= gems_size(dep)
         reqs << dep
       end
 
