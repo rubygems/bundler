@@ -75,6 +75,10 @@ module Spec
           s.write "lib/rack/test.rb", "RACK_TEST = '1.0'"
         end
 
+        build_gem "therubyracer", "0.9.9" do |s|
+          s.write "lib/v8.rb", "THERUBYRACER = '0.9.9'"
+        end
+
         build_gem "platform_specific" do |s|
           s.platform = Gem::Platform.local
           s.write "lib/platform_specific.rb", "PLATFORM_SPECIFIC = '1.0.0 #{Gem::Platform.local}'"
@@ -115,6 +119,11 @@ module Spec
 
         build_gem "multiple_versioned_deps" do |s|
           s.add_dependency "weakling", ">= 0.0.1", "< 0.1"
+        end
+
+        build_gem "multiple_requires" do |s|
+          s.write "lib/multi/one.rb", "MULTI_ONE = 1"
+          s.write "lib/multi/two.rb", "MULTI_TWO = 2"
         end
 
         build_gem "not_released", "1.0.pre"
