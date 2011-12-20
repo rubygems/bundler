@@ -34,7 +34,7 @@ begin
       rm_rf 'tmp'
     end
 
-    desc "Run the real-world spec suite (reequires internet)"
+    desc "Run the real-world spec suite (requires internet)"
     task :realworld => ["set_realworld", "spec"]
 
     task :set_realworld do
