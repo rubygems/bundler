@@ -395,7 +395,7 @@ module Bundler
     def exec(*)
       ARGV.shift # remove "exec"
 
-      Bundler.setup
+      Bundler.load.setup_environment
 
       begin
         # Run
