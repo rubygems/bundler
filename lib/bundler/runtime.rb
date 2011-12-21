@@ -200,12 +200,6 @@ module Bundler
       output
     end
 
-  private
-
-    def cache_path
-      root.join("vendor/cache")
-    end
-
     def setup_environment
       begin
         ENV["BUNDLE_BIN_PATH"] = Bundler.rubygems.bin_path("bundler", "bundle", VERSION)
@@ -228,6 +222,12 @@ module Bundler
         rubyopt.unshift "-I#{File.expand_path('../..', __FILE__)}"
         ENV["RUBYOPT"] = rubyopt.join(' ')
       end
+    end
+
+  private
+
+    def cache_path
+      root.join("vendor/cache")
     end
   end
 end
