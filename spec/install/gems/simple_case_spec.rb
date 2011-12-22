@@ -325,6 +325,18 @@ describe "bundle install with gem sources" do
       G
       exitstatus.should == 0
     end
+
+    it "doesn't blow up when the global .bundle/config is empty" do
+      FileUtils.mkdir_p("#{Bundler.rubygems.user_home}/.bundle")
+      FileUtils.touch("#{Bundler.rubygems.user_home}/.bundle/config")
+
+      install_gemfile(<<-G, :exitstatus => true)
+        source "file://#{gem_repo1}"
+
+        gem 'foo'
+      G
+      exitstatus.should == 0
+    end
   end
 
   describe "when prerelease gems are available" do
