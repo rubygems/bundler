@@ -1,8 +1,8 @@
 module Bundler
   class Settings
     def initialize(root)
-      @root   = root
-      @local_config = (File.exist?(local_config_file) && yaml = YAML.load_file(local_config_file)) ? yaml : {}
+      @root          = root
+      @local_config  = (File.exist?(local_config_file) && yaml = YAML.load_file(local_config_file)) ? yaml : {}
       @global_config = (File.exist?(global_config_file) && yaml = YAML.load_file(global_config_file)) ? yaml : {}
     end
 
