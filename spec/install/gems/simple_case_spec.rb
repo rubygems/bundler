@@ -313,6 +313,18 @@ describe "bundle install with gem sources" do
       out.should include("Could not reach http://localhost:9384/")
       out.should_not include("file://")
     end
+
+    it "doesn't blow up when the local .bundle/config is empty" do
+      FileUtils.mkdir_p(bundled_app(".bundle"))
+      FileUtils.touch(bundled_app(".bundle/config"))
+
+      install_gemfile(<<-G, :exitstatus => true)
+        source "file://#{gem_repo1}"
+
+        gem 'foo'
+      G
+      exitstatus.should == 0
+    end
   end
 
   describe "when prerelease gems are available" do
