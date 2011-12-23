@@ -128,7 +128,7 @@ describe "bundle exec" do
 
     bundle "exec", :exitstatus => true
     # exitstatus.should eq(128)
-    out.should include("bundle exec needs a command to run")
+    out.should include("bundler: exec needs a command to run")
   end
 
   describe "with gem executables" do
