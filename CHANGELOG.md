@@ -1,3 +1,12 @@
+## 1.1.rc.6 (Dec 22, 2011)
+
+Bugfixes:
+
+  - Fix performance regression from 1.0 (@spastorino)
+  - Load gems correctly when GEM_HOME is blank
+  - Refresh gems so Bundler works from inside a bundle
+  - Handle empty .bundle/config files without an error
+
 ## 1.1.rc.5 (Dec 14, 2011)
 
 Bugfixes:
