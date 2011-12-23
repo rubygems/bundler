@@ -2,7 +2,7 @@
 
 Bugfixes:
 
-  - Fix performance regression from 1.0 (@spastorino)
+  - Fix performance regression from 1.0 (@spastorino, #1511, #1591, #1592)
   - Load gems correctly when GEM_HOME is blank
   - Refresh gems so Bundler works from inside a bundle
   - Handle empty .bundle/config files without an error
