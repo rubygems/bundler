@@ -408,7 +408,7 @@ module Bundler
         Bundler.ui.warn  "Install missing gem executables with `bundle install`"
         exit 127
       rescue ArgumentError
-        Bundler.ui.error "bundle exec needs a command to run"
+        Bundler.ui.error "bundler: exec needs a command to run"
         exit 128
       end
     end
