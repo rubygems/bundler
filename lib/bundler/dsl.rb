@@ -6,6 +6,11 @@ module Bundler
       builder = new
       builder.instance_eval(Bundler.read_file(gemfile.to_s), gemfile.to_s, 1)
       builder.to_definition(lockfile, unlock)
+    rescue StandardError, ScriptError => e
+      e.backtrace[0] = "#{e.backtrace[0]}: #{e.message} (#{e.class})"
+      Bundler.ui.info e.backtrace.join("\n       ")
+      raise GemfileError, "There was an error in your Gemfile," \
+        " and Bundler cannot continue."
     end
 
     VALID_PLATFORMS = Bundler::Dependency::PLATFORM_MAP.keys.freeze
