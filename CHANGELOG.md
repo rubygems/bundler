@@ -1,3 +1,9 @@
+## 1.1.rc.7 (Dec 29, 2011)
+
+Bugfixes:
+
+  - Fix bug where `clean` would break when using :path with no gemspec
+
 ## 1.1.rc.6 (Dec 22, 2011)
 
 Bugfixes:
