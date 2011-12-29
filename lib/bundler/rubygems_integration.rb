@@ -269,7 +269,8 @@ module Bundler
     # Rubygems 1.8+
     def backport_base_dir
       Gem::Specification.send(:define_method, :base_dir) do
-        installation_path
+        return Gem.dir unless loaded_from
+        File.dirname File.dirname loaded_from
       end
     end
 
