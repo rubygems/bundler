@@ -468,4 +468,25 @@ describe "bundle clean" do
     exitstatus.should == 0
     out.should == "1.0"
   end
+
+  it "doesn't blow up on path gems without a .gempsec" do
+    relative_path = "vendor/private_gems/bar-1.0"
+    absolute_path = bundled_app(relative_path)
+    FileUtils.mkdir_p("#{absolute_path}/lib/bar")
+    File.open("#{absolute_path}/lib/bar/bar.rb", 'wb') do |file|
+      file.puts "module Bar; end"
+    end
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "foo"
+      gem "bar", "1.0", :path => "#{relative_path}"
+    G
+
+    bundle "install --path vendor/bundle"
+    bundle :clean, :exitstatus => true
+
+    exitstatus.should eq(0)
+  end
 end
