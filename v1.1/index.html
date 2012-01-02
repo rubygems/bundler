@@ -3,7 +3,7 @@
   <head>
     <title>Bundler: The best way to manage Ruby applications</title>
     <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
-    <link href="/stylesheets/application.css" media="all" rel="stylesheet" type="text/css"/><link href="/stylesheets/sunburst.css" media="all" rel="stylesheet" type="text/css"/>
+    <link href="../stylesheets/application.css" media="all" rel="stylesheet" type="text/css"/><link href="../stylesheets/sunburst.css" media="all" rel="stylesheet" type="text/css"/>
     <link href="/images/favicon.png" rel="shortcut icon" type="image/png" />
   </head>
   <body>
@@ -11,9 +11,16 @@
       <div id="contents">
         <div id="header">
           <a href="/">
-            <img alt="The best way to manage your application's dependencies" src="images/gembundler.png" width="725"/>
+            <img alt="The best way to manage your application's dependencies" src="../images/gembundler.png" width="725"/>
           </a>
         </div>
+        <div id="v11-message">
+          We're currently working on updating this page for Bundler 1.1. If you think something is incorrect, missing or
+          if you have some other suggestion for how to improve the docs, please
+          <a href="https://github.com/carlhuda/bundler/issues">open a new github issue</a>.
+          Thanks!
+        </div>
+        <p></p>
         <div id="intro">
           Bundler manages an <strong>application's dependencies</strong> through its
           entire life across many machines systematically and repeatably.
@@ -23,8 +30,8 @@
           <ul class="bullet">
             <a href="https://github.com/carlhuda/bundler/blob/1-0-stable/ISSUES.md">Troubleshooting</a>
             <a href="./rationale.html">Understanding Bundler</a>
-            <a href="./man/gemfile.5.html">Gemfile Manual</a>
-            <a href="./man/bundle.1.html">CLI Manual</a>
+            <a href="../man/gemfile.5.html">Gemfile Manual</a>
+            <a href="./commands.html">Command Line Reference</a>
           </ul>
         </div>
         <h2 id="getting-started">
@@ -89,7 +96,7 @@
               The executables installed into <code>bin</code> are scoped to the
               bundle and will always work
             </div>
-            <a href="./man/bundle-exec.1.html">Learn More: Executables</a>
+            <a href="../man/bundle-exec.1.html">Learn More: Executables</a>
           </div>
         </div>
         <h2 id="using-bundler-with-rails">
@@ -167,7 +174,7 @@
               in your <code>Gemfile</code>)
             </div>
             <pre class='sunburst'>$ bundle update rails</pre>
-            <a href="./man/bundle-update.1.html">Learn More: bundle update</a>
+            <a href="../man/bundle-update.1.html">Learn More: bundle update</a>
           </div>
           <div class="bullet">
             <div class="description">
@@ -176,6 +183,21 @@
               tell bundler to update <strong>all</strong> dependencies
             </div>
             <pre class='sunburst'>$ bundle update&#x000A;</pre>
+          </div>
+          <div class="bullet">
+            <div class="description">
+              To find out whether a newer version of a gem is available without updating yet:
+            </div>
+            <pre class='sunburst'>$ bundle outdated nokogiri</pre>
+            <div class="notes">
+              <p>
+                Check for newer pre-release versions: <code>bundle outdated nokogiri --pre</code>
+              </p>
+              <p>
+                Or leave off the gem name to check for newer versions of all gems: <code>$ bundle outdated</code>
+              </p>
+            </div>
+            <a href="./bundle_outdated.html">Learn More: bundle outdated</a>
           </div>
         </div>
         <h2 id="deploying-your-application">
@@ -244,12 +266,20 @@
             </div>
             <a href="./bundle_install.html">Learn More: bundle install</a>
           </div>
+          <div class="bullet">
+            <div class="description">
+              Create a code file along with the installed gems that can load
+              dependencies without Bundler
+            </div>
+            <pre class='sunburst'>$ bundle install --standalone</pre>
+            <a href="./bundle_install.html">Learn More: bundle install</a>
+          </div>
         </div>
       </div>
     </div>
     <div id="footer">
-      <img alt="Emocow" src="images/emocow.png"/>
-      <img alt="Panda" src="images/panda.jpg"/>
+      <img alt="Emocow" src="../images/emocow.png"/>
+      <img alt="Panda" src="../images/panda.jpg"/>
       <div class="spacer"></div>
       <div id="navigation">
         <p>
@@ -284,7 +314,7 @@
         </p>
       </div>
       <div class="spacer"></div>
-      <img alt="Bundler small" src="images/bundler-small.png"/>
+      <img alt="Bundler small" src="../images/bundler-small.png"/>
     </div>
     <div id="credits">
       <p>Bundler icon and logo designed by <a href="http://twitter.com/johnneiner">John Neiner</a> and donated by <a href="http://pixelgraphics.us">Pixel Graphic Design Studio</a></p>
@@ -293,11 +323,11 @@
       <img alt="Fork me on GitHub" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" />
     </a>
     <div id="prod-versions">
-      <a class="" href="v0.9/index.html">v0.9</a>
-      <a class="current" href="v1.0/index.html">v1.0</a>
+      <a class="" href="../v0.9/index.html">v0.9</a>
+      <a class="" href="../v1.0/index.html">v1.0</a>
     </div>
     <div id="rc-versions">
-      <a class="" href="v1.1/index.html">v1.1 (coming soon)</a>
+      <a class="current" href="../v1.1/index.html">v1.1 (coming soon)</a>
     </div>
     <script type="text/javascript">
       //<![CDATA[

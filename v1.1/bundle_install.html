@@ -3,7 +3,7 @@
   <head>
     <title>Bundler: The best way to manage Ruby applications</title>
     <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
-    <link href="/stylesheets/application.css" media="all" rel="stylesheet" type="text/css"/><link href="/stylesheets/sunburst.css" media="all" rel="stylesheet" type="text/css"/>
+    <link href="../stylesheets/application.css" media="all" rel="stylesheet" type="text/css"/><link href="../stylesheets/sunburst.css" media="all" rel="stylesheet" type="text/css"/>
     <link href="/images/favicon.png" rel="shortcut icon" type="image/png" />
   </head>
   <body>
@@ -11,16 +11,73 @@
       <div id="contents">
         <div id="header">
           <a href="/">
-            <img alt="The best way to manage your application's dependencies" src="images/gembundler.png" width="725"/>
+            <img alt="The best way to manage your application's dependencies" src="../images/gembundler.png" width="725"/>
           </a>
         </div>
+        <div id="v11-message">
+          We're currently working on updating this page for Bundler 1.1. If you think something is incorrect, missing or
+          if you have some other suggestion for how to improve the docs, please
+          <a href="https://github.com/carlhuda/bundler/issues">open a new github issue</a>.
+          Thanks!
+        </div>
+        <p></p>
         <h2>bundle install</h2>
         <div class="contents">
           <div class="bullet">
             <div class="description">
               Make sure all dependencies in your Gemfile are available to your application.
             </div>
-            <pre class='sunburst'>$ bundle install [--system]</pre>
+            <pre class='sunburst'>$ bundle install [--binstubs=PATH] [--clean] [--deployment] [--frozen]&#x000A;                 [--full-index] [--gemfile=FILE] [--local] [--no-cache]&#x000A;                 [--no-prune] [--path=PATH] [--quiet] [--shebang=STRING]&#x000A;                 [--standalone=ARRAY] [--system] [--without=GROUP GROUP]</pre>
+            <div class="notes">
+              <p>
+                Options:
+              </p>
+              <p>
+                <code>--binstubs</code>: Generate bin stubs for bundled gems to ./bin
+              </p>
+              <p>
+                <code>--clean</code>: Run bundle clean automatically after install
+              </p>
+              <p>
+                <code>--deployment</code>: Install using defaults tuned for deployment environments
+              </p>
+              <p>
+                <code>--frozen</code>: Do not allow the Gemfile.lock to be updated after this install
+              </p>
+              <p>
+                <code>--full-index</code>: Use the rubygems modern index instead of the API endpoint
+              </p>
+              <p>
+                <code>--gemfile</code>: Use the specified gemfile instead of Gemfile
+              </p>
+              <p>
+                <code>--local</code>: Do not attempt to fetch gems remotely and use the gem cache instead
+              </p>
+              <p>
+                <code>--no-cache</code>: Don't update the existing gem cache.
+              </p>
+              <p>
+                <code>--no-prune</code>: Don't remove stale gems from the cache.
+              </p>
+              <p>
+                <code>--path</code>: Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine
+              </p>
+              <p>
+                <code>--quiet</code>: Only output warnings and errors.
+              </p>
+              <p>
+                <code>--shebang</code>: Specify a different shebang executable name than the default (usually 'ruby')
+              </p>
+              <p>
+                <code>--standalone</code>: Make a bundle that can work without the Bundler runtime
+              </p>
+              <p>
+                <code>--system</code>: Install to the system location ($BUNDLE_PATH or $GEM_HOME) even if the bundle was previously installed somewhere else for this application
+              </p>
+              <p>
+                <code>--without</code>: Exclude gems that are part of the specified named group.
+              </p>
+            </div>
             <div class="notes">
               <p>
                 Gems will be installed to your default system location for gems. If your
@@ -38,7 +95,7 @@
               </p>
             </div>
           </div>
-          <div class="bullet">
+          <div class="bullet" id="path">
             <div class="description">
               Install your dependencies, even gems that are already installed
               to your system gems, to a location other than your system's gem
@@ -54,14 +111,14 @@
               <a href="./groups.html">Learn More: Bundler.require</a>
             </div>
           </div>
-          <div class="bullet">
+          <div class="bullet" id="without">
             <div class="description">
               Install all dependencies except those in groups that are explicitly excluded.
             </div>
             <pre class='sunburst'>$ bundle install --without development test</pre>
             <a href="./groups.html">Learn More: Groups</a>
           </div>
-          <div class="bullet">
+          <div class="bullet" id="deployment">
             <div class="description">
               Install all dependencies on to a production server.
               Do <b>not</b> use this flag on a development machine.
@@ -84,12 +141,72 @@
             </div>
             <a href="./deploying.html">Learn More: Deploying</a>
           </div>
+          <div class="bullet" id="binstubs">
+            <div class="description">
+              (Example with --binstubs TBD)
+            </div>
+          </div>
+          <div class="bullet" id="clean">
+            <div class="description">
+              (Example with --clean TBD)
+            </div>
+          </div>
+          <div class="bullet" id="frozen">
+            <div class="description">
+              (Example with --frozen TBD)
+            </div>
+          </div>
+          <div class="bullet" id="full-index">
+            <div class="description">
+              (Example with --full-index TBD)
+            </div>
+          </div>
+          <div class="bullet" id="gemfile">
+            <div class="description">
+              (Example with --gemfile TBD)
+            </div>
+          </div>
+          <div class="bullet" id="local">
+            <div class="description">
+              (Example with --local TBD)
+            </div>
+          </div>
+          <div class="bullet" id="no-cache">
+            <div class="description">
+              (Example with --no-cache TBD)
+            </div>
+          </div>
+          <div class="bullet" id="no-prune">
+            <div class="description">
+              (Example with --no-prune TBD)
+            </div>
+          </div>
+          <div class="bullet" id="quiet">
+            <div class="description">
+              (Example with --quiet TBD)
+            </div>
+          </div>
+          <div class="bullet" id="shebang">
+            <div class="description">
+              (Example with --shebang TBD)
+            </div>
+          </div>
+          <div class="bullet" id="standalone">
+            <div class="description">
+              (Example with --standalone TBD)
+            </div>
+          </div>
+          <div class="bullet" id="system">
+            <div class="description">
+              (Example with --system TBD)
+            </div>
+          </div>
         </div>
       </div>
     </div>
     <div id="footer">
-      <img alt="Emocow" src="images/emocow.png"/>
-      <img alt="Panda" src="images/panda.jpg"/>
+      <img alt="Emocow" src="../images/emocow.png"/>
+      <img alt="Panda" src="../images/panda.jpg"/>
       <div class="spacer"></div>
       <div id="navigation">
         <p>
@@ -124,7 +241,7 @@
         </p>
       </div>
       <div class="spacer"></div>
-      <img alt="Bundler small" src="images/bundler-small.png"/>
+      <img alt="Bundler small" src="../images/bundler-small.png"/>
     </div>
     <div id="credits">
       <p>Bundler icon and logo designed by <a href="http://twitter.com/johnneiner">John Neiner</a> and donated by <a href="http://pixelgraphics.us">Pixel Graphic Design Studio</a></p>
@@ -133,11 +250,11 @@
       <img alt="Fork me on GitHub" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" />
     </a>
     <div id="prod-versions">
-      <a class="" href="v0.9/index.html">v0.9</a>
-      <a class="current" href="v1.0/index.html">v1.0</a>
+      <a class="" href="../v0.9/index.html">v0.9</a>
+      <a class="" href="../v1.0/index.html">v1.0</a>
     </div>
     <div id="rc-versions">
-      <a class="" href="v1.1/index.html">v1.1 (coming soon)</a>
+      <a class="current" href="../v1.1/index.html">v1.1 (coming soon)</a>
     </div>
     <script type="text/javascript">
       //<![CDATA[
