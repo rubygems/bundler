@@ -192,6 +192,10 @@ module Bundler
     def with_clean_env
       with_original_env do
         ENV.delete_if { |k,_| k[0,7] == 'BUNDLE_' }
+        if ENV.has_key? 'RUBYOPT'
+          ENV['RUBYOPT'] = ENV['RUBYOPT'].sub '-rbundler/setup', ''
+          ENV['RUBYOPT'] = ENV['RUBYOPT'].sub "-I#{File.expand_path('..', __FILE__)}", ''
+        end
         yield
       end
     end
