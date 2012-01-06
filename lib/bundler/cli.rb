@@ -634,13 +634,39 @@ module Bundler
       end
     end
 
+    CONSOLES = [
+      ['pry',  :Pry],
+      ['ripl', :Ripl],
+      ['irb',  :IRB]
+    ]
+
     desc "console [GROUP]", "Opens an IRB session with the bundle pre-loaded"
     def console(group = nil)
       group ? Bundler.require(:default, *(group.split.map! {|g| g.to_sym })) : Bundler.require
       ARGV.clear
 
-      require 'irb'
-      IRB.start
+      file, constant = CONSOLES.find do |file,constant|
+        begin
+          require(file) || true
+        rescue LoadError
+          false
+        end
+      end
+
+      unless constant
+        Bundler.ui.error "Could not load the Ruby console"
+        return
+      end
+
+      console = begin
+                  Object.const_get(constant)
+                rescue NameError => e
+                  Bundler.ui.error e.inspect
+                  Bundler.ui.error "Could not load the #{file} console"
+                  return
+                end
+
+      console.start
     end
 
     desc "version", "Prints the bundler's version information"
