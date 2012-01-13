@@ -38,6 +38,8 @@ module Bundler
         $LOAD_PATH.unshift(*load_paths)
       end
 
+      setup_manpath
+
       lock
 
       self
@@ -273,6 +275,23 @@ module Bundler
           Bundler.ui.info "  * #{File.basename(path)}"
           FileUtils.rm_rf(path)
         end
+      end
+    end
+
+    def setup_manpath
+      # Store original MANPATH for restoration later in with_clean_env()
+      ENV['BUNDLE_ORIG_MANPATH'] = ENV['MANPATH']
+
+      # Add man/ subdirectories from activated bundles to MANPATH for man(1)
+      manuals = $LOAD_PATH.map do |path|
+        man_subdir = path.sub(/lib$/, 'man')
+        man_subdir unless Dir[man_subdir + '/man?/'].empty?
+      end.compact
+
+      unless manuals.empty?
+        ENV['MANPATH'] = manuals.concat(
+          ENV['MANPATH'].to_s.split(File::PATH_SEPARATOR)
+        ).uniq.join(File::PATH_SEPARATOR)
       end
     end
 
