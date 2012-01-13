@@ -122,4 +122,25 @@ describe "bundle install from an existing gemspec" do
     @err.should_not match(/ahh/)
   end
 
+  context "when the same gem is in a source" do
+    before do
+      build_lib "source_conflict", :path => bundled_app do |s|
+        s.add_dependency "rack_middleware"
+      end
+
+      build_lib "rack_middleware", "1.0", :path => bundled_app("rack_middleware") do |s|
+        s.add_dependency "rack", "1.0" # anything other than 0.9.1
+      end
+    end
+
+    fit "should install the gemspec deps" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gemspec
+      G
+
+      should_be_installed "rack 1.0"
+    end
+  end
+
 end
