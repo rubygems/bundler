@@ -159,20 +159,18 @@ module Bundler
 
     def index
       @index ||= Index.build do |idx|
-        other_sources = @sources.find_all{|s| !s.is_a?(Bundler::Source::Rubygems) }
-        rubygems_sources = @sources.find_all{|s| s.is_a?(Bundler::Source::Rubygems) }
-
         dependency_names = @dependencies.dup || []
         dependency_names.map! {|d| d.name }
-        other_sources.each do |s|
-          source_index = s.specs
-          dependency_names += source_index.unmet_dependency_names
-          idx.add_source source_index
-        end
 
-        rubygems_sources.each do |s|
-          s.dependency_names = dependency_names.uniq if s.is_a?(Bundler::Source::Rubygems)
-          idx.add_source s.specs
+        @sources.each do |s|
+          if s.is_a?(Bundler::Source::Rubygems)
+            s.dependency_names = dependency_names.uniq
+            idx.add_source s.specs
+          else
+            source_index = s.specs
+            dependency_names += source_index.unmet_dependency_names
+            idx.add_source source_index
+          end
         end
       end
     end
