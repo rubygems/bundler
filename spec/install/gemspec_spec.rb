@@ -133,7 +133,7 @@ describe "bundle install from an existing gemspec" do
       end
     end
 
-    fit "should install the gemspec deps" do
+    it "should install the gemspec deps" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
         gemspec
