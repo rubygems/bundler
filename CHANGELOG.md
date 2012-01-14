@@ -1,3 +1,10 @@
+## 1.1.rc.8 (Jan 13, 2011)
+
+Bugfixes:
+
+  - Load gemspecs from git even when a released gem has the same version (#1609)
+  - Declare an accurate Ruby version requirement of 1.8.7 or newer (#1619)
+
 ## 1.1.rc.7 (Dec 29, 2011)
 
 Bugfixes:
