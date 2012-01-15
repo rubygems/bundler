@@ -1,15 +1,34 @@
-require "uri"
-require 'rubygems/user_interaction'
-require "rubygems/installer"
-require "rubygems/spec_fetcher"
-require "rubygems/format"
 require "digest/sha1"
 require "open3"
+require "rubygems/doc_manager"
+require "rubygems/format"
+require "rubygems/installer"
+require "rubygems/spec_fetcher"
+require "rubygems/user_interaction"
+require "uri"
 
 module Bundler
   module Source
+    module HandlesDoc
+      def optionally_install_doc(spec)
+        if Bundler.settings[:ri]
+          docm ||= Gem::DocManager.new(spec)
+          Bundler.ui.info " +ri"
+          docm.generate_ri
+        end
+
+        if Bundler.settings[:rdoc]
+          docm ||= Gem::DocManager.new(spec)
+          Bundler.ui.info " +rdoc"
+          docm.generate_rdoc
+        end
+      end
+    end # HandlesDoc
+
     # TODO: Refactor this class
     class Rubygems
+      include HandlesDoc
+
       FORCE_MODERN_INDEX_LIMIT = 100 # threshold for switching back to the modern index instead of fetching every spec
 
       attr_reader :remotes, :caches
@@ -94,6 +113,8 @@ module Bundler
             :wrappers            => true,
             :env_shebang         => true
           ).install
+
+          optionally_install_doc(spec)
         end
 
         if spec.post_install_message
@@ -264,6 +285,8 @@ module Bundler
     end
 
     class Path
+      include HandlesDoc
+
       attr_reader :path, :options
       # Kind of a hack, but needed for the lock file parser
       attr_writer   :name
@@ -562,6 +585,9 @@ module Bundler
           @installed = true
         end
         generate_bin(spec)
+
+        # NOTE: RI/RDoc for Git gems requires a lot more hacking. Paths need to be sorted out, as well as RDoc internals to search in `bundler/doc/` or something.
+        #optionally_install_doc(spec)
       end
 
       def load_spec_files
@@ -700,6 +726,5 @@ module Bundler
         Dir.chdir(cache_path, &blk)
       end
     end
-
   end
 end

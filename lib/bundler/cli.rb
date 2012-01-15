@@ -128,6 +128,7 @@ module Bundler
 
       If the bundle has already been installed, bundler will tell you so and then exit.
     D
+
     method_option "without", :type => :array, :banner =>
       "Exclude gems that are part of the specified named group."
     method_option "gemfile", :type => :string, :banner =>
@@ -158,6 +159,10 @@ module Bundler
       "Use the rubygems modern index instead of the API endpoint"
     method_option "clean", :type => :boolean, :banner =>
       "Run bundle clean automatically after install"
+    method_option "ri", :type => :boolean, :banner =>
+      "Install RI documentation"
+    method_option "rdoc", :type => :boolean, :banner =>
+      "Install RDoc documentation"
     def install
       opts = options.dup
       if opts[:without]
@@ -212,6 +217,9 @@ module Bundler
       Bundler.settings.without = opts[:without]
       Bundler.ui.be_quiet! if opts[:quiet]
       Bundler.settings[:clean] = opts[:clean] if opts[:clean]
+
+      Bundler.settings[:ri] = true if opts[:ri]
+      Bundler.settings[:rdoc] = true if opts[:rdoc]
 
       Bundler::Fetcher.disable_endpoint = opts["full-index"]
       # rubygems plugins sometimes hook into the gem install process
