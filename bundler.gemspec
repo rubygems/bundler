@@ -14,6 +14,7 @@ Gem::Specification.new do |s|
   s.summary     = %q{The best way to manage your application's dependencies}
   s.description = %q{Bundler manages an application's dependencies through its entire life, across many machines, systematically and repeatably}
 
+  s.required_ruby_version     = ">= 1.8.7"
   s.required_rubygems_version = ">= 1.3.6"
   s.rubyforge_project         = "bundler"
 

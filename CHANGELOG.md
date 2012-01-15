@@ -1,3 +1,25 @@
+## 1.1.rc.8 (Jan 13, 2011)
+
+Bugfixes:
+
+  - Load gemspecs from git even when a released gem has the same version (#1609)
+  - Declare an accurate Ruby version requirement of 1.8.7 or newer (#1619)
+
+## 1.1.rc.7 (Dec 29, 2011)
+
+Bugfixes:
+
+  - Fix bug where `clean` would break when using :path with no gemspec
+
+## 1.1.rc.6 (Dec 22, 2011)
+
+Bugfixes:
+
+  - Fix performance regression from 1.0 (@spastorino, #1511, #1591, #1592)
+  - Load gems correctly when GEM_HOME is blank
+  - Refresh gems so Bundler works from inside a bundle
+  - Handle empty .bundle/config files without an error
+
 ## 1.1.rc.5 (Dec 14, 2011)
 
 Bugfixes:

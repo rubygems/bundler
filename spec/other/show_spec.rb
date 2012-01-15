@@ -16,7 +16,7 @@ describe "bundle show" do
     bundled_app("Gemfile.lock").should exist
   end
 
-  it "creates a Gemfile.lock if one did not exist and we're doing bundle show rails" do
+  it "creates a Gemfile.lock when invoked with a gem name" do
     FileUtils.rm("Gemfile.lock")
 
     bundle "show rails"

@@ -19,4 +19,12 @@ describe Bundler::Dsl do
       subject.dependencies.first.source.uri.should == github_uri
     end
   end
+
+  describe "syntax errors" do
+    it "should raise a Bundler::GemfileError" do
+      gemfile "gem 'foo', :path => /unquoted/string/syntax/error"
+      lambda { Bundler::Dsl.evaluate(bundled_app("Gemfile"), nil, true) }.
+        should raise_error(Bundler::GemfileError)
+    end
+  end
 end

@@ -73,6 +73,10 @@ module Bundler
       Gem.bin_path(gem, bin, ver)
     end
 
+    def refresh
+      Gem.refresh
+    end
+
     def preserve_paths
       # this is a no-op outside of Rubygems 1.8
       yield
@@ -229,7 +233,7 @@ module Bundler
     end
 
     # Because Bundler has a static view of what specs are available,
-    # we don't #reflesh, so stub it out.
+    # we don't #refresh, so stub it out.
     def replace_refresh
       gem_class = (class << Gem ; self ; end)
       gem_class.send(:remove_method, :refresh)
@@ -265,7 +269,8 @@ module Bundler
     # Rubygems 1.8+
     def backport_base_dir
       Gem::Specification.send(:define_method, :base_dir) do
-        installation_path
+        return Gem.dir unless loaded_from
+        File.dirname File.dirname loaded_from
       end
     end
 
