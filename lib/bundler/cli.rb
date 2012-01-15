@@ -39,13 +39,17 @@ module Bundler
       if manpages.include?(command)
         root = File.expand_path("../man", __FILE__)
 
-        if have_groff? && root !~ %r{^file:/.+!/META-INF/jruby.home/.+}
-          groff   = "groff -Wall -mtty-char -mandoc -Tascii"
-          pager   = ENV['MANPAGER'] || ENV['PAGER'] || 'less -R'
+        if have_groff? && root !~ %r{^file:/.+!/META-INF/jruby.home/.+} &&
+                          File.size?("#{root}/#{command}")
 
+          pager = ENV['MANPAGER'] || ENV['PAGER'] || 'less -R'
+          groff   = "groff -Wall -mtty-char -mandoc -Tascii"
           Kernel.exec "#{groff} #{root}/#{command} | #{pager}"
-        else
+
+        elsif File.size?("#{root}/#{command}.txt")
           puts File.read("#{root}/#{command}.txt")
+        else
+          puts "The help for #{command} is not correctly installed.  Consider re-installing bundler."
         end
       else
         super
