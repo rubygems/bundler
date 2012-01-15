@@ -21,6 +21,9 @@ started, and Gemfile(5) for more information on the `Gemfile` format.
 * `--verbose`:
   Prints out additional logging information
 
+* `--help`:
+  Prints this page, see also `bundle help <command>`
+
 ## BUNDLE COMMANDS
 
 We divide `bundle` subcommands into primary commands and utilities.
@@ -44,6 +47,9 @@ We divide `bundle` subcommands into primary commands and utilities.
   Specify and read configuration options for bundler
 
 ## UTILITIES
+
+* `bundle help <command>`:
+  Show help for a bundler command, ex. `bundle help install`.
 
 * `bundle check(1)`:
   Determine whether the requirements for your application are installed
