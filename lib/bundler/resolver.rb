@@ -463,7 +463,7 @@ module Bundler
           else
             if requirement.required_by.first
               o << "Could not find gem '#{clean_req(requirement)}', which is required by "
-              o << "gem '#{clean_req(requirement.required_by.first)}', in any of the sources."
+              o << "#{GemHelper.gem_cmd} '#{clean_req(requirement.required_by.first)}', in any of the sources."
             else
               o << "Could not find gem '#{clean_req(requirement)} in any of the sources\n"
             end

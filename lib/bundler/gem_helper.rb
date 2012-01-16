@@ -11,6 +11,10 @@ module Bundler
       self.new(dir, opts[:name]).install
     end
 
+    def self.gem_cmd
+      Gem::Platform.match('macruby') ? 'macgem' : 'gem'
+    end
+
     attr_reader :spec_path, :base, :gemspec
 
     def initialize(base, name = nil)
@@ -41,7 +45,7 @@ module Bundler
 
     def build_gem
       file_name = nil
-      sh("gem build -V '#{spec_path}'") { |out, code|
+      sh("#{GemHelper.gem_cmd} build -V '#{spec_path}'") { |out, code|
         file_name = File.basename(built_gem_path)
         FileUtils.mkdir_p(File.join(base, 'pkg'))
         FileUtils.mv(built_gem_path, 'pkg')
@@ -52,7 +56,7 @@ module Bundler
 
     def install_gem
       built_gem_path = build_gem
-      out, _ = sh_with_code("gem install '#{built_gem_path}'")
+      out, _ = sh_with_code("#{GemHelper.gem_cmd} install '#{built_gem_path}'")
       raise "Couldn't install gem, run `gem install #{built_gem_path}' for more detailed output" unless out[/Successfully installed/]
       Bundler.ui.confirm "#{name} (#{version}) installed"
     end
@@ -70,7 +74,7 @@ module Bundler
     protected
     def rubygem_push(path)
       if Pathname.new("~/.gem/credentials").expand_path.exist?
-        sh("gem push '#{path}'")
+        sh("#{GemHelper.gem_cmd} push '#{path}'")
         Bundler.ui.confirm "Pushed #{name} #{version} to rubygems.org"
       else
         raise "Your rubygems.org credentials aren't set. Run `gem push` to set them."
