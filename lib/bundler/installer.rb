@@ -88,7 +88,7 @@ module Bundler
       # other failure, likely a native extension build failure
       Bundler.ui.info ""
       Bundler.ui.warn "#{e.class}: #{e.message}"
-      msg = "An error occured while installing #{spec.name} (#{spec.version}),"
+      msg = "An error occurred while installing #{spec.name} (#{spec.version}),"
       msg << " and Bundler cannot continue.\nMake sure that `gem install"
       msg << " #{spec.name} -v '#{spec.version}'` succeeds before bundling."
       raise Bundler::InstallError, msg
