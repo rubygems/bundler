@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 $:.unshift File.expand_path("../lib", __FILE__)
+require 'rubygems'
 require 'bundler/gem_tasks'
 
 def safe_task(&block)
@@ -12,8 +13,8 @@ end
 namespace :spec do
   desc "Ensure spec dependencies are installed"
   task :deps do
-    sh "gem list ronn | (grep 'ronn' 1> /dev/null) || gem install ronn --no-ri --no-rdoc"
-    sh "gem list rspec | (grep 'rspec (2.' 1> /dev/null) || gem install rspec --no-ri --no-rdoc"
+    sh "#{Gem.ruby} -S gem list ronn | (grep 'ronn' 1> /dev/null) || #{Gem.ruby} -S gem install ronn --no-ri --no-rdoc"
+    sh "#{Gem.ruby} -S gem list rspec | (grep 'rspec (2.' 1> /dev/null) || #{Gem.ruby} -S gem install rspec --no-ri --no-rdoc"
   end
 end
 
@@ -135,7 +136,7 @@ begin
       roff = "lib/bundler/man/#{basename}"
 
       file roff => ["lib/bundler/man", ronn] do
-        sh "ronn --roff --pipe #{ronn} > #{roff}"
+        sh "#{Gem.ruby} -S ronn --roff --pipe #{ronn} > #{roff}"
       end
 
       file "#{roff}.txt" => roff do
@@ -171,7 +172,7 @@ begin
 
       desc "Install CI dependencies"
       task :deps do
-        sh "gem list ci_reporter | (grep 'ci_reporter' 1> /dev/null) || gem install ci_reporter --no-ri --no-rdoc"
+        sh "#{Gem.ruby} -S gem list ci_reporter | (grep 'ci_reporter' 1> /dev/null) || #{Gem.ruby} -S gem install ci_reporter --no-ri --no-rdoc"
       end
       task :deps => "spec:deps"
     end
