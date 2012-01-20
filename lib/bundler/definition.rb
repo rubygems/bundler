@@ -81,6 +81,7 @@ module Bundler
       # add_development_dependency in a gemspec that's loaded with the gemspec
       # directive, the lockfile dependencies and resolved dependencies end up
       # with a mismatch on #type.
+      # Test coverage to catch a regression on this is in gemspec_spec.rb
       @dependencies.each do |d|
         if ld = @locked_deps.find { |l| l.name == d.name }
           ld.instance_variable_set(:@type, d.type)
