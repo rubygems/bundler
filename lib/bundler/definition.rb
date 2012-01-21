@@ -87,7 +87,9 @@ module Bundler
 
     def specs
       @specs ||= begin
-        specs = resolve.materialize(requested_dependencies)
+        resolved = resolve_with_local_override
+        #debugger
+        specs = resolved.materialize(requested_dependencies)
 
         unless specs["bundler"].any?
           local = Bundler.settings[:frozen] ? rubygems_index : index
@@ -135,26 +137,40 @@ module Bundler
       specs.for(expand_dependencies(deps))
     end
 
-    def resolve
-      @resolve ||= begin
-        if Bundler.settings[:frozen]
-          @locked_specs
-        else
-          last_resolve = converge_locked_specs
+    def resolve_specs(with_local_override)
+      if Bundler.settings[:frozen]
+        @locked_specs
+      else
+        last_resolve = converge_locked_specs
 
-          # Record the specs available in each gem's source, so that those
-          # specs will be available later when the resolver knows where to
-          # look for that gemspec (or its dependencies)
-          source_requirements = {}
-          dependencies.each do |dep|
-            next unless dep.source
-            source_requirements[dep.name] = dep.source.specs
-          end
-
-          # Run a resolve against the locally available gems
-          last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve)
+        # Record the specs available in each gem's source, so that those
+        # specs will be available later when the resolver knows where to
+        # look for that gemspec (or its dependencies)
+        source_requirements = {}
+        dependencies.each do |dep|
+          next unless dep.source
+          source_requirements[dep.name] = dep.source.specs
         end
+
+        if with_local_override
+          local_overrides = Index.build do |local|
+            path = Bundler::Source::Path.new("name" => "bundler_test_gem", "path" => "~/src/bundler_test_gem")
+            local.add_source path.specs
+          end
+          source_requirements.delete("bundler_test_gem")
+        end
+
+        # Run a resolve against the locally available gems
+        last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve, local_overrides)
       end
+    end
+
+    def resolve
+      @resolve ||= resolve_specs(false)
+    end
+
+    def resolve_with_local_override
+      resolve_specs(true)
     end
 
     def index

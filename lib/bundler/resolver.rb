@@ -121,9 +121,10 @@ module Bundler
     # ==== Returns
     # <GemBundle>,nil:: If the list of dependencies can be resolved, a
     #   collection of gemspecs is returned. Otherwise, nil is returned.
-    def self.resolve(requirements, index, source_requirements = {}, base = [])
+    def self.resolve(requirements, index, source_requirements = {}, base = [], local_overrides = [])
       base = SpecSet.new(base) unless base.is_a?(SpecSet)
-      resolver = new(index, source_requirements, base)
+
+      resolver = new(index, source_requirements, base, local_overrides)
       result = catch(:success) do
         resolver.start(requirements)
         raise resolver.version_conflict
@@ -132,10 +133,11 @@ module Bundler
       SpecSet.new(result)
     end
 
-    def initialize(index, source_requirements, base)
+    def initialize(index, source_requirements, base, local_overrides = nil)
       @errors               = {}
       @stack                = []
       @base                 = base
+      @local_overrides      = local_overrides
       @index                = index
       @deps_for             = {}
       @missing_gems         = Hash.new(0)
@@ -163,9 +165,14 @@ module Bundler
     def resolve(reqs, activated)
       # If the requirements are empty, then we are in a success state. Aka, all
       # gem dependencies have been resolved.
+      if reqs.empty?
+        debug { "resolved!" }
+      end
       throw :success, successify(activated) if reqs.empty?
 
-      debug { print "\e[2J\e[f" ; "==== Iterating ====\n\n" }
+      #debug { print "\e[2J\e[f" ; "==== Iterating ====\n\n" }
+      debug { "iterating" }
+      puts caller.join("\n")
 
       # Sort dependencies so that the ones that are easiest to resolve are first.
       # Easiest to resolve is defined by:
@@ -179,7 +186,7 @@ module Bundler
           activated[a.name] ? 0 : gems_size(a) ]
       end
 
-      debug { "Activated:\n" + activated.values.map {|a| "  #{a}" }.join("\n") }
+      debug { "Activated:\n" + activated.values.map {|a| "  #{a} - #{a.source}" }.join("\n") }
       debug { "Requirements:\n" + reqs.map {|r| "  #{r}"}.join("\n") }
 
       activated = activated.dup
@@ -249,6 +256,7 @@ module Bundler
 
         # Fetch all gem versions matching the requirement
         matching_versions = search(current)
+        debug { matching_versions.join(" - ") }
 
         # If we found no versions that match the current requirement
         if matching_versions.empty?
@@ -357,7 +365,10 @@ module Bundler
     end
 
     def search(dep)
-      if base = @base[dep.name] and base.any?
+      if @local_overrides and (local = @local_overrides[dep.name]) and local.any?
+        reqs = [dep.requirement.as_list, local.first.version.to_s].flatten.compact
+        d = Gem::Dependency.new(local.first.name, *reqs)
+      elsif base = @base[dep.name] and base.any?
         reqs = [dep.requirement.as_list, base.first.version.to_s].flatten.compact
         d = Gem::Dependency.new(base.first.name, *reqs)
       else
@@ -365,8 +376,14 @@ module Bundler
       end
 
       @deps_for[d.hash] ||= begin
-        index = @source_requirements[d.name] || @index
-        results = index.search(d, @base[d.name])
+        if @local_overrides
+          results = @local_overrides.search(d, nil)
+        end
+
+        if results.nil? or results.empty?
+          index = @source_requirements[d.name] || @index
+          results = index.search(d, @base[d.name])
+        end
 
         if results.any?
           version = results.first.version
@@ -383,6 +400,7 @@ module Bundler
           deps = []
         end
       end
+
     end
 
     def clean_req(req)
