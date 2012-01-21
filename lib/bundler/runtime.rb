@@ -13,6 +13,8 @@ module Bundler
       setup_environment
       Bundler.rubygems.replace_entrypoints(specs)
 
+      puts "HI1"
+      puts specs.map { |s| [s.name, s.loaded_from].join(",") }.join("\n")
       # Activate the specs
       specs.each do |spec|
         unless spec.loaded_from
@@ -36,6 +38,8 @@ module Bundler
         $LOAD_PATH.unshift(*load_paths)
       end
 
+      puts "HIHIHI"
+      puts specs.map { |s| [s.name, s.loaded_from].join(",") }.join("\n")
       lock
 
       self

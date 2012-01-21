@@ -14,6 +14,7 @@ module Bundler
     end
 
     def for(dependencies, skip = [], check = false, match_current_platform = false)
+      debugger
       handled, deps, specs = {}, dependencies.dup, []
       skip << 'bundler'
 

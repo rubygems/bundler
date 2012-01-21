@@ -88,7 +88,7 @@ module Bundler
     def specs
       @specs ||= begin
         resolved = resolve_with_local_override
-        #debugger
+        debugger if respond_to?(:debugger)
         specs = resolved.materialize(requested_dependencies)
 
         unless specs["bundler"].any?
@@ -153,11 +153,12 @@ module Bundler
         end
 
         if with_local_override
+          path = nil
           local_overrides = Index.build do |local|
             path = Bundler::Source::Path.new("name" => "bundler_test_gem", "path" => "~/src/bundler_test_gem")
             local.add_source path.specs
           end
-          source_requirements.delete("bundler_test_gem")
+          source_requirements["bundler_test_gem"] = path.specs
         end
 
         # Run a resolve against the locally available gems
