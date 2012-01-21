@@ -157,7 +157,7 @@ module Bundler
             path = Bundler::Source::Path.new("name" => "bundler_test_gem", "path" => "~/src/bundler_test_gem")
             local.add_source path.specs
           end
-          source_requirements["bundler_test_gem"] = path.specs
+          #source_requirements["bundler_test_gem"] = nil
         end
 
         local_resolve = Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve, local_overrides)
@@ -166,8 +166,12 @@ module Bundler
         # so that we don't duplicate gems
         if local_overrides
           local_resolve.to_a.each do |s|
-            if local_overrides[s.name] && last_resolve[s.name]
-              last_resolve.delete(s.name)
+            if local_overrides[s.name].any?
+              if (res = local_resolve[s.name]) && res.first.source.class == Bundler::Source::Path
+                last_resolve.delete(s.name)
+              else
+                Bundler.ui.warn("Couln't use local copy of #{s.name}, perhaps it's out of date?")
+              end
             end
           end
         end

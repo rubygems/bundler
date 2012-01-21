@@ -363,16 +363,24 @@ module Bundler
       @deps_for = {}
     end
 
-    def search(dep)
+    def reqs_for(dep)
       if @local_overrides and (local = @local_overrides[dep.name]) and local.any?
-        reqs = [dep.requirement.as_list, local.first.version.to_s].flatten.compact
-        d = Gem::Dependency.new(local.first.name, *reqs)
-      elsif base = @base[dep.name] and base.any?
-        reqs = [dep.requirement.as_list, base.first.version.to_s].flatten.compact
-        d = Gem::Dependency.new(base.first.name, *reqs)
-      else
         d = dep.dep
+        if @local_overrides.search(d, nil).any?
+          return d
+        end
       end
+
+      if base = @base[dep.name] and base.any?
+        reqs = [dep.requirement.as_list, base.first.version.to_s].flatten.compact
+        Gem::Dependency.new(base.first.name, *reqs)
+      else
+        dep.dep
+      end
+    end
+
+    def search(dep)
+      d = reqs_for(dep)
 
       @deps_for[d.hash] ||= begin
         if @local_overrides
