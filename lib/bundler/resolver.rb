@@ -172,7 +172,6 @@ module Bundler
 
       #debug { print "\e[2J\e[f" ; "==== Iterating ====\n\n" }
       debug { "iterating" }
-      #puts caller.join("\n")
 
       # Sort dependencies so that the ones that are easiest to resolve are first.
       # Easiest to resolve is defined by:

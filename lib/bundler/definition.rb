@@ -88,7 +88,6 @@ module Bundler
     def specs
       @specs ||= begin
         resolved = resolve_with_local_override
-        debugger if respond_to?(:debugger)
         specs = resolved.materialize(requested_dependencies)
 
         unless specs["bundler"].any?
@@ -161,8 +160,19 @@ module Bundler
           source_requirements["bundler_test_gem"] = path.specs
         end
 
-        # Run a resolve against the locally available gems
-        last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve, local_overrides)
+        local_resolve = Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve, local_overrides)
+
+        # for all of the local-override gems that were resolved, pop them out of the lockfile-resolved list
+        # so that we don't duplicate gems
+        if local_overrides
+          local_resolve.to_a.each do |s|
+            if local_overrides[s.name] && last_resolve[s.name]
+              last_resolve.delete(s.name)
+            end
+          end
+        end
+
+        last_resolve.merge local_resolve
       end
     end
 

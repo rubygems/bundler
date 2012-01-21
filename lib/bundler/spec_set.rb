@@ -14,7 +14,6 @@ module Bundler
     end
 
     def for(dependencies, skip = [], check = false, match_current_platform = false)
-      debugger
       handled, deps, specs = {}, dependencies.dup, []
       skip << 'bundler'
 
@@ -64,6 +63,14 @@ module Bundler
       @lookup = nil
       @sorted = nil
       value
+    end
+
+    def delete(key)
+      @specs.delete_if { |s| s.name == key }
+      @lookup = nil
+      @sorted = nil
+      lookup
+      sorted
     end
 
     def sort!
