@@ -14,6 +14,7 @@ module Bundler
       @rubygems_source = Source::Rubygems.new
       @source          = nil
       @sources         = []
+      @local_overrides = []
       @dependencies    = []
       @groups          = []
       @platforms       = []
@@ -108,6 +109,12 @@ module Bundler
       @source = nil
     end
 
+    def local(name, path)
+      if File.directory?(File.expand_path(path, Bundler.root))
+        @local_overrides << Bundler::Source::Path.new("name" => name, "path" => path)
+      end
+    end
+
     def path(path, options = {}, source_options = {}, &blk)
       source Source::Path.new(_normalize_hash(options).merge("path" => Pathname.new(path))), source_options, &blk
     end
@@ -129,7 +136,7 @@ module Bundler
 
     def to_definition(lockfile, unlock)
       @sources << @rubygems_source unless @sources.include?(@rubygems_source)
-      Definition.new(lockfile, @dependencies, @sources, unlock)
+      Definition.new(lockfile, @dependencies, @sources, unlock, @local_overrides)
     end
 
     def group(*args, &blk)
