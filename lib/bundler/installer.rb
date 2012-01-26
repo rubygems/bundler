@@ -124,8 +124,9 @@ module Bundler
     end
 
     def generate_standalone(groups)
-      standalone_path = Bundler.settings[:path]
-      bundler_path = File.join(standalone_path, "bundler")
+      bundler_path = File.expand_path(File.join(Bundler.rubygems.gem_path, "..", "..", "bundler"))
+      bundler_setup_file = File.join(bundler_path, "setup.rb")
+      Bundler.ui.debug "Generating standlone include file #{bundler_setup_file}"
       FileUtils.mkdir_p(bundler_path)
 
       paths = []
@@ -145,8 +146,7 @@ module Bundler
         end
       end
 
-
-      File.open File.join(bundler_path, "setup.rb"), "w" do |file|
+      File.open bundler_setup_file, "w" do |file|
         file.puts "path = File.expand_path('..', __FILE__)"
         paths.each do |path|
           file.puts %{$:.unshift File.expand_path("\#{path}/#{path}")}
