@@ -70,6 +70,23 @@ module Bundler
 
       converge_sources
       converge_dependencies
+
+      fixup_dependency_types!
+    end
+
+    def fixup_dependency_types!
+      # XXX This is a temporary workaround for a bug when using rubygems 1.8.15
+      # where Gem::Dependency#== matches Gem::Dependency#type. As the lockfile
+      # doesn't carry a notion of the dependency type, if you use
+      # add_development_dependency in a gemspec that's loaded with the gemspec
+      # directive, the lockfile dependencies and resolved dependencies end up
+      # with a mismatch on #type.
+      # Test coverage to catch a regression on this is in gemspec_spec.rb
+      @dependencies.each do |d|
+        if ld = @locked_deps.find { |l| l.name == d.name }
+          ld.instance_variable_set(:@type, d.type)
+        end
+      end
     end
 
     def resolve_with_cache!
