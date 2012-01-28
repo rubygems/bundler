@@ -15,10 +15,10 @@ describe "Bundler.with_env helpers" do
   end
 
   around do |example|
-    bundle_path = Bundler::ORIGINAL_ENV['BUNDLE_PATH']
+    env = Bundler::ORIGINAL_ENV.dup
     Bundler::ORIGINAL_ENV['BUNDLE_PATH'] = "./Gemfile"
     example.run
-    Bundler::ORIGINAL_ENV['BUNDLE_PATH'] = bundle_path
+    Bundler::ORIGINAL_ENV.replace env
   end
 
   describe "Bundler.with_clean_env" do
@@ -29,6 +29,18 @@ describe "Bundler.with_env helpers" do
       Bundler.with_clean_env do
         `echo $BUNDLE_PATH`.strip.should_not == './Gemfile'
       end
+    end
+
+    it "should not pass RUBYOPT changes" do
+      lib_path = File.expand_path('../../../lib', __FILE__)
+      Bundler::ORIGINAL_ENV['RUBYOPT'] = " -I#{lib_path} -rbundler/setup"
+
+      Bundler.with_clean_env do
+        `echo $RUBYOPT`.strip.should_not include '-rbundler/setup'
+        `echo $RUBYOPT`.strip.should_not include "-I#{lib_path}"
+      end
+
+      Bundler::ORIGINAL_ENV['RUBYOPT'].should == " -I#{lib_path} -rbundler/setup"
     end
 
     it "should not change ORIGINAL_ENV" do
