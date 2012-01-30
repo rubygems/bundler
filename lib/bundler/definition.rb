@@ -166,10 +166,12 @@ module Bundler
         # so that we don't duplicate gems
         local_resolve.to_a.each do |s|
           if override_index[s.name].any?
-            if last_resolve[s.name]
+            o = override_index[s.name].first
+
+            if local_resolve[s.name] && local_resolve[s.name].first.source.class == Bundler::Source::Path
               last_resolve.delete(s.name)
             else
-              Bundler.ui.warn("Couln't use #{s.name} from #{s.source.path}, perhaps it's out of date?")
+              Bundler.ui.warn("Couln't use #{o.name} from #{o.source.path}, perhaps it's out of date?")
             end
           end
         end
