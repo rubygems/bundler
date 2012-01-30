@@ -109,12 +109,6 @@ module Bundler
       @source = nil
     end
 
-    def local(name, path)
-      if File.directory?(File.expand_path(path, Bundler.root))
-        @local_overrides << Bundler::Source::Path.new("name" => name, "path" => path)
-      end
-    end
-
     def path(path, options = {}, source_options = {}, &blk)
       source Source::Path.new(_normalize_hash(options).merge("path" => Pathname.new(path))), source_options, &blk
     end
@@ -192,7 +186,7 @@ module Bundler
     def _normalize_options(name, version, opts)
       _normalize_hash(opts)
 
-      invalid_keys = opts.keys - %w(group groups git github path name branch ref tag require submodules platform platforms type)
+      invalid_keys = opts.keys - %w(group groups git github local path name branch ref tag require submodules platform platforms type)
       if invalid_keys.any?
         plural = invalid_keys.size > 1
         message = "You passed #{invalid_keys.map{|k| ':'+k }.join(", ")} "
@@ -221,6 +215,12 @@ module Bundler
       if github = opts.delete("github")
         github = "#{github}/#{github}" unless github.include?("/")
         opts["git"] = "git://github.com/#{github}.git"
+      end
+
+      if local_path = opts.delete("local")
+        if File.directory?(File.expand_path(local_path, Bundler.root))
+          @local_overrides << Bundler::Source::Path.new("name" => name, "path" => local_path)
+        end
       end
 
       ["git", "path"].each do |type|

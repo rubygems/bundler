@@ -16,8 +16,7 @@ describe "Bundler.setup with local-override" do
       end
 
       install_gemfile <<-G
-        gem 'rack', :git => "#{lib_path('rack-1.1')}"
-        local 'rack', "#{@path}"
+        gem 'rack', :git => "#{lib_path('rack-1.1')}", :local => "#{@path}"
       G
     end
 
@@ -39,8 +38,7 @@ describe "Bundler.setup with local-override" do
     before do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
-        gem 'rack'
-        local 'rack', "#{@path}"
+        gem 'rack', :local => "#{@path}"
       G
     end
 
