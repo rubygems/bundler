@@ -390,6 +390,24 @@ describe "Bundler.setup" do
       should_be_installed "activesupport 2.3.2", :groups => :default
     end
 
+    it "doesn't need spec file of excluded group in miniresolver" do
+      install_gemfile <<-G, :without => :missing, :env => { "BUNDLE_MINIRESOLVER" => "true" }
+        source "file://#{gem_repo1}"
+        gem "activesupport"
+
+        group :rails do
+          gem "rails", "2.3.2"
+        end
+        group :missing do
+          gem "really_not_existing_gem"
+        end
+      G
+
+      install_gems "activesupport-2.3.5"
+
+      should_be_installed "activesupport 2.3.2", :groups => :default, :env => { "BUNDLE_MINIRESOLVER" => "true", "BUNDLE_WITHOUT" => "rails:missing" }
+    end
+
     it "remembers --without and does not bail on bare Bundler.setup" do
       install_gemfile <<-G, :without => :rails
         source "file://#{gem_repo1}"
