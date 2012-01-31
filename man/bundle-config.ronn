@@ -71,6 +71,9 @@ learn more about their operation in [bundle install(1)][bundle-install].
   is used.
 * `without` (`BUNDLE_WITHOUT`):
   A `:`-separated list of groups whose gems bundler should not install
+* `miniresolver (`BUNDLE_MINIRESOLVER`):
+  Resolve only over target groups, so for packages in excluded groups spec files not needed.
+  Defaults to `false`.
 * `bin` (`BUNDLE_BIN`):
   Install executables from gems in the bundle to the specified directory.
   Defaults to `false`.

@@ -31,6 +31,7 @@ module Bundler
 
     def initialize(lockfile, dependencies, sources, unlock)
       @dependencies, @sources, @unlock = dependencies, sources, unlock
+      @dependencies.reject!{ |d| (d.groups - Bundler.settings.without).empty?} if Bundler.settings[:miniresolver]
       @remote            = false
       @specs             = nil
       @lockfile_contents = ""
