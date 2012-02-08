@@ -1,3 +1,10 @@
+## 1.0.22 (February 8, 2012)
+
+Bugfixes:
+
+  - Tweaks to cache on Rubygems 1.3
+  - Fix for `gemspec` with development dependencies in deployment (@raggi)
+
 ## 1.0.21 (September 30, 2011)
 
   - No changes from RC
