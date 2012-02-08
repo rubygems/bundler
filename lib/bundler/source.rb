@@ -5,9 +5,72 @@ require "rubygems/spec_fetcher"
 require "rubygems/format"
 require "digest/sha1"
 require "open3"
+require 'bundler/maven_gemify2'
+require 'set'
 
 module Bundler
   module Source
+    
+    class Maven
+      def initialize(options = {})
+        @maven_gemify = Gem::Maven::Gemify2.new
+        @dependencies = []
+        repos = options['remotes']
+        if repos
+          repos.each {|repo|
+            @maven_gemify.add_repository(repo) unless repo == "default"
+            }
+        end
+      end
+      
+      def add_repository(repo_url)
+        @maven_gemify.add_repository(repo_url)
+      end
+      
+      def add_dependency(gemname, version)
+        @dependencies << [gemname,version]
+      end
+                
+      def install(spec)
+        #Use maven_gemify to generate the gem here
+        Bundler.ui.info "Installing #{spec.name} (#{spec.version}) "
+        @maven_gemify.generate_gem(spec.name,spec.version)
+      end
+      
+      def specs
+        @specs ||= download_specs
+      end
+      
+      def remote!
+        
+      end
+        
+      def to_lock
+        out = "MAVEN\n"
+        out << @maven_gemify.repositories.map {|r| "  remotes: #{r}\n" }.join
+        out << "  specs:\n"
+      end 
+      
+      def self.from_lock(options)
+        if options['remotes']
+          options['remotes']=Array(options['remotes'])
+        end
+        
+        new(options)
+      end                 
+      private
+      
+      def download_specs
+        return_specs = Index.new
+        @dependencies.each {|dep|
+          spec = @maven_gemify.generate_spec(dep[0],dep[1])
+          spec.source = self
+          spec.loaded_from = "#{Bundler.rubygems.gem_dir}/specifications/#{@maven_gemify.maven_name(spec.name)}-#{spec.version.to_s}.gemspec"
+          return_specs << spec
+          }
+        return_specs
+      end        
+    end
     # TODO: Refactor this class
     class Rubygems
       FORCE_MODERN_INDEX_LIMIT = 100 # threshold for switching back to the modern index instead of fetching every spec

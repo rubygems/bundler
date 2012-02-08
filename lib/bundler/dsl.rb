@@ -1,5 +1,4 @@
 require 'bundler/dependency'
-
 module Bundler
   class Dsl
     def self.evaluate(gemfile, lockfile, unlock)
@@ -45,7 +44,31 @@ module Bundler
         raise InvalidOption, "There are multiple gemspecs at #{path}. Please use the :name option to specify which one."
       end
     end
+    
+    #START MAVEN STUFF
+    
+    #Influenced from https://github.com/jkutner/bundler/blob/master/lib/bundler/dsl.rb
+    def mvn(repo, options={}, source_options={}, &blk)
+      if (options['name'].nil? || options['version'].nil?) and !block_given?
+        raise InvalidOption, 'Must specify a dependency name+version, or block of dependencies.'
+      end
+      puts "MVN REPO=#{repo} OPTS = #{options.inspect} SOPTS = #{source_options.inspect}"
+      remotes = Array === repo ? repo : [repo]
+      local_source = source Source::Maven.new(_normalize_hash(options).merge('remotes' => remotes)), source_options, &blk
+        
+      if options['name'] && options['version']
+        puts "ADD DEP"
+        local_source.add_dependency(options['name'], options['version'])
+      end
+      local_source
+    end
 
+    
+    #TODO: ADD mvn_repo "repo" {
+    #mvn <group_id>,<artifact_id>,<name>
+    #}
+    
+    #END MAVEN STUFF
     def gem(name, *args)
       if name.is_a?(Symbol)
         raise GemfileError, %{You need to specify gem names as Strings. Use 'gem "#{name.to_s}"' instead.}
@@ -85,7 +108,11 @@ module Bundler
           end
         end
       end
-
+      
+      if !@source.nil? && @source.is_a?(Bundler::Source::Maven)
+        @source.add_dependency(name,version[0])
+      end
+      
       @dependencies << dep
     end
 
@@ -185,7 +212,7 @@ module Bundler
     def _normalize_options(name, version, opts)
       _normalize_hash(opts)
 
-      invalid_keys = opts.keys - %w(group groups git github path name branch ref tag require submodules platform platforms type)
+      invalid_keys = opts.keys - %w(group groups git github path name branch ref tag require submodules platform platforms type mvn)
       if invalid_keys.any?
         plural = invalid_keys.size > 1
         message = "You passed #{invalid_keys.map{|k| ':'+k }.join(", ")} "
@@ -215,8 +242,7 @@ module Bundler
         github = "#{github}/#{github}" unless github.include?("/")
         opts["git"] = "git://github.com/#{github}.git"
       end
-
-      ["git", "path"].each do |type|
+      ["git", "path","mvn"].each do |type|
         if param = opts[type]
           if version.first && version.first =~ /^\s*=?\s*(\d[^\s]*)\s*$/
             options = opts.merge("name" => name, "version" => $1)
