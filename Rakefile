@@ -2,6 +2,8 @@
 $:.unshift File.expand_path("../lib", __FILE__)
 require 'bundler/gem_tasks'
 
+task :release => ["man:clean", "man:build"]
+
 def safe_task(&block)
   yield
   true
