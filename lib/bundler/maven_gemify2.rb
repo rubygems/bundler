@@ -11,49 +11,11 @@ module Gem
 
   class Maven3NotFound < StandardError; end
 
-  #This is some of the worst stuff. I had to this because bundler will search
-  #the index of specifications based on the name given in the GemFile which
-  #includes the "mvn:<groupid>:<artifactid>" syntax. The rest of the ruby gem world
-  #doesn't work on this name so I have to constantly convert to the maven name when
-  #necessary for certain methods
   class MavenSpec < Gem::Specification
-    alias_method :old_full_name, :full_name
-    alias_method :old_full_gem_path, :full_gem_path
-
-    alias_method :old_ruby, :to_ruby
-    
-    def to_ruby
-      old_name=self.name
-      self.name=Maven::Gemify2.mname(old_name)
-      return_results = old_ruby
-      self.name=old_name
-      return_results
+    attr_reader :orig_name
+    def orig_name=(orig_name)
+      @orig_name=orig_name
     end
-    
-    def full_name
-      if @full_name.nil?
-        #Needs to use the maven_name here not the gemname which has the "mvn:" stuff
-        old_name=self.name
-        self.name=Maven::Gemify2.mname(old_name)
-        return_path = old_full_name
-        self.name=old_name
-        @full_name=return_path              
-      end
-      @full_name
-    end
-    
-    def full_gem_path
-      if @full_gem_path.nil?
-        #Needs to use the maven_name here not the gemname which has the "mvn:" stuff
-        old_name=self.name
-        self.name=Maven::Gemify2.mname(old_name)
-        return_path = old_full_gem_path
-        self.name=old_name
-        @full_gem_path=return_path              
-      end
-      @full_gem_path
-    end    
-    
   end
 
   module Maven
@@ -246,7 +208,8 @@ module Gem
       def generate_spec(gemname, version)
         mname = maven_name(gemname)
         MavenSpec.new do |s|
-          s.name        = gemname          
+          s.name        = mname
+          s.orig_name = gemname          
           s.date        = '2010-04-28'
           s.summary     = "Hola!"
           s.description = "A simple hello world gem"

@@ -55,10 +55,11 @@ module Bundler
       puts "MVN REPO=#{repo} OPTS = #{options.inspect} SOPTS = #{source_options.inspect}"
       remotes = Array === repo ? repo : [repo]
       local_source = source Source::Maven.new(_normalize_hash(options).merge('remotes' => remotes)), source_options, &blk
-        
+      
+      #This is when you specify the mvn information on the gem line
+      #i.e. gem ... :mvn=> ...  
       if options['name'] && options['version']
-        puts "ADD DEP"
-        local_source.add_dependency(options['name'], options['version'])
+        local_source.add_dependency(options['name'], options['version'])        
       end
       local_source
     end
@@ -79,8 +80,15 @@ module Bundler
 
       _deprecated_options(options)
       _normalize_options(name, version, options)
-
-      dep = Dependency.new(name, version, options)
+      #Do a custom dependency creation for Maven dependencies because 
+      #maven source needs the mvn: prefixed name while everything else
+      #will use the maven_name for dependency resolution, gem require etc.
+      if options['source'] && options['source'].is_a?(Bundler::Source::Maven)
+        mvn_source = options['source']
+        dep = Dependency.new(mvn_source.maven_name(name), version, options)
+      else
+        dep = Dependency.new(name, version, options)  
+      end
 
       # if there's already a dependency with this name we try to prefer one
       if current = @dependencies.find { |d| d.name == dep.name }
@@ -109,10 +117,12 @@ module Bundler
         end
       end
       
+      #@source is populated if gem is called from within the mvn block
+      #i.e. mvn do gem ... end
+      #need to add the dependency to the maven source
       if !@source.nil? && @source.is_a?(Bundler::Source::Maven)
         @source.add_dependency(name,version[0])
       end
-      
       @dependencies << dep
     end
 

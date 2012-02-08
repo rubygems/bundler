@@ -33,8 +33,8 @@ module Bundler
                 
       def install(spec)
         #Use maven_gemify to generate the gem here
-        Bundler.ui.info "Installing #{spec.name} (#{spec.version}) "
-        @maven_gemify.generate_gem(spec.name,spec.version)
+        Bundler.ui.info "Installing #{spec.orig_name} (#{spec.version}) "
+        @maven_gemify.generate_gem(spec.orig_name,spec.version)
       end
       
       def specs
@@ -50,6 +50,10 @@ module Bundler
         out << @maven_gemify.repositories.map {|r| "  remotes: #{r}\n" }.join
         out << "  specs:\n"
       end 
+      
+      def maven_name(gemname)
+        @maven_gemify.maven_name(gemname)
+      end
       
       def self.from_lock(options)
         if options['remotes']
