@@ -16,7 +16,6 @@ env:
   - RGV=v1.6.2
   - RGV=v1.7.2
   - RGV=v1.8.10
-  - RGV=master
 
 matrix:
   exclude:
