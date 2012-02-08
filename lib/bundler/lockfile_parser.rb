@@ -27,12 +27,13 @@ module Bundler
     TYPES = {
       "GIT"  => Bundler::Source::Git,
       "GEM"  => Bundler::Source::Rubygems,
-      "PATH" => Bundler::Source::Path
+      "PATH" => Bundler::Source::Path,
+      "MAVEN" => Bundler::Source::Maven
     }
 
     def parse_source(line)
       case line
-      when "GIT", "GEM", "PATH"
+      when "GIT", "GEM", "PATH", "MAVEN"
         @current_source = nil
         @opts, @type = {}, line
       when "  specs:"
