@@ -342,12 +342,13 @@ module Bundler
       length = @stack.length
       @stack << requirement.name
       retval = catch(requirement.name) do
-        # clear the search cache since the catch means we couldn't meet the
-        # requirement we need with the current constraints on search
-        clear_search_cache
         # try to resolve the next option
         resolve(reqs, activated)
       end
+
+      # clear the search cache since the catch means we couldn't meet the
+      # requirement we need with the current constraints on search
+      clear_search_cache
 
       # Since we're doing a lot of throw / catches. A push does not necessarily match
       # up to a pop. So, we simply slice the stack back to what it was before the catch
