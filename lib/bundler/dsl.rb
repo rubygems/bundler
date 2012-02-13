@@ -54,7 +54,6 @@ module Bundler
       options = Hash === args.last ? args.pop : {}
       version = args || [">= 0"]
 
-      _deprecated_options(options)
       _normalize_options(name, version, options)
 
       dep = Dependency.new(name, version, options)
@@ -165,21 +164,6 @@ module Bundler
                           "  #{content}\n"
     end
 
-    # Deprecated methods
-
-    def self.deprecate(name, replacement = nil)
-      define_method(name) do |*|
-        message = "'#{name}' has been removed from the Gemfile DSL, "
-        if replacement
-          message << "and has been replaced with '#{replacement}'."
-        else
-          message << "and is no longer supported."
-        end
-        message << "\nSee the README for more information on upgrading from Bundler 0.8."
-        raise DeprecatedError, message
-      end
-    end
-
   private
 
     def _normalize_hash(opts)
@@ -245,7 +229,5 @@ module Bundler
       opts["group"]     = groups
     end
 
-    def _deprecated_options(options)
-    end
   end
 end
