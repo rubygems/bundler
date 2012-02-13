@@ -161,14 +161,9 @@ module Bundler
     end
 
     def method_missing(name, *args)
-      call = caller[0].split ':'
-      line = call[1].to_i
-      lines = ([0, line - 3].max)..line + 2
-      content = Bundler.read_file(call[0]).lines.to_a[lines].join('  ').strip
-
-      raise GemfileError, "The Gemfile doesn't support the method `#{name}`.\n" \
-                          "Please check your Gemfile's syntax at line #{line}:\n\n" \
-                          "  #{content}\n"
+      location = caller[0].split(':')[0..1].join(':')
+      raise GemfileError, "Undefined local variable or method `#{name}' for Gemfile\n" \
+        "        from #{location}"
     end
 
   private
