@@ -4,11 +4,13 @@ module Bundler
   class Dsl
     def self.evaluate(gemfile, lockfile, unlock)
       builder = new
-      builder.instance_eval(Bundler.read_file(gemfile.to_s), gemfile.to_s, 1)
+      builder.eval_gemfile(gemfile)
       builder.to_definition(lockfile, unlock)
     end
 
     VALID_PLATFORMS = Bundler::Dependency::PLATFORM_MAP.keys.freeze
+
+    attr_accessor :dependencies
 
     def initialize
       @rubygems_source = Source::Rubygems.new
@@ -20,7 +22,12 @@ module Bundler
       @env             = nil
     end
 
-    attr_accessor :dependencies
+    def eval_gemfile(gemfile)
+      instance_eval(Bundler.read_file(gemfile.to_s), gemfile.to_s, 1)
+    rescue SyntaxError => e
+      bt = e.message.split("\n")[1..-1]
+      raise GemfileError, ["Gemfile syntax error:", *bt].join("\n")
+    end
 
     def gemspec(opts = nil)
       path              = opts && opts[:path] || '.'

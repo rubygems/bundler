@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe Bundler::Dsl do
   before do
-    rubygems = mock("rubygems")
-    Bundler::Source::Rubygems.stub(:new){ rubygems }
+    @rubygems = mock("rubygems")
+    Bundler::Source::Rubygems.stub(:new){ @rubygems }
   end
 
   describe '#_normalize_options' do
@@ -30,4 +30,13 @@ describe Bundler::Dsl do
       lambda { dsl.unknown }.should raise_error(Bundler::GemfileError, error_msg)
     end
   end
+
+  describe "#eval_gemfile" do
+    it "handles syntax errors with a useful message" do
+      Bundler.should_receive(:read_file).with("Gemfile").and_return("}")
+      lambda{ subject.eval_gemfile("Gemfile") }.
+        should raise_error(Bundler::GemfileError, /Gemfile syntax error/)
+    end
+  end
+
 end
