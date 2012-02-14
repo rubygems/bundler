@@ -49,6 +49,10 @@ module Bundler
     
     #Influenced from https://github.com/jkutner/bundler/blob/master/lib/bundler/dsl.rb
     def mvn(repo, options={}, source_options={}, &blk)
+      unless Bundler.java?
+        raise InvalidOption, "mvn can only be executed in JRuby"
+      end
+      
       if (options['name'].nil? || options['version'].nil?) and !block_given?
         raise InvalidOption, 'Must specify a dependency name+version, or block of dependencies.'
       end
@@ -63,13 +67,8 @@ module Bundler
       end
       local_source
     end
-
-    
-    #TODO: ADD mvn_repo "repo" {
-    #mvn <group_id>,<artifact_id>,<name>
-    #}
-    
     #END MAVEN STUFF
+    
     def gem(name, *args)
       if name.is_a?(Symbol)
         raise GemfileError, %{You need to specify gem names as Strings. Use 'gem "#{name.to_s}"' instead.}
