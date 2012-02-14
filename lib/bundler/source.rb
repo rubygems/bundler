@@ -5,7 +5,7 @@ require "rubygems/spec_fetcher"
 require "rubygems/format"
 require "digest/sha1"
 require "open3"
-require 'bundler/maven_gemify2'
+require 'bundler/maven_gemify2' if Bundler.java?
 require 'set'
 
 module Bundler
