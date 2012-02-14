@@ -6,11 +6,24 @@ require 'rubygems/builder'
 require 'rubygems/installer'
 require 'set'
 
-# A modified maven_gemify 
+# Amit Nithianandan
+# ANithian-at-gmail.com 2/01/2012
+# A modified maven_gemify that relies on the underlying Maven dependency 
+# plugin to generate the proper classpath. Instead of downloading and packaging
+# the jar inside the gem, make a ruby file require the jar file that already exists
+# in the existing maven repo. This is handy in cases where java and ruby projects are simultaneously
+# deployed across an organization and servers have mounted both a common maven repo AND a common gem
+# mount. 
 module Gem
 
   class Maven3NotFound < StandardError; end
 
+  #A simple sub-class of the Specification that stores the "original" bundler
+  #name of the gem. This name is not compatible with most file systems and is a pain
+  #to require (require 'mvn:something:something' is ugly compared to require 'something_something')
+  #Since this maven_gemify gets called multiple times, it's necessary to make sure that the original
+  #name is preserved. This could rather store the maven group/artifact id so as to not keep parsing the 
+  #original name over and over again.
   class MavenSpec < Gem::Specification
     attr_reader :orig_name
     def orig_name=(orig_name)
