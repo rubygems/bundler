@@ -3,7 +3,7 @@ bundle-update(1) -- Update your gems to the latest available versions
 
 ## SYNOPSIS
 
-`bundle update` <*gems> [--source=NAME]
+`bundle update` [--local] <*gems> [--source=NAME]
 
 ## DESCRIPTION
 
@@ -21,6 +21,12 @@ gem.
   The name of a `:git` or `:path` source used in the Gemfile(5). For
   instance, with a `:git` source of `http://github.com/rails/rails.git`,
   you would call `bundle update --source rails`
+
+* `--local`:
+  Update the gems specified only from gems that are already installed on
+  the system. Using this option means that bundler will not connect to
+  the gem source and check for newer versions, which is much faster if
+  you already have the required versions installed.
 
 ## UPDATING ALL GEMS
 
