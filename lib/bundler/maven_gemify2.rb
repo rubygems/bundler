@@ -211,7 +211,7 @@ module Gem
       end
       #gemname==mvn:group_id:artifact_id
       def self.mname(gemname)
-        gemname.gsub("mvn:","").gsub("-","_").gsub(".","_").gsub(":","_")
+        gemname.gsub("mvn:","").gsub(".","_").gsub(":","_")
       end
             
       def get_versions(gemname)
