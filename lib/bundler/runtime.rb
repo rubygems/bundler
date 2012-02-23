@@ -68,9 +68,7 @@ module Bundler
             Kernel.require file
           end
         rescue LoadError => e
-          REGEXPS.find { |r| r =~ e.message }
-
-          if dep.name.include?('-')
+          if dep.autorequire.nil? && dep.name.include?('-')
             begin
               namespaced_file = dep.name.gsub('-', '/')
               Kernel.require namespaced_file
@@ -79,6 +77,7 @@ module Bundler
               raise if dep.autorequire || $1.gsub('-', '/') != namespaced_file
             end
           else
+            REGEXPS.find { |r| r =~ e.message }
             raise if dep.autorequire || $1 != required_file
           end
         end
@@ -149,7 +148,7 @@ module Bundler
         md = %r{(.+bundler/gems/.+-[a-f0-9]{7,12})}.match(spec.full_gem_path)
         spec_git_paths << md[1] if md
         spec_gem_executables << spec.executables.collect do |executable|
-          "#{Gem.dir}/#{spec.bindir}/#{executable}"
+          "#{Bundler.rubygems.gem_bindir}/#{executable}"
         end
         spec_cache_paths << spec.cache_file
         spec_gemspec_paths << spec.spec_file
@@ -185,10 +184,9 @@ module Bundler
         FileUtils.rm_rf(gem_dir)
 
         parts    = full_name.split('-')
-        name     = parts[0..-3].join('-')
+        name     = parts[0..-2].join('-')
         revision = parts[-1]
-        version  = parts[-2]
-        output   = "#{name} (#{version} #{revision})"
+        output   = "#{name} (#{revision})"
 
         Bundler.ui.info "Removing #{output}"
 
@@ -200,12 +198,6 @@ module Bundler
       stale_git_cache_dirs.each {|dir| FileUtils.rm_rf(dir) if File.exists?(dir) }
 
       output
-    end
-
-  private
-
-    def cache_path
-      root.join("vendor/cache")
     end
 
     def setup_environment
@@ -230,6 +222,12 @@ module Bundler
         rubyopt.unshift "-I#{File.expand_path('../..', __FILE__)}"
         ENV["RUBYOPT"] = rubyopt.join(' ')
       end
+    end
+
+  private
+
+    def cache_path
+      root.join("vendor/cache")
     end
   end
 end

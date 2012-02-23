@@ -32,7 +32,7 @@ describe "bundle clean" do
 
       gem "thin"
     G
-    bundle "install --no-clean"
+    bundle "install"
 
     bundle :clean
 
@@ -60,7 +60,7 @@ describe "bundle clean" do
       gem "rack", "1.0.0"
       gem "foo"
     G
-    bundle "install --no-clean"
+    bundle "install"
 
     bundle :clean
 
@@ -88,7 +88,7 @@ describe "bundle clean" do
       gem "rack", "0.9.1"
       gem "foo"
     G
-    bundle "install --no-clean"
+    bundle "install"
 
     bundle :clean
 
@@ -111,8 +111,8 @@ describe "bundle clean" do
       end
     G
 
-    bundle "install --path vendor/bundle --no-clean"
-    bundle "install --without test_group --no-clean"
+    bundle "install --path vendor/bundle"
+    bundle "install --without test_group"
     bundle :clean
 
     out.should eq("Removing rack (1.0.0)")
@@ -137,7 +137,7 @@ describe "bundle clean" do
       end
     G
 
-    bundle "install --path vendor/bundle --no-clean"
+    bundle "install --path vendor/bundle"
 
     bundle :clean
 
@@ -146,9 +146,9 @@ describe "bundle clean" do
   end
 
   it "removes unused git gems" do
-    build_git "foo"
-    revision = revision_for(lib_path("foo-1.0"))
-    git_path = lib_path('foo-1.0')
+    build_git "foo", :path => lib_path("foo")
+    git_path = lib_path('foo')
+    revision = revision_for(git_path)
 
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -159,23 +159,23 @@ describe "bundle clean" do
       end
     G
 
-    bundle "install --path vendor/bundle --no-clean"
+    bundle "install --path vendor/bundle"
 
     gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack", "1.0.0"
     G
-    bundle "install --no-clean"
+    bundle "install"
 
     bundle :clean
 
-    out.should eq("Removing foo (1.0 #{revision[0..11]})")
+    out.should eq("Removing foo (#{revision[0..11]})")
 
     vendored_gems("gems/rack-1.0.0").should exist
-    vendored_gems("bundler/gems/foo-1.0-#{revision[0..11]}").should_not exist
+    vendored_gems("bundler/gems/foo-#{revision[0..11]}").should_not exist
     digest = Digest::SHA1.hexdigest(git_path.to_s)
-    vendored_gems("cache/bundler/git/foo-1.0-#{digest}").should_not exist
+    vendored_gems("cache/bundler/git/foo-#{digest}").should_not exist
 
     vendored_gems("specifications/rack-1.0.0.gemspec").should exist
 
@@ -183,31 +183,31 @@ describe "bundle clean" do
   end
 
   it "removes old git gems" do
-    build_git "foo"
-    revision = revision_for(lib_path("foo-1.0"))
+    build_git "foo-bar", :path => lib_path("foo-bar")
+    revision = revision_for(lib_path("foo-bar"))
 
     gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack", "1.0.0"
-      git "#{lib_path('foo-1.0')}" do
-        gem "foo"
+      git "#{lib_path('foo-bar')}" do
+        gem "foo-bar"
       end
     G
 
-    bundle "install --path vendor/bundle --no-clean"
+    bundle "install --path vendor/bundle"
 
-    update_git "foo"
-    revision2 = revision_for(lib_path("foo-1.0"))
+    update_git "foo", :path => lib_path("foo-bar")
+    revision2 = revision_for(lib_path("foo-bar"))
 
-    bundle "update --no-clean"
+    bundle "update"
     bundle :clean
 
-    out.should eq("Removing foo (1.0 #{revision[0..11]})")
+    out.should eq("Removing foo-bar (#{revision[0..11]})")
 
     vendored_gems("gems/rack-1.0.0").should exist
-    vendored_gems("bundler/gems/foo-1.0-#{revision[0..11]}").should_not exist
-    vendored_gems("bundler/gems/foo-1.0-#{revision2[0..11]}").should exist
+    vendored_gems("bundler/gems/foo-bar-#{revision[0..11]}").should_not exist
+    vendored_gems("bundler/gems/foo-bar-#{revision2[0..11]}").should exist
 
     vendored_gems("specifications/rack-1.0.0.gemspec").should exist
 
@@ -225,7 +225,7 @@ describe "bundle clean" do
       gem "activesupport", :git => "#{lib_path('rails')}", :ref => '#{revision}'
     G
 
-    bundle "install --path vendor/bundle --no-clean"
+    bundle "install --path vendor/bundle"
     bundle :clean
     out.should eq("")
 
@@ -239,8 +239,9 @@ describe "bundle clean" do
       gem "rack", "1.0.0"
     G
 
-    bundle :clean
+    bundle :clean, :exitstatus => true
 
+    exitstatus.should eq(1)
     out.should == "Can only use bundle clean when --path is set or --force is set"
   end
 
@@ -253,14 +254,14 @@ describe "bundle clean" do
       gem "foo"
     G
 
-    bundle "install --path vendor/bundle --no-clean"
+    bundle "install --path vendor/bundle"
 
     gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "foo"
     G
-    bundle "install --no-clean"
+    bundle "install"
 
     FileUtils.rm(vendored_gems("bin/rackup"))
     FileUtils.rm_rf(vendored_gems("gems/thin-1.0"))
@@ -295,27 +296,47 @@ describe "bundle clean" do
     out.should include("thin (1.0)")
   end
 
-  it "--clean should override the bundle setting" do
+  it "--clean should override the bundle setting on install" do
     gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "thin"
       gem "rack"
     G
-    bundle "install --path vendor/bundle --no-clean"
+    bundle "install --path vendor/bundle --clean"
 
     gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack"
     G
-    bundle "install --clean"
+    bundle "install"
 
     should_have_gems 'rack-1.0.0'
     should_not_have_gems 'thin-1.0'
   end
 
-  it "clean automatically on --path" do
+  it "--clean should override the bundle setting on update" do
+    build_repo2
+
+    gemfile <<-G
+      source "file://#{gem_repo2}"
+
+      gem "foo"
+    G
+    bundle "install --path vendor/bundle --clean"
+
+    update_repo2 do
+      build_gem 'foo', '1.0.1'
+    end
+
+    bundle "update"
+
+    should_have_gems 'foo-1.0.1'
+    should_not_have_gems 'foo-1.0'
+  end
+
+  it "does not clean automatically on --path" do
     gemfile <<-G
       source "file://#{gem_repo1}"
 
@@ -331,11 +352,10 @@ describe "bundle clean" do
     G
     bundle "install"
 
-    should_have_gems 'rack-1.0.0'
-    should_not_have_gems 'thin-1.0'
+    should_have_gems 'rack-1.0.0', 'thin-1.0'
   end
 
-  it "cleans on bundle update with --path" do
+  it "does not clean on bundle update with --path" do
     build_repo2
 
     gemfile <<-G
@@ -350,7 +370,7 @@ describe "bundle clean" do
     end
 
     bundle :update
-    should_not_have_gems 'foo-1.0'
+    should_have_gems 'foo-1.0', 'foo-1.0.1'
   end
 
   it "does not clean on bundle update when using --system" do
@@ -405,7 +425,7 @@ describe "bundle clean" do
       gem "foo", :git => "#{lib_path('foo-1.0')}"
     G
 
-    bundle "install --path vendor/bundle --no-clean"
+    bundle "install --path vendor/bundle"
 
     # mimic 7 length git revisions in Gemfile.lock
     gemfile_lock = File.read(bundled_app('Gemfile.lock')).split("\n")
@@ -416,12 +436,36 @@ describe "bundle clean" do
       file.print gemfile_lock.join("\n")
     end
 
-    bundle "install --path vendor/bundle --no-clean"
+    bundle "install --path vendor/bundle"
 
     bundle :clean
 
     out.should_not include("Removing foo (1.0 #{revision[0..6]})")
 
     vendored_gems("bundler/gems/foo-1.0-#{revision[0..6]}").should exist
+  end
+
+  it "when using --force on system gems, it doesn't remove binaries" do
+    build_repo2
+    update_repo2 do
+      build_gem 'bindir' do |s|
+        s.bindir = "exe"
+        s.executables = "foo"
+      end
+    end
+
+    gemfile <<-G
+      source "file://#{gem_repo2}"
+
+      gem "bindir"
+    G
+    bundle :install
+
+    bundle "clean --force"
+
+    sys_status "foo"
+
+    exitstatus.should == 0
+    out.should == "1.0"
   end
 end

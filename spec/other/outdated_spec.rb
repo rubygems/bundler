@@ -32,7 +32,7 @@ describe "bundle outdated" do
       FileUtils.rm_rf(gem_repo2)
 
       bundle "outdated --local"
-      out.should_not match(/Fetching source index/)
+      out.should_not match(/Fetching/)
     end
   end
 

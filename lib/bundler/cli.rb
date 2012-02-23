@@ -154,10 +154,10 @@ module Bundler
       "Install using defaults tuned for deployment environments"
     method_option "standalone", :type => :array, :lazy_default => [], :banner =>
       "Make a bundle that can work without the Bundler runtime"
-    method_option "full-index", :tpye => :boolean, :banner =>
+    method_option "full-index", :type => :boolean, :banner =>
       "Use the rubygems modern index instead of the API endpoint"
-    method_option "clean", :type => :boolean, :default => true, :banner =>
-      "Run bundle clean automatically after clean"
+    method_option "clean", :type => :boolean, :banner =>
+      "Run bundle clean automatically after install"
     def install
       opts = options.dup
       if opts[:without]
@@ -211,10 +211,11 @@ module Bundler
       Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? '1' : nil
       Bundler.settings.without = opts[:without]
       Bundler.ui.be_quiet! if opts[:quiet]
+      Bundler.settings[:clean] = opts[:clean] if opts[:clean]
 
       Bundler::Fetcher.disable_endpoint = opts["full-index"]
       # rubygems plugins sometimes hook into the gem install process
-      Gem.load_plugins if Gem.respond_to?(:load_plugins)
+      Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins)
 
       Installer.install(Bundler.root, Bundler.definition, opts)
       Bundler.load.cache if Bundler.root.join("vendor/cache").exist? && !options["no-cache"]
@@ -232,7 +233,7 @@ module Bundler
         Bundler.ui.confirm "Post-install message from #{name}:\n#{msg}"
       end
 
-      clean if opts["clean"] && Bundler.settings[:path]
+      clean if Bundler.settings[:clean] && Bundler.settings[:path]
     rescue GemNotFound => e
       if opts[:local] && Bundler.app_cache.exist?
         Bundler.ui.warn "Some gems seem to be missing from your vendor/cache directory."
@@ -253,8 +254,6 @@ module Bundler
     method_option "source", :type => :array, :banner => "Update a specific source (and all gems associated with it)"
     method_option "local", :type => :boolean, :banner =>
       "Do not attempt to fetch gems remotely and use the gem cache instead"
-    method_option "clean", :type => :boolean, :default => true, :banner =>
-      "Run bundle clean automatically after clean"
     def update(*gems)
       sources = Array(options[:source])
 
@@ -267,11 +266,11 @@ module Bundler
 
       opts = {"update" => true, "local" => options[:local]}
       # rubygems plugins sometimes hook into the gem install process
-      Gem.load_plugins if Gem.respond_to?(:load_plugins)
+      Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins)
 
       Installer.install Bundler.root, Bundler.definition, opts
       Bundler.load.cache if Bundler.root.join("vendor/cache").exist?
-      clean if options["clean"] && Bundler.settings[:path]
+      clean if Bundler.settings[:clean] && Bundler.settings[:path]
       Bundler.ui.confirm "Your bundle is updated! " +
         "Use `bundle show [gemname]` to see where a bundled gem is installed."
     end
@@ -331,35 +330,28 @@ module Bundler
       end
 
       out_count = 0
-      definition.specs.each do |spec|
-        next if !gems.empty? && !gems.include?(spec.name)
+      # Loop through the current specs
+      current_specs.each do |current_spec|
+        next if !gems.empty? && !gems.include?(current_spec.name)
 
-        spec.source.fetch(spec) if spec.source.respond_to?(:fetch)
+        active_spec = definition.index[current_spec.name].sort_by { |b| b.version }
 
-        if spec.source.is_a?(Bundler::Source::Git)
-          current = current_specs.find{|s| spec.name == s.name }
-          next if current.nil?
-        else
-          current = spec
-          spec = definition.index[current.name].sort_by{|b| b.version }
-
-          if !current.version.prerelease? && !options[:pre] && spec.size > 1
-            spec = spec.delete_if{|b| b.respond_to?(:version) && b.version.prerelease? }
-          end
-
-          spec = spec.last
-          next if spec.nil?
+        if !current_spec.version.prerelease? && !options[:pre] && active_spec.size > 1
+          active_spec = active_spec.delete_if { |b| b.respond_to?(:version) && b.version.prerelease? }
         end
 
-        gem_outdated = Gem::Version.new(spec.version) > Gem::Version.new(current.version)
-        git_outdated = current.git_version != spec.git_version
+        active_spec = active_spec.last
+        next if active_spec.nil?
+
+        gem_outdated = Gem::Version.new(active_spec.version) > Gem::Version.new(current_spec.version)
+        git_outdated = current_spec.git_version != active_spec.git_version
         if gem_outdated || git_outdated
-          spec_version    = "#{spec.version}#{spec.git_version}"
-          current_version = "#{current.version}#{current.git_version}"
-          Bundler.ui.info "  * #{spec.name} (#{spec_version} > #{current_version})"
+          spec_version    = "#{active_spec.version}#{active_spec.git_version}"
+          current_version = "#{current_spec.version}#{current_spec.git_version}"
+          Bundler.ui.info "  * #{active_spec.name} (#{spec_version} > #{current_version})"
           out_count += 1
         end
-        Bundler.ui.debug "from #{spec.loaded_from}"
+        Bundler.ui.debug "from #{active_spec.loaded_from}"
       end
 
       Bundler.ui.info "  Your bundle is up to date!" if out_count < 1
@@ -403,7 +395,7 @@ module Bundler
     def exec(*)
       ARGV.shift # remove "exec"
 
-      Bundler.setup
+      Bundler.load.setup_environment
 
       begin
         # Run
@@ -415,6 +407,9 @@ module Bundler
         Bundler.ui.error "bundler: command not found: #{ARGV.first}"
         Bundler.ui.warn  "Install missing gem executables with `bundle install`"
         exit 127
+      rescue ArgumentError
+        Bundler.ui.error "bundle exec needs a command to run"
+        exit 128
       end
     end
 
@@ -512,16 +507,17 @@ module Bundler
       Viz requires the ruby-graphviz gem (and its dependencies).
       The associated gems must also be installed via 'bundle install'.
     D
-    method_option :file, :type => :string, :default => 'gem_graph.png', :aliases => '-f', :banner => "The name to use for the generated png file."
+    method_option :file, :type => :string, :default => 'gem_graph', :aliases => '-f', :banner => "The name to use for the generated file. see format option"
     method_option :version, :type => :boolean, :default => false, :aliases => '-v', :banner => "Set to show each gem version."
     method_option :requirements, :type => :boolean, :default => false, :aliases => '-r', :banner => "Set to show the version of each required dependency."
+    method_option :format, :type => :string, :default => "png", :aliases => '-F', :banner => "This is output format option. Supported format is png, jpg, svg, dot ..."
     def viz
       output_file = File.expand_path(options[:file])
-      graph = Graph.new( Bundler.load )
+      output_format = options[:format]
+      graph = Graph.new(Bundler.load, output_file, options[:version], options[:requirements], options[:format])
 
       begin
-        graph.viz(output_file, options[:version], options[:requirements])
-        Bundler.ui.info output_file
+        graph.viz
       rescue LoadError => e
         Bundler.ui.error e.inspect
         Bundler.ui.warn "Make sure you have the graphviz ruby gem. You can install it with:"
@@ -556,6 +552,8 @@ module Bundler
       }
       template(File.join("newgem/Gemfile.tt"),               File.join(target, "Gemfile"),                opts)
       template(File.join("newgem/Rakefile.tt"),              File.join(target, "Rakefile"),               opts)
+      template(File.join("newgem/LICENSE.tt"),               File.join(target, "LICENSE"),                opts)
+      template(File.join("newgem/README.md.tt"),             File.join(target, "README.md"),              opts)
       template(File.join("newgem/gitignore.tt"),             File.join(target, ".gitignore"),             opts)
       template(File.join("newgem/newgem.gemspec.tt"),        File.join(target, "#{name}.gemspec"),        opts)
       template(File.join("newgem/lib/newgem.rb.tt"),         File.join(target, "lib/#{name}.rb"),         opts)
@@ -579,6 +577,7 @@ module Bundler
         Bundler.load.clean
       else
         Bundler.ui.error "Can only use bundle clean when --path is set or --force is set"
+        exit 1
       end
     end
 

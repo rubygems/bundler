@@ -195,6 +195,10 @@ module Bundler
     def with_clean_env
       with_original_env do
         ENV.delete_if { |k,_| k[0,7] == 'BUNDLE_' }
+        if ENV.has_key? 'RUBYOPT'
+          ENV['RUBYOPT'] = ENV['RUBYOPT'].sub '-rbundler/setup', ''
+          ENV['RUBYOPT'] = ENV['RUBYOPT'].sub "-I#{File.expand_path('..', __FILE__)}", ''
+        end
         yield
       end
     end
@@ -229,7 +233,7 @@ module Bundler
 
       path = bundle_path
       path = path.parent until path.exist?
-      sudo_present = !(`which sudo` rescue '').empty?
+      sudo_present = which "sudo"
       bin_dir = Pathname.new(Bundler.system_bindir)
       bin_dir = bin_dir.parent until bin_dir.exist?
 
@@ -246,6 +250,17 @@ module Bundler
       end
     end
 
+    def which(executable)
+      if File.executable?(executable)
+        executable
+      else
+        path = ENV['PATH'].split(File::PATH_SEPARATOR).find { |p|
+          File.executable?(File.join(p, executable))
+        }
+        path && File.expand_path(executable, path)
+      end
+    end
+
     def sudo(str)
       `sudo -p 'Enter your password to install the bundled RubyGems to your system: ' #{str}`
     end
@@ -255,6 +270,11 @@ module Bundler
     end
 
     def load_gemspec(file)
+      @gemspec_cache ||= {}
+      @gemspec_cache[File.expand_path(file)] ||= load_gemspec_uncached(file)
+    end
+
+    def load_gemspec_uncached(file)
       path = Pathname.new(file)
       # Eval the gemspec from its parent directory
       Dir.chdir(path.dirname.to_s) do
@@ -287,17 +307,20 @@ module Bundler
       if settings[:disable_shared_gems]
         ENV['GEM_PATH'] = ''
         ENV['GEM_HOME'] = File.expand_path(bundle_path, root)
+        # TODO: This mkdir_p is only needed for JRuby <= 1.5 and should go away (GH #602)
+        FileUtils.mkdir_p bundle_path.to_s rescue nil
+
+        Bundler.rubygems.clear_paths
       elsif Bundler.rubygems.gem_dir != bundle_path.to_s
         possibles = [Bundler.rubygems.gem_dir, Bundler.rubygems.gem_path]
         paths = possibles.flatten.compact.uniq.reject { |p| p.empty? }
         ENV["GEM_PATH"] = paths.join(File::PATH_SEPARATOR)
         ENV["GEM_HOME"] = bundle_path.to_s
+        # TODO: This mkdir_p is only needed for JRuby <= 1.5 and should go away (GH #602)
+        FileUtils.mkdir_p bundle_path.to_s rescue nil
+
+        Bundler.rubygems.clear_paths
       end
-
-      # TODO: This mkdir_p is only needed for JRuby <= 1.5 and should go away (GH #602)
-      FileUtils.mkdir_p bundle_path.to_s rescue nil
-
-      Bundler.rubygems.clear_paths
     end
 
     def upgrade_lockfile

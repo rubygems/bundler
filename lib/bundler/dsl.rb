@@ -4,11 +4,13 @@ module Bundler
   class Dsl
     def self.evaluate(gemfile, lockfile, unlock)
       builder = new
-      builder.instance_eval(Bundler.read_file(gemfile.to_s), gemfile.to_s, 1)
+      builder.eval_gemfile(gemfile)
       builder.to_definition(lockfile, unlock)
     end
 
     VALID_PLATFORMS = Bundler::Dependency::PLATFORM_MAP.keys.freeze
+
+    attr_accessor :dependencies
 
     def initialize
       @rubygems_source = Source::Rubygems.new
@@ -20,7 +22,12 @@ module Bundler
       @env             = nil
     end
 
-    attr_accessor :dependencies
+    def eval_gemfile(gemfile)
+      instance_eval(Bundler.read_file(gemfile.to_s), gemfile.to_s, 1)
+    rescue SyntaxError => e
+      bt = e.message.split("\n")[1..-1]
+      raise GemfileError, ["Gemfile syntax error:", *bt].join("\n")
+    end
 
     def gemspec(opts = nil)
       path              = opts && opts[:path] || '.'
@@ -54,7 +61,6 @@ module Bundler
       options = Hash === args.last ? args.pop : {}
       version = args || [">= 0"]
 
-      _deprecated_options(options)
       _normalize_options(name, version, options)
 
       dep = Dependency.new(name, version, options)
@@ -154,19 +160,10 @@ module Bundler
       @env = old
     end
 
-    # Deprecated methods
-
-    def self.deprecate(name, replacement = nil)
-      define_method(name) do |*|
-        message = "'#{name}' has been removed from the Gemfile DSL, "
-        if replacement
-          message << "and has been replaced with '#{replacement}'."
-        else
-          message << "and is no longer supported."
-        end
-        message << "\nSee the README for more information on upgrading from Bundler 0.8."
-        raise DeprecatedError, message
-      end
+    def method_missing(name, *args)
+      location = caller[0].split(':')[0..1].join(':')
+      raise GemfileError, "Undefined local variable or method `#{name}' for Gemfile\n" \
+        "        from #{location}"
     end
 
   private
@@ -234,7 +231,5 @@ module Bundler
       opts["group"]     = groups
     end
 
-    def _deprecated_options(options)
-    end
   end
 end

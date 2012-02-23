@@ -70,6 +70,11 @@ update process below under [CONSERVATIVE UPDATING][].
   a `bin/rails` executable that ensures that all dependencies used
   come from the bundled gems.
 
+* `--shebang ruby-install-name`:
+  Uses the ruby executable (usually `ruby`) provided to execute the scripts created
+  with --binstubs. For instance, if you use --binstubs with `--shebang jruby`,
+  all executables will be created to use jruby instead.
+
 * `--standalone[=<list>]`:
   Make a bundle that can work without Ruby Gems or Bundler at runtime.
   It takes a space separated list of groups to install. It creates a

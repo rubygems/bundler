@@ -415,7 +415,7 @@ module Bundler
     private
 
       def relative_path
-        if path.to_s.include?(Bundler.root.to_s)
+        if path.to_s.match(%r{^#{Bundler.root.to_s}})
           return path.relative_path_from(Bundler.root)
         end
 

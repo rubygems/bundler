@@ -1,3 +1,53 @@
+## 1.1.rc.5 (Dec 14, 2011)
+
+Bugfixes:
+
+  - Fix ASCII encoding errors with gem (rerelease with ruby 1.8)
+
+## 1.1.rc.4 (Dec 14, 2011)
+
+Features:
+
+  - `bundle viz` has the option to output a DOT file instead of a PNG (@hirochachacha, #683)
+
+Bugfixes:
+
+  - Ensure binstubs generated when using --standalone point to the standalonde bundle (@cowboyd, #1588)
+  - fix `bundle viz` (@hirochachacha, #1586)
+
+## 1.1.rc.3 (Dec 8, 2011)
+
+Bugfixes:
+
+  - fix relative_path so it checks Bundler.root is actually in the beginning of the path (#1582)
+  - fix bundle outdated doesn't list all gems (@joelmoss, #1521)
+
+## 1.1.rc.2 (Dec 6, 2011)
+
+Features:
+
+  - Added README.md to `newgem` (@ognevsky, #1574)
+  - Added LICENSE (MIT) to newgem (@ognevsky, #1571)
+
+Bugfixes:
+
+  - only auto-namespace requires for implied requires (#1531)
+  - fix bundle clean output for git repos (#1473)
+  - use Gem.bindir for bundle clean (#1544, #1532)
+  - use `Gem.load_env_plugins` instead of `Gem.load_env_plugins` (#1500, #1543)
+  - differentiate Ruby 2.0 (trunk) from Ruby 1.9 (@tenderlove, #1539)
+  - `bundle clean` handles 7 length git hash for bundle clean (#1490, #1491)
+  - fix Psych loading issues
+  - Search $PATH for a binary rather than shelling out to `which` (@tenderlove, #1573)
+  - do not clear RG cache unless we actually modify GEM_PATH and GEM_HOME- use `Gem.load_env_plugins` instead of `Gem.load_env_plugins` (#1500, #1543)
+  - `newgem` now uses https://rubygems.org (#1562)
+  - `bundle init` now uses https://rubygems.org (@jjb, #1522)
+  - `bundle install/update` does not autoclean when using --path for semver
+
+Documentation:
+
+  - added documentation for --shebang option for `bundle install` (@lunks, #1475, #1558)
+
 ## 1.1.rc (Oct 3, 2011)
 
 Features:
