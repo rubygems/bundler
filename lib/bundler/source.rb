@@ -127,11 +127,16 @@ module Bundler
         @remotes << normalize_uri(source)
       end
 
-      def merge_remotes(source)
+      def replace_remotes(source)
+        diffs = source.remotes & @remotes
+        return false if diffs.empty?
+
         @remotes = []
         source.remotes.each do |r|
           add_remote r.to_s
         end
+
+        true
       end
 
     private
