@@ -29,11 +29,12 @@ module Bundler
       specs, then we can try to resolve locally.
 =end
 
-    def initialize(lockfile, dependencies, sources, unlock)
+    def initialize(lockfile, dependencies, sources, unlock, local_overrides = nil)
       @dependencies, @sources, @unlock = dependencies, sources, unlock
       @remote            = false
       @specs             = nil
       @lockfile_contents = ""
+      @local_overrides = local_overrides
 
       if lockfile && File.exists?(lockfile)
         @lockfile_contents = Bundler.read_file(lockfile)
@@ -87,7 +88,8 @@ module Bundler
 
     def specs
       @specs ||= begin
-        specs = resolve.materialize(requested_dependencies)
+        resolved = resolve_with_local_override
+        specs = resolved.materialize(requested_dependencies)
 
         unless specs["bundler"].any?
           local = Bundler.settings[:frozen] ? rubygems_index : index
@@ -135,26 +137,55 @@ module Bundler
       specs.for(expand_dependencies(deps))
     end
 
-    def resolve
-      @resolve ||= begin
-        if Bundler.settings[:frozen]
-          @locked_specs
-        else
-          last_resolve = converge_locked_specs
+    def resolve_specs(with_local_override)
+      if Bundler.settings[:frozen]
+        @locked_specs
+      else
+        last_resolve = converge_locked_specs
 
-          # Record the specs available in each gem's source, so that those
-          # specs will be available later when the resolver knows where to
-          # look for that gemspec (or its dependencies)
-          source_requirements = {}
-          dependencies.each do |dep|
-            next unless dep.source
-            source_requirements[dep.name] = dep.source.specs
-          end
-
-          # Run a resolve against the locally available gems
-          last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve)
+        # Record the specs available in each gem's source, so that those
+        # specs will be available later when the resolver knows where to
+        # look for that gemspec (or its dependencies)
+        source_requirements = {}
+        dependencies.each do |dep|
+          next unless dep.source
+          source_requirements[dep.name] = dep.source.specs
         end
+
+        override_index = Index.new
+
+        if with_local_override && @local_overrides
+          @local_overrides && @local_overrides.each do |s|
+            override_index.add_source s.specs
+          end
+        end
+
+        local_resolve = Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve, override_index)
+
+        # for all of the local-override gems that were resolved, pop them out of the lockfile-resolved list
+        # so that we don't duplicate gems
+        local_resolve.to_a.each do |s|
+          if override_index[s.name].any?
+            o = override_index[s.name].first
+
+            if local_resolve[s.name] && local_resolve[s.name].first.source.class == Bundler::Source::Path
+              last_resolve.delete(s.name)
+            else
+              Bundler.ui.warn("Couln't use #{o.name} from #{o.source.path}, perhaps it's out of date?")
+            end
+          end
+        end
+
+        last_resolve.merge local_resolve
       end
+    end
+
+    def resolve
+      @resolve ||= resolve_specs(false)
+    end
+
+    def resolve_with_local_override
+      resolve_specs(true)
     end
 
     def index

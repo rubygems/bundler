@@ -51,7 +51,7 @@ class Thor
       #
       def say(message="", color=nil, force_new_line=(message.to_s !~ /( |\t)$/))
         message = message.to_s
-        message = set_color(message, color) if color
+        message = set_color(message, color) if color && stdout.isatty
 
         spaces = "  " * padding
 

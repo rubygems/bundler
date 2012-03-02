@@ -65,6 +65,14 @@ module Bundler
       value
     end
 
+    def delete(key)
+      @specs.delete_if { |s| s.name == key }
+      @lookup = nil
+      @sorted = nil
+      lookup
+      sorted
+    end
+
     def sort!
       self
     end

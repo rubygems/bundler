@@ -29,7 +29,7 @@ module Bundler
     end
 
     def inspect
-      "<Index sources=#{sources.map{|s| s.inspect}} specs.size=#{specs.size}>"
+      "<Index sources=#{sources.map{|s| s.to_s}} specs.size=#{specs.size}>"
     end
 
     def empty?
