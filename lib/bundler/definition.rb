@@ -68,8 +68,8 @@ module Bundler
       eager_unlock = expand_dependencies(@unlock[:gems])
       @unlock[:gems] = @locked_specs.for(eager_unlock).map { |s| s.name }
 
-      converge_sources
-      converge_dependencies
+      @source_changes = converge_sources
+      @dependency_changes = converge_dependencies
     end
 
     def resolve_with_cache!
@@ -137,7 +137,7 @@ module Bundler
 
     def resolve
       @resolve ||= begin
-        if Bundler.settings[:frozen]
+        if Bundler.settings[:frozen] || (!@source_changes && !@dependency_changes)
           @locked_specs
         else
           last_resolve = converge_locked_specs
@@ -325,20 +325,42 @@ module Bundler
     end
 
     def converge_sources
+      changes = false
+
+      # Get the Rubygems source from the Gemfile.lock
       locked_gem = @locked_sources.find { |s| Source::Rubygems === s }
+
+      # Get the Rubygems source from the Gemfile
       actual_gem = @sources.find { |s| Source::Rubygems === s }
 
+      # If there is a Rubygems source in both
       if locked_gem && actual_gem
-        locked_gem.merge_remotes actual_gem
+        # Merge the remotes from the Gemfile into the Gemfile.lock
+        changes = changes | locked_gem.replace_remotes(actual_gem)
       end
 
+      # Replace the sources from the Gemfile with the sources from the Gemfile.lock,
+      # if they exist in the Gemfile.lock and are `==`. If you can't find an equivalent
+      # source in the Gemfile.lock, use the one from the Gemfile.
       @sources.map! do |source|
         @locked_sources.find { |s| s == source } || source
       end
 
+      changes = changes | !(@sources & @locked_sources).empty?
+
       @sources.each do |source|
-        source.unlock! if source.respond_to?(:unlock!) && @unlock[:sources].include?(source.name)
+        # If the source is unlockable and the current command allows an unlock of
+        # the source (for example, you are doing a `bundle update <foo>` of a git-pinned
+        # gem), unlock it. For git sources, this means to unlock the revision, which
+        # will cause the `ref` used to be the most recent for the branch (or master) if
+        # an explicit `ref` is not used.
+        if source.respond_to?(:unlock!) && @unlock[:sources].include?(source.name)
+          source.unlock!
+          changes = true
+        end
       end
+
+      changes
     end
 
     def converge_dependencies
@@ -347,6 +369,8 @@ module Bundler
           dep.source = @sources.find { |s| dep.source == s }
         end
       end
+
+      (@dependencies & @locked_deps).empty?
     end
 
     # Remove elements from the locked specs that are expired. This will most
