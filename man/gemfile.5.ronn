@@ -49,7 +49,6 @@ Each _gem_ `MAY` specify files that should be used when autorequiring via
 `Bundler.require`. You may pass an array with multiple files, or `false` to
 prevent any file from being autorequired.
 
-    gem "sqlite3-ruby", :require => "sqlite3"
     gem "redis", :require => ["redis/connection/hiredis", "redis"]
     gem "webmock", :require => false
 
@@ -239,7 +238,7 @@ applied to a group of gems by using block form.
 
     platforms :ruby do
       gem "ruby-debug"
-      gem "sqlite3-ruby"
+      gem "sqlite3"
     end
 
     group :development do
