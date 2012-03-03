@@ -361,7 +361,7 @@ module Bundler
         @locked_sources.find { |s| s == source } || source
       end
 
-      changes = changes | !(@sources & @locked_sources).empty?
+      changes = changes | (@sources == @locked_sources)
 
       @sources.each do |source|
         # If the source is unlockable and the current command allows an unlock of
