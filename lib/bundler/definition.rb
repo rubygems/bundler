@@ -75,7 +75,15 @@ module Bundler
           ls.class == source.class && ls.path == source.path
         end
 
-        !locked || source.specs != locked.specs
+        if locked
+          unlocking = locked.specs.any? do |spec|
+            @locked_specs.any? do |locked_spec|
+              locked_spec.source != locked
+            end
+          end
+        end
+
+        !locked || unlocking || source.specs != locked.specs
       end
       eager_unlock = expand_dependencies(@unlock[:gems])
       @unlock[:gems] = @locked_specs.for(eager_unlock).map { |s| s.name }
