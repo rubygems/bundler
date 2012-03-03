@@ -1,4 +1,5 @@
 require "digest/sha1"
+require "set"
 
 module Bundler
   class Definition
@@ -371,8 +372,7 @@ module Bundler
       @sources.map! do |source|
         @locked_sources.find { |s| s == source } || source
       end
-
-      changes = changes | (@sources != @locked_sources)
+      changes = changes | (Set.new(@sources) != Set.new(@locked_sources))
 
       @sources.each do |source|
         # If the source is unlockable and the current command allows an unlock of
@@ -395,8 +395,7 @@ module Bundler
           dep.source = @sources.find { |s| dep.source == s }
         end
       end
-      @dependencies != @locked_deps
-
+      Set.new(@dependencies) != Set.new(@locked_deps)
     end
 
     # Remove elements from the locked specs that are expired. This will most
