@@ -30,6 +30,8 @@ module Bundler
 =end
 
     def initialize(lockfile, dependencies, sources, unlock)
+      @unlocking = unlock == true || !unlock.empty?
+
       @dependencies, @sources, @unlock = dependencies, sources, unlock
       @remote            = false
       @specs             = nil
@@ -65,6 +67,15 @@ module Bundler
       @new_platform = !@platforms.include?(current_platform)
       @platforms |= [current_platform]
 
+      @path_changes = @sources.any? do |source|
+        next unless source.instance_of?(Source::Path)
+
+        locked = @locked_sources.find do |ls|
+          ls.class == source.class && ls.path == source.path
+        end
+
+        !locked || source.specs != locked.specs
+      end
       eager_unlock = expand_dependencies(@unlock[:gems])
       @unlock[:gems] = @locked_specs.for(eager_unlock).map { |s| s.name }
 
@@ -154,7 +165,7 @@ module Bundler
 
     def resolve
       @resolve ||= begin
-        if Bundler.settings[:frozen] || (!@source_changes && !@dependency_changes)
+        if Bundler.settings[:frozen] || (!@unlocking && !@source_changes && !@dependency_changes && !@new_platform && !@path_changes)
           @locked_specs
         else
           last_resolve = converge_locked_specs
@@ -361,7 +372,7 @@ module Bundler
         @locked_sources.find { |s| s == source } || source
       end
 
-      changes = changes | (@sources == @locked_sources)
+      changes = changes | (@sources != @locked_sources)
 
       @sources.each do |source|
         # If the source is unlockable and the current command allows an unlock of
@@ -384,8 +395,8 @@ module Bundler
           dep.source = @sources.find { |s| dep.source == s }
         end
       end
+      @dependencies != @locked_deps
 
-      (@dependencies & @locked_deps).empty?
     end
 
     # Remove elements from the locked specs that are expired. This will most
