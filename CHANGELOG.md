@@ -1,9 +1,15 @@
 ## 1.1.rc.8 (Jan 13, 2011)
 
+Performance:
+
+  - don't resolve if the Gemfile.lock and Gemfile haven't changed
+
 Bugfixes:
 
   - Load gemspecs from git even when a released gem has the same version (#1609)
   - Declare an accurate Ruby version requirement of 1.8.7 or newer (#1619)
+  - handle gemspec development dependencies correctly (@raggi, #1639)
+  - Avoid passing RUBYOPT changes in with_clean_env block. (eric1234, #1604)
 
 ## 1.1.rc.7 (Dec 29, 2011)
 
