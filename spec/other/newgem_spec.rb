@@ -7,6 +7,8 @@ describe "bundle gem" do
     @git_email = `git config --global user.email`.chomp
     `git config --global user.email user@example.com`
     bundle 'gem test-gem'
+    # reset gemspec cache for each test because of commit 3d4163a
+    Bundler.instance_variable_set('@gemspec_cache', {})
   end
 
   after :each do
