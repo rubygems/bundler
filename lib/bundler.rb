@@ -77,10 +77,7 @@ module Bundler
     attr_writer :ui, :bundle_path
 
     def configure
-      @configured ||= begin
-        configure_gem_home_and_path
-        true
-      end
+      @configured ||= configure_gem_home_and_path
     end
 
     def ui
@@ -306,23 +303,28 @@ module Bundler
   private
 
     def configure_gem_home_and_path
+      blank_home = ENV['GEM_HOME'].nil? || ENV['GEM_HOME'].empty?
+
       if settings[:disable_shared_gems]
         ENV['GEM_PATH'] = ''
-        ENV['GEM_HOME'] = File.expand_path(bundle_path, root)
-        # TODO: This mkdir_p is only needed for JRuby <= 1.5 and should go away (GH #602)
-        FileUtils.mkdir_p bundle_path.to_s rescue nil
-
-        Bundler.rubygems.clear_paths
-      elsif Bundler.rubygems.gem_dir != bundle_path.to_s
+        configure_gem_home
+      elsif blank_home || Bundler.rubygems.gem_dir != bundle_path.to_s
         possibles = [Bundler.rubygems.gem_dir, Bundler.rubygems.gem_path]
         paths = possibles.flatten.compact.uniq.reject { |p| p.empty? }
         ENV["GEM_PATH"] = paths.join(File::PATH_SEPARATOR)
-        ENV["GEM_HOME"] = bundle_path.to_s
-        # TODO: This mkdir_p is only needed for JRuby <= 1.5 and should go away (GH #602)
-        FileUtils.mkdir_p bundle_path.to_s rescue nil
-
-        Bundler.rubygems.clear_paths
+        configure_gem_home
       end
+
+      Bundler.rubygems.refresh
+      bundle_path
+    end
+
+    def configure_gem_home
+      # TODO: This mkdir_p is only needed for JRuby <= 1.5 and should go away (GH #602)
+      FileUtils.mkdir_p bundle_path.to_s rescue nil
+
+      ENV['GEM_HOME'] = File.expand_path(bundle_path, root)
+      Bundler.rubygems.clear_paths
     end
 
     def upgrade_lockfile

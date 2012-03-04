@@ -133,8 +133,10 @@ module Bundler
       begin
         Bundler.ui.debug "Fetching from: #{uri}"
         response = @@connection.request(uri)
-      rescue SocketError, Timeout::Error, Net::HTTP::Persistent::Error
-        raise Bundler::HTTPError, "Network error while fetching #{uri}"
+      rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, EOFError,
+             SocketError, Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError,
+             Net::HTTP::Persistent::Error, Net::ProtocolError => e
+        raise HTTPError, "Network error while fetching #{uri}"
       end
 
       case response

@@ -1,4 +1,5 @@
 require "digest/sha1"
+require "set"
 
 module Bundler
   class Definition
@@ -30,6 +31,8 @@ module Bundler
 =end
 
     def initialize(lockfile, dependencies, sources, unlock)
+      @unlocking = unlock == true || !unlock.empty?
+
       @dependencies, @sources, @unlock = dependencies, sources, unlock
       @remote            = false
       @specs             = nil
@@ -65,11 +68,45 @@ module Bundler
       @new_platform = !@platforms.include?(current_platform)
       @platforms |= [current_platform]
 
+      @path_changes = @sources.any? do |source|
+        next unless source.instance_of?(Source::Path)
+
+        locked = @locked_sources.find do |ls|
+          ls.class == source.class && ls.path == source.path
+        end
+
+        if locked
+          unlocking = locked.specs.any? do |spec|
+            @locked_specs.any? do |locked_spec|
+              locked_spec.source != locked
+            end
+          end
+        end
+
+        !locked || unlocking || source.specs != locked.specs
+      end
       eager_unlock = expand_dependencies(@unlock[:gems])
       @unlock[:gems] = @locked_specs.for(eager_unlock).map { |s| s.name }
 
       @source_changes = converge_sources
       @dependency_changes = converge_dependencies
+
+      fixup_dependency_types!
+    end
+
+    def fixup_dependency_types!
+      # XXX This is a temporary workaround for a bug when using rubygems 1.8.15
+      # where Gem::Dependency#== matches Gem::Dependency#type. As the lockfile
+      # doesn't carry a notion of the dependency type, if you use
+      # add_development_dependency in a gemspec that's loaded with the gemspec
+      # directive, the lockfile dependencies and resolved dependencies end up
+      # with a mismatch on #type.
+      # Test coverage to catch a regression on this is in gemspec_spec.rb
+      @dependencies.each do |d|
+        if ld = @locked_deps.find { |l| l.name == d.name }
+          ld.instance_variable_set(:@type, d.type)
+        end
+      end
     end
 
     def resolve_with_cache!
@@ -137,7 +174,7 @@ module Bundler
 
     def resolve
       @resolve ||= begin
-        if Bundler.settings[:frozen] || (!@source_changes && !@dependency_changes)
+        if Bundler.settings[:frozen] || (!@unlocking && !@source_changes && !@dependency_changes && !@new_platform && !@path_changes)
           @locked_specs
         else
           last_resolve = converge_locked_specs
@@ -159,20 +196,18 @@ module Bundler
 
     def index
       @index ||= Index.build do |idx|
-        other_sources = @sources.find_all{|s| !s.is_a?(Bundler::Source::Rubygems) }
-        rubygems_sources = @sources.find_all{|s| s.is_a?(Bundler::Source::Rubygems) }
-
         dependency_names = @dependencies.dup || []
         dependency_names.map! {|d| d.name }
-        other_sources.each do |s|
-          source_index = s.specs
-          dependency_names += source_index.unmet_dependency_names
-          idx.add_source source_index
-        end
 
-        rubygems_sources.each do |s|
-          s.dependency_names = dependency_names.uniq if s.is_a?(Bundler::Source::Rubygems)
-          idx.add_source s.specs
+        @sources.each do |s|
+          if s.is_a?(Bundler::Source::Rubygems)
+            s.dependency_names = dependency_names.uniq
+            idx.add_source s.specs
+          else
+            source_index = s.specs
+            dependency_names += source_index.unmet_dependency_names
+            idx.add_source source_index
+          end
         end
       end
     end
@@ -345,6 +380,7 @@ module Bundler
       @sources.map! do |source|
         @locked_sources.find { |s| s == source } || source
       end
+      changes = changes | (Set.new(@sources) != Set.new(@locked_sources))
 
       changes = changes | !(@sources & @locked_sources).empty?
 
@@ -369,8 +405,7 @@ module Bundler
           dep.source = @sources.find { |s| dep.source == s }
         end
       end
-
-      (@dependencies & @locked_deps).empty?
+      Set.new(@dependencies) != Set.new(@locked_deps)
     end
 
     # Remove elements from the locked specs that are expired. This will most

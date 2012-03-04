@@ -35,14 +35,14 @@ module Spec
       @out = ruby(setup + cmd, :expect_err => expect_err, :env => env)
     end
 
-    def load_error_run(ruby, gem, *args)
-      cmd = <<-R
+    def load_error_run(ruby, name, *args)
+      cmd = <<-RUBY
         begin
           #{ruby}
         rescue LoadError => e
-          $stderr.puts "ZOMG LOAD ERROR" if e.message.include?("-- #{gem}")
+          $stderr.puts "ZOMG LOAD ERROR" if e.message.include?("-- #{name}")
         end
-      R
+      RUBY
       opts = args.last.is_a?(Hash) ? args.pop : {}
       opts.merge!(:expect_err => true)
       args += [opts]
@@ -87,12 +87,12 @@ module Spec
       sys_exec(%{#{env}#{Gem.ruby}#{lib_option} -e "#{ruby}"}, expect_err)
     end
 
-    def load_error_ruby(ruby, gem, opts = {})
+    def load_error_ruby(ruby, name, opts = {})
       cmd = <<-R
         begin
           #{ruby}
         rescue LoadError => e
-          $stderr.puts "ZOMG LOAD ERROR"# if e.message.include?("-- #{gem}")
+          $stderr.puts "ZOMG LOAD ERROR"# if e.message.include?("-- #{name}")
         end
       R
       ruby(cmd, opts.merge(:expect_err => true))

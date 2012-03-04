@@ -128,8 +128,7 @@ module Bundler
       end
 
       def replace_remotes(source)
-        diffs = source.remotes & @remotes
-        return false if diffs.empty?
+        return false if source.remotes == @remotes
 
         @remotes = []
         source.remotes.each do |r|

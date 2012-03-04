@@ -110,6 +110,27 @@ describe "bundle install from an existing gemspec" do
     should_be_installed "bar-dev 1.0.0", :groups => :dev
   end
 
+  it "should match a lockfile even if the gemspec defines development dependencies" do
+    build_lib("foo", :path => tmp.join("foo")) do |s|
+      s.write("Gemfile", "source 'file://#{gem_repo1}'\ngemspec")
+      s.add_dependency "actionpack", "=2.3.2"
+      s.add_development_dependency "rake", '=0.8.7'
+    end
+
+    Dir.chdir(tmp.join("foo")) do
+      bundle "install"
+      # This should really be able to rely on $stderr, but, it's not written
+      # right, so we can't. In fact, this is a bug negation test, and so it'll
+      # ghost pass in future, and will only catch a regression if the message
+      # doesn't change. Exit codes should be used correctly (they can be more
+      # than just 0 and 1).
+      output = bundle("install --deployment")
+      output.should_not match(/You have added to the Gemfile/)
+      output.should_not match(/You have deleted from the Gemfile/)
+      output.should_not match(/install in deployment mode after changing/)
+    end
+  end
+
   it "should evaluate the gemspec in its directory" do
     build_lib("foo", :path => tmp.join("foo"))
     File.open(tmp.join("foo/foo.gemspec"), "w") do |s|
@@ -120,6 +141,30 @@ describe "bundle install from an existing gemspec" do
       gemspec :path => '#{tmp.join("foo")}'
     G
     @err.should_not match(/ahh/)
+  end
+
+  context "when child gemspecs conflict with a released gemspec" do
+    before do
+      # build the "parent" gem that depends on another gem in the same repo
+      build_lib "source_conflict", :path => bundled_app do |s|
+        s.add_dependency "rack_middleware"
+      end
+
+      # build the "child" gem that is the same version as a released gem, but
+      # has completely different and conflicting dependency requirements
+      build_lib "rack_middleware", "1.0", :path => bundled_app("rack_middleware") do |s|
+        s.add_dependency "rack", "1.0" # anything other than 0.9.1
+      end
+    end
+
+    it "should install the child gemspec's deps" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gemspec
+      G
+
+      should_be_installed "rack 1.0"
+    end
   end
 
 end
