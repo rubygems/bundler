@@ -300,6 +300,10 @@ module Bundler
       end
     end
 
+    def clear_gemspec_cache
+      @gemspec_cache = {}
+    end
+
   private
 
     def configure_gem_home_and_path
