@@ -312,6 +312,27 @@ OUTPUT
     vendored_gems("bin/rackup").should exist
   end
 
+  it "prints post_install_messages" do
+    gemfile <<-G
+      source "#{source_uri}"
+      gem 'rack-obama'
+    G
+
+    bundle :install, :artifice => "endpoint"
+    out.should include("Post-install message from rack:")
+  end
+
+  it "should display the post install message for a dependency" do
+    gemfile <<-G
+      source "#{source_uri}"
+      gem 'rack_middleware'
+    G
+
+    bundle :install, :artifice => "endpoint"
+    out.should include("Post-install message from rack:")
+    out.should include("Rack's post install message")
+  end
+
   context "when using basic authentication" do
     let(:user)     { "user" }
     let(:password) { "pass" }
