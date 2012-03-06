@@ -382,8 +382,6 @@ module Bundler
       end
       changes = changes | (Set.new(@sources) != Set.new(@locked_sources))
 
-      changes = changes | !(@sources & @locked_sources).empty?
-
       @sources.each do |source|
         # If the source is unlockable and the current command allows an unlock of
         # the source (for example, you are doing a `bundle update <foo>` of a git-pinned
