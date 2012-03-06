@@ -110,7 +110,11 @@ module Bundler
         return
       else
         @source = source
-        options[:prepend] ? @sources.unshift(@source) : @sources << @source
+        if options[:prepend]
+          @sources = [@source] | @sources
+        else
+          @sources = @sources | [@source]
+        end
 
         yield if block_given?
         return @source
