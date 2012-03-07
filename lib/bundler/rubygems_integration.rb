@@ -3,6 +3,7 @@ module Bundler
     def initialize
       # Work around a RubyGems bug
       configuration
+      Gem.use_paths Gem.configuration[:gemhome], Gem.configuration[:gempath]
     end
 
     def loaded_specs(name)
