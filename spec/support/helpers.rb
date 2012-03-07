@@ -162,6 +162,12 @@ module Spec
       end
     end
 
+    def strip_whitespace(str)
+      # Trim the leading spaces
+      spaces = str[/\A\s+/, 0] || ""
+      str.gsub(/^#{spaces}/, '')
+    end
+
     def install_gemfile(*args)
       gemfile(*args)
       opts = args.last.is_a?(Hash) ? args.last : {}

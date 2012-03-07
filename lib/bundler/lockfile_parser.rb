@@ -1,5 +1,15 @@
 require "strscan"
 
+# Some versions of the Bundler 1.1 RC series introduced corrupted
+# lockfiles. There were two major problems:
+#
+# * multiple copies of the same GIT section appeared in the lockfile
+# * when this happened, those sections got multiple copies of gems
+#   in those sections.
+#
+# As a result, Bundler 1.1 contains code that fixes the earlier
+# corruption. We will remove this fix-up code in Bundler 1.2.
+
 module Bundler
   class LockfileParser
     attr_reader :sources, :dependencies, :specs, :platforms
@@ -37,6 +47,12 @@ module Bundler
         @opts, @type = {}, line
       when "  specs:"
         @current_source = TYPES[@type].from_lock(@opts)
+
+        # Strip out duplicate GIT sections
+        if @sources.include?(@current_source)
+          @current_source = @sources.find { |s| s == @current_source }
+        end
+
         @sources << @current_source
       when /^  ([a-z]+): (.*)$/i
         value = $2
@@ -89,7 +105,10 @@ module Bundler
         platform = $3 ? Gem::Platform.new($3) : Gem::Platform::RUBY
         @current_spec = LazySpecification.new(name, version, platform)
         @current_spec.source = @current_source
-        @specs << @current_spec
+
+        # Avoid introducing multiple copies of the same spec (caused by
+        # duplicate GIT sections)
+        @specs << @current_spec unless @specs.include?(@current_spec)
       elsif line =~ %r{^ {6}#{NAME_VERSION}$}
         name, version = $1, $2
         version = version.split(',').map { |d| d.strip } if version
