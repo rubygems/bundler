@@ -25,6 +25,11 @@ module Bundler
       end
     end
 
+    def ==(other)
+      [name, version, dependencies, platform, source] ==
+        [other.name, other.version, other.dependencies, other.platform, other.source]
+    end
+
     def satisfies?(dependency)
       @name == dependency.name && dependency.requirement.satisfied_by?(Gem::Version.new(@version))
     end

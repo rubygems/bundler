@@ -478,6 +478,22 @@ describe "bundle install with git sources" do
     exitstatus.should == 0
   end
 
+  it "does not duplicate git gem sources" do
+    build_lib "foo", :path => lib_path('nested/foo')
+    build_lib "bar", :path => lib_path('nested/bar')
+
+    build_git "foo", :path => lib_path('nested')
+    build_git "bar", :path => lib_path('nested')
+
+    gemfile <<-G
+      gem "foo", :git => "#{lib_path('nested')}"
+      gem "bar", :git => "#{lib_path('nested')}"
+    G
+
+    bundle "install"
+    File.read(bundled_app("Gemfile.lock")).scan('GIT').size.should == 1
+  end
+
   describe "switching sources" do
     it "doesn't explode when switching Path to Git sources" do
       build_gem "foo", "1.0", :to_system => true do |s|

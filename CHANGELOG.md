@@ -1,3 +1,11 @@
+## 1.1.0 (Mar 7, 2012)
+
+Bugfixes:
+
+  - Clean up corrupted lockfiles on bundle installs
+  - Prevent duplicate GIT sources
+  - Fix post_install_message when uing the endpoint API
+
 ## 1.1.rc.8 (Mar 3, 2012)
 
 Performance:
