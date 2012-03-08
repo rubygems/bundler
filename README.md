@@ -10,9 +10,9 @@ you run any ruby code in context of the bundle's gem environment.
 
 See [gembundler.com](http://gembundler.com) for up-to-date installation and usage instructions.
 
-### Troubleshooting
+### Troubleshooting and Reporting Bugs
 
-For help with common problems, see [ISSUES](https://github.com/carlhuda/bundler/blob/master/ISSUES.md).
+For help with common problems and instructions on how to report a bug please see [ISSUES](https://github.com/carlhuda/bundler/blob/master/ISSUES.md).
 
 ### Development
 
