@@ -1,11 +1,8 @@
-require 'bundler/config'
 require 'erb'
 require 'rubygems/dependency_installer'
 
 module Bundler
   class Installer < Environment
-    include Config
-
     class << self
       attr_accessor :post_install_messages
     end
@@ -132,7 +129,7 @@ module Bundler
 
     def generate_bundler_executable_stubs(spec)
       bin_path = Bundler.bin_path
-      template = File.read(File.join(Config::TEMPLATES,'Executable'))
+      template = File.read(File.expand_path('../templates/Executable', __FILE__))
       relative_gemfile_path = Bundler.default_gemfile.relative_path_from(bin_path)
       ruby_command = Thor::Util.ruby_command
 

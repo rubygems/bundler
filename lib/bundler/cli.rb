@@ -1,11 +1,9 @@
-require 'bundler/config'
 require 'bundler/vendored_thor'
 require 'rubygems/user_interaction'
 require 'rubygems/config_file'
 
 module Bundler
   class CLI < Thor
-    include Config
     include Thor::Actions
 
     def initialize(*)
@@ -82,7 +80,7 @@ module Bundler
         end
       else
         puts "Writing new Gemfile to #{Dir.pwd}/Gemfile"
-        FileUtils.cp(File.join(Config::TEMPLATES,'Gemfile'), 'Gemfile')
+        FileUtils.cp(File.expand_path('../templates/Gemfile', __FILE__), 'Gemfile')
       end
     end
 
@@ -568,7 +566,7 @@ module Bundler
     end
 
     def self.source_root
-      Config::TEMPLATES
+      File.expand_path(File.join(File.dirname(__FILE__), 'templates'))
     end
 
     desc "clean", "Cleans up unused gems in your bundler directory"
