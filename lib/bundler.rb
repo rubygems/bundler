@@ -252,9 +252,9 @@ module Bundler
       if File.executable?(executable)
         executable
       else
-        path = ENV['PATH'].split(File::PATH_SEPARATOR).find { |path|
-          File.executable?(File.join(path, executable))
-        }
+        path = ENV['PATH'].split(File::PATH_SEPARATOR).find do |p|
+          File.executable?(File.join(p, executable))
+        end
         path && File.expand_path(executable, path)
       end
     end
