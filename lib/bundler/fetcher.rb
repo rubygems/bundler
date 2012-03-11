@@ -158,7 +158,8 @@ module Bundler
     # fetch from Gemcutter Dependency Endpoint API
     def fetch_dependency_remote_specs(gem_names)
       Bundler.ui.debug "Query Gemcutter Dependency Endpoint API: #{gem_names.join(' ')}"
-      uri = URI.parse("#{@remote_uri}api/v1/dependencies?gems=#{gem_names.join(",")}")
+      encoded_gem_names = URI.encode(gem_names.join(","))
+      uri = URI.parse("#{@remote_uri}api/v1/dependencies?gems=#{encoded_gem_names}")
       marshalled_deps = fetch(uri)
       gem_list = Marshal.load(marshalled_deps)
       deps_list = []

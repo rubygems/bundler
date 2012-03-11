@@ -14,6 +14,16 @@ describe "gemcutter's dependency API" do
     should_be_installed "rack 1.0.0"
   end
 
+  it "should URI encode gem names" do
+    gemfile <<-G
+      source "#{source_uri}"
+      gem " sinatra"
+    G
+
+    bundle :install, :artifice => "endpoint"
+    out.should include("Could not find gem ' sinatra")
+  end
+
   it "should handle nested dependencies" do
     gemfile <<-G
       source "#{source_uri}"
