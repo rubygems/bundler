@@ -472,7 +472,7 @@ module Bundler
           if result == false
             location = " at #{$1}" if hook.inspect =~ /@(.*:\d+)/
             message = "#{type} hook#{location} failed for #{installer.spec.full_name}"
-            raise Gem::InstallError, message
+            raise InstallHookError, message
           end
         end
       end
