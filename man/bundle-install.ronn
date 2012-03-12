@@ -50,7 +50,10 @@ update process below under [CONSERVATIVE UPDATING][].
 
 * `--without=<list>`:
   A space-separated list of groups to skip installing. This is a
-  [remembered option][REMEMBERED OPTIONS].
+  [remembered option][REMEMBERED OPTIONS]. Subsequent use of `--without`
+  replaces the list of of groups that will be skipped. To totally
+  clear the list of groups to be skipped (include all groups),
+  specify `--without ''`.
 
 * `--local`:
   Do not attempt to connect to `rubygems.org`, instead using just

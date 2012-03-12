@@ -91,7 +91,8 @@ list of groups separated by spaces.
 
 After running `bundle install --without test`, bundler will remember that you excluded
 the test group in the last installation. The next time you run `bundle install`,
-without any `--without option`, bundler will recall it.
+without any `--without option`, bundler will recall it. You can run
+`bundle install --without ''` to install all gems with all groups active (none skipped).
 
 Also, calling `Bundler.setup` with no parameters, or calling `require "bundler/setup"`
 will setup all groups except for the ones you excluded via `--without` (since they
