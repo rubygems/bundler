@@ -202,7 +202,7 @@ the `.gemspec`.
     | |-actionpack.gemspec    [actionpack gem located here]
     |~activesupport
     | |-activesupport.gemspec [activesupport gem located here]
-    ...
+    |...
 
 To install a gem located in a git repository, bundler changes to
 the directory containing the gemspec, runs `gem build name.gemspec`
