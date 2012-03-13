@@ -11,6 +11,8 @@ env:
   - RGV=v1.7.2
   - RGV=v1.8.10
 
+language: ruby
+
 matrix:
   exclude:
     - rvm: 1.9.2
