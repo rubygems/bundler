@@ -1,3 +1,17 @@
+## 1.1.1 (March 14, 2012)
+
+Bugfixes:
+
+  - Rescue EAGAIN so the fetcher works on JRuby on Windows
+  - Stop asking users to report gem installation errors
+  - Clarify "no sources" message
+  - Use $\ so `bundle gem` gemspecs work on Windows (@postmodern)
+  - URI-encode gem names for dependency API (@rohit, #1672)
+
+Performance:
+
+  - Reduce invocation of git ls-files in `bundle gem` gemspecs (@knu)
+
 ## 1.1.0 (Mar 7, 2012)
 
 Bugfixes:
