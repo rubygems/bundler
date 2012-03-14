@@ -265,6 +265,15 @@ module Bundler
       end
     end
 
+    # This backport fixes the marshaling of @segments.
+    def backport_yaml_initialize
+      Gem::Version.send(:define_method, :yaml_initialize) do |tag, map|
+        @version = map['version']
+        @segments = nil
+        @hash = nil
+      end
+    end
+
     # This backports base_dir which replaces installation path
     # Rubygems 1.8+
     def backport_base_dir
@@ -301,6 +310,7 @@ module Bundler
         backport_base_dir
         backport_cache_file
         backport_spec_file
+        backport_yaml_initialize
       end
 
       def stub_rubygems(specs)

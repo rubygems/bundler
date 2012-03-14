@@ -642,7 +642,7 @@ describe "bundle install with git sources" do
 
       bundle :install, :expect_err => true,
         :requires => [lib_path('install_hooks.rb')]
-      err.should include("failed for foo-1.0")
+      out.should include("failed for foo-1.0")
     end
   end
 end

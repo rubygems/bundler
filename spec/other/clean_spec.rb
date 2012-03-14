@@ -465,8 +465,8 @@ describe "bundle clean" do
 
     sys_status "foo"
 
-    exitstatus.should == 0
-    out.should == "1.0"
+    exitstatus.should eq(0)
+    out.should eq("1.0")
   end
 
   it "doesn't blow up on path gems without a .gempsec" do

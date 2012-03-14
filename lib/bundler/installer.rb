@@ -116,7 +116,7 @@ module Bundler
       FileUtils.rm_rf(Bundler.tmp)
     rescue Exception => e
       # install hook failed
-      raise e if e.is_a?(Gem::InstallError)
+      raise e if e.is_a?(Bundler::InstallHookError)
 
       # other failure, likely a native extension build failure
       Bundler.ui.info ""

@@ -291,7 +291,7 @@ describe "bundle install with gem sources" do
       G
 
       bundle :install, :expect_err => true
-      out.should =~ /Your Gemfile doesn't have any sources/i
+      out.should =~ /Your Gemfile has no remote sources/i
     end
 
     it "creates a Gemfile.lock on a blank Gemfile" do
@@ -486,7 +486,7 @@ describe "bundle install with gem sources" do
       G
 
       bundle :install, :quiet => true
-      out.should =~ /doesn't have any sources/
+      out.should =~ /Your Gemfile has no remote sources/
     end
   end
 

@@ -13,7 +13,7 @@ class Net::BufferedIO #:nodoc:
     if @io.respond_to? :read_nonblock then
       begin
         @rbuf << @io.read_nonblock(65536)
-      rescue Errno::EWOULDBLOCK => e
+      rescue Errno::EWOULDBLOCK, Errno::EAGAIN => e
         retry if IO.select [@io], nil, nil, @read_timeout
         raise Timeout::Error, e.message
       end
