@@ -254,8 +254,11 @@ module Bundler
     method_option "source", :type => :array, :banner => "Update a specific source (and all gems associated with it)"
     method_option "local", :type => :boolean, :banner =>
       "Do not attempt to fetch gems remotely and use the gem cache instead"
+    method_option "quiet", :type => :boolean, :banner =>
+      "Only output warnings and errors."
     def update(*gems)
       sources = Array(options[:source])
+      Bundler.ui.be_quiet! if options[:quiet]
 
       if gems.empty? && sources.empty?
         # We're doing a full update

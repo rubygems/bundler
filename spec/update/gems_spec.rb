@@ -33,6 +33,18 @@ describe "bundle update" do
     end
   end
 
+  describe "--quiet argument" do
+    it 'shows UI messages without --quiet argument' do
+      bundle "update"
+      out.should include("Fetching source")
+    end
+
+    it 'does not show UI messages with --quiet argument' do
+      bundle "update --quiet"
+      out.should_not include("Fetching source")
+    end
+  end
+
   describe "with a top level dependency" do
     it "unlocks all child dependencies that are unrelated to other locked dependencies" do
       update_repo2 do
