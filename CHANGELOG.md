@@ -7,6 +7,7 @@ Bugfixes:
   - Clarify "no sources" message
   - Use $\ so `bundle gem` gemspecs work on Windows (@postmodern)
   - URI-encode gem names for dependency API (@rohit, #1672)
+  - Fix `cache` edge case in rubygems 1.3.7 (#1202)
 
 Performance:
 
