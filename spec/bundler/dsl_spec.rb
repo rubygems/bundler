@@ -18,6 +18,22 @@ describe Bundler::Dsl do
       github_uri = "git://github.com/rails/rails.git"
       subject.dependencies.first.source.uri.should == github_uri
     end
+    
+    it "should work with maven as an option" do
+      subject.gem("mvn:commons-lang:commons-lang","2.6.1",:mvn=>"default")
+      source = subject.dependencies.first.source
+      puts "SOURCE=#{source}"
+      puts "SPECS = #{source.specs.inspect}"
+    end
+    
+    it "should work with maven as a block" do
+      subject.mvn("default") do
+        subject.gem("mvn:commons-lang:commons-lang","2.6.1")
+      end
+      source = subject.dependencies.first.source
+      puts "SOURCE=#{source}"
+      puts "SPECS = #{source.specs.inspect}"      
+    end
   end
 
   describe '#method_missing' do

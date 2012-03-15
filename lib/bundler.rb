@@ -77,6 +77,10 @@ module Bundler
   class << self
     attr_writer :ui, :bundle_path
 
+    def java?
+      RUBY_PLATFORM == "java"
+    end
+    
     def configure
       @configured ||= configure_gem_home_and_path
     end

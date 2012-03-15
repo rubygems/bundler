@@ -27,3 +27,17 @@ See [UPGRADING](https://github.com/carlhuda/bundler/blob/master/UPGRADING.md).
 ### Other questions
 
 Feel free to chat with the Bundler core team (and many other users) on IRC in the  [#bundler](irc://irc.freenode.net/bundler) channel on Freenode, or via email on the [Bundler mailing list](http://groups.google.com/group/ruby-bundler).
+
+
+### Maven Integration (JRuby only)
+This version of bundler allows maven dependencies to be included alongside your other Ruby dependencies opening up a whole new world of possibilities! 
+There are two ways to add your maven dependencies:
+<ol>
+<li> mvn "repo URL (or 'default' for the default repo URL)" do
+	gem "mvn:<group_id>:<artifact_id>", "version number"
+   end</li>
+<li> gem "mvn:<group_id>:<artifact_id>", "version number", :mvn=>"repo URL (or 'default' for the default repo URL)" </li>
+</ol>
+This integration will download the right jar using maven into your *maven* repo location and simply write the necessary ruby files to require the jars from the
+right location in the maven repository. This allows for maven repos and gem repos to live side by side without duplication of binaries and ensure that dependencies
+are resolved properly as maven does that automatically. 
