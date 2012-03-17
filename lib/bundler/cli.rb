@@ -130,6 +130,8 @@ module Bundler
     D
     method_option "without", :type => :array, :banner =>
       "Exclude gems that are part of the specified named group."
+    method_option "with", :type => :array, :banner =>
+      "Include gems that are part of the specified named group in addition to those that are part of the :default group."
     method_option "gemfile", :type => :string, :banner =>
       "Use the specified gemfile instead of Gemfile"
     method_option "no-prune", :type => :boolean, :banner =>
@@ -164,6 +166,11 @@ module Bundler
         opts[:without].map!{|g| g.split(" ") }
         opts[:without].flatten!
         opts[:without].map!{|g| g.to_sym }
+      end
+      if opts[:with]
+        opts[:with].map!{|g| g.split(" ") }
+        opts[:with].flatten!
+        opts[:with].map!{|g| g.to_sym }
       end
 
       # Can't use Bundler.settings for this because settings needs gemfile.dirname
@@ -210,6 +217,7 @@ module Bundler
       Bundler.settings[:no_prune] = true if opts["no-prune"]
       Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? '1' : nil
       Bundler.settings.without = opts[:without]
+      Bundler.settings.with = opts[:with]
       Bundler.ui.be_quiet! if opts[:quiet]
       Bundler.settings[:clean] = opts[:clean] if opts[:clean]
 

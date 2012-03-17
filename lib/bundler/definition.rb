@@ -156,7 +156,7 @@ module Bundler
 
     def requested_specs
       @requested_specs ||= begin
-        groups = self.groups - Bundler.settings.without
+        groups = self.groups - Bundler.settings.without + Bundler.settings.with
         groups.map! { |g| g.to_sym }
         specs_for(groups)
       end
@@ -504,7 +504,7 @@ module Bundler
     end
 
     def requested_dependencies
-      groups = self.groups - Bundler.settings.without
+      groups = self.groups - Bundler.settings.without + Bundler.settings.with
       groups.map! { |g| g.to_sym }
       dependencies.reject { |d| !d.should_include? || (d.groups & groups).empty? }
     end

@@ -69,6 +69,14 @@ module Bundler
       self[:without] ? self[:without].split(":").map { |w| w.to_sym } : []
     end
 
+    def with=(array)
+      self[:with] = (array.empty? ? nil : array.join(":")) if array
+    end
+
+    def with
+      self[:with] ? self[:with].split(":").map { |w| w.to_sym } : []
+    end
+
     # @local_config["BUNDLE_PATH"] should be prioritized over ENV["BUNDLE_PATH"]
     def path
       path = ENV[key_for(:path)] || @global_config[key_for(:path)]
