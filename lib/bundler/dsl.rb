@@ -25,6 +25,7 @@ module Bundler
       @groups          = []
       @platforms       = []
       @env             = nil
+      @ruby_version    = ""
     end
 
     def eval_gemfile(gemfile)
@@ -144,7 +145,7 @@ module Bundler
 
     def to_definition(lockfile, unlock)
       @sources << @rubygems_source unless @sources.include?(@rubygems_source)
-      Definition.new(lockfile, @dependencies, @sources, unlock)
+      Definition.new(lockfile, @dependencies, @sources, unlock, @ruby_version)
     end
 
     def group(*args, &blk)
@@ -167,6 +168,16 @@ module Bundler
       yield
     ensure
       @env = old
+    end
+
+    def ruby_version(ruby_version, options = {})
+      raise GemfileError, "Please define :engine_version" if options[:engine] && options[:engine_version].nil?
+      raise GemfileError, "Please define :engine" if options[:engine_version] && options[:engine].nil?
+
+      engine         = options[:engine] || "ruby"
+      raise GemfileError, "ruby_version must match the :engine_version for MRI" if options[:engine] == "ruby" && options[:engine_version] && ruby_version != options[:engine_version]
+      engine_version = engine == "ruby" ? ruby_version : options[:engine_version]
+      @ruby_version  = "ruby #{ruby_version} (#{engine} #{engine_version})"
     end
 
     def method_missing(name, *args)

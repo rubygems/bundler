@@ -5,7 +5,7 @@ module Bundler
   class Definition
     include GemHelpers
 
-    attr_reader :dependencies, :platforms, :sources
+    attr_reader :dependencies, :platforms, :sources, :ruby_version
 
     def self.build(gemfile, lockfile, unlock)
       unlock ||= {}
@@ -30,13 +30,14 @@ module Bundler
       specs, then we can try to resolve locally.
 =end
 
-    def initialize(lockfile, dependencies, sources, unlock)
+    def initialize(lockfile, dependencies, sources, unlock, ruby_version = "")
       @unlocking = unlock == true || !unlock.empty?
 
       @dependencies, @sources, @unlock = dependencies, sources, unlock
       @remote            = false
       @specs             = nil
       @lockfile_contents = ""
+      @ruby_version      = ruby_version
 
       if lockfile && File.exists?(lockfile)
         @lockfile_contents = Bundler.read_file(lockfile)

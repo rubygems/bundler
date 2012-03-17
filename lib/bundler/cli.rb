@@ -617,6 +617,11 @@ module Bundler
       end
     end
 
+    desc "ruby", "Displays the ruby version specified"
+    def ruby
+      Bundler.ui.info Bundler.definition.ruby_version
+    end
+
   private
 
     def setup_cache_all
