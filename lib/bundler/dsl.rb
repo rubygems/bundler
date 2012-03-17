@@ -191,7 +191,8 @@ module Bundler
     def _normalize_options(name, version, opts)
       _normalize_hash(opts)
 
-      invalid_keys = opts.keys - %w(group groups git github path name branch ref tag require submodules platform platforms type)
+      valid_keys = %w(group groups git github path name branch ref tag require submodules platform platforms type)
+      invalid_keys = opts.keys - valid_keys
       if invalid_keys.any?
         plural = invalid_keys.size > 1
         message = "You passed #{invalid_keys.map{|k| ':'+k }.join(", ")} "
@@ -200,6 +201,8 @@ module Bundler
         else
           message << "as an option for gem '#{name}', but it is invalid."
         end
+
+        message << " Valid options are: #{valid_keys.join(", ")}"
         raise InvalidOption, message
       end
 
