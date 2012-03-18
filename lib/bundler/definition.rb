@@ -68,23 +68,7 @@ module Bundler
       @new_platform = !@platforms.include?(current_platform)
       @platforms |= [current_platform]
 
-      @path_changes = @sources.any? do |source|
-        next unless source.instance_of?(Source::Path)
-
-        locked = @locked_sources.find do |ls|
-          ls.class == source.class && ls.path == source.path
-        end
-
-        if locked
-          unlocking = locked.specs.any? do |spec|
-            @locked_specs.any? do |locked_spec|
-              locked_spec.source != locked
-            end
-          end
-        end
-
-        !locked || unlocking || source.specs != locked.specs
-      end
+      @path_changes = converge_paths
       eager_unlock = expand_dependencies(@unlock[:gems])
       @unlock[:gems] = @locked_specs.for(eager_unlock).map { |s| s.name }
 
@@ -174,7 +158,7 @@ module Bundler
 
     def resolve
       @resolve ||= begin
-        if Bundler.settings[:frozen] || (!@unlocking && !@source_changes && !@dependency_changes && !@new_platform && !@path_changes)
+        if Bundler.settings[:frozen] || (!@unlocking && nothing_changed?)
           @locked_specs
         else
           last_resolve = converge_locked_specs
@@ -352,11 +336,35 @@ module Bundler
 
   private
 
+    def nothing_changed?
+      !@source_changes && !@dependency_changes && !@new_platform && !@path_changes
+    end
+
     def pretty_dep(dep, source = false)
       msg  = "#{dep.name}"
       msg << " (#{dep.requirement})" unless dep.requirement == Gem::Requirement.default
       msg << " from the `#{dep.source}` source" if source && dep.source
       msg
+    end
+
+    def converge_paths
+      @sources.any? do |source|
+        next unless source.instance_of?(Source::Path)
+
+        locked = @locked_sources.find do |ls|
+          ls.class == source.class && ls.path == source.path
+        end
+
+        if locked
+          unlocking = locked.specs.any? do |spec|
+            @locked_specs.any? do |locked_spec|
+              locked_spec.source != locked
+            end
+          end
+        end
+
+        !locked || unlocking || source.specs != locked.specs
+      end
     end
 
     def converge_sources
