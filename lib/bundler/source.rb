@@ -479,6 +479,111 @@ module Bundler
     end
 
     class Git < Path
+      # The GitProxy is responsible to iteract with git repositories.
+      # All actions required by the Git source is encapsualted in this
+      # object.
+      class GitProxy
+        attr_accessor :path, :uri, :ref, :revision
+
+        def initialize(path, uri, ref, revision=nil, &allow)
+          @path     = path
+          @uri      = uri
+          @ref      = ref
+          @revision = revision
+          @allow    = allow || Proc.new { true }
+        end
+
+        def revision
+          @revision ||= if allow?
+            in_path { git("rev-parse #{ref}").strip }
+          else
+            raise GitError, "The git source #{uri} is not yet checked out. Please run `bundle install` before trying to start your application"
+          end
+        end
+
+        def checkout
+          if path.exist?
+            return if has_revision_cached?
+            Bundler.ui.info "Updating #{uri}"
+            in_path do
+              git %|fetch --force --quiet --tags #{uri_escaped} "refs/heads/*:refs/heads/*"|
+            end
+          else
+            Bundler.ui.info "Fetching #{uri}"
+            FileUtils.mkdir_p(path.dirname)
+            git %|clone #{uri_escaped} "#{path}" --bare --no-hardlinks|
+          end
+        end
+
+        def copy_to(destination, submodules=false)
+          unless File.exist?(destination.join(".git"))
+            FileUtils.mkdir_p(destination.dirname)
+            FileUtils.rm_rf(destination)
+            git %|clone --no-checkout "#{path}" "#{destination}"|
+            File.chmod((0777 & ~File.umask), destination)
+          end
+
+          Dir.chdir(destination) do
+            git %|fetch --force --quiet --tags "#{path}"|
+            git "reset --hard #{@revision}"
+
+            if submodules
+              git "submodule init"
+              git "submodule update"
+            end
+          end
+        end
+
+      private
+
+        def git(command)
+          if allow?
+            out = %x{git #{command}}
+
+            if $?.exitstatus != 0
+              msg = "Git error: command `git #{command}` in directory #{Dir.pwd} has failed."
+              msg << "\nIf this error persists you could try removing the cache directory '#{path}'" if path.exist?
+              raise GitError, msg
+            end
+            out
+          else
+            raise GitError, "Bundler is trying to run a `git #{command}` at runtime. You probably need to run `bundle install`. However, " \
+                            "this error message could probably be more useful. Please submit a ticket at http://github.com/carlhuda/bundler/issues " \
+                            "with steps to reproduce as well as the following\n\nCALLER: #{caller.join("\n")}"
+          end
+        end
+
+        def has_revision_cached?
+          return unless @revision
+          in_path { git("cat-file -e #{@revision}") }
+          true
+        rescue GitError
+          false
+        end
+
+        # Escape the URI for git commands
+        def uri_escaped
+          if Bundler::WINDOWS
+            # Windows quoting requires double quotes only, with double quotes
+            # inside the string escaped by being doubled.
+            '"' + uri.gsub('"') {|s| '""'} + '"'
+          else
+            # Bash requires single quoted strings, with the single quotes escaped
+            # by ending the string, escaping the quote, and restarting the string.
+            "'" + uri.gsub("'") {|s| "'\\''"} + "'"
+          end
+        end
+
+        def in_path(&blk)
+          checkout unless path.exist?
+          Dir.chdir(path, &blk)
+        end
+
+        def allow?
+          @allow.call
+        end
+      end
+
       attr_reader :uri, :ref, :options, :submodules
 
       def initialize(options)
@@ -489,7 +594,6 @@ module Bundler
 
         @uri        = options["uri"]
         @ref        = options["ref"] || options["branch"] || options["tag"] || 'master'
-        @revision   = options["revision"]
         @submodules = options["submodules"]
         @update     = false
         @installed  = nil
@@ -530,7 +634,7 @@ module Bundler
         File.basename(@uri, '.git')
       end
 
-      def path
+      def install_path
         @install_path ||= begin
           git_scope = "#{base_name}-#{shortref_for_path(revision)}"
 
@@ -542,16 +646,17 @@ module Bundler
         end
       end
 
+      alias :path :install_path
+
       def unlock!
-        @revision = nil
+        git_proxy.revision = nil
       end
 
       # TODO: actually cache git specs
       def specs(*)
-        if allow_git_ops? && !@update
-          # Start by making sure the git cache is up to date
-          cache
-          checkout
+        if requires_checkout? && !@update
+          git_proxy.checkout
+          git_proxy.copy_to(install_path, submodules)
           @update = true
         end
         local_specs
@@ -559,10 +664,9 @@ module Bundler
 
       def install(spec)
         Bundler.ui.info "Using #{spec.name} (#{spec.version}) from #{to_s} "
-
-        unless @installed
+        if requires_checkout? && !@installed
           Bundler.ui.debug "  * Checking out revision: #{ref}"
-          checkout if allow_git_ops?
+          git_proxy.copy_to(install_path, submodules)
           @installed = true
         end
         generate_bin(spec)
@@ -585,23 +689,11 @@ module Bundler
           end
         end
       end
+
     private
 
-      def git(command)
-        if allow_git_ops?
-          out = %x{git #{command}}
-
-          if $?.exitstatus != 0
-            msg = "Git error: command `git #{command}` in directory #{Dir.pwd} has failed."
-            msg << "\nIf this error persists you could try removing the cache directory '#{cache_path}'" if cached?
-            raise GitError, msg
-          end
-          out
-        else
-          raise GitError, "Bundler is trying to run a `git #{command}` at runtime. You probably need to run `bundle install`. However, " \
-                          "this error message could probably be more useful. Please submit a ticket at http://github.com/carlhuda/bundler/issues " \
-                          "with steps to reproduce as well as the following\n\nCALLER: #{caller.join("\n")}"
-        end
+      def requires_checkout?
+        allow_git_ops?
       end
 
       def base_name
@@ -628,80 +720,16 @@ module Bundler
         Digest::SHA1.hexdigest(input)
       end
 
-      # Escape the URI for git commands
-      def uri_escaped
-        if Bundler::WINDOWS
-          # Windows quoting requires double quotes only, with double quotes
-          # inside the string escaped by being doubled.
-          '"' + uri.gsub('"') {|s| '""'} + '"'
-        else
-          # Bash requires single quoted strings, with the single quotes escaped
-          # by ending the string, escaping the quote, and restarting the string.
-          "'" + uri.gsub("'") {|s| "'\\''"} + "'"
-        end
-      end
-
-      def cache
-        if cached?
-          return if has_revision_cached?
-          Bundler.ui.info "Updating #{uri}"
-          in_cache do
-            git %|fetch --force --quiet --tags #{uri_escaped} "refs/heads/*:refs/heads/*"|
-          end
-        else
-          Bundler.ui.info "Fetching #{uri}"
-          FileUtils.mkdir_p(cache_path.dirname)
-          git %|clone #{uri_escaped} "#{cache_path}" --bare --no-hardlinks|
-        end
-      end
-
-      def checkout
-        unless File.exist?(path.join(".git"))
-          FileUtils.mkdir_p(path.dirname)
-          FileUtils.rm_rf(path)
-          git %|clone --no-checkout "#{cache_path}" "#{path}"|
-          File.chmod((0777 & ~File.umask), path)
-        end
-        Dir.chdir(path) do
-          git %|fetch --force --quiet --tags "#{cache_path}"|
-          git "reset --hard #{revision}"
-
-          if @submodules
-            git "submodule init"
-            git "submodule update"
-          end
-        end
-      end
-
-      def has_revision_cached?
-        return unless @revision
-        in_cache { git %|cat-file -e #{@revision}| }
-        true
-      rescue GitError
-        false
-      end
-
       def allow_git_ops?
         @allow_remote || @allow_cached
       end
 
       def revision
-        @revision ||= begin
-          if allow_git_ops?
-            in_cache { git("rev-parse #{ref}").strip }
-          else
-            raise GitError, "The git source #{uri} is not yet checked out. Please run `bundle install` before trying to start your application"
-          end
-        end
+        git_proxy.revision
       end
 
-      def cached?
-        cache_path.exist?
-      end
-
-      def in_cache(&blk)
-        cache unless cached?
-        Dir.chdir(cache_path, &blk)
+      def git_proxy
+        @git_proxy ||= GitProxy.new(cache_path, uri, ref, options["revision"]){ allow_git_ops? }
       end
     end
 
