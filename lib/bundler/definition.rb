@@ -75,6 +75,15 @@ module Bundler
       @source_changes = converge_sources
       @dependency_changes = converge_dependencies
 
+      @local_changes = Bundler.settings.local_overrides.map do |k,v|
+        spec   = @dependencies.find { |s| s.name == k }
+        source = spec && spec.source
+        if source && source.respond_to?(:local_override!)
+          source.local_override!(v)
+          true
+        end
+      end.any?
+
       fixup_dependency_types!
     end
 
@@ -337,7 +346,7 @@ module Bundler
   private
 
     def nothing_changed?
-      !@source_changes && !@dependency_changes && !@new_platform && !@path_changes
+      !@source_changes && !@dependency_changes && !@new_platform && !@path_changes && !@local_changes
     end
 
     def pretty_dep(dep, source = false)

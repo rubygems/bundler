@@ -156,6 +156,155 @@ describe "bundle install with git sources" do
     end
   end
 
+  describe "when specifying local" do
+    it "uses the local repository instead of checking a new one out" do
+      # We don't generate it because we actually don't need it
+      # build_git "rack", "0.8"
+
+      build_git "rack", "0.8", :path => lib_path('local-rack') do |s|
+        s.write "lib/rack.rb", "puts :LOCAL"
+      end
+
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :git => "#{lib_path('rack-0.8')}", :branch => "master"
+      G
+
+      bundle %|config rack.local #{lib_path('local-rack')}|
+      bundle :install
+      out.should =~ /at #{lib_path('local-rack')}/
+
+      run "require 'rack'"
+      out.should == "LOCAL"
+    end
+
+    it "chooses the local repository on runtime" do
+      build_git "rack", "0.8"
+
+      FileUtils.cp_r("#{lib_path('rack-0.8')}/.", lib_path('local-rack'))
+
+      update_git "rack", "0.8", :path => lib_path('local-rack') do |s|
+        s.write "lib/rack.rb", "puts :LOCAL"
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :git => "#{lib_path('rack-0.8')}", :branch => "master"
+      G
+
+      bundle %|config rack.local #{lib_path('local-rack')}|
+      run "require 'rack'"
+      out.should == "LOCAL"
+    end
+
+    it "updates specs on runtime" do
+      system_gems "nokogiri-1.4.2"
+
+      build_git "rack", "0.8"
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :git => "#{lib_path('rack-0.8')}", :branch => "master"
+      G
+
+      lockfile0 = File.read(bundled_app("Gemfile.lock"))
+
+      FileUtils.cp_r("#{lib_path('rack-0.8')}/.", lib_path('local-rack'))
+      update_git "rack", "0.8", :path => lib_path('local-rack') do |s|
+        s.add_dependency "nokogiri", "1.4.2"
+      end
+
+      bundle %|config rack.local #{lib_path('local-rack')}|
+      run "require 'rack'"
+
+      lockfile1 = File.read(bundled_app("Gemfile.lock"))
+      lockfile1.should_not == lockfile0
+    end
+
+    it "updates ref on install" do
+      build_git "rack", "0.8"
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :git => "#{lib_path('rack-0.8')}", :branch => "master"
+      G
+
+      lockfile0 = File.read(bundled_app("Gemfile.lock"))
+
+      FileUtils.cp_r("#{lib_path('rack-0.8')}/.", lib_path('local-rack'))
+      update_git "rack", "0.8", :path => lib_path('local-rack')
+
+      bundle %|config rack.local #{lib_path('local-rack')}|
+      bundle :install
+
+      lockfile1 = File.read(bundled_app("Gemfile.lock"))
+      lockfile1.should_not == lockfile0
+    end
+
+    it "explodes if given path does not exist" do
+      build_git "rack", "0.8"
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :git => "#{lib_path('rack-0.8')}", :branch => "master"
+      G
+
+      bundle %|config rack.local #{lib_path('local-rack')}|
+      bundle :install
+      out.should =~ /Cannot use local override for rack-0.8 because #{Regexp.escape(lib_path('local-rack').to_s)} does not exist/
+    end
+
+    it "explodes if branch is not given" do
+      build_git "rack", "0.8"
+      FileUtils.cp_r("#{lib_path('rack-0.8')}/.", lib_path('local-rack'))
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :git => "#{lib_path('rack-0.8')}"
+      G
+
+      bundle %|config rack.local #{lib_path('local-rack')}|
+      bundle :install
+      out.should =~ /because :branch is not specified in Gemfile/
+    end
+
+    it "explodes on different branches" do
+      build_git "rack", "0.8"
+
+      FileUtils.cp_r("#{lib_path('rack-0.8')}/.", lib_path('local-rack'))
+
+      update_git "rack", "0.8", :path => lib_path('local-rack'), :branch => "another" do |s|
+        s.write "lib/rack.rb", "puts :LOCAL"
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :git => "#{lib_path('rack-0.8')}", :branch => "master"
+      G
+
+      bundle %|config rack.local #{lib_path('local-rack')}|
+      bundle :install
+      out.should =~ /is using branch another but Gemfile specifies master/
+    end
+
+    it "explodes on invalid revision" do
+      build_git "rack", "0.8"
+
+      build_git "rack", "0.8", :path => lib_path('local-rack') do |s|
+        s.write "lib/rack.rb", "puts :LOCAL"
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :git => "#{lib_path('rack-0.8')}", :branch => "master"
+      G
+
+      bundle %|config rack.local #{lib_path('local-rack')}|
+      bundle :install
+      out.should =~ /The Gemfile lock is pointing to revision \w+/
+    end
+  end
+
   describe "specified inline" do
     # TODO: Figure out how to write this test so that it is not flaky depending
     #       on the current network situation.
@@ -573,7 +722,6 @@ describe "bundle install with git sources" do
 
       install_gemfile <<-G
         source "file://#{gem_repo1}"
-
         gem "valim", "= 1.0", :git => "#{lib_path('valim')}"
       G
 
