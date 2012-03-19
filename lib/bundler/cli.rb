@@ -418,9 +418,11 @@ module Bundler
       end
     end
 
-    desc "config NAME [VALUE]", "retrieve or set a configuration value"
+    desc "config NAME [VALUE]", "retrieve, set, or unset a configuration value"
+    method_option "unset", :type => :array, :banner => "Unset configuration options."
+    method_option "local", :type => :boolean, :banner => "Used with --unset, unset the value for the local application."
     long_desc <<-D
-      Retrieves or sets a configuration value. If only parameter is provided, retrieve the value. If two parameters are provided, replace the
+      Retrieves, sets, or unsets a configuration value. If only parameter is provided, retrieve the value. If two parameters are provided, replace the
       existing value with the newly provided one.
 
       By default, setting a configuration value sets it for all projects
@@ -440,6 +442,23 @@ module Bundler
         name, scope = values.shift, $'
       else
         name, scope = peek, "global"
+      end
+
+      if options[:unset]
+        Array(options[:unset]).each do |key|
+          locations = Bundler.settings.locations(key)
+
+          if options[:local] && locations[:local]
+            Bundler.settings.unset(key)
+            Bundler.ui.info "You have unset #{key} for your application."
+          elsif locations[:global]
+            Bundler.settings.unset_global(key)
+            Bundler.ui.info "You have unset the system value for #{key}."
+          else
+            Bundler.ui.info "#{key} is not set. Configuration unchanged."
+          end
+        end
+        return
       end
 
       unless name

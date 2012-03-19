@@ -21,6 +21,14 @@ module Bundler
       @local_config.delete(key_for(key))
     end
 
+    def unset(key)
+      unset_key(key, @local_config, local_config_file)
+    end
+
+    def unset_global(key)
+      unset_key(key, @global_config, global_config_file)
+    end
+
     def set_global(key, value)
       set_key(key, value, @global_config, global_config_file)
     end
@@ -110,10 +118,23 @@ module Bundler
       unless hash[key] == value
         hash[key] = value
         hash.delete(key) if value.nil?
-        FileUtils.mkdir_p(file.dirname)
-        File.open(file, "w") { |f| f.puts hash.to_yaml }
+        write_config_file(hash, file)
       end
       value
+    end
+
+    def unset_key(key, hash, file)
+      key = key_for(key)
+
+      if hash[key]
+        hash.delete(key)
+        write_config_file(hash, file)
+      end
+    end
+
+    def write_config_file(hash, file)
+      FileUtils.mkdir_p(file.dirname)
+      File.open(file, "w") { |f| f.puts hash.to_yaml }
     end
 
     def global_config_file
