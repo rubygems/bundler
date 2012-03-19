@@ -4,7 +4,7 @@ require "rubygems/installer"
 require "rubygems/spec_fetcher"
 require "rubygems/format"
 require "digest/sha1"
-require "open3"
+require "fileutils"
 
 module Bundler
   module Source
@@ -287,7 +287,8 @@ module Bundler
           @path = @path.expand_path(Bundler.root) unless @path.relative?
         end
 
-        @name = options["name"]
+        @path    = app_cache_path if has_app_cache?
+        @name    = options["name"]
         @version = options["version"]
       end
 
@@ -332,7 +333,6 @@ module Bundler
 
       def load_spec_files
         index = Index.new
-
         expanded_path = path.expand_path(Bundler.root)
 
         if File.directory?(expanded_path)
@@ -411,12 +411,20 @@ module Bundler
       alias specs local_specs
 
       def cache(spec)
-        unless path.expand_path(Bundler.root).to_s.index(Bundler.root.to_s) == 0
-          Bundler.ui.warn "  * #{spec.name} at `#{path}` will not be cached."
-        end
+        return if path.expand_path(Bundler.root).to_s.index(Bundler.root.to_s) == 0
+        FileUtils.rm_rf(app_cache_path)
+        FileUtils.cp_r("#{path}/.", app_cache_path)
       end
 
     private
+
+      def app_cache_path
+        @app_cache_path ||= Bundler.app_cache.join(name)
+      end
+
+      def has_app_cache?
+        SharedHelpers.in_bundle? && app_cache_path.exist?
+      end
 
       def relative_path
         if path.to_s.match(%r{^#{Bundler.root.to_s}})
@@ -617,17 +625,29 @@ module Bundler
       attr_reader :uri, :ref, :options, :submodules
 
       def initialize(options)
-        super
+        @options = options
+        @glob = options["glob"] || DEFAULT_GLOB
 
-        # stringify options that could be set as symbols
+        @allow_cached = false
+        @allow_remote = false
+
+        # Stringify options that could be set as symbols
         %w(ref branch tag revision).each{|k| options[k] = options[k].to_s if options[k] }
 
         @uri        = options["uri"]
         @ref        = options["ref"] || options["branch"] || options["tag"] || 'master'
         @submodules = options["submodules"]
+        @name       = options["name"]
+        @version    = options["version"]
+
         @update     = false
         @installed  = nil
         @local      = false
+
+        if has_app_cache?
+          @local = true
+          @install_path = @cache_path = app_cache_path
+        end
       end
 
       def self.from_lock(options)
@@ -745,9 +765,17 @@ module Bundler
         generate_bin(spec)
       end
 
+      def cache(spec)
+        return if path.expand_path(Bundler.root).to_s.index(Bundler.root.to_s) == 0
+        FileUtils.rm_rf(app_cache_path)
+        git_proxy.checkout
+        git_proxy.copy_to(app_cache_path, @submodules)
+        FileUtils.rm_rf(app_cache_path.join(".git"))
+      end
+
       def load_spec_files
         super
-      rescue PathError, GitError
+      rescue => e
         raise GitError, "#{to_s} is not checked out. Please run `bundle install`"
       end
 
@@ -764,6 +792,14 @@ module Bundler
       end
 
     private
+
+      def has_app_cache?
+        cached_revision && super
+      end
+
+      def app_cache_path
+        @app_cache_path ||= Bundler.app_cache.join("#{base_name}-#{shortref_for_path(cached_revision)}")
+      end
 
       def local?
         @local
