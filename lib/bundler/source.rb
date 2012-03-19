@@ -494,10 +494,19 @@ module Bundler
         end
 
         def revision
-          @revision ||= if allow?
-            in_path { git("rev-parse #{ref}").strip }
-          else
-            raise GitError, "The git source #{uri} is not yet checked out. Please run `bundle install` before trying to start your application"
+          @revision ||= allowed_in_path { git("rev-parse #{ref}").strip }
+        end
+
+        def branch
+          @branch ||= allowed_in_path do
+            git("branch") =~ /^\* (.*)$/ && $1.strip
+          end
+        end
+
+        def contains?(commit)
+          allowed_in_path do
+            result = git_null("branch --contains #{commit}")
+            $? == 0 && result =~ /^\* (.*)$/
           end
         end
 
@@ -536,11 +545,24 @@ module Bundler
 
       private
 
-        def git(command)
+        # TODO: Do not rely on /dev/null.
+        # Given that open3 is not cross platform until Ruby 1.9.3,
+        # the best solution is to pipe to /dev/null if it exists.
+        # If it doesn't, everything will work fine, but the user
+        # will get the $stderr messages as well.
+        def git_null(command)
+          if !Bundler::WINDOWS && File.exist?("/dev/null")
+            git("#{command} 2>/dev/null", false)
+          else
+            git(command, false)
+          end
+        end
+
+        def git(command, check_errors=true)
           if allow?
             out = %x{git #{command}}
 
-            if $?.exitstatus != 0
+            if check_errors && $?.exitstatus != 0
               msg = "Git error: command `git #{command}` in directory #{Dir.pwd} has failed."
               msg << "\nIf this error persists you could try removing the cache directory '#{path}'" if path.exist?
               raise GitError, msg
@@ -574,13 +596,21 @@ module Bundler
           end
         end
 
+        def allow?
+          @allow.call
+        end
+
         def in_path(&blk)
           checkout unless path.exist?
           Dir.chdir(path, &blk)
         end
 
-        def allow?
-          @allow.call
+        def allowed_in_path
+          if allow?
+            in_path { yield }
+          else
+            raise GitError, "The git source #{uri} is not yet checked out. Please run `bundle install` before trying to start your application"
+          end
         end
       end
 
@@ -597,6 +627,7 @@ module Bundler
         @submodules = options["submodules"]
         @update     = false
         @installed  = nil
+        @local      = false
       end
 
       def self.from_lock(options)
@@ -626,8 +657,14 @@ module Bundler
       alias == eql?
 
       def to_s
-        sref = options["ref"] ? shortref_for_display(options["ref"]) : ref
-        "#{uri} (at #{sref})"
+        at = if local?
+          path
+        elsif options["ref"]
+          shortref_for_display(options["ref"])
+        else
+          ref
+        end
+        "#{uri} (at #{at})"
       end
 
       def name
@@ -650,6 +687,40 @@ module Bundler
 
       def unlock!
         git_proxy.revision = nil
+      end
+
+      def local_override!(path)
+        path = Pathname.new(path)
+        path = path.expand_path(Bundler.root) unless path.relative?
+
+        unless options["branch"]
+          raise GitError, "Cannot use local override for #{name} at #{path} because " \
+            ":branch is not specified in Gemfile. Specify a branch or check " \
+            "`bundle config --delete` to remove the local override"
+        end
+
+        unless path.exist?
+          raise GitError, "Cannot use local override for #{name} because #{path} " \
+            "does not exist. Check `bundle config --delete` to remove the local override"
+        end
+
+        @local       = true
+        @local_specs = nil
+        @git_proxy   = GitProxy.new(path, uri, ref)
+        @cache_path  = @install_path = path
+
+        if git_proxy.branch != options["branch"]
+          raise GitError, "Local override for #{name} at #{path} is using branch " \
+            "#{git_proxy.branch} but Gemfile specifies #{options["branch"]}"
+        end
+
+        rev = cached_revision
+
+        if rev && rev != git_proxy.revision && !git_proxy.contains?(rev)
+          raise GitError, "The Gemfile lock is pointing to revision #{shortref_for_display(rev)} " \
+            "but the current branch in your local override for #{name} does not contain such commit. " \
+            "Please make sure your branch is up to date."
+        end
       end
 
       # TODO: actually cache git specs
@@ -692,8 +763,12 @@ module Bundler
 
     private
 
+      def local?
+        @local
+      end
+
       def requires_checkout?
-        allow_git_ops?
+        allow_git_ops? && !local?
       end
 
       def base_name
@@ -724,12 +799,20 @@ module Bundler
         @allow_remote || @allow_cached
       end
 
+      def cached_revision
+        options["revision"]
+      end
+
       def revision
         git_proxy.revision
       end
 
+      def cached?
+        cache_path.exist?
+      end
+
       def git_proxy
-        @git_proxy ||= GitProxy.new(cache_path, uri, ref, options["revision"]){ allow_git_ops? }
+        @git_proxy ||= GitProxy.new(cache_path, uri, ref, cached_revision){ allow_git_ops? }
       end
     end
 

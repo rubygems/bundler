@@ -32,6 +32,16 @@ module Bundler
       end
     end
 
+    def local_overrides
+      repos = {}
+      all.each do |k|
+        if k =~ /\.local$/
+          repos[$`] = self[k]
+        end
+      end
+      repos
+    end
+
     def locations(key)
       locations = {}
 
