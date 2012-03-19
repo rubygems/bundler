@@ -170,7 +170,7 @@ describe "bundle install with git sources" do
         gem "rack", :git => "#{lib_path('rack-0.8')}", :branch => "master"
       G
 
-      bundle %|config rack.local #{lib_path('local-rack')}|
+      bundle %|config local.rack #{lib_path('local-rack')}|
       bundle :install
       out.should =~ /at #{lib_path('local-rack')}/
 
@@ -192,7 +192,7 @@ describe "bundle install with git sources" do
         gem "rack", :git => "#{lib_path('rack-0.8')}", :branch => "master"
       G
 
-      bundle %|config rack.local #{lib_path('local-rack')}|
+      bundle %|config local.rack #{lib_path('local-rack')}|
       run "require 'rack'"
       out.should == "LOCAL"
     end
@@ -214,7 +214,7 @@ describe "bundle install with git sources" do
         s.add_dependency "nokogiri", "1.4.2"
       end
 
-      bundle %|config rack.local #{lib_path('local-rack')}|
+      bundle %|config local.rack #{lib_path('local-rack')}|
       run "require 'rack'"
 
       lockfile1 = File.read(bundled_app("Gemfile.lock"))
@@ -234,7 +234,7 @@ describe "bundle install with git sources" do
       FileUtils.cp_r("#{lib_path('rack-0.8')}/.", lib_path('local-rack'))
       update_git "rack", "0.8", :path => lib_path('local-rack')
 
-      bundle %|config rack.local #{lib_path('local-rack')}|
+      bundle %|config local.rack #{lib_path('local-rack')}|
       bundle :install
 
       lockfile1 = File.read(bundled_app("Gemfile.lock"))
@@ -249,7 +249,7 @@ describe "bundle install with git sources" do
         gem "rack", :git => "#{lib_path('rack-0.8')}", :branch => "master"
       G
 
-      bundle %|config rack.local #{lib_path('local-rack')}|
+      bundle %|config local.rack #{lib_path('local-rack')}|
       bundle :install
       out.should =~ /Cannot use local override for rack-0.8 because #{Regexp.escape(lib_path('local-rack').to_s)} does not exist/
     end
@@ -263,7 +263,7 @@ describe "bundle install with git sources" do
         gem "rack", :git => "#{lib_path('rack-0.8')}"
       G
 
-      bundle %|config rack.local #{lib_path('local-rack')}|
+      bundle %|config local.rack #{lib_path('local-rack')}|
       bundle :install
       out.should =~ /because :branch is not specified in Gemfile/
     end
@@ -282,7 +282,7 @@ describe "bundle install with git sources" do
         gem "rack", :git => "#{lib_path('rack-0.8')}", :branch => "master"
       G
 
-      bundle %|config rack.local #{lib_path('local-rack')}|
+      bundle %|config local.rack #{lib_path('local-rack')}|
       bundle :install
       out.should =~ /is using branch another but Gemfile specifies master/
     end
@@ -299,7 +299,7 @@ describe "bundle install with git sources" do
         gem "rack", :git => "#{lib_path('rack-0.8')}", :branch => "master"
       G
 
-      bundle %|config rack.local #{lib_path('local-rack')}|
+      bundle %|config local.rack #{lib_path('local-rack')}|
       bundle :install
       out.should =~ /The Gemfile lock is pointing to revision \w+/
     end

@@ -37,8 +37,8 @@ module Bundler
     def local_overrides
       repos = {}
       all.each do |k|
-        if k =~ /\.local$/
-          repos[$`] = self[k]
+        if k =~ /^local\./
+          repos[$'] = self[k]
         end
       end
       repos
