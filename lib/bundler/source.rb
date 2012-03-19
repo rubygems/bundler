@@ -714,13 +714,15 @@ module Bundler
             "#{git_proxy.branch} but Gemfile specifies #{options["branch"]}"
         end
 
-        rev = cached_revision
+        changed = cached_revision && cached_revision != git_proxy.revision
 
-        if rev && rev != git_proxy.revision && !git_proxy.contains?(rev)
-          raise GitError, "The Gemfile lock is pointing to revision #{shortref_for_display(rev)} " \
+        if changed && !git_proxy.contains?(cached_revision)
+          raise GitError, "The Gemfile lock is pointing to revision #{shortref_for_display(cached_revision)} " \
             "but the current branch in your local override for #{name} does not contain such commit. " \
             "Please make sure your branch is up to date."
         end
+
+        changed
       end
 
       # TODO: actually cache git specs
