@@ -83,8 +83,8 @@ describe ".bundle/config" do
       bundle "config --global foo global"
       bundle "config --delete foo"
 
-      run "puts Bundler.settings[:foo]"
-      out.should == ""
+      run "puts Bundler.settings[:foo] == nil"
+      out.should == "true"
     end
 
     it "warns when overriding" do
@@ -121,8 +121,9 @@ describe ".bundle/config" do
     it "can be deleted" do
       bundle "config --local foo local"
       bundle "config --delete foo"
-      run "puts Bundler.settings[:foo]"
-      out.should == ""
+
+      run "puts Bundler.settings[:foo] == nil"
+      out.should == "true"
     end
 
     it "warns when overriding" do
