@@ -74,15 +74,7 @@ module Bundler
 
       @source_changes = converge_sources
       @dependency_changes = converge_dependencies
-
-      @local_changes = Bundler.settings.local_overrides.map do |k,v|
-        spec   = @dependencies.find { |s| s.name == k }
-        source = spec && spec.source
-        if source && source.respond_to?(:local_override!)
-          source.local_override!(v)
-          true
-        end
-      end.any?
+      @local_changes = converge_locals
 
       fixup_dependency_types!
     end
@@ -356,23 +348,49 @@ module Bundler
       msg
     end
 
+    # Check if the specs of the given source changed
+    # according to the locked source. A block should be
+    # in order to specify how the locked version of
+    # the source should be found.
+    def specs_changed?(source, &block)
+      locked = @locked_sources.find(&block)
+
+      if locked
+        unlocking = locked.specs.any? do |spec|
+          @locked_specs.any? do |locked_spec|
+            locked_spec.source != locked
+          end
+        end
+      end
+
+      !locked || unlocking || source.specs != locked.specs
+    end
+
+    # Get all locals and override their matching sources.
+    # Return true if any of the locals changed (for example,
+    # they point to a new revision) or depend on new specs.
+    def converge_locals
+      locals = []
+
+      Bundler.settings.local_overrides.map do |k,v|
+        spec   = @dependencies.find { |s| s.name == k }
+        source = spec && spec.source
+        if source && source.respond_to?(:local_override!)
+          locals << [ source, source.local_override!(v) ]
+        end
+      end
+
+      locals.any? do |source, changed|
+        changed || specs_changed?(source) { |o| source.class === o.class && source.uri == o.uri }
+      end
+    end
+
     def converge_paths
       @sources.any? do |source|
         next unless source.instance_of?(Source::Path)
-
-        locked = @locked_sources.find do |ls|
+        specs_changed?(source) do |ls|
           ls.class == source.class && ls.path == source.path
         end
-
-        if locked
-          unlocking = locked.specs.any? do |spec|
-            @locked_specs.any? do |locked_spec|
-              locked_spec.source != locked
-            end
-          end
-        end
-
-        !locked || unlocking || source.specs != locked.specs
       end
     end
 
