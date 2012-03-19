@@ -1,3 +1,12 @@
+## 1.2.0.pre
+
+Features:
+
+  - bundle config now accepts --local, --global and --delete options
+  - It is possible to override a git repository via configuration
+    For instance, if you have a git dependency on rack, you can force
+    it to use a local repo with `bundle config local.rack ~/path/to/rack`
+
 ## 1.1.1 (March 14, 2012)
 
 Bugfixes:
