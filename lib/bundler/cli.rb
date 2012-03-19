@@ -430,10 +430,17 @@ module Bundler
       will show the current value, as well as any superceded values and
       where they were specified.
     D
-    def config(name = nil, *args)
+    def config(*)
       values = ARGV.dup
       values.shift # remove config
-      values.shift # remove the name
+
+      peek = values.shift
+
+      if peek && peek =~ /^\-\-/
+        name, scope = values.shift, $'
+      else
+        name, scope = peek, "global"
+      end
 
       unless name
         Bundler.ui.confirm "Settings are listed in order of priority. The top value will be used.\n"
@@ -450,29 +457,45 @@ module Bundler
         return
       end
 
-      if values.empty?
-        Bundler.ui.confirm "Settings for `#{name}` in order of priority. The top value will be used"
-        with_padding do
-          Bundler.settings.pretty_values_for(name).each { |line| Bundler.ui.info line }
+      case scope
+      when "delete"
+        Bundler.settings.set_local(name, nil)
+        Bundler.settings.set_global(name, nil)
+      when "local", "global"
+        if values.empty?
+          Bundler.ui.confirm "Settings for `#{name}` in order of priority. The top value will be used"
+          with_padding do
+            Bundler.settings.pretty_values_for(name).each { |line| Bundler.ui.info line }
+          end
+          return
         end
-      else
+
         locations = Bundler.settings.locations(name)
 
-        if local = locations[:local]
-          Bundler.ui.info "Your application has set #{name} to #{local.inspect}. This will override the " \
-            "system value you are currently setting"
+        if scope == "global"
+          if local = locations[:local]
+            Bundler.ui.info "Your application has set #{name} to #{local.inspect}. This will override the " \
+              "global value you are currently setting"
+          end
+
+          if env = locations[:env]
+            Bundler.ui.info "You have a bundler environment variable for #{name} set to #{env.inspect}. " \
+              "This will take precedence over the global value you are setting"
+          end
+
+          if global = locations[:global]
+            Bundler.ui.info "You are replacing the current global value of #{name}, which is currently #{global.inspect}"
+          end
         end
 
-        if global = locations[:global]
-          Bundler.ui.info "You are replacing the current system value of #{name}, which is currently #{global}"
+        if scope == "local" && local = locations[:local]
+          Bundler.ui.info "You are replacing the current local value of #{name}, which is currently #{local.inspect}"
         end
 
-        if env = locations[:env]
-          Bundler.ui.info "You have set a bundler environment variable for #{env}. This will take precedence " \
-            "over the system value you are setting"
-        end
-
-        Bundler.settings.set_global(name, values.join(" "))
+        Bundler.settings.send("set_#{scope}", name, values.join(" "))
+      else
+        Bundler.ui.error "Invalid scope --#{scope} given. Please use --local or --global."
+        exit 1
       end
     end
 

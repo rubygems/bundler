@@ -23,6 +23,14 @@ Executing `bundle config <name> <value>` will set that configuration to the
 value specified for all bundles executed as the current user. The configuration
 will be stored in `~/.bundle/config`.
 
+Executing `bundle config --global <name> <value>` works the same as above.
+
+Executing `bundle config --local <name> <value>` will set that configuration to
+the local application. The configuration will be stored in `app/.bundle/config`.
+
+Executing `bundle config --delete <name>` will delete the configuration in both
+local and global sources.
+
 ## BUILD OPTIONS
 
 You can use `bundle config` to give bundler the flags to pass to the gem
