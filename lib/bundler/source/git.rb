@@ -226,6 +226,8 @@ module Bundler
       end
 
       def local_override!(path)
+        return false if local?
+
         path = Pathname.new(path)
         path = path.expand_path(Bundler.root) unless path.relative?
 

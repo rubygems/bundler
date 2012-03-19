@@ -28,6 +28,27 @@ describe "bundle cache with git" do
     should_be_installed "foo 1.0"
   end
 
+  it "ignores local repository in favor of the cache" do
+    git = build_git "foo"
+    ref = git.ref_for("master", 11)
+
+    build_git "foo", :path => lib_path('local-foo') do |s|
+      s.write "lib/foo.rb", "raise :FAIL"
+    end
+
+    install_gemfile <<-G
+      gem "foo", :git => '#{lib_path("foo-1.0")}', :branch => :master
+    G
+
+    bundle "cache"
+    bundle %|config local.foo #{lib_path('local-foo')}|
+
+    bundle :install
+    out.should =~ /at #{bundled_app("vendor/cache/foo-1.0-#{ref}")}/
+
+    should_be_installed "foo 1.0"
+  end
+
   it "copies repository to vendor cache, including submodules" do
     build_git "submodule", "1.0"
 
