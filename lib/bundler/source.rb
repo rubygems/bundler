@@ -4,7 +4,7 @@ require "rubygems/installer"
 require "rubygems/spec_fetcher"
 require "rubygems/format"
 require "digest/sha1"
-require "open3"
+require "fileutils"
 
 module Bundler
   module Source
@@ -264,12 +264,37 @@ module Bundler
           Bundler.rubygems.sources = old
         end
       end
-
     end
 
+
     class Path
-      attr_reader :path, :options
-      # Kind of a hack, but needed for the lock file parser
+      class Installer < Bundler::GemInstaller
+        def initialize(spec, options = {})
+          @spec              = spec
+          @bin_dir           = Bundler.requires_sudo? ? "#{Bundler.tmp}/bin" : "#{Bundler.rubygems.gem_dir}/bin"
+          @gem_dir           = Bundler.rubygems.path(spec.full_gem_path)
+          @wrappers          = options[:wrappers] || true
+          @env_shebang       = options[:env_shebang] || true
+          @format_executable = options[:format_executable] || false
+        end
+
+        def generate_bin
+          return if spec.executables.nil? || spec.executables.empty?
+
+          if Bundler.requires_sudo?
+            FileUtils.mkdir_p("#{Bundler.tmp}/bin") unless File.exist?("#{Bundler.tmp}/bin")
+          end
+          super
+          if Bundler.requires_sudo?
+            Bundler.mkdir_p "#{Bundler.rubygems.gem_dir}/bin"
+            spec.executables.each do |exe|
+              Bundler.sudo "cp -R #{Bundler.tmp}/bin/#{exe} #{Bundler.rubygems.gem_dir}/bin/"
+            end
+          end
+        end
+      end
+
+      attr_reader   :path, :options
       attr_writer   :name
       attr_accessor :version
 
@@ -287,8 +312,9 @@ module Bundler
           @path = @path.expand_path(Bundler.root) unless @path.relative?
         end
 
-        @name = options["name"]
+        @name    = options["name"]
         @version = options["version"]
+        @path    = app_cache_path if has_app_cache?
       end
 
       def remote!
@@ -330,9 +356,41 @@ module Bundler
         File.basename(path.expand_path(Bundler.root).to_s)
       end
 
+      def install(spec)
+        Bundler.ui.info "Using #{spec.name} (#{spec.version}) from #{to_s} "
+        # Let's be honest, when we're working from a path, we can't
+        # really expect native extensions to work because the whole point
+        # is to just be able to modify what's in that path and go. So, let's
+        # not put ourselves through the pain of actually trying to generate
+        # the full gem.
+        Installer.new(spec).generate_bin
+      end
+
+      def cache(spec)
+        return unless Bundler.settings[:cache_all]
+        return if path.expand_path(Bundler.root).to_s.index(Bundler.root.to_s) == 0
+        FileUtils.rm_rf(app_cache_path)
+        FileUtils.cp_r("#{path}/.", app_cache_path)
+      end
+
+      def local_specs(*)
+        @local_specs ||= load_spec_files
+      end
+
+      alias :specs :local_specs
+
+    private
+
+      def app_cache_path
+        @app_cache_path ||= Bundler.app_cache.join(name)
+      end
+
+      def has_app_cache?
+        SharedHelpers.in_bundle? && app_cache_path.exist?
+      end
+
       def load_spec_files
         index = Index.new
-
         expanded_path = path.expand_path(Bundler.root)
 
         if File.directory?(expanded_path)
@@ -368,61 +426,10 @@ module Bundler
         index
       end
 
-      def local_specs(*)
-        @local_specs ||= load_spec_files
-      end
-
-      class Installer < Bundler::GemInstaller
-        def initialize(spec, options = {})
-          @spec              = spec
-          @bin_dir           = Bundler.requires_sudo? ? "#{Bundler.tmp}/bin" : "#{Bundler.rubygems.gem_dir}/bin"
-          @gem_dir           = Bundler.rubygems.path(spec.full_gem_path)
-          @wrappers          = options[:wrappers] || true
-          @env_shebang       = options[:env_shebang] || true
-          @format_executable = options[:format_executable] || false
-        end
-
-        def generate_bin
-          return if spec.executables.nil? || spec.executables.empty?
-
-          if Bundler.requires_sudo?
-            FileUtils.mkdir_p("#{Bundler.tmp}/bin") unless File.exist?("#{Bundler.tmp}/bin")
-          end
-          super
-          if Bundler.requires_sudo?
-            Bundler.mkdir_p "#{Bundler.rubygems.gem_dir}/bin"
-            spec.executables.each do |exe|
-              Bundler.sudo "cp -R #{Bundler.tmp}/bin/#{exe} #{Bundler.rubygems.gem_dir}/bin/"
-            end
-          end
-        end
-      end
-
-      def install(spec)
-        Bundler.ui.info "Using #{spec.name} (#{spec.version}) from #{to_s} "
-        # Let's be honest, when we're working from a path, we can't
-        # really expect native extensions to work because the whole point
-        # is to just be able to modify what's in that path and go. So, let's
-        # not put ourselves through the pain of actually trying to generate
-        # the full gem.
-        Installer.new(spec).generate_bin
-      end
-
-      alias specs local_specs
-
-      def cache(spec)
-        unless path.expand_path(Bundler.root).to_s.index(Bundler.root.to_s) == 0
-          Bundler.ui.warn "  * #{spec.name} at `#{path}` will not be cached."
-        end
-      end
-
-    private
-
       def relative_path
         if path.to_s.match(%r{^#{Bundler.root.to_s}})
           return path.relative_path_from(Bundler.root)
         end
-
         path
       end
 
@@ -442,7 +449,7 @@ module Bundler
 
         gem_file = Dir.chdir(gem_dir){ Gem::Builder.new(spec).build }
 
-        installer = Installer.new(spec, :env_shebang => false)
+        installer = Path::Installer.new(spec, :env_shebang => false)
         run_hooks(:pre_install, installer)
         installer.build_extensions
         run_hooks(:post_build, installer)
@@ -617,17 +624,29 @@ module Bundler
       attr_reader :uri, :ref, :options, :submodules
 
       def initialize(options)
-        super
+        @options = options
+        @glob = options["glob"] || DEFAULT_GLOB
 
-        # stringify options that could be set as symbols
+        @allow_cached = false
+        @allow_remote = false
+
+        # Stringify options that could be set as symbols
         %w(ref branch tag revision).each{|k| options[k] = options[k].to_s if options[k] }
 
         @uri        = options["uri"]
         @ref        = options["ref"] || options["branch"] || options["tag"] || 'master'
         @submodules = options["submodules"]
+        @name       = options["name"]
+        @version    = options["version"]
+
         @update     = false
         @installed  = nil
         @local      = false
+
+        if has_app_cache?
+          @local = true
+          @install_path = @cache_path = app_cache_path
+        end
       end
 
       def self.from_lock(options)
@@ -690,6 +709,8 @@ module Bundler
       end
 
       def local_override!(path)
+        return false if local?
+
         path = Pathname.new(path)
         path = path.expand_path(Bundler.root) unless path.relative?
 
@@ -745,6 +766,16 @@ module Bundler
         generate_bin(spec)
       end
 
+      def cache(spec)
+        return unless Bundler.settings[:cache_all]
+        return if path.expand_path(Bundler.root).to_s.index(Bundler.root.to_s) == 0
+        cached!
+        FileUtils.rm_rf(app_cache_path)
+        git_proxy.checkout
+        git_proxy.copy_to(app_cache_path, @submodules)
+        FileUtils.rm_rf(app_cache_path.join(".git"))
+      end
+
       def load_spec_files
         super
       rescue PathError, GitError
@@ -764,6 +795,14 @@ module Bundler
       end
 
     private
+
+      def has_app_cache?
+        cached_revision && super
+      end
+
+      def app_cache_path
+        @app_cache_path ||= Bundler.app_cache.join("#{base_name}-#{shortref_for_path(revision)}")
+      end
 
       def local?
         @local
@@ -817,6 +856,5 @@ module Bundler
         @git_proxy ||= GitProxy.new(cache_path, uri, ref, cached_revision){ allow_git_ops? }
       end
     end
-
   end
 end

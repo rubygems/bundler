@@ -365,8 +365,10 @@ module Bundler
 
     desc "cache", "Cache all the gems to vendor/cache", :hide => true
     method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
+    method_option "all",  :type => :boolean, :banner => "Include all sources (including path and git)."
     def cache
       Bundler.definition.resolve_with_cache!
+      setup_cache_all
       Bundler.load.cache
       Bundler.settings[:no_prune] = true if options["no-prune"]
       Bundler.load.lock
@@ -378,6 +380,7 @@ module Bundler
 
     desc "package", "Locks and then caches all of the gems into vendor/cache"
     method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
+    method_option "all",  :type => :boolean, :banner => "Include all sources (including path and git)."
     long_desc <<-D
       The package command will copy the .gem files for every gem in the bundle into the
       directory ./vendor/cache. If you then check that directory into your source
@@ -385,6 +388,7 @@ module Bundler
       bundle without having to download any additional gems.
     D
     def package
+      setup_cache_all
       install
       # TODO: move cache contents here now that all bundles are locked
       Bundler.load.cache
@@ -610,6 +614,16 @@ module Bundler
     end
 
   private
+
+    def setup_cache_all
+      if options.key?("all")
+        Bundler.settings[:cache_all] = options[:all] || nil
+      elsif Bundler.definition.sources.any? { |s| !s.is_a?(Source::Rubygems) }
+        Bundler.ui.warn "Your Gemfile contains path and git dependencies. If you want "    \
+          "to package them as well, please pass the --all flag. This will be the default " \
+          "on Bundler 2.0."
+      end
+    end
 
     def have_groff?
       !(`which groff` rescue '').empty?

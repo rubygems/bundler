@@ -97,7 +97,7 @@ module Bundler
     def cache
       FileUtils.mkdir_p(cache_path) unless File.exists?(cache_path)
 
-      Bundler.ui.info "Updating .gem files in vendor/cache"
+      Bundler.ui.info "Updating files in vendor/cache"
       specs.each do |spec|
         next if spec.name == 'bundler'
         spec.source.cache(spec) if spec.source.respond_to?(:cache)
