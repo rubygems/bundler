@@ -367,6 +367,7 @@ module Bundler
       end
 
       def cache(spec)
+        return unless Bundler.settings[:cache_all]
         return if path.expand_path(Bundler.root).to_s.index(Bundler.root.to_s) == 0
         FileUtils.rm_rf(app_cache_path)
         FileUtils.cp_r("#{path}/.", app_cache_path)
@@ -766,7 +767,9 @@ module Bundler
       end
 
       def cache(spec)
+        return unless Bundler.settings[:cache_all]
         return if path.expand_path(Bundler.root).to_s.index(Bundler.root.to_s) == 0
+        cached!
         FileUtils.rm_rf(app_cache_path)
         git_proxy.checkout
         git_proxy.copy_to(app_cache_path, @submodules)

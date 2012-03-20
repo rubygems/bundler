@@ -123,7 +123,7 @@ describe "bundle cache" do
     it "re-caches during install" do
       cached_gem("rack-1.0.0").rmtree
       bundle :install
-      out.should include("Updating .gem files in vendor/cache")
+      out.should include("Updating files in vendor/cache")
       cached_gem("rack-1.0.0").should exist
     end
 
@@ -213,6 +213,15 @@ describe "bundle cache" do
       bundle "cache"
       bundle "install"
       out.should_not =~ /removing/i
+    end
+
+    it "does not warn about all if it doesn't have any git/path dependency" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+      bundle "cache"
+      out.should_not =~ /\-\-all/
     end
 
     it "should install gems with the name bundler in them (that aren't bundler)" do
