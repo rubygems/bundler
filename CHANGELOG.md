@@ -1,3 +1,9 @@
+## 1.1.2 (March 20, 2012)
+
+Bugfixes:
+
+  - Fix --deployment for multiple PATH sections of the same source (#1782)
+
 ## 1.1.1 (March 14, 2012)
 
 Bugfixes:
