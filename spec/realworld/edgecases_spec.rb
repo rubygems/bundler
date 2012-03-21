@@ -48,4 +48,130 @@ describe "real world edgecases", :realworld => true do
     err.should_not include("Could not find rake")
     err.should be_empty
   end
+
+  it "checks out git repos when the lockfile is corrupted" do
+    gemfile <<-G
+      source :rubygems
+
+      gem 'activerecord',  :github => 'carlhuda/rails-bundler-test', :branch => 'master'
+      gem 'activesupport', :github => 'carlhuda/rails-bundler-test', :branch => 'master'
+      gem 'actionpack',    :github => 'carlhuda/rails-bundler-test', :branch => 'master'
+    G
+
+    lockfile <<-L
+      GIT
+        remote: git://github.com/carlhuda/rails-bundler-test.git
+        revision: 369e28a87419565f1940815219ea9200474589d4
+        branch: master
+        specs:
+          actionpack (3.2.2)
+            activemodel (= 3.2.2)
+            activesupport (= 3.2.2)
+            builder (~> 3.0.0)
+            erubis (~> 2.7.0)
+            journey (~> 1.0.1)
+            rack (~> 1.4.0)
+            rack-cache (~> 1.2)
+            rack-test (~> 0.6.1)
+            sprockets (~> 2.1.2)
+          activemodel (3.2.2)
+            activesupport (= 3.2.2)
+            builder (~> 3.0.0)
+          activerecord (3.2.2)
+            activemodel (= 3.2.2)
+            activesupport (= 3.2.2)
+            arel (~> 3.0.2)
+            tzinfo (~> 0.3.29)
+          activesupport (3.2.2)
+            i18n (~> 0.6)
+            multi_json (~> 1.0)
+
+      GIT
+        remote: git://github.com/carlhuda/rails-bundler-test.git
+        revision: 369e28a87419565f1940815219ea9200474589d4
+        branch: master
+        specs:
+          actionpack (3.2.2)
+            activemodel (= 3.2.2)
+            activesupport (= 3.2.2)
+            builder (~> 3.0.0)
+            erubis (~> 2.7.0)
+            journey (~> 1.0.1)
+            rack (~> 1.4.0)
+            rack-cache (~> 1.2)
+            rack-test (~> 0.6.1)
+            sprockets (~> 2.1.2)
+          activemodel (3.2.2)
+            activesupport (= 3.2.2)
+            builder (~> 3.0.0)
+          activerecord (3.2.2)
+            activemodel (= 3.2.2)
+            activesupport (= 3.2.2)
+            arel (~> 3.0.2)
+            tzinfo (~> 0.3.29)
+          activesupport (3.2.2)
+            i18n (~> 0.6)
+            multi_json (~> 1.0)
+
+      GIT
+        remote: git://github.com/carlhuda/rails-bundler-test.git
+        revision: 369e28a87419565f1940815219ea9200474589d4
+        branch: master
+        specs:
+          actionpack (3.2.2)
+            activemodel (= 3.2.2)
+            activesupport (= 3.2.2)
+            builder (~> 3.0.0)
+            erubis (~> 2.7.0)
+            journey (~> 1.0.1)
+            rack (~> 1.4.0)
+            rack-cache (~> 1.2)
+            rack-test (~> 0.6.1)
+            sprockets (~> 2.1.2)
+          activemodel (3.2.2)
+            activesupport (= 3.2.2)
+            builder (~> 3.0.0)
+          activerecord (3.2.2)
+            activemodel (= 3.2.2)
+            activesupport (= 3.2.2)
+            arel (~> 3.0.2)
+            tzinfo (~> 0.3.29)
+          activesupport (3.2.2)
+            i18n (~> 0.6)
+            multi_json (~> 1.0)
+
+      GEM
+        remote: http://rubygems.org/
+        specs:
+          arel (3.0.2)
+          builder (3.0.0)
+          erubis (2.7.0)
+          hike (1.2.1)
+          i18n (0.6.0)
+          journey (1.0.3)
+          multi_json (1.1.0)
+          rack (1.4.1)
+          rack-cache (1.2)
+            rack (>= 0.4)
+          rack-test (0.6.1)
+            rack (>= 1.0)
+          sprockets (2.1.2)
+            hike (~> 1.2)
+            rack (~> 1.0)
+            tilt (~> 1.1, != 1.3.0)
+          tilt (1.3.3)
+          tzinfo (0.3.32)
+
+      PLATFORMS
+        ruby
+
+      DEPENDENCIES
+        actionpack!
+        activerecord!
+        activesupport!
+    L
+
+    bundle :install, :exitstatus => true
+    exitstatus.should == 0
+  end
 end
