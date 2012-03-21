@@ -53,6 +53,20 @@ describe "install with --deployment or --frozen" do
     exitstatus.should == 0
   end
 
+  it "works when using path gems from the same path and the version is specified" do
+    build_lib "foo", :path => lib_path("nested/foo")
+    build_lib "bar", :path => lib_path("nested/bar")
+    gemfile <<-G
+      gem "foo", "1.0", :path => "#{lib_path("nested")}"
+      gem "bar", :path => "#{lib_path("nested")}"
+    G
+
+    bundle :install
+    bundle "install --deployment", :exitstatus => true
+
+    exitstatus.should == 0
+  end
+
   describe "with an existing lockfile" do
     before do
       bundle "install"
