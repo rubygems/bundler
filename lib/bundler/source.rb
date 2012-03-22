@@ -314,7 +314,10 @@ module Bundler
 
         @name    = options["name"]
         @version = options["version"]
-        @path    = app_cache_path if has_app_cache?
+
+        # Stores the original path. If at any point we move to the
+        # cached directory, we still have the original path to copy from.
+        @original_path = @path
       end
 
       def remote!
@@ -368,16 +371,21 @@ module Bundler
 
       def cache(spec)
         return unless Bundler.settings[:cache_all]
-        return if path.expand_path(Bundler.root).to_s.index(Bundler.root.to_s) == 0
+        return if @original_path.expand_path(Bundler.root).to_s.index(Bundler.root.to_s) == 0
         FileUtils.rm_rf(app_cache_path)
-        FileUtils.cp_r("#{path}/.", app_cache_path)
+        FileUtils.cp_r("#{@original_path}/.", app_cache_path)
       end
 
       def local_specs(*)
         @local_specs ||= load_spec_files
       end
 
-      alias :specs :local_specs
+      def specs
+        if has_app_cache?
+          @path = app_cache_path
+        end
+        local_specs
+      end
 
     private
 

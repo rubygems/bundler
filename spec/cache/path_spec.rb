@@ -28,6 +28,28 @@ require "spec_helper"
       should_be_installed "foo 1.0"
     end
 
+    it "updates the path on each cache" do
+      build_lib "foo"
+
+      install_gemfile <<-G
+        gem "foo", :path => '#{lib_path("foo-1.0")}'
+      G
+
+      bundle "#{cmd} --all"
+
+      build_lib "foo" do |s|
+        s.write "lib/foo.rb", "puts :CACHE"
+      end
+
+      bundle "#{cmd} --all"
+
+      bundled_app("vendor/cache/foo-1.0").should exist
+      FileUtils.rm_rf lib_path("foo-1.0")
+
+      run "require 'foo'"
+      out.should == "CACHE"
+    end
+
     it "raises a warning without --all" do
       build_lib "foo"
 
