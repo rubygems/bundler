@@ -816,7 +816,7 @@ module Bundler
       end
 
       def app_cache_path
-        @app_cache_path ||= Bundler.app_cache.join("#{base_name}-#{shortref_for_path(revision)}")
+        @app_cache_path ||= Bundler.app_cache.join("#{base_name}-#{shortref_for_path(cached_revision || revision)}")
       end
 
       def local?
