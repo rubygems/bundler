@@ -14,7 +14,7 @@ end
 
 %w(cache package).each do |cmd|
   describe "bundle #{cmd} with git" do
-    it "copies repository to vendor cache" do
+    it "copies repository to vendor cache and uses it" do
       git = build_git "foo"
       ref = git.ref_for("master", 11)
 
@@ -30,25 +30,69 @@ end
       should_be_installed "foo 1.0"
     end
 
-    it "ignores local repository in favor of the cache" do
-      git = build_git "foo"
-      ref = git.ref_for("master", 11)
-
-      build_git "foo", :path => lib_path('local-foo') do |s|
-        s.write "lib/foo.rb", "raise :FAIL"
-      end
+    it "runs twice without exploding" do
+      build_git "foo"
 
       install_gemfile <<-G
-        gem "foo", :git => '#{lib_path("foo-1.0")}', :branch => :master
+        gem "foo", :git => '#{lib_path("foo-1.0")}'
       G
 
       bundle "#{cmd} --all"
-      bundle %|config local.foo #{lib_path('local-foo')}|
+      bundle "#{cmd} --all"
 
-      bundle :install
-      out.should =~ /at #{bundled_app("vendor/cache/foo-1.0-#{ref}")}/
-
+      err.should == ""
+      FileUtils.rm_rf lib_path("foo-1.0")
       should_be_installed "foo 1.0"
+    end
+
+    it "tracks updates" do
+      git = build_git "foo"
+      old_ref = git.ref_for("master", 11)
+
+      install_gemfile <<-G
+        gem "foo", :git => '#{lib_path("foo-1.0")}'
+      G
+
+      bundle "#{cmd} --all"
+
+      update_git "foo" do |s|
+        s.write "lib/foo.rb", "puts :CACHE"
+      end
+
+      ref = git.ref_for("master", 11)
+      ref.should_not == old_ref
+
+      bundle "update"
+      bundle "#{cmd} --all"
+
+      bundled_app("vendor/cache/foo-1.0-#{ref}").should exist
+
+      FileUtils.rm_rf lib_path("foo-1.0")
+      run "require 'foo'"
+      out.should == "CACHE"
+    end
+
+    it "uses the local repository to generate the cache" do
+      git = build_git "foo"
+      ref = git.ref_for("master", 11)
+
+      gemfile <<-G
+        gem "foo", :git => '#{lib_path("foo-invalid")}', :branch => :master
+      G
+
+      bundle %|config local.foo #{lib_path('foo-1.0')}|
+      bundle "install"
+      bundle "#{cmd} --all"
+
+      bundled_app("vendor/cache/foo-invalid-#{ref}").should exist
+
+      # Updating the local still uses the local.
+      update_git "foo" do |s|
+        s.write "lib/foo.rb", "puts :LOCAL"
+      end
+
+      run "require 'foo'"
+      out.should == "LOCAL"
     end
 
     it "copies repository to vendor cache, including submodules" do

@@ -642,11 +642,6 @@ module Bundler
         @update     = false
         @installed  = nil
         @local      = false
-
-        if has_app_cache?
-          @local = true
-          @install_path = @cache_path = app_cache_path
-        end
       end
 
       def self.from_lock(options)
@@ -725,10 +720,11 @@ module Bundler
             "does not exist. Check `bundle config --delete` to remove the local override"
         end
 
-        @local       = true
-        @local_specs = nil
-        @git_proxy   = GitProxy.new(path, uri, ref)
-        @cache_path  = @install_path = path
+        set_local!(path)
+
+        # Create a new git proxy without the cached revision
+        # so the Gemfile.lock always picks up the new revision.
+        @git_proxy = GitProxy.new(path, uri, ref)
 
         if git_proxy.branch != options["branch"]
           raise GitError, "Local override for #{name} at #{path} is using branch " \
@@ -748,11 +744,16 @@ module Bundler
 
       # TODO: actually cache git specs
       def specs(*)
+        if has_app_cache? && !local?
+          set_local!(app_cache_path)
+        end
+
         if requires_checkout? && !@update
           git_proxy.checkout
           git_proxy.copy_to(install_path, submodules)
           @update = true
         end
+
         local_specs
       end
 
@@ -771,7 +772,7 @@ module Bundler
         return if path.expand_path(Bundler.root).to_s.index(Bundler.root.to_s) == 0
         cached!
         FileUtils.rm_rf(app_cache_path)
-        git_proxy.checkout
+        git_proxy.checkout if requires_checkout?
         git_proxy.copy_to(app_cache_path, @submodules)
         FileUtils.rm_rf(app_cache_path.join(".git"))
       end
@@ -795,6 +796,12 @@ module Bundler
       end
 
     private
+
+      def set_local!(path)
+        @local       = true
+        @local_specs = @git_proxy = nil
+        @cache_path  = @install_path = path
+      end
 
       def has_app_cache?
         cached_revision && super
