@@ -26,6 +26,10 @@ module Spec
       Dir.chdir(bundled_app2, &blk)
     end
 
+    def in_app_root_custom(root, &blk)
+      Dir.chdir(root, &blk)
+    end
+
     def run(cmd, *args)
       opts = args.last.is_a?(Hash) ? args.pop : {}
       expect_err = opts.delete(:expect_err)
