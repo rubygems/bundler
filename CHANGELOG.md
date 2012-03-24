@@ -8,6 +8,12 @@ Features:
     For instance, if you have a git dependency on rack, you can force
     it to use a local repo with `bundle config local.rack ~/path/to/rack`
 
+## 1.1.3 (March 23, 2012)
+
+Bugfixes:
+
+  - escape the bundler root path (@tenderlove, #1789)
+
 ## 1.1.2 (March 20, 2012)
 
 Bugfixes:
