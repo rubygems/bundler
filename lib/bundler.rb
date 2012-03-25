@@ -27,6 +27,7 @@ module Bundler
   autoload :MatchPlatform,         'bundler/match_platform'
   autoload :RemoteSpecification,   'bundler/remote_specification'
   autoload :Resolver,              'bundler/resolver'
+  autoload :RubyVersion,           'bundler/ruby_version'
   autoload :Runtime,               'bundler/runtime'
   autoload :Settings,              'bundler/settings'
   autoload :SharedHelpers,         'bundler/shared_helpers'
