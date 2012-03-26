@@ -43,7 +43,12 @@ module Bundler
     def initialize(remote_uri)
       @remote_uri = remote_uri
       @has_api    = true # will be set to false if the rubygems index is ever fetched
-      @@connection ||= Net::HTTP::Persistent.new nil, :ENV
+      proxy_config = case Gem.configuration[:http_proxy]
+                       when String then URI.parse Gem.configuration[:http_proxy]
+                       when :no_proxy then nil
+                       else :ENV
+                     end
+      @@connection ||= Net::HTTP::Persistent.new nil, proxy_config
     end
 
     # fetch a gem specification
