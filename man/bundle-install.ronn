@@ -10,6 +10,7 @@ bundle-install(1) -- Install the dependencies specified in your Gemfile
                  [--binstubs[=DIRECTORY]]
                  [--standalone[=GROUP1[ GROUP2...]]]
                  [--quiet]
+                 [--no-cache]
 
 ## DESCRIPTION
 
@@ -80,6 +81,11 @@ update process below under [CONSERVATIVE UPDATING][].
   It takes a space separated list of groups to install. It creates a
   `bundle` directory and installs the bundle there. It also generates
   a `bundle/bundler/setup.rb` file to replace Bundler's own setup.
+
+* `--no-cache`:
+  Do not update the cache in `vendor/cache` with the newly bundled gems. This
+  does not remove any existing cached gems, only stops the newly bundled gems
+  from being cached during the install.
 
 ## DEPLOYMENT MODE
 
