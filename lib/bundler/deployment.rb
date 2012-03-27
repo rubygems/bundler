@@ -45,7 +45,7 @@ module Bundler
           if current_release.to_s.empty?
             raise error_type.new("Cannot detect current release path - make sure you have deployed at least once.")
           end
-          args = ["--gemfile #{File.join(current_release, bundle_gemfile)}"]
+          args = ["--gemfile #{bundle_gemfile}"]
           args << "--path #{bundle_dir}" unless bundle_dir.to_s.empty?
           args << bundle_flags.to_s
           args << "--without #{bundle_without.join(" ")}" unless bundle_without.empty?
