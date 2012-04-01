@@ -23,7 +23,7 @@ describe "bundle check" do
     out.should == "The Gemfile's dependencies are satisfied"
   end
 
-  it "creates a Gemfile.lock if one did not exist" do
+  it "creates a Gemfile.lock by default if one did not exist" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rails"
@@ -34,6 +34,19 @@ describe "bundle check" do
     bundle "check"
 
     bundled_app("Gemfile.lock").should exist
+  end
+
+  it "does not create a Gemfile.lock if --no-lock was passed" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rails"
+    G
+
+    FileUtils.rm("Gemfile.lock")
+
+    bundle "check --no-lock"
+
+    bundled_app("Gemfile.lock").should_not exist
   end
 
   it "prints a generic error if the missing gems are unresolvable" do
