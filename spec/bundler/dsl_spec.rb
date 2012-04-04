@@ -9,13 +9,13 @@ describe Bundler::Dsl do
   describe '#_normalize_options' do
     it "should convert :github to :git" do
       subject.gem("sparks", :github => "indirect/sparks")
-      github_uri = "git://github.com/indirect/sparks.git"
+      github_uri = "https://github.com/indirect/sparks.git"
       subject.dependencies.first.source.uri.should == github_uri
     end
 
     it "should convert 'rails' to 'rails/rails'" do
       subject.gem("rails", :github => "rails")
-      github_uri = "git://github.com/rails/rails.git"
+      github_uri = "https://github.com/rails/rails.git"
       subject.dependencies.first.source.uri.should == github_uri
     end
   end
