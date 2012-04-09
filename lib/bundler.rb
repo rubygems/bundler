@@ -271,7 +271,11 @@ module Bundler
 
     def load_gemspec(file)
       @gemspec_cache ||= {}
-      @gemspec_cache[File.expand_path(file)] ||= load_gemspec_uncached(file)
+      key = File.expand_path(file)
+      spec = ( @gemspec_cache[key] ||= load_gemspec_uncached(file) )
+      # Protect against caching side-effected gemspecs by returning a
+      # new instance each time.
+      spec.dup if spec
     end
 
     def load_gemspec_uncached(file)
