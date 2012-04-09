@@ -7,6 +7,7 @@ Features:
   - It is possible to override a git repository via configuration.
     For instance, if you have a git dependency on rack, you can force
     it to use a local repo with `bundle config local.rack ~/path/to/rack`
+  - Cache gemspec loads for performance (@dekellum, #1635)
 
 ## 1.1.3 (March 23, 2012)
 
