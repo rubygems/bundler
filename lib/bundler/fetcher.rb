@@ -175,7 +175,8 @@ module Bundler
               raise GemspecError, %{Unfortunately, the gem #{s[:name]} (#{s[:number]}) } +
                 %{has an invalid gemspec. As a result, Bundler cannot install this Gemfile. } +
                 %{Please ask the gem author to yank the bad version to fix this issue. For } +
-                %{more information, see http://bit.ly/syck-defaultkey.}
+                %{more information, see http://bit.ly/syck-defaultkey. For a temporary } +
+                %{workaround try using the --full-index option.}
             else
               raise e
             end
