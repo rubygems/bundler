@@ -156,7 +156,7 @@ describe "bundle install with git sources" do
     end
   end
 
-  describe "when specifying local" do
+  describe "when specifying local override" do
     it "uses the local repository instead of checking a new one out" do
       # We don't generate it because we actually don't need it
       # build_git "rack", "0.8"
@@ -241,7 +241,7 @@ describe "bundle install with git sources" do
       lockfile1.should_not == lockfile0
     end
 
-    it "explodes if given path does not exist" do
+    it "explodes if given path does not exist on install" do
       build_git "rack", "0.8"
 
       install_gemfile <<-G
@@ -254,7 +254,7 @@ describe "bundle install with git sources" do
       out.should =~ /Cannot use local override for rack-0.8 because #{Regexp.escape(lib_path('local-rack').to_s)} does not exist/
     end
 
-    it "explodes if branch is not given" do
+    it "explodes if branch is not given on install" do
       build_git "rack", "0.8"
       FileUtils.cp_r("#{lib_path('rack-0.8')}/.", lib_path('local-rack'))
 
@@ -283,7 +283,7 @@ describe "bundle install with git sources" do
       out.should =~ /Your bundle is complete!/
     end
 
-    it "explodes on different branches" do
+    it "explodes on different branches on install" do
       build_git "rack", "0.8"
 
       FileUtils.cp_r("#{lib_path('rack-0.8')}/.", lib_path('local-rack'))
@@ -302,7 +302,7 @@ describe "bundle install with git sources" do
       out.should =~ /is using branch another but Gemfile specifies master/
     end
 
-    it "explodes on invalid revision" do
+    it "explodes on invalid revision on install" do
       build_git "rack", "0.8"
 
       build_git "rack", "0.8", :path => lib_path('local-rack') do |s|
