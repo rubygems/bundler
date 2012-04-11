@@ -374,6 +374,93 @@ describe "Bundler.setup" do
     end
   end
 
+  describe "when specifying local override" do
+    it "explodes if given path does not exist on runtime" do
+      build_git "rack", "0.8"
+
+      FileUtils.cp_r("#{lib_path('rack-0.8')}/.", lib_path('local-rack'))
+
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :git => "#{lib_path('rack-0.8')}", :branch => "master"
+      G
+
+      bundle %|config local.rack #{lib_path('local-rack')}|
+      bundle :install
+      out.should =~ /at #{lib_path('local-rack')}/
+
+      FileUtils.rm_rf(lib_path('local-rack'))
+      run "require 'rack'"
+      err.should =~ /Cannot use local override for rack-0.8 because #{Regexp.escape(lib_path('local-rack').to_s)} does not exist/
+    end
+
+    it "explodes if branch is not given on runtime" do
+      build_git "rack", "0.8"
+
+      FileUtils.cp_r("#{lib_path('rack-0.8')}/.", lib_path('local-rack'))
+
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :git => "#{lib_path('rack-0.8')}", :branch => "master"
+      G
+
+      bundle %|config local.rack #{lib_path('local-rack')}|
+      bundle :install
+      out.should =~ /at #{lib_path('local-rack')}/
+
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :git => "#{lib_path('rack-0.8')}"
+      G
+
+      run "require 'rack'"
+      err.should =~ /because :branch is not specified in Gemfile/
+    end
+
+    it "explodes on different branches on runtime" do
+      build_git "rack", "0.8"
+
+      FileUtils.cp_r("#{lib_path('rack-0.8')}/.", lib_path('local-rack'))
+
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :git => "#{lib_path('rack-0.8')}", :branch => "master"
+      G
+
+      bundle %|config local.rack #{lib_path('local-rack')}|
+      bundle :install
+      out.should =~ /at #{lib_path('local-rack')}/
+
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :git => "#{lib_path('rack-0.8')}", :branch => "changed"
+      G
+
+      run "require 'rack'"
+      err.should =~ /is using branch master but Gemfile specifies changed/
+    end
+
+    it "explodes on refs with different branches on runtime" do
+      build_git "rack", "0.8"
+
+      FileUtils.cp_r("#{lib_path('rack-0.8')}/.", lib_path('local-rack'))
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :git => "#{lib_path('rack-0.8')}", :ref => "master", :branch => "master"
+      G
+
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :git => "#{lib_path('rack-0.8')}", :ref => "master", :branch => "nonexistant"
+      G
+
+      bundle %|config local.rack #{lib_path('local-rack')}|
+      run "require 'rack'"
+      err.should =~ /is using branch master but Gemfile specifies nonexistant/
+    end
+  end
+
   describe "when excluding groups" do
     it "doesn't change the resolve if --without is used" do
       install_gemfile <<-G, :without => :rails
