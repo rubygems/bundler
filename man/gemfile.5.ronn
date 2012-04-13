@@ -210,6 +210,20 @@ and then installs the resulting gem. The `gem build` command,
 which comes standard with Rubygems, evaluates the `.gemspec` in
 the context of the directory in which it is located.
 
+### GITHUB (:github)
+
+If the git repository you want to use is hosted on GitHub and is public, you can use the
+:github shorthand to specify just the github username and repository name (without the
+trailing ".git"), separated by a slash. If both the username and repository name are the
+same, you can omit one.
+
+    gem "rails", :github => "rails/rails"
+    gem "rails", :github => "rails"
+
+Are both equivalent to
+
+    gem "rails", :github => :git://github.com/rails/rails.git"
+
 ### PATH (:path)
 
 You can specify that a gem is located in a particular location
