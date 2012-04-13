@@ -270,6 +270,15 @@ module Bundler
     end
 
     def load_gemspec(file)
+      @gemspec_cache ||= {}
+      key = File.expand_path(file)
+      spec = ( @gemspec_cache[key] ||= load_gemspec_uncached(file) )
+      # Protect against caching side-effected gemspecs by returning a
+      # new instance each time.
+      spec.dup if spec
+    end
+
+    def load_gemspec_uncached(file)
       path = Pathname.new(file)
       # Eval the gemspec from its parent directory
       Dir.chdir(path.dirname.to_s) do
