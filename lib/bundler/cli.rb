@@ -258,6 +258,8 @@ module Bundler
       "Do not attempt to fetch gems remotely and use the gem cache instead"
     method_option "quiet", :type => :boolean, :banner =>
       "Only output warnings and errors."
+    method_option "full-index", :type => :boolean, :banner =>
+        "Use the rubygems modern index instead of the API endpoint"
     def update(*gems)
       sources = Array(options[:source])
       Bundler.ui.be_quiet! if options[:quiet]
@@ -268,6 +270,8 @@ module Bundler
       else
         Bundler.definition(:gems => gems, :sources => sources)
       end
+
+      Bundler::Fetcher.disable_endpoint = options["full-index"]
 
       opts = {"update" => true, "local" => options[:local]}
       # rubygems plugins sometimes hook into the gem install process
