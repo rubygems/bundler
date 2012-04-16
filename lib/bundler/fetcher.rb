@@ -169,22 +169,21 @@ module Bundler
           begin
             name, requirement = d
             dep = Gem::Dependency.new(name, requirement.split(", "))
+            deps_list << dep.name
+            dep
           rescue ArgumentError => e
             if e.message.include?('Illformed requirement ["#<YAML::Syck::DefaultKey')
               puts # we shouldn't print the error message on the "fetching info" status line
-              raise GemspecError, %{Unfortunately, the gem #{s[:name]} (#{s[:number]}) } +
-                %{has an invalid gemspec. As a result, Bundler cannot install this Gemfile. } +
-                %{Please ask the gem author to yank the bad version to fix this issue. For } +
+              STDERR.puts %{Warning: gem #{s[:name]} (#{s[:number]}) } +
+                %{has an invalid gemspec, ignoring it.} +
+                %{Please ask the gem author to yank the bad version to fix this message. For } +
                 %{more information, see http://bit.ly/syck-defaultkey.}
+              nil
             else
               raise e
             end
           end
-
-          deps_list << dep.name
-
-          dep
-        end
+        end.compact
 
         [s[:name], Gem::Version.new(s[:number]), s[:platform], dependencies]
       end
