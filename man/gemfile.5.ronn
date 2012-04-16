@@ -222,7 +222,7 @@ same, you can omit one.
 
 Are both equivalent to
 
-    gem "rails", :github => :git://github.com/rails/rails.git"
+    gem "rails", :git => :git://github.com/rails/rails.git"
 
 ### PATH (:path)
 
