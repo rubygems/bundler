@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe "bundle ruby", :focused => true do
+describe "bundle ruby" do
   it "returns ruby version when explicit" do
     gemfile <<-G
       source "file://#{gem_repo1}"
