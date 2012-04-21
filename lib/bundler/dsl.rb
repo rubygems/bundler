@@ -25,7 +25,7 @@ module Bundler
       @groups          = []
       @platforms       = []
       @env             = nil
-      @ruby_version    = ""
+      @ruby_version    = nil
     end
 
     def eval_gemfile(gemfile)

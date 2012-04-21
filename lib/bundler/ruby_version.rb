@@ -25,9 +25,27 @@ module Bundler
     end
 
     def ==(other)
-      @version          == other.version &&
-        @engine         == other.engine &&
-        @engine_version == other.engine_version
+      version          == other.version &&
+        engine         == other.engine &&
+        engine_version == other.engine_version
+    end
+
+    # Returns a tuple of thsee things:
+    #   [diff, this, other]
+    #   The priority of attributes are
+    #   1. engine
+    #   2. ruby_version
+    #   3. engine_version
+    def diff(other)
+      if engine != other.engine
+        [ :engine, engine, other.engine ]
+      elsif version != other.version
+        [ :version, version, other.version ]
+      elsif engine_version != other.engine_version
+        [ :engine_version, engine_version, other.engine_version ]
+      else
+        nil
+      end
     end
   end
 

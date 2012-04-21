@@ -336,6 +336,26 @@ module Bundler
       raise ProductionError, msg if added.any? || deleted.any? || changed.any?
     end
 
+    def validate_ruby!
+      return unless ruby_version
+
+      system_ruby_version = Bundler::SystemRubyVersion.new
+      if diff = ruby_version.diff(system_ruby_version)
+        problem, expected, actual = diff
+
+        msg = case problem
+        when :engine
+          "Your Ruby engine is #{actual}, but your Gemfile specified #{expected}"
+        when :version
+          "Your Ruby version is #{actual}, but your Gemfile specified #{expected}"
+        when :engine_version
+          "Your #{system_ruby_version.engine} version is #{actual}, but your Gemfile specified #{ruby_version.engine} #{expected}"
+        end
+
+        raise RubyVersionMismatch, msg
+      end
+    end
+
   private
 
     def nothing_changed?

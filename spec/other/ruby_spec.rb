@@ -91,4 +91,55 @@ describe "bundle ruby" do
 
     exitstatus.should_not == 0
   end
+
+  context "bundle install" do
+    it "installs fine when the ruby version matches" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+
+        ruby_version "#{RUBY_VERSION}", :engine => "#{local_ruby_engine}", :engine_version => "#{local_engine_version}"
+      G
+
+      bundled_app('Gemfile.lock').should exist
+    end
+
+    it "doesn't install when the ruby version doesn't match" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+
+        ruby_version "#{not_local_ruby_version}", :engine => "#{local_ruby_engine}", :engine_version => "#{not_local_ruby_version}"
+      G
+
+      bundled_app('Gemfile.lock').should_not exist
+      out.should == "Your Ruby version is #{RUBY_VERSION}, but your Gemfile specified #{not_local_ruby_version}"
+    end
+
+    it "doesn't install when engine doesn't match" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+
+        ruby_version "#{RUBY_VERSION}", :engine => "#{not_local_tag}", :engine_version => "#{RUBY_VERSION}"
+      G
+
+      bundled_app('Gemfile.lock').should_not exist
+      out.should == "Your Ruby engine is #{local_ruby_engine}, but your Gemfile specified #{not_local_tag}"
+    end
+
+    it "doesn't install when engine version doesn't match" do
+      simulate_ruby_engine "jruby" do
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rack"
+
+          ruby_version "#{RUBY_VERSION}", :engine => "#{local_ruby_engine}", :engine_version => "#{not_local_engine_version}"
+        G
+
+        bundled_app('Gemfile.lock').should_not exist
+        out.should == "Your #{local_ruby_engine} version is #{local_engine_version}, but your Gemfile specified #{local_ruby_engine} #{not_local_engine_version}"
+      end
+    end
+  end
 end

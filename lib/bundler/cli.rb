@@ -217,7 +217,9 @@ module Bundler
       # rubygems plugins sometimes hook into the gem install process
       Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins)
 
-      Installer.install(Bundler.root, Bundler.definition, opts)
+      definition = Bundler.definition
+      definition.validate_ruby!
+      Installer.install(Bundler.root, definition, opts)
       Bundler.load.cache if Bundler.root.join("vendor/cache").exist? && !options["no-cache"]
 
       if Bundler.settings[:path]
@@ -619,7 +621,10 @@ module Bundler
 
     desc "ruby", "Displays the ruby version specified"
     def ruby
-      Bundler.ui.info Bundler.definition.ruby_version
+      ruby_version = Bundler.definition.ruby_version
+      ruby_version = "No ruby version specified" unless ruby_version
+
+      Bundler.ui.info ruby_version
     end
 
   private

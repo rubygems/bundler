@@ -49,5 +49,38 @@ module Spec
     def not_local_tag
       [:ruby, :jruby].find { |tag| tag != local_tag }
     end
+
+    def local_ruby_engine
+      ENV["BUNDLER_SPEC_RUBY_ENGINE"] || RUBY_ENGINE
+    end
+
+    def local_engine_version
+      return ENV["BUNDLER_SPEC_RUBY_ENGINE_VERSION"] if ENV["BUNDLER_SPEC_RUBY_ENGINE_VERSION"]
+
+      case local_ruby_engine
+      when "ruby"
+        RUBY_VERSION
+      when "rbx"
+        Rubinius::VERSION
+      when "jruby"
+        JRUBY_VERSION
+      else
+        raise BundlerError, "That RUBY_ENGINE is not recognized"
+        nil
+      end
+    end
+
+    def not_local_engine_version
+      case not_local_tag
+      when :ruby
+        not_local_ruby_version
+      when :jruby
+        "1.6.1"
+      end
+    end
+
+    def not_local_ruby_version
+      "1.12"
+    end
   end
 end

@@ -9,3 +9,14 @@ if ENV['BUNDLER_SPEC_VERSION']
     VERSION = ENV['BUNDLER_SPEC_VERSION'].dup
   end
 end
+
+class Object
+  if ENV['BUNDLER_SPEC_RUBY_ENGINE']
+    remove_const :RUBY_ENGINE
+    RUBY_ENGINE = ENV['BUNDLER_SPEC_RUBY_ENGINE']
+
+    if RUBY_ENGINE == "jruby"
+      JRUBY_VERSION = ENV["BUNDLER_SPEC_RUBY_ENGINE_VERSION"]
+    end
+  end
+end
