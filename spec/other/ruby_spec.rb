@@ -10,7 +10,7 @@ describe "bundle ruby" do
     G
 
     bundle "ruby"
-    
+
     out.should eq("ruby 1.9.3 (ruby 1.9.3)")
   end
 
