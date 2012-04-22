@@ -377,6 +377,7 @@ module Bundler
     method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
     method_option "all",  :type => :boolean, :banner => "Include all sources (including path and git)."
     def cache
+      Bundler.definition.validate_ruby!
       Bundler.definition.resolve_with_cache!
       setup_cache_all
       Bundler.load.cache
