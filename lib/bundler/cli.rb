@@ -99,7 +99,9 @@ module Bundler
 
       Bundler.settings[:path] = File.expand_path(options[:path]) if options[:path]
       begin
-        not_installed = Bundler.definition.missing_specs
+        definition = Bundler.definition
+        definition.validate_ruby!
+        not_installed = definition.missing_specs
       rescue GemNotFound, VersionConflict
         Bundler.ui.error "Your Gemfile's dependencies could not be satisfied"
         Bundler.ui.warn  "Install missing gems with `bundle install`"

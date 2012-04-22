@@ -142,4 +142,80 @@ describe "bundle ruby" do
       end
     end
   end
+
+  context "bundle check" do
+    it "checks fine when the ruby version matches" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+
+        ruby_version "#{RUBY_VERSION}", :engine => "#{local_ruby_engine}", :engine_version => "#{local_engine_version}"
+      G
+
+      bundle :check, :exitstatus => true
+      exitstatus.should eq(0)
+      out.should == "The Gemfile's dependencies are satisfied"
+    end
+
+    it "fails when ruby version doesn't match" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+
+        ruby_version "#{not_local_ruby_version}", :engine => "#{local_ruby_engine}", :engine_version => "#{not_local_ruby_version}"
+      G
+
+      bundle :check, :exitstatus => true
+      exitstatus.should eq(18)
+      out.should == "Your Ruby version is #{RUBY_VERSION}, but your Gemfile specified #{not_local_ruby_version}"
+    end
+
+    it "fails when engine doesn't match" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+
+        ruby_version "#{RUBY_VERSION}", :engine => "#{not_local_tag}", :engine_version => "#{RUBY_VERSION}"
+      G
+
+      bundle :check, :exitstatus => true
+      exitstatus.should eq(18)
+      out.should == "Your Ruby engine is #{local_ruby_engine}, but your Gemfile specified #{not_local_tag}"
+    end
+
+    it "fails when engine version doesn't match" do
+      simulate_ruby_engine "ruby" do
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rack"
+        G
+
+        gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rack"
+
+          ruby_version "#{RUBY_VERSION}", :engine => "#{local_ruby_engine}", :engine_version => "#{not_local_engine_version}"
+        G
+
+        bundle :check, :exitstatus => true
+        exitstatus.should eq(18)
+        out.should == "Your #{local_ruby_engine} version is #{local_engine_version}, but your Gemfile specified #{local_ruby_engine} #{not_local_engine_version}"
+      end
+    end
+  end
 end
