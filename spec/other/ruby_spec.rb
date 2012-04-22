@@ -313,4 +313,63 @@ describe "bundle ruby" do
       end
     end
   end
+
+  context "bundle show" do
+    before do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rails"
+      G
+    end
+
+    it "prints path if ruby version is correct" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rails"
+
+        #{ruby_version_correct}
+      G
+
+      bundle "show rails"
+      out.should == default_bundle_path('gems', 'rails-2.3.2').to_s
+    end
+
+    it "fails if ruby version doesn't match" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rails"
+
+        #{ruby_version_incorrect}
+      G
+
+      bundle "show rails", :exitstatus => true
+      should_be_ruby_version_incorrect
+    end
+
+    it "fails if engine doesn't match" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rails"
+
+        #{engine_incorrect}
+      G
+
+      bundle "show rails", :exitstatus => true
+      should_be_engine_incorrect
+    end
+
+    it "fails if engine version doesn't match" do
+      simulate_ruby_engine "jruby" do
+        gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rails"
+
+          #{engine_version_incorrect}
+        G
+
+        bundle "show rails", :exitstatus => true
+        should_be_engine_version_incorrect
+      end
+    end
+  end
 end
