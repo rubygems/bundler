@@ -97,18 +97,18 @@ describe "bundle ruby" do
   let(:engine_incorrect) { "ruby_version \"#{RUBY_VERSION}\", :engine => \"#{not_local_tag}\", :engine_version => \"#{RUBY_VERSION}\"" }
   let(:engine_version_incorrect) { "ruby_version \"#{RUBY_VERSION}\", :engine => \"#{local_ruby_engine}\", :engine_version => \"#{not_local_engine_version}\"" }
 
-  def should_be_ruby_version_incorrect
-    exitstatus.should eq(18)
+  def should_be_ruby_version_incorrect(opts = {:exitstatus => true})
+    exitstatus.should eq(18) if opts[:exitstatus]
     out.should be_include("Your Ruby version is #{RUBY_VERSION}, but your Gemfile specified #{not_local_ruby_version}")
   end
 
-  def should_be_engine_incorrect
-    exitstatus.should eq(18)
+  def should_be_engine_incorrect(opts = {:exitstatus => true})
+    exitstatus.should eq(18) if opts[:exitstatus]
     out.should be_include("Your Ruby engine is #{local_ruby_engine}, but your Gemfile specified #{not_local_tag}")
   end
 
-  def should_be_engine_version_incorrect
-    exitstatus.should eq(18)
+  def should_be_engine_version_incorrect(opts = {:exitstatus => true})
+    exitstatus.should eq(18) if opts[:exitstatus]
     out.should be_include("Your #{local_ruby_engine} version is #{local_engine_version}, but your Gemfile specified #{local_ruby_engine} #{not_local_engine_version}")
   end
 
@@ -533,6 +533,191 @@ describe "bundle ruby" do
 
         bundle "exec rackup", :exitstatus => true
         should_be_engine_version_incorrect
+      end
+    end
+  end
+
+  context "bundle console" do
+    before do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+        gem "activesupport", :group => :test
+        gem "rack_middleware", :group => :development
+      G
+    end
+
+    it "starts IRB with the default group loaded when ruby version matches" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+        gem "activesupport", :group => :test
+        gem "rack_middleware", :group => :development
+
+        #{ruby_version_correct}
+      G
+
+      bundle "console" do |input|
+        input.puts("puts RACK")
+        input.puts("exit")
+      end
+      out.should include("0.9.1")
+    end
+
+    it "fails when ruby version doesn't match" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+        gem "activesupport", :group => :test
+        gem "rack_middleware", :group => :development
+
+        #{ruby_version_incorrect}
+      G
+
+      bundle "console", :exitstatus => true
+      should_be_ruby_version_incorrect
+    end
+
+    it "fails when engine doesn't match" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+        gem "activesupport", :group => :test
+        gem "rack_middleware", :group => :development
+
+        #{engine_incorrect}
+      G
+
+      bundle "console", :exitstatus => true
+      should_be_engine_incorrect
+    end
+
+    it "fails when engine version doesn't match" do
+      simulate_ruby_engine "jruby" do
+        gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rack"
+          gem "activesupport", :group => :test
+          gem "rack_middleware", :group => :development
+
+          #{engine_version_incorrect}
+        G
+
+        bundle "console", :exitstatus => true
+        should_be_engine_version_incorrect
+      end
+    end
+  end
+
+  context "Bundler.setup" do
+    before do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "yard"
+        gem "rack", :group => :test
+      G
+    end
+
+    it "makes a Gemfile.lock if setup succeeds" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "yard"
+        gem "rack"
+
+        #{ruby_version_correct}
+      G
+
+      File.read(bundled_app("Gemfile.lock"))
+
+      FileUtils.rm(bundled_app("Gemfile.lock"))
+
+      run "1"
+      bundled_app("Gemfile.lock").should exist
+    end
+
+    it "fails when ruby version doesn't match" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "yard"
+        gem "rack"
+
+        #{ruby_version_incorrect}
+      G
+
+      File.read(bundled_app("Gemfile.lock"))
+
+      FileUtils.rm(bundled_app("Gemfile.lock"))
+
+      ruby <<-R
+        require 'rubygems'
+        require 'bundler'
+
+        begin
+          Bundler.setup
+        rescue Bundler::RubyVersionMismatch => e
+          puts e.message
+        end
+      R
+
+      bundled_app("Gemfile.lock").should_not exist
+      should_be_ruby_version_incorrect(:exitstatus => false)
+    end
+
+    it "fails when engine doesn't match" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "yard"
+        gem "rack"
+
+        #{engine_incorrect}
+      G
+
+      File.read(bundled_app("Gemfile.lock"))
+
+      FileUtils.rm(bundled_app("Gemfile.lock"))
+
+      ruby <<-R
+        require 'rubygems'
+        require 'bundler'
+
+        begin
+          Bundler.setup
+        rescue Bundler::RubyVersionMismatch => e
+          puts e.message
+        end
+      R
+
+      bundled_app("Gemfile.lock").should_not exist
+      should_be_engine_incorrect(:exitstatus => false)
+    end
+
+    it "fails when engine version doesn't match" do
+      simulate_ruby_engine "jruby" do
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "yard"
+          gem "rack"
+
+          #{engine_version_incorrect}
+        G
+
+        File.read(bundled_app("Gemfile.lock"))
+
+        FileUtils.rm(bundled_app("Gemfile.lock"))
+
+        ruby <<-R
+          require 'rubygems'
+          require 'bundler'
+
+          begin
+            Bundler.setup
+          rescue Bundler::RubyVersionMismatch => e
+            puts e.message
+          end
+        R
+
+        bundled_app("Gemfile.lock").should_not exist
+        should_be_engine_version_incorrect(:exitstatus => false)
       end
     end
   end

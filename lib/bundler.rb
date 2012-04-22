@@ -107,6 +107,8 @@ module Bundler
       # Just return if all groups are already loaded
       return @setup if defined?(@setup)
 
+      definition.validate_ruby!
+
       if groups.empty?
         # Load all groups, but only once
         @setup = load.setup
