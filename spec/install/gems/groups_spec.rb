@@ -265,4 +265,36 @@ describe "bundle install with gem sources" do
       end
     end
   end
+
+  describe "with subgroups" do
+    before :each do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "weakling"
+        group :sub1 do
+          gem "activesupport"
+        end
+        gem "thin", :groups => :sub2
+        group :parent do
+          include_group :sub1
+          include_group :sub2
+        end
+      G
+    end
+
+    it "sets up the subgroups' gems when a parent group is loaded" do
+      out = run("require 'activesupport'; puts ACTIVESUPPORT", :parent)
+      out.should eq('2.3.5')
+
+      out = run("require 'thin'; puts THIN", :parent)
+      out.should eq('1.0')
+
+      load_error_run <<-R, 'weakling', :parent
+        require 'weakling'
+        puts WEAKLING
+      R
+
+      err.should == "ZOMG LOAD ERROR"
+    end
+  end
 end

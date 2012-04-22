@@ -155,6 +155,16 @@ module Bundler
       args.each { @groups.pop }
     end
 
+    def include_group(group)
+      @dependencies.each do |dependency|
+        if dependency.groups.include?(group)
+          new_groups = dependency.groups + @groups.dup
+          new_groups.uniq!
+          dependency.groups = new_groups
+        end
+      end
+    end
+
     def platforms(*platforms)
       @platforms.concat platforms
       yield
