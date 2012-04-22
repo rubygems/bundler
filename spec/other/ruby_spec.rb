@@ -99,17 +99,17 @@ describe "bundle ruby" do
 
   def should_be_ruby_version_incorrect
     exitstatus.should eq(18)
-    out.should == "Your Ruby version is #{RUBY_VERSION}, but your Gemfile specified #{not_local_ruby_version}"
+    out.should be_include("Your Ruby version is #{RUBY_VERSION}, but your Gemfile specified #{not_local_ruby_version}")
   end
 
   def should_be_engine_incorrect
     exitstatus.should eq(18)
-    out.should == "Your Ruby engine is #{local_ruby_engine}, but your Gemfile specified #{not_local_tag}"
+    out.should be_include("Your Ruby engine is #{local_ruby_engine}, but your Gemfile specified #{not_local_tag}")
   end
 
   def should_be_engine_version_incorrect
     exitstatus.should eq(18)
-    out.should == "Your #{local_ruby_engine} version is #{local_engine_version}, but your Gemfile specified #{local_ruby_engine} #{not_local_engine_version}"
+    out.should be_include("Your #{local_ruby_engine} version is #{local_engine_version}, but your Gemfile specified #{local_ruby_engine} #{not_local_engine_version}")
   end
 
   context "bundle install" do
@@ -480,6 +480,58 @@ describe "bundle ruby" do
         G
 
         bundle :pack, :exitstatus => true
+        should_be_engine_version_incorrect
+      end
+    end
+  end
+
+  context "bundle exec" do
+    before do
+      system_gems "rack-1.0.0", "rack-0.9.1"
+    end
+
+    it "activates the correct gem when ruby version matches" do
+      gemfile <<-G
+        gem "rack", "0.9.1"
+
+        #{ruby_version_correct}
+      G
+
+      bundle "exec rackup"
+      out.should == "0.9.1"
+    end
+
+    it "fails when the ruby version doesn't match" do
+      gemfile <<-G
+        gem "rack", "0.9.1"
+
+        #{ruby_version_incorrect}
+      G
+
+      bundle "exec rackup", :exitstatus => true
+      should_be_ruby_version_incorrect
+    end
+
+    it "fails when the engine doesn't match" do
+      gemfile <<-G
+        gem "rack", "0.9.1"
+
+        #{engine_incorrect}
+      G
+
+      bundle "exec rackup", :exitstatus => true
+      should_be_engine_incorrect
+    end
+
+    it "fails when the engine version doesn't match" do
+      simulate_ruby_engine "jruby" do
+        gemfile <<-G
+        gem "rack", "0.9.1"
+
+        #{engine_version_incorrect}
+        G
+
+        bundle "exec rackup", :exitstatus => true
         should_be_engine_version_incorrect
       end
     end
