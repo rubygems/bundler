@@ -625,8 +625,8 @@ module Bundler
       end
     end
 
-    desc "ruby", "Displays the ruby version specified"
-    def ruby
+    desc "platform", "Displays platform compatibility information"
+    def platform
       ruby_version = Bundler.definition.ruby_version
       ruby_version = "No ruby version specified" unless ruby_version
 

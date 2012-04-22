@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe "bundle ruby" do
+describe "bundle platform" do
   it "returns ruby version when explicit" do
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -9,7 +9,7 @@ describe "bundle ruby" do
       gem "foo"
     G
 
-    bundle "ruby"
+    bundle "platform"
 
     out.should eq("ruby 1.9.3 (ruby 1.9.3)")
   end
@@ -22,7 +22,7 @@ describe "bundle ruby" do
       gem "foo"
     G
 
-    bundle "ruby"
+    bundle "platform"
 
     out.should eq("ruby 1.9.3 (ruby 1.9.3)")
   end
@@ -35,7 +35,7 @@ describe "bundle ruby" do
       gem "foo"
     G
 
-    bundle "ruby"
+    bundle "platform"
 
     out.should eq("ruby 1.8.7 (jruby 1.6.5)")
   end
@@ -48,7 +48,7 @@ describe "bundle ruby" do
       gem "foo"
     G
 
-    bundle "ruby"
+    bundle "platform"
 
     out.should eq("ruby 1.8.7 (rbx 1.2.4)")
   end
@@ -61,7 +61,7 @@ describe "bundle ruby" do
       gem "foo"
     G
 
-    bundle "ruby", :exitstatus => true
+    bundle "platform", :exitstatus => true
 
     exitstatus.should_not == 0
   end
@@ -74,7 +74,7 @@ describe "bundle ruby" do
       gem "foo"
     G
 
-    bundle "ruby", :exitstatus => true
+    bundle "platform", :exitstatus => true
 
     exitstatus.should_not == 0
   end
@@ -87,7 +87,7 @@ describe "bundle ruby" do
       gem "foo"
     G
 
-    bundle "ruby", :exitstatus => true
+    bundle "platform", :exitstatus => true
 
     exitstatus.should_not == 0
   end
