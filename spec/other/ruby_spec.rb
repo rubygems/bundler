@@ -428,4 +428,60 @@ describe "bundle ruby" do
       end
     end
   end
+
+  context "bundle pack" do
+    before do
+      gemfile <<-G
+        gem 'rack'
+      G
+
+      system_gems "rack-1.0.0"
+    end
+
+    it "copies the .gem file to vendor/cache when ruby version matches" do
+      gemfile <<-G
+        gem 'rack'
+
+        #{ruby_version_correct}
+      G
+
+      bundle :pack
+      bundled_app("vendor/cache/rack-1.0.0.gem").should exist
+    end
+
+    it "fails if the ruby version doesn't match" do
+      gemfile <<-G
+        gem 'rack'
+
+        #{ruby_version_incorrect}
+      G
+
+      bundle :pack, :exitstatus => true
+      should_be_ruby_version_incorrect
+    end
+
+    it "fails if the engine doesn't match" do
+      gemfile <<-G
+        gem 'rack'
+
+        #{engine_incorrect}
+      G
+
+      bundle :pack, :exitstatus => true
+      should_be_engine_incorrect
+    end
+
+    it "fails if the engine version doesn't match" do
+      simulate_ruby_engine "jruby" do
+        gemfile <<-G
+        gem 'rack'
+
+        #{engine_version_incorrect}
+        G
+
+        bundle :pack, :exitstatus => true
+        should_be_engine_version_incorrect
+      end
+    end
+  end
 end
