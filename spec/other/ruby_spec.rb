@@ -92,53 +92,73 @@ describe "bundle ruby" do
     exitstatus.should_not == 0
   end
 
+  let(:ruby_version_correct) { "ruby_version \"#{RUBY_VERSION}\", :engine => \"#{local_ruby_engine}\", :engine_version => \"#{local_engine_version}\"" }
+  let(:ruby_version_incorrect) { "ruby_version \"#{not_local_ruby_version}\", :engine => \"#{local_ruby_engine}\", :engine_version => \"#{not_local_ruby_version}\"" }
+  let(:engine_incorrect) { "ruby_version \"#{RUBY_VERSION}\", :engine => \"#{not_local_tag}\", :engine_version => \"#{RUBY_VERSION}\"" }
+  let(:engine_version_incorrect) { "ruby_version \"#{RUBY_VERSION}\", :engine => \"#{local_ruby_engine}\", :engine_version => \"#{not_local_engine_version}\"" }
+
+  def should_be_ruby_version_incorrect
+    exitstatus.should eq(18)
+    out.should == "Your Ruby version is #{RUBY_VERSION}, but your Gemfile specified #{not_local_ruby_version}"
+  end
+
+  def should_be_engine_incorrect
+    exitstatus.should eq(18)
+    out.should == "Your Ruby engine is #{local_ruby_engine}, but your Gemfile specified #{not_local_tag}"
+  end
+
+  def should_be_engine_version_incorrect
+    exitstatus.should eq(18)
+    out.should == "Your #{local_ruby_engine} version is #{local_engine_version}, but your Gemfile specified #{local_ruby_engine} #{not_local_engine_version}"
+  end
+
   context "bundle install" do
     it "installs fine when the ruby version matches" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
 
-        ruby_version "#{RUBY_VERSION}", :engine => "#{local_ruby_engine}", :engine_version => "#{local_engine_version}"
+        #{ruby_version_correct}
       G
 
       bundled_app('Gemfile.lock').should exist
     end
 
     it "doesn't install when the ruby version doesn't match" do
-      install_gemfile <<-G
+      install_gemfile <<-G, :exitstatus => true
         source "file://#{gem_repo1}"
         gem "rack"
 
-        ruby_version "#{not_local_ruby_version}", :engine => "#{local_ruby_engine}", :engine_version => "#{not_local_ruby_version}"
+        #{ruby_version_incorrect}
       G
 
       bundled_app('Gemfile.lock').should_not exist
-      out.should == "Your Ruby version is #{RUBY_VERSION}, but your Gemfile specified #{not_local_ruby_version}"
+      should_be_ruby_version_incorrect
     end
 
     it "doesn't install when engine doesn't match" do
-      install_gemfile <<-G
+      install_gemfile <<-G, :exitstatus => true
         source "file://#{gem_repo1}"
         gem "rack"
 
-        ruby_version "#{RUBY_VERSION}", :engine => "#{not_local_tag}", :engine_version => "#{RUBY_VERSION}"
+        #{engine_incorrect}
       G
 
       bundled_app('Gemfile.lock').should_not exist
-      out.should == "Your Ruby engine is #{local_ruby_engine}, but your Gemfile specified #{not_local_tag}"
+      should_be_engine_incorrect
     end
 
     it "doesn't install when engine version doesn't match" do
       simulate_ruby_engine "jruby" do
-        install_gemfile <<-G
+        install_gemfile <<-G, :exitstatus => true
           source "file://#{gem_repo1}"
           gem "rack"
 
-          ruby_version "#{RUBY_VERSION}", :engine => "#{local_ruby_engine}", :engine_version => "#{not_local_engine_version}"
+          #{engine_version_incorrect}
         G
 
         bundled_app('Gemfile.lock').should_not exist
-        out.should == "Your #{local_ruby_engine} version is #{local_engine_version}, but your Gemfile specified #{local_ruby_engine} #{not_local_engine_version}"
+        should_be_engine_version_incorrect
       end
     end
   end
@@ -154,7 +174,7 @@ describe "bundle ruby" do
         source "file://#{gem_repo1}"
         gem "rack"
 
-        ruby_version "#{RUBY_VERSION}", :engine => "#{local_ruby_engine}", :engine_version => "#{local_engine_version}"
+        #{ruby_version_correct}
       G
 
       bundle :check, :exitstatus => true
@@ -172,12 +192,11 @@ describe "bundle ruby" do
         source "file://#{gem_repo1}"
         gem "rack"
 
-        ruby_version "#{not_local_ruby_version}", :engine => "#{local_ruby_engine}", :engine_version => "#{not_local_ruby_version}"
+        #{ruby_version_incorrect}
       G
 
       bundle :check, :exitstatus => true
-      exitstatus.should eq(18)
-      out.should == "Your Ruby version is #{RUBY_VERSION}, but your Gemfile specified #{not_local_ruby_version}"
+      should_be_ruby_version_incorrect
     end
 
     it "fails when engine doesn't match" do
@@ -190,12 +209,11 @@ describe "bundle ruby" do
         source "file://#{gem_repo1}"
         gem "rack"
 
-        ruby_version "#{RUBY_VERSION}", :engine => "#{not_local_tag}", :engine_version => "#{RUBY_VERSION}"
+        #{engine_incorrect}
       G
 
       bundle :check, :exitstatus => true
-      exitstatus.should eq(18)
-      out.should == "Your Ruby engine is #{local_ruby_engine}, but your Gemfile specified #{not_local_tag}"
+      should_be_engine_incorrect
     end
 
     it "fails when engine version doesn't match" do
@@ -209,12 +227,11 @@ describe "bundle ruby" do
           source "file://#{gem_repo1}"
           gem "rack"
 
-          ruby_version "#{RUBY_VERSION}", :engine => "#{local_ruby_engine}", :engine_version => "#{not_local_engine_version}"
+          #{engine_version_incorrect}
         G
 
         bundle :check, :exitstatus => true
-        exitstatus.should eq(18)
-        out.should == "Your #{local_ruby_engine} version is #{local_engine_version}, but your Gemfile specified #{local_ruby_engine} #{not_local_engine_version}"
+        should_be_engine_version_incorrect
       end
     end
   end
@@ -236,7 +253,7 @@ describe "bundle ruby" do
         gem "activesupport"
         gem "rack-obama"
 
-        ruby_version "#{RUBY_VERSION}", :engine => "#{local_ruby_engine}", :engine_version => "#{local_engine_version}"
+        #{ruby_version_correct}
       G
       update_repo2 do
         build_gem "activesupport", "3.0"
@@ -252,15 +269,14 @@ describe "bundle ruby" do
         gem "activesupport"
         gem "rack-obama"
 
-        ruby_version "#{not_local_ruby_version}", :engine => "#{local_ruby_engine}", :engine_version => "#{not_local_ruby_version}"
+        #{ruby_version_incorrect}
       G
       update_repo2 do
         build_gem "activesupport", "3.0"
       end
 
       bundle :update, :exitstatus => true
-      exitstatus.should eq(18)
-      out.should == "Your Ruby version is #{RUBY_VERSION}, but your Gemfile specified #{not_local_ruby_version}"
+      should_be_ruby_version_incorrect
     end
 
     it "fails when ruby engine doesn't match" do
@@ -269,15 +285,14 @@ describe "bundle ruby" do
         gem "activesupport"
         gem "rack-obama"
 
-        ruby_version "#{RUBY_VERSION}", :engine => "#{not_local_tag}", :engine_version => "#{RUBY_VERSION}"
+        #{engine_incorrect}
       G
       update_repo2 do
         build_gem "activesupport", "3.0"
       end
 
       bundle :update, :exitstatus => true
-      exitstatus.should eq(18)
-      out.should == "Your Ruby engine is #{local_ruby_engine}, but your Gemfile specified #{not_local_tag}"
+      should_be_engine_incorrect
     end
 
     it "fails when ruby engine version doesn't match" do
@@ -287,15 +302,14 @@ describe "bundle ruby" do
           gem "activesupport"
           gem "rack-obama"
 
-          ruby_version "#{RUBY_VERSION}", :engine => "#{local_ruby_engine}", :engine_version => "#{not_local_engine_version}"
+          #{engine_version_incorrect}
         G
         update_repo2 do
           build_gem "activesupport", "3.0"
         end
 
         bundle :update, :exitstatus => true
-        exitstatus.should eq(18)
-        out.should == "Your #{local_ruby_engine} version is #{local_engine_version}, but your Gemfile specified #{local_ruby_engine} #{not_local_engine_version}"
+        should_be_engine_version_incorrect
       end
     end
   end
