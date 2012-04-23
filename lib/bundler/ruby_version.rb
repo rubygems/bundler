@@ -21,7 +21,10 @@ module Bundler
     end
 
     def to_s
-      "ruby #{version} (#{engine} #{engine_version})"
+      output = "ruby #{version}"
+      output << " (#{engine} #{engine_version})" unless engine == "ruby"
+
+      output
     end
 
     def ==(other)

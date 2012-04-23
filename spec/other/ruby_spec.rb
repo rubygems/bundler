@@ -11,7 +11,7 @@ describe "bundle platform" do
 
     bundle "platform"
 
-    out.should eq("ruby 1.9.3 (ruby 1.9.3)")
+    out.should eq("ruby 1.9.3")
   end
 
   it "engine defaults to MRI" do
@@ -24,7 +24,7 @@ describe "bundle platform" do
 
     bundle "platform"
 
-    out.should eq("ruby 1.9.3 (ruby 1.9.3)")
+    out.should eq("ruby 1.9.3")
   end
 
   it "handles jruby" do
