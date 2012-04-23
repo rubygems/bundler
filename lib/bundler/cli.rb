@@ -627,6 +627,8 @@ module Bundler
     end
 
     desc "platform", "Displays platform compatibility information"
+    method_option "ruby", :type => :boolean, :default => false, :banner =>
+      "only display ruby related platform information"
     def platform
       ruby_version = Bundler.definition.ruby_version
       ruby_version = "No ruby version specified" unless ruby_version
