@@ -721,4 +721,93 @@ describe "bundle platform" do
       end
     end
   end
+
+  context "bundle outdated" do
+    before do
+      build_repo2 do
+        build_git "foo", :path => lib_path("foo")
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "activesupport", "2.3.5"
+        gem "foo", :git => "#{lib_path('foo')}"
+      G
+    end
+
+    it "returns list of outdated gems when the ruby version matches" do
+      update_repo2 do
+        build_gem "activesupport", "3.0"
+        update_git "foo", :path => lib_path("foo")
+      end
+
+      gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "activesupport", "2.3.5"
+        gem "foo", :git => "#{lib_path('foo')}"
+
+        #{ruby_version_correct}
+      G
+
+      bundle "outdated"
+      out.should include("activesupport (3.0 > 2.3.5)")
+      out.should include("foo (1.0")
+    end
+
+    it "fails when the ruby version doesn't match" do
+      update_repo2 do
+        build_gem "activesupport", "3.0"
+        update_git "foo", :path => lib_path("foo")
+      end
+
+      gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "activesupport", "2.3.5"
+        gem "foo", :git => "#{lib_path('foo')}"
+
+        #{ruby_version_incorrect}
+      G
+
+      bundle "outdated", :exitstatus => true
+      should_be_ruby_version_incorrect
+    end
+
+    it "fails when the engine doesn't match" do
+      update_repo2 do
+        build_gem "activesupport", "3.0"
+        update_git "foo", :path => lib_path("foo")
+      end
+
+      gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "activesupport", "2.3.5"
+        gem "foo", :git => "#{lib_path('foo')}"
+
+        #{engine_incorrect}
+      G
+
+      bundle "outdated", :exitstatus => true
+      should_be_engine_incorrect
+    end
+
+    it "fails when the engine version doesn't match" do
+      simulate_ruby_engine "jruby" do
+        update_repo2 do
+          build_gem "activesupport", "3.0"
+          update_git "foo", :path => lib_path("foo")
+        end
+
+        gemfile <<-G
+          source "file://#{gem_repo2}"
+          gem "activesupport", "2.3.5"
+          gem "foo", :git => "#{lib_path('foo')}"
+
+          #{engine_version_incorrect}
+        G
+
+        bundle "outdated", :exitstatus => true
+        should_be_engine_version_incorrect
+      end
+    end
+  end
 end

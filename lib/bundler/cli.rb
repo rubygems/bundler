@@ -327,6 +327,7 @@ module Bundler
       "Do not attempt to fetch gems remotely and use the gem cache instead"
     def outdated(*gems)
       sources = Array(options[:source])
+      Bundler.definition.validate_ruby!
       current_specs = Bundler.load.specs
 
       if gems.empty? && sources.empty?
