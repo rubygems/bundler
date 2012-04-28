@@ -170,7 +170,7 @@ module Bundler
       @env = old
     end
 
-    def ruby_version(ruby_version, options = {})
+    def ruby(ruby_version, options = {})
       raise GemfileError, "Please define :engine_version" if options[:engine] && options[:engine_version].nil?
       raise GemfileError, "Please define :engine" if options[:engine_version] && options[:engine].nil?
 

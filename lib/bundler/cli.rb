@@ -630,10 +630,27 @@ module Bundler
     method_option "ruby", :type => :boolean, :default => false, :banner =>
       "only display ruby related platform information"
     def platform
+      platforms    = Bundler.definition.platforms
       ruby_version = Bundler.definition.ruby_version
-      ruby_version = "No ruby version specified" unless ruby_version
+      output       = []
 
-      Bundler.ui.info ruby_version
+      output << "Your platform is: #{RUBY_PLATFORM}"
+      output << "Your app has gems that work on these platforms:\n#{platforms.join("\n")}"
+
+      if ruby_version
+        output << "Your Gemfile specifies a Ruby version requirement:\n* #{ruby_version}"
+
+        begin
+          Bundler.definition.validate_ruby!
+          output << "Your current platform satisfies the Ruby version requirement."
+        rescue RubyVersionMismatch => e
+          output << e.message
+        end
+      else
+        output << "Your Gemfile does not specify a Ruby version requirement."
+      end
+
+      Bundler.ui.info output.join("\n\n")
     end
 
   private

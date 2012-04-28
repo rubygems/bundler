@@ -1,101 +1,169 @@
 require "spec_helper"
 
 describe "bundle platform" do
-  it "returns ruby version when explicit" do
-    gemfile <<-G
-      source "file://#{gem_repo1}"
-      ruby_version "1.9.3", :engine => 'ruby', :engine_version => '1.9.3'
+  context "without flags" do
+    it "returns all the output" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
 
-      gem "foo"
-    G
+        #{ruby_version_correct}
 
-    bundle "platform"
+        gem "foo"
+      G
 
-    out.should eq("ruby 1.9.3")
+      bundle "platform"
+      out.should == <<-G.chomp
+Your platform is: #{RUBY_PLATFORM}
+
+Your app has gems that work on these platforms:
+ruby
+
+Your Gemfile specifies a Ruby version requirement:
+* ruby #{RUBY_VERSION}
+
+Your current platform satisfies the Ruby version requirement.
+G
+    end
+
+    it "doesn't print ruby version requirement if it isn't specified" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+
+        gem "foo"
+      G
+
+      bundle "platform"
+      out.should == <<-G.chomp
+Your platform is: #{RUBY_PLATFORM}
+
+Your app has gems that work on these platforms:
+ruby
+
+Your Gemfile does not specify a Ruby version requirement.
+G
+    end
+
+    it "doesn't match the ruby version requirement" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+
+        #{ruby_version_incorrect}
+
+        gem "foo"
+      G
+
+      bundle "platform"
+      out.should == <<-G.chomp
+Your platform is: #{RUBY_PLATFORM}
+
+Your app has gems that work on these platforms:
+ruby
+
+Your Gemfile specifies a Ruby version requirement:
+* ruby #{not_local_ruby_version}
+
+Your Ruby version is #{RUBY_VERSION}, but your Gemfile specified #{not_local_ruby_version}
+G
+    end
   end
 
-  it "engine defaults to MRI" do
-    gemfile <<-G
-      source "file://#{gem_repo1}"
-      ruby_version "1.9.3"
+  context "--ruby" do
+    it "returns ruby version when explicit" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        ruby "1.9.3", :engine => 'ruby', :engine_version => '1.9.3'
 
-      gem "foo"
-    G
+        gem "foo"
+      G
 
-    bundle "platform"
+      bundle "platform"
 
-    out.should eq("ruby 1.9.3")
+      out.should eq("ruby 1.9.3")
+    end
+
+    it "engine defaults to MRI" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        ruby "1.9.3"
+
+        gem "foo"
+      G
+
+      bundle "platform"
+
+      out.should eq("ruby 1.9.3")
+    end
+
+    it "handles jruby" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        ruby "1.8.7", :engine => 'jruby', :engine_version => '1.6.5'
+
+        gem "foo"
+      G
+
+      bundle "platform"
+
+      out.should eq("ruby 1.8.7 (jruby 1.6.5)")
+    end
+
+    it "handles rbx" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        ruby "1.8.7", :engine => 'rbx', :engine_version => '1.2.4'
+
+        gem "foo"
+      G
+
+      bundle "platform"
+
+      out.should eq("ruby 1.8.7 (rbx 1.2.4)")
+    end
+
+    it "raises an error if engine is used but engine version is not" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        ruby "1.8.7", :engine => 'rbx'
+
+        gem "foo"
+      G
+
+      bundle "platform", :exitstatus => true
+
+      exitstatus.should_not == 0
+    end
+
+    it "raises an error if engine_version is used but engine is not" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        ruby "1.8.7", :engine_version => '1.2.4'
+
+        gem "foo"
+      G
+
+      bundle "platform", :exitstatus => true
+
+      exitstatus.should_not == 0
+    end
+
+    it "raises an error if engine version doesn't match ruby version for mri" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        ruby "1.8.7", :engine => 'ruby', :engine_version => '1.2.4'
+
+        gem "foo"
+      G
+
+      bundle "platform", :exitstatus => true
+
+      exitstatus.should_not == 0
+    end
   end
 
-  it "handles jruby" do
-    gemfile <<-G
-      source "file://#{gem_repo1}"
-      ruby_version "1.8.7", :engine => 'jruby', :engine_version => '1.6.5'
-
-      gem "foo"
-    G
-
-    bundle "platform"
-
-    out.should eq("ruby 1.8.7 (jruby 1.6.5)")
-  end
-
-  it "handles rbx" do
-    gemfile <<-G
-      source "file://#{gem_repo1}"
-      ruby_version "1.8.7", :engine => 'rbx', :engine_version => '1.2.4'
-
-      gem "foo"
-    G
-
-    bundle "platform"
-
-    out.should eq("ruby 1.8.7 (rbx 1.2.4)")
-  end
-
-  it "raises an error if engine is used but engine version is not" do
-    gemfile <<-G
-      source "file://#{gem_repo1}"
-      ruby_version "1.8.7", :engine => 'rbx'
-
-      gem "foo"
-    G
-
-    bundle "platform", :exitstatus => true
-
-    exitstatus.should_not == 0
-  end
-
-  it "raises an error if engine_version is used but engine is not" do
-    gemfile <<-G
-      source "file://#{gem_repo1}"
-      ruby_version "1.8.7", :engine_version => '1.2.4'
-
-      gem "foo"
-    G
-
-    bundle "platform", :exitstatus => true
-
-    exitstatus.should_not == 0
-  end
-
-  it "raises an error if engine version doesn't match ruby version for mri" do
-    gemfile <<-G
-      source "file://#{gem_repo1}"
-      ruby_version "1.8.7", :engine => 'ruby', :engine_version => '1.2.4'
-
-      gem "foo"
-    G
-
-    bundle "platform", :exitstatus => true
-
-    exitstatus.should_not == 0
-  end
-
-  let(:ruby_version_correct) { "ruby_version \"#{RUBY_VERSION}\", :engine => \"#{local_ruby_engine}\", :engine_version => \"#{local_engine_version}\"" }
-  let(:ruby_version_incorrect) { "ruby_version \"#{not_local_ruby_version}\", :engine => \"#{local_ruby_engine}\", :engine_version => \"#{not_local_ruby_version}\"" }
-  let(:engine_incorrect) { "ruby_version \"#{RUBY_VERSION}\", :engine => \"#{not_local_tag}\", :engine_version => \"#{RUBY_VERSION}\"" }
-  let(:engine_version_incorrect) { "ruby_version \"#{RUBY_VERSION}\", :engine => \"#{local_ruby_engine}\", :engine_version => \"#{not_local_engine_version}\"" }
+  let(:ruby_version_correct) { "ruby \"#{RUBY_VERSION}\", :engine => \"#{local_ruby_engine}\", :engine_version => \"#{local_engine_version}\"" }
+  let(:ruby_version_incorrect) { "ruby \"#{not_local_ruby_version}\", :engine => \"#{local_ruby_engine}\", :engine_version => \"#{not_local_ruby_version}\"" }
+  let(:engine_incorrect) { "ruby \"#{RUBY_VERSION}\", :engine => \"#{not_local_tag}\", :engine_version => \"#{RUBY_VERSION}\"" }
+  let(:engine_version_incorrect) { "ruby \"#{RUBY_VERSION}\", :engine => \"#{local_ruby_engine}\", :engine_version => \"#{not_local_engine_version}\"" }
 
   def should_be_ruby_version_incorrect(opts = {:exitstatus => true})
     exitstatus.should eq(18) if opts[:exitstatus]
