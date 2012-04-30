@@ -23,6 +23,7 @@ module Bundler
       @sources         = []
       @dependencies    = []
       @groups          = []
+      @subgroups       = {}
       @platforms       = []
       @env             = nil
       @ruby_version    = nil
@@ -30,6 +31,7 @@ module Bundler
 
     def eval_gemfile(gemfile)
       instance_eval(Bundler.read_file(gemfile.to_s), gemfile.to_s, 1)
+      resolve_subgroups
     rescue SyntaxError => e
       bt = e.message.split("\n")[1..-1]
       raise GemfileError, ["Gemfile syntax error:", *bt].join("\n")
@@ -156,12 +158,9 @@ module Bundler
     end
 
     def include_group(group)
-      @dependencies.each do |dependency|
-        if dependency.groups.include?(group)
-          new_groups = dependency.groups + @groups.dup
-          new_groups.uniq!
-          dependency.groups = new_groups
-        end
+      @groups.each do |parent_group|
+        @subgroups[parent_group] ||= []
+        @subgroups[parent_group] << group unless @subgroups[parent_group].include?(group)
       end
     end
 
@@ -260,6 +259,18 @@ module Bundler
       opts["env"]     ||= @env
       opts["platforms"] = platforms.dup
       opts["group"]     = groups
+    end
+
+    def resolve_subgroups
+      @subgroups.each do |parent_group, subgroups|
+        @dependencies.each do |dependency|
+          in_subgroup = subgroups.length != (subgroups - dependency.groups).length
+
+          if in_subgroup && !dependency.groups.include?(parent_group)
+            dependency.groups += [parent_group]
+          end
+        end
+      end
     end
 
   end

@@ -274,11 +274,11 @@ describe "bundle install with gem sources" do
         group :sub1 do
           gem "activesupport"
         end
-        gem "thin", :groups => :sub2
         group :parent do
           include_group :sub1
           include_group :sub2
         end
+        gem "thin", :groups => :sub2
       G
     end
 
