@@ -12,6 +12,10 @@ rescue
   false
 end
 
+def sudo_task(task)
+  system("sudo -E rake #{task}")
+end
+
 namespace :spec do
   desc "Ensure spec dependencies are installed"
   task :deps do
@@ -117,7 +121,8 @@ begin
       Rake::Task["spec:rubygems:#{rg}"].reenable
 
       puts "\n\e[1;33m[Travis CI] Running bundler sudo specs against rubygems #{rg}\e[m\n\n"
-      sudos = safe_task { Rake::Task["spec:rubygems:#{rg}:sudo"].invoke }
+      sudos = sudo_task "spec:rubygems:#{rg}:sudo"
+      chown = system("sudo chown -R #{ENV['USER']} #{File.join(File.dirname(__FILE__), 'tmp')}")
 
       Rake::Task["spec:rubygems:#{rg}"].reenable
 
