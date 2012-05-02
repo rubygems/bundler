@@ -39,4 +39,4 @@ rvm:
   - 1.9.2
   - 1.9.3
 
-script: rake spec:travis
+script: sudo rake spec:travis
