@@ -7,11 +7,17 @@ module Bundler
     include Thor::Actions
 
     def initialize(*)
-      super
-      the_shell = (options["no-color"] ? Thor::Shell::Basic.new : shell)
-      Bundler.ui = UI::Shell.new(the_shell)
-      Bundler.ui.debug! if options["verbose"]
-      Bundler.rubygems.ui = UI::RGProxy.new(Bundler.ui)
+      begin
+        super
+      rescue UnknownArgumentError => e
+        raise InvalidCLIOption, e.message
+      ensure
+        options ||= {"no-color" => true}
+        the_shell = (options["no-color"] ? Thor::Shell::Basic.new : shell)
+        Bundler.ui = UI::Shell.new(the_shell)
+        Bundler.ui.debug! if options["verbose"]
+        Bundler.rubygems.ui = UI::RGProxy.new(Bundler.ui)
+      end
     end
 
     check_unknown_options!
