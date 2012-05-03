@@ -76,7 +76,7 @@ G
         gem "foo"
       G
 
-      bundle "platform"
+      bundle "platform --ruby"
 
       out.should eq("ruby 1.9.3")
     end
@@ -89,7 +89,7 @@ G
         gem "foo"
       G
 
-      bundle "platform"
+      bundle "platform --ruby"
 
       out.should eq("ruby 1.9.3")
     end
@@ -102,7 +102,7 @@ G
         gem "foo"
       G
 
-      bundle "platform"
+      bundle "platform --ruby"
 
       out.should eq("ruby 1.8.7 (jruby 1.6.5)")
     end
@@ -115,7 +115,7 @@ G
         gem "foo"
       G
 
-      bundle "platform"
+      bundle "platform --ruby"
 
       out.should eq("ruby 1.8.7 (rbx 1.2.4)")
     end
