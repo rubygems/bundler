@@ -261,15 +261,8 @@ module Bundler
     method_option "full-index", :type => :boolean, :banner =>
         "Use the rubygems modern index instead of the API endpoint"
     def update(*gems)
-      sources = Array(options[:source])
       Bundler.ui.be_quiet! if options[:quiet]
-
-      if gems.empty? && sources.empty?
-        # We're doing a full update
-        Bundler.definition(true)
-      else
-        Bundler.definition(:gems => gems, :sources => sources)
-      end
+      set_definition(gems)
 
       Bundler::Fetcher.disable_endpoint = options["full-index"]
 
@@ -320,16 +313,10 @@ module Bundler
     method_option "local", :type => :boolean, :banner =>
       "Do not attempt to fetch gems remotely and use the gem cache instead"
     def outdated(*gems)
-      sources = Array(options[:source])
       current_specs = Bundler.load.specs
+      set_definition(gems)
 
-      if gems.empty? && sources.empty?
-        # We're doing a full update
-        definition = Bundler.definition(true)
-      else
-        definition = Bundler.definition(:gems => gems, :sources => sources)
-      end
-      options["local"] ? definition.resolve_with_cache! : definition.resolve_remotely!
+      options["local"] ? Bundler.definition.resolve_with_cache! : Bundler.definition.resolve_remotely!
 
       Bundler.ui.info ""
       if options["pre"]
@@ -343,7 +330,7 @@ module Bundler
       current_specs.each do |current_spec|
         next if !gems.empty? && !gems.include?(current_spec.name)
 
-        active_spec = definition.index[current_spec.name].sort_by { |b| b.version }
+        active_spec = Bundler.definition.index[current_spec.name].sort_by { |b| b.version }
 
         if !current_spec.version.prerelease? && !options[:pre] && active_spec.size > 1
           active_spec = active_spec.delete_if { |b| b.respond_to?(:version) && b.version.prerelease? }
@@ -640,6 +627,16 @@ module Bundler
         return File.expand_path('../../../', __FILE__)
       end
       spec.full_gem_path
+    end
+
+    def set_definition(gems)
+      sources = Array(options[:source])
+      if gems.empty? && sources.empty?
+        # We're doing a full update
+        Bundler.definition(true)
+      else
+        Bundler.definition(:gems => gems, :sources => sources)
+      end
     end
 
   end
