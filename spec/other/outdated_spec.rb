@@ -5,25 +5,33 @@ describe "bundle outdated" do
   before :each do
     build_repo2 do
       build_git "foo", :path => lib_path("foo")
+      build_git "zebra", :path => lib_path("zebra")
     end
 
     install_gemfile <<-G
       source "file://#{gem_repo2}"
-      gem "activesupport", "2.3.5"
+      gem "zebra", :git => "#{lib_path('zebra')}"
       gem "foo", :git => "#{lib_path('foo')}"
+      gem "activesupport", "2.3.5"
     G
   end
 
   describe "with no arguments" do
-    it "returns list of outdated gems" do
+    it "returns a sorted list of outdated gems" do
       update_repo2 do
         build_gem "activesupport", "3.0"
         update_git "foo", :path => lib_path("foo")
+        update_git "zebra", :path => lib_path("zebra")
       end
 
       bundle "outdated"
+
       out.should include("activesupport (3.0 > 2.3.5)")
       out.should include("foo (1.0")
+
+      # Gem names are one per-line, between "*" and their parenthesized version.
+      gem_list = out.split("\n").map { |g| g[/(?<=\* )(.*)(?= \()/] }.compact
+      gem_list.should == gem_list.sort
     end
   end
 
