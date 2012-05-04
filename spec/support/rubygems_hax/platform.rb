@@ -12,7 +12,7 @@ end
 
 class Object
   if ENV['BUNDLER_SPEC_RUBY_ENGINE']
-    remove_const :RUBY_ENGINE
+    remove_const :RUBY_ENGINE if defined?(RUBY_ENGINE)
     RUBY_ENGINE = ENV['BUNDLER_SPEC_RUBY_ENGINE']
 
     if RUBY_ENGINE == "jruby"

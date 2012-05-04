@@ -69,11 +69,16 @@ module Bundler
     end
 
     def engine
-      RUBY_ENGINE
+      if defined?(RUBY_ENGINE)
+        RUBY_ENGINE
+      else
+        # not defined in ruby 1.8.7
+        "ruby"
+      end
     end
 
     def engine_version
-      case RUBY_ENGINE
+      case engine
       when "ruby"
         RUBY_VERSION
       when "rbx"

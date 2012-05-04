@@ -293,7 +293,7 @@ module Spec
     end
 
     def simulate_ruby_engine(engine, version = "1.6.0")
-      return if engine == RUBY_ENGINE
+      return if engine == local_ruby_engine
 
       old, ENV['BUNDLER_SPEC_RUBY_ENGINE'] = ENV['BUNDLER_SPEC_RUBY_ENGINE'], engine
       old_version, ENV['BUNDLER_SPEC_RUBY_ENGINE_VERSION'] = ENV['BUNDLER_SPEC_RUBY_ENGINE_VERSION'], version
