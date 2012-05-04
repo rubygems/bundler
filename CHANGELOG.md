@@ -8,6 +8,30 @@ Features:
     For instance, if you have a git dependency on rack, you can force
     it to use a local repo with `bundle config local.rack ~/path/to/rack`
   - Cache gemspec loads for performance (@dekellum, #1635)
+  - add --full-index flag to `bundle update` (@fluxx, #1829)
+  - add --quiet flag to `bundle update` (@nashby, #1654)
+  - Add Bundler::GemHelper.gemspec (@knu, #1637)
+  - Graceful handling of Gemfile syntax errors (@koraktor, #1661)
+  - `bundle platform` command
+  - add ruby to DSL, to specify version of ruby
+  - error out if the ruby version doesn't match
+
+Performance:
+
+  - bundle exec shouldn't run Bundler.setup just setting the right rubyopts options is enough (@spastorino, #1598)
+
+Bugfixes:
+
+  - Avoid passing RUBYOPT changes in with_clean_env block (@eric1234, #1604)
+  - Use the same ruby to run subprocesses as is running rake (@brixen)
+
+Documentation:
+
+  - Add :github documentation in DSL (@zofrex, #1848, #1851, #1852)
+  - Add docs for the --no-cache option (@fluxx, #1796)
+  - Add basic documentation for bin_path and bundle_path (@radar)
+  - Add documentation for the run method in Bundler::Installer
+
 
 ## 1.1.3 (March 23, 2012)
 
