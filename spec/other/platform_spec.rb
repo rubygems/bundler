@@ -16,7 +16,7 @@ describe "bundle platform" do
 Your platform is: #{RUBY_PLATFORM}
 
 Your app has gems that work on these platforms:
-ruby
+* ruby
 
 Your Gemfile specifies a Ruby version requirement:
 * ruby #{RUBY_VERSION}
@@ -37,7 +37,7 @@ G
 Your platform is: #{RUBY_PLATFORM}
 
 Your app has gems that work on these platforms:
-ruby
+* ruby
 
 Your Gemfile does not specify a Ruby version requirement.
 G
@@ -57,7 +57,7 @@ G
 Your platform is: #{RUBY_PLATFORM}
 
 Your app has gems that work on these platforms:
-ruby
+* ruby
 
 Your Gemfile specifies a Ruby version requirement:
 * ruby #{not_local_ruby_version}

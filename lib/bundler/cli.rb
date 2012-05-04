@@ -630,7 +630,7 @@ module Bundler
     method_option "ruby", :type => :boolean, :default => false, :banner =>
       "only display ruby related platform information"
     def platform
-      platforms    = Bundler.definition.platforms
+      platforms    = Bundler.definition.platforms.map {|p| "* #{p}" }
       ruby_version = Bundler.definition.ruby_version
       output       = []
 
