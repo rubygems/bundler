@@ -1,9 +1,9 @@
 module Bundler
   class Settings
     def initialize(root)
-      @root   = root
-      @local_config = File.exist?(local_config_file) ? YAML.load_file(local_config_file) : {}
-      @global_config = File.exist?(global_config_file) ? YAML.load_file(global_config_file) : {}
+      @root          = root
+      @local_config  = (File.exist?(local_config_file) && yaml = YAML.load_file(local_config_file)) ? yaml : {}
+      @global_config = (File.exist?(global_config_file) && yaml = YAML.load_file(global_config_file)) ? yaml : {}
     end
 
     def [](key)
@@ -14,6 +14,8 @@ module Bundler
     def []=(key, value)
       set_key(key, value, @local_config, local_config_file)
     end
+
+    alias :set_local :[]=
 
     def delete(key)
       @local_config.delete(key_for(key))
@@ -32,9 +34,19 @@ module Bundler
       end
     end
 
-    def locations(key)
-      locations = {}
+    def local_overrides
+      repos = {}
+      all.each do |k|
+        if k =~ /^local\./
+          repos[$'] = self[k]
+        end
+      end
+      repos
+    end
 
+    def locations(key)
+      key = key_for(key)
+      locations = {}
       locations[:local]  = @local_config[key] if @local_config.key?(key)
       locations[:env]    = ENV[key] if ENV[key]
       locations[:global] = @global_config[key] if @global_config.key?(key)
@@ -71,8 +83,9 @@ module Bundler
 
     # @local_config["BUNDLE_PATH"] should be prioritized over ENV["BUNDLE_PATH"]
     def path
-      path = ENV[key_for(:path)] || @global_config[key_for(:path)]
-      return path if path && !@local_config.key?(key_for(:path))
+      key  = key_for(:path)
+      path = ENV[key] || @global_config[key]
+      return path if path && !@local_config.key?(key)
 
       if path = self[:path]
         "#{path}/#{Bundler.ruby_scope}"

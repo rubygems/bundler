@@ -1,3 +1,5 @@
+require "set"
+
 module Bundler
   class Index
     include Enumerable
@@ -41,9 +43,15 @@ module Bundler
     # about, returning all of the results.
     def search(query, base = nil)
       results = local_search(query, base)
+      seen = Set.new(results.map { |spec| [spec.name, spec.version, spec.platform] })
+
       @sources.each do |source|
-        results += source.search(query, base)
+        source.search(query, base).each do |spec|
+          results << spec unless seen.include?([spec.name, spec.version, spec.platform])
+          seen << [spec.name, spec.version, spec.platform]
+        end
       end
+
       results
     end
 
@@ -109,8 +117,9 @@ module Bundler
     end
 
     def ==(o)
-      all? do |s|
-        s2 = o[s].first and (s.dependencies & s2.dependencies).empty?
+      all? do |spec|
+        other_spec = o[spec].first
+        (spec.dependencies & other_spec.dependencies).empty? && spec.source == other_spec.source
       end
     end
 

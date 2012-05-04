@@ -4,7 +4,7 @@ require "rubygems/installer"
 require "rubygems/spec_fetcher"
 require "rubygems/format"
 require "digest/sha1"
-require "open3"
+require "fileutils"
 
 module Bundler
   module Source
@@ -127,11 +127,15 @@ module Bundler
         @remotes << normalize_uri(source)
       end
 
-      def merge_remotes(source)
+      def replace_remotes(source)
+        return false if source.remotes == @remotes
+
         @remotes = []
         source.remotes.each do |r|
           add_remote r.to_s
         end
+
+        true
       end
 
     private
@@ -260,12 +264,37 @@ module Bundler
           Bundler.rubygems.sources = old
         end
       end
-
     end
 
+
     class Path
-      attr_reader :path, :options
-      # Kind of a hack, but needed for the lock file parser
+      class Installer < Bundler::GemInstaller
+        def initialize(spec, options = {})
+          @spec              = spec
+          @bin_dir           = Bundler.requires_sudo? ? "#{Bundler.tmp}/bin" : "#{Bundler.rubygems.gem_dir}/bin"
+          @gem_dir           = Bundler.rubygems.path(spec.full_gem_path)
+          @wrappers          = options[:wrappers] || true
+          @env_shebang       = options[:env_shebang] || true
+          @format_executable = options[:format_executable] || false
+        end
+
+        def generate_bin
+          return if spec.executables.nil? || spec.executables.empty?
+
+          if Bundler.requires_sudo?
+            FileUtils.mkdir_p("#{Bundler.tmp}/bin") unless File.exist?("#{Bundler.tmp}/bin")
+          end
+          super
+          if Bundler.requires_sudo?
+            Bundler.mkdir_p "#{Bundler.rubygems.gem_dir}/bin"
+            spec.executables.each do |exe|
+              Bundler.sudo "cp -R #{Bundler.tmp}/bin/#{exe} #{Bundler.rubygems.gem_dir}/bin/"
+            end
+          end
+        end
+      end
+
+      attr_reader   :path, :options
       attr_writer   :name
       attr_accessor :version
 
@@ -283,8 +312,12 @@ module Bundler
           @path = @path.expand_path(Bundler.root) unless @path.relative?
         end
 
-        @name = options["name"]
+        @name    = options["name"]
         @version = options["version"]
+
+        # Stores the original path. If at any point we move to the
+        # cached directory, we still have the original path to copy from.
+        @original_path = @path
       end
 
       def remote!
@@ -326,9 +359,46 @@ module Bundler
         File.basename(path.expand_path(Bundler.root).to_s)
       end
 
+      def install(spec)
+        Bundler.ui.info "Using #{spec.name} (#{spec.version}) from #{to_s} "
+        # Let's be honest, when we're working from a path, we can't
+        # really expect native extensions to work because the whole point
+        # is to just be able to modify what's in that path and go. So, let's
+        # not put ourselves through the pain of actually trying to generate
+        # the full gem.
+        Installer.new(spec).generate_bin
+      end
+
+      def cache(spec)
+        return unless Bundler.settings[:cache_all]
+        return if @original_path.expand_path(Bundler.root).to_s.index(Bundler.root.to_s) == 0
+        FileUtils.rm_rf(app_cache_path)
+        FileUtils.cp_r("#{@original_path}/.", app_cache_path)
+      end
+
+      def local_specs(*)
+        @local_specs ||= load_spec_files
+      end
+
+      def specs
+        if has_app_cache?
+          @path = app_cache_path
+        end
+        local_specs
+      end
+
+    private
+
+      def app_cache_path
+        @app_cache_path ||= Bundler.app_cache.join(name)
+      end
+
+      def has_app_cache?
+        SharedHelpers.in_bundle? && app_cache_path.exist?
+      end
+
       def load_spec_files
         index = Index.new
-
         expanded_path = path.expand_path(Bundler.root)
 
         if File.directory?(expanded_path)
@@ -364,61 +434,10 @@ module Bundler
         index
       end
 
-      def local_specs(*)
-        @local_specs ||= load_spec_files
-      end
-
-      class Installer < Bundler::GemInstaller
-        def initialize(spec, options = {})
-          @spec              = spec
-          @bin_dir           = Bundler.requires_sudo? ? "#{Bundler.tmp}/bin" : "#{Bundler.rubygems.gem_dir}/bin"
-          @gem_dir           = Bundler.rubygems.path(spec.full_gem_path)
-          @wrappers          = options[:wrappers] || true
-          @env_shebang       = options[:env_shebang] || true
-          @format_executable = options[:format_executable] || false
-        end
-
-        def generate_bin
-          return if spec.executables.nil? || spec.executables.empty?
-
-          if Bundler.requires_sudo?
-            FileUtils.mkdir_p("#{Bundler.tmp}/bin") unless File.exist?("#{Bundler.tmp}/bin")
-          end
-          super
-          if Bundler.requires_sudo?
-            Bundler.mkdir_p "#{Bundler.rubygems.gem_dir}/bin"
-            spec.executables.each do |exe|
-              Bundler.sudo "cp -R #{Bundler.tmp}/bin/#{exe} #{Bundler.rubygems.gem_dir}/bin/"
-            end
-          end
-        end
-      end
-
-      def install(spec)
-        Bundler.ui.info "Using #{spec.name} (#{spec.version}) from #{to_s} "
-        # Let's be honest, when we're working from a path, we can't
-        # really expect native extensions to work because the whole point
-        # is to just be able to modify what's in that path and go. So, let's
-        # not put ourselves through the pain of actually trying to generate
-        # the full gem.
-        Installer.new(spec).generate_bin
-      end
-
-      alias specs local_specs
-
-      def cache(spec)
-        unless path.expand_path(Bundler.root).to_s.index(Bundler.root.to_s) == 0
-          Bundler.ui.warn "  * #{spec.name} at `#{path}` will not be cached."
-        end
-      end
-
-    private
-
       def relative_path
-        if path.to_s.match(%r{^#{Bundler.root.to_s}})
+        if path.to_s.match(%r{^#{Regexp.escape Bundler.root.to_s}})
           return path.relative_path_from(Bundler.root)
         end
-
         path
       end
 
@@ -438,7 +457,7 @@ module Bundler
 
         gem_file = Dir.chdir(gem_dir){ Gem::Builder.new(spec).build }
 
-        installer = Installer.new(spec, :env_shebang => false)
+        installer = Path::Installer.new(spec, :env_shebang => false)
         run_hooks(:pre_install, installer)
         installer.build_extensions
         run_hooks(:post_build, installer)
@@ -468,27 +487,169 @@ module Bundler
           if result == false
             location = " at #{$1}" if hook.inspect =~ /@(.*:\d+)/
             message = "#{type} hook#{location} failed for #{installer.spec.full_name}"
-            raise Gem::InstallError, message
+            raise InstallHookError, message
           end
         end
       end
     end
 
     class Git < Path
+      # The GitProxy is responsible to iteract with git repositories.
+      # All actions required by the Git source is encapsualted in this
+      # object.
+      class GitProxy
+        attr_accessor :path, :uri, :ref, :revision
+
+        def initialize(path, uri, ref, revision=nil, &allow)
+          @path     = path
+          @uri      = uri
+          @ref      = ref
+          @revision = revision
+          @allow    = allow || Proc.new { true }
+        end
+
+        def revision
+          @revision ||= allowed_in_path { git("rev-parse #{ref}").strip }
+        end
+
+        def branch
+          @branch ||= allowed_in_path do
+            git("branch") =~ /^\* (.*)$/ && $1.strip
+          end
+        end
+
+        def contains?(commit)
+          allowed_in_path do
+            result = git_null("branch --contains #{commit}")
+            $? == 0 && result =~ /^\* (.*)$/
+          end
+        end
+
+        def checkout
+          if path.exist?
+            return if has_revision_cached?
+            Bundler.ui.info "Updating #{uri}"
+            in_path do
+              git %|fetch --force --quiet --tags #{uri_escaped} "refs/heads/*:refs/heads/*"|
+            end
+          else
+            Bundler.ui.info "Fetching #{uri}"
+            FileUtils.mkdir_p(path.dirname)
+            git %|clone #{uri_escaped} "#{path}" --bare --no-hardlinks|
+          end
+        end
+
+        def copy_to(destination, submodules=false)
+          unless File.exist?(destination.join(".git"))
+            FileUtils.mkdir_p(destination.dirname)
+            FileUtils.rm_rf(destination)
+            git %|clone --no-checkout "#{path}" "#{destination}"|
+            File.chmod((0777 & ~File.umask), destination)
+          end
+
+          Dir.chdir(destination) do
+            git %|fetch --force --quiet --tags "#{path}"|
+            git "reset --hard #{@revision}"
+
+            if submodules
+              git "submodule init"
+              git "submodule update"
+            end
+          end
+        end
+
+      private
+
+        # TODO: Do not rely on /dev/null.
+        # Given that open3 is not cross platform until Ruby 1.9.3,
+        # the best solution is to pipe to /dev/null if it exists.
+        # If it doesn't, everything will work fine, but the user
+        # will get the $stderr messages as well.
+        def git_null(command)
+          if !Bundler::WINDOWS && File.exist?("/dev/null")
+            git("#{command} 2>/dev/null", false)
+          else
+            git(command, false)
+          end
+        end
+
+        def git(command, check_errors=true)
+          if allow?
+            out = %x{git #{command}}
+
+            if check_errors && $?.exitstatus != 0
+              msg = "Git error: command `git #{command}` in directory #{Dir.pwd} has failed."
+              msg << "\nIf this error persists you could try removing the cache directory '#{path}'" if path.exist?
+              raise GitError, msg
+            end
+            out
+          else
+            raise GitError, "Bundler is trying to run a `git #{command}` at runtime. You probably need to run `bundle install`. However, " \
+                            "this error message could probably be more useful. Please submit a ticket at http://github.com/carlhuda/bundler/issues " \
+                            "with steps to reproduce as well as the following\n\nCALLER: #{caller.join("\n")}"
+          end
+        end
+
+        def has_revision_cached?
+          return unless @revision
+          in_path { git("cat-file -e #{@revision}") }
+          true
+        rescue GitError
+          false
+        end
+
+        # Escape the URI for git commands
+        def uri_escaped
+          if Bundler::WINDOWS
+            # Windows quoting requires double quotes only, with double quotes
+            # inside the string escaped by being doubled.
+            '"' + uri.gsub('"') {|s| '""'} + '"'
+          else
+            # Bash requires single quoted strings, with the single quotes escaped
+            # by ending the string, escaping the quote, and restarting the string.
+            "'" + uri.gsub("'") {|s| "'\\''"} + "'"
+          end
+        end
+
+        def allow?
+          @allow.call
+        end
+
+        def in_path(&blk)
+          checkout unless path.exist?
+          Dir.chdir(path, &blk)
+        end
+
+        def allowed_in_path
+          if allow?
+            in_path { yield }
+          else
+            raise GitError, "The git source #{uri} is not yet checked out. Please run `bundle install` before trying to start your application"
+          end
+        end
+      end
+
       attr_reader :uri, :ref, :options, :submodules
 
       def initialize(options)
-        super
+        @options = options
+        @glob = options["glob"] || DEFAULT_GLOB
 
-        # stringify options that could be set as symbols
+        @allow_cached = false
+        @allow_remote = false
+
+        # Stringify options that could be set as symbols
         %w(ref branch tag revision).each{|k| options[k] = options[k].to_s if options[k] }
 
         @uri        = options["uri"]
         @ref        = options["ref"] || options["branch"] || options["tag"] || 'master'
-        @revision   = options["revision"]
         @submodules = options["submodules"]
+        @name       = options["name"]
+        @version    = options["version"]
+
         @update     = false
         @installed  = nil
+        @local      = false
       end
 
       def self.from_lock(options)
@@ -518,15 +679,21 @@ module Bundler
       alias == eql?
 
       def to_s
-        sref = options["ref"] ? shortref_for_display(options["ref"]) : ref
-        "#{uri} (at #{sref})"
+        at = if local?
+          path
+        elsif options["ref"]
+          shortref_for_display(options["ref"])
+        else
+          ref
+        end
+        "#{uri} (at #{at})"
       end
 
       def name
         File.basename(@uri, '.git')
       end
 
-      def path
+      def install_path
         @install_path ||= begin
           git_scope = "#{base_name}-#{shortref_for_path(revision)}"
 
@@ -538,30 +705,84 @@ module Bundler
         end
       end
 
+      alias :path :install_path
+
       def unlock!
-        @revision = nil
+        git_proxy.revision = nil
+      end
+
+      def local_override!(path)
+        return false if local?
+
+        path = Pathname.new(path)
+        path = path.expand_path(Bundler.root) unless path.relative?
+
+        unless options["branch"]
+          raise GitError, "Cannot use local override for #{name} at #{path} because " \
+            ":branch is not specified in Gemfile. Specify a branch or check " \
+            "`bundle config --delete` to remove the local override"
+        end
+
+        unless path.exist?
+          raise GitError, "Cannot use local override for #{name} because #{path} " \
+            "does not exist. Check `bundle config --delete` to remove the local override"
+        end
+
+        set_local!(path)
+
+        # Create a new git proxy without the cached revision
+        # so the Gemfile.lock always picks up the new revision.
+        @git_proxy = GitProxy.new(path, uri, ref)
+
+        if git_proxy.branch != options["branch"]
+          raise GitError, "Local override for #{name} at #{path} is using branch " \
+            "#{git_proxy.branch} but Gemfile specifies #{options["branch"]}"
+        end
+
+        changed = cached_revision && cached_revision != git_proxy.revision
+
+        if changed && !git_proxy.contains?(cached_revision)
+          raise GitError, "The Gemfile lock is pointing to revision #{shortref_for_display(cached_revision)} " \
+            "but the current branch in your local override for #{name} does not contain such commit. " \
+            "Please make sure your branch is up to date."
+        end
+
+        changed
       end
 
       # TODO: actually cache git specs
       def specs(*)
-        if allow_git_ops? && !@update
-          # Start by making sure the git cache is up to date
-          cache
-          checkout
+        if has_app_cache? && !local?
+          set_local!(app_cache_path)
+        end
+
+        if requires_checkout? && !@update
+          git_proxy.checkout
+          git_proxy.copy_to(install_path, submodules)
           @update = true
         end
+
         local_specs
       end
 
       def install(spec)
         Bundler.ui.info "Using #{spec.name} (#{spec.version}) from #{to_s} "
-
-        unless @installed
+        if requires_checkout? && !@installed
           Bundler.ui.debug "  * Checking out revision: #{ref}"
-          checkout if allow_git_ops?
+          git_proxy.copy_to(install_path, submodules)
           @installed = true
         end
         generate_bin(spec)
+      end
+
+      def cache(spec)
+        return unless Bundler.settings[:cache_all]
+        return if path.expand_path(Bundler.root).to_s.index(Bundler.root.to_s) == 0
+        cached!
+        FileUtils.rm_rf(app_cache_path)
+        git_proxy.checkout if requires_checkout?
+        git_proxy.copy_to(app_cache_path, @submodules)
+        FileUtils.rm_rf(app_cache_path.join(".git"))
       end
 
       def load_spec_files
@@ -581,23 +802,29 @@ module Bundler
           end
         end
       end
+
     private
 
-      def git(command)
-        if allow_git_ops?
-          out = %x{git #{command}}
+      def set_local!(path)
+        @local       = true
+        @local_specs = @git_proxy = nil
+        @cache_path  = @install_path = path
+      end
 
-          if $?.exitstatus != 0
-            msg = "Git error: command `git #{command}` in directory #{Dir.pwd} has failed."
-            msg << "\nIf this error persists you could try removing the cache directory '#{cache_path}'" if cached?
-            raise GitError, msg
-          end
-          out
-        else
-          raise GitError, "Bundler is trying to run a `git #{command}` at runtime. You probably need to run `bundle install`. However, " \
-                          "this error message could probably be more useful. Please submit a ticket at http://github.com/carlhuda/bundler/issues " \
-                          "with steps to reproduce as well as the following\n\nCALLER: #{caller.join("\n")}"
-        end
+      def has_app_cache?
+        cached_revision && super
+      end
+
+      def app_cache_path
+        @app_cache_path ||= Bundler.app_cache.join("#{base_name}-#{shortref_for_path(cached_revision || revision)}")
+      end
+
+      def local?
+        @local
+      end
+
+      def requires_checkout?
+        allow_git_ops? && !local?
       end
 
       def base_name
@@ -624,82 +851,25 @@ module Bundler
         Digest::SHA1.hexdigest(input)
       end
 
-      # Escape the URI for git commands
-      def uri_escaped
-        if Bundler::WINDOWS
-          # Windows quoting requires double quotes only, with double quotes
-          # inside the string escaped by being doubled.
-          '"' + uri.gsub('"') {|s| '""'} + '"'
-        else
-          # Bash requires single quoted strings, with the single quotes escaped
-          # by ending the string, escaping the quote, and restarting the string.
-          "'" + uri.gsub("'") {|s| "'\\''"} + "'"
-        end
-      end
-
-      def cache
-        if cached?
-          return if has_revision_cached?
-          Bundler.ui.info "Updating #{uri}"
-          in_cache do
-            git %|fetch --force --quiet --tags #{uri_escaped} "refs/heads/*:refs/heads/*"|
-          end
-        else
-          Bundler.ui.info "Fetching #{uri}"
-          FileUtils.mkdir_p(cache_path.dirname)
-          git %|clone #{uri_escaped} "#{cache_path}" --bare --no-hardlinks|
-        end
-      end
-
-      def checkout
-        unless File.exist?(path.join(".git"))
-          FileUtils.mkdir_p(path.dirname)
-          FileUtils.rm_rf(path)
-          git %|clone --no-checkout "#{cache_path}" "#{path}"|
-          File.chmod((0777 & ~File.umask), path)
-        end
-        Dir.chdir(path) do
-          git %|fetch --force --quiet --tags "#{cache_path}"|
-          git "reset --hard #{revision}"
-
-          if @submodules
-            git "submodule init"
-            git "submodule update"
-          end
-        end
-      end
-
-      def has_revision_cached?
-        return unless @revision
-        in_cache { git %|cat-file -e #{@revision}| }
-        true
-      rescue GitError
-        false
-      end
-
       def allow_git_ops?
         @allow_remote || @allow_cached
       end
 
+      def cached_revision
+        options["revision"]
+      end
+
       def revision
-        @revision ||= begin
-          if allow_git_ops?
-            in_cache { git("rev-parse #{ref}").strip }
-          else
-            raise GitError, "The git source #{uri} is not yet checked out. Please run `bundle install` before trying to start your application"
-          end
-        end
+        git_proxy.revision
       end
 
       def cached?
         cache_path.exist?
       end
 
-      def in_cache(&blk)
-        cache unless cached?
-        Dir.chdir(cache_path, &blk)
+      def git_proxy
+        @git_proxy ||= GitProxy.new(cache_path, uri, ref, cached_revision){ allow_git_ops? }
       end
     end
-
   end
 end

@@ -133,8 +133,10 @@ module Bundler
       begin
         Bundler.ui.debug "Fetching from: #{uri}"
         response = @@connection.request(uri)
-      rescue SocketError, Timeout::Error, Net::HTTP::Persistent::Error
-        raise Bundler::HTTPError, "Network error while fetching #{uri}"
+      rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, EOFError,
+             SocketError, Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError,
+             Net::HTTP::Persistent::Error, Net::ProtocolError => e
+        raise HTTPError, "Network error while fetching #{uri}"
       end
 
       case response
@@ -156,7 +158,8 @@ module Bundler
     # fetch from Gemcutter Dependency Endpoint API
     def fetch_dependency_remote_specs(gem_names)
       Bundler.ui.debug "Query Gemcutter Dependency Endpoint API: #{gem_names.join(' ')}"
-      uri = URI.parse("#{@remote_uri}api/v1/dependencies?gems=#{gem_names.join(",")}")
+      encoded_gem_names = URI.encode(gem_names.join(","))
+      uri = URI.parse("#{@remote_uri}api/v1/dependencies?gems=#{encoded_gem_names}")
       marshalled_deps = fetch(uri)
       gem_list = Marshal.load(marshalled_deps)
       deps_list = []
@@ -172,7 +175,8 @@ module Bundler
               raise GemspecError, %{Unfortunately, the gem #{s[:name]} (#{s[:number]}) } +
                 %{has an invalid gemspec. As a result, Bundler cannot install this Gemfile. } +
                 %{Please ask the gem author to yank the bad version to fix this issue. For } +
-                %{more information, see http://bit.ly/syck-defaultkey.}
+                %{more information, see http://bit.ly/syck-defaultkey. For a temporary } +
+                %{workaround try using the --full-index option.}
             else
               raise e
             end

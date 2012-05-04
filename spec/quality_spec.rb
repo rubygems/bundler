@@ -1,6 +1,6 @@
 require "spec_helper"
 
-if defined?(Encoding)
+if defined?(Encoding) && Encoding.default_external != "UTF-8"
   Encoding.default_external = "UTF-8"
 end
 

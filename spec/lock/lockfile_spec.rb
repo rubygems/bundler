@@ -670,6 +670,76 @@ describe "the lockfile format" do
 
   end
 
+  # Some versions of the Bundler 1.1 RC series introduced corrupted
+  # lockfiles. There were two major problems:
+  #
+  # * multiple copies of the same GIT section appeared in the lockfile
+  # * when this happened, those sections got multiple copies of gems
+  #   in those sections.
+  it "fix corrupted lockfiles" do
+    build_git "omg", :path => lib_path('omg')
+    revision = revision_for(lib_path('omg'))
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "omg", :git => "#{lib_path('omg')}", :branch => 'master'
+    G
+
+    bundle "install --path vendor"
+    should_be_installed "omg 1.0"
+
+    # Create a Gemfile.lock that has duplicate GIT sections
+    lockfile <<-L
+      GIT
+        remote: #{lib_path('omg')}
+        revision: #{revision}
+        branch: master
+        specs:
+          omg (1.0)
+
+      GIT
+        remote: #{lib_path('omg')}
+        revision: #{revision}
+        branch: master
+        specs:
+          omg (1.0)
+
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+
+      PLATFORMS
+        #{local}
+
+      DEPENDENCIES
+        omg!
+    L
+
+    FileUtils.rm_rf(bundled_app('vendor'))
+    bundle "install"
+    should_be_installed "omg 1.0"
+
+    # Confirm that duplicate specs do not appear
+    File.read(bundled_app('Gemfile.lock')).should == strip_whitespace(<<-L)
+      GIT
+        remote: #{lib_path('omg')}
+        revision: #{revision}
+        branch: master
+        specs:
+          omg (1.0)
+
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+
+      PLATFORMS
+        #{local}
+
+      DEPENDENCIES
+        omg!
+    L
+  end
+
   describe "line endings" do
     def set_lockfile_mtime_to_known_value
       time = Time.local(2000, 1, 1, 0, 0, 0)

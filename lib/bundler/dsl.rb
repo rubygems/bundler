@@ -4,11 +4,18 @@ module Bundler
   class Dsl
     def self.evaluate(gemfile, lockfile, unlock)
       builder = new
-      builder.instance_eval(Bundler.read_file(gemfile.to_s), gemfile.to_s, 1)
+      builder.eval_gemfile(gemfile)
       builder.to_definition(lockfile, unlock)
+    rescue ScriptError, RegexpError, NameError, ArgumentError => e
+      e.backtrace[0] = "#{e.backtrace[0]}: #{e.message} (#{e.class})"
+      Bundler.ui.info e.backtrace.join("\n       ")
+      raise GemfileError, "There was an error in your Gemfile," \
+        " and Bundler cannot continue."
     end
 
     VALID_PLATFORMS = Bundler::Dependency::PLATFORM_MAP.keys.freeze
+
+    attr_accessor :dependencies
 
     def initialize
       @rubygems_source = Source::Rubygems.new
@@ -18,9 +25,15 @@ module Bundler
       @groups          = []
       @platforms       = []
       @env             = nil
+      @ruby_version    = nil
     end
 
-    attr_accessor :dependencies
+    def eval_gemfile(gemfile)
+      instance_eval(Bundler.read_file(gemfile.to_s), gemfile.to_s, 1)
+    rescue SyntaxError => e
+      bt = e.message.split("\n")[1..-1]
+      raise GemfileError, ["Gemfile syntax error:", *bt].join("\n")
+    end
 
     def gemspec(opts = nil)
       path              = opts && opts[:path] || '.'
@@ -54,7 +67,6 @@ module Bundler
       options = Hash === args.last ? args.pop : {}
       version = args || [">= 0"]
 
-      _deprecated_options(options)
       _normalize_options(name, version, options)
 
       dep = Dependency.new(name, version, options)
@@ -99,7 +111,11 @@ module Bundler
         return
       else
         @source = source
-        options[:prepend] ? @sources.unshift(@source) : @sources << @source
+        if options[:prepend]
+          @sources = [@source] | @sources
+        else
+          @sources = @sources | [@source]
+        end
 
         yield if block_given?
         return @source
@@ -129,7 +145,7 @@ module Bundler
 
     def to_definition(lockfile, unlock)
       @sources << @rubygems_source unless @sources.include?(@rubygems_source)
-      Definition.new(lockfile, @dependencies, @sources, unlock)
+      Definition.new(lockfile, @dependencies, @sources, unlock, @ruby_version)
     end
 
     def group(*args, &blk)
@@ -154,19 +170,18 @@ module Bundler
       @env = old
     end
 
-    # Deprecated methods
+    def ruby(ruby_version, options = {})
+      raise GemfileError, "Please define :engine_version" if options[:engine] && options[:engine_version].nil?
+      raise GemfileError, "Please define :engine" if options[:engine_version] && options[:engine].nil?
 
-    def self.deprecate(name, replacement = nil)
-      define_method(name) do |*|
-        message = "'#{name}' has been removed from the Gemfile DSL, "
-        if replacement
-          message << "and has been replaced with '#{replacement}'."
-        else
-          message << "and is no longer supported."
-        end
-        message << "\nSee the README for more information on upgrading from Bundler 0.8."
-        raise DeprecatedError, message
-      end
+      raise GemfileError, "ruby_version must match the :engine_version for MRI" if options[:engine] == "ruby" && options[:engine_version] && ruby_version != options[:engine_version]
+      @ruby_version = RubyVersion.new(ruby_version, options[:engine], options[:engine_version])
+    end
+
+    def method_missing(name, *args)
+      location = caller[0].split(':')[0..1].join(':')
+      raise GemfileError, "Undefined local variable or method `#{name}' for Gemfile\n" \
+        "        from #{location}"
     end
 
   private
@@ -185,7 +200,8 @@ module Bundler
     def _normalize_options(name, version, opts)
       _normalize_hash(opts)
 
-      invalid_keys = opts.keys - %w(group groups git github path name branch ref tag require submodules platform platforms type)
+      valid_keys = %w(group groups git github path name branch ref tag require submodules platform platforms type)
+      invalid_keys = opts.keys - valid_keys
       if invalid_keys.any?
         plural = invalid_keys.size > 1
         message = "You passed #{invalid_keys.map{|k| ':'+k }.join(", ")} "
@@ -194,6 +210,8 @@ module Bundler
         else
           message << "as an option for gem '#{name}', but it is invalid."
         end
+
+        message << " Valid options are: #{valid_keys.join(", ")}"
         raise InvalidOption, message
       end
 
@@ -234,7 +252,5 @@ module Bundler
       opts["group"]     = groups
     end
 
-    def _deprecated_options(options)
-    end
   end
 end

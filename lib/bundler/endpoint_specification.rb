@@ -53,6 +53,15 @@ module Bundler
       end
     end
 
+    # needed for post_install_messages during install
+    def post_install_message
+      if @remote_specification
+        @remote_specification.post_install_message
+      elsif _local_specification
+        _local_specification.post_install_message
+      end
+    end
+
     def _local_specification
       eval(File.read(local_specification_path)) if @loaded_from && File.exists?(local_specification_path)
     end

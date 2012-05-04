@@ -103,7 +103,9 @@ module Bundler
 
       Bundler.settings[:path] = File.expand_path(options[:path]) if options[:path]
       begin
-        not_installed = Bundler.definition.missing_specs
+        definition = Bundler.definition
+        definition.validate_ruby!
+        not_installed = definition.missing_specs
       rescue GemNotFound, VersionConflict
         Bundler.ui.error "Your Gemfile's dependencies could not be satisfied"
         Bundler.ui.warn  "Install missing gems with `bundle install`"
@@ -221,7 +223,9 @@ module Bundler
       # rubygems plugins sometimes hook into the gem install process
       Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins)
 
-      Installer.install(Bundler.root, Bundler.definition, opts)
+      definition = Bundler.definition
+      definition.validate_ruby!
+      Installer.install(Bundler.root, definition, opts)
       Bundler.load.cache if Bundler.root.join("vendor/cache").exist? && !options["no-cache"]
 
       if Bundler.settings[:path]
@@ -244,7 +248,9 @@ module Bundler
       end
 
       if Bundler.definition.no_sources?
-        Bundler.ui.warn "Your Gemfile doesn't have any sources. You can add one with a line like 'source :rubygems'"
+        Bundler.ui.warn "Your Gemfile has no remote sources. If you need " \
+          "gems that are not already on\nyour machine, add a line like this " \
+          "to your Gemfile:\n    source 'https://rubygems.org'"
       end
       raise e
     end
@@ -258,8 +264,13 @@ module Bundler
     method_option "source", :type => :array, :banner => "Update a specific source (and all gems associated with it)"
     method_option "local", :type => :boolean, :banner =>
       "Do not attempt to fetch gems remotely and use the gem cache instead"
+    method_option "quiet", :type => :boolean, :banner =>
+      "Only output warnings and errors."
+    method_option "full-index", :type => :boolean, :banner =>
+        "Use the rubygems modern index instead of the API endpoint"
     def update(*gems)
       sources = Array(options[:source])
+      Bundler.ui.be_quiet! if options[:quiet]
 
       if gems.empty? && sources.empty?
         # We're doing a full update
@@ -268,10 +279,13 @@ module Bundler
         Bundler.definition(:gems => gems, :sources => sources)
       end
 
+      Bundler::Fetcher.disable_endpoint = options["full-index"]
+
       opts = {"update" => true, "local" => options[:local]}
       # rubygems plugins sometimes hook into the gem install process
       Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins)
 
+      Bundler.definition.validate_ruby!
       Installer.install Bundler.root, Bundler.definition, opts
       Bundler.load.cache if Bundler.root.join("vendor/cache").exist?
       clean if Bundler.settings[:clean] && Bundler.settings[:path]
@@ -287,6 +301,7 @@ module Bundler
     method_option "paths", :type => :boolean,
       :banner => "List the paths of all gems that are required by your Gemfile."
     def show(gem_name = nil)
+      Bundler.definition.validate_ruby!
       Bundler.load.lock
 
       if gem_name
@@ -316,6 +331,7 @@ module Bundler
       "Do not attempt to fetch gems remotely and use the gem cache instead"
     def outdated(*gems)
       sources = Array(options[:source])
+      Bundler.definition.validate_ruby!
       current_specs = Bundler.load.specs
 
       if gems.empty? && sources.empty?
@@ -364,8 +380,11 @@ module Bundler
 
     desc "cache", "Cache all the gems to vendor/cache", :hide => true
     method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
+    method_option "all",  :type => :boolean, :banner => "Include all sources (including path and git)."
     def cache
+      Bundler.definition.validate_ruby!
       Bundler.definition.resolve_with_cache!
+      setup_cache_all
       Bundler.load.cache
       Bundler.settings[:no_prune] = true if options["no-prune"]
       Bundler.load.lock
@@ -377,6 +396,7 @@ module Bundler
 
     desc "package", "Locks and then caches all of the gems into vendor/cache"
     method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
+    method_option "all",  :type => :boolean, :banner => "Include all sources (including path and git)."
     long_desc <<-D
       The package command will copy the .gem files for every gem in the bundle into the
       directory ./vendor/cache. If you then check that directory into your source
@@ -384,6 +404,7 @@ module Bundler
       bundle without having to download any additional gems.
     D
     def package
+      setup_cache_all
       install
       # TODO: move cache contents here now that all bundles are locked
       Bundler.load.cache
@@ -399,6 +420,7 @@ module Bundler
     def exec(*)
       ARGV.shift # remove "exec"
 
+      Bundler.definition.validate_ruby!
       Bundler.load.setup_environment
 
       begin
@@ -412,7 +434,7 @@ module Bundler
         Bundler.ui.warn  "Install missing gem executables with `bundle install`"
         exit 127
       rescue ArgumentError
-        Bundler.ui.error "bundle exec needs a command to run"
+        Bundler.ui.error "bundler: exec needs a command to run"
         exit 128
       end
     end
@@ -429,10 +451,17 @@ module Bundler
       will show the current value, as well as any superceded values and
       where they were specified.
     D
-    def config(name = nil, *args)
+    def config(*)
       values = ARGV.dup
       values.shift # remove config
-      values.shift # remove the name
+
+      peek = values.shift
+
+      if peek && peek =~ /^\-\-/
+        name, scope = values.shift, $'
+      else
+        name, scope = peek, "global"
+      end
 
       unless name
         Bundler.ui.confirm "Settings are listed in order of priority. The top value will be used.\n"
@@ -449,29 +478,45 @@ module Bundler
         return
       end
 
-      if values.empty?
-        Bundler.ui.confirm "Settings for `#{name}` in order of priority. The top value will be used"
-        with_padding do
-          Bundler.settings.pretty_values_for(name).each { |line| Bundler.ui.info line }
+      case scope
+      when "delete"
+        Bundler.settings.set_local(name, nil)
+        Bundler.settings.set_global(name, nil)
+      when "local", "global"
+        if values.empty?
+          Bundler.ui.confirm "Settings for `#{name}` in order of priority. The top value will be used"
+          with_padding do
+            Bundler.settings.pretty_values_for(name).each { |line| Bundler.ui.info line }
+          end
+          return
         end
-      else
+
         locations = Bundler.settings.locations(name)
 
-        if local = locations[:local]
-          Bundler.ui.info "Your application has set #{name} to #{local.inspect}. This will override the " \
-            "system value you are currently setting"
+        if scope == "global"
+          if local = locations[:local]
+            Bundler.ui.info "Your application has set #{name} to #{local.inspect}. This will override the " \
+              "global value you are currently setting"
+          end
+
+          if env = locations[:env]
+            Bundler.ui.info "You have a bundler environment variable for #{name} set to #{env.inspect}. " \
+              "This will take precedence over the global value you are setting"
+          end
+
+          if global = locations[:global]
+            Bundler.ui.info "You are replacing the current global value of #{name}, which is currently #{global.inspect}"
+          end
         end
 
-        if global = locations[:global]
-          Bundler.ui.info "You are replacing the current system value of #{name}, which is currently #{global}"
+        if scope == "local" && local = locations[:local]
+          Bundler.ui.info "You are replacing the current local value of #{name}, which is currently #{local.inspect}"
         end
 
-        if env = locations[:env]
-          Bundler.ui.info "You have set a bundler environment variable for #{env}. This will take precedence " \
-            "over the system value you are setting"
-        end
-
-        Bundler.settings.set_global(name, values.join(" "))
+        Bundler.settings.send("set_#{scope}", name, values.join(" "))
+      else
+        Bundler.ui.error "Invalid scope --#{scope} given. Please use --local or --global."
+        exit 1
       end
     end
 
@@ -585,7 +630,52 @@ module Bundler
       end
     end
 
+    desc "platform", "Displays platform compatibility information"
+    method_option "ruby", :type => :boolean, :default => false, :banner =>
+      "only display ruby related platform information"
+    def platform
+      platforms    = Bundler.definition.platforms.map {|p| "* #{p}" }
+      ruby_version = Bundler.definition.ruby_version
+      output       = []
+
+      if options[:ruby]
+        if ruby_version
+          output << ruby_version
+        else
+          output << "No ruby version specified"
+        end
+      else
+        output << "Your platform is: #{RUBY_PLATFORM}"
+        output << "Your app has gems that work on these platforms:\n#{platforms.join("\n")}"
+
+        if ruby_version
+          output << "Your Gemfile specifies a Ruby version requirement:\n* #{ruby_version}"
+
+          begin
+            Bundler.definition.validate_ruby!
+            output << "Your current platform satisfies the Ruby version requirement."
+          rescue RubyVersionMismatch => e
+            output << e.message
+          end
+        else
+          output << "Your Gemfile does not specify a Ruby version requirement."
+        end
+      end
+
+      Bundler.ui.info output.join("\n\n")
+    end
+
   private
+
+    def setup_cache_all
+      if options.key?("all")
+        Bundler.settings[:cache_all] = options[:all] || nil
+      elsif Bundler.definition.sources.any? { |s| !s.is_a?(Source::Rubygems) }
+        Bundler.ui.warn "Your Gemfile contains path and git dependencies. If you want "    \
+          "to package them as well, please pass the --all flag. This will be the default " \
+          "on Bundler 2.0."
+      end
+    end
 
     def have_groff?
       !(`which groff` rescue '').empty?

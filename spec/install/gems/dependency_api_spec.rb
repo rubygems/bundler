@@ -14,6 +14,16 @@ describe "gemcutter's dependency API" do
     should_be_installed "rack 1.0.0"
   end
 
+  it "should URI encode gem names" do
+    gemfile <<-G
+      source "#{source_uri}"
+      gem " sinatra"
+    G
+
+    bundle :install, :artifice => "endpoint"
+    out.should include("Could not find gem ' sinatra")
+  end
+
   it "should handle nested dependencies" do
     gemfile <<-G
       source "#{source_uri}"
@@ -148,15 +158,28 @@ describe "gemcutter's dependency API" do
     out.should match(/Too many redirects/)
   end
 
-  it "should use the modern index when the --full-index" do
-    gemfile <<-G
-      source "#{source_uri}"
-      gem "rack"
-    G
+  context "when --full-index is specified" do
+    it "should use the modern index for install" do
+      gemfile <<-G
+        source "#{source_uri}"
+        gem "rack"
+      G
 
-    bundle "install --full-index", :artifice => "endpoint"
-    out.should include("Fetching source index from #{source_uri}")
-    should_be_installed "rack 1.0.0"
+      bundle "install --full-index", :artifice => "endpoint"
+      out.should include("Fetching source index from #{source_uri}")
+      should_be_installed "rack 1.0.0"
+    end
+
+    it "should use the modern index for update" do
+      gemfile <<-G
+        source "#{source_uri}"
+        gem "rack"
+      G
+
+      bundle "update --full-index", :artifice => "endpoint"
+      out.should include("Fetching source index from #{source_uri}")
+      should_be_installed "rack 1.0.0"
+    end
   end
 
   it "fetches again when more dependencies are found in subsequent sources" do
@@ -310,6 +333,27 @@ OUTPUT
     bundle "install --path vendor/bundle --no-clean", :artifice => "endpoint"
 
     vendored_gems("bin/rackup").should exist
+  end
+
+  it "prints post_install_messages" do
+    gemfile <<-G
+      source "#{source_uri}"
+      gem 'rack-obama'
+    G
+
+    bundle :install, :artifice => "endpoint"
+    out.should include("Post-install message from rack:")
+  end
+
+  it "should display the post install message for a dependency" do
+    gemfile <<-G
+      source "#{source_uri}"
+      gem 'rack_middleware'
+    G
+
+    bundle :install, :artifice => "endpoint"
+    out.should include("Post-install message from rack:")
+    out.should include("Rack's post install message")
   end
 
   context "when using basic authentication" do

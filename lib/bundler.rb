@@ -27,12 +27,14 @@ module Bundler
   autoload :MatchPlatform,         'bundler/match_platform'
   autoload :RemoteSpecification,   'bundler/remote_specification'
   autoload :Resolver,              'bundler/resolver'
+  autoload :RubyVersion,           'bundler/ruby_version'
   autoload :Runtime,               'bundler/runtime'
   autoload :Settings,              'bundler/settings'
   autoload :SharedHelpers,         'bundler/shared_helpers'
   autoload :SpecSet,               'bundler/spec_set'
   autoload :Source,                'bundler/source'
   autoload :Specification,         'bundler/shared_helpers'
+  autoload :SystemRubyVersion,     'bundler/ruby_version'
   autoload :UI,                    'bundler/ui'
 
   class BundlerError < StandardError
@@ -41,18 +43,20 @@ module Bundler
     end
   end
 
-  class GemfileNotFound  < BundlerError; status_code(10) ; end
-  class GemNotFound      < BundlerError; status_code(7)  ; end
-  class GemfileError     < BundlerError; status_code(4)  ; end
-  class InstallError     < BundlerError; status_code(5)  ; end
-  class PathError        < BundlerError; status_code(13) ; end
-  class GitError         < BundlerError; status_code(11) ; end
-  class DeprecatedError  < BundlerError; status_code(12) ; end
-  class GemspecError     < BundlerError; status_code(14) ; end
-  class DslError         < BundlerError; status_code(15) ; end
-  class ProductionError  < BundlerError; status_code(16) ; end
-  class InvalidOption    < DslError                      ; end
-  class HTTPError        < BundlerError; status_code(17) ; end
+  class GemfileNotFound     < BundlerError; status_code(10) ; end
+  class GemNotFound         < BundlerError; status_code(7)  ; end
+  class GemfileError        < BundlerError; status_code(4)  ; end
+  class InstallError        < BundlerError; status_code(5)  ; end
+  class InstallHookError    < BundlerError; status_code(6)  ; end
+  class PathError           < BundlerError; status_code(13) ; end
+  class GitError            < BundlerError; status_code(11) ; end
+  class DeprecatedError     < BundlerError; status_code(12) ; end
+  class GemspecError        < BundlerError; status_code(14) ; end
+  class DslError            < BundlerError; status_code(15) ; end
+  class ProductionError     < BundlerError; status_code(16) ; end
+  class InvalidOption       < DslError                      ; end
+  class HTTPError           < BundlerError; status_code(17) ; end
+  class RubyVersionMismatch < BundlerError; status_code(18) ; end
 
 
   WINDOWS = RbConfig::CONFIG["host_os"] =~ %r!(msdos|mswin|djgpp|mingw)!
@@ -77,20 +81,19 @@ module Bundler
     attr_writer :ui, :bundle_path
 
     def configure
-      @configured ||= begin
-        configure_gem_home_and_path
-        true
-      end
+      @configured ||= configure_gem_home_and_path
     end
 
     def ui
       @ui ||= UI.new
     end
 
+    # Returns absolute path of where gems are installed on the filesystem.
     def bundle_path
       @bundle_path ||= Pathname.new(settings.path).expand_path(root)
     end
 
+    # Returns absolute location of where binstubs are installed to.
     def bin_path
       @bin_path ||= begin
         path = settings[:bin] || "bin"
@@ -103,6 +106,8 @@ module Bundler
     def setup(*groups)
       # Just return if all groups are already loaded
       return @setup if defined?(@setup)
+
+      definition.validate_ruby!
 
       if groups.empty?
         # Load all groups, but only once
@@ -195,6 +200,10 @@ module Bundler
     def with_clean_env
       with_original_env do
         ENV.delete_if { |k,_| k[0,7] == 'BUNDLE_' }
+        if ENV.has_key? 'RUBYOPT'
+          ENV['RUBYOPT'] = ENV['RUBYOPT'].sub '-rbundler/setup', ''
+          ENV['RUBYOPT'] = ENV['RUBYOPT'].sub "-I#{File.expand_path('..', __FILE__)}", ''
+        end
         yield
       end
     end
@@ -250,9 +259,9 @@ module Bundler
       if File.executable?(executable)
         executable
       else
-        path = ENV['PATH'].split(File::PATH_SEPARATOR).find { |path|
-          File.executable?(File.join(path, executable))
-        }
+        path = ENV['PATH'].split(File::PATH_SEPARATOR).find do |p|
+          File.executable?(File.join(p, executable))
+        end
         path && File.expand_path(executable, path)
       end
     end
@@ -266,6 +275,15 @@ module Bundler
     end
 
     def load_gemspec(file)
+      @gemspec_cache ||= {}
+      key = File.expand_path(file)
+      spec = ( @gemspec_cache[key] ||= load_gemspec_uncached(file) )
+      # Protect against caching side-effected gemspecs by returning a
+      # new instance each time.
+      spec.dup if spec
+    end
+
+    def load_gemspec_uncached(file)
       path = Pathname.new(file)
       # Eval the gemspec from its parent directory
       Dir.chdir(path.dirname.to_s) do
@@ -292,26 +310,35 @@ module Bundler
       end
     end
 
+    def clear_gemspec_cache
+      @gemspec_cache = {}
+    end
+
   private
 
     def configure_gem_home_and_path
+      blank_home = ENV['GEM_HOME'].nil? || ENV['GEM_HOME'].empty?
+
       if settings[:disable_shared_gems]
         ENV['GEM_PATH'] = ''
-        ENV['GEM_HOME'] = File.expand_path(bundle_path, root)
-        # TODO: This mkdir_p is only needed for JRuby <= 1.5 and should go away (GH #602)
-        FileUtils.mkdir_p bundle_path.to_s rescue nil
-
-        Bundler.rubygems.clear_paths
-      elsif Bundler.rubygems.gem_dir != bundle_path.to_s
+        configure_gem_home
+      elsif blank_home || Bundler.rubygems.gem_dir != bundle_path.to_s
         possibles = [Bundler.rubygems.gem_dir, Bundler.rubygems.gem_path]
         paths = possibles.flatten.compact.uniq.reject { |p| p.empty? }
         ENV["GEM_PATH"] = paths.join(File::PATH_SEPARATOR)
-        ENV["GEM_HOME"] = bundle_path.to_s
-        # TODO: This mkdir_p is only needed for JRuby <= 1.5 and should go away (GH #602)
-        FileUtils.mkdir_p bundle_path.to_s rescue nil
-
-        Bundler.rubygems.clear_paths
+        configure_gem_home
       end
+
+      Bundler.rubygems.refresh
+      bundle_path
+    end
+
+    def configure_gem_home
+      # TODO: This mkdir_p is only needed for JRuby <= 1.5 and should go away (GH #602)
+      FileUtils.mkdir_p bundle_path.to_s rescue nil
+
+      ENV['GEM_HOME'] = File.expand_path(bundle_path, root)
+      Bundler.rubygems.clear_paths
     end
 
     def upgrade_lockfile

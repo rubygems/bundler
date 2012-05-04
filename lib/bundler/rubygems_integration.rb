@@ -73,6 +73,10 @@ module Bundler
       Gem.bin_path(gem, bin, ver)
     end
 
+    def refresh
+      Gem.refresh
+    end
+
     def preserve_paths
       # this is a no-op outside of Rubygems 1.8
       yield
@@ -229,7 +233,7 @@ module Bundler
     end
 
     # Because Bundler has a static view of what specs are available,
-    # we don't #reflesh, so stub it out.
+    # we don't #refresh, so stub it out.
     def replace_refresh
       gem_class = (class << Gem ; self ; end)
       gem_class.send(:remove_method, :refresh)
@@ -261,11 +265,21 @@ module Bundler
       end
     end
 
+    # This backport fixes the marshaling of @segments.
+    def backport_yaml_initialize
+      Gem::Version.send(:define_method, :yaml_initialize) do |tag, map|
+        @version = map['version']
+        @segments = nil
+        @hash = nil
+      end
+    end
+
     # This backports base_dir which replaces installation path
     # Rubygems 1.8+
     def backport_base_dir
       Gem::Specification.send(:define_method, :base_dir) do
-        installation_path
+        return Gem.dir unless loaded_from
+        File.dirname File.dirname loaded_from
       end
     end
 
@@ -296,6 +310,7 @@ module Bundler
         backport_base_dir
         backport_cache_file
         backport_spec_file
+        backport_yaml_initialize
       end
 
       def stub_rubygems(specs)

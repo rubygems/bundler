@@ -26,6 +26,10 @@ module Spec
       Dir.chdir(bundled_app2, &blk)
     end
 
+    def in_app_root_custom(root, &blk)
+      Dir.chdir(root, &blk)
+    end
+
     def run(cmd, *args)
       opts = args.last.is_a?(Hash) ? args.pop : {}
       expect_err = opts.delete(:expect_err)
@@ -35,14 +39,14 @@ module Spec
       @out = ruby(setup + cmd, :expect_err => expect_err, :env => env)
     end
 
-    def load_error_run(ruby, gem, *args)
-      cmd = <<-R
+    def load_error_run(ruby, name, *args)
+      cmd = <<-RUBY
         begin
           #{ruby}
         rescue LoadError => e
-          $stderr.puts "ZOMG LOAD ERROR" if e.message.include?("-- #{gem}")
+          $stderr.puts "ZOMG LOAD ERROR" if e.message.include?("-- #{name}")
         end
-      R
+      RUBY
       opts = args.last.is_a?(Hash) ? args.pop : {}
       opts.merge!(:expect_err => true)
       args += [opts]
@@ -56,7 +60,7 @@ module Spec
     def bundle(cmd, options = {})
       expect_err  = options.delete(:expect_err)
       exitstatus = options.delete(:exitstatus)
-      options["no-color"] = true unless options.key?("no-color") || cmd.to_s[0..3] == "exec"
+      options["no-color"] = true unless options.key?("no-color") || %w(exec conf).include?(cmd.to_s[0..3])
 
       bundle_bin = File.expand_path('../../../bin/bundle', __FILE__)
 
@@ -87,12 +91,12 @@ module Spec
       sys_exec(%{#{env}#{Gem.ruby}#{lib_option} -e "#{ruby}"}, expect_err)
     end
 
-    def load_error_ruby(ruby, gem, opts = {})
+    def load_error_ruby(ruby, name, opts = {})
       cmd = <<-R
         begin
           #{ruby}
         rescue LoadError => e
-          $stderr.puts "ZOMG LOAD ERROR"# if e.message.include?("-- #{gem}")
+          $stderr.puts "ZOMG LOAD ERROR"# if e.message.include?("-- #{name}")
         end
       R
       ruby(cmd, opts.merge(:expect_err => true))
@@ -160,6 +164,12 @@ module Spec
       File.open(path.to_s, 'w') do |f|
         f.puts str
       end
+    end
+
+    def strip_whitespace(str)
+      # Trim the leading spaces
+      spaces = str[/\A\s+/, 0] || ""
+      str.gsub(/^#{spaces}/, '')
     end
 
     def install_gemfile(*args)
@@ -280,6 +290,17 @@ module Spec
       yield if block_given?
     ensure
       ENV['BUNDLER_SPEC_PLATFORM'] = old if block_given?
+    end
+
+    def simulate_ruby_engine(engine, version = "1.6.0")
+      return if engine == local_ruby_engine
+
+      old, ENV['BUNDLER_SPEC_RUBY_ENGINE'] = ENV['BUNDLER_SPEC_RUBY_ENGINE'], engine
+      old_version, ENV['BUNDLER_SPEC_RUBY_ENGINE_VERSION'] = ENV['BUNDLER_SPEC_RUBY_ENGINE_VERSION'], version
+      yield if block_given?
+    ensure
+      ENV['BUNDLER_SPEC_RUBY_ENGINE'] = old if block_given?
+      ENV['BUNDLER_SPEC_RUBY_ENGINE_VERSION'] = old_version if block_given?
     end
 
     def simulate_bundler_version(version)

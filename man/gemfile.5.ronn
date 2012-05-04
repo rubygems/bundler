@@ -49,7 +49,6 @@ Each _gem_ `MAY` specify files that should be used when autorequiring via
 `Bundler.require`. You may pass an array with multiple files, or `false` to
 prevent any file from being autorequired.
 
-    gem "sqlite3-ruby", :require => "sqlite3"
     gem "redis", :require => ["redis/connection/hiredis", "redis"]
     gem "webmock", :require => false
 
@@ -203,13 +202,27 @@ the `.gemspec`.
     | |-actionpack.gemspec    [actionpack gem located here]
     |~activesupport
     | |-activesupport.gemspec [activesupport gem located here]
-    ...
+    |...
 
 To install a gem located in a git repository, bundler changes to
 the directory containing the gemspec, runs `gem build name.gemspec`
 and then installs the resulting gem. The `gem build` command,
 which comes standard with Rubygems, evaluates the `.gemspec` in
 the context of the directory in which it is located.
+
+### GITHUB (:github)
+
+If the git repository you want to use is hosted on GitHub and is public, you can use the
+:github shorthand to specify just the github username and repository name (without the
+trailing ".git"), separated by a slash. If both the username and repository name are the
+same, you can omit one.
+
+    gem "rails", :github => "rails/rails"
+    gem "rails", :github => "rails"
+
+Are both equivalent to
+
+    gem "rails", :git => "git://github.com/rails/rails.git"
 
 ### PATH (:path)
 
@@ -239,7 +252,7 @@ applied to a group of gems by using block form.
 
     platforms :ruby do
       gem "ruby-debug"
-      gem "sqlite3-ruby"
+      gem "sqlite3"
     end
 
     group :development do

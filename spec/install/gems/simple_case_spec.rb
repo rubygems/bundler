@@ -291,7 +291,7 @@ describe "bundle install with gem sources" do
       G
 
       bundle :install, :expect_err => true
-      out.should =~ /Your Gemfile doesn't have any sources/i
+      out.should =~ /Your Gemfile has no remote sources/i
     end
 
     it "creates a Gemfile.lock on a blank Gemfile" do
@@ -312,6 +312,53 @@ describe "bundle install with gem sources" do
       bundle :install
       out.should include("Could not reach http://localhost:9384/")
       out.should_not include("file://")
+    end
+
+    it "doesn't blow up when the local .bundle/config is empty" do
+      FileUtils.mkdir_p(bundled_app(".bundle"))
+      FileUtils.touch(bundled_app(".bundle/config"))
+
+      install_gemfile(<<-G, :exitstatus => true)
+        source "file://#{gem_repo1}"
+
+        gem 'foo'
+      G
+      exitstatus.should == 0
+    end
+
+    it "doesn't blow up when the global .bundle/config is empty" do
+      FileUtils.mkdir_p("#{Bundler.rubygems.user_home}/.bundle")
+      FileUtils.touch("#{Bundler.rubygems.user_home}/.bundle/config")
+
+      install_gemfile(<<-G, :exitstatus => true)
+        source "file://#{gem_repo1}"
+
+        gem 'foo'
+      G
+      exitstatus.should == 0
+    end
+  end
+
+  describe "when Bundler root contains regex chars" do
+    before do
+      root_dir = tmp("foo[]bar")
+
+      FileUtils.mkdir_p(root_dir)
+      in_app_root_custom(root_dir)
+    end
+
+    it "doesn't blow up" do
+      build_lib "foo"
+      gemfile = <<-G
+        gem 'foo', :path => "#{lib_path('foo-1.0')}"
+      G
+      File.open('Gemfile', 'w') do |file|
+        file.puts gemfile
+      end
+
+      bundle :install, :exitstatus => true
+
+      exitstatus.should == 0
     end
   end
 
@@ -462,7 +509,7 @@ describe "bundle install with gem sources" do
       G
 
       bundle :install, :quiet => true
-      out.should =~ /doesn't have any sources/
+      out.should =~ /Your Gemfile has no remote sources/
     end
   end
 

@@ -1,3 +1,101 @@
+## 1.2.0.pre
+
+Features:
+
+  - bundle package now accepts --all to package git and path dependencies
+  - bundle config now accepts --local, --global and --delete options
+  - It is possible to override a git repository via configuration.
+    For instance, if you have a git dependency on rack, you can force
+    it to use a local repo with `bundle config local.rack ~/path/to/rack`
+  - Cache gemspec loads for performance (@dekellum, #1635)
+  - add --full-index flag to `bundle update` (@fluxx, #1829)
+  - add --quiet flag to `bundle update` (@nashby, #1654)
+  - Add Bundler::GemHelper.gemspec (@knu, #1637)
+  - Graceful handling of Gemfile syntax errors (@koraktor, #1661)
+  - `bundle platform` command
+  - add ruby to DSL, to specify version of ruby
+  - error out if the ruby version doesn't match
+
+Performance:
+
+  - bundle exec shouldn't run Bundler.setup just setting the right rubyopts options is enough (@spastorino, #1598)
+
+Bugfixes:
+
+  - Avoid passing RUBYOPT changes in with_clean_env block (@eric1234, #1604)
+  - Use the same ruby to run subprocesses as is running rake (@brixen)
+
+Documentation:
+
+  - Add :github documentation in DSL (@zofrex, #1848, #1851, #1852)
+  - Add docs for the --no-cache option (@fluxx, #1796)
+  - Add basic documentation for bin_path and bundle_path (@radar)
+  - Add documentation for the run method in Bundler::Installer
+
+
+## 1.1.3 (March 23, 2012)
+
+Bugfixes:
+
+  - escape the bundler root path (@tenderlove, #1789)
+
+## 1.1.2 (March 20, 2012)
+
+Bugfixes:
+
+  - Fix --deployment for multiple PATH sections of the same source (#1782)
+
+## 1.1.1 (March 14, 2012)
+
+Bugfixes:
+
+  - Rescue EAGAIN so the fetcher works on JRuby on Windows
+  - Stop asking users to report gem installation errors
+  - Clarify "no sources" message
+  - Use $\ so `bundle gem` gemspecs work on Windows (@postmodern)
+  - URI-encode gem names for dependency API (@rohit, #1672)
+  - Fix `cache` edge case in rubygems 1.3.7 (#1202)
+
+Performance:
+
+  - Reduce invocation of git ls-files in `bundle gem` gemspecs (@knu)
+
+## 1.1.0 (Mar 7, 2012)
+
+Bugfixes:
+
+  - Clean up corrupted lockfiles on bundle installs
+  - Prevent duplicate GIT sources
+  - Fix post_install_message when uing the endpoint API
+
+## 1.1.rc.8 (Mar 3, 2012)
+
+Performance:
+
+  - don't resolve if the Gemfile.lock and Gemfile haven't changed
+
+Bugfixes:
+
+  - Load gemspecs from git even when a released gem has the same version (#1609)
+  - Declare an accurate Ruby version requirement of 1.8.7 or newer (#1619)
+  - handle gemspec development dependencies correctly (@raggi, #1639)
+  - Avoid passing RUBYOPT changes in with_clean_env block. (eric1234, #1604)
+
+## 1.1.rc.7 (Dec 29, 2011)
+
+Bugfixes:
+
+  - Fix bug where `clean` would break when using :path with no gemspec
+
+## 1.1.rc.6 (Dec 22, 2011)
+
+Bugfixes:
+
+  - Fix performance regression from 1.0 (@spastorino, #1511, #1591, #1592)
+  - Load gems correctly when GEM_HOME is blank
+  - Refresh gems so Bundler works from inside a bundle
+  - Handle empty .bundle/config files without an error
+
 ## 1.1.rc.5 (Dec 14, 2011)
 
 Bugfixes:

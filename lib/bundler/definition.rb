@@ -1,10 +1,11 @@
 require "digest/sha1"
+require "set"
 
 module Bundler
   class Definition
     include GemHelpers
 
-    attr_reader :dependencies, :platforms, :sources
+    attr_reader :dependencies, :platforms, :sources, :ruby_version
 
     def self.build(gemfile, lockfile, unlock)
       unlock ||= {}
@@ -29,11 +30,14 @@ module Bundler
       specs, then we can try to resolve locally.
 =end
 
-    def initialize(lockfile, dependencies, sources, unlock)
+    def initialize(lockfile, dependencies, sources, unlock, ruby_version = "")
+      @unlocking = unlock == true || !unlock.empty?
+
       @dependencies, @sources, @unlock = dependencies, sources, unlock
       @remote            = false
       @specs             = nil
       @lockfile_contents = ""
+      @ruby_version      = ruby_version
 
       if lockfile && File.exists?(lockfile)
         @lockfile_contents = Bundler.read_file(lockfile)
@@ -65,11 +69,30 @@ module Bundler
       @new_platform = !@platforms.include?(current_platform)
       @platforms |= [current_platform]
 
+      @path_changes = converge_paths
       eager_unlock = expand_dependencies(@unlock[:gems])
       @unlock[:gems] = @locked_specs.for(eager_unlock).map { |s| s.name }
 
-      converge_sources
-      converge_dependencies
+      @source_changes = converge_sources
+      @dependency_changes = converge_dependencies
+      @local_changes = converge_locals
+
+      fixup_dependency_types!
+    end
+
+    def fixup_dependency_types!
+      # XXX This is a temporary workaround for a bug when using rubygems 1.8.15
+      # where Gem::Dependency#== matches Gem::Dependency#type. As the lockfile
+      # doesn't carry a notion of the dependency type, if you use
+      # add_development_dependency in a gemspec that's loaded with the gemspec
+      # directive, the lockfile dependencies and resolved dependencies end up
+      # with a mismatch on #type.
+      # Test coverage to catch a regression on this is in gemspec_spec.rb
+      @dependencies.each do |d|
+        if ld = @locked_deps.find { |l| l.name == d.name }
+          ld.instance_variable_set(:@type, d.type)
+        end
+      end
     end
 
     def resolve_with_cache!
@@ -137,7 +160,7 @@ module Bundler
 
     def resolve
       @resolve ||= begin
-        if Bundler.settings[:frozen]
+        if Bundler.settings[:frozen] || (!@unlocking && nothing_changed?)
           @locked_specs
         else
           last_resolve = converge_locked_specs
@@ -159,20 +182,18 @@ module Bundler
 
     def index
       @index ||= Index.build do |idx|
-        other_sources = @sources.find_all{|s| !s.is_a?(Bundler::Source::Rubygems) }
-        rubygems_sources = @sources.find_all{|s| s.is_a?(Bundler::Source::Rubygems) }
-
         dependency_names = @dependencies.dup || []
         dependency_names.map! {|d| d.name }
-        other_sources.each do |s|
-          source_index = s.specs
-          dependency_names += source_index.unmet_dependency_names
-          idx.add_source source_index
-        end
 
-        rubygems_sources.each do |s|
-          s.dependency_names = dependency_names.uniq if s.is_a?(Bundler::Source::Rubygems)
-          idx.add_source s.specs
+        @sources.each do |s|
+          if s.is_a?(Bundler::Source::Rubygems)
+            s.dependency_names = dependency_names.uniq
+            idx.add_source s.specs
+          else
+            source_index = s.specs
+            dependency_names += source_index.unmet_dependency_names
+            idx.add_source source_index
+          end
         end
       end
     end
@@ -315,7 +336,31 @@ module Bundler
       raise ProductionError, msg if added.any? || deleted.any? || changed.any?
     end
 
+    def validate_ruby!
+      return unless ruby_version
+
+      system_ruby_version = Bundler::SystemRubyVersion.new
+      if diff = ruby_version.diff(system_ruby_version)
+        problem, expected, actual = diff
+
+        msg = case problem
+        when :engine
+          "Your Ruby engine is #{actual}, but your Gemfile specified #{expected}"
+        when :version
+          "Your Ruby version is #{actual}, but your Gemfile specified #{expected}"
+        when :engine_version
+          "Your #{system_ruby_version.engine} version is #{actual}, but your Gemfile specified #{ruby_version.engine} #{expected}"
+        end
+
+        raise RubyVersionMismatch, msg
+      end
+    end
+
   private
+
+    def nothing_changed?
+      !@source_changes && !@dependency_changes && !@new_platform && !@path_changes && !@local_changes
+    end
 
     def pretty_dep(dep, source = false)
       msg  = "#{dep.name}"
@@ -324,21 +369,88 @@ module Bundler
       msg
     end
 
-    def converge_sources
-      locked_gem = @locked_sources.find { |s| Source::Rubygems === s }
-      actual_gem = @sources.find { |s| Source::Rubygems === s }
+    # Check if the specs of the given source changed
+    # according to the locked source. A block should be
+    # in order to specify how the locked version of
+    # the source should be found.
+    def specs_changed?(source, &block)
+      locked = @locked_sources.find(&block)
 
-      if locked_gem && actual_gem
-        locked_gem.merge_remotes actual_gem
+      if locked
+        unlocking = locked.specs.any? do |spec|
+          @locked_specs.any? do |locked_spec|
+            locked_spec.source != locked
+          end
+        end
       end
 
+      !locked || unlocking || source.specs != locked.specs
+    end
+
+    # Get all locals and override their matching sources.
+    # Return true if any of the locals changed (for example,
+    # they point to a new revision) or depend on new specs.
+    def converge_locals
+      locals = []
+
+      Bundler.settings.local_overrides.map do |k,v|
+        spec   = @dependencies.find { |s| s.name == k }
+        source = spec && spec.source
+        if source && source.respond_to?(:local_override!)
+          locals << [ source, source.local_override!(v) ]
+        end
+      end
+
+      locals.any? do |source, changed|
+        changed || specs_changed?(source) { |o| source.class === o.class && source.uri == o.uri }
+      end
+    end
+
+    def converge_paths
+      @sources.any? do |source|
+        next unless source.instance_of?(Source::Path)
+        specs_changed?(source) do |ls|
+          ls.class == source.class && ls.path == source.path
+        end
+      end
+    end
+
+    def converge_sources
+      changes = false
+
+      # Get the Rubygems source from the Gemfile.lock
+      locked_gem = @locked_sources.find { |s| Source::Rubygems === s }
+
+      # Get the Rubygems source from the Gemfile
+      actual_gem = @sources.find { |s| Source::Rubygems === s }
+
+      # If there is a Rubygems source in both
+      if locked_gem && actual_gem
+        # Merge the remotes from the Gemfile into the Gemfile.lock
+        changes = changes | locked_gem.replace_remotes(actual_gem)
+      end
+
+      # Replace the sources from the Gemfile with the sources from the Gemfile.lock,
+      # if they exist in the Gemfile.lock and are `==`. If you can't find an equivalent
+      # source in the Gemfile.lock, use the one from the Gemfile.
       @sources.map! do |source|
         @locked_sources.find { |s| s == source } || source
       end
+      changes = changes | (Set.new(@sources) != Set.new(@locked_sources))
 
       @sources.each do |source|
-        source.unlock! if source.respond_to?(:unlock!) && @unlock[:sources].include?(source.name)
+        # If the source is unlockable and the current command allows an unlock of
+        # the source (for example, you are doing a `bundle update <foo>` of a git-pinned
+        # gem), unlock it. For git sources, this means to unlock the revision, which
+        # will cause the `ref` used to be the most recent for the branch (or master) if
+        # an explicit `ref` is not used.
+        if source.respond_to?(:unlock!) && @unlock[:sources].include?(source.name)
+          source.unlock!
+          changes = true
+        end
       end
+
+      changes
     end
 
     def converge_dependencies
@@ -347,6 +459,7 @@ module Bundler
           dep.source = @sources.find { |s| dep.source == s }
         end
       end
+      Set.new(@dependencies) != Set.new(@locked_deps)
     end
 
     # Remove elements from the locked specs that are expired. This will most
