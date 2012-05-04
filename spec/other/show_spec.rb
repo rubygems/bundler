@@ -39,10 +39,15 @@ describe "bundle show" do
     out.should =~ /could not find gem 'missing'/i
   end
 
-  it "prints path of all gems in bundle" do
+  it "prints path of all gems in bundle sorted by name" do
     bundle "show --paths"
+
     out.should include(default_bundle_path('gems', 'rake-0.8.7').to_s)
     out.should include(default_bundle_path('gems', 'rails-2.3.2').to_s)
+
+    # Gem names are the last component of their path.
+    gem_list = out.split.map { |p| p.split('/').last }
+    gem_list.should == gem_list.sort
   end
 end
 
