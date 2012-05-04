@@ -30,7 +30,7 @@ describe "bundle outdated" do
       out.should include("foo (1.0")
 
       # Gem names are one per-line, between "*" and their parenthesized version.
-      gem_list = out.split("\n").map { |g| g[/(?<=\* )(.*)(?= \()/] }.compact
+      gem_list = out.split("\n").map { |g| g[ /\* (.*) \(/, 1] }.compact
       gem_list.should == gem_list.sort
     end
   end
