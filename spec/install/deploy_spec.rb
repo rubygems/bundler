@@ -194,4 +194,52 @@ describe "install with --deployment or --frozen" do
       should_be_installed "rack 1.0.0"
     end
   end
+
+  describe "bundling with --deployment on a plaform other than Gemfile.lock" do
+    before do
+      @native_plaform = (Bundler.rubygems.platforms.map(&:to_s) - ["ruby"]).first
+      @non_native_platform = (["x86-mswin32", "x86-darwin-10"] - [@native_platform]).first
+
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", "1.0.0"
+        gem "platform_specific"
+      G
+
+      lockfile <<-G
+        GEM
+          remote: file:#{gem_repo1}/
+          specs:
+            rack (1.0.0)
+            platform_specific (1.0-#{@non_native_platform})
+
+        PLATFORMS
+          #{@non_native_platform}
+
+        DEPENDENCIES
+          rack (1.0.0)
+          platform_specific
+      G
+    end
+
+    it "skips the gem with the wrong platform" do
+      bundle "install --deployment"
+
+      should_be_installed "rack 1.0.0"
+      should_not_be_installed "platform_specific"
+
+      vendored_gems("gems/rack-1.0.0").should exist
+    end
+
+    it "installs a native version of the gem with --cross-platform flag" do
+      bundle "install --deployment --cross-platform"
+
+      should_be_installed "rack 1.0.0"
+      should_be_installed "platform_specific 1.0 #{@native_plaform}"
+
+      vendored_gems("gems/rack-1.0.0").should exist
+      vendored_gems("gems/platform_specific-1.0-#{@native_plaform}").should exist
+    end
+
+  end
 end
