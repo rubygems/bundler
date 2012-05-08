@@ -322,6 +322,10 @@ module Bundler
         yield
         Gem.use_paths(old_dir, old_path)
       end
+
+      def all_specs
+        Gem.source_index.to_a.map { |x| x[1] }
+      end
     end
 
   end
