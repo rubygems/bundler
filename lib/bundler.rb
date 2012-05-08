@@ -5,6 +5,7 @@ require 'bundler/psyched_yaml'
 require 'bundler/rubygems_ext'
 require 'bundler/rubygems_integration'
 require 'bundler/version'
+require 'bunder/fix_gzip_error'
 
 module Bundler
   ORIGINAL_ENV = ENV.to_hash
