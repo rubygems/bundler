@@ -48,6 +48,10 @@ module Bundler
 
         # otherwise return the Gemfile if it's there
         filename = File.join(current, 'Gemfile')
+        if File.exists? Pathname.new(current).join('bundler.gemspec')
+          # avoid stepping above the source directory when testing
+          return nil
+        end
         return filename if File.file?(filename)
         current, previous = File.expand_path("..", current), current
       end
