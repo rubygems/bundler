@@ -113,6 +113,9 @@ module Bundler
         not_installed.each { |s| Bundler.ui.error " * #{s.name} (#{s.version})" }
         Bundler.ui.warn "Install missing gems with `bundle install`"
         exit 1
+      elsif !Bundler.default_lockfile.exist? && Bundler.settings[:frozen]
+        Bundler.ui.error "This bundle has been frozen, but there is no Gemfile.lock present"
+        exit 1
       else
         Bundler.load.lock
         Bundler.ui.info "The Gemfile's dependencies are satisfied"
