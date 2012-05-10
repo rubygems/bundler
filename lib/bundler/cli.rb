@@ -573,7 +573,7 @@ module Bundler
 
     desc "clean", "Cleans up unused gems in your bundler directory"
     method_option "force", :type => :boolean, :default => false, :banner =>
-      "forces clean even if --path is set"
+      "forces clean even if --path is not set"
     def clean
       if Bundler.settings[:path] || options[:force]
         Bundler.load.clean
