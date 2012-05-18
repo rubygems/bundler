@@ -220,7 +220,7 @@ module Bundler
 
       Bundler::Fetcher.disable_endpoint = opts["full-index"]
       # rubygems plugins sometimes hook into the gem install process
-      Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins)
+      Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins) && !Bundler.settings[:disable_shared_gems]
 
       definition = Bundler.definition
       definition.validate_ruby!
@@ -282,7 +282,7 @@ module Bundler
 
       opts = {"update" => true, "local" => options[:local]}
       # rubygems plugins sometimes hook into the gem install process
-      Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins)
+      Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins) && !Bundler.settings[:disable_shared_gems]
 
       Bundler.definition.validate_ruby!
       Installer.install Bundler.root, Bundler.definition, opts
