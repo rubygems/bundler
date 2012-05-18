@@ -102,15 +102,19 @@ Bundler also allows you to work against a git repository locally
 instead of using the remote version. This can be achieved by setting
 up a local override:
 
-    bundle config local.rack ~/path/to/local/rack
+    bundle config local.GEM_NAME /path/to/local/git/repository
 
-Now, instead of checking out the remote git repository, the local
+For example, in order to use a local Rack repository, a developer could call:
+
+    bundle config local.rack ~/Work/git/rack
+
+Now instead of checking out the remote git repository, the local
 override will be used. Similar to a path source, every time the local
 git repository change, changes will be automatically picked up by
 Bundler. This means a commit in the local git repo will update the
 revision in the `Gemfile.lock` to the local git repo revision. This
 requires the same attention as git submodules. Before pushing to
-remote, you need to ensure the local override was pushed, otherwise
+the remote, you need to ensure the local override was pushed, otherwise
 you may point to a commit that only exists in your local machine.
 
 Bundler does many checks to ensure a developer won't work with
