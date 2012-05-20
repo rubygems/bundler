@@ -16,7 +16,7 @@ module Bundler
     end
 
     def fetch_platform
-      @plaftorm
+      @platform
     end
 
     # needed for standalone, load required_paths from local gemspec
