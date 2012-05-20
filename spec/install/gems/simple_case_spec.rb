@@ -315,8 +315,9 @@ describe "bundle install with gem sources" do
     end
 
     it "doesn't blow up when the local .bundle/config is empty" do
+      config_file = bundled_app(".bundle/config")
       FileUtils.mkdir_p(bundled_app(".bundle"))
-      FileUtils.touch(bundled_app(".bundle/config"))
+      FileUtils.touch(config_file)
 
       install_gemfile(<<-G, :exitstatus => true)
         source "file://#{gem_repo1}"
@@ -324,18 +325,24 @@ describe "bundle install with gem sources" do
         gem 'foo'
       G
       exitstatus.should == 0
+      File.exists?(config_file).should be_true
+      File.size(config_file).should be_zero
     end
 
     it "doesn't blow up when the global .bundle/config is empty" do
+      config_file = "#{Bundler.rubygems.user_home}/.bundle/config"
       FileUtils.mkdir_p("#{Bundler.rubygems.user_home}/.bundle")
-      FileUtils.touch("#{Bundler.rubygems.user_home}/.bundle/config")
+      FileUtils.touch(config_file)
 
       install_gemfile(<<-G, :exitstatus => true)
         source "file://#{gem_repo1}"
 
         gem 'foo'
       G
+
       exitstatus.should == 0
+      File.exists?(config_file).should be_true
+      File.size(config_file).should be_zero
     end
   end
 

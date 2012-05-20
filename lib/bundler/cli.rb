@@ -419,8 +419,7 @@ module Bundler
     def exec(*)
       ARGV.shift # remove "exec"
 
-      Bundler.definition.validate_ruby!
-      Bundler.load.setup_environment
+      Bundler.setup_environment
 
       begin
         # Run
