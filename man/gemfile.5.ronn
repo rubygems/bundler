@@ -25,6 +25,33 @@ might contain the gems listed in the `Gemfile`.
 
 Each of these _source_s `MUST` be a valid Rubygems repository.
 
+## RUBY (#ruby)
+
+If your application requires a specific Ruby version or engine, specify your
+requirements using the `ruby` method, with the following arguments.
+All parameters are `OPTIONAL` unless otherwise specified.
+
+### VERSION (required)
+
+The version of Ruby that your application requires. If your application
+requires an alternate Ruby engine, such as JRuby or Rubinius, this should be
+the Ruby version that the engine is compatible with.
+
+    ruby "1.9.3"
+
+### ENGINE (:engine)
+
+Each application _may_ specify a Ruby engine. If an engine is specified, an
+engine version _must_ also be specified.
+
+### ENGINE VERSION (:engine_version)
+
+Each application _may_ specify a Ruby engine version. If an engine version is
+specified, an engine _must_ also be specified. If the engine is "ruby" the
+engine version specified _must_ match the Ruby version.
+
+    ruby "1.8.7", :engine => "jruby", :engine_version => "1.6.7"
+
 ## GEMS (#gem)
 
 Specify gem requirements using the `gem` method, with the following arguments.
