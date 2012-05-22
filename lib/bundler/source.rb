@@ -552,8 +552,7 @@ module Bundler
             git "reset --hard #{@revision}"
 
             if submodules
-              git "submodule init"
-              git "submodule update"
+              git "submodule update --init --recursive"
             end
           end
         end
