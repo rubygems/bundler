@@ -41,16 +41,16 @@ module Bundler
           bundle_dir     = context.fetch(:bundle_dir, File.join(context.fetch(:shared_path), 'bundle'))
           bundle_gemfile = context.fetch(:bundle_gemfile, "Gemfile")
           bundle_without = [*context.fetch(:bundle_without, [:development, :test])].compact
-          current_release = context.fetch(:current_release)
-          if current_release.to_s.empty?
+          app_path = context.fetch(:latest_release)
+          if app_path.to_s.empty?
             raise error_type.new("Cannot detect current release path - make sure you have deployed at least once.")
           end
-          args = ["--gemfile #{File.join(current_release, bundle_gemfile)}"]
+          args = ["--gemfile #{File.join(app_path, bundle_gemfile)}"]
           args << "--path #{bundle_dir}" unless bundle_dir.to_s.empty?
           args << bundle_flags.to_s
           args << "--without #{bundle_without.join(" ")}" unless bundle_without.empty?
 
-          run "cd #{current_release} && #{bundle_cmd} install #{args.join(' ')}"
+          run "cd #{app_path} && #{bundle_cmd} install #{args.join(' ')}"
         end
       end
     end
