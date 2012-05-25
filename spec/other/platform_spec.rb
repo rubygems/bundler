@@ -594,9 +594,9 @@ G
     it "fails when the engine version doesn't match" do
       simulate_ruby_engine "jruby" do
         gemfile <<-G
-        gem "rack", "0.9.1"
+          gem "rack", "0.9.1"
 
-        #{engine_version_incorrect}
+          #{engine_version_incorrect}
         G
 
         bundle "exec rackup", :exitstatus => true
