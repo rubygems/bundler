@@ -95,6 +95,15 @@ describe ".bundle/config" do
       run "puts Bundler.settings[:foo]"
       out.should == "global"
     end
+
+    it "doesn't blow up on zero byte .bundle/config" do
+      FileUtils.mkdir_p(File.join(Bundler.rubygems.user_home, ".bundle"))
+      FileUtils.touch(File.join(Bundler.rubygems.user_home, ".bundle/config"))
+
+      bundle :config, :exitstatus => true
+
+      exitstatus.should eq(0)
+    end
   end
 
   describe "local" do
@@ -133,6 +142,15 @@ describe ".bundle/config" do
 
       run "puts Bundler.settings[:foo]"
       out.should == "local"
+    end
+
+    it "doesn't blow up on zero byte .bundle/config" do
+      FileUtils.mkdir_p(bundled_app(".bundle"))
+      FileUtils.touch(bundled_app(".bundle/config"))
+
+      bundle :config, :exitstatus => true
+
+      exitstatus.should eq(0)
     end
   end
 end
