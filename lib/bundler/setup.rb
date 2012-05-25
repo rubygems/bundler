@@ -1,4 +1,5 @@
 require 'bundler/shared_helpers'
+require 'bundler/friendly_errors'
 
 if Bundler::SharedHelpers.in_bundle?
   require 'bundler'
@@ -13,6 +14,11 @@ if Bundler::SharedHelpers.in_bundle?
       end
       exit e.status_code
     end
+  elsif ENV['BUNDLE_EXECING']
+    require 'bundler/vendored_thor'
+    the_shell = (ENV['BUNDLE_EXECING'] == "no-color" ? Thor::Shell::Basic.new : Thor::Base.shell.new)
+    Bundler.ui = Bundler::UI::Shell.new(the_shell)
+    Bundler.with_friendly_errors {Bundler.setup }
   else
     Bundler.setup
   end

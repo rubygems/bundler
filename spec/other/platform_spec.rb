@@ -592,6 +592,7 @@ G
     end
 
     it "fails when the engine version doesn't match" do
+      pending "we need to run this under jruby. can't simulate jruby with Kernel.exec inside `bundle exec`"
       simulate_ruby_engine "jruby" do
         gemfile <<-G
           gem "rack", "0.9.1"
