@@ -22,10 +22,8 @@ rescue Interrupt => e
 rescue SystemExit => e
   exit e.status
 rescue Exception => e
-  Bundler.ui.error "Unfortunately, a fatal error has occurred. " +
-    "Please report this error to the Bundler issue tracker at " +
-    "https://github.com/carlhuda/bundler/issues so that we can fix it. " +
-    "Please include the full output of the command, your Gemfile and Gemfile.lock. " +
-    "Thanks!"
+  Bundler.ui.error(
+    "Unfortunately, a fatal error has occurred. Please see the Bundler \n" \
+    "troubleshooting documentation at http://bit.ly/bundler-issues. Thanks! \n")
   raise e
 end
