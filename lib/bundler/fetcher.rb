@@ -207,7 +207,7 @@ module Bundler
           Bundler.ui.debug "Could not fetch prerelease specs from #{strip_user_pass_from_uri(@remote_uri)}"
         end
       rescue Gem::RemoteFetcher::FetchError
-        raise Bundler::HTTPError, "Could not reach #{strip_user_pass_from_uri(@remote_uri)}"
+        raise HTTPError, "Could not reach #{strip_user_pass_from_uri(@remote_uri)}"
       end
 
       return spec_list
