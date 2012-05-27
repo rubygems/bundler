@@ -1,10 +1,20 @@
 # Bundler Issues
 
-## Troubleshooting
+So! You're having problems with Bundler. This file is here to help. If you're running into an error, try reading the rest of this file for help. If you can't figure out how to solve your problem, there are also instructions on how to report a bug.
 
-Instructions for common Bundler use-cases can be found on the [Bundler documentation site](http://gembundler.com/v1.0/).
+## Documentation
+
+Instructions for common Bundler uses can be found on the [Bundler documentation site](http://gembundler.com/v1.0/).
 
 Detailed information about each Bundler command, including help with common problems, can be found in the [Bundler man pages](http://gembundler.com/man/bundle.1.html).
+
+## Troubleshooting
+
+### Heroku errors
+
+Please open a ticket with Heroku if you're having trouble deploying. They have a professional support team who can help you resolve Heroku issues far better than the Bundler team can. If the problem that you are having turns out to be a bug in Bundler itself, Heroku support can get the exact details to us.
+
+### Something else
 
 After reading the documentation, try these troubleshooting steps:
 
@@ -26,24 +36,9 @@ After reading the documentation, try these troubleshooting steps:
     # try to install one more time
     bundle install
 
-## Frequently encountered issues
-
-### Heroku errors
-
-Open a ticket with Heroku. If the issue somehow turns out to be with Bundler itself, the Heroku support team will forward the details of your issue to us.
-
-### REE and Zlib::GzipFile::Error
-
-Ruby Enterprise Edition users may see a `Zlib::GzipFile::Error` while installing gems. It is due to [a bug in REE](http://code.google.com/p/rubyenterpriseedition/issues/detail?id=45). You may be able to resolve the issue by upgrading REE, or changing to a different interpreter.
-
-### Rake activation error
-
-Anyone who has installed the Spork gem may see activation errors while running `rake` directly. This is because old versions of Spork would [install the newest rake using a mkmf file](https://github.com/timcharper/spork/issues/119). To resolve the issue, update the Spork version requirement in your Gemfile to at least `"~>0.8.5"` or `"~>0.9.0.rc8"`.
-
-
 ## Reporting unresolved problems
 
-Instructions that allow the Bundler team to reproduce your issue are vitally important. When you report a bug, please include the following information:
+The Bundler team needs to know some things in order to diagnose and hopefully fix the bug you've found. When you report a bug, please include the following information:
 
   - The command you ran
   - Exception backtrace(s), if any
@@ -57,11 +52,12 @@ Instructions that allow the Bundler team to reproduce your issue are vitally imp
   - Whether you have the `rubygems-bundler` gem, which can break gem binares
   - Whether you have the `open_gem` gem, which can cause rake activation conflicts
 
-
 If you are using Rails 2.3, please also include:
 
   - Your boot.rb file
   - Your preinitializer.rb file
   - Your environment.rb file
 
-[Create a gist](https://gist.github.com) containing all of that information, then visit the [Bundler issue tracker](https://github.com/carlhuda/bundler) and create a new ticket describing your problem and linking to your gist.
+[Create a gist](https://gist.github.com) containing all of that information, then visit the [Bundler issue tracker](https://github.com/carlhuda/bundler/issues) and [create a new ticket](https://github.com/carlhuda/bundler/issues/new) describing your problem and linking to your gist.
+
+Thanks for reporting issues and making Bundler better!
