@@ -158,7 +158,7 @@ describe "gemcutter's dependency API" do
     out.should match(/Too many redirects/)
   end
 
-  it "should use the modern index when the --full-index" do
+  it "uses the modern index when --full-index is passed" do
     gemfile <<-G
       source "#{source_uri}"
       gem "rack"
