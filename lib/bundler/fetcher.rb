@@ -1,5 +1,5 @@
 require 'uri'
-require 'net/http/persistent'
+require 'bundler/vendored_persistent'
 
 module Bundler
   # Handles all the fetching with the rubygems server
