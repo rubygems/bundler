@@ -25,20 +25,6 @@ describe "Bundler.with_env helpers" do
 
     it_should_behave_like "Bundler.with_*_env"
 
-    it "should keep the original GEM_PATH even in sub processes" do
-      gemfile ""
-      bundle "install --path vendor/bundle"
-
-      gem_path = ENV['GEM_PATH']
-
-      code = "Bundler.with_clean_env do;" +
-             "  print ENV['GEM_PATH'] != '';" +
-             "end"
-
-      result = bundle "exec ruby -e #{code.inspect}"
-      result.should == "true"
-    end
-
     it "should not pass any bundler environment variables" do
       Bundler.with_clean_env do
         `echo $BUNDLE_PATH`.strip.should_not == './Gemfile'

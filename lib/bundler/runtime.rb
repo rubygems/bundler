@@ -201,7 +201,27 @@ module Bundler
     end
 
     def setup_environment
-      Bundler.setup_environment
+      begin
+        ENV["BUNDLE_BIN_PATH"] = Bundler.rubygems.bin_path("bundler", "bundle", VERSION)
+      rescue Gem::GemNotFoundException
+        ENV["BUNDLE_BIN_PATH"] = File.expand_path("../../../bin/bundle", __FILE__)
+      end
+
+      # Set PATH
+      paths = (ENV["PATH"] || "").split(File::PATH_SEPARATOR)
+      paths.unshift "#{Bundler.bundle_path}/bin"
+      ENV["PATH"] = paths.uniq.join(File::PATH_SEPARATOR)
+
+      # Set BUNDLE_GEMFILE
+      ENV["BUNDLE_GEMFILE"] = default_gemfile.to_s
+
+      # Set RUBYOPT
+      rubyopt = [ENV["RUBYOPT"]].compact
+      if rubyopt.empty? || rubyopt.first !~ /-rbundler\/setup/
+        rubyopt.unshift "-rbundler/setup"
+        rubyopt.unshift "-I#{File.expand_path('../..', __FILE__)}"
+        ENV["RUBYOPT"] = rubyopt.join(' ')
+      end
     end
 
   private
