@@ -422,8 +422,6 @@ module Bundler
       Bundler.definition.validate_ruby!
       Bundler.load.setup_environment
 
-      ENV['BUNDLE_EXECING'] = options["no-color"] ? "no-color" : "color"
-
       begin
         # Run
         Kernel.exec(*ARGV)
