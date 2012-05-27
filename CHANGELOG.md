@@ -1,3 +1,11 @@
+## 1.1.4 (May 27, 2012)
+
+Bugfixes:
+
+  - Use `latest_release` in Capistrano and Vlad integration (#1264)
+  - Unknown exceptions now Link to ISSUES for help instead of a new ticket
+  - When OpenSSL is missing, provide instructions instead of blowing up
+
 ## 1.1.3 (March 23, 2012)
 
 Bugfixes:
