@@ -12,36 +12,23 @@ require 'sinatra/base'
 
 class Endpoint < Sinatra::Base
 
-  if defined? ::Deprecate
-    Deprecate = ::Deprecate
-  elsif defined? Gem::Deprecate
-    Deprecate = Gem::Deprecate
-  else
-    class Deprecate
-      def skip_during; yield; end
-    end
-  end
-
   helpers do
     def dependencies_for(gem_names, marshal = gem_repo1("Marshal.4.8"))
       require 'rubygems'
-      gems = Deprecate.skip_during do
-        Marshal.load(File.open(marshal).read).map do |gem, spec|
-          if gem_names.include?(spec.name)
-            {
-              :name         => spec.name,
-              :number       => spec.version.version,
-              :platform     => spec.platform.to_s,
-              :dependencies => spec.dependencies.select {|dep| dep.type == :runtime }.map do |dep|
-                [dep.name, dep.requirement.requirements.map {|a| a.join(" ") }.join(", ")]
-              end
-            }
-          end
-        end # Marshal.load
-      end # Deprecate.skip_during
-      gems.compact
-    end # def dependencies_for
-  end # helpers
+      Marshal.load(File.open(marshal).read).map do |gem, spec|
+        if gem_names.include?(spec.name)
+          {
+            :name         => spec.name,
+            :number       => spec.version.version,
+            :platform     => spec.platform.to_s,
+            :dependencies => spec.dependencies.select {|dep| dep.type == :runtime }.map do |dep|
+              [dep.name, dep.requirement.requirements.map {|a| a.join(" ") }.join(", ")]
+            end
+          }
+        end
+      end.compact
+    end
+  end
 
   get "/quick/Marshal.4.8/:id" do
     redirect "/fetch/actual/gem/#{params[:id]}"
