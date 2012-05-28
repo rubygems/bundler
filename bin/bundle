@@ -8,6 +8,7 @@ $:.each do |path|
     abort(err)
   end
 end
+
 require 'bundler/cli'
 require 'bundler/friendly_errors'
-Bundler.with_friendly_errors {Bundler::CLI.start }
+Bundler.with_friendly_errors { Bundler::CLI.start }

@@ -32,6 +32,15 @@ Documentation:
   - Add basic documentation for bin_path and bundle_path (@radar)
   - Add documentation for the run method in Bundler::Installer
 
+## 1.1.4 (May 27, 2012)
+
+Bugfixes:
+
+  - Use `latest_release` in Capistrano and Vlad integration (#1264)
+  - Unknown exceptions now link to ISSUES for help instead of a new ticket
+  - When OpenSSL is missing, provide instructions for fixing (#1776 etc.)
+  - Correct inline help for `clean --force` (@dougbarth, #1911)
+  - Work around a Ruby 1.9.3p194 bug in Psych when config files are empty
 
 ## 1.1.3 (March 23, 2012)
 

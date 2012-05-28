@@ -124,6 +124,7 @@ module Bundler
       msg = "An error occurred while installing #{spec.name} (#{spec.version}),"
       msg << " and Bundler cannot continue.\nMake sure that `gem install"
       msg << " #{spec.name} -v '#{spec.version}'` succeeds before bundling."
+      Bundler.ui.debug e.backtrace.join("\n")
       raise Bundler::InstallError, msg
     end
 

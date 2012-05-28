@@ -1,5 +1,5 @@
 require 'uri'
-require 'net/http/persistent'
+require 'bundler/vendored_persistent'
 
 module Bundler
   # Handles all the fetching with the rubygems server
@@ -104,6 +104,16 @@ module Bundler
       end
 
       index
+    rescue LoadError => e
+      if e.message.include?("cannot load such file -- openssl")
+        raise InstallError,
+          "\nCould not load OpenSSL." \
+          "\nYou must recompile Ruby with OpenSSL support or change the sources in your" \
+          "\nGemfile from 'https' to 'http'. Instructions for compiling with OpenSSL" \
+          "\nusing RVM are available at rvm.io/packages/openssl."
+      else
+        raise e
+      end
     end
 
     # fetch index
@@ -208,7 +218,7 @@ module Bundler
           Bundler.ui.debug "Could not fetch prerelease specs from #{strip_user_pass_from_uri(@remote_uri)}"
         end
       rescue Gem::RemoteFetcher::FetchError
-        raise Bundler::HTTPError, "Could not reach #{strip_user_pass_from_uri(@remote_uri)}"
+        raise HTTPError, "Could not reach #{strip_user_pass_from_uri(@remote_uri)}"
       end
 
       return spec_list

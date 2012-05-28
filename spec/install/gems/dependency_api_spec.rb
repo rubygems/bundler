@@ -399,4 +399,38 @@ OUTPUT
       out.should_not include("#{user}:#{password}")
     end
   end
+
+  context "when ruby is compiled without openssl" do
+    before do
+      # Install a monkeypatch that reproduces the effects of openssl being
+      # missing when the fetcher runs, as happens in real life. The reason
+      # we can't just overwrite openssl.rb is that Artifice uses it.
+      bundled_app("broken_ssl").mkpath
+      bundled_app("broken_ssl/openssl.rb").open("w") do |f|
+        f.write <<-RUBY
+          $:.delete File.expand_path("..", __FILE__)
+          require 'openssl'
+
+          require 'bundler'
+          class Bundler::Fetcher
+            def fetch(*)
+              raise LoadError, "cannot load such file -- openssl"
+            end
+          end
+        RUBY
+      end
+    end
+
+    it "explains what to do to get it" do
+      gemfile <<-G
+        source "#{source_uri.gsub(/http/, 'https')}"
+        gem "rack"
+      G
+
+      bundle :install, :artifice => "endpoint",
+        :env => {"RUBYOPT" => "-I#{bundled_app("broken_ssl")}"}
+      out.should include("Could not load OpenSSL.")
+    end
+  end
+
 end
