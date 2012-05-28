@@ -1,3 +1,23 @@
+## 1.2.0.pre.1 (May 27, 2012)
+
+Features:
+
+  - Import git submodules of submodules recursively (@nwwatson, #1935)
+
+Bugfixes:
+
+  - Exit from `check` with a non-zero status when frozen with no lock
+  - Use `latest_release` in Capistrano and Vlad integration (#1264)
+  - Work around a Ruby 1.9.3p194 bug in Psych when config files are empty
+
+Documentation:
+
+  - Add instructions for local git repos to the `config` manpage
+  - Update the `Gemfile` manpage to include ruby versions (@stevenh512)
+  - When OpenSSL is missing, provide instructions for fixing (#1776 etc.)
+  - Unknown exceptions now link to ISSUES for help instead of a new ticket
+  - Correct inline help for `clean --force` (@dougbarth, #1911)
+
 ## 1.2.0.pre (May 4, 2012)
 
 Features:
