@@ -2,7 +2,7 @@
 
 Features:
 
-  - Import git submodules of submodules recursively (@nwwatson, #1935)
+  - Git gems import submodules of submodules recursively (@nwwatson, #1935)
 
 Bugfixes:
 
