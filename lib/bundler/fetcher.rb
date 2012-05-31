@@ -72,7 +72,7 @@ module Bundler
         # 1. Gemcutter Endpoint doesn't return a 200
         # 2. Marshal blob doesn't load properly
         # 3. One of the YAML gemspecs has the Syck::DefaultKey problem
-        rescue HTTPError, TypeError => e
+        rescue HTTPError, TypeError, GemspecError => e
           # new line now that the dots are over
           Bundler.ui.info "" unless Bundler.ui.debug?
 
@@ -182,11 +182,10 @@ module Bundler
           rescue ArgumentError => e
             if e.message.include?('Ill-formed requirement ["#<YAML::Syck::DefaultKey')
               puts # we shouldn't print the error message on the "fetching info" status line
-              raise GemspecError, %{Unfortunately, the gem #{s[:name]} (#{s[:number]}) } +
-                %{has an invalid gemspec. As a result, Bundler cannot install this Gemfile. } +
-                %{Please ask the gem author to yank the bad version to fix this issue. For } +
-                %{more information, see http://bit.ly/syck-defaultkey. For a temporary } +
-                %{workaround try using the --full-index option.}
+              raise GemspecError,
+                "Unfortunately, the gem #{s[:name]} (#{s[:number]}) has an invalid gemspec. \n" \
+                "Please ask the gem author to yank the bad version to fix this issue. For \n" \
+                "more information, see http://bit.ly/syck-defaultkey."
             else
               raise e
             end
