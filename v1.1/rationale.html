@@ -9,6 +9,9 @@
   <body>
     <div id="body">
       <div id="contents">
+        <a href="http://www.devswag.com/collections/bundler" id="callout">
+          <img alt="Buy Bundler gear at DevSwag!" src="../images/devswag-callout.png"/>
+        </a>
         <div id="header">
           <a href="/">
             <img alt="The best way to manage your application's dependencies" src="../images/gembundler.png" width="725"/>
@@ -129,7 +132,7 @@
           <p>
             To do this, you can group your dependencies:
           </p>
-          <pre class="sunburst">source <span class="String"><span class="String">&quot;</span>http://rubygems.org<span class="String">&quot;</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">&quot;</span>rails<span class="String">&quot;</span></span>, <span class="String"><span class="String">&quot;</span>3.0.0.rc<span class="String">&quot;</span></span>&#x000A;gem <span class="String"><span class="String">&quot;</span>rack-cache<span class="String">&quot;</span></span>, <span class="Constant"><span class="Constant">:</span>require</span> =&gt; <span class="String"><span class="String">&quot;</span>rack/cache<span class="String">&quot;</span></span>&#x000A;gem <span class="String"><span class="String">&quot;</span>nokogiri<span class="String">&quot;</span></span>, <span class="String"><span class="String">&quot;</span>~&gt; 1.4.2<span class="String">&quot;</span></span>&#x000A;&#x000A;group <span class="Constant"><span class="Constant">:</span>development</span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">&quot;</span>sqlite3-ruby<span class="String">&quot;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;&#x000A;group <span class="Constant"><span class="Constant">:</span>production</span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">&quot;</span>pg<span class="String">&quot;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;</pre>
+          <pre class="sunburst">source <span class="String"><span class="String">&quot;</span>http://rubygems.org<span class="String">&quot;</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">&quot;</span>rails<span class="String">&quot;</span></span>, <span class="String"><span class="String">&quot;</span>3.2.2<span class="String">&quot;</span></span>&#x000A;gem <span class="String"><span class="String">&quot;</span>rack-cache<span class="String">&quot;</span></span>, <span class="Constant"><span class="Constant">:</span>require</span> =&gt; <span class="String"><span class="String">&quot;</span>rack/cache<span class="String">&quot;</span></span>&#x000A;gem <span class="String"><span class="String">&quot;</span>nokogiri<span class="String">&quot;</span></span>, <span class="String"><span class="String">&quot;</span>~&gt; 1.4.2<span class="String">&quot;</span></span>&#x000A;&#x000A;group <span class="Constant"><span class="Constant">:</span>development</span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">&quot;</span>sqlite3<span class="String">&quot;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;&#x000A;group <span class="Constant"><span class="Constant">:</span>production</span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">&quot;</span>pg<span class="String">&quot;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;</pre>
           <p>
             Now, in development, you can instruct bundler to skip the <code>production</code> group:
           </p>
@@ -670,9 +673,7 @@
     <div id="prod-versions">
       <a class="" href="../v0.9/index.html">v0.9</a>
       <a class="" href="../v1.0/index.html">v1.0</a>
-    </div>
-    <div id="rc-versions">
-      <a class="current" href="../v1.1/index.html">v1.1 (coming soon)</a>
+      <a class="current" href="../v1.1/index.html">v1.1</a>
     </div>
     <script type="text/javascript">
       //<![CDATA[

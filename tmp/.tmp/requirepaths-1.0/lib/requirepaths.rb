@@ -1,1 +1,0 @@
-REQUIREPATHS = '1.0'

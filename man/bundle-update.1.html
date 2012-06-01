@@ -61,7 +61,7 @@
     <a href="#UPDATING-A-LIST-OF-GEMS">UPDATING A LIST OF GEMS</a>
     <a href="#OVERLAPPING-DEPENDENCIES">OVERLAPPING DEPENDENCIES</a>
     <a href="#RECOMMENDED-WORKFLOW">RECOMMENDED WORKFLOW</a>
-    </div>
+  </div>
 
   <ol class='man-decor man-head man head'>
     <li class='tl'>bundle-update(1)</li>
@@ -91,7 +91,7 @@ gem.</p>
 <h2 id="OPTIONS">OPTIONS</h2>
 
 <dl>
-<dt><code>--source=&lt;name></code></dt><dd>The name of a <code>:git</code> or <code>:path</code> source used in the <a href="gemfile.5.html" class="man-ref">Gemfile<span class="s">(5)</span></a>. For
+<dt><code>--source=&lt;name></code></dt><dd>The name of a <code>:git</code> or <code>:path</code> source used in the <a class="man-ref" href="gemfile.5.html">Gemfile<span class="s">(5)</span></a>. For
 instance, with a <code>:git</code> source of <code>http://github.com/rails/rails.git</code>,
 you would call <code>bundle update --source rails</code></dd>
 </dl>
@@ -103,7 +103,7 @@ you would call <code>bundle update --source rails</code></dd>
 any previously installed gems and resolve all dependencies again
 based on the latest versions of all gems available in the sources.</p>
 
-<p>Consider the following <a href="gemfile.5.html" class="man-ref">Gemfile<span class="s">(5)</span></a>:</p>
+<p>Consider the following <a class="man-ref" href="gemfile.5.html">Gemfile<span class="s">(5)</span></a>:</p>
 
 <pre><code>source "http://rubygems.org"
 
@@ -144,7 +144,7 @@ Installing rails (3.0.0.rc)
 Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.
 </code></pre>
 
-<p>As you can see, even though you have just two gems in the <a href="gemfile.5.html" class="man-ref">Gemfile<span class="s">(5)</span></a>, your application
+<p>As you can see, even though you have just two gems in the <a class="man-ref" href="gemfile.5.html">Gemfile<span class="s">(5)</span></a>, your application
 actually needs 25 different gems in order to run. Bundler remembers the exact versions
 it installed in <code>Gemfile.lock</code>. The next time you run <a href="bundle-install.1.html">bundle install(1)</a>, bundler skips
 the dependency resolution and installs the same gems as it installed last time.</p>
@@ -155,7 +155,7 @@ last time. You don't need to worry that a new release of <code>erubis</code> or 
 the gems you use.</p>
 
 <p>However, from time to time, you might want to update the gems you are using to the
-newest versions that still match the gems in your <a href="gemfile.5.html" class="man-ref">Gemfile<span class="s">(5)</span></a>.</p>
+newest versions that still match the gems in your <a class="man-ref" href="gemfile.5.html">Gemfile<span class="s">(5)</span></a>.</p>
 
 <p>To do this, run <code>bundle update</code>, which will ignore the <code>Gemfile.lock</code>, and resolve
 all the dependencies again. Keep in mind that this process can result in a significantly
@@ -164,7 +164,7 @@ authors released since the last time you ran <code>bundle update</code>.</p>
 
 <h2 id="UPDATING-A-LIST-OF-GEMS">UPDATING A LIST OF GEMS</h2>
 
-<p>Sometimes, you want to update a single gem in the <a href="gemfile.5.html" class="man-ref">Gemfile<span class="s">(5)</span></a>, and leave the rest of the
+<p>Sometimes, you want to update a single gem in the <a class="man-ref" href="gemfile.5.html">Gemfile<span class="s">(5)</span></a>, and leave the rest of the
 gems that you specified locked to the versions in the <code>Gemfile.lock</code>.</p>
 
 <p>For instance, in the scenario above, imagine that <code>nokogiri</code> releases version <code>1.4.4</code>, and
@@ -176,7 +176,7 @@ its dependencies.</p>
 
 <h2 id="OVERLAPPING-DEPENDENCIES">OVERLAPPING DEPENDENCIES</h2>
 
-<p>Sometimes, multiple gems declared in your <a href="gemfile.5.html" class="man-ref">Gemfile<span class="s">(5)</span></a> are satisfied by the same
+<p>Sometimes, multiple gems declared in your <a class="man-ref" href="gemfile.5.html">Gemfile<span class="s">(5)</span></a> are satisfied by the same
 second-level dependency. For instance, consider the case of <code>thin</code> and
 <code>rack-perftools-profiler</code>.</p>
 
@@ -210,7 +210,7 @@ Using bundler (1.0.0.rc.3)
 <p><code>In short</code>, when you update a gem using <code>bundle update</code>, bundler will update all
 dependencies of that gem, including those that are also dependencies of another gem.</p>
 
-<p>In this scenario, updating the <code>thin</code> version manually in the <a href="gemfile.5.html" class="man-ref">Gemfile<span class="s">(5)</span></a>,
+<p>In this scenario, updating the <code>thin</code> version manually in the <a class="man-ref" href="gemfile.5.html">Gemfile<span class="s">(5)</span></a>,
 and then running <a href="bundle-install.1.html">bundle install(1)</a> will only update <code>daemons</code> and <code>eventmachine</code>,
 but not <code>rack</code>. For more information, see the <code>CONSERVATIVE UPDATING</code> section
 of <a href="bundle-install.1.html">bundle install(1)</a>.</p>
@@ -221,7 +221,7 @@ of <a href="bundle-install.1.html">bundle install(1)</a>.</p>
 use the following workflow:</p>
 
 <ul>
-<li><p>After you create your <a href="gemfile.5.html" class="man-ref">Gemfile<span class="s">(5)</span></a> for the first time, run</p>
+<li><p>After you create your <a class="man-ref" href="gemfile.5.html">Gemfile<span class="s">(5)</span></a> for the first time, run</p>
 
 <p>  $ bundle install</p></li>
 <li><p>Check the resulting <code>Gemfile.lock</code> into version control</p>
@@ -233,18 +233,18 @@ use the following workflow:</p>
 <li><p>When checking out this repository on a deployment machine, run</p>
 
 <p>  $ bundle install --deployment</p></li>
-<li><p>After changing the <a href="gemfile.5.html" class="man-ref">Gemfile<span class="s">(5)</span></a> to reflect a new or update dependency, run</p>
+<li><p>After changing the <a class="man-ref" href="gemfile.5.html">Gemfile<span class="s">(5)</span></a> to reflect a new or update dependency, run</p>
 
 <p>  $ bundle install</p></li>
 <li><p>Make sure to check the updated <code>Gemfile.lock</code> into version control</p>
 
 <p>  $ git add Gemfile.lock</p></li>
 <li><p>If <a href="bundle-install.1.html">bundle install(1)</a> reports a conflict, manually update the specific
-gems that you changed in the <a href="gemfile.5.html" class="man-ref">Gemfile<span class="s">(5)</span></a></p>
+gems that you changed in the <a class="man-ref" href="gemfile.5.html">Gemfile<span class="s">(5)</span></a></p>
 
 <p>  $ bundle update rails thin</p></li>
 <li><p>If you want to update all the gems to the latest possible versions that
-still match the gems listed in the <a href="gemfile.5.html" class="man-ref">Gemfile<span class="s">(5)</span></a>, run</p>
+still match the gems listed in the <a class="man-ref" href="gemfile.5.html">Gemfile<span class="s">(5)</span></a>, run</p>
 
 <p>  $ bundle update</p></li>
 </ul>
@@ -253,7 +253,7 @@ still match the gems listed in the <a href="gemfile.5.html" class="man-ref">Gemf
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'></li>
-    <li class='tc'>August 2010</li>
+    <li class='tc'>June 2012</li>
     <li class='tr'>bundle-update(1)</li>
   </ol>
 

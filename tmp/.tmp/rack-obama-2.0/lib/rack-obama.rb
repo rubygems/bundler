@@ -1,1 +1,0 @@
-RACKOBAMA = '2.0'

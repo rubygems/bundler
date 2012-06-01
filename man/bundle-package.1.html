@@ -58,7 +58,7 @@
     <a href="#DESCRIPTION">DESCRIPTION</a>
     <a href="#GIT-AND-PATH-GEMS">GIT AND PATH GEMS</a>
     <a href="#REMOTE-FETCHING">REMOTE FETCHING</a>
-    </div>
+  </div>
 
   <ol class='man-decor man-head man head'>
     <li class='tl'>bundle-package(1)</li>
@@ -83,9 +83,9 @@ use the gems in the cache in preference to the ones on <code>rubygems.org</code>
 
 <h2 id="GIT-AND-PATH-GEMS">GIT AND PATH GEMS</h2>
 
-<p>In Bundler 1.0, the <code>bundle package</code> command only packages <code>.gem</code> files,
-not gems specified using the <code>:git</code> or <code>:path</code> options. This will likely
-change in the future.</p>
+<p>Since Bundler 1.2, the <code>bundle package</code> command can also package <code>:git</code> and
+<code>:path</code> dependencies besides .gem files. This needs to be explicitly enabled
+via the <code>--all</code> option. Once used, the <code>--all</code> option will be remembered.</p>
 
 <h2 id="REMOTE-FETCHING">REMOTE FETCHING</h2>
 
@@ -94,7 +94,7 @@ change in the future.</p>
 to check whether a platform-specific gem exists for any of the gems
 in <code>vendor/cache</code>.</p>
 
-<p>For instance, consider this <a href="gemfile.5.html" class="man-ref">Gemfile<span class="s">(5)</span></a>:</p>
+<p>For instance, consider this <a class="man-ref" href="gemfile.5.html">Gemfile<span class="s">(5)</span></a>:</p>
 
 <pre><code>source "http://rubygems.org"
 
@@ -132,7 +132,7 @@ deploying to production.</p>
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'></li>
-    <li class='tc'>August 2010</li>
+    <li class='tc'>June 2012</li>
     <li class='tr'>bundle-package(1)</li>
   </ol>
 

@@ -1,1 +1,0 @@
-PLATFORM_SPECIFIC = '1.0.0 x86-darwin-100'

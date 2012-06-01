@@ -1,1 +1,0 @@
-RACK_MIDDLEWARE = '1.0'

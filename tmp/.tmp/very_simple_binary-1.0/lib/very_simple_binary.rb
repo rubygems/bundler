@@ -1,1 +1,0 @@
-VERY_SIMPLE_BINARY = '1.0'

@@ -57,11 +57,12 @@
     <a href="#SYNOPSIS">SYNOPSIS</a>
     <a href="#SYNTAX">SYNTAX</a>
     <a href="#SOURCES-source-">SOURCES (#source)</a>
+    <a href="#RUBY-ruby-">RUBY (#ruby)</a>
     <a href="#GEMS-gem-">GEMS (#gem)</a>
     <a href="#BLOCK-FORM-OF-GIT-PATH-GROUP-and-PLATFORMS">BLOCK FORM OF GIT, PATH, GROUP and PLATFORMS</a>
     <a href="#GEMSPEC-gemspec-">GEMSPEC (#gemspec)</a>
     <a href="#SOURCE-PRIORITY">SOURCE PRIORITY</a>
-    </div>
+  </div>
 
   <ol class='man-decor man-head man head'>
     <li class='tl'>Gemfile(5)</li>
@@ -99,6 +100,35 @@ source "http://gems.github.com"
 
 <p>Each of these _source_s <code>MUST</code> be a valid Rubygems repository.</p>
 
+<h2 id="RUBY-ruby-">RUBY (#ruby)</h2>
+
+<p>If your application requires a specific Ruby version or engine, specify your
+requirements using the <code>ruby</code> method, with the following arguments.
+All parameters are <code>OPTIONAL</code> unless otherwise specified.</p>
+
+<h3 id="VERSION-required-">VERSION (required)</h3>
+
+<p>The version of Ruby that your application requires. If your application
+requires an alternate Ruby engine, such as JRuby or Rubinius, this should be
+the Ruby version that the engine is compatible with.</p>
+
+<pre><code>ruby "1.9.3"
+</code></pre>
+
+<h3 id="ENGINE-engine-">ENGINE (:engine)</h3>
+
+<p>Each application <em>may</em> specify a Ruby engine. If an engine is specified, an
+engine version <em>must</em> also be specified.</p>
+
+<h3 id="ENGINE-VERSION-engine_version-">ENGINE VERSION (:engine_version)</h3>
+
+<p>Each application <em>may</em> specify a Ruby engine version. If an engine version is
+specified, an engine <em>must</em> also be specified. If the engine is "ruby" the
+engine version specified <em>must</em> match the Ruby version.</p>
+
+<pre><code>ruby "1.8.7", :engine =&gt; "jruby", :engine_version =&gt; "1.6.7"
+</code></pre>
+
 <h2 id="GEMS-gem-">GEMS (#gem)</h2>
 
 <p>Specify gem requirements using the <code>gem</code> method, with the following arguments.
@@ -121,13 +151,15 @@ gem "RedCloth", "&gt;= 4.1.0", "&lt; 4.2.0"
 
 <h3 id="REQUIRE-AS-require-">REQUIRE AS (:require)</h3>
 
-<p>Each <em>gem</em> <code>MAY</code> specify its main file, which should be used when autorequiring
-(<code>Bundler.require</code>).</p>
+<p>Each <em>gem</em> <code>MAY</code> specify files that should be used when autorequiring via
+<code>Bundler.require</code>. You may pass an array with multiple files, or <code>false</code> to
+prevent any file from being autorequired.</p>
 
-<pre><code>gem "sqlite3-ruby", :require =&gt; "sqlite3"
+<pre><code>gem "redis", :require =&gt; ["redis/connection/hiredis", "redis"]
+gem "webmock", :require =&gt; false
 </code></pre>
 
-<p>This defaults to the name of the gem itself. For instance, these are identical:</p>
+<p>The argument defaults to the name of the gem. For example, these are identical:</p>
 
 <pre><code>gem "nokogiri"
 gem "nokogiri", :require =&gt; "nokogiri"
@@ -276,7 +308,7 @@ the <code>.gemspec</code>.</p>
 | |-actionpack.gemspec    [actionpack gem located here]
 |~activesupport
 | |-activesupport.gemspec [activesupport gem located here]
-...
+|...
 </code></pre>
 
 <p>To install a gem located in a git repository, bundler changes to
@@ -284,6 +316,22 @@ the directory containing the gemspec, runs <code>gem build name.gemspec</code>
 and then installs the resulting gem. The <code>gem build</code> command,
 which comes standard with Rubygems, evaluates the <code>.gemspec</code> in
 the context of the directory in which it is located.</p>
+
+<h3 id="GITHUB-github-">GITHUB (:github)</h3>
+
+<p>If the git repository you want to use is hosted on GitHub and is public, you can use the
+:github shorthand to specify just the github username and repository name (without the
+trailing ".git"), separated by a slash. If both the username and repository name are the
+same, you can omit one.</p>
+
+<pre><code>gem "rails", :github =&gt; "rails/rails"
+gem "rails", :github =&gt; "rails"
+</code></pre>
+
+<p>Are both equivalent to</p>
+
+<pre><code>gem "rails", :git =&gt; "git://github.com/rails/rails.git"
+</code></pre>
 
 <h3 id="PATH-path-">PATH (:path)</h3>
 
@@ -314,7 +362,7 @@ end
 
 platforms :ruby do
   gem "ruby-debug"
-  gem "sqlite3-ruby"
+  gem "sqlite3"
 end
 
 group :development do
@@ -357,15 +405,15 @@ bundler uses the following priority order:</p>
 repository otherwise declared. This results in bundler prioritizing the
 ActiveSupport gem from the Rails git repository over ones from
 <code>rubygems.org</code></li>
-<li>The sources specified via <code>source</code>, in the order in which they were
-declared in the <code>Gemfile</code>.</li>
+<li>The sources specified via <code>source</code>, searching each source in your <code>Gemfile</code>
+from last added to first added.</li>
 </ol>
 
 
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'></li>
-    <li class='tc'>May 2011</li>
+    <li class='tc'>June 2012</li>
     <li class='tr'>Gemfile(5)</li>
   </ol>
 

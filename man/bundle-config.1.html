@@ -59,7 +59,8 @@
     <a href="#BUILD-OPTIONS">BUILD OPTIONS</a>
     <a href="#CONFIGURATION-KEYS">CONFIGURATION KEYS</a>
     <a href="#LIST-OF-AVAILABLE-KEYS">LIST OF AVAILABLE KEYS</a>
-    </div>
+    <a href="#LOCAL-GIT-REPOS">LOCAL GIT REPOS</a>
+  </div>
 
   <ol class='man-decor man-head man head'>
     <li class='tl'>bundle-config(1)</li>
@@ -94,6 +95,14 @@ setting, and where it was set.</p>
 value specified for all bundles executed as the current user. The configuration
 will be stored in <code>~/.bundle/config</code>.</p>
 
+<p>Executing <code>bundle config --global &lt;name> &lt;value></code> works the same as above.</p>
+
+<p>Executing <code>bundle config --local &lt;name> &lt;value></code> will set that configuration to
+the local application. The configuration will be stored in <code>app/.bundle/config</code>.</p>
+
+<p>Executing <code>bundle config --delete &lt;name></code> will delete the configuration in both
+local and global sources.</p>
+
 <h2 id="BUILD-OPTIONS">BUILD OPTIONS</h2>
 
 <p>You can use <code>bundle config</code> to give bundler the flags to pass to the gem
@@ -121,7 +130,7 @@ to machine, you can specify these flags on a per-machine basis.</p>
 environment variable form.</p>
 
 <p>For instance, passing the <code>--without</code> flag to <a href="bundle-install.1.html">bundle install(1)</a>
-prevents Bundler from installing certain groups specified in the <a href="gemfile.5.html" class="man-ref">Gemfile<span class="s">(5)</span></a>. Bundler
+prevents Bundler from installing certain groups specified in the <a class="man-ref" href="gemfile.5.html">Gemfile<span class="s">(5)</span></a>. Bundler
 persists this value in <code>app/.bundle/config</code> so that calls to <code>Bundler.setup</code>
 do not try to find gems from the <code>Gemfile</code> that you didn't install. Additionally,
 subsequent calls to <a href="bundle-install.1.html">bundle install(1)</a> remember this setting and skip those
@@ -159,10 +168,45 @@ flag to the <a href="bundle-install.1.html">bundle install(1)</a> command.</p>
 whichever is preferable for your setup. If you use both, environment variables
 will take preference over global settings.</p>
 
+<h2 id="LOCAL-GIT-REPOS">LOCAL GIT REPOS</h2>
+
+<p>Bundler also allows you to work against a git repository locally
+instead of using the remote version. This can be achieved by setting
+up a local override:</p>
+
+<pre><code>bundle config local.GEM_NAME /path/to/local/git/repository
+</code></pre>
+
+<p>For example, in order to use a local Rack repository, a developer could call:</p>
+
+<pre><code>bundle config local.rack ~/Work/git/rack
+</code></pre>
+
+<p>Now instead of checking out the remote git repository, the local
+override will be used. Similar to a path source, every time the local
+git repository change, changes will be automatically picked up by
+Bundler. This means a commit in the local git repo will update the
+revision in the <code>Gemfile.lock</code> to the local git repo revision. This
+requires the same attention as git submodules. Before pushing to
+the remote, you need to ensure the local override was pushed, otherwise
+you may point to a commit that only exists in your local machine.</p>
+
+<p>Bundler does many checks to ensure a developer won't work with
+invalid references. Particularly, we force a developer to specify
+a branch in the <code>Gemfile</code> in order to use this feature. If the branch
+specified in the <code>Gemfile</code> and the current branch in the local git
+repository do not match, Bundler will abort. This ensures that
+a developer is always working against the correct branches, avoiding
+a reference to be accidentally updated.</p>
+
+<p>Finally, Bundler also ensures that the current revision in the
+<code>Gemfile.lock</code> exists in the local git repository. By doing this, Bundler
+forces you to fetch the latest changes in the remotes.</p>
+
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'></li>
-    <li class='tc'>August 2010</li>
+    <li class='tc'>June 2012</li>
     <li class='tr'>bundle-config(1)</li>
   </ol>
 
