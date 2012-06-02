@@ -13,6 +13,18 @@ describe Bundler::Dsl do
       subject.dependencies.first.source.uri.should == github_uri
     end
 
+    it "should convert numeric :gist to :git" do
+      subject.gem("not-really-a-gem", :gist => 2859988)
+      github_uri = "git://gist.github.com/2859988.git"
+      subject.dependencies.first.source.uri.should == github_uri
+    end
+
+    it "should convert :gist to :git" do
+      subject.gem("not-really-a-gem", :gist => "2859988")
+      github_uri = "git://gist.github.com/2859988.git"
+      subject.dependencies.first.source.uri.should == github_uri
+    end
+
     it "should convert 'rails' to 'rails/rails'" do
       subject.gem("rails", :github => "rails")
       github_uri = "git://github.com/rails/rails.git"
