@@ -86,7 +86,7 @@ module Bundler
           else
             raise DslError, "You cannot specify the same gem twice coming from different sources. You " \
                             "specified that #{dep.name} (#{dep.requirement}) should come from " \
-                            "#{current.source || 'an unspecfied source'} and #{dep.source}"
+                            "#{current.source || 'an unspecified source'} and #{dep.source}"
           end
         end
       end

@@ -646,7 +646,7 @@ describe "the lockfile format" do
     G
 
     bundled_app("Gemfile.lock").should_not exist
-    out.should include "rack (>= 0) should come from an unspecfied source and git://hubz.com (at master)"
+    out.should include "rack (>= 0) should come from an unspecified source and git://hubz.com (at master)"
   end
 
   it "works correctly with multiple version dependencies" do
