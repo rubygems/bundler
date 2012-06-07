@@ -1,12 +1,14 @@
 require 'rbconfig'
 require 'fileutils'
 require 'pathname'
+require 'bundler/gem_path_manipulation'
 require 'bundler/psyched_yaml'
 require 'bundler/rubygems_ext'
 require 'bundler/rubygems_integration'
 require 'bundler/version'
 
 module Bundler
+  preserve_gem_path
   ORIGINAL_ENV = ENV.to_hash
 
   autoload :Definition,            'bundler/definition'
