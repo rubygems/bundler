@@ -716,7 +716,7 @@ module Bundler
         path = Pathname.new(path)
         path = path.expand_path(Bundler.root) unless path.relative?
 
-        unless options["branch"]
+        unless options["branch"] || Bundler.settings['local_override_require_branch'] == 'false'
           raise GitError, "Cannot use local override for #{name} at #{path} because " \
             ":branch is not specified in Gemfile. Specify a branch or check " \
             "`bundle config --delete` to remove the local override"

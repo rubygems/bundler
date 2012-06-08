@@ -254,7 +254,7 @@ describe "bundle install with git sources" do
       out.should =~ /Cannot use local override for rack-0.8 because #{Regexp.escape(lib_path('local-rack').to_s)} does not exist/
     end
 
-    it "explodes if branch is not given" do
+    it "explodes if branch is not given without being allowed to" do
       build_git "rack", "0.8"
       FileUtils.cp_r("#{lib_path('rack-0.8')}/.", lib_path('local-rack'))
 
@@ -264,8 +264,24 @@ describe "bundle install with git sources" do
       G
 
       bundle %|config local.rack #{lib_path('local-rack')}|
+      bundle %|config --delete local_override_require_branch|
       bundle :install
       out.should =~ /because :branch is not specified in Gemfile/
+    end
+
+    it "does not explode if branch is not given but settings allow this" do
+      build_git "rack", "0.8"
+      FileUtils.cp_r("#{lib_path('rack-0.8')}/.", lib_path('local-rack'))
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :git => "#{lib_path('rack-0.8')}"
+      G
+
+      bundle %|config local.rack #{lib_path('local-rack')}|
+      bundle %|config local_override_require_branch false|
+      bundle :install
+      out.should_not =~ /because :branch is not specified in Gemfile/
     end
 
     it "explodes on different branches" do
