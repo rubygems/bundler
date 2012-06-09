@@ -49,8 +49,8 @@ The Bundler team needs to know some things in order to diagnose and hopefully fi
   - What version of Ruby you are using (run `ruby -v`)
   - What version of Rubygems you are using (run `gem -v`)
   - Whether you are using RVM, and if so what version (run `rvm -v`)
-  - Whether you have the `rubygems-bundler` gem, which can break gem binares
-  - Whether you have the `open_gem` gem, which can cause rake activation conflicts
+  - Whether you have the `rubygems-bundler` gem, which can break gem binares (run `gem list rubygems-bundler`)
+  - Whether you have the `open_gem` gem, which can cause rake activation conflicts (run `gem list open_gem`)
 
 If you are using Rails 2.3, please also include:
 
@@ -58,6 +58,6 @@ If you are using Rails 2.3, please also include:
   - Your preinitializer.rb file
   - Your environment.rb file
 
-[Create a gist](https://gist.github.com) containing all of that information, then visit the [Bundler issue tracker](https://github.com/carlhuda/bundler/issues) and [create a new ticket](https://github.com/carlhuda/bundler/issues/new) describing your problem and linking to your gist.
+[Create a gist](https://gist.github.com) containing all of that information, then visit the [Bundler issue tracker](https://github.com/carlhuda/bundler/issues) and [create a ticket](https://github.com/carlhuda/bundler/issues/new) describing your problem and linking to your gist.
 
 Thanks for reporting issues and making Bundler better!
