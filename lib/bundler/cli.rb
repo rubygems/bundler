@@ -520,10 +520,12 @@ module Bundler
     end
 
     desc "open GEM", "Opens the source directory of the given bundled gem"
+    method_option "grep", :type => :boolean, :banner =>
+      "find gems in the specified pattern (regular expression)."
     def open(name)
       editor = [ENV['BUNDLER_EDITOR'], ENV['VISUAL'], ENV['EDITOR']].find{|e| !e.nil? && !e.empty? }
       if editor
-        gem_path = locate_gem(name)
+        return unless gem_path = locate_gem(name, options[:grep])
         Dir.chdir(gem_path) do
           command = "#{editor} #{gem_path}"
           success = system(command)
@@ -680,14 +682,44 @@ module Bundler
       !(`which groff` rescue '').empty?
     end
 
-    def locate_gem(name)
-      spec = Bundler.load.specs.find{|s| s.name == name }
-      raise GemNotFound, "Could not find gem '#{name}' in the current bundle." unless spec
+    def locate_gem(name, grep = false)
+      return unless spec = select_spec(name, grep)
+
       if spec.name == 'bundler'
         return File.expand_path('../../../', __FILE__)
       end
       spec.full_gem_path
     end
 
+    def select_spec(name, grep)
+      grep ? grep_spec(name) : find_spec(name)
+    end
+
+    def grep_spec(name)
+      regexp_name = Regexp.new(name)
+      specs = Bundler.load.specs.find_all{|s| s.name =~ regexp_name }
+
+      case specs.count
+      when 0
+        raise GemNotFound, "Could not find gem '#{name}' in the current bundle."
+      when 1
+        specs[0]
+      else
+        specs.each_with_index do |spec, index|
+          Bundler.ui.info "#{index.succ} : #{spec.name}", true
+        end
+        Bundler.ui.info '0 : - exit -', true
+
+        input = Bundler.ui.ask('> ')
+        (num = input.to_i) > 0 ? specs[num - 1] : nil
+      end
+    end
+
+    def find_spec(name)
+      spec = Bundler.load.specs.find{|s| s.name == name }
+      raise GemNotFound, "Could not find gem '#{name}' in the current bundle." unless spec
+
+      spec
+    end
   end
 end
