@@ -254,7 +254,7 @@ describe "bundle install with git sources" do
       out.should =~ /Cannot use local override for rack-0.8 because #{Regexp.escape(lib_path('local-rack').to_s)} does not exist/
     end
 
-    it "explodes if branch, tag, or ref is not given" do
+    it "does not explode if branch, tag, or ref is not given" do
       build_git "rack", "0.8"
       FileUtils.cp_r("#{lib_path('rack-0.8')}/.", lib_path('local-rack'))
 
@@ -265,7 +265,7 @@ describe "bundle install with git sources" do
 
       bundle %|config local.rack #{lib_path('local-rack')}|
       bundle :install
-      out.should =~ /because :branch, :tag, or :ref is not specified in Gemfile/
+      out.should_not =~ /is not specified in Gemfile/
     end
 
     it "explodes on invalid revision" do

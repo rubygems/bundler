@@ -716,12 +716,6 @@ module Bundler
         path = Pathname.new(path)
         path = path.expand_path(Bundler.root) unless path.relative?
 
-        unless options["branch"] || options["tag"] || options["ref"]
-          raise GitError, "Cannot use local override for #{name} at #{path} because " \
-            ":branch, :tag, or :ref is not specified in Gemfile. Specify a commit reference or check " \
-            "`bundle config --delete` to remove the local override"
-        end
-
         unless path.exist?
           raise GitError, "Cannot use local override for #{name} because #{path} " \
             "does not exist. Check `bundle config --delete` to remove the local override"
