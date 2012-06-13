@@ -727,6 +727,11 @@ module Bundler
         # so the Gemfile.lock always picks up the new revision.
         @git_proxy = GitProxy.new(path, uri, ref)
 
+        if options["branch"] and git_proxy.branch != options["branch"]
+          raise GitError, "Local override for #{name} at #{path} is using branch " \
+            "#{git_proxy.branch} but Gemfile specifies #{options["branch"]}"
+        end
+
         changed = cached_revision && cached_revision != git_proxy.revision
 
         if changed && !git_proxy.contains?(cached_revision)
