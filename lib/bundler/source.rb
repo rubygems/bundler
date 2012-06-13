@@ -716,12 +716,6 @@ module Bundler
         path = Pathname.new(path)
         path = path.expand_path(Bundler.root) unless path.relative?
 
-        unless options["branch"]
-          raise GitError, "Cannot use local override for #{name} at #{path} because " \
-            ":branch is not specified in Gemfile. Specify a branch or check " \
-            "`bundle config --delete` to remove the local override"
-        end
-
         unless path.exist?
           raise GitError, "Cannot use local override for #{name} because #{path} " \
             "does not exist. Check `bundle config --delete` to remove the local override"
@@ -732,11 +726,6 @@ module Bundler
         # Create a new git proxy without the cached revision
         # so the Gemfile.lock always picks up the new revision.
         @git_proxy = GitProxy.new(path, uri, ref)
-
-        if git_proxy.branch != options["branch"]
-          raise GitError, "Local override for #{name} at #{path} is using branch " \
-            "#{git_proxy.branch} but Gemfile specifies #{options["branch"]}"
-        end
 
         changed = cached_revision && cached_revision != git_proxy.revision
 
