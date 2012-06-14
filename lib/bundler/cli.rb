@@ -523,7 +523,7 @@ module Bundler
     def open(name)
       editor = [ENV['BUNDLER_EDITOR'], ENV['VISUAL'], ENV['EDITOR']].find{|e| !e.nil? && !e.empty? }
       if editor
-        return unless gem_path = locate_gem(name)
+        return unless gem_path = locate_gem(name, true)
         Dir.chdir(gem_path) do
           command = "#{editor} #{gem_path}"
           success = system(command)
@@ -680,8 +680,8 @@ module Bundler
       !(`which groff` rescue '').empty?
     end
 
-    def locate_gem(name)
-      return unless spec = select_spec(name)
+    def locate_gem(name, regexp_match = false)
+      return unless spec = select_spec(name, regexp_match)
 
       if spec.name == 'bundler'
         return File.expand_path('../../../', __FILE__)
@@ -689,13 +689,13 @@ module Bundler
       spec.full_gem_path
     end
 
-    def select_spec(name)
+    def select_spec(name, regexp_match)
       specs = []
       regexp_name = Regexp.new(name)
 
       Bundler.load.specs.each do |spec|
         return spec if spec.name == name
-        specs << spec if spec.name =~ regexp_name
+        specs << spec if regexp_match && spec.name =~ regexp_name
       end
 
       case specs.count
