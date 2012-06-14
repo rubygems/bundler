@@ -124,7 +124,7 @@ specified in the `Gemfile` and the current branch in the local git
 repository do not match, Bundler will abort. This ensures that
 a developer is always working against the correct branches, and prevents
 accidental locking to a different branch.
- 
+
 Finally, Bundler also ensures that the current revision in the
 `Gemfile.lock` exists in the local git repository. By doing this, Bundler
 forces you to fetch the latest changes in the remotes.
