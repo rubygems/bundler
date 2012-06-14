@@ -628,7 +628,7 @@ module Bundler
         end
       end
 
-      attr_reader :uri, :ref, :options, :submodules
+      attr_reader :uri, :ref, :branch, :options, :submodules
 
       def initialize(options)
         @options = options
@@ -641,6 +641,7 @@ module Bundler
         %w(ref branch tag revision).each{|k| options[k] = options[k].to_s if options[k] }
 
         @uri        = options["uri"]
+        @branch     = options["branch"]
         @ref        = options["ref"] || options["branch"] || options["tag"] || 'master'
         @submodules = options["submodules"]
         @name       = options["name"]
@@ -670,6 +671,7 @@ module Bundler
         Git === o            &&
         uri == o.uri         &&
         ref == o.ref         &&
+        branch == o.branch   &&
         name == o.name       &&
         version == o.version &&
         submodules == o.submodules
