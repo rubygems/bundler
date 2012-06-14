@@ -690,8 +690,13 @@ module Bundler
     end
 
     def select_spec(name)
+      specs = []
       regexp_name = Regexp.new(name)
-      specs = Bundler.load.specs.find_all{|s| s.name =~ regexp_name }
+
+      Bundler.load.specs.each do |spec|
+        return spec if spec.name == name
+        specs << spec if spec.name =~ regexp_name
+      end
 
       case specs.count
       when 0
