@@ -14,7 +14,7 @@ module Bundler
       Bundler.rubygems.ui = UI::RGProxy.new(Bundler.ui)
     end
 
-    check_unknown_options!
+    check_unknown_options!(:except => [:config, :exec])
 
     default_task :install
     class_option "no-color", :type => :boolean, :banner => "Disable colorization in output"
@@ -416,20 +416,18 @@ module Bundler
       bundle exec you can require and call the bundled gems as if they were installed
       into the systemwide Rubygems repository.
     D
-    def exec(*)
-      ARGV.shift # remove "exec"
-
+    def exec(*args)
       Bundler.definition.validate_ruby!
       Bundler.load.setup_environment
 
       begin
         # Run
-        Kernel.exec(*ARGV)
+        Kernel.exec(*args)
       rescue Errno::EACCES
-        Bundler.ui.error "bundler: not executable: #{ARGV.first}"
+        Bundler.ui.error "bundler: not executable: #{args.first}"
         exit 126
       rescue Errno::ENOENT
-        Bundler.ui.error "bundler: command not found: #{ARGV.first}"
+        Bundler.ui.error "bundler: command not found: #{args.first}"
         Bundler.ui.warn  "Install missing gem executables with `bundle install`"
         exit 127
       rescue ArgumentError
@@ -450,14 +448,11 @@ module Bundler
       will show the current value, as well as any superceded values and
       where they were specified.
     D
-    def config(*)
-      values = ARGV.dup
-      values.shift # remove config
-
-      peek = values.shift
+    def config(*args)
+      peek = args.shift
 
       if peek && peek =~ /^\-\-/
-        name, scope = values.shift, $'
+        name, scope = args.shift, $'
       else
         name, scope = peek, "global"
       end
@@ -482,7 +477,7 @@ module Bundler
         Bundler.settings.set_local(name, nil)
         Bundler.settings.set_global(name, nil)
       when "local", "global"
-        if values.empty?
+        if args.empty?
           Bundler.ui.confirm "Settings for `#{name}` in order of priority. The top value will be used"
           with_padding do
             Bundler.settings.pretty_values_for(name).each { |line| Bundler.ui.info line }
@@ -512,7 +507,7 @@ module Bundler
           Bundler.ui.info "You are replacing the current local value of #{name}, which is currently #{local.inspect}"
         end
 
-        Bundler.settings.send("set_#{scope}", name, values.join(" "))
+        Bundler.settings.send("set_#{scope}", name, args.join(" "))
       else
         Bundler.ui.error "Invalid scope --#{scope} given. Please use --local or --global."
         exit 1

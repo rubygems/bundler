@@ -104,7 +104,7 @@ class Thor::Group
     #
     # ==== Custom invocations
     #
-    # You can also supply a block to customize how the option is giong to be
+    # You can also supply a block to customize how the option is going to be
     # invoked. The block receives two parameters, an instance of the current
     # class and the klass to be invoked.
     #
@@ -180,16 +180,16 @@ class Thor::Group
         end
         next unless value
 
-        klass, task = prepare_for_invocation(name, value)
+        klass, _ = prepare_for_invocation(name, value)
         next unless klass && klass.respond_to?(:class_options)
 
         value = value.to_s
         human_name = value.respond_to?(:classify) ? value.classify : value
 
         group_options[human_name] ||= []
-        group_options[human_name] += klass.class_options.values.select do |option|
-          base_options[option.name.to_sym].nil? && option.group.nil? &&
-          !group_options.values.flatten.any? { |i| i.name == option.name }
+        group_options[human_name] += klass.class_options.values.select do |class_option|
+          base_options[class_option.name.to_sym].nil? && class_option.group.nil? &&
+          !group_options.values.flatten.any? { |i| i.name == class_option.name }
         end
 
         yield klass if block_given?
@@ -204,8 +204,16 @@ class Thor::Group
       [item]
     end
 
-    def handle_argument_error(task, error) #:nodoc:
-      raise error, "#{task.name.inspect} was called incorrectly. Are you sure it has arity equals to 0?"
+    def handle_argument_error(task, error, arity=nil) #:nodoc:
+      if arity > 0
+        msg = "#{basename} #{task.name} takes #{arity} argument"
+        msg << "s" if arity > 1
+        msg << ", but it should not."
+      else
+        msg = "You should not pass arguments to #{basename} #{task.name}."
+      end
+
+      raise error, msg
     end
 
     protected
@@ -220,10 +228,14 @@ class Thor::Group
         args, opts = Thor::Options.split(given_args)
         opts = given_opts || opts
 
+        instance = new(args, opts, config)
+        yield instance if block_given?
+        args = instance.args
+
         if task
-          new(args, opts, config).invoke_task(all_tasks[task])
+          instance.invoke_task(all_tasks[task])
         else
-          new(args, opts, config).invoke_all
+          instance.invoke_all
         end
       end
 

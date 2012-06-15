@@ -17,6 +17,7 @@ class Thor::Runner < Thor #:nodoc:
     if meth && !self.respond_to?(meth)
       initialize_thorfiles(meth)
       klass, task = Thor::Util.find_class_and_task_by_namespace(meth)
+      self.class.handle_no_task_error(task, false) if klass.nil?
       klass.start(["-h", task].compact, :shell => self.shell)
     else
       super
@@ -30,6 +31,7 @@ class Thor::Runner < Thor #:nodoc:
     meth = meth.to_s
     initialize_thorfiles(meth)
     klass, task = Thor::Util.find_class_and_task_by_namespace(meth)
+    self.class.handle_no_task_error(task, false) if klass.nil?
     args.unshift(task) if task
     klass.start(args, :shell => self.shell)
   end
@@ -124,7 +126,17 @@ class Thor::Runner < Thor #:nodoc:
 
     old_filename = thor_yaml[name][:filename]
     self.options = self.options.merge("as" => name)
-    filename     = install(thor_yaml[name][:location])
+
+    if File.directory? File.expand_path(name)
+      FileUtils.rm_rf(File.join(thor_root, old_filename))
+
+      thor_yaml.delete(old_filename)
+      save_yaml(thor_yaml)
+
+      filename = install(name)
+    else
+      filename = install(thor_yaml[name][:location])
+    end
 
     unless filename == old_filename
       File.delete(File.join(thor_root, old_filename))
@@ -190,7 +202,7 @@ class Thor::Runner < Thor #:nodoc:
       true
     end
 
-    # Load the thorfiles. If relevant_to is supplied, looks for specific files
+    # Load the Thorfiles. If relevant_to is supplied, looks for specific files
     # in the thor_root instead of loading them all.
     #
     # By default, it also traverses the current path until find Thor files, as
@@ -244,7 +256,7 @@ class Thor::Runner < Thor #:nodoc:
       end
     end
 
-    # Load thorfiles relevant to the given method. If you provide "foo:bar" it
+    # Load Thorfiles relevant to the given method. If you provide "foo:bar" it
     # will load all thor files in the thor.yaml that has "foo" e "foo:bar"
     # namespaces registered.
     #

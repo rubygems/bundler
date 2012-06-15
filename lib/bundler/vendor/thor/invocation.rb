@@ -85,7 +85,7 @@ class Thor
     # that it's going to use.
     #
     # If you want Rspec::RR to be initialized with its own set of options, you
-    # have to do that explicitely:
+    # have to do that explicitly:
     #
     #   invoke "rspec:rr", [], :style => :foo
     #
@@ -106,7 +106,9 @@ class Thor
       raise "Expected Thor class, got #{klass}" unless klass <= Thor::Base
 
       args, opts, config = _parse_initialization_options(args, opts, config)
-      klass.send(:dispatch, task, args, opts, config)
+      klass.send(:dispatch, task, args, opts, config) do |instance|
+        instance.parent_options = options
+      end
     end
 
     # Invoke the given task if the given args.

@@ -19,7 +19,7 @@ class Thor
                            action add_file create_file in_root inside run run_ruby_script)
 
   module Base
-    attr_accessor :options
+    attr_accessor :options, :parent_options, :args
 
     # It receives arguments in an Array and two hashes, one for options and
     # other for configuration.
@@ -38,22 +38,43 @@ class Thor
     # config<Hash>:: Configuration for this Thor class.
     #
     def initialize(args=[], options={}, config={})
-      args = Thor::Arguments.parse(self.class.arguments, args)
-      args.each { |key, value| send("#{key}=", value) }
-
       parse_options = self.class.class_options
+
+      # The start method splits inbound arguments at the first argument
+      # that looks like an option (starts with - or --). It then calls
+      # new, passing in the two halves of the arguments Array as the
+      # first two parameters.
 
       if options.is_a?(Array)
         task_options  = config.delete(:task_options) # hook for start
         parse_options = parse_options.merge(task_options) if task_options
         array_options, hash_options = options, {}
       else
+        # Handle the case where the class was explicitly instantiated
+        # with pre-parsed options.
         array_options, hash_options = [], options
       end
 
+      # Let Thor::Options parse the options first, so it can remove
+      # declared options from the array. This will leave us with
+      # a list of arguments that weren't declared.
       opts = Thor::Options.new(parse_options, hash_options)
       self.options = opts.parse(array_options)
+
+      # If unknown options are disallowed, make sure that none of the
+      # remaining arguments looks like an option.
       opts.check_unknown! if self.class.check_unknown_options?(config)
+
+      # Add the remaining arguments from the options parser to the
+      # arguments passed in to initialize. Then remove any positional
+      # arguments declared using #argument (this is primarily used
+      # by Thor::Group). Tis will leave us with the remaining
+      # positional arguments.
+      thor_args = Thor::Arguments.new(self.class.arguments)
+      thor_args.parse(args + opts.remaining).each { |k,v| send("#{k}=", v) }
+      args = thor_args.remaining
+
+      @args = args
     end
 
     class << self
@@ -210,13 +231,14 @@ class Thor
       # options<Hash>:: Described below.
       #
       # ==== Options
-      # :desc     - Description for the argument.
-      # :required - If the argument is required or not.
-      # :default  - Default value for this argument.
-      # :group    - The group for this options. Use by class options to output options in different levels.
-      # :aliases  - Aliases for this option.
-      # :type     - The type of the argument, can be :string, :hash, :array, :numeric or :boolean.
-      # :banner   - String to show on usage notes.
+      # :desc::     -- Description for the argument.
+      # :required:: -- If the argument is required or not.
+      # :default::  -- Default value for this argument.
+      # :group::    -- The group for this options. Use by class options to output options in different levels.
+      # :aliases::  -- Aliases for this option. <b>Note:</b> Thor follows a convention of one-dash-one-letter options. Thus aliases like "-something" wouldn't be parsed; use either "\--something" or "-s" instead.
+      # :type::     -- The type of the argument, can be :string, :hash, :array, :numeric or :boolean.
+      # :banner::   -- String to show on usage notes.
+      # :hide::     -- If you want to hide this option from the help.
       #
       def class_option(name, options={})
         build_option(name, options, class_options)
@@ -225,7 +247,7 @@ class Thor
       # Removes a previous defined argument. If :undefine is given, undefine
       # accessors as well.
       #
-      # ==== Paremeters
+      # ==== Parameters
       # names<Array>:: Arguments to be removed
       #
       # ==== Examples
@@ -244,7 +266,7 @@ class Thor
 
       # Removes a previous defined class option.
       #
-      # ==== Paremeters
+      # ==== Parameters
       # names<Array>:: Class options to be removed
       #
       # ==== Examples
@@ -387,11 +409,17 @@ class Thor
       rescue Thor::Error => e
         ENV["THOR_DEBUG"] == "1" ? (raise e) : config[:shell].error(e.message)
         exit(1) if exit_on_failure?
+      rescue Errno::EPIPE
+        # This happens if a thor task is piped to something like `head`,
+        # which closes the pipe when it's done reading. This will also
+        # mean that if the pipe is closed, further unnecessary
+        # computation will not occur.
+        exit(0)
       end
 
       # Allows to use private methods from parent in child classes as tasks.
       #
-      # ==== Paremeters
+      # ==== Parameters
       #   names<Array>:: Method names to be used as tasks
       #
       # ==== Examples
@@ -405,16 +433,26 @@ class Thor
         end
       end
 
-      def handle_no_task_error(task) #:nodoc:
-        if $thor_runner
+      def handle_no_task_error(task, has_namespace = $thor_runner) #:nodoc:
+        if has_namespace
           raise UndefinedTaskError, "Could not find task #{task.inspect} in #{namespace.inspect} namespace."
         else
           raise UndefinedTaskError, "Could not find task #{task.inspect}."
         end
       end
 
-      def handle_argument_error(task, error) #:nodoc:
-        raise InvocationError, "#{task.name.inspect} was called incorrectly. Call as #{self.banner(task).inspect}."
+      def handle_argument_error(task, error, arity=nil) #:nodoc:
+        msg = "#{basename} #{task.name}"
+        if arity
+          required = arity < 0 ? (-1 - arity) : arity
+          msg << " requires at least #{required} argument"
+          msg << "s" if required > 1
+        else
+          msg = "call #{msg} as"
+        end
+
+        msg << ": #{self.banner(task).inspect}."
+        raise InvocationError, msg
       end
 
       protected
@@ -447,15 +485,17 @@ class Thor
           padding = options.collect{ |o| o.aliases.size }.max.to_i * 4
 
           options.each do |option|
-            item = [ option.usage(padding) ]
-            item.push(option.description ? "# #{option.description}" : "")
+            unless option.hide
+              item = [ option.usage(padding) ]
+              item.push(option.description ? "# #{option.description}" : "")
 
-            list << item
-            list << [ "", "# Default: #{option.default}" ] if option.show_default?
+              list << item
+              list << [ "", "# Default: #{option.default}" ] if option.show_default?
+            end
           end
 
           shell.say(group_name ? "#{group_name} options:" : "Options:")
-          shell.print_table(list, :ident => 2)
+          shell.print_table(list, :indent => 2)
           shell.say ""
         end
 
@@ -473,7 +513,7 @@ class Thor
         def build_option(name, options, scope) #:nodoc:
           scope[name] = Thor::Option.new(name, options[:desc], options[:required],
                                                options[:type], options[:default], options[:banner],
-                                               options[:lazy_default], options[:group], options[:aliases])
+                                               options[:lazy_default], options[:group], options[:aliases], options[:hide])
         end
 
         # Receives a hash of options, parse them and add to the scope. This is a
@@ -506,6 +546,7 @@ class Thor
         # and file into baseclass.
         def inherited(klass)
           Thor::Base.register_klass_file(klass)
+          klass.instance_variable_set(:@no_tasks, false)
         end
 
         # Fire this callback whenever a method is added. Added methods are

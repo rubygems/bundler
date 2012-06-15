@@ -153,11 +153,11 @@ class Thor
       begin
         Thor::Sandbox.class_eval(content, path)
       rescue Exception => e
-        $stderr.puts "WARNING: unable to load thorfile #{path.inspect}: #{e.message}"
+        $stderr.puts("WARNING: unable to load thorfile #{path.inspect}: #{e.message}")
         if debug
-          $stderr.puts *e.backtrace
+          $stderr.puts(*e.backtrace)
         else
-          $stderr.puts e.backtrace.first
+          $stderr.puts(e.backtrace.first)
         end
       end
     end
@@ -184,7 +184,7 @@ class Thor
       end
     end
 
-    # Returns the root where thor files are located, dependending on the OS.
+    # Returns the root where thor files are located, depending on the OS.
     #
     def self.thor_root
       File.join(user_home, ".thor").gsub(/\\/, '/')
@@ -198,7 +198,7 @@ class Thor
     # If we don't #gsub the \ character, Dir.glob will fail.
     #
     def self.thor_root_glob
-      files = Dir["#{thor_root}/*"]
+      files = Dir["#{escape_globs(thor_root)}/*"]
 
       files.map! do |file|
         File.directory?(file) ? File.join(file, "main.thor") : file
@@ -208,6 +208,7 @@ class Thor
     # Where to look for Thor files.
     #
     def self.globs_for(path)
+      path = escape_globs(path)
       ["#{path}/Thorfile", "#{path}/*.thor", "#{path}/tasks/*.thor", "#{path}/lib/tasks/*.thor"]
     end
 
@@ -216,13 +217,49 @@ class Thor
     #
     def self.ruby_command
       @ruby_command ||= begin
-        ruby = File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])
+        ruby_name = RbConfig::CONFIG['ruby_install_name']
+        ruby = File.join(RbConfig::CONFIG['bindir'], ruby_name)
         ruby << RbConfig::CONFIG['EXEEXT']
+
+        # avoid using different name than ruby (on platforms supporting links)
+        if ruby_name != 'ruby' && File.respond_to?(:readlink)
+          begin
+            alternate_ruby = File.join(RbConfig::CONFIG['bindir'], 'ruby')
+            alternate_ruby << RbConfig::CONFIG['EXEEXT']
+
+            # ruby is a symlink
+            if File.symlink? alternate_ruby
+              linked_ruby = File.readlink alternate_ruby
+
+              # symlink points to 'ruby_install_name'
+              ruby = alternate_ruby if linked_ruby == ruby_name || linked_ruby == ruby
+            end
+          rescue NotImplementedError
+            # just ignore on windows
+          end
+        end
 
         # escape string in case path to ruby executable contain spaces.
         ruby.sub!(/.*\s.*/m, '"\&"')
         ruby
       end
+    end
+
+    # Returns a string that has had any glob characters escaped.
+    # The glob characters are `* ? { } [ ]`.
+    #
+    # ==== Examples
+    #
+    #   Thor::Util.escape_globs('[apps]')   # => '\[apps\]'
+    #
+    # ==== Parameters
+    # String
+    #
+    # ==== Returns
+    # String
+    #
+    def self.escape_globs(path)
+      path.to_s.gsub(/[*?{}\[\]]/, '\\\\\\&')
     end
 
   end

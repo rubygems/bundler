@@ -55,7 +55,7 @@ class Thor
                                :desc => "Run but do not make any changes"
 
         class_option :quiet, :type => :boolean, :aliases => "-q", :group => :runtime,
-                             :desc => "Supress status output"
+                             :desc => "Suppress status output"
 
         class_option :skip, :type => :boolean, :aliases => "-s", :group => :runtime,
                             :desc => "Skip files that already exist"
@@ -114,8 +114,12 @@ class Thor
     # the script started).
     #
     def relative_to_original_destination_root(path, remove_dot=true)
-      path = path.gsub(@destination_stack[0], '.')
-      remove_dot ? (path[2..-1] || '') : path
+      if path =~ /^#{@destination_stack[0]}/
+        path = path.gsub(@destination_stack[0], '.')
+        path = remove_dot ? (path[2..-1] || '') : path
+      end
+
+      path
     end
 
     # Holds source paths in instance so they can be manipulated.
