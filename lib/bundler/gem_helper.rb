@@ -75,7 +75,7 @@ module Bundler
       built_gem_path = build_gem
       tag_version {
         git_push
-        rubygem_push(built_gem_path)
+        rubygem_push(built_gem_path) if gem_push?
       }
     end
 
@@ -157,6 +157,10 @@ module Bundler
         end
       }
       [outbuf, $?]
+    end
+
+    def gem_push?
+      ! %w{n no nil false off 0}.include?(ENV['gem_push'].to_s.downcase)
     end
   end
 end
