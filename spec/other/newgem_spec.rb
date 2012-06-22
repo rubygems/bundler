@@ -20,6 +20,7 @@ describe "bundle gem" do
 
   it "generates a gem skeleton" do
     bundled_app("test-gem/test-gem.gemspec").should exist
+    bundled_app("test-gem/LICENSE.txt").should exist
     bundled_app("test-gem/Gemfile").should exist
     bundled_app("test-gem/Rakefile").should exist
     bundled_app("test-gem/lib/test-gem.rb").should exist
