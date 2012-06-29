@@ -26,6 +26,8 @@ module Bundler
           @state = :dependency
         elsif line == "PLATFORMS"
           @state = :platform
+        elsif line.include?("<<<<<<<") || line.include?("=======") || line.include?(">>>>>>>") || line.include?("|||||||")
+          raise LockfileError, "Lockfile contains conflict markers, cowardly refusing to run"
         else
           send("parse_#{@state}", line)
         end
