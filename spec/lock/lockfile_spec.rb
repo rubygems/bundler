@@ -806,4 +806,18 @@ describe "the lockfile format" do
       end
     end
   end
+
+  it "refuses to install if Gemfile.lock contains conflict markers" do
+    lambda { Bundler::LockfileParser.new "<<<<<<<" }.
+        should raise_error Bundler::LockfileError
+
+    lambda { Bundler::LockfileParser.new ">>>>>>>" }.
+        should raise_error Bundler::LockfileError
+
+    lambda { Bundler::LockfileParser.new "=======" }.
+        should raise_error Bundler::LockfileError
+
+    lambda { Bundler::LockfileParser.new "|||||||" }.
+        should raise_error Bundler::LockfileError
+  end
 end
