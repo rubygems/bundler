@@ -260,7 +260,7 @@ module Bundler
     def which(executable)
       if File.executable?(executable)
         executable
-      else
+      elsif ENV['PATH']
         path = ENV['PATH'].split(File::PATH_SEPARATOR).find do |p|
           File.executable?(File.join(p, executable))
         end
