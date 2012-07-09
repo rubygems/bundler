@@ -27,7 +27,7 @@ module Bundler
         elsif line == "PLATFORMS"
           @state = :platform
         elsif line.include?("<<<<<<<") || line.include?("=======") || line.include?(">>>>>>>") || line.include?("|||||||")
-          raise LockfileError, "Lockfile contains conflict markers, cowardly refusing to run"
+          raise LockfileError, "Gemfile.lock contains merge conflicts. Please check out a valid Gemfile.lock and try again."
         else
           send("parse_#{@state}", line)
         end
