@@ -318,6 +318,12 @@ module Bundler
     end
     map %w(list) => "show"
 
+    desc "grep inside bundled gems", "greps the source directories of the bundled gems"
+    def grep(*args)
+      gem_paths = Bundler.load.specs.map(&:lib_dirs_glob).flatten
+      Bundler.ui.info `grep -r #{args.join(' ')} #{gem_paths.join(' ')}`
+    end
+
     desc "outdated [GEM]", "list installed gems with newer versions available"
     long_desc <<-D
       Outdated lists the names and versions of gems that have a newer version available

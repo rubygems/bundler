@@ -22,6 +22,7 @@ module Bundler
   autoload :GemHelpers,            'bundler/gem_helpers'
   autoload :GemInstaller,          'bundler/gem_installer'
   autoload :Graph,                 'bundler/graph'
+  autoload :Grep,                  'bundler/grep'
   autoload :Index,                 'bundler/index'
   autoload :Installer,             'bundler/installer'
   autoload :LazySpecification,     'bundler/lazy_specification'
