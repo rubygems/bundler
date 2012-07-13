@@ -161,6 +161,7 @@ G
   end
 
   let(:ruby_version_correct) { "ruby \"#{RUBY_VERSION}\", :engine => \"#{local_ruby_engine}\", :engine_version => \"#{local_engine_version}\"" }
+  let(:ruby_version_correct_engineless) { "ruby \"#{RUBY_VERSION}\"" }
   let(:ruby_version_incorrect) { "ruby \"#{not_local_ruby_version}\", :engine => \"#{local_ruby_engine}\", :engine_version => \"#{not_local_ruby_version}\"" }
   let(:engine_incorrect) { "ruby \"#{RUBY_VERSION}\", :engine => \"#{not_local_tag}\", :engine_version => \"#{RUBY_VERSION}\"" }
   let(:engine_version_incorrect) { "ruby \"#{RUBY_VERSION}\", :engine => \"#{local_ruby_engine}\", :engine_version => \"#{not_local_engine_version}\"" }
@@ -190,6 +191,19 @@ G
       G
 
       bundled_app('Gemfile.lock').should exist
+    end
+
+    it "installs fine with any engine" do
+      simulate_ruby_engine "jruby" do
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rack"
+
+          #{ruby_version_correct_engineless}
+        G
+
+        bundled_app('Gemfile.lock').should exist
+      end
     end
 
     it "doesn't install when the ruby version doesn't match" do
@@ -248,6 +262,26 @@ G
       bundle :check, :exitstatus => true
       exitstatus.should eq(0)
       out.should == "The Gemfile's dependencies are satisfied"
+    end
+
+    it "checks fine with any engine" do
+      simulate_ruby_engine "jruby" do
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rack"
+        G
+
+        gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rack"
+
+          #{ruby_version_correct_engineless}
+        G
+
+        bundle :check, :exitstatus => true
+        exitstatus.should eq(0)
+        out.should == "The Gemfile's dependencies are satisfied"
+      end
     end
 
     it "fails when ruby version doesn't match" do
@@ -331,6 +365,24 @@ G
       should_be_installed "rack 1.2", "rack-obama 1.0", "activesupport 3.0"
     end
 
+    it "updates fine with any engine" do
+      simulate_ruby_engine "jruby" do
+        gemfile <<-G
+          source "file://#{gem_repo2}"
+          gem "activesupport"
+          gem "rack-obama"
+
+          #{ruby_version_correct_engineless}
+        G
+        update_repo2 do
+          build_gem "activesupport", "3.0"
+        end
+
+        bundle "update"
+        should_be_installed "rack 1.2", "rack-obama 1.0", "activesupport 3.0"
+      end
+    end
+
     it "fails when ruby version doesn't match" do
       gemfile <<-G
         source "file://#{gem_repo2}"
@@ -402,6 +454,20 @@ G
       out.should == default_bundle_path('gems', 'rails-2.3.2').to_s
     end
 
+    it "prints path if ruby version is correct for any engine" do
+      simulate_ruby_engine "jruby" do
+        gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rails"
+
+          #{ruby_version_correct_engineless}
+        G
+
+        bundle "show rails"
+        out.should == default_bundle_path('gems', 'rails-2.3.2').to_s
+      end
+    end
+
     it "fails if ruby version doesn't match" do
       gemfile <<-G
         source "file://#{gem_repo1}"
@@ -461,6 +527,19 @@ G
       bundled_app("vendor/cache/rack-1.0.0.gem").should exist
     end
 
+    it "copies the .gem file to vendor/cache when ruby version matches for any engine" do
+      simulate_ruby_engine "jruby" do
+        gemfile <<-G
+          gem 'rack'
+
+          #{ruby_version_correct_engineless}
+        G
+
+        bundle :cache
+        bundled_app("vendor/cache/rack-1.0.0.gem").should exist
+      end
+    end
+
     it "fails if the ruby version doesn't match" do
       gemfile <<-G
         gem 'rack'
@@ -517,6 +596,19 @@ G
       bundled_app("vendor/cache/rack-1.0.0.gem").should exist
     end
 
+    it "copies the .gem file to vendor/cache when ruby version matches any engine" do
+      simulate_ruby_engine "jruby" do
+        gemfile <<-G
+          gem 'rack'
+
+          #{ruby_version_correct_engineless}
+        G
+
+        bundle :pack
+        bundled_app("vendor/cache/rack-1.0.0.gem").should exist
+      end
+    end
+
     it "fails if the ruby version doesn't match" do
       gemfile <<-G
         gem 'rack'
@@ -567,6 +659,19 @@ G
 
       bundle "exec rackup"
       out.should == "0.9.1"
+    end
+
+    it "activates the correct gem when ruby version matches any engine" do
+      simulate_ruby_engine "jruby" do
+        gemfile <<-G
+          gem "rack", "0.9.1"
+
+          #{ruby_version_correct_engineless}
+        G
+
+        bundle "exec rackup"
+        out.should == "0.9.1"
+      end
     end
 
     it "fails when the ruby version doesn't match" do
@@ -630,6 +735,25 @@ G
         input.puts("exit")
       end
       out.should include("0.9.1")
+    end
+
+    it "starts IRB with the default group loaded when ruby version matches any engine" do
+      simulate_ruby_engine "jruby" do
+        gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rack"
+          gem "activesupport", :group => :test
+          gem "rack_middleware", :group => :development
+
+          #{ruby_version_correct_engineless}
+        G
+
+        bundle "console" do |input|
+          input.puts("puts RACK")
+          input.puts("exit")
+        end
+        out.should include("0.9.1")
+      end
     end
 
     it "fails when ruby version doesn't match" do
@@ -701,6 +825,25 @@ G
 
       run "1"
       bundled_app("Gemfile.lock").should exist
+    end
+
+    it "makes a Gemfile.lock if setup succeeds for any engine" do
+      simulate_ruby_engine "jruby" do
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "yard"
+          gem "rack"
+
+          #{ruby_version_correct_engineless}
+        G
+
+        File.read(bundled_app("Gemfile.lock"))
+
+        FileUtils.rm(bundled_app("Gemfile.lock"))
+
+        run "1"
+        bundled_app("Gemfile.lock").should exist
+      end
     end
 
     it "fails when ruby version doesn't match" do
@@ -820,6 +963,27 @@ G
       bundle "outdated"
       out.should include("activesupport (3.0 > 2.3.5)")
       out.should include("foo (1.0")
+    end
+
+    it "returns list of outdated gems when the ruby version matches for any engine" do
+      simulate_ruby_engine "jruby" do
+        update_repo2 do
+          build_gem "activesupport", "3.0"
+          update_git "foo", :path => lib_path("foo")
+        end
+
+        gemfile <<-G
+          source "file://#{gem_repo2}"
+          gem "activesupport", "2.3.5"
+          gem "foo", :git => "#{lib_path('foo')}"
+
+          #{ruby_version_correct_engineless}
+        G
+
+        bundle "outdated"
+        out.should include("activesupport (3.0 > 2.3.5)")
+        out.should include("foo (1.0")
+      end
     end
 
     it "fails when the ruby version doesn't match" do
