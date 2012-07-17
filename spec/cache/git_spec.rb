@@ -153,5 +153,19 @@ end
 
       out.should include("Your Gemfile contains path and git dependencies.")
     end
+
+    it "does not display warning message if cache_all is set in bundle config" do
+      git = build_git "foo"
+      ref = git.ref_for("master", 11)
+
+      install_gemfile <<-G
+        gem "foo", :git => '#{lib_path("foo-1.0")}'
+      G
+
+      bundle "#{cmd} --all"
+      bundle "#{cmd}"
+
+      out.should_not include("Your Gemfile contains path and git dependencies.")
+    end
   end
 end
