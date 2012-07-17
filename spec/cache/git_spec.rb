@@ -140,5 +140,18 @@ end
       bundled_app("vendor/cache/has_submodule-1.0-#{ref}/submodule-1.0").should exist
       should_be_installed "has_submodule 1.0"
     end
+
+    it "displays warning message when detecting git repo in Gemfile" do
+      git = build_git "foo"
+      ref = git.ref_for("master", 11)
+
+      install_gemfile <<-G
+        gem "foo", :git => '#{lib_path("foo-1.0")}'
+      G
+
+      bundle "#{cmd}"
+
+      out.should include("Your Gemfile contains path and git dependencies.")
+    end
   end
 end
