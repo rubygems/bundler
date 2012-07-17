@@ -107,26 +107,9 @@ module Bundler
 
     def prune_cache
       FileUtils.mkdir_p(cache_path) unless File.exists?(cache_path)
-
       resolve = @definition.resolve
-      cached  = Dir["#{cache_path}/*.gem"]
-
-      cached = cached.delete_if do |path|
-        spec = Bundler.rubygems.spec_from_gem path
-
-        resolve.any? do |s|
-          s.name == spec.name && s.version == spec.version && !s.source.is_a?(Bundler::Source::Git)
-        end
-      end
-
-      if cached.any?
-        Bundler.ui.info "Removing outdated .gem files from vendor/cache"
-
-        cached.each do |path|
-          Bundler.ui.info "  * #{File.basename(path)}"
-          File.delete(path)
-        end
-      end
+      prune_gem_cache(resolve)
+      prune_git_and_path_cache(resolve)
     end
 
     def clean
@@ -225,6 +208,50 @@ module Bundler
     end
 
   private
+
+    def prune_gem_cache(resolve)
+      cached  = Dir["#{cache_path}/*.gem"]
+
+      cached = cached.delete_if do |path|
+        spec = Bundler.rubygems.spec_from_gem path
+
+        resolve.any? do |s|
+          s.name == spec.name && s.version == spec.version && !s.source.is_a?(Bundler::Source::Git)
+        end
+      end
+
+      if cached.any?
+        Bundler.ui.info "Removing outdated .gem files from vendor/cache"
+
+        cached.each do |path|
+          Bundler.ui.info "  * #{File.basename(path)}"
+          File.delete(path)
+        end
+      end
+    end
+
+    def prune_git_and_path_cache(resolve)
+      cached  = Dir["#{cache_path}/*/.bundlecache"]
+
+      cached = cached.delete_if do |path|
+        name = File.basename(File.dirname(path))
+
+        resolve.any? do |s|
+          source = s.source
+          source.respond_to?(:app_cache_dirname) && source.app_cache_dirname == name
+        end
+      end
+
+      if cached.any?
+        Bundler.ui.info "Removing outdated .git/path repos from vendor/cache"
+
+        cached.each do |path|
+          path = File.dirname(path)
+          Bundler.ui.info "  * #{File.basename(path)}"
+          FileUtils.rm_rf(path)
+        end
+      end
+    end
 
     def cache_path
       root.join("vendor/cache")

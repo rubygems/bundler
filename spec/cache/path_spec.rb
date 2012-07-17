@@ -23,6 +23,7 @@ require "spec_helper"
 
       bundle "#{cmd} --all"
       bundled_app("vendor/cache/foo-1.0").should exist
+      bundled_app("vendor/cache/foo-1.0/.bundlecache").should be_file
 
       FileUtils.rm_rf lib_path("foo-1.0")
       should_be_installed "foo 1.0"
@@ -48,6 +49,23 @@ require "spec_helper"
 
       run "require 'foo'"
       out.should == "CACHE"
+    end
+
+    it "removes stale entries cache" do
+      build_lib "foo"
+
+      install_gemfile <<-G
+        gem "foo", :path => '#{lib_path("foo-1.0")}'
+      G
+
+      bundle "#{cmd} --all"
+
+      install_gemfile <<-G
+        gem "bar", :path => '#{lib_path("bar-1.0")}'
+      G
+
+      bundle "#{cmd} --all"
+      bundled_app("vendor/cache/bar-1.0").should_not exist
     end
 
     it "raises a warning without --all" do

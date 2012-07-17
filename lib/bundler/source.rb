@@ -374,6 +374,7 @@ module Bundler
         return if @original_path.expand_path(Bundler.root).to_s.index(Bundler.root.to_s) == 0
         FileUtils.rm_rf(app_cache_path)
         FileUtils.cp_r("#{@original_path}/.", app_cache_path)
+        FileUtils.touch(app_cache_path.join(".bundlecache"))
       end
 
       def local_specs(*)
@@ -387,10 +388,14 @@ module Bundler
         local_specs
       end
 
+      def app_cache_dirname
+        name
+      end
+
     private
 
       def app_cache_path
-        @app_cache_path ||= Bundler.app_cache.join(name)
+        @app_cache_path ||= Bundler.app_cache.join(app_cache_dirname)
       end
 
       def has_app_cache?
@@ -787,6 +792,7 @@ module Bundler
         git_proxy.checkout if requires_checkout?
         git_proxy.copy_to(app_cache_path, @submodules)
         FileUtils.rm_rf(app_cache_path.join(".git"))
+        FileUtils.touch(app_cache_path.join(".bundlecache"))
       end
 
       def load_spec_files
@@ -811,6 +817,10 @@ module Bundler
         end
       end
 
+      def app_cache_dirname
+        "#{base_name}-#{shortref_for_path(cached_revision || revision)}"
+      end
+
     private
 
       def set_local!(path)
@@ -821,10 +831,6 @@ module Bundler
 
       def has_app_cache?
         cached_revision && super
-      end
-
-      def app_cache_path
-        @app_cache_path ||= Bundler.app_cache.join("#{base_name}-#{shortref_for_path(cached_revision || revision)}")
       end
 
       def local?
