@@ -36,7 +36,7 @@ describe "bundle check" do
     bundled_app("Gemfile.lock").should exist
   end
 
-  it "does not create a Gemfile.lock if --no-lock was passed" do
+  it "does not create a Gemfile.lock if --dry-run was passed" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rails"
@@ -44,7 +44,7 @@ describe "bundle check" do
 
     FileUtils.rm("Gemfile.lock")
 
-    bundle "check --no-lock"
+    bundle "check --dry-run"
 
     bundled_app("Gemfile.lock").should_not exist
   end
