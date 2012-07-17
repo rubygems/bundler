@@ -1,3 +1,9 @@
+## 1.1.5 (Jul 17, 2012)
+
+Features:
+
+  - Special case `ruby` directive from 1.2.0, so you can install Gemfiles that use it
+
 ## 1.1.4 (May 27, 2012)
 
 Bugfixes:
