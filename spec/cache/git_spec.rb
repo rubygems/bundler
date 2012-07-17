@@ -14,20 +14,24 @@ end
 
 %w(cache package).each do |cmd|
   describe "bundle #{cmd} with git" do
-    it "copies repository to vendor cache and uses it" do
-      git = build_git "foo"
-      ref = git.ref_for("master", 11)
 
-      install_gemfile <<-G
-        gem "foo", :git => '#{lib_path("foo-1.0")}'
-      G
+    ["install", "install --path vendor/bundle"].each do |install_cmd|
+      it "copies repository to vendor cache and uses it when using #{install_cmd}" do
+        git = build_git "foo"
+        ref = git.ref_for("master", 11)
 
-      bundle "#{cmd} --all"
-      bundled_app("vendor/cache/foo-1.0-#{ref}").should exist
-      bundled_app("vendor/cache/foo-1.0-#{ref}/.git").should_not exist
+        gemfile <<-G
+          gem "foo", :git => '#{lib_path("foo-1.0")}'
+        G
 
-      FileUtils.rm_rf lib_path("foo-1.0")
-      should_be_installed "foo 1.0"
+        bundle install_cmd
+        bundle "#{cmd} --all"
+        bundled_app("vendor/cache/foo-1.0-#{ref}").should exist
+        bundled_app("vendor/cache/foo-1.0-#{ref}/.git").should_not exist
+
+        FileUtils.rm_rf lib_path("foo-1.0")
+        should_be_installed "foo 1.0"
+      end
     end
 
     it "runs twice without exploding" do
