@@ -30,6 +30,24 @@ end
       should_be_installed "foo 1.0"
     end
 
+    it "copies repository to vendor cache and uses it even when installed with bundle --path" do
+      git = build_git "foo"
+      ref = git.ref_for("master", 11)
+
+      install_gemfile <<-G
+        gem "foo", :git => '#{lib_path("foo-1.0")}'
+      G
+
+      bundle "install --path vendor/bundle"
+      bundle "#{cmd} --all"
+
+      bundled_app("vendor/cache/foo-1.0-#{ref}").should exist
+      bundled_app("vendor/cache/foo-1.0-#{ref}/.git").should_not exist
+
+      FileUtils.rm_rf lib_path("foo-1.0")
+      should_be_installed "foo 1.0"
+    end
+
     it "runs twice without exploding" do
       build_git "foo"
 

@@ -694,6 +694,9 @@ module Bundler
         File.basename(@uri, '.git')
       end
 
+      # This is the path which is going to contain a specific
+      # checkout of the git repository. When using local git
+      # repos, this is set to the local repo.
       def install_path
         @install_path ||= begin
           git_scope = "#{base_name}-#{shortref_for_path(revision)}"
@@ -778,7 +781,7 @@ module Bundler
 
       def cache(spec)
         return unless Bundler.settings[:cache_all]
-        return if path.expand_path(Bundler.root).to_s.index(Bundler.root.to_s) == 0
+        return if path == app_cache_path
         cached!
         FileUtils.rm_rf(app_cache_path)
         git_proxy.checkout if requires_checkout?
@@ -792,6 +795,10 @@ module Bundler
         raise GitError, "#{to_s} is not checked out. Please run `bundle install`"
       end
 
+      # This is the path which is going to contain a cache
+      # of the git repository. When using the same git repository
+      # across different projects, this cache will be shared.
+      # When using local git repos, this is set to the local repo.
       def cache_path
         @cache_path ||= begin
           git_scope = "#{base_name}-#{uri_hash}"
