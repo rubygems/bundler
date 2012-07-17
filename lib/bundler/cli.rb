@@ -94,6 +94,8 @@ module Bundler
       "Use the specified gemfile instead of Gemfile"
     method_option "path", :type => :string, :banner =>
       "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
+    method_option "lock", :type => :boolean, :default => true, :banner =>
+      "Lock the Gemfile"
     def check
       ENV['BUNDLE_GEMFILE'] = File.expand_path(options[:gemfile]) if options[:gemfile]
 
@@ -117,7 +119,7 @@ module Bundler
         Bundler.ui.error "This bundle has been frozen, but there is no Gemfile.lock present"
         exit 1
       else
-        Bundler.load.lock
+        Bundler.load.lock if options[:lock]
         Bundler.ui.info "The Gemfile's dependencies are satisfied"
       end
     end
