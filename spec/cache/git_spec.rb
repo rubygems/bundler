@@ -66,6 +66,7 @@ end
       bundle "#{cmd} --all"
 
       bundled_app("vendor/cache/foo-1.0-#{ref}").should exist
+      bundled_app("vendor/cache/foo-1.0-#{old_ref}").should_not exist
 
       FileUtils.rm_rf lib_path("foo-1.0")
       run "require 'foo'"
