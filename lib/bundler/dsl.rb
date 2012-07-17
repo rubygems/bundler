@@ -163,6 +163,12 @@ module Bundler
       @env = old
     end
 
+    def ruby(*args)
+      msg = "Ignoring `ruby` directive. This is a feature added to Bundler 1.2.0 \n" \
+            "and higher. Please upgrade if you would like to use it. \n\n"
+      Bundler.ui.warn msg
+    end
+
     # Deprecated methods
 
     def self.deprecate(name, replacement = nil)
