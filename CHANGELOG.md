@@ -6,7 +6,7 @@ Features:
   - loosen ruby directive for engines
   - prune git/path directories inside vendor/cache (@josevalim, #1988)
   - update vendored thor to 0.15.2 (@sferik)
-  - add .txt to LICENSCE (@postmodern, #2001)
+  - add .txt to LICENSE (@postmodern, #2001)
   - add `config disable_local_branch_check` (@josevalim, #1985)
   - fall back on the full index when experiencing syck errors (#1419)
   - handle syntax errors in Ruby gemspecs (#1974)
