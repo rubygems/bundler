@@ -32,4 +32,19 @@ describe "bundle open" do
     bundle "open missing", :env => {"EDITOR" => "echo editor", "VISUAL" => "", "BUNDLER_EDITOR" => ""}
     out.should match(/could not find gem 'missing'/i)
   end
+
+  it "opens the gem with short words" do
+    bundle "open rec" , :env => {"EDITOR" => "echo editor", "VISUAL" => "echo visual", "BUNDLER_EDITOR" => "echo bundler_editor"}
+
+    out.should == "bundler_editor #{default_bundle_path('gems', 'activerecord-2.3.2')}"
+  end
+
+  it "select the gem from many match gems" do
+    env = {"EDITOR" => "echo editor", "VISUAL" => "echo visual", "BUNDLER_EDITOR" => "echo bundler_editor"}
+    bundle "open active" , :env => env do |input|
+      input.puts '2'
+    end
+
+    out.should =~ /bundler_editor #{default_bundle_path('gems', 'activerecord-2.3.2')}\z/
+  end
 end
