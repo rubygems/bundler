@@ -269,13 +269,21 @@ module Bundler
 
     class Path
       class Installer < Bundler::GemInstaller
+        DEFAULT_OPTIONS = {
+          wrappers:          true,
+          env_shebang:       true,
+          format_executable: false
+        }
+
         def initialize(spec, options = {})
-          @spec              = spec
-          @bin_dir           = Bundler.requires_sudo? ? "#{Bundler.tmp}/bin" : "#{Bundler.rubygems.gem_dir}/bin"
-          @gem_dir           = Bundler.rubygems.path(spec.full_gem_path)
-          @wrappers          = options[:wrappers] || true
-          @env_shebang       = options[:env_shebang] || true
-          @format_executable = options[:format_executable] || false
+          @spec = spec
+          @bin_dir = Bundler.requires_sudo? ? "#{Bundler.tmp}/bin" : "#{Bundler.rubygems.gem_dir}/bin"
+          @gem_dir = Bundler.rubygems.path(spec.full_gem_path)
+
+          @options           = DEFAULT_OPTIONS.merge(options)
+          @wrappers          = @options[:wrappers]
+          @env_shebang       = @options[:env_shebang]
+          @format_executable = @options[:format_executable]
         end
 
         def generate_bin
