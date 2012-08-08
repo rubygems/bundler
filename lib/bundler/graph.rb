@@ -15,6 +15,7 @@ module Bundler
       @node_options      = {}
       @edge_options      = {}
 
+      _patching_gem_dependency_class
       _populate_relations
     end
 
@@ -27,7 +28,6 @@ module Bundler
     private
 
     def _populate_relations
-      relations = Hash.new {|h, k| h[k] = Set.new}
       parent_dependencies = _groups.values.to_set.flatten
       while true
         if parent_dependencies.empty?
@@ -36,7 +36,6 @@ module Bundler
           tmp = Set.new
           parent_dependencies.each do |dependency|
             child_dependencies = dependency.to_spec.runtime_dependencies.to_set
-            relations[dependency.name] += child_dependencies.to_set
             @relations[dependency.name] += child_dependencies.map(&:name).to_set
             tmp += child_dependencies
 
@@ -48,7 +47,6 @@ module Bundler
           parent_dependencies = tmp
         end
       end
-      @relations
     end
 
     def _groups
@@ -85,6 +83,27 @@ module Bundler
         raise ArgumentError, "2nd argument is invalid"
       end
       label.nil? ? {} : { :label => label }
+    end
+
+    def _patching_gem_dependency_class
+      # method borrow from rubygems/dependency.rb
+      # redefinition of matching_specs will also redefine to_spec and to_specs
+      Gem::Dependency.class_eval do
+        def matching_specs platform_only = false
+          matches = Bundler.load.specs.select { |spec|
+            self.name === spec.name and # TODO: == instead of ===
+              requirement.satisfied_by? spec.version
+          }
+
+          if platform_only
+            matches.reject! { |spec|
+              not Gem::Platform.match spec.platform
+            }
+          end
+
+          matches = matches.sort_by { |s| s.sort_obj } # HACK: shouldn't be needed
+        end
+      end
     end
 
     class GraphVizClient
