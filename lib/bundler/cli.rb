@@ -277,6 +277,8 @@ module Bundler
         # We're doing a full update
         Bundler.definition(true)
       else
+        # check that the requested gems exist, then update them
+        gems.each{ |n| gem_spec_with_name!(n) }
         Bundler.definition(:gems => gems, :sources => sources)
       end
 
@@ -678,12 +680,17 @@ module Bundler
     end
 
     def locate_gem(name)
-      spec = Bundler.load.specs.find{|s| s.name == name }
-      raise GemNotFound, "Could not find gem '#{name}' in the current bundle." unless spec
+      spec = gem_spec_with_name!(name)
       if spec.name == 'bundler'
         return File.expand_path('../../../', __FILE__)
       end
       spec.full_gem_path
+    end
+
+    def gem_spec_with_name!(name)
+      spec = Bundler.load.specs.find{|s| s.name == name }
+      return spec if spec
+      raise GemNotFound, "Could not find gem '#{name}' in the current bundle."
     end
 
   end
