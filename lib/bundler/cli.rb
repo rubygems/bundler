@@ -690,8 +690,57 @@ module Bundler
     def gem_spec_with_name!(name)
       spec = Bundler.load.specs.find{|s| s.name == name }
       return spec if spec
-      raise GemNotFound, "Could not find gem '#{name}' in the current bundle."
+
+      # Missing gem, let's see if there's any similarly named ones we can propose instead
+      error_message = "Could not find gem '#{name}' in the current bundle."
+      similar = find_similar_gems(name)
+      if similar.length==1
+        error_message << "\nDid you mean #{similar[0]}?"
+      elsif similar.length>1
+        similar_list = [similar[0..-2].join(', '), similar[-1]].join(' or ')
+        error_message << "\nDid you mean one of #{similar_list}?"
+      end
+
+      raise GemNotFound, error_message
     end
 
+    SimilarityScore = Struct.new(:string, :distance)
+    def find_similar_gems(name)
+      gems_by_similarity = Bundler.load.specs.map{|s| SimilarityScore.new(s.name, levenshtein_distance(s.name, name))}
+      gems_by_similarity.select{|s| s.distance<=3}.sort_by(&:distance).map(&:string)
+    end
+
+    # http://www.informit.com/articles/article.aspx?p=683059&seqNum=36
+    def levenshtein_distance(this, that, ins=2, del=2, sub=1)
+      # ins, del, sub are weighted costs
+      return nil if this.nil?
+      return nil if that.nil?
+      dm = []        # distance matrix
+
+      # Initialize first row values
+      dm[0] = (0..this.length).collect { |i| i * ins }
+      fill = [0] * (this.length - 1)
+
+      # Initialize first column values
+      for i in 1..that.length
+        dm[i] = [i * del, fill.flatten]
+      end
+
+      # populate matrix
+      for i in 1..that.length
+        for j in 1..this.length
+          # critical comparison
+          dm[i][j] = [
+               dm[i-1][j-1] +
+                 (this[j-1] == that[i-1] ? 0 : sub),
+                   dm[i][j-1] + ins,
+               dm[i-1][j] + del
+         ].min
+        end
+      end
+
+      # The last value in matrix is the Levenshtein distance between the strings
+      dm[that.length][this.length]
+    end
   end
 end
