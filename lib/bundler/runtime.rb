@@ -120,7 +120,8 @@ module Bundler
       gem_files            = Dir["#{Gem.dir}/cache/*.gem"]
       gemspec_files        = Dir["#{Gem.dir}/specifications/*.gemspec"]
       spec_gem_paths       = []
-      spec_git_paths       = []
+      # need to keep git sources around
+      spec_git_paths       = @definition.sources.select {|s| s.is_a?(Bundler::Source::Git) }.map {|s| s.path.to_s }
       spec_git_cache_dirs  = []
       spec_gem_executables = []
       spec_cache_paths     = []

@@ -232,6 +232,31 @@ describe "bundle clean" do
     vendored_gems("bundler/gems/rails-#{revision[0..11]}").should exist
   end
 
+  it "does not remove git sources that are in without groups" do
+    build_git "foo", :path => lib_path("foo")
+    git_path = lib_path('foo')
+    revision = revision_for(git_path)
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "rack", "1.0.0"
+      group :test do
+        git "#{git_path}", :ref => "#{revision}" do
+          gem "foo"
+        end
+      end
+    G
+    bundle "install --path vendor/bundle --without test"
+
+    bundle :clean
+
+    out.should eq("")
+    vendored_gems("bundler/gems/foo-#{revision[0..11]}").should exist
+    digest = Digest::SHA1.hexdigest(git_path.to_s)
+    vendored_gems("cache/bundler/git/foo-#{digest}").should_not exist
+  end
+
   it "displays an error when used without --path" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
