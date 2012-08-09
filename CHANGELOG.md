@@ -1,3 +1,9 @@
+## 1.2.0.rc.2 (Aug 8, 2012)
+
+Bugfixes:
+
+  - `clean` doesn't remove gems that are included in the lockfile
+
 ## 1.2.0.rc (Jul 17, 2012)
 
 Features:
