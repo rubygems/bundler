@@ -34,7 +34,7 @@ module Spec
       opts = args.last.is_a?(Hash) ? args.pop : {}
       expect_err = opts.delete(:expect_err)
       env = opts.delete(:env)
-      groups = args.map {|a| a.inspect }.join(", ")
+      groups = args.map { |a| a.inspect }.join(", ")
       setup = "require 'rubygems' ; require 'bundler' ; Bundler.setup(#{groups})\n"
       @out = ruby(setup + cmd, :expect_err => expect_err, :env => env)
     end
@@ -67,9 +67,9 @@ module Spec
       requires = options.delete(:requires) || []
       requires << File.expand_path('../fakeweb/'+options.delete(:fakeweb)+'.rb', __FILE__) if options.key?(:fakeweb)
       requires << File.expand_path('../artifice/'+options.delete(:artifice)+'.rb', __FILE__) if options.key?(:artifice)
-      requires_str = requires.map{|r| "-r#{r}"}.join(" ")
+      requires_str = requires.map{ |r| "-r#{r}" }.join(" ")
 
-      env = (options.delete(:env) || {}).map{|k,v| "#{k}='#{v}' "}.join
+      env = (options.delete(:env) || {}).map{ |k,v| "#{k}='#{v}' " }.join
       args = options.map do |k,v|
         v == true ? " --#{k}" : " --#{k} #{v}" if v
       end.join
@@ -79,14 +79,14 @@ module Spec
       if exitstatus
         sys_status(cmd)
       else
-        sys_exec(cmd, expect_err){|i| yield i if block_given? }
+        sys_exec(cmd, expect_err){ |i| yield i if block_given? }
       end
     end
 
     def ruby(ruby, options = {})
       expect_err = options.delete(:expect_err)
-      env = (options.delete(:env) || {}).map{|k,v| "#{k}='#{v}' "}.join
-      ruby.gsub!(/["`\$]/) {|m| "\\#{m}" }
+      env = (options.delete(:env) || {}).map{ |k,v| "#{k}='#{v}' " }.join
+      ruby.gsub!(/["`\$]/) { |m| "\\#{m}" }
       lib_option = options[:no_lib] ? "" : " -I#{lib}"
       sys_exec(%{#{env}#{Gem.ruby}#{lib_option} -e "#{ruby}"}, expect_err)
     end

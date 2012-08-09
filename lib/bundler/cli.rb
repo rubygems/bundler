@@ -168,9 +168,9 @@ module Bundler
     def install
       opts = options.dup
       if opts[:without]
-        opts[:without].map!{|g| g.split(" ") }
+        opts[:without].map!{ |g| g.split(" ") }
         opts[:without].flatten!
-        opts[:without].map!{|g| g.to_sym }
+        opts[:without].map!{ |g| g.to_sym }
       end
 
       # Can't use Bundler.settings for this because settings needs gemfile.dirname
@@ -518,7 +518,7 @@ module Bundler
 
     desc "open GEM", "Opens the source directory of the given bundled gem"
     def open(name)
-      editor = [ENV['BUNDLER_EDITOR'], ENV['VISUAL'], ENV['EDITOR']].find{|e| !e.nil? && !e.empty? }
+      editor = [ENV['BUNDLER_EDITOR'], ENV['VISUAL'], ENV['EDITOR']].find{ |e| !e.nil? && !e.empty? }
       if editor
         gem_path = locate_gem(name)
         Dir.chdir(gem_path) do
@@ -533,7 +533,7 @@ module Bundler
 
     desc "console [GROUP]", "Opens an IRB session with the bundle pre-loaded"
     def console(group = nil)
-      group ? Bundler.require(:default, *(group.split.map! {|g| g.to_sym })) : Bundler.require
+      group ? Bundler.require(:default, *(group.split.map! { |g| g.to_sym })) : Bundler.require
       ARGV.clear
 
       require 'irb'
@@ -582,8 +582,8 @@ module Bundler
     def gem(name)
       name = name.chomp("/") # remove trailing slash if present
       target = File.join(Dir.pwd, name)
-      constant_name = name.split('_').map{|p| p[0..0].upcase + p[1..-1] }.join
-      constant_name = constant_name.split('-').map{|q| q[0..0].upcase + q[1..-1] }.join('::') if constant_name =~ /-/
+      constant_name = name.split('_').map{ |p| p[0..0].upcase + p[1..-1] }.join
+      constant_name = constant_name.split('-').map{ |q| q[0..0].upcase + q[1..-1] }.join('::') if constant_name =~ /-/
       constant_array = constant_name.split('::')
       FileUtils.mkdir_p(File.join(target, 'lib', name))
       git_user_name = `git config user.name`.chomp
@@ -630,7 +630,7 @@ module Bundler
     method_option "ruby", :type => :boolean, :default => false, :banner =>
       "only display ruby related platform information"
     def platform
-      platforms    = Bundler.definition.platforms.map {|p| "* #{p}" }
+      platforms    = Bundler.definition.platforms.map { |p| "* #{p}" }
       ruby_version = Bundler.definition.ruby_version
       output       = []
 
@@ -678,7 +678,7 @@ module Bundler
     end
 
     def locate_gem(name)
-      spec = Bundler.load.specs.find{|s| s.name == name }
+      spec = Bundler.load.specs.find{ |s| s.name == name }
       raise GemNotFound, "Could not find gem '#{name}' in the current bundle." unless spec
       if spec.name == 'bundler'
         return File.expand_path('../../../', __FILE__)

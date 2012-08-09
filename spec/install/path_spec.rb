@@ -118,7 +118,7 @@ describe "bundle install with explicit source paths" do
       gemspec
     G
 
-    File.open(lib_path("foo/Gemfile"), "w") {|f| f.puts gemfile }
+    File.open(lib_path("foo/Gemfile"), "w") { |f| f.puts gemfile }
 
     Dir.chdir(lib_path("foo")) do
       bundle "install"

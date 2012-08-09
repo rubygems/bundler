@@ -11,7 +11,7 @@ module Bundler
       @output_format     = output_format
 
       @groups            = []
-      @relations         = Hash.new {|h, k| h[k] = Set.new}
+      @relations         = Hash.new { |h, k| h[k] = Set.new}
       @node_options      = {}
       @edge_options      = {}
 
@@ -27,7 +27,7 @@ module Bundler
     private
 
     def _populate_relations
-      relations = Hash.new {|h, k| h[k] = Set.new}
+      relations = Hash.new { |h, k| h[k] = Set.new}
       parent_dependencies = _groups.values.to_set.flatten
       while true
         if parent_dependencies.empty?
@@ -52,7 +52,7 @@ module Bundler
     end
 
     def _groups
-      relations = Hash.new {|h, k| h[k] = Set.new}
+      relations = Hash.new { |h, k| h[k] = Set.new}
       @env.current_dependencies.each do |dependency|
         dependency.groups.each do |group|
           relations[group.to_s].add(dependency)

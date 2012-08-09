@@ -204,7 +204,7 @@ module Bundler
       invalid_keys = opts.keys - valid_keys
       if invalid_keys.any?
         plural = invalid_keys.size > 1
-        message = "You passed #{invalid_keys.map{|k| ':'+k }.join(", ")} "
+        message = "You passed #{invalid_keys.map{ |k| ':'+k }.join(", ")} "
         if plural
           message << "as options for gem '#{name}', but they are invalid."
         else

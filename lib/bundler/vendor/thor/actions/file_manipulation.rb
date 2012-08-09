@@ -74,7 +74,7 @@ class Thor
       destination = args.first
 
       source = File.expand_path(find_in_source_paths(source.to_s)) unless source =~ /^https?\:\/\//
-      render = open(source) {|input| input.binmode.read }
+      render = open(source) { |input| input.binmode.read }
 
       destination ||= if block_given?
         block.arity == 1 ? block.call(render) : block.call

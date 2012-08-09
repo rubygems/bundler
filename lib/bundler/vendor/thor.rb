@@ -85,7 +85,7 @@ class Thor
       if mappings
         mappings.each do |key, value|
           if key.respond_to?(:each)
-            key.each {|subkey| @map[subkey] = value}
+            key.each { |subkey| @map[subkey] = value }
           else
             @map[key] = value
           end

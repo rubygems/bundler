@@ -23,7 +23,7 @@ module Bundler
         @allow_cached = false
 
         @caches = [ Bundler.app_cache ] +
-          Bundler.rubygems.gem_path.map{|p| File.expand_path("#{p}/cache") }
+          Bundler.rubygems.gem_path.map{ |p| File.expand_path("#{p}/cache") }
       end
 
       def remote!
@@ -56,7 +56,7 @@ module Bundler
 
       def to_lock
         out = "GEM\n"
-        out << remotes.map {|r| "  remote: #{r}\n" }.join
+        out << remotes.map { |r| "  remote: #{r}\n" }.join
         out << "  specs:\n"
       end
 
@@ -241,9 +241,9 @@ module Bundler
           # the rubygems repo if there's no api endpoints to search over
           # or it has too many specs to fetch
           fetchers              = sources.keys
-          api_fetchers          = fetchers.select {|fetcher| fetcher.has_api }
+          api_fetchers          = fetchers.select { |fetcher| fetcher.has_api }
           modern_index_fetchers = fetchers - api_fetchers
-          if api_fetchers.any? && modern_index_fetchers.all? {|fetcher| sources[fetcher] < FORCE_MODERN_INDEX_LIMIT }
+          if api_fetchers.any? && modern_index_fetchers.all? { |fetcher| sources[fetcher] < FORCE_MODERN_INDEX_LIMIT }
             # this will fetch all the specifications on the rubygems repo
             unmet_dependency_names = idx.unmet_dependency_names
             unmet_dependency_names -= ['bundler'] # bundler will always be unmet
@@ -256,7 +256,7 @@ module Bundler
             end
           else
             Bundler::Fetcher.disable_endpoint = true
-            api_fetchers.each {|fetcher| idx.use fetcher.specs([], self) }
+            api_fetchers.each { |fetcher| idx.use fetcher.specs([], self) }
           end
 
           idx
@@ -427,8 +427,8 @@ module Bundler
               s.authors  = ["no one"]
               if expanded_path.join("bin").exist?
                 executables = expanded_path.join("bin").children
-                executables.reject!{|p| File.directory?(p) }
-                s.executables = executables.map{|c| c.basename.to_s }
+                executables.reject!{ |p| File.directory?(p) }
+                s.executables = executables.map{ |c| c.basename.to_s }
               end
             end
           end
@@ -607,11 +607,11 @@ module Bundler
           if Bundler::WINDOWS
             # Windows quoting requires double quotes only, with double quotes
             # inside the string escaped by being doubled.
-            '"' + uri.gsub('"') {|s| '""'} + '"'
+            '"' + uri.gsub('"') { |s| '""'} + '"'
           else
             # Bash requires single quoted strings, with the single quotes escaped
             # by ending the string, escaping the quote, and restarting the string.
-            "'" + uri.gsub("'") {|s| "'\\''"} + "'"
+            "'" + uri.gsub("'") { |s| "'\\''"} + "'"
           end
         end
 
@@ -643,7 +643,7 @@ module Bundler
         @allow_remote = false
 
         # Stringify options that could be set as symbols
-        %w(ref branch tag revision).each{|k| options[k] = options[k].to_s if options[k] }
+        %w(ref branch tag revision).each{ |k| options[k] = options[k].to_s if options[k] }
 
         @uri        = options["uri"]
         @branch     = options["branch"]
