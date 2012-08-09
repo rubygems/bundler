@@ -180,8 +180,8 @@ module Bundler
           activated[a.name] ? 0 : @gems_size[a] ]
       end
 
-      debug { "Activated:\n" + activated.values.map {|a| "  #{a}" }.join("\n") }
-      debug { "Requirements:\n" + reqs.map {|r| "  #{r}"}.join("\n") }
+      debug { "Activated:\n" + activated.values.map { |a| "  #{a}" }.join("\n") }
+      debug { "Requirements:\n" + reqs.map { |r| "  #{r}"}.join("\n") }
 
       activated = activated.dup
 
@@ -223,7 +223,7 @@ module Bundler
         else
           debug { "    * [FAIL] Already activated" }
           @errors[existing.name] = [existing, current]
-          debug { current.required_by.map {|d| "      * #{d.name} (#{d.requirement})" }.join("\n") }
+          debug { current.required_by.map { |d| "      * #{d.name} (#{d.requirement})" }.join("\n") }
           # debug { "    * All current conflicts:\n" + @errors.keys.map { |c| "      - #{c}" }.join("\n") }
           # Since the current requirement conflicts with an activated gem, we need
           # to backtrack to the current requirement's parent and try another version
@@ -387,7 +387,7 @@ module Bundler
             end
             nested.last << spec
           end
-          deps = nested.map{|a| SpecGroup.new(a) }.select{|sg| sg.for?(dep.__platform) }
+          deps = nested.map{ |a| SpecGroup.new(a) }.select{ |sg| sg.for?(dep.__platform) }
         else
           deps = []
         end

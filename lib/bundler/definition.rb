@@ -187,7 +187,7 @@ module Bundler
     def index
       @index ||= Index.build do |idx|
         dependency_names = @dependencies.dup || []
-        dependency_names.map! {|d| d.name }
+        dependency_names.map! { |d| d.name }
 
         @sources.each do |s|
           if s.is_a?(Bundler::Source::Rubygems)
@@ -206,7 +206,7 @@ module Bundler
     # spec, even if (say) a git gem is not checked out.
     def rubygems_index
       @rubygems_index ||= Index.build do |idx|
-        rubygems = @sources.find{|s| s.is_a?(Source::Rubygems) }
+        rubygems = @sources.find{ |s| s.is_a?(Source::Rubygems) }
         idx.add_source rubygems.specs
       end
     end
@@ -233,7 +233,7 @@ module Bundler
         return
       end
 
-      File.open(file, 'wb'){|f| f.puts(contents) }
+      File.open(file, 'wb'){ |f| f.puts(contents) }
     rescue Errno::EACCES => e
       raise Bundler::InstallError,
         "There was an error while trying to write to Gemfile.lock. It is likely that \n" \

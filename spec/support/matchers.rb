@@ -22,7 +22,7 @@ module Spec
 
       match do |actual|
         actual = actual.split(/\s+/) if actual.is_a?(String)
-        args.all? {|arg| actual.include?(arg) } && actual.uniq.size == actual.size
+        args.all? { |arg| actual.include?(arg) } && actual.uniq.size == actual.size
       end
     end
 

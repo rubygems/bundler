@@ -130,7 +130,7 @@ module Bundler
       return {@remote_uri => last_spec_list} if query_list.empty?
 
       spec_list, deps_list = fetch_dependency_remote_specs(query_list)
-      returned_gems = spec_list.map {|spec| spec.first }.uniq
+      returned_gems = spec_list.map { |spec| spec.first }.uniq
 
       fetch_remote_specs(deps_list, full_dependency_list + returned_gems, spec_list + last_spec_list)
     end
@@ -212,7 +212,7 @@ module Bundler
         spec_list = Gem::SpecFetcher.new.list(true, false)
         # Then fetch the prerelease specs
         begin
-          Gem::SpecFetcher.new.list(false, true).each {|k, v| spec_list[k] += v }
+          Gem::SpecFetcher.new.list(false, true).each { |k, v| spec_list[k] += v }
         rescue Gem::RemoteFetcher::FetchError
           Bundler.ui.debug "Could not fetch prerelease specs from #{strip_user_pass_from_uri(@remote_uri)}"
         end

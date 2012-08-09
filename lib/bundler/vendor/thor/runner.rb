@@ -46,10 +46,10 @@ class Thor::Runner < Thor #:nodoc:
     begin
       if File.directory?(File.expand_path(name))
         base, package = File.join(name, "main.thor"), :directory
-        contents      = open(base) {|input| input.read }
+        contents      = open(base) { |input| input.read }
       else
         base, package = name, :file
-        contents      = open(name) {|input| input.read }
+        contents      = open(name) { |input| input.read }
       end
     rescue OpenURI::HTTPError
       raise Error, "Error opening URI '#{name}'"

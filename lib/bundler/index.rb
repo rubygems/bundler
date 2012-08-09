@@ -31,7 +31,7 @@ module Bundler
     end
 
     def inspect
-      "<Index sources=#{sources.map{|s| s.inspect}} specs.size=#{specs.size}>"
+      "<Index sources=#{sources.map{ |s| s.inspect}} specs.size=#{specs.size}>"
     end
 
     def empty?
@@ -66,7 +66,7 @@ module Bundler
     end
 
     def source_types
-      sources.map{|s| s.class }.uniq
+      sources.map{ |s| s.class }.uniq
     end
 
     alias [] search
@@ -92,10 +92,10 @@ module Bundler
     def unmet_dependency_names
       dependency_names = specs.values.map do |array_of_s|
         array_of_s.map do |s|
-          s.dependencies.map{|d| d.name }
+          s.dependencies.map{ |d| d.name }
         end
       end.flatten.uniq
-      dependency_names.select{|name| specs_by_name(name).empty? }
+      dependency_names.select{ |name| specs_by_name(name).empty? }
     end
 
     def use(other, override_dupes = false)
@@ -151,13 +151,13 @@ module Bundler
         end
 
         wants_prerelease = dependency.requirement.prerelease?
-        only_prerelease  = specs.all? {|spec| spec.version.prerelease? }
+        only_prerelease  = specs.all? { |spec| spec.version.prerelease? }
 
         unless wants_prerelease || only_prerelease
           found.reject! { |spec| spec.version.prerelease? }
         end
 
-        found.sort_by {|s| [s.version, s.platform.to_s == 'ruby' ? "\0" : s.platform.to_s] }
+        found.sort_by { |s| [s.version, s.platform.to_s == 'ruby' ? "\0" : s.platform.to_s] }
       end
     end
 

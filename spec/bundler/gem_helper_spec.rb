@@ -29,7 +29,7 @@ describe "Bundler::GemHelper tasks" do
     it "should fail when there are two gemspecs and the name isn't specified" do
       bundle 'gem test'
       app = bundled_app("test")
-      File.open(File.join(app.to_s, 'test2.gemspec'), 'w') {|f| f << ''}
+      File.open(File.join(app.to_s, 'test2.gemspec'), 'w') { |f| f << '' }
       proc { Bundler::GemHelper.new(app.to_s) }.should raise_error(/Unable to determine name/)
     end
 
@@ -54,7 +54,7 @@ describe "Bundler::GemHelper tasks" do
       bundle 'gem test'
       @app = bundled_app("test")
       @gemspec = File.read("#{@app.to_s}/test.gemspec")
-      File.open("#{@app.to_s}/test.gemspec", 'w'){|f| f << @gemspec.gsub('TODO: ', '') }
+      File.open("#{@app.to_s}/test.gemspec", 'w'){ |f| f << @gemspec.gsub('TODO: ', '') }
       @helper = Bundler::GemHelper.new(@app.to_s)
     end
 
@@ -101,7 +101,7 @@ describe "Bundler::GemHelper tasks" do
 
       it "raises an appropriate error when the build fails" do
         # break the gemspec by adding back the TODOs...
-        File.open("#{@app.to_s}/test.gemspec", 'w'){|f| f << @gemspec }
+        File.open("#{@app.to_s}/test.gemspec", 'w'){ |f| f << @gemspec }
         proc { @helper.build_gem }.should raise_error(/TODO/)
       end
     end
@@ -120,7 +120,7 @@ describe "Bundler::GemHelper tasks" do
           # write an invalid gem file, so we can simulate install failure...
           FileUtils.mkdir_p(File.join(@app.to_s, 'pkg'))
           path = "#{@app.to_s}/pkg/test-0.0.1.gem"
-          File.open(path, 'w'){|f| f << "not actually a gem"}
+          File.open(path, 'w'){ |f| f << "not actually a gem" }
           path
         end
         proc { @helper.install_gem }.should raise_error

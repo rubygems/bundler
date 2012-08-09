@@ -111,7 +111,7 @@ class Thor
       #
       def print_in_columns(array)
         return if array.empty?
-        colwidth = (array.map{|el| el.to_s.size}.max || 0) + 2
+        colwidth = (array.map{ |el| el.to_s.size }.max || 0) + 2
         array.each_with_index do |value, index|
           # Don't output trailing spaces when printing the last column
           if ((((index + 1) % (terminal_width / colwidth))).zero? && !index.zero?) || index + 1 == array.length
@@ -140,12 +140,12 @@ class Thor
         formats << "%-#{colwidth + 2}s" if colwidth
         start = colwidth ? 1 : 0
 
-        colcount = array.max{|a,b| a.size <=> b.size }.size
+        colcount = array.max{ |a,b| a.size <=> b.size }.size
 
         maximas = []
 
         start.upto(colcount - 1) do |index|
-          maxima = array.map {|row| row[index] ? row[index].to_s.size : 0 }.max
+          maxima = array.map { |row| row[index] ? row[index].to_s.size : 0 }.max
           maximas << maxima
           if index == colcount - 1
             # Don't output 2 trailing spaces when printing the last column

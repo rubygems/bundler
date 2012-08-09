@@ -772,7 +772,7 @@ describe "the lockfile format" do
       it "preserves Gemfile.lock \\n\\r line endings" do
         update_repo2
         win_lock = File.read(bundled_app("Gemfile.lock")).gsub(/\n/, "\r\n")
-        File.open(bundled_app("Gemfile.lock"), "wb"){|f| f.puts(win_lock) }
+        File.open(bundled_app("Gemfile.lock"), "wb"){ |f| f.puts(win_lock) }
         set_lockfile_mtime_to_known_value
 
         lambda { bundle "update" }.should change { File.mtime(bundled_app('Gemfile.lock')) }
@@ -794,7 +794,7 @@ describe "the lockfile format" do
 
       it "preserves Gemfile.lock \\n\\r line endings" do
         win_lock = File.read(bundled_app("Gemfile.lock")).gsub(/\n/, "\r\n")
-        File.open(bundled_app("Gemfile.lock"), "wb"){|f| f.puts(win_lock) }
+        File.open(bundled_app("Gemfile.lock"), "wb"){ |f| f.puts(win_lock) }
         set_lockfile_mtime_to_known_value
 
         lambda { ruby <<-RUBY
