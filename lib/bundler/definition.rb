@@ -211,10 +211,6 @@ module Bundler
       end
     end
 
-    def no_sources?
-      @sources.length == 1 && @sources.first.remotes.empty?
-    end
-
     def groups
       dependencies.map { |d| d.groups }.flatten.uniq
     end

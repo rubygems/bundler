@@ -145,6 +145,7 @@ module Bundler
 
     def to_definition(lockfile, unlock)
       @sources << @rubygems_source unless @sources.include?(@rubygems_source)
+      set_default_remote_source if still_empty_sources?
       Definition.new(lockfile, @dependencies, @sources, unlock, @ruby_version)
     end
 
@@ -250,6 +251,15 @@ module Bundler
       opts["env"]     ||= @env
       opts["platforms"] = platforms.dup
       opts["group"]     = groups
+    end
+
+    def set_default_remote_source
+      source :rubygems
+      @sources << @rubygems_source
+    end
+
+    def still_empty_sources?
+      @sources.length == 1 && @sources.first.remotes.empty?
     end
 
   end
