@@ -112,6 +112,10 @@ module Bundler
       mri? && RUBY_VERSION >= "2.0" && RUBY_VERSION < "3.0"
     end
 
+    def mri_20?
+      mri? && RUBY_VERSION >= "2.0" && RUBY_VERSION < "3.0"
+    end
+
     def rbx?
       ruby? && defined?(RUBY_ENGINE) && RUBY_ENGINE == "rbx"
     end
