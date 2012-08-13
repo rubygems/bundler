@@ -107,7 +107,7 @@ module Bundler
     def mri_19?
       mri? && RUBY_VERSION >= "1.9" && RUBY_VERSION < "2.0"
     end
-    
+
     def mri_20?
       mri? && RUBY_VERSION >= "2.0" && RUBY_VERSION < "3.0"
     end
