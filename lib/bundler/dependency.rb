@@ -12,9 +12,11 @@ module Bundler
       :ruby     => Gem::Platform::RUBY,
       :ruby_18  => Gem::Platform::RUBY,
       :ruby_19  => Gem::Platform::RUBY,
+      :ruby_20  => Gem::Platform::RUBY,
       :mri      => Gem::Platform::RUBY,
       :mri_18   => Gem::Platform::RUBY,
       :mri_19   => Gem::Platform::RUBY,
+      :mri_20   => Gem::Platform::RUBY,
       :rbx      => Gem::Platform::RUBY,
       :jruby    => Gem::Platform::JAVA,
       :mswin    => Gem::Platform::MSWIN,
@@ -90,6 +92,10 @@ module Bundler
       ruby? && RUBY_VERSION >= "1.9" && RUBY_VERSION < "2.0"
     end
 
+    def ruby_19?
+      ruby? && RUBY_VERSION >= "2.0" && RUBY_VERSION < "3.0"
+    end
+
     def mri?
       !mswin? && (!defined?(RUBY_ENGINE) || RUBY_ENGINE == "ruby")
     end
@@ -100,6 +106,14 @@ module Bundler
 
     def mri_19?
       mri? && RUBY_VERSION >= "1.9" && RUBY_VERSION < "2.0"
+    end
+
+    def mri_20?
+      mri? && RUBY_VERSION >= "2.0" && RUBY_VERSION < "3.0"
+    end
+
+    def mri_20?
+      mri? && RUBY_VERSION >= "2.0" && RUBY_VERSION < "3.0"
     end
 
     def rbx?
@@ -127,7 +141,11 @@ module Bundler
     end
 
     def mingw_19?
-      mingw? && RUBY_VERSION >= "1.9"
+      mingw? && RUBY_VERSION >= "1.9" && RUBY_VERSION < "2.0"
+    end
+
+    def mingw_20?
+      mingw? && RUBY_VERSION >= "2.0" && RUBY_VERSION < "3.0"
     end
 
   end
