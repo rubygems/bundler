@@ -277,6 +277,8 @@ module Bundler
         # We're doing a full update
         Bundler.definition(true)
       else
+        # cycle through the requested gems, just to make sure they exist
+        gems.each{ |n| gem_dependency_with_name(n) }
         Bundler.definition(:gems => gems, :sources => sources)
       end
 
@@ -684,6 +686,12 @@ module Bundler
         return File.expand_path('../../../', __FILE__)
       end
       spec.full_gem_path
+    end
+
+    def gem_dependency_with_name(name)
+      dep = Bundler.load.dependencies.find{|d| d.name == name }
+      raise GemNotFound, "Could not find gem '#{name}'." unless dep
+      dep
     end
 
   end
