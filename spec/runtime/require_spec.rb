@@ -121,8 +121,7 @@ describe "Bundler.require" do
 
     it "handles the case where regex fails" do
       build_lib "load-fuuu", "1.0.0" do |s|
-        s.write "lib/load-fuuu.rb", "require 'load/fuuu'"
-        s.write "lib/load/fuuu.rb", "raise LoadError.new(\"Could not open library 'libfuuu-1.0': libfuuu-1.0: cannot open shared object file: No such file or directory.\")"
+        s.write "lib/load-fuuu.rb", "raise LoadError.new(\"Could not open library 'libfuuu-1.0': libfuuu-1.0: cannot open shared object file: No such file or directory.\")"
       end
 
       gemfile <<-G
