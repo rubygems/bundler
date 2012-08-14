@@ -107,7 +107,7 @@ describe "Bundler.require" do
       out.should eq("jquery/rails")
     end
 
-    it "handles the case where the regex fails" do
+    it "does not mangle explictly given requires" do
       gemfile <<-G
         path "#{lib_path}"
         gem 'jquery-rails', :require => 'jquery-rails'
@@ -119,7 +119,7 @@ describe "Bundler.require" do
       err.should == "ZOMG LOAD ERROR"
     end
 
-    it "doesn't obscure actual error messages" do
+    it "handles the case where regex fails" do
       build_lib "load-fuuu", "1.0.0" do |s|
         s.write "lib/load-fuuu.rb", "require 'load/fuuu'"
         s.write "lib/load/fuuu.rb", "raise LoadError.new(\"Could not open library 'libfuuu-1.0': libfuuu-1.0: cannot open shared object file: No such file or directory.\")"
