@@ -56,6 +56,13 @@ describe "bundle update" do
     end
   end
 
+  describe "with a unknown dependency" do
+    it "should inform the user" do
+      bundle "update halting-problem-solver", :expect_err=>true
+      out.should include "Could not find gem 'halting-problem-solver'"
+    end
+  end
+
   describe "with --local option" do
     it "doesn't hit repo2" do
       FileUtils.rm_rf(gem_repo2)
