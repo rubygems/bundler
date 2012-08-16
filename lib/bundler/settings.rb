@@ -126,7 +126,9 @@ module Bundler
     end
 
     def load_config(config_file)
-      if config_file.exist? && !config_file.size.zero?
+      if config_file == "/dev/null"
+        {}
+      elsif config_file.exist? && !config_file.size.zero?
         yaml = YAML.load_file(config_file)
       end
       yaml || {}
