@@ -796,7 +796,7 @@ describe "bundle install with gem sources" do
     # On OS X, Gem.bindir defaults to /usr/bin, so system_bindir is useful if
     # you want to avoid sudo installs for system gems with OS X's default ruby
     it "overrides Gem.bindir" do
-      Pathname.new("/usr/bin").should_not be_writable
+      Pathname.new("/usr/bin").should_not be_writable unless Process::euid == 0
       gemfile <<-G
         require 'rubygems'
         def Gem.bindir; "/usr/bin"; end
