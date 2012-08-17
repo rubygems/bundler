@@ -98,6 +98,14 @@ module Bundler
       !@local_config.key?(key_for(:path))
     end
 
+    def ignore_config?
+      !!@ignore_config
+    end
+
+    def ignore_config!
+      @ignore_config = true
+    end
+
   private
     def key_for(key)
       key = key.to_s.sub(".", "__").upcase
@@ -126,6 +134,7 @@ module Bundler
     end
 
     def load_config(config_file)
+      return {} if ignore_config?
       if config_file.exist? && !config_file.size.zero?
         yaml = YAML.load_file(config_file)
       end

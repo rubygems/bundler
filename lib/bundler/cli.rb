@@ -9,6 +9,7 @@ module Bundler
     def initialize(*)
       super
       the_shell = (options["no-color"] ? Thor::Shell::Basic.new : shell)
+      Bundler.settings.ignore_config! if options["ignore-config"]
       Bundler.ui = UI::Shell.new(the_shell)
       Bundler.ui.debug! if options["verbose"]
       Bundler.rubygems.ui = UI::RGProxy.new(Bundler.ui)
@@ -17,6 +18,7 @@ module Bundler
     check_unknown_options!(:except => [:config, :exec])
 
     default_task :install
+    class_option "ignore-config", :type => :boolean, :banner => "Ignore all system wide bundle configuration", :aliases => "-n"
     class_option "no-color", :type => :boolean, :banner => "Disable colorization in output"
     class_option "verbose",  :type => :boolean, :banner => "Enable verbose output mode", :aliases => "-V"
 
