@@ -32,4 +32,9 @@ describe "bundle open" do
     bundle "open missing", :env => {"EDITOR" => "echo editor", "VISUAL" => "", "BUNDLER_EDITOR" => ""}
     out.should match(/could not find gem 'missing'/i)
   end
+
+  it "suggests alternatives for similar-sounding gems" do
+    bundle "open Rails", :env => {"EDITOR" => "echo editor", "VISUAL" => "", "BUNDLER_EDITOR" => ""}
+    out.should match(/did you mean rails\?/i)
+  end
 end
