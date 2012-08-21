@@ -1,6 +1,7 @@
 require 'bundler/vendored_thor'
 require 'rubygems/user_interaction'
 require 'rubygems/config_file'
+require 'bundler/similarity_detector'
 
 module Bundler
   class CLI < Thor
@@ -681,7 +682,7 @@ module Bundler
 
     def locate_gem(name)
       spec = Bundler.load.specs.find{|s| s.name == name }
-      raise GemNotFound, "Could not find gem '#{name}' in the current bundle." unless spec
+      raise GemNotFound, not_found_message(name, Bundler.load.specs) unless spec
       if spec.name == 'bundler'
         return File.expand_path('../../../', __FILE__)
       end
@@ -690,8 +691,19 @@ module Bundler
 
     def gem_dependency_with_name(name)
       dep = Bundler.load.dependencies.find{|d| d.name == name }
-      raise GemNotFound, "Could not find gem '#{name}'." unless dep
+      raise GemNotFound, not_found_message(name, Bundler.load.dependencies) unless dep
       dep
+    end
+
+    def not_found_message(missing_gem_name, alternatives)
+      message = "Could not find gem '#{missing_gem_name}'."
+
+      # This is called as the result of a GemNotFound, let's see if
+      # there's any similarly named ones we can propose instead
+      alternate_names = alternatives.map{|a| a.name}
+      suggestions = SimilarityDetector.new(alternate_names).similar_word_list(missing_gem_name)
+      message += "\nDid you mean #{suggestions}?" if suggestions
+      message
     end
 
   end
