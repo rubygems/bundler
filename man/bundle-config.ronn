@@ -31,6 +31,9 @@ the local application. The configuration will be stored in `app/.bundle/config`.
 Executing `bundle config --delete <name>` will delete the configuration in both
 local and global sources.
 
+Executing bundle with the `BUNDLE_IGNORE_CONFIG` environment variable set will
+cause it to ignore all configuration.
+
 ## BUILD OPTIONS
 
 You can use `bundle config` to give bundler the flags to pass to the gem
