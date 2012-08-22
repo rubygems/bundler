@@ -2,6 +2,7 @@ module Bundler
   class Settings
     def initialize(root)
       @root          = root
+      @ignore_config = false
       @local_config  = load_config(local_config_file)
       @global_config = load_config(global_config_file)
     end
