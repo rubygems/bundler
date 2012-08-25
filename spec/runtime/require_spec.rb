@@ -107,6 +107,24 @@ describe "Bundler.require" do
       out.should eq("jquery/rails")
     end
 
+    it "silently passes if the require fails" do
+      build_lib "bcrypt-ruby", "1.0.0", :no_default => true do |s|
+        s.write "lib/brcrypt.rb", "BCrypt = '1.0.0'"
+      end
+      gemfile <<-G
+        path "#{lib_path}"
+        gem "bcrypt-ruby"
+      G
+
+      cmd = <<-RUBY
+        require 'bundler'
+        Bundler.require
+      RUBY
+      ruby(cmd, :expect_err => true)
+
+      err.should be_empty
+    end
+
     it "does not mangle explictly given requires" do
       gemfile <<-G
         path "#{lib_path}"
