@@ -23,8 +23,9 @@ module Bundler
       @ruby_version    = nil
     end
 
-    def eval_gemfile(gemfile)
-      instance_eval(Bundler.read_file(gemfile.to_s), gemfile.to_s, 1)
+    def eval_gemfile(gemfile, contents = nil)
+      contents ||= Bundler.read_file(gemfile.to_s)
+      instance_eval(contents, gemfile.to_s, 1)
     rescue SyntaxError => e
       bt = e.message.split("\n")[1..-1]
       raise GemfileError, ["Gemfile syntax error:", *bt].join("\n")
