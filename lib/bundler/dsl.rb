@@ -80,9 +80,9 @@ module Bundler
           elsif dep.type == :development
             return
           else
-            raise DslError, "You cannot specify the same gem twice with different version requirements. " \
+            raise DslError, "You cannot specify the same gem twice with different version requirements. \n" \
                             "You specified: #{current.name} (#{current.requirement}) and " \
-                            "#{dep.name} (#{dep.requirement})"
+                            "#{dep.name} (#{dep.requirement})\n"
           end
         end
 
@@ -92,9 +92,9 @@ module Bundler
           elsif dep.type == :development
             return
           else
-            raise DslError, "You cannot specify the same gem twice coming from different sources. You " \
-                            "specified that #{dep.name} (#{dep.requirement}) should come from " \
-                            "#{current.source || 'an unspecified source'} and #{dep.source}"
+            raise DslError, "You cannot specify the same gem twice coming from different sources.\n" \
+                            "You specified that #{dep.name} (#{dep.requirement}) should come from " \
+                            "#{current.source || 'an unspecified source'} and #{dep.source}\n"
           end
         end
       end
