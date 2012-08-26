@@ -664,6 +664,28 @@ module Bundler
       Bundler.ui.info output.join("\n\n")
     end
 
+    desc "add GEM VERSION ...", "Add the named gem(s), with version requirements, to the resolved Gemfile"
+    def inject(name, version, *gems)
+      # The required arguments allow Thor to give useful feedback when the arguments
+      # are incorrect. This adds those first two arguments onto the list as a whole.
+      gems.unshift(version).unshift(name)
+
+      # Build an array of Dependency objects out of the arguments
+      deps = []
+      gems.each_slice(2) do |name, version|
+        deps << Bundler::Dependency.new(name, version)
+      end
+
+      added = Injector.inject(deps)
+
+      if added.any?
+        Bundler.ui.confirm "Added to Gemfile:"
+        Bundler.ui.confirm added.map{ |g| "  #{g}" }.join("\n")
+      else
+        Bundler.ui.confirm "All injected gems were already present in the Gemfile"
+      end
+    end
+
   private
 
     def setup_cache_all
