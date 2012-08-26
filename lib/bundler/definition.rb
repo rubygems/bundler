@@ -5,7 +5,8 @@ module Bundler
   class Definition
     include GemHelpers
 
-    attr_reader :dependencies, :platforms, :sources, :ruby_version
+    attr_reader :dependencies, :platforms, :sources, :ruby_version,
+      :locked_deps
 
     def self.build(gemfile, lockfile, unlock)
       unlock ||= {}
