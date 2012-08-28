@@ -20,7 +20,9 @@ For help with common problems, see [ISSUES](https://github.com/carlhuda/bundler/
 
 To see what has changed in recent versions of Bundler, see the [CHANGELOG](https://github.com/carlhuda/bundler/blob/master/CHANGELOG.md).
 
-The `master` branch contains our current progress towards version 1.1. Because of that, please submit bugfix pull requests against the `1-0-stable` branch.
+The `master` branch contains our current progress towards version 1.3.
+Please submit pull requests with bugfixes to the stable branch for
+version you would like to fix. naoeutnhaoeunth
 
 ### Upgrading from Bundler 0.8 to 0.9 and above
 
