@@ -73,6 +73,10 @@ We divide `bundle` subcommands into primary commands and utilities.
 * `bundle gem(1)`:
   Create a simple gem, suitable for development with bundler
 
+* `bundle profile(1)`:
+  Show how long each gem takes to load. Optionally pass one or more
+  bundle groups, e.g., development
+
 ## OBSOLETE
 
 These commands are obsolete and should no longer be used

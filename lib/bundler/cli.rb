@@ -664,6 +664,16 @@ module Bundler
       Bundler.ui.info output.join("\n\n")
     end
 
+    desc "profile [GROUPS]", "Output performance information"
+    long_desc <<-D
+      Profile loads all dependencies and dumps their load time to STDOUT.
+      If one or more groups are specified, they are loaded in addition to the default group.
+    D
+    def profile(groups = nil)
+      Bundler.load.profiling = true
+      groups ? Bundler.require(:default, *(groups.split.map! {|g| g.to_sym })) : Bundler.require
+    end
+
   private
 
     def setup_cache_all
