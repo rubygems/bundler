@@ -22,7 +22,7 @@ To see what has changed in recent versions of Bundler, see the [CHANGELOG](https
 
 The `master` branch contains our current progress towards version 1.3.
 Please submit pull requests with bugfixes to the stable branch for
-version you would like to fix. naoeutnhaoeunth
+version you would like to fix.
 
 ### Upgrading from Bundler 0.8 to 0.9 and above
 
