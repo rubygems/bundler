@@ -1,3 +1,13 @@
+## 1.2.0 (Aug 30, 2012)
+
+Bugfixes:
+
+  - raise original error message from LoadError's
+
+Documentation:
+
+  - `platform` man pages
+
 ## 1.2.0.rc.2 (Aug 8, 2012)
 
 Bugfixes:
