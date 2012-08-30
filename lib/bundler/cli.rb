@@ -34,6 +34,7 @@ module Bundler
           bundle-install
           bundle-package
           bundle-update
+          bundle-platform
           gemfile.5)
 
       if manpages.include?(command)

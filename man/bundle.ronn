@@ -73,6 +73,9 @@ We divide `bundle` subcommands into primary commands and utilities.
 * `bundle gem(1)`:
   Create a simple gem, suitable for development with bundler
 
+* `bundle platform(1)`:
+  Displays platform compatibility information
+
 ## OBSOLETE
 
 These commands are obsolete and should no longer be used
