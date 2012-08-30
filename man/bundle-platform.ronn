@@ -33,7 +33,7 @@ If you run `bundle platform` on Ruby 1.9.3, it will display the following output
 `platform` will list all the platforms in your `Gemfile.lock` as well as the
 `ruby` directive if applicable from your Gemfile(5). It will also let you know
 if the `ruby` directive requirement has been met. If `ruby` directive doesn't
-match the running Ruby VM, it will tell you what part does not. 
+match the running Ruby VM, it will tell you what part does not.
 
 ## OPTIONS
 
