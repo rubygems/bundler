@@ -24,10 +24,11 @@
         <h2>I am interested in</h2>
         <div class="contents">
           <ul class="bullet">
-            <a href="https://github.com/carlhuda/bundler/blob/1-0-stable/ISSUES.md">Troubleshooting</a>
-            <a href="./rationale.html">Understanding Bundler</a>
-            <a href="./man/gemfile.5.html">Gemfile Manual</a>
-            <a href="./man/bundle.1.html">CLI Manual</a>
+            <a href="/v1.2/whats_new.html">What's New</a>
+            <a href="https://github.com/carlhuda/bundler/blob/1-2-stable/ISSUES.md">Troubleshooting</a>
+            <a href="/v1.2/rationale.html">Understanding Bundler</a>
+            <a href="/man/gemfile.5.html">Gemfile Manual</a>
+            <a href="/v1.2/commands.html">CLI Reference</a>
           </ul>
         </div>
         <h2 id="getting-started">
@@ -92,7 +93,7 @@
               The executables installed into <code>bin</code> are scoped to the
               bundle and will always work
             </div>
-            <a href="./man/bundle-exec.1.html">Learn More: Executables</a>
+            <a href="../man/bundle-exec.1.html">Learn More: Executables</a>
           </div>
         </div>
         <h2 id="using-bundler-with-rails">
@@ -170,7 +171,7 @@
               in your <code>Gemfile</code>)
             </div>
             <pre class='sunburst'>$ bundle update rails</pre>
-            <a href="./man/bundle-update.1.html">Learn More: bundle update</a>
+            <a href="../man/bundle-update.1.html">Learn More: bundle update</a>
           </div>
           <div class="bullet">
             <div class="description">
@@ -179,6 +180,21 @@
               tell bundler to update <strong>all</strong> dependencies
             </div>
             <pre class='sunburst'>$ bundle update&#x000A;</pre>
+          </div>
+          <div class="bullet">
+            <div class="description">
+              To find out whether a newer version of a gem is available without updating yet:
+            </div>
+            <pre class='sunburst'>$ bundle outdated nokogiri</pre>
+            <div class="notes">
+              <p>
+                Check for newer pre-release versions: <code>bundle outdated nokogiri --pre</code>
+              </p>
+              <p>
+                Or leave off the gem name to check for newer versions of all gems: <code>$ bundle outdated</code>
+              </p>
+            </div>
+            <a href="./bundle_outdated.html">Learn More: bundle outdated</a>
           </div>
         </div>
         <h2 id="deploying-your-application">
@@ -247,6 +263,14 @@
             </div>
             <a href="./bundle_install.html">Learn More: bundle install</a>
           </div>
+          <div class="bullet">
+            <div class="description">
+              Create a code file along with the installed gems that can load
+              dependencies without Bundler
+            </div>
+            <pre class='sunburst'>$ bundle install --standalone</pre>
+            <a href="./bundle_install.html">Learn More: bundle install</a>
+          </div>
         </div>
       </div>
     </div>
@@ -297,8 +321,9 @@
     </a>
     <div id="prod-versions">
       <a class="" href="v0.9/index.html">v0.9</a>
-      <a class="current" href="v1.0/index.html">v1.0</a>
+      <a class="" href="v1.0/index.html">v1.0</a>
       <a class="" href="v1.1/index.html">v1.1</a>
+      <a class="current" href="v1.2/index.html">v1.2</a>
     </div>
     <script type="text/javascript">
       //<![CDATA[
