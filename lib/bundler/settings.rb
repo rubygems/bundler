@@ -85,7 +85,7 @@ module Bundler
     def path
       key  = key_for(:path)
       path = ENV[key] || @global_config[key]
-      return path if path && !@local_config.key?(key)
+      return "#{path}/#{Bundler.ruby_scope}" if path && !@local_config.key?(key)
 
       if path = self[:path]
         "#{path}/#{Bundler.ruby_scope}"
