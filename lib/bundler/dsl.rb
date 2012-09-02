@@ -232,7 +232,7 @@ module Bundler
 
       if github = opts.delete("github")
         github = "#{github}/#{github}" unless github.include?("/")
-        opts["git"] = "git://github.com/#{github}.git"
+        opts["git"] = "https://github.com/#{github}.git"
       end
 
       ["git", "path"].each do |type|
