@@ -128,7 +128,12 @@ describe "Bundler::GemHelper tasks" do
     end
 
     describe 'release' do
+      it "shouldn't push if there are unstaged files" do
+        proc { @helper.release_gem }.should raise_error(/files that need to be committed/)
+      end
+
       it "shouldn't push if there are uncommitted files" do
+        %x{cd test; git add .}
         proc { @helper.release_gem }.should raise_error(/files that need to be committed/)
       end
 
