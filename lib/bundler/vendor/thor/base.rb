@@ -70,11 +70,12 @@ class Thor
       # arguments declared using #argument (this is primarily used
       # by Thor::Group). Tis will leave us with the remaining
       # positional arguments.
-      thor_args = Thor::Arguments.new(self.class.arguments)
-      thor_args.parse(args + opts.remaining).each { |k,v| send("#{k}=", v) }
-      args = thor_args.remaining
+      to_parse  = args
+      to_parse += opts.remaining unless self.class.strict_args_position?(config)
 
-      @args = args
+      thor_args = Thor::Arguments.new(self.class.arguments)
+      thor_args.parse(to_parse).each { |k,v| send("#{k}=", v) }
+      @args = thor_args.remaining
     end
 
     class << self
@@ -141,6 +142,21 @@ class Thor
         !!check_unknown_options
       end
 
+      # If you want only strict string args (useful when cascading thor classes),
+      # call strict_args_position! This is disabled by default to allow dynamic
+      # invocations.
+      def strict_args_position!
+        @strict_args_position = true
+      end
+
+      def strict_args_position #:nodoc:
+        @strict_args_position ||= from_superclass(:strict_args_position, false)
+      end
+
+      def strict_args_position?(config) #:nodoc:
+        !!strict_args_position
+      end
+
       # Adds an argument to the class and creates an attr_accessor for it.
       #
       # Arguments are different from options in several aspects. The first one
@@ -196,8 +212,9 @@ class Thor
                                "the non-required argument #{argument.human_name.inspect}."
         end if required
 
-        arguments << Thor::Argument.new(name, options[:desc], required, options[:type],
-                                              options[:default], options[:banner])
+        options[:required] = required
+
+        arguments << Thor::Argument.new(name, options)
       end
 
       # Returns this class arguments, looking up in the ancestors chain.
@@ -491,6 +508,7 @@ class Thor
 
               list << item
               list << [ "", "# Default: #{option.default}" ] if option.show_default?
+              list << [ "", "# Possible values: #{option.enum.join(', ')}" ] if option.enum
             end
           end
 
@@ -510,10 +528,9 @@ class Thor
         # ==== Parameters
         # name<Symbol>:: The name of the argument.
         # options<Hash>:: Described in both class_option and method_option.
+        # scope<Hash>:: Options hash that is being built up
         def build_option(name, options, scope) #:nodoc:
-          scope[name] = Thor::Option.new(name, options[:desc], options[:required],
-                                               options[:type], options[:default], options[:banner],
-                                               options[:lazy_default], options[:group], options[:aliases], options[:hide])
+          scope[name] = Thor::Option.new(name, options)
         end
 
         # Receives a hash of options, parse them and add to the scope. This is a
@@ -576,7 +593,14 @@ class Thor
             default
           else
             value = superclass.send(method)
-            value.dup if value
+
+            if value
+              if value.is_a?(TrueClass) || value.is_a?(Symbol)
+                value
+              else
+                value.dup
+              end
+            end
           end
         end
 
