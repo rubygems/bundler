@@ -30,7 +30,7 @@ module Bundler
       specs, then we can try to resolve locally.
 =end
 
-    def initialize(lockfile, dependencies, sources, unlock, ruby_version = "")
+    def initialize(lockfile, dependencies, sources, unlock, ruby_version = nil)
       @unlocking = unlock == true || !unlock.empty?
 
       @dependencies, @sources, @unlock = dependencies, sources, unlock
