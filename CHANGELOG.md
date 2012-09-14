@@ -1,3 +1,10 @@
+## 1.2.1
+
+Bugfixes:
+
+  - `bundle clean` now works with BUNDLE_WITHOUT groups again
+  - have a timeout around the Gemcutter API Endpoint
+
 ## 1.2.0 (Aug 30, 2012)
 
 Bugfixes:
