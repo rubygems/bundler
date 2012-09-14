@@ -158,6 +158,17 @@ describe "gemcutter's dependency API" do
     out.should match(/Too many redirects/)
   end
 
+  it "timeouts when Gemcutter API takes too long to respond" do
+    gemfile <<-G
+      source "#{source_uri}"
+      gem "rack"
+    G
+
+    bundle :install, :artifice => "endpoint_timeout"
+    out.should include("\nFetching full source index from #{source_uri}")
+    should_be_installed "rack 1.0.0"
+  end
+
   context "when --full-index is specified" do
     it "should use the modern index for install" do
       gemfile <<-G

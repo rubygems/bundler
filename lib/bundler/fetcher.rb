@@ -5,6 +5,8 @@ module Bundler
   # Handles all the fetching with the rubygems server
   class Fetcher
     REDIRECT_LIMIT = 5
+    # how long to wait for each gemcutter API call
+    API_TIMEOUT    = 10
 
     attr_reader :has_api
 
@@ -142,7 +144,8 @@ module Bundler
 
       begin
         Bundler.ui.debug "Fetching from: #{uri}"
-        response = @@connection.request(uri)
+        response = nil
+        Timeout.timeout(API_TIMEOUT) { response = @@connection.request(uri) }
       rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, EOFError,
              SocketError, Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError,
              Net::HTTP::Persistent::Error, Net::ProtocolError => e
