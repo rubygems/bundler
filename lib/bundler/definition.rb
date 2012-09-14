@@ -108,9 +108,9 @@ module Bundler
       specs
     end
 
-    def specs(deps = requested_dependencies)
+    def specs
       @specs ||= begin
-        specs = resolve.materialize(deps)
+        specs = resolve.materialize(requested_dependencies)
 
         unless specs["bundler"].any?
           local = Bundler.settings[:frozen] ? rubygems_index : index
@@ -128,10 +128,6 @@ module Bundler
 
     def removed_specs
       @locked_specs - specs
-    end
-
-    def all_specs
-      specs(dependencies)
     end
 
     def new_platform?

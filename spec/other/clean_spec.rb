@@ -100,6 +100,29 @@ describe "bundle clean" do
     vendored_gems("bin/rackup").should exist
   end
 
+  it "remove gems in bundle without groups" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "foo"
+
+      group :test_group do
+        gem "rack", "1.0.0"
+      end
+    G
+
+    bundle "install --path vendor/bundle"
+    bundle "install --without test_group"
+    bundle :clean
+
+    out.should eq("Removing rack (1.0.0)")
+
+    should_have_gems 'foo-1.0'
+    should_not_have_gems 'rack-1.0.0'
+
+    vendored_gems("bin/rackup").should_not exist
+  end
+
   it "does not remove cached git dir if it's being used" do
     build_git "foo"
     revision = revision_for(lib_path("foo-1.0"))
@@ -231,7 +254,7 @@ describe "bundle clean" do
     out.should eq("")
     vendored_gems("bundler/gems/foo-#{revision[0..11]}").should exist
     digest = Digest::SHA1.hexdigest(git_path.to_s)
-    vendored_gems("cache/bundler/git/foo-#{digest}").should exist
+    vendored_gems("cache/bundler/git/foo-#{digest}").should_not exist
   end
 
   it "does not blow up when using without groups" do
