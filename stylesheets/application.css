@@ -507,3 +507,15 @@ pre {
 .other-contributors {
   text-align: center;
 }
+
+/* line 308 */
+.contributor {
+  clear: left;
+  margin: 1em 0;
+}
+/* line 312 */
+.contributor img.avatar {
+  float: left;
+  margin-right: 1.5em;
+  width: 150px;
+}
