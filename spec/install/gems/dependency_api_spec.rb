@@ -171,7 +171,7 @@ describe "gemcutter's dependency API" do
 
       require File.join(File.dirname(__FILE__), '../../support/artifice/endpoint_timeout')
       require 'thread'
-      t = Thread.new {
+      @t = Thread.new {
         server = Rack::Server.start(:app       => EndpointTimeout,
                                     :Host      => '0.0.0.0',
                                     :Port      => port,
@@ -179,11 +179,15 @@ describe "gemcutter's dependency API" do
                                     :AccessLog => [])
         server.start
       }
-      t.run
+      @t.run
 
       # ensure server is started
       require 'timeout'
-      Timeout.timeout(10) { sleep(0.1) until t.status == "sleep" }
+      Timeout.timeout(10) { sleep(0.1) until @t.status == "sleep" }
+    end
+
+    after do
+      @t.kill
     end
 
     it "timeouts" do
