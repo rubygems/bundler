@@ -502,18 +502,24 @@ pre {
 .shirts {
   text-align: center;
 }
-
 /* line 305 */
+.shirts a, .shirts a:visited {
+  color: #05b5e6;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/* line 310 */
 .other-contributors {
   text-align: center;
 }
 
-/* line 308 */
+/* line 313 */
 .contributor {
   clear: left;
   margin: 1em 0;
 }
-/* line 312 */
+/* line 317 */
 .contributor img.avatar {
   float: left;
   margin-right: 1.5em;
