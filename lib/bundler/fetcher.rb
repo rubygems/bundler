@@ -46,6 +46,7 @@ module Bundler
       @remote_uri = remote_uri
       @has_api    = true # will be set to false if the rubygems index is ever fetched
       @@connection ||= Net::HTTP::Persistent.new nil, :ENV
+      @@connection.read_timeout = 1
     end
 
     # fetch a gem specification
@@ -145,7 +146,7 @@ module Bundler
       begin
         Bundler.ui.debug "Fetching from: #{uri}"
         response = nil
-        Timeout.timeout(API_TIMEOUT) { response = @@connection.request(uri) }
+        response = @@connection.request(uri)
       rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, EOFError,
              SocketError, Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError,
              Net::HTTP::Persistent::Error, Net::ProtocolError => e

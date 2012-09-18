@@ -158,15 +158,44 @@ describe "gemcutter's dependency API" do
     out.should match(/Too many redirects/)
   end
 
-  it "timeouts when Gemcutter API takes too long to respond" do
-    gemfile <<-G
-      source "#{source_uri}"
-      gem "rack"
-    G
+  context "when Gemcutter API takes too long to respond" do
+    let(:port)       { 2000 }
+    let(:server_uri) { "http://localhost:2000" }
 
-    bundle :install, :artifice => "endpoint_timeout"
-    out.should include("\nFetching full source index from #{source_uri}")
-    should_be_installed "rack 1.0.0"
+    before do
+      # need to hack, so we can require rack
+      old_gem_home = ENV['GEM_HOME']
+      ENV['GEM_HOME'] = Spec::Path.base_system_gems.to_s
+      require 'rack'
+      ENV['GEM_HOME'] = old_gem_home
+
+      require File.join(File.dirname(__FILE__), '../../support/artifice/endpoint_timeout')
+      require 'thread'
+      t = Thread.new {
+        server = Rack::Server.start(:app       => EndpointTimeout,
+                                    :Host      => '0.0.0.0',
+                                    :Port      => port,
+                                    :server    => 'webrick',
+                                    :AccessLog => [])
+        server.start
+      }
+      t.run
+
+      # ensure server is started
+      require 'timeout'
+      Timeout.timeout(10) { sleep(0.1) until t.status == "sleep" }
+    end
+
+    it "timeouts" do
+      gemfile <<-G
+        source "#{server_uri}"
+        gem "rack"
+      G
+
+      bundle :install
+      out.should include("\nFetching full source index from #{server_uri}")
+      should_be_installed "rack 1.0.0"
+    end
   end
 
   context "when --full-index is specified" do
