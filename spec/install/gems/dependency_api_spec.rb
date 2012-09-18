@@ -183,7 +183,7 @@ describe "gemcutter's dependency API" do
 
       # ensure server is started
       require 'timeout'
-      Timeout.timeout(10) { sleep(0.1) until @t.status == "sleep" }
+      Timeout.timeout(15) { sleep(0.1) until @t.status == "sleep" }
     end
 
     after do
