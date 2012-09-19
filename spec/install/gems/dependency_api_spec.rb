@@ -169,7 +169,7 @@ describe "gemcutter's dependency API" do
       require 'rack'
       ENV['GEM_HOME'] = old_gem_home
 
-      require File.join(File.dirname(__FILE__), '../../support/artifice/endpoint_timeout')
+      require File.expand_path('../../../support/artifice/endpoint_timeout', __FILE__)
       require 'thread'
       @t = Thread.new {
         server = Rack::Server.start(:app       => EndpointTimeout,
@@ -190,7 +190,7 @@ describe "gemcutter's dependency API" do
       @t.kill
     end
 
-    it "timeouts" do
+    it "times out and falls back on the modern index" do
       gemfile <<-G
         source "#{server_uri}"
         gem "rack"
