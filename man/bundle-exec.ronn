@@ -59,7 +59,7 @@ It also modifies Rubygems:
 ### Shelling out
 
 When shelling out (using the `system` or backticks methods,
-for example), Bundler's environment changes will propogate to
+for example), Bundler's environment changes will propagate to
 the subshell environment. If you desire to shell out without
 Bundler's environment changes, simply employ the `with_clean_env`
 method. It will restore all environment variables to what they
