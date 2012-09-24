@@ -64,6 +64,10 @@ describe "bundle gem" do
     end
   end
 
+  it "sets gemspec license to MIT by default" do
+    generated_gem.gemspec.license.should == "MIT"
+  end
+
   it "requires the version file" do
     bundled_app("test-gem/lib/test-gem.rb").read.should =~ /require "test-gem\/version"/
   end
