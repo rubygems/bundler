@@ -1,4 +1,4 @@
-describe <%= conifg[:constant_name] %> do
+describe <%= config[:constant_name] %> do
   it 'should have a version number' do
     <%= config[:constant_name] %>::VERSION.should_not be_nil
   end

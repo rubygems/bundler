@@ -86,7 +86,7 @@ RAKEFILE
     end
   end
 
-  context "--bin parameter is set" do
+  context "--bin parameter set" do
     before :each do
       reset!
       in_app_root
@@ -102,7 +102,7 @@ RAKEFILE
     end
   end
 
-  context "--test parameter is set to rspec" do
+  context "--test parameter set to rspec" do
     before :each do
       reset!
       in_app_root
@@ -120,7 +120,7 @@ RAKEFILE
     end
 
     it "creates a default test which fails" do
-      bundled_app("test-gem/spec/test-gem_spec.rb").read.should =~ /false.should == true/
+      bundled_app("test-gem/spec/test-gem_spec.rb").read.should =~ /false.should be_true/
     end
   end
 end
