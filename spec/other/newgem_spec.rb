@@ -85,4 +85,42 @@ RAKEFILE
       out.should include("SUCCESS")
     end
   end
+
+  context "--bin parameter is set" do
+    before :each do
+      reset!
+      in_app_root
+      bundle 'gem test-gem --bin'
+    end
+
+    it "builds bin skeleton" do
+      bundled_app("test-gem/bin/test-gem").should exist
+    end
+
+    it "requires 'test-gem'" do
+      bundled_app("test-gem/bin/test-gem").read.should =~ /require 'test-gem'/      
+    end
+  end
+
+  context "--test parameter is set to rspec" do
+    before :each do
+      reset!
+      in_app_root
+      bundle "gem test-gem --test=rspec"
+    end
+
+    it "builds spec skeleton" do
+      bundled_app("test-gem/.rspec").should exist
+      bundled_app("test-gem/spec/test-gem_spec.rb").should exist
+      bundled_app("test-gem/spec/spec_helper.rb").should exist
+    end
+
+    it "requires 'test-gem'" do
+      bundled_app("test-gem/spec/spec_helper.rb").read.should =~ /require_relative '..\/lib\/test-gem'/
+    end
+
+    it "creates a default test which fails" do
+      bundled_app("test-gem/spec/test-gem_spec.rb").read.should =~ /false.should == true/
+    end
+  end
 end
