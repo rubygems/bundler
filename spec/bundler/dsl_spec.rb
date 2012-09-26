@@ -18,6 +18,21 @@ describe Bundler::Dsl do
       github_uri = "git://github.com/rails/rails.git"
       subject.dependencies.first.source.uri.should == github_uri
     end
+
+    it "should concatenate :github_account + gem name" do
+      subject.gem("bundler", :github_account => "carlhuda")
+      github_uri = "git://github.com/carlhuda/bundler.git"
+      subject.dependencies.first.source.uri.should == github_uri
+    end
+
+    it "should complain if :github_account and :git are specified" do
+      lambda {
+        subject.gem("tricycle",
+          :git => "git@foo.com/trike.git",
+          :github_account => "nonsense"
+        )
+      }.should raise_error Bundler::DslError
+    end
   end
 
   describe '#method_missing' do
