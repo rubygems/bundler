@@ -201,7 +201,7 @@ module Bundler
     def _normalize_options(name, version, opts)
       _normalize_hash(opts)
 
-      valid_keys = %w(group groups git github path name branch ref tag require submodules platform platforms type)
+      valid_keys = %w(group groups git github github_account path name branch ref tag require submodules platform platforms type)
       invalid_keys = opts.keys - valid_keys
       if invalid_keys.any?
         plural = invalid_keys.size > 1
@@ -230,9 +230,25 @@ module Bundler
         raise DslError, "`#{p}` is not a valid platform. The available options are: #{VALID_PLATFORMS.inspect}"
       end
 
+      def github_uri account_and_repo
+        "git://github.com/#{account_and_repo}.git"
+      end
+
       if github = opts.delete("github")
         github = "#{github}/#{github}" unless github.include?("/")
-        opts["git"] = "git://github.com/#{github}.git"
+        opts["git"] = github_uri github
+      end
+
+      if github_account = opts.delete("github_account")
+        raise DslError, <<-EOE if opts["git"]
+:github_account supplied, though the plan was to use #{opts["git"]}"
+(This is contradictory)
+The intent is to do something like this:
+  gem 'bundler', github_account: 'carlhuda'
+Which will resolve to the equivalent of:
+  gem 'bundler', git: '#{github_uri 'carlhuda/bundler'}"
+        EOE
+        opts["git"] = github_uri "#{github_account}/#{name}"
       end
 
       ["git", "path"].each do |type|
