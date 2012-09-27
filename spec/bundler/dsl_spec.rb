@@ -18,6 +18,13 @@ describe Bundler::Dsl do
       github_uri = "git://github.com/rails/rails.git"
       subject.dependencies.first.source.uri.should == github_uri
     end
+
+    it "should interpret slashless 'github:' value as account name" do
+      subject.gem("bundler", :github => "carlhuda")
+      github_uri = "git://github.com/carlhuda/bundler.git"
+      subject.dependencies.first.source.uri.should == github_uri
+    end
+
   end
 
   describe '#method_missing' do
