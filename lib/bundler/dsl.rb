@@ -231,7 +231,7 @@ module Bundler
       end
 
       if github = opts.delete("github")
-        github = "#{github}/#{github}" unless github.include?("/")
+        github = "#{github}/#{name}" unless github.include?("/")
         opts["git"] = "git://github.com/#{github}.git"
       end
 
