@@ -235,7 +235,7 @@ module Bundler
       end
 
       File.open(file, 'wb'){|f| f.puts(contents) }
-    rescue Errno::EACCES => e
+    rescue Errno::EACCES
       raise Bundler::InstallError,
         "There was an error while trying to write to Gemfile.lock. It is likely that \n" \
         "you need to allow write permissions for the file at path: \n" \
