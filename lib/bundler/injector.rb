@@ -10,6 +10,9 @@ module Bundler
     end
 
     def inject(gemfile_path, lockfile_path)
+      # temporarily ignore the frozen setting
+      frozen = Bundler.settings.delete(:frozen)
+
       # evaluate the Gemfile we have now
       builder = Dsl.new
       builder.eval_gemfile(gemfile_path)
@@ -32,6 +35,8 @@ module Bundler
 
       # return an array of the deps that we added
       return @new_deps
+    ensure
+      Bundler.settings[:frozen] = '1' if frozen
     end
 
   private
