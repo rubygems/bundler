@@ -230,7 +230,7 @@ module Bundler
       return if @lockfile_contents == contents
 
       if Bundler.settings[:frozen]
-        # TODO: Warn here if we got here.
+        Bundler.ui.error "Cannot write a changed lockfile while frozen."
         return
       end
 
