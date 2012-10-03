@@ -10,8 +10,12 @@ module Bundler
     end
 
     def inject(gemfile_path, lockfile_path)
-      # temporarily ignore the frozen setting
-      frozen = Bundler.settings.delete(:frozen)
+      if Bundler.settings[:frozen]
+        # ensure the lock and Gemfile are synced
+        Bundler.definition.ensure_equivalent_gemfile_and_lockfile(true)
+        # temporarily remove frozen while we inject
+        frozen = Bundler.settings.delete(:frozen)
+      end
 
       # evaluate the Gemfile we have now
       builder = Dsl.new

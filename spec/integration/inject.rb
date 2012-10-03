@@ -63,5 +63,16 @@ describe "bundle inject" do
       config = YAML.load(bundled_app(".bundle/config").read)
       config["BUNDLE_FROZEN"].should == "1"
     end
+
+    it "doesn't allow Gemfile changes" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack-obama"
+      G
+      bundle "inject 'rack' '> 0'"
+      out.should match(/trying to install in deployment mode after changing/)
+
+      bundled_app("Gemfile.lock").read.should_not match(/rack-obama/)
+    end
   end
 end
