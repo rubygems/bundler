@@ -348,11 +348,6 @@ module Bundler
       options["local"] ? definition.resolve_with_cache! : definition.resolve_remotely!
 
       Bundler.ui.info ""
-      if options["pre"]
-        Bundler.ui.info "Outdated gems included in the bundle (including pre-releases):"
-      else
-        Bundler.ui.info "Outdated gems included in the bundle:"
-      end
 
       out_count = 0
       # Loop through the current specs
@@ -371,6 +366,14 @@ module Bundler
         gem_outdated = Gem::Version.new(active_spec.version) > Gem::Version.new(current_spec.version)
         git_outdated = current_spec.git_version != active_spec.git_version
         if gem_outdated || git_outdated
+          if out_count == 0
+            if options["pre"]
+              Bundler.ui.info "Outdated gems included in the bundle (including pre-releases):"
+            else
+              Bundler.ui.info "Outdated gems included in the bundle:"
+            end
+          end
+
           spec_version    = "#{active_spec.version}#{active_spec.git_version}"
           current_version = "#{current_spec.version}#{current_spec.git_version}"
           Bundler.ui.info "  * #{active_spec.name} (#{spec_version} > #{current_version})"
@@ -379,7 +382,7 @@ module Bundler
         Bundler.ui.debug "from #{active_spec.loaded_from}"
       end
 
-      Bundler.ui.info "  Your bundle is up to date!" if out_count < 1
+      Bundler.ui.info "Your bundle is up to date!" if out_count < 1
       Bundler.ui.info ""
     end
 
