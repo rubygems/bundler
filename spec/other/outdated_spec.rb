@@ -22,8 +22,8 @@ describe "bundle outdated" do
       end
 
       bundle "outdated"
-      out.should include("activesupport (3.0 > 2.3.5)")
-      out.should include("foo (1.0")
+      expect(out).to include("activesupport (3.0 > 2.3.5)")
+      expect(out).to include("foo (1.0")
     end
   end
 
@@ -32,7 +32,7 @@ describe "bundle outdated" do
       FileUtils.rm_rf(gem_repo2)
 
       bundle "outdated --local"
-      out.should_not match(/Fetching/)
+      expect(out).not_to match(/Fetching/)
     end
   end
 
@@ -44,8 +44,8 @@ describe "bundle outdated" do
       end
 
       bundle "outdated foo"
-      out.should_not include("activesupport (3.0 > 2.3.5)")
-      out.should include("foo (1.0")
+      expect(out).not_to include("activesupport (3.0 > 2.3.5)")
+      expect(out).to include("foo (1.0")
     end
   end
 
@@ -57,7 +57,7 @@ describe "bundle outdated" do
         end
 
         bundle "outdated"
-        out.should_not include("activesupport (3.0.0.beta > 2.3.5)")
+        expect(out).not_to include("activesupport (3.0.0.beta > 2.3.5)")
       end
     end
 
@@ -68,7 +68,7 @@ describe "bundle outdated" do
         end
 
         bundle "outdated --pre"
-        out.should include("activesupport (3.0.0.beta > 2.3.5)")
+        expect(out).to include("activesupport (3.0.0.beta > 2.3.5)")
       end
     end
 
@@ -85,7 +85,7 @@ describe "bundle outdated" do
         G
 
         bundle "outdated"
-        out.should include("activesupport (3.0.0.beta.2 > 3.0.0.beta.1)")
+        expect(out).to include("activesupport (3.0.0.beta.2 > 3.0.0.beta.1)")
       end
     end
   end

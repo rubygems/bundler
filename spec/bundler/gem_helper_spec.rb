@@ -8,7 +8,7 @@ describe "Bundler::GemHelper tasks" do
       bundle 'gem test'
       app = bundled_app("test")
       helper = Bundler::GemHelper.new(app.to_s)
-      helper.gemspec.name.should == 'test'
+      expect(helper.gemspec.name).to eq('test')
     end
 
     it "interpolates the name for a hidden gemspec" do
@@ -16,28 +16,28 @@ describe "Bundler::GemHelper tasks" do
       app = bundled_app("test")
       FileUtils.mv app.join('test.gemspec'), app.join('.gemspec')
       helper = Bundler::GemHelper.new(app.to_s)
-      helper.gemspec.name.should == 'test'
+      expect(helper.gemspec.name).to eq('test')
     end
 
     it "should fail when there is no gemspec" do
       bundle 'gem test'
       app = bundled_app("test")
       FileUtils.rm(File.join(app.to_s, 'test.gemspec'))
-      proc { Bundler::GemHelper.new(app.to_s) }.should raise_error(/Unable to determine name/)
+      expect { Bundler::GemHelper.new(app.to_s) }.to raise_error(/Unable to determine name/)
     end
 
     it "should fail when there are two gemspecs and the name isn't specified" do
       bundle 'gem test'
       app = bundled_app("test")
       File.open(File.join(app.to_s, 'test2.gemspec'), 'w') {|f| f << ''}
-      proc { Bundler::GemHelper.new(app.to_s) }.should raise_error(/Unable to determine name/)
+      expect { Bundler::GemHelper.new(app.to_s) }.to raise_error(/Unable to determine name/)
     end
 
     it "handles namespaces and converting to CamelCase" do
       bundle 'gem test-foo_bar'
       lib = bundled_app('test-foo_bar').join('lib/test-foo_bar.rb').read
-      lib.should include("module Test")
-      lib.should include("module FooBar")
+      expect(lib).to include("module Test")
+      expect(lib).to include("module FooBar")
     end
   end
 
@@ -59,7 +59,7 @@ describe "Bundler::GemHelper tasks" do
     end
 
     it "uses a shell UI for output" do
-      Bundler.ui.should be_a(Bundler::UI::Shell)
+      expect(Bundler.ui).to be_a(Bundler::UI::Shell)
     end
 
     describe 'install_tasks' do
@@ -75,20 +75,20 @@ describe "Bundler::GemHelper tasks" do
         names = %w[build install release]
 
         names.each { |name|
-          proc { Rake.application[name] }.should raise_error(/Don't know how to build task/)
+          expect { Rake.application[name] }.to raise_error(/Don't know how to build task/)
         }
 
         @helper.install
 
         names.each { |name|
-          proc { Rake.application[name] }.should_not raise_error
-          Rake.application[name].should be_instance_of Rake::Task
+          expect { Rake.application[name] }.not_to raise_error
+          expect(Rake.application[name]).to be_instance_of Rake::Task
         }
       end
 
       it "provides a way to access the gemspec object" do
         @helper.install
-        Bundler::GemHelper.gemspec.name.should == 'test'
+        expect(Bundler::GemHelper.gemspec.name).to eq('test')
       end
     end
 
@@ -96,13 +96,13 @@ describe "Bundler::GemHelper tasks" do
       it "builds" do
         mock_build_message
         @helper.build_gem
-        bundled_app('test/pkg/test-0.0.1.gem').should exist
+        expect(bundled_app('test/pkg/test-0.0.1.gem')).to exist
       end
 
       it "raises an appropriate error when the build fails" do
         # break the gemspec by adding back the TODOs...
         File.open("#{@app.to_s}/test.gemspec", 'w'){|f| f << @gemspec }
-        proc { @helper.build_gem }.should raise_error(/TODO/)
+        expect { @helper.build_gem }.to raise_error(/TODO/)
       end
     end
 
@@ -111,8 +111,8 @@ describe "Bundler::GemHelper tasks" do
         mock_build_message
         mock_confirm_message "test (0.0.1) installed"
         @helper.install_gem
-        bundled_app('test/pkg/test-0.0.1.gem').should exist
-        %x{gem list}.should include("test (0.0.1)")
+        expect(bundled_app('test/pkg/test-0.0.1.gem')).to exist
+        expect(%x{gem list}).to include("test (0.0.1)")
       end
 
       it "raises an appropriate error when the install fails" do
@@ -123,13 +123,13 @@ describe "Bundler::GemHelper tasks" do
           File.open(path, 'w'){|f| f << "not actually a gem"}
           path
         end
-        proc { @helper.install_gem }.should raise_error
+        expect { @helper.install_gem }.to raise_error
       end
     end
 
     describe 'release' do
       it "shouldn't push if there are uncommitted files" do
-        proc { @helper.release_gem }.should raise_error(/files that need to be committed/)
+        expect { @helper.release_gem }.to raise_error(/files that need to be committed/)
       end
 
       it 'raises an appropriate error if there is no git remote' do
@@ -145,7 +145,7 @@ describe "Bundler::GemHelper tasks" do
           `git commit -a -m "initial commit"`
         }
 
-        proc { @helper.release_gem }.should raise_error
+        expect { @helper.release_gem }.to raise_error
       end
 
       it "releases" do

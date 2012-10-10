@@ -26,7 +26,7 @@ module Spec
     def should_resolve_as(specs)
       got = resolve
       got = got.map { |s| s.full_name }.sort
-      got.should == specs.sort
+      expect(got).to eq(specs.sort)
     end
 
     def should_conflict_on(names)
@@ -34,7 +34,7 @@ module Spec
         got = resolve
         flunk "The resolve succeeded with: #{got.map { |s| s.full_name }.sort.inspect}"
       rescue Bundler::VersionConflict => e
-        Array(names).sort.should == e.conflicts.sort
+        expect(Array(names).sort).to eq(e.conflicts.sort)
       end
     end
 

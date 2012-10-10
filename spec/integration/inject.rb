@@ -10,9 +10,9 @@ describe "bundle inject" do
 
   context "without a lockfile" do
     it "locks with the injected gems" do
-      bundled_app("Gemfile.lock").should_not exist
+      expect(bundled_app("Gemfile.lock")).not_to exist
       bundle "inject 'rack-obama' '> 0'"
-      bundled_app("Gemfile.lock").read.should match(/rack-obama/)
+      expect(bundled_app("Gemfile.lock").read).to match(/rack-obama/)
     end
   end
 
@@ -22,22 +22,22 @@ describe "bundle inject" do
     end
 
     it "adds the injected gems to the gemfile" do
-      bundled_app("Gemfile").read.should_not match(/rack-obama/)
+      expect(bundled_app("Gemfile").read).not_to match(/rack-obama/)
       bundle "inject 'rack-obama' '> 0'"
-      bundled_app("Gemfile").read.should match(/rack-obama/)
+      expect(bundled_app("Gemfile").read).to match(/rack-obama/)
     end
 
     it "locks with the injected gems" do
-      bundled_app("Gemfile.lock").read.should_not match(/rack-obama/)
+      expect(bundled_app("Gemfile.lock").read).not_to match(/rack-obama/)
       bundle "inject 'rack-obama' '> 0'"
-      bundled_app("Gemfile.lock").read.should match(/rack-obama/)
+      expect(bundled_app("Gemfile.lock").read).to match(/rack-obama/)
     end
   end
 
   context "with injected gems already in the Gemfile" do
     it "doesn't add existing gems" do
       bundle "inject 'rack' '> 0'"
-      out.should match(/cannot specify the same gem twice/i)
+      expect(out).to match(/cannot specify the same gem twice/i)
     end
   end
 
@@ -49,19 +49,19 @@ describe "bundle inject" do
 
     it "injects anyway" do
       bundle "inject 'rack-obama' '> 0'"
-      bundled_app("Gemfile").read.should match(/rack-obama/)
+      expect(bundled_app("Gemfile").read).to match(/rack-obama/)
     end
 
     it "locks with the injected gems" do
-      bundled_app("Gemfile.lock").read.should_not match(/rack-obama/)
+      expect(bundled_app("Gemfile.lock").read).not_to match(/rack-obama/)
       bundle "inject 'rack-obama' '> 0'"
-      bundled_app("Gemfile.lock").read.should match(/rack-obama/)
+      expect(bundled_app("Gemfile.lock").read).to match(/rack-obama/)
     end
 
     it "restores frozen afterwards" do
       bundle "inject 'rack-obama' '> 0'"
       config = YAML.load(bundled_app(".bundle/config").read)
-      config["BUNDLE_FROZEN"].should == "1"
+      expect(config["BUNDLE_FROZEN"]).to eq("1")
     end
 
     it "doesn't allow Gemfile changes" do
@@ -70,9 +70,9 @@ describe "bundle inject" do
         gem "rack-obama"
       G
       bundle "inject 'rack' '> 0'"
-      out.should match(/trying to install in deployment mode after changing/)
+      expect(out).to match(/trying to install in deployment mode after changing/)
 
-      bundled_app("Gemfile.lock").read.should_not match(/rack-obama/)
+      expect(bundled_app("Gemfile.lock").read).not_to match(/rack-obama/)
     end
   end
 end

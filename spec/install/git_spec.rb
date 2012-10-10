@@ -23,11 +23,11 @@ describe "bundle install with git sources" do
         puts "WIN" unless defined?(FOO_PREV_REF)
       RUBY
 
-      out.should == "WIN"
+      expect(out).to eq("WIN")
     end
 
     it "caches the git repo" do
-      Dir["#{default_bundle_path}/cache/bundler/git/foo-1.0-*"].should have(1).item
+      expect(Dir["#{default_bundle_path}/cache/bundler/git/foo-1.0-*"]).to have(1).item
     end
 
     it "does not update the git source implicitly" do
@@ -47,14 +47,14 @@ describe "bundle install with git sources" do
           puts "fail" if defined?(FOO_PREV_REF)
         RUBY
 
-        out.should be_empty
+        expect(out).to be_empty
       end
     end
 
     it "setups executables" do
       pending_jruby_shebang_fix
       bundle "exec foobar"
-      out.should == "1.0"
+      expect(out).to eq("1.0")
     end
 
     it "complains if pinned specs don't exist in the git repo" do
@@ -64,7 +64,7 @@ describe "bundle install with git sources" do
         gem "foo", "1.1", :git => "#{lib_path('foo-1.0')}"
       G
 
-      out.should include("Source contains 'foo' at: 1.0")
+      expect(out).to include("Source contains 'foo' at: 1.0")
     end
 
     it "still works after moving the application directory" do
@@ -136,7 +136,7 @@ describe "bundle install with git sources" do
         puts "WIN" unless defined?(FOO_PREV_REF)
       RUBY
 
-      out.should == "WIN"
+      expect(out).to eq("WIN")
     end
 
     it "works when the revision is a symbol" do
@@ -145,14 +145,14 @@ describe "bundle install with git sources" do
           gem "foo"
         end
       G
-      err.should eq("")
+      expect(err).to eq("")
 
       run <<-RUBY
         require 'foo'
         puts "WIN" unless defined?(FOO_PREV_REF)
       RUBY
 
-      out.should == "WIN"
+      expect(out).to eq("WIN")
     end
   end
 
@@ -172,10 +172,10 @@ describe "bundle install with git sources" do
 
       bundle %|config local.rack #{lib_path('local-rack')}|
       bundle :install
-      out.should =~ /at #{lib_path('local-rack')}/
+      expect(out).to match(/at #{lib_path('local-rack')}/)
 
       run "require 'rack'"
-      out.should == "LOCAL"
+      expect(out).to eq("LOCAL")
     end
 
     it "chooses the local repository on runtime" do
@@ -194,7 +194,7 @@ describe "bundle install with git sources" do
 
       bundle %|config local.rack #{lib_path('local-rack')}|
       run "require 'rack'"
-      out.should == "LOCAL"
+      expect(out).to eq("LOCAL")
     end
 
     it "updates specs on runtime" do
@@ -218,7 +218,7 @@ describe "bundle install with git sources" do
       run "require 'rack'"
 
       lockfile1 = File.read(bundled_app("Gemfile.lock"))
-      lockfile1.should_not == lockfile0
+      expect(lockfile1).not_to eq(lockfile0)
     end
 
     it "updates ref on install" do
@@ -238,7 +238,7 @@ describe "bundle install with git sources" do
       bundle :install
 
       lockfile1 = File.read(bundled_app("Gemfile.lock"))
-      lockfile1.should_not == lockfile0
+      expect(lockfile1).not_to eq(lockfile0)
     end
 
     it "explodes if given path does not exist on install" do
@@ -251,7 +251,7 @@ describe "bundle install with git sources" do
 
       bundle %|config local.rack #{lib_path('local-rack')}|
       bundle :install
-      out.should =~ /Cannot use local override for rack-0.8 because #{Regexp.escape(lib_path('local-rack').to_s)} does not exist/
+      expect(out).to match(/Cannot use local override for rack-0.8 because #{Regexp.escape(lib_path('local-rack').to_s)} does not exist/)
     end
 
     it "explodes if branch is not given on install" do
@@ -265,7 +265,7 @@ describe "bundle install with git sources" do
 
       bundle %|config local.rack #{lib_path('local-rack')}|
       bundle :install
-      out.should =~ /cannot use local override/i
+      expect(out).to match(/cannot use local override/i)
     end
 
     it "does not explode if disable_local_branch_check is given" do
@@ -280,7 +280,7 @@ describe "bundle install with git sources" do
       bundle %|config local.rack #{lib_path('local-rack')}|
       bundle %|config disable_local_branch_check true|
       bundle :install
-      out.should =~ /Your bundle is complete!/
+      expect(out).to match(/Your bundle is complete!/)
     end
 
     it "explodes on different branches on install" do
@@ -299,7 +299,7 @@ describe "bundle install with git sources" do
 
       bundle %|config local.rack #{lib_path('local-rack')}|
       bundle :install
-      out.should =~ /is using branch another but Gemfile specifies master/
+      expect(out).to match(/is using branch another but Gemfile specifies master/)
     end
 
     it "explodes on invalid revision on install" do
@@ -316,7 +316,7 @@ describe "bundle install with git sources" do
 
       bundle %|config local.rack #{lib_path('local-rack')}|
       bundle :install
-      out.should =~ /The Gemfile lock is pointing to revision \w+/
+      expect(out).to match(/The Gemfile lock is pointing to revision \w+/)
     end
   end
 
@@ -365,7 +365,7 @@ describe "bundle install with git sources" do
       G
 
       run "require 'rack'"
-      out.should == 'WIN OVERRIDE'
+      expect(out).to eq('WIN OVERRIDE')
     end
 
     it "correctly unlocks when changing to a git source" do
@@ -431,7 +431,7 @@ describe "bundle install with git sources" do
       puts "WIN" unless defined?(FOO_PREV_REF)
     RUBY
 
-    out.should == "WIN"
+    expect(out).to eq("WIN")
   end
 
   it "correctly handles cases with invalid gemspecs" do
@@ -512,9 +512,9 @@ describe "bundle install with git sources" do
 
     bundle :install, :expect_err => true
 
-    out.should include("Git error:")
-    err.should include("fatal")
-    err.should include("omgomg")
+    expect(out).to include("Git error:")
+    expect(err).to include("fatal")
+    expect(err).to include("omgomg")
   end
 
   it "works when the gem path has spaces in it" do
@@ -567,7 +567,7 @@ describe "bundle install with git sources" do
         gem "has_submodule"
       end
     G
-    out.should =~ /could not find gem 'submodule/i
+    expect(out).to match(/could not find gem 'submodule/i)
 
     should_not_be_installed "has_submodule 1.0", :expect_err => true
   end
@@ -614,7 +614,7 @@ describe "bundle install with git sources" do
       puts "WIN" if FOO_PREV_REF == '#{git.ref_for("HEAD^^")}'
     RUBY
 
-    out.should == "WIN"
+    expect(out).to eq("WIN")
   end
 
   it "does not to a remote fetch if the revision is cached locally" do
@@ -627,7 +627,7 @@ describe "bundle install with git sources" do
     FileUtils.rm_rf(lib_path('foo-1.0'))
 
     bundle "install"
-    out.should_not =~ /updating/i
+    expect(out).not_to match(/updating/i)
   end
 
   it "doesn't blow up if bundle install is run twice in a row" do
@@ -639,7 +639,7 @@ describe "bundle install with git sources" do
 
     bundle "install"
     bundle "install", :exitstatus => true
-    exitstatus.should == 0
+    expect(exitstatus).to eq(0)
   end
 
   it "does not duplicate git gem sources" do
@@ -655,7 +655,7 @@ describe "bundle install with git sources" do
     G
 
     bundle "install"
-    File.read(bundled_app("Gemfile.lock")).scan('GIT').size.should == 1
+    expect(File.read(bundled_app("Gemfile.lock")).scan('GIT').size).to eq(1)
   end
 
   describe "switching sources" do
@@ -699,7 +699,7 @@ describe "bundle install with git sources" do
       G
 
       run "require 'new_file'"
-      out.should == "USING GIT"
+      expect(out).to eq("USING GIT")
     end
   end
 
@@ -727,7 +727,7 @@ describe "bundle install with git sources" do
         puts VALIM_PREV_REF
       R
 
-      out.should == old_revision
+      expect(out).to eq(old_revision)
     end
   end
 
@@ -743,7 +743,7 @@ describe "bundle install with git sources" do
       simulate_new_machine
 
       bundle "install --deployment", :exitstatus => true
-      exitstatus.should == 0
+      expect(exitstatus).to eq(0)
     end
   end
 
@@ -765,7 +765,7 @@ describe "bundle install with git sources" do
 
       bundle :install, :expect_err => true,
         :requires => [lib_path('install_hooks.rb')]
-      err.should == "Ran pre-install hook: foo-1.0"
+      expect(err).to eq("Ran pre-install hook: foo-1.0")
     end
 
     it "runs post-install hooks" do
@@ -785,7 +785,7 @@ describe "bundle install with git sources" do
 
       bundle :install, :expect_err => true,
         :requires => [lib_path('install_hooks.rb')]
-      err.should == "Ran post-install hook: foo-1.0"
+      expect(err).to eq("Ran post-install hook: foo-1.0")
     end
 
     it "complains if the install hook fails" do
@@ -805,7 +805,7 @@ describe "bundle install with git sources" do
 
       bundle :install, :expect_err => true,
         :requires => [lib_path('install_hooks.rb')]
-      out.should include("failed for foo-1.0")
+      expect(out).to include("failed for foo-1.0")
     end
   end
 end

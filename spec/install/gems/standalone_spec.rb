@@ -14,7 +14,7 @@ describe "bundle install --standalone" do
     end
 
     it "generates a bundle/bundler/setup.rb" do
-      bundled_app("bundle/bundler/setup.rb").should exist
+      expect(bundled_app("bundle/bundler/setup.rb")).to exist
     end
 
     it "makes the gems available without bundler" do
@@ -26,7 +26,7 @@ describe "bundle install --standalone" do
         puts ACTIONPACK
       RUBY
 
-      out.should be == "2.3.2"
+      expect(out).to eq("2.3.2")
     end
 
     it "works on a different system" do
@@ -41,7 +41,7 @@ describe "bundle install --standalone" do
         puts ACTIONPACK
       RUBY
 
-      out.should be == "2.3.2"
+      expect(out).to eq("2.3.2")
     end
   end
 
@@ -61,7 +61,7 @@ describe "bundle install --standalone" do
     end
 
     it "generates a bundle/bundler/setup.rb" do
-      bundled_app("bundle/bundler/setup.rb").should exist
+      expect(bundled_app("bundle/bundler/setup.rb")).to exist
     end
 
     it "makes the gems available without bundler" do
@@ -75,7 +75,7 @@ describe "bundle install --standalone" do
         puts ACTIONPACK
       RUBY
 
-      out.should be == "1.0\n2.3.2"
+      expect(out).to eq("1.0\n2.3.2")
     end
   end
 
@@ -107,7 +107,7 @@ describe "bundle install --standalone" do
         puts RACK_TEST
       RUBY
 
-      out.should be == "2.3.2\n1.2.7\n1.0"
+      expect(out).to eq("2.3.2\n1.2.7\n1.0")
     end
 
     it "allows creating a standalone file with limited groups" do
@@ -122,8 +122,8 @@ describe "bundle install --standalone" do
         require "spec"
       RUBY
 
-      out.should be == "2.3.2"
-      err.should == "ZOMG LOAD ERROR"
+      expect(out).to eq("2.3.2")
+      expect(err).to eq("ZOMG LOAD ERROR")
     end
 
     it "allows --without to limit the groups used in a standalone" do
@@ -138,8 +138,8 @@ describe "bundle install --standalone" do
         require "spec"
       RUBY
 
-      out.should be == "2.3.2"
-      err.should == "ZOMG LOAD ERROR"
+      expect(out).to eq("2.3.2")
+      expect(err).to eq("ZOMG LOAD ERROR")
     end
 
     it "allows --path to change the location of the standalone bundle" do
@@ -153,7 +153,7 @@ describe "bundle install --standalone" do
         puts ACTIONPACK
       RUBY
 
-      out.should == "2.3.2"
+      expect(out).to eq("2.3.2")
     end
 
     it "allows remembered --without to limit the groups used in a standalone" do
@@ -169,8 +169,8 @@ describe "bundle install --standalone" do
         require "spec"
       RUBY
 
-      out.should be == "2.3.2"
-      err.should == "ZOMG LOAD ERROR"
+      expect(out).to eq("2.3.2")
+      expect(err).to eq("ZOMG LOAD ERROR")
     end
   end
 
@@ -188,7 +188,7 @@ describe "bundle install --standalone" do
       it "should run without errors" do
         bundle "install --standalone", :artifice => "endpoint", :exitstatus => true
 
-        @exitstatus.should be == 0
+        expect(@exitstatus).to eq(0)
       end
 
       it "still makes the gems available to normal bundler" do
@@ -200,7 +200,7 @@ describe "bundle install --standalone" do
       it "generates a bundle/bundler/setup.rb" do
         bundle "install --standalone", :artifice => "endpoint"
 
-        bundled_app("bundle/bundler/setup.rb").should exist
+        expect(bundled_app("bundle/bundler/setup.rb")).to exist
       end
 
       it "makes the gems available without bundler" do
@@ -214,7 +214,7 @@ describe "bundle install --standalone" do
           puts ACTIONPACK
         RUBY
 
-        out.should be == "2.3.2"
+        expect(out).to eq("2.3.2")
       end
 
       it "works on a different system" do
@@ -231,7 +231,7 @@ describe "bundle install --standalone" do
           puts ACTIONPACK
         RUBY
 
-        out.should be == "2.3.2"
+        expect(out).to eq("2.3.2")
       end
     end
   end
@@ -246,14 +246,14 @@ describe "bundle install --standalone" do
 
     it "creates stubs that use the standalone load path" do
       Dir.chdir(bundled_app) do
-        `bin/rails -v`.chomp.should eql "2.3.2"
+        expect(`bin/rails -v`.chomp).to eql "2.3.2"
       end
     end
 
     it "creates stubs that can be executed from anywhere" do
       require 'tmpdir'
       Dir.chdir(Dir.tmpdir) do
-        `#{bundled_app}/bin/rails -v`.chomp.should eql "2.3.2"
+        expect(`#{bundled_app}/bin/rails -v`.chomp).to eql "2.3.2"
       end
     end
   end

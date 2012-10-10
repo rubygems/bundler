@@ -8,7 +8,7 @@ describe "bundle install with gem sources" do
       G
 
       bundle :install
-      out.should =~ /no dependencies/
+      expect(out).to match(/no dependencies/)
     end
 
     it "does not make a lockfile if the install fails" do
@@ -16,8 +16,8 @@ describe "bundle install with gem sources" do
         raise StandardError, "FAIL"
       G
 
-      err.should =~ /FAIL \(StandardError\)/
-      bundled_app("Gemfile.lock").should_not exist
+      expect(err).to match(/FAIL \(StandardError\)/)
+      expect(bundled_app("Gemfile.lock")).not_to exist
     end
 
     it "creates a Gemfile.lock" do
@@ -26,7 +26,7 @@ describe "bundle install with gem sources" do
         gem "rack"
       G
 
-      bundled_app('Gemfile.lock').should exist
+      expect(bundled_app('Gemfile.lock')).to exist
     end
 
     it "creates lock files based on the Gemfile name" do
@@ -37,7 +37,7 @@ describe "bundle install with gem sources" do
 
       bundle 'install --gemfile OmgFile'
 
-      bundled_app("OmgFile.lock").should exist
+      expect(bundled_app("OmgFile.lock")).to exist
     end
 
     it "doesn't delete the lockfile if one already exists" do
@@ -52,7 +52,7 @@ describe "bundle install with gem sources" do
         raise StandardError, "FAIL"
       G
 
-      File.read(bundled_app("Gemfile.lock")).should == lockfile
+      expect(File.read(bundled_app("Gemfile.lock"))).to eq(lockfile)
     end
 
     it "does not touch the lockfile if nothing changed" do
@@ -61,7 +61,7 @@ describe "bundle install with gem sources" do
         gem "rack"
       G
 
-      lambda { run '1' }.should_not change { File.mtime(bundled_app('Gemfile.lock')) }
+      expect { run '1' }.not_to change { File.mtime(bundled_app('Gemfile.lock')) }
     end
 
     it "fetches gems" do
@@ -70,7 +70,7 @@ describe "bundle install with gem sources" do
         gem 'rack'
       G
 
-      default_bundle_path("gems/rack-1.0.0").should exist
+      expect(default_bundle_path("gems/rack-1.0.0")).to exist
       should_be_installed("rack 1.0.0")
     end
 
@@ -80,7 +80,7 @@ describe "bundle install with gem sources" do
         gem 'rack', "> 0.9", "< 1.0"
       G
 
-      default_bundle_path("gems/rack-0.9.1").should exist
+      expect(default_bundle_path("gems/rack-0.9.1")).to exist
       should_be_installed("rack 0.9.1")
     end
 
@@ -90,7 +90,7 @@ describe "bundle install with gem sources" do
         gem 'rack', "< 1.0", "> 0.9"
       G
 
-      default_bundle_path("gems/rack-0.9.1").should exist
+      expect(default_bundle_path("gems/rack-0.9.1")).to exist
       should_be_installed("rack 0.9.1")
     end
 
@@ -99,7 +99,7 @@ describe "bundle install with gem sources" do
         source "file://#{gem_repo1}"
         gem :rack
       G
-      status.should == 4
+      expect(status).to eq(4)
     end
 
     it "pulls in dependencies" do
@@ -204,7 +204,7 @@ describe "bundle install with gem sources" do
         G
 
         run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
-        out.should == "1.0.0 #{Gem::Platform.local}"
+        expect(out).to eq("1.0.0 #{Gem::Platform.local}")
       end
 
       it "falls back on plain ruby" do
@@ -215,7 +215,7 @@ describe "bundle install with gem sources" do
         G
 
         run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
-        out.should == "1.0.0 RUBY"
+        expect(out).to eq("1.0.0 RUBY")
       end
 
       it "installs gems for java" do
@@ -226,7 +226,7 @@ describe "bundle install with gem sources" do
         G
 
         run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
-        out.should == "1.0.0 JAVA"
+        expect(out).to eq("1.0.0 JAVA")
       end
 
       it "installs gems for windows" do
@@ -238,7 +238,7 @@ describe "bundle install with gem sources" do
         G
 
         run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
-        out.should == "1.0.0 MSWIN"
+        expect(out).to eq("1.0.0 MSWIN")
       end
     end
 
@@ -291,14 +291,14 @@ describe "bundle install with gem sources" do
       G
 
       bundle :install, :expect_err => true
-      out.should =~ /Your Gemfile has no remote sources/i
+      expect(out).to match(/Your Gemfile has no remote sources/i)
     end
 
     it "creates a Gemfile.lock on a blank Gemfile" do
       install_gemfile <<-G
       G
 
-      File.exists?(bundled_app("Gemfile.lock")).should be_true
+      expect(File.exists?(bundled_app("Gemfile.lock"))).to be_true
     end
 
     it "gracefully handles error when rubygems server is unavailable" do
@@ -310,8 +310,8 @@ describe "bundle install with gem sources" do
       G
 
       bundle :install
-      out.should include("Could not reach http://localhost:9384/")
-      out.should_not include("file://")
+      expect(out).to include("Could not reach http://localhost:9384/")
+      expect(out).not_to include("file://")
     end
 
     it "doesn't blow up when the local .bundle/config is empty" do
@@ -323,7 +323,7 @@ describe "bundle install with gem sources" do
 
         gem 'foo'
       G
-      exitstatus.should == 0
+      expect(exitstatus).to eq(0)
     end
 
     it "doesn't blow up when the global .bundle/config is empty" do
@@ -335,7 +335,7 @@ describe "bundle install with gem sources" do
 
         gem 'foo'
       G
-      exitstatus.should == 0
+      expect(exitstatus).to eq(0)
     end
   end
 
@@ -358,7 +358,7 @@ describe "bundle install with gem sources" do
 
       bundle :install, :exitstatus => true
 
-      exitstatus.should == 0
+      expect(exitstatus).to eq(0)
     end
   end
 
@@ -425,8 +425,8 @@ describe "bundle install with gem sources" do
         set_bundle_path(type, bundled_app("vendor2").to_s)
         bundle "install --path vendor/bundle"
 
-        vendored_gems("gems/rack-1.0.0").should be_directory
-        bundled_app("vendor2").should_not be_directory
+        expect(vendored_gems("gems/rack-1.0.0")).to be_directory
+        expect(bundled_app("vendor2")).not_to be_directory
         should_be_installed "rack 1.0.0"
       end
 
@@ -435,7 +435,7 @@ describe "bundle install with gem sources" do
 
         bundle :install
 
-        bundled_app('vendor/gems/rack-1.0.0').should be_directory
+        expect(bundled_app('vendor/gems/rack-1.0.0')).to be_directory
         should_be_installed "rack 1.0.0"
       end
 
@@ -447,7 +447,7 @@ describe "bundle install with gem sources" do
           bundle :install
         end
 
-        bundled_app('vendor/gems/rack-1.0.0').should be_directory
+        expect(bundled_app('vendor/gems/rack-1.0.0')).to be_directory
         should_be_installed "rack 1.0.0"
       end
     end
@@ -457,14 +457,14 @@ describe "bundle install with gem sources" do
 
       bundle :install
 
-      vendored_gems('gems/rack-1.0.0').should be_directory
+      expect(vendored_gems('gems/rack-1.0.0')).to be_directory
       should_be_installed "rack 1.0.0"
     end
 
     it "sets BUNDLE_PATH as the first argument to bundle install" do
       bundle "install --path ./vendor/bundle"
 
-      vendored_gems('gems/rack-1.0.0').should be_directory
+      expect(vendored_gems('gems/rack-1.0.0')).to be_directory
       should_be_installed "rack 1.0.0"
     end
 
@@ -473,7 +473,7 @@ describe "bundle install with gem sources" do
       build_gem "rack", "1.1.0", :to_system => true
       bundle "install --path ./vendor/bundle"
 
-      vendored_gems('gems/rack-1.0.0').should be_directory
+      expect(vendored_gems('gems/rack-1.0.0')).to be_directory
       should_be_installed "rack 1.0.0"
     end
   end
@@ -500,7 +500,7 @@ describe "bundle install with gem sources" do
       G
 
       bundle :install, :quiet => true
-      out.should == ""
+      expect(out).to eq("")
     end
 
     it "should still display warnings" do
@@ -509,7 +509,7 @@ describe "bundle install with gem sources" do
       G
 
       bundle :install, :quiet => true
-      out.should =~ /Your Gemfile has no remote sources/
+      expect(out).to match(/Your Gemfile has no remote sources/)
     end
   end
 
@@ -528,9 +528,9 @@ describe "bundle install with gem sources" do
     it "behaves like bundle install vendor/bundle with --deployment" do
       bundle "install"
       bundle "install --deployment"
-      out.should include("It was installed into ./vendor/bundle")
+      expect(out).to include("It was installed into ./vendor/bundle")
       should_be_installed "rack 1.0.0"
-      bundled_app("vendor/bundle").should exist
+      expect(bundled_app("vendor/bundle")).to exist
     end
 
     it "does not use available system gems with bundle --path vendor/bundle" do
@@ -544,7 +544,7 @@ describe "bundle install with gem sources" do
 
       Dir.chdir(dir) do
         bundle "install --path vendor/bundle"
-        out.should include("installed into ./vendor/bundle")
+        expect(out).to include("installed into ./vendor/bundle")
       end
 
       dir.rmtree
@@ -552,12 +552,12 @@ describe "bundle install with gem sources" do
 
     it "prints a warning to let the user know what has happened with bundle --path vendor/bundle" do
       bundle "install --path vendor/bundle"
-      out.should include("It was installed into ./vendor")
+      expect(out).to include("It was installed into ./vendor")
     end
 
     it "disallows --path vendor/bundle --system" do
       bundle "install --path vendor/bundle --system"
-      out.should include("Please choose.")
+      expect(out).to include("Please choose.")
     end
 
     it "remembers to disable system gems after the first time with bundle --path vendor/bundle" do
@@ -565,7 +565,7 @@ describe "bundle install with gem sources" do
       FileUtils.rm_rf bundled_app('vendor')
       bundle "install"
 
-      vendored_gems('gems/rack-1.0.0').should be_directory
+      expect(vendored_gems('gems/rack-1.0.0')).to be_directory
       should_be_installed "rack 1.0.0"
     end
   end
@@ -590,8 +590,8 @@ describe "bundle install with gem sources" do
         end
       R
 
-      out.should include("1.0")
-      out.should include("no activesupport")
+      expect(out).to include("1.0")
+      expect(out).to include("no activesupport")
     end
   end
 
@@ -608,7 +608,7 @@ describe "bundle install with gem sources" do
         gem "yaml_spec"
       G
       bundle :install
-      err.should be_empty
+      expect(err).to be_empty
     end
 
     it "still installs correctly when using path" do
@@ -617,7 +617,7 @@ describe "bundle install with gem sources" do
       install_gemfile <<-G
         gem 'yaml_spec', :path => "#{lib_path('yaml_spec-1.0')}"
       G
-      err.should == ""
+      expect(err).to eq("")
     end
   end
 
@@ -665,7 +665,7 @@ describe "bundle install with gem sources" do
           Current Bundler version:
             bundler (#{Bundler::VERSION})
         E
-      out.should include(nice_error)
+      expect(out).to include(nice_error)
     end
 
     it "works for gems with multiple versions in its dependencies" do
@@ -693,7 +693,7 @@ describe "bundle install with gem sources" do
       G
 
       run "begin; gem 'bundler'; puts 'WIN'; rescue Gem::LoadError; puts 'FAIL'; end"
-      out.should == "WIN"
+      expect(out).to eq("WIN")
     end
 
     it "allows gem 'bundler' when Bundler is not in the Gemfile or its dependencies" do
@@ -703,7 +703,7 @@ describe "bundle install with gem sources" do
       G
 
       run "begin; gem 'bundler'; puts 'WIN'; rescue Gem::LoadError => e; puts e.backtrace; end"
-      out.should == "WIN"
+      expect(out).to eq("WIN")
     end
 
     it "causes a conflict if child dependencies conflict" do
@@ -723,7 +723,7 @@ describe "bundle install with gem sources" do
             rails_fail (>= 0) ruby depends on
               activesupport (1.2.3)
       E
-      out.should == nice_error
+      expect(out).to eq(nice_error)
     end
 
     it "causes a conflict if a child dependency conflicts with the Gemfile" do
@@ -742,7 +742,7 @@ describe "bundle install with gem sources" do
 
             activesupport (2.3.5)
       E
-      out.should == nice_error
+      expect(out).to eq(nice_error)
     end
 
     it "can install dependencies even if " do
@@ -755,7 +755,7 @@ describe "bundle install with gem sources" do
       #simulate_new_machine
 
       bundle "check"
-      out.should == "The Gemfile's dependencies are satisfied"
+      expect(out).to eq("The Gemfile's dependencies are satisfied")
     end
   end
 
@@ -788,7 +788,7 @@ describe "bundle install with gem sources" do
     it "does not hit the remote a second time" do
       FileUtils.rm_rf gem_repo2
       bundle "install --without rack"
-      err.should be_empty
+      expect(err).to be_empty
     end
   end
 
@@ -796,7 +796,7 @@ describe "bundle install with gem sources" do
     # On OS X, Gem.bindir defaults to /usr/bin, so system_bindir is useful if
     # you want to avoid sudo installs for system gems with OS X's default ruby
     it "overrides Gem.bindir" do
-      Pathname.new("/usr/bin").should_not be_writable unless Process::euid == 0
+      expect(Pathname.new("/usr/bin")).not_to be_writable unless Process::euid == 0
       gemfile <<-G
         require 'rubygems'
         def Gem.bindir; "/usr/bin"; end
@@ -807,7 +807,7 @@ describe "bundle install with gem sources" do
       config "BUNDLE_SYSTEM_BINDIR" => system_gem_path('altbin').to_s
       bundle :install
       should_be_installed "rack 1.0.0"
-      system_gem_path("altbin/rackup").should exist
+      expect(system_gem_path("altbin/rackup")).to exist
     end
   end
 

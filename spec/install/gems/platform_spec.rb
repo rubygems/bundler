@@ -96,7 +96,7 @@ describe "bundle install across platforms" do
 
     bundle "install --path vendor/bundle"
 
-    vendored_gems("gems/rack-1.0.0").should exist
+    expect(vendored_gems("gems/rack-1.0.0")).to exist
   end
 
   it "works after switching Rubies" do
@@ -112,7 +112,7 @@ describe "bundle install across platforms" do
     FileUtils.mv(vendored_gems, bundled_app("vendor/bundle/#{Gem.ruby_engine}/#{new_version}"))
 
     bundle "install --path ./vendor/bundle"
-    vendored_gems("gems/rack-1.0.0").should exist
+    expect(vendored_gems("gems/rack-1.0.0")).to exist
   end
 end
 
@@ -186,7 +186,7 @@ describe "bundle install with platform conditionals" do
     G
 
     bundle :show, :exitstatus => true
-    exitstatus.should == 0
+    expect(exitstatus).to eq(0)
   end
 
 end

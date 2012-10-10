@@ -13,8 +13,8 @@ describe "when using sudo", :sudo => true do
         gem "thin"
       G
 
-      system_gem_path("gems/rack-1.0.0").should exist
-      system_gem_path("gems/rack-1.0.0").stat.uid.should eq(0)
+      expect(system_gem_path("gems/rack-1.0.0")).to exist
+      expect(system_gem_path("gems/rack-1.0.0").stat.uid).to eq(0)
       should_be_installed "rack 1.0"
     end
 
@@ -29,8 +29,8 @@ describe "when using sudo", :sudo => true do
         gem "rack", '1.0'
       G
 
-      bundle_path.join("gems/rack-1.0.0").should exist
-      bundle_path.join("gems/rack-1.0.0").stat.uid.should eq(0)
+      expect(bundle_path.join("gems/rack-1.0.0")).to exist
+      expect(bundle_path.join("gems/rack-1.0.0").stat.uid).to eq(0)
       should_be_installed "rack 1.0"
     end
 
@@ -45,7 +45,7 @@ describe "when using sudo", :sudo => true do
         gem "rack", '1.0'
       G
 
-      default_bundle_path("gems/rack-1.0.0").should exist
+      expect(default_bundle_path("gems/rack-1.0.0")).to exist
       should_be_installed "rack 1.0"
     end
   end
@@ -65,7 +65,7 @@ describe "when using sudo", :sudo => true do
           gem "rack", '1.0'
         G
 
-        gem_home.join('bin/rackup').should exist
+        expect(gem_home.join('bin/rackup')).to exist
         should_be_installed "rack 1.0"
       end
     end

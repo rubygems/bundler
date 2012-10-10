@@ -42,16 +42,16 @@ describe "bundle cache with multiple platforms" do
   it "ensures that bundle install does not delete gems for other platforms" do
     bundle "install"
 
-    bundled_app("vendor/cache/rack-1.0.0.gem").should exist
-    bundled_app("vendor/cache/activesupport-2.3.5.gem").should exist
-    bundled_app("vendor/cache/activerecord-2.3.2.gem").should exist
+    expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
+    expect(bundled_app("vendor/cache/activesupport-2.3.5.gem")).to exist
+    expect(bundled_app("vendor/cache/activerecord-2.3.2.gem")).to exist
   end
 
   it "ensures that bundle update does not delete gems for other platforms" do
     bundle "update"
 
-    bundled_app("vendor/cache/rack-1.0.0.gem").should exist
-    bundled_app("vendor/cache/activesupport-2.3.5.gem").should exist
-    bundled_app("vendor/cache/activerecord-2.3.2.gem").should exist
+    expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
+    expect(bundled_app("vendor/cache/activesupport-2.3.5.gem")).to exist
+    expect(bundled_app("vendor/cache/activerecord-2.3.2.gem")).to exist
   end
 end

@@ -10,7 +10,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :artifice => "endpoint"
-    out.should include("Fetching gem metadata from #{source_uri}")
+    expect(out).to include("Fetching gem metadata from #{source_uri}")
     should_be_installed "rack 1.0.0"
   end
 
@@ -21,7 +21,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :artifice => "endpoint"
-    out.should include("Could not find gem ' sinatra")
+    expect(out).to include("Could not find gem ' sinatra")
   end
 
   it "should handle nested dependencies" do
@@ -31,7 +31,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :artifice => "endpoint"
-    out.should include("Fetching gem metadata from #{source_uri}/...")
+    expect(out).to include("Fetching gem metadata from #{source_uri}/...")
     should_be_installed(
       "rails 2.3.2",
       "actionpack 2.3.2",
@@ -59,7 +59,7 @@ describe "gemcutter's dependency API" do
     bundle :install, :artifice => "endpoint"
 
     bundle "install --deployment", :artifice => "endpoint"
-    out.should include("Fetching gem metadata from #{source_uri}")
+    expect(out).to include("Fetching gem metadata from #{source_uri}")
     should_be_installed "rack 1.0.0"
   end
 
@@ -108,7 +108,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :fakeweb => "windows"
-    out.should include("\nFetching full source index from #{source_uri}")
+    expect(out).to include("\nFetching full source index from #{source_uri}")
     should_be_installed "rcov 1.0.0"
   end
 
@@ -124,7 +124,7 @@ describe "gemcutter's dependency API" do
       gem "rails"
     G
     bundle :install, :artifice => "endpoint_fallback"
-    out.should include("\nFetching full source index from #{source_uri}")
+    expect(out).to include("\nFetching full source index from #{source_uri}")
 
     should_be_installed(
       "activesupport 2.3.2",
@@ -144,7 +144,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :artifice => "endpoint_marshal_fail"
-    out.should include("\nFetching full source index from #{source_uri}")
+    expect(out).to include("\nFetching full source index from #{source_uri}")
     should_be_installed "rack 1.0.0"
   end
 
@@ -155,7 +155,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :artifice => "endpoint_redirect"
-    out.should match(/Too many redirects/)
+    expect(out).to match(/Too many redirects/)
   end
 
   context "when --full-index is specified" do
@@ -166,7 +166,7 @@ describe "gemcutter's dependency API" do
       G
 
       bundle "install --full-index", :artifice => "endpoint"
-      out.should include("Fetching source index from #{source_uri}")
+      expect(out).to include("Fetching source index from #{source_uri}")
       should_be_installed "rack 1.0.0"
     end
 
@@ -177,7 +177,7 @@ describe "gemcutter's dependency API" do
       G
 
       bundle "update --full-index", :artifice => "endpoint"
-      out.should include("Fetching source index from #{source_uri}")
+      expect(out).to include("Fetching source index from #{source_uri}")
       should_be_installed "rack 1.0.0"
     end
   end
@@ -220,7 +220,7 @@ describe "gemcutter's dependency API" do
 Fetching gem metadata from http://localgemserver.test/..
 Fetching gem metadata from http://localgemserver.test/extra/.
 OUTPUT
-    out.should include(output)
+    expect(out).to include(output)
   end
 
   it "does not fetch every specs if the index of gems is large when doing back deps" do
@@ -286,7 +286,7 @@ OUTPUT
     G
 
     bundle :install, :artifice => "endpoint"
-    out.should include("Fetching gem metadata from #{source_uri}")
+    expect(out).to include("Fetching gem metadata from #{source_uri}")
   end
 
   it "should install when EndpointSpecification with a bin dir owned by root", :sudo => true do
@@ -310,7 +310,7 @@ OUTPUT
     bundle "install --binstubs", :artifice => "endpoint"
 
     gembin "rackup"
-    out.should == "1.0.0"
+    expect(out).to eq("1.0.0")
   end
 
   it "installs the bins when using --path and uses autoclean" do
@@ -321,7 +321,7 @@ OUTPUT
 
     bundle "install --path vendor/bundle", :artifice => "endpoint"
 
-    vendored_gems("bin/rackup").should exist
+    expect(vendored_gems("bin/rackup")).to exist
   end
 
   it "installs the bins when using --path and uses bundle clean" do
@@ -332,7 +332,7 @@ OUTPUT
 
     bundle "install --path vendor/bundle --no-clean", :artifice => "endpoint"
 
-    vendored_gems("bin/rackup").should exist
+    expect(vendored_gems("bin/rackup")).to exist
   end
 
   it "prints post_install_messages" do
@@ -342,7 +342,7 @@ OUTPUT
     G
 
     bundle :install, :artifice => "endpoint"
-    out.should include("Post-install message from rack:")
+    expect(out).to include("Post-install message from rack:")
   end
 
   it "should display the post install message for a dependency" do
@@ -352,8 +352,8 @@ OUTPUT
     G
 
     bundle :install, :artifice => "endpoint"
-    out.should include("Post-install message from rack:")
-    out.should include("Rack's post install message")
+    expect(out).to include("Post-install message from rack:")
+    expect(out).to include("Rack's post install message")
   end
 
   context "when using basic authentication" do
@@ -374,7 +374,7 @@ OUTPUT
       G
 
       bundle :install, :artifice => "endpoint_basic_authentication"
-      out.should_not include("#{user}:#{password}")
+      expect(out).not_to include("#{user}:#{password}")
       should_be_installed "rack 1.0.0"
     end
 
@@ -385,7 +385,7 @@ OUTPUT
       G
 
       bundle :install, :artifice => "endopint_marshal_fail_basic_authentication"
-      out.should_not include("#{user}:#{password}")
+      expect(out).not_to include("#{user}:#{password}")
       should_be_installed "rack 1.0.0"
     end
 
@@ -396,7 +396,7 @@ OUTPUT
       G
 
       bundle :install, :artifice => "endpoint_500"
-      out.should_not include("#{user}:#{password}")
+      expect(out).not_to include("#{user}:#{password}")
     end
   end
 
@@ -429,7 +429,7 @@ OUTPUT
 
       bundle :install, :artifice => "endpoint",
         :env => {"RUBYOPT" => "-I#{bundled_app("broken_ssl")}"}
-      out.should include("Could not load OpenSSL.")
+      expect(out).to include("Could not load OpenSSL.")
     end
   end
 

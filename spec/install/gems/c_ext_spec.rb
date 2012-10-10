@@ -40,9 +40,9 @@ describe "installing a gem with C extensions" do
     bundle "config build.c_extension --with-c_extension=hello"
     bundle "install"
 
-    out.should_not include("extconf.rb failed")
+    expect(out).not_to include("extconf.rb failed")
 
     run "Bundler.require; puts CExtension.new.its_true"
-    out.should == "true"
+    expect(out).to eq("true")
   end
 end

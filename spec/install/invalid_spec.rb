@@ -11,7 +11,7 @@ describe "bundle install with deprecated features" do
     G
 
     bundle :install
-    out.should =~ /You passed :lib as an option for gem 'rack', but it is invalid/
+    expect(out).to match(/You passed :lib as an option for gem 'rack', but it is invalid/)
   end
 
 end
@@ -30,6 +30,6 @@ describe "bundle install to a dead symlink" do
     G
 
     bundle "install --path bundle"
-    out.should =~ /invalid symlink/
+    expect(out).to match(/invalid symlink/)
   end
 end

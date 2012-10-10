@@ -29,7 +29,7 @@ describe "Bundler.setup with multi platform stuff" do
       end
     R
 
-    out.should == "WIN"
+    expect(out).to eq("WIN")
   end
 
   it "will resolve correctly on the current platform when the lockfile was targetted for a different one" do

@@ -188,7 +188,7 @@ describe "bundle flex_install" do
       ruby <<-RUBY, :expect_err => true
         require 'bundler/setup'
       RUBY
-      err.should =~ /could not find gem 'rack-obama/i
+      expect(err).to match(/could not find gem 'rack-obama/i)
     end
 
     it "suggests bundle update when the Gemfile requires different versions than the lock" do
@@ -207,7 +207,7 @@ describe "bundle flex_install" do
       E
 
       bundle :install
-      out.should == nice_error
+      expect(out).to eq(nice_error)
     end
   end
 
@@ -227,13 +227,13 @@ describe "bundle flex_install" do
     end
 
     it "does something" do
-      lambda {
+      expect {
         bundle "install"
-      }.should_not change { File.read(bundled_app('Gemfile.lock')) }
+      }.not_to change { File.read(bundled_app('Gemfile.lock')) }
 
-      out.should include('rack = 0.9.1')
-      out.should include('locked at 1.0.0')
-      out.should include('bundle update rack')
+      expect(out).to include('rack = 0.9.1')
+      expect(out).to include('locked at 1.0.0')
+      expect(out).to include('bundle update rack')
     end
 
     it "should work when you update" do

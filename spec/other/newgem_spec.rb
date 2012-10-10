@@ -19,30 +19,30 @@ describe "bundle gem" do
   let(:generated_gem) { Bundler::GemHelper.new(bundled_app("test-gem").to_s) }
 
   it "generates a gem skeleton" do
-    bundled_app("test-gem/test-gem.gemspec").should exist
-    bundled_app("test-gem/LICENSE.txt").should exist
-    bundled_app("test-gem/Gemfile").should exist
-    bundled_app("test-gem/Rakefile").should exist
-    bundled_app("test-gem/lib/test-gem.rb").should exist
-    bundled_app("test-gem/lib/test-gem/version.rb").should exist
+    expect(bundled_app("test-gem/test-gem.gemspec")).to exist
+    expect(bundled_app("test-gem/LICENSE.txt")).to exist
+    expect(bundled_app("test-gem/Gemfile")).to exist
+    expect(bundled_app("test-gem/Rakefile")).to exist
+    expect(bundled_app("test-gem/lib/test-gem.rb")).to exist
+    expect(bundled_app("test-gem/lib/test-gem/version.rb")).to exist
   end
 
   it "starts with version 0.0.1" do
-    bundled_app("test-gem/lib/test-gem/version.rb").read.should =~ /VERSION = "0.0.1"/
+    expect(bundled_app("test-gem/lib/test-gem/version.rb").read).to match(/VERSION = "0.0.1"/)
   end
 
   it "nests constants so they work" do
-    bundled_app("test-gem/lib/test-gem/version.rb").read.should =~ /module Test\n  module Gem/
-    bundled_app("test-gem/lib/test-gem.rb").read.should =~ /module Test\n  module Gem/
+    expect(bundled_app("test-gem/lib/test-gem/version.rb").read).to match(/module Test\n  module Gem/)
+    expect(bundled_app("test-gem/lib/test-gem.rb").read).to match(/module Test\n  module Gem/)
   end
 
   context "git config user.{name,email} present" do
     it "sets gemspec author to git user.name if available" do
-      generated_gem.gemspec.authors.first.should == "Bundler User"
+      expect(generated_gem.gemspec.authors.first).to eq("Bundler User")
     end
 
     it "sets gemspec email to git user.email if available" do
-      generated_gem.gemspec.email.first.should == "user@example.com"
+      expect(generated_gem.gemspec.email.first).to eq("user@example.com")
     end
   end
 
@@ -56,20 +56,20 @@ describe "bundle gem" do
     end
 
     it "sets gemspec author to default message if git user.name is not set or empty" do
-      generated_gem.gemspec.authors.first.should == "TODO: Write your name"
+      expect(generated_gem.gemspec.authors.first).to eq("TODO: Write your name")
     end
 
     it "sets gemspec email to default message if git user.email is not set or empty" do
-      generated_gem.gemspec.email.first.should == "TODO: Write your email address"
+      expect(generated_gem.gemspec.email.first).to eq("TODO: Write your email address")
     end
   end
 
   it "sets gemspec license to MIT by default" do
-    generated_gem.gemspec.license.should == "MIT"
+    expect(generated_gem.gemspec.license).to eq("MIT")
   end
 
   it "requires the version file" do
-    bundled_app("test-gem/lib/test-gem.rb").read.should =~ /require "test-gem\/version"/
+    expect(bundled_app("test-gem/lib/test-gem.rb").read).to match(/require "test-gem\/version"/)
   end
 
   it "runs rake without problems" do
@@ -86,7 +86,7 @@ RAKEFILE
 
     Dir.chdir(bundled_app("test-gem")) do
       sys_exec("rake")
-      out.should include("SUCCESS")
+      expect(out).to include("SUCCESS")
     end
   end
 end

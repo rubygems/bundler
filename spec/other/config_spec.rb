@@ -13,8 +13,8 @@ describe ".bundle/config" do
       ENV['BUNDLE_APP_CONFIG'] = tmp('foo/bar').to_s
       bundle "install --path vendor/bundle"
 
-      bundled_app('.bundle').should_not exist
-      tmp('foo/bar/config').should exist
+      expect(bundled_app('.bundle')).not_to exist
+      expect(tmp('foo/bar/config')).to exist
       should_be_installed "rack 1.0.0"
     end
 
@@ -25,8 +25,8 @@ describe ".bundle/config" do
       ENV['BUNDLE_APP_CONFIG'] = "../foo"
       bundle "install --path vendor/bundle"
 
-      bundled_app(".bundle").should_not exist
-      bundled_app("../foo/config").should exist
+      expect(bundled_app(".bundle")).not_to exist
+      expect(bundled_app("../foo/config")).to exist
       should_be_installed "rack 1.0.0"
     end
 
@@ -36,7 +36,7 @@ describe ".bundle/config" do
       bundle "install"
       FileUtils.touch tmp('foo/bar/environment.rb')
       should_be_installed "rack 1.0.0"
-      tmp('foo/bar/environment.rb').should_not exist
+      expect(tmp('foo/bar/environment.rb')).not_to exist
     end
   end
 
@@ -46,23 +46,23 @@ describe ".bundle/config" do
     it "is the default" do
       bundle "config foo global"
       run "puts Bundler.settings[:foo]"
-      out.should == "global"
+      expect(out).to eq("global")
     end
 
     it "can also be set explicitly" do
       bundle "config --global foo global"
       run "puts Bundler.settings[:foo]"
-      out.should == "global"
+      expect(out).to eq("global")
     end
 
     it "has lower precedence than local" do
       bundle "config --local  foo local"
 
       bundle "config --global foo global"
-      out.should =~ /Your application has set foo to "local"/
+      expect(out).to match(/Your application has set foo to "local"/)
 
       run "puts Bundler.settings[:foo]"
-      out.should == "local"
+      expect(out).to eq("local")
     end
 
     it "has lower precedence than env" do
@@ -70,10 +70,10 @@ describe ".bundle/config" do
         ENV["BUNDLE_FOO"] = "env"
 
         bundle "config --global foo global"
-        out.should =~ /You have a bundler environment variable for foo set to "env"/
+        expect(out).to match(/You have a bundler environment variable for foo set to "env"/)
 
         run "puts Bundler.settings[:foo]"
-        out.should == "env"
+        expect(out).to eq("env")
       ensure
         ENV.delete("BUNDLE_FOO")
       end
@@ -84,16 +84,16 @@ describe ".bundle/config" do
       bundle "config --delete foo"
 
       run "puts Bundler.settings[:foo] == nil"
-      out.should == "true"
+      expect(out).to eq("true")
     end
 
     it "warns when overriding" do
       bundle "config --global foo previous"
       bundle "config --global foo global"
-      out.should =~ /You are replacing the current global value of foo/
+      expect(out).to match(/You are replacing the current global value of foo/)
 
       run "puts Bundler.settings[:foo]"
-      out.should == "global"
+      expect(out).to eq("global")
     end
   end
 
@@ -103,7 +103,7 @@ describe ".bundle/config" do
     it "can also be set explicitly" do
       bundle "config --local foo local"
       run "puts Bundler.settings[:foo]"
-      out.should == "local"
+      expect(out).to eq("local")
     end
 
     it "has higher precedence than env" do
@@ -112,7 +112,7 @@ describe ".bundle/config" do
         bundle "config --local foo local"
 
         run "puts Bundler.settings[:foo]"
-        out.should == "local"
+        expect(out).to eq("local")
       ensure
         ENV.delete("BUNDLE_FOO")
       end
@@ -123,16 +123,16 @@ describe ".bundle/config" do
       bundle "config --delete foo"
 
       run "puts Bundler.settings[:foo] == nil"
-      out.should == "true"
+      expect(out).to eq("true")
     end
 
     it "warns when overriding" do
       bundle "config --local foo previous"
       bundle "config --local foo local"
-      out.should =~ /You are replacing the current local value of foo/
+      expect(out).to match(/You are replacing the current local value of foo/)
 
       run "puts Bundler.settings[:foo]"
-      out.should == "local"
+      expect(out).to eq("local")
     end
   end
 end

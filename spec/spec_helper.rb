@@ -71,6 +71,10 @@ RSpec.configure do |config|
     pending "JRuby executables do not have a proper shebang" if RUBY_PLATFORM == "java"
   end
 
+  config.expect_with :rspec do |c|
+    c.syntax = :expect
+  end
+
   config.before :all do
     build_repo1
   end

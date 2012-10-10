@@ -7,10 +7,10 @@ describe "Bundler.with_env helpers" do
       gem_path = ENV['GEM_PATH']
 
       Bundler.with_clean_env do
-        `echo $GEM_PATH`.strip.should_not == gem_path
+        expect(`echo $GEM_PATH`.strip).not_to eq(gem_path)
       end
 
-      ENV['GEM_PATH'].should == gem_path
+      expect(ENV['GEM_PATH']).to eq(gem_path)
     end
   end
 
@@ -34,12 +34,12 @@ describe "Bundler.with_env helpers" do
              "end"
 
       result = bundle "exec ruby -e #{code.inspect}"
-      result.should == "true"
+      expect(result).to eq("true")
     end
 
     it "should not pass any bundler environment variables" do
       Bundler.with_clean_env do
-        `echo $BUNDLE_PATH`.strip.should_not == './Gemfile'
+        expect(`echo $BUNDLE_PATH`.strip).not_to eq('./Gemfile')
       end
     end
 
@@ -48,15 +48,15 @@ describe "Bundler.with_env helpers" do
       Bundler::ORIGINAL_ENV['RUBYOPT'] = " -I#{lib_path} -rbundler/setup"
 
       Bundler.with_clean_env do
-        `echo $RUBYOPT`.strip.should_not include '-rbundler/setup'
-        `echo $RUBYOPT`.strip.should_not include "-I#{lib_path}"
+        expect(`echo $RUBYOPT`.strip).not_to include '-rbundler/setup'
+        expect(`echo $RUBYOPT`.strip).not_to include "-I#{lib_path}"
       end
 
-      Bundler::ORIGINAL_ENV['RUBYOPT'].should == " -I#{lib_path} -rbundler/setup"
+      expect(Bundler::ORIGINAL_ENV['RUBYOPT']).to eq(" -I#{lib_path} -rbundler/setup")
     end
 
     it "should not change ORIGINAL_ENV" do
-      Bundler::ORIGINAL_ENV['BUNDLE_PATH'].should == './Gemfile'
+      expect(Bundler::ORIGINAL_ENV['BUNDLE_PATH']).to eq('./Gemfile')
     end
 
   end
@@ -67,7 +67,7 @@ describe "Bundler.with_env helpers" do
 
     it "should pass bundler environment variables set before Bundler was run" do
       Bundler.with_original_env do
-        `echo $BUNDLE_PATH`.strip.should == './Gemfile'
+        expect(`echo $BUNDLE_PATH`.strip).to eq('./Gemfile')
       end
     end
   end
@@ -75,7 +75,7 @@ describe "Bundler.with_env helpers" do
   describe "Bundler.clean_system" do
     it "runs system inside with_clean_env" do
       Bundler.clean_system(%{echo 'if [ "$BUNDLE_PATH" = "" ]; then exit 42; else exit 1; fi' | /bin/sh})
-      $?.exitstatus.should == 42
+      expect($?.exitstatus).to eq(42)
     end
   end
 
@@ -85,7 +85,7 @@ describe "Bundler.with_env helpers" do
         Bundler.clean_exec(%{echo 'if [ "$BUNDLE_PATH" = "" ]; then exit 42; else exit 1; fi' | /bin/sh})
       end
       Process.wait(pid)
-      $?.exitstatus.should == 42
+      expect($?.exitstatus).to eq(42)
     end
   end
 
