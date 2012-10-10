@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.rubyforge_project         = "bundler"
 
   s.add_development_dependency "ronn"
-  s.add_development_dependency "rspec", "~> 2.0"
+  s.add_development_dependency "rspec", "~> 2.11"
 
   # Man files are required because they are ignored by git
   man_files            = Dir.glob("lib/bundler/man/**/*")
