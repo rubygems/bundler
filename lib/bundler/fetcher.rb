@@ -145,7 +145,7 @@ module Bundler
         response = @@connection.request(uri)
       rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, Errno::ETIMEDOUT,
              EOFError, SocketError, Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError,
-             Net::HTTP::Persistent::Error, Net::ProtocolError => e
+             Errno::EAGAIN, Net::HTTP::Persistent::Error, Net::ProtocolError => e
         raise HTTPError, "Network error while fetching #{uri}"
       end
 
