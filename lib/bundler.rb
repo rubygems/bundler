@@ -291,24 +291,17 @@ module Bundler
       # Eval the gemspec from its parent directory
       Dir.chdir(path.dirname.to_s) do
         contents = File.read(path.basename.to_s)
-        begin
-          Gem::Specification.from_yaml(contents)
-          # Raises ArgumentError if the file is not valid YAML
-        rescue ArgumentError, SyntaxError, Gem::EndOfYAMLException, Gem::Exception
+
+        if contents =~ /\A---/ # try YAML
           begin
-            eval(contents, TOPLEVEL_BINDING, path.expand_path.to_s)
-          rescue LoadError, SyntaxError => e
-            original_line = e.backtrace.find { |line| line.include?(path.to_s) }
-            msg  = "There was a #{e.class} while evaluating #{path.basename}: \n#{e.message}"
-            msg << " from\n  #{original_line}" if original_line
-            msg << "\n"
-
-            if e.is_a?(LoadError) && RUBY_VERSION >= "1.9"
-              msg << "\nDoes it try to require a relative path? That's been removed in Ruby 1.9."
-            end
-
-            raise GemspecError, msg
+            Gem::Specification.from_yaml(contents)
+            # Raises ArgumentError if the file is not valid YAML (on syck)
+            # Psych raises a Psych::SyntaxError
+          rescue ArgumentError, Psych::SyntaxError, Gem::EndOfYAMLException, Gem::Exception
+            eval_gemspec(path, contents)
           end
+        else
+          eval_gemspec(path, contents)
         end
       end
     end
@@ -318,6 +311,21 @@ module Bundler
     end
 
   private
+
+    def eval_gemspec(path, contents)
+      eval(contents, TOPLEVEL_BINDING, path.expand_path.to_s)
+    rescue LoadError, SyntaxError => e
+      original_line = e.backtrace.find { |line| line.include?(path.to_s) }
+      msg  = "There was a #{e.class} while evaluating #{path.basename}: \n#{e.message}"
+      msg << " from\n  #{original_line}" if original_line
+      msg << "\n"
+
+      if e.is_a?(LoadError) && RUBY_VERSION >= "1.9"
+        msg << "\nDoes it try to require a relative path? That's been removed in Ruby 1.9."
+      end
+
+      raise GemspecError, msg
+    end
 
     def configure_gem_home_and_path
       blank_home = ENV['GEM_HOME'].nil? || ENV['GEM_HOME'].empty?
