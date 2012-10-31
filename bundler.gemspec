@@ -8,6 +8,7 @@ Gem::Specification.new do |s|
   s.name        = "bundler"
   s.version     = Bundler::VERSION
   s.platform    = Gem::Platform::RUBY
+  s.license     = "MIT"
   s.authors     = ["André Arko", "Terence Lee", "Carl Lerche", "Yehuda Katz"]
   s.email       = ["andre@arko.net"]
   s.homepage    = "http://gembundler.com"
