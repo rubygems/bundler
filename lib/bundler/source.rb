@@ -503,7 +503,8 @@ module Bundler
       # All actions required by the Git source is encapsualted in this
       # object.
       class GitProxy
-        attr_accessor :path, :uri, :ref, :revision
+        attr_accessor :path, :uri, :ref
+        attr_writer :revision
 
         def initialize(path, uri, ref, revision=nil, &allow)
           @path     = path
