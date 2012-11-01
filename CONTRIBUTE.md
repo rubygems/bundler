@@ -72,7 +72,7 @@ Bundler has two main sources of documentation: the built-in help (including usag
 
 If you’d like to submit a patch to the man pages, follow the steps for adding a feature above. All of the man pages are located in the `man` directory. Just use the “Documentation” heading when you describe what you did in the changelog.
 
-If you have a suggestion or proposed change for [gembundler.com](http://gembundler.com), please open an issue or send a pull request to the [bundler-site](http://github.com/carlhuda/bundler-site) repository. 
+If you have a suggestion or proposed change for [gembundler.com](http://gembundler.com), please open an issue or send a pull request to the [bundler-site](http://github.com/carlhuda/bundler-site) repository.
 
 
 # Community
@@ -83,7 +83,7 @@ It would be tremendously helpful to have more people answering questions about B
 
 Additional documentation and explanation is always helpful, too. If you have any suggestions for the Bundler website [gembundler.com](http://www.gembundler.com), we would absolutely love it if you opened an issue or pull request on the [bundler-site repository](http://github.com/carlhuda/bundler-site).
 
-Finally, sharing your experiences and discoveries by writing them up is a valuable way to help others who have similar problems or experiences in the future. You can write a blog post, create an example and commit it to Github, take screenshots, or make videos. 
+Finally, sharing your experiences and discoveries by writing them up is a valuable way to help others who have similar problems or experiences in the future. You can write a blog post, create an example and commit it to Github, take screenshots, or make videos.
 
 Examples of how Bundler is used help everyone, and we’ve discovered that people already use it in ways that we never imagined when we were writing it. If you’re still not sure what to write about, there are also several projects doing interesting things based on Bundler. They could probably use publicity too.
 
