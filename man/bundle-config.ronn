@@ -77,6 +77,9 @@ learn more about their operation in [bundle install(1)][bundle-install].
 * `frozen` (`BUNDLE_FROZEN`):
   Disallow changes to the `Gemfile`. Defaults to `true` when `--deployment`
   is used.
+* `env_sources` (`BUNDLE_ENV_SOURCES`):
+  Add additional sources for use with this run of bundler only. Useful for adding private
+  repositories to your environment only.
 * `without` (`BUNDLE_WITHOUT`):
   A `:`-separated list of groups whose gems bundler should not install
 * `bin` (`BUNDLE_BIN`):

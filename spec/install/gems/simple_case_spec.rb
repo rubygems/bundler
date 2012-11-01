@@ -285,6 +285,36 @@ describe "bundle install with gem sources" do
       should_be_installed "rack 1.2", "activesupport 1.2.3"
     end
 
+    it "finds gems in env sources" do
+      build_repo2
+      update_repo2
+
+      ENV['BUNDLE_ENV_SOURCES'] = "file://#{gem_repo2}"
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+
+        gem "activesupport", "1.2.3"
+        gem "rack", "1.2"
+      G
+
+      should_be_installed "rack 1.2", "activesupport 1.2.3"
+    end
+
+    it "finds gems in multiple env sources" do
+      build_repo2
+      update_repo2
+
+      ENV['BUNDLE_ENV_SOURCES'] = "file://#{gem_repo1},file://#{gem_repo2}"
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+
+        gem "activesupport", "1.2.3"
+        gem "rack", "1.2"
+      G
+
+      should_be_installed "rack 1.2", "activesupport 1.2.3"
+    end
+
     it "gives a useful error if no sources are set" do
       install_gemfile <<-G
         gem "rack"
