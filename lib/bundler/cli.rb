@@ -684,6 +684,9 @@ module Bundler
         template(File.join("newgem/test/minitest_helper.rb.tt"), File.join(target, "test/minitest_helper.rb"),         opts)
         template(File.join("newgem/test/test_newgem.rb.tt"),     File.join(target, "test/test_#{namespaced_path}.rb"), opts)
       end
+      if options[:test]
+        template(File.join("newgem/.travis.yml.tt"),         File.join(target, ".travis.yml"),            opts)
+      end
       Bundler.ui.info "Initializating git repo in #{target}"
       Dir.chdir(target) { `git init`; `git add .` }
 
