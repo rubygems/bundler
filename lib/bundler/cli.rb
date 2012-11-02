@@ -9,7 +9,7 @@ module Bundler
 
     def initialize(*)
       super
-      the_shell = (options["no-color"] ? Thor::Shell::Basic.new : shell)
+      the_shell = (options["no-color"] || (not STDOUT.tty?) ? Thor::Shell::Basic.new : shell)
       Bundler.ui = UI::Shell.new(the_shell)
       Bundler.ui.debug! if options["verbose"]
       Bundler.rubygems.ui = UI::RGProxy.new(Bundler.ui)
