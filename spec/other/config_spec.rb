@@ -135,4 +135,35 @@ describe ".bundle/config" do
       expect(out).to eq("local")
     end
   end
+
+  describe "env" do
+    before(:each) { bundle :install }
+
+    it "can set boolean properties via the environment" do
+      ENV["BUNDLE_FROZEN"] = "true"
+
+      run "if Bundler.settings[:frozen]; puts 'true' else puts 'false' end"
+      expect(out).to eq("true")
+    end
+
+    it "can set negative boolean properties via the environment" do
+      run "if Bundler.settings[:frozen]; puts 'true' else puts 'false' end"
+      expect(out).to eq("false")
+
+      ENV["BUNDLE_FROZEN"] = "false"
+
+      run "if Bundler.settings[:frozen]; puts 'true' else puts 'false' end"
+      expect(out).to eq("false")
+
+      ENV["BUNDLE_FROZEN"] = "0"
+
+      run "if Bundler.settings[:frozen]; puts 'true' else puts 'false' end"
+      expect(out).to eq("false")
+
+      ENV["BUNDLE_FROZEN"] = ""
+
+      run "if Bundler.settings[:frozen]; puts 'true' else puts 'false' end"
+      expect(out).to eq("false")
+    end
+  end
 end

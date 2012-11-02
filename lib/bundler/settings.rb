@@ -7,8 +7,9 @@ module Bundler
     end
 
     def [](key)
-      key = key_for(key)
-      @local_config[key] || ENV[key] || @global_config[key]
+      the_key = key_for(key)
+      value = (@local_config[the_key] || ENV[the_key] || @global_config[the_key])
+      is_bool(key) ? to_bool(value) : value
     end
 
     def []=(key, value)
@@ -102,6 +103,14 @@ module Bundler
     def key_for(key)
       key = key.to_s.sub(".", "__").upcase
       "BUNDLE_#{key}"
+    end
+
+    def is_bool(key)
+      %w(frozen cache_all no_prune disable_local_branch_check).include? key.to_s
+    end
+
+    def to_bool(value)
+      !(value.nil? || value == '' || value =~ /^(false|f|no|n|0)$/i)
     end
 
     def set_key(key, value, hash, file)
