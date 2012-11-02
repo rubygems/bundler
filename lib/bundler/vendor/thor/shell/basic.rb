@@ -58,7 +58,7 @@ class Thor
       # ==== Example
       # say("I know you knew that.")
       #
-      def say(message="", color=nil, force_new_line=(message.to_s !~ /( |\t)$/))
+      def say(message="", color=nil, force_new_line=(message.to_s !~ /( |\t)\Z/))
         message = message.to_s
 
         message = set_color(message, *color) if color
@@ -370,7 +370,7 @@ HELP
 
       def ask_simply(statement, color=nil)
         say("#{statement} ", color)
-        stdin.gets.strip
+        stdin.gets.tap{|text| text.strip! if text}
       end
 
       def ask_filtered(statement, answer_set, *args)
