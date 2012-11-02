@@ -390,7 +390,7 @@ describe "Bundler.setup" do
       expect(out).to match(/at #{lib_path('local-rack')}/)
 
       FileUtils.rm_rf(lib_path('local-rack'))
-      run "require 'rack'"
+      run "require 'rack'", :expect_err => true
       expect(err).to match(/Cannot use local override for rack-0.8 because #{Regexp.escape(lib_path('local-rack').to_s)} does not exist/)
     end
 
@@ -413,7 +413,7 @@ describe "Bundler.setup" do
         gem "rack", :git => "#{lib_path('rack-0.8')}"
       G
 
-      run "require 'rack'"
+      run "require 'rack'", :expect_err => true
       expect(err).to match(/because :branch is not specified in Gemfile/)
     end
 
@@ -436,7 +436,7 @@ describe "Bundler.setup" do
         gem "rack", :git => "#{lib_path('rack-0.8')}", :branch => "changed"
       G
 
-      run "require 'rack'"
+      run "require 'rack'", :expect_err => true
       expect(err).to match(/is using branch master but Gemfile specifies changed/)
     end
 
@@ -456,7 +456,7 @@ describe "Bundler.setup" do
       G
 
       bundle %|config local.rack #{lib_path('local-rack')}|
-      run "require 'rack'"
+      run "require 'rack'", :expect_err => true
       expect(err).to match(/is using branch master but Gemfile specifies nonexistant/)
     end
   end
