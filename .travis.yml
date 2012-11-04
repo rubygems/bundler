@@ -9,7 +9,7 @@ env:
   - RGV=v1.5.3
   - RGV=v1.6.2
   - RGV=v1.7.2
-  - RGV=v1.8.10
+  - RGV=v1.8.24
 
 language: ruby
 
