@@ -13,3 +13,9 @@ end
 
 # Psych might NOT EXIST AT ALL
 require 'yaml'
+
+begin
+  YamlSyntaxError = Psych::SyntaxError
+rescue NameError
+  YamlSyntaxError = ArgumentError
+end
