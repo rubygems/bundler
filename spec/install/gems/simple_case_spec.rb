@@ -300,6 +300,22 @@ describe "bundle install with gem sources" do
       should_be_installed "rack 1.2", "activesupport 1.2.3"
     end
 
+    it "ensures env sources take priority" do
+      build_repo2
+      update_repo2
+
+      ENV['BUNDLE_ENV_SOURCES'] = "file://#{gem_repo2}"
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+
+        gem "private_gem", "1.0"
+      G
+
+      should_be_installed "private_gem 1.0"
+      expect(system_gem_path("bin/dodgy")).not_to exist
+      expect(system_gem_path("bin/private-app")).to exist
+    end
+
     it "finds gems in multiple env sources" do
       build_repo2
       update_repo2
