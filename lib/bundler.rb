@@ -291,13 +291,12 @@ module Bundler
       # Eval the gemspec from its parent directory
       Dir.chdir(path.dirname.to_s) do
         contents = File.read(path.basename.to_s)
-
         if contents =~ /\A---/ # try YAML
           begin
             Gem::Specification.from_yaml(contents)
             # Raises ArgumentError if the file is not valid YAML (on syck)
             # Psych raises a Psych::SyntaxError
-          rescue ArgumentError, Psych::SyntaxError, Gem::EndOfYAMLException, Gem::Exception
+          rescue ArgumentError, YamlSyntaxError, Gem::EndOfYAMLException, Gem::Exception
             eval_gemspec(path, contents)
           end
         else
