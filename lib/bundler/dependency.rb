@@ -17,6 +17,7 @@ module Bundler
       :mri_19   => Gem::Platform::RUBY,
       :rbx      => Gem::Platform::RUBY,
       :jruby    => Gem::Platform::JAVA,
+      :maglev   => Gem::Platform::RUBY,
       :mswin    => Gem::Platform::MSWIN,
       :mingw    => Gem::Platform::MINGW,
       :mingw_18 => Gem::Platform::MINGW,
