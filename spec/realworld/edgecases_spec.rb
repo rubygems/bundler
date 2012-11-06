@@ -41,7 +41,7 @@ describe "real world edgecases", :realworld => true do
     gemfile <<-G
       source :rubygems
 
-      gem 'rack', '1.0.0'
+      gem 'rack', '1.0.1'
     G
 
     bundle "install --path vendor/bundle", :expect_err => true
