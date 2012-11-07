@@ -24,6 +24,25 @@ describe "the lockfile format" do
     G
   end
 
+  it "does not add env sources to the lockfile" do
+    ENV['BUNDLE_ENV_SOURCES'] = "file://#{gem_repo1}"
+    install_gemfile <<-G
+      gem "rack"
+    G
+
+    lockfile_should_be <<-G
+      GEM
+        specs:
+          rack (1.0.0)
+
+      PLATFORMS
+        #{generic(Gem::Platform.local)}
+
+      DEPENDENCIES
+        rack
+    G
+  end
+
   it "generates a simple lockfile for a single source, gem with dependencies" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"

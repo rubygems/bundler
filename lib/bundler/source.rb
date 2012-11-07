@@ -229,7 +229,7 @@ module Bundler
           old     = Bundler.rubygems.sources
 
           sources = {}
-          all_remotes = remotes
+          all_remotes = remotes.dup
           if Bundler.settings[:env_sources]
             Bundler.settings[:env_sources].split(',').each { |uri|
               all_remotes << normalize_uri(uri)
