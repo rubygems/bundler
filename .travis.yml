@@ -27,18 +27,18 @@ matrix:
       env: RGV=v1.3.7
     - rvm: 1.9.3
       env: RGV=v1.4.2
-    - rvm: 2.0.0-preview1
-      env: RGV=v1.3.6
-    - rvm: 2.0.0-preview1
-      env: RGV=v1.3.7
-    - rvm: 2.0.0-preview1
-      env: RGV=v1.4.2
-    - rvm: 2.0.0-preview1
-      env: RGV=v1.5.3
-    - rvm: 2.0.0-preview1
-      env: RGV=v1.6.2
-    - rvm: 2.0.0-preview1
-      env: RGV=v1.7.2
+    # - rvm: 2.0.0-preview1
+    #   env: RGV=v1.3.6
+    # - rvm: 2.0.0-preview1
+    #   env: RGV=v1.3.7
+    # - rvm: 2.0.0-preview1
+    #   env: RGV=v1.4.2
+    # - rvm: 2.0.0-preview1
+    #   env: RGV=v1.5.3
+    # - rvm: 2.0.0-preview1
+    #   env: RGV=v1.6.2
+    # - rvm: 2.0.0-preview1
+    #   env: RGV=v1.7.2
 
 notifications:
   email:
@@ -50,6 +50,6 @@ rvm:
   - 1.8.7
   - 1.9.2
   - 1.9.3
-  - 2.0.0-preview1
+  # - 2.0.0-preview1
 
 script: rake spec:travis
