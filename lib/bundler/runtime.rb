@@ -74,7 +74,9 @@ module Bundler
               Kernel.require namespaced_file
             rescue LoadError
               REGEXPS.find { |r| r =~ e.message }
-              raise if dep.autorequire || $1.gsub('-', '/') != namespaced_file
+              regex_name = $1
+              raise if dep.autorequire || (regex_name && regex_name.gsub('-', '/') != namespaced_file)
+              raise e if regex_name.nil?
             end
           else
             REGEXPS.find { |r| r =~ e.message }
@@ -107,26 +109,9 @@ module Bundler
 
     def prune_cache
       FileUtils.mkdir_p(cache_path) unless File.exists?(cache_path)
-
       resolve = @definition.resolve
-      cached  = Dir["#{cache_path}/*.gem"]
-
-      cached = cached.delete_if do |path|
-        spec = Bundler.rubygems.spec_from_gem path
-
-        resolve.any? do |s|
-          s.name == spec.name && s.version == spec.version && !s.source.is_a?(Bundler::Source::Git)
-        end
-      end
-
-      if cached.any?
-        Bundler.ui.info "Removing outdated .gem files from vendor/cache"
-
-        cached.each do |path|
-          Bundler.ui.info "  * #{File.basename(path)}"
-          File.delete(path)
-        end
-      end
+      prune_gem_cache(resolve)
+      prune_git_and_path_cache(resolve)
     end
 
     def clean
@@ -137,12 +122,13 @@ module Bundler
       gem_files            = Dir["#{Gem.dir}/cache/*.gem"]
       gemspec_files        = Dir["#{Gem.dir}/specifications/*.gemspec"]
       spec_gem_paths       = []
+      # need to keep git sources around
       spec_git_paths       = []
       spec_git_cache_dirs  = []
       spec_gem_executables = []
       spec_cache_paths     = []
       spec_gemspec_paths   = []
-      specs.each do |spec|
+      @definition.all_specs.each do |spec|
         spec_gem_paths << spec.full_gem_path
         # need to check here in case gems are nested like for the rails git repo
         md = %r{(.+bundler/gems/.+-[a-f0-9]{7,12})}.match(spec.full_gem_path)
@@ -225,6 +211,50 @@ module Bundler
     end
 
   private
+
+    def prune_gem_cache(resolve)
+      cached  = Dir["#{cache_path}/*.gem"]
+
+      cached = cached.delete_if do |path|
+        spec = Bundler.rubygems.spec_from_gem path
+
+        resolve.any? do |s|
+          s.name == spec.name && s.version == spec.version && !s.source.is_a?(Bundler::Source::Git)
+        end
+      end
+
+      if cached.any?
+        Bundler.ui.info "Removing outdated .gem files from vendor/cache"
+
+        cached.each do |path|
+          Bundler.ui.info "  * #{File.basename(path)}"
+          File.delete(path)
+        end
+      end
+    end
+
+    def prune_git_and_path_cache(resolve)
+      cached  = Dir["#{cache_path}/*/.bundlecache"]
+
+      cached = cached.delete_if do |path|
+        name = File.basename(File.dirname(path))
+
+        resolve.any? do |s|
+          source = s.source
+          source.respond_to?(:app_cache_dirname) && source.app_cache_dirname == name
+        end
+      end
+
+      if cached.any?
+        Bundler.ui.info "Removing outdated .git/path repos from vendor/cache"
+
+        cached.each do |path|
+          path = File.dirname(path)
+          Bundler.ui.info "  * #{File.basename(path)}"
+          FileUtils.rm_rf(path)
+        end
+      end
+    end
 
     def cache_path
       root.join("vendor/cache")

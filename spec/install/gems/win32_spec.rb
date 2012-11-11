@@ -21,6 +21,6 @@ describe "bundle install with win32-generated lockfile" do
 
       gem "rack"
     G
-    @exitstatus.should == 0
+    expect(@exitstatus).to eq(0)
   end
 end

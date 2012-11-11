@@ -7,7 +7,7 @@ describe "real world edgecases", :realworld => true do
       source :rubygems
       gem "linecache", "0.46"
     G
-    err.should eq("")
+    expect(err).to eq("")
   end
 
   # https://github.com/carlhuda/bundler/issues/1202
@@ -18,7 +18,7 @@ describe "real world edgecases", :realworld => true do
       gem "will_paginate", "3.0.pre2"
     G
     bundle :cache
-    out.should_not include("Removing outdated .gem files from vendor/cache")
+    expect(out).not_to include("Removing outdated .gem files from vendor/cache")
   end
 
   # https://github.com/carlhuda/bundler/issues/1486
@@ -32,7 +32,7 @@ describe "real world edgecases", :realworld => true do
       gem 'activerecord', '~> 3.0'
       gem 'builder', '~> 2.1.2'
     G
-    out.should include("activemodel (3.0.5)")
+    expect(out).to include("activemodel (3.0.5)")
   end
 
   # https://github.com/carlhuda/bundler/issues/1500
@@ -41,12 +41,12 @@ describe "real world edgecases", :realworld => true do
     gemfile <<-G
       source :rubygems
 
-      gem 'rack', '1.0.0'
+      gem 'rack', '1.0.1'
     G
 
     bundle "install --path vendor/bundle", :expect_err => true
-    err.should_not include("Could not find rake")
-    err.should be_empty
+    expect(err).not_to include("Could not find rake")
+    expect(err).to be_empty
   end
 
   it "checks out git repos when the lockfile is corrupted" do
@@ -172,6 +172,6 @@ describe "real world edgecases", :realworld => true do
     L
 
     bundle :install, :exitstatus => true
-    exitstatus.should == 0
+    expect(exitstatus).to eq(0)
   end
 end

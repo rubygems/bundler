@@ -13,7 +13,7 @@ describe "bundle show" do
 
     bundle "show"
 
-    bundled_app("Gemfile.lock").should exist
+    expect(bundled_app("Gemfile.lock")).to exist
   end
 
   it "creates a Gemfile.lock when invoked with a gem name" do
@@ -21,28 +21,28 @@ describe "bundle show" do
 
     bundle "show rails"
 
-    bundled_app("Gemfile.lock").should exist
+    expect(bundled_app("Gemfile.lock")).to exist
   end
 
   it "prints path if gem exists in bundle" do
     bundle "show rails"
-    out.should == default_bundle_path('gems', 'rails-2.3.2').to_s
+    expect(out).to eq(default_bundle_path('gems', 'rails-2.3.2').to_s)
   end
 
   it "prints the path to the running bundler" do
     bundle "show bundler"
-    out.should == File.expand_path('../../../', __FILE__)
+    expect(out).to eq(File.expand_path('../../../', __FILE__))
   end
 
   it "complains if gem not in bundle" do
     bundle "show missing"
-    out.should =~ /could not find gem 'missing'/i
+    expect(out).to match(/could not find gem 'missing'/i)
   end
 
   it "prints path of all gems in bundle" do
     bundle "show --paths"
-    out.should include(default_bundle_path('gems', 'rake-0.8.7').to_s)
-    out.should include(default_bundle_path('gems', 'rails-2.3.2').to_s)
+    expect(out).to include(default_bundle_path('gems', 'rake-0.8.7').to_s)
+    expect(out).to include(default_bundle_path('gems', 'rails-2.3.2').to_s)
   end
 end
 
@@ -58,7 +58,7 @@ describe "bundle show with a git repo" do
     should_be_installed "foo 1.0"
 
     bundle :show
-    out.should include("foo (1.0 #{@git.ref_for('master', 6)}")
+    expect(out).to include("foo (1.0 #{@git.ref_for('master', 6)}")
   end
 
   it "prints out branch names other than master" do
@@ -73,7 +73,7 @@ describe "bundle show with a git repo" do
     should_be_installed "foo 1.0.omg"
 
     bundle :show
-    out.should include("foo (1.0 #{@git.ref_for('omg', 6)}")
+    expect(out).to include("foo (1.0 #{@git.ref_for('omg', 6)}")
   end
 
   it "doesn't print the branch when tied to a ref" do
@@ -83,6 +83,6 @@ describe "bundle show with a git repo" do
     G
 
     bundle :show
-    out.should include("foo (1.0 #{sha[0..6]})")
+    expect(out).to include("foo (1.0 #{sha[0..6]})")
   end
 end

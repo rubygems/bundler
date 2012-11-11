@@ -1,5 +1,6 @@
 require 'uri'
 require 'bundler/vendored_persistent'
+require 'openssl' if defined?(JRUBY_VERSION)
 
 module Bundler
   # Handles all the fetching with the rubygems server
@@ -143,9 +144,9 @@ module Bundler
       begin
         Bundler.ui.debug "Fetching from: #{uri}"
         response = @@connection.request(uri)
-      rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, EOFError,
-             SocketError, Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError,
-             Net::HTTP::Persistent::Error, Net::ProtocolError => e
+      rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, Errno::ETIMEDOUT,
+             EOFError, SocketError, Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError,
+             Errno::EAGAIN, Net::HTTP::Persistent::Error, Net::ProtocolError => e
         raise HTTPError, "Network error while fetching #{uri}"
       end
 

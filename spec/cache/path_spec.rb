@@ -10,7 +10,7 @@ require "spec_helper"
       G
 
       bundle "#{cmd} --all"
-      bundled_app("vendor/cache/foo-1.0").should_not exist
+      expect(bundled_app("vendor/cache/foo-1.0")).not_to exist
       should_be_installed "foo 1.0"
     end
 
@@ -22,7 +22,8 @@ require "spec_helper"
       G
 
       bundle "#{cmd} --all"
-      bundled_app("vendor/cache/foo-1.0").should exist
+      expect(bundled_app("vendor/cache/foo-1.0")).to exist
+      expect(bundled_app("vendor/cache/foo-1.0/.bundlecache")).to be_file
 
       FileUtils.rm_rf lib_path("foo-1.0")
       should_be_installed "foo 1.0"
@@ -43,11 +44,28 @@ require "spec_helper"
 
       bundle "#{cmd} --all"
 
-      bundled_app("vendor/cache/foo-1.0").should exist
+      expect(bundled_app("vendor/cache/foo-1.0")).to exist
       FileUtils.rm_rf lib_path("foo-1.0")
 
       run "require 'foo'"
-      out.should == "CACHE"
+      expect(out).to eq("CACHE")
+    end
+
+    it "removes stale entries cache" do
+      build_lib "foo"
+
+      install_gemfile <<-G
+        gem "foo", :path => '#{lib_path("foo-1.0")}'
+      G
+
+      bundle "#{cmd} --all"
+
+      install_gemfile <<-G
+        gem "bar", :path => '#{lib_path("bar-1.0")}'
+      G
+
+      bundle "#{cmd} --all"
+      expect(bundled_app("vendor/cache/bar-1.0")).not_to exist
     end
 
     it "raises a warning without --all" do
@@ -58,8 +76,8 @@ require "spec_helper"
       G
 
       bundle cmd
-      out.should =~ /please pass the \-\-all flag/
-      bundled_app("vendor/cache/foo-1.0").should_not exist
+      expect(out).to match(/please pass the \-\-all flag/)
+      expect(bundled_app("vendor/cache/foo-1.0")).not_to exist
     end
 
     it "stores the given flag" do
@@ -78,7 +96,7 @@ require "spec_helper"
       G
 
       bundle cmd
-      bundled_app("vendor/cache/bar-1.0").should exist
+      expect(bundled_app("vendor/cache/bar-1.0")).to exist
     end
 
     it "can rewind chosen configuration" do
@@ -97,7 +115,7 @@ require "spec_helper"
       G
 
       bundle "#{cmd} --no-all"
-      bundled_app("vendor/cache/baz-1.0").should_not exist
+      expect(bundled_app("vendor/cache/baz-1.0")).not_to exist
     end
   end
 end

@@ -32,7 +32,7 @@ describe "bundle update" do
       G
 
       bundle "update rails"
-      out.should include("Using activesupport (3.0) from #{lib_path('rails')} (at master)")
+      expect(out).to include("Using activesupport (3.0) from #{lib_path('rails')} (at master)")
       should_be_installed "rails 3.0", "activesupport 3.0"
     end
 
@@ -89,9 +89,9 @@ describe "bundle update" do
         gem "foo", "1.0", :git => "#{lib_path('foo_two')}"
       G
 
-      err.should be_empty
-      out.should include("Fetching #{lib_path}/foo_two")
-      out.should include("Your bundle is complete!")
+      expect(err).to be_empty
+      expect(out).to include("Fetching #{lib_path}/foo_two")
+      expect(out).to include("Your bundle is complete!")
     end
 
 
@@ -114,7 +114,7 @@ describe "bundle update" do
       G
 
       bundle "update", :exitstatus => true
-      exitstatus.should == 0
+      expect(exitstatus).to eq(0)
     end
 
     describe "with submodules" do
@@ -145,7 +145,7 @@ describe "bundle update" do
         G
 
         run "require 'submodule'"
-        out.should eq('GEM')
+        expect(out).to eq('GEM')
 
         install_gemfile <<-G
           git "#{lib_path('has_submodule-1.0')}", :submodules => true do
@@ -154,7 +154,7 @@ describe "bundle update" do
         G
 
         run "require 'submodule'"
-        out.should == 'GIT'
+        expect(out).to eq('GIT')
       end
 
       it "it unlocks the source when submodules is removed from git source" do
@@ -166,7 +166,7 @@ describe "bundle update" do
         G
 
         run "require 'submodule'"
-        out.should eq('GIT')
+        expect(out).to eq('GIT')
 
         install_gemfile <<-G
           git "#{lib_path('has_submodule-1.0')}" do
@@ -175,7 +175,7 @@ describe "bundle update" do
         G
 
         run "require 'submodule'"
-        out.should == 'GEM'
+        expect(out).to eq('GEM')
       end
     end
 
@@ -189,7 +189,7 @@ describe "bundle update" do
       lib_path("foo-1.0").join(".git").rmtree
 
       bundle :update, :expect_err => true
-      out.should include(lib_path("foo-1.0").to_s)
+      expect(out).to include(lib_path("foo-1.0").to_s)
     end
 
   end

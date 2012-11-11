@@ -35,8 +35,8 @@ module Spec
         version_const = name == 'bundler' ? 'Bundler::VERSION' : Spec::Builders.constantize(name)
         run "require '#{name}.rb'; puts #{version_const}", *groups
         actual_version, actual_platform = out.split(/\s+/)
-        Gem::Version.new(actual_version).should eq(Gem::Version.new(version))
-        actual_platform.should == platform
+        expect(Gem::Version.new(actual_version)).to eq(Gem::Version.new(version))
+        expect(actual_platform).to eq(platform)
       end
     end
 
@@ -56,22 +56,22 @@ module Spec
           end
         R
         if version.nil? || out == "WIN"
-          out.should == "WIN"
+          expect(out).to eq("WIN")
         else
-          Gem::Version.new(out).should_not == Gem::Version.new(version)
+          expect(Gem::Version.new(out)).not_to eq(Gem::Version.new(version))
         end
       end
     end
 
     def should_be_locked
-      bundled_app("Gemfile.lock").should exist
+      expect(bundled_app("Gemfile.lock")).to exist
     end
 
     def lockfile_should_be(expected)
       should_be_locked
       spaces = expected[/\A\s+/, 0] || ""
       expected.gsub!(/^#{spaces}/, '')
-      bundled_app("Gemfile.lock").read.should == expected
+      expect(bundled_app("Gemfile.lock").read).to eq(expected)
     end
   end
 end

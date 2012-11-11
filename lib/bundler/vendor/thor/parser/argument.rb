@@ -2,21 +2,24 @@ class Thor
   class Argument #:nodoc:
     VALID_TYPES = [ :numeric, :hash, :array, :string ]
 
-    attr_reader :name, :description, :required, :type, :default, :banner
+    attr_reader :name, :description, :enum, :required, :type, :default, :banner
     alias :human_name :name
 
-    def initialize(name, description=nil, required=true, type=:string, default=nil, banner=nil)
+    def initialize(name, options={})
       class_name = self.class.name.split("::").last
+
+      type = options[:type]
 
       raise ArgumentError, "#{class_name} name can't be nil."                         if name.nil?
       raise ArgumentError, "Type :#{type} is not valid for #{class_name.downcase}s."  if type && !valid_type?(type)
 
       @name        = name.to_s
-      @description = description
-      @required    = required || false
+      @description = options[:desc]
+      @required    = options.key?(:required) ? options[:required] : true
       @type        = (type || :string).to_sym
-      @default     = default
-      @banner      = banner || default_banner
+      @default     = options[:default]
+      @banner      = options[:banner] || default_banner
+      @enum        = options[:enum]
 
       validate! # Trigger specific validations
     end
@@ -41,7 +44,11 @@ class Thor
     protected
 
       def validate!
-        raise ArgumentError, "An argument cannot be required and have default value." if required? && !default.nil?
+        if required? && !default.nil?
+          raise ArgumentError, "An argument cannot be required and have default value."
+        elsif @enum && !@enum.is_a?(Array)
+          raise ArgumentError, "An argument cannot have an enum other than an array."
+        end
       end
 
       def valid_type?(type)

@@ -5,7 +5,8 @@ module Bundler
   class Definition
     include GemHelpers
 
-    attr_reader :dependencies, :platforms, :sources, :ruby_version
+    attr_reader :dependencies, :platforms, :sources, :ruby_version,
+      :locked_deps
 
     def self.build(gemfile, lockfile, unlock)
       unlock ||= {}
@@ -108,9 +109,9 @@ module Bundler
       specs
     end
 
-    def specs
+    def specs(deps = requested_dependencies)
       @specs ||= begin
-        specs = resolve.materialize(requested_dependencies)
+        specs = resolve.materialize(deps)
 
         unless specs["bundler"].any?
           local = Bundler.settings[:frozen] ? rubygems_index : index
@@ -128,6 +129,10 @@ module Bundler
 
     def removed_specs
       @locked_specs - specs
+    end
+
+    def all_specs
+      specs(dependencies)
     end
 
     def new_platform?
@@ -225,12 +230,12 @@ module Bundler
       return if @lockfile_contents == contents
 
       if Bundler.settings[:frozen]
-        # TODO: Warn here if we got here.
+        Bundler.ui.error "Cannot write a changed lockfile while frozen."
         return
       end
 
       File.open(file, 'wb'){|f| f.puts(contents) }
-    rescue Errno::EACCES => e
+    rescue Errno::EACCES
       raise Bundler::InstallError,
         "There was an error while trying to write to Gemfile.lock. It is likely that \n" \
         "you need to allow write permissions for the file at path: \n" \

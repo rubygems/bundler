@@ -7,18 +7,18 @@ describe Bundler::Source::Rubygems do
 
   describe "caches" do
     it "should include Bundler.app_cache" do
-      subject.caches.should include(Bundler.app_cache)
+      expect(subject.caches).to include(Bundler.app_cache)
     end
 
     it "should include GEM_PATH entries" do
       Gem.path.each do |path|
-        subject.caches.should include(File.expand_path("#{path}/cache"))
+        expect(subject.caches).to include(File.expand_path("#{path}/cache"))
       end
     end
 
     it "should be an array of strings or pathnames" do
       subject.caches.each do |cache|
-        [String, Pathname].should include(cache.class)
+        expect([String, Pathname]).to include(cache.class)
       end
     end
   end

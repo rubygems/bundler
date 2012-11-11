@@ -15,7 +15,7 @@ describe "bundle console" do
       input.puts("puts RACK")
       input.puts("exit")
     end
-    out.should include("0.9.1")
+    expect(out).to include("0.9.1")
   end
 
   it "doesn't load any other groups" do
@@ -23,7 +23,7 @@ describe "bundle console" do
       input.puts("puts ACTIVESUPPORT")
       input.puts("exit")
     end
-    out.should include("NameError")
+    expect(out).to include("NameError")
   end
 
   describe "when given a group" do
@@ -32,7 +32,7 @@ describe "bundle console" do
         input.puts("puts ACTIVESUPPORT")
         input.puts("exit")
       end
-      out.should include("2.3.5")
+      expect(out).to include("2.3.5")
     end
 
     it "loads the default group" do
@@ -40,7 +40,7 @@ describe "bundle console" do
         input.puts("puts RACK")
         input.puts("exit")
       end
-      out.should include("0.9.1")
+      expect(out).to include("0.9.1")
     end
 
     it "doesn't load other groups" do
@@ -48,7 +48,7 @@ describe "bundle console" do
         input.puts("puts RACK_MIDDLEWARE")
         input.puts("exit")
       end
-      out.should include("NameError")
+      expect(out).to include("NameError")
     end
   end
 end

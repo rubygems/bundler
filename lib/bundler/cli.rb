@@ -1,6 +1,7 @@
 require 'bundler/vendored_thor'
 require 'rubygems/user_interaction'
 require 'rubygems/config_file'
+require 'bundler/similarity_detector'
 
 module Bundler
   class CLI < Thor
@@ -8,7 +9,7 @@ module Bundler
 
     def initialize(*)
       super
-      the_shell = (options["no-color"] ? Thor::Shell::Basic.new : shell)
+      the_shell = (options["no-color"] || (not STDOUT.tty?) ? Thor::Shell::Basic.new : shell)
       Bundler.ui = UI::Shell.new(the_shell)
       Bundler.ui.debug! if options["verbose"]
       Bundler.rubygems.ui = UI::RGProxy.new(Bundler.ui)
@@ -34,6 +35,7 @@ module Bundler
           bundle-install
           bundle-package
           bundle-update
+          bundle-platform
           gemfile.5)
 
       if manpages.include?(command)
@@ -94,6 +96,8 @@ module Bundler
       "Use the specified gemfile instead of Gemfile"
     method_option "path", :type => :string, :banner =>
       "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
+    method_option "dry-run", :type => :boolean, :default => false, :banner =>
+      "Lock the Gemfile"
     def check
       ENV['BUNDLE_GEMFILE'] = File.expand_path(options[:gemfile]) if options[:gemfile]
 
@@ -117,7 +121,7 @@ module Bundler
         Bundler.ui.error "This bundle has been frozen, but there is no Gemfile.lock present"
         exit 1
       else
-        Bundler.load.lock
+        Bundler.load.lock unless options[:"dry-run"]
         Bundler.ui.info "The Gemfile's dependencies are satisfied"
       end
     end
@@ -275,6 +279,8 @@ module Bundler
         # We're doing a full update
         Bundler.definition(true)
       else
+        # cycle through the requested gems, just to make sure they exist
+        gems.each{ |n| gem_dependency_with_name(n) }
         Bundler.definition(:gems => gems, :sources => sources)
       end
 
@@ -659,12 +665,34 @@ module Bundler
       Bundler.ui.info output.join("\n\n")
     end
 
+    desc "add GEM VERSION ...", "Add the named gem(s), with version requirements, to the resolved Gemfile"
+    def inject(name, version, *gems)
+      # The required arguments allow Thor to give useful feedback when the arguments
+      # are incorrect. This adds those first two arguments onto the list as a whole.
+      gems.unshift(version).unshift(name)
+
+      # Build an array of Dependency objects out of the arguments
+      deps = []
+      gems.each_slice(2) do |name, version|
+        deps << Bundler::Dependency.new(name, version)
+      end
+
+      added = Injector.inject(deps)
+
+      if added.any?
+        Bundler.ui.confirm "Added to Gemfile:"
+        Bundler.ui.confirm added.map{ |g| "  #{g}" }.join("\n")
+      else
+        Bundler.ui.confirm "All injected gems were already present in the Gemfile"
+      end
+    end
+
   private
 
     def setup_cache_all
-      if options.key?("all")
-        Bundler.settings[:cache_all] = options[:all] || nil
-      elsif Bundler.definition.sources.any? { |s| !s.is_a?(Source::Rubygems) }
+      Bundler.settings[:cache_all] = options[:all] if options.key?("all")
+
+      if Bundler.definition.sources.any? { |s| !s.is_a?(Source::Rubygems) } && !Bundler.settings[:cache_all]
         Bundler.ui.warn "Your Gemfile contains path and git dependencies. If you want "    \
           "to package them as well, please pass the --all flag. This will be the default " \
           "on Bundler 2.0."
@@ -677,11 +705,28 @@ module Bundler
 
     def locate_gem(name)
       spec = Bundler.load.specs.find{|s| s.name == name }
-      raise GemNotFound, "Could not find gem '#{name}' in the current bundle." unless spec
+      raise GemNotFound, not_found_message(name, Bundler.load.specs) unless spec
       if spec.name == 'bundler'
         return File.expand_path('../../../', __FILE__)
       end
       spec.full_gem_path
+    end
+
+    def gem_dependency_with_name(name)
+      dep = Bundler.load.dependencies.find{|d| d.name == name }
+      raise GemNotFound, not_found_message(name, Bundler.load.dependencies) unless dep
+      dep
+    end
+
+    def not_found_message(missing_gem_name, alternatives)
+      message = "Could not find gem '#{missing_gem_name}'."
+
+      # This is called as the result of a GemNotFound, let's see if
+      # there's any similarly named ones we can propose instead
+      alternate_names = alternatives.map{|a| a.name}
+      suggestions = SimilarityDetector.new(alternate_names).similar_word_list(missing_gem_name)
+      message += "\nDid you mean #{suggestions}?" if suggestions
+      message
     end
 
   end

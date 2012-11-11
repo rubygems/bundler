@@ -44,7 +44,7 @@ describe "bundle install with gem sources" do
       end
 
       bundle :install
-      err.should be_empty
+      expect(err).to be_empty
       should_be_installed "rack 1.0"
     end
 
@@ -65,7 +65,7 @@ describe "bundle install with gem sources" do
           gem "platform_specific"
         G
         run "require 'platform_specific' ; puts PLATFORM_SPECIFIC"
-        out.should == "1.0.0 RUBY"
+        expect(out).to eq("1.0.0 RUBY")
       end
     end
 
@@ -75,10 +75,10 @@ describe "bundle install with gem sources" do
         gem "rack"
       G
       bundled_app("vendor/cache").mkpath
-      bundled_app("vendor/cache").children.should be_empty
+      expect(bundled_app("vendor/cache").children).to be_empty
 
       bundle "install --no-cache"
-      bundled_app("vendor/cache").children.should be_empty
+      expect(bundled_app("vendor/cache").children).to be_empty
     end
   end
 end

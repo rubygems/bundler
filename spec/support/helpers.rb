@@ -148,7 +148,7 @@ module Spec
       str  = args.shift || ""
       path.dirname.mkpath
       File.open(path.to_s, 'w') do |f|
-        f.puts str
+        f.puts strip_whitespace(str)
       end
     end
 
@@ -156,13 +156,8 @@ module Spec
       path = bundled_app("Gemfile.lock")
       path = args.shift if Pathname === args.first
       str  = args.shift || ""
-
-      # Trim the leading spaces
-      spaces = str[/\A\s+/, 0] || ""
-      str.gsub!(/^#{spaces}/, '')
-
       File.open(path.to_s, 'w') do |f|
-        f.puts str
+        f.puts strip_whitespace(str)
       end
     end
 

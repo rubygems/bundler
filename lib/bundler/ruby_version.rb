@@ -17,6 +17,8 @@ module Bundler
 
       @version        = version
       @engine         = engine || "ruby"
+      # keep track of the engine specified by the user
+      @input_engine   = engine
       @engine_version = engine_version || version
     end
 
@@ -40,11 +42,11 @@ module Bundler
     #   2. ruby_version
     #   3. engine_version
     def diff(other)
-      if engine != other.engine
+      if engine != other.engine && @input_engine
         [ :engine, engine, other.engine ]
       elsif version != other.version
         [ :version, version, other.version ]
-      elsif engine_version != other.engine_version
+      elsif engine_version != other.engine_version && @input_engine
         [ :engine_version, engine_version, other.engine_version ]
       else
         nil

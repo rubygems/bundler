@@ -11,12 +11,12 @@ describe 'bundle install with gem sources' do
       G
 
       bundle :install
-      out.should include("Post-install message from rack:")
-      out.should include("Rack's post install message")
-      out.should include("Post-install message from thin:")
-      out.should include("Thin's post install message")
-      out.should include("Post-install message from rack-obama:")
-      out.should include("Rack-obama's post install message")
+      expect(out).to include("Post-install message from rack:")
+      expect(out).to include("Rack's post install message")
+      expect(out).to include("Post-install message from thin:")
+      expect(out).to include("Thin's post install message")
+      expect(out).to include("Post-install message from rack-obama:")
+      expect(out).to include("Rack-obama's post install message")
     end
   end
 
@@ -28,7 +28,7 @@ describe 'bundle install with gem sources' do
       G
 
       bundle :install
-      out.should_not include("Post-install message")
+      expect(out).not_to include("Post-install message")
     end
   end
 
@@ -40,8 +40,8 @@ describe 'bundle install with gem sources' do
       G
 
       bundle :install
-      out.should include("Post-install message from rack:")
-      out.should include("Rack's post install message")
+      expect(out).to include("Post-install message from rack:")
+      expect(out).to include("Rack's post install message")
     end
   end
 end

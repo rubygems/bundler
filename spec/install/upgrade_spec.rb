@@ -13,14 +13,14 @@ describe "bundle install for the first time with v1.0" do
   it "removes lockfiles in 0.9 YAML format" do
     File.open("Gemfile.lock", "w"){|f| YAML.dump({}, f) }
     bundle :install
-    File.read("Gemfile.lock").should_not =~ /^---/
+    expect(File.read("Gemfile.lock")).not_to match(/^---/)
   end
 
   it "removes env.rb if it exists" do
     bundled_app.join(".bundle").mkdir
     bundled_app.join(".bundle/environment.rb").open("w"){|f| f.write("raise 'nooo'") }
     bundle :install
-    bundled_app.join(".bundle/environment.rb").should_not exist
+    expect(bundled_app.join(".bundle/environment.rb")).not_to exist
   end
 
 end

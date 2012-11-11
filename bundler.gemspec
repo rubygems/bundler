@@ -8,6 +8,7 @@ Gem::Specification.new do |s|
   s.name        = "bundler"
   s.version     = Bundler::VERSION
   s.platform    = Gem::Platform::RUBY
+  s.license     = "MIT"
   s.authors     = ["André Arko", "Terence Lee", "Carl Lerche", "Yehuda Katz"]
   s.email       = ["andre@arko.net"]
   s.homepage    = "http://gembundler.com"
@@ -19,7 +20,7 @@ Gem::Specification.new do |s|
   s.rubyforge_project         = "bundler"
 
   s.add_development_dependency "ronn"
-  s.add_development_dependency "rspec", "~> 2.0"
+  s.add_development_dependency "rspec", "~> 2.11"
 
   # Man files are required because they are ignored by git
   man_files            = Dir.glob("lib/bundler/man/**/*")

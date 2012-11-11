@@ -6,11 +6,6 @@ module Bundler
       builder = new
       builder.eval_gemfile(gemfile)
       builder.to_definition(lockfile, unlock)
-    rescue ScriptError, RegexpError, NameError, ArgumentError => e
-      e.backtrace[0] = "#{e.backtrace[0]}: #{e.message} (#{e.class})"
-      Bundler.ui.info e.backtrace.join("\n       ")
-      raise GemfileError, "There was an error in your Gemfile," \
-        " and Bundler cannot continue."
     end
 
     VALID_PLATFORMS = Bundler::Dependency::PLATFORM_MAP.keys.freeze
@@ -28,11 +23,17 @@ module Bundler
       @ruby_version    = nil
     end
 
-    def eval_gemfile(gemfile)
-      instance_eval(Bundler.read_file(gemfile.to_s), gemfile.to_s, 1)
+    def eval_gemfile(gemfile, contents = nil)
+      contents ||= Bundler.read_file(gemfile.to_s)
+      instance_eval(contents, gemfile.to_s, 1)
     rescue SyntaxError => e
       bt = e.message.split("\n")[1..-1]
       raise GemfileError, ["Gemfile syntax error:", *bt].join("\n")
+    rescue ScriptError, RegexpError, NameError, ArgumentError => e
+      e.backtrace[0] = "#{e.backtrace[0]}: #{e.message} (#{e.class})"
+      Bundler.ui.warn e.backtrace.join("\n       ")
+      raise GemfileError, "There was an error in your Gemfile," \
+        " and Bundler cannot continue."
     end
 
     def gemspec(opts = nil)
@@ -79,9 +80,9 @@ module Bundler
           elsif dep.type == :development
             return
           else
-            raise DslError, "You cannot specify the same gem twice with different version requirements. " \
+            raise DslError, "You cannot specify the same gem twice with different version requirements. \n" \
                             "You specified: #{current.name} (#{current.requirement}) and " \
-                            "#{dep.name} (#{dep.requirement})"
+                            "#{dep.name} (#{dep.requirement})\n"
           end
         end
 
@@ -91,9 +92,9 @@ module Bundler
           elsif dep.type == :development
             return
           else
-            raise DslError, "You cannot specify the same gem twice coming from different sources. You " \
-                            "specified that #{dep.name} (#{dep.requirement}) should come from " \
-                            "#{current.source || 'an unspecified source'} and #{dep.source}"
+            raise DslError, "You cannot specify the same gem twice coming from different sources.\n" \
+                            "You specified that #{dep.name} (#{dep.requirement}) should come from " \
+                            "#{current.source || 'an unspecified source'} and #{dep.source}\n"
           end
         end
       end
@@ -230,7 +231,7 @@ module Bundler
       end
 
       if github = opts.delete("github")
-        github = "#{github}/#{github}" unless github.include?("/")
+        github = "#{github}/#{name}" unless github.include?("/")
         opts["git"] = "git://github.com/#{github}.git"
       end
 
