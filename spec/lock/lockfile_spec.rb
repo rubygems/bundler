@@ -830,6 +830,6 @@ describe "the lockfile format" do
       gem "rack"
     G
 
-    error.should == "Gemfile.lock contains merge conflicts. Please check out a valid Gemfile.lock and try again."
+    expect(error).to eq "Gemfile.lock contains merge conflicts. Please check out a valid Gemfile.lock and try again."
   end
 end
