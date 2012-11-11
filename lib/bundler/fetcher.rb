@@ -1,5 +1,6 @@
 require 'uri'
 require 'bundler/vendored_persistent'
+require 'openssl' if defined?(JRUBY_VERSION)
 
 module Bundler
   # Handles all the fetching with the rubygems server
