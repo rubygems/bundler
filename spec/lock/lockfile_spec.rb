@@ -808,16 +808,28 @@ describe "the lockfile format" do
   end
 
   it "refuses to install if Gemfile.lock contains conflict markers" do
-    lambda { Bundler::LockfileParser.new "<<<<<<<" }.
-        should raise_error Bundler::LockfileError
+    lockfile <<-L
+      GEM
+        remote: file://#{gem_repo1}/
+        specs:
+<<<<<<<
+          rack (1.0.0)
+=======
+          rack (1.0.1)
+>>>>>>>
 
-    lambda { Bundler::LockfileParser.new ">>>>>>>" }.
-        should raise_error Bundler::LockfileError
+      PLATFORMS
+        ruby
 
-    lambda { Bundler::LockfileParser.new "=======" }.
-        should raise_error Bundler::LockfileError
+      DEPENDENCIES
+        rack
+    L
 
-    lambda { Bundler::LockfileParser.new "|||||||" }.
-        should raise_error Bundler::LockfileError
+    error = install_gemfile(<<-G, :expect_err => true)
+      source "file://#{gem_repo1}"
+      gem "rack"
+    G
+
+    error.should == "Gemfile.lock contains merge conflicts. Please check out a valid Gemfile.lock and try again."
   end
 end
