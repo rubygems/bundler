@@ -15,7 +15,7 @@ module Bundler
     rescue Exception => e
       Bundler.ui.error(
         "Unfortunately, a fatal error has occurred. Please see the Bundler \n" \
-        "troubleshooting documentation at http://bit.ly/bundler-issues. Thanks! \n")
+        "troubleshooting documentation at http://bit.ly/bundler-issues. Thanks! #{e.inspect} #{e.backtrace.join("\n")}\n")
       raise e
     end
   end
