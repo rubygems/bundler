@@ -229,7 +229,14 @@ module Bundler
           old     = Bundler.rubygems.sources
 
           sources = {}
-          remotes.each do |uri|
+          all_remotes = remotes.dup
+          if Bundler.settings[:env_sources]
+            Bundler.settings[:env_sources].split(',').each { |uri|
+              all_remotes << normalize_uri(uri)
+            }
+          end
+
+          all_remotes.each do |uri|
             fetcher          = Bundler::Fetcher.new(uri)
             specs            = fetcher.specs(dependency_names, self)
             sources[fetcher] = specs.size

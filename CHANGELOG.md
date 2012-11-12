@@ -1,3 +1,9 @@
+## 1.3.0.pre
+
+Features:
+
+  - add `config env_sources` (@brettporter, #2140)
+
 ## 1.2.0 (Aug 30, 2012)
 
 Bugfixes:

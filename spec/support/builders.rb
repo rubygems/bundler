@@ -236,6 +236,10 @@ module Spec
         end
 
         build_gem "foo"
+
+        build_gem "private_gem", "1.0" do |s|
+          s.executables = "dodgy"
+        end
       end
     end
 
@@ -256,6 +260,10 @@ module Spec
       update_repo gem_repo2 do
         build_gem "rack", "1.2" do |s|
           s.executables = "rackup"
+        end
+
+        build_gem "private_gem", "1.0" do |s|
+          s.executables = "private-app"
         end
         yield if block_given?
       end
