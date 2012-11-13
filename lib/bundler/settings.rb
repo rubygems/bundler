@@ -111,6 +111,7 @@ module Bundler
         hash[key] = value
         hash.delete(key) if value.nil?
         FileUtils.mkdir_p(file.dirname)
+        require 'bundler/psyched_yaml'
         File.open(file, "w") { |f| f.puts hash.to_yaml }
       end
       value
@@ -127,9 +128,10 @@ module Bundler
 
     def load_config(config_file)
       if config_file.exist? && !config_file.size.zero?
-        yaml = YAML.load_file(config_file)
+        Hash[config_file.read.scan(/^(BUNDLE_.+): '?(.+?)'?$/)]
+      else
+        {}
       end
-      yaml || {}
     end
 
   end
