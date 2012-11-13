@@ -1,10 +1,5 @@
 module Bundler
   class RubygemsIntegration
-    def initialize
-      # Work around a RubyGems bug
-      configuration
-    end
-
     def loaded_specs(name)
       Gem.loaded_specs[name]
     end
