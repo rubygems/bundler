@@ -101,7 +101,10 @@ module Bundler
     end
 
     def spec_from_gem(path)
+      require 'rubygems/format'
       Gem::Format.from_file_by_path(path).spec
+    rescue Gem::Package::FormatError
+      raise Bundler::GemspecError, "Could not read gem at #{path}. It may be corrupted."
     end
 
     def download_gem(spec, uri, path)
