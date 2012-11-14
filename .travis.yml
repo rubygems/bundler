@@ -27,15 +27,15 @@ matrix:
       env: RGV=v1.3.6
     - rvm: 1.9.3
       env: RGV=v1.3.7
-    - rvm: 2.0.0
+    - rvm: ruby-2.0.0-preview1
       env: RGV=v1.4.2
-    - rvm: 2.0.0
+    - rvm: ruby-2.0.0-preview1
       env: RGV=v1.3.6
-    - rvm: 2.0.0
+    - rvm: ruby-2.0.0-preview1
       env: RGV=v1.3.7
-    - rvm: 2.0.0
+    - rvm: ruby-2.0.0-preview1
       env: RGV=v1.4.2
-    - rvm: 2.0.0
+    - rvm: ruby-2.0.0-preview1
       env: RGV=v1.5.3
     - rvm: 2.0.0
       env: RGV=v1.6.2
@@ -52,6 +52,6 @@ rvm:
   - 1.8.7
   - 1.9.2
   - 1.9.3
-  - 2.0.0
+  - ruby-2.0.0-preview1
 
 script: rake spec:travis
