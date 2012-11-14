@@ -9,7 +9,7 @@ env:
   - RGV=v1.5.3
   - RGV=v1.6.2
   - RGV=v1.7.2
-  - RGV=v1.8.10
+  - RGV=v1.8.24
 
 language: ruby
 
@@ -25,8 +25,20 @@ matrix:
       env: RGV=v1.3.6
     - rvm: 1.9.3
       env: RGV=v1.3.7
-    - rvm: 1.9.3
+    - rvm: 2.0.0
       env: RGV=v1.4.2
+    - rvm: 2.0.0
+      env: RGV=v1.3.6
+    - rvm: 2.0.0
+      env: RGV=v1.3.7
+    - rvm: 2.0.0
+      env: RGV=v1.4.2
+    - rvm: 2.0.0
+      env: RGV=v1.5.3
+    - rvm: 2.0.0
+      env: RGV=v1.6.2
+    - rvm: 2.0.0
+      env: RGV=v1.7.2
 
 notifications:
   email:
@@ -38,5 +50,6 @@ rvm:
   - 1.8.7
   - 1.9.2
   - 1.9.3
+  - 2.0.0
 
 script: rake spec:travis
