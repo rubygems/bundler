@@ -1,3 +1,9 @@
+## 1.2.2 (Nov 14, 2012)
+
+Bugfixes:
+
+  - support new Psych::SyntaxError for Ruby 2.0.0 (@tenderlove, @sol)
+
 ## 1.2.1 (Sep 19, 2012)
 
 Bugfixes:
