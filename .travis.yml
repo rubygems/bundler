@@ -2,6 +2,8 @@ before_script:
   - sudo apt-get install groff -y
   - rake spec:deps
 
+# Rubygems versions MUST be available as rake tasks
+# see Rakefile:66 for the list of possible RGV values
 env:
   - RGV=v1.3.6
   - RGV=v1.3.7
