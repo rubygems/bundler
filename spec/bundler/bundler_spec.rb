@@ -3,7 +3,7 @@ require 'bundler'
 
 describe Bundler do
   describe "#load_gemspec_uncached" do
-    fit "should catch Psych syntax errors" do
+    it "should catch Psych syntax errors" do
       gemspec = <<-GEMSPEC
 {:!00 ao=gu\g1= 7~f
 GEMSPEC
