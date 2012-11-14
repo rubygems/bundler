@@ -14,6 +14,9 @@ end
 # Psych might NOT EXIST AT ALL
 require 'yaml'
 
+# if the file is not valid YAML:
+# * Syck raises ArgumentError
+# * Psych raises Psych::SyntaxError
 begin
   YamlSyntaxError = Psych::SyntaxError
 rescue NameError
