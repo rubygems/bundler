@@ -16,5 +16,9 @@ module Bundler
   # On encountering invalid YAML,
   # Psych raises Psych::SyntaxError
   # Syck raises ArgumentError
-  YamlSyntaxError = defined?(Psych) ? Psych::SyntaxError : ArgumentError
+  if defined?(::Psych::SyntaxError)
+    YamlSyntaxError = ::Psych::SyntaxError
+  else
+    YamlSyntaxError = ::ArgumentError
+  end
 end
