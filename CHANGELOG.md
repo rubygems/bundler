@@ -3,6 +3,8 @@
 Bugfixes:
 
   - support new Psych::SyntaxError for Ruby 2.0.0 (@tenderlove, @sol)
+  - `bundle viz` works with git gems again (@hirochachacha)
+  - recognize more cases when OpenSSL is not present
 
 ## 1.2.1 (Sep 19, 2012)
 
