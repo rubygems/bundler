@@ -1,16 +1,19 @@
+# Psych could be a gem, so try to ask for it
 begin
-  # Psych could be a gem, so set up the load path
-  gem 'psych' if defined?(gem)
+  gem 'psych'
+rescue LoadError
+end if defined?(gem)
 
-  # Psych could just be in the stdlib
-  # but it's too late if Syck is already loaded
+# Psych could just be in the stdlib
+# but it's too late if Syck is already loaded
+begin
   require 'psych' unless defined?(Syck)
 rescue LoadError
-  # apparently Psych wasn't available. Oh well.
-ensure
-  # at least load the YAML stdlib, whatever that may be
-  require 'yaml'
+  # Apparently Psych wasn't available. Oh well.
 end
+
+# At least load the YAML stdlib, whatever that may be
+require 'yaml'
 
 module Bundler
   # On encountering invalid YAML,
