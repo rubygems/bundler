@@ -3,7 +3,7 @@ module Bundler
 
     class Path
       autoload :Installer, 'bundler/source/path/installer'
-      
+
       attr_reader   :path, :options
       attr_writer   :name
       attr_accessor :version
