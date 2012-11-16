@@ -100,6 +100,29 @@ describe "bundle clean" do
     expect(vendored_gems("bin/rackup")).to exist
   end
 
+  it "remove gems in bundle without groups" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "foo"
+
+      group :test_group do
+        gem "rack", "1.0.0"
+      end
+    G
+
+    bundle "install --path vendor/bundle"
+    bundle "install --without test_group"
+    bundle :clean
+
+    out.should eq("Removing rack (1.0.0)")
+
+    should_have_gems 'foo-1.0'
+    should_not_have_gems 'rack-1.0.0'
+
+    vendored_gems("bin/rackup").should_not exist
+  end
+
   it "does not remove cached git dir if it's being used" do
     build_git "foo"
     revision = revision_for(lib_path("foo-1.0"))
@@ -232,6 +255,23 @@ describe "bundle clean" do
     expect(vendored_gems("bundler/gems/foo-#{revision[0..11]}")).to exist
     digest = Digest::SHA1.hexdigest(git_path.to_s)
     expect(vendored_gems("cache/bundler/git/foo-#{digest}")).to exist
+  end
+
+  it "does not blow up when using without groups" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "rack"
+
+      group :development do
+        gem "foo"
+      end
+    G
+
+    bundle "install --path vendor/bundle --without development"
+
+    bundle :clean, :exitstatus => true
+    exitstatus.should == 0
   end
 
   it "displays an error when used without --path" do

@@ -31,7 +31,7 @@ module Bundler
       specs, then we can try to resolve locally.
 =end
 
-    def initialize(lockfile, dependencies, sources, unlock, ruby_version = "")
+    def initialize(lockfile, dependencies, sources, unlock, ruby_version = nil)
       @unlocking = unlock == true || !unlock.empty?
 
       @dependencies, @sources, @unlock = dependencies, sources, unlock
@@ -109,9 +109,9 @@ module Bundler
       specs
     end
 
-    def specs(deps = requested_dependencies)
+    def specs
       @specs ||= begin
-        specs = resolve.materialize(deps)
+        specs = resolve.materialize(requested_dependencies)
 
         unless specs["bundler"].any?
           local = Bundler.settings[:frozen] ? rubygems_index : index
@@ -129,10 +129,6 @@ module Bundler
 
     def removed_specs
       @locked_specs - specs
-    end
-
-    def all_specs
-      specs(dependencies)
     end
 
     def new_platform?

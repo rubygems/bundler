@@ -6,6 +6,8 @@ module Bundler
   # Handles all the fetching with the rubygems server
   class Fetcher
     REDIRECT_LIMIT = 5
+    # how long to wait for each gemcutter API call
+    API_TIMEOUT    = 10
 
     attr_reader :has_api
 
@@ -45,6 +47,7 @@ module Bundler
       @remote_uri = remote_uri
       @has_api    = true # will be set to false if the rubygems index is ever fetched
       @@connection ||= Net::HTTP::Persistent.new nil, :ENV
+      @@connection.read_timeout = API_TIMEOUT
     end
 
     # fetch a gem specification
@@ -105,16 +108,6 @@ module Bundler
       end
 
       index
-    rescue LoadError => e
-      if e.message.include?("cannot load such file -- openssl")
-        raise InstallError,
-          "\nCould not load OpenSSL." \
-          "\nYou must recompile Ruby with OpenSSL support or change the sources in your" \
-          "\nGemfile from 'https' to 'http'. Instructions for compiling with OpenSSL" \
-          "\nusing RVM are available at rvm.io/packages/openssl."
-      else
-        raise e
-      end
     end
 
     # fetch index
@@ -143,6 +136,7 @@ module Bundler
 
       begin
         Bundler.ui.debug "Fetching from: #{uri}"
+        response = nil
         response = @@connection.request(uri)
       rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, Errno::ETIMEDOUT,
              EOFError, SocketError, Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError,

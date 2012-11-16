@@ -11,13 +11,14 @@ module Spec
 
       unless File.exist?("#{Path.base_system_gems}")
         FileUtils.mkdir_p(Path.base_system_gems)
-        puts "fetching fakeweb, artifice, sinatra, rake, and builder for the tests to use..."
+        puts "fetching fakeweb, artifice, sinatra, rake, rack, and builder for the tests to use..."
         `gem install fakeweb artifice --no-rdoc --no-ri`
         `gem install sinatra --version 1.2.7 --no-rdoc --no-ri`
         # Rake version has to be consistent for tests to pass
         `gem install rake --version 0.8.7 --no-rdoc --no-ri`
         # 3.0.0 breaks 1.9.2 specs
         `gem install builder --version 2.1.2 --no-rdoc --no-ri`
+        `gem install rack --no-rdoc --no-ri`
       end
 
       ENV['HOME'] = Path.home.to_s

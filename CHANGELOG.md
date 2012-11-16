@@ -1,3 +1,18 @@
+## 1.2.2 (Nov 14, 2012)
+
+Bugfixes:
+
+  - support new Psych::SyntaxError for Ruby 2.0.0 (@tenderlove, @sol)
+  - `bundle viz` works with git gems again (@hirochachacha)
+  - recognize more cases when OpenSSL is not present
+
+## 1.2.1 (Sep 19, 2012)
+
+Bugfixes:
+
+  - `bundle clean` now works with BUNDLE_WITHOUT groups again
+  - have a net/http read timeout around the Gemcutter API Endpoint
+
 ## 1.2.0 (Aug 30, 2012)
 
 Bugfixes:

@@ -2,6 +2,8 @@ before_script:
   - sudo apt-get install groff -y
   - rake spec:deps
 
+# Rubygems versions MUST be available as rake tasks
+# see Rakefile:66 for the list of possible RGV values
 env:
   - RGV=v1.3.6
   - RGV=v1.3.7
@@ -15,30 +17,33 @@ language: ruby
 
 matrix:
   exclude:
-    - rvm: 1.9.2
+    # 2.0.0-preview1 shipped with Rubygems 1.8.24, so start there.
+    - rvm: 2.0.0-preview1
       env: RGV=v1.3.6
-    - rvm: 1.9.2
+    - rvm: 2.0.0-preview1
       env: RGV=v1.3.7
-    - rvm: 1.9.2
+    - rvm: 2.0.0-preview1
       env: RGV=v1.4.2
-    - rvm: 1.9.3
-      env: RGV=v1.3.6
-    - rvm: 1.9.3
-      env: RGV=v1.3.7
-    - rvm: 1.9.3
-      env: RGV=v1.4.2
-    - rvm: 2.0.0
-      env: RGV=v1.3.6
-    - rvm: 2.0.0
-      env: RGV=v1.3.7
-    - rvm: 2.0.0
-      env: RGV=v1.4.2
-    - rvm: 2.0.0
+    - rvm: 2.0.0-preview1
       env: RGV=v1.5.3
-    - rvm: 2.0.0
+    - rvm: 2.0.0-preview1
       env: RGV=v1.6.2
-    - rvm: 2.0.0
+    - rvm: 2.0.0-preview1
       env: RGV=v1.7.2
+    # 1.9.3 shipped with Rubygems 1.3.7.1, and 1.4 was 1.8-only
+    - rvm: 1.9.3
+      env: RGV=v1.3.6
+    - rvm: 1.9.3
+      env: RGV=v1.3.7
+    - rvm: 1.9.3
+      env: RGV=v1.4.2
+    # 1.9.2 shipped with Rubygems 1.3.7, and 1.4 was 1.8-only
+    - rvm: 1.9.2
+      env: RGV=v1.3.6
+    - rvm: 1.9.2
+      env: RGV=v1.3.7
+    - rvm: 1.9.2
+      env: RGV=v1.4.2
 
 notifications:
   email:

@@ -158,6 +158,19 @@ G
 
       expect(exitstatus).not_to eq(0)
     end
+
+    it "should print if no ruby version is specified" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+
+        gem "foo"
+      G
+
+      bundle "platform --ruby"
+      puts err
+
+      out.should eq("No ruby version specified")
+    end
   end
 
   let(:ruby_version_correct) { "ruby \"#{RUBY_VERSION}\", :engine => \"#{local_ruby_engine}\", :engine_version => \"#{local_engine_version}\"" }
