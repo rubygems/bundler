@@ -169,7 +169,7 @@ G
       bundle "platform --ruby"
       puts err
 
-      out.should eq("No ruby version specified")
+      expect(out).to eq("No ruby version specified")
     end
   end
 

@@ -115,12 +115,12 @@ describe "bundle clean" do
     bundle "install --without test_group"
     bundle :clean
 
-    out.should eq("Removing rack (1.0.0)")
+    expect(out).to eq("Removing rack (1.0.0)")
 
     should_have_gems 'foo-1.0'
     should_not_have_gems 'rack-1.0.0'
 
-    vendored_gems("bin/rackup").should_not exist
+    expect(vendored_gems("bin/rackup")).to_not exist
   end
 
   it "does not remove cached git dir if it's being used" do
@@ -271,7 +271,7 @@ describe "bundle clean" do
     bundle "install --path vendor/bundle --without development"
 
     bundle :clean, :exitstatus => true
-    exitstatus.should == 0
+    expect(exitstatus).to eq(0)
   end
 
   it "displays an error when used without --path" do

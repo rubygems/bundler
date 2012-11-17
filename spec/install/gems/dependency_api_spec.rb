@@ -197,7 +197,7 @@ describe "gemcutter's dependency API" do
       G
 
       bundle :install
-      out.should include("\nFetching full source index from #{server_uri}")
+      expect(out).to include("\nFetching full source index from #{server_uri}")
       should_be_installed "rack 1.0.0"
     end
   end

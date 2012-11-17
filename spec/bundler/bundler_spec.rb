@@ -11,9 +11,9 @@ GEMSPEC
         file.puts gemspec
       end
 
-      proc {
+      expect(proc {
         Bundler.load_gemspec_uncached(tmp("test.gemspec"))
-      }.should raise_error(Bundler::GemspecError)
+      }).to raise_error(Bundler::GemspecError)
     end
   end
 end
