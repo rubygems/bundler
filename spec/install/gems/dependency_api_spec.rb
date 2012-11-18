@@ -165,7 +165,7 @@ describe "gemcutter's dependency API" do
       ENV['GEM_HOME'] = Spec::Path.base_system_gems.to_s
       require 'rack'
       ENV['GEM_HOME'] = old_gem_home
-      
+
       port = 21453
       port += 1 while TCPSocket.new("127.0.0.1", port) rescue false
       @server_uri = "http://127.0.0.1:#{port}"
@@ -195,7 +195,7 @@ describe "gemcutter's dependency API" do
       gemfile <<-G
         source "#{@server_uri}"
         gem "rack"
-        
+
         old_v, $VERBOSE = $VERBOSE, nil
         Bundler::Fetcher::API_TIMEOUT = 1
         $VERBOSE = old_v
