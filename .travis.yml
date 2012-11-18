@@ -14,7 +14,8 @@ notifications:
     channels:
       - "irc.freenode.org#bundler"
 rvm:
-  - 2.0.0
+  # disabled until Bundler builds on the Rails workers
+  # - 2.0.0
   - 1.9.3
   - 1.9.2
   - 1.8.7
