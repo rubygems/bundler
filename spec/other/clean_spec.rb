@@ -254,7 +254,7 @@ describe "bundle clean" do
     expect(out).to eq("")
     expect(vendored_gems("bundler/gems/foo-#{revision[0..11]}")).to exist
     digest = Digest::SHA1.hexdigest(git_path.to_s)
-    expect(vendored_gems("cache/bundler/git/foo-#{digest}")).to exist
+    expect(vendored_gems("cache/bundler/git/foo-#{digest}")).to_not exist
   end
 
   it "does not blow up when using without groups" do

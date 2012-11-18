@@ -136,7 +136,6 @@ module Bundler
 
       begin
         Bundler.ui.debug "Fetching from: #{uri}"
-        response = nil
         response = @@connection.request(uri)
       rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, Errno::ETIMEDOUT,
              EOFError, SocketError, Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError,
