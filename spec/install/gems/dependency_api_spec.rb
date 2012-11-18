@@ -159,15 +159,16 @@ describe "gemcutter's dependency API" do
   end
 
   context "when Gemcutter API takes too long to respond" do
-    let(:port)       { 2000 }
-    let(:server_uri) { "http://localhost:2000" }
-
     before do
       # need to hack, so we can require rack
       old_gem_home = ENV['GEM_HOME']
       ENV['GEM_HOME'] = Spec::Path.base_system_gems.to_s
       require 'rack'
       ENV['GEM_HOME'] = old_gem_home
+      
+      port = 21453
+      port += 1 while TCPSocket.new("127.0.0.1", port) rescue false
+      @server_uri = "http://127.0.0.1:#{port}"
 
       require File.expand_path('../../../support/artifice/endpoint_timeout', __FILE__)
       require 'thread'
@@ -192,12 +193,16 @@ describe "gemcutter's dependency API" do
 
     it "times out and falls back on the modern index" do
       gemfile <<-G
-        source "#{server_uri}"
+        source "#{@server_uri}"
         gem "rack"
+        
+        old_v, $VERBOSE = $VERBOSE, nil
+        Bundler::Fetcher::API_TIMEOUT = 1
+        $VERBOSE = old_v
       G
 
       bundle :install
-      out.should include("\nFetching full source index from #{server_uri}")
+      expect(out).to include("\nFetching full source index from #{@server_uri}")
       should_be_installed "rack 1.0.0"
     end
   end
