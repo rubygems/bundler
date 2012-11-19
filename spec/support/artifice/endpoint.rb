@@ -15,8 +15,7 @@ class Endpoint < Sinatra::Base
   helpers do
     def dependencies_for(gem_names, marshal = gem_repo1("Marshal.4.8"))
       require 'rubygems'
-      require 'bundler/rubygems_integration'
-      Bundler::RubygemsIntegration::Deprecate.skip_during do
+      Bundler::Deprecate.skip_during do
         Marshal.load(File.open(marshal).read).map do |gem, spec|
           if gem_names.include?(spec.name)
             {

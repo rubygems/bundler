@@ -13,6 +13,7 @@ module Bundler
   autoload :Definition,            'bundler/definition'
   autoload :Dependency,            'bundler/dependency'
   autoload :DepProxy,              'bundler/dep_proxy'
+  autoload :Deprecate,             'bundler/deprecate'
   autoload :Dsl,                   'bundler/dsl'
   autoload :EndpointSpecification, 'bundler/endpoint_specification'
   autoload :Environment,           'bundler/environment'

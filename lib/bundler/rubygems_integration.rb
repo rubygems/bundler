@@ -159,16 +159,6 @@ module Bundler
       end
     end
 
-    if defined? ::Deprecate
-      Deprecate = ::Deprecate
-    elsif defined? Gem::Deprecate
-      Deprecate = Gem::Deprecate
-    else
-      class Deprecate
-        def skip_during; yield; end
-      end
-    end
-
     def stub_source_index137(specs)
       # Rubygems versions lower than 1.7 use SourceIndex#from_gems_in
       source_index_class = (class << Gem::SourceIndex ; self ; end)
