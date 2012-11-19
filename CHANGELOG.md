@@ -1,3 +1,9 @@
+## next
+
+Bugfixes:
+
+  - Do not swallow --verbose on `bundle exec` (#2102)
+
 ## 1.2.2 (Nov 14, 2012)
 
 Bugfixes:
