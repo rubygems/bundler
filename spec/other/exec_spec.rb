@@ -151,7 +151,7 @@ describe "bundle exec" do
     G
 
     bundle "exec", :exitstatus => true
-    # exitstatus.should eq(128)
+    expect(exitstatus).to eq(128)
     expect(out).to include("bundler: exec needs a command to run")
   end
 
@@ -169,7 +169,6 @@ describe "bundle exec" do
       end
 
       it "works when locked" do
-        bundle "lock"
         should_be_locked
         bundle "exec 'cd #{tmp('gems')} && rackup'"
         expect(out).to eq("1.0.0")
@@ -193,7 +192,6 @@ describe "bundle exec" do
       end
 
       it "works when locked" do
-        bundle "lock"
         should_be_locked
 
         bundle "exec fizz"
@@ -218,7 +216,6 @@ describe "bundle exec" do
       end
 
       it "works when locked" do
-        bundle "lock"
         should_be_locked
         bundle "exec fizz_git"
         expect(out).to eq("1.0")
@@ -242,7 +239,6 @@ describe "bundle exec" do
       end
 
       it "works when locked" do
-        bundle "lock"
         should_be_locked
         bundle "exec fizz_no_gemspec"
         expect(out).to eq("1.0")
