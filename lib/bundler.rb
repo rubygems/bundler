@@ -296,7 +296,7 @@ module Bundler
             Gem::Specification.from_yaml(contents)
             # Raises ArgumentError if the file is not valid YAML (on syck)
             # Psych raises a Psych::SyntaxError
-          rescue YamlSyntaxError, Gem::EndOfYAMLException, Gem::Exception
+          rescue YamlSyntaxError, ArgumentError, Gem::EndOfYAMLException, Gem::Exception
             eval_gemspec(path, contents)
           end
         else
