@@ -39,6 +39,30 @@ describe "bundle exec" do
     expect(out).to eq("exec")
   end
 
+  it "accepts --verbose" do
+    install_gemfile 'gem "rack"'
+    bundle "exec --verbose echo foobar"
+    expect(out).to eq("foobar")
+  end
+
+  it "passes --verbose to command if it is given after the command" do
+    install_gemfile 'gem "rack"'
+    bundle "exec echo --verbose"
+    expect(out).to eq("--verbose")
+  end
+
+  it "can run a command named --verbose" do
+    install_gemfile 'gem "rack"'
+    File.open("--verbose", 'w') do |f|
+      f.puts "#!/bin/sh"
+      f.puts "echo foobar"
+    end
+    File.chmod(0744, "--verbose")
+    ENV['PATH'] = "."
+    bundle "exec -- --verbose"
+    expect(out).to eq("foobar")
+  end
+
   it "handles different versions in different bundles" do
     build_repo2 do
       build_gem "rack_two", "1.0.0" do |s|

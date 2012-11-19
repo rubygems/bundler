@@ -17,6 +17,8 @@ module Bundler
 
     check_unknown_options!(:except => [:config, :exec])
 
+    stop_on_unknown_option! :exec
+
     default_task :install
     class_option "no-color", :type => :boolean, :banner => "Disable colorization in output"
     class_option "verbose",  :type => :boolean, :banner => "Enable verbose output mode", :aliases => "-V"

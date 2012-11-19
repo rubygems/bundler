@@ -1,3 +1,4 @@
+require 'set'
 require 'thor/base'
 
 class Thor
@@ -210,7 +211,7 @@ class Thor
 
       define_method(subcommand) do |*args|
         args, opts = Thor::Arguments.split(args)
-        invoke subcommand_class, args, opts
+        invoke subcommand_class, args, opts, :invoked_via_subcommand => true
       end
     end
 
@@ -251,15 +252,83 @@ class Thor
       end
     end
 
+    # Stop parsing of options as soon as an unknown option or a regular
+    # argument is encountered.  All remaining arguments are passed to the task.
+    # This is useful if you have a task that can receive arbitrary additional
+    # options, and where those additional options should not be handled by
+    # Thor.
+    #
+    # ==== Example
+    #
+    # To better understand how this is useful, let's consider a task that calls
+    # an external command.  A user may want to pass arbitrary options and
+    # arguments to that command.  The task itself also accepts some options,
+    # which should be handled by Thor.
+    #
+    #   class_option "verbose",  :type => :boolean
+    #   stop_on_unknown_option! :exec
+    #   check_unknown_options!  :except => :exec
+    #
+    #   desc "exec", "Run a shell command"
+    #   def exec(*args)
+    #     puts "diagnostic output" if options[:verbose]
+    #     Kernel.exec(*args)
+    #   end
+    #
+    # Here +exec+ can be called with +--verbose+ to get diagnostic output,
+    # e.g.:
+    #
+    #   $ thor exec --verbose echo foo
+    #   diagnostic output
+    #   foo
+    #
+    # But if +--verbose+ is given after +echo+, it is passed to +echo+ instead:
+    #
+    #   $ thor exec echo --verbose foo
+    #   --verbose foo
+    #
+    # ==== Parameters
+    # Symbol ...:: A list of tasks that should be affected.
+    def stop_on_unknown_option!(*task_names)
+      @stop_on_unknown_option ||= Set.new
+      @stop_on_unknown_option.merge(task_names)
+    end
+
+    def stop_on_unknown_option?(task) #:nodoc:
+      !!@stop_on_unknown_option && @stop_on_unknown_option.include?(task.name.to_sym)
+    end
+
     protected
 
       # The method responsible for dispatching given the args.
       def dispatch(meth, given_args, given_opts, config) #:nodoc:
-        meth ||= retrieve_task_name(given_args)
-        task = all_tasks[normalize_task_name(meth)]
+        # There is an edge case when dispatching from a subcommand.
+        # A problem occurs invoking the default task. This case occurs
+        # when arguments are passed and a default task is defined, and
+        # the first given_args does not match the default task.
+        # Thor use "help" by default so we skip that case.
+        # Note the call to retrieve_task_name. It's called with
+        # given_args.dup since that method calls args.shift. Then lookup
+        # the task normally. If the first item in given_args is not
+        # a task then use the default task. The given_args will be
+        # intact later since dup was used.
+        if config[:invoked_via_subcommand] && given_args.size >= 1 && default_task != "help" && given_args.first != default_task
+          meth ||= retrieve_task_name(given_args.dup)
+          task = all_tasks[normalize_task_name(meth)]
+          task ||= all_tasks[normalize_task_name(default_task)]
+        else
+          meth ||= retrieve_task_name(given_args)
+          task = all_tasks[normalize_task_name(meth)]
+        end
 
         if task
           args, opts = Thor::Options.split(given_args)
+          if stop_on_unknown_option?(task) && !args.empty?
+            # given_args starts with a non-option, so we treat everything as
+            # ordinary arguments
+            args.concat opts
+            opts.clear
+          end
         else
           args, opts = given_args, nil
           task = Thor::DynamicTask.new(meth)
