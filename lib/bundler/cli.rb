@@ -13,7 +13,7 @@ module Bundler
     rescue UnknownArgumentError => e
       raise InvalidOption, e.message
     ensure
-      Bundler.ui = UI::Shell.new("shell" => shell, "no-color" => options["no-color"])
+      Bundler.ui = UI::Shell.new(options)
       Bundler.ui.debug! if options["verbose"]
     end
 

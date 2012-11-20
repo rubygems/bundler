@@ -24,12 +24,11 @@ module Bundler
     class Shell < UI
       attr_writer :shell
 
-      def initialize(options)
+      def initialize(options = {})
         if options["no-color"] || !STDOUT.tty?
-          @shell = Thor::Shell::Basic.new
-        else
-          @shell = options["shell"]
+          Thor::Base.shell = Thor::Shell::Basic
         end
+        @shell = Thor::Base.shell.new
         @quiet = false
         @debug = ENV['DEBUG']
       end
