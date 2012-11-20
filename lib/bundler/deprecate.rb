@@ -6,7 +6,7 @@ module Bundler
     Deprecate = Gem::Deprecate
   end
 
-  unless defined?(Deprecate) && Deprecate.respond_to?(:skip_during)
+  if !defined?(Deprecate) || !Deprecate.respond_to?(:skip_during)
     class Deprecate
       def skip_during; yield; end
     end
