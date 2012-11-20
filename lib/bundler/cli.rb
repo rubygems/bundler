@@ -9,10 +9,12 @@ module Bundler
 
     def initialize(*)
       super
-      the_shell = (options["no-color"] || (not STDOUT.tty?) ? Thor::Shell::Basic.new : shell)
-      Bundler.ui = UI::Shell.new(the_shell)
-      Bundler.ui.debug! if options["verbose"]
       Bundler.rubygems.ui = UI::RGProxy.new(Bundler.ui)
+    rescue UnknownArgumentError => e
+      raise InvalidOption, e.message
+    ensure
+      Bundler.ui = UI::Shell.new("shell" => shell, "no-color" => options["no-color"])
+      Bundler.ui.debug! if options["verbose"]
     end
 
     check_unknown_options!(:except => [:config, :exec])
