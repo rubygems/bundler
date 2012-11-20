@@ -72,9 +72,7 @@ module Bundler
     def release_gem
       guard_clean
       built_gem_path = build_gem
-      unless guard_already_tagged
-        tag_version { git_push }
-      end
+      tag_version { git_push } unless already_tagged?
       rubygem_push(built_gem_path)
     end
 
@@ -104,9 +102,9 @@ module Bundler
       raise "Couldn't git push. `#{cmd}' failed with the following output:\n\n#{out}\n" unless code == 0
     end
 
-    def guard_already_tagged
+    def already_tagged?
       if sh('git tag').split(/\n/).include?(version_tag)
-        Bundler.ui.confirm "This tag has already been committed to the repo."
+        Bundler.ui.confirm "Tag #{version_tag} has already been created."
         true
       end
     end
