@@ -47,7 +47,7 @@ describe "Bundler::GemHelper tasks" do
     end
 
     def mock_build_message
-      mock_confirm_message "test 0.0.1 built to pkg/test-0.0.1.gem"
+      mock_confirm_message "test 0.0.1 built to pkg/test-0.0.1.gem."
     end
 
     before(:each) do
@@ -109,7 +109,7 @@ describe "Bundler::GemHelper tasks" do
     describe 'install' do
       it "installs" do
         mock_build_message
-        mock_confirm_message "test (0.0.1) installed"
+        mock_confirm_message "test (0.0.1) installed."
         @helper.install_gem
         expect(bundled_app('test/pkg/test-0.0.1.gem')).to exist
         expect(%x{gem list}).to include("test (0.0.1)")
@@ -151,7 +151,7 @@ describe "Bundler::GemHelper tasks" do
       it "releases" do
         mock_build_message
         mock_confirm_message(/Tagged v0.0.1/)
-        mock_confirm_message("Pushed git commits and tags")
+        mock_confirm_message("Pushed git commits and tags.")
 
         @helper.should_receive(:rubygem_push).with(bundled_app('test/pkg/test-0.0.1.gem').to_s)
 
@@ -172,7 +172,7 @@ describe "Bundler::GemHelper tasks" do
 
       it "releases even if tag already exists" do
         mock_build_message
-        mock_confirm_message("This tag has already been committed to the repo.")
+        mock_confirm_message("Tag v0.0.1 has already been created.")
 
         @helper.should_receive(:rubygem_push).with(bundled_app('test/pkg/test-0.0.1.gem').to_s)
 

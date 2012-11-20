@@ -33,12 +33,12 @@ module Bundler
     end
 
     def install
-      desc "Build #{name}-#{version}.gem into the pkg directory"
+      desc "Build #{name}-#{version}.gem into the pkg directory."
       task 'build' do
         build_gem
       end
 
-      desc "Build and install #{name}-#{version}.gem into system gems"
+      desc "Build and install #{name}-#{version}.gem into system gems."
       task 'install' do
         install_gem
       end
@@ -57,7 +57,7 @@ module Bundler
         file_name = File.basename(built_gem_path)
         FileUtils.mkdir_p(File.join(base, 'pkg'))
         FileUtils.mv(built_gem_path, 'pkg')
-        Bundler.ui.confirm "#{name} #{version} built to pkg/#{file_name}"
+        Bundler.ui.confirm "#{name} #{version} built to pkg/#{file_name}."
       }
       File.join(base, 'pkg', file_name)
     end
@@ -66,7 +66,7 @@ module Bundler
       built_gem_path = build_gem
       out, _ = sh_with_code("gem install '#{built_gem_path}'")
       raise "Couldn't install gem, run `gem install #{built_gem_path}' for more detailed output" unless out[/Successfully installed/]
-      Bundler.ui.confirm "#{name} (#{version}) installed"
+      Bundler.ui.confirm "#{name} (#{version}) installed."
     end
 
     def release_gem
@@ -80,7 +80,7 @@ module Bundler
     def rubygem_push(path)
       if Pathname.new("~/.gem/credentials").expand_path.exist?
         sh("gem push '#{path}'")
-        Bundler.ui.confirm "Pushed #{name} #{version} to rubygems.org"
+        Bundler.ui.confirm "Pushed #{name} #{version} to rubygems.org."
       else
         raise "Your rubygems.org credentials aren't set. Run `gem push` to set them."
       end
@@ -93,7 +93,7 @@ module Bundler
     def git_push
       perform_git_push
       perform_git_push ' --tags'
-      Bundler.ui.confirm "Pushed git commits and tags"
+      Bundler.ui.confirm "Pushed git commits and tags."
     end
 
     def perform_git_push(options = '')
@@ -119,10 +119,10 @@ module Bundler
 
     def tag_version
       sh "git tag -a -m \"Version #{version}\" #{version_tag}"
-      Bundler.ui.confirm "Tagged #{version_tag}"
+      Bundler.ui.confirm "Tagged #{version_tag}."
       yield if block_given?
     rescue
-      Bundler.ui.error "Untagged #{version_tag} due to error"
+      Bundler.ui.error "Untagging #{version_tag} due to error."
       sh_with_code "git tag -d #{version_tag}"
       raise
     end
