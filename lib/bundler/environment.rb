@@ -14,11 +14,6 @@ module Bundler
       @definition.to_lock.inspect
     end
 
-    # TODO: Remove this method. It's used in cli.rb still
-    def index
-      @definition.index
-    end
-
     def requested_specs
       @definition.requested_specs
     end
