@@ -169,6 +169,23 @@ describe "Bundler::GemHelper tasks" do
         }
         @helper.release_gem
       end
+
+      it "releases even if tag already exists" do
+        mock_build_message
+        mock_confirm_message("This tag has already been committed to the repo.")
+
+        @helper.should_receive(:rubygem_push).with(bundled_app('test/pkg/test-0.0.1.gem').to_s)
+
+        Dir.chdir(gem_repo1) {
+          `git init --bare`
+        }
+        Dir.chdir(@app) {
+         `git commit -a -m "another commit"`
+         `git tag -a -m \"Version 0.0.1\" v0.0.1`
+        }
+        @helper.release_gem
+      end
+
     end
   end
 end
