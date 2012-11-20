@@ -162,29 +162,6 @@ begin
     end
   end
 
-  begin
-    require 'ci/reporter/rake/rspec'
-
-    namespace :ci do
-      desc "Run specs with Hudson output"
-      RSpec::Core::RakeTask.new(:spec)
-      task :spec => ["ci:setup:rspec", "man:build"]
-    end
-
-  rescue LoadError
-    namespace :ci do
-      task :spec do
-        abort "Run `rake ci:deps` to be able to run the CI specs"
-      end
-
-      desc "Install CI dependencies"
-      task :deps do
-        sh "#{Gem.ruby} -S gem list ci_reporter | (grep 'ci_reporter' 1> /dev/null) || #{Gem.ruby} -S gem install ci_reporter --no-ri --no-rdoc"
-      end
-      task :deps => "spec:deps"
-    end
-  end
-
 rescue LoadError
   task :spec do
     abort "Run `rake spec:deps` to be able to run the specs"
