@@ -7,7 +7,6 @@ notifications:
   email:
     - mail@arko.net
     - hone02@gmail.com
-    - sferik@gmail.com
   irc:
     on_success: change
     on_failure: always
