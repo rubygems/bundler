@@ -43,6 +43,9 @@ We divide `bundle` subcommands into primary commands and utilities.
 * [bundle config(1)][bundle-config]:
   Specify and read configuration options for bundler
 
+* `bundle help(1)`:
+  Displays this help page
+
 ## UTILITIES
 
 * `bundle check(1)`:
