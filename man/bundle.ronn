@@ -76,7 +76,7 @@ We divide `bundle` subcommands into primary commands and utilities.
 * `bundle gem(1)`:
   Create a simple gem, suitable for development with bundler
 
-* `bundle platform(1)`:
+* [bundle platform(1)][bundle-platform]:
   Displays platform compatibility information
 
 ## OBSOLETE
