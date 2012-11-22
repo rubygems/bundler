@@ -839,23 +839,23 @@ describe "Bundler.setup" do
     end
   end
 
-  context "when using Syck as YAML::Engine" do
+  context "when using Syck as YAML::Engine", :ruby => "1.9" do
     it "should try to eval gemspec after YAML load throws ArgumentError" do
       orig_yamler = YAML::ENGINE.yamler
       YAML::ENGINE.yamler = 'syck'
 
       spec_file = tmp.join('temp_gemspec_to_be_loaded_with_yaml_syck')
       File.open(spec_file, 'w') do |file|
-        file << <<-S
---- # -*- encoding: utf-8 -*-
-spec = Gem::Specification.new do |s|
-  s.name = 'test'
-  s.summary     = %q{TODO: Write a gem summary}
-  s.description = %q{TODO: Write a gem description}
-  s.add_dependency 'rack', '= 1.0.1'
-  s.add_development_dependency 'rspec', '1.2'
-end
-      S
+        file << strip_whitespace(<<-S)
+          --- # -*- encoding: utf-8 -*-
+          spec = Gem::Specification.new do |s|
+            s.name = 'test'
+            s.summary     = %q{TODO: Write a gem summary}
+            s.description = %q{TODO: Write a gem description}
+            s.add_dependency 'rack', '= 1.0.1'
+            s.add_development_dependency 'rspec', '1.2'
+          end
+        S
       end
 
       # <ArgumentError: syntax error on line 4, col 26: `  s.description = %q{TODO: Write a gem description}'>
@@ -868,23 +868,23 @@ end
     end
   end
 
-  context "when using Psych as YAML::Engine" do
+  context "when using Psych as YAML::Engine", :ruby => "1.9" do
     it "should try to eval gemspec after YAML load throws Psych::SyntaxError" do
       orig_yamler = YAML::ENGINE.yamler
       YAML::ENGINE.yamler = 'psych'
 
       spec_file = tmp.join('temp_gemspec_to_be_loaded_with_yaml_psych')
       File.open(spec_file, 'w') do |file|
-        file << <<-S
---- # -*- encoding: utf-8 -*-
-Gem::Specification.new do |s|
-  s.name = 'test'
-  s.summary     = "TODO: Write a gem summary"
-  s.description = "TODO: Write a gem description"
-  s.add_dependency 'rack', '= 1.0.1'
-  s.add_development_dependency 'rspec', '1.2'
-end
-      S
+        file << strip_whitespace(<<-S)
+          --- # -*- encoding: utf-8 -*-
+          Gem::Specification.new do |s|
+            s.name = 'test'
+            s.summary     = "TODO: Write a gem summary"
+            s.description = "TODO: Write a gem description"
+            s.add_dependency 'rack', '= 1.0.1'
+            s.add_development_dependency 'rspec', '1.2'
+          end
+        S
       end
 
       # <Psych::SyntaxError: couldn't parse YAML at line 4 column 23>
