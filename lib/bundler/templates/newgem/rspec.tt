@@ -1,4 +1,2 @@
-# ./.rspec
---format nested
+--format specdoc
 --color
---require spec_helper
