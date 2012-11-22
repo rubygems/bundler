@@ -1,6 +1,15 @@
 require "spec_helper"
 
 describe "gemcutter's dependency API", :realworld => true do
+  def wait_for_server(port, seconds = 15)
+    tries = 0
+    TCPSocket.new("127.0.0.1", port)
+  rescue => e
+    raise(e) if tries > (seconds * 2)
+    tries += 1
+    sleep 0.5
+    retry
+  end
 
   context "when Gemcutter API takes too long to respond" do
     before do
@@ -26,9 +35,7 @@ describe "gemcutter's dependency API", :realworld => true do
       }
       @t.run
 
-      # ensure server is started
-      require 'timeout'
-      Timeout.timeout(15) { sleep(0.1) until @t.status == "sleep" }
+      wait_for_server(port)
     end
 
     after do
