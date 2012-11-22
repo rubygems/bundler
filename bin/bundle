@@ -1,4 +1,9 @@
 #!/usr/bin/env ruby
+if ARGV[0..1] == ["exec", "ruby"]
+  # stop execution early, to not load bundler/setup twice, to not parse the gemfile/dependencies twice
+  exec "ruby", "-rbundler/setup", *ARGV[2..-1] # execution ends here
+end
+
 require 'bundler'
 # Check if an older version of bundler is installed
 $:.each do |path|
