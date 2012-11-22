@@ -590,6 +590,7 @@ module Bundler
 
     desc "gem GEM", "Creates a skeleton for creating a rubygem"
     method_option :bin, :type => :boolean, :default => false, :aliases => '-b', :banner => "Generate a binary for your library."
+    method_option :test, :type => :string, :default => nil, :alias => '-t', :banner => "Generate test directory for your library."
     def gem(name)
       name = name.chomp("/") # remove trailing slash if present
       target = File.join(Dir.pwd, name)
@@ -616,6 +617,12 @@ module Bundler
       template(File.join("newgem/lib/newgem/version.rb.tt"), File.join(target, "lib/#{name}/version.rb"), opts)
       if options[:bin]
         template(File.join("newgem/bin/newgem.tt"),          File.join(target, 'bin', name),              opts)
+      end
+      case options[:test]
+      when 'rspec'
+        template(File.join("newgem/rspec.tt"),               File.join(target, ".rspec"),                 opts)
+        template(File.join("newgem/spec/spec_helper.rb.tt"), File.join(target, "spec/spec_helper.rb"),    opts)
+        template(File.join("newgem/spec/newgem_spec.rb.tt"), File.join(target, "spec/#{name}_spec.rb"),   opts)
       end
       Bundler.ui.info "Initializating git repo in #{target}"
       Dir.chdir(target) { `git init`; `git add .` }
