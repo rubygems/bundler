@@ -1,3 +1,8 @@
+# Please do not submit patches for including directives to ignore IDE/editor
+# generated files. Use a global gitignore as described in
+# https://help.github.com/articles/ignoring-files and find useful gitignore
+# samples at https://github.com/github/gitignore
+
 # system crap
 .DS_Store
 .*.swp
@@ -17,6 +22,3 @@ lib/bundler/man
 
 # output from ci_reporter
 spec/reports
-
-# Netbeans
-nbproject
