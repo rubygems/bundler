@@ -98,11 +98,11 @@ RAKEFILE
     end
 
     it "builds bin skeleton" do
-      bundled_app("test-gem/bin/test-gem").should exist
+      expect(bundled_app("test-gem/bin/test-gem")).to exist
     end
 
     it "requires 'test-gem'" do
-      bundled_app("test-gem/bin/test-gem").read.should =~ /require 'test-gem'/      
+      expect(bundled_app("test-gem/bin/test-gem").read).to match(/require 'test-gem'/)
     end
   end
 
@@ -114,17 +114,17 @@ RAKEFILE
     end
 
     it "builds spec skeleton" do
-      bundled_app("test-gem/.rspec").should exist
-      bundled_app("test-gem/spec/test-gem_spec.rb").should exist
-      bundled_app("test-gem/spec/spec_helper.rb").should exist
+      expect(bundled_app("test-gem/.rspec")).to exist
+      expect(bundled_app("test-gem/spec/test-gem_spec.rb")).to exist
+      expect(bundled_app("test-gem/spec/spec_helper.rb")).to exist
     end
 
     it "requires 'test-gem'" do
-      bundled_app("test-gem/spec/spec_helper.rb").read.should =~ /require_relative '..\/lib\/test-gem'/
+      expect(bundled_app("test-gem/spec/spec_helper.rb").read).to match(/require_relative '..\/lib\/test-gem'/)
     end
 
     it "creates a default test which fails" do
-      bundled_app("test-gem/spec/test-gem_spec.rb").read.should =~ /false.should be_true/
+      expect(bundled_app("test-gem/spec/test-gem_spec.rb").read).to match(/false.should be_true/)
     end
   end
 end
