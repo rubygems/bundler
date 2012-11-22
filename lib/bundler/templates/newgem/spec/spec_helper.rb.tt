@@ -1,1 +1,2 @@
-require_relative '../lib/<%= config[:name] %>'
+$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+require '<%= config[:name] %>'

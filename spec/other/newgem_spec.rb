@@ -120,7 +120,7 @@ RAKEFILE
     end
 
     it "requires 'test-gem'" do
-      expect(bundled_app("test-gem/spec/spec_helper.rb").read).to match(/require_relative '..\/lib\/test-gem'/)
+      expect(bundled_app("test-gem/spec/spec_helper.rb").read).to match(/require 'test-gem'/)
     end
 
     it "creates a default test which fails" do
