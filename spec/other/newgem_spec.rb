@@ -127,4 +127,29 @@ RAKEFILE
       expect(bundled_app("test-gem/spec/test-gem_spec.rb").read).to match(/false.should be_true/)
     end
   end
+  
+  context "--test parameter set to minitest" do
+    before :each do
+      reset!
+      in_app_root
+      bundle "gem test-gem --test=minitest"
+    end
+
+    it "builds spec skeleton" do
+      expect(bundled_app("test-gem/test/test_test-gem.rb")).to exist
+      expect(bundled_app("test-gem/test/minitest_helper.rb")).to exist
+    end
+
+    it "requires 'test-gem'" do
+      expect(bundled_app("test-gem/test/minitest_helper.rb").read).to match(/require 'test-gem'/)
+    end
+
+    it "requires 'minitest_helper'" do
+      expect(bundled_app("test-gem/test/test_test-gem.rb").read).to match(/require '.\/minitest_helper'/)
+    end
+
+    it "creates a default test which fails" do
+      expect(bundled_app("test-gem/test/test_test-gem.rb").read).to match(/assert false/)
+    end
+  end
 end

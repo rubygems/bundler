@@ -623,6 +623,9 @@ module Bundler
         template(File.join("newgem/rspec.tt"),               File.join(target, ".rspec"),                 opts)
         template(File.join("newgem/spec/spec_helper.rb.tt"), File.join(target, "spec/spec_helper.rb"),    opts)
         template(File.join("newgem/spec/newgem_spec.rb.tt"), File.join(target, "spec/#{name}_spec.rb"),   opts)
+      when 'minitest'
+        template(File.join("newgem/test/minitest_helper.rb.tt"), File.join(target, "test/minitest_helper.rb"), opts)
+        template(File.join("newgem/test/test_newgem.rb.tt"),     File.join(target, "test/test_#{name}.rb"),    opts)
       end
       Bundler.ui.info "Initializating git repo in #{target}"
       Dir.chdir(target) { `git init`; `git add .` }
