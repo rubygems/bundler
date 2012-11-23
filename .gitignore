@@ -8,17 +8,18 @@
 .*.swp
 
 # files created by running the specs
-tmp
+tmp/
 
 # built gems
-pkg
+pkg/
 *.gem
 
 # rubinius bytecode
 *.rbc
+.rbx/
 
 # output from ronn
-lib/bundler/man
+lib/bundler/man/
 
 # output from ci_reporter
-spec/reports
+spec/reports/
