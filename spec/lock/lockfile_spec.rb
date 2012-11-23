@@ -806,4 +806,30 @@ describe "the lockfile format" do
       end
     end
   end
+
+  it "refuses to install if Gemfile.lock contains conflict markers" do
+    lockfile <<-L
+      GEM
+        remote: file://#{gem_repo1}/
+        specs:
+<<<<<<<
+          rack (1.0.0)
+=======
+          rack (1.0.1)
+>>>>>>>
+
+      PLATFORMS
+        ruby
+
+      DEPENDENCIES
+        rack
+    L
+
+    error = install_gemfile(<<-G, :expect_err => true)
+      source "file://#{gem_repo1}"
+      gem "rack"
+    G
+
+    expect(error).to eq "Gemfile.lock contains merge conflicts. Please check out a valid Gemfile.lock and try again."
+  end
 end
