@@ -127,7 +127,7 @@ RAKEFILE
       expect(bundled_app("test-gem/spec/test-gem_spec.rb").read).to match(/false.should be_true/)
     end
   end
-  
+
   context "--test parameter set to minitest" do
     before :each do
       reset!
