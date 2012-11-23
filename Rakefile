@@ -2,6 +2,7 @@
 $:.unshift File.expand_path("../lib", __FILE__)
 require 'rubygems'
 require 'bundler/gem_tasks'
+require 'shellwords'
 
 task :release => ["man:clean", "man:build"]
 
