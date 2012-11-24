@@ -14,22 +14,31 @@ module Bundler
   class LockfileParser
     attr_reader :sources, :dependencies, :specs, :platforms
 
+    DEPENDENCIES = "DEPENDENCIES"
+    PLATFORMS    = "PLATFORMS"
+    GIT          = "GIT"
+    GEM          = "GEM"
+    PATH         = "PATH"
+    SPECS        = "  specs:"
+    OPTIONS      = /^  ([a-z]+): (.*)$/i
+
     def initialize(lockfile)
       @platforms    = []
       @sources      = []
       @dependencies = []
-      @specs        = []
       @state        = :source
+      @specs        = {}
 
       lockfile.split(/(?:\r?\n)+/).each do |line|
-        if line == "DEPENDENCIES"
+        if line == DEPENDENCIES
           @state = :dependency
-        elsif line == "PLATFORMS"
+        elsif line == PLATFORMS
           @state = :platform
         else
           send("parse_#{@state}", line)
         end
       end
+      @specs        = @specs.values
     end
 
   private
@@ -42,10 +51,10 @@ module Bundler
 
     def parse_source(line)
       case line
-      when "GIT", "GEM", "PATH"
+      when GIT, GEM, PATH
         @current_source = nil
         @opts, @type = {}, line
-      when "  specs:"
+      when SPECS
         @current_source = TYPES[@type].from_lock(@opts)
 
         # Strip out duplicate GIT sections
@@ -54,7 +63,7 @@ module Bundler
         end
 
         @sources << @current_source
-      when /^  ([a-z]+): (.*)$/i
+      when OPTIONS
         value = $2
         value = true if value == "true"
         value = false if value == "false"
@@ -73,17 +82,20 @@ module Bundler
     end
 
     NAME_VERSION = '(?! )(.*?)(?: \(([^-]*)(?:-(.*))?\))?'
+    NAME_VERSION_2 = %r{^ {2}#{NAME_VERSION}(!)?$}
+    NAME_VERSION_4 = %r{^ {4}#{NAME_VERSION}$}
+    NAME_VERSION_6 = %r{^ {6}#{NAME_VERSION}$}
 
     def parse_dependency(line)
-      if line =~ %r{^ {2}#{NAME_VERSION}(!)?$}
+      if line =~ NAME_VERSION_2
         name, version, pinned = $1, $2, $4
         version = version.split(",").map { |d| d.strip } if version
 
         dep = Bundler::Dependency.new(name, version)
 
         if pinned && dep.name != 'bundler'
-          spec = @specs.find { |s| s.name == dep.name }
-          dep.source = spec.source if spec
+          spec = @specs.find {|k, v| v.name == dep.name }
+          dep.source = spec.last.source if spec
 
           # Path sources need to know what the default name / version
           # to use in the case that there are no gemspecs present. A fake
@@ -100,7 +112,7 @@ module Bundler
     end
 
     def parse_spec(line)
-      if line =~ %r{^ {4}#{NAME_VERSION}$}
+      if line =~ NAME_VERSION_4
         name, version = $1, Gem::Version.new($2)
         platform = $3 ? Gem::Platform.new($3) : Gem::Platform::RUBY
         @current_spec = LazySpecification.new(name, version, platform)
@@ -108,8 +120,8 @@ module Bundler
 
         # Avoid introducing multiple copies of the same spec (caused by
         # duplicate GIT sections)
-        @specs << @current_spec unless @specs.include?(@current_spec)
-      elsif line =~ %r{^ {6}#{NAME_VERSION}$}
+        @specs[@current_spec.identifier] ||= @current_spec
+      elsif line =~ NAME_VERSION_6
         name, version = $1, $2
         version = version.split(',').map { |d| d.strip } if version
         dep = Gem::Dependency.new(name, version)

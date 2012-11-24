@@ -26,11 +26,7 @@ module Bundler
     end
 
     def ==(other)
-      name         == other.name         &&
-      version      == other.version      &&
-      source       == other.source       &&
-      platform     == other.platform     &&
-      dependencies == other.dependencies
+      identifier == other.identifier
     end
 
     def satisfies?(dependency)
@@ -61,7 +57,11 @@ module Bundler
     end
 
     def to_s
-      "#{name} (#{version})"
+      @__to_s ||= "#{name} (#{version})"
+    end
+
+    def identifier
+      @__identifier ||= [name, version, source, platform, dependencies].hash
     end
 
   private
