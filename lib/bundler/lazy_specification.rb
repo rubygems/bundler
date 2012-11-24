@@ -26,8 +26,11 @@ module Bundler
     end
 
     def ==(other)
-      [name, version, dependencies, platform, source] ==
-        [other.name, other.version, other.dependencies, other.platform, other.source]
+      name         == other.name         &&
+      version      == other.version      &&
+      source       == other.source       &&
+      platform     == other.platform     &&
+      dependencies == other.dependencies
     end
 
     def satisfies?(dependency)
