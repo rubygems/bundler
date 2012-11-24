@@ -152,4 +152,16 @@ RAKEFILE
       expect(bundled_app("test-gem/test/test_test-gem.rb").read).to match(/assert false/)
     end
   end
+  
+  context "--test is given without specifying a library" do
+    before :each do
+      reset!
+      in_app_root
+      bundle "gem test-gem --test"
+    end
+    it "defaults to rspec" do
+      expect(bundled_app("test-gem/spec/spec_helper.rb")).to exist
+      expect(bundled_app("test-gem/test/minitest_helper.rb")).to_not exist
+    end
+  end
 end
