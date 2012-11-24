@@ -17,7 +17,7 @@ module Bundler
       Bundler.ui.debug! if options["verbose"]
     end
 
-    check_unknown_options!(:except => [:config, :exec])
+    check_unknown_options!(:except => [:config, :exec, :do])
 
     stop_on_unknown_option! :exec
 
@@ -447,6 +447,12 @@ module Bundler
         Bundler.ui.error "bundler: exec needs a command to run"
         exit 128
       end
+    end
+
+    desc "do", "asdadas"
+    def do(*args)
+      ENV["TRY_TO_BUNDLE"] = "YES"
+      exec(*args)
     end
 
     desc "config NAME [VALUE]", "retrieve or set a configuration value"
