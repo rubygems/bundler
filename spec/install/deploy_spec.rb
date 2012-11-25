@@ -231,5 +231,17 @@ describe "install with --deployment or --frozen" do
       run "Bundler.require"
       expect(out).to eq("omg!")
     end
+
+    it "does not update lockfile" do
+      build_lib "omg", :path => lib_path('omg')
+
+      install_gemfile <<-G
+        gem "omg", :path => "#{lib_path('omg')}"
+      G
+      bundle "package --all"
+      bundle "install --deployment"
+
+      expect(out).not_to include("Cannot write a changed lockfile while frozen.")
+    end
   end
 end
