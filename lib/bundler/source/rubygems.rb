@@ -82,8 +82,9 @@ module Bundler
           bin_path     = Bundler.system_bindir
         end
 
+        installed_spec = nil
         Bundler.rubygems.preserve_paths do
-          Bundler::GemInstaller.new(path,
+          installed_spec = Bundler::GemInstaller.new(path,
             :install_dir         => install_path.to_s,
             :bin_dir             => bin_path.to_s,
             :ignore_dependencies => true,
@@ -107,7 +108,7 @@ module Bundler
             Bundler.sudo "cp -R #{Bundler.tmp}/bin/#{exe} #{Bundler.system_bindir}"
           end
         end
-
+        installed_spec.loaded_from = "#{Bundler.rubygems.gem_dir}/specifications/#{spec.full_name}.gemspec"
         spec.loaded_from = "#{Bundler.rubygems.gem_dir}/specifications/#{spec.full_name}.gemspec"
       end
 
