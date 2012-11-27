@@ -18,6 +18,17 @@ describe "when using sudo", :sudo => true do
       should_be_installed "rack 1.0"
     end
 
+    it "installs rake and a gem dependent on rake in the same session" do
+        gemfile <<-G
+            source "file://#{gem_repo1}"
+            gem "rake"
+            gem "another_implicit_rake_dep"
+          G
+         bundle "install"
+         expect(system_gem_path("gems/another_implicit_rake_dep-1.0")).to exist
+    end
+
+
     it "installs when BUNDLE_PATH is owned by root" do
       bundle_path = tmp("owned_by_root")
       FileUtils.mkdir_p bundle_path
