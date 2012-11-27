@@ -109,6 +109,7 @@ module Bundler
           end
         end
         installed_spec.loaded_from = "#{Bundler.rubygems.gem_dir}/specifications/#{spec.full_name}.gemspec"
+        spec.loaded_from = "#{Bundler.rubygems.gem_dir}/specifications/#{spec.full_name}.gemspec"
       end
 
       def cache(spec)
