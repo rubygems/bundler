@@ -589,7 +589,11 @@ module Spec
             @spec.authors = ["that guy"]
           end
 
-          Gem::Builder.new(@spec).build
+          if Gem.const_defined? :Package
+            Gem::Package.build(@spec)
+          else
+            Gem::Builder.new(@spec).build
+          end
           if opts[:to_system]
             `gem install --ignore-dependencies #{@spec.full_name}.gem`
           else
