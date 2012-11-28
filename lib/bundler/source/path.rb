@@ -157,6 +157,8 @@ module Bundler
       end
 
       def generate_bin(spec)
+        require 'rubygems/builder'
+
         gem_dir  = Pathname.new(spec.full_gem_path)
 
         # Some gem authors put absolute paths in their gemspec

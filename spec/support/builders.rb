@@ -1,3 +1,5 @@
+require 'rubygems/builder'
+
 module Spec
   module Builders
     def self.constantize(name)
