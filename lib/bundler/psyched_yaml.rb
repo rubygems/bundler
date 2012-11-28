@@ -13,15 +13,14 @@ rescue LoadError
 end
 
 # At least load the YAML stdlib, whatever that may be
-require 'yaml'
+require 'yaml' unless defined?(YAML)
 
 module Bundler
   # On encountering invalid YAML,
   # Psych raises Psych::SyntaxError
-  # Syck raises ArgumentError
   if defined?(::Psych::SyntaxError)
     YamlSyntaxError = ::Psych::SyntaxError
-  else
+  else # Syck raises ArgumentError
     YamlSyntaxError = ::ArgumentError
   end
 end
