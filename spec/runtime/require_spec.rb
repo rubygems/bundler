@@ -158,6 +158,28 @@ describe "Bundler.require" do
 
       expect(err).to eq("ZOMG LOAD ERROR")
     end
+
+    it "doesn't swallow the error when the library has an unrelated error" do
+      build_lib "load-fuuu", "1.0.0" do |s|
+        s.write "lib/load-fuuu.rb", "raise LoadError.new(\"cannot load such file -- load-bar\")"
+      end
+
+      gemfile <<-G
+        path "#{lib_path}"
+        gem "load-fuuu"
+      G
+
+      cmd = <<-RUBY
+        begin
+          Bundler.require
+        rescue LoadError => e
+          $stderr.puts "ZOMG LOAD ERROR: \#{e.message}"
+        end
+      RUBY
+      run(cmd, :expect_err => true)
+
+      expect(err).to eq("ZOMG LOAD ERROR: cannot load such file -- load-bar")
+    end
   end
 
   describe "using bundle exec" do
