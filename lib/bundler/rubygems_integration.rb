@@ -96,8 +96,14 @@ module Bundler
     end
 
     def spec_from_gem(path)
-      require 'rubygems/format'
-      Gem::Format.from_file_by_path(path).spec
+      require 'rubygems/package'
+
+      if Gem::Package.respond_to? :build then
+        Gem::Package.new(path)
+      else # 1.8 and older
+        require 'rubygems/format'
+        Gem::Format.from_file_by_path(path)
+      end.spec
     rescue Gem::Package::FormatError
       raise Bundler::GemspecError, "Could not read gem at #{path}. It may be corrupted."
     end
@@ -329,7 +335,7 @@ module Bundler
       end
     end
 
-    # Rubygems 1.8.5
+    # Rubygems ~> 1.8.5
     class Modern < RubygemsIntegration
       def stub_rubygems(specs)
         Gem::Specification.all = specs
@@ -362,9 +368,30 @@ module Bundler
       end
     end
 
+    # Rubygems 2.0
+    class Future < RubygemsIntegration
+      def stub_rubygems(specs)
+        Gem::Specification.all = specs
+
+        Gem.post_reset {
+          Gem::Specification.all = specs
+        }
+      end
+
+      def all_specs
+        Gem::Specification.to_a
+      end
+
+      def find_name(name)
+        Gem::Specification.find_all_by_name name
+      end
+    end
+
   end
 
-  if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.8.5')
+  if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.99.99')
+    @rubygems = RubygemsIntegration::Future.new
+  elsif Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.8.5')
     @rubygems = RubygemsIntegration::Modern.new
   elsif Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.8.0')
     @rubygems = RubygemsIntegration::AlmostModern.new

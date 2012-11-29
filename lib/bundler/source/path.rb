@@ -157,6 +157,8 @@ module Bundler
       end
 
       def generate_bin(spec)
+        require 'rubygems/builder'
+
         gem_dir  = Pathname.new(spec.full_gem_path)
 
         # Some gem authors put absolute paths in their gemspec
@@ -170,7 +172,13 @@ module Bundler
           end
         end.compact
 
-        gem_file = Dir.chdir(gem_dir){ Gem::Builder.new(spec).build }
+        gem_file = Dir.chdir(gem_dir){
+          if Gem::Package.respond_to? :build then
+            Gem::Package.build(spec)
+          else
+            Gem::Builder.new(spec).build
+          end
+        }
 
         installer = Path::Installer.new(spec, :env_shebang => false)
         run_hooks(:pre_install, installer)
