@@ -172,13 +172,7 @@ module Bundler
           end
         end.compact
 
-        gem_file = Dir.chdir(gem_dir){
-          if Gem::Package.respond_to? :build then
-            Gem::Package.build(spec)
-          else
-            Gem::Builder.new(spec).build
-          end
-        }
+        gem_file = Builder.rubygems.build_gem gem_dir, spec
 
         installer = Path::Installer.new(spec, :env_shebang => false)
         run_hooks(:pre_install, installer)

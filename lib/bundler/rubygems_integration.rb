@@ -85,6 +85,24 @@ module Bundler
       Gem::SpecFetcher.new.list(all, pre).each(&blk)
     end
 
+    def fetch_all_remote_specs
+      spec_list = Hash.new { |h,k| h[k] = [] }
+      begin
+        # Fetch all specs, minus prerelease specs
+        spec_list = Gem::SpecFetcher.new.list(true, false)
+        # Then fetch the prerelease specs
+        begin
+          Gem::SpecFetcher.new.list(false, true).each {|k, v| spec_list[k] += v }
+        rescue Gem::RemoteFetcher::FetchError
+          Bundler.ui.debug "Could not fetch prerelease specs from #{strip_user_pass_from_uri(@remote_uri)}"
+        end
+      rescue Gem::RemoteFetcher::FetchError
+        raise HTTPError, "Could not reach #{strip_user_pass_from_uri(@remote_uri)}"
+      end
+
+      return spec_list
+    end
+
     def with_build_args(args)
       old_args = Gem::Command.build_args
       begin
@@ -96,16 +114,17 @@ module Bundler
     end
 
     def spec_from_gem(path)
-      require 'rubygems/package'
+      require 'rubygems/format'
 
-      if Gem::Package.respond_to? :build then
-        Gem::Package.new(path)
-      else # 1.8 and older
-        require 'rubygems/format'
-        Gem::Format.from_file_by_path(path)
-      end.spec
+      Gem::Format.from_file_by_path(path).spec
     rescue Gem::Package::FormatError
       raise Bundler::GemspecError, "Could not read gem at #{path}. It may be corrupted."
+    end
+
+    def build_gem(gem_dir, spec)
+      Dir.chdir(gem_dir) do
+        Gem::Builder.new(spec).build
+      end
     end
 
     def download_gem(spec, uri, path)
@@ -385,6 +404,34 @@ module Bundler
       def find_name(name)
         Gem::Specification.find_all_by_name name
       end
+
+      def fetch_all_remote_specs
+        tuples, _ = Gem::SpecFetcher.new.available_specs(:complete)
+
+        hash = {}
+        tuples.each do |source,tuples|
+          hash[source.uri] = tuples.map { |tuple| tuple.to_a }
+        end
+
+        hash
+      rescue Gem::RemoteFetcher::FetchError
+        raise HTTPError, "Could not reach #{strip_user_pass_from_uri(@remote_uri)}"
+      end
+
+      def spec_from_gem(path)
+        require 'rubygems/package'
+
+        Gem::Package.new(path).spec
+      rescue Gem::Package::FormatError
+        raise Bundler::GemspecError, "Could not read gem at #{path}. It may be corrupted."
+      end
+
+      def build_gem(gem_dir, spec)
+        Dir.chdir(gem_dir) do
+          Gem::Package.build(spec)
+        end
+      end
+
     end
 
   end

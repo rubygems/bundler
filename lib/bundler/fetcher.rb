@@ -201,13 +201,7 @@ module Bundler
       @has_api = false
       Gem.sources = ["#{@remote_uri}"]
 
-      tuples, = Gem::SpecFetcher.new.available_specs(:complete)
-      tuples.each_with_object({}) do |(source,tuples), hash|
-        hash[source.uri] = tuples.map { |tuple| tuple.to_a }
-      end
-
-    rescue Gem::RemoteFetcher::FetchError
-      raise HTTPError, "Could not reach #{strip_user_pass_from_uri(@remote_uri)}"
+      Bundler.rubygems.fetch_all_remote_specs
     end
 
     def strip_user_pass_from_uri(uri)
