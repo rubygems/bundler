@@ -157,7 +157,7 @@ module Bundler
         response.body
       else
         Bundler.ui.debug("HTTP Error")
-        raise HTTPError
+        raise HTTPError, "Don't know how to process #{response.class}"
       end
     end
 
