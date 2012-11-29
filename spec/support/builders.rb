@@ -1,4 +1,4 @@
-require 'rubygems/builder'
+require 'rubygems/package'
 
 module Spec
   module Builders
@@ -589,9 +589,10 @@ module Spec
             @spec.authors = ["that guy"]
           end
 
-          if Gem.const_defined? :Package
+          if Gem::Package.respond_to? :build then
             Gem::Package.build(@spec)
-          else
+          else # 1.8.x and older
+            require 'rubygems/builder'
             Gem::Builder.new(@spec).build
           end
           if opts[:to_system]
