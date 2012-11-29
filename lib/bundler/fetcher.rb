@@ -65,6 +65,8 @@ module Bundler
     def specs(gem_names, source)
       index = Index.new
 
+      specs = nil
+
       if !gem_names || @remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
         Bundler.ui.info "Fetching source index from #{strip_user_pass_from_uri(@remote_uri)}"
         specs = fetch_all_remote_specs
@@ -205,8 +207,6 @@ module Bundler
         Bundler.rubygems.fetch_all_remote_specs
       rescue Gem::RemoteFetcher::FetchError
         raise HTTPError, "Could not reach #{strip_user_pass_from_uri(@remote_uri)}"
-      rescue PrereleaseFetchError
-        Bundler.ui.debug "Could not fetch prerelease specs from #{strip_user_pass_from_uri(@remote_uri)}"
       end
     end
 

@@ -60,7 +60,6 @@ module Bundler
   class InvalidOption        < DslError                      ; end
   class HTTPError            < BundlerError; status_code(17) ; end
   class RubyVersionMismatch  < BundlerError; status_code(18) ; end
-  class PrereleaseFetchError < BundlerError; status_code(19) ; end
 
 
   WINDOWS = RbConfig::CONFIG["host_os"] =~ %r!(msdos|mswin|djgpp|mingw)!
