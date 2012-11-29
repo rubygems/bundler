@@ -94,10 +94,8 @@ module Bundler
         begin
           Gem::SpecFetcher.new.list(false, true).each {|k, v| spec_list[k] += v }
         rescue Gem::RemoteFetcher::FetchError
-          Bundler.ui.debug "Could not fetch prerelease specs from #{strip_user_pass_from_uri(@remote_uri)}"
+          raise PrereleaseFetchError
         end
-      rescue Gem::RemoteFetcher::FetchError
-        raise HTTPError, "Could not reach #{strip_user_pass_from_uri(@remote_uri)}"
       end
 
       return spec_list

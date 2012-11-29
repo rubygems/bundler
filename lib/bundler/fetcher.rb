@@ -201,7 +201,13 @@ module Bundler
       @has_api = false
       Gem.sources = ["#{@remote_uri}"]
 
-      Bundler.rubygems.fetch_all_remote_specs
+      begin
+        Bundler.rubygems.fetch_all_remote_specs
+      rescue Gem::RemoteFetcher::FetchError
+        raise HTTPError, "Could not reach #{strip_user_pass_from_uri(@remote_uri)}"
+      rescue PrereleaseFetchError
+        Bundler.ui.debug "Could not fetch prerelease specs from #{strip_user_pass_from_uri(@remote_uri)}"
+      end
     end
 
     def strip_user_pass_from_uri(uri)
