@@ -200,21 +200,14 @@ module Bundler
     def fetch_all_remote_specs
       @has_api = false
       Gem.sources = ["#{@remote_uri}"]
-      spec_list = Hash.new { |h,k| h[k] = [] }
-      begin
-        # Fetch all specs, minus prerelease specs
-        spec_list = Gem::SpecFetcher.new.list(true, false)
-        # Then fetch the prerelease specs
-        begin
-          Gem::SpecFetcher.new.list(false, true).each {|k, v| spec_list[k] += v }
-        rescue Gem::RemoteFetcher::FetchError
-          Bundler.ui.debug "Could not fetch prerelease specs from #{strip_user_pass_from_uri(@remote_uri)}"
-        end
-      rescue Gem::RemoteFetcher::FetchError
-        raise HTTPError, "Could not reach #{strip_user_pass_from_uri(@remote_uri)}"
+
+      tuples, = Gem::SpecFetcher.new.available_specs(:complete)
+      tuples.each_with_object({}) do |(source,tuples), hash|
+        hash[source.uri] = tuples.map { |tuple| tuple.to_a }
       end
 
-      return spec_list
+    rescue Gem::RemoteFetcher::FetchError
+      raise HTTPError, "Could not reach #{strip_user_pass_from_uri(@remote_uri)}"
     end
 
     def strip_user_pass_from_uri(uri)
