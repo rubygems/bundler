@@ -13,11 +13,12 @@ require 'sinatra/base'
 class Endpoint < Sinatra::Base
 
   helpers do
-    def dependencies_for(gem_names, marshal = gem_repo1("Marshal.4.8"))
+    def dependencies_for(gem_names, marshal = gem_repo1("specs.4.8"))
       require 'rubygems'
       require 'bundler'
       Bundler::Deprecate.skip_during do
-        Marshal.load(File.open(marshal).read).map do |gem, spec|
+        Marshal.load(File.open(marshal).read).map do |name, version, platform|
+          spec = load_spec(name, version, platform)
           if gem_names.include?(spec.name)
             {
               :name         => spec.name,
@@ -30,6 +31,12 @@ class Endpoint < Sinatra::Base
           end
         end.compact
       end
+    end
+
+    def load_spec(name, version, platform)
+      full_name = "#{name}-#{version}"
+      full_name += "-#{platform}" if platform != "ruby"
+      Marshal.load(Gem.inflate(File.open(gem_repo1("quick/Marshal.4.8/#{full_name}.gemspec.rz")).read))
     end
   end
 
