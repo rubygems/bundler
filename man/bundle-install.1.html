@@ -84,9 +84,7 @@
              [--without=GROUP1[ GROUP2...]]
              [--local] [--deployment]
              [--binstubs[=DIRECTORY]]
-             [--standalone[=GROUP1[ GROUP2...]]]
              [--quiet]
-             [--no-cache]
 </code></pre>
 
 <h2 id="DESCRIPTION">DESCRIPTION</h2>
@@ -123,7 +121,10 @@ gems to. This means that, by default, gems installed without a
 overrides any previous <a href="#REMEMBERED-OPTIONS" title="REMEMBERED OPTIONS" data-bare-link="true">remembered</a> use of
 <code>--path</code>.</p></dd>
 <dt><code>--without=&lt;list></code></dt><dd><p>A space-separated list of groups to skip installing. This is a
-<a href="#REMEMBERED-OPTIONS" title="REMEMBERED OPTIONS" data-bare-link="true">remembered option</a>.</p></dd>
+<a href="#REMEMBERED-OPTIONS" title="REMEMBERED OPTIONS" data-bare-link="true">remembered option</a>. Subsequent use of <code>--without</code>
+replaces the list of of groups that will be skipped. To totally
+clear the list of groups to be skipped (include all groups),
+specify <code>--without ''</code>.</p></dd>
 <dt class="flush"><code>--local</code></dt><dd><p>Do not attempt to connect to <code>rubygems.org</code>, instead using just
 the gems already present in Rubygems' cache or in <code>vendor/cache</code>.
 Note that if a more appropriate platform-specific gem exists on
@@ -135,16 +136,6 @@ that runs in the context of the bundle. For instance, if the
 <code>rails</code> gem comes with a <code>rails</code> executable, this flag will create
 a <code>bin/rails</code> executable that ensures that all dependencies used
 come from the bundled gems.</p></dd>
-<dt><code>--shebang ruby-install-name</code></dt><dd><p>Uses the ruby executable (usually <code>ruby</code>) provided to execute the scripts created
-with --binstubs. For instance, if you use --binstubs with <code>--shebang jruby</code>,
-all executables will be created to use jruby instead.</p></dd>
-<dt><code>--standalone[=&lt;list>]</code></dt><dd><p>Make a bundle that can work without Ruby Gems or Bundler at runtime.
-It takes a space separated list of groups to install. It creates a
-<code>bundle</code> directory and installs the bundle there. It also generates
-a <code>bundle/bundler/setup.rb</code> file to replace Bundler's own setup.</p></dd>
-<dt><code>--no-cache</code></dt><dd><p>Do not update the cache in <code>vendor/cache</code> with the newly bundled gems. This
-does not remove any existing cached gems, only stops the newly bundled gems
-from being cached during the install.</p></dd>
 </dl>
 
 
@@ -402,7 +393,7 @@ does not work, run <a href="bundle-update.1.html">bundle update(1)</a>.</p>
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'></li>
-    <li class='tc'>September 2012</li>
+    <li class='tc'>August 2012</li>
     <li class='tr'>bundle-install(1)</li>
   </ol>
 
