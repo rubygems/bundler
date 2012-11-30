@@ -317,8 +317,8 @@ describe "the lockfile format" do
             actionpack (= 2.3.2)
             activerecord (= 2.3.2)
             activeresource (= 2.3.2)
-            rake (= 0.8.7)
-          rake (0.8.7)
+            rake (= 10.0.2)
+          rake (10.0.2)
 
       PLATFORMS
         #{generic(Gem::Platform.local)}

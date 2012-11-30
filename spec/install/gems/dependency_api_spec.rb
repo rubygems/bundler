@@ -338,7 +338,7 @@ OUTPUT
     out.should include("Fetching gem metadata from #{source_uri}")
   end
 
-  it "should install when EndpointSpecification with a bin dir owned by root", :sudo => true do
+  fit "should install when EndpointSpecification with a bin dir owned by root", :sudo => true do
     sudo "mkdir -p #{system_gem_path("bin")}"
     sudo "chown -R root #{system_gem_path("bin")}"
 
@@ -347,6 +347,7 @@ OUTPUT
       gem "rails"
     G
     bundle :install, :artifice => "endpoint"
+    puts out, err
     should_be_installed "rails 2.3.2"
   end
 

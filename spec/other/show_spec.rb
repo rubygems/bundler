@@ -41,7 +41,7 @@ describe "bundle show" do
 
   it "prints path of all gems in bundle" do
     bundle "show --paths"
-    out.should include(default_bundle_path('gems', 'rake-0.8.7').to_s)
+    out.should include(default_bundle_path('gems', 'rake-10.0.2').to_s)
     out.should include(default_bundle_path('gems', 'rails-2.3.2').to_s)
   end
 end
