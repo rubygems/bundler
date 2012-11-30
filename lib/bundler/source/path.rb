@@ -71,12 +71,7 @@ module Bundler
 
       def install(spec)
         Bundler.ui.info "Using #{spec.name} (#{spec.version}) from #{to_s} "
-        # Let's be honest, when we're working from a path, we can't
-        # really expect native extensions to work because the whole point
-        # is to just be able to modify what's in that path and go. So, let's
-        # not put ourselves through the pain of actually trying to generate
-        # the full gem.
-        Installer.new(spec).generate_bin
+        generate_bin(spec, :disable_extensions)
       end
 
       def cache(spec)
@@ -156,7 +151,7 @@ module Bundler
         path
       end
 
-      def generate_bin(spec)
+      def generate_bin(spec, disable_extensions = false)
         gem_dir  = Pathname.new(spec.full_gem_path)
 
         # Some gem authors put absolute paths in their gemspec
@@ -174,7 +169,7 @@ module Bundler
 
         installer = Path::Installer.new(spec, :env_shebang => false)
         run_hooks(:pre_install, installer)
-        installer.build_extensions
+        installer.build_extensions unless disable_extensions
         run_hooks(:post_build, installer)
         installer.generate_bin
         run_hooks(:post_install, installer)
@@ -191,8 +186,8 @@ module Bundler
 
         Bundler.ui.warn "The validation message from Rubygems was:\n  #{e.message}"
       ensure
-        if gem_dir && gem_file && File.exist?(gem_file)
-          Dir.chdir(gem_dir){ FileUtils.rm_rf(gem_file) }
+        if gem_dir && gem_file
+          Dir.chdir(gem_dir){ FileUtils.rm_rf(gem_file) if File.exist?(gem_file) }
         end
       end
 
