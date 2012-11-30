@@ -1,5 +1,3 @@
-require 'rubygems/package'
-
 module Spec
   module Builders
     def self.constantize(name)
@@ -589,12 +587,7 @@ module Spec
             @spec.authors = ["that guy"]
           end
 
-          if Gem::Package.respond_to? :build then
-            Gem::Package.build(@spec)
-          else # 1.8.x and older
-            require 'rubygems/builder'
-            Gem::Builder.new(@spec).build
-          end
+          Bundler.rubygems.build(@spec)
           if opts[:to_system]
             `gem install --ignore-dependencies #{@spec.full_name}.gem`
           else

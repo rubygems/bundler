@@ -1,3 +1,5 @@
+require 'rubygems'
+
 module Bundler
   class RubygemsIntegration
     def loaded_specs(name)
@@ -113,16 +115,18 @@ module Bundler
 
     def spec_from_gem(path)
       require 'rubygems/format'
-
       Gem::Format.from_file_by_path(path).spec
     rescue Gem::Package::FormatError
       raise Bundler::GemspecError, "Could not read gem at #{path}. It may be corrupted."
     end
 
+    def build(spec)
+      require 'rubygems/builder'
+      Gem::Builder.new(spec).build
+    end
+
     def build_gem(gem_dir, spec)
-      Dir.chdir(gem_dir) do
-        Gem::Builder.new(spec).build
-      end
+      Dir.chdir(gem_dir) { build(spec) }
     end
 
     def download_gem(spec, uri, path)
@@ -387,6 +391,8 @@ module Bundler
 
     # Rubygems 2.0
     class Future < RubygemsIntegration
+      require 'rubygems/package'
+
       def stub_rubygems(specs)
         Gem::Specification.all = specs
 
@@ -421,17 +427,13 @@ module Bundler
       end
 
       def spec_from_gem(path)
-        require 'rubygems/package'
-
         Gem::Package.new(path).spec
       rescue Gem::Package::FormatError
         raise Bundler::GemspecError, "Could not read gem at #{path}. It may be corrupted."
       end
 
-      def build_gem(gem_dir, spec)
-        Dir.chdir(gem_dir) do
-          Gem::Package.build(spec)
-        end
+      def build(spec)
+        Gem::Package.build(spec)
       end
 
     end
