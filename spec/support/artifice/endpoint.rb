@@ -59,6 +59,10 @@ class Endpoint < Sinatra::Base
   get "/specs.4.8.gz" do
     File.read("#{gem_repo1}/specs.4.8.gz")
   end
+
+  get "/prerelease_specs.4.8.gz" do
+    File.read("#{gem_repo1}/prerelease_specs.4.8.gz")
+  end
 end
 
 Artifice.activate_with(Endpoint)
