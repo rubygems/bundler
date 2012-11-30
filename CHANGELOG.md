@@ -1,8 +1,38 @@
-## next
+## 1.3.0.pre (Nov 29, 2012)
+
+Features:
+
+  - compatibile with Ruby 2.0.0-preview2
+  - compatibile with Rubygems 2.0.0.preview2 (@drbrain, @evanphx)
+  - ruby 2.0 added to the `:ruby19` ABI-compatible platform
+  - lazy load YAML, allowing Psych to be specified in the Gemfile
+  - significant performance improvements (@cheald, #2181)
+  - `inject` command for scripted Gemfile additions (Engine Yard)
+  - :github option uses slashless arguements as repo owner (@rking)
+  - `open` suggests gem names for typos (@jdelStrother)
+  - `update` reports non-existent gems (@jdelStrother)
+  - `gem` option --test can generate rspec stubs (@MafcoCinco)
+  - `gem` option --test can generate minitest stubs (@kcurtin)
+  - `gem` command generates MIT license (@BrentWheeldon)
+  - gem rake task 'release' resuses existing tags (@shtirlic)
 
 Bugfixes:
 
-  - Do not swallow --verbose on `bundle exec` (#2102)
+  - JRuby new works with HTTPS gem sources (@davidcelis)
+  - `install` installs both rake rake-built gems at once (@crowbot, #2107)
+  - handle Errno::ETIMEDOUT errors (@jmoses)
+  - handle Errno::EAGAIN errors on JRuby
+  - disable ANSI coloring when output is redirected (@tomykaira)
+  - raise LoadErrors correctly during Bundler.require (@Empact)
+  - do not swallow --verbose on `bundle exec` (@sol, #2102)
+  - `gem` generates gemspecs that block double-requires
+  - `gem` generates gemspecs that admit they depend on rake
+
+## 1.2.3 (Nov 29, 2012)
+
+Bugfixes:
+
+  - fix exceptions while loading some gemspecs
 
 ## 1.2.2 (Nov 14, 2012)
 
