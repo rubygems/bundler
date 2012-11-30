@@ -404,7 +404,13 @@ module Bundler
       end
 
       def fetch_all_remote_specs
-        tuples, _ = Gem::SpecFetcher.new.available_specs(:complete)
+        tuples, errors = Gem::SpecFetcher.new.available_specs(:complete)
+        # only raise if we don't get any specs back.
+        # this means we still work if prerelease_specs.4.8.gz
+        # don't exist but specs.4.8.gz do
+        if tuples.empty? && error = errors.detect {|e| e.is_a?(Gem::SourceFetchProblem) }
+          raise Gem::RemoteFetcher::FetchError.new(error.error, error.source)
+        end
 
         hash = {}
         tuples.each do |source,tuples|
@@ -412,8 +418,6 @@ module Bundler
         end
 
         hash
-      rescue Gem::RemoteFetcher::FetchError
-        raise HTTPError, "Could not reach #{strip_user_pass_from_uri(@remote_uri)}"
       end
 
       def spec_from_gem(path)
