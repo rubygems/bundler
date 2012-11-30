@@ -13,20 +13,27 @@ notifications:
     channels:
       - "irc.freenode.org#bundler"
 rvm:
-  - 2.0.0 # disabled until Bundler builds on the Rails workers
+  - 2.0.0
   - 1.9.3
   - 1.9.2
   - 1.8.7
+
+# Rubygems versions MUST be available as rake tasks
+# see Rakefile:66 for the list of possible RGV values
 env:
-  # Rubygems versions MUST be available as rake tasks
-  # see Rakefile:66 for the list of possible RGV values
   - RGV=master
   - RGV=v1.8.24
-  - RGV=v1.7.2
-  - RGV=v1.6.2
-  - RGV=v1.5.3
 matrix:
+  allow_failures:
+    - rvm: 1.9.2
   include:
+    # Bundler 1.x supports Rubygems down to 1.5.3 on Ruby 1.9.3
+    - rvm: 1.9.3
+      env: RGV=v1.7.2
+    - rvm: 1.9.3
+      env: RGV=v1.6.2
+    - rvm: 1.9.3
+      env: RGV=v1.5.3
     # Bundler 1.x supports Rubygems down to 1.3.6 on Ruby 1.8.7
     - rvm: 1.8.7
       env: RGV=v1.4.2
@@ -34,11 +41,3 @@ matrix:
       env: RGV=v1.3.7
     - rvm: 1.8.7
       env: RGV=v1.3.6
-  exclude:
-    # 2.0.0-preview1 shipped with Rubygems 1.8.24, so skip RGV lower than that
-    - rvm: 2.0.0
-      env: RGV=v1.7.2
-    - rvm: 2.0.0
-      env: RGV=v1.6.2
-    - rvm: 2.0.0
-      env: RGV=v1.5.3
