@@ -91,6 +91,7 @@ begin
 
           puts "Running bundler specs against rubygems '#{rg}' at #{hash}"
           ENV["RUBYOPT"] = "-I#{File.expand_path("tmp/rubygems/lib")} #{rubyopt}"
+          puts "RUBYOPT=#{ENV['RUBYOPT']}"
         end
 
         task rg => ["clone_rubygems_#{rg}", "man:build"]
