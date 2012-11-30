@@ -1,3 +1,9 @@
+## 1.2.3 (Nov 29, 2012)
+
+Bugfixes:
+
+  - fix exceptions while loading some gemspecs
+
 ## 1.2.2 (Nov 14, 2012)
 
 Bugfixes:
