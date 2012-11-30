@@ -86,6 +86,8 @@ RSpec.configure do |config|
   end
 
   config.after :each do
+    puts @out if example.exception
+
     Dir.chdir(original_wd)
     # Reset ENV
     ENV['PATH']           = original_path
