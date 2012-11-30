@@ -513,6 +513,7 @@ module Bundler
           @allow    = allow || Proc.new { true }
         end
 
+        remove_method :revision if method_defined? :revision
         def revision
           @revision ||= allowed_in_path { git("rev-parse #{ref}").strip }
         end
