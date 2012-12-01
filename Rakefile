@@ -115,7 +115,6 @@ begin
 
     desc "Run the tests on Travis CI against a rubygem version (using ENV['RGV'])"
     task :travis do
-      ENV['TRACE'] = 'true' # print debug info when an exception comes up
       rg = ENV['RGV'] || 'master'
 
       puts "\n\e[1;33m[Travis CI] Running bundler specs against rubygems #{rg}\e[m\n\n"
