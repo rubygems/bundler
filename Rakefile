@@ -22,6 +22,7 @@ namespace :spec do
   task :deps do
     sh "#{Gem.ruby} -S gem list ronn | (grep 'ronn' 1> /dev/null) || #{Gem.ruby} -S gem install ronn --no-ri --no-rdoc"
     sh "#{Gem.ruby} -S gem list rspec | (grep 'rspec (2.' 1> /dev/null) || #{Gem.ruby} -S gem install rspec --no-ri --no-rdoc"
+    sh "#{Gem.ruby} -S gem list rake | (grep 'rake (10.' 1> /dev/null) || #{Gem.ruby} -S gem install rake -v '~> 10.0.2' --no-ri --no-rdoc"
   end
 end
 

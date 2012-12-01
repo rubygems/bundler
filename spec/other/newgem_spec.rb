@@ -73,7 +73,7 @@ describe "bundle gem" do
   end
 
   it "runs rake without problems" do
-    system_gems ["rake-0.8.7"]
+    system_gems ["rake-10.0.2"]
 
     rakefile = <<-RAKEFILE
       task :default do

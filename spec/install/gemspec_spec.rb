@@ -114,7 +114,7 @@ describe "bundle install from an existing gemspec" do
     build_lib("foo", :path => tmp.join("foo")) do |s|
       s.write("Gemfile", "source 'file://#{gem_repo1}'\ngemspec")
       s.add_dependency "actionpack", "=2.3.2"
-      s.add_development_dependency "rake", '=0.8.7'
+      s.add_development_dependency "rake", '=10.0.2'
     end
 
     Dir.chdir(tmp.join("foo")) do
