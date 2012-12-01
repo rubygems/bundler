@@ -2,10 +2,11 @@ language: ruby
 script: rake spec:travis
 before_script:
   - rake --version
-  - sudo apt-get install groff -y
-  - rake spec:deps
+  - gem install rake -v '10.0.2'
   - gem list rake
   - rake --version
+  - sudo apt-get install groff -y
+  - rake spec:deps
 notifications:
   email:
     - mail@arko.net
