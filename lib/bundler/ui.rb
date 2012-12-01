@@ -8,6 +8,9 @@ module Bundler
     def debug(message, newline = nil)
     end
 
+    def trace(message, newline = nil)
+    end
+
     def error(message, newline = nil)
     end
 
@@ -31,6 +34,7 @@ module Bundler
         @shell = Thor::Base.shell.new
         @quiet = false
         @debug = ENV['DEBUG']
+        @trace = ENV['TRACE']
       end
 
       def info(msg, newline = nil)
@@ -64,6 +68,15 @@ module Bundler
 
       def debug(msg, newline = nil)
         tell_me(msg, nil, newline) if debug?
+      end
+
+      def trace(e, newline = nil)
+        msg = ["#{e.class}: #{e.message}", *e.backtrace].join("\n")
+        if debug?
+          tell_me(msg, nil, newline)
+        elsif @trace
+          STDERR.puts "#{msg}#{newline}"
+        end
       end
 
       private

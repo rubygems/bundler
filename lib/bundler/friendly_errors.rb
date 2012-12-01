@@ -4,11 +4,11 @@ module Bundler
       yield
     rescue Bundler::BundlerError => e
       Bundler.ui.error e.message
-      Bundler.ui.debug e.backtrace.join("\n")
+      Bundler.ui.trace e
       exit e.status_code
     rescue Interrupt => e
       Bundler.ui.error "\nQuitting..."
-      Bundler.ui.debug e.backtrace.join("\n")
+      Bundler.ui.trace e
       exit 1
     rescue SystemExit => e
       exit e.status
@@ -19,8 +19,7 @@ module Bundler
         Bundler.ui.warn "You must recompile Ruby with OpenSSL support or change the sources in your" \
           "\nGemfile from 'https' to 'http'. Instructions for compiling with OpenSSL" \
           "\nusing RVM are available at rvm.io/packages/openssl."
-        Bundler.ui.debug "#{e.class}: #{e.message}"
-        Bundler.ui.debug e.backtrace.join("\n")
+        Bundler.ui.trace e
         exit 1
       else
         raise e
@@ -28,7 +27,7 @@ module Bundler
     rescue Exception => e
       Bundler.ui.error(
         "Unfortunately, a fatal error has occurred. Please see the Bundler \n" \
-        "troubleshooting documentation at http://bit.ly/bundler-issues. Thanks! #{e.inspect} #{e.backtrace.join("\n")}\n")
+        "troubleshooting documentation at http://bit.ly/bundler-issues. Thanks!\n")
       raise e
     end
   end
