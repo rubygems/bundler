@@ -95,7 +95,7 @@ module Bundler
         # Then fetch the prerelease specs
         begin
           Gem::SpecFetcher.new.list(false, true).each {|k, v| spec_list[k] += v }
-        rescue Gem::RemoteFetcher::FetchError => e
+        rescue Gem::RemoteFetcher::FetchError
           # ignore if we can't fetch the prerelease specs
         end
       end
