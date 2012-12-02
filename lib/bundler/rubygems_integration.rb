@@ -419,8 +419,8 @@ module Bundler
         end
 
         hash = {}
-        tuples.each do |source,tuples|
-          hash[source.uri] = tuples.map { |tuple| tuple.to_a }
+        tuples.each do |source, tuple_list|
+          hash[source.uri] = tuple_list.map { |tuple| tuple.to_a }
         end
 
         hash
