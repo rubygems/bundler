@@ -333,6 +333,7 @@ module Bundler
       Outdated lists the names and versions of gems that have a newer version available
       in the given source. Calling outdated with [GEM [GEM]] will only check for newer
       versions of the given gems. By default, available prerelease gems will be ignored.
+      If outdated gems are found then the exit status is set to 300.
     D
     method_option "pre", :type => :boolean, :banner => "Check for newer pre-release gems"
     method_option "source", :type => :array, :banner => "Check against a specific source"
@@ -388,6 +389,7 @@ module Bundler
 
       Bundler.ui.info "Your bundle is up to date!" if out_count < 1
       Bundler.ui.info ""
+      exit 300 if out_count >= 1
     end
 
     desc "cache", "Cache all the gems to vendor/cache", :hide => true

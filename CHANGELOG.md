@@ -1,3 +1,9 @@
+## Next
+
+Bugfixes:
+
+  - `outdated` returns non-zero exit status if outdated gems found (@rohit, #2021)
+
 ## 1.3.0.pre (Nov 29, 2012)
 
 Features:
