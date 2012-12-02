@@ -138,7 +138,7 @@ module Bundler
             end
           end
         else
-          raise PathError, "The path `#{expanded_path}` does not exist."
+          raise PathError, "The path `#{expanded_path}` is not a directory."
         end
 
         index
