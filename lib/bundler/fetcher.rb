@@ -200,6 +200,9 @@ module Bundler
 
     # fetch from modern index: specs.4.8.gz
     def fetch_all_remote_specs
+      # Ensure config is loaded so it doesn't get lazy-loaded later, overwriting Gem.sources!
+      Gem.configuration
+
       @has_api = false
       Gem.sources = ["#{@remote_uri}"]
 
