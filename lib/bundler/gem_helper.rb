@@ -82,7 +82,7 @@ module Bundler
         install_gem
       end
     end
-        
+
     def define_release_task
       desc "Create tag #{version_tag} and build and push #{name}-#{version}.gem to Rubygems"
       task 'release' do
