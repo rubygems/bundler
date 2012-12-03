@@ -137,8 +137,10 @@ module Bundler
               end
             end
           end
-        else
+        elsif File.exists?(expanded_path)
           raise PathError, "The path `#{expanded_path}` is not a directory."
+        else
+          raise PathError, "The path `#{expanded_path}` does not exist."
         end
 
         index
