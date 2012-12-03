@@ -25,6 +25,23 @@ describe "bundle outdated" do
       expect(out).to include("activesupport (3.0 > 2.3.5)")
       expect(out).to include("foo (1.0")
     end
+
+    it "returns non zero exit status if outdated gems present" do
+      update_repo2 do
+        build_gem "activesupport", "3.0"
+        update_git "foo", :path => lib_path("foo")
+      end
+
+      bundle "outdated", :exitstatus => true
+
+      expect(exitstatus).to_not be_zero
+    end
+
+    it "returns success exit status if no outdated gems present" do
+      bundle "outdated", :exitstatus => true
+
+      expect(exitstatus).to be_zero
+    end
   end
 
   describe "with --local option" do
