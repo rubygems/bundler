@@ -27,6 +27,7 @@ rvm:
 # see Rakefile:66 for the list of possible RGV values
 env:
   - RGV=master
+  - RGV=v2.0.0.preview2
   - RGV=v1.8.24
 matrix:
   allow_failures:

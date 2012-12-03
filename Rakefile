@@ -64,7 +64,7 @@ begin
     namespace :rubygems do
       # Rubygems specs by version
       rubyopt = ENV["RUBYOPT"]
-      %w(master v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.24 master).each do |rg|
+      %w(master v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.24 v2.0.0.preview2).each do |rg|
         desc "Run specs with Rubygems #{rg}"
         RSpec::Core::RakeTask.new(rg) do |t|
           t.rspec_opts = %w(-fs --color)
@@ -85,9 +85,8 @@ begin
 
           Dir.chdir("tmp/rubygems") do
             system("git remote update")
-            system("git checkout #{rg}")
-            system("git pull origin master") if rg == "master"
-            hash = `git rev-parse HEAD`.strip
+            system("git checkout origin/#{rg}")
+            hash = `git rev-parse HEAD`.chomp
           end
 
           puts "Running bundler specs against rubygems '#{rg}' at #{hash}"
