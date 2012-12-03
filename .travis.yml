@@ -5,6 +5,7 @@ before_script:
   - gem install rake -v '10.0.2'
   - gem list rake
   - rake --version
+  - sudo sed -i 's/1000::/1000:Travis:/g' /etc/passwd
   - sudo apt-get install groff -y
   - rake spec:deps
 notifications:
