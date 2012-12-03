@@ -288,28 +288,31 @@ module Bundler
 
     def load_gemspec_uncached(file)
       path = Pathname.new(file)
-      # Eval the gemspec from its parent directory
+      # Eval the gemspec from its parent directory, because some gemspecs
+      # depend on "./" relative paths.
       Dir.chdir(path.dirname.to_s) do
-        contents = File.read(path.basename.to_s)
-        if contents =~ /\A---/ # try YAML
-          begin
-            Gem::Specification.from_yaml(contents)
-            # Raises ArgumentError if the file is not valid YAML (on syck)
-            # Psych raises a Psych::SyntaxError
-          rescue YamlSyntaxError, ArgumentError, Gem::EndOfYAMLException, Gem::Exception
-            eval_gemspec(path, contents)
-          end
+        contents = path.read
+        if contents[0..2] == "---" # YAML header
+          eval_yaml_gemspec(path, contents)
         else
           eval_gemspec(path, contents)
         end
       end
     end
 
-    def clear_gemspec_cache
+    def clear_cache
       @gemspec_cache = {}
     end
 
   private
+
+    def eval_yaml_gemspec(path, contents)
+      # If the YAML is invalid, Syck raises an ArgumentError, and Psych
+      # raises a Psych::SyntaxError. See psyched_yaml.rb for more info.
+      Gem::Specification.from_yaml(contents)
+    rescue YamlSyntaxError, ArgumentError, Gem::EndOfYAMLException, Gem::Exception
+      eval_gemspec(path, contents)
+    end
 
     def eval_gemspec(path, contents)
       eval(contents, TOPLEVEL_BINDING, path.expand_path.to_s)
