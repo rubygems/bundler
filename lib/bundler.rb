@@ -300,7 +300,7 @@ module Bundler
       end
     end
 
-    def clear_cache
+    def clear_gemspec_cache
       @gemspec_cache = {}
     end
 
