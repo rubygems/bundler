@@ -85,7 +85,11 @@ begin
 
           Dir.chdir("tmp/rubygems") do
             system("git remote update")
-            system("git checkout origin/#{rg}")
+            if rg == "master"
+              system("git checkout origin/master")
+            else
+              system("git checkout #{rg}")
+            end
             hash = `git rev-parse HEAD`.chomp
           end
 
