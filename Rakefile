@@ -1,8 +1,23 @@
 # -*- encoding: utf-8 -*-
 $:.unshift File.expand_path("../lib", __FILE__)
-require 'rubygems'
 require 'bundler/gem_tasks'
+require 'rubygems'
 require 'shellwords'
+require 'benchmark'
+
+# Benchmark task execution
+module Rake
+  class Task
+    alias_method :real_invoke, :invoke
+
+    def invoke(*args)
+      time = Benchmark.measure(@name) do
+        real_invoke(*args)
+      end
+      puts "#{@name} ran for #{time}"
+    end
+  end
+end
 
 task :release => ["man:clean", "man:build"]
 
@@ -93,7 +108,7 @@ begin
             hash = `git rev-parse HEAD`.chomp
           end
 
-          puts "Running bundler specs against rubygems '#{rg}' at #{hash}"
+          puts "Checked out rubygems '#{rg}' at #{hash}"
           ENV["RUBYOPT"] = "-I#{File.expand_path("tmp/rubygems/lib")} #{rubyopt}"
           puts "RUBYOPT=#{ENV['RUBYOPT']}"
         end
