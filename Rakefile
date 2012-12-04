@@ -84,9 +84,12 @@ begin
 
           Dir.chdir("tmp/rubygems") do
             system("git remote update")
-            system("git checkout #{rg}")
-            system("git pull origin master") if rg == "master"
-            hash = `git rev-parse HEAD`.strip
+            if rg == "master"
+              system("git checkout origin/master")
+            else
+              system("git checkout #{rg}")
+            end
+            hash = `git rev-parse HEAD`.chomp
           end
 
           puts "Running bundler specs against rubygems '#{rg}' at #{hash}"
