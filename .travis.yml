@@ -5,6 +5,7 @@ before_script:
   - gem install rake -v '10.0.2'
   - gem list rake
   - rake --version
+  - sudo sed -i 's/1000::/1000:Travis:/g' /etc/passwd
   - sudo apt-get install groff -y
   - rake spec:deps
 notifications:
@@ -17,16 +18,17 @@ notifications:
     channels:
       - "irc.freenode.org#bundler"
 rvm:
-  - ruby-head
-  - 2.0.0
   - 1.9.3
   - 1.9.2
   - 1.8.7
+  - 2.0.0
+  - ruby-head
 
 # Rubygems versions MUST be available as rake tasks
 # see Rakefile:66 for the list of possible RGV values
 env:
   - RGV=master
+  - RGV=v2.0.0.preview2
   - RGV=v1.8.24
 matrix:
   allow_failures:
