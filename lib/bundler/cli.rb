@@ -314,7 +314,11 @@ module Bundler
       Bundler.load.lock
 
       if gem_name
-        Bundler.ui.info locate_gem(gem_name)
+        path_to_gem = locate_gem(gem_name)
+        unless File.directory?(path_to_gem)
+          Bundler.ui.warn "Warning: The following path to #{gem_name} no longer exists."
+        end
+        Bundler.ui.info path_to_gem
       elsif options[:paths]
         Bundler.load.specs.sort_by { |s| s.name }.each do |s|
           Bundler.ui.info locate_gem(s.name)

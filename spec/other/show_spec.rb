@@ -29,6 +29,15 @@ describe "bundle show" do
     expect(out).to eq(default_bundle_path('gems', 'rails-2.3.2').to_s)
   end
 
+  it "warns if path no longer exists on disk" do
+    FileUtils.rm_rf("#{system_gem_path}/gems/rails-2.3.2")
+
+    bundle "show rails"
+
+    expect(out).to match('Warning: The following path to rails no longer exists')
+    expect(out).to match(default_bundle_path('gems', 'rails-2.3.2').to_s)
+  end
+
   it "prints the path to the running bundler" do
     bundle "show bundler"
     expect(out).to eq(File.expand_path('../../../', __FILE__))
