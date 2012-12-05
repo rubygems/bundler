@@ -451,7 +451,7 @@ module Bundler
 
     desc "config NAME [VALUE]", "retrieve or set a configuration value"
     long_desc <<-D
-      Retrieves or sets a configuration value. If only parameter is provided, retrieve the value. If two parameters are provided, replace the
+      Retrieves or sets a configuration value. If only one parameter is provided, retrieve the value. If two parameters are provided, replace the
       existing value with the newly provided one.
 
       By default, setting a configuration value sets it for all projects
