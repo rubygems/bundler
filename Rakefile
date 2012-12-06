@@ -149,8 +149,16 @@ begin
       puts "\n\e[1;33m[Travis CI] Running bundler real world specs against rubygems #{rg}\e[m\n\n"
       realworld = safe_task { Rake::Task["spec:rubygems:#{rg}:realworld"].invoke }
 
+      {"specs" => specs, "sudo" => sudos, "realworld" => realworld}.each do |name, passed|
+        if passed
+          puts "\e[0;32m[Travis CI] #{name} passed\e[m"
+        else
+          puts "\e[0;31m[Travis CI] #{name} failed\e[m"
+        end
+      end
+
       unless specs && sudos && realworld
-        fail "Bundler tests failed, please review the log for more information"
+        fail "Spec run failed, please review the log for more information"
       end
     end
   end
