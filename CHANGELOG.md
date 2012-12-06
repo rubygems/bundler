@@ -1,3 +1,9 @@
+## 1.3.0.pre.2 (Dec 5, 2012)
+
+Bugfixes:
+
+  - non-rubygems.org sources work now
+
 ## 1.3.0.pre (Nov 29, 2012)
 
 Features:
