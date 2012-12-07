@@ -95,6 +95,12 @@ describe ".bundle/config" do
       run "puts Bundler.settings[:foo]"
       expect(out).to eq("global")
     end
+
+    it "expands the path at time of setting" do
+      bundle "config --global local.foo .."
+      run "puts Bundler.settings['local.foo']"
+      expect(out).to eq(File.expand_path(Dir.pwd + "/.."))
+    end
   end
 
   describe "local" do
@@ -133,6 +139,12 @@ describe ".bundle/config" do
 
       run "puts Bundler.settings[:foo]"
       expect(out).to eq("local")
+    end
+
+    it "expands the path at time of setting" do
+      bundle "config --local local.foo .."
+      run "puts Bundler.settings['local.foo']"
+      expect(out).to eq(File.expand_path(Dir.pwd + "/.."))
     end
   end
 end
