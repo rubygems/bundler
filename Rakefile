@@ -28,10 +28,6 @@ rescue
   false
 end
 
-def sudo_task(task)
-  system("sudo -E rake #{task}")
-end
-
 namespace :spec do
   desc "Ensure spec dependencies are installed"
   task :deps do
@@ -141,8 +137,12 @@ begin
       Rake::Task["spec:rubygems:#{rg}"].reenable
 
       puts "\n\e[1;33m[Travis CI] Running bundler sudo specs against rubygems #{rg}\e[m\n\n"
-      sudos = sudo_task "spec:rubygems:#{rg}:sudo"
-      chown = system("sudo chown -R #{ENV['USER']} #{File.join(File.dirname(__FILE__), 'tmp')}")
+      # fix the sudoers file so that RVM paths transmit through sudo -E
+      system("sudo sed -i '/secure_path/d' /etc/sudoers")
+      # run the sudo specs themselves
+      sudos = system("sudo -E rake spec:rubygems:#{rg}:sudo")
+      # clean up by chowning the newly root-owned tmp directory back to the travis user
+      system("sudo chown -R #{ENV['USER']} #{File.join(File.dirname(__FILE__), 'tmp')}")
 
       Rake::Task["spec:rubygems:#{rg}"].reenable
 
