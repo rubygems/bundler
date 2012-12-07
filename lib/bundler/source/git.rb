@@ -166,6 +166,15 @@ module Bundler
         FileUtils.rm_rf(app_cache_path)
         git_proxy.checkout if requires_checkout?
         git_proxy.copy_to(app_cache_path, @submodules)
+
+        # Process any gemspecs before removing '.git'
+        Dir.glob(app_cache_path.join("*.gemspec")).each do |spec_path|
+          Dir.chdir(File.dirname(spec_path)) do
+            spec = Gem::Specification.load(spec_path)
+            File.write(spec_path, spec.to_ruby)
+          end
+        end
+
         FileUtils.rm_rf(app_cache_path.join(".git"))
         FileUtils.touch(app_cache_path.join(".bundlecache"))
       end
