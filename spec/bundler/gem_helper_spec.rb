@@ -35,7 +35,7 @@ describe "Bundler::GemHelper tasks" do
 
     it "handles namespaces and converting to CamelCase" do
       bundle 'gem test-foo_bar'
-      lib = bundled_app('test-foo_bar').join('lib/test-foo_bar.rb').read
+      lib = bundled_app('test-foo_bar').join('lib/test/foo_bar.rb').read
       expect(lib).to include("module Test")
       expect(lib).to include("module FooBar")
     end
