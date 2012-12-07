@@ -520,6 +520,11 @@ module Bundler
           Bundler.ui.info "You are replacing the current local value of #{name}, which is currently #{local.inspect}"
         end
 
+        if name.match(/\Alocal\./)
+          pathname = Pathname.new(args.join(" "))
+          args = [pathname.expand_path.to_s] if pathname.directory?
+        end
+
         Bundler.settings.send("set_#{scope}", name, args.join(" "))
       else
         Bundler.ui.error "Invalid scope --#{scope} given. Please use --local or --global."
