@@ -1,16 +1,18 @@
-[![Build Status](https://secure.travis-ci.org/carlhuda/bundler.png?branch=master)](http://travis-ci.org/carlhuda/bundler)
+# Bundler: a gem to bundle gems [![Build Status](https://secure.travis-ci.org/carlhuda/bundler.png?branch=master)](http://travis-ci.org/carlhuda/bundler)
 
-# Bundler: a gem to bundle gems
-
-Bundler is a tool that manages gem dependencies for your ruby application. It
-takes a gem manifest file and is able to fetch, download, and install the gems
-and all child dependencies specified in this manifest. It can manage any update
-to the gem manifest file and update the bundle's gems accordingly. It also lets
-you run any ruby code in context of the bundle's gem environment.
+Bundler manages the gems that a ruby application depends on. Given a list of gems, it can automatically download and install those gems, as well as any other gems needed by the gems that are listed. Before installing gems, it checks the versions of every gem to make sure that they are compatible, and can all be loaded at the same time. After the gems have been installed, Bundler can help you update some or all of them when new versions become available. Finally, it records the exact versions that have been installed, so that others can install the exact same gems.
 
 ### Installation and usage
 
-See [gembundler.com](http://gembundler.com) for up-to-date installation and usage instructions.
+See [gembundler.com](http://gembundler.com) for installation and usage instructions. tl;dr:
+
+```
+gem install bundler
+bundle init
+echo "gem 'rails'" >> Gemfile
+bundle install
+bundle exec rails new myapp
+```
 
 ### Troubleshooting
 
@@ -20,13 +22,7 @@ For help with common problems, see [ISSUES](https://github.com/carlhuda/bundler/
 
 To see what has changed in recent versions of Bundler, see the [CHANGELOG](https://github.com/carlhuda/bundler/blob/master/CHANGELOG.md).
 
-The `master` branch contains our current progress towards version 1.3.
-Please submit pull requests with bugfixes to the stable branch for
-version you would like to fix.
-
-### Upgrading from Bundler 0.8 to 0.9 and above
-
-See [UPGRADING](https://github.com/carlhuda/bundler/blob/master/UPGRADING.md).
+The `master` branch contains our current progress towards version 1.3. Versions 1.0 to 1.2 each have their own stable branches. Please submit bugfixes as pull requests to the stable branch for the version you would like to fix.
 
 ### Other questions
 
