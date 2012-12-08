@@ -170,7 +170,7 @@ module Bundler
         # in git might require git or other dependencies.
         # The gemspecs we cache should already be evaluated.
         spec_path = app_cache_path.join(File.basename(spec.loaded_from))
-        File.write(spec_path, spec.to_ruby)
+        File.open(spec_path, 'wb') {|file| file.print spec.to_ruby }
       end
 
       def load_spec_files
