@@ -12,8 +12,6 @@ module Spec
       end
       FileUtils.mkdir_p(tmp)
       FileUtils.mkdir_p(home)
-      Gem.sources = ["file://#{gem_repo1}/"]
-      # Gem.configuration.write
     end
 
     attr_reader :out, :err, :exitstatus
