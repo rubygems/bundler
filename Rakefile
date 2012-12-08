@@ -127,6 +127,19 @@ begin
       task "rubygems:all" => "co"
     end
 
+    namespace :travis do
+      task :deps do
+        # Give the travis user a name so that git won't fatally error
+        system("sudo sed -i 's/1000::/1000:Travis:/g' /etc/passwd")
+        # Strip secure_path so that RVM paths transmit through sudo -E
+        system("sudo sed -i '/secure_path/d' /etc/sudoers")
+        # Install groff for the ronn gem
+        system("sudo apt-get install groff -y")
+        # Install the other gem deps, etc.
+        Rake::Task["spec:deps"].invoke
+      end
+    end
+
     desc "Run the tests on Travis CI against a rubygem version (using ENV['RGV'])"
     task :travis do
       rg = ENV['RGV'] || 'master'
@@ -137,9 +150,6 @@ begin
       Rake::Task["spec:rubygems:#{rg}"].reenable
 
       puts "\n\e[1;33m[Travis CI] Running bundler sudo specs against rubygems #{rg}\e[m\n\n"
-      # fix the sudoers file so that RVM paths transmit through sudo -E
-      system("sudo sed -i '/secure_path/d' /etc/sudoers")
-      # run the sudo specs themselves
       sudos = system("sudo -E rake spec:rubygems:#{rg}:sudo")
       # clean up by chowning the newly root-owned tmp directory back to the travis user
       system("sudo chown -R #{ENV['USER']} #{File.join(File.dirname(__FILE__), 'tmp')}")

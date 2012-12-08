@@ -1,8 +1,6 @@
 language: ruby
 script: rake spec:travis
-before_script:
-  - sudo apt-get install groff -y
-  - rake spec:deps
+before_script: rake spec:travis:deps
 notifications:
   email:
     - mail@arko.net
