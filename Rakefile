@@ -34,6 +34,24 @@ namespace :spec do
     sh "#{Gem.ruby} -S gem list ronn | (grep 'ronn' 1> /dev/null) || #{Gem.ruby} -S gem install ronn --no-ri --no-rdoc"
     sh "#{Gem.ruby} -S gem list rspec | (grep 'rspec (2.' 1> /dev/null) || #{Gem.ruby} -S gem install rspec --no-ri --no-rdoc"
   end
+
+  namespace :travis do
+    task :deps do
+      # Give the travis user a name so that git won't fatally error
+      system("sudo sed -i 's/1000::/1000:Travis:/g' /etc/passwd")
+      # Strip secure_path so that RVM paths transmit through sudo -E
+      system("sudo sed -i '/secure_path/d' /etc/sudoers")
+      # Install groff for the ronn gem
+      system("sudo apt-get install groff -y")
+      # Recompile ruby-head, because the VM version is quite old
+      if ENV['RUBY_VERSION'] == 'ruby-head'
+        system("rvm reinstall ruby-head")
+        system("ruby --version")
+      end
+      # Install the other gem deps, etc.
+      Rake::Task["spec:deps"].invoke
+    end
+  end
 end
 
 begin
@@ -125,24 +143,6 @@ begin
 
       task "co" => "setup_co"
       task "rubygems:all" => "co"
-    end
-
-    namespace :travis do
-      task :deps do
-        # Give the travis user a name so that git won't fatally error
-        system("sudo sed -i 's/1000::/1000:Travis:/g' /etc/passwd")
-        # Strip secure_path so that RVM paths transmit through sudo -E
-        system("sudo sed -i '/secure_path/d' /etc/sudoers")
-        # Install groff for the ronn gem
-        system("sudo apt-get install groff -y")
-        # Recompile ruby-head, because the VM version is quite old
-        if ENV['RUBY_VERSION'] == 'ruby-head'
-          system("rvm reinstall ruby-head")
-          system("ruby --version")
-        end
-        # Install the other gem deps, etc.
-        Rake::Task["spec:deps"].invoke
-      end
     end
 
     desc "Run the tests on Travis CI against a rubygem version (using ENV['RGV'])"
