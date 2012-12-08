@@ -216,10 +216,10 @@ describe "gemcutter's dependency API" do
 
     bundle :install, :artifice => "endpoint_extra"
 
-    output = <<OUTPUT
-Fetching gem metadata from http://localgemserver.test/..
-Fetching gem metadata from http://localgemserver.test/extra/.
-OUTPUT
+    output = <<-OUTPUT.gsub(/^ +/,'')
+      Fetching gem metadata from http://localgemserver.test/..
+      Fetching gem metadata from http://localgemserver.test/extra/.
+    OUTPUT
     expect(out).to include(output)
   end
 
