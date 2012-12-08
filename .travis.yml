@@ -1,13 +1,6 @@
 language: ruby
 script: rake spec:travis
-before_script:
-  - rake --version
-  - gem install rake -v '10.0.2'
-  - gem list rake
-  - rake --version
-  - sudo sed -i 's/1000::/1000:Travis:/g' /etc/passwd
-  - sudo apt-get install groff -y
-  - rake spec:deps
+before_script: rake spec:travis:deps
 notifications:
   email:
     - mail@arko.net
