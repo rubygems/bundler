@@ -166,14 +166,11 @@ module Bundler
         FileUtils.rm_rf(app_cache_path)
         git_proxy.checkout if requires_checkout?
         git_proxy.copy_to(app_cache_path, @submodules)
-
-        # Process any gemspecs before removing '.git'
-        Dir.glob(app_cache_path.join("*.gemspec")).each do |spec_path|
-          Dir.chdir(File.dirname(spec_path)) do
-            spec = Gem::Specification.load(spec_path)
-            File.write(spec_path, spec.to_ruby)
-          end
-        end
+        # Evaluate gemspecs and cache the result. Gemspecs
+        # in git might require git or other dependencies.
+        # The gemspecs we cache should already be evaluated.
+        spec_path = app_cache_path.join(File.basename(spec.loaded_from))
+        File.write(spec_path, spec.to_ruby)
       end
 
       def load_spec_files

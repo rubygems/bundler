@@ -165,5 +165,24 @@ end
 
       expect(out).not_to include("Your Gemfile contains path and git dependencies.")
     end
+
+    it "evaluates gemspecs and writes them out" do
+      git = build_git "foo"
+
+      # Insert a gemspec method that shells out
+      spec_lines = lib_path("foo-1.0/foo.gemspec").read.split("\n")
+      spec_lines.insert(-2, "s.description = `echo bob`")
+      update_git("foo"){ |s| s.write "foo.gemspec", spec_lines.join("\n") }
+
+      install_gemfile <<-G
+        gem "foo", :git => '#{lib_path("foo-1.0")}'
+      G
+      bundle "#{cmd} --all"
+
+      ref = git.ref_for("master", 11)
+      gemspec = bundled_app("vendor/cache/foo-1.0-#{ref}/foo.gemspec").read
+      expect(gemspec).to_not match("`echo bob`")
+    end
+
   end
 end

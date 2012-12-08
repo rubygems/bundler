@@ -547,7 +547,7 @@ module Spec
           _default_files.keys.each do |path|
             _default_files[path] << "\n#{Builders.constantize(name)}_PREV_REF = '#{current_ref}'"
           end
-          super(options.merge(:path => libpath))
+          super(options.merge(:path => libpath, :gemspec => false))
           `git add *`
           `git commit -m "BUMP"`
         end

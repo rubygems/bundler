@@ -3,6 +3,7 @@
 Bugfixes:
 
   - Gemfile sources other than rubygems.org work even when .gemrc contains sources
+  - caching git gems now caches specs, fixing e.g. git ls-files (#2039)
 
 ## 1.3.0.pre (Nov 29, 2012)
 
