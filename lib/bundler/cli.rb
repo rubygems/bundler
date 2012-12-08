@@ -174,9 +174,7 @@ module Bundler
     def install
       opts = options.dup
       if opts[:without]
-        opts[:without].map!{|g| g.split(" ") }
-        opts[:without].flatten!
-        opts[:without].map!{|g| g.to_sym }
+        opts[:without] = opts[:without].map{|g| g.tr(' ', ':') }
       end
 
       # Can't use Bundler.settings for this because settings needs gemfile.dirname
