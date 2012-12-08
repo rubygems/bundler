@@ -104,6 +104,12 @@ module Bundler
         next if spec.name == 'bundler'
         spec.source.cache(spec) if spec.source.respond_to?(:cache)
       end
+
+      Dir[cache_path.join("*/.git")].each do |git_dir|
+        FileUtils.rm_rf(git_dir)
+        FileUtils.touch(File.expand_path("../.bundlecache", git_dir))
+      end
+
       prune_cache unless Bundler.settings[:no_prune]
     end
 
@@ -246,7 +252,7 @@ module Bundler
       end
 
       if cached.any?
-        Bundler.ui.info "Removing outdated .git/path repos from vendor/cache"
+        Bundler.ui.info "Removing outdated git and path gems from vendor/cache"
 
         cached.each do |path|
           path = File.dirname(path)

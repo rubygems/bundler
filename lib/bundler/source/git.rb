@@ -174,9 +174,6 @@ module Bundler
             File.write(spec_path, spec.to_ruby)
           end
         end
-
-        FileUtils.rm_rf(app_cache_path.join(".git"))
-        FileUtils.touch(app_cache_path.join(".bundlecache"))
       end
 
       def load_spec_files
