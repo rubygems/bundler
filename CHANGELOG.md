@@ -1,8 +1,8 @@
-## 1.3.0.pre.2 (Dec 5, 2012)
+## 1.3.0.pre.2 (Dec 8, 2012)
 
 Bugfixes:
 
-  - non-rubygems.org sources work now
+  - Gemfile sources other than rubygems.org work even when .gemrc contains sources
 
 ## 1.3.0.pre (Nov 29, 2012)
 
