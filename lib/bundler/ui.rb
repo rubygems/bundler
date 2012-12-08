@@ -57,6 +57,10 @@ module Bundler
         @quiet = true
       end
 
+      def quiet?
+        @quiet
+      end
+
       def debug?
         # needs to be false instead of nil to be newline param to other methods
         !!@debug && !@quiet
