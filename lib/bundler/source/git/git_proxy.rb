@@ -44,7 +44,9 @@ module Bundler
           else
             Bundler.ui.info "Fetching #{uri}"
             FileUtils.mkdir_p(path.dirname)
-            git %|clone #{uri_escaped} "#{path}" --bare --no-hardlinks|
+            clone_command = %|clone #{uri_escaped} "#{path}" --bare --no-hardlinks|
+            clone_command = "#{clone_command} --quiet" if Bundler.ui.quiet?
+            git clone_command
           end
         end
 
