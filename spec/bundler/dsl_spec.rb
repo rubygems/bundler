@@ -7,19 +7,31 @@ describe Bundler::Dsl do
   end
 
   describe '#_normalize_options' do
-    it "should convert :github to :git" do
+    it "converts :github to :git" do
       subject.gem("sparks", :github => "indirect/sparks")
       github_uri = "git://github.com/indirect/sparks.git"
       expect(subject.dependencies.first.source.uri).to eq(github_uri)
     end
 
-    it "should convert 'rails' to 'rails/rails'" do
+    it "converts numeric :gist to :git" do
+      subject.gem("not-really-a-gem", :gist => 2859988)
+      github_uri = "git://gist.github.com/2859988.git"
+      expect(subject.dependencies.first.source.uri).to eq(github_uri)
+    end
+
+    it "converts :gist to :git" do
+      subject.gem("not-really-a-gem", :gist => "2859988")
+      github_uri = "git://gist.github.com/2859988.git"
+      expect(subject.dependencies.first.source.uri).to eq(github_uri)
+    end
+
+    it "converts 'rails' to 'rails/rails'" do
       subject.gem("rails", :github => "rails")
       github_uri = "git://github.com/rails/rails.git"
       expect(subject.dependencies.first.source.uri).to eq(github_uri)
     end
 
-    it "should interpret slashless 'github:' value as account name" do
+    it "interprets slashless 'github:' value as account name" do
       subject.gem("bundler", :github => "carlhuda")
       github_uri = "git://github.com/carlhuda/bundler.git"
       expect(subject.dependencies.first.source.uri).to eq(github_uri)
@@ -28,7 +40,7 @@ describe Bundler::Dsl do
   end
 
   describe '#method_missing' do
-    it 'should raise an error for unknown DSL methods' do
+    it 'raises an error for unknown DSL methods' do
       Bundler.should_receive(:read_file).with("Gemfile").and_return("unknown")
       error_msg = "Undefined local variable or method `unknown'" \
         " for Gemfile\\s+from Gemfile:1"
@@ -46,7 +58,7 @@ describe Bundler::Dsl do
   end
 
   describe "syntax errors" do
-    it "should raise a Bundler::GemfileError" do
+    it "raise a Bundler::GemfileError" do
       gemfile "gem 'foo', :path => /unquoted/string/syntax/error"
       expect { Bundler::Dsl.evaluate(bundled_app("Gemfile"), nil, true) }.
         to raise_error(Bundler::GemfileError)
