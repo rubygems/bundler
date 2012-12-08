@@ -19,7 +19,7 @@ Please open a ticket with Heroku if you're having trouble deploying. They have a
 After reading the documentation, try these troubleshooting steps:
 
     # remove user-specific gems and git repos
-    rm -rf ~/.bundle/ ~/.gem/
+    rm -rf ~/.bundle/ ~/.gem/bundler/ ~/.gems/cache/bundler/
 
     # remove system-wide git repos and git checkouts
     rm -rf $GEM_HOME/bundler/ $GEM_HOME/cache/bundler/
@@ -32,6 +32,10 @@ After reading the documentation, try these troubleshooting steps:
 
     # remove the saved resolve of the Gemfile
     rm -rf Gemfile.lock
+
+    # uninstall the rubygems-bundler and open_gem gems
+    rvm gemset use global # if using rvm
+    gem uninstall rubygems-bundler open_gem
 
     # try to install one more time
     bundle install
@@ -49,8 +53,10 @@ The Bundler team needs to know some things in order to diagnose and hopefully fi
   - What version of Ruby you are using (run `ruby -v`)
   - What version of Rubygems you are using (run `gem -v`)
   - Whether you are using RVM, and if so what version (run `rvm -v`)
-  - Whether you have the `rubygems-bundler` gem, which can break gem binares (run `gem list rubygems-bundler`)
+  - Whether you have the `rubygems-bundler` gem, which can break gem executables (run `gem list rubygems-bundler`)
   - Whether you have the `open_gem` gem, which can cause rake activation conflicts (run `gem list open_gem`)
+
+If you have either `rubygems-bundler` or `open_gem` installed, please try removing them and then following the troublshooting steps above before opening a new ticket.
 
 If you are using Rails 2.3, please also include:
 
