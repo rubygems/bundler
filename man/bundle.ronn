@@ -79,6 +79,9 @@ We divide `bundle` subcommands into primary commands and utilities.
 * [bundle platform(1)][bundle-platform]:
   Displays platform compatibility information
 
+* `bundle clean(1)`:
+  Cleans up unused gems in your bundler directory
+
 ## OBSOLETE
 
 These commands are obsolete and should no longer be used
