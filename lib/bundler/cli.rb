@@ -576,7 +576,6 @@ module Bundler
     method_option :format, :type => :string, :default => "png", :aliases => '-F', :banner => "This is output format option. Supported format is png, jpg, svg, dot ..."
     def viz
       output_file = File.expand_path(options[:file])
-      output_format = options[:format]
       graph = Graph.new(Bundler.load, output_file, options[:version], options[:requirements], options[:format])
 
       begin
@@ -699,8 +698,8 @@ module Bundler
 
       # Build an array of Dependency objects out of the arguments
       deps = []
-      gems.each_slice(2) do |name, version|
-        deps << Bundler::Dependency.new(name, version)
+      gems.each_slice(2) do |gem_name, gem_version|
+        deps << Bundler::Dependency.new(gem_name, gem_version)
       end
 
       added = Injector.inject(deps)

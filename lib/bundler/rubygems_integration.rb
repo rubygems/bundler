@@ -100,7 +100,7 @@ module Bundler
         # Then fetch the prerelease specs
         begin
           Gem::SpecFetcher.new.list(false, true).each {|k, v| spec_list[k] += v }
-        rescue Gem::RemoteFetcher::FetchError => e
+        rescue Gem::RemoteFetcher::FetchError
           # ignore if we can't fetch the prerelease specs
         end
       end
@@ -415,16 +415,16 @@ module Bundler
       end
 
       def fetch_all_remote_specs
-        tuples, errors = Gem::SpecFetcher.new.available_specs(:complete)
+        fetched, errors = Gem::SpecFetcher.new.available_specs(:complete)
         # only raise if we don't get any specs back.
         # this means we still work if prerelease_specs.4.8.gz
         # don't exist but specs.4.8.gz do
-        if tuples.empty? && error = errors.detect {|e| e.is_a?(Gem::SourceFetchProblem) }
+        if fetched.empty? && error = errors.detect {|e| e.is_a?(Gem::SourceFetchProblem) }
           raise Gem::RemoteFetcher::FetchError.new(error.error, error.source)
         end
 
         hash = {}
-        tuples.each do |source,tuples|
+        fetched.each do |source, tuples|
           hash[source.uri] = tuples.map { |tuple| tuple.to_a }
         end
 

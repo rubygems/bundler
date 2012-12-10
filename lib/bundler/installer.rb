@@ -17,10 +17,10 @@ module Bundler
 
     # Runs the install procedures for a specific Gemfile.
     #
-    # Firstly, this method will check to see if Bundler.bundle_path exists 
+    # Firstly, this method will check to see if Bundler.bundle_path exists
     # and if not then will create it. This is usually the location of gems
     # on the system, be it RVM or at a system path.
-    # 
+    #
     # Secondly, it checks if Bundler has been configured to be "frozen"
     # Frozen ensures that the Gemfile and the Gemfile.lock file are matching.
     # This stops a situation where a developer may update the Gemfile but may not run
@@ -28,7 +28,7 @@ module Bundler
     # If this file is not correctly updated then any other developer running
     # `bundle install` will potentially not install the correct gems.
     #
-    # Thirdly, Bundler checks if there are any dependencies specified in the Gemfile using 
+    # Thirdly, Bundler checks if there are any dependencies specified in the Gemfile using
     # Bundler::Environment#dependencies. If there are no dependencies specified then
     # Bundler returns a warning message stating so and this method returns.
     #
@@ -40,11 +40,11 @@ module Bundler
     # Fifthly, Bundler resolves the dependencies either through a cache of gems or by remote.
     # This then leads into the gems being installed, along with stubs for their executables,
     # but only if the --binstubs option has been passed or Bundler.options[:bin] has been set
-    # earlier. 
-    # 
+    # earlier.
+    #
     # Sixthly, a new Gemfile.lock is created from the installed gems to ensure that the next time
     # that a user runs `bundle install` they will receive any updates from this process.
-    # 
+    #
     # Finally: TODO add documentation for how the standalone process works.
     def run(options)
       # Create the BUNDLE_PATH directory
@@ -129,10 +129,11 @@ module Bundler
     end
 
     def generate_bundler_executable_stubs(spec)
-      bin_path = Bundler.bin_path
-      template = File.read(File.expand_path('../templates/Executable', __FILE__))
-      relative_gemfile_path = Bundler.default_gemfile.relative_path_from(bin_path)
-      ruby_command = Thor::Util.ruby_command
+      # double-assignment to avoid warnings about variables that will be used by ERB
+      bin_path = bin_path = Bundler.bin_path
+      template = template = File.read(File.expand_path('../templates/Executable', __FILE__))
+      relative_gemfile_path = relative_gemfile_path = Bundler.default_gemfile.relative_path_from(bin_path)
+      ruby_command = ruby_command = Thor::Util.ruby_command
 
       spec.executables.each do |executable|
         next if executable == "bundle"
@@ -143,14 +144,15 @@ module Bundler
     end
 
     def generate_standalone_bundler_executable_stubs(spec)
+      # double-assignment to avoid warnings about variables that will be used by ERB
       bin_path = Bundler.bin_path
       template = File.read(File.expand_path('../templates/Executable.standalone', __FILE__))
-      ruby_command = Thor::Util.ruby_command
+      ruby_command = ruby_command = Thor::Util.ruby_command
 
       spec.executables.each do |executable|
         next if executable == "bundle"
-        standalone_path = Pathname(Bundler.settings[:path]).expand_path.relative_path_from(bin_path)
-        executable_path = Pathname(spec.full_gem_path).join(spec.bindir, executable).relative_path_from(bin_path)
+        standalone_path = standalone_path = Pathname(Bundler.settings[:path]).expand_path.relative_path_from(bin_path)
+        executable_path = executable_path = Pathname(spec.full_gem_path).join(spec.bindir, executable).relative_path_from(bin_path)
         File.open "#{bin_path}/#{executable}", 'w', 0755 do |f|
           f.puts ERB.new(template, nil, '-').result(binding)
         end
