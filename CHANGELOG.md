@@ -1,15 +1,17 @@
-## 1.3.0.pre.2 (Dec 8, 2012)
+## 1.3.0.pre.2 (Dec 9, 2012)
 
 Features:
 
   - `config` expands local overrides like `local.rack .` (@gkop, #2205)
   - `gem` generates files correctly for names like `jquery-rails` (@banyan, #2201)
+  - use gems from gists with the :gist option in the Gemfile (@jgaskins)
 
 Bugfixes:
 
   - Gemfile sources other than rubygems.org work even when .gemrc contains sources
   - caching git gems now caches specs, fixing e.g. git ls-files (@bison, #2039)
   - `show GEM` now warns if the directory has been deleted (@rohit, #2070)
+  - git output hidden when running in --quiet mode (@rohit)
 
 ## 1.3.0.pre (Nov 29, 2012)
 
