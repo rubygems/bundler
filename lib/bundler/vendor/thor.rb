@@ -358,6 +358,8 @@ class Thor
       end
 
       def create_task(meth) #:nodoc:
+        @long_desc ||= nil
+        @usage ||= nil
         if @usage && @desc
           base_class = @hide ? Thor::HiddenTask : Thor::Task
           tasks[meth] = base_class.new(meth, @desc, @long_desc, @usage, method_options)
