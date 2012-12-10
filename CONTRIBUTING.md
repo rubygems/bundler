@@ -4,7 +4,7 @@ If you're having a problem, please see [ISSUES](../ISSUES.md) for troubleshootin
 
 # Discussing Bundler
 
-If you'd like to discuss features, ask questions, or just engage in general Bundler-focused discussion, please see the [#bundler](irc://irc.freenode.net/#bundler) IRC channel on Freenode, and the [Bundler mailing list](http://groups.google.com/ruby-bundler) on Google Groups.
+If you'd like to discuss features, ask questions, or just engage in general Bundler-focused discussion, please see the [#bundler](irc://irc.freenode.net/#bundler) IRC channel on Freenode, and the [Bundler mailing list](http://groups.google.com/group/ruby-bundler) on Google Groups.
 
 # Helping Out
 
