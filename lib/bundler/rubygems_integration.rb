@@ -100,7 +100,7 @@ module Bundler
         # Then fetch the prerelease specs
         begin
           Gem::SpecFetcher.new.list(false, true).each {|k, v| spec_list[k] += v }
-        rescue Gem::RemoteFetcher::FetchError => e
+        rescue Gem::RemoteFetcher::FetchError
           # ignore if we can't fetch the prerelease specs
         end
       end
@@ -424,8 +424,8 @@ module Bundler
         end
 
         hash = {}
-        tuples.each do |source,tuples|
-          hash[source.uri] = tuples.map { |tuple| tuple.to_a }
+        tuples.each do |source, tuple_list|
+          hash[source.uri] = tuple_list.map { |tuple| tuple.to_a }
         end
 
         hash
