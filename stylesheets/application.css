@@ -567,3 +567,8 @@ pre {
   color: #124f6a;
   margin-top: -1em;
 }
+/* line 343 */
+.contributor p {
+  margin-left: 150px;
+  padding-left: 1.5em;
+}
