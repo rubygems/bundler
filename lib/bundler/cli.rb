@@ -409,7 +409,7 @@ module Bundler
     rescue GemNotFound => e
       Bundler.ui.error(e.message)
       Bundler.ui.warn "Run `bundle install` to install missing gems."
-      exit 128
+      exit 1
     end
 
     desc "package", "Locks and then caches all of the gems into vendor/cache"
