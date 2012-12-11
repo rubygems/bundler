@@ -80,7 +80,7 @@ module Bundler
           elsif dep.type == :development
             return
           else
-            raise DslError, "You cannot specify the same gem twice with different version requirements. \n" \
+            raise GemfileEror, "You cannot specify the same gem twice with different version requirements. \n" \
                             "You specified: #{current.name} (#{current.requirement}) and " \
                             "#{dep.name} (#{dep.requirement})\n"
           end
@@ -92,7 +92,7 @@ module Bundler
           elsif dep.type == :development
             return
           else
-            raise DslError, "You cannot specify the same gem twice coming from different sources.\n" \
+            raise GemfileEror, "You cannot specify the same gem twice coming from different sources.\n" \
                             "You specified that #{dep.name} (#{dep.requirement}) should come from " \
                             "#{current.source || 'an unspecified source'} and #{dep.source}\n"
           end
@@ -227,7 +227,7 @@ module Bundler
       platforms.map! { |p| p.to_sym }
       platforms.each do |p|
         next if VALID_PLATFORMS.include?(p)
-        raise DslError, "`#{p}` is not a valid platform. The available options are: #{VALID_PLATFORMS.inspect}"
+        raise GemfileError, "`#{p}` is not a valid platform. The available options are: #{VALID_PLATFORMS.inspect}"
       end
 
       if github = opts.delete("github")

@@ -55,12 +55,10 @@ module Bundler
   class GitError             < BundlerError; status_code(11) ; end
   class DeprecatedError      < BundlerError; status_code(12) ; end
   class GemspecError         < BundlerError; status_code(14) ; end
-  class DslError             < BundlerError; status_code(15) ; end
+  class InvalidOption        < BundlerError; status_code(2)  ; end
   class ProductionError      < BundlerError; status_code(16) ; end
-  class InvalidOption        < DslError                      ; end
   class HTTPError            < BundlerError; status_code(17) ; end
   class RubyVersionMismatch  < BundlerError; status_code(18) ; end
-
 
   WINDOWS = RbConfig::CONFIG["host_os"] =~ %r!(msdos|mswin|djgpp|mingw)!
   FREEBSD = RbConfig::CONFIG["host_os"] =~ /bsd/
