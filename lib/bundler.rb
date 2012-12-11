@@ -55,7 +55,7 @@ module Bundler
   class GitError             < BundlerError; status_code(11) ; end
   class DeprecatedError      < BundlerError; status_code(12) ; end
   class GemspecError         < BundlerError; status_code(14) ; end
-  class InvalidOption        < BundlerError; status_code(2)  ; end
+  class InvalidOption        < BundlerError; status_code(15) ; end
   class ProductionError      < BundlerError; status_code(16) ; end
   class HTTPError            < BundlerError; status_code(17) ; end
   class RubyVersionMismatch  < BundlerError; status_code(18) ; end
