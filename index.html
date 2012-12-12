@@ -16,7 +16,14 @@
         </div>
         <h2>What is Bundler?</h2>
         <div id="intro">
-          Bundler is a tool that maintains a consistent environment for a developer’s code across all machines. When a developer’s code is run on different machines, the libraries the developer originally built their code on may change. This breaks the developer’s application. Bundler ensures that the libraries will remain the same, taping everything together so that the developer’s application runs smoothly on every machine where it is deployed.
+          Bundler maintains a consistent environment for ruby applications. It tracks an application's code and the rubygems it needs to run, so that an application will always have the exact gems (and versions) that it needs to run.
+        </div>
+        <h2>Would you like to</h2>
+        <div class="buttons">
+          <a href="#getting-started">Get started</a>
+          <a href="https://github.com/carlhuda/bundler/blob/master/ISSUES.md">Report a bug</a>
+          <a href="/v1.2/whats_new.html">See what's new</a>
+          <a href="#use-bundler">Read documentation</a>
         </div>
         <h2 id="getting-started">
           Getting Started
@@ -82,7 +89,7 @@
             <a href="/v1.2/man/bundle-exec.1.html">Learn More: Executables</a>
           </div>
         </div>
-        <h2>Use Bundler with</h2>
+        <h2 id="use-bundler">Use Bundler with</h2>
         <div class="buttons">
           <a href="/v1.2/rails3.html">Rails 3</a>
           <a href="/v1.2/rails23.html">Rails 2.3</a>
@@ -90,22 +97,18 @@
           <a href="/v1.2/rubygems.html">Rubygems</a>
           <a href="/v1.2/rubymotion.html">RubyMotion</a>
         </div>
-        <h2>Learn about</h2>
+        <h2 id="learn-about">Learn about</h2>
         <div class="buttons">
-          <a href="/v1.2/bundle_install.html">Installing dependencies</a>
-          <a href="/v1.2/man/bundle-update.1.html">Updating dependencies</a>
+          <a href="/v1.2/gemfile.html">Gemfile</a>
+          <a href="/v1.2/bundle_install.html">Installing</a>
+          <a href="/v1.2/man/bundle-update.1.html">Updating</a>
           <a href="/v1.2/deploying.html">Deploying</a>
         </div>
         <div class="buttons">
           <a href="/v1.2/git.html">Git gems</a>
-          <a href="/v1.2/gemfile.html">Gemfile</a>
-          <a href="/v1.2/commands.html">Bundler commands</a>
-        </div>
-        <h2>More about</h2>
-        <div class="buttons">
+          <a href="/v1.2/commands.html">Other commands</a>
           <a href="/v1.2/rationale.html">Why Bundler exists</a>
-          <a href="https://github.com/carlhuda/bundler/blob/1-2-stable/ISSUES.md">Troubleshooting</a>
-          <a href="/v1.2/whats_new.html">What's New</a>
+          <a href="/v1.2/man/bundle.1.html">Man pages</a>
         </div>
         <div class="shirts">
           <div class="content">
@@ -126,36 +129,40 @@
       <div class="spacer"></div>
       <div id="navigation">
         <p>
-          <b>commands</b>
-          <a href="./index.html">home</a>
+          <b><a href="/v1.2/commands.html">commands</a></b>
+          <a href="/v1.2/bundle_install.html">install</a>
           /
-          <a href="./bundle_install.html">install</a>
+          <a href="/v1.2/bundle_update.html">update</a>
           /
-          <a href="./bundle_package.html">package</a>
+          <a href="/v1.2/bundle_exec.html">exec</a>
+          /
+          <a href="/v1.2/bundle_config.html">config</a>
+          /
+          <a href="/v1.2/bundle_package.html">package</a>
         </p>
         <p>
           <b>usage</b>
-          <a href="./gemfile.html">gemfile</a>
+          <a href="/v1.2/gemfile.html">gemfile</a>
           /
-          <a href="./git.html">git</a>
+          <a href="/v1.2/git.html">git</a>
           /
-          <a href="./groups.html">groups</a>
+          <a href="/v1.2/groups.html">groups</a>
           /
-          <a href="./bundler_setup.html">setup</a>
+          <a href="/v1.2/bundler_setup.html">setup</a>
           /
-          <a href="./deploying.html">deploying</a>
+          <a href="/v1.2/deploying.html">deploying</a>
         </p>
         <p>
           <b>frameworks</b>
-          <a href="./rubygems.html">rubygems</a>
+          <a href="/v1.2/rubygems.html">rubygems</a>
           /
-          <a href="./sinatra.html">sinatra</a>
+          <a href="/v1.2/sinatra.html">sinatra</a>
           /
-          <a href="./rails23.html">rails 2.3</a>
+          <a href="/v1.2/rails23.html">rails 2.3</a>
           /
-          <a href="./rails3.html">rails 3</a>
+          <a href="/v1.2/rails3.html">rails 3</a>
           /
-          <a href="./rubymotion.html">rubymotion</a>
+          <a href="/v1.2/rubymotion.html">rubymotion</a>
         </p>
       </div>
       <div class="spacer"></div>
@@ -172,10 +179,10 @@
     </a>
     <div id="prod-versions">
       Docs:
-      <a class="" href="v0.9/index.html">v0.9</a>
-      <a class="" href="v1.0/index.html">v1.0</a>
-      <a class="" href="v1.1/index.html">v1.1</a>
-      <a class="current" href="v1.2/index.html">v1.2</a>
+      <a href="v0.9/index.html">v0.9</a>
+      <a href="v1.0/index.html">v1.0</a>
+      <a href="v1.1/index.html">v1.1</a>
+      <a class="current" href="/">v1.2</a>
     </div>
     <script type="text/javascript">
       //<![CDATA[
