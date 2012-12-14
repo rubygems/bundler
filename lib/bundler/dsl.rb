@@ -236,7 +236,7 @@ module Bundler
       end
 
       if gist = opts.delete("gist")
-        opts["git"] = "git://gist.github.com/#{gist}.git"
+        opts["git"] = "https://gist.github.com/#{gist}.git"
       end
 
       ["git", "path"].each do |type|
