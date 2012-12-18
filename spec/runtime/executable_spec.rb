@@ -99,6 +99,18 @@ describe "Running bin/* commands" do
     expect(bundled_app("bin/rackup")).not_to exist
   end
 
+  it "allows you to stop installing binstubs" do
+    bundle "install --binstubs bin/"
+    bundled_app("bin/rackup").rmtree
+    bundle "install --binstubs \"\""
+
+    expect(bundled_app("bin/rackup")).not_to exist
+    #expect(bundled_app("rackup")).not_to exist
+
+    bundle "config bin"
+    expect(out).to include("You have not configured a value for `bin`")
+  end
+
   it "remembers that the option was specified" do
     gemfile <<-G
       source "file://#{gem_repo1}"
