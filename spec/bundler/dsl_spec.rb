@@ -30,13 +30,6 @@ describe Bundler::Dsl do
       github_uri = "git://github.com/rails/rails.git"
       expect(subject.dependencies.first.source.uri).to eq(github_uri)
     end
-
-    it "interprets slashless 'github:' value as account name" do
-      subject.gem("bundler", :github => "carlhuda")
-      github_uri = "git://github.com/carlhuda/bundler.git"
-      expect(subject.dependencies.first.source.uri).to eq(github_uri)
-    end
-
   end
 
   describe '#method_missing' do
