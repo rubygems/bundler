@@ -2,6 +2,15 @@ require 'rubygems'
 
 module Bundler
   class RubygemsIntegration
+
+    def build_args
+      Gem::Command.build_args
+    end
+
+    def build_args=(args)
+      Gem::Command.build_args = args
+    end
+
     def loaded_specs(name)
       Gem.loaded_specs[name]
     end
@@ -109,12 +118,12 @@ module Bundler
     end
 
     def with_build_args(args)
-      old_args = Gem::Command.build_args
+      old_args = build_args
       begin
-        Gem::Command.build_args = args
+        build_args = args
         yield
       ensure
-        Gem::Command.build_args = old_args
+        build_args = old_args
       end
     end
 
