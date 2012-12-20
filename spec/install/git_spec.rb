@@ -51,7 +51,7 @@ describe "bundle install with git sources" do
       end
     end
 
-    it "setups executables" do
+    it "sets up git gem executables on the path" do
       pending_jruby_shebang_fix
       bundle "exec foobar"
       expect(out).to eq("1.0")
@@ -808,4 +808,34 @@ describe "bundle install with git sources" do
       expect(out).to include("failed for foo-1.0")
     end
   end
+
+  context "with an extension" do
+    it "installs the extension" do
+      build_git "foo" do |s|
+        s.add_dependency "rake"
+        s.extensions << "Rakefile"
+        s.write "Rakefile", <<-RUBY
+          task :default do
+            path = File.expand_path("../lib", __FILE__)
+            FileUtils.mkdir_p(path)
+            File.open("\#{path}/foo.rb", "w") do |f|
+              f.puts "FOO = 'YES'"
+            end
+          end
+        RUBY
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "foo", :git => "#{lib_path('foo-1.0')}"
+      G
+
+      run <<-R
+        require 'foo'
+        puts FOO
+      R
+      expect(out).to eq("YES")
+    end
+  end
+
 end

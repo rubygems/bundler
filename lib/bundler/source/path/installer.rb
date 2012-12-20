@@ -10,6 +10,7 @@ module Bundler
           @wrappers          = options[:wrappers] || true
           @env_shebang       = options[:env_shebang] || true
           @format_executable = options[:format_executable] || false
+          @build_args        = options[:build_args] || Bundler.rubygems.build_args
         end
 
         def generate_bin
