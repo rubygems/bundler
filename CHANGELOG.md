@@ -1,8 +1,16 @@
 ## 1.3.0.pre.3
 
+Features:
+
+  - pushing gems during `rake release` can be disabled (@trans)
+  - installing gems with `rake install` is much faster (@utkarshkukreti)
+
 Bugfixes:
 
-  - `outdated` returns non-zero exit status if outdated gems found (@rohit, #2021)
+  - :git gems with extensions now work with Rubygems >= 2.0 (@jeremy)
+  - `outdated` exits non-zero if outdated gems found (@rohit, #2021)
+  - https Gist URLs for compatibility with Gist 2.0 (@NARKOZ)
+  - namespaced gems no longer generate a superfluous directory (@banyan)
 
 ## 1.3.0.pre.2 (Dec 9, 2012)
 
