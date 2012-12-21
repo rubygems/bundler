@@ -4,10 +4,12 @@ Features:
 
   - pushing gems during `rake release` can be disabled (@trans)
   - installing gems with `rake install` is much faster (@utkarshkukreti)
+  - added platforms :ruby_20 and :mri_20, since the ABI has changed
 
 Bugfixes:
 
   - :git gems with extensions now work with Rubygems >= 2.0 (@jeremy)
+  - revert SemVer breaking change to :github
   - `outdated` exits non-zero if outdated gems found (@rohit, #2021)
   - https Gist URLs for compatibility with Gist 2.0 (@NARKOZ)
   - namespaced gems no longer generate a superfluous directory (@banyan)
