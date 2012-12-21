@@ -118,12 +118,12 @@ module Bundler
     end
 
     def with_build_args(args)
-      old_args = build_args
+      old_args = self.build_args
       begin
-        build_args = args
+        self.build_args = args
         yield
       ensure
-        build_args = old_args
+        self.build_args = old_args
       end
     end
 
