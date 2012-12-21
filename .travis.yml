@@ -35,7 +35,7 @@ matrix:
       env: RGV=master
     # 2.0 release track
     - rvm: 2.0.0-preview2
-      env: RGV=v2.0.0.preview2
+      env: RGV=v2.0.0.preview2.2
     # Bundler 1.x supports Rubygems down to 1.5.3 on Ruby 1.9.3
     - rvm: 1.9.3
       env: RGV=v1.7.2
