@@ -5,6 +5,7 @@ Features:
   - pushing gems during `rake release` can be disabled (@trans)
   - installing gems with `rake install` is much faster (@utkarshkukreti)
   - added platforms :ruby_20 and :mri_20, since the ABI has changed
+  - added '--edit' option to open generated gemspec in editor
 
 Bugfixes:
 

@@ -179,6 +179,16 @@ RAKEFILE
         expect(bundled_app("test_gem/test/minitest_helper.rb")).to_not exist
       end
     end
+
+    context "--edit option" do
+      it "opens the generated gemspec in the user's text editor" do
+        reset!
+        in_app_root
+        output = bundle "gem #{gem_name} --edit=echo"
+        gemspec_path = File.join(Dir.pwd, gem_name, "#{gem_name}.gemspec")
+        expect(output).to include("echo \"#{gemspec_path}\"")
+      end
+    end
   end
 
   context "gem naming with dashed" do
