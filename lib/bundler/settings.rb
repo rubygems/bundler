@@ -128,7 +128,7 @@ module Bundler
 
     def load_config(config_file)
       if config_file.exist? && !config_file.size.zero?
-        Hash[config_file.read.scan(/^(BUNDLE_.+): '?(.+?)'?$/)]
+        Hash[config_file.read.scan(/^(BUNDLE_.+): ['"]?(.+?)['"]?$/)]
       else
         {}
       end
