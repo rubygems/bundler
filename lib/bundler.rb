@@ -31,6 +31,7 @@ module Bundler
   autoload :RemoteSpecification,   'bundler/remote_specification'
   autoload :Resolver,              'bundler/resolver'
   autoload :RubyVersion,           'bundler/ruby_version'
+  autoload :RubyDsl,               'bundler/ruby_dsl'
   autoload :Runtime,               'bundler/runtime'
   autoload :Settings,              'bundler/settings'
   autoload :SharedHelpers,         'bundler/shared_helpers'

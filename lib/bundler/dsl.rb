@@ -2,6 +2,8 @@ require 'bundler/dependency'
 
 module Bundler
   class Dsl
+    include RubyDsl
+
     def self.evaluate(gemfile, lockfile, unlock)
       builder = new
       builder.eval_gemfile(gemfile)
@@ -169,14 +171,6 @@ module Bundler
       yield
     ensure
       @env = old
-    end
-
-    def ruby(ruby_version, options = {})
-      raise GemfileError, "Please define :engine_version" if options[:engine] && options[:engine_version].nil?
-      raise GemfileError, "Please define :engine" if options[:engine_version] && options[:engine].nil?
-
-      raise GemfileError, "ruby_version must match the :engine_version for MRI" if options[:engine] == "ruby" && options[:engine_version] && ruby_version != options[:engine_version]
-      @ruby_version = RubyVersion.new(ruby_version, options[:engine], options[:engine_version])
     end
 
     def method_missing(name, *args)
