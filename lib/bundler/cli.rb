@@ -336,10 +336,14 @@ module Bundler
       This command will install bundler generated binstubs of the [GEM] specified in
       the bin directory specified by --binstubs or the default location.
     D
+    method_option "binstubs", :type => :string, :lazy_default => "bin", :banner =>
+      "Generate bin stubs for bundled gems to ./bin"
     def binstubs(gem_name)
       Bundler.definition.validate_ruby!
-      installer = Installer.new(Bundler.root, Bundler.definition)
-      spec      = installer.specs.find{|s| s.name == gem_name }
+      Bundler.settings[:bin] = options["binstubs"] if options["binstubs"]
+      Bundler.settings[:bin] = nil if options["binstubs"] && options["binstubs"].empty?
+      installer              = Installer.new(Bundler.root, Bundler.definition)
+      spec                   = installer.specs.find{|s| s.name == gem_name }
       raise GemNotFound, not_found_message(name, Bundler.load.specs) unless spec
 
       installer.generate_bundler_executable_stubs(spec)

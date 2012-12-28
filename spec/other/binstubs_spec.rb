@@ -66,4 +66,30 @@ describe "bundle binstubs <gem>" do
       expect(bundled_app("bin/foo")).to exist
     end
   end
+
+  context "--binstubs" do
+    it "sets the binstubs dir" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      bundle "binstubs rack --binstubs exec"
+
+      expect(bundled_app("exec/rackup")).to exist
+    end
+
+    it "setting is saved for bundle install" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+        gem "rails"
+      G
+
+      bundle "binstubs rack --binstubs exec"
+      bundle :install
+
+      expect(bundled_app("exec/rails")).to exist
+    end
+  end
 end
