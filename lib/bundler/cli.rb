@@ -348,7 +348,11 @@ module Bundler
       spec                   = installer.specs.find{|s| s.name == gem_name }
       raise GemNotFound, not_found_message(name, Bundler.load.specs) unless spec
 
-      installer.generate_bundler_executable_stubs(spec, :force => options[:force])
+      if spec.name == "bundler"
+        Bundler.ui.warn "Skipping bundler, since can't bundle bundler."
+      else
+        installer.generate_bundler_executable_stubs(spec, :force => options[:force])
+      end
     end
 
     desc "outdated [GEM]", "list installed gems with newer versions available"

@@ -34,6 +34,7 @@ describe "bundle binstubs <gem>" do
       bundle "binstubs bundler"
 
       expect(bundled_app("bin/bundle")).not_to exist
+      expect(out).to eq("Skipping bundler, since can't bundle bundler.")
     end
 
     it "install binstubs from git gems" do
