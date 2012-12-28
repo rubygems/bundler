@@ -338,6 +338,8 @@ module Bundler
     D
     method_option "binstubs", :type => :string, :lazy_default => "bin", :banner =>
       "Generate bin stubs for bundled gems to ./bin"
+    method_option "force", :type => :boolean, :default => false, :banner =>
+      "forces clean even if --path is not set"
     def binstubs(gem_name)
       Bundler.definition.validate_ruby!
       Bundler.settings[:bin] = options["binstubs"] if options["binstubs"]
@@ -346,7 +348,7 @@ module Bundler
       spec                   = installer.specs.find{|s| s.name == gem_name }
       raise GemNotFound, not_found_message(name, Bundler.load.specs) unless spec
 
-      installer.generate_bundler_executable_stubs(spec)
+      installer.generate_bundler_executable_stubs(spec, :force => options[:force])
     end
 
     desc "outdated [GEM]", "list installed gems with newer versions available"

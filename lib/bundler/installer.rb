@@ -126,7 +126,7 @@ module Bundler
       raise Bundler::InstallError, msg
     end
 
-    def generate_bundler_executable_stubs(spec)
+    def generate_bundler_executable_stubs(spec, options = {})
       # double-assignment to avoid warnings about variables that will be used by ERB
       bin_path = bin_path = Bundler.bin_path
       template = template = File.read(File.expand_path('../templates/Executable', __FILE__))
@@ -134,9 +134,20 @@ module Bundler
       ruby_command = ruby_command = Thor::Util.ruby_command
 
       spec.executables.each do |executable|
+        write        = true
+        binstub_path = "#{bin_path}/#{executable}"
         next if executable == "bundle"
-        File.open "#{bin_path}/#{executable}", 'w', 0755 do |f|
-          f.puts ERB.new(template, nil, '-').result(binding)
+        if File.exists?(binstub_path) && !options[:force]
+          write = false
+          Bundler.ui.warn <<-MSG
+            Skipping #{executable}, since it already exists.
+          MSG
+        end
+
+        if write
+          File.open binstub_path, 'w', 0755 do |f|
+            f.puts ERB.new(template, nil, '-').result(binding)
+          end
         end
       end
     end

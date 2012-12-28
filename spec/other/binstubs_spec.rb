@@ -92,4 +92,43 @@ describe "bundle binstubs <gem>" do
       expect(bundled_app("exec/rails")).to exist
     end
   end
+
+  context "when the bin already exists" do
+    it "don't override it and warn" do
+      FileUtils.mkdir_p(bundled_app("bin"))
+      File.open(bundled_app("bin/rackup"), 'wb') do |file|
+        file.print "OMG"
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      bundle "binstubs rack"
+
+      expect(bundled_app("bin/rackup")).to exist
+      expect(File.read(bundled_app("bin/rackup"))).to eq("OMG")
+      expect(out).to eq("Skipping rackup, since it already exists.")
+    end
+
+    context "when using --force" do
+      it "overrides the binstub" do
+        FileUtils.mkdir_p(bundled_app("bin"))
+        File.open(bundled_app("bin/rackup"), 'wb') do |file|
+          file.print "OMG"
+        end
+
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rack"
+        G
+
+        bundle "binstubs rack --force"
+
+        expect(bundled_app("bin/rackup")).to exist
+        expect(File.read(bundled_app("bin/rackup"))).not_to eq("OMG")
+      end
+    end
+  end
 end
