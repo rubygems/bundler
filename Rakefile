@@ -20,7 +20,13 @@ namespace :spec do
   desc "Ensure spec dependencies are installed"
   task :deps do
     sh "#{Gem.ruby} -S gem list ronn | (grep 'ronn' 1> /dev/null) || #{Gem.ruby} -S gem install ronn --no-ri --no-rdoc"
-    sh "#{Gem.ruby} -S gem list rspec | (grep 'rspec (2.' 1> /dev/null) || #{Gem.ruby} -S gem install rspec --no-ri --no-rdoc"
+
+    # There's a problem in rspec < 2.11.0 which causes a spec failure,
+    # so make sure we've got at least that version
+    rspec_str = `#{Gem.ruby} -S gem list rspec | grep 'rspec (2.'`.strip
+    if rspec_str.empty? || rspec_str[/\(2\.(\d+)/,1].to_i < 11
+      sh "#{Gem.ruby} -S gem install rspec --no-ri --no-rdoc"
+    end
   end
 end
 
