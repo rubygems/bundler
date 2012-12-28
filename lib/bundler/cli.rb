@@ -337,9 +337,9 @@ module Bundler
       the bin directory specified by --binstubs or the default location.
     D
     method_option "binstubs", :type => :string, :lazy_default => "bin", :banner =>
-      "Generate bin stubs for bundled gems to ./bin"
+      "the directory to put the binstubs, defaults to ./bin"
     method_option "force", :type => :boolean, :default => false, :banner =>
-      "forces clean even if --path is not set"
+      "forces the writing of a binstub, even if it already exists"
     def binstubs(gem_name)
       Bundler.definition.validate_ruby!
       Bundler.settings[:bin] = options["binstubs"] if options["binstubs"]
