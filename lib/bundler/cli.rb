@@ -331,6 +331,20 @@ module Bundler
     end
     map %w(list) => "show"
 
+    desc "binstubs [GEM]", "install the binstubs of the listed gem"
+    long_desc <<-D
+      This command will install bundler generated binstubs of the [GEM] specified in
+      the bin directory specified by --binstubs or the default location.
+    D
+    def binstubs(gem_name)
+      Bundler.definition.validate_ruby!
+      installer = Installer.new(Bundler.root, Bundler.definition)
+      spec      = installer.specs.find{|s| s.name == gem_name }
+      raise GemNotFound, not_found_message(name, Bundler.load.specs) unless spec
+
+      installer.generate_bundler_executable_stubs(spec)
+    end
+
     desc "outdated [GEM]", "list installed gems with newer versions available"
     long_desc <<-D
       Outdated lists the names and versions of gems that have a newer version available

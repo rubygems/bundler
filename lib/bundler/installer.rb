@@ -93,8 +93,6 @@ module Bundler
       generate_standalone(options[:standalone]) if options[:standalone]
     end
 
-  private
-
     def install_gem_from_spec(spec, standalone = false)
       # Download the gem to get the spec, because some specs that are returned
       # by rubygems.org are broken and wrong.
@@ -142,6 +140,8 @@ module Bundler
         end
       end
     end
+
+  private
 
     def generate_standalone_bundler_executable_stubs(spec)
       # double-assignment to avoid warnings about variables that will be used by ERB
