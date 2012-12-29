@@ -1,3 +1,15 @@
+## 1.3.0.pre.4
+
+Features:
+
+  - `bundle binstubs <gem>` to setup individual binstubs
+  - `bundle install --binstubs ""` will remove binstubs option
+
+Bugfixes:
+
+  - Avoid stack traces when Ctrl+C during bundle command (@mitchellh)
+  - fix YAML parsing in in ruby-preview2
+
 ## 1.3.0.pre.3 (Dec 21, 2012)
 
 Features:
