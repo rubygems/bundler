@@ -17,25 +17,13 @@ rvm:
 # Rubygems versions MUST be available as rake tasks
 # see Rakefile:66 for the list of possible RGV values
 env:
-  # we need to know if changes to rubygems will break bundler on release
-  - RGV=master
-  # test the latest rubygems release with all of our supported rubies
+  # test the supported rubygems release with all of our supported rubies
   - RGV=v1.8.24
 matrix:
   allow_failures:
-    # we want to know how we're doing with head, but not fail the build
-    - rvm: ruby-head
-    # until the 2.0 rc, it's okay for failures to crop up
-    - rvm: 2.0.0-preview2
     # 1.9.2 is simply too slow. it sometimes exceeds the 25m hard limit.
     - rvm: 1.9.2
   include:
-    # riding the edge
-    - rvm: ruby-head
-      env: RGV=master
-    # 2.0 release track
-    - rvm: 2.0.0-preview2
-      env: RGV=v2.0.0.preview2.2
     # Bundler 1.x supports Rubygems down to 1.5.3 on Ruby 1.9.3
     - rvm: 1.9.3
       env: RGV=v1.7.2
