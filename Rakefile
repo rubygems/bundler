@@ -93,7 +93,7 @@ begin
     namespace :rubygems do
       # Rubygems specs by version
       rubyopt = ENV["RUBYOPT"]
-      %w(master v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.24).each do |rg|
+      %w(master v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.24 v2.0.0.preview2.2).each do |rg|
         desc "Run specs with Rubygems #{rg}"
         RSpec::Core::RakeTask.new(rg) do |t|
           t.rspec_opts = %w(-fs --color)
@@ -202,29 +202,6 @@ begin
     desc "Clean up from the built man pages"
     task :clean do
       rm_rf "lib/bundler/man"
-    end
-  end
-
-  begin
-    require 'ci/reporter/rake/rspec'
-
-    namespace :ci do
-      desc "Run specs with Hudson output"
-      RSpec::Core::RakeTask.new(:spec)
-      task :spec => ["ci:setup:rspec", "man:build"]
-    end
-
-  rescue LoadError
-    namespace :ci do
-      task :spec do
-        abort "Run `rake ci:deps` to be able to run the CI specs"
-      end
-
-      desc "Install CI dependencies"
-      task :deps do
-        sh "#{Gem.ruby} -S gem list ci_reporter | (grep 'ci_reporter' 1> /dev/null) || #{Gem.ruby} -S gem install ci_reporter --no-ri --no-rdoc"
-      end
-      task :deps => "spec:deps"
     end
   end
 
