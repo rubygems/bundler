@@ -140,7 +140,7 @@ module Bundler
         if File.exists?(binstub_path) && !options[:force]
           write = false
           Bundler.ui.warn <<-MSG
-            Skipping #{executable}, since it already exists.
+            Skipping #{executable} since it already exists. Pass --force to overwrite.
           MSG
         end
 
