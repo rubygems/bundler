@@ -43,6 +43,29 @@ Your Gemfile does not specify a Ruby version requirement.
 G
     end
 
+    it "is within limit range" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+
+        #{ruby_version_upper_limit}
+
+        gem "foo"
+      G
+
+      bundle "platform"
+      expect(out).to eq(<<-G.chomp)
+Your platform is: #{RUBY_PLATFORM}
+
+Your app has gems that work on these platforms:
+* ruby
+
+Your Gemfile specifies a Ruby version requirement:
+* ruby <= #{local_ruby_version_bumped}
+
+Your current platform satisfies the Ruby version requirement.
+G
+    end
+
     it "doesn't match the ruby version requirement" do
       gemfile <<-G
         source "file://#{gem_repo1}"
@@ -174,6 +197,7 @@ G
   end
 
   let(:ruby_version_correct) { "ruby \"#{RUBY_VERSION}\", :engine => \"#{local_ruby_engine}\", :engine_version => \"#{local_engine_version}\"" }
+  let(:ruby_version_upper_limit) { "ruby \"<= #{local_ruby_version_bumped}\", :engine => \"#{local_ruby_engine}\", :engine_version => \"<= #{local_engine_version_bumped}\"" }
   let(:ruby_version_correct_engineless) { "ruby \"#{RUBY_VERSION}\"" }
   let(:ruby_version_incorrect) { "ruby \"#{not_local_ruby_version}\", :engine => \"#{local_ruby_engine}\", :engine_version => \"#{not_local_ruby_version}\"" }
   let(:engine_incorrect) { "ruby \"#{RUBY_VERSION}\", :engine => \"#{not_local_tag}\", :engine_version => \"#{RUBY_VERSION}\"" }

@@ -82,5 +82,13 @@ module Spec
     def not_local_ruby_version
       "1.12"
     end
+
+    def local_ruby_version_bumped
+      Gem::Version.create(RUBY_VERSION).bump.version
+    end
+
+    def local_engine_version_bumped
+      Gem::Version.create(local_engine_version).bump.version
+    end
   end
 end
