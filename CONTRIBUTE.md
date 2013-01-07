@@ -14,7 +14,7 @@ The Bundler core team consists of André Arko ([@indirect](http://github.com/ind
 When adding a new feature to Bundler, please follow these steps:
 
   1. [Create an issue](https://github.com/carlhuda/bundler/issues/new) to discuss your feature.
-  2. Base your commits on the master branch, since we follow [SemVer](http://semver.com) and don't add new features to old releases.
+  2. Base your commits on the master branch, since we follow [SemVer](http://semver.org) and don't add new features to old releases.
   3. Commit the code and at least one test covering your changes to a feature branch in your fork.
   4. Put a line in the [CHANGELOG](https://github.com/carlhuda/bundler/blob/master/CHANGELOG.md) summarizing your changes under the next release under the "Features" heading.
   5. Send us a [pull request](https://help.github.com/articles/using-pull-requests) from your feature branch.
