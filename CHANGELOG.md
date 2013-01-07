@@ -9,6 +9,7 @@ Bugfixes:
 
   - Avoid stack traces when Ctrl+C during bundle command (@mitchellh)
   - fix YAML parsing in in ruby-preview2
+  - fix SemVer broken link in the CONTRIBUTE.md page
 
 ## 1.3.0.pre.3 (Dec 21, 2012)
 
