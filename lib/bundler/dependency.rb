@@ -81,20 +81,32 @@ module Bundler
 
   private
 
+    def on_18?
+      RUBY_VERSION =~ /^1\.8/
+    end
+
+    def on_19?
+      RUBY_VERSION =~ /^1\.9/
+    end
+
+    def on_20?
+      RUBY_VERSION =~ /^2\.0/
+    end
+
     def ruby?
       !mswin? && (!defined?(RUBY_ENGINE) || RUBY_ENGINE == "ruby" || RUBY_ENGINE == "rbx" || RUBY_ENGINE == "maglev")
     end
 
     def ruby_18?
-      ruby? && RUBY_VERSION < "1.9"
+      ruby? && on_18?
     end
 
     def ruby_19?
-      ruby? && RUBY_VERSION >= "1.9"
+      ruby? && on_19?
     end
 
     def ruby_20?
-      ruby? && RUBY_VERSION >= "2.0"
+      ruby? && on_20?
     end
 
     def mri?
@@ -102,16 +114,16 @@ module Bundler
     end
 
     def mri_18?
-      mri? && RUBY_VERSION < "1.9"
+      mri? && on_18?
     end
 
     def mri_19?
-      mri? && RUBY_VERSION >= "1.9"
+      mri? && on_19?
     end
 
 
     def mri_20?
-      mri? && RUBY_VERSION >= "2.0"
+      mri? && on_20?
     end
 
     def rbx?
@@ -135,15 +147,15 @@ module Bundler
     end
 
     def mingw_18?
-      mingw? && RUBY_VERSION < "1.9"
+      mingw? && on_18?
     end
 
     def mingw_19?
-      mingw? && RUBY_VERSION >= "1.9"
+      mingw? && on_19?
     end
 
     def mingw_20?
-      mingw? && RUBY_VERSION >= "2.0"
+      mingw? && on_20?
     end
 
   end
