@@ -142,6 +142,21 @@ module Bundler
         end
       end
     end
+    
+    def generate_bundle_aware_executable_stubs(spec)
+      # double-assignment to avoid warnings about variables that will be used by ERB
+      bin_path = bin_path = Bundler.bin_path
+      template = template = File.read(File.expand_path('../templates/Executable', __FILE__))
+      relative_gemfile_path = relative_gemfile_path = Bundler.default_gemfile.relative_path_from(bin_path)
+      ruby_command = ruby_command = Thor::Util.ruby_command
+
+      spec.executables.each do |executable|
+        next if executable == "bundle"
+        File.open "#{bin_path}/#{executable}", 'w', 0755 do |f|
+          f.puts ERB.new(template, nil, '-').result(binding)
+        end
+      end
+    end
 
     def generate_standalone_bundler_executable_stubs(spec)
       # double-assignment to avoid warnings about variables that will be used by ERB
