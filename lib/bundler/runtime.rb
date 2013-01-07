@@ -160,34 +160,48 @@ module Bundler
       output = stale_gem_dirs.collect do |gem_dir|
         full_name = Pathname.new(gem_dir).basename.to_s
 
-        FileUtils.rm_rf(gem_dir)
-
         parts   = full_name.split('-')
         name    = parts[0..-2].join('-')
         version = parts.last
         output  = "#{name} (#{version})"
 
-        Bundler.ui.info "Removing #{output}"
+        if Bundler.settings[:dry_run]
+          Bundler.ui.info "Would have removed #{output}"
+        else
+          Bundler.ui.info "Removing #{output}"
+          FileUtils.rm_rf(gem_dir)
+        end
 
         output
       end + stale_git_dirs.collect do |gem_dir|
         full_name = Pathname.new(gem_dir).basename.to_s
-
-        FileUtils.rm_rf(gem_dir)
 
         parts    = full_name.split('-')
         name     = parts[0..-2].join('-')
         revision = parts[-1]
         output   = "#{name} (#{revision})"
 
-        Bundler.ui.info "Removing #{output}"
+        if Bundler.settings[:dry_run]
+          Bundler.ui.info "Would have removed #{output}"
+        else
+          Bundler.ui.info "Removing #{output}"
+          FileUtils.rm_rf(gem_dir)
+        end
 
         output
       end
 
-      stale_gem_files.each {|file| FileUtils.rm(file) if File.exists?(file) }
-      stale_gemspec_files.each {|file| FileUtils.rm(file) if File.exists?(file) }
-      stale_git_cache_dirs.each {|dir| FileUtils.rm_rf(dir) if File.exists?(dir) }
+      stale_gem_files.each do |file|
+        FileUtils.rm(file) if File.exists?(file) && !Bundler.settings[:dry_run]
+      end
+
+      stale_gemspec_files.each do |file|
+        FileUtils.rm(file) if File.exists?(file) && !Bundler.settings[:dry_run]
+      end
+
+      stale_git_cache_dirs.each do |dir|
+        FileUtils.rm_rf(dir) if File.exists?(dir) && !Bundler.settings[:dry_run]
+      end
 
       output
     end
