@@ -156,7 +156,6 @@ module Bundler
       stale_gem_files      = gem_files - spec_cache_paths
       stale_gemspec_files  = gemspec_files - spec_gemspec_paths
 
-      stale_gem_bins.each {|bin| FileUtils.rm(bin) }
       output = stale_gem_dirs.collect do |gem_dir|
         full_name = Pathname.new(gem_dir).basename.to_s
 
@@ -191,16 +190,11 @@ module Bundler
         output
       end
 
-      stale_gem_files.each do |file|
-        FileUtils.rm(file) if File.exists?(file) && !Bundler.settings[:dry_run]
-      end
-
-      stale_gemspec_files.each do |file|
-        FileUtils.rm(file) if File.exists?(file) && !Bundler.settings[:dry_run]
-      end
-
-      stale_git_cache_dirs.each do |dir|
-        FileUtils.rm_rf(dir) if File.exists?(dir) && !Bundler.settings[:dry_run]
+      unless Bundler.settings[:dry_run]
+        stale_gem_bins.each { |bin| FileUtils.rm(bin) if File.exists?(bin) }
+        stale_gem_files.each { |file| FileUtils.rm(file) if File.exists?(file) }
+        stale_gemspec_files.each { |file| FileUtils.rm(file) if File.exists?(file) }
+        stale_git_cache_dirs.each { |dir| FileUtils.rm_rf(dir) if File.exists?(dir) }
       end
 
       output
