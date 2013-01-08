@@ -4,6 +4,7 @@ Features:
 
   - `bundle binstubs <gem>` to setup individual binstubs
   - `bundle install --binstubs ""` will remove binstubs option
+  - `bundle clean --dry-run` will print out gems instead of removing them
 
 Bugfixes:
 
