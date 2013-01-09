@@ -70,6 +70,10 @@ module Bundler
       options = Hash === args.last ? args.pop : {}
       version = args || [">= 0"]
 
+      if @github_username
+        options.merge!(:github => "#{@github_username}/#{name}")
+      end
+
       _normalize_options(name, version, options)
 
       dep = Dependency.new(name, version, options)
@@ -144,6 +148,11 @@ module Bundler
       end
 
       source Source::Git.new(_normalize_hash(options).merge("uri" => uri)), source_options, &blk
+    end
+
+    def github(username, &blk)
+      @github_username = username
+      blk.call
     end
 
     def to_definition(lockfile, unlock)
