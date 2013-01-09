@@ -176,7 +176,7 @@ module Bundler
         spec.require_paths.each do |path|
           full_path = File.join(spec.full_gem_path, path)
           gem_path = Pathname.new(full_path).relative_path_from(Bundler.root.join(bundler_path))
-          paths << gem_path.to_s.sub("#{SystemRubyVersion.new.engine}/#{RbConfig::CONFIG['ruby_version']}", '#{ruby_engine}/#{RbConfig::CONFIG["ruby_version"]}')
+          paths << gem_path.to_s.sub("#{SystemRubyVersion.new.engine}/#{RbConfig::CONFIG['ruby_version']}", '#{ruby_engine}/#{ruby_version}')
         end
       end
 
@@ -184,6 +184,7 @@ module Bundler
       File.open File.join(bundler_path, "setup.rb"), "w" do |file|
         file.puts "# ruby 1.8.7 doesn't define RUBY_ENGINE"
         file.puts "ruby_engine = defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby'"
+        file.puts "ruby_version = RbConfig::CONFIG[\"ruby_version\"]"
         file.puts "path = File.expand_path('..', __FILE__)"
         paths.each do |path|
           file.puts %{$:.unshift File.expand_path("\#{path}/#{path}")}
