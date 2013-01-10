@@ -137,7 +137,7 @@ module Bundler
         write        = true
         binstub_path = "#{bin_path}/#{executable}"
         next if executable == "bundle"
-        if File.exists?(binstub_path) && !options[:force]
+        if File.exists?(binstub_path) && !options[:force] && options[:binstubs_cmd]
           write = false
           Bundler.ui.warn <<-MSG
             Skipping #{executable} since it already exists. Pass --force to overwrite.

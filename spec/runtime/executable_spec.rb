@@ -129,4 +129,21 @@ describe "Running bin/* commands" do
 
     expect(bundled_app("bin/rackup")).to exist
   end
+
+  it "always reinstalls the binstub" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack"
+    G
+
+    bundle "install --binstubs bin/"
+
+    File.open(bundled_app("bin/rackup"), 'wb') do |file|
+      file.print "OMG"
+    end
+
+    bundle "install"
+
+    expect(File.read(bundled_app("bin/rackup"))).not_to eq("OMG")
+  end
 end

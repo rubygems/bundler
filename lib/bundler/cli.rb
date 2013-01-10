@@ -351,7 +351,7 @@ module Bundler
       if spec.name == "bundler"
         Bundler.ui.warn "Skipping bundler since can't bundle bundler."
       else
-        installer.generate_bundler_executable_stubs(spec, :force => options[:force])
+        installer.generate_bundler_executable_stubs(spec, :force => options[:force], :binstubs_cmd => true)
       end
     end
 
