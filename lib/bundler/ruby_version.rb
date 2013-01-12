@@ -57,6 +57,10 @@ module Bundler
         nil
       end
     end
+
+    def host
+      RbConfig::CONFIG["host"]
+    end
   end
 
   # A subclass of RubyVersion that implements version,
