@@ -31,6 +31,8 @@ module Bundler
       attr_accessor :disable_endpoint, :api_timeout, :redirect_limit, :max_retries
 
       @@spec_fetch_map ||= {}
+      @@connection ||= Net::HTTP::Persistent.new nil, :ENV
+      @@connection.read_timeout = API_TIMEOUT
 
       def fetch(spec)
         spec, uri = @@spec_fetch_map[spec.full_name]
