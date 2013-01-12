@@ -57,6 +57,23 @@ module Bundler
 
         gem_path
       end
+
+      def user_agent
+        @user_agent ||= begin
+          ruby = Bundler.ruby_version
+
+          agent = "bundler/#{Bundler::VERSION}"
+          agent += " rubygems/#{Gem::VERSION}"
+          agent += " ruby/#{ruby.version}"
+          if ruby.engine != "ruby"
+            # engine_version raises on unknown engines
+            engine_version = ruby.engine_version rescue "???"
+            agent += " #{ruby.engine}/#{engine_version}"
+          end
+          agent
+        end
+      end
+
     end
 
     def initialize(remote_uri)
