@@ -240,6 +240,7 @@ module Bundler
       begin
         Bundler.ui.debug "Fetching from: #{uri}"
         req = Net::HTTP::Get.new uri.request_uri
+        req["User-Agent"] = self.class.user_agent
         req.basic_auth(uri.user, uri.password) if uri.user
         if defined?(Net::HTTP::Persistent)
           response = @connection.request(uri, req)
