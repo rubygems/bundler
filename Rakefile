@@ -43,11 +43,6 @@ namespace :spec do
       system("sudo sed -i '/secure_path/d' /etc/sudoers")
       # Install groff for the ronn gem
       system("sudo apt-get install groff -y")
-      # Recompile ruby-head, because the VM version is quite old
-      if ENV['RUBY_VERSION'] == 'ruby-head'
-        system("rvm reinstall ruby-head")
-        system("ruby --version")
-      end
       # Install the other gem deps, etc.
       Rake::Task["spec:deps"].invoke
     end
