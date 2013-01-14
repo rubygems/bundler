@@ -31,8 +31,6 @@ module Bundler
       attr_accessor :disable_endpoint, :api_timeout, :redirect_limit, :max_retries
 
       @@spec_fetch_map ||= {}
-      @@connection ||= Net::HTTP::Persistent.new nil, :ENV
-      @@connection.read_timeout = API_TIMEOUT
 
       def fetch(spec)
         spec, uri = @@spec_fetch_map[spec.full_name]
@@ -58,6 +56,15 @@ module Bundler
         end
 
         gem_path
+      end
+
+      def connection
+        @connection ||= begin
+          conn = Net::HTTP::Persistent.new nil, :ENV
+          conn.read_timeout = API_TIMEOUT
+          conn.override_headers["User-Agent"] = user_agent
+          conn
+        end
       end
 
       def user_agent
@@ -241,7 +248,6 @@ module Bundler
 
       begin
         Bundler.ui.debug "Fetching from: #{uri}"
-<<<<<<< HEAD
         req = Net::HTTP::Get.new uri.request_uri
         req.basic_auth(uri.user, uri.password) if uri.user
         if defined?(Net::HTTP::Persistent)
@@ -252,14 +258,6 @@ module Bundler
       rescue OpenSSL::SSL::SSLError
         raise CertificateFailureError.new(@public_uri)
       rescue *HTTP_ERRORS
-=======
-        request = Net::HTTP::Get.new uri.request_uri
-        request["User-Agent"] = self.class.user_agent
-        response = @@connection.request(uri, request)
-      rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, Errno::ETIMEDOUT,
-             EOFError, SocketError, Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError,
-             Errno::EAGAIN, Net::HTTP::Persistent::Error, Net::ProtocolError
->>>>>>> 8a5ebb2... default requests have "Ruby" in the user-agent
         raise HTTPError, "Network error while fetching #{uri}"
       end
 
