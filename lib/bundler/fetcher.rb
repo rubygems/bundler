@@ -31,8 +31,6 @@ module Bundler
       attr_accessor :disable_endpoint, :api_timeout, :redirect_limit, :max_retries
 
       @@spec_fetch_map ||= {}
-      @@connection ||= Net::HTTP::Persistent.new nil, :ENV
-      @@connection.read_timeout = API_TIMEOUT
 
       def fetch(spec)
         spec, uri = @@spec_fetch_map[spec.full_name]
@@ -58,6 +56,34 @@ module Bundler
         end
 
         gem_path
+      end
+
+      def connection
+        return @connection if @connection
+
+        needs_ssl = @remote_uri.scheme == "https" ||
+          Bundler.settings[:ssl_verify_mode] ||
+          Bundler.settings[:ssl_client_cert]
+        raise SSLError if needs_ssl && !defined(OpenSSL)
+
+        @connection = Net::HTTP::Persistent.new 'bundler', :ENV
+
+        if @remote_uri.scheme == "https"
+          @connection.verify_mode = (Bundler.settings[:ssl_verify_mode] ||
+            OpenSSL::SSL::VERIFY_PEER)
+          @connection.cert_store = bundler_cert_store
+        end
+
+        if Bundler.settings[:ssl_client_cert]
+          pem = File.read(Bundler.settings[:ssl_client_cert])
+          @connection.cert = OpenSSL::X509::Certificate.new(pem)
+          @connection.key  = OpenSSL::PKey::RSA.new(pem)
+        end
+
+        @connection.read_timeout = @api_timeout
+        @connection.override_headers["User-Agent"] = user_agent
+
+        @connection
       end
 
       def user_agent
@@ -90,21 +116,6 @@ module Bundler
       @remote_uri = remote_uri
       @public_uri = remote_uri.dup
       @public_uri.user, @public_uri.password = nil, nil # don't print these
-      if defined?(Net::HTTP::Persistent)
-        @connection = Net::HTTP::Persistent.new 'bundler', :ENV
-        @connection.verify_mode = (Bundler.settings[:ssl_verify_mode] ||
-          OpenSSL::SSL::VERIFY_PEER)
-        @connection.cert_store = bundler_cert_store
-        if Bundler.settings[:ssl_client_cert]
-          pem = File.read(Bundler.settings[:ssl_client_cert])
-          @connection.cert = OpenSSL::X509::Certificate.new(pem)
-          @connection.key  = OpenSSL::PKey::RSA.new(pem)
-        end
-      else
-        raise SSLError if @remote_uri.scheme == "https"
-        @connection = Net::HTTP.new(@remote_uri.host, @remote_uri.port)
-      end
-      @connection.read_timeout = @api_timeout
 
       Socket.do_not_reverse_lookup = true
     end
@@ -242,7 +253,6 @@ module Bundler
       begin
         Bundler.ui.debug "Fetching from: #{uri}"
         req = Net::HTTP::Get.new uri.request_uri
-        req["User-Agent"] = self.class.user_agent
         req.basic_auth(uri.user, uri.password) if uri.user
         if defined?(Net::HTTP::Persistent)
           response = @connection.request(uri, req)
