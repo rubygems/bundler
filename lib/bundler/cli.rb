@@ -646,7 +646,8 @@ module Bundler
         :constant_name   => constant_name,
         :constant_array  => constant_array,
         :author          => git_user_name.empty? ? "TODO: Write your name" : git_user_name,
-        :email           => git_user_email.empty? ? "TODO: Write your email address" : git_user_email
+        :email           => git_user_email.empty? ? "TODO: Write your email address" : git_user_email,
+        :test            => options[:test]
       }
       gemspec_dest = File.join(target, "#{name}.gemspec")
       template(File.join("newgem/Gemfile.tt"),               File.join(target, "Gemfile"),                             opts)
