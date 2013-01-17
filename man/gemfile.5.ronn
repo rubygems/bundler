@@ -23,7 +23,8 @@ might contain the gems listed in the `Gemfile`.
     source "http://rubygems.org"
     source "http://gems.github.com"
 
-Each of these _source_s `MUST` be a valid Rubygems repository.
+Each of these _source_s `MUST` be a valid Rubygems repository. Sources are
+checked for gems following the heuristics described in [SOURCE PRIORITY][].
 
 ## RUBY (#ruby)
 
