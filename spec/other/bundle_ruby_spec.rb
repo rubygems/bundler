@@ -109,4 +109,17 @@ describe "bundle_ruby" do
 
     expect(out).to eq("No ruby version specified")
   end
+
+  it "should return required version" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+      ruby ">= 1.9.3"
+
+      gem "foo"
+    G
+
+    bundle_ruby
+
+    expect(out).to eq("ruby >= 1.9.3")
+  end
 end

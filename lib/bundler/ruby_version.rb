@@ -44,9 +44,9 @@ module Bundler
     def diff(other)
       if engine != other.engine && @input_engine
         [ :engine, engine, other.engine ]
-      elsif version != other.version
+      elsif !Gem::Requirement.create(version).satisfied_by?(Gem::Version.create(other.version))
         [ :version, version, other.version ]
-      elsif engine_version != other.engine_version && @input_engine
+      elsif !Gem::Requirement.create(engine_version).satisfied_by?(Gem::Version.create(other.engine_version)) && @input_engine
         [ :engine_version, engine_version, other.engine_version ]
       else
         nil
