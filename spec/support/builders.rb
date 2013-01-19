@@ -514,11 +514,8 @@ module Spec
     end
 
     class GitUpdater < LibBuilder
-      WINDOWS = RbConfig::CONFIG["host_os"] =~ %r!(msdos|mswin|djgpp|mingw)!
-      NULL    = WINDOWS ? "NUL" : "/dev/null"
-
       def silently(str)
-        `#{str} 2>#{NULL}`
+        `#{str} 2>#{Bundler::NULL}`
       end
 
       def _build(options)
