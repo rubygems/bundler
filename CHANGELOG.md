@@ -4,6 +4,7 @@ Features:
 
   - make `--standalone` require lines ruby engine/version agnostic
   - add `--dry-run` to `bundle clean` (@wfarr, #2237)
+  - add `BUNDLE_IGNORE_CONFIG` environment variable support (@richo)
 
 Bugfixes:
 
