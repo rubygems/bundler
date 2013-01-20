@@ -42,7 +42,7 @@ After reading the documentation, try these troubleshooting steps:
 
 ## Reporting unresolved problems
 
-The Bundler team needs to know some things in order to diagnose and hopefully fix the bug you've found. When you report a bug, please include the following information:
+The Bundler team needs to know some things in order to diagnose and hopefully fix the bug you've found. When you report a bug, please include the following information (or use [bundler_issue_report](https://rubygems.org/gems/bundler_issue_report) to gather it for you):
 
   - The command you ran
   - Exception backtrace(s), if any
