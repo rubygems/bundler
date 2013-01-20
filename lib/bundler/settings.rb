@@ -131,8 +131,7 @@ module Bundler
     end
 
     def load_config(config_file)
-      return {} if ignore_config?
-      if config_file.exist? && !config_file.size.zero?
+      if !ignore_config? && config_file.exist? && !config_file.size.zero?
         Hash[config_file.read.scan(/^(BUNDLE_.+): ['"]?(.+?)['"]?$/)]
       else
         {}
