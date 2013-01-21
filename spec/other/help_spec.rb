@@ -7,8 +7,8 @@ describe "bundle help" do
     system_gems "bundler-0.8.1"
 
     bundle "help", :expect_err => true
-    expect(err).to include("Please remove Bundler 0.8 versions.")
-    expect(err).to include("This can be done by running `gem cleanup bundler`.")
+    expect(err).to include("older than 0.9")
+    expect(err).to include("running `gem cleanup bundler`.")
   end
 
   it "uses groff when available" do
