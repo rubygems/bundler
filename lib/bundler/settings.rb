@@ -1,6 +1,6 @@
 module Bundler
   class Settings
-    def initialize(root)
+    def initialize(root = nil)
       @root          = root
       @local_config  = load_config(local_config_file)
       @global_config = load_config(global_config_file)
@@ -12,6 +12,7 @@ module Bundler
     end
 
     def []=(key, value)
+      local_config_file || raise(GemfileNotFound)
       set_key(key, value, @local_config, local_config_file)
     end
 
@@ -127,11 +128,12 @@ module Bundler
     end
 
     def local_config_file
-      Pathname.new("#{@root}/config")
+      Pathname.new(@root).join("config") if @root
     end
 
     def load_config(config_file)
-      if !ignore_config? && config_file.exist? && !config_file.size.zero?
+      valid_file = config_file && config_file.exist? && !config_file.size.zero?
+      if !ignore_config? && valid_file
         Hash[config_file.read.scan(/^(BUNDLE_.+): ['"]?(.+?)['"]?$/)]
       else
         {}
