@@ -732,7 +732,7 @@ module Bundler
       Bundler.ui.info output.join("\n\n")
     end
 
-    desc "add GEM VERSION ...", "Add the named gem(s), with version requirements, to the resolved Gemfile"
+    desc "inject GEM VERSION ...", "Add the named gem(s), with version requirements, to the resolved Gemfile"
     def inject(name, version, *gems)
       # The required arguments allow Thor to give useful feedback when the arguments
       # are incorrect. This adds those first two arguments onto the list as a whole.
