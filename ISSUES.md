@@ -16,7 +16,9 @@ Please open a ticket with Heroku if you're having trouble deploying. They have a
 
 ### Something else
 
-After reading the documentation, try these troubleshooting steps:
+First, figure out exactly what it is that you're trying to do. Then, go to the [Bundler documentation website](http://gembundler.com) and see if we have instructions on how to do that.
+
+If the instructions don't work, or you can't find any instructions, you can try these troubleshooting steps:
 
     # remove user-specific gems and git repos
     rm -rf ~/.bundle/ ~/.gem/bundler/ ~/.gems/cache/bundler/
@@ -24,10 +26,10 @@ After reading the documentation, try these troubleshooting steps:
     # remove system-wide git repos and git checkouts
     rm -rf $GEM_HOME/bundler/ $GEM_HOME/cache/bundler/
 
-    # remove project-specific settings and git repos
+    # remove project-specific settings
     rm -rf .bundle/
 
-    # remove project-specific cached .gem files
+    # remove project-specific cached gems and repos
     rm -rf vendor/cache/
 
     # remove the saved resolve of the Gemfile
@@ -42,10 +44,13 @@ After reading the documentation, try these troubleshooting steps:
 
 ## Reporting unresolved problems
 
-The Bundler team needs to know some things in order to diagnose and hopefully fix the bug you've found. When you report a bug, please include the following information:
+Hopefully the troubleshooting steps above resolved your problem. If things still aren't working the way you expect them to, please let us know so that we can diagnose and hopefully fix the problem you're having. When you report a problem, please include the following information:
 
+  - What you're trying to accomplish
   - The command you ran
-  - Exception backtrace(s), if any
+  - What you expected to happen
+  - What actually happened
+  - The exception backtrace(s), if any
   - Your Gemfile
   - Your Gemfile.lock
   - Your Bundler configuration settings (run `bundle config`)
@@ -66,4 +71,4 @@ If you are using Rails 2.3, please also include:
 
 [Create a gist](https://gist.github.com) containing all of that information, then visit the [Bundler issue tracker](https://github.com/carlhuda/bundler/issues) and [create a ticket](https://github.com/carlhuda/bundler/issues/new) describing your problem and linking to your gist.
 
-Thanks for reporting issues and making Bundler better!
+Thanks for reporting issues and helping make Bundler better!
