@@ -754,6 +754,11 @@ module Bundler
       end
     end
 
+    desc "env", "Print information about the environment Bundler is running under"
+    def env
+      Env.new.write($stdout)
+    end
+
   private
 
     def setup_cache_all

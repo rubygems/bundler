@@ -17,6 +17,7 @@ module Bundler
   autoload :Dsl,                   'bundler/dsl'
   autoload :EndpointSpecification, 'bundler/endpoint_specification'
   autoload :Environment,           'bundler/environment'
+  autoload :Env,                   'bundler/env'
   autoload :Fetcher,               'bundler/fetcher'
   autoload :GemHelper,             'bundler/gem_helper'
   autoload :GemHelpers,            'bundler/gem_helpers'
