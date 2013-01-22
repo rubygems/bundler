@@ -5,6 +5,15 @@ require 'rubygems'
 require 'shellwords'
 require 'benchmark'
 
+task :release => ["man:clean", "man:build"]
+
+def safe_task(&block)
+  yield
+  true
+rescue
+  false
+end
+
 # Benchmark task execution
 module Rake
   class Task
@@ -17,15 +26,6 @@ module Rake
       puts "#{@name} ran for #{time}"
     end
   end
-end
-
-task :release => ["man:clean", "man:build"]
-
-def safe_task(&block)
-  yield
-  true
-rescue
-  false
 end
 
 namespace :spec do
@@ -88,7 +88,7 @@ begin
     namespace :rubygems do
       # Rubygems specs by version
       rubyopt = ENV["RUBYOPT"]
-      %w(master v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.24 v2.0.0.preview2.2).each do |rg|
+      %w(master v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.24 v2.0.0.rc.1).each do |rg|
         desc "Run specs with Rubygems #{rg}"
         RSpec::Core::RakeTask.new(rg) do |t|
           t.rspec_opts = %w(-fs --color)
