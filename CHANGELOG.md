@@ -1,10 +1,24 @@
+## 1.3.0.pre.6 (January 22, 2013)
+
+Features:
+
+  - `binstubs` lists child gem bins if a gem has no binstubs
+  - `bundle gem --edit` will open the new gemspec (@ndbroadbent)
+  - `bundle gem --test rspec` now makes working tests (@tricknotes)
+  - add `BUNDLE_IGNORE_CONFIG` environment variable support (@richo)
+
+Bugfixes:
+
+  - don't overwrite custom binstubs during `install --binstubs`
+  - don't throw an exception if `binstubs` gem doesn't exist
+  - `bundle config` now works in directories without a Gemfile
+
 ## 1.3.0.pre.5 (Jan 9, 2013)
 
 Features:
 
   - make `--standalone` require lines ruby engine/version agnostic
   - add `--dry-run` to `bundle clean` (@wfarr, #2237)
-  - add `BUNDLE_IGNORE_CONFIG` environment variable support (@richo)
 
 Bugfixes:
 
