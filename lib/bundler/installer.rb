@@ -127,7 +127,7 @@ module Bundler
     end
 
     def generate_bundler_executable_stubs(spec, options = {})
-      if spec.executables.empty?
+      if options[:binstubs_cmd] && spec.executables.empty?
         options = {}
         spec.runtime_dependencies.each do |dep|
           bins = Bundler.definition.specs[dep].first.executables
@@ -164,7 +164,7 @@ module Bundler
         end
       end
 
-      if options[:binstubs_cmd] && !exists.empty?
+      if options[:binstubs_cmd] && exists.any?
         case exists.size
         when 1
           Bundler.ui.warn "Skipped #{exists[0]} since it already exists."
