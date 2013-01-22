@@ -110,7 +110,8 @@ describe "bundle binstubs <gem>" do
 
       expect(bundled_app("bin/rackup")).to exist
       expect(File.read(bundled_app("bin/rackup"))).to eq("OMG")
-      expect(out).to eq("Skipping rackup since it already exists. Pass --force to overwrite.")
+      expect(out).to include("Skipped rackup")
+      expect(out).to include("overwrite skipped stubs, use --force")
     end
 
     context "when using --force" do

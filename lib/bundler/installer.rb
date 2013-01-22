@@ -149,14 +149,13 @@ module Bundler
       relative_gemfile_path = relative_gemfile_path = Bundler.default_gemfile.relative_path_from(bin_path)
       ruby_command = ruby_command = Thor::Util.ruby_command
 
+      exists = []
       spec.executables.each do |executable|
         next if executable == "bundle"
 
         binstub_path = "#{bin_path}/#{executable}"
         if File.exists?(binstub_path) && !options[:force]
-          if options[:binstubs_cmd]
-            Bundler.ui.warn "Skipping #{executable} since it already exists. Pass --force to overwrite."
-          end
+          exists << executable
           next
         end
 
@@ -165,6 +164,19 @@ module Bundler
         end
       end
 
+      if options[:binstubs_cmd] && !exists.empty?
+        case exists.size
+        when 1
+          Bundler.ui.warn "Skipped #{exists[0]} since it already exists."
+        when 2
+          Bundler.ui.warn "Skipped #{exists.join(' and ')} since they already exist."
+        else
+          items = exists[0...-1].empty? ? nil : exists[0...-1].join(', ')
+          skipped = [items, exists[-1]].compact.join(' and ')
+          Bundler.ui.warn "Skipped #{skipped} since they already exist."
+        end
+        Bundler.ui.warn "If you want to overwrite skipped stubs, use --force."
+      end
     end
 
   private
