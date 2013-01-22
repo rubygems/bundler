@@ -333,13 +333,13 @@ module Bundler
 
     desc "binstubs [GEM]", "install the binstubs of the listed gem"
     long_desc <<-D
-      This command will install bundler generated binstubs of the [GEM] specified in
-      the bin directory specified by --binstubs or the default location.
+      Generate binstubs for executables in [GEM]. Binstubs are put into bin,
+      or the --binstubs directory if one has been set.
     D
     method_option "path", :type => :string, :lazy_default => "bin", :banner =>
-      "the directory to put the binstubs, defaults to ./bin"
+      "binstub destination directory (default bin)"
     method_option "force", :type => :boolean, :default => false, :banner =>
-      "forces the writing of a binstub, even if it already exists"
+      "overwrite existing binstubs if they exist"
     def binstubs(gem_name)
       Bundler.definition.validate_ruby!
       Bundler.settings[:bin] = options["path"] if options["path"]
