@@ -127,6 +127,22 @@ module Bundler
     end
 
     def generate_bundler_executable_stubs(spec, options = {})
+      if spec.executables.empty?
+        options = {}
+        spec.dependencies.each do |dep|
+          bins = Bundler.definition.specs[dep].first.executables
+          options[dep.name] = bins unless bins.empty?
+        end
+        if options.any?
+          Bundler.ui.warn "#{spec.name} has no executables, but you may want " +
+            "one from a gem it depends on."
+          options.each{|name,bins| Bundler.ui.warn "  #{name} has: #{bins.join(', ')}" }
+        else
+          Bundler.ui.warn "There are no executables for the gem #{spec.name}."
+        end
+        return
+      end
+
       # double-assignment to avoid warnings about variables that will be used by ERB
       bin_path = bin_path = Bundler.bin_path
       template = template = File.read(File.expand_path('../templates/Executable', __FILE__))
