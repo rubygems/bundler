@@ -134,22 +134,21 @@ module Bundler
       ruby_command = ruby_command = Thor::Util.ruby_command
 
       spec.executables.each do |executable|
-        write        = true
-        binstub_path = "#{bin_path}/#{executable}"
         next if executable == "bundle"
-        if File.exists?(binstub_path) && !options[:force] && options[:binstubs_cmd]
-          write = false
-          Bundler.ui.warn <<-MSG
-            Skipping #{executable} since it already exists. Pass --force to overwrite.
-          MSG
+
+        binstub_path = "#{bin_path}/#{executable}"
+        if File.exists?(binstub_path) && !options[:force]
+          if options[:binstubs_cmd]
+            Bundler.ui.warn "Skipping #{executable} since it already exists. Pass --force to overwrite."
+          end
+          next
         end
 
-        if write
-          File.open binstub_path, 'w', 0755 do |f|
-            f.puts ERB.new(template, nil, '-').result(binding)
-          end
+        File.open(binstub_path, 'w', 0755) do |f|
+          f.puts ERB.new(template, nil, '-').result(binding)
         end
       end
+
     end
 
   private
