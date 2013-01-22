@@ -130,8 +130,8 @@ module Bundler
       if spec.executables.empty?
         options = {}
         spec.dependencies.each do |dep|
-          bins = Bundler.definition.specs[dep].first.executables
-          options[dep.name] = bins unless bins.empty?
+          bins = Bundler.definition.specs[dep].first.executables unless Bundler.definition.specs[dep].empty?
+          options[dep.name] = bins unless bins.nil? || bins.empty?
         end
         if options.any?
           Bundler.ui.warn "#{spec.name} has no executables, but you may want " +
