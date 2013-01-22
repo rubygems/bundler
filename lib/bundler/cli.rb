@@ -349,7 +349,7 @@ module Bundler
       raise GemNotFound, not_found_message(name, Bundler.load.specs) unless spec
 
       if spec.name == "bundler"
-        Bundler.ui.warn "Skipping bundler since can't bundle bundler."
+        Bundler.ui.warn "Sorry, Bundler can only be run via Rubygems."
       else
         installer.generate_bundler_executable_stubs(spec, :force => options[:force], :binstubs_cmd => true)
       end
