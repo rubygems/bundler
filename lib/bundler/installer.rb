@@ -129,7 +129,7 @@ module Bundler
     def generate_bundler_executable_stubs(spec, options = {})
       if spec.executables.empty?
         options = {}
-        spec.dependencies.each do |dep|
+        spec.runtime_dependencies.each do |dep|
           bins = Bundler.definition.specs[dep].first.executables
           options[dep.name] = bins unless bins.empty?
         end

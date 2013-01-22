@@ -133,4 +133,37 @@ describe "bundle binstubs <gem>" do
       end
     end
   end
+
+  context "when the gem has no bins" do
+    it "suggests child gems if they have bins" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack-obama"
+      G
+
+      bundle "binstubs rack-obama"
+      expect(out).to include('rack-obama has no executables')
+      expect(out).to include('rack has: rackup')
+    end
+
+    it "works if child gems don't have bins" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "actionpack"
+      G
+
+      bundle "binstubs actionpack"
+      expect(out).to include('no executables for the gem actionpack')
+    end
+
+    it "works if the gem has development dependencies" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "with_development_dependency"
+      G
+
+      bundle "binstubs with_development_dependency"
+      expect(out).to include('no executables for the gem with_development_dependency')
+    end
+  end
 end
