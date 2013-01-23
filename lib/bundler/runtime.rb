@@ -78,7 +78,7 @@ module Bundler
             rescue LoadError
               REGEXPS.find { |r| r =~ e.message }
               regex_name = $1
-              raise if dep.autorequire || (regex_name && regex_name.gsub('-', '/') != namespaced_file)
+              raise e if dep.autorequire || (regex_name && regex_name.gsub('-', '/') != namespaced_file)
               raise e if regex_name.nil?
             end
           end
