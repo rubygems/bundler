@@ -593,6 +593,20 @@ module Bundler
     end
     map %w(-v --version) => :version
 
+    desc "licenses", "Prints the license of all gems in the bundle"
+    def licenses
+      Bundler.load.specs.sort_by { |s| s.license.to_s }.reverse.each do |s|
+        gem_name = s.name
+        license  = s.license || s.licenses
+
+        if license.empty?
+          Bundler.ui.warn "#{gem_name}: Unknown"
+        else
+          Bundler.ui.info "#{gem_name}: #{license}"
+        end
+      end
+    end
+
     desc 'viz', "Generates a visual dependency graph"
     long_desc <<-D
       Viz generates a PNG file of the current Gemfile as a dependency graph.
