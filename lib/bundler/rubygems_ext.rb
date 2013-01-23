@@ -142,6 +142,7 @@ module Gem
       @cpu.hash ^ @os.hash ^ @version.hash
     end
 
+    remove_method :eql? if method_defined? :eql?
     alias eql? ==
   end
 end
