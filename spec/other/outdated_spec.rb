@@ -26,8 +26,8 @@ describe "bundle outdated" do
 
       bundle "outdated"
 
-      out.should include("activesupport (3.0 > 2.3.5)")
-      out.should include("foo (1.0")
+      expect(out).to include("activesupport (3.0 > 2.3.5)")
+      expect(out).to include("foo (1.0")
 
       # Gem names are one per-line, between "*" and their parenthesized version.
       gem_list = out.split("\n").map { |g| g[ /\* (.*) \(/, 1] }.compact
