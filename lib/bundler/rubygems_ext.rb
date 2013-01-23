@@ -133,9 +133,9 @@ module Gem
   end
 
   class Platform
-    JAVA  = Gem::Platform.new('java')
-    MSWIN = Gem::Platform.new('mswin32')
-    MINGW = Gem::Platform.new('x86-mingw32')
+    JAVA  = Gem::Platform.new('java') unless defined?(JAVA)
+    MSWIN = Gem::Platform.new('mswin32') unless defined?(MSWIN)
+    MINGW = Gem::Platform.new('x86-mingw32') unless defined?(MINGW)
 
     undef_method :hash if method_defined? :hash
     def hash
