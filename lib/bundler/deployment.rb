@@ -21,7 +21,8 @@ module Bundler
           test group will not be installed. The install command is executed \
           with the --deployment and --quiet flags. If the bundle cmd cannot \
           be found then you can override the bundle_cmd variable to specifiy \
-          which one it should use.
+          which one it should use. The base path to the app is fetched from \
+          the :latest_release variable. Set it for custom deploy layouts.
 
           You can override any of these defaults by setting the variables shown below.
 
@@ -34,7 +35,6 @@ module Bundler
             set :bundle_without,  [:development, :test]
             set :bundle_cmd,      "bundle" # e.g. "/opt/ruby/bin/bundle"
             set :bundle_roles,    #{role_default} # e.g. [:app, :batch]
-            set :current_release,    #{current_release} # e.g. "/releases/123456"
         DESC
         send task_method, :install, opts do
           bundle_cmd     = context.fetch(:bundle_cmd, "bundle")
