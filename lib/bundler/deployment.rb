@@ -34,6 +34,7 @@ module Bundler
             set :bundle_without,  [:development, :test]
             set :bundle_cmd,      "bundle" # e.g. "/opt/ruby/bin/bundle"
             set :bundle_roles,    #{role_default} # e.g. [:app, :batch]
+            set :current_release,    #{current_release} # e.g. "/releases/123456"
         DESC
         send task_method, :install, opts do
           bundle_cmd     = context.fetch(:bundle_cmd, "bundle")
