@@ -178,6 +178,10 @@ RAKEFILE
         expect(bundled_app("test_gem/spec/spec_helper.rb")).to exist
         expect(bundled_app("test_gem/test/minitest_helper.rb")).to_not exist
       end
+
+      it "creates a .travis.yml file to test the library against the current Ruby version on Travis CI" do
+        expect(bundled_app("test_gem/.travis.yml").read).to match(%r(- #{RUBY_VERSION}))
+      end
     end
 
     context "--edit option" do
