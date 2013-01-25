@@ -320,9 +320,9 @@ module Bundler
 
     def eval_gemspec(path, contents)
       eval(contents, TOPLEVEL_BINDING, path.expand_path.to_s)
-    rescue LoadError, SyntaxError => e
+    rescue ScriptError, StandardError => e
       original_line = e.backtrace.find { |line| line.include?(path.to_s) }
-      msg  = "There was a #{e.class} while evaluating #{path.basename}: \n#{e.message}"
+      msg  = "There was a #{e.class} while loading #{path.basename}: \n#{e.message}"
       msg << " from\n  #{original_line}" if original_line
       msg << "\n"
 
