@@ -1,4 +1,3 @@
-require 'uri'
 require 'bundler/vendored_persistent'
 
 module Bundler
