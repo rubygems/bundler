@@ -408,15 +408,7 @@ describe "gemcutter's dependency API" do
       bundled_app("broken_ssl").mkpath
       bundled_app("broken_ssl/openssl.rb").open("w") do |f|
         f.write <<-RUBY
-          $:.delete File.expand_path("..", __FILE__)
-          require 'openssl'
-
-          require 'bundler'
-          class Bundler::Fetcher
-            def fetch(*)
-              raise LoadError, "cannot load such file -- openssl"
-            end
-          end
+          raise LoadError, "cannot load such file -- openssl"
         RUBY
       end
     end
@@ -427,9 +419,8 @@ describe "gemcutter's dependency API" do
         gem "rack"
       G
 
-      bundle :install, :artifice => "endpoint", :expect_err => true,
-        :env => {"RUBYOPT" => "-I#{bundled_app("broken_ssl")}"}
-      expect(err).to include("Could not load OpenSSL.")
+      bundle :install, :env => {"RUBYOPT" => "-I#{bundled_app("broken_ssl")}"}
+      expect(out).to include("OpenSSL")
     end
   end
 
