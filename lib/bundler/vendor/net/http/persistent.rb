@@ -458,12 +458,12 @@ class Net::HTTP::Persistent
     @private_key        = nil
     @ssl_version        = nil
     @verify_callback    = nil
-    @verify_mode        = OpenSSL::SSL::VERIFY_PEER
+    @verify_mode        = defined?(OpenSSL) ? OpenSSL::SSL::VERIFY_PEER : nil
     @cert_store         = nil
 
     @generation         = 0 # incremented when proxy URI changes
     @ssl_generation     = 0 # incremented when SSL session variables change
-    @reuse_ssl_sessions = OpenSSL::SSL.const_defined? :Session
+    @reuse_ssl_sessions = defined?(OpenSSL) ? OpenSSL::SSL.const_defined?(:Session) : false
 
     @retry_change_requests = false
 
