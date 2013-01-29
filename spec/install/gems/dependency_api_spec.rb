@@ -427,9 +427,9 @@ describe "gemcutter's dependency API" do
         gem "rack"
       G
 
-      bundle :install, :artifice => "endpoint",
+      bundle :install, :artifice => "endpoint", :expect_err => true,
         :env => {"RUBYOPT" => "-I#{bundled_app("broken_ssl")}"}
-      expect(out).to include("Could not load OpenSSL.")
+      expect(err).to include("Could not load OpenSSL.")
     end
   end
 
