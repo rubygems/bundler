@@ -72,7 +72,7 @@ describe "Bundler::GemHelper tasks" do
       end
 
       it "defines Rake tasks" do
-        names = %w[build install release]
+        names = %w[manifest build install release]
 
         names.each { |name|
           expect { Rake.application[name] }.to raise_error(/Don't know how to build task/)
@@ -89,6 +89,21 @@ describe "Bundler::GemHelper tasks" do
       it "provides a way to access the gemspec object" do
         @helper.install
         expect(Bundler::GemHelper.gemspec.name).to eq('test')
+      end
+    end
+
+    describe 'manifest' do
+      before(:each) do
+        @helper.update_manifest
+        @manifest_contents = bundled_app('test/Manifest.txt').read
+      end
+
+      it 'includes the gemspec in the Manifest' do
+        expect(@manifest_contents).to include 'test.gemspec'
+      end
+
+      it "doesn't include .gitignore in the Manifest" do
+        expect(@manifest_contents).not_to include '.gitignore'
       end
     end
 
