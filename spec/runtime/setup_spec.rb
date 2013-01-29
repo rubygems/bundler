@@ -806,7 +806,7 @@ describe "Bundler.setup" do
         s.write "bar.gemspec", "require 'foobarbaz'"
       end
       bundle :install
-      expect(out).to include("was a LoadError while evaluating bar.gemspec")
+      expect(out).to include("was a LoadError while loading bar.gemspec")
       expect(out).to include("foobarbaz")
       expect(out).to include("bar.gemspec:1")
       expect(out).to include("try to require a relative path") if RUBY_VERSION >= "1.9"
