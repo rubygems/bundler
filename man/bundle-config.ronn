@@ -21,7 +21,8 @@ setting, and where it was set.
 
 Executing `bundle config <name> <value>` will set that configuration to the
 value specified for all bundles executed as the current user. The configuration
-will be stored in `~/.bundle/config`.
+will be stored in `~/.bundle/config`. If <name> already is set, <name> will be
+overridden and user will be warned.
 
 Executing `bundle config --global <name> <value>` works the same as above.
 
@@ -29,7 +30,7 @@ Executing `bundle config --local <name> <value>` will set that configuration to
 the local application. The configuration will be stored in `app/.bundle/config`.
 
 Executing `bundle config --delete <name>` will delete the configuration in both
-local and global sources.
+local and global sources. Not compatible with --global or --local flag.
 
 Executing bundle with the `BUNDLE_IGNORE_CONFIG` environment variable set will
 cause it to ignore all configuration.
