@@ -108,6 +108,11 @@ module Bundler
       end
 
       index
+    rescue OpenSSL::SSL::SSLError
+      raise HTTPError, "\nCould not verify the SSL certificate for #{@remote_uri}.\n" \
+        "Either you don't have the CA certificates needed to verify it, or\n" \
+        "you are experiencing a man-in-the-middle attack. To connect without\n" \
+        "using SSL, edit your Gemfile and change 'https' to 'http'."
     end
 
     # fetch index
