@@ -161,6 +161,8 @@ module Bundler
       "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
     method_option "system", :type => :boolean, :banner =>
       "Install to the system location ($BUNDLE_PATH or $GEM_HOME) even if the bundle was previously installed somewhere else for this application"
+    method_option "enable-shared-gems", :type => :boolean, :banner =>
+      "Allow bundler to use gems that are installed to the system location ($BUNDLE_PATH or $GEM_HOME), even when --path is specified.  Bundler will remember this value"
     method_option "frozen", :type => :boolean, :banner =>
       "Do not allow the Gemfile.lock to be updated after this install"
     method_option "deployment", :type => :boolean, :banner =>
@@ -220,7 +222,10 @@ module Bundler
       Bundler.settings[:bin] = nil if opts["binstubs"] && opts["binstubs"].empty?
       Bundler.settings[:shebang] = opts["shebang"] if opts[:shebang]
       Bundler.settings[:no_prune] = true if opts["no-prune"]
-      Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? '1' : nil
+      if opts[:system] || opts[:path] || opts[:standalone] || opts[:deployment]
+        Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? '1' : nil
+      end
+      Bundler.settings[:disable_shared_gems] = '0' if opts['enable-shared-gems']
       Bundler.settings.without = opts[:without]
       Bundler.ui.be_quiet! if opts[:quiet]
       Bundler.settings[:clean] = opts[:clean] if opts[:clean]

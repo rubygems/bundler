@@ -336,7 +336,7 @@ module Bundler
     def configure_gem_home_and_path
       blank_home = ENV['GEM_HOME'].nil? || ENV['GEM_HOME'].empty?
 
-      if settings[:disable_shared_gems]
+      if settings[:disable_shared_gems] && settings[:disable_shared_gems] != '0'
         ENV['GEM_PATH'] = ''
         configure_gem_home
       elsif blank_home || Bundler.rubygems.gem_dir != bundle_path.to_s

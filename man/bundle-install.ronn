@@ -87,6 +87,12 @@ update process below under [CONSERVATIVE UPDATING][].
   does not remove any existing cached gems, only stops the newly bundled gems
   from being cached during the install.
 
+* `--enable-shared-gems`:
+  Allow bundler to use gems from the system location even when --path is specified.
+  This allows bundler to install only the packages which aren't already installed
+  on the system.  The resulting bundle may not run if copied to another system that
+  has a different set of packages installed.
+
 ## DEPLOYMENT MODE
 
 Bundler's defaults are optimized for development. To switch to
