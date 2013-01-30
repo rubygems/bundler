@@ -5,10 +5,6 @@ Bugfixes:
   - stubs for gems with dev deps no longer cause exceptions (#2272)
   - don't suggest binstubs to --binstubs users
 
-Documentation:
-  
-  - added note on overring variable and flag comptibility for `bundle config` 
-
 ## 1.3.0.pre.6 (22 January 2013)
 
 Features:
