@@ -1,5 +1,9 @@
 ## 1.3.0.pre.7 (22 January 2013)
 
+Features:
+
+  - Added `-enable-shared-gems` option to avoid reinstalling gems present in the system dir
+
 Bugfixes:
 
   - stubs for gems with dev deps no longer cause exceptions (#2272)
