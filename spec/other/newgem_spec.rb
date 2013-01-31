@@ -120,6 +120,22 @@ RAKEFILE
       end
     end
 
+    context "no --test parameter" do
+      before do
+        reset!
+        in_app_root
+        bundle "gem #{gem_name}"
+      end
+
+      it "doesn't create any spec/test file" do
+        expect(bundled_app("test_gem/.rspec")).to_not exist
+        expect(bundled_app("test_gem/spec/test_gem_spec.rb")).to_not exist
+        expect(bundled_app("test_gem/spec/spec_helper.rb")).to_not exist
+        expect(bundled_app("test_gem/test/test_test_gem.rb")).to_not exist
+        expect(bundled_app("test_gem/test/minitest_helper.rb")).to_not exist
+      end
+    end
+
     context "--test parameter set to rspec" do
       before do
         reset!
@@ -277,6 +293,22 @@ RAKEFILE
 
       it "requires 'test/gem'" do
         expect(bundled_app("test-gem/bin/test-gem").read).to match(/require 'test\/gem'/)
+      end
+    end
+
+    context "no --test parameter" do
+      before do
+        reset!
+        in_app_root
+        bundle "gem #{gem_name}"
+      end
+
+      it "doesn't create any spec/test file" do
+        expect(bundled_app("test-gem/.rspec")).to_not exist
+        expect(bundled_app("test-gem/spec/test/gem_spec.rb")).to_not exist
+        expect(bundled_app("test-gem/spec/spec_helper.rb")).to_not exist
+        expect(bundled_app("test-gem/test/test_test/gem.rb")).to_not exist
+        expect(bundled_app("test-gem/test/minitest_helper.rb")).to_not exist
       end
     end
 
