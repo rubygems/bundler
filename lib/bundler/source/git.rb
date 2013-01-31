@@ -142,6 +142,7 @@ module Bundler
         if requires_checkout? && !@copied
           git_proxy.checkout
           git_proxy.copy_to(install_path, submodules)
+          serialize_gemspecs(install_path)
           @copied = true
         end
 
@@ -153,6 +154,7 @@ module Bundler
         if requires_checkout? && !@copied
           Bundler.ui.debug "  * Checking out revision: #{ref}"
           git_proxy.copy_to(install_path, submodules)
+          serialize_gemspecs(install_path)
           @copied = true
         end
         generate_bin(spec)
@@ -165,11 +167,7 @@ module Bundler
         FileUtils.rm_rf(app_cache_path)
         git_proxy.checkout if requires_checkout?
         git_proxy.copy_to(app_cache_path, @submodules)
-        # Evaluate gemspecs and cache the result. Gemspecs
-        # in git might require git or other dependencies.
-        # The gemspecs we cache should already be evaluated.
-        spec_path = app_cache_path.join(File.basename(spec.loaded_from))
-        File.open(spec_path, 'wb') {|file| file.print spec.to_ruby }
+        serialize_gemspecs(install_path)
       end
 
       def load_spec_files
@@ -199,6 +197,18 @@ module Bundler
       end
 
     private
+
+      def serialize_gemspecs(destination)
+        expanded_path = destination.expand_path(Bundler.root)
+        Dir["#{expanded_path}/#{@glob}"].each do |spec_path|
+          # Evaluate gemspecs and cache the result. Gemspecs
+          # in git might require git or other dependencies.
+          # The gemspecs we cache should already be evaluated.
+          spec = Bundler.load_gemspec(spec_path)
+          next unless spec
+          File.open(spec_path, 'wb') {|file| file.write(spec.to_ruby) }
+        end
+      end
 
       def set_local!(path)
         @local       = true

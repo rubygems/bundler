@@ -137,6 +137,7 @@ module Bundler
             raise GitError, "The git source #{uri} is not yet checked out. Please run `bundle install` before trying to start your application"
           end
         end
+
       end
 
     end

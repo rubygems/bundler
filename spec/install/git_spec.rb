@@ -30,6 +30,23 @@ describe "bundle install with git sources" do
       expect(Dir["#{default_bundle_path}/cache/bundler/git/foo-1.0-*"]).to have(1).item
     end
 
+    it "caches the evaluated gemspec" do
+      update_git "foo" do |s|
+        s.executables = ["foobar"] # we added this the first time, so keep it now
+        s.files = ["bin/foobar"] # updating git nukes the files list
+        foospec = s.to_ruby.gsub(/s\.files.*/, 's.files = `git ls-files`.split("\n")')
+        s.write "foo.gemspec", foospec
+      end
+
+      bundle "update foo"
+
+      bundle "show foo"
+      spec_file = File.join(out.chomp, "foo.gemspec")
+      ruby_code = Gem::Specification.load(spec_file).to_ruby
+      file_code = File.read(spec_file)
+      expect(file_code).to eq(ruby_code)
+    end
+
     it "does not update the git source implicitly" do
       update_git "foo"
 
