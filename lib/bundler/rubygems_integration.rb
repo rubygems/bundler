@@ -130,7 +130,7 @@ module Bundler
     def spec_from_gem(path, policy=nil)
       require 'rubygems/format'
       if policy
-        policy = eval("Gem::Security::#{policy}")
+        policy = Gem::Security.const_get(policy)
       end
       Gem::Format.from_file_by_path(path, policy).spec
     rescue Gem::Package::FormatError
