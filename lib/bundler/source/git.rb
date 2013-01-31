@@ -27,8 +27,7 @@ module Bundler
         @name       = options["name"]
         @version    = options["version"]
 
-        @update     = false
-        @installed  = nil
+        @copied     = false
         @local      = false
       end
 
@@ -140,10 +139,10 @@ module Bundler
           set_local!(app_cache_path)
         end
 
-        if requires_checkout? && !@update
+        if requires_checkout? && !@copied
           git_proxy.checkout
           git_proxy.copy_to(install_path, submodules)
-          @update = true
+          @copied = true
         end
 
         local_specs
@@ -151,10 +150,10 @@ module Bundler
 
       def install(spec)
         Bundler.ui.info "Using #{spec.name} (#{spec.version}) from #{to_s} "
-        if requires_checkout? && !@installed
+        if requires_checkout? && !@copied
           Bundler.ui.debug "  * Checking out revision: #{ref}"
           git_proxy.copy_to(install_path, submodules)
-          @installed = true
+          @copied = true
         end
         generate_bin(spec)
       end
@@ -261,7 +260,6 @@ module Bundler
 
       def git_proxy
         @git_proxy ||= GitProxy.new(cache_path, uri, ref, cached_revision){ allow_git_ops? }
-
       end
 
     end
