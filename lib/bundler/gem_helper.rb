@@ -33,6 +33,11 @@ module Bundler
     end
 
     def install
+      desc 'Updates the contents of Manifest.txt to the latest list of files tracked in git'
+      task 'manifest' do
+        update_manifest
+      end
+
       desc "Build #{name}-#{version}.gem into the pkg directory."
       task 'build' do
         build_gem
@@ -51,7 +56,19 @@ module Bundler
       GemHelper.instance = self
     end
 
+    def update_manifest
+      Dir.chdir(base) do
+        git_files     = sh('git ls-files').split("\n")
+        ignored_files = sh('cat .gemignore').split("\n")
+        manifest_list = git_files - ignored_files
+        File.open(File.join(base, 'Manifest.txt'), 'w') do |f|
+          f.puts manifest_list.join("\n")
+        end
+      end
+    end
+
     def build_gem
+      update_manifest
       file_name = nil
       sh("gem build -V '#{spec_path}'") { |out, code|
         file_name = File.basename(built_gem_path)

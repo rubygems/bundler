@@ -669,6 +669,8 @@ module Bundler
       template(File.join("newgem/LICENSE.txt.tt"),           File.join(target, "LICENSE.txt"),                         opts)
       template(File.join("newgem/README.md.tt"),             File.join(target, "README.md"),                           opts)
       template(File.join("newgem/gitignore.tt"),             File.join(target, ".gitignore"),                          opts)
+      template(File.join("newgem/gemignore.tt"),             File.join(target, ".gemignore"),                          opts)
+      template(File.join("newgem/Manifest.txt.tt"),          File.join(target, "Manifest.txt"),                        opts)
       template(File.join("newgem/newgem.gemspec.tt"),        gemspec_dest,                                             opts)
       template(File.join("newgem/lib/newgem.rb.tt"),         File.join(target, "lib/#{namespaced_path}.rb"),           opts)
       template(File.join("newgem/lib/newgem/version.rb.tt"), File.join(target, "lib/#{namespaced_path}/version.rb"),   opts)

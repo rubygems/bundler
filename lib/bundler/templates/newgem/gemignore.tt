@@ -1,0 +1,4 @@
+.gitignore
+.gemignore
+.rspec
+.travis.yml

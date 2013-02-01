@@ -1,3 +1,9 @@
+## Next release
+
+Features:
+
+  - Remove Git dependency from bundler (@matschaffer, #1043)
+
 ## 1.3.0.pre.7 (22 January 2013)
 
 Bugfixes:
