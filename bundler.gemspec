@@ -16,16 +16,12 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version     = '>= 1.8.7'
   spec.required_rubygems_version = '>= 1.3.6'
 
-  spec.add_development_dependency 'ronn'
-  spec.add_development_dependency 'rspec', '>= 2.11'
+  spec.add_development_dependency 'ronn', '~> 0.7.3'
+  spec.add_development_dependency 'rspec', '~> 2.11'
 
-  # Man files are required because they are ignored by git
-  spec.files         = %w(CHANGELOG.md CONTRIBUTE.md CONTRIBUTING.md ISSUES.md LICENSE.md README.md Rakefile UPGRADING.md bundler.gemspec)
-  spec.files        += Dir.glob("lib/**/*.rb")
-  spec.files        += Dir.glob("bin/**/*")
-  spec.files        += Dir.glob("man/**/*")
-  spec.files        += Dir.glob("spec/**/*")
-  spec.test_files    = Dir.glob("spec/**/*")
+  spec.files       = `git ls-files`.split($/)
+  spec.files      += Dir.glob('man/**/*') # man/ is ignored by git
+  spec.test_files  = spec.files.grep(%r{^spec/})
 
   spec.executables   = %w(bundle)
   spec.require_paths = ["lib"]
