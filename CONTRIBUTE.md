@@ -1,4 +1,3 @@
-
 Great to have you here! Here are a few ways you can help out with [Bundler](http://github.com/carlhuda/bundler).
 
 # Learn & listen

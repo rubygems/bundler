@@ -833,11 +833,11 @@ class Net::HTTP::Persistent
     env_no_proxy = ENV['no_proxy'] || ENV['NO_PROXY']
 
     # '*' is special case for always bypass
-    return nil if env_no_proxy == '*' 
+    return nil if env_no_proxy == '*'
 
     if env_no_proxy then
       uri.query = "no_proxy=#{escape(env_no_proxy)}"
-    end 
+    end
 
     unless uri.user or uri.password then
       uri.user     = escape ENV['http_proxy_user'] || ENV['HTTP_PROXY_USER']
