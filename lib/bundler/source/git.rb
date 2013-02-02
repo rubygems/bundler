@@ -142,7 +142,7 @@ module Bundler
         if requires_checkout? && !@copied
           git_proxy.checkout
           git_proxy.copy_to(install_path, submodules)
-          serialize_gemspecs(install_path)
+          serialize_gemspecs_in(install_path)
           @copied = true
         end
 
@@ -154,7 +154,7 @@ module Bundler
         if requires_checkout? && !@copied
           Bundler.ui.debug "  * Checking out revision: #{ref}"
           git_proxy.copy_to(install_path, submodules)
-          serialize_gemspecs(install_path)
+          serialize_gemspecs_in(install_path)
           @copied = true
         end
         generate_bin(spec)
@@ -167,7 +167,7 @@ module Bundler
         FileUtils.rm_rf(app_cache_path)
         git_proxy.checkout if requires_checkout?
         git_proxy.copy_to(app_cache_path, @submodules)
-        serialize_gemspecs(install_path)
+        serialize_gemspecs_in(install_path)
       end
 
       def load_spec_files
@@ -198,7 +198,7 @@ module Bundler
 
     private
 
-      def serialize_gemspecs(destination)
+      def serialize_gemspecs_in(destination)
         expanded_path = destination.expand_path(Bundler.root)
         Dir["#{expanded_path}/#{@glob}"].each do |spec_path|
           # Evaluate gemspecs and cache the result. Gemspecs
