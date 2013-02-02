@@ -166,7 +166,7 @@ end
       expect(out).not_to include("Your Gemfile contains path and git dependencies.")
     end
 
-    it "evaluates gemspecs and writes them out" do
+    it "caches pre-evaluated gemspecs" do
       git = build_git "foo"
 
       # Insert a gemspec method that shells out
