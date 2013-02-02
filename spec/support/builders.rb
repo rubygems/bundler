@@ -323,7 +323,8 @@ module Spec
     end
 
     def update_git(name, *args, &block)
-      build_with(GitUpdater, name, args, &block)
+      spec = build_with(GitUpdater, name, args, &block)
+      GitReader.new lib_path(spec.full_name)
     end
 
   private

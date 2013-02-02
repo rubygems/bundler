@@ -31,7 +31,7 @@ describe "bundle install with git sources" do
     end
 
     it "caches the evaluated gemspec" do
-      update_git "foo" do |s|
+      git = update_git "foo" do |s|
         s.executables = ["foobar"] # we added this the first time, so keep it now
         s.files = ["bin/foobar"] # updating git nukes the files list
         foospec = s.to_ruby.gsub(/s\.files.*/, 's.files = `git ls-files`.split("\n")')
@@ -40,8 +40,8 @@ describe "bundle install with git sources" do
 
       bundle "update foo"
 
-      bundle "show foo"
-      spec_file = File.join(out.chomp, "foo.gemspec")
+      sha = git.ref_for("master", 11)
+      spec_file = default_bundle_path.join("bundler/gems/foo-1.0-#{sha}/foo.gemspec").to_s
       ruby_code = Gem::Specification.load(spec_file).to_ruby
       file_code = File.read(spec_file)
       expect(file_code).to eq(ruby_code)
