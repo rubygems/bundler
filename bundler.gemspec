@@ -1,32 +1,32 @@
-# -*- encoding: utf-8 -*-
+# coding: utf-8
 lib = File.expand_path('../lib/', __FILE__)
 $:.unshift lib unless $:.include?(lib)
-
 require 'bundler/version'
 
-Gem::Specification.new do |s|
-  s.name        = "bundler"
-  s.version     = Bundler::VERSION
-  s.platform    = Gem::Platform::RUBY
-  s.license     = "MIT"
-  s.authors     = ["André Arko", "Terence Lee", "Carl Lerche", "Yehuda Katz"]
-  s.email       = ["andre@arko.net"]
-  s.homepage    = "http://gembundler.com"
-  s.summary     = %q{The best way to manage your application's dependencies}
-  s.description = %q{Bundler manages an application's dependencies through its entire life, across many machines, systematically and repeatably}
+Gem::Specification.new do |spec|
+  spec.name        = 'bundler'
+  spec.version     = Bundler::VERSION
+  spec.licenses    = ['MIT']
+  spec.authors     = ["André Arko", "Terence Lee", "Carl Lerche", "Yehuda Katz"]
+  spec.email       = ["andre@arko.net"]
+  spec.homepage    = "http://gembundler.com"
+  spec.summary     = %q{The best way to manage your application's dependencies}
+  spec.description = %q{Bundler manages an application's dependencies through its entire life, across many machines, systematically and repeatably}
 
-  s.required_ruby_version     = ">= 1.8.7"
-  s.required_rubygems_version = ">= 1.3.6"
-  s.rubyforge_project         = "bundler"
+  spec.required_ruby_version     = '>= 1.8.7'
+  spec.required_rubygems_version = '>= 1.3.6'
 
-  s.add_development_dependency "ronn"
-  s.add_development_dependency "rspec", "~> 2.11"
+  spec.add_development_dependency 'ronn'
+  spec.add_development_dependency 'rspec', '>= 2.11'
 
   # Man files are required because they are ignored by git
-  man_files            = Dir.glob("lib/bundler/man/**/*")
-  git_files            = `git ls-files`.split("\n") rescue ''
-  s.files              = git_files + man_files
-  s.test_files         = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.executables        = %w(bundle)
-  s.require_paths      = ["lib"]
+  spec.files         = %w(CHANGELOG.md CONTRIBUTE.md CONTRIBUTING.md ISSUES.md LICENSE.md README.md Rakefile UPGRADING.md bundler.gemspec)
+  spec.files        += Dir.glob("lib/**/*.rb")
+  spec.files        += Dir.glob("bin/**/*")
+  spec.files        += Dir.glob("man/**/*")
+  spec.files        += Dir.glob("spec/**/*")
+  spec.test_files    = Dir.glob("spec/**/*")
+
+  spec.executables   = %w(bundle)
+  spec.require_paths = ["lib"]
 end
