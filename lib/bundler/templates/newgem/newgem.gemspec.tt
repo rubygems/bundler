@@ -3,23 +3,23 @@ lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require '<%=config[:namespaced_path]%>/version'
 
-Gem::Specification.new do |gem|
-  gem.name          = <%=config[:name].inspect%>
-  gem.version       = <%=config[:constant_name]%>::VERSION
-  gem.authors       = [<%=config[:author].inspect%>]
-  gem.email         = [<%=config[:email].inspect%>]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
-  gem.homepage      = ""
-  gem.license       = "MIT"
+Gem::Specification.new do |spec|
+  spec.name          = <%=config[:name].inspect%>
+  spec.version       = <%=config[:constant_name]%>::VERSION
+  spec.authors       = [<%=config[:author].inspect%>]
+  spec.email         = [<%=config[:email].inspect%>]
+  spec.description   = %q{TODO: Write a gem description}
+  spec.summary       = %q{TODO: Write a gem summary}
+  spec.homepage      = ""
+  spec.license       = "MIT"
 
-  gem.files         = `git ls-files`.split($/)
-  gem.executables   = gem.files.grep(%r{^bin/}) { |f| File.basename(f) }
-  gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
-  gem.require_paths = ["lib"]
+  spec.files         = `git ls-files`.split($/)
+  spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
+  spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
+  spec.require_paths = ["lib"]
 
-  gem.add_development_dependency "rake"
+  spec.add_development_dependency "rake"
 <% if config[:test] -%>
-  gem.add_development_dependency "<%=config[:test]%>"
+  spec.add_development_dependency "<%=config[:test]%>"
 <% end -%>
 end
