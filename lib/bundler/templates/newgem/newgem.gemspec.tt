@@ -18,7 +18,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_development_dependency "bundle"
+  spec.add_development_dependency "bundler", "~> <%= Bundler::VERSION.split(".")[0..1].join(".") %>"
   spec.add_development_dependency "rake"
 <% if config[:test] -%>
   spec.add_development_dependency "<%=config[:test]%>"
