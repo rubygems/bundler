@@ -310,7 +310,7 @@ describe "bundle install with gem sources" do
       G
 
       bundle :install
-      expect(out).to include("Could not reach http://localhost:9384/")
+      expect(out).to include("Could not fetch specs from http://localhost:9384/")
       expect(out).not_to include("file://")
     end
 

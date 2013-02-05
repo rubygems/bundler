@@ -43,6 +43,8 @@ module Bundler
 
     def initialize(remote_uri)
       @remote_uri = remote_uri
+      @public_uri = remote_uri.dup
+      @public_uri.user, @public_uri.password = nil, nil # don't print these
       @has_api    = true # will be set to false if the rubygems index is ever fetched
       @@connection ||= Net::HTTP::Persistent.new nil, :ENV
       @@connection.read_timeout = API_TIMEOUT
@@ -66,10 +68,10 @@ module Bundler
       specs = nil
 
       if !gem_names || @remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
-        Bundler.ui.info "Fetching source index from #{strip_user_pass_from_uri(@remote_uri)}"
+        Bundler.ui.info "Fetching source index from #{@public_uri}"
         specs = fetch_all_remote_specs
       else
-        Bundler.ui.info "Fetching gem metadata from #{strip_user_pass_from_uri(@remote_uri)}", Bundler.ui.debug?
+        Bundler.ui.info "Fetching gem metadata from #{@public_uri}", Bundler.ui.debug?
         begin
           specs = fetch_remote_specs(gem_names)
         # fall back to the legacy index in the following cases
@@ -86,7 +88,7 @@ module Bundler
           Bundler.ui.debug e.message
           Bundler.ui.debug e.backtrace
 
-          Bundler.ui.info "Fetching full source index from #{strip_user_pass_from_uri(@remote_uri)}"
+          Bundler.ui.info "Fetching full source index from #{@public_uri}"
           specs = fetch_all_remote_specs
         else
           # new line now that the dots are over
@@ -209,16 +211,9 @@ module Bundler
       begin
         Bundler.rubygems.fetch_all_remote_specs
       rescue Gem::RemoteFetcher::FetchError
-        raise HTTPError, "Could not reach #{strip_user_pass_from_uri(@remote_uri)}"
+        raise HTTPError, "Could not fetch specs from #{@public_uri}"
       end
     end
 
-    def strip_user_pass_from_uri(uri)
-      uri_dup = uri.dup
-      uri_dup.user = "****" if uri_dup.user
-      uri_dup.password = "****" if uri_dup.password
-
-      uri_dup
-    end
   end
 end
