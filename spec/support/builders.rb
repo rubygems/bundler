@@ -265,6 +265,22 @@ module Spec
       end
     end
 
+    def build_security_repo
+      build_repo security_repo do
+        build_gem "rack"
+
+        build_gem "signed_gem" do |s|
+          cert = 'signing-cert.pem'
+          pkey = 'signing-pkey.pem'
+          s.write cert, TEST_CERT
+          s.write pkey, TEST_PKEY
+          s.signing_key = pkey
+          s.cert_chain = [cert]
+        end
+      end
+
+    end
+
     def build_repo(path, &blk)
       return if File.directory?(path)
       rake_path = Dir["#{Path.base_system_gems}/**/rake*.gem"].first
@@ -601,5 +617,57 @@ module Spec
         @context.gem_repo1('gems')
       end
     end
+
+    TEST_CERT=<<CERT
+-----BEGIN CERTIFICATE-----
+MIIDLDCCAhSgAwIBAgIBADANBgkqhkiG9w0BAQUFADA8MRAwDgYDVQQDDAdleGFt
+cGxlMRMwEQYKCZImiZPyLGQBGRYDZm9vMRMwEQYKCZImiZPyLGQBGRYDY29tMB4X
+DTEzMDIwNDIxMTYzNVoXDTE0MDIwNDIxMTYzNVowPDEQMA4GA1UEAwwHZXhhbXBs
+ZTETMBEGCgmSJomT8ixkARkWA2ZvbzETMBEGCgmSJomT8ixkARkWA2NvbTCCASIw
+DQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANVgibTKM0ux14SXQU9M2Ec2mTHG
+hoPJl/3Qq+p4wEalT87/Ascc2BaT6hXWWfAJ4oxReZnPfVop+fXZZDgtVC0JijPC
+v+5JHs5KLEG1N+wzaVI7238yv4N62t48XD585bPp1meiVh9wE2kdax1bIJBwcRhd
+gzR5kFfr2+O7u/g1nO/LN6aAWlKBXqntUmG0wEoWAibWDqpv4AIJhSGrzAqw648F
+5TWiOEvKyrwohAt7IWbmiS8Cr3qT+GSq6tR9Hi6IC8vFW0gBvd1pSX25oUjdNApX
+lzf6zkqBTzek9R7FN6TiymbJfCqaMz55rNAGZDDX0DOqJIvRTR6I2MQSfJsCAwEA
+AaM5MDcwCQYDVR0TBAIwADAdBgNVHQ4EFgQULUiq0A8j8lc03KGvxV4a0tuBqfUw
+CwYDVR0PBAQDAgSwMA0GCSqGSIb3DQEBBQUAA4IBAQBMqoR/F94kK2ou9Yff+DMp
+b/hXEnl8lXzW0euUiTQcVRX6HO2AqGTqdZemUmm1uetGiozsuA1nbPInZQTL/zQq
+oNbg60JxlKWStxF3zsZdKVDNXsXWg4WlzvF6qd4AjDCO//e/BHHe44r+vASqglYO
+zTrTWYgjtDmPOLDvZTHhZ3kBV0Q0pGCBi7f0VYpqjEHSeyRfqJH1LT8yYC3vuYzZ
+PPIub1CZNnaS4jvtSKZsEzaijftwI7ddt/S9Yt7BahUrfHCMrA/Nt3XSDu0BcgaF
+cxrVBbDO8ELUvTY1yFcMYE1gzTIPCYE9TWXgm7A9HcD/7XLXkUL6nuvG3wwpBPTa
+-----END CERTIFICATE-----
+CERT
+
+    TEST_PKEY=<<PKEY
+-----BEGIN RSA PRIVATE KEY-----
+MIIEogIBAAKCAQEA1WCJtMozS7HXhJdBT0zYRzaZMcaGg8mX/dCr6njARqVPzv8C
+xxzYFpPqFdZZ8AnijFF5mc99Win59dlkOC1ULQmKM8K/7kkezkosQbU37DNpUjvb
+fzK/g3ra3jxcPnzls+nWZ6JWH3ATaR1rHVsgkHBxGF2DNHmQV+vb47u7+DWc78s3
+poBaUoFeqe1SYbTAShYCJtYOqm/gAgmFIavMCrDrjwXlNaI4S8rKvCiEC3shZuaJ
+LwKvepP4ZKrq1H0eLogLy8VbSAG93WlJfbmhSN00CleXN/rOSoFPN6T1HsU3pOLK
+Zsl8KpozPnms0AZkMNfQM6oki9FNHojYxBJ8mwIDAQABAoIBAD8AD+iXQun4il+V
+oSzezYTJNBYkPZcvsHa6Y+gI2wyAxr2hQZq0g4C3D4h/D3L2GDPB4pttTd+PQUQ7
+eYG0sIPTq0B5Id4jLLtP3x1PekF9NH2ZOselnjId1f2D6OByVAf45NsYbUE/ABwr
+GXNDcqvy5xGAmrqlod6zvurQhUFVWNYw1Ry6MCxD79S54Rky9cv6qzviPAh570y+
+aWS+lXJeqVVhmwWnbOUBWu/8dsniJbknassxwOYCShNLGnPMW+gklPaUucOkDF8K
+R0xYbOpAowQaIOdm7sQtt/CZOD34pgAWlLMev/J5y7+y6jvdqBMoLKIMAj/YqphW
+FqOY4fECgYEA9t5MqdexzOpz5LTQbqUDDiMtVR5mn/7wPbgNCRuAADTuM8QJkREe
+JCEG/S9CEmefoa6gr+CyWhq9qbFhLC7rEgBCInW/hL5m8qGVAVcpIUCbpYh7nirN
+fHQP6zL2RESmJDo3Y0vLZosR+XR1UDSb3tdTQSXt/MX6p+gjcswnzN0CgYEA3UUY
+ew22HjB1dnS7ps/gdsNwlalYYwSkfuBqNkluvMRE56HGbKeDYjEV4egkWZVYUNDJ
+P+jVKUTOSfgzXOsR7rKeiaQ3UEZfVpV3iQWtqzS2+BlhWBoQsBLD5CjdP8ykOQGr
+NQVNegXAFGhsiRNwm4Mpl5+t+Ap9aqSy1WwAu9cCgYBwY0vrlrLvY11XpamudZkq
+eoFM2wZFmL6umnf0yXxAm9hF4N2qGWzrbc3MvhMKZfqalPG6oEUSGFJ4SrS+dK24
+CD4Tih+iwzwDAeTgM1oaNVumxLfijgH2wq/sl8rd0ZMBsy88GWmESZPpSUePOCQu
+E0Fny2jJRyiSAHEC9ka4UQKBgDFBmWKDOeBcjzlwYPmQWvp1JVHbodZhCTFJSbuN
++z3AP0qFA8PaQnAQVzuzzqu2iDNtVu+IKDOIopdqzhxII/TMBGjFip6vG7gNi8+P
+2Qo8sOJn2/idzMs1UjAvPJlgN8qM6YzjAk1AjHK+kDKvhijIOPEM1dBanXKo+Tpz
+UXJ/AoGABULY7oaW7vW7XLiHVTHeoqi9m9yNTVQRnsMFJm5GhisjavZbCzCGz1Tl
+hiIdZiAgSpltgy7+R7l7JhmFf04xVnEJc/4lyJc4ZwYXkMGqD1tE9FXowbBFKktB
+cPFVDEsR7SPkiAmGm99WiigexSwxW9hl+TjgolcXG7HTDsES2Sg=
+-----END RSA PRIVATE KEY-----
+PKEY
   end
 end
