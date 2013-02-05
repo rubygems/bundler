@@ -31,8 +31,10 @@ end
 namespace :spec do
   desc "Ensure spec dependencies are installed"
   task :deps do
-    sh "#{Gem.ruby} -S gem list ronn | (grep 'ronn' 1> /dev/null) || #{Gem.ruby} -S gem install ronn --no-ri --no-rdoc"
-    sh "#{Gem.ruby} -S gem list rspec | (grep 'rspec (2.' 1> /dev/null) || #{Gem.ruby} -S gem install rspec --no-ri --no-rdoc"
+    {"rdiscount" => "~> 1.6", "ronn" => "~> 0.7.3", "rspec" => "~> 2.11"}.each do |name, version|
+      sh "#{Gem.ruby} -S gem list #{name} -v '#{version}' | grep '#{name}' -q || " \
+         "#{Gem.ruby} -S gem install #{name} -v '#{version}' --no-ri --no-rdoc"
+    end
   end
 
   namespace :travis do
