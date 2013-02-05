@@ -74,9 +74,9 @@ module Bundler
           specs = fetch_remote_specs(gem_names)
         # fall back to the legacy index in the following cases
         # 1. Gemcutter Endpoint doesn't return a 200
-        # 2. Marshal blob doesn't load properly
-        # 3. One of the YAML gemspecs has the Syck::DefaultKey problem
-        rescue HTTPError, TypeError, GemspecError => e
+        # 2,3. Marshal blob doesn't load properly
+        # 4. One of the YAML gemspecs has the Syck::DefaultKey problem
+        rescue HTTPError, ArgumentError, TypeError, GemspecError => e
           # new line now that the dots are over
           Bundler.ui.info "" unless Bundler.ui.debug?
 
