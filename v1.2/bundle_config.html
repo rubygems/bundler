@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
   <head>
-    <title>Bundler: The best way to manage Ruby applications</title>
+    <title>Bundler: The best way to manage a Ruby application's gems</title>
     <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
     <link href="../stylesheets/application.css" media="all" rel="stylesheet" type="text/css"/><link href="../stylesheets/sunburst.css" media="all" rel="stylesheet" type="text/css"/>
     <link href="/images/favicon.png" rel="shortcut icon" type="image/png" />
@@ -88,7 +88,9 @@
               <div class="notes">
                 Will set <code>NAME</code> to <code>VALUE</code> for all bundles
                 executed as the current user (i.e. global setting). The configuration
-                will be stored in  <code>~/.bundle/config</code>.
+                will be stored in  <code>~/.bundle/config</code>. If <code>NAME</code>
+                already is set, <code>NAME</code> will be overridden and user will be
+                warned.
               </div>
             </div>
           </div>
@@ -124,7 +126,7 @@
             <div class="how">
               <pre class='sunburst'>$ bundle config --delete NAME</pre>
               <div class="notes">
-                Will delete the configuration for <code>NAME</code> variable in both local and global sources.
+                Will delete the configuration for <code>NAME</code> variable in both local and global sources. Not compatible with --global or --local flag.
               </div>
             </div>
           </div>
@@ -200,7 +202,7 @@
                 <li>
                   <code>path</code> (<code>BUNDLE_PATH</code>): The location on disk
                   to install gems. Defaults to <code>$GEM_HOME</code> in development
-                  and <code>vendor/bundler</code> when <code>--deployment</code> is used.
+                  and <code>vendor/bundle</code> when <code>--deployment</code> is used.
                 </li>
                 <li>
                   <code>frozen</code> (<code>BUNDLE_FROZEN</code>): Disallow changes to
@@ -315,15 +317,15 @@
         </p>
         <p>
           <b>frameworks</b>
+          <a href="/v1.2/bundler_setup.html">ruby</a>
+          /
           <a href="/v1.2/rubygems.html">rubygems</a>
+          /
+          <a href="/v1.2/rubymotion.html">rubymotion</a>
           /
           <a href="/v1.2/sinatra.html">sinatra</a>
           /
-          <a href="/v1.2/rails23.html">rails 2.3</a>
-          /
           <a href="/v1.2/rails3.html">rails 3</a>
-          /
-          <a href="/v1.2/rubymotion.html">rubymotion</a>
         </p>
       </div>
       <div class="spacer"></div>
