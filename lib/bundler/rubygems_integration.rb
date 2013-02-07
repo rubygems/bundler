@@ -1,6 +1,5 @@
 require 'rubygems'
 require 'rubygems/config_file'
-require 'rubygems/security'
 
 module Bundler
   class RubygemsIntegration
@@ -129,16 +128,15 @@ module Bundler
       end
     end
 
-    def spec_from_gem(path, policy=nil)
+    def spec_from_gem(path, policy = nil)
       require 'rubygems/format'
-      if policy
-        policy = Gem::Security.const_get(policy)
-      end
+      require 'rubygems/security'
+      policy = Gem::Security.const_get(policy) if policy
       Gem::Format.from_file_by_path(path, policy).spec
     rescue Gem::Package::FormatError
-      raise Bundler::GemspecError, "Could not read gem at #{path}. It may be corrupted."
+      raise GemspecError, "Could not read gem at #{path}. It may be corrupted."
     rescue => e
-      raise GemfileError, "Error loading gem at #{path}: " + e.message
+      raise GemspecError, "Error loading gemspec at #{path}: " + e.message
     end
 
     def build(spec)
