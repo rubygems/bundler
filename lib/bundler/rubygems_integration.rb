@@ -1,4 +1,6 @@
 require 'rubygems'
+# rubygems master requires UI for ConfigFile but doesn't require it
+require 'rubygems/user_interaction'
 require 'rubygems/config_file'
 
 module Bundler
