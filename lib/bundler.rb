@@ -1,6 +1,6 @@
-require 'rbconfig'
 require 'fileutils'
 require 'pathname'
+require 'rbconfig'
 require 'bundler/gem_path_manipulation'
 require 'bundler/rubygems_ext'
 require 'bundler/rubygems_integration'

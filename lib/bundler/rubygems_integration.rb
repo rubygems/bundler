@@ -1,4 +1,6 @@
 require 'rubygems'
+require 'rubygems/config_file'
+require 'rubygems/security'
 
 module Bundler
   class RubygemsIntegration

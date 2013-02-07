@@ -1,8 +1,7 @@
+require 'bundler/rubygems_integration'
+require 'bundler/similarity_detector'
 require 'bundler/vendored_thor'
 require 'rubygems/user_interaction'
-require 'rubygems/config_file'
-require 'rubygems/security'
-require 'bundler/similarity_detector'
 
 module Bundler
   class CLI < Thor
