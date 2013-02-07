@@ -18,7 +18,6 @@ module Bundler
     end
 
     check_unknown_options!(:except => [:config, :exec])
-
     stop_on_unknown_option! :exec
 
     default_task :install
@@ -832,27 +831,10 @@ module Bundler
     end
 
     def pager_system
-      pager_environment_variable or available_pager_system
-    end
-
-    def pager_environment_variable
-      ENV['PAGER'] or ENV['MANPAGER']
-    end
-
-    def available_pager_system
-      less or more or fallback_pager
-    end
-
-    def less
-      'less -R' if !(`which less` rescue '').empty?
-    end
-
-    def more
-      'more' if !(`which more` rescue '').empty?
-    end
-
-    def fallback_pager
-      'cat'
+      pager = ENV['PAGER'] || ENV['MANPAGER']
+      pager ||= 'less -R' if !(`which less` rescue '').empty?
+      pager ||= 'more' if !(`which more` rescue '').empty?
+      pager ||= 'cat'
     end
 
   end
