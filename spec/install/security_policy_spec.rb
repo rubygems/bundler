@@ -1,6 +1,5 @@
 require "spec_helper"
-require 'rubygems/format'
-require 'rubygems/security'
+require "rubygems/security"
 
 # unfortunately, testing signed gems with a provided CA is extremely difficult
 # as 'gem cert' is currently the only way to add CAs to the system.
