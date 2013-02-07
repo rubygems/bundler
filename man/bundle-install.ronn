@@ -9,8 +9,9 @@ bundle-install(1) -- Install the dependencies specified in your Gemfile
                  [--local] [--deployment]
                  [--binstubs[=DIRECTORY]]
                  [--standalone[=GROUP1[ GROUP2...]]]
-                 [--quiet]
+                 [--trust-policy=POLICY]
                  [--no-cache]
+                 [--quiet]
 
 ## DESCRIPTION
 
@@ -82,10 +83,19 @@ update process below under [CONSERVATIVE UPDATING][].
   `bundle` directory and installs the bundle there. It also generates
   a `bundle/bundler/setup.rb` file to replace Bundler's own setup.
 
+* `--trust-policy=[<policy>]`:
+  Apply the Rubygems security policy named <policy>, where policy is one of
+  HighSecurity, MediumSecurity, LowSecurity, or NoSecurity. For more detail,
+  see the Rubygems signing documentation, linked below in [SEE ALSO][].
+
 * `--no-cache`:
   Do not update the cache in `vendor/cache` with the newly bundled gems. This
   does not remove any existing cached gems, only stops the newly bundled gems
   from being cached during the install.
+
+* `--quiet`:
+  Do not print progress information to stdout. Instead, communicate the
+  success of the install operation via exit status code.
 
 ## DEPLOYMENT MODE
 
@@ -333,3 +343,8 @@ which other gems in the Gemfile(5) still depend on, run
 should first try to run `bundle install`, which will guarantee that no
 other gems in the Gemfile(5) are impacted by the change. If that
 does not work, run [bundle update(1)][bundle-update].
+
+## SEE ALSO
+
+* Gem install docs: http://docs.rubygems.org/read/chapter/2
+* Rubygems signing docs: http://docs.rubygems.org/read/chapter/21

@@ -1,7 +1,7 @@
-require 'bundler/rubygems_integration'
 require 'bundler/similarity_detector'
 require 'bundler/vendored_thor'
 require 'rubygems/user_interaction'
+require 'rubygems/security'
 
 module Bundler
   class CLI < Thor
@@ -170,8 +170,8 @@ module Bundler
       "Use the rubygems modern index instead of the API endpoint"
     method_option "clean", :type => :boolean, :banner =>
       "Run bundle clean automatically after install"
-    method_option "policy", :type => :string, :banner =>
-      "Security Policy (see gem -P option). Must be one of " + Gem::Security::Policies.keys.join('|')
+    method_option "trust-policy", :alias => "P", :type => :string, :banner =>
+      "Gem trust policy (like gem install -P). Must be one of " + Gem::Security::Policies.keys.join('|')
 
     def install
       opts = options.dup
@@ -192,14 +192,15 @@ module Bundler
         exit 1
       end
 
-      if (opts[:policy])
-        unless (Gem::Security::Policies.keys.include?(opts[:policy]))
-          Bundler.ui.error "You have specified an invalid security policy."
+      if (opts["trust-policy"])
+        unless (Gem::Security::Policies.keys.include?(opts["trust-policy"]))
+          Bundler.ui.error "Rubygems doesn't know about trust policy '#{opts["trust-policy"]}'. " \
+            "The known policies are: #{Gem::Security::Policies.keys.join(', ')}."
           exit 1
         end
-        Bundler.settings[:policy] = opts[:policy]
+        Bundler.settings["trust-policy"] = opts["trust-policy"]
       else
-        Bundler.settings[:policy] = nil if Bundler.settings[:policy]
+        Bundler.settings["trust-policy"] = nil if Bundler.settings["trust-policy"]
       end
 
       if opts[:deployment] || opts[:frozen]
