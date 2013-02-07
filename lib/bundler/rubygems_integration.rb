@@ -461,8 +461,8 @@ module Bundler
 
       def gem_from_path(path, policy = nil)
         p = Gem::Package.new(path)
-        p.security_policy = policy
-        p
+        p.security_policy = policy if policy
+        return p
       end
 
       def build(spec)
