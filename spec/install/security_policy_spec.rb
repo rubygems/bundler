@@ -23,18 +23,18 @@ describe "policies with unsigned gems" do
   end
 
   it "fails when given invalid security policy" do
-    bundle "install --policy=InvalidPolicyName"
-    expect(out).to include("You have specified an invalid security policy.")
+    bundle "install --trust-policy=InvalidPolicyName"
+    expect(out).to include("Rubygems doesn't know about trust policy")
   end
 
   it "fails with High Security setting due to presence of unsigned gem" do
-    bundle "install --policy=HighSecurity", :exitstatus => true
-    expect(out).to include("Error loading gem at")
+    bundle "install --trust-policy=HighSecurity", :exitstatus => true
+    expect(out).to include("security policy didn't allow")
   end
 
   it "fails with Medium Security setting due to presence of unsigned gem" do
-    bundle "install --policy=MediumSecurity"
-    expect(out).to include("Error loading gem at")
+    bundle "install --trust-policy=MediumSecurity"
+    expect(out).to include("security policy didn't allow")
   end
 
   it "succeeds with no policy" do
@@ -54,17 +54,17 @@ describe "policies with signed gems, no CA" do
   end
 
   it "fails with High Security setting, gem is self-signed" do
-    bundle "install --policy=HighSecurity"
-    expect(out).to include("Error loading gem at")
+    bundle "install --trust-policy=HighSecurity"
+    expect(out).to include("security policy didn't allow")
   end
 
   it "fails with Medium Security setting, gem is self-signed" do
-    bundle "install --policy=MediumSecurity"
-    expect(out).to include("Error loading gem at")
+    bundle "install --trust-policy=MediumSecurity"
+    expect(out).to include("security policy didn't allow")
   end
 
   it "succeeds with Low Security setting, low security accepts self signed gem" do
-    bundle "install --policy=LowSecurity", :exitstatus => true
+    bundle "install --trust-policy=LowSecurity", :exitstatus => true
     expect(exitstatus).to eq(0)
     should_be_installed "signed_gem 1.0"
   end
