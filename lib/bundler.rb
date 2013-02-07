@@ -61,6 +61,7 @@ module Bundler
   class ProductionError      < BundlerError; status_code(16) ; end
   class HTTPError            < BundlerError; status_code(17) ; end
   class RubyVersionMismatch  < BundlerError; status_code(18) ; end
+  class SecurityError        < BundlerError; status_code(19) ; end
 
   WINDOWS = RbConfig::CONFIG["host_os"] =~ %r!(msdos|mswin|djgpp|mingw)!
   FREEBSD = RbConfig::CONFIG["host_os"] =~ /bsd/
