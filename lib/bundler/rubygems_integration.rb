@@ -128,15 +128,27 @@ module Bundler
       end
     end
 
-    def spec_from_gem(path, policy = nil)
+    def gem_from_path(path, policy = nil)
       require 'rubygems/format'
+      Gem::Format.from_file_by_path(path, policy)
+    end
+
+    def spec_from_gem(path, policy = nil)
       require 'rubygems/security'
       policy = Gem::Security.const_get(policy) if policy
-      Gem::Format.from_file_by_path(path, policy).spec
+      gem_from_path(path, policy).spec
     rescue Gem::Package::FormatError
       raise GemspecError, "Could not read gem at #{path}. It may be corrupted."
-    rescue => e
-      raise GemspecError, "Error loading gemspec at #{path}: " + e.message
+    rescue Exception, Gem::Exception, Gem::Security::Exception => e
+      if e.is_a?(Gem::Security::Exception) ||
+          e.message =~ /unknown trust policy|unsigned gem/i ||
+          e.message =~ /couldn't verify (meta)?data signature/i
+        raise SecurityError,
+          "The gem #{File.basename(path, '.gem')} can't be installed because " \
+          "the security policy didn't allow it, with the message: #{e.message}"
+      else
+        raise e
+      end
     end
 
     def build(spec)
@@ -445,10 +457,10 @@ module Bundler
         hash
       end
 
-      def spec_from_gem(path)
-        Gem::Package.new(path).spec
-      rescue Gem::Package::FormatError
-        raise Bundler::GemspecError, "Could not read gem at #{path}. It may be corrupted."
+      def gem_from_path(path, policy = nil)
+        p = Gem::Package.new(path)
+        p.security_policy = policy
+        p
       end
 
       def build(spec)
