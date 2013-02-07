@@ -127,11 +127,16 @@ module Bundler
       end
     end
 
-    def spec_from_gem(path)
+    def spec_from_gem(path, policy=nil)
       require 'rubygems/format'
-      Gem::Format.from_file_by_path(path).spec
+      if policy
+        policy = Gem::Security.const_get(policy)
+      end
+      Gem::Format.from_file_by_path(path, policy).spec
     rescue Gem::Package::FormatError
       raise Bundler::GemspecError, "Could not read gem at #{path}. It may be corrupted."
+    rescue => e
+      raise GemfileError, "Error loading gem at #{path}: " + e.message
     end
 
     def build(spec)

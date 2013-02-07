@@ -1,6 +1,7 @@
 require 'bundler/vendored_thor'
 require 'rubygems/user_interaction'
 require 'rubygems/config_file'
+require 'rubygems/security'
 require 'bundler/similarity_detector'
 
 module Bundler
@@ -171,6 +172,9 @@ module Bundler
       "Use the rubygems modern index instead of the API endpoint"
     method_option "clean", :type => :boolean, :banner =>
       "Run bundle clean automatically after install"
+    method_option "policy", :type => :string, :banner =>
+      "Security Policy (see gem -P option). Must be one of " + Gem::Security::Policies.keys.join('|')
+
     def install
       opts = options.dup
       if opts[:without]
@@ -188,6 +192,16 @@ module Bundler
         Bundler.ui.error "You have specified both a path to install your gems to, \n" \
                          "as well as --system. Please choose."
         exit 1
+      end
+
+      if (opts[:policy])
+        unless (Gem::Security::Policies.keys.include?(opts[:policy]))
+          Bundler.ui.error "You have specified an invalid security policy."
+          exit 1
+        end
+        Bundler.settings[:policy] = opts[:policy]
+      else
+        Bundler.settings[:policy] = nil if Bundler.settings[:policy]
       end
 
       if opts[:deployment] || opts[:frozen]
