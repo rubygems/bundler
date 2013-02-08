@@ -137,8 +137,7 @@ module Bundler
 
     def spec_from_gem(path, policy = nil)
       require 'rubygems/security'
-      policy = Gem::Security.const_get(policy) if policy
-      gem_from_path(path, policy).spec
+      gem_from_path(path, Gem::Security::Policies[policy]).spec
     rescue Gem::Package::FormatError
       raise GemspecError, "Could not read gem at #{path}. It may be corrupted."
     rescue Exception, Gem::Exception, Gem::Security::Exception => e
