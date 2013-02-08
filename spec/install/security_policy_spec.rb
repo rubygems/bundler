@@ -27,7 +27,7 @@ describe "policies with unsigned gems" do
   end
 
   it "fails with High Security setting due to presence of unsigned gem" do
-    bundle "install --trust-policy=HighSecurity", :exitstatus => true
+    bundle "install --trust-policy=HighSecurity"
     expect(out).to include("security policy didn't allow")
   end
 
