@@ -1,10 +1,15 @@
+## 1.3.0.rc (tbd)
+
+Features:
+
+  - optimize resolver when too new of a gem is already activated (@rykov, #2248)
+
 ## 1.3.0.pre.7 (22 January 2013)
 
 Bugfixes:
 
   - stubs for gems with dev deps no longer cause exceptions (#2272)
   - don't suggest binstubs to --binstubs users
-  - optimize conflict resolution to avoid "infinite loop" (#2248)
 
 ## 1.3.0.pre.6 (22 January 2013)
 
