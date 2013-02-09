@@ -108,5 +108,27 @@ module Spec
         end
       end
     end
+
+    # Builder 3.1.4 will activate first, but if all
+    # goes well, it should resolve to 3.0.4
+    def a_conflict_index
+      build_index do
+        gem "builder", %w(3.0.4 3.1.4)
+        gem("grape", '0.2.6') do
+          dep "builder", ">= 0"
+        end
+
+        versions '3.2.8 3.2.9 3.2.10 3.2.11' do |version|
+          gem("activemodel", version) do
+            dep "builder", "~> 3.0.0"
+          end
+        end
+
+        gem("my_app", '1.0.0') do
+          dep "activemodel", ">= 0"
+          dep "grape", ">= 0"
+        end
+      end
+    end
   end
 end
