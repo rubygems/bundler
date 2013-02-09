@@ -4,6 +4,7 @@ Bugfixes:
 
   - stubs for gems with dev deps no longer cause exceptions (#2272)
   - don't suggest binstubs to --binstubs users
+  - optimize conflict resolution to avoid "infinite loop" (#2248)
 
 ## 1.3.0.pre.6 (22 January 2013)
 
