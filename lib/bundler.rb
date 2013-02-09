@@ -291,7 +291,7 @@ module Bundler
       Dir.chdir(path.dirname.to_s) do
         contents = File.read(path.basename.to_s)
 
-        if contents =~ /\A---/ # try YAML
+        if contents[0..2] == "---" # YAML header
           begin
             Gem::Specification.from_yaml(contents)
           rescue ArgumentError, YamlSyntaxError, Gem::EndOfYAMLException, Gem::Exception
