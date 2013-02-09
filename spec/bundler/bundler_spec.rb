@@ -28,11 +28,11 @@ GEMSPEC
       end
 
       File.open(tmp("test.gemspec"), "wb") do |file|
-        file.puts <<-G
-# -*- encoding: utf-8 -*-
-Gem::Specification.new do |gem|
-  gem.author = "André the Giant"
-end
+        file.puts <<-G.gsub(/^\s+/, '')
+          # -*- encoding: utf-8 -*-
+          Gem::Specification.new do |gem|
+            gem.author = "André the Giant"
+          end
         G
       end
 
