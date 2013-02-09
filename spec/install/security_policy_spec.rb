@@ -31,7 +31,8 @@ describe "policies with unsigned gems" do
     expect(out).to include("security policy didn't allow")
   end
 
-  it "fails with Medium Security setting due to presence of unsigned gem" do
+  # This spec will fail on Rubygems 2 rc1 due to a bug in policy.rb. the bug is fixed in rc3.
+  it "fails with Medium Security setting due to presence of unsigned gem", :unless => ENV['RGV'] == "v2.0.0.rc.1" do
     bundle "install --trust-policy=MediumSecurity"
     expect(out).to include("security policy didn't allow")
   end
