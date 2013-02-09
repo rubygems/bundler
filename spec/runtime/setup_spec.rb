@@ -46,6 +46,19 @@ describe "Bundler.setup" do
       expect(out).to eq("WIN")
     end
 
+    it "accepts string for group name" do
+      ruby <<-RUBY
+        require 'rubygems'
+        require 'bundler'
+        Bundler.setup(:default, 'test')
+
+        require 'rack'
+        puts RACK
+      RUBY
+      expect(err).to eq("")
+      expect(out).to eq("1.0.0")
+    end
+
     it "leaves all groups available if they were already" do
       ruby <<-RUBY
         require 'rubygems'
