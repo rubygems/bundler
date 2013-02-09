@@ -295,6 +295,15 @@ module Bundler
           conflict = resolve_requirement(spec_group, current, reqs.dup, activated.dup)
           conflicts << conflict if conflict
         end
+
+        # If didn't jump on a conflict, but we are still carrying errors,
+        # we should rewind up the bad dependency chain to pivot on gems that matter
+        if conflicts.empty? && !@errors.empty? && !current.required_by.empty?
+          errorpivot = current.required_by.last.name
+          debug { "    -> Jumping to: #{errorpivot}" }
+          throw errorpivot
+        end
+
         # If the current requirement is a root level gem and we have conflicts, we
         # can figure out the best spot to backtrack to.
         if current.required_by.empty? && !conflicts.empty?
