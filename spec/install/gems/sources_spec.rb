@@ -57,4 +57,56 @@ describe "bundle install with gems on multiple sources" do
       end
     end
   end
+
+  context "with source affinity" do
+    context "with sources given by a block" do
+      before do
+        # Oh no! Someone evil is trying to hijack rack :(
+        # need this to be broken to check for correct source ordering
+        build_repo gem_repo3 do
+          build_gem "rack", "1.0.0" do |s|
+            s.write "lib/rack.rb", "RACK = 'FAIL'"
+          end
+        end
+
+        gemfile <<-G
+          source "file://#{gem_repo3}"
+          source "file://#{gem_repo1}" do
+            gem "rack"
+          end
+          gem "rack-obama" # shoud come from repo3!
+        G
+      end
+
+      it "installs the gems without any warning" do
+        bundle :install
+        expect(out).not_to include("Warning")
+        should_be_installed("rack-obama 1.0.0", "rack 1.0.0")
+      end
+    end
+
+    context "with sources set by an option" do
+      before do
+        # Oh no! Someone evil is trying to hijack rack :(
+        # need this to be broken to check for correct source ordering
+        build_repo gem_repo3 do
+          build_gem "rack", "1.0.0" do |s|
+            s.write "lib/rack.rb", "RACK = 'FAIL'"
+          end
+        end
+
+        gemfile <<-G
+          source "file://#{gem_repo3}"
+          gem "rack-obama" # should come from repo3!
+          gem "rack", :source => "file://#{gem_repo1}"
+        G
+      end
+
+      it "installs the gems without any warning" do
+        bundle :install
+        expect(out).not_to include("Warning")
+        should_be_installed("rack-obama 1.0.0", "rack 1.0.0")
+      end
+    end
+  end
 end

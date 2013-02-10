@@ -67,7 +67,7 @@ module Bundler
 
     def gem(name, *args)
       options = args.last.is_a?(Hash) ? args.pop.dup : {}
-      version = args
+      version = args || [">= 0"]
 
       normalize_options(name, version, options)
 
@@ -107,9 +107,13 @@ module Bundler
       @dependencies << dep
     end
 
-    def source(source)
+    def source(source, &blk)
       source = normalize_source(source)
-      @sources.add_rubygems_remote(source)
+      if block_given?
+        with_source(@sources.add_rubygems_source("remotes" => source), &blk)
+      else
+        @sources.add_rubygems_remote(source)
+      end
     end
 
     def git_source(name, &block)
@@ -205,7 +209,7 @@ module Bundler
     end
 
     def valid_keys
-      @valid_keys ||= %w(group groups git path name branch ref tag require submodules platform platforms type)
+      @valid_keys ||= %w(group groups git path name branch ref tag require submodules platform platforms type source)
     end
 
     def normalize_options(name, version, opts)
@@ -242,6 +246,12 @@ module Bundler
       platforms.each do |p|
         next if VALID_PLATFORMS.include?(p)
         raise GemfileError, "`#{p}` is not a valid platform. The available options are: #{VALID_PLATFORMS.inspect}"
+      end
+
+      # Save sources passed in a key
+      if opts.has_key?("source")
+        source = normalize_source(opts["source"])
+        opts["source"] = @sources.add_rubygems_source("remotes" => source)
       end
 
       git_name = (git_names & opts.keys).last
