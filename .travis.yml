@@ -16,6 +16,11 @@ notifications:
     on_failure: always
     channels:
       - "irc.freenode.org#bundler"
+  campfire:
+    on_success: change
+    on_failure: always
+    rooms:
+      - secure: "geau3P+A9ZJHkA/OHN5v9Mcb8hAti1PllXw5DsHNJfLAWBAw5ReGGMA8Xfpf\nLdT7ktIUlQwzw94cKQ6sRZk8szXTiHncf3bxXTACJf2RpiKmbkoQU51TmCDq\nYSMuY1FIryk/3t9aZCrarufbIDI3DBscDEe4Bj9bERl+TJ8ArBY="
 rvm:
   - 1.9.3
   - 1.9.2
