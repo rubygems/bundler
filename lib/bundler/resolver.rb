@@ -296,12 +296,19 @@ module Bundler
           conflicts << conflict if conflict
         end
 
-        # If didn't jump on a conflict, but we are still carrying errors,
-        # we should rewind up the bad dependency chain to pivot on gems that matter
-        if conflicts.empty? && !@errors.empty? && !current.required_by.empty?
-          errorpivot = current.required_by.last.name
-          debug { "    -> Jumping to: #{errorpivot}" }
-          throw errorpivot
+        # We throw the conflict up the dependency chain if it has not been
+        # resolved (in @errors), thus avoiding branches of the tree that have no effect
+        # on this conflict.  Note that if the tree has multiple conflicts, we don't
+        # care which one we throw, as long as we get out safe
+        if !current.required_by.empty? && !conflicts.empty?
+          @errors.reverse_each do |name, pair|
+            if conflicts.include?(name)
+              # Choose the closest pivot in the stack that will affect the conflict
+              errorpivot = (@stack & [name, current.required_by.last.name]).last
+              debug { "    -> Jumping to: #{errorpivot}" }
+              throw errorpivot, name
+            end
+          end
         end
 
         # If the current requirement is a root level gem and we have conflicts, we
