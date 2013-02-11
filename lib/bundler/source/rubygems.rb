@@ -237,7 +237,6 @@ module Bundler
           if api_fetchers.any? && modern_index_fetchers.all? {|fetcher| sources[fetcher] < FORCE_MODERN_INDEX_LIMIT }
             # this will fetch all the specifications on the rubygems repo
             unmet_dependency_names = idx.unmet_dependency_names
-            unmet_dependency_names -= ['bundler'] # bundler will always be unmet
 
             Bundler.ui.debug "Unmet Dependencies: #{unmet_dependency_names}"
             if unmet_dependency_names.any?

@@ -95,7 +95,7 @@ module Bundler
           s.dependencies.map{|d| d.name }
         end
       end.flatten.uniq
-      dependency_names.select{|name| specs_by_name(name).empty? }
+      dependency_names.select{|name| name != 'bundler' && specs_by_name(name).empty? }
     end
 
     def use(other, override_dupes = false)
