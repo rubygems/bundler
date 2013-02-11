@@ -101,21 +101,22 @@ module Bundler
     end
 
     def fetch_specs(all, pre, &blk)
-      Gem::SpecFetcher.new.list(all, pre).each(&blk)
+      specs = Gem::SpecFetcher.new.list(all, pre)
+      specs.each { yield } if block_given?
+      specs
+    end
+
+    def fetch_prerelease_specs
+      fetch_specs(false, true)
+    rescue Gem::RemoteFetcher::FetchError
+      [] # if we can't download them, there aren't any
     end
 
     def fetch_all_remote_specs
-      spec_list = Hash.new { |h,k| h[k] = [] }
-      begin
-        # Fetch all specs, minus prerelease specs
-        spec_list = Gem::SpecFetcher.new.list(true, false)
-        # Then fetch the prerelease specs
-        begin
-          Gem::SpecFetcher.new.list(false, true).each {|k, v| spec_list[k] += v }
-        rescue Gem::RemoteFetcher::FetchError
-          # ignore if we can't fetch the prerelease specs
-        end
-      end
+      # Fetch all specs, minus prerelease specs
+      spec_list = fetch_specs(true, false)
+      # Then fetch the prerelease specs
+      fetch_prerelease_specs.each {|k, v| spec_list[k] += v }
 
       return spec_list
     end
