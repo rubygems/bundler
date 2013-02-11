@@ -216,40 +216,39 @@ module Bundler
 
       def remote_specs
         @remote_specs ||= begin
-          idx     = Index.new
-          old     = Bundler.rubygems.sources
+          old = Bundler.rubygems.sources
 
           sources = {}
           remotes.each do |uri|
             fetcher          = Bundler::Fetcher.new(uri)
-            specs            = fetcher.specs(dependency_names, self)
-            sources[fetcher] = specs.size
-
-            idx.use specs
+            sources[fetcher] = fetcher.specs(dependency_names, self)
           end
 
           # don't need to fetch all specifications for every gem/version on
           # the rubygems repo if there's no api endpoints to search over
           # or it has too many specs to fetch
-          fetchers              = sources.keys
-          api_fetchers          = fetchers.select {|fetcher| fetcher.has_api }
-          modern_index_fetchers = fetchers - api_fetchers
-          if api_fetchers.any? && modern_index_fetchers.all? {|fetcher| sources[fetcher] < FORCE_MODERN_INDEX_LIMIT }
-            # this will fetch all the specifications on the rubygems repo
-            unmet_dependency_names = idx.unmet_dependency_names
+          fetchers       = sources.keys
+          api_fetchers   = fetchers.select {|fetcher| fetcher.has_api }
+          index_fetchers = fetchers - api_fetchers
 
-            Bundler.ui.debug "Unmet Dependencies: #{unmet_dependency_names}"
-            if unmet_dependency_names.any?
-              api_fetchers.each do |fetcher|
-                idx.use fetcher.specs(unmet_dependency_names, self)
-              end
-            end
-          else
-            Bundler::Fetcher.disable_endpoint = true
-            api_fetchers.each {|fetcher| idx.use fetcher.specs([], self) }
+          index_fetchers.each do |fetcher|
+            sources[fetcher].use fetcher.specs([], self)
           end
 
-          idx
+          api_fetchers.each do |fetcher|
+            idx = sources[fetcher]
+            if idx.size < FORCE_MODERN_INDEX_LIMIT
+              unmet = idx.unmet_dependency_names
+              idx.use fetcher.specs(unmet, self)
+            else
+              idx.use fetcher.specs([], self)
+            end
+          end
+
+          idx = Index.new
+          sources.each { |fetcher, specs| idx.use specs }
+
+          return idx
         ensure
           Bundler.rubygems.sources = old
         end
