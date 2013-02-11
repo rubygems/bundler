@@ -31,7 +31,7 @@ module Bundler
     end
 
     def inspect
-      "<Index sources=#{sources.map{|s| s.inspect}} specs.size=#{specs.size}>"
+      "#<#{self.class}:0x#{object_id} sources=#{sources.map{|s| s.inspect}} specs.size=#{specs.size}>"
     end
 
     def empty?

@@ -203,6 +203,10 @@ module Bundler
       [spec_list, deps_list.uniq]
     end
 
+    def inspect
+      "#<#{self.class}:0x#{object_id} uri=#{@public_uri.to_s} has_api=#{@has_api}>"
+    end
+
     # fetch from modern index: specs.4.8.gz
     def fetch_all_remote_specs
       @has_api = false
