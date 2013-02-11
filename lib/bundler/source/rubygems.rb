@@ -234,9 +234,10 @@ module Bundler
           api_fetchers.each do |fetcher|
             idx = sources[fetcher]
             if idx.size < FORCE_MODERN_INDEX_LIMIT
-              unmet = idx.unmet_dependency_names
               # download only the specs we still need
-              idx.use fetcher.specs(unmet, self)
+              unmet = idx.unmet_dependency_names
+              children = fetcher.specs(unmet, self)
+              idx.use children
             else
               # download the entire index without the API
               idx.use fetcher.specs(nil, self)
