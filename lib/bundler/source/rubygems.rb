@@ -232,16 +232,18 @@ module Bundler
           index_fetchers = fetchers - api_fetchers
 
           index_fetchers.each do |fetcher|
-            sources[fetcher].use fetcher.specs([], self)
+            sources[fetcher].use fetcher.specs(nil, self)
           end
 
           api_fetchers.each do |fetcher|
             idx = sources[fetcher]
             if idx.size < FORCE_MODERN_INDEX_LIMIT
               unmet = idx.unmet_dependency_names
+              # download only the specs we still need
               idx.use fetcher.specs(unmet, self)
             else
-              idx.use fetcher.specs([], self)
+              # download the entire index without the API
+              idx.use fetcher.specs(nil, self)
             end
           end
 
