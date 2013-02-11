@@ -224,28 +224,29 @@ module Bundler
             sources[fetcher] = fetcher.specs(dependency_names, self)
           end
 
-          # don't need to fetch all specifications for every gem/version on
-          # the rubygems repo if there's no api endpoints to search over
-          # or it has too many specs to fetch
+          idx = Index.new
           fetchers       = sources.keys
           api_fetchers   = fetchers.select {|fetcher| fetcher.has_api }
           index_fetchers = fetchers - api_fetchers
 
-          api_fetchers.each do |fetcher|
-            idx = sources[fetcher]
-            if idx.size < FORCE_MODERN_INDEX_LIMIT
-              # download only the specs we still need
-              unmet = idx.unmet_dependency_names
-              children = fetcher.specs(unmet, self)
-              idx.use children
-            else
-              # download the entire index without the API
-              idx.use fetcher.specs(nil, self)
+          # first we gather all the specs that were downloaded so far
+          index_fetchers.each { |f| idx.use sources[f] }
+
+          # then, if we need few enough specs, we download just the ones that
+          # we need to be sure we have them all, which should be faster.
+          if idx.size < FORCE_MODERN_INDEX_LIMIT
+            unmet = idx.unmet_dependency_names
+            api_fetchers.each do |f|
+              idx.use f.specs(unmet, self)
+            end
+
+          # if we still need too many, we just give up and download them all
+          # right here, because > 100 requests is pretty slow, too.
+          else
+            api_fetchers.each do |f|
+              idx.use f.specs(nil, self)
             end
           end
-
-          idx = Index.new
-          sources.each { |fetcher, specs| idx.use specs }
 
           return idx
         ensure
