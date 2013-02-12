@@ -136,6 +136,10 @@ module Bundler
       fetch_remote_specs(deps_list, full_dependency_list + returned_gems, spec_list + last_spec_list)
     end
 
+    def inspect
+      "#<#{self.class}:0x#{object_id} uri=#{@public_uri.to_s}>"
+    end
+
   private
 
     def fetch(uri, counter = 0)
@@ -201,10 +205,6 @@ module Bundler
       end
 
       [spec_list, deps_list.uniq]
-    end
-
-    def inspect
-      "#<#{self.class}:0x#{object_id} uri=#{@public_uri.to_s} has_api=#{@has_api}>"
     end
 
     # fetch from modern index: specs.4.8.gz
