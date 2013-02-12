@@ -108,7 +108,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :fakeweb => "windows"
-    expect(out).to include("\nFetching full source index from #{source_uri}")
+    expect(out).to include("Fetching source index from #{source_uri}")
     should_be_installed "rcov 1.0.0"
   end
 
@@ -124,7 +124,7 @@ describe "gemcutter's dependency API" do
       gem "rails"
     G
     bundle :install, :artifice => "endpoint_fallback"
-    expect(out).to include("\nFetching full source index from #{source_uri}")
+    expect(out).to include("Fetching source index from #{source_uri}")
 
     should_be_installed(
       "activesupport 2.3.2",
@@ -144,7 +144,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :artifice => "endpoint_marshal_fail"
-    expect(out).to include("\nFetching full source index from #{source_uri}")
+    expect(out).to include("Fetching full source index from #{source_uri}")
     should_be_installed "rack 1.0.0"
   end
 
@@ -216,11 +216,8 @@ describe "gemcutter's dependency API" do
 
     bundle :install, :artifice => "endpoint_extra"
 
-    output = <<-OUTPUT.gsub(/^ +/,'')
-      Fetching gem metadata from http://localgemserver.test/..
-      Fetching gem metadata from http://localgemserver.test/extra/.
-    OUTPUT
-    expect(out).to include(output)
+    expect(out).to include("Fetching gem metadata from http://localgemserver.test/..")
+    expect(out).to include("Fetching source index from http://localgemserver.test/extra")
   end
 
   it "does not fetch every specs if the index of gems is large when doing back deps" do
