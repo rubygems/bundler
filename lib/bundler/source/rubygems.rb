@@ -220,7 +220,7 @@ module Bundler
           idx = Index.new
 
           fetchers       = remotes.map { |uri| Bundler::Fetcher.new(uri) }
-          api_fetchers   = fetchers.select { |f| f.has_api }
+          api_fetchers   = fetchers.select { |f| f.use_api }
           index_fetchers = fetchers - api_fetchers
 
           # gather lists from non-api sites

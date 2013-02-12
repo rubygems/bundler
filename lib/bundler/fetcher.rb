@@ -7,8 +7,6 @@ module Bundler
     # how long to wait for each gemcutter API call
     API_TIMEOUT    = 10
 
-    attr_reader :has_api
-
     class << self
       attr_accessor :disable_endpoint
 
@@ -66,7 +64,7 @@ module Bundler
 
       specs = nil
 
-      if !gem_names || @remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint || !has_api
+      if !gem_names || !use_api
         Bundler.ui.info "Fetching source index from #{@public_uri}"
         specs = fetch_all_remote_specs
       else
@@ -79,7 +77,7 @@ module Bundler
         # 4. One of the YAML gemspecs has the Syck::DefaultKey problem
         rescue HTTPError, ArgumentError, TypeError, GemspecError => e
           # API errors mean we should treat this as a non-API source
-          @has_api = false
+          @use_api = false
 
           # new line now that the dots are over
           Bundler.ui.info "" unless Bundler.ui.debug?
@@ -138,11 +136,16 @@ module Bundler
       fetch_remote_specs(deps_list, full_dependency_list + returned_gems, spec_list + last_spec_list)
     end
 
-    def has_api
-      return @has_api if defined?(@has_api)
-      @has_api = true if fetch(dependency_api_uri)
+    def use_api
+      return @use_api if defined?(@use_api)
+
+      if @remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
+        @use_api = false
+      elsif fetch(dependency_api_uri)
+        @use_api = true
+      end
     rescue HTTPError
-      @has_api = false
+      @use_api = false
     end
 
     def inspect
