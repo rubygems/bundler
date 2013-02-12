@@ -45,7 +45,6 @@ module Bundler
       @remote_uri = remote_uri
       @public_uri = remote_uri.dup
       @public_uri.user, @public_uri.password = nil, nil # don't print these
-      @has_api    = true # will be set to false if the rubygems index is ever fetched
       @connection ||= Net::HTTP::Persistent.new 'bundler', :ENV
       @connection.read_timeout = API_TIMEOUT
     end
@@ -67,7 +66,7 @@ module Bundler
 
       specs = nil
 
-      if !gem_names || @remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
+      if !gem_names || @remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint || !has_api
         Bundler.ui.info "Fetching source index from #{@public_uri}"
         specs = fetch_all_remote_specs
       else
@@ -79,6 +78,9 @@ module Bundler
         # 2,3. Marshal blob doesn't load properly
         # 4. One of the YAML gemspecs has the Syck::DefaultKey problem
         rescue HTTPError, ArgumentError, TypeError, GemspecError => e
+          # API errors mean we should treat this as a non-API source
+          @has_api = false
+
           # new line now that the dots are over
           Bundler.ui.info "" unless Bundler.ui.debug?
 
@@ -134,6 +136,13 @@ module Bundler
       returned_gems = spec_list.map {|spec| spec.first }.uniq
 
       fetch_remote_specs(deps_list, full_dependency_list + returned_gems, spec_list + last_spec_list)
+    end
+
+    def has_api
+      return @has_api if defined?(@has_api)
+      @has_api = true if fetch(dependency_api_uri)
+    rescue HTTPError
+      @has_api = false
     end
 
     def inspect
@@ -213,7 +222,6 @@ module Bundler
 
     # fetch from modern index: specs.4.8.gz
     def fetch_all_remote_specs
-      @has_api = false
       Bundler.rubygems.sources = ["#{@remote_uri}"]
       Bundler.rubygems.fetch_all_remote_specs
     rescue Gem::RemoteFetcher::FetchError
