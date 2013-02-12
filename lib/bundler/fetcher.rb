@@ -170,12 +170,16 @@ module Bundler
       end
     end
 
+    def dependency_api_uri(gem_names = [])
+      url = "#{@remote_uri}api/v1/dependencies"
+      url << "?gems=#{URI.encode(gem_names.join(","))}" if gem_names.any?
+      URI.parse(url)
+    end
+
     # fetch from Gemcutter Dependency Endpoint API
     def fetch_dependency_remote_specs(gem_names)
-      Bundler.ui.debug "Query Gemcutter Dependency Endpoint API: #{gem_names.join(' ')}"
-      encoded_gem_names = URI.encode(gem_names.join(","))
-      uri = URI.parse("#{@remote_uri}api/v1/dependencies?gems=#{encoded_gem_names}")
-      marshalled_deps = fetch(uri)
+      Bundler.ui.debug "Query Gemcutter Dependency Endpoint API: #{gem_names.join(',')}"
+      marshalled_deps = fetch dependency_api_uri(gem_names)
       gem_list = Marshal.load(marshalled_deps)
       deps_list = []
 
