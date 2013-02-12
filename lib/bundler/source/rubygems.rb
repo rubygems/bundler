@@ -148,7 +148,8 @@ module Bundler
       end
 
       def add_remote(source)
-        @remotes.unshift(normalize_uri(source))
+        uri = normalize_uri(source)
+        @remotes.unshift(uri) unless @remotes.include?(uri)
       end
 
       def replace_remotes(source)
