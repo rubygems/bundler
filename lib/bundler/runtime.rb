@@ -5,6 +5,8 @@ module Bundler
     include SharedHelpers
 
     def setup(*groups)
+      groups.map! { |g| g.to_sym }
+
       # Has to happen first
       clean_load_path
 
