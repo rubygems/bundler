@@ -66,10 +66,6 @@ module Bundler
     end
 
     def gem(name, *args)
-      if name.is_a?(Symbol)
-        raise GemfileError, %{You need to specify gem names as Strings. Use 'gem "#{name.to_s}"' instead.}
-      end
-
       options = args.last.is_a?(Hash) ? args.pop.dup : {}
       version = args
 
@@ -222,6 +218,10 @@ module Bundler
     end
 
     def normalize_options(name, version, opts)
+      if name.is_a?(Symbol)
+        raise GemfileError, %{You need to specify gem names as Strings. Use 'gem "#{name.to_s}"' instead.}
+      end
+
       normalize_hash(opts)
 
       git_names = @git_sources.keys.map(&:to_s)
