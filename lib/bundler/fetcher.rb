@@ -1,6 +1,18 @@
 require 'bundler/vendored_persistent'
 
 module Bundler
+  # This is the error raised if OpenSSL fails the cert verification
+  class CertificateFailureError < HTTPError
+    def initialize(message = nil)
+      @message = message
+      @message ||= "\nCould not verify the SSL certificate for " \
+        "#{@remote_uri}. Either you don't have the CA certificates needed to " \
+        "verify it, or you are experiencing a man-in-the-middle attack. To " \
+        "connect without using SSL, edit your Gemfile sources to and change " \
+        "'https' to 'http'."
+    end
+  end
+
   # Handles all the fetching with the rubygems server
   class Fetcher
     REDIRECT_LIMIT = 5
@@ -111,10 +123,7 @@ module Bundler
 
       index
     rescue OpenSSL::SSL::SSLError
-      raise HTTPError, "\nCould not verify the SSL certificate for #{@remote_uri}.\n" \
-        "Either you don't have the CA certificates needed to verify it, or\n" \
-        "you are experiencing a man-in-the-middle attack. To connect without\n" \
-        "using SSL, edit your Gemfile and change 'https' to 'http'."
+      raise CertificateFailureError.new
     end
 
     # fetch index
@@ -227,8 +236,12 @@ module Bundler
     def fetch_all_remote_specs
       Bundler.rubygems.sources = ["#{@remote_uri}"]
       Bundler.rubygems.fetch_all_remote_specs
-    rescue Gem::RemoteFetcher::FetchError
-      raise HTTPError, "Could not fetch specs from #{@public_uri}"
+    rescue Gem::RemoteFetcher::FetchError => e
+      if e.message.match("certificate verify failed")
+        raise CertificateFailureError.new
+      else
+        raise HTTPError, "Could not fetch specs from #{@public_uri}"
+      end
     end
 
   end
