@@ -211,12 +211,9 @@ module Bundler
     def fetch_all_remote_specs
       @has_api = false
       Bundler.rubygems.sources = ["#{@remote_uri}"]
-
-      begin
-        Bundler.rubygems.fetch_all_remote_specs
-      rescue Gem::RemoteFetcher::FetchError
-        raise HTTPError, "Could not fetch specs from #{@public_uri}"
-      end
+      Bundler.rubygems.fetch_all_remote_specs
+    rescue Gem::RemoteFetcher::FetchError
+      raise HTTPError, "Could not fetch specs from #{@public_uri}"
     end
 
   end
