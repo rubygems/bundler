@@ -144,8 +144,10 @@ module Bundler
       when Net::HTTPRedirection
         Bundler.ui.debug("HTTP Redirection")
         new_uri = URI.parse(response["location"])
-        new_uri.user = uri.user
-        new_uri.password = uri.password
+        if new_uri.host == uri.host
+          new_uri.user = uri.user
+          new_uri.password = uri.password
+        end
         fetch(new_uri, counter + 1)
       when Net::HTTPSuccess
         Bundler.ui.debug("HTTP Success")
