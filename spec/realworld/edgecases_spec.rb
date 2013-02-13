@@ -11,7 +11,7 @@ describe "real world edgecases", :realworld => true do
   end
 
   # https://github.com/carlhuda/bundler/issues/1202
-  it "bundle cache works with rubygems 1.3.7 and pre gems" do
+  it "bundle cache works with rubygems 1.3.7 and pre gems", :ruby => "1.8" do
     install_gemfile <<-G
       source :rubygems
       gem "rack",          "1.3.0.beta2"
@@ -23,7 +23,7 @@ describe "real world edgecases", :realworld => true do
 
   # https://github.com/carlhuda/bundler/issues/1486
   # this is a hash collision that only manifests on 1.8.7
-  it "finds the correct child versions" do
+  it "finds the correct child versions", :ruby => "1.8" do
     install_gemfile <<-G
       source :rubygems
 
