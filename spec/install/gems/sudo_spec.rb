@@ -50,24 +50,20 @@ describe "when using sudo", :sudo => true do
     end
   end
 
-  describe "and BUNDLE_PATH is not writable" do
+  describe "and GEM_HOME is not writable" do
     it "installs" do
-      begin
-        gem_home = tmp('sudo_gem_home')
+      gem_home = tmp('sudo_gem_home')
+      sudo "mkdir -p #{gem_home}"
+      sudo "chmod ugo-w #{gem_home}"
 
-        sudo "mkdir -p #{gem_home}"
-        sudo "chmod ugo-w #{gem_home}"
-        ENV['GEM_HOME'] = gem_home.to_s
-        ENV['GEM_PATH'] = nil
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", '1.0'
+      G
 
-        install_gemfile <<-G
-          source "file://#{gem_repo1}"
-          gem "rack", '1.0'
-        G
-
-        gem_home.join('bin/rackup').should exist
-        should_be_installed "rack 1.0"
-      end
+      bundle :install, :env => {'GEM_HOME' => gem_home.to_s, 'GEM_PATH' => nil}
+      gem_home.join('bin/rackup').should exist
+      should_be_installed "rack 1.0", :env => {'GEM_HOME' => gem_home.to_s, 'GEM_PATH' => nil}
     end
   end
 
