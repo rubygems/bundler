@@ -106,8 +106,8 @@ module Bundler
           Bundler.mkdir_p "#{Bundler.rubygems.gem_dir}/specifications"
           Bundler.sudo "cp -R #{Bundler.tmp}/gems/#{spec.full_name} #{Bundler.rubygems.gem_dir}/gems/"
           Bundler.sudo "cp -R #{Bundler.tmp}/specifications/#{spec.full_name}.gemspec #{Bundler.rubygems.gem_dir}/specifications/"
+          Bundler.mkdir_p Bundler.system_bindir
           spec.executables.each do |exe|
-            Bundler.mkdir_p Bundler.system_bindir
             Bundler.sudo "cp -R #{Bundler.tmp}/bin/#{exe} #{Bundler.system_bindir}"
           end
         end
