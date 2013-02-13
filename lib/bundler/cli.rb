@@ -12,6 +12,7 @@ module Bundler
       Bundler.ui = UI::Shell.new(the_shell)
       Bundler.ui.debug! if options["verbose"]
       Bundler.rubygems.ui = UI::RGProxy.new(Bundler.ui)
+      warn_on_incompatible_ruby_or_rubygems
     end
 
     check_unknown_options!(:except => [:config, :exec])
@@ -685,6 +686,18 @@ module Bundler
         return File.expand_path('../../../', __FILE__)
       end
       spec.full_gem_path
+    end
+
+    def warn_on_incompatible_ruby_or_rubygems
+      ruby2 = "Ruby 2.0" if Gem::Version.new(RUBY_VERSION.dup) >= Gem::Version.new('2.0.pre')
+      rg2 = "Rubygems 2.0" if Gem::Version.new(Gem::VERSION.dup) >= Gem::Version.new('2.0.pre')
+      upgrade = [ruby2, rg2].compact
+
+      if upgrade.any?
+        Bundler.ui.warn "Bundler is not compatible with #{upgrade.join(' or ')}."
+        Bundler.ui.error "Please upgrade to Bundler 1.3 or higher."
+        exit 1
+      end
     end
 
   end
