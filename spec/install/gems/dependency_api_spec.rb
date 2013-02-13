@@ -425,7 +425,7 @@ describe "gemcutter's dependency API" do
   context ".gemrc with sources is present" do
     before do
       File.open(home('.gemrc'), 'w') do |file|
-        file.puts({:sources => ["http://rubygems.org"]}.to_yaml)
+        file.puts({:sources => ["https://rubygems.org"]}.to_yaml)
       end
     end
 

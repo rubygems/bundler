@@ -20,7 +20,7 @@ a number of methods used to describe the gem requirements.
 At the top of the `Gemfile`, add one line for each `Rubygems` source that
 might contain the gems listed in the `Gemfile`.
 
-    source "http://rubygems.org"
+    source "https://rubygems.org"
     source "http://gems.github.com"
 
 Each of these _source_s `MUST` be a valid Rubygems repository. Sources are
