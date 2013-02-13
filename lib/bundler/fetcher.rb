@@ -79,11 +79,8 @@ module Bundler
           # new line now that the dots are over
           Bundler.ui.info "" unless Bundler.ui.debug?
 
-          if @remote_uri.to_s.include?("rubygems.org")
-            Bundler.ui.info "Error #{e.class} during request to dependency API"
-          end
-          Bundler.ui.debug e.message
-          Bundler.ui.debug e.backtrace
+          Bundler.ui.debug "Error during API request. #{e.class}: #{e.message}"
+          Bundler.ui.debug e.backtrace.join("  ")
 
           Bundler.ui.info "Fetching full source index from #{strip_user_pass_from_uri(@remote_uri)}"
           specs = fetch_all_remote_specs
