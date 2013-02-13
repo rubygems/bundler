@@ -219,7 +219,7 @@ module Bundler
       Bundler.settings[:no_prune] = true if opts["no-prune"]
       Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? '1' : nil
       Bundler.settings.without = opts[:without]
-      Bundler.ui.be_quiet! if opts[:quiet]
+      Bundler.ui.quiet = opts[:quiet]
       Bundler.settings[:clean] = opts[:clean] if opts[:clean]
 
       Bundler::Fetcher.disable_endpoint = opts["full-index"]
@@ -273,7 +273,7 @@ module Bundler
         "Use the rubygems modern index instead of the API endpoint"
     def update(*gems)
       sources = Array(options[:source])
-      Bundler.ui.be_quiet! if options[:quiet]
+      Bundler.ui.quiet = options[:quiet]
 
       if gems.empty? && sources.empty?
         # We're doing a full update

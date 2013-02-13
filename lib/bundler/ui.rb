@@ -22,6 +22,7 @@ module Bundler
     end
 
     class Shell < UI
+      attr_reader :quiet
       attr_writer :shell
 
       def initialize(shell)
@@ -46,8 +47,8 @@ module Bundler
         tell_me(msg, :red, newline)
       end
 
-      def be_quiet!
-        @quiet = true
+      def quiet=(value)
+        @quiet = value
       end
 
       def debug?
