@@ -26,7 +26,7 @@ in `vendor/cache`.
 
 For instance, consider this Gemfile(5):
 
-    source "http://rubygems.org"
+    source "https://rubygems.org"
 
     gem "nokogiri"
 

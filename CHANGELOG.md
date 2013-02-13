@@ -3,6 +3,7 @@
 Features:
 
   - optimize resolver when too new of a gem is already activated (@rykov, #2248)
+  - `source :rubygems` now uses https://rubygems.org (#2314)
 
 ## 1.3.0.pre.7 (22 January 2013)
 
