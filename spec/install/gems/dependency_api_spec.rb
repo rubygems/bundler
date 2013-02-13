@@ -227,7 +227,7 @@ describe "gemcutter's dependency API" do
       end
       build_gem "missing"
       # need to hit the limit
-      1.upto(Bundler::Source::Rubygems::FORCE_MODERN_INDEX_LIMIT) do |i|
+      1.upto(Bundler::Source::Rubygems::API_REQUEST_LIMIT) do |i|
         build_gem "gem#{i}"
       end
 

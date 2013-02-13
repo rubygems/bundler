@@ -6,7 +6,7 @@ module Bundler
   module Source
     # TODO: Refactor this class
     class Rubygems
-      FORCE_MODERN_INDEX_LIMIT = 100 # threshold for switching back to the modern index instead of fetching every spec
+      API_REQUEST_LIMIT = 100 # threshold for switching back to the modern index instead of fetching every spec
 
       attr_reader :remotes, :caches
       attr_accessor :dependency_names
@@ -230,7 +230,7 @@ module Bundler
           # because ensuring we have all the gems we need involves downloading
           # the gemspecs of those gems, if the non-api sites contain more than
           # about 100 gems, we just treat all sites as non-api for speed.
-          if idx.size < FORCE_MODERN_INDEX_LIMIT
+          if idx.size < API_REQUEST_LIMIT && dependency_names.size < API_REQUEST_LIMIT
             api_fetchers.each { |f| idx.use f.specs(dependency_names, self) }
 
             # it's possible that gems from one source depend on gems from some
