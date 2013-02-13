@@ -101,9 +101,9 @@ module Bundler
     def bin_path
       @bin_path ||= begin
         path = settings[:bin] || "bin"
-        path = Pathname.new(path).expand_path(root)
+        path = Pathname.new(path).expand_path(root).expand_path
         FileUtils.mkdir_p(path)
-        Pathname.new(path).expand_path
+        path
       end
     end
 
@@ -336,7 +336,6 @@ module Bundler
 
     def configure_gem_home_and_path
       blank_home = ENV['GEM_HOME'].nil? || ENV['GEM_HOME'].empty?
-
       if settings[:disable_shared_gems]
         ENV['GEM_PATH'] = ''
         configure_gem_home
