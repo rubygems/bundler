@@ -1,9 +1,33 @@
-## 1.3.0.rc (tbd)
+## 1.3.0.pre.8 (12 February 2013)
+
+Security:
+
+  - validate SSL certificate chain during HTTPS network requests
+  - don't send HTTP Basic Auth creds when redirected to other hosts (@perplexes)
+  - add `--trust-policy` to `install`, like `gem install -P` (@CosmicCat, #2293)
 
 Features:
 
   - optimize resolver when too new of a gem is already activated (@rykov, #2248)
-  - `source :rubygems` now uses https://rubygems.org (#2314)
+  - update Net::HTTP::Persistent for SSL cert validation and no_proxy ENV
+  - explain SSL cert validation failures
+  - generate gemspecs when installing git repos, removing shellouts
+  - add pager selection (@csgui)
+  - add `licenses` command (@bryanwoods, #1898)
+  - sort output from `outdated` (@richardkmichael, #1896)
+  - add a .travis.yml to `gem -t` (@ndbroadbent, #2143)
+  - inform users when the resolver starts
+  - disable reverse DNS to speed up API requests (@raggi)
+
+Bugfixes:
+
+  - raise errors while requiring dashed gems (#1807)
+  - quote the Bundler path on Windows (@jgeiger, #1862, #1856)
+  - load gemspecs containing unicode (@gaffneyc, #2301)
+  - support any ruby version in --standalone
+  - resolve some ruby -w warnings (@chastell, #2193)
+  - don't scare users with an error message during API fallback
+  - `install --binstubs` is back to overwriting. thanks, SemVer.
 
 ## 1.3.0.pre.7 (22 January 2013)
 
