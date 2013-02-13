@@ -192,7 +192,7 @@ third-party code being used in different environments.`
 
 For a simple illustration, consider the following Gemfile(5):
 
-    source "http://rubygems.org"
+    source "https://rubygems.org"
 
     gem "sinatra"
 
@@ -288,7 +288,7 @@ same versions of all dependencies as it used before the update.
 
 Let's take a look at an example. Here's your original Gemfile(5):
 
-    source "http://rubygems.org"
+    source "https://rubygems.org"
 
     gem "actionpack", "2.3.8"
     gem "activemerchant"
@@ -304,7 +304,7 @@ gems in your Gemfile(5).
 
 Next, you modify your Gemfile(5) to:
 
-    source "http://rubygems.org"
+    source "https://rubygems.org"
 
     gem "actionpack", "3.0.0.rc"
     gem "activemerchant"

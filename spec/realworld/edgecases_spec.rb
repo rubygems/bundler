@@ -141,7 +141,7 @@ describe "real world edgecases", :realworld => true do
             multi_json (~> 1.0)
 
       GEM
-        remote: http://rubygems.org/
+        remote: https://rubygems.org/
         specs:
           arel (3.0.2)
           builder (3.0.0)
