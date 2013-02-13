@@ -7,6 +7,7 @@ module Bundler
     REDIRECT_LIMIT = 5
     # how long to wait for each gemcutter API call
     API_TIMEOUT    = 10
+    class FallbackError < Bundler::HTTPError; end
 
     attr_reader :has_api
 
@@ -79,8 +80,11 @@ module Bundler
           # new line now that the dots are over
           Bundler.ui.info "" unless Bundler.ui.debug?
 
-          Bundler.ui.debug "Error during API request. #{e.class}: #{e.message}"
-          Bundler.ui.debug e.backtrace.join("  ")
+          if FallbackError === e
+            Bundler.ui.debug "API refused request: #{e.message}"
+          else
+            Bundler.ui.debug "Error during API request. #{e.class}: #{e.message}"
+          end
 
           Bundler.ui.info "Fetching full source index from #{strip_user_pass_from_uri(@remote_uri)}"
           specs = fetch_all_remote_specs
@@ -152,9 +156,10 @@ module Bundler
       when Net::HTTPSuccess
         Bundler.ui.debug("HTTP Success")
         response.body
+      when Net::HTTPRequestEntityTooLarge
+        raise FallbackError, response.body
       else
-        Bundler.ui.debug("HTTP Error")
-        raise HTTPError
+        raise HTTPError, "#{response.class}: #{response.body}"
       end
     end
 
