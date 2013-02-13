@@ -48,6 +48,8 @@ module Bundler
       @has_api    = true # will be set to false if the rubygems index is ever fetched
       @@connection ||= Net::HTTP::Persistent.new nil, :ENV
       @@connection.read_timeout = API_TIMEOUT
+
+      Socket.do_not_reverse_lookup = true
     end
 
     # fetch a gem specification
