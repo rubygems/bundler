@@ -107,6 +107,9 @@ module Bundler
     def source(source, options = {})
       case source
       when :gemcutter, :rubygems, :rubyforge then
+        Bundler.ui.warn "The source :#{source} is deprecated because HTTP " \
+          "requests are insecure.\nPlease change your source to 'https://" \
+          "rubygems.org' if possible, or 'http://rubygems.org' if not."
         @rubygems_source.add_remote "https://rubygems.org"
         return
       when String
