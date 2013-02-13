@@ -57,6 +57,8 @@ module Bundler
       @public_uri.user, @public_uri.password = nil, nil # don't print these
       @connection ||= Net::HTTP::Persistent.new 'bundler', :ENV
       @connection.read_timeout = API_TIMEOUT
+
+      Socket.do_not_reverse_lookup = true
     end
 
     # fetch a gem specification
