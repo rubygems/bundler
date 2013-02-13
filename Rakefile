@@ -144,7 +144,7 @@ begin
 
     desc "Run the tests on Travis CI against a rubygem version (using ENV['RGV'])"
     task :travis do
-      rg = ENV['RGV'] || 'master'
+      rg = ENV['RGV'] || 'v1.8.24'
 
       puts "\n\e[1;33m[Travis CI] Running bundler specs against rubygems #{rg}\e[m\n\n"
       specs = safe_task { Rake::Task["spec:rubygems:#{rg}"].invoke }

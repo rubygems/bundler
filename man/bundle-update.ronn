@@ -39,7 +39,7 @@ When you run [bundle install(1)][bundle-install] the first time, bundler will re
 all of the dependencies, all the way down, and install what you need:
 
     Fetching source index for http://rubygems.org/
-    Installing rake (0.8.7)
+    Installing rake (10.0.2)
     Installing abstract (1.0.0)
     Installing activesupport (3.0.0.rc)
     Installing builder (2.1.2)

@@ -94,11 +94,8 @@ module Bundler
           # new line now that the dots are over
           Bundler.ui.info "" unless Bundler.ui.debug?
 
-          if @remote_uri.to_s.include?("rubygems.org")
-            Bundler.ui.info "Error #{e.class} during request to dependency API"
-          end
-          Bundler.ui.debug e.message
-          Bundler.ui.debug e.backtrace
+          Bundler.ui.debug "Error during API request. #{e.class}: #{e.message}"
+          Bundler.ui.debug e.backtrace.join("  ")
 
           Bundler.ui.info "Fetching full source index from #{@public_uri}"
           specs = fetch_all_remote_specs
@@ -179,8 +176,10 @@ module Bundler
       when Net::HTTPRedirection
         Bundler.ui.debug("HTTP Redirection")
         new_uri = URI.parse(response["location"])
-        new_uri.user = uri.user
-        new_uri.password = uri.password
+        if new_uri.host == uri.host
+          new_uri.user = uri.user
+          new_uri.password = uri.password
+        end
         fetch(new_uri, counter + 1)
       when Net::HTTPSuccess
         Bundler.ui.debug("HTTP Success")
