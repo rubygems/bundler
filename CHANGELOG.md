@@ -118,8 +118,9 @@ Bugfixes:
 
 Features:
 
-  - Warn about Ruby 2.0 and Rubygems 2.0
-  - Inform users when the resolver starts
+  - warn about Ruby 2.0 and Rubygems 2.0
+  - inform users when the resolver starts
+  - disable reverse DNS to speed up API requests (@raggi)
 
 Bugfixes:
 
