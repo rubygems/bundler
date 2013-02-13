@@ -77,38 +77,19 @@ module Bundler
     def specs(gem_names, source)
       index = Index.new
 
-      specs = nil
+      if gem_names && use_api
+        Bundler.ui.info "Fetching gem metadata from #{@public_uri}", Bundler.ui.debug?
+        specs = fetch_remote_specs(gem_names)
+        # new line now that the dots are over
+        Bundler.ui.info "" if specs && !Bundler.ui.debug?
+      end
 
-      if !gem_names || !use_api
+      if specs.nil?
+        # API errors mean we should treat this as a non-API source
+        @use_api = false
+
         Bundler.ui.info "Fetching source index from #{@public_uri}"
         specs = fetch_all_remote_specs
-      else
-        Bundler.ui.info "Fetching gem metadata from #{@public_uri}", Bundler.ui.debug?
-        begin
-          specs = fetch_remote_specs(gem_names)
-        # fall back to the legacy index in the following cases
-        # 1. Gemcutter Endpoint doesn't return a 200
-        # 2,3. Marshal blob doesn't load properly
-        # 4. One of the YAML gemspecs has the Syck::DefaultKey problem
-        rescue HTTPError, ArgumentError, TypeError, GemspecError => e
-          # API errors mean we should treat this as a non-API source
-          @use_api = false
-
-          # new line now that the dots are over
-          Bundler.ui.info "" unless Bundler.ui.debug?
-
-          if FallbackError === e
-            Bundler.ui.debug "API refused request: #{e.message}"
-          else
-            Bundler.ui.debug "Error during API request. #{e.class}: #{e.message}"
-          end
-
-          Bundler.ui.info "Fetching full source index from #{@public_uri}"
-          specs = fetch_all_remote_specs
-        else
-          # new line now that the dots are over
-          Bundler.ui.info "" unless Bundler.ui.debug?
-        end
       end
 
       specs[@remote_uri].each do |name, version, platform, dependencies|
@@ -146,6 +127,20 @@ module Bundler
       returned_gems = spec_list.map {|spec| spec.first }.uniq
 
       fetch_remote_specs(deps_list, full_dependency_list + returned_gems, spec_list + last_spec_list)
+    # fall back to the legacy index in the following cases
+    # 1. Gemcutter Endpoint doesn't return a 200
+    # 2,3. Marshal blob doesn't load properly
+    # 4. One of the YAML gemspecs has the Syck::DefaultKey problem
+    rescue HTTPError, ArgumentError, TypeError, GemspecError => e
+      @use_api = false
+
+      # new line now that the dots are over
+      Bundler.ui.info "" unless Bundler.ui.debug?
+
+      Bundler.ui.debug "Error during API request. #{e.class}: #{e.message}"
+      Bundler.ui.debug e.backtrace.join("  ")
+
+      return nil
     end
 
     def use_api

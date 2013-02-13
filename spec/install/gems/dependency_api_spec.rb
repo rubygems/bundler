@@ -144,7 +144,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :artifice => "endpoint_marshal_fail"
-    expect(out).to include("Fetching full source index from #{source_uri}")
+    expect(out).to include("Fetching source index from #{source_uri}")
     should_be_installed "rack 1.0.0"
   end
 

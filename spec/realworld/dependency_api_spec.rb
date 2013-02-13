@@ -53,7 +53,7 @@ describe "gemcutter's dependency API", :realworld => true do
       G
 
       bundle :install
-      expect(out).to include("\nFetching full source index from #{@server_uri}")
+      expect(out).to include("\nFetching source index from #{@server_uri}")
       should_be_installed "rack 1.0.0"
     end
   end
