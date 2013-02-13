@@ -1,3 +1,18 @@
+## 1.2.4 (Feb 12, 2013)
+
+Features:
+
+  - Warn about Ruby 2.0 and Rubygems 2.0
+  - Inform users when the resolver starts
+
+Bugfixes:
+
+  - don't send user/pass when redirected to another host (@perplexes)
+  - load gemspecs containing unicode (@gaffneyc, #2301)
+  - support any ruby version in --standalone
+  - resolve some ruby -w warnings (@chastell, #2193)
+  - don't scare users with an error message during API fallback
+
 ## 1.2.3 (Nov 29, 2012)
 
 Bugfixes:
