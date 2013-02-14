@@ -396,6 +396,16 @@ describe "gemcutter's dependency API" do
       bundle :install, :artifice => "endpoint_500"
       expect(out).not_to include("#{user}:#{password}")
     end
+
+    it "does not pass the user / password to different hosts on redirect" do
+      gemfile <<-G
+        source "#{basic_auth_source_uri}"
+        gem "rack"
+      G
+
+      bundle :install, :artifice => "endpoint_creds_diff_host"
+      should_be_installed "rack 1.0.0"
+    end
   end
 
   context "when ruby is compiled without openssl" do
