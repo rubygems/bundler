@@ -109,8 +109,10 @@ module Bundler
 
       # newline comes after installing, some gems say "with native extensions"
       Bundler.ui.info ""
-      if Bundler.settings[:bin]
-        standalone ? generate_standalone_bundler_executable_stubs(spec) : generate_bundler_executable_stubs(spec)
+      if Bundler.settings[:bin] && standalone
+        generate_standalone_bundler_executable_stubs(spec)
+      elsif Bundler.settings[:bin]
+        generate_bundler_executable_stubs(spec, :force => true)
       end
 
       FileUtils.rm_rf(Bundler.tmp)

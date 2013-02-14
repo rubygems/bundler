@@ -130,7 +130,7 @@ describe "Running bin/* commands" do
     expect(bundled_app("bin/rackup")).to exist
   end
 
-  it "doesn't overwrite on --binstub" do
+  it "rewrites bins on --binstubs (to maintain backwards compatibility)" do
     gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack"
@@ -144,6 +144,6 @@ describe "Running bin/* commands" do
 
     bundle "install"
 
-    expect(bundled_app("bin/rackup").read).to eq("OMG")
+    expect(bundled_app("bin/rackup").read).to_not eq("OMG")
   end
 end

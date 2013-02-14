@@ -357,8 +357,8 @@ module Bundler
       Bundler.definition.validate_ruby!
       Bundler.settings[:bin] = options["path"] if options["path"]
       Bundler.settings[:bin] = nil if options["path"] && options["path"].empty?
-      installer              = Installer.new(Bundler.root, Bundler.definition)
-      spec                   = installer.specs.find{|s| s.name == gem_name }
+      installer = Installer.new(Bundler.root, Bundler.definition)
+      spec      = installer.specs.find{|s| s.name == gem_name }
       raise GemNotFound, not_found_message(gem_name, Bundler.load.specs) unless spec
 
       if spec.name == "bundler"
