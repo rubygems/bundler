@@ -5,6 +5,7 @@ require 'rubygems'
 require 'shellwords'
 require 'benchmark'
 
+task :build => ["man:clean", "man:build"]
 task :release => ["man:clean", "man:build"]
 
 def safe_task(&block)
