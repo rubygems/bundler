@@ -4,10 +4,24 @@ require 'bundler/vendored_persistent'
 module Bundler
   # Handles all the fetching with the rubygems server
   class Fetcher
+    # How many redirects to allew in one request
     REDIRECT_LIMIT = 5
     # how long to wait for each gemcutter API call
-    API_TIMEOUT    = 10
-    class FallbackError < Bundler::HTTPError; end
+    API_TIMEOUT = 10
+
+    # This error is raised if the API returns a 413 (only printed in verbose)
+    class FallbackError < HTTPError; end
+    # This is the error raised if OpenSSL fails the cert verification
+    class CertificateFailureError < HTTPError
+      def initialize(remote_uri)
+        super "Could not verify the SSL certificate for #{remote_uri}.\nThere" \
+          " is a chance you are experiencing a man-in-the-middle attack, but" \
+          " most likely your system doesn't have the CA certificates needed" \
+          " for verification. For information about OpenSSL certificates, see" \
+          " bit.ly/ssl-certs. To connect without using SSL, edit your Gemfile" \
+          " sources and change 'https' to 'http'."
+      end
+    end
 
     attr_reader :has_api
 
@@ -66,8 +80,9 @@ module Bundler
     # return the specs in the bundler format as an index
     def specs(gem_names, source)
       index = Index.new
+      use_full_source_index = !gem_names || @remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
 
-      if !gem_names || @remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
+      if use_full_source_index
         Bundler.ui.info "Fetching source index from #{strip_user_pass_from_uri(@remote_uri)}"
         specs = fetch_all_remote_specs
       else
@@ -110,6 +125,9 @@ module Bundler
       end
 
       index
+    rescue OpenSSL::SSL::SSLError
+      Bundler.ui.info "" if !use_full_source_index # newline after dots
+      raise CertificateFailureError.new(strip_user_pass_from_uri(@remote_uri))
     end
 
     # fetch index
@@ -216,8 +234,12 @@ module Bundler
         rescue Gem::RemoteFetcher::FetchError
           Bundler.ui.debug "Could not fetch prerelease specs from #{strip_user_pass_from_uri(@remote_uri)}"
         end
-      rescue Gem::RemoteFetcher::FetchError
-        raise HTTPError, "Could not reach #{strip_user_pass_from_uri(@remote_uri)}"
+      rescue Gem::RemoteFetcher::FetchError => e
+        if e.message.match("certificate verify failed")
+          raise CertificateFailureError.new(strip_user_pass_from_uri(@remote_uri))
+        else
+          raise HTTPError, "Could not fetch specs from #{strip_user_pass_from_uri(@remote_uri)}"
+        end
       end
 
       return spec_list

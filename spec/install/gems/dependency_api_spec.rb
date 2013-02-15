@@ -483,4 +483,47 @@ OUTPUT
     end
   end
 
+  context "when SSL certificate verification fails" do
+    it "explains what is going on" do
+      # Install a monkeypatch that reproduces the effects of openssl raising
+      # a certificate validation error at the appropriate moment.
+      gemfile <<-G
+        class Bundler::Fetcher
+          def fetch_all_remote_specs
+            raise OpenSSL::SSL::SSLError, "Certificate invalid"
+          end
+        end
+
+        source "#{source_uri.gsub(/http/, 'https')}"
+        gem "rack"
+      G
+
+      bundle :install
+      expect(out).to match(/could not verify the SSL certificate/i)
+    end
+  end
+
+  context ".gemrc with sources is present" do
+    before do
+      File.open(home('.gemrc'), 'w') do |file|
+        file.puts({:sources => ["https://rubygems.org"]}.to_yaml)
+      end
+    end
+
+    after do
+      home('.gemrc').rmtree
+    end
+
+    it "uses other sources declared in the Gemfile" do
+      gemfile <<-G
+        source "#{source_uri}"
+        gem 'rack'
+      G
+
+      bundle "install", :exitstatus => true, :artifice => "endpoint_marshal_fail"
+
+      expect(exitstatus).to eq(0)
+    end
+  end
+
 end
