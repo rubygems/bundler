@@ -235,6 +235,10 @@ module Bundler
       SharedHelpers.default_lockfile
     end
 
+    def default_checksumfile
+      SharedHelpers.default_checksumfile
+    end
+
     def system_bindir
       # Gem.bindir doesn't always return the location that Rubygems will install
       # system binaries. If you put '-n foo' in your .gemrc, Rubygems will

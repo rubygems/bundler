@@ -34,6 +34,10 @@ module Bundler
       @definition.lock(Bundler.default_lockfile)
     end
 
+    def checksum
+      @definition.checksum(Bundler.default_checksumfile)
+    end
+
     def update(*gems)
       # Nothing
     end

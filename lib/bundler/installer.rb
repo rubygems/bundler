@@ -62,6 +62,7 @@ module Bundler
       if dependencies.empty?
         Bundler.ui.warn "The Gemfile specifies no dependencies"
         lock
+        checksum
         return
       end
 
@@ -92,6 +93,7 @@ module Bundler
       end
 
       lock
+      checksum
       generate_standalone(options[:standalone]) if options[:standalone]
     end
 

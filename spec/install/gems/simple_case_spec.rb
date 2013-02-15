@@ -339,6 +339,28 @@ describe "bundle install with gem sources" do
     end
   end
 
+  context "Gemfile.lock.asc" do
+    it "creates a Gemfile.lock.asc" do
+      install_gemfile(<<-G)
+        source "file://#{gem_repo1}"
+
+        gem 'foo'
+      G
+
+      expect(bundled_app("Gemfile.lock.asc")).to exist
+    end
+
+    context "on empty Gemfile" do
+      it "creates a Gemfile.lock.asc" do
+        install_gemfile(<<-G)
+          source "file://#{gem_repo1}"
+        G
+
+        expect(bundled_app("Gemfile.lock.asc")).to exist
+      end
+    end
+  end
+
   describe "when Bundler root contains regex chars" do
     before do
       root_dir = tmp("foo[]bar")

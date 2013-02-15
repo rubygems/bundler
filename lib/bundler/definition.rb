@@ -279,6 +279,17 @@ module Bundler
       out
     end
 
+    def checksum(file)
+      contents = ""
+
+      File.open(file, 'wb'){|f| f.puts(contents) }
+    rescue Errno::EACCES
+      raise Bundler::InstallError,
+        "There was an error while trying to write to Gemfile.lock.asc. It is likely that \n" \
+        "you need to allow write permissions for the file at path: \n" \
+        "#{File.expand_path(file)}"
+    end
+
     def ensure_equivalent_gemfile_and_lockfile(explicit_flag = false)
       changes = false
 

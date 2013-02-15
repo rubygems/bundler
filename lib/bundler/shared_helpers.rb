@@ -27,6 +27,10 @@ module Bundler
       Pathname.new("#{default_gemfile}.lock")
     end
 
+    def default_checksumfile
+      Pathname.new("#{default_lockfile}.asc")
+    end
+
     def in_bundle?
       find_gemfile
     end
