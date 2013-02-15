@@ -3,7 +3,7 @@ module Bundler
     begin
       yield
     rescue Bundler::BundlerError => e
-      Bundler.ui.error e.message
+      Bundler.ui.error e.message, :wrap => true
       Bundler.ui.trace e
       exit e.status_code
     rescue Interrupt => e
@@ -13,9 +13,11 @@ module Bundler
     rescue SystemExit => e
       exit e.status
     rescue Exception => e
-      Bundler.ui.error(
-        "Unfortunately, a fatal error has occurred. Please see the Bundler \n" \
-        "troubleshooting documentation at http://bit.ly/bundler-issues. Thanks!\n")
+      Bundler.ui.error <<-ERR, :wrap => true
+        Unfortunately, a fatal error has occurred. Please see the Bundler
+        troubleshooting documentation at http://bit.ly/bundler-issues. Thanks!
+
+      ERR
       raise e
     end
   end

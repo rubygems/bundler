@@ -95,10 +95,11 @@ module Bundler
 
       # valimism
       def tell_me(msg, color = nil, newline = nil)
+        msg = word_wrap(msg) if newline.is_a?(Hash) && newline[:wrap]
         if newline.nil?
-          @shell.say(word_wrap(msg), color)
+          @shell.say(msg, color)
         else
-          @shell.say(word_wrap(msg), color, newline)
+          @shell.say(msg, color, newline)
         end
       end
 
