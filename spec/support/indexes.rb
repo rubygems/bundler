@@ -12,7 +12,7 @@ module Spec
 
     alias platforms platform
 
-    def resolve
+    def make_deps
       @platforms ||= ['ruby']
       deps = []
       @deps.each do |d|
@@ -20,7 +20,11 @@ module Spec
           deps << Bundler::DepProxy.new(d, p)
         end
       end
-      Bundler::Resolver.resolve(deps, @index)
+      deps
+    end
+
+    def resolve(resolver = nil)
+      Bundler::Resolver.resolve(make_deps, @index)
     end
 
     def should_resolve_as(specs)
@@ -40,6 +44,45 @@ module Spec
 
     def gem(*args, &blk)
       build_spec(*args, &blk).first
+    end
+
+    # Create an index that triggers a worst-case scenario in the
+    # current (1.1.rc.7) resolver.
+    #
+    # The trick here is that there are many versions (+n+) of many
+    # gems (+m+) on which 'root' declares a non-specific dependency.
+    # It also declares a non-specific dependency on 'more' where
+    # 'more' has both more available versions that the other
+    # dependecies and declares specific dependencies on older
+    # versions.
+    #
+    # Thus during resolution, newest versions are favored until 'more'
+    # is activated, after which each intermediate dependency's
+    # activated version is decremented recursively during the
+    # backtracking.
+    #
+    # @param [Integer] m number of unique gems (plus one called 'root'
+    # that depends on each, and one called 'more' that depends on
+    # version 1.0.0 of each)
+    #
+    # @apram [Integer] n number of versions of each gem, except 'root'
+    # which only has version 1.0 and 'more' which has n+1 versions
+    def a_worst_case_index(m, n)
+      build_index do
+        gem 'root', '1.0' do
+          m.times { |i| dep "gem#{i}", '>= 1.0' }
+          dep 'more', '>= 1.0'
+        end
+
+        n.times do |patch|
+          m.times { |i| gem "gem#{i}", "1.0.#{patch}" }
+        end
+        (n+1).times do |patch|
+          gem 'more', "1.0.#{patch}" do
+            m.times { |i| dep "gem#{i}", '= 1.0.0' }
+          end
+        end
+      end
     end
 
     def an_awesome_index
