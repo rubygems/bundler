@@ -296,7 +296,7 @@ module Bundler
         Bundler.definition(true)
       else
         # cycle through the requested gems, just to make sure they exist
-        gems.each{ |n| gem_dependency_with_name(n) }
+        gems.map{|g| select_spec(g) }.map(&:name)
         Bundler.definition(:gems => gems, :sources => sources)
       end
 
@@ -580,7 +580,7 @@ module Bundler
     def open(name)
       editor = [ENV['BUNDLER_EDITOR'], ENV['VISUAL'], ENV['EDITOR']].find{|e| !e.nil? && !e.empty? }
       if editor
-        gem_path = locate_gem(name)
+        return unless gem_path = locate_gem(name, true)
         Dir.chdir(gem_path) do
           command = "#{editor} #{gem_path}"
           success = system(command)
@@ -801,23 +801,38 @@ module Bundler
       end
     end
 
-    def have_groff?
-      !(`which groff` rescue '').empty?
-    end
+    def locate_gem(name, regexp_match = false)
+      return unless spec = select_spec(name, regexp_match)
 
-    def locate_gem(name)
-      spec = Bundler.load.specs.find{|s| s.name == name }
-      raise GemNotFound, not_found_message(name, Bundler.load.specs) unless spec
       if spec.name == 'bundler'
         return File.expand_path('../../../', __FILE__)
       end
       spec.full_gem_path
     end
 
-    def gem_dependency_with_name(name)
-      dep = Bundler.load.dependencies.find{|d| d.name == name }
-      raise GemNotFound, not_found_message(name, Bundler.load.dependencies) unless dep
-      dep
+    def select_spec(name, regexp_match = false)
+      specs = []
+      regexp_name = Regexp.new(name)
+
+      Bundler.load.specs.each do |spec|
+        return spec if spec.name == name
+        specs << spec if regexp_match && spec.name =~ regexp_name
+      end
+
+      case specs.count
+      when 0
+        raise GemNotFound, not_found_message(name, Bundler.load.dependencies)
+      when 1
+        specs[0]
+      else
+        specs.each_with_index do |spec, index|
+          Bundler.ui.info "#{index.succ} : #{spec.name}", true
+        end
+        Bundler.ui.info '0 : - exit -', true
+
+        input = Bundler.ui.ask('> ')
+        (num = input.to_i) > 0 ? specs[num - 1] : nil
+      end
     end
 
     def not_found_message(missing_gem_name, alternatives)
@@ -829,6 +844,10 @@ module Bundler
       suggestions = SimilarityDetector.new(alternate_names).similar_word_list(missing_gem_name)
       message += "\nDid you mean #{suggestions}?" if suggestions
       message
+    end
+
+    def have_groff?
+      !(`which groff` rescue '').empty?
     end
 
     def pager_system

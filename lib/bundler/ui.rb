@@ -24,6 +24,9 @@ module Bundler
       false
     end
 
+    def ask(message)
+    end
+
     class Shell < UI
       attr_reader :quiet
       attr_writer :shell
@@ -73,6 +76,10 @@ module Bundler
 
       def debug(msg, newline = nil)
         tell_me(msg, nil, newline) if debug?
+      end
+
+      def ask(msg)
+        @shell.ask(msg)
       end
 
       def trace(e, newline = nil)
