@@ -84,10 +84,21 @@ module Bundler
         end
       end
 
-      private
+    private
+
       # valimism
       def tell_me(msg, color = nil, newline = nil)
-        newline.nil? ? @shell.say(msg, color) : @shell.say(msg, color, newline)
+        if newline.nil?
+          @shell.say(word_wrap(msg), color)
+        else
+          @shell.say(word_wrap(msg), color, newline)
+        end
+      end
+
+      def word_wrap(text, line_width = @shell.terminal_width)
+        text.split("\n").collect do |line|
+          line.length > line_width ? line.gsub(/(.{1,#{line_width}})(\s+|$)/, "\\1\n").strip : line
+        end * "\n"
       end
     end
 
