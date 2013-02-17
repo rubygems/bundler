@@ -59,7 +59,17 @@ module Bundler
       @remote_uri = remote_uri
       @public_uri = remote_uri.dup
       @public_uri.user, @public_uri.password = nil, nil # don't print these
-      @connection ||= Net::HTTP::Persistent.new 'bundler', :ENV
+      if USE_PERSISTENT
+        @connection ||= Net::HTTP::Persistent.new 'bundler', :ENV
+      else
+        if @remote_uri.scheme == "https"
+          raise Bundler::HTTPError, "Could not load OpenSSL.\n" \
+            "You must recompile Ruby with OpenSSL support or change the sources in your " \
+            "Gemfile from 'https' to 'http'. Instructions for compiling with OpenSSL " \
+            "using RVM are available at rvm.io/packages/openssl."
+        end
+        @connection ||= Net::HTTP.new(@remote_uri.host, @remote_uri.port)
+      end
       @connection.read_timeout = API_TIMEOUT
 
       Socket.do_not_reverse_lookup = true
@@ -165,15 +175,25 @@ module Bundler
 
   private
 
+    HTTP_ERRORS = [
+      Timeout::Error, EOFError, SocketError,
+      Errno::EINVAL, Errno::ECONNRESET, Errno::ETIMEDOUT, Errno::EAGAIN,
+      Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError
+    ]
+    HTTP_ERRORS << Net::HTTP::Persistent::Error if defined?(Net::HTTP::Persistent)
+
     def fetch(uri, counter = 0)
       raise HTTPError, "Too many redirects" if counter >= REDIRECT_LIMIT
 
       begin
         Bundler.ui.debug "Fetching from: #{uri}"
-        response = @connection.request(uri)
-      rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, Errno::ETIMEDOUT,
-             EOFError, SocketError, Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError,
-             Errno::EAGAIN, Net::HTTP::Persistent::Error, Net::ProtocolError
+        if USE_PERSISTENT
+          response = @connection.request(uri)
+        else
+          req = Net::HTTP::Get.new uri.request_uri
+          response = @connection.request(req)
+        end
+      rescue *HTTP_ERRORS
         raise HTTPError, "Network error while fetching #{uri}"
       end
 
