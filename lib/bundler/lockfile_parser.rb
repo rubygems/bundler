@@ -29,6 +29,11 @@ module Bundler
       @state        = :source
       @specs        = {}
 
+      if lockfile.match(/<<<<<<<|=======|>>>>>>>|\|\|\|\|\|\|\|/)
+        raise LockfileError, "Your Gemfile.lock contains merge conflicts.\n" \
+          "Run `git checkout HEAD -- Gemfile.lock` first to get a clean lock."
+      end
+
       lockfile.split(/(?:\r?\n)+/).each do |line|
         if line == DEPENDENCIES
           @state = :dependency
@@ -38,7 +43,7 @@ module Bundler
           send("parse_#{@state}", line)
         end
       end
-      @specs        = @specs.values
+      @specs = @specs.values
     end
 
   private
