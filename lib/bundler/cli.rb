@@ -296,7 +296,12 @@ module Bundler
         Bundler.definition(true)
       else
         # cycle through the requested gems, just to make sure they exist
-        gems.map{|g| select_spec(g) }.map(&:name)
+        lock = Bundler.read_file(Bundler.default_lockfile)
+        names = LockfileParser.new(lock).specs.map{ |s| s.name }
+        gems.each do |g|
+          next if names.include?(g)
+          raise GemNotFound, not_found_message(g, names)
+        end
         Bundler.definition(:gems => gems, :sources => sources)
       end
 
@@ -829,7 +834,7 @@ module Bundler
 
       # This is called as the result of a GemNotFound, let's see if
       # there's any similarly named ones we can propose instead
-      alternate_names = alternatives.map{|a| a.name}
+      alternate_names = alternatives.map { |a| a.respond_to?(:name) ? a.name : a }
       suggestions = SimilarityDetector.new(alternate_names).similar_word_list(missing_gem_name)
       message += "\nDid you mean #{suggestions}?" if suggestions
       message
