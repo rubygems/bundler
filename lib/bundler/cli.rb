@@ -331,12 +331,20 @@ module Bundler
       Bundler.load.lock
 
       if gem_name
-        return unless spec = select_spec(gem_name, :regex_match)
-        if !File.directory?(spec.full_gem_path)
-          Bundler.ui.warn "The gem #{gem_name} has been deleted."
+        if gem_name == "bundler"
+          path = File.expand_path("../../..", __FILE__)
+        else
+          spec = select_spec(gem_name, :regex_match)
+          return unless spec
+          path = spec.full_gem_path
+          if !File.directory?(path)
+            Bundler.ui.warn "The gem #{gem_name} has been deleted. It was installed at:"
+          end
         end
-        Bundler.ui.info spec.full_gem_path
-      elsif options[:paths]
+        return Bundler.ui.info(path)
+      end
+
+      if options[:paths]
         Bundler.load.specs.sort_by { |s| s.name }.map do |s|
           Bundler.ui.info s.full_gem_path
         end
