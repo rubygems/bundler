@@ -34,8 +34,8 @@ describe "bundle show" do
 
     bundle "show rails"
 
-    expect(out).to match('Warning: The following path to rails no longer exists')
-    expect(out).to match(default_bundle_path('gems', 'rails-2.3.2').to_s)
+    expect(out).to match(/has been deleted/i)
+    expect(out).to include(default_bundle_path('gems', 'rails-2.3.2').to_s)
   end
 
   it "prints the path to the running bundler" do
