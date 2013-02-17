@@ -326,14 +326,14 @@ module Bundler
       Bundler.load.lock
 
       if gem_name
-        path_to_gem = locate_gem(gem_name)
-        unless File.directory?(path_to_gem)
-          Bundler.ui.warn "Warning: The following path to #{gem_name} no longer exists."
+        return unless spec = select_spec(gem_name, :regex_match)
+        if !File.directory?(spec.full_gem_path)
+          Bundler.ui.warn "The gem #{gem_name} has been deleted."
         end
-        Bundler.ui.info path_to_gem
+        Bundler.ui.info spec.full_gem_path
       elsif options[:paths]
-        Bundler.load.specs.sort_by { |s| s.name }.each do |s|
-          Bundler.ui.info locate_gem(s.name)
+        Bundler.load.specs.sort_by { |s| s.name }.map do |s|
+          Bundler.ui.info s.full_gem_path
         end
       else
         Bundler.ui.info "Gems included by the bundle:"
@@ -359,7 +359,7 @@ module Bundler
       Bundler.settings[:bin] = nil if options["path"] && options["path"].empty?
       installer = Installer.new(Bundler.root, Bundler.definition)
       spec      = installer.specs.find{|s| s.name == gem_name }
-      raise GemNotFound, not_found_message(gem_name, Bundler.load.specs) unless spec
+      raise GemNotFound, not_found_message(gem_name, Bundler.definition.specs) unless spec
 
       if spec.name == "bundler"
         Bundler.ui.warn "Sorry, Bundler can only be run via Rubygems."
@@ -579,15 +579,13 @@ module Bundler
     desc "open GEM", "Opens the source directory of the given bundled gem"
     def open(name)
       editor = [ENV['BUNDLER_EDITOR'], ENV['VISUAL'], ENV['EDITOR']].find{|e| !e.nil? && !e.empty? }
-      if editor
-        return unless gem_path = locate_gem(name, true)
-        Dir.chdir(gem_path) do
-          command = "#{editor} #{gem_path}"
-          success = system(command)
-          Bundler.ui.info "Could not run '#{command}'" unless success
-        end
-      else
-        Bundler.ui.info("To open a bundled gem, set $EDITOR or $BUNDLER_EDITOR")
+      return Bundler.ui.info("To open a bundled gem, set $EDITOR or $BUNDLER_EDITOR") unless editor
+      spec = select_spec(name, :regex_match)
+      return unless spec
+      Dir.chdir(spec.full_gem_path) do
+        command = "#{editor} #{spec.full_gem_path}"
+        success = system(command)
+        Bundler.ui.info "Could not run '#{command}'" unless success
       end
     end
 
@@ -801,29 +799,20 @@ module Bundler
       end
     end
 
-    def locate_gem(name, regexp_match = false)
-      return unless spec = select_spec(name, regexp_match)
-
-      if spec.name == 'bundler'
-        return File.expand_path('../../../', __FILE__)
-      end
-      spec.full_gem_path
-    end
-
-    def select_spec(name, regexp_match = false)
+    def select_spec(name, regex_match = nil)
       specs = []
-      regexp_name = Regexp.new(name)
+      regexp = Regexp.new(name) if regex_match
 
-      Bundler.load.specs.each do |spec|
+      Bundler.definition.specs.each do |spec|
         return spec if spec.name == name
-        specs << spec if regexp_match && spec.name =~ regexp_name
+        specs << spec if regexp && spec.name =~ regexp
       end
 
       case specs.count
       when 0
-        raise GemNotFound, not_found_message(name, Bundler.load.dependencies)
+        raise GemNotFound, not_found_message(name, Bundler.definition.dependencies)
       when 1
-        specs[0]
+        specs.first
       else
         specs.each_with_index do |spec, index|
           Bundler.ui.info "#{index.succ} : #{spec.name}", true
