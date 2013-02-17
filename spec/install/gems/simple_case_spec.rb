@@ -310,7 +310,7 @@ describe "bundle install with gem sources" do
       G
 
       bundle :install
-      out.should include("Could not reach http://localhost:9384/")
+      out.should include("Could not fetch specs from http://localhost:9384/")
       out.should_not include("file://")
     end
 
