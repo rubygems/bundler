@@ -67,6 +67,14 @@ describe "bundle update" do
     end
   end
 
+  describe "with a child dependency" do
+    it "should update the child dependency" do
+      update_repo2
+      bundle "update rack"
+      should_be_installed "rack 1.2"
+    end
+  end
+
   describe "with --local option" do
     it "doesn't hit repo2" do
       FileUtils.rm_rf(gem_repo2)
