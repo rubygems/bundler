@@ -110,11 +110,15 @@ module Bundler
     end
 
     def guard_clean
-      clean? or raise("There are files that need to be committed first.")
+      clean? && committed? or raise("There are files that need to be committed first.")
     end
 
     def clean?
       sh_with_code("git diff --exit-code")[1] == 0
+    end
+
+    def committed?
+      sh_with_code("git diff-index --quiet --cached HEAD")[1] == 0
     end
 
     def tag_version
