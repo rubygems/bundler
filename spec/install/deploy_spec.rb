@@ -113,6 +113,20 @@ describe "install with --deployment or --frozen" do
       expect(out).not_to include("You have changed in the Gemfile")
     end
 
+    it "can have --frozen set to false via an environment variable" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+        gem "rack-obama"
+      G
+
+      ENV['BUNDLE_FROZEN'] = "false"
+      bundle "install"
+      expect(out).not_to include("deployment mode")
+      expect(out).not_to include("You have added to the Gemfile")
+      expect(out).not_to include("* rack-obama")
+    end
+
     it "explodes with the --frozen flag if you make a change and don't check in the lockfile" do
       gemfile <<-G
         source "file://#{gem_repo1}"
