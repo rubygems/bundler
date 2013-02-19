@@ -1,8 +1,7 @@
 module Spec
   module Sudo
     def self.present?
-      @which_sudo ||= (`which sudo`.chomp rescue '')
-      !@which_sudo.empty?
+      @which_sudo ||= Bundler.which("sudo")
     end
 
     def self.test_sudo?

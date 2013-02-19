@@ -44,7 +44,7 @@ module Bundler
       if manpages.include?(command)
         root = File.expand_path("../man", __FILE__)
 
-        if have_groff? && root !~ %r{^file:/.+!/META-INF/jruby.home/.+}
+        if Bundler.which("groff")? && root !~ %r{^file:/.+!/META-INF/jruby.home/.+}
           groff = "groff -Wall -mtty-char -mandoc -Tascii"
           pager = pager_system
 
@@ -848,14 +848,10 @@ module Bundler
       message
     end
 
-    def have_groff?
-      !(`which groff` rescue '').empty?
-    end
-
     def pager_system
       pager = ENV['PAGER'] || ENV['MANPAGER']
-      pager ||= 'less -R' if !(`which less` rescue '').empty?
-      pager ||= 'more' if !(`which more` rescue '').empty?
+      pager ||= 'less -R' if Bundler.which("less")
+      pager ||= 'more' if Bundler.which("more")
       pager ||= 'cat'
     end
 
