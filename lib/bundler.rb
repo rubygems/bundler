@@ -81,6 +81,7 @@ module Bundler
   end
 
   class InvalidSpecSet < StandardError; end
+  class MarshalError   < StandardError; end
 
   class << self
     attr_writer :ui, :bundle_path
@@ -282,6 +283,12 @@ module Bundler
 
     def read_file(file)
       File.open(file, "rb") { |f| f.read }
+    end
+
+    def load_marshal(data)
+      Marshal.load(data)
+    rescue => e
+      raise MarshalError, "#{e.class}: #{e.message}"
     end
 
     def load_gemspec(file)

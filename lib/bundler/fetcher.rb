@@ -83,7 +83,10 @@ module Bundler
       uri = URI.parse("#{@remote_uri}#{Gem::MARSHAL_SPEC_DIR}#{spec_file_name}")
 
       spec_rz = (uri.scheme == "file") ? Gem.read_binary(uri.path) : fetch(uri)
-      Marshal.load Gem.inflate(spec_rz)
+      Bundler.load_marshal Gem.inflate(spec_rz)
+    rescue MarshalError => e
+      raise HTTPError, "Gemspec #{spec} contained invalid data.\n" \
+        "Your network or your gem server is probably having issues right now."
     end
 
     # return the specs in the bundler format as an index
@@ -143,9 +146,9 @@ module Bundler
       fetch_remote_specs(deps_list, full_dependency_list + returned_gems, spec_list + last_spec_list)
     # fall back to the legacy index in the following cases
     # 1. Gemcutter Endpoint doesn't return a 200
-    # 2,3. Marshal blob doesn't load properly
-    # 4. One of the YAML gemspecs has the Syck::DefaultKey problem
-    rescue HTTPError, ArgumentError, TypeError, GemspecError => e
+    # 2. Marshal blob doesn't load properly
+    # 3. One of the YAML gemspecs has the Syck::DefaultKey problem
+    rescue HTTPError, MarshalError, GemspecError => e
       @use_api = false
 
       # new line now that the dots are over
@@ -226,7 +229,7 @@ module Bundler
     def fetch_dependency_remote_specs(gem_names)
       Bundler.ui.debug "Query Gemcutter Dependency Endpoint API: #{gem_names.join(',')}"
       marshalled_deps = fetch dependency_api_uri(gem_names)
-      gem_list = Marshal.load(marshalled_deps)
+      gem_list = Bundler.load_marshal(marshalled_deps)
       deps_list = []
 
       spec_list = gem_list.map do |s|
