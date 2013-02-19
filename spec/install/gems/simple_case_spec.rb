@@ -412,17 +412,9 @@ describe "bundle install with gem sources" do
       G
     end
 
-    def set_bundle_path(type, location)
-      if type == :env
-        ENV["BUNDLE_PATH"] = location
-      elsif type == :global
-        bundle "config path #{location}", "no-color" => nil
-      end
-    end
-
-    [:env, :global].each do |type|
-      it "installs gems to a path if one is specified" do
-        set_bundle_path(type, bundled_app("vendor2").to_s)
+    describe "with BUNDLE_PATH set" do
+      it "installs gems to --path if one is given" do
+        ENV["BUNDLE_PATH"] = bundled_app("vendor2").to_s
         bundle "install --path vendor/bundle"
 
         expect(vendored_gems("gems/rack-1.0.0")).to be_directory
@@ -430,8 +422,8 @@ describe "bundle install with gem sources" do
         should_be_installed "rack 1.0.0"
       end
 
-      it "installs gems to BUNDLE_PATH with #{type}" do
-        set_bundle_path(type, bundled_app("vendor").to_s)
+      it "installs gems to BUNDLE_PATH" do
+        ENV["BUNDLE_PATH"] = bundled_app("vendor").to_s
 
         bundle :install
 
@@ -440,7 +432,7 @@ describe "bundle install with gem sources" do
       end
 
       it "installs gems to BUNDLE_PATH relative to root when relative" do
-        set_bundle_path(type, "vendor")
+        ENV["BUNDLE_PATH"] = "vendor"
 
         FileUtils.mkdir_p bundled_app('lol')
         Dir.chdir(bundled_app('lol')) do
@@ -448,6 +440,39 @@ describe "bundle install with gem sources" do
         end
 
         expect(bundled_app('vendor/gems/rack-1.0.0')).to be_directory
+        should_be_installed "rack 1.0.0"
+      end
+    end
+
+    describe "with 'config path' set" do
+      it "installs gems to the path" do
+        bundle "config path #{home(".bundle").to_s}", "no-color" => nil
+
+        bundle :install
+
+        expect(home(".bundle/#{Bundler.ruby_scope}/gems/rack-1.0.0")).to be_directory
+        should_be_installed "rack 1.0.0"
+      end
+
+      it "installs gems into --path if given" do
+        bundle "config path #{home(".bundle").to_s}", "no-color" => nil
+
+        bundle "install --path vendor/bundle"
+
+        expect(vendored_gems("gems/rack-1.0.0")).to be_directory
+        expect(home(".bundle/#{Bundler.ruby_scope}")).to_not be_directory
+        should_be_installed "rack 1.0.0"
+      end
+
+      it "installs gems to the path relative to root when relative" do
+        bundle "config path vendor", "no-color" => nil
+
+        FileUtils.mkdir_p bundled_app('lol')
+        Dir.chdir(bundled_app('lol')) do
+          bundle :install
+        end
+
+        expect(bundled_app("vendor/#{Bundler.ruby_scope}/gems/rack-1.0.0")).to be_directory
         should_be_installed "rack 1.0.0"
       end
     end
