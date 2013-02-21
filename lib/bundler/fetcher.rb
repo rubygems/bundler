@@ -233,24 +233,9 @@ module Bundler
       deps_list = []
 
       spec_list = gem_list.map do |s|
-        dependencies = s[:dependencies].map do |d|
-          begin
-            name, requirement = d
-            dep = Gem::Dependency.new(name, requirement.split(", "))
-          rescue ArgumentError => e
-            if e.message.include?('Ill-formed requirement ["#<YAML::Syck::DefaultKey')
-              puts # we shouldn't print the error message on the "fetching info" status line
-              raise GemspecError,
-                "Unfortunately, the gem #{s[:name]} (#{s[:number]}) has an invalid gemspec. \n" \
-                "Please ask the gem author to yank the bad version to fix this issue. For \n" \
-                "more information, see http://bit.ly/syck-defaultkey."
-            else
-              raise e
-            end
-          end
-
+        dependencies = s[:dependencies].map do |name, requirement|
+          dep = well_formed_dependency(name, requirement.split(", "))
           deps_list << dep.name
-
           dep
         end
 
@@ -271,6 +256,19 @@ module Bundler
         raise HTTPError, "Could not fetch specs from #{@public_uri}"
       end
     end
+
+    def well_formed_dependency(name, *requirements)
+      Gem::Dependency.new(name, *requirements)
+    rescue ArgumentError => e
+      illformed = 'Ill-formed requirement ["#<YAML::Syck::DefaultKey'
+      raise e unless e.message.include?(illformed)
+      puts # we shouldn't print the error message on the "fetching info" status line
+      raise GemspecError,
+        "Unfortunately, the gem #{s[:name]} (#{s[:number]}) has an invalid " \
+        "gemspec. \nPlease ask the gem author to yank the bad version to fix " \
+        "this issue. For more information, see http://bit.ly/syck-defaultkey."
+    end
+
 
   end
 end
