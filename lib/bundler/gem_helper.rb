@@ -33,19 +33,21 @@ module Bundler
     end
 
     def install
+      built_gem_path = nil
+
       desc "Build #{name}-#{version}.gem into the pkg directory."
       task 'build' do
-        build_gem
+        built_gem_path = build_gem
       end
 
       desc "Build and install #{name}-#{version}.gem into system gems."
-      task 'install' do
-        install_gem
+      task 'install' => 'build' do
+        install_gem(built_gem_path)
       end
 
       desc "Create tag #{version_tag} and build and push #{name}-#{version}.gem to Rubygems"
-      task 'release' do
-        release_gem
+      task 'release' => 'build' do
+        release_gem(built_gem_path)
       end
 
       GemHelper.instance = self
@@ -62,16 +64,16 @@ module Bundler
       File.join(base, 'pkg', file_name)
     end
 
-    def install_gem
-      built_gem_path = build_gem
+    def install_gem(built_gem_path=nil)
+      built_gem_path ||= build_gem
       out, _ = sh_with_code("gem install '#{built_gem_path}' --local")
       raise "Couldn't install gem, run `gem install #{built_gem_path}' for more detailed output" unless out[/Successfully installed/]
       Bundler.ui.confirm "#{name} (#{version}) installed."
     end
 
-    def release_gem
+    def release_gem(built_gem_path=nil)
       guard_clean
-      built_gem_path = build_gem
+      built_gem_path ||= build_gem
       tag_version { git_push } unless already_tagged?
       rubygem_push(built_gem_path) if gem_push?
     end
