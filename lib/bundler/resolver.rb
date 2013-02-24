@@ -302,12 +302,12 @@ module Bundler
         # on this conflict.  Note that if the tree has multiple conflicts, we don't
         # care which one we throw, as long as we get out safe
         if !current.required_by.empty? && !conflicts.empty?
-          @errors.reverse_each do |name, pair|
-            if conflicts.include?(name)
+          @errors.reverse_each do |req_name, pair|
+            if conflicts.include?(req_name)
               # Choose the closest pivot in the stack that will affect the conflict
-              errorpivot = (@stack & [name, current.required_by.last.name]).last
+              errorpivot = (@stack & [req_name, current.required_by.last.name]).last
               debug { "    -> Jumping to: #{errorpivot}" }
-              throw errorpivot, name
+              throw errorpivot, req_name
             end
           end
         end
