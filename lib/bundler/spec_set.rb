@@ -22,9 +22,11 @@ module Bundler
         next if handled[dep] || skip.include?(dep.name)
 
         spec = lookup[dep.name].find do |s|
-          match_current_platform ?
-            Gem::Platform.match(s.platform) :
+          if match_current_platform
+            Gem::Platform.match(s.platform)
+          else
             s.match_platform(dep.__platform)
+          end
         end
 
         handled[dep] = true
