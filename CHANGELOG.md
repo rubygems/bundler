@@ -1,3 +1,20 @@
+## 1.3.0 (24 February 2013)
+
+Features:
+
+  - raise a useful error when the lockfile contains a merge conflict (@zofrex)
+  - ensure `rake release` checks for uncommitted as well as unstaged (@benmoss)
+  - allow environment variables to be negated with 'false' and '0' (@brettporter)
+  - set $MANPATH inside `exec` for gems with man pages (@sunaku)
+  - partial gem names for `open` and `update` now return a list (@takkanm)
+
+Bugfixes:
+
+  - `update` now (again) finds gems that aren't listed in the Gemfile
+  - `install` now (again) updates cached gems that aren't in the Gemfile
+  - install Gemfiles with HTTP sources even without OpenSSL present
+  - display CerficateFailureError message in full
+
 ## 1.3.0.pre.8 (12 February 2013)
 
 Security:
