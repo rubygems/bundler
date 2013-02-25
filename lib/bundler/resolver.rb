@@ -134,6 +134,7 @@ module Bundler
     end
 
     def initialize(index, source_requirements, base)
+      @iteration_counter    = 0
       @errors               = {}
       @stack                = []
       @base                 = base
@@ -166,6 +167,11 @@ module Bundler
       # If the requirements are empty, then we are in a success state. Aka, all
       # gem dependencies have been resolved.
       throw :success, successify(activated) if reqs.empty?
+
+      @iteration_counter += 1
+      if((@iteration_counter % 10000) == 0)
+        Bundler.ui.info ".", false
+      end
 
       debug { print "\e[2J\e[f" ; "==== Iterating ====\n\n" }
 
