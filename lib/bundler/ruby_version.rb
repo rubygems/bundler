@@ -70,6 +70,10 @@ module Bundler
       RUBY_VERSION.dup
     end
 
+    def gem_version
+      @gem_version ||= Gem::Version.new(version)
+    end
+
     def engine
       if defined?(RUBY_ENGINE)
         RUBY_ENGINE.dup
