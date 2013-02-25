@@ -474,4 +474,5 @@ describe "gemcutter's dependency API" do
       expect(exitstatus).to eq(0)
     end
   end
+
 end

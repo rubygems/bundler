@@ -92,6 +92,7 @@ module Bundler
     # return the specs in the bundler format as an index
     def specs(gem_names, source)
       index = Index.new
+      use_full_source_index = !gem_names || @remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
 
       if gem_names && use_api
         Bundler.ui.info "Fetching gem metadata from #{@public_uri}", Bundler.ui.debug?

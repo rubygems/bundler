@@ -138,6 +138,13 @@ Bugfixes:
   - `gem` generates gemspecs that block double-requires
   - `gem` generates gemspecs that admit they depend on rake
 
+## 1.2.5 (Feb 24, 2013)
+
+Bugfixes:
+
+  - install Gemfiles with HTTP sources even without OpenSSL present
+  - display CerficateFailureError message in full
+
 ## 1.2.4 (Feb 12, 2013)
 
 Features:
