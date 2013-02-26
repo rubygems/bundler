@@ -14,7 +14,7 @@ module Bundler
       raise InvalidOption, e.message
     ensure
       Bundler.ui = UI::Shell.new(options)
-      Bundler.ui.debug! if options["verbose"]
+      Bundler.ui.level = "debug" if options["verbose"]
     end
 
     check_unknown_options!(:except => [:config, :exec])
@@ -225,20 +225,20 @@ module Bundler
       end
 
       # Can't use Bundler.settings for this because settings needs gemfile.dirname
-      Bundler.settings[:path]   = nil if opts[:system]
-      Bundler.settings[:path]   = "vendor/bundle" if opts[:deployment]
-      Bundler.settings[:path]   = opts[:path] if opts[:path]
-      Bundler.settings[:path] ||= "bundle" if opts[:standalone]
-      Bundler.settings[:bin] = opts["binstubs"] if opts["binstubs"]
-      Bundler.settings[:bin] = nil if opts["binstubs"] && opts["binstubs"].empty?
-      Bundler.settings[:shebang] = opts["shebang"] if opts[:shebang]
+      Bundler.settings[:path]     = nil if opts[:system]
+      Bundler.settings[:path]     = "vendor/bundle" if opts[:deployment]
+      Bundler.settings[:path]     = opts[:path] if opts[:path]
+      Bundler.settings[:path]     ||= "bundle" if opts[:standalone]
+      Bundler.settings[:bin]      = opts["binstubs"] if opts["binstubs"]
+      Bundler.settings[:bin]      = nil if opts["binstubs"] && opts["binstubs"].empty?
+      Bundler.settings[:shebang]  = opts["shebang"] if opts[:shebang]
       Bundler.settings[:no_prune] = true if opts["no-prune"]
-      Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? '1' : nil
-      Bundler.settings.without = opts[:without]
-      Bundler.ui.quiet = opts[:quiet]
-      Bundler.settings[:clean] = opts[:clean] if opts[:clean]
-
+      Bundler.settings[:clean]    = opts[:clean] if opts[:clean]
+      Bundler.settings.without    = opts[:without]
+      Bundler.ui.level            = "warn" if opts[:quiet]
       Bundler::Fetcher.disable_endpoint = opts["full-index"]
+      Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? '1' : nil
+
       # rubygems plugins sometimes hook into the gem install process
       Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins)
 
@@ -289,7 +289,7 @@ module Bundler
         "Use the rubygems modern index instead of the API endpoint"
     def update(*gems)
       sources = Array(options[:source])
-      Bundler.ui.quiet = options[:quiet]
+      Bundler.ui.level = "warn" if options[:quiet]
 
       if gems.empty? && sources.empty?
         # We're doing a full update

@@ -66,13 +66,13 @@ module Bundler
       end
 
       if Bundler.default_lockfile.exist? && !options["update"]
-        real_ui, Bundler.ui = Bundler.ui, Bundler::UI.new
-        begin
-          tmpdef = Definition.build(Bundler.default_gemfile, Bundler.default_lockfile, nil)
-          local = true unless tmpdef.new_platform? || tmpdef.missing_specs.any?
-        rescue BundlerError
+        local = Bundler.ui.silence do
+          begin
+            tmpdef = Definition.build(Bundler.default_gemfile, Bundler.default_lockfile, nil)
+            true unless tmpdef.new_platform? || tmpdef.missing_specs.any?
+          rescue BundlerError
+          end
         end
-        Bundler.ui = real_ui
       end
 
       # Since we are installing, we can resolve the definition
