@@ -433,11 +433,17 @@ describe "gemcutter's dependency API" do
   end
 
   context "when SSL certificate verification fails" do
-    it "explains what is going on" do
+    it "explains what happened" do
       # Install a monkeypatch that reproduces the effects of openssl raising
       # a certificate validation error at the appropriate moment.
       gemfile <<-G
-        class Bundler::Fetcher
+        class Net::HTTP::Persistent
+          def request(uri, req = nil)
+            raise OpenSSL::SSL::SSLError, "Certificate invalid"
+          end
+        end
+
+        class Bundler::RubygemsIntegration
           def fetch_all_remote_specs
             raise OpenSSL::SSL::SSLError, "Certificate invalid"
           end

@@ -123,9 +123,9 @@ module Bundler
       end
 
       index
-    rescue OpenSSL::SSL::SSLError
+    rescue CertificateFailureError => e
       Bundler.ui.info "" if gem_names && use_api # newline after dots
-      raise CertificateFailureError.new(@public_uri)
+      raise e
     end
 
     # fetch index
@@ -197,6 +197,8 @@ module Bundler
           req = Net::HTTP::Get.new uri.request_uri
           response = @connection.request(req)
         end
+      rescue OpenSSL::SSL::SSLError
+        raise CertificateFailureError.new(@public_uri)
       rescue *HTTP_ERRORS
         raise HTTPError, "Network error while fetching #{uri}"
       end
@@ -256,6 +258,8 @@ module Bundler
       else
         raise HTTPError, "Could not fetch specs from #{@public_uri}"
       end
+    rescue OpenSSL::SSL::SSLError
+      raise CertificateFailureError.new(@public_uri)
     end
 
     def well_formed_dependency(name, *requirements)
