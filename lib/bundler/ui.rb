@@ -77,7 +77,7 @@ module Bundler
         raise ArgumentError unless LEVELS.include?(level.to_s)
         @level = level
       end
-      
+
       def level(name = nil)
         name ? LEVELS.index(name) <= LEVELS.index(@level) : @level
       end
@@ -90,7 +90,7 @@ module Bundler
           STDERR.puts "#{msg}#{newline}"
         end
       end
-      
+
       def silence
         old_level, @level = @level, "silent"
         yield
