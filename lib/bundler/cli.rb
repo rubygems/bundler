@@ -742,9 +742,11 @@ module Bundler
     method_option "ruby", :type => :boolean, :default => false, :banner =>
       "only display ruby related platform information"
     def platform
-      platforms    = Bundler.definition.platforms.map {|p| "* #{p}" }
-      ruby_version = Bundler.definition.ruby_version
-      output       = []
+      platforms, ruby_version = Bundler.ui.silence do
+        [ Bundler.definition.platforms.map {|p| "* #{p}" },
+          Bundler.definition.ruby_version ]
+      end
+      output = []
 
       if options[:ruby]
         if ruby_version
