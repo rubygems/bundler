@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec', '~> 2.11'
 
   spec.files       = `git ls-files`.split($/)
-  spec.files      += Dir.glob('man/**/*') # man/ is ignored by git
+  spec.files      += Dir.glob('lib/bundler/man/**/*') # man/ is ignored by git
   spec.test_files  = spec.files.grep(%r{^spec/})
 
   spec.executables   = %w(bundle)
