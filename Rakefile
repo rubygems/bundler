@@ -5,9 +5,6 @@ require 'rubygems'
 require 'shellwords'
 require 'benchmark'
 
-task :build => ["man:clean", "man:build"]
-task :release => ["man:clean", "man:build"]
-
 def safe_task(&block)
   yield
   true
@@ -176,6 +173,15 @@ begin
     end
   end
 
+rescue LoadError
+  task :spec do
+    abort "Run `rake spec:deps` to be able to run the specs"
+  end
+end
+
+begin
+  require 'ronn'
+
   namespace :man do
     directory "lib/bundler/man"
 
@@ -204,10 +210,14 @@ begin
   end
 
 rescue LoadError
-  task :spec do
-    abort "Run `rake spec:deps` to be able to run the specs"
+  namespace :man do
+    task(:build) { abort "Install the ronn gem to be able to release!" }
+    task(:clean) { abort "Install the ronn gem to be able to release!" }
   end
 end
+
+task :build => ["man:clean", "man:build"]
+task :release => ["man:clean", "man:build"]
 
 namespace :vendor do
   desc "Build the vendor dir"
