@@ -22,6 +22,7 @@ notifications:
     rooms:
       - secure: "geau3P+A9ZJHkA/OHN5v9Mcb8hAti1PllXw5DsHNJfLAWBAw5ReGGMA8Xfpf\nLdT7ktIUlQwzw94cKQ6sRZk8szXTiHncf3bxXTACJf2RpiKmbkoQU51TmCDq\nYSMuY1FIryk/3t9aZCrarufbIDI3DBscDEe4Bj9bERl+TJ8ArBY="
 rvm:
+  - 2.0.0
   - 1.9.3
   - 1.9.2
   - 1.8.7
@@ -31,23 +32,20 @@ env:
   # we need to know if changes to rubygems will break bundler on release
   - RGV=master
   # test the latest rubygems release with all of our supported rubies
-  - RGV=v1.8.24
+  - RGV=v2.0.0
 matrix:
   allow_failures:
     # we want to know how we're doing with head, but not fail the build
     - rvm: ruby-head
-    # until the 2.0 rc, it's okay for failures to crop up
-    - rvm: 2.0.0
     # 1.9.2 is simply too slow. it sometimes exceeds the 25m hard limit.
     - rvm: 1.9.2
   include:
     # riding the edge
     - rvm: ruby-head
       env: RGV=master
-    # 2.0 release track
-    - rvm: 2.0.0
-      env: RGV=v2.0.0.rc.1
     # Bundler 1.x supports Rubygems down to 1.5.3 on Ruby 1.9.3
+    - rvm: 1.9.3
+      env: RGV=v1.8.25
     - rvm: 1.9.3
       env: RGV=v1.7.2
     - rvm: 1.9.3
@@ -55,6 +53,8 @@ matrix:
     - rvm: 1.9.3
       env: RGV=v1.5.3
     # Bundler 1.x supports Rubygems down to 1.3.6 on Ruby 1.8.7
+    - rvm: 1.8.7
+      env: RGV=v1.8.25
     - rvm: 1.8.7
       env: RGV=v1.7.2
     - rvm: 1.8.7
