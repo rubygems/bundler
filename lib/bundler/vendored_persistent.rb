@@ -1,6 +1,6 @@
 begin
   require 'openssl'
-  OpenSSL # ensure OpenSSL is loaded
+  OpenSSL && OpenSSL::SSL # ensure OpenSSL is loaded
 
   vendor = File.expand_path('../vendor', __FILE__)
   $:.unshift(vendor) unless $:.include?(vendor)
