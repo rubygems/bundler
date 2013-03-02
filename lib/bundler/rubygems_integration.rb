@@ -166,6 +166,15 @@ module Bundler
       Gem::RemoteFetcher.fetcher.download(spec, uri, path)
     end
 
+    def security_policies
+      @security_policies ||= begin
+        require 'rubygems/security'
+        Gem::Security::Policies
+      rescue LoadError
+        {}
+      end
+    end
+
     def reverse_rubygems_kernel_mixin
       # Disable rubygems' gem activation system
       ::Kernel.class_eval do
@@ -424,8 +433,6 @@ module Bundler
 
     # Rubygems 2.0
     class Future < RubygemsIntegration
-      require 'rubygems/package'
-
       def stub_rubygems(specs)
         Gem::Specification.all = specs
 
@@ -460,12 +467,14 @@ module Bundler
       end
 
       def gem_from_path(path, policy = nil)
+        require 'rubygems/package'
         p = Gem::Package.new(path)
         p.security_policy = policy if policy
         return p
       end
 
       def build(spec)
+        require 'rubygems/package'
         Gem::Package.build(spec)
       end
 

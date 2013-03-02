@@ -1,7 +1,6 @@
+require 'bundler'
 require 'bundler/similarity_detector'
 require 'bundler/vendored_thor'
-require 'rubygems/user_interaction'
-require 'rubygems/security'
 
 module Bundler
   class CLI < Thor
@@ -170,8 +169,10 @@ module Bundler
       "Use the rubygems modern index instead of the API endpoint"
     method_option "clean", :type => :boolean, :banner =>
       "Run bundle clean automatically after install"
-    method_option "trust-policy", :alias => "P", :type => :string, :banner =>
-      "Gem trust policy (like gem install -P). Must be one of " + Gem::Security::Policies.keys.join('|')
+    unless Bundler.rubygems.security_policies.empty?
+      method_option "trust-policy", :alias => "P", :type => :string, :banner =>
+        "Gem trust policy (like gem install -P). Must be one of " + Bundler.rubygems.security_policies.keys.join('|')
+    end
 
     def install
       opts = options.dup
@@ -193,9 +194,9 @@ module Bundler
       end
 
       if (opts["trust-policy"])
-        unless (Gem::Security::Policies.keys.include?(opts["trust-policy"]))
+        unless (Bundler.rubygems.security_policies.keys.include?(opts["trust-policy"]))
           Bundler.ui.error "Rubygems doesn't know about trust policy '#{opts["trust-policy"]}'. " \
-            "The known policies are: #{Gem::Security::Policies.keys.join(', ')}."
+            "The known policies are: #{Bundler.rubygems.security_policies.keys.join(', ')}."
           exit 1
         end
         Bundler.settings["trust-policy"] = opts["trust-policy"]
