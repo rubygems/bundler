@@ -252,14 +252,13 @@ module Bundler
     def fetch_all_remote_specs
       Bundler.rubygems.sources = ["#{@remote_uri}"]
       Bundler.rubygems.fetch_all_remote_specs
-    rescue Gem::RemoteFetcher::FetchError => e
+    rescue Gem::RemoteFetcher::FetchError, OpenSSL::SSL::SSLError => e
       if e.message.match("certificate verify failed")
         raise CertificateFailureError.new(@public_uri)
       else
+        Bundler.ui.trace e
         raise HTTPError, "Could not fetch specs from #{@public_uri}"
       end
-    rescue OpenSSL::SSL::SSLError
-      raise CertificateFailureError.new(@public_uri)
     end
 
     def well_formed_dependency(name, *requirements)
