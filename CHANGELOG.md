@@ -1,3 +1,12 @@
+## 1.3.1 (3 March 2013)
+
+Bugfixes:
+
+  - include manpages in gem, restoring many help pages
+  - handle more SSL certificate verification failures
+  - check for the full version of SSL, which we need (@alup)
+  - gem rake task 'install' now depends on task 'build' (@sunaku)
+
 ## 1.3.0 (24 February 2013)
 
 Features:
