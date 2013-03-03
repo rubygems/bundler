@@ -36,6 +36,7 @@ matrix:
   allow_failures:
     # we want to know how we're doing with head, but not fail the build
     - rvm: ruby-head
+    - env: RGV=master
     # 1.9.2 is simply too slow. it sometimes exceeds the 25m hard limit.
     - rvm: 1.9.2
   include:
