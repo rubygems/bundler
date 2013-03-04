@@ -1,5 +1,9 @@
 ## 1.3.3
 
+Features:
+
+  - mention skipped groups in bundle install and bundle update output (@simi)
+
 Bugfixes:
 
   -  use YAML.dump over {}.to_yaml for better forwards compat

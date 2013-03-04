@@ -105,6 +105,17 @@ describe "bundle install with gem sources" do
           expect(out).not_to include("activesupport")
         end
 
+        it "does say the groups are skipped from the previously excluded groups" do
+          bundle :install, :without => "emo"
+          bundle :install
+          expect(out).to include("Skipped groups for this bundle are: emo.")
+        end
+
+        it "does say the group is skipped" do
+          bundle :install, :without => "emo"
+          expect(out).to include("Skipped groups for this bundle are: emo.")
+        end
+
         it "allows Bundler.setup for specific groups" do
           bundle :install, :without => "emo"
           run("require 'rack'; puts RACK", :default)
@@ -216,6 +227,11 @@ describe "bundle install with gem sources" do
           it "does not install the gem w/ option --without 'emo lolercoaster'" do
             bundle "install --without 'emo lolercoaster'"
             should_not_be_installed "activesupport 2.3.5"
+          end
+
+          it "does say the groups are skipped" do
+            bundle "install --without 'emo lolercoaster'"
+            expect(out).to include("Skipped groups for this bundle are: emo lolercoaster.")
           end
         end
       end
