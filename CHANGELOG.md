@@ -1,3 +1,9 @@
+## 1.3.2 (tbd)
+
+Features:
+
+ - mention skipped groups in bundle install and bundle update output (@simi)
+
 ## 1.3.1 (3 March 2013)
 
 Bugfixes:
