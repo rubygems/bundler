@@ -1,6 +1,10 @@
 module Bundler
   class RubygemsMirror
 
+    def self.to_uri(uri)
+      mirrors[add_slash(uri)] || uri
+    end
+
     private
 
     def self.mirrors
@@ -18,10 +22,5 @@ module Bundler
       uri =~ /\/$/ ? uri : uri + '/'
     end
 
-    public
-
-    def self.to_uri(uri)
-      mirrors[add_slash(uri)] || uri
-    end
   end
 end
