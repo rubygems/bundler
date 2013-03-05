@@ -403,8 +403,8 @@ module Bundler
         spec   = @dependencies.find { |s| s.name == k }
         source = spec && spec.source
         if source && source.respond_to?(:local_override!)
-          source_unlocked = @unlock[:gems].include?(spec.name)
-          locals << [ source, source.local_override!(v, source_unlocked) ]
+          source.unlock! if @unlock[:gems].include?(spec.name)
+          locals << [ source, source.local_override!(v) ]
         end
       end
 
