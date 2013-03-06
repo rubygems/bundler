@@ -1,3 +1,5 @@
+  - allow orphan revisions for local overrides if updating them (@jamesferguson)
+
 ## 1.3.1 (3 March 2013)
 
 Bugfixes:
