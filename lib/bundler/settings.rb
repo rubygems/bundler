@@ -29,6 +29,7 @@ module Bundler
 
     def all
       env_keys = ENV.keys.select { |k| k =~ /BUNDLE_.*/ }
+
       keys = @global_config.keys | @local_config.keys | env_keys
 
       keys.map do |key|
@@ -44,6 +45,16 @@ module Bundler
         end
       end
       repos
+    end
+
+    def gem_mirrors
+      all.inject({}) do |h, k|
+        if k =~ /^mirror\./
+          uri = normalize_uri($')
+          h[uri] = normalize_uri(self[k])
+        end
+        h
+      end
     end
 
     def locations(key)
@@ -147,6 +158,16 @@ module Bundler
       else
         {}
       end
+    end
+
+    # TODO: duplicates Rubygems#normalize_uri
+    # TODO: is this the correct place to validate mirror URIs?
+    def normalize_uri(uri)
+      uri = uri.to_s
+      uri = "#{uri}/" unless uri =~ %r[/\Z]
+      uri = URI(uri)
+      raise ArgumentError, "Gem mirror sources must be absolute URIs (configured: #{mirror_source})" unless uri.absolute?
+      uri
     end
 
   end
