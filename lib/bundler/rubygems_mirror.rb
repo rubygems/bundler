@@ -2,24 +2,17 @@ module Bundler
   class RubygemsMirror
 
     def self.to_uri(uri)
-      mirrors[add_slash(uri)] || uri
+      # NOTE: implementation of Settings forces case insensitivity, which
+      # breaks case sensitive URIs (like file paths). We therefore need to do
+      # lookups on downcased URIs.
+      lookup_uri = URI(uri.to_s.downcase)
+      mirrors[lookup_uri] || uri
     end
 
     private
 
     def self.mirrors
-      @mirrors ||= Bundler.settings.all.inject({}) do |h, k|
-        if k =~ /^mirror./
-          uri = add_slash(k.sub(/^mirror./, ''))
-          h[uri] = URI.parse(Bundler.settings[k])
-        end
-        h
-      end
-    end
-
-    def self.add_slash(uri)
-      uri = uri.to_s
-      uri =~ /\/$/ ? uri : uri + '/'
+      Bundler.settings.gem_mirrors
     end
 
   end
