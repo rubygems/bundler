@@ -70,9 +70,12 @@ module Bundler
       @public_uri.user, @public_uri.password = nil, nil # don't print these
       if defined?(OpenSSL::SSL)
         @connection = Net::HTTP::Persistent.new 'bundler', :ENV
+        @connection.verify_mode = (Bundler.settings[:ssl_verify_mode] ||
+          OpenSSL::SSL::VERIFY_PEER)
+        @connection.cert_store = bundler_cert_store
       else
-        @connection ||= Net::HTTP.new(@remote_uri.host, @remote_uri.port)
         raise SSLError if @remote_uri.scheme == "https"
+        @connection = Net::HTTP.new(@remote_uri.host, @remote_uri.port)
       end
       @connection.read_timeout = API_TIMEOUT
 
@@ -277,6 +280,21 @@ module Bundler
         "this issue. For more information, see http://bit.ly/syck-defaultkey."
     end
 
+    def bundler_cert_store
+      store = OpenSSL::X509::Store.new
+      if Bundler.settings[:ssl_ca_cert]
+        if File.directory? Bundler.settings[:ssl_ca_cert]
+          store.add_path Bundler.settings[:ssl_ca_cert]
+        else
+          store.add_file Bundler.settings[:ssl_ca_cert]
+        end
+      else
+        store.set_default_paths
+        certs = File.expand_path("../ssl_certs/*.pem", __FILE__)
+        Dir.glob(certs).each { |c| store.add_file c }
+      end
+      store
+    end
 
   end
 end
