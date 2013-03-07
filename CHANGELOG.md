@@ -1,5 +1,9 @@
 ## 1.3.2 (7 March 2013)
 
+Features:
+
+  - include rubygems.org CA chain
+
 Bugfixes:
 
   - don't store --dry-run as a Bundler setting
