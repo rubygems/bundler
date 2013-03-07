@@ -59,8 +59,8 @@ module Bundler
       @remote_uri = remote_uri
       @public_uri = remote_uri.dup
       @public_uri.user, @public_uri.password = nil, nil # don't print these
-      if USE_PERSISTENT
-        @connection ||= Net::HTTP::Persistent.new 'bundler', :ENV
+      if defined?(OpenSSL::SSL)
+        @connection = Net::HTTP::Persistent.new 'bundler', :ENV
       else
         if @remote_uri.scheme == "https"
           raise Bundler::HTTPError, "Could not load OpenSSL.\n" \
@@ -191,7 +191,7 @@ module Bundler
 
       begin
         Bundler.ui.debug "Fetching from: #{uri}"
-        if USE_PERSISTENT
+        if @connection.is_a?(Net::HTTP::Persistent)
           response = @connection.request(uri)
         else
           req = Net::HTTP::Get.new uri.request_uri
