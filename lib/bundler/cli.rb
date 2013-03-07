@@ -733,8 +733,7 @@ module Bundler
       "forces clean even if --path is not set"
     def clean
       if Bundler.settings[:path] || options[:force]
-        Bundler.settings[:dry_run] = options[:"dry-run"]
-        Bundler.load.clean
+        Bundler.load.clean(options[:"dry-run"])
       else
         Bundler.ui.error "Can only use bundle clean when --path is set or --force is set"
         exit 1

@@ -124,7 +124,7 @@ module Bundler
       prune_git_and_path_cache(resolve)
     end
 
-    def clean
+    def clean(dry_run = false)
       gem_bins             = Dir["#{Gem.dir}/bin/*"]
       git_dirs             = Dir["#{Gem.dir}/bundler/gems/*"]
       git_cache_dirs       = Dir["#{Gem.dir}/cache/bundler/git/*"]
@@ -169,7 +169,7 @@ module Bundler
         version = parts.last
         output  = "#{name} (#{version})"
 
-        if Bundler.settings[:dry_run]
+        if dry_run
           Bundler.ui.info "Would have removed #{output}"
         else
           Bundler.ui.info "Removing #{output}"
@@ -185,7 +185,7 @@ module Bundler
         revision = parts[-1]
         output   = "#{name} (#{revision})"
 
-        if Bundler.settings[:dry_run]
+        if dry_run
           Bundler.ui.info "Would have removed #{output}"
         else
           Bundler.ui.info "Removing #{output}"
@@ -195,7 +195,7 @@ module Bundler
         output
       end
 
-      unless Bundler.settings[:dry_run]
+      unless dry_run
         stale_gem_bins.each { |bin| FileUtils.rm(bin) if File.exists?(bin) }
         stale_gem_files.each { |file| FileUtils.rm(file) if File.exists?(file) }
         stale_gemspec_files.each { |file| FileUtils.rm(file) if File.exists?(file) }
