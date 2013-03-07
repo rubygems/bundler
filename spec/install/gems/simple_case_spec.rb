@@ -1,6 +1,43 @@
 require "spec_helper"
 
 describe "bundle install with gem sources" do
+  describe "with mirror settings" do
+
+    it 'configures mirrors' do
+      config("BUNDLE_MIRROR__HTTPS://RUBYGEMS.ORG" => "file://repo1/",
+             "BUNDLE_MIRROR__HTTP://RUBYGEMS.ORG/" => "file://repo2",
+             "BUNDLE_MIRROR__HTTPS://RUBYGEMS.ORG/" => "file://repo3/",
+             "BUNDLE_MIRROR__HTTP://RUBYGEMS.ORG" => "file://repo4")
+
+      gemfile # Bundler.settings needs a Gemfile
+
+      expect(Bundler::RubygemsMirror.to_uri('http://rubygems.org').to_s).to eq('file://repo4/')
+      expect(Bundler::RubygemsMirror.to_uri('https://rubygems.org/').to_s).to eq('file://repo3/')
+    end
+
+    it "creates a Gemfile.lock" do
+      config("BUNDLE_MIRROR__HTTPS://RUBYGEMS.ORG" => "file://#{gem_repo1}/")
+      install_gemfile <<-G
+        source 'https://rubygems.org'
+        gem "rack"
+      G
+
+      expect(bundled_app('Gemfile.lock')).to exist
+    end
+
+    it "should fail with wrong mirror" do
+      config("BUNDLE_MIRROR__HTTPS://RUBYGEMS.ORG" => "file://me.and.the.corner")
+      install_gemfile <<-G, :expect_err => true
+        source 'https://rubygems.org'
+        gem "rack"
+      G
+
+      expect(out).to match(/Could not fetch specs from file:\/\/me.and.the.corner/)
+      expect(bundled_app('Gemfile.lock')).to_not exist
+    end
+
+  end
+
   describe "the simple case" do
     it "prints output and returns if no dependencies are specified" do
       gemfile <<-G

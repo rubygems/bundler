@@ -1,4 +1,5 @@
 require 'bundler/vendored_persistent'
+require 'bundler/rubygems_mirror'
 
 module Bundler
 
@@ -56,8 +57,8 @@ module Bundler
     end
 
     def initialize(remote_uri)
-      @remote_uri = remote_uri
-      @public_uri = remote_uri.dup
+      @remote_uri = RubygemsMirror.to_uri(remote_uri)
+      @public_uri = @remote_uri.dup
       @public_uri.user, @public_uri.password = nil, nil # don't print these
       if USE_PERSISTENT
         @connection ||= Net::HTTP::Persistent.new 'bundler', :ENV
