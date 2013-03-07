@@ -22,6 +22,15 @@ module Bundler
           " sources and change 'https' to 'http'."
       end
     end
+    # This is the error raised when a source is HTTPS and OpenSSL didn't load
+    class SSLError < HTTPError
+      def initialize(msg = nil)
+        super msg || "Could not load OpenSSL.\n" \
+            "You must recompile Ruby with OpenSSL support or change the sources in your " \
+            "Gemfile from 'https' to 'http'. Instructions for compiling with OpenSSL " \
+            "using RVM are available at rvm.io/packages/openssl."
+      end
+    end
 
     class << self
       attr_accessor :disable_endpoint
@@ -62,13 +71,8 @@ module Bundler
       if defined?(OpenSSL::SSL)
         @connection = Net::HTTP::Persistent.new 'bundler', :ENV
       else
-        if @remote_uri.scheme == "https"
-          raise Bundler::HTTPError, "Could not load OpenSSL.\n" \
-            "You must recompile Ruby with OpenSSL support or change the sources in your " \
-            "Gemfile from 'https' to 'http'. Instructions for compiling with OpenSSL " \
-            "using RVM are available at rvm.io/packages/openssl."
-        end
         @connection ||= Net::HTTP.new(@remote_uri.host, @remote_uri.port)
+        raise SSLError if @remote_uri.scheme == "https"
       end
       @connection.read_timeout = API_TIMEOUT
 
