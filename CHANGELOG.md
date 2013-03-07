@@ -1,3 +1,9 @@
+## 1.3.2 (7 March 2013)
+
+Bugfixes:
+
+  - don't store --dry-run as a Bundler setting
+
 ## 1.3.1 (3 March 2013)
 
 Bugfixes:
