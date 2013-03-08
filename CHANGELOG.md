@@ -1,3 +1,9 @@
+## 1.3.3
+
+Bugfixes:
+
+  -  use YAML.dump over {}.to_yaml for better forwards compat
+
 ## 1.3.2 (7 March 2013)
 
 Features:
