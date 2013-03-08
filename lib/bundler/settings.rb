@@ -126,7 +126,7 @@ module Bundler
         hash.delete(key) if value.nil?
         FileUtils.mkdir_p(file.dirname)
         require 'bundler/psyched_yaml'
-        File.open(file, "w") { |f| f.puts hash.to_yaml }
+        File.open(file, "w") { |f| f.puts YAML.dump(hash) }
       end
       value
     end
