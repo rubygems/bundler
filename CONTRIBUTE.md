@@ -6,7 +6,7 @@ You can start learning about Bundler by reading [the documentation](http://gembu
 
 ## Core Team
 
-The Bundler core team consists of André Arko ([@indirect](http://github.com/indirect)) and Terence Lee ([@hone](http://github.com/hone)), with support and advice from original Bundler author Yehuda Katz ([@wycats](http://github.com/wycats)).
+The Bundler core team consists of André Arko ([@indirect](http://github.com/indirect)), Terence Lee ([@hone](http://github.com/hone)), and Jessica Lynn Suttles ([@jlsuttles](http://github.com/jlsuttles)), with support and advice from original Bundler author Yehuda Katz ([@wycats](http://github.com/wycats)).
 
 # Adding new features
 
