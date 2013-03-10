@@ -92,6 +92,7 @@ module Gem
   end
 
   class Dependency
+    require 'digest/sha2'
     attr_accessor :source, :groups
 
     alias eql? ==
@@ -113,6 +114,11 @@ module Gem
         out << " (#{reqs.join(', ')})"
       end
       out
+    end
+
+    def to_checksum
+      spec = to_spec
+      "#{spec.full_name}:#{Digest::SHA256.hexdigest(File.read(spec.cache_file))}"
     end
 
     def all_deps(dep = self)

@@ -281,6 +281,16 @@ module Bundler
 
     def checksum(file)
       contents = ""
+      handled = []
+      dependencies.map {|d|
+        d.all_deps(d) }.flatten.
+        sort_by { |d| d.to_s }.
+        each do |dep|
+          next if handled.include?(dep.name)
+          contents << dep.to_checksum
+          contents << "\n"
+          handled << dep.name
+      end
 
       File.open(file, 'wb'){|f| f.puts(contents) }
     rescue Errno::EACCES
@@ -288,6 +298,9 @@ module Bundler
         "There was an error while trying to write to Gemfile.lock.asc. It is likely that \n" \
         "you need to allow write permissions for the file at path: \n" \
         "#{File.expand_path(file)}"
+    end
+
+    def to_checksum
     end
 
     def ensure_equivalent_gemfile_and_lockfile(explicit_flag = false)

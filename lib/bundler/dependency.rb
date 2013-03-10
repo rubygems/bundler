@@ -79,6 +79,10 @@ module Bundler
       out << "\n"
     end
 
+    def to_checksum
+      out = super
+    end
+
   private
 
     def on_18?

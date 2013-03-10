@@ -340,14 +340,32 @@ describe "bundle install with gem sources" do
   end
 
   context "Gemfile.lock.asc" do
+    require 'digest/sha2'
+
     it "creates a Gemfile.lock.asc" do
-      install_gemfile(<<-G)
+      gemfile(<<-G)
         source "file://#{gem_repo1}"
 
-        gem 'foo'
+        gem 'thin'
       G
 
+      bundle "install --path vendor/bundle"
+
+      ruby_version = Bundler::SystemRubyVersion.new
+      ruby_abi     = RbConfig::CONFIG['ruby_version']
+      cache_dir    = "vendor/bundle/#{ruby_version.engine}/#{ruby_abi}/cache"
+      hashes       = {}
+      ['thin-1.0', 'rack-1.0.0'].each do |gem|
+        hashes[gem] = Digest::SHA256.hexdigest(File.read(bundled_app("#{cache_dir}/#{gem}.gem")))
+      end
+
       expect(bundled_app("Gemfile.lock.asc")).to exist
+
+      contents = File.read(bundled_app("Gemfile.lock.asc")).split("\n")
+      contents.each do |line|
+        gem, checksum = line.split(":")
+        expect(hashes[gem]).to eq(checksum)
+      end
     end
 
     context "on empty Gemfile" do
