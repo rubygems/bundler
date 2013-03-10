@@ -115,6 +115,17 @@ module Gem
       out
     end
 
+    def all_deps(dep = self)
+      deps = dep.to_spec.dependencies.select {|d| d.type == :runtime }
+
+      if deps.any?
+        result = [dep] + deps.map {|d| all_deps(d) }
+        dep == self ? result.flatten.uniq : result
+      else
+        dep
+      end
+    end
+
     # Backport of performance enhancement added to Rubygems 1.4
     def matches_spec?(spec)
       # name can be a Regexp, so use ===
