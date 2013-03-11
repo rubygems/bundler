@@ -357,6 +357,21 @@ RAKEFILE
       it "creates a default test which fails" do
         expect(bundled_app("test-gem/test/test_test/gem.rb").read).to match(/assert false/)
       end
+
+      it "creates a default rake task to run test suite" do
+        rakefile = <<-RAKEFILE
+require "bundler/gem_tasks"
+require "rake/testtask"
+
+Rake::TestTask.new :test do |t|
+  t.libs << 'test'
+end
+
+task default: :test
+RAKEFILE
+
+        expect(bundled_app("test-gem/Rakefile").read).to eq(rakefile)
+      end
     end
 
     context "--test with no arguments" do
