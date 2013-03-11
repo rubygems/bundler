@@ -468,7 +468,7 @@ module Bundler
           hash[source] = fetch_specs(source, "specs")
 
           pres = fetch_specs(source, "prerelease_specs")
-          hash[source] << pres if pres && pres.any?
+          hash[source].push(*pres) if pres && !pres.empty?
         end
 
         hash
