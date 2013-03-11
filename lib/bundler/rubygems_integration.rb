@@ -455,7 +455,7 @@ module Bundler
         Bundler.load_marshal(string)
       rescue Gem::RemoteFetcher::FetchError => e
         # it's okay for prerelease to fail
-        raise e unless path == "prerelease_specs"
+        raise e unless name == "prerelease_specs"
       end
 
       def fetch_all_remote_specs
