@@ -1,3 +1,7 @@
+# 1.3.4
+
+  - add Gem::Specification#bindir to gemspec.tt so that users can change their executables dir easily
+
 ## 1.3.3
 
 Bugfixes:
