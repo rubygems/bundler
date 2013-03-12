@@ -70,6 +70,25 @@ describe "Bundler.with_env helpers" do
         expect(`echo $BUNDLE_PATH`.strip).to eq('./Gemfile')
       end
     end
+
+    it "should preserve the outer env when running in a sub process" do
+      require "json"
+
+      gemfile ""
+      bundle "install --path vendor/bundle"
+
+      code = <<-end_code.gsub($/, ";")
+        require "json"
+
+        Bundler.with_original_env do
+          print ENV.to_hash.to_json
+        end
+      end_code
+
+      subprocess_env = JSON.parse(bundle("exec ruby -e #{code.inspect}"))
+      expect(subprocess_env).to eq(Bundler::ORIGINAL_ENV.to_hash)
+    end
+
   end
 
   describe "Bundler.clean_system" do
