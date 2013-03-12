@@ -17,8 +17,12 @@ describe "Bundler.with_env helpers" do
   around do |example|
     env = Bundler::ORIGINAL_ENV.dup
     Bundler::ORIGINAL_ENV['BUNDLE_PATH'] = "./Gemfile"
+    ENV["_BUNDLER_ORIGINAL_ENV"] = Base64.encode64(Marshal.dump(Bundler::ORIGINAL_ENV))
+
     example.run
+
     Bundler::ORIGINAL_ENV.replace env
+    ENV["_BUNDLER_ORIGINAL_ENV"] = Base64.encode64(Marshal.dump(Bundler::ORIGINAL_ENV))
   end
 
   describe "Bundler.with_clean_env" do
@@ -40,6 +44,7 @@ describe "Bundler.with_env helpers" do
     it "should not pass any bundler environment variables" do
       Bundler.with_clean_env do
         expect(`echo $BUNDLE_PATH`.strip).not_to eq('./Gemfile')
+        expect(`echo $_BUNDLER_ORIGINAL_ENV`.strip).to eq('')
       end
     end
 
