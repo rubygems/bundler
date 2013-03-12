@@ -2,11 +2,11 @@ require "spec_helper"
 
 describe "Bundler.with_env helpers" do
 
-  shared_examples_for "Bundler.with_*_env" do
+  shared_examples_for "Bundler.with_*_env" do |method|
     it "should reset and restore the environment" do
       gem_path = ENV['GEM_PATH']
 
-      Bundler.with_clean_env do
+      Bundler.send(method) do
         expect(`echo $GEM_PATH`.strip).not_to eq(gem_path)
       end
 
@@ -23,7 +23,7 @@ describe "Bundler.with_env helpers" do
 
   describe "Bundler.with_clean_env" do
 
-    it_should_behave_like "Bundler.with_*_env"
+    it_should_behave_like "Bundler.with_*_env", :with_clean_env
 
     it "should keep the original GEM_PATH even in sub processes" do
       gemfile ""
@@ -63,7 +63,7 @@ describe "Bundler.with_env helpers" do
 
   describe "Bundler.with_original_env" do
 
-    it_should_behave_like "Bundler.with_*_env"
+    it_should_behave_like "Bundler.with_*_env", :with_original_env
 
     it "should pass bundler environment variables set before Bundler was run" do
       Bundler.with_original_env do
