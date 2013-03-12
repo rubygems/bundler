@@ -77,20 +77,21 @@ describe "Bundler.with_env helpers" do
     end
 
     it "should preserve the outer env when running in a sub process" do
-      require "json"
+      require "base64"
 
       gemfile ""
       bundle "install --path vendor/bundle"
 
       code = <<-end_code.gsub($/, ";")
-        require "json"
+        require "base64"
 
         Bundler.with_original_env do
-          print ENV.to_hash.to_json
+          print Base64.encode64(Marshal.dump(ENV.to_hash))
         end
       end_code
 
-      subprocess_env = JSON.parse(bundle("exec ruby -e #{code.inspect}"))
+      env_data = bundle "exec ruby -e #{code.inspect}"
+      subprocess_env = Marshal.load(Base64.decode64(env_data))
       expect(subprocess_env).to eq(Bundler::ORIGINAL_ENV.to_hash)
     end
 
