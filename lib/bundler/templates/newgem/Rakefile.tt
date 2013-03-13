@@ -2,8 +2,8 @@ require "bundler/gem_tasks"
 <% if config[:test] == 'minitest' -%>
 require "rake/testtask"
 
-Rake::TestTask.new :test do |t|
-  t.libs << 'test'
+Rake::TestTask.new(:test) do |t|
+  t.libs << "lib" << "test"
 end
 
 task default: :test
