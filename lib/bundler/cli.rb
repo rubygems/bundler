@@ -259,7 +259,8 @@ module Bundler
         Bundler.ui.confirm "Use `bundle show [gemname]` to see where a bundled gem is installed."
       end
       Installer.post_install_messages.to_a.each do |name, msg|
-        Bundler.ui.confirm "Post-install message from #{name}:\n#{msg}"
+        Bundler.ui.confirm "Post-install message from #{name}:"
+        Bundler.ui.info msg
       end
 
       clean if Bundler.settings[:clean] && Bundler.settings[:path]
