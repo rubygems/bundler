@@ -79,6 +79,10 @@ module Bundler
       out << "\n"
     end
 
+    def to_spec
+      Bundler.definition.specs[name].sort_by(&:version).last
+    end
+
   private
 
     def on_18?
