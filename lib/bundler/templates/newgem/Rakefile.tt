@@ -6,5 +6,5 @@ Rake::TestTask.new(:test) do |t|
   t.libs << "lib" << "test"
 end
 
-task default: :test
+task :default => :test
 <% end -%>
