@@ -251,13 +251,13 @@ module Bundler
       if Bundler.settings[:path]
         absolute_path = File.expand_path(Bundler.settings[:path])
         relative_path = absolute_path.sub(File.expand_path('.'), '.')
-        Bundler.ui.confirm without_groups_message.to_s +
-          "Your bundle is complete!\n" +
-          "It was installed into #{relative_path}"
+        Bundler.ui.confirm "Your bundle is complete!"
+        Bundler.ui.confirm without_groups_message if Bundler.settings.without.any?
+        Bundler.ui.confirm "It was installed into #{relative_path}"
       else
-        Bundler.ui.confirm use_budle_show_message +
-          without_groups_message.to_s +
-          "Your bundle is complete!"
+        Bundler.ui.confirm "Your bundle is complete!"
+        Bundler.ui.confirm without_groups_message if Bundler.settings.without.any?
+        Bundler.ui.confirm "Use `bundle show [gemname]` to see where a bundled gem is installed."
       end
       Installer.post_install_messages.to_a.each do |name, msg|
         Bundler.ui.confirm "Post-install message from #{name}:\n#{msg}"
@@ -318,9 +318,8 @@ module Bundler
       Installer.install Bundler.root, Bundler.definition, opts
       Bundler.load.cache if Bundler.root.join("vendor/cache").exist?
       clean if Bundler.settings[:clean] && Bundler.settings[:path]
-      Bundler.ui.confirm use_budle_show_message +
-        without_groups_message.to_s +
-        "Your bundle is updated!"
+      Bundler.ui.confirm "Your bundle is updated!"
+      Bundler.ui.confirm without_groups_message if Bundler.settings.without.any?
     end
 
     desc "show [GEM]", "Shows all gems that are part of the bundle, or the path to a given gem"
@@ -863,13 +862,11 @@ module Bundler
     end
 
     def without_groups_message
-      if Bundler.settings.without.any?
-        "Skipped groups for this bundle are: #{Bundler.settings.without.join(' ')}.\n"
-      end
-    end
-
-    def use_budle_show_message
-      "Use `bundle show [gemname]` to see where a bundled gem is installed.\n"
+      groups = Bundler.settings.without
+      group_list = [groups[0...-1].join(", "), groups[-1]].
+        reject{|s| s.empty? }.join(" and ")
+      group_str = (groups.size == 1) ? "group" : "groups"
+      "Gems in the #{group_str} #{group_list} were not installed."
     end
 
   end
