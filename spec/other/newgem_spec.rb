@@ -175,7 +175,7 @@ RAKEFILE
       end
 
       it "requires 'minitest_helper'" do
-        expect(bundled_app("test_gem/test/test_test_gem.rb").read).to match(/require '.\/minitest_helper'/)
+        expect(bundled_app("test_gem/test/test_test_gem.rb").read).to match(/require 'minitest_helper'/)
       end
 
       it "creates a default test which fails" do
@@ -351,7 +351,7 @@ RAKEFILE
       end
 
       it "requires 'minitest_helper'" do
-        expect(bundled_app("test-gem/test/test_test/gem.rb").read).to match(/require '.\/minitest_helper'/)
+        expect(bundled_app("test-gem/test/test_test/gem.rb").read).to match(/require 'minitest_helper'/)
       end
 
       it "creates a default test which fails" do

@@ -700,7 +700,9 @@ module Bundler
       template(File.join("newgem/lib/newgem.rb.tt"),         File.join(target, "lib/#{namespaced_path}.rb"),           opts)
       template(File.join("newgem/lib/newgem/version.rb.tt"), File.join(target, "lib/#{namespaced_path}/version.rb"),   opts)
       if options[:bin]
-        template(File.join("newgem/bin/newgem.tt"),          File.join(target, 'bin', name),                           opts)
+        bin_dest = File.join(target, 'bin', name)
+        template(File.join("newgem/bin/newgem.tt"),          bin_dest,                                                 opts)
+        `chmod +x #{bin_dest}`
       end
       case options[:test]
       when 'rspec'
