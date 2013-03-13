@@ -169,11 +169,10 @@ module Bundler
       "Use the rubygems modern index instead of the API endpoint"
     method_option "clean", :type => :boolean, :banner =>
       "Run bundle clean automatically after install"
-    unless Bundler.rubygems.security_policies.empty?
-      method_option "trust-policy", :alias => "P", :type => :string, :banner =>
-        "Gem trust policy (like gem install -P). Must be one of " + Bundler.rubygems.security_policies.keys.join('|')
-    end
-
+    method_option "trust-policy", :alias => "P", :type => :string, :banner =>
+      "Gem trust policy (like gem install -P). Must be one of " +
+        Bundler.rubygems.security_policies.keys.join('|') unless
+        Bundler.rubygems.security_policies.empty?
     def install
       opts = options.dup
       if opts[:without]
