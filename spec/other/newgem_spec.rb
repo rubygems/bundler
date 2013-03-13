@@ -367,7 +367,7 @@ Rake::TestTask.new :test do |t|
   t.libs << 'test'
 end
 
-task default: :test
+task :default => :test
 RAKEFILE
 
         expect(bundled_app("test-gem/Rakefile").read).to eq(rakefile)
