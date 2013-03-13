@@ -332,6 +332,19 @@ RAKEFILE
       it "creates a default test which fails" do
         expect(bundled_app("test-gem/spec/test/gem_spec.rb").read).to match(/false.should be_true/)
       end
+
+      it "creates a default rake task to run test suite" do
+        rakefile = <<-RAKEFILE
+require "bundler/gem_tasks"
+require 'rspec/core/rake_task'
+
+RSpec::Core::RakeTask.new(:spec)
+
+task :default => :spec
+RAKEFILE
+
+        expect(bundled_app("test-gem/Rakefile").read).to eq(rakefile)
+      end
     end
 
     context "--test parameter set to minitest" do
@@ -356,6 +369,21 @@ RAKEFILE
 
       it "creates a default test which fails" do
         expect(bundled_app("test-gem/test/test_test/gem.rb").read).to match(/assert false/)
+      end
+
+      it "creates a default rake task to run test suite" do
+        rakefile = <<-RAKEFILE
+require "bundler/gem_tasks"
+require "rake/testtask"
+
+Rake::TestTask.new :test do |t|
+  t.libs << 'test'
+end
+
+task :default => :test
+RAKEFILE
+
+        expect(bundled_app("test-gem/Rakefile").read).to eq(rakefile)
       end
     end
 
