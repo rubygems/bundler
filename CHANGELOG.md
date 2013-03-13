@@ -2,11 +2,14 @@
 
 Features:
 
+  - compatible with Rubygems 2.0.2 (higher and lower already work)
   - mention skipped groups in bundle install and bundle update output (@simi)
+  - `gem` creates rake tasks for minitest (@coop) and rspec
 
 Bugfixes:
 
-  -  use YAML.dump over {}.to_yaml for better forwards compat
+  - require rbconfig for standalone mode
+  - revert to working quoting of RUBYOPT on Windows (@ogra)
 
 ## 1.3.2 (7 March 2013)
 
