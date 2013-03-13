@@ -1,5 +1,4 @@
 require "bundler/gem_tasks"
-<% if config[:test] == 'minitest' -%>
 require "rake/testtask"
 
 Rake::TestTask.new :test do |t|
@@ -7,4 +6,3 @@ Rake::TestTask.new :test do |t|
 end
 
 task :default => :test
-<% end -%>

@@ -681,6 +681,7 @@ module Bundler
       constant_array = constant_name.split('::')
       git_user_name = `git config user.name`.chomp
       git_user_email = `git config user.email`.chomp
+      test_framework = options[:test] || 'no_test'
       opts = {
         :name            => name,
         :namespaced_path => namespaced_path,
@@ -691,28 +692,28 @@ module Bundler
         :test            => options[:test]
       }
       gemspec_dest = File.join(target, "#{name}.gemspec")
-      template(File.join("newgem/Gemfile.tt"),               File.join(target, "Gemfile"),                             opts)
-      template(File.join("newgem/Rakefile.tt"),              File.join(target, "Rakefile"),                            opts)
-      template(File.join("newgem/LICENSE.txt.tt"),           File.join(target, "LICENSE.txt"),                         opts)
-      template(File.join("newgem/README.md.tt"),             File.join(target, "README.md"),                           opts)
-      template(File.join("newgem/gitignore.tt"),             File.join(target, ".gitignore"),                          opts)
-      template(File.join("newgem/newgem.gemspec.tt"),        gemspec_dest,                                             opts)
-      template(File.join("newgem/lib/newgem.rb.tt"),         File.join(target, "lib/#{namespaced_path}.rb"),           opts)
-      template(File.join("newgem/lib/newgem/version.rb.tt"), File.join(target, "lib/#{namespaced_path}/version.rb"),   opts)
+      template(File.join("newgem/Gemfile.tt"),                    File.join(target, "Gemfile"),                           opts)
+      template(File.join("newgem/Rakefile_#{test_framework}.tt"), File.join(target, "Rakefile"),                          opts)
+      template(File.join("newgem/LICENSE.txt.tt"),                File.join(target, "LICENSE.txt"),                       opts)
+      template(File.join("newgem/README.md.tt"),                  File.join(target, "README.md"),                         opts)
+      template(File.join("newgem/gitignore.tt"),                  File.join(target, ".gitignore"),                        opts)
+      template(File.join("newgem/newgem.gemspec.tt"),             gemspec_dest,                                           opts)
+      template(File.join("newgem/lib/newgem.rb.tt"),              File.join(target, "lib/#{namespaced_path}.rb"),         opts)
+      template(File.join("newgem/lib/newgem/version.rb.tt"),      File.join(target, "lib/#{namespaced_path}/version.rb"), opts)
       if options[:bin]
-        template(File.join("newgem/bin/newgem.tt"),          File.join(target, 'bin', name),                           opts)
+        template(File.join("newgem/bin/newgem.tt"),               File.join(target, 'bin', name),                         opts)
       end
       case options[:test]
       when 'rspec'
-        template(File.join("newgem/rspec.tt"),               File.join(target, ".rspec"),                              opts)
-        template(File.join("newgem/spec/spec_helper.rb.tt"), File.join(target, "spec/spec_helper.rb"),                 opts)
-        template(File.join("newgem/spec/newgem_spec.rb.tt"), File.join(target, "spec/#{namespaced_path}_spec.rb"),     opts)
+        template(File.join("newgem/rspec.tt"),                    File.join(target, ".rspec"),                            opts)
+        template(File.join("newgem/spec/spec_helper.rb.tt"),      File.join(target, "spec/spec_helper.rb"),               opts)
+        template(File.join("newgem/spec/newgem_spec.rb.tt"),      File.join(target, "spec/#{namespaced_path}_spec.rb"),   opts)
       when 'minitest'
-        template(File.join("newgem/test/minitest_helper.rb.tt"), File.join(target, "test/minitest_helper.rb"),         opts)
-        template(File.join("newgem/test/test_newgem.rb.tt"),     File.join(target, "test/test_#{namespaced_path}.rb"), opts)
+        template(File.join("newgem/test/minitest_helper.rb.tt"),  File.join(target, "test/minitest_helper.rb"),           opts)
+        template(File.join("newgem/test/test_newgem.rb.tt"),      File.join(target, "test/test_#{namespaced_path}.rb"),   opts)
       end
       if options[:test]
-        template(File.join("newgem/.travis.yml.tt"),         File.join(target, ".travis.yml"),            opts)
+        template(File.join("newgem/.travis.yml.tt"),              File.join(target, ".travis.yml"),                       opts)
       end
       Bundler.ui.info "Initializating git repo in #{target}"
       Dir.chdir(target) { `git init`; `git add .` }
