@@ -68,7 +68,7 @@ module Bundler
       @remote_uri = remote_uri
       @public_uri = remote_uri.dup
       @public_uri.user, @public_uri.password = nil, nil # don't print these
-      if defined?(OpenSSL::SSL)
+      if defined?(OpenSSL::SSL) && defined?(Net::HTTP::Persistent)
         @connection = Net::HTTP::Persistent.new 'bundler', :ENV
         @connection.verify_mode = (Bundler.settings[:ssl_verify_mode] ||
           OpenSSL::SSL::VERIFY_PEER)
@@ -198,7 +198,7 @@ module Bundler
 
       begin
         Bundler.ui.debug "Fetching from: #{uri}"
-        if @connection.is_a?(Net::HTTP::Persistent)
+        if defined?(Net::HTTP::Persistent) && @connection.is_a?(Net::HTTP::Persistent)
           response = @connection.request(uri)
         else
           req = Net::HTTP::Get.new uri.request_uri
