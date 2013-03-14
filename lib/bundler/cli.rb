@@ -169,11 +169,10 @@ module Bundler
       "Use the rubygems modern index instead of the API endpoint"
     method_option "clean", :type => :boolean, :banner =>
       "Run bundle clean automatically after install"
-    unless Bundler.rubygems.security_policies.empty?
-      method_option "trust-policy", :alias => "P", :type => :string, :banner =>
-        "Gem trust policy (like gem install -P). Must be one of " + Bundler.rubygems.security_policies.keys.join('|')
-    end
-
+    method_option "trust-policy", :alias => "P", :type => :string, :banner =>
+      "Gem trust policy (like gem install -P). Must be one of " +
+        Bundler.rubygems.security_policies.keys.join('|') unless
+        Bundler.rubygems.security_policies.empty?
     def install
       opts = options.dup
       if opts[:without]
@@ -251,14 +250,17 @@ module Bundler
       if Bundler.settings[:path]
         absolute_path = File.expand_path(Bundler.settings[:path])
         relative_path = absolute_path.sub(File.expand_path('.'), '.')
-        Bundler.ui.confirm "Your bundle is complete! " +
-          "It was installed into #{relative_path}"
+        Bundler.ui.confirm "Your bundle is complete!"
+        Bundler.ui.confirm without_groups_message if Bundler.settings.without.any?
+        Bundler.ui.confirm "It was installed into #{relative_path}"
       else
-        Bundler.ui.confirm "Your bundle is complete! " +
-          "Use `bundle show [gemname]` to see where a bundled gem is installed."
+        Bundler.ui.confirm "Your bundle is complete!"
+        Bundler.ui.confirm without_groups_message if Bundler.settings.without.any?
+        Bundler.ui.confirm "Use `bundle show [gemname]` to see where a bundled gem is installed."
       end
       Installer.post_install_messages.to_a.each do |name, msg|
-        Bundler.ui.confirm "Post-install message from #{name}:\n#{msg}"
+        Bundler.ui.confirm "Post-install message from #{name}:"
+        Bundler.ui.info msg
       end
 
       clean if Bundler.settings[:clean] && Bundler.settings[:path]
@@ -316,8 +318,8 @@ module Bundler
       Installer.install Bundler.root, Bundler.definition, opts
       Bundler.load.cache if Bundler.root.join("vendor/cache").exist?
       clean if Bundler.settings[:clean] && Bundler.settings[:path]
-      Bundler.ui.confirm "Your bundle is updated! " +
-        "Use `bundle show [gemname]` to see where a bundled gem is installed."
+      Bundler.ui.confirm "Your bundle is updated!"
+      Bundler.ui.confirm without_groups_message if Bundler.settings.without.any?
     end
 
     desc "show [GEM]", "Shows all gems that are part of the bundle, or the path to a given gem"
@@ -857,6 +859,14 @@ module Bundler
       pager ||= 'less -R' if Bundler.which("less")
       pager ||= 'more' if Bundler.which("more")
       pager ||= 'cat'
+    end
+
+    def without_groups_message
+      groups = Bundler.settings.without
+      group_list = [groups[0...-1].join(", "), groups[-1]].
+        reject{|s| s.empty? }.join(" and ")
+      group_str = (groups.size == 1) ? "group" : "groups"
+      "Gems in the #{group_str} #{group_list} were not installed."
     end
 
   end

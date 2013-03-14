@@ -226,6 +226,7 @@ module Bundler
 
 
       File.open File.join(bundler_path, "setup.rb"), "w" do |file|
+        file.puts "require 'rbconfig'"
         file.puts "# ruby 1.8.7 doesn't define RUBY_ENGINE"
         file.puts "ruby_engine = defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby'"
         file.puts "ruby_version = RbConfig::CONFIG[\"ruby_version\"]"
