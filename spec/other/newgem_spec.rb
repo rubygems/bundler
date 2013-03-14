@@ -377,7 +377,7 @@ describe "bundle gem" do
           require "rake/testtask"
 
           Rake::TestTask.new(:test) do |t|
-            t.libs << "lib" << "test"
+            t.libs << "test"
           end
 
           task :default => :test
