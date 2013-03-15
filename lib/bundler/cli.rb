@@ -264,7 +264,7 @@ module Bundler
       end
 
       clean if Bundler.settings[:clean] && Bundler.settings[:path]
-    rescue GemNotFound => e
+    rescue GemNotFound, VersionConflict => e
       if opts[:local] && Bundler.app_cache.exist?
         Bundler.ui.warn "Some gems seem to be missing from your vendor/cache directory."
       end
