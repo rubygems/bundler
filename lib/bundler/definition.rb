@@ -208,8 +208,8 @@ module Bundler
       end
     end
 
-    def no_sources?
-      @sources.length == 1 && @sources.first.remotes.empty?
+    def rubygems_remotes
+      @sources.select{|s| s.is_a?(Source::Rubygems) }.map{|s| s.remotes }.flatten
     end
 
     def groups

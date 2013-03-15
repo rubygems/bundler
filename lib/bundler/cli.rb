@@ -269,7 +269,7 @@ module Bundler
         Bundler.ui.warn "Some gems seem to be missing from your vendor/cache directory."
       end
 
-      if Bundler.definition.no_sources?
+      if Bundler.definition.rubygems_remotes.empty?
         Bundler.ui.warn "Your Gemfile has no remote sources. If you need " \
           "gems that are not already on\nyour machine, add a line like this " \
           "to your Gemfile:\n    source 'https://rubygems.org'"
