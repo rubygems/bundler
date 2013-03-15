@@ -649,6 +649,8 @@ module Bundler
     method_option :requirements, :type => :boolean, :default => false, :aliases => '-r', :banner => "Set to show the version of each required dependency."
     method_option :format, :type => :string, :default => "png", :aliases => '-F', :banner => "This is output format option. Supported format is png, jpg, svg, dot ..."
     def viz
+      require 'graphviz'
+
       output_file = File.expand_path(options[:file])
       graph = Graph.new(Bundler.load, output_file, options[:version], options[:requirements], options[:format])
 
