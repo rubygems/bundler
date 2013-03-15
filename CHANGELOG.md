@@ -1,5 +1,9 @@
 ## 1.3.3
 
+Features:
+
+  - Encourage gem signing by adding the required fields in `bundle gem`
+
 Bugfixes:
 
   -  use YAML.dump over {}.to_yaml for better forwards compat
