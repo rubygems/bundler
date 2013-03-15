@@ -270,9 +270,11 @@ module Bundler
       end
 
       if Bundler.definition.rubygems_remotes.empty?
-        Bundler.ui.warn "Your Gemfile has no remote sources. If you need " \
-          "gems that are not already on\nyour machine, add a line like this " \
-          "to your Gemfile:\n    source 'https://rubygems.org'"
+        Bundler.ui.warn <<-WARN, :wrap => true
+          Your Gemfile has no Rubygems sources. If you need gems that are not \
+          already on your machine, add a line like this to your Gemfile:
+          source 'https://rubygems.org'
+        WARN
       end
       raise e
     end

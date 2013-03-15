@@ -110,8 +110,13 @@ module Bundler
         end
       end
 
+      def strip_leading_spaces(text)
+        spaces = text[/\A\s+/, 0]
+        spaces ? text.gsub(/#{spaces}/, '') : text
+      end
+
       def word_wrap(text, line_width = @shell.terminal_width)
-        text.split("\n").collect do |line|
+        strip_leading_spaces(text).split("\n").collect do |line|
           line.length > line_width ? line.gsub(/(.{1,#{line_width}})(\s+|$)/, "\\1\n").strip : line
         end * "\n"
       end
