@@ -1,3 +1,10 @@
+## 1.3.4 (15 March 2103)
+
+Bugfixes:
+
+  - load YAML on Rubygems version that define module YAML
+  - fix regression that broke --without on ruby 1.8.7
+
 ## 1.3.3 (13 March 2013)
 
 Features:
