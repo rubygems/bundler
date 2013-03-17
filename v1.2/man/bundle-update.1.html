@@ -105,7 +105,7 @@ based on the latest versions of all gems available in the sources.</p>
 
 <p>Consider the following <a class="man-ref" href="gemfile.5.html">Gemfile<span class="s">(5)</span></a>:</p>
 
-<pre><code>source "http://rubygems.org"
+<pre><code>source "https://rubygems.org"
 
 gem "rails", "3.0.0.rc"
 gem "nokogiri"
@@ -114,7 +114,7 @@ gem "nokogiri"
 <p>When you run <a href="bundle-install.1.html">bundle install(1)</a> the first time, bundler will resolve
 all of the dependencies, all the way down, and install what you need:</p>
 
-<pre><code>Fetching source index for http://rubygems.org/
+<pre><code>Fetching source index for https://rubygems.org/
 Installing rake (10.0.2)
 Installing abstract (1.0.0)
 Installing activesupport (3.0.0.rc)
@@ -180,7 +180,7 @@ its dependencies.</p>
 second-level dependency. For instance, consider the case of <code>thin</code> and
 <code>rack-perftools-profiler</code>.</p>
 
-<pre><code>source "http://rubygems.org"
+<pre><code>source "https://rubygems.org"
 
 gem "thin"
 gem "rack-perftools-profiler"
@@ -189,7 +189,7 @@ gem "rack-perftools-profiler"
 <p>The <code>thin</code> gem depends on <code>rack &gt;= 1.0</code>, while <code>rack-perftools-profiler</code> depends
 on <code>rack ~&gt; 1.0</code>. If you run bundle install, you get:</p>
 
-<pre><code>Fetching source index for http://rubygems.org/
+<pre><code>Fetching source index for https://rubygems.org/
 Installing daemons (1.1.0)
 Installing eventmachine (0.12.10) with native extensions
 Installing open4 (1.0.1)
@@ -253,7 +253,7 @@ still match the gems listed in the <a class="man-ref" href="gemfile.5.html">Gemf
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'></li>
-    <li class='tc'>February 2013</li>
+    <li class='tc'>March 2013</li>
     <li class='tr'>bundle-update(1)</li>
   </ol>
 

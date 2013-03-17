@@ -93,7 +93,8 @@ setting, and where it was set.</p>
 
 <p>Executing <code>bundle config &lt;name> &lt;value></code> will set that configuration to the
 value specified for all bundles executed as the current user. The configuration
-will be stored in <code>~/.bundle/config</code>.</p>
+will be stored in <code>~/.bundle/config</code>. If <var>name</var> already is set, <var>name</var> will be
+overridden and user will be warned.</p>
 
 <p>Executing <code>bundle config --global &lt;name> &lt;value></code> works the same as above.</p>
 
@@ -101,7 +102,10 @@ will be stored in <code>~/.bundle/config</code>.</p>
 the local application. The configuration will be stored in <code>app/.bundle/config</code>.</p>
 
 <p>Executing <code>bundle config --delete &lt;name></code> will delete the configuration in both
-local and global sources.</p>
+local and global sources. Not compatible with --global or --local flag.</p>
+
+<p>Executing bundle with the <code>BUNDLE_IGNORE_CONFIG</code> environment variable set will
+cause it to ignore all configuration.</p>
 
 <h2 id="BUILD-OPTIONS">BUILD OPTIONS</h2>
 
@@ -206,7 +210,7 @@ forces you to fetch the latest changes in the remotes.</p>
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'></li>
-    <li class='tc'>February 2013</li>
+    <li class='tc'>March 2013</li>
     <li class='tr'>bundle-config(1)</li>
   </ol>
 

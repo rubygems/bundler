@@ -94,11 +94,12 @@ a number of methods used to describe the gem requirements.</p>
 <p>At the top of the <code>Gemfile</code>, add one line for each <code>Rubygems</code> source that
 might contain the gems listed in the <code>Gemfile</code>.</p>
 
-<pre><code>source "http://rubygems.org"
+<pre><code>source "https://rubygems.org"
 source "http://gems.github.com"
 </code></pre>
 
-<p>Each of these _source_s <code>MUST</code> be a valid Rubygems repository.</p>
+<p>Each of these _source_s <code>MUST</code> be a valid Rubygems repository. Sources are
+checked for gems following the heuristics described in <a href="#SOURCE-PRIORITY" title="SOURCE PRIORITY" data-bare-link="true">SOURCE PRIORITY</a>.</p>
 
 <h2 id="RUBY-ruby-">RUBY (#ruby)</h2>
 
@@ -225,15 +226,18 @@ platforms.</p>
 <dt class="flush"><code>ruby</code></dt><dd>C Ruby (MRI) or Rubinius, but <code>NOT</code> Windows</dd>
 <dt class="flush"><code>ruby_18</code></dt><dd><em>ruby</em> <code>AND</code> version 1.8</dd>
 <dt class="flush"><code>ruby_19</code></dt><dd><em>ruby</em> <code>AND</code> version 1.9</dd>
+<dt class="flush"><code>ruby_20</code></dt><dd><em>ruby</em> <code>AND</code> version 2.0</dd>
 <dt class="flush"><code>mri</code></dt><dd>Same as <em>ruby</em>, but not Rubinius</dd>
 <dt class="flush"><code>mri_18</code></dt><dd><em>mri</em> <code>AND</code> version 1.8</dd>
 <dt class="flush"><code>mri_19</code></dt><dd><em>mri</em> <code>AND</code> version 1.9</dd>
+<dt class="flush"><code>mri_20</code></dt><dd><em>mri</em> <code>AND</code> version 2.0</dd>
 <dt class="flush"><code>rbx</code></dt><dd>Same as <em>ruby</em>, but only Rubinius (not MRI)</dd>
 <dt class="flush"><code>jruby</code></dt><dd>JRuby</dd>
 <dt class="flush"><code>mswin</code></dt><dd>Windows</dd>
 <dt class="flush"><code>mingw</code></dt><dd>Windows 'mingw32' platform (aka RubyInstaller)</dd>
 <dt><code>mingw_18</code></dt><dd><em>mingw</em> <code>AND</code> version 1.8</dd>
 <dt><code>mingw_19</code></dt><dd><em>mingw</em> <code>AND</code> version 1.9</dd>
+<dt><code>mingw_20</code></dt><dd><em>mingw</em> <code>AND</code> version 2.0</dd>
 </dl>
 
 
@@ -413,7 +417,7 @@ from last added to first added.</li>
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'></li>
-    <li class='tc'>February 2013</li>
+    <li class='tc'>March 2013</li>
     <li class='tr'>Gemfile(5)</li>
   </ol>
 
