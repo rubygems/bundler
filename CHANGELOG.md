@@ -1,3 +1,9 @@
+## 1.3.5
+
+Bugfixes:
+
+  - update local overrides with orphaned revisions (@jamesferguson)
+
 ## 1.3.4 (15 March 2103)
 
 Bugfixes:
