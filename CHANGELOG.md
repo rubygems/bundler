@@ -118,6 +118,7 @@ Features:
   - `binstubs` lists child gem bins if a gem has no binstubs
   - `bundle gem --edit` will open the new gemspec (@ndbroadbent)
   - `bundle gem --test rspec` now makes working tests (@tricknotes)
+  - `bundle env` prints info about bundler's environment (@peeja)
   - add `BUNDLE_IGNORE_CONFIG` environment variable support (@richo)
 
 Bugfixes:
