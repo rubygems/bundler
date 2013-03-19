@@ -202,6 +202,7 @@ module Bundler
           response = @connection.request(uri)
         else
           req = Net::HTTP::Get.new uri.request_uri
+          req.basic_auth(uri.user, uri.password) if uri.user
           response = @connection.request(req)
         end
       rescue OpenSSL::SSL::SSLError
