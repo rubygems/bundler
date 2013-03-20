@@ -63,7 +63,6 @@
     <a href="#REMEMBERED-OPTIONS">REMEMBERED OPTIONS</a>
     <a href="#THE-GEMFILE-LOCK">THE GEMFILE.LOCK</a>
     <a href="#CONSERVATIVE-UPDATING">CONSERVATIVE UPDATING</a>
-    <a href="#SEE-ALSO">SEE ALSO</a>
   </div>
 
   <ol class='man-decor man-head man head'>
@@ -85,9 +84,6 @@
              [--without=GROUP1[ GROUP2...]]
              [--local] [--deployment]
              [--binstubs[=DIRECTORY]]
-             [--standalone[=GROUP1[ GROUP2...]]]
-             [--trust-policy=POLICY]
-             [--no-cache]
              [--quiet]
 </code></pre>
 
@@ -125,7 +121,10 @@ gems to. This means that, by default, gems installed without a
 overrides any previous <a href="#REMEMBERED-OPTIONS" title="REMEMBERED OPTIONS" data-bare-link="true">remembered</a> use of
 <code>--path</code>.</p></dd>
 <dt><code>--without=&lt;list></code></dt><dd><p>A space-separated list of groups to skip installing. This is a
-<a href="#REMEMBERED-OPTIONS" title="REMEMBERED OPTIONS" data-bare-link="true">remembered option</a>.</p></dd>
+<a href="#REMEMBERED-OPTIONS" title="REMEMBERED OPTIONS" data-bare-link="true">remembered option</a>. Subsequent use of <code>--without</code>
+replaces the list of of groups that will be skipped. To totally
+clear the list of groups to be skipped (include all groups),
+specify <code>--without ''</code>.</p></dd>
 <dt class="flush"><code>--local</code></dt><dd><p>Do not attempt to connect to <code>rubygems.org</code>, instead using just
 the gems already present in Rubygems' cache or in <code>vendor/cache</code>.
 Note that if a more appropriate platform-specific gem exists on
@@ -137,21 +136,6 @@ that runs in the context of the bundle. For instance, if the
 <code>rails</code> gem comes with a <code>rails</code> executable, this flag will create
 a <code>bin/rails</code> executable that ensures that all dependencies used
 come from the bundled gems.</p></dd>
-<dt><code>--shebang ruby-install-name</code></dt><dd><p>Uses the ruby executable (usually <code>ruby</code>) provided to execute the scripts created
-with --binstubs. For instance, if you use --binstubs with <code>--shebang jruby</code>,
-all executables will be created to use jruby instead.</p></dd>
-<dt><code>--standalone[=&lt;list>]</code></dt><dd><p>Make a bundle that can work without Ruby Gems or Bundler at runtime.
-It takes a space separated list of groups to install. It creates a
-<code>bundle</code> directory and installs the bundle there. It also generates
-a <code>bundle/bundler/setup.rb</code> file to replace Bundler's own setup.</p></dd>
-<dt><code>--trust-policy=[&lt;policy>]</code></dt><dd><p>Apply the Rubygems security policy named <var>policy</var>, where policy is one of
-HighSecurity, MediumSecurity, LowSecurity, or NoSecurity. For more detail,
-see the Rubygems signing documentation, linked below in <a href="#SEE-ALSO" title="SEE ALSO" data-bare-link="true">SEE ALSO</a>.</p></dd>
-<dt><code>--no-cache</code></dt><dd><p>Do not update the cache in <code>vendor/cache</code> with the newly bundled gems. This
-does not remove any existing cached gems, only stops the newly bundled gems
-from being cached during the install.</p></dd>
-<dt class="flush"><code>--quiet</code></dt><dd><p>Do not print progress information to stdout. Instead, communicate the
-success of the install operation via exit status code.</p></dd>
 </dl>
 
 
@@ -254,7 +238,7 @@ third-party code being used in different environments.</code></p>
 
 <p>For a simple illustration, consider the following <a class="man-ref" href="gemfile.5.html">Gemfile<span class="s">(5)</span></a>:</p>
 
-<pre><code>source "https://rubygems.org"
+<pre><code>source "http://rubygems.org"
 
 gem "sinatra"
 
@@ -347,7 +331,7 @@ same versions of all dependencies as it used before the update.</p>
 
 <p>Let's take a look at an example. Here's your original <a class="man-ref" href="gemfile.5.html">Gemfile<span class="s">(5)</span></a>:</p>
 
-<pre><code>source "https://rubygems.org"
+<pre><code>source "http://rubygems.org"
 
 gem "actionpack", "2.3.8"
 gem "activemerchant"
@@ -364,7 +348,7 @@ gems in your <a class="man-ref" href="gemfile.5.html">Gemfile<span class="s">(5)
 
 <p>Next, you modify your <a class="man-ref" href="gemfile.5.html">Gemfile<span class="s">(5)</span></a> to:</p>
 
-<pre><code>source "https://rubygems.org"
+<pre><code>source "http://rubygems.org"
 
 gem "actionpack", "3.0.0.rc"
 gem "activemerchant"
@@ -405,14 +389,6 @@ which other gems in the <a class="man-ref" href="gemfile.5.html">Gemfile<span cl
 should first try to run <code>bundle install</code>, which will guarantee that no
 other gems in the <a class="man-ref" href="gemfile.5.html">Gemfile<span class="s">(5)</span></a> are impacted by the change. If that
 does not work, run <a href="bundle-update.1.html">bundle update(1)</a>.</p>
-
-<h2 id="SEE-ALSO">SEE ALSO</h2>
-
-<ul>
-<li>Gem install docs: http://docs.rubygems.org/read/chapter/2</li>
-<li>Rubygems signing docs: http://docs.rubygems.org/read/chapter/21</li>
-</ul>
-
 
 
   <ol class='man-decor man-foot man foot'>
