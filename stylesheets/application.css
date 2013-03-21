@@ -1,33 +1,33 @@
-/* line 42, application.sass */
+/* line 43, application.sass */
 a {
   text-decoration: none;
   color: #0e3f54; }
   /* line 26, application.sass */
   a:hover {
     border-bottom: 1px solid; }
+  /* line 45, application.sass */
+  a.image {
+    text-decoration: none;
+    border: none; }
 
-/* line 45, application.sass */
+/* line 49, application.sass */
 #standalone {
   line-height: 150%; }
-  /* line 48, application.sass */
+  /* line 52, application.sass */
   #standalone code {
     background-color: rgba(0, 0, 0, 0.1); }
-  /* line 51, application.sass */
+  /* line 55, application.sass */
   #standalone h1 {
     margin-top: 40px;
     margin-bottom: 10px;
     line-height: 125%; }
 
-/* line 56, application.sass */
+/* line 60, application.sass */
 html {
   width: 100%;
   background-color: #c6e7ec;
   padding-top: 10px;
   font-family: Helvetica, sans-serif; }
-
-/* line 63, application.sass */
-img {
-  border: 0; }
 
 /* line 66, application.sass */
 code {
@@ -203,6 +203,11 @@ h2 {
     -moz-box-flex: 1; }
     /* line 39, application.sass */
     .buttons a:hover {
+      background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #4e9326), color-stop(100%, #35641a));
+      background-image: -webkit-linear-gradient(#4e9326, #35641a);
+      background-image: -moz-linear-gradient(#4e9326, #35641a);
+      background-image: -o-linear-gradient(#4e9326, #35641a);
+      background-image: linear-gradient(#4e9326, #35641a);
       border-bottom: none; }
     /* line 163, application.sass */
     .buttons a:last-child {
@@ -269,15 +274,13 @@ h2 {
     margin: 15px 0 0 450px; }
     /* line 39, application.sass */
     .bullet a:hover {
+      background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #4e9326), color-stop(100%, #35641a));
+      background-image: -webkit-linear-gradient(#4e9326, #35641a);
+      background-image: -moz-linear-gradient(#4e9326, #35641a);
+      background-image: -o-linear-gradient(#4e9326, #35641a);
+      background-image: linear-gradient(#4e9326, #35641a);
       border-bottom: none; }
   /* line 198, application.sass */
-  .bullet a:hover {
-    background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #4e9326), color-stop(100%, #35641a));
-    background-image: -webkit-linear-gradient(#4e9326, #35641a);
-    background-image: -moz-linear-gradient(#4e9326, #35641a);
-    background-image: -o-linear-gradient(#4e9326, #35641a);
-    background-image: linear-gradient(#4e9326, #35641a); }
-  /* line 201, application.sass */
   .bullet .how {
     display: -webkit-box;
     display: -moz-box;
@@ -288,16 +291,16 @@ h2 {
     -webkit-box-flex: 1;
     -moz-box-flex: 1;
     line-height: 24px; }
-  /* line 206, application.sass */
+  /* line 203, application.sass */
   .bullet pre {
     -webkit-box-flex: 1;
     -moz-box-flex: 1;
     margin: 0; }
-  /* line 210, application.sass */
+  /* line 207, application.sass */
   .bullet code {
     background-color: rgba(0, 0, 0, 0.1); }
 
-/* line 213, application.sass */
+/* line 210, application.sass */
 pre {
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
@@ -305,34 +308,34 @@ pre {
   -o-border-radius: 5px;
   border-radius: 5px; }
 
-/* line 216, application.sass */
+/* line 213, application.sass */
 .bullet:nth-child(even) {
   background-color: rgba(0, 0, 0, 0.1);
   border-top: 1px solid rgba(0, 0, 0, 0.1);
   border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
 
-/* line 221, application.sass */
+/* line 218, application.sass */
 .bullet:not(:nth-of-type(1)) {
   padding-top: 15px; }
 
-/* line 225, application.sass */
+/* line 222, application.sass */
 #credits p {
   text-align: center;
   font-size: 11pt;
   color: #668493; }
-  /* line 229, application.sass */
+  /* line 226, application.sass */
   #credits p a, #credits p a:visited {
     color: #2c596b;
     text-decoration: none; }
 
-/* line 234, application.sass */
+/* line 231, application.sass */
 #github img {
   position: absolute;
   top: 0;
   right: 0;
   border: 0; }
 
-/* line 253, application.sass */
+/* line 250, application.sass */
 #prod-versions {
   position: absolute;
   top: 0;
@@ -343,7 +346,7 @@ pre {
   -webkit-border-bottom-right-radius: 10px;
   border-bottom-right-radius: 10px;
   z-index: 1; }
-  /* line 247, application.sass */
+  /* line 244, application.sass */
   #prod-versions a {
     text-decoration: none;
     color: #0e3f54;
@@ -351,11 +354,11 @@ pre {
     /* line 26, application.sass */
     #prod-versions a:hover {
       border-bottom: 1px solid; }
-  /* line 250, application.sass */
+  /* line 247, application.sass */
   #prod-versions a.current {
     font-weight: bold; }
 
-/* line 256, application.sass */
+/* line 253, application.sass */
 #rc-versions {
   position: absolute;
   top: 0;
@@ -366,7 +369,7 @@ pre {
   -webkit-border-bottom-right-radius: 10px;
   border-bottom-right-radius: 10px;
   z-index: 0; }
-  /* line 247, application.sass */
+  /* line 244, application.sass */
   #rc-versions a {
     text-decoration: none;
     color: #0e3f54;
@@ -374,47 +377,48 @@ pre {
     /* line 26, application.sass */
     #rc-versions a:hover {
       border-bottom: 1px solid; }
-  /* line 250, application.sass */
+  /* line 247, application.sass */
   #rc-versions a.current {
     font-weight: bold; }
 
-/* line 260, application.sass */
+/* line 257, application.sass */
 #command_reference {
   padding-top: 20px; }
-  /* line 263, application.sass */
+  /* line 260, application.sass */
   #command_reference th {
     text-align: left;
     height: 30px;
     padding-left: 5px; }
-  /* line 268, application.sass */
+  /* line 265, application.sass */
   #command_reference td {
     vertical-align: top;
     padding: 20px 0 20px 5px; }
-    /* line 272, application.sass */
+    /* line 269, application.sass */
     #command_reference td .cli_name {
       padding-top: 5px;
       width: 400px; }
-    /* line 276, application.sass */
+    /* line 273, application.sass */
     #command_reference td .cli_desc {
       padding-top: 10px;
       width: 400px; }
-    /* line 280, application.sass */
+    /* line 277, application.sass */
     #command_reference td .cli_option {
       margin: 5px 7px 15px 0px;
       float: left; }
-    /* line 284, application.sass */
+    /* line 281, application.sass */
     #command_reference td .clear {
       clear: left; }
-  /* line 287, application.sass */
+  /* line 284, application.sass */
   #command_reference tr:nth-child(even) {
     background-color: rgba(0, 0, 0, 0.1);
     border-top: 1px solid rgba(0, 0, 0, 0.1);
     border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
-  /* line 292, application.sass */
+  /* line 289, application.sass */
   #command_reference a {
-    padding: 8px 5px 5px 5px;
-    margin: 5px 0 5px 0;
+    padding-top: 8px;
+    padding-bottom: 5px;
     text-decoration: none;
+    display: block;
     color: white;
     text-shadow: rgba(0, 0, 0, 0.3), 0, -1px, 0;
     text-align: center;
@@ -427,47 +431,51 @@ pre {
     -moz-border-radius: 5px;
     -ms-border-radius: 5px;
     -o-border-radius: 5px;
-    border-radius: 5px; }
-  /* line 302, application.sass */
-  #command_reference a:hover {
-    background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #4e9326), color-stop(100%, #35641a));
-    background-image: -webkit-linear-gradient(#4e9326, #35641a);
-    background-image: -moz-linear-gradient(#4e9326, #35641a);
-    background-image: -o-linear-gradient(#4e9326, #35641a);
-    background-image: linear-gradient(#4e9326, #35641a); }
+    border-radius: 5px;
+    padding: 8px 5px 5px 5px;
+    margin: 5px 0 5px 0;
+    display: inline; }
+    /* line 39, application.sass */
+    #command_reference a:hover {
+      background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #4e9326), color-stop(100%, #35641a));
+      background-image: -webkit-linear-gradient(#4e9326, #35641a);
+      background-image: -moz-linear-gradient(#4e9326, #35641a);
+      background-image: -o-linear-gradient(#4e9326, #35641a);
+      background-image: linear-gradient(#4e9326, #35641a);
+      border-bottom: none; }
 
-/* line 305, application.sass */
+/* line 295, application.sass */
 .shirts {
   text-align: center; }
-  /* line 309, application.sass */
+  /* line 299, application.sass */
   .shirts a, .shirts a:visited {
     color: #05b5e6;
     text-decoration: none;
     font-weight: bold; }
 
-/* line 314, application.sass */
+/* line 304, application.sass */
 .other-contributors {
   text-align: center; }
 
-/* line 317, application.sass */
+/* line 307, application.sass */
 .contributor {
   clear: left;
   margin: 1em 0; }
-  /* line 321, application.sass */
+  /* line 311, application.sass */
   .contributor .avatar {
     float: left;
     margin-right: 1.5em;
     width: 150px;
     min-height: 25px; }
-  /* line 327, application.sass */
+  /* line 317, application.sass */
   .contributor h3 {
     color: #0e3f54; }
-  /* line 330, application.sass */
+  /* line 320, application.sass */
   .contributor h4 {
     font-size: 80%;
     color: #124f6a;
     margin-top: -1em; }
-  /* line 335, application.sass */
+  /* line 325, application.sass */
   .contributor p {
     margin-left: 150px;
     padding-left: 1.5em; }
