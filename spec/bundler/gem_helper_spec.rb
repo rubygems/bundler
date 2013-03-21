@@ -185,8 +185,11 @@ describe "Bundler::GemHelper tasks" do
           `git init --bare`
         }
         Dir.chdir(@app) {
-         `git commit -a -m "another commit"`
-         `git tag -a -m \"Version 0.0.1\" v0.0.1`
+          `git init`
+          `git config user.email "you@example.com"`
+          `git config user.name "name"`
+          `git commit -a -m "another commit"`
+          `git tag -a -m \"Version 0.0.1\" v0.0.1`
         }
         @helper.release_gem
       end
