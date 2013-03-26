@@ -100,7 +100,7 @@ module Bundler
     private
 
       def app_cache_path
-        @app_cache_path ||= Bundler.app_cache.join(app_cache_dirname)
+        @app_cache_path ||= Bundler.install_path.join(app_cache_dirname)
       end
 
       def has_app_cache?
