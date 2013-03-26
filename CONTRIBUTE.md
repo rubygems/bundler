@@ -6,7 +6,7 @@ You can start learning about Bundler by reading [the documentation](http://gembu
 
 ## Core Team
 
-The Bundler core team consists of André Arko ([@indirect](http://github.com/indirect)) and Terence Lee ([@hone](http://github.com/hone)), with support and advice from original Bundler author Yehuda Katz ([@wycats](http://github.com/wycats)).
+The Bundler core team consists of André Arko ([@indirect](http://github.com/indirect)), Terence Lee ([@hone](http://github.com/hone)), and Jessica Lynn Suttles ([@jlsuttles](http://github.com/jlsuttles)), with support and advice from original Bundler author Yehuda Katz ([@wycats](http://github.com/wycats)).
 
 # Adding new features
 
@@ -71,7 +71,7 @@ Bundler has two main sources of documentation: the built-in help (including usag
 
 If you’d like to submit a patch to the man pages, follow the steps for adding a feature above. All of the man pages are located in the `man` directory. Just use the “Documentation” heading when you describe what you did in the changelog.
 
-If you have a suggestion or proposed change for [gembundler.com](http://gembundler.com), please open an issue or send a pull request to the [bundler-site](http://github.com/carlhuda/bundler-site) repository.
+If you have a suggestion or proposed change for [gembundler.com](http://gembundler.com), please open an issue or send a pull request to the [bundler-site-middleman](https://github.com/bundler/bundler-site-middleman) repository.
 
 
 # Community
@@ -80,7 +80,7 @@ Community is an important part of all we do. If you’d like to be part of the B
 
 It would be tremendously helpful to have more people answering questions about Bundler (and often simply about Rubygems or Ruby itself) in our [issue tracker](https://github.com/carlhuda/bundler/issues) or on [Stack Overflow](http://stackoverflow.com/questions/tagged/bundler).
 
-Additional documentation and explanation is always helpful, too. If you have any suggestions for the Bundler website [gembundler.com](http://www.gembundler.com), we would absolutely love it if you opened an issue or pull request on the [bundler-site repository](http://github.com/carlhuda/bundler-site).
+Additional documentation and explanation is always helpful, too. If you have any suggestions for the Bundler website [gembundler.com](http://www.gembundler.com), we would absolutely love it if you opened an issue or pull request on the [bundler-site-middleman](https://github.com/bundler/bundler-site-middleman) repository.
 
 Finally, sharing your experiences and discoveries by writing them up is a valuable way to help others who have similar problems or experiences in the future. You can write a blog post, create an example and commit it to Github, take screenshots, or make videos.
 
