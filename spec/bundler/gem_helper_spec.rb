@@ -50,44 +50,26 @@ describe "Bundler::GemHelper tasks" do
       mock_confirm_message "test 0.0.1 built to pkg/test-0.0.1.gem."
     end
 
-    before(:each) do
-      bundle 'gem test'
-      @app = bundled_app("test")
-      @gemspec = File.read("#{@app.to_s}/test.gemspec")
-      File.open("#{@app.to_s}/test.gemspec", 'w'){|f| f << @gemspec.gsub('TODO: ', '') }
-      @helper = Bundler::GemHelper.new(@app.to_s)
-    end
+    around do |it|
+      Dir.chdir(bundled_app){ bundle 'gem test' }
+      gemspec_path = bundled_app("test/test.gemspec")
+      working_spec = gemspec_path.read.gsub('TODO: ', '')
+      gemspec_path.open('w'){|f| f << working_spec }
 
-    it "uses a shell UI for output" do
-      expect(Bundler.ui).to be_a(Bundler::UI::Shell)
+      old, Rake.application = Rake.application, Rake::Application.new
+      Bundler::GemHelper.install_tasks(:dir => bundled_app("test"), :name => 'test')
+      it.run
+      Rake.application = old
     end
 
     describe 'install_tasks' do
-      before(:each) do
-        @saved, Rake.application = Rake.application, Rake::Application.new
-      end
-
-      after(:each) do
-        Rake.application = @saved
-      end
-
       it "defines Rake tasks" do
-        names = %w[build install release]
-
-        names.each { |name|
-          expect { Rake.application[name] }.to raise_error(/Don't know how to build task/)
-        }
-
-        @helper.install
-
-        names.each { |name|
-          expect { Rake.application[name] }.not_to raise_error
-          expect(Rake.application[name]).to be_instance_of Rake::Task
-        }
+        %w[build install release].each do |task|
+          expect(Rake.application[task]).to be_a(Rake::Task)
+        end
       end
 
       it "provides a way to access the gemspec object" do
-        @helper.install
         expect(Bundler::GemHelper.gemspec.name).to eq('test')
       end
     end
@@ -95,7 +77,7 @@ describe "Bundler::GemHelper tasks" do
     describe 'build' do
       it "builds" do
         mock_build_message
-        @helper.build_gem
+        Rake.application[:build].execute
         expect(bundled_app('test/pkg/test-0.0.1.gem')).to exist
       end
 

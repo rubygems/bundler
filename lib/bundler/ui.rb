@@ -1,3 +1,4 @@
+require 'bundler/vendored_thor'
 require 'rubygems/user_interaction'
 
 module Bundler
