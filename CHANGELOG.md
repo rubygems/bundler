@@ -3,6 +3,7 @@
 Bugfixes:
 
   -  use YAML.dump over {}.to_yaml for better forwards compat
+  -  correct error message grammar for commands that take no arguments (@dougal)
 
 ## 1.3.2 (7 March 2013)
 
