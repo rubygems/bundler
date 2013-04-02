@@ -245,17 +245,29 @@ module Bundler
     end
 
     def requires_sudo?
-      return @requires_sudo if defined?(@checked_for_sudo)
+      return @requires_sudo if defined?(@requires_sudo_ran)
 
-      path = bundle_path
-      path = path.parent until path.exist?
-      sudo_present = which "sudo"
-      bin_dir = Pathname.new(Bundler.system_bindir)
-      bin_dir = bin_dir.parent until bin_dir.exist?
+      if settings.allow_sudo?
+        sudo_present = which "sudo"
+      end
 
-      @checked_for_sudo = true
-      sudo_gems = !File.writable?(path) || !File.writable?(bin_dir)
-      @requires_sudo = settings.allow_sudo? && sudo_gems && sudo_present
+      if sudo_present
+        # the bundle path and subdirectories need to be writable for Rubygems
+        # to be able to unpack and install gems without exploding
+        path = bundle_path
+        path = path.parent until path.exist?
+
+        # bins are written to a different location on OS X
+        bin_dir = Pathname.new(Bundler.system_bindir)
+        bin_dir = bin_dir.parent until bin_dir.exist?
+
+        # if any directory is not writable, we need sudo
+        dirs = [path, bin_dir] | Dir[path.join('*')]
+        sudo_needed = dirs.find{|d| !File.writable?(d) }
+      end
+
+      @requires_sudo_ran = true
+      @requires_sudo = settings.allow_sudo? && sudo_present && sudo_needed
     end
 
     def mkdir_p(path)
