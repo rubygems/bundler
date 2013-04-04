@@ -402,7 +402,8 @@ module Bundler
     def outdated(*gems)
       sources = Array(options[:source])
       Bundler.definition.validate_ruby!
-      current_specs = Bundler.load.specs
+
+      current_specs = Bundler.ui.silence { Bundler.load.specs }
 
       if gems.empty? && sources.empty?
         # We're doing a full update
