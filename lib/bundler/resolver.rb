@@ -122,7 +122,7 @@ module Bundler
     # <GemBundle>,nil:: If the list of dependencies can be resolved, a
     #   collection of gemspecs is returned. Otherwise, nil is returned.
     def self.resolve(requirements, index, source_requirements = {}, base = [])
-      Bundler.ui.info "Resolving dependencies..."
+      Bundler.ui.info "Resolving dependencies...", false
       base = SpecSet.new(base) unless base.is_a?(SpecSet)
       resolver = new(index, source_requirements, base)
       result = catch(:success) do
@@ -130,7 +130,11 @@ module Bundler
         raise resolver.version_conflict
         nil
       end
+      Bundler.ui.info "" # new line now that dots are done
       SpecSet.new(result)
+    rescue => e
+      Bundler.ui.info "" # new line before the error
+      raise e
     end
 
     def initialize(index, source_requirements, base)
