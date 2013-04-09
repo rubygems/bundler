@@ -1,3 +1,9 @@
 #!/usr/bin/env ruby
 
-require '<%= config[:namespaced_path] %>'
+begin
+  require '<%= config[:namespaced_path] %>'
+rescue LoadError
+  lib = File.expand_path('../../lib', __FILE__)
+  $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+  require '<%= config[:namespaced_path] %>'
+end
