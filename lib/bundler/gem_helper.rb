@@ -1,5 +1,8 @@
-$:.unshift File.expand_path('../vendor', __FILE__)
-require 'thor'
+begin
+  Thor
+rescue NameError
+  require 'bundler/vendored_thor'
+end
 require 'bundler'
 
 module Bundler
