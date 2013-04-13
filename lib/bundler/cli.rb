@@ -650,23 +650,20 @@ module Bundler
     method_option :requirements, :type => :boolean, :default => false, :aliases => '-r', :banner => "Set to show the version of each required dependency."
     method_option :format, :type => :string, :default => "png", :aliases => '-F', :banner => "This is output format option. Supported format is png, jpg, svg, dot ..."
     def viz
+      require 'graphviz'
       output_file = File.expand_path(options[:file])
       graph = Graph.new(Bundler.load, output_file, options[:version], options[:requirements], options[:format])
-
-      begin
-        require 'graphviz'
-        graph.viz
-      rescue LoadError => e
-        Bundler.ui.error e.inspect
-        Bundler.ui.warn "Make sure you have the graphviz ruby gem. You can install it with:"
-        Bundler.ui.warn "`gem install ruby-graphviz`"
-      rescue StandardError => e
-        if e.message =~ /GraphViz not installed or dot not in PATH/
-          Bundler.ui.error e.message
-          Bundler.ui.warn "The ruby graphviz gem requires GraphViz to be installed"
-        else
-          raise
-        end
+      graph.viz
+    rescue LoadError => e
+      Bundler.ui.error e.inspect
+      Bundler.ui.warn "Make sure you have the graphviz ruby gem. You can install it with:"
+      Bundler.ui.warn "`gem install ruby-graphviz`"
+    rescue StandardError => e
+      if e.message =~ /GraphViz not installed or dot not in PATH/
+        Bundler.ui.error e.message
+        Bundler.ui.warn "Please install GraphViz. On a Mac with homebrew, you can run `brew install graphviz`."
+      else
+        raise
       end
     end
 
