@@ -76,7 +76,7 @@ If you are using Rails 2.3, please also include:
   - Your environment.rb file
 
 
-If you have either `rubygems-bundler` or `open_gem` installed, please try removing them and then following the troublshooting steps above before opening a new ticket.
+If you have either `rubygems-bundler` or `open_gem` installed, please try removing them and then following the troubleshooting steps above before opening a new ticket.
 
 [Create a gist](https://gist.github.com) containing all of that information, then visit the [Bundler issue tracker](https://github.com/carlhuda/bundler/issues) and [create a ticket](https://github.com/carlhuda/bundler/issues/new) describing your problem and linking to your gist.
 

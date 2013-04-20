@@ -492,7 +492,7 @@ module Bundler
     long_desc <<-D
       Exec runs a command, providing it access to the gems in the bundle. While using
       bundle exec you can require and call the bundled gems as if they were installed
-      into the systemwide Rubygems repository.
+      into the system wide Rubygems repository.
     D
     def exec(*args)
       Bundler.definition.validate_ruby!
@@ -717,7 +717,7 @@ module Bundler
       if options[:test]
         template(File.join("newgem/.travis.yml.tt"),         File.join(target, ".travis.yml"),            opts)
       end
-      Bundler.ui.info "Initializating git repo in #{target}"
+      Bundler.ui.info "Initializing git repo in #{target}"
       Dir.chdir(target) { `git init`; `git add .` }
 
       if options[:edit]

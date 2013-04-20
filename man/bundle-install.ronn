@@ -321,7 +321,7 @@ evaluates the gems currently being used to satisfy its requirements:
     also used to satisfy a dependency in `activemerchant`,
     which is not being updated
   * `rack ~> 1.1.0`:
-    not currently being used to satify another dependency
+    not currently being used to satisfy another dependency
 
 Because you did not explicitly ask to update `activemerchant`,
 you would not expect it to suddenly stop working after updating
