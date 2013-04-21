@@ -136,6 +136,7 @@ module Gem
     JAVA  = Gem::Platform.new('java') unless defined?(JAVA)
     MSWIN = Gem::Platform.new('mswin32') unless defined?(MSWIN)
     MINGW = Gem::Platform.new('x86-mingw32') unless defined?(MINGW)
+    DALVIK = Gem::Platform.new('dalvik') unless defined?(DALVIK)
 
     undef_method :hash if method_defined? :hash
     def hash
