@@ -201,6 +201,7 @@ module Bundler
         if @connection.is_a?(Net::HTTP::Persistent)
           response = @connection.request(uri)
         else
+          @connection = Net::HTTP.new(uri.host, uri.port)
           req = Net::HTTP::Get.new uri.request_uri
           response = @connection.request(req)
         end
