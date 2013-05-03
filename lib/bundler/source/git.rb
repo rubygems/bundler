@@ -172,8 +172,8 @@ module Bundler
 
       def load_spec_files
         super
-      rescue PathError, GitError
-        raise GitError, "#{to_s} is not checked out. Please run `bundle install`"
+      rescue PathError, GitError => e
+        raise GitError, "#{e.to_s} #{to_s} is not checked out. Please run `bundle install`"
       end
 
       # This is the path which is going to contain a cache
