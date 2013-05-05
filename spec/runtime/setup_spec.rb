@@ -314,7 +314,7 @@ describe "Bundler.setup" do
 
     it "provides a useful exception when the git repo is not checked out yet" do
       run "1", :expect_err => true
-      expect(err).to include("#{lib_path('rack-1.0.0')} (at master) is not checked out. Please run `bundle install`")
+      expect(err).to match(/the git source #{lib_path('rack-1.0.0')} is not yet checked out. Please run `bundle install`/i)
     end
 
     it "does not hit the git binary if the lockfile is available and up to date" do
