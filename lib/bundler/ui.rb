@@ -20,6 +20,10 @@ module Bundler
     def confirm(message, newline = nil)
     end
 
+    def quiet?
+      false
+    end
+
     def debug?
       false
     end
