@@ -81,7 +81,7 @@ end
       ref = git.ref_for("master", 11)
       expect(ref).not_to eq(old_ref)
 
-      bundle "update"
+      bundle "update --force"
       bundle "#{cmd} --all"
 
       expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
