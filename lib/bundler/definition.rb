@@ -249,7 +249,7 @@ module Bundler
           select  { |s| s.source == source }.
           # This needs to be sorted by full name so that
           # gems with the same name, but different platform
-          # are ordered consistantly
+          # are ordered consistently
           sort_by { |s| s.full_name }.
           each do |spec|
             next if spec.name == 'bundler'
