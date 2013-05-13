@@ -67,7 +67,7 @@ module Bundler
         raise GemfileError, %{You need to specify gem names as Strings. Use 'gem "#{name.to_s}"' instead.}
       end
 
-      options = Hash === args.last ? args.pop : {}
+      options = Hash === args.last ? args.pop.dup : {}
       version = args
 
       _normalize_options(name, version, options)
