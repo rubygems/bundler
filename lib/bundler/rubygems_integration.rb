@@ -87,10 +87,6 @@ module Bundler
       Gem.bin_path(gem, bin, ver)
     end
 
-    def refresh
-      Gem.refresh
-    end
-
     def preserve_paths
       # this is a no-op outside of Rubygems 1.8
       yield
