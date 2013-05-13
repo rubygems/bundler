@@ -548,8 +548,12 @@ module Bundler
 
       case scope
       when "delete"
-        Bundler.settings.set_local(name, nil)
-        Bundler.settings.set_global(name, nil)
+        if name.match(/\A(local|global)\.(.*)/)
+          Bundler.settings.send("set_#{$1}", $2, nil)
+        else
+          Bundler.settings.set_local(name, nil)
+          Bundler.settings.set_global(name, nil)
+        end
       when "local", "global"
         if args.empty?
           Bundler.ui.confirm "Settings for `#{name}` in order of priority. The top value will be used"

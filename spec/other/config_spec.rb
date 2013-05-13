@@ -87,6 +87,15 @@ describe ".bundle/config" do
       expect(out).to eq("true")
     end
 
+    it "can only be deleted when key starts with 'global'" do
+      bundle "config --global foo global"
+      bundle "config --local foo local"
+      bundle "config --delete global.foo"
+
+      run "puts Bundler.settings[:foo]"
+      expect(out).to eq("local")
+    end
+
     it "warns when overriding" do
       bundle "config --global foo previous"
       bundle "config --global foo global"
@@ -130,6 +139,15 @@ describe ".bundle/config" do
 
       run "puts Bundler.settings[:foo] == nil"
       expect(out).to eq("true")
+    end
+
+    it "can only be deleted when key starts with 'local'" do
+      bundle "config --global foo global"
+      bundle "config --local foo local"
+      bundle "config --delete local.foo"
+
+      run "puts Bundler.settings[:foo]"
+      expect(out).to eq("global")
     end
 
     it "warns when overriding" do
