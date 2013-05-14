@@ -174,6 +174,9 @@ module Bundler
       "Gem trust policy (like gem install -P). Must be one of " +
         Bundler.rubygems.security_policies.keys.join('|') unless
         Bundler.rubygems.security_policies.empty?
+    method_option "jobs", :aliases => "-j", :type => :numeric, :banner =>
+      "Specify the number of jobs to run in parallel"
+
     def install
       opts = options.dup
       if opts[:without]

@@ -90,7 +90,7 @@ module Bundler
 
       request_queue = Queue.new
       response_queue = Queue.new
-      size = 4
+      size = options[:jobs] || 1
       name2spec = {}
       threads = size.times.map do
         Thread.start do
