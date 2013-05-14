@@ -129,6 +129,48 @@ module Bundler
       end
     end
 
+
+
+    desc "lock", "Generate Gemfile.lock from Gemfile"
+    long_desc <<-D
+      lock will read Gemfile, and resolve all the dependencies and versions
+      of the gems listed into a Gemfile.lock.
+    D
+    method_option "without", :type => :array, :banner =>
+      "Exclude gems that are part of the specified named group."
+    method_option "gemfile", :type => :string, :banner =>
+      "Use the specified gemfile instead of Gemfile"
+    method_option "quiet", :type => :boolean, :banner =>
+      "Only output warnings and errors."
+    method_option "full-index", :type => :boolean, :banner =>
+      "Use the rubygems modern index instead of the API endpoint"
+    unless Bundler.rubygems.security_policies.empty?
+      method_option "trust-policy", :alias => "P", :type => :string, :banner =>
+        "Gem trust policy (like gem install -P). Must be one of " + Bundler.rubygems.security_policies.keys.join('|')
+    end
+
+    def lock
+      opts = options.dup
+      if opts[:without]
+        opts[:without] = opts[:without].map{|g| g.tr(' ', ':') }
+      end
+
+      # Can't use Bundler.settings for this because settings needs gemfile.dirname
+      ENV['BUNDLE_GEMFILE'] = File.expand_path(opts[:gemfile]) if opts[:gemfile]
+
+      definition = Bundler.definition
+      definition.validate_ruby!
+      Locker.lock(Bundler.root, definition, opts)
+    rescue GemNotFound => e
+      if Bundler.definition.no_sources?
+        Bundler.ui.warn "Your Gemfile has no remote sources. If you need " \
+          "gems that are not already on\nyour machine, add a line like this " \
+          "to your Gemfile:\n    source 'https://rubygems.org'"
+      end
+      raise e
+    end
+
+
     desc "install", "Install the current environment to the system"
     long_desc <<-D
       Install will install all of the gems in the current bundle, making them available

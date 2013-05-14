@@ -4,7 +4,7 @@ describe "the lockfile format" do
   include Bundler::GemHelpers
 
   it "generates a simple lockfile for a single source, gem" do
-    install_gemfile <<-G
+    lock_gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack"
@@ -25,7 +25,7 @@ describe "the lockfile format" do
   end
 
   it "generates a simple lockfile for a single source, gem with dependencies" do
-    install_gemfile <<-G
+    lock_gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack-obama"
@@ -48,7 +48,7 @@ describe "the lockfile format" do
   end
 
   it "generates a simple lockfile for a single source, gem with a version requirement" do
-    install_gemfile <<-G
+    lock_gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack-obama", ">= 1.0"
@@ -71,7 +71,7 @@ describe "the lockfile format" do
   end
 
   it "generates lockfiles with multiple requirements" do
-    install_gemfile <<-G
+    lock_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "net-sftp"
     G
@@ -90,14 +90,12 @@ describe "the lockfile format" do
       DEPENDENCIES
         net-sftp
     G
-
-    should_be_installed "net-sftp 1.1.1", "net-ssh 1.0.0"
   end
 
   it "generates a simple lockfile for a single pinned source, gem with a version requirement" do
     git = build_git "foo"
 
-    install_gemfile <<-G
+    lock_gemfile <<-G
       gem "foo", :git => "#{lib_path("foo-1.0")}"
     G
 
@@ -151,14 +149,13 @@ describe "the lockfile format" do
         rack
     L
 
-    bundle "install"
-    should_be_installed "rack 1.0.0"
+    bundle "lock"
   end
 
   it "serializes global git sources" do
     git = build_git "foo"
 
-    install_gemfile <<-G
+    lock_gemfile <<-G
       git "#{lib_path('foo-1.0')}" do
         gem "foo"
       end
@@ -186,7 +183,7 @@ describe "the lockfile format" do
     git = build_git "foo"
     update_git "foo", :branch => "omg"
 
-    install_gemfile <<-G
+    lock_gemfile <<-G
       gem "foo", :git => "#{lib_path("foo-1.0")}", :branch => "omg"
     G
 
@@ -213,7 +210,7 @@ describe "the lockfile format" do
     git = build_git "foo"
     update_git "foo", :tag => "omg"
 
-    install_gemfile <<-G
+    lock_gemfile <<-G
       gem "foo", :git => "#{lib_path("foo-1.0")}", :tag => "omg"
     G
 
@@ -239,7 +236,7 @@ describe "the lockfile format" do
   it "serializes pinned path sources to the lockfile" do
     build_lib "foo"
 
-    install_gemfile <<-G
+    lock_gemfile <<-G
       gem "foo", :path => "#{lib_path("foo-1.0")}"
     G
 
@@ -261,7 +258,7 @@ describe "the lockfile format" do
   end
 
   it "lists gems alphabetically" do
-    install_gemfile <<-G
+    lock_gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "thin"
@@ -293,7 +290,7 @@ describe "the lockfile format" do
   end
 
   it "order dependencies of dependencies in alphabetical order" do
-    install_gemfile <<-G
+    lock_gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rails"
@@ -329,7 +326,7 @@ describe "the lockfile format" do
   end
 
   it "orders dependencies according to version" do
-    install_gemfile <<-G
+    lock_gemfile <<-G
       source "file://#{gem_repo1}"
       gem 'double_deps'
     G
@@ -352,7 +349,7 @@ describe "the lockfile format" do
   end
 
   it "does not add the :require option to the lockfile" do
-    install_gemfile <<-G
+    lock_gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack-obama", ">= 1.0", :require => "rack/obama"
@@ -375,7 +372,7 @@ describe "the lockfile format" do
   end
 
   it "does not add the :group option to the lockfile" do
-    install_gemfile <<-G
+    lock_gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack-obama", ">= 1.0", :group => :test
@@ -400,7 +397,7 @@ describe "the lockfile format" do
   it "stores relative paths when the path is provided in a relative fashion and in Gemfile dir" do
     build_lib "foo", :path => bundled_app('foo')
 
-    install_gemfile <<-G
+    lock_gemfile <<-G
       path "foo"
       gem "foo"
     G
@@ -425,7 +422,7 @@ describe "the lockfile format" do
   it "stores relative paths when the path is provided in a relative fashion and is above Gemfile dir" do
     build_lib "foo", :path => bundled_app(File.join('..', 'foo'))
 
-    install_gemfile <<-G
+    lock_gemfile <<-G
       path "../foo"
       gem "foo"
     G
@@ -450,7 +447,7 @@ describe "the lockfile format" do
   it "stores relative paths when the path is provided in an absolute fashion but is relative" do
     build_lib "foo", :path => bundled_app('foo')
 
-    install_gemfile <<-G
+    lock_gemfile <<-G
       path File.expand_path("../foo", __FILE__)
       gem "foo"
     G
@@ -486,7 +483,7 @@ describe "the lockfile format" do
         rack
     G
 
-    install_gemfile <<-G
+    lock_gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack"
@@ -516,7 +513,7 @@ describe "the lockfile format" do
 
     simulate_platform "universal-java-16"
 
-    install_gemfile <<-G
+    lock_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "platform_specific"
     G
@@ -536,12 +533,12 @@ describe "the lockfile format" do
   end
 
   it "does not add duplicate gems" do
-    install_gemfile <<-G
+    lock_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack"
     G
 
-    install_gemfile <<-G
+    lock_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack"
       gem "activesupport"
@@ -564,7 +561,7 @@ describe "the lockfile format" do
   end
 
   it "does not add duplicate dependencies" do
-    install_gemfile <<-G
+    lock_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack"
       gem "rack"
@@ -585,7 +582,7 @@ describe "the lockfile format" do
   end
 
   it "does not add duplicate dependencies with versions" do
-    install_gemfile <<-G
+    lock_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack", "1.0"
       gem "rack", "1.0"
@@ -606,7 +603,7 @@ describe "the lockfile format" do
   end
 
   it "does not add duplicate dependencies in different groups" do
-    install_gemfile <<-G
+    lock_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack", "1.0", :group => :one
       gem "rack", "1.0", :group => :two
@@ -627,7 +624,7 @@ describe "the lockfile format" do
   end
 
   it "raises if two different versions are used" do
-    install_gemfile <<-G
+    lock_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack", "1.0"
       gem "rack", "1.1"
@@ -639,7 +636,7 @@ describe "the lockfile format" do
 
 
   it "raises if two different versions are used" do
-    install_gemfile <<-G
+    lock_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack"
       gem "rack", :git => "git://hubz.com"
@@ -650,7 +647,7 @@ describe "the lockfile format" do
   end
 
   it "works correctly with multiple version dependencies" do
-    install_gemfile <<-G
+    lock_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack", "> 0.9", "< 1.0"
     G
@@ -685,8 +682,7 @@ describe "the lockfile format" do
       gem "omg", :git => "#{lib_path('omg')}", :branch => 'master'
     G
 
-    bundle "install --path vendor"
-    should_be_installed "omg 1.0"
+    bundle "lock --path vendor"
 
     # Create a Gemfile.lock that has duplicate GIT sections
     lockfile <<-L
@@ -716,8 +712,7 @@ describe "the lockfile format" do
     L
 
     FileUtils.rm_rf(bundled_app('vendor'))
-    bundle "install"
-    should_be_installed "omg 1.0"
+    bundle "lock"
 
     # Confirm that duplicate specs do not appear
     expect(File.read(bundled_app('Gemfile.lock'))).to eq(strip_whitespace(<<-L))
@@ -747,7 +742,7 @@ describe "the lockfile format" do
     end
     before(:each) do
       build_repo2
-      install_gemfile <<-G
+      lock_gemfile <<-G
         source "file://#{gem_repo2}"
         gem "rack"
       G
@@ -756,7 +751,6 @@ describe "the lockfile format" do
 
     it "generates Gemfile.lock with \\n line endings" do
       expect(File.read(bundled_app("Gemfile.lock"))).not_to match("\r\n")
-      should_be_installed "rack 1.0"
     end
 
     context "during updates" do
@@ -766,7 +760,6 @@ describe "the lockfile format" do
 
         expect { bundle "update" }.to change { File.mtime(bundled_app('Gemfile.lock')) }
         expect(File.read(bundled_app("Gemfile.lock"))).not_to match("\r\n")
-        should_be_installed "rack 1.2"
       end
 
       it "preserves Gemfile.lock \\n\\r line endings" do
@@ -777,32 +770,6 @@ describe "the lockfile format" do
 
         expect { bundle "update" }.to change { File.mtime(bundled_app('Gemfile.lock')) }
         expect(File.read(bundled_app("Gemfile.lock"))).to match("\r\n")
-        should_be_installed "rack 1.2"
-      end
-    end
-
-    context "when nothing changes" do
-
-      it "preserves Gemfile.lock \\n line endings" do
-        expect { ruby <<-RUBY
-                   require 'rubygems'
-                   require 'bundler'
-                   Bundler.setup
-                 RUBY
-               }.not_to change { File.mtime(bundled_app('Gemfile.lock')) }
-      end
-
-      it "preserves Gemfile.lock \\n\\r line endings" do
-        win_lock = File.read(bundled_app("Gemfile.lock")).gsub(/\n/, "\r\n")
-        File.open(bundled_app("Gemfile.lock"), "wb"){|f| f.puts(win_lock) }
-        set_lockfile_mtime_to_known_value
-
-        expect { ruby <<-RUBY
-                   require 'rubygems'
-                   require 'bundler'
-                   Bundler.setup
-                 RUBY
-               }.not_to change { File.mtime(bundled_app('Gemfile.lock')) }
       end
     end
   end
@@ -825,7 +792,7 @@ describe "the lockfile format" do
         rack
     L
 
-    error = install_gemfile(<<-G, :expect_err => true)
+    error = lock_gemfile(<<-G, :expect_err => true)
       source "file://#{gem_repo1}"
       gem "rack"
     G
