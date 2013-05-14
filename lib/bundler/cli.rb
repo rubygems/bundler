@@ -246,7 +246,7 @@ module Bundler
 
       definition = Bundler.definition
       definition.validate_ruby!
-      Installer.install(Bundler.root, definition, opts)
+      LockingInstaller.install(Bundler.root, definition, opts)
       Bundler.load.cache if Bundler.root.join("vendor/cache").exist? && !options["no-cache"]
 
       if Bundler.settings[:path]
@@ -275,6 +275,7 @@ module Bundler
       end
       raise e
     end
+
 
     desc "update", "update the current environment"
     long_desc <<-D
@@ -314,7 +315,7 @@ module Bundler
       Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins)
 
       Bundler.definition.validate_ruby!
-      Installer.install Bundler.root, Bundler.definition, opts
+      LockingInstaller.install Bundler.root, Bundler.definition, opts
       Bundler.load.cache if Bundler.root.join("vendor/cache").exist?
       clean if Bundler.settings[:clean] && Bundler.settings[:path]
       Bundler.ui.confirm "Your bundle is updated! " +
