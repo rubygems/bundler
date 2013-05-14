@@ -153,7 +153,7 @@ module Bundler
       cmd << " 2>&1"
       outbuf = ''
       Bundler.ui.debug(cmd)
-      Dir.chdir(base) {
+      SharedHelpers.chdir(base) {
         outbuf = `#{cmd}`
         if $? == 0
           block.call(outbuf) if block

@@ -316,7 +316,7 @@ module Bundler
       path = Pathname.new(file)
       # Eval the gemspec from its parent directory, because some gemspecs
       # depend on "./" relative paths.
-      Dir.chdir(path.dirname.to_s) do
+      SharedHelpers.chdir(path.dirname.to_s) do
         contents = path.read
         if contents[0..2] == "---" # YAML header
           eval_yaml_gemspec(path, contents)

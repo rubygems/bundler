@@ -1,5 +1,6 @@
 require 'pathname'
 require 'rubygems'
+require 'monitor'
 
 require 'bundler/rubygems_integration'
 
@@ -29,6 +30,19 @@ module Bundler
 
     def in_bundle?
       find_gemfile
+    end
+
+    @chdir_monitor = Monitor.new
+    def chdir(dir, &blk)
+      @chdir_monitor.synchronize do
+        Dir.chdir dir, &blk
+      end
+    end
+
+    def pwd
+      @chdir_monitor.synchronize do
+        Dir.pwd
+      end
     end
 
   private

@@ -189,7 +189,7 @@ module Bundler
         Bundler.ui.warn "The validation message from Rubygems was:\n  #{e.message}"
       ensure
         if gem_dir && gem_file
-          Dir.chdir(gem_dir){ FileUtils.rm_rf(gem_file) if File.exist?(gem_file) }
+          SharedHelpers.chdir(gem_dir){ FileUtils.rm_rf(gem_file) if File.exist?(gem_file) }
         end
       end
 
