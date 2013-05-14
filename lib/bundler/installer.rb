@@ -88,52 +88,13 @@ module Bundler
       # the gem.
       Installer.post_install_messages = {}
 
-      request_queue = Queue.new
-      response_queue = Queue.new
       size = options[:jobs] || 1
-      name2spec = {}
-      threads = size.times.map do
-        Thread.start do
-          Thread.abort_on_exception = true
-          while name = request_queue.pop
-            spec = name2spec[name]
-            install_gem_from_spec spec, options[:standalone]
-            response_queue.push name
-          end
-        end
+      size = [size, 1].max
+      if size > 1
+        install_in_parallel size, options[:standalone]
+      else
+        install_sequentially options[:standalone]
       end
-
-      remains = {}
-      enqueued = {}
-      specs.each do |spec|
-        name2spec[spec.name] = spec
-        remains[spec.name] = true
-        deps = spec.dependencies.select { |dep| dep.type != :development }
-        if deps.empty?
-          request_queue.push spec.name
-          enqueued[spec.name] = true
-        end
-      end
-
-      until remains.empty?
-        finished_name = response_queue.pop
-        remains.delete finished_name
-        remains.keys.each do |name|
-          next if enqueued[name]
-          spec = name2spec[name]
-          deps = spec.dependencies.select { |dep| remains[dep.name] and dep.type != :development }
-          if deps.empty?
-            request_queue.push name
-            enqueued[name] = true
-          end
-        end
-        Bundler.ui.debug "#{request_queue.num_waiting} workers are waiting"
-      end
-
-      size.times do
-        request_queue.push nil
-      end
-      threads.each &:join
 
       lock
       generate_standalone(options[:standalone]) if options[:standalone]
@@ -277,6 +238,60 @@ module Bundler
           file.puts %{$:.unshift File.expand_path("\#{path}/#{path}")}
         end
       end
+    end
+
+    def install_sequentially(standalone)
+      specs.each do |spec|
+        install_gem_from_spec spec, standalone
+      end
+    end
+
+    def install_in_parallel(size, standalone)
+      request_queue = Queue.new
+      response_queue = Queue.new
+      name2spec = {}
+      threads = size.times.map do
+        Thread.start do
+          Thread.abort_on_exception = true
+          while name = request_queue.pop
+            spec = name2spec[name]
+            install_gem_from_spec spec, standalone
+            response_queue.push name
+          end
+        end
+      end
+
+      remains = {}
+      enqueued = {}
+      specs.each do |spec|
+        name2spec[spec.name] = spec
+        remains[spec.name] = true
+        deps = spec.dependencies.select { |dep| dep.type != :development }
+        if deps.empty?
+          request_queue.push spec.name
+          enqueued[spec.name] = true
+        end
+      end
+
+      until remains.empty?
+        finished_name = response_queue.pop
+        remains.delete finished_name
+        remains.keys.each do |name|
+          next if enqueued[name]
+          spec = name2spec[name]
+          deps = spec.dependencies.select { |dep| remains[dep.name] and dep.type != :development }
+          if deps.empty?
+            request_queue.push name
+            enqueued[name] = true
+          end
+        end
+        Bundler.ui.debug "#{request_queue.num_waiting} workers are waiting"
+      end
+
+      size.times do
+        request_queue.push nil
+      end
+      threads.each &:join
     end
   end
 end
