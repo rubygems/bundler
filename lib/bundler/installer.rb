@@ -87,9 +87,52 @@ module Bundler
       # as dependencies might actually affect the installation of
       # the gem.
       Installer.post_install_messages = {}
-      specs.each do |spec|
-        install_gem_from_spec(spec, options[:standalone])
+
+      request_queue = Queue.new
+      response_queue = Queue.new
+      size = 4
+      name2spec = {}
+      threads = size.times.map do
+        Thread.start do
+          Thread.abort_on_exception = true
+          while name = request_queue.pop
+            spec = name2spec[name]
+            install_gem_from_spec spec, options[:standalone]
+            response_queue.push name
+          end
+        end
       end
+
+      remains = {}
+      enqueued = {}
+      specs.each do |spec|
+        name2spec[spec.name] = spec
+        remains[spec.name] = true
+        deps = spec.dependencies.select { |dep| dep.type != :development }
+        if deps.empty?
+          request_queue.push spec.name
+          enqueued[spec.name] = true
+        end
+      end
+
+      until remains.empty?
+        finished_name = response_queue.pop
+        remains.delete finished_name
+        remains.keys.each do |name|
+          next if enqueued[name]
+          spec = name2spec[name]
+          deps = spec.dependencies.select { |dep| remains[dep.name] and dep.type != :development }
+          if deps.empty?
+            request_queue.push name
+            enqueued[name] = true
+          end
+        end
+      end
+
+      size.times do
+        request_queue.push nil
+      end
+      threads.each &:join
 
       lock
       generate_standalone(options[:standalone]) if options[:standalone]
