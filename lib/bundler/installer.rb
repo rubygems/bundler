@@ -127,6 +127,7 @@ module Bundler
             enqueued[name] = true
           end
         end
+        Bundler.ui.debug "#{request_queue.num_waiting} workers are waiting"
       end
 
       size.times do
@@ -147,11 +148,9 @@ module Bundler
       settings = Bundler.settings["build.#{spec.name}"]
       Bundler.rubygems.with_build_args [settings] do
         spec.source.install(spec)
-        Bundler.ui.debug "from #{spec.loaded_from} "
+        Bundler.ui.debug "  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
       end
 
-      # newline comes after installing, some gems say "with native extensions"
-      Bundler.ui.info ""
       if Bundler.settings[:bin] && standalone
         generate_standalone_bundler_executable_stubs(spec)
       elsif Bundler.settings[:bin]

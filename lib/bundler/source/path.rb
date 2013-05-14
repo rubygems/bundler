@@ -70,7 +70,7 @@ module Bundler
       end
 
       def install(spec)
-        Bundler.ui.info "Using #{spec.name} (#{spec.version}) from #{to_s} "
+        Bundler.ui.info "Using #{spec.name} (#{spec.version}) from #{to_s}"
         generate_bin(spec, :disable_extensions)
       end
 
