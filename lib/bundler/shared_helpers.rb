@@ -52,7 +52,7 @@ module Bundler
       return given if given && !given.empty?
 
       previous = nil
-      current  = File.expand_path(Dir.pwd)
+      current  = File.expand_path(SharedHelpers.pwd)
 
       until !File.directory?(current) || current == previous
         if ENV['BUNDLE_SPEC_RUN']
