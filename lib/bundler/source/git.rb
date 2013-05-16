@@ -159,6 +159,7 @@ module Bundler
           @copied = true
         end
         generate_bin(spec)
+        nil
       end
 
       def cache(spec)

@@ -1,5 +1,6 @@
 require 'erb'
 require 'rubygems/dependency_installer'
+require 'bundler/worker_pool'
 
 module Bundler
   class Installer < Environment
@@ -107,8 +108,9 @@ module Bundler
 
       # Fetch the build settings, if there are any
       settings = Bundler.settings["build.#{spec.name}"]
+      message = nil
       Bundler.rubygems.with_build_args [settings] do
-        spec.source.install(spec)
+        message = spec.source.install(spec)
         Bundler.ui.debug "  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
       end
 
@@ -119,6 +121,7 @@ module Bundler
       end
 
       FileUtils.rm_rf(Bundler.tmp)
+      message
     rescue Exception => e
       # install hook failed
       raise e if e.is_a?(Bundler::InstallHookError) || e.is_a?(Bundler::SecurityError)
@@ -247,51 +250,46 @@ module Bundler
     end
 
     def install_in_parallel(size, standalone)
-      request_queue = Queue.new
-      response_queue = Queue.new
       name2spec = {}
-      threads = size.times.map do
-        Thread.start do
-          Thread.abort_on_exception = true
-          while name = request_queue.pop
-            spec = name2spec[name]
-            install_gem_from_spec spec, standalone
-            response_queue.push name
-          end
-        end
-      end
-
       remains = {}
       enqueued = {}
       specs.each do |spec|
         name2spec[spec.name] = spec
         remains[spec.name] = true
+      end
+
+      worker_pool = WorkerPool.new size, lambda { |name|
+        spec = name2spec[name]
+        message = install_gem_from_spec spec, standalone
+        { :name => spec.name, :post_install => message }
+      }
+
+      specs.each do |spec|
         deps = spec.dependencies.select { |dep| dep.type != :development }
         if deps.empty?
-          request_queue.push spec.name
+          worker_pool.enq spec.name
           enqueued[spec.name] = true
         end
       end
 
       until remains.empty?
-        finished_name = response_queue.pop
-        remains.delete finished_name
+        message = worker_pool.deq
+        remains.delete message[:name]
+        if message[:post_install]
+          Installer.post_install_messages[message[:name]] = message[:post_install]
+        end
         remains.keys.each do |name|
           next if enqueued[name]
           spec = name2spec[name]
           deps = spec.dependencies.select { |dep| remains[dep.name] and dep.type != :development }
           if deps.empty?
-            request_queue.push name
+            worker_pool.enq name
             enqueued[name] = true
           end
         end
-        Bundler.ui.debug "#{request_queue.num_waiting} workers are waiting"
       end
-
-      size.times do
-        request_queue.push nil
-      end
-      threads.each &:join
+    ensure
+      worker_pool && worker_pool.stop
     end
   end
 end

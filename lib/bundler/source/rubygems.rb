@@ -94,10 +94,6 @@ module Bundler
           ).install
         end
 
-        if spec.post_install_message
-          Installer.post_install_messages[spec.name] = spec.post_install_message
-        end
-
         # SUDO HAX
         if Bundler.requires_sudo?
           Bundler.mkdir_p "#{Bundler.rubygems.gem_dir}/gems"
@@ -112,6 +108,7 @@ module Bundler
         Bundler.ui.info "Installed #{spec.name} (#{spec.version})"
         installed_spec.loaded_from = "#{Bundler.rubygems.gem_dir}/specifications/#{spec.full_name}.gemspec"
         spec.loaded_from = "#{Bundler.rubygems.gem_dir}/specifications/#{spec.full_name}.gemspec"
+        spec.post_install_message
       end
 
       def cache(spec)
