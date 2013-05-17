@@ -1,6 +1,7 @@
 require 'pathname'
 require 'rubygems'
 
+require 'bundler/constants'
 require 'bundler/rubygems_integration'
 
 module Gem
