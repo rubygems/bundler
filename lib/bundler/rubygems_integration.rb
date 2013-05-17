@@ -31,7 +31,12 @@ module Bundler
     end
 
     def configuration
-      Gem.configuration
+      begin
+        Gem.configuration
+      rescue Gem::SystemExitException => e
+        puts e
+        raise Gem::SystemExitException
+      end
     end
 
     def ruby_engine
