@@ -17,4 +17,9 @@ end
 
 require 'bundler/cli'
 require 'bundler/friendly_errors'
-Bundler.with_friendly_errors { Bundler::CLI.start }
+Bundler.with_friendly_errors {
+    # Set debug flag so we can rescue Thor::error's
+    # and set the correct exit code.
+    ENV["THOR_DEBUG"] = "1"
+    Bundler::CLI.start
+}
