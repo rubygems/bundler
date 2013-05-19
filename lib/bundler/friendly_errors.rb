@@ -5,6 +5,9 @@ module Bundler
     Bundler.ui.error e.message, :wrap => true
     Bundler.ui.trace e
     exit e.status_code
+  rescue Thor::Error => e
+    Bundler.ui.error e.message
+    exit 1
   rescue LoadError => e
     raise e unless e.message =~ /cannot load such file -- openssl|openssl.so|libcrypto.so/
     Bundler.ui.error "\nCould not load OpenSSL."
