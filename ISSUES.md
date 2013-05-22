@@ -6,7 +6,7 @@ So! You're having problems with Bundler. This file is here to help. If you're ru
 
 Instructions for common Bundler uses can be found on the [Bundler documentation site](http://gembundler.com/).
 
-Detailed information about each Bundler command, including help with common problems, can be found in the [Bundler man pages](http://gembundler.com/man/bundle.1.html).
+Detailed information about each Bundler command, including help with common problems, can be found in the [Bundler man pages](http://gembundler.com/v1.3/man/bundle.1.html).
 
 ## Troubleshooting
 
