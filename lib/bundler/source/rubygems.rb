@@ -15,6 +15,7 @@ module Bundler
         @options = options
         @remotes = (options["remotes"] || []).map { |r| normalize_uri(r) }
         @fetchers = {}
+        @dependency_names = []
         @allow_remote = false
         @allow_cached = false
 

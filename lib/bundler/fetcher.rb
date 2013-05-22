@@ -18,7 +18,7 @@ module Bundler
           " is a chance you are experiencing a man-in-the-middle attack, but" \
           " most likely your system doesn't have the CA certificates needed" \
           " for verification. For information about OpenSSL certificates, see" \
-          " bit.ly/ssl-certs. To connect without using SSL, edit your Gemfile" \
+          " bit.ly/ruby-ssl. To connect without using SSL, edit your Gemfile" \
           " sources and change 'https' to 'http'."
       end
     end
@@ -68,7 +68,7 @@ module Bundler
       @remote_uri = remote_uri
       @public_uri = remote_uri.dup
       @public_uri.user, @public_uri.password = nil, nil # don't print these
-      if defined?(OpenSSL::SSL)
+      if defined?(Net::HTTP::Persistent)
         @connection = Net::HTTP::Persistent.new 'bundler', :ENV
         @connection.verify_mode = (Bundler.settings[:ssl_verify_mode] ||
           OpenSSL::SSL::VERIFY_PEER)
@@ -198,10 +198,11 @@ module Bundler
 
       begin
         Bundler.ui.debug "Fetching from: #{uri}"
-        if @connection.is_a?(Net::HTTP::Persistent)
+        if defined?(Net::HTTP::Persistent)
           response = @connection.request(uri)
         else
           req = Net::HTTP::Get.new uri.request_uri
+          req.basic_auth(uri.user, uri.password) if uri.user && uri.password
           response = @connection.request(req)
         end
       rescue OpenSSL::SSL::SSLError

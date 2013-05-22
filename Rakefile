@@ -30,7 +30,7 @@ namespace :spec do
   desc "Ensure spec dependencies are installed"
   task :deps do
     {"rdiscount" => "~> 1.6", "ronn" => "~> 0.7.3", "rspec" => "~> 2.13"}.each do |name, version|
-      sh "#{Gem.ruby} -S gem list #{name} -i -v '#{version}' || " \
+      sh "#{Gem.ruby} -S gem list -i #{name} -v '#{version}' || " \
          "#{Gem.ruby} -S gem install #{name} -v '#{version}' --no-ri --no-rdoc"
     end
   end
@@ -88,7 +88,7 @@ begin
     namespace :rubygems do
       # Rubygems specs by version
       rubyopt = ENV["RUBYOPT"]
-      %w(master v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.25 v2.0.0).each do |rg|
+      %w(master v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.25 v2.0.2).each do |rg|
         desc "Run specs with Rubygems #{rg}"
         RSpec::Core::RakeTask.new(rg) do |t|
           t.rspec_opts = %w(-fs --color)

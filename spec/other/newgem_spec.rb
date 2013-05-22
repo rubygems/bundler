@@ -89,11 +89,11 @@ describe "bundle gem" do
     it "runs rake without problems" do
       system_gems ["rake-10.0.2"]
 
-      rakefile = <<-RAKEFILE
+      rakefile = strip_whitespace <<-RAKEFILE
         task :default do
           puts 'SUCCESS'
         end
-RAKEFILE
+      RAKEFILE
       File.open(bundled_app("test_gem/Rakefile"), 'w') do |file|
         file.puts rakefile
       end
@@ -175,7 +175,7 @@ RAKEFILE
       end
 
       it "requires 'minitest_helper'" do
-        expect(bundled_app("test_gem/test/test_test_gem.rb").read).to match(/require '.\/minitest_helper'/)
+        expect(bundled_app("test_gem/test/test_test_gem.rb").read).to match(/require 'minitest_helper'/)
       end
 
       it "creates a default test which fails" do
@@ -265,11 +265,11 @@ RAKEFILE
     it "runs rake without problems" do
       system_gems ["rake-10.0.2"]
 
-      rakefile = <<-RAKEFILE
+      rakefile = strip_whitespace <<-RAKEFILE
         task :default do
           puts 'SUCCESS'
         end
-RAKEFILE
+      RAKEFILE
       File.open(bundled_app("test-gem/Rakefile"), 'w') do |file|
         file.puts rakefile
       end
@@ -332,6 +332,19 @@ RAKEFILE
       it "creates a default test which fails" do
         expect(bundled_app("test-gem/spec/test/gem_spec.rb").read).to match(/false.should be_true/)
       end
+
+      it "creates a default rake task to run the specs" do
+        rakefile = strip_whitespace <<-RAKEFILE
+          require "bundler/gem_tasks"
+          require "rspec/core/rake_task"
+
+          RSpec::Core::RakeTask.new(:spec)
+
+          task :default => :spec
+        RAKEFILE
+
+        expect(bundled_app("test-gem/Rakefile").read).to eq(rakefile)
+      end
     end
 
     context "--test parameter set to minitest" do
@@ -351,11 +364,26 @@ RAKEFILE
       end
 
       it "requires 'minitest_helper'" do
-        expect(bundled_app("test-gem/test/test_test/gem.rb").read).to match(/require '.\/minitest_helper'/)
+        expect(bundled_app("test-gem/test/test_test/gem.rb").read).to match(/require 'minitest_helper'/)
       end
 
       it "creates a default test which fails" do
         expect(bundled_app("test-gem/test/test_test/gem.rb").read).to match(/assert false/)
+      end
+
+      it "creates a default rake task to run the test suite" do
+        rakefile = strip_whitespace <<-RAKEFILE
+          require "bundler/gem_tasks"
+          require "rake/testtask"
+
+          Rake::TestTask.new(:test) do |t|
+            t.libs << "test"
+          end
+
+          task :default => :test
+        RAKEFILE
+
+        expect(bundled_app("test-gem/Rakefile").read).to eq(rakefile)
       end
     end
 

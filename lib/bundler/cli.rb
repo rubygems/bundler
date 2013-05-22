@@ -170,11 +170,10 @@ module Bundler
       "Use the rubygems modern index instead of the API endpoint"
     method_option "clean", :type => :boolean, :banner =>
       "Run bundle clean automatically after install"
-    unless Bundler.rubygems.security_policies.empty?
-      method_option "trust-policy", :alias => "P", :type => :string, :banner =>
-        "Gem trust policy (like gem install -P). Must be one of " + Bundler.rubygems.security_policies.keys.join('|')
-    end
-
+    method_option "trust-policy", :alias => "P", :type => :string, :banner =>
+      "Gem trust policy (like gem install -P). Must be one of " +
+        Bundler.rubygems.security_policies.keys.join('|') unless
+        Bundler.rubygems.security_policies.empty?
     def install
       opts = options.dup
       if opts[:without]
@@ -252,26 +251,31 @@ module Bundler
       if Bundler.settings[:path]
         absolute_path = File.expand_path(Bundler.settings[:path])
         relative_path = absolute_path.sub(File.expand_path('.'), '.')
-        Bundler.ui.confirm "Your bundle is complete! " +
-          "It was installed into #{relative_path}"
+        Bundler.ui.confirm "Your bundle is complete!"
+        Bundler.ui.confirm without_groups_message if Bundler.settings.without.any?
+        Bundler.ui.confirm "It was installed into #{relative_path}"
       else
-        Bundler.ui.confirm "Your bundle is complete! " +
-          "Use `bundle show [gemname]` to see where a bundled gem is installed."
+        Bundler.ui.confirm "Your bundle is complete!"
+        Bundler.ui.confirm without_groups_message if Bundler.settings.without.any?
+        Bundler.ui.confirm "Use `bundle show [gemname]` to see where a bundled gem is installed."
       end
       Installer.post_install_messages.to_a.each do |name, msg|
-        Bundler.ui.confirm "Post-install message from #{name}:\n#{msg}"
+        Bundler.ui.confirm "Post-install message from #{name}:"
+        Bundler.ui.info msg
       end
 
       clean if Bundler.settings[:clean] && Bundler.settings[:path]
-    rescue GemNotFound => e
+    rescue GemNotFound, VersionConflict => e
       if opts[:local] && Bundler.app_cache.exist?
         Bundler.ui.warn "Some gems seem to be missing from your vendor/cache directory."
       end
 
-      if Bundler.definition.no_sources?
-        Bundler.ui.warn "Your Gemfile has no remote sources. If you need " \
-          "gems that are not already on\nyour machine, add a line like this " \
-          "to your Gemfile:\n    source 'https://rubygems.org'"
+      if Bundler.definition.rubygems_remotes.empty?
+        Bundler.ui.warn <<-WARN, :wrap => true
+          Your Gemfile has no gem server sources. If you need gems that are \
+          not already on your machine, add a line like this to your Gemfile:
+          source 'https://rubygems.org'
+        WARN
       end
       raise e
     end
@@ -317,8 +321,8 @@ module Bundler
       Installer.install Bundler.root, Bundler.definition, opts
       Bundler.load.cache if Bundler.root.join("vendor/cache").exist?
       clean if Bundler.settings[:clean] && Bundler.settings[:path]
-      Bundler.ui.confirm "Your bundle is updated! " +
-        "Use `bundle show [gemname]` to see where a bundled gem is installed."
+      Bundler.ui.confirm "Your bundle is updated!"
+      Bundler.ui.confirm without_groups_message if Bundler.settings.without.any?
     end
 
     desc "show [GEM]", "Shows all gems that are part of the bundle, or the path to a given gem"
@@ -399,7 +403,8 @@ module Bundler
     def outdated(*gems)
       sources = Array(options[:source])
       Bundler.definition.validate_ruby!
-      current_specs = Bundler.load.specs
+
+      current_specs = Bundler.ui.silence { Bundler.load.specs }
 
       if gems.empty? && sources.empty?
         # We're doing a full update
@@ -488,7 +493,7 @@ module Bundler
     long_desc <<-D
       Exec runs a command, providing it access to the gems in the bundle. While using
       bundle exec you can require and call the bundled gems as if they were installed
-      into the systemwide Rubygems repository.
+      into the system wide Rubygems repository.
     D
     def exec(*args)
       Bundler.definition.validate_ruby!
@@ -646,22 +651,20 @@ module Bundler
     method_option :requirements, :type => :boolean, :default => false, :aliases => '-r', :banner => "Set to show the version of each required dependency."
     method_option :format, :type => :string, :default => "png", :aliases => '-F', :banner => "This is output format option. Supported format is png, jpg, svg, dot ..."
     def viz
+      require 'graphviz'
       output_file = File.expand_path(options[:file])
       graph = Graph.new(Bundler.load, output_file, options[:version], options[:requirements], options[:format])
-
-      begin
-        graph.viz
-      rescue LoadError => e
-        Bundler.ui.error e.inspect
-        Bundler.ui.warn "Make sure you have the graphviz ruby gem. You can install it with:"
-        Bundler.ui.warn "`gem install ruby-graphviz`"
-      rescue StandardError => e
-        if e.message =~ /GraphViz not installed or dot not in PATH/
-          Bundler.ui.error e.message
-          Bundler.ui.warn "The ruby graphviz gem requires GraphViz to be installed"
-        else
-          raise
-        end
+      graph.viz
+    rescue LoadError => e
+      Bundler.ui.error e.inspect
+      Bundler.ui.warn "Make sure you have the graphviz ruby gem. You can install it with:"
+      Bundler.ui.warn "`gem install ruby-graphviz`"
+    rescue StandardError => e
+      if e.message =~ /GraphViz not installed or dot not in PATH/
+        Bundler.ui.error e.message
+        Bundler.ui.warn "Please install GraphViz. On a Mac with homebrew, you can run `brew install graphviz`."
+      else
+        raise
       end
     end
 
@@ -715,7 +718,7 @@ module Bundler
       if options[:test]
         template(File.join("newgem/.travis.yml.tt"),         File.join(target, ".travis.yml"),            opts)
       end
-      Bundler.ui.info "Initializating git repo in #{target}"
+      Bundler.ui.info "Initializing git repo in #{target}"
       Dir.chdir(target) { `git init`; `git add .` }
 
       if options[:edit]
@@ -858,6 +861,14 @@ module Bundler
       pager ||= 'less -R' if Bundler.which("less")
       pager ||= 'more' if Bundler.which("more")
       pager ||= 'cat'
+    end
+
+    def without_groups_message
+      groups = Bundler.settings.without
+      group_list = [groups[0...-1].join(", "), groups[-1..-1]].
+        reject{|s| s.to_s.empty? }.join(" and ")
+      group_str = (groups.size == 1) ? "group" : "groups"
+      "Gems in the #{group_str} #{group_list} were not installed."
     end
 
   end

@@ -99,6 +99,20 @@ describe "gemcutter's dependency API" do
     should_be_installed("rails 2.3.2")
   end
 
+  it "doesn't fail if you only have a git gem with no deps when using --deployment" do
+    build_git "foo"
+    gemfile <<-G
+      source "#{source_uri}"
+      gem 'foo', :git => "file:///#{lib_path('foo-1.0')}"
+    G
+
+    bundle "install", :artifice => "endpoint"
+    bundle "install --deployment", :artifice => "endpoint", :exitstatus => true
+
+    expect(exitstatus).to eq(0)
+    should_be_installed("foo 1.0")
+  end
+
   it "falls back when the API errors out" do
     simulate_platform mswin
 

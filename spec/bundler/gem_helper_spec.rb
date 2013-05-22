@@ -177,11 +177,16 @@ describe "Bundler::GemHelper tasks" do
 
         @helper.should_receive(:rubygem_push).with(bundled_app('test/pkg/test-0.0.1.gem').to_s)
 
-        Dir.chdir(gem_repo1) { `git init --bare` }
-        Dir.chdir(@app) do
-         `git commit -a -m "another commit"`
-         `git tag -a -m \"Version 0.0.1\" v0.0.1`
-        end
+        Dir.chdir(gem_repo1) {
+          `git init --bare`
+        }
+        Dir.chdir(@app) {
+          `git init`
+          `git config user.email "you@example.com"`
+          `git config user.name "name"`
+          `git commit -a -m "another commit"`
+          `git tag -a -m \"Version 0.0.1\" v0.0.1`
+        }
         @helper.release_gem
       end
 

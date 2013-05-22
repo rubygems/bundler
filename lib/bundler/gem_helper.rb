@@ -1,5 +1,4 @@
-$:.unshift File.expand_path('../vendor', __FILE__)
-require 'thor'
+require 'bundler/vendored_thor' unless defined?(Thor)
 require 'bundler'
 
 module Bundler

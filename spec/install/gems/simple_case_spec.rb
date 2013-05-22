@@ -291,7 +291,7 @@ describe "bundle install with gem sources" do
       G
 
       bundle :install, :expect_err => true
-      expect(out).to match(/Your Gemfile has no remote sources/i)
+      expect(out).to match(/Your Gemfile has no gem server sources/i)
     end
 
     it "creates a Gemfile.lock on a blank Gemfile" do
@@ -509,7 +509,7 @@ describe "bundle install with gem sources" do
       G
 
       bundle :install, :quiet => true
-      expect(out).to match(/Your Gemfile has no remote sources/)
+      expect(out).to match(/Your Gemfile has no gem server sources/)
     end
   end
 

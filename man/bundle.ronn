@@ -44,7 +44,7 @@ We divide `bundle` subcommands into primary commands and utilities.
   Specify and read configuration options for bundler
 
 * `bundle help(1)`:
-  Displays this help page
+  Displays detailed help for each subcommand
 
 ## UTILITIES
 

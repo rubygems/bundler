@@ -1,4 +1,4 @@
-# Bundler: a gem to bundle gems [![Build Status](https://secure.travis-ci.org/carlhuda/bundler.png?branch=master)](http://travis-ci.org/carlhuda/bundler)
+# Bundler: a gem to bundle gems [![Build Status](https://secure.travis-ci.org/carlhuda/bundler.png?branch=1-3-stable)](http://travis-ci.org/carlhuda/bundler)
 
 Bundler keeps ruby applications running the same code on every machine.
 

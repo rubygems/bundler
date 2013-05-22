@@ -6,7 +6,7 @@ So! You're having problems with Bundler. This file is here to help. If you're ru
 
 Instructions for common Bundler uses can be found on the [Bundler documentation site](http://gembundler.com/).
 
-Detailed information about each Bundler command, including help with common problems, can be found in the [Bundler man pages](http://gembundler.com/man/bundle.1.html).
+Detailed information about each Bundler command, including help with common problems, can be found in the [Bundler man pages](http://gembundler.com/v1.3/man/bundle.1.html).
 
 ## Troubleshooting
 
@@ -14,9 +14,13 @@ Detailed information about each Bundler command, including help with common prob
 
 Please open a ticket with Heroku if you're having trouble deploying. They have a professional support team who can help you resolve Heroku issues far better than the Bundler team can. If the problem that you are having turns out to be a bug in Bundler itself, Heroku support can get the exact details to us.
 
-### Something else
+### Other problems
 
 First, figure out exactly what it is that you're trying to do. Then, go to the [Bundler documentation website](http://gembundler.com) and see if we have instructions on how to do that.
+
+Second, check [the compatibility
+list](http://gembundler.com/compatibility.html), and make sure that the version of Bundler that you are
+using works with the versions of Ruby and Rubygems that you are using.
 
 If the instructions don't work, or you can't find any instructions, you can try these troubleshooting steps:
 
@@ -72,7 +76,7 @@ If you are using Rails 2.3, please also include:
   - Your environment.rb file
 
 
-If you have either `rubygems-bundler` or `open_gem` installed, please try removing them and then following the troublshooting steps above before opening a new ticket.
+If you have either `rubygems-bundler` or `open_gem` installed, please try removing them and then following the troubleshooting steps above before opening a new ticket.
 
 [Create a gist](https://gist.github.com) containing all of that information, then visit the [Bundler issue tracker](https://github.com/carlhuda/bundler/issues) and [create a ticket](https://github.com/carlhuda/bundler/issues/new) describing your problem and linking to your gist.
 

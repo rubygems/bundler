@@ -1,8 +1,34 @@
-## 1.3.3
+## 1.3.5 (3 April 2013)
+
+Features:
+
+  - progress indicator while resolver is running (@chief)
 
 Bugfixes:
 
-  -  use YAML.dump over {}.to_yaml for better forwards compat
+  - update local overrides with orphaned revisions (@jamesferguson)
+  - revert to working quoting of RUBYOPT on Windows (@ogra)
+  - use basic auth even when SSL is not available (@jayniz)
+  - installing git gems without dependencies in deployment now works
+
+## 1.3.4 (15 March 2103)
+
+Bugfixes:
+
+  - load YAML on Rubygems versions that define module YAML
+  - fix regression that broke --without on ruby 1.8.7
+
+## 1.3.3 (13 March 2013)
+
+Features:
+
+  - compatible with Rubygems 2.0.2 (higher and lower already work)
+  - mention skipped groups in bundle install and bundle update output (@simi)
+  - `gem` creates rake tasks for minitest (@coop) and rspec
+
+Bugfixes:
+
+  - require rbconfig for standalone mode
 
 ## 1.3.2 (7 March 2013)
 

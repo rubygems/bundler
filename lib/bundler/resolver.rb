@@ -109,7 +109,7 @@ module Bundler
       end
     end
 
-    attr_reader :errors
+    attr_reader :errors, :started_at, :iteration_rate, :iteration_counter
 
     # Figures out the best possible configuration of gems that satisfies
     # the list of passed dependencies and any child dependencies without
@@ -122,7 +122,7 @@ module Bundler
     # <GemBundle>,nil:: If the list of dependencies can be resolved, a
     #   collection of gemspecs is returned. Otherwise, nil is returned.
     def self.resolve(requirements, index, source_requirements = {}, base = [])
-      Bundler.ui.info "Resolving dependencies..."
+      Bundler.ui.info "Resolving dependencies...", false
       base = SpecSet.new(base) unless base.is_a?(SpecSet)
       resolver = new(index, source_requirements, base)
       result = catch(:success) do
@@ -130,11 +130,14 @@ module Bundler
         raise resolver.version_conflict
         nil
       end
+      Bundler.ui.info "" # new line now that dots are done
       SpecSet.new(result)
+    rescue => e
+      Bundler.ui.info "" # new line before the error
+      raise e
     end
 
     def initialize(index, source_requirements, base)
-      @iteration_counter    = 0
       @errors               = {}
       @stack                = []
       @base                 = base
@@ -142,6 +145,8 @@ module Bundler
       @deps_for             = {}
       @missing_gems         = Hash.new(0)
       @source_requirements  = source_requirements
+      @iteration_counter    = 0
+      @started_at           = Time.now
     end
 
     def debug
@@ -168,10 +173,7 @@ module Bundler
       # gem dependencies have been resolved.
       throw :success, successify(activated) if reqs.empty?
 
-      @iteration_counter += 1
-      if((@iteration_counter % 10000) == 0)
-        Bundler.ui.info ".", false
-      end
+      indicate_progress
 
       debug { print "\e[2J\e[f" ; "==== Iterating ====\n\n" }
 
@@ -503,6 +505,25 @@ module Bundler
 
         end
         o
+      end
+    end
+
+    private
+
+    # Indicates progress by writing a '.' every iteration_rate time which is
+    # aproximately every second. iteration_rate is calculated in the first
+    # second of resolve running.
+    def indicate_progress
+      @iteration_counter += 1
+
+      if iteration_rate.nil?
+        if ((Time.now - started_at) % 3600).round >= 1
+          @iteration_rate = iteration_counter
+        end
+      else
+        if ((iteration_counter % iteration_rate) == 0)
+          Bundler.ui.info ".", false
+        end
       end
     end
   end

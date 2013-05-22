@@ -449,18 +449,26 @@ module Bundler
         Gem::Specification.find_all_by_name name
       end
 
-      def fetch_all_remote_specs
-        fetched, errors = Gem::SpecFetcher.new.available_specs(:complete)
-        # only raise if we don't get any specs back.
-        # this means we still work if prerelease_specs.4.8.gz
-        # don't exist but specs.4.8.gz do
-        if fetched.empty? && error = errors.detect {|e| e.is_a?(Gem::SourceFetchProblem) }
-          raise Gem::RemoteFetcher::FetchError.new(error.error, error.source)
-        end
+      def fetch_specs(source, name)
+        path = source + "#{name}.#{Gem.marshal_version}.gz"
+        string = Gem::RemoteFetcher.fetcher.fetch_path(path)
+        Bundler.load_marshal(string)
+      rescue Gem::RemoteFetcher::FetchError => e
+        # it's okay for prerelease to fail
+        raise e unless name == "prerelease_specs"
+      end
 
+      def fetch_all_remote_specs
+        # Since SpecFetcher now returns NameTuples, we just fetch directly
+        # and unmarshal the array ourselves.
         hash = {}
-        fetched.each do |source, tuples|
-          hash[source.uri] = tuples.map { |tuple| tuple.to_a }
+
+        Gem.sources.each do |source|
+          source = URI.parse(source.to_s) unless source.is_a?(URI)
+          hash[source] = fetch_specs(source, "specs")
+
+          pres = fetch_specs(source, "prerelease_specs")
+          hash[source].push(*pres) if pres && !pres.empty?
         end
 
         hash

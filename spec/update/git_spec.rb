@@ -192,5 +192,22 @@ describe "bundle update" do
       expect(out).to include(lib_path("foo-1.0").to_s)
     end
 
+    it "should not explode on invalid revision on update of gem by name" do
+      build_git "rack", "0.8"
+
+      build_git "rack", "0.8", :path => lib_path('local-rack') do |s|
+        s.write "lib/rack.rb", "puts :LOCAL"
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :git => "#{lib_path('rack-0.8')}", :branch => "master"
+      G
+
+      bundle %|config local.rack #{lib_path('local-rack')}|
+      bundle "update rack"
+      expect(out).to include("Your bundle is updated!")
+    end
+
   end
 end
