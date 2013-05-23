@@ -4,6 +4,13 @@ module Bundler
   class WorkerPool
     POISON = Object.new
 
+    class WrappedException < StandardError
+      attr_reader :exception
+      def initialize(exn)
+        @exception = exn
+      end
+    end
+
     def initialize(size, func)
       @request_queue = Queue.new
       @response_queue = Queue.new
@@ -16,7 +23,11 @@ module Bundler
     end
 
     def deq
-      @response_queue.deq
+      result = @response_queue.deq
+      if WrappedException === result
+        raise result.exception
+      end
+      result
     end
 
     def stop
@@ -67,6 +78,8 @@ module Bundler
                 obj = Marshal.load child_read
                 Marshal.dump func.call(obj), child_write
               end
+            rescue Exception => e
+              Marshal.dump WrappedException.new(e), child_write
             ensure
               child_read.close
               child_write.close
