@@ -245,7 +245,10 @@ module Bundler
 
     def install_sequentially(standalone)
       specs.each do |spec|
-        install_gem_from_spec spec, standalone
+        message = install_gem_from_spec spec, standalone
+        if message
+          Installer.post_install_messages[spec.name] = message
+        end
       end
     end
 
@@ -288,6 +291,7 @@ module Bundler
           end
         end
       end
+      message
     ensure
       worker_pool && worker_pool.stop
     end
