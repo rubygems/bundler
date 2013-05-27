@@ -472,6 +472,30 @@ describe "the lockfile format" do
     G
   end
 
+  it "stores relative paths when the path is provided for gemspec" do
+    build_lib("foo", :path => tmp.join("foo"))
+
+    install_gemfile <<-G
+      gemspec :path => "../foo"
+    G
+
+    lockfile_should_be <<-G
+      PATH
+        remote: ../foo
+        specs:
+          foo (1.0)
+
+      GEM
+        specs:
+
+      PLATFORMS
+        #{generic(Gem::Platform.local)}
+
+      DEPENDENCIES
+        foo!
+    G
+  end
+
   it "keeps existing platforms in the lockfile" do
     lockfile <<-G
       GEM
