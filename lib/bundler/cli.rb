@@ -405,6 +405,7 @@ module Bundler
       Bundler.definition.validate_ruby!
 
       current_specs = Bundler.ui.silence { Bundler.load.specs }
+      current_dependencies = Bundler.ui.silence { Bundler.load.dependencies }
 
       if gems.empty? && sources.empty?
         # We're doing a full update
@@ -443,7 +444,9 @@ module Bundler
 
           spec_version    = "#{active_spec.version}#{active_spec.git_version}"
           current_version = "#{current_spec.version}#{current_spec.git_version}"
-          Bundler.ui.info "  * #{active_spec.name} (#{spec_version} > #{current_version})"
+          dependency = current_dependencies.find { |dep| dep.name == current_spec.name }
+          dependency_version = %|Gemfile specifies "#{dependency.requirement}"| if dependency && dependency.specific?
+          Bundler.ui.info "  * #{active_spec.name} (#{spec_version} > #{current_version}) #{dependency_version}".rstrip
           out_count += 1
         end
         Bundler.ui.debug "from #{active_spec.loaded_from}"
