@@ -41,7 +41,7 @@ module Bundler
       def prepare_workers(size, func)
         @threads = size.times.map do |i|
           Thread.start do
-            Thread.abort_on_exception = true
+            Thread.current.abort_on_exception = true
             loop do
               obj = @request_queue.deq
               break if obj.equal? POISON
@@ -96,7 +96,7 @@ module Bundler
         @threads = size.times.map do |i|
           Thread.start do
             worker = @workers[i]
-            Thread.abort_on_exception = true
+            Thread.current.abort_on_exception = true
             loop do
               obj = @request_queue.deq
               break if obj.equal? POISON
