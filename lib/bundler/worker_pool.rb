@@ -61,6 +61,8 @@ module Bundler
         def work(obj)
           Marshal.dump obj, io_w
           Marshal.load io_r
+        rescue IOError
+          nil
         end
       end
 
@@ -79,7 +81,11 @@ module Bundler
                 Marshal.dump func.call(obj), child_write
               end
             rescue Exception => e
-              Marshal.dump WrappedException.new(e), child_write
+              begin
+                Marshal.dump WrappedException.new(e), child_write
+              rescue Errno::EPIPE
+                nil
+              end
             ensure
               child_read.close
               child_write.close
@@ -110,6 +116,7 @@ module Bundler
         @workers.each do |worker|
           worker.io_r.close
           worker.io_w.close
+          Process.kill :INT, worker.pid
         end
         @workers.each do |worker|
           Process.waitpid worker.pid
