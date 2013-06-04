@@ -112,6 +112,9 @@ module Bundler
           "rubygems.org' if possible, or 'http://rubygems.org' if not."
         @rubygems_source.add_remote "http://rubygems.org"
         return
+      when :gemcutter_https, :rubygems_https, :rubyforge_https then
+        @rubygems_source.add_remote "https://rubygems.org"
+        return
       when String
         @rubygems_source.add_remote source
         return
