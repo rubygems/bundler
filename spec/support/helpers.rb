@@ -191,11 +191,22 @@ module Spec
       str.gsub(/^#{spaces}/, '')
     end
 
-    def install_gemfile(*args)
+
+    def bundle_with_gemfile(cmd, *args)
       gemfile(*args)
       opts = args.last.is_a?(Hash) ? args.last : {}
-      bundle :install, opts
+      bundle cmd, opts
     end
+
+
+    def lock_gemfile(*args)
+      bundle_with_gemfile :lock, *args
+    end
+
+    def install_gemfile(*args)
+      bundle_with_gemfile :install, *args
+    end
+
 
     def install_gems(*gems)
       gems.each do |g|

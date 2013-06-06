@@ -27,6 +27,8 @@ module Bundler
   autoload :Installer,             'bundler/installer'
   autoload :Injector,              'bundler/injector'
   autoload :LazySpecification,     'bundler/lazy_specification'
+  autoload :Locker,                'bundler/locker'
+  autoload :LockingInstaller,      'bundler/locking_installer'
   autoload :LockfileParser,        'bundler/lockfile_parser'
   autoload :MatchPlatform,         'bundler/match_platform'
   autoload :RemoteSpecification,   'bundler/remote_specification'

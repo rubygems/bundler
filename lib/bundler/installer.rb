@@ -15,38 +15,8 @@ module Bundler
       installer
     end
 
-    # Runs the install procedures for a specific Gemfile.
-    #
-    # Firstly, this method will check to see if Bundler.bundle_path exists
-    # and if not then will create it. This is usually the location of gems
-    # on the system, be it RVM or at a system path.
-    #
-    # Secondly, it checks if Bundler has been configured to be "frozen"
-    # Frozen ensures that the Gemfile and the Gemfile.lock file are matching.
-    # This stops a situation where a developer may update the Gemfile but may not run
-    # `bundle install`, which leads to the Gemfile.lock file not being correctly updated.
-    # If this file is not correctly updated then any other developer running
-    # `bundle install` will potentially not install the correct gems.
-    #
-    # Thirdly, Bundler checks if there are any dependencies specified in the Gemfile using
-    # Bundler::Environment#dependencies. If there are no dependencies specified then
-    # Bundler returns a warning message stating so and this method returns.
-    #
-    # Fourthly, Bundler checks if the default lockfile (Gemfile.lock) exists, and if so
-    # then proceeds to set up a defintion based on the default gemfile (Gemfile) and the
-    # default lock file (Gemfile.lock). However, this is not the case if the platform is different
-    # to that which is specified in Gemfile.lock, or if there are any missing specs for the gems.
-    #
-    # Fifthly, Bundler resolves the dependencies either through a cache of gems or by remote.
-    # This then leads into the gems being installed, along with stubs for their executables,
-    # but only if the --binstubs option has been passed or Bundler.options[:bin] has been set
-    # earlier.
-    #
-    # Sixthly, a new Gemfile.lock is created from the installed gems to ensure that the next time
-    # that a user runs `bundle install` they will receive any updates from this process.
-    #
-    # Finally: TODO add documentation for how the standalone process works.
-    def run(options)
+
+    def make_bundle_path
       # Create the BUNDLE_PATH directory
       begin
         Bundler.bundle_path.mkpath unless Bundler.bundle_path.exist?
@@ -54,35 +24,18 @@ module Bundler
         raise PathError, "Could not install to path `#{Bundler.settings[:path]}` " +
           "because of an invalid symlink. Remove the symlink so the directory can be created."
       end
+    end
 
+
+    # Check that the gemfile and lockfile match if we're installing "frozen."
+    def vet_freeze!(options)
       if Bundler.settings[:frozen]
         @definition.ensure_equivalent_gemfile_and_lockfile(options[:deployment])
       end
+    end
 
-      if dependencies.empty?
-        Bundler.ui.warn "The Gemfile specifies no dependencies"
-        lock
-        return
-      end
 
-      if Bundler.default_lockfile.exist? && !options["update"]
-        local = Bundler.ui.silence do
-          begin
-            tmpdef = Definition.build(Bundler.default_gemfile, Bundler.default_lockfile, nil)
-            true unless tmpdef.new_platform? || tmpdef.missing_specs.any?
-          rescue BundlerError
-          end
-        end
-      end
-
-      # Since we are installing, we can resolve the definition
-      # using remote specs
-      unless local
-        options["local"] ?
-          @definition.resolve_with_cache! :
-          @definition.resolve_remotely!
-      end
-
+    def install(options)
       # Must install gems in the order that the resolver provides
       # as dependencies might actually affect the installation of
       # the gem.
@@ -91,9 +44,17 @@ module Bundler
         install_gem_from_spec(spec, options[:standalone])
       end
 
-      lock
       generate_standalone(options[:standalone]) if options[:standalone]
     end
+
+
+    def run(options)
+      make_bundle_path
+      vet_freeze!(options)
+
+      install(options)
+    end
+
 
     def install_gem_from_spec(spec, standalone = false)
       # Download the gem to get the spec, because some specs that are returned
@@ -200,6 +161,7 @@ module Bundler
         end
       end
     end
+
 
     def generate_standalone(groups)
       standalone_path = Bundler.settings[:path]
