@@ -85,15 +85,36 @@ module Bundler
     # fetch a gem specification
     def fetch_spec(spec)
       spec = spec - [nil, 'ruby', '']
-      spec_file_name = "#{spec.join '-'}.gemspec.rz"
+      spec_file_name = "#{spec.join '-'}.gemspec"
 
-      uri = URI.parse("#{@remote_uri}#{Gem::MARSHAL_SPEC_DIR}#{spec_file_name}")
+      if cached_spec_path = gemspec_cached_path(spec_file_name)
+        Bundler.load_gemspec(cached_spec_path)
+      else
+        spec_file_name << '.rz'
+        uri = URI.parse("#{@remote_uri}#{Gem::MARSHAL_SPEC_DIR}#{spec_file_name}")
 
-      spec_rz = (uri.scheme == "file") ? Gem.read_binary(uri.path) : fetch(uri)
-      Bundler.load_marshal Gem.inflate(spec_rz)
+        spec_rz = (uri.scheme == "file") ? Gem.read_binary(uri.path) : fetch(uri)
+        Bundler.load_marshal Gem.inflate(spec_rz)
+      end
     rescue MarshalError => e
       raise HTTPError, "Gemspec #{spec} contained invalid data.\n" \
         "Your network or your gem server is probably having issues right now."
+    end
+
+    # cached gem specification path, if one exists
+    def gemspec_cached_path spec_file_name
+      paths = gemspec_cache_dirs.map { |dir| File.join(dir, spec_file_name) }
+      paths = paths.select {|path| File.file? path }
+      paths.first
+    end
+
+    # directories where cached gemspecs are likely to exist
+    def gemspec_cache_dirs
+      @gemspec_cache_dirs ||= begin
+        dirs = Gem.path.map {|dir| File.join(dir, 'specifications')}
+        dirs << Gem.spec_cache_dir if Gem.respond_to?(:spec_cache_dir) # Not in Rubygems 2.0.3 or earlier
+        dirs.select {|dir| File.directory? dir}
+      end
     end
 
     # return the specs in the bundler format as an index
