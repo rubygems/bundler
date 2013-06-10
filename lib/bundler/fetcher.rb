@@ -102,18 +102,9 @@ module Bundler
 
     # cached gem specification path, if one exists
     def gemspec_cached_path spec_file_name
-      paths = gemspec_cache_dirs.map { |dir| File.join(dir, spec_file_name) }
+      paths = Bundler.rubygems.spec_cache_dirs.map { |dir| File.join(dir, spec_file_name) }
       paths = paths.select {|path| File.file? path }
       paths.first
-    end
-
-    # directories where cached gemspecs are likely to exist
-    def gemspec_cache_dirs
-      @gemspec_cache_dirs ||= begin
-        dirs = Gem.path.map {|dir| File.join(dir, 'specifications')}
-        dirs << Gem.spec_cache_dir if Gem.respond_to?(:spec_cache_dir) # Not in Rubygems 2.0.3 or earlier
-        dirs.select {|dir| File.directory? dir}
-      end
     end
 
     # return the specs in the bundler format as an index
