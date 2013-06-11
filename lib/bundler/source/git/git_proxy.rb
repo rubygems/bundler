@@ -95,7 +95,7 @@ module Bundler
             out
           else
             raise GitError, "Bundler is trying to run a `git #{command}` at runtime. You probably need to run `bundle install`. However, " \
-                            "this error message could probably be more useful. Please submit a ticket at http://github.com/carlhuda/bundler/issues " \
+                            "this error message could probably be more useful. Please submit a ticket at http://github.com/bundler/bundler/issues " \
                             "with steps to reproduce as well as the following\n\nCALLER: #{caller.join("\n")}"
           end
         end

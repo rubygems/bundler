@@ -1,4 +1,4 @@
-Great to have you here! Here are a few ways you can help out with [Bundler](http://github.com/carlhuda/bundler).
+Great to have you here! Here are a few ways you can help out with [Bundler](http://github.com/bundler/bundler).
 
 # Learn & listen
 
@@ -12,10 +12,10 @@ The Bundler core team consists of André Arko ([@indirect](http://github.com/ind
 
 When adding a new feature to Bundler, please follow these steps:
 
-  1. [Create an issue](https://github.com/carlhuda/bundler/issues/new) to discuss your feature.
+  1. [Create an issue](https://github.com/bundler/bundler/issues/new) to discuss your feature.
   2. Base your commits on the master branch, since we follow [SemVer](http://semver.org) and don't add new features to old releases.
   3. Commit the code and at least one test covering your changes to a feature branch in your fork.
-  4. Put a line in the [CHANGELOG](https://github.com/carlhuda/bundler/blob/master/CHANGELOG.md) summarizing your changes under the next release under the "Features" heading.
+  4. Put a line in the [CHANGELOG](https://github.com/bundler/bundler/blob/master/CHANGELOG.md) summarizing your changes under the next release under the "Features" heading.
   5. Send us a [pull request](https://help.github.com/articles/using-pull-requests) from your feature branch.
 
 If you don't hear back immediately, don’t get discouraged! We all have day jobs, but we respond to most tickets within a day or two.
@@ -24,9 +24,9 @@ If you don't hear back immediately, don’t get discouraged! We all have day job
 
 Triage is the work of processing tickets that have been opened into actionable issues, feature requests, or bug reports. That includes verifying bugs, categorizing the ticket, and ensuring there's enough information to reproduce the bug for anyone who wants to try to fix it.
 
-We've created an [issues guide](https://github.com/carlhuda/bundler/blob/master/ISSUES.md) to walk Bundler users through the process of troubleshooting issues and reporting bugs.
+We've created an [issues guide](https://github.com/bundler/bundler/blob/master/ISSUES.md) to walk Bundler users through the process of troubleshooting issues and reporting bugs.
 
-If you'd like to help, awesome! You can [report a new bug](https://github.com/carlhuda/bundler/issues/new) or browse our [existing open tickets](https://github.com/carlhuda/bundler/issues).
+If you'd like to help, awesome! You can [report a new bug](https://github.com/bundler/bundler/issues/new) or browse our [existing open tickets](https://github.com/bundler/bundler/issues).
 
 Not every ticket will point to a bug in Bundler's code, but open tickets usually mean that there is something we could improve to help that user. Sometimes that means writing additional documentation, sometimes that means making error messages clearer, and sometimes that means explaining to a user that they need to install git to use git gems.
 
@@ -45,7 +45,7 @@ If you can reproduce an issue, you're well on your way to fixing it. :) Fixing i
   1. Discuss the fix on the existing issue. Coordinating with everyone else saves duplicate work and serves as a great way to get suggestions and ideas if you need any.
   2. Base your commits on the correct branch. Bugfixes for 1.x versions of Bundler should be based on the matching 1-x-stable branch.
   3. Commit the code and at least one test covering your changes to a named branch in your fork.
-  4. Put a line in the [CHANGELOG](https://github.com/carlhuda/bundler/blob/master/CHANGELOG.md) summarizing your changes under the next release under the “Bugfixes” heading.
+  4. Put a line in the [CHANGELOG](https://github.com/bundler/bundler/blob/master/CHANGELOG.md) summarizing your changes under the next release under the “Bugfixes” heading.
   5. Send us a [pull request](https://help.github.com/articles/using-pull-requests) from your bugfix branch.
 
 Finally, the ticket may be a duplicate of another older ticket. If you notice a ticket is a duplicate, simply comment on the ticket noting the original ticket’s number. For example, you could say “This is a duplicate of issue #42, and can be closed”.
@@ -78,7 +78,7 @@ If you have a suggestion or proposed change for [gembundler.com](http://gembundl
 
 Community is an important part of all we do. If you’d like to be part of the Bundler community, you can jump right in and start helping make Bundler better for everyone who uses it.
 
-It would be tremendously helpful to have more people answering questions about Bundler (and often simply about Rubygems or Ruby itself) in our [issue tracker](https://github.com/carlhuda/bundler/issues) or on [Stack Overflow](http://stackoverflow.com/questions/tagged/bundler).
+It would be tremendously helpful to have more people answering questions about Bundler (and often simply about Rubygems or Ruby itself) in our [issue tracker](https://github.com/bundler/bundler/issues) or on [Stack Overflow](http://stackoverflow.com/questions/tagged/bundler).
 
 Additional documentation and explanation is always helpful, too. If you have any suggestions for the Bundler website [gembundler.com](http://www.gembundler.com), we would absolutely love it if you opened an issue or pull request on the [bundler-site](https://github.com/bundler/bundler-site) repository.
 
