@@ -69,6 +69,23 @@ were before Bundler was activated. For example:
       `brew install wget`
     end
 
+Using `with_clean_env` is necessary if you are shelling out and
+invoking another bundler managed binary.  If invoked
+without `with_clean_env` the child process will inherit the
+BUNDLE_GEMFILE environment variable and run using the 
+parent process' Gemfile.  For example, to invoke correctly:
+
+    Bundler.with_clean_env do
+      `bundle exec /other/bundler/project/script`
+    end
+
+Bundler also provides some convenience helpers that wrap `system`
+and `exec`.
+
+    Bundler.clean_system('bundle exec /other/bundler/project/script')
+    Bundler.clean_exec('bundle exec /other/bundler/project/script')
+
+
 ## RUBYGEMS PLUGINS
 
 At present, the Rubygems plugin system requires all files
