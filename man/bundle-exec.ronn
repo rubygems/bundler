@@ -58,32 +58,33 @@ It also modifies Rubygems:
 
 ### Shelling out
 
-When shelling out (using the `system` or backticks methods,
-for example), Bundler's environment changes will propagate to
-the subshell environment. If you desire to shell out without
-Bundler's environment changes, simply employ the `with_clean_env`
-method. It will restore all environment variables to what they
-were before Bundler was activated. For example:
+Any Ruby code that opens a subshell (like `system`, backticks, or `%x{}`) will
+automatically use the current Bundler environment. If you need to shell out to
+a Ruby command that is not part of your current bundle, use the
+`with_clean_env` method with a block. Any subshells created inside the block
+will be given the environment present before Bundler was activated. For
+example, Homebrew commands run Ruby, but don't work inside a bundle:
 
     Bundler.with_clean_env do
       `brew install wget`
     end
 
-Using `with_clean_env` is necessary if you are shelling out and
-invoking another bundler managed binary.  If invoked
-without `with_clean_env` the child process will inherit the
-BUNDLE_GEMFILE environment variable and run using the 
-parent process' Gemfile.  For example, to invoke correctly:
+Using `with_clean_env` is also necessary if you are shelling out to a different
+bundle. Any Bundler commands run in a subshell will inherit the current
+Gemfile, so commands that need to run in the context of a different bundle also
+need to use `with_clean_env`.
 
     Bundler.with_clean_env do
-      `bundle exec /other/bundler/project/script`
+      Dir.chdir "/other/bundler/project" do
+        `bundle exec ./script`
+      end
     end
 
-Bundler also provides some convenience helpers that wrap `system`
-and `exec`.
+Bundler provides convenience helpers that wrap `system` and `exec`, and they
+can be used like this:
 
-    Bundler.clean_system('bundle exec /other/bundler/project/script')
-    Bundler.clean_exec('bundle exec /other/bundler/project/script')
+    Bundler.clean_system('brew install wget')
+    Bundler.clean_exec('brew install wget')
 
 
 ## RUBYGEMS PLUGINS
