@@ -201,6 +201,7 @@ module Bundler
         if defined?(Net::HTTP::Persistent)
           response = @connection.request(uri)
         else
+          @connection = Net::HTTP.new(uri.host, uri.port)
           req = Net::HTTP::Get.new uri.request_uri
           req.basic_auth(uri.user, uri.password) if uri.user && uri.password
           response = @connection.request(req)
