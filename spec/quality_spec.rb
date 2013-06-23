@@ -20,7 +20,6 @@ describe "The library itself" do
     failing_lines = []
     File.readlines(filename).each_with_index do |line,number|
       next if line =~ /^\s+#.*\s+\n$/
-      next if %w(LICENCE.md).include?(line)
       failing_lines << number + 1 if line =~ /\s+\n$/
     end
 
@@ -40,10 +39,11 @@ describe "The library itself" do
   end
 
   it "has no malformed whitespace" do
+    exempt = /\.gitmodules|\.marshal|fixtures|vendor|ssl_certs|LICENSE/
     error_messages = []
     Dir.chdir(File.expand_path("../..", __FILE__)) do
       `git ls-files`.split("\n").each do |filename|
-        next if filename =~ /\.gitmodules|\.marshal|fixtures|vendor|ssl_certs/
+        next if filename =~ exempt
         error_messages << check_for_tab_characters(filename)
         error_messages << check_for_extra_spaces(filename)
       end
