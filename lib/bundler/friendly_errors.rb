@@ -5,7 +5,7 @@ module Bundler
     Bundler.ui.error e.message, :wrap => true
     Bundler.ui.trace e
     exit e.status_code
-  rescue Thor::UndefinedCommandError => e
+  rescue Thor::UndefinedTaskError => e
     Bundler.ui.error e.message
     exit 15
   rescue Thor::Error => e

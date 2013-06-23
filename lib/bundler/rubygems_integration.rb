@@ -32,6 +32,10 @@ module Bundler
 
     def configuration
       Gem.configuration
+    rescue Gem::SystemExitException => e
+      Bundler.ui.error "#{e.class}: #{e.message}"
+      Bundler.ui.trace e
+      raise Gem::SystemExitException
     end
 
     def ruby_engine
@@ -85,10 +89,6 @@ module Bundler
 
     def bin_path(gem, bin, ver)
       Gem.bin_path(gem, bin, ver)
-    end
-
-    def refresh
-      Gem.refresh
     end
 
     def preserve_paths

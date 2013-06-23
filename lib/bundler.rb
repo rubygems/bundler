@@ -367,7 +367,6 @@ module Bundler
         configure_gem_home
       end
 
-      Bundler.rubygems.refresh
       bundle_path
     end
 
