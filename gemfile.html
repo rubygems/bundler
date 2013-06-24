@@ -76,21 +76,20 @@
   </div>
   <div class='bullet'>
     <div class='description'>
-      If you are actively developing a gem, perhaps checked out from Github, you can use the gem
-      directly from its directory on your filesystem.
+      If you would like to use a unpacked gem directly from the filesystem, simply set the <code>:path</code> option to the path containing the the gem's files.
     </div>
-    <pre class="sunburst">gem <span class="String"><span class="String">'</span>nokogiri<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>path</span> =&gt; <span class="String"><span class="String">'</span>~/sw/gems/nokogiri<span class="String">'</span></span>&#x000A;</pre>
+    <pre class="sunburst">gem <span class="String"><span class="String">'</span>extracted_library<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>path</span> =&gt; <span class="String"><span class="String">'</span>./vendor/extracted_library<span class="String">'</span></span>&#x000A;</pre>
   </div>
   <div class='bullet'>
     <div class='description'>
-      Dependencies can be placed into groups, to be ignored at install-time or required all at once.
+      Dependencies can be placed into groups. Groups can be ignored at install-time (using <code>--without</code>) or required all at once (using <code>Bundler.require</code>).
     </div>
-    <pre class="sunburst">gem <span class="String"><span class="String">'</span>wirble<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>group</span> =&gt; <span class="Constant"><span class="Constant">:</span>development</span>&#x000A;gem <span class="String"><span class="String">'</span>ruby-debug<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>group</span> =&gt; [<span class="Constant"><span class="Constant">:</span>development</span>, <span class="Constant"><span class="Constant">:</span>test</span>]&#x000A;&#x000A;group <span class="Constant"><span class="Constant">:</span>test</span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">'</span>rspec<span class="String">'</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;</pre>
+    <pre class="sunburst">gem <span class="String"><span class="String">'</span>wirble<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>group</span> =&gt; <span class="Constant"><span class="Constant">:</span>development</span>&#x000A;gem <span class="String"><span class="String">'</span>debugger<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>group</span> =&gt; [<span class="Constant"><span class="Constant">:</span>development</span>, <span class="Constant"><span class="Constant">:</span>test</span>]&#x000A;&#x000A;group <span class="Constant"><span class="Constant">:</span>test</span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">'</span>rspec<span class="String">'</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;</pre>
     <a href="/groups.html">Learn more: Groups</a>
   </div>
   <div class='bullet'>
     <div class='description'>
-      You can now specify the version of Ruby in the <code>Gemfile</code> like the following:
+      You can specify the required version of Ruby in the <code>Gemfile</code> with <code>ruby</code>. If the <code>Gemfile</code> is loaded on a different Ruby version, Bundler will raise an exception with an explanation.
     </div>
     <pre class="sunburst">ruby <span class="String"><span class="String">'</span>1.9.3<span class="String">'</span></span>&#x000A;</pre>
   </div>
