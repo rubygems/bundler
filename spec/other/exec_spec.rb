@@ -244,6 +244,5 @@ describe "bundle exec" do
         expect(out).to eq("1.0")
       end
     end
-
   end
 end
