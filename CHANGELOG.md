@@ -1,3 +1,9 @@
+## 1.3.6
+
+Bugfixes:
+
+  - set --no-cache when bundle install --local is called (@TimMoore)
+
 ## 1.3.5 (3 April 2013)
 
 Features:
