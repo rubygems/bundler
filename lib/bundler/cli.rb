@@ -224,6 +224,8 @@ module Bundler
         opts[:system] = true
       end
 
+      opts["no-cache"] ||= opts[:local]
+
       # Can't use Bundler.settings for this because settings needs gemfile.dirname
       Bundler.settings[:path]     = nil if opts[:system]
       Bundler.settings[:path]     = "vendor/bundle" if opts[:deployment]
@@ -245,7 +247,7 @@ module Bundler
       definition = Bundler.definition
       definition.validate_ruby!
       Installer.install(Bundler.root, definition, opts)
-      Bundler.load.cache if Bundler.root.join("vendor/cache").exist? && !options["no-cache"]
+      Bundler.load.cache if Bundler.root.join("vendor/cache").exist? && !opts["no-cache"]
 
       if Bundler.settings[:path]
         absolute_path = File.expand_path(Bundler.settings[:path])
