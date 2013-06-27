@@ -88,5 +88,4 @@ describe "Bundler.with_env helpers" do
       expect($?.exitstatus).to eq(42)
     end
   end
-
 end
