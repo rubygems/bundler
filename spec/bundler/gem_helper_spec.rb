@@ -128,6 +128,14 @@ describe "Bundler::GemHelper tasks" do
     end
 
     describe 'release' do
+      before do
+        Dir.chdir(@app) do
+          `git init`
+          `git config user.email "you@example.com"`
+          `git config user.name "name"`
+        end
+      end
+
       it "shouldn't push if there are unstaged files" do
         expect { @helper.release_gem }.to raise_error(/files that need to be committed/)
       end
@@ -140,15 +148,8 @@ describe "Bundler::GemHelper tasks" do
       it 'raises an appropriate error if there is no git remote' do
         Bundler.ui.stub(:confirm => nil, :error => nil) # silence messages
 
-        Dir.chdir(gem_repo1) {
-          `git init --bare`
-        }
-        Dir.chdir(@app) {
-          `git init`
-          `git config user.email "you@example.com"`
-          `git config user.name "name"`
-          `git commit -a -m "initial commit"`
-        }
+        Dir.chdir(gem_repo1) { `git init --bare` }
+        Dir.chdir(@app) { `git commit -a -m "initial commit"` }
 
         expect { @helper.release_gem }.to raise_error
       end
@@ -160,18 +161,13 @@ describe "Bundler::GemHelper tasks" do
 
         @helper.should_receive(:rubygem_push).with(bundled_app('test/pkg/test-0.0.1.gem').to_s)
 
-        Dir.chdir(gem_repo1) {
-          `git init --bare`
-        }
-        Dir.chdir(@app) {
-          `git init`
-          `git config user.email "you@example.com"`
-          `git config user.name "name"`
+        Dir.chdir(gem_repo1) { `git init --bare` }
+        Dir.chdir(@app) do
           `git remote add origin file://#{gem_repo1}`
           `git commit -a -m "initial commit"`
           sys_exec("git push origin master", true)
           `git commit -a -m "another commit"`
-        }
+        end
         @helper.release_gem
       end
 

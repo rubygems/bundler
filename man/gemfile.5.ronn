@@ -258,6 +258,10 @@ Are both equivalent to
 
     gem "rails", :git => "git://github.com/rails/rails.git"
 
+In addition, if you wish to choose a specific branch:
+
+    gem "rails", :github => "rails/rails", :branch => "branch_name"
+
 ### PATH (:path)
 
 You can specify that a gem is located in a particular location
