@@ -80,8 +80,7 @@ module Bundler
     status_code(6)
   end
 
-  class InvalidSpecSet < StandardError; end
-  class MarshalError   < StandardError; end
+  class MarshalError < StandardError; end
 
   class << self
     attr_writer :ui, :bundle_path
