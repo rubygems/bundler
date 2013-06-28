@@ -31,5 +31,4 @@ describe "bundle lock with git gems" do
     RUBY
     expect(out).to eq(bundle("show foo"))
   end
-
 end
