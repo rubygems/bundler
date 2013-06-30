@@ -66,7 +66,7 @@ describe "The library itself" do
   it "uses double-quotes consistently in specs" do
     included = /spec/
     error_messages = []
-    Dir.chdir(File.expand_path("../..", __FILE__)) do
+    Dir.chdir(File.expand_path("../", __FILE__)) do
       `git ls-files`.split("\n").each do |filename|
         next unless filename =~ included
         error_messages << check_for_spec_defs_with_single_quotes(filename)
