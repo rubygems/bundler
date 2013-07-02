@@ -6,7 +6,7 @@ describe Bundler::Dsl do
     Bundler::Source::Rubygems.stub(:new){ @rubygems }
   end
 
-  describe '#_normalize_options' do
+  describe "#_normalize_options" do
     it "converts :github to :git" do
       subject.gem("sparks", :github => "indirect/sparks")
       github_uri = "git://github.com/indirect/sparks.git"
@@ -32,8 +32,8 @@ describe Bundler::Dsl do
     end
   end
 
-  describe '#method_missing' do
-    it 'raises an error for unknown DSL methods' do
+  describe "#method_missing" do
+    it "raises an error for unknown DSL methods" do
       Bundler.should_receive(:read_file).with("Gemfile").and_return("unknown")
       error_msg = "Undefined local variable or method `unknown'" \
         " for Gemfile\\s+from Gemfile:1"
@@ -51,7 +51,7 @@ describe Bundler::Dsl do
   end
 
   describe "syntax errors" do
-    it "raise a Bundler::GemfileError" do
+    it "will raise a Bundler::GemfileError" do
       gemfile "gem 'foo', :path => /unquoted/string/syntax/error"
       expect { Bundler::Dsl.evaluate(bundled_app("Gemfile"), nil, true) }.
         to raise_error(Bundler::GemfileError)

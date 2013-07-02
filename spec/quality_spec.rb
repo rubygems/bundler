@@ -9,7 +9,7 @@ describe "The library itself" do
     failing_lines = []
 
     File.readlines(filename).each_with_index do |line,number|
-      failing_lines << number + 1 if line =~ /^(describe|it|context) {1}'{1}/
+      failing_lines << number + 1 if line =~ /^ *(describe|it|context) {1}'{1}/
     end
 
     unless failing_lines.empty?
