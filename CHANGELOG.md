@@ -3,6 +3,7 @@
 Features:
 
   - add `ENV['DEBUG_RESOLVER_TREE']` outputs resolver tree (@dblock)
+  - set $MANPATH so `bundle exec man name` works (#1624, @sunaku)
 
 ## 1.3.6
 
