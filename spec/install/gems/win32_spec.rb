@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe "bundle install with win32-generated lockfile" do
-  it 'should read lockfile' do
+  it "should read lockfile" do
     File.open(bundled_app('Gemfile.lock'), 'wb') do |f|
       f << "GEM\r\n"
       f << "  remote: file:#{gem_repo1}/\r\n"

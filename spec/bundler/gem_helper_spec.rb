@@ -62,7 +62,7 @@ describe "Bundler::GemHelper tasks" do
       expect(Bundler.ui).to be_a(Bundler::UI::Shell)
     end
 
-    describe 'install_tasks' do
+    describe "install_tasks" do
       before(:each) do
         @saved, Rake.application = Rake.application, Rake::Application.new
       end
@@ -92,7 +92,7 @@ describe "Bundler::GemHelper tasks" do
       end
     end
 
-    describe 'build' do
+    describe "build" do
       it "builds" do
         mock_build_message
         @helper.build_gem
@@ -106,7 +106,7 @@ describe "Bundler::GemHelper tasks" do
       end
     end
 
-    describe 'install' do
+    describe "install" do
       it "installs" do
         mock_build_message
         mock_confirm_message "test (0.0.1) installed."
@@ -127,7 +127,7 @@ describe "Bundler::GemHelper tasks" do
       end
     end
 
-    describe 'release' do
+    describe "release" do
       it "shouldn't push if there are unstaged files" do
         expect { @helper.release_gem }.to raise_error(/files that need to be committed/)
       end
@@ -137,7 +137,7 @@ describe "Bundler::GemHelper tasks" do
         expect { @helper.release_gem }.to raise_error(/files that need to be committed/)
       end
 
-      it 'raises an appropriate error if there is no git remote' do
+      it "raises an appropriate error if there is no git remote" do
         Bundler.ui.stub(:confirm => nil, :error => nil) # silence messages
 
         Dir.chdir(gem_repo1) {
@@ -193,7 +193,6 @@ describe "Bundler::GemHelper tasks" do
         }
         @helper.release_gem
       end
-
     end
   end
 end
