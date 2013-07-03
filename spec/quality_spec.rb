@@ -32,6 +32,7 @@ describe "The library itself" do
     failing_lines = []
     File.readlines(filename).each_with_index do |line,number|
       next if line =~ /^\s+#.*\s+\n$/
+      next if %w(LICENCE.md).include?(line)
       failing_lines << number + 1 if line =~ /\s+\n$/
     end
 

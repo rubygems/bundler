@@ -6,7 +6,11 @@ Features:
   - set $MANPATH so `bundle exec man name` works (#1624, @sunaku)
   - add Gemfile dependency info to bundle outdated output (#2487, @rahearn)
   - faster installs using gemspecs from the local system cache (#2497, @mipearson)
-  - add `bundle install -jN` option for N parallel gem installations (#2481, @eagletmt)
+  - add `bundle install -jN` for N parallel gem installations (#2481, @eagletmt)
+
+Bugfixes:
+
+  - reduce stack size while resolving, helping JRuby overflow less (#2510, @headius)
 
 ## 1.3.6
 

@@ -1,4 +1,5 @@
 require 'set'
+require 'bundler/safe_catch'
 # This is the latest iteration of the gem dependency resolving algorithm. As of now,
 # it can resolve (as a success or failure) any set of gem dependencies we throw at it
 # in a reasonable amount of time. The most iterations I've seen it take is about 150.
@@ -21,6 +22,9 @@ end
 
 module Bundler
   class Resolver
+    include SafeCatch
+    extend SafeCatch
+
     ALL = Bundler::Dependency::PLATFORM_MAP.values.uniq.freeze
 
     class SpecGroup < Array
@@ -125,7 +129,7 @@ module Bundler
       Bundler.ui.info "Resolving dependencies...", false
       base = SpecSet.new(base) unless base.is_a?(SpecSet)
       resolver = new(index, source_requirements, base)
-      result = catch(:success) do
+      result = safe_catch(:success) do
         resolver.start(requirements)
         raise resolver.version_conflict
         nil
@@ -171,7 +175,7 @@ module Bundler
     def resolve(reqs, activated, depth = 0)
       # If the requirements are empty, then we are in a success state. Aka, all
       # gem dependencies have been resolved.
-      throw :success, successify(activated) if reqs.empty?
+      safe_throw :success, successify(activated) if reqs.empty?
 
       indicate_progress
 
@@ -250,7 +254,7 @@ module Bundler
           if parent && parent.name != 'bundler'
             debug { "    -> Jumping to: #{parent.name}" }
             required_by = existing.respond_to?(:required_by) && existing.required_by.last
-            throw parent.name, required_by && required_by.name
+            safe_throw parent.name, required_by && required_by.name
           else
             # The original set of dependencies conflict with the base set of specs
             # passed to the resolver. This is by definition an impossible resolve.
@@ -317,7 +321,7 @@ module Bundler
               # Choose the closest pivot in the stack that will affect the conflict
               errorpivot = (@stack & [req_name, current.required_by.last.name]).last
               debug { "    -> Jumping to: #{errorpivot}" }
-              throw errorpivot, req_name
+              safe_throw errorpivot, req_name
             end
           end
         end
@@ -332,7 +336,7 @@ module Bundler
           @stack.reverse_each do |savepoint|
             if conflicts.include?(savepoint)
               debug { "    -> Jumping to: #{savepoint}" }
-              throw savepoint
+              safe_throw savepoint
             end
           end
         end
@@ -368,7 +372,7 @@ module Bundler
       # jump back to this point and try another version of the gem.
       length = @stack.length
       @stack << requirement.name
-      retval = catch(requirement.name) do
+      retval = safe_catch(requirement.name) do
         # try to resolve the next option
         resolve(reqs, activated, depth)
       end
