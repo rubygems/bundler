@@ -814,4 +814,22 @@ describe "bundle install with gem sources" do
     end
   end
 
+  it "should use gemspecs in the system cache when available" do
+    gemfile <<-G
+      source "http://localtestserver.gem"
+      gem 'rack'
+    G
+
+    FileUtils.mkdir_p "#{tmp}/gems/system/specifications"
+    File.open("#{tmp}/gems/system/specifications/rack-1.0.0.gemspec", 'w+') do |f|
+      spec = Gem::Specification.new do |s|
+        s.name = 'rack'
+        s.version = '1.0.0'
+        s.add_runtime_dependency 'activesupport', '2.3.2'
+      end
+      f.write spec.to_ruby
+    end
+    bundle :install, :artifice => 'endpoint_marshal_fail' # force gemspec load
+    should_be_installed "activesupport 2.3.2"
+  end
 end

@@ -85,15 +85,26 @@ module Bundler
     # fetch a gem specification
     def fetch_spec(spec)
       spec = spec - [nil, 'ruby', '']
-      spec_file_name = "#{spec.join '-'}.gemspec.rz"
+      spec_file_name = "#{spec.join '-'}.gemspec"
 
-      uri = URI.parse("#{@remote_uri}#{Gem::MARSHAL_SPEC_DIR}#{spec_file_name}")
-
-      spec_rz = (uri.scheme == "file") ? Gem.read_binary(uri.path) : fetch(uri)
-      Bundler.load_marshal Gem.inflate(spec_rz)
+      uri = URI.parse("#{@remote_uri}#{Gem::MARSHAL_SPEC_DIR}#{spec_file_name}.rz")
+      if uri.scheme == 'file'
+        Bundler.load_marshal Gem.inflate(Gem.read_binary(uri.path))
+      elsif cached_spec_path = gemspec_cached_path(spec_file_name)
+        Bundler.load_gemspec(cached_spec_path)
+      else
+        Bundler.load_marshal Gem.inflate(fetch(uri))
+      end
     rescue MarshalError => e
       raise HTTPError, "Gemspec #{spec} contained invalid data.\n" \
         "Your network or your gem server is probably having issues right now."
+    end
+
+    # cached gem specification path, if one exists
+    def gemspec_cached_path spec_file_name
+      paths = Bundler.rubygems.spec_cache_dirs.map { |dir| File.join(dir, spec_file_name) }
+      paths = paths.select {|path| File.file? path }
+      paths.first
     end
 
     # return the specs in the bundler format as an index
