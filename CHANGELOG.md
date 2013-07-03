@@ -1,3 +1,8 @@
+## 1.3.6
+
+Features:
+  - add Gemfile dependency info to bundle outdated output (@rahearn)
+
 ## 1.3.5 (3 April 2013)
 
 Features:

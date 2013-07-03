@@ -405,6 +405,8 @@ module Bundler
       Bundler.definition.validate_ruby!
 
       current_specs = Bundler.ui.silence { Bundler.load.specs }
+      current_dependencies = {}
+      Bundler.ui.silence { Bundler.load.dependencies.each { |dep| current_dependencies[dep.name] = dep } }
 
       if gems.empty? && sources.empty?
         # We're doing a full update
@@ -418,7 +420,8 @@ module Bundler
 
       out_count = 0
       # Loop through the current specs
-      current_specs.sort_by { |s| s.name }.each do |current_spec|
+      gemfile_specs, dependency_specs = current_specs.partition { |spec| current_dependencies.has_key? spec.name }
+      [gemfile_specs.sort_by(&:name), dependency_specs.sort_by(&:name)].flatten.each do |current_spec|
         next if !gems.empty? && !gems.include?(current_spec.name)
 
         active_spec = definition.index[current_spec.name].sort_by { |b| b.version }
@@ -443,7 +446,9 @@ module Bundler
 
           spec_version    = "#{active_spec.version}#{active_spec.git_version}"
           current_version = "#{current_spec.version}#{current_spec.git_version}"
-          Bundler.ui.info "  * #{active_spec.name} (#{spec_version} > #{current_version})"
+          dependency = current_dependencies[current_spec.name]
+          dependency_version = %|Gemfile specifies "#{dependency.requirement}"| if dependency && dependency.specific?
+          Bundler.ui.info "  * #{active_spec.name} (#{spec_version} > #{current_version}) #{dependency_version}".rstrip
           out_count += 1
         end
         Bundler.ui.debug "from #{active_spec.loaded_from}"

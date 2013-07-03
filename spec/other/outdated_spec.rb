@@ -26,7 +26,7 @@ describe "bundle outdated" do
 
       bundle "outdated"
 
-      expect(out).to include("activesupport (3.0 > 2.3.5)")
+      expect(out).to include("activesupport (3.0 > 2.3.5) Gemfile specifies \"= 2.3.5\"")
       expect(out).to include("foo (1.0")
 
       # Gem names are one per-line, between "*" and their parenthesized version.
@@ -93,7 +93,7 @@ describe "bundle outdated" do
         end
 
         bundle "outdated --pre"
-        expect(out).to include("activesupport (3.0.0.beta > 2.3.5)")
+        expect(out).to include("activesupport (3.0.0.beta > 2.3.5) Gemfile specifies \"= 2.3.5\"")
       end
     end
 
@@ -110,7 +110,7 @@ describe "bundle outdated" do
         G
 
         bundle "outdated"
-        expect(out).to include("activesupport (3.0.0.beta.2 > 3.0.0.beta.1)")
+        expect(out).to include("activesupport (3.0.0.beta.2 > 3.0.0.beta.1) Gemfile specifies \"= 3.0.0.beta.1\"")
       end
     end
   end
