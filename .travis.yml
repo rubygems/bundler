@@ -33,7 +33,7 @@ env:
   # we need to know if changes to rubygems will break bundler on release
   - RGV=master
   # test the latest rubygems release with all of our supported rubies
-  - RGV=v2.0.2
+  - RGV=v2.0.4
 matrix:
   allow_failures:
     # we want to know how we're doing with head, but not fail the build
