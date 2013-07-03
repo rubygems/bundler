@@ -79,6 +79,13 @@ module Bundler
       out << "\n"
     end
 
+
+    def specific?
+      super
+    rescue NoMethodError
+      requirement != ">= 0"
+    end
+
   private
 
     def on_18?

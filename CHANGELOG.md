@@ -4,6 +4,7 @@ Features:
 
   - add `ENV['DEBUG_RESOLVER_TREE']` outputs resolver tree (@dblock)
   - set $MANPATH so `bundle exec man name` works (#1624, @sunaku)
+  - add Gemfile dependency info to bundle outdated output (#2487, @rahearn)
 
 ## 1.3.6
 
