@@ -1,7 +1,6 @@
 require "spec_helper"
 
 describe "bundle outdated" do
-
   before :each do
     build_repo2 do
       build_git "foo", :path => lib_path("foo")
@@ -114,5 +113,4 @@ describe "bundle outdated" do
       end
     end
   end
-
 end

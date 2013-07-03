@@ -36,5 +36,4 @@ describe "bundle init" do
     expect(gemfile.scan(/gem "rspec", "= 1.2"/).size).to eq(1)
     expect(gemfile.scan(/group :development/).size).to eq(1)
   end
-
 end

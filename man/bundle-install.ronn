@@ -59,7 +59,7 @@ update process below under [CONSERVATIVE UPDATING][].
   Do not attempt to connect to `rubygems.org`, instead using just
   the gems already present in Rubygems' cache or in `vendor/cache`.
   Note that if a more appropriate platform-specific gem exists on
-  `rubygems.org`, it will not be found.
+  `rubygems.org`, it will not be found. This option implies `--no-cache`.
 
 * `--deployment`:
   Switches bundler's defaults into [deployment mode][DEPLOYMENT MODE].

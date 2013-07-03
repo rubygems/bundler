@@ -37,7 +37,7 @@ describe "bundle binstubs <gem>" do
       expect(out).to eq("Sorry, Bundler can only be run via Rubygems.")
     end
 
-    it "install binstubs from git gems" do
+    it "installs binstubs from git gems" do
       FileUtils.mkdir_p(lib_path("foo/bin"))
       FileUtils.touch(lib_path("foo/bin/foo"))
       build_git "foo", "1.0", :path => lib_path("foo") do |s|
@@ -95,7 +95,7 @@ describe "bundle binstubs <gem>" do
   end
 
   context "when the bin already exists" do
-    it "don't override it and warn" do
+    it "doesn't overwrite and warns" do
       FileUtils.mkdir_p(bundled_app("bin"))
       File.open(bundled_app("bin/rackup"), 'wb') do |file|
         file.print "OMG"
@@ -115,7 +115,7 @@ describe "bundle binstubs <gem>" do
     end
 
     context "when using --force" do
-      it "overrides the binstub" do
+      it "overwrites the binstub" do
         FileUtils.mkdir_p(bundled_app("bin"))
         File.open(bundled_app("bin/rackup"), 'wb') do |file|
           file.print "OMG"

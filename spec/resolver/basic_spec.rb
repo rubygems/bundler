@@ -18,7 +18,7 @@ describe "Resolving" do
     should_resolve_as %w(actionpack-2.3.5 activesupport-2.3.5 rack-1.0)
   end
 
-  it "resolve a conflicting index" do
+  it "resolves a conflicting index" do
     @index = a_conflict_index
     dep "my_app"
     should_resolve_as %w(activemodel-3.2.11 builder-3.0.4 grape-0.2.6 my_app-1.0.0)

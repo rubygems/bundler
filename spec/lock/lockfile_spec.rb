@@ -292,7 +292,7 @@ describe "the lockfile format" do
     G
   end
 
-  it "order dependencies of dependencies in alphabetical order" do
+  it "orders dependencies' dependencies in alphabetical order" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
 
@@ -328,7 +328,7 @@ describe "the lockfile format" do
     G
   end
 
-  it "orders dependencies according to version" do
+  it "orders dependencies by version" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
       gem 'double_deps'
@@ -469,6 +469,30 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         foo
+    G
+  end
+
+  it "stores relative paths when the path is provided for gemspec" do
+    build_lib("foo", :path => tmp.join("foo"))
+
+    install_gemfile <<-G
+      gemspec :path => "../foo"
+    G
+
+    lockfile_should_be <<-G
+      PATH
+        remote: ../foo
+        specs:
+          foo (1.0)
+
+      GEM
+        specs:
+
+      PLATFORMS
+        #{generic(Gem::Platform.local)}
+
+      DEPENDENCIES
+        foo!
     G
   end
 
@@ -638,7 +662,7 @@ describe "the lockfile format" do
   end
 
 
-  it "raises if two different versions are used" do
+  it "raises if two different sources are used" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack"
@@ -676,7 +700,7 @@ describe "the lockfile format" do
   # * multiple copies of the same GIT section appeared in the lockfile
   # * when this happened, those sections got multiple copies of gems
   #   in those sections.
-  it "fix corrupted lockfiles" do
+  it "fixes corrupted lockfiles" do
     build_git "omg", :path => lib_path('omg')
     revision = revision_for(lib_path('omg'))
 
@@ -740,7 +764,7 @@ describe "the lockfile format" do
     L
   end
 
-  describe "line endings" do
+  describe "a line ending" do
     def set_lockfile_mtime_to_known_value
       time = Time.local(2000, 1, 1, 0, 0, 0)
       File.utime(time, time, bundled_app('Gemfile.lock'))

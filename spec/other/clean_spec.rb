@@ -100,7 +100,7 @@ describe "bundle clean" do
     expect(vendored_gems("bin/rackup")).to exist
   end
 
-  it "remove gems in bundle without groups" do
+  it "removes gems in bundle without groups" do
     gemfile <<-G
       source "file://#{gem_repo1}"
 
@@ -288,7 +288,7 @@ describe "bundle clean" do
   end
 
   # handling bundle clean upgrade path from the pre's
-  it "removes .gem/.gemspec file even if there's no corresponding gem dir is already moved" do
+  it "removes .gem/.gemspec file even if there's no corresponding gem dir" do
     gemfile <<-G
       source "file://#{gem_repo1}"
 

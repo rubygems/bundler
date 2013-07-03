@@ -83,7 +83,7 @@ describe "bundle_ruby" do
     expect(out).to eq("Please define :engine")
   end
 
-  it "raises an error if engine version doesn't match ruby version for mri" do
+  it "raises an error if engine version doesn't match ruby version for MRI" do
     gemfile <<-G
       source "file://#{gem_repo1}"
       ruby "1.8.7", :engine => 'ruby', :engine_version => '1.2.4'

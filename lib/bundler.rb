@@ -80,8 +80,7 @@ module Bundler
     status_code(6)
   end
 
-  class InvalidSpecSet < StandardError; end
-  class MarshalError   < StandardError; end
+  class MarshalError < StandardError; end
 
   class << self
     attr_writer :ui, :bundle_path
@@ -262,7 +261,7 @@ module Bundler
         bin_dir = bin_dir.parent until bin_dir.exist?
 
         # if any directory is not writable, we need sudo
-        dirs = [path, bin_dir] | Dir[path.join('*')]
+        dirs = [path, bin_dir] | Dir[path.join('*').to_s]
         sudo_needed = dirs.find{|d| !File.writable?(d) }
       end
 

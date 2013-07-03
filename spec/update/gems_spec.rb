@@ -34,12 +34,12 @@ describe "bundle update" do
   end
 
   describe "--quiet argument" do
-    it 'shows UI messages without --quiet argument' do
+    it "shows UI messages without --quiet argument" do
       bundle "update"
       expect(out).to include("Fetching source")
     end
 
-    it 'does not show UI messages with --quiet argument' do
+    it "does not show UI messages with --quiet argument" do
       bundle "update --quiet"
       expect(out).not_to include("Fetching source")
     end
@@ -56,7 +56,7 @@ describe "bundle update" do
     end
   end
 
-  describe "with a unknown dependency" do
+  describe "with an unknown dependency" do
     it "should inform the user" do
       bundle "update halting-problem-solver", :expect_err=>true
       expect(out).to include "Could not find gem 'halting-problem-solver'"

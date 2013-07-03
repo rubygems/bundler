@@ -1,3 +1,10 @@
+## 1.3.6
+
+Bugfixes:
+
+  - set --no-cache when bundle install --local is called (@TimMoore)
+  - make gemspec path option preserve relative paths in lock file (@bwillis)
+
 ## 1.3.5 (3 April 2013)
 
 Features:
@@ -111,6 +118,7 @@ Features:
   - `binstubs` lists child gem bins if a gem has no binstubs
   - `bundle gem --edit` will open the new gemspec (@ndbroadbent)
   - `bundle gem --test rspec` now makes working tests (@tricknotes)
+  - `bundle env` prints info about bundler's environment (@peeja)
   - add `BUNDLE_IGNORE_CONFIG` environment variable support (@richo)
 
 Bugfixes:
