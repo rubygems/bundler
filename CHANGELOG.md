@@ -6,6 +6,10 @@ Features:
   - set $MANPATH so `bundle exec man name` works (#1624, @sunaku)
   - add Gemfile dependency info to bundle outdated output (#2487, @rahearn)
 
+Performance:
+
+  - Obtain gemspecs from the local system cache if available (#2497, @mipearson)
+
 ## 1.3.6
 
 Bugfixes:

@@ -79,6 +79,14 @@ module Bundler
       Gem.path
     end
 
+    def spec_cache_dirs
+      @spec_cache_dirs ||= begin
+        dirs = gem_path.map {|dir| File.join(dir, 'specifications')}
+        dirs << Gem.spec_cache_dir if Gem.respond_to?(:spec_cache_dir) # Not in Rubygems 2.0.3 or earlier
+        dirs.uniq.select {|dir| File.directory? dir}
+      end
+    end
+
     def marshal_spec_dir
       Gem::MARSHAL_SPEC_DIR
     end
