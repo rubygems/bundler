@@ -1,3 +1,9 @@
+## 1.3.6
+
+Bugfixes:
+
+ - make gemspec path option preserve relative paths in lock file (@bwillis)
+
 ## 1.3.5 (3 April 2013)
 
 Features:
