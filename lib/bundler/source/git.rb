@@ -151,7 +151,7 @@ module Bundler
       end
 
       def install(spec)
-        Bundler.ui.info "Using #{spec.name} (#{spec.version}) from #{to_s} "
+        Bundler.ui.info "Using #{spec.name} (#{spec.version}) from #{to_s}"
         if requires_checkout? && !@copied
           Bundler.ui.debug "  * Checking out revision: #{ref}"
           git_proxy.copy_to(install_path, submodules)
@@ -159,6 +159,7 @@ module Bundler
           @copied = true
         end
         generate_bin(spec)
+        nil
       end
 
       def cache(spec)

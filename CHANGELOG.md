@@ -5,10 +5,8 @@ Features:
   - add `ENV['DEBUG_RESOLVER_TREE']` outputs resolver tree (@dblock)
   - set $MANPATH so `bundle exec man name` works (#1624, @sunaku)
   - add Gemfile dependency info to bundle outdated output (#2487, @rahearn)
-
-Performance:
-
-  - Obtain gemspecs from the local system cache if available (#2497, @mipearson)
+  - faster installs using gemspecs from the local system cache (#2497, @mipearson)
+  - add `bundle install -jN` option for N parallel gem installations (#2481, @eagletmt)
 
 ## 1.3.6
 

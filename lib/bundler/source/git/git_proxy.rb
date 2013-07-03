@@ -58,7 +58,7 @@ module Bundler
             File.chmod((0777 & ~File.umask), destination)
           end
 
-          Dir.chdir(destination) do
+          SharedHelpers.chdir(destination) do
             git %|fetch --force --quiet --tags "#{path}"|
             git "reset --hard #{@revision}"
 
@@ -127,7 +127,7 @@ module Bundler
 
         def in_path(&blk)
           checkout unless path.exist?
-          Dir.chdir(path, &blk)
+          SharedHelpers.chdir(path, &blk)
         end
 
         def allowed_in_path

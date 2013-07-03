@@ -70,8 +70,9 @@ module Bundler
       end
 
       def install(spec)
-        Bundler.ui.info "Using #{spec.name} (#{spec.version}) from #{to_s} "
+        Bundler.ui.info "Using #{spec.name} (#{spec.version}) from #{to_s}"
         generate_bin(spec, :disable_extensions)
+        nil
       end
 
       def cache(spec)
@@ -189,7 +190,7 @@ module Bundler
         Bundler.ui.warn "The validation message from Rubygems was:\n  #{e.message}"
       ensure
         if gem_dir && gem_file
-          Dir.chdir(gem_dir){ FileUtils.rm_rf(gem_file) if File.exist?(gem_file) }
+          FileUtils.rm_rf(gem_dir.join gem_file)
         end
       end
 

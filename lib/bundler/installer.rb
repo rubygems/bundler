@@ -1,5 +1,6 @@
 require 'erb'
 require 'rubygems/dependency_installer'
+require 'bundler/worker_pool'
 
 module Bundler
   class Installer < Environment
@@ -87,8 +88,13 @@ module Bundler
       # as dependencies might actually affect the installation of
       # the gem.
       Installer.post_install_messages = {}
-      specs.each do |spec|
-        install_gem_from_spec(spec, options[:standalone])
+
+      size = options[:jobs] || 1
+      size = [size, 1].max
+      if size > 1
+        install_in_parallel size, options[:standalone]
+      else
+        install_sequentially options[:standalone]
       end
 
       lock
@@ -102,13 +108,12 @@ module Bundler
 
       # Fetch the build settings, if there are any
       settings = Bundler.settings["build.#{spec.name}"]
+      message = nil
       Bundler.rubygems.with_build_args [settings] do
-        spec.source.install(spec)
-        Bundler.ui.debug "from #{spec.loaded_from} "
+        message = spec.source.install(spec)
+        Bundler.ui.debug "  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
       end
 
-      # newline comes after installing, some gems say "with native extensions"
-      Bundler.ui.info ""
       if Bundler.settings[:bin] && standalone
         generate_standalone_bundler_executable_stubs(spec)
       elsif Bundler.settings[:bin]
@@ -116,6 +121,7 @@ module Bundler
       end
 
       FileUtils.rm_rf(Bundler.tmp)
+      message
     rescue Exception => e
       # install hook failed
       raise e if e.is_a?(Bundler::InstallHookError) || e.is_a?(Bundler::SecurityError)
@@ -235,6 +241,59 @@ module Bundler
           file.puts %{$:.unshift File.expand_path("\#{path}/#{path}")}
         end
       end
+    end
+
+    def install_sequentially(standalone)
+      specs.each do |spec|
+        message = install_gem_from_spec spec, standalone
+        if message
+          Installer.post_install_messages[spec.name] = message
+        end
+      end
+    end
+
+    def install_in_parallel(size, standalone)
+      name2spec = {}
+      remains = {}
+      enqueued = {}
+      specs.each do |spec|
+        name2spec[spec.name] = spec
+        remains[spec.name] = true
+      end
+
+      worker_pool = WorkerPool.new size, lambda { |name|
+        spec = name2spec[name]
+        message = install_gem_from_spec spec, standalone
+        { :name => spec.name, :post_install => message }
+      }
+
+      specs.each do |spec|
+        deps = spec.dependencies.select { |dep| dep.type != :development }
+        if deps.empty?
+          worker_pool.enq spec.name
+          enqueued[spec.name] = true
+        end
+      end
+
+      until remains.empty?
+        message = worker_pool.deq
+        remains.delete message[:name]
+        if message[:post_install]
+          Installer.post_install_messages[message[:name]] = message[:post_install]
+        end
+        remains.keys.each do |name|
+          next if enqueued[name]
+          spec = name2spec[name]
+          deps = spec.dependencies.select { |dep| remains[dep.name] and dep.type != :development }
+          if deps.empty?
+            worker_pool.enq name
+            enqueued[name] = true
+          end
+        end
+      end
+      message
+    ensure
+      worker_pool && worker_pool.stop
     end
   end
 end
