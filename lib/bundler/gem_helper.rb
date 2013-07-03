@@ -24,7 +24,7 @@ module Bundler
 
     def initialize(base = nil, name = nil)
       Bundler.ui = UI::Shell.new
-      @base = (base ||= Dir.pwd)
+      @base = (base ||= SharedHelpers.pwd)
       gemspecs = name ? [File.join(base, "#{name}.gemspec")] : Dir[File.join(base, "{,*}.gemspec")]
       raise "Unable to determine name from existing gemspec. Use :name => 'gemname' in #install_tasks to manually set it." unless gemspecs.size == 1
       @spec_path = gemspecs.first
@@ -153,7 +153,7 @@ module Bundler
       cmd << " 2>&1"
       outbuf = ''
       Bundler.ui.debug(cmd)
-      Dir.chdir(base) {
+      SharedHelpers.chdir(base) {
         outbuf = `#{cmd}`
         if $? == 0
           block.call(outbuf) if block

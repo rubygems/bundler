@@ -5,6 +5,7 @@ require 'bundler/gem_path_manipulation'
 require 'bundler/rubygems_ext'
 require 'bundler/rubygems_integration'
 require 'bundler/version'
+require 'bundler/constants'
 
 module Bundler
   preserve_gem_path
@@ -63,10 +64,6 @@ module Bundler
   class RubyVersionMismatch < BundlerError; status_code(18) ; end
   class SecurityError       < BundlerError; status_code(19) ; end
   class LockfileError       < BundlerError; status_code(20) ; end
-
-  WINDOWS = RbConfig::CONFIG["host_os"] =~ %r!(msdos|mswin|djgpp|mingw)!
-  FREEBSD = RbConfig::CONFIG["host_os"] =~ /bsd/
-  NULL    = WINDOWS ? "NUL" : "/dev/null"
 
   # Internal errors, should be rescued
   class VersionConflict  < BundlerError
@@ -316,7 +313,7 @@ module Bundler
       path = Pathname.new(file)
       # Eval the gemspec from its parent directory, because some gemspecs
       # depend on "./" relative paths.
-      Dir.chdir(path.dirname.to_s) do
+      SharedHelpers.chdir(path.dirname.to_s) do
         contents = path.read
         if contents[0..2] == "---" # YAML header
           eval_yaml_gemspec(path, contents)

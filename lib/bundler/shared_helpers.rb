@@ -1,6 +1,7 @@
 require 'pathname'
 require 'rubygems'
 
+require 'bundler/constants'
 require 'bundler/rubygems_integration'
 
 module Gem
@@ -31,6 +32,30 @@ module Bundler
       find_gemfile
     end
 
+    if WINDOWS
+      require 'monitor'
+      @chdir_monitor = Monitor.new
+      def chdir(dir, &blk)
+        @chdir_monitor.synchronize do
+          Dir.chdir dir, &blk
+        end
+      end
+
+      def pwd
+        @chdir_monitor.synchronize do
+          Dir.pwd
+        end
+      end
+    else
+      def chdir(dir, &blk)
+        Dir.chdir dir, &blk
+      end
+
+      def pwd
+        Dir.pwd
+      end
+    end
+
   private
 
     def find_gemfile
@@ -38,7 +63,7 @@ module Bundler
       return given if given && !given.empty?
 
       previous = nil
-      current  = File.expand_path(Dir.pwd)
+      current  = File.expand_path(SharedHelpers.pwd)
 
       until !File.directory?(current) || current == previous
         if ENV['BUNDLE_SPEC_RUN']
