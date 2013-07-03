@@ -48,7 +48,7 @@ describe "bundle cache with multiple platforms" do
   end
 
   it "ensures that bundle update does not delete gems for other platforms" do
-    bundle "update"
+    bundle "update --force"
 
     expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
     expect(bundled_app("vendor/cache/activesupport-2.3.5.gem")).to exist

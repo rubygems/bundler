@@ -764,7 +764,7 @@ describe "the lockfile format" do
       it "preserves Gemfile.lock \\n line endings" do
         update_repo2
 
-        expect { bundle "update" }.to change { File.mtime(bundled_app('Gemfile.lock')) }
+        expect { bundle "update --force" }.to change { File.mtime(bundled_app('Gemfile.lock')) }
         expect(File.read(bundled_app("Gemfile.lock"))).not_to match("\r\n")
         should_be_installed "rack 1.2"
       end
@@ -775,7 +775,7 @@ describe "the lockfile format" do
         File.open(bundled_app("Gemfile.lock"), "wb"){|f| f.puts(win_lock) }
         set_lockfile_mtime_to_known_value
 
-        expect { bundle "update" }.to change { File.mtime(bundled_app('Gemfile.lock')) }
+        expect { bundle "update --force" }.to change { File.mtime(bundled_app('Gemfile.lock')) }
         expect(File.read(bundled_app("Gemfile.lock"))).to match("\r\n")
         should_be_installed "rack 1.2"
       end

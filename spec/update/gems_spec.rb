@@ -12,12 +12,26 @@ describe "bundle update" do
   end
 
   describe "with no arguments" do
-    it "updates the entire bundle" do
+    it "prints --force message and exits" do
       update_repo2 do
         build_gem "activesupport", "3.0"
       end
 
       bundle "update"
+      expect(out).to include("--force")
+
+      should_be_installed "rack 1.0.0", "rack-obama 1.0", "activesupport 2.3.5"
+    end
+
+  end
+
+  describe "with --force and no arguments" do
+    it "updates the entire bundle" do
+      update_repo2 do
+        build_gem "activesupport", "3.0"
+      end
+
+      bundle "update --force"
       should_be_installed "rack 1.2", "rack-obama 1.0", "activesupport 3.0"
     end
 
@@ -28,19 +42,19 @@ describe "bundle update" do
         gem "rack-obama"
         exit!
       G
-      bundle "update"
+      bundle "update --force"
       expect(bundled_app("Gemfile.lock")).to exist
     end
   end
 
   describe "--quiet argument" do
     it 'shows UI messages without --quiet argument' do
-      bundle "update"
+      bundle "update --force"
       expect(out).to include("Fetching source")
     end
 
     it 'does not show UI messages with --quiet argument' do
-      bundle "update --quiet"
+      bundle "update --quiet --force"
       expect(out).not_to include("Fetching source")
     end
   end
@@ -51,7 +65,7 @@ describe "bundle update" do
         build_gem "activesupport", "3.0"
       end
 
-      bundle "update rack-obama"
+      bundle "update rack-obama "
       should_be_installed "rack 1.2", "rack-obama 1.0", "activesupport 2.3.5"
     end
   end
@@ -119,7 +133,7 @@ describe "bundle update without a Gemfile.lock" do
       gem "rack", "1.0"
     G
 
-    bundle "update"
+    bundle "update --force"
 
     should_be_installed "rack 1.0.0"
   end
@@ -140,12 +154,12 @@ describe "bundle update when a gem depends on a newer version of bundler" do
   end
 
   it "should not explode" do
-    bundle "update"
+    bundle "update --force"
     expect(err).to be_empty
   end
 
   it "should explain that bundler conflicted" do
-    bundle "update"
+    bundle "update --force"
     expect(out).not_to match(/in snapshot/i)
     expect(out).to match(/current Bundler version/i)
     expect(out).to match(/perhaps you need to update bundler/i)

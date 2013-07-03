@@ -20,7 +20,7 @@ describe "bundle update" do
     it "updates the source" do
       update_git "foo", :path => @git.path
 
-      bundle "update --source foo"
+      bundle "update --source foo --force"
 
       in_app_root do
         run <<-RUBY
@@ -35,7 +35,7 @@ describe "bundle update" do
     it "unlocks gems that were originally pulled in by the source" do
       update_git "foo", "2.0", :path => @git.path
 
-      bundle "update --source foo"
+      bundle "update --source foo --force"
       should_be_installed "foo 2.0"
     end
 
@@ -43,7 +43,7 @@ describe "bundle update" do
       update_repo2
       update_git "foo", :path => @git.path
 
-      bundle "update --source foo"
+      bundle "update --source foo --force"
       should_be_installed "rack 1.0"
     end
   end

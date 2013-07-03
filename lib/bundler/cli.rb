@@ -286,6 +286,7 @@ module Bundler
       update when you have changed the Gemfile, or if you want to get the newest
       possible versions of the gems in the bundle.
     D
+    method_option "force", :type => :boolean, :banner => "Update all the dependencies if a gem is not specified."
     method_option "source", :type => :array, :banner => "Update a specific source (and all gems associated with it)"
     method_option "local", :type => :boolean, :banner =>
       "Do not attempt to fetch gems remotely and use the gem cache instead"
@@ -296,6 +297,11 @@ module Bundler
     def update(*gems)
       sources = Array(options[:source])
       Bundler.ui.level = "warn" if options[:quiet]
+
+      if gems.empty? && !options[:force]
+        Bundler.ui.error "Run `bundle update GEM` to update a specific gem. Run `bundle update --force` if you really want to update all gems."
+        exit 1
+      end
 
       if gems.empty? && sources.empty?
         # We're doing a full update

@@ -200,7 +200,7 @@ describe "bundle clean" do
     update_git "foo", :path => lib_path("foo-bar")
     revision2 = revision_for(lib_path("foo-bar"))
 
-    bundle "update"
+    bundle "update --force"
     bundle :clean
 
     expect(out).to eq("Removing foo-bar (#{revision[0..11]})")
@@ -372,7 +372,7 @@ describe "bundle clean" do
       build_gem 'foo', '1.0.1'
     end
 
-    bundle "update"
+    bundle "update --force"
 
     should_have_gems 'foo-1.0.1'
     should_not_have_gems 'foo-1.0'
@@ -411,7 +411,7 @@ describe "bundle clean" do
       build_gem 'foo', '1.0.1'
     end
 
-    bundle :update
+    bundle 'update --force'
     should_have_gems 'foo-1.0', 'foo-1.0.1'
   end
 
@@ -428,7 +428,7 @@ describe "bundle clean" do
     update_repo2 do
       build_gem 'foo', '1.0.1'
     end
-    bundle :update
+    bundle 'update --force'
 
     sys_exec "gem list"
     expect(out).to include("foo (1.0.1, 1.0)")

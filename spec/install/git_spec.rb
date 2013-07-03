@@ -558,14 +558,14 @@ describe "bundle install with git sources" do
       s.write "lib/forced.rb", "FORCED = '1.1'"
     end
 
-    bundle "update"
+    bundle "update --force"
     should_be_installed "forced 1.1"
 
     Dir.chdir(lib_path('forced-1.0')) do
       `git reset --hard HEAD^`
     end
 
-    bundle "update"
+    bundle "update --force"
     should_be_installed "forced 1.0"
   end
 

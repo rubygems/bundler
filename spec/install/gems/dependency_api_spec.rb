@@ -190,7 +190,7 @@ describe "gemcutter's dependency API" do
         gem "rack"
       G
 
-      bundle "update --full-index", :artifice => "endpoint"
+      bundle "update --full-index --force", :artifice => "endpoint"
       expect(out).to include("Fetching source index from #{source_uri}")
       should_be_installed "rack 1.0.0"
     end
