@@ -1,3 +1,9 @@
+## 1.4.0
+
+Features:
+
+  - add `ENV['DEBUG_RESOLVER_TREE']` outputs resolver tree (@dblock)
+
 ## 1.3.6
 
 Bugfixes:

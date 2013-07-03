@@ -168,7 +168,7 @@ module Bundler
       resolve(reqs, activated)
     end
 
-    def resolve(reqs, activated)
+    def resolve(reqs, activated, depth = 0)
       # If the requirements are empty, then we are in a success state. Aka, all
       # gem dependencies have been resolved.
       throw :success, successify(activated) if reqs.empty?
@@ -196,6 +196,8 @@ module Bundler
 
       # Pull off the first requirement so that we can resolve it
       current = reqs.shift
+
+      $stderr.puts "#{' ' * depth}#{current}" if ENV['DEBUG_RESOLVER_TREE']
 
       debug { "Attempting:\n  #{current}"}
 
@@ -228,7 +230,7 @@ module Bundler
             @gems_size[dep] ||= gems_size(dep)
           end
 
-          resolve(reqs, activated)
+          resolve(reqs, activated, depth + 1)
         else
           debug { "    * [FAIL] Already activated" }
           @errors[existing.name] = [existing, current]
@@ -301,7 +303,7 @@ module Bundler
         end
 
         matching_versions.reverse_each do |spec_group|
-          conflict = resolve_requirement(spec_group, current, reqs.dup, activated.dup)
+          conflict = resolve_requirement(spec_group, current, reqs.dup, activated.dup, depth)
           conflicts << conflict if conflict
         end
 
@@ -337,7 +339,7 @@ module Bundler
       end
     end
 
-    def resolve_requirement(spec_group, requirement, reqs, activated)
+    def resolve_requirement(spec_group, requirement, reqs, activated, depth)
       # We are going to try activating the spec. We need to keep track of stack of
       # requirements that got us to the point of activating this gem.
       spec_group.required_by.replace requirement.required_by
@@ -368,7 +370,7 @@ module Bundler
       @stack << requirement.name
       retval = catch(requirement.name) do
         # try to resolve the next option
-        resolve(reqs, activated)
+        resolve(reqs, activated, depth)
       end
 
       # clear the search cache since the catch means we couldn't meet the
