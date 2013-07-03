@@ -42,8 +42,9 @@ module Bundler
       path              = opts && opts[:path] || '.'
       name              = opts && opts[:name] || '{,*}'
       development_group = opts && opts[:development_group] || :development
-      path              = File.expand_path(path, Bundler.default_gemfile.dirname)
-      gemspecs = Dir[File.join(path, "#{name}.gemspec")]
+      expanded_path     = File.expand_path(path, Bundler.default_gemfile.dirname)
+
+      gemspecs = Dir[File.join(expanded_path, "#{name}.gemspec")]
 
       case gemspecs.size
       when 1
@@ -56,9 +57,9 @@ module Bundler
           end
         end
       when 0
-        raise InvalidOption, "There are no gemspecs at #{path}."
+        raise InvalidOption, "There are no gemspecs at #{expanded_path}."
       else
-        raise InvalidOption, "There are multiple gemspecs at #{path}. Please use the :name option to specify which one."
+        raise InvalidOption, "There are multiple gemspecs at #{expanded_path}. Please use the :name option to specify which one."
       end
     end
 
