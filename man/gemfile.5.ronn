@@ -196,8 +196,7 @@ as they would for a normal gem.
 A git repository `SHOULD` have at least one file, at the root of the
 directory containing the gem, with the extension `.gemspec`. This file
 `MUST` contain a valid gem specification, as expected by the `gem build`
-command. It `MUST NOT` have any dependencies, other than on the files in
-the git repository itself and any built-in functionality of Ruby or Rubygems.
+command.
 
 If a git repository does not have a `.gemspec`, bundler will attempt to
 create one, but it will not contain any dependencies, executables, or
