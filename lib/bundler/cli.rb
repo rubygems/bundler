@@ -171,7 +171,7 @@ module Bundler
     method_option "clean", :type => :boolean, :banner =>
       "Run bundle clean automatically after install"
     method_option "platform", :type => :string, :banner =>
-      "Force the use of the specified platform instead of runtime detected platform" 
+      "Force the use of the specified platform instead of runtime detected platform"
     method_option "trust-policy", :alias => "P", :type => :string, :banner =>
       "Gem trust policy (like gem install -P). Must be one of " +
         Bundler.rubygems.security_policies.keys.join('|') unless
@@ -223,15 +223,15 @@ module Bundler
 
         Bundler.settings[:frozen] = '1'
       end
-       
+
       if opts[:platform]
-        Bundler.settings[:platform] = opts[:platform]  
+        Bundler.settings[:platform] = opts[:platform]
       else
         #Reset settings[:platform] to nil because if the option was given
         #in a previous call it was stored
-        Bundler.settings[:platform] = nil  
-      end   
-        
+        Bundler.settings[:platform] = nil
+      end
+
       # When install is called with --no-deployment, disable deployment mode
       if opts[:deployment] == false
         Bundler.settings.delete(:frozen)

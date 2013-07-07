@@ -84,7 +84,7 @@ update process below under [CONSERVATIVE UPDATING][].
   a `bundle/bundler/setup.rb` file to replace Bundler's own setup.
 
 * `--platform=<platform>`:
-  Force the platform used by bundler to determine the gems to be 
+  Force the platform used by bundler to determine the gems to be
   installed. By default bundler will use runtime detection to
   determine the target platform.
 

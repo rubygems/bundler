@@ -7,7 +7,7 @@ Features:
   - add Gemfile dependency info to bundle outdated output (#2487, @rahearn)
   - faster installs using gemspecs from the local system cache (#2497, @mipearson)
   - add `bundle install -jN` for N parallel gem installations (#2481, @eagletmt)
-  - add `bundle install --platform` to manually specify a platform (@Garoe) 
+  - add `bundle install --platform` to manually specify a platform (@Garoe)
 
 Bugfixes:
 
