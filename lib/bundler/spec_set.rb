@@ -23,11 +23,11 @@ module Bundler
 
         spec = lookup[dep.name].find do |s|
           if match_current_platform
-            if Bundler.settings[:platform]             
+            if Bundler.settings[:platform]
               MatchPlatform.match_argument_platform(s.platform)
             else
               Gem::Platform.match(s.platform)
-            end                          
+            end
           else
             s.match_platform(dep.__platform)
           end
