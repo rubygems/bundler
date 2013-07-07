@@ -6,6 +6,7 @@ module Bundler
       Gem::Platform.new('java'),
       Gem::Platform.new('mswin32'),
       Gem::Platform.new('x86-mingw32'),
+      Gem::Platform.new('dalvik'),
       Gem::Platform::RUBY
     ]
 

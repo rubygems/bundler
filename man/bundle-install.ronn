@@ -83,6 +83,11 @@ update process below under [CONSERVATIVE UPDATING][].
   `bundle` directory and installs the bundle there. It also generates
   a `bundle/bundler/setup.rb` file to replace Bundler's own setup.
 
+* `--platform=<platform>`:
+  Force the platform used by bundler to determine the gems to be 
+  installed. By default bundler will use runtime detection to
+  determine the target platform.
+
 * `--trust-policy=[<policy>]`:
   Apply the Rubygems security policy named <policy>, where policy is one of
   HighSecurity, MediumSecurity, LowSecurity, or NoSecurity. For more detail,
