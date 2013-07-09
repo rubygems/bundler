@@ -29,7 +29,7 @@ module Bundler
     def self.match_argument_platform(p)
       return false unless Bundler.settings[:platform]
       platform = Dependency.gem_platform(Bundler.settings[:platform].to_sym)
-      if platform.os == 'dalvik'
+      if platform != 'ruby' and platform.os == 'dalvik'
         platform = Dependency.dalvik_platform(Bundler.settings[:platform].to_sym)
         Gem::Platform::RUBY == p or
         p.nil? or match_dalvik(platform, p) or
