@@ -217,7 +217,7 @@ describe "bundle install --platform" do
           platform_specific (1.0-x86-mswin32)
 
       PLATFORMS
-        ruby
+        jruby
 
       DEPENDENCIES
         platform_specific
@@ -262,11 +262,11 @@ describe "bundle install --platform" do
     gemfile <<-G
       source "file://#{gem_repo1}"
 
-      gem "example_gem"
+      gem "dalvik_gem"
     G
 
     bundle "install --platorm ruboto"
-    should_be_installed "example_gem 0.0.1"
+    should_be_installed "dalvik_gem 1.0"
   end
 
   it "installs a dalvik gem with a higher version" do
@@ -274,11 +274,11 @@ describe "bundle install --platform" do
     gemfile <<-G
       source "file://#{gem_repo1}"
 
-      gem "example_gem"
+      gem "dalvik_gem"
     G
 
     bundle "install --platorm ruboto_9"
-    should_be_installed "example_gem 0.0.1"
+    should_be_installed "dalvik_gem 1.0"
   end
 
   it "does not installs a dalvik gem with a lower version" do
@@ -286,11 +286,11 @@ describe "bundle install --platform" do
     gemfile <<-G
       source "file://#{gem_repo1}"
 
-      gem "example_gem"
+      gem "dalvik_gem"
     G
 
     bundle "install --platorm ruboto_11"
-    should_not_be_installed "example_gem"
+    should_not_be_installed "dalvik_gem"
   end
 
 end
