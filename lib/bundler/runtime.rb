@@ -1,4 +1,5 @@
 require "digest/sha1"
+require "shellwords"
 
 module Bundler
   class Runtime < Environment
@@ -224,7 +225,7 @@ module Bundler
       rubyopt = [ENV["RUBYOPT"]].compact
       if rubyopt.empty? || rubyopt.first !~ /-rbundler\/setup/
         rubyopt.unshift %|-rbundler/setup|
-        rubyopt.unshift %|-I#{File.expand_path('../..', __FILE__)}|
+        rubyopt.unshift %|-I#{File.expand_path('../..', __FILE__).shellescape}|
         ENV["RUBYOPT"] = rubyopt.join(' ')
       end
     end
