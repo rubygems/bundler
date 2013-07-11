@@ -108,19 +108,34 @@ describe "bundle exec" do
     should_not_be_installed "rack_middleware 1.0"
   end
 
-  it "should not duplicate already exec'ed RUBYOPT or PATH" do
+  it "does not duplicate already exec'ed RUBYOPT" do
     install_gemfile <<-G
       gem "rack"
     G
 
     rubyopt = ENV['RUBYOPT']
-    rubyopt = "-I#{bundler_path} -rbundler/setup #{rubyopt}"
+    rubyopt = "-rbundler/setup #{rubyopt}"
 
     bundle "exec 'echo $RUBYOPT'"
     expect(out).to have_rubyopts(rubyopt)
 
     bundle "exec 'echo $RUBYOPT'", :env => {"RUBYOPT" => rubyopt}
     expect(out).to have_rubyopts(rubyopt)
+  end
+
+  it "does not duplicate already exec'ed PATH" do
+    install_gemfile <<-G
+      gem "rack"
+    G
+
+    rubylib = ENV['RUBYLIB']
+    rubylib = "#{bundler_path}"
+
+    bundle "exec 'echo $RUBYLIB'"
+    expect(out.split(File::PATH_SEPARATOR).count(rubylib)).to eq(1)
+
+    bundle "exec 'echo $RUBYLIB'", :env => {"RUBYLIB" => rubylib}
+    expect(out.split(File::PATH_SEPARATOR).count(rubylib)).to eq(1)
   end
 
   it "errors nicely when the argument doesn't exist" do
