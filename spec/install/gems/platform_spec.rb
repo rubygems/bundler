@@ -229,7 +229,7 @@ describe "bundle install --platform" do
       gem "platform_specific"
     G
 
-    bundle "install --platorm jruby"
+    bundle "install --platform jruby"
     should_be_installed "platform_specific 1.0 JAVA"
   end
 
@@ -241,7 +241,7 @@ describe "bundle install --platform" do
       gem "nokogiri"
     G
 
-    bundle "install --platorm jruby"
+    bundle "install --platform jruby"
     should_be_installed "nokogiri 1.4.2 JAVA", "weakling 0.0.3"
 
     simulate_new_machine
@@ -252,7 +252,7 @@ describe "bundle install --platform" do
       gem "nokogiri"
     G
 
-    bundle "install --platorm ruby"
+    bundle "install --platform ruby"
     should_be_installed "nokogiri 1.4.2"
     should_not_be_installed "weakling"
   end
@@ -265,7 +265,7 @@ describe "bundle install --platform" do
       gem "dalvik_gem"
     G
 
-    bundle "install --platorm ruboto"
+    bundle "install --platform ruboto"
     should_be_installed "dalvik_gem 1.0"
   end
 
@@ -277,7 +277,7 @@ describe "bundle install --platform" do
       gem "dalvik_gem"
     G
 
-    bundle "install --platorm ruboto_9"
+    bundle "install --platform ruboto_9"
     should_be_installed "dalvik_gem 1.0"
   end
 
@@ -289,7 +289,7 @@ describe "bundle install --platform" do
       gem "dalvik_gem"
     G
 
-    bundle "install --platorm ruboto_11"
+    bundle "install --platform ruboto_11"
     should_not_be_installed "dalvik_gem"
   end
 
