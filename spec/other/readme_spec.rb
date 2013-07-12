@@ -18,7 +18,7 @@ describe "bundle readme" do
         end
 
         bundle "readme rails"
-        out.should eq("This is the contents of the readme file")
+        expect(out).to eq("This is the contents of the readme file")
       end
 
     end
@@ -26,12 +26,12 @@ describe "bundle readme" do
 
   it "complains if a readme wasn't found" do
     bundle "readme rails"
-    out.should match(/No README found for 'rails'/i)
+    expect(out).to match(/No README found for 'rails'/i)
   end
 
   it "complains if gem not in bundle" do
     bundle "readme missing"
-    out.should match(/could not find gem 'missing'/i)
+    expect(out).to match(/could not find gem 'missing'/i)
   end
 
 end

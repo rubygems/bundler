@@ -610,17 +610,16 @@ module Bundler
 
     desc "readme GEM", "Prints out the README file of the given bundled gem"
     def readme(name)
-      gem_path = locate_gem(name)
-      file = Dir.glob(File.join(gem_path, "{README,readme,Readme,ReadMe}*")).first
+      return unless spec = select_spec(name, :regex_match)
+      file = Dir.glob(File.join(spec.full_gem_path, "{README,readme,Readme,ReadMe}*")).first
 
       Bundler.ui.info "No README found for '#{name}'" unless show_file(file)
     end
 
     desc "changelog GEM", "Prints the changelog of the given bundled gem"
     def changelog(name)
-      gem_path = locate_gem(name)
-
-      file = Dir.glob(File.join(gem_path, "*")).select do |f|
+      return unless spec = select_spec(name, :regex_match)
+      file = Dir.glob(File.join(spec.full_gem_path, "*")).select do |f|
         File.file?(f) && File.basename(f) =~ /^(history|changelog|changes)/i
       end.first
 
@@ -904,7 +903,7 @@ module Bundler
       success = false
 
       if file
-        command = "less #{file}"
+        command = "#{pager_system} #{file}"
         success = system(command)
         Bundler.ui.info "Could not run '#{command}'" unless success
       end

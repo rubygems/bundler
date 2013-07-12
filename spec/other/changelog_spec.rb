@@ -18,7 +18,7 @@ describe "bundle changelog" do
         end
 
         bundle "changelog rails"
-        out.should eq("This is the contents of the changelog file")
+        expect(out).to eq("This is the contents of the changelog file")
       end
 
     end
@@ -26,12 +26,12 @@ describe "bundle changelog" do
 
   it "complains if a changelog wasn't found" do
     bundle "changelog rails"
-    out.should match(/No Changelog found for 'rails'/i)
+    expect(out).to match(/No Changelog found for 'rails'/i)
   end
 
   it "complains if gem not in bundle" do
     bundle "changelog missing"
-    out.should match(/could not find gem 'missing'/i)
+    expect(out).to match(/could not find gem 'missing'/i)
   end
 
 end
