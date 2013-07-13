@@ -621,6 +621,20 @@ module Bundler
       end
     end
 
+    desc "goto GEM", "Opens a browser with homepage of the given bundled gem"
+    def goto(name)
+      browser = ENV['BROWSER']
+      return Bundler.ui.info("To visit the gem's homepage, set the $BROWSER env variable. You can use 'open' for OSX, or 'xdg-open' for Linux.") if browser.empty?
+      return unless spec = select_spec(name, :regex_match)
+
+      if spec.homepage
+        command = "#{browser} #{spec.homepage}"
+        Bundler.ui.info "Could not run '#{command}'" unless system(command)
+      else
+        Bundler.ui.error("No homepage available for this gem")
+      end
+    end
+
     desc "console [GROUP]", "Opens an IRB session with the bundle pre-loaded"
     def console(group = nil)
       group ? Bundler.require(:default, *(group.split.map! {|g| g.to_sym })) : Bundler.require

@@ -16,6 +16,7 @@ module Spec
       build_repo gem_repo1 do
         build_gem "rack", %w(0.9.1 1.0.0) do |s|
           s.executables = "rackup"
+          s.homepage = "http://rack.github.io/"
           s.post_install_message = "Rack's post install message"
         end
 
