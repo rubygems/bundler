@@ -68,6 +68,8 @@ module Bundler
           # dependency. If there are none, use the dependency's name
           # as the autorequire.
           Array(dep.autorequire || dep.name).each do |file|
+            # Allow `require: true` as an alias for `require: <name>`
+            file = dep.name if file == true
             required_file = file
             Kernel.require file
           end
