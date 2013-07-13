@@ -624,7 +624,7 @@ module Bundler
     desc "goto GEM", "Opens a browser with homepage of the given bundled gem"
     def goto(name)
       browser = ENV['BROWSER']
-      return Bundler.ui.info("To visit the gem's homepage, set the $BROWSER env variable. You can use 'open' for OSX, or 'xdg-open' for Linux.") if browser.empty?
+      return Bundler.ui.info("To visit the gem's homepage, set the $BROWSER env variable. You can use 'open' for OSX, or 'xdg-open' for Linux.") if browser.nil? || browser.empty?
       return unless spec = select_spec(name, :regex_match)
 
       if spec.homepage
