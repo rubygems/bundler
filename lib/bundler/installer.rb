@@ -1,6 +1,6 @@
 require 'erb'
 require 'rubygems/dependency_installer'
-require 'bundler/worker_pool'
+require 'bundler/parallel_workers'
 
 module Bundler
   class Installer < Environment
@@ -261,12 +261,11 @@ module Bundler
         remains[spec.name] = true
       end
 
-      worker_pool = WorkerPool.new size, lambda { |name|
+      worker_pool = ParallelWorkers.worker_pool size, lambda { |name|
         spec = name2spec[name]
         message = install_gem_from_spec spec, standalone
         { :name => spec.name, :post_install => message }
       }
-
       specs.each do |spec|
         deps = spec.dependencies.select { |dep| dep.type != :development }
         if deps.empty?
