@@ -33,6 +33,10 @@ describe "Bundler.require" do
       s.write "lib/seven.rb", "puts 'seven'"
     end
 
+    build_lib "eight", "1.0.0" do |s|
+      s.write "lib/eight.rb", "puts 'eight'"
+    end
+
     gemfile <<-G
       path "#{lib_path}"
       gem "one", :group => :bar, :require => %w(baz qux)
@@ -42,6 +46,7 @@ describe "Bundler.require" do
       gem "five"
       gem "six", :group => "string"
       gem "seven", :group => :not
+      gem "eight", :require => true, :group => :require_true
     G
   end
 
@@ -69,6 +74,10 @@ describe "Bundler.require" do
     # required in resolver order instead of gemfile order
     run("Bundler.require(:not)")
     expect(out.split("\n").sort).to eq(['seven', 'three'])
+
+    # test require: true
+    run "Bundler.require(:require_true)"
+    expect(out).to eq("eight")
   end
 
   it "allows requiring gems with non standard names explicitly" do
