@@ -240,6 +240,10 @@ module Spec
         end
 
         build_gem "foo"
+
+        build_gem "dalvik_gem" do |s|
+          s.platform = Gem::Platform.new([nil, "dalvik", 10])
+        end
       end
     end
 

@@ -67,6 +67,7 @@ module Bundler
       @unlock[:sources] ||= []
 
       current_platform = Bundler.rubygems.platforms.map { |p| generic(p) }.compact.last
+      current_platform = Dependency.gem_platform(Bundler.settings[:platform].to_sym) if Bundler.settings[:platform]
       @new_platform = !@platforms.include?(current_platform)
       @platforms |= [current_platform]
 
