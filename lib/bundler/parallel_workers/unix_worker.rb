@@ -1,5 +1,8 @@
 module Bundler
   module ParallelWorkers
+    # UnixWorker is used only on platforms where fork is available. The way
+    # this code works is, it forks a preconfigured number of workers and then
+    # It starts preconfigured number of threads that write to the connected pipe.
     class UnixWorker < Worker
 
       class JobHandler < Struct.new(:pid, :io_r, :io_w)
@@ -11,6 +14,13 @@ module Bundler
         end
       end
 
+      private
+
+      # Start forked workers for downloading gems. This version of worker
+      # is only used on platforms where fork is available.
+      #
+      # @param size [Integer] Size of worker pool
+      # @param func [Proc] Job that should be executed in the worker
       def prepare_workers(size, func)
         @workers = size.times.map do
           child_read, parent_write = IO.pipe
@@ -43,6 +53,11 @@ module Bundler
         end
       end
 
+      # Start the threads whose job is basically to wait for incoming messages
+      # on request queue and write that message to the connected pipe. Also retrieve
+      # messages from child worker via connected pipe and write the message to response queue
+      #
+      # @param size [Integer] Number of threads to be started
       def prepare_threads(size)
         @threads = size.times.map do |i|
           Thread.start do
@@ -57,6 +72,7 @@ module Bundler
         end
       end
 
+      # Kill the forked workers by sending SIGINT to them
       def stop_workers
         @workers.each do |worker|
           worker.io_r.close

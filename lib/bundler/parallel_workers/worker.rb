@@ -21,10 +21,14 @@ module Bundler
         prepare_threads size
       end
 
+      # Enque a request to be executed in the worker pool
+      #
+      # @param obj [String] mostly it is name of spec that should be downloaded
       def enq(obj)
         @request_queue.enq obj
       end
 
+      # Retrieves results of job function being executed in worker pool
       def deq
         result = @response_queue.deq
         if WrappedException === result
@@ -33,11 +37,15 @@ module Bundler
         result
       end
 
+      # Stop the forked workers and started threads
       def stop
         stop_workers
         stop_threads
       end
 
+      private
+      # Stop the worker threads by sending a poison object down the request queue 
+      # so as worker threads after retrieving it, shut themselves down
       def stop_threads
         @threads.each do
           @request_queue.enq POISON
@@ -47,9 +55,11 @@ module Bundler
         end
       end
 
+      # To be overridden by child classes
       def prepare_threads(size)
       end
 
+      # To be overridden by child classes
       def stop_workers
       end
 
