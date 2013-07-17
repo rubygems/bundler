@@ -226,12 +226,14 @@ module Bundler
     # spec, even if (say) a git gem is not checked out.
     def rubygems_index
       @rubygems_index ||= Index.build do |idx|
-        idx.add_source sources.rubygems_source.specs
+        sources.rubygems_sources.each do |rubygems|
+          idx.add_source rubygems.specs
+        end
       end
     end
 
     def has_rubygems_remotes?
-      sources.rubygems_source.remotes.any?
+      sources.rubygems_sources.any? {|s| s.remotes.any? }
     end
 
     def has_local_dependencies?
@@ -271,12 +273,12 @@ module Bundler
     def to_lock
       out = ""
 
-      sources.all_sources.each do |source|
+      sources.lock_sources.each do |source|
         # Add the source header
         out << source.to_lock
         # Find all specs for this source
         resolve.
-          select  { |s| s.source == source }.
+          select { |s| source.can_lock?(s) }.
           # This needs to be sorted by full name so that
           # gems with the same name, but different platform
           # are ordered consistently
@@ -461,16 +463,7 @@ module Bundler
       changes = false
 
       # Get the Rubygems source from the Gemfile.lock
-      locked_gem = @locked_sources.find { |s| s.kind_of?(Source::Rubygems) }
-
-      # Get the Rubygems source from the Gemfile
-      actual_gem = sources.rubygems_source
-
-      # If there is a Rubygems source in both
-      if locked_gem && actual_gem
-        # Merge the remotes from the Gemfile into the Gemfile.lock
-        changes = changes | locked_gem.replace_remotes(actual_gem)
-      end
+      locked_gem = @locked_sources.select { |s| s.kind_of?(Source::Rubygems) }
 
       # Replace the sources from the Gemfile with the sources from the Gemfile.lock,
       # if they exist in the Gemfile.lock and are `==`. If you can't find an equivalent

@@ -29,14 +29,18 @@ module Bundler
       end
 
       def hash
-        Rubygems.hash
+        @remotes.hash
       end
 
       def eql?(o)
-        o.is_a?(Rubygems)
+        o.is_a?(Rubygems) && remotes == o.remotes
       end
 
       alias == eql?
+
+      def can_lock?(spec)
+        spec.source.is_a?(Rubygems)
+      end
 
       def options
         { "remotes" => @remotes.map { |r| r.to_s } }
@@ -156,17 +160,6 @@ module Bundler
       def add_remote(source)
         uri = normalize_uri(source)
         @remotes.unshift(uri) unless @remotes.include?(uri)
-      end
-
-      def replace_remotes(source)
-        return false if source.remotes == @remotes
-
-        @remotes = []
-        source.remotes.each do |r|
-          add_remote r.to_s
-        end
-
-        true
       end
 
     protected

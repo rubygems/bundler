@@ -24,5 +24,8 @@ module Bundler
       message
     end
 
+    def can_lock?(spec)
+      spec.source == self
+    end
   end
 end
