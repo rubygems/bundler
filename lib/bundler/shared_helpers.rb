@@ -33,7 +33,7 @@ module Bundler
       find_gemfile
     end
 
-    if WINDOWS
+    if WINDOWS || RUBY_PLATFORM == 'java'
       require 'monitor'
       @chdir_monitor = Monitor.new
       def chdir(dir, &blk)
