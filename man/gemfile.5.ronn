@@ -74,16 +74,19 @@ Each _gem_ `MAY` have one or more version specifiers.
 ### REQUIRE AS (:require)
 
 Each _gem_ `MAY` specify files that should be used when autorequiring via
-`Bundler.require`. You may pass an array with multiple files, or `false` to
+`Bundler.require`. You may pass an array with multiple files or `true` if file
+you want `required` has same name as _gem_ or `false` to
 prevent any file from being autorequired.
 
     gem "redis", :require => ["redis/connection/hiredis", "redis"]
     gem "webmock", :require => false
+    gem "debugger", :require => true
 
 The argument defaults to the name of the gem. For example, these are identical:
 
     gem "nokogiri"
     gem "nokogiri", :require => "nokogiri"
+    gem "nokogiri", :require => true
 
 ### GROUPS (:group or :groups)
 
