@@ -6,6 +6,7 @@ require 'bundler/rubygems_ext'
 require 'bundler/rubygems_integration'
 require 'bundler/version'
 require 'bundler/constants'
+require 'bundler/current_ruby'
 
 module Bundler
   preserve_gem_path
@@ -320,6 +321,14 @@ module Bundler
           eval_gemspec(path, contents)
         end
       end
+    end
+
+
+    # Returns current version of Ruby
+    #
+    # @return [CurrentRuby] Current version of Ruby
+    def current_ruby
+      @current_ruby ||= CurrentRuby.new()
     end
 
     def clear_gemspec_cache
