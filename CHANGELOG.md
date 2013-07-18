@@ -7,6 +7,7 @@ Features:
   - add Gemfile dependency info to bundle outdated output (#2487, @rahearn)
   - faster installs using gemspecs from the local system cache (#2497, @mipearson)
   - add `bundle install -jN` for N parallel gem installations (#2481, @eagletmt)
+  - allow `require: true` as an alias for `require: <name>` (#2538, @ndbroadbent)
 
 Bugfixes:
 
