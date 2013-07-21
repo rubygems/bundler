@@ -17,76 +17,76 @@
 
         </div>
         <h2>bundle install</h2>
-<div class='contents'>
-  <div class='bullet'>
-    <div class='description'>
-      Make sure all dependencies in your Gemfile are available to your application.
-    </div>
-    <pre class='sunburst'>$ bundle install [--system]</pre>
-    <div class='notes'>
-      <p>
-        Gems will be installed to your default system location for gems. If your
-        system gems are stored in a root-owned location (such as in Mac OSX),
-        bundle will ask for your root password to install them there.
-      </p>
-      <p>
-        While installing gems, Bundler will check <code>vendor/cache</code> and then
-        your system's gems. If a gem isn't cached or installed, Bundler will try to
-        install it from the sources you have declared in your Gemfile.
-      </p>
-      <p>
-        The <code>--system</code> option is the default. Pass it to switch back after
-        using the <code>--path</code> option as described below.
-      </p>
-    </div>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      Install your dependencies, even gems that are already installed
-      to your system gems, to a location other than your system's gem
-      repository. In this case, install them to <code>vendor/bundle</code>.
-    </div>
-    <div class='how'>
-      <pre class='sunburst'>$ bundle install --path vendor/bundle</pre>
-      <div class='notes'>
-        Further <code>bundle</code> commands or calls to <code>Bundler.setup</code> or
-        <code>Bundler.require</code> will remember this location.
-      </div>
-      <a href="/v1.0/bundler_setup.html">Learn More: Bundler.setup</a>
-      <a href="/v1.0/groups.html">Learn More: Bundler.require</a>
-    </div>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      Install all dependencies except those in groups that are explicitly excluded.
-    </div>
-    <pre class='sunburst'>$ bundle install --without development test</pre>
-    <a href="/v1.0/groups.html">Learn More: Groups</a>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      Install all dependencies on to a production server.
-      Do <b>not</b> use this flag on a development machine.
-    </div>
-    <pre class='sunburst'>$ bundle install --deployment</pre>
-    <div class='notes'>
-      <p>
-        The <code>--deployment</code> flag activates a number of deployment-friendly
-        conventions:
-      </p>
-      <ul>
-        <li>Isolate all gems into <code>vendor/bundle</code></li>
-        <li>Require an up-to-date <code>Gemfile.lock</code></li>
-        <li>
-          If <code>bundle package</code> was run, do not fetch gems
-          from rubygems.org. Instead, only use gems in the checked
-          in <code>vendor/cache</code>
-        </li>
-      </ul>
-    </div>
-    <a href="/v1.0/deploying.html">Learn More: Deploying</a>
-  </div>
-</div>
+        <div class='contents'>
+          <div class='bullet'>
+            <div class='description'>
+              Make sure all dependencies in your Gemfile are available to your application.
+            </div>
+            <pre class='sunburst'>$ bundle install [--system]</pre>
+            <div class='notes'>
+              <p>
+                Gems will be installed to your default system location for gems. If your
+                system gems are stored in a root-owned location (such as in Mac OSX),
+                bundle will ask for your root password to install them there.
+              </p>
+              <p>
+                While installing gems, Bundler will check <code>vendor/cache</code> and then
+                your system's gems. If a gem isn't cached or installed, Bundler will try to
+                install it from the sources you have declared in your Gemfile.
+              </p>
+              <p>
+                The <code>--system</code> option is the default. Pass it to switch back after
+                using the <code>--path</code> option as described below.
+              </p>
+            </div>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              Install your dependencies, even gems that are already installed
+              to your system gems, to a location other than your system's gem
+              repository. In this case, install them to <code>vendor/bundle</code>.
+            </div>
+            <div class='how'>
+              <pre class='sunburst'>$ bundle install --path vendor/bundle</pre>
+              <div class='notes'>
+                Further <code>bundle</code> commands or calls to <code>Bundler.setup</code> or
+                <code>Bundler.require</code> will remember this location.
+              </div>
+              <a href="/v1.0/bundler_setup.html">Learn More: Bundler.setup</a>
+              <a href="/v1.0/groups.html">Learn More: Bundler.require</a>
+            </div>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              Install all dependencies except those in groups that are explicitly excluded.
+            </div>
+            <pre class='sunburst'>$ bundle install --without development test</pre>
+            <a href="/v1.0/groups.html">Learn More: Groups</a>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              Install all dependencies on to a production server.
+              Do <b>not</b> use this flag on a development machine.
+            </div>
+            <pre class='sunburst'>$ bundle install --deployment</pre>
+            <div class='notes'>
+              <p>
+                The <code>--deployment</code> flag activates a number of deployment-friendly
+                conventions:
+              </p>
+              <ul>
+                <li>Isolate all gems into <code>vendor/bundle</code></li>
+                <li>Require an up-to-date <code>Gemfile.lock</code></li>
+                <li>
+                  If <code>bundle package</code> was run, do not fetch gems
+                  from rubygems.org. Instead, only use gems in the checked
+                  in <code>vendor/cache</code>
+                </li>
+              </ul>
+            </div>
+            <a href="/v1.0/deploying.html">Learn More: Deploying</a>
+          </div>
+        </div>
       </div>
     </div>
     <div id='footer'>

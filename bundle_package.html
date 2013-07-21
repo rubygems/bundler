@@ -17,82 +17,82 @@
 
         </div>
         <h2>bundle package</h2>
-<div class='contents'>
-  <div class='bullet'>
-    <div class='description'>
-      Locks and then caches the gems into <code>./vendor/cache</code>.
-    </div>
-    <pre class='sunburst'>$ bundle package [--no-prune] [--all]</pre>
-    <div class='notes'>
-      <p>
-        Options:
-      </p>
-      <p>
-        <code>--no-prune</code>: Don't remove stale gems from the cache.
-      </p>
-      <p>
-        <code>--all</code>: package <code>:git</code>, <code>:path</code>, and <code>.gem</code> dependencies. Once used, the <code>--all</code> option will be remembered.
-      </p>
-    </div>
-    <div class='description'>
-      <p>
-        The package command will copy the <code>.gem</code> files for your gems in the
-        bundle into <code>./vendor/cache</code>. Afterward, when you run <code>bundle install</code>,
-        Bundler will use the gems in the cache in preference to the ones on rubygems.org.
-      </p>
-      <p>
-        Additionally, if you then check that directory into your source control repository,
-        others who check out your source will be able to install the bundle without having
-        to download any additional gems.
-      </p>
-    </div>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      Lock and cache gems from RubyGems into <code>./vendor/cache</code>.
-    </div>
-    <div class='how'>
-      <pre class='sunburst'>$ bundle package&#x000A;</pre>
-    </div>
-    <div class='notes'>
-      <p>
-        By default, if you simply run <code>bundle install</code> after running
-        <code>bundle package</code>, Bundler will still connect to rubygems.org to check
-        whether a platform-specific gem exists for any of the gems in <code>vendor/cache</code>.
-      </p>
-      <p>
-        This behavior can be avoided by instead running <code>bundle install --local</code>.
-        Note that this requires you to have the correctly platformed version for all of your gems
-        already cached. The easiest way to achieve this is to run <code>bundle package</code>
-        on an identical machine and then check in those vendored gems.
-      </p>
-    </div>
-  </div>
-  <div class='bullet' id='no-prune'>
-    <div class='description'>
-      Lock and cache gems from RubyGems into <code>./vendor/cache</code>, and don't remove any stale gems from the existing cache.
-    </div>
-    <div class='how'>
-      <pre class='sunburst'>$ bundle package --no-prune&#x000A;</pre>
-    </div>
-  </div>
-  <div class='bullet' id='all'>
-    <div class='description'>
-      Lock and cache all gems into <code>./vendor/cache</code>, including <code>:git</code>, <code>:path</code>, and <code>.gem</code> dependencies.
-    </div>
-    <div class='how'>
-      <pre class='sunburst'>$ bundle package --all</pre>
-    </div>
-    <div class='notes'>
-      <p>
-        Once used, the <code>--all</code> option will be remembered.
-      </p>
-      <p>
-        This will be the default on Bundler 2.0.
-      </p>
-    </div>
-  </div>
-</div>
+        <div class='contents'>
+          <div class='bullet'>
+            <div class='description'>
+              Locks and then caches the gems into <code>./vendor/cache</code>.
+            </div>
+            <pre class='sunburst'>$ bundle package [--no-prune] [--all]</pre>
+            <div class='notes'>
+              <p>
+                Options:
+              </p>
+              <p>
+                <code>--no-prune</code>: Don't remove stale gems from the cache.
+              </p>
+              <p>
+                <code>--all</code>: package <code>:git</code>, <code>:path</code>, and <code>.gem</code> dependencies. Once used, the <code>--all</code> option will be remembered.
+              </p>
+            </div>
+            <div class='description'>
+              <p>
+                The package command will copy the <code>.gem</code> files for your gems in the
+                bundle into <code>./vendor/cache</code>. Afterward, when you run <code>bundle install</code>,
+                Bundler will use the gems in the cache in preference to the ones on rubygems.org.
+              </p>
+              <p>
+                Additionally, if you then check that directory into your source control repository,
+                others who check out your source will be able to install the bundle without having
+                to download any additional gems.
+              </p>
+            </div>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              Lock and cache gems from RubyGems into <code>./vendor/cache</code>.
+            </div>
+            <div class='how'>
+              <pre class='sunburst'>$ bundle package&#x000A;</pre>
+            </div>
+            <div class='notes'>
+              <p>
+                By default, if you simply run <code>bundle install</code> after running
+                <code>bundle package</code>, Bundler will still connect to rubygems.org to check
+                whether a platform-specific gem exists for any of the gems in <code>vendor/cache</code>.
+              </p>
+              <p>
+                This behavior can be avoided by instead running <code>bundle install --local</code>.
+                Note that this requires you to have the correctly platformed version for all of your gems
+                already cached. The easiest way to achieve this is to run <code>bundle package</code>
+                on an identical machine and then check in those vendored gems.
+              </p>
+            </div>
+          </div>
+          <div class='bullet' id='no-prune'>
+            <div class='description'>
+              Lock and cache gems from RubyGems into <code>./vendor/cache</code>, and don't remove any stale gems from the existing cache.
+            </div>
+            <div class='how'>
+              <pre class='sunburst'>$ bundle package --no-prune&#x000A;</pre>
+            </div>
+          </div>
+          <div class='bullet' id='all'>
+            <div class='description'>
+              Lock and cache all gems into <code>./vendor/cache</code>, including <code>:git</code>, <code>:path</code>, and <code>.gem</code> dependencies.
+            </div>
+            <div class='how'>
+              <pre class='sunburst'>$ bundle package --all</pre>
+            </div>
+            <div class='notes'>
+              <p>
+                Once used, the <code>--all</code> option will be remembered.
+              </p>
+              <p>
+                This will be the default on Bundler 2.0.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div id='footer'>

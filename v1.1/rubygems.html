@@ -17,56 +17,56 @@
 
         </div>
         <h2>Using Bundler with Rubygem gemspecs</h2>
-<div class='contents'>
-  <div class='bullet'>
-    <div class='description'>
-      If you're creating a gem from scratch, you can use bundler's built in gem skeleton to create a base gem for you to edit.
-    </div>
-    <div class='how'>
-      <pre class='sunburst'>$ bundle gem my_gem</pre>
-      <div class='notes'>
-        This will create a new directory named <code>my_gem</code> with your new gem skeleton.
-      </div>
-    </div>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      If you already have a gem with a gemspec, you can generate a Gemfile for your gem.
-    </div>
-    <pre class='sunburst'>$ bundle init</pre>
-    <div class='notes'>
-      Then, add the following to your new Gemfile
-    </div>
-    <pre class="sunburst">gemspec&#x000A;</pre>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      Runtime dependencies in your gemspec are treated like base dependencies, and development dependencies are added by default to the group, <code>:development</code>. You can change that group with the <code>:development_group</code> option
-    </div>
-    <pre class="sunburst">gemspec <span class="Constant"><span class="Constant">:</span>development_group</span> =&gt; <span class="Constant"><span class="Constant">:</span>dev</span>&#x000A;</pre>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      As well, you can point to a specific gemspec using <code>:path</code>. If your gemspec is in <code>/gemspec/path</code>, use
-    </div>
-    <pre class="sunburst">gemspec <span class="Constant"><span class="Constant">:</span>path</span> =&gt; <span class="String"><span class="String">&#39;</span>/gemspec/path<span class="String">&#39;</span></span>&#x000A;</pre>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      If you have multiple gemspecs in the same directory, specify which one you'd like to reference using <code>:name</code>
-    </div>
-    <pre class="sunburst">gemspec <span class="Constant"><span class="Constant">:</span>name</span> =&gt; <span class="String"><span class="String">&#39;</span>my_awesome_gem<span class="String">&#39;</span></span>&#x000A;</pre>
-    <div class='notes'>
-      This will use <code>my_awesome_gem.gemspec</code>
-    </div>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      That's it! Use bundler when developing your gem, and otherwise, use gemspecs normally!
-    </div>
-    <pre class='sunburst'>$ gem build my_gem.gemspec</pre>
-  </div>
-</div>
+        <div class='contents'>
+          <div class='bullet'>
+            <div class='description'>
+              If you're creating a gem from scratch, you can use bundler's built in gem skeleton to create a base gem for you to edit.
+            </div>
+            <div class='how'>
+              <pre class='sunburst'>$ bundle gem my_gem</pre>
+              <div class='notes'>
+                This will create a new directory named <code>my_gem</code> with your new gem skeleton.
+              </div>
+            </div>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              If you already have a gem with a gemspec, you can generate a Gemfile for your gem.
+            </div>
+            <pre class='sunburst'>$ bundle init</pre>
+            <div class='notes'>
+              Then, add the following to your new Gemfile
+            </div>
+            <pre class="sunburst">gemspec&#x000A;</pre>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              Runtime dependencies in your gemspec are treated like base dependencies, and development dependencies are added by default to the group, <code>:development</code>. You can change that group with the <code>:development_group</code> option
+            </div>
+            <pre class="sunburst">gemspec <span class="Constant"><span class="Constant">:</span>development_group</span> =&gt; <span class="Constant"><span class="Constant">:</span>dev</span>&#x000A;</pre>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              As well, you can point to a specific gemspec using <code>:path</code>. If your gemspec is in <code>/gemspec/path</code>, use
+            </div>
+            <pre class="sunburst">gemspec <span class="Constant"><span class="Constant">:</span>path</span> =&gt; <span class="String"><span class="String">&#39;</span>/gemspec/path<span class="String">&#39;</span></span>&#x000A;</pre>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              If you have multiple gemspecs in the same directory, specify which one you'd like to reference using <code>:name</code>
+            </div>
+            <pre class="sunburst">gemspec <span class="Constant"><span class="Constant">:</span>name</span> =&gt; <span class="String"><span class="String">&#39;</span>my_awesome_gem<span class="String">&#39;</span></span>&#x000A;</pre>
+            <div class='notes'>
+              This will use <code>my_awesome_gem.gemspec</code>
+            </div>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              That's it! Use bundler when developing your gem, and otherwise, use gemspecs normally!
+            </div>
+            <pre class='sunburst'>$ gem build my_gem.gemspec</pre>
+          </div>
+        </div>
       </div>
     </div>
     <div id='footer'>

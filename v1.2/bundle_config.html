@@ -17,275 +17,275 @@
 
         </div>
         <h2>bundle config</h2>
-<div class='contents'>
-  <div class='bullet'>
-    <div class='description'>
-      Retrieve or set a configuration value
-    </div>
-    <pre class='sunburst'>$ bundle config [NAME [VALUE]] [--local] [--global] [--delete]</pre>
-    <div class='notes'>
-      <p>
-        Options:
-      </p>
-      <p>
-        <code>--local</code>: Get/set local configuration
-      </p>
-      <p>
-        <code>--global</code>: Get/set global configuration
-      </p>
-      <p>
-        <code>--delete</code>: Delete <code>NAME</code> value
-      </p>
-    </div>
-    <div class='description'>
-      <p>
-        Retrieves or sets a configuration value. If only parameter is provided,
-        retrieve the value. If two parameters are provided, replace the existing
-        value with the newly provided one.
-      </p>
-      <p>
-        By default, setting a configuration value sets it for all projects on
-        the machine.
-      </p>
-      <p>
-        If a global setting is superceded by local configuration, this command
-        will show the current value, as well as any superceded values and where
-        they were specified.
-      </p>
-    </div>
-  </div>
-  <div class='bullet' id='config'>
-    <div class='description'>
-      Get your bundle configuration.
-    </div>
-    <div class='how'>
-      <pre class='sunburst'>$ bundle config</pre>
-      <div class='notes'>
-        Executing <code>bundle config</code> with no parameters will print a
-        list of all bundler configuration for the current bundle, and where
-        that configuration was set.
-      </div>
-    </div>
-  </div>
-  <div class='bullet' id='get'>
-    <div class='description'>
-      Get your bundle configuration for <code>NAME</code> variable.
-    </div>
-    <div class='how'>
-      <pre class='sunburst'>$ bundle config NAME</pre>
-      <div class='notes'>
-        Will print the value of that configuration setting for
-        <code>NAME</code>, and where it was set. Will print both local and
-        global configuration.
-      </div>
-    </div>
-  </div>
-  <div class='bullet' id='set'>
-    <div class='description'>
-      Set your bundle configuration for <code>NAME</code> variable to
-      <code>VALUE</code>.
-    </div>
-    <div class='how'>
-      <pre class='sunburst'>$ bundle config NAME VALUE</pre>
-      <div class='notes'>
-        Will set <code>NAME</code> to <code>VALUE</code> for all bundles
-        executed as the current user (i.e. global setting). The configuration
-        will be stored in  <code>~/.bundle/config</code>. If <code>NAME</code>
-        already is set, <code>NAME</code> will be overridden and user will be
-        warned.
-      </div>
-    </div>
-  </div>
-  <div class='bullet' id='global'>
-    <div class='description'>
-      Set your bundle global/user configuration for <code>NAME</code> variable
-      to <code>VALUE</code>.
-    </div>
-    <div class='how'>
-      <pre class='sunburst'>$ bundle config --global NAME VALUE </pre>
-      <div class='notes'>
-        Works the same as the command above.
-      </div>
-    </div>
-  </div>
-  <div class='bullet' id='local'>
-    <div class='description'>
-      Set your bundle local configuration for <code>NAME</code> variable to
-      <code>VALUE</code>.
-    </div>
-    <div class='how'>
-      <pre class='sunburst'>$ bundle config --local NAME VALUE </pre>
-      <div class='notes'>
-        Works the same as the two command above but for the local application.
-        The configuration will be stored in <code>app/.bundle/config</code>.
-      </div>
-    </div>
-  </div>
-  <div class='bullet' id='delete'>
-    <div class='description'>
-      Delete the configuration for <code>NAME</code> in both local and global sources.
-    </div>
-    <div class='how'>
-      <pre class='sunburst'>$ bundle config --delete NAME</pre>
-      <div class='notes'>
-        Will delete the configuration for <code>NAME</code> variable in both local and global sources. Not compatible with --global or --local flag.
-      </div>
-    </div>
-  </div>
-</div>
-<h2>Build options</h2>
-<div class='contents'>
-  <div class='bullet' id='build_options'>
-    <div class='description'>
-      <p>
-        You can use <code>bundle config</code> to give bundler the flags to
-        pass to the gem installer every time bundler tries to install a
-        particular gem.
-      </p>
-      <p>
-        A very common example, the <code>mysql</code> gem, requires Snow
-        Leopard users to pass configuration flags to <code>gem install</code>
-        to specify where to find the <code>mysql_config</code> executable.
-      </p>
-      <div class='how'>
-        <pre class='sunburst'>$ gem install mysql -- --with-mysql-config=/usr/local/mysql/bin/mysql_config&#x000A;</pre>
-      </div>
-      <p>
-        Since the specific location of that executable can change from machine
-        to machine, you can specify these flags on a per-machine basis.
-      </p>
-      <div class='how'>
-        <pre class='sunburst'>$ bundle config build.mysql --with-mysql-config=/usr/local/mysql/bin/mysql_config</pre>
-      </div>
-      <p>
-        After running this command, every time bundler needs to install the
-        <code>mysql</code> gem, it will pass along the flags you specified.
-      </p>
-    </div>
-  </div>
-</div>
-<h2>Configuration keys</h2>
-<div class='contents'>
-  <div class='bullet' id='configuration_keys'>
-    <div class='description'>
-      <p>
-        Configuration keys in bundler have two forms: the canonical form and
-        the environment variable form.
-      </p>
-      <p>
-        For instance, passing the <code>--without</code> flag to
-        <code>bundle install</code> prevents Bundler from installing
-        certain groups specified in the <code>Gemfile</code>. Bundler persists
-        this value in <code>app/.bundle/config</code> so that calls to
-        <code>Bundler.setup</code> do not try to find gems from the
-        <code>Gemfile</code> that you didn't install. Additionally, subsequent
-        calls to <code>bundle install</code> remember this setting and
-        skip those groups.
-      </p>
-      <p>
-        The canonical form of this configuration is <code>"without"</code>. To
-        convert the canonical form to the environment variable form, capitalize
-        it, and prepend <code>BUNDLE_</code>. The environment variable form of
-        <code>"without"</code> is <code>BUNDLE_WITHOUT</code>.
-      </p>
-    </div>
-  </div>
-</div>
-<h2>List of available keys</h2>
-<div class='contents'>
-  <div class='bullet' id='available_keys'>
-    <div class='description'>
-      <p>
-        The following is a list of all configuration keys and their purpose.
-        You can learn more about their operation in
-        <code>bundle install</code>.
-      </p>
-      <ul>
-        <li>
-          <code>path</code> (<code>BUNDLE_PATH</code>): The location on disk
-          to install gems. Defaults to <code>$GEM_HOME</code> in development
-          and <code>vendor/bundle</code> when <code>--deployment</code> is used.
-        </li>
-        <li>
-          <code>frozen</code> (<code>BUNDLE_FROZEN</code>): Disallow changes to
-          the <code>Gemfile</code>. Defaults to <code>true</code> when
-          <code>--deployment</code> is used.
-        </li>
-        <li>
-          <code>without</code> (<code>BUNDLE_WITHOUT</code>): A
-          <code>:</code>-separated list of groups whose gems bundler should not
-          installer
-        </li>
-        <li>
-          <code>bin</code> (<code>BUNDLE_BIN</code>): Install executables from
-          gems in the bundle to the specified directory. Defaults to
-          <code>false</code>.
-        </li>
-        <li>
-          <code>gemfile</code> (<code>BUNDLE_GEMFILE</code>): The name of the
-          file that bundler should use as the <code>Gemfile</code>. This location
-          of this file also sets the root of the project, which is used to
-          resolve relative paths in the <code>Gemfile</code>, among other things.
-          By default, bundler will search up from the current working directory
-          until it finds a <code>Gemfile</code>.
-        </li>
-      </ul>
-      <p>
-        In general, you should set these settings per-application by using the
-        applicable flag to the <code>bundle install</code> command.
-      </p>
-      <p>
-        You can set them globally either via environment variables or
-        <code>bundle config</code>, whichever is preferable for your setup. If
-        you use both, environment variables will take preference over global
-        settings.
-      </p>
-    </div>
-  </div>
-</div>
-<h2>Local git repositories</h2>
-<div class='contents'>
-  <div class='bullet' id='local_git_repos'>
-    <div class='description'>
-      <p>
-        Bundler also allows you to work against a git repository locally
-        instead of using the remote version. This can be achieved by setting
-        up a local override:
-      </p>
-      <pre class='sunburst'>$ bundle config local.GEM_NAME /path/to/local/git/repository&#x000A;</pre>
-      <p>
-        For example, in order to use a local Rack repository, a developer
-        could call:
-      </p>
-      <pre class='sunburst'>$ bundle config local.rack ~/Work/git/rack&#x000A;</pre>
-      <p>
-        Now instead of checking out the remote git repository, the local
-        override will be used. Similar to a path source, every time the local
-        git repository change, changes will be automatically picked up by
-        Bundler. This means a commit in the local git repo will update the
-        revision in the <code>Gemfile.lock</code> to the local git repo
-        revision. This requires the same attention as git submodules. Before
-        pushing to the remote, you need to ensure the local override was
-        pushed, otherwise you may point to a commit that only exists in your
-        local machine.
-      </p>
-      <p>
-        Bundler does many checks to ensure a developer won't work with
-        invalid references. Particularly, we force a developer to specify a
-        branch in the <code>Gemfile</code> in order to use this feature. If the
-        branch specified in the `Gemfile` and the current branch in the local
-        git repository do not match, Bundler will abort. This ensures that a
-        developer is always working against the correct branches, and prevents
-        accidental locking to a different branch.
-      </p>
-      <p>
-        Finally, Bundler also ensures that the current revision in the
-        <code>Gemfile.lock</code> exists in the local git repository. By doing
-        this, Bundler forces you to fetch the latest changes in the remotes.
-      </p>
-    </div>
-  </div>
-</div>
+        <div class='contents'>
+          <div class='bullet'>
+            <div class='description'>
+              Retrieve or set a configuration value
+            </div>
+            <pre class='sunburst'>$ bundle config [NAME [VALUE]] [--local] [--global] [--delete]</pre>
+            <div class='notes'>
+              <p>
+                Options:
+              </p>
+              <p>
+                <code>--local</code>: Get/set local configuration
+              </p>
+              <p>
+                <code>--global</code>: Get/set global configuration
+              </p>
+              <p>
+                <code>--delete</code>: Delete <code>NAME</code> value
+              </p>
+            </div>
+            <div class='description'>
+              <p>
+                Retrieves or sets a configuration value. If only parameter is provided,
+                retrieve the value. If two parameters are provided, replace the existing
+                value with the newly provided one.
+              </p>
+              <p>
+                By default, setting a configuration value sets it for all projects on
+                the machine.
+              </p>
+              <p>
+                If a global setting is superceded by local configuration, this command
+                will show the current value, as well as any superceded values and where
+                they were specified.
+              </p>
+            </div>
+          </div>
+          <div class='bullet' id='config'>
+            <div class='description'>
+              Get your bundle configuration.
+            </div>
+            <div class='how'>
+              <pre class='sunburst'>$ bundle config</pre>
+              <div class='notes'>
+                Executing <code>bundle config</code> with no parameters will print a
+                list of all bundler configuration for the current bundle, and where
+                that configuration was set.
+              </div>
+            </div>
+          </div>
+          <div class='bullet' id='get'>
+            <div class='description'>
+              Get your bundle configuration for <code>NAME</code> variable.
+            </div>
+            <div class='how'>
+              <pre class='sunburst'>$ bundle config NAME</pre>
+              <div class='notes'>
+                Will print the value of that configuration setting for
+                <code>NAME</code>, and where it was set. Will print both local and
+                global configuration.
+              </div>
+            </div>
+          </div>
+          <div class='bullet' id='set'>
+            <div class='description'>
+              Set your bundle configuration for <code>NAME</code> variable to
+              <code>VALUE</code>.
+            </div>
+            <div class='how'>
+              <pre class='sunburst'>$ bundle config NAME VALUE</pre>
+              <div class='notes'>
+                Will set <code>NAME</code> to <code>VALUE</code> for all bundles
+                executed as the current user (i.e. global setting). The configuration
+                will be stored in  <code>~/.bundle/config</code>. If <code>NAME</code>
+                already is set, <code>NAME</code> will be overridden and user will be
+                warned.
+              </div>
+            </div>
+          </div>
+          <div class='bullet' id='global'>
+            <div class='description'>
+              Set your bundle global/user configuration for <code>NAME</code> variable
+              to <code>VALUE</code>.
+            </div>
+            <div class='how'>
+              <pre class='sunburst'>$ bundle config --global NAME VALUE </pre>
+              <div class='notes'>
+                Works the same as the command above.
+              </div>
+            </div>
+          </div>
+          <div class='bullet' id='local'>
+            <div class='description'>
+              Set your bundle local configuration for <code>NAME</code> variable to
+              <code>VALUE</code>.
+            </div>
+            <div class='how'>
+              <pre class='sunburst'>$ bundle config --local NAME VALUE </pre>
+              <div class='notes'>
+                Works the same as the two command above but for the local application.
+                The configuration will be stored in <code>app/.bundle/config</code>.
+              </div>
+            </div>
+          </div>
+          <div class='bullet' id='delete'>
+            <div class='description'>
+              Delete the configuration for <code>NAME</code> in both local and global sources.
+            </div>
+            <div class='how'>
+              <pre class='sunburst'>$ bundle config --delete NAME</pre>
+              <div class='notes'>
+                Will delete the configuration for <code>NAME</code> variable in both local and global sources. Not compatible with --global or --local flag.
+              </div>
+            </div>
+          </div>
+        </div>
+        <h2>Build options</h2>
+        <div class='contents'>
+          <div class='bullet' id='build_options'>
+            <div class='description'>
+              <p>
+                You can use <code>bundle config</code> to give bundler the flags to
+                pass to the gem installer every time bundler tries to install a
+                particular gem.
+              </p>
+              <p>
+                A very common example, the <code>mysql</code> gem, requires Snow
+                Leopard users to pass configuration flags to <code>gem install</code>
+                to specify where to find the <code>mysql_config</code> executable.
+              </p>
+              <div class='how'>
+                <pre class='sunburst'>$ gem install mysql -- --with-mysql-config=/usr/local/mysql/bin/mysql_config&#x000A;</pre>
+              </div>
+              <p>
+                Since the specific location of that executable can change from machine
+                to machine, you can specify these flags on a per-machine basis.
+              </p>
+              <div class='how'>
+                <pre class='sunburst'>$ bundle config build.mysql --with-mysql-config=/usr/local/mysql/bin/mysql_config</pre>
+              </div>
+              <p>
+                After running this command, every time bundler needs to install the
+                <code>mysql</code> gem, it will pass along the flags you specified.
+              </p>
+            </div>
+          </div>
+        </div>
+        <h2>Configuration keys</h2>
+        <div class='contents'>
+          <div class='bullet' id='configuration_keys'>
+            <div class='description'>
+              <p>
+                Configuration keys in bundler have two forms: the canonical form and
+                the environment variable form.
+              </p>
+              <p>
+                For instance, passing the <code>--without</code> flag to
+                <code>bundle install</code> prevents Bundler from installing
+                certain groups specified in the <code>Gemfile</code>. Bundler persists
+                this value in <code>app/.bundle/config</code> so that calls to
+                <code>Bundler.setup</code> do not try to find gems from the
+                <code>Gemfile</code> that you didn't install. Additionally, subsequent
+                calls to <code>bundle install</code> remember this setting and
+                skip those groups.
+              </p>
+              <p>
+                The canonical form of this configuration is <code>"without"</code>. To
+                convert the canonical form to the environment variable form, capitalize
+                it, and prepend <code>BUNDLE_</code>. The environment variable form of
+                <code>"without"</code> is <code>BUNDLE_WITHOUT</code>.
+              </p>
+            </div>
+          </div>
+        </div>
+        <h2>List of available keys</h2>
+        <div class='contents'>
+          <div class='bullet' id='available_keys'>
+            <div class='description'>
+              <p>
+                The following is a list of all configuration keys and their purpose.
+                You can learn more about their operation in
+                <code>bundle install</code>.
+              </p>
+              <ul>
+                <li>
+                  <code>path</code> (<code>BUNDLE_PATH</code>): The location on disk
+                  to install gems. Defaults to <code>$GEM_HOME</code> in development
+                  and <code>vendor/bundle</code> when <code>--deployment</code> is used.
+                </li>
+                <li>
+                  <code>frozen</code> (<code>BUNDLE_FROZEN</code>): Disallow changes to
+                  the <code>Gemfile</code>. Defaults to <code>true</code> when
+                  <code>--deployment</code> is used.
+                </li>
+                <li>
+                  <code>without</code> (<code>BUNDLE_WITHOUT</code>): A
+                  <code>:</code>-separated list of groups whose gems bundler should not
+                  installer
+                </li>
+                <li>
+                  <code>bin</code> (<code>BUNDLE_BIN</code>): Install executables from
+                  gems in the bundle to the specified directory. Defaults to
+                  <code>false</code>.
+                </li>
+                <li>
+                  <code>gemfile</code> (<code>BUNDLE_GEMFILE</code>): The name of the
+                  file that bundler should use as the <code>Gemfile</code>. This location
+                  of this file also sets the root of the project, which is used to
+                  resolve relative paths in the <code>Gemfile</code>, among other things.
+                  By default, bundler will search up from the current working directory
+                  until it finds a <code>Gemfile</code>.
+                </li>
+              </ul>
+              <p>
+                In general, you should set these settings per-application by using the
+                applicable flag to the <code>bundle install</code> command.
+              </p>
+              <p>
+                You can set them globally either via environment variables or
+                <code>bundle config</code>, whichever is preferable for your setup. If
+                you use both, environment variables will take preference over global
+                settings.
+              </p>
+            </div>
+          </div>
+        </div>
+        <h2>Local git repositories</h2>
+        <div class='contents'>
+          <div class='bullet' id='local_git_repos'>
+            <div class='description'>
+              <p>
+                Bundler also allows you to work against a git repository locally
+                instead of using the remote version. This can be achieved by setting
+                up a local override:
+              </p>
+              <pre class='sunburst'>$ bundle config local.GEM_NAME /path/to/local/git/repository&#x000A;</pre>
+              <p>
+                For example, in order to use a local Rack repository, a developer
+                could call:
+              </p>
+              <pre class='sunburst'>$ bundle config local.rack ~/Work/git/rack&#x000A;</pre>
+              <p>
+                Now instead of checking out the remote git repository, the local
+                override will be used. Similar to a path source, every time the local
+                git repository change, changes will be automatically picked up by
+                Bundler. This means a commit in the local git repo will update the
+                revision in the <code>Gemfile.lock</code> to the local git repo
+                revision. This requires the same attention as git submodules. Before
+                pushing to the remote, you need to ensure the local override was
+                pushed, otherwise you may point to a commit that only exists in your
+                local machine.
+              </p>
+              <p>
+                Bundler does many checks to ensure a developer won't work with
+                invalid references. Particularly, we force a developer to specify a
+                branch in the <code>Gemfile</code> in order to use this feature. If the
+                branch specified in the `Gemfile` and the current branch in the local
+                git repository do not match, Bundler will abort. This ensures that a
+                developer is always working against the correct branches, and prevents
+                accidental locking to a different branch.
+              </p>
+              <p>
+                Finally, Bundler also ensures that the current revision in the
+                <code>Gemfile.lock</code> exists in the local git repository. By doing
+                this, Bundler forces you to fetch the latest changes in the remotes.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div id='footer'>

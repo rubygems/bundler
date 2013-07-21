@@ -17,236 +17,236 @@
 
         </div>
         <div id='intro'>
-  Bundler manages an <strong>application's dependencies</strong> through its
-  entire life across many machines systematically and repeatably.
-</div>
-<h2>I am interested in</h2>
-<div class='contents'>
-  <ul class='bullet'>
-    <a href="https://github.com/bundler/bundler/blob/1-0-stable/ISSUES.md">Troubleshooting</a>
-    <a href="/v1.0/rationale.html">Understanding Bundler</a>
-    <a href="./man/gemfile.5.html">Gemfile Manual</a>
-    <a href="./man/bundle.1.html">CLI Manual</a>
-  </ul>
-</div>
-<h2 id='getting-started'>
-  Getting Started
-</h2>
-<div class='contents'>
-  <div class='bullet'>
-    <div class='description'>
-      Getting started with bundler is easy
-    </div>
-    <pre class='sunburst'>$ gem install bundler&#x000A;</pre>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      Specify your dependencies in a Gemfile in your project's root
-    </div>
-    <pre class="sunburst">source <span class="String"><span class="String">&quot;</span>http://rubygems.org<span class="String">&quot;</span></span>&#x000A;gem <span class="String"><span class="String">&quot;</span>nokogiri<span class="String">&quot;</span></span>&#x000A;gem <span class="String"><span class="String">&quot;</span>rack<span class="String">&quot;</span></span>, <span class="String"><span class="String">&quot;</span>~&gt;1.1<span class="String">&quot;</span></span>&#x000A;gem <span class="String"><span class="String">&quot;</span>rspec<span class="String">&quot;</span></span>, <span class="Constant"><span class="Constant">:</span>require</span> =&gt; <span class="String"><span class="String">&quot;</span>spec<span class="String">&quot;</span></span>&#x000A;</pre>
-    <a href="/v1.0/gemfile.html">Learn More: Gemfiles</a>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      Install all of the required gems from your specified sources
-    </div>
-    <pre class='sunburst'>$ bundle install&#x000A;$ git add Gemfile Gemfile.lock</pre>
-    <a href="/v1.0/bundle_install.html">Learn More: bundle install</a>
-    <div class='notes'>
-      Make sure to add Gemfile.lock to your repository. This will
-      ensure that other developers on your app, as well as your
-      deployment environment, use exactly the same third-party code
-      as you just installed.
-    </div>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      Inside your app, load up the bundled environment
-    </div>
-    <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">&quot;</span>rubygems<span class="String">&quot;</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&quot;</span>bundler/setup<span class="String">&quot;</span></span>&#x000A;&#x000A;<span class="Comment"><span class="Comment">#</span> require your gems as usual</span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&quot;</span>nokogiri<span class="String">&quot;</span></span>&#x000A;</pre>
-    <a href="/v1.0/bundler_setup.html">Learn More: Bundler.setup</a>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      Run an executable that comes with a gem in your bundle
-    </div>
-    <pre class='sunburst'>$ bundle exec rspec spec/models</pre>
-    <div class='notes'>
-      <p>
-        In some cases, running executables without <code>bundle exec</code>
-        may work, if the executable happens to be installed in your system
-        and does not pull in any gems that conflict with your bundle.
-      </p>
-      <p>
-        However, this is unreliable and is the source of considerable pain.
-        Even if it looks like it works, it may not work in the future or
-        on another machine.
-      </p>
-    </div>
-    <div class='description'>
-      If you want a way to get a shortcut to gems in your bundle
-    </div>
-    <pre class='sunburst'>$ bundle install --binstubs&#x000A;$ bin/rspec spec/models</pre>
-    <div class='notes'>
-      The executables installed into <code>bin</code> are scoped to the
-      bundle and will always work
-    </div>
-    <a href="./man/bundle-exec.1.html">Learn More: Executables</a>
-  </div>
-</div>
-<h2 id='using-bundler-with-rails'>
-  Using Bundler with Rails
-</h2>
-<div class='contents'>
-  <div class='bullet'>
-    <div class='description'>
-      Bundler works out of the box with Rails 3. Once you
-      understand the basics of using bundler, you know
-      everything you need to know.
-      <a href="/v1.0/rails3.html">Using Bundler with Rails 3</a>
-    </div>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      Bundler works with Rails 2.3 with a small change
-      to boot.rb and adding a preinitializer.rb.
-      <a href="/v1.0/rails23.html">Using Bundler with Rails 2.3</a>
-    </div>
-  </div>
-</div>
-<h2 id='checking-out-application-with-a-gemfile-for-development'>
-  Checking Out an Application With a Gemfile for Development
-</h2>
-<div class='contents'>
-  <div class='bullet'>
-    <div class='description'>
-      Install the required gems
-    </div>
-    <pre class='sunburst'>$ bundle install</pre>
-    <a href="/v1.0/bundle_install.html">Learn More: bundle install</a>
-    <div class='notes'>
-      If your system stores its gems in a root-owned location (this
-      is the default for Mac OSX), bundler will ask you for your
-      password, so it can install the gems there.
-    </div>
-  </div>
-</div>
-<h2 id='updating-your-dependencies'>
-  Updating Your Dependencies
-</h2>
-<div class='contents'>
-  <div class='bullet'>
-    <div class='description'>
-      Make a change to your Gemfile
-    </div>
-    <pre class="sunburst"><span class="Comment"><span class="Comment">#</span> change</span>&#x000A;gem <span class="String"><span class="String">&quot;</span>nokogiri<span class="String">&quot;</span></span>, <span class="String"><span class="String">&quot;</span>1.4.2<span class="String">&quot;</span></span>&#x000A;<span class="Comment"><span class="Comment">#</span> to</span>&#x000A;gem <span class="String"><span class="String">&quot;</span>nokogiri<span class="String">&quot;</span></span>, <span class="String"><span class="String">&quot;</span>1.4.3<span class="String">&quot;</span></span>&#x000A;</pre>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      Install the new gems
-    </div>
-    <pre class='sunburst'>$ bundle install</pre>
-    <div class='notes'>
-      <p>
-        After making a change to your <code>Gemfile</code>, the next
-        <code>bundle install</code> will try to update the gems in
-        your snapshot (<code>Gemfile.lock</code>) without forcing an
-        update to any of the other gems in your Gemfile.
-      </p>
-      <p>
-        This will usually work for simple dependencies, like
-        <code>nokogiri</code> or <code>sqlite3</code>. On the
-        other hand, updating Rails will usually require an update
-        to some other component, because of the amount of dependencies
-        it has.
-      </p>
-    </div>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      If bundler reports a conflict, tell bundler to explicitly update
-      the gem, but none of the other top-level dependencies (the ones
-      in your <code>Gemfile</code>)
-    </div>
-    <pre class='sunburst'>$ bundle update rails</pre>
-    <a href="./man/bundle-update.1.html">Learn More: bundle update</a>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      In some rare cases, bundler will be unable to update the dependency
-      without updating the top-level dependencies as well. In this case,
-      tell bundler to update <strong>all</strong> dependencies
-    </div>
-    <pre class='sunburst'>$ bundle update&#x000A;</pre>
-  </div>
-</div>
-<h2 id='deploying-your-application'>
-  Deploying Your Application
-</h2>
-<div class='contents'>
-  <div class='bullet'>
-    <div class='description'>
-      On production servers, you can enable deployment mode:
-    </div>
-    <pre class='sunburst'>$ bundle install --deployment</pre>
-    <div class='notes'>
-      Do <b>not</b> use this flag on development machines. The
-      <code>--deployment</code> flag turns on defaults that are appropriate for
-      a deployment environment. Gems are installed to
-      <code>vendor/bundle</code> and the <code>Gemfile.lock</code> must be
-      checked in and up to date before Bundler is run.
-    </div>
-    <a href="/v1.0/deploying.html">Learn More: deploying</a>
-  </div>
-</div>
-<h2 id='digging-further'>
-  Digging Further
-</h2>
-<div class='contents'>
-  <div class='bullet'>
-    <div class='description'>
-      Store all of the required gems in your application. All future installs will get gems
-      from this cache, bypassing rubygems.org
-    </div>
-    <pre class='sunburst'>$ bundle package</pre>
-    <a href="/v1.0/bundle_package.html">Learn More: bundle package</a>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      Put dependencies in a group, so they can be ignored at install time or required
-      together in your application
-    </div>
-    <pre class="sunburst">group <span class="Constant"><span class="Constant">:</span>development</span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">&quot;</span>wirble<span class="String">&quot;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;</pre>
-    <a href="/v1.0/groups.html">Learn more: Groups</a>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      Use a gem that is stored in git and has a <code>.gemspec</code> at its root.
-      Bundler will make the executables available to <code>bundle exec</code> and
-      compile C extensions
-    </div>
-    <pre class="sunburst">gem <span class="String"><span class="String">&quot;</span>nokogiri<span class="String">&quot;</span></span>, <span class="Constant"><span class="Constant">:</span>git</span> =&gt;&#x000A;  <span class="String"><span class="String">&quot;</span>git://github.com/tenderlove/nokogiri.git<span class="String">&quot;</span></span>&#x000A;</pre>
-    <a href="/v1.0/git.html">Learn more: Git</a>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      Use a gem that you are actively developing on your file system
-    </div>
-    <pre class="sunburst">gem <span class="String"><span class="String">&quot;</span>nokogiri<span class="String">&quot;</span></span>, <span class="Constant"><span class="Constant">:</span>path</span> =&gt; <span class="String"><span class="String">&quot;</span>~/Code/nokogiri<span class="String">&quot;</span></span>&#x000A;</pre>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      Install gems to an alternate location. By default, bundler installs your
-      gems to the system location
-    </div>
-    <pre class='sunburst'>$ bundle install --path vendor</pre>
-    <div class='notes'>
-      When installing to a path, bundler completely isolates your gems
-      from the system, guaranteeing you a clear set of dependencies.
-    </div>
-    <a href="/v1.0/bundle_install.html">Learn More: bundle install</a>
-  </div>
-</div>
+          Bundler manages an <strong>application's dependencies</strong> through its
+          entire life across many machines systematically and repeatably.
+        </div>
+        <h2>I am interested in</h2>
+        <div class='contents'>
+          <ul class='bullet'>
+            <a href="https://github.com/bundler/bundler/blob/1-0-stable/ISSUES.md">Troubleshooting</a>
+            <a href="/v1.0/rationale.html">Understanding Bundler</a>
+            <a href="./man/gemfile.5.html">Gemfile Manual</a>
+            <a href="./man/bundle.1.html">CLI Manual</a>
+          </ul>
+        </div>
+        <h2 id='getting-started'>
+          Getting Started
+        </h2>
+        <div class='contents'>
+          <div class='bullet'>
+            <div class='description'>
+              Getting started with bundler is easy
+            </div>
+            <pre class='sunburst'>$ gem install bundler&#x000A;</pre>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              Specify your dependencies in a Gemfile in your project's root
+            </div>
+            <pre class="sunburst">source <span class="String"><span class="String">&quot;</span>http://rubygems.org<span class="String">&quot;</span></span>&#x000A;gem <span class="String"><span class="String">&quot;</span>nokogiri<span class="String">&quot;</span></span>&#x000A;gem <span class="String"><span class="String">&quot;</span>rack<span class="String">&quot;</span></span>, <span class="String"><span class="String">&quot;</span>~&gt;1.1<span class="String">&quot;</span></span>&#x000A;gem <span class="String"><span class="String">&quot;</span>rspec<span class="String">&quot;</span></span>, <span class="Constant"><span class="Constant">:</span>require</span> =&gt; <span class="String"><span class="String">&quot;</span>spec<span class="String">&quot;</span></span>&#x000A;</pre>
+            <a href="/v1.0/gemfile.html">Learn More: Gemfiles</a>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              Install all of the required gems from your specified sources
+            </div>
+            <pre class='sunburst'>$ bundle install&#x000A;$ git add Gemfile Gemfile.lock</pre>
+            <a href="/v1.0/bundle_install.html">Learn More: bundle install</a>
+            <div class='notes'>
+              Make sure to add Gemfile.lock to your repository. This will
+              ensure that other developers on your app, as well as your
+              deployment environment, use exactly the same third-party code
+              as you just installed.
+            </div>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              Inside your app, load up the bundled environment
+            </div>
+            <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">&quot;</span>rubygems<span class="String">&quot;</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&quot;</span>bundler/setup<span class="String">&quot;</span></span>&#x000A;&#x000A;<span class="Comment"><span class="Comment">#</span> require your gems as usual</span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&quot;</span>nokogiri<span class="String">&quot;</span></span>&#x000A;</pre>
+            <a href="/v1.0/bundler_setup.html">Learn More: Bundler.setup</a>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              Run an executable that comes with a gem in your bundle
+            </div>
+            <pre class='sunburst'>$ bundle exec rspec spec/models</pre>
+            <div class='notes'>
+              <p>
+                In some cases, running executables without <code>bundle exec</code>
+                may work, if the executable happens to be installed in your system
+                and does not pull in any gems that conflict with your bundle.
+              </p>
+              <p>
+                However, this is unreliable and is the source of considerable pain.
+                Even if it looks like it works, it may not work in the future or
+                on another machine.
+              </p>
+            </div>
+            <div class='description'>
+              If you want a way to get a shortcut to gems in your bundle
+            </div>
+            <pre class='sunburst'>$ bundle install --binstubs&#x000A;$ bin/rspec spec/models</pre>
+            <div class='notes'>
+              The executables installed into <code>bin</code> are scoped to the
+              bundle and will always work
+            </div>
+            <a href="./man/bundle-exec.1.html">Learn More: Executables</a>
+          </div>
+        </div>
+        <h2 id='using-bundler-with-rails'>
+          Using Bundler with Rails
+        </h2>
+        <div class='contents'>
+          <div class='bullet'>
+            <div class='description'>
+              Bundler works out of the box with Rails 3. Once you
+              understand the basics of using bundler, you know
+              everything you need to know.
+              <a href="/v1.0/rails3.html">Using Bundler with Rails 3</a>
+            </div>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              Bundler works with Rails 2.3 with a small change
+              to boot.rb and adding a preinitializer.rb.
+              <a href="/v1.0/rails23.html">Using Bundler with Rails 2.3</a>
+            </div>
+          </div>
+        </div>
+        <h2 id='checking-out-application-with-a-gemfile-for-development'>
+          Checking Out an Application With a Gemfile for Development
+        </h2>
+        <div class='contents'>
+          <div class='bullet'>
+            <div class='description'>
+              Install the required gems
+            </div>
+            <pre class='sunburst'>$ bundle install</pre>
+            <a href="/v1.0/bundle_install.html">Learn More: bundle install</a>
+            <div class='notes'>
+              If your system stores its gems in a root-owned location (this
+              is the default for Mac OSX), bundler will ask you for your
+              password, so it can install the gems there.
+            </div>
+          </div>
+        </div>
+        <h2 id='updating-your-dependencies'>
+          Updating Your Dependencies
+        </h2>
+        <div class='contents'>
+          <div class='bullet'>
+            <div class='description'>
+              Make a change to your Gemfile
+            </div>
+            <pre class="sunburst"><span class="Comment"><span class="Comment">#</span> change</span>&#x000A;gem <span class="String"><span class="String">&quot;</span>nokogiri<span class="String">&quot;</span></span>, <span class="String"><span class="String">&quot;</span>1.4.2<span class="String">&quot;</span></span>&#x000A;<span class="Comment"><span class="Comment">#</span> to</span>&#x000A;gem <span class="String"><span class="String">&quot;</span>nokogiri<span class="String">&quot;</span></span>, <span class="String"><span class="String">&quot;</span>1.4.3<span class="String">&quot;</span></span>&#x000A;</pre>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              Install the new gems
+            </div>
+            <pre class='sunburst'>$ bundle install</pre>
+            <div class='notes'>
+              <p>
+                After making a change to your <code>Gemfile</code>, the next
+                <code>bundle install</code> will try to update the gems in
+                your snapshot (<code>Gemfile.lock</code>) without forcing an
+                update to any of the other gems in your Gemfile.
+              </p>
+              <p>
+                This will usually work for simple dependencies, like
+                <code>nokogiri</code> or <code>sqlite3</code>. On the
+                other hand, updating Rails will usually require an update
+                to some other component, because of the amount of dependencies
+                it has.
+              </p>
+            </div>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              If bundler reports a conflict, tell bundler to explicitly update
+              the gem, but none of the other top-level dependencies (the ones
+              in your <code>Gemfile</code>)
+            </div>
+            <pre class='sunburst'>$ bundle update rails</pre>
+            <a href="./man/bundle-update.1.html">Learn More: bundle update</a>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              In some rare cases, bundler will be unable to update the dependency
+              without updating the top-level dependencies as well. In this case,
+              tell bundler to update <strong>all</strong> dependencies
+            </div>
+            <pre class='sunburst'>$ bundle update&#x000A;</pre>
+          </div>
+        </div>
+        <h2 id='deploying-your-application'>
+          Deploying Your Application
+        </h2>
+        <div class='contents'>
+          <div class='bullet'>
+            <div class='description'>
+              On production servers, you can enable deployment mode:
+            </div>
+            <pre class='sunburst'>$ bundle install --deployment</pre>
+            <div class='notes'>
+              Do <b>not</b> use this flag on development machines. The
+              <code>--deployment</code> flag turns on defaults that are appropriate for
+              a deployment environment. Gems are installed to
+              <code>vendor/bundle</code> and the <code>Gemfile.lock</code> must be
+              checked in and up to date before Bundler is run.
+            </div>
+            <a href="/v1.0/deploying.html">Learn More: deploying</a>
+          </div>
+        </div>
+        <h2 id='digging-further'>
+          Digging Further
+        </h2>
+        <div class='contents'>
+          <div class='bullet'>
+            <div class='description'>
+              Store all of the required gems in your application. All future installs will get gems
+              from this cache, bypassing rubygems.org
+            </div>
+            <pre class='sunburst'>$ bundle package</pre>
+            <a href="/v1.0/bundle_package.html">Learn More: bundle package</a>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              Put dependencies in a group, so they can be ignored at install time or required
+              together in your application
+            </div>
+            <pre class="sunburst">group <span class="Constant"><span class="Constant">:</span>development</span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">&quot;</span>wirble<span class="String">&quot;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;</pre>
+            <a href="/v1.0/groups.html">Learn more: Groups</a>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              Use a gem that is stored in git and has a <code>.gemspec</code> at its root.
+              Bundler will make the executables available to <code>bundle exec</code> and
+              compile C extensions
+            </div>
+            <pre class="sunburst">gem <span class="String"><span class="String">&quot;</span>nokogiri<span class="String">&quot;</span></span>, <span class="Constant"><span class="Constant">:</span>git</span> =&gt;&#x000A;  <span class="String"><span class="String">&quot;</span>git://github.com/tenderlove/nokogiri.git<span class="String">&quot;</span></span>&#x000A;</pre>
+            <a href="/v1.0/git.html">Learn more: Git</a>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              Use a gem that you are actively developing on your file system
+            </div>
+            <pre class="sunburst">gem <span class="String"><span class="String">&quot;</span>nokogiri<span class="String">&quot;</span></span>, <span class="Constant"><span class="Constant">:</span>path</span> =&gt; <span class="String"><span class="String">&quot;</span>~/Code/nokogiri<span class="String">&quot;</span></span>&#x000A;</pre>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              Install gems to an alternate location. By default, bundler installs your
+              gems to the system location
+            </div>
+            <pre class='sunburst'>$ bundle install --path vendor</pre>
+            <div class='notes'>
+              When installing to a path, bundler completely isolates your gems
+              from the system, guaranteeing you a clear set of dependencies.
+            </div>
+            <a href="/v1.0/bundle_install.html">Learn More: bundle install</a>
+          </div>
+        </div>
       </div>
     </div>
     <div id='footer'>

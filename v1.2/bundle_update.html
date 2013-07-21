@@ -17,227 +17,227 @@
 
         </div>
         <h2>bundle update</h2>
-<div class='contents'>
-  <div class='bullet'>
-    <div class='description'>
-      Update the current environment
-    </div>
-    <pre class='sunburst'>$ bundle update [GEM] [--local] [--source=SOURCE]</pre>
-    <div class='notes'>
-      <p>
-        Options:
-      </p>
-      <p>
-        <code>--local</code>: Do not attempt to fetch gems remotely and use
-        the gem cache instead
-      </p>
-      <p>
-        <code>--source</code>: Update a specific source (and all gems
-        associated with it)
-      </p>
-    </div>
-    <div class='description'>
-      Update the gems specified (all gems, if none are specified), ignoring
-      the previously installed gems specified in the <code>Gemfile.lock</code>.
-      In general, you should use <code>bundle install</code> to install the same
-      exact gems and versions across machines.
-      You would use <code>bundle update</code> to explicitly update the version
-      of a gem.
-    </div>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      Update the current environment.
-    </div>
-    <div class='how'>
-      <pre class='sunburst'>$ bundle update</pre>
-    </div>
-    <div class='notes'>
-      If you run <code>bundle update</code> with no parameters, bundler will
-      ignore any previously installed gems and resolve all dependencies again
-      based on the latest versions of all gems available in the sources.
-    </div>
-  </div>
-  <div class='bullet' id='local'>
-    <div class='description'>
-      (Example with --local TBD)
-    </div>
-  </div>
-  <div class='bullet' id='source'>
-    <div class='description'>
-      Update a specific source (and all gems associated with it)
-    </div>
-    <div class='how'>
-      <pre class='sunburst'>$ bundle update --source=SOURCE</pre>
-    </div>
-    <div class='notes'>
-      The name of a <code>:git</code> or <code>:path</code> source used in the
-      <code>Gemfile</code>. For instance, with a <code>:git</code> source of
-      <code>http://github.com/rails/rails.git</code>, you would call
-      <code>bundle update --source rails</code>.
-    </div>
-  </div>
-</div>
-<h2>Update all gems</h2>
-<div class='contents'>
-  <div class='bullet' id='update_all_extended'>
-    <div class='description'>
-      <p>
-        If you run <code>bundle update</code> with no parameters, bundler will
-        ignore any previously installed gems and resolve all dependencies again
-        based on the latest versions of all gems available in the sources.
-      </p>
-      <p>
-        Consider the following <code>Gemfile</code>:
-        <pre class="sunburst">source <span class="String"><span class="String">&#39;</span>http://rubygems.org<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rails<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>3.0.0.rc<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>&#x000A;</pre>
-      </p>
-      <p>
-        When you run <code>bundle install</code> the first time, bundler will
-        resolve all of the dependencies, all the way down, and install what you
-        need:
-        <pre class='sunburst'>Fetching source index for http://rubygems.org/&#x000A;Installing rake (0.8.7)&#x000A;Installing abstract (1.0.0)&#x000A;Installing activesupport (3.0.0.rc)&#x000A;Installing builder (2.1.2)&#x000A;Installing i18n (0.4.1)&#x000A;Installing activemodel (3.0.0.rc)&#x000A;Installing erubis (2.6.6)&#x000A;Installing rack (1.2.1)&#x000A;Installing rack-mount (0.6.9)&#x000A;Installing rack-test (0.5.4)&#x000A;Installing tzinfo (0.3.22)&#x000A;Installing actionpack (3.0.0.rc)&#x000A;Installing mime-types (1.16)&#x000A;Installing polyglot (0.3.1)&#x000A;Installing treetop (1.4.8)&#x000A;Installing mail (2.2.5)&#x000A;Installing actionmailer (3.0.0.rc)&#x000A;Installing arel (0.4.0)&#x000A;Installing activerecord (3.0.0.rc)&#x000A;Installing activeresource (3.0.0.rc)&#x000A;Installing bundler (1.0.0.rc.3)&#x000A;Installing nokogiri (1.4.3.1) with native extensions&#x000A;Installing thor (0.14.0)&#x000A;Installing railties (3.0.0.rc)&#x000A;Installing rails (3.0.0.rc)&#x000A;&#x000A;Your bundle is complete! Use `bundle show [gemname]` to see where a&#x000A;bundled gem is installed.</pre>
-      </p>
-      <p>
-        As you can see, even though you have just two gems in the
-        <code>Gemfile</code>, your application actually needs 25 different gems
-        in order to run. Bundler remembers the exact versions it installed in
-        <code>Gemfile.lock</code>. The next time you run
-        <code>bundle install</code>, bundler skips the dependency resolution and
-        installs the same gems as it installed last time.
-      </p>
-      <p>
-        After checking in the <code>Gemfile.lock</code> into version control and
-        cloning it on another machine, running <code>bundle install</code> will
-        _still_ install the gems that you installed last time. You don't need to
-        worry that a new release of <code>erubis</code> or <code>mail</code>
-        changes the gems you use.
-      </p>
-      <p>
-        However, from time to time, you might want to update the gems you are
-        using to the newest versions that still match the gems in your
-        <code>Gemfile</code>.
-      </p>
-      <p>
-        To do this, run <code>bundle update</code>, which will ignore the
-        <code>Gemfile.lock</code>, and resolve all the dependencies again. Keep
-        in mind that this process can result in a significantly different set
-        of the 25 gems, based on the requirements of new gems that the gem
-        authors released since the last time you ran <code>bundle update</code>.
-      </p>
-    </div>
-  </div>
-</div>
-<h2>Update a list of gems.</h2>
-<div class='contents'>
-  <div class='bullet' id='update_list_of_gems'>
-    <div class='description'>
-      <p>
-        Sometimes, you want to update a single gem in the <code>Gemfile</code>,
-        and leave the rest of the gems that you specified locked to the
-        versions in the <code>Gemfile.lock</code>.
-      </p>
-      <p>
-        For instance, in the scenario above, imagine that
-        <code>nokogiri</code> releases version <code>1.4.4</code>, and you want
-        to update it _without_ updating Rails and all of its dependencies. To
-        do this, run
-        <pre class='sunburst'>bundle update nokogiri&#x000A;</pre>
-      </p>
-      <p>
-        Bundler will update <code>nokogiri</code> and any of its dependencies,
-        but leave alone Rails and its dependencies.
-      </p>
-    </div>
-  </div>
-</div>
-<h2>Overlapping dependencies</h2>
-<div class='contents'>
-  <div class='bullet' id='overlapping_dependencies'>
-    <div class='description'>
-      <p>
-        Sometimes, multiple gems declared in your <code>Gemfile</code> are
-        satisfied by the same second-level dependency. For instance, consider the
-        case of <code>thin</code> and <code>rack-perftools-profiler</code>.
-        <pre class="sunburst">source <span class="String"><span class="String">&#39;</span>http://rubygems.org<span class="String">&#39;</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">&#39;</span>thin<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rack-perftools-profiler<span class="String">&#39;</span></span>&#x000A;</pre>
-      </p>
-      <p>
-        The <code>thin</code> gem depends on <code>rack >= 1.0</code>, while
-        <code>rack-perftools-profiler</code> depends on <code>rack ~> 1.0</code>.
-        If you run bundle install, you get:
-        <pre class='sunburst'>Fetching source index for http://rubygems.org/&#x000A;Installing daemons (1.1.0)&#x000A;Installing eventmachine (0.12.10) with native extensions&#x000A;Installing open4 (1.0.1)&#x000A;Installing perftools.rb (0.4.7) with native extensions&#x000A;Installing rack (1.2.1)&#x000A;Installing rack-perftools_profiler (0.0.2)&#x000A;Installing thin (1.2.7) with native extensions&#x000A;Using bundler (1.0.0.rc.3)&#x000A;</pre>
-      </p>
-      <p>
-        In this case, the two gems have their own set of dependencies, but they
-        share <code>rack</code> in common. If you run <code>bundle update
-        thin</code>, bundler will update <code>daemons</code>,
-        <code>eventmachine</code> and <code>rack</code>, which are dependencies
-        of <code>thin</code>, but not <code>open4</code> or
-        <code>perftools.rb</code>, which are dependencies of
-        <code>rack-perftools_profiler</code>. Note that
-        <code>bundle update thin</code> will update <code>rack</code> even though
-        it's _also_ a dependency of <code>rack-perftools_profiler</code>.
-      </p>
-      <p>
-        In short, when you update a gem using
-        <code>bundle update</code>, bundler will update all dependencies of that
-        gem, including those that are also dependencies of another gem.
-      </p>
-      <p>
-        In this scenario, updating the <code>thin</code> version manually in the
-        <code>Gemfile</code>, and then running <code>bundle install</code> will
-        only update <code>daemons</code> and <code>eventmachine</code>, but not
-        <code>rack</code>.
-      </p>
-    </div>
-  </div>
-</div>
-<h2>Recommended workflow</h2>
-<div class='contents'>
-  <div class='bullet' id='recommended_workflow'>
-    <div class='description'>
-      <p>
-        In general, when working with an application managed with bundler, you
-        should use the following workflow:
-      </p>
-      <p>
-        After you create your <code>Gemfile</code> for the first time, run
-        <pre class='sunburst'>$ bundle install</pre>
-      </p>
-      <p>
-        Check the resulting <code>Gemfile.lock</code> into version control
-        <pre class='sunburst'>$ git add Gemfile.lock</pre>
-      </p>
-      <p>
-        When checking out this repository on another development machine, run
-        <pre class='sunburst'>$ bundle install</pre>
-      </p>
-      <p>
-        When checking out this repository on a deployment machine, run
-        <pre class='sunburst'>$ bundle install --deployment</pre>
-      </p>
-      <p>
-        After changing the <code>Gemfile</code> to reflect a new or update
-        dependency, run
-        <pre class='sunburst'>$ bundle install</pre>
-      </p>
-      <p>
-        Make sure to check the updated <code>Gemfile.lock</code> into version
-        control
-        <pre class='sunburst'>$ git add Gemfile.lock</pre>
-      </p>
-      <p>
-        If <code>bundle install</code> reports a conflict, manually update the
-        specific gems that you changed in the <code>Gemfile</code>
-        <pre class='sunburst'>$ bundle update rails thin</pre>
-      </p>
-      <p>
-        If you want to update all the gems to the latest possible versions that
-        still match the gems listed in the <code>Gemfile</code>, run
-        <pre class='sunburst'>$ bundle update</pre>
-      </p>
-    </div>
-  </div>
-</div>
+        <div class='contents'>
+          <div class='bullet'>
+            <div class='description'>
+              Update the current environment
+            </div>
+            <pre class='sunburst'>$ bundle update [GEM] [--local] [--source=SOURCE]</pre>
+            <div class='notes'>
+              <p>
+                Options:
+              </p>
+              <p>
+                <code>--local</code>: Do not attempt to fetch gems remotely and use
+                the gem cache instead
+              </p>
+              <p>
+                <code>--source</code>: Update a specific source (and all gems
+                associated with it)
+              </p>
+            </div>
+            <div class='description'>
+              Update the gems specified (all gems, if none are specified), ignoring
+              the previously installed gems specified in the <code>Gemfile.lock</code>.
+              In general, you should use <code>bundle install</code> to install the same
+              exact gems and versions across machines.
+              You would use <code>bundle update</code> to explicitly update the version
+              of a gem.
+            </div>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              Update the current environment.
+            </div>
+            <div class='how'>
+              <pre class='sunburst'>$ bundle update</pre>
+            </div>
+            <div class='notes'>
+              If you run <code>bundle update</code> with no parameters, bundler will
+              ignore any previously installed gems and resolve all dependencies again
+              based on the latest versions of all gems available in the sources.
+            </div>
+          </div>
+          <div class='bullet' id='local'>
+            <div class='description'>
+              (Example with --local TBD)
+            </div>
+          </div>
+          <div class='bullet' id='source'>
+            <div class='description'>
+              Update a specific source (and all gems associated with it)
+            </div>
+            <div class='how'>
+              <pre class='sunburst'>$ bundle update --source=SOURCE</pre>
+            </div>
+            <div class='notes'>
+              The name of a <code>:git</code> or <code>:path</code> source used in the
+              <code>Gemfile</code>. For instance, with a <code>:git</code> source of
+              <code>http://github.com/rails/rails.git</code>, you would call
+              <code>bundle update --source rails</code>.
+            </div>
+          </div>
+        </div>
+        <h2>Update all gems</h2>
+        <div class='contents'>
+          <div class='bullet' id='update_all_extended'>
+            <div class='description'>
+              <p>
+                If you run <code>bundle update</code> with no parameters, bundler will
+                ignore any previously installed gems and resolve all dependencies again
+                based on the latest versions of all gems available in the sources.
+              </p>
+              <p>
+                Consider the following <code>Gemfile</code>:
+                <pre class="sunburst">source <span class="String"><span class="String">&#39;</span>http://rubygems.org<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rails<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>3.0.0.rc<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>&#x000A;</pre>
+              </p>
+              <p>
+                When you run <code>bundle install</code> the first time, bundler will
+                resolve all of the dependencies, all the way down, and install what you
+                need:
+                <pre class='sunburst'>Fetching source index for http://rubygems.org/&#x000A;Installing rake (0.8.7)&#x000A;Installing abstract (1.0.0)&#x000A;Installing activesupport (3.0.0.rc)&#x000A;Installing builder (2.1.2)&#x000A;Installing i18n (0.4.1)&#x000A;Installing activemodel (3.0.0.rc)&#x000A;Installing erubis (2.6.6)&#x000A;Installing rack (1.2.1)&#x000A;Installing rack-mount (0.6.9)&#x000A;Installing rack-test (0.5.4)&#x000A;Installing tzinfo (0.3.22)&#x000A;Installing actionpack (3.0.0.rc)&#x000A;Installing mime-types (1.16)&#x000A;Installing polyglot (0.3.1)&#x000A;Installing treetop (1.4.8)&#x000A;Installing mail (2.2.5)&#x000A;Installing actionmailer (3.0.0.rc)&#x000A;Installing arel (0.4.0)&#x000A;Installing activerecord (3.0.0.rc)&#x000A;Installing activeresource (3.0.0.rc)&#x000A;Installing bundler (1.0.0.rc.3)&#x000A;Installing nokogiri (1.4.3.1) with native extensions&#x000A;Installing thor (0.14.0)&#x000A;Installing railties (3.0.0.rc)&#x000A;Installing rails (3.0.0.rc)&#x000A;&#x000A;Your bundle is complete! Use `bundle show [gemname]` to see where a&#x000A;bundled gem is installed.</pre>
+              </p>
+              <p>
+                As you can see, even though you have just two gems in the
+                <code>Gemfile</code>, your application actually needs 25 different gems
+                in order to run. Bundler remembers the exact versions it installed in
+                <code>Gemfile.lock</code>. The next time you run
+                <code>bundle install</code>, bundler skips the dependency resolution and
+                installs the same gems as it installed last time.
+              </p>
+              <p>
+                After checking in the <code>Gemfile.lock</code> into version control and
+                cloning it on another machine, running <code>bundle install</code> will
+                _still_ install the gems that you installed last time. You don't need to
+                worry that a new release of <code>erubis</code> or <code>mail</code>
+                changes the gems you use.
+              </p>
+              <p>
+                However, from time to time, you might want to update the gems you are
+                using to the newest versions that still match the gems in your
+                <code>Gemfile</code>.
+              </p>
+              <p>
+                To do this, run <code>bundle update</code>, which will ignore the
+                <code>Gemfile.lock</code>, and resolve all the dependencies again. Keep
+                in mind that this process can result in a significantly different set
+                of the 25 gems, based on the requirements of new gems that the gem
+                authors released since the last time you ran <code>bundle update</code>.
+              </p>
+            </div>
+          </div>
+        </div>
+        <h2>Update a list of gems.</h2>
+        <div class='contents'>
+          <div class='bullet' id='update_list_of_gems'>
+            <div class='description'>
+              <p>
+                Sometimes, you want to update a single gem in the <code>Gemfile</code>,
+                and leave the rest of the gems that you specified locked to the
+                versions in the <code>Gemfile.lock</code>.
+              </p>
+              <p>
+                For instance, in the scenario above, imagine that
+                <code>nokogiri</code> releases version <code>1.4.4</code>, and you want
+                to update it _without_ updating Rails and all of its dependencies. To
+                do this, run
+                <pre class='sunburst'>bundle update nokogiri&#x000A;</pre>
+              </p>
+              <p>
+                Bundler will update <code>nokogiri</code> and any of its dependencies,
+                but leave alone Rails and its dependencies.
+              </p>
+            </div>
+          </div>
+        </div>
+        <h2>Overlapping dependencies</h2>
+        <div class='contents'>
+          <div class='bullet' id='overlapping_dependencies'>
+            <div class='description'>
+              <p>
+                Sometimes, multiple gems declared in your <code>Gemfile</code> are
+                satisfied by the same second-level dependency. For instance, consider the
+                case of <code>thin</code> and <code>rack-perftools-profiler</code>.
+                <pre class="sunburst">source <span class="String"><span class="String">&#39;</span>http://rubygems.org<span class="String">&#39;</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">&#39;</span>thin<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rack-perftools-profiler<span class="String">&#39;</span></span>&#x000A;</pre>
+              </p>
+              <p>
+                The <code>thin</code> gem depends on <code>rack >= 1.0</code>, while
+                <code>rack-perftools-profiler</code> depends on <code>rack ~> 1.0</code>.
+                If you run bundle install, you get:
+                <pre class='sunburst'>Fetching source index for http://rubygems.org/&#x000A;Installing daemons (1.1.0)&#x000A;Installing eventmachine (0.12.10) with native extensions&#x000A;Installing open4 (1.0.1)&#x000A;Installing perftools.rb (0.4.7) with native extensions&#x000A;Installing rack (1.2.1)&#x000A;Installing rack-perftools_profiler (0.0.2)&#x000A;Installing thin (1.2.7) with native extensions&#x000A;Using bundler (1.0.0.rc.3)&#x000A;</pre>
+              </p>
+              <p>
+                In this case, the two gems have their own set of dependencies, but they
+                share <code>rack</code> in common. If you run <code>bundle update
+                thin</code>, bundler will update <code>daemons</code>,
+                <code>eventmachine</code> and <code>rack</code>, which are dependencies
+                of <code>thin</code>, but not <code>open4</code> or
+                <code>perftools.rb</code>, which are dependencies of
+                <code>rack-perftools_profiler</code>. Note that
+                <code>bundle update thin</code> will update <code>rack</code> even though
+                it's _also_ a dependency of <code>rack-perftools_profiler</code>.
+              </p>
+              <p>
+                In short, when you update a gem using
+                <code>bundle update</code>, bundler will update all dependencies of that
+                gem, including those that are also dependencies of another gem.
+              </p>
+              <p>
+                In this scenario, updating the <code>thin</code> version manually in the
+                <code>Gemfile</code>, and then running <code>bundle install</code> will
+                only update <code>daemons</code> and <code>eventmachine</code>, but not
+                <code>rack</code>.
+              </p>
+            </div>
+          </div>
+        </div>
+        <h2>Recommended workflow</h2>
+        <div class='contents'>
+          <div class='bullet' id='recommended_workflow'>
+            <div class='description'>
+              <p>
+                In general, when working with an application managed with bundler, you
+                should use the following workflow:
+              </p>
+              <p>
+                After you create your <code>Gemfile</code> for the first time, run
+                <pre class='sunburst'>$ bundle install</pre>
+              </p>
+              <p>
+                Check the resulting <code>Gemfile.lock</code> into version control
+                <pre class='sunburst'>$ git add Gemfile.lock</pre>
+              </p>
+              <p>
+                When checking out this repository on another development machine, run
+                <pre class='sunburst'>$ bundle install</pre>
+              </p>
+              <p>
+                When checking out this repository on a deployment machine, run
+                <pre class='sunburst'>$ bundle install --deployment</pre>
+              </p>
+              <p>
+                After changing the <code>Gemfile</code> to reflect a new or update
+                dependency, run
+                <pre class='sunburst'>$ bundle install</pre>
+              </p>
+              <p>
+                Make sure to check the updated <code>Gemfile.lock</code> into version
+                control
+                <pre class='sunburst'>$ git add Gemfile.lock</pre>
+              </p>
+              <p>
+                If <code>bundle install</code> reports a conflict, manually update the
+                specific gems that you changed in the <code>Gemfile</code>
+                <pre class='sunburst'>$ bundle update rails thin</pre>
+              </p>
+              <p>
+                If you want to update all the gems to the latest possible versions that
+                still match the gems listed in the <code>Gemfile</code>, run
+                <pre class='sunburst'>$ bundle update</pre>
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div id='footer'>

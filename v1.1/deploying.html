@@ -17,90 +17,90 @@
 
         </div>
         <h2>Deploying bundled applications</h2>
-<div class='contents'>
-  <div class='bullet'>
-    <div class='description'>
-      Before deploying an app that uses Bundler, Add your <code>Gemfile</code>
-      and <code>Gemfile.lock</code> to source control, but ignore the
-      <code>.bundle</code> folder, which is specific to each machine.
-    </div>
-    <pre class='sunburst'>$ echo ".bundle\n" >> .gitignore&#x000A;$ git add Gemfile Gemfile.lock .gitignore&#x000A;$ git commit -m "Add Bundler support"</pre>
-    <div class='notes'>
-      Once you have done that, there are two ways to deploy using Bundler:
-      manually or automatically.
-    </div>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      <h3>Manual deployment</h3>
-      In your deploy script, after updating to the latest
-      code, install your bundle to the <code>vendor/bundle</code>
-      directory, ensuring all your dependencies are met.
-    </div>
-    <pre class='sunburst'>$ bundle install --deployment</pre>
-    <div class='notes'>
-      <p>
-        Start your application servers as usual, and your
-        application will use your bundled environment
-        with the exact same gems you use in development.
-      </p>
-      <p>
-        If you have run <code>bundle package</code>, the cached
-        gems will be used automatically.
-      </p>
-      <a href="/v1.1/bundle_package.html">Learn More: Packing</a>
-    </div>
-  </div>
-  <div class='bullet'>
-    <h3>Automatic deployment with Capistrano</h3>
-    <div class='description'>
-      To pull in the Bundler Cap task, just add this to your
-      <code>deploy.rb</code> file:
-    </div>
-    <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>bundler/capistrano<span class="String">&#39;</span></span>&#x000A;</pre>
-    <div class='notes'>
-      That's it! Running <code>cap deploy</code> will now automatically run
-      <code>bundle install</code> on the remote server with deployment-friendly
-      options. A list of options that can be changed is available in the help
-      for the cap task. To see it, run <code>cap -e bundle:install</code>.
-    </div>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      <h3>Automatic deployment with Vlad</h3>
-      There is a default Vlad task available. To make it available, add this line
-      to the Vlad <code>deploy.rb</code>.
-    </div>
-    <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>bundler/vlad<span class="String">&#39;</span></span>&#x000A;</pre>
-    <div class='notes'>
-      Once you have done that, the <code>vlad:bundle:install</code> task will be
-      available for use. Make sure it is run as part of your deploy. For example:
-    </div>
-    <pre class="sunburst">task <span class="String"><span class="String">&quot;</span>vlad:deploy<span class="String">&quot;</span></span> =&gt; <span class="String"><span class="String">%w[</span></span>&#x000A;<span class="String">  vlad:update vlad:bundle:install vlad:start_app vlad:cleanup</span>&#x000A;<span class="String"><span class="String">]</span></span>&#x000A;</pre>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      <h3>After deploying</h3>
-      Make sure to use <code>bundle exec</code> to run any executables
-      from gems in the bundle
-    </div>
-    <pre class='sunburst'>$ bundle exec rake db:setup</pre>
-    <div class='notes'>
-      Alternatively, you can use the <code>--binstubs</code> option on the
-      install command to generate executable binaries that can be used instead of
-      <code>bundle exec</code>.
-    </div>
-    <a href="./man/bundle-exec.1.html">Learn More: Executables</a>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      <h3>Heroku</h3>
-      When you deploy to Heroku, Bundler will be run automatically as long as a Gemfile is present. If you check in your Gemfile.lock, Heroku will run <code>`bundle install --deployment`</code>. If you want to exclude certain groups using the <code>--without</code> option, you need to use <code>`heroku config`</code>.
-    </div>
-    <pre class='sunburst'>$ heroku config:add BUNDLE_WITHOUT="test development" --app app_name</pre>
-    <a href="http://docs.heroku.com/bundler">Heroku Bundler Documentation</a>
-  </div>
-</div>
+        <div class='contents'>
+          <div class='bullet'>
+            <div class='description'>
+              Before deploying an app that uses Bundler, Add your <code>Gemfile</code>
+              and <code>Gemfile.lock</code> to source control, but ignore the
+              <code>.bundle</code> folder, which is specific to each machine.
+            </div>
+            <pre class='sunburst'>$ echo ".bundle\n" >> .gitignore&#x000A;$ git add Gemfile Gemfile.lock .gitignore&#x000A;$ git commit -m "Add Bundler support"</pre>
+            <div class='notes'>
+              Once you have done that, there are two ways to deploy using Bundler:
+              manually or automatically.
+            </div>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              <h3>Manual deployment</h3>
+              In your deploy script, after updating to the latest
+              code, install your bundle to the <code>vendor/bundle</code>
+              directory, ensuring all your dependencies are met.
+            </div>
+            <pre class='sunburst'>$ bundle install --deployment</pre>
+            <div class='notes'>
+              <p>
+                Start your application servers as usual, and your
+                application will use your bundled environment
+                with the exact same gems you use in development.
+              </p>
+              <p>
+                If you have run <code>bundle package</code>, the cached
+                gems will be used automatically.
+              </p>
+              <a href="/v1.1/bundle_package.html">Learn More: Packing</a>
+            </div>
+          </div>
+          <div class='bullet'>
+            <h3>Automatic deployment with Capistrano</h3>
+            <div class='description'>
+              To pull in the Bundler Cap task, just add this to your
+              <code>deploy.rb</code> file:
+            </div>
+            <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>bundler/capistrano<span class="String">&#39;</span></span>&#x000A;</pre>
+            <div class='notes'>
+              That's it! Running <code>cap deploy</code> will now automatically run
+              <code>bundle install</code> on the remote server with deployment-friendly
+              options. A list of options that can be changed is available in the help
+              for the cap task. To see it, run <code>cap -e bundle:install</code>.
+            </div>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              <h3>Automatic deployment with Vlad</h3>
+              There is a default Vlad task available. To make it available, add this line
+              to the Vlad <code>deploy.rb</code>.
+            </div>
+            <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>bundler/vlad<span class="String">&#39;</span></span>&#x000A;</pre>
+            <div class='notes'>
+              Once you have done that, the <code>vlad:bundle:install</code> task will be
+              available for use. Make sure it is run as part of your deploy. For example:
+            </div>
+            <pre class="sunburst">task <span class="String"><span class="String">&quot;</span>vlad:deploy<span class="String">&quot;</span></span> =&gt; <span class="String"><span class="String">%w[</span></span>&#x000A;<span class="String">  vlad:update vlad:bundle:install vlad:start_app vlad:cleanup</span>&#x000A;<span class="String"><span class="String">]</span></span>&#x000A;</pre>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              <h3>After deploying</h3>
+              Make sure to use <code>bundle exec</code> to run any executables
+              from gems in the bundle
+            </div>
+            <pre class='sunburst'>$ bundle exec rake db:setup</pre>
+            <div class='notes'>
+              Alternatively, you can use the <code>--binstubs</code> option on the
+              install command to generate executable binaries that can be used instead of
+              <code>bundle exec</code>.
+            </div>
+            <a href="./man/bundle-exec.1.html">Learn More: Executables</a>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              <h3>Heroku</h3>
+              When you deploy to Heroku, Bundler will be run automatically as long as a Gemfile is present. If you check in your Gemfile.lock, Heroku will run <code>`bundle install --deployment`</code>. If you want to exclude certain groups using the <code>--without</code> option, you need to use <code>`heroku config`</code>.
+            </div>
+            <pre class='sunburst'>$ heroku config:add BUNDLE_WITHOUT="test development" --app app_name</pre>
+            <a href="http://docs.heroku.com/bundler">Heroku Bundler Documentation</a>
+          </div>
+        </div>
       </div>
     </div>
     <div id='footer'>

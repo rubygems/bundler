@@ -17,127 +17,127 @@
 
         </div>
         <h2>Gems from git repositories</h2>
-<div class='contents'>
-  <div class='bullet'>
-    <div class='description'>
-      Bundler adds the ability to use gems directly from git repositories. Setting
-      them up is as easy as adding a gem to your Gemfile. Using the very latest
-      version of a gem (or even a fork) is just as easy as using an official
-      release.
-    </div>
-    <div class='description'>
-      Because Rubygems lacks the ability to handle gems from git, any gems
-      installed from a git repository will not show up in <code>gem list</code>.
-      They will, however, be available after running <code>Bundler.setup</code>.
-    </div>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      Specify that a gem should come from a git
-      repository with a .gemspec at its root
-    </div>
-    <pre class="sunburst">gem <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>git</span> =&gt; <span class="String"><span class="String">&#39;</span>git://github.com/tenderlove/nokogiri.git<span class="String">&#39;</span></span>&#x000A;</pre>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      If there is no .gemspec at the root of
-      a git repository, you must specify a version
-      that bundler should use when resolving
-      dependencies
-    </div>
-    <pre class="sunburst">gem <span class="String"><span class="String">&#39;</span>deep_merge<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>1.0<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>git</span> =&gt; <span class="String"><span class="String">&#39;</span>git://github.com/peritor/deep_merge.git<span class="String">&#39;</span></span>&#x000A;</pre>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      Specify that a git repository containing
-      multiple .gemspec files should be treated
-      as a gem source
-    </div>
-    <pre class="sunburst">git <span class="String"><span class="String">&#39;</span>git://github.com/rails/rails.git<span class="String">&#39;</span></span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">&#39;</span>railties<span class="String">&#39;</span></span>&#x000A;  gem <span class="String"><span class="String">&#39;</span>action_pack<span class="String">&#39;</span></span>&#x000A;  gem <span class="String"><span class="String">&#39;</span>active_model<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;</pre>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      Specify that a git repository should use
-      a particular ref, branch, or tag
-    </div>
-    <pre class="sunburst"><span class="Constant"><span class="Constant">:</span>git</span> =&gt; <span class="String"><span class="String">&#39;</span>git://github.com/rails/rails.git<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>ref</span> =&gt; <span class="String"><span class="String">&#39;</span>4aded<span class="String">&#39;</span></span>&#x000A;<span class="Constant"><span class="Constant">:</span>git</span> =&gt; <span class="String"><span class="String">&#39;</span>git://github.com/rails/rails.git<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>branch</span> =&gt; <span class="String"><span class="String">&#39;</span>2-3-stable<span class="String">&#39;</span></span>&#x000A;<span class="Constant"><span class="Constant">:</span>git</span> =&gt; <span class="String"><span class="String">&#39;</span>git://github.com/rails/rails.git<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>tag</span> =&gt; <span class="String"><span class="String">&#39;</span>v2.3.5<span class="String">&#39;</span></span>&#x000A;</pre>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      Specifying a ref, branch, or tag for a
-      git repository specified inline works
-      exactly the same way
-    </div>
-    <pre class="sunburst">gem <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>git</span> =&gt; <span class="String"><span class="String">&#39;</span>git://github.com/tenderlove/nokogiri.git<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>ref</span> =&gt; <span class="String"><span class="String">&#39;</span>0eec4<span class="String">&#39;</span></span>&#x000A;</pre>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      If you are getting your gems from a public GitHub repository,
-      you can use the shorthand
-    </div>
-    <pre class="sunburst">gem <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>github</span> =&gt; <span class="String"><span class="String">&#39;</span>tenderlove/nokogiri<span class="String">&#39;</span></span>&#x000A;</pre>
-    <div class='description'>
-      If the repository name is the same as the GitHub account hosting it,
-      you can omit it
-    </div>
-    <pre class="sunburst">gem <span class="String"><span class="String">&#39;</span>rails<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>github</span> =&gt; <span class="String"><span class="String">&#39;</span>rails<span class="String">&#39;</span></span>&#x000A;</pre>
-  </div>
-</div>
-<h2 id='local'>Local Git Repos</h2>
-<div class='contents'>
-  <div class='bullet'>
-    <div class='description'>
-      Bundler also allows you to work against a git repository locally
-      instead of using the remote version. This can be achieved by setting
-      up a local override:
-    </div>
-    <pre class='sunburst'>bundle config local.GEM_NAME /path/to/local/git/repository&#x000A;</pre>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      For example, in order to use a local Rack repository, a developer could call:
-    </div>
-    <pre class='sunburst'>bundle config local.rack ~/Work/git/rack</pre>
-    <div class='description'>
-      and setup the git repo pointing to a branch:
-    </div>
-    <pre class="sunburst">gem <span class="String"><span class="String">&#39;</span>rack<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>github</span> =&gt; <span class="String"><span class="String">&#39;</span>rack/rack<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>branch</span> =&gt; <span class="String"><span class="String">&#39;</span>master<span class="String">&#39;</span></span>&#x000A;</pre>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      <p>
-        Now instead of checking out the remote git repository, the local
-        override will be used. Similar to a path source, every time the local
-        git repository change, changes will be automatically picked up by
-        Bundler. This means a commit in the local git repo will update the
-        revision in the <code>Gemfile.lock</code> to the local git repo revision. This
-        requires the same attention as git submodules. Before pushing to
-        the remote, you need to ensure the local override was pushed, otherwise
-        you may point to a commit that only exists in your local machine.
-      </p>
-      <p>
-        Bundler does many checks to ensure a developer won't work with
-        invalid references. Particularly, we force a developer to specify
-        a branch in the <code>Gemfile</code> in order to use this feature. If the branch
-        specified in the <code>Gemfile</code> and the current branch in the local git
-        repository do not match, Bundler will abort. This ensures that
-        a developer is always working against the correct branches, and prevents
-        accidental locking to a different branch.
-      </p>
-      <p>
-        Finally, Bundler also ensures that the current revision in the
-        <code>Gemfile.lock</code> exists in the local git repository. By doing this, Bundler
-        forces you to fetch the latest changes in the remotes.
-      </p>
-    </div>
-  </div>
-  <div class='bullet'>
-    <div class='description'>
-      <p>If you do not want bundler to make these branch checks, you can override it by setting this option:</p>
-    </div>
-    <pre class='sunburst'>bundle config disable_local_branch_check true</pre>
-  </div>
-</div>
+        <div class='contents'>
+          <div class='bullet'>
+            <div class='description'>
+              Bundler adds the ability to use gems directly from git repositories. Setting
+              them up is as easy as adding a gem to your Gemfile. Using the very latest
+              version of a gem (or even a fork) is just as easy as using an official
+              release.
+            </div>
+            <div class='description'>
+              Because Rubygems lacks the ability to handle gems from git, any gems
+              installed from a git repository will not show up in <code>gem list</code>.
+              They will, however, be available after running <code>Bundler.setup</code>.
+            </div>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              Specify that a gem should come from a git
+              repository with a .gemspec at its root
+            </div>
+            <pre class="sunburst">gem <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>git</span> =&gt; <span class="String"><span class="String">&#39;</span>git://github.com/tenderlove/nokogiri.git<span class="String">&#39;</span></span>&#x000A;</pre>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              If there is no .gemspec at the root of
+              a git repository, you must specify a version
+              that bundler should use when resolving
+              dependencies
+            </div>
+            <pre class="sunburst">gem <span class="String"><span class="String">&#39;</span>deep_merge<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>1.0<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>git</span> =&gt; <span class="String"><span class="String">&#39;</span>git://github.com/peritor/deep_merge.git<span class="String">&#39;</span></span>&#x000A;</pre>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              Specify that a git repository containing
+              multiple .gemspec files should be treated
+              as a gem source
+            </div>
+            <pre class="sunburst">git <span class="String"><span class="String">&#39;</span>git://github.com/rails/rails.git<span class="String">&#39;</span></span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">&#39;</span>railties<span class="String">&#39;</span></span>&#x000A;  gem <span class="String"><span class="String">&#39;</span>action_pack<span class="String">&#39;</span></span>&#x000A;  gem <span class="String"><span class="String">&#39;</span>active_model<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;</pre>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              Specify that a git repository should use
+              a particular ref, branch, or tag
+            </div>
+            <pre class="sunburst"><span class="Constant"><span class="Constant">:</span>git</span> =&gt; <span class="String"><span class="String">&#39;</span>git://github.com/rails/rails.git<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>ref</span> =&gt; <span class="String"><span class="String">&#39;</span>4aded<span class="String">&#39;</span></span>&#x000A;<span class="Constant"><span class="Constant">:</span>git</span> =&gt; <span class="String"><span class="String">&#39;</span>git://github.com/rails/rails.git<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>branch</span> =&gt; <span class="String"><span class="String">&#39;</span>2-3-stable<span class="String">&#39;</span></span>&#x000A;<span class="Constant"><span class="Constant">:</span>git</span> =&gt; <span class="String"><span class="String">&#39;</span>git://github.com/rails/rails.git<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>tag</span> =&gt; <span class="String"><span class="String">&#39;</span>v2.3.5<span class="String">&#39;</span></span>&#x000A;</pre>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              Specifying a ref, branch, or tag for a
+              git repository specified inline works
+              exactly the same way
+            </div>
+            <pre class="sunburst">gem <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>git</span> =&gt; <span class="String"><span class="String">&#39;</span>git://github.com/tenderlove/nokogiri.git<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>ref</span> =&gt; <span class="String"><span class="String">&#39;</span>0eec4<span class="String">&#39;</span></span>&#x000A;</pre>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              If you are getting your gems from a public GitHub repository,
+              you can use the shorthand
+            </div>
+            <pre class="sunburst">gem <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>github</span> =&gt; <span class="String"><span class="String">&#39;</span>tenderlove/nokogiri<span class="String">&#39;</span></span>&#x000A;</pre>
+            <div class='description'>
+              If the repository name is the same as the GitHub account hosting it,
+              you can omit it
+            </div>
+            <pre class="sunburst">gem <span class="String"><span class="String">&#39;</span>rails<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>github</span> =&gt; <span class="String"><span class="String">&#39;</span>rails<span class="String">&#39;</span></span>&#x000A;</pre>
+          </div>
+        </div>
+        <h2 id='local'>Local Git Repos</h2>
+        <div class='contents'>
+          <div class='bullet'>
+            <div class='description'>
+              Bundler also allows you to work against a git repository locally
+              instead of using the remote version. This can be achieved by setting
+              up a local override:
+            </div>
+            <pre class='sunburst'>bundle config local.GEM_NAME /path/to/local/git/repository&#x000A;</pre>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              For example, in order to use a local Rack repository, a developer could call:
+            </div>
+            <pre class='sunburst'>bundle config local.rack ~/Work/git/rack</pre>
+            <div class='description'>
+              and setup the git repo pointing to a branch:
+            </div>
+            <pre class="sunburst">gem <span class="String"><span class="String">&#39;</span>rack<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>github</span> =&gt; <span class="String"><span class="String">&#39;</span>rack/rack<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>branch</span> =&gt; <span class="String"><span class="String">&#39;</span>master<span class="String">&#39;</span></span>&#x000A;</pre>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              <p>
+                Now instead of checking out the remote git repository, the local
+                override will be used. Similar to a path source, every time the local
+                git repository change, changes will be automatically picked up by
+                Bundler. This means a commit in the local git repo will update the
+                revision in the <code>Gemfile.lock</code> to the local git repo revision. This
+                requires the same attention as git submodules. Before pushing to
+                the remote, you need to ensure the local override was pushed, otherwise
+                you may point to a commit that only exists in your local machine.
+              </p>
+              <p>
+                Bundler does many checks to ensure a developer won't work with
+                invalid references. Particularly, we force a developer to specify
+                a branch in the <code>Gemfile</code> in order to use this feature. If the branch
+                specified in the <code>Gemfile</code> and the current branch in the local git
+                repository do not match, Bundler will abort. This ensures that
+                a developer is always working against the correct branches, and prevents
+                accidental locking to a different branch.
+              </p>
+              <p>
+                Finally, Bundler also ensures that the current revision in the
+                <code>Gemfile.lock</code> exists in the local git repository. By doing this, Bundler
+                forces you to fetch the latest changes in the remotes.
+              </p>
+            </div>
+          </div>
+          <div class='bullet'>
+            <div class='description'>
+              <p>If you do not want bundler to make these branch checks, you can override it by setting this option:</p>
+            </div>
+            <pre class='sunburst'>bundle config disable_local_branch_check true</pre>
+          </div>
+        </div>
       </div>
     </div>
     <div id='footer'>
