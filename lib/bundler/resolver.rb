@@ -178,7 +178,6 @@ module Bundler
       safe_throw :success, successify(activated) if reqs.empty?
 
       indicate_progress
-
       debug { print "\e[2J\e[f" ; "==== Iterating ====\n\n" }
 
       # Sort dependencies so that the ones that are easiest to resolve are first.
@@ -246,6 +245,13 @@ module Bundler
           # current requirement is a root level requirement, we need to jump back to
           # where the conflicting gem was activated.
           parent = current.required_by.last
+
+          if parent && other_versions_of_parent = search(parent)
+            if other_versions_of_parent.length <=1
+              parent = existing.required_by.last if existing.respond_to?(:required_by)
+            end
+          end
+
           # `existing` could not respond to required_by if it is part of the base set
           # of specs that was passed to the resolver (aka, instance of LazySpecification)
           parent ||= existing.required_by.last if existing.respond_to?(:required_by)
