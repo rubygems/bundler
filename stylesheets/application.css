@@ -232,7 +232,11 @@ h2 {
   .notes + .description, .shirts + .description {
     margin-top: 20px; }
 
-/* line 181, application.sass */
+/* line 182, application.sass */
+.sunburst + .description {
+  margin-top: 15px; }
+
+/* line 185, application.sass */
 .bullet {
   width: 100%;
   padding: 5px 15px 15px 15px;
@@ -245,14 +249,14 @@ h2 {
   -moz-box-orient: vertical;
   -webkit-box-align: justify;
   -moz-box-align: justify; }
-  /* line 187, application.sass */
+  /* line 191, application.sass */
   .bullet .description {
     width: 100%;
     margin-right: 16px;
     color: #003333;
     line-height: 24px;
     margin-bottom: 8px; }
-  /* line 194, application.sass */
+  /* line 198, application.sass */
   .bullet a {
     padding-top: 8px;
     padding-bottom: 5px;
@@ -280,7 +284,7 @@ h2 {
       background-image: -o-linear-gradient(#4e9326, #35641a);
       background-image: linear-gradient(#4e9326, #35641a);
       border-bottom: none; }
-  /* line 198, application.sass */
+  /* line 202, application.sass */
   .bullet .how {
     display: -webkit-box;
     display: -moz-box;
@@ -291,16 +295,16 @@ h2 {
     -webkit-box-flex: 1;
     -moz-box-flex: 1;
     line-height: 24px; }
-  /* line 203, application.sass */
+  /* line 207, application.sass */
   .bullet pre {
     -webkit-box-flex: 1;
     -moz-box-flex: 1;
     margin: 0; }
-  /* line 207, application.sass */
+  /* line 211, application.sass */
   .bullet code {
     background-color: rgba(0, 0, 0, 0.1); }
 
-/* line 210, application.sass */
+/* line 214, application.sass */
 pre {
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
@@ -308,34 +312,34 @@ pre {
   -o-border-radius: 5px;
   border-radius: 5px; }
 
-/* line 213, application.sass */
+/* line 217, application.sass */
 .bullet:nth-child(even) {
   background-color: rgba(0, 0, 0, 0.1);
   border-top: 1px solid rgba(0, 0, 0, 0.1);
   border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
 
-/* line 218, application.sass */
+/* line 222, application.sass */
 .bullet:not(:nth-of-type(1)) {
   padding-top: 15px; }
 
-/* line 222, application.sass */
+/* line 226, application.sass */
 #credits p {
   text-align: center;
   font-size: 11pt;
   color: #668493; }
-  /* line 226, application.sass */
+  /* line 230, application.sass */
   #credits p a, #credits p a:visited {
     color: #2c596b;
     text-decoration: none; }
 
-/* line 231, application.sass */
+/* line 235, application.sass */
 #github img {
   position: absolute;
   top: 0;
   right: 0;
   border: 0; }
 
-/* line 250, application.sass */
+/* line 254, application.sass */
 #prod-versions {
   position: absolute;
   top: 0;
@@ -346,7 +350,7 @@ pre {
   -webkit-border-bottom-right-radius: 10px;
   border-bottom-right-radius: 10px;
   z-index: 1; }
-  /* line 244, application.sass */
+  /* line 248, application.sass */
   #prod-versions a {
     text-decoration: none;
     color: #0e3f54;
@@ -354,11 +358,11 @@ pre {
     /* line 26, application.sass */
     #prod-versions a:hover {
       border-bottom: 1px solid; }
-  /* line 247, application.sass */
+  /* line 251, application.sass */
   #prod-versions a.current {
     font-weight: bold; }
 
-/* line 253, application.sass */
+/* line 257, application.sass */
 #rc-versions {
   position: absolute;
   top: 0;
@@ -369,7 +373,7 @@ pre {
   -webkit-border-bottom-right-radius: 10px;
   border-bottom-right-radius: 10px;
   z-index: 0; }
-  /* line 244, application.sass */
+  /* line 248, application.sass */
   #rc-versions a {
     text-decoration: none;
     color: #0e3f54;
@@ -377,43 +381,43 @@ pre {
     /* line 26, application.sass */
     #rc-versions a:hover {
       border-bottom: 1px solid; }
-  /* line 247, application.sass */
+  /* line 251, application.sass */
   #rc-versions a.current {
     font-weight: bold; }
 
-/* line 257, application.sass */
+/* line 261, application.sass */
 #command_reference {
   padding-top: 20px; }
-  /* line 260, application.sass */
+  /* line 264, application.sass */
   #command_reference th {
     text-align: left;
     height: 30px;
     padding-left: 5px; }
-  /* line 265, application.sass */
+  /* line 269, application.sass */
   #command_reference td {
     vertical-align: top;
     padding: 20px 0 20px 5px; }
-    /* line 269, application.sass */
+    /* line 273, application.sass */
     #command_reference td .cli_name {
       padding-top: 5px;
       width: 400px; }
-    /* line 273, application.sass */
+    /* line 277, application.sass */
     #command_reference td .cli_desc {
       padding-top: 10px;
       width: 400px; }
-    /* line 277, application.sass */
+    /* line 281, application.sass */
     #command_reference td .cli_option {
       margin: 5px 7px 15px 0px;
       float: left; }
-    /* line 281, application.sass */
+    /* line 285, application.sass */
     #command_reference td .clear {
       clear: left; }
-  /* line 284, application.sass */
+  /* line 288, application.sass */
   #command_reference tr:nth-child(even) {
     background-color: rgba(0, 0, 0, 0.1);
     border-top: 1px solid rgba(0, 0, 0, 0.1);
     border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
-  /* line 289, application.sass */
+  /* line 293, application.sass */
   #command_reference a {
     padding-top: 8px;
     padding-bottom: 5px;
@@ -444,38 +448,38 @@ pre {
       background-image: linear-gradient(#4e9326, #35641a);
       border-bottom: none; }
 
-/* line 295, application.sass */
+/* line 299, application.sass */
 .shirts {
   text-align: center; }
-  /* line 299, application.sass */
+  /* line 303, application.sass */
   .shirts a, .shirts a:visited {
     color: #05b5e6;
     text-decoration: none;
     font-weight: bold; }
 
-/* line 304, application.sass */
+/* line 308, application.sass */
 .other-contributors {
   text-align: center; }
 
-/* line 307, application.sass */
+/* line 311, application.sass */
 .contributor {
   clear: left;
   margin: 1em 0; }
-  /* line 311, application.sass */
+  /* line 315, application.sass */
   .contributor .avatar {
     float: left;
     margin-right: 1.5em;
     width: 150px;
     min-height: 25px; }
-  /* line 317, application.sass */
+  /* line 321, application.sass */
   .contributor h3 {
     color: #0e3f54; }
-  /* line 320, application.sass */
+  /* line 324, application.sass */
   .contributor h4 {
     font-size: 80%;
     color: #124f6a;
     margin-top: -1em; }
-  /* line 325, application.sass */
+  /* line 329, application.sass */
   .contributor p {
     margin-left: 150px;
     padding-left: 1.5em; }

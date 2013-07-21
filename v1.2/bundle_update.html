@@ -3,6 +3,7 @@
   <head>
     <title>Bundler: The best way to manage a Ruby application's gems</title>
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <meta content='276VSYOko8B8vIu1i8i5qbj7_ql5PXo0dU69XQy-SL' name='globalsign-domain-verification'>
     <link href='/images/favicon.png' rel='shortcut icon' type='image/png'>
     <link href="/stylesheets/application.css" media="screen" rel="stylesheet" type="text/css" />
     <link href="/stylesheets/sunburst.css" media="screen" rel="stylesheet" type="text/css" />
@@ -88,7 +89,7 @@
       </p>
       <p>
         Consider the following <code>Gemfile</code>:
-        <pre class="sunburst">source <span class="String"><span class="String">'</span>http://rubygems.org<span class="String">'</span></span>&#x000A;gem <span class="String"><span class="String">'</span>rails<span class="String">'</span></span>, <span class="String"><span class="String">'</span>3.0.0.rc<span class="String">'</span></span>&#x000A;gem <span class="String"><span class="String">'</span>nokogiri<span class="String">'</span></span>&#x000A;</pre>
+        <pre class="sunburst">source <span class="String"><span class="String">&#39;</span>http://rubygems.org<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rails<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>3.0.0.rc<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>&#x000A;</pre>
       </p>
       <p>
         When you run <code>bundle install</code> the first time, bundler will
@@ -157,7 +158,7 @@
         Sometimes, multiple gems declared in your <code>Gemfile</code> are
         satisfied by the same second-level dependency. For instance, consider the
         case of <code>thin</code> and <code>rack-perftools-profiler</code>.
-        <pre class="sunburst">source <span class="String"><span class="String">'</span>http://rubygems.org<span class="String">'</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">'</span>thin<span class="String">'</span></span>&#x000A;gem <span class="String"><span class="String">'</span>rack-perftools-profiler<span class="String">'</span></span>&#x000A;</pre>
+        <pre class="sunburst">source <span class="String"><span class="String">&#39;</span>http://rubygems.org<span class="String">&#39;</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">&#39;</span>thin<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rack-perftools-profiler<span class="String">&#39;</span></span>&#x000A;</pre>
       </p>
       <p>
         The <code>thin</code> gem depends on <code>rack >= 1.0</code>, while
