@@ -247,7 +247,7 @@ module Bundler
           parent = current.required_by.last
 
           if parent && other_versions_of_parent = search(parent)
-            if other_versions_of_parent.length <=1
+            if parent.required_by.empty? && other_versions_of_parent.length <=1
               parent = existing.required_by.last if existing.respond_to?(:required_by)
             end
           end
@@ -277,7 +277,6 @@ module Bundler
 
         # Fetch all gem versions matching the requirement
         matching_versions = search(current)
-
         # If we found no versions that match the current requirement
         if matching_versions.empty?
           # If this is a top-level Gemfile requirement
@@ -316,7 +315,6 @@ module Bundler
           conflict = resolve_requirement(spec_group, current, reqs.dup, activated.dup, depth)
           conflicts << conflict if conflict
         end
-
         # We throw the conflict up the dependency chain if it has not been
         # resolved (in @errors), thus avoiding branches of the tree that have no effect
         # on this conflict.  Note that if the tree has multiple conflicts, we don't
