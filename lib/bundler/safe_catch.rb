@@ -26,11 +26,19 @@
 module Bundler
   module SafeCatch
     def safe_catch(tag, &block)
-      Internal.catch(tag, &block)
+      if Bundler.current_ruby.jruby?
+        Internal.catch(tag, &block)
+      else
+        catch(tag, &block)
+      end
     end
 
     def safe_throw(tag, value = nil)
-      Internal.throw(tag, value)
+      if Bundler.current_ruby.jruby?
+        Internal.throw(tag, value)
+      else
+        throw(tag, value)
+      end
     end
 
     module Internal
