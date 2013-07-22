@@ -23,4 +23,10 @@ describe "Resolving" do
     dep "my_app"
     should_resolve_as %w(activemodel-3.2.11 builder-3.0.4 grape-0.2.6 my_app-1.0.0)
   end
+
+  it "should resolve a index with conflict on child" do
+    @index = index_with_conflict_on_child
+    dep "chef_app"
+    should_resolve_as %w(berkshelf-2.0.7 chef-10.26 chef_app-1.0.0 json-1.7.7)
+  end
 end

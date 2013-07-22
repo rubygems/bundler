@@ -178,7 +178,6 @@ module Bundler
       safe_throw :success, successify(activated) if reqs.empty?
 
       indicate_progress
-
       debug { print "\e[2J\e[f" ; "==== Iterating ====\n\n" }
 
       # Sort dependencies so that the ones that are easiest to resolve are first.
@@ -246,6 +245,13 @@ module Bundler
           # current requirement is a root level requirement, we need to jump back to
           # where the conflicting gem was activated.
           parent = current.required_by.last
+
+          if parent && other_versions_of_parent = search(parent)
+            if parent.required_by.empty? && other_versions_of_parent.length <=1
+              parent = existing.required_by.last if existing.respond_to?(:required_by)
+            end
+          end
+
           # `existing` could not respond to required_by if it is part of the base set
           # of specs that was passed to the resolver (aka, instance of LazySpecification)
           parent ||= existing.required_by.last if existing.respond_to?(:required_by)
@@ -271,7 +277,6 @@ module Bundler
 
         # Fetch all gem versions matching the requirement
         matching_versions = search(current)
-
         # If we found no versions that match the current requirement
         if matching_versions.empty?
           # If this is a top-level Gemfile requirement
@@ -310,7 +315,6 @@ module Bundler
           conflict = resolve_requirement(spec_group, current, reqs.dup, activated.dup, depth)
           conflicts << conflict if conflict
         end
-
         # We throw the conflict up the dependency chain if it has not been
         # resolved (in @errors), thus avoiding branches of the tree that have no effect
         # on this conflict.  Note that if the tree has multiple conflicts, we don't
