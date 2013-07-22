@@ -137,6 +137,11 @@ module Bundler
       Bundler::Environment.new(root, definition)
     end
 
+    # Returns an instance of Bundler::Definition for given Gemfile and lockfile
+    #
+    # @param unlock [Hash, Boolean, nil] Gems that have been requested
+    #   to be updated or true if all gems should be updated
+    # @return [Bundler::Definition]
     def definition(unlock = nil)
       @definition = nil if unlock
       @definition ||= begin
