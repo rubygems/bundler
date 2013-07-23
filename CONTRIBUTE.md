@@ -11,12 +11,12 @@ The Bundler core team consists of André Arko ([@indirect](http://github.com/ind
 # How to Set Up Bundler for Development
 
 Install Bundler development dependencies
-	  
+ 
    `$ rake spec:deps`
 
 
 Run the Bundler test suite
-  	
+
    `$ rake spec`
 
 
