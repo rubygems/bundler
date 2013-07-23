@@ -8,6 +8,34 @@ You can start learning about Bundler by reading [the documentation](http://gembu
 
 The Bundler core team consists of André Arko ([@indirect](http://github.com/indirect)), Terence Lee ([@hone](http://github.com/hone)), and Jessica Lynn Suttles ([@jlsuttles](http://github.com/jlsuttles)), with support and advice from original Bundler author Yehuda Katz ([@wycats](http://github.com/wycats)).
 
+# How to set up bundler for development
+1. Fork Bundler
+   Go to the Bundler Github https://github.com/bundler/bundler
+   Press the fork button.
+
+2. Clone Bundler to your Repo
+    $ git clone https://github.com/jendiamond/bundler.git
+
+3. Change into the Bundler directory
+    $ cd bundler
+
+4. Configure the remote
+	  $ git remote add upstream https://github.com/bundler/bundler.git
+
+   This connects your local repo to the upstream repo at Github. 
+
+5. Get Rake dependencies 
+	$ rake spec:deps 
+
+   What is rake? http://rake.rubyforge.org/
+
+6. Run tests
+	$ rake spec
+
+   Spec == Test
+
+  This should take about 15 minutes.
+
 # Adding new features
 
 When adding a new feature to Bundler, please follow these steps:
