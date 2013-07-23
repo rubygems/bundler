@@ -8,33 +8,45 @@ You can start learning about Bundler by reading [the documentation](http://gembu
 
 The Bundler core team consists of André Arko ([@indirect](http://github.com/indirect)), Terence Lee ([@hone](http://github.com/hone)), and Jessica Lynn Suttles ([@jlsuttles](http://github.com/jlsuttles)), with support and advice from original Bundler author Yehuda Katz ([@wycats](http://github.com/wycats)).
 
-# How to set up bundler for development
-1. Fork Bundler
-   Go to the Bundler Github https://github.com/bundler/bundler
-   Press the fork button.
+# How to Set Up Bundler for Development
 
-2. Clone Bundler to your Repo
-    $ git clone https://github.com/jendiamond/bundler.git
+1. Fork Bundler
+   
+    Go to the Bundler Github [https://github.com/bundler/bundler](https://github.com/bundler/bundler)
+   
+    Press the fork button.
+
+    Fork Bundler so you can create pull requests with your changes
+
+    ![](https://raw.github.com/exosamsi/detrending/master/fork.png)
+
+2. Download a copy of your fork of Bundler
+    
+    `$ git clone https://github.com/user_name/bundler.git`
+
 
 3. Change into the Bundler directory
-    $ cd bundler
+
+    `$ cd bundler`
 
 4. Configure the remote
-	  $ git remote add upstream https://github.com/bundler/bundler.git
+ 
+    `$ git remote add upstream https://github.com/bundler/bundler.git`
 
-   This connects your local repo to the upstream repo at Github. 
+    This connects your local repo to the upstream repo at Github. 
 
-5. Get Rake dependencies 
-	$ rake spec:deps 
 
-   What is rake? http://rake.rubyforge.org/
+5. Install Bundler development dependencies
+	  
+    `$ rake spec:deps`
 
-6. Run tests
-	$ rake spec
+    What is rake? [http://rake.rubyforge.org/](http://rake.rubyforge.org/)
 
-   Spec == Test
+6. Run the Bundler test suite
+  	
+    `$ rake spec`
 
-  This should take about 15 minutes.
+    This should take about 15 minutes.
 
 # Adding new features
 
