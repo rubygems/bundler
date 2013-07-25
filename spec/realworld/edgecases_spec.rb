@@ -174,4 +174,15 @@ describe "real world edgecases", :realworld => true do
     bundle :install, :exitstatus => true
     expect(exitstatus).to eq(0)
   end
+
+  it "installs gems parallely" do
+    gemfile <<-G
+      source "https://rubygems.org"
+
+      gem 'rails'
+    G
+
+    bundle :install, :jobs => 4
+    expect(exitstatus).to eq(0)
+  end
 end
