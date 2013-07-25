@@ -50,21 +50,22 @@ module Bundler
     end
   end
 
-  class GemfileNotFound     < BundlerError; status_code(10) ; end
-  class GemNotFound         < BundlerError; status_code(7)  ; end
-  class GemfileError        < BundlerError; status_code(4)  ; end
-  class InstallError        < BundlerError; status_code(5)  ; end
-  class InstallHookError    < BundlerError; status_code(6)  ; end
-  class PathError           < BundlerError; status_code(13) ; end
-  class GitError            < BundlerError; status_code(11) ; end
-  class DeprecatedError     < BundlerError; status_code(12) ; end
-  class GemspecError        < BundlerError; status_code(14) ; end
-  class InvalidOption       < BundlerError; status_code(15) ; end
-  class ProductionError     < BundlerError; status_code(16) ; end
-  class HTTPError           < BundlerError; status_code(17) ; end
-  class RubyVersionMismatch < BundlerError; status_code(18) ; end
-  class SecurityError       < BundlerError; status_code(19) ; end
-  class LockfileError       < BundlerError; status_code(20) ; end
+  class GemfileNotFound     < BundlerError;   status_code(10) ; end
+  class GemNotFound         < BundlerError;   status_code(7)  ; end
+  class GemfileError        < BundlerError;   status_code(4)  ; end
+  class InstallError        < BundlerError;   status_code(5)  ; end
+  class InstallHookError    < BundlerError;   status_code(6)  ; end
+  class PathError           < BundlerError;   status_code(13) ; end
+  class GitError            < BundlerError;   status_code(11) ; end
+  class DeprecatedError     < BundlerError;   status_code(12) ; end
+  class GemspecError        < BundlerError;   status_code(14) ; end
+  class InvalidOption       < BundlerError;   status_code(15) ; end
+  class ProductionError     < BundlerError;   status_code(16) ; end
+  class HTTPError           < BundlerError;   status_code(17) ; end
+  class RubyVersionMismatch < BundlerError;   status_code(18) ; end
+  class SecurityError       < BundlerError;   status_code(19) ; end
+  class LockfileError       < BundlerError;   status_code(20) ; end
+  class CyclicDependencyError < BundlerError; status_code(21) ; end
 
   # Internal errors, should be rescued
   class VersionConflict  < BundlerError

@@ -109,7 +109,12 @@ module Bundler
 
     def sorted
       rake = @specs.find { |s| s.name == 'rake' }
-      @sorted ||= ([rake] + tsort).compact.uniq
+      begin
+        @sorted ||= ([rake] + tsort).compact.uniq
+      rescue TSort::Cyclic
+        raise CyclicDependencyError.new("Bundler has detected cyclic dependencies and can't" +
+            " proceed, update your Gemfile by removing cyclic dependency and rerun bundler.")
+      end
     end
 
     def lookup
