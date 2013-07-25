@@ -4,11 +4,6 @@ module Bundler
 
   # Handles all the fetching with the rubygems server
   class Fetcher
-    # How many redirects to allew in one request
-    REDIRECT_LIMIT = 5
-    # how long to wait for each gemcutter API call
-    API_TIMEOUT = 10
-
     # This error is raised if the API returns a 413 (only printed in verbose)
     class FallbackError < HTTPError; end
     # This is the error raised if OpenSSL fails the cert verification
@@ -33,7 +28,7 @@ module Bundler
     end
 
     class << self
-      attr_accessor :disable_endpoint
+      attr_accessor :disable_endpoint, :api_timeout, :redirect_limit, :max_retries
 
       @@spec_fetch_map ||= {}
 
@@ -65,6 +60,13 @@ module Bundler
     end
 
     def initialize(remote_uri)
+      # How many redirects to allew in one request
+      @redirect_limit = 5
+      # How long to wait for each gemcutter API call
+      @api_timeout = 10
+      # How many retries for the gemcutter API call
+      @max_retries = 3
+
       @remote_uri = remote_uri
       @public_uri = remote_uri.dup
       @public_uri.user, @public_uri.password = nil, nil # don't print these
@@ -77,7 +79,7 @@ module Bundler
         raise SSLError if @remote_uri.scheme == "https"
         @connection = Net::HTTP.new(@remote_uri.host, @remote_uri.port)
       end
-      @connection.read_timeout = API_TIMEOUT
+      @connection.read_timeout = @api_timeout
 
       Socket.do_not_reverse_lookup = true
     end
@@ -148,35 +150,43 @@ module Bundler
 
     # fetch index
     def fetch_remote_specs(gem_names, full_dependency_list = [], last_spec_list = [])
-      query_list = gem_names - full_dependency_list
+      current_retries = 0
+      begin
+        query_list = gem_names - full_dependency_list
 
-      # only display the message on the first run
-      if Bundler.ui.debug?
-        Bundler.ui.debug "Query List: #{query_list.inspect}"
-      else
-        Bundler.ui.info ".", false
+        # only display the message on the first run
+        if Bundler.ui.debug?
+          Bundler.ui.debug "Query List: #{query_list.inspect}"
+        else
+          Bundler.ui.info ".", false
+        end
+
+        return {@remote_uri => last_spec_list} if query_list.empty?
+
+        spec_list, deps_list = fetch_dependency_remote_specs(query_list)
+        returned_gems = spec_list.map {|spec| spec.first }.uniq
+
+        fetch_remote_specs(deps_list, full_dependency_list + returned_gems, spec_list + last_spec_list)
+      # fall back to the legacy index in the following cases
+      # 1. Gemcutter Endpoint doesn't return a 200
+      # 2. Marshal blob doesn't load properly
+      # 3. One of the YAML gemspecs has the Syck::DefaultKey problem
+      rescue HTTPError, MarshalError, GemspecError => e
+
+        # new line now that the dots are over
+        Bundler.ui.info "" unless Bundler.ui.debug?
+
+        Bundler.ui.debug "Error during API request. #{e.class}: #{e.message}"
+        Bundler.ui.debug e.backtrace.join("  ")
+
+        if current_retries < @max_retries
+          current_retries += 1
+          retry
+        end
+
+        @use_api = false
+        return nil
       end
-
-      return {@remote_uri => last_spec_list} if query_list.empty?
-
-      spec_list, deps_list = fetch_dependency_remote_specs(query_list)
-      returned_gems = spec_list.map {|spec| spec.first }.uniq
-
-      fetch_remote_specs(deps_list, full_dependency_list + returned_gems, spec_list + last_spec_list)
-    # fall back to the legacy index in the following cases
-    # 1. Gemcutter Endpoint doesn't return a 200
-    # 2. Marshal blob doesn't load properly
-    # 3. One of the YAML gemspecs has the Syck::DefaultKey problem
-    rescue HTTPError, MarshalError, GemspecError => e
-      @use_api = false
-
-      # new line now that the dots are over
-      Bundler.ui.info "" unless Bundler.ui.debug?
-
-      Bundler.ui.debug "Error during API request. #{e.class}: #{e.message}"
-      Bundler.ui.debug e.backtrace.join("  ")
-
-      return nil
     end
 
     def use_api
@@ -205,7 +215,7 @@ module Bundler
     HTTP_ERRORS << Net::HTTP::Persistent::Error if defined?(Net::HTTP::Persistent)
 
     def fetch(uri, counter = 0)
-      raise HTTPError, "Too many redirects" if counter >= REDIRECT_LIMIT
+      raise HTTPError, "Too many redirects" if counter >= @redirect_limit
 
       begin
         Bundler.ui.debug "Fetching from: #{uri}"
