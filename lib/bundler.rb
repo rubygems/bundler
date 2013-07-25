@@ -328,14 +328,6 @@ module Bundler
       end
     end
 
-
-    # Returns current version of Ruby
-    #
-    # @return [CurrentRuby] Current version of Ruby
-    def current_ruby
-      @current_ruby ||= CurrentRuby.new()
-    end
-
     def clear_gemspec_cache
       @gemspec_cache = {}
     end
