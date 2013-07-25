@@ -33,5 +33,9 @@ module Bundler
       troubleshooting documentation at http://bit.ly/bundler-issues. Thanks!
     ERR
     raise e
+  rescue ArgumentError => e
+    raise e unless e.message =~ /Ambiguous task/
+    Bundler.ui.error "\nA more hepful message"
+    exit e.status_code
   end
 end
