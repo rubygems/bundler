@@ -1,4 +1,11 @@
 module Bundler
+  # Returns current version of Ruby
+  #
+  # @return [CurrentRuby] Current version of Ruby
+  def self.current_ruby
+    @current_ruby ||= CurrentRuby.new
+  end
+
   class CurrentRuby
     def on_18?
       RUBY_VERSION =~ /^1\.8/

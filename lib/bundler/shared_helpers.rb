@@ -3,6 +3,7 @@ require 'rubygems'
 
 require 'bundler/constants'
 require 'bundler/rubygems_integration'
+require 'bundler/current_ruby'
 
 module Gem
   class Dependency
