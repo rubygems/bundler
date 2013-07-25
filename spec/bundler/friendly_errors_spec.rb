@@ -1,18 +1,13 @@
 require "spec_helper"
+require "bundler"
+require "bundler/friendly_errors"
 
-describe "friendly errors" do
+describe Bundler, "friendly errors" do
   it "rescues ArgumentErrors" do
-    expect{ Bundler.with_friendly_errors {
-      raise ArgumentError.new("Ambiguous task") } }.not_to raise_error
-  end
-
-  it "rescues ArgumentErrors" do
-    bundle :i
-    expect(err).to be_empty
-  end
-
-  it "prints a friendly error message" do
-    bundle :i
-    expect(out).to match /A more helpful message/
+    expect {
+      Bundler.with_friendly_errors do
+        raise ArgumentError.new("Ambiguous task")
+      end
+    }.to_not raise_error
   end
 end
