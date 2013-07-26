@@ -229,7 +229,7 @@ module Bundler
 
       # Set RUBYLIB
       rubylib = (ENV["RUBYLIB"] || "").split(File::PATH_SEPARATOR)
-      rubylib.unshift %|#{File.expand_path('../..', __FILE__)}|
+      rubylib.unshift File.expand_path('../..', __FILE__)
       ENV["RUBYLIB"] = rubylib.uniq.join(File::PATH_SEPARATOR)
     end
 
