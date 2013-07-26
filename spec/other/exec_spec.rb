@@ -123,19 +123,20 @@ describe "bundle exec" do
     expect(out).to have_rubyopts(rubyopt)
   end
 
-  it "does not duplicate already exec'ed PATH" do
+  it "does not duplicate already exec'ed RUBYLIB" do
     install_gemfile <<-G
       gem "rack"
     G
 
     rubylib = ENV['RUBYLIB']
-    rubylib = "#{bundler_path}"
+    rubylib = "#{rubylib}".split(File::PATH_SEPARATOR).unshift "#{bundler_path}"
+    rubylib = rubylib.uniq.join(File::PATH_SEPARATOR)
 
     bundle "exec 'echo $RUBYLIB'"
-    expect(out.split(File::PATH_SEPARATOR).count(rubylib)).to eq(1)
+    expect(out).to eq(rubylib)
 
     bundle "exec 'echo $RUBYLIB'", :env => {"RUBYLIB" => rubylib}
-    expect(out.split(File::PATH_SEPARATOR).count(rubylib)).to eq(1)
+    expect(out).to eq(rubylib)
   end
 
   it "errors nicely when the argument doesn't exist" do
