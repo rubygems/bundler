@@ -226,9 +226,13 @@ module Bundler
       rubyopt = [ENV["RUBYOPT"]].compact
       if rubyopt.empty? || rubyopt.first !~ /-rbundler\/setup/
         rubyopt.unshift %|-rbundler/setup|
-        rubyopt.unshift %|-I#{File.expand_path('../..', __FILE__)}|
         ENV["RUBYOPT"] = rubyopt.join(' ')
       end
+
+      # Set RUBYLIB
+      rubylib = (ENV["RUBYLIB"] || "").split(File::PATH_SEPARATOR)
+      rubylib.unshift File.expand_path('../..', __FILE__)
+      ENV["RUBYLIB"] = rubylib.uniq.join(File::PATH_SEPARATOR)
     end
 
   private
