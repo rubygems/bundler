@@ -112,8 +112,9 @@ module Bundler
       begin
         @sorted ||= ([rake] + tsort).compact.uniq
       rescue TSort::Cyclic
-        raise CyclicDependencyError.new("Bundler has detected cyclic dependencies and can't" +
-            " proceed, update your Gemfile by removing cyclic dependency and rerun bundler.")
+        raise CyclicDependencyError, "Unfortunately, your Gemfile contains gems" \
+          " that each depend on each other, so it's not possible to to install this " \
+          " bundle. Remove one of the gems from your Gemfile to continue."
       end
     end
 
