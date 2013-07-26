@@ -31,6 +31,6 @@ describe "Resolving" do
     got = resolve
     expect {
       got = got.map { |s| s.full_name }.sort
-    }.to raise_error(Bundler::CyclicDependencyError)
+    }.to raise_error(Bundler::CyclicDependencyError, /Your Gemfile includes gems bar and foo/)
   end
 end

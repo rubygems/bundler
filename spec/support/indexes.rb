@@ -133,6 +133,7 @@ module Spec
 
     def a_circular_index
       build_index do
+        gem "rack", "1.0.1"
         gem("foo", '0.2.6') do
           dep "bar", ">= 0"
         end
