@@ -112,10 +112,18 @@ module Bundler
       begin
         @sorted ||= ([rake] + tsort).compact.uniq
       rescue TSort::Cyclic => error
-        gemstr = error.message.scan(/@name="(.*?)"/).flatten.join(" and ")
+        gemstr = extract_circular_gems(error)
         raise CyclicDependencyError, "Your Gemfile includes gems #{gemstr}" \
           " that each depend on other, so it's not possible to to install this" \
           " bundle. Remove one of the gems from your Gemfile to continue."
+      end
+    end
+
+    def extract_circular_gems(error)
+      if Bundler.current_ruby.mri? && Bundler.current_ruby.on_19?
+        error.message.scan(/(\w+) \([^)]/).flatten.join(" and ")
+      else
+        error.message.scan(/@name="(.*?)"/).flatten.join(" and ")
       end
     end
 
