@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Bundler::Dsl do
   before do
-    @rubygems = mock("rubygems")
+    @rubygems = double("rubygems")
     Bundler::Source::Rubygems.stub(:new){ @rubygems }
   end
 
