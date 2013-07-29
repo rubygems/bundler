@@ -130,5 +130,23 @@ module Spec
         end
       end
     end
+
+    def a_circular_index
+      build_index do
+        gem "rack", "1.0.1"
+        gem("foo", '0.2.6') do
+          dep "bar", ">= 0"
+        end
+
+        gem("bar", "1.0.0") do
+          dep "foo", ">= 0"
+        end
+
+        gem("circular_app", '1.0.0') do
+          dep "foo", ">= 0"
+          dep "bar", ">= 0"
+        end
+      end
+    end
   end
 end
