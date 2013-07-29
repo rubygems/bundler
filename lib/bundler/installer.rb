@@ -91,7 +91,8 @@ module Bundler
 
       size = options[:jobs] || 1
       size = [size, 1].max
-      if size > 1
+
+      if size > 1 && can_install_parallely?
         install_in_parallel size, options[:standalone]
       else
         install_sequentially options[:standalone]
@@ -190,6 +191,17 @@ module Bundler
     end
 
   private
+    def can_install_parallely?
+      if Bundler.current_ruby.mri? || Gem::VERSION >= "2.1.0"
+        true
+      else
+        Bundler.ui.warn "Bundler has detected Rubygems version #{Gem::VERSION} which is " \
+          "old and not threadsafe and thus Bundler can't proceed with parallel" \
+          "gem installation. Install Rubygems version >= 2.1.0 for parallel"\
+          "installation, Bundler will now resume installation by using serial method."
+        false
+      end
+    end
 
     def generate_standalone_bundler_executable_stubs(spec)
       # double-assignment to avoid warnings about variables that will be used by ERB
