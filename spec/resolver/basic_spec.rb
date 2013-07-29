@@ -23,4 +23,15 @@ describe "Resolving" do
     dep "my_app"
     should_resolve_as %w(activemodel-3.2.11 builder-3.0.4 grape-0.2.6 my_app-1.0.0)
   end
+
+  it "should throw error in case of circular dependencies" do
+    @index = a_circular_index
+    dep "circular_app"
+
+    got = resolve
+    expect {
+      got = got.map { |s| s.full_name }.sort
+    }.to raise_error(Bundler::CyclicDependencyError, /please remove either gem 'foo' or gem 'bar'/i)
+  end
+
 end
