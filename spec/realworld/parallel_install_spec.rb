@@ -5,7 +5,7 @@ describe "installing dependencies parallely", :realworld => true do
     gemfile <<-G
       source "https://rubygems.org"
 
-      gem 'rails'
+      gem 'rails', "~> 3.2.13"
     G
 
     bundle :install, :jobs => 4
