@@ -5,14 +5,15 @@ describe "installing dependencies parallely", :realworld => true do
     gemfile <<-G
       source "https://rubygems.org"
 
-      gem 'rails', "~> 3.2.13"
+      gem 'activesupport', '~> 3.2.13'
+      gem 'faker', '~> 1.1.2'
     G
 
     bundle :install, :jobs => 4
-    bundle "show rails"
-    expect(out).to match(/rails/)
+    bundle "show activesupport"
+    expect(out).to match(/activesupport/)
 
-    bundle "show rack"
-    expect(out).to match(/rack/)
+    bundle "show faker"
+    expect(out).to match(/faker/)
   end
 end
