@@ -209,11 +209,11 @@ module Bundler
 
       begin
         Bundler.ui.debug "Fetching from: #{uri}"
+        req = Net::HTTP::Get.new uri.request_uri
+        req.basic_auth(uri.user, uri.password) if uri.user && uri.password
         if defined?(Net::HTTP::Persistent)
-          response = @connection.request(uri)
+          response = @connection.request(uri, req)
         else
-          req = Net::HTTP::Get.new uri.request_uri
-          req.basic_auth(uri.user, uri.password) if uri.user && uri.password
           response = @connection.request(req)
         end
       rescue OpenSSL::SSL::SSLError
