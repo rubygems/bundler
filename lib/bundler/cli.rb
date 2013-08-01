@@ -379,18 +379,26 @@ module Bundler
       "binstub destination directory (default bin)"
     method_option "force", :type => :boolean, :default => false, :banner =>
       "overwrite existing binstubs if they exist"
-    def binstubs(gem_name)
+    def binstubs(*gems)
       Bundler.definition.validate_ruby!
       Bundler.settings[:bin] = options["path"] if options["path"]
       Bundler.settings[:bin] = nil if options["path"] && options["path"].empty?
       installer = Installer.new(Bundler.root, Bundler.definition)
-      spec      = installer.specs.find{|s| s.name == gem_name }
-      raise GemNotFound, not_found_message(gem_name, Bundler.definition.specs) unless spec
 
-      if spec.name == "bundler"
-        Bundler.ui.warn "Sorry, Bundler can only be run via Rubygems."
-      else
-        installer.generate_bundler_executable_stubs(spec, :force => options[:force], :binstubs_cmd => true)
+      if gems.empty?
+        Bundler.ui.error "`bundle binstubs` needs at least one gem to run."
+        exit 1
+      end
+
+      gems.each do |gem_name|
+        spec = installer.specs.find{|s| s.name == gem_name }
+        raise GemNotFound, not_found_message(gem_name, Bundler.definition.specs) unless spec
+
+        if spec.name == "bundler"
+          Bundler.ui.warn "Sorry, Bundler can only be run via Rubygems."
+        else
+          installer.generate_bundler_executable_stubs(spec, :force => options[:force], :binstubs_cmd => true)
+        end
       end
     end
 
