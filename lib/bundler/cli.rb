@@ -493,6 +493,7 @@ module Bundler
     desc "package", "Locks and then caches all of the gems into vendor/cache"
     method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
     method_option "all",  :type => :boolean, :banner => "Include all sources (including path and git)."
+    method_option "quiet", :type => :boolean, :banner => "Only output warnings and errors."
     long_desc <<-D
       The package command will copy the .gem files for every gem in the bundle into the
       directory ./vendor/cache. If you then check that directory into your source
@@ -500,6 +501,7 @@ module Bundler
       bundle without having to download any additional gems.
     D
     def package
+      Bundler.ui.level = "warn" if options[:quiet]
       setup_cache_all
       install
       # TODO: move cache contents here now that all bundles are locked
