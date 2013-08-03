@@ -24,7 +24,7 @@ For help with common problems, see [ISSUES](https://github.com/bundler/bundler/b
 
 ### Contributing
 
-If you'd like to contribute to Bundler, that's awesome, and we <3 you. There's a guide to contributing to Bundler (both code and general help) over in [CONTRIBUTE](https://github.com/bundler/bundler/blob/master/CONTRIBUTE.md)
+If you'd like to contribute to Bundler, that's awesome, and we <3 you. There's a guide to contributing to Bundler (both code and general help) over in [CONTRIBUTING](https://github.com/bundler/bundler/blob/master/CONTRIBUTING.md)
 
 ### Development
 
