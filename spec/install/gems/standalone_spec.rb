@@ -174,6 +174,51 @@ describe "bundle install --standalone" do
     end
   end
 
+  describe "requiring gems in the standalone" do
+    before do
+      install_gemfile <<-G, :standalone => true, :without => 'test'
+      source "file://#{gem_repo1}"
+
+      gem 'actionpack', '=2.3.2'
+      gem 'therubyracer', :require => 'v8'
+      gem 'multiple_requires', :require => ['multi/one', 'multi/two']
+
+      group :test do
+        gem 'rspec'
+      end
+      G
+    end
+
+    it "requires gems by name" do
+      ruby <<-RUBY, :no_lib => true
+      $:.unshift('bundle')
+      require 'bundler/require'
+      puts ACTIONPACK
+      RUBY
+      out.should eql "2.3.2"
+    end
+
+    it "honors the :require directive in the gemfile" do
+      ruby <<-RUBY, :no_lib => true
+      $:.unshift 'bundle'
+      require 'bundler/require'
+      puts THERUBYRACER
+      puts MULTI_ONE
+      puts MULTI_TWO
+      RUBY
+      out.should eql "0.9.9\n1\n2"
+    end
+
+    it "does not require non-bundled groups" do
+      ruby <<-RUBY, :no_lib => true
+      $:.unshift 'bundle'
+      require 'bundler/require'
+      puts !!defined?RSPEC
+      RUBY
+      out.should eql "false"
+    end
+  end
+
   describe "with gemcutter's dependency API" do
     let(:source_uri) { "http://localgemserver.test" }
 

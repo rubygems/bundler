@@ -224,12 +224,15 @@ module Bundler
       FileUtils.mkdir_p(bundler_path)
 
       paths = []
-
+      groups = groups.map {|g| g.to_sym}
       if groups.empty?
         specs = Bundler.definition.requested_specs
+        standalone_groups = Bundler.definition.groups
       else
-        specs = Bundler.definition.specs_for groups.map { |g| g.to_sym }
+        specs = Bundler.definition.specs_for groups
+        standalone_groups = groups
       end
+      standalone_groups -= Bundler.settings.without
 
       specs.each do |spec|
         next if spec.name == "bundler"
@@ -250,6 +253,16 @@ module Bundler
         file.puts "path = File.expand_path('..', __FILE__)"
         paths.each do |path|
           file.puts %{$:.unshift File.expand_path("\#{path}/#{path}")}
+        end
+      end
+
+      File.open File.join(bundler_path, "require.rb"), "w" do |file|
+        file.puts "require 'bundler/setup'"
+        Bundler.definition.dependencies.each do |dep|
+          next unless (dep.groups & standalone_groups).any? && dep.current_platform?
+          Array(dep.autorequire || dep.name).each do |requirement|
+            file.puts "require '#{requirement}'"
+          end
         end
       end
     end
