@@ -725,6 +725,7 @@ module Bundler
       template(File.join("newgem/lib/newgem/version.rb.tt"), File.join(target, "lib/#{namespaced_path}/version.rb"),   opts)
       if options[:bin]
         template(File.join("newgem/bin/newgem.tt"),          File.join(target, 'bin', name),                           opts)
+        chmod(File.join(target, 'bin', name), 0755)
       end
       case options[:test]
       when 'rspec'

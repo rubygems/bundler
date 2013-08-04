@@ -113,6 +113,7 @@ describe "bundle gem" do
 
       it "builds bin skeleton" do
         expect(bundled_app("test_gem/bin/test_gem")).to exist
+        expect { FileTest.executable?(bundled_app("test_gem/bin/test_gem")) }.to be_true
       end
 
       it "requires 'test-gem'" do
