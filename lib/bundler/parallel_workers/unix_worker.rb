@@ -1,63 +1,11 @@
-require 'thread'
-
 module Bundler
-  class WorkerPool
-    POISON = Object.new
+  module ParallelWorkers
+    # UnixWorker is used only on platforms where fork is available. The way
+    # this code works is, it forks a preconfigured number of workers and then
+    # It starts preconfigured number of threads that write to the connected pipe.
+    class UnixWorker < Worker
 
-    class WrappedException < StandardError
-      attr_reader :exception
-      def initialize(exn)
-        @exception = exn
-      end
-    end
-
-    def initialize(size, func)
-      @request_queue = Queue.new
-      @response_queue = Queue.new
-      prepare_workers size, func
-      prepare_threads size
-    end
-
-    def enq(obj)
-      @request_queue.enq obj
-    end
-
-    def deq
-      result = @response_queue.deq
-      if WrappedException === result
-        raise result.exception
-      end
-      result
-    end
-
-    def stop
-      stop_workers
-      stop_threads
-    end
-
-    private
-
-    if WINDOWS
-      def prepare_workers(size, func)
-        @threads = size.times.map do |i|
-          Thread.start do
-            Thread.current.abort_on_exception = true
-            loop do
-              obj = @request_queue.deq
-              break if obj.equal? POISON
-              @response_queue.enq func.call(obj)
-            end
-          end
-        end
-      end
-
-      def prepare_threads(size)
-      end
-
-      def stop_workers
-      end
-    else
-      class Worker < Struct.new(:pid, :io_r, :io_w)
+      class JobHandler < Struct.new(:pid, :io_r, :io_w)
         def work(obj)
           Marshal.dump obj, io_w
           Marshal.load io_r
@@ -66,6 +14,13 @@ module Bundler
         end
       end
 
+      private
+
+      # Start forked workers for downloading gems. This version of worker
+      # is only used on platforms where fork is available.
+      #
+      # @param size [Integer] Size of worker pool
+      # @param func [Proc] Job that should be executed in the worker
       def prepare_workers(size, func)
         @workers = size.times.map do
           child_read, parent_write = IO.pipe
@@ -94,10 +49,15 @@ module Bundler
 
           child_read.close
           child_write.close
-          Worker.new pid, parent_read, parent_write
+          JobHandler.new pid, parent_read, parent_write
         end
       end
 
+      # Start the threads whose job is basically to wait for incoming messages
+      # on request queue and write that message to the connected pipe. Also retrieve
+      # messages from child worker via connected pipe and write the message to response queue
+      #
+      # @param size [Integer] Number of threads to be started
       def prepare_threads(size)
         @threads = size.times.map do |i|
           Thread.start do
@@ -112,6 +72,7 @@ module Bundler
         end
       end
 
+      # Kill the forked workers by sending SIGINT to them
       def stop_workers
         @workers.each do |worker|
           worker.io_r.close
@@ -121,15 +82,6 @@ module Bundler
         @workers.each do |worker|
           Process.waitpid worker.pid
         end
-      end
-    end
-
-    def stop_threads
-      @threads.each do
-        @request_queue.enq POISON
-      end
-      @threads.each do |thread|
-        thread.join
       end
     end
   end
