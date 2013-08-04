@@ -615,6 +615,24 @@ module Bundler
       end
     end
 
+    desc "readme GEM", "Prints out the README file of the given bundled gem"
+    def readme(name)
+      return unless spec = select_spec(name, :regex_match)
+      file = Dir.glob(File.join(spec.full_gem_path, "{README,readme,Readme,ReadMe}*")).first
+
+      Bundler.ui.info "No README found for '#{name}'" unless show_file(file)
+    end
+
+    desc "changelog GEM", "Prints the changelog of the given bundled gem"
+    def changelog(name)
+      return unless spec = select_spec(name, :regex_match)
+      file = Dir.glob(File.join(spec.full_gem_path, "*")).select do |f|
+        File.file?(f) && File.basename(f) =~ /^(history|changelog|changes)/i
+      end.first
+
+      Bundler.ui.info "No changelog found for '#{name}'" unless show_file(file)
+    end
+
     desc "open GEM", "Opens the source directory of the given bundled gem"
     def open(name)
       editor = [ENV['BUNDLER_EDITOR'], ENV['VISUAL'], ENV['EDITOR']].find{|e| !e.nil? && !e.empty? }
@@ -880,6 +898,18 @@ module Bundler
         reject{|s| s.to_s.empty? }.join(" and ")
       group_str = (groups.size == 1) ? "group" : "groups"
       "Gems in the #{group_str} #{group_list} were not installed."
+    end
+
+    def show_file(file)
+      success = false
+
+      if file
+        command = "#{pager_system} #{file}"
+        success = system(command)
+        Bundler.ui.info "Could not run '#{command}'" unless success
+      end
+
+      success
     end
 
   end
