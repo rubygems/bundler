@@ -1,6 +1,6 @@
 require 'erb'
 require 'rubygems/dependency_installer'
-require 'bundler/worker_pool'
+require 'bundler/parallel_workers'
 
 module Bundler
   class Installer < Environment
@@ -91,7 +91,8 @@ module Bundler
 
       size = options[:jobs] || 1
       size = [size, 1].max
-      if size > 1
+
+      if size > 1 && can_install_parallely?
         install_in_parallel size, options[:standalone]
       else
         install_sequentially options[:standalone]
@@ -190,6 +191,17 @@ module Bundler
     end
 
   private
+    def can_install_parallely?
+      if Bundler.current_ruby.mri? || Gem::VERSION >= "2.1.0"
+        true
+      else
+        Bundler.ui.warn "Bundler has detected Rubygems version #{Gem::VERSION} which is " \
+          "old and not threadsafe and thus Bundler can't proceed with parallel" \
+          "gem installation. Install Rubygems version >= 2.1.0 for parallel"\
+          "installation, Bundler will now resume installation by using serial method."
+        false
+      end
+    end
 
     def generate_standalone_bundler_executable_stubs(spec)
       # double-assignment to avoid warnings about variables that will be used by ERB
@@ -261,12 +273,11 @@ module Bundler
         remains[spec.name] = true
       end
 
-      worker_pool = WorkerPool.new size, lambda { |name|
+      worker_pool = ParallelWorkers.worker_pool size, lambda { |name|
         spec = name2spec[name]
         message = install_gem_from_spec spec, standalone
         { :name => spec.name, :post_install => message }
       }
-
       specs.each do |spec|
         deps = spec.dependencies.select { |dep| dep.type != :development }
         if deps.empty?
