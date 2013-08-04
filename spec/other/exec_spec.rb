@@ -39,6 +39,12 @@ describe "bundle exec" do
     expect(out).to eq("exec")
   end
 
+  it "works when exec'ing to ruby" do
+    install_gemfile 'gem "rack"'
+    bundle "exec ruby -e 'puts %{hi}'"
+    expect(out).to eq("hi")
+  end
+
   it "accepts --verbose" do
     install_gemfile 'gem "rack"'
     bundle "exec --verbose echo foobar"
