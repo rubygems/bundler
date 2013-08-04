@@ -94,10 +94,6 @@ module Spec
       requires_str = requires.map{|r| "-r#{r}"}.join(" ")
 
       env = (options.delete(:env) || {}).map{|k,v| "#{k}='#{v}' "}.join
-      args = options.map do |k,v|
-        v == true ? " --#{k}" : " --#{k} #{v}" if v
-      end.join
-
       cmd = "#{env}#{Gem.ruby} -I#{lib} #{requires_str} #{bundle_bin}"
 
       if exitstatus
