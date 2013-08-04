@@ -1,7 +1,7 @@
 require 'fileutils'
 require 'pathname'
 require 'rbconfig'
-require 'bundler/gem_path_manipulation'
+require 'bundler/env_preservation'
 require 'bundler/rubygems_ext'
 require 'bundler/rubygems_integration'
 require 'bundler/version'
@@ -9,8 +9,7 @@ require 'bundler/constants'
 require 'bundler/current_ruby'
 
 module Bundler
-  preserve_gem_path
-  ORIGINAL_ENV = ENV.to_hash
+  preserve_original_environment
 
   autoload :Definition,            'bundler/definition'
   autoload :Dependency,            'bundler/dependency'

@@ -2,11 +2,11 @@ require "spec_helper"
 
 describe "Bundler.with_env helpers" do
 
-  shared_examples_for "Bundler.with_*_env" do
+  shared_examples_for "Bundler.with_*_env" do |method|
     it "should reset and restore the environment" do
       gem_path = ENV['GEM_PATH']
 
-      Bundler.with_clean_env do
+      Bundler.send(method) do
         expect(`echo $GEM_PATH`.strip).not_to eq(gem_path)
       end
 
@@ -17,13 +17,17 @@ describe "Bundler.with_env helpers" do
   around do |example|
     env = Bundler::ORIGINAL_ENV.dup
     Bundler::ORIGINAL_ENV['BUNDLE_PATH'] = "./Gemfile"
+    ENV["_BUNDLER_ORIGINAL_ENV"] = Base64.encode64(Marshal.dump(Bundler::ORIGINAL_ENV))
+
     example.run
+
     Bundler::ORIGINAL_ENV.replace env
+    ENV["_BUNDLER_ORIGINAL_ENV"] = Base64.encode64(Marshal.dump(Bundler::ORIGINAL_ENV))
   end
 
   describe "Bundler.with_clean_env" do
 
-    it_should_behave_like "Bundler.with_*_env"
+    it_should_behave_like "Bundler.with_*_env", :with_clean_env
 
     it "should keep the original GEM_PATH even in sub processes" do
       gemfile ""
@@ -40,6 +44,7 @@ describe "Bundler.with_env helpers" do
     it "should not pass any bundler environment variables" do
       Bundler.with_clean_env do
         expect(`echo $BUNDLE_PATH`.strip).not_to eq('./Gemfile')
+        expect(`echo $_BUNDLER_ORIGINAL_ENV`.strip).to eq('')
       end
     end
 
@@ -63,13 +68,33 @@ describe "Bundler.with_env helpers" do
 
   describe "Bundler.with_original_env" do
 
-    it_should_behave_like "Bundler.with_*_env"
+    it_should_behave_like "Bundler.with_*_env", :with_original_env
 
     it "should pass bundler environment variables set before Bundler was run" do
       Bundler.with_original_env do
         expect(`echo $BUNDLE_PATH`.strip).to eq('./Gemfile')
       end
     end
+
+    it "should preserve the outer env when running in a sub process" do
+      require "base64"
+
+      gemfile ""
+      bundle "install --path vendor/bundle"
+
+      code = <<-end_code.gsub($/, ";")
+        require "base64"
+
+        Bundler.with_original_env do
+          print Base64.encode64(Marshal.dump(ENV.to_hash))
+        end
+      end_code
+
+      env_data = bundle "exec ruby -e #{code.inspect}"
+      subprocess_env = Marshal.load(Base64.decode64(env_data))
+      expect(subprocess_env).to eq(Bundler::ORIGINAL_ENV.to_hash)
+    end
+
   end
 
   describe "Bundler.clean_system" do
