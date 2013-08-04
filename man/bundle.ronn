@@ -67,6 +67,9 @@ We divide `bundle` subcommands into primary commands and utilities.
 * `bundle open(1)`:
   Open an installed gem in the editor
 
+* `bundle goto(1)`:
+  Goto homepage for a bundled gem
+
 * `bundle viz(1)`:
   Generate a visual representation of your dependencies
 
