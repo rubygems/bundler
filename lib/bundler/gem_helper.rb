@@ -123,7 +123,13 @@ module Bundler
     end
 
     def tag_version
-      sh "git tag -a -m \"Version #{version}\" #{version_tag}"
+      git_params = "-a -m \"Version #{version}\" #{version_tag}"
+
+      if Bundler.settings['gem_helper.sign_tags']
+        git_params =  '-s ' + git_params
+      end
+
+      sh "git tag #{git_params}"
       Bundler.ui.confirm "Tagged #{version_tag}."
       yield if block_given?
     rescue

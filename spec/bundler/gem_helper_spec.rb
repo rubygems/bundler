@@ -190,6 +190,50 @@ describe "Bundler::GemHelper tasks" do
         @helper.release_gem
       end
 
+      context "Sign releas tag", :gpg => true  do
+        def add_key_to_keyring
+          `gpg --allow-secret-key-import --import #{File.join(Spec::Path.root, "/spec/fixtures/523c0c07.asc")} 2>&1`
+        end
+
+        before do
+          add_key_to_keyring
+          ENV['BUNDLE_GEM_HELPER__SIGN_TAGS'] = 'true'
+        end
+
+        after do
+          ENV['BUNDLE_GEM_HELPER__SIGN_TAGS'] = 'false'
+        end
+
+        it "sign" do
+          mock_build_message
+          mock_confirm_message(/Tagged v0.0.1/)
+          mock_confirm_message("Pushed git commits and tags.")
+          @helper.stub(:rubygem_push).with(bundled_app('test/pkg/test-0.0.1.gem').to_s)
+
+          Dir.chdir(gem_repo1) {
+            `git init --bare`
+          }
+          Dir.chdir(@app) {
+            `git init`
+            `git config user.email "you@example.com"`
+            `git config user.name "Bundler Test"`
+            `git remote add origin file://#{gem_repo1}`
+            `git commit -a -m "initial commit"`
+            sys_exec("git push --force origin master", true)
+            sys_exec("git push --delete origin v0.0.1", true)
+            `git commit -a -m "another commit"`
+
+
+            @helper.release_gem
+
+            result = %x( git tag -v v0.0.1 2>&1)
+
+            expect(result).to match(/Good signature from "Bundler Test <you@example.com>"/)
+            expect($?.exitstatus).to eq(0)
+          }
+
+        end
+      end
     end
   end
 end

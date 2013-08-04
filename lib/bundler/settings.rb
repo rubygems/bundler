@@ -111,7 +111,7 @@ module Bundler
     end
 
     def is_bool(key)
-      %w(frozen cache_all no_prune disable_local_branch_check).include? key.to_s
+      %w(frozen cache_all no_prune disable_local_branch_check gem_helper.sign_tags).include? key.to_s
     end
 
     def to_bool(value)
