@@ -195,10 +195,9 @@ module Bundler
       if Bundler.current_ruby.mri? || Bundler.rubygems.provides?(">= 2.1.0.rc")
         true
       else
-        Bundler.ui.warn "Bundler has detected Rubygems version #{Gem::VERSION} which is " \
-          "old and not threadsafe and thus Bundler can't proceed with parallel" \
-          "gem installation. Install Rubygems version >= 2.1.0 for parallel"\
-          "installation, Bundler will now resume installation by using serial method."
+        Bundler.ui.warn "Rubygems #{Gem::VERSION} is not threadsafe, so your "\
+          "gems must be installed one at a time. Upgrade to Rubygems 2.1 or "\
+          "higher to enable parallel gem installation."
         false
       end
     end
