@@ -44,11 +44,8 @@ module Bundler
       if manpages.include?(command)
         root = File.expand_path("../man", __FILE__)
 
-        if Bundler.which("groff") && root !~ %r{^file:/.+!/META-INF/jruby.home/.+}
-          groff = "groff -Wall -mtty-char -mandoc -Tascii"
-          pager = pager_system
-
-          Kernel.exec "#{groff} #{root}/#{command} | #{pager}"
+        if Bundler.which("man") && root !~ %r{^file:/.+!/META-INF/jruby.home/.+}
+          Kernel.exec "man #{root}/#{command}"
         else
           puts File.read("#{root}/#{command}.txt")
         end
@@ -876,12 +873,6 @@ module Bundler
       message
     end
 
-    def pager_system
-      pager = ENV['PAGER'] || ENV['MANPAGER']
-      pager ||= 'less -R' if Bundler.which("less")
-      pager ||= 'more' if Bundler.which("more")
-      pager ||= 'cat'
-    end
 
     def without_groups_message
       groups = Bundler.settings.without
