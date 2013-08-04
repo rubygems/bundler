@@ -50,6 +50,7 @@ module Bundler
       /^Missing \w+ (?:file\s*)?([^\s]+.rb)$/i,
       /^Missing API definition file in (.+)$/i,
       /^cannot load such file -- (.+)$/i,
+      /^dlopen\([^)]*\): Library not loaded: (.+)$/i,
     ]
 
     def require(*groups)
