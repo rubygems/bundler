@@ -76,6 +76,9 @@ module Bundler
     end
 
     def without=(array)
+      if @local_config.key?(key_for(:without)) && !array
+        Bundler.ui.warn "Groups '#{self[:without]}' excluded because of a local configuration file!"
+      end
       self[:without] = (array.empty? ? nil : array.join(":")) if array
     end
 

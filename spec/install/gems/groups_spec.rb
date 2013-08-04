@@ -100,6 +100,13 @@ describe "bundle install with gem sources" do
           should_not_be_installed "activesupport 2.3.5"
         end
 
+        it "warns about excluding a previously excluded group because of a local configuration file" do
+          bundle :install, :without => "emo"
+          out.should_not match(/Groups.*emo.*excluded/)
+          bundle :install
+          out.should match(/Groups.*emo.*excluded/)
+        end
+
         it "does not say it installed gems from the excluded group" do
           bundle :install, :without => "emo"
           expect(out).not_to include("activesupport")
