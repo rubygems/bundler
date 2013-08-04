@@ -192,7 +192,7 @@ module Bundler
 
   private
     def can_install_parallely?
-      if Bundler.current_ruby.mri? || Gem::VERSION >= "2.1.0"
+      if Bundler.current_ruby.mri? || Bundler.rubygems.provides?(">= 2.1.0.rc")
         true
       else
         Bundler.ui.warn "Bundler has detected Rubygems version #{Gem::VERSION} which is " \
