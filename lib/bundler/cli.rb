@@ -712,7 +712,9 @@ module Bundler
         :constant_array  => constant_array,
         :author          => git_user_name.empty? ? "TODO: Write your name" : git_user_name,
         :email           => git_user_email.empty? ? "TODO: Write your email address" : git_user_email,
-        :test            => options[:test]
+        :test            => options[:test],
+        :cert_chain      => "TODO: Path to your public key (a .pem file)",
+        :signing_key     => "TODO: Path to your private key (a .pem file)",
       }
       gemspec_dest = File.join(target, "#{name}.gemspec")
       template(File.join("newgem/Gemfile.tt"),               File.join(target, "Gemfile"),                             opts)

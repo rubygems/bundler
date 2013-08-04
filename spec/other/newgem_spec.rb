@@ -35,6 +35,16 @@ describe "bundle gem" do
     end
   end
 
+  shared_examples_for "it is signed" do
+    it "should have a default cert chain" do
+      expect(generated_gem.gemspec.cert_chain.first).to eq("TODO: Path to your public key (a .pem file)")
+    end
+
+    it "should have a default signing key" do
+      expect(generated_gem.gemspec.signing_key).to eq("TODO: Path to your private key (a .pem file)")
+    end
+  end
+
   context "gem naming with underscore" do
     let(:gem_name) { 'test_gem' }
 
@@ -85,6 +95,8 @@ describe "bundle gem" do
     it "requires the version file" do
       expect(bundled_app("test_gem/lib/test_gem.rb").read).to match(/require "test_gem\/version"/)
     end
+
+    it_should_behave_like "it is signed"
 
     it "runs rake without problems" do
       system_gems ["rake-10.0.2"]
@@ -261,6 +273,8 @@ describe "bundle gem" do
     it "requires the version file" do
       expect(bundled_app("test-gem/lib/test/gem.rb").read).to match(/require "test\/gem\/version"/)
     end
+
+    it_should_behave_like "it is signed"
 
     it "runs rake without problems" do
       system_gems ["rake-10.0.2"]

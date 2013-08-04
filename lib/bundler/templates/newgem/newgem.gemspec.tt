@@ -18,6 +18,12 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
+  # You can generate a key pair with `gem cert --build <%=config[:email]%>`
+  # Keep your signing_key secret - don't check it in!
+  # For more details, read http://docs.rubygems.org/read/chapter/21
+  spec.cert_chain  = [<%=config[:cert_chain].inspect%>]
+  spec.signing_key = <%=config[:signing_key].inspect%>
+
   spec.add_development_dependency "bundler", "~> <%= Bundler::VERSION.split(".")[0..1].join(".") %>"
   spec.add_development_dependency "rake"
 <% if config[:test] -%>

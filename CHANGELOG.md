@@ -48,6 +48,10 @@ Features:
   - mention skipped groups in bundle install and bundle update output (@simi)
   - `gem` creates rake tasks for minitest (@coop) and rspec
 
+Features:
+
+  - Encourage gem signing by adding the required fields in `bundle gem`
+
 Bugfixes:
 
   - require rbconfig for standalone mode
