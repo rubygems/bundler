@@ -1,3 +1,5 @@
+require "bundler/vendored_thor"
+
 module Bundler
   def self.with_friendly_errors
     yield
@@ -5,6 +7,9 @@ module Bundler
     Bundler.ui.error e.message, :wrap => true
     Bundler.ui.trace e
     exit e.status_code
+  rescue Thor::AmbiguousTaskError => e
+    Bundler.ui.error e.message
+    exit 15
   rescue Thor::UndefinedTaskError => e
     Bundler.ui.error e.message
     exit 15
