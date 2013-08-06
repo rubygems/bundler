@@ -6,6 +6,13 @@ module Bundler
   class CLI < Thor
     include Thor::Actions
 
+    def self.start(*)
+      super
+    rescue Exception => e
+      Bundler.ui = UI::Shell.new
+      raise e
+    end
+
     def initialize(*)
       super
       Bundler.rubygems.ui = UI::RGProxy.new(Bundler.ui)
