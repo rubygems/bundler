@@ -23,8 +23,6 @@
 # threads. This value can be adjusted with the BUNDLER_SAFE_RECURSE_EVERY env
 # var; setting it to zero effectively disables safe recursion.
 
-require 'bundler/current_ruby'
-
 module Bundler
   module SafeCatch
     def safe_catch(tag, &block)
