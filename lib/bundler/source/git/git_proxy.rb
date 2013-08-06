@@ -6,14 +6,15 @@ module Bundler
       # All actions required by the Git source is encapsualted in this
       # object.
       class GitProxy
-        attr_accessor :path, :uri, :ref
+        attr_accessor :path, :uri, :ref, :password
         attr_writer :revision
 
-        def initialize(path, uri, ref, revision=nil, &allow)
+        def initialize(path, uri, ref, revision=nil, password=nil, &allow)
           @path     = path
           @uri      = uri
           @ref      = ref
           @revision = revision
+          @password = password
           @allow    = allow || Proc.new { true }
         end
 
@@ -85,7 +86,12 @@ module Bundler
 
         def git(command, check_errors=true)
           if allow?
-            out = %x{git #{command}}
+            # If a password is set and ssh_auth is supported, use SSH_ASKPASS.
+            out = if @password.nil? or not ssh_auth_supported?
+              %x{git #{command}}
+            else
+              ssh_auth command
+            end
 
             if check_errors && $?.exitstatus != 0
               msg = "Git error: command `git #{command}` in directory #{Dir.pwd} has failed."
@@ -98,6 +104,39 @@ module Bundler
                             "this error message could probably be more useful. Please submit a ticket at http://github.com/bundler/bundler/issues " \
                             "with steps to reproduce as well as the following\n\nCALLER: #{caller.join("\n")}"
           end
+        end
+
+        def ssh_auth_supported?
+          not Bundler::WINDOWS
+        end
+
+        def ssh_auth(command)
+          file     = Tempfile.new(['ssh-auth', '.rb'])
+          out      = nil
+          ruby_bin = "#{RbConfig::CONFIG['bindir']}/#{RbConfig::CONFIG['ruby_install_name']}"
+          begin
+            file.write %{#!#{ruby_bin}
+              if not ENV['SSH_ASKPASS_PASSWORD'].nil?
+                print ENV['SSH_ASKPASS_PASSWORD']
+              else
+                ENV['SSH_ASKPASS']          = File.expand_path $0
+                ENV['SSH_ASKPASS_PASSWORD'] = ENV['ssh_password']
+                ENV['DISPLAY']              = 'dummydisplay:0' if ENV['DISPLAY'].nil?
+                pid = fork do
+                  Process.setsid
+                  exec ARGV.join ' '
+                end
+                Process.waitpid pid
+              end
+            }
+            file.close
+            File.chmod 0500, file.path
+            out = %x{ssh_password='#{@password}' #{file.path} git #{command}}
+          ensure
+            file.close
+            file.unlink
+          end
+          out
         end
 
         def has_revision_cached?

@@ -8,7 +8,7 @@ module Bundler
     class Git < Path
       autoload :GitProxy, 'bundler/source/git/git_proxy'
 
-      attr_reader :uri, :ref, :branch, :options, :submodules
+      attr_reader :uri, :ref, :branch, :password, :options, :submodules
 
       def initialize(options)
         @options = options
@@ -25,6 +25,7 @@ module Bundler
         @ref        = options["ref"] || options["branch"] || options["tag"] || 'master'
         @submodules = options["submodules"]
         @name       = options["name"]
+        @password   = options["password"]
         @version    = options["version"]
 
         @copied     = false
@@ -116,7 +117,7 @@ module Bundler
 
         # Create a new git proxy without the cached revision
         # so the Gemfile.lock always picks up the new revision.
-        @git_proxy = GitProxy.new(path, uri, ref)
+        @git_proxy = GitProxy.new(path, uri, ref, nil, password)
 
         if git_proxy.branch != options["branch"] && !Bundler.settings[:disable_local_branch_check]
           raise GitError, "Local override for #{name} at #{path} is using branch " \
@@ -272,7 +273,7 @@ module Bundler
       end
 
       def git_proxy
-        @git_proxy ||= GitProxy.new(cache_path, uri, ref, cached_revision){ allow_git_ops? }
+        @git_proxy ||= GitProxy.new(cache_path, uri, ref, cached_revision, password){ allow_git_ops? }
       end
 
     end
