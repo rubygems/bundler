@@ -194,7 +194,7 @@ module Bundler
       @security_policies ||= begin
         require 'rubygems/security'
         Gem::Security::Policies
-      rescue LoadError
+      rescue LoadError, NameError
         {}
       end
     end
