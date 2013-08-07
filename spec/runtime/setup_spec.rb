@@ -550,7 +550,7 @@ describe "Bundler.setup" do
           end
         R
 
-        expect(out).to eq("You have already activated thin 1.1, but your Gemfile requires thin 1.0. Using bundle exec may solve this.")
+        expect(out).to eq("You have already activated thin 1.1, but your Gemfile requires thin 1.0. Prepending `bundle exec` to your command may solve this.")
       end
 
       it "version_requirement is now deprecated in rubygems 1.4.0+" do

@@ -23,7 +23,8 @@ module Bundler
 
         if activated_spec = Bundler.rubygems.loaded_specs(spec.name) and activated_spec.version != spec.version
           e = Gem::LoadError.new "You have already activated #{activated_spec.name} #{activated_spec.version}, " \
-                                 "but your Gemfile requires #{spec.name} #{spec.version}. Using bundle exec may solve this."
+                                 "but your Gemfile requires #{spec.name} #{spec.version}. Prepending " \
+                                 "`bundle exec` to your command may solve this."
           e.name = spec.name
           if e.respond_to?(:requirement=)
             e.requirement = Gem::Requirement.new(spec.version.to_s)
