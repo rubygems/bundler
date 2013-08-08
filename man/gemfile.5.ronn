@@ -164,13 +164,17 @@ There are a number of `Gemfile` platforms:
   * `mswin`:
     Windows
   * `mingw`:
-    Windows 'mingw32' platform (aka RubyInstaller)
+    Windows 32 bit 'mingw32' platform (aka RubyInstaller)
   * `mingw_18`:
     _mingw_ `AND` version 1.8
   * `mingw_19`:
     _mingw_ `AND` version 1.9
   * `mingw_20`:
     _mingw_ `AND` version 2.0
+  * `x64_mingw`:
+    Windows 64 bit 'mingw32' platform (aka RubyInstaller x64)
+  * `x64_mingw_20`:
+    _x64_mingw_ `AND` version 2.0
 
 As with groups, you can specify one or more platforms:
 
