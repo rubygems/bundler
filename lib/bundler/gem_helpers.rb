@@ -7,8 +7,7 @@ module Bundler
       [Gem::Platform.new('mswin32'), Gem::Platform.new('mswin32')],
       [Gem::Platform.new('x64-mingw32'), Gem::Platform.new('x64-mingw32')],
       [Gem::Platform.new('x86_64-mingw32'), Gem::Platform.new('x64-mingw32')],
-      [Gem::Platform.new('mingw32'), Gem::Platform.new('x86-mingw32')],
-      [Gem::Platform::RUBY, Gem::Platform.new('java')]
+      [Gem::Platform.new('mingw32'), Gem::Platform.new('x86-mingw32')]
     ]
 
     def generic(p)
@@ -16,7 +15,7 @@ module Bundler
 
       GENERIC_CACHE[p] ||= begin
         _, found = GENERICS.find do |match, _generic|
-          match.is_a?(Gem::Platform) && p.os == match.os && (!match.cpu || p.cpu == match.cpu)
+          p.os == match.os && (!match.cpu || p.cpu == match.cpu)
         end
         found || Gem::Platform::RUBY
       end
