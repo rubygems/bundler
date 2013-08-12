@@ -4,9 +4,11 @@ Great to have you here! Here are a few ways you can help out with [Bundler](http
 
 You can start learning about Bundler by reading [the documentation](http://gembundler.com). If you want, you can also read a (lengthy) explanation of [why Bundler exists and what it does](http://gembundler.com/v1.2/rationale.html). You can also check out discussions about Bundler on the [Bundler mailing list](https://groups.google.com/group/ruby-bundler) and in the [Bundler IRC channel](irc://irc.freenode.net/#bundler), which is #bundler on Freenode.
 
-## Core Team
+# Your first commits
 
-The Bundler core team consists of André Arko ([@indirect](http://github.com/indirect)), Terence Lee ([@hone](http://github.com/hone)), and Jessica Lynn Suttles ([@jlsuttles](http://github.com/jlsuttles)), with support and advice from original Bundler author Yehuda Katz ([@wycats](http://github.com/wycats)).
+If you’re interested in contributing to Bundler, that’s awesome! We’d love your help.
+
+If you have any questions after reading this page, please feel free to contact either [@indirect](http://github.com/indirect) or [@hone](http://github.com/hone). They are both happy to provide help working through your first bugfix or thinking through the problem you’re trying to resolve.
 
 # Development setup
 
@@ -26,18 +28,6 @@ Bundler doesn't use a Gemfile to list development dependencies, because when we 
 
      With that set up, you can test changes you've made to Bundler by running `dbundle`, without interfering with the regular `bundle` command.
 
-
-# Adding new features
-
-If you would like to add a new feature to Bundler, please follow these steps:
-
-  1. [Create an issue](https://github.com/bundler/bundler/issues/new) to discuss your feature.
-  2. Base your commits on the master branch, since we follow [SemVer](http://semver.org) and don't add new features to old releases.
-  3. Commit the code and at least one test covering your changes to a feature branch in your fork.
-  4. Put a line in the [CHANGELOG](https://github.com/bundler/bundler/blob/master/CHANGELOG.md) summarizing your changes under the next release under the "Features" heading.
-  5. Send us a [pull request](https://help.github.com/articles/using-pull-requests) from your feature branch.
-
-If you don't hear back immediately, don’t get discouraged! We all have day jobs, but we respond to most tickets within a day or two.
 
 # Bug triage
 
@@ -68,6 +58,19 @@ If you can reproduce an issue, you're well on your way to fixing it. :) Fixing i
   5. Send us a [pull request](https://help.github.com/articles/using-pull-requests) from your bugfix branch.
 
 Finally, the ticket may be a duplicate of another older ticket. If you notice a ticket is a duplicate, simply comment on the ticket noting the original ticket’s number. For example, you could say “This is a duplicate of issue #42, and can be closed”.
+
+
+# Adding new features
+
+If you would like to add a new feature to Bundler, please follow these steps:
+
+  1. [Create an issue](https://github.com/bundler/bundler/issues/new) to discuss your feature.
+  2. Base your commits on the master branch, since we follow [SemVer](http://semver.org) and don't add new features to old releases.
+  3. Commit the code and at least one test covering your changes to a feature branch in your fork.
+  4. Put a line in the [CHANGELOG](https://github.com/bundler/bundler/blob/master/CHANGELOG.md) summarizing your changes under the next release under the "Features" heading.
+  5. Send us a [pull request](https://help.github.com/articles/using-pull-requests) from your feature branch.
+
+If you don't hear back immediately, don’t get discouraged! We all have day jobs, but we respond to most tickets within a day or two.
 
 
 # Beta testing
@@ -106,10 +109,3 @@ Finally, sharing your experiences and discoveries by writing them up is a valuab
 Examples of how Bundler is used help everyone, and we’ve discovered that people already use it in ways that we never imagined when we were writing it. If you’re still not sure what to write about, there are also several projects doing interesting things based on Bundler. They could probably use publicity too.
 
 If you let someone on the core team know you wrote about Bundler, we will add your post to the list of Bundler resources on the Github project wiki.
-
-
-# Your first commits
-
-If you’re interested in contributing to Bundler, that’s awesome! We’d love your help.
-
-If you have any questions after reading this page, please feel free to contact either [@indirect](http://github.com/indirect) or [@hone](http://github.com/hone). They are both happy to provide help working through your first bugfix or thinking through the problem you’re trying to resolve.
