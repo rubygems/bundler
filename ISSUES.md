@@ -8,9 +8,9 @@ discuss features. The bundler issue tracker is only for bugs.**
 
 ## Documentation
 
-Instructions for common Bundler uses can be found on the [Bundler documentation site](http://gembundler.com/).
+Instructions for common Bundler uses can be found on the [Bundler documentation site](http://bundler.io/).
 
-Detailed information about each Bundler command, including help with common problems, can be found in the [Bundler man pages](http://gembundler.com/v1.3/man/bundle.1.html).
+Detailed information about each Bundler command, including help with common problems, can be found in the [Bundler man pages](http://bundler.io/v1.3/man/bundle.1.html).
 
 ## Troubleshooting
 
@@ -20,10 +20,10 @@ Please open a ticket with Heroku if you're having trouble deploying. They have a
 
 ### Other problems
 
-First, figure out exactly what it is that you're trying to do. Then, go to the [Bundler documentation website](http://gembundler.com) and see if we have instructions on how to do that.
+First, figure out exactly what it is that you're trying to do. Then, go to the [Bundler documentation website](http://bundler.io) and see if we have instructions on how to do that.
 
 Second, check [the compatibility
-list](http://gembundler.com/compatibility.html), and make sure that the version of Bundler that you are
+list](http://bundler.io/compatibility.html), and make sure that the version of Bundler that you are
 using works with the versions of Ruby and Rubygems that you are using.
 
 If the instructions don't work, or you can't find any instructions, you can try these troubleshooting steps:

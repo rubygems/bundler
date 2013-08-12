@@ -2,7 +2,7 @@ Great to have you here! Here are a few ways you can help out with [Bundler](http
 
 # Where should I start?
 
-You can start learning about Bundler by reading [the documentation](http://gembundler.com). If you want, you can also read a (lengthy) explanation of [why Bundler exists and what it does](http://gembundler.com/v1.2/rationale.html). You can also check out discussions about Bundler on the [Bundler mailing list](https://groups.google.com/group/ruby-bundler) and in the [Bundler IRC channel](irc://irc.freenode.net/#bundler), which is #bundler on Freenode.
+You can start learning about Bundler by reading [the documentation](http://bundler.io). If you want, you can also read a (lengthy) explanation of [why Bundler exists and what it does](http://bundler.io/v1.2/rationale.html). You can also check out discussions about Bundler on the [Bundler mailing list](https://groups.google.com/group/ruby-bundler) and in the [Bundler IRC channel](irc://irc.freenode.net/#bundler), which is #bundler on Freenode.
 
 # Your first commits
 
@@ -89,11 +89,11 @@ We don't currently have any translations, but please reach out to us if you woul
 
 Code needs explanation, and sometimes those who know the code well have trouble explaining it to someone just getting into it. Because of that, we welcome documentation suggestions and patches from everyone, especially if they are brand new to using Bundler.
 
-Bundler has two main sources of documentation: the built-in help (including usage information and man pages) and the [Bundler documentation site](http://gembundler.com).
+Bundler has two main sources of documentation: the built-in help (including usage information and man pages) and the [Bundler documentation site](http://bundler.io).
 
 If you’d like to submit a patch to the man pages, follow the steps for adding a feature above. All of the man pages are located in the `man` directory. Just use the “Documentation” heading when you describe what you did in the changelog.
 
-If you have a suggestion or proposed change for [gembundler.com](http://gembundler.com), please open an issue or send a pull request to the [bundler-site](https://github.com/bundler/bundler-site) repository.
+If you have a suggestion or proposed change for [bundler.io](http://bundler.io), please open an issue or send a pull request to the [bundler-site](https://github.com/bundler/bundler-site) repository.
 
 
 # Community
@@ -102,7 +102,7 @@ Community is an important part of all we do. If you’d like to be part of the B
 
 It would be tremendously helpful to have more people answering questions about Bundler (and often simply about Rubygems or Ruby itself) in our [issue tracker](https://github.com/bundler/bundler/issues) or on [Stack Overflow](http://stackoverflow.com/questions/tagged/bundler).
 
-Additional documentation and explanation is always helpful, too. If you have any suggestions for the Bundler website [gembundler.com](http://www.gembundler.com), we would absolutely love it if you opened an issue or pull request on the [bundler-site](https://github.com/bundler/bundler-site) repository.
+Additional documentation and explanation is always helpful, too. If you have any suggestions for the Bundler website [bundler.io](http://bundler.io), we would absolutely love it if you opened an issue or pull request on the [bundler-site](https://github.com/bundler/bundler-site) repository.
 
 Finally, sharing your experiences and discoveries by writing them up is a valuable way to help others who have similar problems or experiences in the future. You can write a blog post, create an example and commit it to Github, take screenshots, or make videos.
 
