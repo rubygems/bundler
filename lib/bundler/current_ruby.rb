@@ -69,7 +69,7 @@ module Bundler
     end
 
     def mingw?
-      Bundler::WINDOWS && Gem::Platform.local.os == "mingw32"
+      Bundler::WINDOWS && Gem::Platform.local.os == "mingw32" && Gem::Platform.local.cpu != 'x64'
     end
 
     def mingw_18?
@@ -82,6 +82,14 @@ module Bundler
 
     def mingw_20?
       mingw? && on_20?
+    end
+
+    def x64_mingw?
+      Bundler::WINDOWS && Gem::Platform.local.os == "mingw32" && Gem::Platform.local.cpu == 'x64'
+    end
+
+    def x64_mingw_20?
+      x64_mingw? && on_20?
     end
 
   end
