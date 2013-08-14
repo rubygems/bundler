@@ -5,7 +5,7 @@ Signal.trap("INT") { exit 1 }
 
 require 'bundler'
 # Check if an older version of bundler is installed
-$:.each do |path|
+$LOAD_PATH.each do |path|
   if path =~ %r'/bundler-0.(\d+)' && $1.to_i < 9
     err = "Looks like you have a version of bundler that's older than 0.9.\n"
     err << "Please remove your old versions.\n"
