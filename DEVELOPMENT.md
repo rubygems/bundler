@@ -4,11 +4,17 @@ Great to have you here! Here are a few ways you can help out with [Bundler](http
 
 You can start learning about Bundler by reading [the documentation](http://bundler.io). If you want, you can also read a (lengthy) explanation of [why Bundler exists and what it does](http://bundler.io/v1.2/rationale.html). You can also check out discussions about Bundler on the [Bundler mailing list](https://groups.google.com/group/ruby-bundler) and in the [Bundler IRC channel](irc://irc.freenode.net/#bundler), which is #bundler on Freenode.
 
-# Your first commits
+## Your first commits
 
 If you’re interested in contributing to Bundler, that’s awesome! We’d love your help.
 
 If you have any questions after reading this page, please feel free to contact either [@indirect](http://github.com/indirect) or [@hone](http://github.com/hone). They are both happy to provide help working through your first bugfix or thinking through the problem you’re trying to resolve.
+
+## Tackle some small problems
+
+We track [small
+bugs](https://github.com/bundler/bundler/issues?labels=small&state=open) and [small features](https://github.com/bundler/bundler-features/issues?labels=small&state=open) so that anyone who wants to help can start with something that's not too overwhelming. If nothing on those lists looks good, though, just talk to us.
+
 
 # Development setup
 
