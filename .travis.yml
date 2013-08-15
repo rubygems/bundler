@@ -33,12 +33,14 @@ env:
   # we need to know if changes to rubygems will break bundler on release
   - RGV=master
   # test the latest rubygems release with all of our supported rubies
-  - RGV=v2.0.3
+  - RGV=v2.0.6
+  - RGV=2.0
 matrix:
   allow_failures:
     # we want to know how we're doing with head, but not fail the build
     - rvm: ruby-head
     - env: RGV=master
+    - env: RGV=2.0
     # 1.9.2 is simply too slow. it sometimes exceeds the 25m hard limit.
     - rvm: 1.9.2
   include:
