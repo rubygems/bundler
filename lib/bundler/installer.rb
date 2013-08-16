@@ -76,14 +76,22 @@ module Bundler
         end
       end
 
+      retry_times = options[:retry] || 1
+
       # Since we are installing, we can resolve the definition
       # using remote specs
       unless local
-        options["local"] ?
-          @definition.resolve_with_cache! :
-          @definition.resolve_remotely!
+        if options["local"]
+          @definition.resolve_with_cache!
+        else
+          Bundler::Retry.new("source fetch", retry_times).attempts do
+            @definition.resolve_remotely!
+          end
+        end
       end
-
+      # Must install gems in the order that the resolver provides
+      # as dependencies might actually affect the installation of
+      # the gem.
       Installer.post_install_messages = {}
 
       # the order that the resolver provides is significant, since

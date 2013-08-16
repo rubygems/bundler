@@ -33,6 +33,7 @@ module Bundler
   autoload :MatchPlatform,         'bundler/match_platform'
   autoload :RemoteSpecification,   'bundler/remote_specification'
   autoload :Resolver,              'bundler/resolver'
+  autoload :Retry,                 'bundler/retry'
   autoload :RubyVersion,           'bundler/ruby_version'
   autoload :RubyDsl,               'bundler/ruby_dsl'
   autoload :Runtime,               'bundler/runtime'

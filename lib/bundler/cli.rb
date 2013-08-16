@@ -180,6 +180,8 @@ module Bundler
         Bundler.rubygems.security_policies.empty?
     method_option "jobs", :aliases => "-j", :type => :numeric, :banner =>
       "Specify the number of jobs to run in parallel"
+    method_option "retry", :aliases => "-r", :type => :numeric, :banner =>
+      "Specify the number of times you wish to attempt a bundle install"
 
     def install
       opts = options.dup

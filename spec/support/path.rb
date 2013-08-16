@@ -48,6 +48,10 @@ module Spec
       tmp("gems/remote1", *args)
     end
 
+    def gem_repo_missing(*args)
+      tmp("gems/missing", *args)
+    end
+
     def gem_repo2(*args)
       tmp("gems/remote2", *args)
     end
