@@ -131,8 +131,12 @@ module Bundler
       Bundler.ui.info ""
       Bundler.ui.warn "#{e.class}: #{e.message}"
       msg = "An error occurred while installing #{spec.name} (#{spec.version}),"
-      msg << " and Bundler cannot continue.\nMake sure that `gem install"
-      msg << " #{spec.name} -v '#{spec.version}'` succeeds before bundling."
+      msg << " and Bundler cannot continue."
+
+      unless spec.source.options["git"]
+        msg << "\nMake sure that `gem install"
+        msg << " #{spec.name} -v '#{spec.version}'` succeeds before bundling."
+      end
       Bundler.ui.debug e.backtrace.join("\n")
       raise Bundler::InstallError, msg
     end
