@@ -6,7 +6,7 @@ module Bundler
       # All actions required by the Git source is encapsualted in this
       # object.
       class GitProxy
-        attr_accessor :path, :uri, :ref
+        attr_accessor :path, :uri, :ref, :max_retries
         attr_writer :revision
 
         def initialize(path, uri, ref, revision=nil, &allow)
@@ -15,6 +15,8 @@ module Bundler
           @ref      = ref
           @revision = revision
           @allow    = allow || Proc.new { true }
+          # How many retries for the git command
+          @max_retries = 3
         end
 
         def revision
@@ -84,19 +86,25 @@ module Bundler
         end
 
         def git(command, check_errors=true)
-          if allow?
-            out = %x{git #{command}}
-
-            if check_errors && $?.exitstatus != 0
-              msg = "Git error: command `git #{command}` in directory #{Dir.pwd} has failed."
-              msg << "\nIf this error persists you could try removing the cache directory '#{path}'" if path.exist?
-              raise GitError, msg
-            end
-            out
-          else
-            raise GitError, "Bundler is trying to run a `git #{command}` at runtime. You probably need to run `bundle install`. However, " \
+          @current_retries = 0
+          while @current_retries != @max_retries
+            if allow?
+              out = %x{git #{command}}
+              if check_errors && $?.exitstatus != 0
+                unless (@current_retries + 1) == @max_retries
+                  @current_retries += 1
+                  next
+                end
+                msg = "Git error: command `git #{command}` in directory #{Dir.pwd} has failed."
+                msg << "\nIf this error persists you could try removing the cache directory '#{path}'" if path.exist?
+                raise GitError, msg
+              end
+              return out
+            else
+              raise GitError, "Bundler is trying to run a `git #{command}` at runtime. You probably need to run `bundle install`. However, " \
                             "this error message could probably be more useful. Please submit a ticket at http://github.com/bundler/bundler/issues " \
                             "with steps to reproduce as well as the following\n\nCALLER: #{caller.join("\n")}"
+            end
           end
         end
 
