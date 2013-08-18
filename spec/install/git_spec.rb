@@ -875,4 +875,26 @@ describe "bundle install with git sources" do
     end
   end
 
+  it 'ignores git environment variables' do
+    build_git "xxxxxx" do |s|
+      s.executables = "xxxxxxbar"
+    end
+
+    Bundler::SharedHelpers.with_clean_git_env do
+      ENV['GIT_DIR']       = 'bar'
+      ENV['GIT_WORK_TREE'] = 'bar'
+
+      result = install_gemfile <<-G, :exitstatus => true
+        source "file://#{gem_repo1}"
+        git "#{lib_path('xxxxxx-1.0')}" do
+          gem 'xxxxxx'
+        end
+      G
+
+      expect(exitstatus).to eq(0)
+      expect(ENV['GIT_DIR']).to eq('bar')
+      expect(ENV['GIT_WORK_TREE']).to eq('bar')
+    end
+  end
+
 end
