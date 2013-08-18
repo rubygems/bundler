@@ -221,5 +221,41 @@ describe "install with --deployment or --frozen" do
 
       should_be_installed "rack 1.0.0"
     end
+
+    it "picks up a cached gem with explicit source path with dependency in a .gemspec" do
+      build_lib "omg", :path => lib_path('omg') do |s|
+        s.add_dependency "rack"
+        s.write "lib/omg.rb", "puts 'omg!'"
+      end
+
+      install_gemfile <<-G
+        gem "omg", :path => "#{lib_path('omg')}"
+      G
+      bundle "package --all"
+
+      simulate_new_machine
+      FileUtils.rm_rf lib_path('omg')
+
+      bundle "install --deployment"
+
+      expect(out).not_to include("You are trying to install in deployment mode after changing")
+      expect(out).not_to include("You have added to the Gemfile:\n* source: source at #{lib_path('omg')}")
+      expect(out).not_to include("You have deleted from the Gemfile:\n* source: source at #{bundled_app("vendor/cache/omg")}")
+
+      run "Bundler.require"
+      expect(out).to eq("omg!")
+    end
+
+    it "does not update lockfile" do
+      build_lib "omg", :path => lib_path('omg')
+
+      install_gemfile <<-G
+        gem "omg", :path => "#{lib_path('omg')}"
+      G
+      bundle "package --all"
+      bundle "install --deployment"
+
+      expect(out).not_to include("Cannot write a changed lockfile while frozen.")
+    end
   end
 end

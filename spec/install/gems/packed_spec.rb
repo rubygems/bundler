@@ -1,5 +1,37 @@
 require "spec_helper"
 
+describe "bundle install" do
+  describe "when cached and locked" do
+    describe "with explicit source paths" do
+      it "does not change path in lockfile" do
+        build_lib "omg", :path => lib_path('omg')
+
+        install_gemfile <<-G
+          gem "omg", :path => "#{lib_path('omg')}"
+        G
+        bundle "pack --all"
+        bundle :install
+
+        lockfile_should_be <<-G
+          PATH
+            remote: #{lib_path('omg')}
+            specs:
+              omg (1.0)
+
+          GEM
+            specs:
+
+          PLATFORMS
+            #{generic(Gem::Platform.local)}
+
+          DEPENDENCIES
+            omg!
+        G
+      end
+    end
+  end
+end
+
 describe "bundle install with gem sources" do
   describe "when cached and locked" do
     it "does not hit the remote at all if --local is passed" do
