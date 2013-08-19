@@ -1,3 +1,9 @@
+## 1.4.0.pre.2
+
+Features:
+
+  - add support for the x64-mingw32 platform (#2356, #2590, @larskanis)
+
 ## 1.4.0.pre.1 (2013-08-04)
 
 Features:
