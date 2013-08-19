@@ -875,7 +875,7 @@ describe "bundle install with git sources" do
     end
   end
 
-  it 'ignores git environment variables' do
+  it "ignores git environment variables" do
     build_git "xxxxxx" do |s|
       s.executables = "xxxxxxbar"
     end
@@ -884,7 +884,7 @@ describe "bundle install with git sources" do
       ENV['GIT_DIR']       = 'bar'
       ENV['GIT_WORK_TREE'] = 'bar'
 
-      result = install_gemfile <<-G, :exitstatus => true
+      install_gemfile <<-G, :exitstatus => true
         source "file://#{gem_repo1}"
         git "#{lib_path('xxxxxx-1.0')}" do
           gem 'xxxxxx'
