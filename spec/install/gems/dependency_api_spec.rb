@@ -419,6 +419,20 @@ describe "gemcutter's dependency API" do
       bundle :install, :artifice => "endpoint_creds_diff_host"
       should_be_installed "rack 1.0.0"
     end
+
+    describe "with no password" do
+      let(:password) { nil }
+
+      it "passes basic authentication details" do
+        gemfile <<-G
+          source "#{basic_auth_source_uri}"
+          gem "rack"
+        G
+
+        bundle :install, :artifice => "endpoint_basic_authentication"
+        should_be_installed "rack 1.0.0"
+      end
+    end
   end
 
   context "when ruby is compiled without openssl" do
