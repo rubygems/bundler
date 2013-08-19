@@ -12,12 +12,14 @@ module Bundler
 
       def initialize(options = {})
         @options = options
-        @remotes = (options["remotes"] || []).map { |r| normalize_uri(r) }
+        @remotes = []
         @fetchers = {}
         @dependency_names = []
         @allow_remote = false
         @allow_cached = false
         @caches = [Bundler.app_cache, *Bundler.rubygems.gem_cache]
+
+        Array(options["remotes"] || []).reverse_each{|r| add_remote(r) }
       end
 
       def remote!
@@ -47,9 +49,7 @@ module Bundler
       end
 
       def self.from_lock(options)
-        s = new(options)
-        Array(options["remote"]).each { |r| s.add_remote(r) }
-        s
+        new(options)
       end
 
       def to_lock
