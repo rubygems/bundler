@@ -10,70 +10,106 @@
   </head>
   <body>
     <div id='body'>
-      <div id='contents'>
-        <div id='header'>
-                    <a class="image" href="/"><img width="725" alt="The best way to manage your application's dependencies" src="/images/gembundler.png" />
-          </a>
+      <div id='header'>
+                <a class="image" href="/"><img width="725" alt="The best way to manage your application's dependencies" src="/images/gembundler.png" />
+        </a>
 
+      </div>
+      <div id='container'>
+        <div id='contents'>
+          <h2>Bundler Project Sponsors</h2>
+          <p>Development work on Bundler has been sponsored by many companies over the years. Here, we thank the companies that have directly contributed money or significant paid time to implement features or fix bugs.</p>
+          <div class='contributor'>
+            <a href="http://heroku.com"><img class="avatar" src="/images/sponsors/heroku.png" /></a>
+            <h3><a href="http://heroku.com">Heroku</a></h3>
+            <p>Heroku employs <a href="https://github.com/hone">Terence Lee</a> to maintain the Ruby platform on Heroku, including ongoing contributions to Bundler.</p>
+          </div>
+          <div class='contributor'>
+            <a href="http://engineyard.com"><img class="avatar" src="/images/sponsors/engineyard.png" /></a>
+            <h3><a href="http://engineyard.com">Engine Yard</a></h3>
+            <p>Engine Yard employed <a href="https://github.com/wycats">Yehuda Katz</a>, <a href="https://github.com/carllerche">Carl Lerche</a>, and <a href="https://github.com/indirect">André Arko</a> during the initial development of Bundler. Later, they sponsored the development of the <code>bundle inject</code> command.</p>
+          </div>
+          <div class='contributor'>
+            <a href="http://www.mavenlink.com"><img class="avatar" src="/images/sponsors/mavenlink.png" /></a>
+            <h3><a href="http://www.mavenlink.com">Mavenlink</a></h3>
+            <p>Mavenlink employed <a href="https://github.com/indirect">André Arko</a> to work full-time on open source software, including Bundler, for several months.</p>
+          </div>
+          <div class='contributor'>
+            <a href="http://travis-ci.org"><img class="avatar" src="/images/sponsors/travis.png" /></a>
+            <h3><a href="http://travis-ci.org">Travis CI</a></h3>
+            <p>Travis provides <a href="http://travis-ci.org/bundler/bundler/">Bundler's continuous integration</a> infrastructure, which uses servers donated by <a href="http://bluebox.net">BlueBox</a> to automatically test Bundler against all of the Ruby and Rubygems versions that we support.</p>
+          </div>
+          <div class='contributor'>
+            <a href="http://www.globalsign.com"><img class="avatar" src="/images/sponsors/globalsign.png" /></a>
+            <h3><a href="http://www.globalsign.com">Globalsign</a></h3>
+            <p>Globalsign donates SSL certificates for Bundler's website, <a href="http://bundler.io">bundler.io</a></p>
+          </div>
+          <h2>Bundler API Sponsors</h2>
+          <p>The <a href="http://github.com/rubygems/bundler-api">Bundler dependency API</a> provides dependency information to Bundler version 1.1 and higher. It speeds up `bundle install` by several times over, but requires server capacity beyond what RubyCentral is able to provide for rubygems.org. These sponsors have provided the resources that make hosting the Bundler API possible.</p>
+          <div class='contributor'>
+            <a href="http://heroku.com"><img class="avatar" src="/images/sponsors/heroku.png" /></a>
+            <h3><a href="http://heroku.com">Heroku</a></h3>
+            <p>Heroku provides the Ruby and Postgres servers that the API runs on.</p>
+          </div>
+          <div class='contributor'>
+            <a href="http://librato.com"><img class="avatar" src="/images/sponsors/librato.png" /></a>
+            <h3><a href="http://librato.com">Librato</a></h3>
+            <p>Librato provides metrics, analytics, and <a href="https://metrics.librato.com/share/dashboards/18w46x4p">the API dashboard</a>.</p>
+          </div>
+          <div class='contributor'>
+            <a href="http://honeybadger.io"><img class="avatar" src="/images/sponsors/honeybadger.png" /></a>
+            <h3><a href="http://honeybadger.io">Honeybadger</a></h3>
+            <p>Honeybadger provides exception reporting, tracking, and alerting.</p>
+          </div>
+          <div class='contributor'>
+            <a href="http://pagerduty.com"><img class="avatar" src="/images/sponsors/pagerduty.png" /></a>
+            <h3><a href="http://pagerduty.com">PagerDuty</a></h3>
+            <p>PagerDuty provides operational alerting, notifications, and on-call schedule rotation.</p>
+          </div>
+          <div class='contributor'>
+            <a href="http://papertrailapp.com"><img class="avatar" src="/images/sponsors/papertrail.png" /></a>
+            <h3><a href="http://papertrailapp.com">Papertrail</a></h3>
+            <p>Papertrail provides hosted log management for all of the API servers.</p>
+          </div>
+          <div class='contributor'>
+            <a href="http://rollbar.com"><img class="avatar" src="/images/sponsors/rollbar.png" /></a>
+            <h3><a href="http://rollbar.com">Rollbar</a></h3>
+            <p>Rollbar provides exception tracking and analysis.</p>
+          </div>
         </div>
-        <h2>Bundler Project Sponsors</h2>
-        <p>Development work on Bundler has been sponsored by many companies over the years. Here, we thank the companies that have directly contributed money or significant paid time to implement features or fix bugs.</p>
-        <div class='contributor'>
-          <a href="http://heroku.com"><img class="avatar" src="/images/sponsors/heroku.png" /></a>
-          <h3><a href="http://heroku.com">Heroku</a></h3>
-          <p>Heroku employs <a href="https://github.com/hone">Terence Lee</a> to maintain the Ruby platform on Heroku, including ongoing contributions to Bundler.</p>
-        </div>
-        <div class='contributor'>
-          <a href="http://engineyard.com"><img class="avatar" src="/images/sponsors/engineyard.png" /></a>
-          <h3><a href="http://engineyard.com">Engine Yard</a></h3>
-          <p>Engine Yard employed <a href="https://github.com/wycats">Yehuda Katz</a>, <a href="https://github.com/carllerche">Carl Lerche</a>, and <a href="https://github.com/indirect">André Arko</a> during the initial development of Bundler. Later, they sponsored the development of the <code>bundle inject</code> command.</p>
-        </div>
-        <div class='contributor'>
-          <a href="http://www.mavenlink.com"><img class="avatar" src="/images/sponsors/mavenlink.png" /></a>
-          <h3><a href="http://www.mavenlink.com">Mavenlink</a></h3>
-          <p>Mavenlink employed <a href="https://github.com/indirect">André Arko</a> to work full-time on open source software, including Bundler, for several months.</p>
-        </div>
-        <div class='contributor'>
-          <a href="http://travis-ci.org"><img class="avatar" src="/images/sponsors/travis.png" /></a>
-          <h3><a href="http://travis-ci.org">Travis CI</a></h3>
-          <p>Travis provides <a href="http://travis-ci.org/bundler/bundler/">Bundler's continuous integration</a> infrastructure, which uses servers donated by <a href="http://bluebox.net">BlueBox</a> to automatically test Bundler against all of the Ruby and Rubygems versions that we support.</p>
-        </div>
-        <div class='contributor'>
-          <a href="http://www.globalsign.com"><img class="avatar" src="/images/sponsors/globalsign.png" /></a>
-          <h3><a href="http://www.globalsign.com">Globalsign</a></h3>
-          <p>Globalsign donates SSL certificates for Bundler's website, <a href="http://bundler.io">bundler.io</a></p>
-        </div>
-        <h2>Bundler API Sponsors</h2>
-        <p>The <a href="http://github.com/rubygems/bundler-api">Bundler dependency API</a> provides dependency information to Bundler version 1.1 and higher. It speeds up `bundle install` by several times over, but requires server capacity beyond what RubyCentral is able to provide for rubygems.org. These sponsors have provided the resources that make hosting the Bundler API possible.</p>
-        <div class='contributor'>
-          <a href="http://heroku.com"><img class="avatar" src="/images/sponsors/heroku.png" /></a>
-          <h3><a href="http://heroku.com">Heroku</a></h3>
-          <p>Heroku provides the Ruby and Postgres servers that the API runs on.</p>
-        </div>
-        <div class='contributor'>
-          <a href="http://librato.com"><img class="avatar" src="/images/sponsors/librato.png" /></a>
-          <h3><a href="http://librato.com">Librato</a></h3>
-          <p>Librato provides metrics, analytics, and <a href="https://metrics.librato.com/share/dashboards/18w46x4p">the API dashboard</a>.</p>
-        </div>
-        <div class='contributor'>
-          <a href="http://honeybadger.io"><img class="avatar" src="/images/sponsors/honeybadger.png" /></a>
-          <h3><a href="http://honeybadger.io">Honeybadger</a></h3>
-          <p>Honeybadger provides exception reporting, tracking, and alerting.</p>
-        </div>
-        <div class='contributor'>
-          <a href="http://pagerduty.com"><img class="avatar" src="/images/sponsors/pagerduty.png" /></a>
-          <h3><a href="http://pagerduty.com">PagerDuty</a></h3>
-          <p>PagerDuty provides operational alerting, notifications, and on-call schedule rotation.</p>
-        </div>
-        <div class='contributor'>
-          <a href="http://papertrailapp.com"><img class="avatar" src="/images/sponsors/papertrail.png" /></a>
-          <h3><a href="http://papertrailapp.com">Papertrail</a></h3>
-          <p>Papertrail provides hosted log management for all of the API servers.</p>
-        </div>
-        <div class='contributor'>
-          <a href="http://rollbar.com"><img class="avatar" src="/images/sponsors/rollbar.png" /></a>
-          <h3><a href="http://rollbar.com">Rollbar</a></h3>
-          <p>Rollbar provides exception tracking and analysis.</p>
+        <div id='sidebar'>
+          <h2>Would you like to</h2>
+          <ul>
+            <li><a href="/#getting-started">Get started</a></li>
+            <li><a href="https://github.com/bundler/bundler/blob/master/ISSUES.md">Report a bug</a></li>
+            <li><a href="/v1.3/whats_new.html">See what's new</a></li>
+            <li><a href="/v1.3/man/bundle.1.html">Read documentation</a></li>
+            <li><a href="/#get-involved">Discuss and Contribute</a></li>
+          </ul>
+          <h2>Bundler Commands</h2>
+          <ul>
+            <li><a href="/v1.3/bundle_install.html">bundle install</a></li>
+            <li><a href="/v1.3/bundle_update.html">bundle update</a></li>
+            <div class='buttons'>
+              <a href="/v1.3/commands.html">View all commands</a>
+            </div>
+          </ul>
+          <h2>Usage</h2>
+          <ul>
+            <li><a href="/v1.3/gemfile.html">Gemfile</a></li>
+            <li><a href="/v1.3/git.html">Gems from git</a></li>
+            <li><a href="/v1.3/groups.html">Grouping</a></li>
+            <li><a href="/v1.3/bundler_setup.html">Bundler.setup</a></li>
+            <li><a href="/v1.3/deploying.html">Deploying</a></li>
+          </ul>
+          <h2>Use Bundler with</h2>
+          <ul>
+            <li><a href="/v1.3/rails3.html">Rails 3</a></li>
+            <li><a href="/v1.3/rails23.html">Rails 2.3</a></li>
+            <li><a href="/v1.3/sinatra.html">Sinatra</a></li>
+            <li><a href="/v1.3/rubygems.html">Rubygems</a></li>
+            <li><a href="/v1.3/rubymotion.html">RubyMotion</a></li>
+          </ul>
         </div>
       </div>
     </div>

@@ -10,74 +10,110 @@
   </head>
   <body>
     <div id='body'>
-      <div id='contents'>
-        <div id='header'>
-                    <a class="image" href="/"><img width="725" alt="The best way to manage your application's dependencies" src="/images/gembundler.png" />
-          </a>
+      <div id='header'>
+                <a class="image" href="/"><img width="725" alt="The best way to manage your application's dependencies" src="/images/gembundler.png" />
+        </a>
 
-        </div>
-        <div id='intro'>
-          Rails 3 comes with baked in support with bundler.
-        </div>
-        <h2>Using Bundler with Rails 3</h2>
-        <div class='contents'>
-          <div class='bullet'>
-            <div class='description'>
-              Install Rails as you normally would. Use sudo if you would normally use
-              sudo to install gems.
+      </div>
+      <div id='container'>
+        <div id='contents'>
+          <div id='intro'>
+            Rails 3 comes with baked in support with bundler.
+          </div>
+          <h2>Using Bundler with Rails 3</h2>
+          <div class='contents'>
+            <div class='bullet'>
+              <div class='description'>
+                Install Rails as you normally would. Use sudo if you would normally use
+                sudo to install gems.
+              </div>
+              <div class='how'>
+                <pre class='sunburst'>$ gem install rails</pre>
+                <div class='notes'>
+                  We recommend using rvm for dependable Ruby installations, especially if
+                  you are switching between different versions of Ruby
+                </div>
+              </div>
             </div>
-            <div class='how'>
-              <pre class='sunburst'>$ gem install rails</pre>
-              <div class='notes'>
-                We recommend using rvm for dependable Ruby installations, especially if
-                you are switching between different versions of Ruby
+            <div class='bullet'>
+              <div class='description'>
+                Generate a Rails app as usual
+              </div>
+              <pre class='sunburst'>$ rails new myapp&#x000A;$ cd myapp&#x000A;</pre>
+            </div>
+            <div class='bullet'>
+              <div class='description'>
+                Run the server. Bundler is transparently managing your dependencies!
+              </div>
+              <pre class='sunburst'>$ rails server&#x000A;</pre>
+            </div>
+            <div class='bullet'>
+              <div class='description'>
+                Add new dependencies to your Gemfile as you need them.
+              </div>
+              <pre class="sunburst">gem <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>geokit<span class="String">&#39;</span></span>&#x000A;</pre>
+            </div>
+            <div class='bullet'>
+              <div class='description'>
+                If you want a dependency to be loaded only in a certain Rails environment,
+                place it in a group named after that Rails environment
+              </div>
+              <pre class="sunburst">group <span class="Constant"><span class="Constant">:</span>test</span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">&#39;</span>rspec<span class="String">&#39;</span></span>&#x000A;  gem <span class="String"><span class="String">&#39;</span>faker<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;</pre>
+            </div>
+            <div class='bullet' id='shared_with_23'>
+              <div class='description'>
+                You can place a dependency in multiple groups at once as well
+              </div>
+              <pre class="sunburst">group <span class="Constant"><span class="Constant">:</span>development</span>, <span class="Constant"><span class="Constant">:</span>test</span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">&#39;</span>wirble<span class="String">&#39;</span></span>&#x000A;  gem <span class="String"><span class="String">&#39;</span>ruby-debug<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;</pre>
+              <a href="/v1.1/groups.html">Learn More: Groups</a>
+            </div>
+            <div class='bullet'>
+              <div class='description'>
+                After adding a dependency, if it is not yet installed, install it
+              </div>
+              <div class='how'>
+                <pre class='sunburst'>$ bundle install</pre>
+                <div class='notes'>
+                  This will update all dependencies in your Gemfile to the latest versions
+                  that do not conflict with other dependencies
+                </div>
               </div>
             </div>
           </div>
-          <div class='bullet'>
-            <div class='description'>
-              Generate a Rails app as usual
+        </div>
+        <div id='sidebar'>
+          <h2>Would you like to</h2>
+          <ul>
+            <li><a href="/#getting-started">Get started</a></li>
+            <li><a href="https://github.com/bundler/bundler/blob/master/ISSUES.md">Report a bug</a></li>
+            <li><a href="/v1.3/whats_new.html">See what's new</a></li>
+            <li><a href="/v1.3/man/bundle.1.html">Read documentation</a></li>
+            <li><a href="/#get-involved">Discuss and Contribute</a></li>
+          </ul>
+          <h2>Bundler Commands</h2>
+          <ul>
+            <li><a href="/v1.3/bundle_install.html">bundle install</a></li>
+            <li><a href="/v1.3/bundle_update.html">bundle update</a></li>
+            <div class='buttons'>
+              <a href="/v1.3/commands.html">View all commands</a>
             </div>
-            <pre class='sunburst'>$ rails new myapp&#x000A;$ cd myapp&#x000A;</pre>
-          </div>
-          <div class='bullet'>
-            <div class='description'>
-              Run the server. Bundler is transparently managing your dependencies!
-            </div>
-            <pre class='sunburst'>$ rails server&#x000A;</pre>
-          </div>
-          <div class='bullet'>
-            <div class='description'>
-              Add new dependencies to your Gemfile as you need them.
-            </div>
-            <pre class="sunburst">gem <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>geokit<span class="String">&#39;</span></span>&#x000A;</pre>
-          </div>
-          <div class='bullet'>
-            <div class='description'>
-              If you want a dependency to be loaded only in a certain Rails environment,
-              place it in a group named after that Rails environment
-            </div>
-            <pre class="sunburst">group <span class="Constant"><span class="Constant">:</span>test</span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">&#39;</span>rspec<span class="String">&#39;</span></span>&#x000A;  gem <span class="String"><span class="String">&#39;</span>faker<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;</pre>
-          </div>
-          <div class='bullet' id='shared_with_23'>
-            <div class='description'>
-              You can place a dependency in multiple groups at once as well
-            </div>
-            <pre class="sunburst">group <span class="Constant"><span class="Constant">:</span>development</span>, <span class="Constant"><span class="Constant">:</span>test</span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">&#39;</span>wirble<span class="String">&#39;</span></span>&#x000A;  gem <span class="String"><span class="String">&#39;</span>ruby-debug<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;</pre>
-            <a href="/v1.1/groups.html">Learn More: Groups</a>
-          </div>
-          <div class='bullet'>
-            <div class='description'>
-              After adding a dependency, if it is not yet installed, install it
-            </div>
-            <div class='how'>
-              <pre class='sunburst'>$ bundle install</pre>
-              <div class='notes'>
-                This will update all dependencies in your Gemfile to the latest versions
-                that do not conflict with other dependencies
-              </div>
-            </div>
-          </div>
+          </ul>
+          <h2>Usage</h2>
+          <ul>
+            <li><a href="/v1.3/gemfile.html">Gemfile</a></li>
+            <li><a href="/v1.3/git.html">Gems from git</a></li>
+            <li><a href="/v1.3/groups.html">Grouping</a></li>
+            <li><a href="/v1.3/bundler_setup.html">Bundler.setup</a></li>
+            <li><a href="/v1.3/deploying.html">Deploying</a></li>
+          </ul>
+          <h2>Use Bundler with</h2>
+          <ul>
+            <li><a href="/v1.3/rails3.html">Rails 3</a></li>
+            <li><a href="/v1.3/rails23.html">Rails 2.3</a></li>
+            <li><a href="/v1.3/sinatra.html">Sinatra</a></li>
+            <li><a href="/v1.3/rubygems.html">Rubygems</a></li>
+            <li><a href="/v1.3/rubymotion.html">RubyMotion</a></li>
+          </ul>
         </div>
       </div>
     </div>

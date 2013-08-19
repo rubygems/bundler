@@ -10,32 +10,68 @@
   </head>
   <body>
     <div id='body'>
-      <div id='contents'>
-        <div id='header'>
-                    <a class="image" href="/"><img width="725" alt="The best way to manage your application's dependencies" src="/images/gembundler.png" />
-          </a>
+      <div id='header'>
+                <a class="image" href="/"><img width="725" alt="The best way to manage your application's dependencies" src="/images/gembundler.png" />
+        </a>
 
+      </div>
+      <div id='container'>
+        <div id='contents'>
+          <h2>bundle lock</h2>
+          <div class='contents'>
+            <div class='bullet'>
+              <div class='description'>
+                Calculate the entire dependency tree and store the results in Gemfile.lock. Check Gemfile.lock into version control
+              </div>
+              <pre class='sunburst'>$ bundle lock&#x000A;$ git add Gemfile.lock&#x000A;</pre>
+            </div>
+            <div class='bullet'>
+              <div class='description'>
+                After you have locked your gems, you've updated your Gemfile and want to update Gemfile.lock
+              </div>
+              <pre class='sunburst'>$ bundle lock&#x000A;</pre>
+            </div>
+            <div class='bullet'>
+              <div class='description'>
+                After you have locked your gems, you've updated your Gemfile and want to install the new gems
+              </div>
+              <pre class='sunburst'>$ bundle install --relock</pre>
+            </div>
+          </div>
         </div>
-        <h2>bundle lock</h2>
-        <div class='contents'>
-          <div class='bullet'>
-            <div class='description'>
-              Calculate the entire dependency tree and store the results in Gemfile.lock. Check Gemfile.lock into version control
+        <div id='sidebar'>
+          <h2>Would you like to</h2>
+          <ul>
+            <li><a href="/#getting-started">Get started</a></li>
+            <li><a href="https://github.com/bundler/bundler/blob/master/ISSUES.md">Report a bug</a></li>
+            <li><a href="/v1.3/whats_new.html">See what's new</a></li>
+            <li><a href="/v1.3/man/bundle.1.html">Read documentation</a></li>
+            <li><a href="/#get-involved">Discuss and Contribute</a></li>
+          </ul>
+          <h2>Bundler Commands</h2>
+          <ul>
+            <li><a href="/v1.3/bundle_install.html">bundle install</a></li>
+            <li><a href="/v1.3/bundle_update.html">bundle update</a></li>
+            <div class='buttons'>
+              <a href="/v1.3/commands.html">View all commands</a>
             </div>
-            <pre class='sunburst'>$ bundle lock&#x000A;$ git add Gemfile.lock&#x000A;</pre>
-          </div>
-          <div class='bullet'>
-            <div class='description'>
-              After you have locked your gems, you've updated your Gemfile and want to update Gemfile.lock
-            </div>
-            <pre class='sunburst'>$ bundle lock&#x000A;</pre>
-          </div>
-          <div class='bullet'>
-            <div class='description'>
-              After you have locked your gems, you've updated your Gemfile and want to install the new gems
-            </div>
-            <pre class='sunburst'>$ bundle install --relock</pre>
-          </div>
+          </ul>
+          <h2>Usage</h2>
+          <ul>
+            <li><a href="/v1.3/gemfile.html">Gemfile</a></li>
+            <li><a href="/v1.3/git.html">Gems from git</a></li>
+            <li><a href="/v1.3/groups.html">Grouping</a></li>
+            <li><a href="/v1.3/bundler_setup.html">Bundler.setup</a></li>
+            <li><a href="/v1.3/deploying.html">Deploying</a></li>
+          </ul>
+          <h2>Use Bundler with</h2>
+          <ul>
+            <li><a href="/v1.3/rails3.html">Rails 3</a></li>
+            <li><a href="/v1.3/rails23.html">Rails 2.3</a></li>
+            <li><a href="/v1.3/sinatra.html">Sinatra</a></li>
+            <li><a href="/v1.3/rubygems.html">Rubygems</a></li>
+            <li><a href="/v1.3/rubymotion.html">RubyMotion</a></li>
+          </ul>
         </div>
       </div>
     </div>

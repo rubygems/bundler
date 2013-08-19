@@ -10,192 +10,228 @@
   </head>
   <body>
     <div id='body'>
-      <div id='contents'>
-        <div id='header'>
-                    <a class="image" href="/"><img width="725" alt="The best way to manage your application's dependencies" src="/images/gembundler.png" />
-          </a>
+      <div id='header'>
+                <a class="image" href="/"><img width="725" alt="The best way to manage your application's dependencies" src="/images/gembundler.png" />
+        </a>
 
-        </div>
-        <h2>bundle install</h2>
-        <div class='contents'>
-          <div class='bullet'>
-            <div class='description'>
-              Make sure all dependencies in your Gemfile are available to your application.
-            </div>
-            <pre class='sunburst'>$ bundle install [--binstubs=PATH] [--clean] [--deployment] [--frozen]&#x000A;                 [--full-index] [--gemfile=FILE] [--local] [--no-cache]&#x000A;                 [--no-prune] [--path=PATH] [--quiet] [--shebang=STRING]&#x000A;                 [--standalone=ARRAY] [--system] [--without=GROUP GROUP]</pre>
-            <div class='notes'>
-              <p>
-                Options:
-              </p>
-              <p>
-                <code>--binstubs</code>: Generate bin stubs for bundled gems to ./bin
-              </p>
-              <p>
-                <code>--clean</code>: Run bundle clean automatically after install
-              </p>
-              <p>
-                <code>--deployment</code>: Install using defaults tuned for deployment environments
-              </p>
-              <p>
-                <code>--frozen</code>: Do not allow the Gemfile.lock to be updated after this install
-              </p>
-              <p>
-                <code>--full-index</code>: Use the rubygems modern index instead of the API endpoint
-              </p>
-              <p>
-                <code>--gemfile</code>: Use the specified gemfile instead of Gemfile
-              </p>
-              <p>
-                <code>--local</code>: Do not attempt to fetch gems remotely and use the gem cache instead
-              </p>
-              <p>
-                <code>--no-cache</code>: Don't update the existing gem cache.
-              </p>
-              <p>
-                <code>--no-prune</code>: Don't remove stale gems from the cache.
-              </p>
-              <p>
-                <code>--path</code>: Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine
-              </p>
-              <p>
-                <code>--quiet</code>: Only output warnings and errors.
-              </p>
-              <p>
-                <code>--shebang</code>: Specify a different shebang executable name than the default (usually 'ruby')
-              </p>
-              <p>
-                <code>--standalone</code>: Make a bundle that can work without the Bundler runtime
-              </p>
-              <p>
-                <code>--system</code>: Install to the system location ($BUNDLE_PATH or $GEM_HOME) even if the bundle was previously installed somewhere else for this application
-              </p>
-              <p>
-                <code>--without</code>: Exclude gems that are part of the specified named group.
-              </p>
-            </div>
-            <div class='notes'>
-              <p>
-                Gems will be installed to your default system location for gems. If your
-                system gems are stored in a root-owned location (such as in Mac OSX),
-                bundle will ask for your root password to install them there.
-              </p>
-              <p>
-                While installing gems, Bundler will check <code>vendor/cache</code> and then
-                your system's gems. If a gem isn't cached or installed, Bundler will try to
-                install it from the sources you have declared in your Gemfile.
-              </p>
-              <p>
-                The <code>--system</code> option is the default. Pass it to switch back after
-                using the <code>--path</code> option as described below.
-              </p>
-            </div>
-          </div>
-          <div class='bullet' id='path'>
-            <div class='description'>
-              Install your dependencies, even gems that are already installed
-              to your system gems, to a location other than your system's gem
-              repository. In this case, install them to <code>vendor/bundle</code>.
-            </div>
-            <div class='how'>
-              <pre class='sunburst'>$ bundle install --path vendor/bundle</pre>
-              <div class='notes'>
-                Further <code>bundle</code> commands or calls to <code>Bundler.setup</code> or
-                <code>Bundler.require</code> will remember this location.
+      </div>
+      <div id='container'>
+        <div id='contents'>
+          <h2>bundle install</h2>
+          <div class='contents'>
+            <div class='bullet'>
+              <div class='description'>
+                Make sure all dependencies in your Gemfile are available to your application.
               </div>
-              <a href="/bundler_setup.html">Learn More: Bundler.setup</a>
-              <a href="/groups.html">Learn More: Bundler.require</a>
+              <pre class='sunburst'>$ bundle install [--binstubs=PATH] [--clean] [--deployment] [--frozen]&#x000A;                 [--full-index] [--gemfile=FILE] [--local] [--no-cache]&#x000A;                 [--no-prune] [--path=PATH] [--quiet] [--shebang=STRING]&#x000A;                 [--standalone=ARRAY] [--system] [--without=GROUP GROUP]</pre>
+              <div class='notes'>
+                <p>
+                  Options:
+                </p>
+                <p>
+                  <code>--binstubs</code>: Generate bin stubs for bundled gems to ./bin
+                </p>
+                <p>
+                  <code>--clean</code>: Run bundle clean automatically after install
+                </p>
+                <p>
+                  <code>--deployment</code>: Install using defaults tuned for deployment environments
+                </p>
+                <p>
+                  <code>--frozen</code>: Do not allow the Gemfile.lock to be updated after this install
+                </p>
+                <p>
+                  <code>--full-index</code>: Use the rubygems modern index instead of the API endpoint
+                </p>
+                <p>
+                  <code>--gemfile</code>: Use the specified gemfile instead of Gemfile
+                </p>
+                <p>
+                  <code>--local</code>: Do not attempt to fetch gems remotely and use the gem cache instead
+                </p>
+                <p>
+                  <code>--no-cache</code>: Don't update the existing gem cache.
+                </p>
+                <p>
+                  <code>--no-prune</code>: Don't remove stale gems from the cache.
+                </p>
+                <p>
+                  <code>--path</code>: Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine
+                </p>
+                <p>
+                  <code>--quiet</code>: Only output warnings and errors.
+                </p>
+                <p>
+                  <code>--shebang</code>: Specify a different shebang executable name than the default (usually 'ruby')
+                </p>
+                <p>
+                  <code>--standalone</code>: Make a bundle that can work without the Bundler runtime
+                </p>
+                <p>
+                  <code>--system</code>: Install to the system location ($BUNDLE_PATH or $GEM_HOME) even if the bundle was previously installed somewhere else for this application
+                </p>
+                <p>
+                  <code>--without</code>: Exclude gems that are part of the specified named group.
+                </p>
+              </div>
+              <div class='notes'>
+                <p>
+                  Gems will be installed to your default system location for gems. If your
+                  system gems are stored in a root-owned location (such as in Mac OSX),
+                  bundle will ask for your root password to install them there.
+                </p>
+                <p>
+                  While installing gems, Bundler will check <code>vendor/cache</code> and then
+                  your system's gems. If a gem isn't cached or installed, Bundler will try to
+                  install it from the sources you have declared in your Gemfile.
+                </p>
+                <p>
+                  The <code>--system</code> option is the default. Pass it to switch back after
+                  using the <code>--path</code> option as described below.
+                </p>
+              </div>
+            </div>
+            <div class='bullet' id='path'>
+              <div class='description'>
+                Install your dependencies, even gems that are already installed
+                to your system gems, to a location other than your system's gem
+                repository. In this case, install them to <code>vendor/bundle</code>.
+              </div>
+              <div class='how'>
+                <pre class='sunburst'>$ bundle install --path vendor/bundle</pre>
+                <div class='notes'>
+                  Further <code>bundle</code> commands or calls to <code>Bundler.setup</code> or
+                  <code>Bundler.require</code> will remember this location.
+                </div>
+                <a href="/bundler_setup.html">Learn More: Bundler.setup</a>
+                <a href="/groups.html">Learn More: Bundler.require</a>
+              </div>
+            </div>
+            <div class='bullet' id='without'>
+              <div class='description'>
+                Install all dependencies except those in groups that are explicitly excluded.
+              </div>
+              <pre class='sunburst'>$ bundle install --without development test</pre>
+              <a href="/groups.html">Learn More: Groups</a>
+            </div>
+            <div class='bullet' id='deployment'>
+              <div class='description'>
+                Install all dependencies on to a production server.
+                Do <b>not</b> use this flag on a development machine.
+              </div>
+              <pre class='sunburst'>$ bundle install --deployment</pre>
+              <div class='notes'>
+                <p>
+                  The <code>--deployment</code> flag activates a number of deployment-friendly
+                  conventions:
+                </p>
+                <ul>
+                  <li>Isolate all gems into <code>vendor/bundle</code></li>
+                  <li>Require an up-to-date <code>Gemfile.lock</code></li>
+                  <li>
+                    If <code>bundle package</code> was run, do not fetch gems
+                    from rubygems.org. Instead, only use gems in the checked
+                    in <code>vendor/cache</code>
+                  </li>
+                </ul>
+              </div>
+              <a href="/deploying.html">Learn More: Deploying</a>
+            </div>
+            <div class='bullet' id='binstubs'>
+              <div class='description'>
+                (Example with --binstubs TBD)
+              </div>
+            </div>
+            <div class='bullet' id='clean'>
+              <div class='description'>
+                (Example with --clean TBD)
+              </div>
+            </div>
+            <div class='bullet' id='frozen'>
+              <div class='description'>
+                (Example with --frozen TBD)
+              </div>
+            </div>
+            <div class='bullet' id='full-index'>
+              <div class='description'>
+                (Example with --full-index TBD)
+              </div>
+            </div>
+            <div class='bullet' id='gemfile'>
+              <div class='description'>
+                (Example with --gemfile TBD)
+              </div>
+            </div>
+            <div class='bullet' id='local'>
+              <div class='description'>
+                (Example with --local TBD)
+              </div>
+            </div>
+            <div class='bullet' id='no-cache'>
+              <div class='description'>
+                (Example with --no-cache TBD)
+              </div>
+            </div>
+            <div class='bullet' id='no-prune'>
+              <div class='description'>
+                (Example with --no-prune TBD)
+              </div>
+            </div>
+            <div class='bullet' id='quiet'>
+              <div class='description'>
+                (Example with --quiet TBD)
+              </div>
+            </div>
+            <div class='bullet' id='shebang'>
+              <div class='description'>
+                (Example with --shebang TBD)
+              </div>
+            </div>
+            <div class='bullet' id='standalone'>
+              <div class='description'>
+                (Example with --standalone TBD)
+              </div>
+            </div>
+            <div class='bullet' id='system'>
+              <div class='description'>
+                (Example with --system TBD)
+              </div>
             </div>
           </div>
-          <div class='bullet' id='without'>
-            <div class='description'>
-              Install all dependencies except those in groups that are explicitly excluded.
+        </div>
+        <div id='sidebar'>
+          <h2>Would you like to</h2>
+          <ul>
+            <li><a href="/#getting-started">Get started</a></li>
+            <li><a href="https://github.com/bundler/bundler/blob/master/ISSUES.md">Report a bug</a></li>
+            <li><a href="/v1.3/whats_new.html">See what's new</a></li>
+            <li><a href="/v1.3/man/bundle.1.html">Read documentation</a></li>
+            <li><a href="/#get-involved">Discuss and Contribute</a></li>
+          </ul>
+          <h2>Bundler Commands</h2>
+          <ul>
+            <li><a href="/v1.3/bundle_install.html">bundle install</a></li>
+            <li><a href="/v1.3/bundle_update.html">bundle update</a></li>
+            <div class='buttons'>
+              <a href="/v1.3/commands.html">View all commands</a>
             </div>
-            <pre class='sunburst'>$ bundle install --without development test</pre>
-            <a href="/groups.html">Learn More: Groups</a>
-          </div>
-          <div class='bullet' id='deployment'>
-            <div class='description'>
-              Install all dependencies on to a production server.
-              Do <b>not</b> use this flag on a development machine.
-            </div>
-            <pre class='sunburst'>$ bundle install --deployment</pre>
-            <div class='notes'>
-              <p>
-                The <code>--deployment</code> flag activates a number of deployment-friendly
-                conventions:
-              </p>
-              <ul>
-                <li>Isolate all gems into <code>vendor/bundle</code></li>
-                <li>Require an up-to-date <code>Gemfile.lock</code></li>
-                <li>
-                  If <code>bundle package</code> was run, do not fetch gems
-                  from rubygems.org. Instead, only use gems in the checked
-                  in <code>vendor/cache</code>
-                </li>
-              </ul>
-            </div>
-            <a href="/deploying.html">Learn More: Deploying</a>
-          </div>
-          <div class='bullet' id='binstubs'>
-            <div class='description'>
-              (Example with --binstubs TBD)
-            </div>
-          </div>
-          <div class='bullet' id='clean'>
-            <div class='description'>
-              (Example with --clean TBD)
-            </div>
-          </div>
-          <div class='bullet' id='frozen'>
-            <div class='description'>
-              (Example with --frozen TBD)
-            </div>
-          </div>
-          <div class='bullet' id='full-index'>
-            <div class='description'>
-              (Example with --full-index TBD)
-            </div>
-          </div>
-          <div class='bullet' id='gemfile'>
-            <div class='description'>
-              (Example with --gemfile TBD)
-            </div>
-          </div>
-          <div class='bullet' id='local'>
-            <div class='description'>
-              (Example with --local TBD)
-            </div>
-          </div>
-          <div class='bullet' id='no-cache'>
-            <div class='description'>
-              (Example with --no-cache TBD)
-            </div>
-          </div>
-          <div class='bullet' id='no-prune'>
-            <div class='description'>
-              (Example with --no-prune TBD)
-            </div>
-          </div>
-          <div class='bullet' id='quiet'>
-            <div class='description'>
-              (Example with --quiet TBD)
-            </div>
-          </div>
-          <div class='bullet' id='shebang'>
-            <div class='description'>
-              (Example with --shebang TBD)
-            </div>
-          </div>
-          <div class='bullet' id='standalone'>
-            <div class='description'>
-              (Example with --standalone TBD)
-            </div>
-          </div>
-          <div class='bullet' id='system'>
-            <div class='description'>
-              (Example with --system TBD)
-            </div>
-          </div>
+          </ul>
+          <h2>Usage</h2>
+          <ul>
+            <li><a href="/v1.3/gemfile.html">Gemfile</a></li>
+            <li><a href="/v1.3/git.html">Gems from git</a></li>
+            <li><a href="/v1.3/groups.html">Grouping</a></li>
+            <li><a href="/v1.3/bundler_setup.html">Bundler.setup</a></li>
+            <li><a href="/v1.3/deploying.html">Deploying</a></li>
+          </ul>
+          <h2>Use Bundler with</h2>
+          <ul>
+            <li><a href="/v1.3/rails3.html">Rails 3</a></li>
+            <li><a href="/v1.3/rails23.html">Rails 2.3</a></li>
+            <li><a href="/v1.3/sinatra.html">Sinatra</a></li>
+            <li><a href="/v1.3/rubygems.html">Rubygems</a></li>
+            <li><a href="/v1.3/rubymotion.html">RubyMotion</a></li>
+          </ul>
         </div>
       </div>
     </div>
