@@ -57,6 +57,19 @@ module Bundler
       end
     end
 
+    def with_clean_git_env(&block)
+      keys    = %w[GIT_DIR GIT_WORK_TREE]
+      old_env = keys.inject({}) do |h, k|
+        h.update(k => ENV[k])
+      end
+
+      keys.each {|key| ENV.delete(key) }
+
+      block.call
+    ensure
+      keys.each {|key| ENV[key] = old_env[key] }
+    end
+
   private
 
     def find_gemfile

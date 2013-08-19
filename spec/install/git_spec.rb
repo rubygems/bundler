@@ -853,6 +853,48 @@ describe "bundle install with git sources" do
       R
       expect(out).to eq("YES")
     end
+
+    it "does not prompt to gem install if extension fails" do
+      build_git "foo" do |s|
+        s.add_dependency "rake"
+        s.extensions << "Rakefile"
+        s.write "Rakefile", <<-RUBY
+          task :default do
+            raise
+          end
+        RUBY
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "foo", :git => "#{lib_path('foo-1.0')}"
+      G
+
+      expect(out).to include("An error occurred while installing foo (1.0)")
+      expect(out).not_to include("gem install foo")
+    end
+  end
+
+  it 'ignores git environment variables' do
+    build_git "xxxxxx" do |s|
+      s.executables = "xxxxxxbar"
+    end
+
+    Bundler::SharedHelpers.with_clean_git_env do
+      ENV['GIT_DIR']       = 'bar'
+      ENV['GIT_WORK_TREE'] = 'bar'
+
+      result = install_gemfile <<-G, :exitstatus => true
+        source "file://#{gem_repo1}"
+        git "#{lib_path('xxxxxx-1.0')}" do
+          gem 'xxxxxx'
+        end
+      G
+
+      expect(exitstatus).to eq(0)
+      expect(ENV['GIT_DIR']).to eq('bar')
+      expect(ENV['GIT_WORK_TREE']).to eq('bar')
+    end
   end
 
 end
