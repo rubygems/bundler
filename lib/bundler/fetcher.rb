@@ -217,7 +217,7 @@ module Bundler
       begin
         Bundler.ui.debug "Fetching from: #{uri}"
         req = Net::HTTP::Get.new uri.request_uri
-        req.basic_auth(uri.user, uri.password) if uri.user && uri.password
+        req.basic_auth(uri.user, uri.password) if uri.user
         if defined?(Net::HTTP::Persistent)
           response = @connection.request(uri, req)
         else
