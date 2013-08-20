@@ -1,35 +1,35 @@
-/* line 43, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+/* line 43, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
 a {
   text-decoration: none;
   color: #0e3f54; }
-  /* line 26, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 26, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   a:hover {
     border-bottom: 1px solid; }
-  /* line 45, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 45, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   a.image {
     text-decoration: none;
     border: none; }
 
-/* line 49, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+/* line 49, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
 #standalone {
   line-height: 150%; }
-  /* line 52, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 52, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   #standalone code {
     background-color: rgba(0, 0, 0, 0.1); }
-  /* line 55, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 55, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   #standalone h1 {
     margin-top: 40px;
     margin-bottom: 10px;
     line-height: 125%; }
 
-/* line 60, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+/* line 60, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
 html {
   width: 100%;
   background-color: #c6e7ec;
   padding-top: 10px;
   font-family: Helvetica, sans-serif; }
 
-/* line 66, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+/* line 66, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
 code {
   font-family: monospace;
   font-size: 120%;
@@ -41,11 +41,11 @@ code {
   -o-border-radius: 3px;
   border-radius: 3px; }
 
-/* line 73, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+/* line 73, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
 .intro {
   width: 100%; }
 
-/* line 76, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+/* line 76, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
 #body {
   display: -webkit-box;
   display: -moz-box;
@@ -55,7 +55,7 @@ code {
   -moz-box-align: center;
   width: 100%; }
 
-/* line 80, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+/* line 80, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
 #container {
   display: -webkit-box;
   display: -moz-box;
@@ -64,7 +64,7 @@ code {
   -webkit-box-align: left;
   -moz-box-align: left; }
 
-/* line 83, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+/* line 83, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
 #contents {
   display: -webkit-box;
   display: -moz-box;
@@ -76,7 +76,7 @@ code {
   position: relative;
   padding: 0 15px; }
 
-/* line 89, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+/* line 89, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
 #sidebar {
   display: -webkit-box;
   display: -moz-box;
@@ -88,15 +88,15 @@ code {
   margin-top: 23.5px;
   padding: 0 15px;
   text-align: left; }
-  /* line 97, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 97, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   #sidebar .buttons a {
     margin-left: 0; }
-  /* line 100, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 100, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   #sidebar h2 {
     font-size: 16px;
     border-bottom: none;
     margin: -5px; }
-  /* line 105, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 105, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   #sidebar ul {
     background-color: rgba(0, 0, 0, 0.1);
     -webkit-border-radius: 5px;
@@ -106,11 +106,11 @@ code {
     border-radius: 5px;
     list-style: none;
     padding: 10px; }
-  /* line 111, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 111, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   #sidebar li {
     padding: 5px; }
 
-/* line 124, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+/* line 124, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
 #intro {
   background: rgba(0, 0, 0, 0.1);
   -webkit-border-radius: 5px;
@@ -122,23 +122,23 @@ code {
   color: #043042;
   font-size: 18px;
   line-height: 24px; }
-  /* line 121, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 121, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   #intro strong {
     color: #041f2a; }
 
-/* line 127, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+/* line 127, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
 #header {
   margin-bottom: 20px;
   height: 100%;
   clear: both; }
-  /* line 131, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 131, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   #header h1 {
     font-size: 22px;
     text-align: right;
     padding-right: 43px;
     color: #346b8c; }
 
-/* line 137, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+/* line 137, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
 #footer {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -155,29 +155,29 @@ code {
   background-color: rgba(0, 0, 0, 0.1);
   width: 100%;
   margin-top: 25px; }
-  /* line 146, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 146, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   #footer img:first-child {
     -webkit-box-shadow: blue, 0, 0, 5px;
     -moz-box-shadow: blue, 0, 0, 5px;
     box-shadow: blue, 0, 0, 5px;
     margin-right: 10px; }
-  /* line 150, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 150, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   #footer img:nth-child(2) {
     -webkit-box-shadow: blue, 0, 0, 5px;
     -moz-box-shadow: blue, 0, 0, 5px;
     box-shadow: blue, 0, 0, 5px; }
-  /* line 153, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 153, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   #footer img:last-child {
     margin-top: -20px;
     margin-right: -20px; }
-  /* line 157, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 157, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   #footer .spacer {
     -webkit-box-flex: 1;
     -moz-box-flex: 1; }
-  /* line 160, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 160, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   #footer img {
     display: block; }
-  /* line 163, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 163, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   #footer #navigation {
     display: -webkit-box;
     display: -moz-box;
@@ -185,25 +185,25 @@ code {
     -moz-box-orient: vertical;
     -webkit-box-align: center;
     -moz-box-align: center; }
-    /* line 166, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+    /* line 166, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
     #footer #navigation p {
       font-family: Helvetica, sans-serif;
       color: #336666;
       font-size: 16px;
       margin: 0; }
-      /* line 171, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+      /* line 171, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
       #footer #navigation p a {
         text-decoration: none;
         color: #0e3f54; }
-        /* line 26, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+        /* line 26, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
         #footer #navigation p a:hover {
           border-bottom: 1px solid; }
 
-/* line 174, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+/* line 174, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
 .contents {
   width: 725px; }
 
-/* line 177, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+/* line 177, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
 h2 {
   font-size: 20px;
   padding: 5px;
@@ -215,7 +215,7 @@ h2 {
   -moz-box-sizing: border-box;
   box-sizing: border-box; }
 
-/* line 186, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+/* line 186, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
 .buttons {
   display: -webkit-box;
   display: -moz-box;
@@ -225,7 +225,7 @@ h2 {
   -moz-box-align: center;
   -webkit-box-pack: justify;
   -moz-box-pack: justify; }
-  /* line 190, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 190, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   .buttons a {
     padding-top: 8px;
     padding-bottom: 5px;
@@ -247,7 +247,7 @@ h2 {
     margin: 10px;
     -webkit-box-flex: 1;
     -moz-box-flex: 1; }
-    /* line 39, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+    /* line 39, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
     .buttons a:hover {
       background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #4e9326), color-stop(100%, #35641a));
       background-image: -webkit-linear-gradient(#4e9326, #35641a);
@@ -255,11 +255,11 @@ h2 {
       background-image: -o-linear-gradient(#4e9326, #35641a);
       background-image: linear-gradient(#4e9326, #35641a);
       border-bottom: none; }
-    /* line 194, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+    /* line 194, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
     .buttons a:last-child {
       margin-right: 0; }
 
-/* line 197, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+/* line 197, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
 .notes, .shirts {
   font-size: 90%;
   line-height: 150%;
@@ -268,21 +268,21 @@ h2 {
   padding-right: 4px;
   padding-left: 4px;
   color: #006666; }
-  /* line 205, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 205, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   .notes + a, .shirts + a {
     margin-top: 10px; }
-  /* line 207, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 207, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   .notes + pre, .shirts + pre {
     margin-top: 10px; }
-  /* line 209, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 209, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   .notes + .description, .shirts + .description {
     margin-top: 20px; }
 
-/* line 213, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+/* line 213, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
 .sunburst + .description {
   margin-top: 15px; }
 
-/* line 216, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+/* line 216, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
 .bullet {
   width: 100%;
   padding: 5px 15px 15px 15px;
@@ -295,14 +295,14 @@ h2 {
   -moz-box-orient: vertical;
   -webkit-box-align: justify;
   -moz-box-align: justify; }
-  /* line 222, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 222, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   .bullet .description {
     width: 100%;
     margin-right: 16px;
     color: #003333;
     line-height: 24px;
     margin-bottom: 8px; }
-  /* line 229, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 229, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   .bullet a {
     padding-top: 8px;
     padding-bottom: 5px;
@@ -322,7 +322,7 @@ h2 {
     -o-border-radius: 5px;
     border-radius: 5px;
     margin: 15px 0 0 450px; }
-    /* line 39, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+    /* line 39, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
     .bullet a:hover {
       background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #4e9326), color-stop(100%, #35641a));
       background-image: -webkit-linear-gradient(#4e9326, #35641a);
@@ -330,7 +330,7 @@ h2 {
       background-image: -o-linear-gradient(#4e9326, #35641a);
       background-image: linear-gradient(#4e9326, #35641a);
       border-bottom: none; }
-  /* line 233, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 233, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   .bullet .how {
     display: -webkit-box;
     display: -moz-box;
@@ -341,16 +341,16 @@ h2 {
     -webkit-box-flex: 1;
     -moz-box-flex: 1;
     line-height: 24px; }
-  /* line 238, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 238, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   .bullet pre {
     -webkit-box-flex: 1;
     -moz-box-flex: 1;
     margin: 0; }
-  /* line 242, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 242, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   .bullet code {
     background-color: rgba(0, 0, 0, 0.1); }
 
-/* line 245, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+/* line 245, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
 pre {
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
@@ -358,34 +358,34 @@ pre {
   -o-border-radius: 5px;
   border-radius: 5px; }
 
-/* line 248, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+/* line 248, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
 .bullet:nth-child(even) {
   background-color: rgba(0, 0, 0, 0.1);
   border-top: 1px solid rgba(0, 0, 0, 0.1);
   border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
 
-/* line 253, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+/* line 253, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
 .bullet:not(:nth-of-type(1)) {
   padding-top: 15px; }
 
-/* line 257, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+/* line 257, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
 #credits p {
   text-align: center;
   font-size: 11pt;
   color: #668493; }
-  /* line 261, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 261, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   #credits p a, #credits p a:visited {
     color: #2c596b;
     text-decoration: none; }
 
-/* line 266, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+/* line 266, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
 #github img {
   position: absolute;
   top: 0;
   right: 0;
   border: 0; }
 
-/* line 285, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+/* line 285, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
 #prod-versions {
   position: absolute;
   top: 0;
@@ -396,19 +396,19 @@ pre {
   -webkit-border-bottom-right-radius: 10px;
   border-bottom-right-radius: 10px;
   z-index: 1; }
-  /* line 279, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 279, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   #prod-versions a {
     text-decoration: none;
     color: #0e3f54;
     padding: 0.1em 0.25em; }
-    /* line 26, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+    /* line 26, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
     #prod-versions a:hover {
       border-bottom: 1px solid; }
-  /* line 282, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 282, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   #prod-versions a.current {
     font-weight: bold; }
 
-/* line 288, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+/* line 288, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
 #rc-versions {
   position: absolute;
   top: 0;
@@ -419,51 +419,51 @@ pre {
   -webkit-border-bottom-right-radius: 10px;
   border-bottom-right-radius: 10px;
   z-index: 0; }
-  /* line 279, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 279, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   #rc-versions a {
     text-decoration: none;
     color: #0e3f54;
     padding: 0.1em 0.25em; }
-    /* line 26, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+    /* line 26, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
     #rc-versions a:hover {
       border-bottom: 1px solid; }
-  /* line 282, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 282, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   #rc-versions a.current {
     font-weight: bold; }
 
-/* line 292, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+/* line 292, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
 #command_reference {
   padding-top: 20px; }
-  /* line 295, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 295, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   #command_reference th {
     text-align: left;
     height: 30px;
     padding-left: 5px; }
-  /* line 300, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 300, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   #command_reference td {
     vertical-align: top;
     padding: 20px 0 20px 5px; }
-    /* line 304, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+    /* line 304, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
     #command_reference td .cli_name {
       padding-top: 5px;
       width: 400px; }
-    /* line 308, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+    /* line 308, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
     #command_reference td .cli_desc {
       padding-top: 10px;
       width: 400px; }
-    /* line 312, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+    /* line 312, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
     #command_reference td .cli_option {
       margin: 5px 7px 15px 0px;
       float: left; }
-    /* line 316, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+    /* line 316, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
     #command_reference td .clear {
       clear: left; }
-  /* line 319, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 319, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   #command_reference tr:nth-child(even) {
     background-color: rgba(0, 0, 0, 0.1);
     border-top: 1px solid rgba(0, 0, 0, 0.1);
     border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
-  /* line 324, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 324, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   #command_reference a {
     padding-top: 8px;
     padding-bottom: 5px;
@@ -485,7 +485,7 @@ pre {
     padding: 8px 5px 5px 5px;
     margin: 5px 0 5px 0;
     display: inline; }
-    /* line 39, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+    /* line 39, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
     #command_reference a:hover {
       background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #4e9326), color-stop(100%, #35641a));
       background-image: -webkit-linear-gradient(#4e9326, #35641a);
@@ -494,38 +494,38 @@ pre {
       background-image: linear-gradient(#4e9326, #35641a);
       border-bottom: none; }
 
-/* line 330, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+/* line 330, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
 .shirts {
   text-align: center; }
-  /* line 334, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 334, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   .shirts a, .shirts a:visited {
     color: #05b5e6;
     text-decoration: none;
     font-weight: bold; }
 
-/* line 339, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+/* line 339, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
 .other-contributors {
   text-align: center; }
 
-/* line 342, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+/* line 342, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
 .contributor {
   clear: left;
   margin: 1em 0; }
-  /* line 346, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 346, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   .contributor .avatar {
     float: left;
     margin-right: 1.5em;
     width: 150px;
     min-height: 25px; }
-  /* line 352, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 352, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   .contributor h3 {
     color: #0e3f54; }
-  /* line 355, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 355, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   .contributor h4 {
     font-size: 80%;
     color: #124f6a;
     margin-top: -1em; }
-  /* line 360, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  /* line 360, /Users/jlsuttles/Projects/bundler/bundler-site/source/stylesheets/application.sass */
   .contributor p {
     margin-left: 150px;
     padding-left: 1.5em; }

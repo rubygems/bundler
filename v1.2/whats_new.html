@@ -32,13 +32,13 @@
               <div class='description'>
                 You can now specify the version of Ruby in the <code>Gemfile</code> like the following:
               </div>
-              <pre class="sunburst">ruby <span class="String"><span class="String">&#39;</span>1.9.3<span class="String">&#39;</span></span>&#x000A;</pre>
+              <pre class="sunburst">ruby <span class="String"><span class="String">'</span>1.9.3<span class="String">'</span></span>&#x000A;</pre>
             </div>
             <div class='bullet'>
               <div class='description'>
                 That line declares that this application has a dependency on the Ruby VM that is ABI-compatible with 1.9.3. If the version check does not match, Bundler will raise an exception. This will ensure the running code matches. You can be more specific with the <code>:engine</code> and <code>:engine_version</code> options.
               </div>
-              <pre class="sunburst">ruby <span class="String"><span class="String">&#39;</span>1.9.3<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>engine</span> =&gt; <span class="String"><span class="String">&#39;</span>jruby<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>engine_version</span> =&gt; <span class="String"><span class="String">&#39;</span>1.6.7<span class="String">&#39;</span></span>&#x000A;</pre>
+              <pre class="sunburst">ruby <span class="String"><span class="String">'</span>1.9.3<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>engine</span> =&gt; <span class="String"><span class="String">'</span>jruby<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>engine_version</span> =&gt; <span class="String"><span class="String">'</span>1.6.7<span class="String">'</span></span>&#x000A;</pre>
               <a href="/v1.2/gemfile_ruby.html">Learn More: Ruby Directive</a>
             </div>
           </div>
@@ -71,7 +71,7 @@
               <div class='description'>
                 and in your <code>Gemfile</code> you would set:
               </div>
-              <pre class="sunburst">gem <span class="String"><span class="String">&#39;</span>rack<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>github</span> =&gt; <span class="String"><span class="String">&#39;</span>rack/rack<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>branch</span> =&gt; <span class="String"><span class="String">&#39;</span>master<span class="String">&#39;</span></span>&#x000A;</pre>
+              <pre class="sunburst">gem <span class="String"><span class="String">'</span>rack<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>github</span> =&gt; <span class="String"><span class="String">'</span>rack/rack<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>branch</span> =&gt; <span class="String"><span class="String">'</span>master<span class="String">'</span></span>&#x000A;</pre>
               <div class='description'>
                 You'll need to reference a git branch, since Bundler will do checks to
                 ensure you don't work with invalid references. If the branch specified in
@@ -83,40 +83,6 @@
               <a href="/v1.2/git.html#local">Learn More: Git</a>
             </div>
           </div>
-        </div>
-        <div id='sidebar'>
-          <h2>Would you like to</h2>
-          <ul>
-            <li><a href="/#getting-started">Get started</a></li>
-            <li><a href="https://github.com/bundler/bundler/blob/master/ISSUES.md">Report a bug</a></li>
-            <li><a href="/v1.3/whats_new.html">See what's new</a></li>
-            <li><a href="/v1.3/man/bundle.1.html">Read documentation</a></li>
-            <li><a href="/#get-involved">Discuss and Contribute</a></li>
-          </ul>
-          <h2>Bundler Commands</h2>
-          <ul>
-            <li><a href="/v1.3/bundle_install.html">bundle install</a></li>
-            <li><a href="/v1.3/bundle_update.html">bundle update</a></li>
-            <div class='buttons'>
-              <a href="/v1.3/commands.html">View all commands</a>
-            </div>
-          </ul>
-          <h2>Usage</h2>
-          <ul>
-            <li><a href="/v1.3/gemfile.html">Gemfile</a></li>
-            <li><a href="/v1.3/git.html">Gems from git</a></li>
-            <li><a href="/v1.3/groups.html">Grouping</a></li>
-            <li><a href="/v1.3/bundler_setup.html">Bundler.setup</a></li>
-            <li><a href="/v1.3/deploying.html">Deploying</a></li>
-          </ul>
-          <h2>Use Bundler with</h2>
-          <ul>
-            <li><a href="/v1.3/rails3.html">Rails 3</a></li>
-            <li><a href="/v1.3/rails23.html">Rails 2.3</a></li>
-            <li><a href="/v1.3/sinatra.html">Sinatra</a></li>
-            <li><a href="/v1.3/rubygems.html">Rubygems</a></li>
-            <li><a href="/v1.3/rubymotion.html">RubyMotion</a></li>
-          </ul>
         </div>
       </div>
     </div>
