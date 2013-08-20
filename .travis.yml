@@ -1,6 +1,6 @@
 language: ruby
 script: rake spec:travis
-before_script: rake spec:travis:deps
+before_script: travis_retry rake spec:travis:deps
 branches:
   only:
     - master
