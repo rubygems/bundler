@@ -86,5 +86,9 @@ module Spec
     def not_local_ruby_version
       "1.12"
     end
+
+    def not_local_patchlevel
+      9999
+    end
   end
 end
