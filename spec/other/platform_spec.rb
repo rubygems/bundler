@@ -578,9 +578,9 @@ G
     it "fails if the engine version doesn't match" do
       simulate_ruby_engine "jruby" do
         gemfile <<-G
-        gem 'rack'
+          gem 'rack'
 
-        #{engine_version_incorrect}
+          #{engine_version_incorrect}
         G
 
         bundle :cache, :exitstatus => true
@@ -647,9 +647,9 @@ G
     it "fails if the engine version doesn't match" do
       simulate_ruby_engine "jruby" do
         gemfile <<-G
-        gem 'rack'
+          gem 'rack'
 
-        #{engine_version_incorrect}
+          #{engine_version_incorrect}
         G
 
         bundle :pack, :exitstatus => true
