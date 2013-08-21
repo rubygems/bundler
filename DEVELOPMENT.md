@@ -70,7 +70,7 @@ Finally, the ticket may be a duplicate of another older ticket. If you notice a 
 
 If you would like to add a new feature to Bundler, please follow these steps:
 
-  1. [Create an issue](https://github.com/bundler/bundler/issues/new) to discuss your feature.
+  1. [Create an issue](https://github.com/bundler/bundler-features/issues/new) to discuss your feature.
   2. Base your commits on the master branch, since we follow [SemVer](http://semver.org) and don't add new features to old releases.
   3. Commit the code and at least one test covering your changes to a feature branch in your fork.
   4. Put a line in the [CHANGELOG](https://github.com/bundler/bundler/blob/master/CHANGELOG.md) summarizing your changes under the next release under the "Features" heading.
