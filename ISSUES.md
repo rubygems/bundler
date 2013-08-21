@@ -52,7 +52,16 @@ If the instructions don't work, or you can't find any instructions, you can try 
 
 ## Reporting unresolved problems
 
-Hopefully the troubleshooting steps above resolved your problem. If things still aren't working the way you expect them to, please let us know so that we can diagnose and hopefully fix the problem you're having. When you report a problem, please include the following information:
+Hopefully the troubleshooting steps above resolved your problem. If things still aren't working the way you expect them to, please let us know so that we can diagnose and hopefully fix the problem you're having.
+
+**The best way to report a bug is by providing a reproduction script.** See these examples:
+
+* [Git environment variables causing install to fail.](https://gist.github.com/xaviershay/6207550)
+* [Multiple gems in a repository cannot be updated independently.](https://gist.github.com/xaviershay/6295889)
+
+A half working script with comments for the parts you were unable to automate is still appreciated.
+
+If you are unable to do that, please include the following information in your report:
 
   - What you're trying to accomplish
   - The command you ran
