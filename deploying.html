@@ -58,7 +58,7 @@
                 To pull in the Bundler Cap task, just add this to your
                 <code>deploy.rb</code> file:
               </div>
-              <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">'</span>bundler/capistrano<span class="String">'</span></span>&#x000A;</pre>
+              <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>bundler/capistrano<span class="String">&#39;</span></span>&#x000A;</pre>
               <div class='notes'>
                 That's it! Running <code>cap deploy</code> will now automatically run
                 <code>bundle install</code> on the remote server with deployment-friendly
@@ -72,7 +72,7 @@
                 There is a default Vlad task available. To make it available, add this line
                 to the Vlad <code>deploy.rb</code>.
               </div>
-              <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">'</span>bundler/vlad<span class="String">'</span></span>&#x000A;</pre>
+              <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>bundler/vlad<span class="String">&#39;</span></span>&#x000A;</pre>
               <div class='notes'>
                 Once you have done that, the <code>vlad:bundle:install</code> task will be
                 available for use. Make sure it is run as part of your deploy. For example:

@@ -39,13 +39,13 @@
               <div class='description'>
                 You can now specify the version of Ruby in the <code>Gemfile</code> like the following:
               </div>
-              <pre class="sunburst">ruby <span class="String"><span class="String">'</span>1.9.3<span class="String">'</span></span>&#x000A;</pre>
+              <pre class="sunburst">ruby <span class="String"><span class="String">&#39;</span>1.9.3<span class="String">&#39;</span></span>&#x000A;</pre>
             </div>
             <div class='bullet'>
               <div class='description'>
                 That line declares that this application has a dependency on the Ruby VM that is ABI-compatible with 1.9.3. If the version check does not match, Bundler will raise an exception. This will ensure the running code matches. You can be more specific with the <code>:engine</code> and <code>:engine_version</code> options.
               </div>
-              <pre class="sunburst">ruby <span class="String"><span class="String">'</span>1.9.3<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>engine</span> =&gt; <span class="String"><span class="String">'</span>jruby<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>engine_version</span> =&gt; <span class="String"><span class="String">'</span>1.6.7<span class="String">'</span></span>&#x000A;</pre>
+              <pre class="sunburst">ruby <span class="String"><span class="String">&#39;</span>1.9.3<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>engine</span> =&gt; <span class="String"><span class="String">&#39;</span>jruby<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>engine_version</span> =&gt; <span class="String"><span class="String">&#39;</span>1.6.7<span class="String">&#39;</span></span>&#x000A;</pre>
               <a href="/v1.2/gemfile_ruby.html">Learn More: Ruby Directive</a>
             </div>
           </div>
@@ -78,7 +78,7 @@
               <div class='description'>
                 and in your <code>Gemfile</code> you would set:
               </div>
-              <pre class="sunburst">gem <span class="String"><span class="String">'</span>rack<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>github</span> =&gt; <span class="String"><span class="String">'</span>rack/rack<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>branch</span> =&gt; <span class="String"><span class="String">'</span>master<span class="String">'</span></span>&#x000A;</pre>
+              <pre class="sunburst">gem <span class="String"><span class="String">&#39;</span>rack<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>github</span> =&gt; <span class="String"><span class="String">&#39;</span>rack/rack<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>branch</span> =&gt; <span class="String"><span class="String">&#39;</span>master<span class="String">&#39;</span></span>&#x000A;</pre>
               <div class='description'>
                 You'll need to reference a git branch, since Bundler will do checks to
                 ensure you don't work with invalid references. If the branch specified in
