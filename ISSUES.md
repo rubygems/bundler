@@ -63,24 +63,24 @@ A half working script with comments for the parts you were unable to automate is
 
 If you are unable to do that, please include the following information in your report:
 
-  - What you're trying to accomplish
-  - The command you ran
-  - What you expected to happen
-  - What actually happened
-  - The exception backtrace(s), if any
-  - Everything output by running `bundle env`
+ - What you're trying to accomplish
+ - The command you ran
+ - What you expected to happen
+ - What actually happened
+ - The exception backtrace(s), if any
+ - Everything output by running `bundle env`
 
 If your version of Bundler does not have the `bundle env` command, then please include:
 
-  - Your Gemfile
-  - Your Gemfile.lock
-  - Your Bundler configuration settings (run `bundle config`)
-  - What version of bundler you are using (run `bundle -v`)
-  - What version of Ruby you are using (run `ruby -v`)
-  - What version of Rubygems you are using (run `gem -v`)
-  - Whether you are using RVM, and if so what version (run `rvm -v`)
-  - Whether you have the `rubygems-bundler` gem, which can break gem executables (run `gem list rubygems-bundler`)
-  - Whether you have the `open_gem` gem, which can cause rake activation conflicts (run `gem list open_gem`)
+ - Your Gemfile
+ - Your Gemfile.lock
+ - Your Bundler configuration settings (run `bundle config`)
+ - What version of bundler you are using (run `bundle -v`)
+ - What version of Ruby you are using (run `ruby -v`)
+ - What version of Rubygems you are using (run `gem -v`)
+ - Whether you are using RVM, and if so what version (run `rvm -v`)
+ - Whether you have the `rubygems-bundler` gem, which can break gem executables (run `gem list rubygems-bundler`)
+ - Whether you have the `open_gem` gem, which can cause rake activation conflicts (run `gem list open_gem`)
 
 If you are using Rails 2.3, please also include:
 
