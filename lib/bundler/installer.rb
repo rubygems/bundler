@@ -89,8 +89,7 @@ module Bundler
       # the gem.
       Installer.post_install_messages = {}
 
-      size = options[:jobs] || 1
-      size = [size, 1].max
+      size = [options[:jobs].to_i, 1].max
 
       if size > 1 && can_install_parallely?
         install_in_parallel size, options[:standalone]
