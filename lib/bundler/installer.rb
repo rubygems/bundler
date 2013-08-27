@@ -107,10 +107,14 @@ module Bundler
       Bundler::Fetcher.fetch(spec) if spec.source.is_a?(Bundler::Source::Rubygems)
 
       # Fetch the build settings, if there are any
-      settings = Bundler.settings["build.#{spec.name}"]
-      message = nil
+      settings             = Bundler.settings["build.#{spec.name}"]
+      install_message      = nil
+      post_install_message = nil
+      debug_message        = nil
       Bundler.rubygems.with_build_args [settings] do
-        message = spec.source.install(spec)
+        install_message, post_install_message, debug_message = spec.source.install(spec)
+        Bundler.ui.info install_message
+        Bundler.ui.debug debug_message if debug_message
         Bundler.ui.debug "  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
       end
 
@@ -121,7 +125,7 @@ module Bundler
       end
 
       FileUtils.rm_rf(Bundler.tmp)
-      message
+      post_install_message
     rescue Exception => e
       # if install hook failed or gem signature is bad, just die
       raise e if e.is_a?(Bundler::InstallHookError) || e.is_a?(Bundler::SecurityError)

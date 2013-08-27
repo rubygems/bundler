@@ -70,9 +70,8 @@ module Bundler
       end
 
       def install(spec)
-        Bundler.ui.info "Using #{spec.name} (#{spec.version}) from #{to_s}"
         generate_bin(spec, :disable_extensions)
-        nil
+        ["Using #{spec.name} (#{spec.version}) from #{to_s}", nil]
       end
 
       def cache(spec)
