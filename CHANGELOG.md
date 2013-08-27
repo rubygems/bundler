@@ -3,6 +3,15 @@
 Features:
 
   - add support for the x64-mingw32 platform (#2356, #2590, @larskanis)
+  - add :patchlevel option to ruby DSL
+  - add `bundler` bin (#2598, @kirs)
+  - friendly ambiguous error messages (#2581, #2550, @jlsuttles, @jendiamond, @joyicecloud)
+
+Bugfixes:
+
+  - allow passwordless Basic Auth (#2606, @rykov)
+  - don't suggest `gem install foo` when `foo` is a git gem that fails (@kirs)
+  - revert #2569, going back to git instead of https for :github gems
 
 ## 1.4.0.pre.1 (2013-08-04)
 
