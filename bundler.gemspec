@@ -23,6 +23,6 @@ Gem::Specification.new do |spec|
   spec.files      += Dir.glob('lib/bundler/man/**/*') # man/ is ignored by git
   spec.test_files  = spec.files.grep(%r{^spec/})
 
-  spec.executables   = %w(bundle)
+  spec.executables   = %w(bundle bundler)
   spec.require_paths = ["lib"]
 end
