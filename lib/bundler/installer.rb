@@ -101,7 +101,7 @@ module Bundler
       generate_standalone(options[:standalone]) if options[:standalone]
     end
 
-    def install_gem_from_spec(spec, standalone = false)
+    def install_gem_from_spec(spec, standalone = false, worker = 0)
       # Download the gem to get the spec, because some specs that are returned
       # by rubygems.org are broken and wrong.
       Bundler::Fetcher.fetch(spec) if spec.source.is_a?(Bundler::Source::Rubygems)
@@ -115,7 +115,7 @@ module Bundler
         install_message, post_install_message, debug_message = spec.source.install(spec)
         Bundler.ui.info install_message
         Bundler.ui.debug debug_message if debug_message
-        Bundler.ui.debug "  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
+        Bundler.ui.debug "#{worker}:  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
       end
 
       if Bundler.settings[:bin] && standalone
@@ -263,7 +263,7 @@ module Bundler
 
     def install_sequentially(standalone)
       specs.each do |spec|
-        message = install_gem_from_spec spec, standalone
+        message = install_gem_from_spec spec, standalone, 0
         if message
           Installer.post_install_messages[spec.name] = message
         end
@@ -279,9 +279,9 @@ module Bundler
         remains[spec.name] = true
       end
 
-      worker_pool = ParallelWorkers.worker_pool size, lambda { |name|
+      worker_pool = ParallelWorkers.worker_pool size, lambda { |name, worker|
         spec = name2spec[name]
-        message = install_gem_from_spec spec, standalone
+        message = install_gem_from_spec spec, standalone, worker
         { :name => spec.name, :post_install => message }
       }
       specs.each do |spec|

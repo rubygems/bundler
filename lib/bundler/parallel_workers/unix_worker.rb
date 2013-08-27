@@ -22,7 +22,7 @@ module Bundler
       # @param size [Integer] Size of worker pool
       # @param func [Proc] Job that should be executed in the worker
       def prepare_workers(size, func)
-        @workers = size.times.map do
+        @workers = size.times.map do |num|
           child_read, parent_write = IO.pipe
           parent_read, child_write = IO.pipe
 
@@ -33,7 +33,7 @@ module Bundler
 
               while !child_read.eof?
                 obj = Marshal.load child_read
-                Marshal.dump func.call(obj), child_write
+                Marshal.dump func.call(obj, num), child_write
               end
             rescue Exception => e
               begin
