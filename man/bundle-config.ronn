@@ -95,7 +95,7 @@ learn more about their operation in [bundle install(1)][bundle-install].
 * `ssl_ca_cert`:
   Path to a designated CA certificate file in PEM format.
 * `ssl_client_cert`:
-  Path to a designated X.509 client certificate in PEM format.
+  Path to a designated X.509 client certificate and key in PEM format.
 
 In general, you should set these settings per-application by using the applicable
 flag to the [bundle install(1)][bundle-install] command.
