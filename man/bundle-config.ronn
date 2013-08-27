@@ -92,10 +92,10 @@ learn more about their operation in [bundle install(1)][bundle-install].
   relative paths in the `Gemfile`, among other things. By default, bundler
   will search up from the current working directory until it finds a
   `Gemfile`.
-* `ssl_ca_cert`:
+* `ssl_ca_cert` (`BUNDLE_SSL_CA_CERT`):
   Path to a designated CA certificate file or folder containing multiple
   certificates for trusted CAs in PEM format.
-* `ssl_client_cert`:
+* `ssl_client_cert` (`BUNDLE_SSL_CLIENT_CERT`):
   Path to a designated file containing a X.509 client certificate
   and key in PEM format.
 
