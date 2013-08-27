@@ -193,3 +193,56 @@ describe "when a gem has no architecture" do
     should_be_installed "rcov 1.0.0"
   end
 end
+
+describe "bundle install --platform" do
+  it "pulls in the correct platform specific gem" do
+    lockfile <<-G
+      GEM
+        remote: file:#{gem_repo1}
+        specs:
+          platform_specific (1.0)
+          platform_specific (1.0-java)
+          platform_specific (1.0-x86-mswin32)
+
+      PLATFORMS
+        java
+
+      DEPENDENCIES
+        platform_specific
+    G
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "platform_specific"
+    G
+
+    bundle "install --platform jruby"
+    should_be_installed "platform_specific 1.0 JAVA"
+  end
+
+  it "works with gems that have different dependencies" do
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "nokogiri"
+    G
+
+    bundle "install --platform jruby"
+    should_be_installed "nokogiri 1.4.2 JAVA", "weakling 0.0.3"
+
+    simulate_new_machine
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "nokogiri"
+    G
+
+    bundle "install --platform ruby"
+    should_be_installed "nokogiri 1.4.2"
+    should_not_be_installed "weakling"
+  end
+
+end

@@ -47,6 +47,14 @@ module Bundler
         Bundler.settings[:frozen] = '1'
       end
 
+      if options[:platform]
+        Bundler.settings[:platform] = options[:platform]
+        unless Dependency.gem_platform(options[:platform].to_sym)
+          raise InvalidOption, "Unknown platform, available platforms are " \
+                             "#{(Dependency::PLATFORM_MAP.keys.collect {|p| p.to_s}).inspect}"
+        end
+      end
+
       # When install is called with --no-deployment, disable deployment mode
       if options[:deployment] == false
         Bundler.settings.delete(:frozen)

@@ -134,6 +134,8 @@ module Bundler
       "Use the rubygems modern index instead of the API endpoint"
     method_option "clean", :type => :boolean, :banner =>
       "Run bundle clean automatically after install"
+    method_option "platform", :type => :string, :banner =>
+      "Force the use of the specified platform instead of runtime detected platform"
     method_option "trust-policy", :alias => "P", :type => :string, :banner =>
       "Gem trust policy (like gem install -P). Must be one of " +
         Bundler.rubygems.security_policies.keys.join('|') unless
