@@ -105,7 +105,6 @@ module Bundler
             Bundler.sudo "cp -R #{Bundler.tmp}/bin/#{exe} #{Bundler.system_bindir}"
           end
         end
-        Bundler.ui.info "Installed #{spec.name} (#{spec.version})"
         installed_spec.loaded_from = "#{Bundler.rubygems.gem_dir}/specifications/#{spec.full_name}.gemspec"
         spec.loaded_from = "#{Bundler.rubygems.gem_dir}/specifications/#{spec.full_name}.gemspec"
         spec.post_install_message
