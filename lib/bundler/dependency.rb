@@ -43,6 +43,10 @@ module Bundler
       end
     end
 
+    def self.gem_platform(platform)
+      PLATFORM_MAP[platform]
+    end
+
     def gem_platforms(valid_platforms)
       return valid_platforms if @platforms.empty?
 
@@ -72,6 +76,10 @@ module Bundler
 
     def current_platform?
       return true if @platforms.empty?
+      if Bundler.settings[:platform]
+        current = Dependency.gem_platform(Bundler.settings[:platform].to_sym)
+        return @platforms.any? { |p| p == current }
+      end
       @platforms.any? { |p|
         Bundler.current_ruby.send("#{p}?")
       }

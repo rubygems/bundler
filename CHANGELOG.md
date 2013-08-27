@@ -6,6 +6,7 @@ Features:
   - add :patchlevel option to ruby DSL
   - add `bundler` bin (#2598, @kirs)
   - friendly ambiguous error messages (#2581, #2550, @jlsuttles, @jendiamond, @joyicecloud)
+  - add `bundle install --platform` to manually specify a platform (@Garoe)
 
 Bugfixes:
 
