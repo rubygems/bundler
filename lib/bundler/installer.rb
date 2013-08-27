@@ -84,15 +84,15 @@ module Bundler
           @definition.resolve_remotely!
       end
 
-      # Must install gems in the order that the resolver provides
-      # as dependencies might actually affect the installation of
-      # the gem.
       Installer.post_install_messages = {}
 
-      size = [options[:jobs].to_i, 1].max
-
-      if size > 1 && can_install_parallely?
-        install_in_parallel size, options[:standalone]
+      # the order that the resolver provides is significant, since
+      # dependencies might actually affect the installation of a gem.
+      # that said, it's a rare situation (other than rake), and parallel
+      # installation is just SO MUCH FASTER. so we let people opt in.
+      jobs = [options[:jobs].to_i, 1].max
+      if jobs > 1 && can_install_parallely?
+        install_in_parallel jobs, options[:standalone]
       else
         install_sequentially options[:standalone]
       end
@@ -123,7 +123,7 @@ module Bundler
       FileUtils.rm_rf(Bundler.tmp)
       message
     rescue Exception => e
-      # install hook failed
+      # if install hook failed or gem signature is bad, just die
       raise e if e.is_a?(Bundler::InstallHookError) || e.is_a?(Bundler::SecurityError)
 
       # other failure, likely a native extension build failure
