@@ -75,6 +75,10 @@ module Bundler
         @connection.verify_mode = (Bundler.settings[:ssl_verify_mode] ||
           OpenSSL::SSL::VERIFY_PEER)
         @connection.cert_store = bundler_cert_store
+        @connection.ca_file = Bundler.settings[:ssl_ca_cert]
+          if Bundler.settings[:ssl_ca_cert]
+        @connection.cert = Bundler.settings[:ssl_client_cert]
+          if Bundler.settings[:ssl_client_cert]
       else
         raise SSLError if @remote_uri.scheme == "https"
         @connection = Net::HTTP.new(@remote_uri.host, @remote_uri.port)
