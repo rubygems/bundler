@@ -17,7 +17,7 @@ module Bundler
 
     def initialize
       @source          = nil
-      @sources         = []
+      @sources         = SourceList.new
       @git_sources     = {}
       @dependencies    = []
       @groups          = []
@@ -25,10 +25,6 @@ module Bundler
       @env             = nil
       @ruby_version    = nil
       add_github_sources
-    end
-
-    def rubygems_source
-      @rubygems_source ||= Source::Rubygems.new
     end
 
     def eval_gemfile(gemfile, contents = nil)
@@ -115,30 +111,18 @@ module Bundler
       @dependencies << dep
     end
 
-    def source(source, options = {})
+    def source(source)
       case source
       when :gemcutter, :rubygems, :rubyforge then
         Bundler.ui.warn "The source :#{source} is deprecated because HTTP " \
           "requests are insecure.\nPlease change your source to 'https://" \
           "rubygems.org' if possible, or 'http://rubygems.org' if not."
-        rubygems_source.add_remote "http://rubygems.org"
-        return
+        @sources.add_rubygems_remote("http://rubygems.org")
       when String
-        rubygems_source.add_remote source
-        return
+        @sources.add_rubygems_remote(source)
       else
-        @source = source
-        if options[:prepend]
-          @sources = [@source] | @sources
-        else
-          @sources = @sources | [@source]
-        end
-
-        yield if block_given?
-        return @source
+        raise GemfileError, "Unknown source '#{source}'"
       end
-    ensure
-      @source = nil
     end
 
     def git_source(name, &block)
@@ -154,11 +138,11 @@ module Bundler
       @git_sources[name.to_s] = block
     end
 
-    def path(path, options = {}, source_options = {}, &blk)
-      source Source::Path.new(normalize_hash(options).merge("path" => Pathname.new(path))), source_options, &blk
+    def path(path, options = {}, &blk)
+      with_source(@sources.add_path_source(normalize_hash(options).merge("path" => Pathname.new(path))), &blk)
     end
 
-    def git(uri, options = {}, source_options = {}, &blk)
+    def git(uri, options = {}, &blk)
       unless block_given?
         msg = "You can no longer specify a git source by itself. Instead, \n" \
               "either use the :git option on a gem, or specify the gems that \n" \
@@ -170,11 +154,10 @@ module Bundler
         raise DeprecatedError, msg
       end
 
-      source Source::Git.new(normalize_hash(options).merge("uri" => uri)), source_options, &blk
+      with_source(@sources.add_git_source(normalize_hash(options).merge("uri" => uri)), &blk)
     end
 
     def to_definition(lockfile, unlock)
-      @sources << rubygems_source unless @sources.include?(rubygems_source)
       Definition.new(lockfile, @dependencies, @sources, unlock, @ruby_version)
     end
 
@@ -215,6 +198,16 @@ module Bundler
       end
 
       git_source(:gist){ |repo_name| "https://gist.github.com/#{repo_name}.git" }
+    end
+
+    def with_source(source)
+      if block_given?
+        @source = source
+        yield
+      end
+      source
+    ensure
+      @source = nil
     end
 
     def normalize_hash(opts)
@@ -272,7 +265,7 @@ module Bundler
           else
             options = opts.dup
           end
-          source = send(type, param, options, :prepend => true) {}
+          source = send(type, param, options) {}
           opts["source"] = source
         end
       end

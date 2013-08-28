@@ -39,7 +39,7 @@ module Bundler
     #
     # @param lockfile [Pathname] Path to Gemfile.lock
     # @param dependencies [Array(Bundler::Dependency)] array of dependencies from Gemfile
-    # @param sources [Array(Bundler::Source::Rubygems)]
+    # @param sources [Bundler::SourceList]
     # @param unlock [Hash, Boolean, nil] Gems that have been requested
     #   to be updated or true if all gems should be updated
     # @param ruby_version [Bundler::RubyVersion, nil] Requested Ruby Version
@@ -110,14 +110,14 @@ module Bundler
 
     def resolve_with_cache!
       raise "Specs already loaded" if @specs
-      @sources.each { |s| s.cached! }
+      sources.cached!
       specs
     end
 
     def resolve_remotely!
       raise "Specs already loaded" if @specs
       @remote = true
-      @sources.each { |s| s.remote! }
+      sources.remote!
       specs
     end
 
@@ -209,7 +209,7 @@ module Bundler
         dependency_names = @dependencies.dup || []
         dependency_names.map! {|d| d.name }
 
-        @sources.each do |s|
+        sources.all_sources.each do |s|
           if s.is_a?(Bundler::Source::Rubygems)
             s.dependency_names = dependency_names.uniq
             idx.add_source s.specs
@@ -226,21 +226,20 @@ module Bundler
     # spec, even if (say) a git gem is not checked out.
     def rubygems_index
       @rubygems_index ||= Index.build do |idx|
-        rubygems = @sources.find{|s| s.is_a?(Source::Rubygems) }
-        idx.add_source rubygems.specs
+        idx.add_source sources.rubygems_source.specs
       end
     end
 
     def has_rubygems_remotes?
-      @sources.any?{|s| s.is_a?(Source::Rubygems) && s.remotes.any? }
+      sources.rubygems_source.remotes.any?
     end
 
     def has_local_dependencies?
-      @sources.any? { |s| !s.is_a?(Source::Rubygems) }
+      !sources.path_sources.empty? || !sources.git_sources.empty?
     end
 
     def spec_git_paths
-      @sources.select {|s| s.is_a?(Bundler::Source::Git) }.map {|s| s.path.to_s }
+      sources.git_sources.map {|s| s.path.to_s }
     end
 
     def groups
@@ -272,7 +271,7 @@ module Bundler
     def to_lock
       out = ""
 
-      sorted_sources.each do |source|
+      sources.all_sources.each do |source|
         # Add the source header
         out << source.to_lock
         # Find all specs for this source
@@ -326,9 +325,10 @@ module Bundler
       deleted = []
       changed = []
 
-      if @locked_sources != @sources
-        new_sources = @sources - @locked_sources
-        deleted_sources = @locked_sources - @sources
+      gemfile_sources = sources.all_sources
+      if @locked_sources != gemfile_sources
+        new_sources = gemfile_sources - @locked_sources
+        deleted_sources = @locked_sources - gemfile_sources
 
         if new_sources.any?
           added.concat new_sources.map { |source| "* source: #{source}" }
@@ -450,8 +450,7 @@ module Bundler
     end
 
     def converge_paths
-      @sources.any? do |source|
-        next unless source.instance_of?(Source::Path)
+      sources.path_sources.any? do |source|
         specs_changed?(source) do |ls|
           ls.class == source.class && ls.path == source.path
         end
@@ -465,7 +464,7 @@ module Bundler
       locked_gem = @locked_sources.find { |s| s.kind_of?(Source::Rubygems) }
 
       # Get the Rubygems source from the Gemfile
-      actual_gem = @sources.find { |s| s.kind_of?(Source::Rubygems) }
+      actual_gem = sources.rubygems_source
 
       # If there is a Rubygems source in both
       if locked_gem && actual_gem
@@ -476,12 +475,11 @@ module Bundler
       # Replace the sources from the Gemfile with the sources from the Gemfile.lock,
       # if they exist in the Gemfile.lock and are `==`. If you can't find an equivalent
       # source in the Gemfile.lock, use the one from the Gemfile.
-      @sources.map! do |source|
-        @locked_sources.find { |s| s == source } || source
-      end
-      changes = changes | (Set.new(@sources) != Set.new(@locked_sources))
+      sources.replace_sources!(@locked_sources)
+      gemfile_sources = sources.all_sources
+      changes = changes | (Set.new(gemfile_sources) != Set.new(@locked_sources))
 
-      @sources.each do |source|
+      gemfile_sources.each do |source|
         # If the source is unlockable and the current command allows an unlock of
         # the source (for example, you are doing a `bundle update <foo>` of a git-pinned
         # gem), unlock it. For git sources, this means to unlock the revision, which
@@ -499,7 +497,7 @@ module Bundler
     def converge_dependencies
       (@dependencies + @locked_deps).each do |dep|
         if dep.source
-          dep.source = @sources.find { |s| dep.source == s }
+          dep.source = sources.get(dep.source)
         end
       end
       Set.new(@dependencies) != Set.new(@locked_deps)
@@ -533,7 +531,7 @@ module Bundler
 
       converged = []
       @locked_specs.each do |s|
-        s.source = @sources.find { |src| s.source == src }
+        s.source = sources.get(s.source)
 
         # Don't add a spec to the list if its source is expired. For example,
         # if you change a Git gem to Rubygems.
@@ -562,7 +560,7 @@ module Bundler
       diff    = @locked_specs.to_a - resolve.to_a
 
       # Now, we unlock any sources that do not have anymore gems pinned to it
-      @sources.each do |source|
+      sources.all_sources.each do |source|
         next unless source.respond_to?(:unlock!)
 
         unless resolve.any? { |s| s.source == source }
@@ -595,13 +593,6 @@ module Bundler
         end
       end
       deps
-    end
-
-    def sorted_sources
-      @sources.sort_by do |s|
-        # Place GEM at the top
-        [ s.is_a?(Source::Rubygems) ? 1 : 0, s.to_s ]
-      end
     end
 
     def requested_dependencies
