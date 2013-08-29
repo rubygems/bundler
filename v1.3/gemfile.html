@@ -11,9 +11,7 @@
   <body>
     <div id='body'>
       <div id='header'>
-                <a class="image" href="/"><img width="725" alt="The best way to manage your application's dependencies" src="/images/gembundler.png" />
-        </a>
-
+        <a class="image" href="/"><img width="725" alt="The best way to manage your application's dependencies" src="/images/gembundler.png" /></a>
       </div>
       <div id='container'>
         <div id='contents'>
@@ -33,14 +31,14 @@
               <div class='description'>
                 Gemfiles require at least one gem source, in the form of the URL for a Rubygems server. Generate a Gemfile with the default rubygems.org source by running <code>bundle init</code>. If you can, use <code>https</code> so your connection to the rubygems.org server will be verified with SSL.
               </div>
-              <pre class="sunburst">source <span class="String"><span class="String">&#39;</span>https://rubygems.org<span class="String">&#39;</span></span>&#x000A;</pre>
+              <pre class="sunburst">source <span class="String"><span class="String">'</span>https://rubygems.org<span class="String">'</span></span>&#x000A;</pre>
             </div>
             <div class='bullet'>
               <div class='description'>
                 Declare the gems that you need, including version numbers. Specify versions using the same
                 syntax that Rubygems supports for dependencies.
               </div>
-              <pre class="sunburst">gem <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rails<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>3.0.0.beta3<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rack<span class="String">&#39;</span></span>,  <span class="String"><span class="String">&#39;</span>&gt;=1.0<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>thin<span class="String">&#39;</span></span>,  <span class="String"><span class="String">&#39;</span>~&gt;1.1<span class="String">&#39;</span></span>&#x000A;</pre>
+              <pre class="sunburst">gem <span class="String"><span class="String">'</span>nokogiri<span class="String">'</span></span>&#x000A;gem <span class="String"><span class="String">'</span>rails<span class="String">'</span></span>, <span class="String"><span class="String">'</span>3.0.0.beta3<span class="String">'</span></span>&#x000A;gem <span class="String"><span class="String">'</span>rack<span class="String">'</span></span>,  <span class="String"><span class="String">'</span>&gt;=1.0<span class="String">'</span></span>&#x000A;gem <span class="String"><span class="String">'</span>thin<span class="String">'</span></span>,  <span class="String"><span class="String">'</span>~&gt;1.1<span class="String">'</span></span>&#x000A;</pre>
               <div class='notes'>
                 Most of the version specifiers, like <code>>= 1.0</code>, are self-explanatory.
                 The specifier <code>~></code> has a special meaning, best shown by example.
@@ -54,11 +52,11 @@
               <div class='description'>
                 If a gem's main file is different than the gem name, specify how to require it.
               </div>
-              <pre class="sunburst">gem <span class="String"><span class="String">&#39;</span>rspec<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>require</span> =&gt; <span class="String"><span class="String">&#39;</span>spec<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>sqlite3<span class="String">&#39;</span></span>&#x000A;</pre>
+              <pre class="sunburst">gem <span class="String"><span class="String">'</span>rspec<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>require</span> =&gt; <span class="String"><span class="String">'</span>spec<span class="String">'</span></span>&#x000A;gem <span class="String"><span class="String">'</span>sqlite3<span class="String">'</span></span>&#x000A;</pre>
               <div class='description'>
                 Specify <code>:require => false</code> to prevent bundler from requiring the gem, but still install it and maintain dependencies.
               </div>
-              <pre class="sunburst">gem <span class="String"><span class="String">&#39;</span>rspec<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>require</span> =&gt; <span class="Constant">false</span>&#x000A;gem <span class="String"><span class="String">&#39;</span>sqlite3<span class="String">&#39;</span></span>&#x000A;</pre>
+              <pre class="sunburst">gem <span class="String"><span class="String">'</span>rspec<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>require</span> =&gt; <span class="Constant">false</span>&#x000A;gem <span class="String"><span class="String">'</span>sqlite3<span class="String">'</span></span>&#x000A;</pre>
               <div class='notes'>
                 In order to require gems in your <code>Gemfile</code>, you will need to call
                 <code>Bundler.require</code> in your application.
@@ -71,7 +69,7 @@
                 more valid gems. Specify what to check out with <code>:tag</code>,
                 <code>:branch</code>, or <code>:ref</code>. The default is the <code>master</code> branch.
               </div>
-              <pre class="sunburst">gem <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>git</span> =&gt; <span class="String"><span class="String">&#39;</span>git://github.com/tenderlove/nokogiri.git<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>branch</span> =&gt; <span class="String"><span class="String">&#39;</span>1.4<span class="String">&#39;</span></span>&#x000A;</pre>
+              <pre class="sunburst">gem <span class="String"><span class="String">'</span>nokogiri<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>git</span> =&gt; <span class="String"><span class="String">'</span>git://github.com/tenderlove/nokogiri.git<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>branch</span> =&gt; <span class="String"><span class="String">'</span>1.4<span class="String">'</span></span>&#x000A;</pre>
               <div class='notes'>
                 If the git repository does not contain a <code>.gemspec</code> file, bundler
                 will create a simple one, without any dependencies, executables or C extensions.
@@ -84,26 +82,26 @@
               <div class='description'>
                 If you would like to use a unpacked gem directly from the filesystem, simply set the <code>:path</code> option to the path containing the the gem's files.
               </div>
-              <pre class="sunburst">gem <span class="String"><span class="String">&#39;</span>extracted_library<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>path</span> =&gt; <span class="String"><span class="String">&#39;</span>./vendor/extracted_library<span class="String">&#39;</span></span>&#x000A;</pre>
+              <pre class="sunburst">gem <span class="String"><span class="String">'</span>extracted_library<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>path</span> =&gt; <span class="String"><span class="String">'</span>./vendor/extracted_library<span class="String">'</span></span>&#x000A;</pre>
             </div>
             <div class='bullet'>
               <div class='description'>
                 Dependencies can be placed into groups. Groups can be ignored at install-time (using <code>--without</code>) or required all at once (using <code>Bundler.require</code>).
               </div>
-              <pre class="sunburst">gem <span class="String"><span class="String">&#39;</span>wirble<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>group</span> =&gt; <span class="Constant"><span class="Constant">:</span>development</span>&#x000A;gem <span class="String"><span class="String">&#39;</span>debugger<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>group</span> =&gt; [<span class="Constant"><span class="Constant">:</span>development</span>, <span class="Constant"><span class="Constant">:</span>test</span>]&#x000A;&#x000A;group <span class="Constant"><span class="Constant">:</span>test</span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">&#39;</span>rspec<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;</pre>
+              <pre class="sunburst">gem <span class="String"><span class="String">'</span>wirble<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>group</span> =&gt; <span class="Constant"><span class="Constant">:</span>development</span>&#x000A;gem <span class="String"><span class="String">'</span>debugger<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>group</span> =&gt; [<span class="Constant"><span class="Constant">:</span>development</span>, <span class="Constant"><span class="Constant">:</span>test</span>]&#x000A;&#x000A;group <span class="Constant"><span class="Constant">:</span>test</span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">'</span>rspec<span class="String">'</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;</pre>
               <a href="/v1.3/groups.html">Learn more: Groups</a>
             </div>
             <div class='bullet'>
               <div class='description'>
                 You can specify the required version of Ruby in the <code>Gemfile</code> with <code>ruby</code>. If the <code>Gemfile</code> is loaded on a different Ruby version, Bundler will raise an exception with an explanation.
               </div>
-              <pre class="sunburst">ruby <span class="String"><span class="String">&#39;</span>1.9.3<span class="String">&#39;</span></span>&#x000A;</pre>
+              <pre class="sunburst">ruby <span class="String"><span class="String">'</span>1.9.3<span class="String">'</span></span>&#x000A;</pre>
             </div>
             <div class='bullet'>
               <div class='description'>
                 What this means is that this app has a dependency to a Ruby VM that is ABI compatible with 1.9.3. If the version check does not match, Bundler will raise an exception. This will ensure the running code matches. You can be more specific with the <code>:engine</code> and <code>:engine_version</code> options.
               </div>
-              <pre class="sunburst">ruby <span class="String"><span class="String">&#39;</span>1.9.3<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>engine</span> =&gt; <span class="String"><span class="String">&#39;</span>jruby<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>engine_version</span> =&gt; <span class="String"><span class="String">&#39;</span>1.6.7<span class="String">&#39;</span></span>&#x000A;</pre>
+              <pre class="sunburst">ruby <span class="String"><span class="String">'</span>1.9.3<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>engine</span> =&gt; <span class="String"><span class="String">'</span>jruby<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>engine_version</span> =&gt; <span class="String"><span class="String">'</span>1.6.7<span class="String">'</span></span>&#x000A;</pre>
               <a href="/v1.3/gemfile_ruby.html">Learn More: Ruby Directive</a>
             </div>
           </div>
@@ -112,7 +110,7 @@
           <h2>Would you like to</h2>
           <ul>
             <li><a href="/#getting-started">Get started</a></li>
-            <li><a href="https://github.com/bundler/bundler/blob/master/ISSUES.md">Report a bug</a></li>
+            <li><a href="/issues.html">Report a bug</a></li>
             <li><a href="/v1.3/whats_new.html">See what's new</a></li>
             <li><a href="/v1.3/man/bundle.1.html">Read documentation</a></li>
             <li><a href="/#get-involved">Discuss and Contribute</a></li>
