@@ -4,7 +4,7 @@
 # Bundler will be activated after each new deployment.
 require 'bundler/deployment'
 
-if Gem::Version.new(Capistrano::Version).release >= Gem::Version.new("3.0")
+if defined?(Capistrano::Version) && Gem::Version.new(Capistrano::Version).release >= Gem::Version.new("3.0")
   raise "For Capistrano 3.x integration, please use http://github.com/capistrano/bundler"
 end
 
