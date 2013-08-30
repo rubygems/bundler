@@ -85,6 +85,8 @@ module Bundler
 
         def git(command, check_errors=true)
           if allow?
+            raise GitError, "You need to install git to be able to use gems from git repositories. For help installing git, please refer to GitHub's tutorial at https://help.github.com/articles/set-up-git" if !Bundler.git_present?
+
             out = SharedHelpers.with_clean_git_env { %x{git #{command}} }
 
             if check_errors && $?.exitstatus != 0

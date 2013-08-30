@@ -897,4 +897,18 @@ describe "bundle install with git sources" do
     end
   end
 
+  describe "without git installed" do
+    it "prints a better error message" do
+      build_git "foo"
+
+      install_gemfile <<-G
+        git "#{lib_path('foo-1.0')}" do
+          gem 'foo'
+        end
+      G
+
+      bundle "update", :env => {"PATH" => ""}
+      expect(out).to include("You need to install git to be able to use gems from git repositories. For help installing git, please refer to GitHub's tutorial at https://help.github.com/articles/set-up-git")
+    end
+  end
 end
