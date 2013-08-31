@@ -66,6 +66,11 @@ module Bundler
         return
       end
 
+      if Bundler.settings[:platform]
+        Bundler.ui.warn "Gems will be installed for platform #{Bundler.settings[:platform]}" \
+                        " instead of current platform #{Gem::Platform::local}"
+      end
+
       if Bundler.default_lockfile.exist? && !options["update"]
         local = Bundler.ui.silence do
           begin

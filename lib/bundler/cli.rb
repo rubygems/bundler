@@ -229,16 +229,11 @@ module Bundler
       end
 
       if opts[:platform]
-        if Dependency.gem_platform(opts[:platform].to_sym)
-          Bundler.settings[:platform] = opts[:platform]
-        else
+        Bundler.settings[:platform] = opts[:platform]
+        unless Dependency.gem_platform(opts[:platform].to_sym)
           raise InvalidOption, "Unknown platform, available platforms are " \
                              "#{(Dependency::PLATFORM_MAP.keys.collect {|p| p.to_s}).inspect}"
         end
-      else
-        #Reset settings[:platform] to nil because if the option was given
-        #in a previous call it was stored
-        Bundler.settings[:platform] = nil
       end
 
       # When install is called with --no-deployment, disable deployment mode
