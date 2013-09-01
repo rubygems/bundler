@@ -311,8 +311,7 @@ module Bundler
         Bundler.definition(true)
       else
         # cycle through the requested gems, just to make sure they exist
-        lock = Bundler.read_file(Bundler.default_lockfile)
-        names = LockfileParser.new(lock).specs.map{ |s| s.name }
+        names = Bundler.locked_gems.specs.map{ |s| s.name }
         gems.each do |g|
           next if names.include?(g)
           raise GemNotFound, not_found_message(g, names)
