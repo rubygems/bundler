@@ -18,6 +18,28 @@ describe "bundle console" do
     expect(out).to include("0.9.1")
   end
 
+  it "starts another REPL if configured as such" do
+    bundle "config console pry"
+
+    bundle "console" do |input|
+      input.puts("__callee__")
+      input.puts("exit")
+    end
+    expect(out).to include("pry")
+  end
+
+  it "falls back to IRB if the other REPL isn't available" do
+    bundle "config console pry"
+    # make sure pry isn't there
+
+    bundle "console" do |input|
+      input.puts("__callee__")
+      input.puts("exit")
+    end
+    expect(out).to include("irb")
+  end
+
+
   it "doesn't load any other groups" do
     bundle "console" do |input|
       input.puts("puts ACTIVESUPPORT")

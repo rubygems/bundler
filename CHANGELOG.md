@@ -1,3 +1,8 @@
+
+Features:
+
+  - add support for IRB alternatives such as Pry and Ripl (@joallard, @postmodern)
+
 ## 1.4.0.pre.2
 
 Features:
