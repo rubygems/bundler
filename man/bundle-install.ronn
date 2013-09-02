@@ -91,6 +91,7 @@ update process below under [CONSERVATIVE UPDATING][].
 
 * `--jobs=[<size>]`:
   Install gems parallely by starting <size> number of parallel workers.
+  This value may also be configured via $BUNDLE_JOBS.
 
 * `--no-cache`:
   Do not update the cache in `vendor/cache` with the newly bundled gems. This
