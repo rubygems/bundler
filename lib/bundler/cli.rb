@@ -234,17 +234,16 @@ module Bundler
 
       opts["no-cache"] ||= opts[:local]
 
-      # Can't use Bundler.settings for this because settings needs gemfile.dirname
       Bundler.settings[:path]     = nil if opts[:system]
       Bundler.settings[:path]     = "vendor/bundle" if opts[:deployment]
-      Bundler.settings[:path]     = opts[:path] if opts[:path]
-      Bundler.settings[:path]     ||= "bundle" if opts[:standalone]
+      Bundler.settings[:path]     = opts["path"] if opts["path"]
+      Bundler.settings[:path]     ||= "bundle" if opts["standalone"]
       Bundler.settings[:bin]      = opts["binstubs"] if opts["binstubs"]
       Bundler.settings[:bin]      = nil if opts["binstubs"] && opts["binstubs"].empty?
-      Bundler.settings[:shebang]  = opts["shebang"] if opts[:shebang]
+      Bundler.settings[:shebang]  = opts["shebang"] if opts["shebang"]
       Bundler.settings[:jobs]     = opts["jobs"] if opts["jobs"]
       Bundler.settings[:no_prune] = true if opts["no-prune"]
-      Bundler.settings[:clean]    = opts[:clean] if opts[:clean]
+      Bundler.settings[:clean]    = opts["clean"] if opts["clean"]
       Bundler.settings.without    = opts[:without]
       Bundler.ui.level            = "warn" if opts[:quiet]
       Bundler::Fetcher.disable_endpoint = opts["full-index"]
