@@ -242,6 +242,7 @@ module Bundler
       Bundler.settings[:bin]      = opts["binstubs"] if opts["binstubs"]
       Bundler.settings[:bin]      = nil if opts["binstubs"] && opts["binstubs"].empty?
       Bundler.settings[:shebang]  = opts["shebang"] if opts[:shebang]
+      Bundler.settings[:jobs]     = opts["jobs"] if opts["jobs"]
       Bundler.settings[:no_prune] = true if opts["no-prune"]
       Bundler.settings[:clean]    = opts[:clean] if opts[:clean]
       Bundler.settings.without    = opts[:without]
