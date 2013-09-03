@@ -16,7 +16,7 @@ module Bundler
             loop do
               obj = @request_queue.deq
               break if obj.equal? POISON
-              @response_queue.enq func.call(obj)
+              @response_queue.enq func.call(obj, i)
             end
           end
         end
