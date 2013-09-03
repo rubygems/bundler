@@ -16,7 +16,7 @@ module Bundler
               obj = @request_queue.deq
               break if obj.equal? POISON
               begin
-                @response_queue.enq func.call(obj)
+                @response_queue.enq func.call(obj, i)
               rescue Exception => e
                 @response_queue.enq(WrappedException.new(e))
               end
