@@ -1,5 +1,5 @@
 module Bundler
-  module Source
+  class Source
 
     class Git < Path
       # The GitProxy is responsible to iteract with git repositories.

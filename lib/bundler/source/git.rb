@@ -3,7 +3,7 @@ require 'uri'
 require 'digest/sha1'
 
 module Bundler
-  module Source
+  class Source
 
     class Git < Path
       autoload :GitProxy, 'bundler/source/git/git_proxy'
@@ -159,7 +159,7 @@ module Bundler
           @copied = true
         end
         generate_bin(spec)
-        ["Using #{spec.name} (#{spec.version}) from #{to_s}", nil, debug]
+        ["Using #{version_message(spec)} from #{to_s}", nil, debug]
       end
 
       def cache(spec)
