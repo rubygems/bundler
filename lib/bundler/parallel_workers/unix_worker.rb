@@ -9,7 +9,7 @@ module Bundler
         def work(obj)
           Marshal.dump obj, io_w
           Marshal.load io_r
-        rescue IOError
+        rescue IOError, Errno::EPIPE
           nil
         end
       end
