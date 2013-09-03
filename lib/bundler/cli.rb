@@ -232,6 +232,10 @@ module Bundler
         opts[:system] = true
       end
 
+      if opts[:jobs].nil? && ENV["BUNDLE_JOBS"]
+        opts[:jobs] = ENV["BUNDLE_JOBS"].to_i
+      end
+
       opts["no-cache"] ||= opts[:local]
 
       Bundler.settings[:path]     = nil if opts[:system]
