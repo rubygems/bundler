@@ -1,3 +1,5 @@
+require "bundler/match_platform"
+
 module Bundler
   # used for Creating Specifications from the Gemcutter Endpoint
   class EndpointSpecification < Gem::Specification
@@ -5,6 +7,7 @@ module Bundler
 
     attr_reader :name, :version, :platform, :dependencies
     attr_accessor :source, :source_uri
+    attr_accessor :required_ruby_version, :required_rubygems_version
 
     def initialize(name, version, platform, dependencies)
       @name         = name
@@ -20,48 +23,33 @@ module Bundler
     # needed for standalone, load required_paths from local gemspec
     # after the gem in installed
     def require_paths
-      if @remote_specification
-        @remote_specification.require_paths
-      elsif _local_specification
-        _local_specification.require_paths
-      else
-        super
-      end
+      __specification__ ? __specification__.require_paths : super
     end
 
     # needed for binstubs
     def executables
-      if @remote_specification
-        @remote_specification.executables
-      elsif _local_specification
-        _local_specification.executables
-      else
-        super
-      end
+      __specification__ ? __specification__.executables : super
     end
 
     # needed for bundle clean
     def bindir
-      if @remote_specification
-        @remote_specification.bindir
-      elsif _local_specification
-        _local_specification.bindir
-      else
-        super
-      end
+      __specification__ ? __specification__.bindir : super
     end
 
     # needed for post_install_messages during install
     def post_install_message
-      if @remote_specification
-        @remote_specification.post_install_message
-      elsif _local_specification
-        _local_specification.post_install_message
-      end
+      __specification__ && __specification__.post_install_message
     end
 
-    def _local_specification
-      eval(File.read(local_specification_path)) if @loaded_from && File.exists?(local_specification_path)
+    def __specification__
+      return @remote_specification if @remote_specification
+      return @specification if defined?(@specification)
+
+      if @loaded_from && File.exists?(local_specification_path)
+        @specification = Bundler.load_gemspec(local_specification_path)
+      else
+        @specification = nil
+      end
     end
 
     def __swap__(spec)
