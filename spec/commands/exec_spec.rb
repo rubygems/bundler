@@ -57,6 +57,37 @@ describe "bundle exec" do
     expect(out).to eq("--verbose")
   end
 
+  it "handles --keep-file-descriptors" do
+    require 'tempfile'
+
+    bundle_bin = File.expand_path('../../../bin/bundle', __FILE__)
+
+    command = Tempfile.new("io-test")
+    command.sync = true
+    command.write <<-G
+      if ARGV[0]
+        IO.for_fd(ARGV[0].to_i)
+      else
+        require 'tempfile'
+        io = Tempfile.new("io-test-fd")
+        args = %W[#{Gem.ruby} -I#{lib} #{bundle_bin} exec --keep-file-descriptors #{Gem.ruby} #{command.path} \#{io.to_i}]
+        args << { io.to_i => io } if RUBY_VERSION >= "2.0"
+        exec(*args)
+      end
+    G
+
+    install_gemfile ''
+    sys_exec("#{Gem.ruby} #{command.path}")
+    expect(out).to eq("")
+    expect(err).to eq("")
+  end
+
+  it "accepts --keep-file-descriptors" do
+    install_gemfile ''
+    bundle "exec --keep-file-descriptors echo foobar"
+    expect(out).to eq("foobar")
+  end
+
   it "can run a command named --verbose" do
     install_gemfile 'gem "rack"'
     File.open("--verbose", 'w') do |f|

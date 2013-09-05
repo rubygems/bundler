@@ -513,6 +513,7 @@ module Bundler
     map %w(pack) => :package
 
     desc "exec", "Run the command in context of the bundle"
+    method_options :keep_file_descriptors => :boolean
     long_desc <<-D
       Exec runs a command, providing it access to the gems in the bundle. While using
       bundle exec you can require and call the bundled gems as if they were installed
@@ -523,6 +524,12 @@ module Bundler
       Bundler.load.setup_environment
 
       begin
+        # Ruby 2.0 changed the default file descriptor
+        # behavior for #exec, this option forces 1.9 behavior
+        if RUBY_VERSION >= "2.0" && options.keep_file_descriptors?
+          args << { :close_others => false }
+        end
+
         # Run
         Kernel.exec(*args)
       rescue Errno::EACCES
