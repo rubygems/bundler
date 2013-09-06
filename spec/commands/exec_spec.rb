@@ -78,14 +78,21 @@ describe "bundle exec" do
 
     install_gemfile ''
     sys_exec("#{Gem.ruby} #{command.path}")
-    expect(out).to eq("")
+
+    if RUBY_VERSION >= "2.0"
+      expect(out).to eq("")
+    else
+      expect(out).to eq("Ruby version #{RUBY_VERSION} defaults to keeping non-standard file descriptors on Kernel#exec.")
+    end
+
     expect(err).to eq("")
   end
 
   it "accepts --keep-file-descriptors" do
     install_gemfile ''
     bundle "exec --keep-file-descriptors echo foobar"
-    expect(out).to eq("foobar")
+
+    expect(err).to eq("")
   end
 
   it "can run a command named --verbose" do
