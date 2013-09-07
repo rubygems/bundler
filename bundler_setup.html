@@ -22,7 +22,7 @@
                 Configure the load path so all dependencies in
                 your Gemfile can be required
               </div>
-              <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">'</span>rubygems<span class="String">'</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">'</span>bundler/setup<span class="String">'</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">'</span>nokogiri<span class="String">'</span></span>&#x000A;</pre>
+              <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>rubygems<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>bundler/setup<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>&#x000A;</pre>
             </div>
             <div class='bullet'>
               <div class='description'>
@@ -30,7 +30,7 @@
                 load path. If you want the gems in the
                 default group, make sure to include it
               </div>
-              <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">'</span>rubygems<span class="String">'</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">'</span>bundler<span class="String">'</span></span>&#x000A;<span class="Support">Bundler</span>.<span class="Entity">setup</span>(<span class="Constant"><span class="Constant">:</span>default</span>, <span class="Constant"><span class="Constant">:</span>ci</span>)&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">'</span>nokogiri<span class="String">'</span></span>&#x000A;</pre>
+              <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>rubygems<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>bundler<span class="String">&#39;</span></span>&#x000A;<span class="Support">Bundler</span>.<span class="Entity">setup</span>(<span class="Constant"><span class="Constant">:</span>default</span>, <span class="Constant"><span class="Constant">:</span>ci</span>)&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>&#x000A;</pre>
               <a href="/groups.html">Learn More: Groups</a>
             </div>
           </div>
@@ -42,6 +42,50 @@
                 <a href="/compatibility.html">Learn More: Compatibility</a>
               </div>
             </div>
+            <h2 id='setting-up-your-application-to-use-bundler'>
+              Setting Up Your Application to Use Bundler
+            </h2>
+            <p>
+              Bundler makes sure that Ruby can find all of the gems in the <code>Gemfile</code>
+              (and all of their dependencies). If your app is a Rails 3 app, your default application
+              already has the code necessary to invoke bundler. If it is a Rails 2.3 app, please see
+              <a href="./rails23.html">Setting up Bundler in Rails 2.3</a>.
+            </p>
+            <p>
+              For another kind of application (such as a Sinatra application), you will need to set up
+              bundler before trying to require any gems. At the top of the first file that your
+              application loads (for Sinatra, the file that calls <code>require 'sinatra'</code>), put
+              the following code:
+            </p>
+            <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>rubygems<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>bundler/setup<span class="String">&#39;</span></span>&#x000A;</pre>
+            <p>
+              This will automatically discover your <code>Gemfile</code>, and make all of the gems in
+              your <code>Gemfile</code> available to Ruby (in technical terms, it puts the gems "on the
+              load path"). You can think of it as an adding some extra powers to <code>require
+              'rubygems'</code>.
+            </p>
+            <p>
+              Now that your code is available to Ruby, you can require the gems that you need. For
+              instance, you can <code>require 'sinatra'</code>. If you have a lot of dependencies, you
+              might want to say "require all of the gems in my <code>Gemfile</code>". To do this, put
+              the following code immediately following <code>require 'bundler/setup'</code>:
+            </p>
+            <pre class="sunburst"><span class="Support">Bundler</span>.<span class="Entity">require</span>(<span class="Constant"><span class="Constant">:</span>default</span>)&#x000A;</pre>
+            For our example Gemfile, this line is exactly equivalent to:
+            <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>rails<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>rack-cache<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>&#x000A;</pre>
+            <p>
+              Astute readers will notice that the correct way to require the <code>rack-cache</code>
+              gem is <code>require 'rack/cache'</code>, not <code>require 'rack-cache'</code>. To tell
+              bundler to use <code>require 'rack/cache'</code>, update your Gemfile:
+            </p>
+            <pre class="sunburst">source <span class="String"><span class="String">&#39;</span>http://rubygems.org<span class="String">&#39;</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">&#39;</span>rails<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>3.0.0.rc<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rack-cache<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>require</span> =&gt; <span class="String"><span class="String">&#39;</span>rack/cache<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>~&gt; 1.4.2<span class="String">&#39;</span></span>&#x000A;</pre>
+            <p>
+              For such a small <code>Gemfile</code>, we'd advise you to skip
+              <code>Bundler.require</code> and just require the gems by hand (especially given the
+              need to put in a <code>:require</code> directive in the <code>Gemfile</code>). For much
+              larger <code>Gemfile</code>s, using <code>Bundler.require</code> allows you to skip
+              repeating a large stack of requirements.
+            </p>
           </div>
         </div>
         <div id='sidebar'>
@@ -52,6 +96,7 @@
             <li><a href="/v1.3/whats_new.html">See what's new</a></li>
             <li><a href="/v1.3/man/bundle.1.html">Read documentation</a></li>
             <li><a href="/#get-involved">Discuss and Contribute</a></li>
+            <li><a href="/v1.3/faq.html">View FAQs</a></li>
           </ul>
           <h2>Bundler Commands</h2>
           <ul>
@@ -64,10 +109,12 @@
           <h2>Usage</h2>
           <ul>
             <li><a href="/v1.3/gemfile.html">Gemfile</a></li>
+            <li><a href="/v1.3/groups.html">Groups</a></li>
             <li><a href="/v1.3/git.html">Gems from git</a></li>
-            <li><a href="/v1.3/groups.html">Grouping</a></li>
             <li><a href="/v1.3/bundler_setup.html">Bundler.setup</a></li>
             <li><a href="/v1.3/deploying.html">Deploying</a></li>
+            <li><a href="/v1.3/bundler_sharing.html">Sharing</a></li>
+            <li><a href="/v1.3/updating_gems.html">Updating Gems</a></li>
           </ul>
           <h2>Use Bundler with</h2>
           <ul>
@@ -77,6 +124,16 @@
             <li><a href="/v1.3/rubygems.html">Rubygems</a></li>
             <li><a href="/v1.3/rubymotion.html">RubyMotion</a></li>
           </ul>
+          <div class='shirts'>
+            <div class='content'>
+                            <a class="image" onclick="ga('send', 'devswag');" href="http://www.devswag.com/collections/bundler"><img src="/images/bundler-shirt.png" />
+              </a>
+
+              <p>
+                <a onclick="ga('send', 'devswag');" href="http://www.devswag.com/collections/bundler">Buy Bundler Shirts & Stickers!</a>
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -84,52 +141,14 @@
       <img src="/images/emocow.png" />
       <img src="/images/panda.jpg" />
       <div class='spacer'></div>
-      <div id='navigation'>
+      <div id='credits'>
         <p>
-          <b>commands</b>
-          <a href="/v1.3/man/bundle-install.1.html">install</a>
-          /
-          <a href="/v1.3/man/bundle-update.1.html">update</a>
-          /
-          <a href="/v1.3/man/bundle-exec.1.html">exec</a>
-          /
-          <a href="/v1.3/man/bundle-config.1.html">config</a>
-          /
-          <a href="/v1.3/man/bundle-package.1.html">package</a>
-        </p>
-        <p>
-          <b>usage</b>
-          <a href="/v1.3/gemfile.html">gemfile</a>
-          /
-          <a href="/v1.3/git.html">git</a>
-          /
-          <a href="/v1.3/groups.html">groups</a>
-          /
-          <a href="/v1.3/bundler_setup.html">setup</a>
-          /
-          <a href="/v1.3/deploying.html">deploying</a>
-        </p>
-        <p>
-          <b>frameworks</b>
-          <a href="/v1.3/bundler_setup.html">ruby</a>
-          /
-          <a href="/v1.3/rubygems.html">rubygems</a>
-          /
-          <a href="/v1.3/rubymotion.html">rubymotion</a>
-          /
-          <a href="/v1.3/sinatra.html">sinatra</a>
-          /
-          <a href="/v1.3/rails3.html">rails 3</a>
+          Many thanks to Bundler's <a href="/contributors.html">contributors</a>
+          and <a href="/sponsors.html">sponsors</a>
         </p>
       </div>
       <div class='spacer'></div>
       <img src="/images/bundler-small.png" />
-    </div>
-    <div id='credits'>
-      <p>
-        Many thanks to Bundler's <a href="/contributors.html">contributors</a>
-        and <a href="/sponsors.html">sponsors</a>
-      </p>
     </div>
     <a href='http://github.com/bundler/bundler/' id='github'>
       <img alt='Fork me on GitHub' src='http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png'>

@@ -23,7 +23,7 @@
                 to perform operations on the entire
                 group.
               </div>
-              <pre class="sunburst"><span class="Comment"><span class="Comment">#</span> These gems are in the :default group</span>&#x000A;gem <span class="String"><span class="String">'</span>nokogiri<span class="String">'</span></span>&#x000A;gem <span class="String"><span class="String">'</span>sinatra<span class="String">'</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">'</span>wirble<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>group</span> =&gt; <span class="Constant"><span class="Constant">:</span>development</span>&#x000A;&#x000A;group <span class="Constant"><span class="Constant">:</span>test</span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">'</span>faker<span class="String">'</span></span>&#x000A;  gem <span class="String"><span class="String">'</span>rspec<span class="String">'</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;&#x000A;group <span class="Constant"><span class="Constant">:</span>test</span>, <span class="Constant"><span class="Constant">:</span>development</span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">'</span>capybara<span class="String">'</span></span>&#x000A;  gem <span class="String"><span class="String">'</span>rspec-rails<span class="String">'</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;&#x000A;gem <span class="String"><span class="String">'</span>cucumber<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>group</span> =&gt; [<span class="Constant"><span class="Constant">:</span>cucumber</span>, <span class="Constant"><span class="Constant">:</span>test</span>]&#x000A;</pre>
+              <pre class="sunburst"><span class="Comment"><span class="Comment">#</span> These gems are in the :default group</span>&#x000A;gem <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>sinatra<span class="String">&#39;</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">&#39;</span>wirble<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>group</span> =&gt; <span class="Constant"><span class="Constant">:</span>development</span>&#x000A;&#x000A;group <span class="Constant"><span class="Constant">:</span>test</span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">&#39;</span>faker<span class="String">&#39;</span></span>&#x000A;  gem <span class="String"><span class="String">&#39;</span>rspec<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;&#x000A;group <span class="Constant"><span class="Constant">:</span>test</span>, <span class="Constant"><span class="Constant">:</span>development</span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">&#39;</span>capybara<span class="String">&#39;</span></span>&#x000A;  gem <span class="String"><span class="String">&#39;</span>rspec-rails<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;&#x000A;gem <span class="String"><span class="String">&#39;</span>cucumber<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>group</span> =&gt; [<span class="Constant"><span class="Constant">:</span>cucumber</span>, <span class="Constant"><span class="Constant">:</span>test</span>]&#x000A;</pre>
             </div>
             <div class='bullet'>
               <div class='description'>
@@ -55,9 +55,61 @@
                 want to add to the load path. Only gems
                 in these groups will be require'able
               </div>
-              <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">'</span>rubygems<span class="String">'</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">'</span>bundler<span class="String">'</span></span>&#x000A;<span class="Support">Bundler</span>.<span class="Entity">setup</span>(<span class="Constant"><span class="Constant">:</span>default</span>, <span class="Constant"><span class="Constant">:</span>ci</span>)&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">'</span>nokogiri<span class="String">'</span></span>&#x000A;</pre>
+              <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>rubygems<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>bundler<span class="String">&#39;</span></span>&#x000A;<span class="Support">Bundler</span>.<span class="Entity">setup</span>(<span class="Constant"><span class="Constant">:</span>default</span>, <span class="Constant"><span class="Constant">:</span>ci</span>)&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>&#x000A;</pre>
               <a href="/bundler_setup.html">Learn More: Bundler.setup</a>
             </div>
+            <h2 id='grouping-your-dependencies'>
+              Grouping Your Dependencies
+            </h2>
+            <p>
+              You'll sometimes have groups of gems that only make sense in particular environments.
+              For instance, you might develop your app (at an early stage) using SQLite, but deploy it
+              using <code>mysql2</code> or <code>pg</code>. In this example, you might not have MySQL
+              or Postgres installed on your development machine, and want bundler to skip it.
+            </p>
+            <p>
+              To do this, you can group your dependencies:
+            </p>
+            <pre class="sunburst">source <span class="String"><span class="String">&#39;</span>http://rubygems.org<span class="String">&#39;</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">&#39;</span>rails<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>3.2.2<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rack-cache<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>require</span> =&gt; <span class="String"><span class="String">&#39;</span>rack/cache<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>~&gt; 1.4.2<span class="String">&#39;</span></span>&#x000A;&#x000A;group <span class="Constant"><span class="Constant">:</span>development</span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">&#39;</span>sqlite3<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;&#x000A;group <span class="Constant"><span class="Constant">:</span>production</span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">&#39;</span>pg<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;</pre>
+            <p>
+              Now, in development, you can instruct bundler to skip the <code>production</code> group:
+            </p>
+            <pre class='sunburst'>$ bundle install --without production&#x000A;</pre>
+            <p>
+              Bundler will remember that you installed the gems using <code>--without
+              production</code>. For curious readers, bundler stores the flag in
+              <code>APP_ROOT/.bundle/config</code>. You can see all of the settings that bundler saved
+              there by running <code>bundle config</code>, which will also print out global settings
+              (stored in <code>~/.bundle/config</code>), and settings set via environment variables.
+              For more information on configuring bundler, please see
+              <a href="/bundle_config.html">bundle config</a>.
+            </p>
+            <p>
+              If you run <code>bundle install</code> later, without any flag, bundler will remember
+              that you last called <code>bundle install --without production</code>, and use that flag
+              again. When you <code>require 'bundler/setup'</code>, bundler will ignore gems in these
+              groups.
+            </p>
+            <p>
+              You can also specify which groups to automatically require through the parameters to
+              <code>Bundler.require</code>. The <code>:default</code> group includes all gems not
+              listed under any group. If you call <code>Bundler.require(:default, :development)</code>,
+              bundler will <code>require</code> all the gems in the <code>:default</code> group, as
+              well as the gems in the <code>:development</code> group.
+            </p>
+            <p>
+              By default, a Rails generated app calls <code>Bundler.require(:default,
+              Rails.env)</code> in your <code>application.rb</code>, which links the groups in your
+              <code>Gemfile</code> to the Rails environment. If you use other groups (not linked to a
+              Rails environment), you can add them to the call to <code>Bundler.require</code>, if you
+              want them to be automatically required.
+            </p>
+            <p>
+              Remember that you can always leave groups of gems out of <code>Bundler.require</code>,
+              and then require them manually using Ruby's <code>require</code> at the appropriate
+              place in your app. You might do this because requiring a certain gem takes some time,
+              and you don't need it every time you boot your application.
+            </p>
           </div>
         </div>
         <div id='sidebar'>
@@ -68,6 +120,7 @@
             <li><a href="/v1.3/whats_new.html">See what's new</a></li>
             <li><a href="/v1.3/man/bundle.1.html">Read documentation</a></li>
             <li><a href="/#get-involved">Discuss and Contribute</a></li>
+            <li><a href="/v1.3/faq.html">View FAQs</a></li>
           </ul>
           <h2>Bundler Commands</h2>
           <ul>
@@ -80,10 +133,12 @@
           <h2>Usage</h2>
           <ul>
             <li><a href="/v1.3/gemfile.html">Gemfile</a></li>
+            <li><a href="/v1.3/groups.html">Groups</a></li>
             <li><a href="/v1.3/git.html">Gems from git</a></li>
-            <li><a href="/v1.3/groups.html">Grouping</a></li>
             <li><a href="/v1.3/bundler_setup.html">Bundler.setup</a></li>
             <li><a href="/v1.3/deploying.html">Deploying</a></li>
+            <li><a href="/v1.3/bundler_sharing.html">Sharing</a></li>
+            <li><a href="/v1.3/updating_gems.html">Updating Gems</a></li>
           </ul>
           <h2>Use Bundler with</h2>
           <ul>
@@ -93,6 +148,16 @@
             <li><a href="/v1.3/rubygems.html">Rubygems</a></li>
             <li><a href="/v1.3/rubymotion.html">RubyMotion</a></li>
           </ul>
+          <div class='shirts'>
+            <div class='content'>
+                            <a class="image" onclick="ga('send', 'devswag');" href="http://www.devswag.com/collections/bundler"><img src="/images/bundler-shirt.png" />
+              </a>
+
+              <p>
+                <a onclick="ga('send', 'devswag');" href="http://www.devswag.com/collections/bundler">Buy Bundler Shirts & Stickers!</a>
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -100,52 +165,14 @@
       <img src="/images/emocow.png" />
       <img src="/images/panda.jpg" />
       <div class='spacer'></div>
-      <div id='navigation'>
+      <div id='credits'>
         <p>
-          <b>commands</b>
-          <a href="/v1.3/man/bundle-install.1.html">install</a>
-          /
-          <a href="/v1.3/man/bundle-update.1.html">update</a>
-          /
-          <a href="/v1.3/man/bundle-exec.1.html">exec</a>
-          /
-          <a href="/v1.3/man/bundle-config.1.html">config</a>
-          /
-          <a href="/v1.3/man/bundle-package.1.html">package</a>
-        </p>
-        <p>
-          <b>usage</b>
-          <a href="/v1.3/gemfile.html">gemfile</a>
-          /
-          <a href="/v1.3/git.html">git</a>
-          /
-          <a href="/v1.3/groups.html">groups</a>
-          /
-          <a href="/v1.3/bundler_setup.html">setup</a>
-          /
-          <a href="/v1.3/deploying.html">deploying</a>
-        </p>
-        <p>
-          <b>frameworks</b>
-          <a href="/v1.3/bundler_setup.html">ruby</a>
-          /
-          <a href="/v1.3/rubygems.html">rubygems</a>
-          /
-          <a href="/v1.3/rubymotion.html">rubymotion</a>
-          /
-          <a href="/v1.3/sinatra.html">sinatra</a>
-          /
-          <a href="/v1.3/rails3.html">rails 3</a>
+          Many thanks to Bundler's <a href="/contributors.html">contributors</a>
+          and <a href="/sponsors.html">sponsors</a>
         </p>
       </div>
       <div class='spacer'></div>
       <img src="/images/bundler-small.png" />
-    </div>
-    <div id='credits'>
-      <p>
-        Many thanks to Bundler's <a href="/contributors.html">contributors</a>
-        and <a href="/sponsors.html">sponsors</a>
-      </p>
     </div>
     <a href='http://github.com/bundler/bundler/' id='github'>
       <img alt='Fork me on GitHub' src='http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png'>

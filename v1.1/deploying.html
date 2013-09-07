@@ -56,7 +56,7 @@
                 To pull in the Bundler Cap task, just add this to your
                 <code>deploy.rb</code> file:
               </div>
-              <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">'</span>bundler/capistrano<span class="String">'</span></span>&#x000A;</pre>
+              <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>bundler/capistrano<span class="String">&#39;</span></span>&#x000A;</pre>
               <div class='notes'>
                 That's it! Running <code>cap deploy</code> will now automatically run
                 <code>bundle install</code> on the remote server with deployment-friendly
@@ -70,7 +70,7 @@
                 There is a default Vlad task available. To make it available, add this line
                 to the Vlad <code>deploy.rb</code>.
               </div>
-              <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">'</span>bundler/vlad<span class="String">'</span></span>&#x000A;</pre>
+              <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>bundler/vlad<span class="String">&#39;</span></span>&#x000A;</pre>
               <div class='notes'>
                 Once you have done that, the <code>vlad:bundle:install</code> task will be
                 available for use. Make sure it is run as part of your deploy. For example:
@@ -107,52 +107,14 @@
       <img src="/images/emocow.png" />
       <img src="/images/panda.jpg" />
       <div class='spacer'></div>
-      <div id='navigation'>
+      <div id='credits'>
         <p>
-          <b>commands</b>
-          <a href="/v1.1/man/bundle-install.1.html">install</a>
-          /
-          <a href="/v1.1/man/bundle-update.1.html">update</a>
-          /
-          <a href="/v1.1/man/bundle-exec.1.html">exec</a>
-          /
-          <a href="/v1.1/man/bundle-config.1.html">config</a>
-          /
-          <a href="/v1.1/man/bundle-package.1.html">package</a>
-        </p>
-        <p>
-          <b>usage</b>
-          <a href="/v1.1/gemfile.html">gemfile</a>
-          /
-          <a href="/v1.1/git.html">git</a>
-          /
-          <a href="/v1.1/groups.html">groups</a>
-          /
-          <a href="/v1.1/bundler_setup.html">setup</a>
-          /
-          <a href="/v1.1/deploying.html">deploying</a>
-        </p>
-        <p>
-          <b>frameworks</b>
-          <a href="/v1.1/bundler_setup.html">ruby</a>
-          /
-          <a href="/v1.1/rubygems.html">rubygems</a>
-          /
-          <a href="/v1.1/rubymotion.html">rubymotion</a>
-          /
-          <a href="/v1.1/sinatra.html">sinatra</a>
-          /
-          <a href="/v1.1/rails3.html">rails 3</a>
+          Many thanks to Bundler's <a href="/contributors.html">contributors</a>
+          and <a href="/sponsors.html">sponsors</a>
         </p>
       </div>
       <div class='spacer'></div>
       <img src="/images/bundler-small.png" />
-    </div>
-    <div id='credits'>
-      <p>
-        Many thanks to Bundler's <a href="/contributors.html">contributors</a>
-        and <a href="/sponsors.html">sponsors</a>
-      </p>
     </div>
     <a href='http://github.com/bundler/bundler/' id='github'>
       <img alt='Fork me on GitHub' src='http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png'>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Bundler: The best way to manage a Ruby application's gems</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <meta content='276VSYOko8B8vIu1i8i5qbj7_ql5PXo0dU69XQy-SL' name='globalsign-domain-verification'>
+    <link href='/images/favicon.png' rel='shortcut icon' type='image/png'>
+    <link href="/stylesheets/application.css" media="screen" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/sunburst.css" media="screen" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <div id='body'>
+      <div id='header'>
+        <a class="image" href="/"><img width="725" alt="The best way to manage your application's dependencies" src="/images/gembundler.png" /></a>
+      </div>
+      <div id='container'>
+        <div id='contents'>
+          <h2 id='sharing'>
+            Sharing
+            <h3 id='checking-your-code-into-version-control'>
+              Checking Your Code into Version Control
+            </h3>
+            <p>
+              After developing your application for a while, check in the application together with the
+              <code>Gemfile</code> and <code>Gemfile.lock</code> snapshot. Now, your repository has a
+              record of the exact versions of all of the gems that you used the last time you know for
+              sure that the application worked. Keep in mind that while your <code>Gemfile</code>
+              lists only three gems (with varying degrees of version strictness), your application
+              depends on dozens of gems, once you take into consideration all of the implicit
+              requirements of the gems you depend on.
+            </p>
+            <p>
+              This is important: <strong>the <code>Gemfile.lock</code> makes your application a single
+              package of both your own code and the third-party code it ran the last time you know for
+              sure that everything worked</strong>. Specifying exact versions of the third-party code
+              you depend on in your <code>Gemfile</code> would not provide the same guarantee, because
+              gems usually declare a range of versions for their dependencies.
+            </p>
+            <p>
+              The next time you run <code>bundle install</code> on the same machine, bundler will see
+              that it already has all of the dependencies you need, and skip the installation process.
+            </p>
+            <p>
+              Do not check in the <code>.bundle</code> directory, or any of the files inside it. Those
+              files are specific to each particular machine, and are used to persist installation options
+              between runs of the <code>bundle install</code> command.
+            </p>
+            <p>
+              If you have run <code>bundle pack</code>, the gems (although not the git gems) required
+              by your bundle will be downloaded into <code>vendor/cache</code>. Bundler can run without
+              connecting to the internet (or the Rubygems server) if all the gems you need are present
+              in that folder and checked in to your source control. This is an <strong>optional</strong>
+              step, and not recommended, due to the increase in size of your source control repository.
+            </p>
+            <h3 id='sharing-your-application-with-other-developers'>
+              Sharing Your Application With Other Developers
+            </h3>
+            <p>
+              When your co-developers (or you on another machine) check out your code, it will come
+              with the exact versions of all the third-party code your application used on the machine
+              that you last developed on (in the <code>Gemfile.lock</code>). When **they** run
+              <code>bundle install</code>, bundler will find the <code>Gemfile.lock</code> and skip
+              the dependency resolution step. Instead, it will install all of the same gems that you
+              used on the original machine.
+            </p>
+            <p>
+              In other words, you don't have to guess which versions of the dependencies you should
+              install. In the example we've been using, even though <code>rack-cache</code> declares a
+              dependency on <code>rack >= 0.4</code>, we know for sure it works with <code>rack
+              1.2.1</code>. Even if the Rack team releases <code>rack 1.2.2</code>, bundler will
+              always install <code>1.2.1</code>, the exact version of the gem that we know works. This
+              relieves a large maintenance burden from application developers, because all machines
+              always run the exact same third-party code.
+            </p>
+          </h2>
+        </div>
+        <div id='sidebar'>
+          <h2>Would you like to</h2>
+          <ul>
+            <li><a href="/#getting-started">Get started</a></li>
+            <li><a href="/issues.html">Report a bug</a></li>
+            <li><a href="/v1.3/whats_new.html">See what's new</a></li>
+            <li><a href="/v1.3/man/bundle.1.html">Read documentation</a></li>
+            <li><a href="/#get-involved">Discuss and Contribute</a></li>
+            <li><a href="/v1.3/faq.html">View FAQs</a></li>
+          </ul>
+          <h2>Bundler Commands</h2>
+          <ul>
+            <li><a href="/v1.3/bundle_install.html">bundle install</a></li>
+            <li><a href="/v1.3/bundle_update.html">bundle update</a></li>
+            <div class='buttons'>
+              <a href="/v1.3/commands.html">View all commands</a>
+            </div>
+          </ul>
+          <h2>Usage</h2>
+          <ul>
+            <li><a href="/v1.3/gemfile.html">Gemfile</a></li>
+            <li><a href="/v1.3/groups.html">Groups</a></li>
+            <li><a href="/v1.3/git.html">Gems from git</a></li>
+            <li><a href="/v1.3/bundler_setup.html">Bundler.setup</a></li>
+            <li><a href="/v1.3/deploying.html">Deploying</a></li>
+            <li><a href="/v1.3/bundler_sharing.html">Sharing</a></li>
+            <li><a href="/v1.3/updating_gems.html">Updating Gems</a></li>
+          </ul>
+          <h2>Use Bundler with</h2>
+          <ul>
+            <li><a href="/v1.3/rails3.html">Rails 3</a></li>
+            <li><a href="/v1.3/rails23.html">Rails 2.3</a></li>
+            <li><a href="/v1.3/sinatra.html">Sinatra</a></li>
+            <li><a href="/v1.3/rubygems.html">Rubygems</a></li>
+            <li><a href="/v1.3/rubymotion.html">RubyMotion</a></li>
+          </ul>
+          <div class='shirts'>
+            <div class='content'>
+                            <a class="image" onclick="ga('send', 'devswag');" href="http://www.devswag.com/collections/bundler"><img src="/images/bundler-shirt.png" />
+              </a>
+
+              <p>
+                <a onclick="ga('send', 'devswag');" href="http://www.devswag.com/collections/bundler">Buy Bundler Shirts & Stickers!</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id='footer'>
+      <img src="/images/emocow.png" />
+      <img src="/images/panda.jpg" />
+      <div class='spacer'></div>
+      <div id='credits'>
+        <p>
+          Many thanks to Bundler's <a href="/contributors.html">contributors</a>
+          and <a href="/sponsors.html">sponsors</a>
+        </p>
+      </div>
+      <div class='spacer'></div>
+      <img src="/images/bundler-small.png" />
+    </div>
+    <a href='http://github.com/bundler/bundler/' id='github'>
+      <img alt='Fork me on GitHub' src='http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png'>
+    </a>
+    <div id='prod-versions'>
+      Docs:
+      <a href="/v0.9/">v0.9</a>
+      <a href="/v1.0/">v1.0</a>
+      <a href="/v1.1/">v1.1</a>
+      <a href="/v1.2/">v1.2</a>
+      <a class="current" href="/">v1.3</a>
+    </div>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-39559982-1', 'bundler.io');
+      ga('send', 'pageview');
+    </script>
+  </body>
+</html>

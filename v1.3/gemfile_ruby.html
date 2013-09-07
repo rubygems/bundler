@@ -21,13 +21,13 @@
               <div class='description'>
                 Like gems, developers can setup a dependency on Ruby. This makes your app fail faster in case you depend on specific features in a Ruby VM. This way, the Ruby VM on your deployment server will match your local one. You can do this by using the <code>ruby</code> directive in the <code>Gemfile</code>:
               </div>
-              <pre class="sunburst">ruby <span class="String"><span class="String">'</span>RUBY_VERSION<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>engine</span> =&gt; <span class="String"><span class="String">'</span>ENGINE<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>engine_version</span> =&gt; <span class="String"><span class="String">'</span>ENGINE_VERSION<span class="String">'</span></span>&#x000A;</pre>
+              <pre class="sunburst">ruby <span class="String"><span class="String">&#39;</span>RUBY_VERSION<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>engine</span> =&gt; <span class="String"><span class="String">&#39;</span>ENGINE<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>engine_version</span> =&gt; <span class="String"><span class="String">&#39;</span>ENGINE_VERSION<span class="String">&#39;</span></span>&#x000A;</pre>
             </div>
             <div class='bullet'>
               <div class='description'>
                 If you wanted to use JRuby 1.6.7 using Ruby 1.9.3, you would simply do the following:
               </div>
-              <pre class="sunburst">ruby <span class="String"><span class="String">'</span>1.9.3<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>engine</span> =&gt; <span class="String"><span class="String">'</span>jruby<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>engine_version</span> =&gt; <span class="String"><span class="String">'</span>1.6.7<span class="String">'</span></span>&#x000A;</pre>
+              <pre class="sunburst">ruby <span class="String"><span class="String">&#39;</span>1.9.3<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>engine</span> =&gt; <span class="String"><span class="String">&#39;</span>jruby<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>engine_version</span> =&gt; <span class="String"><span class="String">&#39;</span>1.6.7<span class="String">&#39;</span></span>&#x000A;</pre>
             </div>
             <div class='bullet'>
               <div class='description'>
@@ -62,6 +62,7 @@
             <li><a href="/v1.3/whats_new.html">See what's new</a></li>
             <li><a href="/v1.3/man/bundle.1.html">Read documentation</a></li>
             <li><a href="/#get-involved">Discuss and Contribute</a></li>
+            <li><a href="/v1.3/faq.html">View FAQs</a></li>
           </ul>
           <h2>Bundler Commands</h2>
           <ul>
@@ -74,10 +75,12 @@
           <h2>Usage</h2>
           <ul>
             <li><a href="/v1.3/gemfile.html">Gemfile</a></li>
+            <li><a href="/v1.3/groups.html">Groups</a></li>
             <li><a href="/v1.3/git.html">Gems from git</a></li>
-            <li><a href="/v1.3/groups.html">Grouping</a></li>
             <li><a href="/v1.3/bundler_setup.html">Bundler.setup</a></li>
             <li><a href="/v1.3/deploying.html">Deploying</a></li>
+            <li><a href="/v1.3/bundler_sharing.html">Sharing</a></li>
+            <li><a href="/v1.3/updating_gems.html">Updating Gems</a></li>
           </ul>
           <h2>Use Bundler with</h2>
           <ul>
@@ -87,6 +90,16 @@
             <li><a href="/v1.3/rubygems.html">Rubygems</a></li>
             <li><a href="/v1.3/rubymotion.html">RubyMotion</a></li>
           </ul>
+          <div class='shirts'>
+            <div class='content'>
+                            <a class="image" onclick="ga('send', 'devswag');" href="http://www.devswag.com/collections/bundler"><img src="/images/bundler-shirt.png" />
+              </a>
+
+              <p>
+                <a onclick="ga('send', 'devswag');" href="http://www.devswag.com/collections/bundler">Buy Bundler Shirts & Stickers!</a>
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -94,52 +107,14 @@
       <img src="/images/emocow.png" />
       <img src="/images/panda.jpg" />
       <div class='spacer'></div>
-      <div id='navigation'>
+      <div id='credits'>
         <p>
-          <b>commands</b>
-          <a href="/v1.3/man/bundle-install.1.html">install</a>
-          /
-          <a href="/v1.3/man/bundle-update.1.html">update</a>
-          /
-          <a href="/v1.3/man/bundle-exec.1.html">exec</a>
-          /
-          <a href="/v1.3/man/bundle-config.1.html">config</a>
-          /
-          <a href="/v1.3/man/bundle-package.1.html">package</a>
-        </p>
-        <p>
-          <b>usage</b>
-          <a href="/v1.3/gemfile.html">gemfile</a>
-          /
-          <a href="/v1.3/git.html">git</a>
-          /
-          <a href="/v1.3/groups.html">groups</a>
-          /
-          <a href="/v1.3/bundler_setup.html">setup</a>
-          /
-          <a href="/v1.3/deploying.html">deploying</a>
-        </p>
-        <p>
-          <b>frameworks</b>
-          <a href="/v1.3/bundler_setup.html">ruby</a>
-          /
-          <a href="/v1.3/rubygems.html">rubygems</a>
-          /
-          <a href="/v1.3/rubymotion.html">rubymotion</a>
-          /
-          <a href="/v1.3/sinatra.html">sinatra</a>
-          /
-          <a href="/v1.3/rails3.html">rails 3</a>
+          Many thanks to Bundler's <a href="/contributors.html">contributors</a>
+          and <a href="/sponsors.html">sponsors</a>
         </p>
       </div>
       <div class='spacer'></div>
       <img src="/images/bundler-small.png" />
-    </div>
-    <div id='credits'>
-      <p>
-        Many thanks to Bundler's <a href="/contributors.html">contributors</a>
-        and <a href="/sponsors.html">sponsors</a>
-      </p>
     </div>
     <a href='http://github.com/bundler/bundler/' id='github'>
       <img alt='Fork me on GitHub' src='http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png'>

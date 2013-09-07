@@ -17,7 +17,18 @@
         <div id='contents'>
           <h2>What is Bundler?</h2>
           <div id='intro'>
-            Bundler maintains a consistent environment for ruby applications. It tracks an application's code and the rubygems it needs to run, so that an application will always have the exact gems (and versions) that it needs to run.
+            <p>
+              Bundler maintains a consistent environment for ruby applications. It tracks
+              an application's code and the rubygems it needs to run, so that an application
+              will always have the exact gems (and versions) that it needs to run.
+            </p>
+            <p>
+              We designed bundler to make it easy to share your code across a number
+              of development, staging and production machines. Of course, you know how to
+              share your own application or gem: stick it on GitHub and clone it where you
+              need it. Bundler makes it easy to make sure that your application has the
+              dependencies it needs to start up and run without errors.
+            </p>
           </div>
           <div class='bullet'>
             <a href="/v1.3/rationale.html">Learn More: Why Bundler exists</a>
@@ -36,7 +47,7 @@
               <div class='description'>
                 Specify your dependencies in a Gemfile in your project's root:
               </div>
-              <pre class="sunburst">source <span class="String"><span class="String">'</span>https://rubygems.org<span class="String">'</span></span>&#x000A;gem <span class="String"><span class="String">'</span>nokogiri<span class="String">'</span></span>&#x000A;gem <span class="String"><span class="String">'</span>rack<span class="String">'</span></span>, <span class="String"><span class="String">'</span>~&gt;1.1<span class="String">'</span></span>&#x000A;gem <span class="String"><span class="String">'</span>rspec<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>require</span> =&gt; <span class="String"><span class="String">'</span>spec<span class="String">'</span></span>&#x000A;</pre>
+              <pre class="sunburst">source <span class="String"><span class="String">&#39;</span>https://rubygems.org<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rack<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>~&gt;1.1<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rspec<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>require</span> =&gt; <span class="String"><span class="String">&#39;</span>spec<span class="String">&#39;</span></span>&#x000A;</pre>
               <a href="/v1.3/gemfile.html">Learn More: Gemfiles</a>
             </div>
             <div class='bullet'>
@@ -55,7 +66,7 @@
               <div class='description'>
                 Inside your app, load up the bundled environment:
               </div>
-              <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">'</span>rubygems<span class="String">'</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">'</span>bundler/setup<span class="String">'</span></span>&#x000A;&#x000A;<span class="Comment"><span class="Comment">#</span> require your gems as usual</span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">'</span>nokogiri<span class="String">'</span></span>&#x000A;</pre>
+              <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>rubygems<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>bundler/setup<span class="String">&#39;</span></span>&#x000A;&#x000A;<span class="Comment"><span class="Comment">#</span> require your gems as usual</span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>&#x000A;</pre>
               <a href="/v1.3/bundler_setup.html">Learn More: Bundler.setup</a>
             </div>
             <div class='bullet'>
@@ -94,19 +105,6 @@
             <a href="/v1.3/rubygems.html">Rubygems</a>
             <a href="/v1.3/rubymotion.html">RubyMotion</a>
           </div>
-          <h2 id='learn-about'>Learn about</h2>
-          <div class='buttons'>
-            <a href="/v1.3/gemfile.html">Gemfile</a>
-            <a href="/v1.3/bundle_install.html">Installing</a>
-            <a href="/v1.3/bundle_update.html">Updating</a>
-            <a href="/v1.3/deploying.html">Deploying</a>
-          </div>
-          <div class='buttons'>
-            <a href="/v1.3/git.html">Gems from git</a>
-            <a href="/v1.3/commands.html">Other commands</a>
-            <a href="/v1.3/rationale.html">Why Bundler exists</a>
-            <a href="/v1.3/man/bundle.1.html">The man pages</a>
-          </div>
           <h2 id='get-involved'>Get involved</h2>
           <p>Bundler has a lot of contributors and users, and they all talk to each other quite a bit. If you have questions, try the IRC channel or mailing list. If you're interested in contributing to the project (no programming skills needed), read the contributing guide. If you have sponsorship or security questions, please contact the core team directly.</p>
           <div class='buttons'>
@@ -114,19 +112,6 @@
             <a href="http://groups.google.com/group/ruby-bundler">Mailing list</a>
             <a href="https://github.com/bundler/bundler/blob/master/DEVELOPMENT.md">Contributing</a>
             <a href="mailto:andre.arko+terence.lee@gmail.com">Core team</a>
-          </div>
-          <div class='shirts'>
-            <div class='content'>
-                  <a class="image" onclick="ga('send', 'devswag');" href="http://www.devswag.com/collections/bundler"><img src="/images/bundler-shirt.png" />
-              </a>
-          
-              <p>
-                Want to show the world you support Bundler?
-                <br>
-                Buy Bundler shirts and stickers at
-                <a onclick="ga('send', 'devswag');" href="http://www.devswag.com/collections/bundler">DevSwag</a>
-              </p>
-            </div>
           </div>
         </div>
         <div id='sidebar'>
@@ -137,6 +122,7 @@
             <li><a href="/v1.3/whats_new.html">See what's new</a></li>
             <li><a href="/v1.3/man/bundle.1.html">Read documentation</a></li>
             <li><a href="/#get-involved">Discuss and Contribute</a></li>
+            <li><a href="/v1.3/faq.html">View FAQs</a></li>
           </ul>
           <h2>Bundler Commands</h2>
           <ul>
@@ -149,10 +135,12 @@
           <h2>Usage</h2>
           <ul>
             <li><a href="/v1.3/gemfile.html">Gemfile</a></li>
+            <li><a href="/v1.3/groups.html">Groups</a></li>
             <li><a href="/v1.3/git.html">Gems from git</a></li>
-            <li><a href="/v1.3/groups.html">Grouping</a></li>
             <li><a href="/v1.3/bundler_setup.html">Bundler.setup</a></li>
             <li><a href="/v1.3/deploying.html">Deploying</a></li>
+            <li><a href="/v1.3/bundler_sharing.html">Sharing</a></li>
+            <li><a href="/v1.3/updating_gems.html">Updating Gems</a></li>
           </ul>
           <h2>Use Bundler with</h2>
           <ul>
@@ -162,6 +150,16 @@
             <li><a href="/v1.3/rubygems.html">Rubygems</a></li>
             <li><a href="/v1.3/rubymotion.html">RubyMotion</a></li>
           </ul>
+          <div class='shirts'>
+            <div class='content'>
+                            <a class="image" onclick="ga('send', 'devswag');" href="http://www.devswag.com/collections/bundler"><img src="/images/bundler-shirt.png" />
+              </a>
+
+              <p>
+                <a onclick="ga('send', 'devswag');" href="http://www.devswag.com/collections/bundler">Buy Bundler Shirts & Stickers!</a>
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -169,52 +167,14 @@
       <img src="/images/emocow.png" />
       <img src="/images/panda.jpg" />
       <div class='spacer'></div>
-      <div id='navigation'>
+      <div id='credits'>
         <p>
-          <b>commands</b>
-          <a href="/v1.3/man/bundle-install.1.html">install</a>
-          /
-          <a href="/v1.3/man/bundle-update.1.html">update</a>
-          /
-          <a href="/v1.3/man/bundle-exec.1.html">exec</a>
-          /
-          <a href="/v1.3/man/bundle-config.1.html">config</a>
-          /
-          <a href="/v1.3/man/bundle-package.1.html">package</a>
-        </p>
-        <p>
-          <b>usage</b>
-          <a href="/v1.3/gemfile.html">gemfile</a>
-          /
-          <a href="/v1.3/git.html">git</a>
-          /
-          <a href="/v1.3/groups.html">groups</a>
-          /
-          <a href="/v1.3/bundler_setup.html">setup</a>
-          /
-          <a href="/v1.3/deploying.html">deploying</a>
-        </p>
-        <p>
-          <b>frameworks</b>
-          <a href="/v1.3/bundler_setup.html">ruby</a>
-          /
-          <a href="/v1.3/rubygems.html">rubygems</a>
-          /
-          <a href="/v1.3/rubymotion.html">rubymotion</a>
-          /
-          <a href="/v1.3/sinatra.html">sinatra</a>
-          /
-          <a href="/v1.3/rails3.html">rails 3</a>
+          Many thanks to Bundler's <a href="/contributors.html">contributors</a>
+          and <a href="/sponsors.html">sponsors</a>
         </p>
       </div>
       <div class='spacer'></div>
       <img src="/images/bundler-small.png" />
-    </div>
-    <div id='credits'>
-      <p>
-        Many thanks to Bundler's <a href="/contributors.html">contributors</a>
-        and <a href="/sponsors.html">sponsors</a>
-      </p>
     </div>
     <a href='http://github.com/bundler/bundler/' id='github'>
       <img alt='Fork me on GitHub' src='http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png'>

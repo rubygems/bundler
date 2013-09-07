@@ -35,7 +35,7 @@
               First, you declare these dependencies in a file at the root of your application, called
               <code>Gemfile</code>. It looks something like this:
             </p>
-            <pre class="sunburst">source <span class="String"><span class="String">'</span>http://rubygems.org<span class="String">'</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">'</span>rails<span class="String">'</span></span>, <span class="String"><span class="String">'</span>3.0.0.rc<span class="String">'</span></span>&#x000A;gem <span class="String"><span class="String">'</span>rack-cache<span class="String">'</span></span>&#x000A;gem <span class="String"><span class="String">'</span>nokogiri<span class="String">'</span></span>, <span class="String"><span class="String">'</span>~&gt; 1.4.2<span class="String">'</span></span>&#x000A;</pre>
+            <pre class="sunburst">source <span class="String"><span class="String">&#39;</span>http://rubygems.org<span class="String">&#39;</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">&#39;</span>rails<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>3.0.0.rc<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rack-cache<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>~&gt; 1.4.2<span class="String">&#39;</span></span>&#x000A;</pre>
             <p>
               This <code>Gemfile</code> says a few things. First, it says that bundler should look for gems
               declared in the <code>Gemfile</code> at <code>http://rubygems.org</code>. You can declare
@@ -82,7 +82,7 @@
               application loads (for Sinatra, the file that calls <code>require 'sinatra'</code>), put
               the following code:
             </p>
-            <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">'</span>rubygems<span class="String">'</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">'</span>bundler/setup<span class="String">'</span></span>&#x000A;</pre>
+            <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>rubygems<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>bundler/setup<span class="String">&#39;</span></span>&#x000A;</pre>
             <p>
               This will automatically discover your <code>Gemfile</code>, and make all of the gems in
               your <code>Gemfile</code> available to Ruby (in technical terms, it puts the gems "on the
@@ -97,13 +97,13 @@
             </p>
             <pre class="sunburst"><span class="Support">Bundler</span>.<span class="Entity">require</span>(<span class="Constant"><span class="Constant">:</span>default</span>)&#x000A;</pre>
             For our example Gemfile, this line is exactly equivalent to:
-            <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">'</span>rails<span class="String">'</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">'</span>rack-cache<span class="String">'</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">'</span>nokogiri<span class="String">'</span></span>&#x000A;</pre>
+            <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>rails<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>rack-cache<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>&#x000A;</pre>
             <p>
               Astute readers will notice that the correct way to require the <code>rack-cache</code>
               gem is <code>require 'rack/cache'</code>, not <code>require 'rack-cache'</code>. To tell
               bundler to use <code>require 'rack/cache'</code>, update your Gemfile:
             </p>
-            <pre class="sunburst">source <span class="String"><span class="String">'</span>http://rubygems.org<span class="String">'</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">'</span>rails<span class="String">'</span></span>, <span class="String"><span class="String">'</span>3.0.0.rc<span class="String">'</span></span>&#x000A;gem <span class="String"><span class="String">'</span>rack-cache<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>require</span> =&gt; <span class="String"><span class="String">'</span>rack/cache<span class="String">'</span></span>&#x000A;gem <span class="String"><span class="String">'</span>nokogiri<span class="String">'</span></span>, <span class="String"><span class="String">'</span>~&gt; 1.4.2<span class="String">'</span></span>&#x000A;</pre>
+            <pre class="sunburst">source <span class="String"><span class="String">&#39;</span>http://rubygems.org<span class="String">&#39;</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">&#39;</span>rails<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>3.0.0.rc<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rack-cache<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>require</span> =&gt; <span class="String"><span class="String">&#39;</span>rack/cache<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>~&gt; 1.4.2<span class="String">&#39;</span></span>&#x000A;</pre>
             <p>
               For such a small <code>Gemfile</code>, we'd advise you to skip
               <code>Bundler.require</code> and just require the gems by hand (especially given the
@@ -123,7 +123,7 @@
             <p>
               To do this, you can group your dependencies:
             </p>
-            <pre class="sunburst">source <span class="String"><span class="String">'</span>http://rubygems.org<span class="String">'</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">'</span>rails<span class="String">'</span></span>, <span class="String"><span class="String">'</span>3.2.2<span class="String">'</span></span>&#x000A;gem <span class="String"><span class="String">'</span>rack-cache<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>require</span> =&gt; <span class="String"><span class="String">'</span>rack/cache<span class="String">'</span></span>&#x000A;gem <span class="String"><span class="String">'</span>nokogiri<span class="String">'</span></span>, <span class="String"><span class="String">'</span>~&gt; 1.4.2<span class="String">'</span></span>&#x000A;&#x000A;group <span class="Constant"><span class="Constant">:</span>development</span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">'</span>sqlite3<span class="String">'</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;&#x000A;group <span class="Constant"><span class="Constant">:</span>production</span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">'</span>pg<span class="String">'</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;</pre>
+            <pre class="sunburst">source <span class="String"><span class="String">&#39;</span>http://rubygems.org<span class="String">&#39;</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">&#39;</span>rails<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>3.2.2<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rack-cache<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>require</span> =&gt; <span class="String"><span class="String">&#39;</span>rack/cache<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>~&gt; 1.4.2<span class="String">&#39;</span></span>&#x000A;&#x000A;group <span class="Constant"><span class="Constant">:</span>development</span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">&#39;</span>sqlite3<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;&#x000A;group <span class="Constant"><span class="Constant">:</span>production</span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">&#39;</span>pg<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;</pre>
             <p>
               Now, in development, you can instruct bundler to skip the <code>production</code> group:
             </p>
@@ -547,7 +547,7 @@
                   Next, add any gems that your application depends on. If you care which version of a
                   particular gem that you need, be sure to include an appropriate version restriction:
                 </p>
-                <pre class="sunburst">source <span class="String"><span class="String">'</span>http://rubygems.org<span class="String">'</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">'</span>sinatra<span class="String">'</span></span>, <span class="String"><span class="String">'</span>~&gt; 0.9.0<span class="String">'</span></span>&#x000A;gem <span class="String"><span class="String">'</span>rack-cache<span class="String">'</span></span>&#x000A;gem <span class="String"><span class="String">'</span>rack-bug<span class="String">'</span></span>&#x000A;</pre>
+                <pre class="sunburst">source <span class="String"><span class="String">&#39;</span>http://rubygems.org<span class="String">&#39;</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">&#39;</span>sinatra<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>~&gt; 0.9.0<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rack-cache<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rack-bug<span class="String">&#39;</span></span>&#x000A;</pre>
               </li>
               <li>
                 <p>
@@ -559,7 +559,7 @@
                 <p>
                   To update a gem's version requirements, first modify the Gemfile:
                 </p>
-                <pre class="sunburst">source <span class="String"><span class="String">'</span>http://rubygems.org<span class="String">'</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">'</span>sinatra<span class="String">'</span></span>, <span class="String"><span class="String">'</span>~&gt; 1.0.0<span class="String">'</span></span>&#x000A;gem <span class="String"><span class="String">'</span>rack-cache<span class="String">'</span></span>&#x000A;gem <span class="String"><span class="String">'</span>rack-bug<span class="String">'</span></span>&#x000A;</pre>
+                <pre class="sunburst">source <span class="String"><span class="String">&#39;</span>http://rubygems.org<span class="String">&#39;</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">&#39;</span>sinatra<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>~&gt; 1.0.0<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rack-cache<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rack-bug<span class="String">&#39;</span></span>&#x000A;</pre>
                 <p>
                   and then run:
                 </p>
@@ -621,52 +621,14 @@
       <img src="/images/emocow.png" />
       <img src="/images/panda.jpg" />
       <div class='spacer'></div>
-      <div id='navigation'>
+      <div id='credits'>
         <p>
-          <b>commands</b>
-          <a href="/v1.1/man/bundle-install.1.html">install</a>
-          /
-          <a href="/v1.1/man/bundle-update.1.html">update</a>
-          /
-          <a href="/v1.1/man/bundle-exec.1.html">exec</a>
-          /
-          <a href="/v1.1/man/bundle-config.1.html">config</a>
-          /
-          <a href="/v1.1/man/bundle-package.1.html">package</a>
-        </p>
-        <p>
-          <b>usage</b>
-          <a href="/v1.1/gemfile.html">gemfile</a>
-          /
-          <a href="/v1.1/git.html">git</a>
-          /
-          <a href="/v1.1/groups.html">groups</a>
-          /
-          <a href="/v1.1/bundler_setup.html">setup</a>
-          /
-          <a href="/v1.1/deploying.html">deploying</a>
-        </p>
-        <p>
-          <b>frameworks</b>
-          <a href="/v1.1/bundler_setup.html">ruby</a>
-          /
-          <a href="/v1.1/rubygems.html">rubygems</a>
-          /
-          <a href="/v1.1/rubymotion.html">rubymotion</a>
-          /
-          <a href="/v1.1/sinatra.html">sinatra</a>
-          /
-          <a href="/v1.1/rails3.html">rails 3</a>
+          Many thanks to Bundler's <a href="/contributors.html">contributors</a>
+          and <a href="/sponsors.html">sponsors</a>
         </p>
       </div>
       <div class='spacer'></div>
       <img src="/images/bundler-small.png" />
-    </div>
-    <div id='credits'>
-      <p>
-        Many thanks to Bundler's <a href="/contributors.html">contributors</a>
-        and <a href="/sponsors.html">sponsors</a>
-      </p>
     </div>
     <a href='http://github.com/bundler/bundler/' id='github'>
       <img alt='Fork me on GitHub' src='http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png'>
