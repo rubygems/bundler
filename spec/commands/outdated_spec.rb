@@ -113,4 +113,11 @@ describe "bundle outdated" do
       end
     end
   end
+
+  describe "with invalid gem name" do
+    it "returns could not find gem name" do
+      bundle "outdated invalid_gem_name"
+      expect(out).to include("Could not find gem 'invalid_gem_name'.")
+    end
+  end
 end

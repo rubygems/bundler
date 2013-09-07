@@ -418,8 +418,12 @@ module Bundler
       "Do not attempt to fetch gems remotely and use the gem cache instead"
     def outdated(*gems)
       sources = Array(options[:source])
-      Bundler.definition.validate_ruby!
 
+      gems.each do |gem_name|
+        select_spec(gem_name)
+      end
+
+      Bundler.definition.validate_ruby!
       current_specs = Bundler.ui.silence { Bundler.load.specs }
       current_dependencies = {}
       Bundler.ui.silence { Bundler.load.dependencies.each { |dep| current_dependencies[dep.name] = dep } }
@@ -878,7 +882,6 @@ module Bundler
       message += "\nDid you mean #{suggestions}?" if suggestions
       message
     end
-
 
     def without_groups_message
       groups = Bundler.settings.without
