@@ -3,7 +3,7 @@ bundle-exec(1) -- Execute a command in the context of the bundle
 
 ## SYNOPSIS
 
-`bundle exec` <command> [--keep-file-descriptors]
+`bundle exec` [--keep-file-descriptors] <command>
 
 ## DESCRIPTION
 
