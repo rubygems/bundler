@@ -288,6 +288,8 @@ module Bundler
       "Only output warnings and errors."
     method_option "full-index", :type => :boolean, :banner =>
         "Use the rubygems modern index instead of the API endpoint"
+    method_option "all", :type => :boolean, :banner =>
+        "updates all gems"
     def update(*gems)
       sources = Array(options[:source])
       Bundler.ui.quiet = options[:quiet]
@@ -297,7 +299,9 @@ module Bundler
         exit 1
       end
 
-      if gems.empty? && sources.empty?
+      if !options[:all] && gems.empty? && sources.empty?
+        return Bundler.ui.info("Are you sure you want to update every single gem in your bundle?!\n\nIf yes, run bundle update --all.\nIf you want to update an individual gem, run bundle update <gem_name>.\nIf not, have a good day!")
+      elsif options[:all] && gems.empty? && sources.empty?
         # We're doing a full update
         Bundler.definition(true)
       else
