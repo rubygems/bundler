@@ -119,5 +119,10 @@ describe "bundle outdated" do
       bundle "outdated invalid_gem_name"
       expect(out).to include("Could not find gem 'invalid_gem_name'.")
     end
+
+    it "returns non-zero exit code" do
+      bundle "outdated invalid_gem_name", :exitstatus => true
+      expect(exitstatus).to_not be_zero
+    end
   end
 end
