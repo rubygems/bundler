@@ -43,6 +43,8 @@ namespace :spec do
       system("sudo sed -i '/secure_path/d' /etc/sudoers")
       # Install groff for the ronn gem
       system("sudo apt-get install groff -y")
+      # Stop hardcoding the Bluebox Virginia DNS servers
+      system("printf 'nameserver 199.91.168.70\nnameserver 199.91.168.71\n' | sudo tee /etc/resolv.conf")
       # Install the other gem deps, etc.
       Rake::Task["spec:deps"].invoke
     end
