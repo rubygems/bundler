@@ -162,13 +162,13 @@ describe "bundle update" do
     G
 
     bundle "update"
-    expect(out).to include("Using activesupport (2.3.5)")
+    expect(out).to include("Using activesupport 2.3.5")
 
     update_repo2 do
       build_gem "activesupport", "3.0"
     end
 
     bundle "update"
-    expect(out).to include("Installing activesupport (3.0) was (2.3.5)")
+    expect(out).to include("Installing activesupport 3.0 (was 2.3.5)")
   end
 end
