@@ -207,7 +207,7 @@ describe "bundle flex_install" do
         the gems in your Gemfile, which may resolve the conflict.
       E
 
-      bundle :install
+      bundle :install, :retry => 0
       expect(out).to eq(nice_error)
     end
   end

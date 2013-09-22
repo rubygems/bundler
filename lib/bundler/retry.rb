@@ -1,17 +1,28 @@
 module Bundler
   # General purpose class for retrying code that may fail
   class Retry
-    attr_accessor :name, :max_attempts, :current_attempt
+    DEFAULT_ATTEMPTS = 2
+    attr_accessor :name, :total_runs, :current_run
 
-    def initialize(name, max_attempts = 1)
-      @name            = name
-      @max_attempts    = max_attempts
+    class << self
+      attr_accessor :attempts
+    end
+
+    def initialize(name, attempts = nil)
+      @name        = name
+      attempts    ||= default_attempts
+      @total_runs =  attempts.next # will run once, then upto attempts.times
+    end
+
+    def default_attempts
+      return Integer(self.class.attempts) if self.class.attempts
+      DEFAULT_ATTEMPTS
     end
 
     def attempt(&block)
-      @current_attempt = 0
-      @failed          = false
-      @error           = nil
+      @current_run = 0
+      @failed      = false
+      @error       = nil
       while keep_trying? do
         run(&block)
       end
@@ -21,8 +32,8 @@ module Bundler
 
   private
     def run(&block)
-      @failed          = false
-      @current_attempt += 1
+      @failed      = false
+      @current_run += 1
       @result = block.call
     rescue => e
       fail(e)
@@ -32,17 +43,17 @@ module Bundler
       @failed = true
       raise e if last_attempt?
       return true unless name
-      Bundler.ui.warn "Retrying #{name} due to error (#{current_attempt.next}/#{max_attempts}): #{e.message}"
+      Bundler.ui.warn "Retrying #{name} due to error (#{current_run.next}/#{total_runs}): #{e.message}"
     end
 
     def keep_trying?
-      return true  if current_attempt.zero?
+      return true  if current_run.zero?
       return false if last_attempt?
       return true  if @failed
     end
 
     def last_attempt?
-      current_attempt >= max_attempts
+      current_run >= total_runs
     end
   end
 end

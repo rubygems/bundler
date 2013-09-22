@@ -32,7 +32,7 @@ describe "Bundler.load" do
       expect {
         ENV['BUNDLE_GEMFILE'] = ""
         Bundler.load
-      }.not_to raise_error(Bundler::GemfileNotFound)
+      }.not_to raise_error()
     end
 
   end

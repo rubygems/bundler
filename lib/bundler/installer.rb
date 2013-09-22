@@ -76,15 +76,13 @@ module Bundler
         end
       end
 
-      retry_times = options[:retry] || 1
-
       # Since we are installing, we can resolve the definition
       # using remote specs
       unless local
         if options["local"]
           @definition.resolve_with_cache!
         else
-          Bundler::Retry.new("source fetch", retry_times).attempts do
+          Bundler::Retry.new("source fetch").attempts do
             @definition.resolve_remotely!
           end
         end

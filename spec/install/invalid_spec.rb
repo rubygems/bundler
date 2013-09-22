@@ -41,7 +41,7 @@ describe "invalid or inaccessible gem source" do
       gem "rack"
       gem "signed_gem"
     G
-    bundle "install --retry 3"
+    bundle "install", :retry => 2
     exp = Regexp.escape("Retrying source fetch due to error (2/3)")
     expect(out).to match(exp)
     exp = Regexp.escape("Retrying source fetch due to error (3/3)")

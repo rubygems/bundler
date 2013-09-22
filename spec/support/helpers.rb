@@ -56,7 +56,7 @@ module Spec
     end
 
     def bundle(cmd, options = {})
-      expect_err  = options.delete(:expect_err)
+      expect_err = options.delete(:expect_err)
       exitstatus = options.delete(:exitstatus)
       options["no-color"] = true unless options.key?("no-color") || %w(exec conf).include?(cmd.to_s[0..3])
 
@@ -190,6 +190,7 @@ module Spec
     def install_gemfile(*args)
       gemfile(*args)
       opts = args.last.is_a?(Hash) ? args.last : {}
+      opts[:retry] ||= 0
       bundle :install, opts
     end
 
