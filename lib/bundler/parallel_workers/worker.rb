@@ -39,8 +39,8 @@ module Bundler
 
       # Stop the forked workers and started threads
       def stop
-        stop_workers
         stop_threads
+        stop_workers
       end
 
       private
