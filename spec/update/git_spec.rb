@@ -17,7 +17,6 @@ describe "bundle update" do
       end
 
       bundle "update --force"
-
       should_be_installed "foo 1.1"
     end
 
