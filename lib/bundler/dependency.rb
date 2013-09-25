@@ -13,10 +13,12 @@ module Bundler
       :ruby_18  => Gem::Platform::RUBY,
       :ruby_19  => Gem::Platform::RUBY,
       :ruby_20  => Gem::Platform::RUBY,
+      :ruby_21  => Gem::Platform::RUBY,
       :mri      => Gem::Platform::RUBY,
       :mri_18   => Gem::Platform::RUBY,
       :mri_19   => Gem::Platform::RUBY,
       :mri_20   => Gem::Platform::RUBY,
+      :mri_21   => Gem::Platform::RUBY,
       :rbx      => Gem::Platform::RUBY,
       :jruby    => Gem::Platform::JAVA,
       :mswin    => Gem::Platform::MSWIN,
@@ -24,8 +26,10 @@ module Bundler
       :mingw_18 => Gem::Platform::MINGW,
       :mingw_19 => Gem::Platform::MINGW,
       :mingw_20 => Gem::Platform::MINGW,
+      :mingw_21 => Gem::Platform::MINGW,
       :x64_mingw    => Gem::Platform::X64_MINGW,
-      :x64_mingw_20 => Gem::Platform::X64_MINGW
+      :x64_mingw_20 => Gem::Platform::X64_MINGW,
+      :x64_mingw_21 => Gem::Platform::X64_MINGW
     }.freeze
 
     def initialize(name, version, options = {}, &blk)
