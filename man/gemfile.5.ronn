@@ -149,6 +149,8 @@ There are a number of `Gemfile` platforms:
     _ruby_ `AND` version 1.9
   * `ruby_20`:
     _ruby_ `AND` version 2.0
+  * `ruby_21`:
+    _ruby_ `AND` version 2.1
   * `mri`:
     Same as _ruby_, but not Rubinius
   * `mri_18`:
@@ -157,6 +159,8 @@ There are a number of `Gemfile` platforms:
     _mri_ `AND` version 1.9
   * `mri_20`:
     _mri_ `AND` version 2.0
+  * `mri_21`:
+    _mri_ `AND` version 2.1
   * `rbx`:
     Same as _ruby_, but only Rubinius (not MRI)
   * `jruby`:
@@ -171,10 +175,14 @@ There are a number of `Gemfile` platforms:
     _mingw_ `AND` version 1.9
   * `mingw_20`:
     _mingw_ `AND` version 2.0
+  * `mingw_21`:
+    _mingw_ `AND` version 2.1
   * `x64_mingw`:
     Windows 64 bit 'mingw32' platform (aka RubyInstaller x64)
   * `x64_mingw_20`:
     _x64_mingw_ `AND` version 2.0
+  * `x64_mingw_21`:
+    _x64_mingw_ `AND` version 2.1
 
 As with groups, you can specify one or more platforms:
 

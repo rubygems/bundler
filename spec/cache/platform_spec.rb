@@ -5,7 +5,7 @@ describe "bundle cache with multiple platforms" do
     gemfile <<-G
       source "file://#{gem_repo1}"
 
-      platforms :ruby, :ruby_18, :ruby_19, :ruby_20 do
+      platforms :ruby, :ruby_18, :ruby_19, :ruby_20, :ruby_21 do
         gem "rack", "1.0.0"
       end
 
@@ -13,7 +13,7 @@ describe "bundle cache with multiple platforms" do
         gem "activesupport", "2.3.5"
       end
 
-      platforms :mri, :mri_18, :mri_19, :mri_20 do
+      platforms :mri, :mri_18, :mri_19, :mri_20, :mri_21 do
         gem "activerecord", "2.3.2"
       end
     G
