@@ -1,7 +1,7 @@
 module Bundler
-  module Source
+  class Source
 
-    class Path
+    class Path < Source
       autoload :Installer, 'bundler/source/path/installer'
 
       attr_reader   :path, :options
@@ -71,7 +71,7 @@ module Bundler
 
       def install(spec)
         generate_bin(spec, :disable_extensions)
-        ["Using #{spec.name} (#{spec.version}) from #{to_s}", nil]
+        ["Using #{version_message(spec)} from #{to_s}", nil]
       end
 
       def cache(spec)

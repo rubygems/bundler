@@ -32,7 +32,7 @@ describe "bundle update" do
       G
 
       bundle "update rails"
-      expect(out).to include("Using activesupport (3.0) from #{lib_path('rails')} (at master)")
+      expect(out).to include("Using activesupport 3.0 from #{lib_path('rails')} (at master)")
       should_be_installed "rails 3.0", "activesupport 3.0"
     end
 
@@ -209,5 +209,28 @@ describe "bundle update" do
       expect(out).to include("Your bundle is updated!")
     end
 
+    it "shows the previous version of the gem" do
+      build_git "rails", "3.0", :path => lib_path("rails")
+
+      install_gemfile <<-G
+        gem "rails", :git => "#{lib_path('rails')}"
+      G
+
+      lockfile <<-G
+        GIT
+          remote: #{lib_path("rails")}
+          specs:
+            rails (2.3.2)
+
+        PLATFORMS
+          #{generic(Gem::Platform.local)}
+
+        DEPENDENCIES
+          rails!
+      G
+
+      bundle "update"
+      expect(out).to include("Using rails 3.0 (was 2.3.2) from #{lib_path('rails')} (at master)")
+    end
   end
 end

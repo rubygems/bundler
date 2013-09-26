@@ -1,5 +1,5 @@
 module Bundler
-  module Source
+  class Source
     class Path
 
       class Installer < Bundler::GemInstaller
