@@ -21,6 +21,8 @@ module Bundler
       :mri_21   => Gem::Platform::RUBY,
       :rbx      => Gem::Platform::RUBY,
       :jruby    => Gem::Platform::JAVA,
+      :jruby_18 => Gem::Platform::JAVA,
+      :jruby_19 => Gem::Platform::JAVA,
       :mswin    => Gem::Platform::MSWIN,
       :mingw    => Gem::Platform::MINGW,
       :mingw_18 => Gem::Platform::MINGW,
