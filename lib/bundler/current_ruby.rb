@@ -71,6 +71,14 @@ module Bundler
       defined?(RUBY_ENGINE) && RUBY_ENGINE == "jruby"
     end
 
+    def jruby_18?
+      jruby? && on_18?
+    end
+
+    def jruby_19?
+      jruby? && on_19?
+    end
+
     def maglev?
       defined?(RUBY_ENGINE) && RUBY_ENGINE == "maglev"
     end
