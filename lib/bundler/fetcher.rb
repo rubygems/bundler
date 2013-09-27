@@ -69,9 +69,8 @@ module Bundler
       # How many retries for the gemcutter API call
       @max_retries = 3
 
-      @remote_uri = remote_uri
       @remote_uri = RubygemsMirror.to_uri(remote_uri)
-      @public_uri = remote_uri.dup
+      @public_uri = @remote_uri.dup
       @public_uri.user, @public_uri.password = nil, nil # don't print these
       if defined?(Net::HTTP::Persistent)
         @connection = Net::HTTP::Persistent.new 'bundler', :ENV
