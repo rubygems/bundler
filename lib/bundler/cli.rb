@@ -645,13 +645,44 @@ module Bundler
       end
     end
 
+    CONSOLES = {
+      'pry'  => :Pry,
+      'ripl' => :Ripl,
+      'irb'  => :IRB,
+    }
+
     desc "console [GROUP]", "Opens an IRB session with the bundle pre-loaded"
     def console(group = nil)
       group ? Bundler.require(:default, *(group.split.map! {|g| g.to_sym })) : Bundler.require
       ARGV.clear
 
-      require 'irb'
-      IRB.start
+      preferred = Bundler.settings[:console] || 'irb'
+
+      # See if console is available
+      begin
+        require preferred || true
+      rescue LoadError
+        false
+
+        # Is it in Gemfile?
+        Bundler.ui.error "Could not load the #{preferred} console"
+        Bundler.ui.info "Falling back on IRB..."
+
+        require 'irb'
+        preferred = 'irb'
+      end
+
+      constant = CONSOLES[preferred]
+
+      console = begin
+                  Object.const_get(constant)
+                rescue NameError => e
+                  Bundler.ui.error e.inspect
+                  Bundler.ui.error "Could not load the #{constant} console"
+                  return
+                end
+
+      console.start
     end
 
     desc "version", "Prints the bundler's version information"
