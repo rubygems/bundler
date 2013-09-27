@@ -148,7 +148,7 @@ module Bundler
       if options[:binstubs_cmd] && spec.executables.empty?
         options = {}
         spec.runtime_dependencies.each do |dep|
-          bins = Bundler.definition.specs[dep].first.executables
+          bins = @definition.specs[dep].first.executables
           options[dep.name] = bins unless bins.empty?
         end
         if options.any?
@@ -233,9 +233,9 @@ module Bundler
       paths = []
 
       if groups.empty?
-        specs = Bundler.definition.requested_specs
+        specs = @definition.requested_specs
       else
-        specs = Bundler.definition.specs_for groups.map { |g| g.to_sym }
+        specs = @definition.specs_for groups.map { |g| g.to_sym }
       end
 
       specs.each do |spec|
