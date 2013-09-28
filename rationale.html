@@ -60,78 +60,280 @@
               any needed gems to your system, bundler writes a snapshot of all of the gems and
               versions that it installed to <code>Gemfile.lock</code>.
             </p>
-            <h2 id='deploying-your-application'>
-              Deploying Your Application
+            <h2 id='setting-up-your-application-to-use-bundler'>
+              Setting Up Your Application to Use Bundler
             </h2>
             <p>
-              When you run <code>bundle install</code>, bundler will (by default), install your gems
-              to your system repository of gems. This means that they will show up in <code>gem
-              list</code>. Additionally, if you are developing a number of applications, you will not
-              need to download and install gems in common for each application. This is nice for
-              development, but somewhat problematic for deployment.
+              Bundler makes sure that Ruby can find all of the gems in the <code>Gemfile</code>
+              (and all of their dependencies). If your app is a Rails 3 app, your default application
+              already has the code necessary to invoke bundler. If it is a Rails 2.3 app, please see
+              <a href="./rails23.html">Setting up Bundler in Rails 2.3</a>.
             </p>
             <p>
-              In a deployment scenario, the Unix user you deploy with may not have access to install
-              gems to a system location. Even if the user does (or you use <code>sudo</code>), the
-              user that boots the application may not have access to them. For instance, Passenger
-              runs its Ruby subprocesses with the user <code>nobody</code>, a somewhat restricted
-              user. The tradeoffs in a deployment environment lean more heavily in favor of isolation
-              (even at the cost of a somewhat slower deploy-time <code>bundle install</code> when some
-              third-party dependencies have changed).
+              For another kind of application (such as a Sinatra application), you will need to set up
+              bundler before trying to require any gems. At the top of the first file that your
+              application loads (for Sinatra, the file that calls <code>require 'sinatra'</code>), put
+              the following code:
+            </p>
+            <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>rubygems<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>bundler/setup<span class="String">&#39;</span></span>&#x000A;</pre>
+            <p>
+              This will automatically discover your <code>Gemfile</code>, and make all of the gems in
+              your <code>Gemfile</code> available to Ruby (in technical terms, it puts the gems "on the
+              load path"). You can think of it as an adding some extra powers to <code>require
+              'rubygems'</code>.
             </p>
             <p>
-              As a result, bundler comes with a <code>--deployment</code> flag that encapsulates the
-              best practices for using bundler in a deployment environment. These practices are based
-              on significant feedback we have received during the development of bundler, as well as a
-              number of bug reports that mostly reflected a misunderstanding of how to best configure
-              bundler for deployment. The <code>--deployment</code> flags adds the following defaults:
+              Now that your code is available to Ruby, you can require the gems that you need. For
+              instance, you can <code>require 'sinatra'</code>. If you have a lot of dependencies, you
+              might want to say "require all of the gems in my <code>Gemfile</code>". To do this, put
+              the following code immediately following <code>require 'bundler/setup'</code>:
             </p>
+            <pre class="sunburst"><span class="Support">Bundler</span>.<span class="Entity">require</span>(<span class="Constant"><span class="Constant">:</span>default</span>)&#x000A;</pre>
+            For our example Gemfile, this line is exactly equivalent to:
+            <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>rails<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>rack-cache<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>&#x000A;</pre>
+            <p>
+              Astute readers will notice that the correct way to require the <code>rack-cache</code>
+              gem is <code>require 'rack/cache'</code>, not <code>require 'rack-cache'</code>. To tell
+              bundler to use <code>require 'rack/cache'</code>, update your Gemfile:
+            </p>
+            <pre class="sunburst">source <span class="String"><span class="String">&#39;</span>http://rubygems.org<span class="String">&#39;</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">&#39;</span>rails<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>3.0.0.rc<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rack-cache<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>require</span> =&gt; <span class="String"><span class="String">&#39;</span>rack/cache<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>~&gt; 1.4.2<span class="String">&#39;</span></span>&#x000A;</pre>
+            <p>
+              For such a small <code>Gemfile</code>, we'd advise you to skip
+              <code>Bundler.require</code> and just require the gems by hand (especially given the
+              need to put in a <code>:require</code> directive in the <code>Gemfile</code>). For much
+              larger <code>Gemfile</code>s, using <code>Bundler.require</code> allows you to skip
+              repeating a large stack of requirements.
+            </p>
+            <h2 id='checking-your-code-into-version-control'>
+              Checking Your Code into Version Control
+            </h2>
+            <p>
+              After developing your application for a while, check in the application together with
+              the <code>Gemfile</code> and <code>Gemfile.lock</code> snapshot. Now, your repository
+              has a record of the exact versions of all of the gems that you used the last time you
+              know for sure that the application worked. Keep in mind that while your
+              <code>Gemfile</code> lists only three gems (with varying degrees of version strictness),
+              your application depends on dozens of gems, once you take into consideration all of the
+              implicit requirements of the gems you depend on.
+            </p>
+            <p>
+              This is important: <strong>the <code>Gemfile.lock</code> makes your application a single
+              package of both your own code and the third-party code it ran the last time you know for
+              sure that everything worked</strong>. Specifying exact versions of the third-party code
+              you depend on in your <code>Gemfile</code> would not provide the same guarantee, because
+              gems usually declare a range of versions for their dependencies.
+            </p>
+            <p>
+              The next time you run <code>bundle install</code> on the same machine, bundler will see
+              that it already has all of the dependencies you need, and skip the installation process.
+            </p>
+            <p>
+              Do not check in the <code>.bundle</code> directory, or any of the files inside it. Those
+              files are specific to each particular machine, and are used to persist installation options
+              between runs of the <code>bundle install</code> command.
+            </p>
+            <p>
+              If you have run <code>bundle pack</code>, the gems (although not the git gems) required
+              by your bundle will be downloaded into <code>vendor/cache</code>. Bundler can run without
+              connecting to the internet (or the Rubygems server) if all the gems you need are present
+              in that folder and checked in to your source control. This is an <strong>optional</strong>
+              step, and not recommended, due to the increase in size of your source control repository.
+            </p>
+            <h2 id='sharing-your-application-with-other-developers'>
+              Sharing Your Application With Other Developers
+            </h2>
+            <p>
+              When your co-developers (or you on another machine) check out your code, it will come
+              with the exact versions of all the third-party code your application used on the machine
+              that you last developed on (in the <code>Gemfile.lock</code>). When **they** run
+              <code>bundle install</code>, bundler will find the <code>Gemfile.lock</code> and skip
+              the dependency resolution step. Instead, it will install all of the same gems that you
+              used on the original machine.
+            </p>
+            <p>
+              In other words, you don't have to guess which versions of the dependencies you should
+              install. In the example we've been using, even though <code>rack-cache</code> declares a
+              dependency on <code>rack >= 0.4</code>, we know for sure it works with <code>rack
+              1.2.1</code>. Even if the Rack team releases <code>rack 1.2.2</code>, bundler will
+              always install <code>1.2.1</code>, the exact version of the gem that we know works. This
+              relieves a large maintenance burden from application developers, because all machines
+              always run the exact same third-party code.
+            </p>
+            <h2 id='updating-a-dependency'>
+              Updating a Dependency
+            </h2>
+            <p>
+              Of course, at some point, you might want to update the version of a particular
+              dependency your application relies on. For instance, you might want to update
+              <code>rails</code> to <code>3.0.0</code> final. Importantly, just because you're
+              updating one dependency, it doesn't mean you want to re-resolve all of your dependencies
+              and use the latest version of everything. In our example, you only have three
+              dependencies, but even in this case, updating everything can cause complications.
+            </p>
+            <p>
+              To illustrate, the <code>rails 3.0.0.rc</code> gem depends on <code>actionpack
+              3.0.0.rc</code> gem, which depends on <code>rack ~> 1.2.1</code> (which means <code>>=
+              1.2.1</code> and <code>< 1.3.0</code>). The <code>rack-cache</code> gem depends on
+              <code>rack >= 0.4</code>. Let's assume that the <code>rails 3.0.0</code> final gem also
+              depends on <code>rack ~> 1.2.1</code>, and that since the release of <code>rails
+              3.0.0</code>, the Rack team released <code>rack 1.2.2</code>.
+            </p>
+            <p>
+              If we naïvely update all of our gems in order to update Rails, we'll get <code>rack
+              1.2.2</code>, which satisfies the requirements of both <code>rails 3.0.0</code> and
+              <code>rack-cache</code>. However, we didn't specifically ask to update
+              <code>rack-cache</code>, which may not be compatible with <code>rack 1.2.2</code> (for
+              whatever reason). And while an update from <code>rack 1.2.1</code> to <code>rack
+              1.2.2</code> probably won't break anything, similar scenarios can happen that involve
+              much larger jumps. (see [1] below for a larger discussion)
+            </p>
+            <p>
+              In order to avoid this problem, when you update a gem, bundler will not update a
+              dependency of that gem if another gem still depends on it. In this example, since
+              <code>rack-cache</code> still depends on <code>rack</code>, bundler will not update the
+              <code>rack</code> gem. This ensures that updating <code>rails</code> doesn't
+              inadvertently break <code>rack-cache</code>. Since <code>rails 3.0.0</code>'s dependency
+              <code>actionpack 3.0.0</code> remains compatible with <code>rack 1.2.1</code>, bundler
+              leaves it alone, and <code>rack-cache</code> continues to work even in the face of an
+              incompatibility with <code>rack 1.2.2</code>.
+            </p>
+            <p>
+              Since you originally declared a dependency on <code>rails 3.0.0.rc</code>, if you want
+              to update to <code>rails 3.0.0</code>, simply update your <code>Gemfile</code> to
+              <code>gem 'rails', '3.0.0'</code> and run:
+            </p>
+            <pre class='sunburst'>$ bundle install&#x000A;</pre>
+            <p>
+              As described above, the <code>bundle install</code> command always does a conservative
+              update, refusing to update gems (or their dependencies) that you have not explicitly
+              changed in the <code>Gemfile</code>. This means that if you do not modify
+              <code>rack-cache</code> in your <code>Gemfile</code>, bundler will treat it **and its
+              dependencies** (<code>rack</code>) as a single, unmodifiable unit. If <code>rails
+              3.0.0</code> was incompatible with <code>rack-cache</code>, bundler will report a
+              conflict between your snapshotted dependencies (<code>Gemfile.lock</code>) and your
+              updated <code>Gemfile</code>.
+            </p>
+            <p>
+              If you update your <code>Gemfile</code>, and your system already has all of the needed
+              dependencies, bundler will transparently update the <code>Gemfile.lock</code> when you
+              boot your application. For instance, if you add <code>mysql</code> to your
+              <code>Gemfile</code>, and have already installed it in your system, you can boot your
+              application without running <code>bundle install</code>, and bundler will persist the
+              "last known good" configuration to the <code>Gemfile.lock</code> snapshot.
+            </p>
+            <p>
+              This can come in handy when adding or updating gems with minimal dependencies (database
+              drivers, <code>wirble</code>, <code>ruby-debug</code>). It will probably fail if you
+              update gems with significant dependencies (<code>rails</code>), or that a lot of gems
+              depend on (<code>rack</code>). If a transparent update fails, your application will fail
+              to boot, and bundler will print out an error instructing you to run <code>bundle
+              install</code>.
+            </p>
+            <h2 id='updating-a-gem-without-modyfying-the-gemfile'>
+              Updating a Gem Without Modifying the Gemfile
+            </h2>
+            <p>
+              Sometimes, you want to update a dependency without modifying the Gemfile. For example,
+              you might want to update to the latest version of <code>rack-cache</code>. Because you
+              did not declare a specific version of <code>rack-cache</code> in the
+              <code>Gemfile</code>, you might want to periodically get the latest version of
+              <code>rack-cache</code>. To do this, you want to use the <code>bundle update</code>
+              command:
+            </p>
+            <pre class='sunburst'>$ bundle update rack-cache&#x000A;</pre>
+            <p>
+              This command will update <code>rack-cache</code> and its dependencies to the latest
+              version allowed by the <code>Gemfile</code> (in this case, the latest version
+              available). It will not modify any other dependencies.
+            </p>
+            <p>
+              It will, however, update dependencies of other gems if necessary. For instance, if the
+              latest version of <code>rack-cache</code> specifies a dependency on <code>rack >=
+              1.2.2</code>, bundler will update <code>rack</code> to <code>1.2.2</code> even though
+              you have not asked bundler to update <code>rack</code>. If bundler needs to update a
+              gem that another gem depends on, it will let you know after the update has completed.
+            </p>
+            <p>
+              If you want to update every gem in the Gemfile to the latest possible versions, run:
+            </p>
+            <pre class='sunburst'>$ bundle update&#x000A;</pre>
+            <p>
+              This will resolve dependencies from scratch, ignoring the <code>Gemfile.lock</code>. If
+              you do this, keep <code>git reset --hard</code> and your test suite in your back pocket.
+              Resolving all dependencies from scratch can have surprising results, especially if a
+              number of the third-party packages you depend on have released new versions since you
+              last did a full update.
+            </p>
+            <h2 id='summary'>
+              Summary
+            </h2>
+            <h2>A Simple Bundler Workflow</h2>
             <ul>
               <li>
-                Instead of installing gems to the system location, bundler will install gems to
-                <code>vendor/bundle</code> inside your application. Bundler will transparently remember
-                this location when you invoke it inside your application (with
-                <code>Bundler.setup</code> and <code>Bundler.require</code>).
+                <p>
+                  When you first create a Rails application, it already comes with a
+                  <code>Gemfile</code>.  For another kind of application (such as Sinatra), run:
+                </p>
+                <pre class='sunburst'>$ bundle init&#x000A;</pre>
+                <p>
+                  The <code>bundle init</code> command creates a simple <code>Gemfile</code> which you
+                  can edit.
+                </p>
               </li>
               <li>
-                Bundler will not use gems already installed to your system, even if they exist.
+                <p>
+                  Next, add any gems that your application depends on. If you care which version of a
+                  particular gem that you need, be sure to include an appropriate version restriction:
+                </p>
+                <pre class="sunburst">source <span class="String"><span class="String">&#39;</span>http://rubygems.org<span class="String">&#39;</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">&#39;</span>sinatra<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>~&gt; 0.9.0<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rack-cache<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rack-bug<span class="String">&#39;</span></span>&#x000A;</pre>
               </li>
               <li>
-                If you have run <code>bundle pack</code>, checked in the <code>vendor/cache</code>
-                directory, and do not have any git gems, Bundler will not contact the internet while
-                installing your bundle.
+                <p>
+                  If you don't have the gems installed in your system yet, run:
+                </p>
+                <pre class='sunburst'>$ bundle install&#x000A;</pre>
               </li>
               <li>
-                Bundler will require a <code>Gemfile.lock</code> snapshot, and fail if you did not
-                provide one.
+                <p>
+                  To update a gem's version requirements, first modify the Gemfile:
+                </p>
+                <pre class="sunburst">source <span class="String"><span class="String">&#39;</span>http://rubygems.org<span class="String">&#39;</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">&#39;</span>sinatra<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>~&gt; 1.0.0<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rack-cache<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rack-bug<span class="String">&#39;</span></span>&#x000A;</pre>
+                <p>
+                  and then run:
+                </p>
+                <pre class='sunburst'>$ bundle install&#x000A;</pre>
               </li>
               <li>
-                Bundler will not transparently update your <code>Gemfile.lock</code> if it is out of
-                date with your <code>Gemfile</code>
+                <p>
+                  If <code>bundle install</code> reports a conflict between your <code>Gemfile</code>
+                  and <code>Gemfile.lock</code>, run:
+                </p>
+                <pre class='sunburst'>$ bundle update sinatra&#x000A;</pre>
+                <p>
+                  This will update just the Sinatra gem, as well as any of its dependencies
+                </p>
+              </li>
+              <li>
+                <p>
+                  To update all of the gems in your <code>Gemfile</code> to the latest possible
+                  versions, run:
+                </p>
+                <pre class='sunburst'>$ bundle update&#x000A;</pre>
+              </li>
+              <li>
+                Whenever your <code>Gemfile.lock</code> changes, always check it in to version
+                control. It keeps a history of the exact versions of all third-party code that you
+                used to successfully run your application.
+              </li>
+              <li>
+                <p>
+                  When deploying your code to a staging or production server, first run your tests (or
+                  boot your local development server), make sure you have checked in your
+                  <code>Gemfile.lock</code> to version control. On the remote server, run:
+                </p>
+                <pre class='sunburst'>$ bundle install --deployment&#x000A;</pre>
               </li>
             </ul>
-            <p>
-              If you use Capistrano, you should symlink <code>vendor/bundle</code> to
-              <code>shared/vendor_bundle</code> so that bundler will share your installed gems between
-              deployments (making things zippy if you didn't make any changes), but still give you the
-              benefits of isolation from other applications.
-            </p>
-            <p>
-              By defaulting the bundle directory to <code>vendor/bundle</code>, and installing your
-              bundle as part of your deployment process, you can be sure that the same Unix user that
-              checked out your application also installed the third-party code your application needs.
-              This means that if Passenger (or Unicorn) can see your application, it can also see its
-              dependencies.
-            </p>
-            <p>
-              The <code>--deployment</code> flag requires an up-to-date <code>Gemfile.lock</code> to
-              ensure that the testing you have done (in development and staging) actually reflects the
-              code you put into production. You can run <code>bundle check</code> before deploying
-              your application to make sure that your <code>Gemfile.lock</code> is up-to-date. Note
-              that it will always be up-to-date if you have run <code>bundle install</code>,
-              successfully booted your application (or run your tests) since the last time you changed
-              your <code>Gemfile</code>.
-            </p>
             <h2 id='notes'>
               Notes
             </h2>

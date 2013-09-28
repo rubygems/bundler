@@ -158,6 +158,29 @@
                   you specify the necessary build flags for a gem, you can successfully install that gem as many times
                   as necessary.
                 </p>
+                <h3>
+                  I Do Not Have an Internet Connection and Bundler Keeps Trying to Connect to the Gem Server
+                </h3>
+                <p>
+                  <strong>Q</strong>:  I do not have an internet connection but I have installed the gem before.
+                  How do I get bundler to use my local gem cache and not connect to the gem server?
+                </p>
+                <p>
+                  <strong>A</strong>: Use the --local flag with bundle install. The --local flag tells bundler
+                  to use the local gem cache instead of reaching out to the remote gem server.
+                </p>
+                <pre class='sunburst'>$ bundle install --local&#x000A;</pre>
+                <h3>
+                  Bundling From RubyGems is Really Slow
+                </h3>
+                <p>
+                  <strong>Q</strong>: When I bundle from rubygems it is really slow. Is there anything I can do to make it faster?
+                </p>
+                <p>
+                  <strong>A</strong>: Add the --full-index flag when bundling from the rubygems server. This downloads
+                  the index all at once instead of making numerous small requests to the api.
+                </p>
+                <pre class='sunburst'>$ bundle install --full-index</pre>
               </div>
             </div>
           </div>
