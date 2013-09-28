@@ -247,9 +247,9 @@ module Bundler
     HTTP_ERRORS = [
       Timeout::Error, EOFError, SocketError,
       Errno::EINVAL, Errno::ECONNRESET, Errno::ETIMEDOUT, Errno::EAGAIN,
-      Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError
+      Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError,
+      Net::HTTP::Persistent::Error
     ]
-    HTTP_ERRORS << Net::HTTP::Persistent::Error if defined?(Net::HTTP::Persistent)
 
     def fetch(uri, counter = 0)
       raise HTTPError, "Too many redirects" if counter >= @redirect_limit
@@ -258,11 +258,7 @@ module Bundler
         Bundler.ui.debug "Fetching from: #{uri}"
         req = Net::HTTP::Get.new uri.request_uri
         req.basic_auth(uri.user, uri.password) if uri.user
-        if defined?(Net::HTTP::Persistent)
-          response = @connection.request(uri, req)
-        else
-          response = @connection.request(req)
-        end
+        response = @connection.request(uri, req)
       rescue OpenSSL::SSL::SSLError
         raise CertificateFailureError.new(@public_uri)
       rescue *HTTP_ERRORS
