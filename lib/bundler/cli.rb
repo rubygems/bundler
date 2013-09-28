@@ -15,6 +15,8 @@ module Bundler
 
     def initialize(*)
       super
+      ENV['BUNDLE_GEMFILE']   = File.expand_path(options[:gemfile]) if options[:gemfile]
+      Bundler::Retry.attempts = options[:retry] || Bundler.settings[:retry] || Bundler::Retry::DEFAULT_ATTEMPTS
       Bundler.rubygems.ui = UI::RGProxy.new(Bundler.ui)
     rescue UnknownArgumentError => e
       raise InvalidOption, e.message
@@ -30,6 +32,8 @@ module Bundler
     default_task :install
     class_option "no-color", :type => :boolean, :banner => "Disable colorization in output"
     class_option "verbose",  :type => :boolean, :banner => "Enable verbose output mode", :aliases => "-V"
+    class_option "retry",    :type => :numeric, :aliases => "-r", :banner =>
+      "Specify the number of times you wish to attempt network commands"
 
     def help(cli = nil)
       case cli
@@ -106,8 +110,6 @@ module Bundler
     method_option "dry-run", :type => :boolean, :default => false, :banner =>
       "Lock the Gemfile"
     def check
-      ENV['BUNDLE_GEMFILE'] = File.expand_path(options[:gemfile]) if options[:gemfile]
-
       Bundler.settings[:path] = File.expand_path(options[:path]) if options[:path]
       begin
         definition = Bundler.definition
@@ -187,8 +189,6 @@ module Bundler
         opts[:without] = opts[:without].map{|g| g.tr(' ', ':') }
       end
 
-      # Can't use Bundler.settings for this because settings needs gemfile.dirname
-      ENV['BUNDLE_GEMFILE'] = File.expand_path(opts[:gemfile]) if opts[:gemfile]
       ENV['RB_USER_INSTALL'] = '1' if Bundler::FREEBSD
 
       # Just disable color in deployment mode
