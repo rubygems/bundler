@@ -1,7 +1,31 @@
 module Bundler
   module Source
-
     class Git < Path
+      class GitNotInstalledError < GitError
+        def initialize
+          msg =  "You need to install git to be able to use gems from git repositories. "
+          msg << "For help installing git, please refer to GitHub's tutorial at https://help.github.com/articles/set-up-git"
+          super msg
+        end
+      end
+
+      class GitNotAllowedError < GitError
+        def initialize(command)
+          msg =  "Bundler is trying to run a `git #{command}` at runtime. You probably need to run `bundle install`. However, "
+          msg << "this error message could probably be more useful. Please submit a ticket at http://github.com/bundler/bundler/issues "
+          mag << "with steps to reproduce as well as the following\n\nCALLER: #{caller.join("\n")}"
+          super msg
+        end
+      end
+
+      class GitCommandError < GitError
+        def initialize(command, path = nil)
+          msg =  "Git error: command `git #{command}` in directory #{Dir.pwd} has failed."
+          msg << "\nIf this error persists you could try removing the cache directory '#{path}'" if path && path.exist?
+          super msg
+        end
+      end
+
       # The GitProxy is responsible to iteract with git repositories.
       # All actions required by the Git source is encapsualted in this
       # object.
@@ -84,21 +108,12 @@ module Bundler
         end
 
         def git(command, check_errors=true)
-          if allow?
-            raise GitError, "You need to install git to be able to use gems from git repositories. For help installing git, please refer to GitHub's tutorial at https://help.github.com/articles/set-up-git" if !Bundler.git_present?
-
+          raise GitNotAllowedError.new(command) unless allow?
+          raise GitNotInstalledError.new        unless Bundler.git_present?
+          Bundler::Retry.new("git #{command}").attempts do
             out = SharedHelpers.with_clean_git_env { %x{git #{command}} }
-
-            if check_errors && $?.exitstatus != 0
-              msg = "Git error: command `git #{command}` in directory #{Dir.pwd} has failed."
-              msg << "\nIf this error persists you could try removing the cache directory '#{path}'" if path.exist?
-              raise GitError, msg
-            end
+            raise GitCommandError.new(command, path) if check_errors && !$?.success?
             out
-          else
-            raise GitError, "Bundler is trying to run a `git #{command}` at runtime. You probably need to run `bundle install`. However, " \
-                            "this error message could probably be more useful. Please submit a ticket at http://github.com/bundler/bundler/issues " \
-                            "with steps to reproduce as well as the following\n\nCALLER: #{caller.join("\n")}"
           end
         end
 
