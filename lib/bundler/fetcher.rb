@@ -59,34 +59,6 @@ module Bundler
         gem_path
       end
 
-      def connection
-        return @connection if @connection
-
-        needs_ssl = @remote_uri.scheme == "https" ||
-          Bundler.settings[:ssl_verify_mode] ||
-          Bundler.settings[:ssl_client_cert]
-        raise SSLError if needs_ssl && !defined(OpenSSL)
-
-        @connection = Net::HTTP::Persistent.new 'bundler', :ENV
-
-        if @remote_uri.scheme == "https"
-          @connection.verify_mode = (Bundler.settings[:ssl_verify_mode] ||
-            OpenSSL::SSL::VERIFY_PEER)
-          @connection.cert_store = bundler_cert_store
-        end
-
-        if Bundler.settings[:ssl_client_cert]
-          pem = File.read(Bundler.settings[:ssl_client_cert])
-          @connection.cert = OpenSSL::X509::Certificate.new(pem)
-          @connection.key  = OpenSSL::PKey::RSA.new(pem)
-        end
-
-        @connection.read_timeout = @api_timeout
-        @connection.override_headers["User-Agent"] = user_agent
-
-        @connection
-      end
-
       def user_agent
         @user_agent ||= begin
           ruby = Bundler.ruby_version
@@ -122,6 +94,34 @@ module Bundler
       @public_uri.user, @public_uri.password = nil, nil # don't print these
 
       Socket.do_not_reverse_lookup = true
+    end
+
+    def connection
+      return @connection if @connection
+
+      needs_ssl = @remote_uri.scheme == "https" ||
+        Bundler.settings[:ssl_verify_mode] ||
+        Bundler.settings[:ssl_client_cert]
+      raise SSLError if needs_ssl && !defined(OpenSSL)
+
+      @connection = Net::HTTP::Persistent.new 'bundler', :ENV
+
+      if @remote_uri.scheme == "https"
+        @connection.verify_mode = (Bundler.settings[:ssl_verify_mode] ||
+          OpenSSL::SSL::VERIFY_PEER)
+        @connection.cert_store = bundler_cert_store
+      end
+
+      if Bundler.settings[:ssl_client_cert]
+        pem = File.read(Bundler.settings[:ssl_client_cert])
+        @connection.cert = OpenSSL::X509::Certificate.new(pem)
+        @connection.key  = OpenSSL::PKey::RSA.new(pem)
+      end
+
+      @connection.read_timeout = @api_timeout
+      @connection.override_headers["User-Agent"] = self.class.user_agent
+
+      @connection
     end
 
     # fetch a gem specification
@@ -258,7 +258,7 @@ module Bundler
         Bundler.ui.debug "Fetching from: #{uri}"
         req = Net::HTTP::Get.new uri.request_uri
         req.basic_auth(uri.user, uri.password) if uri.user
-        response = @connection.request(uri, req)
+        response = connection.request(uri, req)
       rescue OpenSSL::SSL::SSLError
         raise CertificateFailureError.new(@public_uri)
       rescue *HTTP_ERRORS
