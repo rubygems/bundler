@@ -95,7 +95,7 @@ module Bundler
           agent += " rubygems/#{Gem::VERSION}"
           agent += " ruby/#{ruby.version}"
           agent += " (#{ruby.host})"
-          agent += " command/#{ARGV.join(" ")}"
+          agent += " command/#{ARGV.first}"
 
           if ruby.engine != "ruby"
             # engine_version raises on unknown engines
