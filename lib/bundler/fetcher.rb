@@ -1,4 +1,5 @@
 require 'bundler/vendored_persistent'
+require 'securerandom'
 
 module Bundler
 
@@ -57,6 +58,55 @@ module Bundler
 
         gem_path
       end
+
+      def connection
+        return @connection if @connection
+
+        needs_ssl = @remote_uri.scheme == "https" ||
+          Bundler.settings[:ssl_verify_mode] ||
+          Bundler.settings[:ssl_client_cert]
+        raise SSLError if needs_ssl && !defined(OpenSSL)
+
+        @connection = Net::HTTP::Persistent.new 'bundler', :ENV
+
+        if @remote_uri.scheme == "https"
+          @connection.verify_mode = (Bundler.settings[:ssl_verify_mode] ||
+            OpenSSL::SSL::VERIFY_PEER)
+          @connection.cert_store = bundler_cert_store
+        end
+
+        if Bundler.settings[:ssl_client_cert]
+          pem = File.read(Bundler.settings[:ssl_client_cert])
+          @connection.cert = OpenSSL::X509::Certificate.new(pem)
+          @connection.key  = OpenSSL::PKey::RSA.new(pem)
+        end
+
+        @connection.read_timeout = @api_timeout
+        @connection.override_headers["User-Agent"] = user_agent
+
+        @connection
+      end
+
+      def user_agent
+        @user_agent ||= begin
+          ruby = Bundler.ruby_version
+
+          agent = "bundler/#{Bundler::VERSION}"
+          agent += " rubygems/#{Gem::VERSION}"
+          agent += " ruby/#{ruby.version}"
+          agent += " (#{ruby.host})"
+          agent += " command/#{ARGV.join(" ")}"
+
+          if ruby.engine != "ruby"
+            # engine_version raises on unknown engines
+            engine_version = ruby.engine_version rescue "???"
+            agent += " #{ruby.engine}/#{engine_version}"
+          end
+          # add a random ID so we can consolidate runs server-side
+          agent << " " << SecureRandom.hex(8)
+        end
+      end
+
     end
 
     def initialize(remote_uri)
@@ -70,21 +120,6 @@ module Bundler
       @remote_uri = remote_uri
       @public_uri = remote_uri.dup
       @public_uri.user, @public_uri.password = nil, nil # don't print these
-      if defined?(Net::HTTP::Persistent)
-        @connection = Net::HTTP::Persistent.new 'bundler', :ENV
-        @connection.verify_mode = (Bundler.settings[:ssl_verify_mode] ||
-          OpenSSL::SSL::VERIFY_PEER)
-        @connection.cert_store = bundler_cert_store
-        if Bundler.settings[:ssl_client_cert]
-          pem = File.read(Bundler.settings[:ssl_client_cert])
-          @connection.cert = OpenSSL::X509::Certificate.new(pem)
-          @connection.key  = OpenSSL::PKey::RSA.new(pem)
-        end
-      else
-        raise SSLError if @remote_uri.scheme == "https"
-        @connection = Net::HTTP.new(@remote_uri.host, @remote_uri.port)
-      end
-      @connection.read_timeout = @api_timeout
 
       Socket.do_not_reverse_lookup = true
     end

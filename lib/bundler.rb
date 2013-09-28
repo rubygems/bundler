@@ -357,6 +357,10 @@ module Bundler
       @git_present ||= Bundler.which("git")
     end
 
+    def ruby_version
+      @ruby_version ||= SystemRubyVersion.new
+    end
+
   private
 
     def eval_yaml_gemspec(path, contents)
