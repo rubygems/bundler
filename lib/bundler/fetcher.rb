@@ -1,4 +1,5 @@
 require 'bundler/vendored_persistent'
+require 'securerandom'
 
 module Bundler
 
@@ -30,6 +31,8 @@ module Bundler
     class << self
       attr_accessor :disable_endpoint, :api_timeout, :redirect_limit, :max_retries
 
+      API_TIMEOUT = 15
+
       @@spec_fetch_map ||= {}
 
       def fetch(spec)
@@ -57,10 +60,40 @@ module Bundler
 
         gem_path
       end
+
+      def connection
+        @connection ||= begin
+          conn = Net::HTTP::Persistent.new nil, :ENV
+          conn.read_timeout = API_TIMEOUT
+          conn.override_headers["User-Agent"] = user_agent
+          conn
+        end
+      end
+
+      def user_agent
+        @user_agent ||= begin
+          ruby = Bundler.ruby_version
+
+          agent = "bundler/#{Bundler::VERSION}"
+          agent += " rubygems/#{Gem::VERSION}"
+          agent += " ruby/#{ruby.version}"
+          agent += " (#{ruby.host})"
+          agent += " command/#{ARGV.join(" ")}"
+
+          if ruby.engine != "ruby"
+            # engine_version raises on unknown engines
+            engine_version = ruby.engine_version rescue "???"
+            agent += " #{ruby.engine}/#{engine_version}"
+          end
+          # add a random ID so we can consolidate runs server-side
+          agent << " " << SecureRandom.hex(8)
+        end
+      end
+
     end
 
     def initialize(remote_uri)
-      # How many redirects to allew in one request
+      # How many redirects to allow in one request
       @redirect_limit = 5
       # How long to wait for each gemcutter API call
       @api_timeout = 10
@@ -70,23 +103,7 @@ module Bundler
       @remote_uri = remote_uri
       @public_uri = remote_uri.dup
       @public_uri.user, @public_uri.password = nil, nil # don't print these
-      if defined?(Net::HTTP::Persistent)
-        @connection = Net::HTTP::Persistent.new 'bundler', :ENV
-        @connection.verify_mode = (Bundler.settings[:ssl_verify_mode] ||
-          OpenSSL::SSL::VERIFY_PEER)
-        @connection.cert_store = bundler_cert_store
-        if Bundler.settings[:ssl_client_cert]
-          pem = File.read(Bundler.settings[:ssl_client_cert])
-          @connection.cert = OpenSSL::X509::Certificate.new(pem)
-          @connection.key  = OpenSSL::PKey::RSA.new(pem)
-        end
-      else
-        raise SSLError if @remote_uri.scheme == "https"
-        @connection = Net::HTTP.new(@remote_uri.host, @remote_uri.port)
-      end
-      @connection.read_timeout = @api_timeout
-
-      Socket.do_not_reverse_lookup = true
+      @has_api    = true # will be set to false if the rubygems index is ever fetched
     end
 
     # fetch a gem specification
@@ -221,16 +238,10 @@ module Bundler
 
       begin
         Bundler.ui.debug "Fetching from: #{uri}"
-        req = Net::HTTP::Get.new uri.request_uri
-        req.basic_auth(uri.user, uri.password) if uri.user
-        if defined?(Net::HTTP::Persistent)
-          response = @connection.request(uri, req)
-        else
-          response = @connection.request(req)
-        end
-      rescue OpenSSL::SSL::SSLError
-        raise CertificateFailureError.new(@public_uri)
-      rescue *HTTP_ERRORS
+        response = self.class.connection.request(uri)
+      rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, Errno::ETIMEDOUT,
+             EOFError, SocketError, Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError,
+             Errno::EAGAIN, Net::HTTP::Persistent::Error, Net::ProtocolError
         raise HTTPError, "Network error while fetching #{uri}"
       end
 
