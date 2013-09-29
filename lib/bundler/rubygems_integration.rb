@@ -300,8 +300,8 @@ module Bundler
         spec = nil
 
         if exec_name
-          spec = specs.find { |s| s.executables.include?(exec_name) }
-          spec or raise Gem::Exception, "can't find executable #{exec_name}"
+          spec = specs.find { |s| s.name == name && s.executables.include?(exec_name) }
+          spec or raise Gem::Exception, "can't find executable #{exec_name} in #{name}"
         else
           spec = specs.find  { |s| s.name == name }
           exec_name = spec.default_executable or raise Gem::Exception, "no default executable for #{spec.full_name}"
