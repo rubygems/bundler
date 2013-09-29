@@ -153,9 +153,10 @@ module Bundler
     # return the specs in the bundler format as an index
     def specs(gem_names, source)
       index = Index.new
-      use_full_source_index = !gem_names || @remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
+      use_full_index = !gem_names || @remote_uri.scheme == "file" ||
+        Bundler::Fetcher.disable_endpoint || !use_api
 
-      if gem_names && use_api
+      if !use_full_index
         specs = fetch_remote_specs(gem_names)
       end
 
