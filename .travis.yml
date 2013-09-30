@@ -8,6 +8,7 @@ branches:
     - 1-2-stable
     - 1-1-stable
     - 1-0-stable
+    - 2-0-dev
 notifications:
   email:
     # andre
