@@ -33,16 +33,15 @@ env:
   # We need to know if changes to rubygems will break bundler on release
   - RGV=master
   # Test the latest rubygems release with all of our supported rubies
-  - RGV=v2.0.6
+  - RGV=v2.1.3
   # Test the latest stable branch so we know the next minor will work
-  - RGV=2.0
+  - RGV=2.1
 matrix:
   allow_failures:
     # We want to know how we're doing with head, but not fail the build
     - rvm: ruby-head
     - env: RGV=master
-    - env: RGV=2.0
-    # 1.9.2 is simply too slow. it sometimes exceeds the 25m hard limit.
+    # 1.9.2 is simply too slow. it sometimes exceeds the Travis hard limit.
     - rvm: 1.9.2
     # Alternate implementations are good data points but not maintained
     - rvm: jruby
@@ -53,12 +52,21 @@ matrix:
       env: RGV=master
     # Alternate implementations
     - rvm: jruby
-      env: RGV=v2.0.6
+      env: RGV=v2.1.5
     - rvm: rbx
-      env: RGV=v2.0.6
+      env: RGV=v2.1.5
+    # Rubygems goes down to 2.0 on Ruby 2.0.0
+    - rvm: 2.0.0
+      env: RGV=v2.1.5
+    - rvm: 2.0.0
+      env: RGV=v2.0.10
     # Rubygems goes down to 1.5.3 on Ruby 1.9.3
     - rvm: 1.9.3
-      env: RGV=v1.8.25
+      env: RGV=v2.1.5
+    - rvm: 1.9.3
+      env: RGV=v2.0.10
+    - rvm: 1.9.3
+      env: RGV=v1.8.27
     - rvm: 1.9.3
       env: RGV=v1.7.2
     - rvm: 1.9.3
@@ -67,10 +75,10 @@ matrix:
       env: RGV=v1.5.3
     # We only want an overview of how 1.9.2 is doing
     - rvm: 1.9.2
-      env: RGV=v2.0.6
+      env: RGV=v2.1.5
     # Rubygems goes down to 1.3.6 on Ruby 1.8.7
     - rvm: 1.8.7
-      env: RGV=v1.8.25
+      env: RGV=v1.8.27
     - rvm: 1.8.7
       env: RGV=v1.7.2
     - rvm: 1.8.7
