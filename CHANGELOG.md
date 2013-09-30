@@ -1,4 +1,4 @@
-## 1.4.0.pre.2
+## 1.4.0.rc.1 (2013-09-29)
 
 Features:
 
@@ -6,12 +6,21 @@ Features:
   - add :patchlevel option to ruby DSL
   - add `bundler` bin (#2598, @kirs)
   - friendly ambiguous error messages (#2581, #2550, @jlsuttles, @jendiamond, @joyicecloud)
+  - add `:jruby_18` and `:jruby_19` paltform options (@mcfiredrill)
+  - add X.509 client certificates for auth without passwords (@snackbandit)
+  - add `exec --keep-file-descriptors` for Ruby 1.9-like behavior on 2.0 (@steved555)
+  - print a better error when git is not installed (@joyicecloud)
+  - exit non-zero when `outdated` is run with an unknown gem (@joyicecloud)
+  - add `:ruby_21` platform option (@brandonblack)
+  - add `--retry` to retry failed network and git commands (@schneems)
+  - include command and versions in User-Agent (@indirect, @joyicecloud)
 
 Bugfixes:
 
   - allow passwordless Basic Auth (#2606, @rykov)
   - don't suggest `gem install foo` when `foo` is a git gem that fails (@kirs)
-  - revert #2569, going back to git instead of https for :github gems
+  - revert #2569, staying compatible with git: instead of https: for :github gems
+  - handle exceptions while installing gems in parallel (@gnufied)
 
 ## 1.4.0.pre.1 (2013-08-04)
 
