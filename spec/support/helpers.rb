@@ -56,7 +56,7 @@ module Spec
     end
 
     def bundle(cmd, options = {})
-      expect_err  = options.delete(:expect_err)
+      expect_err = options.delete(:expect_err)
       exitstatus = options.delete(:exitstatus)
       options["no-color"] = true unless options.key?("no-color") || %w(exec conf).include?(cmd.to_s[0..3])
 
@@ -94,10 +94,6 @@ module Spec
       requires_str = requires.map{|r| "-r#{r}"}.join(" ")
 
       env = (options.delete(:env) || {}).map{|k,v| "#{k}='#{v}' "}.join
-      args = options.map do |k,v|
-        v == true ? " --#{k}" : " --#{k} #{v}" if v
-      end.join
-
       cmd = "#{env}#{Gem.ruby} -I#{lib} #{requires_str} #{bundle_bin}"
 
       if exitstatus
@@ -194,6 +190,7 @@ module Spec
     def install_gemfile(*args)
       gemfile(*args)
       opts = args.last.is_a?(Hash) ? args.last : {}
+      opts[:retry] ||= 0
       bundle :install, opts
     end
 
@@ -226,13 +223,13 @@ module Spec
       ENV["PATH"] = "#{tmp("broken_path")}:#{ENV["PATH"]}"
     end
 
-    def fake_groff!
-      FileUtils.mkdir_p(tmp("fake_groff"))
-      File.open(tmp("fake_groff/groff"), "w", 0755) do |f|
+    def fake_man!
+      FileUtils.mkdir_p(tmp("fake_man"))
+      File.open(tmp("fake_man/man"), "w", 0755) do |f|
         f.puts "#!/usr/bin/env ruby\nputs ARGV.inspect\n"
       end
 
-      ENV["PATH"] = "#{tmp("fake_groff")}:#{ENV["PATH"]}"
+      ENV["PATH"] = "#{tmp("fake_man")}:#{ENV["PATH"]}"
     end
 
     def kill_path!

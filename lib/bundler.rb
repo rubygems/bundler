@@ -5,6 +5,8 @@ require 'bundler/gem_path_manipulation'
 require 'bundler/rubygems_ext'
 require 'bundler/rubygems_integration'
 require 'bundler/version'
+require 'bundler/constants'
+require 'bundler/current_ruby'
 
 module Bundler
   preserve_gem_path
@@ -31,6 +33,7 @@ module Bundler
   autoload :MatchPlatform,         'bundler/match_platform'
   autoload :RemoteSpecification,   'bundler/remote_specification'
   autoload :Resolver,              'bundler/resolver'
+  autoload :Retry,                 'bundler/retry'
   autoload :RubyVersion,           'bundler/ruby_version'
   autoload :RubyDsl,               'bundler/ruby_dsl'
   autoload :Runtime,               'bundler/runtime'
@@ -48,25 +51,22 @@ module Bundler
     end
   end
 
-  class GemfileNotFound     < BundlerError; status_code(10) ; end
-  class GemNotFound         < BundlerError; status_code(7)  ; end
-  class GemfileError        < BundlerError; status_code(4)  ; end
-  class InstallError        < BundlerError; status_code(5)  ; end
-  class InstallHookError    < BundlerError; status_code(6)  ; end
-  class PathError           < BundlerError; status_code(13) ; end
-  class GitError            < BundlerError; status_code(11) ; end
-  class DeprecatedError     < BundlerError; status_code(12) ; end
-  class GemspecError        < BundlerError; status_code(14) ; end
-  class InvalidOption       < BundlerError; status_code(15) ; end
-  class ProductionError     < BundlerError; status_code(16) ; end
-  class HTTPError           < BundlerError; status_code(17) ; end
-  class RubyVersionMismatch < BundlerError; status_code(18) ; end
-  class SecurityError       < BundlerError; status_code(19) ; end
-  class LockfileError       < BundlerError; status_code(20) ; end
-
-  WINDOWS = RbConfig::CONFIG["host_os"] =~ %r!(msdos|mswin|djgpp|mingw)!
-  FREEBSD = RbConfig::CONFIG["host_os"] =~ /bsd/
-  NULL    = WINDOWS ? "NUL" : "/dev/null"
+  class GemfileNotFound       < BundlerError; status_code(10) ; end
+  class GemNotFound           < BundlerError; status_code(7)  ; end
+  class GemfileError          < BundlerError; status_code(4)  ; end
+  class InstallError          < BundlerError; status_code(5)  ; end
+  class InstallHookError      < BundlerError; status_code(6)  ; end
+  class PathError             < BundlerError; status_code(13) ; end
+  class GitError              < BundlerError; status_code(11) ; end
+  class DeprecatedError       < BundlerError; status_code(12) ; end
+  class GemspecError          < BundlerError; status_code(14) ; end
+  class InvalidOption         < BundlerError; status_code(15) ; end
+  class ProductionError       < BundlerError; status_code(16) ; end
+  class HTTPError             < BundlerError; status_code(17) ; end
+  class RubyVersionMismatch   < BundlerError; status_code(18) ; end
+  class SecurityError         < BundlerError; status_code(19) ; end
+  class LockfileError         < BundlerError; status_code(20) ; end
+  class CyclicDependencyError < BundlerError; status_code(21) ; end
 
   # Internal errors, should be rescued
   class VersionConflict  < BundlerError
@@ -80,8 +80,7 @@ module Bundler
     status_code(6)
   end
 
-  class InvalidSpecSet < StandardError; end
-  class MarshalError   < StandardError; end
+  class MarshalError < StandardError; end
 
   class << self
     attr_writer :ui, :bundle_path
@@ -140,12 +139,24 @@ module Bundler
       Bundler::Environment.new(root, definition)
     end
 
+    # Returns an instance of Bundler::Definition for given Gemfile and lockfile
+    #
+    # @param unlock [Hash, Boolean, nil] Gems that have been requested
+    #   to be updated or true if all gems should be updated
+    # @return [Bundler::Definition]
     def definition(unlock = nil)
       @definition = nil if unlock
       @definition ||= begin
         configure
         upgrade_lockfile
         Definition.build(default_gemfile, default_lockfile, unlock)
+      end
+    end
+
+    def locked_gems
+      @locked_gems ||= begin
+        lock = Bundler.read_file(Bundler.default_lockfile)
+        LockfileParser.new(lock)
       end
     end
 
@@ -245,17 +256,29 @@ module Bundler
     end
 
     def requires_sudo?
-      return @requires_sudo if defined?(@checked_for_sudo)
+      return @requires_sudo if defined?(@requires_sudo_ran)
 
-      path = bundle_path
-      path = path.parent until path.exist?
-      sudo_present = which "sudo"
-      bin_dir = Pathname.new(Bundler.system_bindir)
-      bin_dir = bin_dir.parent until bin_dir.exist?
+      if settings.allow_sudo?
+        sudo_present = which "sudo"
+      end
 
-      @checked_for_sudo = true
-      sudo_gems = !File.writable?(path) || !File.writable?(bin_dir)
-      @requires_sudo = settings.allow_sudo? && sudo_gems && sudo_present
+      if sudo_present
+        # the bundle path and subdirectories need to be writable for Rubygems
+        # to be able to unpack and install gems without exploding
+        path = bundle_path
+        path = path.parent until path.exist?
+
+        # bins are written to a different location on OS X
+        bin_dir = Pathname.new(Bundler.system_bindir)
+        bin_dir = bin_dir.parent until bin_dir.exist?
+
+        # if any directory is not writable, we need sudo
+        dirs = [path, bin_dir] | Dir[path.join('*').to_s]
+        sudo_needed = dirs.find{|d| !File.writable?(d) }
+      end
+
+      @requires_sudo_ran = true
+      @requires_sudo = settings.allow_sudo? && sudo_present && sudo_needed
     end
 
     def mkdir_p(path)
@@ -278,7 +301,19 @@ module Bundler
     end
 
     def sudo(str)
-      `sudo -p 'Enter your password to install the bundled RubyGems to your system: ' #{str}`
+      prompt = "\n\n" + <<-PROMPT.gsub(/^ {6}/, '').strip + " "
+      Your user account isn't allowed to install to the system Rubygems.
+      You can cancel this installation and run:
+
+          bundle install --path vendor/bundle
+
+      to install the gems into ./vendor/bundle/, or you can enter your password
+      and install the bundled gems to Rubygems using sudo.
+
+      Password:
+      PROMPT
+
+      `sudo -p "#{prompt}" #{str}`
     end
 
     def read_file(file)
@@ -304,7 +339,7 @@ module Bundler
       path = Pathname.new(file)
       # Eval the gemspec from its parent directory, because some gemspecs
       # depend on "./" relative paths.
-      Dir.chdir(path.dirname.to_s) do
+      SharedHelpers.chdir(path.dirname.to_s) do
         contents = path.read
         if contents[0..2] == "---" # YAML header
           eval_yaml_gemspec(path, contents)
@@ -316,6 +351,14 @@ module Bundler
 
     def clear_gemspec_cache
       @gemspec_cache = {}
+    end
+
+    def git_present?
+      @git_present ||= Bundler.which("git")
+    end
+
+    def ruby_version
+      @ruby_version ||= SystemRubyVersion.new
     end
 
   private
@@ -355,7 +398,6 @@ module Bundler
         configure_gem_home
       end
 
-      Bundler.rubygems.refresh
       bundle_path
     end
 

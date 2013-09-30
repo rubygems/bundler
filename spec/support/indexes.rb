@@ -87,7 +87,7 @@ module Spec
         end
 
         versions '1.0 1.2 1.2.1 1.2.2 1.3 1.3.0.1 1.3.5 1.4.0 1.4.2 1.4.2.1' do |version|
-          platforms "ruby java mswin32 mingw32" do |platform|
+          platforms "ruby java mswin32 mingw32 x64-mingw32" do |platform|
             next if version == v('1.4.2.1') && platform != pl('x86-mswin32')
             next if version == v('1.4.2') && platform == pl('x86-mswin32')
             gem "nokogiri", version, platform do
@@ -127,6 +127,24 @@ module Spec
         gem("my_app", '1.0.0') do
           dep "activemodel", ">= 0"
           dep "grape", ">= 0"
+        end
+      end
+    end
+
+    def a_circular_index
+      build_index do
+        gem "rack", "1.0.1"
+        gem("foo", '0.2.6') do
+          dep "bar", ">= 0"
+        end
+
+        gem("bar", "1.0.0") do
+          dep "foo", ">= 0"
+        end
+
+        gem("circular_app", '1.0.0') do
+          dep "foo", ">= 0"
+          dep "bar", ">= 0"
         end
       end
     end

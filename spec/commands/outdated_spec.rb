@@ -1,7 +1,6 @@
 require "spec_helper"
 
 describe "bundle outdated" do
-
   before :each do
     build_repo2 do
       build_git "foo", :path => lib_path("foo")
@@ -26,7 +25,7 @@ describe "bundle outdated" do
 
       bundle "outdated"
 
-      expect(out).to include("activesupport (3.0 > 2.3.5)")
+      expect(out).to include("activesupport (3.0 > 2.3.5) Gemfile specifies \"= 2.3.5\"")
       expect(out).to include("foo (1.0")
 
       # Gem names are one per-line, between "*" and their parenthesized version.
@@ -93,7 +92,7 @@ describe "bundle outdated" do
         end
 
         bundle "outdated --pre"
-        expect(out).to include("activesupport (3.0.0.beta > 2.3.5)")
+        expect(out).to include("activesupport (3.0.0.beta > 2.3.5) Gemfile specifies \"= 2.3.5\"")
       end
     end
 
@@ -110,8 +109,20 @@ describe "bundle outdated" do
         G
 
         bundle "outdated"
-        expect(out).to include("activesupport (3.0.0.beta.2 > 3.0.0.beta.1)")
+        expect(out).to include("activesupport (3.0.0.beta.2 > 3.0.0.beta.1) Gemfile specifies \"= 3.0.0.beta.1\"")
       end
+    end
+  end
+
+  describe "with invalid gem name" do
+    it "returns could not find gem name" do
+      bundle "outdated invalid_gem_name"
+      expect(out).to include("Could not find gem 'invalid_gem_name'.")
+    end
+
+    it "returns non-zero exit code" do
+      bundle "outdated invalid_gem_name", :exitstatus => true
+      expect(exitstatus).to_not be_zero
     end
   end
 

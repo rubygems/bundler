@@ -33,7 +33,7 @@ your deploy.rb file to run Bundler automatically as part of deploying:
     require 'bundler/capistrano'
 
 For more details on deploying using bundler, see the documentation
-for the bundler cap task, and the [documentation on deploying](http://gembundler.com/deploying.html).
+for the bundler cap task, and the [documentation on deploying](http://bundler.io/deploying.html).
 
 
 ## Bundler 0.8 to 0.9 and above

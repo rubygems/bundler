@@ -52,7 +52,7 @@ module Gem
 
     def git_version
       if @loaded_from && File.exist?(File.join(full_gem_path, ".git"))
-        sha = Dir.chdir(full_gem_path){ `git rev-parse HEAD`.strip }
+        sha = Bundler::SharedHelpers.chdir(full_gem_path){ `git rev-parse HEAD`.strip }
         " #{sha[0..6]}"
       end
     end
@@ -136,6 +136,7 @@ module Gem
     JAVA  = Gem::Platform.new('java') unless defined?(JAVA)
     MSWIN = Gem::Platform.new('mswin32') unless defined?(MSWIN)
     MINGW = Gem::Platform.new('x86-mingw32') unless defined?(MINGW)
+    X64_MINGW = Gem::Platform.new('x64-mingw32') unless defined?(X64_MINGW)
 
     undef_method :hash if method_defined? :hash
     def hash

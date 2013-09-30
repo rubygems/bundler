@@ -99,6 +99,20 @@ describe "gemcutter's dependency API" do
     should_be_installed("rails 2.3.2")
   end
 
+  it "doesn't fail if you only have a git gem with no deps when using --deployment" do
+    build_git "foo"
+    gemfile <<-G
+      source "#{source_uri}"
+      gem 'foo', :git => "file:///#{lib_path('foo-1.0')}"
+    G
+
+    bundle "install", :artifice => "endpoint"
+    bundle "install --deployment", :artifice => "endpoint", :exitstatus => true
+
+    expect(exitstatus).to eq(0)
+    should_be_installed("foo 1.0")
+  end
+
   it "falls back when the API errors out" do
     simulate_platform mswin
 
@@ -286,7 +300,7 @@ describe "gemcutter's dependency API" do
     expect(out).to include("Fetching gem metadata from #{source_uri}")
   end
 
-  fit "should install when EndpointSpecification with a bin dir owned by root", :sudo => true do
+  it "should install when EndpointSpecification has a bin dir owned by root", :sudo => true do
     sudo "mkdir -p #{system_gem_path("bin")}"
     sudo "chown -R root #{system_gem_path("bin")}"
 
@@ -295,7 +309,6 @@ describe "gemcutter's dependency API" do
       gem "rails"
     G
     bundle :install, :artifice => "endpoint"
-    puts out, err
     should_be_installed "rails 2.3.2"
   end
 
@@ -406,6 +419,20 @@ describe "gemcutter's dependency API" do
       bundle :install, :artifice => "endpoint_creds_diff_host"
       should_be_installed "rack 1.0.0"
     end
+
+    describe "with no password" do
+      let(:password) { nil }
+
+      it "passes basic authentication details" do
+        gemfile <<-G
+          source "#{basic_auth_source_uri}"
+          gem "rack"
+        G
+
+        bundle :install, :artifice => "endpoint_basic_authentication"
+        should_be_installed "rack 1.0.0"
+      end
+    end
   end
 
   context "when ruby is compiled without openssl" do
@@ -433,13 +460,13 @@ describe "gemcutter's dependency API" do
   end
 
   context "when SSL certificate verification fails" do
-    it "explains what is going on" do
+    it "explains what happened" do
       # Install a monkeypatch that reproduces the effects of openssl raising
-      # a certificate validation error at the appropriate moment.
+      # a certificate validation error when Rubygems tries to connect.
       gemfile <<-G
-        class Bundler::Fetcher
-          def fetch_all_remote_specs
-            raise OpenSSL::SSL::SSLError, "Certificate invalid"
+        class Net::HTTP
+          def start
+            raise OpenSSL::SSL::SSLError, "certificate verify failed"
           end
         end
 
@@ -474,4 +501,5 @@ describe "gemcutter's dependency API" do
       expect(exitstatus).to eq(0)
     end
   end
+
 end

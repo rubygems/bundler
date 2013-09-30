@@ -1,5 +1,9 @@
 require 'net/http'
-require 'net/https'
+begin
+  require 'net/https'
+rescue LoadError
+  # net/https or openssl
+end if RUBY_VERSION < '1.9' # but only for 1.8
 require 'net/http/faster'
 require 'uri'
 require 'cgi' # for escaping
@@ -8,6 +12,8 @@ begin
   require 'net/http/pipeline'
 rescue LoadError
 end
+
+autoload :OpenSSL, 'openssl'
 
 ##
 # Persistent connections for Net::HTTP
@@ -37,6 +43,11 @@ end
 #   # perform a GET
 #   response = http.request uri
 #
+#   # or
+#
+#   get = Net::HTTP::Get.new uri.request_uri
+#   response = http.request get
+#
 #   # create a POST
 #   post_uri = uri + 'create'
 #   post = Net::HTTP::Post.new post_uri.path
@@ -44,6 +55,10 @@ end
 #
 #   # perform the POST, the URI is always required
 #   response http.request post_uri, post
+#
+# Note that for GET, HEAD and other requests that do not have a body you want
+# to use URI#request_uri not URI#path.  The request_uri contains the query
+# params which are sent in the body for other requests.
 #
 # == SSL
 #
@@ -104,6 +119,13 @@ end
 #
 # The amount of time allowed between reading two chunks from the socket.  Set
 # through #read_timeout
+#
+# === Max Requests
+#
+# The number of requests that should be made before opening a new connection.
+# Typically many keep-alive capable servers tune this to 100 or less, so the
+# 101st request will fail with ECONNRESET. If unset (default), this value has no
+# effect, if set, connections will be reset on the request after max_requests.
 #
 # === Open Timeout
 #
@@ -174,9 +196,29 @@ class Net::HTTP::Persistent
   EPOCH = Time.at 0 # :nodoc:
 
   ##
+  # Is OpenSSL available?  This test works with autoload
+
+  HAVE_OPENSSL = defined? OpenSSL::SSL # :nodoc:
+
+  ##
   # The version of Net::HTTP::Persistent you are using
 
-  VERSION = '2.8'
+  VERSION = '2.9'
+
+  ##
+  # Exceptions rescued for automatic retry on ruby 2.0.0.  This overlaps with
+  # the exception list for ruby 1.x.
+
+  RETRIED_EXCEPTIONS = [ # :nodoc:
+    (Net::ReadTimeout if Net.const_defined? :ReadTimeout),
+    IOError,
+    EOFError,
+    Errno::ECONNRESET,
+    Errno::ECONNABORTED,
+    Errno::EPIPE,
+    (OpenSSL::SSL::SSLError if HAVE_OPENSSL),
+    Timeout::Error,
+  ].compact
 
   ##
   # Error class for errors raised by Net::HTTP::Persistent.  Various
@@ -226,6 +268,8 @@ class Net::HTTP::Persistent
       $stderr.puts "sleeping #{sleep_time}" if $DEBUG
       sleep sleep_time
     end
+  rescue
+    # ignore StandardErrors, we've probably found the idle timeout.
   ensure
     http.shutdown
 
@@ -286,6 +330,12 @@ class Net::HTTP::Persistent
   # automatically closed.
 
   attr_accessor :idle_timeout
+
+  ##
+  # Maximum number of requests on a connection before it is considered expired
+  # and automatically closed.
+
+  attr_accessor :max_requests
 
   ##
   # The value sent in the Keep-Alive header.  Defaults to 30.  Not needed for
@@ -442,6 +492,7 @@ class Net::HTTP::Persistent
     @open_timeout     = nil
     @read_timeout     = nil
     @idle_timeout     = 5
+    @max_requests     = nil
     @socket_options   = []
 
     @socket_options << [Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1] if
@@ -458,14 +509,21 @@ class Net::HTTP::Persistent
     @private_key        = nil
     @ssl_version        = nil
     @verify_callback    = nil
-    @verify_mode        = OpenSSL::SSL::VERIFY_PEER
+    @verify_mode        = nil
     @cert_store         = nil
 
     @generation         = 0 # incremented when proxy URI changes
     @ssl_generation     = 0 # incremented when SSL session variables change
-    @reuse_ssl_sessions = OpenSSL::SSL.const_defined? :Session
+
+    if HAVE_OPENSSL then
+      @verify_mode        = OpenSSL::SSL::VERIFY_PEER
+      @reuse_ssl_sessions = OpenSSL::SSL.const_defined? :Session
+    end
 
     @retry_change_requests = false
+
+    @ruby_1 = RUBY_VERSION < '2'
+    @retried_on_ruby_2 = !@ruby_1
 
     self.proxy = proxy if proxy
   end
@@ -536,6 +594,9 @@ class Net::HTTP::Persistent
     use_ssl = uri.scheme.downcase == 'https'
 
     if use_ssl then
+      raise Net::HTTP::Persistent::Error, 'OpenSSL is not available' unless
+        HAVE_OPENSSL
+
       ssl_generation = @ssl_generation
 
       ssl_cleanup ssl_generation
@@ -606,10 +667,12 @@ class Net::HTTP::Persistent
   end
 
   ##
-  # Returns true if the connection should be reset due to an idle timeout,
-  # false otherwise.
+  # Returns true if the connection should be reset due to an idle timeout, or
+  # maximum request count, false otherwise.
 
   def expired? connection
+    requests = Thread.current[@request_key][connection.object_id]
+    return true  if     @max_requests && requests >= @max_requests
     return false unless @idle_timeout
     return true  if     @idle_timeout.zero?
 
@@ -679,10 +742,15 @@ class Net::HTTP::Persistent
   end
 
   ##
-  # Is the request idempotent or is retry_change_requests allowed
+  # Is the request +req+ idempotent or is retry_change_requests allowed.
+  #
+  # If +retried_on_ruby_2+ is true, true will be returned if we are on ruby,
+  # retry_change_requests is allowed and the request is not idempotent.
 
-  def can_retry? req
-    retry_change_requests or idempotent?(req)
+  def can_retry? req, retried_on_ruby_2 = false
+    return @retry_change_requests && !idempotent?(req) if retried_on_ruby_2
+
+    @retry_change_requests || idempotent?(req)
   end
 
   if RUBY_VERSION > '1.9' then
@@ -901,31 +969,14 @@ class Net::HTTP::Persistent
   #
   # +req+ must be a Net::HTTPRequest subclass (see Net::HTTP for a list).
   #
-  # If there is an error and the request is idempontent according to RFC 2616
+  # If there is an error and the request is idempotent according to RFC 2616
   # it will be retried automatically.
 
   def request uri, req = nil, &block
     retried      = false
     bad_response = false
 
-    req = Net::HTTP::Get.new uri.request_uri unless req
-
-    @headers.each do |pair|
-      req.add_field(*pair)
-    end
-
-    if uri.user or uri.password
-      req.basic_auth uri.user, uri.password
-    end
-
-    @override_headers.each do |name, value|
-      req[name] = value
-    end
-
-    unless req['Connection'] then
-      req.add_field 'Connection', 'keep-alive'
-      req.add_field 'Keep-Alive', @keep_alive
-    end
+    req = request_setup req || uri
 
     connection = connection_for uri
     connection_id = connection.object_id
@@ -950,23 +1001,25 @@ class Net::HTTP::Persistent
 
       bad_response = true
       retry
-    rescue IOError, EOFError, Timeout::Error,
-           Errno::ECONNABORTED, Errno::ECONNRESET, Errno::EPIPE,
-           Errno::EINVAL, OpenSSL::SSL::SSLError => e
-
-      if retried or not can_retry? req
-        due_to = "(due to #{e.message} - #{e.class})"
-        message = error_message connection
-
-        finish connection
-
-        raise Error, "too many connection resets #{due_to} #{message}"
-      end
+    rescue *RETRIED_EXCEPTIONS => e # retried on ruby 2
+      request_failed e, req, connection if
+        retried or not can_retry? req, @retried_on_ruby_2
 
       reset connection
 
       retried = true
       retry
+    rescue Errno::EINVAL, Errno::ETIMEDOUT => e # not retried on ruby 2
+      request_failed e, req, connection if retried or not can_retry? req
+
+      reset connection
+
+      retried = true
+      retry
+    rescue Exception => e
+      finish connection
+
+      raise
     ensure
       Thread.current[@timeout_key][connection_id] = Time.now
     end
@@ -974,6 +1027,51 @@ class Net::HTTP::Persistent
     @http_versions["#{uri.host}:#{uri.port}"] ||= response.http_version
 
     response
+  end
+
+  ##
+  # Raises an Error for +exception+ which resulted from attempting the request
+  # +req+ on the +connection+.
+  #
+  # Finishes the +connection+.
+
+  def request_failed exception, req, connection # :nodoc:
+    due_to = "(due to #{exception.message} - #{exception.class})"
+    message = "too many connection resets #{due_to} #{error_message connection}"
+
+    finish connection
+
+
+    raise Error, message, exception.backtrace
+  end
+
+  ##
+  # Creates a GET request if +req_or_uri+ is a URI and adds headers to the
+  # request.
+  #
+  # Returns the request.
+
+  def request_setup req_or_uri # :nodoc:
+    req = if URI === req_or_uri then
+            Net::HTTP::Get.new req_or_uri.request_uri
+          else
+            req_or_uri
+          end
+
+    @headers.each do |pair|
+      req.add_field(*pair)
+    end
+
+    @override_headers.each do |name, value|
+      req[name] = value
+    end
+
+    unless req['Connection'] then
+      req.add_field 'Connection', 'keep-alive'
+      req.add_field 'Keep-Alive', @keep_alive
+    end
+
+    req
   end
 
   ##

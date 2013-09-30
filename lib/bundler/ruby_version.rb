@@ -1,8 +1,8 @@
 module Bundler
   class RubyVersion
-    attr_reader :version, :engine, :engine_version
+    attr_reader :version, :patchlevel, :engine, :engine_version
 
-    def initialize(version, engine, engine_version)
+    def initialize(version, patchlevel, engine, engine_version)
       # The parameters to this method must satisfy the
       # following constraints, which are verified in
       # the DSL:
@@ -20,10 +20,12 @@ module Bundler
       # keep track of the engine specified by the user
       @input_engine   = engine
       @engine_version = engine_version || version
+      @patchlevel     = patchlevel
     end
 
     def to_s
       output = "ruby #{version}"
+      output << "p#{patchlevel}" if patchlevel
       output << " (#{engine} #{engine_version})" unless engine == "ruby"
 
       output
@@ -32,7 +34,8 @@ module Bundler
     def ==(other)
       version          == other.version &&
         engine         == other.engine &&
-        engine_version == other.engine_version
+        engine_version == other.engine_version &&
+        patchlevel     == other.patchlevel
     end
 
     # Returns a tuple of thsee things:
@@ -48,9 +51,19 @@ module Bundler
         [ :version, version, other.version ]
       elsif engine_version != other.engine_version && @input_engine
         [ :engine_version, engine_version, other.engine_version ]
+      elsif patchlevel != other.patchlevel && @patchlevel
+        [ :patchlevel, patchlevel, other.patchlevel ]
       else
         nil
       end
+    end
+
+    def host
+      @host ||= [
+        RbConfig::CONFIG["host_cpu"],
+        RbConfig::CONFIG["host_vendor"],
+        RbConfig::CONFIG["host_os"]
+      ].join("-")
     end
   end
 
@@ -67,12 +80,16 @@ module Bundler
     end
 
     def version
-      RUBY_VERSION
+      RUBY_VERSION.dup
+    end
+
+    def gem_version
+      @gem_version ||= Gem::Version.new(version)
     end
 
     def engine
       if defined?(RUBY_ENGINE)
-        RUBY_ENGINE
+        RUBY_ENGINE.dup
       else
         # not defined in ruby 1.8.7
         "ruby"
@@ -82,15 +99,19 @@ module Bundler
     def engine_version
       case engine
       when "ruby"
-        RUBY_VERSION
+        RUBY_VERSION.dup
       when "rbx"
-        Rubinius::VERSION
+        Rubinius::VERSION.dup
       when "jruby"
-        JRUBY_VERSION
+        JRUBY_VERSION.dup
       else
-        raise BundlerError, "That RUBY_ENGINE is not recognized"
+        raise BundlerError, "RUBY_ENGINE value #{RUBY_ENGINE} is not recognized"
         nil
       end
+    end
+
+    def patchlevel
+      RUBY_PATCHLEVEL
     end
   end
 end

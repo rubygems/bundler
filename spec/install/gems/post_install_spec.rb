@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe 'bundle install with gem sources' do
-  describe 'when gems include post install messages' do
+describe "bundle install with gem sources" do
+  describe "when gems include post install messages" do
     it "should display the post-install messages after installing" do
       gemfile <<-G
         source "file://#{gem_repo1}"
@@ -20,7 +20,7 @@ describe 'bundle install with gem sources' do
     end
   end
 
-  describe 'when gems do not include post install messages' do
+  describe "when gems do not include post install messages" do
     it "should not display any post-install messages" do
       gemfile <<-G
         source "file://#{gem_repo1}"

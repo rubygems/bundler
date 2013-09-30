@@ -1,5 +1,4 @@
-$:.unshift File.expand_path('../vendor', __FILE__)
-require 'thor'
+require 'bundler/vendored_thor' unless defined?(Thor)
 require 'bundler'
 
 module Bundler
@@ -25,7 +24,7 @@ module Bundler
 
     def initialize(base = nil, name = nil)
       Bundler.ui = UI::Shell.new
-      @base = (base ||= Dir.pwd)
+      @base = (base ||= SharedHelpers.pwd)
       gemspecs = name ? [File.join(base, "#{name}.gemspec")] : Dir[File.join(base, "{,*}.gemspec")]
       raise "Unable to determine name from existing gemspec. Use :name => 'gemname' in #install_tasks to manually set it." unless gemspecs.size == 1
       @spec_path = gemspecs.first
@@ -33,19 +32,21 @@ module Bundler
     end
 
     def install
+      built_gem_path = nil
+
       desc "Build #{name}-#{version}.gem into the pkg directory."
       task 'build' do
-        build_gem
+        built_gem_path = build_gem
       end
 
       desc "Build and install #{name}-#{version}.gem into system gems."
-      task 'install' do
-        install_gem
+      task 'install' => 'build' do
+        install_gem(built_gem_path)
       end
 
       desc "Create tag #{version_tag} and build and push #{name}-#{version}.gem to Rubygems"
-      task 'release' do
-        release_gem
+      task 'release' => 'build' do
+        release_gem(built_gem_path)
       end
 
       GemHelper.instance = self
@@ -62,16 +63,16 @@ module Bundler
       File.join(base, 'pkg', file_name)
     end
 
-    def install_gem
-      built_gem_path = build_gem
+    def install_gem(built_gem_path=nil)
+      built_gem_path ||= build_gem
       out, _ = sh_with_code("gem install '#{built_gem_path}' --local")
       raise "Couldn't install gem, run `gem install #{built_gem_path}' for more detailed output" unless out[/Successfully installed/]
       Bundler.ui.confirm "#{name} (#{version}) installed."
     end
 
-    def release_gem
+    def release_gem(built_gem_path=nil)
       guard_clean
-      built_gem_path = build_gem
+      built_gem_path ||= build_gem
       tag_version { git_push } unless already_tagged?
       rubygem_push(built_gem_path) if gem_push?
     end
@@ -152,7 +153,7 @@ module Bundler
       cmd << " 2>&1"
       outbuf = ''
       Bundler.ui.debug(cmd)
-      Dir.chdir(base) {
+      SharedHelpers.chdir(base) {
         outbuf = `#{cmd}`
         if $? == 0
           block.call(outbuf) if block

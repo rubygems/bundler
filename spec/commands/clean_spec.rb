@@ -100,7 +100,7 @@ describe "bundle clean" do
     expect(vendored_gems("bin/rackup")).to exist
   end
 
-  it "remove gems in bundle without groups" do
+  it "removes gems in bundle without groups" do
     gemfile <<-G
       source "file://#{gem_repo1}"
 
@@ -288,7 +288,7 @@ describe "bundle clean" do
   end
 
   # handling bundle clean upgrade path from the pre's
-  it "removes .gem/.gemspec file even if there's no corresponding gem dir is already moved" do
+  it "removes .gem/.gemspec file even if there's no corresponding gem dir" do
     gemfile <<-G
       source "file://#{gem_repo1}"
 
@@ -556,6 +556,36 @@ describe "bundle clean" do
     expect(out).to eq("Would have removed foo (1.0)")
 
     should_have_gems 'thin-1.0', 'rack-1.0.0', 'foo-1.0'
+
+    expect(vendored_gems("bin/rackup")).to exist
+  end
+
+  it "doesn't store dry run as a config setting" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "thin"
+      gem "foo"
+    G
+
+    bundle "install --path vendor/bundle --no-clean"
+    bundle "config dry_run false"
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "thin"
+    G
+
+    bundle :install
+
+    bundle "clean"
+
+    expect(out).to eq("Removing foo (1.0)")
+    expect(out).not_to eq("Would have removed foo (1.0)")
+
+    should_have_gems 'thin-1.0', 'rack-1.0.0'
+    should_not_have_gems 'foo-1.0'
 
     expect(vendored_gems("bin/rackup")).to exist
   end

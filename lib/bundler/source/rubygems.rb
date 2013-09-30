@@ -15,6 +15,7 @@ module Bundler
         @options = options
         @remotes = (options["remotes"] || []).map { |r| normalize_uri(r) }
         @fetchers = {}
+        @dependency_names = []
         @allow_remote = false
         @allow_cached = false
 
@@ -68,11 +69,10 @@ module Bundler
 
       def install(spec)
         if installed_specs[spec].any?
-          Bundler.ui.info "Using #{spec.name} (#{spec.version}) "
-          return
+          return ["Using #{spec.name} (#{spec.version})", nil]
         end
 
-        Bundler.ui.info "Installing #{spec.name} (#{spec.version}) "
+        install_message = "Installing #{spec.name} (#{spec.version})"
         path = cached_gem(spec)
         if Bundler.requires_sudo?
           install_path = Bundler.tmp
@@ -93,10 +93,6 @@ module Bundler
           ).install
         end
 
-        if spec.post_install_message
-          Installer.post_install_messages[spec.name] = spec.post_install_message
-        end
-
         # SUDO HAX
         if Bundler.requires_sudo?
           Bundler.mkdir_p "#{Bundler.rubygems.gem_dir}/gems"
@@ -110,6 +106,7 @@ module Bundler
         end
         installed_spec.loaded_from = "#{Bundler.rubygems.gem_dir}/specifications/#{spec.full_name}.gemspec"
         spec.loaded_from = "#{Bundler.rubygems.gem_dir}/specifications/#{spec.full_name}.gemspec"
+        [install_message, spec.post_install_message]
       end
 
       def cache(spec)

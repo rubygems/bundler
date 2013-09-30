@@ -47,8 +47,11 @@ module Bundler
 
       @sources.each do |source|
         source.search(query, base).each do |spec|
-          results << spec unless seen.include?([spec.name, spec.version, spec.platform])
-          seen << [spec.name, spec.version, spec.platform]
+          lookup = [spec.name, spec.version, spec.platform]
+          unless seen.include?(lookup)
+            results << spec
+            seen << lookup
+          end
         end
       end
 

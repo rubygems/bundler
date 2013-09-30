@@ -74,16 +74,19 @@ Each _gem_ `MAY` have one or more version specifiers.
 ### REQUIRE AS (:require)
 
 Each _gem_ `MAY` specify files that should be used when autorequiring via
-`Bundler.require`. You may pass an array with multiple files, or `false` to
+`Bundler.require`. You may pass an array with multiple files or `true` if file
+you want `required` has same name as _gem_ or `false` to
 prevent any file from being autorequired.
 
     gem "redis", :require => ["redis/connection/hiredis", "redis"]
     gem "webmock", :require => false
+    gem "debugger", :require => true
 
 The argument defaults to the name of the gem. For example, these are identical:
 
     gem "nokogiri"
     gem "nokogiri", :require => "nokogiri"
+    gem "nokogiri", :require => true
 
 ### GROUPS (:group or :groups)
 
@@ -127,7 +130,7 @@ are obviously not available).
 Note that on `bundle install`, bundler downloads and evaluates all gems, in order to
 create a single canonical list of all of the required gems and their dependencies.
 This means that you cannot list different versions of the same gems in different
-groups. For more details, see [Understanding Bundler](http://gembundler.com/rationale.html).
+groups. For more details, see [Understanding Bundler](http://bundler.io/rationale.html).
 
 ### PLATFORMS (:platforms)
 
@@ -146,6 +149,8 @@ There are a number of `Gemfile` platforms:
     _ruby_ `AND` version 1.9
   * `ruby_20`:
     _ruby_ `AND` version 2.0
+  * `ruby_21`:
+    _ruby_ `AND` version 2.1
   * `mri`:
     Same as _ruby_, but not Rubinius
   * `mri_18`:
@@ -154,6 +159,8 @@ There are a number of `Gemfile` platforms:
     _mri_ `AND` version 1.9
   * `mri_20`:
     _mri_ `AND` version 2.0
+  * `mri_21`:
+    _mri_ `AND` version 2.1
   * `rbx`:
     Same as _ruby_, but only Rubinius (not MRI)
   * `jruby`:
@@ -161,13 +168,21 @@ There are a number of `Gemfile` platforms:
   * `mswin`:
     Windows
   * `mingw`:
-    Windows 'mingw32' platform (aka RubyInstaller)
+    Windows 32 bit 'mingw32' platform (aka RubyInstaller)
   * `mingw_18`:
     _mingw_ `AND` version 1.8
   * `mingw_19`:
     _mingw_ `AND` version 1.9
   * `mingw_20`:
     _mingw_ `AND` version 2.0
+  * `mingw_21`:
+    _mingw_ `AND` version 2.1
+  * `x64_mingw`:
+    Windows 64 bit 'mingw32' platform (aka RubyInstaller x64)
+  * `x64_mingw_20`:
+    _x64_mingw_ `AND` version 2.0
+  * `x64_mingw_21`:
+    _x64_mingw_ `AND` version 2.1
 
 As with groups, you can specify one or more platforms:
 
@@ -257,6 +272,10 @@ same, you can omit one.
 Are both equivalent to
 
     gem "rails", :git => "git://github.com/rails/rails.git"
+
+In addition, if you wish to choose a specific branch:
+
+    gem "rails", :github => "rails/rails", :branch => "branch_name"
 
 ### PATH (:path)
 

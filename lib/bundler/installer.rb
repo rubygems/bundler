@@ -1,5 +1,6 @@
 require 'erb'
 require 'rubygems/dependency_installer'
+require 'bundler/parallel_workers'
 
 module Bundler
   class Installer < Environment
@@ -66,49 +67,63 @@ module Bundler
       end
 
       if Bundler.default_lockfile.exist? && !options["update"]
-        real_ui, Bundler.ui = Bundler.ui, Bundler::UI.new
-        begin
-          tmpdef = Definition.build(Bundler.default_gemfile, Bundler.default_lockfile, nil)
-          local = true unless tmpdef.new_platform? || tmpdef.missing_specs.any?
-        rescue BundlerError
+        local = Bundler.ui.silence do
+          begin
+            tmpdef = Definition.build(Bundler.default_gemfile, Bundler.default_lockfile, nil)
+            true unless tmpdef.new_platform? || tmpdef.missing_specs.any?
+          rescue BundlerError
+          end
         end
-        Bundler.ui = real_ui
       end
 
       # Since we are installing, we can resolve the definition
       # using remote specs
       unless local
-        options["local"] ?
-          @definition.resolve_with_cache! :
-          @definition.resolve_remotely!
+        if options["local"]
+          @definition.resolve_with_cache!
+        else
+          Bundler::Retry.new("source fetch").attempts do
+            @definition.resolve_remotely!
+          end
+        end
       end
-
       # Must install gems in the order that the resolver provides
       # as dependencies might actually affect the installation of
       # the gem.
       Installer.post_install_messages = {}
-      specs.each do |spec|
-        install_gem_from_spec(spec, options[:standalone])
+
+      # the order that the resolver provides is significant, since
+      # dependencies might actually affect the installation of a gem.
+      # that said, it's a rare situation (other than rake), and parallel
+      # installation is just SO MUCH FASTER. so we let people opt in.
+      jobs = [Bundler.settings[:jobs].to_i, 1].max
+      if jobs > 1 && can_install_parallely?
+        install_in_parallel jobs, options[:standalone]
+      else
+        install_sequentially options[:standalone]
       end
 
       lock
       generate_standalone(options[:standalone]) if options[:standalone]
     end
 
-    def install_gem_from_spec(spec, standalone = false)
+    def install_gem_from_spec(spec, standalone = false, worker = 0)
       # Download the gem to get the spec, because some specs that are returned
       # by rubygems.org are broken and wrong.
       Bundler::Fetcher.fetch(spec) if spec.source.is_a?(Bundler::Source::Rubygems)
 
       # Fetch the build settings, if there are any
-      settings = Bundler.settings["build.#{spec.name}"]
+      settings             = Bundler.settings["build.#{spec.name}"]
+      install_message      = nil
+      post_install_message = nil
+      debug_message        = nil
       Bundler.rubygems.with_build_args [settings] do
-        spec.source.install(spec)
-        Bundler.ui.debug "from #{spec.loaded_from} "
+        install_message, post_install_message, debug_message = spec.source.install(spec)
+        Bundler.ui.info install_message
+        Bundler.ui.debug debug_message if debug_message
+        Bundler.ui.debug "#{worker}:  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
       end
 
-      # newline comes after installing, some gems say "with native extensions"
-      Bundler.ui.info ""
       if Bundler.settings[:bin] && standalone
         generate_standalone_bundler_executable_stubs(spec)
       elsif Bundler.settings[:bin]
@@ -116,16 +131,21 @@ module Bundler
       end
 
       FileUtils.rm_rf(Bundler.tmp)
+      post_install_message
     rescue Exception => e
-      # install hook failed
+      # if install hook failed or gem signature is bad, just die
       raise e if e.is_a?(Bundler::InstallHookError) || e.is_a?(Bundler::SecurityError)
 
       # other failure, likely a native extension build failure
       Bundler.ui.info ""
       Bundler.ui.warn "#{e.class}: #{e.message}"
       msg = "An error occurred while installing #{spec.name} (#{spec.version}),"
-      msg << " and Bundler cannot continue.\nMake sure that `gem install"
-      msg << " #{spec.name} -v '#{spec.version}'` succeeds before bundling."
+      msg << " and Bundler cannot continue."
+
+      unless spec.source.options["git"]
+        msg << "\nMake sure that `gem install"
+        msg << " #{spec.name} -v '#{spec.version}'` succeeds before bundling."
+      end
       Bundler.ui.debug e.backtrace.join("\n")
       raise Bundler::InstallError, msg
     end
@@ -134,7 +154,7 @@ module Bundler
       if options[:binstubs_cmd] && spec.executables.empty?
         options = {}
         spec.runtime_dependencies.each do |dep|
-          bins = Bundler.definition.specs[dep].first.executables
+          bins = @definition.specs[dep].first.executables
           options[dep.name] = bins unless bins.empty?
         end
         if options.any?
@@ -184,6 +204,16 @@ module Bundler
     end
 
   private
+    def can_install_parallely?
+      if Bundler.current_ruby.mri? || Bundler.rubygems.provides?(">= 2.1.0.rc")
+        true
+      else
+        Bundler.ui.warn "Rubygems #{Gem::VERSION} is not threadsafe, so your "\
+          "gems must be installed one at a time. Upgrade to Rubygems 2.1 or "\
+          "higher to enable parallel gem installation."
+        false
+      end
+    end
 
     def generate_standalone_bundler_executable_stubs(spec)
       # double-assignment to avoid warnings about variables that will be used by ERB
@@ -209,9 +239,9 @@ module Bundler
       paths = []
 
       if groups.empty?
-        specs = Bundler.definition.requested_specs
+        specs = @definition.requested_specs
       else
-        specs = Bundler.definition.specs_for groups.map { |g| g.to_sym }
+        specs = @definition.specs_for groups.map { |g| g.to_sym }
       end
 
       specs.each do |spec|
@@ -220,12 +250,13 @@ module Bundler
         spec.require_paths.each do |path|
           full_path = File.join(spec.full_gem_path, path)
           gem_path = Pathname.new(full_path).relative_path_from(Bundler.root.join(bundler_path))
-          paths << gem_path.to_s.sub("#{SystemRubyVersion.new.engine}/#{RbConfig::CONFIG['ruby_version']}", '#{ruby_engine}/#{ruby_version}')
+          paths << gem_path.to_s.sub("#{Bundler.ruby_version.engine}/#{RbConfig::CONFIG['ruby_version']}", '#{ruby_engine}/#{ruby_version}')
         end
       end
 
 
       File.open File.join(bundler_path, "setup.rb"), "w" do |file|
+        file.puts "require 'rbconfig'"
         file.puts "# ruby 1.8.7 doesn't define RUBY_ENGINE"
         file.puts "ruby_engine = defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby'"
         file.puts "ruby_version = RbConfig::CONFIG[\"ruby_version\"]"
@@ -234,6 +265,58 @@ module Bundler
           file.puts %{$:.unshift File.expand_path("\#{path}/#{path}")}
         end
       end
+    end
+
+    def install_sequentially(standalone)
+      specs.each do |spec|
+        message = install_gem_from_spec spec, standalone, 0
+        if message
+          Installer.post_install_messages[spec.name] = message
+        end
+      end
+    end
+
+    def install_in_parallel(size, standalone)
+      name2spec = {}
+      remains = {}
+      enqueued = {}
+      specs.each do |spec|
+        name2spec[spec.name] = spec
+        remains[spec.name] = true
+      end
+
+      worker_pool = ParallelWorkers.worker_pool size, lambda { |name, worker|
+        spec = name2spec[name]
+        message = install_gem_from_spec spec, standalone, worker
+        { :name => spec.name, :post_install => message }
+      }
+      specs.each do |spec|
+        deps = spec.dependencies.select { |dep| dep.type != :development }
+        if deps.empty?
+          worker_pool.enq spec.name
+          enqueued[spec.name] = true
+        end
+      end
+
+      until remains.empty?
+        message = worker_pool.deq
+        remains.delete message[:name]
+        if message[:post_install]
+          Installer.post_install_messages[message[:name]] = message[:post_install]
+        end
+        remains.keys.each do |name|
+          next if enqueued[name]
+          spec = name2spec[name]
+          deps = spec.dependencies.select { |dep| remains[dep.name] and dep.type != :development }
+          if deps.empty?
+            worker_pool.enq name
+            enqueued[name] = true
+          end
+        end
+      end
+      message
+    ensure
+      worker_pool && worker_pool.stop
     end
   end
 end

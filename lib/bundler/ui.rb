@@ -20,6 +20,10 @@ module Bundler
     def confirm(message, newline = nil)
     end
 
+    def quiet?
+      false
+    end
+
     def debug?
       false
     end
@@ -28,7 +32,8 @@ module Bundler
     end
 
     class Shell < UI
-      attr_reader :quiet
+      LEVELS = %w(silent error warn confirm info debug)
+
       attr_writer :shell
 
       def initialize(options = {})
@@ -36,50 +41,49 @@ module Bundler
           Thor::Base.shell = Thor::Shell::Basic
         end
         @shell = Thor::Base.shell.new
-        @quiet = false
-        @debug = ENV['DEBUG']
-        @trace = ENV['TRACE']
+        @level = ENV['DEBUG'] ? "debug" : "info"
       end
 
       def info(msg, newline = nil)
-        tell_me(msg, nil, newline) if !@quiet
+        tell_me(msg, nil, newline) if level("info")
       end
 
       def confirm(msg, newline = nil)
-        tell_me(msg, :green, newline) if !@quiet
+        tell_me(msg, :green, newline) if level("confirm")
       end
 
       def warn(msg, newline = nil)
-        tell_me(msg, :yellow, newline)
+        tell_me(msg, :yellow, newline) if level("warn")
       end
 
       def error(msg, newline = nil)
-        tell_me(msg, :red, newline)
+        tell_me(msg, :red, newline) if level("error")
       end
 
-      def quiet=(value)
-        @quiet = value
-      end
-
-      def quiet?
-        @quiet
+      def debug(msg, newline = nil)
+        tell_me(msg, nil, newline) if level("debug")
       end
 
       def debug?
         # needs to be false instead of nil to be newline param to other methods
-        !!@debug && !@quiet
+        level("debug")
       end
 
-      def debug!
-        @debug = true
-      end
-
-      def debug(msg, newline = nil)
-        tell_me(msg, nil, newline) if debug?
+      def quiet?
+        LEVELS.index(@level) <= LEVELS.index("warn")
       end
 
       def ask(msg)
         @shell.ask(msg)
+      end
+
+      def level=(level)
+        raise ArgumentError unless LEVELS.include?(level.to_s)
+        @level = level
+      end
+
+      def level(name = nil)
+        name ? LEVELS.index(name) <= LEVELS.index(@level) : @level
       end
 
       def trace(e, newline = nil)
@@ -89,6 +93,13 @@ module Bundler
         elsif @trace
           STDERR.puts "#{msg}#{newline}"
         end
+      end
+
+      def silence
+        old_level, @level = @level, "silent"
+        yield
+      ensure
+        @level = old_level
       end
 
     private
@@ -103,8 +114,13 @@ module Bundler
         end
       end
 
+      def strip_leading_spaces(text)
+        spaces = text[/\A\s+/, 0]
+        spaces ? text.gsub(/#{spaces}/, '') : text
+      end
+
       def word_wrap(text, line_width = @shell.terminal_width)
-        text.split("\n").collect do |line|
+        strip_leading_spaces(text).split("\n").collect do |line|
           line.length > line_width ? line.gsub(/(.{1,#{line_width}})(\s+|$)/, "\\1\n").strip : line
         end * "\n"
       end

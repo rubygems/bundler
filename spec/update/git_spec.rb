@@ -136,7 +136,7 @@ describe "bundle update" do
         end
       end
 
-      it "it unlocks the source when submodules is added to a git source" do
+      it "it unlocks the source when submodules are added to a git source" do
         install_gemfile <<-G
           git "#{lib_path('has_submodule-1.0')}" do
             gem "has_submodule"
@@ -156,7 +156,7 @@ describe "bundle update" do
         expect(out).to eq('GIT')
       end
 
-      it "it unlocks the source when submodules is removed from git source" do
+      it "it unlocks the source when submodules are removed from git source" do
         pending "This would require actually removing the submodule from the clone"
         install_gemfile <<-G
           git "#{lib_path('has_submodule-1.0')}", :submodules => true do
@@ -189,6 +189,23 @@ describe "bundle update" do
 
       bundle 'update --force', :expect_err => true
       expect(out).to include(lib_path("foo-1.0").to_s)
+    end
+
+    it "should not explode on invalid revision on update of gem by name" do
+      build_git "rack", "0.8"
+
+      build_git "rack", "0.8", :path => lib_path('local-rack') do |s|
+        s.write "lib/rack.rb", "puts :LOCAL"
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :git => "#{lib_path('rack-0.8')}", :branch => "master"
+      G
+
+      bundle %|config local.rack #{lib_path('local-rack')}|
+      bundle "update rack"
+      expect(out).to include("Your bundle is updated!")
     end
 
   end

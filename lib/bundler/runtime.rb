@@ -23,7 +23,8 @@ module Bundler
 
         if activated_spec = Bundler.rubygems.loaded_specs(spec.name) and activated_spec.version != spec.version
           e = Gem::LoadError.new "You have already activated #{activated_spec.name} #{activated_spec.version}, " \
-                                 "but your Gemfile requires #{spec.name} #{spec.version}. Using bundle exec may solve this."
+                                 "but your Gemfile requires #{spec.name} #{spec.version}. Prepending " \
+                                 "`bundle exec` to your command may solve this."
           e.name = spec.name
           if e.respond_to?(:requirement=)
             e.requirement = Gem::Requirement.new(spec.version.to_s)
@@ -50,6 +51,7 @@ module Bundler
       /^Missing \w+ (?:file\s*)?([^\s]+.rb)$/i,
       /^Missing API definition file in (.+)$/i,
       /^cannot load such file -- (.+)$/i,
+      /^dlopen\([^)]*\): Library not loaded: (.+)$/i,
     ]
 
     def require(*groups)
@@ -68,6 +70,8 @@ module Bundler
           # dependency. If there are none, use the dependency's name
           # as the autorequire.
           Array(dep.autorequire || dep.name).each do |file|
+            # Allow `require: true` as an alias for `require: <name>`
+            file = dep.name if file == true
             required_file = file
             Kernel.require file
           end
@@ -124,7 +128,7 @@ module Bundler
       prune_git_and_path_cache(resolve)
     end
 
-    def clean
+    def clean(dry_run = false)
       gem_bins             = Dir["#{Gem.dir}/bin/*"]
       git_dirs             = Dir["#{Gem.dir}/bundler/gems/*"]
       git_cache_dirs       = Dir["#{Gem.dir}/cache/bundler/git/*"]
@@ -144,7 +148,8 @@ module Bundler
         md = %r{(.+bundler/gems/.+-[a-f0-9]{7,12})}.match(spec.full_gem_path)
         spec_git_paths << md[1] if md
         spec_gem_executables << spec.executables.collect do |executable|
-          "#{Bundler.rubygems.gem_bindir}/#{executable}"
+          e = "#{Bundler.rubygems.gem_bindir}/#{executable}"
+          [e, "#{e}.bat"]
         end
         spec_cache_paths << spec.cache_file
         spec_gemspec_paths << spec.spec_file
@@ -168,7 +173,7 @@ module Bundler
         version = parts.last
         output  = "#{name} (#{version})"
 
-        if Bundler.settings[:dry_run]
+        if dry_run
           Bundler.ui.info "Would have removed #{output}"
         else
           Bundler.ui.info "Removing #{output}"
@@ -184,7 +189,7 @@ module Bundler
         revision = parts[-1]
         output   = "#{name} (#{revision})"
 
-        if Bundler.settings[:dry_run]
+        if dry_run
           Bundler.ui.info "Would have removed #{output}"
         else
           Bundler.ui.info "Removing #{output}"
@@ -194,7 +199,7 @@ module Bundler
         output
       end
 
-      unless Bundler.settings[:dry_run]
+      unless dry_run
         stale_gem_bins.each { |bin| FileUtils.rm(bin) if File.exists?(bin) }
         stale_gem_files.each { |file| FileUtils.rm(file) if File.exists?(file) }
         stale_gemspec_files.each { |file| FileUtils.rm(file) if File.exists?(file) }
@@ -223,13 +228,13 @@ module Bundler
       rubyopt = [ENV["RUBYOPT"]].compact
       if rubyopt.empty? || rubyopt.first !~ /-rbundler\/setup/
         rubyopt.unshift %|-rbundler/setup|
-        if Bundler::WINDOWS
-          rubyopt.unshift %|"-I#{File.expand_path('../..', __FILE__)}"|
-        else
-          rubyopt.unshift %|-I#{File.expand_path('../..', __FILE__)}|
-        end
         ENV["RUBYOPT"] = rubyopt.join(' ')
       end
+
+      # Set RUBYLIB
+      rubylib = (ENV["RUBYLIB"] || "").split(File::PATH_SEPARATOR)
+      rubylib.unshift File.expand_path('../..', __FILE__)
+      ENV["RUBYLIB"] = rubylib.uniq.join(File::PATH_SEPARATOR)
     end
 
   private

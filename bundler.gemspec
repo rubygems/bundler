@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.licenses    = ['MIT']
   spec.authors     = ["André Arko", "Terence Lee", "Carl Lerche", "Yehuda Katz"]
   spec.email       = ["andre@arko.net"]
-  spec.homepage    = "http://gembundler.com"
+  spec.homepage    = "http://bundler.io"
   spec.summary     = %q{The best way to manage your application's dependencies}
   spec.description = %q{Bundler manages an application's dependencies through its entire life, across many machines, systematically and repeatably}
 
@@ -20,9 +20,9 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec', '~> 2.11'
 
   spec.files       = `git ls-files`.split($/)
-  spec.files      += Dir.glob('man/**/*') # man/ is ignored by git
+  spec.files      += Dir.glob('lib/bundler/man/**/*') # man/ is ignored by git
   spec.test_files  = spec.files.grep(%r{^spec/})
 
-  spec.executables   = %w(bundle)
+  spec.executables   = %w(bundle bundler)
   spec.require_paths = ["lib"]
 end

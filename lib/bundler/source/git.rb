@@ -92,6 +92,7 @@ module Bundler
 
       def unlock!
         git_proxy.revision = nil
+        @unlocked = true
       end
 
       def local_override!(path)
@@ -124,7 +125,7 @@ module Bundler
 
         changed = cached_revision && cached_revision != git_proxy.revision
 
-        if changed && !git_proxy.contains?(cached_revision)
+        if changed && !@unlocked && !git_proxy.contains?(cached_revision)
           raise GitError, "The Gemfile lock is pointing to revision #{shortref_for_display(cached_revision)} " \
             "but the current branch in your local override for #{name} does not contain such commit. " \
             "Please make sure your branch is up to date."
@@ -150,14 +151,15 @@ module Bundler
       end
 
       def install(spec)
-        Bundler.ui.info "Using #{spec.name} (#{spec.version}) from #{to_s} "
+        debug = nil
         if requires_checkout? && !@copied
-          Bundler.ui.debug "  * Checking out revision: #{ref}"
+          debug = "  * Checking out revision: #{ref}"
           git_proxy.copy_to(install_path, submodules)
           serialize_gemspecs_in(install_path)
           @copied = true
         end
         generate_bin(spec)
+        ["Using #{spec.name} (#{spec.version}) from #{to_s}", nil, debug]
       end
 
       def cache(spec)
@@ -172,8 +174,9 @@ module Bundler
 
       def load_spec_files
         super
-      rescue PathError, GitError
-        raise GitError, "#{to_s} is not checked out. Please run `bundle install`"
+      rescue PathError => e
+        Bundler.ui.trace e
+        raise GitError, "#{to_s} is not yet checked out. Run `bundle install` first."
       end
 
       # This is the path which is going to contain a cache

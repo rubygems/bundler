@@ -1,4 +1,5 @@
 require 'set'
+require 'bundler/safe_catch'
 # This is the latest iteration of the gem dependency resolving algorithm. As of now,
 # it can resolve (as a success or failure) any set of gem dependencies we throw at it
 # in a reasonable amount of time. The most iterations I've seen it take is about 150.
@@ -21,6 +22,9 @@ end
 
 module Bundler
   class Resolver
+    include SafeCatch
+    extend SafeCatch
+
     ALL = Bundler::Dependency::PLATFORM_MAP.values.uniq.freeze
 
     class SpecGroup < Array
@@ -109,7 +113,7 @@ module Bundler
       end
     end
 
-    attr_reader :errors
+    attr_reader :errors, :started_at, :iteration_rate, :iteration_counter
 
     # Figures out the best possible configuration of gems that satisfies
     # the list of passed dependencies and any child dependencies without
@@ -122,15 +126,19 @@ module Bundler
     # <GemBundle>,nil:: If the list of dependencies can be resolved, a
     #   collection of gemspecs is returned. Otherwise, nil is returned.
     def self.resolve(requirements, index, source_requirements = {}, base = [])
-      Bundler.ui.info "Resolving dependencies..."
+      Bundler.ui.info "Resolving dependencies...", false
       base = SpecSet.new(base) unless base.is_a?(SpecSet)
       resolver = new(index, source_requirements, base)
-      result = catch(:success) do
+      result = safe_catch(:success) do
         resolver.start(requirements)
         raise resolver.version_conflict
         nil
       end
+      Bundler.ui.info "" # new line now that dots are done
       SpecSet.new(result)
+    rescue => e
+      Bundler.ui.info "" # new line before the error
+      raise e
     end
 
     def initialize(index, source_requirements, base)
@@ -141,6 +149,8 @@ module Bundler
       @deps_for             = {}
       @missing_gems         = Hash.new(0)
       @source_requirements  = source_requirements
+      @iteration_counter    = 0
+      @started_at           = Time.now
     end
 
     def debug
@@ -162,10 +172,12 @@ module Bundler
       resolve(reqs, activated)
     end
 
-    def resolve(reqs, activated)
+    def resolve(reqs, activated, depth = 0)
       # If the requirements are empty, then we are in a success state. Aka, all
       # gem dependencies have been resolved.
-      throw :success, successify(activated) if reqs.empty?
+      safe_throw :success, successify(activated) if reqs.empty?
+
+      indicate_progress
 
       debug { print "\e[2J\e[f" ; "==== Iterating ====\n\n" }
 
@@ -188,6 +200,8 @@ module Bundler
 
       # Pull off the first requirement so that we can resolve it
       current = reqs.shift
+
+      $stderr.puts "#{' ' * depth}#{current}" if ENV['DEBUG_RESOLVER_TREE']
 
       debug { "Attempting:\n  #{current}"}
 
@@ -220,7 +234,7 @@ module Bundler
             @gems_size[dep] ||= gems_size(dep)
           end
 
-          resolve(reqs, activated)
+          resolve(reqs, activated, depth + 1)
         else
           debug { "    * [FAIL] Already activated" }
           @errors[existing.name] = [existing, current]
@@ -240,7 +254,7 @@ module Bundler
           if parent && parent.name != 'bundler'
             debug { "    -> Jumping to: #{parent.name}" }
             required_by = existing.respond_to?(:required_by) && existing.required_by.last
-            throw parent.name, required_by && required_by.name
+            safe_throw parent.name, required_by && required_by.name
           else
             # The original set of dependencies conflict with the base set of specs
             # passed to the resolver. This is by definition an impossible resolve.
@@ -293,7 +307,7 @@ module Bundler
         end
 
         matching_versions.reverse_each do |spec_group|
-          conflict = resolve_requirement(spec_group, current, reqs.dup, activated.dup)
+          conflict = resolve_requirement(spec_group, current, reqs.dup, activated.dup, depth)
           conflicts << conflict if conflict
         end
 
@@ -302,12 +316,12 @@ module Bundler
         # on this conflict.  Note that if the tree has multiple conflicts, we don't
         # care which one we throw, as long as we get out safe
         if !current.required_by.empty? && !conflicts.empty?
-          @errors.reverse_each do |name, pair|
-            if conflicts.include?(name)
+          @errors.reverse_each do |req_name, pair|
+            if conflicts.include?(req_name)
               # Choose the closest pivot in the stack that will affect the conflict
-              errorpivot = (@stack & [name, current.required_by.last.name]).last
+              errorpivot = (@stack & [req_name, current.required_by.last.name]).last
               debug { "    -> Jumping to: #{errorpivot}" }
-              throw errorpivot, name
+              safe_throw errorpivot, req_name
             end
           end
         end
@@ -322,14 +336,14 @@ module Bundler
           @stack.reverse_each do |savepoint|
             if conflicts.include?(savepoint)
               debug { "    -> Jumping to: #{savepoint}" }
-              throw savepoint
+              safe_throw savepoint
             end
           end
         end
       end
     end
 
-    def resolve_requirement(spec_group, requirement, reqs, activated)
+    def resolve_requirement(spec_group, requirement, reqs, activated, depth)
       # We are going to try activating the spec. We need to keep track of stack of
       # requirements that got us to the point of activating this gem.
       spec_group.required_by.replace requirement.required_by
@@ -358,9 +372,9 @@ module Bundler
       # jump back to this point and try another version of the gem.
       length = @stack.length
       @stack << requirement.name
-      retval = catch(requirement.name) do
+      retval = safe_catch(requirement.name) do
         # try to resolve the next option
-        resolve(reqs, activated)
+        resolve(reqs, activated, depth)
       end
 
       # clear the search cache since the catch means we couldn't meet the
@@ -497,6 +511,25 @@ module Bundler
 
         end
         o
+      end
+    end
+
+    private
+
+    # Indicates progress by writing a '.' every iteration_rate time which is
+    # aproximately every second. iteration_rate is calculated in the first
+    # second of resolve running.
+    def indicate_progress
+      @iteration_counter += 1
+
+      if iteration_rate.nil?
+        if ((Time.now - started_at) % 3600).round >= 1
+          @iteration_rate = iteration_counter
+        end
+      else
+        if ((iteration_counter % iteration_rate) == 0)
+          Bundler.ui.info ".", false
+        end
       end
     end
   end

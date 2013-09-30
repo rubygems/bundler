@@ -67,6 +67,62 @@ describe "bundle install with gem sources" do
 
         should_be_installed "net_a 1.0", "net_b 1.0", "net_c 1.0", "net_d 1.0", "net_e 1.0"
       end
+
+      context "with ENV['DEBUG_RESOLVER'] set" do
+        before do
+          ENV['DEBUG_RESOLVER'] = '1'
+        end
+        it "produces debug output" do
+          expect(capture(:stdout) do
+            install_gemfile <<-G
+              source "file://#{gem_repo1}"
+              gem "net_c"
+              gem "net_e"
+            G
+          end).to include "==== Iterating ===="
+        end
+        after do
+          ENV['DEBUG_RESOLVER'] = nil
+        end
+      end
+
+      context "with ENV['DEBUG_RESOLVER_TREE'] set" do
+        before do
+          ENV['DEBUG_RESOLVER_TREE'] = '1'
+        end
+        it "produces debug output" do
+          expect(capture(:stdout) do
+            install_gemfile <<-G
+              source "file://#{gem_repo1}"
+              gem "net_c"
+              gem "net_e"
+            G
+          end).to include " net_b (>= 0) ruby"
+        end
+        after do
+          ENV['DEBUG_RESOLVER_TREE'] = nil
+        end
+      end
+
+    end
+
+    describe "when some gems require a different version of ruby" do
+      it "does not try to install those gems" do
+        pending "waiting for a rubygems index that includes ruby version"
+
+        update_repo gem_repo1 do
+          build_gem "require_ruby" do |s|
+            s.required_ruby_version = "> 9000"
+          end
+        end
+
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem 'require_ruby'
+        G
+
+        expect(out).to_not include("Gem::InstallError: require_ruby requires Ruby version > 9000")
+      end
     end
   end
 end

@@ -1,3 +1,128 @@
+## 1.4.0.rc.1 (2013-09-29)
+
+Features:
+
+  - add support for the x64-mingw32 platform (#2356, #2590, @larskanis)
+  - add :patchlevel option to ruby DSL
+  - add `bundler` bin (#2598, @kirs)
+  - friendly ambiguous error messages (#2581, #2550, @jlsuttles, @jendiamond, @joyicecloud)
+  - add `:jruby_18` and `:jruby_19` paltform options (@mcfiredrill)
+  - add X.509 client certificates for auth without passwords (@snackbandit)
+  - add `exec --keep-file-descriptors` for Ruby 1.9-like behavior on 2.0 (@steved555)
+  - print a better error when git is not installed (@joyicecloud)
+  - exit non-zero when `outdated` is run with an unknown gem (@joyicecloud)
+  - add `:ruby_21` platform option (@brandonblack)
+  - add `--retry` to retry failed network and git commands (@schneems)
+  - include command and versions in User-Agent (@indirect, @joyicecloud)
+
+Bugfixes:
+
+  - allow passwordless Basic Auth (#2606, @rykov)
+  - don't suggest `gem install foo` when `foo` is a git gem that fails (@kirs)
+  - revert #2569, staying compatible with git: instead of https: for :github gems
+  - handle exceptions while installing gems in parallel (@gnufied)
+
+## 1.4.0.pre.1 (2013-08-04)
+
+Features:
+
+  - retry network requests while installing gems (#2561, @ascherger)
+  - faster installs using gemspecs from the local system cache (#2497, @mipearson)
+  - add `bundle install -jN` for N parallel gem installations (#2481, @eagletmt)
+  - add `ENV['DEBUG_RESOLVER_TREE']` outputs resolver tree (@dblock)
+  - set $MANPATH so `bundle exec man name` works (#1624, @sunaku)
+  - use `man` instead of `groff` (#2579, @ixti, @simi)
+  - add Gemfile dependency info to bundle outdated output (#2487, @rahearn)
+  - allow `require: true` as an alias for `require: <name>` (#2538, @ndbroadbent)
+  - rescue and report Thor errors (#2478, @pjvds)
+  - detect cyclic dependencies (#2564, @gnufied)
+  - support multiple gems in `binstubs` (#2576, @lucasmazza)
+  - use https instead of git for :github gems (#2569, @fuadsaud)
+  - add quiet option to `bundle package` (#2573, @shtirlic)
+  - use RUBYLIB instead of RUBYOPT for better Windows support (#2536, @equinux)
+
+Bugfixes:
+
+  - reduce stack size while resolving to fix JRuby overflow (#2510, @headius)
+  - display GitErrors while loading specs in --verbose mode (#2461)
+  - allow the same options hash to be passed to multiple gems (#2447)
+  - handle missing binaries without an exception (#2019, @luismreis)
+
+## 1.3.6
+
+Bugfixes:
+
+  - set --no-cache when bundle install --local is called (@TimMoore)
+  - make gemspec path option preserve relative paths in lock file (@bwillis)
+
+## 1.3.5 (3 April 2013)
+
+Features:
+
+  - progress indicator while resolver is running (@chief)
+
+Bugfixes:
+
+  - update local overrides with orphaned revisions (@jamesferguson)
+  - revert to working quoting of RUBYOPT on Windows (@ogra)
+  - use basic auth even when SSL is not available (@jayniz)
+  - installing git gems without dependencies in deployment now works
+
+## 1.3.4 (15 March 2103)
+
+Bugfixes:
+
+  - load YAML on Rubygems versions that define module YAML
+  - fix regression that broke --without on ruby 1.8.7
+
+## 1.3.3 (13 March 2013)
+
+Features:
+
+  - compatible with Rubygems 2.0.2 (higher and lower already work)
+  - mention skipped groups in bundle install and bundle update output (@simi)
+  - `gem` creates rake tasks for minitest (@coop) and rspec
+
+Bugfixes:
+
+  - require rbconfig for standalone mode
+
+## 1.3.2 (7 March 2013)
+
+Features:
+
+  - include rubygems.org CA chain
+
+Bugfixes:
+
+  - don't store --dry-run as a Bundler setting
+
+## 1.3.1 (3 March 2013)
+
+Bugfixes:
+
+  - include manpages in gem, restoring many help pages
+  - handle more SSL certificate verification failures
+  - check for the full version of SSL, which we need (@alup)
+  - gem rake task 'install' now depends on task 'build' (@sunaku)
+
+## 1.3.0 (24 February 2013)
+
+Features:
+
+  - raise a useful error when the lockfile contains a merge conflict (@zofrex)
+  - ensure `rake release` checks for uncommitted as well as unstaged (@benmoss)
+  - allow environment variables to be negated with 'false' and '0' (@brettporter)
+  - set $MANPATH inside `exec` for gems with man pages (@sunaku)
+  - partial gem names for `open` and `update` now return a list (@takkanm)
+
+Bugfixes:
+
+  - `update` now (again) finds gems that aren't listed in the Gemfile
+  - `install` now (again) updates cached gems that aren't in the Gemfile
+  - install Gemfiles with HTTP sources even without OpenSSL present
+  - display CerficateFailureError message in full
+
 ## 1.3.0.pre.8 (12 February 2013)
 
 Security:
@@ -43,6 +168,7 @@ Features:
   - `binstubs` lists child gem bins if a gem has no binstubs
   - `bundle gem --edit` will open the new gemspec (@ndbroadbent)
   - `bundle gem --test rspec` now makes working tests (@tricknotes)
+  - `bundle env` prints info about bundler's environment (@peeja)
   - add `BUNDLE_IGNORE_CONFIG` environment variable support (@richo)
 
 Bugfixes:
@@ -137,6 +263,13 @@ Bugfixes:
   - do not swallow --verbose on `bundle exec` (@sol, #2102)
   - `gem` generates gemspecs that block double-requires
   - `gem` generates gemspecs that admit they depend on rake
+
+## 1.2.5 (Feb 24, 2013)
+
+Bugfixes:
+
+  - install Gemfiles with HTTP sources even without OpenSSL present
+  - display CerficateFailureError message in full
 
 ## 1.2.4 (Feb 12, 2013)
 

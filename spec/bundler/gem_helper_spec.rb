@@ -62,7 +62,7 @@ describe "Bundler::GemHelper tasks" do
       expect(Bundler.ui).to be_a(Bundler::UI::Shell)
     end
 
-    describe 'install_tasks' do
+    describe "install_tasks" do
       before(:each) do
         @saved, Rake.application = Rake.application, Rake::Application.new
       end
@@ -92,7 +92,7 @@ describe "Bundler::GemHelper tasks" do
       end
     end
 
-    describe 'build' do
+    describe "build" do
       it "builds" do
         mock_build_message
         @helper.build_gem
@@ -106,7 +106,7 @@ describe "Bundler::GemHelper tasks" do
       end
     end
 
-    describe 'install' do
+    describe "install" do
       it "installs" do
         mock_build_message
         mock_confirm_message "test (0.0.1) installed."
@@ -127,7 +127,15 @@ describe "Bundler::GemHelper tasks" do
       end
     end
 
-    describe 'release' do
+    describe "release" do
+      before do
+        Dir.chdir(@app) do
+          `git init`
+          `git config user.email "you@example.com"`
+          `git config user.name "name"`
+        end
+      end
+
       it "shouldn't push if there are unstaged files" do
         expect { @helper.release_gem }.to raise_error(/files that need to be committed/)
       end
@@ -137,18 +145,11 @@ describe "Bundler::GemHelper tasks" do
         expect { @helper.release_gem }.to raise_error(/files that need to be committed/)
       end
 
-      it 'raises an appropriate error if there is no git remote' do
+      it "raises an appropriate error if there is no git remote" do
         Bundler.ui.stub(:confirm => nil, :error => nil) # silence messages
 
-        Dir.chdir(gem_repo1) {
-          `git init --bare`
-        }
-        Dir.chdir(@app) {
-          `git init`
-          `git config user.email "you@example.com"`
-          `git config user.name "name"`
-          `git commit -a -m "initial commit"`
-        }
+        Dir.chdir(gem_repo1) { `git init --bare` }
+        Dir.chdir(@app) { `git commit -a -m "initial commit"` }
 
         expect { @helper.release_gem }.to raise_error
       end
@@ -160,18 +161,13 @@ describe "Bundler::GemHelper tasks" do
 
         @helper.should_receive(:rubygem_push).with(bundled_app('test/pkg/test-0.0.1.gem').to_s)
 
-        Dir.chdir(gem_repo1) {
-          `git init --bare`
-        }
-        Dir.chdir(@app) {
-          `git init`
-          `git config user.email "you@example.com"`
-          `git config user.name "name"`
+        Dir.chdir(gem_repo1) { `git init --bare` }
+        Dir.chdir(@app) do
           `git remote add origin file://#{gem_repo1}`
           `git commit -a -m "initial commit"`
           sys_exec("git push origin master", true)
           `git commit -a -m "another commit"`
-        }
+        end
         @helper.release_gem
       end
 
@@ -185,8 +181,11 @@ describe "Bundler::GemHelper tasks" do
           `git init --bare`
         }
         Dir.chdir(@app) {
-         `git commit -a -m "another commit"`
-         `git tag -a -m \"Version 0.0.1\" v0.0.1`
+          `git init`
+          `git config user.email "you@example.com"`
+          `git config user.name "name"`
+          `git commit -a -m "another commit"`
+          `git tag -a -m \"Version 0.0.1\" v0.0.1`
         }
         @helper.release_gem
       end

@@ -1,6 +1,27 @@
 require "spec_helper"
 
 describe "when using sudo", :sudo => true do
+  describe "and BUNDLE_PATH is writable" do
+    context "but BUNDLE_PATH/build_info is not writable" do
+      before do
+        subdir = system_gem_path('cache')
+        subdir.mkpath
+        sudo "chmod u-w #{subdir}"
+      end
+
+      it "installs" do
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rack"
+        G
+
+        expect(out).to_not match(/an error occurred/i)
+        expect(system_gem_path("cache/rack-1.0.0.gem")).to exist
+        should_be_installed "rack 1.0"
+      end
+    end
+  end
+
   describe "and GEM_HOME is owned by root" do
     before :each do
       chown_system_gems_to_root

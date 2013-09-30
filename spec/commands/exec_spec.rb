@@ -39,6 +39,12 @@ describe "bundle exec" do
     expect(out).to eq("exec")
   end
 
+  it "works when exec'ing to ruby" do
+    install_gemfile 'gem "rack"'
+    bundle "exec ruby -e 'puts %{hi}'"
+    expect(out).to eq("hi")
+  end
+
   it "accepts --verbose" do
     install_gemfile 'gem "rack"'
     bundle "exec --verbose echo foobar"
@@ -49,6 +55,44 @@ describe "bundle exec" do
     install_gemfile 'gem "rack"'
     bundle "exec echo --verbose"
     expect(out).to eq("--verbose")
+  end
+
+  it "handles --keep-file-descriptors" do
+    require 'tempfile'
+
+    bundle_bin = File.expand_path('../../../bin/bundle', __FILE__)
+
+    command = Tempfile.new("io-test")
+    command.sync = true
+    command.write <<-G
+      if ARGV[0]
+        IO.for_fd(ARGV[0].to_i)
+      else
+        require 'tempfile'
+        io = Tempfile.new("io-test-fd")
+        args = %W[#{Gem.ruby} -I#{lib} #{bundle_bin} exec --keep-file-descriptors #{Gem.ruby} #{command.path} \#{io.to_i}]
+        args << { io.to_i => io } if RUBY_VERSION >= "2.0"
+        exec(*args)
+      end
+    G
+
+    install_gemfile ''
+    sys_exec("#{Gem.ruby} #{command.path}")
+
+    if RUBY_VERSION >= "2.0"
+      expect(out).to eq("")
+    else
+      expect(out).to eq("Ruby version #{RUBY_VERSION} defaults to keeping non-standard file descriptors on Kernel#exec.")
+    end
+
+    expect(err).to eq("")
+  end
+
+  it "accepts --keep-file-descriptors" do
+    install_gemfile ''
+    bundle "exec --keep-file-descriptors echo foobar"
+
+    expect(err).to eq("")
   end
 
   it "can run a command named --verbose" do
@@ -108,19 +152,35 @@ describe "bundle exec" do
     should_not_be_installed "rack_middleware 1.0"
   end
 
-  it "should not duplicate already exec'ed RUBYOPT or PATH" do
+  it "does not duplicate already exec'ed RUBYOPT" do
     install_gemfile <<-G
       gem "rack"
     G
 
     rubyopt = ENV['RUBYOPT']
-    rubyopt = "-I#{bundler_path} -rbundler/setup #{rubyopt}"
+    rubyopt = "-rbundler/setup #{rubyopt}"
 
     bundle "exec 'echo $RUBYOPT'"
     expect(out).to have_rubyopts(rubyopt)
 
     bundle "exec 'echo $RUBYOPT'", :env => {"RUBYOPT" => rubyopt}
     expect(out).to have_rubyopts(rubyopt)
+  end
+
+  it "does not duplicate already exec'ed RUBYLIB" do
+    install_gemfile <<-G
+      gem "rack"
+    G
+
+    rubylib = ENV['RUBYLIB']
+    rubylib = "#{rubylib}".split(File::PATH_SEPARATOR).unshift "#{bundler_path}"
+    rubylib = rubylib.uniq.join(File::PATH_SEPARATOR)
+
+    bundle "exec 'echo $RUBYLIB'"
+    expect(out).to eq(rubylib)
+
+    bundle "exec 'echo $RUBYLIB'", :env => {"RUBYLIB" => rubylib}
+    expect(out).to eq(rubylib)
   end
 
   it "errors nicely when the argument doesn't exist" do
@@ -244,6 +304,5 @@ describe "bundle exec" do
         expect(out).to eq("1.0")
       end
     end
-
   end
 end

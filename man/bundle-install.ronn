@@ -10,6 +10,7 @@ bundle-install(1) -- Install the dependencies specified in your Gemfile
                  [--binstubs[=DIRECTORY]]
                  [--standalone[=GROUP1[ GROUP2...]]]
                  [--trust-policy=POLICY]
+                 [--jobs=SIZE]
                  [--no-cache]
                  [--quiet]
 
@@ -59,7 +60,7 @@ update process below under [CONSERVATIVE UPDATING][].
   Do not attempt to connect to `rubygems.org`, instead using just
   the gems already present in Rubygems' cache or in `vendor/cache`.
   Note that if a more appropriate platform-specific gem exists on
-  `rubygems.org`, it will not be found.
+  `rubygems.org`, it will not be found. This option implies `--no-cache`.
 
 * `--deployment`:
   Switches bundler's defaults into [deployment mode][DEPLOYMENT MODE].
@@ -87,6 +88,9 @@ update process below under [CONSERVATIVE UPDATING][].
   Apply the Rubygems security policy named <policy>, where policy is one of
   HighSecurity, MediumSecurity, LowSecurity, or NoSecurity. For more detail,
   see the Rubygems signing documentation, linked below in [SEE ALSO][].
+
+* `--jobs=[<size>]`:
+  Install gems parallely by starting <size> number of parallel workers.
 
 * `--no-cache`:
   Do not update the cache in `vendor/cache` with the newly bundled gems. This
@@ -321,7 +325,7 @@ evaluates the gems currently being used to satisfy its requirements:
     also used to satisfy a dependency in `activemerchant`,
     which is not being updated
   * `rack ~> 1.1.0`:
-    not currently being used to satify another dependency
+    not currently being used to satisfy another dependency
 
 Because you did not explicitly ask to update `activemerchant`,
 you would not expect it to suddenly stop working after updating
