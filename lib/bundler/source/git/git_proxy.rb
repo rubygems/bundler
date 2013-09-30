@@ -13,7 +13,7 @@ module Bundler
         def initialize(command)
           msg =  "Bundler is trying to run a `git #{command}` at runtime. You probably need to run `bundle install`. However, "
           msg << "this error message could probably be more useful. Please submit a ticket at http://github.com/bundler/bundler/issues "
-          mag << "with steps to reproduce as well as the following\n\nCALLER: #{caller.join("\n")}"
+          msg << "with steps to reproduce as well as the following\n\nCALLER: #{caller.join("\n")}"
           super msg
         end
       end
