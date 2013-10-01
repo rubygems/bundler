@@ -23,7 +23,7 @@ notifications:
     on_success: change
     on_failure: always
     rooms:
-      - secure: "geau3P+A9ZJHkA/OHN5v9Mcb8hAti1PllXw5DsHNJfLAWBAw5ReGGMA8Xfpf\nLdT7ktIUlQwzw94cKQ6sRZk8szXTiHncf3bxXTACJf2RpiKmbkoQU51TmCDq\nYSMuY1FIryk/3t9aZCrarufbIDI3DBscDEe4Bj9bERl+TJ8ArBY="
+      secure: MNTSGIySYwHia5gIgRiZxXtPMPDIP9KmzQk7Kq2ZoVvP3mIk8W1TMkvcyFkEf6uCasyVZZixzUBfY+E0BlHAz1ycQpTh1jvSpuIpEVYW48ShJldJ+8W8xfzafyOHii3z7VrDaomEffmMDdmHRsbQAfekMjdR4bTpXtT9V+wOXlg=
 rvm:
   - 2.0.0
   - 1.9.3
