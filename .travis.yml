@@ -18,7 +18,7 @@ notifications:
     on_success: change
     on_failure: always
     channels:
-      - "irc.freenode.org#bundler"
+      secure: R4AY8ww2M6RYucSS2i/FeO8TchtqE3mfe+GhyY3a3w5gxX++X1FkkFDsTzUFkTfAoItQAysxQShtFBp5HKcKlrw4yUnQ1DVm4SpsMJ6R3GYKf6CwxetG30tQSYUijwPvebrFIXQ28ZETA7AZ4poF9NgfCe7dLaeQPhVXDAWq7N8=
   campfire:
     on_success: change
     on_failure: always
