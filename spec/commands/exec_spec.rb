@@ -126,9 +126,13 @@ describe "bundle exec" do
       G
     end
 
+    # This fails because the system `rackup` points to rack_two, not rack
     bundle "exec rackup"
+    expect(err).to match(%r{can't find executable rackup in rack_two})
 
-    expect(out).to eq("0.9.1")
+    # This works because the generated binstub points to rack
+    bundle "binstubs rack"
+    expect(sys_exec("RUBYLIB='#{lib}' #{bundled_app("bin/rackup")}")).to eq("0.9.1")
 
     Dir.chdir bundled_app2 do
       bundle "exec rackup"
