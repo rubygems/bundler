@@ -6,7 +6,7 @@ Features:
   - add :patchlevel option to ruby DSL
   - add `bundler` bin (#2598, @kirs)
   - friendly ambiguous error messages (#2581, #2550, @jlsuttles, @jendiamond, @joyicecloud)
-  - add `:jruby_18` and `:jruby_19` paltform options (@mcfiredrill)
+  - add `:jruby_18` and `:jruby_19` platform options (@mcfiredrill)
   - add X.509 client certificates for auth without passwords (@snackbandit)
   - add `exec --keep-file-descriptors` for Ruby 1.9-like behavior on 2.0 (@steved555)
   - print a better error when git is not installed (@joyicecloud)
