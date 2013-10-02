@@ -13,7 +13,7 @@ module Bundler
       @name         = name
       @version      = version
       @platform     = platform
-      @dependencies = dependencies
+      @dependencies = dependencies || []
     end
 
     def fetch_platform
