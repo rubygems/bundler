@@ -230,25 +230,33 @@ module Bundler
           # because ensuring we have all the gems we need involves downloading
           # the gemspecs of those gems, if the non-api sites contain more than
           # about 100 gems, we just treat all sites as non-api for speed.
-          if idx.size < API_REQUEST_LIMIT && dependency_names.size < API_REQUEST_LIMIT
+          allow_api = idx.size < API_REQUEST_LIMIT && dependency_names.size < API_REQUEST_LIMIT
+
+          if allow_api
             api_fetchers.each do |f|
               Bundler.ui.info "Fetching gem metadata from #{f.uri}", Bundler.ui.debug?
               idx.use f.specs(dependency_names, self)
               Bundler.ui.info "" if !Bundler.ui.debug? # new line now that the dots are over
             end
 
-            # it's possible that gems from one source depend on gems from some
-            # other source, so now we download gemspecs and iterate over those
-            # dependencies, looking for gems we don't have info on yet.
-            unmet = idx.unmet_dependency_names
+            if api_fetchers.all?{|f| f.use_api }
+              # it's possible that gems from one source depend on gems from some
+              # other source, so now we download gemspecs and iterate over those
+              # dependencies, looking for gems we don't have info on yet.
+              unmet = idx.unmet_dependency_names
 
-            # if there are any cross-site gems we missed, get them now
-            api_fetchers.each do |f|
-              Bundler.ui.info "Fetching additional metadata from #{f.uri}", Bundler.ui.debug?
-              idx.use f.specs(unmet, self)
-              Bundler.ui.info "" if !Bundler.ui.debug? # new line now that the dots are over
-            end if unmet.any?
-          else
+              # if there are any cross-site gems we missed, get them now
+              api_fetchers.each do |f|
+                Bundler.ui.info "Fetching additional metadata from #{f.uri}", Bundler.ui.debug?
+                idx.use f.specs(unmet, self)
+                Bundler.ui.info "" if !Bundler.ui.debug? # new line now that the dots are over
+              end if unmet.any?
+            else
+              allow_api = false
+            end
+          end
+
+          if !allow_api
             api_fetchers.each do |f|
               Bundler.ui.info "Fetching source index from #{f.uri}"
               idx.use f.specs(nil, self)
