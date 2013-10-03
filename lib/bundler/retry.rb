@@ -8,9 +8,10 @@ module Bundler
       attr_accessor :attempts
     end
 
-    def initialize(name, attempts = nil)
+    def initialize(name, exceptions = nil, attempts = nil)
       @name        = name
       attempts    ||= default_attempts
+      @exceptions = Array(exceptions) || []
       @total_runs =  attempts.next # will run once, then upto attempts.times
     end
 
@@ -41,9 +42,9 @@ module Bundler
 
     def fail(e)
       @failed = true
-      raise e if last_attempt?
+      raise e if last_attempt? || @exceptions.any?{|k| k === e }
       return true unless name
-      Bundler.ui.warn "Retrying #{name} due to error (#{current_run.next}/#{total_runs}): #{e.message}"
+      Bundler.ui.warn "Retrying#{" #{name}" if name} due to error (#{current_run.next}/#{total_runs}): #{e.message}"
     end
 
     def keep_trying?
