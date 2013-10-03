@@ -12,6 +12,7 @@ module Bundler
     def initialize(source, source_uri = nil)
       @source = source
       @source_uri = source_uri || source.remotes.first
+      @dep_fetcher = DepFetcher.new(source_uri)
     end
 
     def spec_index(names)
@@ -22,6 +23,8 @@ module Bundler
     alias_method :specs, :spec_index
 
     def each_spec(names)
+      return unless @dep_fetcher.fetch(names)
+
       names.each do |name|
         raise "Sorry, #{name} is not a valid gem name" unless name =~ NAME_PATTERN
         each_spec_for(name) { |spec| yield spec }
