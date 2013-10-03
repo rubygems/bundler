@@ -79,13 +79,7 @@ module Bundler
       # Since we are installing, we can resolve the definition
       # using remote specs
       unless local
-        if options["local"]
-          @definition.resolve_with_cache!
-        else
-          Bundler::Retry.new("source fetch").attempts do
-            @definition.resolve_remotely!
-          end
-        end
+        options["local"] ? @definition.resolve_with_cache! : @definition.resolve_remotely!
       end
       # Must install gems in the order that the resolver provides
       # as dependencies might actually affect the installation of
