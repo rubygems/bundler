@@ -44,7 +44,7 @@ module Bundler
       @failed = true
       raise e if last_attempt? || @exceptions.any?{|k| k === e }
       return true unless name
-      Bundler.ui.warn "Retrying#{" #{name}" if name} due to error (#{current_run.next}/#{total_runs}): #{e.message}"
+      Bundler.ui.warn "Retrying#{" #{name}" if name} due to error (#{current_run.next}/#{total_runs}): #{e.class} #{e.message}"
     end
 
     def keep_trying?
