@@ -121,6 +121,10 @@ module Bundler
       @connection
     end
 
+    def uri
+      @public_uri
+    end
+
     # fetch a gem specification
     def fetch_spec(spec)
       spec = spec - [nil, 'ruby', '']
@@ -152,7 +156,7 @@ module Bundler
       use_full_source_index = !gem_names || @remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
 
       if gem_names && use_api
-        Bundler.ui.info "Fetching gem metadata from #{@public_uri}", Bundler.ui.debug?
+        Bundler.ui.info "Fetching gem metadata from #{uri}", Bundler.ui.debug?
         specs = fetch_remote_specs(gem_names)
         # new line now that the dots are over
         Bundler.ui.info "" if specs && !Bundler.ui.debug?
@@ -162,7 +166,7 @@ module Bundler
         # API errors mean we should treat this as a non-API source
         @use_api = false
 
-        Bundler.ui.info "Fetching source index from #{@public_uri}"
+        Bundler.ui.info "Fetching source index from #{uri}"
         specs = Bundler::Retry.new("source fetch").attempts do
           fetch_all_remote_specs
         end
@@ -227,7 +231,7 @@ module Bundler
     end
 
     def inspect
-      "#<#{self.class}:0x#{object_id} uri=#{@public_uri.to_s}>"
+      "#<#{self.class}:0x#{object_id} uri=#{uri}>"
     end
 
   private
@@ -248,7 +252,7 @@ module Bundler
         req.basic_auth(uri.user, uri.password) if uri.user
         response = connection.request(uri, req)
       rescue OpenSSL::SSL::SSLError
-        raise CertificateFailureError.new(@public_uri)
+        raise CertificateFailureError.new(uri)
       rescue *HTTP_ERRORS
         raise HTTPError, "Network error while fetching #{uri}"
       end
@@ -304,10 +308,10 @@ module Bundler
       Bundler.rubygems.fetch_all_remote_specs
     rescue Gem::RemoteFetcher::FetchError, OpenSSL::SSL::SSLError => e
       if e.message.match("certificate verify failed")
-        raise CertificateFailureError.new(@public_uri)
+        raise CertificateFailureError.new(uri)
       else
         Bundler.ui.trace e
-        raise HTTPError, "Could not fetch specs from #{@public_uri}"
+        raise HTTPError, "Could not fetch specs from #{uri}"
       end
     end
 
