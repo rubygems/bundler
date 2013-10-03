@@ -152,67 +152,39 @@ module Bundler
 
     # return the specs in the bundler format as an index
     def specs(gem_names, source)
-      index = Index.new
-      use_full_index = !gem_names || @remote_uri.scheme == "file" ||
-        Bundler::Fetcher.disable_endpoint || !use_api
+      use_full_index = !gem_names || @remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
 
       if !use_full_index
-        specs = fetch_remote_specs(gem_names)
+        index = fetch_dep_specs(gem_names, source)
+        return index if index
+        Bundler.ui.debug "Rubygems server at #{uri} does not support the dependency index," \
+          "falling back on the full index of all specs."
       end
 
-      if specs.nil?
-        # API errors mean we should treat this as a non-API source
-        @use_api = false
+      # API errors mean we should treat this as a non-API source
+      @use_api = false
 
-        specs = Bundler::Retry.new("source fetch").attempts do
-          fetch_all_remote_specs
+      specs = Bundler::Retry.new("source fetch").attempts do
+        fetch_all_remote_specs
+      end
+
+      Index.new do |index|
+        specs[@remote_uri].each do |name, version, platform, dependencies|
+          next if name == 'bundler'
+          spec = nil
+          if dependencies
+            spec = EndpointSpecification.new(name, version, platform, dependencies)
+          else
+            spec = RemoteSpecification.new(name, version, platform, self)
+          end
+          spec.source = source
+          spec.source_uri = @remote_uri
+          index << spec
         end
       end
-
-      specs[@remote_uri].each do |name, version, platform, dependencies|
-        next if name == 'bundler'
-        spec = nil
-        if dependencies
-          spec = EndpointSpecification.new(name, version, platform, dependencies)
-        else
-          spec = RemoteSpecification.new(name, version, platform, self)
-        end
-        spec.source = source
-        spec.source_uri = @remote_uri
-        index << spec
-      end
-
-      index
     rescue CertificateFailureError => e
       Bundler.ui.info "" if gem_names && use_api # newline after dots
       raise e
-    end
-
-    # fetch index
-    def fetch_remote_specs(gem_names, full_dependency_list = [], last_spec_list = [])
-      query_list = gem_names - full_dependency_list
-
-      # only display the message on the first run
-      if Bundler.ui.debug?
-        Bundler.ui.debug "Query List: #{query_list.inspect}"
-      else
-        Bundler.ui.info ".", false
-      end
-
-      return {@remote_uri => last_spec_list} if query_list.empty?
-
-      remote_specs = Bundler::Retry.new("dependency api").attempts do
-        fetch_dependency_remote_specs(query_list)
-      end
-
-      spec_list, deps_list = remote_specs
-      returned_gems = spec_list.map {|spec| spec.first }.uniq
-      fetch_remote_specs(deps_list, full_dependency_list + returned_gems, spec_list + last_spec_list)
-    rescue HTTPError, MarshalError, GemspecError => e
-      Bundler.ui.info "" unless Bundler.ui.debug? # new line now that the dots are over
-      Bundler.ui.debug "could not fetch from the dependency API, trying the full index"
-      @use_api = false
-      return nil
     end
 
     def use_api
@@ -220,11 +192,9 @@ module Bundler
 
       if @remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
         @use_api = false
-      elsif fetch(dependency_api_uri)
+      else
         @use_api = true
       end
-    rescue HTTPError
-      @use_api = false
     end
 
     def inspect
@@ -279,24 +249,9 @@ module Bundler
       URI.parse(url)
     end
 
-    # fetch from Gemcutter Dependency Endpoint API
-    def fetch_dependency_remote_specs(gem_names)
-      Bundler.ui.debug "Query Gemcutter Dependency Endpoint API: #{gem_names.join(',')}"
-      marshalled_deps = fetch dependency_api_uri(gem_names)
-      gem_list = Bundler.load_marshal(marshalled_deps)
-      deps_list = []
-
-      spec_list = gem_list.map do |s|
-        dependencies = s[:dependencies].map do |name, requirement|
-          dep = well_formed_dependency(name, requirement.split(", "))
-          deps_list << dep.name
-          dep
-        end
-
-        [s[:name], Gem::Version.new(s[:number]), s[:platform], dependencies]
-      end
-
-      [spec_list, deps_list.uniq]
+    def fetch_dep_specs(names, source)
+      index = Bundler::DepSpecs.new(source, @remote_uri).specs(names)
+      index.size.zero? ? nil : index
     end
 
     # fetch from modern index: specs.4.8.gz
