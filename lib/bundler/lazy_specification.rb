@@ -7,7 +7,7 @@ module Bundler
     include MatchPlatform
 
     attr_reader :name, :version, :dependencies, :platform
-    attr_accessor :source
+    attr_accessor :source, :source_uri
 
     def initialize(name, version, platform, source = nil)
       @name          = name

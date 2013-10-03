@@ -13,7 +13,7 @@ module Gem
   @loaded_stacks = Hash.new { |h,k| h[k] = [] }
 
   class Specification
-    attr_accessor :source, :location, :relative_loaded_from
+    attr_accessor :source, :source_uri, :location, :relative_loaded_from
 
     alias_method :rg_full_gem_path, :full_gem_path
     alias_method :rg_loaded_from,   :loaded_from

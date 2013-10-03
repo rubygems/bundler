@@ -31,12 +31,9 @@ module Bundler
     class << self
       attr_accessor :disable_endpoint, :api_timeout, :redirect_limit, :max_retries
 
-      @@spec_fetch_map ||= {}
-
       def fetch(spec)
-        spec, uri = @@spec_fetch_map[spec.full_name]
-        if spec
-          path = download_gem_from_uri(spec, uri)
+        if spec.source_uri
+          path = download_gem_from_uri(spec, spec.source_uri)
           s = Bundler.rubygems.spec_from_gem(path, Bundler.settings["trust-policy"])
           spec.__swap__(s)
         end
@@ -180,7 +177,7 @@ module Bundler
           spec = RemoteSpecification.new(name, version, platform, self)
         end
         spec.source = source
-        @@spec_fetch_map[spec.full_name] = [spec, @remote_uri]
+        spec.source_uri = @remote_uri
         index << spec
       end
 
