@@ -156,17 +156,13 @@ module Bundler
       use_full_source_index = !gem_names || @remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
 
       if gem_names && use_api
-        Bundler.ui.info "Fetching gem metadata from #{uri}", Bundler.ui.debug?
         specs = fetch_remote_specs(gem_names)
-        # new line now that the dots are over
-        Bundler.ui.info "" if specs && !Bundler.ui.debug?
       end
 
       if specs.nil?
         # API errors mean we should treat this as a non-API source
         @use_api = false
 
-        Bundler.ui.info "Fetching source index from #{uri}"
         specs = Bundler::Retry.new("source fetch").attempts do
           fetch_all_remote_specs
         end

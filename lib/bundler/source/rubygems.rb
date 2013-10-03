@@ -221,14 +221,21 @@ module Bundler
           index_fetchers = fetchers - api_fetchers
 
           # gather lists from non-api sites
-          index_fetchers.each { |f| idx.use f.specs(nil, self) }
+          index_fetchers.each do |f|
+            Bundler.ui.info "Fetching source index from #{f.uri}"
+            idx.use f.specs(nil, self)
+          end
           return idx if api_fetchers.empty?
 
           # because ensuring we have all the gems we need involves downloading
           # the gemspecs of those gems, if the non-api sites contain more than
           # about 100 gems, we just treat all sites as non-api for speed.
           if idx.size < API_REQUEST_LIMIT && dependency_names.size < API_REQUEST_LIMIT
-            api_fetchers.each { |f| idx.use f.specs(dependency_names, self) }
+            api_fetchers.each do |f|
+              Bundler.ui.info "Fetching gem metadata from #{f.uri}", Bundler.ui.debug?
+              idx.use f.specs(dependency_names, self)
+              Bundler.ui.info "" if !Bundler.ui.debug? # new line now that the dots are over
+            end
 
             # it's possible that gems from one source depend on gems from some
             # other source, so now we download gemspecs and iterate over those
@@ -236,9 +243,16 @@ module Bundler
             unmet = idx.unmet_dependency_names
 
             # if there are any cross-site gems we missed, get them now
-            api_fetchers.each { |f| idx.use f.specs(unmet, self) } if unmet.any?
+            api_fetchers.each do |f|
+              Bundler.ui.info "Fetching additional metadata from #{f.uri}", Bundler.ui.debug?
+              idx.use f.specs(unmet, self)
+              Bundler.ui.info "" if !Bundler.ui.debug? # new line now that the dots are over
+            end if unmet.any?
           else
-            api_fetchers.each { |f| idx.use f.specs(nil, self) }
+            api_fetchers.each do |f|
+              Bundler.ui.info "Fetching source index from #{f.uri}"
+              idx.use f.specs(nil, self)
+            end
           end
 
           return idx
