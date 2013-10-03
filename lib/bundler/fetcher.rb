@@ -201,27 +201,16 @@ module Bundler
 
       return {@remote_uri => last_spec_list} if query_list.empty?
 
-      spec_list, deps_list = fetch_dependency_remote_specs(query_list)
-      returned_gems = spec_list.map {|spec| spec.first }.uniq
-
-      fetch_remote_specs(deps_list, full_dependency_list + returned_gems, spec_list + last_spec_list)
-    # fall back to the legacy index in the following cases
-    # 1. Gemcutter Endpoint doesn't return a 200
-    # 2. Marshal blob doesn't load properly
-    # 3. One of the YAML gemspecs has the Syck::DefaultKey problem
-    rescue HTTPError, MarshalError, GemspecError => e
-      # new line now that the dots are over
-      Bundler.ui.info "" unless Bundler.ui.debug?
-
-      Bundler.ui.debug "Error during API request. #{e.class}: #{e.message}"
-      Bundler.ui.debug e.backtrace.join("  ")
-
-      @current_retries ||= 0
-      if @current_retries < @max_retries
-        @current_retries += 1
-        retry
+      remote_specs = Bundler::Retry.new("dependency api").attempts do
+        fetch_dependency_remote_specs(query_list)
       end
 
+      spec_list, deps_list = remote_specs
+      returned_gems = spec_list.map {|spec| spec.first }.uniq
+      fetch_remote_specs(deps_list, full_dependency_list + returned_gems, spec_list + last_spec_list)
+    rescue HTTPError, MarshalError, GemspecError => e
+      Bundler.ui.info "" unless Bundler.ui.debug? # new line now that the dots are over
+      Bundler.ui.debug "could not fetch from the dependency API, trying the full index"
       @use_api = false
       return nil
     end
@@ -313,7 +302,9 @@ module Bundler
     # fetch from modern index: specs.4.8.gz
     def fetch_all_remote_specs
       Bundler.rubygems.sources = ["#{@remote_uri}"]
-      Bundler.rubygems.fetch_all_remote_specs
+      Bundler::Retry.new("source fetch").attempts do
+        Bundler.rubygems.fetch_all_remote_specs
+      end
     rescue Gem::RemoteFetcher::FetchError, OpenSSL::SSL::SSLError => e
       if e.message.match("certificate verify failed")
         raise CertificateFailureError.new(@public_uri)
