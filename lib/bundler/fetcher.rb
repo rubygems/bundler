@@ -166,7 +166,9 @@ module Bundler
         @use_api = false
 
         Bundler.ui.info "Fetching source index from #{@public_uri}"
-        specs = fetch_all_remote_specs
+        specs = Bundler::Retry.new("source fetch").attempts do
+          fetch_all_remote_specs
+        end
       end
 
       specs[@remote_uri].each do |name, version, platform, dependencies|
@@ -302,9 +304,7 @@ module Bundler
     # fetch from modern index: specs.4.8.gz
     def fetch_all_remote_specs
       Bundler.rubygems.sources = ["#{@remote_uri}"]
-      Bundler::Retry.new("source fetch").attempts do
-        Bundler.rubygems.fetch_all_remote_specs
-      end
+      Bundler.rubygems.fetch_all_remote_specs
     rescue Gem::RemoteFetcher::FetchError, OpenSSL::SSL::SSLError => e
       if e.message.match("certificate verify failed")
         raise CertificateFailureError.new(@public_uri)
