@@ -151,14 +151,20 @@ module Bundler
 
     # return the specs in the bundler format as an index
     def specs(gem_names, source)
+      @silent = false unless defined?(@silent)
+
       index = Index.new
       use_full_source_index = !gem_names || @remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
 
       if gem_names && use_api
-        Bundler.ui.info "Fetching gem metadata from #{@public_uri}", Bundler.ui.debug?
+        unless @silent
+          Bundler.ui.info "Fetching gem metadata from #{@public_uri}", Bundler.ui.debug?
+        end
         specs = fetch_remote_specs(gem_names)
         # new line now that the dots are over
-        Bundler.ui.info "" if specs && !Bundler.ui.debug?
+        unless @silent
+          Bundler.ui.info "" if specs && !Bundler.ui.debug?
+        end
       end
 
       if specs.nil?
@@ -182,6 +188,8 @@ module Bundler
         index << spec
       end
 
+      @silent = true
+
       index
     rescue CertificateFailureError => e
       Bundler.ui.info "" if gem_names && use_api # newline after dots
@@ -193,10 +201,12 @@ module Bundler
       query_list = gem_names - full_dependency_list
 
       # only display the message on the first run
-      if Bundler.ui.debug?
-        Bundler.ui.debug "Query List: #{query_list.inspect}"
-      else
-        Bundler.ui.info ".", false
+      unless @silent
+        if Bundler.ui.debug?
+          Bundler.ui.debug "Query List: #{query_list.inspect}"
+        else
+          Bundler.ui.info ".", false
+        end
       end
 
       return {@remote_uri => last_spec_list} if query_list.empty?

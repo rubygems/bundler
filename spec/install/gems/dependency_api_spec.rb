@@ -300,6 +300,17 @@ describe "gemcutter's dependency API" do
     expect(out).to include("Fetching gem metadata from #{source_uri}")
   end
 
+  it "does not print 'Fetching gem metadata' more than once" do
+    gemfile <<-G
+      source "#{source_uri}"
+
+      gem "bundler_dep"
+    G
+
+    bundle :install, :artifice => "endpoint"
+    expect(out.gsub(/Fetching gem metadata/).to_a.size).to eq 1
+  end
+
   it "should install when EndpointSpecification has a bin dir owned by root", :sudo => true do
     sudo "mkdir -p #{system_gem_path("bin")}"
     sudo "chown -R root #{system_gem_path("bin")}"
