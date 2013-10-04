@@ -387,6 +387,11 @@ module Bundler
       end
     end
 
+    def validate_bundler!
+      locked_spec = Bundler.locked_gems.specs.find { |s| s.name == "bundler"}
+      Bundler::VERSION
+    end
+
   private
 
     def nothing_changed?
