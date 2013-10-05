@@ -157,7 +157,7 @@ module Bundler
       if !use_full_index
         index = fetch_dep_specs(gem_names, source)
         return index if index
-        Bundler.ui.debug "Rubygems server at #{uri} does not support the dependency index," \
+        Bundler.ui.debug "Rubygems server at #{uri} does not support the dependency index, " \
           "falling back on the full index of all specs."
       end
 
