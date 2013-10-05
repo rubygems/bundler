@@ -65,9 +65,11 @@ module Bundler
       v, p = vp.split("-", 2)
       gv, gp = Gem::Version.new(v), Gem::Platform.new(p)
 
-      deps, reqs = dr.split('|').map{|l| l.split(",") }
-      gd = deps.map { |d| Gem::Dependency.new(*d.split(":")) } if deps
-      gr = reqs.map { |r| Gem::Dependency.new(*r.split(":")) } if reqs
+      if dr
+        deps, reqs = dr.split('|').map{|l| l.split(",") }
+        gd = deps.map { |d| Gem::Dependency.new(*d.split(":")) } if deps
+        gr = reqs.map { |r| Gem::Dependency.new(*r.split(":")) } if reqs
+      end
 
       [gv, gp, gd, gr]
     end
