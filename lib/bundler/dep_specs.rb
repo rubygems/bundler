@@ -46,6 +46,18 @@ module Bundler
       end
     end
 
+    def each_index_line(filename)
+      index_path = Bundler.bundle_path.join(filename)
+      index_path.open do |file|
+        in_prologue = true
+        file.each_line do |line|
+          line.chomp!
+          in_prologue = false if line == "---"
+          yield(line) unless in_prologue
+        end
+      end
+    end
+
     def version_info(line)
       vp, dr = line.split(' ', 2)
       return unless vp =~ VERSION_PATTERN
@@ -58,17 +70,6 @@ module Bundler
       gr = reqs.map { |r| Gem::Dependency.new(*r.split(":")) } if reqs
 
       [gv, gp, gd, gr]
-    end
-
-    def each_index_line(filename)
-      Bundler.bundle_path.join(filename).open do |file|
-        in_prologue = true
-        file.each_line do |line|
-          line.chomp!
-          in_prologue = false if line == "---"
-          yield(line) unless in_prologue
-        end
-      end
     end
 
   end
