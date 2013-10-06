@@ -76,6 +76,46 @@ module Bundler
         end
       end
 
+      HTTP_ERRORS = [
+        Timeout::Error, EOFError, SocketError,
+        Errno::EINVAL, Errno::ECONNRESET, Errno::ETIMEDOUT, Errno::EAGAIN,
+        Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError,
+        Net::HTTP::Persistent::Error
+      ]
+
+      def get(uri, counter = 0)
+        raise HTTPError, "Too many redirects" if counter >= @redirect_limit
+
+        begin
+          Bundler.ui.debug "Fetching from: #{uri}"
+          req = Net::HTTP::Get.new uri.request_uri
+          req.basic_auth(uri.user, uri.password) if uri.user
+          response = connection.request(uri, req)
+        rescue OpenSSL::SSL::SSLError
+          raise CertificateFailureError.new(uri)
+        rescue *HTTP_ERRORS
+          raise HTTPError, "Network error while fetching #{uri}"
+        end
+
+        case response
+        when Net::HTTPRedirection
+          Bundler.ui.debug("HTTP Redirection")
+          new_uri = URI.parse(response["location"])
+          if new_uri.host == uri.host
+            new_uri.user = uri.user
+            new_uri.password = uri.password
+          end
+          fetch(new_uri, counter + 1)
+        when Net::HTTPSuccess
+          Bundler.ui.debug("HTTP Success")
+          response.body
+        when Net::HTTPRequestEntityTooLarge
+          raise FallbackError, response.body
+        else
+          raise HTTPError, "#{response.class}: #{response.body}"
+        end
+      end
+
     end
 
     attr_reader :remote_uri
@@ -152,69 +192,24 @@ module Bundler
       paths.first
     end
 
+
     # return the specs in the bundler format as an index
     def specs(gem_names, source)
-      index = Index.new
-      use_full_index = !gem_names || @remote_uri.scheme == "file" ||
-        Bundler::Fetcher.disable_endpoint || !use_api
-
-      if !use_full_index
-        specs = fetch_remote_specs(gem_names)
+      if gem_names && use_api
+        # try the dependency index first
+        specs = Bundler::DepSpecs.new(source, remote_uri).specs(gem_names)
+        # then try the dependency api
+        specs ||= RemoteSpecs.new(source, remote_uri).specs(gem_names)
       end
 
-      if specs.nil?
-        # API errors mean we should treat this as a non-API source
-        @use_api = false
+      # if we need the full index, this isn't an API source
+      @use_api = false if specs.nil?
 
-        specs = Bundler::Retry.new("source fetch").attempts do
-          fetch_all_remote_specs
-        end
-      end
-
-      specs[@remote_uri].each do |name, version, platform, dependencies|
-        next if name == 'bundler'
-        spec = nil
-        if dependencies
-          spec = EndpointSpecification.new(name, version, platform, dependencies)
-        else
-          spec = RemoteSpecification.new(name, version, platform, self)
-        end
-        spec.source = source
-        spec.source_uri = @remote_uri
-        index << spec
-      end
-
-      index
+      # finally, if we don't have any specs yet, grab the full index
+      specs || MarshalledSpecs.new(source, remote_uri, self).specs
     rescue CertificateFailureError => e
       Bundler.ui.info "" if gem_names && use_api # newline after dots
       raise e
-    end
-
-    # fetch index
-    def fetch_remote_specs(gem_names, full_dependency_list = [], last_spec_list = [])
-      query_list = gem_names - full_dependency_list
-
-      # only display the message on the first run
-      if Bundler.ui.debug?
-        Bundler.ui.debug "Query List: #{query_list.inspect}"
-      else
-        Bundler.ui.info ".", false
-      end
-
-      return {@remote_uri => last_spec_list} if query_list.empty?
-
-      remote_specs = Bundler::Retry.new("dependency api").attempts do
-        fetch_dependency_remote_specs(query_list)
-      end
-
-      spec_list, deps_list = remote_specs
-      returned_gems = spec_list.map {|spec| spec.first }.uniq
-      fetch_remote_specs(deps_list, full_dependency_list + returned_gems, spec_list + last_spec_list)
-    rescue HTTPError, MarshalError, GemspecError => e
-      Bundler.ui.info "" unless Bundler.ui.debug? # new line now that the dots are over
-      Bundler.ui.debug "could not fetch from the dependency API, trying the full index"
-      @use_api = false
-      return nil
     end
 
     def use_api
@@ -222,11 +217,9 @@ module Bundler
 
       if @remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
         @use_api = false
-      elsif fetch(dependency_api_uri)
+      else
         @use_api = true
       end
-    rescue HTTPError
-      @use_api = false
     end
 
     def inspect
@@ -234,85 +227,6 @@ module Bundler
     end
 
   private
-
-    HTTP_ERRORS = [
-      Timeout::Error, EOFError, SocketError,
-      Errno::EINVAL, Errno::ECONNRESET, Errno::ETIMEDOUT, Errno::EAGAIN,
-      Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError,
-      Net::HTTP::Persistent::Error
-    ]
-
-    def fetch(uri, counter = 0)
-      raise HTTPError, "Too many redirects" if counter >= @redirect_limit
-
-      begin
-        Bundler.ui.debug "Fetching from: #{uri}"
-        req = Net::HTTP::Get.new uri.request_uri
-        req.basic_auth(uri.user, uri.password) if uri.user
-        response = connection.request(uri, req)
-      rescue OpenSSL::SSL::SSLError
-        raise CertificateFailureError.new(uri)
-      rescue *HTTP_ERRORS
-        raise HTTPError, "Network error while fetching #{uri}"
-      end
-
-      case response
-      when Net::HTTPRedirection
-        Bundler.ui.debug("HTTP Redirection")
-        new_uri = URI.parse(response["location"])
-        if new_uri.host == uri.host
-          new_uri.user = uri.user
-          new_uri.password = uri.password
-        end
-        fetch(new_uri, counter + 1)
-      when Net::HTTPSuccess
-        Bundler.ui.debug("HTTP Success")
-        response.body
-      when Net::HTTPRequestEntityTooLarge
-        raise FallbackError, response.body
-      else
-        raise HTTPError, "#{response.class}: #{response.body}"
-      end
-    end
-
-    def dependency_api_uri(gem_names = [])
-      url = "#{@remote_uri}api/v1/dependencies"
-      url << "?gems=#{URI.encode(gem_names.join(","))}" if gem_names.any?
-      URI.parse(url)
-    end
-
-    # fetch from Gemcutter Dependency Endpoint API
-    def fetch_dependency_remote_specs(gem_names)
-      Bundler.ui.debug "Query Gemcutter Dependency Endpoint API: #{gem_names.join(',')}"
-      marshalled_deps = fetch dependency_api_uri(gem_names)
-      gem_list = Bundler.load_marshal(marshalled_deps)
-      deps_list = []
-
-      spec_list = gem_list.map do |s|
-        dependencies = s[:dependencies].map do |name, requirement|
-          dep = well_formed_dependency(name, requirement.split(", "))
-          deps_list << dep.name
-          dep
-        end
-
-        [s[:name], Gem::Version.new(s[:number]), s[:platform], dependencies]
-      end
-
-      [spec_list, deps_list.uniq]
-    end
-
-    # fetch from modern index: specs.4.8.gz
-    def fetch_all_remote_specs
-      Bundler.rubygems.sources = ["#{@remote_uri}"]
-      Bundler.rubygems.fetch_all_remote_specs
-    rescue Gem::RemoteFetcher::FetchError, OpenSSL::SSL::SSLError => e
-      if e.message.match("certificate verify failed")
-        raise CertificateFailureError.new(uri)
-      else
-        Bundler.ui.trace e
-        raise HTTPError, "Could not fetch specs from #{uri}"
-      end
-    end
 
     def well_formed_dependency(name, *requirements)
       Gem::Dependency.new(name, *requirements)
