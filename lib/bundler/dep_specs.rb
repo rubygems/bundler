@@ -18,6 +18,11 @@ module Bundler
     def spec_index(names)
       Index.build do |i|
         return unless each_spec(names) { |s| i << s }
+        begin
+          unmet = i.unmet_dependency_names
+          each_spec(unmet) { |s| i << s }
+          no_change = unmet.empty? || unmet == i.unmet_dependency_names
+        end until no_change
       end
     end
     alias_method :specs, :spec_index
