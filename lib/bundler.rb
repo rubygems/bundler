@@ -31,6 +31,7 @@ module Bundler
   autoload :Injector,              'bundler/injector'
   autoload :LazySpecification,     'bundler/lazy_specification'
   autoload :LockfileParser,        'bundler/lockfile_parser'
+  autoload :MarshalledSpecs,       'bundler/mashalled_specs'
   autoload :MatchPlatform,         'bundler/match_platform'
   autoload :RemoteSpecification,   'bundler/remote_specification'
   autoload :Resolver,              'bundler/resolver'
