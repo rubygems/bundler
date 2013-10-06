@@ -34,6 +34,7 @@ module Bundler
   autoload :MarshalledSpecs,       'bundler/mashalled_specs'
   autoload :MatchPlatform,         'bundler/match_platform'
   autoload :RemoteSpecification,   'bundler/remote_specification'
+  autoload :RemoteSpecs,           'bundler/remote_specs'
   autoload :Resolver,              'bundler/resolver'
   autoload :Retry,                 'bundler/retry'
   autoload :RubyVersion,           'bundler/ruby_version'
