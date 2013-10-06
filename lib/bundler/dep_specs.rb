@@ -17,7 +17,7 @@ module Bundler
 
     def spec_index(names)
       Index.build do |i|
-        each_spec(names) { |s| i << s }
+        return unless each_spec(names) { |s| i << s }
       end
     end
     alias_method :specs, :spec_index

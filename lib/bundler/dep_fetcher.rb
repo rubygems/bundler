@@ -12,9 +12,15 @@ module Bundler
       Bundler.bundle_path.join("deps").mkpath
 
       names.each do |name|
-        deps = @http.request(@source_uri + "/api/v2/deps/#{name}").body
-        Bundler.bundle_path.join("deps/#{name}").open("w"){|f| f.write(deps) }
+        uri = @source_uri + "/api/v2/deps/#{name}"
+        Bundler.ui.debug "GET #{uri}"
+        Bundler.bundle_path.join("deps/#{name}").open("w") do |f|
+          f.write @http.request(uri).body
+        end
       end
+    rescue Net::HTTP::Persistent::Error
+      Bundler.ui.debug "Rubygems source #{uri} does not support the dependency index."
+      return nil
     end
 
   end

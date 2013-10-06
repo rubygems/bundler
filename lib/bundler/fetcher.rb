@@ -155,10 +155,8 @@ module Bundler
       use_full_index = !gem_names || @remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
 
       if !use_full_index
-        index = fetch_dep_specs(gem_names, source)
+        index = Bundler::DepSpecs.new(source, @remote_uri).specs(gem_names)
         return index if index
-        Bundler.ui.debug "Rubygems server at #{uri} does not support the dependency index, " \
-          "falling back on the full index of all specs."
       end
 
       # API errors mean we should treat this as a non-API source
@@ -247,11 +245,6 @@ module Bundler
       url = "#{@remote_uri}api/v1/dependencies"
       url << "?gems=#{URI.encode(gem_names.join(","))}" if gem_names.any?
       URI.parse(url)
-    end
-
-    def fetch_dep_specs(names, source)
-      index = Bundler::DepSpecs.new(source, @remote_uri).specs(names)
-      index.size.zero? ? nil : index
     end
 
     # fetch from modern index: specs.4.8.gz
