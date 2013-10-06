@@ -78,6 +78,8 @@ module Bundler
 
     end
 
+    attr_reader :remote_uri
+
     def initialize(remote_uri)
       # How many redirects to allew in one request
       @redirect_limit = 5
@@ -173,7 +175,7 @@ module Bundler
           if dependencies
             spec = EndpointSpecification.new(name, version, platform, dependencies)
           else
-            spec = RemoteSpecification.new(name, version, platform, self)
+            spec = RemoteSpecification.new(name, version, platform)
           end
           spec.source = source
           spec.source_uri = @remote_uri

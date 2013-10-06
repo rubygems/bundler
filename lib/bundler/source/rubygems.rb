@@ -211,12 +211,20 @@ module Bundler
         idx
       end
 
+      def fetchers
+        @fetchers ||= remotes.map { |uri| Bundler::Fetcher.new(uri) }
+      end
+
+      def fetch_spec(uri, spec)
+        fetcher = fetchers.find{|f| f.remote_uri == uri }
+        fetcher && fetcher.fetch_spec(spec)
+      end
+
       def remote_specs
         @remote_specs ||= begin
           old = Bundler.rubygems.sources
           idx = Index.new
 
-          fetchers   = remotes.map { |uri| Bundler::Fetcher.new(uri) }
           api, index = fetchers.partition { |f| f.use_api }
           indexes    = {}
 
