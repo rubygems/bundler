@@ -67,11 +67,16 @@ module Bundler
 
       if dr
         deps, reqs = dr.split('|').map{|l| l.split(",") }
-        gd = deps.map { |d| Gem::Dependency.new(*d.split(":")) } if deps
-        gr = reqs.map { |r| Gem::Dependency.new(*r.split(":")) } if reqs
+        gd = deps.map { |d| dependency_info(d) } if deps
+        gr = reqs.map { |r| dependency_info(r) } if reqs
       end
 
       [gv, gp, gd, gr]
+    end
+
+    def dependency_info(string)
+      name, req_str = string.split(":")
+      Gem::Dependency.new(name, req_str.split("&"))
     end
 
   end
