@@ -41,11 +41,11 @@ update process below under [CONSERVATIVE UPDATING][].
   to it.
 
 * `--path=<path>`:
-  The location to install the gems in the bundle to. This defaults
-  to the gem home, which is the location that `gem install` installs
-  gems to. This means that, by default, gems installed without a
-  `--path` setting will show up in `gem list`. This setting is a
-  [remembered option][REMEMBERED OPTIONS].
+  The location to install the gems in the bundle to. This defaults to
+  Rubygems' gem home, which is also the default location where `gem
+  install` installs gems. This means that, by default, gems installed
+  without a `--path` setting will show up in `gem list`. This setting is
+  a [remembered option][REMEMBERED OPTIONS].
 
 * `--system`:
   Installs the gems in the bundle to the system location. This
