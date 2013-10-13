@@ -354,7 +354,8 @@ module Bundler
     end
 
     def git_present?
-      @git_present ||= Bundler.which("git")
+      return @git_present if defined?(@git_present)
+      @git_present = Bundler.which("git") || Bundler.which("git.exe")
     end
 
     def ruby_version
