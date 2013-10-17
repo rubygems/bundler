@@ -1,4 +1,6 @@
+<% unless config[:local] -%>
 require "bundler/gem_tasks"
+<% end -%>
 <% if config[:test] == 'minitest' -%>
 require "rake/testtask"
 
