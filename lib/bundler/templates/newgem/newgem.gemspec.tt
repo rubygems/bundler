@@ -1,13 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-<% unless config[:local] -%>
 require '<%=config[:namespaced_path]%>/version'
-<% end -%>
 
 Gem::Specification.new do |spec|
   spec.name          = <%=config[:name].inspect%>
-  spec.version       = <%= config[:local] ? '"0.0.1"' : "#{config[:constant_name]}::VERSION" %>
+  spec.version       = <%=config[:constant_name]%>::VERSION
 <% unless config[:local] -%>
   spec.authors       = [<%=config[:author].inspect%>]
   spec.email         = [<%=config[:email].inspect%>]

@@ -738,7 +738,7 @@ module Bundler
       template(File.join("newgem/gitignore.tt"),             File.join(target, ".gitignore"),                          opts)
       template(File.join("newgem/newgem.gemspec.tt"),        gemspec_dest,                                             opts)
       template(File.join("newgem/lib/newgem.rb.tt"),         File.join(target, "lib/#{namespaced_path}.rb"),           opts)
-      template(File.join("newgem/lib/newgem/version.rb.tt"), File.join(target, "lib/#{namespaced_path}/version.rb"),   opts) unless options[:local]
+      template(File.join("newgem/lib/newgem/version.rb.tt"), File.join(target, "lib/#{namespaced_path}/version.rb"),   opts)
       if options[:bin]
         template(File.join("newgem/bin/newgem.tt"),          File.join(target, 'bin', name),                           opts)
       end

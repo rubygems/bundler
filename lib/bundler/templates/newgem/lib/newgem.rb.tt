@@ -1,7 +1,5 @@
-<% unless config[:local] -%>
 require "<%=config[:namespaced_path]%>/version"
 
-<% end -%>
 <%- config[:constant_array].each_with_index do |c,i| -%>
 <%= '  '*i %>module <%= c %>
 <%- end -%>
