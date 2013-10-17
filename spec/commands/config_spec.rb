@@ -178,4 +178,18 @@ describe ".bundle/config" do
       expect(out).to eq("false")
     end
   end
+
+  describe "gem mirrors" do
+    before(:each) { bundle :install }
+
+    it "configures mirrors using keys with `mirror.`" do
+      bundle "config --local mirror.http://gems.example.org http://gem-mirror.example.org"
+      run(<<-E)
+Bundler.settings.gem_mirrors.each do |k, v|
+  puts "\#{k} => \#{v}"
+end
+E
+      expect(out).to eq("http://gems.example.org/ => http://gem-mirror.example.org/")
+    end
+  end
 end

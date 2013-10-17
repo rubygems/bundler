@@ -138,3 +138,12 @@ accidental locking to a different branch.
 Finally, Bundler also ensures that the current revision in the
 `Gemfile.lock` exists in the local git repository. By doing this, Bundler
 forces you to fetch the latest changes in the remotes.
+
+## MIRRORS OF GEM REPOSITORIES
+
+Bundler supports overriding gem sources with mirrors. This allows you to
+configure rubygems.org as the gem source in your Gemfile while still using your
+mirror to fetch gems.
+
+    bundle config mirror.http://rubygems.org http://localhost:8081/nexus/content/ruby/rubygems.org
+

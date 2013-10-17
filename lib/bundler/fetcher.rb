@@ -1,3 +1,4 @@
+require 'bundler/rubygems_mirror'
 require 'bundler/vendored_persistent'
 require 'securerandom'
 
@@ -79,6 +80,7 @@ module Bundler
     end
 
     def initialize(remote_uri)
+
       # How many redirects to allew in one request
       @redirect_limit = 5
       # How long to wait for each gemcutter API call
@@ -86,8 +88,8 @@ module Bundler
       # How many retries for the gemcutter API call
       @max_retries = 3
 
-      @remote_uri = remote_uri
-      @public_uri = remote_uri.dup
+      @remote_uri = RubygemsMirror.to_uri(remote_uri)
+      @public_uri = @remote_uri.dup
       @public_uri.user, @public_uri.password = nil, nil # don't print these
 
       Socket.do_not_reverse_lookup = true
