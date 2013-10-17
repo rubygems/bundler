@@ -2,7 +2,6 @@ require 'rubygems'
 # rubygems master requires UI for ConfigFile but doesn't require it
 require 'rubygems/user_interaction'
 require 'rubygems/config_file'
-require 'bundler/rubygems_mirror'
 
 module Bundler
   class RubygemsIntegration
@@ -188,7 +187,7 @@ module Bundler
     end
 
     def download_gem(spec, uri, path)
-      uri = RubygemsMirror.to_uri(uri)
+      uri = Bundler::Source.mirror_for(uri)
       Gem::RemoteFetcher.fetcher.download(spec, uri, path)
     end
 
