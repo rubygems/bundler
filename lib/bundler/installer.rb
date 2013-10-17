@@ -102,10 +102,6 @@ module Bundler
     end
 
     def install_gem_from_spec(spec, standalone = false, worker = 0)
-      # Download the gem to get the spec, because some specs that are returned
-      # by rubygems.org are broken and wrong.
-      Bundler::Fetcher.fetch(spec) if spec.source.is_a?(Bundler::Source::Rubygems)
-
       # Fetch the build settings, if there are any
       settings             = Bundler.settings["build.#{spec.name}"]
       install_message      = nil
