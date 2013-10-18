@@ -31,6 +31,8 @@ module Gem
     end
 
     def load_paths
+      return full_require_paths if respond_to?(:full_require_paths)
+
       require_paths.map do |require_path|
         if require_path.include?(full_gem_path)
           require_path
