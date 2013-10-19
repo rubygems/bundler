@@ -72,6 +72,10 @@ module Bundler
           return ["Using #{spec.name} (#{spec.version})", nil]
         end
 
+        # Download the gem to get the spec, because some specs that are returned
+        # by rubygems.org are broken and wrong.
+        Bundler::Fetcher.fetch(spec)
+
         install_message = "Installing #{spec.name} (#{spec.version})"
         path = cached_gem(spec)
         if Bundler.requires_sudo?
