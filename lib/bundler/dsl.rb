@@ -83,10 +83,14 @@ module Bundler
           elsif dep.type == :development
             return
           else
-            raise GemfileError, "You cannot specify the same gem twice with different version requirements. \n" \
-                            "You specified: #{current.name} (#{current.requirement}) and " \
-                            "#{dep.name} (#{dep.requirement})\n"
+            raise GemfileError, "You cannot specify the same gem twice with different version requirements.\n" \
+                            "You specified: #{current.name} (#{current.requirement}) and #{dep.name} (#{dep.requirement})"
           end
+
+        else
+          Bundler.ui.warn "Your Gemfile lists the gem #{current.name} (#{current.requirement}) more than once.\n" \
+                          "You should probably keep only one of them.\n" \
+                          "While it's not a problem now, it could cause errors if you change the version of just one of them later."
         end
 
         if current.source != dep.source

@@ -832,4 +832,15 @@ describe "bundle install with gem sources" do
     bundle :install, :artifice => 'endpoint_marshal_fail' # force gemspec load
     should_be_installed "activesupport 2.3.2"
   end
+
+  describe "#gem" do
+    it "will display a Warning if the gem is duplicated" do
+      gemfile <<-G
+        gem 'rails', '~> 4.0.0'
+        gem 'rails', '~> 4.0.0'
+      G
+      bundle :install
+      expect(out).to include("more than once")
+    end
+  end
 end
