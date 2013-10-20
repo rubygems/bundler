@@ -397,31 +397,6 @@ describe "bundle install with gem sources" do
     end
   end
 
-  describe "when loading only the default group" do
-    it "should not load all groups" do
-      install_gemfile <<-G
-        source "file://#{gem_repo1}"
-        gem "rack"
-        gem "activesupport", :groups => :development
-      G
-
-      ruby <<-R
-        require "bundler"
-        Bundler.setup :default
-        Bundler.require :default
-        puts RACK
-        begin
-          require "activesupport"
-        rescue LoadError
-          puts "no activesupport"
-        end
-      R
-
-      expect(out).to include("1.0")
-      expect(out).to include("no activesupport")
-    end
-  end
-
   describe "when a gem has a YAML gemspec" do
     before :each do
       build_repo2 do
@@ -586,39 +561,6 @@ describe "bundle install with gem sources" do
 
       bundle "check"
       expect(out).to eq("The Gemfile's dependencies are satisfied")
-    end
-  end
-
-  describe "when locked and installed with --without" do
-    before(:each) do
-      build_repo2
-      system_gems "rack-0.9.1" do
-        install_gemfile <<-G, :without => :rack
-          source "file://#{gem_repo2}"
-          gem "rack"
-
-          group :rack do
-            gem "rack_middleware"
-          end
-        G
-      end
-    end
-
-    it "uses the correct versions even if --without was used on the original" do
-      should_be_installed "rack 0.9.1"
-      should_not_be_installed "rack_middleware 1.0"
-      simulate_new_machine
-
-      bundle :install
-
-      should_be_installed "rack 0.9.1"
-      should_be_installed "rack_middleware 1.0"
-    end
-
-    it "does not hit the remote a second time" do
-      FileUtils.rm_rf gem_repo2
-      bundle "install --without rack"
-      expect(err).to be_empty
     end
   end
 
