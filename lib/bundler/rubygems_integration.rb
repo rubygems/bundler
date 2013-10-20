@@ -256,7 +256,6 @@ module Bundler
     def stub_source_index137(specs)
       # Rubygems versions lower than 1.7 use SourceIndex#from_gems_in
       source_index_class = (class << Gem::SourceIndex ; self ; end)
-      source_index_class.send(:remove_method, :from_gems_in)
       source_index_class.send(:define_method, :from_gems_in) do |*args|
         source_index = Gem::SourceIndex.new
         source_index.spec_dirs = *args
@@ -290,7 +289,6 @@ module Bundler
     # +specs+
     def replace_bin_path(specs)
       gem_class = (class << Gem ; self ; end)
-      gem_class.send(:remove_method, :bin_path)
       gem_class.send(:define_method, :bin_path) do |name, *args|
         exec_name = args.first
 
@@ -318,7 +316,6 @@ module Bundler
     # we don't #refresh, so stub it out.
     def replace_refresh
       gem_class = (class << Gem ; self ; end)
-      gem_class.send(:remove_method, :refresh)
       gem_class.send(:define_method, :refresh) { }
     end
 

@@ -43,7 +43,6 @@ module Gem
     end
 
     # RubyGems 1.8+ used only.
-    remove_method :gem_dir if method_defined? :gem_dir
     def gem_dir
       full_gem_path
     end
