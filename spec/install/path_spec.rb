@@ -129,4 +129,22 @@ describe "bundle install" do
     end
   end
 
+  describe "to a dead symlink" do
+    before do
+      in_app_root do
+        `ln -s /tmp/idontexist bundle`
+      end
+    end
+
+    it "reports the symlink is dead" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      bundle "install --path bundle"
+      expect(out).to match(/invalid symlink/)
+    end
+  end
+
 end
