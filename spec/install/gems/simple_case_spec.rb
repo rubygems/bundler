@@ -362,20 +362,6 @@ describe "bundle install with gem sources" do
     end
   end
 
-  describe "when passing in a Gemfile via --gemfile" do
-    it "finds the gemfile" do
-      gemfile bundled_app("NotGemfile"), <<-G
-        source "file://#{gem_repo1}"
-        gem 'rack'
-      G
-
-      bundle :install, :gemfile => bundled_app("NotGemfile")
-
-      ENV['BUNDLE_GEMFILE'] = "NotGemfile"
-      should_be_installed "rack 1.0.0"
-    end
-  end
-
   describe "when requesting a quiet install via --quiet" do
     it "should be quiet if there are no warnings" do
       gemfile <<-G

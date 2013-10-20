@@ -12,6 +12,20 @@ describe "bundle install" do
     end
   end
 
+  context "with --gemfile" do
+    it "finds the gemfile" do
+      gemfile bundled_app("NotGemfile"), <<-G
+        source "file://#{gem_repo1}"
+        gem 'rack'
+      G
+
+      bundle :install, :gemfile => bundled_app("NotGemfile")
+
+      ENV['BUNDLE_GEMFILE'] = "NotGemfile"
+      should_be_installed "rack 1.0.0"
+    end
+  end
+
   context "with deprecated features" do
     before :each do
       in_app_root
