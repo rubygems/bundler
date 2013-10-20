@@ -28,7 +28,7 @@ env:
   # We need to know if changes to rubygems will break bundler on release
   - RGV=master
   # Test the latest rubygems release with all of our supported rubies
-  - RGV=v2.1.3
+  - RGV=v2.1.9
   # Test the latest stable branch so we know the next minor will work
   - RGV=2.1
 matrix:
@@ -47,21 +47,21 @@ matrix:
       env: RGV=master
     # Alternate implementations
     - rvm: jruby
-      env: RGV=v2.1.5
+      env: RGV=v2.1.9
     - rvm: rbx
-      env: RGV=v2.1.5
+      env: RGV=v2.1.9
     # Rubygems goes down to 2.0 on Ruby 2.0.0
     - rvm: 2.0.0
-      env: RGV=v2.1.5
+      env: RGV=v2.1.9
     - rvm: 2.0.0
-      env: RGV=v2.0.10
+      env: RGV=v2.0.12
     # Rubygems goes down to 1.5.3 on Ruby 1.9.3
     - rvm: 1.9.3
-      env: RGV=v2.1.5
+      env: RGV=v2.1.9
     - rvm: 1.9.3
-      env: RGV=v2.0.10
+      env: RGV=v2.0.12
     - rvm: 1.9.3
-      env: RGV=v1.8.27
+      env: RGV=v1.8.28
     - rvm: 1.9.3
       env: RGV=v1.7.2
     - rvm: 1.9.3
@@ -70,10 +70,10 @@ matrix:
       env: RGV=v1.5.3
     # We only want an overview of how 1.9.2 is doing
     - rvm: 1.9.2
-      env: RGV=v2.1.5
+      env: RGV=v2.1.9
     # Rubygems goes down to 1.3.6 on Ruby 1.8.7
     - rvm: 1.8.7
-      env: RGV=v1.8.27
+      env: RGV=v1.8.28
     - rvm: 1.8.7
       env: RGV=v1.7.2
     - rvm: 1.8.7
