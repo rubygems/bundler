@@ -31,14 +31,6 @@ module Bundler
     class << self
       attr_accessor :disable_endpoint, :api_timeout, :redirect_limit, :max_retries
 
-      def fetch(spec)
-        if spec.source_uri
-          path = download_gem_from_uri(spec, spec.source_uri)
-          s = Bundler.rubygems.spec_from_gem(path, Bundler.settings["trust-policy"])
-          spec.__swap__(s)
-        end
-      end
-
       def download_gem_from_uri(spec, uri)
         spec.fetch_platform
 

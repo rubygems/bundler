@@ -74,7 +74,11 @@ module Bundler
 
         # Download the gem to get the spec, because some specs that are returned
         # by rubygems.org are broken and wrong.
-        Bundler::Fetcher.fetch(spec)
+        if spec.source_uri
+          path = Fetcher.download_gem_from_uri(spec, spec.source_uri)
+          s = Bundler.rubygems.spec_from_gem(path, Bundler.settings["trust-policy"])
+          spec.__swap__(s)
+        end
 
         install_message = "Installing #{spec.name} (#{spec.version})"
         path = cached_gem(spec)
