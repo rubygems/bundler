@@ -257,7 +257,7 @@ module Bundler
 
     def stub_source_index(specs)
       Gem::SourceIndex.send(:alias_method, :old_initialize, :initialize)
-      Gem::SourceIndex.send(:define_method, :initialize) do |*args|
+      redefine_method(Gem::SourceIndex, :initialize) do |*args|
         @gems = {}
         # You're looking at this thinking: Oh! This is how I make those
         # rubygems deprecations go away!
@@ -280,7 +280,7 @@ module Bundler
     # +specs+
     def replace_bin_path(specs)
       gem_class = (class << Gem ; self ; end)
-      gem_class.send(:define_method, :bin_path) do |name, *args|
+      redefine_method(gem_class, :bin_path) do |name, *args|
         exec_name = args.first
 
         if exec_name == 'bundle'
@@ -307,7 +307,7 @@ module Bundler
     # we don't #refresh, so stub it out.
     def replace_refresh
       gem_class = (class << Gem ; self ; end)
-      gem_class.send(:define_method, :refresh) { }
+      redefine_method(gem_class, :refresh) { }
     end
 
     # Replace or hook into Rubygems to provide a bundlerized view
@@ -326,7 +326,7 @@ module Bundler
     # This backports the correct segment generation code from Rubygems 1.4+
     # by monkeypatching it into the method in Rubygems 1.3.6 and 1.3.7.
     def backport_segment_generation
-      Gem::Version.send(:define_method, :segments) do
+      redefine_method(Gem::Version, :segments) do
         @segments ||= @version.scan(/[0-9]+|[a-z]+/i).map do |s|
           /^\d+$/ =~ s ? s.to_i : s
         end
@@ -335,7 +335,7 @@ module Bundler
 
     # This backport fixes the marshaling of @segments.
     def backport_yaml_initialize
-      Gem::Version.send(:define_method, :yaml_initialize) do |tag, map|
+      redefine_method(Gem::Version, :yaml_initialize) do |tag, map|
         @version = map['version']
         @segments = nil
         @hash = nil
@@ -345,30 +345,37 @@ module Bundler
     # This backports base_dir which replaces installation path
     # Rubygems 1.8+
     def backport_base_dir
-      Gem::Specification.send(:define_method, :base_dir) do
+      redefine_method(Gem::Specification, :base_dir) do
         return Gem.dir unless loaded_from
         File.dirname File.dirname loaded_from
       end
     end
 
     def backport_cache_file
-      Gem::Specification.send(:define_method, :cache_dir) do
+      redefine_method(Gem::Specification, :cache_dir) do
         @cache_dir ||= File.join base_dir, "cache"
       end
 
-      Gem::Specification.send(:define_method, :cache_file) do
+      redefine_method(Gem::Specification, :cache_file) do
         @cache_file ||= File.join cache_dir, "#{full_name}.gem"
       end
     end
 
     def backport_spec_file
-      Gem::Specification.send(:define_method, :spec_dir) do
+      redefine_method(Gem::Specification, :spec_dir) do
         @spec_dir ||= File.join base_dir, "specifications"
       end
 
-      Gem::Specification.send(:define_method, :spec_file) do
+      redefine_method(Gem::Specification, :spec_file) do
         @spec_file ||= File.join spec_dir, "#{full_name}.gemspec"
       end
+    end
+
+    def redefine_method(klass, method, &block)
+      if klass.instance_methods(false).include?(method)
+        klass.send(:remove_method, method)
+      end
+      klass.send(:define_method, method, &block)
     end
 
     # Rubygems 1.4 through 1.6

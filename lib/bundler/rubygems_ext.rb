@@ -13,7 +13,10 @@ module Gem
   @loaded_stacks = Hash.new { |h,k| h[k] = [] }
 
   class Specification
-    attr_accessor :source, :source_uri, :location, :relative_loaded_from
+    attr_accessor :source_uri, :location, :relative_loaded_from
+
+    remove_method :source if instance_methods(false).include?(:source)
+    attr_accessor :source
 
     alias_method :rg_full_gem_path, :full_gem_path
     alias_method :rg_loaded_from,   :loaded_from
@@ -43,6 +46,7 @@ module Gem
     end
 
     # RubyGems 1.8+ used only.
+    remove_method :gem_dir if instance_methods(false).include?(:gem_dir)
     def gem_dir
       full_gem_path
     end
