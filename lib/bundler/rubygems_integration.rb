@@ -213,6 +213,8 @@ module Bundler
     end
 
     def replace_gem(specs)
+      reverse_rubygems_kernel_mixin
+
       executables = specs.map { |s| s.executables }.flatten
 
       ::Kernel.send(:define_method, :gem) do |dep, *reqs|
@@ -253,18 +255,7 @@ module Bundler
       end
     end
 
-    def stub_source_index137(specs)
-      # Rubygems versions lower than 1.7 use SourceIndex#from_gems_in
-      source_index_class = (class << Gem::SourceIndex ; self ; end)
-      source_index_class.send(:define_method, :from_gems_in) do |*args|
-        source_index = Gem::SourceIndex.new
-        source_index.spec_dirs = *args
-        source_index.add_specs(*specs)
-        source_index
-      end
-    end
-
-    def stub_source_index170(specs)
+    def stub_source_index(specs)
       Gem::SourceIndex.send(:alias_method, :old_initialize, :initialize)
       Gem::SourceIndex.send(:define_method, :initialize) do |*args|
         @gems = {}
@@ -322,8 +313,6 @@ module Bundler
     # Replace or hook into Rubygems to provide a bundlerized view
     # of the world.
     def replace_entrypoints(specs)
-      reverse_rubygems_kernel_mixin
-
       replace_gem(specs)
 
       stub_rubygems(specs)
@@ -393,7 +382,14 @@ module Bundler
       end
 
       def stub_rubygems(specs)
-        stub_source_index137(specs)
+        # Rubygems versions lower than 1.7 use SourceIndex#from_gems_in
+        source_index_class = (class << Gem::SourceIndex ; self ; end)
+        source_index_class.send(:define_method, :from_gems_in) do |*args|
+          source_index = Gem::SourceIndex.new
+          source_index.spec_dirs = *args
+          source_index.add_specs(*specs)
+          source_index
+        end
       end
 
       def all_specs
@@ -416,7 +412,7 @@ module Bundler
     # Rubygems 1.7
     class Transitional < Legacy
       def stub_rubygems(specs)
-        stub_source_index170(specs)
+        stub_source_index(specs)
       end
     end
 
@@ -429,7 +425,7 @@ module Bundler
           Gem::Specification.all = specs
         }
 
-        stub_source_index170(specs)
+        stub_source_index(specs)
       end
 
       def all_specs
