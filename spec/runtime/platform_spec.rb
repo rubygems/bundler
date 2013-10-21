@@ -75,9 +75,9 @@ describe "Bundler.setup with multi platform stuff" do
         nokogiri
     G
 
-    system_gems "nokogiri-1.4.2", "platform_specific-1.0-x86-darwin-100"
-
     simulate_platform "x86-darwin-100"
+
+    system_gems "nokogiri-1.4.2", "platform_specific-1.0-x86-darwin-100"
 
     gemfile <<-G
       source "file://#{gem_repo1}"
