@@ -28,7 +28,7 @@ $show_err = true
 
 Spec::Rubygems.setup
 FileUtils.rm_rf(Spec::Path.gem_repo1)
-ENV['RUBYOPT'] = "#{ENV['RUBYOPT']} -r#{Spec::Path.root}/spec/support/rubygems_hax/platform.rb"
+ENV['RUBYOPT'] = "#{ENV['RUBYOPT']} -r#{Spec::Path.root}/spec/support/hax.rb"
 ENV['BUNDLE_SPEC_RUN'] = "true"
 
 # Don't wrap output in tests
