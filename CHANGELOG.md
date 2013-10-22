@@ -68,7 +68,7 @@ Bugfixes:
   - use basic auth even when SSL is not available (@jayniz)
   - installing git gems without dependencies in deployment now works
 
-## 1.3.4 (15 March 2103)
+## 1.3.4 (15 March 2013)
 
 Bugfixes:
 
