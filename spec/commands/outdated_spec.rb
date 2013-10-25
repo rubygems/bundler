@@ -12,6 +12,7 @@ describe "bundle outdated" do
       gem "zebra", :git => "#{lib_path('zebra')}"
       gem "foo", :git => "#{lib_path('foo')}"
       gem "activesupport", "2.3.5"
+      gem "weakling", "~> 0.0.1"
     G
   end
 
@@ -19,6 +20,7 @@ describe "bundle outdated" do
     it "returns a sorted list of outdated gems" do
       update_repo2 do
         build_gem "activesupport", "3.0"
+        build_gem "weakling", "0.2"
         update_git "foo", :path => lib_path("foo")
         update_git "zebra", :path => lib_path("zebra")
       end
@@ -26,6 +28,7 @@ describe "bundle outdated" do
       bundle "outdated"
 
       expect(out).to include("activesupport (3.0 > 2.3.5) Gemfile specifies \"= 2.3.5\"")
+      expect(out).to include("weakling (0.2 > 0.0.3) Gemfile specifies \"~> 0.0.1\"")
       expect(out).to include("foo (1.0")
 
       # Gem names are one per-line, between "*" and their parenthesized version.
@@ -111,6 +114,20 @@ describe "bundle outdated" do
         bundle "outdated"
         expect(out).to include("activesupport (3.0.0.beta.2 > 3.0.0.beta.1) Gemfile specifies \"= 3.0.0.beta.1\"")
       end
+    end
+  end
+
+  describe "with --strict option" do
+    it "only reports gems that have a newer version that matches the specified dependency version requirements" do
+      update_repo2 do
+        build_gem "activesupport", "3.0"
+        build_gem "weakling", "0.0.5"
+      end
+
+      bundle "outdated --strict"
+
+      expect(out).to_not include("activesupport (3.0 > 2.3.5) Gemfile specifies \"= 2.3.5\"")
+      expect(out).to include("weakling (0.0.5 > 0.0.3) Gemfile specifies \"~> 0.0.1\"")
     end
   end
 

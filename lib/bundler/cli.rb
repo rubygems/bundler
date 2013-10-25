@@ -416,6 +416,8 @@ module Bundler
     method_option "source", :type => :array, :banner => "Check against a specific source"
     method_option "local", :type => :boolean, :banner =>
       "Do not attempt to fetch gems remotely and use the gem cache instead"
+    method_option "strict", :type => :boolean, :banner =>
+      "Only list newer versions that match requirements"
     def outdated(*gems)
       sources = Array(options[:source])
 
@@ -444,13 +446,19 @@ module Bundler
       [gemfile_specs.sort_by(&:name), dependency_specs.sort_by(&:name)].flatten.each do |current_spec|
         next if !gems.empty? && !gems.include?(current_spec.name)
 
-        active_spec = definition.index[current_spec.name].sort_by { |b| b.version }
+        dependency = current_dependencies[current_spec.name]
 
+        active_spec = definition.index[current_spec.name].sort_by { |b| b.version }
         if !current_spec.version.prerelease? && !options[:pre] && active_spec.size > 1
           active_spec = active_spec.delete_if { |b| b.respond_to?(:version) && b.version.prerelease? }
         end
-
-        active_spec = active_spec.last
+        if options["strict"]
+          active_spec =  active_spec.reverse.detect do |b|
+            dependency && b.respond_to?(:version) && dependency.requirement.satisfied_by?(b.version)
+          end || active_spec.last
+        else
+          active_spec = active_spec.last
+        end
         next if active_spec.nil?
 
         gem_outdated = Gem::Version.new(active_spec.version) > Gem::Version.new(current_spec.version)
@@ -466,7 +474,6 @@ module Bundler
 
           spec_version    = "#{active_spec.version}#{active_spec.git_version}"
           current_version = "#{current_spec.version}#{current_spec.git_version}"
-          dependency = current_dependencies[current_spec.name]
           dependency_version = %|Gemfile specifies "#{dependency.requirement}"| if dependency && dependency.specific?
           Bundler.ui.info "  * #{active_spec.name} (#{spec_version} > #{current_version}) #{dependency_version}".rstrip
           out_count += 1
