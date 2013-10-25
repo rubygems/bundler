@@ -203,7 +203,12 @@ module Bundler
         else
           req = Net::HTTP::Get.new uri.request_uri
           req.basic_auth(uri.user, uri.password) if uri.user && uri.password
-          response = @connection.request(req)
+          if uri.host == @connection.address && uri.port == @connection.port
+            connection = @connection
+          else
+            connection = Net::HTTP.new(uri.host, uri.port)
+          end
+          response = connection.request(req)
         end
       rescue OpenSSL::SSL::SSLError
         raise CertificateFailureError.new(@public_uri)
