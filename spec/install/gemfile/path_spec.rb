@@ -46,6 +46,18 @@ describe "bundle install with explicit source paths" do
     should_be_installed("foo 1.0")
   end
 
+  it "expands paths raise error with not existing user's home dir" do
+    build_lib "foo"
+    username = 'some_unexisting_user'
+    relative_path = lib_path('foo-1.0').relative_path_from(Pathname.new("/home/#{username}").expand_path)
+
+    install_gemfile <<-G
+      gem 'foo', :path => "~#{username}/#{relative_path}"
+    G
+    # TODO improve expect condition
+    expect(out).to match("The path `~#{username}/#{relative_path}` is incorrect: user #{username} doesn't exist")
+  end
+
   it "expands paths relative to Bundler.root" do
     build_lib "foo", :path => bundled_app("foo-1.0")
 
