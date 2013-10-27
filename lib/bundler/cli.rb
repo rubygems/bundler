@@ -417,7 +417,7 @@ module Bundler
     method_option "local", :type => :boolean, :banner =>
       "Do not attempt to fetch gems remotely and use the gem cache instead"
     method_option "strict", :type => :boolean, :banner =>
-      "Only list newer versions that match requirements"
+      "Only list newer versions allowed by your Gemfile requirements"
     def outdated(*gems)
       sources = Array(options[:source])
 
