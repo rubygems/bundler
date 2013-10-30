@@ -302,6 +302,8 @@ module Bundler
       "Only output warnings and errors."
     method_option "full-index", :type => :boolean, :banner =>
         "Use the rubygems modern index instead of the API endpoint"
+    method_option "jobs", :aliases => "-j", :type => :numeric, :banner =>
+      "Specify the number of jobs to run in parallel"
     def update(*gems)
       sources = Array(options[:source])
       Bundler.ui.level = "warn" if options[:quiet]
