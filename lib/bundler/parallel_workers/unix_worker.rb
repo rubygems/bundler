@@ -14,6 +14,12 @@ module Bundler
         end
       end
 
+      def initialize(size, job)
+        # Close the persistent connections for the main thread before forking
+        Net::HTTP::Persistent.new('bundler', :ENV).shutdown
+        super
+      end
+
       private
 
       # Start forked workers for downloading gems. This version of worker
