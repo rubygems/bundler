@@ -1,6 +1,5 @@
 require 'erb'
 require 'rubygems/dependency_installer'
-require 'bundler/parallel_workers'
 
 module Bundler
   class Installer < Environment
@@ -195,7 +194,7 @@ module Bundler
 
   private
     def can_install_parallely?
-      if Bundler.current_ruby.mri? || Bundler.rubygems.provides?(">= 2.1.0.rc")
+      if Bundler.rubygems.provides?(">= 2.1.0.rc")
         true
       else
         Bundler.ui.warn "Rubygems #{Gem::VERSION} is not threadsafe, so your "\
@@ -275,7 +274,7 @@ module Bundler
         remains[spec.name] = true
       end
 
-      worker_pool = ParallelWorkers.worker_pool size, lambda { |name, worker|
+      worker_pool = WorkerPool.new size, lambda { |name, worker|
         spec = name2spec[name]
         message = install_gem_from_spec spec, standalone, worker
         { :name => spec.name, :post_install => message }

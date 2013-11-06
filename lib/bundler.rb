@@ -44,6 +44,7 @@ module Bundler
   autoload :Specification,         'bundler/shared_helpers'
   autoload :SystemRubyVersion,     'bundler/ruby_version'
   autoload :UI,                    'bundler/ui'
+  autoload :WorkerPool,            'bundler/worker_pool'
 
   class BundlerError < StandardError
     def self.status_code(code)
