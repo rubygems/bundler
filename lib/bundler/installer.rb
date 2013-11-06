@@ -206,8 +206,8 @@ module Bundler
 
     def generate_standalone_bundler_executable_stubs(spec)
       # double-assignment to avoid warnings about variables that will be used by ERB
-      bin_path = Bundler.bin_path
-      template = File.read(File.expand_path('../templates/Executable.standalone', __FILE__))
+      bin_path = bin_path = Bundler.bin_path
+      template = template = File.read(File.expand_path('../templates/Executable.standalone', __FILE__))
       ruby_command = ruby_command = Thor::Util.ruby_command
 
       spec.executables.each do |executable|
