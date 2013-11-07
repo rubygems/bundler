@@ -1,3 +1,24 @@
+## 1.5.0.rc.1 (2013-11-09)
+
+Features:
+
+  - bundle update also accepts --jobs (#2692, @mrkn)
+  - add fork URL to README for new `bundle gem` (#2665, @zzak)
+  - add `bundle outdated --strict` (#2685, @rhysd)
+  - warn if same gem/version is added twice (#2679, @jendiamond)
+  - don't redownload installed specs for `bundle install` (#2680, @cainlevy)
+  - override gem sources with mirrors (#2650, @danielsdeleo, @mkristian)
+
+Bugfixes:
+
+  - fix sharing same SSL socket when forking workers for parallel install (#2632)
+  - fix msg typo in GitNotAllowedError (#2654, @joyicecloud)
+  - fix Bundler.which for directories (#2697, @rhysd)
+  - properly require `Capistrano::Version` (#2690, @steveklabnik)
+  - search for git.exe and git
+  - fix the bug that downloads every spec when API fetcher encouters an error
+  - only retry network requests
+
 ## 1.4.0.rc.1 (2013-09-29)
 
 Features:
