@@ -53,7 +53,7 @@ module Bundler
       @lockfile_contents = ""
       @ruby_version      = ruby_version
 
-      if lockfile && File.exists?(lockfile)
+      if lockfile && File.exist?(lockfile)
         @lockfile_contents = Bundler.read_file(lockfile)
         locked = LockfileParser.new(@lockfile_contents)
         @platforms      = locked.platforms
