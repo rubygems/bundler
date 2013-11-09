@@ -4,7 +4,7 @@ describe "updating dependencies parallely", :realworld => true do
   before :each do
     install_gemfile <<-G
       source "https://rubygems.org"
-      gem 'activesupport', '~> 3.2.13'
+      gem 'activesupport', '~> 3.2.12'
       gem 'faker', '~> 1.1.2'
     G
   end
@@ -12,14 +12,14 @@ describe "updating dependencies parallely", :realworld => true do
   it "installs gems parallely" do
     gemfile <<-G
       source "https://rubygems.org"
-      gem 'activesupport', '~> 4.0.0'
+      gem 'activesupport', '3.2.13'
       gem 'faker', '~> 1.1.2'
     G
 
     bundle :update, :jobs => 4
 
     bundle "show activesupport"
-    expect(out).to match(/activesupport-4\.0\.\d+/)
+    expect(out).to match(/activesupport-3\.2\.13/)
 
     bundle "show faker"
     expect(out).to match(/faker/)
