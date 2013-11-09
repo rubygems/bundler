@@ -652,8 +652,9 @@ module Bundler
       return Bundler.ui.info("To open a bundled gem, set $EDITOR or $BUNDLER_EDITOR") unless editor
       spec = select_spec(name, :regex_match)
       return unless spec
-      Dir.chdir(spec.full_gem_path) do
-        command = "#{editor} #{spec.full_gem_path}"
+      full_gem_path = spec.full_gem_path
+      Dir.chdir(full_gem_path) do
+        command = "#{editor} #{full_gem_path}"
         success = system(command)
         Bundler.ui.info "Could not run '#{command}'" unless success
       end
