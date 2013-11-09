@@ -198,11 +198,12 @@ G
 
   let(:ruby_version_correct) { "ruby \"#{RUBY_VERSION}\", :engine => \"#{local_ruby_engine}\", :engine_version => \"#{local_engine_version}\"" }
   let(:ruby_version_correct_engineless) { "ruby \"#{RUBY_VERSION}\"" }
-  let(:ruby_version_correct_patchlevel) { "#{ruby_version_correct}, :patchlevel => #{RUBY_PATCHLEVEL}" }
+  let(:ruby_version_correct_patchlevel) { "#{ruby_version_correct}, :patchlevel => '#{RUBY_PATCHLEVEL}'" }
   let(:ruby_version_incorrect) { "ruby \"#{not_local_ruby_version}\", :engine => \"#{local_ruby_engine}\", :engine_version => \"#{not_local_ruby_version}\"" }
   let(:engine_incorrect) { "ruby \"#{RUBY_VERSION}\", :engine => \"#{not_local_tag}\", :engine_version => \"#{RUBY_VERSION}\"" }
   let(:engine_version_incorrect) { "ruby \"#{RUBY_VERSION}\", :engine => \"#{local_ruby_engine}\", :engine_version => \"#{not_local_engine_version}\"" }
-  let(:patchlevel_incorrect) { "#{ruby_version_correct}, :patchlevel => #{not_local_patchlevel}" }
+  let(:patchlevel_incorrect) { "#{ruby_version_correct}, :patchlevel => '#{not_local_patchlevel}'" }
+  let(:patchlevel_fixnum) { "#{ruby_version_correct}, :patchlevel => #{RUBY_PATCHLEVEL}1" }
 
   def should_be_ruby_version_incorrect(opts = {:exitstatus => true})
     expect(exitstatus).to eq(18) if opts[:exitstatus]
@@ -223,6 +224,12 @@ G
     expect(exitstatus).to eq(18) if opts[:exitstatus]
 
     expect(out).to be_include("Your Ruby patchlevel is #{RUBY_PATCHLEVEL}, but your Gemfile specified #{not_local_patchlevel}")
+  end
+
+  def should_be_patchlevel_fixnum(opts = {:exitstatus => true})
+    expect(exitstatus).to eq(18) if opts[:exitstatus]
+
+    expect(out).to be_include("The Ruby patchlevel in your Gemfile must be a string")
   end
 
   context "bundle install" do
@@ -1252,6 +1259,26 @@ G
 
         bundle "outdated", :exitstatus => true
         should_be_patchlevel_incorrect
+      end
+    end
+
+    it "fails when the patchlevel is a fixnum" do
+      simulate_ruby_engine "jruby" do
+        update_repo2 do
+          build_gem "activesupport", "3.0"
+          update_git "foo", :path => lib_path("foo")
+        end
+
+        gemfile <<-G
+          source "file://#{gem_repo2}"
+          gem "activesupport", "2.3.5"
+          gem "foo", :git => "#{lib_path('foo')}"
+
+          #{patchlevel_fixnum}
+        G
+
+        bundle "outdated", :exitstatus => true
+        should_be_patchlevel_fixnum
       end
     end
   end

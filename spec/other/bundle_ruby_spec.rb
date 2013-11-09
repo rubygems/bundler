@@ -116,7 +116,7 @@ describe "bundle_ruby" do
     it "returns the ruby version" do
       gemfile <<-G
         source "file://#{gem_repo1}"
-        ruby "1.9.3", :patchlevel => 429, :engine => 'ruby', :engine_version => '1.9.3'
+        ruby "1.9.3", :patchlevel => '429', :engine => 'ruby', :engine_version => '1.9.3'
 
         gem "foo"
       G
@@ -129,7 +129,7 @@ describe "bundle_ruby" do
     it "handles an engine" do
       gemfile <<-G
         source "file://#{gem_repo1}"
-        ruby "1.9.3", :patchlevel => 392, :engine => 'jruby', :engine_version => '1.7.4'
+        ruby "1.9.3", :patchlevel => '392', :engine => 'jruby', :engine_version => '1.7.4'
 
         gem "foo"
       G

@@ -111,7 +111,7 @@ module Bundler
     end
 
     def patchlevel
-      RUBY_PATCHLEVEL
+      RUBY_PATCHLEVEL.to_s
     end
   end
 end

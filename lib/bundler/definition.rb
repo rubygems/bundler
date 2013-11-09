@@ -380,7 +380,11 @@ module Bundler
         when :engine_version
           "Your #{Bundler.ruby_version.engine} version is #{actual}, but your Gemfile specified #{ruby_version.engine} #{expected}"
         when :patchlevel
-          "Your Ruby patchlevel is #{actual}, but your Gemfile specified #{expected}"
+          if !expected.is_a?(String)
+            "The Ruby patchlevel in your Gemfile must be a string"
+          else
+            "Your Ruby patchlevel is #{actual}, but your Gemfile specified #{expected}"
+          end
         end
 
         raise RubyVersionMismatch, msg
