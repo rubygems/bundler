@@ -8,7 +8,8 @@ describe "installing dependencies parallely", :realworld => true do
       gem 'faker', '~> 1.1.2'
     G
 
-    bundle :install, :jobs => 4
+    bundle :install, :jobs => 4, :env => {"DEBUG" => "1"}
+    (0..3).each {|i| expect(out).to include("#{i}: ") }
 
     bundle "show activesupport"
     expect(out).to match(/activesupport/)
