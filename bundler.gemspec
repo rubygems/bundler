@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
   spec.required_rubygems_version = '>= 1.3.6'
 
   spec.add_development_dependency 'ronn', '~> 0.7.3'
-  spec.add_development_dependency 'rspec', '~> 2.11'
+  spec.add_development_dependency 'rspec', '~> 2.99.0.beta1'
 
   spec.files       = `git ls-files`.split($/)
   spec.files      += Dir.glob('lib/bundler/man/**/*') # man/ is ignored by git
