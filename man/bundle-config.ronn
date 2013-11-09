@@ -145,5 +145,5 @@ Bundler supports overriding gem sources with mirrors. This allows you to
 configure rubygems.org as the gem source in your Gemfile while still using your
 mirror to fetch gems.
 
-    bundle config mirror.http://rubygems.org http://localhost:8081/nexus/content/ruby/rubygems.org
+    bundle config mirror.http://rubygems.org http://rubygems-mirror.org
 

@@ -53,6 +53,12 @@ engine version specified _must_ match the Ruby version.
 
     ruby "1.8.7", :engine => "jruby", :engine_version => "1.6.7"
 
+### PATCHLEVEL (:patchlevel)
+
+Each application _may_ specify a Ruby patchlevel.
+
+    ruby "2.0.0", :patchlevel => "247"
+
 ## GEMS (#gem)
 
 Specify gem requirements using the `gem` method, with the following arguments.
