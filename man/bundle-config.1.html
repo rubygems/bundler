@@ -60,6 +60,7 @@
     <a href="#CONFIGURATION-KEYS">CONFIGURATION KEYS</a>
     <a href="#LIST-OF-AVAILABLE-KEYS">LIST OF AVAILABLE KEYS</a>
     <a href="#LOCAL-GIT-REPOS">LOCAL GIT REPOS</a>
+    <a href="#MIRRORS-OF-GEM-REPOSITORIES">MIRRORS OF GEM REPOSITORIES</a>
   </div>
 
   <ol class='man-decor man-head man head'>
@@ -162,6 +163,10 @@ of this file also sets the root of the project, which is used to resolve
 relative paths in the <code>Gemfile</code>, among other things. By default, bundler
 will search up from the current working directory until it finds a
 <code>Gemfile</code>.</dd>
+<dt><code>ssl_ca_cert</code> (<code>BUNDLE_SSL_CA_CERT</code>)</dt><dd>Path to a designated CA certificate file or folder containing multiple
+certificates for trusted CAs in PEM format.</dd>
+<dt><code>ssl_client_cert</code> (<code>BUNDLE_SSL_CLIENT_CERT</code>)</dt><dd>Path to a designated file containing a X.509 client certificate
+and key in PEM format.</dd>
 </dl>
 
 
@@ -207,10 +212,19 @@ accidental locking to a different branch.</p>
 <code>Gemfile.lock</code> exists in the local git repository. By doing this, Bundler
 forces you to fetch the latest changes in the remotes.</p>
 
+<h2 id="MIRRORS-OF-GEM-REPOSITORIES">MIRRORS OF GEM REPOSITORIES</h2>
+
+<p>Bundler supports overriding gem sources with mirrors. This allows you to
+configure rubygems.org as the gem source in your Gemfile while still using your
+mirror to fetch gems.</p>
+
+<pre><code>bundle config mirror.http://rubygems.org http://rubygems-mirror.org
+</code></pre>
+
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'></li>
-    <li class='tc'>September 2013</li>
+    <li class='tc'>November 2013</li>
     <li class='tr'>bundle-config(1)</li>
   </ol>
 

@@ -17,49 +17,79 @@
         <div id='contents'>
           <h1>What's New in each Release</h1>
           <div class='buttons'>
-            <a href="/v1.3/whats_new.html#version13">Latest Version v1.3</a>
+            <a href="/v1.5/whats_new.html#version15">Latest Version v1.5</a>
+            <a href="/v1.3/whats_new.html#version13">v1.3</a>
             <a href="/v1.2/whats_new.html#version12">v1.2</a>
             <a href="https://github.com/bundler/bundler/blob/master/CHANGELOG.md#110-mar-7-2012">v1.1</a>
             <a href="https://github.com/bundler/bundler/blob/master/CHANGELOG.md#100-august-29-2010">v1.0</a>
           </div>
-          <h2 id='version13'>What's New in v1.3</h2>
+          <h2 id='version15'>What's New in v1.5</h2>
           <div class='contents'>
             <div class='bullet'>
               <div class='description'>
-                In this section, you'll find the major features introduced in the release. All the changes are documented in the Bundler 1.3 CHANGELOG.
-                <a href="https://github.com/bundler/bundler/blob/1-3-stable/CHANGELOG.md">CHANGELOG</a>
+                In this section, you'll find the major features introduced in the release. All the changes are documented in the Bundler 1.5 changelog.
+                <a href="https://github.com/bundler/bundler/blob/1-5-stable/CHANGELOG.md">Full 1.5 changelog</a>
               </div>
             </div>
           </div>
-          <h2 id='ruby-2'>Compatible with Ruby 2 and Rubygems 2</h2>
+          <h2 id='parallel-install'></h2>
           <div class='contents'>
             <div class='bullet'>
               <div class='description'>
-                Bundler 1.3 is compatible with Ruby 2.0.0 and Rubygems 2.0.0. The way of the future!
+                The <code>--jobs</code> option (<code>-j</code> for short) installs gems in parallel. For example, <code>bundle install -j4</code> will use 4 workers. We've seen speedups of 40-60% on fresh bundle installs. To always install in parallel, run <code>bundle config --global jobs 4</code> or set <code>BUNDLE_JOBS</code>.
               </div>
+              <a href="/bundle_install.html#jobs">Learn More: Parallel Install</a>
             </div>
           </div>
-          <h2 id='rails-4'>Compatible with Rails 4</h2>
+          <h2 id='gem-source-mirrors'></h2>
           <div class='contents'>
             <div class='bullet'>
               <div class='description'>
-                Bundler 1.3 provides the <code>binstubs</code> command, which is used by Rails 4 to create executables that will run inside the context of your Rails app. For example, <code>bundle binstubs rspec-core</code> will create <code>bin/rspec</code> that you can run directly without needing <code>bundle exec</code>.
+                Bundler now supports the ability to use a gem mirror in a Gemfile locally by using <code>bundle config</code>. <code> bundle config mirror.http://rubygems.org http://rubygems-mirror.org/</code>
               </div>
+              <a href="/bundle_config.html#gem-source-mirrors">Learn More: Source Mirrors</a>
             </div>
           </div>
-          <h2 id='resolver'>Install and update speed improvements</h2>
+          <h2 id='ruby-patchlevel'></h2>
           <div class='contents'>
             <div class='bullet'>
               <div class='description'>
-                Installing a Gemfile with no lock or running <code>bundle update</code> used to be extremely slow in certain cases. In our testing, all of those cases now complete within a few seconds. In some cases, the install or update completes 150 times faster!
+                The ruby DSL now takes a <code>:patchlevel</code> option for locking to specific patchlevels of ruby like <code>ruby '2.0.0', :patchlevel => "247"</code>
               </div>
+              <a href="/gemfile_ruby.html#patchlevel">Learn More: Ruby Directive</a>
             </div>
           </div>
-          <h2 id='signing'>Support for signed gems</h2>
+          <h2 id='outdated-strict'></h2>
           <div class='contents'>
             <div class='bullet'>
               <div class='description'>
-                Bundler now supports signed gems! <code>bundle install --trust-policy</code> takes the same arguments as <code>gem install --trust-policy</code> does.
+                <code>bundle outdated --strict</code> displays outdated gems that match the dependency requirements.
+              </div>
+              <a href="/bundle_outdated.html#strict">Learn More: outdated --strict</a>
+            </div>
+          </div>
+          <h2 id='retry-install'></h2>
+          <div class='contents'>
+            <div class='bullet'>
+              <div class='description'>
+                <code>bundle install</code> now retries failed downloads. You can adjust the number of retries with the  <code>--retry</code> option.
+              </div>
+              <a href="/bundle_install.html#retry">Learn More: Retry</a>
+            </div>
+          </div>
+          <h2 id='other-changes'></h2>
+          <div class='contents'>
+            <div class='bullet'>
+              <div class='description'>
+                Bundler 1.5 also includes:
+                <ul>
+                  <li>many smaller performance improvements to make resolving and installing faster</li>
+                  <li>cyclic dependency detection, to avoid infinite loops</li>
+                  <li>multiple arguments to the <code>bundle binstubs</code> command</li>
+                  <li>a <code>bundler</code> command in case you typo <code>bundle</code></li>
+                  <li>uses RUBYLIB for better compatibility with Windows</li>
+                  <li><a href="https://github.com/bundler/bundler/blob/1-5-stable/CHANGELOG.md">Full 1.5 changelog</a></li>
+                </ul>
               </div>
             </div>
           </div>
@@ -69,36 +99,36 @@
           <ul>
             <li><a href="/#getting-started">Get started</a></li>
             <li><a href="/issues.html">Report a bug</a></li>
-            <li><a href="/v1.3/whats_new.html">See what's new</a></li>
-            <li><a href="/v1.3/man/bundle.1.html">Read documentation</a></li>
+            <li><a href="/v1.5/whats_new.html">See what's new</a></li>
+            <li><a href="/v1.5/man/bundle.1.html">Read documentation</a></li>
             <li><a href="/#get-involved">Discuss and Contribute</a></li>
-            <li><a href="/v1.3/faq.html">View FAQs</a></li>
+            <li><a href="/v1.5/faq.html">View FAQs</a></li>
           </ul>
           <h2>Bundler Commands</h2>
           <ul>
-            <li><a href="/v1.3/bundle_install.html">bundle install</a></li>
-            <li><a href="/v1.3/bundle_update.html">bundle update</a></li>
+            <li><a href="/v1.5/bundle_install.html">bundle install</a></li>
+            <li><a href="/v1.5/bundle_update.html">bundle update</a></li>
             <div class='buttons'>
-              <a href="/v1.3/commands.html">View all commands</a>
+              <a href="/v1.5/commands.html">View all commands</a>
             </div>
           </ul>
           <h2>Usage</h2>
           <ul>
-            <li><a href="/v1.3/gemfile.html">Gemfile</a></li>
-            <li><a href="/v1.3/groups.html">Groups</a></li>
-            <li><a href="/v1.3/git.html">Gems from git</a></li>
-            <li><a href="/v1.3/bundler_setup.html">Bundler.setup</a></li>
-            <li><a href="/v1.3/deploying.html">Deploying</a></li>
-            <li><a href="/v1.3/bundler_sharing.html">Sharing</a></li>
-            <li><a href="/v1.3/updating_gems.html">Updating Gems</a></li>
+            <li><a href="/v1.5/gemfile.html">Gemfile</a></li>
+            <li><a href="/v1.5/groups.html">Groups</a></li>
+            <li><a href="/v1.5/git.html">Gems from git</a></li>
+            <li><a href="/v1.5/bundler_setup.html">Bundler.setup</a></li>
+            <li><a href="/v1.5/deploying.html">Deploying</a></li>
+            <li><a href="/v1.5/bundler_sharing.html">Sharing</a></li>
+            <li><a href="/v1.5/updating_gems.html">Updating Gems</a></li>
           </ul>
           <h2>Use Bundler with</h2>
           <ul>
-            <li><a href="/v1.3/rails3.html">Rails 3</a></li>
-            <li><a href="/v1.3/rails23.html">Rails 2.3</a></li>
-            <li><a href="/v1.3/sinatra.html">Sinatra</a></li>
-            <li><a href="/v1.3/rubygems.html">Rubygems</a></li>
-            <li><a href="/v1.3/rubymotion.html">RubyMotion</a></li>
+            <li><a href="/v1.5/rails3.html">Rails 3</a></li>
+            <li><a href="/v1.5/rails23.html">Rails 2.3</a></li>
+            <li><a href="/v1.5/sinatra.html">Sinatra</a></li>
+            <li><a href="/v1.5/rubygems.html">Rubygems</a></li>
+            <li><a href="/v1.5/rubymotion.html">RubyMotion</a></li>
           </ul>
           <div class='shirts'>
             <div class='content'>
@@ -135,7 +165,8 @@
       <a href="/v1.0/">v1.0</a>
       <a href="/v1.1/">v1.1</a>
       <a href="/v1.2/">v1.2</a>
-      <a class="current" href="/">v1.3</a>
+      <a href="/v1.3/index.html">v1.3</a>
+      <a class="current" href="/">v1.5</a>
     </div>
     <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

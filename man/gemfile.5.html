@@ -130,6 +130,13 @@ engine version specified <em>must</em> match the Ruby version.</p>
 <pre><code>ruby "1.8.7", :engine =&gt; "jruby", :engine_version =&gt; "1.6.7"
 </code></pre>
 
+<h3 id="PATCHLEVEL-patchlevel-">PATCHLEVEL (:patchlevel)</h3>
+
+<p>Each application <em>may</em> specify a Ruby patchlevel.</p>
+
+<pre><code>ruby "2.0.0", :patchlevel =&gt; "247"
+</code></pre>
+
 <h2 id="GEMS-gem-">GEMS (#gem)</h2>
 
 <p>Specify gem requirements using the <code>gem</code> method, with the following arguments.
@@ -153,17 +160,20 @@ gem "RedCloth", "&gt;= 4.1.0", "&lt; 4.2.0"
 <h3 id="REQUIRE-AS-require-">REQUIRE AS (:require)</h3>
 
 <p>Each <em>gem</em> <code>MAY</code> specify files that should be used when autorequiring via
-<code>Bundler.require</code>. You may pass an array with multiple files, or <code>false</code> to
+<code>Bundler.require</code>. You may pass an array with multiple files or <code>true</code> if file
+you want <code>required</code> has same name as <em>gem</em> or <code>false</code> to
 prevent any file from being autorequired.</p>
 
 <pre><code>gem "redis", :require =&gt; ["redis/connection/hiredis", "redis"]
 gem "webmock", :require =&gt; false
+gem "debugger", :require =&gt; true
 </code></pre>
 
 <p>The argument defaults to the name of the gem. For example, these are identical:</p>
 
 <pre><code>gem "nokogiri"
 gem "nokogiri", :require =&gt; "nokogiri"
+gem "nokogiri", :require =&gt; true
 </code></pre>
 
 <h3 id="GROUPS-group-or-groups-">GROUPS (:group or :groups)</h3>
@@ -211,7 +221,7 @@ are obviously not available).</p>
 <p>Note that on <code>bundle install</code>, bundler downloads and evaluates all gems, in order to
 create a single canonical list of all of the required gems and their dependencies.
 This means that you cannot list different versions of the same gems in different
-groups. For more details, see <a href="http://gembundler.com/rationale.html">Understanding Bundler</a>.</p>
+groups. For more details, see <a href="http://bundler.io/rationale.html">Understanding Bundler</a>.</p>
 
 <h3 id="PLATFORMS-platforms-">PLATFORMS (:platforms)</h3>
 
@@ -227,17 +237,23 @@ platforms.</p>
 <dt class="flush"><code>ruby_18</code></dt><dd><em>ruby</em> <code>AND</code> version 1.8</dd>
 <dt class="flush"><code>ruby_19</code></dt><dd><em>ruby</em> <code>AND</code> version 1.9</dd>
 <dt class="flush"><code>ruby_20</code></dt><dd><em>ruby</em> <code>AND</code> version 2.0</dd>
+<dt class="flush"><code>ruby_21</code></dt><dd><em>ruby</em> <code>AND</code> version 2.1</dd>
 <dt class="flush"><code>mri</code></dt><dd>Same as <em>ruby</em>, but not Rubinius</dd>
 <dt class="flush"><code>mri_18</code></dt><dd><em>mri</em> <code>AND</code> version 1.8</dd>
 <dt class="flush"><code>mri_19</code></dt><dd><em>mri</em> <code>AND</code> version 1.9</dd>
 <dt class="flush"><code>mri_20</code></dt><dd><em>mri</em> <code>AND</code> version 2.0</dd>
+<dt class="flush"><code>mri_21</code></dt><dd><em>mri</em> <code>AND</code> version 2.1</dd>
 <dt class="flush"><code>rbx</code></dt><dd>Same as <em>ruby</em>, but only Rubinius (not MRI)</dd>
 <dt class="flush"><code>jruby</code></dt><dd>JRuby</dd>
 <dt class="flush"><code>mswin</code></dt><dd>Windows</dd>
-<dt class="flush"><code>mingw</code></dt><dd>Windows 'mingw32' platform (aka RubyInstaller)</dd>
+<dt class="flush"><code>mingw</code></dt><dd>Windows 32 bit 'mingw32' platform (aka RubyInstaller)</dd>
 <dt><code>mingw_18</code></dt><dd><em>mingw</em> <code>AND</code> version 1.8</dd>
 <dt><code>mingw_19</code></dt><dd><em>mingw</em> <code>AND</code> version 1.9</dd>
 <dt><code>mingw_20</code></dt><dd><em>mingw</em> <code>AND</code> version 2.0</dd>
+<dt><code>mingw_21</code></dt><dd><em>mingw</em> <code>AND</code> version 2.1</dd>
+<dt><code>x64_mingw</code></dt><dd>Windows 64 bit 'mingw32' platform (aka RubyInstaller x64)</dd>
+<dt><code>x64_mingw_20</code></dt><dd><em>x64_mingw</em> <code>AND</code> version 2.0</dd>
+<dt><code>x64_mingw_21</code></dt><dd><em>x64_mingw</em> <code>AND</code> version 2.1</dd>
 </dl>
 
 
@@ -270,7 +286,8 @@ as they would for a normal gem.</p>
 <p>A git repository <code>SHOULD</code> have at least one file, at the root of the
 directory containing the gem, with the extension <code>.gemspec</code>. This file
 <code>MUST</code> contain a valid gem specification, as expected by the <code>gem build</code>
-command.</p>
+command. It <code>MUST NOT</code> have any dependencies, other than on the files in
+the git repository itself and any built-in functionality of Ruby or Rubygems.</p>
 
 <p>If a git repository does not have a <code>.gemspec</code>, bundler will attempt to
 create one, but it will not contain any dependencies, executables, or
@@ -334,6 +351,11 @@ gem "rails", :github =&gt; "rails"
 <p>Are both equivalent to</p>
 
 <pre><code>gem "rails", :git =&gt; "git://github.com/rails/rails.git"
+</code></pre>
+
+<p>In addition, if you wish to choose a specific branch:</p>
+
+<pre><code>gem "rails", :github =&gt; "rails/rails", :branch =&gt; "branch_name"
 </code></pre>
 
 <h3 id="PATH-path-">PATH (:path)</h3>
@@ -416,7 +438,7 @@ from last added to first added.</li>
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'></li>
-    <li class='tc'>September 2013</li>
+    <li class='tc'>November 2013</li>
     <li class='tr'>Gemfile(5)</li>
   </ol>
 

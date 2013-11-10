@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv='content-type' value='text/html;charset=utf8'>
+  <meta name='generator' value='Ronn/v0.7.3 (http://github.com/rtomayko/ronn/tree/0.7.3)'>
+  <title>bundle-exec(1) - Execute a command in the context of the bundle</title>
+  <style type='text/css' media='all'>
+  /* style: man */
+  body#manpage {margin:0}
+  .mp {max-width:100ex;padding:0 9ex 1ex 4ex}
+  .mp p,.mp pre,.mp ul,.mp ol,.mp dl {margin:0 0 20px 0}
+  .mp h2 {margin:10px 0 0 0}
+  .mp > p,.mp > pre,.mp > ul,.mp > ol,.mp > dl {margin-left:8ex}
+  .mp h3 {margin:0 0 0 4ex}
+  .mp dt {margin:0;clear:left}
+  .mp dt.flush {float:left;width:8ex}
+  .mp dd {margin:0 0 0 9ex}
+  .mp h1,.mp h2,.mp h3,.mp h4 {clear:left}
+  .mp pre {margin-bottom:20px}
+  .mp pre+h2,.mp pre+h3 {margin-top:22px}
+  .mp h2+pre,.mp h3+pre {margin-top:5px}
+  .mp img {display:block;margin:auto}
+  .mp h1.man-title {display:none}
+  .mp,.mp code,.mp pre,.mp tt,.mp kbd,.mp samp,.mp h3,.mp h4 {font-family:monospace;font-size:14px;line-height:1.42857142857143}
+  .mp h2 {font-size:16px;line-height:1.25}
+  .mp h1 {font-size:20px;line-height:2}
+  .mp {text-align:justify;background:#fff}
+  .mp,.mp code,.mp pre,.mp pre code,.mp tt,.mp kbd,.mp samp {color:#131211}
+  .mp h1,.mp h2,.mp h3,.mp h4 {color:#030201}
+  .mp u {text-decoration:underline}
+  .mp code,.mp strong,.mp b {font-weight:bold;color:#131211}
+  .mp em,.mp var {font-style:italic;color:#232221;text-decoration:none}
+  .mp a,.mp a:link,.mp a:hover,.mp a code,.mp a pre,.mp a tt,.mp a kbd,.mp a samp {color:#0000ff}
+  .mp b.man-ref {font-weight:normal;color:#434241}
+  .mp pre {padding:0 4ex}
+  .mp pre code {font-weight:normal;color:#434241}
+  .mp h2+pre,h3+pre {padding-left:0}
+  ol.man-decor,ol.man-decor li {margin:3px 0 10px 0;padding:0;float:left;width:33%;list-style-type:none;text-transform:uppercase;color:#999;letter-spacing:1px}
+  ol.man-decor {width:100%}
+  ol.man-decor li.tl {text-align:left}
+  ol.man-decor li.tc {text-align:center;letter-spacing:4px}
+  ol.man-decor li.tr {text-align:right;float:right}
+  </style>
+</head>
+<!--
+  The following styles are deprecated and will be removed at some point:
+  div#man, div#man ol.man, div#man ol.head, div#man ol.man.
+
+  The .man-page, .man-decor, .man-head, .man-foot, .man-title, and
+  .man-navigation should be used instead.
+-->
+<body id='manpage'>
+  <div class='mp' id='man'>
+
+  <div class='man-navigation' style='display:none'>
+    <a href="#NAME">NAME</a>
+    <a href="#SYNOPSIS">SYNOPSIS</a>
+    <a href="#DESCRIPTION">DESCRIPTION</a>
+    <a href="#OPTIONS">OPTIONS</a>
+    <a href="#BUNDLE-INSTALL-BINSTUBS">BUNDLE INSTALL --BINSTUBS</a>
+    <a href="#ENVIRONMENT-MODIFICATIONS">ENVIRONMENT MODIFICATIONS</a>
+    <a href="#RUBYGEMS-PLUGINS">RUBYGEMS PLUGINS</a>
+  </div>
+
+  <ol class='man-decor man-head man head'>
+    <li class='tl'>bundle-exec(1)</li>
+    <li class='tc'></li>
+    <li class='tr'>bundle-exec(1)</li>
+  </ol>
+
+  <h2 id="NAME">NAME</h2>
+<p class="man-name">
+  <code>bundle-exec</code> - <span class="man-whatis">Execute a command in the context of the bundle</span>
+</p>
+
+<h2 id="SYNOPSIS">SYNOPSIS</h2>
+
+<p><code>bundle exec</code> [--keep-file-descriptors] <var>command</var></p>
+
+<h2 id="DESCRIPTION">DESCRIPTION</h2>
+
+<p>This command executes the command, making all gems specified in the
+<code>Gemfile(5)</code> available to <code>require</code> in Ruby programs.</p>
+
+<p>Essentially, if you would normally have run something like
+<code>rspec spec/my_spec.rb</code>, and you want to use the gems specified
+in the <code>Gemfile(5)</code> and installed via <a href="bundle-install.1.html">bundle install(1)</a>, you
+should run <code>bundle exec rspec spec/my_spec.rb</code>.</p>
+
+<p>Note that <code>bundle exec</code> does not require that an executable is
+available on your shell's <code>$PATH</code>.</p>
+
+<h2 id="OPTIONS">OPTIONS</h2>
+
+<dl>
+<dt><code>--keep-file-descriptors</code></dt><dd>Exec in Ruby 2.0 began discarding non-standard file descriptors. When this
+flag is passed, exec will revert to the 1.9 behaviour of passing all file
+descriptors to the new process.</dd>
+</dl>
+
+
+<h2 id="BUNDLE-INSTALL-BINSTUBS">BUNDLE INSTALL --BINSTUBS</h2>
+
+<p>If you use the <code>--binstubs</code> flag in <a href="bundle-install.1.html">bundle install(1)</a>, Bundler will
+automatically create a directory (which defaults to <code>app_root/bin</code>)
+containing all of the executables available from gems in the bundle.</p>
+
+<p>After using <code>--binstubs</code>, <code>bin/rspec spec/my_spec.rb</code> is identical
+to <code>bundle exec rspec spec/my_spec.rb</code>.</p>
+
+<h2 id="ENVIRONMENT-MODIFICATIONS">ENVIRONMENT MODIFICATIONS</h2>
+
+<p><code>bundle exec</code> makes a number of changes to the shell environment,
+then executes the command you specify in full.</p>
+
+<ul>
+<li>make sure that it's still possible to shell out to <code>bundle</code>
+from inside a command invoked by <code>bundle exec</code> (using
+<code>$BUNDLE_BIN_PATH</code>)</li>
+<li>put the directory containing executables (like <code>rails</code>, <code>rspec</code>,
+<code>rackup</code>) for your bundle on <code>$PATH</code></li>
+<li>make sure that if bundler is invoked in the subshell, it uses
+the same <code>Gemfile</code> (by setting <code>BUNDLE_GEMFILE</code>)</li>
+<li>add <code>-rbundler/setup</code> to <code>$RUBYOPT</code>, which makes sure that
+Ruby programs invoked in the subshell can see the gems in
+the bundle</li>
+</ul>
+
+
+<p>It also modifies Rubygems:</p>
+
+<ul>
+<li>disallow loading additional gems not in the bundle</li>
+<li>modify the <code>gem</code> method to be a no-op if a gem matching
+the requirements is in the bundle, and to raise a
+<code>Gem::LoadError</code> if it's not</li>
+<li>Define <code>Gem.refresh</code> to be a no-op, since the source
+index is always frozen when using bundler, and to
+prevent gems from the system leaking into the environment</li>
+<li>Override <code>Gem.bin_path</code> to use the gems in the bundle,
+making system executables work</li>
+<li>Add all gems in the bundle into Gem.loaded_specs</li>
+</ul>
+
+
+<h3 id="Shelling-out">Shelling out</h3>
+
+<p>Any Ruby code that opens a subshell (like <code>system</code>, backticks, or <code>%x{}</code>) will
+automatically use the current Bundler environment. If you need to shell out to
+a Ruby command that is not part of your current bundle, use the
+<code>with_clean_env</code> method with a block. Any subshells created inside the block
+will be given the environment present before Bundler was activated. For
+example, Homebrew commands run Ruby, but don't work inside a bundle:</p>
+
+<pre><code>Bundler.with_clean_env do
+  `brew install wget`
+end
+</code></pre>
+
+<p>Using <code>with_clean_env</code> is also necessary if you are shelling out to a different
+bundle. Any Bundler commands run in a subshell will inherit the current
+Gemfile, so commands that need to run in the context of a different bundle also
+need to use <code>with_clean_env</code>.</p>
+
+<pre><code>Bundler.with_clean_env do
+  Dir.chdir "/other/bundler/project" do
+    `bundle exec ./script`
+  end
+end
+</code></pre>
+
+<p>Bundler provides convenience helpers that wrap <code>system</code> and <code>exec</code>, and they
+can be used like this:</p>
+
+<pre><code>Bundler.clean_system('brew install wget')
+Bundler.clean_exec('brew install wget')
+</code></pre>
+
+<h2 id="RUBYGEMS-PLUGINS">RUBYGEMS PLUGINS</h2>
+
+<p>At present, the Rubygems plugin system requires all files
+named <code>rubygems_plugin.rb</code> on the load path of <em>any</em> installed
+gem when any Ruby code requires <code>rubygems.rb</code>. This includes
+executables installed into the system, like <code>rails</code>, <code>rackup</code>,
+and <code>rspec</code>.</p>
+
+<p>Since Rubygems plugins can contain arbitrary Ruby code, they
+commonly end up activating themselves or their dependencies.</p>
+
+<p>For instance, the <code>gemcutter 0.5</code> gem depended on <code>json_pure</code>.
+If you had that version of gemcutter installed (even if
+you <em>also</em> had a newer version without this problem), Rubygems
+would activate <code>gemcutter 0.5</code> and <code>json_pure &lt;latest></code>.</p>
+
+<p>If your <a class="man-ref" href="gemfile.5.html">Gemfile<span class="s">(5)</span></a> also contained <code>json_pure</code> (or a gem
+with a dependency on <code>json_pure</code>), the latest version on
+your system might conflict with the version in your
+<a class="man-ref" href="gemfile.5.html">Gemfile<span class="s">(5)</span></a>, or the snapshot version in your <code>Gemfile.lock</code>.</p>
+
+<p>If this happens, bundler will say:</p>
+
+<pre><code>You have already activated json_pure 1.4.6 but your Gemfile
+requires json_pure 1.4.3. Consider using bundle exec.
+</code></pre>
+
+<p>In this situation, you almost certainly want to remove the
+underlying gem with the problematic gem plugin. In general,
+the authors of these plugins (in this case, the <code>gemcutter</code>
+gem) have released newer versions that are more careful in
+their plugins.</p>
+
+<p>You can find a list of all the gems containing gem plugins
+by running</p>
+
+<pre><code>ruby -rubygems -e "puts Gem.find_files('rubygems_plugin.rb')"
+</code></pre>
+
+<p>At the very least, you should remove all but the newest
+version of each gem plugin, and also remove all gem plugins
+that you aren't using (<code>gem uninstall gem_name</code>).</p>
+
+
+  <ol class='man-decor man-foot man foot'>
+    <li class='tl'></li>
+    <li class='tc'>November 2013</li>
+    <li class='tr'>bundle-exec(1)</li>
+  </ol>
+
+  </div>
+</body>
+</html>

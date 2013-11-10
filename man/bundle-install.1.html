@@ -87,6 +87,8 @@
              [--binstubs[=DIRECTORY]]
              [--standalone[=GROUP1[ GROUP2...]]]
              [--trust-policy=POLICY]
+             [--jobs=SIZE]
+             [--retry=TRIES]
              [--no-cache]
              [--quiet]
 </code></pre>
@@ -116,11 +118,11 @@ to a gemfile in the current working directory. In general, bundler
 will assume that the location of the <a class="man-ref" href="gemfile.5.html">Gemfile<span class="s">(5)</span></a> is also the project
 root, and will look for the <code>Gemfile.lock</code> and <code>vendor/cache</code> relative
 to it.</p></dd>
-<dt><code>--path=&lt;path></code></dt><dd><p>The location to install the gems in the bundle to. This defaults
-to the gem home, which is the location that <code>gem install</code> installs
-gems to. This means that, by default, gems installed without a
-<code>--path</code> setting will show up in <code>gem list</code>. This setting is a
-<a href="#REMEMBERED-OPTIONS" title="REMEMBERED OPTIONS" data-bare-link="true">remembered option</a>.</p></dd>
+<dt><code>--path=&lt;path></code></dt><dd><p>The location to install the gems in the bundle to. This defaults to
+Rubygems' gem home, which is also the default location where <code>gem
+install</code> installs gems. This means that, by default, gems installed
+without a <code>--path</code> setting will show up in <code>gem list</code>. This setting is
+a <a href="#REMEMBERED-OPTIONS" title="REMEMBERED OPTIONS" data-bare-link="true">remembered option</a>.</p></dd>
 <dt><code>--system</code></dt><dd><p>Installs the gems in the bundle to the system location. This
 overrides any previous <a href="#REMEMBERED-OPTIONS" title="REMEMBERED OPTIONS" data-bare-link="true">remembered</a> use of
 <code>--path</code>.</p></dd>
@@ -147,6 +149,8 @@ a <code>bundle/bundler/setup.rb</code> file to replace Bundler's own setup.</p><
 <dt><code>--trust-policy=[&lt;policy>]</code></dt><dd><p>Apply the Rubygems security policy named <var>policy</var>, where policy is one of
 HighSecurity, MediumSecurity, LowSecurity, or NoSecurity. For more detail,
 see the Rubygems signing documentation, linked below in <a href="#SEE-ALSO" title="SEE ALSO" data-bare-link="true">SEE ALSO</a>.</p></dd>
+<dt><code>--jobs=[&lt;size>]</code></dt><dd><p>Install gems parallely by starting <var>size</var> number of parallel workers.</p></dd>
+<dt><code>--retry[&lt;tries]</code></dt><dd><p>Retries failed network or git requests <var>tries</var> times.</p></dd>
 <dt><code>--no-cache</code></dt><dd><p>Do not update the cache in <code>vendor/cache</code> with the newly bundled gems. This
 does not remove any existing cached gems, only stops the newly bundled gems
 from being cached during the install.</p></dd>
@@ -417,7 +421,7 @@ does not work, run <a href="bundle-update.1.html">bundle update(1)</a>.</p>
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'></li>
-    <li class='tc'>September 2013</li>
+    <li class='tc'>November 2013</li>
     <li class='tr'>bundle-install(1)</li>
   </ol>
 

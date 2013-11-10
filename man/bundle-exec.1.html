@@ -56,6 +56,7 @@
     <a href="#NAME">NAME</a>
     <a href="#SYNOPSIS">SYNOPSIS</a>
     <a href="#DESCRIPTION">DESCRIPTION</a>
+    <a href="#OPTIONS">OPTIONS</a>
     <a href="#BUNDLE-INSTALL-BINSTUBS">BUNDLE INSTALL --BINSTUBS</a>
     <a href="#ENVIRONMENT-MODIFICATIONS">ENVIRONMENT MODIFICATIONS</a>
     <a href="#RUBYGEMS-PLUGINS">RUBYGEMS PLUGINS</a>
@@ -74,7 +75,7 @@
 
 <h2 id="SYNOPSIS">SYNOPSIS</h2>
 
-<p><code>bundle exec</code> <var>command</var></p>
+<p><code>bundle exec</code> [--keep-file-descriptors] <var>command</var></p>
 
 <h2 id="DESCRIPTION">DESCRIPTION</h2>
 
@@ -88,6 +89,15 @@ should run <code>bundle exec rspec spec/my_spec.rb</code>.</p>
 
 <p>Note that <code>bundle exec</code> does not require that an executable is
 available on your shell's <code>$PATH</code>.</p>
+
+<h2 id="OPTIONS">OPTIONS</h2>
+
+<dl>
+<dt><code>--keep-file-descriptors</code></dt><dd>Exec in Ruby 2.0 began discarding non-standard file descriptors. When this
+flag is passed, exec will revert to the 1.9 behaviour of passing all file
+descriptors to the new process.</dd>
+</dl>
+
 
 <h2 id="BUNDLE-INSTALL-BINSTUBS">BUNDLE INSTALL --BINSTUBS</h2>
 
@@ -212,7 +222,7 @@ that you aren't using (<code>gem uninstall gem_name</code>).</p>
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'></li>
-    <li class='tc'>September 2013</li>
+    <li class='tc'>November 2013</li>
     <li class='tr'>bundle-exec(1)</li>
   </ol>
 

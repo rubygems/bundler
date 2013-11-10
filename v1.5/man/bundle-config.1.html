@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv='content-type' value='text/html;charset=utf8'>
+  <meta name='generator' value='Ronn/v0.7.3 (http://github.com/rtomayko/ronn/tree/0.7.3)'>
+  <title>bundle-config(1) - Set bundler configuration options</title>
+  <style type='text/css' media='all'>
+  /* style: man */
+  body#manpage {margin:0}
+  .mp {max-width:100ex;padding:0 9ex 1ex 4ex}
+  .mp p,.mp pre,.mp ul,.mp ol,.mp dl {margin:0 0 20px 0}
+  .mp h2 {margin:10px 0 0 0}
+  .mp > p,.mp > pre,.mp > ul,.mp > ol,.mp > dl {margin-left:8ex}
+  .mp h3 {margin:0 0 0 4ex}
+  .mp dt {margin:0;clear:left}
+  .mp dt.flush {float:left;width:8ex}
+  .mp dd {margin:0 0 0 9ex}
+  .mp h1,.mp h2,.mp h3,.mp h4 {clear:left}
+  .mp pre {margin-bottom:20px}
+  .mp pre+h2,.mp pre+h3 {margin-top:22px}
+  .mp h2+pre,.mp h3+pre {margin-top:5px}
+  .mp img {display:block;margin:auto}
+  .mp h1.man-title {display:none}
+  .mp,.mp code,.mp pre,.mp tt,.mp kbd,.mp samp,.mp h3,.mp h4 {font-family:monospace;font-size:14px;line-height:1.42857142857143}
+  .mp h2 {font-size:16px;line-height:1.25}
+  .mp h1 {font-size:20px;line-height:2}
+  .mp {text-align:justify;background:#fff}
+  .mp,.mp code,.mp pre,.mp pre code,.mp tt,.mp kbd,.mp samp {color:#131211}
+  .mp h1,.mp h2,.mp h3,.mp h4 {color:#030201}
+  .mp u {text-decoration:underline}
+  .mp code,.mp strong,.mp b {font-weight:bold;color:#131211}
+  .mp em,.mp var {font-style:italic;color:#232221;text-decoration:none}
+  .mp a,.mp a:link,.mp a:hover,.mp a code,.mp a pre,.mp a tt,.mp a kbd,.mp a samp {color:#0000ff}
+  .mp b.man-ref {font-weight:normal;color:#434241}
+  .mp pre {padding:0 4ex}
+  .mp pre code {font-weight:normal;color:#434241}
+  .mp h2+pre,h3+pre {padding-left:0}
+  ol.man-decor,ol.man-decor li {margin:3px 0 10px 0;padding:0;float:left;width:33%;list-style-type:none;text-transform:uppercase;color:#999;letter-spacing:1px}
+  ol.man-decor {width:100%}
+  ol.man-decor li.tl {text-align:left}
+  ol.man-decor li.tc {text-align:center;letter-spacing:4px}
+  ol.man-decor li.tr {text-align:right;float:right}
+  </style>
+</head>
+<!--
+  The following styles are deprecated and will be removed at some point:
+  div#man, div#man ol.man, div#man ol.head, div#man ol.man.
+
+  The .man-page, .man-decor, .man-head, .man-foot, .man-title, and
+  .man-navigation should be used instead.
+-->
+<body id='manpage'>
+  <div class='mp' id='man'>
+
+  <div class='man-navigation' style='display:none'>
+    <a href="#NAME">NAME</a>
+    <a href="#SYNOPSIS">SYNOPSIS</a>
+    <a href="#DESCRIPTION">DESCRIPTION</a>
+    <a href="#BUILD-OPTIONS">BUILD OPTIONS</a>
+    <a href="#CONFIGURATION-KEYS">CONFIGURATION KEYS</a>
+    <a href="#LIST-OF-AVAILABLE-KEYS">LIST OF AVAILABLE KEYS</a>
+    <a href="#LOCAL-GIT-REPOS">LOCAL GIT REPOS</a>
+    <a href="#MIRRORS-OF-GEM-REPOSITORIES">MIRRORS OF GEM REPOSITORIES</a>
+  </div>
+
+  <ol class='man-decor man-head man head'>
+    <li class='tl'>bundle-config(1)</li>
+    <li class='tc'></li>
+    <li class='tr'>bundle-config(1)</li>
+  </ol>
+
+  <h2 id="NAME">NAME</h2>
+<p class="man-name">
+  <code>bundle-config</code> - <span class="man-whatis">Set bundler configuration options</span>
+</p>
+
+<h2 id="SYNOPSIS">SYNOPSIS</h2>
+
+<p><code>bundle config</code> [<var>name</var> [<var>value</var>]]</p>
+
+<h2 id="DESCRIPTION">DESCRIPTION</h2>
+
+<p>This command allows you to interact with bundler's configuration system.
+Bundler retrieves its configuration from the local application (<code>app/.bundle/config</code>),
+environment variables, and the user's home directory (<code>~/.bundle/config</code>),
+in that order of priority.</p>
+
+<p>Executing <code>bundle config</code> with no parameters will print a list of all
+bundler configuration for the current bundle, and where that configuration
+was set.</p>
+
+<p>Executing <code>bundle config &lt;name></code> will print the value of that configuration
+setting, and where it was set.</p>
+
+<p>Executing <code>bundle config &lt;name> &lt;value></code> will set that configuration to the
+value specified for all bundles executed as the current user. The configuration
+will be stored in <code>~/.bundle/config</code>. If <var>name</var> already is set, <var>name</var> will be
+overridden and user will be warned.</p>
+
+<p>Executing <code>bundle config --global &lt;name> &lt;value></code> works the same as above.</p>
+
+<p>Executing <code>bundle config --local &lt;name> &lt;value></code> will set that configuration to
+the local application. The configuration will be stored in <code>app/.bundle/config</code>.</p>
+
+<p>Executing <code>bundle config --delete &lt;name></code> will delete the configuration in both
+local and global sources. Not compatible with --global or --local flag.</p>
+
+<p>Executing bundle with the <code>BUNDLE_IGNORE_CONFIG</code> environment variable set will
+cause it to ignore all configuration.</p>
+
+<h2 id="BUILD-OPTIONS">BUILD OPTIONS</h2>
+
+<p>You can use <code>bundle config</code> to give bundler the flags to pass to the gem
+installer every time bundler tries to install a particular gem.</p>
+
+<p>A very common example, the <code>mysql</code> gem, requires Snow Leopard users to
+pass configuration flags to <code>gem install</code> to specify where to find the
+<code>mysql_config</code> executable.</p>
+
+<pre><code>gem install mysql -- --with-mysql-config=/usr/local/mysql/bin/mysql_config
+</code></pre>
+
+<p>Since the specific location of that executable can change from machine
+to machine, you can specify these flags on a per-machine basis.</p>
+
+<pre><code>bundle config build.mysql --with-mysql-config=/usr/local/mysql/bin/mysql_config
+</code></pre>
+
+<p>After running this command, every time bundler needs to install the
+<code>mysql</code> gem, it will pass along the flags you specified.</p>
+
+<h2 id="CONFIGURATION-KEYS">CONFIGURATION KEYS</h2>
+
+<p>Configuration keys in bundler have two forms: the canonical form and the
+environment variable form.</p>
+
+<p>For instance, passing the <code>--without</code> flag to <a href="bundle-install.1.html">bundle install(1)</a>
+prevents Bundler from installing certain groups specified in the <a class="man-ref" href="gemfile.5.html">Gemfile<span class="s">(5)</span></a>. Bundler
+persists this value in <code>app/.bundle/config</code> so that calls to <code>Bundler.setup</code>
+do not try to find gems from the <code>Gemfile</code> that you didn't install. Additionally,
+subsequent calls to <a href="bundle-install.1.html">bundle install(1)</a> remember this setting and skip those
+groups.</p>
+
+<p>The canonical form of this configuration is <code>"without"</code>. To convert the canonical
+form to the environment variable form, capitalize it, and prepend <code>BUNDLE_</code>. The
+environment variable form of <code>"without"</code> is <code>BUNDLE_WITHOUT</code>.</p>
+
+<h2 id="LIST-OF-AVAILABLE-KEYS">LIST OF AVAILABLE KEYS</h2>
+
+<p>The following is a list of all configuration keys and their purpose. You can
+learn more about their operation in <a href="bundle-install.1.html">bundle install(1)</a>.</p>
+
+<dl>
+<dt><code>path</code> (<code>BUNDLE_PATH</code>)</dt><dd>The location on disk to install gems. Defaults to <code>$GEM_HOME</code> in development
+and <code>vendor/bundler</code> when <code>--deployment</code> is used</dd>
+<dt><code>frozen</code> (<code>BUNDLE_FROZEN</code>)</dt><dd>Disallow changes to the <code>Gemfile</code>. Defaults to <code>true</code> when <code>--deployment</code>
+is used.</dd>
+<dt><code>without</code> (<code>BUNDLE_WITHOUT</code>)</dt><dd>A <code>:</code>-separated list of groups whose gems bundler should not install</dd>
+<dt><code>bin</code> (<code>BUNDLE_BIN</code>)</dt><dd>Install executables from gems in the bundle to the specified directory.
+Defaults to <code>false</code>.</dd>
+<dt><code>gemfile</code> (<code>BUNDLE_GEMFILE</code>)</dt><dd>The name of the file that bundler should use as the <code>Gemfile</code>. This location
+of this file also sets the root of the project, which is used to resolve
+relative paths in the <code>Gemfile</code>, among other things. By default, bundler
+will search up from the current working directory until it finds a
+<code>Gemfile</code>.</dd>
+<dt><code>ssl_ca_cert</code> (<code>BUNDLE_SSL_CA_CERT</code>)</dt><dd>Path to a designated CA certificate file or folder containing multiple
+certificates for trusted CAs in PEM format.</dd>
+<dt><code>ssl_client_cert</code> (<code>BUNDLE_SSL_CLIENT_CERT</code>)</dt><dd>Path to a designated file containing a X.509 client certificate
+and key in PEM format.</dd>
+</dl>
+
+
+<p>In general, you should set these settings per-application by using the applicable
+flag to the <a href="bundle-install.1.html">bundle install(1)</a> command.</p>
+
+<p>You can set them globally either via environment variables or <code>bundle config</code>,
+whichever is preferable for your setup. If you use both, environment variables
+will take preference over global settings.</p>
+
+<h2 id="LOCAL-GIT-REPOS">LOCAL GIT REPOS</h2>
+
+<p>Bundler also allows you to work against a git repository locally
+instead of using the remote version. This can be achieved by setting
+up a local override:</p>
+
+<pre><code>bundle config local.GEM_NAME /path/to/local/git/repository
+</code></pre>
+
+<p>For example, in order to use a local Rack repository, a developer could call:</p>
+
+<pre><code>bundle config local.rack ~/Work/git/rack
+</code></pre>
+
+<p>Now instead of checking out the remote git repository, the local
+override will be used. Similar to a path source, every time the local
+git repository change, changes will be automatically picked up by
+Bundler. This means a commit in the local git repo will update the
+revision in the <code>Gemfile.lock</code> to the local git repo revision. This
+requires the same attention as git submodules. Before pushing to
+the remote, you need to ensure the local override was pushed, otherwise
+you may point to a commit that only exists in your local machine.</p>
+
+<p>Bundler does many checks to ensure a developer won't work with
+invalid references. Particularly, we force a developer to specify
+a branch in the <code>Gemfile</code> in order to use this feature. If the branch
+specified in the <code>Gemfile</code> and the current branch in the local git
+repository do not match, Bundler will abort. This ensures that
+a developer is always working against the correct branches, and prevents
+accidental locking to a different branch.</p>
+
+<p>Finally, Bundler also ensures that the current revision in the
+<code>Gemfile.lock</code> exists in the local git repository. By doing this, Bundler
+forces you to fetch the latest changes in the remotes.</p>
+
+<h2 id="MIRRORS-OF-GEM-REPOSITORIES">MIRRORS OF GEM REPOSITORIES</h2>
+
+<p>Bundler supports overriding gem sources with mirrors. This allows you to
+configure rubygems.org as the gem source in your Gemfile while still using your
+mirror to fetch gems.</p>
+
+<pre><code>bundle config mirror.http://rubygems.org http://rubygems-mirror.org
+</code></pre>
+
+
+  <ol class='man-decor man-foot man foot'>
+    <li class='tl'></li>
+    <li class='tc'>November 2013</li>
+    <li class='tr'>bundle-config(1)</li>
+  </ol>
+
+  </div>
+</body>
+</html>

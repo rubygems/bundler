@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv='content-type' value='text/html;charset=utf8'>
+  <meta name='generator' value='Ronn/v0.7.3 (http://github.com/rtomayko/ronn/tree/0.7.3)'>
+  <title>bundle(1) - Ruby Dependency Management</title>
+  <style type='text/css' media='all'>
+  /* style: man */
+  body#manpage {margin:0}
+  .mp {max-width:100ex;padding:0 9ex 1ex 4ex}
+  .mp p,.mp pre,.mp ul,.mp ol,.mp dl {margin:0 0 20px 0}
+  .mp h2 {margin:10px 0 0 0}
+  .mp > p,.mp > pre,.mp > ul,.mp > ol,.mp > dl {margin-left:8ex}
+  .mp h3 {margin:0 0 0 4ex}
+  .mp dt {margin:0;clear:left}
+  .mp dt.flush {float:left;width:8ex}
+  .mp dd {margin:0 0 0 9ex}
+  .mp h1,.mp h2,.mp h3,.mp h4 {clear:left}
+  .mp pre {margin-bottom:20px}
+  .mp pre+h2,.mp pre+h3 {margin-top:22px}
+  .mp h2+pre,.mp h3+pre {margin-top:5px}
+  .mp img {display:block;margin:auto}
+  .mp h1.man-title {display:none}
+  .mp,.mp code,.mp pre,.mp tt,.mp kbd,.mp samp,.mp h3,.mp h4 {font-family:monospace;font-size:14px;line-height:1.42857142857143}
+  .mp h2 {font-size:16px;line-height:1.25}
+  .mp h1 {font-size:20px;line-height:2}
+  .mp {text-align:justify;background:#fff}
+  .mp,.mp code,.mp pre,.mp pre code,.mp tt,.mp kbd,.mp samp {color:#131211}
+  .mp h1,.mp h2,.mp h3,.mp h4 {color:#030201}
+  .mp u {text-decoration:underline}
+  .mp code,.mp strong,.mp b {font-weight:bold;color:#131211}
+  .mp em,.mp var {font-style:italic;color:#232221;text-decoration:none}
+  .mp a,.mp a:link,.mp a:hover,.mp a code,.mp a pre,.mp a tt,.mp a kbd,.mp a samp {color:#0000ff}
+  .mp b.man-ref {font-weight:normal;color:#434241}
+  .mp pre {padding:0 4ex}
+  .mp pre code {font-weight:normal;color:#434241}
+  .mp h2+pre,h3+pre {padding-left:0}
+  ol.man-decor,ol.man-decor li {margin:3px 0 10px 0;padding:0;float:left;width:33%;list-style-type:none;text-transform:uppercase;color:#999;letter-spacing:1px}
+  ol.man-decor {width:100%}
+  ol.man-decor li.tl {text-align:left}
+  ol.man-decor li.tc {text-align:center;letter-spacing:4px}
+  ol.man-decor li.tr {text-align:right;float:right}
+  </style>
+</head>
+<!--
+  The following styles are deprecated and will be removed at some point:
+  div#man, div#man ol.man, div#man ol.head, div#man ol.man.
+
+  The .man-page, .man-decor, .man-head, .man-foot, .man-title, and
+  .man-navigation should be used instead.
+-->
+<body id='manpage'>
+  <div class='mp' id='man'>
+
+  <div class='man-navigation' style='display:none'>
+    <a href="#NAME">NAME</a>
+    <a href="#SYNOPSIS">SYNOPSIS</a>
+    <a href="#DESCRIPTION">DESCRIPTION</a>
+    <a href="#OPTIONS">OPTIONS</a>
+    <a href="#BUNDLE-COMMANDS">BUNDLE COMMANDS</a>
+    <a href="#PRIMARY-COMMANDS">PRIMARY COMMANDS</a>
+    <a href="#UTILITIES">UTILITIES</a>
+    <a href="#OBSOLETE">OBSOLETE</a>
+  </div>
+
+  <ol class='man-decor man-head man head'>
+    <li class='tl'>bundle(1)</li>
+    <li class='tc'></li>
+    <li class='tr'>bundle(1)</li>
+  </ol>
+
+  <h2 id="NAME">NAME</h2>
+<p class="man-name">
+  <code>bundle</code> - <span class="man-whatis">Ruby Dependency Management</span>
+</p>
+
+<h2 id="SYNOPSIS">SYNOPSIS</h2>
+
+<p><code>bundle</code> COMMAND [--no-color] [--verbose] [ARGS]</p>
+
+<h2 id="DESCRIPTION">DESCRIPTION</h2>
+
+<p>Bundler manages an <code>application's dependencies</code> through its entire life
+across many machines systematically and repeatably.</p>
+
+<p>See <a href="http://bundler.io">the bundler website</a> for information on getting
+started, and <a class="man-ref" href="gemfile.5.html">Gemfile<span class="s">(5)</span></a> for more information on the <code>Gemfile</code> format.</p>
+
+<h2 id="OPTIONS">OPTIONS</h2>
+
+<dl>
+<dt><code>--no-color</code></dt><dd><p>Prints all output without color</p></dd>
+<dt><code>--verbose</code></dt><dd><p>Prints out additional logging information</p></dd>
+</dl>
+
+
+<h2 id="BUNDLE-COMMANDS">BUNDLE COMMANDS</h2>
+
+<p>We divide <code>bundle</code> subcommands into primary commands and utilities.</p>
+
+<h2 id="PRIMARY-COMMANDS">PRIMARY COMMANDS</h2>
+
+<dl>
+<dt><a href="bundle-install.1.html">bundle install(1)</a></dt><dd><p>Install the gems specified by the <code>Gemfile</code> or <code>Gemfile.lock</code></p></dd>
+<dt><a href="bundle-update.1.html">bundle update(1)</a></dt><dd><p>Update dependencies to their latest versions</p></dd>
+<dt><a href="bundle-package.1.html">bundle package(1)</a></dt><dd><p>Package the .gem files required by your application into the
+<code>vendor/cache</code> directory</p></dd>
+<dt><a href="bundle-exec.1.html">bundle exec(1)</a></dt><dd><p>Execute a script in the context of the current bundle</p></dd>
+<dt><a href="bundle-config.1.html">bundle config(1)</a></dt><dd><p>Specify and read configuration options for bundler</p></dd>
+<dt><code>bundle help(1)</code></dt><dd><p>Displays detailed help for each subcommand</p></dd>
+</dl>
+
+
+<h2 id="UTILITIES">UTILITIES</h2>
+
+<dl>
+<dt><code>bundle check(1)</code></dt><dd><p>Determine whether the requirements for your application are installed
+and available to bundler</p></dd>
+<dt><code>bundle list(1)</code></dt><dd><p>Show all of the gems in the current bundle</p></dd>
+<dt><code>bundle show(1)</code></dt><dd><p>Show the source location of a particular gem in the bundle</p></dd>
+<dt><code>bundle outdated(1)</code></dt><dd><p>Show all of the outdated gems in the current bundle</p></dd>
+<dt><code>bundle console(1)</code></dt><dd><p>Start an IRB session in the context of the current bundle</p></dd>
+<dt><code>bundle open(1)</code></dt><dd><p>Open an installed gem in the editor</p></dd>
+<dt><code>bundle viz(1)</code></dt><dd><p>Generate a visual representation of your dependencies</p></dd>
+<dt><code>bundle init(1)</code></dt><dd><p>Generate a simple <code>Gemfile</code>, placed in the current directory</p></dd>
+<dt><code>bundle gem(1)</code></dt><dd><p>Create a simple gem, suitable for development with bundler</p></dd>
+<dt><a href="bundle-platform.1.html">bundle platform(1)</a></dt><dd><p>Displays platform compatibility information</p></dd>
+<dt><code>bundle clean(1)</code></dt><dd><p>Cleans up unused gems in your bundler directory</p></dd>
+</dl>
+
+
+<h2 id="OBSOLETE">OBSOLETE</h2>
+
+<p>These commands are obsolete and should no longer be used</p>
+
+<ul>
+<li><code>bundle lock(1)</code></li>
+<li><code>bundle unlock(1)</code></li>
+<li><code>bundle cache(1)</code></li>
+</ul>
+
+
+
+  <ol class='man-decor man-foot man foot'>
+    <li class='tl'></li>
+    <li class='tc'>November 2013</li>
+    <li class='tr'>bundle(1)</li>
+  </ol>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv='content-type' value='text/html;charset=utf8'>
+  <meta name='generator' value='Ronn/v0.7.3 (http://github.com/rtomayko/ronn/tree/0.7.3)'>
+  <title>Gemfile(5) - A format for describing gem dependencies for Ruby programs</title>
+  <style type='text/css' media='all'>
+  /* style: man */
+  body#manpage {margin:0}
+  .mp {max-width:100ex;padding:0 9ex 1ex 4ex}
+  .mp p,.mp pre,.mp ul,.mp ol,.mp dl {margin:0 0 20px 0}
+  .mp h2 {margin:10px 0 0 0}
+  .mp > p,.mp > pre,.mp > ul,.mp > ol,.mp > dl {margin-left:8ex}
+  .mp h3 {margin:0 0 0 4ex}
+  .mp dt {margin:0;clear:left}
+  .mp dt.flush {float:left;width:8ex}
+  .mp dd {margin:0 0 0 9ex}
+  .mp h1,.mp h2,.mp h3,.mp h4 {clear:left}
+  .mp pre {margin-bottom:20px}
+  .mp pre+h2,.mp pre+h3 {margin-top:22px}
+  .mp h2+pre,.mp h3+pre {margin-top:5px}
+  .mp img {display:block;margin:auto}
+  .mp h1.man-title {display:none}
+  .mp,.mp code,.mp pre,.mp tt,.mp kbd,.mp samp,.mp h3,.mp h4 {font-family:monospace;font-size:14px;line-height:1.42857142857143}
+  .mp h2 {font-size:16px;line-height:1.25}
+  .mp h1 {font-size:20px;line-height:2}
+  .mp {text-align:justify;background:#fff}
+  .mp,.mp code,.mp pre,.mp pre code,.mp tt,.mp kbd,.mp samp {color:#131211}
+  .mp h1,.mp h2,.mp h3,.mp h4 {color:#030201}
+  .mp u {text-decoration:underline}
+  .mp code,.mp strong,.mp b {font-weight:bold;color:#131211}
+  .mp em,.mp var {font-style:italic;color:#232221;text-decoration:none}
+  .mp a,.mp a:link,.mp a:hover,.mp a code,.mp a pre,.mp a tt,.mp a kbd,.mp a samp {color:#0000ff}
+  .mp b.man-ref {font-weight:normal;color:#434241}
+  .mp pre {padding:0 4ex}
+  .mp pre code {font-weight:normal;color:#434241}
+  .mp h2+pre,h3+pre {padding-left:0}
+  ol.man-decor,ol.man-decor li {margin:3px 0 10px 0;padding:0;float:left;width:33%;list-style-type:none;text-transform:uppercase;color:#999;letter-spacing:1px}
+  ol.man-decor {width:100%}
+  ol.man-decor li.tl {text-align:left}
+  ol.man-decor li.tc {text-align:center;letter-spacing:4px}
+  ol.man-decor li.tr {text-align:right;float:right}
+  </style>
+</head>
+<!--
+  The following styles are deprecated and will be removed at some point:
+  div#man, div#man ol.man, div#man ol.head, div#man ol.man.
+
+  The .man-page, .man-decor, .man-head, .man-foot, .man-title, and
+  .man-navigation should be used instead.
+-->
+<body id='manpage'>
+  <div class='mp' id='man'>
+
+  <div class='man-navigation' style='display:none'>
+    <a href="#NAME">NAME</a>
+    <a href="#SYNOPSIS">SYNOPSIS</a>
+    <a href="#SYNTAX">SYNTAX</a>
+    <a href="#SOURCES-source-">SOURCES (#source)</a>
+    <a href="#RUBY-ruby-">RUBY (#ruby)</a>
+    <a href="#GEMS-gem-">GEMS (#gem)</a>
+    <a href="#BLOCK-FORM-OF-GIT-PATH-GROUP-and-PLATFORMS">BLOCK FORM OF GIT, PATH, GROUP and PLATFORMS</a>
+    <a href="#GEMSPEC-gemspec-">GEMSPEC (#gemspec)</a>
+    <a href="#SOURCE-PRIORITY">SOURCE PRIORITY</a>
+  </div>
+
+  <ol class='man-decor man-head man head'>
+    <li class='tl'>Gemfile(5)</li>
+    <li class='tc'></li>
+    <li class='tr'>Gemfile(5)</li>
+  </ol>
+
+  <h2 id="NAME">NAME</h2>
+<p class="man-name">
+  <code>Gemfile</code> - <span class="man-whatis">A format for describing gem dependencies for Ruby programs</span>
+</p>
+
+<h2 id="SYNOPSIS">SYNOPSIS</h2>
+
+<p>A <code>Gemfile</code> describes the gem dependencies required to execute associated
+Ruby code.</p>
+
+<p>Place the <code>Gemfile</code> in the root of the directory containing the associated
+code. For instance, in a Rails application, place the <code>Gemfile</code> in the same
+directory as the <code>Rakefile</code>.</p>
+
+<h2 id="SYNTAX">SYNTAX</h2>
+
+<p>A <code>Gemfile</code> is evaluated as Ruby code, in a context which makes available
+a number of methods used to describe the gem requirements.</p>
+
+<h2 id="SOURCES-source-">SOURCES (#source)</h2>
+
+<p>At the top of the <code>Gemfile</code>, add one line for each <code>Rubygems</code> source that
+might contain the gems listed in the <code>Gemfile</code>.</p>
+
+<pre><code>source "https://rubygems.org"
+source "http://gems.github.com"
+</code></pre>
+
+<p>Each of these _source_s <code>MUST</code> be a valid Rubygems repository. Sources are
+checked for gems following the heuristics described in <a href="#SOURCE-PRIORITY" title="SOURCE PRIORITY" data-bare-link="true">SOURCE PRIORITY</a>.</p>
+
+<h2 id="RUBY-ruby-">RUBY (#ruby)</h2>
+
+<p>If your application requires a specific Ruby version or engine, specify your
+requirements using the <code>ruby</code> method, with the following arguments.
+All parameters are <code>OPTIONAL</code> unless otherwise specified.</p>
+
+<h3 id="VERSION-required-">VERSION (required)</h3>
+
+<p>The version of Ruby that your application requires. If your application
+requires an alternate Ruby engine, such as JRuby or Rubinius, this should be
+the Ruby version that the engine is compatible with.</p>
+
+<pre><code>ruby "1.9.3"
+</code></pre>
+
+<h3 id="ENGINE-engine-">ENGINE (:engine)</h3>
+
+<p>Each application <em>may</em> specify a Ruby engine. If an engine is specified, an
+engine version <em>must</em> also be specified.</p>
+
+<h3 id="ENGINE-VERSION-engine_version-">ENGINE VERSION (:engine_version)</h3>
+
+<p>Each application <em>may</em> specify a Ruby engine version. If an engine version is
+specified, an engine <em>must</em> also be specified. If the engine is "ruby" the
+engine version specified <em>must</em> match the Ruby version.</p>
+
+<pre><code>ruby "1.8.7", :engine =&gt; "jruby", :engine_version =&gt; "1.6.7"
+</code></pre>
+
+<h3 id="PATCHLEVEL-patchlevel-">PATCHLEVEL (:patchlevel)</h3>
+
+<p>Each application <em>may</em> specify a Ruby patchlevel.</p>
+
+<pre><code>ruby "2.0.0", :patchlevel =&gt; "247"
+</code></pre>
+
+<h2 id="GEMS-gem-">GEMS (#gem)</h2>
+
+<p>Specify gem requirements using the <code>gem</code> method, with the following arguments.
+All parameters are <code>OPTIONAL</code> unless otherwise specified.</p>
+
+<h3 id="NAME-required-">NAME (required)</h3>
+
+<p>For each gem requirement, list a single <em>gem</em> line.</p>
+
+<pre><code>gem "nokogiri"
+</code></pre>
+
+<h3 id="VERSION">VERSION</h3>
+
+<p>Each <em>gem</em> <code>MAY</code> have one or more version specifiers.</p>
+
+<pre><code>gem "nokogiri", "&gt;= 1.4.2"
+gem "RedCloth", "&gt;= 4.1.0", "&lt; 4.2.0"
+</code></pre>
+
+<h3 id="REQUIRE-AS-require-">REQUIRE AS (:require)</h3>
+
+<p>Each <em>gem</em> <code>MAY</code> specify files that should be used when autorequiring via
+<code>Bundler.require</code>. You may pass an array with multiple files or <code>true</code> if file
+you want <code>required</code> has same name as <em>gem</em> or <code>false</code> to
+prevent any file from being autorequired.</p>
+
+<pre><code>gem "redis", :require =&gt; ["redis/connection/hiredis", "redis"]
+gem "webmock", :require =&gt; false
+gem "debugger", :require =&gt; true
+</code></pre>
+
+<p>The argument defaults to the name of the gem. For example, these are identical:</p>
+
+<pre><code>gem "nokogiri"
+gem "nokogiri", :require =&gt; "nokogiri"
+gem "nokogiri", :require =&gt; true
+</code></pre>
+
+<h3 id="GROUPS-group-or-groups-">GROUPS (:group or :groups)</h3>
+
+<p>Each <em>gem</em> <code>MAY</code> specify membership in one or more groups. Any <em>gem</em> that does
+not specify membership in any group is placed in the <code>default</code> group.</p>
+
+<pre><code>gem "rspec", :group =&gt; :test
+gem "wirble", :groups =&gt; [:development, :test]
+</code></pre>
+
+<p>The Bundler runtime allows its two main methods, <code>Bundler.setup</code> and
+<code>Bundler.require</code>, to limit their impact to particular groups.</p>
+
+<pre><code># setup adds gems to Ruby's load path
+Bundler.setup                    # defaults to all groups
+require "bundler/setup"          # same as Bundler.setup
+Bundler.setup(:default)          # only set up the _default_ group
+Bundler.setup(:test)             # only set up the _test_ group (but `not` _default_)
+Bundler.setup(:default, :test)   # set up the _default_ and _test_ groups, but no others
+
+# require requires all of the gems in the specified groups
+Bundler.require                  # defaults to just the _default_ group
+Bundler.require(:default)        # identical
+Bundler.require(:default, :test) # requires the _default_ and _test_ groups
+Bundler.require(:test)           # requires just the _test_ group
+</code></pre>
+
+<p>The Bundler CLI allows you to specify a list of groups whose gems <code>bundle install</code> should
+not install with the <code>--without</code> option. To specify multiple groups to ignore, specify a
+list of groups separated by spaces.</p>
+
+<pre><code>bundle install --without test
+bundle install --without development test
+</code></pre>
+
+<p>After running <code>bundle install --without test</code>, bundler will remember that you excluded
+the test group in the last installation. The next time you run <code>bundle install</code>,
+without any <code>--without option</code>, bundler will recall it.</p>
+
+<p>Also, calling <code>Bundler.setup</code> with no parameters, or calling <code>require "bundler/setup"</code>
+will setup all groups except for the ones you excluded via <code>--without</code> (since they
+are obviously not available).</p>
+
+<p>Note that on <code>bundle install</code>, bundler downloads and evaluates all gems, in order to
+create a single canonical list of all of the required gems and their dependencies.
+This means that you cannot list different versions of the same gems in different
+groups. For more details, see <a href="http://bundler.io/rationale.html">Understanding Bundler</a>.</p>
+
+<h3 id="PLATFORMS-platforms-">PLATFORMS (:platforms)</h3>
+
+<p>If a gem should only be used in a particular platform or set of platforms, you can
+specify them. Platforms are essentially identical to groups, except that you do not
+need to use the <code>--without</code> install-time flag to exclude groups of gems for other
+platforms.</p>
+
+<p>There are a number of <code>Gemfile</code> platforms:</p>
+
+<dl>
+<dt class="flush"><code>ruby</code></dt><dd>C Ruby (MRI) or Rubinius, but <code>NOT</code> Windows</dd>
+<dt class="flush"><code>ruby_18</code></dt><dd><em>ruby</em> <code>AND</code> version 1.8</dd>
+<dt class="flush"><code>ruby_19</code></dt><dd><em>ruby</em> <code>AND</code> version 1.9</dd>
+<dt class="flush"><code>ruby_20</code></dt><dd><em>ruby</em> <code>AND</code> version 2.0</dd>
+<dt class="flush"><code>ruby_21</code></dt><dd><em>ruby</em> <code>AND</code> version 2.1</dd>
+<dt class="flush"><code>mri</code></dt><dd>Same as <em>ruby</em>, but not Rubinius</dd>
+<dt class="flush"><code>mri_18</code></dt><dd><em>mri</em> <code>AND</code> version 1.8</dd>
+<dt class="flush"><code>mri_19</code></dt><dd><em>mri</em> <code>AND</code> version 1.9</dd>
+<dt class="flush"><code>mri_20</code></dt><dd><em>mri</em> <code>AND</code> version 2.0</dd>
+<dt class="flush"><code>mri_21</code></dt><dd><em>mri</em> <code>AND</code> version 2.1</dd>
+<dt class="flush"><code>rbx</code></dt><dd>Same as <em>ruby</em>, but only Rubinius (not MRI)</dd>
+<dt class="flush"><code>jruby</code></dt><dd>JRuby</dd>
+<dt class="flush"><code>mswin</code></dt><dd>Windows</dd>
+<dt class="flush"><code>mingw</code></dt><dd>Windows 32 bit 'mingw32' platform (aka RubyInstaller)</dd>
+<dt><code>mingw_18</code></dt><dd><em>mingw</em> <code>AND</code> version 1.8</dd>
+<dt><code>mingw_19</code></dt><dd><em>mingw</em> <code>AND</code> version 1.9</dd>
+<dt><code>mingw_20</code></dt><dd><em>mingw</em> <code>AND</code> version 2.0</dd>
+<dt><code>mingw_21</code></dt><dd><em>mingw</em> <code>AND</code> version 2.1</dd>
+<dt><code>x64_mingw</code></dt><dd>Windows 64 bit 'mingw32' platform (aka RubyInstaller x64)</dd>
+<dt><code>x64_mingw_20</code></dt><dd><em>x64_mingw</em> <code>AND</code> version 2.0</dd>
+<dt><code>x64_mingw_21</code></dt><dd><em>x64_mingw</em> <code>AND</code> version 2.1</dd>
+</dl>
+
+
+<p>As with groups, you can specify one or more platforms:</p>
+
+<pre><code>gem "weakling",   :platforms =&gt; :jruby
+gem "ruby-debug", :platforms =&gt; :mri_18
+gem "nokogiri",   :platforms =&gt; [:mri_18, :jruby]
+</code></pre>
+
+<p>All operations involving groups (<code>bundle install</code>, <code>Bundler.setup</code>,
+<code>Bundler.require</code>) behave exactly the same as if any groups not
+matching the current platform were explicitly excluded.</p>
+
+<h3 id="GIT-git-">GIT (:git)</h3>
+
+<p>If necessary, you can specify that a gem is located at a particular
+git repository. The repository can be public (<code>http://github.com/rails/rails.git</code>)
+or private (<code>git@github.com:rails/rails.git</code>). If the repository is private,
+the user that you use to run <code>bundle install</code> <code>MUST</code> have the appropriate
+keys available in their <code>$HOME/.ssh</code>.</p>
+
+<p>Git repositories are specified using the <code>:git</code> parameter. The <code>group</code>,
+<code>platforms</code>, and <code>require</code> options are available and behave exactly the same
+as they would for a normal gem.</p>
+
+<pre><code>gem "rails", :git =&gt; "git://github.com/rails/rails.git"
+</code></pre>
+
+<p>A git repository <code>SHOULD</code> have at least one file, at the root of the
+directory containing the gem, with the extension <code>.gemspec</code>. This file
+<code>MUST</code> contain a valid gem specification, as expected by the <code>gem build</code>
+command. It <code>MUST NOT</code> have any dependencies, other than on the files in
+the git repository itself and any built-in functionality of Ruby or Rubygems.</p>
+
+<p>If a git repository does not have a <code>.gemspec</code>, bundler will attempt to
+create one, but it will not contain any dependencies, executables, or
+C extension compilation instructions. As a result, it may fail to properly
+integrate into your application.</p>
+
+<p>If a git repository does have a <code>.gemspec</code> for the gem you attached it
+to, a version specifier, if provided, means that the git repository is
+only valid if the <code>.gemspec</code> specifies a version matching the version
+specifier. If not, bundler will print a warning.</p>
+
+<pre><code>gem "rails", "2.3.8", :git =&gt; "git://github.com/rails/rails.git"
+# bundle install will fail, because the .gemspec in the rails
+# repository's master branch specifies version 3.0.0
+</code></pre>
+
+<p>If a git repository does <code>not</code> have a <code>.gemspec</code> for the gem you attached
+it to, a version specifier <code>MUST</code> be provided. Bundler will use this
+version in the simple <code>.gemspec</code> it creates.</p>
+
+<p>Git repositories support a number of additional options.</p>
+
+<dl>
+<dt><code>branch</code>, <code>tag</code>, and <code>ref</code></dt><dd>You <code>MUST</code> only specify at most one of these options. The default
+is <code>:branch =&gt; "master"</code></dd>
+<dt><code>submodules</code></dt><dd>Specify <code>:submodules =&gt; true</code> to cause bundler to expand any
+submodules included in the git repository</dd>
+</dl>
+
+
+<p>If a git repository contains multiple <code>.gemspecs</code>, each <code>.gemspec</code>
+represents a gem located at the same place in the file system as
+the <code>.gemspec</code>.</p>
+
+<pre><code>|~rails                   [git root]
+| |-rails.gemspec         [rails gem located here]
+|~actionpack
+| |-actionpack.gemspec    [actionpack gem located here]
+|~activesupport
+| |-activesupport.gemspec [activesupport gem located here]
+|...
+</code></pre>
+
+<p>To install a gem located in a git repository, bundler changes to
+the directory containing the gemspec, runs <code>gem build name.gemspec</code>
+and then installs the resulting gem. The <code>gem build</code> command,
+which comes standard with Rubygems, evaluates the <code>.gemspec</code> in
+the context of the directory in which it is located.</p>
+
+<h3 id="GITHUB-github-">GITHUB (:github)</h3>
+
+<p>If the git repository you want to use is hosted on GitHub and is public, you can use the
+:github shorthand to specify just the github username and repository name (without the
+trailing ".git"), separated by a slash. If both the username and repository name are the
+same, you can omit one.</p>
+
+<pre><code>gem "rails", :github =&gt; "rails/rails"
+gem "rails", :github =&gt; "rails"
+</code></pre>
+
+<p>Are both equivalent to</p>
+
+<pre><code>gem "rails", :git =&gt; "git://github.com/rails/rails.git"
+</code></pre>
+
+<p>In addition, if you wish to choose a specific branch:</p>
+
+<pre><code>gem "rails", :github =&gt; "rails/rails", :branch =&gt; "branch_name"
+</code></pre>
+
+<h3 id="PATH-path-">PATH (:path)</h3>
+
+<p>You can specify that a gem is located in a particular location
+on the file system. Relative paths are resolved relative to the
+directory containing the <code>Gemfile</code>.</p>
+
+<p>Similar to the semantics of the <code>:git</code> option, the <code>:path</code>
+option requires that the directory in question either contains
+a <code>.gemspec</code> for the gem, or that you specify an explicit
+version that bundler should use.</p>
+
+<p>Unlike <code>:git</code>, bundler does not compile C extensions for
+gems specified as paths.</p>
+
+<pre><code>gem "rails", :path =&gt; "vendor/rails"
+</code></pre>
+
+<h2 id="BLOCK-FORM-OF-GIT-PATH-GROUP-and-PLATFORMS">BLOCK FORM OF GIT, PATH, GROUP and PLATFORMS</h2>
+
+<p>The <code>:git</code>, <code>:path</code>, <code>:group</code>, and <code>:platforms</code> options may be
+applied to a group of gems by using block form.</p>
+
+<pre><code>git "git://github.com/rails/rails.git" do
+  gem "activesupport"
+  gem "actionpack"
+end
+
+platforms :ruby do
+  gem "ruby-debug"
+  gem "sqlite3"
+end
+
+group :development do
+  gem "wirble"
+  gem "faker"
+end
+</code></pre>
+
+<p>In the case of the <code>git</code> block form, the <code>:ref</code>, <code>:branch</code>, <code>:tag</code>,
+and <code>:submodules</code> options may be passed to the <code>git</code> method, and
+all gems in the block will inherit those options.</p>
+
+<h2 id="GEMSPEC-gemspec-">GEMSPEC (#gemspec)</h2>
+
+<p>If you wish to use Bundler to help install dependencies for a gem while it is
+being developed, use the <code>gemspec</code> method to pull in the dependencies listed in
+the <code>.gemspec</code> file.</p>
+
+<p>The <code>gemspec</code> method adds any runtime dependencies as gem requirements in the
+default group. It also adds development dependencies as gem requirements in the
+<code>development</code> group. Finally, it adds a gem requirement on your project (<code>:path
+=&gt; '.'</code>). In conjunction with <code>Bundler.setup</code>, this allows you to require project
+files in your test code as you would if the project were installed as a gem; you
+need not manipulate the load path manually or require project files via relative
+paths.</p>
+
+<p>The <code>gemspec</code> method supports optional <code>:path</code>, <code>:name</code>, and <code>:development_group</code>
+options, which control where bundler looks for the <code>.gemspec</code>, what named
+<code>.gemspec</code> it uses (if more than one is present), and which group development
+dependencies are included in.</p>
+
+<h2 id="SOURCE-PRIORITY">SOURCE PRIORITY</h2>
+
+<p>When attempting to locate a gem to satisfy a gem requirement,
+bundler uses the following priority order:</p>
+
+<ol>
+<li>The source explicitly attached to the gem (using <code>:path</code> or <code>:git</code>)</li>
+<li>For implicit gems (dependencies of explicit gems), any git or path
+repository otherwise declared. This results in bundler prioritizing the
+ActiveSupport gem from the Rails git repository over ones from
+<code>rubygems.org</code></li>
+<li>The sources specified via <code>source</code>, searching each source in your <code>Gemfile</code>
+from last added to first added.</li>
+</ol>
+
+
+
+  <ol class='man-decor man-foot man foot'>
+    <li class='tl'></li>
+    <li class='tc'>November 2013</li>
+    <li class='tr'>Gemfile(5)</li>
+  </ol>
+
+  </div>
+</body>
+</html>
