@@ -154,7 +154,7 @@ describe "bundle gem" do
       end
 
       it "creates a default test which fails" do
-        expect(bundled_app("test_gem/spec/test_gem_spec.rb").read).to match(/expect(false).to be true/)
+        expect(bundled_app("test_gem/spec/test_gem_spec.rb").read).to match(/false.should be_true/)
       end
     end
 
@@ -330,7 +330,7 @@ describe "bundle gem" do
       end
 
       it "creates a default test which fails" do
-        expect(bundled_app("test-gem/spec/test/gem_spec.rb").read).to match(/expect(false).to be true/)
+        expect(bundled_app("test-gem/spec/test/gem_spec.rb").read).to match(/false.should be_true/)
       end
 
       it "creates a default rake task to run the specs" do

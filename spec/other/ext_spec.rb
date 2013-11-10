@@ -3,7 +3,7 @@ require 'spec_helper'
 describe "Gem::Specification#match_platform" do
   it "does not match platforms other than the gem platform" do
     darwin = gem "lol", "1.0", "platform_specific-1.0-x86-darwin-10"
-    expect(darwin.match_platform(pl('java'))).to be false
+    expect(darwin.match_platform(pl('java'))).to be_false
   end
 end
 
