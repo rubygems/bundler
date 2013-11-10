@@ -27,7 +27,7 @@ describe "bundle install with git sources" do
     end
 
     it "caches the git repo" do
-      expect(Dir["#{default_bundle_path}/cache/bundler/git/foo-1.0-*"]).to have(1).item
+      expect(Dir["#{default_bundle_path}/cache/bundler/git/foo-1.0-*"].size).to eq(1)
     end
 
     it "caches the evaluated gemspec" do
