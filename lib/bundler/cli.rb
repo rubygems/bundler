@@ -369,6 +369,11 @@ module Bundler
       Env.new.write($stdout)
     end
 
+    desc "add GEM [VERSION]", "Add the named gem to the bottom of Gemfile"
+    def add(name, version = nil)
+      Adder.new(name, version).add
+    end
+
     private
 
       # Automatically invoke `bundle install` and resume if
