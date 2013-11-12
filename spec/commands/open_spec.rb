@@ -33,6 +33,19 @@ describe "bundle open" do
     expect(out).to match(/could not find gem 'missing'/i)
   end
 
+  it "does not blow up if the gem to open does not have a Gemfile" do
+    git = build_git "foo"
+    ref = git.ref_for("master", 11)
+
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem 'foo', :git => "#{lib_path("foo-1.0")}"
+    G
+
+    bundle "open foo", :env => {"EDITOR" => "echo editor", "VISUAL" => "", "BUNDLER_EDITOR" => ""}
+    expect(out).to match("editor #{default_bundle_path.join("bundler/gems/foo-1.0-#{ref}")}")
+  end
+
   it "suggests alternatives for similar-sounding gems" do
     bundle "open Rails", :env => {"EDITOR" => "echo editor", "VISUAL" => "", "BUNDLER_EDITOR" => ""}
     expect(out).to match(/did you mean rails\?/i)
