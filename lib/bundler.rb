@@ -18,6 +18,7 @@ module Bundler
   ENV.replace(environment_preserver.backup)
   SUDO_MUTEX = Mutex.new
 
+  autoload :Adder,                 'bundler/adder'
   autoload :Definition,             "bundler/definition"
   autoload :Dependency,             "bundler/dependency"
   autoload :DepProxy,               "bundler/dep_proxy"
