@@ -26,7 +26,7 @@ For help with common problems, see [ISSUES](https://github.com/bundler/bundler/b
 
 If you'd like to contribute to Bundler, that's awesome, and we <3 you. There's a guide to contributing to Bundler (both code and general help) over in [DEVELOPMENT](https://github.com/bundler/bundler/blob/master/DEVELOPMENT.md)
 
-The `master` branch contains our current progress towards version 1.4. Versions 1.0-1.3 each have their own stable branches. Please submit bugfixes as pull requests to the stable branch for the version you would like to fix.
+The `master` branch contains our current progress towards version 1.5. Versions 1.0-1.3 each have their own stable branches. Please submit bugfixes as pull requests to the stable branch for the version you would like to fix.
 
 ### Core Team
 
