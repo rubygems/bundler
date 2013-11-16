@@ -83,8 +83,6 @@ module Bundler
           worker.io_r.close
           worker.io_w.close
           Process.kill :INT, worker.pid
-        end
-        @workers.each do |worker|
           Process.waitpid worker.pid
         end
       end
