@@ -83,7 +83,7 @@ If you don't hear back immediately, don’t get discouraged! We all have day job
 
 Early releases require heavy testing, especially across various system setups. We :heart: testers, and are big fans of anyone who can run `gem install bundler --pre` and try out upcoming releases in their development and staging environments.
 
-As of September 3 2012, there is no current prerelease or beta version of Bundler. That said, you are always welcome to try checking out master and building a gem yourself if you want to try out the latest changes.
+There may not always be prereleases or beta versions of Bundler. That said, you are always welcome to try checking out master and building a gem yourself if you want to try out the latest changes.
 
 
 # Translations
