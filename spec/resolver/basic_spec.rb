@@ -23,6 +23,12 @@ describe "Resolving" do
     dep "my_app"
     should_resolve_as %w(activemodel-3.2.11 builder-3.0.4 grape-0.2.6 my_app-1.0.0)
   end
+  
+  it "resolves a complex conflicting index" do
+    @index = a_complex_conflict_index
+    dep "my_app"
+    should_resolve_as %w(a-1.4.0 b-0.3.5 c-3.2 d-0.9.8 my_app-1.1.0)
+  end
 
   it "should throw error in case of circular dependencies" do
     @index = a_circular_index

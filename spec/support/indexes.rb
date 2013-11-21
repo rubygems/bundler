@@ -115,7 +115,7 @@ module Spec
       build_index do
         gem "builder", %w(3.0.4 3.1.4)
         gem("grape", '0.2.6') do
-          dep "builder", ">= 4"
+          dep "builder", ">= 0"
         end
 
         versions '3.2.8 3.2.9 3.2.10 3.2.11' do |version|
@@ -127,6 +127,53 @@ module Spec
         gem("my_app", '1.0.0') do
           dep "activemodel", ">= 0"
           dep "grape", ">= 0"
+        end
+      end
+    end
+
+    def a_complex_conflict_index
+      build_index do
+        gem("a", %w(1.0.2 1.1.4 1.2.0 1.4.0)) do
+          dep "d", ">= 0" 
+        end
+
+        gem("d", %w(1.3.0 1.4.1)) do
+          dep "x", ">= 0"
+        end
+
+        gem "d", "0.9.8"
+
+        gem("b", '0.3.4') do
+          dep "a", ">= 1.5.0"
+        end
+
+        gem("b", '0.3.5') do
+          dep "a", ">= 1.2"
+        end
+
+        gem("b", '0.3.3') do
+          dep "a", "> 1.0"
+        end
+
+        versions '3.2 3.3' do |version|
+          gem("c", version) do
+            dep "a", "~> 1.0"
+          end
+        end
+
+        gem("my_app", '1.3.0') do
+          dep "c", ">= 4.0"
+          dep "b", ">= 0"
+        end
+
+        gem("my_app", '1.2.0') do
+          dep "c", "~> 3.3.0"
+          dep "b", "0.3.4"
+        end
+
+        gem("my_app", '1.1.0') do
+          dep "c", "~> 3.2.0"
+          dep "b", "0.3.5"
         end
       end
     end

@@ -207,7 +207,7 @@ module Bundler
 
     def resolve_for_conflict(_reqs, _activated, state)
       return _reqs, _activated if state.possibles.empty?
-      reqs, activated = state.reqs, state.activated
+      reqs, activated = state.reqs.dup, state.activated.dup
       requirement = state.requirement
       possible = state.possibles.pop
 
@@ -220,13 +220,14 @@ module Bundler
       conflicts = Set.new
       states = []
 
-      reqs = reqs.sort_by do |a|
-        [ activated[a.name] ? 0 : 1,
-          a.requirement.prerelease? ? 0 : 1,
-          activated[a.name] ? 0 : @gems_size[a] ]
-      end
-
       until reqs.empty?
+        reqs = reqs.sort_by do |a|
+          [ activated[a.name] ? 0 : 1,
+            a.requirement.prerelease? ? 0 : 1,
+            @errors[a.name]   ? 0 : 1,
+            activated[a.name] ? 0 : @gems_size[a] ]
+        end
+
         current = reqs.shift
         existing = activated[current.name]
 
@@ -240,7 +241,7 @@ module Bundler
           end
 
           if current.requirement.satisfied_by?(existing.version)
-
+            @errors.delete(existing.name)
             dependencies = existing.activate_platform(current.__platform)
             reqs.concat dependencies
 
@@ -251,6 +252,7 @@ module Bundler
 
             next
           else 
+            @errors[existing.name] = [existing, current]
             parent = current.required_by.last
 
             parent ||= existing.required_by.last if existing.respond_to?(:required_by)
@@ -301,7 +303,8 @@ module Bundler
               raise GemNotFound, message
               # This is not a top-level Gemfile requirement
             else
-              parent = current.required_by.last
+              @errors[current.name] = [nil, current]
+              parent = handle_conflict(current, states)
               state = find_conflict_state(parent.name, states)
               reqs, activated = resolve_for_conflict(reqs, activated, state)
               states << state unless state.possibles.empty?
@@ -314,7 +317,17 @@ module Bundler
           activate_gem(reqs, activated, requirement, current)
         end
       end
-        successify(activated)
+      successify(activated)
+    end
+
+    def handle_conflict(current, states)
+      parent = current.required_by.last
+      state = states.detect { |i| i.name == parent.name }
+      until state.possibles.any? || parent.required_by.empty?
+        parent = parent.required_by.last
+        state = states.detect { |i| i.name == parent.name }
+      end
+      parent
     end
 
     def resolve(reqs, activated, depth = 0)
