@@ -260,6 +260,7 @@ module Bundler
               conflicts << required_by
               state = find_conflict_state(parent.name, states)
               reqs, activated = resolve_for_conflict(reqs, activated, state)
+              states << state unless state.possibles.empty?
               clear_search_cache
             else
               raise version_conflict
@@ -303,6 +304,7 @@ module Bundler
               parent = current.required_by.last
               state = find_conflict_state(parent.name, states)
               reqs, activated = resolve_for_conflict(reqs, activated, state)
+              states << state unless state.possibles.empty?
               next
             end
           end
