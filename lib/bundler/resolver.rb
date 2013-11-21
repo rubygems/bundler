@@ -300,6 +300,10 @@ module Bundler
               raise GemNotFound, message
               # This is not a top-level Gemfile requirement
             else
+              parent = current.required_by.last
+              state = find_conflict_state(parent.name, states)
+              reqs, activated = resolve_for_conflict(reqs, activated, state)
+              next
             end
           end
 
