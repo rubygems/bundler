@@ -113,8 +113,19 @@ module Spec
     # goes well, it should resolve to 3.0.4
     def a_conflict_index
       build_index do
-        gem "builder", %w(3.0.4 3.1.4)
+        versions "3.0.4 3.1.4" do |version|
+          gem("builder", version) do
+            dep "activesupport", "3.2.9"
+          end
+        end
+
+        gem("activesupport", %w(3.2.0 3.2.9 3.3.0))
+
         gem("grape", '0.2.6') do
+          dep "builder", ">= 4"
+        end
+
+        gem("grape", '0.2.2') do
           dep "builder", ">= 0"
         end
 

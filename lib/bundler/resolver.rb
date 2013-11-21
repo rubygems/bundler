@@ -129,11 +129,7 @@ module Bundler
       Bundler.ui.info "Resolving dependencies...", false
       base = SpecSet.new(base) unless base.is_a?(SpecSet)
       resolver = new(index, source_requirements, base)
-      result = safe_catch(:success) do
-        resolver.start(requirements)
-        raise resolver.version_conflict
-        nil
-      end
+      result = resolver.start(requirements)
       Bundler.ui.info "" # new line now that dots are done
       SpecSet.new(result)
     rescue => e
@@ -169,7 +165,149 @@ module Bundler
       activated = {}
       @gems_size = Hash[reqs.map { |r| [r, gems_size(r)] }]
 
-      resolve(reqs, activated)
+      resolve2(reqs, activated)
+    end
+
+    class State < Struct.new(:reqs, :activated, :requirement, :possibles)
+      def name
+        requirement.name
+      end
+    end
+
+    def find_conflict_state(conflict, states)
+      rejected = []
+
+      until states.empty? do
+        state = states.pop
+
+        return state if conflict == state.name
+
+        rejected << state
+      end
+      
+      return rejected.shift
+    ensure
+      rejected = rejected.concat(states)
+      states.replace(rejected)
+    end
+
+    def activate_gem(reqs, activated, requirement, current)
+      requirement.required_by.replace current.required_by
+      requirement.required_by << current
+      activated[requirement.name] = requirement
+      dependencies = requirement.activate_platform(current.__platform)
+      dependencies.each do |dep|
+        next if dep.type == :development
+        dep.required_by.replace(current.required_by)
+        dep.required_by << current
+        @gems_size[dep] ||= gems_size(dep)
+        reqs << dep
+      end
+    end
+
+    def resolve_for_conflict(state)
+      reqs, activated = state.reqs, state.activated
+      requirement = state.requirement
+      possible = state.possibles.pop
+
+      activate_gem(reqs, activated, possible, requirement)
+
+      return reqs, activated
+    end
+
+    def resolve2(reqs, activated)
+      conflicts = Set.new
+      states = []
+
+      reqs = reqs.sort_by do |a|
+        [ activated[a.name] ? 0 : 1,
+          a.requirement.prerelease? ? 0 : 1,
+          activated[a.name] ? 0 : @gems_size[a] ]
+      end
+
+      until reqs.empty?
+        current = reqs.shift
+        existing = activated[current.name]
+
+        if existing || current.name == 'bundler'
+          # Force the current
+          if current.name == 'bundler' && !existing
+            existing = search(DepProxy.new(Gem::Dependency.new('bundler', VERSION), Gem::Platform::RUBY)).first
+            raise GemNotFound, %Q{Bundler could not find gem "bundler" (#{VERSION})} unless existing
+            existing.required_by << existing
+            activated['bundler'] = existing
+          end
+
+          if current.requirement.satisfied_by?(existing.version)
+
+            dependencies = existing.activate_platform(current.__platform)
+            reqs.concat dependencies
+
+            dependencies.each do |dep|
+              next if dep.type == :development
+              @gems_size[dep] ||= gems_size(dep)
+            end
+
+            next
+          else 
+            parent = current.required_by.last
+
+            parent ||= existing.required_by.last if existing.respond_to?(:required_by)
+
+            if parent && parent.name != 'bundler'
+              required_by = existing.respond_to?(:required_by) && existing.required_by.last
+              conflicts << required_by
+              state = find_conflict_state(parent.name, states)
+              reqs, activated = resolve_for_conflict(state)
+              clear_search_cache
+            else
+              raise version_conflict
+            end
+          end
+        else
+          matching_versions = search(current)
+          state = State.new(reqs.dup, activated.dup, current, matching_versions)
+          states << state
+
+          # If we found no versions that match the current requirement
+          if matching_versions.empty?
+            # If this is a top-level Gemfile requirement
+            if current.required_by.empty?
+              if base = @base[current.name] and !base.empty?
+                version = base.first.version
+                message = "You have requested:\n" \
+                  "  #{current.name} #{current.requirement}\n\n" \
+                  "The bundle currently has #{current.name} locked at #{version}.\n" \
+                  "Try running `bundle update #{current.name}`"
+              elsif current.source
+                name = current.name
+                versions = @source_requirements[name][name].map { |s| s.version }
+                message  = "Could not find gem '#{current}' in #{current.source}.\n"
+                if versions.any?
+                  message << "Source contains '#{name}' at: #{versions.join(', ')}"
+                else
+                  message << "Source does not contain any versions of '#{current}'"
+                end
+              else
+                message = "Could not find gem '#{current}' "
+                if @index.source_types.include?(Bundler::Source::Rubygems)
+                  message << "in any of the gem sources listed in your Gemfile."
+                else
+                  message << "in the gems available on this machine."
+                end
+              end
+              raise GemNotFound, message
+              # This is not a top-level Gemfile requirement
+            else
+            end
+          end
+
+          raise version_conflict if state.possibles.empty?
+          requirement = state.possibles.pop
+          activate_gem(reqs, activated, requirement, current)
+        end
+      end
+        successify(activated)
     end
 
     def resolve(reqs, activated, depth = 0)
