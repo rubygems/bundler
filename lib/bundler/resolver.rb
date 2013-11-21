@@ -205,7 +205,8 @@ module Bundler
       end
     end
 
-    def resolve_for_conflict(state)
+    def resolve_for_conflict(_reqs, _activated, state)
+      return _reqs, _activated if state.possibles.empty?
       reqs, activated = state.reqs, state.activated
       requirement = state.requirement
       possible = state.possibles.pop
@@ -258,7 +259,7 @@ module Bundler
               required_by = existing.respond_to?(:required_by) && existing.required_by.last
               conflicts << required_by
               state = find_conflict_state(parent.name, states)
-              reqs, activated = resolve_for_conflict(state)
+              reqs, activated = resolve_for_conflict(reqs, activated, state)
               clear_search_cache
             else
               raise version_conflict
