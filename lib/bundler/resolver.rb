@@ -174,6 +174,16 @@ module Bundler
       end
     end
 
+    def handle_conflict(current, states)
+      parent = current
+      state = states.detect { |i| i.name == parent.name }
+      until (state && state.possibles.any?) || parent.required_by.empty?
+        parent = parent.required_by.last
+        state = states.detect { |i| i.name == parent.name }
+      end
+      parent
+    end
+
     def find_conflict_state(conflict, states)
       rejected = []
 
@@ -195,7 +205,13 @@ module Bundler
       requirement.required_by.replace current.required_by
       requirement.required_by << current
       activated[requirement.name] = requirement
+
+      debug { "  Activating: #{requirement.name} (#{requirement.version})" }
+      debug { requirement.required_by.map { |d| "    * #{d.name} (#{d.requirement})" }.join("\n") }
+
       dependencies = requirement.activate_platform(current.__platform)
+
+      debug { "    Dependencies"}
       dependencies.each do |dep|
         next if dep.type == :development
         dep.required_by.replace(current.required_by)
@@ -221,6 +237,10 @@ module Bundler
       states = []
 
       until reqs.empty?
+        indicate_progress
+
+        debug { print "\e[2J\e[f" ; "==== Iterating ====\n\n" }
+
         reqs = reqs.sort_by do |a|
           [ activated[a.name] ? 0 : 1,
             a.requirement.prerelease? ? 0 : 1,
@@ -228,8 +248,15 @@ module Bundler
             activated[a.name] ? 0 : @gems_size[a] ]
         end
 
+        debug { "Activated:\n" + activated.values.map {|a| "  #{a}" }.join("\n") }
+        debug { "Requirements:\n" + reqs.map {|r| "  #{r}"}.join("\n") }
+
         current = reqs.shift
+
+        debug { "Attempting:\n  #{current}"}
+
         existing = activated[current.name]
+
 
         if existing || current.name == 'bundler'
           # Force the current
@@ -241,6 +268,7 @@ module Bundler
           end
 
           if current.requirement.satisfied_by?(existing.version)
+            debug { "    * [SUCCESS] Already activated" }
             @errors.delete(existing.name)
             dependencies = existing.activate_platform(current.__platform)
             reqs.concat dependencies
@@ -252,13 +280,12 @@ module Bundler
 
             next
           else 
+            debug { "    * [FAIL] Already activated" }
             @errors[existing.name] = [existing, current]
             parent = handle_conflict(current, states)
 
-
             if parent && parent.name != 'bundler'
-              required_by = existing.respond_to?(:required_by) && existing.required_by.last
-              conflicts << required_by
+              debug { "    -> Going to: #{parent.name} state" }
               state = find_conflict_state(parent.name, states)
               reqs, activated = resolve_for_conflict(reqs, activated, state)
               states << state unless state.possibles.empty?
@@ -304,9 +331,11 @@ module Bundler
             else
               @errors[current.name] = [nil, current]
               parent = handle_conflict(current, states)
+              debug { "    -> Going to: #{parent.name} state" }
               state = find_conflict_state(parent.name, states)
               reqs, activated = resolve_for_conflict(reqs, activated, state)
               states << state unless state.possibles.empty?
+              clear_search_cache
               next
             end
           end
