@@ -233,6 +233,7 @@ module Bundler
       states = []
 
       until reqs.empty?
+
         indicate_progress
 
         debug { print "\e[2J\e[f" ; "==== Iterating ====\n\n" }
@@ -278,12 +279,23 @@ module Bundler
           else 
             debug { "    * [FAIL] Already activated" }
             @errors[existing.name] = [existing, current]
+            
+            # Return a requirment/gem which has other possibles states
+            # Given the set of constraints placed by requrired_by
             parent = handle_conflict(current, states)
 
             if parent && parent.name != 'bundler'
               debug { "    -> Going to: #{parent.name} state" }
+              
+              # Find the state where the conlict has occured 
               state = find_conflict_state(parent.name, states)
+              
+              # Resolve the conflicts by rewinding the state
+              # when the conflicted gem was activated
+              
               reqs, activated = resolve_for_conflict(reqs, activated, state)
+
+              # Keep the state around if it still has other possiblities 
               states << state unless state.possibles.empty?
               clear_search_cache
             else
@@ -326,11 +338,24 @@ module Bundler
               # This is not a top-level Gemfile requirement
             else
               @errors[current.name] = [nil, current]
+              
+              # Return a requirment/gem which has other possibles states
+              # Given the set of constraints placed by requrired_by
               parent = handle_conflict(current, states)
               debug { "    -> Going to: #{parent.name} state" }
+
+
+              # Find the state where the conlict has occured 
               state = find_conflict_state(parent.name, states)
+              
+              # Resolve the conflicts by rewinding the state
+              # when the conflicted gem was activated
+              
               reqs, activated = resolve_for_conflict(reqs, activated, state)
+
+              # Keep the state around if it still has other possiblities 
               states << state unless state.possibles.empty?
+
               clear_search_cache
               next
             end
