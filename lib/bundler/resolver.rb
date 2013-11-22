@@ -290,9 +290,11 @@ module Bundler
               # Find the state where the conlict has occured 
               state = find_conflict_state(parent.name, states)
               
+              # Raise version_conflict if the dependent gem is not found
+              raise version_conflict if state.possibles.empty?
+
               # Resolve the conflicts by rewinding the state
               # when the conflicted gem was activated
-              
               reqs, activated = resolve_for_conflict(reqs, activated, state)
 
               # Keep the state around if it still has other possiblities 
@@ -347,6 +349,9 @@ module Bundler
 
               # Find the state where the conlict has occured 
               state = find_conflict_state(parent.name, states)
+              
+              # Raise version_conflict if the dependent gem is not found
+              raise version_conflict if state.possibles.empty?
               
               # Resolve the conflicts by rewinding the state
               # when the conflicted gem was activated

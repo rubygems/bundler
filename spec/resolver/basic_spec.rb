@@ -30,11 +30,21 @@ describe "Resolving" do
     should_resolve_as %w(a-1.4.0 b-0.3.5 c-3.2 d-0.9.8 my_app-1.1.0)
   end
 
-  it "should resolve a index with conflict on child" do
+  it "resolves a index with conflict on child" do
     @index = index_with_conflict_on_child
     dep "chef_app"
     should_resolve_as %w(berkshelf-2.0.7 chef-10.26 chef_app-1.0.0 json-1.7.7)
   end
+
+  it "raises an exception if a child dependency is not resolved" do
+    @index = a_unresovable_child_index
+    dep "chef_app_error"
+    expect { 
+      resolve
+    }.to raise_error(Bundler::VersionConflict, /Could not find gem/)
+  end
+
+
 
   it "should throw error in case of circular dependencies" do
     @index = a_circular_index

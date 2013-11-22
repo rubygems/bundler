@@ -197,6 +197,24 @@ module Spec
       end
     end
 
+    def a_unresovable_child_index
+      build_index do
+        gem "json", %w(1.8.0)
+
+        gem("chef", '10.26') do
+          dep "json", [">= 1.4.4", "<= 1.7.7"]
+        end
+
+        gem("berkshelf", "2.0.7") do
+          dep "json", ">= 1.7.7"
+        end
+
+        gem("chef_app_error", '1.0.0') do
+          dep "berkshelf", "~> 2.0"
+          dep "chef", "~> 10.26"
+        end
+      end
+    end
 
     def a_circular_index
       build_index do
