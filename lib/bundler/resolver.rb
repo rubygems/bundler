@@ -322,7 +322,7 @@ module Bundler
     def handle_conflict(current, states)
       parent = current
       state = states.detect { |i| i.name == parent.name }
-      until state.possibles.any? || parent.required_by.empty?
+      until (state && state.possibles.any?) || parent.required_by.empty?
         parent = parent.required_by.last
         state = states.detect { |i| i.name == parent.name }
       end
