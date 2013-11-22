@@ -253,9 +253,8 @@ module Bundler
             next
           else 
             @errors[existing.name] = [existing, current]
-            parent = current.required_by.last
+            parent = handle_conflict(current, states)
 
-            parent ||= existing.required_by.last if existing.respond_to?(:required_by)
 
             if parent && parent.name != 'bundler'
               required_by = existing.respond_to?(:required_by) && existing.required_by.last
@@ -321,7 +320,7 @@ module Bundler
     end
 
     def handle_conflict(current, states)
-      parent = current.required_by.last
+      parent = current
       state = states.detect { |i| i.name == parent.name }
       until state.possibles.any? || parent.required_by.empty?
         parent = parent.required_by.last

@@ -178,6 +178,26 @@ module Spec
       end
     end
 
+    def index_with_conflict_on_child
+      build_index do
+        gem "json", %w(1.6.5 1.7.7 1.8.0)
+
+        gem("chef", '10.26') do
+          dep "json", [">= 1.4.4", "<= 1.7.7"]
+        end
+
+        gem("berkshelf", "2.0.7") do
+          dep "json", ">= 1.7.7"
+        end
+
+        gem("chef_app", '1.0.0') do
+          dep "berkshelf", "~> 2.0"
+          dep "chef", "~> 10.26"
+        end
+      end
+    end
+
+
     def a_circular_index
       build_index do
         gem "rack", "1.0.1"
