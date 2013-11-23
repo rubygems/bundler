@@ -92,7 +92,7 @@ begin
       rubyopt = ENV["RUBYOPT"]
       # When editing this list, also edit .travis.yml!
       branches = %w(master 2.1)
-      releases = %w(v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.28 v2.0.12 v2.1.9)
+      releases = %w(v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.28 v2.0.12 v2.1.11)
       (branches + releases).each do |rg|
         desc "Run specs with Rubygems #{rg}"
         RSpec::Core::RakeTask.new(rg) do |t|
