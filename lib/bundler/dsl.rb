@@ -15,7 +15,6 @@ module Bundler
     attr_accessor :dependencies
 
     def initialize
-      @rubygems_source = Source::Rubygems.new
       @source          = nil
       @sources         = []
       @dependencies    = []
@@ -23,6 +22,10 @@ module Bundler
       @platforms       = []
       @env             = nil
       @ruby_version    = nil
+    end
+
+    def rubygems_source
+      @rubygems_source ||= Source::Rubygems.new
     end
 
     def eval_gemfile(gemfile, contents = nil)
@@ -115,10 +118,10 @@ module Bundler
         Bundler.ui.warn "The source :#{source} is deprecated because HTTP " \
           "requests are insecure.\nPlease change your source to 'https://" \
           "rubygems.org' if possible, or 'http://rubygems.org' if not."
-        @rubygems_source.add_remote "http://rubygems.org"
+        rubygems_source.add_remote "http://rubygems.org"
         return
       when String
-        @rubygems_source.add_remote source
+        rubygems_source.add_remote source
         return
       else
         @source = source
@@ -155,7 +158,7 @@ module Bundler
     end
 
     def to_definition(lockfile, unlock)
-      @sources << @rubygems_source unless @sources.include?(@rubygems_source)
+      @sources << rubygems_source unless @sources.include?(rubygems_source)
       Definition.new(lockfile, @dependencies, @sources, unlock, @ruby_version)
     end
 
