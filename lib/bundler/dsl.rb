@@ -1,4 +1,5 @@
 require 'bundler/dependency'
+require 'bundler/ruby_dsl'
 
 module Bundler
   class Dsl
