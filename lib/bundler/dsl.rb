@@ -33,8 +33,8 @@ module Bundler
       contents ||= Bundler.read_file(gemfile.to_s)
       instance_eval(contents, gemfile.to_s, 1)
     rescue SyntaxError => e
-      bt = e.message.split("\n")[1..-1]
-      raise GemfileError, ["Gemfile syntax error:", *bt].join("\n")
+      syntax_msg = e.message.gsub("#{gemfile.to_s}:", 'on line ')
+      raise GemfileError, "Gemfile syntax error #{syntax_msg}"
     rescue ScriptError, RegexpError, NameError, ArgumentError => e
       e.backtrace[0] = "#{e.backtrace[0]}: #{e.message} (#{e.class})"
       Bundler.ui.warn e.backtrace.join("\n       ")
