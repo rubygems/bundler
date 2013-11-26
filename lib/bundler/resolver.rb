@@ -444,7 +444,7 @@ module Bundler
       # A requirement that is required by itself is actually in the Gemfile, and does
       # not "depend on" itself
       if requirement.required_by.first && requirement.required_by.first.name != requirement.name
-        print_dependency_tree(m, required_by)
+        dependency_tree(m, required_by)
         m << "#{clean_req(requirement)}\n"
       else
         m << "    #{clean_req(requirement)}\n"
@@ -452,7 +452,7 @@ module Bundler
       m << "\n"
     end
 
-    def print_dependency_tree(m, requirements)
+    def dependency_tree(m, requirements)
       reqs = requirements
       reqs.each_with_index do |i, j|
         m << ("  " * j)
