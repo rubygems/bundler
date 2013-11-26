@@ -405,18 +405,28 @@ module Bundler
     end
 
     # For a given conflicted requirement, print out what exactly went wrong
-    def gem_message(requirement)
+    def gem_message(requirement, required_by=[])
       m = ""
 
       # A requirement that is required by itself is actually in the Gemfile, and does
       # not "depend on" itself
       if requirement.required_by.first && requirement.required_by.first.name != requirement.name
-        m << "    #{clean_req(requirement.required_by.first)} depends on\n"
-        m << "      #{clean_req(requirement)}\n"
+        print_dependency_tree(m, required_by)
+        m << "#{clean_req(requirement)}\n"
       else
         m << "    #{clean_req(requirement)}\n"
       end
       m << "\n"
+    end
+
+    def print_dependency_tree(m, requirements)
+      reqs = requirements
+      reqs.each_with_index do |i, j|
+        m << ("  " * j)
+        m << "#{clean_req(i)}"
+        m << " depends on\n"
+      end
+      m << ("  " * reqs.size)
     end
 
     def error_message
@@ -428,7 +438,8 @@ module Bundler
           o << %{Bundler could not find compatible versions for gem "#{origin.name}":\n}
           o << "  In Gemfile:\n"
 
-          o << gem_message(requirement)
+          required_by = requirement.required_by
+          o << gem_message(requirement, required_by)
 
           # If the origin is "bundler", the conflict is us
           if origin.name == "bundler"
@@ -439,7 +450,8 @@ module Bundler
             o << "  In snapshot (Gemfile.lock):\n"
           end
 
-          o << gem_message(origin)
+          required_by = origin.required_by[0..-2]
+          o << gem_message(origin, required_by)
 
           # If the bundle wants a newer bundler than the running bundler, explain
           if origin.name == "bundler" && other_bundler_required
@@ -462,7 +474,9 @@ module Bundler
             o << "    #{clean_req(locked)}\n\n"
 
             o << "  In Gemfile:\n"
-            o << gem_message(requirement)
+
+            required_by = requirement.required_by
+            o << gem_message(requirement, required_by)
             o << "Running `bundle update` will rebuild your snapshot from scratch, using only\n"
             o << "the gems in your Gemfile, which may resolve the conflict.\n"
 
