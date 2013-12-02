@@ -1,5 +1,4 @@
 require 'bundler'
-require 'bundler/cli/init'
 require 'bundler/similarity_detector'
 require 'bundler/vendored_thor'
 
