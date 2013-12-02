@@ -109,7 +109,11 @@ module Bundler
       debug_message        = nil
       Bundler.rubygems.with_build_args [settings] do
         install_message, post_install_message, debug_message = spec.source.install(spec)
-        Bundler.ui.info install_message
+        if install_message.include? 'Installing'
+          Bundler.ui.confirm install_message
+        else
+          Bundler.ui.info install_message
+        end
         Bundler.ui.debug debug_message if debug_message
         Bundler.ui.debug "#{worker}:  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
       end
