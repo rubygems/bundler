@@ -309,8 +309,6 @@ module Bundler
           end
         else
           matching_versions = search(current)
-          state = State.new(reqs.dup, activated.dup, current, matching_versions)
-          states << state
 
           # If we found no versions that match the current requirement
           if matching_versions.empty?
@@ -348,6 +346,8 @@ module Bundler
             end
           end
 
+          state = State.new(reqs.dup, activated.dup, current, matching_versions)
+          states << state
           requirement = state.possibles.pop
           activate_gem(reqs, activated, requirement, current)
         end
