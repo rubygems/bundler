@@ -101,11 +101,7 @@ module Bundler
         # If it doesn't, everything will work fine, but the user
         # will get the $stderr messages as well.
         def git_null(command)
-          if !Bundler::WINDOWS && File.exist?("/dev/null")
-            git("#{command} 2>/dev/null", false)
-          else
-            git(command, false)
-          end
+          git("#{command} 2>#{Bundler::NULL}", false)
         end
 
         def git(command, check_errors=true)
