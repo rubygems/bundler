@@ -3,6 +3,7 @@
 Features:
 
   - add support for IRB alternatives such as Pry and Ripl (@joallard, @postmodern)
+  - highlight installing logs (#2722, @yaotti)
 
 ## 1.5.0.rc.1 (2013-11-09)
 
