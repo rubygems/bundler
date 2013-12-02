@@ -1,13 +1,18 @@
 module Bundler
-  class Init 
-    def self.define_init!(opts)
+  class CLI::Init 
+    attr_reader :options
+    def initialize(options)
+      @options = options
+    end
+
+    def run
       if File.exist?("Gemfile")
         Bundler.ui.error "Gemfile already exists at #{Dir.pwd}/Gemfile"
         exit 1
       end
 
-      if opts[:gemspec]
-        gemspec = File.expand_path(opts[:gemspec])
+      if options[:gemspec]
+        gemspec = File.expand_path(options[:gemspec])
         unless File.exist?(gemspec)
           Bundler.ui.error "Gem specification #{gemspec} doesn't exist"
           exit 1
