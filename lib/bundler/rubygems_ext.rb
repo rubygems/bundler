@@ -99,7 +99,7 @@ module Gem
     # TODO: Do not rely on /dev/null.
     # see https://github.com/bundler/bundler/blob/98f79a1d/lib/bundler/source/git/git_proxy.rb#L97-101
     def null_command(command)
-      out = (!Bundler::WINDOWS && File.exist?("/dev/null")) ? `#{command} 2>/dev/null` : ''
+      out = Bundler::SharedHelpers.dev_null_available? ? `#{command} 2>/dev/null` : ''
       out.empty? ? `#{command}` : out
     end
 
