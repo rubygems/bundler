@@ -101,4 +101,18 @@ describe "bundle show" do
       expect(out).to include("foo (1.0 #{sha[0..6]})")
     end
   end
+
+  context "in a fresh gem in a blank git repo" do
+    before :each do
+      build_git "foo", :path => lib_path("foo")
+      in_app_root_custom lib_path("foo")
+      File.open('Gemfile', 'w') {|f| f.puts "gemspec" }
+      sys_exec 'rm -rf .git && git init'
+    end
+
+    it "does not output git errors" do
+      bundle :show
+      expect(err).to be_empty
+    end
+  end
 end
