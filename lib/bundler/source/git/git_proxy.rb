@@ -100,8 +100,7 @@ module Bundler
         # If it doesn't, everything will work fine, but the user
         # will get the $stderr messages as well.
         def git_null(command)
-          command += " 2>/dev/null" if SharedHelpers.dev_null_available?
-          git(command, false)
+          git("#{command} 2>#{Bundler::NULL}", false)
         end
 
         def git(command, check_errors=true)

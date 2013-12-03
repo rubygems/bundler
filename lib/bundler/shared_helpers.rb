@@ -29,10 +29,6 @@ module Bundler
       Pathname.new("#{default_gemfile}.lock")
     end
 
-    def dev_null_available?
-      !Bundler::WINDOWS && File.exist?("/dev/null")
-    end
-
     def in_bundle?
       find_gemfile
     end
