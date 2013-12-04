@@ -23,6 +23,11 @@ module Bundler
       @patchlevel     = patchlevel
     end
 
+    def self.from_string(ruby_version)
+      version, patchlevel = ruby_version.split('-p')
+      new(version, patchlevel, nil, nil)
+    end
+
     def to_s
       output = "ruby #{version}"
       output << "p#{patchlevel}" if patchlevel

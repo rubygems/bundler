@@ -7,5 +7,9 @@ module Bundler
       raise GemfileError, "ruby_version must match the :engine_version for MRI" if options[:engine] == "ruby" && options[:engine_version] && ruby_version != options[:engine_version]
       @ruby_version = RubyVersion.new(ruby_version, options[:patchlevel], options[:engine], options[:engine_version])
     end
+
+    def enforce_ruby_version_file!
+      @ruby_version = RubyVersion.from_string(File.read('./.ruby_version'))
+    end
   end
 end
