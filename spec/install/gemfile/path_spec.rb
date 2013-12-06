@@ -54,8 +54,8 @@ describe "bundle install with explicit source paths" do
     install_gemfile <<-G
       gem 'foo', :path => "~#{username}/#{relative_path}"
     G
-    # TODO improve expect condition
-    expect(out).to match("The path `~#{username}/#{relative_path}` is incorrect: user #{username} doesn't exist")
+    expect(out).to match("The path `~#{username}/#{relative_path}` could not be used due to an error")
+    expect(out).to match("user #{username} doesn't exist")
   end
 
   it "expands paths relative to Bundler.root" do

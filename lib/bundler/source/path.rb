@@ -97,16 +97,15 @@ module Bundler
         name
       end
 
-    private
+      private
 
       def expand(somepath)
-        #TODO improve catch errors
-        begin
-          somepath.expand_path(Bundler.root)
-        rescue ArgumentError => e
-          raise PathError, "The path `#{somepath}` is incorrect: #{e.message}."
-        end
+        somepath.expand_path(Bundler.root)
+      rescue ArgumentError => e
+        Bundler.ui.debug(e)
+        raise PathError, "The path `#{somepath}` could not be used due to an error: #{e.message}."
       end
+
       def app_cache_path
         @app_cache_path ||= Bundler.app_cache.join(app_cache_dirname)
       end
