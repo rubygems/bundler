@@ -188,7 +188,9 @@ module Bundler
 
     def download_gem(spec, uri, path)
       uri = Bundler::Source.mirror_for(uri)
-      Gem::RemoteFetcher.fetcher.download(spec, uri, path)
+      proxy, dns = Gem.configuration[:http_proxy], Resolv::DNS.new
+      fetcher = Gem::RemoteFetcher.new(proxy, dns)
+      fetcher.download(spec, uri, path)
     end
 
     def security_policies
