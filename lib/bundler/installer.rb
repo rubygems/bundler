@@ -195,7 +195,7 @@ module Bundler
 
   private
     def can_install_parallely?
-      if Bundler.current_ruby.mri? || Bundler.rubygems.provides?(">= 2.1.0.rc")
+      if Bundler.current_ruby.mri? || Bundler.rubygems.provides?(">= 2.0.7")
         true
       else
         Bundler.ui.warn "Rubygems #{Gem::VERSION} is not threadsafe, so your "\
