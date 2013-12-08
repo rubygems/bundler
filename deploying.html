@@ -102,75 +102,79 @@
             <h2 id='deploying-your-application'>
               Deploying Your Application
             </h2>
-            <p>
-              When you run <code>bundle install</code>, bundler will (by default), install your gems
-              to your system repository of gems. This means that they will show up in <code>gem
-              list</code>. Additionally, if you are developing a number of applications, you will not
-              need to download and install gems in common for each application. This is nice for
-              development, but somewhat problematic for deployment.
-            </p>
-            <p>
-              In a deployment scenario, the Unix user you deploy with may not have access to install
-              gems to a system location. Even if the user does (or you use <code>sudo</code>), the
-              user that boots the application may not have access to them. For instance, Passenger
-              runs its Ruby subprocesses with the user <code>nobody</code>, a somewhat restricted
-              user. The tradeoffs in a deployment environment lean more heavily in favor of isolation
-              (even at the cost of a somewhat slower deploy-time <code>bundle install</code> when some
-              third-party dependencies have changed).
-            </p>
-            <p>
-              As a result, bundler comes with a <code>--deployment</code> flag that encapsulates the
-              best practices for using bundler in a deployment environment. These practices are based
-              on significant feedback we have received during the development of bundler, as well as a
-              number of bug reports that mostly reflected a misunderstanding of how to best configure
-              bundler for deployment. The <code>--deployment</code> flags adds the following defaults:
-            </p>
-            <ul>
-              <li>
-                Instead of installing gems to the system location, bundler will install gems to
-                <code>vendor/bundle</code> inside your application. Bundler will transparently remember
-                this location when you invoke it inside your application (with
-                <code>Bundler.setup</code> and <code>Bundler.require</code>).
-              </li>
-              <li>
-                Bundler will not use gems already installed to your system, even if they exist.
-              </li>
-              <li>
-                If you have run <code>bundle pack</code>, checked in the <code>vendor/cache</code>
-                directory, and do not have any git gems, Bundler will not contact the internet while
-                installing your bundle.
-              </li>
-              <li>
-                Bundler will require a <code>Gemfile.lock</code> snapshot, and fail if you did not
-                provide one.
-              </li>
-              <li>
-                Bundler will not transparently update your <code>Gemfile.lock</code> if it is out of
-                date with your <code>Gemfile</code>
-              </li>
-            </ul>
-            <p>
-              If you use Capistrano, you should symlink <code>vendor/bundle</code> to
-              <code>shared/vendor_bundle</code> so that bundler will share your installed gems between
-              deployments (making things zippy if you didn't make any changes), but still give you the
-              benefits of isolation from other applications.
-            </p>
-            <p>
-              By defaulting the bundle directory to <code>vendor/bundle</code>, and installing your
-              bundle as part of your deployment process, you can be sure that the same Unix user that
-              checked out your application also installed the third-party code your application needs.
-              This means that if Passenger (or Unicorn) can see your application, it can also see its
-              dependencies.
-            </p>
-            <p>
-              The <code>--deployment</code> flag requires an up-to-date <code>Gemfile.lock</code> to
-              ensure that the testing you have done (in development and staging) actually reflects the
-              code you put into production. You can run <code>bundle check</code> before deploying
-              your application to make sure that your <code>Gemfile.lock</code> is up-to-date. Note
-              that it will always be up-to-date if you have run <code>bundle install</code>,
-              successfully booted your application (or run your tests) since the last time you changed
-              your <code>Gemfile</code>.
-            </p>
+            <div class='bullet'>
+              <div class='description'>
+                When you run <code>bundle install</code>, bundler will (by default), install your gems
+                to your system repository of gems. This means that they will show up in <code>gem
+                list</code>. Additionally, if you are developing a number of applications, you will not
+                need to download and install gems in common for each application. This is nice for
+                development, but somewhat problematic for deployment.
+              </div>
+              <p class='description'>
+                In a deployment scenario, the Unix user you deploy with may not have access to install
+                gems to a system location. Even if the user does (or you use <code>sudo</code>), the
+                user that boots the application may not have access to them. For instance, Passenger
+                runs its Ruby subprocesses with the user <code>nobody</code>, a somewhat restricted
+                user. The tradeoffs in a deployment environment lean more heavily in favor of isolation
+                (even at the cost of a somewhat slower deploy-time <code>bundle install</code> when some
+                third-party dependencies have changed).
+              </p>
+              <p class='description'>
+                As a result, bundler comes with a <code>--deployment</code> flag that encapsulates the
+                best practices for using bundler in a deployment environment. These practices are based
+                on significant feedback we have received during the development of bundler, as well as a
+                number of bug reports that mostly reflected a misunderstanding of how to best configure
+                bundler for deployment. The <code>--deployment</code> flags adds the following defaults:
+              </p>
+              <div class='description'>
+                <ul>
+                  <li>
+                    Instead of installing gems to the system location, bundler will install gems to
+                    <code>vendor/bundle</code> inside your application. Bundler will transparently remember
+                    this location when you invoke it inside your application (with
+                    <code>Bundler.setup</code> and <code>Bundler.require</code>).
+                  </li>
+                  <li>
+                    Bundler will not use gems already installed to your system, even if they exist.
+                  </li>
+                  <li>
+                    If you have run <code>bundle pack</code>, checked in the <code>vendor/cache</code>
+                    directory, and do not have any git gems, Bundler will not contact the internet while
+                    installing your bundle.
+                  </li>
+                  <li>
+                    Bundler will require a <code>Gemfile.lock</code> snapshot, and fail if you did not
+                    provide one.
+                  </li>
+                  <li>
+                    Bundler will not transparently update your <code>Gemfile.lock</code> if it is out of
+                    date with your <code>Gemfile</code>
+                  </li>
+                </ul>
+              </div>
+              <p class='description'>
+                If you use Capistrano, you should symlink <code>vendor/bundle</code> to
+                <code>shared/vendor_bundle</code> so that bundler will share your installed gems between
+                deployments (making things zippy if you didn't make any changes), but still give you the
+                benefits of isolation from other applications.
+              </p>
+              <p class='description'>
+                By defaulting the bundle directory to <code>vendor/bundle</code>, and installing your
+                bundle as part of your deployment process, you can be sure that the same Unix user that
+                checked out your application also installed the third-party code your application needs.
+                This means that if Passenger (or Unicorn) can see your application, it can also see its
+                dependencies.
+              </p>
+              <p class='description'>
+                The <code>--deployment</code> flag requires an up-to-date <code>Gemfile.lock</code> to
+                ensure that the testing you have done (in development and staging) actually reflects the
+                code you put into production. You can run <code>bundle check</code> before deploying
+                your application to make sure that your <code>Gemfile.lock</code> is up-to-date. Note
+                that it will always be up-to-date if you have run <code>bundle install</code>,
+                successfully booted your application (or run your tests) since the last time you changed
+                your <code>Gemfile</code>.
+              </p>
+            </div>
           </div>
         </div>
         <div id='sidebar'>

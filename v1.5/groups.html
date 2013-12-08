@@ -61,55 +61,61 @@
             <h2 id='grouping-your-dependencies'>
               Grouping Your Dependencies
             </h2>
-            <p>
-              You'll sometimes have groups of gems that only make sense in particular environments.
-              For instance, you might develop your app (at an early stage) using SQLite, but deploy it
-              using <code>mysql2</code> or <code>pg</code>. In this example, you might not have MySQL
-              or Postgres installed on your development machine, and want bundler to skip it.
-            </p>
-            <p>
-              To do this, you can group your dependencies:
-            </p>
-            <pre class="sunburst">source <span class="String"><span class="String">&#39;</span>http://rubygems.org<span class="String">&#39;</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">&#39;</span>rails<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>3.2.2<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rack-cache<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>require</span> =&gt; <span class="String"><span class="String">&#39;</span>rack/cache<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>~&gt; 1.4.2<span class="String">&#39;</span></span>&#x000A;&#x000A;group <span class="Constant"><span class="Constant">:</span>development</span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">&#39;</span>sqlite3<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;&#x000A;group <span class="Constant"><span class="Constant">:</span>production</span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">&#39;</span>pg<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;</pre>
-            <p>
-              Now, in development, you can instruct bundler to skip the <code>production</code> group:
-            </p>
-            <pre class='sunburst'>$ bundle install --without production&#x000A;</pre>
-            <p>
-              Bundler will remember that you installed the gems using <code>--without
-              production</code>. For curious readers, bundler stores the flag in
-              <code>APP_ROOT/.bundle/config</code>. You can see all of the settings that bundler saved
-              there by running <code>bundle config</code>, which will also print out global settings
-              (stored in <code>~/.bundle/config</code>), and settings set via environment variables.
-              For more information on configuring bundler, please see
-              <a href="/v1.5/bundle_config.html">bundle config</a>.
-            </p>
-            <p>
-              If you run <code>bundle install</code> later, without any flag, bundler will remember
-              that you last called <code>bundle install --without production</code>, and use that flag
-              again. When you <code>require 'bundler/setup'</code>, bundler will ignore gems in these
-              groups.
-            </p>
-            <p>
-              You can also specify which groups to automatically require through the parameters to
-              <code>Bundler.require</code>. The <code>:default</code> group includes all gems not
-              listed under any group. If you call <code>Bundler.require(:default, :development)</code>,
-              bundler will <code>require</code> all the gems in the <code>:default</code> group, as
-              well as the gems in the <code>:development</code> group.
-            </p>
-            <p>
-              By default, a Rails generated app calls <code>Bundler.require(:default,
-              Rails.env)</code> in your <code>application.rb</code>, which links the groups in your
-              <code>Gemfile</code> to the Rails environment. If you use other groups (not linked to a
-              Rails environment), you can add them to the call to <code>Bundler.require</code>, if you
-              want them to be automatically required.
-            </p>
-            <p>
-              Remember that you can always leave groups of gems out of <code>Bundler.require</code>,
-              and then require them manually using Ruby's <code>require</code> at the appropriate
-              place in your app. You might do this because requiring a certain gem takes some time,
-              and you don't need it every time you boot your application.
-            </p>
+            <div class='bullet'>
+              <div class='description'>
+                You'll sometimes have groups of gems that only make sense in particular environments.
+                For instance, you might develop your app (at an early stage) using SQLite, but deploy it
+                using <code>mysql2</code> or <code>pg</code>. In this example, you might not have MySQL
+                or Postgres installed on your development machine, and want bundler to skip it.
+                To do this, you can group your dependencies:
+              </div>
+              <pre class="sunburst">source <span class="String"><span class="String">&#39;</span>http://rubygems.org<span class="String">&#39;</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">&#39;</span>rails<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>3.2.2<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rack-cache<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>require</span> =&gt; <span class="String"><span class="String">&#39;</span>rack/cache<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>~&gt; 1.4.2<span class="String">&#39;</span></span>&#x000A;&#x000A;group <span class="Constant"><span class="Constant">:</span>development</span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">&#39;</span>sqlite3<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;&#x000A;group <span class="Constant"><span class="Constant">:</span>production</span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">&#39;</span>pg<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;</pre>
+            </div>
+            <div class='bullet'>
+              <div class='description'>
+                Now, in development, you can instruct bundler to skip the <code>production</code> group:
+              </div>
+              <pre class='sunburst'>$ bundle install --without production&#x000A;</pre>
+            </div>
+            <div class='bullet'>
+              <div class='description'>
+                Bundler will remember that you installed the gems using <code>--without
+                production</code>. For curious readers, bundler stores the flag in
+                <code>APP_ROOT/.bundle/config</code>. You can see all of the settings that bundler saved
+                there by running <code>bundle config</code>, which will also print out global settings
+                (stored in <code>~/.bundle/config</code>), and settings set via environment variables.
+                For more information on configuring bundler, please see:
+                <a href="/v1.5/bundle_config.html">bundle config</a>
+              </div>
+            </div>
+            <div class='bullet'>
+              <p class='description'>
+                If you run <code>bundle install</code> later, without any flags, bundler will remember
+                that you last called <code>bundle install --without production</code>, and use that flag
+                again. When you <code>require 'bundler/setup'</code>, bundler will ignore gems in these
+                groups.
+              </p>
+              <p class='description'>
+                You can also specify which groups to automatically require through the parameters to
+                <code>Bundler.require</code>. The <code>:default</code> group includes all gems not
+                listed under any group. If you call <code>Bundler.require(:default, :development)</code>,
+                bundler will <code>require</code> all the gems in the <code>:default</code> group, as
+                well as the gems in the <code>:development</code> group.
+              </p>
+              <p class='description'>
+                By default, a Rails generated app calls <code>Bundler.require(:default,
+                Rails.env)</code> in your <code>application.rb</code>, which links the groups in your
+                <code>Gemfile</code> to the Rails environment. If you use other groups (not linked to a
+                Rails environment), you can add them to the call to <code>Bundler.require</code>, if you
+                want them to be automatically required.
+              </p>
+              <p class='description'>
+                Remember that you can always leave groups of gems out of <code>Bundler.require</code>,
+                and then require them manually using Ruby's <code>require</code> at the appropriate
+                place in your app. You might do this because requiring a certain gem takes some time,
+                and you don't need it every time you boot your application.
+              </p>
+            </div>
           </div>
         </div>
         <div id='sidebar'>

@@ -45,47 +45,59 @@
             <h2 id='setting-up-your-application-to-use-bundler'>
               Setting Up Your Application to Use Bundler
             </h2>
-            <p>
-              Bundler makes sure that Ruby can find all of the gems in the <code>Gemfile</code>
-              (and all of their dependencies). If your app is a Rails 3 app, your default application
-              already has the code necessary to invoke bundler. If it is a Rails 2.3 app, please see
-              <a href="./rails23.html">Setting up Bundler in Rails 2.3</a>.
-            </p>
-            <p>
-              For another kind of application (such as a Sinatra application), you will need to set up
-              bundler before trying to require any gems. At the top of the first file that your
-              application loads (for Sinatra, the file that calls <code>require 'sinatra'</code>), put
-              the following code:
-            </p>
-            <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>rubygems<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>bundler/setup<span class="String">&#39;</span></span>&#x000A;</pre>
-            <p>
-              This will automatically discover your <code>Gemfile</code>, and make all of the gems in
-              your <code>Gemfile</code> available to Ruby (in technical terms, it puts the gems "on the
-              load path"). You can think of it as an adding some extra powers to <code>require
-              'rubygems'</code>.
-            </p>
-            <p>
-              Now that your code is available to Ruby, you can require the gems that you need. For
-              instance, you can <code>require 'sinatra'</code>. If you have a lot of dependencies, you
-              might want to say "require all of the gems in my <code>Gemfile</code>". To do this, put
-              the following code immediately following <code>require 'bundler/setup'</code>:
-            </p>
-            <pre class="sunburst"><span class="Support">Bundler</span>.<span class="Entity">require</span>(<span class="Constant"><span class="Constant">:</span>default</span>)&#x000A;</pre>
-            For our example Gemfile, this line is exactly equivalent to:
-            <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>rails<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>rack-cache<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>&#x000A;</pre>
-            <p>
-              Astute readers will notice that the correct way to require the <code>rack-cache</code>
-              gem is <code>require 'rack/cache'</code>, not <code>require 'rack-cache'</code>. To tell
-              bundler to use <code>require 'rack/cache'</code>, update your Gemfile:
-            </p>
-            <pre class="sunburst">source <span class="String"><span class="String">&#39;</span>http://rubygems.org<span class="String">&#39;</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">&#39;</span>rails<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>3.0.0.rc<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rack-cache<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>require</span> =&gt; <span class="String"><span class="String">&#39;</span>rack/cache<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>~&gt; 1.4.2<span class="String">&#39;</span></span>&#x000A;</pre>
-            <p>
-              For such a small <code>Gemfile</code>, we'd advise you to skip
-              <code>Bundler.require</code> and just require the gems by hand (especially given the
-              need to put in a <code>:require</code> directive in the <code>Gemfile</code>). For much
-              larger <code>Gemfile</code>s, using <code>Bundler.require</code> allows you to skip
-              repeating a large stack of requirements.
-            </p>
+            <div class='bullet'>
+              <div class='description'>
+                Bundler makes sure that Ruby can find all of the gems in the <code>Gemfile</code>
+                (and all of their dependencies). If your app is a Rails 3 app, your default application
+                already has the code necessary to invoke bundler. If it is a Rails 2.3 app, please see:
+                <a href="./rails23.html">Setting up Bundler in Rails 2.3</a>
+              </div>
+            </div>
+            <div class='bullet'>
+              <div class='description'>
+                For another kind of application (such as a Sinatra application), you will need to set up
+                bundler before trying to require any gems. At the top of the first file that your
+                application loads (for Sinatra, the file that calls <code>require 'sinatra'</code>), put
+                the following code:
+              </div>
+              <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>rubygems<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>bundler/setup<span class="String">&#39;</span></span>&#x000A;</pre>
+            </div>
+            <div class='bullet'>
+              <div class='description'>
+                This will automatically discover your <code>Gemfile</code>, and make all of the gems in
+                your <code>Gemfile</code> available to Ruby (in technical terms, it puts the gems "on the
+                load path"). You can think of it as an adding some extra powers to <code>require
+                'rubygems'</code>.
+              </div>
+            </div>
+            <div class='bullet'>
+              <div class='description'>
+                Now that your code is available to Ruby, you can require the gems that you need. For
+                instance, you can <code>require 'sinatra'</code>. If you have a lot of dependencies, you
+                might want to say "require all of the gems in my <code>Gemfile</code>". To do this, put
+                the following code immediately following <code>require 'bundler/setup'</code>:
+              </div>
+              <pre class="sunburst"><span class="Support">Bundler</span>.<span class="Entity">require</span>(<span class="Constant"><span class="Constant">:</span>default</span>)&#x000A;</pre>
+              For our example Gemfile, this line is exactly equivalent to:
+              <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>rails<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>rack-cache<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>&#x000A;</pre>
+            </div>
+            <div class='bullet'>
+              <div class='description'>
+                Astute readers will notice that the correct way to require the <code>rack-cache</code>
+                gem is <code>require 'rack/cache'</code>, not <code>require 'rack-cache'</code>. To tell
+                bundler to use <code>require 'rack/cache'</code>, update your Gemfile:
+              </div>
+              <pre class="sunburst">source <span class="String"><span class="String">&#39;</span>http://rubygems.org<span class="String">&#39;</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">&#39;</span>rails<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>3.0.0.rc<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rack-cache<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>require</span> =&gt; <span class="String"><span class="String">&#39;</span>rack/cache<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>~&gt; 1.4.2<span class="String">&#39;</span></span>&#x000A;</pre>
+            </div>
+            <div class='bullet'>
+              <div class='description'>
+                For such a small <code>Gemfile</code>, we'd advise you to skip
+                <code>Bundler.require</code> and just require the gems by hand (especially given the
+                need to put in a <code>:require</code> directive in the <code>Gemfile</code>). For much
+                larger <code>Gemfile</code>s, using <code>Bundler.require</code> allows you to skip
+                repeating a large stack of requirements.
+              </div>
+            </div>
           </div>
         </div>
         <div id='sidebar'>

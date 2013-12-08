@@ -15,114 +15,122 @@
       </div>
       <div id='container'>
         <div id='contents'>
-          <h2>
-            Updating Gems
-            <h3 id='updating-a-dependency'>
-              Updating a Dependency
-            </h3>
-            <p>
-              Of course, at some point, you might want to update the version of a particular
-              dependency your application relies on. For instance, you might want to update
-              <code>rails</code> to <code>3.0.0</code> final. Importantly, just because you're
-              updating one dependency, it doesn't mean you want to re-resolve all of your dependencies
-              and use the latest version of everything. In our example, you only have three
-              dependencies, but even in this case, updating everything can cause complications.
-            </p>
-            <p>
-              To illustrate, the <code>rails 3.0.0.rc</code> gem depends on <code>actionpack
-              3.0.0.rc</code> gem, which depends on <code>rack ~> 1.2.1</code> (which means <code>>=
-              1.2.1</code> and <code>< 1.3.0</code>). The <code>rack-cache</code> gem depends on
-              <code>rack >= 0.4</code>. Let's assume that the <code>rails 3.0.0</code> final gem also
-              depends on <code>rack ~> 1.2.1</code>, and that since the release of <code>rails
-              3.0.0</code>, the Rack team released <code>rack 1.2.2</code>.
-            </p>
-            <p>
-              If we naïvely update all of our gems in order to update Rails, we'll get <code>rack
-              1.2.2</code>, which satisfies the requirements of both <code>rails 3.0.0</code> and
-              <code>rack-cache</code>. However, we didn't specifically ask to update
-              <code>rack-cache</code>, which may not be compatible with <code>rack 1.2.2</code> (for
-              whatever reason). And while an update from <code>rack 1.2.1</code> to <code>rack
-              1.2.2</code> probably won't break anything, similar scenarios can happen that involve
-              much larger jumps. (see [1] below for a larger discussion)
-            </p>
-            <p>
-              In order to avoid this problem, when you update a gem, bundler will not update a
-              dependency of that gem if another gem still depends on it. In this example, since
-              <code>rack-cache</code> still depends on <code>rack</code>, bundler will not update the
-              <code>rack</code> gem. This ensures that updating <code>rails</code> doesn't
-              inadvertently break <code>rack-cache</code>. Since <code>rails 3.0.0</code>'s dependency
-              <code>actionpack 3.0.0</code> remains compatible with <code>rack 1.2.1</code>, bundler
-              leaves it alone, and <code>rack-cache</code> continues to work even in the face of an
-              incompatibility with <code>rack 1.2.2</code>.
-            </p>
-            <p>
-              Since you originally declared a dependency on <code>rails 3.0.0.rc</code>, if you want
-              to update to <code>rails 3.0.0</code>, simply update your <code>Gemfile</code> to
-              <code>gem 'rails', '3.0.0'</code> and run:
-            </p>
-            <pre class='sunburst'>$ bundle install&#x000A;</pre>
-            <p>
-              As described above, the <code>bundle install</code> command always does a conservative
-              update, refusing to update gems (or their dependencies) that you have not explicitly
-              changed in the <code>Gemfile</code>. This means that if you do not modify
-              <code>rack-cache</code> in your <code>Gemfile</code>, bundler will treat it **and its
-              dependencies** (<code>rack</code>) as a single, unmodifiable unit. If <code>rails
-              3.0.0</code> was incompatible with <code>rack-cache</code>, bundler will report a
-              conflict between your snapshotted dependencies (<code>Gemfile.lock</code>) and your
-              updated <code>Gemfile</code>.
-            </p>
-            <p>
-              If you update your <code>Gemfile</code>, and your system already has all of the needed
-              dependencies, bundler will transparently update the <code>Gemfile.lock</code> when you
-              boot your application. For instance, if you add <code>mysql</code> to your
-              <code>Gemfile</code>, and have already installed it in your system, you can boot your
-              application without running <code>bundle install</code>, and bundler will persist the
-              "last known good" configuration to the <code>Gemfile.lock</code> snapshot.
-            </p>
-            <p>
-              This can come in handy when adding or updating gems with minimal dependencies (database
-              drivers, <code>wirble</code>, <code>ruby-debug</code>). It will probably fail if you
-              update gems with significant dependencies (<code>rails</code>), or that a lot of gems
-              depend on (<code>rack</code>). If a transparent update fails, your application will fail
-              to boot, and bundler will print out an error instructing you to run <code>bundle
-              install</code>.
-            </p>
-            <h3 id='updating-a-gem-without-modifying-the-gemfile'>
-              Updating a Gem Without Modifying the Gemfile
-            </h3>
-            <p>
-              Sometimes, you want to update a dependency without modifying the Gemfile. For example,
-              you might want to update to the latest version of <code>rack-cache</code>. Because you
-              did not declare a specific version of <code>rack-cache</code> in the
-              <code>Gemfile</code>, you might want to periodically get the latest version of
-              <code>rack-cache</code>. To do this, you want to use the <code>bundle update</code>
-              command:
-            </p>
-            <pre class='sunburst'>$ bundle update rack-cache&#x000A;</pre>
-            <p>
-              This command will update <code>rack-cache</code> and its dependencies to the latest
-              version allowed by the <code>Gemfile</code> (in this case, the latest version
-              available). It will not modify any other dependencies.
-            </p>
-            <p>
-              It will, however, update dependencies of other gems if necessary. For instance, if the
-              latest version of <code>rack-cache</code> specifies a dependency on <code>rack >=
-              1.2.2</code>, bundler will update <code>rack</code> to <code>1.2.2</code> even though
-              you have not asked bundler to update <code>rack</code>. If bundler needs to update a
-              gem that another gem depends on, it will let you know after the update has completed.
-            </p>
-            <p>
-              If you want to update every gem in the Gemfile to the latest possible versions, run:
-            </p>
-            <pre class='sunburst'>$ bundle update&#x000A;</pre>
-            <p>
-              This will resolve dependencies from scratch, ignoring the <code>Gemfile.lock</code>. If
-              you do this, keep <code>git reset --hard</code> and your test suite in your back pocket.
-              Resolving all dependencies from scratch can have surprising results, especially if a
-              number of the third-party packages you depend on have released new versions since you
-              last did a full update.
-            </p>
-          </h2>
+          <h2>Updating Gems</h2>
+          <div class='contents'>
+            <div class='bullet'>
+              <div class='description'>
+                <h3 id='updating-a-dependency'>
+                  Updating a Dependency
+                </h3>
+              </div>
+              <p class='description'>
+                Of course, at some point, you might want to update the version of a particular
+                dependency your application relies on. For instance, you might want to update
+                <code>rails</code> to <code>3.0.0</code> final. Importantly, just because you're
+                updating one dependency, it doesn't mean you want to re-resolve all of your dependencies
+                and use the latest version of everything. In our example, you only have three
+                dependencies, but even in this case, updating everything can cause complications.
+              </p>
+              <p class='description'>
+                To illustrate, the <code>rails 3.0.0.rc</code> gem depends on <code>actionpack
+                3.0.0.rc</code> gem, which depends on <code>rack ~> 1.2.1</code> (which means <code>>=
+                1.2.1</code> and <code>< 1.3.0</code>). The <code>rack-cache</code> gem depends on
+                <code>rack >= 0.4</code>. Let's assume that the <code>rails 3.0.0</code> final gem also
+                depends on <code>rack ~> 1.2.1</code>, and that since the release of <code>rails
+                3.0.0</code>, the Rack team released <code>rack 1.2.2</code>.
+              </p>
+              <p class='description'>
+                If we naïvely update all of our gems in order to update Rails, we'll get <code>rack
+                1.2.2</code>, which satisfies the requirements of both <code>rails 3.0.0</code> and
+                <code>rack-cache</code>. However, we didn't specifically ask to update
+                <code>rack-cache</code>, which may not be compatible with <code>rack 1.2.2</code> (for
+                whatever reason). And while an update from <code>rack 1.2.1</code> to <code>rack
+                1.2.2</code> probably won't break anything, similar scenarios can happen that involve
+                much larger jumps. (see [1] below for a larger discussion)
+              </p>
+              <p class='description'>
+                In order to avoid this problem, when you update a gem, bundler will not update a
+                dependency of that gem if another gem still depends on it. In this example, since
+                <code>rack-cache</code> still depends on <code>rack</code>, bundler will not update the
+                <code>rack</code> gem. This ensures that updating <code>rails</code> doesn't
+                inadvertently break <code>rack-cache</code>. Since <code>rails 3.0.0</code>'s dependency
+                <code>actionpack 3.0.0</code> remains compatible with <code>rack 1.2.1</code>, bundler
+                leaves it alone, and <code>rack-cache</code> continues to work even in the face of an
+                incompatibility with <code>rack 1.2.2</code>.
+              </p>
+              <p class='description'>
+                Since you originally declared a dependency on <code>rails 3.0.0.rc</code>, if you want
+                to update to <code>rails 3.0.0</code>, simply update your <code>Gemfile</code> to
+                <code>gem 'rails', '3.0.0'</code> and run:
+              </p>
+              <pre class='sunburst'>$ bundle install&#x000A;</pre>
+              <p class='description'>
+                As described above, the <code>bundle install</code> command always does a conservative
+                update, refusing to update gems (or their dependencies) that you have not explicitly
+                changed in the <code>Gemfile</code>. This means that if you do not modify
+                <code>rack-cache</code> in your <code>Gemfile</code>, bundler will treat it **and its
+                dependencies** (<code>rack</code>) as a single, unmodifiable unit. If <code>rails
+                3.0.0</code> was incompatible with <code>rack-cache</code>, bundler will report a
+                conflict between your snapshotted dependencies (<code>Gemfile.lock</code>) and your
+                updated <code>Gemfile</code>.
+              </p>
+              <p class='description'>
+                If you update your <code>Gemfile</code>, and your system already has all of the needed
+                dependencies, bundler will transparently update the <code>Gemfile.lock</code> when you
+                boot your application. For instance, if you add <code>mysql</code> to your
+                <code>Gemfile</code>, and have already installed it in your system, you can boot your
+                application without running <code>bundle install</code>, and bundler will persist the
+                "last known good" configuration to the <code>Gemfile.lock</code> snapshot.
+              </p>
+              <p class='description'>
+                This can come in handy when adding or updating gems with minimal dependencies (database
+                drivers, <code>wirble</code>, <code>ruby-debug</code>). It will probably fail if you
+                update gems with significant dependencies (<code>rails</code>), or that a lot of gems
+                depend on (<code>rack</code>). If a transparent update fails, your application will fail
+                to boot, and bundler will print out an error instructing you to run <code>bundle
+                install</code>.
+              </p>
+            </div>
+            <div class='bullet'>
+              <div class='description'>
+                <h3 id='updating-a-gem-without-modifying-the-gemfile'>
+                  Updating a Gem Without Modifying the Gemfile
+                </h3>
+                <p>
+                  Sometimes, you want to update a dependency without modifying the Gemfile. For example,
+                  you might want to update to the latest version of <code>rack-cache</code>. Because you
+                  did not declare a specific version of <code>rack-cache</code> in the
+                  <code>Gemfile</code>, you might want to periodically get the latest version of
+                  <code>rack-cache</code>. To do this, you want to use the <code>bundle update</code>
+                  command:
+                </p>
+                <pre class='sunburst'>$ bundle update rack-cache&#x000A;</pre>
+                <p>
+                  This command will update <code>rack-cache</code> and its dependencies to the latest
+                  version allowed by the <code>Gemfile</code> (in this case, the latest version
+                  available). It will not modify any other dependencies.
+                </p>
+                <p>
+                  It will, however, update dependencies of other gems if necessary. For instance, if the
+                  latest version of <code>rack-cache</code> specifies a dependency on <code>rack >=
+                  1.2.2</code>, bundler will update <code>rack</code> to <code>1.2.2</code> even though
+                  you have not asked bundler to update <code>rack</code>. If bundler needs to update a
+                  gem that another gem depends on, it will let you know after the update has completed.
+                </p>
+                <p>
+                  If you want to update every gem in the Gemfile to the latest possible versions, run:
+                </p>
+                <pre class='sunburst'>$ bundle update&#x000A;</pre>
+                <p>
+                  This will resolve dependencies from scratch, ignoring the <code>Gemfile.lock</code>. If
+                  you do this, keep <code>git reset --hard</code> and your test suite in your back pocket.
+                  Resolving all dependencies from scratch can have surprising results, especially if a
+                  number of the third-party packages you depend on have released new versions since you
+                  last did a full update.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
         <div id='sidebar'>
           <h2>Would you like to</h2>
