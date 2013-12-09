@@ -208,20 +208,18 @@ module Bundler
     def check_rubygems_cache_dir
       require 'digest'
       cached_gems = Dir["#{Bundler.rubygems.gem_dir}/cache/*.gem"]
-      sizes = cached_gems.reduce({}) do |h, f|
+      sizes = cached_gems.each_with_object({}) do |f, h|
         size = File.size(f)
         h[size] ||= []
         h[size] << f
-        h
       end
 
       gems_with_same_size = sizes.select { |i, ns| ns.size > 1}
 
-      sha1_gems = gems_with_same_size.values.flatten.reduce({}) do |h, f|
+      sha1_gems = gems_with_same_size.values.flatten.each_with_object({}) do |f, h|
         sha1 = Digest::SHA1.hexdigest(File.read(f))
         h[sha1] ||= []
         h[sha1] << f
-        h
       end
 
       corrupted_gems = sha1_gems.select { |i, ns| ns.size > 1 }
