@@ -1,6 +1,7 @@
 require 'erb'
 require 'rubygems/dependency_installer'
 require 'bundler/parallel_workers'
+require 'logger'
 
 module Bundler
   class Installer < Environment
@@ -107,11 +108,14 @@ module Bundler
       install_message      = nil
       post_install_message = nil
       debug_message        = nil
+      logger = Logger.new("#{Bundler.app_config_path}/install.log")
       Bundler.rubygems.with_build_args [settings] do
         install_message, post_install_message, debug_message = spec.source.install(spec)
         Bundler.ui.info install_message
         Bundler.ui.debug debug_message if debug_message
-        Bundler.ui.debug "#{worker}:  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
+        spec_info = "#{worker}:  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
+        Bundler.ui.debug spec_info
+        logger.info spec_info
       end
 
       if Bundler.settings[:bin] && standalone
@@ -137,6 +141,7 @@ module Bundler
         msg << " #{spec.name} -v '#{spec.version}'` succeeds before bundling."
       end
       Bundler.ui.debug e.backtrace.join("\n")
+      logger.error(msg)
       raise Bundler::InstallError, msg
     end
 
