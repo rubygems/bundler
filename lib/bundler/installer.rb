@@ -208,24 +208,15 @@ module Bundler
     def check_rubygems_cache_dir
       require 'digest'
       cached_gems = Dir["#{Bundler.rubygems.gem_dir}/cache/*.gem"]
-      sizes = cached_gems.each_with_object({}) do |f, h|
-        size = File.size(f)
-        h[size] ||= []
-        h[size] << f
-      end
 
+      sizes = cached_gems.group_by { |f| File.size(f) }
       gems_with_same_size = sizes.select { |i, ns| ns.size > 1}
 
-      sha1_gems = gems_with_same_size.values.flatten.each_with_object({}) do |f, h|
-        sha1 = Digest::SHA1.hexdigest(File.read(f))
-        h[sha1] ||= []
-        h[sha1] << f
-      end
-
+      sha1_gems = gems_with_same_size.values.flatten.group_by { |f| Digest::SHA1.hexdigest(File.read(f)) }
       corrupted_gems = sha1_gems.select { |i, ns| ns.size > 1 }
 
       unless corrupted_gems.empty?
-        Bundler.ui.warn "Following gems are corrupted #{corrupted_gems.values}"\
+        Bundler.ui.warn "Following gems are corrupted #{corrupted_gems.values.flatten}\n"\
           "Please report this issue with the .bundle/install.log logfile"
       end
     end
