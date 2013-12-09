@@ -205,6 +205,33 @@ module Bundler
       end
     end
 
+    def check_rubygems_cache_dir
+      require 'digest'
+      cached_gems = Dir["#{Bundler.rubygems.gem_dir}/cache/*.gem"]
+      sizes = cached_gems.reduce({}) do |h, f|
+        size = File.size(f)
+        h[size] ||= []
+        h[size] << f
+        h
+      end
+
+      gems_with_same_size = sizes.select { |i, ns| ns.size > 1}
+
+      sha1_gems = gems_with_same_size.values.flatten.reduce({}) do |h, f|
+        sha1 = Digest::SHA1.hexdigest(File.read(f))
+        h[sha1] ||= []
+        h[sha1] << f
+        h
+      end
+
+      corrupted_gems = sha1_gems.select { |i, ns| ns.size > 1 }
+
+      unless corrupted_gems.empty?
+        Bundler.ui.warn "Following gems are corrupted #{corrupted_gems.values}"\
+          "Please report this issue with the .bundle/install.log logfile"
+      end
+    end
+
     def generate_standalone_bundler_executable_stubs(spec)
       # double-assignment to avoid warnings about variables that will be used by ERB
       bin_path = Bundler.bin_path
@@ -307,6 +334,7 @@ module Bundler
       message
     ensure
       worker_pool && worker_pool.stop
+      check_rubygems_cache_dir
     end
   end
 end
