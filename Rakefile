@@ -234,7 +234,7 @@ namespace :rubygems do
         system("git checkout master && git pull --rebase origin master")
       end
     else
-      system("git clone git://github.com/rubygems/rubygems.git #{local_rubygems_dir}")
+      system("git clone --depth 1 --branch master git://github.com/rubygems/rubygems.git #{local_rubygems_dir}")
     end
 
     bundler_certs_dir = "lib/bundler/ssl_certs/"
