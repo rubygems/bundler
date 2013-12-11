@@ -131,6 +131,91 @@ module Spec
       end
     end
 
+    def a_complex_conflict_index
+      build_index do
+        gem("a", %w(1.0.2 1.1.4 1.2.0 1.4.0)) do
+          dep "d", ">= 0" 
+        end
+
+        gem("d", %w(1.3.0 1.4.1)) do
+          dep "x", ">= 0"
+        end
+
+        gem "d", "0.9.8"
+
+        gem("b", '0.3.4') do
+          dep "a", ">= 1.5.0"
+        end
+
+        gem("b", '0.3.5') do
+          dep "a", ">= 1.2"
+        end
+
+        gem("b", '0.3.3') do
+          dep "a", "> 1.0"
+        end
+
+        versions '3.2 3.3' do |version|
+          gem("c", version) do
+            dep "a", "~> 1.0"
+          end
+        end
+
+        gem("my_app", '1.3.0') do
+          dep "c", ">= 4.0"
+          dep "b", ">= 0"
+        end
+
+        gem("my_app", '1.2.0') do
+          dep "c", "~> 3.3.0"
+          dep "b", "0.3.4"
+        end
+
+        gem("my_app", '1.1.0') do
+          dep "c", "~> 3.2.0"
+          dep "b", "0.3.5"
+        end
+      end
+    end
+
+    def index_with_conflict_on_child
+      build_index do
+        gem "json", %w(1.6.5 1.7.7 1.8.0)
+
+        gem("chef", '10.26') do
+          dep "json", [">= 1.4.4", "<= 1.7.7"]
+        end
+
+        gem("berkshelf", "2.0.7") do
+          dep "json", ">= 1.7.7"
+        end
+
+        gem("chef_app", '1.0.0') do
+          dep "berkshelf", "~> 2.0"
+          dep "chef", "~> 10.26"
+        end
+      end
+    end
+
+    def a_unresovable_child_index
+      build_index do
+        gem "json", %w(1.8.0)
+
+        gem("chef", '10.26') do
+          dep "json", [">= 1.4.4", "<= 1.7.7"]
+        end
+
+        gem("berkshelf", "2.0.7") do
+          dep "json", ">= 1.7.7"
+        end
+
+        gem("chef_app_error", '1.0.0') do
+          dep "berkshelf", "~> 2.0"
+          dep "chef", "~> 10.26"
+        end
+      end
+    end
+
     def a_circular_index
       build_index do
         gem "rack", "1.0.1"
