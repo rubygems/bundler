@@ -453,13 +453,12 @@ module Bundler
     end
 
     def dependency_tree(m, requirements)
-      reqs = requirements
-      reqs.each_with_index do |i, j|
-        m << ("  " * j)
+      requirements.each_with_index do |i, j|
+        m << "    " << ("  " * j)
         m << "#{clean_req(i)}"
         m << " depends on\n"
       end
-      m << ("  " * reqs.size)
+      m << "    " << ("  " * requirements.size)
     end
 
     def error_message
