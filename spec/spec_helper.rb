@@ -1,10 +1,10 @@
 $:.unshift File.expand_path('..', __FILE__)
 $:.unshift File.expand_path('../../lib', __FILE__)
+require 'rspec'
 require 'bundler/psyched_yaml'
 require 'fileutils'
 require 'rubygems'
 require 'bundler'
-require 'rspec'
 require 'uri'
 require 'digest/sha1'
 
