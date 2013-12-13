@@ -3,6 +3,7 @@ $:.unshift File.expand_path("../lib", __FILE__)
 require 'rubygems'
 require 'shellwords'
 require 'benchmark'
+require 'bundler/ssl_certs/certificate_manager'
 
 def safe_task(&block)
   yield
@@ -227,27 +228,6 @@ task :default => :spec
 namespace :rubygems do
   desc "Update bundler certificates to match those from rubygems"
   task :update_certs => "spec:rubygems:clone_rubygems_master" do
-    local_rubygems_dir = "tmp/rubygems"
-
-    bundler_certs_dir = "lib/bundler/ssl_certs/"
-    rubygems_certs_dir = File.join(local_rubygems_dir, "lib/rubygems/ssl_certs/")
-
-    bundler_certs = Dir.entries(bundler_certs_dir).select { |file| file.end_with? "pem" }.sort
-    rubygems_certs = Dir.entries(rubygems_certs_dir).select { |file| file.end_with? "pem" }.sort
-    same_filenames = (bundler_certs == rubygems_certs)
-    same_certificates = false
-
-    if same_filenames
-      same_certificates = bundler_certs.all? do |filename|
-        FileUtils.compare_file(File.join(bundler_certs_dir, filename), File.join(rubygems_certs_dir, filename))
-      end
-    end
-
-    if same_filenames && same_certificates
-      puts "SSL Certificates are up to date!"
-    else
-      FileUtils.rm Dir.glob(File.join(bundler_certs_dir, "*.pem"))
-      FileUtils.cp_r Dir.glob(File.join(rubygems_certs_dir, "*.pem")), bundler_certs_dir
-    end
+    CertificateManager.new.update!
   end
 end
