@@ -226,16 +226,8 @@ task :default => :spec
 
 namespace :rubygems do
   desc "Update bundler certificates to match those from rubygems"
-  task :update_certs do
+  task :update_certs => "spec:rubygems:clone_rubygems_master" do
     local_rubygems_dir = "tmp/rubygems"
-
-    if File.directory?(local_rubygems_dir)
-      Dir.chdir(local_rubygems_dir) do
-        system("git checkout master && git pull --rebase origin master")
-      end
-    else
-      system("git clone --depth 1 --branch master git://github.com/rubygems/rubygems.git #{local_rubygems_dir}")
-    end
 
     bundler_certs_dir = "lib/bundler/ssl_certs/"
     rubygems_certs_dir = File.join(local_rubygems_dir, "lib/rubygems/ssl_certs/")
