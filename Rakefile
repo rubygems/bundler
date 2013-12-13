@@ -1,6 +1,5 @@
 # -*- encoding: utf-8 -*-
 $:.unshift File.expand_path("../lib", __FILE__)
-require 'bundler/gem_tasks'
 require 'rubygems'
 require 'shellwords'
 require 'benchmark'
@@ -219,6 +218,7 @@ rescue LoadError
   end
 end
 
+require 'bundler/gem_tasks'
 task :build => ["man:clean", "man:build"]
 task :release => ["man:clean", "man:build"]
 
