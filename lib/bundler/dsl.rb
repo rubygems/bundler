@@ -108,17 +108,8 @@ module Bundler
     end
 
     def source(source)
-      case source
-      when :gemcutter, :rubygems, :rubyforge then
-        Bundler.ui.warn "The source :#{source} is deprecated because HTTP " \
-          "requests are insecure.\nPlease change your source to 'https://" \
-          "rubygems.org' if possible, or 'http://rubygems.org' if not."
-        @sources.add_rubygems_remote("http://rubygems.org")
-      when String
-        @sources.add_rubygems_remote(source)
-      else
-        raise GemfileError, "Unknown source '#{source}'"
-      end
+      source = normalize_source(source)
+      @sources.add_rubygems_remote(source)
     end
 
     def git_source(name, &block)
@@ -276,5 +267,18 @@ module Bundler
       opts["group"]     = groups
     end
 
+    def normalize_source(source)
+      case source
+      when :gemcutter, :rubygems, :rubyforge
+        Bundler.ui.warn "The source :#{source} is deprecated because HTTP " \
+          "requests are insecure.\nPlease change your source to 'https://" \
+          "rubygems.org' if possible, or 'http://rubygems.org' if not."
+        "http://rubygems.org"
+      when String
+        source
+      else
+        raise GemfileError, "Unknown source '#{source}'"
+      end
+    end
   end
 end
