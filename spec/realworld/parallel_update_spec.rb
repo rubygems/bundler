@@ -26,6 +26,6 @@ describe "updating dependencies parallely", :realworld => true do
     expect(out).to match(/faker/)
 
     bundle "config jobs"
-    expect(out).to match(/: "4"/)
+    expect(out).to match(/: "2"/)
   end
 end
