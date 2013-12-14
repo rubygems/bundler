@@ -16,8 +16,8 @@ describe "updating dependencies parallely", :realworld => true do
       gem 'faker', '~> 1.1.2'
     G
 
-    bundle :update, :jobs => 4, :env => {"DEBUG" => "1"}
-    (0..3).each {|i| expect(out).to include("#{i}: ") }
+    bundle :update, :jobs => 2, :env => {"DEBUG" => "1"}
+    (0..1).each {|i| expect(out).to include("#{i}: ") }
 
     bundle "show activesupport"
     expect(out).to match(/activesupport-3\.2\.13/)
