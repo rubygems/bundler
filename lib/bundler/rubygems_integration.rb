@@ -177,7 +177,7 @@ module Bundler
       end
     end
 
-    def build(spec)
+    def build(spec, skip_validation = false)
       require 'rubygems/builder'
       Gem::Builder.new(spec).build
     end
@@ -442,6 +442,11 @@ module Bundler
       def find_name(name)
         Gem::Specification.find_all_by_name name
       end
+
+      def build(spec, skip_validation = false)
+        require 'rubygems/builder'
+        Gem::Builder.new(spec).build(skip_validation)
+      end
     end
 
     # Rubygems 1.8.0 to 1.8.4
@@ -506,9 +511,9 @@ module Bundler
         return p
       end
 
-      def build(spec)
+      def build(spec, skip_validation = false)
         require 'rubygems/package'
-        Gem::Package.build(spec)
+        Gem::Package.build(spec, skip_validation)
       end
 
     end
