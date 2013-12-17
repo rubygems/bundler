@@ -212,10 +212,12 @@ module Bundler
       sizes = cached_gems.group_by { |f| File.size(f) }
       gems_with_same_size = sizes.select { |i, ns| ns.size > 1}
 
-      sha1_gems = gems_with_same_size.values.flatten.group_by { |f| Digest::SHA1.hexdigest(File.read(f)) }
+      sha1_gems = gems_with_same_size.values.flatten.group_by do |f|
+        Digest::SHA1.hexdigest(File.read(f))
+      end
       corrupted_gems = sha1_gems.select { |i, ns| ns.size > 1 }
 
-      unless corrupted_gems.empty?
+      if corrupted_gems.any?
         Bundler.ui.warn "Following gems are corrupted #{corrupted_gems.values.flatten}\n"\
           "Please report this issue with the .bundle/install.log logfile"
       end
