@@ -234,7 +234,9 @@ module Spec
         end
 
         # Capistrano did this (at least until version 2.5.10)
-        build_gem "double_deps" do |s|
+        # Rubygems 2.2 doesn't allow the specifying of a dependency twice
+        # See https://github.com/rubygems/rubygems/commit/03dbac93a3396a80db258d9bc63500333c25bd2f
+        build_gem "double_deps", "1.0", :skip_validation => true do |s|
           s.add_dependency "net-ssh", ">= 1.0.0"
           s.add_dependency "net-ssh"
         end
@@ -605,7 +607,7 @@ module Spec
             @spec.authors = ["that guy"]
           end
 
-          Bundler.rubygems.build(@spec)
+          Bundler.rubygems.build(@spec, opts[:skip_validation])
           if opts[:to_system]
             `gem install --ignore-dependencies #{@spec.full_name}.gem`
           else
