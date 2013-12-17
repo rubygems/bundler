@@ -320,10 +320,10 @@ module Bundler
           end
         end
       end
+      check_rubygems_cache_dir
       message
     ensure
       worker_pool && worker_pool.stop
-      check_rubygems_cache_dir
     end
   end
 end
