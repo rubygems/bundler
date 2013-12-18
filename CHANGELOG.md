@@ -1,3 +1,15 @@
+## 1.5.0.rc.2 (2013-12-18)
+
+"Features":
+
+  - Support threaded installation on Rubygems 2.0.7+
+  - Debug installation logs in .bundle/install.log
+
+"Bugfixes":
+
+  - Try to catch gem installation race conditions
+  
+
 ## 1.5.0.rc.1 (2013-11-09)
 
 Features:
