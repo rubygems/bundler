@@ -200,12 +200,13 @@ module Bundler
 
   private
     def can_install_parallely?
-      if Bundler.current_ruby.mri? || Bundler.rubygems.provides?(">= 2.0.7")
+      min_rubygems = "2.0.7"
+      if Bundler.current_ruby.mri? || Bundler.rubygems.provides?(">= #{min_rubygems}")
         true
       else
         Bundler.ui.warn "Rubygems #{Gem::VERSION} is not threadsafe, so your "\
-          "gems must be installed one at a time. Upgrade to Rubygems 2.1 or "\
-          "higher to enable parallel gem installation."
+          "gems must be installed one at a time. Upgrade to Rubygems " \
+          "#{min_rubygems} or higher to enable parallel gem installation."
         false
       end
     end
