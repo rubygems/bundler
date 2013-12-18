@@ -1,7 +1,6 @@
 require 'erb'
 require 'rubygems/dependency_installer'
 require 'bundler/parallel_workers'
-require 'logger'
 
 module Bundler
   class Installer < Environment
@@ -108,7 +107,6 @@ module Bundler
       install_message      = nil
       post_install_message = nil
       debug_message        = nil
-      logger = Logger.new("#{Bundler.app_config_path}/install.log")
       Bundler.rubygems.with_build_args [settings] do
         install_message, post_install_message, debug_message = spec.source.install(spec)
         Bundler.ui.info install_message
@@ -141,7 +139,7 @@ module Bundler
         msg << " #{spec.name} -v '#{spec.version}'` succeeds before bundling."
       end
       Bundler.ui.debug e.backtrace.join("\n")
-      logger.error(msg)
+      logger.error("#{e.class}: #{e.message}\n#{e.backtrace.join('  \n')}")
       raise Bundler::InstallError, msg
     end
 
@@ -199,6 +197,15 @@ module Bundler
     end
 
   private
+
+    def logger
+      # Create a debug installation log limited to 1MB
+      @logger ||= begin
+        require 'logger'
+        Logger.new("#{Bundler.app_config_path}/install.log", 1, 1048576)
+      end
+    end
+
     def can_install_parallely?
       min_rubygems = "2.0.7"
       if Bundler.current_ruby.mri? || Bundler.rubygems.provides?(">= #{min_rubygems}")
