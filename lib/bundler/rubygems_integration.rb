@@ -185,10 +185,8 @@ module Bundler
     end
 
     def download_gem(spec, uri, path)
-      require 'resolv'
       uri = Bundler::Source.mirror_for(uri)
-      proxy, dns = configuration[:http_proxy], Resolv::DNS.new
-      fetcher = Gem::RemoteFetcher.new(proxy, dns)
+      fetcher = Gem::RemoteFetcher.new(configuration[:http_proxy])
       fetcher.download(spec, uri, path)
     end
 
@@ -503,6 +501,14 @@ module Bundler
         end
 
         hash
+      end
+
+      def download_gem(spec, uri, path)
+        require 'resolv'
+        uri = Bundler::Source.mirror_for(uri)
+        proxy, dns = configuration[:http_proxy], Resolv::DNS.new
+        fetcher = Gem::RemoteFetcher.new(proxy, dns)
+        fetcher.download(spec, uri, path)
       end
 
       def gem_from_path(path, policy = nil)
