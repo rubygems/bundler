@@ -3,7 +3,6 @@ require 'open-uri'
 
 class Thor
   module Actions
-
     # Copies the file from the relative source to the relative destination. If
     # the destination is not given it's assumed to be equal to the source.
     #
@@ -79,14 +78,14 @@ class Thor
       config = args.last.is_a?(Hash) ? args.pop : {}
       destination = args.first
 
-      source = File.expand_path(find_in_source_paths(source.to_s)) unless source =~ /^https?\:\/\//
-      render = open(source) {|input| input.binmode.read }
+      source = File.expand_path(find_in_source_paths(source.to_s)) unless source =~ %r{^https?\://}
+      render = open(source) { |input| input.binmode.read }
 
       destination ||= if block_given?
-        block.arity == 1 ? block.call(render) : block.call
-      else
-        File.basename(source)
-      end
+                        block.arity == 1 ? block.call(render) : block.call
+                      else
+                        File.basename(source)
+                      end
 
       create_file destination, render, config
     end
@@ -108,7 +107,7 @@ class Thor
     #
     def template(source, *args, &block)
       config = args.last.is_a?(Hash) ? args.pop : {}
-      destination = args.first || source.sub(/\.tt$/, '')
+      destination = args.first || source.sub(/#{TEMPLATE_EXTNAME}$/, '')
 
       source  = File.expand_path(find_in_source_paths(source.to_s))
       context = instance_eval('binding')
@@ -131,7 +130,7 @@ class Thor
     #
     #   chmod "script/server", 0755
     #
-    def chmod(path, mode, config={})
+    def chmod(path, mode, config = {})
       return unless behavior == :invoke
       path = File.expand_path(path, destination_root)
       say_status :chmod, relative_to_original_destination_root(path), config.fetch(:verbose, true)
@@ -284,14 +283,14 @@ class Thor
     #   remove_file 'README'
     #   remove_file 'app/controllers/application_controller.rb'
     #
-    def remove_file(path, config={})
+    def remove_file(path, config = {})
       return unless behavior == :invoke
       path  = File.expand_path(path, destination_root)
 
       say_status :remove, relative_to_original_destination_root(path), config.fetch(:verbose, true)
-      ::FileUtils.rm_rf(path) if !options[:pretend] && File.exists?(path)
+      ::FileUtils.rm_rf(path) if !options[:pretend] && File.exist?(path)
     end
-    alias :remove_dir :remove_file
+    alias_method :remove_dir, :remove_file
 
   attr_accessor :output_buffer
   private :output_buffer, :output_buffer=
