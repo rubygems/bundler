@@ -32,7 +32,7 @@ describe "real world edgecases", :realworld => true do
       gem 'activerecord', '~> 3.0'
       gem 'builder', '~> 2.1.2'
     G
-    expect(out).to include("activemodel (3.0.5)")
+    expect(out).to include("activemodel 3.0.5")
   end
 
   # https://github.com/bundler/bundler/issues/1500

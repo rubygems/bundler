@@ -151,3 +151,24 @@ describe "bundle update when a gem depends on a newer version of bundler" do
     expect(out).to match(/perhaps you need to update bundler/i)
   end
 end
+
+describe "bundle update" do
+  it "shows the previous version of the gem when updated from rubygems source" do
+    build_repo2
+
+    install_gemfile <<-G
+      source "file://#{gem_repo2}"
+      gem "activesupport"
+    G
+
+    bundle "update"
+    expect(out).to include("Using activesupport 2.3.5")
+
+    update_repo2 do
+      build_gem "activesupport", "3.0"
+    end
+
+    bundle "update"
+    expect(out).to include("Installing activesupport 3.0 (was 2.3.5)")
+  end
+end

@@ -3,9 +3,9 @@ require 'rubygems/user_interaction'
 require 'rubygems/spec_fetcher'
 
 module Bundler
-  module Source
+  class Source
     # TODO: Refactor this class
-    class Rubygems
+    class Rubygems < Source
       API_REQUEST_LIMIT = 100 # threshold for switching back to the modern index instead of fetching every spec
 
       attr_reader :remotes, :caches
@@ -68,9 +68,7 @@ module Bundler
       end
 
       def install(spec)
-        if installed_specs[spec].any?
-          return ["Using #{spec.name} (#{spec.version})", nil]
-        end
+        return ["Using #{version_message(spec)}", nil] if installed_specs[spec].any?
 
         # Download the gem to get the spec, because some specs that are returned
         # by rubygems.org are broken and wrong.
@@ -80,7 +78,6 @@ module Bundler
           spec.__swap__(s)
         end
 
-        install_message = "Installing #{spec.name} (#{spec.version})"
         path = cached_gem(spec)
         if Bundler.requires_sudo?
           install_path = Bundler.tmp
@@ -114,7 +111,7 @@ module Bundler
         end
         installed_spec.loaded_from = "#{Bundler.rubygems.gem_dir}/specifications/#{spec.full_name}.gemspec"
         spec.loaded_from = "#{Bundler.rubygems.gem_dir}/specifications/#{spec.full_name}.gemspec"
-        [install_message, spec.post_install_message]
+        ["Installing #{version_message(spec)}", spec.post_install_message]
       end
 
       def cache(spec)

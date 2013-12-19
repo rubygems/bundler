@@ -1,6 +1,7 @@
 module Bundler
-  module Source
+  class Source
     class Git < Path
+
       class GitNotInstalledError < GitError
         def initialize
           msg =  "You need to install git to be able to use gems from git repositories. "
