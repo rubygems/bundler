@@ -19,7 +19,7 @@ module Bundler
 
         if options["path"]
           @path = Pathname.new(options["path"])
-          @path = @path.expand_path(Bundler.root) unless @path.relative?
+          @path = expand(@path) unless @path.relative?
         end
 
         @name    = options["name"]
@@ -59,14 +59,14 @@ module Bundler
 
       def eql?(o)
         o.instance_of?(Path) &&
-        path.expand_path(Bundler.root) == o.path.expand_path(Bundler.root) &&
+        expand(path) == expand(o.path) &&
         version == o.version
       end
 
       alias == eql?
 
       def name
-        File.basename(path.expand_path(Bundler.root).to_s)
+        File.basename(expand(path).to_s)
       end
 
       def install(spec)
@@ -76,7 +76,7 @@ module Bundler
 
       def cache(spec)
         return unless Bundler.settings[:cache_all]
-        return if @original_path.expand_path(Bundler.root).to_s.index(Bundler.root.to_s) == 0
+        return if expand(@original_path).to_s.index(Bundler.root.to_s) == 0
         FileUtils.rm_rf(app_cache_path)
         FileUtils.cp_r("#{@original_path}/.", app_cache_path)
         FileUtils.touch(app_cache_path.join(".bundlecache"))
@@ -97,7 +97,14 @@ module Bundler
         name
       end
 
-    private
+      private
+
+      def expand(somepath)
+        somepath.expand_path(Bundler.root)
+      rescue ArgumentError => e
+        Bundler.ui.debug(e)
+        raise PathError, "The path `#{somepath}` could not be used due to an error: #{e.message}."
+      end
 
       def app_cache_path
         @app_cache_path ||= Bundler.app_cache.join(app_cache_dirname)
@@ -109,7 +116,7 @@ module Bundler
 
       def load_spec_files
         index = Index.new
-        expanded_path = path.expand_path(Bundler.root)
+        expanded_path = expand(path)
 
         if File.directory?(expanded_path)
           Dir["#{expanded_path}/#{@glob}"].each do |file|
