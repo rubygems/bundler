@@ -230,9 +230,11 @@ module Bundler
         Digest::SHA1.hexdigest(File.read(f))
       end.values.select { |names| names.size > 1 }
 
-        Bundler.ui.warn "Following gems are corrupted #{corrupted_gems.values.flatten}\n"\
-          "Please report this issue with the .bundle/install.log logfile"
       if same_hash_gems.any?
+        Bundler.ui.warn "It looks like some of your gems are corrupted!"
+        same_hash_gems.each { |name| Bundler.ui.warn "  * #{name}" }
+        Bundler.ui.warn "Please report this issue to the Bundler issue tracker " \
+          "on Github, and include the log file at .bundle/install.log. Thanks!"
       end
     end
 
