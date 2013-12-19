@@ -3,6 +3,7 @@ $:.unshift File.expand_path("../lib", __FILE__)
 require 'rubygems'
 require 'shellwords'
 require 'benchmark'
+require 'bundler/ssl_certs/certificate_manager'
 
 def safe_task(&block)
   yield
@@ -223,3 +224,10 @@ task :build => ["man:clean", "man:build"]
 task :release => ["man:clean", "man:build"]
 
 task :default => :spec
+
+namespace :rubygems do
+  desc "Update bundler certificates to match those from rubygems"
+  task :update_certs => "spec:rubygems:clone_rubygems_master" do
+    CertificateManager.new.update!
+  end
+end
