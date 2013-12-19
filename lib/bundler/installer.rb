@@ -202,7 +202,7 @@ module Bundler
       # Create a debug installation log limited to 1MB
       @logger ||= begin
         require 'logger'
-        Bundler.app_config_path.mktree
+        Bundler.app_config_path.mkpath
         Logger.new(Bundler.app_config_path.join("install.log"), 1, 1048576)
       end
     end
