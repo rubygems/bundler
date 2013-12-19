@@ -3,7 +3,8 @@ $:.unshift File.expand_path("../lib", __FILE__)
 require 'rubygems'
 require 'shellwords'
 require 'benchmark'
-require 'bundler/ssl_certs/certificate_manager'
+
+RUBYGEMS_REPO = "tmp/rubygems"
 
 def safe_task(&block)
   yield
@@ -110,7 +111,7 @@ begin
           end
           hash = nil
 
-          Dir.chdir("tmp/rubygems") do
+          Dir.chdir(RUBYGEMS_REPO) do
             system("git remote update")
             if rg == "master"
               system("git checkout origin/master")
@@ -219,15 +220,14 @@ rescue LoadError
   end
 end
 
+desc "Update vendored SSL certs to match the certs vendored by Rubygems"
+task :update_certs => "spec:rubygems:clone_rubygems_master" do
+  require 'bundler/ssl_certs/certificate_manager'
+  CertificateManager.update_from!(RUBYGEMS_REPO)
+end
+
 require 'bundler/gem_tasks'
 task :build => ["man:clean", "man:build"]
 task :release => ["man:clean", "man:build"]
 
 task :default => :spec
-
-namespace :rubygems do
-  desc "Update bundler certificates to match those from rubygems"
-  task :update_certs => "spec:rubygems:clone_rubygems_master" do
-    CertificateManager.new.update!
-  end
-end
