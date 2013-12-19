@@ -103,7 +103,8 @@ module Bundler
         somepath.expand_path(Bundler.root)
       rescue ArgumentError => e
         Bundler.ui.debug(e)
-        raise PathError, "The path `#{somepath}` could not be used due to an error: #{e.message}."
+        raise PathError, "There was an error while trying to use the path " \
+          "`#{somepath}`.\nThe error message was: #{e.message}."
       end
 
       def app_cache_path
