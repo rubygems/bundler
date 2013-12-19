@@ -191,3 +191,39 @@ describe "bundle binstubs <gem>" do
     end
   end
 end
+
+describe "running binstubs" do
+  it "gets correct version from binstub" do
+    build_git "gem_with_executable1" do |s|
+      s.executables = "gwe"
+    end
+    install_gemfile <<-G
+      gem "gem_with_executable1", :git => "#{lib_path('gem_with_executable1-1.0')}"
+      gem "bundler"
+    G
+
+    bundle "binstubs gem_with_executable1"
+
+    expect(bundled_app("bin/gwe")).to exist
+    expect(sys_exec("RUBYLIB='#{lib}' #{bundled_app("bin/gwe")}")).to eq("1.0")
+  end
+
+  it "loads correct version from binstub when two gems have a bin with the same name" do
+    build_git "gem_with_executable1" do |s|
+      s.executables = "gwe"
+    end
+    build_git "gem_with_executable2", "2.0" do |s|
+      s.executables = "gwe"
+    end
+    install_gemfile <<-G
+      gem "gem_with_executable1", :git => "#{lib_path('gem_with_executable1-1.0')}"
+      gem "gem_with_executable2", :git => "#{lib_path('gem_with_executable2-2.0')}"
+      gem "bundler"
+    G
+
+    bundle "binstubs gem_with_executable2"
+
+    expect(bundled_app("bin/gwe")).to exist
+    expect(sys_exec("RUBYLIB='#{lib}' #{bundled_app("bin/gwe")}")).to eq("2.0")
+  end
+end
