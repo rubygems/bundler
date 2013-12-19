@@ -4,7 +4,7 @@ require 'rubygems'
 require 'shellwords'
 require 'benchmark'
 
-RUBYGEMS_REPO = "tmp/rubygems"
+RUBYGEMS_REPO = File.expand_path("tmp/rubygems")
 
 def safe_task(&block)
   yield
@@ -146,7 +146,7 @@ begin
 
     desc "Run the tests on Travis CI against a rubygem version (using ENV['RGV'])"
     task :travis do
-      rg = ENV['RGV'] || 'v1.8.24'
+      rg = ENV['RGV'] || raise("Rubygems version is required on Travis!")
 
       puts "\n\e[1;33m[Travis CI] Running bundler specs against rubygems #{rg}\e[m\n\n"
       specs = safe_task { Rake::Task["spec:rubygems:#{rg}"].invoke }
@@ -223,7 +223,7 @@ end
 desc "Update vendored SSL certs to match the certs vendored by Rubygems"
 task :update_certs => "spec:rubygems:clone_rubygems_master" do
   require 'bundler/ssl_certs/certificate_manager'
-  CertificateManager.update_from!(RUBYGEMS_REPO)
+  Bundler::SSLCerts::CertificateManager.update_from!(RUBYGEMS_REPO)
 end
 
 require 'bundler/gem_tasks'
