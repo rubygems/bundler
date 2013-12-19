@@ -8,7 +8,6 @@
 "Bugfixes":
 
   - Try to catch gem installation race conditions
-  
 
 ## 1.5.0.rc.1 (2013-11-09)
 
