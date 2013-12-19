@@ -159,6 +159,9 @@ module Bundler
           @copied = true
         end
         generate_bin(spec)
+        if requires_checkout? && spec.post_install_message
+          Installer.post_install_messages[spec.name] = spec.post_install_message
+        end
         ["Using #{version_message(spec)} from #{to_s}", nil, debug]
       end
 
