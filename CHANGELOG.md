@@ -5,7 +5,7 @@ Features:
   - add support for IRB alternatives such as Pry and Ripl (@joallard, @postmodern)
   - highlight installing logs (#2722, @yaotti)
   - highlight updating logs (#2741, @simi)
-  - display post_install_message's for gems installed via :git and :path (@phallstrom)
+  - display post_install_message's for gems installed via :git (@phallstrom)
 
 ## 1.5.0.rc.1 (2013-11-09)
 
