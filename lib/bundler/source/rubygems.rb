@@ -68,7 +68,7 @@ module Bundler
       end
 
       def install(spec)
-        if installed_specs[spec].any?
+        if installed_specs[spec].any? && gem_dir_exists?(spec)
           Bundler.ui.info "Using #{spec.name} (#{spec.version}) "
           return
         end
@@ -248,6 +248,14 @@ module Bundler
           return idx
         ensure
           Bundler.rubygems.sources = old
+        end
+      end
+
+      def gem_dir_exists?(spec)
+        if spec.name == "bundler"
+          true
+        else
+          File.directory?(spec.full_gem_path)
         end
       end
     end

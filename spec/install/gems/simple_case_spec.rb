@@ -337,6 +337,22 @@ describe "bundle install with gem sources" do
       G
       expect(exitstatus).to eq(0)
     end
+
+    it "reinstalls the gem if the gem dir is missing but the specification file exists" do
+      gemfile(<<-G)
+        source "file://#{gem_repo1}"
+
+        gem 'foo'
+      G
+
+      bundle "install --path vendor/bundle"
+
+      FileUtils.rm_rf(vendored_gems('gems/foo-1.0'))
+
+      bundle "install"
+
+      expect(vendored_gems('gems/foo-1.0')).to exist
+    end
   end
 
   describe "when Bundler root contains regex chars" do
