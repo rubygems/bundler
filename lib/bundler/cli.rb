@@ -304,11 +304,14 @@ module Bundler
         "Use the rubygems modern index instead of the API endpoint"
     method_option "jobs", :aliases => "-j", :type => :numeric, :banner =>
       "Specify the number of jobs to run in parallel"
+    method_option "group", :aliases => "-g", :type => :array, :banner =>
+      "Update a specific group"
     def update(*gems)
       sources = Array(options[:source])
+      groups  = Array(options[:group]).map(&:to_sym)
       Bundler.ui.level = "warn" if options[:quiet]
 
-      if gems.empty? && sources.empty?
+      if gems.empty? && sources.empty? && groups.empty?
         # We're doing a full update
         Bundler.definition(true)
       else
@@ -318,6 +321,8 @@ module Bundler
           next if names.include?(g)
           raise GemNotFound, not_found_message(g, names)
         end
+        specs = Bundler.definition.specs_for groups
+        sources.concat(specs.map(&:name))
         Bundler.definition(:gems => gems, :sources => sources)
       end
 
