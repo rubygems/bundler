@@ -104,13 +104,14 @@ module Bundler
 
     alias gems specs
 
-    def cache
+    def cache(custom_path = nil)
+      cache_path = cache_path(custom_path)
       FileUtils.mkdir_p(cache_path) unless File.exists?(cache_path)
 
       Bundler.ui.info "Updating files in vendor/cache"
       specs.each do |spec|
         next if spec.name == 'bundler'
-        spec.source.cache(spec) if spec.source.respond_to?(:cache)
+        spec.source.cache(spec, custom_path) if spec.source.respond_to?(:cache)
       end
 
       Dir[cache_path.join("*/.git")].each do |git_dir|
@@ -118,14 +119,15 @@ module Bundler
         FileUtils.touch(File.expand_path("../.bundlecache", git_dir))
       end
 
-      prune_cache unless Bundler.settings[:no_prune]
+      prune_cache(custom_path) unless Bundler.settings[:no_prune]
     end
 
-    def prune_cache
+    def prune_cache(custom_path)
+      cache_path = cache_path(custom_path)
       FileUtils.mkdir_p(cache_path) unless File.exists?(cache_path)
       resolve = @definition.resolve
-      prune_gem_cache(resolve)
-      prune_git_and_path_cache(resolve)
+      prune_gem_cache(resolve, custom_path)
+      prune_git_and_path_cache(resolve, custom_path)
     end
 
     def clean(dry_run = false)
@@ -239,8 +241,8 @@ module Bundler
 
   private
 
-    def prune_gem_cache(resolve)
-      cached  = Dir["#{cache_path}/*.gem"]
+    def prune_gem_cache(resolve, custom_path)
+      cached  = Dir["#{cache_path(custom_path)}/*.gem"]
 
       cached = cached.delete_if do |path|
         spec = Bundler.rubygems.spec_from_gem path
@@ -260,8 +262,8 @@ module Bundler
       end
     end
 
-    def prune_git_and_path_cache(resolve)
-      cached  = Dir["#{cache_path}/*/.bundlecache"]
+    def prune_git_and_path_cache(resolve, custom_path)
+      cached  = Dir["#{cache_path(custom_path)}/*/.bundlecache"]
 
       cached = cached.delete_if do |path|
         name = File.basename(File.dirname(path))
@@ -300,8 +302,9 @@ module Bundler
       end
     end
 
-    def cache_path
-      root.join("vendor/cache")
+    def cache_path(custom_path = nil)
+      path = custom_path || root
+      path.join("vendor/cache")
     end
   end
 end
