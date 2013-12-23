@@ -83,6 +83,22 @@ describe "bundle update" do
       expect(out).not_to match(/Fetching source index/)
     end
   end
+
+  describe "with --group option" do
+    it "should update only specifed group gems" do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "activesupport", :group => :development
+        gem "rack"
+      G
+      update_repo2 do
+        build_gem "activesupport", "3.0"
+      end
+      bundle "update --group development"
+      should_be_installed "activesupport 3.0"
+      should_not_be_installed "rack 1.2"
+    end
+  end
 end
 
 describe "bundle update in more complicated situations" do
