@@ -677,8 +677,6 @@ module Bundler
       begin
         require preferred || true
       rescue LoadError
-        false
-
         # Is it in Gemfile?
         Bundler.ui.error "Could not load the #{preferred} console"
         Bundler.ui.info "Falling back on IRB..."
