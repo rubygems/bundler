@@ -165,7 +165,7 @@ module Bundler
       resolve(reqs, activated)
     end
 
-    class State < Struct.new(:reqs, :activated, :requirement, :possibles)
+    class State < Struct.new(:reqs, :activated, :requirement, :possibles, :depth)
       def name
         requirement.name
       end
@@ -220,13 +220,13 @@ module Bundler
 
     def resolve_for_conflict(state)
       raise version_conflict if state.possibles.empty?
-      reqs, activated = state.reqs.dup, state.activated.dup
+      reqs, activated, depth = state.reqs.dup, state.activated.dup, state.depth
       requirement = state.requirement
       possible = state.possibles.pop
 
       activate_gem(reqs, activated, possible, requirement)
 
-      return reqs, activated
+      return reqs, activated, depth
     end
 
     def resolve_conflict(current, states)
@@ -241,17 +241,18 @@ module Bundler
 
       # Resolve the conflicts by rewinding the state
       # when the conflicted gem was activated
-      reqs, activated = resolve_for_conflict(state)
+      reqs, activated, depth = resolve_for_conflict(state)
 
       # Keep the state around if it still has other possiblities
       states << state unless state.possibles.empty?
       clear_search_cache
 
-      return reqs, activated
+      return reqs, activated, depth
     end
 
     def resolve(reqs, activated)
       states = []
+      depth = 0
 
       until reqs.empty?
 
@@ -270,6 +271,8 @@ module Bundler
         debug { "Requirements:\n" + reqs.map {|r| "  #{r}"}.join("\n") }
 
         current = reqs.shift
+
+        $stderr.puts "#{' ' * depth}#{current}" if ENV['DEBUG_RESOLVER_TREE']
 
         debug { "Attempting:\n  #{current}"}
 
@@ -296,6 +299,7 @@ module Bundler
               @gems_size[dep] ||= gems_size(dep)
             end
 
+            depth += 1
             next
           else
             debug { "    * [FAIL] Already activated" }
@@ -305,7 +309,7 @@ module Bundler
             parent ||= existing.required_by.last if existing.respond_to?(:required_by)
             raise version_conflict if parent.nil? || parent.name == 'bundler'
 
-            reqs, activated = resolve_conflict(current, states)
+            reqs, activated, depth = resolve_conflict(current, states)
           end
         else
           matching_versions = search(current)
@@ -341,12 +345,12 @@ module Bundler
               # This is not a top-level Gemfile requirement
             else
               @errors[current.name] = [nil, current]
-              reqs, activated = resolve_conflict(current, states)
+              reqs, activated, depth = resolve_conflict(current, states)
               next
             end
           end
 
-          state = State.new(reqs.dup, activated.dup, current, matching_versions)
+          state = State.new(reqs.dup, activated.dup, current, matching_versions, depth)
           states << state
           requirement = state.possibles.pop
           activate_gem(reqs, activated, requirement, current)
