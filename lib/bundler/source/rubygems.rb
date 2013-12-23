@@ -114,12 +114,12 @@ module Bundler
         ["Installing #{version_message(spec)}", spec.post_install_message]
       end
 
-      def cache(spec)
+      def cache(spec, custom_path = nil)
         cached_path = cached_gem(spec)
         raise GemNotFound, "Missing gem file '#{spec.full_name}.gem'." unless cached_path
         return if File.dirname(cached_path) == Bundler.app_cache.to_s
         Bundler.ui.info "  * #{File.basename(cached_path)}"
-        FileUtils.cp(cached_path, Bundler.app_cache)
+        FileUtils.cp(cached_path, Bundler.app_cache(custom_path))
       end
 
       def add_remote(source)

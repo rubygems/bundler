@@ -74,7 +74,8 @@ module Bundler
         ["Using #{version_message(spec)} from #{to_s}", nil]
       end
 
-      def cache(spec)
+      def cache(spec, custom_path = nil)
+        app_cache_path = app_cache_path(custom_path)
         return unless Bundler.settings[:cache_all]
         return if expand(@original_path).to_s.index(Bundler.root.to_s) == 0
         FileUtils.rm_rf(app_cache_path)
@@ -107,8 +108,8 @@ module Bundler
           "`#{somepath}`.\nThe error message was: #{e.message}."
       end
 
-      def app_cache_path
-        @app_cache_path ||= Bundler.app_cache.join(app_cache_dirname)
+      def app_cache_path(custom_path = nil)
+        @app_cache_path ||= Bundler.app_cache(custom_path).join(app_cache_dirname)
       end
 
       def has_app_cache?

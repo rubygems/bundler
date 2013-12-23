@@ -197,8 +197,9 @@ module Bundler
         root.join('.bundle')
     end
 
-    def app_cache
-      root.join("vendor/cache")
+    def app_cache(custom_path = nil)
+      path = custom_path || root
+      path.join("vendor/cache")
     end
 
     def tmp
