@@ -321,8 +321,12 @@ module Bundler
           next if names.include?(g)
           raise GemNotFound, not_found_message(g, names)
         end
-        specs = Bundler.definition.specs_for groups
-        sources.concat(specs.map(&:name))
+
+        if groups.any?
+          specs = Bundler.definition.specs_for groups
+          sources.concat(specs.map(&:name))
+        end
+
         Bundler.definition(:gems => gems, :sources => sources)
       end
 
