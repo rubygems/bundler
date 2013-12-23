@@ -69,38 +69,34 @@ describe "bundle install with gem sources" do
       end
 
       context "with ENV['DEBUG_RESOLVER'] set" do
-        before do
-          ENV['DEBUG_RESOLVER'] = '1'
-        end
         it "produces debug output" do
-          expect(capture(:stdout) do
-            install_gemfile <<-G
-              source "file://#{gem_repo1}"
-              gem "net_c"
-              gem "net_e"
-            G
-          end).to include "==== Iterating ===="
-        end
-        after do
-          ENV['DEBUG_RESOLVER'] = nil
+          gemfile <<-G
+            source "file://#{gem_repo1}"
+            gem "net_c"
+            gem "net_e"
+          G
+
+          resolve_output = capture(:stdout) do
+            bundle :install, :env => {"DEBUG_RESOLVER" => "1"}
+          end
+
+          expect(resolve_output).to include("==== Iterating ====")
         end
       end
 
       context "with ENV['DEBUG_RESOLVER_TREE'] set" do
-        before do
-          ENV['DEBUG_RESOLVER_TREE'] = '1'
-        end
         it "produces debug output" do
-          expect(capture(:stdout) do
-            install_gemfile <<-G
-              source "file://#{gem_repo1}"
-              gem "net_c"
-              gem "net_e"
-            G
-          end).to include " net_b (>= 0) ruby"
-        end
-        after do
-          ENV['DEBUG_RESOLVER_TREE'] = nil
+          gemfile <<-G
+            source "file://#{gem_repo1}"
+            gem "net_c"
+            gem "net_e"
+          G
+
+          resolve_output = capture(:stdout) do
+            bundle :install, :env => {"DEBUG_RESOLVER_TREE" => "1"}
+          end
+
+          expect(resolve_output).to include(" net_b (>= 0) ruby")
         end
       end
 
