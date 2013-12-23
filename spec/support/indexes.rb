@@ -134,7 +134,7 @@ module Spec
     def a_complex_conflict_index
       build_index do
         gem("a", %w(1.0.2 1.1.4 1.2.0 1.4.0)) do
-          dep "d", ">= 0" 
+          dep "d", ">= 0"
         end
 
         gem("d", %w(1.3.0 1.4.1)) do
