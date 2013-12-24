@@ -250,14 +250,13 @@ module Spec
           dep "activesupport", "= 3.0.5"
           dep "activemodel", "= 3.0.5"
         end
-        
+
         gem("activerecord", '3.0.9') do
           dep "activesupport", "= 3.1.5"
           dep "activemodel", "= 3.1.5"
         end
       end
     end
-
 
     def a_circular_index
       build_index do
@@ -276,5 +275,6 @@ module Spec
         end
       end
     end
+
   end
 end
