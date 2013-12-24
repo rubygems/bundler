@@ -2,7 +2,7 @@ module Spec
   module Indexes
     def dep(name, reqs = nil)
       @deps ||= []
-      @deps << Bundler::Dependency.new(name, :version => reqs)
+      @deps << Bundler::Dependency.new(name, reqs)
     end
 
     def platform(*args)
