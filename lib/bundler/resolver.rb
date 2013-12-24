@@ -181,6 +181,11 @@ module Bundler
       parent
     end
 
+    def other_possible?(conflict, states)
+      state = states.detect { |i| i.name == conflict }
+      state && state.possibles.any?
+    end
+
     def find_conflict_state(conflict, states)
       rejected = []
 
@@ -306,10 +311,10 @@ module Bundler
             @errors[existing.name] = [existing, current]
 
             parent = current.required_by.last
-            parent ||= existing.required_by.last if existing.respond_to?(:required_by)
-            raise version_conflict if parent.nil? || parent.name == 'bundler'
+            parent = current unless other_possible?(parent.name, states)
+            raise version_conflict if parent.name == 'bundler'
 
-            reqs, activated, depth = resolve_conflict(current, states)
+            reqs, activated, depth = resolve_conflict(parent, states)
           end
         else
           matching_versions = search(current)

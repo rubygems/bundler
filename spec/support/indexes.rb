@@ -216,6 +216,49 @@ module Spec
       end
     end
 
+    def a_index_with_root_conflict_on_child
+      build_index do
+        gem "builder", %w(2.1.2 3.0.1 3.1.3)
+        gem "i18n", %w(0.4.1 0.4.2)
+
+        gem "activesupport", %w(3.0.0 3.0.1 3.0.5 3.1.7)
+
+        gem("activemodel", '3.0.5') do
+          dep "activesupport", "= 3.0.5"
+          dep "builder", "~> 2.1.2"
+          dep 'i18n', '~> 0.4'
+        end
+
+        gem("activemodel", '3.0.0') do
+          dep "activesupport", "= 3.0.0"
+          dep "builder", "~> 2.1.2"
+          dep 'i18n', '~> 0.4.1'
+        end
+
+        gem("activemodel", '3.1.3') do
+          dep "activesupport", "= 3.1.3"
+          dep "builder", "~> 2.1.2"
+          dep 'i18n', '~> 0.5'
+        end
+
+        gem("activerecord", '3.0.0') do
+          dep "activesupport", "= 3.0.0"
+          dep "activemodel", "= 3.0.0"
+        end
+
+        gem("activerecord", '3.0.5') do
+          dep "activesupport", "= 3.0.5"
+          dep "activemodel", "= 3.0.5"
+        end
+        
+        gem("activerecord", '3.0.9') do
+          dep "activesupport", "= 3.1.5"
+          dep "activemodel", "= 3.1.5"
+        end
+      end
+    end
+
+
     def a_circular_index
       build_index do
         gem "rack", "1.0.1"
