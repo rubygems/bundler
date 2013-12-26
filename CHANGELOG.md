@@ -1,3 +1,13 @@
+## 1.5.0 (2013-12-26)
+
+Features:
+
+  - install missing gems if their specs are present (@hone)
+
+Bugfixes:
+
+  - use print for "Installing…" so messages are thread-safe (@TimMoore)
+
 ## 1.5.0.rc.2 (2013-12-18)
 
 "Features":
