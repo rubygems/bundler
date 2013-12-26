@@ -17,14 +17,21 @@
         <div id='contents'>
           <h2>What is Bundler?</h2>
           <div id='intro'>
-            Bundler maintains a consistent environment for ruby applications. It tracks an application's code and the rubygems it needs to run, so that an application will always have the exact gems (and versions) that it needs to run.
+            <p>
+              Bundler maintains a consistent environment for ruby applications. It tracks
+              an application's code and the rubygems it needs to run, so that an application
+              will always have the exact gems (and versions) that it needs to run.
+            </p>
+            <p>
+              We designed bundler to make it easy to share your code across a number
+              of development, staging and production machines. Of course, you know how to
+              share your own application or gem: stick it on GitHub and clone it where you
+              need it. Bundler makes it easy to make sure that your application has the
+              dependencies it needs to start up and run without errors.
+            </p>
           </div>
-          <h2>Would you like to</h2>
-          <div class='buttons'>
-            <a href="#getting-started">Get started</a>
-            <a href="https://github.com/bundler/bundler/blob/master/ISSUES.md">Report a bug</a>
-            <a href="/v1.2/whats_new.html">See what's new</a>
-            <a href="#use-bundler">Read documentation</a>
+          <div class='bullet'>
+            <a href="/v1.3/rationale.html">Learn More: Why Bundler exists</a>
           </div>
           <h2 id='getting-started'>
             Getting Started
@@ -32,7 +39,7 @@
           <div class='contents'>
             <div class='bullet'>
               <div class='description'>
-                Getting started with bundler is easy! Open a terminal window and type the following:
+                Getting started with bundler is easy! Open a terminal window and run this command:
               </div>
               <pre class='sunburst'>$ gem install bundler&#x000A;</pre>
             </div>
@@ -40,15 +47,15 @@
               <div class='description'>
                 Specify your dependencies in a Gemfile in your project's root:
               </div>
-              <pre class="sunburst">source <span class="String"><span class="String">&quot;</span>https://rubygems.org<span class="String">&quot;</span></span>&#x000A;gem <span class="String"><span class="String">&quot;</span>nokogiri<span class="String">&quot;</span></span>&#x000A;gem <span class="String"><span class="String">&quot;</span>rack<span class="String">&quot;</span></span>, <span class="String"><span class="String">&quot;</span>~&gt;1.1<span class="String">&quot;</span></span>&#x000A;gem <span class="String"><span class="String">&quot;</span>rspec<span class="String">&quot;</span></span>, <span class="Constant"><span class="Constant">:</span>require</span> =&gt; <span class="String"><span class="String">&quot;</span>spec<span class="String">&quot;</span></span>&#x000A;</pre>
-              <a href="/v1.2/gemfile.html">Learn More: Gemfiles</a>
+              <pre class="sunburst">source <span class="String"><span class="String">&#39;</span>https://rubygems.org<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rack<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>~&gt;1.1<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rspec<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>require</span> =&gt; <span class="String"><span class="String">&#39;</span>spec<span class="String">&#39;</span></span>&#x000A;</pre>
+              <a href="/v1.3/gemfile.html">Learn More: Gemfiles</a>
             </div>
             <div class='bullet'>
               <div class='description'>
                 Install all of the required gems from your specified sources:
               </div>
               <pre class='sunburst'>$ bundle install&#x000A;$ git add Gemfile Gemfile.lock</pre>
-              <a href="/v1.2/bundle_install.html">Learn More: bundle install</a>
+              <a href="/v1.3/bundle_install.html">Learn More: bundle install</a>
               <div class='notes'>
                 The second command adds the Gemfile and Gemfile.lock to your repository. This ensures
                 that other developers on your app, as well as your deployment environment, will all use
@@ -59,8 +66,8 @@
               <div class='description'>
                 Inside your app, load up the bundled environment:
               </div>
-              <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">&quot;</span>rubygems<span class="String">&quot;</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&quot;</span>bundler/setup<span class="String">&quot;</span></span>&#x000A;&#x000A;<span class="Comment"><span class="Comment">#</span> require your gems as usual</span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&quot;</span>nokogiri<span class="String">&quot;</span></span>&#x000A;</pre>
-              <a href="/v1.2/bundler_setup.html">Learn More: Bundler.setup</a>
+              <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>rubygems<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>bundler/setup<span class="String">&#39;</span></span>&#x000A;&#x000A;<span class="Comment"><span class="Comment">#</span> require your gems as usual</span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>&#x000A;</pre>
+              <a href="/v1.3/bundler_setup.html">Learn More: Bundler.setup</a>
             </div>
             <div class='bullet'>
               <div class='description'>
@@ -87,48 +94,24 @@
                 The executables installed into <code>bin</code> are scoped to the
                 bundle, and will always work.
               </div>
-              <a href="/v1.2/man/bundle-exec.1.html">Learn More: Executables</a>
+              <a href="/v1.3/man/bundle-exec.1.html">Learn More: Executables</a>
             </div>
           </div>
           <h2 id='use-bundler'>Use Bundler with</h2>
           <div class='buttons'>
-            <a href="/v1.2/rails3.html">Rails 3</a>
-            <a href="/v1.2/rails23.html">Rails 2.3</a>
-            <a href="/v1.2/sinatra.html">Sinatra</a>
-            <a href="/v1.2/rubygems.html">Rubygems</a>
-            <a href="/v1.2/rubymotion.html">RubyMotion</a>
-          </div>
-          <h2 id='learn-about'>Learn about</h2>
-          <div class='buttons'>
-            <a href="/v1.2/gemfile.html">Gemfile</a>
-            <a href="/v1.2/bundle_install.html">Installing</a>
-            <a href="/v1.2/man/bundle-update.1.html">Updating</a>
-            <a href="/v1.2/deploying.html">Deploying</a>
-          </div>
-          <div class='buttons'>
-            <a href="/v1.2/git.html">Gems from git</a>
-            <a href="/v1.2/commands.html">Other commands</a>
-            <a href="/v1.2/rationale.html">Why Bundler exists</a>
-            <a href="/v1.2/man/bundle.1.html">The man pages</a>
+            <a href="/v1.3/rails3.html">Rails 3</a>
+            <a href="/v1.3/rails23.html">Rails 2.3</a>
+            <a href="/v1.3/sinatra.html">Sinatra</a>
+            <a href="/v1.3/rubygems.html">Rubygems</a>
+            <a href="/v1.3/rubymotion.html">RubyMotion</a>
           </div>
           <h2 id='get-involved'>Get involved</h2>
-          <p>Bundler has a lot of contributors and users, and they all talk to each other quite a bit. If you have questions, try the IRC channel or mailing list. If you're interested in contributing to the project (no programming skills needed), read the contributing guide. If you have sponsorship or security questions, email us directly.</p>
+          <p>Bundler has a lot of contributors and users, and they all talk to each other quite a bit. If you have questions, try the IRC channel or mailing list. If you're interested in contributing to the project (no programming skills needed), read the contributing guide. If you have sponsorship or security questions, please contact the core team directly.</p>
           <div class='buttons'>
-            <a href="https://github.com/bundler/bundler/blob/master/DEVELOPMENT.md">Contributing</a>
+            <a href="http://webchat.freenode.net/?channels=bundler">#bundler on IRC</a>
             <a href="http://groups.google.com/group/ruby-bundler">Mailing list</a>
-            <a href="irc://irc.freenode.net/#bundler">IRC channel</a>
-            <a href="mailto:andre.arko+terence.lee@gmail.com">Email core team</a>
-          </div>
-          <div class='shirts'>
-            <div class='content'>
-              <img src="/images/bundler-shirt.png" />
-              <p>
-                Want to show the world you support Bundler?
-                <br>
-                Buy Bundler shirts and stickers at
-                <a href="http://www.devswag.com/collections/bundler">DevSwag</a>
-              </p>
-            </div>
+            <a href="https://github.com/bundler/bundler/blob/master/DEVELOPMENT.md">Contributing</a>
+            <a href="mailto:andre.arko+terence.lee@gmail.com">Core team</a>
           </div>
         </div>
       </div>
@@ -154,8 +137,8 @@
       <a href="/v0.9/">v0.9</a>
       <a href="/v1.0/">v1.0</a>
       <a href="/v1.1/">v1.1</a>
-      <a class="current" href="/v1.2/">v1.2</a>
-      <a href="/v1.3/">v1.3</a>
+      <a href="/v1.2/">v1.2</a>
+      <a class="current" href="/v1.3/">v1.3</a>
       <a href="/">v1.5</a>
     </div>
     <script>
