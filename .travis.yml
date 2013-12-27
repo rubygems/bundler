@@ -21,6 +21,7 @@ notifications:
     rooms:
       secure: MNTSGIySYwHia5gIgRiZxXtPMPDIP9KmzQk7Kq2ZoVvP3mIk8W1TMkvcyFkEf6uCasyVZZixzUBfY+E0BlHAz1ycQpTh1jvSpuIpEVYW48ShJldJ+8W8xfzafyOHii3z7VrDaomEffmMDdmHRsbQAfekMjdR4bTpXtT9V+wOXlg=
 rvm:
+  - 2.1.0-rc1
   - 2.0.0
   - 1.9.3
 # Rubygems versions MUST be available as rake tasks
