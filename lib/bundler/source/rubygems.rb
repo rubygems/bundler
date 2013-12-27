@@ -278,11 +278,9 @@ module Bundler
       end
 
       def gem_dir_exists?(spec)
-        if spec.name == "bundler"
-          true
-        else
-          File.directory?(spec.full_gem_path)
-        end
+        return true if spec.name == "bundler"
+        return true if spec.loaded_from.include?("specifications/default/")
+        File.directory?(spec.full_gem_path)
       end
     end
 
