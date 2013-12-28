@@ -358,9 +358,10 @@ describe "bundle install with gem sources" do
       json_version = ruby "require 'json';puts JSON::VERSION".chomp
 
       gemfile(<<-G)
-      source "file://#{gem_repo1}"
+        puts :GEM_HOME => ENV["GEM_HOME"]
+        source "file://#{gem_repo1}"
 
-      gem "json", "#{json_version}"
+        gem "json", "#{json_version}"
       G
 
       bundle "install --local"
