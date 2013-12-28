@@ -16,15 +16,22 @@ module Spec
 
     def copy_ruby_19_default_gems!(original_gem_path)
       if RUBY_VERSION >= "1.9" && RUBY_VERSION < "2.0"
+        unless defined?(@@ruby19_specifications)
+          @@ruby19_specifications = []
+
+          original_gem_path.split(":").each do |path|
+            next if path == system_gem_path
+            Dir.glob("#{path}/specifications/*").each do |spec_path|
+              spec = eval(File.read(spec_path))
+              @@ruby19_specifications << spec_path if spec.summary.include?("is bundled with Ruby")
+            end
+          end
+        end
+
         dest_spec_dir = system_gem_path("specifications")
         FileUtils.mkdir_p(dest_spec_dir)
-
-        original_gem_path.split(":").each do |path|
-          next if path == system_gem_path
-          Dir.glob("#{path}/specifications/*").each do |spec_path|
-            spec = eval(File.read(spec_path))
-            FileUtils.cp(spec_path, dest_spec_dir) if spec.summary.include?("is bundled with Ruby")
-          end
+        @@ruby19_specifications.each do |spec_path|
+          FileUtils.cp(spec_path, dest_spec_dir)
         end
       end
     end
