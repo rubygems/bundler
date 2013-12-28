@@ -1,3 +1,9 @@
+## 1.5.1 (2013-12-28)
+
+Bugfixes:
+
+  - correctly find gems installed with Ruby by default
+
 ## 1.5.0 (2013-12-26)
 
 Features:
