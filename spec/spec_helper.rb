@@ -26,7 +26,14 @@ end
 $debug    = false
 $show_err = true
 
+original_wd       = Dir.pwd
+original_gem_path = ENV['GEM_PATH']
+original_gem_home = ENV['GEM_HOME']
+
 Spec::Rubygems.setup
+
+original_path     = ENV['PATH']
+
 FileUtils.rm_rf(Spec::Path.gem_repo1)
 ENV['RUBYOPT'] = "#{ENV['RUBYOPT']} -r#{Spec::Path.root}/spec/support/hax.rb"
 ENV['BUNDLE_SPEC_RUN'] = "true"
@@ -66,10 +73,6 @@ RSpec.configure do |config|
   config.run_all_when_everything_filtered = true
   config.alias_example_to :fit, :focused => true
 
-  original_wd       = Dir.pwd
-  original_path     = ENV['PATH']
-  original_gem_home = ENV['GEM_HOME']
-
   def pending_jruby_shebang_fix
     pending "JRuby executables do not have a proper shebang" if RUBY_PLATFORM == "java"
   end
@@ -95,7 +98,7 @@ RSpec.configure do |config|
     # Reset ENV
     ENV['PATH']           = original_path
     ENV['GEM_HOME']       = original_gem_home
-    ENV['GEM_PATH']       = original_gem_home
+    ENV['GEM_PATH']       = original_gem_path
     ENV['BUNDLE_PATH']    = nil
     ENV['BUNDLE_GEMFILE'] = nil
     ENV['BUNDLER_TEST']   = nil
