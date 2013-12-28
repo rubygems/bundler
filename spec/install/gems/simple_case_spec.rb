@@ -353,6 +353,19 @@ describe "bundle install with gem sources" do
 
       expect(vendored_gems('gems/foo-1.0')).to exist
     end
+
+    it "doesn't reinstall ruby's default gems", :ruby => "1.9" do
+      json_version = ruby "require 'json';puts JSON::VERSION".chomp
+
+      gemfile(<<-G)
+      source "file://#{gem_repo1}"
+
+      gem "json", "#{json_version}"
+      G
+
+      bundle "install --local"
+      expect(bundled_app("Gemfile.lock")).to exist
+    end
   end
 
   describe "when Bundler root contains regex chars" do
