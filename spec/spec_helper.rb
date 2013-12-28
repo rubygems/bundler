@@ -89,6 +89,7 @@ RSpec.configure do |config|
     reset!
     system_gems []
     in_app_root
+    copy_ruby_19_default_gems!(original_gem_path)
   end
 
   config.after :each do
