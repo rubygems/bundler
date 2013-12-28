@@ -23,7 +23,9 @@ module Spec
             next if path == system_gem_path
             Dir.glob("#{path}/specifications/*").each do |spec_path|
               spec = eval(File.read(spec_path))
-              @@ruby19_specifications << spec_path if spec.summary.include?("is bundled with Ruby")
+              if spec.summary && spec.summary.include?("is bundled with Ruby")
+                @@ruby19_specifications << spec_path
+              end
             end
           end
         end
