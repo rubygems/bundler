@@ -7,13 +7,22 @@ module Bundler
     class << self
       attr_accessor :post_install_messages
     end
-
+  
     # Begins the installation process for Bundler.
     # For more information see the #run method on this class.
     def self.install(root, definition, options = {})
+      #@@count = 0
+      if(options["verbose"] == true)
+        @@flag = -1
+      else
+        @@flag = 0
+      end
       installer = new(root, definition)
       installer.run(options)
       installer
+      if(@@flag != -1)
+        puts "using #{@@flag} already installed gems"
+      end
     end
 
     # Runs the install procedures for a specific Gemfile.
@@ -112,7 +121,11 @@ module Bundler
         if install_message.include? 'Installing'
           Bundler.ui.confirm install_message
         else
-          Bundler.ui.info install_message
+          if(@@flag != -1)
+            @@flag += 1
+          else
+            Bundler.ui.info install_message
+          end
         end
         Bundler.ui.debug debug_message if debug_message
         Bundler.ui.debug "#{worker}:  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
