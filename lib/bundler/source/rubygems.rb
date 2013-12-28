@@ -253,7 +253,11 @@ module Bundler
 
       def gem_dir_exists?(spec)
         return true if spec.name == "bundler"
+        # Ruby 2 default gems
         return true if spec.loaded_from.include?("specifications/default/")
+        # Ruby 1.9 default gems
+        return true if spec.summary =~ /is bundled with Ruby/
+
         File.directory?(spec.full_gem_path)
       end
     end
