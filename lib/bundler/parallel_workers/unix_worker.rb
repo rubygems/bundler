@@ -80,12 +80,20 @@ module Bundler
       # Kill the forked workers by sending SIGINT to them
       def stop_workers
         @workers.each do |worker|
-          worker.io_r.close
-          worker.io_w.close
-          Process.kill :INT, worker.pid
+          worker.io_r.close unless worker.io_r.closed?
+          worker.io_w.close unless worker.io_w.closed?
+          begin
+            Process.kill :INT, worker.pid
+          rescue Errno::ESRCH
+            nil
+          end
         end
         @workers.each do |worker|
-          Process.waitpid worker.pid
+          begin
+            Process.waitpid worker.pid
+          rescue Errno::ECHILD
+            nil
+          end
         end
       end
     end
