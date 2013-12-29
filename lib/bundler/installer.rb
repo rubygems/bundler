@@ -7,15 +7,13 @@ module Bundler
     class << self
       attr_accessor :post_install_messages
     end
-  
     # Begins the installation process for Bundler.
     # For more information see the #run method on this class.
     def self.install(root, definition, options = {})
-      #@@count = 0
-      if(options["verbose"] == true)
-        @@flag = -1
+      if(options.length == 1)
+       @@flag = 0
       else
-        @@flag = 0
+        @@flag = -1
       end
       installer = new(root, definition)
       installer.run(options)
