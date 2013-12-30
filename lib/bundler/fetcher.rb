@@ -226,7 +226,7 @@ module Bundler
   private
 
     HTTP_ERRORS = [
-      Timeout::Error, EOFError, SocketError,
+      Timeout::Error, EOFError, SocketError, Errno::ENETDOWN,
       Errno::EINVAL, Errno::ECONNRESET, Errno::ETIMEDOUT, Errno::EAGAIN,
       Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError,
       Net::HTTP::Persistent::Error
