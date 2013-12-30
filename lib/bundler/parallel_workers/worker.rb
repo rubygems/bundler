@@ -19,6 +19,7 @@ module Bundler
         @response_queue = Queue.new
         prepare_workers size, func
         prepare_threads size
+        trap("INT") { @threads.each {|i| i.exit }; stop_workers; exit 1 }
       end
 
       # Enque a request to be executed in the worker pool
