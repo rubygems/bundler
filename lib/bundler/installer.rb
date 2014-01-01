@@ -10,17 +10,9 @@ module Bundler
     # Begins the installation process for Bundler.
     # For more information see the #run method on this class.
     def self.install(root, definition, options = {})
-      if(options.length == 1)
-       @@flag = 0
-      else
-        @@flag = -1
-      end
       installer = new(root, definition)
       installer.run(options)
       installer
-      if(@@flag != -1)
-        puts "using #{@@flag} already installed gems"
-      end
     end
 
     # Runs the install procedures for a specific Gemfile.
@@ -92,36 +84,38 @@ module Bundler
       # as dependencies might actually affect the installation of
       # the gem.
       Installer.post_install_messages = {}
-
       # the order that the resolver provides is significant, since
       # dependencies might actually affect the installation of a gem.
       # that said, it's a rare situation (other than rake), and parallel
       # installation is just SO MUCH FASTER. so we let people opt in.
+      bundle_without_options = true
+      if(options.length != 1 and options[:jobs].to_i != 1)
+        bundle_without_options = false
+      end
       jobs = [Bundler.settings[:jobs].to_i, 1].max
       if jobs > 1 && can_install_parallely?
-        install_in_parallel jobs, options[:standalone]
+        install_in_parallel jobs, options[:standalone],bundle_without_options
       else
-        install_sequentially options[:standalone]
+        install_sequentially options[:standalone],bundle_without_options
       end
-
       lock
       generate_standalone(options[:standalone]) if options[:standalone]
     end
 
-    def install_gem_from_spec(spec, standalone = false, worker = 0)
+    def install_gem_from_spec(spec, standalone = false, worker = 0,bundle_without_options)
       # Fetch the build settings, if there are any
       settings             = Bundler.settings["build.#{spec.name}"]
       install_message      = nil
       post_install_message = nil
       debug_message        = nil
+      flag                 =  0
       Bundler.rubygems.with_build_args [settings] do
         install_message, post_install_message, debug_message = spec.source.install(spec)
         if install_message.include? 'Installing'
           Bundler.ui.confirm install_message
         else
-          if(@@flag != -1)
-            @@flag += 1
-          else
+          flag = 1
+          if(bundle_without_options == false)
             Bundler.ui.info install_message
           end
         end
@@ -134,9 +128,8 @@ module Bundler
       elsif Bundler.settings[:bin]
         generate_bundler_executable_stubs(spec, :force => true)
       end
-
       FileUtils.rm_rf(Bundler.tmp)
-      post_install_message
+      return post_install_message,flag
     rescue Exception => e
       # if install hook failed or gem signature is bad, just die
       raise e if e.is_a?(Bundler::InstallHookError) || e.is_a?(Bundler::SecurityError)
@@ -153,6 +146,7 @@ module Bundler
       end
       Bundler.ui.debug e.backtrace.join("\n")
       raise Bundler::InstallError, msg
+      return msg,flag
     end
 
     def generate_bundler_executable_stubs(spec, options = {})
@@ -272,16 +266,21 @@ module Bundler
       end
     end
 
-    def install_sequentially(standalone)
+    def install_sequentially(standalone,bundle_without_options)
+      count = 0
       specs.each do |spec|
-        message = install_gem_from_spec spec, standalone, 0
+        message,flag = install_gem_from_spec spec, standalone, 0,bundle_without_options
         if message
           Installer.post_install_messages[spec.name] = message
         end
+        count = count + flag
+      end
+      if(bundle_without_options == true)
+        Bundler.ui.info "using #{count} already installed gems"
       end
     end
 
-    def install_in_parallel(size, standalone)
+    def install_in_parallel(size, standalone,bundle_without_options)
       name2spec = {}
       remains = {}
       enqueued = {}
@@ -289,10 +288,9 @@ module Bundler
         name2spec[spec.name] = spec
         remains[spec.name] = true
       end
-
       worker_pool = ParallelWorkers.worker_pool size, lambda { |name, worker|
         spec = name2spec[name]
-        message = install_gem_from_spec spec, standalone, worker
+        message,flag = install_gem_from_spec spec, standalone, worker,bundle_without_options
         { :name => spec.name, :post_install => message }
       }
       specs.each do |spec|
@@ -319,7 +317,6 @@ module Bundler
           end
         end
       end
-      message
     ensure
       worker_pool && worker_pool.stop
     end
