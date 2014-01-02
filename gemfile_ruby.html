@@ -55,7 +55,7 @@
             </div>
             <div class='bullet'>
               <div class='description'>
-                The <code>ruby</code> directive explicitly leaves out the ability to specify a patch level. Ruby patches often include important bug and security fixes and are extremely compatible.
+                In the <code>ruby</code> directive, <code>:patchlevel</code> is optional, as patchlevel releases are usually compatible and include important security fixes. The patchlevel option checks the <code>RUBY_PATCHLEVEL</code> constant, and if not specified then bundler will simply ignore it.
               </div>
             </div>
           </div>
