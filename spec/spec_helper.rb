@@ -43,6 +43,7 @@ RSpec.configure do |config|
   config.include Spec::Rubygems
   config.include Spec::Platforms
   config.include Spec::Sudo
+  config.include Spec::Permissions
 
   if Spec::Sudo.test_sudo?
     config.filter_run :sudo => true

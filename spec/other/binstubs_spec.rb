@@ -66,6 +66,19 @@ describe "bundle binstubs <gem>" do
 
       expect(bundled_app("bin/foo")).to exist
     end
+
+    it "sets correct permissions for binstubs" do
+      with_umask(0002) do
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rack"
+        G
+
+        bundle "binstubs rack"
+        binary = bundled_app("bin/rackup")
+        expect(File.stat(binary).mode.to_s(8)).to eq("100775")
+      end
+    end
   end
 
   context "--path" do
