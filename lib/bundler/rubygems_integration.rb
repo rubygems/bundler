@@ -428,7 +428,7 @@ module Bundler
       end
     end
 
-    # Rubygems ~> 1.8.5
+    # Rubygems 1.8.5-1.8.19
     class Modern < RubygemsIntegration
       def stub_rubygems(specs)
         Gem::Specification.all = specs
@@ -447,11 +447,6 @@ module Bundler
       def find_name(name)
         Gem::Specification.find_all_by_name name
       end
-
-      def build(spec, skip_validation = false)
-        require 'rubygems/builder'
-        Gem::Builder.new(spec).build(skip_validation)
-      end
     end
 
     # Rubygems 1.8.0 to 1.8.4
@@ -463,6 +458,16 @@ module Bundler
         old_dir, old_path = gem_dir, gem_path
         yield
         Gem.use_paths(old_dir, old_path)
+      end
+    end
+
+    # Rubygems 1.8.20+
+    class MoreModern < Modern
+      # Rubygems 1.8.20 and adds the skip_validation parameter, so that's
+      # when we start passing it through.
+      def build(spec, skip_validation = false)
+        require 'rubygems/builder'
+        Gem::Builder.new(spec).build(skip_validation)
       end
     end
 
@@ -527,6 +532,8 @@ module Bundler
 
   if RubygemsIntegration.provides?(">= 1.99.99")
     @rubygems = RubygemsIntegration::Future.new
+  elsif RubygemsIntegration.provides?('>= 1.8.20')
+    @rubygems = RubygemsIntegration::MoreModern.new
   elsif RubygemsIntegration.provides?('>= 1.8.5')
     @rubygems = RubygemsIntegration::Modern.new
   elsif RubygemsIntegration.provides?('>= 1.8.0')
