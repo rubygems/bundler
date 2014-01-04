@@ -57,12 +57,12 @@ matrix:
     - rvm: 2.0.0
       env: RGV=v2.1.11
     - rvm: 2.0.0
-      env: RGV=v2.0.12
+      env: RGV=v2.0.14
     # Rubygems goes down to 1.5.3 on Ruby 1.9.3
     - rvm: 1.9.3
       env: RGV=v2.1.11
     - rvm: 1.9.3
-      env: RGV=v2.0.12
+      env: RGV=v2.0.14
     - rvm: 1.9.3
       env: RGV=v1.8.29
     - rvm: 1.9.3
