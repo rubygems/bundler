@@ -53,11 +53,7 @@ matrix:
       env: RGV=v2.1.11
     - rvm: rbx
       env: RGV=v2.1.11
-    # Rubygems goes down to 2.0 on Ruby 2.0.0 and 2.1.0
-    - rvm: 2.1.0
-      env: RGV=v2.1.11
-    - rvm: 2.1.0
-      env: RGV=v2.0.12
+    # Rubygems goes down to 2.0 on Ruby 2.0.0
     - rvm: 2.0.0
       env: RGV=v2.1.11
     - rvm: 2.0.0
