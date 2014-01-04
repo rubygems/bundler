@@ -21,6 +21,7 @@ notifications:
     rooms:
       secure: MNTSGIySYwHia5gIgRiZxXtPMPDIP9KmzQk7Kq2ZoVvP3mIk8W1TMkvcyFkEf6uCasyVZZixzUBfY+E0BlHAz1ycQpTh1jvSpuIpEVYW48ShJldJ+8W8xfzafyOHii3z7VrDaomEffmMDdmHRsbQAfekMjdR4bTpXtT9V+wOXlg=
 rvm:
+  - 2.1.0
   - 2.0.0
   - 1.9.3
 # Rubygems versions MUST be available as rake tasks
@@ -51,7 +52,11 @@ matrix:
       env: RGV=v2.1.11
     - rvm: rbx
       env: RGV=v2.1.11
-    # Rubygems goes down to 2.0 on Ruby 2.0.0
+    # Rubygems goes down to 2.0 on Ruby 2.0.0 and 2.1.0
+    - rvm: 2.1.0
+      env: RGV=v2.1.11
+    - rvm: 2.1.0
+      env: RGV=v2.0.12
     - rvm: 2.0.0
       env: RGV=v2.1.11
     - rvm: 2.0.0
