@@ -32,7 +32,7 @@ env:
   # Test the latest rubygems release with all of our supported rubies
   - RGV=v2.1.11
   # Test the latest stable branch so we know the next minor will work
-  - RGV=2.1
+  - RGV=2.2
 matrix:
   allow_failures:
     # We want to know how we're doing with head, but not fail the build
