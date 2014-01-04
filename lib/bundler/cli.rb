@@ -232,8 +232,6 @@ module Bundler
         opts[:system] = true
       end
 
-      opts["no-cache"] ||= opts[:local]
-
       Bundler.settings[:path]     = nil if opts[:system]
       Bundler.settings[:path]     = "vendor/bundle" if opts[:deployment]
       Bundler.settings[:path]     = opts["path"] if opts["path"]
