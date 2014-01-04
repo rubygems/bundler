@@ -31,7 +31,7 @@ env:
   # We need to know if changes to rubygems will break bundler on release
   - RGV=master
   # Test the latest rubygems release with all of our supported rubies
-  - RGV=v2.1.11
+  - RGV=v2.2.0
   # Test the latest stable branch so we know the next minor will work
   - RGV=2.2
 matrix:
@@ -50,9 +50,9 @@ matrix:
       env: RGV=master
     # Alternate implementations
     - rvm: jruby
-      env: RGV=v2.1.11
+      env: RGV=v2.2.0
     - rvm: rbx
-      env: RGV=v2.1.11
+      env: RGV=v2.2.0
     # Rubygems goes down to 2.0 on Ruby 2.0.0
     - rvm: 2.0.0
       env: RGV=v2.1.11
