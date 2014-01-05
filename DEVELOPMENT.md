@@ -2,7 +2,7 @@ Great to have you here! Here are a few ways you can help out with [Bundler](http
 
 # Where should I start?
 
-You can start learning about Bundler by reading [the documentation](http://bundler.io). If you want, you can also read a (lengthy) explanation of [why Bundler exists and what it does](http://bundler.io/v1.2/rationale.html). You can also check out discussions about Bundler on the [Bundler mailing list](https://groups.google.com/group/ruby-bundler) and in the [Bundler IRC channel](irc://irc.freenode.net/#bundler), which is #bundler on Freenode.
+You can start learning about Bundler by reading [the documentation](http://bundler.io). If you want, you can also read a (lengthy) explanation of [why Bundler exists and what it does](http://bundler.io/v1.5/rationale.html). You can also check out discussions about Bundler on the [Bundler mailing list](https://groups.google.com/group/ruby-bundler) and in the [Bundler IRC channel](irc://irc.freenode.net/#bundler), which is #bundler on Freenode.
 
 ## Your first commits
 
