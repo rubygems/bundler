@@ -113,7 +113,6 @@ module Bundler
         Bundler.ui.debug debug_message if debug_message
         spec_info = "#{worker}:  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
         Bundler.ui.debug spec_info
-        logger.info spec_info
       end
 
       if Bundler.settings[:bin] && standalone
@@ -139,7 +138,6 @@ module Bundler
         msg << " #{spec.name} -v '#{spec.version}'` succeeds before bundling."
       end
       Bundler.ui.debug e.backtrace.join("\n")
-      logger.error("#{e.class}: #{e.message}\n#{e.backtrace.join('  \n')}")
       raise Bundler::InstallError, msg
     end
 
@@ -198,15 +196,6 @@ module Bundler
 
   private
 
-    def logger
-      # Create a debug installation log limited to 1MB
-      @logger ||= begin
-        require 'logger'
-        Bundler.app_config_path.mkpath
-        Logger.new(Bundler.app_config_path.join("install.log"), 1, 1048576)
-      end
-    end
-
     def can_install_parallely?
       min_rubygems = "2.0.7"
       if Bundler.current_ruby.mri? || Bundler.rubygems.provides?(">= #{min_rubygems}")
@@ -216,25 +205,6 @@ module Bundler
           "gems must be installed one at a time. Upgrade to Rubygems " \
           "#{min_rubygems} or higher to enable parallel gem installation."
         false
-      end
-    end
-
-    def check_rubygems_cache_dir
-      require 'digest'
-      cached_gems = Dir["#{Bundler.rubygems.gem_dir}/cache/*.gem"]
-
-      same_size_gems = cached_gems.group_by { |f| File.size(f) }.
-        values.select { |names| names.size > 1 }
-
-      same_hash_gems = same_size_gems.flatten.group_by do |f|
-        Digest::SHA1.hexdigest(File.read(f))
-      end.values.select { |names| names.size > 1 }
-
-      if same_hash_gems.any?
-        Bundler.ui.warn "It looks like some of your gems are corrupted!"
-        same_hash_gems.each { |name| Bundler.ui.warn "  * #{name}" }
-        Bundler.ui.warn "Please report this issue to the Bundler issue tracker " \
-          "on Github, and include the log file at .bundle/install.log. Thanks!"
       end
     end
 
@@ -337,7 +307,6 @@ module Bundler
           end
         end
       end
-      check_rubygems_cache_dir
       message
     ensure
       worker_pool && worker_pool.stop
