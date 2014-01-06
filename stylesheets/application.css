@@ -535,3 +535,13 @@ pre {
     font-weight: normal;
     color: #124f6a;
     margin-top: -0.5em; }
+
+/* line 369, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+.license {
+  margin-top: 5em;
+  text-align: right;
+  font-size: 0.8em; }
+  /* line 374, /Users/andre/src/bundler/bundler-site/source/stylesheets/application.sass */
+  .license img {
+    float: left;
+    margin-right: 3em; }
