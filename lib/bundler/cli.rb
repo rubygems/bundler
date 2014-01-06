@@ -73,6 +73,7 @@ module Bundler
     D
     method_option "gemspec", :type => :string, :banner => "Use the specified .gemspec to create the Gemfile"
     def init
+      require 'bundler/cli/init'
       Init.new(options.dup).run
     end
 
@@ -89,6 +90,7 @@ module Bundler
     method_option "dry-run", :type => :boolean, :default => false, :banner =>
       "Lock the Gemfile"
     def check
+      require 'bundler/cli/check'
       Check.new(options).run
     end
 
@@ -141,6 +143,7 @@ module Bundler
       "Specify the number of jobs to run in parallel"
 
     def install
+      require 'bundler/cli/install'
       Install.new(options.dup).run
     end
 
@@ -162,6 +165,7 @@ module Bundler
     method_option "group", :aliases => "-g", :type => :array, :banner =>
       "Update a specific group"
     def update(*gems)
+      require 'bundler/cli/update'
       Update.new(options, gems).run
     end
 
@@ -173,6 +177,7 @@ module Bundler
     method_option "paths", :type => :boolean,
       :banner => "List the paths of all gems that are required by your Gemfile."
     def show(gem_name = nil)
+      require 'bundler/cli/show'
       Show.new(options, gem_name).run
     end
     map %w(list) => "show"
@@ -187,6 +192,7 @@ module Bundler
     method_option "force", :type => :boolean, :default => false, :banner =>
       "overwrite existing binstubs if they exist"
     def binstubs(*gems)
+      require 'bundler/cli/binstubs'
       Binstubs.new(options, gems).run
     end
 
@@ -204,6 +210,7 @@ module Bundler
     method_option "strict", :type => :boolean, :banner =>
       "Only list newer versions allowed by your Gemfile requirements"
     def outdated(*gems)
+      require 'bundler/cli/outdated'
       Outdated.new(options, gems).run
     end
 
@@ -211,6 +218,7 @@ module Bundler
     method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
     method_option "all",  :type => :boolean, :banner => "Include all sources (including path and git)."
     def cache
+      require 'bundler/cli/cache'
       Cache.new(options).run
     end
 
@@ -522,12 +530,8 @@ module Bundler
     method_option "force", :type => :boolean, :default => false, :banner =>
       "forces clean even if --path is not set"
     def clean
-      if Bundler.settings[:path] || options[:force]
-        Bundler.load.clean(options[:"dry-run"])
-      else
-        Bundler.ui.error "Can only use bundle clean when --path is set or --force is set"
-        exit 1
-      end
+      require 'bundler/cli/clean'
+      Clean.new(options.dup).run
     end
 
     desc "platform", "Displays platform compatibility information"
@@ -641,23 +645,6 @@ module Bundler
       message += "\nDid you mean #{suggestions}?" if suggestions
       message
     end
-
-    def without_groups_message
-      groups = Bundler.settings.without
-      group_list = [groups[0...-1].join(", "), groups[-1..-1]].
-        reject{|s| s.to_s.empty? }.join(" and ")
-      group_str = (groups.size == 1) ? "group" : "groups"
-      "Gems in the #{group_str} #{group_list} were not installed."
-    end
-
   end
 end
 
-require 'bundler/cli/init'
-require 'bundler/cli/check'
-require 'bundler/cli/install'
-require 'bundler/cli/update'
-require 'bundler/cli/show'
-require 'bundler/cli/binstubs'
-require 'bundler/cli/outdated'
-require 'bundler/cli/cache'

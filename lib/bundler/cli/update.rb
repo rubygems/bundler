@@ -44,9 +44,23 @@ module Bundler
       Bundler.definition.validate_ruby!
       Installer.install Bundler.root, Bundler.definition, opts
       Bundler.load.cache if Bundler.root.join("vendor/cache").exist?
-      clean if Bundler.settings[:clean] && Bundler.settings[:path]
+
+      if Bundler.settings[:clean] && Bundler.settings[:path]
+        require "bundler/cli/clean"
+        Bundler::CLI::Clean.new(options).run
+      end
+
       Bundler.ui.confirm "Your bundle is updated!"
-      Bundler.ui.confirm without_groups_message if Bundler.settings.without.any?
+      without_groups_messages
+    end
+
+    private
+
+    def without_groups_messages
+      if Bundler.settings.without.any?
+        require "bundler/cli/common"
+        Bundler.ui.confirm Bundler::CLI::Common.without_groups_message
+      end
     end
   end
 end

@@ -82,11 +82,11 @@ module Bundler
         absolute_path = File.expand_path(Bundler.settings[:path])
         relative_path = absolute_path.sub(File.expand_path('.'), '.')
         Bundler.ui.confirm "Your bundle is complete!"
-        Bundler.ui.confirm without_groups_message if Bundler.settings.without.any?
+        without_groups_messages
         Bundler.ui.confirm "It was installed into #{relative_path}"
       else
         Bundler.ui.confirm "Your bundle is complete!"
-        Bundler.ui.confirm without_groups_message if Bundler.settings.without.any?
+        without_groups_messages
         Bundler.ui.confirm "Use `bundle show [gemname]` to see where a bundled gem is installed."
       end
       Installer.post_install_messages.to_a.each do |name, msg|
@@ -94,7 +94,10 @@ module Bundler
         Bundler.ui.info msg
       end
 
-      clean if Bundler.settings[:clean] && Bundler.settings[:path]
+      if Bundler.settings[:clean] && Bundler.settings[:path]
+        require "bundler/cli/clean"
+        Bundler::CLI::Clean.new(options).run
+      end
     rescue GemNotFound, VersionConflict => e
       if options[:local] && Bundler.app_cache.exist?
         Bundler.ui.warn "Some gems seem to be missing from your vendor/cache directory."
@@ -108,6 +111,15 @@ module Bundler
         WARN
       end
       raise e
+    end
+
+    private
+
+    def without_groups_messages
+      if Bundler.settings.without.any?
+        require "bundler/cli/common"
+        Bundler.ui.confirm Bundler::CLI::Common.without_groups_message
+      end
     end
   end
 end
