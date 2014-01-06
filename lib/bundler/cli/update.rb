@@ -46,7 +46,7 @@ module Bundler
       Bundler.load.cache if Bundler.root.join("vendor/cache").exist?
 
       if Bundler.settings[:clean] && Bundler.settings[:path]
-        require_relative "clean"
+        require "bundler/cli/clean"
         Bundler::CLI::Clean.new(options).run
       end
 
@@ -58,7 +58,7 @@ module Bundler
 
     def without_groups_messages
       if Bundler.settings.without.any?
-        require_relative "common"
+        require "bundler/cli/common"
         Bundler.ui.confirm Bundler::CLI::Common.without_groups_message
       end
     end
