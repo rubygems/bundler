@@ -95,7 +95,7 @@ module Bundler
       end
 
       if Bundler.settings[:clean] && Bundler.settings[:path]
-        require "bundler/cli/clean"
+        require_relative "clean"
         Bundler::CLI::Clean.new(options).run
       end
     rescue GemNotFound, VersionConflict => e
@@ -117,7 +117,7 @@ module Bundler
 
     def without_groups_messages
       if Bundler.settings.without.any?
-        require "bundler/cli/common"
+        require_relative "common"
         Bundler.ui.confirm Bundler::CLI::Common.without_groups_message
       end
     end
