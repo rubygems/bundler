@@ -25,6 +25,7 @@ rvm:
   - 2.1.0
   - 2.0.0
   - 1.9.3
+  - 1.8.7
 # Rubygems versions MUST be available as rake tasks
 # see Rakefile:66 for the list of possible RGV values
 env:
