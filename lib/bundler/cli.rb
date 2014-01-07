@@ -163,7 +163,7 @@ module Bundler
     method_option "shebang", :type => :string, :banner =>
       "Specify a different shebang executable name than the default (usually 'ruby')"
     method_option "path", :type => :string, :banner =>
-      "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
+      "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME)"
     method_option "system", :type => :boolean, :banner =>
       "Install to the system location ($BUNDLE_PATH or $GEM_HOME) even if the bundle was previously installed somewhere else for this application"
     method_option "frozen", :type => :boolean, :banner =>
@@ -200,15 +200,11 @@ module Bundler
         exit 1
       end
 
-      if (opts["trust-policy"])
-        unless (Bundler.rubygems.security_policies.keys.include?(opts["trust-policy"]))
-          Bundler.ui.error "Rubygems doesn't know about trust policy '#{opts["trust-policy"]}'. " \
-            "The known policies are: #{Bundler.rubygems.security_policies.keys.join(', ')}."
-          exit 1
-        end
-        Bundler.settings["trust-policy"] = opts["trust-policy"]
-      else
-        Bundler.settings["trust-policy"] = nil if Bundler.settings["trust-policy"]
+      opts["trust-policy"] ||= Bundler.settings["trust-policy"]
+      if opts["trust-policy"] && !Bundler.rubygems.security_policies.keys.include?(opts["trust-policy"])
+        Bundler.ui.error "Rubygems doesn't know about trust policy '#{opts["trust-policy"]}'. " \
+          "The known policies are: #{Bundler.rubygems.security_policies.keys.join(', ')}."
+        exit 1
       end
 
       if opts[:deployment] || opts[:frozen]
@@ -234,38 +230,37 @@ module Bundler
 
       opts["no-cache"] ||= opts[:local]
 
-      Bundler.settings[:path]     = nil if opts[:system]
-      Bundler.settings[:path]     = "vendor/bundle" if opts[:deployment]
-      Bundler.settings[:path]     = opts["path"] if opts["path"]
-      Bundler.settings[:path]     ||= "bundle" if opts["standalone"]
-      Bundler.settings[:bin]      = opts["binstubs"] if opts["binstubs"]
-      Bundler.settings[:bin]      = nil if opts["binstubs"] && opts["binstubs"].empty?
-      Bundler.settings[:shebang]  = opts["shebang"] if opts["shebang"]
-      Bundler.settings[:jobs]     = opts["jobs"] if opts["jobs"]
-      Bundler.settings[:no_prune] = true if opts["no-prune"]
-      Bundler.settings[:clean]    = opts["clean"] if opts["clean"]
-      Bundler.settings.without    = opts[:without]
-      Bundler.ui.level            = "warn" if opts[:quiet]
+      path = opts[:system] ? nil : Bundler.settings[:path]
+      path = "vendor/bundle" if opts[:deployment]
+      path = opts[:path] if opts[:path]
+      path ||= "bundle" if opts[:standalone]
+      opts[:path] = path
+      Bundler.configure(opts[:path])
+      
+      # Bundler.settings[:path] = path if opts[:standalone] || opts[:deployment] # todo
+
+      Bundler.ui.level = "warn" if opts[:quiet]
       Bundler::Fetcher.disable_endpoint = opts["full-index"]
-      Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? '1' : nil
 
       # rubygems plugins sometimes hook into the gem install process
       Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins)
 
-      definition = Bundler.definition
+      definition = Bundler.definition(false, opts[:without])
       definition.validate_ruby!
       Installer.install(Bundler.root, definition, opts)
-      Bundler.load.cache if Bundler.root.join("vendor/cache").exist? && !opts["no-cache"]
+      Bundler.load.cache(opts["no-prune"]) if Bundler.root.join("vendor/cache").exist? && !opts["no-cache"]
 
-      if Bundler.settings[:path]
-        absolute_path = File.expand_path(Bundler.settings[:path])
+      show_without_message = Bundler.settings.without.any? || (opts[:without] && opts[:without].any?)
+
+      if opts[:path]
+        absolute_path = File.expand_path(opts[:path])
         relative_path = absolute_path.sub(File.expand_path('.'), '.')
         Bundler.ui.confirm "Your bundle is complete!"
-        Bundler.ui.confirm without_groups_message if Bundler.settings.without.any?
+        Bundler.ui.confirm without_groups_message if show_without_message
         Bundler.ui.confirm "It was installed into #{relative_path}"
       else
         Bundler.ui.confirm "Your bundle is complete!"
-        Bundler.ui.confirm without_groups_message if Bundler.settings.without.any?
+        Bundler.ui.confirm without_groups_message if show_without_message
         Bundler.ui.confirm "Use `bundle show [gemname]` to see where a bundled gem is installed."
       end
       Installer.post_install_messages.to_a.each do |name, msg|
@@ -273,7 +268,7 @@ module Bundler
         Bundler.ui.info msg
       end
 
-      clean if Bundler.settings[:clean] && Bundler.settings[:path]
+      clean if opts["clean"] && opts[:path]
     rescue GemNotFound, VersionConflict => e
       if opts[:local] && Bundler.app_cache.exist?
         Bundler.ui.warn "Some gems seem to be missing from your vendor/cache directory."
@@ -410,7 +405,10 @@ module Bundler
         if spec.name == "bundler"
           Bundler.ui.warn "Sorry, Bundler can only be run via Rubygems."
         else
-          installer.generate_bundler_executable_stubs(spec, :force => options[:force], :binstubs_cmd => true)
+          installer.generate_bundler_executable_stubs(spec, 
+            :force => options[:force], 
+            :binstubs_cmd => true, 
+            :bin => Bundler.bin_path(options))
         end
       end
     end

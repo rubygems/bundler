@@ -33,11 +33,11 @@ module Bundler
 
       @@spec_fetch_map ||= {}
 
-      def fetch(spec)
+      def fetch(spec, policy=nil)
         spec, uri = @@spec_fetch_map[spec.full_name]
         if spec
           path = download_gem_from_uri(spec, uri)
-          s = Bundler.rubygems.spec_from_gem(path, Bundler.settings["trust-policy"])
+          s = Bundler.rubygems.spec_from_gem(path, policy)
           spec.__swap__(s)
         end
       end

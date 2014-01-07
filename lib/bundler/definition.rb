@@ -15,7 +15,7 @@ module Bundler
     # @param unlock [Hash, Boolean, nil] Gems that have been requested
     #   to be updated or true if all gems should be updated
     # @return [Bundler::Definition]
-    def self.build(gemfile, lockfile, unlock)
+    def self.build(gemfile, lockfile, unlock, without=[])
       unlock ||= {}
       gemfile = Pathname.new(gemfile).expand_path
 
@@ -23,7 +23,7 @@ module Bundler
         raise GemfileNotFound, "#{gemfile} not found"
       end
 
-      Dsl.evaluate(gemfile, lockfile, unlock)
+      Dsl.evaluate(gemfile, lockfile, unlock, without)
     end
 
 
@@ -44,7 +44,10 @@ module Bundler
     # @param unlock [Hash, Boolean, nil] Gems that have been requested
     #   to be updated or true if all gems should be updated
     # @param ruby_version [Bundler::RubyVersion, nil] Requested Ruby Version
-    def initialize(lockfile, dependencies, sources, unlock, ruby_version = nil)
+    def initialize(lockfile, dependencies, sources, unlock, ruby_version = nil, without = nil)
+      without ||= []
+      @without = without.empty? ? Bundler.settings.without : without.map(&:to_sym)
+
       @unlocking = unlock == true || !unlock.empty?
 
       @dependencies, @sources, @unlock = dependencies, sources, unlock
@@ -162,7 +165,7 @@ module Bundler
 
     def requested_specs
       @requested_specs ||= begin
-        groups = self.groups - Bundler.settings.without
+        groups = self.groups - @without
         groups.map! { |g| g.to_sym }
         specs_for(groups)
       end
@@ -592,7 +595,7 @@ module Bundler
     end
 
     def requested_dependencies
-      groups = self.groups - Bundler.settings.without
+      groups = self.groups - @without
       groups.map! { |g| g.to_sym }
       dependencies.reject { |d| !d.should_include? || (d.groups & groups).empty? }
     end

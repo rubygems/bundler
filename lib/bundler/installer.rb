@@ -52,7 +52,7 @@ module Bundler
       begin
         Bundler.bundle_path.mkpath unless Bundler.bundle_path.exist?
       rescue Errno::EEXIST
-        raise PathError, "Could not install to path `#{Bundler.settings[:path]}` " +
+        raise PathError, "Could not install to path `#{Bundler.bundle_path}` " +
           "because of an invalid symlink. Remove the symlink so the directory can be created."
       end
 
@@ -96,21 +96,24 @@ module Bundler
       # dependencies might actually affect the installation of a gem.
       # that said, it's a rare situation (other than rake), and parallel
       # installation is just SO MUCH FASTER. so we let people opt in.
-      jobs = [Bundler.settings[:jobs].to_i, 1].max
+      jobs = options[:jobs] || Bundler.settings[:jobs]
+      jobs = [jobs.to_i, 1].max
       if jobs > 1 && can_install_parallely?
-        install_in_parallel jobs, options[:standalone]
+        install_in_parallel jobs, options
       else
-        install_sequentially options[:standalone]
+        install_sequentially options
       end
 
       lock
-      generate_standalone(options[:standalone]) if options[:standalone]
+      generate_standalone(options[:standalone], options[:path]) if options[:standalone]
     end
 
-    def install_gem_from_spec(spec, standalone = false, worker = 0)
+    def install_gem_from_spec(spec, options, worker = 0)
+      standalone = options[:standalone] || false
+
       # Download the gem to get the spec, because some specs that are returned
       # by rubygems.org are broken and wrong.
-      Bundler::Fetcher.fetch(spec) if spec.source.is_a?(Bundler::Source::Rubygems)
+      Bundler::Fetcher.fetch(spec, options["trust-policy"]) if spec.source.is_a?(Bundler::Source::Rubygems)
 
       # Fetch the build settings, if there are any
       settings             = Bundler.settings["build.#{spec.name}"]
@@ -124,10 +127,17 @@ module Bundler
         Bundler.ui.debug "#{worker}:  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
       end
 
-      if Bundler.settings[:bin] && standalone
-        generate_standalone_bundler_executable_stubs(spec)
-      elsif Bundler.settings[:bin]
-        generate_bundler_executable_stubs(spec, :force => true)
+      if options[:binstubs]
+        bin_path = Bundler.bin_path(options)
+        if standalone
+          generate_standalone_bundler_executable_stubs(spec, options[:path], 
+            :shebang => options[:shebang],
+            :bin     => bin_path)
+        else
+          generate_bundler_executable_stubs(spec, :force => true, 
+            :shebang => options[:shebang],
+            :bin     => bin_path)
+        end
       end
 
       FileUtils.rm_rf(Bundler.tmp)
@@ -168,10 +178,10 @@ module Bundler
       end
 
       # double-assignment to avoid warnings about variables that will be used by ERB
-      bin_path = bin_path = Bundler.bin_path
+      bin_path = bin_path = options[:bin]
       template = template = File.read(File.expand_path('../templates/Executable', __FILE__))
       relative_gemfile_path = relative_gemfile_path = Bundler.default_gemfile.relative_path_from(bin_path)
-      ruby_command = ruby_command = Thor::Util.ruby_command
+      shebang = shebang = options[:shebang] || Bundler.settings[:shebang] || RbConfig::CONFIG['ruby_install_name']
 
       exists = []
       spec.executables.each do |executable|
@@ -215,15 +225,15 @@ module Bundler
       end
     end
 
-    def generate_standalone_bundler_executable_stubs(spec)
+    def generate_standalone_bundler_executable_stubs(spec, path, options={})
       # double-assignment to avoid warnings about variables that will be used by ERB
-      bin_path = Bundler.bin_path
+      bin_path = options[:bin]
       template = File.read(File.expand_path('../templates/Executable.standalone', __FILE__))
-      ruby_command = ruby_command = Thor::Util.ruby_command
+      shebang = shebang = options[:shebang] || Bundler.settings[:shebang] || RbConfig::CONFIG['ruby_install_name']
 
       spec.executables.each do |executable|
         next if executable == "bundle"
-        standalone_path = standalone_path = Pathname(Bundler.settings[:path]).expand_path.relative_path_from(bin_path)
+        standalone_path = standalone_path = Pathname(path).expand_path.relative_path_from(bin_path)
         executable_path = executable_path = Pathname(spec.full_gem_path).join(spec.bindir, executable).relative_path_from(bin_path)
         File.open "#{bin_path}/#{executable}", 'w', 0755 do |f|
           f.puts ERB.new(template, nil, '-').result(binding)
@@ -231,9 +241,8 @@ module Bundler
       end
     end
 
-    def generate_standalone(groups)
-      standalone_path = Bundler.settings[:path]
-      bundler_path = File.join(standalone_path, "bundler")
+    def generate_standalone(groups, path)
+      bundler_path = File.join(path, "bundler")
       FileUtils.mkdir_p(bundler_path)
 
       paths = []
@@ -267,16 +276,16 @@ module Bundler
       end
     end
 
-    def install_sequentially(standalone)
+    def install_sequentially(options)
       specs.each do |spec|
-        message = install_gem_from_spec spec, standalone, 0
+        message = install_gem_from_spec spec, options, 0
         if message
           Installer.post_install_messages[spec.name] = message
         end
       end
     end
 
-    def install_in_parallel(size, standalone)
+    def install_in_parallel(size, options)
       name2spec = {}
       remains = {}
       enqueued = {}
@@ -287,7 +296,7 @@ module Bundler
 
       worker_pool = ParallelWorkers.worker_pool size, lambda { |name, worker|
         spec = name2spec[name]
-        message = install_gem_from_spec spec, standalone, worker
+        message = install_gem_from_spec spec, options, worker
         { :name => spec.name, :post_install => message }
       }
       specs.each do |spec|

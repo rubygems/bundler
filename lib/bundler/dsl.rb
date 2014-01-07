@@ -4,10 +4,10 @@ module Bundler
   class Dsl
     include RubyDsl
 
-    def self.evaluate(gemfile, lockfile, unlock)
+    def self.evaluate(gemfile, lockfile, unlock, without=[])
       builder = new
       builder.eval_gemfile(gemfile)
-      builder.to_definition(lockfile, unlock)
+      builder.to_definition(lockfile, unlock, without)
     end
 
     VALID_PLATFORMS = Bundler::Dependency::PLATFORM_MAP.keys.freeze
@@ -150,9 +150,9 @@ module Bundler
       source Source::Git.new(_normalize_hash(options).merge("uri" => uri)), source_options, &blk
     end
 
-    def to_definition(lockfile, unlock)
+    def to_definition(lockfile, unlock, without=[])
       @sources << @rubygems_source unless @sources.include?(@rubygems_source)
-      Definition.new(lockfile, @dependencies, @sources, unlock, @ruby_version)
+      Definition.new(lockfile, @dependencies, @sources, unlock, @ruby_version, without)
     end
 
     def group(*args, &blk)

@@ -127,6 +127,15 @@ describe "bundle cache" do
       expect(cached_gem("rack-1.0.0")).to exist
     end
 
+    it "leaves removed gem in cache during install with --no-prune" do
+      gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "rack"
+      G
+      bundle 'install --no-prune'
+      expect(cached_gem("actionpack-2.3.2")).to exist
+    end
+
     it "adds and removes when gems are updated" do
       update_repo2
       bundle 'update --force'
