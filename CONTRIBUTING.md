@@ -1,6 +1,6 @@
 # Contributing
 
-Bundler welcomes contributions from *everyone*.
+Bundler welcomes contributions from *everyone*. While contributing, please follow the project [code of conduct](http://bundler.io/conduct.html), so that everyone can be included.
 
 Here are some ways you can contribute:
 
