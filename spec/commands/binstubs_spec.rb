@@ -203,4 +203,27 @@ describe "bundle binstubs <gem>" do
       expect(out).to include('no executables for the gem with_development_dependency')
     end
   end
+
+  context "when BUNDLE_INSTALL is specified" do
+    it "performs an automatic bundle install" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      bundle "binstubs rack", :env => { "BUNDLE_INSTALL" => 1 }
+      expect(out).to include('Installing rack 1.0.0')
+      should_be_installed "rack 1.0.0"
+    end
+
+    it "does nothing when already up to date" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      bundle "binstubs rack", :env => { "BUNDLE_INSTALL" => 1 }
+      expect(out).not_to include('Installing rack 1.0.0')
+    end
+  end
 end

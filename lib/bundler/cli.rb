@@ -397,6 +397,7 @@ module Bundler
     method_option "force", :type => :boolean, :default => false, :banner =>
       "overwrite existing binstubs if they exist"
     def binstubs(*gems)
+      auto_install
       Bundler.definition.validate_ruby!
       Bundler.settings[:bin] = options["path"] if options["path"]
       Bundler.settings[:bin] = nil if options["path"] && options["path"].empty?
