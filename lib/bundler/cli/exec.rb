@@ -2,7 +2,7 @@ module Bundler
   class CLI::Exec
     attr_reader :options, :args
 
-    def initialize(options, args)
+    def initialize(options, *args)
       @options = options
       @args = args
     end

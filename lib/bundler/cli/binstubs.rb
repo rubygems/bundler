@@ -1,7 +1,7 @@
 module Bundler
   class CLI::Binstubs 
     attr_reader :options, :gems
-    def initialize(options, gems)
+    def initialize(options, *gems)
       @options = options
       @gems = gems
     end
