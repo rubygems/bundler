@@ -354,6 +354,7 @@ module Bundler
     method_option "paths", :type => :boolean,
       :banner => "List the paths of all gems that are required by your Gemfile."
     def show(gem_name = nil)
+      auto_install
       Bundler.ui.silence do
         Bundler.definition.validate_ruby!
         Bundler.load.lock

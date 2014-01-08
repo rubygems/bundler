@@ -115,4 +115,14 @@ describe "bundle show" do
       expect(err).to be_empty
     end
   end
+
+  it "performs an automatic bundle install" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "foo"
+    G
+
+    bundle :show, :env => { 'BUNDLE_INSTALL' => '1' }
+    expect(out).to include("Installing foo 1.0")
+  end
 end
