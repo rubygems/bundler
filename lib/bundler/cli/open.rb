@@ -1,7 +1,7 @@
 require 'bundler/cli/common'
 
 module Bundler
-  class CLI::Open 
+  class CLI::Open
     attr_reader :options, :name
     def initialize(options, name)
       @options = options

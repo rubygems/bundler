@@ -7,7 +7,7 @@ module Bundler
     end
 
     def run
-      Bundler.ui.level = "warn" if options[:quiet] 
+      Bundler.ui.level = "warn" if options[:quiet]
       Bundler.settings[:path] = File.expand_path(options[:path]) if options[:path]
       setup_cache_all
       install
@@ -34,4 +34,3 @@ module Bundler
     end
   end
 end
-

@@ -1,5 +1,5 @@
 module Bundler
-  class CLI::Inject 
+  class CLI::Inject
     attr_reader :options, :name, :version, :gems
     def initialize(options, name, version, gems)
       @options = options

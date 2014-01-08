@@ -1,5 +1,5 @@
 module Bundler
-  class CLI::Update 
+  class CLI::Update
     attr_reader :options, :gems
     def initialize(options, gems)
       @options = options

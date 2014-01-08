@@ -481,4 +481,3 @@ module Bundler
     end
   end
 end
-

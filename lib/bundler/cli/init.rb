@@ -1,5 +1,5 @@
 module Bundler
-  class CLI::Init 
+  class CLI::Init
     attr_reader :options
     def initialize(options)
       @options = options

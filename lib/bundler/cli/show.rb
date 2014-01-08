@@ -1,7 +1,7 @@
 require 'bundler/cli/common'
 
 module Bundler
-  class CLI::Show 
+  class CLI::Show
     attr_reader :options, :gem_name
     def initialize(options, gem_name)
       @options = options

@@ -1,5 +1,5 @@
 module Bundler
-  class CLI::Viz 
+  class CLI::Viz
     attr_reader :options, :gem_name
     def initialize(options)
       @options = options

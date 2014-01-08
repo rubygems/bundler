@@ -1,7 +1,7 @@
 require 'bundler/cli/common'
 
 module Bundler
-  class CLI::Outdated 
+  class CLI::Outdated
     attr_reader :options, :gems
     def initialize(options, gems)
       @options = options

@@ -1,5 +1,5 @@
 module Bundler
-  class CLI::Cache 
+  class CLI::Cache
     attr_reader :options
     def initialize(options)
       @options = options
