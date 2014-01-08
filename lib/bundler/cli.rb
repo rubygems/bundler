@@ -553,6 +553,7 @@ module Bundler
     D
     def exec(*args)
       Bundler.definition.validate_ruby!
+      auto_install
       Bundler.load.setup_environment
 
       begin

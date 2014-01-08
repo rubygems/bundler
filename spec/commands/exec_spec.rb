@@ -306,4 +306,15 @@ describe "bundle exec" do
       end
     end
   end
+
+  it "performs an automatic bundle install" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack", "0.9.1"
+      gem "foo"
+    G
+
+    bundle "exec rackup", :env => { 'BUNDLE_INSTALL' => '1' }
+    expect(out).to include("Installing foo 1.0")
+  end
 end
