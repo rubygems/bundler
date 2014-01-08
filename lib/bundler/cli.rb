@@ -355,6 +355,7 @@ module Bundler
       "forces clean even if --path is not set"
     def clean
       require 'bundler/cli/clean'
+      auto_install if Bundler.settings[:path] || options[:force]
       Clean.new(options.dup).run
     end
 
