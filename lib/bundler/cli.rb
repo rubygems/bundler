@@ -177,6 +177,7 @@ module Bundler
       :banner => "List the paths of all gems that are required by your Gemfile."
     def show(gem_name = nil)
       require 'bundler/cli/show'
+      auto_install
       Show.new(options, gem_name).run
     end
     map %w(list) => "show"
