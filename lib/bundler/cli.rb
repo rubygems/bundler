@@ -253,6 +253,7 @@ module Bundler
     D
     def exec(*args)
       require 'bundler/cli/exec'
+      auto_install
       Exec.new(options, args).run
     end
 
