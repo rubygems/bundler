@@ -723,6 +723,7 @@ module Bundler
 
     desc "licenses", "Prints the license of all gems in the bundle"
     def licenses
+      auto_install
       Bundler.load.specs.sort_by { |s| s.license.to_s }.reverse.each do |s|
         gem_name = s.name
         license  = s.license || s.licenses
