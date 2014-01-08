@@ -290,6 +290,7 @@ module Bundler
     desc "console [GROUP]", "Opens an IRB session with the bundle pre-loaded"
     def console(group = nil)
       require 'bundler/cli/console'
+      auto_install
       Console.new(options, group, CONSOLES).run
     end
 
