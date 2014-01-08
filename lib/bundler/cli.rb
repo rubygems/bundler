@@ -909,6 +909,25 @@ module Bundler
       end
     end
 
+    # Automatically invoke `bundle install` and resume if BUNDLE_INSTALL is set to `1` and any specs
+    # are not presently locally.
+    #
+    # Note that this method `nil`s out the global Definition object, so it should be called first,
+    # before you instantiate anything like an `Installer` that'll keep a reference to the old one
+    # instead.
+    def auto_install
+      return unless ENV['BUNDLE_INSTALL']
+
+      begin
+        Bundler.definition.specs
+      rescue GemNotFound
+        Bundler.ui.info "Automatically installing missing gems."
+        Bundler.reset!
+        invoke :install, []
+        Bundler.reset!
+      end
+    end
+
     def select_spec(name, regex_match = nil)
       specs = []
       regexp = Regexp.new(name) if regex_match
