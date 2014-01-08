@@ -338,16 +338,8 @@ module Bundler
 
     desc "open GEM", "Opens the source directory of the given bundled gem"
     def open(name)
-      editor = [ENV['BUNDLER_EDITOR'], ENV['VISUAL'], ENV['EDITOR']].find{|e| !e.nil? && !e.empty? }
-      return Bundler.ui.info("To open a bundled gem, set $EDITOR or $BUNDLER_EDITOR") unless editor
-      spec = select_spec(name, :regex_match)
-      return unless spec
-      full_gem_path = spec.full_gem_path
-      Dir.chdir(full_gem_path) do
-        command = "#{editor} #{full_gem_path}"
-        success = system(command)
-        Bundler.ui.info "Could not run '#{command}'" unless success
-      end
+      require 'bundler/cli/open'
+      Open.new(options, name).run
     end
 
     CONSOLES = {
@@ -570,44 +562,6 @@ module Bundler
     desc "env", "Print information about the environment Bundler is running under"
     def env
       Env.new.write($stdout)
-    end
-
-  private
-
-    def select_spec(name, regex_match = nil)
-      specs = []
-      regexp = Regexp.new(name) if regex_match
-
-      Bundler.definition.specs.each do |spec|
-        return spec if spec.name == name
-        specs << spec if regexp && spec.name =~ regexp
-      end
-
-      case specs.count
-      when 0
-        raise GemNotFound, not_found_message(name, Bundler.definition.dependencies)
-      when 1
-        specs.first
-      else
-        specs.each_with_index do |spec, index|
-          Bundler.ui.info "#{index.succ} : #{spec.name}", true
-        end
-        Bundler.ui.info '0 : - exit -', true
-
-        input = Bundler.ui.ask('> ')
-        (num = input.to_i) > 0 ? specs[num - 1] : nil
-      end
-    end
-
-    def not_found_message(missing_gem_name, alternatives)
-      message = "Could not find gem '#{missing_gem_name}'."
-
-      # This is called as the result of a GemNotFound, let's see if
-      # there's any similarly named ones we can propose instead
-      alternate_names = alternatives.map { |a| a.respond_to?(:name) ? a.name : a }
-      suggestions = SimilarityDetector.new(alternate_names).similar_word_list(missing_gem_name)
-      message += "\nDid you mean #{suggestions}?" if suggestions
-      message
     end
   end
 end

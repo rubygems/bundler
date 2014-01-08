@@ -20,7 +20,7 @@ module Bundler
 
     def install
       require 'bundler/cli/install'
-      Install.new(options.dup).run
+      Bundler::CLI::Install.new(options.dup).run
     end
 
     def setup_cache_all

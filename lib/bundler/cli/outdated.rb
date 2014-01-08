@@ -1,7 +1,9 @@
+require 'bundler/cli/common'
+
 module Bundler
   class CLI::Outdated 
     attr_reader :options, :gems
-    def initialize(options, *gems)
+    def initialize(options, gems)
       @options = options
       @gems = gems
     end
@@ -10,7 +12,7 @@ module Bundler
       sources = Array(options[:source])
 
       gems.each do |gem_name|
-        select_spec(gem_name)
+        Bundler::CLI::Common.select_spec(gem_name)
       end
 
       Bundler.definition.validate_ruby!

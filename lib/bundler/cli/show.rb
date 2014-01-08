@@ -1,3 +1,5 @@
+require 'bundler/cli/common'
+
 module Bundler
   class CLI::Show 
     attr_reader :options, :gem_name
@@ -16,7 +18,7 @@ module Bundler
         if gem_name == "bundler"
           path = File.expand_path("../../..", __FILE__)
         else
-          spec = select_spec(gem_name, :regex_match)
+          spec = Bundler::CLI::Common.select_spec(gem_name, :regex_match)
           return unless spec
           path = spec.full_gem_path
           if !File.directory?(path)
