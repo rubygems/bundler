@@ -193,6 +193,7 @@ module Bundler
       "overwrite existing binstubs if they exist"
     def binstubs(*gems)
       require 'bundler/cli/binstubs'
+      auto_install
       Binstubs.new(options, gems).run
     end
 
