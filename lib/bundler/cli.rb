@@ -434,6 +434,7 @@ module Bundler
     method_option "strict", :type => :boolean, :banner =>
       "Only list newer versions allowed by your Gemfile requirements"
     def outdated(*gems)
+      auto_install
       sources = Array(options[:source])
 
       gems.each do |gem_name|
