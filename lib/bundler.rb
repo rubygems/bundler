@@ -366,6 +366,10 @@ module Bundler
       @ruby_version ||= SystemRubyVersion.new
     end
 
+    def reset!
+      @definition = nil
+    end
+
   private
 
     def eval_yaml_gemspec(path, contents)
