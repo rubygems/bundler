@@ -350,34 +350,8 @@ module Bundler
 
     desc "console [GROUP]", "Opens an IRB session with the bundle pre-loaded"
     def console(group = nil)
-      group ? Bundler.require(:default, *(group.split.map! {|g| g.to_sym })) : Bundler.require
-      ARGV.clear
-
-      preferred = Bundler.settings[:console] || 'irb'
-
-      # See if console is available
-      begin
-        require preferred || true
-      rescue LoadError
-        # Is it in Gemfile?
-        Bundler.ui.error "Could not load the #{preferred} console"
-        Bundler.ui.info "Falling back on IRB..."
-
-        require 'irb'
-        preferred = 'irb'
-      end
-
-      constant = CONSOLES[preferred]
-
-      console = begin
-                  Object.const_get(constant)
-                rescue NameError => e
-                  Bundler.ui.error e.inspect
-                  Bundler.ui.error "Could not load the #{constant} console"
-                  return
-                end
-
-      console.start
+      require 'bundler/cli/console'
+      Console.new(options, group, CONSOLES).run
     end
 
     desc "version", "Prints the bundler's version information"
@@ -411,21 +385,8 @@ module Bundler
     method_option :requirements, :type => :boolean, :default => false, :aliases => '-r', :banner => "Set to show the version of each required dependency."
     method_option :format, :type => :string, :default => "png", :aliases => '-F', :banner => "This is output format option. Supported format is png, jpg, svg, dot ..."
     def viz
-      require 'graphviz'
-      output_file = File.expand_path(options[:file])
-      graph = Graph.new(Bundler.load, output_file, options[:version], options[:requirements], options[:format])
-      graph.viz
-    rescue LoadError => e
-      Bundler.ui.error e.inspect
-      Bundler.ui.warn "Make sure you have the graphviz ruby gem. You can install it with:"
-      Bundler.ui.warn "`gem install ruby-graphviz`"
-    rescue StandardError => e
-      if e.message =~ /GraphViz not installed or dot not in PATH/
-        Bundler.ui.error e.message
-        Bundler.ui.warn "Please install GraphViz. On a Mac with homebrew, you can run `brew install graphviz`."
-      else
-        raise
-      end
+      require 'bundler/cli/viz'
+      Viz.new(options).run
     end
 
     desc "gem GEM", "Creates a skeleton for creating a rubygem"
@@ -504,59 +465,14 @@ module Bundler
     method_option "ruby", :type => :boolean, :default => false, :banner =>
       "only display ruby related platform information"
     def platform
-      platforms, ruby_version = Bundler.ui.silence do
-        [ Bundler.definition.platforms.map {|p| "* #{p}" },
-          Bundler.definition.ruby_version ]
-      end
-      output = []
-
-      if options[:ruby]
-        if ruby_version
-          output << ruby_version
-        else
-          output << "No ruby version specified"
-        end
-      else
-        output << "Your platform is: #{RUBY_PLATFORM}"
-        output << "Your app has gems that work on these platforms:\n#{platforms.join("\n")}"
-
-        if ruby_version
-          output << "Your Gemfile specifies a Ruby version requirement:\n* #{ruby_version}"
-
-          begin
-            Bundler.definition.validate_ruby!
-            output << "Your current platform satisfies the Ruby version requirement."
-          rescue RubyVersionMismatch => e
-            output << e.message
-          end
-        else
-          output << "Your Gemfile does not specify a Ruby version requirement."
-        end
-      end
-
-      Bundler.ui.info output.join("\n\n")
+      require 'bundler/cli/platform'
+      Platform.new(options).run
     end
 
     desc "inject GEM VERSION ...", "Add the named gem(s), with version requirements, to the resolved Gemfile"
     def inject(name, version, *gems)
-      # The required arguments allow Thor to give useful feedback when the arguments
-      # are incorrect. This adds those first two arguments onto the list as a whole.
-      gems.unshift(version).unshift(name)
-
-      # Build an array of Dependency objects out of the arguments
-      deps = []
-      gems.each_slice(2) do |gem_name, gem_version|
-        deps << Bundler::Dependency.new(gem_name, gem_version)
-      end
-
-      added = Injector.inject(deps)
-
-      if added.any?
-        Bundler.ui.confirm "Added to Gemfile:"
-        Bundler.ui.confirm added.map{ |g| "  #{g}" }.join("\n")
-      else
-        Bundler.ui.confirm "All injected gems were already present in the Gemfile"
-      end
+      require 'bundler/cli/inject'
+      Inject.new(options, name, version, gems).run
     end
 
     desc "env", "Print information about the environment Bundler is running under"
