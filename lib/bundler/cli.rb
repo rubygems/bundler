@@ -277,6 +277,7 @@ module Bundler
     desc "open GEM", "Opens the source directory of the given bundled gem"
     def open(name)
       require 'bundler/cli/open'
+      auto_install
       Open.new(options, name).run
     end
 
