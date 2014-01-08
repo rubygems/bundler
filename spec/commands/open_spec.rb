@@ -65,4 +65,15 @@ describe "bundle open" do
 
     expect(out).to match(/bundler_editor #{default_bundle_path('gems', 'activerecord-2.3.2')}\z/)
   end
+
+  it "performs an automatic bundle install" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rails"
+      gem "foo"
+    G
+
+    bundle "open rails", :env => { "BUNDLE_INSTALL" => "1", "EDITOR" => "echo editor" }
+    expect(out).to include("Installing foo 1.0")
+  end
 end
