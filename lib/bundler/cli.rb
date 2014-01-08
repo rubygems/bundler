@@ -212,6 +212,7 @@ module Bundler
       "Only list newer versions allowed by your Gemfile requirements"
     def outdated(*gems)
       require 'bundler/cli/outdated'
+      auto_install
       Outdated.new(options, gems).run
     end
 
