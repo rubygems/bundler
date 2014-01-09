@@ -4,6 +4,19 @@ Bugfixes:
 
   - make gemspec path option preserve relative paths in lock file (@bwillis)
   - use umask when creating binstubs (#1618, @v-yarotsky)
+  - warn if graphviz is not installed (#2435, @Agis-)
+  - show git errors while loading gemspecs
+  - don't mutate gem method options hash (#2447)
+  - print Thor errors (#2478, @pjvds)
+  - print Rubygems system exit errors (James Cook)
+  - more Pathnames into Strings for MacRuby (@kml)
+  - preserve original gemspec path (@bwillis)
+  - remove warning about deps with :git (#1651, @ixti)
+  - split git files on null (#2634, @jasonmp85)
+  - handle cross-host redirects without SSL (#2686, @grddev)
+  - handle Rubygems 2 security exception (@zzak)
+  - reinstall gems if they are missing with spec present
+  - set binstub permissions using umask (#1618, @v-yarotsky)
 
 ## 1.3.5 (3 April 2013)
 
