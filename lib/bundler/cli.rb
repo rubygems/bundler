@@ -1,4 +1,5 @@
 require 'bundler'
+require 'bundler/ui/rg_proxy'
 require 'bundler/vendored_thor'
 
 module Bundler
