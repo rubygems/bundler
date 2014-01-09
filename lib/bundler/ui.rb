@@ -31,5 +31,9 @@ module Bundler
 
     def ask(message)
     end
+
+    def silence
+      yield
+    end
   end
 end
