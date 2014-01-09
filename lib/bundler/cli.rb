@@ -21,7 +21,7 @@ module Bundler
     rescue UnknownArgumentError => e
       raise InvalidOption, e.message
     ensure
-      options ||= {}
+      self.options ||= {}
       Bundler.ui = UI::Shell.new(options)
       Bundler.ui.level = "debug" if options["verbose"]
     end
