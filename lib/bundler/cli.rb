@@ -1,5 +1,4 @@
 require 'bundler'
-require 'bundler/similarity_detector'
 require 'bundler/vendored_thor'
 
 module Bundler
@@ -938,10 +937,8 @@ module Bundler
     end
 
     def not_found_message(missing_gem_name, alternatives)
+      require 'bundler/similarity_detector'
       message = "Could not find gem '#{missing_gem_name}'."
-
-      # This is called as the result of a GemNotFound, let's see if
-      # there's any similarly named ones we can propose instead
       alternate_names = alternatives.map { |a| a.respond_to?(:name) ? a.name : a }
       suggestions = SimilarityDetector.new(alternate_names).similar_word_list(missing_gem_name)
       message += "\nDid you mean #{suggestions}?" if suggestions
