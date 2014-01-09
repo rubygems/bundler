@@ -1,8 +1,6 @@
-require 'bundler/ui'
-
 module Bundler
-  class UI
-    class Shell < UI
+  module UI
+    class Shell
       LEVELS = %w(silent error warn confirm info debug)
 
       attr_writer :shell

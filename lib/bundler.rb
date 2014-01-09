@@ -90,7 +90,7 @@ module Bundler
     end
 
     def ui
-      @ui ||= UI.new
+      @ui ||= UI::Silent.new
     end
 
     # Returns absolute path of where gems are installed on the filesystem.

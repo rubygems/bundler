@@ -2,7 +2,7 @@ require 'bundler/ui'
 require 'rubygems/user_interaction'
 
 module Bundler
-  class UI
+  module UI
     class RGProxy < ::Gem::SilentUI
       def initialize(ui)
         @ui = ui
