@@ -1,4 +1,5 @@
 require 'bundler'
+require 'bundler/ui/shell'
 require 'bundler/ui/rg_proxy'
 require 'bundler/vendored_thor'
 
