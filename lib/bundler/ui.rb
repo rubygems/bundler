@@ -1,5 +1,8 @@
 module Bundler
   class UI
+    autoload :RGProxy, 'bundler/ui/rg_proxy'
+    autoload :Shell,   'bundler/ui/shell'
+
     def warn(message, newline = nil)
     end
 
