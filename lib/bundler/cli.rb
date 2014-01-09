@@ -253,7 +253,7 @@ module Bundler
       definition = Bundler.definition
       definition.validate_ruby!
       Installer.install(Bundler.root, definition, opts)
-      Bundler.load.cache if Bundler.root.join("vendor/cache").exist? && !opts["no-cache"]
+      Bundler.load.cache if Bundler.root.join("vendor/cache").exist? && !options["no-cache"]
 
       if Bundler.settings[:path]
         absolute_path = File.expand_path(Bundler.settings[:path])

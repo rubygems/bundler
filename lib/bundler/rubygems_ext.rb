@@ -56,7 +56,7 @@ module Gem
     end
 
     def git_version
-      if @loaded_from && File.exist?(File.join(full_gem_path, ".git"))
+      if loaded_from && File.exist?(File.join(full_gem_path, ".git"))
         sha = Bundler::SharedHelpers.chdir(full_gem_path){ `git rev-parse HEAD`.strip }
         " #{sha[0..6]}"
       end

@@ -470,9 +470,9 @@ module Bundler
       def stub_rubygems(specs)
         Gem::Specification.all = specs
 
-        Gem.post_reset {
+        Gem.post_reset do
           Gem::Specification.all = specs
-        }
+        end
       end
 
       def all_specs

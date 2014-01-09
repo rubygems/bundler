@@ -174,7 +174,7 @@ module Bundler
           next
         end
 
-        File.open(binstub_path, 'w', 0755) do |f|
+        File.open(binstub_path, 'w', 0777 & ~File.umask) do |f|
           f.puts ERB.new(template, nil, '-').result(binding)
         end
       end
