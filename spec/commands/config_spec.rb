@@ -202,7 +202,7 @@ E
       expect(out).to eq("something'")
     end
 
-    it "doesn't save quoted values" do
+    it "doesn't return quotes around values", :ruby => "1.9" do
       bundle "config foo '1'"
       run "puts Bundler.settings.send(:global_config_file).read"
       expect(out).to include("'1'")
