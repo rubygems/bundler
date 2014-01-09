@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe "bundle install with gem sources" do
   describe "when cached and locked" do
-    it "does not hit the remote at all if --local is passed" do
+    it "does not hit the remote at all" do
       build_repo2
       install_gemfile <<-G
         source "file://#{gem_repo2}"
@@ -14,11 +14,10 @@ describe "bundle install with gem sources" do
       FileUtils.rm_rf gem_repo2
 
       bundle "install --local"
-      expect(out).not_to include("Updating files in vendor/cache")
       should_be_installed "rack 1.0.0"
     end
 
-    it "does not hit the remote at all if --deployment is passed" do
+    it "does not hit the remote at all" do
       build_repo2
       install_gemfile <<-G
         source "file://#{gem_repo2}"
@@ -30,7 +29,6 @@ describe "bundle install with gem sources" do
       FileUtils.rm_rf gem_repo2
 
       bundle "install --deployment"
-      expect(out).not_to include("Updating files in vendor/cache")
       should_be_installed "rack 1.0.0"
     end
 
