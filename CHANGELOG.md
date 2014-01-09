@@ -4,6 +4,7 @@ Bugfixes:
 
   - set --no-cache when bundle install --local is called (@TimMoore)
   - make gemspec path option preserve relative paths in lock file (@bwillis)
+  - use umask when creating binstubs (#1618, @v-yarotsky)
 
 ## 1.3.5 (3 April 2013)
 
