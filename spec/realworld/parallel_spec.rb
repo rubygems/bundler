@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe "parallel", :realworld => true do
-  it "bundle installs" do
+  it "installs" do
     gemfile <<-G
       source "https://rubygems.org"
       gem 'activesupport', '~> 3.2.13'
@@ -21,7 +21,20 @@ describe "parallel", :realworld => true do
     expect(out).to match(/: "4"/)
   end
 
-  it "bundle updates" do
+  it "installs even with circular dependency", :realworld => true do
+    gemfile <<-G
+      source 'https://rubygems.org'
+      gem 'mongoid_auto_increment', "0.1.1"
+    G
+
+    bundle :install, :jobs => 2, :env => {"DEBUG" => "1"}
+    (0..1).each {|i| expect(out).to include("#{i}: ") }
+
+    bundle "show mongoid_auto_increment"
+    expect(out).to match(%r{gems/mongoid_auto_increment})
+  end
+
+  it "updates" do
     install_gemfile <<-G
       source "https://rubygems.org"
       gem 'activesupport', '3.2.12'

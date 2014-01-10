@@ -284,8 +284,7 @@ module Bundler
         { :name => spec.name, :post_install => message }
       }
       specs.each do |spec|
-        deps = spec.dependencies.select { |dep| dep.type != :development }
-        if deps.empty?
+        if ready_to_install?(spec, remains)
           worker_pool.enq spec.name
           enqueued[spec.name] = true
         end
@@ -300,8 +299,7 @@ module Bundler
         remains.keys.each do |name|
           next if enqueued[name]
           spec = name2spec[name]
-          deps = spec.dependencies.select { |dep| remains[dep.name] and dep.type != :development }
-          if deps.empty?
+          if ready_to_install?(spec, remains)
             worker_pool.enq name
             enqueued[name] = true
           end
@@ -310,6 +308,12 @@ module Bundler
       message
     ensure
       worker_pool && worker_pool.stop
+    end
+
+    def ready_to_install?(spec, remains)
+      spec.dependencies.none? do |dep|
+        remains[dep.name] && dep.type != :development && dep.name != spec.name
+      end
     end
   end
 end
