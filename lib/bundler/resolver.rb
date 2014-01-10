@@ -301,9 +301,7 @@ module Bundler
             @errors[existing.name] = [existing, current]
 
             parent = current.required_by.last
-            unless parent && other_possible?(parent.name, states)
-              parent = existing.required_by.last if  existing.respond_to?(:required_by)
-            end
+            parent = current unless parent && other_possible?(parent.name, states)
             raise version_conflict if parent.name == 'bundler'
 
 
