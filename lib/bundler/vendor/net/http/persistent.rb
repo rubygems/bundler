@@ -1215,4 +1215,3 @@ application:
 end
 
 require 'net/http/persistent/ssl_reuse'
-
