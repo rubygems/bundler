@@ -193,4 +193,3 @@ describe "when a gem has no architecture" do
     should_be_installed "rcov 1.0.0"
   end
 end
-
