@@ -278,7 +278,6 @@ module Bundler
         name2spec[spec.name] = spec
         remains[spec.name] = true
       end
-
       worker_pool = ParallelWorkers.worker_pool size, lambda { |name, worker|
         spec = name2spec[name]
         message = install_gem_from_spec spec, standalone, worker
@@ -291,7 +290,6 @@ module Bundler
           enqueued[spec.name] = true
         end
       end
-
       until remains.empty?
         message = worker_pool.deq
         remains.delete message[:name]
@@ -301,7 +299,7 @@ module Bundler
         remains.keys.each do |name|
           next if enqueued[name]
           spec = name2spec[name]
-          deps = spec.dependencies.select { |dep| remains[dep.name] and dep.type != :development }
+          deps = installable_dependencies(spec, name, remains)
           if deps.empty?
             worker_pool.enq name
             enqueued[name] = true
@@ -311,6 +309,20 @@ module Bundler
       message
     ensure
       worker_pool && worker_pool.stop
+    end
+
+    def installable_dependencies(spec, spec_name, remains)
+      spec.dependencies.select do |dep|
+        check_if_requires_installing?(remains, spec_name, dep)
+      end
+    end
+
+    def check_if_requires_installing?(remains, parent_spec_name, dep)
+      return false if dep.type == :development
+
+      return false if dep.name == parent_spec_name && remains[dep.name]
+
+      remains[dep.name]
     end
   end
 end
