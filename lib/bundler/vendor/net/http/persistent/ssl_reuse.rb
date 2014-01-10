@@ -126,4 +126,3 @@ class Net::HTTP::Persistent::SSLReuse < Net::HTTP
   private :connect
 
 end
-

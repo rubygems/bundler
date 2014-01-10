@@ -45,7 +45,7 @@ module Bundler
       end
 
       private
-      # Stop the worker threads by sending a poison object down the request queue 
+      # Stop the worker threads by sending a poison object down the request queue
       # so as worker threads after retrieving it, shut themselves down
       def stop_threads
         @threads.each do
