@@ -284,13 +284,23 @@ module Bundler
         message = install_gem_from_spec spec, standalone, worker
         { :name => spec.name, :post_install => message }
       }
-      specs.each do |spec|
-        deps = spec.dependencies.select { |dep| dep.type != :development }
-        if deps.empty?
-          worker_pool.enq spec.name
-          enqueued[spec.name] = true
+
+      # Keys in the remains hash represent uninstalled gems specs.
+      # We enqueue all gem specs that do not have any dependencies.
+      # Later we call this lambda again to install specs that depended on
+      # previously installed specifications. We continue until all specs
+      # are installed.
+      enqueue_remaining_specs = lambda do
+        remains.keys.each do |name|
+          next if enqueued[name]
+          spec = name2spec[name]
+          if ready_to_install?(spec, remains)
+            worker_pool.enq name
+            enqueued[name] = true
+          end
         end
       end
+      enqueue_remaining_specs.call
 
       until remains.empty?
         message = worker_pool.deq
@@ -298,19 +308,21 @@ module Bundler
         if message[:post_install]
           Installer.post_install_messages[message[:name]] = message[:post_install]
         end
-        remains.keys.each do |name|
-          next if enqueued[name]
-          spec = name2spec[name]
-          deps = spec.dependencies.select { |dep| remains[dep.name] and dep.type != :development }
-          if deps.empty?
-            worker_pool.enq name
-            enqueued[name] = true
-          end
-        end
+        enqueue_remaining_specs.call
       end
       message
     ensure
       worker_pool && worker_pool.stop
+    end
+
+    # We only want to install a gem spec if all its dependencies are met.
+    # If the dependency is no longer in the `remains` hash then it has been met.
+    # If a dependency is only development or is self referential it can be ignored.
+    def ready_to_install?(spec, remains)
+      spec.dependencies.none? do |dep|
+        next if dep.type == :development || dep.name == spec.name
+        remains[dep.name]
+      end
     end
   end
 end
