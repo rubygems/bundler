@@ -20,4 +20,17 @@ describe "installing dependencies parallely", :realworld => true do
     bundle "config jobs"
     expect(out).to match(/: "2"/)
   end
+
+  it 'installs even with circular dependency' do
+    gemfile <<-G
+      source 'https://rubygems.org'
+      gem 'mongoid_auto_increment', "0.1.1"
+    G
+
+    bundle :install, :jobs => 2, :env => {"DEBUG" => "1"}
+    (0..1).each {|i| expect(out).to include("#{i}: ") }
+
+    bundle "show mongoid_auto_increment"
+    expect(out).to match(/mongoid_auto_increment/)
+  end
 end

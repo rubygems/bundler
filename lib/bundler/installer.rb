@@ -285,8 +285,8 @@ module Bundler
         { :name => spec.name, :post_install => message }
       }
       specs.each do |spec|
-        deps = spec.dependencies.select { |dep| dep.type != :development }
-        if deps.empty?
+        deps = spec.dependencies.select { |dep| dep.type != :development && dep.name != spec.name }
+        if deps.empty? || deps.all? {|dep| remains[dep.name] }
           worker_pool.enq spec.name
           enqueued[spec.name] = true
         end
