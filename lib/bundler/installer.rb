@@ -177,7 +177,7 @@ module Bundler
           next
         end
 
-        File.open(binstub_path, 'w', 0755) do |f|
+        File.open(binstub_path, 'w', 0777 & ~File.umask) do |f|
           f.puts ERB.new(template, nil, '-').result(binding)
         end
       end
@@ -198,13 +198,15 @@ module Bundler
     end
 
   private
+
     def can_install_parallely?
-      if Bundler.current_ruby.mri? || Bundler.rubygems.provides?(">= 2.1.0.rc")
+      min_rubygems = "2.0.7"
+      if Bundler.current_ruby.mri? || Bundler.rubygems.provides?(">= #{min_rubygems}")
         true
       else
         Bundler.ui.warn "Rubygems #{Gem::VERSION} is not threadsafe, so your "\
-          "gems must be installed one at a time. Upgrade to Rubygems 2.1 or "\
-          "higher to enable parallel gem installation."
+          "gems must be installed one at a time. Upgrade to Rubygems " \
+          "#{min_rubygems} or higher to enable parallel gem installation."
         false
       end
     end

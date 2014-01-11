@@ -20,7 +20,7 @@ module Bundler
     rescue UnknownArgumentError => e
       raise InvalidOption, e.message
     ensure
-      options ||= {}
+      self.options ||= {}
       Bundler.ui = UI::Shell.new(options)
       Bundler.ui.level = "debug" if options["verbose"]
     end
@@ -231,8 +231,6 @@ module Bundler
         opts[:system] = true
       end
 
-      opts["no-cache"] ||= opts[:local]
-
       Bundler.settings[:path]     = nil if opts[:system]
       Bundler.settings[:path]     = "vendor/bundle" if opts[:deployment]
       Bundler.settings[:path]     = opts["path"] if opts["path"]
@@ -254,7 +252,7 @@ module Bundler
       definition = Bundler.definition
       definition.validate_ruby!
       Installer.install(Bundler.root, definition, opts)
-      Bundler.load.cache if Bundler.root.join("vendor/cache").exist? && !opts["no-cache"]
+      Bundler.load.cache if Bundler.root.join("vendor/cache").exist? && !options["no-cache"]
 
       if Bundler.settings[:path]
         absolute_path = File.expand_path(Bundler.settings[:path])

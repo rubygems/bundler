@@ -226,7 +226,7 @@ module Bundler
   private
 
     HTTP_ERRORS = [
-      Timeout::Error, EOFError, SocketError,
+      Timeout::Error, EOFError, SocketError, Errno::ENETDOWN,
       Errno::EINVAL, Errno::ECONNRESET, Errno::ETIMEDOUT, Errno::EAGAIN,
       Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError,
       Net::HTTP::Persistent::Error
@@ -235,17 +235,7 @@ module Bundler
     def fetch(uri, counter = 0)
       raise HTTPError, "Too many redirects" if counter >= @redirect_limit
 
-      begin
-        Bundler.ui.debug "Fetching from: #{uri}"
-        req = Net::HTTP::Get.new uri.request_uri
-        req.basic_auth(uri.user, uri.password) if uri.user
-        response = connection.request(uri, req)
-      rescue OpenSSL::SSL::SSLError
-        raise CertificateFailureError.new(uri)
-      rescue *HTTP_ERRORS
-        raise HTTPError, "Network error while fetching #{uri}"
-      end
-
+      response = request(uri)
       case response
       when Net::HTTPRedirection
         Bundler.ui.debug("HTTP Redirection")
@@ -263,6 +253,17 @@ module Bundler
       else
         raise HTTPError, "#{response.class}: #{response.body}"
       end
+    end
+
+    def request(uri)
+      Bundler.ui.debug "Fetching from: #{uri}"
+      req = Net::HTTP::Get.new uri.request_uri
+      req.basic_auth(uri.user, uri.password) if uri.user
+      response = connection.request(uri, req)
+    rescue OpenSSL::SSL::SSLError
+      raise CertificateFailureError.new(uri)
+    rescue *HTTP_ERRORS
+      raise HTTPError, "Network error while fetching #{uri}"
     end
 
     def dependency_api_uri(gem_names = [])

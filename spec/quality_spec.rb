@@ -55,7 +55,7 @@ describe "The library itself" do
     exempt = /\.gitmodules|\.marshal|fixtures|vendor|ssl_certs|LICENSE/
     error_messages = []
     Dir.chdir(File.expand_path("../..", __FILE__)) do
-      `git ls-files`.split("\n").each do |filename|
+      `git ls-files -z`.split("\x0").each do |filename|
         next if filename =~ exempt
         error_messages << check_for_tab_characters(filename)
         error_messages << check_for_extra_spaces(filename)
@@ -68,7 +68,7 @@ describe "The library itself" do
     included = /spec/
     error_messages = []
     Dir.chdir(File.expand_path("../", __FILE__)) do
-      `git ls-files`.split("\n").each do |filename|
+      `git ls-files -z`.split("\x0").each do |filename|
         next unless filename =~ included
         error_messages << check_for_spec_defs_with_single_quotes(filename)
       end
