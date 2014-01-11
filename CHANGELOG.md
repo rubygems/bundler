@@ -1,3 +1,14 @@
+## 1.5.2 (2014-01-10)
+
+Bugfixes:
+
+  - fix integration with Rubygems 1.8.0-1.8.19
+  - handle ENETDOWN exception during network requests
+  - gracefully shut down after interrupt during parallel install (@Who828)
+  - allow Rails to run Thor without debug mode (@rafaelfranca)
+  - set git binstub permissions by umask (@v-yarotsky)
+  - remove parallel install debug log
+
 ## 1.5.1 (2013-12-28)
 
 Bugfixes:
@@ -96,7 +107,7 @@ Bugfixes:
   - allow the same options hash to be passed to multiple gems (#2447)
   - handle missing binaries without an exception (#2019, @luismreis)
 
-## 1.3.6
+## 1.3.6 (8 January 2014)
 
 Bugfixes:
 
