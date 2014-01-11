@@ -68,13 +68,9 @@ module Bundler
       end
 
       def install(spec)
-<<<<<<< HEAD
-        return ["Using #{version_message(spec)}", nil] if installed_specs[spec].any? && gem_dir_exists?(spec)
-=======
         if installed_specs[spec].any? && gem_dir_exists?(spec)
-          return ["Using #{spec.name} (#{spec.version})", nil]
+          return ["Using #{version_message(spec)}", nil]
         end
->>>>>>> 1-5-stable
 
         # Download the gem to get the spec, because some specs that are returned
         # by rubygems.org are broken and wrong.
