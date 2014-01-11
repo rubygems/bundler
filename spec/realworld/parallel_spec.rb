@@ -43,7 +43,7 @@ describe "parallel", :realworld => true do
 
     gemfile <<-G
       source "https://rubygems.org"
-      gem 'activesupport', '3.2.13'
+      gem 'activesupport', '~> 3.2.12'
       gem 'faker', '~> 1.1.2'
     G
 
@@ -51,7 +51,7 @@ describe "parallel", :realworld => true do
      expect(out).to match(/[1-3]: /)
 
     bundle "show activesupport"
-    expect(out).to match(/activesupport-3\.2\.13/)
+    expect(out).to match(/activesupport-3\.2\.1[3-9]/)
 
     bundle "show faker"
     expect(out).to match(/faker/)
