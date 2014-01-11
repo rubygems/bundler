@@ -28,7 +28,7 @@ describe "parallel", :realworld => true do
     G
 
     bundle :install, :jobs => 2, :env => {"DEBUG" => "1"}
-    (0..1).each {|i| expect(out).to include("#{i}: ") }
+    expect(out).to match(/[0-3]: /)
 
     bundle "show mongoid_auto_increment"
     expect(out).to match(%r{gems/mongoid_auto_increment})
