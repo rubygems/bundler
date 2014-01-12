@@ -172,13 +172,14 @@ module Bundler
     end
 
     def handle_conflict(current, states)
+      return unless current
       parent = current
       state = states.detect { |i| i.name == parent.name }
       until (state && state.possibles.any?) || parent.required_by.empty?
         parent = parent.required_by.last
         state = states.detect { |i| i.name == parent.name }
       end
-      parent
+      return parent, state
     end
 
     def other_possible?(conflict, states)
@@ -228,7 +229,7 @@ module Bundler
     def resolve_conflict(current, states)
       # Return a requirment/gem which has other possibles states
       # Given the set of constraints placed by requrired_by
-      parent = handle_conflict(current, states)
+      parent, _ = handle_conflict(current, states)
 
       debug { "    -> Going to: #{parent.name} state" }
 
@@ -302,8 +303,8 @@ module Bundler
             @errors[existing.name] = [existing, current]
 
             parent = current.required_by.last
-            parent = handle_conflict(current, states) unless other_possible?(parent, states)
-            parent = existing.required_by[-2] if !other_possible?(parent, states) && existing.respond_to?(:required_by)
+            parent, state = handle_conflict(existing.required_by[-2], states) if !other_possible?(parent, states) && existing.respond_to?(:required_by)
+            parent = current unless state && state.possibles.any?
 
             raise version_conflict if parent.nil? || parent.name == 'bundler'
 
