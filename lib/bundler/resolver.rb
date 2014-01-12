@@ -302,11 +302,10 @@ module Bundler
             @errors[existing.name] = [existing, current]
 
             parent = current.required_by.last
+            parent = handle_conflict(current, states) unless other_possible?(parent, states)
             parent = existing.required_by[-2] if !other_possible?(parent, states) && existing.respond_to?(:required_by)
-            parent = current unless other_possible?(parent, states)
 
-
-            raise version_conflict if parent.name == 'bundler'
+            raise version_conflict if parent.nil? || parent.name == 'bundler'
 
 
             reqs, activated, depth = resolve_conflict(parent, states)
