@@ -44,6 +44,10 @@ namespace :spec do
       system("sudo sed -i '/secure_path/d' /etc/sudoers")
       # Install groff for the ronn gem
       system("sudo apt-get install groff -y")
+      # Downgrade Rubygems on 1.8 to avoid https://github.com/rubygems/rubygems/issues/784
+      if RUBY_VERSION < '1.9'
+        system("gem update --system 2.1.11")
+      end
       # Install the other gem deps, etc.
       Rake::Task["spec:deps"].invoke
     end
