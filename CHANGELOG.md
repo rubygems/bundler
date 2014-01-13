@@ -1,10 +1,15 @@
 ## 1.6.0
 
+Bugfixes:
+
+  - many Gemfiles that had incorrect errors now resolve correctly (@Who828)
+
 Features:
 
+  - resolver rewritten to avoid recursion (@Who828)
+  - some complex Gemfiles are resolved up to 10x faster (@Who828)
   - add support for IRB alternatives such as Pry and Ripl (@joallard, @postmodern)
-  - highlight installing logs (#2722, @yaotti)
-  - highlight updating logs (#2741, @simi)
+  - highlight installed or updated gems (#2722, #2741, @yaotti, @simi)
   - display post_install_message's for gems installed via :git (@phallstrom)
 
 ## 1.5.2 (2014-01-10)
