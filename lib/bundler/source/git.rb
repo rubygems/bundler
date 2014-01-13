@@ -203,6 +203,10 @@ module Bundler
         "#{base_name}-#{shortref_for_path(cached_revision || revision)}"
       end
 
+      def revision
+        git_proxy.revision
+      end
+
     private
 
       def serialize_gemspecs_in(destination)
@@ -265,10 +269,6 @@ module Bundler
 
       def cached_revision
         options["revision"]
-      end
-
-      def revision
-        git_proxy.revision
       end
 
       def cached?
