@@ -210,4 +210,18 @@ E
       expect(out).to eq("1")
     end
   end
+
+  describe "very long lines" do
+    before(:each) { bundle :install }
+    let(:long_string) do
+      '--with-xml2-include=/usr/pkg/include/libxm l2 --with-xml2-lib=/usr/pkg/lib --with-xslt-dir=/usr/pkg'
+    end
+
+    it "doesn't wrap values" do
+      bundle "config foo.name '#{long_string}'"
+      run "puts Bundler.settings['foo.name']"
+      expect(out).to eq(long_string)
+    end
+  end
+
 end
