@@ -924,6 +924,9 @@ module Bundler
       when 1
         specs.first
       else
+        unless $stdout.tty? || ENV['BUNDLE_SPEC_RUN']
+          raise GemNotFound, not_found_message(name, Bundler.definition.dependencies)
+        end
         specs.each_with_index do |spec, index|
           Bundler.ui.info "#{index.succ} : #{spec.name}", true
         end
