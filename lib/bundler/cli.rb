@@ -924,17 +924,22 @@ module Bundler
       when 1
         specs.first
       else
-        unless $stdout.tty? || ENV['BUNDLE_SPEC_RUN']
-          raise GemNotFound, not_found_message(name, Bundler.definition.dependencies)
-        end
-        specs.each_with_index do |spec, index|
-          Bundler.ui.info "#{index.succ} : #{spec.name}", true
-        end
-        Bundler.ui.info '0 : - exit -', true
-
-        input = Bundler.ui.ask('> ')
-        (num = input.to_i) > 0 ? specs[num - 1] : nil
+        ask_for_spec_from(specs)
       end
+    end
+
+    def ask_for_spec_from(specs)
+      if !$stdout.tty? && ENV['BUNDLE_SPEC_RUN'].nil?
+        raise GemNotFound, not_found_message(name, Bundler.definition.dependencies)
+      end
+
+      specs.each_with_index do |spec, index|
+        Bundler.ui.info "#{index.succ} : #{spec.name}", true
+      end
+      Bundler.ui.info '0 : - exit -', true
+
+      num = Bundler.ui.ask('> ').to_i
+      num > 0 ? specs[num - 1] : nil
     end
 
     def not_found_message(missing_gem_name, alternatives)
