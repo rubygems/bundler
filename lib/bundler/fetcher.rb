@@ -297,9 +297,19 @@ module Bundler
       Bundler.rubygems.sources = ["#{@remote_uri}"]
       Bundler.rubygems.fetch_all_remote_specs
     rescue Gem::RemoteFetcher::FetchError, OpenSSL::SSL::SSLError => e
-      if e.message.match("certificate verify failed")
+      case e.message
+      when /certificate verify failed/
         raise CertificateFailureError.new(uri)
+      when /401|403/
+        # Retry with basic auth if configured for this source. GemFury appears to use a 403 for
+        # unauthenticated requests, so we retry on both.
+        auth = Bundler.settings[@remote_uri.to_s]
+        raise "needs auth for #{@remote_uri}!" unless auth
+
+        @remote_uri.user, @remote_uri.password = *auth.split(":")
+        fetch_all_remote_specs
       else
+        puts e.message
         Bundler.ui.trace e
         raise HTTPError, "Could not fetch specs from #{uri}"
       end
