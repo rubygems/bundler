@@ -320,18 +320,9 @@ module Bundler
       when /certificate verify failed/
         raise CertificateFailureError.new(uri)
       when /401|403/
-        # Raise an exception if authentication has already been attempted and failed.
-        raise BadAuthenticationError.new(uri) if @remote_uri.user
-
-        # Retry with basic auth if configured for this source. GemFury appears to use a 403 for
-        # unauthenticated requests, so we retry on both.
-        auth = Bundler.settings[@remote_uri.to_s]
-
-        # Raise an exception if authentication isn't provided.
-        raise AuthenticationRequiredError.new(uri) if auth.nil? && @remote_uri.user.nil?
-
-        @remote_uri.user, @remote_uri.password = *auth.split(":", 2) if @remote_uri.user.nil?
-        fetch_all_remote_specs
+        # Gemfury uses a 403 for unauthenticated requests instead of a 401, so retry auth
+        # on both.
+        retry_with_auth { fetch_all_remote_specs }
       else
         puts e.message
         Bundler.ui.trace e
@@ -365,6 +356,21 @@ module Bundler
         Dir.glob(certs).each { |c| store.add_file c }
       end
       store
+    end
+
+    # Attempt to retry with HTTP authentication, if it's appropriate to do so. Yields to a block;
+    # the caller should use this to re-attempt the failing request with the altered `@remote_uri`.
+    def retry_with_auth
+      # Authentication has already been attempted and failed.
+      raise BadAuthenticationError.new(uri) if @remote_uri.user
+
+      auth = Bundler.settings[@remote_uri.to_s]
+
+      # Authentication isn't provided at all, by "bundle config" or in the URI.
+      raise AuthenticationRequiredError.new(uri) if auth.nil?
+
+      @remote_uri.user, @remote_uri.password = *auth.split(":", 2)
+      yield
     end
 
   end
