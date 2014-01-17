@@ -212,7 +212,7 @@ module Bundler
 
       return {@remote_uri => last_spec_list} if query_list.empty?
 
-      remote_specs = Bundler::Retry.new("dependency api").attempts do
+      remote_specs = Bundler::Retry.new("dependency api", AUTH_ERRORS).attempts do
         fetch_dependency_remote_specs(query_list)
       end
 
@@ -279,6 +279,8 @@ module Bundler
       req = Net::HTTP::Get.new uri.request_uri
       req.basic_auth(uri.user, uri.password) if uri.user
       response = connection.request(uri, req)
+    rescue Net::HTTPUnauthorized, Net::HTTPForbidden
+      retry_with_auth { request(uri) }
     rescue OpenSSL::SSL::SSLError
       raise CertificateFailureError.new(uri)
     rescue *HTTP_ERRORS
