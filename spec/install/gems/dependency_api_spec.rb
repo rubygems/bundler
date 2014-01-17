@@ -454,7 +454,7 @@ describe "gemcutter's dependency API" do
       should_be_installed "rack 1.0.0"
     end
 
-    describe "with authentication details in bundle config", focused: true do
+    describe "with authentication details in bundle config" do
       before do
         gemfile <<-G
           source "#{source_uri}"
