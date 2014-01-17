@@ -43,6 +43,10 @@ module Bundler
       end
     end
 
+    # Exceptions classes that should bypass retry attempts. If your password didn't work the
+    # first time, it's not going to the third time.
+    AUTH_ERRORS = [AuthenticationRequiredError, BadAuthenticationError]
+
     class << self
       attr_accessor :disable_endpoint, :api_timeout, :redirect_limit, :max_retries
 
@@ -171,7 +175,7 @@ module Bundler
         # API errors mean we should treat this as a non-API source
         @use_api = false
 
-        specs = Bundler::Retry.new("source fetch", [AuthenticationRequiredError, BadAuthenticationError]).attempts do
+        specs = Bundler::Retry.new("source fetch", AUTH_ERRORS).attempts do
           fetch_all_remote_specs
         end
       end
