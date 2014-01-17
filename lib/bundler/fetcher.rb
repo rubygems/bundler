@@ -326,7 +326,6 @@ module Bundler
         # on both.
         retry_with_auth { fetch_all_remote_specs }
       else
-        puts e.message
         Bundler.ui.trace e
         raise HTTPError, "Could not fetch specs from #{uri}"
       end
