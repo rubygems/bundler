@@ -354,6 +354,7 @@ module Bundler
     method_option "paths", :type => :boolean,
       :banner => "List the paths of all gems that are required by your Gemfile."
     def show(gem_name = nil)
+      auto_install
       Bundler.ui.silence do
         Bundler.definition.validate_ruby!
         Bundler.load.lock
@@ -396,6 +397,7 @@ module Bundler
     method_option "force", :type => :boolean, :default => false, :banner =>
       "overwrite existing binstubs if they exist"
     def binstubs(*gems)
+      auto_install
       Bundler.definition.validate_ruby!
       Bundler.settings[:bin] = options["path"] if options["path"]
       Bundler.settings[:bin] = nil if options["path"] && options["path"].empty?
@@ -432,6 +434,7 @@ module Bundler
     method_option "strict", :type => :boolean, :banner =>
       "Only list newer versions allowed by your Gemfile requirements"
     def outdated(*gems)
+      auto_install
       sources = Array(options[:source])
 
       gems.each do |gem_name|
@@ -550,6 +553,7 @@ module Bundler
     D
     def exec(*args)
       Bundler.definition.validate_ruby!
+      auto_install
       Bundler.load.setup_environment
 
       begin
@@ -659,6 +663,7 @@ module Bundler
 
     desc "open GEM", "Opens the source directory of the given bundled gem"
     def open(name)
+      auto_install
       editor = [ENV['BUNDLER_EDITOR'], ENV['VISUAL'], ENV['EDITOR']].find{|e| !e.nil? && !e.empty? }
       return Bundler.ui.info("To open a bundled gem, set $EDITOR or $BUNDLER_EDITOR") unless editor
       spec = select_spec(name, :regex_match)
@@ -679,6 +684,7 @@ module Bundler
 
     desc "console [GROUP]", "Opens an IRB session with the bundle pre-loaded"
     def console(group = nil)
+      auto_install
       group ? Bundler.require(:default, *(group.split.map! {|g| g.to_sym })) : Bundler.require
       ARGV.clear
 
@@ -717,6 +723,7 @@ module Bundler
 
     desc "licenses", "Prints the license of all gems in the bundle"
     def licenses
+      auto_install
       Bundler.load.specs.sort_by { |s| s.license.to_s }.reverse.each do |s|
         gem_name = s.name
         license  = s.license || s.licenses
@@ -826,6 +833,7 @@ module Bundler
       "forces clean even if --path is not set"
     def clean
       if Bundler.settings[:path] || options[:force]
+        auto_install
         Bundler.load.clean(options[:"dry-run"])
       else
         Bundler.ui.error "Can only use bundle clean when --path is set or --force is set"
@@ -906,6 +914,25 @@ module Bundler
         Bundler.ui.warn "Your Gemfile contains path and git dependencies. If you want "    \
           "to package them as well, please pass the --all flag. This will be the default " \
           "on Bundler 2.0."
+      end
+    end
+
+    # Automatically invoke `bundle install` and resume if BUNDLE_INSTALL is set to `1` and any specs
+    # are not presently locally.
+    #
+    # Note that this method `nil`s out the global Definition object, so it should be called first,
+    # before you instantiate anything like an `Installer` that'll keep a reference to the old one
+    # instead.
+    def auto_install
+      return unless ENV['BUNDLE_INSTALL']
+
+      begin
+        Bundler.definition.specs
+      rescue GemNotFound
+        Bundler.ui.info "Automatically installing missing gems."
+        Bundler.reset!
+        invoke :install, []
+        Bundler.reset!
       end
     end
 

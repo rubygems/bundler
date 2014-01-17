@@ -15,4 +15,16 @@ describe "bundle licenses" do
     expect(out).to include("actionpack: Unknown")
     expect(out).to include("with_license: MIT")
   end
+
+  it "performs an automatic bundle install" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rails"
+      gem "with_license"
+      gem "foo"
+    G
+
+    bundle :licenses, :env => { 'BUNDLE_INSTALL' => '1' }
+    expect(out).to include("Installing foo 1.0")
+  end
 end

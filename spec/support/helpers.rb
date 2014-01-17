@@ -12,6 +12,8 @@ module Spec
       end
       FileUtils.mkdir_p(tmp)
       FileUtils.mkdir_p(home)
+
+      ENV['BUNDLE_INSTALL'] = nil
     end
 
     attr_reader :out, :err, :exitstatus
