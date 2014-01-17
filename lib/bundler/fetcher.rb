@@ -27,6 +27,21 @@ module Bundler
             "using RVM are available at rvm.io/packages/openssl."
       end
     end
+    # This error is raised if HTTP authentication is required, but not provided.
+    class AuthenticationRequiredError < HTTPError
+      def initialize(remote_uri)
+        super "Authentication is required for #{remote_uri}.\n" \
+          "Please supply credentials for this source. You can do this by running:\n" \
+          " bundle config #{remote_uri} username:password"
+      end
+    end
+    # This error is raised if HTTP authentication is provided, but incorrect.
+    class BadAuthenticationError < HTTPError
+      def initialize(remote_uri)
+        super "Bad username or password for #{remote_uri}.\n" \
+          "Please double-check your credentials and correct them."
+      end
+    end
 
     class << self
       attr_accessor :disable_endpoint, :api_timeout, :redirect_limit, :max_retries
@@ -156,7 +171,7 @@ module Bundler
         # API errors mean we should treat this as a non-API source
         @use_api = false
 
-        specs = Bundler::Retry.new("source fetch").attempts do
+        specs = Bundler::Retry.new("source fetch", [AuthenticationRequiredError, BadAuthenticationError]).attempts do
           fetch_all_remote_specs
         end
       end
@@ -301,12 +316,17 @@ module Bundler
       when /certificate verify failed/
         raise CertificateFailureError.new(uri)
       when /401|403/
+        # Raise an exception if authentication has already been attempted and failed.
+        raise BadAuthenticationError.new(uri) if @remote_uri.user
+
         # Retry with basic auth if configured for this source. GemFury appears to use a 403 for
         # unauthenticated requests, so we retry on both.
         auth = Bundler.settings[@remote_uri.to_s]
-        raise "needs auth for #{@remote_uri}!" unless auth
 
-        @remote_uri.user, @remote_uri.password = *auth.split(":")
+        # Raise an exception if authentication isn't provided.
+        raise AuthenticationRequiredError.new(uri) if auth.nil? && @remote_uri.user.nil?
+
+        @remote_uri.user, @remote_uri.password = *auth.split(":", 2) if @remote_uri.user.nil?
         fetch_all_remote_specs
       else
         puts e.message

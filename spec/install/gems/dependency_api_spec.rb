@@ -476,7 +476,7 @@ describe "gemcutter's dependency API" do
           gem "rack"
         G
 
-        bundle "config #{source_uri} otheruser:wrong"
+        bundle "config #{source_uri}/ otheruser:wrong"
 
         bundle :install, :artifice => "endpoint_strict_basic_authentication"
         should_be_installed "rack 1.0.0"
@@ -484,11 +484,11 @@ describe "gemcutter's dependency API" do
 
       it "shows instructions if auth is not provided for the source" do
         bundle :install, :artifice => "endpoint_strict_basic_authentication"
-        expect(out).to include("bundle config #{source_uri}/ <username>:<password>")
+        expect(out).to include("bundle config #{source_uri}/ username:password")
       end
 
       it "fails if authentication has already been provided, but failed" do
-        bundle "config #{source_uri} #{user}:wrong"
+        bundle "config #{source_uri}/ #{user}:wrong"
 
         bundle :install, :artifice => "endpoint_strict_basic_authentication"
         expect(out).to include("Bad username or password")
