@@ -24,7 +24,6 @@ module Bundler
         specs.first
       else
         ask_for_spec_from(specs)
-        endV
       end
     end
 
