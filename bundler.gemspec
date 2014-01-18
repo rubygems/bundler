@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'ronn', '~> 0.7.3'
   spec.add_development_dependency 'rspec', '~> 2.99.0.beta1'
 
-  spec.files       = `git ls-files`.split($/)
+  spec.files       = `git ls-files -z`.split("\x0")
   spec.files      += Dir.glob('lib/bundler/man/**/*') # man/ is ignored by git
   spec.test_files  = spec.files.grep(%r{^spec/})
 

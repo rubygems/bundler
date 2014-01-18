@@ -1,11 +1,54 @@
 ## 1.6.0
 
+Bugfixes:
+
+  - many Gemfiles that had incorrect errors now resolve correctly (@Who828)
+
 Features:
 
+  - resolver rewritten to avoid recursion (@Who828)
+  - some complex Gemfiles are resolved up to 10x faster (@Who828)
   - add support for IRB alternatives such as Pry and Ripl (@joallard, @postmodern)
-  - highlight installing logs (#2722, @yaotti)
-  - highlight updating logs (#2741, @simi)
+  - highlight installed or updated gems (#2722, #2741, @yaotti, @simi)
   - display post_install_message's for gems installed via :git (@phallstrom)
+
+## 1.5.2 (2014-01-10)
+
+Bugfixes:
+
+  - fix integration with Rubygems 1.8.0-1.8.19
+  - handle ENETDOWN exception during network requests
+  - gracefully shut down after interrupt during parallel install (@Who828)
+  - allow Rails to run Thor without debug mode (@rafaelfranca)
+  - set git binstub permissions by umask (@v-yarotsky)
+  - remove parallel install debug log
+
+## 1.5.1 (2013-12-28)
+
+Bugfixes:
+
+  - correctly find gems installed with Ruby by default
+
+## 1.5.0 (2013-12-26)
+
+Features:
+
+  - install missing gems if their specs are present (@hone)
+
+Bugfixes:
+
+  - use print for "Installing…" so messages are thread-safe (@TimMoore)
+
+## 1.5.0.rc.2 (2013-12-18)
+
+"Features":
+
+  - Support threaded installation on Rubygems 2.0.7+
+  - Debug installation logs in .bundle/install.log
+
+"Bugfixes":
+
+  - Try to catch gem installation race conditions
 
 ## 1.5.0.rc.1 (2013-11-09)
 
@@ -78,12 +121,25 @@ Bugfixes:
   - allow the same options hash to be passed to multiple gems (#2447)
   - handle missing binaries without an exception (#2019, @luismreis)
 
-## 1.3.6
+## 1.3.6 (8 January 2014)
 
 Bugfixes:
 
-  - set --no-cache when bundle install --local is called (@TimMoore)
   - make gemspec path option preserve relative paths in lock file (@bwillis)
+  - use umask when creating binstubs (#1618, @v-yarotsky)
+  - warn if graphviz is not installed (#2435, @Agis-)
+  - show git errors while loading gemspecs
+  - don't mutate gem method options hash (#2447)
+  - print Thor errors (#2478, @pjvds)
+  - print Rubygems system exit errors (James Cook)
+  - more Pathnames into Strings for MacRuby (@kml)
+  - preserve original gemspec path (@bwillis)
+  - remove warning about deps with :git (#1651, @ixti)
+  - split git files on null (#2634, @jasonmp85)
+  - handle cross-host redirects without SSL (#2686, @grddev)
+  - handle Rubygems 2 security exception (@zzak)
+  - reinstall gems if they are missing with spec present
+  - set binstub permissions using umask (#1618, @v-yarotsky)
 
 ## 1.3.5 (3 April 2013)
 

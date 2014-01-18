@@ -68,7 +68,9 @@ module Bundler
       end
 
       def install(spec)
-        return ["Using #{version_message(spec)}", nil] if installed_specs[spec].any? && gem_dir_exists?(spec)
+        if installed_specs[spec].any? && gem_dir_exists?(spec)
+          return ["Using #{version_message(spec)}", nil]
+        end
 
         # Download the gem to get the spec, because some specs that are returned
         # by rubygems.org are broken and wrong.
@@ -275,11 +277,13 @@ module Bundler
       end
 
       def gem_dir_exists?(spec)
-        if spec.name == "bundler"
-          true
-        else
-          File.directory?(spec.full_gem_path)
-        end
+        return true if spec.name == "bundler"
+        # Ruby 2 default gems
+        return true if spec.loaded_from.include?("specifications/default/")
+        # Ruby 1.9 default gems
+        return true if spec.summary =~ /is bundled with Ruby/
+
+        File.directory?(spec.full_gem_path)
       end
     end
 

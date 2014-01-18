@@ -56,12 +56,8 @@ module Gem
     end
 
     def git_version
-      if @loaded_from && File.exist?(File.join(full_gem_path, ".git"))
-        sha = Bundler::SharedHelpers.chdir(full_gem_path) do
-          null_command("git rev-parse HEAD").strip
-        end
-        " #{sha[0..6]}"
-      end
+      return unless loaded_from && source.is_a?(Bundler::Source::Git)
+      " #{source.revision[0..6]}"
     end
 
     def to_gemfile(path = nil)
@@ -94,12 +90,6 @@ module Gem
         gemfile << "end\n" if group
       end
       gemfile
-    end
-
-    # TODO: Do not rely on /dev/null.
-    # see https://github.com/bundler/bundler/blob/98f79a1d/lib/bundler/source/git/git_proxy.rb#L97-101
-    def null_command(command)
-      `#{command} 2>#{Bundler::NULL}`.tap {|out| return `#{command}` if out.empty? }
     end
 
   end

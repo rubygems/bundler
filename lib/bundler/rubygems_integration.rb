@@ -1,6 +1,4 @@
 require 'rubygems'
-# rubygems master requires UI for ConfigFile but doesn't require it
-require 'rubygems/user_interaction'
 require 'rubygems/config_file'
 
 module Bundler
@@ -188,7 +186,8 @@ module Bundler
 
     def download_gem(spec, uri, path)
       uri = Bundler::Source.mirror_for(uri)
-      Gem::RemoteFetcher.fetcher.download(spec, uri, path)
+      fetcher = Gem::RemoteFetcher.new(configuration[:http_proxy])
+      fetcher.download(spec, uri, path)
     end
 
     def security_policies
@@ -476,9 +475,9 @@ module Bundler
       def stub_rubygems(specs)
         Gem::Specification.all = specs
 
-        Gem.post_reset {
+        Gem.post_reset do
           Gem::Specification.all = specs
-        }
+        end
       end
 
       def all_specs
@@ -512,6 +511,14 @@ module Bundler
         end
 
         hash
+      end
+
+      def download_gem(spec, uri, path)
+        require 'resolv'
+        uri = Bundler::Source.mirror_for(uri)
+        proxy, dns = configuration[:http_proxy], Resolv::DNS.new
+        fetcher = Gem::RemoteFetcher.new(proxy, dns)
+        fetcher.download(spec, uri, path)
       end
 
       def gem_from_path(path, policy = nil)

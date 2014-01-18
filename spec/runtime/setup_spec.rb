@@ -631,7 +631,7 @@ describe "Bundler.setup" do
     expect(out).to eq("yay")
   end
 
-  it "ignores Gem.refresh" do
+  it "stubs out Gem.refresh so it does not reveal system gems" do
     system_gems "rack-1.0.0"
 
     install_gemfile <<-G
@@ -640,11 +640,12 @@ describe "Bundler.setup" do
     G
 
     run <<-R
+      puts Bundler.rubygems.find_name("rack").inspect
       Gem.refresh
       puts Bundler.rubygems.find_name("rack").inspect
     R
 
-    expect(out).to eq("[]")
+    expect(out).to eq("[]\n[]")
   end
 
   describe "when a vendored gem specification uses the :path option" do

@@ -154,7 +154,9 @@ module Bundler
     def load_config(config_file)
       valid_file = config_file && config_file.exist? && !config_file.size.zero?
       if !ignore_config? && valid_file
-        Hash[config_file.read.scan(/^(BUNDLE_.+): ['"]?(.+?)['"]?$/)]
+        config_regex = /^(BUNDLE_.+): (?:['"](.*)['"]|(.+))$/
+        config_pairs = config_file.read.scan(config_regex).map{|m| m.compact }
+        Hash[config_pairs]
       else
         {}
       end

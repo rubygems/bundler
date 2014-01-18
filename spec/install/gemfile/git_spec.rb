@@ -34,7 +34,7 @@ describe "bundle install with git sources" do
       git = update_git "foo" do |s|
         s.executables = ["foobar"] # we added this the first time, so keep it now
         s.files = ["bin/foobar"] # updating git nukes the files list
-        foospec = s.to_ruby.gsub(/s\.files.*/, 's.files = `git ls-files`.split("\n")')
+        foospec = s.to_ruby.gsub(/s\.files.*/, 's.files = `git ls-files -z`.split("\x0")')
         s.write "foo.gemspec", foospec
       end
 

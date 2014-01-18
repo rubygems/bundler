@@ -192,4 +192,22 @@ E
       expect(out).to eq("http://gems.example.org/ => http://gem-mirror.example.org/")
     end
   end
+
+  describe "quoting" do
+    before(:each) { bundle :install }
+
+    it "saves quotes" do
+      bundle "config foo something\\'"
+      run "puts Bundler.settings[:foo]"
+      expect(out).to eq("something'")
+    end
+
+    it "doesn't return quotes around values", :ruby => "1.9" do
+      bundle "config foo '1'"
+      run "puts Bundler.settings.send(:global_config_file).read"
+      expect(out).to include("'1'")
+      run "puts Bundler.settings[:foo]"
+      expect(out).to eq("1")
+    end
+  end
 end
