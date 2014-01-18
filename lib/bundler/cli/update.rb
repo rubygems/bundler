@@ -19,7 +19,8 @@ module Bundler
         names = Bundler.locked_gems.specs.map{ |s| s.name }
         gems.each do |g|
           next if names.include?(g)
-          raise GemNotFound, not_found_message(g, names)
+          require "bundler/cli/common"
+          raise GemNotFound, Bundler::CLI::Common.not_found_message(g, names)
         end
 
         if groups.any?

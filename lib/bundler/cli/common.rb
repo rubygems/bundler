@@ -23,21 +23,28 @@ module Bundler
       when 1
         specs.first
       else
-        specs.each_with_index do |spec, index|
-          Bundler.ui.info "#{index.succ} : #{spec.name}", true
-        end
-        Bundler.ui.info '0 : - exit -', true
-
-        input = Bundler.ui.ask('> ')
-        (num = input.to_i) > 0 ? specs[num - 1] : nil
+        ask_for_spec_from(specs)
+        endV
       end
     end
 
-    def self.not_found_message(missing_gem_name, alternatives)
-      message = "Could not find gem '#{missing_gem_name}'."
+    def self.ask_for_spec_from(specs)
+      if !$stdout.tty? && ENV['BUNDLE_SPEC_RUN'].nil?
+        raise GemNotFound, not_found_message(name, Bundler.definition.dependencies)
+      end
 
-      # This is called as the result of a GemNotFound, let's see if
-      # there's any similarly named ones we can propose instead
+      specs.each_with_index do |spec, index|
+        Bundler.ui.info "#{index.succ} : #{spec.name}", true
+      end
+      Bundler.ui.info '0 : - exit -', true
+
+      num = Bundler.ui.ask('> ').to_i
+      num > 0 ? specs[num - 1] : nil
+    end
+
+    def self.not_found_message(missing_gem_name, alternatives)
+      require 'bundler/similarity_detector'
+      message = "Could not find gem '#{missing_gem_name}'."
       alternate_names = alternatives.map { |a| a.respond_to?(:name) ? a.name : a }
       suggestions = SimilarityDetector.new(alternate_names).similar_word_list(missing_gem_name)
       message += "\nDid you mean #{suggestions}?" if suggestions
