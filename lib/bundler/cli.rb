@@ -249,9 +249,6 @@ module Bundler
       Bundler::Fetcher.disable_endpoint = opts["full-index"]
       Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? '1' : nil
 
-      # rubygems plugins sometimes hook into the gem install process
-      Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins)
-
       definition = Bundler.definition
       definition.validate_ruby!
       Installer.install(Bundler.root, definition, opts)
@@ -328,9 +325,6 @@ module Bundler
       opts["local"] = options[:local]
 
       Bundler.settings[:jobs]     = opts["jobs"] if opts["jobs"]
-
-      # rubygems plugins sometimes hook into the gem install process
-      Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins)
 
       Bundler.definition.validate_ruby!
       Installer.install Bundler.root, Bundler.definition, opts

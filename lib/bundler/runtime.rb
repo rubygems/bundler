@@ -129,12 +129,12 @@ module Bundler
     end
 
     def clean(dry_run = false)
-      gem_bins             = Dir["#{Gem.dir}/bin/*"]
-      git_dirs             = Dir["#{Gem.dir}/bundler/gems/*"]
-      git_cache_dirs       = Dir["#{Gem.dir}/cache/bundler/git/*"]
-      gem_dirs             = Dir["#{Gem.dir}/gems/*"]
-      gem_files            = Dir["#{Gem.dir}/cache/*.gem"]
-      gemspec_files        = Dir["#{Gem.dir}/specifications/*.gemspec"]
+      gem_bins             = Dir["#{Bundler.rubygems.gem_dir}/bin/*"]
+      git_dirs             = Dir["#{Bundler.rubygems.gem_dir}/bundler/gems/*"]
+      git_cache_dirs       = Dir["#{Bundler.rubygems.gem_dir}/cache/bundler/git/*"]
+      gem_dirs             = Dir["#{Bundler.rubygems.gem_dir}/gems/*"]
+      gem_files            = Dir["#{Bundler.rubygems.gem_dir}/cache/*.gem"]
+      gemspec_files        = Dir["#{Bundler.rubygems.gem_dir}/specifications/*.gemspec"]
       spec_gem_paths       = []
       # need to keep git sources around
       spec_git_paths       = @definition.sources.select {|s| s.is_a?(Bundler::Source::Git) }.map {|s| s.path.to_s }

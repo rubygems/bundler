@@ -6,6 +6,12 @@ require 'rubygems/config_file'
 module Bundler
   class RubygemsIntegration
 
+    def initialize
+      Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins)
+      Gem.load_plugins if Gem.respond_to?(:load_plugins)
+      super
+    end
+
     def self.version
       @version ||= Gem::Version.new(Gem::VERSION)
     end
@@ -520,21 +526,25 @@ module Bundler
 
   end
 
-  if RubygemsIntegration.provides?(">= 1.99.99")
-    @rubygems = RubygemsIntegration::Future.new
-  elsif RubygemsIntegration.provides?('>= 1.8.5')
-    @rubygems = RubygemsIntegration::Modern.new
-  elsif RubygemsIntegration.provides?('>= 1.8.0')
-    @rubygems = RubygemsIntegration::AlmostModern.new
-  elsif RubygemsIntegration.provides?('>= 1.7.0')
-    @rubygems = RubygemsIntegration::Transitional.new
-  elsif RubygemsIntegration.provides?('>= 1.4.0')
-    @rubygems = RubygemsIntegration::Legacy.new
-  else # Rubygems 1.3.6 and 1.3.7
-    @rubygems = RubygemsIntegration::Ancient.new
-  end
-
   class << self
-    attr_reader :rubygems
+    def rubygems
+      @rubygems ||= build_rubygems
+    end
+
+    def build_rubygems
+      if RubygemsIntegration.provides?(">= 1.99.99")
+        @rubygems = RubygemsIntegration::Future.new
+      elsif RubygemsIntegration.provides?('>= 1.8.5')
+        @rubygems = RubygemsIntegration::Modern.new
+      elsif RubygemsIntegration.provides?('>= 1.8.0')
+        @rubygems = RubygemsIntegration::AlmostModern.new
+      elsif RubygemsIntegration.provides?('>= 1.7.0')
+        @rubygems = RubygemsIntegration::Transitional.new
+      elsif RubygemsIntegration.provides?('>= 1.4.0')
+        @rubygems = RubygemsIntegration::Legacy.new
+      else # Rubygems 1.3.6 and 1.3.7
+        @rubygems = RubygemsIntegration::Ancient.new
+      end
+    end
   end
 end

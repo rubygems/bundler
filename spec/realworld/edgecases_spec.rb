@@ -1,6 +1,7 @@
 require 'spec_helper'
 
-describe "real world edgecases", :realworld => true do
+#describe "real world edgecases", :realworld => true do
+describe "real world edgecases" do
   # there is no rbx-relative-require gem that will install on 1.9
   it "ignores extra gems with bad platforms", :ruby => "1.8" do
     install_gemfile <<-G
@@ -47,6 +48,14 @@ describe "real world edgecases", :realworld => true do
     bundle "install --path vendor/bundle", :expect_err => true
     expect(err).not_to include("Could not find rake")
     expect(err).to be_empty
+  end
+
+  # https://github.com/bundler/bundler/issues/2824
+  it "loads all rubygems plugins" do
+    require 'rubygems/command_manager'
+    realworld_system_gems("open_gem --version 1.4.2", "rake --version 0.9.2")
+    load 'bundler/rubygems_integration.rb'
+    expect(Gem::CommandManager.instance.find_command("open")).to be_true
   end
 
   it "checks out git repos when the lockfile is corrupted" do
