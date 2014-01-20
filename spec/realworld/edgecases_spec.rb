@@ -53,8 +53,10 @@ describe "real world edgecases" do
   # https://github.com/bundler/bundler/issues/2824
   it "loads all rubygems plugins" do
     require 'rubygems/command_manager'
+    Bundler.set_rubygems(nil)
     realworld_system_gems("open_gem --version 1.4.2", "rake --version 0.9.2")
-    load 'bundler/rubygems_integration.rb'
+    expect { Gem::CommandManager.instance.find_command("open") }.to raise_error
+    Bundler.rubygems
     expect(Gem::CommandManager.instance.find_command("open")).to be_true
   end
 
