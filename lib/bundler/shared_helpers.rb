@@ -93,7 +93,6 @@ module Bundler
 
     def clean_load_path
       # handle 1.9 where system gems are always on the load path
-      require 'bundler/rubygems_integration'
       if defined?(::Gem)
         me = File.expand_path("../../", __FILE__)
         $LOAD_PATH.reject! do |p|

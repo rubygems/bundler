@@ -528,7 +528,6 @@ module Bundler
 
   class << self
     def rubygems(value=nil)
-      puts "AARON: rubygems called"
       set_rubygems(value) unless value == nil
       @rubygems ||= build_rubygems
     end
@@ -538,7 +537,6 @@ module Bundler
     end
 
     def build_rubygems
-      puts "AARON: building rubygems"
       if RubygemsIntegration.provides?(">= 1.99.99")
         @rubygems = RubygemsIntegration::Future.new
       elsif RubygemsIntegration.provides?('>= 1.8.5')
