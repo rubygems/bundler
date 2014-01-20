@@ -126,12 +126,10 @@ module Bundler
       uri = URI.parse("#{@remote_uri}#{Gem::MARSHAL_SPEC_DIR}#{spec_file_name}.rz")
       if uri.scheme == 'file'
         Bundler.load_marshal Bundler.rubygems.inflate(Bundler.rubygems.read_binary(uri.path))
-        #bundler.load_marshal gem.inflate(gem.read_binary(uri.path))
       elsif cached_spec_path = gemspec_cached_path(spec_file_name)
         Bundler.load_gemspec(cached_spec_path)
       else
         Bundler.load_marshal Bundler.rubygems.inflate(fetch(uri))
-        #Bundler.load_marshal Gem.inflate(fetch(uri))
       end
     rescue MarshalError => e
       raise HTTPError, "Gemspec #{spec} contained invalid data.\n" \
