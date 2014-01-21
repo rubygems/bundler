@@ -35,14 +35,14 @@ describe "bundle retry" do
   end
 
   it "raises the last error" do
-    error    = Bundler::GemfileNotFound
+    errors = [StandardError, StandardError, StandardError, Bundler::GemfileNotFound]
     attempts = 0
     expect {
       Bundler::Retry.new(nil, nil, 3).attempt do
         attempts += 1
-        raise error
+        raise errors.shift
       end
-    }.to raise_error(error)
+    }.to raise_error(Bundler::GemfileNotFound)
     expect(attempts).to eq(4)
   end
 
