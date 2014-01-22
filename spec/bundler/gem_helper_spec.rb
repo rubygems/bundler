@@ -49,7 +49,7 @@ describe Bundler::GemHelper do
 
   context "gem management" do
     def mock_confirm_message(message)
-      Bundler.ui.should_receive(:confirm).with(message)
+      expect(Bundler.ui).to receive(:confirm).with(message)
     end
 
     def mock_build_message
@@ -57,10 +57,7 @@ describe Bundler::GemHelper do
     end
 
     before(:each) do
-      bundle 'gem test'
       @app = bundled_app("test")
-      @gemspec = File.read("#{@app.to_s}/test.gemspec")
-      File.open("#{@app.to_s}/test.gemspec", 'w'){|f| f << @gemspec.gsub('TODO: ', '') }
       @helper = Bundler::GemHelper.new(@app.to_s)
     end
 
@@ -68,33 +65,51 @@ describe Bundler::GemHelper do
       expect(Bundler.ui).to be_a(Bundler::UI::Shell)
     end
 
-    describe "install_tasks" do
+    describe "#install_tasks" do
+      let(:app_version) { "0.0.1" }
+      let(:app_gemspec_content) { File.read(app_gemspec_path) }
+      let(:app_gem_path) { "#{app_path.to_s}/pkg/#{app_name}-#{app_version}.gem" }
+      let!(:rake_application) { Rake.application }
+
       before(:each) do
-        @saved, Rake.application = Rake.application, Rake::Application.new
+        content = app_gemspec_content.gsub("TODO: ", "")
+        File.open(app_gemspec_path, "w") { |file| file << content }
+
+        Rake.application = Rake::Application.new
       end
 
       after(:each) do
-        Rake.application = @saved
+        Rake.application = rake_application
       end
 
-      it "defines Rake tasks" do
-        names = %w[build install release]
+      context "defines Rake tasks" do
+        let(:task_names) { %w[build install release] }
 
-        names.each { |name|
-          expect { Rake.application[name] }.to raise_error(/Don't know how to build task/)
-        }
+        context "before installation" do
+          it "raises an error with appropriate message" do
+            task_names.each do |name|
+              expect { Rake.application[name] }.
+                to raise_error(/Don't know how to build task/)
+            end
+          end
+        end
 
-        @helper.install
+        context "after installation" do
+          before do
+            subject.install
+          end
 
-        names.each { |name|
-          expect { Rake.application[name] }.not_to raise_error
-          expect(Rake.application[name]).to be_instance_of Rake::Task
-        }
-      end
+          it "adds Rake tasks successfully" do
+            task_names.each do |name|
+              expect { Rake.application[name] }.not_to raise_error
+              expect(Rake.application[name]).to be_instance_of Rake::Task
+            end
+          end
 
-      it "provides a way to access the gemspec object" do
-        @helper.install
-        expect(Bundler::GemHelper.gemspec.name).to eq('test')
+          it "provides a way to access the gemspec object" do
+            expect(subject.gemspec.name).to eq(app_name)
+          end
+        end
       end
     end
 
