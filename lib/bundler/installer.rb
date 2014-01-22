@@ -90,7 +90,7 @@ module Bundler
       # dependencies might actually affect the installation of a gem.
       # that said, it's a rare situation (other than rake), and parallel
       # installation is just SO MUCH FASTER. so we let people opt in.
-      jobs = [Bundler.settings[:jobs].to_i, 1].max
+      jobs = [Bundler.settings[:jobs].to_i-1, 1].max
       if jobs > 1 && can_install_parallely?
         install_in_parallel jobs, options[:standalone]
       else
