@@ -356,13 +356,13 @@ dependencies are included in.</p>
 bundler uses the following priority order:</p>
 
 <ol>
-<li>The source explicitly attached to the gem (using <code>:path</code> or <code>:git</code>)</li>
-<li>For implicit gems (dependencies of explicit gems), any git or path
-repository otherwise declared. This results in bundler prioritizing the
-ActiveSupport gem from the Rails git repository over ones from
-<code>rubygems.org</code></li>
-<li>The sources specified via <code>source</code>, searching each source in your <code>Gemfile</code>
-from last added to first added.</li>
+<li> The source explicitly attached to the gem (using <code>:path</code> or <code>:git</code>)</li>
+<li> For implicit gems (dependencies of explicit gems), any git or path
+ repository otherwise declared. This results in bundler prioritizing the
+ ActiveSupport gem from the Rails git repository over ones from
+ <code>rubygems.org</code></li>
+<li> The sources specified via <code>source</code>, searching each source in your <code>Gemfile</code>
+ from last added to first added.</li>
 </ol>
 
 

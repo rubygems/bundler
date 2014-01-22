@@ -6,7 +6,6 @@
     <meta content='276VSYOko8B8vIu1i8i5qbj7_ql5PXo0dU69XQy-SL' name='globalsign-domain-verification'>
     <link href='/images/favicon.png' rel='shortcut icon' type='image/png'>
     <link href="/stylesheets/application.css" media="screen" rel="stylesheet" type="text/css" />
-    <link href="/stylesheets/sunburst.css" media="screen" rel="stylesheet" type="text/css" />
   </head>
   <body>
     <div id='body'>
@@ -151,7 +150,7 @@
                   If you really need to pass flags to a C extension, you can use the <code>bundle config</code>
                   command:
                 </p>
-                <pre class='sunburst'>$ bundle config build.mysql --with-mysql-config=/usr/local/mysql/bin/mysql_config&#x000A;</pre>
+                <pre class="highlight plaintext">$ bundle config build.mysql --with-mysql-config=/usr/local/mysql/bin/mysql_config&#x000A;</pre>
                 <p>
                   Bundler will store this configuration in <code>~/.bundle/config</code>, and bundler will use
                   the configuration for any <code>bundle install</code> performed by the same user. As a result, once
@@ -169,7 +168,7 @@
                   <strong>A</strong>: Use the --local flag with bundle install. The --local flag tells bundler
                   to use the local gem cache instead of reaching out to the remote gem server.
                 </p>
-                <pre class='sunburst'>$ bundle install --local&#x000A;</pre>
+                <pre class="highlight plaintext">$ bundle install --local&#x000A;</pre>
                 <h3>
                   Bundling From RubyGems is Really Slow
                 </h3>
@@ -180,7 +179,7 @@
                   <strong>A</strong>: Add the --full-index flag when bundling from the rubygems server. This downloads
                   the index all at once instead of making numerous small requests to the api.
                 </p>
-                <pre class='sunburst'>$ bundle install --full-index</pre>
+                <pre class="highlight plaintext">$ bundle install --full-index</pre>
               </div>
             </div>
           </div>

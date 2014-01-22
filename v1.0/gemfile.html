@@ -6,7 +6,6 @@
     <meta content='276VSYOko8B8vIu1i8i5qbj7_ql5PXo0dU69XQy-SL' name='globalsign-domain-verification'>
     <link href='/images/favicon.png' rel='shortcut icon' type='image/png'>
     <link href="/stylesheets/application.css" media="screen" rel="stylesheet" type="text/css" />
-    <link href="/stylesheets/sunburst.css" media="screen" rel="stylesheet" type="text/css" />
   </head>
   <body>
     <div id='body'>
@@ -32,14 +31,14 @@
                 Gemfiles require at least one gem source, in the form of the URL for a Rubygems server.
                 There are shortcuts for the default gem server, so all of these sources are the same.
               </div>
-              <pre class="sunburst">source <span class="Constant"><span class="Constant">:</span>rubygems</span>&#x000A;source <span class="String"><span class="String">&quot;</span>http://rubygems.org<span class="String">&quot;</span></span>&#x000A;source <span class="Constant"><span class="Constant">:</span>rubyforge</span>&#x000A;source <span class="String"><span class="String">&quot;</span>http://gems.rubyforge.org<span class="String">&quot;</span></span>&#x000A;source <span class="Constant"><span class="Constant">:</span>gemcutter</span>&#x000A;source <span class="String"><span class="String">&quot;</span>http://gemcutter.org<span class="String">&quot;</span></span>&#x000A;</pre>
+              <pre class="highlight ruby"><span class="n">source</span> <span class="ss">:rubygems</span>&#x000A;<span class="n">source</span> <span class="s2">"http://rubygems.org"</span>&#x000A;<span class="n">source</span> <span class="ss">:rubyforge</span>&#x000A;<span class="n">source</span> <span class="s2">"http://gems.rubyforge.org"</span>&#x000A;<span class="n">source</span> <span class="ss">:gemcutter</span>&#x000A;<span class="n">source</span> <span class="s2">"http://gemcutter.org"</span>&#x000A;</pre>
             </div>
             <div class='bullet'>
               <div class='description'>
                 Declare the gems that you need, including version numbers. Specify versions using the same
                 syntax that Rubygems supports for dependencies.
               </div>
-              <pre class="sunburst">gem <span class="String"><span class="String">&quot;</span>nokogiri<span class="String">&quot;</span></span>&#x000A;gem <span class="String"><span class="String">&quot;</span>rails<span class="String">&quot;</span></span>, <span class="String"><span class="String">&quot;</span>3.0.0.beta3<span class="String">&quot;</span></span>&#x000A;gem <span class="String"><span class="String">&quot;</span>rack<span class="String">&quot;</span></span>,  <span class="String"><span class="String">&quot;</span>&gt;=1.0<span class="String">&quot;</span></span>&#x000A;gem <span class="String"><span class="String">&quot;</span>thin<span class="String">&quot;</span></span>,  <span class="String"><span class="String">&quot;</span>~&gt;1.1<span class="String">&quot;</span></span>&#x000A;</pre>
+              <pre class="highlight ruby"><span class="n">gem</span> <span class="s2">"nokogiri"</span>&#x000A;<span class="n">gem</span> <span class="s2">"rails"</span><span class="p">,</span> <span class="s2">"3.0.0.beta3"</span>&#x000A;<span class="n">gem</span> <span class="s2">"rack"</span><span class="p">,</span>  <span class="s2">"&gt;=1.0"</span>&#x000A;<span class="n">gem</span> <span class="s2">"thin"</span><span class="p">,</span>  <span class="s2">"~&gt;1.1"</span></pre>
               <div class='notes'>
                 Most of the version specifiers, like <code>>= 1.0</code>, are self-explanatory.
                 The specifier <code>~></code> has a special meaning, best shown by example.
@@ -47,7 +46,7 @@
                 <code>~> 2.1</code> is identical to <code>>= 2.1</code> and <code>< 3.0</code>.
                 <code>~> 2.2.beta</code> will match prerelease versions like <code>2.2.beta.12</code>.
               </div>
-              <a href="http://docs.rubygems.org/read/chapter/16#page74">Rubygems version specifiers</a>
+              <a href="http://guides.rubygems.org/patterns/#pessimistic_version_constraint">Rubygems version specifiers</a>
             </div>
             <div class='bullet'>
               <div class='description'>
@@ -56,7 +55,7 @@
                 install it and maintain dependencies). And for gems with several files to require,
                 it's also possible to give an array to <code>:require</code>.
               </div>
-              <pre class="sunburst">gem <span class="String"><span class="String">&quot;</span>rspec<span class="String">&quot;</span></span>, <span class="Constant"><span class="Constant">:</span>require</span> =&gt; <span class="String"><span class="String">&quot;</span>spec<span class="String">&quot;</span></span>&#x000A;gem <span class="String"><span class="String">&quot;</span>sqlite3<span class="String">&quot;</span></span>&#x000A;gem <span class="String"><span class="String">&quot;</span>gem-release<span class="String">&quot;</span></span>, <span class="Constant"><span class="Constant">:</span>require</span> =&gt; <span class="Constant">false</span>&#x000A;gem <span class="String"><span class="String">&quot;</span>redis<span class="String">&quot;</span></span>, <span class="Constant"><span class="Constant">:</span>require</span> =&gt; [<span class="String"><span class="String">&quot;</span>redis/connection/hiredis<span class="String">&quot;</span></span>, <span class="String"><span class="String">&quot;</span>redis<span class="String">&quot;</span></span>]&#x000A;</pre>
+              <pre class="highlight ruby"><span class="n">gem</span> <span class="s2">"rspec"</span><span class="p">,</span> <span class="ss">:require</span> <span class="o">=&gt;</span> <span class="s2">"spec"</span>&#x000A;<span class="n">gem</span> <span class="s2">"sqlite3"</span>&#x000A;<span class="n">gem</span> <span class="s2">"gem-release"</span><span class="p">,</span> <span class="ss">:require</span> <span class="o">=&gt;</span> <span class="kp">false</span>&#x000A;<span class="n">gem</span> <span class="s2">"redis"</span><span class="p">,</span> <span class="ss">:require</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="s2">"redis/connection/hiredis"</span><span class="p">,</span> <span class="s2">"redis"</span><span class="o">]</span></pre>
               <div class='notes'>
                 In order to require gems in your <code>Gemfile</code>, you will need to call
                 <code>Bundler.require</code> in your application.
@@ -69,7 +68,7 @@
                 more valid gems. Specify what to check out with <code>:tag</code>,
                 <code>:branch</code>, or <code>:ref</code>. The default is the <code>master</code> branch.
               </div>
-              <pre class="sunburst">gem <span class="String"><span class="String">&quot;</span>nokogiri<span class="String">&quot;</span></span>, <span class="Constant"><span class="Constant">:</span>git</span> =&gt; <span class="String"><span class="String">&quot;</span>git://github.com/tenderlove/nokogiri.git<span class="String">&quot;</span></span>, <span class="Constant"><span class="Constant">:</span>branch</span> =&gt; <span class="String"><span class="String">&quot;</span>1.4<span class="String">&quot;</span></span>&#x000A;&#x000A;git <span class="String"><span class="String">&quot;</span>git://github.com/wycats/thor.git<span class="String">&quot;</span></span>, <span class="Constant"><span class="Constant">:</span>tag</span> =&gt; <span class="String"><span class="String">&quot;</span>v0.13.4<span class="String">&quot;</span></span>&#x000A;gem <span class="String"><span class="String">&quot;</span>thor<span class="String">&quot;</span></span>&#x000A;</pre>
+              <pre class="highlight ruby"><span class="n">gem</span> <span class="s2">"nokogiri"</span><span class="p">,</span> <span class="ss">:git</span> <span class="o">=&gt;</span> <span class="s2">"git://github.com/tenderlove/nokogiri.git"</span><span class="p">,</span> <span class="ss">:branch</span> <span class="o">=&gt;</span> <span class="s2">"1.4"</span>&#x000A;&#x000A;<span class="n">git</span> <span class="s2">"git://github.com/wycats/thor.git"</span><span class="p">,</span> <span class="ss">:tag</span> <span class="o">=&gt;</span> <span class="s2">"v0.13.4"</span>&#x000A;<span class="n">gem</span> <span class="s2">"thor"</span></pre>
               <div class='notes'>
                 If the git repository does not contain a <code>.gemspec</code> file, bundler
                 will create a simple one, without any dependencies, executables or C extensions.
@@ -83,13 +82,13 @@
                 If you are actively developing a gem, perhaps checked out from Github, you can use the gem
                 directly from its directory on your filesystem.
               </div>
-              <pre class="sunburst">gem <span class="String"><span class="String">&quot;</span>nokogiri<span class="String">&quot;</span></span>, <span class="Constant"><span class="Constant">:</span>path</span> =&gt; <span class="String"><span class="String">&quot;</span>~/sw/gems/nokogiri<span class="String">&quot;</span></span>&#x000A;</pre>
+              <pre class="highlight ruby"><span class="n">gem</span> <span class="s2">"nokogiri"</span><span class="p">,</span> <span class="ss">:path</span> <span class="o">=&gt;</span> <span class="s2">"~/sw/gems/nokogiri"</span>&#x000A;</pre>
             </div>
             <div class='bullet'>
               <div class='description'>
                 Dependencies can be placed into groups, to be ignored at install-time or required all at once.
               </div>
-              <pre class="sunburst">gem <span class="String"><span class="String">&quot;</span>wirble<span class="String">&quot;</span></span>, <span class="Constant"><span class="Constant">:</span>group</span> =&gt; <span class="Constant"><span class="Constant">:</span>development</span>&#x000A;gem <span class="String"><span class="String">&quot;</span>ruby-debug<span class="String">&quot;</span></span>, <span class="Constant"><span class="Constant">:</span>group</span> =&gt; [<span class="Constant"><span class="Constant">:</span>development</span>, <span class="Constant"><span class="Constant">:</span>test</span>]&#x000A;&#x000A;group <span class="Constant"><span class="Constant">:</span>test</span> <span class="Keyword">do</span>&#x000A;  gem <span class="String"><span class="String">&quot;</span>rspec<span class="String">&quot;</span></span>&#x000A;<span class="Keyword">end</span>&#x000A;</pre>
+              <pre class="highlight ruby"><span class="n">gem</span> <span class="s2">"wirble"</span><span class="p">,</span> <span class="ss">:group</span> <span class="o">=&gt;</span> <span class="ss">:development</span>&#x000A;<span class="n">gem</span> <span class="s2">"ruby-debug"</span><span class="p">,</span> <span class="ss">:group</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="ss">:development</span><span class="p">,</span> <span class="ss">:test</span><span class="o">]</span>&#x000A;&#x000A;<span class="n">group</span> <span class="ss">:test</span> <span class="k">do</span>&#x000A;  <span class="n">gem</span> <span class="s2">"rspec"</span>&#x000A;<span class="k">end</span></pre>
               <a href="/v1.0/groups.html">Learn more: Groups</a>
             </div>
           </div>

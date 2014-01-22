@@ -1,0 +1,4 @@
+# www.robotstxt.org
+User-agent: *
+Allow: /
+Sitemap: http://bundler.io/sitemap.xml

@@ -6,7 +6,6 @@
     <meta content='276VSYOko8B8vIu1i8i5qbj7_ql5PXo0dU69XQy-SL' name='globalsign-domain-verification'>
     <link href='/images/favicon.png' rel='shortcut icon' type='image/png'>
     <link href="/stylesheets/application.css" media="screen" rel="stylesheet" type="text/css" />
-    <link href="/stylesheets/sunburst.css" media="screen" rel="stylesheet" type="text/css" />
   </head>
   <body>
     <div id='body'>
@@ -28,7 +27,7 @@
               First, you declare these dependencies in a file at the root of your application, called
               <code>Gemfile</code>. It looks something like this:
             </p>
-            <pre class="sunburst">source <span class="String"><span class="String">&#39;</span>https://rubygems.org<span class="String">&#39;</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">&#39;</span>rails<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>3.0.0.rc<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rack-cache<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>~&gt; 1.4.2<span class="String">&#39;</span></span>&#x000A;</pre>
+            <pre class="highlight ruby"><span class="n">source</span> <span class="s1">'https://rubygems.org'</span>&#x000A;&#x000A;<span class="n">gem</span> <span class="s1">'rails'</span><span class="p">,</span> <span class="s1">'3.0.0.rc'</span>&#x000A;<span class="n">gem</span> <span class="s1">'rack-cache'</span>&#x000A;<span class="n">gem</span> <span class="s1">'nokogiri'</span><span class="p">,</span> <span class="s1">'~&gt; 1.4.2'</span>&#x000A;</pre>
             <p>
               This <code>Gemfile</code> says a few things. First, it says that bundler should look for gems
               declared in the <code>Gemfile</code> at <code>http://rubygems.org</code>. You can declare
@@ -46,7 +45,7 @@
             <p>
               After declaring your first set of dependencies, you tell bundler to go get them:
             </p>
-            <pre class='sunburst'>$ bundle install    # <code>bundle</code> is a shortcut for <code>bundle install</code>&#x000A;</pre>
+            <pre class="highlight plaintext">$ bundle install    # &lt;code&gt;bundle&lt;/code&gt; is a shortcut for &lt;code&gt;bundle install&lt;/code&gt;&#x000A;</pre>
             <p>
               Bundler will connect to <code>rubygems.org</code> (and any other sources that you declared),
               and find a list of all of the required gems that meet the requirements you specified. Because
@@ -54,7 +53,7 @@
               those have their own dependencies), running <code>bundle install</code> on the
               <code>Gemfile</code> above will install quite a few gems.
             </p>
-            <pre class='sunburst'>$ bundle install&#x000A;Fetching source index for http://gemcutter.org/&#x000A;Using rake (0.8.7)&#x000A;Using abstract (1.0.0)&#x000A;Installing activesupport (3.0.0.rc)&#x000A;Using builder (2.1.2)&#x000A;Using i18n (0.4.1)&#x000A;Installing activemodel (3.0.0.rc)&#x000A;Using erubis (2.6.6)&#x000A;Using rack (1.2.1)&#x000A;Installing rack-mount (0.6.9)&#x000A;Using rack-test (0.5.4)&#x000A;Using tzinfo (0.3.22)&#x000A;Installing actionpack (3.0.0.rc)&#x000A;Using mime-types (1.16)&#x000A;Using polyglot (0.3.1)&#x000A;Using treetop (1.4.8)&#x000A;Using mail (2.2.5)&#x000A;Installing actionmailer (3.0.0.rc)&#x000A;Using arel (0.4.0)&#x000A;Installing activerecord (3.0.0.rc)&#x000A;Installing activeresource (3.0.0.rc)&#x000A;Using bundler (1.0.0.rc.3)&#x000A;Installing nokogiri (1.4.3.1) with native extensions&#x000A;Installing rack-cache (0.5.2)&#x000A;Installing thor (0.14.0)&#x000A;Installing railties (3.0.0.rc)&#x000A;Installing rails (3.0.0.rc)&#x000A;Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.&#x000A;</pre>
+            <pre class="highlight plaintext">$ bundle install&#x000A;Fetching gem metadata from https://rubygems.org/&#x000A;Resolving dependencies...&#x000A;Using rake (0.8.7)&#x000A;Using abstract (1.0.0)&#x000A;Installing activesupport (3.0.0.rc)&#x000A;Using builder (2.1.2)&#x000A;Using i18n (0.4.1)&#x000A;Installing activemodel (3.0.0.rc)&#x000A;Using erubis (2.6.6)&#x000A;Using rack (1.2.1)&#x000A;Installing rack-mount (0.6.9)&#x000A;Using rack-test (0.5.4)&#x000A;Using tzinfo (0.3.22)&#x000A;Installing actionpack (3.0.0.rc)&#x000A;Using mime-types (1.16)&#x000A;Using polyglot (0.3.1)&#x000A;Using treetop (1.4.8)&#x000A;Using mail (2.2.5)&#x000A;Installing actionmailer (3.0.0.rc)&#x000A;Using arel (0.4.0)&#x000A;Installing activerecord (3.0.0.rc)&#x000A;Installing activeresource (3.0.0.rc)&#x000A;Using bundler (1.0.0.rc.3)&#x000A;Installing nokogiri (1.4.3.1) with native extensions&#x000A;Installing rack-cache (0.5.2)&#x000A;Installing thor (0.14.0)&#x000A;Installing railties (3.0.0.rc)&#x000A;Installing rails (3.0.0.rc)&#x000A;Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.&#x000A;</pre>
             <p>
               If any of the needed gems are already installed, Bundler will use them. After installing
               any needed gems to your system, bundler writes a snapshot of all of the gems and
@@ -75,7 +74,7 @@
               application loads (for Sinatra, the file that calls <code>require 'sinatra'</code>), put
               the following code:
             </p>
-            <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>rubygems<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>bundler/setup<span class="String">&#39;</span></span>&#x000A;</pre>
+            <pre class="highlight ruby"><span class="nb">require</span> <span class="s1">'rubygems'</span>&#x000A;<span class="nb">require</span> <span class="s1">'bundler/setup'</span>&#x000A;</pre>
             <p>
               This will automatically discover your <code>Gemfile</code>, and make all of the gems in
               your <code>Gemfile</code> available to Ruby (in technical terms, it puts the gems "on the
@@ -88,15 +87,15 @@
               might want to say "require all of the gems in my <code>Gemfile</code>". To do this, put
               the following code immediately following <code>require 'bundler/setup'</code>:
             </p>
-            <pre class="sunburst"><span class="Support">Bundler</span>.<span class="Entity">require</span>(<span class="Constant"><span class="Constant">:</span>default</span>)&#x000A;</pre>
+            <pre class="highlight ruby"><span class="no">Bundler</span><span class="p">.</span><span class="nf">require</span><span class="p">(</span><span class="ss">:default</span><span class="p">)</span>&#x000A;</pre>
             For our example Gemfile, this line is exactly equivalent to:
-            <pre class="sunburst"><span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>rails<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>rack-cache<span class="String">&#39;</span></span>&#x000A;<span class="Keyword">require</span> <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>&#x000A;</pre>
+            <pre class="highlight ruby"><span class="nb">require</span> <span class="s1">'rails'</span>&#x000A;<span class="nb">require</span> <span class="s1">'rack-cache'</span>&#x000A;<span class="nb">require</span> <span class="s1">'nokogiri'</span>&#x000A;</pre>
             <p>
               Astute readers will notice that the correct way to require the <code>rack-cache</code>
               gem is <code>require 'rack/cache'</code>, not <code>require 'rack-cache'</code>. To tell
               bundler to use <code>require 'rack/cache'</code>, update your Gemfile:
             </p>
-            <pre class="sunburst">source <span class="String"><span class="String">&#39;</span>http://rubygems.org<span class="String">&#39;</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">&#39;</span>rails<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>3.0.0.rc<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rack-cache<span class="String">&#39;</span></span>, <span class="Constant"><span class="Constant">:</span>require</span> =&gt; <span class="String"><span class="String">&#39;</span>rack/cache<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>~&gt; 1.4.2<span class="String">&#39;</span></span>&#x000A;</pre>
+            <pre class="highlight ruby"><span class="n">source</span> <span class="s1">'http://rubygems.org'</span>&#x000A;&#x000A;<span class="n">gem</span> <span class="s1">'rails'</span><span class="p">,</span> <span class="s1">'3.0.0.rc'</span>&#x000A;<span class="n">gem</span> <span class="s1">'rack-cache'</span><span class="p">,</span> <span class="ss">:require</span> <span class="o">=&gt;</span> <span class="s1">'rack/cache'</span>&#x000A;<span class="n">gem</span> <span class="s1">'nokogiri'</span><span class="p">,</span> <span class="s1">'~&gt; 1.4.2'</span>&#x000A;</pre>
             <p>
               For such a small <code>Gemfile</code>, we'd advise you to skip
               <code>Bundler.require</code> and just require the gems by hand (especially given the
@@ -202,7 +201,7 @@
               to update to <code>rails 3.0.0</code>, simply update your <code>Gemfile</code> to
               <code>gem 'rails', '3.0.0'</code> and run:
             </p>
-            <pre class='sunburst'>$ bundle install&#x000A;</pre>
+            <pre class="highlight plaintext">$ bundle install&#x000A;</pre>
             <p>
               As described above, the <code>bundle install</code> command always does a conservative
               update, refusing to update gems (or their dependencies) that you have not explicitly
@@ -240,7 +239,7 @@
               <code>rack-cache</code>. To do this, you want to use the <code>bundle update</code>
               command:
             </p>
-            <pre class='sunburst'>$ bundle update rack-cache&#x000A;</pre>
+            <pre class="highlight plaintext">$ bundle update rack-cache&#x000A;</pre>
             <p>
               This command will update <code>rack-cache</code> and its dependencies to the latest
               version allowed by the <code>Gemfile</code> (in this case, the latest version
@@ -256,7 +255,7 @@
             <p>
               If you want to update every gem in the Gemfile to the latest possible versions, run:
             </p>
-            <pre class='sunburst'>$ bundle update&#x000A;</pre>
+            <pre class="highlight plaintext">$ bundle update&#x000A;</pre>
             <p>
               This will resolve dependencies from scratch, ignoring the <code>Gemfile.lock</code>. If
               you do this, keep <code>git reset --hard</code> and your test suite in your back pocket.
@@ -274,7 +273,7 @@
                   When you first create a Rails application, it already comes with a
                   <code>Gemfile</code>.  For another kind of application (such as Sinatra), run:
                 </p>
-                <pre class='sunburst'>$ bundle init&#x000A;</pre>
+                <pre class="highlight plaintext">$ bundle init&#x000A;</pre>
                 <p>
                   The <code>bundle init</code> command creates a simple <code>Gemfile</code> which you
                   can edit.
@@ -285,30 +284,30 @@
                   Next, add any gems that your application depends on. If you care which version of a
                   particular gem that you need, be sure to include an appropriate version restriction:
                 </p>
-                <pre class="sunburst">source <span class="String"><span class="String">&#39;</span>http://rubygems.org<span class="String">&#39;</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">&#39;</span>sinatra<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>~&gt; 0.9.0<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rack-cache<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rack-bug<span class="String">&#39;</span></span>&#x000A;</pre>
+                <pre class="highlight ruby"><span class="n">source</span> <span class="s1">'http://rubygems.org'</span>&#x000A;&#x000A;<span class="n">gem</span> <span class="s1">'sinatra'</span><span class="p">,</span> <span class="s1">'~&gt; 0.9.0'</span>&#x000A;<span class="n">gem</span> <span class="s1">'rack-cache'</span>&#x000A;<span class="n">gem</span> <span class="s1">'rack-bug'</span>&#x000A;</pre>
               </li>
               <li>
                 <p>
                   If you don't have the gems installed in your system yet, run:
                 </p>
-                <pre class='sunburst'>$ bundle install&#x000A;</pre>
+                <pre class="highlight plaintext">$ bundle install&#x000A;</pre>
               </li>
               <li>
                 <p>
                   To update a gem's version requirements, first modify the Gemfile:
                 </p>
-                <pre class="sunburst">source <span class="String"><span class="String">&#39;</span>http://rubygems.org<span class="String">&#39;</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">&#39;</span>sinatra<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>~&gt; 1.0.0<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rack-cache<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rack-bug<span class="String">&#39;</span></span>&#x000A;</pre>
+                <pre class="highlight ruby"><span class="n">source</span> <span class="s1">'http://rubygems.org'</span>&#x000A;&#x000A;<span class="n">gem</span> <span class="s1">'sinatra'</span><span class="p">,</span> <span class="s1">'~&gt; 1.0.0'</span>&#x000A;<span class="n">gem</span> <span class="s1">'rack-cache'</span>&#x000A;<span class="n">gem</span> <span class="s1">'rack-bug'</span>&#x000A;</pre>
                 <p>
                   and then run:
                 </p>
-                <pre class='sunburst'>$ bundle install&#x000A;</pre>
+                <pre class="highlight plaintext">$ bundle install&#x000A;</pre>
               </li>
               <li>
                 <p>
                   If <code>bundle install</code> reports a conflict between your <code>Gemfile</code>
                   and <code>Gemfile.lock</code>, run:
                 </p>
-                <pre class='sunburst'>$ bundle update sinatra&#x000A;</pre>
+                <pre class="highlight plaintext">$ bundle update sinatra&#x000A;</pre>
                 <p>
                   This will update just the Sinatra gem, as well as any of its dependencies
                 </p>
@@ -318,7 +317,7 @@
                   To update all of the gems in your <code>Gemfile</code> to the latest possible
                   versions, run:
                 </p>
-                <pre class='sunburst'>$ bundle update&#x000A;</pre>
+                <pre class="highlight plaintext">$ bundle update&#x000A;</pre>
               </li>
               <li>
                 Whenever your <code>Gemfile.lock</code> changes, always check it in to version
@@ -331,7 +330,7 @@
                   boot your local development server), make sure you have checked in your
                   <code>Gemfile.lock</code> to version control. On the remote server, run:
                 </p>
-                <pre class='sunburst'>$ bundle install --deployment&#x000A;</pre>
+                <pre class="highlight plaintext">$ bundle install --deployment&#x000A;</pre>
               </li>
             </ul>
             <h2 id='notes'>

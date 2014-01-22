@@ -6,7 +6,6 @@
     <meta content='276VSYOko8B8vIu1i8i5qbj7_ql5PXo0dU69XQy-SL' name='globalsign-domain-verification'>
     <link href='/images/favicon.png' rel='shortcut icon' type='image/png'>
     <link href="/stylesheets/application.css" media="screen" rel="stylesheet" type="text/css" />
-    <link href="/stylesheets/sunburst.css" media="screen" rel="stylesheet" type="text/css" />
   </head>
   <body>
     <div id='body'>
@@ -21,7 +20,7 @@
               <div class='description'>
                 Retrieve or set a configuration value
               </div>
-              <pre class='sunburst'>$ bundle config [NAME [VALUE]] [--local] [--global] [--delete]</pre>
+              <pre class="highlight plaintext">$ bundle config [NAME [VALUE]] [--local] [--global] [--delete]</pre>
               <div class='notes'>
                 <p>
                   Options:
@@ -58,7 +57,7 @@
                 Get your bundle configuration.
               </div>
               <div class='how'>
-                <pre class='sunburst'>$ bundle config</pre>
+                <pre class="highlight plaintext">$ bundle config</pre>
                 <div class='notes'>
                   Executing <code>bundle config</code> with no parameters will print a
                   list of all bundler configuration for the current bundle, and where
@@ -71,7 +70,7 @@
                 Get your bundle configuration for <code>NAME</code> variable.
               </div>
               <div class='how'>
-                <pre class='sunburst'>$ bundle config NAME</pre>
+                <pre class="highlight plaintext">$ bundle config NAME</pre>
                 <div class='notes'>
                   Will print the value of that configuration setting for
                   <code>NAME</code>, and where it was set. Will print both local and
@@ -85,7 +84,7 @@
                 <code>VALUE</code>.
               </div>
               <div class='how'>
-                <pre class='sunburst'>$ bundle config NAME VALUE</pre>
+                <pre class="highlight plaintext">$ bundle config NAME VALUE</pre>
                 <div class='notes'>
                   Will set <code>NAME</code> to <code>VALUE</code> for all bundles
                   executed as the current user (i.e. global setting). The configuration
@@ -101,7 +100,7 @@
                 to <code>VALUE</code>.
               </div>
               <div class='how'>
-                <pre class='sunburst'>$ bundle config --global NAME VALUE </pre>
+                <pre class="highlight plaintext">$ bundle config --global NAME VALUE </pre>
                 <div class='notes'>
                   Works the same as the command above.
                 </div>
@@ -113,7 +112,7 @@
                 <code>VALUE</code>.
               </div>
               <div class='how'>
-                <pre class='sunburst'>$ bundle config --local NAME VALUE </pre>
+                <pre class="highlight plaintext">$ bundle config --local NAME VALUE </pre>
                 <div class='notes'>
                   Works the same as the two command above but for the local application.
                   The configuration will be stored in <code>app/.bundle/config</code>.
@@ -125,7 +124,7 @@
                 Delete the configuration for <code>NAME</code> in both local and global sources.
               </div>
               <div class='how'>
-                <pre class='sunburst'>$ bundle config --delete NAME</pre>
+                <pre class="highlight plaintext">$ bundle config --delete NAME</pre>
                 <div class='notes'>
                   Will delete the configuration for <code>NAME</code> variable in both local and global sources. Not compatible with --global or --local flag.
                 </div>
@@ -147,14 +146,14 @@
                   to specify where to find the <code>mysql_config</code> executable.
                 </p>
                 <div class='how'>
-                  <pre class='sunburst'>$ gem install mysql -- --with-mysql-config=/usr/local/mysql/bin/mysql_config&#x000A;</pre>
+                  <pre class="highlight plaintext">$ gem install mysql -- --with-mysql-config=/usr/local/mysql/bin/mysql_config&#x000A;</pre>
                 </div>
                 <p>
                   Since the specific location of that executable can change from machine
                   to machine, you can specify these flags on a per-machine basis.
                 </p>
                 <div class='how'>
-                  <pre class='sunburst'>$ bundle config build.mysql --with-mysql-config=/usr/local/mysql/bin/mysql_config</pre>
+                  <pre class="highlight plaintext">$ bundle config build.mysql --with-mysql-config=/usr/local/mysql/bin/mysql_config</pre>
                 </div>
                 <p>
                   After running this command, every time bundler needs to install the
@@ -251,12 +250,12 @@
                   instead of using the remote version. This can be achieved by setting
                   up a local override:
                 </p>
-                <pre class='sunburst'>$ bundle config local.GEM_NAME /path/to/local/git/repository&#x000A;</pre>
+                <pre class="highlight plaintext">$ bundle config local.GEM_NAME /path/to/local/git/repository&#x000A;</pre>
                 <p>
                   For example, in order to use a local Rack repository, a developer
                   could call:
                 </p>
-                <pre class='sunburst'>$ bundle config local.rack ~/Work/git/rack&#x000A;</pre>
+                <pre class="highlight plaintext">$ bundle config local.rack ~/Work/git/rack&#x000A;</pre>
                 <p>
                   Now instead of checking out the remote git repository, the local
                   override will be used. Similar to a path source, every time the local

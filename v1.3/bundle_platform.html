@@ -6,7 +6,6 @@
     <meta content='276VSYOko8B8vIu1i8i5qbj7_ql5PXo0dU69XQy-SL' name='globalsign-domain-verification'>
     <link href='/images/favicon.png' rel='shortcut icon' type='image/png'>
     <link href="/stylesheets/application.css" media="screen" rel="stylesheet" type="text/css" />
-    <link href="/stylesheets/sunburst.css" media="screen" rel="stylesheet" type="text/css" />
   </head>
   <body>
     <div id='body'>
@@ -21,7 +20,7 @@
               <div class='description'>
                 Displays platform compatibility information
               </div>
-              <pre class='sunburst'>$ bundle platform [--ruby]</pre>
+              <pre class="highlight plaintext">$ bundle platform [--ruby]</pre>
               <div class='notes'>
                 <p>
                   Options:
@@ -35,17 +34,17 @@
               <div class='description'>
                 When not passed any options, platform will display information from your <code>Gemfile</code>, <code>Gemfile.lock</code>, and Ruby VM about your platform. You'll see output like the following:
               </div>
-              <pre class='sunburst'>$ bundle platform&#x000A;Your platform is: x86_64-linux&#x000A;&#x000A;Your app has gems that work on these platforms:&#x000A;* ruby&#x000A;&#x000A;Your Gemfile specifies a Ruby version requirement:&#x000A;* ruby 1.9.3&#x000A;&#x000A;Your current platform satisfies the Ruby version requirement.</pre>
+              <pre class="highlight plaintext">$ bundle platform&#x000A;Your platform is: x86_64-linux&#x000A;&#x000A;Your app has gems that work on these platforms:&#x000A;* ruby&#x000A;&#x000A;Your Gemfile specifies a Ruby version requirement:&#x000A;* ruby 1.9.3&#x000A;&#x000A;Your current platform satisfies the Ruby version requirement.</pre>
               <div class='description'>
                 When the <code>ruby</code> directive doesn't match the running Ruby VM, it will tell you what part does not.
               </div>
-              <pre class='sunburst'>Your Ruby version is 1.9.3, but your Gemfile specified 1.8.7&#x000A;</pre>
+              <pre class="highlight plaintext">Your Ruby version is 1.9.3, but your Gemfile specified 1.8.7&#x000A;</pre>
             </div>
             <div class='bullet' id='ruby'>
               <div class='description'>
                 When using the <code>--ruby</code> flag, it will just display the <code>ruby</code> directive information, so you don't have to parse it from the Gemfile.
               </div>
-              <pre class='sunburst'>$ bundle platform --ruby&#x000A;ruby 1.9.3 (jruby 1.6.7)</pre>
+              <pre class="highlight plaintext">$ bundle platform --ruby&#x000A;ruby 1.9.3 (jruby 1.6.7)</pre>
             </div>
           </div>
         </div>

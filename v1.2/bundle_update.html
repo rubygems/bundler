@@ -6,7 +6,6 @@
     <meta content='276VSYOko8B8vIu1i8i5qbj7_ql5PXo0dU69XQy-SL' name='globalsign-domain-verification'>
     <link href='/images/favicon.png' rel='shortcut icon' type='image/png'>
     <link href="/stylesheets/application.css" media="screen" rel="stylesheet" type="text/css" />
-    <link href="/stylesheets/sunburst.css" media="screen" rel="stylesheet" type="text/css" />
   </head>
   <body>
     <div id='body'>
@@ -21,7 +20,7 @@
               <div class='description'>
                 Update the current environment
               </div>
-              <pre class='sunburst'>$ bundle update [GEM] [--local] [--source=SOURCE]</pre>
+              <pre class="highlight plaintext">$ bundle update [GEM] [--local] [--source=SOURCE]</pre>
               <div class='notes'>
                 <p>
                   Options:
@@ -49,7 +48,7 @@
                 Update the current environment.
               </div>
               <div class='how'>
-                <pre class='sunburst'>$ bundle update</pre>
+                <pre class="highlight plaintext">$ bundle update</pre>
               </div>
               <div class='notes'>
                 If you run <code>bundle update</code> with no parameters, bundler will
@@ -62,7 +61,7 @@
                 Update a specific source (and all gems associated with it)
               </div>
               <div class='how'>
-                <pre class='sunburst'>$ bundle update --source=SOURCE</pre>
+                <pre class="highlight plaintext">$ bundle update --source=SOURCE</pre>
               </div>
               <div class='notes'>
                 The name of a <code>:git</code> or <code>:path</code> source used in the
@@ -83,13 +82,13 @@
                 </p>
                 <p>
                   Consider the following <code>Gemfile</code>:
-                  <pre class="sunburst">source <span class="String"><span class="String">&#39;</span>http://rubygems.org<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rails<span class="String">&#39;</span></span>, <span class="String"><span class="String">&#39;</span>3.0.0.rc<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>nokogiri<span class="String">&#39;</span></span>&#x000A;</pre>
+                  <pre class="highlight ruby"><span class="n">source</span> <span class="s1">'http://rubygems.org'</span>&#x000A;<span class="n">gem</span> <span class="s1">'rails'</span><span class="p">,</span> <span class="s1">'3.0.0.rc'</span>&#x000A;<span class="n">gem</span> <span class="s1">'nokogiri'</span></pre>
                 </p>
                 <p>
                   When you run <code>bundle install</code> the first time, bundler will
                   resolve all of the dependencies, all the way down, and install what you
                   need:
-                  <pre class='sunburst'>Fetching source index for http://rubygems.org/&#x000A;Installing rake (0.8.7)&#x000A;Installing abstract (1.0.0)&#x000A;Installing activesupport (3.0.0.rc)&#x000A;Installing builder (2.1.2)&#x000A;Installing i18n (0.4.1)&#x000A;Installing activemodel (3.0.0.rc)&#x000A;Installing erubis (2.6.6)&#x000A;Installing rack (1.2.1)&#x000A;Installing rack-mount (0.6.9)&#x000A;Installing rack-test (0.5.4)&#x000A;Installing tzinfo (0.3.22)&#x000A;Installing actionpack (3.0.0.rc)&#x000A;Installing mime-types (1.16)&#x000A;Installing polyglot (0.3.1)&#x000A;Installing treetop (1.4.8)&#x000A;Installing mail (2.2.5)&#x000A;Installing actionmailer (3.0.0.rc)&#x000A;Installing arel (0.4.0)&#x000A;Installing activerecord (3.0.0.rc)&#x000A;Installing activeresource (3.0.0.rc)&#x000A;Installing bundler (1.0.0.rc.3)&#x000A;Installing nokogiri (1.4.3.1) with native extensions&#x000A;Installing thor (0.14.0)&#x000A;Installing railties (3.0.0.rc)&#x000A;Installing rails (3.0.0.rc)&#x000A;&#x000A;Your bundle is complete! Use `bundle show [gemname]` to see where a&#x000A;bundled gem is installed.</pre>
+                  <pre class="highlight plaintext">Fetching source index for http://rubygems.org/&#x000A;Installing rake (0.8.7)&#x000A;Installing abstract (1.0.0)&#x000A;Installing activesupport (3.0.0.rc)&#x000A;Installing builder (2.1.2)&#x000A;Installing i18n (0.4.1)&#x000A;Installing activemodel (3.0.0.rc)&#x000A;Installing erubis (2.6.6)&#x000A;Installing rack (1.2.1)&#x000A;Installing rack-mount (0.6.9)&#x000A;Installing rack-test (0.5.4)&#x000A;Installing tzinfo (0.3.22)&#x000A;Installing actionpack (3.0.0.rc)&#x000A;Installing mime-types (1.16)&#x000A;Installing polyglot (0.3.1)&#x000A;Installing treetop (1.4.8)&#x000A;Installing mail (2.2.5)&#x000A;Installing actionmailer (3.0.0.rc)&#x000A;Installing arel (0.4.0)&#x000A;Installing activerecord (3.0.0.rc)&#x000A;Installing activeresource (3.0.0.rc)&#x000A;Installing bundler (1.0.0.rc.3)&#x000A;Installing nokogiri (1.4.3.1) with native extensions&#x000A;Installing thor (0.14.0)&#x000A;Installing railties (3.0.0.rc)&#x000A;Installing rails (3.0.0.rc)&#x000A;&#x000A;Your bundle is complete! Use `bundle show [gemname]` to see where a&#x000A;bundled gem is installed.</pre>
                 </p>
                 <p>
                   As you can see, even though you have just two gems in the
@@ -135,7 +134,7 @@
                   <code>nokogiri</code> releases version <code>1.4.4</code>, and you want
                   to update it _without_ updating Rails and all of its dependencies. To
                   do this, run
-                  <pre class='sunburst'>bundle update nokogiri&#x000A;</pre>
+                  <pre class="highlight plaintext">bundle update nokogiri&#x000A;</pre>
                 </p>
                 <p>
                   Bundler will update <code>nokogiri</code> and any of its dependencies,
@@ -152,13 +151,13 @@
                   Sometimes, multiple gems declared in your <code>Gemfile</code> are
                   satisfied by the same second-level dependency. For instance, consider the
                   case of <code>thin</code> and <code>rack-perftools-profiler</code>.
-                  <pre class="sunburst">source <span class="String"><span class="String">&#39;</span>http://rubygems.org<span class="String">&#39;</span></span>&#x000A;&#x000A;gem <span class="String"><span class="String">&#39;</span>thin<span class="String">&#39;</span></span>&#x000A;gem <span class="String"><span class="String">&#39;</span>rack-perftools-profiler<span class="String">&#39;</span></span>&#x000A;</pre>
+                  <pre class="highlight ruby"><span class="n">source</span> <span class="s1">'http://rubygems.org'</span>&#x000A;&#x000A;<span class="n">gem</span> <span class="s1">'thin'</span>&#x000A;<span class="n">gem</span> <span class="s1">'rack-perftools-profiler'</span>&#x000A;</pre>
                 </p>
                 <p>
                   The <code>thin</code> gem depends on <code>rack >= 1.0</code>, while
                   <code>rack-perftools-profiler</code> depends on <code>rack ~> 1.0</code>.
                   If you run bundle install, you get:
-                  <pre class='sunburst'>Fetching source index for http://rubygems.org/&#x000A;Installing daemons (1.1.0)&#x000A;Installing eventmachine (0.12.10) with native extensions&#x000A;Installing open4 (1.0.1)&#x000A;Installing perftools.rb (0.4.7) with native extensions&#x000A;Installing rack (1.2.1)&#x000A;Installing rack-perftools_profiler (0.0.2)&#x000A;Installing thin (1.2.7) with native extensions&#x000A;Using bundler (1.0.0.rc.3)&#x000A;</pre>
+                  <pre class="highlight plaintext">Fetching source index for http://rubygems.org/&#x000A;Installing daemons (1.1.0)&#x000A;Installing eventmachine (0.12.10) with native extensions&#x000A;Installing open4 (1.0.1)&#x000A;Installing perftools.rb (0.4.7) with native extensions&#x000A;Installing rack (1.2.1)&#x000A;Installing rack-perftools_profiler (0.0.2)&#x000A;Installing thin (1.2.7) with native extensions&#x000A;Using bundler (1.0.0.rc.3)&#x000A;</pre>
                 </p>
                 <p>
                   In this case, the two gems have their own set of dependencies, but they
@@ -195,39 +194,39 @@
                 </p>
                 <p>
                   After you create your <code>Gemfile</code> for the first time, run
-                  <pre class='sunburst'>$ bundle install</pre>
+                  <pre class="highlight plaintext">$ bundle install</pre>
                 </p>
                 <p>
                   Check the resulting <code>Gemfile.lock</code> into version control
-                  <pre class='sunburst'>$ git add Gemfile.lock</pre>
+                  <pre class="highlight plaintext">$ git add Gemfile.lock</pre>
                 </p>
                 <p>
                   When checking out this repository on another development machine, run
-                  <pre class='sunburst'>$ bundle install</pre>
+                  <pre class="highlight plaintext">$ bundle install</pre>
                 </p>
                 <p>
                   When checking out this repository on a deployment machine, run
-                  <pre class='sunburst'>$ bundle install --deployment</pre>
+                  <pre class="highlight plaintext">$ bundle install --deployment</pre>
                 </p>
                 <p>
                   After changing the <code>Gemfile</code> to reflect a new or update
                   dependency, run
-                  <pre class='sunburst'>$ bundle install</pre>
+                  <pre class="highlight plaintext">$ bundle install</pre>
                 </p>
                 <p>
                   Make sure to check the updated <code>Gemfile.lock</code> into version
                   control
-                  <pre class='sunburst'>$ git add Gemfile.lock</pre>
+                  <pre class="highlight plaintext">$ git add Gemfile.lock</pre>
                 </p>
                 <p>
                   If <code>bundle install</code> reports a conflict, manually update the
                   specific gems that you changed in the <code>Gemfile</code>
-                  <pre class='sunburst'>$ bundle update rails thin</pre>
+                  <pre class="highlight plaintext">$ bundle update rails thin</pre>
                 </p>
                 <p>
                   If you want to update all the gems to the latest possible versions that
                   still match the gems listed in the <code>Gemfile</code>, run
-                  <pre class='sunburst'>$ bundle update</pre>
+                  <pre class="highlight plaintext">$ bundle update</pre>
                 </p>
               </div>
             </div>

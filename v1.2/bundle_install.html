@@ -6,7 +6,6 @@
     <meta content='276VSYOko8B8vIu1i8i5qbj7_ql5PXo0dU69XQy-SL' name='globalsign-domain-verification'>
     <link href='/images/favicon.png' rel='shortcut icon' type='image/png'>
     <link href="/stylesheets/application.css" media="screen" rel="stylesheet" type="text/css" />
-    <link href="/stylesheets/sunburst.css" media="screen" rel="stylesheet" type="text/css" />
   </head>
   <body>
     <div id='body'>
@@ -21,7 +20,7 @@
               <div class='description'>
                 Make sure all dependencies in your Gemfile are available to your application.
               </div>
-              <pre class='sunburst'>$ bundle install [--binstubs=PATH] [--clean] [--deployment] [--frozen]&#x000A;                 [--full-index] [--gemfile=FILE] [--local] [--no-cache]&#x000A;                 [--no-prune] [--path=PATH] [--quiet] [--shebang=STRING]&#x000A;                 [--standalone=ARRAY] [--system] [--without=GROUP GROUP]</pre>
+              <pre class="highlight plaintext">$ bundle install [--binstubs=PATH] [--clean] [--deployment] [--frozen]&#x000A;                 [--full-index] [--gemfile=FILE] [--local] [--no-cache]&#x000A;                 [--no-prune] [--path=PATH] [--quiet] [--shebang=STRING]&#x000A;                 [--standalone=ARRAY] [--system] [--without=GROUP GROUP]</pre>
               <div class='notes'>
                 <p>
                   Options:
@@ -96,7 +95,7 @@
                 repository. In this case, install them to <code>vendor/bundle</code>.
               </div>
               <div class='how'>
-                <pre class='sunburst'>$ bundle install --path vendor/bundle</pre>
+                <pre class="highlight plaintext">$ bundle install --path vendor/bundle</pre>
                 <div class='notes'>
                   Further <code>bundle</code> commands or calls to <code>Bundler.setup</code> or
                   <code>Bundler.require</code> will remember this location.
@@ -109,7 +108,7 @@
               <div class='description'>
                 Install all dependencies except those in groups that are explicitly excluded.
               </div>
-              <pre class='sunburst'>$ bundle install --without development test</pre>
+              <pre class="highlight plaintext">$ bundle install --without development test</pre>
               <a href="/v1.2/groups.html">Learn More: Groups</a>
             </div>
             <div class='bullet' id='deployment'>
@@ -117,7 +116,7 @@
                 Install all dependencies on to a production server.
                 Do <b>not</b> use this flag on a development machine.
               </div>
-              <pre class='sunburst'>$ bundle install --deployment</pre>
+              <pre class="highlight plaintext">$ bundle install --deployment</pre>
               <div class='notes'>
                 <p>
                   The <code>--deployment</code> flag activates a number of deployment-friendly

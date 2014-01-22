@@ -6,7 +6,6 @@
     <meta content='276VSYOko8B8vIu1i8i5qbj7_ql5PXo0dU69XQy-SL' name='globalsign-domain-verification'>
     <link href='/images/favicon.png' rel='shortcut icon' type='image/png'>
     <link href="/stylesheets/application.css" media="screen" rel="stylesheet" type="text/css" />
-    <link href="/stylesheets/sunburst.css" media="screen" rel="stylesheet" type="text/css" />
   </head>
   <body>
     <div id='body'>
@@ -60,7 +59,7 @@
               to update to <code>rails 3.0.0</code>, simply update your <code>Gemfile</code> to
               <code>gem 'rails', '3.0.0'</code> and run:
             </p>
-            <pre class='sunburst'>$ bundle install&#x000A;</pre>
+            <pre class="highlight plaintext">$ bundle install&#x000A;</pre>
             <p>
               As described above, the <code>bundle install</code> command always does a conservative
               update, refusing to update gems (or their dependencies) that you have not explicitly
@@ -98,7 +97,7 @@
               <code>rack-cache</code>. To do this, you want to use the <code>bundle update</code>
               command:
             </p>
-            <pre class='sunburst'>$ bundle update rack-cache&#x000A;</pre>
+            <pre class="highlight plaintext">$ bundle update rack-cache&#x000A;</pre>
             <p>
               This command will update <code>rack-cache</code> and its dependencies to the latest
               version allowed by the <code>Gemfile</code> (in this case, the latest version
@@ -114,7 +113,7 @@
             <p>
               If you want to update every gem in the Gemfile to the latest possible versions, run:
             </p>
-            <pre class='sunburst'>$ bundle update&#x000A;</pre>
+            <pre class="highlight plaintext">$ bundle update&#x000A;</pre>
             <p>
               This will resolve dependencies from scratch, ignoring the <code>Gemfile.lock</code>. If
               you do this, keep <code>git reset --hard</code> and your test suite in your back pocket.
