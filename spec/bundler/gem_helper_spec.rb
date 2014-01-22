@@ -21,7 +21,7 @@ describe Bundler::GemHelper do
       end
 
       it "when there are two gemspecs and the name isn't specified" do
-        File.open(File.join(app_path.to_s, 'test2.gemspec'), 'w') { |f| f << '' }
+        File.open(File.join(app_path.to_s, 'test2.gemspec'), "w"){ |f| f << '' }
         expect { subject }.to raise_error(/Unable to determine name/)
       end
     end
@@ -56,7 +56,16 @@ describe Bundler::GemHelper do
       mock_confirm_message "test 0.0.1 built to pkg/test-0.0.1.gem."
     end
 
+    let(:app_version) { "0.0.1" }
+    let(:app_gem_path) do
+      bundled_app "#{app_name}/pkg/#{app_name}-#{app_version}.gem"
+    end
+    let(:app_gemspec_content) { File.read(app_gemspec_path) }
+
     before(:each) do
+      content = app_gemspec_content.gsub("TODO: ", "")
+      File.open(app_gemspec_path, "w") { |file| file << content }
+
       @app = bundled_app("test")
       @helper = Bundler::GemHelper.new(@app.to_s)
     end
@@ -66,15 +75,9 @@ describe Bundler::GemHelper do
     end
 
     describe "#install_tasks" do
-      let(:app_version) { "0.0.1" }
-      let(:app_gemspec_content) { File.read(app_gemspec_path) }
-      let(:app_gem_path) { "#{app_path.to_s}/pkg/#{app_name}-#{app_version}.gem" }
       let!(:rake_application) { Rake.application }
 
       before(:each) do
-        content = app_gemspec_content.gsub("TODO: ", "")
-        File.open(app_gemspec_path, "w") { |file| file << content }
-
         Rake.application = Rake::Application.new
       end
 
@@ -113,17 +116,22 @@ describe Bundler::GemHelper do
       end
     end
 
-    describe "build" do
-      it "builds" do
-        mock_build_message
-        @helper.build_gem
-        expect(bundled_app('test/pkg/test-0.0.1.gem')).to exist
+    describe "#build_gem" do
+      context "when build failed" do
+        it "raises an error with appropriate message" do
+          # break the gemspec by adding back the TODOs...
+          File.open(app_gemspec_path, "w"){ |file| file << app_gemspec_content }
+          expect { subject.build_gem }.to raise_error(/TODO/)
+        end
       end
 
-      it "raises an appropriate error when the build fails" do
-        # break the gemspec by adding back the TODOs...
-        File.open("#{@app.to_s}/test.gemspec", 'w'){|f| f << @gemspec }
-        expect { @helper.build_gem }.to raise_error(/TODO/)
+      context "when build was successful" do
+        it "creates .gem file" do
+          gemhelper = subject
+          mock_build_message
+          gemhelper.build_gem
+          expect(app_gem_path).to exist
+        end
       end
     end
 
