@@ -22,7 +22,7 @@ module Bundler
         trap("INT") { @threads.each {|i| i.exit }; stop_workers; exit 1 }
       end
 
-      # Enque a request to be executed in the worker pool
+      # Enqueue a request to be executed in the worker pool
       #
       # @param obj [String] mostly it is name of spec that should be downloaded
       def enq(obj)
