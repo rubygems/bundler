@@ -1,3 +1,9 @@
+## 1.5.3
+
+Bugfixes:
+
+  - Use n-1 cores when given n jobs for parallel install (@jdickey)
+
 ## 1.5.2 (2014-01-10)
 
 Bugfixes:
