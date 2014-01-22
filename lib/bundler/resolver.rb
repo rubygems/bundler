@@ -236,19 +236,19 @@ module Bundler
     end
 
     def resolve_conflict(current, states)
-      # Return a requirment/gem which has other possibles states
+      # Return a requirement/gem which has other possibles states
       # Given the set of constraints placed by requrired_by
 
       debug { "    -> Going to: #{current.name} state" }
 
-      # Find the state where the conlict has occured
+      # Find the state where the conflict has occurred
       state = find_conflict_state(current, states)
 
       # Resolve the conflicts by rewinding the state
       # when the conflicted gem was activated
       reqs, activated, depth = resolve_for_conflict(state)
 
-      # Keep the state around if it still has other possiblities
+      # Keep the state around if it still has other possibilities
       states << state unless state.possibles.empty?
       clear_search_cache
 
@@ -513,7 +513,7 @@ module Bundler
     private
 
     # Indicates progress by writing a '.' every iteration_rate time which is
-    # aproximately every second. iteration_rate is calculated in the first
+    # approximately every second. iteration_rate is calculated in the first
     # second of resolve running.
     def indicate_progress
       @iteration_counter += 1
