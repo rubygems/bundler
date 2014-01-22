@@ -2,40 +2,46 @@ require "spec_helper"
 require 'rake'
 require 'bundler/gem_helper'
 
-describe "Bundler::GemHelper tasks" do
+describe Bundler::GemHelper do
+  let(:app_name) { "test" }
+  let(:app_path) { bundled_app app_name }
+  let(:app_gemspec_path) { "#{app_path}/test.gemspec" }
+
+  before(:each) do
+    bundle "gem #{app_name}"
+  end
+
+  subject { Bundler::GemHelper.new(app_path.to_s) }
+
   context "determining gemspec" do
-    it "interpolates the name when there is only one gemspec" do
-      bundle 'gem test'
-      app = bundled_app("test")
-      helper = Bundler::GemHelper.new(app.to_s)
-      expect(helper.gemspec.name).to eq('test')
+    context "fails" do
+      it "when there is no gemspec" do
+        FileUtils.rm app_gemspec_path
+        expect { subject }.to raise_error(/Unable to determine name/)
+      end
+
+      it "when there are two gemspecs and the name isn't specified" do
+        File.open(File.join(app_path.to_s, 'test2.gemspec'), 'w') { |f| f << '' }
+        expect { subject }.to raise_error(/Unable to determine name/)
+      end
     end
 
-    it "interpolates the name for a hidden gemspec" do
-      bundle 'gem test'
-      app = bundled_app("test")
-      FileUtils.mv app.join('test.gemspec'), app.join('.gemspec')
-      helper = Bundler::GemHelper.new(app.to_s)
-      expect(helper.gemspec.name).to eq('test')
+    context "interpolates the name" do
+      it "when there is only one gemspec" do
+        expect(subject.gemspec.name).to eq(app_name)
+      end
+
+      it "for a hidden gemspec" do
+        FileUtils.mv app_gemspec_path, app_path.join('.gemspec')
+        expect(subject.gemspec.name).to eq(app_name)
+      end
     end
 
-    it "should fail when there is no gemspec" do
-      bundle 'gem test'
-      app = bundled_app("test")
-      FileUtils.rm(File.join(app.to_s, 'test.gemspec'))
-      expect { Bundler::GemHelper.new(app.to_s) }.to raise_error(/Unable to determine name/)
-    end
+    it "handles namespaces and converts them to CamelCase" do
+      bundle "gem test-foo_bar"
+      app_path = bundled_app("test-foo_bar")
 
-    it "should fail when there are two gemspecs and the name isn't specified" do
-      bundle 'gem test'
-      app = bundled_app("test")
-      File.open(File.join(app.to_s, 'test2.gemspec'), 'w') {|f| f << ''}
-      expect { Bundler::GemHelper.new(app.to_s) }.to raise_error(/Unable to determine name/)
-    end
-
-    it "handles namespaces and converting to CamelCase" do
-      bundle 'gem test-foo_bar'
-      lib = bundled_app('test-foo_bar').join('lib/test/foo_bar.rb').read
+      lib = app_path.join("lib/test/foo_bar.rb").read
       expect(lib).to include("module Test")
       expect(lib).to include("module FooBar")
     end
