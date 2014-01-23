@@ -171,15 +171,23 @@ module Bundler
       end
     end
 
-    def handle_conflict(current, states)
-      return unless current
-      parent = current
-      state = states.detect { |i| i.name == parent.name }
-      until (state && state.possibles.any?) || parent.required_by.empty?
-        parent = parent.required_by.last
-        state = states.detect { |i| i.name == parent.name }
+    def handle_conflict(current, states, existing=nil)
+      until current.nil? && existing.nil?
+        current_state = find_state(current, states)
+        existing_state = find_state(existing, states)
+        return current if state_any?(current_state)
+        return existing if state_any?(existing_state)
+        existing = existing.required_by.last if existing
+        current = current.required_by.last if current
       end
-      return parent, state
+    end
+
+    def state_any?(state)
+      state && state.possibles.any?
+    end
+
+    def find_state(current, states)
+      states.detect { |i| current && current.name == i.name }
     end
 
     def other_possible?(conflict, states)
@@ -189,6 +197,7 @@ module Bundler
     end
 
     def find_conflict_state(conflict, states)
+      return unless conflict
       until states.empty? do
         state = states.pop
         return state if conflict.name == state.name
@@ -229,12 +238,11 @@ module Bundler
     def resolve_conflict(current, states)
       # Return a requirment/gem which has other possibles states
       # Given the set of constraints placed by requrired_by
-      parent, _ = handle_conflict(current, states)
 
-      debug { "    -> Going to: #{parent.name} state" }
+      debug { "    -> Going to: #{current.name} state" }
 
       # Find the state where the conlict has occured
-      state = find_conflict_state(parent, states)
+      state = find_conflict_state(current, states)
 
       # Resolve the conflicts by rewinding the state
       # when the conflicted gem was activated
@@ -303,8 +311,11 @@ module Bundler
             @errors[existing.name] = [existing, current]
 
             parent = current.required_by.last
-            parent, state = handle_conflict(existing.required_by[-2], states) if !other_possible?(parent, states) && existing.respond_to?(:required_by)
-            parent = current unless state && state.possibles.any?
+            if existing.respond_to?(:required_by)
+              parent = handle_conflict(current, states, existing.required_by[-2]) unless other_possible?(parent, states)
+            else
+              parent = handle_conflict(current, states) unless other_possible?(parent, states)
+            end
 
             raise version_conflict if parent.nil? || parent.name == 'bundler'
 
@@ -345,7 +356,8 @@ module Bundler
               # This is not a top-level Gemfile requirement
             else
               @errors[current.name] = [nil, current]
-              reqs, activated, depth = resolve_conflict(current, states)
+              parent = handle_conflict(current, states)
+              reqs, activated, depth = resolve_conflict(parent, states)
               next
             end
           end
