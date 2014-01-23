@@ -65,9 +65,6 @@ describe Bundler::GemHelper do
     before(:each) do
       content = app_gemspec_content.gsub("TODO: ", "")
       File.open(app_gemspec_path, "w") { |file| file << content }
-
-      @app = bundled_app("test")
-      @helper = Bundler::GemHelper.new(@app.to_s)
     end
 
     it "uses a shell UI for output" do
@@ -160,69 +157,66 @@ describe Bundler::GemHelper do
       end
     end
 
-    describe "release" do
+    describe "#release_gem" do
       before do
-        Dir.chdir(@app) do
+        Dir.chdir(app_path) do
           `git init`
           `git config user.email "you@example.com"`
           `git config user.name "name"`
         end
       end
 
-      it "shouldn't push if there are unstaged files" do
-        expect { @helper.release_gem }.to raise_error(/files that need to be committed/)
-      end
-
-      it "shouldn't push if there are uncommitted files" do
-        %x{cd test; git add .}
-        expect { @helper.release_gem }.to raise_error(/files that need to be committed/)
-      end
-
-      it "raises an appropriate error if there is no git remote" do
-        Bundler.ui.stub(:confirm => nil, :error => nil) # silence messages
-
-        Dir.chdir(gem_repo1) { `git init --bare` }
-        Dir.chdir(@app) { `git commit -a -m "initial commit"` }
-
-        expect { @helper.release_gem }.to raise_error
-      end
-
-      it "releases" do
-        mock_build_message
-        mock_confirm_message(/Tagged v0.0.1/)
-        mock_confirm_message("Pushed git commits and tags.")
-
-        @helper.should_receive(:rubygem_push).with(bundled_app('test/pkg/test-0.0.1.gem').to_s)
-
-        Dir.chdir(gem_repo1) { `git init --bare` }
-        Dir.chdir(@app) do
-          `git remote add origin file://#{gem_repo1}`
-          `git commit -a -m "initial commit"`
-          sys_exec("git push origin master", true)
-          `git commit -a -m "another commit"`
+      context "fails" do
+        it "when there are unstaged files" do
+          expect { subject.release_gem }.
+            to raise_error("There are files that need to be committed first.")
         end
-        @helper.release_gem
+
+        it "when there are uncommitted files" do
+          Dir.chdir(app_path) { `git add .` }
+          expect { subject.release_gem }.
+            to raise_error("There are files that need to be committed first.")
+        end
+
+        it "when there is no git remote" do
+          Bundler.ui.stub(:confirm => nil, :error => nil) # silence messages
+          Dir.chdir(app_path) { `git commit -a -m "initial commit"` }
+          expect { subject.release_gem }.to raise_error
+        end
       end
 
-      it "releases even if tag already exists" do
-        mock_build_message
-        mock_confirm_message("Tag v0.0.1 has already been created.")
+      context "succeeds" do
+        before do
+          Dir.chdir(gem_repo1) { `git init --bare` }
+          Dir.chdir(app_path) do
+            `git remote add origin file://#{gem_repo1}`
+            `git commit -a -m "initial commit"`
+          end
+        end
 
-        @helper.should_receive(:rubygem_push).with(bundled_app('test/pkg/test-0.0.1.gem').to_s)
+        it "on releasing" do
+          mock_build_message
+          mock_confirm_message "Tagged v#{app_version}."
+          mock_confirm_message "Pushed git commits and tags."
+          expect(subject).to receive(:rubygem_push).with(app_gem_path.to_s)
 
-        Dir.chdir(gem_repo1) {
-          `git init --bare`
-        }
-        Dir.chdir(@app) {
-          `git init`
-          `git config user.email "you@example.com"`
-          `git config user.name "name"`
-          `git commit -a -m "another commit"`
-          `git tag -a -m \"Version 0.0.1\" v0.0.1`
-        }
-        @helper.release_gem
+          Dir.chdir(app_path) { sys_exec("git push origin master", true) }
+
+          subject.release_gem
+        end
+
+        it "even if tag already exists" do
+          mock_build_message
+          mock_confirm_message "Tag v#{app_version} has already been created."
+          expect(subject).to receive(:rubygem_push).with(app_gem_path.to_s)
+
+          Dir.chdir(app_path) do
+            `git tag -a -m \"Version #{app_version}\" v#{app_version}`
+          end
+
+          subject.release_gem
+        end
       end
-
     end
   end
 end
