@@ -11,9 +11,9 @@ describe Bundler::GemHelper do
     bundle "gem #{app_name}"
   end
 
-  subject { Bundler::GemHelper.new(app_path.to_s) }
-
   context "determining gemspec" do
+    subject { Bundler::GemHelper.new(app_path) }
+
     context "fails" do
       it "when there is no gemspec" do
         FileUtils.rm app_gemspec_path
@@ -56,6 +56,7 @@ describe Bundler::GemHelper do
       mock_confirm_message "test 0.0.1 built to pkg/test-0.0.1.gem."
     end
 
+    subject! { Bundler::GemHelper.new(app_path) }
     let(:app_version) { "0.0.1" }
     let(:app_gem_dir) { app_path.join "pkg" }
     let(:app_gem_path) { app_gem_dir.join "#{app_name}-#{app_version}.gem" }
@@ -126,9 +127,8 @@ describe Bundler::GemHelper do
 
       context "when build was successful" do
         it "creates .gem file" do
-          gemhelper = subject
           mock_build_message
-          gemhelper.build_gem
+          subject.build_gem
           expect(app_gem_path).to exist
         end
       end
@@ -151,10 +151,9 @@ describe Bundler::GemHelper do
 
       context "when installation was successful" do
         it "installs" do
-          gemhelper = subject
           mock_build_message
           mock_confirm_message "#{app_name} (#{app_version}) installed."
-          gemhelper.install_gem
+          subject.install_gem
           expect(app_gem_path).to exist
           expect(`gem list`).to include("#{app_name} (#{app_version})")
         end
