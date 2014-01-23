@@ -57,9 +57,8 @@ describe Bundler::GemHelper do
     end
 
     let(:app_version) { "0.0.1" }
-    let(:app_gem_path) do
-      bundled_app "#{app_name}/pkg/#{app_name}-#{app_version}.gem"
-    end
+    let(:app_gem_dir) { app_path.join "pkg" }
+    let(:app_gem_path) { app_gem_dir.join "#{app_name}-#{app_version}.gem" }
     let(:app_gemspec_content) { File.read(app_gemspec_path) }
 
     before(:each) do
@@ -119,7 +118,7 @@ describe Bundler::GemHelper do
     describe "#build_gem" do
       context "when build failed" do
         it "raises an error with appropriate message" do
-          # break the gemspec by adding back the TODOs...
+          # break the gemspec by adding back the TODOs
           File.open(app_gemspec_path, "w"){ |file| file << app_gemspec_content }
           expect { subject.build_gem }.to raise_error(/TODO/)
         end
@@ -135,24 +134,30 @@ describe Bundler::GemHelper do
       end
     end
 
-    describe "install" do
-      it "installs" do
-        mock_build_message
-        mock_confirm_message "test (0.0.1) installed."
-        @helper.install_gem
-        expect(bundled_app('test/pkg/test-0.0.1.gem')).to exist
-        expect(%x{gem list}).to include("test (0.0.1)")
+    describe "#install_gem" do
+      context "when installation failed" do
+        before do
+          # create empty  gem file in order to simulate install failure
+          subject.stub(:build_gem) do
+            FileUtils.mkdir_p(app_gem_dir)
+            FileUtils.touch app_gem_path
+            app_gem_path
+          end
+        end
+        it "raises an error with appropriate message" do
+          expect { subject.install_gem }.to raise_error
+        end
       end
 
-      it "raises an appropriate error when the install fails" do
-        @helper.should_receive(:build_gem) do
-          # write an invalid gem file, so we can simulate install failure...
-          FileUtils.mkdir_p(File.join(@app.to_s, 'pkg'))
-          path = "#{@app.to_s}/pkg/test-0.0.1.gem"
-          File.open(path, 'w'){|f| f << "not actually a gem"}
-          path
+      context "when installation was successful" do
+        it "installs" do
+          gemhelper = subject
+          mock_build_message
+          mock_confirm_message "#{app_name} (#{app_version}) installed."
+          gemhelper.install_gem
+          expect(app_gem_path).to exist
+          expect(`gem list`).to include("#{app_name} (#{app_version})")
         end
-        expect { @helper.install_gem }.to raise_error
       end
     end
 
