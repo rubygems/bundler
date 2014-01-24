@@ -313,10 +313,14 @@ module Bundler
         Bundler.definition(true)
       else
         # cycle through the requested gems, just to make sure they exist
-        names = Bundler.locked_gems.specs.map{ |s| s.name }
+        lock = Bundler.locked_gems
+        raise GemfileLockNotFound, lock_not_found_message if lock.nil?
+
+        names = lock.specs.map{ |s| s.name }
+
         gems.each do |g|
           next if names.include?(g)
-          raise GemNotFound, not_found_message(g, names)
+          raise GemNotFound, gem_not_found_message(g, names)
         end
 
         if groups.any?
@@ -408,7 +412,7 @@ module Bundler
 
       gems.each do |gem_name|
         spec = installer.specs.find{|s| s.name == gem_name }
-        raise GemNotFound, not_found_message(gem_name, Bundler.definition.specs) unless spec
+        raise GemNotFound, gem_not_found_message(gem_name, Bundler.definition.specs) unless spec
 
         if spec.name == "bundler"
           Bundler.ui.warn "Sorry, Bundler can only be run via Rubygems."
@@ -920,7 +924,7 @@ module Bundler
 
       case specs.count
       when 0
-        raise GemNotFound, not_found_message(name, Bundler.definition.dependencies)
+        raise GemNotFound, gem_not_found_message(name, Bundler.definition.dependencies)
       when 1
         specs.first
       else
@@ -942,13 +946,17 @@ module Bundler
       num > 0 ? specs[num - 1] : nil
     end
 
-    def not_found_message(missing_gem_name, alternatives)
+    def gem_not_found_message(missing_gem_name, alternatives)
       require 'bundler/similarity_detector'
       message = "Could not find gem '#{missing_gem_name}'."
       alternate_names = alternatives.map { |a| a.respond_to?(:name) ? a.name : a }
       suggestions = SimilarityDetector.new(alternate_names).similar_word_list(missing_gem_name)
       message += "\nDid you mean #{suggestions}?" if suggestions
       message
+    end
+
+    def lock_not_found_message
+      "Lock not found. Run bundle install first."
     end
 
     def without_groups_message
