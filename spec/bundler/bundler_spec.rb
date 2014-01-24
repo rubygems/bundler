@@ -4,11 +4,12 @@ require 'bundler'
 
 describe Bundler do
   describe "#load_gemspec_uncached" do
-    subject(:gemspec) { tmp("test.gemspec") }
+    let(:app_gemspec_path) { tmp("test.gemspec") }
+    subject { Bundler.load_gemspec_uncached(app_gemspec_path) }
 
     context "with incorrect YAML file" do
       before do
-        File.open(gemspec, "wb") do |f|
+        File.open(app_gemspec_path, "wb") do |f|
           f.write strip_whitespace(<<-GEMSPEC)
             ---
               {:!00 ao=gu\g1= 7~f
@@ -18,8 +19,7 @@ describe Bundler do
 
       context "on Ruby 1.8", :ruby => "1.8" do
         it "should catch YAML syntax errors" do
-          expect { Bundler.load_gemspec_uncached(gemspec) }.
-            to raise_error(Bundler::GemspecError)
+          expect { subject }.to raise_error(Bundler::GemspecError)
         end
       end
 
@@ -28,8 +28,7 @@ describe Bundler do
           it "raises a GemspecError after YAML load throws ArgumentError" do
             orig_yamler, YAML::ENGINE.yamler = YAML::ENGINE.yamler, 'syck'
 
-            expect { Bundler.load_gemspec_uncached(gemspec) }.
-              to raise_error(Bundler::GemspecError)
+            expect { subject }.to raise_error(Bundler::GemspecError)
 
             YAML::ENGINE.yamler = orig_yamler
           end
@@ -39,8 +38,7 @@ describe Bundler do
           it "raises a GemspecError after YAML load throws Psych::SyntaxError" do
             orig_yamler, YAML::ENGINE.yamler = YAML::ENGINE.yamler, 'psych'
 
-            expect { Bundler.load_gemspec_uncached(gemspec) }.
-              to raise_error(Bundler::GemspecError)
+            expect { subject }.to raise_error(Bundler::GemspecError)
 
             YAML::ENGINE.yamler = orig_yamler
           end
@@ -59,7 +57,7 @@ describe Bundler do
           Encoding.default_external = "ASCII"
         end
 
-        File.open(gemspec, "wb") do |file|
+        File.open(app_gemspec_path, "wb") do |file|
           file.puts <<-GEMSPEC.gsub(/^\s+/, '')
             # -*- encoding: utf-8 -*-
             Gem::Specification.new do |gem|
@@ -68,8 +66,7 @@ describe Bundler do
           GEMSPEC
         end
 
-        expect(Bundler.load_gemspec_uncached(gemspec).author).
-          to eq("André the Giant")
+        expect(subject.author).to eq("André the Giant")
 
         Encoding.default_external = encoding if defined?(Encoding)
       end
