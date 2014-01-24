@@ -5,7 +5,7 @@ require 'bundler/gem_helper'
 describe Bundler::GemHelper do
   let(:app_name) { "test" }
   let(:app_path) { bundled_app app_name }
-  let(:app_gemspec_path) { "#{app_path}/test.gemspec" }
+  let(:app_gemspec_path) { app_path.join("#{app_name}.gemspec") }
 
   before(:each) do
     bundle "gem #{app_name}"
@@ -21,7 +21,7 @@ describe Bundler::GemHelper do
       end
 
       it "when there are two gemspecs and the name isn't specified" do
-        File.open(File.join(app_path.to_s, 'test2.gemspec'), "w"){ |f| f << '' }
+        FileUtils.touch app_path.join("#{app_name}-2.gemspec")
         expect { subject }.to raise_error(/Unable to determine name/)
       end
     end
@@ -32,17 +32,17 @@ describe Bundler::GemHelper do
       end
 
       it "for a hidden gemspec" do
-        FileUtils.mv app_gemspec_path, app_path.join('.gemspec')
+        FileUtils.mv app_gemspec_path, app_path.join(".gemspec")
         expect(subject.gemspec.name).to eq(app_name)
       end
     end
 
     it "handles namespaces and converts them to CamelCase" do
-      bundle "gem test-foo_bar"
-      app_path = bundled_app("test-foo_bar")
+      bundle "gem #{app_name}-foo_bar"
+      app_path = bundled_app "#{app_name}-foo_bar"
 
-      lib = app_path.join("lib/test/foo_bar.rb").read
-      expect(lib).to include("module Test")
+      lib = app_path.join("lib/#{app_name}/foo_bar.rb").read
+      expect(lib).to include("module #{app_name.capitalize}")
       expect(lib).to include("module FooBar")
     end
   end
@@ -52,14 +52,15 @@ describe Bundler::GemHelper do
       expect(Bundler.ui).to receive(:confirm).with(message)
     end
 
-    def mock_build_message
-      mock_confirm_message "test 0.0.1 built to pkg/test-0.0.1.gem."
+    def mock_build_message(name, version)
+      message = "#{name} #{version} built to pkg/#{name}-#{version}.gem."
+      mock_confirm_message message
     end
 
     subject! { Bundler::GemHelper.new(app_path) }
     let(:app_version) { "0.0.1" }
-    let(:app_gem_dir) { app_path.join "pkg" }
-    let(:app_gem_path) { app_gem_dir.join "#{app_name}-#{app_version}.gem" }
+    let(:app_gem_dir) { app_path.join("pkg") }
+    let(:app_gem_path) { app_gem_dir.join("#{app_name}-#{app_version}.gem") }
     let(:app_gemspec_content) { File.read(app_gemspec_path) }
 
     before(:each) do
@@ -71,7 +72,7 @@ describe Bundler::GemHelper do
       expect(Bundler.ui).to be_a(Bundler::UI::Shell)
     end
 
-    describe "#install_tasks" do
+    describe "#install" do
       let!(:rake_application) { Rake.application }
 
       before(:each) do
@@ -89,7 +90,7 @@ describe Bundler::GemHelper do
           it "raises an error with appropriate message" do
             task_names.each do |name|
               expect { Rake.application[name] }.
-                to raise_error(/Don't know how to build task/)
+                to raise_error("Don't know how to build task '#{name}'")
             end
           end
         end
@@ -124,7 +125,7 @@ describe Bundler::GemHelper do
 
       context "when build was successful" do
         it "creates .gem file" do
-          mock_build_message
+          mock_build_message app_name, app_version
           subject.build_gem
           expect(app_gem_path).to exist
         end
@@ -134,21 +135,22 @@ describe Bundler::GemHelper do
     describe "#install_gem" do
       context "when installation failed" do
         before do
-          # create empty  gem file in order to simulate install failure
+          # create empty gem file in order to simulate install failure
           subject.stub(:build_gem) do
             FileUtils.mkdir_p(app_gem_dir)
             FileUtils.touch app_gem_path
             app_gem_path
           end
         end
+
         it "raises an error with appropriate message" do
-          expect { subject.install_gem }.to raise_error
+          expect { subject.install_gem }.to raise_error(/Couldn't install gem/)
         end
       end
 
       context "when installation was successful" do
-        it "installs" do
-          mock_build_message
+        it "gem is installed" do
+          mock_build_message app_name, app_version
           mock_confirm_message "#{app_name} (#{app_version}) installed."
           subject.install_gem
           expect(app_gem_path).to exist
@@ -195,7 +197,7 @@ describe Bundler::GemHelper do
         end
 
         it "on releasing" do
-          mock_build_message
+          mock_build_message app_name, app_version
           mock_confirm_message "Tagged v#{app_version}."
           mock_confirm_message "Pushed git commits and tags."
           expect(subject).to receive(:rubygem_push).with(app_gem_path.to_s)
@@ -206,7 +208,7 @@ describe Bundler::GemHelper do
         end
 
         it "even if tag already exists" do
-          mock_build_message
+          mock_build_message app_name, app_version
           mock_confirm_message "Tag v#{app_version} has already been created."
           expect(subject).to receive(:rubygem_push).with(app_gem_path.to_s)
 

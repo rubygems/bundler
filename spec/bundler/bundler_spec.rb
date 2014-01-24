@@ -18,7 +18,7 @@ describe Bundler do
       end
 
       context "on Ruby 1.8", :ruby => "1.8" do
-        it "should catch YAML syntax errors" do
+        it "catches YAML syntax errors" do
           expect { subject }.to raise_error(Bundler::GemspecError)
         end
       end
@@ -50,8 +50,6 @@ describe Bundler do
       it "can load a gemspec with unicode characters with default ruby encoding" do
         # spec_helper forces the external encoding to UTF-8 but that's not the
         # ruby default.
-        encoding = nil
-
         if defined?(Encoding)
           encoding = Encoding.default_external
           Encoding.default_external = "ASCII"

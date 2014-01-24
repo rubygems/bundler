@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "bundle retry" do
+describe Bundler::Retry do
   it "return successful result if no errors" do
     attempts = 0
     result = Bundler::Retry.new(nil, nil, 3).attempt do
@@ -18,7 +18,7 @@ describe "bundle retry" do
         attempts += 1
         raise "nope"
       end
-    }.to raise_error
+    }.to raise_error("nope")
     expect(attempts).to eq(3)
   end
 
@@ -27,8 +27,7 @@ describe "bundle retry" do
     attempts = 0
     result = Bundler::Retry.new(nil, nil, 3).attempt do
       attempts += 1
-      job = jobs.shift
-      job.call
+      jobs.shift.call
     end
     expect(result).to eq(:bar)
     expect(attempts).to eq(2)
