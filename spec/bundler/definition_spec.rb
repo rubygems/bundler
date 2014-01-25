@@ -11,7 +11,7 @@ describe Bundler::Definition do
       subject{ Bundler::Definition.new(nil, [], [], []) }
 
       it "raises an InstallError with explanation" do
-        File.should_receive(:open).with("Gemfile.lock", "wb").
+        expect(File).to receive(:open).with("Gemfile.lock", "wb").
           and_raise(Errno::EACCES)
         expect{ subject.lock("Gemfile.lock") }.
           to raise_error(Bundler::InstallError)
