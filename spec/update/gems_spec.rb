@@ -187,4 +187,15 @@ describe "bundle update" do
     bundle "update"
     expect(out).to include("Installing activesupport 3.0 (was 2.3.5)")
   end
+
+  it "shows error message when Gemfile.lock is not preset and gem is specified" do
+    install_gemfile <<-G
+      source "file://#{gem_repo2}"
+      gem "activesupport"
+    G
+
+    bundle "update nonexisting", :exitstatus => true
+    expect(out).to include("Lock not found. Run bundle install first.")
+    expect(@exitstatus).to eq(22)
+  end
 end
