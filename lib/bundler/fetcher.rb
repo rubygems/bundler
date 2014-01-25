@@ -260,8 +260,8 @@ module Bundler
       Bundler.ui.debug "Fetching from: #{uri}"
       req = Net::HTTP::Get.new uri.request_uri
       if uri.user
-        user = CGI::unescape(uri.user)
-        password = uri.password ? CGI::unescape(uri.password) : nil
+        user = CGI.unescape(uri.user)
+        password = uri.password ? CGI.unescape(uri.password) : nil
         req.basic_auth(user, password)
       end
       response = connection.request(uri, req)
