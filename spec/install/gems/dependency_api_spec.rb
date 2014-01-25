@@ -454,6 +454,47 @@ describe "gemcutter's dependency API" do
       should_be_installed "rack 1.0.0"
     end
 
+    describe "with authentication details in bundle config" do
+      before do
+        gemfile <<-G
+          source "#{source_uri}"
+          gem "rack"
+        G
+      end
+
+      it "reads authentication details from bundle config" do
+        # The trailing slash is necessary here; Fetcher canonicalizes the URI.
+        bundle "config #{source_uri}/ #{user}:#{password}"
+
+        bundle :install, :artifice => "endpoint_strict_basic_authentication"
+        should_be_installed "rack 1.0.0"
+      end
+
+      it "prefers auth supplied in the source uri" do
+        gemfile <<-G
+          source "#{basic_auth_source_uri}"
+          gem "rack"
+        G
+
+        bundle "config #{source_uri}/ otheruser:wrong"
+
+        bundle :install, :artifice => "endpoint_strict_basic_authentication"
+        should_be_installed "rack 1.0.0"
+      end
+
+      it "shows instructions if auth is not provided for the source" do
+        bundle :install, :artifice => "endpoint_strict_basic_authentication"
+        expect(out).to include("bundle config #{source_uri}/ username:password")
+      end
+
+      it "fails if authentication has already been provided, but failed" do
+        bundle "config #{source_uri}/ #{user}:wrong"
+
+        bundle :install, :artifice => "endpoint_strict_basic_authentication"
+        expect(out).to include("Bad username or password")
+      end
+    end
+
     describe "with no password" do
       let(:password) { nil }
 

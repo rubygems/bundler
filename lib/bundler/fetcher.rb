@@ -27,6 +27,25 @@ module Bundler
             "using RVM are available at rvm.io/packages/openssl."
       end
     end
+    # This error is raised if HTTP authentication is required, but not provided.
+    class AuthenticationRequiredError < HTTPError
+      def initialize(remote_uri)
+        super "Authentication is required for #{remote_uri}.\n" \
+          "Please supply credentials for this source. You can do this by running:\n" \
+          " bundle config #{remote_uri} username:password"
+      end
+    end
+    # This error is raised if HTTP authentication is provided, but incorrect.
+    class BadAuthenticationError < HTTPError
+      def initialize(remote_uri)
+        super "Bad username or password for #{remote_uri}.\n" \
+          "Please double-check your credentials and correct them."
+      end
+    end
+
+    # Exceptions classes that should bypass retry attempts. If your password didn't work the
+    # first time, it's not going to the third time.
+    AUTH_ERRORS = [AuthenticationRequiredError, BadAuthenticationError]
 
     class << self
       attr_accessor :disable_endpoint, :api_timeout, :redirect_limit, :max_retries
@@ -156,7 +175,7 @@ module Bundler
         # API errors mean we should treat this as a non-API source
         @use_api = false
 
-        specs = Bundler::Retry.new("source fetch").attempts do
+        specs = Bundler::Retry.new("source fetch", AUTH_ERRORS).attempts do
           fetch_all_remote_specs
         end
       end
@@ -193,7 +212,7 @@ module Bundler
 
       return {@remote_uri => last_spec_list} if query_list.empty?
 
-      remote_specs = Bundler::Retry.new("dependency api").attempts do
+      remote_specs = Bundler::Retry.new("dependency api", AUTH_ERRORS).attempts do
         fetch_dependency_remote_specs(query_list)
       end
 
@@ -260,6 +279,8 @@ module Bundler
       req = Net::HTTP::Get.new uri.request_uri
       req.basic_auth(uri.user, uri.password) if uri.user
       response = connection.request(uri, req)
+    rescue Net::HTTPUnauthorized, Net::HTTPForbidden
+      retry_with_auth { request(uri) }
     rescue OpenSSL::SSL::SSLError
       raise CertificateFailureError.new(uri)
     rescue *HTTP_ERRORS
@@ -297,8 +318,13 @@ module Bundler
       Bundler.rubygems.sources = ["#{@remote_uri}"]
       Bundler.rubygems.fetch_all_remote_specs
     rescue Gem::RemoteFetcher::FetchError, OpenSSL::SSL::SSLError => e
-      if e.message.match("certificate verify failed")
+      case e.message
+      when /certificate verify failed/
         raise CertificateFailureError.new(uri)
+      when /401|403/
+        # Gemfury uses a 403 for unauthenticated requests instead of a 401, so retry auth
+        # on both.
+        retry_with_auth { fetch_all_remote_specs }
       else
         Bundler.ui.trace e
         raise HTTPError, "Could not fetch specs from #{uri}"
@@ -331,6 +357,21 @@ module Bundler
         Dir.glob(certs).each { |c| store.add_file c }
       end
       store
+    end
+
+    # Attempt to retry with HTTP authentication, if it's appropriate to do so. Yields to a block;
+    # the caller should use this to re-attempt the failing request with the altered `@remote_uri`.
+    def retry_with_auth
+      # Authentication has already been attempted and failed.
+      raise BadAuthenticationError.new(uri) if @remote_uri.user
+
+      auth = Bundler.settings[@remote_uri.to_s]
+
+      # Authentication isn't provided at all, by "bundle config" or in the URI.
+      raise AuthenticationRequiredError.new(uri) if auth.nil?
+
+      @remote_uri.user, @remote_uri.password = *auth.split(":", 2)
+      yield
     end
 
   end
