@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "bundle retry" do
+describe Bundler::Retry do
   it "return successful result if no errors" do
     attempts = 0
     result = Bundler::Retry.new(nil, nil, 3).attempt do
@@ -18,7 +18,7 @@ describe "bundle retry" do
         attempts += 1
         raise "nope"
       end
-    }.to raise_error
+    }.to raise_error("nope")
     expect(attempts).to eq(3)
   end
 
@@ -27,22 +27,21 @@ describe "bundle retry" do
     attempts = 0
     result = Bundler::Retry.new(nil, nil, 3).attempt do
       attempts += 1
-      job = jobs.shift
-      job.call
+      jobs.shift.call
     end
     expect(result).to eq(:bar)
     expect(attempts).to eq(2)
   end
 
   it "raises the last error" do
-    error    = Bundler::GemfileNotFound
+    errors = [StandardError, StandardError, StandardError, Bundler::GemfileNotFound]
     attempts = 0
     expect {
       Bundler::Retry.new(nil, nil, 3).attempt do
         attempts += 1
-        raise error
+        raise errors.shift
       end
-    }.to raise_error(error)
+    }.to raise_error(Bundler::GemfileNotFound)
     expect(attempts).to eq(4)
   end
 

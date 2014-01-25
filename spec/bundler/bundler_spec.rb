@@ -4,71 +4,70 @@ require 'bundler'
 
 describe Bundler do
   describe "#load_gemspec_uncached" do
+    let(:app_gemspec_path) { tmp("test.gemspec") }
+    subject { Bundler.load_gemspec_uncached(app_gemspec_path) }
 
-    before do
-      @gemspec = tmp("test.gemspec")
-      @gemspec.open('wb') do |f|
-        f.write strip_whitespace(<<-GEMSPEC)
-          ---
-            {:!00 ao=gu\g1= 7~f
-        GEMSPEC
-      end
-    end
-
-    describe "on Ruby 1.8", :ruby => "1.8" do
-      it "should catch YAML syntax errors" do
-        expect { Bundler.load_gemspec_uncached(@gemspec) }.
-          to raise_error(Bundler::GemspecError)
-      end
-    end
-
-    context "on Ruby 1.9", :ruby => "1.9" do
-      context "with Syck as YAML::Engine" do
-        it "raises a GemspecError after YAML load throws ArgumentError" do
-          orig_yamler, YAML::ENGINE.yamler = YAML::ENGINE.yamler, 'syck'
-
-          expect { Bundler.load_gemspec_uncached(@gemspec) }.
-            to raise_error(Bundler::GemspecError)
-
-          YAML::ENGINE.yamler = orig_yamler
+    context "with incorrect YAML file" do
+      before do
+        File.open(app_gemspec_path, "wb") do |f|
+          f.write strip_whitespace(<<-GEMSPEC)
+            ---
+              {:!00 ao=gu\g1= 7~f
+          GEMSPEC
         end
       end
 
-      context "with Psych as YAML::Engine" do
-        it "raises a GemspecError after YAML load throws Psych::SyntaxError" do
-          orig_yamler, YAML::ENGINE.yamler = YAML::ENGINE.yamler, 'psych'
-
-          expect { Bundler.load_gemspec_uncached(@gemspec) }.
-            to raise_error(Bundler::GemspecError)
-
-          YAML::ENGINE.yamler = orig_yamler
+      context "on Ruby 1.8", :ruby => "1.8" do
+        it "catches YAML syntax errors" do
+          expect { subject }.to raise_error(Bundler::GemspecError)
         end
       end
-    end
 
-    it "can load a gemspec with unicode characters with default ruby encoding" do
-      # spec_helper forces the external encoding to UTF-8 but that's not the
-      # ruby default.
-      encoding = nil
+      context "on Ruby 1.9", :ruby => "1.9" do
+        context "with Syck as YAML::Engine" do
+          it "raises a GemspecError after YAML load throws ArgumentError" do
+            orig_yamler, YAML::ENGINE.yamler = YAML::ENGINE.yamler, 'syck'
 
-      if defined?(Encoding)
-        encoding = Encoding.default_external
-        Encoding.default_external = "ASCII"
-      end
+            expect { subject }.to raise_error(Bundler::GemspecError)
 
-      File.open(tmp("test.gemspec"), "wb") do |file|
-        file.puts <<-G.gsub(/^\s+/, '')
-          # -*- encoding: utf-8 -*-
-          Gem::Specification.new do |gem|
-            gem.author = "André the Giant"
+            YAML::ENGINE.yamler = orig_yamler
           end
-        G
+        end
+
+        context "with Psych as YAML::Engine" do
+          it "raises a GemspecError after YAML load throws Psych::SyntaxError" do
+            orig_yamler, YAML::ENGINE.yamler = YAML::ENGINE.yamler, 'psych'
+
+            expect { subject }.to raise_error(Bundler::GemspecError)
+
+            YAML::ENGINE.yamler = orig_yamler
+          end
+        end
       end
+    end
 
-      gemspec = Bundler.load_gemspec_uncached(tmp("test.gemspec"))
-      expect(gemspec.author).to eq("André the Giant")
+    context "with correct YAML file" do
+      it "can load a gemspec with unicode characters with default ruby encoding" do
+        # spec_helper forces the external encoding to UTF-8 but that's not the
+        # ruby default.
+        if defined?(Encoding)
+          encoding = Encoding.default_external
+          Encoding.default_external = "ASCII"
+        end
 
-      Encoding.default_external = encoding if defined?(Encoding)
+        File.open(app_gemspec_path, "wb") do |file|
+          file.puts <<-GEMSPEC.gsub(/^\s+/, '')
+            # -*- encoding: utf-8 -*-
+            Gem::Specification.new do |gem|
+              gem.author = "André the Giant"
+            end
+          GEMSPEC
+        end
+
+        expect(subject.author).to eq("André the Giant")
+
+        Encoding.default_external = encoding if defined?(Encoding)
+      end
     end
 
   end

@@ -2,8 +2,7 @@ require 'spec_helper'
 
 describe Bundler::Dsl do
   before do
-    @rubygems = double("rubygems")
-    Bundler::Source::Rubygems.stub(:new){ @rubygems }
+    Bundler::Source::Rubygems.stub(:new){ double("rubygems") }
   end
 
   describe "#_normalize_options" do
@@ -34,7 +33,9 @@ describe Bundler::Dsl do
 
   describe "#method_missing" do
     it "raises an error for unknown DSL methods" do
-      Bundler.should_receive(:read_file).with("Gemfile").and_return("unknown")
+      expect(Bundler).to receive(:read_file).with("Gemfile").
+        and_return("unknown")
+
       error_msg = "Undefined local variable or method `unknown'" \
         " for Gemfile\\s+from Gemfile:1"
       expect { subject.eval_gemfile("Gemfile") }.
@@ -44,7 +45,7 @@ describe Bundler::Dsl do
 
   describe "#eval_gemfile" do
     it "handles syntax errors with a useful message" do
-      Bundler.should_receive(:read_file).with("Gemfile").and_return("}")
+      expect(Bundler).to receive(:read_file).with("Gemfile").and_return("}")
       expect { subject.eval_gemfile("Gemfile") }.
         to raise_error(Bundler::GemfileError, /Gemfile syntax error/)
     end
@@ -54,7 +55,7 @@ describe Bundler::Dsl do
     it "will raise a Bundler::GemfileError" do
       gemfile "gem 'foo', :path => /unquoted/string/syntax/error"
       expect { Bundler::Dsl.evaluate(bundled_app("Gemfile"), nil, true) }.
-        to raise_error(Bundler::GemfileError)
+        to raise_error(Bundler::GemfileError, /Gemfile syntax error/)
     end
   end
 end
