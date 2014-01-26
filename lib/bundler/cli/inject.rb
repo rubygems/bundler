@@ -28,5 +28,6 @@ module Bundler
         Bundler.ui.confirm "All injected gems were already present in the Gemfile"
       end
     end
+
   end
 end

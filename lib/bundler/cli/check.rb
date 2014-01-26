@@ -30,5 +30,6 @@ module Bundler
         Bundler.ui.info "The Gemfile's dependencies are satisfied"
       end
     end
+
   end
 end

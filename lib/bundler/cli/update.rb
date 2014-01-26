@@ -37,7 +37,7 @@ module Bundler
       opts["update"] = true
       opts["local"] = options[:local]
 
-      Bundler.settings[:jobs]     = opts["jobs"] if opts["jobs"]
+      Bundler.settings[:jobs] = opts["jobs"] if opts["jobs"]
 
       # rubygems plugins sometimes hook into the gem install process
       Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins)
@@ -55,7 +55,7 @@ module Bundler
       without_groups_messages
     end
 
-    private
+  private
 
     def without_groups_messages
       if Bundler.settings.without.any?
@@ -63,5 +63,6 @@ module Bundler
         Bundler.ui.confirm Bundler::CLI::Common.without_groups_message
       end
     end
+
   end
 end

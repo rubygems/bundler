@@ -49,5 +49,6 @@ module Bundler
       message += "\nDid you mean #{suggestions}?" if suggestions
       message
     end
+
   end
 end

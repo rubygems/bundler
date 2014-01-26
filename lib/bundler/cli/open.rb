@@ -20,5 +20,6 @@ module Bundler
         Bundler.ui.info "Could not run '#{command}'" unless success
       end
     end
+
   end
 end

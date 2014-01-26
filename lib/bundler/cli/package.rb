@@ -16,7 +16,7 @@ module Bundler
       Bundler.load.cache(custom_path)
     end
 
-    private
+  private
 
     def install
       require 'bundler/cli/install'

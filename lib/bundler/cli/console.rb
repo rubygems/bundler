@@ -37,5 +37,6 @@ module Bundler
 
       console.start
     end
+
   end
 end

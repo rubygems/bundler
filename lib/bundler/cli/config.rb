@@ -79,5 +79,6 @@ module Bundler
         exit 1
       end
     end
+
   end
 end

@@ -113,7 +113,7 @@ module Bundler
       raise e
     end
 
-    private
+  private
 
     def without_groups_messages
       if Bundler.settings.without.any?

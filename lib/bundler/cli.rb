@@ -367,5 +367,6 @@ module Bundler
     def env
       Env.new.write($stdout)
     end
+
   end
 end
