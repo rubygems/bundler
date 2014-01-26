@@ -1,5 +1,6 @@
 require 'bundler/vendored_persistent'
 require 'securerandom'
+require 'cgi'
 
 module Bundler
 
@@ -277,7 +278,11 @@ module Bundler
     def request(uri)
       Bundler.ui.debug "Fetching from: #{uri}"
       req = Net::HTTP::Get.new uri.request_uri
-      req.basic_auth(uri.user, uri.password) if uri.user
+      if uri.user
+        user = CGI.unescape(uri.user)
+        password = uri.password ? CGI.unescape(uri.password) : nil
+        req.basic_auth(user, password)
+      end
       response = connection.request(uri, req)
     rescue Net::HTTPUnauthorized, Net::HTTPForbidden
       retry_with_auth { request(uri) }
