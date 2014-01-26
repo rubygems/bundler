@@ -7,6 +7,11 @@ module Bundler
     end
 
     def run
+      unless Bundler.default_lockfile.exist?
+        raise GemfileLockNotFound, "This Bundle hasn't been installed yet. " \
+          "Run `bundle install` to update and install the bundled gems."
+      end
+
       sources = Array(options[:source])
       groups  = Array(options[:group]).map(&:to_sym)
       Bundler.ui.level = "warn" if options[:quiet]
@@ -20,7 +25,7 @@ module Bundler
         gems.each do |g|
           next if names.include?(g)
           require "bundler/cli/common"
-          raise GemNotFound, Bundler::CLI::Common.not_found_message(g, names)
+          raise GemNotFound, Bundler::CLI::Common.gem_not_found_message(g, names)
         end
 
         if groups.any?

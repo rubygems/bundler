@@ -67,6 +67,7 @@ module Bundler
   class SecurityError         < BundlerError; status_code(19) ; end
   class LockfileError         < BundlerError; status_code(20) ; end
   class CyclicDependencyError < BundlerError; status_code(21) ; end
+  class GemfileLockNotFound   < BundlerError; status_code(22) ; end
 
   # Internal errors, should be rescued
   class VersionConflict  < BundlerError

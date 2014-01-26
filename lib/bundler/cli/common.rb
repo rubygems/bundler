@@ -19,7 +19,7 @@ module Bundler
 
       case specs.count
       when 0
-        raise GemNotFound, not_found_message(name, Bundler.definition.dependencies)
+        raise GemNotFound, gem_not_found_message(name, Bundler.definition.dependencies)
       when 1
         specs.first
       else
@@ -29,7 +29,7 @@ module Bundler
 
     def self.ask_for_spec_from(specs)
       if !$stdout.tty? && ENV['BUNDLE_SPEC_RUN'].nil?
-        raise GemNotFound, not_found_message(name, Bundler.definition.dependencies)
+        raise GemNotFound, gem_not_found_message(name, Bundler.definition.dependencies)
       end
 
       specs.each_with_index do |spec, index|
@@ -41,7 +41,7 @@ module Bundler
       num > 0 ? specs[num - 1] : nil
     end
 
-    def self.not_found_message(missing_gem_name, alternatives)
+    def self.gem_not_found_message(missing_gem_name, alternatives)
       require 'bundler/similarity_detector'
       message = "Could not find gem '#{missing_gem_name}'."
       alternate_names = alternatives.map { |a| a.respond_to?(:name) ? a.name : a }
