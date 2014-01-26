@@ -19,7 +19,10 @@ module Bundler
 
       gems.each do |gem_name|
         spec = installer.specs.find{|s| s.name == gem_name }
-        raise GemNotFound, not_found_message(gem_name, Bundler.definition.specs) unless spec
+        unless spec
+          raise GemNotFound, Bundler::CLI::Common.gem_not_found_message(
+            gem_name, Bundler.definition.specs)
+        end
 
         if spec.name == "bundler"
           Bundler.ui.warn "Sorry, Bundler can only be run via Rubygems."
@@ -28,5 +31,6 @@ module Bundler
         end
       end
     end
+
   end
 end
