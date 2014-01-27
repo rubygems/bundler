@@ -401,7 +401,7 @@ module Bundler
         paths = possibles.flatten.compact.uniq.reject { |p| p.empty? }
         ENV["GEM_PATH"] = paths.join(File::PATH_SEPARATOR)
       end
-      
+
       configure_gem_home
       bundle_path
     end
