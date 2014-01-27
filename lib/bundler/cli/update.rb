@@ -7,10 +7,6 @@ module Bundler
     end
 
     def run
-      unless Bundler.default_lockfile.exist?
-        raise GemfileLockNotFound, "This Bundle hasn't been installed yet. " \
-          "Run `bundle install` to update and install the bundled gems."
-      end
 
       sources = Array(options[:source])
       groups  = Array(options[:group]).map(&:to_sym)
@@ -20,6 +16,10 @@ module Bundler
         # We're doing a full update
         Bundler.definition(true)
       else
+        unless Bundler.default_lockfile.exist?
+          raise GemfileLockNotFound, "This Bundle hasn't been installed yet. " \
+            "Run `bundle install` to update and install the bundled gems."
+        end
         # cycle through the requested gems, just to make sure they exist
         names = Bundler.locked_gems.specs.map{ |s| s.name }
         gems.each do |g|
