@@ -38,15 +38,13 @@ module Bundler
 
         dependency = current_dependencies[current_spec.name]
 
-        active_spec = definition.index[current_spec.name].sort_by { |b| b.version }
-        if !current_spec.version.prerelease? && !options[:pre] && active_spec.size > 1
-          active_spec = active_spec.delete_if { |b| b.respond_to?(:version) && b.version.prerelease? }
-        end
         if options["strict"]
-          active_spec =  active_spec.reverse.detect do |b|
-            dependency && b.respond_to?(:version) && dependency.requirement.satisfied_by?(b.version)
-          end || active_spec.last
+          active_spec =  definition.specs.detect { |spec| spec.name == current_spec.name }
         else
+          active_spec = definition.index[current_spec.name].sort_by { |b| b.version }
+          if !current_spec.version.prerelease? && !options[:pre] && active_spec.size > 1
+            active_spec = active_spec.delete_if { |b| b.respond_to?(:version) && b.version.prerelease? }
+          end
           active_spec = active_spec.last
         end
         next if active_spec.nil?
