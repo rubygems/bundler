@@ -137,7 +137,7 @@ module Bundler
         hash.delete(key) if value.nil?
         FileUtils.mkdir_p(file.dirname)
         require 'bundler/psyched_yaml'
-        File.open(file, "w") { |f| f.puts YAML.dump(hash, :line_width => -1) }
+        File.open(file, "w") { |f| f.puts YAML.dump(hash) }
       end
       value
     end
@@ -154,8 +154,8 @@ module Bundler
     def load_config(config_file)
       valid_file = config_file && config_file.exist? && !config_file.size.zero?
       if !ignore_config? && valid_file
-        config_regex = /^(BUNDLE_.+): (?:['"](.*)['"]|(.+))$/
-        config_pairs = config_file.read.scan(config_regex).map{|m| m.compact }
+        config_regex =/^(BUNDLE_.+): (?:['"](.*)['"]|(.+(?:\n(?!BUNDLE).+))|(.+))$/
+        config_pairs = config_file.read.scan(config_regex).map{|m| m.compact.map { |n| n.gsub(/\n\s?/, "") } }
         Hash[config_pairs]
       else
         {}
