@@ -11,6 +11,7 @@ Features:
   - add support for IRB alternatives such as Pry and Ripl (@joallard, @postmodern)
   - highlight installed or updated gems (#2722, #2741, @yaotti, @simi)
   - display post_install_message's for gems installed via :git (@phallstrom)
+  - `bundle outdated --strict` only reports dependencies that can be updated (@davidblondeau)
 
 ## 1.5.2 (2014-01-10)
 
@@ -56,7 +57,7 @@ Features:
 
   - bundle update also accepts --jobs (#2692, @mrkn)
   - add fork URL to README for new `bundle gem` (#2665, @zzak)
-  - add `bundle outdated --strict` (#2685, @rhysd)
+  - add `bundle outdated --strict` (#2685, @davidblondeau)
   - warn if same gem/version is added twice (#2679, @jendiamond)
   - don't redownload installed specs for `bundle install` (#2680, @cainlevy)
   - override gem sources with mirrors (#2650, @danielsdeleo, @mkristian)
