@@ -89,7 +89,7 @@ RSpec.configure do |config|
     in_app_root
   end
 
-  config.after :each do
+  config.after :each do |example|
     puts @out if example.exception
 
     Dir.chdir(original_wd)
