@@ -28,7 +28,7 @@ end
 namespace :spec do
   desc "Ensure spec dependencies are installed"
   task :deps do
-    {"rdiscount" => "~> 1.6", "ronn" => "~> 0.7.3", "rspec" => "~> 2.13"}.each do |name, version|
+    {"rdiscount" => "~> 1.6", "ronn" => "~> 0.7.3", "rspec" => "~> 3.0.beta"}.each do |name, version|
       sh "#{Gem.ruby} -S gem list -i '^#{name}$' -v '#{version}' || " \
          "#{Gem.ruby} -S gem install #{name} -v '#{version}' --no-ri --no-rdoc"
     end
