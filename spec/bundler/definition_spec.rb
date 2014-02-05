@@ -3,7 +3,7 @@ require 'bundler/definition'
 
 describe Bundler::Definition do
   before do
-    Bundler.stub(:settings){ Bundler::Settings.new(".") }
+    allow(Bundler).to receive(:settings){ Bundler::Settings.new(".") }
   end
 
   describe "#lock" do
@@ -11,7 +11,7 @@ describe Bundler::Definition do
       subject{ Bundler::Definition.new(nil, [], [], []) }
 
       before do
-        File.should_receive(:open).with("Gemfile.lock", "wb").
+        expect(File).to receive(:open).with("Gemfile.lock", "wb").
           and_raise(Errno::EACCES)
       end
 

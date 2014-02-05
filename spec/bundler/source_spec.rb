@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Bundler::Source::Rubygems do
   before do
-    Bundler.stub(:root){ Pathname.new("root") }
+    allow(Bundler).to receive(:root){ Pathname.new("root") }
   end
 
   describe "caches" do

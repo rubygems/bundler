@@ -1,8 +1,8 @@
 # encoding: utf-8
 require 'spec_helper'
 require 'bundler'
-require "bundler/safe_catch"
-require "bundler/current_ruby"
+require 'bundler/safe_catch'
+require 'bundler/current_ruby'
 
 class RecursiveTmpResolver
   include Bundler::SafeCatch
@@ -13,8 +13,8 @@ describe Bundler::SafeCatch do
 
   it "should use safe_catch on jruby" do
     if Bundler.current_ruby.jruby?
-      Bundler::SafeCatch::Internal.should_receive(:catch).and_call_original
-      Bundler::SafeCatch::Internal.should_receive(:throw).and_call_original
+      expect(Bundler::SafeCatch::Internal).to receive(:catch).and_call_original
+      expect(Bundler::SafeCatch::Internal).to receive(:throw).and_call_original
 
       retval = resolver.safe_catch(:resolve) do
         resolver.safe_throw(:resolve, "good bye world")
@@ -25,8 +25,8 @@ describe Bundler::SafeCatch do
 
   it "should use regular catch/throw on MRI" do
     if Bundler.current_ruby.mri?
-      Bundler::SafeCatch::Internal.should_not_receive(:catch)
-      Bundler::SafeCatch::Internal.should_not_receive(:throw)
+      expect(Bundler::SafeCatch::Internal).to_not receive(:catch)
+      expect(Bundler::SafeCatch::Internal).to_not receive(:throw)
 
       retval = resolver.safe_catch(:resolve) do
         resolver.safe_throw(:resolve, "good bye world")

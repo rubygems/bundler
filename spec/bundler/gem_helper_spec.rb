@@ -43,7 +43,7 @@ describe "Bundler::GemHelper tasks" do
 
   context "gem management" do
     def mock_confirm_message(message)
-      Bundler.ui.should_receive(:confirm).with(message)
+      expect(Bundler.ui).to receive(:confirm).with(message)
     end
 
     def mock_build_message
@@ -116,7 +116,7 @@ describe "Bundler::GemHelper tasks" do
       end
 
       it "raises an appropriate error when the install fails" do
-        @helper.should_receive(:build_gem) do
+        expect(@helper).to receive(:build_gem) do
           # write an invalid gem file, so we can simulate install failure...
           FileUtils.mkdir_p(File.join(@app.to_s, 'pkg'))
           path = "#{@app.to_s}/pkg/test-0.0.1.gem"
@@ -146,7 +146,9 @@ describe "Bundler::GemHelper tasks" do
       end
 
       it "raises an appropriate error if there is no git remote" do
-        Bundler.ui.stub(:confirm => nil, :error => nil) # silence messages
+        # silence messages
+        allow(Bundler.ui).to receive(:confirm)
+        allow(Bundler.ui).to receive(:error)
 
         Dir.chdir(gem_repo1) { `git init --bare` }
         Dir.chdir(@app) { `git commit -a -m "initial commit"` }
@@ -159,7 +161,7 @@ describe "Bundler::GemHelper tasks" do
         mock_confirm_message(/Tagged v0.0.1/)
         mock_confirm_message("Pushed git commits and tags.")
 
-        @helper.should_receive(:rubygem_push).with(bundled_app('test/pkg/test-0.0.1.gem').to_s)
+        expect(@helper).to receive(:rubygem_push).with(bundled_app('test/pkg/test-0.0.1.gem').to_s)
 
         Dir.chdir(gem_repo1) { `git init --bare` }
         Dir.chdir(@app) do
@@ -175,7 +177,7 @@ describe "Bundler::GemHelper tasks" do
         mock_build_message
         mock_confirm_message("Tag v0.0.1 has already been created.")
 
-        @helper.should_receive(:rubygem_push).with(bundled_app('test/pkg/test-0.0.1.gem').to_s)
+        expect(@helper).to receive(:rubygem_push).with(bundled_app('test/pkg/test-0.0.1.gem').to_s)
 
         Dir.chdir(gem_repo1) {
           `git init --bare`
