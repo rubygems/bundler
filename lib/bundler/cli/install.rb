@@ -6,6 +6,7 @@ module Bundler
     end
 
     def run
+      options = options.dup
       if options[:without]
         options[:without] = options[:without].map{|g| g.tr(' ', ':') }
       end
@@ -52,8 +53,6 @@ module Bundler
         Bundler.settings.delete(:frozen)
         options[:system] = true
       end
-
-      options["no-cache"] ||= options[:local]
 
       Bundler.settings[:path]     = nil if options[:system]
       Bundler.settings[:path]     = "vendor/bundle" if options[:deployment]

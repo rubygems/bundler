@@ -3,7 +3,7 @@ require 'bundler/definition'
 
 describe Bundler::Definition do
   before do
-    Bundler.stub(:settings){ Bundler::Settings.new(".") }
+    allow(Bundler).to receive(:settings){ Bundler::Settings.new(".") }
   end
 
   describe "#lock" do

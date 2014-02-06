@@ -13,6 +13,13 @@ Features:
   - display post_install_message's for gems installed via :git (@phallstrom)
   - `bundle outdated --strict` only reports dependencies that can be updated (@davidblondeau)
 
+## 1.5.3 (2014-02-06)
+
+Bugfixes:
+
+  - find "missing" gems that are actually present (#2780, #2818, #2854)
+  - pse n-1 cores when given n jobs for parallel install (@jdickey)
+
 ## 1.5.2 (2014-01-10)
 
 Bugfixes:

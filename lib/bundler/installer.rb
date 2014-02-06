@@ -115,7 +115,8 @@ module Bundler
           Bundler.ui.info install_message
         end
         Bundler.ui.debug debug_message if debug_message
-        Bundler.ui.debug "#{worker}:  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
+        spec_info = "#{worker}:  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
+        Bundler.ui.debug spec_info
       end
 
       if Bundler.settings[:bin] && standalone
@@ -287,19 +288,10 @@ module Bundler
         { :name => spec.name, :post_install => message }
       }
 
-      # Keys in the remains hash represent uninstalled gems specs.
-      # We enqueue all gem specs that do not have any dependencies.
-      # Later we call this lambda again to install specs that depended on
-      # previously installed specifications. We continue until all specs
-      # are installed.
-      enqueue_remaining_specs = lambda do
-        remains.keys.each do |name|
-          next if enqueued[name]
-          spec = name2spec[name]
-          if ready_to_install?(spec, remains)
-            worker_pool.enq name
-            enqueued[name] = true
-          end
+      specs.each do |spec|
+        if ready_to_install?(spec, remains)
+          worker_pool.enq spec.name
+          enqueued[spec.name] = true
         end
       end
       enqueue_remaining_specs.call
@@ -317,14 +309,11 @@ module Bundler
       worker_pool && worker_pool.stop
     end
 
-    # We only want to install a gem spec if all its dependencies are met.
-    # If the dependency is no longer in the `remains` hash then it has been met.
-    # If a dependency is only development or is self referential it can be ignored.
     def ready_to_install?(spec, remains)
       spec.dependencies.none? do |dep|
-        next if dep.type == :development || dep.name == spec.name
-        remains[dep.name]
+        remains[dep.name] && dep.type != :development && dep.name != spec.name
       end
     end
+
   end
 end

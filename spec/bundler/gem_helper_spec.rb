@@ -133,21 +133,6 @@ describe Bundler::GemHelper do
     end
 
     describe "#install_gem" do
-      context "when installation failed" do
-        before do
-          # create empty gem file in order to simulate install failure
-          subject.stub(:build_gem) do
-            FileUtils.mkdir_p(app_gem_dir)
-            FileUtils.touch app_gem_path
-            app_gem_path
-          end
-        end
-
-        it "raises an error with appropriate message" do
-          expect { subject.install_gem }.to raise_error(/Couldn't install gem/)
-        end
-      end
-
       context "when installation was successful" do
         it "gem is installed" do
           mock_build_message app_name, app_version
@@ -155,6 +140,18 @@ describe Bundler::GemHelper do
           subject.install_gem
           expect(app_gem_path).to exist
           expect(`gem list`).to include("#{app_name} (#{app_version})")
+        end
+      end
+
+      context "when installation fails" do
+        it "raises an error with appropriate message" do
+          # create empty gem file in order to simulate install failure
+          subject.stub(:build_gem) do
+            FileUtils.mkdir_p(app_gem_dir)
+            FileUtils.touch app_gem_path
+            app_gem_path
+          end
+          expect { subject.install_gem }.to raise_error(/Couldn't install gem/)
         end
       end
     end

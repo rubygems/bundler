@@ -2,7 +2,8 @@ require 'spec_helper'
 
 describe Bundler::Dsl do
   before do
-    Bundler::Source::Rubygems.stub(:new){ double("rubygems") }
+    @rubygems = double("rubygems")
+    allow(Bundler::Source::Rubygems).to receive(:new){ @rubygems }
   end
 
   describe "#_normalize_options" do
