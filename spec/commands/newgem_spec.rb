@@ -150,11 +150,11 @@ describe "bundle gem" do
       end
 
       it "requires 'test-gem'" do
-        expect(bundled_app("test_gem/spec/spec_helper.rb").read).to match(/require 'test_gem'/)
+        expect(bundled_app("test_gem/spec/spec_helper.rb").read).to include("require 'test_gem'")
       end
 
       it "creates a default test which fails" do
-        expect(bundled_app("test_gem/spec/test_gem_spec.rb").read).to match(/false.should eq(true)/)
+        expect(bundled_app("test_gem/spec/test_gem_spec.rb").read).to include("expect(false).to eq(true)")
       end
     end
 
@@ -171,15 +171,15 @@ describe "bundle gem" do
       end
 
       it "requires 'test-gem'" do
-        expect(bundled_app("test_gem/test/minitest_helper.rb").read).to match(/require 'test_gem'/)
+        expect(bundled_app("test_gem/test/minitest_helper.rb").read).to include("require 'test_gem'")
       end
 
       it "requires 'minitest_helper'" do
-        expect(bundled_app("test_gem/test/test_test_gem.rb").read).to match(/require 'minitest_helper'/)
+        expect(bundled_app("test_gem/test/test_test_gem.rb").read).to include("require 'minitest_helper'")
       end
 
       it "creates a default test which fails" do
-        expect(bundled_app("test_gem/test/test_test_gem.rb").read).to match(/assert false/)
+        expect(bundled_app("test_gem/test/test_test_gem.rb").read).to include("assert false")
       end
     end
 
@@ -326,11 +326,11 @@ describe "bundle gem" do
       end
 
       it "requires 'test/gem'" do
-        expect(bundled_app("test-gem/spec/spec_helper.rb").read).to match(/require 'test\/gem'/)
+        expect(bundled_app("test-gem/spec/spec_helper.rb").read).to include("require 'test/gem'")
       end
 
       it "creates a default test which fails" do
-        expect(bundled_app("test-gem/spec/test/gem_spec.rb").read).to match(/false.should eq(true)/)
+        expect(bundled_app("test-gem/spec/test/gem_spec.rb").read).to include("expect(false).to eq(true)")
       end
 
       it "creates a default rake task to run the specs" do

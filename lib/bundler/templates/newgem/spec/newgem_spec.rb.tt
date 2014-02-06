@@ -6,6 +6,6 @@ describe <%= config[:constant_name] %> do
   end
 
   it 'should do something useful' do
-    false.should eq(true)
+    expect(false).to eq(true)
   end
 end
