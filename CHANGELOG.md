@@ -1,3 +1,9 @@
+## Unreleased
+
+Features:
+
+  - add ability to define custom git source to use as an option like :github, :gist by using `git_source` (@strzalek)
+
 ## 1.6.0
 
 Bugfixes:
