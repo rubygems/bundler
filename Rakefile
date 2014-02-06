@@ -47,7 +47,7 @@ namespace :spec do
       if RUBY_VERSION < '1.9'
         # Downgrade Rubygems on 1.8 so Ronn can be required
         # https://github.com/rubygems/rubygems/issues/784
-        sh "gem update --system 2.1.14"
+        sh "gem update --system 2.1.11"
       else
         # Downgrade Rubygems so RSpec 3 can be instaled
         # https://github.com/rubygems/rubygems/issues/813
