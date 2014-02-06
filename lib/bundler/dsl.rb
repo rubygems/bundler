@@ -83,7 +83,7 @@ module Bundler
       options = Hash === args.last ? args.pop.dup : {}
       version = args
 
-      _normalize_options(name, version, options)
+      normalize_options(name, version, options)
 
       dep = Dependency.new(name, version, options)
 
@@ -156,7 +156,7 @@ module Bundler
     end
 
     def path(path, options = {}, source_options = {}, &blk)
-      source Source::Path.new(_normalize_hash(options).merge("path" => Pathname.new(path))), source_options, &blk
+      source Source::Path.new(normalize_hash(options).merge("path" => Pathname.new(path))), source_options, &blk
     end
 
     def git(uri, options = {}, source_options = {}, &blk)
@@ -171,7 +171,7 @@ module Bundler
         raise DeprecatedError, msg
       end
 
-      source Source::Git.new(_normalize_hash(options).merge("uri" => uri)), source_options, &blk
+      source Source::Git.new(normalize_hash(options).merge("uri" => uri)), source_options, &blk
     end
 
     def to_definition(lockfile, unlock)
@@ -209,19 +209,15 @@ module Bundler
 
   private
 
-    def _normalize_hash(opts)
-      # Cannot modify a hash during an iteration in 1.9
+    def normalize_hash(opts)
       opts.keys.each do |k|
-        next if String === k
-        v = opts[k]
-        opts.delete(k)
-        opts[k.to_s] = v
+        opts[k.to_s] = opts.delete(k) unless k.is_a?(String)
       end
       opts
     end
 
-    def _normalize_options(name, version, opts)
-      _normalize_hash(opts)
+    def normalize_options(name, version, opts)
+      normalize_hash(opts)
 
       valid_keys = %w(group groups git path name branch ref tag require submodules platform platforms type)
 
