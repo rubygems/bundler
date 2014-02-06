@@ -37,13 +37,20 @@ namespace :spec do
   namespace :travis do
     task :deps do
       # Give the travis user a name so that git won't fatally error
-      system("sudo sed -i 's/1000::/1000:Travis:/g' /etc/passwd")
+      system "sudo sed -i 's/1000::/1000:Travis:/g' /etc/passwd"
       # Strip secure_path so that RVM paths transmit through sudo -E
-      system("sudo sed -i '/secure_path/d' /etc/sudoers")
+      system "sudo sed -i '/secure_path/d' /etc/sudoers"
       # Install groff for the ronn gem
-      system("sudo apt-get install groff -y")
-      # Switch to the Bluebox DNS servers in the Travis data center
-      system("printf 'nameserver 199.91.168.70\nnameserver 199.91.168.71\n' | sudo tee /etc/resolv.conf")
+      sh "sudo apt-get install groff -y"
+      if RUBY_VERSION < '1.9'
+        # Downgrade Rubygems on 1.8 so Ronn can be required
+        # https://github.com/rubygems/rubygems/issues/784
+        sh "gem update --system 2.1.14"
+      else
+        # Downgrade Rubygems so RSpec 3 can be instaled
+        # https://github.com/rubygems/rubygems/issues/813
+        sh "gem update --system 2.2.0"
+      end
       # Install the other gem deps, etc.
       Rake::Task["spec:deps"].invoke
     end
