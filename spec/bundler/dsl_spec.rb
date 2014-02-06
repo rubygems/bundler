@@ -16,8 +16,9 @@ describe Bundler::Dsl do
     end
 
     it "raises expection on invalid hostname" do
-      subject.git_source(:group){ |repo_name| "git@git.example.com:#{repo_name}.git" }
-      expect{ subject.gem("dobry-pies", :group => "strzalek/dobry-pies") }.to raise_error(Bundler::InvalidOption)
+      expect {
+        subject.git_source(:group){ |repo_name| "git@git.example.com:#{repo_name}.git" }
+      }.to raise_error(Bundler::InvalidOption)
     end
 
     it "expects block passed" do

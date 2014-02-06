@@ -141,12 +141,17 @@ module Bundler
       @source = nil
     end
 
-    def git_source(host_name, &block)
-      if block_given?
-        @git_sources[host_name] = block
-      else
+    def git_source(name, &block)
+      unless block_given?
         raise InvalidOption, "You need to pass a block to #git_source"
       end
+
+      if valid_keys.include?(name.to_s)
+        raise InvalidOption, "You cannot use #{name} as a git source. It " \
+          "is a reserved key. Reserved keys are: #{valid_keys.join(", ")}"
+      end
+
+      @git_sources[name.to_s] = block
     end
 
     def path(path, options = {}, source_options = {}, &blk)
@@ -219,27 +224,16 @@ module Bundler
       opts
     end
 
+    def valid_keys
+      @valid_keys ||= %w(group groups git path name branch ref tag require submodules platform platforms type)
+    end
+
     def normalize_options(name, version, opts)
       normalize_hash(opts)
 
-      valid_keys = %w(group groups git path name branch ref tag require submodules platform platforms type)
+      git_names = @git_sources.keys.map(&:to_s)
 
-      git_sources = _normalize_hash(@git_sources.dup)
-      git_sources_keys = git_sources.keys
-
-      invalid_git_sources = (git_sources_keys & valid_keys)
-      if invalid_git_sources.any?
-        message = "You registered #{invalid_git_sources.map{|k| ':'+k }.join(", ")} "
-        message << if invalid_git_sources.size > 1
-                     "as host name for gem '#{name}', but they are reserved keys."
-                   else
-                     "as an host name for gem '#{name}', but it is reserved key."
-                   end
-        message << " Reserved keys are: #{valid_keys.join(", ")}"
-        raise InvalidOption, message
-      end
-
-      invalid_keys = opts.keys - (valid_keys + git_sources_keys)
+      invalid_keys = opts.keys - (valid_keys + git_names)
       if invalid_keys.any?
         message = "You passed #{invalid_keys.map{|k| ':'+k }.join(", ")} "
         message << if invalid_keys.size > 1
@@ -266,11 +260,9 @@ module Bundler
         raise GemfileError, "`#{p}` is not a valid platform. The available options are: #{VALID_PLATFORMS.inspect}"
       end
 
-      git_source_names = git_sources_keys & opts.keys
-      git_source_name = git_source_names.any? ? git_source_names.last : nil
-
-      if repo_name = opts.delete(git_source_name)
-        opts["git"] = git_sources[git_source_name].call(repo_name)
+      git_name = (git_names & opts.keys).last
+      if @git_sources[git_name]
+        opts["git"] = @git_sources[git_name].call(opts[git_name])
       end
 
       ["git", "path"].each do |type|

@@ -1,17 +1,12 @@
-## Unreleased
-
-Features:
-
-  - add ability to define custom git source to use as an option like :github, :gist by using `git_source` (@strzalek)
-
 ## 1.6.0
 
 Bugfixes:
 
-  - many Gemfiles that had incorrect errors now resolve correctly (@Who828)
+  - many Gemfiles that caused incorrect errors now resolve correctly (@Who828)
 
 Features:
 
+  - add `git_source` for custom options like :github and :gist (@strzalek)
   - resolver rewritten to avoid recursion (@Who828)
   - some complex Gemfiles are resolved up to 10x faster (@Who828)
   - add support for IRB alternatives such as Pry and Ripl (@joallard, @postmodern)
