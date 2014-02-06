@@ -24,13 +24,7 @@ module Bundler
       @platforms       = []
       @env             = nil
       @ruby_version    = nil
-
-      git_source(:github) do |repo_name|
-        repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
-        "git://github.com/#{repo_name}.git"
-      end
-
-      git_source(:gist){ |repo_name| "https://gist.github.com/#{repo_name}.git" }
+      add_github_sources
     end
 
     def rubygems_source
@@ -208,6 +202,15 @@ module Bundler
     end
 
   private
+
+    def add_github_sources
+      git_source(:github) do |repo_name|
+        repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
+        "git://github.com/#{repo_name}.git"
+      end
+
+      git_source(:gist){ |repo_name| "https://gist.github.com/#{repo_name}.git" }
+    end
 
     def normalize_hash(opts)
       opts.keys.each do |k|
