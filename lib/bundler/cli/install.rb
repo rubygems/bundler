@@ -2,11 +2,10 @@ module Bundler
   class CLI::Install
     attr_reader :options
     def initialize(options)
-      @options = options
+      @options = options.dup
     end
 
     def run
-      options = options.dup
       if options[:without]
         options[:without] = options[:without].map{|g| g.tr(' ', ':') }
       end
