@@ -146,7 +146,7 @@ describe Bundler::GemHelper do
       context "when installation fails" do
         it "raises an error with appropriate message" do
           # create empty gem file in order to simulate install failure
-          subject.stub(:build_gem) do
+          allow(subject).to receive(:build_gem) do
             FileUtils.mkdir_p(app_gem_dir)
             FileUtils.touch app_gem_path
             app_gem_path
@@ -178,7 +178,10 @@ describe Bundler::GemHelper do
         end
 
         it "when there is no git remote" do
-          Bundler.ui.stub(:confirm => nil, :error => nil) # silence messages
+          # silence messages
+          allow(Bundler.ui).to receive(:confirm)
+          allow(Bundler.ui).to receive(:error)
+
           Dir.chdir(app_path) { `git commit -a -m "initial commit"` }
           expect { subject.release_gem }.to raise_error
         end
