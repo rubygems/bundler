@@ -1,8 +1,9 @@
-## 1.5.3
+## 1.5.3 (2014-02-06)
 
 Bugfixes:
 
-  - Use n-1 cores when given n jobs for parallel install (@jdickey)
+  - find "missing" gems that are actually present (#2780, #2818, #2854)
+  - pse n-1 cores when given n jobs for parallel install (@jdickey)
 
 ## 1.5.2 (2014-01-10)
 
