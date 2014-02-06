@@ -4,7 +4,6 @@ require 'rubygems/spec_fetcher'
 
 module Bundler
   module Source
-    # TODO: Refactor this class
     class Rubygems
       API_REQUEST_LIMIT = 100 # threshold for switching back to the modern index instead of fetching every spec
 
@@ -68,7 +67,7 @@ module Bundler
       end
 
       def install(spec)
-        if installed_specs[spec].any? && gem_dir_exists?(spec)
+        if installed_specs[spec].any?
           return ["Using #{spec.name} (#{spec.version})", nil]
         end
 
@@ -277,16 +276,6 @@ module Bundler
         end
       end
 
-      def gem_dir_exists?(spec)
-        return true if spec.name == "bundler"
-        # Ruby 2 default gems
-        return true if spec.loaded_from.include?("specifications/default/")
-        # Ruby 1.9 default gems
-        return true if spec.summary =~ /is bundled with Ruby/
-
-        File.directory?(spec.full_gem_path)
-      end
     end
-
   end
 end
