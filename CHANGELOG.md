@@ -3,16 +3,21 @@
 Bugfixes:
 
   - many Gemfiles that caused incorrect errors now resolve correctly (@Who828)
+  - redirects across hosts now work on rubies without OpenSSL (#2686, @grddev)
+  - gemspecs now handle filenames with newlines (#2634, @jasonmp85)
+  - support escaped characters in usernames and passwords (@punkie)
+  - no more exception on `update GEM` without lock file (@simi)
 
 Features:
 
-  - add `git_source` for custom options like :github and :gist (@strzalek)
   - resolver rewritten to avoid recursion (@Who828)
+  - add `git_source` for custom options like :github and :gist (@strzalek)
+  - HTTP auth may now be stored in `bundle config` (@smashwilson)
   - some complex Gemfiles are resolved up to 10x faster (@Who828)
   - add support for IRB alternatives such as Pry and Ripl (@joallard, @postmodern)
   - highlight installed or updated gems (#2722, #2741, @yaotti, @simi)
-  - display post_install_message's for gems installed via :git (@phallstrom)
-  - `bundle outdated --strict` only reports dependencies that can be updated (@davidblondeau)
+  - display the `post_install_message` for gems installed via :git (@phallstrom)
+  - `bundle outdated --strict` now only reports allowed updates (@davidblondeau)
 
 ## 1.5.3 (2014-02-06)
 
