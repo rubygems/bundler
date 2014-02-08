@@ -59,6 +59,13 @@ describe "bundle show" do
       gem_list = out.split.map { |p| p.split('/').last }
       expect(gem_list).to eq(gem_list.sort)
     end
+
+    it "prints summary of gems" do
+      bundle "show --verbose"
+
+      expect(out).to include(' - This is just a fake gem for testing')
+      expect(out).to include(' - Ruby based make-like utility.')
+    end
   end
 
   context "with a git repo in the Gemfile" do
