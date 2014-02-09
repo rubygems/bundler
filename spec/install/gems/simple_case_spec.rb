@@ -298,7 +298,7 @@ describe "bundle install with gem sources" do
       install_gemfile <<-G
       G
 
-      expect(File.exists?(bundled_app("Gemfile.lock"))).to eq(true)
+      expect(File.exist?(bundled_app("Gemfile.lock"))).to eq(true)
     end
 
     it "gracefully handles error when rubygems server is unavailable" do

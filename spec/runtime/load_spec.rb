@@ -53,7 +53,7 @@ describe "Bundler.load" do
 
     it "does not find a Gemfile above the testing directory" do
       bundler_gemfile = tmp.join("../Gemfile")
-      unless File.exists?(bundler_gemfile)
+      unless File.exist?(bundler_gemfile)
         FileUtils.touch(bundler_gemfile)
         @remove_bundler_gemfile = true
       end
