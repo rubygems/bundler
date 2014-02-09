@@ -151,7 +151,7 @@ module Bundler
       else
         Bundler.load_marshal Gem.inflate(fetch(uri))
       end
-    rescue MarshalError => e
+    rescue MarshalError
       raise HTTPError, "Gemspec #{spec} contained invalid data.\n" \
         "Your network or your gem server is probably having issues right now."
     end
@@ -166,7 +166,6 @@ module Bundler
     # return the specs in the bundler format as an index
     def specs(gem_names, source)
       index = Index.new
-      use_full_source_index = !gem_names || @remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
 
       if gem_names && use_api
         specs = fetch_remote_specs(gem_names)
@@ -220,7 +219,7 @@ module Bundler
       spec_list, deps_list = remote_specs
       returned_gems = spec_list.map {|spec| spec.first }.uniq
       fetch_remote_specs(deps_list, full_dependency_list + returned_gems, spec_list + last_spec_list)
-    rescue HTTPError, MarshalError, GemspecError => e
+    rescue HTTPError, MarshalError, GemspecError
       Bundler.ui.info "" unless Bundler.ui.debug? # new line now that the dots are over
       Bundler.ui.debug "could not fetch from the dependency API, trying the full index"
       @use_api = false
@@ -283,7 +282,7 @@ module Bundler
         password = uri.password ? CGI.unescape(uri.password) : nil
         req.basic_auth(user, password)
       end
-      response = connection.request(uri, req)
+      connection.request(uri, req)
     rescue Net::HTTPUnauthorized, Net::HTTPForbidden
       retry_with_auth { request(uri) }
     rescue OpenSSL::SSL::SSLError
