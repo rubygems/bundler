@@ -12,6 +12,7 @@ module Bundler
     end
 
     VALID_PLATFORMS = Bundler::Dependency::PLATFORM_MAP.keys.freeze
+    VALID_GITHUB_PROTOCOLS = [:git, :https].freeze
 
     attr_accessor :dependencies
 
@@ -24,11 +25,17 @@ module Bundler
       @platforms       = []
       @env             = nil
       @ruby_version    = nil
+      @github_protocol = :git
       add_github_sources
     end
 
     def rubygems_source
       @rubygems_source ||= Source::Rubygems.new
+    end
+
+    def github_protocol(protocol)
+      raise GemfileError, "Wrong protocol '#{protocol}'. Must be one of these: #{VALID_GITHUB_PROTOCOLS.join(', ')}" unless VALID_GITHUB_PROTOCOLS.include?(protocol.to_sym)
+      @github_protocol = protocol
     end
 
     def eval_gemfile(gemfile, contents = nil)
@@ -211,7 +218,7 @@ module Bundler
     def add_github_sources
       git_source(:github) do |repo_name|
         repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
-        "git://github.com/#{repo_name}.git"
+        "#{@github_protocol}://github.com/#{repo_name}.git"
       end
 
       git_source(:gist){ |repo_name| "https://gist.github.com/#{repo_name}.git" }
