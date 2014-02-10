@@ -189,7 +189,7 @@ describe "bundle install with git sources" do
 
       bundle %|config local.rack #{lib_path('local-rack')}|
       bundle :install
-      expect(out).to match(/at #{lib_path('local-rack')}/)
+      expect(out).to match('Using 2 already installed gems')
 
       run "require 'rack'"
       expect(out).to eq("LOCAL")

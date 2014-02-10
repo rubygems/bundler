@@ -92,6 +92,8 @@ module Bundler
       # the gem.
       Installer.post_install_messages = {}
 
+      @already_installed_gems_count = 0
+
       # the order that the resolver provides is significant, since
       # dependencies might actually affect the installation of a gem.
       # that said, it's a rare situation (other than rake), and parallel
@@ -102,6 +104,8 @@ module Bundler
       else
         install_sequentially options[:standalone]
       end
+      
+      Bundler.ui.info "Using #{@already_installed_gems_count} already installed gems" if Bundler.ui.level == 'info'
 
       lock
       generate_standalone(options[:standalone]) if options[:standalone]
@@ -119,7 +123,7 @@ module Bundler
       debug_message        = nil
       Bundler.rubygems.with_build_args [settings] do
         install_message, post_install_message, debug_message = spec.source.install(spec)
-        Bundler.ui.info install_message
+        Bundler.ui.level == 'info' ? @already_installed_gems_count += 1 : Bundler.ui.info(install_message)
         Bundler.ui.debug debug_message if debug_message
         Bundler.ui.debug "#{worker}:  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
       end

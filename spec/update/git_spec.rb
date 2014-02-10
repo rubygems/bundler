@@ -31,7 +31,7 @@ describe "bundle update" do
       G
 
       bundle "update rails"
-      expect(out).to include("Using activesupport (3.0) from #{lib_path('rails')} (at master)")
+      expect(out).to include("Using 3 already installed gems")
       should_be_installed "rails 3.0", "activesupport 3.0"
     end
 
