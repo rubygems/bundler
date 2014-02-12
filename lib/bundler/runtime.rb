@@ -106,7 +106,7 @@ module Bundler
 
     def cache(custom_path = nil)
       cache_path = cache_path(custom_path)
-      FileUtils.mkdir_p(cache_path) unless File.exists?(cache_path)
+      FileUtils.mkdir_p(cache_path) unless File.exist?(cache_path)
 
       Bundler.ui.info "Updating files in vendor/cache"
       specs.each do |spec|
@@ -124,7 +124,7 @@ module Bundler
 
     def prune_cache(custom_path)
       cache_path = cache_path(custom_path)
-      FileUtils.mkdir_p(cache_path) unless File.exists?(cache_path)
+      FileUtils.mkdir_p(cache_path) unless File.exist?(cache_path)
       resolve = @definition.resolve
       prune_gem_cache(resolve, custom_path)
       prune_git_and_path_cache(resolve, custom_path)
@@ -202,10 +202,10 @@ module Bundler
       end
 
       unless dry_run
-        stale_gem_bins.each { |bin| FileUtils.rm(bin) if File.exists?(bin) }
-        stale_gem_files.each { |file| FileUtils.rm(file) if File.exists?(file) }
-        stale_gemspec_files.each { |file| FileUtils.rm(file) if File.exists?(file) }
-        stale_git_cache_dirs.each { |dir| FileUtils.rm_rf(dir) if File.exists?(dir) }
+        stale_gem_bins.each { |bin| FileUtils.rm(bin) if File.exist?(bin) }
+        stale_gem_files.each { |file| FileUtils.rm(file) if File.exist?(file) }
+        stale_gemspec_files.each { |file| FileUtils.rm(file) if File.exist?(file) }
+        stale_git_cache_dirs.each { |dir| FileUtils.rm_rf(dir) if File.exist?(dir) }
       end
 
       output
