@@ -236,13 +236,10 @@ module Bundler
     end
 
     def resolve_conflict(current, states)
-      # Return a requirement/gem which has other possibles states
-      # Given the set of constraints placed by requrired_by
-
-      debug { "    -> Going to: #{current.name} state" }
-
       # Find the state where the conflict has occurred
       state = find_conflict_state(current, states)
+
+      debug { "    -> Going to: #{current.name} state" }
 
       # Resolve the conflicts by rewinding the state
       # when the conflicted gem was activated
