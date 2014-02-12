@@ -69,8 +69,7 @@ module Bundler
           else
             Bundler.ui.info "Fetching #{uri}"
             FileUtils.mkdir_p(path.dirname)
-            clone_command = %|clone #{uri_escaped} "#{path}" --bare --no-hardlinks|
-            clone_command = "#{clone_command} --quiet" if Bundler.ui.quiet?
+            clone_command = %|clone #{uri_escaped} "#{path}" --bare --no-hardlinks --quiet|
             git clone_command
           end
         end
@@ -79,7 +78,7 @@ module Bundler
           unless File.exist?(destination.join(".git"))
             FileUtils.mkdir_p(destination.dirname)
             FileUtils.rm_rf(destination)
-            git %|clone --no-checkout "#{path}" "#{destination}"|
+            git %|clone --no-checkout --quiet "#{path}" "#{destination}"|
             File.chmod((0777 & ~File.umask), destination)
           end
 
