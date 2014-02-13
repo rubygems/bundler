@@ -92,20 +92,19 @@ module Bundler
       # the gem.
       Installer.post_install_messages = {}
 
-      @already_installed_gems_count = 0
-
       # the order that the resolver provides is significant, since
       # dependencies might actually affect the installation of a gem.
       # that said, it's a rare situation (other than rake), and parallel
       # installation is just SO MUCH FASTER. so we let people opt in.
       jobs = [Bundler.settings[:jobs].to_i, 1].max
-      if jobs > 1 && can_install_parallely?
-        install_in_parallel jobs, options[:standalone]
-      else
-        install_sequentially options[:standalone]
-      end
-      
-      Bundler.ui.info "Using #{@already_installed_gems_count} already installed gems" if Bundler.ui.level == 'info'
+
+      already_installed_gems_count = if jobs > 1 && can_install_parallely?
+                                       install_in_parallel jobs, options[:standalone]
+                                     else
+                                       install_sequentially options[:standalone]
+                                     end
+
+      Bundler.ui.info "Using #{already_installed_gems_count} already installed gems" if Bundler.ui.level == 'info'
 
       lock
       generate_standalone(options[:standalone]) if options[:standalone]
@@ -117,13 +116,15 @@ module Bundler
       Bundler::Fetcher.fetch(spec) if spec.source.is_a?(Bundler::Source::Rubygems)
 
       # Fetch the build settings, if there are any
-      settings             = Bundler.settings["build.#{spec.name}"]
-      install_message      = nil
-      post_install_message = nil
-      debug_message        = nil
+      settings              = Bundler.settings["build.#{spec.name}"]
+      install_message       = nil
+      post_install_message  = nil
+      debug_message         = nil
+      needed_to_install_gem = false
       Bundler.rubygems.with_build_args [settings] do
         install_message, post_install_message, debug_message = spec.source.install(spec)
-        Bundler.ui.level == 'info' ? @already_installed_gems_count += 1 : Bundler.ui.info(install_message)
+        needed_to_install_gem = install_message.include?('Installing') ? true : false
+        Bundler.ui.debug install_message
         Bundler.ui.debug debug_message if debug_message
         Bundler.ui.debug "#{worker}:  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
       end
@@ -135,7 +136,7 @@ module Bundler
       end
 
       FileUtils.rm_rf(Bundler.tmp)
-      post_install_message
+      return post_install_message, needed_to_install_gem
     rescue Exception => e
       # if install hook failed or gem signature is bad, just die
       raise e if e.is_a?(Bundler::InstallHookError) || e.is_a?(Bundler::SecurityError)
@@ -272,12 +273,15 @@ module Bundler
     end
 
     def install_sequentially(standalone)
+      already_installed_gems_count = 0
       specs.each do |spec|
-        message = install_gem_from_spec spec, standalone, 0
+        message, needed_to_install_gem = install_gem_from_spec spec, standalone, 0
+        already_installed_gems_count += 1 unless needed_to_install_gem
         if message
           Installer.post_install_messages[spec.name] = message
         end
       end
+      already_installed_gems_count
     end
 
     def install_in_parallel(size, standalone)
@@ -289,11 +293,14 @@ module Bundler
         remains[spec.name] = true
       end
 
+      already_installed_gems_count = 0
       worker_pool = ParallelWorkers.worker_pool size, lambda { |name, worker|
         spec = name2spec[name]
-        message = install_gem_from_spec spec, standalone, worker
-        { :name => spec.name, :post_install => message }
+        message, needed_to_install_gem = install_gem_from_spec spec, standalone, worker
+        already_installed_gems_count += 1 unless needed_to_install_gem
+        { :name => spec.name, :post_install => message, :already_installed_gems_count => already_installed_gems_count}
       }
+
       specs.each do |spec|
         deps = spec.dependencies.select { |dep| dep.type != :development }
         if deps.empty?
@@ -318,7 +325,8 @@ module Bundler
           end
         end
       end
-      message
+
+      message[:already_installed_gems_count]
     ensure
       worker_pool && worker_pool.stop
     end
