@@ -123,8 +123,13 @@ module Bundler
       needed_to_install_gem = false
       Bundler.rubygems.with_build_args [settings] do
         install_message, post_install_message, debug_message = spec.source.install(spec)
-        needed_to_install_gem = install_message.include?('Installing') ? true : false
-        Bundler.ui.debug install_message
+        needed_to_install_gem = if install_message.include?('Installing')
+                                  Bundler.ui.info install_message
+                                  true
+                                else
+                                  Bundler.ui.debug install_message
+                                  false
+                                end
         Bundler.ui.debug debug_message if debug_message
         Bundler.ui.debug "#{worker}:  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
       end
