@@ -239,7 +239,7 @@ module Bundler
       # Find the state where the conflict has occurred
       state = find_conflict_state(current, states)
 
-      debug { "    -> Going to: #{current.name} state" }
+      debug { "    -> Going to: #{current.name} state" } if current
 
       # Resolve the conflicts by rewinding the state
       # when the conflicted gem was activated
