@@ -114,6 +114,10 @@ module Bundler
       end
 
       def cache(spec, custom_path = nil)
+        # Gems bundled with Ruby don't have .gem files cached locally, but it doesn't matter
+        # since they're always going to be installed on this Ruby version.
+        return if builtin_gem?(spec)
+
         cached_path = cached_gem(spec)
         raise GemNotFound, "Missing gem file '#{spec.full_name}.gem'." unless cached_path
         return if File.dirname(cached_path) == Bundler.app_cache.to_s
@@ -273,6 +277,13 @@ module Bundler
         end
       end
 
+      def builtin_gem?(spec)
+        # Ruby 2.1-style
+        return true if spec.summary =~ /is bundled with Ruby/
+
+        # Ruby 2.0 style
+        spec.loaded_from.include?("specifications/default/")
+      end
     end
   end
 end
