@@ -7,6 +7,9 @@ Bugfixes:
   - gemspecs now handle filenames with newlines (#2634, @jasonmp85)
   - support escaped characters in usernames and passwords (@punkie)
   - no more exception on `update GEM` without lock file (@simi)
+  - allow long config values (#2823, @kgrz)
+  - cache successfully even locked to gems shipped with Ruby (#2869, @aughr)
+  - respect NO_PROXY even if a proxy is configured (#2878, @stlay)
 
 Features:
 
@@ -24,7 +27,7 @@ Features:
 Bugfixes:
 
   - find "missing" gems that are actually present (#2780, #2818, #2854)
-  - pse n-1 cores when given n jobs for parallel install (@jdickey)
+  - use n-1 cores when given n jobs for parallel install (@jdickey)
 
 ## 1.5.2 (2014-01-10)
 
