@@ -616,6 +616,8 @@ class Net::HTTP::Persistent
     if @proxy_uri and not proxy_bypass? uri.host, uri.port then
       connection_id << @proxy_connection_id
       net_http_args.concat @proxy_args
+    elsif proxy_bypass? uri.host, uri.port then
+      net_http_args.concat [nil, nil]
     end
 
     connection = connections[connection_id]
