@@ -399,8 +399,8 @@ describe "Bundler.setup" do
       G
 
       bundle %|config local.rack #{lib_path('local-rack')}|
-      bundle :install
-      expect(out).to match('Using 2 already installed gems')
+      bundle 'install --verbose'
+      expect(out).to match(/at #{lib_path('local-rack')}/)
 
       FileUtils.rm_rf(lib_path('local-rack'))
       run "require 'rack'", :expect_err => true
@@ -418,8 +418,8 @@ describe "Bundler.setup" do
       G
 
       bundle %|config local.rack #{lib_path('local-rack')}|
-      bundle :install
-      expect(out).to match('Using 2 already installed gems')
+      bundle 'install --verbose'
+      expect(out).to match(/at #{lib_path('local-rack')}/)
 
       gemfile <<-G
         source "file://#{gem_repo1}"
@@ -441,8 +441,8 @@ describe "Bundler.setup" do
       G
 
       bundle %|config local.rack #{lib_path('local-rack')}|
-      bundle :install
-      expect(out).to match("Using 2 already installed gems")
+      bundle 'install --verbose'
+      expect(out).to match(/at #{lib_path('local-rack')}/)
 
       gemfile <<-G
         source "file://#{gem_repo1}"
