@@ -74,6 +74,42 @@ describe "bundle cache" do
     end
   end
 
+  describe "when there is a built-in gem" do
+    let(:version) { "1.0.0" }
+
+    before :each do
+      build_repo2 do
+        build_gem "builtin_gem", version do |s|
+          s.summary = "This builtin_gem is bundled with Ruby"
+        end
+
+        build_gem "remote_gem", version do |s|
+          s.summary = "Totally normal gem"
+        end
+      end
+
+      build_gem "builtin_gem", version, :to_system => true do |s|
+        s.summary = "This builtin_gem is bundled with Ruby"
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem 'builtin_gem', '#{version}'
+        gem 'remote_gem', '#{version}'
+      G
+
+      FileUtils.rm("#{system_gem_path}/cache/builtin_gem-#{version}.gem")
+    end
+
+    it "caches normal gems successfully" do
+      bundle :cache, :exitstatus => true
+
+      expect(exitstatus).to be_zero
+      expect(bundled_app("vendor/cache/builtin_gem-#{version}.gem")).to_not exist
+      expect(bundled_app("vendor/cache/remote_gem-#{version}.gem")).to exist
+    end
+  end
+
   describe "when there are also git sources" do
     before do
       build_git "foo"
