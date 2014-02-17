@@ -136,6 +136,10 @@ module Bundler
 
       # TODO: actually cache git specs
       def specs(*)
+        if has_app_cache? && !local?
+          set_local!(app_cache_path)
+        end
+
         if requires_checkout? && !@copied
           git_proxy.checkout
           git_proxy.copy_to(install_path, submodules)
