@@ -92,19 +92,9 @@ module Bundler
       # the gem.
       Installer.post_install_messages = {}
 
-      # the order that the resolver provides is significant, since
-      # dependencies might actually affect the installation of a gem.
-      # that said, it's a rare situation (other than rake), and parallel
-      # installation is just SO MUCH FASTER. so we let people opt in.
-      jobs = [Bundler.settings[:jobs].to_i, 1].max
+      existing_gems = install_gems(options[:standalone])
 
-      already_installed_gems_count = if jobs > 1 && can_install_parallely?
-                                       install_in_parallel jobs, options[:standalone]
-                                     else
-                                       install_sequentially options[:standalone]
-                                     end
-
-      Bundler.ui.info "Using #{already_installed_gems_count} already installed gems" if Bundler.ui.level == 'info'
+      Bundler.ui.info "Using #{existing_gems} already installed gems" if Bundler.ui.level == 'info'
 
       lock
       generate_standalone(options[:standalone]) if options[:standalone]
@@ -117,19 +107,19 @@ module Bundler
 
       # Fetch the build settings, if there are any
       settings              = Bundler.settings["build.#{spec.name}"]
-      install_message       = nil
+      gem_message           = nil
       post_install_message  = nil
       debug_message         = nil
-      needed_to_install_gem = false
+      installed_gem         = false
       Bundler.rubygems.with_build_args [settings] do
-        install_message, post_install_message, debug_message = spec.source.install(spec)
-        needed_to_install_gem = if install_message.include?('Installing')
-                                  Bundler.ui.info install_message
-                                  true
-                                else
-                                  Bundler.ui.debug install_message
-                                  false
-                                end
+        gem_message, post_install_message, debug_message = spec.source.install(spec)
+        installed_gem = gem_message.include?('Installing')
+        if installed_gem
+          Bundler.ui.info gem_message
+        else
+          Bundler.ui.debug gem_message
+        end
+
         Bundler.ui.debug debug_message if debug_message
         Bundler.ui.debug "#{worker}:  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
       end
@@ -141,7 +131,7 @@ module Bundler
       end
 
       FileUtils.rm_rf(Bundler.tmp)
-      return post_install_message, needed_to_install_gem
+      { post_install_message: post_install_message, installed_gem: installed_gem }
     rescue Exception => e
       # if install hook failed or gem signature is bad, just die
       raise e if e.is_a?(Bundler::InstallHookError) || e.is_a?(Bundler::SecurityError)
@@ -214,6 +204,20 @@ module Bundler
     end
 
   private
+
+    def install_gems(standalone = false)
+      # the order that the resolver provides is significant, since
+      # dependencies might actually affect the installation of a gem.
+      # that said, it's a rare situation (other than rake), and parallel
+      # installation is just SO MUCH FASTER. so we let people opt in.
+      jobs = [Bundler.settings[:jobs].to_i, 1].max
+      if jobs > 1 && can_install_parallely?
+        install_in_parallel jobs, standalone
+      else
+        install_sequentially standalone
+      end
+    end
+
     def can_install_parallely?
       if Bundler.current_ruby.mri? || Bundler.rubygems.provides?(">= 2.1.0.rc")
         true
@@ -278,15 +282,15 @@ module Bundler
     end
 
     def install_sequentially(standalone)
-      already_installed_gems_count = 0
+      existing_gems = 0
       specs.each do |spec|
-        message, needed_to_install_gem = install_gem_from_spec spec, standalone, 0
-        already_installed_gems_count += 1 unless needed_to_install_gem
-        if message
-          Installer.post_install_messages[spec.name] = message
+        message = install_gem_from_spec spec, standalone, 0
+        existing_gems += 1 unless message[:installed_gem]
+        if message[:post_install_message]
+          Installer.post_install_messages[spec.name] = message[:post_install_message]
         end
       end
-      already_installed_gems_count
+      existing_gems
     end
 
     def install_in_parallel(size, standalone)
@@ -298,12 +302,12 @@ module Bundler
         remains[spec.name] = true
       end
 
-      already_installed_gems_count = 0
+      existing_gems = 0
       worker_pool = ParallelWorkers.worker_pool size, lambda { |name, worker|
         spec = name2spec[name]
-        message, needed_to_install_gem = install_gem_from_spec spec, standalone, worker
-        already_installed_gems_count += 1 unless needed_to_install_gem
-        { :name => spec.name, :post_install => message, :already_installed_gems_count => already_installed_gems_count}
+        message = install_gem_from_spec spec, standalone, worker
+        existing_gems += 1 unless message[:installed_gem]
+        { :name => spec.name, :post_install => message[:post_install_message], :existing_gems => existing_gems}
       }
 
       specs.each do |spec|
@@ -331,7 +335,7 @@ module Bundler
         end
       end
 
-      message[:already_installed_gems_count]
+      message[:existing_gems]
     ensure
       worker_pool && worker_pool.stop
     end
