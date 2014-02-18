@@ -114,7 +114,8 @@ module Bundler
 
         def has_revision_cached?
           return unless @revision
-          in_path { git("cat-file -e #{@revision}") }
+          # Don't raise an error report, will always exit(1) when it's not cached.
+          in_path { git("cat-file -e #{@revision}", false) }
           true
         rescue GitError
           false
