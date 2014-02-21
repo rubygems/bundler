@@ -329,6 +329,7 @@ module Bundler
                   :lazy_default => [ENV['BUNDLER_EDITOR'], ENV['VISUAL'], ENV['EDITOR']].find{|e| !e.nil? && !e.empty? },
                   :required => false, :banner => "/path/to/your/editor",
                   :desc => "Open generated gemspec in the specified editor (defaults to $EDITOR or $BUNDLER_EDITOR)"
+    method_option :ext, :type => :boolean, :detailt => false, :banner => "Generate the boilerplate for C extension code"
 
     def gem(name)
       require 'bundler/cli/gem'

@@ -399,5 +399,23 @@ describe "bundle gem" do
         expect(bundled_app("test-gem/test/minitest_helper.rb")).to_not exist
       end
     end
+
+    context "--ext parameter set" do
+      before do
+        reset!
+        in_app_root
+        bundle "gem test_gem --ext"
+      end
+
+      it "builds ext skeleton" do
+        expect(bundled_app("test_gem/ext/test_gem/extconf.rb")).to exist
+        expect(bundled_app("test_gem/ext/test_gem/test_gem.h")).to exist
+        expect(bundled_app("test_gem/ext/test_gem/test_gem.c")).to exist
+      end
+
+      it "includes rake-compiler" do
+        expect(bundled_app("test_gem/test_gem.gemspec").read).to include('spec.add_development_dependency "rake-compiler"')
+      end
+    end
   end
 end

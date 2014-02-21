@@ -22,6 +22,7 @@ Features:
   - display the `post_install_message` for gems installed via :git (@phallstrom)
   - `bundle outdated --strict` now only reports allowed updates (@davidblondeau)
   - `bundle show --verbose` Add gem ummary to the output (@lardcanoe)
+  - `bundle gem GEM --ext` now generates a skeleton for a C extension (@superdealloc)
 
 ## 1.5.3 (2014-02-06)
 
