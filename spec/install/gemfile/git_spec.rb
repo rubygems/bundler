@@ -737,7 +737,7 @@ describe "bundle install with git sources" do
         file.puts lockfile.gsub(/revision: #{old_revision}/, "revision: #{new_revision}")
       end
 
-      bundle "install"
+      bundle :update
 
       run <<-R
         require "valim"
