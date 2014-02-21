@@ -8,6 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = <%=config[:constant_name]%>::VERSION
   spec.authors       = [<%=config[:author].inspect%>]
   spec.email         = [<%=config[:email].inspect%>]
+<% if config[:ext] -%>
+  spec.extensions    = ["ext/<%=config[:underscored_name]%>/extconf.rb"]
+<% end -%>
   spec.summary       = %q{TODO: Write a short summary. Required.}
   spec.description   = %q{TODO: Write a longer description. Optional.}
   spec.homepage      = ""
@@ -20,6 +23,9 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> <%= Bundler::VERSION.split(".")[0..1].join(".") %>"
   spec.add_development_dependency "rake"
+<% if config[:ext] -%>
+  spec.add_development_dependency "rake-compiler"
+<% end -%>
 <% if config[:test] -%>
   spec.add_development_dependency "<%=config[:test]%>"
 <% end -%>

@@ -9,6 +9,7 @@ module Bundler
 
     def run
       name = gem_name.chomp("/") # remove trailing slash if present
+      underscored_name = name.tr('-', '_')
       namespaced_path = name.tr('-', '/')
       target = File.join(Dir.pwd, name)
       constant_name = name.split('_').map{|p| p[0..0].upcase + p[1..-1] }.join
@@ -17,13 +18,15 @@ module Bundler
       git_user_name = `git config user.name`.chomp
       git_user_email = `git config user.email`.chomp
       opts = {
-        :name            => name,
-        :namespaced_path => namespaced_path,
-        :constant_name   => constant_name,
-        :constant_array  => constant_array,
-        :author          => git_user_name.empty? ? "TODO: Write your name" : git_user_name,
-        :email           => git_user_email.empty? ? "TODO: Write your email address" : git_user_email,
-        :test            => options[:test]
+        :name             => name,
+        :underscored_name => underscored_name,
+        :namespaced_path  => namespaced_path,
+        :constant_name    => constant_name,
+        :constant_array   => constant_array,
+        :author           => git_user_name.empty? ? "TODO: Write your name" : git_user_name,
+        :email            => git_user_email.empty? ? "TODO: Write your email address" : git_user_email,
+        :test             => options[:test],
+        :ext              => options[:ext]
       }
       gemspec_dest = File.join(target, "#{name}.gemspec")
       thor.template(File.join("newgem/Gemfile.tt"),               File.join(target, "Gemfile"),                             opts)
@@ -48,6 +51,11 @@ module Bundler
       end
       if options[:test]
         thor.template(File.join("newgem/.travis.yml.tt"),         File.join(target, ".travis.yml"),            opts)
+      end
+      if options[:ext]
+        thor.template(File.join("newgem/ext/newgem/extconf.rb.tt"), File.join(target, "ext/#{name}/extconf.rb"), opts)
+        thor.template(File.join("newgem/ext/newgem/newgem.h.tt"), File.join(target, "ext/#{name}/#{underscored_name}.h"), opts)
+        thor.template(File.join("newgem/ext/newgem/newgem.c.tt"), File.join(target, "ext/#{name}/#{underscored_name}.c"), opts)
       end
       Bundler.ui.info "Initializing git repo in #{target}"
       Dir.chdir(target) { `git init`; `git add .` }
