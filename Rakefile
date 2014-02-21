@@ -66,7 +66,7 @@ begin
 
   desc "Run specs"
   RSpec::Core::RakeTask.new do |t|
-    t.rspec_opts = %w(-fs --color)
+    t.rspec_opts = %w(--format documentation --color)
     t.ruby_opts  = %w(-w)
   end
   task :spec => "man:build"
@@ -104,7 +104,7 @@ begin
       (branches + releases).each do |rg|
         desc "Run specs with Rubygems #{rg}"
         RSpec::Core::RakeTask.new(rg) do |t|
-          t.rspec_opts = %w(-fs --color)
+          t.rspec_opts = %w(--format documentation --color)
           t.ruby_opts  = %w(-w)
         end
 
@@ -141,7 +141,7 @@ begin
 
       desc "Run specs under a Rubygems checkout (set RG=path)"
       RSpec::Core::RakeTask.new("co") do |t|
-        t.rspec_opts = %w(-fs --color)
+        t.rspec_opts = %w(--format documentation --color)
         t.ruby_opts  = %w(-w)
       end
 
