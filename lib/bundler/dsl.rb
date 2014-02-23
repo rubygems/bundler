@@ -25,6 +25,7 @@ module Bundler
       @env             = nil
       @ruby_version    = nil
       add_github_sources
+      add_bitbucket_source
     end
 
     def rubygems_source
@@ -215,6 +216,13 @@ module Bundler
       end
 
       git_source(:gist){ |repo_name| "https://gist.github.com/#{repo_name}.git" }
+    end
+
+    def add_bitbucket_source
+      git_source(:bitbucket) do |repo_name|
+        repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
+        "git@bitbucket.org:#{repo_name}.git"
+      end
     end
 
     def normalize_hash(opts)
