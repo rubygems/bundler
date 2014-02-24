@@ -65,12 +65,12 @@ module Bundler
             return if has_revision_cached?
             Bundler.ui.confirm "Updating #{uri}"
             in_path do
-              git %|fetch --force --quiet --tags #{uri_escaped} "refs/heads/*:refs/heads/*"|
+              git_retry %|fetch --force --quiet --tags #{uri_escaped} "refs/heads/*:refs/heads/*"|
             end
           else
             Bundler.ui.info "Fetching #{uri}"
             FileUtils.mkdir_p(path.dirname)
-            git %|clone #{uri_escaped} "#{path}" --bare --no-hardlinks --quiet|
+            git_retry %|clone #{uri_escaped} "#{path}" --bare --no-hardlinks --quiet|
           end
         end
 
@@ -78,16 +78,16 @@ module Bundler
           unless File.exist?(destination.join(".git"))
             FileUtils.mkdir_p(destination.dirname)
             FileUtils.rm_rf(destination)
-            git %|clone --no-checkout --quiet "#{path}" "#{destination}"|
+            git_retry %|clone --no-checkout --quiet "#{path}" "#{destination}"|
             File.chmod((0777 & ~File.umask), destination)
           end
 
           SharedHelpers.chdir(destination) do
-            git %|fetch --force --quiet --tags "#{path}"|
+            git_retry %|fetch --force --quiet --tags "#{path}"|
             git "reset --hard #{@revision}"
 
             if submodules
-              git "submodule update --init --recursive"
+              git_retry "submodule update --init --recursive"
             end
           end
         end
@@ -103,13 +103,17 @@ module Bundler
           git("#{command} 2>#{Bundler::NULL}", false)
         end
 
+        def git_retry(command)
+          Bundler::Retry.new("git #{command}", GitNotAllowedError).attempts do
+            git(command)
+          end
+        end
+
         def git(command, check_errors=true)
           raise GitNotAllowedError.new(command) unless allow?
-          Bundler::Retry.new("git #{command}").attempts do
-            out = SharedHelpers.with_clean_git_env { %x{git #{command}} }
-            raise GitCommandError.new(command, path) if check_errors && !$?.success?
-            out
-          end
+          out = SharedHelpers.with_clean_git_env { %x{git #{command}} }
+          raise GitCommandError.new(command, path) if check_errors && !$?.success?
+          out
         end
 
         def has_revision_cached?
