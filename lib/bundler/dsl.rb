@@ -220,8 +220,9 @@ module Bundler
 
     def add_bitbucket_source
       git_source(:bitbucket) do |repo_name|
-        repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
-        "git@bitbucket.org:#{repo_name}.git"
+        repo_name, user_name = repo_name.split '/'
+        user_name ||= repo_name
+        "https://#{user_name}@bitbucket.org/#{user_name}/#{repo_name}.git"
       end
     end
 

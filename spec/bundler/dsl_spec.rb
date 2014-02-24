@@ -52,13 +52,13 @@ describe Bundler::Dsl do
 
       it "converts :bitbucket to :git" do
         subject.gem("not-really-a-gem", :bitbucket => "mcorp/flatlab-rails")
-        bitbucket_uri = "git://bitbucket.org/mcorp/flatlab-rails.git"
+        bitbucket_uri = "https://mcorp@bitbucket.org/mcorp/flatlab-rails.git"
         expect(subject.dependencies.first.source.uri).to eq(bitbucket_uri)
       end
 
       it "converts 'mcorp' to 'mcorp/mcorp'" do
         subject.gem("not-really-a-gem", :bitbucket => "mcorp")
-        bitbucket_uri = "git://bitbucket.org/mcorp/mcorp.git"
+        bitbucket_uri = "https://mcorp@bitbucket.org/mcorp/mcorp.git"
         expect(subject.dependencies.first.source.uri).to eq(bitbucket_uri)
       end
     end
