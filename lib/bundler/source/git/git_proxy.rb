@@ -40,6 +40,7 @@ module Bundler
           @ref      = ref
           @revision = revision
           @allow    = allow || Proc.new { true }
+          raise GitNotInstalledError.new unless Bundler.git_present?
         end
 
         def revision
@@ -104,7 +105,6 @@ module Bundler
 
         def git(command, check_errors=true)
           raise GitNotAllowedError.new(command) unless allow?
-          raise GitNotInstalledError.new        unless Bundler.git_present?
           Bundler::Retry.new("git #{command}").attempts do
             out = SharedHelpers.with_clean_git_env { %x{git #{command}} }
             raise GitCommandError.new(command, path) if check_errors && !$?.success?
