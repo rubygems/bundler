@@ -21,6 +21,7 @@ Features:
   - highlight installed or updated gems (#2722, #2741, @yaotti, @simi)
   - display the `post_install_message` for gems installed via :git (@phallstrom)
   - `bundle outdated --strict` now only reports allowed updates (@davidblondeau)
+  - `bundle show --verbose` Add gem ummary to the output (@lardcanoe)
 
 ## 1.5.3 (2014-02-06)
 
