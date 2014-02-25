@@ -8,6 +8,14 @@ module Bundler
     end
 
     def run
+      if options[:ext] && gem_name.index('-')
+        Bundler.ui.error "You have specified a gem name which does not conform to the \n" \
+                         "naming guidelines for C extensions. For more information, \n" \
+                         "see the 'Extension Naming' section at the following URL:\n" \
+                         "http://guides.rubygems.org/gems-with-extensions/\n"
+        exit 1
+      end
+
       name = gem_name.chomp("/") # remove trailing slash if present
       underscored_name = name.tr('-', '_')
       namespaced_path = name.tr('-', '/')
