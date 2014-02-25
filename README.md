@@ -1,6 +1,6 @@
-[![Code Climate](https://codeclimate.com/github/bundler/bundler.png)](https://codeclimate.com/github/bundler/bundler)
-[![Build Status](https://travis-ci.org/bundler/bundler.png?branch=master)](http://travis-ci.org/bundler/bundler)
-<a href="http://badge.fury.io/rb/bundler"><img src="https://badge.fury.io/rb/bundler@2x.png" alt="Gem Version" height="18"></a>
+[![Code Climate](https://img.shields.io/codeclimate/github/bundler/bundler.svg)](https://codeclimate.com/github/bundler/bundler)
+[![Build Status](https://img.shields.io/travis/bundler/bundler/master.svg)](https://travis-ci.org/bundler/bundler)
+[![Version     ](https://img.shields.io/gem/v/bundler.svg)](https://rubygems.org/gems/bundler)
 
 # Bundler: a gem to bundle gems
 Bundler keeps ruby applications running the same code on every machine.
