@@ -30,7 +30,11 @@ end
 namespace :spec do
   desc "Ensure spec dependencies are installed"
   task :deps do
-    {"rdiscount" => "~> 1.6", "ronn" => "~> 0.7.3", "rspec" => "~> 3.0.beta"}.each do |name, version|
+    deps = RUBY_ENGINE == 'jruby' ?
+        {"rspec" => "~> 3.0.beta"} :
+        {"rdiscount" => "~> 1.6", "ronn" => "~> 0.7.3", "rspec" => "~> 3.0.beta"}
+
+    deps.each do |name, version|
       sh "#{Gem.ruby} -S gem list -i '^#{name}$' -v '#{version}' || " \
          "#{Gem.ruby} -S gem install #{name} -v '#{version}' --no-ri --no-rdoc"
     end
@@ -62,7 +66,6 @@ end
 begin
   # running the specs needs both rspec and ronn
   require 'rspec/core/rake_task'
-  require 'ronn'
 
   desc "Run specs"
   RSpec::Core::RakeTask.new do |t|
@@ -224,8 +227,8 @@ begin
 
 rescue LoadError
   namespace :man do
-    task(:build) { abort "Install the ronn gem to be able to release!" }
-    task(:clean) { abort "Install the ronn gem to be able to release!" }
+    task(:build) { warn "Install the ronn gem to be able to release!" }
+    task(:clean) { warn "Install the ronn gem to be able to release!" }
   end
 end
 
