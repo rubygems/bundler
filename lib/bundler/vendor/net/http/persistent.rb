@@ -203,7 +203,7 @@ class Net::HTTP::Persistent
   ##
   # The version of Net::HTTP::Persistent you are using
 
-  VERSION = '2.9'
+  VERSION = '2.9.3'
 
   ##
   # Exceptions rescued for automatic retry on ruby 2.0.0.  This overlaps with
@@ -616,8 +616,6 @@ class Net::HTTP::Persistent
     if @proxy_uri and not proxy_bypass? uri.host, uri.port then
       connection_id << @proxy_connection_id
       net_http_args.concat @proxy_args
-    elsif proxy_bypass? uri.host, uri.port then
-      net_http_args.concat [nil, nil]
     end
 
     connection = connections[connection_id]
@@ -633,6 +631,7 @@ class Net::HTTP::Persistent
     start connection unless connection.started?
 
     connection.read_timeout = @read_timeout if @read_timeout
+    connection.keep_alive_timeout = @idle_timeout if @idle_timeout && connection.respond_to?(:keep_alive_timeout=)
 
     connection
   rescue Errno::ECONNREFUSED
@@ -667,6 +666,14 @@ class Net::HTTP::Persistent
   def escape str
     CGI.escape str if str
   end
+
+  ##
+  # URI::unescape wrapper
+
+  def unescape str
+    CGI.unescape str if str
+  end
+
 
   ##
   # Returns true if the connection should be reset due to an idle timeout, or
@@ -860,8 +867,8 @@ class Net::HTTP::Persistent
       @proxy_args = [
         @proxy_uri.host,
         @proxy_uri.port,
-        @proxy_uri.user,
-        @proxy_uri.password,
+        unescape(@proxy_uri.user),
+        unescape(@proxy_uri.password),
       ]
 
       @proxy_connection_id = [nil, *@proxy_args].join ':'
@@ -957,9 +964,13 @@ class Net::HTTP::Persistent
 
     start connection
   rescue Errno::ECONNREFUSED
-    raise Error, "connection refused: #{connection.address}:#{connection.port}"
+    e = Error.new "connection refused: #{connection.address}:#{connection.port}"
+    e.set_backtrace $@
+    raise e
   rescue Errno::EHOSTDOWN
-    raise Error, "host down: #{connection.address}:#{connection.port}"
+    e = Error.new "host down: #{connection.address}:#{connection.port}"
+    e.set_backtrace $@
+    raise e
   end
 
   ##
