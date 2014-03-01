@@ -279,7 +279,7 @@ module Bundler
 
         # if any directory is not writable, we need sudo
         dirs = [path, bin_dir] | Dir[path.join('*').to_s]
-        sudo_needed = dirs.find{|d| !File.writable?(d) }
+        sudo_needed = dirs.any?{|d| !File.writable?(d) }
       end
 
       @requires_sudo_ran = true
