@@ -278,7 +278,7 @@ module Bundler
         bin_dir = bin_dir.parent until bin_dir.exist?
 
         # if any directory is not writable, we need sudo
-        files = [path, bin_dir] | Dir[path.join('build_info/*').to_s]
+        files = [path, bin_dir] | Dir[path.join('build_info/*').to_s] | Dir[path.join('*').to_s]
         sudo_needed = files.any?{|f| !File.writable?(f) }
       end
 
