@@ -30,9 +30,17 @@ end
 namespace :spec do
   desc "Ensure spec dependencies are installed"
   task :deps do
-    deps = RUBY_ENGINE == 'jruby' ?
-        {"rspec" => "~> 3.0.beta"} :
-        {"rdiscount" => "~> 1.6", "ronn" => "~> 0.7.3", "rspec" => "~> 3.0.beta"}
+    deps = {
+      "rdiscount" => "~> 1.6",
+      "ronn" => "~> 0.7.3",
+      "rspec" => "~> 3.0.beta"
+    }
+
+    # JRuby can't build ronn or rdiscount, so we skip that
+    if defined?(RUBY_ENGINE) && RUBY_ENGINE == 'jruby'
+      deps.delete("ronn")
+      deps.delete("rdiscount")
+    end
 
     deps.each do |name, version|
       sh "#{Gem.ruby} -S gem list -i '^#{name}$' -v '#{version}' || " \
