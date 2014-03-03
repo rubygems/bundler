@@ -64,7 +64,7 @@ module Bundler
       end
     end
 
-    desc "init", "Generates a Gemfile into the current working directory"
+    desc "init [OPTIONS]", "Generates a Gemfile into the current working directory"
     long_desc <<-D
       Init generates a default Gemfile in the current working directory. When adding a
       Gemfile to a gem with a gemspec, the --gemspec option will automatically add each
@@ -76,7 +76,7 @@ module Bundler
       Init.new(options.dup).run
     end
 
-    desc "check", "Checks if the dependencies listed in Gemfile are satisfied by currently installed gems"
+    desc "check [OPTIONS]", "Checks if the dependencies listed in Gemfile are satisfied by currently installed gems"
     long_desc <<-D
       Check searches the local machine for each of the gems requested in the Gemfile. If
       all gems are found, Bundler prints a success message and exits with a status of 0.
@@ -93,7 +93,7 @@ module Bundler
       Check.new(options).run
     end
 
-    desc "install", "Install the current environment to the system"
+    desc "install [OPTIONS]", "Install the current environment to the system"
     long_desc <<-D
       Install will install all of the gems in the current bundle, making them available
       for use. In a freshly checked out repository, this command will give you the same
@@ -146,7 +146,7 @@ module Bundler
       Install.new(options.dup).run
     end
 
-    desc "update", "update the current environment"
+    desc "update [OPTIONS]", "update the current environment"
     long_desc <<-D
       Update will install the newest versions of the gems listed in the Gemfile. Use
       update when you have changed the Gemfile, or if you want to get the newest
@@ -168,7 +168,7 @@ module Bundler
       Update.new(options, gems).run
     end
 
-    desc "show [GEM]", "Shows all gems that are part of the bundle, or the path to a given gem"
+    desc "show GEM [OPTIONS]", "Shows all gems that are part of the bundle, or the path to a given gem"
     long_desc <<-D
       Show lists the names and versions of all gems that are required by your Gemfile.
       Calling show with [GEM] will list the exact location of that gem on your machine.
@@ -181,7 +181,7 @@ module Bundler
     end
     map %w(list) => "show"
 
-    desc "binstubs [GEM]", "install the binstubs of the listed gem"
+    desc "binstubs GEM [OPTIONS]", "install the binstubs of the listed gem"
     long_desc <<-D
       Generate binstubs for executables in [GEM]. Binstubs are put into bin,
       or the --binstubs directory if one has been set.
@@ -195,7 +195,7 @@ module Bundler
       Binstubs.new(options, gems).run
     end
 
-    desc "outdated [GEM]", "list installed gems with newer versions available"
+    desc "outdated GEM [OPTIONS]", "list installed gems with newer versions available"
     long_desc <<-D
       Outdated lists the names and versions of gems that have a newer version available
       in the given source. Calling outdated with [GEM [GEM]] will only check for newer
@@ -213,7 +213,7 @@ module Bundler
       Outdated.new(options, gems).run
     end
 
-    desc "cache", "Cache all the gems to vendor/cache", :hide => true
+    desc "cache [OPTIONS]", "Cache all the gems to vendor/cache", :hide => true
     method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
     method_option "all",  :type => :boolean, :banner => "Include all sources (including path and git)."
     def cache
@@ -221,7 +221,7 @@ module Bundler
       Cache.new(options).run
     end
 
-    desc "package", "Locks and then caches all of the gems into vendor/cache"
+    desc "package [OPTIONS]", "Locks and then caches all of the gems into vendor/cache"
     method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
     method_option "all",  :type => :boolean, :banner => "Include all sources (including path and git)."
     method_option "quiet", :type => :boolean, :banner => "Only output warnings and errors."
@@ -240,7 +240,7 @@ module Bundler
     end
     map %w(pack) => :package
 
-    desc "exec", "Run the command in context of the bundle"
+    desc "exec [OPTIONS]", "Run the command in context of the bundle"
     method_option :keep_file_descriptors, :type => :boolean, :default => false
     long_desc <<-D
       Exec runs a command, providing it access to the gems in the bundle. While using
@@ -307,7 +307,7 @@ module Bundler
       end
     end
 
-    desc 'viz', "Generates a visual dependency graph"
+    desc 'viz [OPTIONS]', "Generates a visual dependency graph"
     long_desc <<-D
       Viz generates a PNG file of the current Gemfile as a dependency graph.
       Viz requires the ruby-graphviz gem (and its dependencies).
@@ -322,7 +322,7 @@ module Bundler
       Viz.new(options).run
     end
 
-    desc "gem GEM", "Creates a skeleton for creating a rubygem"
+    desc "gem GEM [OPTIONS]", "Creates a skeleton for creating a rubygem"
     method_option :bin, :type => :boolean, :default => false, :aliases => '-b', :banner => "Generate a binary for your library."
     method_option :test, :type => :string, :lazy_default => 'rspec', :aliases => '-t', :banner => "Generate a test directory for your library: 'rspec' is the default, but 'minitest' is also supported."
     method_option :edit, :type => :string, :aliases => "-e",
@@ -339,7 +339,7 @@ module Bundler
       File.expand_path(File.join(File.dirname(__FILE__), 'templates'))
     end
 
-    desc "clean", "Cleans up unused gems in your bundler directory"
+    desc "clean [OPTIONS]", "Cleans up unused gems in your bundler directory"
     method_option "dry-run", :type => :boolean, :default => false, :banner =>
       "only print out changes, do not actually clean gems"
     method_option "force", :type => :boolean, :default => false, :banner =>
@@ -349,7 +349,7 @@ module Bundler
       Clean.new(options.dup).run
     end
 
-    desc "platform", "Displays platform compatibility information"
+    desc "platform [OPTIONS]", "Displays platform compatibility information"
     method_option "ruby", :type => :boolean, :default => false, :banner =>
       "only display ruby related platform information"
     def platform
