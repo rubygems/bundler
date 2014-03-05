@@ -292,7 +292,7 @@ module Bundler
     end
 
     def dependency_api_uri(gem_names = [])
-      url = "#{@remote_uri}api/v1/dependencies"
+      url = "#{redirected_uri}api/v1/dependencies"
       url << "?gems=#{URI.encode(gem_names.join(","))}" if gem_names.any?
       URI.parse(url)
     end
@@ -376,6 +376,20 @@ module Bundler
 
       @remote_uri.user, @remote_uri.password = *auth.split(":", 2)
       yield
+    end
+
+    private
+    def redirected_uri
+      return bundler_uri if rubygems?
+      return @remote_uri
+    end
+
+    def rubygems?
+      @remote_uri.host == "rubygems.org"
+    end
+
+    def bundler_uri
+      URI.parse("#{@remote_uri.scheme}://bundler.#{@remote_uri.host}/")
     end
 
   end
