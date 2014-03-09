@@ -10,6 +10,10 @@ Bugfixes:
   - allow long config values (#2823, @kgrz)
   - cache successfully even locked to gems shipped with Ruby (#2869, @aughr)
   - respect NO_PROXY even if a proxy is configured (#2878, @stlay)
+  - only retry git commands that hit the network (#2899, @timmoore)
+  - fix NameError regression when OpenSSL is not available (#2898, @timmoore)
+  - handle exception installing when build_info owned by root (@Who828)
+  - skip HTTP redirects from rubygems.org, huge speed boost (@Who828)
 
 Features:
 
@@ -21,7 +25,7 @@ Features:
   - highlight installed or updated gems (#2722, #2741, @yaotti, @simi)
   - display the `post_install_message` for gems installed via :git (@phallstrom)
   - `bundle outdated --strict` now only reports allowed updates (@davidblondeau)
-  - `bundle show --verbose` Add gem ummary to the output (@lardcanoe)
+  - `bundle show --verbose` Add gem summary to the output (@lardcanoe)
   - `bundle gem GEM --ext` now generates a skeleton for a C extension (@superdealloc)
 
 ## 1.5.3 (2014-02-06)
