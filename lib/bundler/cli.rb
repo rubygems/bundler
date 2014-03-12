@@ -16,8 +16,9 @@ module Bundler
     def initialize(*)
       super
       ENV['BUNDLE_GEMFILE']   = File.expand_path(options[:gemfile]) if options[:gemfile]
-      Bundler::Retry.attempts = options[:retry] || Bundler.settings[:retry] || Bundler::Retry::DEFAULT_ATTEMPTS
-      Bundler.rubygems.ui = UI::RGProxy.new(Bundler.ui)
+      #Bundler::Retry.attempts = options[:retry] || Bundler.settings[:retry] || Bundler::Retry::DEFAULT_ATTEMPTS
+      Bundler::Retry.attempts(options[:retry]) if options[:retry]
+      #Bundler.rubygems.ui = UI::RGProxy.new(Bundler.ui)
     rescue UnknownArgumentError => e
       raise InvalidOption, e.message
     ensure
@@ -178,8 +179,12 @@ module Bundler
       "Run bundle clean automatically after install"
     method_option "trust-policy", :alias => "P", :type => :string, :banner =>
       "Gem trust policy (like gem install -P). Must be one of " +
+        #AARON: this attempts to build a list of available security policies. This necessitates
+        # the loading of rubygems plugins as a rubygem plugin could be adding a security policy
+        # either remove this code or live with loading rubygem plugins for everything
         Bundler.rubygems.security_policies.keys.join('|') unless
         Bundler.rubygems.security_policies.empty?
+        #" "
     method_option "jobs", :aliases => "-j", :type => :numeric, :banner =>
       "Specify the number of jobs to run in parallel"
 

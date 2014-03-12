@@ -8,8 +8,14 @@ module Bundler
     class Rubygems
       API_REQUEST_LIMIT = 100 # threshold for switching back to the modern index instead of fetching every spec
 
-      attr_reader :remotes, :caches
+      #attr_reader :remotes, :caches
+      attr_reader :remotes
       attr_accessor :dependency_names
+
+      def caches
+        @caches ||= [ Bundler.app_cache ] +
+          Bundler.rubygems.gem_path.map{|p| File.expand_path("#{p}/cache") }
+      end
 
       def initialize(options = {})
         @options = options
@@ -19,8 +25,8 @@ module Bundler
         @allow_remote = false
         @allow_cached = false
 
-        @caches = [ Bundler.app_cache ] +
-          Bundler.rubygems.gem_path.map{|p| File.expand_path("#{p}/cache") }
+        #@caches = [ Bundler.app_cache ] +
+        #  Bundler.rubygems.gem_path.map{|p| File.expand_path("#{p}/cache") }
       end
 
       def remote!
@@ -143,7 +149,8 @@ module Bundler
     private
 
       def cached_gem(spec)
-        possibilities = @caches.map { |p| "#{p}/#{spec.file_name}" }
+        #possibilities = @caches.map { |p| "#{p}/#{spec.file_name}" }
+        possibilities = caches.map { |p| "#{p}/#{spec.file_name}" }
         cached_gem = possibilities.find { |p| File.exist?(p) }
         unless cached_gem
           raise Bundler::GemNotFound, "Could not find #{spec.file_name} for installation"

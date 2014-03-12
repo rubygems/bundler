@@ -3,12 +3,17 @@ module Bundler
     def initialize(root = nil)
       @root          = root
       @local_config  = load_config(local_config_file)
-      @global_config = load_config(global_config_file)
+    end
+
+    def global_config
+      #puts "AARON2: - "+caller[0] 
+      @global_config ||= load_config(global_config_file)
     end
 
     def [](key)
+      #puts "AARON3: - "+caller[0]
       the_key = key_for(key)
-      value = (@local_config[the_key] || ENV[the_key] || @global_config[the_key])
+      value = (@local_config[the_key] || ENV[the_key] || global_config[the_key])
       is_bool(key) ? to_bool(value) : value
     end
 
@@ -24,13 +29,13 @@ module Bundler
     end
 
     def set_global(key, value)
-      set_key(key, value, @global_config, global_config_file)
+      set_key(key, value, global_config, global_config_file)
     end
 
     def all
       env_keys = ENV.keys.select { |k| k =~ /BUNDLE_.*/ }
 
-      keys = @global_config.keys | @local_config.keys | env_keys
+      keys = global_config.keys | @local_config.keys | env_keys
 
       keys.map do |key|
         key.sub(/^BUNDLE_/, '').gsub(/__/, ".").downcase
@@ -62,7 +67,7 @@ module Bundler
       locations = {}
       locations[:local]  = @local_config[key] if @local_config.key?(key)
       locations[:env]    = ENV[key] if ENV[key]
-      locations[:global] = @global_config[key] if @global_config.key?(key)
+      locations[:global] = global_config[key] if global_config.key?(key)
       locations
     end
 
@@ -78,8 +83,8 @@ module Bundler
         locations << "Set via #{key}: #{value.inspect}"
       end
 
-      if @global_config.key?(key)
-        locations << "Set for the current user (#{global_config_file}): #{@global_config[key].inspect}"
+      if global_config.key?(key)
+        locations << "Set for the current user (#{global_config_file}): #{global_config[key].inspect}"
       end
 
       return ["You have not configured a value for `#{exposed_key}`"] if locations.empty?
@@ -97,7 +102,7 @@ module Bundler
     # @local_config["BUNDLE_PATH"] should be prioritized over ENV["BUNDLE_PATH"]
     def path
       key  = key_for(:path)
-      path = ENV[key] || @global_config[key]
+      path = ENV[key] || global_config[key]
       return path if path && !@local_config.key?(key)
 
       if path = self[:path]

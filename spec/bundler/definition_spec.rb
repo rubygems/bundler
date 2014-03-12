@@ -4,6 +4,7 @@ require 'bundler/definition'
 describe Bundler::Definition do
   before do
     Bundler.stub(:settings){ Bundler::Settings.new(".") }
+    Bundler.stub(:settings){ Bundler::Settings.global_config_file }
   end
 
   describe "#lock" do

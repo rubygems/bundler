@@ -611,7 +611,9 @@ module Spec
             @spec.authors = ["that guy"]
           end
 
-          Bundler.rubygems.build(@spec, opts[:skip_validation])
+          #Bundler.rubygems.build(@spec, opts[:skip_validation])
+          require 'rubygems/package'
+          Gem::Package.build(@spec, opts[:skip_validation])
           if opts[:to_system]
             `gem install --ignore-dependencies #{@spec.full_name}.gem`
           else

@@ -5,7 +5,11 @@ module Bundler
     attr_accessor :name, :total_runs, :current_run
 
     class << self
-      attr_accessor :attempts
+      #attr_accessor :attempts
+      def attempts(value = nil)
+        @attempts = value if value
+        @attempts ||= Bundler.settings[:retry] || Bundler::Retry::DEFAULT_ATTEMPTS
+      end
     end
 
     def initialize(name, exceptions = nil, attempts = nil)
@@ -14,6 +18,10 @@ module Bundler
       @exceptions = Array(exceptions) || []
       @total_runs =  attempts.next # will run once, then upto attempts.times
     end
+
+#    def total_runs
+#      @total_runs ||=  attempts.next # will run once, then upto attempts.times
+#    end
 
     def default_attempts
       return Integer(self.class.attempts) if self.class.attempts

@@ -45,6 +45,7 @@ module Bundler
     #   to be updated or true if all gems should be updated
     # @param ruby_version [Bundler::RubyVersion, nil] Requested Ruby Version
     def initialize(lockfile, dependencies, sources, unlock, ruby_version = nil)
+      #puts "AARON: init"
       @unlocking = unlock == true || !unlock.empty?
 
       @dependencies, @sources, @unlock = dependencies, sources, unlock
@@ -79,7 +80,13 @@ module Bundler
       @unlock[:gems] ||= []
       @unlock[:sources] ||= []
 
-      current_platform = Bundler.rubygems.platforms.map { |p| generic(p) }.compact.last
+      #puts "AARON: debug 1"
+      #begin
+        current_platform = Bundler.rubygems.platforms.map { |p| generic(p) }.compact.last
+      #rescue
+      #  puts "AARON: exception"
+      #end
+      #puts "AARON: debug 2"
       @new_platform = !@platforms.include?(current_platform)
       @platforms |= [current_platform]
 
@@ -92,6 +99,7 @@ module Bundler
       @local_changes = converge_locals
 
       fixup_dependency_types!
+      #puts "AARON: init done"
     end
 
     def fixup_dependency_types!
@@ -241,6 +249,7 @@ module Bundler
     end
 
     def lock(file)
+      #puts "AARON: calling lock"
       contents = to_lock
 
       # Convert to \r\n if the existing lock has them

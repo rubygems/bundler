@@ -6,10 +6,22 @@ require 'rubygems/config_file'
 module Bundler
   class RubygemsIntegration
 
+    #prevents infinite loading loops
+    @@loading_plugins = false
+
     def initialize
-      Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins)
-      Gem.load_plugins if Gem.respond_to?(:load_plugins)
+      #puts "AARON loading rubygems plugins"
+      load_plugins
+      Gem::DefaultUserInteraction.ui = UI::RGProxy.new(Bundler.ui)
       super
+    end
+
+    def load_plugins
+      unless(@@loading_plugins)
+        @@loading_plugins = true
+        Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins)
+        Gem.load_plugins if Gem.respond_to?(:load_plugins)
+      end
     end
 
     def self.version
@@ -528,12 +540,13 @@ module Bundler
 
   class << self
     def rubygems(value=nil)
+      #puts "AARON: - "+caller[0]
       set_rubygems(value) unless value == nil
-      @rubygems ||= build_rubygems
+      @@rubygems ||= build_rubygems
     end
 
     def set_rubygems(value)
-      @rubygems = value
+      @@rubygems = value
     end
 
     def build_rubygems
