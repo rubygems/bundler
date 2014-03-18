@@ -14,6 +14,11 @@ bundle-install(1) -- Install the dependencies specified in your Gemfile
                  [--retry=TRIES]
                  [--no-cache]
                  [--quiet]
+                 [--clean]
+                 [--frozen]
+                 [--full-index]
+                 [--no-prune]
+                 [--shebang]
 
 ## DESCRIPTION
 
@@ -104,6 +109,18 @@ update process below under [CONSERVATIVE UPDATING][].
 * `--quiet`:
   Do not print progress information to stdout. Instead, communicate the
   success of the install operation via exit status code.
+
+* `--clean`:
+  Run bundle clean automatically after install.
+
+* `--frozen`:
+   Do not allow the Gemfile.lock to be updated after this install.
+
+* `--full-index`:
+  Use the rubygems modern index instead of the API endpoint.
+
+* `--no-prune`:
+  Don't remove stale gems from the cache.
 
 ## DEPLOYMENT MODE
 
