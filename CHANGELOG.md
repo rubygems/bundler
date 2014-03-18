@@ -28,6 +28,10 @@ Features:
   - `bundle show --verbose` Add gem summary to the output (@lardcanoe)
   - `bundle gem GEM --ext` now generates a skeleton for a C extension (@superdealloc)
 
+Documentation:
+
+  - Add missing switches for bundle-install(1) and bundle-update(1) (@as-cii)
+
 ## 1.5.3 (2014-02-06)
 
 Bugfixes:
