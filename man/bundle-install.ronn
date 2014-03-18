@@ -15,7 +15,6 @@ bundle-install(1) -- Install the dependencies specified in your Gemfile
                  [--no-cache]
                  [--quiet]
                  [--clean]
-                 [--frozen]
                  [--full-index]
                  [--no-prune]
                  [--shebang]
@@ -112,9 +111,6 @@ update process below under [CONSERVATIVE UPDATING][].
 
 * `--clean`:
   Run bundle clean automatically after install.
-
-* `--frozen`:
-   Do not allow the Gemfile.lock to be updated after this install.
 
 * `--full-index`:
   Use the rubygems modern index instead of the API endpoint.
