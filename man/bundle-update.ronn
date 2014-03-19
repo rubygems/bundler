@@ -3,7 +3,7 @@ bundle-update(1) -- Update your gems to the latest available versions
 
 ## SYNOPSIS
 
-`bundle update` <*gems> [--source=NAME]
+`bundle update` <*gems> [--source=NAME] [--local]
 
 ## DESCRIPTION
 
@@ -21,6 +21,9 @@ gem.
   The name of a `:git` or `:path` source used in the Gemfile(5). For
   instance, with a `:git` source of `http://github.com/rails/rails.git`,
   you would call `bundle update --source rails`
+
+* `--local`:
+  Do not attempt to fetch gems remotely and use the gem cache instead.
 
 ## UPDATING ALL GEMS
 
