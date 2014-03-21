@@ -35,7 +35,7 @@ module Bundler
       end
 
       def eql?(o)
-        Rubygems === o
+        o.is_a?(Rubygems)
       end
 
       alias == eql?

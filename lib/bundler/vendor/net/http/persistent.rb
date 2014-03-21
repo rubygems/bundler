@@ -241,7 +241,7 @@ class Net::HTTP::Persistent
   # NOTE:  This may not work on ruby > 1.9.
 
   def self.detect_idle_timeout uri, max = 10
-    uri = URI uri unless URI::Generic === uri
+    uri = URI uri unless uri.is_a?(URI::Generic)
     uri += '/'
 
     req = Net::HTTP::Head.new uri.request_uri
@@ -257,7 +257,7 @@ class Net::HTTP::Persistent
 
       $stderr.puts "HEAD #{uri} => #{response.code}" if $DEBUG
 
-      unless Net::HTTPOK === response then
+      unless response.is_a?(Net::HTTPOK) then
         raise Error, "bad response code #{response.code} detecting idle timeout"
       end
 
@@ -1065,7 +1065,7 @@ class Net::HTTP::Persistent
   # Returns the request.
 
   def request_setup req_or_uri # :nodoc:
-    req = if URI === req_or_uri then
+    req = if req_or_uri.is_a?(URI) then
             Net::HTTP::Get.new req_or_uri.request_uri
           else
             req_or_uri

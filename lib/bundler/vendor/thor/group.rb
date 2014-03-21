@@ -125,7 +125,7 @@ class Thor::Group # rubocop:disable ClassLength
             return unless options[#{name.inspect}]
 
             value = options[#{name.inspect}]
-            value = #{name.inspect} if TrueClass === value
+            value = #{name.inspect} if value.is_a?(TrueClass)
             klass, command = self.class.prepare_for_invocation(#{name.inspect}, value)
 
             if klass

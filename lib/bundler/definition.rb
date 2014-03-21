@@ -438,7 +438,7 @@ module Bundler
       end
 
       locals.any? do |source, changed|
-        changed || specs_changed?(source) { |o| source.class === o.class && source.uri == o.uri }
+        changed || specs_changed?(source) { |o| source.class == o.class && source.uri == o.uri }
       end
     end
 
@@ -455,10 +455,10 @@ module Bundler
       changes = false
 
       # Get the Rubygems source from the Gemfile.lock
-      locked_gem = @locked_sources.find { |s| Source::Rubygems === s }
+      locked_gem = @locked_sources.find { |s| s.kind_of?(Source::Rubygems) }
 
       # Get the Rubygems source from the Gemfile
-      actual_gem = @sources.find { |s| Source::Rubygems === s }
+      actual_gem = @sources.find { |s| s.kind_of?(Source::Rubygems) }
 
       # If there is a Rubygems source in both
       if locked_gem && actual_gem

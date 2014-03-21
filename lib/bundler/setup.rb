@@ -8,7 +8,7 @@ if Bundler::SharedHelpers.in_bundle?
     rescue Bundler::BundlerError => e
       puts "\e[31m#{e.message}\e[0m"
       puts e.backtrace.join("\n") if ENV["DEBUG"]
-      if Bundler::GemNotFound === e
+      if e.is_a?(Bundler::GemNotFound)
         puts "\e[33mRun `bundle install` to install missing gems.\e[0m"
       end
       exit e.status_code
