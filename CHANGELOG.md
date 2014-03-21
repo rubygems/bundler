@@ -27,6 +27,7 @@ Features:
   - `bundle outdated --strict` now only reports allowed updates (@davidblondeau)
   - `bundle show --verbose` Add gem summary to the output (@lardcanoe)
   - `bundle gem GEM --ext` now generates a skeleton for a C extension (@superdealloc)
+  - Avoid using threequals operator where possible (@as-cii)
 
 ## 1.5.3 (2014-02-06)
 
