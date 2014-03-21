@@ -67,9 +67,9 @@ module Bundler
 
     def current_env?
       return true unless @env
-      if Hash === @env
+      if @env.is_a?(Hash)
         @env.all? do |key, val|
-          ENV[key.to_s] && (String === val ? ENV[key.to_s] == val : ENV[key.to_s] =~ val)
+          ENV[key.to_s] && (val.is_a?(String) ? ENV[key.to_s] == val : ENV[key.to_s] =~ val)
         end
       else
         ENV[@env.to_s]

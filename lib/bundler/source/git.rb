@@ -47,7 +47,7 @@ module Bundler
       end
 
       def eql?(o)
-        Git === o            &&
+        o.is_a?(Git)         &&
         uri == o.uri         &&
         ref == o.ref         &&
         branch == o.branch   &&

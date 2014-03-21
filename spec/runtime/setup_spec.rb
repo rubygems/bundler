@@ -594,7 +594,7 @@ describe "Bundler.setup" do
 
     run <<-R
       Gem.loaded_specs.each do |n, s|
-        puts "FAIL" unless String === s.loaded_from
+        puts "FAIL" unless s.loaded_from.is_a?(String)
       end
     R
 

@@ -182,7 +182,7 @@ module Bundler
     end
 
     def spec_satisfies_dependency?(spec, dep)
-      return false unless dep.name === spec.name
+      return false unless dep.name == spec.name
       dep.requirement.satisfied_by?(spec.version)
     end
 

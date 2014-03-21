@@ -164,7 +164,7 @@ module Spec
 
     def gemfile(*args)
       path = bundled_app("Gemfile")
-      path = args.shift if Pathname === args.first
+      path = args.shift if args.first.is_a?(Pathname)
       str  = args.shift || ""
       path.dirname.mkpath
       File.open(path.to_s, 'w') do |f|
@@ -174,7 +174,7 @@ module Spec
 
     def lockfile(*args)
       path = bundled_app("Gemfile.lock")
-      path = args.shift if Pathname === args.first
+      path = args.shift if args.first.is_a?(Pathname)
       str  = args.shift || ""
       File.open(path.to_s, 'w') do |f|
         f.puts strip_whitespace(str)

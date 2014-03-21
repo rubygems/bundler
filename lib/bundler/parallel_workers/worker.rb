@@ -32,7 +32,7 @@ module Bundler
       # Retrieves results of job function being executed in worker pool
       def deq
         result = @response_queue.deq
-        if WrappedException === result
+        if result.is_a?(WrappedException)
           raise result.exception
         end
         result
