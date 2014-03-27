@@ -19,10 +19,10 @@ module Bundler
           Install the current Bundler environment. By default, gems will be \
           installed to the shared/bundle path. Gems in the development and \
           test group will not be installed. The install command is executed \
-          with the --deployment and --quiet flags. If the bundle cmd cannot \
-          be found then you can override the bundle_cmd variable to specify \
-          which one it should use. The base path to the app is fetched from \
-          the :latest_release variable. Set it for custom deploy layouts.
+          with the --deployment, --quiet and --clean flags. If the bundle cmd 
+          cannot be found then you can override the bundle_cmd variable to \ 
+          specify which one it should use. The base path to the app is fetched \
+          from the :latest_release variable. Set it for custom deploy layouts.
 
           You can override any of these defaults by setting the variables shown below.
 
@@ -31,14 +31,14 @@ module Bundler
 
             set :bundle_gemfile,  "Gemfile"
             set :bundle_dir,      File.join(fetch(:shared_path), 'bundle')
-            set :bundle_flags,    "--deployment --quiet"
+            set :bundle_flags,    "--deployment --quiet --clean"
             set :bundle_without,  [:development, :test]
             set :bundle_cmd,      "bundle" # e.g. "/opt/ruby/bin/bundle"
             set :bundle_roles,    #{role_default} # e.g. [:app, :batch]
         DESC
         send task_method, :install, opts do
           bundle_cmd     = context.fetch(:bundle_cmd, "bundle")
-          bundle_flags   = context.fetch(:bundle_flags, "--deployment --quiet")
+          bundle_flags   = context.fetch(:bundle_flags, "--deployment --quiet --clean")
           bundle_dir     = context.fetch(:bundle_dir, File.join(context.fetch(:shared_path), 'bundle'))
           bundle_gemfile = context.fetch(:bundle_gemfile, "Gemfile")
           bundle_without = [*context.fetch(:bundle_without, [:development, :test])].compact
