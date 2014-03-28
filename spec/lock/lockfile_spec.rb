@@ -134,7 +134,7 @@ describe "the lockfile format" do
 
     lockfile <<-L
       GIT
-        remote: git://github.com/nex3/haml.git
+        remote: https://github.com/nex3/haml.git
         revision: 8a2271f
         specs:
 
