@@ -90,6 +90,10 @@ module Bundler
 
       alias :path :install_path
 
+      def extension_dir_name
+        "#{base_name}-#{shortref_for_path(revision)}"
+      end
+
       def unlock!
         git_proxy.revision = nil
         @unlocked = true
