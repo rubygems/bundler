@@ -45,6 +45,15 @@ module Gem
       end
     end
 
+    if method_defined?(:extension_dir)
+      alias_method :rg_extension_dir, :extension_dir
+      def extension_dir
+        @extension_dir ||= source.respond_to?(:extension_dir_name) ?
+          File.expand_path(File.join(extensions_dir, source.extension_dir_name)) :
+          rg_extension_dir
+      end
+    end
+
     # RubyGems 1.8+ used only.
     remove_method :gem_dir if instance_methods(false).include?(:gem_dir)
     def gem_dir

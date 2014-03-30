@@ -854,6 +854,43 @@ describe "bundle install with git sources" do
       expect(out).to eq("YES")
     end
 
+    it "does not use old extension after ref changes" do
+      git_reader = build_git "foo", :no_default => true do |s|
+        s.extensions = ["ext/extconf.rb"]
+        s.write "ext/extconf.rb", <<-RUBY
+          require "mkmf"
+          create_makefile("foo")
+        RUBY
+        s.write "ext/foo.c", "void Init_foo() {}"
+      end
+
+      2.times do |i|
+        Dir.chdir(git_reader.path) do
+          File.open("ext/foo.c", "w") do |file|
+            file.write <<-C
+              #include "ruby.h"
+              VALUE foo() { return INT2FIX(#{i}); }
+              void Init_foo() { rb_define_global_function("foo", &foo, 0); }
+            C
+          end
+          `git commit -m 'commit for iteration #{i}' ext/foo.c`
+        end
+        git_sha = git_reader.ref_for("HEAD")
+
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "foo", :git => "#{lib_path('foo-1.0')}", :ref => "#{git_sha}"
+        G
+
+        run <<-R
+          require 'foo'
+          puts foo
+        R
+
+        expect(out).to eq(i.to_s)
+      end
+    end
+
     it "does not prompt to gem install if extension fails" do
       build_git "foo" do |s|
         s.add_dependency "rake"
