@@ -203,8 +203,9 @@ module Bundler
       path.join("vendor/cache")
     end
 
-    def tmp
-      Pathname.new(Dir.mktmpdir(Process.pid.to_s))
+    def tmp(name = Process.pid.to_s)
+      @tmp ||= Pathname.new Dir.mktmpdir("bundler")
+      @tmp.join(name)
     end
 
     def settings
