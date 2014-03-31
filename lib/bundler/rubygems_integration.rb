@@ -109,6 +109,10 @@ module Bundler
       Gem::ConfigMap
     end
 
+    def repository_subdirectories
+      %w[cache doc gems specifications]
+    end
+
     def clear_paths
       Gem.clear_paths
     end
@@ -537,6 +541,9 @@ module Bundler
         Gem::Package.build(spec, skip_validation)
       end
 
+      def repository_subdirectories
+        Gem::REPOSITORY_SUBDIRECTORIES
+      end
     end
 
   end

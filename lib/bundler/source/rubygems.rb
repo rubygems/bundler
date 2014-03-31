@@ -99,7 +99,7 @@ module Bundler
 
         # SUDO HAX
         if Bundler.requires_sudo?
-          Gem::REPOSITORY_SUBDIRECTORIES.each do |name|
+          Bundler.rubygems.repository_subdirectories.each do |name|
             Bundler.mkdir_p File.join(Bundler.rubygems.gem_dir, name)
             Bundler.sudo "cp -R #{install_path}/#{name}/* #{Bundler.rubygems.gem_dir}/#{name}/"
           end
