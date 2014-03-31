@@ -79,7 +79,7 @@ module Bundler
 
         path = cached_gem(spec)
         if Bundler.requires_sudo?
-          install_path = Bundler.tmp
+          install_path = Bundler.tmp(spec.full_name)
           bin_path     = install_path.join("bin")
         else
           install_path = Bundler.rubygems.gem_dir
@@ -99,13 +99,14 @@ module Bundler
 
         # SUDO HAX
         if Bundler.requires_sudo?
-          Bundler.mkdir_p "#{Bundler.rubygems.gem_dir}/gems"
-          Bundler.mkdir_p "#{Bundler.rubygems.gem_dir}/specifications"
-          Bundler.sudo "cp -R #{Bundler.tmp}/gems/#{spec.full_name} #{Bundler.rubygems.gem_dir}/gems/"
-          Bundler.sudo "cp -R #{Bundler.tmp}/specifications/#{spec.full_name}.gemspec #{Bundler.rubygems.gem_dir}/specifications/"
+          Gem::REPOSITORY_SUBDIRECTORIES.each do |name|
+            Bundler.mkdir_p File.join(Bundler.rubygems.gem_dir, name)
+            Bundler.sudo "cp -R #{install_path}/#{name}/* #{Bundler.rubygems.gem_dir}/#{name}/"
+          end
+
           spec.executables.each do |exe|
             Bundler.mkdir_p Bundler.system_bindir
-            Bundler.sudo "cp -R #{Bundler.tmp}/bin/#{exe} #{Bundler.system_bindir}"
+            Bundler.sudo "cp -R #{install_path}/bin/#{exe} #{Bundler.system_bindir}/"
           end
         end
         installed_spec.loaded_from = "#{Bundler.rubygems.gem_dir}/specifications/#{spec.full_name}.gemspec"

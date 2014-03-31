@@ -54,7 +54,7 @@ module Bundler
       def download_gem_from_uri(spec, uri)
         spec.fetch_platform
 
-        download_path = Bundler.requires_sudo? ? Bundler.tmp : Bundler.rubygems.gem_dir
+        download_path = Bundler.requires_sudo? ? Bundler.tmp(spec.full_name) : Bundler.rubygems.gem_dir
         gem_path = "#{Bundler.rubygems.gem_dir}/cache/#{spec.full_name}.gem"
 
         FileUtils.mkdir_p("#{download_path}/cache")
@@ -62,7 +62,7 @@ module Bundler
 
         if Bundler.requires_sudo?
           Bundler.mkdir_p "#{Bundler.rubygems.gem_dir}/cache"
-          Bundler.sudo "mv #{Bundler.tmp}/cache/#{spec.full_name}.gem #{gem_path}"
+          Bundler.sudo "mv #{Bundler.tmp(spec.full_name)}/cache/#{spec.full_name}.gem #{gem_path}"
         end
 
         gem_path
