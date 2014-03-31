@@ -111,6 +111,8 @@ module Bundler
         installed_spec.loaded_from = "#{Bundler.rubygems.gem_dir}/specifications/#{spec.full_name}.gemspec"
         spec.loaded_from = "#{Bundler.rubygems.gem_dir}/specifications/#{spec.full_name}.gemspec"
         ["Installing #{version_message(spec)}", spec.post_install_message]
+      ensure
+        FileUtils.remove_entry_secure(install_path) if Bundler.requires_sudo?
       end
 
       def cache(spec, custom_path = nil)

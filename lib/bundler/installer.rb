@@ -141,8 +141,6 @@ module Bundler
       end
       Bundler.ui.debug e.backtrace.join("\n")
       raise Bundler::InstallError, msg
-    ensure
-      FileUtils.remove_entry_secure(Bundler.tmp)
     end
 
     def generate_bundler_executable_stubs(spec, options = {})
