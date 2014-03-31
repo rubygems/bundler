@@ -165,7 +165,7 @@ module Bundler
     end
 
     def ruby_scope
-      "#{Bundler.rubygems.ruby_engine}/#{Gem::ConfigMap[:ruby_version]}"
+      "#{Bundler.rubygems.ruby_engine}/#{Bundler.rubygems.config_map[:ruby_version]}"
     end
 
     def user_bundle_path

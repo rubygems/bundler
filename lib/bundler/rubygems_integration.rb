@@ -105,6 +105,10 @@ module Bundler
       Gem::MARSHAL_SPEC_DIR
     end
 
+    def config_map
+      Gem::ConfigMap
+    end
+
     def clear_paths
       Gem.clear_paths
     end
