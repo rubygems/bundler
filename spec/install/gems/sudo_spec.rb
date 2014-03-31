@@ -66,7 +66,22 @@ describe "when using sudo", :sudo => true do
       should_be_installed "rack 1.0"
     end
 
-    it "installs when BUNDLE_PATH does not exist"
+    it "installs when BUNDLE_PATH does not exist" do
+      root_path = tmp("owned_by_root")
+      FileUtils.mkdir_p root_path
+      sudo "chown -R root #{root_path}"
+      bundle_path = root_path.join("does_not_exist")
+
+      ENV['BUNDLE_PATH'] = bundle_path.to_s
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", '1.0'
+      G
+
+      expect(bundle_path.join("gems/rack-1.0.0")).to exist
+      expect(bundle_path.join("gems/rack-1.0.0").stat.uid).to eq(0)
+      should_be_installed "rack 1.0"
+    end
   end
 
   describe "and BUNDLE_PATH is not writable" do

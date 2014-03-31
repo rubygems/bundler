@@ -48,13 +48,7 @@ module Bundler
     #
     # Finally: TODO add documentation for how the standalone process works.
     def run(options)
-      # Create the BUNDLE_PATH directory
-      begin
-        Bundler.bundle_path.mkpath unless Bundler.bundle_path.exist?
-      rescue Errno::EEXIST
-        raise PathError, "Could not install to path `#{Bundler.settings[:path]}` " +
-          "because of an invalid symlink. Remove the symlink so the directory can be created."
-      end
+      create_bundle_path
 
       if Bundler.settings[:frozen]
         @definition.ensure_equivalent_gemfile_and_lockfile(options[:deployment])
@@ -325,5 +319,13 @@ module Bundler
         remains[dep.name]
       end
     end
+
+    def create_bundle_path
+      Bundler.mkdir_p(Bundler.bundle_path.to_s) unless Bundler.bundle_path.exist?
+    rescue Errno::EEXIST
+      raise PathError, "Could not install to path `#{Bundler.settings[:path]}` " +
+        "because of an invalid symlink. Remove the symlink so the directory can be created."
+    end
+
   end
 end
