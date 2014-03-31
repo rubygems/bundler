@@ -204,7 +204,7 @@ module Bundler
     end
 
     def tmp
-      user_bundle_path.join("tmp", Process.pid.to_s)
+      Pathname.new(Dir.mktmpdir(Process.pid.to_s))
     end
 
     def settings
