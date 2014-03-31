@@ -45,7 +45,7 @@ RSpec.configure do |config|
   config.include Spec::Sudo
   config.include Spec::Permissions
 
-  if Spec::Sudo.test_sudo?
+  if ENV['BUNDLER_SUDO_TESTS'] && Spec::Sudo.present?
     config.filter_run :sudo => true
   else
     config.filter_run_excluding :sudo => true
