@@ -104,7 +104,9 @@ module Bundler
             dst = File.join(Bundler.rubygems.gem_dir, name)
             if name == "extensions"
               src = File.join(src, "*/*")
-              dst = File.dirname(File.join(dst, Dir.glob(src).first.gsub(src[0..-6], '')))
+              ext_src = Dir.glob(src).first.gsub(src[0..-6], '')
+              ext_dst = File.join(dst, ext_src)
+              dst = File.dirname(ext_dst)
             end
             Bundler.mkdir_p dst
             Bundler.sudo "cp -R #{src} #{dst}" if Dir[src].any?
