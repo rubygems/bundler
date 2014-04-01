@@ -203,16 +203,26 @@ matching the current platform were explicitly excluded.
 ### GIT (:git)
 
 If necessary, you can specify that a gem is located at a particular
-git repository. The repository can be public (`http://github.com/rails/rails.git`)
-or private (`git@github.com:rails/rails.git`). If the repository is private,
-the user that you use to run `bundle install` `MUST` have the appropriate
-keys available in their `$HOME/.ssh`.
+git repository using the `:git` parameter. The repository can be accessed via
+several protocols:
 
-Git repositories are specified using the `:git` parameter. The `group`,
-`platforms`, and `require` options are available and behave exactly the same
-as they would for a normal gem.
-
+  * `HTTP(S)`:
+    gem "rails", :git => "https://github.com/rails/rails.git"
+  * `SSH`:
+    gem "rails", :git => "git@github.com:rails/rails.git"
+  * `git`:
     gem "rails", :git => "git://github.com/rails/rails.git"
+
+If using SSH, the user that you use to run `bundle install` `MUST` have the
+appropriate keys available in their `$HOME/.ssh`.
+
+`NOTE`: `http://` and `git://` URLs should be avoided if at all possible. These
+protocols are unauthenticated, so a man-in-the-middle attacker can deliver
+malicious code and compromise your system. HTTPS and SSH are strongly
+preferred.
+
+The `group`, `platforms`, and `require` options are available and behave
+exactly the same as they would for a normal gem.
 
 A git repository `SHOULD` have at least one file, at the root of the
 directory containing the gem, with the extension `.gemspec`. This file
@@ -229,7 +239,7 @@ to, a version specifier, if provided, means that the git repository is
 only valid if the `.gemspec` specifies a version matching the version
 specifier. If not, bundler will print a warning.
 
-    gem "rails", "2.3.8", :git => "git://github.com/rails/rails.git"
+    gem "rails", "2.3.8", :git => "https://github.com/rails/rails.git"
     # bundle install will fail, because the .gemspec in the rails
     # repository's master branch specifies version 3.0.0
 
@@ -265,6 +275,10 @@ which comes standard with Rubygems, evaluates the `.gemspec` in
 the context of the directory in which it is located.
 
 ### GITHUB (:github)
+
+`NOTE`: This shorthand should be avoided until Bundler 2.0, since it
+currently expands to an insecure `git://` URL. This allows a
+man-in-the-middle attacker to compromise your system.
 
 If the git repository you want to use is hosted on GitHub and is public, you can use the
 :github shorthand to specify just the github username and repository name (without the
@@ -303,7 +317,7 @@ gems specified as paths.
 The `:git`, `:path`, `:group`, and `:platforms` options may be
 applied to a group of gems by using block form.
 
-    git "git://github.com/rails/rails.git" do
+    git "https://github.com/rails/rails.git" do
       gem "activesupport"
       gem "actionpack"
     end
