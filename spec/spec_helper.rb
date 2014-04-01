@@ -63,6 +63,10 @@ RSpec.configure do |config|
     config.filter_run_excluding :ruby => "1.9"
   end
 
+  if Gem::VERSION >= "2.2"
+    config.filter_run :rubygems => "2.2"
+  end
+
   config.filter_run :focused => true unless ENV['CI']
   config.run_all_when_everything_filtered = true
   config.alias_example_to :fit, :focused => true
