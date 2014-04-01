@@ -102,11 +102,11 @@ module Bundler
           Bundler.rubygems.repository_subdirectories.each do |name|
             src = File.join(install_path, name, "*")
             dst = File.join(Bundler.rubygems.gem_dir, name)
-            if name == "extensions"
+            if name == "extensions" && Dir.glob(src).any?
               src = File.join(src, "*/*")
-              ext_src = Dir.glob(src).first.gsub(src[0..-6], '')
-              ext_dst = File.join(dst, ext_src)
-              dst = File.dirname(ext_dst)
+              ext_src = Dir.glob(src).first
+              ext_src.gsub!(src[0..-6], '')
+              dst = File.dirname(File.join(dst, ext_src))
             end
             Bundler.mkdir_p dst
             Bundler.sudo "cp -R #{src} #{dst}" if Dir[src].any?
