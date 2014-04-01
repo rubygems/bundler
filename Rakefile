@@ -46,6 +46,11 @@ namespace :spec do
       sh "#{Gem.ruby} -S gem list -i '^#{name}$' -v '#{version}' || " \
          "#{Gem.ruby} -S gem install #{name} -v '#{version}' --no-ri --no-rdoc"
     end
+
+    # Download and install gems used inside tests
+    $LOAD_PATH.unshift("./spec")
+    require 'support/rubygems_ext'
+    Spec::Rubygems.setup
   end
 
   namespace :travis do
