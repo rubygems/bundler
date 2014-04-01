@@ -63,9 +63,7 @@ RSpec.configure do |config|
     config.filter_run_excluding :ruby => "1.9"
   end
 
-  if Gem::VERSION >= "2.2"
-    config.filter_run :rubygems => "2.2"
-  else
+  if Gem::VERSION < "2.2"
     config.filter_run_excluding :rubygems => "2.2"
   end
 
