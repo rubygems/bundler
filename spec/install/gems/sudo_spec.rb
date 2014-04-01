@@ -82,6 +82,16 @@ describe "when using sudo", :sudo => true do
       expect(bundle_path.join("gems/rack-1.0.0").stat.uid).to eq(0)
       should_be_installed "rack 1.0"
     end
+
+    it "installs extensions/ compiled by Rubygems 2.2", :rubygems => "2.2" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "very_simple_binary"
+      G
+
+      binary = Dir.glob(system_gem_path("extensions/*/*/very_simple_binary-1.0/very_simple_binary_c.bundle")).first
+      expect(File.exist?(binary)).to be
+    end
   end
 
   describe "and BUNDLE_PATH is not writable" do

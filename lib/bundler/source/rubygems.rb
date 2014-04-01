@@ -100,9 +100,13 @@ module Bundler
         # SUDO HAX
         if Bundler.requires_sudo?
           Bundler.rubygems.repository_subdirectories.each do |name|
-            src = "#{install_path}/#{name}/*"
-            dst = "#{Bundler.rubygems.gem_dir}/#{name}/"
-            Bundler.mkdir_p dist
+            src = File.join(install_path, name, "*")
+            dst = File.join(Bundler.rubygems.gem_dir, name)
+            if name == "extensions"
+              src = File.join(src, "*/*")
+              dst = File.dirname(File.join(dst, Dir.glob(src).first.gsub(src[0..-6], '')))
+            end
+            Bundler.mkdir_p dst
             Bundler.sudo "cp -R #{src} #{dst}" if Dir[src].any?
           end
 
