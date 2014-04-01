@@ -122,7 +122,7 @@ module Bundler
         installed_spec.loaded_from = spec.loaded_from
         ["Installing #{version_message(spec)}", spec.post_install_message]
       ensure
-        if defined?(install_path) && Bundler.requires_sudo?
+        if install_path && Bundler.requires_sudo?
           FileUtils.remove_entry_secure(install_path)
         end
       end
