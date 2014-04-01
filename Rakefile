@@ -136,7 +136,7 @@ begin
             if rg == "master"
               system("git checkout origin/master")
             else
-              system("git checkout #{rg}")
+              system("git checkout #{rg}") || raise("Unknown Rubygems ref #{rg}")
             end
             hash = `git rev-parse HEAD`.chomp
           end
