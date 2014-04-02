@@ -1,4 +1,14 @@
-## 1.6.0
+## 1.6.1 (2014-04-02)
+
+Bugfixes:
+
+  - update C extensions when git gem versions change (#2948, @dylanahsmith)
+
+Features:
+
+  - add support for C extensions in sudo mode on Rubygems 2.2
+
+## 1.6.0 (2014-04-28)
 
 Bugfixes:
 
