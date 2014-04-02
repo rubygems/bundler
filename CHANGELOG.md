@@ -8,7 +8,7 @@ Features:
 
   - add support for C extensions in sudo mode on Rubygems 2.2
 
-## 1.6.0 (2014-04-28)
+## 1.6.0 (2014-03-28)
 
 Bugfixes:
 
