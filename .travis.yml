@@ -34,8 +34,6 @@ env:
   - RGV=master
   # Test the latest rubygems release with all of our supported rubies
   - RGV=v2.2.2
-  # Test the latest stable branch so we know the next minor will work
-  - RGV=2.2
 matrix:
   include:
     # Ruby 2.0.0, Rubygems 2.0 and up
