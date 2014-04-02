@@ -89,10 +89,9 @@ describe "when using sudo", :sudo => true do
         gem "very_simple_binary"
       G
 
-      binary_glob = system_gem_path("extensions/*/*/very_simple_binary-1.0/very_simple_binary_c.bundle")
-      binary = Dir.glob(binary_glob).first
-      expect(binary).to be
-      expect(Pathname.new(binary)).to exist
+      expect(system_gem_path("gems/very_simple_binary-1.0")).to exist
+      binary_glob = system_gem_path("extensions/*/*/very_simple_binary-1.0")
+      expect(Dir.glob(binary_glob).first).to be
     end
   end
 
