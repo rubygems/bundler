@@ -143,8 +143,26 @@ module Bundler
 
     def install
       require 'bundler/cli/install'
+      warn_if_root
       Install.new(options.dup).run
     end
+
+    no_commands {
+      def warn_if_root
+        warning = <<-W
+
+WARNING ****************************************************************
+Running bundler with sudo will likely have unintended consequences.
+If bundler requires you to run a command with sudo it will let you know.
+************************************************************************
+
+        W
+
+        if Process.uid == 0
+          puts warning
+        end
+      end
+    }
 
     desc "update [OPTIONS]", "update the current environment"
     long_desc <<-D
