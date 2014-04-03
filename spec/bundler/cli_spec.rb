@@ -13,12 +13,12 @@ describe "bundle executable" do
       G
 
       warning = <<-W
-WARNING: Running bundler with sudo will likely have unintended consequences.
-         There are several steps during installation that must be run as the
-         current user, including updating the Gemfile.lock, updating vendor/cache
-         and checking out private git repositories using the current user's
-         SSH keys.
-         If bundler requires you to run a command with sudo it will let you know.
+
+WARNING ****************************************************************
+Running bundler with sudo will likely have unintended consequences.
+If bundler requires you to run a command with sudo it will let you know.
+************************************************************************
+
       W
 
       output = capture_output {
