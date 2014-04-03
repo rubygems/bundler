@@ -292,11 +292,10 @@ module Bundler
       end
 
       def builtin_gem?(spec)
-        # Ruby 2.1-style
-        return true if spec.summary =~ /is bundled with Ruby/
-
-        # Ruby 2.0 style
-        spec.loaded_from.include?("specifications/default/")
+        # gems bundled with ruby have summary as - "is bundled with ruby"
+        # or else use "specifications/default" to store the gemspecs.
+        spec.summary =~ /is bundled with Ruby/ ||
+          (spec.loaded_from && spec.loaded_from.include?("specifications/default/"))
       end
     end
   end
