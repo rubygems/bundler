@@ -14,7 +14,8 @@ $LOAD_PATH.each do |path|
   end
 end
 
-require 'bundler/cli'
-
 require 'bundler/friendly_errors'
-Bundler.with_friendly_errors { Bundler::CLI.start(ARGV, :debug => true) }
+Bundler.with_friendly_errors do
+  require 'bundler/cli'
+  Bundler::CLI.start(ARGV, :debug => true)
+end
