@@ -947,5 +947,21 @@ describe "bundle install with git sources" do
       bundle "update", :env => {"PATH" => ""}
       expect(out).to include("You need to install git to be able to use gems from git repositories. For help installing git, please refer to GitHub's tutorial at https://help.github.com/articles/set-up-git")
     end
+
+    it "installs a packaged git gem successfully" do
+      build_git "foo"
+
+      install_gemfile <<-G
+        git "#{lib_path('foo-1.0')}" do
+          gem 'foo'
+        end
+      G
+      bundle "package --all"
+      simulate_new_machine
+
+      bundle "install", :env => {"PATH" => ""}, :exitstatus => true
+      expect(out).to_not include("You need to install git to be able to use gems from git repositories.")
+      expect(exitstatus).to be_zero
+    end
   end
 end
