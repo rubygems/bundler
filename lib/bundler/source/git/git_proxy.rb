@@ -147,11 +147,8 @@ module Bundler
         end
 
         def allowed_in_path
-          if allow?
-            in_path { yield }
-          else
-            raise GitError, "The git source #{uri} is not yet checked out. Please run `bundle install` before trying to start your application"
-          end
+          return in_path { yield } if allow?
+          raise GitError, "The git source #{uri} is not yet checked out. Please run `bundle install` before trying to start your application"
         end
 
       end
