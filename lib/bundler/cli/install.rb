@@ -6,6 +6,8 @@ module Bundler
     end
 
     def run
+      warn_if_root
+
       if options[:without]
         options[:without] = options[:without].map{|g| g.tr(' ', ':') }
       end
@@ -112,6 +114,13 @@ module Bundler
     end
 
   private
+
+    def warn_if_root
+      return unless Process.uid.zero?
+      Bundler.ui.warn "Don't run Bundler as root. Bundler can ask for sudo " \
+        "if it is needed, and installing your bundle as root will break this " \
+        "application for all non-root users on this machine.", :wrap => true
+    end
 
     def without_groups_messages
       if Bundler.settings.without.any?
