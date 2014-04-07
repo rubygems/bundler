@@ -211,6 +211,10 @@ module Bundler
         git_proxy.revision
       end
 
+      def allow_git_ops?
+        @allow_remote || @allow_cached
+      end
+
     private
 
       def serialize_gemspecs_in(destination)
@@ -267,10 +271,6 @@ module Bundler
         Digest::SHA1.hexdigest(input)
       end
 
-      def allow_git_ops?
-        @allow_remote || @allow_cached
-      end
-
       def cached_revision
         options["revision"]
       end
@@ -280,7 +280,7 @@ module Bundler
       end
 
       def git_proxy
-        @git_proxy ||= GitProxy.new(cache_path, uri, ref, cached_revision){ allow_git_ops? }
+        @git_proxy ||= GitProxy.new(cache_path, uri, ref, cached_revision, self)
       end
 
     end
