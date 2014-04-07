@@ -138,7 +138,7 @@ module Bundler
         end
 
         def allow?
-          @git.allow_git_ops?
+          @git ? @git.allow_git_ops? : true
         end
 
         def in_path(&blk)
