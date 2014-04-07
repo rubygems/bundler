@@ -138,7 +138,7 @@ module Bundler
         end
 
         def allow?
-          !@allow.nil?
+          @allow
         end
 
         def in_path(&blk)
