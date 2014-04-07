@@ -34,12 +34,12 @@ module Bundler
         attr_accessor :path, :uri, :ref
         attr_writer :revision
 
-        def initialize(path, uri, ref, revision = nil, allow = true)
+        def initialize(path, uri, ref, revision=nil, &allow)
           @path     = path
           @uri      = uri
           @ref      = ref
           @revision = revision
-          @allow    = allow
+          @allow    = allow || Proc.new { true }
           raise GitNotInstalledError.new if allow? && !Bundler.git_present?
         end
 
@@ -138,7 +138,7 @@ module Bundler
         end
 
         def allow?
-          @allow
+          @allow.call
         end
 
         def in_path(&blk)
