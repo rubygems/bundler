@@ -38,6 +38,7 @@ Features:
   - `bundle show --verbose` Add gem summary to the output (@lardcanoe)
   - `bundle gem GEM --ext` now generates a skeleton for a C extension (@superdealloc)
   - Avoid using threequals operator where possible (@as-cii)
+  - Add `bundle update --group` to update specific group (#2731 @banyan)
 
 Documentation:
 
