@@ -162,7 +162,9 @@ begin
       end
 
       task "setup_co" do
-        ENV["RUBYOPT"] = "-I#{File.expand_path ENV['RG']} #{rubyopt}"
+        rg = File.expand_path ENV['RG']
+        puts "Running specs against Rubygems in #{rg}..."
+        ENV["RUBYOPT"] = "-I#{rg} #{rubyopt}"
       end
 
       task "co" => "setup_co"
