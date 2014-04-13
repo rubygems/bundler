@@ -70,8 +70,7 @@ module Bundler
         # Download the gem to get the spec, because some specs that are returned
         # by rubygems.org are broken and wrong.
         if spec.source_uri
-          path = Fetcher.download_gem_from_uri(spec, spec.source_uri)
-          s = Bundler.rubygems.spec_from_gem(path, Bundler.settings["trust-policy"])
+          s = Bundler.rubygems.spec_from_gem(fetch_gem(spec), Bundler.settings["trust-policy"])
           spec.__swap__(s)
         end
 
@@ -126,11 +125,12 @@ module Bundler
       end
 
       def cache(spec, custom_path = nil)
-        # Gems bundled with Ruby don't have .gem files cached locally, but it doesn't matter
-        # since they're always going to be installed on this Ruby version.
-        return if builtin_gem?(spec)
-
-        cached_path = cached_gem(spec)
+        if builtin_gem?(spec)
+          remote_spec = remote_specs.search(spec).first
+          cached_path = fetch_gem(remote_spec)
+        else
+          cached_path = cached_gem(spec)
+        end
         raise GemNotFound, "Missing gem file '#{spec.full_name}.gem'." unless cached_path
         return if File.dirname(cached_path) == Bundler.app_cache.to_s
         Bundler.ui.info "  * #{File.basename(cached_path)}"
@@ -287,6 +287,11 @@ module Bundler
         ensure
           Bundler.rubygems.sources = old
         end
+      end
+
+      def fetch_gem(spec)
+        return false unless spec.source_uri
+        Fetcher.download_gem_from_uri(spec, spec.source_uri)
       end
 
       def builtin_gem?(spec)
