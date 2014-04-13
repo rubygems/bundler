@@ -235,6 +235,7 @@ module Bundler
 
       specs.each do |spec|
         next if spec.name == "bundler"
+        next if spec.require_paths.nil? # builtin gems
 
         spec.require_paths.each do |path|
           full_path = File.join(spec.full_gem_path, path)
