@@ -1,3 +1,17 @@
+## 1.6.2 (2014-04-13)
+
+Bugfixes:
+
+  - fix an exception when using builtin gems (#2915, #2963, @gnufied)
+  - cache gems that are built in to the running ruby (#2975, @indirect)
+  - re-allow deploying cached git gems without git installed (#2968, @aughr)
+  - keep standalone working even with builtin gems (@indirect)
+  - don't update vendor/cache in deployment mode (#2921, @indirect)
+
+Features:
+
+  - warn informatively when `bundle install` is run as root (#2936, @1337807)
+
 ## 1.6.1 (2014-04-02)
 
 Bugfixes:
