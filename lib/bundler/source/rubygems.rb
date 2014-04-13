@@ -17,9 +17,7 @@ module Bundler
         @dependency_names = []
         @allow_remote = false
         @allow_cached = false
-
-        @caches = [ Bundler.app_cache ] +
-          Bundler.rubygems.gem_path.map{|p| File.expand_path("#{p}/cache") }
+        @caches = [Bundler.app_cache, *Bundler.rubygems.gem_cache]
       end
 
       def remote!
