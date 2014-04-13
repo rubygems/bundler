@@ -91,7 +91,7 @@ module Bundler
         install_sequentially options[:standalone]
       end
 
-      lock
+      lock unless Bundler.settings[:frozen]
       generate_standalone(options[:standalone]) if options[:standalone]
     end
 
