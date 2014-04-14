@@ -58,6 +58,7 @@ module Spec
     def bundle(cmd, options = {})
       expect_err = options.delete(:expect_err)
       exitstatus = options.delete(:exitstatus)
+      sudo       = "sudo" if options.delete(:sudo)
       options["no-color"] = true unless options.key?("no-color") || %w(exec conf).include?(cmd.to_s[0..3])
 
       bundle_bin = File.expand_path('../../../bin/bundle', __FILE__)
@@ -67,12 +68,12 @@ module Spec
       requires << File.expand_path('../artifice/'+options.delete(:artifice)+'.rb', __FILE__) if options.key?(:artifice)
       requires_str = requires.map{|r| "-r#{r}"}.join(" ")
 
-      env = (options.delete(:env) || {}).map{|k,v| "#{k}='#{v}' "}.join
+      env = (options.delete(:env) || {}).map{|k,v| "#{k}='#{v}'"}.join(" ")
       args = options.map do |k,v|
         v == true ? " --#{k}" : " --#{k} #{v}" if v
       end.join
 
-      cmd = "#{env}#{Gem.ruby} -I#{lib} #{requires_str} #{bundle_bin} #{cmd}#{args}"
+      cmd = "#{env} #{sudo} #{Gem.ruby} -I#{lib} #{requires_str} #{bundle_bin} #{cmd}#{args}"
 
       if exitstatus
         sys_status(cmd)
@@ -328,6 +329,17 @@ module Spec
 
     def revision_for(path)
       Dir.chdir(path) { `git rev-parse HEAD`.strip }
+    end
+
+    def capture_output
+      fake_stdout = StringIO.new
+      actual_stdout = $stdout
+      $stdout = fake_stdout
+      yield
+      fake_stdout.rewind
+      fake_stdout.read
+    ensure
+      $stdout = actual_stdout
     end
   end
 end

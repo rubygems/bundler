@@ -91,7 +91,7 @@ module Bundler
         install_sequentially options[:standalone]
       end
 
-      lock
+      lock unless Bundler.settings[:frozen]
       generate_standalone(options[:standalone]) if options[:standalone]
     end
 
@@ -235,6 +235,7 @@ module Bundler
 
       specs.each do |spec|
         next if spec.name == "bundler"
+        next if spec.require_paths.nil? # builtin gems
 
         spec.require_paths.each do |path|
           full_path = File.join(spec.full_gem_path, path)

@@ -74,39 +74,34 @@ describe "bundle cache" do
     end
   end
 
-  describe "when there is a built-in gem" do
-    let(:version) { "1.0.0" }
-
+  describe "when there is a built-in gem", :ruby => "2.0" do
     before :each do
       build_repo2 do
-        build_gem "builtin_gem", version do |s|
-          s.summary = "This builtin_gem is bundled with Ruby"
-        end
-
-        build_gem "remote_gem", version do |s|
-          s.summary = "Totally normal gem"
-        end
+        build_gem "builtin_gem", "1.0.2"
       end
 
-      build_gem "builtin_gem", version, :to_system => true do |s|
+      build_gem "builtin_gem", "1.0.2", :to_system => true do |s|
         s.summary = "This builtin_gem is bundled with Ruby"
       end
 
-      install_gemfile <<-G
-        source "file://#{gem_repo2}"
-        gem 'builtin_gem', '#{version}'
-        gem 'remote_gem', '#{version}'
-      G
-
-      FileUtils.rm("#{system_gem_path}/cache/builtin_gem-#{version}.gem")
+      FileUtils.rm("#{system_gem_path}/cache/builtin_gem-1.0.2.gem")
     end
 
-    it "caches normal gems successfully" do
-      bundle :cache, :exitstatus => true
+    it "uses builtin gems" do
+      install_gemfile %|gem 'builtin_gem', '1.0.2'|
+      should_be_installed("builtin_gem 1.0.2")
+    end
 
-      expect(exitstatus).to be_zero
-      expect(bundled_app("vendor/cache/builtin_gem-#{version}.gem")).to_not exist
-      expect(bundled_app("vendor/cache/remote_gem-#{version}.gem")).to exist
+    it "caches remote and builtin gems" do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem 'builtin_gem', '1.0.2'
+        gem 'rack', '1.0.0'
+      G
+
+      bundle :cache
+      expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
+      expect(bundled_app("vendor/cache/builtin_gem-1.0.2.gem")).to exist
     end
   end
 

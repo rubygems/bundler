@@ -34,13 +34,13 @@ module Bundler
         attr_accessor :path, :uri, :ref
         attr_writer :revision
 
-        def initialize(path, uri, ref, revision=nil, &allow)
+        def initialize(path, uri, ref, revision = nil, git = nil)
           @path     = path
           @uri      = uri
           @ref      = ref
           @revision = revision
-          @allow    = allow || Proc.new { true }
-          raise GitNotInstalledError.new unless Bundler.git_present?
+          @git      = git
+          raise GitNotInstalledError.new if allow? && !Bundler.git_present?
         end
 
         def revision
@@ -138,7 +138,7 @@ module Bundler
         end
 
         def allow?
-          @allow.call
+          @git ? @git.allow_git_ops? : true
         end
 
         def in_path(&blk)
@@ -147,11 +147,8 @@ module Bundler
         end
 
         def allowed_in_path
-          if allow?
-            in_path { yield }
-          else
-            raise GitError, "The git source #{uri} is not yet checked out. Please run `bundle install` before trying to start your application"
-          end
+          return in_path { yield } if allow?
+          raise GitError, "The git source #{uri} is not yet checked out. Please run `bundle install` before trying to start your application"
         end
 
       end
