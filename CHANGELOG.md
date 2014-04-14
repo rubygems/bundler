@@ -21,6 +21,7 @@ Bugfixes:
 Features:
 
   - add support for C extensions in sudo mode on Rubygems 2.2
+  - add `bundle install --platform` to manually specify a platform (@Garoe)
 
 ## 1.6.0 (2014-03-28)
 
