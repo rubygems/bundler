@@ -506,7 +506,7 @@ module Bundler
       # and Gemfile.lock. If the Gemfile modified a dependency, but
       # the gem in the Gemfile.lock still satisfies it, this is fine
       # too.
-      locked_deps_hash = @locked_deps.each_with_object({}) { |dep, hsh| hsh[dep] = dep }
+      locked_deps_hash = @locked_deps.inject({}) { |hsh, dep| hsh[dep] = dep; hsh }
       @dependencies.each do |dep|
         locked_dep = locked_deps_hash[dep]
 
