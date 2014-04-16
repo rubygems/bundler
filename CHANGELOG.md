@@ -17,6 +17,7 @@ Bugfixes:
 Features:
 
   - warn informatively when `bundle install` is run as root (#2936, @1337807)
+  - adds a `--no-install` flag to `bundle package`
 
 ## 1.6.1 (2014-04-02)
 

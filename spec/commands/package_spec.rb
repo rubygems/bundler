@@ -28,6 +28,20 @@ describe "bundle package" do
       expect(bundled_app("test/vendor/cache/")).to exist
     end
   end
+
+  context "with --no-install" do
+    it "puts the gems in vendor/cache but does not install them" do
+      gemfile <<-D
+        source "file://#{gem_repo1}"
+        gem 'rack'
+      D
+
+      bundle "package --no-install"
+
+      should_not_be_installed "rack 1.0.0"
+      expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
+    end
+  end
 end
 
 describe "bundle install with gem sources" do

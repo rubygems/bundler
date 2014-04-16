@@ -74,49 +74,50 @@ module Bundler
           spec.__swap__(s)
         end
 
-        path = cached_gem(spec)
-        if Bundler.requires_sudo?
-          install_path = Bundler.tmp(spec.full_name)
-          bin_path     = install_path.join("bin")
-        else
-          install_path = Bundler.rubygems.gem_dir
-          bin_path     = Bundler.system_bindir
-        end
+        unless Bundler.settings[:no_install]
+          path = cached_gem(spec)
+          if Bundler.requires_sudo?
+            install_path = Bundler.tmp(spec.full_name)
+            bin_path     = install_path.join("bin")
+          else
+            install_path = Bundler.rubygems.gem_dir
+            bin_path     = Bundler.system_bindir
+          end
 
-        installed_spec = nil
-        Bundler.rubygems.preserve_paths do
-          installed_spec = Bundler::GemInstaller.new(path,
-            :install_dir         => install_path.to_s,
-            :bin_dir             => bin_path.to_s,
-            :ignore_dependencies => true,
-            :wrappers            => true,
-            :env_shebang         => true
-          ).install
-        end
+          installed_spec = nil
+          Bundler.rubygems.preserve_paths do
+            installed_spec = Bundler::GemInstaller.new(path,
+              :install_dir         => install_path.to_s,
+              :bin_dir             => bin_path.to_s,
+              :ignore_dependencies => true,
+              :wrappers            => true,
+              :env_shebang         => true
+            ).install
+          end
 
-        # SUDO HAX
-        if Bundler.requires_sudo?
-          Bundler.rubygems.repository_subdirectories.each do |name|
-            src = File.join(install_path, name, "*")
-            dst = File.join(Bundler.rubygems.gem_dir, name)
-            if name == "extensions" && Dir.glob(src).any?
-              src = File.join(src, "*/*")
-              ext_src = Dir.glob(src).first
-              ext_src.gsub!(src[0..-6], '')
-              dst = File.dirname(File.join(dst, ext_src))
+          # SUDO HAX
+          if Bundler.requires_sudo?
+            Bundler.rubygems.repository_subdirectories.each do |name|
+              src = File.join(install_path, name, "*")
+              dst = File.join(Bundler.rubygems.gem_dir, name)
+              if name == "extensions" && Dir.glob(src).any?
+                src = File.join(src, "*/*")
+                ext_src = Dir.glob(src).first
+                ext_src.gsub!(src[0..-6], '')
+                dst = File.dirname(File.join(dst, ext_src))
+              end
+              Bundler.mkdir_p dst
+              Bundler.sudo "cp -R #{src} #{dst}" if Dir[src].any?
             end
-            Bundler.mkdir_p dst
-            Bundler.sudo "cp -R #{src} #{dst}" if Dir[src].any?
-          end
 
-          spec.executables.each do |exe|
-            Bundler.mkdir_p Bundler.system_bindir
-            Bundler.sudo "cp -R #{install_path}/bin/#{exe} #{Bundler.system_bindir}/"
+            spec.executables.each do |exe|
+              Bundler.mkdir_p Bundler.system_bindir
+              Bundler.sudo "cp -R #{install_path}/bin/#{exe} #{Bundler.system_bindir}/"
+            end
           end
+          installed_spec.loaded_from = loaded_from(spec)
         end
-
-        spec.loaded_from = "#{Bundler.rubygems.gem_dir}/specifications/#{spec.full_name}.gemspec"
-        installed_spec.loaded_from = spec.loaded_from
+        spec.loaded_from = loaded_from(spec)
         ["Installing #{version_message(spec)}", spec.post_install_message]
       ensure
         if install_path && Bundler.requires_sudo?
@@ -153,6 +154,10 @@ module Bundler
       end
 
     private
+
+      def loaded_from(spec)
+        "#{Bundler.rubygems.gem_dir}/specifications/#{spec.full_name}.gemspec"
+      end
 
       def cached_gem(spec)
         possibilities = @caches.map { |p| "#{p}/#{spec.file_name}" }
