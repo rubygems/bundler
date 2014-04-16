@@ -412,10 +412,8 @@ module Bundler
       locked = @locked_sources.find(&block)
 
       if locked
-        unlocking = locked.specs.any? do |spec|
-          @locked_specs.any? do |locked_spec|
-            locked_spec.source != locked
-          end
+        unlocking = @locked_specs.any? do |locked_spec|
+          locked_spec.source != locked
         end
       end
 
@@ -508,8 +506,9 @@ module Bundler
       # and Gemfile.lock. If the Gemfile modified a dependency, but
       # the gem in the Gemfile.lock still satisfies it, this is fine
       # too.
+      locked_deps_hash = @locked_deps.inject({}) { |hsh, dep| hsh[dep] = dep; hsh }
       @dependencies.each do |dep|
-        locked_dep = @locked_deps.find { |d| dep == d }
+        locked_dep = locked_deps_hash[dep]
 
         if in_locked_deps?(dep, locked_dep) || satisfies_locked_spec?(dep)
           deps << dep
