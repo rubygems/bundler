@@ -87,6 +87,38 @@ module Bundler
       Bundler::WINDOWS
     end
 
+    def mswin_18?
+      mswin? && on_18?
+    end
+
+    def mswin_19?
+      mswin? && on_19?
+    end
+
+    def mswin_20?
+      mswin? && on_20?
+    end
+
+    def mswin_21?
+      mswin? && on_21?
+    end
+
+    def mswin64?
+      Bundler::WINDOWS && Gem::Platform.local.os == "mswin64" && Gem::Platform.local.cpu == 'x64'
+    end
+
+    def mswin64_19?
+      mswin64? && on_19?
+    end
+
+    def mswin64_20?
+      mswin64? && on_20?
+    end
+
+    def mswin64_21?
+      mswin64? && on_21?
+    end
+
     def mingw?
       Bundler::WINDOWS && Gem::Platform.local.os == "mingw32" && Gem::Platform.local.cpu != 'x64'
     end
