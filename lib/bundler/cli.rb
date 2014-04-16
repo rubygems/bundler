@@ -223,6 +223,7 @@ module Bundler
 
     desc "package [OPTIONS]", "Locks and then caches all of the gems into vendor/cache"
     method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
+    method_option "no-install",  :type => :boolean, :banner => "Don't actually install the gems, just package."
     method_option "all",  :type => :boolean, :banner => "Include all sources (including path and git)."
     method_option "quiet", :type => :boolean, :banner => "Only output warnings and errors."
     method_option "path", :type => :string, :banner =>
