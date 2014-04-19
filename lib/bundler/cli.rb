@@ -4,6 +4,7 @@ require 'bundler/vendored_thor'
 module Bundler
   class CLI < Thor
     include Thor::Actions
+    AUTO_INSTALL_CMDS = %w[show binstubs outdated exec open console licenses clean]
 
     def self.start(*)
       super
@@ -12,11 +13,13 @@ module Bundler
       raise e
     end
 
-    def initialize(*)
+    def initialize(*args)
       super
+      current_cmd = args.last[:current_command].name
       ENV['BUNDLE_GEMFILE']   = File.expand_path(options[:gemfile]) if options[:gemfile]
       Bundler::Retry.attempts = options[:retry] || Bundler.settings[:retry] || Bundler::Retry::DEFAULT_ATTEMPTS
       Bundler.rubygems.ui = UI::RGProxy.new(Bundler.ui)
+      auto_install if AUTO_INSTALL_CMDS.include?(current_cmd)
     rescue UnknownArgumentError => e
       raise InvalidOption, e.message
     ensure
@@ -177,7 +180,6 @@ module Bundler
       :banner => "List the paths of all gems that are required by your Gemfile."
     def show(gem_name = nil)
       require 'bundler/cli/show'
-      auto_install
       Show.new(options, gem_name).run
     end
     map %w(list) => "show"
@@ -193,7 +195,6 @@ module Bundler
       "overwrite existing binstubs if they exist"
     def binstubs(*gems)
       require 'bundler/cli/binstubs'
-      auto_install
       Binstubs.new(options, gems).run
     end
 
@@ -212,7 +213,6 @@ module Bundler
       "Only list newer versions allowed by your Gemfile requirements"
     def outdated(*gems)
       require 'bundler/cli/outdated'
-      auto_install
       Outdated.new(options, gems).run
     end
 
@@ -253,7 +253,6 @@ module Bundler
     D
     def exec(*args)
       require 'bundler/cli/exec'
-      auto_install
       Exec.new(options, args).run
     end
 
@@ -277,7 +276,6 @@ module Bundler
     desc "open GEM", "Opens the source directory of the given bundled gem"
     def open(name)
       require 'bundler/cli/open'
-      auto_install
       Open.new(options, name).run
     end
 
@@ -290,7 +288,6 @@ module Bundler
     desc "console [GROUP]", "Opens an IRB session with the bundle pre-loaded"
     def console(group = nil)
       require 'bundler/cli/console'
-      auto_install
       Console.new(options, group, CONSOLES).run
     end
 
@@ -302,7 +299,6 @@ module Bundler
 
     desc "licenses", "Prints the license of all gems in the bundle"
     def licenses
-      auto_install
       Bundler.load.specs.sort_by { |s| s.license.to_s }.reverse.each do |s|
         gem_name = s.name
         license  = s.license || s.licenses
@@ -355,7 +351,6 @@ module Bundler
       "forces clean even if --path is not set"
     def clean
       require 'bundler/cli/clean'
-      auto_install if Bundler.settings[:path] || options[:force]
       Clean.new(options.dup).run
     end
 
