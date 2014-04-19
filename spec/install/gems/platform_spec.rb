@@ -177,6 +177,32 @@ describe "bundle install with platform conditionals" do
     expect(exitstatus).to eq(0)
   end
 
+  it "does not attempt to install gems from :rbx when using --local" do
+    simulate_platform "ruby"
+    simulate_ruby_engine "ruby"
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "some_gem", platform: :rbx
+    G
+
+    bundle "install --local"
+    expect(out).not_to match(/Could not find gem 'some_gem/)
+  end
+
+  it "does not attempt to install gems from other rubies when using --local" do
+    simulate_platform "ruby"
+    simulate_ruby_engine "ruby"
+    other_ruby_version_tag = RUBY_VERSION =~ /^1\.8/ ? :ruby_19 : :ruby_18
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "some_gem", platform: :#{other_ruby_version_tag}
+    G
+
+    bundle "install --local"
+    expect(out).not_to match(/Could not find gem 'some_gem/)
+  end
 end
 
 describe "when a gem has no architecture" do
