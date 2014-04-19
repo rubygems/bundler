@@ -106,6 +106,10 @@ module Spec
           s.platform = "java"
         end
 
+        build_gem "only_rbx" do |s|
+          s.platform = "rbx"
+        end
+
         build_gem "nokogiri", "1.4.2"
         build_gem "nokogiri", "1.4.2" do |s|
           s.platform = "java"
