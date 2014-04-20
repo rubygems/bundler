@@ -4,7 +4,6 @@ require 'bundler/vendored_thor'
 module Bundler
   class CLI < Thor
     include Thor::Actions
-    AUTO_INSTALL_CMDS = %w[show binstubs outdated exec open console licenses clean]
 
     def self.start(*)
       super
@@ -15,11 +14,10 @@ module Bundler
 
     def initialize(*args)
       super
-      current_cmd = args.last[:current_command].name
       ENV['BUNDLE_GEMFILE']   = File.expand_path(options[:gemfile]) if options[:gemfile]
       Bundler::Retry.attempts = options[:retry] || Bundler.settings[:retry] || Bundler::Retry::DEFAULT_ATTEMPTS
       Bundler.rubygems.ui = UI::RGProxy.new(Bundler.ui)
-      auto_install if AUTO_INSTALL_CMDS.include?(current_cmd)
+      auto_install_for(args.last[:current_command].name)
     rescue UnknownArgumentError => e
       raise InvalidOption, e.message
     ensure
@@ -382,7 +380,8 @@ module Bundler
       # Note that this method `nil`s out the global Definition object, so it
       # should be called first, before you instantiate anything like an
       # `Installer` that'll keep a reference to the old one instead.
-      def auto_install
+      def auto_install_for(cmd)
+        return unless %w[show binstubs outdated exec open console licenses clean].include?(cmd)
         return unless Bundler.settings[:auto_install]
 
         begin
