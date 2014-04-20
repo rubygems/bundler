@@ -4,6 +4,7 @@ require 'bundler/vendored_thor'
 module Bundler
   class CLI < Thor
     include Thor::Actions
+    AUTO_INSTALL_CMDS = %w[show binstubs outdated exec open console licenses clean]
 
     def self.start(*)
       super
@@ -12,11 +13,13 @@ module Bundler
       raise e
     end
 
-    def initialize(*)
+    def initialize(*args)
       super
+      current_cmd = args.last[:current_command].name
       ENV['BUNDLE_GEMFILE']   = File.expand_path(options[:gemfile]) if options[:gemfile]
       Bundler::Retry.attempts = options[:retry] || Bundler.settings[:retry] || Bundler::Retry::DEFAULT_ATTEMPTS
       Bundler.rubygems.ui = UI::RGProxy.new(Bundler.ui)
+      auto_install if AUTO_INSTALL_CMDS.include?(current_cmd)
     rescue UnknownArgumentError => e
       raise InvalidOption, e.message
     ensure
@@ -370,5 +373,26 @@ module Bundler
       Env.new.write($stdout)
     end
 
+    private
+
+      # Automatically invoke `bundle install` and resume if
+      # Bundler.settings[:auto_install] exists. This is set through config cmd
+      # `bundle config auto_install 1`.
+      #
+      # Note that this method `nil`s out the global Definition object, so it
+      # should be called first, before you instantiate anything like an
+      # `Installer` that'll keep a reference to the old one instead.
+      def auto_install
+        return unless Bundler.settings[:auto_install]
+
+        begin
+          Bundler.definition.specs
+        rescue GemNotFound
+          Bundler.ui.info "Automatically installing missing gems."
+          Bundler.reset!
+          invoke :install, []
+          Bundler.reset!
+        end
+      end
   end
 end

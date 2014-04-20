@@ -589,4 +589,28 @@ describe "bundle clean" do
 
     expect(vendored_gems("bin/rackup")).to exist
   end
+
+  it "performs an automatic bundle install" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "thin"
+      gem "foo"
+    G
+
+    bundle "install --path vendor/bundle --no-clean"
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "thin"
+      gem "weakling"
+    G
+
+    bundle "config auto_install 1"
+    bundle :clean
+    expect(out).to include('Installing weakling 0.0.3')
+    should_have_gems 'thin-1.0', 'rack-1.0.0', 'weakling-0.0.3'
+    should_not_have_gems 'foo-1.0'
+  end
 end

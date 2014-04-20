@@ -73,4 +73,23 @@ describe "bundle console" do
       expect(out).to include("NameError")
     end
   end
+
+  it "performs an automatic bundle install" do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack"
+      gem "activesupport", :group => :test
+      gem "rack_middleware", :group => :development
+      gem "foo"
+    G
+
+    bundle "config auto_install 1"
+    bundle :console do |input|
+      input.puts("puts 'hello'")
+      input.puts("exit")
+    end
+    expect(out).to include("Installing foo 1.0")
+    expect(out).to include("hello")
+    should_be_installed "foo 1.0"
+  end
 end

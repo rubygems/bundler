@@ -1,3 +1,5 @@
+require "bundler/cli/common"
+
 module Bundler
   class CLI::Binstubs
     attr_reader :options, :gems
