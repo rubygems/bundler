@@ -19,7 +19,7 @@ module Bundler
       :mri_19   => Gem::Platform::RUBY,
       :mri_20   => Gem::Platform::RUBY,
       :mri_21   => Gem::Platform::RUBY,
-      :rbx      => Gem::Platform::RUBY,
+      :rbx      => Gem::Platform::RUBINIUS,
       :jruby    => Gem::Platform::JAVA,
       :jruby_18 => Gem::Platform::JAVA,
       :jruby_19 => Gem::Platform::JAVA,
