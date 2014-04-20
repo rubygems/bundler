@@ -300,6 +300,26 @@ describe "bundle install with git sources" do
       expect(out).to match(/Your bundle is complete!/)
     end
 
+    it "switches branch if auto_switch_local_branch is given" do
+      build_git "rack", "0.8"
+
+      FileUtils.cp_r("#{lib_path('rack-0.8')}/.", lib_path('local-rack'))
+
+      update_git "rack", "0.8", :path => lib_path('local-rack'), :branch => "another" do |s|
+        s.write "lib/rack.rb", "puts :ANOTHER"
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :git => "#{lib_path('rack-0.8')}", :branch => "master"
+      G
+
+      bundle %|config local.rack #{lib_path('local-rack')}|
+      bundle %|config auto_switch_local_branch true|
+      bundle :install
+      expect(out).to match(/Your bundle is complete!/)
+    end
+
     it "explodes on different branches on install" do
       build_git "rack", "0.8"
 

@@ -122,6 +122,13 @@ module Bundler
         # so the Gemfile.lock always picks up the new revision.
         @git_proxy = GitProxy.new(path, uri, ref)
 
+        if git_proxy.branch != options["branch"] && Bundler.settings[:auto_switch_local_branch]
+          if !git_proxy.exists?(options["branch"])
+            raise GitError, "Failed to switch branch, branch #{options["branch"]} doesn't exist"
+          end
+          git_proxy.switch(options["branch"])
+        end
+
         if git_proxy.branch != options["branch"] && !Bundler.settings[:disable_local_branch_check]
           raise GitError, "Local override for #{name} at #{path} is using branch " \
             "#{git_proxy.branch} but Gemfile specifies #{options["branch"]}"

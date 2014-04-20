@@ -48,7 +48,7 @@ module Bundler
         end
 
         def branch
-          @branch ||= allowed_in_path do
+          allowed_in_path do
             git("branch") =~ /^\* (.*)$/ && $1.strip
           end
         end
@@ -56,6 +56,20 @@ module Bundler
         def contains?(commit)
           allowed_in_path do
             result = git_null("branch --contains #{commit}")
+            $? == 0 && result =~ /^\* (.*)$/
+          end
+        end
+
+        def exists?(branch)
+          allowed_in_path do
+            git_null("show-ref --verify --quiet refs/heads/#{branch}")
+            $? == 0
+          end
+        end
+
+        def switch(branch)
+          allowed_in_path do
+            result = git_null("checkout #{branch}")
             $? == 0 && result =~ /^\* (.*)$/
           end
         end
