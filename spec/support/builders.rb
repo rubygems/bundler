@@ -107,7 +107,7 @@ module Spec
         end
 
         build_gem "only_rbx" do |s|
-          s.platform = "rbx"
+          s.platform = Gem::Platform::RUBINIUS
         end
 
         build_gem "nokogiri", "1.4.2"
