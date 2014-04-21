@@ -23,18 +23,16 @@ See [bundler.io](http://bundler.io) for the full documentation.
 
 For help with common problems, see [ISSUES](https://github.com/bundler/bundler/blob/master/ISSUES.md).
 
-### Contributing
-
-If you'd like to contribute to Bundler, that's awesome, and we <3 you. There's a guide to contributing to Bundler (both code and general help) over in [DEVELOPMENT](https://github.com/bundler/bundler/blob/master/DEVELOPMENT.md)
-
-The `master` branch contains our current progress towards version 1.5. Versions 1.0-1.3 each have their own stable branches. Please submit bugfixes as pull requests to the stable branch for the version you would like to fix.
-
-### Core Team
-
-The Bundler core team consists of André Arko ([@indirect](http://github.com/indirect)), Terence Lee ([@hone](http://github.com/hone)), and Jessica Lynn Suttles ([@jlsuttles](http://github.com/jlsuttles)), with support and advice from original Bundler author Yehuda Katz ([@wycats](http://github.com/wycats)).
-
 ### Other questions
 
 To see what has changed in recent versions of Bundler, see the [CHANGELOG](https://github.com/bundler/bundler/blob/master/CHANGELOG.md).
 
 Feel free to chat with the Bundler core team (and many other users) on IRC in the  [#bundler](irc://irc.freenode.net/bundler) channel on Freenode, or via email on the [Bundler mailing list](http://groups.google.com/group/ruby-bundler).
+
+### Contributing
+
+If you'd like to contribute to Bundler, that's awesome, and we <3 you. There's a guide to contributing to Bundler (both code and general help) over in [DEVELOPMENT](https://github.com/bundler/bundler/blob/master/DEVELOPMENT.md)
+
+### Support work on Bundler
+
+Bundler is developed entirely by a team of volunteers. If Bundler saves your company time and money, contribute to the [Bundler development fund on Gittip](http://www.gittip.com/bundler). Every dollar goes towards Bundler documentation, outreach, and development.
