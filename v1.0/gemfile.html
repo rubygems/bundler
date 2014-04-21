@@ -68,7 +68,7 @@
                 more valid gems. Specify what to check out with <code>:tag</code>,
                 <code>:branch</code>, or <code>:ref</code>. The default is the <code>master</code> branch.
               </div>
-              <pre class="highlight ruby"><span class="n">gem</span> <span class="s2">"nokogiri"</span><span class="p">,</span> <span class="ss">:git</span> <span class="o">=&gt;</span> <span class="s2">"git://github.com/tenderlove/nokogiri.git"</span><span class="p">,</span> <span class="ss">:branch</span> <span class="o">=&gt;</span> <span class="s2">"1.4"</span>&#x000A;&#x000A;<span class="n">git</span> <span class="s2">"git://github.com/wycats/thor.git"</span><span class="p">,</span> <span class="ss">:tag</span> <span class="o">=&gt;</span> <span class="s2">"v0.13.4"</span>&#x000A;<span class="n">gem</span> <span class="s2">"thor"</span></pre>
+              <pre class="highlight ruby"><span class="n">gem</span> <span class="s2">"nokogiri"</span><span class="p">,</span> <span class="ss">:git</span> <span class="o">=&gt;</span> <span class="s2">"https://github.com/tenderlove/nokogiri.git"</span><span class="p">,</span> <span class="ss">:branch</span> <span class="o">=&gt;</span> <span class="s2">"1.4"</span>&#x000A;&#x000A;<span class="n">git</span> <span class="s2">"https://github.com/wycats/thor.git"</span><span class="p">,</span> <span class="ss">:tag</span> <span class="o">=&gt;</span> <span class="s2">"v0.13.4"</span>&#x000A;<span class="n">gem</span> <span class="s2">"thor"</span></pre>
               <div class='notes'>
                 If the git repository does not contain a <code>.gemspec</code> file, bundler
                 will create a simple one, without any dependencies, executables or C extensions.
