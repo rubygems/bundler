@@ -145,6 +145,42 @@ describe "bundle clean" do
     expect(vendored_gems("cache/bundler/git/foo-1.0-#{digest}")).to exist
   end
 
+  it "removes unused svn gems" do
+    build_svn "foo", :path => lib_path("foo")
+    svn_path = lib_path('foo')
+    revision = 1
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "rack", "1.0.0"
+      svn "file://#{svn_path}", :ref => "#{revision}" do
+        gem "foo"
+      end
+    G
+
+    bundle "install --path vendor/bundle"
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "rack", "1.0.0"
+    G
+    bundle "install"
+
+    bundle :clean
+
+    expect(out).to eq("Removing foo (#{revision})")
+
+    expect(vendored_gems("gems/rack-1.0.0")).to exist
+    expect(vendored_gems("bundler/gems/foo-#{revision}")).not_to exist
+    expect(vendored_gems("cache/bundler/svn/foo-#{revision}")).not_to exist
+
+    expect(vendored_gems("specifications/rack-1.0.0.gemspec")).to exist
+
+    expect(vendored_gems("bin/rackup")).to exist
+  end
+
   it "removes unused git gems" do
     build_git "foo", :path => lib_path("foo")
     git_path = lib_path('foo')

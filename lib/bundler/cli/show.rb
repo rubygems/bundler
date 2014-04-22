@@ -35,7 +35,7 @@ module Bundler
       else
         Bundler.ui.info "Gems included by the bundle:"
         Bundler.load.specs.sort_by { |s| s.name }.each do |s|
-          desc = "  * #{s.name} (#{s.version}#{s.git_version})"
+          desc = "  * #{s.name} (#{s.version}#{s.scm_version})"
           if @options[:verbose]
             Bundler.ui.info "#{desc} - #{s.summary || 'No description available.'}"
           else

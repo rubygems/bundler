@@ -109,6 +109,22 @@ describe "bundle show" do
     end
   end
 
+  context "with a svn repo in the Gemfile" do
+    before :each do
+      @svn = build_svn "foo", "1.0"
+    end
+
+    it "prints out svn info" do
+      install_gemfile <<-G
+        gem "foo", :svn => "file://#{lib_path('foo-1.0')}"
+      G
+      should_be_installed "foo 1.0"
+
+      bundle :show
+      expect(out).to include("foo (1.0 1")
+    end
+  end
+
   context "in a fresh gem in a blank git repo" do
     before :each do
       build_git "foo", :path => lib_path("foo")

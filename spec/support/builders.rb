@@ -351,6 +351,17 @@ module Spec
       GitReader.new lib_path(spec.full_name)
     end
 
+    def build_svn(name, *args, &block)
+      opts = args.last.is_a?(Hash) ? args.last : {}
+      spec = build_with(SVNBuilder, name, args, &block)
+      SVNReader.new(opts[:path] || lib_path(spec.full_name))
+    end
+
+    def update_svn(name, *args, &block)
+      spec = build_with(SVNUpdater, name, args, &block)
+      SVNReader.new lib_path(spec.full_name)
+    end
+
   private
 
     def build_with(builder, name, args, &blk)
@@ -601,6 +612,54 @@ module Spec
         end
       end
 
+    end
+
+    class SVNBuilder < LibBuilder
+      def _build(options)
+        path = options[:path] || _default_path
+        super(options.merge(:path => path))
+        Dir.chdir(path) do
+          `mkdir .repo_data && find . -maxdepth 1 ! \\( -name ".repo_data" -or -name "." \\) -exec mv {} \\.repo_data/ \\;`
+          `svnadmin create .repo`
+          `svn import .repo_data file://#{File.join(path, '.repo')} -m 'OMG INITIAL COMMIT'`
+          `mv .repo/* .`
+        end
+      end
+    end
+
+    class SVNUpdater < LibBuilder
+      def _build(options)
+        lib_path = options[:path] || _default_path
+        checkout_path = File.join(lib_path, '.checkout')
+
+        `mkdir #{checkout_path}`
+        Dir.chdir(checkout_path) do
+          `svn checkout file://#{lib_path} .`
+          super(options.merge(:path => checkout_path, :gemspec => false))
+          `svn add --force *`
+          `svn commit -m "BUMP"`
+        end
+      end
+    end
+
+    class SVNReader
+      attr_reader :path
+
+      def initialize(path)
+        @path = path
+      end
+
+      def ref_for(ref, len = nil)
+        ref = svn("info --revision #{ref} file://#{path} | grep \"Revision\" | awk '{print $2}'").strip
+        ref = ref[0..len] if len
+        ref
+      end
+
+    private
+
+      def svn(cmd)
+        Dir.chdir(@path) { `svn #{cmd}`.strip }
+      end
     end
 
     class GemBuilder < LibBuilder

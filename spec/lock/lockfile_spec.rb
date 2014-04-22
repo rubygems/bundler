@@ -182,6 +182,33 @@ describe "the lockfile format" do
     G
   end
 
+  it "serializes global svn sources" do
+    svn = build_svn "foo"
+
+    install_gemfile <<-G
+      svn "file://#{lib_path('foo-1.0')}" do
+        gem "foo"
+      end
+    G
+
+    lockfile_should_be <<-G
+      SVN
+        remote: file://#{lib_path('foo-1.0')}
+        revision: 1
+        specs:
+          foo (1.0)
+
+      GEM
+        specs:
+
+      PLATFORMS
+        #{generic(Gem::Platform.local)}
+
+      DEPENDENCIES
+        foo!
+    G
+  end
+
   it "generates a lockfile with a ref for a single pinned source, git gem with a branch requirement" do
     git = build_git "foo"
     update_git "foo", :branch => "omg"
