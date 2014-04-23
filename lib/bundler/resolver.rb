@@ -317,7 +317,7 @@ module Bundler
             end
 
             if parent.nil? && !conflicts.empty?
-              parent = states.reverse.detect { |i| conflicts.include?(i.name) && other_possible?(i, states) }
+              parent = states.reverse.detect { |i| conflicts.include?(i.name) && state_any?(i)}
             end
 
             raise version_conflict if parent.nil? || parent.name == 'bundler'
