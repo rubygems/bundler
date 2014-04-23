@@ -85,8 +85,9 @@ module Bundler
   class << self
     attr_writer :ui, :bundle_path
 
-    def configure
-      @configured ||= configure_gem_home_and_path
+    def configure(path=nil)
+      @bundle_path = Pathname.new(settings.path(path)).expand_path(root) if path
+      @configured ||= configure_gem_home_and_path(path)
     end
 
     def ui
@@ -99,13 +100,17 @@ module Bundler
     end
 
     # Returns absolute location of where binstubs are installed to.
-    def bin_path
-      @bin_path ||= begin
-        path = settings[:bin] || "bin"
-        path = Pathname.new(path).expand_path(root).expand_path
-        FileUtils.mkdir_p(path)
-        path
+    def bin_path(options)
+      path = if options[:binstubs] && !options[:binstubs].empty?
+        options[:binstubs]
+      else
+        settings[:bin]
       end
+      path ||= 'bin'
+
+      path = Pathname.new(path).expand_path(root).expand_path
+      FileUtils.mkdir_p(path)
+      path
     end
 
     def setup(*groups)
@@ -143,13 +148,14 @@ module Bundler
     #
     # @param unlock [Hash, Boolean, nil] Gems that have been requested
     #   to be updated or true if all gems should be updated
+    # @param without [Array] List of groups to exclude
     # @return [Bundler::Definition]
-    def definition(unlock = nil)
+    def definition(unlock = nil, without = [])
       @definition = nil if unlock
       @definition ||= begin
         configure
         upgrade_lockfile
-        Definition.build(default_gemfile, default_lockfile, unlock)
+        Definition.build(default_gemfile, default_lockfile, unlock, without)
       end
     end
 
@@ -386,9 +392,9 @@ module Bundler
       raise GemspecError, msg
     end
 
-    def configure_gem_home_and_path
+    def configure_gem_home_and_path(path=nil)
       blank_home = ENV['GEM_HOME'].nil? || ENV['GEM_HOME'].empty?
-      if settings[:disable_shared_gems]
+      if path
         ENV['GEM_PATH'] = ''
         configure_gem_home
       elsif blank_home || Bundler.rubygems.gem_dir != bundle_path.to_s

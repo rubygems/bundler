@@ -46,6 +46,11 @@ describe "Running bin/* commands" do
     expect(File.open("bin/rackup").gets).to eq("#!/usr/bin/env ruby-foo\n")
   end
 
+  it "allows the name of the shebang executable to be specified for standalone install" do
+    bundle "install --standalone --binstubs --shebang ruby-foo"
+    expect(File.open("bin/rackup").gets).to eq("#!/usr/bin/env ruby-foo\n")
+  end
+
   it "runs the bundled command when out of the bundle" do
     bundle "install --binstubs"
 

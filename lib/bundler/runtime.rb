@@ -104,7 +104,9 @@ module Bundler
 
     alias gems specs
 
-    def cache
+    def cache(no_prune=nil)
+      no_prune ||= Bundler.settings[:no_prune]
+
       FileUtils.mkdir_p(cache_path) unless File.exists?(cache_path)
 
       Bundler.ui.info "Updating files in vendor/cache"
@@ -118,7 +120,7 @@ module Bundler
         FileUtils.touch(File.expand_path("../.bundlecache", git_dir))
       end
 
-      prune_cache unless Bundler.settings[:no_prune]
+      prune_cache unless no_prune
     end
 
     def prune_cache
