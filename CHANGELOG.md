@@ -4,6 +4,10 @@ Bugfixes:
 
   - don't warn about sudo when installing on Windows (#2984, @indirect)
 
+Features:
+
+  - add support for SVN sources (@msnexploder)
+
 ## 1.6.2 (2014-04-13)
 
 Bugfixes:

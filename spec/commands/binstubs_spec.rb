@@ -61,6 +61,21 @@ describe "bundle binstubs <gem>" do
       expect(out).to eq("Sorry, Bundler can only be run via Rubygems.")
     end
 
+    it "installs binstubs from svn gems" do
+      FileUtils.mkdir_p(lib_path("foo/bin"))
+      FileUtils.touch(lib_path("foo/bin/foo"))
+      build_svn "foo", "1.0", :path => lib_path("foo") do |s|
+        s.executables = %w(foo)
+      end
+      install_gemfile <<-G
+        gem "foo", :svn => "file://#{lib_path('foo')}"
+      G
+
+      bundle "binstubs foo"
+
+      expect(bundled_app("bin/foo")).to exist
+    end
+
     it "installs binstubs from git gems" do
       FileUtils.mkdir_p(lib_path("foo/bin"))
       FileUtils.touch(lib_path("foo/bin/foo"))

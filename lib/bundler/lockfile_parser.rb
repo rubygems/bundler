@@ -19,6 +19,7 @@ module Bundler
     GIT          = "GIT"
     GEM          = "GEM"
     PATH         = "PATH"
+    SVN          = "SVN"
     SPECS        = "  specs:"
     OPTIONS      = /^  ([a-z]+): (.*)$/i
 
@@ -51,12 +52,13 @@ module Bundler
     TYPES = {
       "GIT"  => Bundler::Source::Git,
       "GEM"  => Bundler::Source::Rubygems,
-      "PATH" => Bundler::Source::Path
+      "PATH" => Bundler::Source::Path,
+      "SVN"  => Bundler::Source::SVN
     }
 
     def parse_source(line)
       case line
-      when GIT, GEM, PATH
+      when GIT, GEM, PATH, SVN
         @current_source = nil
         @opts, @type = {}, line
       when SPECS

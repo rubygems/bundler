@@ -218,7 +218,7 @@ module Bundler
 
     desc "cache [OPTIONS]", "Cache all the gems to vendor/cache", :hide => true
     method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
-    method_option "all",  :type => :boolean, :banner => "Include all sources (including path and git)."
+    method_option "all",  :type => :boolean, :banner => "Include all sources (including path, git and svn)."
     def cache
       require 'bundler/cli/cache'
       Cache.new(options).run
@@ -227,7 +227,7 @@ module Bundler
     desc "package [OPTIONS]", "Locks and then caches all of the gems into vendor/cache"
     method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
     method_option "no-install",  :type => :boolean, :banner => "Don't actually install the gems, just package."
-    method_option "all",  :type => :boolean, :banner => "Include all sources (including path and git)."
+    method_option "all",  :type => :boolean, :banner => "Include all sources (including path, git and svn)."
     method_option "quiet", :type => :boolean, :banner => "Only output warnings and errors."
     method_option "path", :type => :string, :banner =>
       "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"

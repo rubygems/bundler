@@ -137,6 +137,38 @@ describe "bundle cache" do
     end
   end
 
+  describe "when there are also svn sources" do
+    before do
+      build_svn "foo"
+      system_gems "rack-1.0.0"
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        svn "file://#{lib_path("foo-1.0")}" do
+          gem 'foo'
+        end
+        gem 'rack'
+      G
+    end
+
+    it "still works" do
+      bundle :cache
+
+      system_gems []
+      bundle "install --local"
+
+      should_be_installed("rack 1.0.0", "foo 1.0")
+    end
+
+    it "should not explode if the lockfile is not present" do
+      FileUtils.rm(bundled_app("Gemfile.lock"))
+
+      bundle :cache
+
+      expect(bundled_app("Gemfile.lock")).to exist
+    end
+  end
+
   describe "when previously cached" do
     before :each do
       build_repo2

@@ -50,8 +50,8 @@ module Bundler
         next if active_spec.nil?
 
         gem_outdated = Gem::Version.new(active_spec.version) > Gem::Version.new(current_spec.version)
-        git_outdated = current_spec.git_version != active_spec.git_version
-        if gem_outdated || git_outdated
+        scm_outdated = current_spec.scm_version != active_spec.scm_version
+        if gem_outdated || scm_outdated
           if out_count == 0
             if options["pre"]
               Bundler.ui.info "Outdated gems included in the bundle (including pre-releases):"
@@ -60,8 +60,8 @@ module Bundler
             end
           end
 
-          spec_version    = "#{active_spec.version}#{active_spec.git_version}"
-          current_version = "#{current_spec.version}#{current_spec.git_version}"
+          spec_version    = "#{active_spec.version}#{active_spec.scm_version}"
+          current_version = "#{current_spec.version}#{current_spec.scm_version}"
           dependency_version = %|Gemfile specifies "#{dependency.requirement}"| if dependency && dependency.specific?
           Bundler.ui.info "  * #{active_spec.name} (#{spec_version} > #{current_version}) #{dependency_version}".rstrip
           out_count += 1

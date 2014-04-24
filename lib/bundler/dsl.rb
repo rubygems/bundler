@@ -173,6 +173,18 @@ module Bundler
       source Source::Git.new(normalize_hash(options).merge("uri" => uri)), source_options, &blk
     end
 
+    def svn(uri, options = {}, source_options = {}, &blk)
+      unless block_given?
+        msg = "You can no longer specify a svn source by itself. Instead, \n" \
+              "either use the :svn option on a gem, or specify the gems that \n" \
+              "bundler should find in the svn source by passing a block to \n" \
+              "the svn method."
+        raise DeprecatedError, msg
+      end
+
+      source Source::SVN.new(normalize_hash(options).merge("uri" => uri)), source_options, &blk
+    end
+
     def to_definition(lockfile, unlock)
       @sources << rubygems_source unless @sources.include?(rubygems_source)
       Definition.new(lockfile, @dependencies, @sources, unlock, @ruby_version)
@@ -225,7 +237,7 @@ module Bundler
     end
 
     def valid_keys
-      @valid_keys ||= %w(group groups git path name branch ref tag require submodules platform platforms type)
+      @valid_keys ||= %w(group groups git svn path name branch ref tag require submodules platform platforms type)
     end
 
     def normalize_options(name, version, opts)
@@ -265,7 +277,7 @@ module Bundler
         opts["git"] = @git_sources[git_name].call(opts[git_name])
       end
 
-      ["git", "path"].each do |type|
+      ["git", "path", "svn"].each do |type|
         if param = opts[type]
           if version.first && version.first =~ /^\s*=?\s*(\d[^\s]*)\s*$/
             options = opts.merge("name" => name, "version" => $1)
