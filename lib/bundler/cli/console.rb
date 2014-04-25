@@ -35,6 +35,10 @@ module Bundler
                   return
                 end
 
+      # Load '.consolerc' if it exists. This is a place for gem authors to
+      # include fixtures so that it makes experimenting easy.
+      load '.consolerc' if File.exists?('.consolerc')
+
       console.start
     end
 
