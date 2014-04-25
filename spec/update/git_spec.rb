@@ -30,7 +30,7 @@ describe "bundle update" do
         gem "rails", :git => "#{lib_path('rails')}"
       G
 
-      bundle "update rails"
+      bundle "update rails --verbose"
       expect(out).to include("Using activesupport (3.0) from #{lib_path('rails')} (at master)")
       should_be_installed "rails 3.0", "activesupport 3.0"
     end

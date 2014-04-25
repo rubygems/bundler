@@ -399,7 +399,7 @@ describe "Bundler.setup" do
       G
 
       bundle %|config local.rack #{lib_path('local-rack')}|
-      bundle :install
+      bundle 'install --verbose'
       expect(out).to match(/at #{lib_path('local-rack')}/)
 
       FileUtils.rm_rf(lib_path('local-rack'))
@@ -418,7 +418,7 @@ describe "Bundler.setup" do
       G
 
       bundle %|config local.rack #{lib_path('local-rack')}|
-      bundle :install
+      bundle 'install --verbose'
       expect(out).to match(/at #{lib_path('local-rack')}/)
 
       gemfile <<-G
@@ -441,7 +441,7 @@ describe "Bundler.setup" do
       G
 
       bundle %|config local.rack #{lib_path('local-rack')}|
-      bundle :install
+      bundle 'install --verbose'
       expect(out).to match(/at #{lib_path('local-rack')}/)
 
       gemfile <<-G
