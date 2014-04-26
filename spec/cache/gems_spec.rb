@@ -103,6 +103,20 @@ describe "bundle cache" do
       expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
       expect(bundled_app("vendor/cache/builtin_gem-1.0.2.gem")).to exist
     end
+
+    it "doesn't make remote request after caching the gem" do
+      build_gem "builtin_gem_2", "1.0.2", :path => bundled_app('vendor/cache') do |s|
+        s.summary = "This builtin_gem is bundled with Ruby"
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem 'builtin_gem_2', '1.0.2'
+      G
+
+      bundle "install --local"
+      should_be_installed("builtin_gem_2 1.0.2")
+    end
   end
 
   describe "when there are also git sources" do
