@@ -1,6 +1,7 @@
 [![Code Climate](https://img.shields.io/codeclimate/github/bundler/bundler.svg)](https://codeclimate.com/github/bundler/bundler)
 [![Build Status](https://img.shields.io/travis/bundler/bundler/master.svg)](https://travis-ci.org/bundler/bundler)
 [![Version     ](https://img.shields.io/gem/v/bundler.svg)](https://rubygems.org/gems/bundler)
+[![Inline docs ](http://inch-pages.github.io/github/bundler/bundler.svg)](http://inch-pages.github.io/github/bundler/bundler)
 
 # Bundler: a gem to bundle gems
 Bundler keeps ruby applications running the same code on every machine.
