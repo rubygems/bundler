@@ -126,8 +126,7 @@ module Bundler
 
       def cache(spec, custom_path = nil)
         if builtin_gem?(spec)
-          remote_spec = remote_specs.search(spec).first
-          cached_path = fetch_gem(remote_spec)
+          cached_path = cached_built_in_gem(spec)
         else
           cached_path = cached_gem(spec)
         end
@@ -135,6 +134,15 @@ module Bundler
         return if File.dirname(cached_path) == Bundler.app_cache.to_s
         Bundler.ui.info "  * #{File.basename(cached_path)}"
         FileUtils.cp(cached_path, Bundler.app_cache(custom_path))
+      end
+
+      def cached_built_in_gem(spec)
+        cached_path = cached_path(spec)
+        if cached_path.nil?
+          remote_spec = remote_specs.search(spec).first
+          cached_path = fetch_gem(remote_spec)
+        end
+        cached_path
       end
 
       def add_remote(source)
@@ -155,12 +163,16 @@ module Bundler
     private
 
       def cached_gem(spec)
-        possibilities = @caches.map { |p| "#{p}/#{spec.file_name}" }
-        cached_gem = possibilities.find { |p| File.exist?(p) }
+        cached_gem = cached_path(spec)
         unless cached_gem
           raise Bundler::GemNotFound, "Could not find #{spec.file_name} for installation"
         end
         cached_gem
+      end
+
+      def cached_path(spec)
+        possibilities = @caches.map { |p| "#{p}/#{spec.file_name}" }
+        possibilities.find { |p| File.exist?(p) }
       end
 
       def normalize_uri(uri)
