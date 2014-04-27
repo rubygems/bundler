@@ -64,8 +64,8 @@ module Bundler
       when SPECS
         @current_source = TYPES[@type].from_lock(@opts)
 
-        # Strip out duplicate GIT sections
-        if @sources.include?(@current_source) && @current_source.is_a?(Bundler::Source::Git)
+        # Strip out duplicate GIT / SVN sections
+        if @sources.include?(@current_source) && (@current_source.is_a?(Bundler::Source::Git) || @current_source.is_a?(Bundler::Source::SVN))
           @current_source = @sources.find { |s| s == @current_source }
         end
 

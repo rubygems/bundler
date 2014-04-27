@@ -617,6 +617,7 @@ module Spec
     class SVNBuilder < LibBuilder
       def _build(options)
         path = options[:path] || _default_path
+        checkout_path = File.join(path, '.checkout')
         super(options.merge(:path => path))
         Dir.chdir(path) do
           `mkdir .repo_data && find . -maxdepth 1 ! \\( -name ".repo_data" -or -name "." \\) -exec mv {} \\.repo_data/ \\;`
@@ -624,17 +625,24 @@ module Spec
           `svn import .repo_data file://#{File.join(path, '.repo')} -m 'OMG INITIAL COMMIT'`
           `mv .repo/* .`
         end
+
+        `mkdir #{checkout_path}`
+        Dir.chdir(checkout_path) do
+          `svn checkout file://#{path} .`
+        end
       end
     end
 
     class SVNUpdater < LibBuilder
       def _build(options)
-        lib_path = options[:path] || _default_path
-        checkout_path = File.join(lib_path, '.checkout')
+        path = options[:path] || _default_path
+        checkout_path = File.join(path, '.checkout')
 
-        `mkdir #{checkout_path}`
         Dir.chdir(checkout_path) do
-          `svn checkout file://#{lib_path} .`
+          current_ref = `svn info --revision HEAD file://#{checkout_path} | grep \"Revision\" | awk '{print $2}'`.strip
+          _default_files.keys.each do |path|
+            _default_files[path] << "\n#{Builders.constantize(name)}_PREV_REF = '#{current_ref}'"
+          end
           super(options.merge(:path => checkout_path, :gemspec => false))
           `svn add --force *`
           `svn commit -m "BUMP"`

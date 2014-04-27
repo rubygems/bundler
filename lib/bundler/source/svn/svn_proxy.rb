@@ -47,6 +47,10 @@ module Bundler
           @revision ||= svn("info --revision #{ref} #{uri_escaped} | grep \"Revision\" | awk '{print $2}'").strip
         end
 
+        def contains?(commit)
+          revision >= commit
+        end
+
         def checkout
           if path.exist?
             Bundler.ui.confirm "Updating #{uri}"

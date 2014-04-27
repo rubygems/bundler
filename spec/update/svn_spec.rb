@@ -68,7 +68,7 @@ describe "bundle update" do
         gem "rack", :svn => "file://#{lib_path('rack-0.8')}", :branch => "master"
       G
 
-      bundle %|config local.rack #{lib_path('local-rack')}|
+      bundle %|config local.rack #{File.join(lib_path('local-rack'), '.checkout')}|
       bundle "update rack"
       expect(out).to include("Your bundle is updated!")
     end

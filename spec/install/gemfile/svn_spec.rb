@@ -105,6 +105,105 @@ describe "bundle install with svn sources" do
     end
   end
 
+  describe "when specifying local override" do
+    it "uses the local repository instead of checking a new one out" do
+      # We don't generate it because we actually don't need it
+      # build_svn "rack", "0.8"
+
+      build_svn "rack", "0.8", :path => lib_path('local-rack') do |s|
+        s.write "lib/rack.rb", "puts :LOCAL"
+      end
+
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :svn => "file://#{lib_path('rack-0.8')}"
+      G
+
+      bundle %|config local.rack #{File.join(lib_path('local-rack'), '.checkout')}|
+      bundle :install
+      expect(out).to match(/at #{File.join(lib_path('local-rack'), '.checkout')}/)
+
+      run "require 'rack'"
+      expect(out).to eq("LOCAL")
+    end
+
+    it "chooses the local repository on runtime" do
+      build_svn "rack", "0.8"
+
+      FileUtils.cp_r("#{lib_path('rack-0.8')}/.", lib_path('local-rack'))
+
+      update_svn "rack", "0.8", :path => lib_path('local-rack') do |s|
+        s.write "lib/rack.rb", "puts :LOCAL"
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :svn => "file://#{lib_path('rack-0.8')}"
+      G
+
+      bundle %|config local.rack #{File.join(lib_path('local-rack'), '.checkout')}|
+      run "require 'rack'"
+      expect(out).to eq("LOCAL")
+    end
+
+    it "updates specs on runtime" do
+      system_gems "nokogiri-1.4.2"
+
+      build_svn "rack", "0.8"
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :svn => "file://#{lib_path('rack-0.8')}"
+      G
+
+      lockfile0 = File.read(bundled_app("Gemfile.lock"))
+
+      FileUtils.cp_r("#{lib_path('rack-0.8')}/.", lib_path('local-rack'))
+      update_svn "rack", "0.8", :path => lib_path('local-rack') do |s|
+        s.add_dependency "nokogiri", "1.4.2"
+      end
+
+      bundle %|config local.rack #{File.join(lib_path('local-rack'), '.checkout')}|
+      run "require 'rack'"
+
+      lockfile1 = File.read(bundled_app("Gemfile.lock"))
+      expect(lockfile1).not_to eq(lockfile0)
+    end
+
+    it "updates ref on install" do
+      build_svn "rack", "0.8"
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :svn => "file://#{lib_path('rack-0.8')}"
+      G
+
+      lockfile0 = File.read(bundled_app("Gemfile.lock"))
+
+      FileUtils.cp_r("#{lib_path('rack-0.8')}/.", lib_path('local-rack'))
+      update_svn "rack", "0.8", :path => lib_path('local-rack')
+
+      bundle %|config local.rack #{File.join(lib_path('local-rack'), '.checkout')}|
+      bundle :install
+
+      lockfile1 = File.read(bundled_app("Gemfile.lock"))
+      expect(lockfile1).not_to eq(lockfile0)
+    end
+
+    it "explodes if given path does not exist on install" do
+      build_svn "rack", "0.8"
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :svn => "file://#{lib_path('rack-0.8')}"
+      G
+
+      bundle %|config local.rack #{File.join(lib_path('local-rack'), '.checkout')}|
+      bundle :install
+      expect(out).to match(/Cannot use local override for rack-0.8 because #{Regexp.escape(File.join(lib_path('local-rack'), '.checkout').to_s)} does not exist/)
+    end
+  end
+
   describe "specified inline" do
     it "installs from svn even if a newer gem is available elsewhere" do
       build_svn "rack", "0.8"

@@ -92,6 +92,34 @@ module Bundler
         @unlocked = true
       end
 
+      def local_override!(path)
+        return false if local?
+
+        path = Pathname.new(path)
+        path = path.expand_path(Bundler.root) unless path.relative?
+
+        unless path.exist?
+          raise SVNError, "Cannot use local override for #{name} because #{path} " \
+            "does not exist. Check `bundle config --delete` to remove the local override"
+        end
+
+        set_local!(path)
+
+        # Create a new svn proxy without the cached revision
+        # so the Gemfile.lock always picks up the new revision.
+        @svn_proxy = SVNProxy.new(path, uri, ref)
+
+        changed = cached_revision && cached_revision != svn_proxy.revision
+
+        if changed && !@unlocked && !svn_proxy.contains?(cached_revision)
+          raise SVNError, "The Gemfile lock is pointing to revision #{cached_revision} " \
+            "but the current branch in your local override for #{name} does not contain such commit. " \
+            "Please make sure your local copy is up to date."
+        end
+
+        changed
+      end
+
       # TODO: actually cache svn specs
       def specs(*)
         if has_app_cache? && !local?
