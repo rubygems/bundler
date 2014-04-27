@@ -33,9 +33,9 @@ module Bundler
 
     default_task :install
     class_option "no-color", :type => :boolean, :banner => "Disable colorization in output"
-    class_option "verbose",  :type => :boolean, :banner => "Enable verbose output mode", :aliases => "-V"
     class_option "retry",    :type => :numeric, :aliases => "-r", :banner =>
       "Specify the number of times you wish to attempt network commands"
+    class_option "verbose",  :type => :boolean, :banner => "Enable verbose output mode", :aliases => "-V"
 
     def help(cli = nil)
       case cli
@@ -85,12 +85,12 @@ module Bundler
       all gems are found, Bundler prints a success message and exits with a status of 0.
       If not, the first missing gem is listed and Bundler exits status 1.
     D
+    method_option "dry-run", :type => :boolean, :default => false, :banner =>
+      "Lock the Gemfile"
     method_option "gemfile", :type => :string, :banner =>
       "Use the specified gemfile instead of Gemfile"
     method_option "path", :type => :string, :banner =>
       "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
-    method_option "dry-run", :type => :boolean, :default => false, :banner =>
-      "Lock the Gemfile"
     def check
       require 'bundler/cli/check'
       Check.new(options).run
@@ -107,42 +107,42 @@ module Bundler
 
       If the bundle has already been installed, bundler will tell you so and then exit.
     D
-    method_option "without", :type => :array, :banner =>
-      "Exclude gems that are part of the specified named group."
-    method_option "gemfile", :type => :string, :banner =>
-      "Use the specified gemfile instead of Gemfile"
-    method_option "no-prune", :type => :boolean, :banner =>
-      "Don't remove stale gems from the cache."
-    method_option "no-cache", :type => :boolean, :banner =>
-      "Don't update the existing gem cache."
-    method_option "quiet", :type => :boolean, :banner =>
-      "Only output warnings and errors."
-    method_option "local", :type => :boolean, :banner =>
-      "Do not attempt to fetch gems remotely and use the gem cache instead"
     method_option "binstubs", :type => :string, :lazy_default => "bin", :banner =>
       "Generate bin stubs for bundled gems to ./bin"
-    method_option "shebang", :type => :string, :banner =>
-      "Specify a different shebang executable name than the default (usually 'ruby')"
-    method_option "path", :type => :string, :banner =>
-      "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
-    method_option "system", :type => :boolean, :banner =>
-      "Install to the system location ($BUNDLE_PATH or $GEM_HOME) even if the bundle was previously installed somewhere else for this application"
-    method_option "frozen", :type => :boolean, :banner =>
-      "Do not allow the Gemfile.lock to be updated after this install"
-    method_option "deployment", :type => :boolean, :banner =>
-      "Install using defaults tuned for deployment environments"
-    method_option "standalone", :type => :array, :lazy_default => [], :banner =>
-      "Make a bundle that can work without the Bundler runtime"
-    method_option "full-index", :type => :boolean, :banner =>
-      "Use the rubygems modern index instead of the API endpoint"
     method_option "clean", :type => :boolean, :banner =>
       "Run bundle clean automatically after install"
+    method_option "deployment", :type => :boolean, :banner =>
+      "Install using defaults tuned for deployment environments"
+    method_option "frozen", :type => :boolean, :banner =>
+      "Do not allow the Gemfile.lock to be updated after this install"
+    method_option "full-index", :type => :boolean, :banner =>
+      "Use the rubygems modern index instead of the API endpoint"
+    method_option "gemfile", :type => :string, :banner =>
+      "Use the specified gemfile instead of Gemfile"
+    method_option "jobs", :aliases => "-j", :type => :numeric, :banner =>
+      "Specify the number of jobs to run in parallel"
+    method_option "local", :type => :boolean, :banner =>
+      "Do not attempt to fetch gems remotely and use the gem cache instead"
+    method_option "no-cache", :type => :boolean, :banner =>
+      "Don't update the existing gem cache."
+    method_option "no-prune", :type => :boolean, :banner =>
+      "Don't remove stale gems from the cache."
+    method_option "path", :type => :string, :banner =>
+      "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
+    method_option "quiet", :type => :boolean, :banner =>
+      "Only output warnings and errors."
+    method_option "shebang", :type => :string, :banner =>
+      "Specify a different shebang executable name than the default (usually 'ruby')"
+    method_option "standalone", :type => :array, :lazy_default => [], :banner =>
+      "Make a bundle that can work without the Bundler runtime"
+    method_option "system", :type => :boolean, :banner =>
+      "Install to the system location ($BUNDLE_PATH or $GEM_HOME) even if the bundle was previously installed somewhere else for this application"
     method_option "trust-policy", :alias => "P", :type => :string, :banner =>
       "Gem trust policy (like gem install -P). Must be one of " +
         Bundler.rubygems.security_policies.keys.join('|') unless
         Bundler.rubygems.security_policies.empty?
-    method_option "jobs", :aliases => "-j", :type => :numeric, :banner =>
-      "Specify the number of jobs to run in parallel"
+    method_option "without", :type => :array, :banner =>
+      "Exclude gems that are part of the specified named group."
 
     def install
       require 'bundler/cli/install'
@@ -155,17 +155,18 @@ module Bundler
       update when you have changed the Gemfile, or if you want to get the newest
       possible versions of the gems in the bundle.
     D
-    method_option "source", :type => :array, :banner => "Update a specific source (and all gems associated with it)"
+    method_option "full-index", :type => :boolean, :banner =>
+      "Use the rubygems modern index instead of the API endpoint"
+    method_option "group", :aliases => "-g", :type => :array, :banner =>
+      "Update a specific group"
+    method_option "jobs", :aliases => "-j", :type => :numeric, :banner =>
+      "Specify the number of jobs to run in parallel"
     method_option "local", :type => :boolean, :banner =>
       "Do not attempt to fetch gems remotely and use the gem cache instead"
     method_option "quiet", :type => :boolean, :banner =>
       "Only output warnings and errors."
-    method_option "full-index", :type => :boolean, :banner =>
-        "Use the rubygems modern index instead of the API endpoint"
-    method_option "jobs", :aliases => "-j", :type => :numeric, :banner =>
-      "Specify the number of jobs to run in parallel"
-    method_option "group", :aliases => "-g", :type => :array, :banner =>
-      "Update a specific group"
+    method_option "source", :type => :array, :banner =>
+      "Update a specific source (and all gems associated with it)"
     def update(*gems)
       require 'bundler/cli/update'
       Update.new(options, gems).run
@@ -184,15 +185,15 @@ module Bundler
     end
     map %w(list) => "show"
 
-    desc "binstubs GEM [OPTIONS]", "install the binstubs of the listed gem"
+    desc "binstubs GEM [OPTIONS]", "Install the binstubs of the listed gem"
     long_desc <<-D
       Generate binstubs for executables in [GEM]. Binstubs are put into bin,
       or the --binstubs directory if one has been set.
     D
-    method_option "path", :type => :string, :lazy_default => "bin", :banner =>
-      "binstub destination directory (default bin)"
     method_option "force", :type => :boolean, :default => false, :banner =>
-      "overwrite existing binstubs if they exist"
+      "Overwrite existing binstubs if they exist"
+    method_option "path", :type => :string, :lazy_default => "bin", :banner =>
+      "Binstub destination directory (default bin)"
     def binstubs(*gems)
       require 'bundler/cli/binstubs'
       Binstubs.new(options, gems).run
@@ -205,10 +206,10 @@ module Bundler
       versions of the given gems. Prerelease gems are ignored by default. If your gems
       are up to date, Bundler will exit with a status of 0. Otherwise, it will exit 1.
     D
-    method_option "pre", :type => :boolean, :banner => "Check for newer pre-release gems"
-    method_option "source", :type => :array, :banner => "Check against a specific source"
     method_option "local", :type => :boolean, :banner =>
       "Do not attempt to fetch gems remotely and use the gem cache instead"
+    method_option "pre", :type => :boolean, :banner => "Check for newer pre-release gems"
+    method_option "source", :type => :array, :banner => "Check against a specific source"
     method_option "strict", :type => :boolean, :banner =>
       "Only list newer versions allowed by your Gemfile requirements"
     def outdated(*gems)
@@ -217,21 +218,21 @@ module Bundler
     end
 
     desc "cache [OPTIONS]", "Cache all the gems to vendor/cache", :hide => true
-    method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
     method_option "all",  :type => :boolean, :banner => "Include all sources (including path, git and svn)."
+    method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
     def cache
       require 'bundler/cli/cache'
       Cache.new(options).run
     end
 
     desc "package [OPTIONS]", "Locks and then caches all of the gems into vendor/cache"
-    method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
-    method_option "no-install",  :type => :boolean, :banner => "Don't actually install the gems, just package."
     method_option "all",  :type => :boolean, :banner => "Include all sources (including path, git and svn)."
-    method_option "quiet", :type => :boolean, :banner => "Only output warnings and errors."
+    method_option "gemfile", :type => :string, :banner => "Use the specified gemfile instead of Gemfile"
+    method_option "no-install",  :type => :boolean, :banner => "Don't actually install the gems, just package."
+    method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
     method_option "path", :type => :string, :banner =>
       "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
-    method_option "gemfile", :type => :string, :banner => "Use the specified gemfile instead of Gemfile"
+    method_option "quiet", :type => :boolean, :banner => "Only output warnings and errors."
     long_desc <<-D
       The package command will copy the .gem files for every gem in the bundle into the
       directory ./vendor/cache. If you then check that directory into your source
@@ -318,9 +319,9 @@ module Bundler
       The associated gems must also be installed via 'bundle install'.
     D
     method_option :file, :type => :string, :default => 'gem_graph', :aliases => '-f', :banner => "The name to use for the generated file. see format option"
-    method_option :version, :type => :boolean, :default => false, :aliases => '-v', :banner => "Set to show each gem version."
-    method_option :requirements, :type => :boolean, :default => false, :aliases => '-r', :banner => "Set to show the version of each required dependency."
     method_option :format, :type => :string, :default => "png", :aliases => '-F', :banner => "This is output format option. Supported format is png, jpg, svg, dot ..."
+    method_option :requirements, :type => :boolean, :default => false, :aliases => '-r', :banner => "Set to show the version of each required dependency."
+    method_option :version, :type => :boolean, :default => false, :aliases => '-v', :banner => "Set to show each gem version."
     def viz
       require 'bundler/cli/viz'
       Viz.new(options).run
@@ -328,12 +329,13 @@ module Bundler
 
     desc "gem GEM [OPTIONS]", "Creates a skeleton for creating a rubygem"
     method_option :bin, :type => :boolean, :default => false, :aliases => '-b', :banner => "Generate a binary for your library."
-    method_option :test, :type => :string, :lazy_default => 'rspec', :aliases => '-t', :banner => "Generate a test directory for your library: 'rspec' is the default, but 'minitest' is also supported."
     method_option :edit, :type => :string, :aliases => "-e",
                   :lazy_default => [ENV['BUNDLER_EDITOR'], ENV['VISUAL'], ENV['EDITOR']].find{|e| !e.nil? && !e.empty? },
                   :required => false, :banner => "/path/to/your/editor",
                   :desc => "Open generated gemspec in the specified editor (defaults to $EDITOR or $BUNDLER_EDITOR)"
-    method_option :ext, :type => :boolean, :detailt => false, :banner => "Generate the boilerplate for C extension code"
+    method_option :ext, :type => :boolean, :default => false, :banner => "Generate the boilerplate for C extension code"
+    method_option :test, :type => :string, :lazy_default => 'rspec', :aliases => '-t', :banner =>
+      "Generate a test directory for your library: 'rspec' is the default, but 'minitest' is also supported."
 
     def gem(name)
       require 'bundler/cli/gem'
@@ -346,9 +348,9 @@ module Bundler
 
     desc "clean [OPTIONS]", "Cleans up unused gems in your bundler directory"
     method_option "dry-run", :type => :boolean, :default => false, :banner =>
-      "only print out changes, do not actually clean gems"
+      "Only print out changes, do not actually clean gems"
     method_option "force", :type => :boolean, :default => false, :banner =>
-      "forces clean even if --path is not set"
+      "Forces clean even if --path is not set"
     def clean
       require 'bundler/cli/clean'
       Clean.new(options.dup).run
