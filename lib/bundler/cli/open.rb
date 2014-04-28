@@ -15,7 +15,7 @@ module Bundler
       return unless spec
       full_gem_path = spec.full_gem_path
       Dir.chdir(full_gem_path) do
-        command = "#{editor} #{full_gem_path}"
+        command = "#{editor} \"#{full_gem_path.to_s.gsub('"', '\\"')}\""
         success = system(command)
         Bundler.ui.info "Could not run '#{command}'" unless success
       end
