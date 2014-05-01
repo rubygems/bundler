@@ -78,6 +78,18 @@ describe "bundle gem" do
       it_should_behave_like "git config is absent"
     end
 
+    context "Metadata allowed pushed host" do
+      rubygems_2_2_0 = ENV['RGV'] == 'master' || Gem::Version.new(ENV['RGV'].gsub('v', '')) > Gem::Version.new("2.2.0")
+
+      it "sets gemspec metadata['allowed_push_host'] if rubygemes >= 2.2.0", :if => rubygems_2_2_0 do
+        expect(generated_gem.gemspec.metadata['allowed_push_host']).to eq("TODO: Set to 'http://mygemserver.com' to prevent pushes to rubygems.org, or delete to allow pushes to any server.")
+      end
+
+      it "did not raise error if rubygemes < 2.2.0", :unless => rubygems_2_2_0 do
+        expect(generated_gem.gemspec).not_to raise_error
+      end
+    end
+
     it "sets gemspec license to MIT by default" do
       expect(generated_gem.gemspec.license).to eq("MIT")
     end
@@ -252,6 +264,18 @@ describe "bundle gem" do
       end
 
       it_should_behave_like "git config is absent"
+    end
+
+    context "Metadata allowed pushed host" do
+      rubygems_2_2_0 = ENV['RGV'] == 'master' || Gem::Version.new(ENV['RGV'].gsub('v', '')) > Gem::Version.new("2.2.0")
+
+      it "sets gemspec metadata['allowed_push_host'] if rubygemes >= 2.2.0", :if => rubygems_2_2_0 do
+        expect(generated_gem.gemspec.metadata['allowed_push_host']).to eq("TODO: Set to 'http://mygemserver.com' to prevent pushes to rubygems.org, or delete to allow pushes to any server.")
+      end
+
+      it "did not raise error if rubygemes < 2.2.0", :unless => rubygems_2_2_0 do
+        expect(generated_gem.gemspec).not_to raise_error
+      end
     end
 
     it "sets gemspec license to MIT by default" do
