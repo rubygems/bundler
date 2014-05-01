@@ -7,6 +7,7 @@ Bugfixes:
 Features:
 
   - add support for SVN sources (@msnexploder)
+  - add metadata allowed_push_host to new gem template (#3002, @juanitofatas)
 
 ## 1.6.2 (2014-04-13)
 

@@ -8,6 +8,11 @@ Gem::Specification.new do |spec|
   spec.version       = <%=config[:constant_name]%>::VERSION
   spec.authors       = [<%=config[:author].inspect%>]
   spec.email         = [<%=config[:email].inspect%>]
+
+<% if ::Gem::Version.new(::Gem::VERSION) >= ::Gem::Version.new("2.2.0") -%>
+  spec.metadata['allowed_push_host'] = "TODO: Set to 'http://mygemserver.com' to prevent pushes to rubygems.org, or delete to allow pushes to any server."
+<% end -%>
+
 <% if config[:ext] -%>
   spec.extensions    = ["ext/<%=config[:underscored_name]%>/extconf.rb"]
 <% end -%>
