@@ -66,6 +66,13 @@ describe "bundle show" do
       expect(out).to include(' - This is just a fake gem for testing')
       expect(out).to include(' - Ruby based make-like utility.')
     end
+
+    it "prints summary of gems that can be copied to a gemfile" do
+      bundle "show --semantic"
+
+      expect(out).to include('rake', '~> 10.0.2')
+      expect(out).to include('rails', '~> 2.3.2')
+    end
   end
 
   context "with a git repo in the Gemfile" do

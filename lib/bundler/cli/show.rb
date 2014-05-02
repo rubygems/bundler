@@ -38,6 +38,8 @@ module Bundler
           desc = "  * #{s.name} (#{s.version}#{s.scm_version})"
           if @options[:verbose]
             Bundler.ui.info "#{desc} - #{s.summary || 'No description available.'}"
+          elsif @options[:semantic]
+            Bundler.ui.info "  * gem '#{s.name}', '~> #{s.version}'"
           else
             Bundler.ui.info desc
           end

@@ -179,6 +179,8 @@ module Bundler
     D
     method_option "paths", :type => :boolean,
       :banner => "List the paths of all gems that are required by your Gemfile."
+    method_option "semantic", :type => :boolean,
+      :banner => "Output the gems using the ~> format, which can be used to paste into gemfiles"
     def show(gem_name = nil)
       require 'bundler/cli/show'
       Show.new(options, gem_name).run
