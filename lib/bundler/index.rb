@@ -75,7 +75,7 @@ module Bundler
     alias [] search
 
     def <<(spec)
-      @specs[spec.name]["#{spec.version}:#{spec.platform}"] = spec
+      @specs[spec.name]["#{spec.version}-#{spec.platform}"] = spec
 
       spec
     end
@@ -101,9 +101,9 @@ module Bundler
       other.each do |s|
         if (dupes = search_by_spec(s)) && dupes.any?
           next unless override_dupes
-          @specs[s.name]["#{s.version}:#{s.platform}"] = s
+          self << s
         end
-        @specs[s.name]["#{s.version}:#{s.platform}"] = s
+        self << s
       end
       self
     end
@@ -160,7 +160,7 @@ module Bundler
     end
 
     def search_by_spec(spec)
-      spec = @specs[spec.name]["#{spec.version}:#{spec.platform}"]
+      spec = @specs[spec.name]["#{spec.version}-#{spec.platform}"]
       spec ? [spec] : []
     end
 
