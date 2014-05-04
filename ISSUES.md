@@ -10,7 +10,7 @@ discuss features. The bundler issue tracker is only for bugs.**
 
 Instructions for common Bundler uses can be found on the [Bundler documentation site](http://bundler.io/).
 
-Detailed information about each Bundler command, including help with common problems, can be found in the [Bundler man pages](http://bundler.io/v1.3/man/bundle.1.html).
+Detailed information about each Bundler command, including help with common problems, can be found in the [Bundler man pages](http://bundler.io/man/bundle.1.html).
 
 ## Troubleshooting
 
