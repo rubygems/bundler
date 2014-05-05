@@ -6,6 +6,7 @@ Here are some ways you can contribute:
 
   - by using prerelease versions
   - by reporting bugs
+  - by adding failing tests that reproduce reported bugs
   - by suggesting new features
   - by writing or editing documentation
   - by closing issues
