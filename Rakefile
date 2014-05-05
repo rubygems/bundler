@@ -66,7 +66,7 @@ namespace :spec do
         # https://github.com/rubygems/rubygems/issues/784
         sh "gem update --system 2.1.11"
       else
-        # Downgrade Rubygems so RSpec 3 can be instaled
+        # Downgrade Rubygems so RSpec 3 can be installed
         # https://github.com/rubygems/rubygems/issues/813
         sh "gem update --system 2.2.0"
       end
