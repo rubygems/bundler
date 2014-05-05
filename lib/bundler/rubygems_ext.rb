@@ -152,7 +152,6 @@ module Gem
     MSWIN = Gem::Platform.new('mswin32') unless defined?(MSWIN)
     MSWIN64 = Gem::Platform.new('mswin64') unless defined?(MSWIN64)
     MINGW = Gem::Platform.new('x86-mingw32') unless defined?(MINGW)
-    RUBINIUS = Gem::Platform.new('rubinius') unless defined?(RUBINIUS)
     X64_MINGW = Gem::Platform.new('x64-mingw32') unless defined?(X64_MINGW)
 
     undef_method :hash if method_defined? :hash

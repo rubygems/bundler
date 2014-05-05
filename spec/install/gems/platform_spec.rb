@@ -177,17 +177,6 @@ describe "bundle install with platform conditionals" do
     expect(exitstatus).to eq(0)
   end
 
-  it "does not attempt to install gems from :rbx when using --local" do
-    simulate_platform "ruby"
-
-    gemfile <<-G
-      source "file://#{gem_repo1}"
-      gem "only_rbx", platform: :rbx
-    G
-
-    bundle "install --local"
-    expect(out).not_to match(/Could not find gem 'only_rbx/)
-  end
 end
 
 describe "when a gem has no architecture" do
