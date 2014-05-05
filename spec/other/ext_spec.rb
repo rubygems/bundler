@@ -20,6 +20,11 @@ describe "Bundler::GemHelpers#generic" do
     expect(generic(pl('java'))).to eq(pl('java'))
   end
 
+  it "converts bogus platforms into ruby" do
+    expect(generic(pl('foo'))).to eq(pl('ruby'))
+    expect(generic(pl('foo-bar'))).to eq(pl('ruby'))
+  end
+
   it "converts mswin platform variants into x86-mswin32" do
     expect(generic(pl('mswin32'))).to eq(pl('x86-mswin32'))
     expect(generic(pl('i386-mswin32'))).to eq(pl('x86-mswin32'))
@@ -35,6 +40,10 @@ describe "Bundler::GemHelpers#generic" do
   it "converts 64-bit mingw platform variants into x64-mingw32" do
     expect(generic(pl('x64-mingw32'))).to eq(pl('x64-mingw32'))
     expect(generic(pl('x86_64-mingw32'))).to eq(pl('x64-mingw32'))
+  end
+
+  it "converts rubinius platform variants into rubinius" do
+    expect(generic(pl(['x86_64', 'rubinius', '2.2']))).to eq(pl([nil, 'rubinius', nil]))
   end
 end
 

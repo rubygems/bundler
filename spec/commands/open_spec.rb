@@ -74,7 +74,7 @@ describe "bundle open" do
     G
 
     bundle "config auto_install 1"
-    bundle "open rails", :env => { "EDITOR" => "echo editor" }
+    bundle "open rails", :env => {"EDITOR" => "echo editor", "VISUAL" => "", "BUNDLER_EDITOR" => ""}
     expect(out).to include("Installing foo 1.0")
   end
 end
