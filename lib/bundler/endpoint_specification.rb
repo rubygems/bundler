@@ -18,7 +18,7 @@ module Bundler
     end
 
     # needed for standalone, load required_paths from local gemspec
-    # after the gem in installed
+    # after the gem is installed
     def require_paths
       if @remote_specification
         @remote_specification.require_paths
