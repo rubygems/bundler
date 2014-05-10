@@ -336,7 +336,7 @@ module Bundler
                 message = "You have requested:\n" \
                   "  #{current.name} #{current.requirement}\n\n" \
                   "The bundle currently has #{current.name} locked at #{version}.\n" \
-                  "Try running `bundle update #{current.name}`"
+                  "Try running `bundle update --source #{current.name}`"
               elsif current.source
                 name = current.name
                 versions = @source_requirements[name][name].map { |s| s.version }
