@@ -15,8 +15,10 @@
 /test/tmp/
 /test/version_tmp/
 /tmp/
+<%- if config[:ext] -%>
 *.bundle
 *.so
 *.o
 *.a
 mkmf.log
+<%- end -%>
