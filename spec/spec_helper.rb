@@ -1,6 +1,13 @@
 $:.unshift File.expand_path('..', __FILE__)
 $:.unshift File.expand_path('../../lib', __FILE__)
-require 'rspec'
+
+begin
+  gem 'rspec', '~> 3.0.0.beta1'
+  require 'rspec'
+rescue LoadError
+  abort "Run `rake spec:deps` to install the gems you need to run the specs"
+end
+
 require 'bundler/psyched_yaml'
 require 'fileutils'
 require 'rubygems'
