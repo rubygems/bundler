@@ -16,6 +16,7 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version     = '>= 1.8.7'
   spec.required_rubygems_version = '>= 1.3.6'
 
+  spec.add_development_dependency 'rdiscount', '~> 1.6'
   spec.add_development_dependency 'ronn', '~> 0.7.3'
   spec.add_development_dependency 'rspec', '~> 2.99.0.beta1'
 
