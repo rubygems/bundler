@@ -36,7 +36,7 @@ describe "bundle console" do
       input.puts("__callee__")
       input.puts("exit")
     end
-    expect(out).to include("irb")
+    expect(out).to include("IRB")
   end
 
   it "loads up .consolerc if it exists" do

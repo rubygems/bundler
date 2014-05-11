@@ -11,35 +11,29 @@ module Bundler
       group ? Bundler.require(:default, *(group.split.map! {|g| g.to_sym })) : Bundler.require
       ARGV.clear
 
-      preferred = Bundler.settings[:console] || 'irb'
-
-      # See if console is available
-      begin
-        require preferred || true
-      rescue LoadError
-        # Is it in Gemfile?
-        Bundler.ui.error "Could not load the #{preferred} console"
-        Bundler.ui.info "Falling back on IRB..."
-
-        require 'irb'
-        preferred = 'irb'
-      end
-
-      constant = consoles[preferred]
-
-      console = begin
-                  Object.const_get(constant)
-                rescue NameError => e
-                  Bundler.ui.error e.inspect
-                  Bundler.ui.error "Could not load the #{constant} console"
-                  return
-                end
-
-      # Load '.consolerc' if it exists. This is a place for gem authors to
-      # include fixtures so that it makes experimenting easy.
+      console = get_console(Bundler.settings[:console] || 'irb')
       load '.consolerc' if File.exists?('.consolerc')
-
       console.start
+    end
+
+    def get_console(name)
+      require name
+      get_constant(name)
+    rescue LoadError
+      Bundler.ui.error "Couldn't load console #{name}"
+      get_constant('irb')
+    end
+
+    def get_constant(name)
+      const_name = {
+        'pry'  => :Pry,
+        'ripl' => :Ripl,
+        'irb'  => :IRB,
+      }[name]
+      Object.const_get(const_name)
+    rescue NameError
+      Bundler.ui.error "Could not find constant #{const_name}"
+      exit 1
     end
 
   end
