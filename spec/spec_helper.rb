@@ -115,15 +115,15 @@ RSpec.configure do |config|
 
     Dir.chdir(original_wd)
     # Reset ENV
-    ENV['PATH']           = original_path
-    ENV['GEM_HOME']       = original_gem_home
-    ENV['GEM_PATH']       = original_gem_home
-    ENV['BUNDLE_PATH']    = nil
-    ENV['BUNDLE_GEMFILE'] = nil
-    ENV['BUNDLER_TEST']   = nil
-    ENV['BUNDLE_FROZEN']  = nil
+    ENV['PATH']                  = original_path
+    ENV['GEM_HOME']              = original_gem_home
+    ENV['GEM_PATH']              = original_gem_home
+    ENV['BUNDLE_PATH']           = nil
+    ENV['BUNDLE_GEMFILE']        = nil
+    ENV['BUNDLE_FROZEN']         = nil
+    ENV['BUNDLE_APP_CONFIG']     = nil
+    ENV['BUNDLER_TEST']          = nil
     ENV['BUNDLER_SPEC_PLATFORM'] = nil
     ENV['BUNDLER_SPEC_VERSION']  = nil
-    ENV['BUNDLE_APP_CONFIG']     = nil
   end
 end
