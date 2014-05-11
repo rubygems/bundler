@@ -430,6 +430,22 @@ describe "bundle gem" do
       it "includes rake-compiler" do
         expect(bundled_app("test_gem/test_gem.gemspec").read).to include('spec.add_development_dependency "rake-compiler"')
       end
+
+      it "depends on compile task for build" do
+        rakefile = strip_whitespace <<-RAKEFILE
+          require "bundler/gem_tasks"
+
+          require "rake/extensiontask"
+
+          task :build => :compile
+
+          Rake::ExtensionTask.new("test_gem") do |ext|
+            ext.lib_dir = "lib/test_gem"
+          end
+        RAKEFILE
+
+        expect(bundled_app("test_gem/Rakefile").read).to eq(rakefile)
+      end
     end
   end
 end
