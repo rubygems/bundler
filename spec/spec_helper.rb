@@ -64,25 +64,8 @@ RSpec.configure do |config|
     config.filter_run_excluding :realworld => true
   end
 
-  if RUBY_VERSION >= "1.9"
-    config.filter_run_excluding :ruby => "1.8"
-  else
-    config.filter_run_excluding :ruby => "1.9"
-  end
-
-  if RUBY_VERSION >= "2.0"
-    config.filter_run_excluding :ruby => "1.8"
-    config.filter_run_excluding :ruby => "1.9"
-  else
-    config.filter_run_excluding :ruby => "2.0"
-    config.filter_run_excluding :ruby => "2.1"
-  end
-
-  if Gem::VERSION < "2.0"
-    config.filter_run_excluding :rubygems => "2.0"
-  elsif Gem::VERSION < "2.2"
-    config.filter_run_excluding :rubygems => "2.2"
-  end
+  config.filter_run_excluding :ruby => LessThanProc.with(RUBY_VERSION)
+  config.filter_run_excluding :rubygems => LessThanProc.with(Gem::VERSION)
 
   config.filter_run :focused => true unless ENV['CI']
   config.run_all_when_everything_filtered = true
