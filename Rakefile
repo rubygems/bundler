@@ -79,10 +79,7 @@ begin
   require 'rspec/core/rake_task'
 
   desc "Run specs"
-  RSpec::Core::RakeTask.new do |t|
-    t.rspec_opts = %w(--format documentation --color)
-    t.ruby_opts  = %w(-w)
-  end
+  RSpec::Core::RakeTask.new
   task :spec => "man:build"
 
   namespace :spec do
