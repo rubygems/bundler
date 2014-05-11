@@ -39,6 +39,13 @@ describe "bundle console" do
     expect(out).to include("irb")
   end
 
+  it "loads up .consolerc if it exists" do
+    consolerc <<-C
+      puts "Hello!"
+    C
+    bundle "console"
+    expect(out).to include("Hello!")
+  end
 
   it "doesn't load any other groups" do
     bundle "console" do |input|

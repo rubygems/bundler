@@ -163,8 +163,8 @@ module Spec
       config
     end
 
-    def gemfile(*args)
-      path = bundled_app("Gemfile")
+    def create_file(*args)
+      path = bundled_app(args.shift)
       path = args.shift if args.first.is_a?(Pathname)
       str  = args.shift || ""
       path.dirname.mkpath
@@ -173,13 +173,16 @@ module Spec
       end
     end
 
+    def gemfile(*args)
+      create_file("Gemfile", *args)
+    end
+
     def lockfile(*args)
-      path = bundled_app("Gemfile.lock")
-      path = args.shift if args.first.is_a?(Pathname)
-      str  = args.shift || ""
-      File.open(path.to_s, 'w') do |f|
-        f.puts strip_whitespace(str)
-      end
+      create_file("Gemfile.lock", *args)
+    end
+
+    def consolerc(*args)
+      create_file(".consolerc", *args)
     end
 
     def strip_whitespace(str)

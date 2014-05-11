@@ -42,6 +42,7 @@ module Bundler
       thor.template(File.join("newgem/LICENSE.txt.tt"),           File.join(target, "LICENSE.txt"),                         opts)
       thor.template(File.join("newgem/README.md.tt"),             File.join(target, "README.md"),                           opts)
       thor.template(File.join("newgem/gitignore.tt"),             File.join(target, ".gitignore"),                          opts)
+      thor.template(File.join("newgem/consolerc.tt"),             File.join(target, ".consolerc"),                          opts)
       thor.template(File.join("newgem/newgem.gemspec.tt"),        gemspec_dest,                                             opts)
       thor.template(File.join("newgem/lib/newgem.rb.tt"),         File.join(target, "lib/#{namespaced_path}.rb"),           opts)
       thor.template(File.join("newgem/lib/newgem/version.rb.tt"), File.join(target, "lib/#{namespaced_path}/version.rb"),   opts)
