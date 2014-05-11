@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.version     = Bundler::VERSION
   spec.licenses    = ['MIT']
   spec.authors     = ["André Arko", "Terence Lee", "Carl Lerche", "Yehuda Katz"]
-  spec.email       = ["andre@arko.net"]
+  spec.email       = ["andre.arko+terence.lee@gmail.com"]
   spec.homepage    = "http://bundler.io"
   spec.summary     = %q{The best way to manage your application's dependencies}
   spec.description = %q{Bundler manages an application's dependencies through its entire life, across many machines, systematically and repeatably}
