@@ -21,9 +21,11 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec', '~> 3.0.0.beta1'
 
   spec.files       = `git ls-files -z`.split("\x0")
-  spec.files      += Dir.glob('lib/bundler/man/**/*') # man/ is ignored by git
-  spec.test_files  = spec.files.grep(%r{^spec/})
+  # we don't check in man pages, but we need to ship them because
+  # we use them to generate the long-form help for each command.
+  spec.files      += Dir.glob('lib/bundler/man/**/*')
 
+  spec.test_files  = spec.files.grep(%r{^spec/})
   spec.executables   = %w(bundle bundler)
   spec.require_paths = ["lib"]
 end
