@@ -30,11 +30,10 @@ end
 namespace :spec do
   desc "Ensure spec dependencies are installed"
   task :deps do
-    deps = {
-      "rdiscount" => "~> 1.6",
-      "ronn" => "~> 0.7.3",
-      "rspec" => "~> 3.0.beta"
-    }
+    spec = Gem::Specification.load("bundler.gemspec")
+    deps = Hash[spec.development_dependencies.map do |d|
+      [d.name, d.requirement.to_s]
+    end]
 
     # JRuby can't build ronn or rdiscount, so we skip that
     if defined?(RUBY_ENGINE) && RUBY_ENGINE == 'jruby'
@@ -77,7 +76,6 @@ namespace :spec do
 end
 
 begin
-  # running the specs needs both rspec and ronn
   require 'rspec/core/rake_task'
 
   desc "Run specs"
