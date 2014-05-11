@@ -1,10 +1,9 @@
 module Bundler
   class CLI::Console
-    attr_reader :options, :group, :consoles
-    def initialize(options, group, consoles)
+    attr_reader :options, :group
+    def initialize(options, group)
       @options = options
       @group = group
-      @consoles = consoles
     end
 
     def run

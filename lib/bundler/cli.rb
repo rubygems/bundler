@@ -280,16 +280,10 @@ module Bundler
       Open.new(options, name).run
     end
 
-    CONSOLES = {
-      'pry'  => :Pry,
-      'ripl' => :Ripl,
-      'irb'  => :IRB,
-    }
-
     desc "console [GROUP]", "Opens an IRB session with the bundle pre-loaded"
     def console(group = nil)
       require 'bundler/cli/console'
-      Console.new(options, group, CONSOLES).run
+      Console.new(options, group).run
     end
 
     desc "version", "Prints the bundler's version information"
