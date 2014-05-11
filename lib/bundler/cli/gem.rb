@@ -29,6 +29,7 @@ module Bundler
         :name             => name,
         :underscored_name => underscored_name,
         :namespaced_path  => namespaced_path,
+        :makefile_path    => "#{underscored_name}/#{underscored_name}",
         :constant_name    => constant_name,
         :constant_array   => constant_array,
         :author           => git_user_name.empty? ? "TODO: Write your name" : git_user_name,
