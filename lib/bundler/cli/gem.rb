@@ -41,12 +41,12 @@ module Bundler
         "Gemfile.tt" => "Gemfile",
         "gitignore.tt" => ".gitignore",
         "lib/newgem.rb.tt" => "lib/#{namespaced_path}.rb",
-        "lib/newgem/version.rb.tt" => "lib/#{namespaced_path}/version.rb"
+        "lib/newgem/version.rb.tt" => "lib/#{namespaced_path}/version.rb",
         "LICENSE.txt.tt" => "LICENSE.txt",
         "newgem.gemspec.tt" => "#{name}.gemspec",
-        "newgem/consolerc.tt" => ".consolerc",
+        "consolerc.tt" => ".consolerc",
         "Rakefile.tt" => "Rakefile",
-        "README.md.tt" => "README.md",
+        "README.md.tt" => "README.md"
       }
 
       templates.merge!("bin/newgem.tt" => "bin/#{name}") if options[:bin]
