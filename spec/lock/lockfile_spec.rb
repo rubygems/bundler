@@ -183,7 +183,7 @@ describe "the lockfile format" do
   end
 
   it "serializes global svn sources" do
-    svn = build_svn "foo"
+    build_svn "foo"
 
     install_gemfile <<-G
       svn "file://#{lib_path('foo-1.0')}" do

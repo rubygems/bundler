@@ -636,8 +636,8 @@ module Spec
 
         Dir.chdir(checkout_path) do
           current_ref = `svn info --revision HEAD file://#{checkout_path} | grep \"Revision\" | awk '{print $2}'`.strip
-          _default_files.keys.each do |path|
-            _default_files[path] << "\n#{Builders.constantize(name)}_PREV_REF = '#{current_ref}'"
+          _default_files.keys.each do |prev_ref_path|
+            _default_files[prev_ref_path] << "\n#{Builders.constantize(name)}_PREV_REF = '#{current_ref}'"
           end
           super(options.merge(:path => checkout_path, :gemspec => false))
           `svn add --force *`
