@@ -88,13 +88,13 @@ module Bundler
     end
 
     def validate_ext_name
-      if gem_name.index('-')
-        Bundler.ui.error "You have specified a gem name which does not conform to the \n" \
-                         "naming guidelines for C extensions. For more information, \n" \
-                         "see the 'Extension Naming' section at the following URL:\n" \
-                         "http://guides.rubygems.org/gems-with-extensions/\n"
-        exit 1
-      end
+      return unless gem_name.index('-')
+
+      Bundler.ui.error "You have specified a gem name which does not conform to the \n" \
+                       "naming guidelines for C extensions. For more information, \n" \
+                       "see the 'Extension Naming' section at the following URL:\n" \
+                       "http://guides.rubygems.org/gems-with-extensions/\n"
+      exit 1
     end
 
   end
