@@ -6,7 +6,9 @@ TODO: Write a gem description
 
 Add this line to your application's Gemfile:
 
-    gem '<%=config[:name]%>'
+```ruby
+gem '<%=config[:name]%>'
+```
 
 And then execute:
 
