@@ -202,6 +202,10 @@ module Bundler
       fetcher.download(spec, uri, path)
     end
 
+    def security_policy_keys
+      %w{High Medium Low No}.map { |level| "#{level}Security" }
+    end
+
     def security_policies
       @security_policies ||= begin
         require 'rubygems/security'

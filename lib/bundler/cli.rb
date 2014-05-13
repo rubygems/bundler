@@ -136,8 +136,7 @@ module Bundler
       "Run bundle clean automatically after install"
     method_option "trust-policy", :alias => "P", :type => :string, :banner =>
       "Gem trust policy (like gem install -P). Must be one of " +
-        Bundler.rubygems.security_policies.keys.join('|') unless
-        Bundler.rubygems.security_policies.empty?
+        Bundler.rubygems.security_policy_keys.join('|')
     method_option "jobs", :aliases => "-j", :type => :numeric, :banner =>
       "Specify the number of jobs to run in parallel"
 
