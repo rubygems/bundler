@@ -57,7 +57,7 @@ module Bundler
 
       Bundler.settings[:path]     = nil if options[:system]
       Bundler.settings[:path]     = "vendor/bundle" if options[:deployment]
-      Bundler.settings[:path]     = options["path"] if options["path"]
+      Bundler.settings[:path]     = File.expand_path(options["path"], Dir.pwd) if options["path"]
       Bundler.settings[:path]     ||= "bundle" if options["standalone"]
       Bundler.settings[:bin]      = options["binstubs"] if options["binstubs"]
       Bundler.settings[:bin]      = nil if options["binstubs"] && options["binstubs"].empty?
