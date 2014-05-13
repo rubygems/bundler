@@ -65,6 +65,7 @@ describe Bundler::GemHelper do
 
     before(:each) do
       content = app_gemspec_content.gsub("TODO: ", "")
+      content.sub!(/homepage\s+= ".*"/, 'homepage = ""')
       File.open(app_gemspec_path, "w") { |file| file << content }
     end
 

@@ -9,17 +9,17 @@ Gem::Specification.new do |spec|
   spec.authors       = [<%=config[:author].inspect%>]
   spec.email         = [<%=config[:email].inspect%>]
 
-<% if ::Gem::Requirement.new(">= 2.0").satisfied_by? ::Gem::Version.new(::Gem::VERSION) -%>
+<%- if ::Gem::Requirement.new(">= 2.0").satisfied_by? ::Gem::Version.new(::Gem::VERSION) -%>
   spec.metadata['allowed_push_host'] = "TODO: Set to 'http://mygemserver.com' to prevent pushes to rubygems.org, or delete to allow pushes to any server."
   spec.required_rubygems_version = ">= 2.0"
 <% end -%>
 
-<% if config[:ext] -%>
+<%- if config[:ext] -%>
   spec.extensions    = ["ext/<%=config[:underscored_name]%>/extconf.rb"]
-<% end -%>
-  spec.summary       = %q{TODO: Write a short summary. Required.}
-  spec.description   = %q{TODO: Write a longer description. Optional, please update before building.}
-  spec.homepage      = ""
+<%- end -%>
+  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
+  spec.description   = %q{TODO: Write a longer description or delete this line.}
+  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")
@@ -29,10 +29,10 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> <%= Bundler::VERSION.split(".")[0..1].join(".") %>"
   spec.add_development_dependency "rake", "~> 10.0"
-<% if config[:ext] -%>
+<%- if config[:ext] -%>
   spec.add_development_dependency "rake-compiler"
-<% end -%>
-<% if config[:test] -%>
+<%- end -%>
+<%- if config[:test] -%>
   spec.add_development_dependency "<%=config[:test]%>"
-<% end -%>
+<%- end -%>
 end

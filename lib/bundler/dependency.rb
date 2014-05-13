@@ -97,7 +97,6 @@ module Bundler
       out << "\n"
     end
 
-
     def specific?
       super
     rescue NoMethodError

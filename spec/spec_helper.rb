@@ -1,6 +1,13 @@
 $:.unshift File.expand_path('..', __FILE__)
 $:.unshift File.expand_path('../../lib', __FILE__)
-require 'rspec'
+
+begin
+  gem 'rspec', '~> 3.0.0.beta1'
+  require 'rspec'
+rescue LoadError
+  abort "Run `rake spec:deps` to install the gems you need to run the specs"
+end
+
 require 'bundler/psyched_yaml'
 require 'fileutils'
 require 'rubygems'
@@ -57,25 +64,8 @@ RSpec.configure do |config|
     config.filter_run_excluding :realworld => true
   end
 
-  if RUBY_VERSION >= "1.9"
-    config.filter_run_excluding :ruby => "1.8"
-  else
-    config.filter_run_excluding :ruby => "1.9"
-  end
-
-  if RUBY_VERSION >= "2.0"
-    config.filter_run_excluding :ruby => "1.8"
-    config.filter_run_excluding :ruby => "1.9"
-  else
-    config.filter_run_excluding :ruby => "2.0"
-    config.filter_run_excluding :ruby => "2.1"
-  end
-
-  if Gem::VERSION < "2.0"
-    config.filter_run_excluding :rubygems => "2.0"
-  elsif Gem::VERSION < "2.2"
-    config.filter_run_excluding :rubygems => "2.2"
-  end
+  config.filter_run_excluding :ruby => LessThanProc.with(RUBY_VERSION)
+  config.filter_run_excluding :rubygems => LessThanProc.with(Gem::VERSION)
 
   config.filter_run :focused => true unless ENV['CI']
   config.run_all_when_everything_filtered = true
@@ -108,15 +98,15 @@ RSpec.configure do |config|
 
     Dir.chdir(original_wd)
     # Reset ENV
-    ENV['PATH']           = original_path
-    ENV['GEM_HOME']       = original_gem_home
-    ENV['GEM_PATH']       = original_gem_home
-    ENV['BUNDLE_PATH']    = nil
-    ENV['BUNDLE_GEMFILE'] = nil
-    ENV['BUNDLER_TEST']   = nil
-    ENV['BUNDLE_FROZEN']  = nil
+    ENV['PATH']                  = original_path
+    ENV['GEM_HOME']              = original_gem_home
+    ENV['GEM_PATH']              = original_gem_home
+    ENV['BUNDLE_PATH']           = nil
+    ENV['BUNDLE_GEMFILE']        = nil
+    ENV['BUNDLE_FROZEN']         = nil
+    ENV['BUNDLE_APP_CONFIG']     = nil
+    ENV['BUNDLER_TEST']          = nil
     ENV['BUNDLER_SPEC_PLATFORM'] = nil
     ENV['BUNDLER_SPEC_VERSION']  = nil
-    ENV['BUNDLE_APP_CONFIG']     = nil
   end
 end

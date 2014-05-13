@@ -18,6 +18,8 @@ task :default => :spec
 <% if config[:ext] -%>
 require "rake/extensiontask"
 
+task :build => :compile
+
 Rake::ExtensionTask.new("<%=config[:underscored_name]%>") do |ext|
   ext.lib_dir = "lib/<%=config[:namespaced_path]%>"
 end

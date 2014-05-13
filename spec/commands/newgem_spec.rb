@@ -53,6 +53,8 @@ describe "bundle gem" do
       expect(bundled_app("test_gem/Rakefile")).to exist
       expect(bundled_app("test_gem/lib/test_gem.rb")).to exist
       expect(bundled_app("test_gem/lib/test_gem/version.rb")).to exist
+      expect(bundled_app("test_gem/.gitignore")).to exist
+      expect(bundled_app("test_gem/.consolerc")).to exist
     end
 
     it "starts with version 0.0.1" do
@@ -427,6 +429,22 @@ describe "bundle gem" do
 
       it "includes rake-compiler" do
         expect(bundled_app("test_gem/test_gem.gemspec").read).to include('spec.add_development_dependency "rake-compiler"')
+      end
+
+      it "depends on compile task for build" do
+        rakefile = strip_whitespace <<-RAKEFILE
+          require "bundler/gem_tasks"
+
+          require "rake/extensiontask"
+
+          task :build => :compile
+
+          Rake::ExtensionTask.new("test_gem") do |ext|
+            ext.lib_dir = "lib/test_gem"
+          end
+        RAKEFILE
+
+        expect(bundled_app("test_gem/Rakefile").read).to eq(rakefile)
       end
     end
   end

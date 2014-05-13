@@ -16,17 +16,17 @@ module Bundler
     def initialize
       @sources = []
       @cache = {}
-      @specs = Hash.new { |h,k| h[k] = [] }
+      @specs = Hash.new { |h,k| h[k] = Hash.new }
     end
 
     def initialize_copy(o)
       super
       @sources = @sources.dup
       @cache = {}
-      @specs = Hash.new { |h,k| h[k] = [] }
+      @specs = Hash.new { |h,k| h[k] = Hash.new }
 
-      o.specs.each do |name, array|
-        @specs[name] = array.dup
+      o.specs.each do |name, hash|
+        @specs[name] = hash.dup
       end
     end
 
@@ -75,26 +75,21 @@ module Bundler
     alias [] search
 
     def <<(spec)
-      arr = specs_by_name(spec.name)
+      @specs[spec.name]["#{spec.version}-#{spec.platform}"] = spec
 
-      arr.delete_if do |s|
-        same_version?(s.version, spec.version) && s.platform == spec.platform
-      end
-
-      arr << spec
       spec
     end
 
     def each(&blk)
-      specs.values.each do |specs|
-        specs.each(&blk)
+      specs.values.each do |spec_sets|
+        spec_sets.values.each(&blk)
       end
     end
 
     # returns a list of the dependencies
     def unmet_dependency_names
-      dependency_names = specs.values.map do |array_of_s|
-        array_of_s.map do |s|
+      dependency_names = specs.values.map do |hash_of_s|
+        hash_of_s.values.map do |s|
           s.dependencies.map{|d| d.name }
         end
       end.flatten.uniq
@@ -106,9 +101,9 @@ module Bundler
       other.each do |s|
         if (dupes = search_by_spec(s)) && dupes.any?
           next unless override_dupes
-          @specs[s.name] -= dupes
+          self << s
         end
-        @specs[s.name] << s
+        self << s
       end
       self
     end
@@ -138,7 +133,7 @@ module Bundler
   private
 
     def specs_by_name(name)
-      @specs[name]
+      @specs[name].values
     end
 
     def search_by_dependency(dependency, base = nil)
@@ -165,9 +160,8 @@ module Bundler
     end
 
     def search_by_spec(spec)
-      specs_by_name(spec.name).select do |s|
-        same_version?(s.version, spec.version) && Gem::Platform.new(s.platform) == Gem::Platform.new(spec.platform)
-      end
+      spec = @specs[spec.name]["#{spec.version}-#{spec.platform}"]
+      spec ? [spec] : []
     end
 
     if RUBY_VERSION < '1.9'

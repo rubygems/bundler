@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.version     = Bundler::VERSION
   spec.licenses    = ['MIT']
   spec.authors     = ["André Arko", "Terence Lee", "Carl Lerche", "Yehuda Katz"]
-  spec.email       = ["andre@arko.net"]
+  spec.email       = ["andre.arko+terence.lee@gmail.com"]
   spec.homepage    = "http://bundler.io"
   spec.summary     = %q{The best way to manage your application's dependencies}
   spec.description = %q{Bundler manages an application's dependencies through its entire life, across many machines, systematically and repeatably}
@@ -16,13 +16,16 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version     = '>= 1.8.7'
   spec.required_rubygems_version = '>= 1.3.6'
 
+  spec.add_development_dependency 'rdiscount', '~> 1.6'
   spec.add_development_dependency 'ronn', '~> 0.7.3'
-  spec.add_development_dependency 'rspec', '~> 2.99.0.beta1'
+  spec.add_development_dependency 'rspec', '~> 3.0.0.beta1'
 
   spec.files       = `git ls-files -z`.split("\x0")
-  spec.files      += Dir.glob('lib/bundler/man/**/*') # man/ is ignored by git
-  spec.test_files  = spec.files.grep(%r{^spec/})
+  # we don't check in man pages, but we need to ship them because
+  # we use them to generate the long-form help for each command.
+  spec.files      += Dir.glob('lib/bundler/man/**/*')
 
+  spec.test_files  = spec.files.grep(%r{^spec/})
   spec.executables   = %w(bundle bundler)
   spec.require_paths = ["lib"]
 end
