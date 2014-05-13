@@ -6,7 +6,7 @@ describe Bundler::Dsl do
     allow(Bundler::Source::Rubygems).to receive(:new){ @rubygems }
   end
 
-  describe "#register_host" do
+  describe "#git_source" do
     it "registers custom hosts" do
       subject.git_source(:example){ |repo_name| "git@git.example.com:#{repo_name}.git" }
       subject.git_source(:foobar){ |repo_name| "git@foobar.com:#{repo_name}.git" }
