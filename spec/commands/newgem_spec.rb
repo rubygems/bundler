@@ -428,7 +428,7 @@ describe "bundle gem" do
       end
 
       it "includes rake-compiler" do
-        expect(bundled_app("test_gem/test_gem.gemspec").read).to include('spec.add_development_dependency "rake-compiler"')
+        expect(bundled_app("test_gem/test_gem.gemspec").read).to include("spec.add_development_dependency 'rake-compiler'")
       end
 
       it "depends on compile task for build" do
