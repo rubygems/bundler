@@ -91,8 +91,9 @@ update process below under [CONSERVATIVE UPDATING][].
 
 * `--trust-policy=[<policy>]`:
   Apply the Rubygems security policy named <policy>, where policy is one of
-  HighSecurity, MediumSecurity, LowSecurity, or NoSecurity. For more detail,
-  see the Rubygems signing documentation, linked below in [SEE ALSO][].
+  HighSecurity, MediumSecurity, LowSecurity, AlmostNoSecurity, or NoSecurity.
+  For more detail, see the Rubygems signing documentation, linked below in
+  [SEE ALSO][].
 
 * `--jobs=[<size>]`:
   Install gems parallely by starting <size> number of parallel workers.
@@ -367,5 +368,5 @@ does not work, run [bundle update(1)][bundle-update].
 
 ## SEE ALSO
 
-* Gem install docs: http://docs.rubygems.org/read/chapter/2
-* Rubygems signing docs: http://docs.rubygems.org/read/chapter/21
+* Gem install docs: http://guides.rubygems.org/rubygems-basics/#installing-gems
+* Rubygems signing docs: http://guides.rubygems.org/security/
