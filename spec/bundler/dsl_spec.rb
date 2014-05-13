@@ -72,6 +72,20 @@ describe Bundler::Dsl do
     end
   end
 
+  describe "#gem" do
+    [:ruby, :ruby_18, :ruby_19, :ruby_20, :ruby_21, :mri, :mri_18, :mri_19,
+     :mri_20, :mri_21, :jruby, :rbx].each do |platform|
+      it "allows #{platform} as a valid platform" do
+        subject.gem("foo", :platform => platform)
+      end
+    end
+
+    it "rejects invalid platforms" do
+      expect { subject.gem("foo", :platform => :bogus) }.
+        to raise_error(Bundler::GemfileError, /is not a valid platform/)
+    end
+  end
+
   describe "syntax errors" do
     it "will raise a Bundler::GemfileError" do
       gemfile "gem 'foo', :path => /unquoted/string/syntax/error"
