@@ -24,8 +24,7 @@ module Bundler
       @platforms       = []
       @env             = nil
       @ruby_version    = nil
-      add_github_sources
-      add_bitbucket_source
+      add_git_sources
     end
 
     def rubygems_source
@@ -221,19 +220,17 @@ module Bundler
 
   private
 
-    def add_github_sources
+    def add_git_sources
       git_source(:github) do |repo_name|
         repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
         "git://github.com/#{repo_name}.git"
       end
 
       git_source(:gist){ |repo_name| "https://gist.github.com/#{repo_name}.git" }
-    end
 
-    def add_bitbucket_source
       git_source(:bitbucket) do |repo_name|
-        repo_name, user_name = repo_name.split '/'
-        user_name ||= repo_name
+        user_name, repo_name = repo_name.split '/'
+        repo_name ||= user_name
         "https://#{user_name}@bitbucket.org/#{user_name}/#{repo_name}.git"
       end
     end
