@@ -38,7 +38,7 @@ module Bundler
         patchlevel     == other.patchlevel
     end
 
-    # Returns a tuple of thsee things:
+    # Returns a tuple of these things:
     #   [diff, this, other]
     #   The priority of attributes are
     #   1. engine
