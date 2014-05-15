@@ -8,11 +8,7 @@ module Bundler
     autoload :ThreadWorker, "bundler/parallel_workers/thread_worker"
 
     def self.worker_pool(size, job)
-      if Bundler.current_ruby.mswin? || Bundler.current_ruby.jruby? || Bundler.current_ruby.rbx?
-        ThreadWorker.new(size, job)
-      else
-        UnixWorker.new(size, job)
-      end
+      ThreadWorker.new(size, job)
     end
   end
 end
