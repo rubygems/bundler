@@ -22,6 +22,8 @@ notifications:
     rooms:
       # Bundler Ops
       secure: MNTSGIySYwHia5gIgRiZxXtPMPDIP9KmzQk7Kq2ZoVvP3mIk8W1TMkvcyFkEf6uCasyVZZixzUBfY+E0BlHAz1ycQpTh1jvSpuIpEVYW48ShJldJ+8W8xfzafyOHii3z7VrDaomEffmMDdmHRsbQAfekMjdR4bTpXtT9V+wOXlg=
+  slack:
+    secure: "b/9aCHOYWrIYDWVW5sCMhbUSdbX1CyMc2zUg+UaefKoGGI+URfQUk5IirQmQuf0b/pGAKm8IaqkTrDscKDOdOGscjAFb4VX7elakIuX8ulp/v3BuM99bxOFobzpkxK/DjJFYZMMzqKkjJg1TwMqU40b0N7BaoNuTbT9LdNjvzUM="
 rvm:
   - 2.1.1
   - 2.0.0
