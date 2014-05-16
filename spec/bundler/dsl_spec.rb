@@ -6,7 +6,7 @@ describe Bundler::Dsl do
     allow(Bundler::Source::Rubygems).to receive(:new){ @rubygems }
   end
 
-  describe "#register_host" do
+  describe "#git_source" do
     it "registers custom hosts" do
       subject.git_source(:example){ |repo_name| "git@git.example.com:#{repo_name}.git" }
       subject.git_source(:foobar){ |repo_name| "git@foobar.com:#{repo_name}.git" }
@@ -81,6 +81,20 @@ describe Bundler::Dsl do
       expect(Bundler).to receive(:read_file).with("Gemfile").and_return("}")
       expect { subject.eval_gemfile("Gemfile") }.
         to raise_error(Bundler::GemfileError, /Gemfile syntax error/)
+    end
+  end
+
+  describe "#gem" do
+    [:ruby, :ruby_18, :ruby_19, :ruby_20, :ruby_21, :mri, :mri_18, :mri_19,
+     :mri_20, :mri_21, :jruby, :rbx].each do |platform|
+      it "allows #{platform} as a valid platform" do
+        subject.gem("foo", :platform => platform)
+      end
+    end
+
+    it "rejects invalid platforms" do
+      expect { subject.gem("foo", :platform => :bogus) }.
+        to raise_error(Bundler::GemfileError, /is not a valid platform/)
     end
   end
 
