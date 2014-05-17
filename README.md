@@ -2,6 +2,8 @@
 [![Build Status](https://img.shields.io/travis/bundler/bundler/master.svg)](https://travis-ci.org/bundler/bundler)
 [![Code Climate](https://img.shields.io/codeclimate/github/bundler/bundler.svg)](https://codeclimate.com/github/bundler/bundler)
 [![Inline docs ](http://inch-pages.github.io/github/bundler/bundler.svg)](http://inch-pages.github.io/github/bundler/bundler)
+[![Gittip
+](http://img.shields.io/gittip/bundler.svg)](http://gittip.com/bundler)
 
 # Bundler: a gem to bundle gems
 
