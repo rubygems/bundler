@@ -252,7 +252,7 @@ module Bundler
         file.puts "ruby_version = RbConfig::CONFIG[\"ruby_version\"]"
         file.puts "path = File.expand_path('..', __FILE__)"
         paths.each do |path|
-          file.puts %{$:.unshift File.expand_path("\#{path}/#{path}")}
+          file.puts %{$:.unshift "\#{path}/#{path}"}
         end
       end
     end
