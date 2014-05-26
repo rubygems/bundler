@@ -1,10 +1,10 @@
 # -*- encoding: utf-8 -*-
 $:.unshift File.expand_path("../lib", __FILE__)
-require 'rubygems'
 require 'shellwords'
 require 'benchmark'
 
 RUBYGEMS_REPO = File.expand_path("tmp/rubygems")
+BUNDLER_SPEC = Gem::Specification.load("bundler.gemspec")
 
 def safe_task(&block)
   yield
@@ -30,8 +30,7 @@ end
 namespace :spec do
   desc "Ensure spec dependencies are installed"
   task :deps do
-    spec = Gem::Specification.load("bundler.gemspec")
-    deps = Hash[spec.development_dependencies.map do |d|
+    deps = Hash[BUNDLER_SPEC.development_dependencies.map do |d|
       [d.name, d.requirement.to_s]
     end]
 
@@ -76,6 +75,8 @@ namespace :spec do
 end
 
 begin
+  rspec = BUNDLER_SPEC.development_dependencies.find{|d| d.name == "rspec" }
+  gem 'rspec', rspec.requirement.to_s
   require 'rspec/core/rake_task'
 
   desc "Run specs"

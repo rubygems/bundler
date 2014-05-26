@@ -1,21 +1,21 @@
 $:.unshift File.expand_path('..', __FILE__)
 $:.unshift File.expand_path('../../lib', __FILE__)
 
-begin
-  # rspec rake task doesn't load rubygems on 1.8.7
-  require 'rubygems'
-  gem 'rspec', '~> 3.0.0.beta1'
-  require 'rspec'
-rescue LoadError
-  abort "Run `rake spec:deps` to install the gems you need to run the specs"
-end
-
-require 'bundler/psyched_yaml'
 require 'fileutils'
-require 'rubygems'
-require 'bundler'
 require 'uri'
 require 'digest/sha1'
+
+require 'bundler/psyched_yaml'
+require 'bundler'
+
+begin
+  require 'rubygems'
+  spec = Gem::Specification.load("bundler.gemspec")
+  gem 'rspec', spec.dependencies.last.requirement.to_s
+  require 'rspec'
+rescue LoadError
+  abort "Run rake spec:deps to install development dependencies"
+end
 
 # Require the correct version of popen for the current platform
 if RbConfig::CONFIG['host_os'] =~ /mingw|mswin/
