@@ -2,6 +2,8 @@ $:.unshift File.expand_path('..', __FILE__)
 $:.unshift File.expand_path('../../lib', __FILE__)
 
 begin
+  # rspec rake task doesn't load rubygems on 1.8.7
+  require 'rubygems'
   gem 'rspec', '~> 3.0.0.beta1'
   require 'rspec'
 rescue LoadError
