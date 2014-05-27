@@ -94,10 +94,10 @@ matrix:
     - rvm: jruby
       env: RGV=v2.2.2
     # Rubinius, the latest (not maintained, but good to know)
-    - rvm: rbx
+    - rvm: rbx-2
       env: RGV=v2.2.2
   allow_failures:
     - rvm: ruby-head
     - rvm: 1.9.2
     - rvm: jruby
-    - rvm: rbx
+    - rvm: rbx-2
