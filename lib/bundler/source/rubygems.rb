@@ -50,7 +50,9 @@ module Bundler
 
       def to_lock
         out = "GEM\n"
-        out << remotes.map {|r| "  remote: #{r}\n" }.join
+        out << remotes.map { |remote|
+          "  remote: #{suppress_configured_credentials remote}\n"
+        }.join
         out << "  specs:\n"
       end
 
@@ -169,6 +171,18 @@ module Bundler
         uri = URI(uri)
         raise ArgumentError, "The source must be an absolute URI" unless uri.absolute?
         uri
+      end
+
+      def suppress_configured_credentials(remote)
+        userinfo = URI(remote).userinfo
+        remote_without_userinfo = URI(remote).tap { |u| u.user = u.password = nil }.to_s
+        if userinfo && userinfo == Bundler.settings[remote_without_userinfo]
+          remote_without_userinfo
+        else
+          remote
+        end
+      rescue URI::InvalidURIError
+        remote
       end
 
       def fetch_specs
