@@ -28,7 +28,7 @@ notifications:
     rooms:
       secure: "OSIcoeVfwT9MyTmTfjQh4lRXmBAt2WnFXmkKs0xY2cSQm1wXD8DGg/WcutZmPcNK+vAQc0w4QmtagxbeugnjAVrbJLK5SetvgPz/SAeSIrHEwcXNGkx3E3wshhLPCwP6IRSQrUZHw1mWPMs/MvRVFWDJRe/ho+DDO2/1QtlkrkY="
 rvm:
-  - 2.1.1
+  - 2.1.2
   - 2.0.0
   - 1.9.3
   - 1.8.7
