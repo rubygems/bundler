@@ -174,15 +174,12 @@ module Bundler
       end
 
       def suppress_configured_credentials(remote)
-        userinfo = URI(remote).userinfo
-        remote_without_userinfo = URI(remote).tap { |u| u.user = u.password = nil }.to_s
-        if userinfo && userinfo == Bundler.settings[remote_without_userinfo]
-          remote_without_userinfo
+        remote_nouser = remote.tap { |uri| uri.user = uri.password = nil }.to_s
+        if remote.userinfo && remote.userinfo == Bundler.settings[remote_nouser]
+          remote_nouser
         else
           remote
         end
-      rescue URI::InvalidURIError
-        remote
       end
 
       def fetch_specs
