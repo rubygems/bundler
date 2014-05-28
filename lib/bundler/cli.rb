@@ -315,6 +315,8 @@ module Bundler
     method_option :format, :type => :string, :default => "png", :aliases => '-F', :banner => "This is output format option. Supported format is png, jpg, svg, dot ..."
     method_option :requirements, :type => :boolean, :default => false, :aliases => '-r', :banner => "Set to show the version of each required dependency."
     method_option :version, :type => :boolean, :default => false, :aliases => '-v', :banner => "Set to show each gem version."
+    method_option :without, :type => :array, :default => [], :banner => "Exclude gems that are part of the specified named group."
+
     def viz
       require 'bundler/cli/viz'
       Viz.new(options).run
