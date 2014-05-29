@@ -8,7 +8,7 @@ module Bundler
     def run
       require 'graphviz'
       output_file = File.expand_path(options[:file])
-      graph = Graph.new(Bundler.load, output_file, options[:version], options[:requirements], options[:format])
+      graph = Graph.new(Bundler.load, output_file, options[:version], options[:requirements], options[:format], options[:without])
       graph.viz
     rescue LoadError => e
       Bundler.ui.error e.inspect
