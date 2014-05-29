@@ -70,6 +70,31 @@ describe "the lockfile format" do
     G
   end
 
+  it "generates a lockfile wihout credentials for a configured source" do
+    bundle "config http://localgemserver.test/ user:pass"
+
+    install_gemfile(<<-G, :artifice => "endpoint_strict_basic_authentication", :quiet => true)
+      source "http://localgemserver.test/"
+
+      gem "rack-obama", ">= 1.0"
+    G
+
+    lockfile_should_be <<-G
+      GEM
+        remote: http://localgemserver.test/
+        specs:
+          rack (1.0.0)
+          rack-obama (1.0)
+            rack
+
+      PLATFORMS
+        #{generic(Gem::Platform.local)}
+
+      DEPENDENCIES
+        rack-obama (>= 1.0)
+    G
+  end
+
   it "generates lockfiles with multiple requirements" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"

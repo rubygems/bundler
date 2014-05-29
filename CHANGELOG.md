@@ -3,6 +3,7 @@
 Bugfixes:
 
   - don't warn about sudo when installing on Windows (#2984, @indirect)
+  - don't store configured source credentials in Gemfile.lock (#3045, @lhz)
 
 Features:
 
