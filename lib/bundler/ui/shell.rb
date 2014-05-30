@@ -76,7 +76,9 @@ module Bundler
     private
 
       def no_color_support?
-        ! Curses.has_colors?.tap { Curses.close_screen }
+        ! Curses.has_colors?
+      ensure
+        Curses.close_screen
       end
 
       # valimism
