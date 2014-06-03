@@ -1,4 +1,4 @@
-Copyright (c) <%=Time.now.year%> <%=config[:author]%>
+Copyright <%=Time.now.year%> <%=config[:author]%>
 
 MIT License
 
