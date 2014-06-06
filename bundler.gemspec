@@ -13,8 +13,10 @@ Gem::Specification.new do |spec|
   spec.summary     = %q{The best way to manage your application's dependencies}
   spec.description = %q{Bundler manages an application's dependencies through its entire life, across many machines, systematically and repeatably}
 
-  spec.required_ruby_version     = '>= 1.8.7'
-  spec.required_rubygems_version = '>= 1.3.6'
+  if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('1.8.7')
+    spec.add_dependency 'rubysl-securerandom'
+    spec.add_dependency 'backports'
+  end
 
   spec.add_development_dependency 'rdiscount', '~> 1.6'
   spec.add_development_dependency 'ronn', '~> 0.7.3'

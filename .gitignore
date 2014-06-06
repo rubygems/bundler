@@ -14,3 +14,4 @@
 
 # output from ci_reporter
 /spec/reports/
+Gemfile.lock
