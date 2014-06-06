@@ -1,3 +1,8 @@
+if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('1.8.7')
+  require 'backports'
+  require 'bundler/backports/time'
+end
+
 require 'fileutils'
 require 'pathname'
 require 'rbconfig'
