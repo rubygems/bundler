@@ -3,6 +3,7 @@ module Bundler
     attr_reader :options
     def initialize(options)
       @options = options.dup
+      Bundler.settings.options = options.dup
     end
 
     def run
