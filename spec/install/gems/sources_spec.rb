@@ -108,5 +108,105 @@ describe "bundle install with gems on multiple sources" do
         should_be_installed("rack-obama 1.0.0", "rack 1.0.0")
       end
     end
+
+    context "with an indirect dependency" do
+      before do
+        build_repo gem_repo3 do
+          build_gem "depends_on_rack", "1.0.1" do |s|
+            s.add_dependency "rack"
+          end
+        end
+      end
+
+      context "when the indirect dependency is in the pinned source" do
+        before do
+          # we need a working rack gem in repo3
+          update_repo gem_repo3 do
+            build_gem "rack", "1.0.0"
+          end
+
+          gemfile <<-G
+            source "file://#{gem_repo2}"
+            source "file://#{gem_repo3}" do
+              gem "depends_on_rack"
+            end
+          G
+        end
+
+        context "and not in any other sources" do
+          before do
+            build_repo(gem_repo2) {}
+          end
+
+          it "installs from the same source without any warning" do
+            bundle :install
+            expect(out).not_to include("Warning")
+            should_be_installed("depends_on_rack 1.0.1", "rack 1.0.0")
+          end
+        end
+
+        context "and in another source" do
+          before do
+            # need this to be broken to check for correct source ordering
+            build_repo gem_repo2 do
+              build_gem "rack", "1.0.0" do |s|
+                s.write "lib/rack.rb", "RACK = 'FAIL'"
+              end
+            end
+          end
+
+          it "installs from the same source without any warning" do
+            bundle :install
+            expect(out).not_to include("Warning")
+            should_be_installed("depends_on_rack 1.0.1", "rack 1.0.0")
+          end
+        end
+      end
+
+      context "when the indirect dependency is in a different source" do
+        before do
+          # In these tests, we need a working rack gem in repo2 and not repo3
+          build_repo gem_repo2 do
+            build_gem "rack", "1.0.0"
+          end
+        end
+
+        context "and not in any other sources" do
+          before do
+            gemfile <<-G
+              source "file://#{gem_repo2}"
+              source "file://#{gem_repo3}" do
+                gem "depends_on_rack"
+              end
+            G
+          end
+
+          it "installs from the other source without any warning" do
+            bundle :install
+            expect(out).not_to include("Warning")
+            should_be_installed("depends_on_rack 1.0.1", "rack 1.0.0")
+          end
+        end
+
+        context "and in yet another source" do
+          before do
+            gemfile <<-G
+              source "file://#{gem_repo1}"
+              source "file://#{gem_repo2}"
+              source "file://#{gem_repo3}" do
+                gem "depends_on_rack"
+              end
+            G
+          end
+
+          it "installs from the other source and warns about ambiguous gems" do
+            bundle :install
+            expect(out).to include("Warning: the gem 'rack' was found in multiple sources.")
+            expect(out).to include("Installed from: file:#{gem_repo2}")
+            should_be_installed("depends_on_rack 1.0.1", "rack 1.0.0")
+          end
+        end
+      end
+    end
   end
 end
