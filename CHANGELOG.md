@@ -2,7 +2,10 @@
 
 Bugfixes:
 
+  - fix regression when resolving many conflicts (#2994, @Who828)
+  - use local gemspec for builtin gems during install --local (#3041, @Who828)
   - don't warn about sudo when installing on Windows (#2984, @indirect)
+  - shell escape `bundle open` arguments (@indirect)
 
 ## 1.6.2 (2014-04-13)
 
