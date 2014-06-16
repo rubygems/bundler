@@ -162,6 +162,7 @@ describe Bundler::GemHelper do
           `git init`
           `git config user.email "you@example.com"`
           `git config user.name "name"`
+          `git config push.default simple`
         end
       end
 
@@ -202,7 +203,7 @@ describe Bundler::GemHelper do
           mock_confirm_message "Pushed git commits and tags."
           expect(subject).to receive(:rubygem_push).with(app_gem_path.to_s)
 
-          Dir.chdir(app_path) { sys_exec("git push origin master", true) }
+          Dir.chdir(app_path) { sys_exec("git push -u origin master", true) }
 
           subject.release_gem
         end
