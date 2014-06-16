@@ -1,12 +1,13 @@
 $:.unshift File.expand_path('..', __FILE__)
 $:.unshift File.expand_path('../../lib', __FILE__)
-require 'rspec'
-require 'bundler/psyched_yaml'
-require 'fileutils'
-require 'rubygems'
-require 'bundler'
+# stdlib first
 require 'uri'
 require 'digest/sha1'
+require 'fileutils'
+require 'bundler/psyched_yaml'
+require 'rubygems'
+require 'rspec'
+require 'bundler'
 
 # Require the correct version of popen for the current platform
 if RbConfig::CONFIG['host_os'] =~ /mingw|mswin/
