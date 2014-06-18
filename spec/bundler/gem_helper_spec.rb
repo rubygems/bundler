@@ -190,35 +190,47 @@ describe Bundler::GemHelper do
       end
 
       context "succeeds" do
-        before do
-          Dir.chdir(gem_repo1) { `git init --bare` }
-          Dir.chdir(app_path) do
-            `git remote add origin file://#{gem_repo1}`
-            `git commit -a -m "initial commit"`
+        context "with git" do
+          before do
+            Dir.chdir(gem_repo1) { `git init --bare` }
+            Dir.chdir(app_path) do
+              `git remote add origin file://#{gem_repo1}`
+              `git commit -a -m "initial commit"`
+            end
+          end
+
+          it "on releasing" do
+            mock_build_message app_name, app_version
+            mock_confirm_message "Tagged v#{app_version}."
+            mock_confirm_message "Pushed git commits and tags."
+            expect(subject).to receive(:rubygem_push).with(app_gem_path.to_s)
+
+            Dir.chdir(app_path) { sys_exec("git push -u origin master", true) }
+
+            subject.release_gem
+          end
+
+          it "even if tag already exists" do
+            mock_build_message app_name, app_version
+            mock_confirm_message "Tag v#{app_version} has already been created."
+            expect(subject).to receive(:rubygem_push).with(app_gem_path.to_s)
+
+            Dir.chdir(app_path) do
+              `git tag -a -m \"Version #{app_version}\" v#{app_version}`
+            end
+
+            subject.release_gem
           end
         end
 
-        it "on releasing" do
+        it "without git if requested" do
+          ENV['gem_git'], env_orig = 'no', ENV['gem_git']
           mock_build_message app_name, app_version
-          mock_confirm_message "Tagged v#{app_version}."
-          mock_confirm_message "Pushed git commits and tags."
           expect(subject).to receive(:rubygem_push).with(app_gem_path.to_s)
 
-          Dir.chdir(app_path) { sys_exec("git push -u origin master", true) }
-
           subject.release_gem
-        end
 
-        it "even if tag already exists" do
-          mock_build_message app_name, app_version
-          mock_confirm_message "Tag v#{app_version} has already been created."
-          expect(subject).to receive(:rubygem_push).with(app_gem_path.to_s)
-
-          Dir.chdir(app_path) do
-            `git tag -a -m \"Version #{app_version}\" v#{app_version}`
-          end
-
-          subject.release_gem
+          ENV['gem_git'] = env_orig
         end
       end
     end

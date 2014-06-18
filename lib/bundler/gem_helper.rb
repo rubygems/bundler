@@ -71,9 +71,9 @@ module Bundler
     end
 
     def release_gem(built_gem_path=nil)
-      guard_clean
+      guard_clean if gem_git?
       built_gem_path ||= build_gem
-      tag_version { git_push } unless already_tagged?
+      tag_version { git_push } if gem_git? and not already_tagged?
       rubygem_push(built_gem_path) if gem_push?
     end
 
@@ -164,6 +164,10 @@ module Bundler
 
     def gem_push?
       ! %w{n no nil false off 0}.include?(ENV['gem_push'].to_s.downcase)
+    end
+
+    def gem_git?
+      ! %w{n no nil false off 0}.include?(ENV['gem_git'].to_s.downcase)
     end
   end
 end
