@@ -45,8 +45,20 @@ module Bundler
       end
 
       desc "Create tag #{version_tag} and build and push #{name}-#{version}.gem to Rubygems"
-      task 'release' => 'build' do
-        release_gem(built_gem_path)
+      task 'release' => ['build', 'release:guard_clean',
+                         'release:source_control_push', 'release:rubygem_push'] do
+      end
+
+      task 'release:guard_clean' do
+        guard_clean
+      end
+
+      task 'release:source_control_push' do
+        tag_version { git_push } unless already_tagged?
+      end
+
+      task 'release:rubygem_push' do
+        rubygem_push(built_gem_path) if gem_push?
       end
 
       GemHelper.instance = self
