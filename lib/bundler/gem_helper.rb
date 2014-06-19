@@ -82,13 +82,6 @@ module Bundler
       Bundler.ui.confirm "#{name} (#{version}) installed."
     end
 
-    def release_gem(built_gem_path=nil)
-      guard_clean
-      built_gem_path ||= build_gem
-      tag_version { git_push } unless already_tagged?
-      rubygem_push(built_gem_path) if gem_push?
-    end
-
     protected
     def rubygem_push(path)
       if Pathname.new("~/.gem/credentials").expand_path.exist?
