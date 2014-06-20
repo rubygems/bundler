@@ -85,7 +85,8 @@ describe Bundler::GemHelper do
       end
 
       context "defines Rake tasks" do
-        let(:task_names) { %w[build install release] }
+        let(:task_names) { %w[build install release
+          release:guard_clean release:source_control_push release:rubygem_push] }
 
         context "before installation" do
           it "raises an error with appropriate message" do
@@ -157,7 +158,18 @@ describe Bundler::GemHelper do
       end
     end
 
-    describe "#release_gem" do
+    describe "rake release" do
+      let!(:rake_application) { Rake.application }
+
+      before(:each) do
+        Rake.application = Rake::Application.new
+        subject.install
+      end
+
+      after(:each) do
+        Rake.application = rake_application
+      end
+
       before do
         Dir.chdir(app_path) do
           `git init`
@@ -169,13 +181,13 @@ describe Bundler::GemHelper do
 
       context "fails" do
         it "when there are unstaged files" do
-          expect { subject.release_gem }.
+          expect { Rake.application["release"].invoke }.
             to raise_error("There are files that need to be committed first.")
         end
 
         it "when there are uncommitted files" do
           Dir.chdir(app_path) { `git add .` }
-          expect { subject.release_gem }.
+          expect { Rake.application["release"].invoke }.
             to raise_error("There are files that need to be committed first.")
         end
 
@@ -185,7 +197,7 @@ describe Bundler::GemHelper do
           allow(Bundler.ui).to receive(:error)
 
           Dir.chdir(app_path) { `git commit -a -m "initial commit"` }
-          expect { subject.release_gem }.to raise_error
+          expect { Rake.application["release"].invoke }.to raise_error
         end
       end
 
@@ -206,7 +218,7 @@ describe Bundler::GemHelper do
 
           Dir.chdir(app_path) { sys_exec("git push -u origin master", true) }
 
-          subject.release_gem
+          Rake.application["release"].invoke
         end
 
         it "even if tag already exists" do
@@ -218,7 +230,7 @@ describe Bundler::GemHelper do
             `git tag -a -m \"Version #{app_version}\" v#{app_version}`
           end
 
-          subject.release_gem
+          Rake.application["release"].invoke
         end
       end
     end
