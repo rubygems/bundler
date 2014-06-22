@@ -20,16 +20,28 @@
               <div class='description'>
                 Locks and then caches the gems into <code>./vendor/cache</code>.
               </div>
-              <pre class="highlight plaintext">$ bundle package [--no-prune] [--all]</pre>
+              <pre class="highlight plaintext">$ bundle package [--all] [--gemfile=GEMFILE] [--no-install] [--no-prune] [--path=PATH] [--quiet]</pre>
               <div class='notes'>
                 <p>
                   Options:
                 </p>
                 <p>
+                  <code>--all</code>: package <code>:git</code>, <code>:path</code>, and <code>.gem</code> dependencies. Once used, the <code>--all</code> option will be remembered.
+                </p>
+                <p>
+                  <code>--gemfile</code>: Use the specified gemfile instead of Gemfile.
+                </p>
+                <p>
+                  <code>--no-install</code>: Don't actually install the gems, just package.
+                </p>
+                <p>
                   <code>--no-prune</code>: Don't remove stale gems from the cache.
                 </p>
                 <p>
-                  <code>--all</code>: package <code>:git</code>, <code>:path</code>, and <code>.gem</code> dependencies. Once used, the <code>--all</code> option will be remembered.
+                  <code>--path</code>: Specify a different path than the system default.
+                </p>
+                <p>
+                  <code>--quiet</code>: Only output warnings and errors.
                 </p>
               </div>
               <div class='description'>

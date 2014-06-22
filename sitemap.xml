@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>http://bundler.io</loc>
-    <lastmod>2014-04-21T04:13:12Z</lastmod>
+    <lastmod>2014-06-22T20:45:17Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -496,6 +496,9 @@
     <loc>http://bundler.io/v1.5/whats_new.html</loc>
   </url>
   <url>
+    <loc>http://bundler.io/v1.6/bundle_binstubs.html</loc>
+  </url>
+  <url>
     <loc>http://bundler.io/v1.6/bundle_check.html</loc>
   </url>
   <url>
@@ -518,6 +521,9 @@
   </url>
   <url>
     <loc>http://bundler.io/v1.6/bundle_init.html</loc>
+  </url>
+  <url>
+    <loc>http://bundler.io/v1.6/bundle_inject.html</loc>
   </url>
   <url>
     <loc>http://bundler.io/v1.6/bundle_install.html</loc>

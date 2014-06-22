@@ -20,14 +20,27 @@
               <div class='description'>
                 Update the current environment
               </div>
-              <pre class="highlight plaintext">$ bundle update [GEM] [--local] [--source=SOURCE]</pre>
+              <pre class="highlight plaintext">$ bundle update [GEM] [--full-index] [--group=GROUP] [--jobs=NUMBER] [--local] [--quiet] [--source=SOURCE]</pre>
               <div class='notes'>
                 <p>
                   Options:
                 </p>
                 <p>
+                  <code>--full-index</code>: Use the rubygems modern index instead of
+                  the API endpoint
+                </p>
+                <p>
+                  <code>--group</code>: Update one or more gem groups
+                </p>
+                <p>
+                  <code>--jobs</code>: Specify the number of jobs to run in parallel
+                </p>
+                <p>
                   <code>--local</code>: Do not attempt to fetch gems remotely and use
                   the gem cache instead
+                </p>
+                <p>
+                  <code>--quiet</code>: Only output warnings and errors.
                 </p>
                 <p>
                   <code>--source</code>: Update a specific source (and all gems

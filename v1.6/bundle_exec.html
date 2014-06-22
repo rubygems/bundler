@@ -20,7 +20,16 @@
               <div class='description'>
                 Run the command in context of the bundle
               </div>
-              <pre class="highlight plaintext">$ bundle exec</pre>
+              <pre class="highlight plaintext">$ bundle exec [--keep-file-descriptors]</pre>
+              <div class='notes'>
+                <p>
+                  Options:
+                </p>
+                <p>
+                  <code>--keep-file-descriptors</code>: For Ruby versions less than 2.0,
+                  keeps non-standard file descriptors on Kernel#exec
+                </p>
+              </div>
               <div class='description'>
                 Exec runs a command, providing it access to the gems in the bundle. While using
                 bundle exec you can require and call the bundled gems as if they were installed

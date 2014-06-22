@@ -20,16 +20,21 @@
               <div class='description'>
                 Checks if the dependencies listed in Gemfile are satisfied by currently installed gems
               </div>
-              <pre class="highlight plaintext">$ bundle check [--gemfile=FILE] [--path=PATH]</pre>
+              <pre class="highlight plaintext">$ bundle check [--dry-run] [--gemfile=FILE] [--path=PATH]</pre>
               <div class='notes'>
                 <p>
                   Options:
                 </p>
                 <p>
+                  <code>--dry-run</code>: Locks the Gemfile.
+                </p>
+                <p>
                   <code>--gemfile</code>: Use the specified gemfile instead of Gemfile.
                 </p>
                 <p>
-                  <code>--path</code>: Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine.
+                  <code>--path</code>: Specify a different path than the system default
+                  ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future
+                  installs on this machine.
                 </p>
               </div>
               <div class='description'>

@@ -100,7 +100,7 @@
                 to <code>VALUE</code>.
               </div>
               <div class='how'>
-                <pre class="highlight plaintext">$ bundle config --global NAME VALUE </pre>
+                <pre class="highlight plaintext">$ bundle config --global NAME VALUE</pre>
                 <div class='notes'>
                   Works the same as the command above.
                 </div>
@@ -112,7 +112,7 @@
                 <code>VALUE</code>.
               </div>
               <div class='how'>
-                <pre class="highlight plaintext">$ bundle config --local NAME VALUE </pre>
+                <pre class="highlight plaintext">$ bundle config --local NAME VALUE</pre>
                 <div class='notes'>
                   Works the same as the two command above but for the local application.
                   The configuration will be stored in <code>app/.bundle/config</code>.
@@ -199,6 +199,14 @@
                   <code>bundle install</code>.
                 </p>
                 <ul>
+                  <li>
+                    <code>auto_install</code> (<code>1</code>): Setting auto_install config
+                    to 1 or any other truthy value will enable automatic installing of gems
+                    instead of raising an error. This behavior applies to the following
+                    commands: <code>show</code>, <code>binstubs</code>,
+                    <code>outdated</code>, <code>exec</code>, <code>open</code>,
+                    <code>console</code>, <code>license</code>, <code>clean</code>.
+                  </li>
                   <li>
                     <code>path</code> (<code>BUNDLE_PATH</code>): The location on disk
                     to install gems. Defaults to <code>$GEM_HOME</code> in development
