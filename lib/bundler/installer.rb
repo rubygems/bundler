@@ -85,7 +85,7 @@ module Bundler
       # that said, it's a rare situation (other than rake), and parallel
       # installation is just SO MUCH FASTER. so we let people opt in.
       jobs = [Bundler.settings[:jobs].to_i-1, 1].max
-      if jobs > 1 && can_install_parallely?
+      if jobs > 1 && can_install_in_parallel?
         install_in_parallel jobs, options[:standalone]
       else
         install_sequentially options[:standalone]
@@ -192,7 +192,7 @@ module Bundler
 
   private
 
-    def can_install_parallely?
+    def can_install_in_parallel?
       min_rubygems = "2.0.7"
       if Bundler.current_ruby.mri? || Bundler.rubygems.provides?(">= #{min_rubygems}")
         true
