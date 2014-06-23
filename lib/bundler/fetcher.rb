@@ -277,14 +277,14 @@ module Bundler
     def request(uri)
       Bundler.ui.debug "Fetching from: #{uri}"
       req = Net::HTTP::Get.new uri.request_uri
-      if uri.user
-        user = CGI.unescape(uri.user)
-        password = uri.password ? CGI.unescape(uri.password) : nil
+      if @remote_uri.user
+        user = CGI.unescape(@remote_uri.user)
+        password = @remote_uri.password ? CGI.unescape(@remote_uri.password) : nil
         req.basic_auth(user, password)
       end
-      connection.request(uri, req)
-    rescue Net::HTTPUnauthorized, Net::HTTPForbidden
-      retry_with_auth { request(uri) }
+      result = connection.request(uri, req)
+      return retry_with_auth { request(uri) } if Net::HTTPUnauthorized === result or Net::HTTPForbidden === result
+      result
     rescue OpenSSL::SSL::SSLError
       raise CertificateFailureError.new(uri)
     rescue *HTTP_ERRORS

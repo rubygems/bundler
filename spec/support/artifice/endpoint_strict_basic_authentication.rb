@@ -8,7 +8,7 @@ class EndpointStrictBasicAuthentication < Endpoint
       halt 401, "Authentication info not supplied"
     end
 
-    # Only accepts password == "password"
+    # Only accepts credentials == user:pass
     unless env["HTTP_AUTHORIZATION"] == "Basic dXNlcjpwYXNz"
       halt 403, "Authentication failed"
     end
