@@ -1,8 +1,7 @@
-## 1.6.3
+## 1.7.0
 
 Bugfixes:
 
-  - don't warn about sudo when installing on Windows (#2984, @indirect)
   - don't store configured source credentials in Gemfile.lock (#3045, @lhz)
 
 Features:
@@ -11,6 +10,15 @@ Features:
   - add metadata allowed_push_host to new gem template (#3002, @juanitofatas)
   - adds a `--no-install` flag to `bundle package`
   - add `bundle viz --without` to exclude gem groups from resulting graph (@fnichol)
+
+## 1.6.3 (2014-06-16)
+
+Bugfixes:
+
+  - fix regression when resolving many conflicts (#2994, @Who828)
+  - use local gemspec for builtin gems during install --local (#3041, @Who828)
+  - don't warn about sudo when installing on Windows (#2984, @indirect)
+  - shell escape `bundle open` arguments (@indirect)
 
 ## 1.6.2 (2014-04-13)
 
