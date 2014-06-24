@@ -37,6 +37,7 @@ module Bundler
         out = "SVN\n"
         out << "  remote: #{@uri}\n"
         out << "  revision: #{revision}\n"
+        out << "  ref: #{ref}\n"
         out << "  glob: #{@glob}\n" unless @glob == DEFAULT_GLOB
         out << "  specs:\n"
       end
@@ -97,12 +98,6 @@ module Bundler
 
         path = Pathname.new(path)
         path = path.expand_path(Bundler.root) unless path.relative?
-
-        if options["ref"]
-          raise SVNError, "Cannot use local override for #{name} at #{path} because " \
-            ":ref is specified in Gemfile. Don't specify a revision or use " \
-            "`bundle config --delete` to remove the local override"
-        end
 
         unless path.exist?
           raise SVNError, "Cannot use local override for #{name} because #{path} " \
