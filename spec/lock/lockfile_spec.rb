@@ -219,8 +219,8 @@ describe "the lockfile format" do
     lockfile_should_be <<-G
       SVN
         remote: file://#{lib_path('foo-1.0')}
-        ref: HEAD
         revision: 1
+        ref: HEAD
         specs:
           foo (1.0)
 
