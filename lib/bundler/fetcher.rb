@@ -102,6 +102,7 @@ module Bundler
       @remote_uri = Bundler::Source.mirror_for(remote_uri)
       @public_uri = @remote_uri.dup
       @public_uri.user, @public_uri.password = nil, nil # don't print these
+      # TODO: pull auth from config (like #retry_with_auth does) here
 
       Socket.do_not_reverse_lookup = true
     end
@@ -277,14 +278,21 @@ module Bundler
     def request(uri)
       Bundler.ui.debug "Fetching from: #{uri}"
       req = Net::HTTP::Get.new uri.request_uri
+
       if @remote_uri.user
         user = CGI.unescape(@remote_uri.user)
         password = @remote_uri.password ? CGI.unescape(@remote_uri.password) : nil
         req.basic_auth(user, password)
       end
+
       result = connection.request(uri, req)
-      return retry_with_auth { request(uri) } if Net::HTTPUnauthorized === result or Net::HTTPForbidden === result
-      result
+
+      case result
+      when Net::HTTPUnauthorized, Net::HTTPForbidden
+        retry_with_auth { request(uri) }
+      else
+        result
+      end
     rescue OpenSSL::SSL::SSLError
       raise CertificateFailureError.new(uri)
     rescue *HTTP_ERRORS
