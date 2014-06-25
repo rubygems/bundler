@@ -45,6 +45,7 @@ env:
   - RGV=v2.3.0
 
 matrix:
+  fast_finish: true
   include:
     # Ruby 2.1, Rubygems 2.2.2 and up
     - rvm: 2.1.2
@@ -110,7 +111,7 @@ matrix:
       env: RGV=v2.3.0
   allow_failures:
     - rvm: 1.8.7
-      env: RGV=2.1.11
+      env: RGV=v2.1.11
     - rvm: 1.9.2
     - rvm: ruby-head
     - rvm: jruby
