@@ -1,6 +1,7 @@
 language: ruby
 script: rake spec:travis
 before_script: travis_retry rake spec:travis:deps
+
 branches:
   only:
     - master
@@ -10,6 +11,7 @@ branches:
     - 1-2-stable
     - 1-1-stable
     - 1-0-stable
+
 notifications:
   email:
     # andre
@@ -27,11 +29,13 @@ notifications:
     on_failure: always
     rooms:
       secure: "OSIcoeVfwT9MyTmTfjQh4lRXmBAt2WnFXmkKs0xY2cSQm1wXD8DGg/WcutZmPcNK+vAQc0w4QmtagxbeugnjAVrbJLK5SetvgPz/SAeSIrHEwcXNGkx3E3wshhLPCwP6IRSQrUZHw1mWPMs/MvRVFWDJRe/ho+DDO2/1QtlkrkY="
+
 rvm:
   - 2.1.2
   - 2.0.0
   - 1.9.3
   - 1.8.7
+
 # Rubygems versions MUST be available as rake tasks
 # see Rakefile:66 for the list of possible RGV values
 env:
