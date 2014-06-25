@@ -7,10 +7,16 @@ module Bundler
     end
 
     def run
-      if Bundler.settings[:path] || options[:force]
-        Bundler.load.clean(options[:"dry-run"])
-      else
-        Bundler.ui.error "Can only use bundle clean when --path is set or --force is set"
+      reqire_path_or_force
+      Bundler.load.clean(options[:"dry-run"])
+    end
+
+  protected
+
+    def reqire_path_or_force
+      if !Bundler.settings[:path] && !options[:force]
+        Bundler.ui.error "Cleaning all the gems on your system is dangerous! " \
+          "To remove every gem not in this bundle, run `bundle clean --force`."
         exit 1
       end
     end
