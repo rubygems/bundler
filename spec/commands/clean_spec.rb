@@ -320,7 +320,7 @@ describe "bundle clean" do
     bundle :clean, :exitstatus => true
 
     expect(exitstatus).to eq(1)
-    expect(out).to eq("Can only use bundle clean when --path is set or --force is set")
+    expect(out).to include("--force")
   end
 
   # handling bundle clean upgrade path from the pre's
