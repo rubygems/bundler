@@ -84,6 +84,9 @@ matrix:
       env: RGV=v1.3.6
 
     # ALLOWED FAILURES
+    # For no apparent reason, this often goes over the Travis limit
+    - rvm: 1.8.7
+      env: RGV=v2.1.11
     # Ruby 1.9.2 sanity check
     # (but it's just too slow and sometimes goes over the Travis limit)
     - rvm: 1.9.2
@@ -98,7 +101,9 @@ matrix:
     - rvm: rbx-2
       env: RGV=v2.2.2
   allow_failures:
-    - rvm: ruby-head
+    - rvm: 1.8.7
+      env: RGV=2.1.11
     - rvm: 1.9.2
+    - rvm: ruby-head
     - rvm: jruby
     - rvm: rbx-2
