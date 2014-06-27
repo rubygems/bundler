@@ -66,4 +66,23 @@ describe "parallel", :realworld => true do
     bundle "config jobs"
     expect(out).to match(/: "4"/)
   end
+
+  it "works with --standalone" do
+    gemfile <<-G, :standalone => true
+      source "https://rubygems.org"
+      gem "diff-lcs"
+    G
+
+    bundle :install, :standalone => true, :jobs => 4
+
+    ruby <<-RUBY, :no_lib => true
+      $:.unshift File.expand_path("bundle")
+      require "bundler/setup"
+
+      require "diff/lcs"
+      puts Diff::LCS
+    RUBY
+
+    expect(out).to eq("Diff::LCS")
+  end
 end
