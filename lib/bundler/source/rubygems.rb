@@ -6,6 +6,7 @@ module Bundler
   class Source
     class Rubygems < Source
       API_REQUEST_LIMIT = 100 # threshold for switching back to the modern index instead of fetching every spec
+      S3_SCHEME = 's3'
 
       attr_reader :remotes, :caches
       attr_accessor :dependency_names
@@ -163,6 +164,18 @@ module Bundler
         true
       end
 
+    protected
+      def remotes_to_fetchers(remotes)
+        remotes.map do |uri|
+          case uri.scheme
+          when S3_SCHEME
+            Bundler::S3Fetcher.new(uri)
+          else
+            Bundler::Fetcher.new(uri)
+          end
+        end
+      end
+
     private
 
       def loaded_from(spec)
@@ -264,7 +277,7 @@ module Bundler
           old = Bundler.rubygems.sources
           idx = Index.new
 
-          fetchers       = remotes.map { |uri| Bundler::Fetcher.new(uri) }
+          fetchers       = remotes_to_fetchers(remotes)
           api_fetchers   = fetchers.select { |f| f.use_api }
           index_fetchers = fetchers - api_fetchers
 

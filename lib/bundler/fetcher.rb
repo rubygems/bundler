@@ -243,6 +243,15 @@ module Bundler
       "#<#{self.class}:0x#{object_id} uri=#{uri}>"
     end
 
+  protected
+    def add_basic_auth(req)
+      if @remote_uri.user
+        user = CGI.unescape(@remote_uri.user)
+        password = @remote_uri.password ? CGI.unescape(@remote_uri.password) : nil
+        req.basic_auth(user, password)
+      end
+    end
+
   private
 
     HTTP_ERRORS = [
@@ -278,13 +287,7 @@ module Bundler
     def request(uri)
       Bundler.ui.debug "Fetching from: #{uri}"
       req = Net::HTTP::Get.new uri.request_uri
-
-      if @remote_uri.user
-        user = CGI.unescape(@remote_uri.user)
-        password = @remote_uri.password ? CGI.unescape(@remote_uri.password) : nil
-        req.basic_auth(user, password)
-      end
-
+      add_basic_auth(req)
       result = connection.request(uri, req)
 
       case result
