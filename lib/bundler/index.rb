@@ -10,13 +10,14 @@ module Bundler
       i
     end
 
-    attr_reader :specs, :sources
-    protected   :specs
+    attr_reader :specs, :all_specs, :sources
+    protected   :specs, :all_specs
 
     def initialize
       @sources = []
       @cache = {}
       @specs = Hash.new { |h,k| h[k] = [] }
+      @all_specs = Hash.new { |h,k| h[k] = [] }
     end
 
     def initialize_copy(o)
@@ -24,9 +25,13 @@ module Bundler
       @sources = @sources.dup
       @cache = {}
       @specs = Hash.new { |h,k| h[k] = [] }
+      @all_specs = Hash.new { |h,k| h[k] = [] }
 
       o.specs.each do |name, array|
         @specs[name] = array.dup
+      end
+      o.all_specs.each do |name, array|
+        @all_specs[name] = array.dup
       end
     end
 
@@ -37,6 +42,14 @@ module Bundler
     def empty?
       each { return false }
       true
+    end
+
+    def search_all(name)
+      all_matches = @all_specs[name] + local_search(name)
+      @sources.each do |source|
+        all_matches.concat(source.search_all(name))
+      end
+      all_matches
     end
 
     # Search this index's specs, and any source indexes that this index knows
@@ -105,6 +118,7 @@ module Bundler
       return unless other
       other.each do |s|
         if (dupes = search_by_spec(s)) && dupes.any?
+          @all_specs[s.name] = [s] + dupes
           next unless override_dupes
           @specs[s.name] -= dupes
         end

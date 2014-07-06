@@ -5,7 +5,10 @@ require 'bundler/parallel_workers'
 module Bundler
   class Installer < Environment
     class << self
-      attr_accessor :post_install_messages
+      attr_accessor :post_install_messages, :ambiguous_gems
+
+      Installer.post_install_messages = {}
+      Installer.ambiguous_gems = []
     end
 
     # Begins the installation process for Bundler.
@@ -75,10 +78,6 @@ module Bundler
       unless local
         options["local"] ? @definition.resolve_with_cache! : @definition.resolve_remotely!
       end
-      # Must install gems in the order that the resolver provides
-      # as dependencies might actually affect the installation of
-      # the gem.
-      Installer.post_install_messages = {}
 
       # the order that the resolver provides is significant, since
       # dependencies might actually affect the installation of a gem.

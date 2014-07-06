@@ -72,6 +72,12 @@ module Bundler
         # Download the gem to get the spec, because some specs that are returned
         # by rubygems.org are broken and wrong.
         if spec.source_uri
+          # Check for this spec from other sources
+          uris = [spec.source_uri]
+          uris += source_uris_for_spec(spec)
+          uris.uniq!
+          Installer.ambiguous_gems << [spec.name, *uris] if uris.length > 1
+
           s = Bundler.rubygems.spec_from_gem(fetch_gem(spec), Bundler.settings["trust-policy"])
           spec.__swap__(s)
         end
@@ -161,6 +167,12 @@ module Bundler
         end
 
         true
+      end
+
+    protected
+
+      def source_uris_for_spec(spec)
+        specs.search_all(spec.name).map{|s| s.source_uri }
       end
 
     private
