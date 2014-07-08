@@ -164,7 +164,6 @@ module Bundler
         true
       end
 
-    protected
       def remotes_to_fetchers(remotes)
         remotes.map do |uri|
           case uri.scheme
