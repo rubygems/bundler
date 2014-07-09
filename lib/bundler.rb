@@ -37,6 +37,7 @@ module Bundler
   autoload :RubyVersion,           'bundler/ruby_version'
   autoload :RubyDsl,               'bundler/ruby_dsl'
   autoload :Runtime,               'bundler/runtime'
+  autoload :S3Fetcher,             'bundler/s3_fetcher'
   autoload :Settings,              'bundler/settings'
   autoload :SharedHelpers,         'bundler/shared_helpers'
   autoload :SpecSet,               'bundler/spec_set'
