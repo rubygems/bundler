@@ -34,11 +34,10 @@ module Bundler
     end
 
     BASE64_URI_TRANSLATE = { '+' => '%2B', '/' => '%2F', '=' => '%3D' }.freeze
-  end
-
-  protected
-  # The s3 fetcher does not use the username and password for basic auth,
-  # so this is a no-op
-  def add_basic_auth(req)
+    protected
+      # The s3 fetcher does not use the username and password for basic auth,
+      # so this is a no-op
+      def add_basic_auth(req)
+      end
   end
 end
