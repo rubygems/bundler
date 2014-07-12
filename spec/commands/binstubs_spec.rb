@@ -120,6 +120,19 @@ describe "bundle binstubs <gem>" do
     end
   end
 
+  context "when the gem doesn't exist" do
+    it "displays an error with correct status" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+      G
+
+      bundle "binstubs doesnt_exist", :exitstatus => true
+
+      expect(exitstatus).to eq(7)
+      expect(out).to eq("Could not find gem 'doesnt_exist'.")
+    end
+  end
+
   context "--path" do
     it "sets the binstubs dir" do
       install_gemfile <<-G
