@@ -1,3 +1,9 @@
+## 1.6.4
+
+Bugfixes:
+
+  - fix undefined constant error when can't find gem during binstubs (#3095, @jetaggart)
+
 ## 1.6.3 (2014-06-16)
 
 Bugfixes:
