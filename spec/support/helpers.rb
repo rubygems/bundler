@@ -341,5 +341,19 @@ module Spec
     ensure
       $stdout = actual_stdout
     end
+
+    def with_read_only(pattern)
+      chmod = lambda do |dirmode, filemode|
+        lambda do |f|
+          mode = File.directory?(f) ? dirmode : filemode
+          File.chmod(mode, f)
+        end
+      end
+
+      Dir[pattern].each(&chmod[0555, 0444])
+      yield
+    ensure
+      Dir[pattern].each(&chmod[0755, 0644])
+    end
   end
 end

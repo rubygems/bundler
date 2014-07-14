@@ -385,6 +385,14 @@ describe "Bundler.setup" do
         end
       end
     end
+
+    it "finds git gem when default bundle path becomes read only" do
+      bundle "install"
+
+      with_read_only("#{Bundler.bundle_path}/**/*") do
+        should_be_installed "rack 1.0.0"
+      end
+    end
   end
 
   describe "when specifying local override" do

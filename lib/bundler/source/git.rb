@@ -79,11 +79,12 @@ module Bundler
       def install_path
         @install_path ||= begin
           git_scope = "#{base_name}-#{shortref_for_path(revision)}"
+          path = Bundler.install_path.join(git_scope)
 
-          if Bundler.requires_sudo?
+          if !path.exist? && Bundler.requires_sudo?
             Bundler.user_bundle_path.join(Bundler.ruby_scope).join(git_scope)
           else
-            Bundler.install_path.join(git_scope)
+            path
           end
         end
       end
