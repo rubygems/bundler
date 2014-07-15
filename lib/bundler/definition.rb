@@ -5,8 +5,7 @@ module Bundler
   class Definition
     include GemHelpers
 
-    attr_reader :dependencies, :platforms, :sources, :ruby_version,
-      :locked_deps
+    attr_reader :dependencies, :platforms, :ruby_version, :locked_deps
 
     # Given a gemfile and lockfile creates a Bundler definition
     #
@@ -232,8 +231,16 @@ module Bundler
       end
     end
 
-    def rubygems_remotes
-      @sources.select{|s| s.is_a?(Source::Rubygems) }.map{|s| s.remotes }.flatten
+    def has_rubygems_remotes?
+      @sources.any?{|s| s.is_a?(Source::Rubygems) && s.remotes.any? }
+    end
+
+    def has_local_dependencies?
+      @sources.any? { |s| !s.is_a?(Source::Rubygems) }
+    end
+
+    def spec_git_paths
+      @sources.select {|s| s.is_a?(Bundler::Source::Git) }.map {|s| s.path.to_s }
     end
 
     def groups
@@ -392,6 +399,8 @@ module Bundler
     end
 
   private
+
+    attr_reader :sources
 
     def nothing_changed?
       !@source_changes && !@dependency_changes && !@new_platform && !@path_changes && !@local_changes
