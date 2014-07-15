@@ -316,7 +316,8 @@ module Bundler
 
     # fetch from modern index: specs.4.8.gz
     def fetch_all_remote_specs
-      Bundler.rubygems.sources = ["#{@remote_uri}"]
+      old_sources = Bundler.rubygems.sources
+      Bundler.rubygems.sources = [@remote_uri.to_s]
       Bundler.rubygems.fetch_all_remote_specs
     rescue Gem::RemoteFetcher::FetchError, OpenSSL::SSL::SSLError => e
       case e.message
@@ -330,6 +331,8 @@ module Bundler
         Bundler.ui.trace e
         raise HTTPError, "Could not fetch specs from #{uri}"
       end
+    ensure
+      Bundler.rubygems.sources = old_sources
     end
 
     def well_formed_dependency(name, *requirements)
