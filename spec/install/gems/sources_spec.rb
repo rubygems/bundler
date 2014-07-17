@@ -208,6 +208,24 @@ describe "bundle install with gems on multiple sources" do
         end
       end
     end
+
+    context "with a gem that is only found in the wrong source" do
+      before do
+        build_repo gem_repo3 do
+          build_gem "not_in_repo1", "1.0.0"
+        end
+
+        gemfile <<-G
+          source "file://#{gem_repo3}"
+          gem "not_in_repo1", :source => "file://#{gem_repo1}"
+        G
+      end
+
+      it "does not install the gem" do
+        bundle :install
+        expect(out).to include("Could not find gem 'not_in_repo1 (>= 0) ruby'")
+      end
+    end
   end
 
   context "when an older version of the same gem also ships with Ruby" do
