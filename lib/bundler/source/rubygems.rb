@@ -79,6 +79,7 @@ module Bundler
           # Check for this spec from other sources
           uris = [spec.source_uri]
           uris += source_uris_for_spec(spec)
+          uris.compact!
           uris.uniq!
           Installer.ambiguous_gems << [spec.name, *uris] if uris.length > 1
 

@@ -209,4 +209,21 @@ describe "bundle install with gems on multiple sources" do
       end
     end
   end
+
+  context "when an older version of the same gem also ships with Ruby" do
+    before do
+      system_gems "rack-0.9.1"
+
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack" # shoud come from repo1!
+      G
+    end
+
+    it "installs the gems without any warning" do
+      bundle :install
+      expect(out).not_to include("Warning")
+      should_be_installed("rack 1.0.0")
+    end
+  end
 end
