@@ -6,7 +6,7 @@ module Bundler
     include RubyDsl
 
     def self.evaluate(gemfile, lockfile, unlock)
-      builder = new
+      builder = new(gemfile.dirname)
       builder.eval_gemfile(gemfile)
       builder.to_definition(lockfile, unlock)
     end
@@ -15,7 +15,7 @@ module Bundler
 
     attr_accessor :dependencies
 
-    def initialize
+    def initialize(gemfile_root = nil)
       @source          = nil
       @sources         = []
       @git_sources     = {}
@@ -24,6 +24,7 @@ module Bundler
       @platforms       = []
       @env             = nil
       @ruby_version    = nil
+      @gemfile_root    = gemfile_root || Pathname.new(SharedHelpers.pwd)
       add_git_sources
     end
 
@@ -32,7 +33,8 @@ module Bundler
     end
 
     def eval_gemfile(gemfile, contents = nil)
-      contents ||= Bundler.read_file(gemfile.to_s)
+      gemfile = @gemfile_root.join(gemfile)
+      contents ||= Bundler.read_file(gemfile)
       instance_eval(contents, gemfile.to_s, 1)
     rescue SyntaxError => e
       syntax_msg = e.message.gsub("#{gemfile.to_s}:", 'on line ')

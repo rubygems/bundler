@@ -66,11 +66,10 @@ describe Bundler::Dsl do
 
   describe "#method_missing" do
     it "raises an error for unknown DSL methods" do
-      expect(Bundler).to receive(:read_file).with("Gemfile").
-        and_return("unknown")
+      expect(Bundler).to receive(:read_file).and_return("unknown")
 
       error_msg = "Undefined local variable or method `unknown'" \
-        " for Gemfile\\s+from Gemfile:1"
+        " for Gemfile\\s+from /.*/Gemfile:1"
       expect { subject.eval_gemfile("Gemfile") }.
         to raise_error(Bundler::GemfileError, Regexp.new(error_msg))
     end
@@ -78,9 +77,19 @@ describe Bundler::Dsl do
 
   describe "#eval_gemfile" do
     it "handles syntax errors with a useful message" do
-      expect(Bundler).to receive(:read_file).with("Gemfile").and_return("}")
+      expect(Bundler).to receive(:read_file).and_return("}")
       expect { subject.eval_gemfile("Gemfile") }.
         to raise_error(Bundler::GemfileError, /Gemfile syntax error/)
+    end
+
+    it "treats gemfile path as relative to the root gemfile" do
+      expect(Bundler).to receive(:read_file).
+        with(bundled_app("Gemfile")).
+        and_return("eval_gemfile 'Gemfile.foo'")
+      expect(Bundler).to receive(:read_file).
+        with(bundled_app("Gemfile.foo")).
+        and_return("")
+      subject.eval_gemfile("Gemfile")
     end
   end
 
