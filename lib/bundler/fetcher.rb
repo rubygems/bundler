@@ -111,7 +111,7 @@ module Bundler
         needs_ssl = @remote_uri.scheme == "https" ||
           Bundler.settings[:ssl_verify_mode] ||
           Bundler.settings[:ssl_client_cert]
-        raise SSLError if needs_ssl && !defined?(OpenSSL)
+        raise SSLError if needs_ssl && !defined?(OpenSSL::SSL)
 
         con = Net::HTTP::Persistent.new 'bundler', :ENV
 
