@@ -108,31 +108,30 @@ module Bundler
     end
 
     def connection
-      return @connection if @connection
+      @connection ||= begin
+        needs_ssl = @remote_uri.scheme == "https" ||
+          Bundler.settings[:ssl_verify_mode] ||
+          Bundler.settings[:ssl_client_cert]
+        raise SSLError if needs_ssl && !defined?(OpenSSL)
 
-      needs_ssl = @remote_uri.scheme == "https" ||
-        Bundler.settings[:ssl_verify_mode] ||
-        Bundler.settings[:ssl_client_cert]
-      raise SSLError if needs_ssl && !defined?(OpenSSL)
+        con = Net::HTTP::Persistent.new 'bundler', :ENV
 
-      @connection = Net::HTTP::Persistent.new 'bundler', :ENV
+        if @remote_uri.scheme == "https"
+          con.verify_mode = (Bundler.settings[:ssl_verify_mode] ||
+            OpenSSL::SSL::VERIFY_PEER)
+          con.cert_store = bundler_cert_store
+        end
 
-      if @remote_uri.scheme == "https"
-        @connection.verify_mode = (Bundler.settings[:ssl_verify_mode] ||
-          OpenSSL::SSL::VERIFY_PEER)
-        @connection.cert_store = bundler_cert_store
+        if Bundler.settings[:ssl_client_cert]
+          pem = File.read(Bundler.settings[:ssl_client_cert])
+          con.cert = OpenSSL::X509::Certificate.new(pem)
+          con.key  = OpenSSL::PKey::RSA.new(pem)
+        end
+
+        con.read_timeout = @api_timeout
+        con.override_headers["User-Agent"] = self.class.user_agent
+        con
       end
-
-      if Bundler.settings[:ssl_client_cert]
-        pem = File.read(Bundler.settings[:ssl_client_cert])
-        @connection.cert = OpenSSL::X509::Certificate.new(pem)
-        @connection.key  = OpenSSL::PKey::RSA.new(pem)
-      end
-
-      @connection.read_timeout = @api_timeout
-      @connection.override_headers["User-Agent"] = self.class.user_agent
-
-      @connection
     end
 
     def uri
