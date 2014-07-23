@@ -274,7 +274,7 @@ module Bundler
     end
 
     def request(uri)
-      Bundler.ui.debug "Fetching from: #{uri}"
+      Bundler.ui.debug "HTTP GET #{uri}"
       req = Net::HTTP::Get.new uri.request_uri
       if uri.user
         user = CGI.unescape(uri.user)
