@@ -286,7 +286,8 @@ module Bundler
       retry_with_auth { request(uri) }
     rescue OpenSSL::SSL::SSLError
       raise CertificateFailureError.new(uri)
-    rescue *HTTP_ERRORS
+    rescue *HTTP_ERRORS => e
+      Bundler.ui.trace e
       raise HTTPError, "Network error while fetching #{uri}"
     end
 
