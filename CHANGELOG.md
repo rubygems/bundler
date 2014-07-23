@@ -12,6 +12,18 @@ Features:
   - add `bundle viz --without` to exclude gem groups from resulting graph (@fnichol)
   - add support for private S3 sources (@tryba)
 
+## 1.6.4 (2014-07-17)
+
+Bugfixes:
+
+  - fix undefined constant error when can't find gem during binstubs (#3095, @jetaggart)
+  - work when installed git gems are not writable (#3092, @pmahoney)
+  - don't store configured source credentials in Gemfile.lock (#3045, @lhz)
+  - don't include config source credentials in the lockfile (Lars Haugseth)
+  - use threads for jobs on Rubinius (@YorickPeterse)
+  - skip dependencies from other platforms (@mvz)
+  - work when Rubygems was built without SSL (@andremedeiros)
+
 ## 1.6.3 (2014-06-16)
 
 Bugfixes:
