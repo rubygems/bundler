@@ -1,3 +1,5 @@
+require 'thread'
+
 module Bundler
   class Worker
     POISON = Object.new
