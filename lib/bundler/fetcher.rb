@@ -254,9 +254,10 @@ module Bundler
       raise HTTPError, "Too many redirects" if counter >= @redirect_limit
 
       response = request(uri)
+      Bundler.ui.debug("HTTP #{response.code} #{response.message}")
+
       case response
       when Net::HTTPRedirection
-        Bundler.ui.debug("HTTP Redirection")
         new_uri = URI.parse(response["location"])
         if new_uri.host == uri.host
           new_uri.user = uri.user
@@ -264,7 +265,6 @@ module Bundler
         end
         fetch(new_uri, counter + 1)
       when Net::HTTPSuccess
-        Bundler.ui.debug("HTTP Success")
         response.body
       when Net::HTTPRequestEntityTooLarge
         raise FallbackError, response.body
