@@ -4,6 +4,7 @@
 [![Inline docs ](http://inch-ci.org/github/bundler/bundler.svg)](http://inch-ci.org/github/bundler/bundler)
 [![Gittip
 ](http://img.shields.io/gittip/bundler.svg)](http://gittip.com/bundler)
+[![Reference Status](https://www.versioneye.com/ruby/bundler/reference_badge.svg)](https://www.versioneye.com/ruby/bundler/references)
 
 # Bundler: a gem to bundle gems
 
