@@ -91,13 +91,9 @@ module Bundler
     end
 
     def initialize(remote_uri)
-
-      # How many redirects to allew in one request
-      @redirect_limit = 5
-      # How long to wait for each gemcutter API call
-      @api_timeout = 10
-      # How many retries for the gemcutter API call
-      @max_retries = 3
+      @redirect_limit = 5  # How many redirects to allow in one request
+      @api_timeout    = 10 # How long to wait for each API call
+      @max_retries    = 3  # How many retries for the API call
 
       @remote_uri = Bundler::Source.mirror_for(remote_uri)
       @public_uri = @remote_uri.dup
@@ -105,6 +101,7 @@ module Bundler
       # TODO: pull auth from config (like #retry_with_auth does) here
 
       Socket.do_not_reverse_lookup = true
+      connection # create persistent connection
     end
 
     def connection
@@ -112,7 +109,7 @@ module Bundler
         needs_ssl = @remote_uri.scheme == "https" ||
           Bundler.settings[:ssl_verify_mode] ||
           Bundler.settings[:ssl_client_cert]
-        raise SSLError if needs_ssl && !defined?(OpenSSL)
+        raise SSLError if needs_ssl && !defined?(OpenSSL::SSL)
 
         con = Net::HTTP::Persistent.new 'bundler', :ENV
 
@@ -264,9 +261,10 @@ module Bundler
       raise HTTPError, "Too many redirects" if counter >= @redirect_limit
 
       response = request(uri)
+      Bundler.ui.debug("HTTP #{response.code} #{response.message}")
+
       case response
       when Net::HTTPRedirection
-        Bundler.ui.debug("HTTP Redirection")
         new_uri = URI.parse(response["location"])
         if new_uri.host == uri.host
           new_uri.user = uri.user
@@ -274,7 +272,6 @@ module Bundler
         end
         fetch(new_uri, counter + 1)
       when Net::HTTPSuccess
-        Bundler.ui.debug("HTTP Success")
         response.body
       when Net::HTTPRequestEntityTooLarge
         raise FallbackError, response.body
@@ -284,7 +281,7 @@ module Bundler
     end
 
     def request(uri)
-      Bundler.ui.debug "Fetching from: #{uri}"
+      Bundler.ui.debug "HTTP GET #{uri}"
       req = Net::HTTP::Get.new uri.request_uri
       add_basic_auth(req)
       result = connection.request(uri, req)
@@ -297,7 +294,8 @@ module Bundler
       end
     rescue OpenSSL::SSL::SSLError
       raise CertificateFailureError.new(uri)
-    rescue *HTTP_ERRORS
+    rescue *HTTP_ERRORS => e
+      Bundler.ui.trace e
       raise HTTPError, "Network error while fetching #{uri}"
     end
 

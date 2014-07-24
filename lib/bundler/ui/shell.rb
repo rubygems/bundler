@@ -56,12 +56,9 @@ module Bundler
       end
 
       def trace(e, newline = nil)
+        return unless debug?
         msg = ["#{e.class}: #{e.message}", *e.backtrace].join("\n")
-        if debug?
-          tell_me(msg, nil, newline)
-        elsif @trace
-          STDERR.puts "#{msg}#{newline}"
-        end
+        tell_me(msg, nil, newline)
       end
 
       def silence

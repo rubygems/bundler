@@ -12,6 +12,12 @@ Features:
   - add `bundle viz --without` to exclude gem groups from resulting graph (@fnichol)
   - add support for private S3 sources (@tryba)
 
+## 1.6.5 (2014-07-23)
+
+Bugfixes:
+
+  - require openssl explicitly to fix rare HTTPS request failures (@indirect, #3107)
+
 ## 1.6.4 (2014-07-17)
 
 Bugfixes:
