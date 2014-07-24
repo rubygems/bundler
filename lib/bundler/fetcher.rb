@@ -91,13 +91,9 @@ module Bundler
     end
 
     def initialize(remote_uri)
-
-      # How many redirects to allew in one request
-      @redirect_limit = 5
-      # How long to wait for each gemcutter API call
-      @api_timeout = 10
-      # How many retries for the gemcutter API call
-      @max_retries = 3
+      @redirect_limit = 5  # How many redirects to allow in one request
+      @api_timeout    = 10 # How long to wait for each API call
+      @max_retries    = 3  # How many retries for the API call
 
       @remote_uri = Bundler::Source.mirror_for(remote_uri)
       @public_uri = @remote_uri.dup
