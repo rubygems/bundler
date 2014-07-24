@@ -100,6 +100,7 @@ module Bundler
       @public_uri.user, @public_uri.password = nil, nil # don't print these
 
       Socket.do_not_reverse_lookup = true
+      connection # create persistent connection
     end
 
     def connection
