@@ -42,6 +42,10 @@ module Bundler
         out << "  specs:\n"
       end
 
+      def hash
+        [self.class, uri, ref, name, version].hash
+      end
+
       def eql?(o)
         o.is_a?(SVN)         &&
         uri == o.uri         &&

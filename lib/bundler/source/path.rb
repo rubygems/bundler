@@ -54,7 +54,7 @@ module Bundler
       end
 
       def hash
-        self.class.hash
+        [self.class, expand(path), version].hash
       end
 
       def eql?(o)

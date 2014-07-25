@@ -46,6 +46,10 @@ module Bundler
         out << "  specs:\n"
       end
 
+      def hash
+        [self.class, uri, ref, branch, name, version, submodules].hash
+      end
+
       def eql?(o)
         o.is_a?(Git)         &&
         uri == o.uri         &&
