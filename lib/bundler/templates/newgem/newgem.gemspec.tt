@@ -1,7 +1,4 @@
-# coding: utf-8
-lib = File.expand_path('../lib', __FILE__)
-$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require '<%=config[:namespaced_path]%>/version'
+require './lib/<%=config[:namespaced_path]%>/version'
 
 Gem::Specification.new do |spec|
   spec.name          = <%=config[:name].inspect%>
@@ -17,15 +14,14 @@ Gem::Specification.new do |spec|
 <%- if config[:ext] -%>
   spec.extensions    = ["ext/<%=config[:underscored_name]%>/extconf.rb"]
 <%- end -%>
-  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
+  spec.summary       = "TODO: Write a short summary, because Rubygems requires one."
+  spec.description   = "TODO: Write a longer description or delete this line."
   spec.homepage      = "TODO: Put your gem's website or public repo URL here."
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
-  spec.require_paths = ["lib"]
 
   spec.add_development_dependency "bundler", "~> <%= Bundler::VERSION.split(".")[0..1].join(".") %>"
   spec.add_development_dependency "rake", "~> 10.0"
