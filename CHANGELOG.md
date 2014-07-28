@@ -16,6 +16,7 @@ Features:
 
 Bugfixes:
 
+  - store source credentials for not configured source in Gemfile.lock (@splattael)
   - require openssl explicitly to fix rare HTTPS request failures (@indirect, #3107)
 
 ## 1.6.4 (2014-07-17)
