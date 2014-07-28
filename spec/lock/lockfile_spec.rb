@@ -70,7 +70,7 @@ describe "the lockfile format" do
     G
   end
 
-  it "generates a lockfile wihout credentials for a configured source" do
+  it "generates a lockfile without credentials for a configured source" do
     bundle "config http://localgemserver.test/ user:pass"
 
     install_gemfile(<<-G, :artifice => "endpoint_strict_basic_authentication", :quiet => true)
