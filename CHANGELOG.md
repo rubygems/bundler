@@ -1,9 +1,5 @@
 ## 1.7.0
 
-Bugfixes:
-
-  - don't store configured source credentials in Gemfile.lock (#3045, @lhz)
-
 Features:
 
   - add support for SVN sources (@msnexploder)
