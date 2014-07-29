@@ -1,9 +1,8 @@
-[![Version     ](https://img.shields.io/gem/v/bundler.svg)](https://rubygems.org/gems/bundler)
-[![Build Status](https://img.shields.io/travis/bundler/bundler/master.svg)](https://travis-ci.org/bundler/bundler)
-[![Code Climate](https://img.shields.io/codeclimate/github/bundler/bundler.svg)](https://codeclimate.com/github/bundler/bundler)
-[![Inline docs ](http://inch-ci.org/github/bundler/bundler.svg)](http://inch-ci.org/github/bundler/bundler)
+[![Version     ](https://img.shields.io/gem/v/bundler.svg?style=flat)](https://rubygems.org/gems/bundler)
+[![Build Status](https://img.shields.io/travis/bundler/bundler/master.svg?style=flat)](https://travis-ci.org/bundler/bundler)
+[![Code Climate](https://img.shields.io/codeclimate/github/bundler/bundler.svg?style=flat)](https://codeclimate.com/github/bundler/bundler)
 [![Gittip
-](http://img.shields.io/gittip/bundler.svg)](http://gittip.com/bundler)
+](http://img.shields.io/gittip/bundler.svg?style=flat)](http://gittip.com/bundler)
 
 # Bundler: a gem to bundle gems
 
