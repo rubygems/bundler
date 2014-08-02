@@ -25,6 +25,8 @@ module Bundler
       else
         ask_for_spec_from(specs)
       end
+    rescue RegexpError
+      raise GemNotFound, gem_not_found_message(name, Bundler.definition.dependencies)
     end
 
     def self.ask_for_spec_from(specs)

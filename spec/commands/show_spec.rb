@@ -149,4 +149,18 @@ describe "bundle show" do
     bundle :show
     expect(out).to include("Installing foo 1.0")
   end
+
+  context "with an invalid regexp for gem name" do
+    it "does not find the gem" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rails"
+      G
+
+      invalid_regexp = '[]'
+
+      bundle "show #{invalid_regexp}"
+      expect(out).to include("Could not find gem '#{invalid_regexp}'.")
+    end
+  end
 end
