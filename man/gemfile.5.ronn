@@ -33,6 +33,19 @@ be selected for gems that need to use a non-standard repository, suppressing
 this warning, by using the [`:source` option](#SOURCE-source-) or a
 [`source` block](#BLOCK-FORM-OF-SOURCE-GIT-PATH-GROUP-and-PLATFORMS).
 
+### PRIVATE REPOSITORIES
+
+To access private repositories you can use `bundle config` to set user and
+password on a per source basis.
+
+    bundle config https://gems.example.com/ user:password
+
+As alternative you can provide credentials directly in the source URI.
+
+    source "https://user:passowrd@gems.example.com"
+
+Credentials provided in the source URI will take presedence.
+
 ## RUBY (#ruby)
 
 If your application requires a specific Ruby version or engine, specify your
