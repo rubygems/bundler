@@ -26,6 +26,19 @@ might contain the gems listed in the `Gemfile`.
 Each of these _source_s `MUST` be a valid Rubygems repository. Sources are
 checked for gems following the heuristics described in [SOURCE PRIORITY][].
 
+### PRIVATE REPOSITORIES
+
+To access private repositories you can use `bundle config` to set user and
+password on a per source basis.
+
+    bundle config https://gems.example.com/ user:password
+
+As alternative you can provide credentials directly in the source URI.
+
+    source "https://user:passowrd@gems.example.com"
+
+Credentials provided in the source URI will take presedence.
+
 ## RUBY (#ruby)
 
 If your application requires a specific Ruby version or engine, specify your

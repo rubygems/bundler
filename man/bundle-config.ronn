@@ -153,3 +153,15 @@ mirror to fetch gems.
 
     bundle config mirror.http://rubygems.org http://rubygems-mirror.org
 
+## CREDENTIALS FOR PRIVATE REPOSITORIES
+
+Bundler allows you to configure credentials for private repositories on a per
+source basis.
+
+    bundle config REMOTE_URI USERNAME:PASSWORD
+
+For example to use your company geminabox server you can call:
+
+    bundle config https://gems.example.com/ username:password
+
+This way you can avoid putting secrets into your Gemfile.
