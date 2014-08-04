@@ -33,18 +33,22 @@ be selected for gems that need to use a non-standard repository, suppressing
 this warning, by using the [`:source` option](#SOURCE-source-) or a
 [`source` block](#BLOCK-FORM-OF-SOURCE-GIT-PATH-GROUP-and-PLATFORMS).
 
-### PRIVATE REPOSITORIES
+### CREDENTIALS (#credentials)
 
-To access private repositories you can use `bundle config` to set user and
-password on a per source basis.
+Some gem sources require a username and password. Use `bundle config` to set
+the username and password for any sources that need it. The command must be run
+once on each computer that will install the Gemfile, but this keeps the
+credentials from being stored in plain text in version control.
 
     bundle config https://gems.example.com/ user:password
 
-As alternative you can provide credentials directly in the source URI.
+For some sources, like a company Gemfury account, it may be easier to simply
+include the credentials in the Gemfile as part of the source URL.
 
     source "https://user:password@gems.example.com"
 
-Credentials provided in the source URI will take presedence.
+Credentials in the source URL will take precedence over credentials set using
+`config`.
 
 ## RUBY (#ruby)
 
