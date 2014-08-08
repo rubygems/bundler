@@ -54,6 +54,7 @@ D
     private
 
     def outdated?(current, latest)
+      return false unless latest
       Gem::Version.new(current.version) < Gem::Version.new(latest.version)
     end
   end
