@@ -37,12 +37,25 @@ module Bundler
         Bundler.load.specs.sort_by { |s| s.name }.each do |s|
           desc = "  * #{s.name} (#{s.version}#{s.scm_version})"
           if @options[:verbose]
-            Bundler.ui.info "#{desc} - #{s.summary || 'No description available.'}"
+            latest = Gem::Specification.latest_specs.find { |l| l.name == s.name }
+            require 'bundler/cli/outdated'
+            Bundler.ui.info <<D
+#{desc}
+\tSummary:  #{s.summary || 'No description available.'}
+\tHomepage: #{s.homepage || 'No website available.'}
+\tStatus:   #{outdated?(s, latest) ? "Outdated - #{s.version} < #{latest.version}" : "Up to date"}
+D
           else
             Bundler.ui.info desc
           end
         end
       end
+    end
+
+    private
+
+    def outdated?(current, latest)
+      Gem::Version.new(current.version) < Gem::Version.new(latest.version)
     end
   end
 end
