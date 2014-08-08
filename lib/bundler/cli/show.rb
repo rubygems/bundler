@@ -38,7 +38,6 @@ module Bundler
           desc = "  * #{s.name} (#{s.version}#{s.scm_version})"
           if @options[:verbose]
             latest = Gem::Specification.latest_specs.find { |l| l.name == s.name }
-            require 'bundler/cli/outdated'
             Bundler.ui.info <<D
 #{desc}
 \tSummary:  #{s.summary || 'No description available.'}
