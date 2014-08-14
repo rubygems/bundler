@@ -462,8 +462,19 @@ module Bundler
     def converge_sources
       changes = false
 
-      # Get the Rubygems source from the Gemfile.lock
-      locked_gem = @locked_sources.select { |s| s.kind_of?(Source::Rubygems) }
+      # Get the Rubygems sources from the Gemfile.lock
+      locked_gem_sources = @locked_sources.select { |s| s.kind_of?(Source::Rubygems) }
+      # Get the Rubygems sources from the Gemfile
+      actual_gem_sources = @sources.rubygems_sources
+
+      # If there is a Rubygems source in both
+      unless locked_gem_sources.empty? && actual_gem_sources.empty?
+        actual_remotes = actual_gem_sources.map(&:remotes).flatten.uniq
+        locked_gem_sources.each do |locked_gem|
+          # Merge the remotes from the Gemfile into the Gemfile.lock
+          changes = changes | locked_gem.replace_remotes(actual_remotes)
+        end
+      end
 
       # Replace the sources from the Gemfile with the sources from the Gemfile.lock,
       # if they exist in the Gemfile.lock and are `==`. If you can't find an equivalent

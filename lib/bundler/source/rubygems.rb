@@ -35,7 +35,7 @@ module Bundler
       end
 
       def eql?(o)
-        o.is_a?(Rubygems) && remotes == o.remotes
+        o.is_a?(Rubygems) && remotes_equal?(o.remotes)
       end
 
       alias == eql?
@@ -163,6 +163,15 @@ module Bundler
         @remotes.unshift(uri) unless @remotes.include?(uri)
       end
 
+      def replace_remotes(other_remotes)
+        return false if other_remotes == @remotes
+
+        @remotes = []
+        other_remotes.reverse_each do |r|
+          add_remote r.to_s
+        end
+      end
+
     protected
 
       def source_uris_for_spec(spec)
@@ -193,7 +202,7 @@ module Bundler
       end
 
       def suppress_configured_credentials(remote)
-        remote_nouser = remote.tap { |uri| uri.user = uri.password = nil }.to_s
+        remote_nouser = remote.dup.tap { |uri| uri.user = uri.password = nil }.to_s
         if remote.userinfo && remote.userinfo == Bundler.settings[remote_nouser]
           remote_nouser
         else
@@ -330,6 +339,10 @@ module Bundler
 
         # Ruby 2.0, where gemspecs are stored in specifications/default/
         spec.loaded_from && spec.loaded_from.include?("specifications/default/")
+      end
+
+      def remotes_equal?(other_remotes)
+        remotes.map(&method(:suppress_configured_credentials)) == other_remotes.map(&method(:suppress_configured_credentials))
       end
     end
   end
