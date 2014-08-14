@@ -1,3 +1,18 @@
+## 1.7.0 (2014-08-13)
+
+Security:
+
+  - Fix for CVE-2013-0334, installing gems from an unexpected source
+
+Features:
+
+  - Gemfile `source` calls now take a block containing gems from that source (@tmoore)
+  - added the `:source` option to `gem` to specify a source (@tmoore)
+
+Bugfixes:
+
+  - warn on ambiguous gems available from more than one source (@tmoore)
+
 ## 1.6.5 (2014-07-23)
 
 Bugfixes:
