@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Bundler::SourceList do
   before do
-    Bundler.stub(:root) { Pathname.new '/' }
+    allow(Bundler).to receive(:root) { Pathname.new '/' }
   end
 
   subject(:source_list) { Bundler::SourceList.new }
@@ -337,22 +337,11 @@ describe Bundler::SourceList do
     let(:git_source)      { source_list.add_git_source('uri' => 'git://host/path.git') }
     let(:path_source)     { source_list.add_path_source('path' => '/path/to/gem') }
 
-    before do
-      rubygems_source.stub(:cached!)
-      git_source.stub(:cached!)
-      path_source.stub(:cached!)
+    it "calls #cached! on all the sources" do
+      expect(rubygems_source).to receive(:cached!)
+      expect(git_source).to receive(:cached!)
+      expect(path_source).to receive(:cached!)
       source_list.cached!
-    end
-
-    it "calls #cached! on the included rubygems source" do
-      expect(rubygems_source).to have_received(:cached!)
-    end
-
-    it "calls #cached! on the included git source" do
-      expect(git_source).to have_received(:cached!)
-    end
-    it "calls #cached! on the included path source" do
-      expect(path_source).to have_received(:cached!)
     end
   end
 
@@ -361,22 +350,12 @@ describe Bundler::SourceList do
     let(:git_source)      { source_list.add_git_source('uri' => 'git://host/path.git') }
     let(:path_source)     { source_list.add_path_source('path' => '/path/to/gem') }
 
-    before do
-      rubygems_source.stub(:remote!)
-      git_source.stub(:remote!)
-      path_source.stub(:remote!)
+    it "calls #remote! on all the sources" do
+      expect(rubygems_source).to receive(:remote!)
+      expect(git_source).to receive(:remote!)
+      expect(path_source).to receive(:remote!)
       source_list.remote!
     end
-
-    it "calls #remote! on the included rubygems source" do
-      expect(rubygems_source).to have_received(:remote!)
-    end
-
-    it "calls #remote! on the included git source" do
-      expect(git_source).to have_received(:remote!)
-    end
-    it "calls #remote! on the included path source" do
-      expect(path_source).to have_received(:remote!)
-    end
   end
+
 end
