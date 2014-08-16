@@ -289,9 +289,9 @@ module Bundler
     end
 
     def dependency_api_uri(gem_names = [])
-      url = "#{redirected_uri}api/v1/dependencies"
-      url << "?gems=#{URI.encode(gem_names.join(","))}" if gem_names.any?
-      URI.parse(url)
+      uri = fetch_uri + "api/v1/dependencies"
+      uri.query = "gems=#{URI.encode(gem_names.join(","))}" if gem_names.any?
+      uri
     end
 
     # fetch from Gemcutter Dependency Endpoint API
@@ -378,18 +378,18 @@ module Bundler
       yield
     end
 
-    private
-    def redirected_uri
-      return bundler_uri if rubygems?
-      return @remote_uri
-    end
+  private
 
-    def rubygems?
-      @remote_uri.host == "rubygems.org"
-    end
-
-    def bundler_uri
-      URI.parse("#{@remote_uri.scheme}://bundler.#{@remote_uri.host}/")
+    def fetch_uri
+      @fetch_uri ||= begin
+        if @remote_uri.host == "rubygems.org"
+          uri = @remote_uri.dup 
+          uri.host = "bundler.rubygems.org"
+          uri
+        else
+          @remote_uri
+        end
+      end
     end
 
   end
