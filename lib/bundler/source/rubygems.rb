@@ -284,7 +284,7 @@ module Bundler
             Bundler.ui.info "Fetching source index from #{f.uri}"
             idx.use f.specs(nil, self)
           end
-          return idx if api_fetchers.empty?
+          next if api_fetchers.empty?
 
           # because ensuring we have all the gems we need involves downloading
           # the gemspecs of those gems, if the non-api sites contain more than
