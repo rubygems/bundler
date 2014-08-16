@@ -1,8 +1,14 @@
+## 1.7.1
+
+Bugfixes:
+
+  - Install gems from one source needed by gems in another source (@indirect)
+
 ## 1.7.0 (2014-08-13)
 
 Security:
 
-  - Fix for CVE-2013-0334, installing gems from an unexpected source
+  - Fix for CVE-2013-0334, installing gems from an unexpected source (@tmoore)
 
 Features:
 
