@@ -13,7 +13,6 @@ module Bundler
       def initialize(options = {})
         @options = options
         @remotes = []
-        @fetchers = {}
         @dependency_names = []
         @allow_remote = false
         @allow_cached = false
@@ -270,9 +269,14 @@ module Bundler
         idx
       end
 
+      def fetchers
+        @fetchers ||= remotes.map do |url|
+          Bundler::Fetcher.new(url)
+        end
+      end
+
       def remote_specs
         @remote_specs ||= Index.build do |idx|
-          fetchers       = remotes.map { |uri| Bundler::Fetcher.new(uri) }
           api_fetchers   = fetchers.select { |f| f.use_api }
           index_fetchers = fetchers - api_fetchers
 
