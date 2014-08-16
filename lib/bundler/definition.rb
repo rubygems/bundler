@@ -46,9 +46,7 @@ module Bundler
     def initialize(lockfile, dependencies, sources, unlock, ruby_version = nil)
       @unlocking = unlock == true || !unlock.empty?
 
-      @dependencies      = dependencies || []
-      @sources           = sources
-      @unlock            = unlock
+      @dependencies, @sources, @unlock = dependencies, sources, unlock
       @remote            = false
       @specs             = nil
       @lockfile_contents = ""
@@ -91,11 +89,6 @@ module Bundler
       @source_changes = converge_sources
       @dependency_changes = converge_dependencies
       @local_changes = converge_locals
-
-      @dependency_names = @dependencies.map{|d| d.name }.uniq
-      sources.all_sources.each do |s|
-        s.dependency_names = @dependency_names
-      end
 
       fixup_dependency_types!
     end
@@ -213,9 +206,18 @@ module Bundler
 
     def index
       @index ||= Index.build do |idx|
+        dependency_names = @dependencies.dup || []
+        dependency_names.map! {|d| d.name }
+
         sources.all_sources.each do |s|
-          @dependency_names += s.specs.unmet_dependency_names
-          idx.add_source s.specs
+          if s.is_a?(Bundler::Source::Rubygems)
+            s.dependency_names = dependency_names.uniq
+            idx.add_source s.specs
+          else
+            source_index = s.specs
+            dependency_names += source_index.unmet_dependency_names
+            idx.add_source source_index
+          end
         end
       end
     end
