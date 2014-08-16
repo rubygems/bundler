@@ -271,9 +271,7 @@ module Bundler
       end
 
       def remote_specs
-        @remote_specs ||= begin
-          idx = Index.new
-
+        @remote_specs ||= Index.build do |idx|
           fetchers       = remotes.map { |uri| Bundler::Fetcher.new(uri) }
           api_fetchers   = fetchers.select { |f| f.use_api }
           index_fetchers = fetchers - api_fetchers
@@ -320,8 +318,6 @@ module Bundler
               idx.use f.specs(nil, self)
             end
           end
-
-          return idx
         end
       end
 
