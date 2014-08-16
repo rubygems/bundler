@@ -189,15 +189,6 @@ module Bundler
         else
           last_resolve = converge_locked_specs
 
-          # Record the specs available in each gem's source, so that those
-          # specs will be available later when the resolver knows where to
-          # look for that gemspec (or its dependencies)
-          source_requirements = {}
-          dependencies.each do |dep|
-            next unless dep.source
-            source_requirements[dep.name] = dep.source.specs
-          end
-
           # Run a resolve against the locally available gems
           last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve)
         end
@@ -604,5 +595,19 @@ module Bundler
       groups.map! { |g| g.to_sym }
       dependencies.reject { |d| !d.should_include? || (d.groups & groups).empty? }
     end
+
+    def source_requirements
+      # Load all specs from remote sources
+      index
+
+      # Record the specs available in each gem's source, so that those
+      # specs will be available later when the resolver knows where to
+      # look for that gemspec (or its dependencies)
+      dependencies.each_with_object({}) do |dep, source_requirements|
+        next unless dep.source
+        source_requirements[dep.name] = dep.source.specs
+      end
+    end
+
   end
 end
