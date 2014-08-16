@@ -14,6 +14,11 @@ module Bundler
       mirrors[normalized_key] || uri
     end
 
+    attr_accessor :dependency_names
+    def add_specs_named(names)
+      # implemented in Rubygems
+    end
+
     def version_message(spec)
       locked_spec = Bundler.locked_gems.specs.find { |s| s.name == spec.name } if Bundler.locked_gems
       locked_spec_version = locked_spec.version if locked_spec

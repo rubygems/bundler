@@ -204,9 +204,16 @@ module Bundler
 
     def index
       @index ||= Index.build do |idx|
+        unmet = []
+
         sources.all_sources.each do |s|
-          @dependency_names += s.specs.unmet_dependency_names
+          unmet.push(*s.specs.unmet_dependency_names).uniq!
           idx.add_source s.specs
+        end
+
+        sources.all_sources.each do |s|
+          s.add_specs_named(unmet)
+          unmet.push(*s.specs.unmet_dependency_names).uniq!
         end
       end
     end

@@ -8,7 +8,6 @@ module Bundler
       API_REQUEST_LIMIT = 100 # threshold for switching back to the modern index instead of fetching every spec
 
       attr_reader :remotes, :caches
-      attr_accessor :dependency_names
 
       def initialize(options = {})
         @options = options
@@ -171,6 +170,14 @@ module Bundler
         end
       end
 
+      def add_specs_named(names)
+        return unless @allow_remote
+        fetchers.each do |f|
+          new_specs = f.specs(names, self)
+          specs.use new_specs unless new_specs.empty?
+        end
+      end
+
     protected
 
       def source_uris_for_spec(spec)
@@ -298,25 +305,7 @@ module Bundler
               idx.use f.specs(dependency_names, self)
               Bundler.ui.info "" if !Bundler.ui.debug? # new line now that the dots are over
             end
-
-            if api_fetchers.all?{|f| f.use_api }
-              # it's possible that gems from one source depend on gems from some
-              # other source, so now we download gemspecs and iterate over those
-              # dependencies, looking for gems we don't have info on yet.
-              unmet = idx.unmet_dependency_names
-
-              # if there are any cross-site gems we missed, get them now
-              api_fetchers.each do |f|
-                Bundler.ui.info "Fetching additional metadata from #{f.uri}", Bundler.ui.debug?
-                idx.use f.specs(unmet, self)
-                Bundler.ui.info "" if !Bundler.ui.debug? # new line now that the dots are over
-              end if unmet.any?
-            else
-              allow_api = false
-            end
-          end
-
-          if !allow_api
+          else
             api_fetchers.each do |f|
               Bundler.ui.info "Fetching source index from #{f.uri}"
               idx.use f.specs(nil, self)
