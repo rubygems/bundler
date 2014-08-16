@@ -201,14 +201,9 @@ module Bundler
         dependency_names.map! {|d| d.name }
 
         sources.all_sources.each do |s|
-          if s.is_a?(Bundler::Source::Rubygems)
-            s.dependency_names = dependency_names.uniq
-            idx.add_source s.specs
-          else
-            source_index = s.specs
-            dependency_names += source_index.unmet_dependency_names
-            idx.add_source source_index
-          end
+          s.dependency_names = dependency_names
+          idx.add_source s.specs
+          dependency_names.push(*s.unmet_deps).uniq!
         end
       end
     end

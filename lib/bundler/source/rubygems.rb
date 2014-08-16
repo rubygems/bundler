@@ -8,7 +8,6 @@ module Bundler
       API_REQUEST_LIMIT = 100 # threshold for switching back to the modern index instead of fetching every spec
 
       attr_reader :remotes, :caches
-      attr_accessor :dependency_names
 
       def initialize(options = {})
         @options = options
@@ -176,6 +175,14 @@ module Bundler
         @remotes = []
         other_remotes.reverse_each do |r|
           add_remote r.to_s
+        end
+      end
+
+      def unmet_deps
+        if fetchers.any? && fetchers.all?{|f| f.use_api }
+          remote_specs.unmet_dependency_names
+        else
+          []
         end
       end
 
