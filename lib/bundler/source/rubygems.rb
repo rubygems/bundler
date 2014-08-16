@@ -279,7 +279,6 @@ module Bundler
             Bundler.ui.info "Fetching source index from #{f.uri}"
             idx.use f.specs(nil, self)
           end
-          return idx if api_fetchers.empty?
 
           # because ensuring we have all the gems we need involves downloading
           # the gemspecs of those gems, if the non-api sites contain more than
@@ -293,7 +292,7 @@ module Bundler
               Bundler.ui.info "" if !Bundler.ui.debug? # new line now that the dots are over
             end
 
-            if api_fetchers.all?{|f| f.use_api }
+            if api_fetchers.any? && api_fetchers.all?{|f| f.use_api }
               # it's possible that gems from one source depend on gems from some
               # other source, so now we download gemspecs and iterate over those
               # dependencies, looking for gems we don't have info on yet.
