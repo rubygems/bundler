@@ -272,7 +272,6 @@ module Bundler
 
       def remote_specs
         @remote_specs ||= begin
-          old = Bundler.rubygems.sources
           idx = Index.new
 
           fetchers       = remotes.map { |uri| Bundler::Fetcher.new(uri) }
@@ -323,8 +322,6 @@ module Bundler
           end
 
           return idx
-        ensure
-          Bundler.rubygems.sources = old
         end
       end
 

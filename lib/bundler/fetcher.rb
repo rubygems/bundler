@@ -161,6 +161,7 @@ module Bundler
 
     # return the specs in the bundler format as an index
     def specs(gem_names, source)
+      old = Bundler.rubygems.sources
       index = Index.new
 
       if gem_names && use_api
@@ -193,6 +194,8 @@ module Bundler
     rescue CertificateFailureError => e
       Bundler.ui.info "" if gem_names && use_api # newline after dots
       raise e
+    ensure
+      Bundler.rubygems.sources = old
     end
 
     # fetch index
