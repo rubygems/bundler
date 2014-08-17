@@ -598,10 +598,12 @@ module Bundler
       # Record the specs available in each gem's source, so that those
       # specs will be available later when the resolver knows where to
       # look for that gemspec (or its dependencies)
-      dependencies.each_with_object({}) do |dep, source_requirements|
+      source_requirements = {}
+      dependencies.each do |dep|
         next unless dep.source
         source_requirements[dep.name] = dep.source.specs
       end
+      source_requirements
     end
 
   end
