@@ -386,7 +386,7 @@ module Bundler
     def fetch_uri
       @fetch_uri ||= begin
         if @remote_uri.host == "rubygems.org"
-          uri = @remote_uri.dup 
+          uri = @remote_uri.dup
           uri.host = "bundler.rubygems.org"
           uri
         else
