@@ -68,7 +68,7 @@ module Bundler
         end
       end
 
-      results
+      results.sort_by {|s| [s.version, s.platform.to_s == 'ruby' ? "\0" : s.platform.to_s] }
     end
 
     def local_search(query, base = nil)
@@ -173,7 +173,7 @@ module Bundler
           found.reject! { |spec| spec.version.prerelease? }
         end
 
-        found.sort_by {|s| [s.version, s.platform.to_s == 'ruby' ? "\0" : s.platform.to_s] }
+        found
       end
     end
 
