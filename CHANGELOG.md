@@ -3,6 +3,7 @@
 Bugfixes:
 
   - Install gems from one source needed by gems in another source (@indirect)
+  - Install the same gem versions even after some are installed (@tmoore)
 
 ## 1.7.0 (2014-08-13)
 
