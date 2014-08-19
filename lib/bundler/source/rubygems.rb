@@ -179,7 +179,7 @@ module Bundler
       end
 
       def unmet_deps
-        if fetchers.any? && fetchers.all?{|f| f.use_api }
+        if @allow_remote && api_fetchers.any?
           remote_specs.unmet_dependency_names
         else
           []
@@ -276,9 +276,12 @@ module Bundler
         end
       end
 
+      def api_fetchers
+        fetchers.select{|f| f.use_api }
+      end
+
       def remote_specs
         @remote_specs ||= Index.build do |idx|
-          api_fetchers   = fetchers.select { |f| f.use_api }
           index_fetchers = fetchers - api_fetchers
 
           # gather lists from non-api sites
