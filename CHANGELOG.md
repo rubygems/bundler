@@ -7,6 +7,7 @@ Features:
   - adds a `--no-install` flag to `bundle package`
   - add `bundle viz --without` to exclude gem groups from resulting graph (@fnichol)
   - add support for private S3 sources (@tryba)
+  - prevent whitespace in gem declarations with clear messaging
 
 ## 1.7.0 (2014-08-13)
 
