@@ -96,6 +96,47 @@ describe Bundler::Dsl do
       expect { subject.gem("foo", :platform => :bogus) }.
         to raise_error(Bundler::GemfileError, /is not a valid platform/)
     end
+
+    it "rejects with a leading space in the name" do
+      expect { subject.gem(" foo") }.
+        to raise_error(Bundler::GemfileError, /' foo' is not a valid gem name because it contains whitespace/)
+    end
+
+    it "rejects with a trailing space in the name" do
+      expect { subject.gem("foo ") }.
+        to raise_error(Bundler::GemfileError, /'foo ' is not a valid gem name because it contains whitespace/)
+    end
+
+    it "rejects with a space in the gem name" do
+      expect { subject.gem("fo o") }.
+        to raise_error(Bundler::GemfileError, /'fo o' is not a valid gem name because it contains whitespace/)
+    end
+
+    it "rejects with a tab in the gem name" do
+      expect { subject.gem("fo\to") }.
+        to raise_error(Bundler::GemfileError, /'fo\to' is not a valid gem name because it contains whitespace/)
+    end
+
+    it "rejects with a newline in the gem name" do
+      expect { subject.gem("fo\no") }.
+        to raise_error(Bundler::GemfileError, /'fo\no' is not a valid gem name because it contains whitespace/)
+    end
+
+    it "rejects with a carriage return in the gem name" do
+      expect { subject.gem("fo\ro") }.
+        to raise_error(Bundler::GemfileError, /'fo\ro' is not a valid gem name because it contains whitespace/)
+    end
+
+    it "rejects with a form feed in the gem name" do
+      expect { subject.gem("fo\fo") }.
+        to raise_error(Bundler::GemfileError, /'fo\fo' is not a valid gem name because it contains whitespace/)
+    end
+
+    it "rejects symbols as gem name" do
+      expect { subject.gem(:foo) }.
+        to raise_error(Bundler::GemfileError, /You need to specify gem names as Strings. Use 'gem "foo"' instead/)
+    end
+
   end
 
   describe "syntax errors" do

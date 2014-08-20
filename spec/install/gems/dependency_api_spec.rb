@@ -21,7 +21,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :artifice => "endpoint"
-    expect(out).to include("Could not find gem ' sinatra")
+    expect(out).to include("' sinatra' is not a valid gem name because it contains whitespace.")
   end
 
   it "should handle nested dependencies" do

@@ -73,6 +73,9 @@ module Bundler
       if name.is_a?(Symbol)
         raise GemfileError, %{You need to specify gem names as Strings. Use 'gem "#{name.to_s}"' instead.}
       end
+      if name =~ /\s/
+        raise GemfileError, %{'#{name}' is not a valid gem name because it contains whitespace.}
+      end
 
       options = args.last.is_a?(Hash) ? args.pop.dup : {}
       version = args
