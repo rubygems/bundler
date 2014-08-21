@@ -305,4 +305,222 @@ describe "bundle install with groups" do
     end
   end
 
+  describe "installing --only" do
+    describe "with gems assigned to a single group" do
+      before :each do
+        gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rack"
+          group :emo do
+            gem "activesupport", "2.3.5"
+          end
+        G
+      end
+
+      it "does not install gems in the default group" do
+        bundle :install, :only => "emo"
+        should_not_be_installed "rack 1.0.0"
+      end
+
+      it "installs gems from the specified group" do
+        bundle :install, :only => "emo"
+        should_be_installed "activesupport 2.3.5", :groups => [:emo]
+      end
+
+      it "remembers previous only options" do
+        bundle :install, :only => "emo"
+        bundle :install
+        should_not_be_installed "rack 1.0.0"
+      end
+
+      it "does not say it installed gems from the excluded group" do
+        bundle :install, :only => "emo"
+        expect(out).not_to include("rack")
+      end
+
+      it "allows Bundler.setup for specific groups" do
+        bundle :install, :only => "default"
+        run("require 'rack'; puts RACK", :default)
+        expect(out).to eq('1.0.0')
+      end
+
+      it "does not affect the resolve" do
+        gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rails", "2.3.2"
+          group :emo do
+            gem "activesupport"
+          end
+        G
+
+        bundle :install, :only => "emo"
+        should_be_installed "activesupport 2.3.2", :groups => [:emo]
+      end
+
+      it "still works on a different machine and excludes gems" do
+        bundle :install, :only => "emo"
+
+        simulate_new_machine
+        bundle :install, :only => "emo"
+
+        should_not_be_installed "rack 1.0.0", :groups => [:emo]
+        should_be_installed "activesupport 2.3.5", :groups => [:emo]
+      end
+
+      it "still works when BUNDLE_ONLY is set" do
+        ENV["BUNDLE_ONLY"] = "emo"
+
+        bundle :install
+        expect(out).not_to include("rack")
+
+        should_not_be_installed "rack 1.0.0", :groups => [:emo]
+        should_be_installed "activesupport 2.3.5", :groups => [:emo]
+
+        ENV["BUNDLE_ONLY"] = nil
+      end
+
+    end
+
+    describe "with gems assigned to multiple groups" do
+      before :each do
+        gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rack"
+          group :emo, :lolercoaster do
+            gem "activesupport", "2.3.5"
+          end
+        G
+      end
+
+      it "installs the gem if any of its groups are installed" do
+        bundle "install --only emo"
+        should_be_installed "activesupport 2.3.5"
+      end
+
+      it "allows --without to override --only" do
+        pending('requires a refactor')
+        bundle "install --only emo --without lolercoaster"
+        should_not_be_installed "activesupport 2.3.5"
+      end
+
+      describe "with a gem defined multiple times in different groups" do
+        before :each do
+          gemfile <<-G
+            source "file://#{gem_repo1}"
+            gem "rack"
+
+            group :emo do
+              gem "activesupport", "2.3.5"
+            end
+
+            group :lolercoaster do
+              gem "activesupport", "2.3.5"
+            end
+          G
+        end
+
+        it "installs the gem w/ option --only emo" do
+          bundle "install --only emo"
+          should_be_installed "activesupport 2.3.5"
+        end
+
+        it "installs the gem w/ option --only lolercoaster" do
+          bundle "install --only lolercoaster"
+          should_be_installed "activesupport 2.3.5"
+        end
+
+        it "installs the gem w/ option --only emo lolercoaster" do
+          bundle "install --only emo lolercoaster"
+          should_be_installed "activesupport 2.3.5"
+        end
+
+        it "does not install the gem w/ option --only default" do
+          bundle "install --only default"
+          should_not_be_installed "activesupport 2.3.5"
+        end
+      end
+    end
+
+    describe "nesting groups" do
+      before :each do
+        gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rack"
+          group :emo do
+            group :lolercoaster do
+              gem "activesupport", "2.3.5"
+            end
+          end
+        G
+      end
+
+      it "installs the gem if any of its groups are installed" do
+        %w[emo lolercoaster].each do |group|
+          bundle "install --only #{group}"
+          should_be_installed "activesupport 2.3.5"
+        end
+      end
+
+    end
+  end
+
+  describe "when loading only the default group" do
+    it "should not load all groups" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+        gem "activesupport", :groups => :development
+      G
+
+      ruby <<-R
+        require "bundler"
+        Bundler.setup :default
+        Bundler.require :default
+        puts RACK
+        begin
+          require "activesupport"
+        rescue LoadError
+          puts "no activesupport"
+        end
+      R
+
+      expect(out).to include("1.0")
+      expect(out).to include("no activesupport")
+    end
+  end
+
+
+  describe "when locked and installed with --only" do
+    before(:each) do
+      build_repo2
+      system_gems "rack-0.9.1" do
+        install_gemfile <<-G, :only => :default
+          source "file://#{gem_repo2}"
+          gem "rack"
+
+          group :rack do
+            gem "rack_middleware"
+          end
+        G
+      end
+    end
+
+    it "uses the correct versions even if --only was used on the original" do
+      should_be_installed "rack 0.9.1"
+      should_not_be_installed "rack_middleware 1.0"
+      simulate_new_machine
+
+      bundle :install
+
+      should_be_installed "rack 0.9.1"
+      should_be_installed "rack_middleware 1.0"
+    end
+
+    it "does not hit the remote a second time" do
+      FileUtils.rm_rf gem_repo2
+      bundle "install --only rack"
+      expect(err).to be_empty
+    end
+  end
+
 end
