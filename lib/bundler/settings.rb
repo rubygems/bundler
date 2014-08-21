@@ -94,6 +94,14 @@ module Bundler
       self[:without] ? self[:without].split(":").map { |w| w.to_sym } : []
     end
 
+     def only=(array)
+      self[:only] = (array.empty? ? nil : array.join(":")) if array
+    end
+
+    def only
+      self[:only] ? self[:only].split(":").map { |w| w.to_sym } : nil
+    end
+
     # @local_config["BUNDLE_PATH"] should be prioritized over ENV["BUNDLE_PATH"]
     def path
       key  = key_for(:path)

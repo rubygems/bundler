@@ -6,6 +6,7 @@ bundle-install(1) -- Install the dependencies specified in your Gemfile
 `bundle install` [--gemfile=GEMFILE]
                  [--path PATH] [--system]
                  [--without=GROUP1[ GROUP2...]]
+                 [--only=GROUP1[ GROUP2...]]
                  [--local] [--deployment]
                  [--binstubs[=DIRECTORY]]
                  [--standalone[=GROUP1[ GROUP2...]]]
@@ -60,6 +61,10 @@ update process below under [CONSERVATIVE UPDATING][].
 * `--without=<list>`:
   A space-separated list of groups to skip installing. This is a
   [remembered option][REMEMBERED OPTIONS].
+
+* `--only=<list>`:
+  A space-separated list of groups. If provided, only gems in these groups
+  are installed. This is a [remembered option][REMEMBERED OPTIONS].
 
 * `--local`:
   Do not attempt to connect to `rubygems.org`, instead using just
@@ -194,11 +199,12 @@ By default, `bundle install` will install all gems in all groups
 in your Gemfile(5), except those declared for a different platform.
 
 However, you can explicitly tell bundler to skip installing
-certain groups with the `--without` option. This option takes
+certain groups using either the `--without` option (for blacklisting)
+or the `--only` option (for whitelisting). These options take
 a space-separated list of groups.
 
-While the `--without` option will skip _installing_ the gems in the
-specified groups, it will still _download_ those gems and use them to
+While these options will skip _installing_ the gems in the
+excluded groups, Bundler will still _download_ those gems and use them to
 resolve the dependencies of every gem in your Gemfile(5).
 
 This is so that installing a different set of groups on another
@@ -271,9 +277,9 @@ The settings that are remembered are:
   Bundler will update the executables every subsequent call to
   `bundle install`.
 
-* `--without`:
-  As described above, Bundler will skip the gems specified by
-  `--without` in subsequent calls to `bundle install`. The
+* `--without` and `--only`:
+  As described above, Bundler will skip the gems excluded by
+  `--without` or `--only` in subsequent calls to `bundle install`. The
   Bundler runtime will also not try to make the gems in the
   skipped groups available.
 

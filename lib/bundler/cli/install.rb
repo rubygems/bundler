@@ -8,8 +8,10 @@ module Bundler
     def run
       warn_if_root
 
-      if options[:without]
-        options[:without] = options[:without].map{|g| g.tr(' ', ':') }
+      [:without, :only].each do |key|
+        if options[key]
+          options[key].map!{|g| g.tr(' ', ':') }
+        end
       end
 
       ENV['RB_USER_INSTALL'] = '1' if Bundler::FREEBSD
@@ -67,6 +69,7 @@ module Bundler
       Bundler.settings[:no_install] = true if options["no-install"]
       Bundler.settings[:clean]    = options["clean"] if options["clean"]
       Bundler.settings.without    = options[:without]
+      Bundler.settings.only    = options[:only]
       Bundler.ui.level            = "warn" if options[:quiet]
       Bundler::Fetcher.disable_endpoint = options["full-index"]
       Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? '1' : nil

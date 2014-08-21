@@ -8,6 +8,7 @@ Features:
   - add `bundle viz --without` to exclude gem groups from resulting graph (@fnichol)
   - add support for private S3 sources (@tryba)
   - prevent whitespace in gem declarations with clear messaging
+  - add --only whitelist option as an alternative to --without
 
 ## 1.7.0 (2014-08-13)
 
