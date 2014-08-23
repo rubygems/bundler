@@ -1,3 +1,9 @@
+## 1.7.2 (2014-08-23)
+
+Bugfixes:
+
+  - Revert gem source sorting in lock files (@indirect)
+
 ## 1.7.1 (2014-08-20)
 
 Bugfixes:
