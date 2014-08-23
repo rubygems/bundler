@@ -103,7 +103,7 @@ module Bundler
         name
       end
 
-      private
+    private
 
       def expand(somepath)
         somepath.expand_path(Bundler.root)
