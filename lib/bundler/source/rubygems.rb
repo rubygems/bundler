@@ -186,7 +186,7 @@ module Bundler
       end
 
       def suppress_configured_credentials(remote)
-        remote_nouser = remote.tap { |uri| uri.user = uri.password = nil }.to_s
+        remote_nouser = remote.dup.tap { |uri| uri.user = uri.password = nil }.to_s
         if remote.userinfo && remote.userinfo == Bundler.settings[remote_nouser]
           remote_nouser
         else
