@@ -43,7 +43,8 @@ module Bundler
     end
 
     def lock_sources
-      (path_sources + git_sources + svn_sources) << combine_rubygems_sources
+      lock_sources = (path_sources + git_sources + svn_sources).sort_by(&:to_s)
+      lock_sources << combine_rubygems_sources
     end
 
     def replace_sources!(replacement_sources)

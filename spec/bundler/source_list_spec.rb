@@ -351,12 +351,12 @@ describe Bundler::SourceList do
       source_list.add_svn_source('uri' => 'svn://first-svn.org/path')
 
       expect(source_list.lock_sources).to eq [
-        Bundler::Source::Path.new('path' => '/first/path/to/gem'),
-        Bundler::Source::Path.new('path' => '/second/path/to/gem'),
-        Bundler::Source::Path.new('path' => '/third/path/to/gem'),
         Bundler::Source::Git.new('uri' => 'git://first-git.org/path.git'),
         Bundler::Source::Git.new('uri' => 'git://second-git.org/path.git'),
         Bundler::Source::Git.new('uri' => 'git://third-git.org/path.git'),
+        Bundler::Source::Path.new('path' => '/first/path/to/gem'),
+        Bundler::Source::Path.new('path' => '/second/path/to/gem'),
+        Bundler::Source::Path.new('path' => '/third/path/to/gem'),
         Bundler::Source::SVN.new('uri' => 'svn://first-svn.org/path'),
         Bundler::Source::SVN.new('uri' => 'svn://second-svn.org/path'),
         Bundler::Source::Rubygems.new('remotes' => [

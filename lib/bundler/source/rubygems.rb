@@ -355,6 +355,7 @@ module Bundler
       def remotes_equal?(other_remotes)
         remotes.map(&method(:suppress_configured_credentials)) == other_remotes.map(&method(:suppress_configured_credentials))
       end
+
     end
   end
 end
