@@ -75,6 +75,7 @@ describe "the lockfile format" do
 
     install_gemfile(<<-G, :artifice => "endpoint_strict_basic_authentication", :quiet => true)
       source "http://localgemserver.test/"
+      source "http://user:pass@othergemserver.test/"
 
       gem "rack-obama", ">= 1.0"
     G
@@ -82,6 +83,7 @@ describe "the lockfile format" do
     lockfile_should_be <<-G
       GEM
         remote: http://localgemserver.test/
+        remote: http://user:pass@othergemserver.test/
         specs:
           rack (1.0.0)
           rack-obama (1.0)
@@ -144,7 +146,7 @@ describe "the lockfile format" do
     G
   end
 
-  it "does not assplode when a platform specific dependency is present and the Gemfile has not been resolved on that platform" do
+  it "does not asplode when a platform specific dependency is present and the Gemfile has not been resolved on that platform" do
     build_lib "omg", :path => lib_path('omg')
 
     gemfile <<-G
@@ -310,6 +312,45 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         foo!
+    G
+  end
+
+  it "sorts serialized sources by type" do
+    build_lib "foo"
+    bar = build_git "bar"
+
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "rack"
+      gem "foo", :path => "#{lib_path("foo-1.0")}"
+      gem "bar", :git => "#{lib_path("bar-1.0")}"
+    G
+
+    lockfile_should_be <<-G
+      GIT
+        remote: #{lib_path("bar-1.0")}
+        revision: #{bar.ref_for('master')}
+        specs:
+          bar (1.0)
+
+      PATH
+        remote: #{lib_path("foo-1.0")}
+        specs:
+          foo (1.0)
+
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          rack (1.0.0)
+
+      PLATFORMS
+        #{generic(Gem::Platform.local)}
+
+      DEPENDENCIES
+        bar!
+        foo!
+        rack
     G
   end
 

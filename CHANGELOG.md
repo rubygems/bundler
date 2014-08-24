@@ -32,6 +32,12 @@ Bugfixes:
 
   - warn on ambiguous gems available from more than one source (@tmoore)
 
+## 1.6.6 (2014-08-23)
+
+Bugfixes:
+
+  - restore Gemfile credentials to Gemfile.lock (@indirect)
+
 ## 1.6.5 (2014-07-23)
 
 Bugfixes:
