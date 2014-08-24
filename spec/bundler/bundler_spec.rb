@@ -46,14 +46,13 @@ describe Bundler do
       end
     end
 
-    context "with correct YAML file" do
+    context "with correct YAML file", :if => defined?(Encoding) do
       it "can load a gemspec with unicode characters with default ruby encoding" do
         # spec_helper forces the external encoding to UTF-8 but that's not the
-        # ruby default.
-        if defined?(Encoding)
-          encoding = Encoding.default_external
-          Encoding.default_external = "ASCII"
-        end
+        # default until Ruby 2.0
+        verbose, $VERBOSE = $VERBOSE, false
+        encoding, Encoding.default_external = Encoding.default_external, "ASCII"
+        $VERBOSE = verbose
 
         File.open(app_gemspec_path, "wb") do |file|
           file.puts <<-GEMSPEC.gsub(/^\s+/, '')
@@ -66,7 +65,9 @@ describe Bundler do
 
         expect(subject.author).to eq("André the Giant")
 
-        Encoding.default_external = encoding if defined?(Encoding)
+        verbose, $VERBOSE = $VERBOSE, false
+        Encoding.default_external = encoding
+        $VERBOSE = verbose
       end
     end
 
