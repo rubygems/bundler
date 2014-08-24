@@ -17,7 +17,7 @@ module Bundler
 
     def initialize
       @source          = nil
-      @sources         = []
+      @sources         = SourceList.new
       @git_sources     = {}
       @dependencies    = []
       @groups          = []
@@ -25,10 +25,6 @@ module Bundler
       @env             = nil
       @ruby_version    = nil
       add_git_sources
-    end
-
-    def rubygems_source
-      @rubygems_source ||= Source::Rubygems.new
     end
 
     def eval_gemfile(gemfile, contents = nil)
@@ -70,15 +66,8 @@ module Bundler
     end
 
     def gem(name, *args)
-      if name.is_a?(Symbol)
-        raise GemfileError, %{You need to specify gem names as Strings. Use 'gem "#{name.to_s}"' instead.}
-      end
-      if name =~ /\s/
-        raise GemfileError, %{'#{name}' is not a valid gem name because it contains whitespace.}
-      end
-
       options = args.last.is_a?(Hash) ? args.pop.dup : {}
-      version = args
+      version = args || [">= 0"]
 
       normalize_options(name, version, options)
 
@@ -118,30 +107,13 @@ module Bundler
       @dependencies << dep
     end
 
-    def source(source, options = {})
-      case source
-      when :gemcutter, :rubygems, :rubyforge then
-        Bundler.ui.warn "The source :#{source} is deprecated because HTTP " \
-          "requests are insecure.\nPlease change your source to 'https://" \
-          "rubygems.org' if possible, or 'http://rubygems.org' if not."
-        rubygems_source.add_remote "http://rubygems.org"
-        return
-      when String
-        rubygems_source.add_remote source
-        return
+    def source(source, &blk)
+      source = normalize_source(source)
+      if block_given?
+        with_source(@sources.add_rubygems_source("remotes" => source), &blk)
       else
-        @source = source
-        if options[:prepend]
-          @sources = [@source] | @sources
-        else
-          @sources = @sources | [@source]
-        end
-
-        yield if block_given?
-        return @source
+        @sources.add_rubygems_remote(source)
       end
-    ensure
-      @source = nil
     end
 
     def git_source(name, &block)
@@ -157,11 +129,11 @@ module Bundler
       @git_sources[name.to_s] = block
     end
 
-    def path(path, options = {}, source_options = {}, &blk)
-      source Source::Path.new(normalize_hash(options).merge("path" => Pathname.new(path))), source_options, &blk
+    def path(path, options = {}, &blk)
+      with_source(@sources.add_path_source(normalize_hash(options).merge("path" => Pathname.new(path))), &blk)
     end
 
-    def git(uri, options = {}, source_options = {}, &blk)
+    def git(uri, options = {}, &blk)
       unless block_given?
         msg = "You can no longer specify a git source by itself. Instead, \n" \
               "either use the :git option on a gem, or specify the gems that \n" \
@@ -173,7 +145,7 @@ module Bundler
         raise DeprecatedError, msg
       end
 
-      source Source::Git.new(normalize_hash(options).merge("uri" => uri)), source_options, &blk
+      with_source(@sources.add_git_source(normalize_hash(options).merge("uri" => uri)), &blk)
     end
 
     def svn(uri, options = {}, source_options = {}, &blk)
@@ -185,11 +157,10 @@ module Bundler
         raise DeprecatedError, msg
       end
 
-      source Source::SVN.new(normalize_hash(options).merge("uri" => uri)), source_options, &blk
+      with_source(@sources.add_svn_source(normalize_hash(options).merge("uri" => uri)), &blk)
     end
 
     def to_definition(lockfile, unlock)
-      @sources << rubygems_source unless @sources.include?(rubygems_source)
       Definition.new(lockfile, @dependencies, @sources, unlock, @ruby_version)
     end
 
@@ -238,6 +209,16 @@ module Bundler
       end
     end
 
+    def with_source(source)
+      if block_given?
+        @source = source
+        yield
+      end
+      source
+    ensure
+      @source = nil
+    end
+
     def normalize_hash(opts)
       opts.keys.each do |k|
         opts[k.to_s] = opts.delete(k) unless k.is_a?(String)
@@ -246,10 +227,17 @@ module Bundler
     end
 
     def valid_keys
-      @valid_keys ||= %w(group groups git svn path name branch ref tag require submodules platform platforms type)
+      @valid_keys ||= %w(group groups git svn path name branch ref tag require submodules platform platforms type source)
     end
 
     def normalize_options(name, version, opts)
+      if name.is_a?(Symbol)
+        raise GemfileError, %{You need to specify gem names as Strings. Use 'gem "#{name.to_s}"' instead.}
+      end
+      if name =~ /\s/
+        raise GemfileError, %{'#{name}' is not a valid gem name because it contains whitespace.}
+      end
+
       normalize_hash(opts)
 
       git_names = @git_sources.keys.map(&:to_s)
@@ -281,6 +269,12 @@ module Bundler
         raise GemfileError, "`#{p}` is not a valid platform. The available options are: #{VALID_PLATFORMS.inspect}"
       end
 
+      # Save sources passed in a key
+      if opts.has_key?("source")
+        source = normalize_source(opts["source"])
+        opts["source"] = @sources.add_rubygems_source("remotes" => source)
+      end
+
       git_name = (git_names & opts.keys).last
       if @git_sources[git_name]
         opts["git"] = @git_sources[git_name].call(opts[git_name])
@@ -293,7 +287,7 @@ module Bundler
           else
             options = opts.dup
           end
-          source = send(type, param, options, :prepend => true) {}
+          source = send(type, param, options) {}
           opts["source"] = source
         end
       end
@@ -304,5 +298,18 @@ module Bundler
       opts["group"]     = groups
     end
 
+    def normalize_source(source)
+      case source
+      when :gemcutter, :rubygems, :rubyforge
+        Bundler.ui.warn "The source :#{source} is deprecated because HTTP " \
+          "requests are insecure.\nPlease change your source to 'https://" \
+          "rubygems.org' if possible, or 'http://rubygems.org' if not."
+        "http://rubygems.org"
+      when String
+        source
+      else
+        raise GemfileError, "Unknown source '#{source}'"
+      end
+    end
   end
 end

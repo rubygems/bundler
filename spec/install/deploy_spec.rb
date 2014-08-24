@@ -79,6 +79,18 @@ describe "install with --deployment or --frozen" do
     expect(exitstatus).to eq(0)
   end
 
+  it "works when there are credentials in the source URL" do
+    install_gemfile(<<-G, :artifice => "endpoint_strict_basic_authentication", :quiet => true)
+      source "http://user:pass@localgemserver.test/"
+
+      gem "rack-obama", ">= 1.0"
+    G
+
+    bundle "install --deployment", :exitstatus => true, :artifice => "endpoint_strict_basic_authentication"
+
+    expect(exitstatus).to eq(0)
+  end
+
   describe "with an existing lockfile" do
     before do
       bundle "install"

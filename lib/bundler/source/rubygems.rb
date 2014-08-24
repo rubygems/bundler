@@ -9,16 +9,16 @@ module Bundler
       S3_SCHEME = 's3'
 
       attr_reader :remotes, :caches
-      attr_accessor :dependency_names
 
       def initialize(options = {})
         @options = options
-        @remotes = (options["remotes"] || []).map { |r| normalize_uri(r) }
-        @fetchers = {}
+        @remotes = []
         @dependency_names = []
         @allow_remote = false
         @allow_cached = false
         @caches = [Bundler.app_cache, *Bundler.rubygems.gem_cache]
+
+        Array(options["remotes"] || []).reverse_each{|r| add_remote(r) }
       end
 
       def remote!
@@ -30,23 +30,25 @@ module Bundler
       end
 
       def hash
-        Rubygems.hash
+        @remotes.hash
       end
 
       def eql?(o)
-        o.is_a?(Rubygems)
+        o.is_a?(Rubygems) && remotes_equal?(o.remotes)
       end
 
       alias == eql?
+
+      def can_lock?(spec)
+        spec.source.is_a?(Rubygems)
+      end
 
       def options
         { "remotes" => @remotes.map { |r| r.to_s } }
       end
 
       def self.from_lock(options)
-        s = new(options)
-        Array(options["remote"]).each { |r| s.add_remote(r) }
-        s
+        new(options)
       end
 
       def to_lock
@@ -64,7 +66,15 @@ module Bundler
       alias_method :name, :to_s
 
       def specs
-        @specs ||= fetch_specs
+        @specs ||= begin
+          # remote_specs usually generates a way larger Index than the other
+          # sources, and large_idx.use small_idx is way faster than
+          # small_idx.use large_idx.
+          idx = @allow_remote ? remote_specs.dup : Index.new
+          idx.use(cached_specs, :override_dupes) if @allow_cached || @allow_remote
+          idx.use(installed_specs, :override_dupes)
+          idx
+        end
       end
 
       def install(spec)
@@ -73,6 +83,13 @@ module Bundler
         # Download the gem to get the spec, because some specs that are returned
         # by rubygems.org are broken and wrong.
         if spec.source_uri
+          # Check for this spec from other sources
+          uris = [spec.source_uri]
+          uris += source_uris_for_spec(spec)
+          uris.compact!
+          uris.uniq!
+          Installer.ambiguous_gems << [spec.name, *uris] if uris.length > 1
+
           s = Bundler.rubygems.spec_from_gem(fetch_gem(spec), Bundler.settings["trust-policy"])
           spec.__swap__(s)
         end
@@ -150,22 +167,29 @@ module Bundler
       end
 
       def add_remote(source)
-        @remotes << normalize_uri(source)
+        uri = normalize_uri(source)
+        @remotes.unshift(uri) unless @remotes.include?(uri)
       end
 
-      def replace_remotes(source)
-        return false if source.remotes == @remotes
+      def replace_remotes(other_remotes)
+        return false if other_remotes == @remotes
 
         @remotes = []
-        source.remotes.each do |r|
+        other_remotes.reverse_each do |r|
           add_remote r.to_s
         end
-
-        true
       end
 
-      def remotes_to_fetchers(remotes)
-        remotes.map do |uri|
+      def unmet_deps
+        if @allow_remote && api_fetchers.any?
+          remote_specs.unmet_dependency_names
+        else
+          []
+        end
+      end
+
+      def fetchers
+        @fetchers ||= remotes.map do |uri|
           case uri.scheme
           when S3_SCHEME
             Bundler::S3Fetcher.new(uri)
@@ -173,6 +197,12 @@ module Bundler
             Bundler::Fetcher.new(uri)
           end
         end
+      end
+
+    protected
+
+      def source_uris_for_spec(spec)
+        specs.search_all(spec.name).map{|s| s.source_uri }
       end
 
     private
@@ -203,26 +233,12 @@ module Bundler
       end
 
       def suppress_configured_credentials(remote)
-        remote_nouser = remote.tap { |uri| uri.user = uri.password = nil }.to_s
+        remote_nouser = remote.dup.tap { |uri| uri.user = uri.password = nil }.to_s
         if remote.userinfo && remote.userinfo == Bundler.settings[remote_nouser]
           remote_nouser
         else
           remote
         end
-      end
-
-      def fetch_specs
-        # remote_specs usually generates a way larger Index than the other
-        # sources, and large_idx.use small_idx is way faster than
-        # small_idx.use large_idx.
-        if @allow_remote
-          idx = remote_specs.dup
-        else
-          idx = Index.new
-        end
-        idx.use(cached_specs, :override_dupes) if @allow_cached || @allow_remote
-        idx.use(installed_specs, :override_dupes)
-        idx
       end
 
       def installed_specs
@@ -271,13 +287,12 @@ module Bundler
         idx
       end
 
-      def remote_specs
-        @remote_specs ||= begin
-          old = Bundler.rubygems.sources
-          idx = Index.new
+      def api_fetchers
+        fetchers.select{|f| f.use_api }
+      end
 
-          fetchers       = remotes_to_fetchers(remotes)
-          api_fetchers   = fetchers.select { |f| f.use_api }
+      def remote_specs
+        @remote_specs ||= Index.build do |idx|
           index_fetchers = fetchers - api_fetchers
 
           # gather lists from non-api sites
@@ -285,7 +300,6 @@ module Bundler
             Bundler.ui.info "Fetching source index from #{f.uri}"
             idx.use f.specs(nil, self)
           end
-          return idx if api_fetchers.empty?
 
           # because ensuring we have all the gems we need involves downloading
           # the gemspecs of those gems, if the non-api sites contain more than
@@ -299,7 +313,7 @@ module Bundler
               Bundler.ui.info "" if !Bundler.ui.debug? # new line now that the dots are over
             end
 
-            if api_fetchers.all?{|f| f.use_api }
+            if api_fetchers.any? && api_fetchers.all?{|f| f.use_api }
               # it's possible that gems from one source depend on gems from some
               # other source, so now we download gemspecs and iterate over those
               # dependencies, looking for gems we don't have info on yet.
@@ -322,10 +336,6 @@ module Bundler
               idx.use f.specs(nil, self)
             end
           end
-
-          return idx
-        ensure
-          Bundler.rubygems.sources = old
         end
       end
 
@@ -340,6 +350,10 @@ module Bundler
 
         # Ruby 2.0, where gemspecs are stored in specifications/default/
         spec.loaded_from && spec.loaded_from.include?("specifications/default/")
+      end
+
+      def remotes_equal?(other_remotes)
+        remotes.map(&method(:suppress_configured_credentials)) == other_remotes.map(&method(:suppress_configured_credentials))
       end
     end
   end

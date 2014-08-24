@@ -10,13 +10,14 @@ module Bundler
       i
     end
 
-    attr_reader :specs, :sources
-    protected   :specs
+    attr_reader :specs, :all_specs, :sources
+    protected   :specs, :all_specs
 
     def initialize
       @sources = []
       @cache = {}
       @specs = Hash.new { |h,k| h[k] = Hash.new }
+      @all_specs = Hash.new { |h,k| h[k] = [] }
     end
 
     def initialize_copy(o)
@@ -24,9 +25,13 @@ module Bundler
       @sources = @sources.dup
       @cache = {}
       @specs = Hash.new { |h,k| h[k] = Hash.new }
+      @all_specs = Hash.new { |h,k| h[k] = [] }
 
       o.specs.each do |name, hash|
         @specs[name] = hash.dup
+      end
+      o.all_specs.each do |name, array|
+        @all_specs[name] = array.dup
       end
     end
 
@@ -37,6 +42,14 @@ module Bundler
     def empty?
       each { return false }
       true
+    end
+
+    def search_all(name)
+      all_matches = @all_specs[name] + local_search(name)
+      @sources.each do |source|
+        all_matches.concat(source.search_all(name))
+      end
+      all_matches
     end
 
     # Search this index's specs, and any source indexes that this index knows
@@ -55,7 +68,7 @@ module Bundler
         end
       end
 
-      results
+      results.sort_by {|s| [s.version, s.platform.to_s == 'ruby' ? "\0" : s.platform.to_s] }
     end
 
     def local_search(query, base = nil)
@@ -88,18 +101,18 @@ module Bundler
 
     # returns a list of the dependencies
     def unmet_dependency_names
-      dependency_names = specs.values.map do |hash_of_s|
-        hash_of_s.values.map do |s|
-          s.dependencies.map{|d| d.name }
-        end
-      end.flatten.uniq
-      dependency_names.select{|name| name != 'bundler' && specs_by_name(name).empty? }
+      names = []
+      each{|s| names.push *s.dependencies.map{|d| d.name } }
+      names.uniq!
+      names.delete_if{|n| n == "bundler" }
+      names.select{|n| search(n).empty? }
     end
 
     def use(other, override_dupes = false)
       return unless other
       other.each do |s|
         if (dupes = search_by_spec(s)) && dupes.any?
+          @all_specs[s.name] = [s] + dupes
           next unless override_dupes
           self << s
         end
@@ -155,7 +168,7 @@ module Bundler
           found.reject! { |spec| spec.version.prerelease? }
         end
 
-        found.sort_by {|s| [s.version, s.platform.to_s == 'ruby' ? "\0" : s.platform.to_s] }
+        found
       end
     end
 

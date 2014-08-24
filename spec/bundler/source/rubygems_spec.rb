@@ -23,10 +23,12 @@ describe Bundler::Source::Rubygems do
     end
   end
 
-  describe "remotes_to_fetchers" do
+  describe "#fetchers" do
+    let(:remotes) { [URI("s3://foo"), URI("http://foo")] }
+    subject(:source) { Bundler::Source::Rubygems.new("remotes" => remotes) }
+
     it "turns s3 paths into S3Fetcher objects and other paths into Fetcher objects" do
-      result = subject.remotes_to_fetchers([URI("s3://foo"),
-                                            URI("http://foo")])
+      result = source.fetchers
       expect(result.first).to be_an_instance_of Bundler::S3Fetcher
       expect(result.last).to be_an_instance_of Bundler::Fetcher
     end

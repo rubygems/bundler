@@ -162,6 +162,7 @@ module Bundler
 
     # return the specs in the bundler format as an index
     def specs(gem_names, source)
+      old = Bundler.rubygems.sources
       index = Index.new
 
       if gem_names && use_api
@@ -194,6 +195,8 @@ module Bundler
     rescue CertificateFailureError => e
       Bundler.ui.info "" if gem_names && use_api # newline after dots
       raise e
+    ensure
+      Bundler.rubygems.sources = old
     end
 
     # fetch index
@@ -300,9 +303,9 @@ module Bundler
     end
 
     def dependency_api_uri(gem_names = [])
-      url = "#{redirected_uri}api/v1/dependencies"
-      url << "?gems=#{URI.encode(gem_names.join(","))}" if gem_names.any?
-      URI.parse(url)
+      uri = fetch_uri + "api/v1/dependencies"
+      uri.query = "gems=#{URI.encode(gem_names.join(","))}" if gem_names.any?
+      uri
     end
 
     # fetch from Gemcutter Dependency Endpoint API
@@ -327,7 +330,8 @@ module Bundler
 
     # fetch from modern index: specs.4.8.gz
     def fetch_all_remote_specs
-      Bundler.rubygems.sources = ["#{@remote_uri}"]
+      old_sources = Bundler.rubygems.sources
+      Bundler.rubygems.sources = [@remote_uri.to_s]
       Bundler.rubygems.fetch_all_remote_specs
     rescue Gem::RemoteFetcher::FetchError, OpenSSL::SSL::SSLError => e
       case e.message
@@ -341,6 +345,8 @@ module Bundler
         Bundler.ui.trace e
         raise HTTPError, "Could not fetch specs from #{uri}"
       end
+    ensure
+      Bundler.rubygems.sources = old_sources
     end
 
     def well_formed_dependency(name, *requirements)
@@ -386,18 +392,18 @@ module Bundler
       yield
     end
 
-    private
-    def redirected_uri
-      return bundler_uri if rubygems?
-      return @remote_uri
-    end
+  private
 
-    def rubygems?
-      @remote_uri.host == "rubygems.org"
-    end
-
-    def bundler_uri
-      URI.parse("#{@remote_uri.scheme}://bundler.#{@remote_uri.host}/")
+    def fetch_uri
+      @fetch_uri ||= begin
+        if @remote_uri.host == "rubygems.org"
+          uri = @remote_uri.dup
+          uri.host = "bundler.rubygems.org"
+          uri
+        else
+          @remote_uri
+        end
+      end
     end
 
   end

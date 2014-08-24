@@ -9,6 +9,14 @@ Features:
   - add support for private S3 sources (@tryba)
   - prevent whitespace in gem declarations with clear messaging
 
+## 1.7.1 (2014-08-20)
+
+Bugfixes:
+
+  - Install gems from one source needed by gems in another source (@indirect)
+  - Install the same gem versions even after some are installed (@tmoore)
+  - Download specs only when installing from servers (@indirect)
+
 ## 1.7.0 (2014-08-13)
 
 Security:

@@ -30,6 +30,8 @@ module Bundler
       @state        = :source
       @specs        = {}
 
+      @rubygems_aggregate = Source::Rubygems.new
+
       if lockfile.match(/<<<<<<<|=======|>>>>>>>|\|\|\|\|\|\|\|/)
         raise LockfileError, "Your Gemfile.lock contains merge conflicts.\n" \
           "Run `git checkout HEAD -- Gemfile.lock` first to get a clean lock."
@@ -44,6 +46,7 @@ module Bundler
           send("parse_#{@state}", line)
         end
       end
+      @sources << @rubygems_aggregate
       @specs = @specs.values
     end
 
@@ -62,14 +65,24 @@ module Bundler
         @current_source = nil
         @opts, @type = {}, line
       when SPECS
-        @current_source = TYPES[@type].from_lock(@opts)
-
-        # Strip out duplicate GIT / SVN sections
-        if @sources.include?(@current_source) && (@current_source.is_a?(Bundler::Source::Git) || @current_source.is_a?(Bundler::Source::SVN))
-          @current_source = @sources.find { |s| s == @current_source }
+        case @type
+        when "PATH"
+          @current_source = TYPES[@type].from_lock(@opts)
+          @sources << @current_source
+        when "GIT", "SVN"
+          @current_source = TYPES[@type].from_lock(@opts)
+          # Strip out duplicate GIT / SVN sections
+          if @sources.include?(@current_source)
+            @current_source = @sources.find { |s| s == @current_source }
+          else
+            @sources << @current_source
+          end
+        when "GEM"
+          Array(@opts["remote"]).each do |url|
+            @rubygems_aggregate.add_remote(url)
+          end
+          @current_source = @rubygems_aggregate
         end
-
-        @sources << @current_source
       when OPTIONS
         value = $2
         value = true if value == "true"

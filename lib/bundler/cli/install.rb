@@ -94,6 +94,15 @@ module Bundler
         Bundler.ui.confirm "Post-install message from #{name}:"
         Bundler.ui.info msg
       end
+      Installer.ambiguous_gems.to_a.each do |name, installed_from_uri, *also_found_in_uris|
+        Bundler.ui.error "Warning: the gem '#{name}' was found in multiple sources."
+        Bundler.ui.error "Installed from: #{installed_from_uri}"
+        Bundler.ui.error "Also found in:"
+        also_found_in_uris.each { |uri| Bundler.ui.error "  * #{uri}" }
+        Bundler.ui.error "You should add a source requirement to restrict this gem to your preferred source."
+        Bundler.ui.error "For example:"
+        Bundler.ui.error "    gem '#{name}', :source => '#{installed_from_uri}'"
+      end
 
       if Bundler.settings[:clean] && Bundler.settings[:path]
         require "bundler/cli/clean"
@@ -104,7 +113,7 @@ module Bundler
         Bundler.ui.warn "Some gems seem to be missing from your vendor/cache directory."
       end
 
-      if Bundler.definition.rubygems_remotes.empty?
+      unless Bundler.definition.has_rubygems_remotes?
         Bundler.ui.warn <<-WARN, :wrap => true
           Your Gemfile has no gem server sources. If you need gems that are \
           not already on your machine, add a line like this to your Gemfile:

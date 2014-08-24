@@ -23,7 +23,7 @@ module Bundler
     def setup_cache_all
       Bundler.settings[:cache_all] = options[:all] if options.key?("all")
 
-      if Bundler.definition.sources.any? { |s| !s.is_a?(Source::Rubygems) } && !Bundler.settings[:cache_all]
+      if Bundler.definition.has_local_dependencies? && !Bundler.settings[:cache_all]
         Bundler.ui.warn "Your Gemfile contains path and git dependencies. If you want "    \
           "to package them as well, please pass the --all flag. This will be the default " \
           "on Bundler 2.0."

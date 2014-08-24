@@ -15,16 +15,23 @@ directory as the `Rakefile`.
 A `Gemfile` is evaluated as Ruby code, in a context which makes available
 a number of methods used to describe the gem requirements.
 
-## SOURCES (#source)
+## GLOBAL SOURCES (#source)
 
-At the top of the `Gemfile`, add one line for each `Rubygems` source that
-might contain the gems listed in the `Gemfile`.
+At the top of the `Gemfile`, add a line for the `Rubygems` source that contains
+the gems listed in the `Gemfile`.
 
     source "https://rubygems.org"
-    source "http://gems.github.com"
 
-Each of these _source_s `MUST` be a valid Rubygems repository. Sources are
-checked for gems following the heuristics described in [SOURCE PRIORITY][].
+It is possible, but not recommended as of Bundler 1.7, to add multiple global
+`source` lines. Each of these `source`s `MUST` be a valid Rubygems repository.
+
+Sources are checked for gems following the heuristics described in
+[SOURCE PRIORITY][]. If a gem is found in more than one global source, Bundler
+will print a warning after installing the gem indicating which source was used,
+and listing the other sources where the gem is available. A specific source can
+be selected for gems that need to use a non-standard repository, suppressing
+this warning, by using the [`:source` option](#SOURCE-source-) or a
+[`source` block](#BLOCK-FORM-OF-SOURCE-GIT-PATH-GROUP-and-PLATFORMS).
 
 ### CREDENTIALS (#credentials)
 
@@ -217,6 +224,25 @@ All operations involving groups (`bundle install`, `Bundler.setup`,
 `Bundler.require`) behave exactly the same as if any groups not
 matching the current platform were explicitly excluded.
 
+### SOURCE (:source)
+
+You can select an alternate Rubygems repository for a gem using the ':source'
+option.
+
+    gem "some_internal_gem", :source => "https://gems.example.com"
+
+This forces the gem to be loaded from this source and ignores any global sources
+declared at the top level of the file. If the gem does not exist in this source,
+it will not be installed.
+
+Bundler will search for child dependencies of this gem by first looking in the
+source selected for the parent, but if they are not found there, it will fall
+back on global sources using the ordering described in [SOURCE PRIORITY][].
+
+Selecting a specific source repository this way also suppresses the ambiguous
+gem warning described above in
+[GLOBAL SOURCES (#source)](#GLOBAL-SOURCES-source-).
+
 ### GIT (:git)
 
 If necessary, you can specify that a gem is located at a particular
@@ -369,10 +395,15 @@ gems specified as paths.
 
     gem "rails", :path => "vendor/rails"
 
-## BLOCK FORM OF GIT, PATH, GROUP and PLATFORMS
+## BLOCK FORM OF SOURCE, GIT, PATH, GROUP and PLATFORMS
 
-The `:git`, `:path`, `:group`, and `:platforms` options may be
+The `:source`, `:git`, `:path`, `:group`, and `:platforms` options may be
 applied to a group of gems by using block form.
+
+    source "https://gems.example.com" do
+      gem "some_internal_gem"
+      gem "another_internal_gem"
+    end
 
     git "https://github.com/rails/rails.git" do
       gem "activesupport"
@@ -417,10 +448,11 @@ dependencies are included in.
 When attempting to locate a gem to satisfy a gem requirement,
 bundler uses the following priority order:
 
-  1. The source explicitly attached to the gem (using `:path` or `:git`)
-  2. For implicit gems (dependencies of explicit gems), any git or path
-     repository otherwise declared. This results in bundler prioritizing the
+  1. The source explicitly attached to the gem (using `:source`, `:path`, or
+     `:git`)
+  2. For implicit gems (dependencies of explicit gems), any source, git, or path
+     repository declared on the parent. This results in bundler prioritizing the
      ActiveSupport gem from the Rails git repository over ones from
      `rubygems.org`
-  3. The sources specified via `source`, searching each source in your `Gemfile`
-     from last added to first added.
+  3. The sources specified via global `source` lines, searching each source in
+     your `Gemfile` from last added to first added.
