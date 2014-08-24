@@ -118,6 +118,9 @@ module Bundler
       end
 
       post_install_message
+    rescue Errno::ENOSPC
+      raise Bundler::InstallError, "Your disk is out of space. Free some " \
+        "space to be able to install your bundle."
     rescue Exception => e
       # if install hook failed or gem signature is bad, just die
       raise e if e.is_a?(Bundler::InstallHookError) || e.is_a?(Bundler::SecurityError)
