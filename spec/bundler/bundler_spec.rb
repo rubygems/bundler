@@ -23,7 +23,7 @@ describe Bundler do
         end
       end
 
-      context "on Ruby 1.9", :ruby => "1.9" do
+      context "on Ruby 1.9", :ruby => "1.9", :if => defined?(YAML::ENGINE) do
         context "with Syck as YAML::Engine" do
           it "raises a GemspecError after YAML load throws ArgumentError" do
             orig_yamler, YAML::ENGINE.yamler = YAML::ENGINE.yamler, 'syck'
