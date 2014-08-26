@@ -73,7 +73,7 @@ module Gem
     end
 
     def to_gemfile(path = nil)
-      gemfile = "source :gemcutter\n"
+      gemfile = "source 'https://rubygems.org'\n"
       gemfile << dependencies_to_gemfile(nondevelopment_dependencies)
       unless development_dependencies.empty?
         gemfile << "\n"
