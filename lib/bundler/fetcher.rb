@@ -166,6 +166,7 @@ module Bundler
       index = Index.new
 
       if gem_names && use_api
+        fetch(dependency_api_uri)
         specs = fetch_remote_specs(gem_names)
       end
 
@@ -192,7 +193,7 @@ module Bundler
       end
 
       index
-    rescue CertificateFailureError => e
+    rescue CertificateFailureError, HTTPError => e
       Bundler.ui.info "" if gem_names && use_api # newline after dots
       raise e
     ensure
@@ -231,11 +232,9 @@ module Bundler
 
       if @remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
         @use_api = false
-      elsif fetch(dependency_api_uri)
+      else
         @use_api = true
       end
-    rescue HTTPError
-      @use_api = false
     end
 
     def inspect
@@ -299,7 +298,12 @@ module Bundler
       raise CertificateFailureError.new(uri)
     rescue *HTTP_ERRORS => e
       Bundler.ui.trace e
-      raise HTTPError, "Network error while fetching #{uri}"
+      if e.message == "getaddrinfo: nodename nor servname provided, or not known"
+        raise HTTPError, "Could not reach host #{uri.host}. Check your network " \
+          "connection and try again."
+      else
+        raise HTTPError, "Network error while fetching #{uri}"
+      end
     end
 
     def dependency_api_uri(gem_names = [])
