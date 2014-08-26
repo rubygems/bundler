@@ -57,7 +57,7 @@ module Bundler
 
       def trace(e, newline = nil)
         return unless debug?
-        msg = ["#{e.class}: #{e.message}", *e.backtrace].join("\n")
+        msg = "#{e.class}: #{e.message}\n#{e.backtrace.join("\n  ")}"
         tell_me(msg, nil, newline)
       end
 
