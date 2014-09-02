@@ -3,7 +3,7 @@ bundle-update(1) -- Update your gems to the latest available versions
 
 ## SYNOPSIS
 
-`bundle update` <*gems> [--source=NAME] [--local]
+`bundle update` <*gems> [--group=NAME] [--source=NAME] [--local]
 
 ## DESCRIPTION
 
@@ -16,6 +16,12 @@ You would use `bundle update` to explicitly update the version of a
 gem.
 
 ## OPTIONS
+
+* `--group=<name>`:
+  Only update the gems in the specified group. For instance, you can update all gems
+  in the development group with `bundle update --group development`. You can also
+  call `bundle update rails --group test` to update the rails gem and all gems in
+  the test group, for example.
 
 * `--source=<name>`:
   The name of a `:git` or `:path` source used in the Gemfile(5). For
