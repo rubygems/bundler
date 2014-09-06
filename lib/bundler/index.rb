@@ -102,7 +102,7 @@ module Bundler
     # returns a list of the dependencies
     def unmet_dependency_names
       names = []
-      each{|s| names.push *s.dependencies.map{|d| d.name } }
+      each{|s| names.push(*s.dependencies.map{|d| d.name }) }
       names.uniq!
       names.delete_if{|n| n == "bundler" }
       names.select{|n| search(n).empty? }
