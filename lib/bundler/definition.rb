@@ -386,9 +386,10 @@ module Bundler
       end
     end
 
-  private
-
     attr_reader :sources
+    private     :sources
+
+  private
 
     def nothing_changed?
       !@source_changes && !@dependency_changes && !@new_platform && !@path_changes && !@local_changes
