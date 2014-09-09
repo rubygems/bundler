@@ -129,7 +129,7 @@ module Bundler
     # @return [Bundler::SpecSet]
     def specs
       @specs ||= begin
-        specs = resolve.materialize(requested_dependencies)
+        specs = resolve.materialize(Bundler.settings[:cache_all_platforms] ? dependencies : requested_dependencies)
 
         unless specs["bundler"].any?
           local = Bundler.settings[:frozen] ? rubygems_index : index

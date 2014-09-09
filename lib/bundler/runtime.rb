@@ -112,6 +112,7 @@ module Bundler
       Bundler.ui.info "Updating files in vendor/cache"
       specs.each do |spec|
         next if spec.name == 'bundler'
+        spec.source.send(:fetch_gem, spec) if Bundler.settings[:cache_all_platforms] && spec.source.respond_to?(:fetch_gem, true)
         spec.source.cache(spec, custom_path) if spec.source.respond_to?(:cache)
       end
 
