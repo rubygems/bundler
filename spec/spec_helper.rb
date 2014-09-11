@@ -103,7 +103,7 @@ RSpec.configure do |config|
   end
 
   config.after :each do |example|
-    puts @out if example.exception
+    puts @out if defined?(@out) && example.exception
 
     Dir.chdir(original_wd)
     # Reset ENV
