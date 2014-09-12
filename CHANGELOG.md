@@ -8,6 +8,8 @@ Features:
   - add `bundle viz --without` to exclude gem groups from resulting graph (@fnichol)
   - add support for private S3 sources (@tryba)
   - prevent whitespace in gem declarations with clear messaging
+  - tries to find a `bundler-<command>` executable on your path for non-bundler commands (@andremedeiros)
+  - generates a `.consolerc` file with new gems and tries to load it on `bundle console` (@andremedeiros)
 
 ## 1.7.2 (2014-08-23)
 
