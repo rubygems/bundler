@@ -82,6 +82,12 @@ We divide `bundle` subcommands into primary commands and utilities.
 * `bundle clean(1)`:
   Cleans up unused gems in your bundler directory
 
+## PLUGINS
+
+When running a command that isn't listed in PRIMARY COMMANDS or UTILITIES,
+Bundler will try to find an executable on your path named `bundler-<command>`
+and execute it, passing down any extra arguments to it.
+
 ## OBSOLETE
 
 These commands are obsolete and should no longer be used
