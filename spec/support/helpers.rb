@@ -74,7 +74,6 @@ module Spec
       end.join
 
       cmd = "#{env} #{sudo} #{Gem.ruby} -I#{lib} #{requires_str} #{bundle_bin} #{cmd}#{args}"
-
       if exitstatus
         sys_status(cmd)
       else
@@ -83,7 +82,7 @@ module Spec
     end
 
     def bundle_ruby(options = {})
-      expect_err  = options.delete(:expect_err)
+      expect_err = options.delete(:expect_err)
       exitstatus = options.delete(:exitstatus)
       options["no-color"] = true unless options.key?("no-color")
 
@@ -216,6 +215,14 @@ module Spec
       yield
     ensure
       ENV['GEM_HOME'], ENV['GEM_PATH'] = gem_home, gem_path
+    end
+
+    def with_path_as(path)
+      old_path = ENV['PATH']
+      ENV['PATH'] = "#{path}:#{ENV['PATH']}"
+      yield
+    ensure
+      ENV['PATH'] = old_path
     end
 
     def break_git!

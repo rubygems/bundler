@@ -67,6 +67,12 @@ module Bundler
       end
     end
 
+    def self.handle_no_command_error(command, has_namespace = $thor_runner)
+      return super unless command_path = Bundler.which("bundler-#{command}")
+
+      Kernel.exec(command_path, *ARGV[1..-1])
+    end
+
     desc "init [OPTIONS]", "Generates a Gemfile into the current working directory"
     long_desc <<-D
       Init generates a default Gemfile in the current working directory. When adding a

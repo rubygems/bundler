@@ -13,4 +13,17 @@ describe "bundle executable" do
     bundle 'unrecognized-tast', :exitstatus => true
     expect(exitstatus).to_not be_zero
   end
+
+  it "looks for a binary and executes it if it's named bundler-<task>" do
+    File.open(tmp('bundler-testtasks'), 'w', 0755) do |f|
+      f.puts "#!/usr/bin/env ruby\nputs 'Hello, world'\n"
+    end
+
+    with_path_as(tmp) do
+      bundle 'testtasks', :exitstatus => true
+    end
+
+    expect(exitstatus).to be_zero
+    expect(out).to eq('Hello, world')
+  end
 end
