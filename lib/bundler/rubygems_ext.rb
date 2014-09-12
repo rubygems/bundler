@@ -55,7 +55,9 @@ module Gem
     end
 
     # RubyGems 1.8+ used only.
-    remove_method :gem_dir if instance_methods(false).include?(:gem_dir)
+    methods = instance_methods(false)
+    gem_dir = methods.first.is_a?(String) ? "gem_dir" : :gem_dir
+    remove_method :gem_dir if methods.include?(gem_dir)
     def gem_dir
       full_gem_path
     end
