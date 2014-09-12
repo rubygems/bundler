@@ -87,12 +87,12 @@ describe "The library itself" do
   end
 
   it "does not contain any warnings" do
-    Dir.chdir(root)
+    Dir.chdir(root.join("lib"))
     exclusions = /bundler\/capistrano\.rb|bundler\/vlad\.rb|bundler\/gem_tasks\.rb/
-    lib_files = `git ls-files -z -- lib/**/*.rb`.split("\x0").reject{|f| f =~ exclusions }
-    sys_exec("ruby -w -I lib", :expect_err) do |input|
+    lib_files = `git ls-files -z -- **/*.rb`.split("\x0").reject{|f| f =~ exclusions }
+    sys_exec("ruby -w -I. ", :expect_err) do |input|
       lib_files.each do |f|
-        input.puts "require './#{f.gsub(/\.rb$/, '')}'"
+        input.puts "require '#{f.gsub(/\.rb$/, '')}'"
       end
     end
 
