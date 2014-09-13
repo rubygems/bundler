@@ -91,12 +91,11 @@ module Bundler
         end
 
         # otherwise return the Gemfile if it's there
-        filename = ['Gemfile', 'gems.rb'].find do |file|
+        ['Gemfile', 'gems.rb'].each do |file|
           path = File.join(current, file)
-          File.file?(path)
+          return path if File.file?(path)
         end
 
-        return filename unless filename.nil?
         current, previous = File.expand_path("..", current), current
       end
     end
