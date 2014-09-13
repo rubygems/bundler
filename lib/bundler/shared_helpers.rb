@@ -29,8 +29,8 @@ module Bundler
       gemfile = default_gemfile
 
       case gemfile.basename.to_s
-      when 'Gemfile' then Pathname.new("#{gemfile}.lock")
       when 'gems.rb' then Pathname.new(gemfile.sub(/.rb$/, '.locked'))
+      else Pathname.new("#{gemfile}.lock")
       end
     end
 
