@@ -34,7 +34,23 @@ describe "Bundler.load" do
         Bundler.load
       }.not_to raise_error()
     end
+  end
 
+  describe "with a gems.rb file" do
+    before(:each) do
+      create_file "gems.rb", <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+    end
+
+    it "provides a list of the env dependencies" do
+      expect(Bundler.load.dependencies).to have_dep("rack", ">= 0")
+    end
+
+    it "provides a list of the resolved gems" do
+      expect(Bundler.load.gems).to have_gem("rack-1.0.0", "bundler-#{Bundler::VERSION}")
+    end
   end
 
   describe "without a gemfile" do

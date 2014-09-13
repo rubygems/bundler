@@ -26,7 +26,12 @@ module Bundler
     end
 
     def default_lockfile
-      Pathname.new("#{default_gemfile}.lock")
+      gemfile = default_gemfile
+
+      case gemfile.basename.to_s
+      when 'Gemfile' then Pathname.new("#{gemfile}.lock")
+      when 'gems.rb' then Pathname.new(gemfile.sub(/.rb$/, '.locked'))
+      end
     end
 
     def in_bundle?
@@ -86,8 +91,12 @@ module Bundler
         end
 
         # otherwise return the Gemfile if it's there
-        filename = File.join(current, 'Gemfile')
-        return filename if File.file?(filename)
+        filename = ['Gemfile', 'gems.rb'].find do |file|
+          path = File.join(current, file)
+          File.file?(path)
+        end
+
+        return filename unless filename.nil?
         current, previous = File.expand_path("..", current), current
       end
     end
