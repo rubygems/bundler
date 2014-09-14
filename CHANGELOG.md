@@ -1,8 +1,9 @@
-## 1.7.3 (unreleased)
+## 1.7.3 (2014-09-14)
 
 Bugfixes:
 
   - `extconf.rb` is now generated with the right path for `create_makefile` (@andremedeiros)
+  - Fix various Ruby warnings (@piotrsanarki, @indirect)
 
 ## 1.7.2 (2014-08-23)
 
