@@ -59,6 +59,11 @@ namespace :spec do
       system "sudo sed -i '/secure_path/d' /etc/sudoers"
       # Install groff for the ronn gem
       sh "sudo apt-get install groff -y"
+      if File.directory?("/var/ramfs")
+        # Put the test files onto the Travis ramdisk
+        sh "mkdir -p /var/ramfs/bundler-tests"
+        sh "ln -s /var/ramfs/bundler-tests tmp"
+      end
       if RUBY_VERSION < '1.9'
         # Downgrade Rubygems on 1.8 so Ronn can be required
         # https://github.com/rubygems/rubygems/issues/784
