@@ -3,7 +3,7 @@ language: ruby
 sudo: false
 
 env:
-  - JRUBY_OPTS="--dev -Xcext.enabled=false -Xcompile.invokedynamic=false"
+  - JRUBY_OPTS="-Xlaunch.inproc=true -Xcext.enabled=false -Xcompile.invokedynamic=false"
 
 before_script: travis_retry rake spec:travis:deps
 
