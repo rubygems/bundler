@@ -12,7 +12,7 @@ rvm:
 # see Rakefile:66 for the list of possible RGV values
 env:
   global:
-    - JRUBY_OPTS="--dev -Xcext.enabled=false -Xcompile.invokedynamic=false"
+    - JRUBY_OPTS="--dev -X-C -Xlaunch.inproc=true -Xcext.enabled=false -Xcompile.invokedynamic=false"
   matrix:
     # We need to know if changes to rubygems will break bundler on release
     - RGV=master
