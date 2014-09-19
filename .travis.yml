@@ -1,7 +1,13 @@
 language: ruby
-script: rake spec:travis
-before_script: travis_retry rake spec:travis:deps
+
 sudo: false
+
+env:
+  - JRUBY_OPTS="--dev -Xcext.enabled=false -Xcompile.invokedynamic=false"
+
+before_script: travis_retry rake spec:travis:deps
+
+script: rake spec:travis
 
 branches:
   only:
