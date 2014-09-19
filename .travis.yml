@@ -5,6 +5,7 @@ sudo: false
 
 branches:
   only:
+    - travis-docker
     - master
     - 1-7-stable
     - 1-6-stable
