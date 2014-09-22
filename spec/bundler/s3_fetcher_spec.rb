@@ -15,9 +15,9 @@ describe Bundler::S3Fetcher do
       accessId = "a"
       secretKey = "b"
       url = "s3://#{accessId}:#{secretKey}@foo"
-      time = Time.utc(2014,6,1).to_i
+      time = Time.utc(2014, 6, 1).to_i
 
-      actual = Bundler::S3Fetcher.new(url).sign(URI(url),time)
+      actual = Bundler::S3Fetcher.new(url).sign(URI(url), time)
       expect(actual.host).to eq "foo.s3.amazonaws.com"
       expect(actual.scheme).to eq "https"
       query = CGI.parse(actual.query)
