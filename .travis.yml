@@ -1,7 +1,6 @@
 language: ruby
 script: rake spec:travis
 before_script: travis_retry rake spec:travis:deps
-after_failure: df -h
 
 branches:
   only:
