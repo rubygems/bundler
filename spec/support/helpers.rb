@@ -68,8 +68,8 @@ module Spec
       requires << File.expand_path('../artifice/'+options.delete(:artifice)+'.rb', __FILE__) if options.key?(:artifice)
       requires_str = requires.map{|r| "-r#{r}"}.join(" ")
 
-      env = (options.delete(:env) || {}).map{|k,v| "#{k}='#{v}'"}.join(" ")
-      args = options.map do |k,v|
+      env = (options.delete(:env) || {}).map{|k, v| "#{k}='#{v}'"}.join(" ")
+      args = options.map do |k, v|
         v == true ? " --#{k}" : " --#{k} #{v}" if v
       end.join
 
@@ -93,7 +93,7 @@ module Spec
       requires << File.expand_path('../artifice/'+options.delete(:artifice)+'.rb', __FILE__) if options.key?(:artifice)
       requires_str = requires.map{|r| "-r#{r}"}.join(" ")
 
-      env = (options.delete(:env) || {}).map{|k,v| "#{k}='#{v}' "}.join
+      env = (options.delete(:env) || {}).map{|k, v| "#{k}='#{v}' "}.join
       cmd = "#{env}#{Gem.ruby} -I#{lib} #{requires_str} #{bundle_bin}"
 
       if exitstatus
@@ -105,7 +105,7 @@ module Spec
 
     def ruby(ruby, options = {})
       expect_err = options.delete(:expect_err)
-      env = (options.delete(:env) || {}).map{|k,v| "#{k}='#{v}' "}.join
+      env = (options.delete(:env) || {}).map{|k, v| "#{k}='#{v}' "}.join
       ruby.gsub!(/["`\$]/) {|m| "\\#{m}" }
       lib_option = options[:no_lib] ? "" : " -I#{lib}"
       sys_exec(%{#{env}#{Gem.ruby}#{lib_option} -e "#{ruby}"}, expect_err)
