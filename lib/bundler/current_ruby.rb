@@ -23,6 +23,10 @@ module Bundler
       RUBY_VERSION =~ /^2\.1/
     end
 
+    def on_22?
+      RUBY_VERSION =~ /^2\.2/
+    end
+
     def ruby?
       !mswin? && (!defined?(RUBY_ENGINE) || RUBY_ENGINE == "ruby" || RUBY_ENGINE == "rbx" || RUBY_ENGINE == "maglev")
     end
@@ -43,6 +47,10 @@ module Bundler
       ruby? && on_21?
     end
 
+    def ruby_22?
+      ruby? && on_22?
+    end
+
     def mri?
       !mswin? && (!defined?(RUBY_ENGINE) || RUBY_ENGINE == "ruby")
     end
@@ -61,6 +69,10 @@ module Bundler
 
     def mri_21?
       mri? && on_21?
+    end
+
+    def mri_22?
+      mri? && on_22?
     end
 
     def rbx?
@@ -103,6 +115,10 @@ module Bundler
       mswin? && on_21?
     end
 
+    def mswin_22?
+      mswin? && on_22?
+    end
+
     def mswin64?
       Bundler::WINDOWS && Gem::Platform.local.os == "mswin64" && Gem::Platform.local.cpu == 'x64'
     end
@@ -117,6 +133,10 @@ module Bundler
 
     def mswin64_21?
       mswin64? && on_21?
+    end
+
+    def mswin64_22?
+      mswin64? && on_22?
     end
 
     def mingw?
@@ -139,6 +159,10 @@ module Bundler
       mingw? && on_21?
     end
 
+    def mingw_22?
+      mingw? && on_22?
+    end
+
     def x64_mingw?
       Bundler::WINDOWS && Gem::Platform.local.os == "mingw32" && Gem::Platform.local.cpu == 'x64'
     end
@@ -149,6 +173,10 @@ module Bundler
 
     def x64_mingw_21?
       x64_mingw? && on_21?
+    end
+
+    def x64_mingw_22?
+      x64_mingw? && on_22?
     end
 
   end
