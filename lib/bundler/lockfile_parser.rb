@@ -53,10 +53,10 @@ module Bundler
   private
 
     TYPES = {
-      "GIT"  => Bundler::Source::Git,
-      "GEM"  => Bundler::Source::Rubygems,
-      "PATH" => Bundler::Source::Path,
-      "SVN"  => Bundler::Source::SVN
+      GIT  => Bundler::Source::Git,
+      GEM  => Bundler::Source::Rubygems,
+      PATH => Bundler::Source::Path,
+      SVN  => Bundler::Source::SVN
     }
 
     def parse_source(line)
@@ -66,10 +66,10 @@ module Bundler
         @opts, @type = {}, line
       when SPECS
         case @type
-        when "PATH"
+        when PATH
           @current_source = TYPES[@type].from_lock(@opts)
           @sources << @current_source
-        when "GIT", "SVN"
+        when GIT, SVN
           @current_source = TYPES[@type].from_lock(@opts)
           # Strip out duplicate GIT / SVN sections
           if @sources.include?(@current_source)
@@ -77,7 +77,7 @@ module Bundler
           else
             @sources << @current_source
           end
-        when "GEM"
+        when GEM
           Array(@opts["remote"]).each do |url|
             @rubygems_aggregate.add_remote(url)
           end
