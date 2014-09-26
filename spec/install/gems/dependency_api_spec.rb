@@ -467,6 +467,8 @@ describe "gemcutter's dependency API" do
         bundle "config #{source_uri}/ #{user}:#{password}"
 
         bundle :install, :artifice => "endpoint_strict_basic_authentication"
+
+        expect(out).to include("Fetching gem metadata from #{source_uri}")
         should_be_installed "rack 1.0.0"
       end
 

@@ -226,6 +226,12 @@ module Bundler
     end
 
     def use_api
+      _use_api(true)
+    rescue AuthenticationRequiredError
+      retry_with_auth{_use_api(false)}
+    end
+
+    def _use_api(reraise_auth_error = false)
       return @use_api if defined?(@use_api)
 
       if @remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
@@ -233,6 +239,9 @@ module Bundler
       elsif fetch(dependency_api_uri)
         @use_api = true
       end
+    rescue AuthenticationRequiredError => e
+      raise e if reraise_auth_error
+      false
     rescue HTTPError
       @use_api = false
     end
@@ -268,6 +277,8 @@ module Bundler
         response.body
       when Net::HTTPRequestEntityTooLarge
         raise FallbackError, response.body
+      when Net::HTTPUnauthorized
+        raise AuthenticationRequiredError, "#{response.class}: #{response.body}"
       else
         raise HTTPError, "#{response.class}: #{response.body}"
       end
@@ -282,8 +293,6 @@ module Bundler
         req.basic_auth(user, password)
       end
       connection.request(uri, req)
-    rescue Net::HTTPUnauthorized, Net::HTTPForbidden
-      retry_with_auth { request(uri) }
     rescue OpenSSL::SSL::SSLError
       raise CertificateFailureError.new(uri)
     rescue *HTTP_ERRORS => e
