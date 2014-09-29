@@ -74,7 +74,7 @@ module Bundler
     end
 
     def combine_rubygems_sources
-      Source::Rubygems.new("remotes" => rubygems_sources.map(&:remotes).flatten.uniq.reverse)
+      Source::Rubygems.new("remotes" => rubygems_sources.map(&:remotes).flatten.uniq)
     end
   end
 end

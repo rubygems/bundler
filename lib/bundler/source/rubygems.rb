@@ -52,9 +52,9 @@ module Bundler
 
       def to_lock
         out = "GEM\n"
-        out << remotes.map { |remote|
-          "  remote: #{suppress_configured_credentials remote}\n"
-        }.join
+        remotes.reverse_each do |remote|
+          out << "  remote: #{suppress_configured_credentials remote}\n"
+        end
         out << "  specs:\n"
       end
 

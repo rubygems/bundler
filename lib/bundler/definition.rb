@@ -313,7 +313,7 @@ module Bundler
       deleted = []
       changed = []
 
-      gemfile_sources = sources.all_sources
+      gemfile_sources = sources.lock_sources
       if @locked_sources != gemfile_sources
         new_sources = gemfile_sources - @locked_sources
         deleted_sources = @locked_sources - gemfile_sources
