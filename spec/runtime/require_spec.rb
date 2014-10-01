@@ -98,6 +98,28 @@ describe "Bundler.require" do
     expect(err).to eq("ZOMG LOAD ERROR")
   end
 
+  it "doesn't swallow the error when the library has an unrelated error" do
+    build_lib "loadfuuu", "1.0.0" do |s|
+      s.write "lib/loadfuuu.rb", "raise LoadError.new(\"cannot load such file -- load-bar\")"
+    end
+
+    gemfile <<-G
+      path "#{lib_path}"
+      gem "loadfuuu"
+    G
+
+    cmd = <<-RUBY
+      begin
+        Bundler.require
+      rescue LoadError => e
+        $stderr.puts "ZOMG LOAD ERROR: \#{e.message}"
+      end
+    RUBY
+    run(cmd, :expect_err => true)
+
+    expect(err).to eq("ZOMG LOAD ERROR: cannot load such file -- load-bar")
+  end
+
   describe "with namespaced gems" do
     before :each do
       build_lib "jquery-rails", "1.0.0" do |s|
@@ -170,8 +192,9 @@ describe "Bundler.require" do
 
     it "doesn't swallow the error when the library has an unrelated error" do
       build_lib "load-fuuu", "1.0.0" do |s|
-        s.write "lib/load-fuuu.rb", "raise LoadError.new(\"cannot load such file -- load-bar\")"
+        s.write "lib/load/fuuu.rb", "raise LoadError.new(\"cannot load such file -- load-bar\")"
       end
+      lib_path('load-fuuu-1.0.0/lib/load-fuuu.rb').rmtree
 
       gemfile <<-G
         path "#{lib_path}"
