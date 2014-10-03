@@ -1,9 +1,12 @@
 module Bundler
   class Settings
+    attr_accessor :options
+
     def initialize(root = nil)
       @root          = root
       @local_config  = load_config(local_config_file)
       @global_config = load_config(global_config_file)
+      @options       = nil
     end
 
     def [](key)
@@ -122,7 +125,7 @@ module Bundler
     end
 
     def is_bool(key)
-      %w(frozen cache_all no_prune disable_local_branch_check).include? key.to_s
+      %w(frozen fixed cache_all no_prune disable_local_branch_check).include? key.to_s
     end
 
     def to_bool(value)

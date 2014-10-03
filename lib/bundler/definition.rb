@@ -248,7 +248,7 @@ module Bundler
         return
       end
 
-      File.open(file, 'wb'){|f| f.puts(contents) }
+      File.open(file, 'wb'){|f| f.puts(contents) } unless Bundler.settings.options[:fixed]
     rescue Errno::EACCES
       raise Bundler::InstallError,
         "There was an error while trying to write to Gemfile.lock. It is likely that \n" \

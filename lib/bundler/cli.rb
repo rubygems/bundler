@@ -121,6 +121,8 @@ module Bundler
       "Install using defaults tuned for deployment environments"
     method_option "frozen", :type => :boolean, :banner =>
       "Do not allow the Gemfile.lock to be updated after this install"
+    method_option "fixed", :type => :boolean, :banner =>
+      "Install normally except do not update the Gemfile.lock"
     method_option "full-index", :type => :boolean, :banner =>
       "Use the rubygems modern index instead of the API endpoint"
     method_option "gemfile", :type => :string, :banner =>
