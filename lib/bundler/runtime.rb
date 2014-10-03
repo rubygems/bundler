@@ -46,7 +46,7 @@ module Bundler
       self
     end
 
-    REGEXPS = [
+    REQUIRE_ERRORS = [
       /^no such file to load -- (.+)$/i,
       /^Missing \w+ (?:file\s*)?([^\s]+.rb)$/i,
       /^Missing API definition file in (.+)$/i,
@@ -76,18 +76,16 @@ module Bundler
             Kernel.require file
           end
         rescue LoadError => e
-          REGEXPS.find { |r| r =~ e.message }
+          REQUIRE_ERRORS.find { |r| r =~ e.message }
           raise if dep.autorequire || $1 != required_file
 
           if dep.autorequire.nil? && dep.name.include?('-')
             begin
               namespaced_file = dep.name.gsub('-', '/')
               Kernel.require namespaced_file
-            rescue LoadError
-              REGEXPS.find { |r| r =~ e.message }
-              regex_name = $1
-              raise e if dep.autorequire || (regex_name && regex_name.gsub('-', '/') != namespaced_file)
-              raise e if regex_name.nil?
+            rescue LoadError => e
+              REQUIRE_ERRORS.find { |r| r =~ e.message }
+              raise if $1 != namespaced_file
             end
           end
         end
