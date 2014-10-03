@@ -12,6 +12,7 @@ module Bundler
   preserve_gem_path
   ORIGINAL_ENV = ENV.to_hash
 
+  autoload :Adder,                 'bundler/adder'
   autoload :Definition,            'bundler/definition'
   autoload :Dependency,            'bundler/dependency'
   autoload :DepProxy,              'bundler/dep_proxy'
