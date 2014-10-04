@@ -125,6 +125,13 @@ module Bundler
         return
       when String
         rubygems_source.add_remote source
+
+        if block_given?
+          Bundler.ui.warn "A block was passed to `source`, but Bundler versions " \
+            "prior to 1.7 ignore the block.  Please upgrade Bundler to 1.7 or " \
+            "specify your dependencies outside of the block passed to `source`."
+        end
+
         return
       else
         @source = source
