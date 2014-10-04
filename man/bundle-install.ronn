@@ -222,7 +222,7 @@ For a simple illustration, consider the following Gemfile(5):
       gem "rack-perftools-profiler"
     end
 
-In this case, `sinatra` depends on any version of Rack (`>= 1.0`, while
+In this case, `sinatra` depends on any version of Rack (`>= 1.0`), while
 `rack-perftools-profiler` depends on 1.x (`~> 1.0`).
 
 When you run `bundle install --without production` in development, we
