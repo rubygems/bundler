@@ -286,6 +286,7 @@ module Bundler
     end
 
     desc "console [GROUP]", "Opens an IRB session with the bundle pre-loaded"
+    method_option :load_paths, :type => :array, :default => [], :aliases => '-I'
     def console(group = nil)
       require 'bundler/cli/console'
       Console.new(options, group).run

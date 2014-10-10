@@ -12,6 +12,11 @@ module Bundler
 
       console = get_console(Bundler.settings[:console] || 'irb')
       load '.consolerc' if File.exists?('.consolerc')
+
+      options[:load_paths].each do |dir|
+        $LOAD_PATH.unshift(File.expand_path(dir))
+      end
+
       console.start
     end
 
