@@ -54,19 +54,19 @@ module Bundler
       end
 
       def hash
-        [self.class, expand(path), version].hash
+        [self.class, expanded_path, version].hash
       end
 
       def eql?(o)
         o.instance_of?(Path) &&
-        expand(path) == expand(o.path) &&
+        expanded_path == expand(o.path) &&
         version == o.version
       end
 
       alias == eql?
 
       def name
-        File.basename(expand(path).to_s)
+        File.basename(expanded_path.to_s)
       end
 
       def install(spec)
@@ -95,6 +95,7 @@ module Bundler
       def specs
         if has_app_cache?
           @path = app_cache_path
+          @expanded_path = nil # Invalidate
         end
         local_specs
       end
@@ -104,6 +105,10 @@ module Bundler
       end
 
     private
+
+      def expanded_path
+        @expanded_path ||= expand(path)
+      end
 
       def expand(somepath)
         somepath.expand_path(Bundler.root)
@@ -123,7 +128,6 @@ module Bundler
 
       def load_spec_files
         index = Index.new
-        expanded_path = expand(path)
 
         if File.directory?(expanded_path)
           Dir["#{expanded_path}/#{@glob}"].each do |file|

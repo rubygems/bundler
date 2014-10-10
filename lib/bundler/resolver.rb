@@ -160,6 +160,7 @@ module Bundler
     def start(reqs)
       activated = {}
       @gems_size = Hash[reqs.map { |r| [r, gems_size(r)] }]
+      @prereleases = Set.new(reqs.select { |r| r.requirement.prerelease? })
 
       resolve(reqs, activated)
     end
@@ -264,7 +265,7 @@ module Bundler
 
         reqs = reqs.sort_by do |a|
           [ activated[a.name] ? 0 : 1,
-            a.requirement.prerelease? ? 0 : 1,
+            @prereleases.include?(a) ? 0 : 1,
             @errors[a.name]   ? 0 : 1,
             activated[a.name] ? 0 : @gems_size[a] ]
         end
