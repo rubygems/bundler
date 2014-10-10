@@ -23,12 +23,14 @@ module Bundler
       get_constant('irb')
     end
 
+    CONSOLES = {
+      'pry'  => :Pry,
+      'ripl' => :Ripl,
+      'irb'  => :IRB,
+    }
+
     def get_constant(name)
-      const_name = {
-        'pry'  => :Pry,
-        'ripl' => :Ripl,
-        'irb'  => :IRB,
-      }[name]
+      const_name = CONSOLES[name]
       Object.const_get(const_name)
     rescue NameError
       Bundler.ui.error "Could not find constant #{const_name}"
