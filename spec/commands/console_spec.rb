@@ -55,7 +55,7 @@ describe "bundle console" do
     expect(out).to include("NameError")
   end
 
-  describe "when given a group" do
+  context "when given a group" do
     it "loads the given group" do
       bundle "console test" do |input|
         input.puts("puts ACTIVESUPPORT")
