@@ -83,6 +83,18 @@ describe "bundle install with gems on multiple sources" do
         expect(out).not_to include("Warning")
         should_be_installed("rack-obama 1.0.0", "rack 1.0.0")
       end
+
+      it "can cache and deploy" do
+        bundle :package
+
+        expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
+        expect(bundled_app("vendor/cache/rack-obama-1.0.gem")).to exist
+
+        bundle "install --deployment", :exitstatus => true
+
+        expect(exitstatus).to eq(0)
+        should_be_installed("rack-obama 1.0.0", "rack 1.0.0")
+      end
     end
 
     context "with sources set by an option" do
