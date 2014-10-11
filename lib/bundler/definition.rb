@@ -451,12 +451,11 @@ module Bundler
 
       # Get the Rubygems sources from the Gemfile.lock
       locked_gem_sources = @locked_sources.select { |s| s.kind_of?(Source::Rubygems) }
-      # Get the Rubygems sources from the Gemfile
-      actual_gem_sources = @sources.rubygems_sources
+      # Get the Rubygems remotes from the Gemfile
+      actual_remotes = sources.rubygems_remotes
 
       # If there is a Rubygems source in both
-      unless locked_gem_sources.empty? && actual_gem_sources.empty?
-        actual_remotes = actual_gem_sources.map(&:remotes).flatten.uniq
+      if !locked_gem_sources.empty? && !actual_remotes.empty?
         locked_gem_sources.each do |locked_gem|
           # Merge the remotes from the Gemfile into the Gemfile.lock
           changes = changes | locked_gem.replace_remotes(actual_remotes)
@@ -466,11 +465,9 @@ module Bundler
       # Replace the sources from the Gemfile with the sources from the Gemfile.lock,
       # if they exist in the Gemfile.lock and are `==`. If you can't find an equivalent
       # source in the Gemfile.lock, use the one from the Gemfile.
-      sources.replace_sources!(@locked_sources)
-      gemfile_sources = sources.all_sources
-      changes = changes | (Set.new(gemfile_sources) != Set.new(@locked_sources))
+      changes = changes | sources.replace_sources!(@locked_sources)
 
-      gemfile_sources.each do |source|
+      sources.all_sources.each do |source|
         # If the source is unlockable and the current command allows an unlock of
         # the source (for example, you are doing a `bundle update <foo>` of a git-pinned
         # gem), unlock it. For git sources, this means to unlock the revision, which
