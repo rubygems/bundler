@@ -80,15 +80,16 @@ describe "install with --deployment or --frozen" do
   end
 
   it "works with sources given by a block" do
-    install_gemfile(<<-G, :artifice => "endpoint_strict_basic_authentication", :quiet => true)
-      source "http://user:pass@localgemserver.test/" do
-        gem "rack-obama", ">= 1.0"
+    install_gemfile <<-G
+      source "file://#{gem_repo1}" do
+        gem "rack"
       end
     G
 
-    bundle "install --deployment", :exitstatus => true, :artifice => "endpoint_strict_basic_authentication"
+    bundle "install --deployment", :exitstatus => true
 
     expect(exitstatus).to eq(0)
+    should_be_installed "rack 1.0"
   end
 
   describe "with an existing lockfile" do
