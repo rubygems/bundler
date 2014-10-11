@@ -1,3 +1,9 @@
+## 1.7.4 (2014-10-10)
+
+Bugfixes:
+
+  - Use dependency API even when HTTP credentials are in ENV (#3191, @fvaleur)
+
 ## 1.7.3 (2014-09-14)
 
 Bugfixes:
