@@ -55,7 +55,32 @@ describe "bundle console" do
     expect(out).to include("NameError")
   end
 
-  describe "when given a group" do
+  context "when given -I options" do
+    let(:dir) { '/foo/bar' }
+
+    it "adds the directories to the front of $LOAD_PATH" do
+      bundle "console -I #{dir}" do |input|
+        input.puts("puts $LOAD_PATH[0]")
+        input.puts("exit")
+      end
+      expect(out.split($/)).to include(dir)
+    end
+
+    context "when the directory is relative" do
+      let(:relative_path) { "./foo/bar" }
+      let(:expanded_path) { File.expand_path(relative_path) }
+
+      it "expands the directory path" do
+        bundle "console -I #{relative_path}" do |input|
+          input.puts("puts $LOAD_PATH[0]")
+          input.puts("exit")
+        end
+        expect(out.split($/)).to include(expanded_path)
+      end
+    end
+  end
+
+  context "when given a group" do
     it "loads the given group" do
       bundle "console test" do |input|
         input.puts("puts ACTIVESUPPORT")
