@@ -42,7 +42,7 @@ password on a per source basis.
 
 As alternative you can provide credentials directly in the source URI.
 
-    source "https://user:passowrd@gems.example.com"
+    source "https://user:password@gems.example.com"
 
 Credentials provided in the source URI will take presedence.
 
