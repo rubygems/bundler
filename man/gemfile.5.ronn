@@ -45,7 +45,7 @@ credentials from being stored in plain text in version control.
 For some sources, like a company Gemfury account, it may be easier to simply
 include the credentials in the Gemfile as part of the source URL.
 
-    source "https://user:passowrd@gems.example.com"
+    source "https://user:password@gems.example.com"
 
 Credentials in the source URL will take precedence over credentials set using
 `config`.
