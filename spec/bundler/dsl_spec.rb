@@ -84,6 +84,50 @@ describe Bundler::Dsl do
     end
   end
 
+  describe "#require_gemfile" do
+    it "nests paths" do
+      allow(Bundler).to receive(:root).and_return(Pathname.new("/root"))
+      expect(Bundler).to receive(:read_file).with("/root/some_path/Gemfile").and_return(<<-GEMFILE)
+      gem "gem1"
+      gem "gem2", :path => "path1"
+
+      path "path2" do
+        gem "gem3"
+        gem "gem4", :path => "path3"
+      end
+      GEMFILE
+
+      expect(Bundler::SharedHelpers).to receive(:chdir).and_yield
+
+      subject.gem "hello", :path => "top_level_path"
+
+      subject.require_gemfile("some_path/Gemfile")
+
+      expected_paths = [
+        "some_path/path3",
+        "some_path/path2",
+        "some_path/path1",
+        "top_level_path"
+      ]
+
+      paths = subject.sources.path_sources.map do |source|
+        source.path.to_s
+      end
+
+      expect(paths).to eq(expected_paths)
+
+      expected_dependencies = [
+        "hello",
+        "gem1",
+        "gem2",
+        "gem3",
+        "gem4"
+      ]
+
+      expect(subject.dependencies.map(&:name)).to eq(expected_dependencies)
+    end
+  end
+
   describe "#gem" do
     [:ruby, :ruby_18, :ruby_19, :ruby_20, :ruby_21, :mri, :mri_18, :mri_19,
      :mri_20, :mri_21, :jruby, :rbx].each do |platform|
