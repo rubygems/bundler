@@ -1,3 +1,13 @@
+## 1.6.7 (2014-10-19)
+
+Features:
+
+  - warn to upgrade when using useless source blocks (@danfinnie)
+
+Documentation:
+
+  - explain how to use gem server credentials via ENV (@hwartig)
+
 ## 1.6.6 (2014-08-23)
 
 Bugfixes:
