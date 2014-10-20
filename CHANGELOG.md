@@ -1,8 +1,11 @@
-## 1.7.4 (2014-10-10)
+## 1.7.4 (2014-10-19)
 
 Bugfixes:
 
+  - Allow --deployment after `pack` while using source blocks (#3167, @tmoore)
   - Use dependency API even when HTTP credentials are in ENV (#3191, @fvaleur)
+  - Silence warnings (including root warning) in --quiet mode (#3186, @indirect)
+  - Stop asking gem servers for gems already found locally (#2909, @dubek)
 
 ## 1.7.3 (2014-09-14)
 
@@ -34,11 +37,11 @@ Security:
 Features:
 
   - Gemfile `source` calls now take a block containing gems from that source (@tmoore)
-  - added the `:source` option to `gem` to specify a source (@tmoore)
+  - Added the `:source` option to `gem` to specify a source (@tmoore)
 
 Bugfixes:
 
-  - warn on ambiguous gems available from more than one source (@tmoore)
+  - Warn on ambiguous gems available from more than one source (@tmoore)
 
 ## 1.6.5 (2014-07-23)
 
