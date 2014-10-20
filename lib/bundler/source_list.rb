@@ -1,14 +1,13 @@
 module Bundler
   class SourceList
     attr_reader :path_sources,
-                :git_sources,
-                :rubygems_sources
+                :git_sources
 
     def initialize
       @path_sources       = []
       @git_sources        = []
       @rubygems_aggregate = Source::Rubygems.new
-      @rubygems_sources   = [@rubygems_aggregate]
+      @rubygems_sources   = []
     end
 
     def add_path_source(options = {})
@@ -28,6 +27,14 @@ module Bundler
       @rubygems_aggregate
     end
 
+    def rubygems_sources
+      @rubygems_sources + [@rubygems_aggregate]
+    end
+
+    def rubygems_remotes
+      rubygems_sources.map(&:remotes).flatten.uniq
+    end
+
     def all_sources
       path_sources + git_sources + rubygems_sources
     end
@@ -42,11 +49,21 @@ module Bundler
     end
 
     def replace_sources!(replacement_sources)
-      [path_sources, git_sources, rubygems_sources].each do |source_list|
+      return true if replacement_sources.empty?
+
+      [path_sources, git_sources].each do |source_list|
         source_list.map! do |source|
           replacement_sources.find { |s| s == source } || source
         end
       end
+
+      replacement_rubygems =
+        replacement_sources.detect { |s| s.is_a?(Source::Rubygems) }
+      @rubygems_aggregate = replacement_rubygems
+
+      # Return true if there were changes
+      all_sources.to_set != replacement_sources.to_set ||
+        rubygems_remotes.to_set != replacement_rubygems.remotes.to_set
     end
 
     def cached!
@@ -74,7 +91,7 @@ module Bundler
     end
 
     def combine_rubygems_sources
-      Source::Rubygems.new("remotes" => rubygems_sources.map(&:remotes).flatten.uniq.reverse)
+      Source::Rubygems.new("remotes" => rubygems_remotes)
     end
   end
 end
