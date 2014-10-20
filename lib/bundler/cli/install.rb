@@ -6,6 +6,8 @@ module Bundler
     end
 
     def run
+      Bundler.ui.level = "error" if options[:quiet]
+
       warn_if_root
 
       if options[:without]
@@ -66,7 +68,6 @@ module Bundler
       Bundler.settings[:no_prune] = true if options["no-prune"]
       Bundler.settings[:clean]    = options["clean"] if options["clean"]
       Bundler.settings.without    = options[:without]
-      Bundler.ui.level            = "warn" if options[:quiet]
       Bundler::Fetcher.disable_endpoint = options["full-index"]
       Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? '1' : nil
 

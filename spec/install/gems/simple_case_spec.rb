@@ -291,7 +291,7 @@ describe "bundle install with gem sources" do
       G
 
       bundle :install, :expect_err => true
-      expect(out).to match(/Your Gemfile has no gem server sources/i)
+      expect(out).to include("Your Gemfile has no gem server sources")
     end
 
     it "creates a Gemfile.lock on a blank Gemfile" do
@@ -363,23 +363,14 @@ describe "bundle install with gem sources" do
   end
 
   describe "when requesting a quiet install via --quiet" do
-    it "should be quiet if there are no warnings" do
-      gemfile <<-G
-        source "file://#{gem_repo1}"
-        gem 'rack'
-      G
-
-      bundle :install, :quiet => true
-      expect(out).to eq("")
-    end
-
-    it "should still display warnings" do
+    it "should be quiet" do
       gemfile <<-G
         gem 'rack'
       G
 
       bundle :install, :quiet => true
-      expect(out).to match(/Your Gemfile has no gem server sources/)
+      expect(out).to include("Could not find gem 'rack (>= 0) ruby'")
+      expect(out).to_not include("Your Gemfile has no gem server sources")
     end
   end
 
