@@ -140,7 +140,6 @@ module Bundler
       @index                = index
       @deps_for             = {}
       @missing_gems         = Hash.new(0)
-      @prereleases_cache    = Hash.new { |h,k| h[k] = k.prerelease? }
       @source_requirements  = source_requirements
       @iteration_counter    = 0
       @started_at           = Time.now
@@ -265,7 +264,7 @@ module Bundler
 
         reqs = reqs.sort_by do |a|
           [ activated[a.name] ? 0 : 1,
-            @prereleases_cache[a.requirement] ? 0 : 1,
+            a.requirement.prerelease? ? 0 : 1,
             @errors[a.name]   ? 0 : 1,
             activated[a.name] ? 0 : @gems_size[a] ]
         end
