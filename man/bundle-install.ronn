@@ -98,8 +98,8 @@ update process below under [CONSERVATIVE UPDATING][].
 * `--jobs=[<size>]`:
   Install gems parallely by starting <size> number of parallel workers.
 
-* `--retry[<tries]`:
-  Retries failed network or git requests <tries> times.
+* `--retry=[<number>]`:
+  Retry failed network or git requests for <number> times.
 
 * `--no-cache`:
   Do not update the cache in `vendor/cache` with the newly bundled gems. This
