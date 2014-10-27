@@ -71,8 +71,9 @@ update process below under [CONSERVATIVE UPDATING][].
   found.
 
 * `--deployment`:
-  Switches Bundler to [deployment mode][DEPLOYMENT MODE]. Do not use this flag
-  on for development or testing.
+  In [deployment mode][DEPLOYMENT MODE], Bundler will 'roll-out' the bundle for
+  `production` use. Please check carefully if you want to have this option
+  enabled in `development` or `test` environments.
 
 * `--system`:
   Installs the gems specified in the bundle to the system's Rubygems location.
