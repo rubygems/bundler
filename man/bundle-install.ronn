@@ -39,85 +39,88 @@ update process below under [CONSERVATIVE UPDATING][].
 ## OPTIONS
 
 * `--gemfile=<gemfile>`:
-  The location of the Gemfile(5) that bundler should use. This defaults
-  to a gemfile in the current working directory. In general, bundler
-  will assume that the location of the Gemfile(5) is also the project
-  root, and will look for the `Gemfile.lock` and `vendor/cache` relative
-  to it.
+  The location of the Gemfile(5) which bundler should use. This defaults
+  to a Gemfile(5) in the current working directory. In general, bundler
+  will assume that the location of the Gemfile(5) is also the project's
+  root and will try to find `Gemfile.lock` and `vendor/cache` relative
+  to this location.
 
 * `--path=<path>`:
-  The location to install the gems in the bundle to. This defaults to
-  Rubygems' gem home, which is also the default location where `gem
-  install` installs gems. This means that, by default, gems installed
-  without a `--path` setting will show up in `gem list`. This setting is
-  a [remembered option][REMEMBERED OPTIONS].
-
-* `--system`:
-  Installs the gems in the bundle to the system location. This
-  overrides any previous [remembered][REMEMBERED OPTIONS] use of
-  `--path`.
-
-* `--without=<list>`:
-  A space-separated list of groups to skip installing. This is a
+  The location to install the specified gems to. This defaults to Rubygems'
+  setting. Bundler shares this location with Rubygems, `gem install ...` will
+  have gem installed there, too. Therefore, gems installed without a
+  `--path ...` setting will show up by calling `gem list`. Accodingly, gems
+  installed to other locations will not get listed. This setting is a
   [remembered option][REMEMBERED OPTIONS].
 
+* `--system`:
+  Installs the gems specified in the bundle to the system's Rubygems location.
+  This overrides any previous [remembered][REMEMBERED OPTIONS] use of `--path`.
+
+* `--without=<list>`:
+  A space-separated list of groups referencing gems to skip during installation.
+  This is a [remembered option][REMEMBERED OPTIONS].
+
 * `--local`:
-  Do not attempt to connect to `rubygems.org`, instead using just
-  the gems already present in Rubygems' cache or in `vendor/cache`.
-  Note that if a more appropriate platform-specific gem exists on
-  `rubygems.org`, it will not be found.
+  Do not attempt to connect to `rubygems.org`. Instead, bundler will use the
+  gems already present in Rubygems' cache or in `vendor/cache`. Note that if a
+  appropriate platform-specific gem exists on `rubygems.org` it will not be
+  found.
 
 * `--deployment`:
-  Switches bundler's defaults into [deployment mode][DEPLOYMENT MODE].
-  Do not use this flag on development machines.
+  Switches bundler to [deployment mode][DEPLOYMENT MODE]. Do not use this flag
+  on for development or testing.
 
 * `--binstubs[=<directory>]`:
-  Create a directory (defaults to `bin`) containing an executable
-  that runs in the context of the bundle. For instance, if the
-  `rails` gem comes with a `rails` executable, this flag will create
-  a `bin/rails` executable that ensures that all dependencies used
-  come from the bundled gems.
+  Creates a directory (defaults to `~/bin`) and place any executables from the
+  gem there. These executables run in bundler's context. If used, you might add
+  this directory to your environment's `PATH` variable. For instance, if the
+  `rails` gem comes with a `rails` executable, this flag will create a
+  `bin/rails` executable that ensures that all referred dependencies will be
+  resolved using the bundled gems.
 
-* `--shebang ruby-install-name`:
-  Uses the ruby executable (usually `ruby`) provided to execute the scripts created
-  with --binstubs. For instance, if you use --binstubs with `--shebang jruby`,
-  all executables will be created to use jruby instead.
+* `--shebang=<ruby-executable>`:
+  Uses the specified ruby executable (usually `ruby`) to execute the scripts
+  created with `--binstubs`. In addition, if you use `--binstubs` together with
+  `--shebang jruby` these executables will be changed to execute `jruby`
+  instead.
 
 * `--standalone[=<list>]`:
-  Make a bundle that can work without Ruby Gems or Bundler at runtime.
-  It takes a space separated list of groups to install. It creates a
-  `bundle` directory and installs the bundle there. It also generates
-  a `bundle/bundler/setup.rb` file to replace Bundler's own setup.
+  Makes a bundle that can work without depending on Rubygems or Bundler at
+  runtime. A space separated list of groups to install has to be specified.
+  Bundler creates a directory named `bundle` and installs the bundle there. It
+  also generates a `bundle/bundler/setup.rb` file to replace Bundler's own setup
+  in the manner required.
 
 * `--trust-policy=[<policy>]`:
-  Apply the Rubygems security policy named <policy>, where policy is one of
-  HighSecurity, MediumSecurity, LowSecurity, AlmostNoSecurity, or NoSecurity.
-  For more detail, see the Rubygems signing documentation, linked below in
-  [SEE ALSO][].
+  Apply the Rubygems security policy <policy>, where policy is one of
+  `HighSecurity`, `MediumSecurity`, `LowSecurity`, `AlmostNoSecurity`, or
+  `NoSecurity`. For more details, please see the Rubygems signing documentation
+  linked below in [SEE ALSO][].
 
-* `--jobs=[<size>]`:
-  Install gems parallely by starting <size> number of parallel workers.
+* `--jobs=[<number>]`:
+  Install gems by starting <number> of workers parallely.
 
 * `--retry=[<number>]`:
   Retry failed network or git requests for <number> times.
 
 * `--no-cache`:
   Do not update the cache in `vendor/cache` with the newly bundled gems. This
-  does not remove any existing cached gems, only stops the newly bundled gems
-  from being cached during the install.
+  does not remove any gems in the cache but keeps the newly bundled gems from
+  being cached during the install.
 
 * `--quiet`:
-  Do not print progress information to stdout. Instead, communicate the
-  success of the install operation via exit status code.
+  Do not print progress information to the standard output. Instead, Bundler
+  will exist using status code (`$?`).
 
 * `--clean`:
-  Run bundle clean automatically after install.
+  Run `bundle clean` after installation to tidy up.
 
 * `--full-index`:
-  Use the rubygems modern index instead of the API endpoint.
+  Use the gem index of Rubygems instead of calling the API endpoint.
 
 * `--no-prune`:
-  Don't remove stale gems from the cache.
+  Don't remove stale gems from the cache when the installation finishes.
 
 ## DEPLOYMENT MODE
 
