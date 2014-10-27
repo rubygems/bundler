@@ -52,7 +52,9 @@ update process below under [CONSERVATIVE UPDATING][].
   removed.
 
 * `--full-index`:
-  Use the gem index of Rubygems instead of calling the API endpoint.
+  Bundler will not call Rubygems' API endpoint (default) but download and cache
+  a (currently big) index file of all gems. Performance can be improved for
+  large bundles that seldomly change by enabling this option.
 
 * `--gemfile=<gemfile>`:
   The location of the Gemfile(5) which Bundler should use. This defaults
