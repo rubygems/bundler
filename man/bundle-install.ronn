@@ -48,7 +48,7 @@ update process below under [CONSERVATIVE UPDATING][].
 
 * `--clean`:
   On finishing the installation Bundler is going to remove any gems not present
-  in the current Gemfile. Don't worry, gems currently in use will not be
+  in the current Gemfile(5). Don't worry, gems currently in use will not be
   removed.
 
 * `--full-index`:
@@ -133,7 +133,7 @@ update process below under [CONSERVATIVE UPDATING][].
 Bundler's defaults are optimized for development. To switch to
 defaults optimized for deployment, use the `--deployment` flag.
 Do not activate deployment mode on development machines, as it
-will cause in an error when the Gemfile is modified.
+will cause in an error when the Gemfile(5) is modified.
 
 1. A `Gemfile.lock` is required.
 
@@ -223,12 +223,12 @@ third-party code being used in different environments.`
 
 For a simple illustration, consider the following Gemfile(5):
 
-    source "https://rubygems.org"
+    source 'https://rubygems.org'
 
-    gem "sinatra"
+    gem 'sinatra'
 
     group :production do
-      gem "rack-perftools-profiler"
+      gem 'rack-perftools-profiler'
     end
 
 In this case, `sinatra` depends on any version of Rack (`>= 1.0`), while
@@ -319,10 +319,10 @@ same versions of all dependencies as it used before the update.
 
 Let's take a look at an example. Here's your original Gemfile(5):
 
-    source "https://rubygems.org"
+    source 'https://rubygems.org'
 
-    gem "actionpack", "2.3.8"
-    gem "activemerchant"
+    gem 'actionpack', '2.3.8'
+    gem 'activemerchant'
 
 In this case, both `actionpack` and `activemerchant` depend on
 `activesupport`. The `actionpack` gem depends on `activesupport 2.3.8`
@@ -335,10 +335,10 @@ gems in your Gemfile(5).
 
 Next, you modify your Gemfile(5) to:
 
-    source "https://rubygems.org"
+    source 'https://rubygems.org'
 
-    gem "actionpack", "3.0.0.rc"
-    gem "activemerchant"
+    gem 'actionpack', '3.0.0.rc'
+    gem 'activemerchant'
 
 The `actionpack 3.0.0.rc` gem has a number of new dependencies,
 and updates the `activesupport` dependency to `= 3.0.0.rc` and
