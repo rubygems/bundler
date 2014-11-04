@@ -1,10 +1,10 @@
 module Bundler
   class DepProxy
 
-    attr_reader :required_by, :__platform, :dep
+    attr_reader :__platform, :dep
 
     def initialize(dep, platform)
-      @dep, @__platform, @required_by = dep, platform, []
+      @dep, @__platform = dep, platform
     end
 
     def hash

@@ -27,6 +27,29 @@ module Rake
   end
 end
 
+namespace :molinillo do
+  task :namespace do
+    files = Dir.glob('lib/bundler/vendor/Molinillo*/**/*.rb')
+    sh "sed -i.bak 's/Molinillo/Bundler::Molinillo/g' #{files.join(' ')}"
+    sh "rm #{files.join('.bak ')}.bak"
+  end
+
+  task :clean do
+    files = Dir.glob('lib/bundler/vendor/Molinillo*/*', File::FNM_DOTMATCH).reject { |f| %(. .. lib).include? f.split('/').last }
+    puts files
+    sh "rm -r #{files.join(' ')}"
+  end
+
+  task :update, [:tag] => [] do |t, args|
+    tag = args[:tag]
+    Dir.chdir 'lib/bundler/vendor' do
+      `curl -L https://github.com/CocoaPods/molinillo/archive/#{tag}.tar.gz | tar -xz`
+    end
+    Rake::Task['molinillo:namespace'].invoke
+    Rake::Task['molinillo:clean'].invoke
+  end
+end
+
 namespace :spec do
   desc "Ensure spec dependencies are installed"
   task :deps do
