@@ -144,19 +144,16 @@ module Bundler
     end
 
     def start(requirements)
+      verify_gemfile_dependencies_are_found!(requirements)
       dg = @resolver.resolve(requirements, @base_dg)
       dg.map(&:payload).flat_map(&:to_specs)
     rescue Molinillo::VersionConflict => e
-      if e.conflicts.values.flat_map(&:requirements).flat_map(&:keys).uniq == %w(Gemfile)
-        raise GemNotFound, e.message
-      else
-        raise VersionConflict.new(e.conflicts.keys.uniq, e.message)
-      end
+      raise VersionConflict.new(e.conflicts.keys.uniq, e.message)
     rescue Molinillo::CircularDependencyError => e
+      names = e.dependencies.reverse_each.map { |d| "gem '#{d.name}'"}
       raise CyclicDependencyError, "Your Gemfile requires gems that depend" \
-        " depend on each other, creating an infinite loop. Please remove" \
-        " either #{e.dependencies.reverse_each.map { |d| "gem '#{d.name}'"}.join(' or ')}" \
-        " and try again."
+        " depend on each other, creating an infinite loop. Please remove " \
+        " either #{names.join(' or ')} and try again."
     end
 
     def before_resolution
@@ -227,6 +224,14 @@ module Bundler
           conflicts[name] ? 0 : 1,
           search_for(dependency).count,
         ]
+      end
+    end
+
+    def verify_gemfile_dependencies_are_found!(requirements)
+      requirements.each do |requirement|
+        if search_for(requirement).empty?
+          raise GemNotFound, "Could not find gem '#{requirement}'"
+        end
       end
     end
 
