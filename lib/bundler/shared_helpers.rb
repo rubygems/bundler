@@ -115,7 +115,7 @@ module Bundler
 
         Gem.loaded_specs.clear
 
-        bundler_spec.activate
+        bundler_spec.activate if bundler_spec
       end
     end
 
