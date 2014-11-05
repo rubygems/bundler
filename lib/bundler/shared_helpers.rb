@@ -98,10 +98,22 @@ module Bundler
       # handle 1.9 where system gems are always on the load path
       if defined?(::Gem)
         me = File.expand_path("../../", __FILE__)
-        $LOAD_PATH.reject! do |p|
-          next if File.expand_path(p) =~ /^#{Regexp.escape(me)}/
-          p != File.dirname(__FILE__) &&
-            Bundler.rubygems.gem_path.any?{|gp| p =~ /^#{Regexp.escape(gp)}/ }
+
+        # RubyGems 2.2+ can put binary extension into dedicated folders,
+        # therefore use RubyGems facilities to obtain their load paths.
+        if Gem::Specification.method_defined? :full_require_paths
+          loaded_gem_paths = Gem.loaded_specs.map do |n, s|
+            s.full_require_paths.none? {|path| File.expand_path(path) =~ /^#{Regexp.escape(me)}/} ? s.full_require_paths : []
+          end
+          loaded_gem_paths.flatten!
+
+          $LOAD_PATH.reject! {|p| loaded_gem_paths.delete(p) }
+        else
+          $LOAD_PATH.reject! do |p|
+            next if File.expand_path(p) =~ /^#{Regexp.escape(me)}/
+            p != File.dirname(__FILE__) &&
+              Bundler.rubygems.gem_path.any?{|gp| p =~ /^#{Regexp.escape(gp)}/ }
+          end
         end
         $LOAD_PATH.uniq!
       end
