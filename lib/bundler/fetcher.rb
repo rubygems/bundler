@@ -75,15 +75,15 @@ module Bundler
           ruby = Bundler.ruby_version
 
           agent = "bundler/#{Bundler::VERSION}"
-          agent += " rubygems/#{Gem::VERSION}"
-          agent += " ruby/#{ruby.version}"
-          agent += " (#{ruby.host})"
-          agent += " command/#{ARGV.first}"
+          agent << " rubygems/#{Gem::VERSION}"
+          agent << " ruby/#{ruby.version}"
+          agent << " (#{ruby.host})"
+          agent << " command/#{ARGV.first}"
 
           if ruby.engine != "ruby"
             # engine_version raises on unknown engines
             engine_version = ruby.engine_version rescue "???"
-            agent += " #{ruby.engine}/#{engine_version}"
+            agent << " #{ruby.engine}/#{engine_version}"
           end
           # add a random ID so we can consolidate runs server-side
           agent << " " << SecureRandom.hex(8)
