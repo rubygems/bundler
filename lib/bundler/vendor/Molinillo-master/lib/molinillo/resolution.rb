@@ -55,7 +55,7 @@ module Bundler::Molinillo
           break unless state.requirements.any? || state.requirement
           indicate_progress
           if state.respond_to?(:pop_possibility_state) # DependencyState
-            debug(depth) { "creating possibility state (#{possibilities.count} remaining)" }
+            debug(depth) { "Creating possibility state (#{possibilities.count} remaining)" }
             state.pop_possibility_state.tap { |s| states.push(s) if s }
           end
           process_topmost_state
@@ -75,7 +75,7 @@ module Bundler::Molinillo
 
         states.push(initial_state)
 
-        debug { "starting resolution (#{@started_at})" }
+        debug { "Starting resolution (#{@started_at})" }
         resolver_ui.before_resolution
       end
 
@@ -84,11 +84,11 @@ module Bundler::Molinillo
       def end_resolution
         resolver_ui.after_resolution
         debug do
-          "finished resolution (#{@iteration_counter} steps) " \
-          "(took #{(ended_at = Time.now) - @started_at} seconds) (#{ended_at})"
+          "Finished resolution (#{@iteration_counter} steps) " \
+          "(Took #{(ended_at = Time.now) - @started_at} seconds) (#{ended_at})"
         end
-        debug { 'unactivated: ' + Hash[activated.vertices.reject { |_n, v| v.payload }].keys.join(', ') }
-        debug { 'activated: ' + Hash[activated.vertices.select { |_n, v| v.payload }].keys.join(', ') }
+        debug { 'Unactivated: ' + Hash[activated.vertices.reject { |_n, v| v.payload }].keys.join(', ') } if state
+        debug { 'Activated: ' + Hash[activated.vertices.select { |_n, v| v.payload }].keys.join(', ') } if state
       end
 
       require 'molinillo/state'
@@ -115,9 +115,11 @@ module Bundler::Molinillo
           begin
             specification_provider.send(instance_method, *args, &block)
           rescue NoSuchDependencyError => error
-            vertex = activated.vertex_named(name_for error.dependency)
-            error.required_by += vertex.incoming_edges.map { |e| e.origin.name }
-            error.required_by << name_for_explicit_dependency_source unless vertex.explicit_requirements.empty?
+            if state
+              vertex = activated.vertex_named(name_for error.dependency)
+              error.required_by += vertex.incoming_edges.map { |e| e.origin.name }
+              error.required_by << name_for_explicit_dependency_source unless vertex.explicit_requirements.empty?
+            end
             raise
           end
         end
@@ -225,7 +227,7 @@ module Bundler::Molinillo
       # Attempts to activate the current {#possibility}
       # @return [void]
       def attempt_to_activate
-        debug(depth) { 'attempting to activate ' + possibility.to_s }
+        debug(depth) { 'Attempting to activate ' + possibility.to_s }
         existing_node = activated.vertex_named(name)
         if existing_node && existing_node.payload
           attempt_to_activate_existing_spec(existing_node)
@@ -283,7 +285,7 @@ module Bundler::Molinillo
       # @return [void]
       def activate_spec
         conflicts.delete(name)
-        debug(depth) { 'activated ' + name + ' at ' + possibility.to_s }
+        debug(depth) { 'Activated ' + name + ' at ' + possibility.to_s }
         vertex = activated.vertex_named(name)
         vertex.payload = possibility
         require_nested_dependencies_for(possibility)
@@ -295,7 +297,7 @@ module Bundler::Molinillo
       # @return [void]
       def require_nested_dependencies_for(activated_spec)
         nested_dependencies = dependencies_for(activated_spec)
-        debug(depth) { "requiring nested dependencies (#{nested_dependencies.map(&:to_s).join(', ')})" }
+        debug(depth) { "Requiring nested dependencies (#{nested_dependencies.map(&:to_s).join(', ')})" }
         nested_dependencies.each { |d|  activated.add_child_vertex name_for(d), nil, [name_for(activated_spec)], d }
 
         push_state_for_requirements(requirements + nested_dependencies)

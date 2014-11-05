@@ -53,11 +53,12 @@ module Bundler::Molinillo
     end
 
     # Whether or not debug messages should be printed.
-    # By default, whether or not the `CP_RESOLVER` environment variable is set.
+    # By default, whether or not the `MOLINILLO_DEBUG` environment variable is
+    # set.
     #
     # @return [Boolean]
     def debug?
-      @debug_mode ||= ENV['CP_RESOLVER']
+      @debug_mode ||= ENV['MOLINILLO_DEBUG']
     end
   end
 end

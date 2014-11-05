@@ -156,16 +156,16 @@ module Bundler
         " either #{names.join(' or ')} and try again."
     end
 
-    def before_resolution
-    end
-    def after_resolution
-    end
-    def indicate_progress
-    end
-
-    private
+    # def before_resolution
+    # end
+    # def after_resolution
+    # end
+    # def indicate_progress
+    # end
 
     include Molinillo::UI
+
+    private
 
     include Molinillo::SpecificationProvider
 
@@ -181,6 +181,7 @@ module Bundler
         # puts dependency
         # puts index.search(dependency, nil)
         results = index.search(dependency, @base[dependency.name])
+        locked_requirement = (vertex = @base_dg.vertex_named(dependency.name) && vertex.requirement)
         if results.any?
           version = results.first.version
           nested  = [[]]
@@ -191,7 +192,8 @@ module Bundler
             end
             nested.last << spec
           end
-          nested.map { |a| SpecGroup.new(a) }
+          groups = nested.map { |a| SpecGroup.new(a) }
+          !locked_requirement ? groups : groups.select { |sg| locked_requirement.satisfied_by? sg.version }
         else
           []
         end
@@ -218,11 +220,14 @@ module Bundler
     def sort_dependencies(dependencies, activated, conflicts)
       dependencies.sort_by do |dependency|
         name = name_for(dependency)
+        search = search_for(dependency)
+        last = search.last
+        nested_dependencies = last ? last.dependencies_for_activated_platforms.count : 1
         [
           activated.vertex_named(name).payload ? 0 : 1,
-          @prereleases_cache[dependency] ? 0 : 1,
+          @prereleases_cache[dependency.requirement] ? 0 : 1,
           conflicts[name] ? 0 : 1,
-          search_for(dependency).count,
+          activated.vertex_named(name).payload ? 0 : (search.count * Math.sqrt(nested_dependencies) ),
         ]
       end
     end
