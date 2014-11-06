@@ -58,7 +58,7 @@ describe "parallel", :realworld => true do
      expect(out).to match(/[1-3]: /)
 
     bundle "show activesupport"
-    expect(out).to match(/activesupport-3\.2\.1[3-9]/)
+    expect(out).to match(/activesupport-3\.2\.\d+/)
 
     bundle "show faker"
     expect(out).to match(/faker/)
