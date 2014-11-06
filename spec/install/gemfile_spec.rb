@@ -41,29 +41,4 @@ describe "bundle install" do
     end
   end
 
-  context "with future features" do
-    context "when source is used with a block" do
-      it "reports that sources with a block is not supported" do
-        gemfile <<-G
-          source 'http://rubygems.example.org' do
-            gem 'rack'
-          end
-        G
-
-        bundle :install
-        expect(out).to match(/A block was passed to `source`/)
-      end
-    end
-
-    context "when source is used without a block" do
-      it "prints no warnings" do
-        gemfile <<-G
-          source 'http://rubygems.example.org'
-        G
-
-        bundle :install
-        expect(out).not_to match(/A block was passed to `source`/)
-      end
-    end
-  end
 end
