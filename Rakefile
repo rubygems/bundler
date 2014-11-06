@@ -41,7 +41,7 @@ namespace :spec do
       deps.delete("rdiscount")
     end
 
-    deps.each do |name, version|
+    deps.sort_by{|name, _| name }.each do |name, version|
       sh "#{Gem.ruby} -S gem list -i '^#{name}$' -v '#{version}' || " \
          "#{Gem.ruby} -S gem install #{name} -v '#{version}' --no-ri --no-rdoc"
     end
