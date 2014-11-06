@@ -32,7 +32,7 @@ namespace :spec do
   task :deps do
     deps = Hash[BUNDLER_SPEC.development_dependencies.map do |d|
       [d.name, d.requirement.to_s]
-    end]
+    end.sort_by{|name, _| name }]
 
     # JRuby can't build ronn or rdiscount, so we skip that
     if defined?(RUBY_ENGINE) && RUBY_ENGINE == 'jruby'
