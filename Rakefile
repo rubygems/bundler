@@ -32,7 +32,7 @@ namespace :spec do
   task :deps do
     deps = Hash[BUNDLER_SPEC.development_dependencies.map do |d|
       [d.name, d.requirement.to_s]
-    end.sort_by{|name, _| name }]
+    end]
 
     # JRuby can't build ronn or rdiscount, so we skip that
     if defined?(RUBY_ENGINE) && RUBY_ENGINE == 'jruby'
@@ -40,7 +40,7 @@ namespace :spec do
       deps.delete("rdiscount")
     end
 
-    deps.each do |name, version|
+    deps.sort_by{|name, _| name }.each do |name, version|
       sh "#{Gem.ruby} -S gem list -i '^#{name}$' -v '#{version}' || " \
          "#{Gem.ruby} -S gem install #{name} -v '#{version}' --no-ri --no-rdoc"
     end
