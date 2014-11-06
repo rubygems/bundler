@@ -85,8 +85,15 @@ module Bundler
             engine_version = ruby.engine_version rescue "???"
             agent << " #{ruby.engine}/#{engine_version}"
           end
+
           # add a random ID so we can consolidate runs server-side
           agent << " " << SecureRandom.hex(8)
+
+          # add any user agent strings set in the config
+          extra_ua = Bundler.settings[:user_agent]
+          agent << " " << extra_ua if extra_ua
+
+          agent
         end
       end
 
