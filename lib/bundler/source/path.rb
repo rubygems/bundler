@@ -173,7 +173,6 @@ module Bundler
 
       def generate_bin(spec, disable_extensions = false)
         gem_dir  = Pathname.new(spec.full_gem_path)
-        gem_file = nil
 
         # Some gem authors put absolute paths in their gemspec
         # and we have to save them from themselves
@@ -187,8 +186,6 @@ module Bundler
         end.compact
 
         SharedHelpers.chdir(gem_dir) do
-          gem_file = Bundler.rubygems.build_gem gem_dir, spec
-
           installer = Path::Installer.new(spec, :env_shebang => false)
           run_hooks(:pre_install, installer)
           installer.build_extensions unless disable_extensions
@@ -208,10 +205,6 @@ module Bundler
         end
 
         Bundler.ui.warn "The validation message from Rubygems was:\n  #{e.message}"
-      ensure
-        if gem_dir && gem_file
-          FileUtils.rm_rf(gem_dir.join gem_file)
-        end
       end
 
       def run_hooks(type, installer)
