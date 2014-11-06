@@ -298,8 +298,6 @@ module Bundler
     end
 
     def ensure_equivalent_gemfile_and_lockfile(explicit_flag = false)
-      changes = false
-
       msg = "You are trying to install in deployment mode after changing\n" \
             "your Gemfile. Run `bundle install` elsewhere and add the\n" \
             "updated Gemfile.lock to version control."
@@ -325,32 +323,29 @@ module Bundler
         if deleted_sources.any?
           deleted.concat deleted_sources.map { |source| "* source: #{source}" }
         end
-
-        changes = true
       end
 
-      both_sources = Hash.new { |h,k| h[k] = ["no specified source", "no specified source"] }
-      @dependencies.each { |d| both_sources[d.name][0] = d.source if d.source }
-      @locked_deps.each  { |d| both_sources[d.name][1] = d.source if d.source }
-      both_sources.delete_if { |k,v| v[0] == v[1] }
+      new_deps = @dependencies - @locked_deps
+      deleted_deps = @locked_deps - @dependencies
 
-      if @dependencies != @locked_deps
-        new_deps = @dependencies - @locked_deps
-        deleted_deps = @locked_deps - @dependencies
+      if new_deps.any?
+        added.concat new_deps.map { |d| "* #{pretty_dep(d)}" }
+      end
 
-        if new_deps.any?
-          added.concat new_deps.map { |d| "* #{pretty_dep(d)}" }
+      if deleted_deps.any?
+        deleted.concat deleted_deps.map { |d| "* #{pretty_dep(d)}" }
+      end
+
+      both_sources = Hash.new { |h,k| h[k] = [] }
+      @dependencies.each { |d| both_sources[d.name][0] = d }
+      @locked_deps.each  { |d| both_sources[d.name][1] = d.source }
+
+      both_sources.each do |name, (dep, lock_source)|
+        if (dep.nil? && !lock_source.nil?) || (!dep.nil? && !lock_source.nil? && !lock_source.can_lock?(dep))
+          gemfile_source_name = (dep && dep.source) || 'no specified source'
+          lockfile_source_name = lock_source || 'no specified source'
+          changed << "* #{name} from `#{gemfile_source_name}` to `#{lockfile_source_name}`"
         end
-
-        if deleted_deps.any?
-          deleted.concat deleted_deps.map { |d| "* #{pretty_dep(d)}" }
-        end
-
-        both_sources.each do |name, sources|
-          changed << "* #{name} from `#{sources[0]}` to `#{sources[1]}`"
-        end
-
-        changes = true
       end
 
       msg << "\n\nYou have added to the Gemfile:\n"     << added.join("\n") if added.any?
