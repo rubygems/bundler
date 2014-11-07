@@ -14,6 +14,7 @@ module Bundler
     VALID_PLATFORMS = Bundler::Dependency::PLATFORM_MAP.keys.freeze
 
     attr_accessor :dependencies
+    attr_reader :sources
 
     def initialize
       @source          = nil
@@ -25,6 +26,17 @@ module Bundler
       @env             = nil
       @ruby_version    = nil
       add_git_sources
+    end
+
+    def require_gemfile(gemfile_path)
+      gemfile_path = Pathname.new(gemfile_path).expand_path(Bundler.root)
+
+      other_file = self.class.new
+      SharedHelpers.chdir(gemfile_path.dirname) do
+        other_file.eval_gemfile(gemfile_path)
+      end
+
+      merge(other_file, gemfile_path)
     end
 
     def eval_gemfile(gemfile, contents = nil)
@@ -72,39 +84,7 @@ module Bundler
       normalize_options(name, version, options)
 
       dep = Dependency.new(name, version, options)
-
-      # if there's already a dependency with this name we try to prefer one
-      if current = @dependencies.find { |d| d.name == dep.name }
-        if current.requirement != dep.requirement
-          if current.type == :development
-            @dependencies.delete current
-          elsif dep.type == :development
-            return
-          else
-            raise GemfileError, "You cannot specify the same gem twice with different version requirements.\n" \
-                            "You specified: #{current.name} (#{current.requirement}) and #{dep.name} (#{dep.requirement})"
-          end
-
-        else
-          Bundler.ui.warn "Your Gemfile lists the gem #{current.name} (#{current.requirement}) more than once.\n" \
-                          "You should probably keep only one of them.\n" \
-                          "While it's not a problem now, it could cause errors if you change the version of just one of them later."
-        end
-
-        if current.source != dep.source
-          if current.type == :development
-            @dependencies.delete current
-          elsif dep.type == :development
-            return
-          else
-            raise GemfileError, "You cannot specify the same gem twice coming from different sources.\n" \
-                            "You specified that #{dep.name} (#{dep.requirement}) should come from " \
-                            "#{current.source || 'an unspecified source'} and #{dep.source}\n"
-          end
-        end
-      end
-
-      @dependencies << dep
+      add_dependency(dep)
     end
 
     def source(source, &blk)
@@ -193,6 +173,49 @@ module Bundler
     end
 
   private
+
+    def merge(other_file, gemfile_path)
+      @sources.merge(other_file.sources, gemfile_path)
+
+      other_file.dependencies.each do |dependency|
+        add_dependency(dependency)
+      end
+    end
+
+    def add_dependency(dep)
+      # if there's already a dependency with this name we try to prefer one
+      if current = @dependencies.find { |d| d.name == dep.name }
+        if current.requirement != dep.requirement
+          if current.type == :development
+            @dependencies.delete current
+          elsif dep.type == :development
+            return
+          else
+            raise GemfileError, "You cannot specify the same gem twice with different version requirements.\n" \
+                            "You specified: #{current.name} (#{current.requirement}) and #{dep.name} (#{dep.requirement})"
+          end
+
+        else
+          Bundler.ui.warn "Your Gemfile lists the gem #{current.name} (#{current.requirement}) more than once.\n" \
+                          "You should probably keep only one of them.\n" \
+                          "While it's not a problem now, it could cause errors if you change the version of just one of them later."
+        end
+
+        if current.source != dep.source
+          if current.type == :development
+            @dependencies.delete current
+          elsif dep.type == :development
+            return
+          else
+            raise GemfileError, "You cannot specify the same gem twice coming from different sources.\n" \
+                            "You specified that #{dep.name} (#{dep.requirement}) should come from " \
+                            "#{current.source || 'an unspecified source'} and #{dep.source}\n"
+          end
+        end
+      end
+
+      @dependencies << dep
+    end
 
     def add_git_sources
       git_source(:github) do |repo_name|

@@ -11,9 +11,9 @@ describe Bundler::SourceList do
 
   describe "adding sources" do
     before do
-      source_list.add_path_source('path' => '/existing/path/to/gem')
-      source_list.add_git_source('uri' => 'git://existing-git.org/path.git')
-      source_list.add_rubygems_source('remotes' => ['https://existing-rubygems.org'])
+      @existing_path_source = source_list.add_path_source('path' => '/existing/path/to/gem')
+      @existing_git_source = source_list.add_git_source('uri' => 'git://existing-git.org/path.git')
+      @existing_rubygems_source = source_list.add_rubygems_source('remotes' => ['https://existing-rubygems.org'])
     end
 
     describe "#add_path_source" do
@@ -120,6 +120,48 @@ describe Bundler::SourceList do
       it "adds the provided remote to the beginning of the aggregate source" do
         source_list.add_rubygems_remote('https://othersource.org')
         expect(@returned_source.remotes.first).to eq(URI('https://othersource.org/'))
+      end
+    end
+
+    describe "#merge" do
+      before do
+        @other_source_list = Bundler::SourceList.new
+
+        allow(Bundler).to receive(:root).and_return(Pathname.new("/root"))
+
+        @existing_rubygems_sources = source_list.rubygems_sources.dup
+
+        @other_source_list.add_path_source('path' => 'path/to/gem')
+
+        @new_git_source = @other_source_list.add_git_source('uri' => 'git://git.org/path.git')
+        @new_rubygems_source = @other_source_list.add_rubygems_source('remotes' => ['https://rubygems2.org'])
+
+        source_list.merge(@other_source_list, Pathname.new("/root/some_path/Gempaths"))
+      end
+
+      it "merges rebased path source" do
+        paths = source_list.path_sources.map { |p| p.path.to_s }
+
+        expected_paths = ["some_path/path/to/gem", "/existing/path/to/gem"]
+        expect(paths).to eq(expected_paths)
+      end
+
+      it "doesn't touch existing path sources" do
+        expect(source_list.path_sources.last).to eq(@existing_path_source)
+      end
+
+      it "merges the git sources" do
+        expect(source_list.git_sources).to eq([@new_git_source, @existing_git_source])
+      end
+
+      it "merges the rubygems sources" do
+        expect(source_list.rubygems_sources).to eq([@new_rubygems_source] + @existing_rubygems_sources)
+      end
+
+      it "merges the rubygems aggregate source" do
+        # TODO - Not sure how this is used.
+        pending("understanding how the aggregate source works.")
+        true.should be(false)
       end
     end
   end

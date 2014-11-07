@@ -3,7 +3,8 @@ module Bundler
     attr_reader :path_sources,
                 :git_sources,
                 :svn_sources,
-                :rubygems_sources
+                :rubygems_sources,
+                :rubygems_aggregate
 
     def initialize
       @path_sources       = []
@@ -63,11 +64,36 @@ module Bundler
       all_sources.each(&:remote!)
     end
 
+    def merge(source_list, base_path)
+      source_list.path_sources.reverse.each do |source|
+        options = source.options.dup
+        options["path"] = source.path.expand_path(base_path.dirname).relative_path_from(Bundler.root)
+        add_path_source(options)
+      end
+
+      merge_source_to_list(git_sources, source_list.git_sources)
+      merge_source_to_list(svn_sources, source_list.svn_sources)
+
+      rubygems_without_aggregate_sources = source_list.rubygems_sources.reject do |source|
+        source.object_id == source_list.rubygems_aggregate.object_id
+      end
+
+      merge_source_to_list(rubygems_sources, rubygems_without_aggregate_sources)
+
+      # TODO - figure out how to merge the aggregate source.
+    end
+
   private
 
     def add_source_to_list(source, list)
       list.unshift(source).uniq!
       source
+    end
+
+    def merge_source_to_list(target_list, source_list)
+      source_list.each do |source|
+        add_source_to_list source, target_list
+      end
     end
 
     def source_list_for(source)
