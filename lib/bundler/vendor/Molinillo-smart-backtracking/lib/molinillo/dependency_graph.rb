@@ -102,6 +102,7 @@ module Bundler::Molinillo
     # @return [void]
     def detach_vertex_named(name)
       vertex = vertex_named(name)
+      return unless vertex
       successors = vertex.successors
       vertices.delete(name)
       edges.reject! { |e| e.origin == vertex || e.destination == vertex }

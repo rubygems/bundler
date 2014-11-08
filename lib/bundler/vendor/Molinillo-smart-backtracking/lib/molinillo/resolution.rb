@@ -3,12 +3,14 @@ module Bundler::Molinillo
     # A specific resolution from a given {Resolver}
     class Resolution
       # A conflict that the resolution process encountered
+      # @attr [Object] requirement the requirement that immediately led to the conflict
       # @attr [{String,Nil=>[Object]}] requirements the requirements that caused the conflict
       # @attr [Object, nil] existing the existing spec that was in conflict with
       #   the {#possibility}
       # @attr [Object] possibility the spec that was unable to be activated due
       #   to a conflict
       Conflict = Struct.new(
+        :requirement,
         :requirements,
         :existing,
         :possibility
@@ -172,15 +174,29 @@ module Bundler::Molinillo
       # Unwinds the states stack because a conflict has been encountered
       # @return [void]
       def unwind_for_conflict
-        if depth > 0
-          debug(depth) { 'Unwinding from level ' + state.depth.to_s }
-          conflicts.tap do |c|
-            states.pop
-            state.conflicts = c
+        existing_state_index = state_index_for_unwind
+        conflicts.tap do |c|
+          if existing_state_index
+            states.slice!(existing_state_index..-1)
           end
-        else
-          raise VersionConflict.new(conflicts)
+          states.pop if state
+          raise VersionConflict.new(c) unless state
+          state.conflicts = c
         end
+      end
+
+      # @return [Integer] The index to which the resolution should unwind in the
+      #   case of conflict.
+      def state_index_for_unwind
+        index = states.rindex do |state|
+          return nil unless vertex = state.activated.vertex_named(name)
+          state.is_a?(DependencyState) &&
+            (
+              !vertex.payload ||
+              (!state.requirements.include?(requirement) && state.requirement != requirement)
+            )
+        end
+        index + 2 if index
       end
 
       # @return [Conflict] a {Conflict} that reflects the failure to activate
@@ -194,7 +210,8 @@ module Bundler::Molinillo
         }
         vertex.incoming_edges.each { |edge| (requirements[edge.origin.payload] ||= []).unshift(*edge.requirements) }
         conflicts[name] = Conflict.new(
-          requirements,
+          requirement,
+          Hash[requirements.select { |_, r| !r.empty? }],
           existing,
           possibility
         )
