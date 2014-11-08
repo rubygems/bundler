@@ -152,18 +152,18 @@ module Bundler
     rescue Molinillo::CircularDependencyError => e
       names = e.dependencies.reverse_each.map { |d| "gem '#{d.name}'"}
       raise CyclicDependencyError, "Your Gemfile requires gems that depend" \
-        " depend on each other, creating an infinite loop. Please remove " \
+        " on each other, creating an infinite loop. Please remove" \
         " either #{names.join(' or ')} and try again."
     end
 
-    # def before_resolution
-    # end
-    # def after_resolution
-    # end
-    # def indicate_progress
-    # end
-
     include Molinillo::UI
+
+    def before_resolution
+    end
+    def after_resolution
+    end
+    def indicate_progress
+    end
 
     private
 
@@ -181,7 +181,9 @@ module Bundler
         # puts dependency
         # puts index.search(dependency, nil)
         results = index.search(dependency, @base[dependency.name])
-        locked_requirement = (vertex = @base_dg.vertex_named(dependency.name) && vertex.requirement)
+        if vertex = @base_dg.vertex_named(dependency.name)
+          locked_requirement = vertex.payload.requirement
+        end
         if results.any?
           version = results.first.version
           nested  = [[]]
