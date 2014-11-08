@@ -72,6 +72,7 @@ describe "bundle install with gems on multiple sources" do
         gemfile <<-G
           source "file://#{gem_repo3}"
           source "file://#{gem_repo1}" do
+            gem "thin" # comes first to test name sorting
             gem "rack"
           end
           gem "rack-obama" # shoud come from repo3!
