@@ -222,14 +222,11 @@ module Bundler
     def sort_dependencies(dependencies, activated, conflicts)
       dependencies.sort_by do |dependency|
         name = name_for(dependency)
-        search = search_for(dependency)
-        last = search.last
-        nested_dependencies = last ? last.dependencies_for_activated_platforms.count : 1
         [
           activated.vertex_named(name).payload ? 0 : 1,
           @prereleases_cache[dependency.requirement] ? 0 : 1,
           conflicts[name] ? 0 : 1,
-          activated.vertex_named(name).payload ? 0 : (search.count * Math.sqrt(nested_dependencies) ),
+          activated.vertex_named(name).payload ? 0 : search_for(dependency).count,
         ]
       end
     end
