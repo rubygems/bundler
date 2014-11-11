@@ -1,3 +1,9 @@
+## 1.6.8 (2014-11-10)
+
+Features:
+
+  - vendor new certificates to validate HTTPS with rubygems.org
+
 ## 1.6.7 (2014-10-19)
 
 Features:
