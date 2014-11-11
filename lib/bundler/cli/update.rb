@@ -7,10 +7,10 @@ module Bundler
     end
 
     def run
+      Bundler.ui.level = "error" if options[:quiet]
 
       sources = Array(options[:source])
       groups  = Array(options[:group]).map(&:to_sym)
-      Bundler.ui.level = "warn" if options[:quiet]
 
       if gems.empty? && sources.empty? && groups.empty?
         # We're doing a full update

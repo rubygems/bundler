@@ -335,18 +335,18 @@ describe Bundler::SourceList do
   end
 
   describe "#lock_sources" do
-    it "combines the rubygems sources into a single instance, removing duplicate remotes from the front" do
+    it "combines the rubygems sources into a single instance, removing duplicate remotes from the end" do
       source_list.add_svn_source('uri' => 'svn://second-svn.org/path')
       source_list.add_git_source('uri' => 'git://third-git.org/path.git')
-      source_list.add_rubygems_source('remotes' => ['https://fourth-rubygems.org']) # intentional duplicate
+      source_list.add_rubygems_source('remotes' => ['https://duplicate-rubygems.org'])
       source_list.add_path_source('path' => '/third/path/to/gem')
-      source_list.add_rubygems_source('remotes' => ['https://first-rubygems.org'])
+      source_list.add_rubygems_source('remotes' => ['https://third-rubygems.org'])
       source_list.add_path_source('path' => '/second/path/to/gem')
       source_list.add_rubygems_source('remotes' => ['https://second-rubygems.org'])
       source_list.add_git_source('uri' => 'git://second-git.org/path.git')
-      source_list.add_rubygems_source('remotes' => ['https://third-rubygems.org'])
+      source_list.add_rubygems_source('remotes' => ['https://first-rubygems.org'])
       source_list.add_path_source('path' => '/first/path/to/gem')
-      source_list.add_rubygems_source('remotes' => ['https://fourth-rubygems.org'])
+      source_list.add_rubygems_source('remotes' => ['https://duplicate-rubygems.org'])
       source_list.add_git_source('uri' => 'git://first-git.org/path.git')
       source_list.add_svn_source('uri' => 'svn://first-svn.org/path')
 
@@ -360,10 +360,10 @@ describe Bundler::SourceList do
         Bundler::Source::SVN.new('uri' => 'svn://first-svn.org/path'),
         Bundler::Source::SVN.new('uri' => 'svn://second-svn.org/path'),
         Bundler::Source::Rubygems.new('remotes' => [
+          'https://duplicate-rubygems.org',
           'https://first-rubygems.org',
           'https://second-rubygems.org',
           'https://third-rubygems.org',
-          'https://fourth-rubygems.org',
         ]),
       ]
     end

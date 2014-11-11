@@ -197,12 +197,12 @@ module Bundler
 
     def index
       @index ||= Index.build do |idx|
-        dependency_names = @dependencies.dup || []
-        dependency_names.map! {|d| d.name }
+        dependency_names = @dependencies.map { |d| d.name }
 
         sources.all_sources.each do |s|
-          s.dependency_names = dependency_names
+          s.dependency_names = dependency_names.dup
           idx.add_source s.specs
+          s.specs.each { |spec| dependency_names.delete(spec.name) }
           dependency_names.push(*s.unmet_deps).uniq!
         end
       end
@@ -298,8 +298,6 @@ module Bundler
     end
 
     def ensure_equivalent_gemfile_and_lockfile(explicit_flag = false)
-      changes = false
-
       msg = "You are trying to install in deployment mode after changing\n" \
             "your Gemfile. Run `bundle install` elsewhere and add the\n" \
             "updated Gemfile.lock to version control."
@@ -313,7 +311,7 @@ module Bundler
       deleted = []
       changed = []
 
-      gemfile_sources = sources.all_sources
+      gemfile_sources = sources.lock_sources
       if @locked_sources != gemfile_sources
         new_sources = gemfile_sources - @locked_sources
         deleted_sources = @locked_sources - gemfile_sources
@@ -325,32 +323,29 @@ module Bundler
         if deleted_sources.any?
           deleted.concat deleted_sources.map { |source| "* source: #{source}" }
         end
-
-        changes = true
       end
 
-      both_sources = Hash.new { |h,k| h[k] = ["no specified source", "no specified source"] }
-      @dependencies.each { |d| both_sources[d.name][0] = d.source if d.source }
-      @locked_deps.each  { |d| both_sources[d.name][1] = d.source if d.source }
-      both_sources.delete_if { |k,v| v[0] == v[1] }
+      new_deps = @dependencies - @locked_deps
+      deleted_deps = @locked_deps - @dependencies
 
-      if @dependencies != @locked_deps
-        new_deps = @dependencies - @locked_deps
-        deleted_deps = @locked_deps - @dependencies
+      if new_deps.any?
+        added.concat new_deps.map { |d| "* #{pretty_dep(d)}" }
+      end
 
-        if new_deps.any?
-          added.concat new_deps.map { |d| "* #{pretty_dep(d)}" }
+      if deleted_deps.any?
+        deleted.concat deleted_deps.map { |d| "* #{pretty_dep(d)}" }
+      end
+
+      both_sources = Hash.new { |h,k| h[k] = [] }
+      @dependencies.each { |d| both_sources[d.name][0] = d }
+      @locked_deps.each  { |d| both_sources[d.name][1] = d.source }
+
+      both_sources.each do |name, (dep, lock_source)|
+        if (dep.nil? && !lock_source.nil?) || (!dep.nil? && !lock_source.nil? && !lock_source.can_lock?(dep))
+          gemfile_source_name = (dep && dep.source) || 'no specified source'
+          lockfile_source_name = lock_source || 'no specified source'
+          changed << "* #{name} from `#{gemfile_source_name}` to `#{lockfile_source_name}`"
         end
-
-        if deleted_deps.any?
-          deleted.concat deleted_deps.map { |d| "* #{pretty_dep(d)}" }
-        end
-
-        both_sources.each do |name, sources|
-          changed << "* #{name} from `#{sources[0]}` to `#{sources[1]}`"
-        end
-
-        changes = true
       end
 
       msg << "\n\nYou have added to the Gemfile:\n"     << added.join("\n") if added.any?
@@ -451,12 +446,11 @@ module Bundler
 
       # Get the Rubygems sources from the Gemfile.lock
       locked_gem_sources = @locked_sources.select { |s| s.kind_of?(Source::Rubygems) }
-      # Get the Rubygems sources from the Gemfile
-      actual_gem_sources = @sources.rubygems_sources
+      # Get the Rubygems remotes from the Gemfile
+      actual_remotes = sources.rubygems_remotes
 
       # If there is a Rubygems source in both
-      unless locked_gem_sources.empty? && actual_gem_sources.empty?
-        actual_remotes = actual_gem_sources.map(&:remotes).flatten.uniq
+      if !locked_gem_sources.empty? && !actual_remotes.empty?
         locked_gem_sources.each do |locked_gem|
           # Merge the remotes from the Gemfile into the Gemfile.lock
           changes = changes | locked_gem.replace_remotes(actual_remotes)
@@ -466,11 +460,9 @@ module Bundler
       # Replace the sources from the Gemfile with the sources from the Gemfile.lock,
       # if they exist in the Gemfile.lock and are `==`. If you can't find an equivalent
       # source in the Gemfile.lock, use the one from the Gemfile.
-      sources.replace_sources!(@locked_sources)
-      gemfile_sources = sources.all_sources
-      changes = changes | (Set.new(gemfile_sources) != Set.new(@locked_sources))
+      changes = changes | sources.replace_sources!(@locked_sources)
 
-      gemfile_sources.each do |source|
+      sources.all_sources.each do |source|
         # If the source is unlockable and the current command allows an unlock of
         # the source (for example, you are doing a `bundle update <foo>` of a git-pinned
         # gem), unlock it. For git sources, this means to unlock the revision, which

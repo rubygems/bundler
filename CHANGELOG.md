@@ -12,6 +12,29 @@ Features:
   - generates a `.consolerc` file with new gems and tries to load it on `bundle console` (@andremedeiros)
   - tries to find `gems.rb` and it's new counterpart, `gems.locked` (@andremedeiros)
 
+## 1.7.5 (2014-11-10)
+
+Bugfixes:
+
+  - Fix --deployment with source blocks and non-alphabetical gems (#3224, @tmoore)
+  - Vendor CA chain to validate new rubygems.org HTTPS certificate (@indirect)
+
+## 1.7.4 (2014-10-19)
+
+Bugfixes:
+
+  - Allow --deployment after `pack` while using source blocks (#3167, @tmoore)
+  - Use dependency API even when HTTP credentials are in ENV (#3191, @fvaleur)
+  - Silence warnings (including root warning) in --quiet mode (#3186, @indirect)
+  - Stop asking gem servers for gems already found locally (#2909, @dubek)
+
+## 1.7.3 (2014-09-14)
+
+Bugfixes:
+
+  - `extconf.rb` is now generated with the right path for `create_makefile` (@andremedeiros)
+  - Fix various Ruby warnings (@piotrsanarki, @indirect)
+
 ## 1.7.2 (2014-08-23)
 
 Bugfixes:
@@ -35,11 +58,11 @@ Security:
 Features:
 
   - Gemfile `source` calls now take a block containing gems from that source (@tmoore)
-  - added the `:source` option to `gem` to specify a source (@tmoore)
+  - Added the `:source` option to `gem` to specify a source (@tmoore)
 
 Bugfixes:
 
-  - warn on ambiguous gems available from more than one source (@tmoore)
+  - Warn on ambiguous gems available from more than one source (@tmoore)
 
 ## 1.6.7 (2014-10-19)
 
