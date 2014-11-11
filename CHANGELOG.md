@@ -1,3 +1,10 @@
+## 1.7.5 (2014-11-10)
+
+Bugfixes:
+
+  - Fix --deployment with source blocks and non-alphabetical gems (#3224, @tmoore)
+  - Vendor CA chain to validate new rubygems.org HTTPS certificate (@indirect)
+
 ## 1.7.4 (2014-10-19)
 
 Bugfixes:
