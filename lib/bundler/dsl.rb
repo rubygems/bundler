@@ -31,7 +31,7 @@ module Bundler
       contents ||= Bundler.read_file(gemfile.to_s)
       instance_eval(contents, gemfile.to_s, 1)
     rescue SyntaxError => e
-      syntax_msg = e.message.gsub("#{gemfile.to_s}:", 'on line ')
+      syntax_msg = e.message.gsub("#{gemfile}:", 'on line ')
       raise GemfileError, "Gemfile syntax error #{syntax_msg}"
     rescue ScriptError, RegexpError, NameError, ArgumentError => e
       e.backtrace[0] = "#{e.backtrace[0]}: #{e.message} (#{e.class})"
@@ -232,7 +232,7 @@ module Bundler
 
     def normalize_options(name, version, opts)
       if name.is_a?(Symbol)
-        raise GemfileError, %{You need to specify gem names as Strings. Use 'gem "#{name.to_s}"' instead.}
+        raise GemfileError, %{You need to specify gem names as Strings. Use 'gem "#{name}"' instead.}
       end
       if name =~ /\s/
         raise GemfileError, %{'#{name}' is not a valid gem name because it contains whitespace.}
