@@ -18,8 +18,10 @@ module Bundler
       end
 
       def up_to_date?
-        bundler_certs.zip(rubygems_certs).all? do |bc, rc|
-          File.basename(bc) == File.basename(rc) && FileUtils.compare_file(bc, rc)
+        rubygems_certs.all? do |rc|
+          bundler_certs.find do |bc|
+            File.basename(bc) == File.basename(rc) && FileUtils.compare_file(bc, rc)
+          end
         end
       end
 
