@@ -2,8 +2,7 @@ module Bundler
   class SourceList
     attr_reader :path_sources,
                 :git_sources,
-                :svn_sources,
-                :rubygems_sources
+                :svn_sources
 
     def initialize
       @path_sources       = []
