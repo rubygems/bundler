@@ -76,6 +76,12 @@ RSpec.configure do |config|
     config.filter_run_excluding :rubygems => "2.2"
   end
 
+  if ENV['RGV'] == "master"
+    config.filter_run :rubygems_master => true
+  else
+    config.filter_run_excluding :rubygems_master => true
+  end
+
   config.filter_run :focused => true unless ENV['CI']
   config.run_all_when_everything_filtered = true
   config.alias_example_to :fit, :focused => true
