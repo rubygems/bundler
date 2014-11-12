@@ -174,11 +174,8 @@ module Bundler::Molinillo
       # Unwinds the states stack because a conflict has been encountered
       # @return [void]
       def unwind_for_conflict
-        existing_state_index = state_index_for_unwind
         conflicts.tap do |c|
-          if existing_state_index
-            states.slice!(existing_state_index..-1)
-          end
+          states.slice!(state_index_for_unwind..-1)
           states.pop if state
           raise VersionConflict.new(c) unless state
           state.conflicts = c
@@ -196,7 +193,7 @@ module Bundler::Molinillo
               (!state.requirements.include?(requirement) && state.requirement != requirement)
             )
         end
-        index + 2 if index
+        index + 2
       end
 
       # @return [Conflict] a {Conflict} that reflects the failure to activate
