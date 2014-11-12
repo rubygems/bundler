@@ -1,8 +1,14 @@
+## 1.6.9 (2014-11-11)
+
+Features:
+
+  - alternate certificates that work with all OpenSSLs (@luislavena, @indirect)
+
 ## 1.6.8 (2014-11-10)
 
 Features:
 
-  - vendor new certificates to validate HTTPS with rubygems.org
+  - vendor new certificates to validate HTTPS with rubygems.org (@indirect)
 
 ## 1.6.7 (2014-10-19)
 
