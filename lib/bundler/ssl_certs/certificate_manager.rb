@@ -1,4 +1,6 @@
 require 'fileutils'
+require 'net/https'
+require 'openssl'
 
 module Bundler
   module SSLCerts
@@ -9,9 +11,11 @@ module Bundler
         new(rubygems_path).update!
       end
 
-      def initialize(rubygems_path)
-        rubygems_certs = File.join(rubygems_path, 'lib/rubygems/ssl_certs')
-        @rubygems_certs = certificates_in(rubygems_certs)
+      def initialize(rubygems_path = nil)
+        if rubygems_path
+          rubygems_cert_path = File.join(rubygems_path, 'lib/rubygems/ssl_certs')
+          @rubygems_certs = certificates_in(rubygems_cert_path)
+        end
 
         @bundler_cert_path = File.expand_path("..", __FILE__)
         @bundler_certs = certificates_in(bundler_cert_path)
@@ -32,10 +36,28 @@ module Bundler
         FileUtils.cp rubygems_certs, bundler_cert_path
       end
 
+      def connect_to(host)
+        http = Net::HTTP.new(host, 443)
+        http.use_ssl = true
+        http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+        http.cert_store = store
+        http.head('/')
+      end
+
     private
 
       def certificates_in(path)
         Dir[File.join(path, "*.pem")].sort
+      end
+
+      def store
+        @store ||= begin
+          store = OpenSSL::X509::Store.new
+          bundler_certs.each do |cert|
+            store.add_file cert
+          end
+          store
+        end
       end
 
     end
