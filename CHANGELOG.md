@@ -12,6 +12,12 @@ Features:
   - generates a `.consolerc` file with new gems and tries to load it on `bundle console` (@andremedeiros)
   - tries to find `gems.rb` and it's new counterpart, `gems.locked` (@andremedeiros)
 
+## 1.7.6 (2014-11-11)
+
+Bugfixes:
+
+  - CA certificates that work with all OpenSSLs (@luislavena, @indirect)
+
 ## 1.7.5 (2014-11-10)
 
 Bugfixes:

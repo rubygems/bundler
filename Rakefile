@@ -127,7 +127,7 @@ begin
         end
 
         task "clone_rubygems_#{rg}" do
-          unless File.directory?("tmp/rubygems")
+          unless File.directory?(RUBYGEMS_REPO)
             system("git clone https://github.com/rubygems/rubygems.git tmp/rubygems")
           end
           hash = nil
