@@ -1,3 +1,9 @@
+## 1.7.6 (2014-11-11)
+
+Bugfixes:
+
+  - CA certificates that work with all OpenSSLs (@luislavena, @indirect)
+
 ## 1.7.5 (2014-11-10)
 
 Bugfixes:
