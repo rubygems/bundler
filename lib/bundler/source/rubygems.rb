@@ -83,9 +83,8 @@ module Bundler
         # by rubygems.org are broken and wrong.
         if spec.source_uri
           # Check for this spec from other sources
-          uris = [spec.source_uri]
+          uris = [uri_without_credentials(spec.source_uri)]
           uris += source_uris_for_spec(spec)
-          uris.compact!
           uris.uniq!
           Installer.ambiguous_gems << [spec.name, *uris] if uris.length > 1
 
@@ -186,13 +185,14 @@ module Bundler
         end
       end
 
-    protected
+    private
 
       def source_uris_for_spec(spec)
-        specs.search_all(spec.name).map{|s| s.source_uri }
+        specs.search_all(spec.name).inject([]) do |uris, spec|
+          uris << uri_without_credentials(spec.source_uri) if spec.source_uri
+          uris
+        end
       end
-
-    private
 
       def cached_gem(spec)
         cached_gem = cached_path(spec)
@@ -216,12 +216,16 @@ module Bundler
       end
 
       def suppress_configured_credentials(remote)
-        remote_nouser = remote.dup.tap { |uri| uri.user = uri.password = nil }.to_s
+        remote_nouser = uri_without_credentials(remote).to_s
         if remote.userinfo && remote.userinfo == Bundler.settings[remote_nouser]
           remote_nouser
         else
           remote
         end
+      end
+
+      def uri_without_credentials(uri)
+        uri.dup.tap { |uri| uri.user = uri.password = nil }
       end
 
       def installed_specs
