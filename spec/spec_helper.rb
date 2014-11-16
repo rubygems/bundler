@@ -68,12 +68,7 @@ RSpec.configure do |config|
 
   config.filter_run_excluding :ruby => LessThanProc.with(RUBY_VERSION)
   config.filter_run_excluding :rubygems => LessThanProc.with(Gem::VERSION)
-
-  if ENV['RGV'] == "master"
-    config.filter_run :rubygems_master => true
-  else
-    config.filter_run_excluding :rubygems_master => true
-  end
+  config.filter_run_excluding :rubygems_master => (ENV['RGV'] != "master")
 
   config.filter_run :focused => true unless ENV['CI']
   config.run_all_when_everything_filtered = true
