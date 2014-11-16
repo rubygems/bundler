@@ -96,8 +96,7 @@ module Bundler
       @max_retries    = 3  # How many retries for the API call
 
       @remote_uri = Bundler::Source.mirror_for(remote_uri)
-      @public_uri = @remote_uri.dup
-      @public_uri.user, @public_uri.password = nil, nil # don't print these
+      @anonymizable_uri = AnonymizableURI.new(@remote_uri.dup) unless @remote_uri.nil?
 
       Socket.do_not_reverse_lookup = true
       connection # create persistent connection
@@ -131,7 +130,7 @@ module Bundler
     end
 
     def uri
-      @public_uri
+      @anonymizable_uri.without_credentials unless @anonymizable_uri.nil?
     end
 
     # fetch a gem specification
@@ -186,7 +185,7 @@ module Bundler
           spec = RemoteSpecification.new(name, version, platform, self)
         end
         spec.source = source
-        spec.source_uri = @remote_uri
+        spec.source_uri = @anonymizable_uri
         index << spec
       end
 
@@ -387,6 +386,7 @@ module Bundler
       raise AuthenticationRequiredError.new(uri) if auth.nil?
 
       @remote_uri.user, @remote_uri.password = *auth.split(":", 2)
+      @anonymizable_uri = AnonymizableURI.new(@remote_uri.dup)
       yield
     end
 
