@@ -140,7 +140,7 @@ module Bundler
       end
 
       def dependencies_for_activated_platforms
-        @activated.flat_map { |p| __dependencies[p] }
+        @activated.map { |p| __dependencies[p] }.flatten
       end
 
       def platforms_for_dependency_named(dependency)
@@ -198,7 +198,7 @@ module Bundler
     def start(requirements)
       verify_gemfile_dependencies_are_found!(requirements)
       dg = @resolver.resolve(requirements, @base_dg)
-      dg.map(&:payload).flat_map(&:to_specs)
+      dg.map(&:payload).map(&:to_specs).flatten
     rescue Molinillo::VersionConflict => e
       raise VersionConflict.new(e.conflicts.keys.uniq, e.message)
     rescue Molinillo::CircularDependencyError => e
