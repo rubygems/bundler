@@ -162,7 +162,7 @@ module Bundler::Molinillo
       # @return [Array<Object>] all of the requirements that required
       #   this vertex
       def requirements
-        incoming_edges.flat_map(&:requirements) + explicit_requirements
+        (incoming_edges.map(&:requirements) + explicit_requirements).flatten
       end
 
       # @return [Array<Edge>] the edges of {#graph} that have `self` as their

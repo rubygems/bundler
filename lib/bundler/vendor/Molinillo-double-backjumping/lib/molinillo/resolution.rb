@@ -9,11 +9,16 @@ module Bundler::Molinillo
       #   the {#possibility}
       # @attr [Object] possibility the spec that was unable to be activated due
       #   to a conflict
+      # @attr [Object] locked_requirement the relevant locking requirement.
+      # @attr [Array<Array<Object>>] requirement_trees the different requirement
+      #   trees that led to every requirement for the conflicting name.
       Conflict = Struct.new(
         :requirement,
         :requirements,
         :existing,
-        :possibility
+        :possibility,
+        :locked_requirement,
+        :requirement_trees
       )
 
       # @return [SpecificationProvider] the provider that knows about
@@ -43,6 +48,7 @@ module Bundler::Molinillo
         @base = base
         @states = []
         @iteration_counter = 0
+        @all_conflicts = []
       end
 
       # Resolves the {#original_requested} dependencies into a full dependency
@@ -57,11 +63,13 @@ module Bundler::Molinillo
           break unless state.requirements.any? || state.requirement
           indicate_progress
           if state.respond_to?(:pop_possibility_state) # DependencyState
-            debug(depth) { "Creating possibility state (#{possibilities.count} remaining)" }
+            debug(depth) { "Creating possibility state for #{requirement} (#{possibilities.count} remaining)" }
             state.pop_possibility_state.tap { |s| states.push(s) if s }
           end
           process_topmost_state
         end
+
+        double_check_conflict_existing_specs
 
         activated.freeze
       ensure
@@ -105,6 +113,10 @@ module Bundler::Molinillo
 
       # @return [Array<ResolutionState>] the stack of states for the resolution
       attr_accessor :states
+
+      # @return [Array<Array(String,Object)>] an array of duples of name and
+      #   existing spec for all conflicts.
+      attr_accessor :all_conflicts
 
       ResolutionState.new.members.each do |member|
         define_method member do |*args, &block|
@@ -174,9 +186,9 @@ module Bundler::Molinillo
       # Unwinds the states stack because a conflict has been encountered
       # @return [void]
       def unwind_for_conflict
+        debug(depth) { "Unwinding for conflict: #{requirement}" }
         conflicts.tap do |c|
-          states.slice!(state_index_for_unwind..-1)
-          states.pop if state
+          states.slice!((state_index_for_unwind + 1)..-1)
           raise VersionConflict.new(c) unless state
           state.conflicts = c
         end
@@ -185,33 +197,135 @@ module Bundler::Molinillo
       # @return [Integer] The index to which the resolution should unwind in the
       #   case of conflict.
       def state_index_for_unwind
-        index = states.rindex do |state|
-          return nil unless vertex = state.activated.vertex_named(name)
-          state.is_a?(DependencyState) &&
-            (
-              !vertex.payload ||
-              (!state.requirements.include?(requirement) && state.requirement != requirement)
-            )
+        current_requirement = requirement
+        existing_requirement = requirement_for_existing_name(name)
+        until current_requirement.nil? && existing_requirement.nil?
+          current_state = find_state_for(current_requirement)
+          existing_state = find_state_for(existing_requirement)
+          return states.index(current_state) if state_any?(current_state)
+          return states.index(existing_state) if state_any?(existing_state)
+          existing_requirement = parent_of(existing_requirement)
+          current_requirement = parent_of(current_requirement)
         end
-        index + 2
+        -1
+      end
+
+      # @return [Object] the requirement that led to `requirement` being added
+      #   to the list of requirements.
+      def parent_of(requirement)
+        return nil unless requirement
+        seen = false
+        state = states.reverse_each.find do |s|
+          seen ||= s.requirement == requirement
+          seen && s.requirement != requirement && !s.requirements.include?(requirement)
+        end
+        state && state.requirement
+      end
+
+      # @return [Object] the requirement that led to a version of a possibility
+      #   with the given name being activated.
+      def requirement_for_existing_name(name)
+        return nil unless activated.vertex_named(name).payload
+        states.reverse_each.find { |s| !s.activated.vertex_named(name).payload }.requirement
+      end
+
+      # @return [ResolutionState] the state whose `requirement` is the given
+      #   `requirement`.
+      def find_state_for(requirement)
+        return nil unless requirement
+        states.find { |i| requirement == i.requirement }
+      end
+
+      # @return [Boolean] whether or not the given state has any possibilities
+      #   left.
+      def state_any?(state)
+        state && state.possibilities.any?
+      end
+
+      # Enumerate over {#all_conflicts} and ensure that already activated specs
+      # that were backtracked from were not that optimal possibilities that
+      # should have been activated instead, and swaps them in if such a simple
+      # switch is possible.
+      # @return [void]
+      def double_check_conflict_existing_specs
+        debug { "Double checking conflicts' existing specs" }
+        all_conflicts.each do |name, conflict_possibility|
+          next unless conflict_possibility
+          vertex = activated.vertex_named(name)
+          possibilities = search_for(vertex.requirements.first)
+          conflict_index = possibilities.index(conflict_possibility)
+          payload_index = possibilities.index(vertex.payload)
+          if conflict_index && payload_index && conflict_index > payload_index
+            if safe_to_swap?(name, conflict_possibility)
+              debug { "Swapping #{conflict_possibility} in for #{activated.vertex_named(name).payload}" }
+              vertex.payload = conflict_possibility
+            end
+          end
+        end
+      end
+
+      # @param  [String] name
+      # @param  [Object] conflict_possibility the existing possibility from a
+      #   conflict that is being attempted to be swapped for the current
+      #   activated spec of the given name.
+      # @return [Boolen] whether it is safe to swap in `conflict possibility`.
+      def safe_to_swap?(name, conflict_possibility)
+        duplicate_activated = activated.dup
+        duplicate_activated.vertex_named(name).payload = conflict_possibility
+        locked_requirement = locked_requirement_named(name)
+        (!locked_requirement || requirement_satisfied_by?(locked_requirement, a, conflict_possibility)) &&
+          activated.vertex_named(name).requirements.all? do |r|
+            requirement_satisfied_by?(r, duplicate_activated, conflict_possibility)
+          end &&
+          dependencies_for(conflict_possibility).all? { |r| existing_spec_satisfied_by?(r, duplicate_activated) }
+      end
+
+      # @param  [Object] requirement the requirement.
+      # @param  [DependencyGraph] duplicate_activated the dependency graph that
+      #   should be used when checking for satisfaction.
+      # @return [Boolean] whether the existing spec satisfies the given
+      #   requirement.
+      def existing_spec_satisfied_by?(requirement, duplicate_activated)
+        name = name_for(requirement)
+        activated.vertex_named(name) && payload = activated.vertex_named(name).payload
+        payload && requirement_satisfied_by(requirement, duplicate_activated, payload)
       end
 
       # @return [Conflict] a {Conflict} that reflects the failure to activate
       #   the {#possibility} in conjunction with the current {#state}
       def create_conflict
         vertex = activated.vertex_named(name)
-        existing = vertex.payload
         requirements = {
           name_for_explicit_dependency_source => vertex.explicit_requirements,
           name_for_locking_dependency_source => Array(locked_requirement_named(name)),
         }
         vertex.incoming_edges.each { |edge| (requirements[edge.origin.payload] ||= []).unshift(*edge.requirements) }
+        all_conflicts << [name, vertex.payload]
         conflicts[name] = Conflict.new(
           requirement,
           Hash[requirements.select { |_, r| !r.empty? }],
-          existing,
-          possibility
+          vertex.payload,
+          possibility,
+          locked_requirement_named(name),
+          requirement_trees
         )
+      end
+
+      # @return [Array<Array<Object>>] rhe different requirement
+      #   trees that led to every requirement for the current spec.
+      def requirement_trees
+        activated.vertex_named(name).requirements.map { |r| requirement_tree_for(r) }
+      end
+
+      # @return [Array<Object>] the list of requirements that led to
+      #   `requirement` being required.
+      def requirement_tree_for(requirement)
+        tree = []
+        while requirement
+          tree.unshift(requirement)
+          requirement = parent_of(requirement)
+        end
+        tree
       end
 
       # Indicates progress roughly once every second
@@ -243,7 +357,8 @@ module Bundler::Molinillo
       def attempt_to_activate
         debug(depth) { 'Attempting to activate ' + possibility.to_s }
         existing_node = activated.vertex_named(name)
-        if existing_node && existing_node.payload
+        if existing_node.payload
+          debug(depth) { "Found existing spec (#{existing_node.payload})" }
           attempt_to_activate_existing_spec(existing_node)
         else
           attempt_to_activate_new_spec
@@ -260,7 +375,7 @@ module Bundler::Molinillo
           push_state_for_requirements(new_requirements)
         else
           create_conflict
-          debug(depth) { 'Unsatisfied by existing spec' }
+          debug(depth) { "Unsatisfied by existing spec (#{existing_node.payload})" }
           unwind_for_conflict
         end
       end
