@@ -104,7 +104,7 @@ describe "bundle install" do
               activesupport (>= 2.0.0) ruby
 
             rails_fail (>= 0) ruby depends on
-              activesupport (1.2.3)
+              activesupport (= 1.2.3) ruby
       E
       expect(out).to eq(nice_error)
     end
@@ -124,7 +124,7 @@ describe "bundle install" do
             rails_fail (>= 0) ruby depends on
               activesupport (= 1.2.3) ruby
 
-            activesupport (2.3.5)
+            activesupport (= 2.3.5) ruby
       E
       expect(out).to eq(nice_error)
     end

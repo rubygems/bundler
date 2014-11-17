@@ -80,7 +80,7 @@ describe "bundle install with gem sources" do
             bundle :install, :env => {"DEBUG_RESOLVER" => "1"}
           end
 
-          expect(resolve_output).to include("==== Iterating ====")
+          expect(resolve_output).to include("Creating possibility state for net_c")
         end
       end
 

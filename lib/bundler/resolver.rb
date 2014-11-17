@@ -11,6 +11,63 @@ module Bundler
 
     require 'bundler/vendored_molinillo'
 
+    class Molinillo::VersionConflict
+      def clean_req(req)
+        if req.to_s.include?(">= 0")
+          req.to_s.gsub(/ \(.*?\)$/, '')
+        else
+          req.to_s.gsub(/\, (runtime|development)\)$/, ')')
+        end
+      end
+
+      def message
+        conflicts.values.flatten.reduce('') do |o, conflict|
+          o << %(Bundler could not find compatible versions for gem "#{conflict.requirement.name}":\n)
+          if conflict.locked_requirement
+            o << %(  In snapshot (Gemfile.lock):\n)
+            o << %(    #{clean_req conflict.locked_requirement}\n)
+            o << %(\n)
+          end
+          o << %(  In Gemfile:\n)
+          o << conflict.requirement_trees.map do |tree|
+            t = ''
+            depth = 2
+            tree.each do |req|
+              t << '  ' * depth << %(#{clean_req req})
+              t << %( depends on) unless tree[-1] == req
+              t << %(\n)
+              depth += 1
+            end
+            t
+          end.join("\n")
+
+          if conflict.requirement.name == 'bundler'
+            o << %(\n  Current Bundler version:\n    bundler (#{Bundler::VERSION}))
+            other_bundler_required = !conflict.requirement.requirement.satisfied_by?(Gem::Version.new Bundler::VERSION)
+          end
+
+          if conflict.requirement.name == "bundler" && other_bundler_required
+            o << "\n"
+            o << "This Gemfile requires a different version of Bundler.\n"
+            o << "Perhaps you need to update Bundler by running `gem install bundler`?"
+          end
+          if conflict.locked_requirement
+            o << "\n"
+            o << %(Running `bundle update` will rebuild your snapshot from scratch, using only\n)
+            o << %(the gems in your Gemfile, which may resolve the conflict.\n)
+          elsif !conflict.existing
+            if conflict.requirement_trees.first.size > 1
+              o << "Could not find gem '#{clean_req(conflict.requirement)}', which is required by "
+              o << "gem '#{clean_req(conflict.requirement_trees.first.last)}', in any of the sources."
+            else
+              o << "Could not find gem '#{clean_req(conflict.requirement)} in any of the sources\n"
+            end
+          end
+          o
+        end
+      end
+    end
+
     ALL = Bundler::Dependency::PLATFORM_MAP.values.uniq.freeze
 
     class SpecGroup < Array
@@ -120,15 +177,10 @@ module Bundler
     # <GemBundle>,nil:: If the list of dependencies can be resolved, a
     #   collection of gemspecs is returned. Otherwise, nil is returned.
     def self.resolve(requirements, index, source_requirements = {}, base = [])
-      Bundler.ui.info "Resolving dependencies...", false
       base = SpecSet.new(base) unless base.is_a?(SpecSet)
       resolver = new(index, source_requirements, base)
       result = resolver.start(requirements)
-      Bundler.ui.info "" # new line now that dots are done
       SpecSet.new(result)
-    rescue
-      Bundler.ui.info "" # new line before the error
-      raise
     end
 
 
@@ -158,11 +210,20 @@ module Bundler
 
     include Molinillo::UI
 
+    def debug?
+      ENV['DEBUG_RESOLVER'] || ENV['DEBUG_RESOLVER_TREE']
+    end
+
     def before_resolution
+      Bundler.ui.info 'Resolving dependencies...', false
     end
+
     def after_resolution
+      Bundler.ui.info ''
     end
+
     def indicate_progress
+      Bundler.ui.info '.', false
     end
 
     private
@@ -178,8 +239,6 @@ module Bundler
       dependency = dependency.dep unless dependency.is_a? Gem::Dependency
       search = @search_for[dependency.hash] ||= begin
         index = @source_requirements[dependency.name] || @index
-        # puts dependency
-        # puts index.search(dependency, nil)
         results = index.search(dependency, @base[dependency.name])
         if vertex = @base_dg.vertex_named(dependency.name)
           locked_requirement = vertex.payload.requirement
@@ -233,8 +292,32 @@ module Bundler
 
     def verify_gemfile_dependencies_are_found!(requirements)
       requirements.each do |requirement|
+        next if requirement.name == 'bundler'
         if search_for(requirement).empty?
-          raise GemNotFound, "Could not find gem '#{requirement}'"
+          if base = @base[requirement.name] and !base.empty?
+            version = base.first.version
+            message = "You have requested:\n" \
+              "  #{requirement.name} #{requirement.requirement}\n\n" \
+              "The bundle currently has #{requirement.name} locked at #{version}.\n" \
+              "Try running `bundle update #{requirement.name}`"
+          elsif requirement.source
+            name = requirement.name
+            versions = @source_requirements[name][name].map { |s| s.version }
+            message  = "Could not find gem '#{requirement}' in #{requirement.source}.\n"
+            if versions.any?
+              message << "Source contains '#{name}' at: #{versions.join(', ')}"
+            else
+              message << "Source does not contain any versions of '#{requirement}'"
+            end
+          else
+            message = "Could not find gem '#{requirement}' "
+            if @index.source_types.include?(Bundler::Source::Rubygems)
+              message << "in any of the gem sources listed in your Gemfile."
+            else
+              message << "in the gems available on this machine."
+            end
+          end
+          raise GemNotFound, message
         end
       end
     end
