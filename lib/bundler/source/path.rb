@@ -173,6 +173,7 @@ module Bundler
 
       def generate_bin(spec, disable_extensions = false)
         gem_dir  = Pathname.new(spec.full_gem_path)
+        gem_file = nil
 
         # Some gem authors put absolute paths in their gemspec
         # and we have to save them from themselves
@@ -185,14 +186,16 @@ module Bundler
           end
         end.compact
 
-        gem_file = Bundler.rubygems.build_gem gem_dir, spec
+        SharedHelpers.chdir(gem_dir) do
+          gem_file = Bundler.rubygems.build_gem gem_dir, spec
 
-        installer = Path::Installer.new(spec, :env_shebang => false)
-        run_hooks(:pre_install, installer)
-        installer.build_extensions unless disable_extensions
-        run_hooks(:post_build, installer)
-        installer.generate_bin
-        run_hooks(:post_install, installer)
+          installer = Path::Installer.new(spec, :env_shebang => false)
+          run_hooks(:pre_install, installer)
+          installer.build_extensions unless disable_extensions
+          run_hooks(:post_build, installer)
+          installer.generate_bin
+          run_hooks(:post_install, installer)
+        end
       rescue Gem::InvalidSpecificationException => e
         Bundler.ui.warn "\n#{spec.name} at #{spec.full_gem_path} did not have a valid gemspec.\n" \
                         "This prevents bundler from installing bins or native extensions, but " \

@@ -193,7 +193,7 @@ module Bundler
     end
 
     def build_gem(gem_dir, spec)
-      SharedHelpers.chdir(gem_dir) { build(spec) }
+       build(spec)
     end
 
     def download_gem(spec, uri, path)
