@@ -223,14 +223,16 @@ module Bundler
     private
 
       def serialize_gemspecs_in(destination)
-        expanded_path = destination.expand_path(Bundler.root)
-        Dir["#{expanded_path}/#{@glob}"].each do |spec_path|
-          # Evaluate gemspecs and cache the result. Gemspecs
-          # in git might require git or other dependencies.
-          # The gemspecs we cache should already be evaluated.
-          spec = Bundler.load_gemspec(spec_path)
-          next unless spec
-          File.open(spec_path, 'wb') {|file| file.write(spec.to_ruby) }
+        SharedHelpers.chdir(destination) do
+          expanded_path = destination.expand_path(Bundler.root)
+          Dir["#{expanded_path}/#{@glob}"].each do |spec_path|
+            # Evaluate gemspecs and cache the result. Gemspecs
+            # in git might require git or other dependencies.
+            # The gemspecs we cache should already be evaluated.
+            spec = Bundler.load_gemspec(spec_path)
+            next unless spec
+            File.open(spec_path, 'wb') {|file| file.write(spec.to_ruby) }
+          end
         end
       end
 
