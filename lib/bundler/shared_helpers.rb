@@ -19,6 +19,7 @@ end
 module Bundler
   module SharedHelpers
     attr_accessor :gem_loaded
+    CHDIR_MONITOR = Monitor.new
 
     def default_gemfile
       gemfile = find_gemfile
@@ -35,7 +36,7 @@ module Bundler
     end
 
     def chdir_monitor
-      @chdir_monitor ||= Monitor.new
+      CHDIR_MONITOR
     end
 
     def chdir(dir, &blk)
