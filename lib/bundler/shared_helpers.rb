@@ -1,3 +1,4 @@
+require 'monitor'
 require 'pathname'
 require 'rubygems'
 
@@ -38,26 +39,18 @@ module Bundler
       find_gemfile
     end
 
-    if Bundler.current_ruby.mswin? || Bundler.current_ruby.jruby?
-      require 'monitor'
-      @chdir_monitor = Monitor.new
-      def chdir(dir, &blk)
-        @chdir_monitor.synchronize do
-          Dir.chdir dir, &blk
-        end
-      end
+    def chdir_monitor
+      @chdir_monitor ||= Monitor.new
+    end
 
-      def pwd
-        @chdir_monitor.synchronize do
-          Dir.pwd
-        end
-      end
-    else
-      def chdir(dir, &blk)
+    def chdir(dir, &blk)
+      chdir_monitor.synchronize do
         Dir.chdir dir, &blk
       end
+    end
 
-      def pwd
+    def pwd
+      chdir_monitor.synchronize do
         Dir.pwd
       end
     end
