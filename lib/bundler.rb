@@ -210,11 +210,10 @@ module Bundler
     end
 
     def settings
-      @settings ||= begin
-        Settings.new(app_config_path)
-      rescue GemfileNotFound
-        Settings.new
-      end
+      return @settings if defined?(@settings)
+      @settings = Settings.new(app_config_path)
+    rescue GemfileNotFound
+      @settings = Settings.new
     end
 
     def with_original_env
