@@ -1,3 +1,11 @@
+## 1.7.7 (2014-11-19)
+
+Bugfixes:
+
+  - Ensure server credentials stored in config or ENV will be used (#3180, @arronmabrey)
+  - Fix race condition causing errors while installing git-based gems (#3174, @Who828)
+  - Use single quotes in config so YAML won't add more quotes (#3261, @indirect)
+
 ## 1.7.6 (2014-11-11)
 
 Bugfixes:
