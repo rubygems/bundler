@@ -194,7 +194,7 @@ E
   end
 
   describe "quoting" do
-    before(:each) { bundle :install }
+    before(:each) { gemfile "# no gems" }
 
     it "saves quotes" do
       bundle "config foo something\\'"
@@ -208,6 +208,15 @@ E
       expect(out).to include("'1'")
       run "puts Bundler.settings[:foo]"
       expect(out).to eq("1")
+    end
+
+    it "doesn't duplicate quotes around values" do
+      config = "foo\nbar"
+      bundled_app(".bundle").mkpath
+      bundled_app(".bundle/config").write("BUNDLE_FOO: \"#{config}\"")
+      bundle :install, :jobs => 4
+      run "puts Bundler.settings.send(:local_config_file).read"
+      expect(out).to include('BUNDLE_FOO: "foo bar"')
     end
   end
 
