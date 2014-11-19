@@ -298,7 +298,7 @@ module Bundler
         response.body
       when Net::HTTPRequestEntityTooLarge
         raise FallbackError, response.body
-      when Net::HTTPUnauthorized
+      when Net::HTTPUnauthorized, Net::HTTPForbidden
         raise AuthenticationRequiredError, "#{response.class}: #{response.body}"
       else
         raise HTTPError, "#{response.class}: #{response.body}"
