@@ -211,12 +211,14 @@ E
     end
 
     it "doesn't duplicate quotes around values" do
-      config = "foo\nbar"
       bundled_app(".bundle").mkpath
-      bundled_app(".bundle/config").write("BUNDLE_FOO: \"#{config}\"")
+      File.open(bundled_app(".bundle/config"), 'w') do |f|
+        f.write 'BUNDLE_FOO: "$BUILD_DIR"'
+      end
+      expect(bundled_app(".bundle/config").read).to eq('BUNDLE_FOO: "$BUILD_DIR"')
       bundle :install, :jobs => 4
       run "puts Bundler.settings.send(:local_config_file).read"
-      expect(out).to include('BUNDLE_FOO: "foo bar"')
+      expect(out).to include('BUNDLE_FOO: "$BUILD_DIR"')
     end
   end
 
