@@ -26,4 +26,26 @@ describe "bundle executable" do
     expect(exitstatus).to be_zero
     expect(out).to eq('Hello, world')
   end
+
+  describe "report prompt on the first run" do
+    before do
+      bundle('config --delete report_anonymized_usage')
+    end
+
+    it "can be disabled on the first run" do
+      bundle 'init', :disable_reporting => false do |input|
+        input.puts "n"
+      end
+
+      expect(bundle('config report_anonymized_usage', :disable_reporting => false)).to match /"false"/
+    end
+
+    it "can be enabled on the first run" do
+      bundle 'init', :disable_reporting => false do |input|
+        input.puts "y"
+      end
+
+      expect(bundle('config report_anonymized_usage', :disable_reporting => false)).to match /"true"/
+    end
+  end
 end

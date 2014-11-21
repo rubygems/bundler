@@ -68,12 +68,17 @@ module Spec
       requires << File.expand_path('../artifice/'+options.delete(:artifice)+'.rb', __FILE__) if options.key?(:artifice)
       requires_str = requires.map{|r| "-r#{r}"}.join(" ")
 
-      env = (options.delete(:env) || {}).map{|k, v| "#{k}='#{v}'"}.join(" ")
+      env = options.delete(:env) || {}
+      if options[:disable_reporting] != false
+        env["BUNDLE_REPORT_ANONYMIZED_USAGE"] = false
+      end
+
+      normalized_env = env.map{|k, v| "#{k}='#{v}'"}.join(" ")
       args = options.map do |k, v|
         v == true ? " --#{k}" : " --#{k} #{v}" if v
       end.join
 
-      cmd = "#{env} #{sudo} #{Gem.ruby} -I#{lib} #{requires_str} #{bundle_bin} #{cmd}#{args}"
+      cmd = "#{normalized_env} #{sudo} #{Gem.ruby} -I#{lib} #{requires_str} #{bundle_bin} #{cmd}#{args}"
       if exitstatus
         sys_status(cmd)
       else

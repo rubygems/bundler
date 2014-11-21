@@ -27,6 +27,10 @@ module Bundler
       def ask(message)
       end
 
+      def yes?(message)
+        false
+      end
+
       def level=(name)
       end
 

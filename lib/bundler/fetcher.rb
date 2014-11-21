@@ -86,6 +86,8 @@ module Bundler
             agent << " #{ruby.engine}/#{engine_version}"
           end
 
+          agent << " options/#{Bundler.settings.all.join(",")}"
+
           # add a random ID so we can consolidate runs server-side
           agent << " " << SecureRandom.hex(8)
 
