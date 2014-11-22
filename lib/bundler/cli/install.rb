@@ -91,6 +91,9 @@ module Bundler
         without_groups_messages
         Bundler.ui.confirm "Use `bundle show [gemname]` to see where a bundled gem is installed."
       end
+
+      Bundler.ui.confirm "#{definition.dependencies.count} dependencies in total, #{definition.specs.count} gems installed."
+
       Installer.post_install_messages.to_a.each do |name, msg|
         Bundler.ui.confirm "Post-install message from #{name}:"
         Bundler.ui.info msg

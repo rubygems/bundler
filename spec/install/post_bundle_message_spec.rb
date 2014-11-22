@@ -17,6 +17,7 @@ describe "post bundle message" do
   let(:bundle_deployment_message) {"It was installed into ./vendor"}
   let(:bundle_complete_message)   {"Your bundle is complete!"}
   let(:bundle_updated_message)    {"Your bundle is updated!"}
+  let(:installed_gems_stats)    {"4 dependencies in total, 5 gems installed."}
 
   describe "for fresh bundle install" do
     it "without any options" do
@@ -24,6 +25,7 @@ describe "post bundle message" do
       expect(out).to include(bundle_show_message)
       expect(out).not_to include("Gems in the group")
       expect(out).to include(bundle_complete_message)
+      expect(out).to include(installed_gems_stats)
     end
 
     it "with --without one group" do
@@ -31,6 +33,7 @@ describe "post bundle message" do
       expect(out).to include(bundle_show_message)
       expect(out).to include("Gems in the group emo were not installed")
       expect(out).to include(bundle_complete_message)
+      expect(out).to include(installed_gems_stats)
     end
 
     it "with --without two groups" do
@@ -38,6 +41,7 @@ describe "post bundle message" do
       expect(out).to include(bundle_show_message)
       expect(out).to include("Gems in the groups emo and test were not installed")
       expect(out).to include(bundle_complete_message)
+      expect(out).to include("4 dependencies in total, 3 gems installed.")
     end
 
     it "with --without more groups" do
@@ -45,6 +49,7 @@ describe "post bundle message" do
       expect(out).to include(bundle_show_message)
       expect(out).to include("Gems in the groups emo, obama and test were not installed")
       expect(out).to include(bundle_complete_message)
+      expect(out).to include("4 dependencies in total, 2 gems installed.")
     end
 
     describe "with --path and" do
@@ -84,6 +89,7 @@ describe "post bundle message" do
       expect(out).to include(bundle_show_message)
       expect(out).to_not include("Gems in the groups")
       expect(out).to include(bundle_complete_message)
+      expect(out).to include(installed_gems_stats)
     end
 
     it "with --without one group" do
@@ -92,6 +98,7 @@ describe "post bundle message" do
       expect(out).to include(bundle_show_message)
       expect(out).to include("Gems in the group emo were not installed")
       expect(out).to include(bundle_complete_message)
+      expect(out).to include(installed_gems_stats)
     end
 
     it "with --without two groups" do
