@@ -1,3 +1,4 @@
+# encoding: utf-8
 require "bundler/vendored_thor"
 
 module Bundler
@@ -33,10 +34,48 @@ module Bundler
   rescue SystemExit => e
     exit e.status
   rescue Exception => e
-    Bundler.ui.error <<-ERR, :wrap => true
-      Unfortunately, a fatal error has occurred. Please see the Bundler \
-      troubleshooting documentation at http://bit.ly/bundler-issues. Thanks!
-    ERR
-    raise e
+
+    Bundler.ui.error <<-EOS
+#{'――― MARKDOWN TEMPLATE ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――'}
+### Report
+* What did you do?
+* What did you expect to happen?
+* What happened instead?
+
+#{Bundler::Env.new.report(:print_gemfile => false)}
+
+### Error
+```
+#{e.class} - #{e.message}
+#{e.backtrace.join("\n")}
+```
+#{'――― TEMPLATE END ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――'}
+[!] Oh no, an error occurred.
+
+Troubleshooting documentation: http://bit.ly/bundler-issues
+
+Search for existing github issues similar to yours:
+#{issues_url(e)}
+
+If none exists, create a ticket, with the template displayed above, on:
+https://github.com/bundler/bundler/issues/new
+Be sure to first read the contributing guide for details on how to properly submit a ticket:
+https://github.com/bundler/bundler/blob/master/CONTRIBUTING.md
+You may also include your Gemfile sample.
+Don't forget to anonymize any private data!
+EOS
+    exit 1
   end
+
+  def self.issues_url(exception)
+    message = pathless_exception_message(exception.message)
+    'https://github.com/bundler/bundler/search?q=' \
+    "#{CGI.escape(message)}&type=Issues"
+  end
+
+  def self.pathless_exception_message(message)
+    message.gsub(/- \(.*\):/, '-')
+  end
+
+
 end
