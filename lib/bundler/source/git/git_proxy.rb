@@ -60,6 +60,10 @@ module Bundler
           end
         end
 
+        def version
+          git("--version").sub("git version", "").strip
+        end
+
         def checkout
           if path.exist?
             return if has_revision_cached?
