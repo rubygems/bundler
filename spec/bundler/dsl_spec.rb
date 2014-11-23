@@ -138,16 +138,16 @@ describe Bundler::Dsl do
     end
   end
 
-  context 'can bundle groups of gems with' do
-    # git 'https://github.com/rails/rails.git' do
-    #   gem 'railties'
-    #   gem 'action_pack'
-    #   gem 'active_model'
+  context "can bundle groups of gems with" do
+    # git "https://github.com/rails/rails.git" do
+    #   gem "railties"
+    #   gem "action_pack"
+    #   gem "active_model"
     # end
-    describe '#git' do
-      it 'from a single repo' do
-        rails_gems = ['railties', 'action_pack', 'active_model']
-        example = subject.git 'https://github.com/rails/rails.git' do
+    describe "#git" do
+      it "from a single repo" do
+        rails_gems = ["railties", "action_pack", "active_model"]
+        example = subject.git "https://github.com/rails/rails.git" do
           rails_gems.each { |rails_gem| subject.send :gem, rails_gem }
         end
         expect(subject.dependencies.map(&:name)).to match_array rails_gems
@@ -159,10 +159,10 @@ describe Bundler::Dsl do
     #   gem 'spree_api'
     #   gem 'spree_backend'
     # end
-    describe '#github' do
-      it 'from github' do
-        spree_gems = ['spree_core', 'spree_api', 'spree_backend']
-        example = subject.github 'spree' do
+    describe "#github" do
+      it "from github" do
+        spree_gems = ["spree_core", "spree_api", "spree_backend"]
+        example = subject.github "spree" do
           spree_gems.each { |spree_gem| subject.send :gem, spree_gem }
         end
         expect(subject.dependencies.map(&:name)).to match_array spree_gems
