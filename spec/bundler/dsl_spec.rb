@@ -154,6 +154,20 @@ describe Bundler::Dsl do
       end
     end
 
+    # github 'spree' do
+    #   gem 'spree_core'
+    #   gem 'spree_api'
+    #   gem 'spree_backend'
+    # end
+    describe '#github' do
+      it 'from github' do
+        spree_gems = ['spree_core', 'spree_api', 'spree_backend']
+        example = subject.github 'spree' do
+          spree_gems.each { |spree_gem| subject.send :gem, spree_gem }
+        end
+        expect(subject.dependencies.map(&:name)).to match_array spree_gems
+      end
+    end
   end
 
   describe "syntax errors" do
