@@ -171,13 +171,16 @@ module Bundler
     end
 
     def handle_conflict(current, states, existing=nil)
-      until current.nil? && existing.nil?
+      until current.nil?
         current_state = find_state(current, states)
-        existing_state = find_state(existing, states)
         return current if state_any?(current_state)
+        current = current.required_by.last if current
+      end
+
+      until existing.nil?
+        existing_state = find_state(existing, states)
         return existing if state_any?(existing_state)
         existing = existing.required_by.last if existing
-        current = current.required_by.last if current
       end
     end
 
