@@ -320,7 +320,7 @@ module Bundler
             end
 
             if existing.respond_to?(:required_by)
-              parent = handle_conflict(parent, states, existing.required_by[-2])
+              parent = handle_conflict(parent, states, existing.required_by[-2]) unless other_possible?(parent, states)
             end
 
             raise version_conflict if parent.nil? || parent.name == 'bundler'
