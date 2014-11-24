@@ -199,13 +199,16 @@ module Bundler::Molinillo
       def state_index_for_unwind
         current_requirement = requirement
         existing_requirement = requirement_for_existing_name(name)
-        until current_requirement.nil? && existing_requirement.nil?
+        until current_requirement.nil?
           current_state = find_state_for(current_requirement)
-          existing_state = find_state_for(existing_requirement)
           return states.index(current_state) if state_any?(current_state)
+          current_requirement = parent_of(current_requirement)
+        end
+
+        until existing_requirement.nil?
+          existing_state = find_state_for(existing_requirement)
           return states.index(existing_state) if state_any?(existing_state)
           existing_requirement = parent_of(existing_requirement)
-          current_requirement = parent_of(current_requirement)
         end
         -1
       end
