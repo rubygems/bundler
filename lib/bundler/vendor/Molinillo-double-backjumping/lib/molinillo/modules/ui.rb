@@ -40,7 +40,6 @@ module Bundler::Molinillo
     end
 
     # Conveys debug information to the user.
-    # By default, prints to `STDERR` instead of {#output}.
     #
     # @param [Integer] depth the current depth of the resolution process.
     # @return [void]
@@ -48,7 +47,7 @@ module Bundler::Molinillo
       if debug?
         debug_info = yield
         debug_info = debug_info.inspect unless debug_info.is_a?(String)
-        STDERR.puts debug_info.split("\n").map { |s| '  ' * depth + s }
+        output.puts debug_info.split("\n").map { |s| '  ' * depth + s }
       end
     end
 
