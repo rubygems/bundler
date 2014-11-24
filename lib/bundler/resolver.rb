@@ -313,14 +313,14 @@ module Bundler
             conflicts << current.name
 
             parent = current.required_by.last
-            if existing.respond_to?(:required_by)
-              parent = handle_conflict(current, states, existing.required_by[-2]) unless other_possible?(parent, states)
-            else
-              parent = handle_conflict(current, states) unless other_possible?(parent, states)
-            end
+            parent = handle_conflict(parent, states)
 
             if parent.nil? && !conflicts.empty?
               parent = states.reverse.detect { |i| conflicts.include?(i.name) && state_any?(i)}
+            end
+
+            if existing.respond_to?(:required_by)
+              parent = handle_conflict(parent, states, existing.required_by[-2])
             end
 
             raise version_conflict if parent.nil? || parent.name == 'bundler'
@@ -366,6 +366,7 @@ module Bundler
               next
             end
           end
+
 
           state = State.new(reqs.dup, activated.dup, current, matching_versions, depth, conflicts)
           states << state
