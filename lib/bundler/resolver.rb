@@ -293,7 +293,7 @@ module Bundler
             activated['bundler'] = existing
           end
 
-          if current.requirement.satisfied_by?(existing.version)
+          if current.requirement.satisfied_by?(existing.version) || current.name == 'bundler'
             debug { "    * [SUCCESS] Already activated" }
             @errors.delete(existing.name)
             dependencies = existing.activate_platform(current.__platform)
