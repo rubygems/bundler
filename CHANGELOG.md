@@ -1,3 +1,11 @@
+## 1.7.8 (2014-11-26)
+
+Bugfixes:
+
+  - Fix an issue where bundler sometime spams one gem in Gemfile.lock (#3216, @Who828)
+  - Ensure bundle update installs the newer version of the gem (#3089, @Who828)
+  - Fix an regression which stopped Bundler from resolving some Gemfiles (#3059, #3248, @Who828)
+
 ## 1.7.7 (2014-11-19)
 
 Bugfixes:
