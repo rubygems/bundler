@@ -48,7 +48,6 @@ module Bundler::Molinillo
         @base = base
         @states = []
         @iteration_counter = 0
-        @all_conflicts = []
       end
 
       # Resolves the {#original_requested} dependencies into a full dependency
@@ -68,8 +67,6 @@ module Bundler::Molinillo
           end
           process_topmost_state
         end
-
-        double_check_conflict_existing_specs
 
         activated.freeze
       ensure
@@ -113,10 +110,6 @@ module Bundler::Molinillo
 
       # @return [Array<ResolutionState>] the stack of states for the resolution
       attr_accessor :states
-
-      # @return [Array<Array(String,Object)>] an array of duples of name and
-      #   existing spec for all conflicts.
-      attr_accessor :all_conflicts
 
       ResolutionState.new.members.each do |member|
         define_method member do |*args, &block|
@@ -245,55 +238,6 @@ module Bundler::Molinillo
         state && state.possibilities.any?
       end
 
-      # Enumerate over {#all_conflicts} and ensure that already activated specs
-      # that were backtracked from were not that optimal possibilities that
-      # should have been activated instead, and swaps them in if such a simple
-      # switch is possible.
-      # @return [void]
-      def double_check_conflict_existing_specs
-        debug { "Double checking conflicts' existing specs" }
-        all_conflicts.each do |name, conflict_possibility|
-          next unless conflict_possibility
-          vertex = activated.vertex_named(name)
-          possibilities = search_for(vertex.requirements.first)
-          conflict_index = possibilities.index(conflict_possibility)
-          payload_index = possibilities.index(vertex.payload)
-          if conflict_index && payload_index && conflict_index > payload_index
-            if safe_to_swap?(name, conflict_possibility)
-              debug { "Swapping #{conflict_possibility} in for #{activated.vertex_named(name).payload}" }
-              vertex.payload = conflict_possibility
-            end
-          end
-        end
-      end
-
-      # @param  [String] name
-      # @param  [Object] conflict_possibility the existing possibility from a
-      #   conflict that is being attempted to be swapped for the current
-      #   activated spec of the given name.
-      # @return [Boolen] whether it is safe to swap in `conflict possibility`.
-      def safe_to_swap?(name, conflict_possibility)
-        duplicate_activated = activated.dup
-        duplicate_activated.vertex_named(name).payload = conflict_possibility
-        locked_requirement = locked_requirement_named(name)
-        (!locked_requirement || requirement_satisfied_by?(locked_requirement, a, conflict_possibility)) &&
-          activated.vertex_named(name).requirements.all? do |r|
-            requirement_satisfied_by?(r, duplicate_activated, conflict_possibility)
-          end &&
-          dependencies_for(conflict_possibility).all? { |r| existing_spec_satisfied_by?(r, duplicate_activated) }
-      end
-
-      # @param  [Object] requirement the requirement.
-      # @param  [DependencyGraph] duplicate_activated the dependency graph that
-      #   should be used when checking for satisfaction.
-      # @return [Boolean] whether the existing spec satisfies the given
-      #   requirement.
-      def existing_spec_satisfied_by?(requirement, duplicate_activated)
-        name = name_for(requirement)
-        activated.vertex_named(name) && payload = activated.vertex_named(name).payload
-        payload && requirement_satisfied_by(requirement, duplicate_activated, payload)
-      end
-
       # @return [Conflict] a {Conflict} that reflects the failure to activate
       #   the {#possibility} in conjunction with the current {#state}
       def create_conflict
@@ -303,7 +247,6 @@ module Bundler::Molinillo
           name_for_locking_dependency_source => Array(locked_requirement_named(name)),
         }
         vertex.incoming_edges.each { |edge| (requirements[edge.origin.payload] ||= []).unshift(*edge.requirements) }
-        all_conflicts << [name, vertex.payload]
         conflicts[name] = Conflict.new(
           requirement,
           Hash[requirements.select { |_, r| !r.empty? }],
@@ -314,7 +257,7 @@ module Bundler::Molinillo
         )
       end
 
-      # @return [Array<Array<Object>>] rhe different requirement
+      # @return [Array<Array<Object>>] The different requirement
       #   trees that led to every requirement for the current spec.
       def requirement_trees
         activated.vertex_named(name).requirements.map { |r| requirement_tree_for(r) }
