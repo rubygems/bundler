@@ -63,8 +63,10 @@ describe "bundle show" do
     it "prints summary of gems" do
       bundle "show --verbose"
 
-      expect(out).to include(' - This is just a fake gem for testing')
-      expect(out).to include(' - Ruby based make-like utility.')
+      expect(out).to include("* actionmailer (2.3.2)")
+      expect(out).to include("\tSummary:  This is just a fake gem for testing")
+      expect(out).to include("\tHomepage: No website available.")
+      expect(out).to include("\tStatus:   Up to date")
     end
   end
 

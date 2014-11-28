@@ -186,6 +186,8 @@ module Bundler
     D
     method_option "paths", :type => :boolean,
       :banner => "List the paths of all gems that are required by your Gemfile."
+    method_option "remote", :type => :boolean,
+      :banner => "Fetch remote specs for outdated check (only used with -V)."
     def show(gem_name = nil)
       require 'bundler/cli/show'
       Show.new(options, gem_name).run
