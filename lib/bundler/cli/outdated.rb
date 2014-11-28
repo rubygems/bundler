@@ -70,7 +70,7 @@ module Bundler
       end
 
       if out_count.zero?
-        Bundler.ui.info "Your bundle is up to date!\n"
+        Bundler.ui.info "Bundle up to date!\n"
       else
         exit 1
       end

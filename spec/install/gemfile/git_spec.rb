@@ -297,7 +297,7 @@ describe "bundle install with git sources" do
       bundle %|config local.rack #{lib_path('local-rack')}|
       bundle %|config disable_local_branch_check true|
       bundle :install
-      expect(out).to match(/Your bundle is complete!/)
+      expect(out).to match(/Bundle complete!/)
     end
 
     it "explodes on different branches on install" do

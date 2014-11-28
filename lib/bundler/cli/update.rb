@@ -56,7 +56,7 @@ module Bundler
         Bundler::CLI::Clean.new(options).run
       end
 
-      Bundler.ui.confirm "Your bundle is updated!"
+      Bundler.ui.confirm "Bundle updated!"
       without_groups_messages
     end
 

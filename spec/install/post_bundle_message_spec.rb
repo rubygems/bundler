@@ -14,10 +14,10 @@ describe "post bundle message" do
   end
 
   let(:bundle_show_message)       {"Use `bundle show [gemname]` to see where a bundled gem is installed."}
-  let(:bundle_deployment_message) {"It was installed into ./vendor"}
-  let(:bundle_complete_message)   {"Your bundle is complete!"}
-  let(:bundle_updated_message)    {"Your bundle is updated!"}
-  let(:installed_gems_stats)    {"4 dependencies in total, 5 gems installed."}
+  let(:bundle_deployment_message) {"Bundled gems are installed into ./vendor"}
+  let(:bundle_complete_message)   {"Bundle complete!"}
+  let(:bundle_updated_message)    {"Bundle updated!"}
+  let(:installed_gems_stats)      {"4 Gemfile dependencies, 5 gems now installed."}
 
   describe "for fresh bundle install" do
     it "without any options" do
@@ -41,7 +41,7 @@ describe "post bundle message" do
       expect(out).to include(bundle_show_message)
       expect(out).to include("Gems in the groups emo and test were not installed")
       expect(out).to include(bundle_complete_message)
-      expect(out).to include("4 dependencies in total, 3 gems installed.")
+      expect(out).to include("4 Gemfile dependencies, 3 gems now installed.")
     end
 
     it "with --without more groups" do
@@ -49,7 +49,7 @@ describe "post bundle message" do
       expect(out).to include(bundle_show_message)
       expect(out).to include("Gems in the groups emo, obama and test were not installed")
       expect(out).to include(bundle_complete_message)
-      expect(out).to include("4 dependencies in total, 2 gems installed.")
+      expect(out).to include("4 Gemfile dependencies, 2 gems now installed.")
     end
 
     describe "with --path and" do

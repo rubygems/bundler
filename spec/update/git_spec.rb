@@ -91,7 +91,7 @@ describe "bundle update" do
 
       expect(err).to be_empty
       expect(out).to include("Fetching #{lib_path}/foo_two")
-      expect(out).to include("Your bundle is complete!")
+      expect(out).to include("Bundle complete!")
     end
 
 
@@ -206,7 +206,7 @@ describe "bundle update" do
 
       bundle %|config local.rack #{lib_path('local-rack')}|
       bundle "update rack"
-      expect(out).to include("Your bundle is updated!")
+      expect(out).to include("Bundle updated!")
     end
 
     it "shows the previous version of the gem" do
