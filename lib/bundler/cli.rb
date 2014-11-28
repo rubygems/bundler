@@ -11,6 +11,8 @@ module Bundler
     rescue Exception => e
       Bundler.ui = UI::Shell.new
       raise e
+    ensure
+      Bundler.cleanup
     end
 
     def initialize(*args)
