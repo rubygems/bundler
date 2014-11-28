@@ -33,7 +33,7 @@ describe "bundle install" do
 
     it "prints a warning to let the user know what has happened with bundle --path vendor/bundle" do
       bundle "install --path vendor/bundle"
-      expect(out).to include("It was installed into ./vendor")
+      expect(out).to include("gems are installed into ./vendor")
     end
 
     it "disallows --path vendor/bundle --system" do
