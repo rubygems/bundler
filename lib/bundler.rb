@@ -213,6 +213,7 @@ module Bundler
 
     def cleanup
       FileUtils.remove_entry_secure(@tmp) if @tmp
+    rescue
     end
 
     def settings
