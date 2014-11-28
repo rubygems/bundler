@@ -148,6 +148,10 @@ module Bundler
       with_source(@sources.add_git_source(normalize_hash(options).merge("uri" => uri)), &blk)
     end
 
+    def github(repo, options = {}, &blk)
+      with_source(@sources.add_git_source(normalize_hash(options).merge("github" => repo)), &blk)
+    end
+
     def svn(uri, options = {}, source_options = {}, &blk)
       unless block_given?
         msg = "You can no longer specify a svn source by itself. Instead, \n" \
