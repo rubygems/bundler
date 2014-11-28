@@ -20,7 +20,7 @@ module Bundler
 
       out << "GEM_PATH #{ENV['GEM_PATH']}\n" unless ENV['GEM_PATH'] == ENV['GEM_HOME']
 
-      out << `command git --version`.strip << "\n"
+      out << `command git --version 2>&1`.strip << "\n"
 
       %w(rubygems-bundler open_gem).each do |name|
         specs = Gem::Specification.find_all{|s| s.name == name }
