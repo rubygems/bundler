@@ -6,11 +6,11 @@ module Bundler
 
     def initialize(options, gem_name, thor)
       @options = options
-      @gem_name = gem_name
+      @gem_name = resolve_name(gem_name)
       @thor = thor
 
-      @name = gem_name.chomp("/") # remove trailing slash if present
-      @target = Pathname.pwd.join(name)
+      @name = @gem_name
+      @target = Pathname.pwd.join(gem_name)
 
       validate_ext_name if options[:ext]
     end
@@ -85,6 +85,12 @@ module Bundler
         # Open gemspec in editor
         thor.run("#{options["edit"]} \"#{target.join("#{name}.gemspec")}\"")
       end
+    end
+
+    private
+
+    def resolve_name(name)
+      Pathname.pwd.join(name).basename.to_s
     end
 
     def validate_ext_name
