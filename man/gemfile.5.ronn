@@ -181,6 +181,8 @@ There are a number of `Gemfile` platforms:
     _ruby_ `AND` version 2.0
   * `ruby_21`:
     _ruby_ `AND` version 2.1
+  * `ruby_22`:
+    _ruby_ `AND` version 2.2
   * `mri`:
     Same as _ruby_, but not Rubinius
   * `mri_18`:
