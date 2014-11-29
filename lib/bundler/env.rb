@@ -1,3 +1,5 @@
+require 'bundler/source/git/git_proxy'
+
 module Bundler
   class Env
 
@@ -5,16 +7,16 @@ module Bundler
       io.write(report)
     end
 
-    def report
-      out = "Bundler #{Bundler::VERSION}\n"
+    def report(options = {})
+      print_gemfile = options.delete(:print_gemfile)
 
-      out << "Ruby #{RUBY_VERSION} (#{RUBY_RELEASE_DATE}"
-      out << " patchlevel #{RUBY_PATCHLEVEL}" if defined? RUBY_PATCHLEVEL
-      out << ") [#{RUBY_PLATFORM}]\n"
+      out = "Bundler #{Bundler::VERSION}\n"
 
       out << "Rubygems #{Gem::VERSION}\n"
 
       out << "rvm #{ENV['rvm_version']}\n" if ENV['rvm_version']
+
+      out << "Git #{git_information}"
 
       out << "GEM_HOME #{ENV['GEM_HOME']}\n"
 
@@ -23,8 +25,10 @@ module Bundler
       out << `command git --version 2>&1`.strip << "\n"
 
       %w(rubygems-bundler open_gem).each do |name|
-        specs = Gem::Specification.find_all{|s| s.name == name }
-        out << "#{name} (#{specs.map(&:version).join(',')})\n" unless specs.empty?
+        if Gem::Specification.respond_to?(:find_all)
+          specs = Gem::Specification.find_all{|s| s.name == name }
+          out << "#{name} (#{specs.map(&:version).join(',')})\n" unless specs.empty?
+        end
       end
 
       out << "\nBundler settings\n" unless Bundler.settings.all.empty?
@@ -35,11 +39,13 @@ module Bundler
         end
       end
 
-      out << "\n\n" << "Gemfile\n"
-      out << read_file("Gemfile") << "\n"
+      if print_gemfile
+        out << "\n\n" << "Gemfile\n"
+        out << read_file("Gemfile") << "\n"
 
-      out << "\n\n" << "Gemfile.lock\n"
-      out << read_file("Gemfile.lock") << "\n"
+        out << "\n\n" << "Gemfile.lock\n"
+        out << read_file("Gemfile.lock") << "\n"
+      end
 
       out
     end
@@ -52,6 +58,12 @@ module Bundler
       "<No #{filename} found>"
     rescue => e
       "#{e.class}: #{e.message}"
+    end
+
+    def git_information
+      Bundler::Source::Git::GitProxy.new(nil, nil, nil).version
+    rescue Bundler::Source::Git::GitNotInstalledError
+      "not installed"
     end
 
   end
