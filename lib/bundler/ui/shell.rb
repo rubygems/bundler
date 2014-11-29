@@ -1,3 +1,5 @@
+require 'curses'
+
 module Bundler
   module UI
     class Shell
@@ -6,7 +8,7 @@ module Bundler
       attr_writer :shell
 
       def initialize(options = {})
-        if options["no-color"] || !STDOUT.tty?
+        if options["no-color"] || no_color_support?
           Thor::Base.shell = Thor::Shell::Basic
         end
         @shell = Thor::Base.shell.new
@@ -69,6 +71,12 @@ module Bundler
       end
 
     private
+
+      def no_color_support?
+        ! Curses.has_colors?
+      ensure
+        Curses.close_screen
+      end
 
       # valimism
       def tell_me(msg, color = nil, newline = nil)
