@@ -25,8 +25,10 @@ module Bundler
       out << `command git --version 2>&1`.strip << "\n"
 
       %w(rubygems-bundler open_gem).each do |name|
-        specs = Gem::Specification.find_all{|s| s.name == name }
-        out << "#{name} (#{specs.map(&:version).join(',')})\n" unless specs.empty?
+        if Gem::Specification.respond_to?(:find_all)
+          specs = Gem::Specification.find_all{|s| s.name == name }
+          out << "#{name} (#{specs.map(&:version).join(',')})\n" unless specs.empty?
+        end
       end
 
       out << "\nBundler settings\n" unless Bundler.settings.all.empty?
