@@ -17,7 +17,7 @@ module Bundler
 
       out << "rvm #{ENV['rvm_version']}\n" if ENV['rvm_version']
 
-      out << "Git #{git_information}"
+      out << "Git #{git_information}\n"
 
       out << "GEM_HOME #{ENV['GEM_HOME']}\n"
 
