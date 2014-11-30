@@ -14,6 +14,9 @@ module Bundler
       out = "Environment\n\n"
       out << "    Bundler #{Bundler::VERSION}\n"
       out << "    Rubygems #{Gem::VERSION}\n"
+      out << "    Ruby #{RUBY_VERSION}"
+      out << "p#{RUBY_PATCHLEVEL}" if defined? RUBY_PATCHLEVEL
+      out << " (#{RUBY_RELEASE_DATE} revision #{RUBY_REVISION}) [#{RUBY_PLATFORM}]\n"
       out << "    GEM_HOME #{ENV['GEM_HOME']}\n" unless ENV['GEM_HOME'].nil? || ENV['GEM_HOME'].empty?
       out << "    GEM_PATH #{ENV['GEM_PATH']}\n" unless ENV['GEM_PATH'] == ENV['GEM_HOME']
       out << "    RVM #{ENV['rvm_version']}\n" if ENV['rvm_version']
