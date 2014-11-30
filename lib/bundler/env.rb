@@ -23,8 +23,6 @@ module Bundler
 
       out << "GEM_PATH #{ENV['GEM_PATH']}\n" unless ENV['GEM_PATH'] == ENV['GEM_HOME']
 
-      out << `command git --version 2>&1`.strip << "\n"
-
       %w(rubygems-bundler open_gem).each do |name|
         specs = Bundler.rubygems.find_name(name)
         out << "#{name} (#{specs.map(&:version).join(',')})\n" unless specs.empty?
