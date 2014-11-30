@@ -1,3 +1,4 @@
+require 'bundler/rubygems_integration'
 require 'bundler/source/git/git_proxy'
 
 module Bundler
@@ -25,10 +26,8 @@ module Bundler
       out << `command git --version 2>&1`.strip << "\n"
 
       %w(rubygems-bundler open_gem).each do |name|
-        if Gem::Specification.respond_to?(:find_all)
-          specs = Gem::Specification.find_all{|s| s.name == name }
-          out << "#{name} (#{specs.map(&:version).join(',')})\n" unless specs.empty?
-        end
+        specs = Bundler.rubygems.find_name(name)
+        out << "#{name} (#{specs.map(&:version).join(',')})\n" unless specs.empty?
       end
 
       out << "\nBundler settings\n" unless Bundler.settings.all.empty?
