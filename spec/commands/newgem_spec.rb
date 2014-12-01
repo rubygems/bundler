@@ -35,6 +35,42 @@ describe "bundle gem" do
     end
   end
 
+  context "gem naming with relative paths" do
+    before do
+      reset!
+      in_app_root
+    end
+
+    it "resolves ." do
+      create_temporary_dir('tmp')
+
+      bundle 'gem .'
+
+      expect(bundled_app("tmp/lib/tmp.rb")).to exist
+    end
+
+    it "resolves .." do
+      create_temporary_dir('temp/empty_dir')
+
+      bundle 'gem ..'
+
+      expect(bundled_app("temp/lib/temp.rb")).to exist
+    end
+
+    it "resolves relative directory" do
+      create_temporary_dir('tmp/empty/tmp')
+
+      bundle 'gem ../../empty'
+
+      expect(bundled_app("tmp/empty/lib/empty.rb")).to exist
+    end
+
+    def create_temporary_dir(dir)
+      FileUtils.mkdir_p(dir)
+      Dir.chdir(dir)
+    end
+  end
+
   context "gem naming with underscore" do
     let(:gem_name) { 'test_gem' }
 
