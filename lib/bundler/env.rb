@@ -36,10 +36,10 @@ module Bundler
 
       if print_gemfile
         out << "\nGemfile\n\n"
-        out << "    " << read_file("Gemfile").gsub(/\n/, "\n    ") << "\n"
+        out << "    " << read_file(Bundler.default_gemfile).gsub(/\n/, "\n    ") << "\n"
 
         out << "\n" << "Gemfile.lock\n\n"
-        out << "    " << read_file("Gemfile.lock").gsub(/\n/, "\n    ") << "\n"
+        out << "    " << read_file(Bundler.default_lockfile).gsub(/\n/, "\n    ") << "\n"
       end
 
       out
@@ -48,7 +48,7 @@ module Bundler
   private
 
     def read_file(filename)
-      File.read(filename).strip
+      File.read(filename.to_s).strip
     rescue Errno::ENOENT
       "<No #{filename} found>"
     rescue => e
