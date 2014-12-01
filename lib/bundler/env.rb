@@ -14,13 +14,11 @@ module Bundler
       out = "Environment\n\n"
       out << "    Bundler   #{Bundler::VERSION}\n"
       out << "    Rubygems  #{Gem::VERSION}\n"
-      out << "    Ruby      #{RUBY_VERSION}"
-      out << "p#{RUBY_PATCHLEVEL}" if defined? RUBY_PATCHLEVEL
-      out << " (#{RUBY_RELEASE_DATE} revision #{RUBY_REVISION}) [#{RUBY_PLATFORM}]\n"
+      out << "    Ruby      #{ruby_version}"
       out << "    GEM_HOME  #{ENV['GEM_HOME']}\n" unless ENV['GEM_HOME'].nil? || ENV['GEM_HOME'].empty?
       out << "    GEM_PATH  #{ENV['GEM_PATH']}\n" unless ENV['GEM_PATH'] == ENV['GEM_HOME']
       out << "    RVM       #{ENV['rvm_version']}\n" if ENV['rvm_version']
-      out << "    Git       #{git_information}\n"
+      out << "    Git       #{git_version}\n"
       %w(rubygems-bundler open_gem).each do |name|
         specs = Bundler.rubygems.find_name(name)
         out << "    #{name} (#{specs.map(&:version).join(',')})\n" unless specs.empty?
@@ -55,7 +53,19 @@ module Bundler
       "#{e.class}: #{e.message}"
     end
 
-    def git_information
+    def ruby_version
+      str = "#{RUBY_VERSION}"
+      if RUBY_VERSION < '1.9'
+        str << " (#{RUBY_RELEASE_DATE}"
+        str << " patchlevel #{RUBY_PATCHLEVEL}" if defined? RUBY_PATCHLEVEL
+        str << ") [#{RUBY_PLATFORM}]\n"
+      else
+        str << "p#{RUBY_PATCHLEVEL}" if defined? RUBY_PATCHLEVEL
+        str << " (#{RUBY_RELEASE_DATE} revision #{RUBY_REVISION}) [#{RUBY_PLATFORM}]\n"
+      end
+    end
+
+    def git_version
       Bundler::Source::Git::GitProxy.new(nil, nil, nil).version
     rescue Bundler::Source::Git::GitNotInstalledError
       "not installed"
