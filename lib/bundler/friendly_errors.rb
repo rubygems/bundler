@@ -34,48 +34,42 @@ module Bundler
   rescue SystemExit => e
     exit e.status
   rescue Exception => e
-
-    Bundler.ui.error <<-EOS
-#{'――― MARKDOWN TEMPLATE ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――'}
-### Report
-* What did you do?
-* What did you expect to happen?
-* What happened instead?
-
-#{Bundler::Env.new.report(:print_gemfile => false)}
-
-### Error
-```
-#{e.class} - #{e.message}
-#{e.backtrace.join("\n")}
-```
-#{'――― TEMPLATE END ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――'}
-[!] Oh no, an error occurred.
-
-Troubleshooting documentation: http://bit.ly/bundler-issues
-
-Search for existing github issues similar to yours:
-#{issues_url(e)}
-
-If none exists, create a ticket, with the template displayed above, on:
-https://github.com/bundler/bundler/issues/new
-Be sure to first read the contributing guide for details on how to properly submit a ticket:
-https://github.com/bundler/bundler/blob/master/CONTRIBUTING.md
-You may also include your Gemfile sample.
-Don't forget to anonymize any private data!
-EOS
+    request_issue_report_for(e)
     exit 1
   end
 
+  def self.request_issue_report_for(e)
+    Bundler.ui.info <<-EOS.gsub(/^ {6}/, '')
+      #{'――― ERROR REPORT TEMPLATE ―――――――――――――――――――――――――――――――――――――――――――――――――――――――'}
+      - What did you do?
+      - What did you expect to happen?
+      - What happened instead?
+
+      Error details
+
+          #{e.class}: #{e.message}
+          #{e.backtrace.join("\n          ")}
+
+      #{Bundler::Env.new.report(:print_gemfile => false).gsub(/\n/, "\n      ").strip}
+      #{'――― TEMPLATE END ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――'}
+
+    EOS
+
+    Bundler.ui.error "Unfortunately, an unexpected error occurred, and Bundler cannot continue."
+
+    Bundler.ui.warn <<-EOS.gsub(/^ {6}/, '')
+
+      First, try this link to see if there are any existing issue reports for this error:
+      #{issues_url(e)}
+
+      If there aren't any reports for this error yet, please create copy and paste the report template above into a new issue. Don't forget to anonymize any private data! The new issue form is located at:
+      https://github.com/bundler/bundler/issues/new
+    EOS
+  end
+
   def self.issues_url(exception)
-    message = pathless_exception_message(exception.message)
     'https://github.com/bundler/bundler/search?q=' \
-    "#{CGI.escape(message)}&type=Issues"
+    "#{CGI.escape(exception.message)}&type=Issues"
   end
-
-  def self.pathless_exception_message(message)
-    message.gsub(/- \(.*\):/, '-')
-  end
-
 
 end
