@@ -83,9 +83,8 @@ module Bundler
         # by rubygems.org are broken and wrong.
         if spec.source_uri
           # Check for this spec from other sources
-          uris = [spec.source_uri]
+          uris = [spec.source_uri.without_credentials]
           uris += source_uris_for_spec(spec)
-          uris.compact!
           uris.uniq!
           Installer.ambiguous_gems << [spec.name, *uris] if uris.length > 1
 
@@ -186,13 +185,14 @@ module Bundler
         end
       end
 
-    protected
+    private
 
       def source_uris_for_spec(spec)
-        specs.search_all(spec.name).map{|s| s.source_uri }
+        specs.search_all(spec.name).inject([]) do |uris, spec|
+          uris << spec.source_uri.without_credentials if spec.source_uri
+          uris
+        end
       end
-
-    private
 
       def cached_gem(spec)
         cached_gem = cached_path(spec)
@@ -330,7 +330,7 @@ module Bundler
 
       def fetch_gem(spec)
         return false unless spec.source_uri
-        Fetcher.download_gem_from_uri(spec, spec.source_uri)
+        Fetcher.download_gem_from_uri(spec, spec.source_uri.original_uri)
       end
 
       def builtin_gem?(spec)
