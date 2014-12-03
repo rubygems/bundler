@@ -397,9 +397,10 @@ gems specified as paths.
 
 If you would like to use multiple local gems directly from the filesystem, you can set a global `path` option to the path containing the gem's files. This will automatically load gemspec files from subdirectories.
 
-    path 'components'
-    gem 'admin_ui'
-    gem 'public_ui'
+    path 'components' do
+      gem 'admin_ui'
+      gem 'public_ui'
+    end
 
 ## BLOCK FORM OF SOURCE, GIT, PATH, GROUP and PLATFORMS
 
