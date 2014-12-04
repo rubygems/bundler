@@ -49,7 +49,7 @@ module Bundler
           if conflict.requirement.name == "bundler" && other_bundler_required
             o << "\n"
             o << "This Gemfile requires a different version of Bundler.\n"
-            o << "Perhaps you need to update Bundler by running `gem install bundler`?"
+            o << "Perhaps you need to update Bundler by running `gem install bundler`?\n"
           end
           if conflict.locked_requirement
             o << "\n"
@@ -58,7 +58,7 @@ module Bundler
           elsif !conflict.existing
             if conflict.requirement_trees.first.size > 1
               o << "Could not find gem '#{clean_req(conflict.requirement)}', which is required by "
-              o << "gem '#{clean_req(conflict.requirement_trees.first.last)}', in any of the sources."
+              o << "gem '#{clean_req(conflict.requirement_trees.first[-2])}', in any of the sources."
             else
               o << "Could not find gem '#{clean_req(conflict.requirement)} in any of the sources\n"
             end
