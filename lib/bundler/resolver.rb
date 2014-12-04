@@ -250,7 +250,7 @@ module Bundler
     def search_for(dependency)
       platform = dependency.__platform
       dependency = dependency.dep unless dependency.is_a? Gem::Dependency
-      search = @search_for[dependency.hash] ||= begin
+      search = @search_for[dependency] ||= begin
         index = @source_requirements[dependency.name] || @index
         results = index.search(dependency, @base[dependency.name])
         if vertex = @base_dg.vertex_named(dependency.name)
