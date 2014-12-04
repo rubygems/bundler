@@ -59,7 +59,7 @@ describe "Resolving" do
 
     expect {
       resolve
-    }.to raise_error(Bundler::CyclicDependencyError, /please remove either gem 'foo' or gem 'bar'/i)
+    }.to raise_error(Bundler::CyclicDependencyError, /please remove either gem 'bar' or gem 'foo'/i)
   end
 
 end

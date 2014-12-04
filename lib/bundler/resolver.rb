@@ -202,10 +202,11 @@ module Bundler
     rescue Molinillo::VersionConflict => e
       raise VersionConflict.new(e.conflicts.keys.uniq, e.message)
     rescue Molinillo::CircularDependencyError => e
-      names = e.dependencies.reverse_each.map { |d| "gem '#{d.name}'"}
+      names = e.dependencies.sort_by(&:name).map { |d| "gem '#{d.name}'"}
       raise CyclicDependencyError, "Your Gemfile requires gems that depend" \
         " on each other, creating an infinite loop. Please remove" \
-        " either #{names.join(' or ')} and try again."
+        " #{names.count > 1 ? 'either ' : '' }#{names.join(' or ')}" \
+        " and try again."
     end
 
     include Molinillo::UI
