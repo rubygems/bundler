@@ -12,6 +12,9 @@ Features:
   - generates a `.consolerc` file with new gems and tries to load it on `bundle console` (@andremedeiros)
   - tries to find `gems.rb` and it's new counterpart, `gems.locked` (@andremedeiros)
 
+Documentation:
+  - add missing Gemfile global `path` explanation (@agenteo)
+
 ## 1.7.6 (2014-11-11)
 
 Bugfixes:
