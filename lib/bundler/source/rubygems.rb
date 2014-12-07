@@ -201,8 +201,8 @@ module Bundler
     protected
 
       def source_uris_for_spec(spec)
-        specs.search_all(spec.name).inject([]) do |uris, spec|
-          uris << spec.source_uri.without_credentials if spec.source_uri
+        specs.search_all(spec.name).inject([]) do |uris, s|
+          uris << s.source_uri.without_credentials if s.source_uri
           uris
         end
       end
