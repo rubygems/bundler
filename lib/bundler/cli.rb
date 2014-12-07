@@ -21,13 +21,16 @@ module Bundler
       ENV['BUNDLE_GEMFILE']   = File.expand_path(options[:gemfile]) if options[:gemfile]
       Bundler::Retry.attempts = options[:retry] || Bundler.settings[:retry] || Bundler::Retry::DEFAULT_ATTEMPTS
       Bundler.rubygems.ui = UI::RGProxy.new(Bundler.ui)
-      auto_install if AUTO_INSTALL_CMDS.include?(current_cmd)
-    rescue UnknownArgumentError => e
-      raise InvalidOption, e.message
-    ensure
+
       self.options ||= {}
       Bundler.ui = UI::Shell.new(options)
       Bundler.ui.level = "debug" if options["verbose"]
+
+      ask_for_anonymous_reports if current_cmd != "config" && options[:deployment].nil?
+
+      auto_install if AUTO_INSTALL_CMDS.include?(current_cmd)
+    rescue UnknownArgumentError => e
+      raise InvalidOption, e.message
     end
 
     check_unknown_options!(:except => [:config, :exec])
@@ -399,6 +402,14 @@ module Bundler
           Bundler.reset!
           invoke :install, []
           Bundler.reset!
+        end
+      end
+
+      def ask_for_anonymous_reports
+        if Bundler.settings[:report_anonymized_usage].nil?
+          result = Bundler.ui.yes?("Allow anonymous usage statistics to be reported, so that we can use them to improve Bundler? (y/n):")
+
+          Bundler.settings.set_global(:report_anonymized_usage, result)
         end
       end
   end

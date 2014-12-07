@@ -3,6 +3,8 @@ require "spec_helper"
 describe "bundle exec" do
   before :each do
     system_gems "rack-1.0.0", "rack-0.9.1"
+
+    bundle('config report_anonymized_usage false')
   end
 
   it "activates the correct gem" do
