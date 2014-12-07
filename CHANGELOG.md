@@ -1,3 +1,9 @@
+## 1.7.8 (2014-12-06)
+
+Bugfixes:
+
+  - Hide credentials while warning about gems with ambiguous sources (#3256, @tmoore)
+
 ## 1.7.7 (2014-11-19)
 
 Bugfixes:
