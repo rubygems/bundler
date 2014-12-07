@@ -173,6 +173,7 @@ module Bundler
 
       def generate_bin(spec, disable_extensions = false)
         gem_dir  = Pathname.new(spec.full_gem_path)
+        gem_file = nil
 
         # Some gem authors put absolute paths in their gemspec
         # and we have to save them from themselves

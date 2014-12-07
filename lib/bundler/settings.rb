@@ -139,6 +139,7 @@ module Bundler
         require 'bundler/psyched_yaml'
         File.open(file, "w") { |f| f.puts YAML.dump(hash) }
       end
+
       value
     end
 
@@ -154,8 +155,10 @@ module Bundler
     def load_config(config_file)
       valid_file = config_file && config_file.exist? && !config_file.size.zero?
       if !ignore_config? && valid_file
-        config_regex =/^(BUNDLE_.+): (?:['"](.*)['"]|(.+(?:\n(?!BUNDLE).+))|(.+))$/
-        config_pairs = config_file.read.scan(config_regex).map{|m| m.compact.map { |n| n.gsub(/\n\s?/, "") } }
+        config_regex = /^(BUNDLE_.+): (?:['"](.*)['"]|(.+(?:\n(?!BUNDLE).+))|(.+))$/
+        config_pairs = config_file.read.scan(config_regex).map do |m|
+          m.compact.map { |n| n.gsub(/\s+/, " ").tr('"', "'") }
+        end
         Hash[config_pairs]
       else
         {}

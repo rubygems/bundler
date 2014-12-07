@@ -15,6 +15,20 @@ Features:
 Documentation:
   - add missing Gemfile global `path` explanation (@agenteo)
 
+## 1.7.8 (2014-12-06)
+
+Bugfixes:
+
+  - Hide credentials while warning about gems with ambiguous sources (#3256, @tmoore)
+
+## 1.7.7 (2014-11-19)
+
+Bugfixes:
+
+  - Ensure server credentials stored in config or ENV will be used (#3180, @arronmabrey)
+  - Fix race condition causing errors while installing git-based gems (#3174, @Who828)
+  - Use single quotes in config so YAML won't add more quotes (#3261, @indirect)
+
 ## 1.7.6 (2014-11-11)
 
 Bugfixes:
