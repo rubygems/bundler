@@ -213,8 +213,6 @@ module Bundler
         "#{Bundler.rubygems.gem_dir}/specifications/#{spec.full_name}.gemspec"
       end
 
-=======
->>>>>>> v1.7.8
       def cached_gem(spec)
         cached_gem = cached_path(spec)
         unless cached_gem
