@@ -110,7 +110,7 @@ module Bundler
       end
     end
 
-    attr_reader :errors, :started_at, :iteration_rate, :iteration_counter
+    attr_reader :errors, :started_at, :iteration_rate, :iteration_counter, :initial_reqs
 
     # Figures out the best possible configuration of gems that satisfies
     # the list of passed dependencies and any child dependencies without
@@ -135,6 +135,7 @@ module Bundler
     end
 
     def initialize(index, source_requirements, base)
+      @initial_reqs         = []
       @errors               = {}
       @base                 = base
       @index                = index
@@ -157,11 +158,12 @@ module Bundler
       activated.values.map { |s| s.to_specs }.flatten.compact
     end
 
-    def start(reqs)
+    def start(reqs, current_traversal=false)
+      @initial_reqs = reqs.dup unless current_traversal
       activated = {}
       @gems_size = Hash[reqs.map { |r| [r, gems_size(r)] }]
 
-      resolve(reqs, activated)
+      resolve(reqs, activated, current_traversal)
     end
 
     class State < Struct.new(:reqs, :activated, :requirement, :possibles, :depth, :conflicts)
@@ -171,13 +173,16 @@ module Bundler
     end
 
     def handle_conflict(current, states, existing=nil)
-      until current.nil? && existing.nil?
+      until current.nil?
         current_state = find_state(current, states)
-        existing_state = find_state(existing, states)
         return current if state_any?(current_state)
+        current = current.required_by.last if current
+      end
+
+      until existing.nil?
+        existing_state = find_state(existing, states)
         return existing if state_any?(existing_state)
         existing = existing.required_by.last if existing
-        current = current.required_by.last if current
       end
     end
 
@@ -224,7 +229,7 @@ module Bundler
     end
 
     def resolve_for_conflict(state)
-      raise version_conflict if state.nil? || state.possibles.empty?
+      return version_conflict if state.nil? || state.possibles.empty?
       reqs, activated, depth, conflicts = state.reqs.dup, state.activated.dup, state.depth, state.conflicts.dup
       requirement = state.requirement
       possible = state.possibles.pop
@@ -251,7 +256,7 @@ module Bundler
       return reqs, activated, depth, conflicts
     end
 
-    def resolve(reqs, activated)
+    def resolve(reqs, activated, current_traversal)
       states = []
       depth = 0
       conflicts = Set.new
@@ -310,17 +315,23 @@ module Bundler
             conflicts << current.name
 
             parent = current.required_by.last
-            if existing.respond_to?(:required_by)
-              parent = handle_conflict(current, states, existing.required_by[-2]) unless other_possible?(parent, states)
+
+            if current_traversal
+              parent = handle_conflict(current, states)
             else
-              parent = handle_conflict(current, states) unless other_possible?(parent, states)
+              parent = handle_conflict(parent, states)
             end
+
 
             if parent.nil? && !conflicts.empty?
               parent = states.reverse.detect { |i| conflicts.include?(i.name) && state_any?(i)}
             end
 
-            raise version_conflict if parent.nil? || parent.name == 'bundler'
+            if existing.respond_to?(:required_by)
+              parent = handle_conflict(parent, states, existing.required_by[-2]) unless other_possible?(parent, states)
+            end
+
+            return version_conflict(current_traversal) if parent.nil? || parent.name == 'bundler'
 
             reqs, activated, depth, conflicts = resolve_conflict(parent, states)
           end
@@ -363,6 +374,7 @@ module Bundler
               next
             end
           end
+
 
           state = State.new(reqs.dup, activated.dup, current, matching_versions, depth, conflicts)
           states << state
@@ -418,8 +430,15 @@ module Bundler
       end
     end
 
-    def version_conflict
-      VersionConflict.new(errors.keys, error_message)
+    def version_conflict(current_traversal=true)
+      raise VersionConflict.new(errors.keys, error_message) if current_traversal
+      reset_state
+      start(initial_reqs, true)
+    end
+
+    def reset_state
+      clear_search_cache
+      @errors = {}
     end
 
     # For a given conflicted requirement, print out what exactly went wrong
