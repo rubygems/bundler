@@ -135,7 +135,7 @@ module Bundler
       # therefore use RubyGems facilities to obtain their load paths.
       if Gem::Specification.method_defined? :full_require_paths
         loaded_gem_paths = Gem.loaded_specs.map {|n, s| s.full_require_paths}
-        loaded_gem_paths.flatten!
+        loaded_gem_paths.flatten
       else
         $LOAD_PATH.select do |p|
           Bundler.rubygems.gem_path.any?{|gp| p =~ /^#{Regexp.escape(gp)}/ }
