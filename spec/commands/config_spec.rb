@@ -177,6 +177,13 @@ describe ".bundle/config" do
       run "if Bundler.settings[:frozen]; puts 'true' else puts 'false' end"
       expect(out).to eq("false")
     end
+
+    it "can set properties with periods via the environment" do
+      ENV["BUNDLE_FOO__BAR"] = "baz"
+
+      run "puts Bundler.settings['foo.bar']"
+      expect(out).to eq("baz")
+     end
   end
 
   describe "gem mirrors" do

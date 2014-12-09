@@ -162,9 +162,9 @@ For example, to use a mirror of rubygems.org hosted at
 Bundler allows you to configure credentials for any gem source, which allows
 you to avoid putting secrets into your Gemfile.
 
-    bundle config SOURCE_URL USERNAME:PASSWORD
+    bundle config SOURCE_HOSTNAME USERNAME:PASSWORD
 
 For example, to save the credentials of user `claudette` for the gem source at
 `gems.longerous.com`, you would run:
 
-    bundle config https://gems.longerous.com/ claudette:s00pers3krit
+    bundle config gems.longerous.com claudette:s00pers3krit
