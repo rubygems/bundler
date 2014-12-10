@@ -70,6 +70,10 @@ The canonical form of this configuration is `"without"`. To convert the canonica
 form to the environment variable form, capitalize it, and prepend `BUNDLE_`. The
 environment variable form of `"without"` is `BUNDLE_WITHOUT`.
 
+Any periods in the configuration keys must be replaced with two underscores when
+setting it via environment variables. The configuration key `local.rack` becomes
+the environment variable `BUNDLE_LOCAL__RACK`.
+
 ## LIST OF AVAILABLE KEYS
 
 The following is a list of all configuration keys and their purpose. You can
@@ -168,3 +172,7 @@ For example, to save the credentials of user `claudette` for the gem source at
 `gems.longerous.com`, you would run:
 
     bundle config gems.longerous.com claudette:s00pers3krit
+
+Or you can set the credentials as an environment variable like this:
+
+    export BUNDLE_GEMS__LONGEROUS__COM="claudette:s00pers3krit"
