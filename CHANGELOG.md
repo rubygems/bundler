@@ -15,7 +15,7 @@ Features:
 Documentation:
   - add missing Gemfile global `path` explanation (@agenteo)
 
-## 1.7.9
+## 1.7.9 (2014-12-09)
 
 Bugfixes:
 
