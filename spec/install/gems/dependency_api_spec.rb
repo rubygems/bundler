@@ -1,7 +1,8 @@
 require "spec_helper"
 
 describe "gemcutter's dependency API" do
-  let(:source_uri) { "http://localgemserver.test" }
+  let(:source_hostname) { "localgemserver.test" }
+  let(:source_uri) { "http://#{source_hostname}" }
 
   it "should use the API" do
     gemfile <<-G
@@ -475,7 +476,16 @@ describe "gemcutter's dependency API" do
         G
       end
 
-      it "reads authentication details from bundle config" do
+      it "reads authentication details by host name from bundle config" do
+        bundle "config #{source_hostname} #{user}:#{password}"
+
+        bundle :install, :artifice => "endpoint_strict_basic_authentication"
+
+        expect(out).to include("Fetching gem metadata from #{source_uri}")
+        should_be_installed "rack 1.0.0"
+      end
+
+      it "reads authentication details by full url from bundle config" do
         # The trailing slash is necessary here; Fetcher canonicalizes the URI.
         bundle "config #{source_uri}/ #{user}:#{password}"
 
@@ -486,7 +496,7 @@ describe "gemcutter's dependency API" do
       end
 
       it "should use the API" do
-        bundle "config #{source_uri}/ #{user}:#{password}"
+        bundle "config #{source_hostname} #{user}:#{password}"
         bundle :install, :artifice => "endpoint_strict_basic_authentication"
         expect(out).to include("Fetching gem metadata from #{source_uri}")
         should_be_installed "rack 1.0.0"
@@ -498,7 +508,7 @@ describe "gemcutter's dependency API" do
           gem "rack"
         G
 
-        bundle "config #{source_uri}/ otheruser:wrong"
+        bundle "config #{source_hostname} otheruser:wrong"
 
         bundle :install, :artifice => "endpoint_strict_basic_authentication"
         should_be_installed "rack 1.0.0"
@@ -506,11 +516,11 @@ describe "gemcutter's dependency API" do
 
       it "shows instructions if auth is not provided for the source" do
         bundle :install, :artifice => "endpoint_strict_basic_authentication"
-        expect(out).to include("bundle config #{source_uri}/ username:password")
+        expect(out).to include("bundle config #{source_hostname} username:password")
       end
 
       it "fails if authentication has already been provided, but failed" do
-        bundle "config #{source_uri}/ #{user}:wrong"
+        bundle "config #{source_hostname} #{user}:wrong"
 
         bundle :install, :artifice => "endpoint_strict_basic_authentication"
         expect(out).to include("Bad username or password")

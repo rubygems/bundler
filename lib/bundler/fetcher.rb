@@ -411,10 +411,11 @@ module Bundler
       # Authentication has already been attempted and failed.
       raise BadAuthenticationError.new(uri) if @remote_uri.user
 
-      auth = Bundler.settings[@remote_uri.to_s]
+      auth = Bundler.settings[uri.host]
+      auth ||= Bundler.settings[uri.to_s]
 
       # Authentication isn't provided at all, by "bundle config" or in the URI.
-      raise AuthenticationRequiredError.new(uri) if auth.nil?
+      raise AuthenticationRequiredError.new(uri.host) if auth.nil?
 
       @remote_uri.user, @remote_uri.password = *auth.split(":", 2)
       @anonymizable_uri = AnonymizableURI.new(@remote_uri.dup)
