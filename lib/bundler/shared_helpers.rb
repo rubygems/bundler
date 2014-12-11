@@ -31,6 +31,11 @@ module Bundler
       Pathname.new("#{default_gemfile}.lock")
     end
 
+    def default_bundle_dir
+      bundle_dir = find_directory(".bundle")
+      Pathname.new(bundle_dir) if bundle_dir
+    end
+
     def in_bundle?
       find_gemfile
     end
@@ -70,6 +75,22 @@ module Bundler
       given = ENV['BUNDLE_GEMFILE']
       return given if given && !given.empty?
 
+      find_file('Gemfile')
+    end
+
+    def find_file(name)
+      search_up(name) {|filename|
+        return filename if File.file?(filename)
+      }
+    end
+
+    def find_directory(name)
+      search_up(name) {|dirname|
+        return dirname if File.directory?(dirname)
+      }
+    end
+
+    def search_up(name)
       previous = nil
       current  = File.expand_path(SharedHelpers.pwd)
 
@@ -79,9 +100,8 @@ module Bundler
           return nil if File.file?(File.join(current, 'bundler.gemspec'))
         end
 
-        # otherwise return the Gemfile if it's there
-        filename = File.join(current, 'Gemfile')
-        return filename if File.file?(filename)
+        filename = File.join(current, name)
+        yield filename
         current, previous = File.expand_path("..", current), current
       end
     end
