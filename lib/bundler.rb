@@ -193,7 +193,13 @@ module Bundler
     end
 
     def root
-      @root ||= default_gemfile.dirname.expand_path
+      @root ||= begin
+                  default_gemfile.dirname.expand_path
+                rescue GemfileNotFound
+                  bundle_dir = default_bundle_dir
+                  raise GemfileNotFound, "Could not locate Gemfile or .bundle/ directory" unless bundle_dir
+                  Pathname.new(File.expand_path("..", bundle_dir))
+                end
     end
 
     def app_config_path
@@ -221,7 +227,7 @@ module Bundler
       return @settings if defined?(@settings)
       @settings = Settings.new(app_config_path)
     rescue GemfileNotFound
-      @settings = Settings.new
+      @settings = Settings.new(Pathname.new(".bundle").expand_path)
     end
 
     def with_original_env
@@ -258,6 +264,10 @@ module Bundler
 
     def default_lockfile
       SharedHelpers.default_lockfile
+    end
+
+    def default_bundle_dir
+      SharedHelpers.default_bundle_dir
     end
 
     def system_bindir
