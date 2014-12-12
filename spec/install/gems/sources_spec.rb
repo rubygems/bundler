@@ -239,6 +239,38 @@ describe "bundle install with gems on multiple sources" do
         expect(out).to include("Could not find gem 'not_in_repo1 (>= 0) ruby'")
       end
     end
+
+    context "with an existing lockfile" do
+      before do
+        system_gems "rack-0.9.1", "rack-1.0.0"
+
+        lockfile <<-L
+          GEM
+            remote: file:#{gem_repo1}
+            remote: file:#{gem_repo3}
+            specs:
+              rack (0.9.1)
+
+          PLATFORMS
+            ruby
+
+          DEPENDENCIES
+            rack!
+        L
+
+        gemfile <<-G
+          source "file://#{gem_repo1}"
+          source "file://#{gem_repo3}" do
+            gem 'rack'
+          end
+        G
+      end
+
+      # Reproduction of https://github.com/bundler/bundler/issues/3298
+      it "does not unlock the installed gem on exec" do
+        should_be_installed("rack 0.9.1")
+      end
+    end
   end
 
   context "when an older version of the same gem also ships with Ruby" do

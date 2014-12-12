@@ -59,10 +59,10 @@ module Bundler
 
       replacement_rubygems =
         replacement_sources.detect { |s| s.is_a?(Source::Rubygems) }
-      @rubygems_aggregate = replacement_rubygems
+      @rubygems_aggregate = replacement_rubygems if replacement_rubygems
 
       # Return true if there were changes
-      all_sources.to_set != replacement_sources.to_set ||
+      lock_sources.to_set != replacement_sources.to_set ||
         rubygems_remotes.to_set != replacement_rubygems.remotes.to_set
     end
 
