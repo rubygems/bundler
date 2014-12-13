@@ -272,6 +272,32 @@ describe "bundle install with groups" do
   end
 
 
+  describe "when loading without some group" do
+    it "should not load all groups except given --without" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+        gem "activesupport", :groups => :development
+      G
+
+      ruby <<-R
+        require "bundler"
+        Bundler.setup :default
+        Bundler.require :default
+        puts RACK
+        begin
+          require "activesupport"
+        rescue LoadError
+          puts "no activesupport"
+        end
+      R
+
+      expect(out).to include("1.0")
+      expect(out).to include("no activesupport")
+    end
+  end
+
+
   describe "when locked and installed with --without" do
     before(:each) do
       build_repo2
