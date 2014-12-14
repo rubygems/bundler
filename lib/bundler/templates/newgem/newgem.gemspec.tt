@@ -25,19 +25,19 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
+  # Add minimum set of gems needed for `bundle exec rake build` to work
   build_tools = [
     ["bundler", "~> <%= Bundler::VERSION.split(".")[0..1].join(".") %>"],
     ["rake", "~> 10.0"],
 <%- if config[:ext] -%>
     ['rake-compiler'],
 <%- end -%>
-  ]
-<%- if config[:test] -%>
-  test_tools = ["<%=config[:test]%>"]
-<%- end -%>
+  ].each { |*args| spec.add_development_dependency(*args) }
 
-  # NOTE: any gems not in either category should go into the Gemfile
-  build_tools + test_tools.each do |*args|
-    spec.add_development_dependency(*args)
-  end
+<%- if config[:test] -%>
+  # Add minimum set of gems needed for `bundle exec rake` to work
+  test_tools = [
+  "<%=config[:test]%>"
+  ].each { |*args| spec.add_development_dependency(*args) }
+<%- end -%>
 end
