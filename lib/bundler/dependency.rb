@@ -14,6 +14,7 @@ module Bundler
       :ruby_19  => Gem::Platform::RUBY,
       :ruby_20  => Gem::Platform::RUBY,
       :ruby_21  => Gem::Platform::RUBY,
+      :ruby_22  => Gem::Platform::RUBY,
       :mri      => Gem::Platform::RUBY,
       :mri_18   => Gem::Platform::RUBY,
       :mri_19   => Gem::Platform::RUBY,
