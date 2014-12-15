@@ -82,7 +82,7 @@ Gemfile, so commands that need to run in the context of a different bundle also
 need to use `with_clean_env`.
 
     Bundler.with_clean_env do
-      Dir.chdir "/other/bundler/project" do
+      Dir.chdir '/other/bundler/project' do
         `bundle exec ./script`
       end
     end

@@ -39,10 +39,10 @@ based on the latest versions of all gems available in the sources.
 
 Consider the following Gemfile(5):
 
-    source "https://rubygems.org"
+    source 'https://rubygems.org'
 
-    gem "rails", "3.0.0.rc"
-    gem "nokogiri"
+    gem 'rails', '3.0.0.rc'
+    gem 'nokogiri'
 
 When you run [bundle install(1)][bundle-install] the first time, bundler will resolve
 all of the dependencies, all the way down, and install what you need:
@@ -115,10 +115,10 @@ Sometimes, multiple gems declared in your Gemfile(5) are satisfied by the same
 second-level dependency. For instance, consider the case of `thin` and
 `rack-perftools-profiler`.
 
-    source "https://rubygems.org"
+    source 'https://rubygems.org'
 
-    gem "thin"
-    gem "rack-perftools-profiler"
+    gem 'thin'
+    gem 'rack-perftools-profiler'
 
 The `thin` gem depends on `rack >= 1.0`, while `rack-perftools-profiler` depends
 on `rack ~> 1.0`. If you run bundle install, you get:
