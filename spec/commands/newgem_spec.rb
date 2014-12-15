@@ -87,7 +87,6 @@ describe "bundle gem" do
       expect(bundled_app("test_gem/LICENSE.txt")).to exist
       expect(bundled_app("test_gem/Gemfile")).to exist
       expect(bundled_app("test_gem/Rakefile")).to exist
-      expect(bundled_app("test_gem/CODE_OF_CONDUCT.md")).to exist
       expect(bundled_app("test_gem/lib/test_gem.rb")).to exist
       expect(bundled_app("test_gem/lib/test_gem/version.rb")).to exist
       expect(bundled_app("test_gem/.gitignore")).to exist

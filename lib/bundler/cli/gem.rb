@@ -46,8 +46,7 @@ module Bundler
         "newgem.gemspec.tt" => "#{name}.gemspec",
         "consolerc.tt" => ".consolerc",
         "Rakefile.tt" => "Rakefile",
-        "README.md.tt" => "README.md",
-        "CODE_OF_CONDUCT.md.tt" => "CODE_OF_CONDUCT.md"
+        "README.md.tt" => "README.md"
       }
 
       templates.merge!("bin/newgem.tt" => "bin/#{name}") if options[:bin]
