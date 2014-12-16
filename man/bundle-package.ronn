@@ -26,9 +26,9 @@ in `vendor/cache`.
 
 For instance, consider this Gemfile(5):
 
-    source "https://rubygems.org"
+    source 'https://rubygems.org'
 
-    gem "nokogiri"
+    gem 'nokogiri'
 
 If you run `bundle package` under C Ruby, bundler will retrieve
 the version of `nokogiri` for the `"ruby"` platform. If you deploy

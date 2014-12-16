@@ -20,7 +20,7 @@ a number of methods used to describe the gem requirements.
 At the top of the `Gemfile`, add a line for the `Rubygems` source that contains
 the gems listed in the `Gemfile`.
 
-    source "https://rubygems.org"
+    source 'https://rubygems.org'
 
 It is possible, but not recommended as of Bundler 1.7, to add multiple global
 `source` lines. Each of these `source`s `MUST` be a valid Rubygems repository.
@@ -45,7 +45,7 @@ credentials from being stored in plain text in version control.
 For some sources, like a company Gemfury account, it may be easier to simply
 include the credentials in the Gemfile as part of the source URL.
 
-    source "https://user:password@gems.example.com"
+    source 'https://user:password@gems.example.com'
 
 Credentials in the source URL will take precedence over credentials set using
 `config`.
@@ -62,7 +62,7 @@ The version of Ruby that your application requires. If your application
 requires an alternate Ruby engine, such as JRuby or Rubinius, this should be
 the Ruby version that the engine is compatible with.
 
-    ruby "1.9.3"
+    ruby '1.9.3'
 
 ### ENGINE (:engine)
 
@@ -75,13 +75,13 @@ Each application _may_ specify a Ruby engine version. If an engine version is
 specified, an engine _must_ also be specified. If the engine is "ruby" the
 engine version specified _must_ match the Ruby version.
 
-    ruby "1.8.7", :engine => "jruby", :engine_version => "1.6.7"
+    ruby '1.8.7', :engine => 'jruby', :engine_version => '1.6.7'
 
 ### PATCHLEVEL (:patchlevel)
 
 Each application _may_ specify a Ruby patchlevel.
 
-    ruby "2.0.0", :patchlevel => "247"
+    ruby '2.0.0', :patchlevel => '247'
 
 ## GEMS (#gem)
 
@@ -92,14 +92,14 @@ All parameters are `OPTIONAL` unless otherwise specified.
 
 For each gem requirement, list a single _gem_ line.
 
-    gem "nokogiri"
+    gem 'nokogiri'
 
 ### VERSION
 
 Each _gem_ `MAY` have one or more version specifiers.
 
-    gem "nokogiri", ">= 1.4.2"
-    gem "RedCloth", ">= 4.1.0", "< 4.2.0"
+    gem 'nokogiri', '>= 1.4.2'
+    gem 'RedCloth', '>= 4.1.0', '< 4.2.0'
 
 ### REQUIRE AS (:require)
 
@@ -108,30 +108,30 @@ Each _gem_ `MAY` specify files that should be used when autorequiring via
 you want `required` has same name as _gem_ or `false` to
 prevent any file from being autorequired.
 
-    gem "redis", :require => ["redis/connection/hiredis", "redis"]
-    gem "webmock", :require => false
-    gem "debugger", :require => true
+    gem 'redis', :require => ['redis/connection/hiredis', 'redis']
+    gem 'webmock', :require => false
+    gem 'debugger', :require => true
 
 The argument defaults to the name of the gem. For example, these are identical:
 
-    gem "nokogiri"
-    gem "nokogiri", :require => "nokogiri"
-    gem "nokogiri", :require => true
+    gem 'nokogiri'
+    gem 'nokogiri', :require => 'nokogiri'
+    gem 'nokogiri', :require => true
 
 ### GROUPS (:group or :groups)
 
 Each _gem_ `MAY` specify membership in one or more groups. Any _gem_ that does
 not specify membership in any group is placed in the `default` group.
 
-    gem "rspec", :group => :test
-    gem "wirble", :groups => [:development, :test]
+    gem 'rspec', :group => :test
+    gem 'wirble', :groups => [:development, :test]
 
 The Bundler runtime allows its two main methods, `Bundler.setup` and
 `Bundler.require`, to limit their impact to particular groups.
 
     # setup adds gems to Ruby's load path
     Bundler.setup                    # defaults to all groups
-    require "bundler/setup"          # same as Bundler.setup
+    require 'bundler/setup'          # same as Bundler.setup
     Bundler.setup(:default)          # only set up the _default_ group
     Bundler.setup(:test)             # only set up the _test_ group (but `not` _default_)
     Bundler.setup(:default, :test)   # set up the _default_ and _test_ groups, but no others
@@ -153,7 +153,7 @@ After running `bundle install --without test`, bundler will remember that you ex
 the test group in the last installation. The next time you run `bundle install`,
 without any `--without option`, bundler will recall it.
 
-Also, calling `Bundler.setup` with no parameters, or calling `require "bundler/setup"`
+Also, calling `Bundler.setup` with no parameters, or calling `require 'bundler/setup'`
 will setup all groups except for the ones you excluded via `--without` (since they
 are obviously not available).
 
@@ -218,9 +218,9 @@ There are a number of `Gemfile` platforms:
 
 As with groups, you can specify one or more platforms:
 
-    gem "weakling",   :platforms => :jruby
-    gem "ruby-debug", :platforms => :mri_18
-    gem "nokogiri",   :platforms => [:mri_18, :jruby]
+    gem 'weakling',   :platforms => :jruby
+    gem 'ruby-debug', :platforms => :mri_18
+    gem 'nokogiri',   :platforms => [:mri_18, :jruby]
 
 All operations involving groups (`bundle install`, `Bundler.setup`,
 `Bundler.require`) behave exactly the same as if any groups not
@@ -231,7 +231,7 @@ matching the current platform were explicitly excluded.
 You can select an alternate Rubygems repository for a gem using the ':source'
 option.
 
-    gem "some_internal_gem", :source => "https://gems.example.com"
+    gem 'some_internal_gem', :source => 'https://gems.example.com'
 
 This forces the gem to be loaded from this source and ignores any global sources
 declared at the top level of the file. If the gem does not exist in this source,
@@ -252,11 +252,11 @@ git repository using the `:git` parameter. The repository can be accessed via
 several protocols:
 
   * `HTTP(S)`:
-    gem "rails", :git => "https://github.com/rails/rails.git"
+    gem 'rails', :git => 'https://github.com/rails/rails.git'
   * `SSH`:
-    gem "rails", :git => "git@github.com:rails/rails.git"
+    gem 'rails', :git => 'git@github.com:rails/rails.git'
   * `git`:
-    gem "rails", :git => "git://github.com/rails/rails.git"
+    gem 'rails', :git => 'git://github.com/rails/rails.git'
 
 If using SSH, the user that you use to run `bundle install` `MUST` have the
 appropriate keys available in their `$HOME/.ssh`.
@@ -284,7 +284,7 @@ to, a version specifier, if provided, means that the git repository is
 only valid if the `.gemspec` specifies a version matching the version
 specifier. If not, bundler will print a warning.
 
-    gem "rails", "2.3.8", :git => "https://github.com/rails/rails.git"
+    gem 'rails', '2.3.8', :git => 'https://github.com/rails/rails.git'
     # bundle install will fail, because the .gemspec in the rails
     # repository's master branch specifies version 3.0.0
 
@@ -296,7 +296,7 @@ Git repositories support a number of additional options.
 
   * `branch`, `tag`, and `ref`:
     You `MUST` only specify at most one of these options. The default
-    is `:branch => "master"`
+    is `:branch => 'master'`
   * `submodules`:
     Specify `:submodules => true` to cause bundler to expand any
     submodules included in the git repository
@@ -330,7 +330,7 @@ string to return the full repo address:
 
 In addition, if you wish to choose a specific branch:
 
-    gem "rails", :stash => "forks/rails", :branch => "branch_name"
+    gem 'rails', :stash => 'forks/rails', :branch => 'branch_name'
 
 ### GITHUB (:github)
 
@@ -343,12 +343,12 @@ If the git repository you want to use is hosted on GitHub and is public, you can
 trailing ".git"), separated by a slash. If both the username and repository name are the
 same, you can omit one.
 
-    gem "rails", :github => "rails/rails"
-    gem "rails", :github => "rails"
+    gem 'rails', :github => 'rails/rails'
+    gem 'rails', :github => 'rails'
 
 Are both equivalent to
 
-    gem "rails", :git => "git://github.com/rails/rails.git"
+    gem 'rails', :git => 'git://github.com/rails/rails.git'
 
 Since the `github` method is a specialization of `git_source`, it accepts a `:branch` named argument.
 
@@ -357,11 +357,11 @@ Since the `github` method is a specialization of `git_source`, it accepts a `:br
 If the git repository you want to use is hosted as a Github Gist and is public, you can use
 the :gist shorthand to specify just the gist identifier (without the trailing ".git").
 
-    gem "the_hatch", :gist => "4815162342"
+    gem 'the_hatch', :gist => '4815162342'
 
 Is equivalent to:
 
-    gem "the_hatch", :git => "https://gist.github.com/4815162342.git"
+    gem 'the_hatch', :git => 'https://gist.github.com/4815162342.git'
 
 Since the `gist` method is a specialization of `git_source`, it accepts a `:branch` named argument.
 
@@ -372,12 +372,12 @@ If the git repository you want to use is hosted on Bitbucket and is public, you 
 trailing ".git"), separated by a slash. If both the username and repository name are the
 same, you can omit one.
 
-    gem "rails", :bitbucket => "rails/rails"
-    gem "rails", :bitbucket => "rails"
+    gem 'rails', :bitbucket => 'rails/rails'
+    gem 'rails', :bitbucket => 'rails'
 
 Are both equivalent to
 
-    gem "rails", :git => "https://rails@bitbucket.org/rails/rails.git"
+    gem 'rails', :git => 'https://rails@bitbucket.org/rails/rails.git'
 
 Since the `bitbucket` method is a specialization of `git_source`, it accepts a `:branch` named argument.
 
@@ -395,7 +395,7 @@ version that bundler should use.
 Unlike `:git`, bundler does not compile C extensions for
 gems specified as paths.
 
-    gem "rails", :path => "vendor/rails"
+    gem 'rails', :path => 'vendor/rails'
 
 If you would like to use multiple local gems directly from the filesystem, you can set a global `path` option to the path containing the gem's files. This will automatically load gemspec files from subdirectories.
 
@@ -409,24 +409,24 @@ If you would like to use multiple local gems directly from the filesystem, you c
 The `:source`, `:git`, `:path`, `:group`, and `:platforms` options may be
 applied to a group of gems by using block form.
 
-    source "https://gems.example.com" do
-      gem "some_internal_gem"
-      gem "another_internal_gem"
+    source 'https://gems.example.com' do
+      gem 'some_internal_gem'
+      gem 'another_internal_gem'
     end
 
-    git "https://github.com/rails/rails.git" do
-      gem "activesupport"
-      gem "actionpack"
+    git 'https://github.com/rails/rails.git' do
+      gem 'activesupport'
+      gem 'actionpack'
     end
 
     platforms :ruby do
-      gem "ruby-debug"
-      gem "sqlite3"
+      gem 'ruby-debug'
+      gem 'sqlite3'
     end
 
     group :development do
-      gem "wirble"
-      gem "faker"
+      gem 'wirble'
+      gem 'faker'
     end
 
 In the case of the `git` block form, the `:ref`, `:branch`, `:tag`,

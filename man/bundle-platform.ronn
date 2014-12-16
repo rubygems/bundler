@@ -12,11 +12,11 @@ VM about your platform.
 
 For instance, using this Gemfile(5):
 
-    source "https://rubygems.org"
+    source 'https://rubygems.org'
 
-    ruby "1.9.3"
+    ruby '1.9.3'
 
-    gem "rack"
+    gem 'rack'
 
 If you run `bundle platform` on Ruby 1.9.3, it will display the following output:
 
