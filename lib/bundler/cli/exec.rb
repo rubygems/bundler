@@ -37,11 +37,15 @@ module Bundler
     private
 
     def execute_within_path
-      if RUBY_VERSION >= "1.9"
-        path.each do |path|
-          bin_path = File.join(path, @cmd)
-          if bin_path == Bundler.which(@cmd)
+      path.each do |path|
+        bin_path = File.join(path, @cmd)
+        if bin_path == Bundler.which(@cmd)
+          if RUBY_VERSION >= "1.9"
             Kernel.exec(build_env, bin_path, *args)
+          else
+            cmd = [env_string, bin_path, args.map { |ar| %("#{ar}") } ].join(" ")
+            cmd << ";"
+            Kernel.exec(cmd)
           end
         end
       end
@@ -66,7 +70,7 @@ module Bundler
       rubylib.unshift File.expand_path('../../..', __FILE__)
 
       {
-        'RUBYOPT' => rubyopt.join(' '),
+        'RUBYOPT' => %("#{rubyopt.join(' ')}"),
         'RUBYLIB' => rubylib.uniq.join(File::PATH_SEPARATOR),
         'FORCE_TTY' => 'true'
       }
