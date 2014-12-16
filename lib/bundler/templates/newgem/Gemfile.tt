@@ -1,4 +1,10 @@
 source 'https://rubygems.org'
 
 # Specify your gem's dependencies in <%=config[:name]%>.gemspec
-gemspec
+#
+# NOTE: it is recommended for the gemspec's "development" dependencies to
+# actually contain only essential build tools and test frameworks, so a Bundler
+# :test group is more suitable than a :development one (which would contain
+# only the optional packages)
+
+gemspec :development_group => :test
