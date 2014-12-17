@@ -88,6 +88,52 @@ Your Gemfile specifies a Ruby version requirement:
 Your Ruby version is #{RUBY_VERSION}, but your Gemfile specified #{not_local_ruby_version}
 G
     end
+
+    it "doesn't match the ruby version comparison requirement" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+
+        ruby "< 1.0.0"
+
+        gem "foo"
+      G
+
+      bundle "platform"
+      expect(out).to eq(<<-G.chomp)
+Your platform is: #{RUBY_PLATFORM}
+
+Your app has gems that work on these platforms:
+* ruby
+
+Your Gemfile specifies a Ruby version requirement:
+* ruby < 1.0.0
+
+Your Ruby version is #{RUBY_VERSION}, but your Gemfile specified < 1.0.0
+G
+    end
+
+    it "match the ruby version comparison requirement" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+
+        ruby "> 1.0.0"
+
+        gem "foo"
+      G
+
+      bundle "platform"
+      expect(out).to eq(<<-G.chomp)
+Your platform is: #{RUBY_PLATFORM}
+
+Your app has gems that work on these platforms:
+* ruby
+
+Your Gemfile specifies a Ruby version requirement:
+* ruby > 1.0.0
+
+Your current platform satisfies the Ruby version requirement.
+G
+    end
   end
 
   context "--ruby" do
@@ -115,6 +161,19 @@ G
       bundle "platform --ruby"
 
       expect(out).to eq("ruby 1.9.3")
+    end
+
+    it 'handles requirement' do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        ruby ">= 1.9.3"
+
+        gem "foo"
+      G
+
+      bundle "platform --ruby"
+
+      expect(out).to eq("ruby >= 1.9.3")
     end
 
     it "handles jruby" do

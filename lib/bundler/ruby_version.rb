@@ -32,7 +32,7 @@ module Bundler
     end
 
     def ==(other)
-      version          == other.version &&
+      Requirement.new(version).satisfied_by?(other.version) &&
         engine         == other.engine &&
         engine_version == other.engine_version &&
         patchlevel     == other.patchlevel
@@ -47,7 +47,7 @@ module Bundler
     def diff(other)
       if engine != other.engine && @input_engine
         [ :engine, engine, other.engine ]
-      elsif version != other.version
+      elsif !Requirement.new(version).satisfied_by?(other.version)
         [ :version, version, other.version ]
       elsif engine_version != other.engine_version && @input_engine
         [ :engine_version, engine_version, other.engine_version ]
@@ -64,6 +64,13 @@ module Bundler
         RbConfig::CONFIG["host_vendor"],
         RbConfig::CONFIG["host_os"]
       ].join("-")
+    end
+
+    class Requirement < Gem::Requirement
+      def satisfied_by?(version)
+        version = Gem::Version.new(version)
+        requirements.all? { |op, rv| (OPS[op] || OPS["="]).call version, rv }
+      end
     end
   end
 
