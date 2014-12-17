@@ -30,7 +30,7 @@ Gem::Specification.new do |spec|
 <%- if config[:ext] -%>
   spec.add_development_dependency "rake-compiler"
 <%- end -%>
-<%- if config[:test] -%>
+<%- if config[:test] && config[:test] != "false" -%>
   spec.add_development_dependency "<%=config[:test]%>"
 <%- end -%>
 end
