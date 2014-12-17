@@ -347,6 +347,9 @@ module Bundler
     method_option :test, :type => :string, :lazy_default => 'rspec', :aliases => '-t', :banner =>
       "Generate a test directory for your library: 'rspec' is the default, but 'minitest' is also supported."
 
+    method_option :mit, :type => :boolean, :banner => "Use MIT license"
+    method_option :coc, :type => :boolean, :banner => "Use Code Of Conduct"
+
     def gem(name)
       require 'bundler/cli/gem'
       Gem.new(options, name, self).run

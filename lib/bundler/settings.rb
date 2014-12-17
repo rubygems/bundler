@@ -1,5 +1,7 @@
 module Bundler
   class Settings
+    BOOL_KEYS = %w(frozen cache_all no_prune disable_local_branch_check gem.mit gem.coc).freeze
+
     def initialize(root = nil)
       @root          = root
       @local_config  = load_config(local_config_file)
@@ -130,7 +132,7 @@ module Bundler
     end
 
     def is_bool(key)
-      %w(frozen cache_all no_prune disable_local_branch_check).include? key.to_s
+      BOOL_KEYS.include?(key.to_s)
     end
 
     def to_bool(value)

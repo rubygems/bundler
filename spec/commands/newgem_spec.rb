@@ -2,6 +2,8 @@ require "spec_helper"
 
 describe "bundle gem" do
   before do
+    config "gem.mit" => "false", "gem.coc" => "false", "gem.test" => "false"
+
     @git_name = `git config --global user.name`.chomp
     `git config --global user.name "Bundler User"`
     @git_email = `git config --global user.email`.chomp
@@ -10,7 +12,7 @@ describe "bundle gem" do
 
   after do
     `git config --global user.name "#{@git_name}"`
-    `git config --global user.email #{@git_email}`
+    `git config --global user.email "#{@git_email}"`
   end
 
   shared_examples_for "git config is present" do
@@ -84,7 +86,6 @@ describe "bundle gem" do
 
     it "generates a gem skeleton" do
       expect(bundled_app("test_gem/test_gem.gemspec")).to exist
-      expect(bundled_app("test_gem/LICENSE.txt")).to exist
       expect(bundled_app("test_gem/Gemfile")).to exist
       expect(bundled_app("test_gem/Rakefile")).to exist
       expect(bundled_app("test_gem/lib/test_gem.rb")).to exist
@@ -154,11 +155,11 @@ describe "bundle gem" do
       end
 
       it "builds bin skeleton" do
-        expect(bundled_app("test_gem/bin/test_gem")).to exist
+        expect(bundled_app("test_gem/exe/test_gem")).to exist
       end
 
       it "requires 'test-gem'" do
-        expect(bundled_app("test_gem/bin/test_gem").read).to match(/require 'test_gem'/)
+        expect(bundled_app("test_gem/exe/test_gem").read).to match(/require "test_gem"/)
       end
     end
 
@@ -197,6 +198,35 @@ describe "bundle gem" do
 
       it "creates a default test which fails" do
         expect(bundled_app("test_gem/spec/test_gem_spec.rb").read).to include("expect(false).to eq(true)")
+      end
+    end
+
+    context "gem.test setting set to rspec" do
+      before do
+        reset!
+        in_app_root
+        bundle "config gem.test rspec"
+        bundle "gem #{gem_name}"
+      end
+
+      it "builds spec skeleton" do
+        expect(bundled_app("test_gem/.rspec")).to exist
+        expect(bundled_app("test_gem/spec/test_gem_spec.rb")).to exist
+        expect(bundled_app("test_gem/spec/spec_helper.rb")).to exist
+      end
+    end
+
+    context "gem.test setting set to rspec and --test is set to minitest" do
+      before do
+        reset!
+        in_app_root
+        bundle "config gem.test rspec"
+        bundle "gem #{gem_name} --test=minitest"
+      end
+
+      it "builds spec skeleton" do
+        expect(bundled_app("test_gem/test/test_test_gem.rb")).to exist
+        expect(bundled_app("test_gem/test/minitest_helper.rb")).to exist
       end
     end
 
@@ -253,6 +283,44 @@ describe "bundle gem" do
     end
   end
 
+  context "with --mit option" do
+    let(:gem_name) { 'test-gem' }
+
+    before do
+      bundle "gem #{gem_name} --mit"
+      # reset gemspec cache for each test because of commit 3d4163a
+      Bundler.clear_gemspec_cache
+    end
+
+    it "generates a gem skeleton with MIT license" do
+      expect(bundled_app("test-gem/test-gem.gemspec")).to exist
+      expect(bundled_app("test-gem/LICENSE.txt")).to exist
+      expect(bundled_app("test-gem/Gemfile")).to exist
+      expect(bundled_app("test-gem/Rakefile")).to exist
+      expect(bundled_app("test-gem/lib/test/gem.rb")).to exist
+      expect(bundled_app("test-gem/lib/test/gem/version.rb")).to exist
+    end
+  end
+
+  context "with --coc option" do
+    let(:gem_name) { 'test-gem' }
+
+    before do
+      bundle "gem #{gem_name} --coc"
+      # reset gemspec cache for each test because of commit 3d4163a
+      Bundler.clear_gemspec_cache
+    end
+
+    it "generates a gem skeleton with Code of Conduct" do
+      expect(bundled_app("test-gem/test-gem.gemspec")).to exist
+      expect(bundled_app("test-gem/CODE_OF_CONDUCT.md")).to exist
+      expect(bundled_app("test-gem/Gemfile")).to exist
+      expect(bundled_app("test-gem/Rakefile")).to exist
+      expect(bundled_app("test-gem/lib/test/gem.rb")).to exist
+      expect(bundled_app("test-gem/lib/test/gem/version.rb")).to exist
+    end
+  end
+
   context "gem naming with dashed" do
     let(:gem_name) { 'test-gem' }
 
@@ -266,7 +334,7 @@ describe "bundle gem" do
 
     it "generates a gem skeleton" do
       expect(bundled_app("test-gem/test-gem.gemspec")).to exist
-      expect(bundled_app("test-gem/LICENSE.txt")).to exist
+      # expect(bundled_app("test-gem/LICENSE.txt")).to exist
       expect(bundled_app("test-gem/Gemfile")).to exist
       expect(bundled_app("test-gem/Rakefile")).to exist
       expect(bundled_app("test-gem/lib/test/gem.rb")).to exist
@@ -335,11 +403,11 @@ describe "bundle gem" do
       end
 
       it "builds bin skeleton" do
-        expect(bundled_app("test-gem/bin/test-gem")).to exist
+        expect(bundled_app("test-gem/exe/test-gem")).to exist
       end
 
       it "requires 'test/gem'" do
-        expect(bundled_app("test-gem/bin/test-gem").read).to match(/require 'test\/gem'/)
+        expect(bundled_app("test-gem/exe/test-gem").read).to match(/require "test\/gem"/)
       end
     end
 
