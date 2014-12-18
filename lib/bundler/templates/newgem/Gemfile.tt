@@ -2,3 +2,12 @@ source 'https://rubygems.org'
 
 # Specify your gem's dependencies in <%=config[:name]%>.gemspec
 gemspec
+
+gem "rake", "~> 10.0"
+
+<%- if config[:ext] -%>
+gem "rake-compiler", :groups => [:build, :development]
+<%- end -%>
+<%- if config[:test] -%>
+gem "<%= config[:test] %>", :groups => [:test, :development]
+<%- end -%>

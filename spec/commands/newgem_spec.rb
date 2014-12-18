@@ -448,6 +448,11 @@ describe "bundle gem" do
         expect(bundled_app("test-gem/spec/spec_helper.rb")).to exist
         expect(bundled_app("test-gem/test/minitest_helper.rb")).to_not exist
       end
+
+      it "includes rspec" do
+        expect(bundled_app("test-gem/Gemfile").read).
+          to include('gem "rspec", :groups => [:test, :development]')
+      end
     end
 
     context "--ext parameter set" do
@@ -464,7 +469,8 @@ describe "bundle gem" do
       end
 
       it "includes rake-compiler" do
-        expect(bundled_app("test_gem/test_gem.gemspec").read).to include('spec.add_development_dependency "rake-compiler"')
+        expect(bundled_app("test_gem/Gemfile").read).
+          to include('gem "rake-compiler", :groups => [:build, :development]')
       end
 
       it "depends on compile task for build" do
