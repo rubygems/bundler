@@ -25,7 +25,6 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  # NOTE: Using `add_development_dependency` at all is strongly discouraged.
-  # Instead, organize development dependencies into logical groups in the Gemfile
+  # NOTE: "development" here means just tools for building the gem itself
   spec.add_development_dependency "bundler", "~> <%= Bundler::VERSION.split(".")[0..1].join(".") %>"
 end

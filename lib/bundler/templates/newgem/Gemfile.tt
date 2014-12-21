@@ -1,7 +1,9 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in <%=config[:name]%>.gemspec
-gemspec
+# Specify your gem's runtime dependencies in <%=config[:name]%>.gemspec
+gemspec :development_group => :gem_build_tools
+
+# Add your development, test and build dependencies below
 
 gem "rake", "~> 10.0"
 
