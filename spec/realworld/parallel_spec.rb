@@ -6,6 +6,7 @@ describe "parallel", :realworld => true do
       source "https://rubygems.org"
       gem 'activesupport', '~> 3.2.13'
       gem 'faker', '~> 1.1.2'
+      gem 'i18n', '~> 0.6.0' # Because 1.7+ requires Ruby 1.9.3+
     G
 
     bundle :install, :jobs => 4, :env => {"DEBUG" => "1"}
@@ -52,6 +53,7 @@ describe "parallel", :realworld => true do
       source "https://rubygems.org"
       gem 'activesupport', '~> 3.2.12'
       gem 'faker', '~> 1.1.2'
+      gem 'i18n', '~> 0.6.0' # Because 1.7+ requires Ruby 1.9.3+
     G
 
     bundle :update, :jobs => 4, :env => {"DEBUG" => "1"}
