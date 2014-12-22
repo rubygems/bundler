@@ -27,7 +27,7 @@ describe "real world edgecases", :realworld => true do
     install_gemfile <<-G
       source :rubygems
 
-      gem 'i18n', '~> 0.4'
+      gem 'i18n', '~> 0.6.0'
       gem 'activesupport', '~> 3.0'
       gem 'activerecord', '~> 3.0'
       gem 'builder', '~> 2.1.2'
@@ -61,7 +61,7 @@ describe "real world edgecases", :realworld => true do
     install_gemfile <<-G
     source "https://rubygems.org"
 
-    gem "i18n", "~> 0.4"
+    gem "i18n", "~> 0.6.0"
     gem "activesupport", "~> 3.0"
     gem "activerecord", "~> 3.0"
     gem "builder", "~> 2.1.2"
