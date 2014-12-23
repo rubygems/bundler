@@ -58,7 +58,7 @@ describe Bundler::GemHelper do
     end
 
     subject! { Bundler::GemHelper.new(app_path) }
-    let(:app_version) { "0.0.1" }
+    let(:app_version) { "0.1.0" }
     let(:app_gem_dir) { app_path.join("pkg") }
     let(:app_gem_path) { app_gem_dir.join("#{app_name}-#{app_version}.gem") }
     let(:app_gemspec_content) { File.read(app_gemspec_path) }
