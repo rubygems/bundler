@@ -193,6 +193,8 @@ There are a number of `Gemfile` platforms:
     _mri_ `AND` version 2.0
   * `mri_21`:
     _mri_ `AND` version 2.1
+  * `mri_22`:
+    _mri_ `AND` version 2.2
   * `rbx`:
     Same as _ruby_, but only Rubinius (not MRI)
   * `jruby`:
