@@ -1,3 +1,13 @@
+## 1.7.10 (2014-12-29)
+
+Bugfixes:
+
+  - Fix source blocks sometimes causing deployment mode to fail wrongly (#3298, @TimMoore)
+
+Features(?):
+
+  - Support `platform :mri_22` and related version bits (#3309, @thomasfedb)
+
 ## 1.7.9 (2014-12-09)
 
 Bugfixes:
