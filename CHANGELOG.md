@@ -10,7 +10,7 @@ Bugfixes:
 
 Bugfixes:
 
-  - Hide credentials while warning about gems with ambiguous sources (#3256, @tmoore)
+  - Hide credentials while warning about gems with ambiguous sources (#3256, @TimMoore)
 
 ## 1.7.7 (2014-11-19)
 
@@ -30,14 +30,14 @@ Bugfixes:
 
 Bugfixes:
 
-  - Fix --deployment with source blocks and non-alphabetical gems (#3224, @tmoore)
+  - Fix --deployment with source blocks and non-alphabetical gems (#3224, @TimMoore)
   - Vendor CA chain to validate new rubygems.org HTTPS certificate (@indirect)
 
 ## 1.7.4 (2014-10-19)
 
 Bugfixes:
 
-  - Allow --deployment after `pack` while using source blocks (#3167, @tmoore)
+  - Allow --deployment after `pack` while using source blocks (#3167, @TimMoore)
   - Use dependency API even when HTTP credentials are in ENV (#3191, @fvaleur)
   - Silence warnings (including root warning) in --quiet mode (#3186, @indirect)
   - Stop asking gem servers for gems already found locally (#2909, @dubek)
@@ -60,23 +60,23 @@ Bugfixes:
 Bugfixes:
 
   - Install gems from one source needed by gems in another source (@indirect)
-  - Install the same gem versions even after some are installed (@tmoore)
+  - Install the same gem versions even after some are installed (@TimMoore)
   - Download specs only when installing from servers (@indirect)
 
 ## 1.7.0 (2014-08-13)
 
 Security:
 
-  - Fix for CVE-2013-0334, installing gems from an unexpected source (@tmoore)
+  - Fix for CVE-2013-0334, installing gems from an unexpected source (@TimMoore)
 
 Features:
 
-  - Gemfile `source` calls now take a block containing gems from that source (@tmoore)
-  - Added the `:source` option to `gem` to specify a source (@tmoore)
+  - Gemfile `source` calls now take a block containing gems from that source (@TimMoore)
+  - Added the `:source` option to `gem` to specify a source (@TimMoore)
 
 Bugfixes:
 
-  - Warn on ambiguous gems available from more than one source (@tmoore)
+  - Warn on ambiguous gems available from more than one source (@TimMoore)
 
 ## 1.6.5 (2014-07-23)
 
