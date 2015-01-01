@@ -198,7 +198,7 @@ module Bundler
                         "This prevents bundler from installing bins or native extensions, but " \
                         "that may not affect its functionality."
 
-        if !spec.extensions.empty? && !spec.email.empty?
+        unless spec.extensions.empty? && spec.email.empty?
           Bundler.ui.warn "If you need to use this package without installing it from a gem " \
                           "repository, please contact #{spec.email} and ask them " \
                           "to modify their .gemspec so it can work with `gem build`."

@@ -450,7 +450,7 @@ module Bundler
       actual_remotes = sources.rubygems_remotes
 
       # If there is a Rubygems source in both
-      if !locked_gem_sources.empty? && !actual_remotes.empty?
+      unless locked_gem_sources.empty? && actual_remotes.empty?
         locked_gem_sources.each do |locked_gem|
           # Merge the remotes from the Gemfile into the Gemfile.lock
           changes = changes | locked_gem.replace_remotes(actual_remotes)
