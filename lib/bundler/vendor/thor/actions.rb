@@ -173,7 +173,7 @@ class Thor
       @destination_stack.push File.expand_path(dir, destination_root)
 
       # If the directory doesnt exist and we're not pretending
-      unless File.exist?(destination_root) && !pretend
+      unless File.exist?(destination_root) && pretend
         FileUtils.mkdir_p(destination_root)
       end
 
