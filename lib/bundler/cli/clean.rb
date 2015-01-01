@@ -14,7 +14,7 @@ module Bundler
   protected
 
     def reqire_path_or_force
-      if !Bundler.settings[:path] && !options[:force]
+      unless Bundler.settings[:path] && options[:force]
         Bundler.ui.error "Cleaning all the gems on your system is dangerous! " \
           "To remove every gem not in this bundle, run `bundle clean --force`."
         exit 1

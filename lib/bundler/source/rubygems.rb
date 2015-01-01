@@ -312,7 +312,7 @@ module Bundler
             api_fetchers.each do |f|
               Bundler.ui.info "Fetching gem metadata from #{f.uri}", Bundler.ui.debug?
               idx.use f.specs(dependency_names, self)
-              Bundler.ui.info "" if !Bundler.ui.debug? # new line now that the dots are over
+              Bundler.ui.info "" unless Bundler.ui.debug? # new line now that the dots are over
             end
 
             if api_fetchers.any? && api_fetchers.all?{|f| f.use_api }
@@ -325,14 +325,14 @@ module Bundler
               api_fetchers.each do |f|
                 Bundler.ui.info "Fetching additional metadata from #{f.uri}", Bundler.ui.debug?
                 idx.use f.specs(unmet, self)
-                Bundler.ui.info "" if !Bundler.ui.debug? # new line now that the dots are over
+                Bundler.ui.info "" unless Bundler.ui.debug? # new line now that the dots are over
               end if unmet.any?
             else
               allow_api = false
             end
           end
 
-          if !allow_api
+          unless allow_api
             api_fetchers.each do |f|
               Bundler.ui.info "Fetching source index from #{f.uri}"
               idx.use f.specs(nil, self)
