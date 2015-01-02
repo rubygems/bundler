@@ -1,0 +1,3 @@
+Pry.config.prompt = lambda do |context, nesting, pry|
+  "[<%=config[:name]%>] #{context}> "
+end

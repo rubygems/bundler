@@ -34,6 +34,7 @@ module Bundler
         :author           => git_user_name.empty? ? "TODO: Write your name" : git_user_name,
         :email            => git_user_email.empty? ? "TODO: Write your email address" : git_user_email,
         :test             => options[:test],
+        :console          => options[:console],
         :ext              => options[:ext]
       }
 
@@ -74,12 +75,19 @@ module Bundler
         )
       end
 
+      if options[:console]
+        templates.merge!(
+          "bin/console.tt" => "bin/console",
+          "lib/newgem/console.rb" => "lib/#{name}/console.rb"
+        )
+      end
       templates.each do |src, dst|
         thor.template("newgem/#{src}", target.join(dst), opts)
       end
 
       Bundler.ui.info "Initializing git repo in #{target}"
       Dir.chdir(target) { `git init`; `git add .` }
+      Dir.chdir(target) { `chmod +x bin/console` } if options[:console]
 
       if options[:edit]
         # Open gemspec in editor

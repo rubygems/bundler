@@ -1,0 +1,17 @@
+#!/bin/sh
+# Run a Ruby REPL.
+
+set -e
+
+cd $(dirname "$0")/..
+PRY_PATH=$(which pry)
+
+if [ -x $PRY_PATH ]
+then
+  exec bundle exec ruby $PRY_PATH -Ilib -r <%=config[:namespaced_path]%> -r <%=config[:namespaced_path]%>/console
+else
+
+  red='\033[0;31m'
+  NC='\033[0m'
+  echo "${red}Pry executable was not found. Try running 'bundle install'.${NC}"
+fi

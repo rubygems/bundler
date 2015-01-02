@@ -483,5 +483,26 @@ describe "bundle gem" do
         expect(bundled_app("test_gem/Rakefile").read).to eq(rakefile)
       end
     end
+
+    context "--console parameter set" do
+      before do
+        reset!
+        in_app_root
+        bundle "gem test_gem --console"
+      end
+
+      it "adds console executable and Pry initializer" do
+        expect(bundled_app("test_gem/bin/console")).to exist
+        expect(bundled_app("test_gem/lib/test_gem/console.rb")).to exist
+      end
+
+      it "should chmod bin/console" do
+        expect(bundled_app("test_gem/bin/console").executable?).to eq(true)
+      end
+
+      it "includes pry" do
+        expect(bundled_app("test_gem/test_gem.gemspec").read).to include('spec.add_development_dependency "pry"')
+      end
+    end
   end
 end
