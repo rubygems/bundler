@@ -341,7 +341,7 @@ module Bundler
     method_option :ext, :type => :boolean, :default => false, :banner => "Generate the boilerplate for C extension code"
     method_option :test, :type => :string, :lazy_default => 'rspec', :aliases => '-t', :banner =>
       "Generate a test directory for your library: 'rspec' is the default, but 'minitest' is also supported."
-    method_option :console, type: :boolean, default: false, aliases: '-c', banner: "Generate a binary pry console that can be run by executing ./bin/console"
+    method_option :console, :type => :boolean, :default => false, :aliases => '-c', :banner => "Generate a binary pry console that can be run by executing ./bin/console"
 
     def gem(name)
       require 'bundler/cli/gem'
