@@ -1,3 +1,9 @@
+## 1.7.11 (2015-01-04)
+
+Bugfixes:
+
+  - Recognize `:mri_22` and `:mingw_22`, rather than just `:ruby_22` (#3328, @myabc)
+
 ## 1.7.10 (2014-12-29)
 
 Bugfixes:
