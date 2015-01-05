@@ -42,6 +42,18 @@ describe "bundle package" do
       expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
     end
   end
+
+  context "with --all-platforms" do
+    it "puts the gems in vendor/cache even for other rubies", :ruby => "2.1" do
+      gemfile <<-D
+        source "file://#{gem_repo1}"
+        gem 'rack', :platforms => :ruby_19
+      D
+
+      bundle "package --all-platforms"
+      expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
+    end
+  end
 end
 
 describe "bundle install with gem sources" do
