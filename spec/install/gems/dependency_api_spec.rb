@@ -162,6 +162,17 @@ describe "gemcutter's dependency API" do
     should_be_installed "rack 1.0.0"
   end
 
+  it "falls back when the API URL returns 403 Forbidden" do
+    gemfile <<-G
+      source "#{source_uri}"
+      gem "rack"
+    G
+
+    bundle :install, :verbose => true, :artifice => "endpoint_api_forbidden"
+    expect(out).to include("Fetching source index from #{source_uri}")
+    should_be_installed "rack 1.0.0"
+  end
+
   it "handles host redirects" do
     gemfile <<-G
       source "#{source_uri}"
