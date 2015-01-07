@@ -35,6 +35,7 @@ module Bundler
 
     default_task :install
     class_option "no-color", :type => :boolean, :banner => "Disable colorization in output"
+    class_option "no-version", :type => :boolean, :banner => "Disable version names in vendor cache"
     class_option "retry",    :type => :numeric, :aliases => "-r", :banner =>
       "Specify the number of times you wish to attempt network commands"
     class_option "verbose",  :type => :boolean, :banner => "Enable verbose output mode", :aliases => "-V"

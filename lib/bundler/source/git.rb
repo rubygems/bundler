@@ -82,7 +82,7 @@ module Bundler
       # repos, this is set to the local repo.
       def install_path
         @install_path ||= begin
-          git_scope = "#{base_name}-#{shortref_for_path(revision)}"
+          git_scope = options["no-version"] ? base_name : extension_dir_name
           path = Bundler.install_path.join(git_scope)
 
           if !path.exist? && Bundler.requires_sudo?
