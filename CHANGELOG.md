@@ -1,3 +1,9 @@
+## 1.7.12 (2015-01-08)
+
+Bugfixes:
+
+  - Always send credentials for sources, fixing private Gemfury gems (#3342, @TimMoore)
+
 ## 1.7.11 (2015-01-04)
 
 Bugfixes:
