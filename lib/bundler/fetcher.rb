@@ -95,8 +95,7 @@ module Bundler
       @api_timeout    = 10 # How long to wait for each API call
       @max_retries    = 3  # How many retries for the API call
 
-      @remote_uri = Bundler::Source.mirror_for(remote_uri)
-      @anonymizable_uri = AnonymizableURI.new(@remote_uri.dup) unless @remote_uri.nil?
+      @anonymizable_uri = resolve_remote_uri(remote_uri)
 
       Socket.do_not_reverse_lookup = true
       connection # create persistent connection
@@ -104,14 +103,14 @@ module Bundler
 
     def connection
       @connection ||= begin
-        needs_ssl = @remote_uri.scheme == "https" ||
+        needs_ssl = remote_uri.scheme == "https" ||
           Bundler.settings[:ssl_verify_mode] ||
           Bundler.settings[:ssl_client_cert]
         raise SSLError if needs_ssl && !defined?(OpenSSL::SSL)
 
         con = Net::HTTP::Persistent.new 'bundler', :ENV
 
-        if @remote_uri.scheme == "https"
+        if remote_uri.scheme == "https"
           con.verify_mode = (Bundler.settings[:ssl_verify_mode] ||
             OpenSSL::SSL::VERIFY_PEER)
           con.cert_store = bundler_cert_store
@@ -130,7 +129,7 @@ module Bundler
     end
 
     def uri
-      @anonymizable_uri.without_credentials unless @anonymizable_uri.nil?
+      @anonymizable_uri.without_credentials
     end
 
     # fetch a gem specification
@@ -138,7 +137,7 @@ module Bundler
       spec = spec - [nil, 'ruby', '']
       spec_file_name = "#{spec.join '-'}.gemspec"
 
-      uri = URI.parse("#{@remote_uri}#{Gem::MARSHAL_SPEC_DIR}#{spec_file_name}.rz")
+      uri = URI.parse("#{remote_uri}#{Gem::MARSHAL_SPEC_DIR}#{spec_file_name}.rz")
       if uri.scheme == 'file'
         Bundler.load_marshal Gem.inflate(Gem.read_binary(uri.path))
       elsif cached_spec_path = gemspec_cached_path(spec_file_name)
@@ -176,7 +175,7 @@ module Bundler
         end
       end
 
-      specs[@remote_uri].each do |name, version, platform, dependencies|
+      specs[remote_uri].each do |name, version, platform, dependencies|
         next if name == 'bundler'
         spec = nil
         if dependencies
@@ -208,7 +207,7 @@ module Bundler
         Bundler.ui.info ".", false
       end
 
-      return {@remote_uri => last_spec_list} if query_list.empty?
+      return {remote_uri => last_spec_list} if query_list.empty?
 
       remote_specs = Bundler::Retry.new("dependency api", AUTH_ERRORS).attempts do
         fetch_dependency_remote_specs(query_list)
@@ -225,22 +224,16 @@ module Bundler
     end
 
     def use_api
-      _use_api(true)
-    rescue AuthenticationRequiredError
-      retry_with_auth{_use_api(false)}
-    end
-
-    def _use_api(reraise_auth_error = false)
       return @use_api if defined?(@use_api)
 
-      if @remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
+      if remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
         @use_api = false
       elsif fetch(dependency_api_uri)
         @use_api = true
       end
-    rescue AuthenticationRequiredError => e
-      raise e if reraise_auth_error
-      false
+    rescue AuthenticationRequiredError
+      # We got a 401 from the server. Don't fall back to the full index, just fail.
+      raise
     rescue HTTPError
       @use_api = false
     end
@@ -277,7 +270,7 @@ module Bundler
       when Net::HTTPRequestEntityTooLarge
         raise FallbackError, response.body
       when Net::HTTPUnauthorized
-        raise AuthenticationRequiredError, "#{response.class}: #{response.body}"
+        raise AuthenticationRequiredError, remote_uri
       else
         raise HTTPError, "#{response.class}: #{response.body}"
       end
@@ -328,16 +321,20 @@ module Bundler
     # fetch from modern index: specs.4.8.gz
     def fetch_all_remote_specs
       old_sources = Bundler.rubygems.sources
-      Bundler.rubygems.sources = [@remote_uri.to_s]
+      Bundler.rubygems.sources = [remote_uri.to_s]
       Bundler.rubygems.fetch_all_remote_specs
     rescue Gem::RemoteFetcher::FetchError, OpenSSL::SSL::SSLError => e
       case e.message
       when /certificate verify failed/
         raise CertificateFailureError.new(uri)
-      when /401|403/
-        # Gemfury uses a 403 for unauthenticated requests instead of a 401, so retry auth
-        # on both.
-        retry_with_auth { fetch_all_remote_specs }
+      when /401/
+        raise AuthenticationRequiredError, remote_uri
+      when /403/
+        if remote_uri.userinfo
+          raise BadAuthenticationError, remote_uri
+        else
+          raise AuthenticationRequiredError, remote_uri
+        end
       else
         Bundler.ui.trace e
         raise HTTPError, "Could not fetch specs from #{uri}"
@@ -374,35 +371,35 @@ module Bundler
       store
     end
 
-    # Attempt to retry with HTTP authentication, if it's appropriate to do so. Yields to a block;
-    # the caller should use this to re-attempt the failing request with the altered `@remote_uri`.
-    def retry_with_auth
-      # Authentication has already been attempted and failed.
-      raise BadAuthenticationError.new(uri) if @remote_uri.user
+  private
 
-      auth = Bundler.settings[@remote_uri.to_s]
-
-      # Authentication isn't provided at all, by "bundle config" or in the URI.
-      raise AuthenticationRequiredError.new(uri) if auth.nil?
-
-      @remote_uri.user, @remote_uri.password = *auth.split(":", 2)
-      @anonymizable_uri = AnonymizableURI.new(@remote_uri.dup)
-      yield
+    def resolve_remote_uri(uri)
+      add_configured_credentials(Bundler::Source.mirror_for(uri))
     end
 
-  private
+    def add_configured_credentials(uri)
+      auth = Bundler.settings[uri.to_s]
+      if auth
+        uri = uri.dup
+        uri.user, uri.password = *auth.split(":", 2)
+      end
+      AnonymizableURI.new(uri)
+    end
 
     def fetch_uri
       @fetch_uri ||= begin
-        if @remote_uri.host == "rubygems.org"
-          uri = @remote_uri.dup
+        if remote_uri.host == "rubygems.org"
+          uri = remote_uri.dup
           uri.host = "bundler.rubygems.org"
           uri
         else
-          @remote_uri
+          remote_uri
         end
       end
     end
 
+    def remote_uri
+      @anonymizable_uri.original_uri
+    end
   end
 end
