@@ -93,8 +93,8 @@ describe "bundle gem" do
       expect(bundled_app("test_gem/.consolerc")).to exist
     end
 
-    it "starts with version 0.0.1" do
-      expect(bundled_app("test_gem/lib/test_gem/version.rb").read).to match(/VERSION = "0.0.1"/)
+    it "starts with version 0.1.0" do
+      expect(bundled_app("test_gem/lib/test_gem/version.rb").read).to match(/VERSION = "0.1.0"/)
     end
 
     it "does not nest constants" do
@@ -274,8 +274,8 @@ describe "bundle gem" do
       expect(bundled_app("test-gem/lib/test/gem/version.rb")).to exist
     end
 
-    it "starts with version 0.0.1" do
-      expect(bundled_app("test-gem/lib/test/gem/version.rb").read).to match(/VERSION = "0.0.1"/)
+    it "starts with version 0.1.0" do
+      expect(bundled_app("test-gem/lib/test/gem/version.rb").read).to match(/VERSION = "0.1.0"/)
     end
 
     it "nests constants so they work" do
