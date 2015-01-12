@@ -26,6 +26,32 @@ describe "bundle install" do
     end
   end
 
+  context "with gemfile set via config" do
+    before do
+      gemfile bundled_app("NotGemfile"), <<-G
+        source "file://#{gem_repo1}"
+        gem 'rack'
+      G
+
+      bundle "config --local gemfile #{bundled_app("NotGemfile")}"
+    end
+    it "uses the gemfile to install" do
+      bundle "install"
+      bundle "show"
+
+      expect(out).to include("rack (1.0.0)")
+    end
+    it "uses the gemfile while in a subdirectory" do
+      bundled_app("subdir").mkpath
+      Dir.chdir(bundled_app("subdir")) do
+        bundle "install"
+        bundle "show"
+
+        expect(out).to include("rack (1.0.0)")
+      end
+    end
+  end
+
   context "with deprecated features" do
     before :each do
       in_app_root
