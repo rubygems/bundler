@@ -379,12 +379,10 @@ module Bundler
 
     def add_configured_credentials(uri)
       auth = Bundler.settings[uri.to_s]
-
-      if auth && uri.user.nil?
+      if auth
         uri = uri.dup
         uri.user, uri.password = *auth.split(":", 2)
       end
-
       AnonymizableURI.new(uri)
     end
 
