@@ -11,26 +11,32 @@ module Bundler
     # Instead of taking a dependency on aws-sdk, use a method modeled on
     # the signing method in https://github.com/rubygems/rubygems/pull/856
     def sign(uri, expiration = default_expiration)
-      uri = uri.dup
-      unless uri.user && uri.password
-        raise AuthenticationRequiredError.new("credentials needed in s3 source, like s3://key:secret@bucket-name/")
-      end
-
-      payload = "GET\n\n\n#{expiration}\n/#{uri.host}#{uri.path}"
-      digest = OpenSSL::HMAC.digest('sha1', uri.password, payload)
+      id, secret = s3_source_auth uri.host
+      expiration ||= default_expiration
+      canonical_path = "/#{uri.host}#{uri.path}"
+      payload = "GET\n\n\n#{expiration}\n#{canonical_path}"
+      digest = OpenSSL::HMAC.digest('sha1', secret, payload)
       # URI.escape is deprecated, and there isn't yet a replacement that does quite what we want
       signature = Base64.encode64(digest).gsub("\n", '').gsub(/[\+\/=]/) { |c| BASE64_URI_TRANSLATE[c] }
-      uri.query = [uri.query, "AWSAccessKeyId=#{uri.user}&Expires=#{expiration}&Signature=#{signature}"].compact.join('&')
-      uri.user = nil
-      uri.password = nil
-      uri.scheme = "https"
-      uri.host = [uri.host, "s3.amazonaws.com"].join('.')
-
-      URI.parse(uri.to_s)
+      URI.parse("https://#{uri.host}.s3.amazonaws.com#{uri.path}?AWSAccessKeyId=#{id}&Expires=#{expiration}&Signature=#{signature}")
     end
 
     def default_expiration
       (Time.now + 3600).to_i # one hour from now
+    end
+
+    # Gem configuration appears to be mutable within the Gemfile in case of project-specific AWS keys not present in the .gemrc:
+    #
+    # Gem.configuration[:s3_source] = {'bucketname' => {id: 'aws id', secret: 'aws secret'}}
+    def s3_source_auth(host)
+      s3_source = Gem.configuration[:s3_source] || Gem.configuration['s3_source']
+      raise GemspecError.new('no s3_source key exists in .gemrc') unless s3_source
+      auth = s3_source[host] || s3_source[host.to_sym]
+      raise GemspecError.new("no key for host #{host} in s3_source in .gemrc") unless auth
+      id = auth[:id] || auth['id']
+      secret = auth[:secret] || auth['secret']
+      raise  GemspecError.new("s3_source for #{host} missing id or secret") unless id and secret
+      [id, secret]
     end
 
     BASE64_URI_TRANSLATE = { '+' => '%2B', '/' => '%2F', '=' => '%3D' }.freeze

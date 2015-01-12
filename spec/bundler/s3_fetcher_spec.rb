@@ -8,13 +8,16 @@ describe Bundler::S3Fetcher do
   describe "sign" do
     it "requires authentication" do
       url = "s3://foo"
-      expect { Bundler::S3Fetcher.new(url).sign(URI(url))}.to raise_error(Bundler::Fetcher::AuthenticationRequiredError)
+      expect { Bundler::S3Fetcher.new(url).sign(URI(url))}.to raise_error(Bundler::GemspecError)
     end
 
     it "signs S3 requests" do
-      accessId = "a"
-      secretKey = "b"
-      url = "s3://#{accessId}:#{secretKey}@foo"
+      accessId = "AKHAJIHAFOW6WWJUV5RA"
+      Gem.configuration[:s3_source] = {"foo" => {
+        id: accessId,
+        secret: "7UVCy7cYjEzwfwLwwQR/DlOdJ7V+c7GFWKZDn8yx9"
+      } }
+      url = "s3://foo/"
       time = Time.utc(2014, 6, 1).to_i
 
       actual = Bundler::S3Fetcher.new(url).sign(URI(url), time)
@@ -23,7 +26,7 @@ describe Bundler::S3Fetcher do
       query = CGI.parse(actual.query)
       expect(query['AWSAccessKeyId']).to eq [accessId]
       expect(query['Expires']).to eq [time.to_s]
-      expect(query['Signature']).to eq ["2ZFX8vg7E04u/UqUH9F/cKiQjJA="]
+      expect(query['Signature']).to eq ["9IrED0v8ae/VwAr0E9eoy9mcE4Y="]
     end
   end
 end
