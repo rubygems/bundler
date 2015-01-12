@@ -14,8 +14,8 @@ describe Bundler::S3Fetcher do
     it "signs S3 requests" do
       accessId = "AKHAJIHAFOW6WWJUV5RA"
       Gem.configuration[:s3_source] = {"foo" => {
-        id: accessId,
-        secret: "7UVCy7cYjEzwfwLwwQR/DlOdJ7V+c7GFWKZDn8yx9"
+        :id => accessId,
+        :secret => "7UVCy7cYjEzwfwLwwQR/DlOdJ7V+c7GFWKZDn8yx9"
       } }
       url = "s3://foo/"
       time = Time.utc(2014, 6, 1).to_i
