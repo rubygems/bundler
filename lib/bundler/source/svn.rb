@@ -76,7 +76,7 @@ module Bundler
       # repos, this is set to the local repo.
       def install_path
         @install_path ||= begin
-          svn_scope = "#{base_name}-#{revision}"
+          svn_scope = options["no-version"] ? base_name : extension_dir_name
 
           if Bundler.requires_sudo?
             Bundler.user_bundle_path.join(Bundler.ruby_scope).join(svn_scope)
