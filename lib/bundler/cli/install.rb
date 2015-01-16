@@ -36,6 +36,8 @@ module Bundler
         Bundler.settings["trust-policy"] = nil if Bundler.settings["trust-policy"]
       end
 
+      Bundler.settings[:cache_path] = options["cache-path"]
+
       if options[:deployment] || options[:frozen]
         unless Bundler.default_lockfile.exist?
           flag = options[:deployment] ? '--deployment' : '--frozen'
@@ -44,7 +46,7 @@ module Bundler
                                  "before deploying."
         end
 
-        if Bundler.root.join("vendor/cache").exist?
+        if Bundler.app_cache.exist?
           options[:local] = true
         end
 
@@ -57,18 +59,18 @@ module Bundler
         options[:system] = true
       end
 
-      Bundler.settings[:path]     = nil if options[:system]
-      Bundler.settings[:path]     = "vendor/bundle" if options[:deployment]
-      Bundler.settings[:path]     = options["path"] if options["path"]
-      Bundler.settings[:path]     ||= "bundle" if options["standalone"]
-      Bundler.settings[:bin]      = options["binstubs"] if options["binstubs"]
-      Bundler.settings[:bin]      = nil if options["binstubs"] && options["binstubs"].empty?
-      Bundler.settings[:shebang]  = options["shebang"] if options["shebang"]
-      Bundler.settings[:jobs]     = options["jobs"] if options["jobs"]
-      Bundler.settings[:no_prune] = true if options["no-prune"]
+      Bundler.settings[:path]       = nil if options[:system]
+      Bundler.settings[:path]       = "vendor/bundle" if options[:deployment]
+      Bundler.settings[:path]       = options["path"] if options["path"]
+      Bundler.settings[:path]       ||= "bundle" if options["standalone"]
+      Bundler.settings[:bin]        = options["binstubs"] if options["binstubs"]
+      Bundler.settings[:bin]        = nil if options["binstubs"] && options["binstubs"].empty?
+      Bundler.settings[:shebang]    = options["shebang"] if options["shebang"]
+      Bundler.settings[:jobs]       = options["jobs"] if options["jobs"]
+      Bundler.settings[:no_prune]   = true if options["no-prune"]
       Bundler.settings[:no_install] = true if options["no-install"]
-      Bundler.settings[:clean]    = options["clean"] if options["clean"]
-      Bundler.settings.without    = options[:without]
+      Bundler.settings[:clean]      = options["clean"] if options["clean"]
+      Bundler.settings.without      = options[:without]
       Bundler::Fetcher.disable_endpoint = options["full-index"]
       Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? '1' : nil
 
@@ -78,7 +80,7 @@ module Bundler
       definition = Bundler.definition
       definition.validate_ruby!
       Installer.install(Bundler.root, definition, options)
-      Bundler.load.cache if Bundler.root.join("vendor/cache").exist? && !options["no-cache"] && !Bundler.settings[:frozen]
+      Bundler.load.cache if Bundler.app_cache.exist? && !options["no-cache"] && !Bundler.settings[:frozen]
 
       Bundler.ui.confirm "Bundle complete! #{dependencies_count_for(definition)}, #{gems_installed_for(definition)}."
       confirm_without_groups
@@ -112,7 +114,7 @@ module Bundler
       end
     rescue GemNotFound, VersionConflict => e
       if options[:local] && Bundler.app_cache.exist?
-        Bundler.ui.warn "Some gems seem to be missing from your vendor/cache directory."
+        Bundler.ui.warn "Some gems seem to be missing from your #{Bundler.settings.cache_path} directory."
       end
 
       unless Bundler.definition.has_rubygems_remotes?

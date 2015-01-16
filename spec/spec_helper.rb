@@ -103,6 +103,7 @@ RSpec.configure do |config|
     ENV['PATH']                  = original_path
     ENV['GEM_HOME']              = original_gem_home
     ENV['GEM_PATH']              = original_gem_home
+    ENV['BUNDLE_CACHE_PATH']     = nil
     ENV['BUNDLE_PATH']           = nil
     ENV['BUNDLE_GEMFILE']        = nil
     ENV['BUNDLE_FROZEN']         = nil

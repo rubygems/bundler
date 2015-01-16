@@ -36,8 +36,8 @@ module Spec
       bundled_app(*["vendor/bundle", Gem.ruby_engine, Gem::ConfigMap[:ruby_version], path].compact)
     end
 
-    def cached_gem(path)
-      bundled_app("vendor/cache/#{path}.gem")
+    def cached_gem(path, options = {})
+      bundled_app("#{Bundler.settings.cache_path}/#{path}.gem")
     end
 
     def base_system_gems

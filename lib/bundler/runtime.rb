@@ -109,7 +109,7 @@ module Bundler
       cache_path = cache_path(custom_path)
       FileUtils.mkdir_p(cache_path) unless File.exist?(cache_path)
 
-      Bundler.ui.info "Updating files in vendor/cache"
+      Bundler.ui.info "Updating files in #{Bundler.settings.cache_path}"
       specs.each do |spec|
         next if spec.name == 'bundler'
         spec.source.send(:fetch_gem, spec) if Bundler.settings[:cache_all_platforms] && spec.source.respond_to?(:fetch_gem, true)
@@ -240,7 +240,7 @@ module Bundler
       end
 
       if cached.any?
-        Bundler.ui.info "Removing outdated .gem files from vendor/cache"
+        Bundler.ui.info "Removing outdated .gem files from #{Bundler.settings.cache_path}"
 
         cached.each do |path|
           Bundler.ui.info "  * #{File.basename(path)}"
@@ -262,7 +262,7 @@ module Bundler
       end
 
       if cached.any?
-        Bundler.ui.info "Removing outdated git and path gems from vendor/cache"
+        Bundler.ui.info "Removing outdated git and path gems from #{Bundler.settings.cache_path}"
 
         cached.each do |path|
           path = File.dirname(path)
@@ -291,7 +291,7 @@ module Bundler
 
     def cache_path(custom_path = nil)
       path = custom_path || root
-      path.join("vendor/cache")
+      path.join(Bundler.settings.cache_path)
     end
   end
 end

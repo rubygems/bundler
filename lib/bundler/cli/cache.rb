@@ -8,6 +8,7 @@ module Bundler
     def run
       Bundler.definition.validate_ruby!
       Bundler.definition.resolve_with_cache!
+      Bundler.settings[:cache_path] = options["cache-path"]
       setup_cache_all
       Bundler.settings[:cache_all_platforms] = options["all-platforms"] if options.key?("all-platforms")
       Bundler.load.cache
