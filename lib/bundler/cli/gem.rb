@@ -36,6 +36,7 @@ module Bundler
         :test             => options[:test],
         :ext              => options[:ext]
       }
+      valid_name?(opts)
 
       templates = {
         "Gemfile.tt" => "Gemfile",
@@ -91,6 +92,16 @@ module Bundler
 
     def resolve_name(name)
       Pathname.pwd.join(name).basename.to_s
+    end
+
+    def valid_name? opts
+      if opts[:name] =~ /^\d/
+        Bundler.ui.error "Invalid gem name #{opts[:name]}. Please give a name which does not start with numbers."
+        exit 1
+      elsif Object.const_defined?(opts[:constant_array].first)
+        Bundler.ui.error "Invalid gem name #{opts[:name]}, constant #{opts[:constant_name]} is already in use. Please choose another gem name."
+        exit 1
+      end
     end
 
     def validate_ext_name
