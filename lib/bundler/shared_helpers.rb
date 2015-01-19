@@ -74,6 +74,25 @@ module Bundler
       keys.each {|key| ENV[key] = old_env[key] }
     end
 
+    def set_bundle_environment
+      # Set PATH
+      paths = (ENV["PATH"] || "").split(File::PATH_SEPARATOR)
+      paths.unshift "#{Bundler.bundle_path}/bin"
+      ENV["PATH"] = paths.uniq.join(File::PATH_SEPARATOR)
+
+      # Set RUBYOPT
+      rubyopt = [ENV["RUBYOPT"]].compact
+      if rubyopt.empty? || rubyopt.first !~ /-rbundler\/setup/
+        rubyopt.unshift %|-rbundler/setup|
+        ENV["RUBYOPT"] = rubyopt.join(' ')
+      end
+
+      # Set RUBYLIB
+      rubylib = (ENV["RUBYLIB"] || "").split(File::PATH_SEPARATOR)
+      rubylib.unshift File.expand_path('../..', __FILE__)
+      ENV["RUBYLIB"] = rubylib.uniq.join(File::PATH_SEPARATOR)
+    end
+
   private
 
     def find_gemfile

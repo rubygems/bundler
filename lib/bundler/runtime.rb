@@ -220,25 +220,10 @@ module Bundler
         ENV["BUNDLE_BIN_PATH"] = File.expand_path("../../../bin/bundle", __FILE__)
       end
 
-      # Set PATH
-      paths = (ENV["PATH"] || "").split(File::PATH_SEPARATOR)
-      paths.unshift "#{Bundler.bundle_path}/bin"
-      ENV["PATH"] = paths.uniq.join(File::PATH_SEPARATOR)
-
       # Set BUNDLE_GEMFILE
       ENV["BUNDLE_GEMFILE"] = default_gemfile.to_s
 
-      # Set RUBYOPT
-      rubyopt = [ENV["RUBYOPT"]].compact
-      if rubyopt.empty? || rubyopt.first !~ /-rbundler\/setup/
-        rubyopt.unshift %|-rbundler/setup|
-        ENV["RUBYOPT"] = rubyopt.join(' ')
-      end
-
-      # Set RUBYLIB
-      rubylib = (ENV["RUBYLIB"] || "").split(File::PATH_SEPARATOR)
-      rubylib.unshift File.expand_path('../..', __FILE__)
-      ENV["RUBYLIB"] = rubylib.uniq.join(File::PATH_SEPARATOR)
+      SharedHelpers.set_bundle_environment
     end
 
   private
