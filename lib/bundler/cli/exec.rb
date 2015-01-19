@@ -67,8 +67,7 @@ module Bundler
 
       {
         'RUBYOPT' => rubyopt.join(' '),
-        'RUBYLIB' => rubylib.uniq.join(File::PATH_SEPARATOR),
-        'FORCE_TTY' => 'true'
+        'RUBYLIB' => rubylib.uniq.join(File::PATH_SEPARATOR)
       }
     end
 

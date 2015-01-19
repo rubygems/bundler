@@ -2,7 +2,8 @@ require 'bundler/shared_helpers'
 
 if Bundler::SharedHelpers.in_bundle?
   require 'bundler'
-  if STDOUT.tty? || ENV['FORCE_TTY']
+
+  if STDOUT.tty? || ENV['BUNDLER_FORCE_TTY']
     begin
       Bundler.setup
     rescue Bundler::BundlerError => e

@@ -790,6 +790,7 @@ G
 
   context "bundle exec" do
     before do
+      ENV["BUNDLER_FORCE_TTY"] = "true"
       system_gems "rack-1.0.0", "rack-0.9.1"
     end
 
