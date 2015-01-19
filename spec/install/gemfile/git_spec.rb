@@ -655,7 +655,7 @@ describe "bundle install with git sources" do
     G
 
     bundle "install"
-    bundle "install", :exitstatus => true
+    bundle "install"
     expect(exitstatus).to eq(0)
   end
 
@@ -759,7 +759,7 @@ describe "bundle install with git sources" do
 
       simulate_new_machine
 
-      bundle "install --deployment", :exitstatus => true
+      bundle "install --deployment"
       expect(exitstatus).to eq(0)
     end
   end
@@ -921,7 +921,7 @@ describe "bundle install with git sources" do
       ENV['GIT_DIR']       = 'bar'
       ENV['GIT_WORK_TREE'] = 'bar'
 
-      install_gemfile <<-G, :exitstatus => true
+      install_gemfile <<-G
         source "file://#{gem_repo1}"
         git "#{lib_path('xxxxxx-1.0')}" do
           gem 'xxxxxx'
@@ -959,7 +959,7 @@ describe "bundle install with git sources" do
       bundle "package --all"
       simulate_new_machine
 
-      bundle "install", :env => {"PATH" => ""}, :exitstatus => true
+      bundle "install", :env => {"PATH" => ""}
       expect(out).to_not include("You need to install git to be able to use gems from git repositories.")
       expect(exitstatus).to be_zero
     end

@@ -45,7 +45,7 @@ describe "bundle binstubs <gem>" do
         gem "rack"
       G
 
-      bundle "binstubs", :exitstatus => true
+      bundle "binstubs"
       expect(exitstatus).to eq(1)
       expect(out).to eq("`bundle binstubs` needs at least one gem to run.")
     end
@@ -126,7 +126,7 @@ describe "bundle binstubs <gem>" do
         source "file://#{gem_repo1}"
       G
 
-      bundle "binstubs doesnt_exist", :exitstatus => true
+      bundle "binstubs doesnt_exist"
 
       expect(exitstatus).to eq(7)
       expect(out).to eq("Could not find gem 'doesnt_exist'.")

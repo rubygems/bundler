@@ -189,7 +189,7 @@ describe "bundle exec" do
       gem "rack"
     G
 
-    bundle "exec foobarbaz", :exitstatus => true
+    bundle "exec foobarbaz"
     expect(exitstatus).to eq(127)
     expect(out).to include("bundler: command not found: foobarbaz")
     expect(out).to include("Install missing gem executables with `bundle install`")
@@ -201,7 +201,7 @@ describe "bundle exec" do
     G
 
     bundle "exec touch foo"
-    bundle "exec ./foo", :exitstatus => true
+    bundle "exec ./foo"
     expect(exitstatus).to eq(126)
     expect(out).to include("bundler: not executable: ./foo")
   end
@@ -211,7 +211,7 @@ describe "bundle exec" do
       gem "rack"
     G
 
-    bundle "exec", :exitstatus => true
+    bundle "exec"
     expect(exitstatus).to eq(128)
     expect(out).to include("bundler: exec needs a command to run")
   end

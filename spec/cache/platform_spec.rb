@@ -34,7 +34,7 @@ describe "bundle cache with multiple platforms" do
   end
 
   it "ensures that a succesful bundle install does not delete gems for other platforms" do
-    bundle "install", :exitstatus => true
+    bundle "install"
 
     expect(exitstatus).to eq 0
 
@@ -43,7 +43,7 @@ describe "bundle cache with multiple platforms" do
   end
 
   it "ensures that a succesful bundle update does not delete gems for other platforms" do
-    bundle "update", :exitstatus => true
+    bundle "update"
 
     expect(exitstatus).to eq 0
 

@@ -306,7 +306,7 @@ describe "bundle clean" do
 
     bundle "install --path vendor/bundle --without development"
 
-    bundle :clean, :exitstatus => true
+    bundle :clean
     expect(exitstatus).to eq(0)
   end
 
@@ -317,7 +317,7 @@ describe "bundle clean" do
       gem "rack", "1.0.0"
     G
 
-    bundle :clean, :exitstatus => true
+    bundle :clean
 
     expect(exitstatus).to eq(1)
     expect(out).to include("--force")
@@ -563,7 +563,7 @@ describe "bundle clean" do
     G
 
     bundle "install --path vendor/bundle"
-    bundle :clean, :exitstatus => true
+    bundle :clean
 
     expect(exitstatus).to eq(0)
   end

@@ -78,7 +78,7 @@ describe "bundle install with explicit source paths" do
       gem 'foo', :path => File.expand_path("../foo-1.0", __FILE__)
     G
 
-    bundle "install --frozen", :exitstatus => true
+    bundle "install --frozen"
     expect(exitstatus).to eq(0)
   end
 
@@ -199,7 +199,7 @@ describe "bundle install with explicit source paths" do
       s.write "bar.gemspec"
     end
 
-    install_gemfile <<-G, :exitstatus => true
+    install_gemfile <<-G
       gemspec :path => "#{lib_path("foo")}"
     G
 
@@ -212,7 +212,7 @@ describe "bundle install with explicit source paths" do
       s.write "bar.gemspec"
     end
 
-    install_gemfile <<-G, :exitstatus => true
+    install_gemfile <<-G
       gemspec :path => "#{lib_path("foo")}", :name => "foo"
     G
 

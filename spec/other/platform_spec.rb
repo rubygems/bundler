@@ -151,7 +151,7 @@ G
         gem "foo"
       G
 
-      bundle "platform", :exitstatus => true
+      bundle "platform"
 
       expect(exitstatus).not_to eq(0)
     end
@@ -164,7 +164,7 @@ G
         gem "foo"
       G
 
-      bundle "platform", :exitstatus => true
+      bundle "platform"
 
       expect(exitstatus).not_to eq(0)
     end
@@ -177,7 +177,7 @@ G
         gem "foo"
       G
 
-      bundle "platform", :exitstatus => true
+      bundle "platform"
 
       expect(exitstatus).not_to eq(0)
     end
@@ -222,13 +222,11 @@ G
 
   def should_be_patchlevel_incorrect(opts = {:exitstatus => true})
     expect(exitstatus).to eq(18) if opts[:exitstatus]
-
     expect(out).to be_include("Your Ruby patchlevel is #{RUBY_PATCHLEVEL}, but your Gemfile specified #{not_local_patchlevel}")
   end
 
   def should_be_patchlevel_fixnum(opts = {:exitstatus => true})
     expect(exitstatus).to eq(18) if opts[:exitstatus]
-
     expect(out).to be_include("The Ruby patchlevel in your Gemfile must be a string")
   end
 
@@ -269,7 +267,7 @@ G
     end
 
     it "doesn't install when the ruby version doesn't match" do
-      install_gemfile <<-G, :exitstatus => true
+      install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
 
@@ -281,7 +279,7 @@ G
     end
 
     it "doesn't install when engine doesn't match" do
-      install_gemfile <<-G, :exitstatus => true
+      install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
 
@@ -294,7 +292,7 @@ G
 
     it "doesn't install when engine version doesn't match" do
       simulate_ruby_engine "jruby" do
-        install_gemfile <<-G, :exitstatus => true
+        install_gemfile <<-G
           source "file://#{gem_repo1}"
           gem "rack"
 
@@ -307,7 +305,7 @@ G
     end
 
     it "doesn't install when patchlevel doesn't match" do
-      install_gemfile <<-G, :exitstatus => true
+      install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
 
@@ -333,7 +331,7 @@ G
         #{ruby_version_correct}
       G
 
-      bundle :check, :exitstatus => true
+      bundle :check
       expect(exitstatus).to eq(0)
       expect(out).to eq("The Gemfile's dependencies are satisfied")
     end
@@ -352,7 +350,7 @@ G
           #{ruby_version_correct_engineless}
         G
 
-        bundle :check, :exitstatus => true
+        bundle :check
         expect(exitstatus).to eq(0)
         expect(out).to eq("The Gemfile's dependencies are satisfied")
       end
@@ -371,7 +369,7 @@ G
         #{ruby_version_incorrect}
       G
 
-      bundle :check, :exitstatus => true
+      bundle :check
       should_be_ruby_version_incorrect
     end
 
@@ -388,7 +386,7 @@ G
         #{engine_incorrect}
       G
 
-      bundle :check, :exitstatus => true
+      bundle :check
       should_be_engine_incorrect
     end
 
@@ -406,13 +404,13 @@ G
           #{engine_version_incorrect}
         G
 
-        bundle :check, :exitstatus => true
+        bundle :check
         should_be_engine_version_incorrect
       end
     end
 
     it "fails when patchlevel doesn't match" do
-      install_gemfile <<-G, :exitstatus => true
+      install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
       G
@@ -424,7 +422,7 @@ G
         #{patchlevel_incorrect}
       G
 
-      bundle :check, :exitstatus => true
+      bundle :check
       should_be_patchlevel_incorrect
     end
   end
@@ -486,7 +484,7 @@ G
         build_gem "activesupport", "3.0"
       end
 
-      bundle :update, :exitstatus => true
+      bundle :update
       should_be_ruby_version_incorrect
     end
 
@@ -502,7 +500,7 @@ G
         build_gem "activesupport", "3.0"
       end
 
-      bundle :update, :exitstatus => true
+      bundle :update
       should_be_engine_incorrect
     end
 
@@ -519,13 +517,13 @@ G
           build_gem "activesupport", "3.0"
         end
 
-        bundle :update, :exitstatus => true
+        bundle :update
         should_be_engine_version_incorrect
       end
     end
 
     it "fails when patchlevel doesn't match" do
-      gemfile <<-G, :exitstatus => true
+      gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
 
@@ -535,7 +533,7 @@ G
         build_gem "activesupport", "3.0"
       end
 
-      bundle :update, :exitstatus => true
+      bundle :update
       should_be_patchlevel_incorrect
     end
   end
@@ -582,7 +580,7 @@ G
         #{ruby_version_incorrect}
       G
 
-      bundle "show rails", :exitstatus => true
+      bundle "show rails"
       should_be_ruby_version_incorrect
     end
 
@@ -594,7 +592,7 @@ G
         #{engine_incorrect}
       G
 
-      bundle "show rails", :exitstatus => true
+      bundle "show rails"
       should_be_engine_incorrect
     end
 
@@ -607,13 +605,13 @@ G
           #{engine_version_incorrect}
         G
 
-        bundle "show rails", :exitstatus => true
+        bundle "show rails"
         should_be_engine_version_incorrect
       end
     end
 
     it "fails when patchlevel doesn't match" do
-      gemfile <<-G, :exitstatus => true
+      gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
 
@@ -623,7 +621,7 @@ G
         build_gem "activesupport", "3.0"
       end
 
-      bundle "show rails", :exitstatus => true
+      bundle "show rails"
       should_be_patchlevel_incorrect
     end
   end
@@ -668,7 +666,7 @@ G
         #{ruby_version_incorrect}
       G
 
-      bundle :cache, :exitstatus => true
+      bundle :cache
       should_be_ruby_version_incorrect
     end
 
@@ -679,7 +677,7 @@ G
         #{engine_incorrect}
       G
 
-      bundle :cache, :exitstatus => true
+      bundle :cache
       should_be_engine_incorrect
     end
 
@@ -691,20 +689,20 @@ G
           #{engine_version_incorrect}
         G
 
-        bundle :cache, :exitstatus => true
+        bundle :cache
         should_be_engine_version_incorrect
       end
     end
 
     it "fails when patchlevel doesn't match" do
-      gemfile <<-G, :exitstatus => true
+      gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
 
         #{patchlevel_incorrect}
       G
 
-      bundle :cache, :exitstatus => true
+      bundle :cache
       should_be_patchlevel_incorrect
     end
   end
@@ -749,7 +747,7 @@ G
         #{ruby_version_incorrect}
       G
 
-      bundle :pack, :exitstatus => true
+      bundle :pack
       should_be_ruby_version_incorrect
     end
 
@@ -760,7 +758,7 @@ G
         #{engine_incorrect}
       G
 
-      bundle :pack, :exitstatus => true
+      bundle :pack
       should_be_engine_incorrect
     end
 
@@ -772,20 +770,20 @@ G
           #{engine_version_incorrect}
         G
 
-        bundle :pack, :exitstatus => true
+        bundle :pack
         should_be_engine_version_incorrect
       end
     end
 
     it "fails when patchlevel doesn't match" do
-      gemfile <<-G, :exitstatus => true
+      gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
 
         #{patchlevel_incorrect}
       G
 
-      bundle :pack, :exitstatus => true
+      bundle :pack
       should_be_patchlevel_incorrect
     end
   end
@@ -826,7 +824,7 @@ G
         #{ruby_version_incorrect}
       G
 
-      bundle "exec rackup", :exitstatus => true
+      bundle "exec rackup"
       should_be_ruby_version_incorrect
     end
 
@@ -837,7 +835,7 @@ G
         #{engine_incorrect}
       G
 
-      bundle "exec rackup", :exitstatus => true
+      bundle "exec rackup"
       should_be_engine_incorrect
     end
 
@@ -849,20 +847,20 @@ G
           #{engine_version_incorrect}
         G
 
-        bundle "exec rackup", :exitstatus => true
+        bundle "exec rackup"
         should_be_engine_version_incorrect
       end
     end
 
     it "fails when patchlevel doesn't match" do
-      gemfile <<-G, :exitstatus => true
+      gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
 
         #{patchlevel_incorrect}
       G
 
-      bundle "exec rackup", :exitstatus => true
+      bundle "exec rackup"
       should_be_patchlevel_incorrect
     end
   end
@@ -923,7 +921,7 @@ G
         #{ruby_version_incorrect}
       G
 
-      bundle "console", :exitstatus => true
+      bundle "console"
       should_be_ruby_version_incorrect
     end
 
@@ -937,7 +935,7 @@ G
         #{engine_incorrect}
       G
 
-      bundle "console", :exitstatus => true
+      bundle "console"
       should_be_engine_incorrect
     end
 
@@ -952,13 +950,13 @@ G
           #{engine_version_incorrect}
         G
 
-        bundle "console", :exitstatus => true
+        bundle "console"
         should_be_engine_version_incorrect
       end
     end
 
     it "fails when patchlevel doesn't match" do
-      gemfile <<-G, :exitstatus => true
+      gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
         gem "activesupport", :group => :test
@@ -967,7 +965,7 @@ G
         #{patchlevel_incorrect}
       G
 
-      bundle "console", :exitstatus => true
+      bundle "console"
       should_be_patchlevel_incorrect
     end
   end
@@ -1200,7 +1198,7 @@ G
         #{ruby_version_incorrect}
       G
 
-      bundle "outdated", :exitstatus => true
+      bundle "outdated"
       should_be_ruby_version_incorrect
     end
 
@@ -1218,7 +1216,7 @@ G
         #{engine_incorrect}
       G
 
-      bundle "outdated", :exitstatus => true
+      bundle "outdated"
       should_be_engine_incorrect
     end
 
@@ -1237,7 +1235,7 @@ G
           #{engine_version_incorrect}
         G
 
-        bundle "outdated", :exitstatus => true
+        bundle "outdated"
         should_be_engine_version_incorrect
       end
     end
@@ -1257,7 +1255,7 @@ G
           #{patchlevel_incorrect}
         G
 
-        bundle "outdated", :exitstatus => true
+        bundle "outdated"
         should_be_patchlevel_incorrect
       end
     end
@@ -1277,7 +1275,7 @@ G
           #{patchlevel_fixnum}
         G
 
-        bundle "outdated", :exitstatus => true
+        bundle "outdated"
         should_be_patchlevel_fixnum
       end
     end

@@ -186,7 +186,7 @@ describe "bundle install --standalone" do
       end
 
       it "should run without errors" do
-        bundle "install --standalone", :artifice => "endpoint", :exitstatus => true
+        bundle "install --standalone", :artifice => "endpoint"
 
         expect(@exitstatus).to eq(0)
       end

@@ -42,13 +42,13 @@ describe "bundle outdated" do
         update_git "foo", :path => lib_path("foo")
       end
 
-      bundle "outdated", :exitstatus => true
+      bundle "outdated"
 
       expect(exitstatus).to_not be_zero
     end
 
     it "returns success exit status if no outdated gems present" do
-      bundle "outdated", :exitstatus => true
+      bundle "outdated"
 
       expect(exitstatus).to be_zero
     end
@@ -149,7 +149,7 @@ describe "bundle outdated" do
     end
 
     it "returns non-zero exit code" do
-      bundle "outdated invalid_gem_name", :exitstatus => true
+      bundle "outdated invalid_gem_name"
       expect(exitstatus).to_not be_zero
     end
   end

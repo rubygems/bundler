@@ -108,7 +108,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle "install", :artifice => "endpoint"
-    bundle "install --deployment", :artifice => "endpoint", :exitstatus => true
+    bundle "install --deployment", :artifice => "endpoint"
 
     expect(exitstatus).to eq(0)
     should_be_installed("foo 1.0")
@@ -603,7 +603,7 @@ describe "gemcutter's dependency API" do
         gem 'rack'
       G
 
-      bundle "install", :exitstatus => true, :artifice => "endpoint_marshal_fail"
+      bundle "install", :artifice => "endpoint_marshal_fail"
 
       expect(exitstatus).to eq(0)
     end

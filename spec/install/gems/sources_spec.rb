@@ -91,7 +91,7 @@ describe "bundle install with gems on multiple sources" do
         expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
         expect(bundled_app("vendor/cache/rack-obama-1.0.gem")).to exist
 
-        bundle "install --deployment", :exitstatus => true
+        bundle "install --deployment"
 
         expect(exitstatus).to eq(0)
         should_be_installed("rack-obama 1.0.0", "rack 1.0.0")

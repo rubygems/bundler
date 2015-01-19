@@ -96,7 +96,7 @@ describe "bundle install with gem sources" do
     end
 
     it "raises an appropriate error when gems are specified using symbols" do
-      status = install_gemfile(<<-G, :exitstatus => true)
+      status = install_gemfile(<<-G)
         source "file://#{gem_repo1}"
         gem :rack
       G
@@ -319,7 +319,7 @@ describe "bundle install with gem sources" do
       FileUtils.mkdir_p(bundled_app(".bundle"))
       FileUtils.touch(bundled_app(".bundle/config"))
 
-      install_gemfile(<<-G, :exitstatus => true)
+      install_gemfile(<<-G)
         source "file://#{gem_repo1}"
 
         gem 'foo'
@@ -331,7 +331,7 @@ describe "bundle install with gem sources" do
       FileUtils.mkdir_p("#{Bundler.rubygems.user_home}/.bundle")
       FileUtils.touch("#{Bundler.rubygems.user_home}/.bundle/config")
 
-      install_gemfile(<<-G, :exitstatus => true)
+      install_gemfile(<<-G)
         source "file://#{gem_repo1}"
 
         gem 'foo'
@@ -357,7 +357,7 @@ describe "bundle install with gem sources" do
         file.puts gemfile
       end
 
-      bundle :install, :exitstatus => true
+      bundle :install
 
       expect(exitstatus).to eq(0)
     end

@@ -173,7 +173,7 @@ describe "bundle install with platform conditionals" do
       end
     G
 
-    bundle :show, :exitstatus => true
+    bundle :show
     expect(exitstatus).to eq(0)
   end
 

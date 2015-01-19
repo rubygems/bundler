@@ -16,7 +16,7 @@ describe "bundle install with win32-generated lockfile" do
       f << "  rack\r\n"
     end
 
-    install_gemfile <<-G, :exitstatus => true
+    install_gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack"

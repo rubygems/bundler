@@ -20,7 +20,7 @@ describe "install with --deployment or --frozen" do
 
   it "works after you try to deploy without a lock" do
     bundle "install --deployment"
-    bundle :install, :exitstatus => true
+    bundle :install
     expect(exitstatus).to eq(0)
     should_be_installed "rack 1.0"
   end
@@ -42,7 +42,7 @@ describe "install with --deployment or --frozen" do
       end
     G
     bundle :install
-    bundle "install --deployment --without test", :exitstatus => true
+    bundle "install --deployment --without test"
     expect(exitstatus).to eq(0)
   end
 
@@ -54,14 +54,14 @@ describe "install with --deployment or --frozen" do
       end
     G
     bundle :install
-    bundle "install --deployment --without test", :exitstatus => true
+    bundle "install --deployment --without test"
     expect(exitstatus).to eq(0)
   end
 
   it "works when you bundle exec bundle" do
     bundle :install
     bundle "install --deployment"
-    bundle "exec bundle check", :exitstatus => true
+    bundle "exec bundle check"
     expect(exitstatus).to eq(0)
   end
 
@@ -74,7 +74,7 @@ describe "install with --deployment or --frozen" do
     G
 
     bundle :install
-    bundle "install --deployment", :exitstatus => true
+    bundle "install --deployment"
 
     expect(exitstatus).to eq(0)
   end
@@ -86,7 +86,7 @@ describe "install with --deployment or --frozen" do
       gem "rack-obama", ">= 1.0"
     G
 
-    bundle "install --deployment", :exitstatus => true, :artifice => "endpoint_strict_basic_authentication"
+    bundle "install --deployment", :artifice => "endpoint_strict_basic_authentication"
 
     expect(exitstatus).to eq(0)
   end
@@ -98,7 +98,7 @@ describe "install with --deployment or --frozen" do
       end
     G
 
-    bundle "install --deployment", :exitstatus => true
+    bundle "install --deployment"
 
     expect(exitstatus).to eq(0)
     should_be_installed "rack 1.0"
@@ -110,12 +110,12 @@ describe "install with --deployment or --frozen" do
     end
 
     it "works with the --deployment flag if you didn't change anything" do
-      bundle "install --deployment", :exitstatus => true
+      bundle "install --deployment"
       expect(exitstatus).to eq(0)
     end
 
     it "works with the --frozen flag if you didn't change anything" do
-      bundle "install --frozen", :exitstatus => true
+      bundle "install --frozen"
       expect(exitstatus).to eq(0)
     end
 

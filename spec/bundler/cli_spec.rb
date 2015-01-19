@@ -5,12 +5,12 @@ describe "bundle executable" do
   let(:source_uri) { "http://localgemserver.test" }
 
   it "returns non-zero exit status when passed unrecognized options" do
-    bundle '--invalid_argument', :exitstatus => true
+    bundle '--invalid_argument'
     expect(exitstatus).to_not be_zero
   end
 
   it "returns non-zero exit status when passed unrecognized task" do
-    bundle 'unrecognized-tast', :exitstatus => true
+    bundle 'unrecognized-tast'
     expect(exitstatus).to_not be_zero
   end
 
@@ -20,7 +20,7 @@ describe "bundle executable" do
     end
 
     with_path_as(tmp) do
-      bundle 'testtasks', :exitstatus => true
+      bundle 'testtasks'
     end
 
     expect(exitstatus).to be_zero

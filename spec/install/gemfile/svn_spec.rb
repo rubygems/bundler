@@ -393,7 +393,7 @@ describe "bundle install with svn sources" do
     G
 
     bundle "install"
-    bundle "install", :exitstatus => true
+    bundle "install"
     expect(exitstatus).to eq(0)
   end
 
@@ -453,7 +453,7 @@ describe "bundle install with svn sources" do
 
       simulate_new_machine
 
-      bundle "install --deployment", :exitstatus => true
+      bundle "install --deployment"
       expect(exitstatus).to eq(0)
     end
   end
@@ -574,7 +574,7 @@ describe "bundle install with svn sources" do
       bundle "package --all"
       simulate_new_machine
 
-      bundle "install", :env => {"PATH" => ""}, :exitstatus => true
+      bundle "install", :env => {"PATH" => ""}
       expect(out).to_not include("You need to install svn to be able to use gems from svn repositories.")
       expect(exitstatus).to be_zero
     end

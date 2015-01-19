@@ -113,7 +113,7 @@ describe "bundle update" do
         gem 'foo', :git => "#{@remote.path}", :tag => "fubar"
       G
 
-      bundle "update", :exitstatus => true
+      bundle "update"
       expect(exitstatus).to eq(0)
     end
 

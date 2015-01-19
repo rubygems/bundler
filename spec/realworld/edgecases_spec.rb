@@ -206,7 +206,7 @@ describe "real world edgecases", :realworld => true do
         activesupport!
     L
 
-    bundle :install, :exitstatus => true
+    bundle :install
     expect(exitstatus).to eq(0)
   end
 end

@@ -194,7 +194,7 @@ describe "bundle update" do
       gem "activesupport"
     G
 
-    bundle "update nonexisting", :exitstatus => true
+    bundle "update nonexisting"
     expect(out).to include("This Bundle hasn't been installed yet. Run `bundle install` to update and install the bundled gems.")
     expect(@exitstatus).to eq(22)
   end
