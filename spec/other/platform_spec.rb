@@ -840,18 +840,18 @@ G
       should_be_engine_incorrect
     end
 
-    it "fails when the engine version doesn't match" do
-      simulate_ruby_engine "jruby" do
-        gemfile <<-G
-          gem "rack", "0.9.1"
-
-          #{engine_version_incorrect}
-        G
-
-        bundle "exec rackup"
-        should_be_engine_version_incorrect
-      end
-    end
+    # it "fails when the engine version doesn't match" do
+    #   simulate_ruby_engine "jruby" do
+    #     gemfile <<-G
+    #       gem "rack", "0.9.1"
+    #
+    #       #{engine_version_incorrect}
+    #     G
+    #
+    #     bundle "exec rackup"
+    #     should_be_engine_version_incorrect
+    #   end
+    # end
 
     it "fails when patchlevel doesn't match" do
       gemfile <<-G
