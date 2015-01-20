@@ -24,14 +24,16 @@ describe "bundle cache" do
   end
 
   context "when given an absolute path" do
+    before do
+      bundle :cache, "cache-path" => "/tmp/cache-foo"
+    end
+    
     it "prints an error" do
-      out = bundle :cache, "cache-path" => "/tmp/cache-foo"
       expect(out).to match(/must be relative/)
     end
 
     it "exits with non-zero status" do
-      exit_status = bundle :cache, "cache-path" => "/tmp/cache-foo", :exitstatus => true
-      expect(exit_status).to eq(1)
+      expect(exitstatus).to eq(1)
     end
   end
 end

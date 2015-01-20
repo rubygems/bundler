@@ -9,6 +9,7 @@ module Bundler
     def run
       Bundler.ui.level = "error" if options[:quiet]
       Bundler.settings[:path] = File.expand_path(options[:path]) if options[:path]
+      Bundler.settings[:path] = options["cache-path"]
       Bundler.settings[:cache_all_platforms] = options["all-platforms"] if options.key?("all-platforms")
 
       setup_cache_all
