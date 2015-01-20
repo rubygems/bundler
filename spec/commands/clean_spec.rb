@@ -541,7 +541,7 @@ describe "bundle clean" do
 
     bundle "clean --force"
 
-    sys_status "foo"
+    sys_exec "foo"
 
     expect(exitstatus).to eq(0)
     expect(out).to eq("1.0")

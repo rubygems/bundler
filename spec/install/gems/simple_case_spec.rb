@@ -96,11 +96,11 @@ describe "bundle install with gem sources" do
     end
 
     it "raises an appropriate error when gems are specified using symbols" do
-      status = install_gemfile(<<-G)
+      install_gemfile(<<-G)
         source "file://#{gem_repo1}"
         gem :rack
       G
-      expect(status).to eq(4)
+      expect(exitstatus).to eq(4)
     end
 
     it "pulls in dependencies" do
