@@ -14,23 +14,23 @@ module Bundler
       end
 
       def info(msg, newline = nil)
-        tell_me(msg, nil, newline) if level("info")
+        tell_stdout(msg, nil, newline) if level("info")
       end
 
       def confirm(msg, newline = nil)
-        tell_me(msg, :green, newline) if level("confirm")
+        tell_stdout(msg, :green, newline) if level("confirm")
       end
 
       def warn(msg, newline = nil)
-        tell_me(msg, :yellow, newline) if level("warn")
+        tell_stdout(msg, :yellow, newline) if level("warn")
       end
 
       def error(msg, newline = nil)
-        tell_me(msg, :red, newline) if level("error")
+        tell_stderr(msg, :red, newline) if level("error")
       end
 
       def debug(msg, newline = nil)
-        tell_me(msg, nil, newline) if level("debug")
+        tell_stdout(msg, nil, newline) if level("debug")
       end
 
       def debug?
@@ -58,7 +58,7 @@ module Bundler
       def trace(e, newline = nil)
         return unless debug?
         msg = "#{e.class}: #{e.message}\n#{e.backtrace.join("\n  ")}"
-        tell_me(msg, nil, newline)
+        tell_stdout(msg, nil, newline)
       end
 
       def silence
@@ -71,13 +71,33 @@ module Bundler
     private
 
       # valimism
-      def tell_me(msg, color = nil, newline = nil)
+      def tell_stdout(msg, color = nil, newline = nil)
         msg = word_wrap(msg) if newline.is_a?(Hash) && newline[:wrap]
         if newline.nil?
           @shell.say(msg, color)
         else
           @shell.say(msg, color, newline)
         end
+      end
+
+      def tell_stderr(msg, color = nil, newline = nil)
+        msg = word_wrap(msg) if newline.is_a?(Hash) && newline[:wrap]
+        if newline.nil?
+          say_error(msg, color)
+        else
+          say_error(msg, color, newline)
+        end
+      end
+
+      # Print to STDERR with color and formatting from Thor. This is an ugly
+      # necessity that provides a feature Thor::Base.shell does not.
+      def say_error(message = '', color = nil, force_new_line = (message.to_s !~ /( |\t)\Z/))
+        buffer = @shell.send(:prepare_message, message, *color)
+        buffer << "\n" if force_new_line && !message.end_with?("\n")
+
+        stderr = @shell.send(:stderr)
+        stderr.print(buffer)
+        stderr.flush
       end
 
       def strip_leading_spaces(text)
