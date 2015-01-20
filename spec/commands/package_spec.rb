@@ -148,6 +148,5 @@ describe "bundle install with gem sources" do
       bundle "install --cache"
       expect(bundled_app("vendor/cache").children).not_to be_empty
     end
-
   end
 end
