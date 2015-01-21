@@ -196,6 +196,6 @@ describe "bundle update" do
 
     bundle "update nonexisting"
     expect(out).to include("This Bundle hasn't been installed yet. Run `bundle install` to update and install the bundled gems.")
-    expect(@exitstatus).to eq(22)
+    expect(exitstatus).to eq(22) if exitstatus
   end
 end

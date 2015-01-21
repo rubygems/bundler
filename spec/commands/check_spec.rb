@@ -8,7 +8,7 @@ describe "bundle check" do
     G
 
     bundle :check
-    expect(@exitstatus).to eq(0)
+    expect(exitstatus).to eq(0) if exitstatus
     expect(out).to eq("The Gemfile's dependencies are satisfied")
   end
 
@@ -68,7 +68,7 @@ describe "bundle check" do
     G
 
     bundle :check
-    expect(@exitstatus).to be > 0
+    expect(exitstatus).to be > 0 if exitstatus
     expect(out).to include("Bundler can't satisfy your Gemfile's dependencies.")
   end
 
@@ -102,7 +102,7 @@ describe "bundle check" do
 
     bundle "install --without foo"
     bundle "check"
-    expect(@exitstatus).to eq(0)
+    expect(exitstatus).to eq(0) if exitstatus
     expect(out).to include("The Gemfile's dependencies are satisfied")
   end
 
@@ -121,7 +121,7 @@ describe "bundle check" do
 
     bundle "check"
     expect(out).to include("* rack (1.0.0)")
-    expect(@exitstatus).to eq(1)
+    expect(exitstatus).to eq(1) if exitstatus
   end
 
   it "ignores missing gems restricted to other platforms" do
@@ -188,13 +188,13 @@ describe "bundle check" do
 
   it "outputs an error when the default Gemfile is not found" do
     bundle :check
-    expect(@exitstatus).to eq(10)
+    expect(exitstatus).to eq(10) if exitstatus
     expect(out).to include("Could not locate Gemfile")
   end
 
   it "does not output fatal error message" do
     bundle :check
-    expect(@exitstatus).to eq(10)
+    expect(exitstatus).to eq(10) if exitstatus
     expect(out).not_to include("Unfortunately, a fatal error has occurred. ")
   end
 
@@ -241,14 +241,14 @@ describe "bundle check" do
 
     it "returns success" do
       bundle "check --path vendor/bundle"
-      expect(@exitstatus).to eq(0)
+      expect(exitstatus).to eq(0) if exitstatus
       expect(out).to eq("The Gemfile's dependencies are satisfied")
     end
 
     it "should write to .bundle/config" do
       bundle "check --path vendor/bundle"
       bundle "check"
-      expect(@exitstatus).to eq(0)
+      expect(exitstatus).to eq(0) if exitstatus
     end
   end
 
@@ -264,7 +264,7 @@ describe "bundle check" do
     it "returns success when the Gemfile is satisfied" do
       bundle :install
       bundle :check
-      expect(@exitstatus).to eq(0)
+      expect(exitstatus).to eq(0) if exitstatus
       expect(out).to eq("The Gemfile's dependencies are satisfied")
     end
 

@@ -1041,7 +1041,7 @@ G
       R
 
       expect(bundled_app("Gemfile.lock")).not_to exist
-      should_be_ruby_version_incorrect(:exitstatus => false)
+      should_be_ruby_version_incorrect
     end
 
     it "fails when engine doesn't match" do
@@ -1069,7 +1069,7 @@ G
       R
 
       expect(bundled_app("Gemfile.lock")).not_to exist
-      should_be_engine_incorrect(:exitstatus => false)
+      should_be_engine_incorrect
     end
 
     it "fails when engine version doesn't match" do
@@ -1098,7 +1098,7 @@ G
         R
 
         expect(bundled_app("Gemfile.lock")).not_to exist
-        should_be_engine_version_incorrect(:exitstatus => false)
+        should_be_engine_version_incorrect
       end
     end
 
@@ -1128,7 +1128,7 @@ G
       R
 
       expect(bundled_app("Gemfile.lock")).not_to exist
-      should_be_patchlevel_incorrect(:exitstatus => false)
+      should_be_patchlevel_incorrect
     end
   end
 

@@ -188,7 +188,7 @@ describe "bundle install --standalone" do
       it "should run without errors" do
         bundle "install --standalone", :artifice => "endpoint"
 
-        expect(@exitstatus).to eq(0)
+        expect(exitstatus).to eq(0) if exitstatus
       end
 
       it "still makes the gems available to normal bundler" do
