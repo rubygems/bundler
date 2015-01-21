@@ -114,7 +114,7 @@ describe "bundle update" do
       G
 
       bundle "update"
-      expect(exitstatus).to eq(0)
+      expect(exitstatus).to eq(0) if exitstatus
     end
 
     describe "with submodules" do

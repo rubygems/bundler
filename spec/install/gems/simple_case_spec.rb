@@ -100,7 +100,7 @@ describe "bundle install with gem sources" do
         source "file://#{gem_repo1}"
         gem :rack
       G
-      expect(exitstatus).to eq(4)
+      expect(exitstatus).to eq(4) if exitstatus
     end
 
     it "pulls in dependencies" do
@@ -324,7 +324,7 @@ describe "bundle install with gem sources" do
 
         gem 'foo'
       G
-      expect(exitstatus).to eq(0)
+      expect(exitstatus).to eq(0) if exitstatus
     end
 
     it "doesn't blow up when the global .bundle/config is empty" do
@@ -336,7 +336,7 @@ describe "bundle install with gem sources" do
 
         gem 'foo'
       G
-      expect(exitstatus).to eq(0)
+      expect(exitstatus).to eq(0) if exitstatus
     end
   end
 
@@ -359,7 +359,7 @@ describe "bundle install with gem sources" do
 
       bundle :install
 
-      expect(exitstatus).to eq(0)
+      expect(exitstatus).to eq(0) if exitstatus
     end
   end
 

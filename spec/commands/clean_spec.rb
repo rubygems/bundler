@@ -307,7 +307,7 @@ describe "bundle clean" do
     bundle "install --path vendor/bundle --without development"
 
     bundle :clean
-    expect(exitstatus).to eq(0)
+    expect(exitstatus).to eq(0) if exitstatus
   end
 
   it "displays an error when used without --path" do
@@ -319,7 +319,7 @@ describe "bundle clean" do
 
     bundle :clean
 
-    expect(exitstatus).to eq(1)
+    expect(exitstatus).to eq(1) if exitstatus
     expect(out).to include("--force")
   end
 
@@ -543,7 +543,7 @@ describe "bundle clean" do
 
     sys_exec "foo"
 
-    expect(exitstatus).to eq(0)
+    expect(exitstatus).to eq(0) if exitstatus
     expect(out).to eq("1.0")
   end
 
@@ -565,7 +565,7 @@ describe "bundle clean" do
     bundle "install --path vendor/bundle"
     bundle :clean
 
-    expect(exitstatus).to eq(0)
+    expect(exitstatus).to eq(0) if exitstatus
   end
 
   it "doesn't remove gems in dry-run mode" do

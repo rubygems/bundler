@@ -6,12 +6,12 @@ describe "bundle executable" do
 
   it "returns non-zero exit status when passed unrecognized options" do
     bundle '--invalid_argument'
-    expect(exitstatus).to_not be_zero
+    expect(exitstatus).to_not be_zero if exitstatus
   end
 
   it "returns non-zero exit status when passed unrecognized task" do
     bundle 'unrecognized-tast'
-    expect(exitstatus).to_not be_zero
+    expect(exitstatus).to_not be_zero if exitstatus
   end
 
   it "looks for a binary and executes it if it's named bundler-<task>" do
@@ -23,7 +23,7 @@ describe "bundle executable" do
       bundle 'testtasks'
     end
 
-    expect(exitstatus).to be_zero
+    expect(exitstatus).to be_zero if exitstatus
     expect(out).to eq('Hello, world')
   end
 end

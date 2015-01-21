@@ -44,13 +44,13 @@ describe "bundle outdated" do
 
       bundle "outdated"
 
-      expect(exitstatus).to_not be_zero
+      expect(exitstatus).to_not be_zero if exitstatus
     end
 
     it "returns success exit status if no outdated gems present" do
       bundle "outdated"
 
-      expect(exitstatus).to be_zero
+      expect(exitstatus).to be_zero if exitstatus
     end
   end
 
@@ -150,7 +150,7 @@ describe "bundle outdated" do
 
     it "returns non-zero exit code" do
       bundle "outdated invalid_gem_name"
-      expect(exitstatus).to_not be_zero
+      expect(exitstatus).to_not be_zero if exitstatus
     end
   end
 

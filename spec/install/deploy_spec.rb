@@ -21,7 +21,7 @@ describe "install with --deployment or --frozen" do
   it "works after you try to deploy without a lock" do
     bundle "install --deployment"
     bundle :install
-    expect(exitstatus).to eq(0)
+    expect(exitstatus).to eq(0) if exitstatus
     should_be_installed "rack 1.0"
   end
 
@@ -43,7 +43,7 @@ describe "install with --deployment or --frozen" do
     G
     bundle :install
     bundle "install --deployment --without test"
-    expect(exitstatus).to eq(0)
+    expect(exitstatus).to eq(0) if exitstatus
   end
 
   it "works if you exclude a group with a svn gem" do
@@ -55,14 +55,14 @@ describe "install with --deployment or --frozen" do
     G
     bundle :install
     bundle "install --deployment --without test"
-    expect(exitstatus).to eq(0)
+    expect(exitstatus).to eq(0) if exitstatus
   end
 
   it "works when you bundle exec bundle" do
     bundle :install
     bundle "install --deployment"
     bundle "exec bundle check"
-    expect(exitstatus).to eq(0)
+    expect(exitstatus).to eq(0) if exitstatus
   end
 
   it "works when using path gems from the same path and the version is specified" do
@@ -76,7 +76,7 @@ describe "install with --deployment or --frozen" do
     bundle :install
     bundle "install --deployment"
 
-    expect(exitstatus).to eq(0)
+    expect(exitstatus).to eq(0) if exitstatus
   end
 
   it "works when there are credentials in the source URL" do
@@ -88,7 +88,7 @@ describe "install with --deployment or --frozen" do
 
     bundle "install --deployment", :artifice => "endpoint_strict_basic_authentication"
 
-    expect(exitstatus).to eq(0)
+    expect(exitstatus).to eq(0) if exitstatus
   end
 
   it "works with sources given by a block" do
@@ -100,7 +100,7 @@ describe "install with --deployment or --frozen" do
 
     bundle "install --deployment"
 
-    expect(exitstatus).to eq(0)
+    expect(exitstatus).to eq(0) if exitstatus
     should_be_installed "rack 1.0"
   end
 
@@ -111,12 +111,12 @@ describe "install with --deployment or --frozen" do
 
     it "works with the --deployment flag if you didn't change anything" do
       bundle "install --deployment"
-      expect(exitstatus).to eq(0)
+      expect(exitstatus).to eq(0) if exitstatus
     end
 
     it "works with the --frozen flag if you didn't change anything" do
       bundle "install --frozen"
-      expect(exitstatus).to eq(0)
+      expect(exitstatus).to eq(0) if exitstatus
     end
 
     it "explodes with the --deployment flag if you make a change and don't check in the lockfile" do

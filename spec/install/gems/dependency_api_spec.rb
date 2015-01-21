@@ -110,7 +110,7 @@ describe "gemcutter's dependency API" do
     bundle "install", :artifice => "endpoint"
     bundle "install --deployment", :artifice => "endpoint"
 
-    expect(exitstatus).to eq(0)
+    expect(exitstatus).to eq(0) if exitstatus
     should_be_installed("foo 1.0")
   end
 
@@ -605,7 +605,7 @@ describe "gemcutter's dependency API" do
 
       bundle "install", :artifice => "endpoint_marshal_fail"
 
-      expect(exitstatus).to eq(0)
+      expect(exitstatus).to eq(0) if exitstatus
     end
   end
 

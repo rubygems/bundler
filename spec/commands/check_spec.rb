@@ -225,7 +225,7 @@ describe "bundle check" do
     FileUtils.rm(bundled_app("Gemfile.lock"))
 
     bundle :check
-    expect(exitstatus).not_to eq(0)
+    expect(exitstatus).not_to eq(0) if exitstatus
   end
 
   context "--path" do

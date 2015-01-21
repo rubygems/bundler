@@ -63,7 +63,7 @@ describe "bundle_ruby" do
       G
 
       bundle_ruby :exitstatus => true
-      expect(exitstatus).not_to eq(0)
+      expect(exitstatus).not_to eq(0) if exitstatus
 
       bundle_ruby
       expect(out).to eq("Please define :engine_version")
@@ -78,7 +78,7 @@ describe "bundle_ruby" do
       G
 
       bundle_ruby :exitstatus => true
-      expect(exitstatus).not_to eq(0)
+      expect(exitstatus).not_to eq(0) if exitstatus
 
       bundle_ruby
       expect(out).to eq("Please define :engine")
@@ -93,7 +93,7 @@ describe "bundle_ruby" do
       G
 
       bundle_ruby :exitstatus => true
-      expect(exitstatus).not_to eq(0)
+      expect(exitstatus).not_to eq(0) if exitstatus
 
       bundle_ruby
       expect(out).to eq("ruby_version must match the :engine_version for MRI")

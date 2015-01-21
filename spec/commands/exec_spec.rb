@@ -190,7 +190,7 @@ describe "bundle exec" do
     G
 
     bundle "exec foobarbaz"
-    expect(exitstatus).to eq(127)
+    expect(exitstatus).to eq(127) if exitstatus
     expect(out).to include("bundler: command not found: foobarbaz")
     expect(out).to include("Install missing gem executables with `bundle install`")
   end
@@ -202,7 +202,7 @@ describe "bundle exec" do
 
     bundle "exec touch foo"
     bundle "exec ./foo"
-    expect(exitstatus).to eq(126)
+    expect(exitstatus).to eq(126) if exitstatus
     expect(out).to include("bundler: not executable: ./foo")
   end
 
@@ -212,7 +212,7 @@ describe "bundle exec" do
     G
 
     bundle "exec"
-    expect(exitstatus).to eq(128)
+    expect(exitstatus).to eq(128) if exitstatus
     expect(out).to include("bundler: exec needs a command to run")
   end
 

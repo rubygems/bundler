@@ -130,7 +130,7 @@ module Spec
 
         @out = @out_p.read_available_bytes.strip
         @err = @err_p.read_available_bytes.strip
-        @exitstatus = wait_thr.value.exitstatus
+        @exitstatus = wait_thr && wait_thr.value.exitstatus
       end
 
       puts @err unless expect_err || @err.empty? || !$show_err

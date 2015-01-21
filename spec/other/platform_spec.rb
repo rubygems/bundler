@@ -153,7 +153,7 @@ G
 
       bundle "platform"
 
-      expect(exitstatus).not_to eq(0)
+      expect(exitstatus).not_to eq(0) if exitstatus
     end
 
     it "raises an error if engine_version is used but engine is not" do
@@ -166,7 +166,7 @@ G
 
       bundle "platform"
 
-      expect(exitstatus).not_to eq(0)
+      expect(exitstatus).not_to eq(0) if exitstatus
     end
 
     it "raises an error if engine version doesn't match ruby version for MRI" do
@@ -179,7 +179,7 @@ G
 
       bundle "platform"
 
-      expect(exitstatus).not_to eq(0)
+      expect(exitstatus).not_to eq(0) if exitstatus
     end
 
     it "should print if no ruby version is specified" do
@@ -205,28 +205,28 @@ G
   let(:patchlevel_incorrect) { "#{ruby_version_correct}, :patchlevel => '#{not_local_patchlevel}'" }
   let(:patchlevel_fixnum) { "#{ruby_version_correct}, :patchlevel => #{RUBY_PATCHLEVEL}1" }
 
-  def should_be_ruby_version_incorrect(opts = {:exitstatus => true})
-    expect(exitstatus).to eq(18) if opts[:exitstatus]
+  def should_be_ruby_version_incorrect
+    expect(exitstatus).to eq(18) if exitstatus
     expect(out).to be_include("Your Ruby version is #{RUBY_VERSION}, but your Gemfile specified #{not_local_ruby_version}")
   end
 
-  def should_be_engine_incorrect(opts = {:exitstatus => true})
-    expect(exitstatus).to eq(18) if opts[:exitstatus]
+  def should_be_engine_incorrect
+    expect(exitstatus).to eq(18) if exitstatus
     expect(out).to be_include("Your Ruby engine is #{local_ruby_engine}, but your Gemfile specified #{not_local_tag}")
   end
 
-  def should_be_engine_version_incorrect(opts = {:exitstatus => true})
-    expect(exitstatus).to eq(18) if opts[:exitstatus]
+  def should_be_engine_version_incorrect
+    expect(exitstatus).to eq(18) if exitstatus
     expect(out).to be_include("Your #{local_ruby_engine} version is #{local_engine_version}, but your Gemfile specified #{local_ruby_engine} #{not_local_engine_version}")
   end
 
-  def should_be_patchlevel_incorrect(opts = {:exitstatus => true})
-    expect(exitstatus).to eq(18) if opts[:exitstatus]
+  def should_be_patchlevel_incorrect
+    expect(exitstatus).to eq(18) if exitstatus
     expect(out).to be_include("Your Ruby patchlevel is #{RUBY_PATCHLEVEL}, but your Gemfile specified #{not_local_patchlevel}")
   end
 
-  def should_be_patchlevel_fixnum(opts = {:exitstatus => true})
-    expect(exitstatus).to eq(18) if opts[:exitstatus]
+  def should_be_patchlevel_fixnum
+    expect(exitstatus).to eq(18) if exitstatus
     expect(out).to be_include("The Ruby patchlevel in your Gemfile must be a string")
   end
 
@@ -332,7 +332,7 @@ G
       G
 
       bundle :check
-      expect(exitstatus).to eq(0)
+      expect(exitstatus).to eq(0) if exitstatus
       expect(out).to eq("The Gemfile's dependencies are satisfied")
     end
 
@@ -351,7 +351,7 @@ G
         G
 
         bundle :check
-        expect(exitstatus).to eq(0)
+        expect(exitstatus).to eq(0) if exitstatus
         expect(out).to eq("The Gemfile's dependencies are satisfied")
       end
     end

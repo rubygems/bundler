@@ -79,7 +79,7 @@ describe "bundle install with explicit source paths" do
     G
 
     bundle "install --frozen"
-    expect(exitstatus).to eq(0)
+    expect(exitstatus).to eq(0) if exitstatus
   end
 
   it "installs dependencies from the path even if a newer gem is available elsewhere" do
@@ -203,7 +203,7 @@ describe "bundle install with explicit source paths" do
       gemspec :path => "#{lib_path("foo")}"
     G
 
-    expect(exitstatus).to eq(15)
+    expect(exitstatus).to eq(15) if exitstatus
     expect(out).to match(/There are multiple gemspecs/)
   end
 

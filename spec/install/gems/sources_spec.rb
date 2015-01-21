@@ -93,7 +93,7 @@ describe "bundle install with gems on multiple sources" do
 
         bundle "install --deployment"
 
-        expect(exitstatus).to eq(0)
+        expect(exitstatus).to eq(0) if exitstatus
         should_be_installed("rack-obama 1.0.0", "rack 1.0.0")
       end
     end

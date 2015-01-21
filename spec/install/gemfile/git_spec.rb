@@ -656,7 +656,7 @@ describe "bundle install with git sources" do
 
     bundle "install"
     bundle "install"
-    expect(exitstatus).to eq(0)
+    expect(exitstatus).to eq(0) if exitstatus
   end
 
   it "does not duplicate git gem sources" do
@@ -760,7 +760,7 @@ describe "bundle install with git sources" do
       simulate_new_machine
 
       bundle "install --deployment"
-      expect(exitstatus).to eq(0)
+      expect(exitstatus).to eq(0) if exitstatus
     end
   end
 
@@ -928,7 +928,7 @@ describe "bundle install with git sources" do
         end
       G
 
-      expect(exitstatus).to eq(0)
+      expect(exitstatus).to eq(0) if exitstatus
       expect(ENV['GIT_DIR']).to eq('bar')
       expect(ENV['GIT_WORK_TREE']).to eq('bar')
     end
@@ -961,7 +961,7 @@ describe "bundle install with git sources" do
 
       bundle "install", :env => {"PATH" => ""}
       expect(out).to_not include("You need to install git to be able to use gems from git repositories.")
-      expect(exitstatus).to be_zero
+      expect(exitstatus).to be_zero if exitstatus
     end
   end
 end
