@@ -205,28 +205,28 @@ G
   let(:patchlevel_incorrect) { "#{ruby_version_correct}, :patchlevel => '#{not_local_patchlevel}'" }
   let(:patchlevel_fixnum) { "#{ruby_version_correct}, :patchlevel => #{RUBY_PATCHLEVEL}1" }
 
-  def should_be_ruby_version_incorrect
-    expect(exitstatus).to eq(18) if exitstatus
+  def should_be_ruby_version_incorrect(opts = {:exitstatus => true})
+    expect(exitstatus).to eq(18) if opts[:exitstatus] && exitstatus
     expect(out).to be_include("Your Ruby version is #{RUBY_VERSION}, but your Gemfile specified #{not_local_ruby_version}")
   end
 
-  def should_be_engine_incorrect
-    expect(exitstatus).to eq(18) if exitstatus
+  def should_be_engine_incorrect(opts = {:exitstatus => true})
+    expect(exitstatus).to eq(18) if opts[:exitstatus] && exitstatus
     expect(out).to be_include("Your Ruby engine is #{local_ruby_engine}, but your Gemfile specified #{not_local_tag}")
   end
 
-  def should_be_engine_version_incorrect
-    expect(exitstatus).to eq(18) if exitstatus
+  def should_be_engine_version_incorrect(opts = {:exitstatus => true})
+    expect(exitstatus).to eq(18) if opts[:exitstatus] && exitstatus
     expect(out).to be_include("Your #{local_ruby_engine} version is #{local_engine_version}, but your Gemfile specified #{local_ruby_engine} #{not_local_engine_version}")
   end
 
-  def should_be_patchlevel_incorrect
-    expect(exitstatus).to eq(18) if exitstatus
+  def should_be_patchlevel_incorrect(opts = {:exitstatus => true})
+    expect(exitstatus).to eq(18) if opts[:exitstatus] && exitstatus
     expect(out).to be_include("Your Ruby patchlevel is #{RUBY_PATCHLEVEL}, but your Gemfile specified #{not_local_patchlevel}")
   end
 
-  def should_be_patchlevel_fixnum
-    expect(exitstatus).to eq(18) if exitstatus
+  def should_be_patchlevel_fixnum(opts = {:exitstatus => true})
+    expect(exitstatus).to eq(18) if opts[:exitstatus] && exitstatus
     expect(out).to be_include("The Ruby patchlevel in your Gemfile must be a string")
   end
 
@@ -1041,7 +1041,7 @@ G
       R
 
       expect(bundled_app("Gemfile.lock")).not_to exist
-      should_be_ruby_version_incorrect
+      should_be_ruby_version_incorrect(exitstatus: false)
     end
 
     it "fails when engine doesn't match" do
@@ -1069,7 +1069,7 @@ G
       R
 
       expect(bundled_app("Gemfile.lock")).not_to exist
-      should_be_engine_incorrect
+      should_be_engine_incorrect(exitstatus: false)
     end
 
     it "fails when engine version doesn't match" do
@@ -1098,7 +1098,7 @@ G
         R
 
         expect(bundled_app("Gemfile.lock")).not_to exist
-        should_be_engine_version_incorrect
+        should_be_engine_version_incorrect(exitstatus: false)
       end
     end
 
@@ -1110,9 +1110,6 @@ G
 
         #{patchlevel_incorrect}
       G
-
-      puts File.read(bundled_app("Gemfile"))
-      File.read(bundled_app("Gemfile.lock"))
 
       FileUtils.rm(bundled_app("Gemfile.lock"))
 
@@ -1128,7 +1125,7 @@ G
       R
 
       expect(bundled_app("Gemfile.lock")).not_to exist
-      should_be_patchlevel_incorrect
+      should_be_patchlevel_incorrect(exitstatus: false)
     end
   end
 
