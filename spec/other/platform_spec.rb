@@ -205,28 +205,28 @@ G
   let(:patchlevel_incorrect) { "#{ruby_version_correct}, :patchlevel => '#{not_local_patchlevel}'" }
   let(:patchlevel_fixnum) { "#{ruby_version_correct}, :patchlevel => #{RUBY_PATCHLEVEL}1" }
 
-  def should_be_ruby_version_incorrect(opts = {:exitstatus => true})
-    expect(exitstatus).to eq(18) if opts[:exitstatus] && exitstatus
+  def should_be_ruby_version_incorrect
+    expect(exitstatus).to eq(18) if exitstatus
     expect(out).to be_include("Your Ruby version is #{RUBY_VERSION}, but your Gemfile specified #{not_local_ruby_version}")
   end
 
-  def should_be_engine_incorrect(opts = {:exitstatus => true})
-    expect(exitstatus).to eq(18) if opts[:exitstatus] && exitstatus
+  def should_be_engine_incorrect
+    expect(exitstatus).to eq(18) if exitstatus
     expect(out).to be_include("Your Ruby engine is #{local_ruby_engine}, but your Gemfile specified #{not_local_tag}")
   end
 
-  def should_be_engine_version_incorrect(opts = {:exitstatus => true})
-    expect(exitstatus).to eq(18) if opts[:exitstatus] && exitstatus
+  def should_be_engine_version_incorrect
+    expect(exitstatus).to eq(18) if exitstatus
     expect(out).to be_include("Your #{local_ruby_engine} version is #{local_engine_version}, but your Gemfile specified #{local_ruby_engine} #{not_local_engine_version}")
   end
 
-  def should_be_patchlevel_incorrect(opts = {:exitstatus => true})
-    expect(exitstatus).to eq(18) if opts[:exitstatus] && exitstatus
+  def should_be_patchlevel_incorrect
+    expect(exitstatus).to eq(18) if exitstatus
     expect(out).to be_include("Your Ruby patchlevel is #{RUBY_PATCHLEVEL}, but your Gemfile specified #{not_local_patchlevel}")
   end
 
-  def should_be_patchlevel_fixnum(opts = {:exitstatus => true})
-    expect(exitstatus).to eq(18) if opts[:exitstatus] && exitstatus
+  def should_be_patchlevel_fixnum
+    expect(exitstatus).to eq(18) if exitstatus
     expect(out).to be_include("The Ruby patchlevel in your Gemfile must be a string")
   end
 
@@ -978,6 +978,8 @@ G
         gem "yard"
         gem "rack", :group => :test
       G
+
+      ENV['BUNDLER_FORCE_TTY'] = "true"
     end
 
     it "makes a Gemfile.lock if setup succeeds" do
@@ -988,8 +990,6 @@ G
 
         #{ruby_version_correct}
       G
-
-      File.read(bundled_app("Gemfile.lock"))
 
       FileUtils.rm(bundled_app("Gemfile.lock"))
 
@@ -1007,8 +1007,6 @@ G
           #{ruby_version_correct_engineless}
         G
 
-        File.read(bundled_app("Gemfile.lock"))
-
         FileUtils.rm(bundled_app("Gemfile.lock"))
 
         run "1"
@@ -1025,23 +1023,15 @@ G
         #{ruby_version_incorrect}
       G
 
-      File.read(bundled_app("Gemfile.lock"))
-
       FileUtils.rm(bundled_app("Gemfile.lock"))
 
       ruby <<-R
         require 'rubygems'
-        require 'bundler'
-
-        begin
-          Bundler.setup
-        rescue Bundler::RubyVersionMismatch => e
-          puts e.message
-        end
+        require 'bundler/setup'
       R
 
       expect(bundled_app("Gemfile.lock")).not_to exist
-      should_be_ruby_version_incorrect(exitstatus: false)
+      should_be_ruby_version_incorrect
     end
 
     it "fails when engine doesn't match" do
@@ -1053,23 +1043,15 @@ G
         #{engine_incorrect}
       G
 
-      File.read(bundled_app("Gemfile.lock"))
-
       FileUtils.rm(bundled_app("Gemfile.lock"))
 
       ruby <<-R
         require 'rubygems'
-        require 'bundler'
-
-        begin
-          Bundler.setup
-        rescue Bundler::RubyVersionMismatch => e
-          puts e.message
-        end
+        require 'bundler/setup'
       R
 
       expect(bundled_app("Gemfile.lock")).not_to exist
-      should_be_engine_incorrect(exitstatus: false)
+      should_be_engine_incorrect
     end
 
     it "fails when engine version doesn't match" do
@@ -1082,23 +1064,15 @@ G
           #{engine_version_incorrect}
         G
 
-        File.read(bundled_app("Gemfile.lock"))
-
         FileUtils.rm(bundled_app("Gemfile.lock"))
 
         ruby <<-R
           require 'rubygems'
-          require 'bundler'
-
-          begin
-            Bundler.setup
-          rescue Bundler::RubyVersionMismatch => e
-            puts e.message
-          end
+          require 'bundler/setup'
         R
 
         expect(bundled_app("Gemfile.lock")).not_to exist
-        should_be_engine_version_incorrect(exitstatus: false)
+        should_be_engine_version_incorrect
       end
     end
 
@@ -1115,17 +1089,11 @@ G
 
       ruby <<-R
         require 'rubygems'
-        require 'bundler'
-
-        begin
-          Bundler.setup
-        rescue Bundler::RubyVersionMismatch => e
-          puts e.message
-        end
+        require 'bundler/setup'
       R
 
       expect(bundled_app("Gemfile.lock")).not_to exist
-      should_be_patchlevel_incorrect(exitstatus: false)
+      should_be_patchlevel_incorrect
     end
   end
 
