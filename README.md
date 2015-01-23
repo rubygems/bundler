@@ -2,8 +2,6 @@
 [![Build Status](https://img.shields.io/travis/bundler/bundler/master.svg?style=flat)](https://travis-ci.org/bundler/bundler)
 [![Code Climate](https://img.shields.io/codeclimate/github/bundler/bundler.svg?style=flat)](https://codeclimate.com/github/bundler/bundler)
 [![Inline docs ](http://inch-ci.org/github/bundler/bundler.svg?style=flat)](http://inch-ci.org/github/bundler/bundler)
-[![Gittip
-](http://img.shields.io/gittip/bundler.svg?style=flat)](http://gittip.com/bundler)
 
 # Bundler: a gem to bundle gems
 
@@ -36,7 +34,3 @@ Feel free to chat with the Bundler core team (and many other users) on IRC in th
 ### Contributing
 
 If you'd like to contribute to Bundler, that's awesome, and we <3 you. There's a guide to contributing to Bundler (both code and general help) over in [DEVELOPMENT](https://github.com/bundler/bundler/blob/master/DEVELOPMENT.md)
-
-### Support work on Bundler
-
-Bundler is developed entirely by a team of volunteers. If Bundler saves your company time and money, contribute to the [Bundler development fund on Gittip](http://www.gittip.com/bundler). Every dollar goes towards Bundler documentation, outreach, and development.
