@@ -66,12 +66,9 @@ module Gem
       @groups ||= []
     end
 
-    def scm_version
-      return unless loaded_from
-      case source
-      when Bundler::Source::Git then " #{source.revision[0..6]}"
-      when Bundler::Source::SVN then " #{source.revision}"
-      end
+    def git_version
+      return unless loaded_from && source.is_a?(Bundler::Source::Git)
+      " #{source.revision[0..6]}"
     end
 
     def to_gemfile(path = nil)

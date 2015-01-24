@@ -46,18 +46,6 @@ describe "install with --deployment or --frozen" do
     expect(exitstatus).to eq(0) if exitstatus
   end
 
-  it "works if you exclude a group with a svn gem" do
-    build_svn "foo"
-    gemfile <<-G
-      group :test do
-        gem "foo", :svn => "file://#{lib_path('foo-1.0')}"
-      end
-    G
-    bundle :install
-    bundle "install --deployment --without test"
-    expect(exitstatus).to eq(0) if exitstatus
-  end
-
   it "works when you bundle exec bundle" do
     bundle :install
     bundle "install --deployment"

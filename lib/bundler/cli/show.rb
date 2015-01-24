@@ -37,7 +37,7 @@ module Bundler
       else
         Bundler.ui.info "Gems included by the bundle:"
         Bundler.load.specs.sort_by { |s| s.name }.each do |s|
-          desc = "  * #{s.name} (#{s.version}#{s.scm_version})"
+          desc = "  * #{s.name} (#{s.version}#{s.git_version})"
           if @verbose
             latest = latest_specs.find { |l| l.name == s.name }
             Bundler.ui.info <<-END.gsub(/^ +/, '')

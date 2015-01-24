@@ -62,29 +62,6 @@ describe Bundler::SourceList do
       end
     end
 
-    describe "#add_svn_source" do
-      before do
-        @duplicate = source_list.add_svn_source('uri' => 'svn://host/path')
-        @new_source = source_list.add_svn_source('uri' => 'svn://host/path')
-      end
-
-      it "returns the new svn source" do
-        expect(@new_source).to be_instance_of(Bundler::Source::SVN)
-      end
-
-      it "passes the provided options to the new source" do
-        expect(@new_source.options).to eq('uri' => 'svn://host/path')
-      end
-
-      it "adds the source to the beginning of svn_sources" do
-        expect(source_list.svn_sources.first).to equal(@new_source)
-      end
-
-      it "removes existing duplicates" do
-        expect(source_list.svn_sources).not_to include equal(@duplicate)
-      end
-    end
-
     describe "#add_rubygems_source" do
       before do
         @duplicate = source_list.add_rubygems_source('remotes' => ['https://rubygems.org/'])
@@ -140,23 +117,7 @@ describe Bundler::SourceList do
       expect(source_list.all_sources).to include rubygems_aggregate
     end
 
-    it "returns path sources before git sources before svn sources before rubygems sources before the aggregate" do
-      source_list.add_git_source('uri' => 'git://host/path.git')
-      source_list.add_rubygems_source('remotes' => ['https://rubygems.org'])
-      source_list.add_path_source('path' => '/path/to/gem')
-      source_list.add_svn_source('uri' => 'svn://host/path')
-
-      expect(source_list.all_sources).to eq [
-        Bundler::Source::Path.new('path' => '/path/to/gem'),
-        Bundler::Source::Git.new('uri' => 'git://host/path.git'),
-        Bundler::Source::SVN.new('uri' => 'svn://host/path'),
-        Bundler::Source::Rubygems.new('remotes' => ['https://rubygems.org']),
-        rubygems_aggregate,
-      ]
-    end
-
     it "returns sources of the same type in the reverse order that they were added" do
-      source_list.add_svn_source('uri' => 'svn://second-svn.org/path')
       source_list.add_git_source('uri' => 'git://third-git.org/path.git')
       source_list.add_rubygems_source('remotes' => ['https://fifth-rubygems.org'])
       source_list.add_path_source('path' => '/third/path/to/gem')
@@ -168,7 +129,6 @@ describe Bundler::SourceList do
       source_list.add_path_source('path' => '/first/path/to/gem')
       source_list.add_rubygems_source('remotes' => ['https://first-rubygems.org'])
       source_list.add_git_source('uri' => 'git://first-git.org/path.git')
-      source_list.add_svn_source('uri' => 'svn://first-svn.org/path')
 
       expect(source_list.all_sources).to eq [
         Bundler::Source::Path.new('path' => '/first/path/to/gem'),
@@ -177,8 +137,6 @@ describe Bundler::SourceList do
         Bundler::Source::Git.new('uri' => 'git://first-git.org/path.git'),
         Bundler::Source::Git.new('uri' => 'git://second-git.org/path.git'),
         Bundler::Source::Git.new('uri' => 'git://third-git.org/path.git'),
-        Bundler::Source::SVN.new('uri' => 'svn://first-svn.org/path'),
-        Bundler::Source::SVN.new('uri' => 'svn://second-svn.org/path'),
         Bundler::Source::Rubygems.new('remotes' => ['https://first-rubygems.org']),
         Bundler::Source::Rubygems.new('remotes' => ['https://second-rubygems.org']),
         Bundler::Source::Rubygems.new('remotes' => ['https://third-rubygems.org']),
@@ -246,35 +204,6 @@ describe Bundler::SourceList do
     end
   end
 
-  describe "#svn_sources" do
-    it "returns an empty array when no svn sources have been added" do
-      source_list.add_rubygems_remote('https://rubygems.org')
-      source_list.add_path_source('path' => '/path/to/gem')
-
-      expect(source_list.svn_sources).to be_empty
-    end
-
-    it "returns svn sources in the reverse order that they were added" do
-      source_list.add_svn_source('uri' => 'svn://third-svn.org/path')
-      source_list.add_rubygems_remote('https://fifth-rubygems.org')
-      source_list.add_path_source('path' => '/third/path/to/gem')
-      source_list.add_rubygems_remote('https://fourth-rubygems.org')
-      source_list.add_path_source('path' => '/second/path/to/gem')
-      source_list.add_rubygems_remote('https://third-rubygems.org')
-      source_list.add_svn_source('uri' => 'svn://second-svn.org/path')
-      source_list.add_rubygems_remote('https://second-rubygems.org')
-      source_list.add_path_source('path' => '/first/path/to/gem')
-      source_list.add_rubygems_remote('https://first-rubygems.org')
-      source_list.add_svn_source('uri' => 'svn://first-svn.org/path')
-
-      expect(source_list.svn_sources).to eq [
-        Bundler::Source::SVN.new('uri' => 'svn://first-svn.org/path'),
-        Bundler::Source::SVN.new('uri' => 'svn://second-svn.org/path'),
-        Bundler::Source::SVN.new('uri' => 'svn://third-svn.org/path'),
-      ]
-    end
-  end
-
   describe "#rubygems_sources" do
     it "includes the aggregate rubygems source when rubygems sources have been added" do
       source_list.add_git_source('uri' => 'git://host/path.git')
@@ -336,7 +265,6 @@ describe Bundler::SourceList do
 
   describe "#lock_sources" do
     it "combines the rubygems sources into a single instance, removing duplicate remotes from the end" do
-      source_list.add_svn_source('uri' => 'svn://second-svn.org/path')
       source_list.add_git_source('uri' => 'git://third-git.org/path.git')
       source_list.add_rubygems_source('remotes' => ['https://duplicate-rubygems.org'])
       source_list.add_path_source('path' => '/third/path/to/gem')
@@ -348,7 +276,6 @@ describe Bundler::SourceList do
       source_list.add_path_source('path' => '/first/path/to/gem')
       source_list.add_rubygems_source('remotes' => ['https://duplicate-rubygems.org'])
       source_list.add_git_source('uri' => 'git://first-git.org/path.git')
-      source_list.add_svn_source('uri' => 'svn://first-svn.org/path')
 
       expect(source_list.lock_sources).to eq [
         Bundler::Source::Git.new('uri' => 'git://first-git.org/path.git'),
@@ -357,8 +284,6 @@ describe Bundler::SourceList do
         Bundler::Source::Path.new('path' => '/first/path/to/gem'),
         Bundler::Source::Path.new('path' => '/second/path/to/gem'),
         Bundler::Source::Path.new('path' => '/third/path/to/gem'),
-        Bundler::Source::SVN.new('uri' => 'svn://first-svn.org/path'),
-        Bundler::Source::SVN.new('uri' => 'svn://second-svn.org/path'),
         Bundler::Source::Rubygems.new('remotes' => [
           'https://duplicate-rubygems.org',
           'https://first-rubygems.org',
@@ -397,13 +322,11 @@ describe Bundler::SourceList do
   describe "#cached!" do
     let(:rubygems_source) { source_list.add_rubygems_remote('https://rubygems.org') }
     let(:git_source)      { source_list.add_git_source('uri' => 'git://host/path.git') }
-    let(:svn_source)      { source_list.add_svn_source('uri' => 'svn://host/path') }
     let(:path_source)     { source_list.add_path_source('path' => '/path/to/gem') }
 
     it "calls #cached! on all the sources" do
       expect(rubygems_source).to receive(:cached!)
       expect(git_source).to receive(:cached!)
-      expect(svn_source).to receive(:cached!)
       expect(path_source).to receive(:cached!)
       source_list.cached!
     end
@@ -412,13 +335,11 @@ describe Bundler::SourceList do
   describe "#remote!" do
     let(:rubygems_source) { source_list.add_rubygems_remote('https://rubygems.org') }
     let(:git_source)      { source_list.add_git_source('uri' => 'git://host/path.git') }
-    let(:svn_source)      { source_list.add_git_source('uri' => 'svn://host/path') }
     let(:path_source)     { source_list.add_path_source('path' => '/path/to/gem') }
 
     it "calls #remote! on all the sources" do
       expect(rubygems_source).to receive(:remote!)
       expect(git_source).to receive(:remote!)
-      expect(svn_source).to receive(:remote!)
       expect(path_source).to receive(:remote!)
       source_list.remote!
     end

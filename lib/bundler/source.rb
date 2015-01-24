@@ -3,7 +3,6 @@ module Bundler
     autoload :Rubygems, 'bundler/source/rubygems'
     autoload :Path,     'bundler/source/path'
     autoload :Git,      'bundler/source/git'
-    autoload :SVN,      'bundler/source/svn'
 
     def self.mirror_for(uri)
       uri = URI(uri.to_s) unless uri.is_a?(URI)

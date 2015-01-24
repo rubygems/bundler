@@ -228,7 +228,7 @@ module Bundler
     end
 
     desc "cache [OPTIONS]", "Cache all the gems to vendor/cache", :hide => true
-    method_option "all",  :type => :boolean, :banner => "Include all sources (including path, git and svn)."
+    method_option "all",  :type => :boolean, :banner => "Include all sources (including path and git)."
     method_option "all-platforms", :type => :boolean, :banner => "Include gems for all platforms, not just the current one"
     method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
     def cache
@@ -237,7 +237,7 @@ module Bundler
     end
 
     desc "package [OPTIONS]", "Locks and then caches all of the gems into vendor/cache"
-    method_option "all",  :type => :boolean, :banner => "Include all sources (including path, git and svn)."
+    method_option "all",  :type => :boolean, :banner => "Include all sources (including path and git)."
     method_option "all-platforms", :type => :boolean, :banner => "Include gems for all platforms, not just the current one"
     method_option "cache-path", :type => :string, :banner =>
       "Specify a different cache path than the default (vendor/cache)."

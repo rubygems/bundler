@@ -19,7 +19,6 @@ module Bundler
     GIT          = "GIT"
     GEM          = "GEM"
     PATH         = "PATH"
-    SVN          = "SVN"
     SPECS        = "  specs:"
     OPTIONS      = /^  ([a-z]+): (.*)$/i
 
@@ -56,12 +55,11 @@ module Bundler
       GIT  => Bundler::Source::Git,
       GEM  => Bundler::Source::Rubygems,
       PATH => Bundler::Source::Path,
-      SVN  => Bundler::Source::SVN
     }
 
     def parse_source(line)
       case line
-      when GIT, GEM, PATH, SVN
+      when GIT, GEM, PATH
         @current_source = nil
         @opts, @type = {}, line
       when SPECS
@@ -69,9 +67,9 @@ module Bundler
         when PATH
           @current_source = TYPES[@type].from_lock(@opts)
           @sources << @current_source
-        when GIT, SVN
+        when GIT
           @current_source = TYPES[@type].from_lock(@opts)
-          # Strip out duplicate GIT / SVN sections
+          # Strip out duplicate GIT sections
           if @sources.include?(@current_source)
             @current_source = @sources.find { |s| s == @current_source }
           else

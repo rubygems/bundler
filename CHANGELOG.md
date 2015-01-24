@@ -2,7 +2,6 @@
 
 Features:
 
-  - add support for SVN sources (@msnexploder)
   - add metadata allowed_push_host to new gem template (#3002, @juanitofatas)
   - adds a `--no-install` flag to `bundle package`
   - add `bundle viz --without` to exclude gem groups from resulting graph (@fnichol)

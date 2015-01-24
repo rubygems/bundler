@@ -61,7 +61,6 @@ module Bundler
   class InstallHookError      < BundlerError; status_code(8)  ; end
   class PathError             < BundlerError; status_code(13) ; end
   class GitError              < BundlerError; status_code(11) ; end
-  class SVNError              < BundlerError; status_code(23) ; end
   class DeprecatedError       < BundlerError; status_code(12) ; end
   class GemspecError          < BundlerError; status_code(14) ; end
   class InvalidOption         < BundlerError; status_code(15) ; end
@@ -380,11 +379,6 @@ module Bundler
     def git_present?
       return @git_present if defined?(@git_present)
       @git_present = Bundler.which("git") || Bundler.which("git.exe")
-    end
-
-    def svn_present?
-      return @svn_present if defined?(@svn_present)
-      @svn_present = Bundler.which("svn") || Bundler.which("svn.exe")
     end
 
     def ruby_version
