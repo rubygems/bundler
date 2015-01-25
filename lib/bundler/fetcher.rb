@@ -255,15 +255,6 @@ module Bundler
       "#<#{self.class}:0x#{object_id} uri=#{uri}>"
     end
 
-  protected
-    def add_basic_auth(req)
-      if @remote_uri.user
-        user = CGI.unescape(@remote_uri.user)
-        password = @remote_uri.password ? CGI.unescape(@remote_uri.password) : nil
-        req.basic_auth(user, password)
-      end
-    end
-
   private
 
     HTTP_ERRORS = [
@@ -292,7 +283,7 @@ module Bundler
       when Net::HTTPRequestEntityTooLarge
         raise FallbackError, response.body
       when Net::HTTPUnauthorized
-        raise AuthenticationRequiredError, remote_uri
+        raise AuthenticationRequiredError, remote_uri.host
       else
         raise HTTPError, "#{response.class}: #{response.body}"
       end
@@ -301,15 +292,12 @@ module Bundler
     def request(uri)
       Bundler.ui.debug "HTTP GET #{uri}"
       req = Net::HTTP::Get.new uri.request_uri
-      add_basic_auth(req)
-      result = connection.request(uri, req)
-
-      case result
-      when Net::HTTPUnauthorized, Net::HTTPForbidden
-        retry_with_auth { request(uri) }
-      else
-        result
+      if uri.user
+        user = CGI.unescape(uri.user)
+        password = uri.password ? CGI.unescape(uri.password) : nil
+        req.basic_auth(user, password)
       end
+      connection.request(uri, req)
     rescue OpenSSL::SSL::SSLError
       raise CertificateFailureError.new(uri)
     rescue *HTTP_ERRORS => e
@@ -410,10 +398,13 @@ module Bundler
 
     def add_configured_credentials(uri)
       auth = Bundler.settings[uri.to_s]
+      auth ||= Bundler.settings[uri.host]
+
       if auth
         uri = uri.dup
         uri.user, uri.password = *auth.split(":", 2)
       end
+
       AnonymizableURI.new(uri)
     end
 
