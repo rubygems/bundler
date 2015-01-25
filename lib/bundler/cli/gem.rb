@@ -36,7 +36,8 @@ module Bundler
         :author           => git_user_name.empty? ? "TODO: Write your name" : git_user_name,
         :email            => git_user_email.empty? ? "TODO: Write your email address" : git_user_email,
         :test             => options[:test],
-        :ext              => options[:ext]
+        :ext              => options[:ext],
+        :bin              => options[:bin]
       }
 
       templates = {
@@ -46,7 +47,9 @@ module Bundler
         "lib/newgem/version.rb.tt" => "lib/#{namespaced_path}/version.rb",
         "newgem.gemspec.tt" => "#{name}.gemspec",
         "Rakefile.tt" => "Rakefile",
-        "README.md.tt" => "README.md"
+        "README.md.tt" => "README.md",
+        "bin/console.tt" => "bin/console",
+        "bin/setup.tt" => "bin/setup"
       }
 
       if ask_and_set(:coc, "Do you want to include a code of conduct in gems you generate?",
@@ -85,7 +88,7 @@ module Bundler
         end
       end
 
-      templates.merge!("bin/newgem.tt" => "bin/#{name}") if options[:bin]
+      templates.merge!("exe/newgem.tt" => "exe/#{name}") if options[:bin]
 
       if options[:ext]
         templates.merge!(
