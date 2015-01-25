@@ -6,7 +6,6 @@ module Bundler
   class Source
     class Rubygems < Source
       API_REQUEST_LIMIT = 100 # threshold for switching back to the modern index instead of fetching every spec
-      S3_SCHEME = 's3'
 
       attr_reader :remotes, :caches
 
@@ -189,12 +188,7 @@ module Bundler
 
       def fetchers
         @fetchers ||= remotes.map do |uri|
-          case uri.scheme
-          when S3_SCHEME
-            Bundler::S3Fetcher.new(uri)
-          else
             Bundler::Fetcher.new(uri)
-          end
         end
       end
 

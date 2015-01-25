@@ -5,7 +5,6 @@ Features:
   - add metadata allowed_push_host to new gem template (#3002, @juanitofatas)
   - adds a `--no-install` flag to `bundle package`
   - add `bundle viz --without` to exclude gem groups from resulting graph (@fnichol)
-  - add support for private S3 sources (@tryba)
   - prevent whitespace in gem declarations with clear messaging (@benlakey)
   - tries to find a `bundler-<command>` executable on your path for non-bundler commands (@andremedeiros)
   - tries to find `gems.rb` and it's new counterpart, `gems.locked` (@andremedeiros)
