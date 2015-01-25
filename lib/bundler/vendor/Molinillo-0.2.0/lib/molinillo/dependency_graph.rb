@@ -1,12 +1,34 @@
 require 'set'
+require 'tsort'
 
 module Bundler::Molinillo
   # A directed acyclic graph that is tuned to hold named dependencies
   class DependencyGraph
     include Enumerable
 
+    # Enumerates through the vertices of the graph.
+    # @return [Array<Vertex>] The graph's vertices.
     def each
       vertices.values.each { |v| yield v }
+    end
+
+    include TSort
+
+    alias_method :tsort_each_node, :each
+
+    def tsort_each_child(vertex, &block)
+      vertex.successors.each(&block)
+    end
+
+    # Topologically sorts the given vertices.
+    # @param [Enumerable<Vertex>] vertices the vertices to be sorted, which must
+    #   all belong to the same graph.
+    # @return [Array<Vertex>] The sorted vertices.
+    def self.tsort(vertices)
+      TSort.tsort(
+        lambda { |b| vertices.each(&b) },
+        lambda { |v, &b| (v.successors & vertices).each(&b) }
+      )
     end
 
     # A directed edge of a {DependencyGraph}
