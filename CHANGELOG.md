@@ -9,7 +9,6 @@ Features:
   - add support for private S3 sources (@tryba)
   - prevent whitespace in gem declarations with clear messaging (@benlakey)
   - tries to find a `bundler-<command>` executable on your path for non-bundler commands (@andremedeiros)
-  - generates a `.consolerc` file with new gems and tries to load it on `bundle console` (@andremedeiros)
   - tries to find `gems.rb` and it's new counterpart, `gems.locked` (@andremedeiros)
   - Change the initial version of new gems from `0.0.1` to `0.1.0` (@petedmarsh)
 

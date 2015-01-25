@@ -90,7 +90,6 @@ describe "bundle gem" do
       expect(bundled_app("test_gem/lib/test_gem.rb")).to exist
       expect(bundled_app("test_gem/lib/test_gem/version.rb")).to exist
       expect(bundled_app("test_gem/.gitignore")).to exist
-      expect(bundled_app("test_gem/.consolerc")).to exist
     end
 
     it "starts with version 0.1.0" do

@@ -165,10 +165,6 @@ module Spec
       create_file("Gemfile.lock", *args)
     end
 
-    def consolerc(*args)
-      create_file(".consolerc", *args)
-    end
-
     def strip_whitespace(str)
       # Trim the leading spaces
       spaces = str[/\A\s+/, 0] || ""

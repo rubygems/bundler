@@ -11,7 +11,6 @@ module Bundler
       ARGV.clear
 
       console = get_console(Bundler.settings[:console] || 'irb')
-      load '.consolerc' if File.exists?('.consolerc')
       console.start
     end
 

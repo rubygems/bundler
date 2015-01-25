@@ -44,7 +44,6 @@ module Bundler
         "lib/newgem/version.rb.tt" => "lib/#{namespaced_path}/version.rb",
         "LICENSE.txt.tt" => "LICENSE.txt",
         "newgem.gemspec.tt" => "#{name}.gemspec",
-        "consolerc.tt" => ".consolerc",
         "Rakefile.tt" => "Rakefile",
         "README.md.tt" => "README.md"
       }
