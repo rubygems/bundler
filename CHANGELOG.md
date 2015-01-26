@@ -12,6 +12,7 @@ Features:
   - generates a `.consolerc` file with new gems and tries to load it on `bundle console` (@andremedeiros)
   - tries to find `gems.rb` and it's new counterpart, `gems.locked` (@andremedeiros)
   - Change the initial version of new gems from `0.0.1` to `0.1.0` (@petedmarsh)
+  - Optimized `bundle-exec` checks the `$PATH` for existing command/binstub and executes it (@kirs) #3291
 
 Documentation:
   - add missing Gemfile global `path` explanation (@agenteo)
