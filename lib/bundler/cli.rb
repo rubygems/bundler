@@ -35,10 +35,10 @@ module Bundler
     stop_on_unknown_option! :exec
 
     default_task :install
-    class_option "no-color", :type => :boolean, :banner => "Disable colorization in output"
-    class_option "retry",    :type => :numeric, :aliases => "-r", :banner =>
-      "Specify the number of times you wish to attempt network commands"
-    class_option "verbose",  :type => :boolean, :banner => "Enable verbose output mode", :aliases => "-V"
+    class_option "no-color", :type => :boolean, :desc => "Disable colorization in output"
+    class_option "retry",    :type => :numeric, :aliases => "-r", :banner => "NUM",
+      :desc => "Specify the number of times you wish to attempt network commands"
+    class_option "verbose",  :type => :boolean, :desc => "Enable verbose output mode", :aliases => "-V"
 
     def help(cli = nil)
       case cli
@@ -337,15 +337,15 @@ module Bundler
     end
 
     desc "gem GEM [OPTIONS]", "Creates a skeleton for creating a rubygem"
-    method_option :bin, :type => :boolean, :default => false, :aliases => '-b', :banner => "Generate a binary for your library."
-    method_option :coc, :type => :boolean, :banner => "Generate a code of conduct file"
-    method_option :edit, :type => :string, :aliases => "-e", :required => false, :banner => "/path/to/your/editor",
+    method_option :bin, :type => :boolean, :default => false, :aliases => '-b', :desc => "Generate a binary for your library. Set a default with `bundle config gem.mit true`."
+    method_option :coc, :type => :boolean, :desc => "Generate a code of conduct file. Set a default with `bundle config gem.coc true`."
+    method_option :edit, :type => :string, :aliases => "-e", :required => false, :banner => "EDITOR",
       :lazy_default => [ENV['BUNDLER_EDITOR'], ENV['VISUAL'], ENV['EDITOR']].find{|e| !e.nil? && !e.empty? },
       :desc => "Open generated gemspec in the specified editor (defaults to $EDITOR or $BUNDLER_EDITOR)"
-    method_option :ext, :type => :boolean, :default => false, :banner => "Generate the boilerplate for C extension code"
-    method_option :mit, :type => :boolean, :banner => "Generate an MIT license file"
-    method_option :test, :type => :string, :lazy_default => 'rspec', :aliases => '-t',
-      :banner => "Generate a test directory for your library: 'rspec' is the default, but 'minitest' is also supported."
+    method_option :ext, :type => :boolean, :default => false, :desc => "Generate the boilerplate for C extension code"
+    method_option :mit, :type => :boolean, :desc => "Generate an MIT license file"
+    method_option :test, :type => :string, :lazy_default => 'rspec', :aliases => '-t', :banner => "rspec",
+      :desc => "Generate a test directory for your library, either rspec or minitest. Set a default with `bundle config gem.test rspec`."
     def gem(name)
       require 'bundler/cli/gem'
       Gem.new(options, name, self).run
