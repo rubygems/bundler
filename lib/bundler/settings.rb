@@ -115,6 +115,14 @@ module Bundler
       ENV['BUNDLE_IGNORE_CONFIG']
     end
 
+    def app_cache_path
+      @app_cache_path ||= begin
+        path = self[:cache_path] || "vendor/cache"
+        raise InvalidOption, "Cache path must be relative to the bundle path" if path.start_with?("/")
+        path
+      end
+    end
+
   private
     def key_for(key)
       key = key.to_s.gsub(".", "__").upcase

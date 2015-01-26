@@ -44,7 +44,7 @@ module Bundler
                                  "before deploying."
         end
 
-        if Bundler.root.join("vendor/cache").exist?
+        if Bundler.app_cache.exist?
           options[:local] = true
         end
 
@@ -78,7 +78,7 @@ module Bundler
       definition = Bundler.definition
       definition.validate_ruby!
       Installer.install(Bundler.root, definition, options)
-      Bundler.load.cache if Bundler.root.join("vendor/cache").exist? && !options["no-cache"] && !Bundler.settings[:frozen]
+      Bundler.load.cache if Bundler.app_cache.exist? && !options["no-cache"] && !Bundler.settings[:frozen]
 
       Bundler.ui.confirm "Bundle complete! #{dependencies_count_for(definition)}, #{gems_installed_for(definition)}."
       confirm_without_groups
@@ -113,7 +113,7 @@ module Bundler
       end
     rescue GemNotFound, VersionConflict => e
       if options[:local] && Bundler.app_cache.exist?
-        Bundler.ui.warn "Some gems seem to be missing from your vendor/cache directory."
+        Bundler.ui.warn "Some gems seem to be missing from your #{Bundler.settings.app_cache_path} directory."
       end
 
       unless Bundler.definition.has_rubygems_remotes?

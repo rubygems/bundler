@@ -106,10 +106,10 @@ module Bundler
     alias gems specs
 
     def cache(custom_path = nil)
-      cache_path = cache_path(custom_path)
+      cache_path = Bundler.app_cache(custom_path)
       FileUtils.mkdir_p(cache_path) unless File.exist?(cache_path)
 
-      Bundler.ui.info "Updating files in vendor/cache"
+      Bundler.ui.info "Updating files in #{Bundler.settings.app_cache_path}"
       specs.each do |spec|
         next if spec.name == 'bundler'
         spec.source.send(:fetch_gem, spec) if Bundler.settings[:cache_all_platforms] && spec.source.respond_to?(:fetch_gem, true)
@@ -121,15 +121,14 @@ module Bundler
         FileUtils.touch(File.expand_path("../.bundlecache", git_dir))
       end
 
-      prune_cache(custom_path) unless Bundler.settings[:no_prune]
+      prune_cache(cache_path) unless Bundler.settings[:no_prune]
     end
 
-    def prune_cache(custom_path)
-      cache_path = cache_path(custom_path)
+    def prune_cache(cache_path)
       FileUtils.mkdir_p(cache_path) unless File.exist?(cache_path)
       resolve = @definition.resolve
-      prune_gem_cache(resolve, custom_path)
-      prune_git_and_path_cache(resolve, custom_path)
+      prune_gem_cache(resolve, cache_path)
+      prune_git_and_path_cache(resolve, cache_path)
     end
 
     def clean(dry_run = false)
@@ -228,8 +227,8 @@ module Bundler
 
   private
 
-    def prune_gem_cache(resolve, custom_path)
-      cached  = Dir["#{cache_path(custom_path)}/*.gem"]
+    def prune_gem_cache(resolve, cache_path)
+      cached  = Dir["#{cache_path}/*.gem"]
 
       cached = cached.delete_if do |path|
         spec = Bundler.rubygems.spec_from_gem path
@@ -240,7 +239,7 @@ module Bundler
       end
 
       if cached.any?
-        Bundler.ui.info "Removing outdated .gem files from vendor/cache"
+        Bundler.ui.info "Removing outdated .gem files from #{Bundler.settings.app_cache_path}"
 
         cached.each do |path|
           Bundler.ui.info "  * #{File.basename(path)}"
@@ -249,8 +248,8 @@ module Bundler
       end
     end
 
-    def prune_git_and_path_cache(resolve, custom_path)
-      cached  = Dir["#{cache_path(custom_path)}/*/.bundlecache"]
+    def prune_git_and_path_cache(resolve, cache_path)
+      cached  = Dir["#{cache_path}/*/.bundlecache"]
 
       cached = cached.delete_if do |path|
         name = File.basename(File.dirname(path))
@@ -262,7 +261,7 @@ module Bundler
       end
 
       if cached.any?
-        Bundler.ui.info "Removing outdated git and path gems from vendor/cache"
+        Bundler.ui.info "Removing outdated git and path gems from #{Bundler.settings.app_cache_path}"
 
         cached.each do |path|
           path = File.dirname(path)
@@ -289,9 +288,5 @@ module Bundler
       end
     end
 
-    def cache_path(custom_path = nil)
-      path = custom_path || root
-      path.join("vendor/cache")
-    end
   end
 end

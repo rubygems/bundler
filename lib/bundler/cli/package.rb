@@ -10,6 +10,7 @@ module Bundler
       Bundler.ui.level = "error" if options[:quiet]
       Bundler.settings[:path] = File.expand_path(options[:path]) if options[:path]
       Bundler.settings[:cache_all_platforms] = options["all-platforms"] if options.key?("all-platforms")
+      Bundler.settings[:cache_path] = options["cache-path"] if options.key?("cache-path")
 
       setup_cache_all
       install

@@ -49,7 +49,7 @@ module Bundler
 
       Bundler.definition.validate_ruby!
       Installer.install Bundler.root, Bundler.definition, opts
-      Bundler.load.cache if Bundler.root.join("vendor/cache").exist?
+      Bundler.load.cache if Bundler.app_cache.exist?
 
       if Bundler.settings[:clean] && Bundler.settings[:path]
         require "bundler/cli/clean"
