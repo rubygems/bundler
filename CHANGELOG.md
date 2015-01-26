@@ -1,14 +1,32 @@
-## 1.8.0 (unreleased)
+## 1.8.0.pre (2015-01-26)
 
 Features:
 
   - add metadata allowed_push_host to new gem template (#3002, @juanitofatas)
-  - adds a `--no-install` flag to `bundle package`
+  - adds a `--no-install` flag to `bundle package` (@d-reinhold)
+  - add `bundle config auto_install true` to install automatically (@smashwilson)
   - add `bundle viz --without` to exclude gem groups from resulting graph (@fnichol)
   - prevent whitespace in gem declarations with clear messaging (@benlakey)
   - tries to find a `bundler-<command>` executable on your path for non-bundler commands (@andremedeiros)
   - tries to find `gems.rb` and it's new counterpart, `gems.locked` (@andremedeiros)
-  - Change the initial version of new gems from `0.0.1` to `0.1.0` (@petedmarsh)
+  - change the initial version of new gems from `0.0.1` to `0.1.0` (@petedmarsh)
+  - add `package --all-platforms` to cache gems for each known platform (@ccutrer)
+  - speed up `exec` when running commands on the $PATH (@kirs)
+  - add gem code of conduct file and option (@kirs)
+  - add config settings for gem license and tests (@kirs)
+  - add `bin/setup` and `bin/console` to new gems (@indirect)
+  - include configured user-agent in network requests (@indirect)
+  - support `github`, `gist`, and `bitbucket` options on git gems (@indirect)
+  - add `package --cache-path` and `config cache_path` for cache location (@jnraine)
+  - allow `config` to work even when a Gemfile is not present (@dholdren)
+  - add `config gemfile /path` for other Gemfile locations (@dholdren)
+
+Bugfixes:
+
+  - reduce memory usage with threaded parallel workers (@Who828)
+  - support read-only git gems (@pmahoney)
+  - various resolver performance improvements (@dubek)
+  - untaint git gem paths for Rubygems compatibility (@tdtds)
 
 Documentation:
 
