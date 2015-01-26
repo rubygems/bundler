@@ -12,6 +12,7 @@ Features:
   - generates a `.consolerc` file with new gems and tries to load it on `bundle console` (@andremedeiros)
   - tries to find `gems.rb` and it's new counterpart, `gems.locked` (@andremedeiros)
   - Change the initial version of new gems from `0.0.1` to `0.1.0` (@petedmarsh)
+  - add support for setting cache path via --cache-path or BUNDLE_CACHE_PATH (@jnraine)
 
 Documentation:
   - add missing Gemfile global `path` explanation (@agenteo)

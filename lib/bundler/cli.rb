@@ -118,6 +118,8 @@ module Bundler
     D
     method_option "binstubs", :type => :string, :lazy_default => "bin", :banner =>
       "Generate bin stubs for bundled gems to ./bin"
+    method_option "cache-path", :type => :string, :banner =>
+      "Specify a different cache path than the system default ($BUNDLE_CACHE_PATH or vendor/cache)."
     method_option "clean", :type => :boolean, :banner =>
       "Run bundle clean automatically after install"
     method_option "deployment", :type => :boolean, :banner =>
@@ -230,6 +232,8 @@ module Bundler
     desc "cache [OPTIONS]", "Cache all the gems to vendor/cache", :hide => true
     method_option "all",  :type => :boolean, :banner => "Include all sources (including path, git and svn)."
     method_option "all-platforms", :type => :boolean, :banner => "Include gems for all platforms, not just the current one"
+    method_option "cache-path", :type => :string, :banner =>
+      "Specify a different cache path than the system default ($BUNDLE_CACHE_PATH or vendor/cache)."
     method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
     def cache
       require 'bundler/cli/cache'
@@ -239,6 +243,8 @@ module Bundler
     desc "package [OPTIONS]", "Locks and then caches all of the gems into vendor/cache"
     method_option "all",  :type => :boolean, :banner => "Include all sources (including path, git and svn)."
     method_option "all-platforms", :type => :boolean, :banner => "Include gems for all platforms, not just the current one"
+    method_option "cache-path", :type => :string, :banner =>
+      "Specify a different cache path than the system default ($BUNDLE_CACHE_PATH or vendor/cache)."
     method_option "gemfile", :type => :string, :banner => "Use the specified gemfile instead of Gemfile"
     method_option "no-install",  :type => :boolean, :banner => "Don't actually install the gems, just package."
     method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."

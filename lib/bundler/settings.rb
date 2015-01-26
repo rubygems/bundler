@@ -107,6 +107,16 @@ module Bundler
       end
     end
 
+    def cache_path
+      @cache_path = self[:cache_path] || ENV["BUNDLE_CACHE_PATH"] || "vendor/cache"
+
+      if @cache_path.start_with?("/")
+        fail Thor::Error, "Cache path must be relative: #{self[:cache_path]}"
+      end
+
+      @cache_path
+    end
+
     def allow_sudo?
       !@local_config.key?(key_for(:path))
     end
