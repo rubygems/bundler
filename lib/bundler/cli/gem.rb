@@ -16,6 +16,8 @@ module Bundler
     end
 
     def run
+      Bundler.ui.confirm "Creating gem '#{name}'..."
+
       underscored_name = name.tr('-', '_')
       namespaced_path = name.tr('-', '/')
       constant_name = name.split('_').map{|p| p[0..0].upcase + p[1..-1] }.join
@@ -47,11 +49,21 @@ module Bundler
         "README.md.tt" => "README.md"
       }
 
-      if ask_and_set(:coc, "Do you want to include Code Of Conduct?")
+      if ask_and_set(:coc, "Do you want to include a code of conduct in gems you generate?",
+          "Codes of conduct can increase contributions to your project by contributors who " \
+          "prefer collaborative, safe spaces. You can read more about the code of conduct at " \
+          "contributor-covenant.org. Having a code of conduct means agreeing to the responsibility " \
+          "of enforcing it, so be sure that you are prepared to do that. For suggestions about " \
+          "how to enforce codes of conduct, see bit.ly/coc-enforcement."
+        )
         templates.merge!("CODE_OF_CONDUCT.md.tt" => "CODE_OF_CONDUCT.md")
       end
 
-      if ask_and_set(:mit, "Do you want to license your code permissively under the MIT license (http://choosealicense.com/licenses/mit/)?")
+      if ask_and_set(:mit, "Do you want to license your code permissively under the MIT license?",
+          "This means that any other developer or company will be legally allowed to use your code " \
+          "for free as long as they admit you created it. You can read more about the MIT license " \
+          "at choosealicense.com/licenses/mit."
+        )
         templates.merge!("LICENSE.txt.tt" => "LICENSE.txt")
       end
 
@@ -102,11 +114,12 @@ module Bundler
       Pathname.pwd.join(name).basename.to_s
     end
 
-    def ask_and_set(key, message)
+    def ask_and_set(key, header, message)
       result = options[key]
       if !Bundler.settings.all.include?("gem.#{key}")
         if result.nil?
-          result = Bundler.ui.ask("#{message} (y/n):") == "y"
+          Bundler.ui.confirm header
+          result = Bundler.ui.ask("#{message} y/(n):") == "y"
         end
 
         Bundler.settings.set_global("gem.#{key}", result)
@@ -128,8 +141,14 @@ module Bundler
     def ask_and_set_test_framework
       test_framework = options[:test] || Bundler.settings["gem.test"]
       if test_framework.nil?
-        result = Bundler.ui.ask("Would like to generate tests along with their gems? (rspec/minitest/false):")
-        test_framework = result == "false" ? false : result
+        Bundler.ui.confirm "Do you want to generate tests with your gem?"
+        result = Bundler.ui.ask "Type 'rspec' or 'minitest' to generate those test files now and " \
+          "in the future. rspec/minitest/(none):"
+        if result =~ /rspec|minitest/
+          test_framework = result
+        else
+          test_framework = "false"
+        end
       end
 
       if Bundler.settings["gem.test"].nil?

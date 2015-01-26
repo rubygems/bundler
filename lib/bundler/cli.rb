@@ -331,7 +331,6 @@ module Bundler
     method_option :requirements, :type => :boolean, :default => false, :aliases => '-r', :banner => "Set to show the version of each required dependency."
     method_option :version, :type => :boolean, :default => false, :aliases => '-v', :banner => "Set to show each gem version."
     method_option :without, :type => :array, :default => [], :banner => "Exclude gems that are part of the specified named group."
-
     def viz
       require 'bundler/cli/viz'
       Viz.new(options).run
@@ -339,17 +338,14 @@ module Bundler
 
     desc "gem GEM [OPTIONS]", "Creates a skeleton for creating a rubygem"
     method_option :bin, :type => :boolean, :default => false, :aliases => '-b', :banner => "Generate a binary for your library."
-    method_option :edit, :type => :string, :aliases => "-e",
-                  :lazy_default => [ENV['BUNDLER_EDITOR'], ENV['VISUAL'], ENV['EDITOR']].find{|e| !e.nil? && !e.empty? },
-                  :required => false, :banner => "/path/to/your/editor",
-                  :desc => "Open generated gemspec in the specified editor (defaults to $EDITOR or $BUNDLER_EDITOR)"
+    method_option :coc, :type => :boolean, :banner => "Generate a code of conduct file"
+    method_option :edit, :type => :string, :aliases => "-e", :required => false, :banner => "/path/to/your/editor",
+      :lazy_default => [ENV['BUNDLER_EDITOR'], ENV['VISUAL'], ENV['EDITOR']].find{|e| !e.nil? && !e.empty? },
+      :desc => "Open generated gemspec in the specified editor (defaults to $EDITOR or $BUNDLER_EDITOR)"
     method_option :ext, :type => :boolean, :default => false, :banner => "Generate the boilerplate for C extension code"
-    method_option :test, :type => :string, :lazy_default => 'rspec', :aliases => '-t', :banner =>
-      "Generate a test directory for your library: 'rspec' is the default, but 'minitest' is also supported."
-
-    method_option :mit, :type => :boolean, :banner => "Use MIT license"
-    method_option :coc, :type => :boolean, :banner => "Use Code Of Conduct"
-
+    method_option :mit, :type => :boolean, :banner => "Generate an MIT license file"
+    method_option :test, :type => :string, :lazy_default => 'rspec', :aliases => '-t',
+      :banner => "Generate a test directory for your library: 'rspec' is the default, but 'minitest' is also supported."
     def gem(name)
       require 'bundler/cli/gem'
       Gem.new(options, name, self).run
