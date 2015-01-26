@@ -106,7 +106,7 @@ module Bundler
       @api_timeout    = 10 # How long to wait for each API call
       @max_retries    = 3  # How many retries for the API call
 
-      @anonymizable_uri = resolve_remote_uri(remote_uri)
+      @anonymizable_uri = configured_uri_for(remote_uri)
 
       Socket.do_not_reverse_lookup = true
       connection # create persistent connection
@@ -392,20 +392,10 @@ module Bundler
 
   private
 
-    def resolve_remote_uri(uri)
-      add_configured_credentials(Bundler::Source.mirror_for(uri))
-    end
-
-    def add_configured_credentials(uri)
-      auth = Bundler.settings[uri.to_s]
-      auth ||= Bundler.settings[uri.host]
-
-      if auth
-        uri = uri.dup
-        uri.user, uri.password = *auth.split(":", 2)
-      end
-
-      AnonymizableURI.new(uri)
+    def configured_uri_for(uri)
+      uri = Bundler::Source.mirror_for(uri)
+      config_auth = Bundler.settings[uri.to_s] || Bundler.settings[uri.host]
+      AnonymizableURI.new(uri, config_auth)
     end
 
     def fetch_uri

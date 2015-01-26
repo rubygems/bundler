@@ -3,14 +3,30 @@ module Bundler
     attr_reader :original_uri,
                 :without_credentials
 
-    def initialize(original_uri)
-      @original_uri = original_uri.freeze
-      @without_credentials ||=
-        if original_uri.userinfo
-          original_uri.dup.tap { |uri| uri.user = uri.password = nil }.freeze
-        else
-          original_uri
-        end
+    def initialize(original_uri, fallback_auth)
+      @original_uri = apply_auth(original_uri, fallback_auth).freeze
+      @without_credentials = remove_auth(@original_uri).freeze
     end
+
+  private
+
+    def apply_auth(uri, auth)
+      if uri.userinfo.nil?
+        uri = uri.dup
+        uri.userinfo = auth
+      end
+
+      uri
+    end
+
+    def remove_auth(uri)
+      if uri.userinfo
+        uri = uri.dup
+        uri.user = uri.password = nil
+      end
+
+      uri
+    end
+
   end
 end
