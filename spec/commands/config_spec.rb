@@ -254,10 +254,10 @@ describe "setting gemfile via config" do
       gem 'rack'
       G
     end
-    it "persists the gemfile location to .bundle/config" do
 
+    it "persists the gemfile location to .bundle/config" do
       bundle "config --local gemfile #{bundled_app("NotGemfile")}"
-      expect(File.exists?(".bundle/config")).to eq(true)
+      expect(File.exist?(".bundle/config")).to eq(true)
 
       bundle "config"
       expect(out).to include("NotGemfile")
