@@ -215,8 +215,8 @@ E
       File.open(bundled_app(".bundle/config"), 'w') do |f|
         f.write 'BUNDLE_FOO: "$BUILD_DIR"'
       end
-      expect(bundled_app(".bundle/config").read).to eq('BUNDLE_FOO: "$BUILD_DIR"')
-      bundle :install, :jobs => 4
+
+      bundle "config bar baz"
       run "puts Bundler.settings.send(:local_config_file).read"
 
       # Starting in Ruby 2.1, YAML automatically adds double quotes
