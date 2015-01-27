@@ -1,3 +1,17 @@
+## 1.8.0.rc (2015-01-26)
+
+Features:
+
+  - add `config disable_multisource` option to ensure sources can't compete (@indirect)
+
+Bugfixes:
+
+  - don't add extra quotes around long, quoted config values (@aroben, #3338)
+
+Security:
+
+  - warn when more than one top-level source is present (@indirect)
+
 ## 1.8.0.pre (2015-01-26)
 
 Features:
