@@ -8,7 +8,7 @@ describe Bundler::GemHelper do
   let(:app_gemspec_path) { app_path.join("#{app_name}.gemspec") }
 
   before(:each) do
-    config "gem.mit" => "false", "gem.coc" => "false", "gem.test" => "false"
+    global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__TEST" => "false", "BUNDLE_GEM__COC" => "false"
     bundle "gem #{app_name}"
   end
 
