@@ -15,7 +15,7 @@ describe "bundle install with gems on multiple sources" do
       end
     end
 
-    context "when the same version of the same gem is in multiple sources" do
+    context "with multiple toplevel sources" do
       let(:repo3_rack_version) { "1.0.0" }
 
       before do
@@ -30,9 +30,17 @@ describe "bundle install with gems on multiple sources" do
       it "warns about ambiguous gems, but installs anyway, prioritizing sources last to first" do
         bundle :install
 
+        expect(out).to include("Warning: this Gemfile contains multiple primary sources.")
         expect(out).to include("Warning: the gem 'rack' was found in multiple sources.")
         expect(out).to include("Installed from: file:#{gem_repo1}")
         should_be_installed("rack-obama 1.0.0", "rack 1.0.0")
+      end
+
+      it "errors when disable_multisource is set" do
+        bundle "config disable_multisource true"
+        bundle :install
+        expect(out).to include("Each source after the first must include a block")
+        expect(exitstatus).to eq(14) if exitstatus
       end
     end
 
@@ -51,6 +59,7 @@ describe "bundle install with gems on multiple sources" do
       it "warns about ambiguous gems, but installs anyway" do
         bundle :install
 
+        expect(out).to include("Warning: this Gemfile contains multiple primary sources.")
         expect(out).to include("Warning: the gem 'rack' was found in multiple sources.")
         expect(out).to include("Installed from: file:#{gem_repo1}")
         should_be_installed("rack-obama 1.0.0", "rack 1.0.0")
@@ -214,6 +223,7 @@ describe "bundle install with gems on multiple sources" do
 
           it "installs from the other source and warns about ambiguous gems" do
             bundle :install
+            expect(out).to include("Warning: this Gemfile contains multiple primary sources.")
             expect(out).to include("Warning: the gem 'rack' was found in multiple sources.")
             expect(out).to include("Installed from: file:#{gem_repo2}")
             should_be_installed("depends_on_rack 1.0.1", "rack 1.0.0")

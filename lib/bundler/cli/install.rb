@@ -104,7 +104,7 @@ module Bundler
         Bundler.ui.error "You should add a source requirement to restrict this gem to your preferred source."
         Bundler.ui.error "For example:"
         Bundler.ui.error "    gem '#{name}', :source => '#{installed_from_uri}'"
-        Bundler.ui.error "Then uninstall the gem '#{name}' (or delete all bundled gems) and then install again."
+        Bundler.ui.error "Then uninstall the gem '#{name}' (or delete all bundled gems) and install again."
       end
 
       if Bundler.settings[:clean] && Bundler.settings[:path]

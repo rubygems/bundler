@@ -74,6 +74,10 @@ module Bundler
       all_sources.each(&:remote!)
     end
 
+    def rubygems_primary_remotes
+      @rubygems_aggregate.remotes
+    end
+
   private
 
     def add_source_to_list(source, list)
