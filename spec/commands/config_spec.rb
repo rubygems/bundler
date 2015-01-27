@@ -223,6 +223,19 @@ E
       # around some values, including $ and newlines.
       expect(out).to include('BUNDLE_FOO: "$BUILD_DIR"')
     end
+
+    it "doesn't duplicate quotes around long wrapped values" do
+      long_string = "--with-xml2-include=/usr/pkg/include/libxml2 --with-xml2-lib=/usr/pkg/lib --with-xslt-dir=/usr/pkg"
+      bundle "config foo #{long_string}"
+
+      run "puts Bundler.settings[:foo]"
+      expect(out).to eq(long_string)
+
+      bundle "config bar baz"
+
+      run "puts Bundler.settings[:foo]"
+      expect(out).to eq(long_string)
+    end
   end
 
   describe "very long lines" do
@@ -230,11 +243,20 @@ E
     let(:long_string) do
       "--with-xml2-include=/usr/pkg/include/libxml2 --with-xml2-lib=/usr/pkg/lib --with-xslt-dir=/usr/pkg"
     end
+    let(:long_string_without_special_characters) do
+      "here is quite a long string that will wrap to a second line but will not be surrounded by quotes"
+    end
 
     it "doesn't wrap values" do
       bundle "config foo #{long_string}"
       run "puts Bundler.settings[:foo]"
       expect(out).to match(long_string)
+    end
+
+    it "can read wrapped unquoted values" do
+      bundle "config foo #{long_string_without_special_characters}"
+      run "puts Bundler.settings[:foo]"
+      expect(out).to match(long_string_without_special_characters)
     end
   end
 
