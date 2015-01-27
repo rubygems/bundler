@@ -1,9 +1,12 @@
 require "spec_helper"
 
 describe "bundle gem" do
-  before do
-    config "gem.mit" => "false", "gem.coc" => "false", "gem.test" => "false"
+  def reset!
+    super
+    global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__TEST" => "false", "BUNDLE_GEM__COC" => "false"
+  end
 
+  before do
     @git_name = `git config --global user.name`.chomp
     `git config --global user.name "Bundler User"`
     @git_email = `git config --global user.email`.chomp
