@@ -262,7 +262,7 @@ describe "gemcutter's dependency API" do
 
   it "considers all possible versions of dependencies from all api gem sources" do
     # In this scenario, the gem "somegem" only exists in repo4.  It depends on specific version of activesupport that
-    # exists only in repo1.  There happens also be a version of activesupport in repo4, but one that version 1.0.0
+    # exists only in repo1.  There happens also be a version of activesupport in repo4, but not the one that version 1.0.0
     # of somegem wants. This test makes sure that bundler actually finds version 1.2.3 of active support in the other
     # repo and installs it.
     build_repo4 do
