@@ -57,10 +57,9 @@ describe "Resolving" do
     @index = a_circular_index
     dep "circular_app"
 
-    got = resolve
     expect {
-      got = got.map { |s| s.full_name }.sort
-    }.to raise_error(Bundler::CyclicDependencyError, /please remove either gem 'foo' or gem 'bar'/i)
+      resolve
+    }.to raise_error(Bundler::CyclicDependencyError, /please remove either gem 'bar' or gem 'foo'/i)
   end
 
 end

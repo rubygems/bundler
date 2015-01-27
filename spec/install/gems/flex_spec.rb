@@ -197,7 +197,7 @@ describe "bundle flex_install" do
         Resolving dependencies...
         Bundler could not find compatible versions for gem "rack":
           In snapshot (Gemfile.lock):
-            rack (0.9.1)
+            rack (= 0.9.1)
 
           In Gemfile:
             rack-obama (= 2.0) ruby depends on
