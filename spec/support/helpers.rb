@@ -153,8 +153,7 @@ module Spec
       @exitstatus = $?.exitstatus
     end
 
-    def config(config = nil)
-      path = bundled_app('.bundle/config')
+    def config(config = nil, path = bundled_app('.bundle/config'))
       return YAML.load_file(path) unless config
       FileUtils.mkdir_p(File.dirname(path))
       File.open(path, 'w') do |f|
@@ -163,20 +162,23 @@ module Spec
       config
     end
 
+    def global_config(config = nil)
+      config(config, home(".bundle/config"))
+    end
+
     def gemfile(*args)
-      path = bundled_app("Gemfile")
-      path = args.shift if args.first.is_a?(Pathname)
-      str  = args.shift || ""
-      path.dirname.mkpath
-      File.open(path.to_s, 'w') do |f|
-        f.puts strip_whitespace(str)
-      end
+      create_file("Gemfile", *args)
     end
 
     def lockfile(*args)
-      path = bundled_app("Gemfile.lock")
+      create_file("Gemfile.lock", *args)
+    end
+
+    def create_file(*args)
+      path = bundled_app(args.shift)
       path = args.shift if args.first.is_a?(Pathname)
       str  = args.shift || ""
+      path.dirname.mkpath
       File.open(path.to_s, 'w') do |f|
         f.puts strip_whitespace(str)
       end
