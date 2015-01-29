@@ -302,6 +302,18 @@ module Bundler
               Bundler.ui.info "" if !Bundler.ui.debug? # new line now that the dots are over
             end
 
+            # Suppose the gem Foo depends on the gem Bar.  Foo exists in Source A.  Bar has some versions that exist in both
+            # sources A and B.  At this point, the API request will have found all the versions of Bar in source A,
+            # but will not have found any versions of Bar from source B, which is a problem if the requested version
+            # of Foo specifically depends on a version of Bar that is only found in source B. This ensures that for
+            # each spec we found, we add all possible versions from all sources to the index.
+            begin
+              idxcount = idx.size
+              api_fetchers.each do |f|
+                idx.use f.specs(idx.dependency_names, self), true
+              end
+            end until idxcount == idx.size
+
             if api_fetchers.any? && api_fetchers.all?{|f| f.use_api }
               # it's possible that gems from one source depend on gems from some
               # other source, so now we download gemspecs and iterate over those

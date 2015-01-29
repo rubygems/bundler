@@ -260,6 +260,12 @@ module Spec
       FileUtils.rm_rf Dir[gem_repo3("prerelease*")]
     end
 
+    # A repo that has no pre-installed gems included.  (The caller completely determines the contents with the block)
+    def build_repo4(&blk)
+      FileUtils.rm_rf gem_repo4
+      build_repo(gem_repo4, &blk)
+    end
+
     def update_repo2
       update_repo gem_repo2 do
         build_gem "rack", "1.2" do |s|

@@ -60,6 +60,10 @@ module Spec
       tmp("gems/remote3", *args)
     end
 
+    def gem_repo4(*args)
+      tmp("gems/remote4", *args)
+    end
+
     def security_repo(*args)
       tmp("gems/security_repo", *args)
     end
