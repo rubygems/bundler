@@ -20,6 +20,7 @@ Features:
   - add `package --cache-path` and `config cache_path` for cache location (@jnraine)
   - allow `config` to work even when a Gemfile is not present (@dholdren)
   - add `config gemfile /path` for other Gemfile locations (@dholdren)
+  - add `github` method alonside the `git` method (@BenMorganIO)
 
 Bugfixes:
 
