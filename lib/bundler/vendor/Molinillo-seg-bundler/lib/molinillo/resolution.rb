@@ -229,7 +229,7 @@ module Bundler::Molinillo
       #   `requirement`.
       def find_state_for(requirement)
         return nil unless requirement
-        states.find { |i| requirement == i.requirement }
+        states.reverse_each.find { |i| requirement == i.requirement && i.is_a?(DependencyState) }
       end
 
       # @return [Boolean] whether or not the given state has any possibilities
@@ -320,10 +320,22 @@ module Bundler::Molinillo
           new_requirements = requirements.dup
           push_state_for_requirements(new_requirements)
         else
+          return if attempt_to_swap_possibility
           create_conflict
           debug(depth) { "Unsatisfied by existing spec (#{existing_node.payload})" }
           unwind_for_conflict
         end
+      end
+
+      # Attempts to swp the current {#possibility} with the already-activated
+      # spec with the given name
+      # @return [Boolean] Whether the possibility was swapped into {#activated}
+      def attempt_to_swap_possibility
+        swapped = activated.dup
+        swapped.vertex_named(name).payload = possibility
+        return unless swapped.vertex_named(name).requirements.
+            all? { |r| requirement_satisfied_by?(r, swapped, possibility) }
+        attempt_to_activate_new_spec
       end
 
       # Attempts to activate the current {#possibility} (given that it hasn't
@@ -383,7 +395,7 @@ module Bundler::Molinillo
       # @param [Array] new_requirements
       # @return [void]
       def push_state_for_requirements(new_requirements)
-        new_requirements = sort_dependencies(new_requirements, activated, conflicts)
+        new_requirements = sort_dependencies(new_requirements.uniq, activated, conflicts)
         new_requirement = new_requirements.shift
         states.push DependencyState.new(
           new_requirement ? name_for(new_requirement) : '',
