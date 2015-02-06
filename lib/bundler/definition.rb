@@ -202,7 +202,7 @@ module Bundler
         sources.all_sources.each do |s|
           s.dependency_names = dependency_names.dup
           idx.add_source s.specs
-          s.specs.each { |spec| dependency_names.delete(spec.name) }
+          dependency_names -= s.specs.map{|s| s.name }.uniq
           dependency_names.push(*s.unmet_deps).uniq!
         end
       end
