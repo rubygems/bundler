@@ -1,3 +1,10 @@
+## 1.7.13 (2015-02-07)
+
+Bugfixes:
+
+  - Look up installed gems in remote sources (#3368, #3377, #3300, #3381, @indirect)
+  - Look up gems across all sources to satisfy dependencies (#3365, @keiths-osc)
+
 ## 1.7.12 (2015-01-08)
 
 Bugfixes:
