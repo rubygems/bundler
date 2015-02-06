@@ -263,7 +263,9 @@ module Spec
     # A repo that has no pre-installed gems included.  (The caller completely determines the contents with the block)
     def build_repo4(&blk)
       FileUtils.rm_rf gem_repo4
-      build_repo(gem_repo4, &blk)
+      build_repo(gem_repo4) do
+        yield if block_given?
+      end
     end
 
     def update_repo2

@@ -202,7 +202,11 @@ module Bundler
         sources.all_sources.each do |s|
           s.dependency_names = dependency_names.dup
           idx.add_source s.specs
-          dependency_names -= s.specs.map{|s| s.name }.uniq
+
+          if s.is_a?(Source::Git) || s.is_a?(Source::Path)
+            dependency_names -= s.specs.map{|s| s.name }.uniq
+          end
+
           dependency_names.push(*s.unmet_deps).uniq!
         end
       end

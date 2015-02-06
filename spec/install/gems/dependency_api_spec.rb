@@ -259,6 +259,31 @@ describe "gemcutter's dependency API" do
     should_be_installed "back_deps 1.0"
   end
 
+  it "fetches gem versions even when those gems are already installed" do
+    build_repo4
+
+    gemfile <<-G
+      source "#{source_uri}"
+      source "#{source_uri}/extra" do; end
+      gem "rack", "1.0.0"
+    G
+    bundle :install, :artifice => "endpoint_extra_api"
+
+    update_repo gem_repo1 do
+      build_gem "rack", "1.2" do |s|
+        s.executables = "rackup"
+      end
+    end
+
+    gemfile <<-G
+      source "#{source_uri}"
+      source "#{source_uri}/extra" do; end
+      gem "rack", "1.2"
+    G
+    bundle :install, :artifice => "endpoint_extra_api"
+    should_be_installed "rack 1.2"
+  end
+
   it "considers all possible versions of dependencies from all api gem sources" do
     # In this scenario, the gem "somegem" only exists in repo4.  It depends on specific version of activesupport that
     # exists only in repo1.  There happens also be a version of activesupport in repo4, but not the one that version 1.0.0
@@ -303,7 +328,7 @@ describe "gemcutter's dependency API" do
     expect(out).to include("Fetching source index from http://localgemserver.test/extra")
   end
 
-  it "does not fetch every specs if the index of gems is large when doing back deps" do
+  it "does not fetch every spec if the index of gems is large when doing back deps" do
     build_repo2 do
       build_gem "back_deps" do |s|
         s.add_dependency "foo"
