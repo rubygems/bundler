@@ -301,9 +301,13 @@ module Bundler
     # fetch from Gemcutter Dependency Endpoint API
     def fetch_dependency_remote_specs(gem_names)
       Bundler.ui.debug "Query Gemcutter Dependency Endpoint API: #{gem_names.join(',')}"
-      marshalled_deps = fetch dependency_api_uri(gem_names)
-      gem_list = Bundler.load_marshal(marshalled_deps)
+      gem_list = []
       deps_list = []
+
+      gem_names.each_slice(Source::Rubygems::API_REQUEST_LIMIT) do |names|
+        marshalled_deps = fetch dependency_api_uri(names)
+        gem_list += Bundler.load_marshal(marshalled_deps)
+      end
 
       spec_list = gem_list.map do |s|
         dependencies = s[:dependencies].map do |name, requirement|
