@@ -310,7 +310,9 @@ module Bundler
             begin
               idxcount = idx.size
               api_fetchers.each do |f|
+                Bundler.ui.info "Fetching version metadata from #{f.uri}", Bundler.ui.debug?
                 idx.use f.specs(idx.dependency_names, self), true
+                Bundler.ui.info "" if !Bundler.ui.debug? # new line now that the dots are over
               end
             end until idxcount == idx.size
 
@@ -322,7 +324,7 @@ module Bundler
 
               # if there are any cross-site gems we missed, get them now
               api_fetchers.each do |f|
-                Bundler.ui.info "Fetching additional metadata from #{f.uri}", Bundler.ui.debug?
+                Bundler.ui.info "Fetching dependency metadata from #{f.uri}", Bundler.ui.debug?
                 idx.use f.specs(unmet, self)
                 Bundler.ui.info "" if !Bundler.ui.debug? # new line now that the dots are over
               end if unmet.any?
