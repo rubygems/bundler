@@ -165,7 +165,10 @@ describe Bundler::Dsl do
         subject.github "spree" do
           spree_gems.each { |spree_gem| subject.send :gem, spree_gem }
         end
-        expect(subject.dependencies.map(&:name)).to match_array spree_gems
+
+        subject.dependencies.each do |d|
+          expect(d.source.uri).to eq("git://github.com/spree/spree.git")
+        end
       end
     end
   end

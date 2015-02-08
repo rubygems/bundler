@@ -149,8 +149,12 @@ module Bundler
       with_source(@sources.add_git_source(normalize_hash(options).merge("uri" => uri)), &blk)
     end
 
-    def github(repo, options = {}, &blk)
-      with_source(@sources.add_git_source(normalize_hash(options).merge("github" => repo)), &blk)
+    def github(repo, options = {})
+      raise ArgumentError, "Github sources require a block" unless block_given?
+      github_uri  = @git_sources["github"].call(repo)
+      git_options = normalize_hash(options).merge("uri" => github_uri)
+      git_source  = @sources.add_git_source(git_options)
+      with_source(git_source) { yield }
     end
 
     def to_definition(lockfile, unlock)
