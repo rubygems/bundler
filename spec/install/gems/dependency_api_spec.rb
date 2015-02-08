@@ -260,24 +260,21 @@ describe "gemcutter's dependency API" do
   end
 
   it "fetches gem versions even when those gems are already installed" do
-    build_repo4
-
     gemfile <<-G
       source "#{source_uri}"
-      source "#{source_uri}/extra" do; end
       gem "rack", "1.0.0"
     G
     bundle :install, :artifice => "endpoint_extra_api"
 
-    update_repo gem_repo1 do
+    build_repo4 do
       build_gem "rack", "1.2" do |s|
         s.executables = "rackup"
       end
     end
 
     gemfile <<-G
-      source "#{source_uri}"
-      source "#{source_uri}/extra" do; end
+      source "#{source_uri}" do; end
+      source "#{source_uri}/extra"
       gem "rack", "1.2"
     G
     bundle :install, :artifice => "endpoint_extra_api"
