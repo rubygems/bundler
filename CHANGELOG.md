@@ -2,8 +2,9 @@
 
 Bugfixes:
 
-  - Look up installed gems in remote sources (#3368, #3377, #3300, #3381, @indirect)
+  - Look up installed gems in remote sources (#3300, #3368, #3377, #3380, #3381, @indirect)
   - Look up gems across all sources to satisfy dependencies (#3365, @keiths-osc)
+  - Request dependencies for no more than 100 gems at a time (#3367, @segiddins)
 
 ## 1.7.12 (2015-01-08)
 
