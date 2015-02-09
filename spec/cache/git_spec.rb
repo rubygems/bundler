@@ -16,24 +16,23 @@ end
   describe "bundle #{cmd} with git" do
     it "copies repository to vendor cache and uses it" do
       git = build_git "foo"
-      ref = git.ref_for("master", 11)
+      ref = git.ref_for("master")
 
       install_gemfile <<-G
         gem "foo", :git => '#{lib_path("foo-1.0")}'
       G
 
       bundle "#{cmd} --all"
-      expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
-      expect(bundled_app("vendor/cache/foo-1.0-#{ref}/.git")).not_to exist
-      expect(bundled_app("vendor/cache/foo-1.0-#{ref}/.bundlecache")).to be_file
+      expect(bundled_app("vendor/cache/foo-1.0")).to exist
+      expect(bundled_app("vendor/cache/foo-1.0/.git")).not_to exist
+      expect(bundled_app("vendor/cache/foo-1.0/.bundlecache").read).to eql(ref)
 
       FileUtils.rm_rf lib_path("foo-1.0")
       should_be_installed "foo 1.0"
     end
 
     it "copies repository to vendor cache and uses it even when installed with bundle --path" do
-      git = build_git "foo"
-      ref = git.ref_for("master", 11)
+      build_git "foo"
 
       install_gemfile <<-G
         gem "foo", :git => '#{lib_path("foo-1.0")}'
@@ -42,8 +41,8 @@ end
       bundle "install --path vendor/bundle"
       bundle "#{cmd} --all"
 
-      expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
-      expect(bundled_app("vendor/cache/foo-1.0-#{ref}/.git")).not_to exist
+      expect(bundled_app("vendor/cache/foo-1.0")).to exist
+      expect(bundled_app("vendor/cache/foo-1.0/.git")).not_to exist
 
       FileUtils.rm_rf lib_path("foo-1.0")
       should_be_installed "foo 1.0"
@@ -66,7 +65,7 @@ end
 
     it "tracks updates" do
       git = build_git "foo"
-      old_ref = git.ref_for("master", 11)
+      old_ref = git.ref_for("master")
 
       install_gemfile <<-G
         gem "foo", :git => '#{lib_path("foo-1.0")}'
@@ -78,14 +77,14 @@ end
         s.write "lib/foo.rb", "puts :CACHE"
       end
 
-      ref = git.ref_for("master", 11)
+      ref = git.ref_for("master")
       expect(ref).not_to eq(old_ref)
 
       bundle "update"
       bundle "#{cmd} --all"
 
-      expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
-      expect(bundled_app("vendor/cache/foo-1.0-#{old_ref}")).not_to exist
+      expect(bundled_app("vendor/cache/foo-1.0")).to exist
+      expect(bundled_app("vendor/cache/foo-1.0/.bundlecache").read).to eql(ref)
 
       FileUtils.rm_rf lib_path("foo-1.0")
       run "require 'foo'"
@@ -93,8 +92,7 @@ end
     end
 
     it "uses the local repository to generate the cache" do
-      git = build_git "foo"
-      ref = git.ref_for("master", 11)
+      build_git "foo"
 
       gemfile <<-G
         gem "foo", :git => '#{lib_path("foo-invalid")}', :branch => :master
@@ -104,7 +102,7 @@ end
       bundle "install"
       bundle "#{cmd} --all"
 
-      expect(bundled_app("vendor/cache/foo-invalid-#{ref}")).to exist
+      expect(bundled_app("vendor/cache/foo-invalid")).to exist
 
       # Updating the local still uses the local.
       update_git "foo" do |s|
@@ -118,7 +116,7 @@ end
     it "copies repository to vendor cache, including submodules" do
       build_git "submodule", "1.0"
 
-      git = build_git "has_submodule", "1.0" do |s|
+      build_git "has_submodule", "1.0" do |s|
         s.add_dependency "submodule"
       end
 
@@ -133,11 +131,10 @@ end
         end
       G
 
-      ref = git.ref_for("master", 11)
       bundle "#{cmd} --all"
 
-      expect(bundled_app("vendor/cache/has_submodule-1.0-#{ref}")).to exist
-      expect(bundled_app("vendor/cache/has_submodule-1.0-#{ref}/submodule-1.0")).to exist
+      expect(bundled_app("vendor/cache/has_submodule-1.0")).to exist
+      expect(bundled_app("vendor/cache/has_submodule-1.0/submodule-1.0")).to exist
       should_be_installed "has_submodule 1.0"
     end
 
@@ -167,7 +164,7 @@ end
     end
 
     it "caches pre-evaluated gemspecs" do
-      git = build_git "foo"
+      build_git "foo"
 
       # Insert a gemspec method that shells out
       spec_lines = lib_path("foo-1.0/foo.gemspec").read.split("\n")
@@ -179,8 +176,7 @@ end
       G
       bundle "#{cmd} --all"
 
-      ref = git.ref_for("master", 11)
-      gemspec = bundled_app("vendor/cache/foo-1.0-#{ref}/foo.gemspec").read
+      gemspec = bundled_app("vendor/cache/foo-1.0/foo.gemspec").read
       expect(gemspec).to_not match("`echo bob`")
     end
 
