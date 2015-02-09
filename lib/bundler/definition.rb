@@ -199,11 +199,15 @@ module Bundler
       @index ||= Index.build do |idx|
         dependency_names = @dependencies.map { |d| d.name }
 
-        sources.all_sources.each do |s|
-          s.dependency_names = dependency_names.dup
-          idx.add_source s.specs
-          s.specs.each { |spec| dependency_names.delete(spec.name) }
-          dependency_names.push(*s.unmet_deps).uniq!
+        sources.all_sources.each do |source|
+          source.dependency_names = dependency_names.dup
+          idx.add_source source.specs
+
+          if source.is_a?(Source::Git) || source.is_a?(Source::Path)
+            dependency_names -= source.specs.map{|s| s.name }.uniq
+          end
+
+          dependency_names.push(*source.unmet_deps).uniq!
         end
       end
     end
