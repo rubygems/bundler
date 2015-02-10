@@ -1,3 +1,15 @@
+## 1.8.0 (2015-02-10)
+
+Bugfixes:
+
+  - Gemfile `github` blocks now work (#3379, @indirect)
+
+Bugfixes from v1.7.13:
+
+  - Look up installed gems in remote sources (#3300, #3368, #3377, #3380, #3381, @indirect)
+  - Look up gems across all sources to satisfy dependencies (#3365, @keiths-osc)
+  - Request dependencies for no more than 100 gems at a time (#3367, @segiddins)
+
 ## 1.8.0.rc (2015-01-26)
 
 Features:
