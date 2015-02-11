@@ -5,7 +5,8 @@ require 'rubygems/spec_fetcher'
 module Bundler
   class Source
     class Rubygems < Source
-      API_REQUEST_LIMIT = 100 # threshold for switching back to the modern index instead of fetching every spec
+      # threshold for switching back to the modern index instead of fetching every spec
+      API_REQUEST_LIMIT = 100
 
       attr_reader :remotes, :caches
 
@@ -65,15 +66,10 @@ module Bundler
       alias_method :name, :to_s
 
       def specs
-        @specs ||= begin
-          # remote_specs usually generates a way larger Index than the other
-          # sources, and large_idx.use small_idx is way faster than
-          # small_idx.use large_idx.
-          idx = @allow_remote ? remote_specs.dup : Index.new
-          idx.use(cached_specs, :override_dupes) if @allow_cached || @allow_remote
-          idx.use(installed_specs, :override_dupes)
-          idx
-        end
+        # remote_specs usually generates a way larger Index than the other
+        # sources, and large_idx.use small_idx is way faster than
+        # small_idx.use large_idx.
+        @specs ||= @allow_remote ? remote_specs.dup : Index.new
       end
 
       def install(spec)
@@ -309,6 +305,20 @@ module Bundler
               Bundler.ui.info "" if !Bundler.ui.debug? # new line now that the dots are over
             end
 
+            # Suppose the gem Foo depends on the gem Bar.  Foo exists in Source A.  Bar has some versions that exist in both
+            # sources A and B.  At this point, the API request will have found all the versions of Bar in source A,
+            # but will not have found any versions of Bar from source B, which is a problem if the requested version
+            # of Foo specifically depends on a version of Bar that is only found in source B. This ensures that for
+            # each spec we found, we add all possible versions from all sources to the index.
+            begin
+              idxcount = idx.size
+              api_fetchers.each do |f|
+                Bundler.ui.info "Fetching version metadata from #{f.uri}", Bundler.ui.debug?
+                idx.use f.specs(idx.dependency_names, self), true
+                Bundler.ui.info "" if !Bundler.ui.debug? # new line now that the dots are over
+              end
+            end until idxcount == idx.size
+
             if api_fetchers.any? && api_fetchers.all?{|f| f.use_api }
               # it's possible that gems from one source depend on gems from some
               # other source, so now we download gemspecs and iterate over those
@@ -317,7 +327,7 @@ module Bundler
 
               # if there are any cross-site gems we missed, get them now
               api_fetchers.each do |f|
-                Bundler.ui.info "Fetching additional metadata from #{f.uri}", Bundler.ui.debug?
+                Bundler.ui.info "Fetching dependency metadata from #{f.uri}", Bundler.ui.debug?
                 idx.use f.specs(unmet, self)
                 Bundler.ui.info "" if !Bundler.ui.debug? # new line now that the dots are over
               end if unmet.any?

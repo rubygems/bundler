@@ -3,7 +3,7 @@ require 'rake'
 require 'bundler/gem_helper'
 
 describe Bundler::GemHelper do
-  let(:app_name) { "test" }
+  let(:app_name) { "lorem__ipsum" }
   let(:app_path) { bundled_app app_name }
   let(:app_gemspec_path) { app_path.join("#{app_name}.gemspec") }
 
@@ -43,7 +43,7 @@ describe Bundler::GemHelper do
       app_path = bundled_app "#{app_name}-foo_bar"
 
       lib = app_path.join("lib/#{app_name}/foo_bar.rb").read
-      expect(lib).to include("module #{app_name.capitalize}")
+      expect(lib).to include("module LoremIpsum")
       expect(lib).to include("module FooBar")
     end
   end

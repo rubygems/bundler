@@ -1,3 +1,29 @@
+## 1.8.0 (2015-02-10)
+
+Bugfixes:
+
+  - Gemfile `github` blocks now work (#3379, @indirect)
+
+Bugfixes from v1.7.13:
+
+  - Look up installed gems in remote sources (#3300, #3368, #3377, #3380, #3381, @indirect)
+  - Look up gems across all sources to satisfy dependencies (#3365, @keiths-osc)
+  - Request dependencies for no more than 100 gems at a time (#3367, @segiddins)
+
+## 1.8.0.rc (2015-01-26)
+
+Features:
+
+  - add `config disable_multisource` option to ensure sources can't compete (@indirect)
+
+Bugfixes:
+
+  - don't add extra quotes around long, quoted config values (@aroben, #3338)
+
+Security:
+
+  - warn when more than one top-level source is present (@indirect)
+
 ## 1.8.0.pre (2015-01-26)
 
 Features:
@@ -32,6 +58,14 @@ Bugfixes:
 Documentation:
 
   - add missing Gemfile global `path` explanation (@agenteo)
+
+## 1.7.13 (2015-02-07)
+
+Bugfixes:
+
+  - Look up installed gems in remote sources (#3300, #3368, #3377, #3380, #3381, @indirect)
+  - Look up gems across all sources to satisfy dependencies (#3365, @keiths-osc)
+  - Request dependencies for no more than 100 gems at a time (#3367, @segiddins)
 
 ## 1.7.12 (2015-01-08)
 

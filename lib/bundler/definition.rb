@@ -199,11 +199,11 @@ module Bundler
       @index ||= Index.build do |idx|
         dependency_names = @dependencies.map { |d| d.name }
 
-        sources.all_sources.each do |s|
-          s.dependency_names = dependency_names.dup
-          idx.add_source s.specs
-          s.specs.each { |spec| dependency_names.delete(spec.name) }
-          dependency_names.push(*s.unmet_deps).uniq!
+        sources.all_sources.each do |source|
+          source.dependency_names = dependency_names.dup
+          idx.add_source source.specs
+          dependency_names -= pinned_spec_names(source.specs)
+          dependency_names.push(*source.unmet_deps).uniq!
         end
       end
     end
@@ -597,6 +597,20 @@ module Bundler
         source_requirements[dep.name] = dep.source.specs
       end
       source_requirements
+    end
+
+    def pinned_spec_names(specs)
+      names = []
+      specs.each do |s|
+        # TODO when two sources without blocks is an error, we can change
+        # this check to !s.source.is_a?(Source::LocalRubygems). For now,
+        # we need to ask every Rubygems for every gem name.
+        if s.source.is_a?(Source::Git) || s.source.is_a?(Source::Path)
+          names << s.name
+        end
+      end
+      names.uniq!
+      names
     end
 
   end
