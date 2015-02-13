@@ -5,8 +5,10 @@ require 'rubygems/spec_fetcher'
 module Bundler
   class Source
     class Rubygems < Source
-      # threshold for switching back to the modern index instead of fetching every spec
-      API_REQUEST_LIMIT = 100
+      # Use the API when installing less than X gems
+      API_REQUEST_LIMIT = 500
+      # Ask for X gems per API request
+      API_REQUEST_SIZE = 50
 
       attr_reader :remotes, :caches
 
