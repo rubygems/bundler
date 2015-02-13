@@ -349,5 +349,12 @@ module Spec
     ensure
       Dir[pattern].each(&chmod[0755, 0644])
     end
+
+    def process_file(pathname)
+      changed_lines = pathname.readlines.map do |line|
+        yield line
+      end
+      File.open(pathname, 'w') { |file| file.puts(changed_lines.join) }
+    end
   end
 end
