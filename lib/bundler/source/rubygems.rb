@@ -152,6 +152,7 @@ module Bundler
         Bundler.ui.info "  * #{File.basename(cached_path)}"
         FileUtils.cp(cached_path, Bundler.app_cache(custom_path))
       rescue Errno::EACCES => e
+        Bundler.ui.debug(e)
         raise InstallError, e.message
       end
 
