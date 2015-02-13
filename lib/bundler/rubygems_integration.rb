@@ -1,3 +1,4 @@
+require 'monitor'
 require 'rubygems'
 require 'rubygems/config_file'
 
@@ -132,6 +133,10 @@ module Bundler
 
     def ui=(obj)
       Gem::DefaultUserInteraction.ui = obj
+    end
+
+    def ext_lock
+      @ext_lock ||= Monitor.new
     end
 
     def fetch_specs(all, pre, &blk)
@@ -554,9 +559,37 @@ module Bundler
       end
     end
 
+    class MoreFuture < Future
+      def initialize
+        super
+        backport_ext_builder_monitor
+      end
+
+      def backport_ext_builder_monitor
+        require 'rubygems/ext'
+
+        Gem::Ext::Builder.class_eval do
+          if !const_defined?(:CHDIR_MONITOR)
+            const_set(:CHDIR_MONITOR, Monitor.new)
+          end
+
+          if const_defined?(:CHDIR_MUTEX)
+            remove_const(:CHDIR_MUTEX)
+            const_set(:CHDIR_MUTEX, const_get(:CHDIR_MONITOR))
+          end
+        end
+      end
+
+      def ext_lock
+        Gem::Ext::Builder::CHDIR_MONITOR
+      end
+    end
+
   end
 
-  if RubygemsIntegration.provides?(">= 1.99.99")
+  if RubygemsIntegration.provides?(">= 2.1.0")
+    @rubygems = RubygemsIntegration::MoreFuture.new
+  elsif RubygemsIntegration.provides?(">= 1.99.99")
     @rubygems = RubygemsIntegration::Future.new
   elsif RubygemsIntegration.provides?('>= 1.8.20')
     @rubygems = RubygemsIntegration::MoreModern.new
