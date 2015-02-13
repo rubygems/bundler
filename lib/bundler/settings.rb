@@ -129,6 +129,9 @@ module Bundler
 
   private
     def key_for(key)
+      if key.is_a?(String) && key.include?("http")
+        key = normalize_uri(key).to_s
+      end
       key = key.to_s.gsub(".", "__").upcase
       "BUNDLE_#{key}"
     end
