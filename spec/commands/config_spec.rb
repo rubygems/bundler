@@ -202,6 +202,10 @@ E
 
   describe "quoting" do
     before(:each) { gemfile "# no gems" }
+    let(:long_string) do
+      "--with-xml2-include=/usr/pkg/include/libxml2 --with-xml2-lib=/usr/pkg/lib " \
+      "--with-xslt-dir=/usr/pkg"
+    end
 
     it "saves quotes" do
       bundle "config foo something\\'"
@@ -232,7 +236,6 @@ E
     end
 
     it "doesn't duplicate quotes around long wrapped values" do
-      long_string = "--with-xml2-include=/usr/pkg/include/libxml2 --with-xml2-lib=/usr/pkg/lib --with-xslt-dir=/usr/pkg"
       bundle "config foo #{long_string}"
 
       run "puts Bundler.settings[:foo]"
@@ -248,10 +251,12 @@ E
   describe "very long lines" do
     before(:each) { bundle :install }
     let(:long_string) do
-      "--with-xml2-include=/usr/pkg/include/libxml2 --with-xml2-lib=/usr/pkg/lib --with-xslt-dir=/usr/pkg"
+      "--with-xml2-include=/usr/pkg/include/libxml2 --with-xml2-lib=/usr/pkg/lib " \
+      "--with-xslt-dir=/usr/pkg"
     end
     let(:long_string_without_special_characters) do
-      "here is quite a long string that will wrap to a second line but will not be surrounded by quotes"
+      "here is quite a long string that will wrap to a second line but will not be " \
+      "surrounded by quotes"
     end
 
     it "doesn't wrap values" do
@@ -270,14 +275,12 @@ end
 
 describe "setting gemfile via config" do
   context "when only the non-default Gemfile exists" do
-    before do
-      gemfile bundled_app("NotGemfile"), <<-G
-      source "file://#{gem_repo1}"
-      gem 'rack'
-      G
-    end
-
     it "persists the gemfile location to .bundle/config" do
+      bundled_app("NotGemfile").write <<-G
+        source "file://#{gem_repo1}"
+        gem 'rack'
+      G
+
       bundle "config --local gemfile #{bundled_app("NotGemfile")}"
       expect(File.exist?(".bundle/config")).to eq(true)
 

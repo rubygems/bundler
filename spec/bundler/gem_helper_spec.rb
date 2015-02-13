@@ -40,9 +40,9 @@ describe Bundler::GemHelper do
 
     it "handles namespaces and converts them to CamelCase" do
       bundle "gem #{app_name}-foo_bar"
-      app_path = bundled_app "#{app_name}-foo_bar"
+      underscore_path = bundled_app "#{app_name}-foo_bar"
 
-      lib = app_path.join("lib/#{app_name}/foo_bar.rb").read
+      lib = underscore_path.join("lib/#{app_name}/foo_bar.rb").read
       expect(lib).to include("module LoremIpsum")
       expect(lib).to include("module FooBar")
     end
