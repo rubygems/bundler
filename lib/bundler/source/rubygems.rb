@@ -151,6 +151,8 @@ module Bundler
         return if File.dirname(cached_path) == Bundler.app_cache.to_s
         Bundler.ui.info "  * #{File.basename(cached_path)}"
         FileUtils.cp(cached_path, Bundler.app_cache(custom_path))
+      rescue Errno::EACCES => e
+        raise InstallError, e.message
       end
 
       def cached_built_in_gem(spec)
