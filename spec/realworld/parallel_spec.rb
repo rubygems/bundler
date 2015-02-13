@@ -10,7 +10,12 @@ describe "parallel", :realworld => true do
     G
 
     bundle :install, :jobs => 4, :env => {"DEBUG" => "1"}
-    expect(out).to match(/[1-3]: /)
+
+    if Bundler.rubygems.provides?(">= 2.1.0")
+      expect(out).to match(/[1-3]: /)
+    else
+      expect(out).to include("is not threadsafe")
+    end
 
     bundle "show activesupport"
     expect(out).to match(/activesupport/)
@@ -30,7 +35,12 @@ describe "parallel", :realworld => true do
     G
 
     bundle :install, :jobs => 4, :env => {"DEBUG" => "1"}
-    expect(out).to match(/[1-3]: /)
+
+    if Bundler.rubygems.provides?(">= 2.1.0")
+      expect(out).to match(/[1-3]: /)
+    else
+      expect(out).to include("is not threadsafe")
+    end
 
     bundle "show activesupport"
     expect(out).to match(/activesupport/)
@@ -57,7 +67,12 @@ describe "parallel", :realworld => true do
     G
 
     bundle :update, :jobs => 4, :env => {"DEBUG" => "1"}
-     expect(out).to match(/[1-3]: /)
+
+    if Bundler.rubygems.provides?(">= 2.1.0")
+      expect(out).to match(/[1-3]: /)
+    else
+      expect(out).to include("is not threadsafe")
+    end
 
     bundle "show activesupport"
     expect(out).to match(/activesupport-3\.2\.\d+/)
