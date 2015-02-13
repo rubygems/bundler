@@ -30,7 +30,7 @@ describe "bundle gem" do
     end
   end
 
-  shared_examples_for "git config is absent" do |hoge|
+  shared_examples_for "git config is absent" do
     it "sets gemspec author to default message if git user.name is not set or empty" do
       expect(generated_gem.gemspec.authors.first).to eq("TODO: Write your name")
     end
@@ -38,6 +38,36 @@ describe "bundle gem" do
     it "sets gemspec email to default message if git user.email is not set or empty" do
       expect(generated_gem.gemspec.email.first).to eq("TODO: Write your email address")
     end
+  end
+
+  it "generates a valid gemspec" do
+    system_gems ["rake-10.0.2"]
+
+    in_app_root
+    bundle "gem newgem --bin"
+
+    process_file(bundled_app('newgem', "newgem.gemspec")) do |line|
+      next line unless line =~ /TODO/
+      # Simulate replacing TODOs with real values
+      case line
+      when /spec\.metadata\['allowed_push_host'\]/, /spec\.homepage/
+        line.gsub(/\=.*$/, "= 'http://example.org'")
+      when /spec\.summary/
+        line.gsub(/\=.*$/, "= %q{A short summary of my new gem.}")
+      when /spec\.description/
+        line.gsub(/\=.*$/, "= %q{A longer description of my new gem.}")
+      else
+        line
+      end
+    end
+
+    Dir.chdir(bundled_app('newgem')) do
+      bundle "exec rake build"
+    end
+
+    expect(exitstatus).to be_zero if exitstatus
+    expect(out).not_to include("ERROR")
+    expect(err).not_to include("ERROR")
   end
 
   context "gem naming with relative paths" do
