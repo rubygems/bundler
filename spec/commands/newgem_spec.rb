@@ -50,14 +50,12 @@ describe "bundle gem" do
       next line unless line =~ /TODO/
       # Simulate replacing TODOs with real values
       case line
-      when /spec\.metadata\['allowed_push_host'\]/
+      when /spec\.metadata\['allowed_push_host'\]/, /spec\.homepage/
         line.gsub(/\=.*$/, "= 'http://example.org'")
       when /spec\.summary/
         line.gsub(/\=.*$/, "= %q{A short summary of my new gem.}")
       when /spec\.description/
         line.gsub(/\=.*$/, "= %q{A longer description of my new gem.}")
-      when /spec\.homepage/
-        line.gsub(/\=.*$/, "= 'http://example.org'")
       else
         line
       end
