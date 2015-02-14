@@ -10,4 +10,38 @@ describe Bundler::Settings do
       end
     end
   end
+
+  describe "URI normalization" do
+    let(:settings) { described_class.new(bundled_app) }
+
+    it "normalizes HTTP URIs in credentials configuration" do
+      settings["http://gemserver.example.org"] = "username:password"
+      expect(settings.all).to include("http://gemserver.example.org/")
+    end
+
+    it "normalizes HTTPS URIs in credentials configuration" do
+      settings["https://gemserver.example.org"] = "username:password"
+      expect(settings.all).to include("https://gemserver.example.org/")
+    end
+
+    it "normalizes HTTP URIs in mirror configuration" do
+      settings["mirror.http://rubygems.org"] = "http://rubygems-mirror.org"
+      expect(settings.all).to include("mirror.http://rubygems.org/")
+    end
+
+    it "normalizes HTTPS URIs in mirror configuration" do
+      settings["mirror.https://rubygems.org"] = "http://rubygems-mirror.org"
+      expect(settings.all).to include("mirror.https://rubygems.org/")
+    end
+
+    it "does not normalize other config keys that happen to contain 'http'" do
+      settings["local.httparty"] = home("httparty")
+      expect(settings.all).to include("local.httparty")
+    end
+
+    it "does not normalize other config keys that happen to contain 'https'" do
+      settings["local.httpsmarty"] = home("httpsmarty")
+      expect(settings.all).to include("local.httpsmarty")
+    end
+  end
 end
