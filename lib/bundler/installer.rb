@@ -66,8 +66,7 @@ module Bundler
       if Bundler.default_lockfile.exist? && !options["update"]
         local = Bundler.ui.silence do
           begin
-            tmpdef = Definition.build(Bundler.default_gemfile, Bundler.default_lockfile, nil)
-            true unless tmpdef.new_platform? || tmpdef.missing_specs.any?
+            true unless @definition.new_platform? || @definition.missing_specs.any?
           rescue BundlerError
           end
         end
