@@ -1,3 +1,9 @@
+## 1.8.2 (2015-02-14)
+
+Bugfixes:
+
+  - allow config settings for gems with 'http' in the name again (#3398, @tmoore)
+
 ## 1.8.1 (2015-02-13)
 
 Bugfixes:
