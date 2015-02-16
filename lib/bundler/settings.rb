@@ -141,7 +141,7 @@ module Bundler
     end
 
     def to_bool(value)
-      !(value.nil? || value == '' || value =~ /^(false|f|no|n|0)$/i)
+      !(value.nil? || value == '' || value =~ /^(false|f|no|n|0)$/i || value == false)
     end
 
     def set_key(key, value, hash, file)
