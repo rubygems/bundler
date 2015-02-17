@@ -164,10 +164,10 @@ module Bundler
     end
 
     def bundler_dependency_version
-      major, minor, *etc = Bundler::VERSION.split(".")
-      version = [major, minor]
-      version << etc.last if etc.last =~ /[a-z]/i
-      version.join(".")
+      v = Gem::Version.new(Bundler::VERSION)
+      req = v.segments[0..1]
+      req << v.segments.last if v.prerelease?
+      req.join(".")
     end
 
   end
