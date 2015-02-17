@@ -1,14 +1,31 @@
+## 1.8.2 (2015-02-14)
+
+Bugfixes:
+
+  - allow config settings for gems with 'http' in the name again (#3398, @tmoore)
+
+## 1.8.1 (2015-02-13)
+
+Bugfixes:
+
+  - synchronize building git gem native extensions (#3385, @antifuchs & @indirect)
+  - set gemspec bindir correctly (#3392, @tmoore)
+  - request lockfile deletion when it is malformed (#3396, @indirect)
+  - explain problem when mirror config is missing (#3386, @indirect)
+  - explain problem when caching causes permission error (#3390, @indirect)
+  - normalize URLs in config keys (#3391, @indirect)
+
 ## 1.8.0 (2015-02-10)
 
 Bugfixes:
 
-  - Gemfile `github` blocks now work (#3379, @indirect)
+  - gemfile `github` blocks now work (#3379, @indirect)
 
 Bugfixes from v1.7.13:
 
-  - Look up installed gems in remote sources (#3300, #3368, #3377, #3380, #3381, @indirect)
-  - Look up gems across all sources to satisfy dependencies (#3365, @keiths-osc)
-  - Request dependencies for no more than 100 gems at a time (#3367, @segiddins)
+  - look up installed gems in remote sources (#3300, #3368, #3377, #3380, #3381, @indirect)
+  - look up gems across all sources to satisfy dependencies (#3365, @keiths-osc)
+  - request dependencies for no more than 100 gems at a time (#3367, @segiddins)
 
 ## 1.8.0.rc (2015-01-26)
 

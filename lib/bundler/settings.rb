@@ -1,3 +1,5 @@
+require 'uri'
+
 module Bundler
   class Settings
     BOOL_KEYS = %w(frozen cache_all no_prune disable_local_branch_check gem.mit gem.coc).freeze
@@ -127,6 +129,9 @@ module Bundler
 
   private
     def key_for(key)
+      if key.is_a?(String) && /https?:/ =~ key
+        key = normalize_uri(key).to_s
+      end
       key = key.to_s.gsub(".", "__").upcase
       "BUNDLE_#{key}"
     end
@@ -182,7 +187,9 @@ module Bundler
       uri = uri.to_s
       uri = "#{uri}/" unless uri =~ %r[/\Z]
       uri = URI(uri)
-      raise ArgumentError, "Gem mirror sources must be absolute URIs (configured: #{mirror_source})" unless uri.absolute?
+      unless uri.absolute?
+        raise ArgumentError, "Gem sources must be absolute. You provided '#{uri}'."
+      end
       uri
     end
 

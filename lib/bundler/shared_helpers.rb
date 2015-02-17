@@ -1,4 +1,3 @@
-require 'monitor'
 require 'pathname'
 require 'rubygems'
 
@@ -19,7 +18,6 @@ end
 module Bundler
   module SharedHelpers
     attr_accessor :gem_loaded
-    CHDIR_MONITOR = Monitor.new
 
     def default_gemfile
       gemfile = find_gemfile
@@ -52,7 +50,7 @@ module Bundler
     end
 
     def chdir_monitor
-      CHDIR_MONITOR
+      Bundler.rubygems.ext_lock
     end
 
     def chdir(dir, &blk)

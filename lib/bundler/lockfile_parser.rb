@@ -47,6 +47,10 @@ module Bundler
       end
       @sources << @rubygems_aggregate
       @specs = @specs.values
+    rescue ArgumentError => e
+      Bundler.ui.debug(e)
+      raise LockfileError, "Your lockfile is unreadable. Run `rm Gemfile.lock` " \
+        "and then `bundle install` to generate a new lockfile."
     end
 
   private

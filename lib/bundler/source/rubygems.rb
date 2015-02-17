@@ -5,8 +5,10 @@ require 'rubygems/spec_fetcher'
 module Bundler
   class Source
     class Rubygems < Source
-      # threshold for switching back to the modern index instead of fetching every spec
-      API_REQUEST_LIMIT = 100
+      # Use the API when installing less than X gems
+      API_REQUEST_LIMIT = 500
+      # Ask for X gems per API request
+      API_REQUEST_SIZE = 50
 
       attr_reader :remotes, :caches
 
@@ -149,6 +151,9 @@ module Bundler
         return if File.dirname(cached_path) == Bundler.app_cache.to_s
         Bundler.ui.info "  * #{File.basename(cached_path)}"
         FileUtils.cp(cached_path, Bundler.app_cache(custom_path))
+      rescue Errno::EACCES => e
+        Bundler.ui.debug(e)
+        raise InstallError, e.message
       end
 
       def cached_built_in_gem(spec)

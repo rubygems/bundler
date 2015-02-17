@@ -1,7 +1,8 @@
 require "spec_helper"
 
-if defined?(Encoding) && Encoding.default_external != "UTF-8"
-  Encoding.default_external = "UTF-8"
+if defined?(Encoding) && Encoding.default_external.name != "UTF-8"
+  # Poor man's ruby -E UTF-8, since it works on 1.8.7
+  Encoding.default_external = Encoding.find("UTF-8")
 end
 
 describe "The library itself" do

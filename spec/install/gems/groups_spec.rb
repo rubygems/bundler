@@ -41,14 +41,14 @@ describe "bundle install with groups" do
     end
 
     it "sets up everything if Bundler.setup is used with no groups" do
-      out = run("require 'rack'; puts RACK")
-      expect(out).to eq('1.0.0')
+      output = run("require 'rack'; puts RACK")
+      expect(output).to eq('1.0.0')
 
-      out = run("require 'activesupport'; puts ACTIVESUPPORT")
-      expect(out).to eq('2.3.5')
+      output = run("require 'activesupport'; puts ACTIVESUPPORT")
+      expect(output).to eq('2.3.5')
 
-      out = run("require 'thin'; puts THIN")
-      expect(out).to eq('1.0')
+      output = run("require 'thin'; puts THIN")
+      expect(output).to eq('1.0')
     end
 
     it "removes old groups when new groups are set up" do
@@ -62,12 +62,12 @@ describe "bundle install with groups" do
     end
 
     it "sets up old groups when they have previously been removed" do
-      out = run <<-RUBY, :emo
+      output = run <<-RUBY, :emo
         Bundler.setup(:default)
         Bundler.setup(:default, :emo)
         require 'thin'; puts THIN
       RUBY
-      expect(out).to eq('1.0')
+      expect(output).to eq('1.0')
     end
   end
 
