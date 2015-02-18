@@ -37,7 +37,8 @@ module Bundler
         :email            => git_user_email.empty? ? "TODO: Write your email address" : git_user_email,
         :test             => options[:test],
         :ext              => options[:ext],
-        :bin              => options[:bin]
+        :bin              => options[:bin],
+        :bundler_version  => bundler_dependency_version
       }
 
       templates = {
@@ -160,6 +161,13 @@ module Bundler
 
       return if test_framework == "false"
       test_framework
+    end
+
+    def bundler_dependency_version
+      v = Gem::Version.new(Bundler::VERSION)
+      req = v.segments[0..1]
+      req << v.segments.last if v.prerelease?
+      req.join(".")
     end
 
   end
