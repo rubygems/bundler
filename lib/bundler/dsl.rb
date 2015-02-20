@@ -96,10 +96,14 @@ module Bundler
             @dependencies.delete current
           elsif dep.type == :development
             return
+          elsif !dep.source
+            return
+          elsif !current.source
+            @dependencies.delete current
           else
             raise GemfileError, "You cannot specify the same gem twice coming from different sources.\n" \
                             "You specified that #{dep.name} (#{dep.requirement}) should come from " \
-                            "#{current.source || 'an unspecified source'} and #{dep.source}\n"
+                            "#{current.source} and #{dep.source}\n"
           end
         end
       end

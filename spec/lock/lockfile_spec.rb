@@ -731,12 +731,54 @@ describe "the lockfile format" do
   it "raises if two different sources are used" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
-      gem "rack"
+      gem "rack", :path => '../rack'
       gem "rack", :git => "git://hubz.com"
     G
 
     expect(bundled_app("Gemfile.lock")).not_to exist
-    expect(out).to include "rack (>= 0) should come from an unspecified source and git://hubz.com (at master)"
+    expect(out).to include "rack (>= 0) should come from source at ../rack and git://hubz.com (at master)"
+  end
+
+  it "allows a specific source to override an unspecified source" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack"
+      gem "rack", :source => "file://#{gem_repo1}"
+    G
+
+    lockfile_should_be <<-G
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          rack (1.0.0)
+
+      PLATFORMS
+        ruby
+
+      DEPENDENCIES
+        rack!
+    G
+  end
+
+  it "ignores an unspecified source after a specific source" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack", :source => "file://#{gem_repo1}"
+      gem "rack"
+    G
+
+    lockfile_should_be <<-G
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          rack (1.0.0)
+
+      PLATFORMS
+        ruby
+
+      DEPENDENCIES
+        rack!
+    G
   end
 
   it "works correctly with multiple version dependencies" do
