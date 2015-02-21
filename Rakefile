@@ -52,13 +52,13 @@ end
 
 namespace :thor do
   task :namespace do
-    files = Dir.glob('lib/bundler/vendor/Thor*/**/*.rb')
+    files = Dir.glob('lib/bundler/vendor/thor*/**/*.rb')
     sh "sed -i.bak 's/Thor/Bundler::Thor/g' #{files.join(' ')}"
     sh "rm #{files.join('.bak ')}.bak"
   end
 
   task :clean do
-    files = Dir.glob('lib/bundler/vendor/Thor*/*', File::FNM_DOTMATCH).reject { |f| %(. .. lib).include? f.split('/').last }
+    files = Dir.glob('lib/bundler/vendor/thor*/*', File::FNM_DOTMATCH).reject { |f| %(. .. lib).include? f.split('/').last }
     puts files
     sh "rm -r #{files.join(' ')}"
   end
