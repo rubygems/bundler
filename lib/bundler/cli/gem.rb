@@ -40,6 +40,7 @@ module Bundler
         :bin              => options[:bin],
         :bundler_version  => bundler_dependency_version
       }
+      ensure_safe_gem_name(opts[:name], opts[:constant_array])
 
       templates = {
         "Gemfile.tt" => "Gemfile",
@@ -168,6 +169,16 @@ module Bundler
       req = v.segments[0..1]
       req << v.segments.last if v.prerelease?
       req.join(".")
+    end
+
+    def ensure_safe_gem_name name, constant_array
+      if name =~ /^\d/
+        Bundler.ui.error "Invalid gem name #{name} Please give a name which does not start with numbers."
+        exit 1
+      elsif Object.const_defined?(constant_array.first)
+        Bundler.ui.error "Invalid gem name #{name} constant #{constant_array.join("::")} is already in use. Please choose another gem name."
+        exit 1
+      end
     end
 
   end
