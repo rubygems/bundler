@@ -406,11 +406,18 @@ module Bundler
 
       if locked
         unlocking = @locked_specs.any? do |locked_spec|
-          locked_spec.source != locked
+          locked_spec.source.class == locked.class && locked_spec.source != locked
         end
       end
 
-      !locked || unlocking || source.specs != locked.specs
+      !locked || unlocking || dependencies_for_source_changed?(locked) || source.specs != locked.specs
+    end
+
+    def dependencies_for_source_changed?(source)
+      deps_for_source = @dependencies.select { |s| s.source == source }
+      locked_deps_for_source = @locked_deps.select { |s| s.source == source }
+
+      deps_for_source != locked_deps_for_source
     end
 
     # Get all locals and override their matching sources.

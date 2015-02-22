@@ -281,6 +281,26 @@ describe "bundle install with gems on multiple sources" do
         should_be_installed("rack 0.9.1")
       end
     end
+
+    context "with a path gem in the same Gemfile" do
+      before do
+        build_lib "foo"
+
+        gemfile <<-G
+          gem "rack", :source => "file://#{gem_repo1}"
+          gem "foo", :path => "#{lib_path('foo-1.0')}"
+        G
+      end
+
+      it "does not unlock the non-path gem after install" do
+        bundle :install
+
+        bundle %{exec ruby -e 'puts "OK"'}
+
+        expect(out).to include("OK")
+        expect(exitstatus).to eq(0) if exitstatus
+      end
+    end
   end
 
   context "when an older version of the same gem also ships with Ruby" do
