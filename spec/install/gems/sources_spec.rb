@@ -78,12 +78,15 @@ describe "bundle install with gems on multiple sources" do
           end
         end
 
+        build_lib "barry-o"
+
         gemfile <<-G
           source "file://#{gem_repo3}"
           source "file://#{gem_repo1}" do
             gem "thin" # comes first to test name sorting
             gem "rack"
           end
+          gem "barry-o", :path => "#{lib_path("barry-o-1.0")}"
           gem "rack-obama" # shoud come from repo3!
         G
       end
