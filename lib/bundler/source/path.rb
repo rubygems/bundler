@@ -130,7 +130,7 @@ module Bundler
         index = Index.new
 
         if File.directory?(expanded_path)
-          Dir["#{expanded_path}/#{@glob}"].each do |file|
+          Dir["#{expanded_path}/#{@glob}"].sort_by { |p| p.split(File::SEPARATOR).size }.each do |file|
             spec = Bundler.load_gemspec(file)
             if spec
               spec.loaded_from = file.to_s
