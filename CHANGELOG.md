@@ -1,15 +1,22 @@
+## 1.8.3 (2015-02-24)
+
+Bugfixes:
+
+  - handle boolean values for gem settings (@EduardoBautista)
+  - stop always looking for updated `path` gems (#3414, #3417, #3429, @TimMoore)
+
 ## 1.8.2 (2015-02-14)
 
 Bugfixes:
 
-  - allow config settings for gems with 'http' in the name again (#3398, @tmoore)
+  - allow config settings for gems with 'http' in the name again (#3398, @TimMoore)
 
 ## 1.8.1 (2015-02-13)
 
 Bugfixes:
 
   - synchronize building git gem native extensions (#3385, @antifuchs & @indirect)
-  - set gemspec bindir correctly (#3392, @tmoore)
+  - set gemspec bindir correctly (#3392, @TimMoore)
   - request lockfile deletion when it is malformed (#3396, @indirect)
   - explain problem when mirror config is missing (#3386, @indirect)
   - explain problem when caching causes permission error (#3390, @indirect)
