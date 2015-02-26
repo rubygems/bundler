@@ -70,7 +70,7 @@ module Bundler
         else
           ref
         end
-        "#{uri} (at #{at})"
+        "#{uri} (at #{at} - #{revision})"
       end
 
       def name
