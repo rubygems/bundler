@@ -17,6 +17,13 @@ Since Bundler 1.2, the `bundle package` command can also package `:git` and
 `:path` dependencies besides .gem files. This needs to be explicitly enabled
 via the `--all` option. Once used, the `--all` option will be remembered.
 
+## SUPPORT FOR MULTIPLE PLATFORMS
+
+When using gems that have different packages for different platforms, Bundler
+1.8 and newer support caching of gems for other platforms in `vendor/cache`.
+This needs to be enabled via the `--all-platforms` option. This setting will be
+remembered in your local bundler configuration.
+
 ## REMOTE FETCHING
 
 By default, if you simply run [bundle install(1)][bundle-install] after running
