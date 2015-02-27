@@ -120,6 +120,25 @@ describe "bundle install with explicit source paths" do
     should_be_installed "foo 1.0"
   end
 
+  it "prefers gemspecs closer to the path root" do
+    build_lib "premailer", "1.0.0", :path => lib_path("premailer") do |s|
+      s.write "gemfiles/ruby187.gemspec", <<-G
+        Gem::Specification.new do |s|
+          s.name    = 'premailer'
+          s.version = '1.0.0'
+        end
+      G
+    end
+
+    install_gemfile <<-G
+      gem "premailer", :path => "#{lib_path("premailer")}"
+    G
+
+    # Installation of the 'gemfiles' gemspec would fail since it will be unable
+    # to require 'premailer.rb'
+    should_be_installed "premailer 1.0.0"
+  end
+
   it "supports gemspec syntax" do
     build_lib "foo", "1.0", :path => lib_path("foo") do |s|
       s.add_dependency "rack", "1.0"
