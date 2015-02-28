@@ -68,9 +68,19 @@ module Bundler
         elsif options["ref"]
           shortref_for_display(options["ref"])
         else
-          ref
+          ref_with_rev
         end
         "#{uri} (at #{at})"
+      end
+
+      def ref_with_rev
+        rev = @copied ? revision : cached_revision
+
+        if rev
+          "#{ref} - #{rev}"
+        else
+          ref
+        end
       end
 
       def name
@@ -171,7 +181,7 @@ module Bundler
         if requires_checkout? && spec.post_install_message
           Installer.post_install_messages[spec.name] = spec.post_install_message
         end
-        ["Using #{version_message(spec)} from #{to_s} - #{revision}", nil, debug]
+        ["Using #{version_message(spec)} from #{to_s}", nil, debug]
       end
 
       def cache(spec, custom_path = nil)
