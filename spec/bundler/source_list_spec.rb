@@ -91,7 +91,7 @@ describe Bundler::SourceList do
       end
 
       it "returns the aggregate rubygems source" do
-        expect(@returned_source).to be_instance_of(Bundler::Source::LocalRubygems)
+        expect(@returned_source).to be_instance_of(Bundler::Source::Rubygems)
       end
 
       it "adds the provided remote to the beginning of the aggregate source" do
