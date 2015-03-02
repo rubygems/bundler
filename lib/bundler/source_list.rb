@@ -6,7 +6,7 @@ module Bundler
     def initialize
       @path_sources       = []
       @git_sources        = []
-      @rubygems_aggregate = Source::LocalRubygems.new
+      @rubygems_aggregate = Source::Rubygems.new
       @rubygems_sources   = []
     end
 
@@ -57,7 +57,8 @@ module Bundler
         end
       end
 
-      replacement_rubygems = replacement_sources.detect { |s| s.is_a?(Source::LocalRubygems) }
+      replacement_rubygems =
+        replacement_sources.detect { |s| s.is_a?(Source::Rubygems) }
       @rubygems_aggregate = replacement_rubygems if replacement_rubygems
 
       # Return true if there were changes
