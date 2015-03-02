@@ -22,7 +22,12 @@ module Bundler
     end
 
     def add_git_source(options = {})
-      add_source_to_list Source::Git.new(options), git_sources
+      source = add_source_to_list Source::Git.new(options), git_sources
+      if source.uri =~ /^git:/
+        Bundler.ui.warn "The git source `#{source.uri}` uses the `git` protocol, " \
+                        "please consider changing it to `https`, which is more secure."
+      end
+      source
     end
 
     def add_rubygems_source(options = {})
