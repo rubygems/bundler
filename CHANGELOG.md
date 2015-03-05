@@ -1,3 +1,10 @@
+## 1.8.4 (2015-03-05)
+
+Bugfixes:
+
+  - document --all-platforms option (#3449, @moeffju)
+  - find gems from all sources on exec after install (#3450, @TimMoore)
+
 ## 1.8.3 (2015-02-24)
 
 Bugfixes:
