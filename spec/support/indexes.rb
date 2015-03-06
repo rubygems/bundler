@@ -29,6 +29,14 @@ module Spec
       expect(got).to eq(specs.sort)
     end
 
+    def should_resolve_and_include(specs)
+      got = resolve
+      got = got.map { |s| s.full_name }.sort
+      specs.each do |s|
+        expect(got).to include(s)
+      end
+    end
+
     def should_conflict_on(names)
       begin
         got = resolve
@@ -194,6 +202,70 @@ module Spec
           dep "berkshelf", "~> 2.0"
           dep "chef", "~> 10.26"
         end
+      end
+    end
+
+    # Issue #3459
+    def a_complicated_index
+      build_index do
+
+        gem "foo", %w{3.0.0 3.0.5} do
+          dep "qux", ["~> 3.1"]
+          dep "baz", ["< 9.0", ">= 5.0"]
+          dep "bar", ["~> 1.0"]
+          dep "grault", ["~> 3.1"]
+        end
+
+        gem "foo", "1.2.1" do
+          dep "baz", ["~> 4.2"]
+          dep "bar", ["~> 1.0"]
+          dep "qux", ["~> 3.1"]
+          dep "grault", ["~> 2.0"]
+        end
+
+        gem "bar", "1.0.5" do
+          dep "grault", ["~> 3.1"]
+          dep "baz", ["< 9", ">= 4.2"]
+        end
+
+        gem "bar", "1.0.3" do
+          dep "baz", ["< 9", ">= 4.2"]
+          dep "grault", ["~> 2.0"]
+        end
+
+        gem "baz", "8.2.10" do
+          dep "grault", ["~> 3.0"]
+          dep "garply", [">= 0.5.1", "~> 0.5"]
+        end
+
+        gem "baz", "5.0.2" do
+          dep "grault", ["~> 2.0"]
+          dep "garply", [">= 0.3.1"]
+        end
+
+        gem "baz", "4.2.0" do
+          dep "grault", ["~> 2.0"]
+          dep "garply", [">= 0.3.1"]
+        end
+
+        gem "grault", %w{2.6.3 3.1.1}
+
+        gem "garply", "0.5.1" do
+          dep "waldo", ["~> 0.1.3"]
+        end
+
+        gem "waldo", "0.1.5" do
+          dep "plugh", ["~> 0.6.0"]
+        end
+
+        gem "plugh", %w(0.6.3 0.6.11 0.7.0)
+
+        gem "qux", "3.2.21" do
+          dep "plugh", [">= 0.6.4", "~> 0.6"]
+          dep "corge", ["~> 1.0"]
+        end
+
+        gem "corge", "1.10.1"
       end
     end
 
