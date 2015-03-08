@@ -14,7 +14,6 @@ RSpec::Core::RakeTask.new(:spec)
 
 task :default => :spec
 <% end -%>
-
 <% if config[:ext] -%>
 require "rake/extensiontask"
 
