@@ -453,10 +453,10 @@ files in your test code as you would if the project were installed as a gem; you
 need not manipulate the load path manually or require project files via relative
 paths.
 
-The `gemspec` method supports optional `:path`, `:name`, and `:development_group`
-options, which control where bundler looks for the `.gemspec`, what named
-`.gemspec` it uses (if more than one is present), and which group development
-dependencies are included in.
+The `gemspec` method supports optional `:path`, `:glob`, `:name`, and `:development_group`
+options, which control where bundler looks for the `.gemspec`, the glob it uses to look 
+for the gemspec (defaults to: "{,*,*/*}.gemspec"), what named `.gemspec` it uses 
+(if more than one is present), and which group development dependencies are included in.
 
 ## SOURCE PRIORITY
 
