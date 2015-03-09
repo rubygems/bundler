@@ -118,17 +118,21 @@ module Bundler
     end
 
     def ask_and_set(key, header, message)
-      result = options[key]
+      choice = options[key]
       if !Bundler.settings.all.include?("gem.#{key}")
-        if result.nil?
+        if choice.nil?
           Bundler.ui.confirm header
-          result = Bundler.ui.ask("#{message} y/(n):") == "y"
+          choice = Bundler.ui.ask("#{message} y/(n):") == "y"
         end
 
-        Bundler.settings.set_global("gem.#{key}", result)
+        Bundler.settings.set_global("gem.#{key}", choice)
       end
 
-      result || Bundler.settings["gem.#{key}"]
+      if choice.nil?
+        Bundler.settings["gem.#{key}"]
+      else
+        choice
+      end
     end
 
     def validate_ext_name
