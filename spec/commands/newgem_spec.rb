@@ -489,7 +489,6 @@ describe "bundle gem" do
           RSpec::Core::RakeTask.new(:spec)
 
           task :default => :spec
-
         RAKEFILE
 
         expect(bundled_app("test-gem/Rakefile").read).to eq(rakefile)
@@ -530,7 +529,6 @@ describe "bundle gem" do
           end
 
           task :default => :test
-
         RAKEFILE
 
         expect(bundled_app("test-gem/Rakefile").read).to eq(rakefile)
@@ -570,7 +568,6 @@ describe "bundle gem" do
       it "depends on compile task for build" do
         rakefile = strip_whitespace <<-RAKEFILE
           require "bundler/gem_tasks"
-
           require "rake/extensiontask"
 
           task :build => :compile
