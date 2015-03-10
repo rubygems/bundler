@@ -2,7 +2,7 @@ module Bundler
   class CLI::Install
     attr_reader :options
     def initialize(options)
-      @options = options.dup
+      @options = options
     end
 
     def run
