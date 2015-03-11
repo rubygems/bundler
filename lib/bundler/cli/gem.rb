@@ -166,7 +166,7 @@ module Bundler
     def bundler_dependency_version
       v = Gem::Version.new(Bundler::VERSION)
       req = v.segments[0..1]
-      req << v.segments.last if v.prerelease?
+      req << 'a' if v.prerelease?
       req.join(".")
     end
 
