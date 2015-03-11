@@ -26,7 +26,7 @@ module Bundler
       git_user_name = `git config user.name`.chomp
       git_user_email = `git config user.email`.chomp
 
-      opts = {
+      config = {
         :name             => name,
         :underscored_name => underscored_name,
         :namespaced_path  => namespaced_path,
@@ -69,6 +69,7 @@ module Bundler
           "for free as long as they admit you created it. You can read more about the MIT license " \
           "at choosealicense.com/licenses/mit."
         )
+        config[:mit] = true
         templates.merge!("LICENSE.txt.tt" => "LICENSE.txt")
       end
 
@@ -101,7 +102,7 @@ module Bundler
       end
 
       templates.each do |src, dst|
-        thor.template("newgem/#{src}", target.join(dst), opts)
+        thor.template("newgem/#{src}", target.join(dst), config)
       end
 
       Bundler.ui.info "Initializing git repo in #{target}"
@@ -120,17 +121,15 @@ module Bundler
     end
 
     def ask_and_set(key, header, message)
-      result = options[key]
-      if !Bundler.settings.all.include?("gem.#{key}")
-        if result.nil?
-          Bundler.ui.confirm header
-          result = Bundler.ui.ask("#{message} y/(n):") == "y"
-        end
+      choice = options[key] || Bundler.settings["gem.#{key}"]
 
-        Bundler.settings.set_global("gem.#{key}", result)
+      if choice.nil?
+        Bundler.ui.confirm header
+        choice = (Bundler.ui.ask("#{message} y/(n):") =~ /y|yes/)
+        Bundler.settings.set_global("gem.#{key}", choice)
       end
 
-      result || Bundler.settings["gem.#{key}"]
+      choice
     end
 
     def validate_ext_name
@@ -145,6 +144,7 @@ module Bundler
 
     def ask_and_set_test_framework
       test_framework = options[:test] || Bundler.settings["gem.test"]
+
       if test_framework.nil?
         Bundler.ui.confirm "Do you want to generate tests with your gem?"
         result = Bundler.ui.ask "Type 'rspec' or 'minitest' to generate those test files now and " \
@@ -152,7 +152,7 @@ module Bundler
         if result =~ /rspec|minitest/
           test_framework = result
         else
-          test_framework = "false"
+          test_framework = false
         end
       end
 
@@ -160,7 +160,6 @@ module Bundler
         Bundler.settings.set_global("gem.test", test_framework)
       end
 
-      return if test_framework == "false"
       test_framework
     end
 

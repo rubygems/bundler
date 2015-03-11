@@ -29,7 +29,7 @@ module Bundler
       @state        = :source
       @specs        = {}
 
-      @rubygems_aggregate = Source::LocalRubygems.new
+      @rubygems_aggregate = Source::Rubygems.new
 
       if lockfile.match(/<<<<<<<|=======|>>>>>>>|\|\|\|\|\|\|\|/)
         raise LockfileError, "Your Gemfile.lock contains merge conflicts.\n" \

@@ -1,9 +1,8 @@
 module Bundler
   class Source
-    autoload :Rubygems,      'bundler/source/rubygems'
-    autoload :LocalRubygems, 'bundler/source/local_rubygems'
-    autoload :Path,          'bundler/source/path'
-    autoload :Git,           'bundler/source/git'
+    autoload :Rubygems, 'bundler/source/rubygems'
+    autoload :Path,     'bundler/source/path'
+    autoload :Git,      'bundler/source/git'
 
     def self.mirror_for(uri)
       uri = URI(uri.to_s) unless uri.is_a?(URI)

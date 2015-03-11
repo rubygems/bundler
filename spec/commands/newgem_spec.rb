@@ -1,6 +1,7 @@
 require "spec_helper"
 
 describe "bundle gem" do
+
   def reset!
     super
     global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__TEST" => "false", "BUNDLE_GEM__COC" => "false"
@@ -152,10 +153,6 @@ describe "bundle gem" do
     it "sets gemspec metadata['allowed_push_host']", :rubygems => "2.0" do
       expect(generated_gem.gemspec.metadata['allowed_push_host']).
         to match("delete to allow pushes to any server")
-    end
-
-    it "sets gemspec license to MIT by default" do
-      expect(generated_gem.gemspec.license).to eq("MIT")
     end
 
     it "requires the version file" do
@@ -332,6 +329,9 @@ describe "bundle gem" do
       expect(bundled_app("test-gem/Rakefile")).to exist
       expect(bundled_app("test-gem/lib/test/gem.rb")).to exist
       expect(bundled_app("test-gem/lib/test/gem/version.rb")).to exist
+
+      skel = Bundler::GemHelper.new(bundled_app(gem_name).to_s)
+      expect(skel.gemspec.license).to eq("MIT")
     end
   end
 
@@ -400,10 +400,6 @@ describe "bundle gem" do
     it "sets gemspec metadata['allowed_push_host']", :rubygems => "2.0" do
       expect(generated_gem.gemspec.metadata['allowed_push_host']).
         to match("delete to allow pushes to any server")
-    end
-
-    it "sets gemspec license to MIT by default" do
-      expect(generated_gem.gemspec.license).to eq("MIT")
     end
 
     it "requires the version file" do
@@ -581,4 +577,44 @@ describe "bundle gem" do
       end
     end
   end
+
+  context "on first run" do
+    before do
+      in_app_root
+    end
+
+    it "asks about test framework" do
+      global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__COC" => "false"
+
+      bundle "gem foobar" do |input|
+        input.puts "rspec"
+      end
+
+      expect(bundled_app("foobar/spec/spec_helper.rb")).to exist
+    end
+
+    it "asks about MIT license" do
+      global_config "BUNDLE_GEM__TEST" => "false", "BUNDLE_GEM__COC" => "false"
+
+      bundle :config
+
+      bundle "gem foobar" do |input|
+        input.puts "yes"
+      end
+
+      expect(bundled_app("foobar/LICENSE.txt")).to exist
+    end
+
+    it "asks about CoC" do
+      global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__TEST" => "false"
+
+
+      bundle "gem foobar" do |input|
+        input.puts "yes"
+      end
+
+      expect(bundled_app("foobar/CODE_OF_CONDUCT.md")).to exist
+    end
+  end
+
 end

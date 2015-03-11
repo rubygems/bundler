@@ -10,10 +10,15 @@ module Bundler
       @global_config = load_config(global_config_file)
     end
 
-    def [](key)
-      the_key = key_for(key)
-      value = (@local_config[the_key] || ENV[the_key] || @global_config[the_key])
-      is_bool(key) ? to_bool(value) : value
+    def [](name)
+      key = key_for(name)
+      value = (@local_config[key] || ENV[key] || @global_config[key])
+
+      if !value.nil? && is_bool(name)
+        to_bool(value)
+      else
+        value
+      end
     end
 
     def []=(key, value)
@@ -141,7 +146,7 @@ module Bundler
     end
 
     def to_bool(value)
-      !(value.nil? || value == '' || value =~ /^(false|f|no|n|0)$/i)
+      !(value.nil? || value == '' || value =~ /^(false|f|no|n|0)$/i || value == false)
     end
 
     def set_key(key, value, hash, file)
