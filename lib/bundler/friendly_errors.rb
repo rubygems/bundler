@@ -1,4 +1,5 @@
 # encoding: utf-8
+require "cgi"
 require "bundler/vendored_thor"
 
 module Bundler

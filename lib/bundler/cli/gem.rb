@@ -40,7 +40,7 @@ module Bundler
         :bin              => options[:bin],
         :bundler_version  => bundler_dependency_version
       }
-      ensure_safe_gem_name(opts[:name], opts[:constant_array])
+      ensure_safe_gem_name(name, constant_array)
 
       templates = {
         "Gemfile.tt" => "Gemfile",
