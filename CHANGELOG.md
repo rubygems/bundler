@@ -1,3 +1,10 @@
+## 1.8.5 (2015-03-11)
+
+Bugfixes:
+
+  - remove MIT license from gemspec when removing license file (@indirect)
+  - respect 'no' immediately as well as saving it in `gem` config (@kirs)
+
 ## 1.8.4 (2015-03-05)
 
 Bugfixes:
