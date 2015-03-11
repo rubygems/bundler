@@ -26,7 +26,7 @@ module Bundler
       git_user_name = `git config user.name`.chomp
       git_user_email = `git config user.email`.chomp
 
-      opts = {
+      config = {
         :name             => name,
         :underscored_name => underscored_name,
         :namespaced_path  => namespaced_path,
@@ -67,6 +67,7 @@ module Bundler
           "for free as long as they admit you created it. You can read more about the MIT license " \
           "at choosealicense.com/licenses/mit."
         )
+        config[:mit] = true
         templates.merge!("LICENSE.txt.tt" => "LICENSE.txt")
       end
 
@@ -99,7 +100,7 @@ module Bundler
       end
 
       templates.each do |src, dst|
-        thor.template("newgem/#{src}", target.join(dst), opts)
+        thor.template("newgem/#{src}", target.join(dst), config)
       end
 
       Bundler.ui.info "Initializing git repo in #{target}"
