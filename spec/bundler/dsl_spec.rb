@@ -180,4 +180,12 @@ describe Bundler::Dsl do
         to raise_error(Bundler::GemfileError, /Gemfile syntax error/)
     end
   end
+
+  describe "Runtime errors", :unless => Bundler.current_ruby.on_18? do
+    it "will raise a Bundler::GemfileError" do
+      gemfile "s = 'foo'.freeze; s.strip!"
+      expect { Bundler::Dsl.evaluate(bundled_app("Gemfile"), nil, true) }.
+        to raise_error(Bundler::GemfileError, /There was an error in your Gemfile/)
+    end
+  end
 end
