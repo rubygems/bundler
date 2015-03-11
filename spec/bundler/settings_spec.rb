@@ -43,5 +43,11 @@ describe Bundler::Settings do
       settings["local.httpsmarty"] = home("httpsmarty")
       expect(settings.all).to include("local.httpsmarty")
     end
+
+    it "reads older keys without trailing slashes" do
+      settings["mirror.https://rubygems.org"] = "http://rubygems-mirror.org"
+      expect(settings.gem_mirrors).to eq(URI("https://rubygems.org/") => URI("http://rubygems-mirror.org/"))
+    end
+
   end
 end
