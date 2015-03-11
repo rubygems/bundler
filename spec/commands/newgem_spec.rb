@@ -1,6 +1,7 @@
 require "spec_helper"
 
 describe "bundle gem" do
+
   def reset!
     super
     global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__TEST" => "false", "BUNDLE_GEM__COC" => "false"
@@ -584,4 +585,44 @@ describe "bundle gem" do
       end
     end
   end
+
+  context "on first run" do
+    before do
+      in_app_root
+    end
+
+    it "asks about test framework" do
+      global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__COC" => "false"
+
+      bundle "gem foobar" do |input|
+        input.puts "rspec"
+      end
+
+      expect(bundled_app("foobar/spec/spec_helper.rb")).to exist
+    end
+
+    it "asks about MIT license" do
+      global_config "BUNDLE_GEM__TEST" => "false", "BUNDLE_GEM__COC" => "false"
+
+      bundle :config
+
+      bundle "gem foobar" do |input|
+        input.puts "yes"
+      end
+
+      expect(bundled_app("foobar/LICENSE.txt")).to exist
+    end
+
+    it "asks about CoC" do
+      global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__TEST" => "false"
+
+
+      bundle "gem foobar" do |input|
+        input.puts "yes"
+      end
+
+      expect(bundled_app("foobar/CODE_OF_CONDUCT.md")).to exist
+    end
+  end
+
 end
