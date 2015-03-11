@@ -1,3 +1,9 @@
+## 1.9.0.pre.1 (2015-03-11)
+
+Bugfixes:
+
+  - make `gem` command work again (@arthurnn)
+
 ## 1.9.0.pre (2015-03-11)
 
 Features:
