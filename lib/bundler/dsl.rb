@@ -33,7 +33,7 @@ module Bundler
     rescue SyntaxError => e
       syntax_msg = e.message.gsub("#{gemfile}:", 'on line ')
       raise GemfileError, "Gemfile syntax error #{syntax_msg}"
-    rescue ScriptError, RegexpError, NameError, ArgumentError => e
+    rescue ScriptError, RegexpError, NameError, ArgumentError, RuntimeError => e
       e.backtrace[0] = "#{e.backtrace[0]}: #{e.message} (#{e.class})"
       Bundler.ui.warn e.backtrace.join("\n       ")
       raise GemfileError, "There was an error in your Gemfile," \
