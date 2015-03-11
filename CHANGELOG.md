@@ -1,3 +1,15 @@
+## 1.9.0.pre (2015-03-11)
+
+Features:
+
+  - prefer gemspecs closest to the directory root (#3428, @segiddins)
+  - debug log for API request limits (#3452, @neerfri)
+
+"Features":
+
+  - Molinillo resolver, shared with CocoaPods (@segiddins)
+  - updated Thor to v0.19.1 (@segiddins)
+
 ## 1.8.5 (2015-03-11)
 
 Bugfixes:
