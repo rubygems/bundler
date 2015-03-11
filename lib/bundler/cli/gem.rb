@@ -119,21 +119,15 @@ module Bundler
     end
 
     def ask_and_set(key, header, message)
-      choice = options[key]
-      if !Bundler.settings.all.include?("gem.#{key}")
-        if choice.nil?
-          Bundler.ui.confirm header
-          choice = Bundler.ui.ask("#{message} y/(n):") == "y"
-        end
+      choice = options[key] || Bundler.settings["gem.#{key}"]
 
+      if choice.nil?
+        Bundler.ui.confirm header
+        choice = (Bundler.ui.ask("#{message} y/(n):") =~ /y|yes/)
         Bundler.settings.set_global("gem.#{key}", choice)
       end
 
-      if choice.nil?
-        Bundler.settings["gem.#{key}"]
-      else
-        choice
-      end
+      choice
     end
 
     def validate_ext_name
@@ -148,6 +142,7 @@ module Bundler
 
     def ask_and_set_test_framework
       test_framework = options[:test] || Bundler.settings["gem.test"]
+
       if test_framework.nil?
         Bundler.ui.confirm "Do you want to generate tests with your gem?"
         result = Bundler.ui.ask "Type 'rspec' or 'minitest' to generate those test files now and " \
@@ -155,7 +150,7 @@ module Bundler
         if result =~ /rspec|minitest/
           test_framework = result
         else
-          test_framework = "false"
+          test_framework = false
         end
       end
 
@@ -163,7 +158,6 @@ module Bundler
         Bundler.settings.set_global("gem.test", test_framework)
       end
 
-      return if test_framework == "false"
       test_framework
     end
 
