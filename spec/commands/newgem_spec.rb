@@ -155,10 +155,6 @@ describe "bundle gem" do
         to match("delete to allow pushes to any server")
     end
 
-    it "sets gemspec license to MIT by default" do
-      expect(generated_gem.gemspec.license).to eq("MIT")
-    end
-
     it "requires the version file" do
       expect(bundled_app("test_gem/lib/test_gem.rb").read).to match(/require "test_gem\/version"/)
     end
@@ -333,6 +329,9 @@ describe "bundle gem" do
       expect(bundled_app("test-gem/Rakefile")).to exist
       expect(bundled_app("test-gem/lib/test/gem.rb")).to exist
       expect(bundled_app("test-gem/lib/test/gem/version.rb")).to exist
+
+      skel = Bundler::GemHelper.new(bundled_app(gem_name).to_s)
+      expect(skel.gemspec.license).to eq("MIT")
     end
   end
 
@@ -401,10 +400,6 @@ describe "bundle gem" do
     it "sets gemspec metadata['allowed_push_host']", :rubygems => "2.0" do
       expect(generated_gem.gemspec.metadata['allowed_push_host']).
         to match("delete to allow pushes to any server")
-    end
-
-    it "sets gemspec license to MIT by default" do
-      expect(generated_gem.gemspec.license).to eq("MIT")
     end
 
     it "requires the version file" do
