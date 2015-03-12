@@ -316,7 +316,8 @@ module Bundler
         executable
       elsif ENV['PATH']
         path = ENV['PATH'].split(File::PATH_SEPARATOR).find do |p|
-          File.executable?(File.join(p, executable))
+          abs_path = File.join(p, executable)
+          File.file?(abs_path) && File.executable?(abs_path)
         end
         path && File.expand_path(executable, path)
       end
