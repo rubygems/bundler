@@ -42,6 +42,7 @@ module Bundler
 
     def gemspec(opts = nil)
       path              = opts && opts[:path] || '.'
+      glob              = opts && opts[:glob] #|| nil
       name              = opts && opts[:name] || '{,*}'
       development_group = opts && opts[:development_group] || :development
       expanded_path     = File.expand_path(path, Bundler.default_gemfile.dirname)
@@ -52,8 +53,7 @@ module Bundler
       when 1
         spec = Bundler.load_gemspec(gemspecs.first)
         raise InvalidOption, "There was an error loading the gemspec at #{gemspecs.first}." unless spec
-        opts ||= {}
-        gem spec.name, opts.merge(:path => path)
+        gem spec.name, path: path, glob: glob
         group(development_group) do
           spec.development_dependencies.each do |dep|
             gem dep.name, *(dep.requirement.as_list + [:type => :development])
