@@ -42,7 +42,7 @@ module Bundler
 
     def gemspec(opts = nil)
       path              = opts && opts[:path] || '.'
-      glob              = opts && opts[:glob] #|| nil
+      glob              = opts && opts[:glob]
       name              = opts && opts[:name] || '{,*}'
       development_group = opts && opts[:development_group] || :development
       expanded_path     = File.expand_path(path, Bundler.default_gemfile.dirname)
