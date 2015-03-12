@@ -53,7 +53,7 @@ module Bundler
       when 1
         spec = Bundler.load_gemspec(gemspecs.first)
         raise InvalidOption, "There was an error loading the gemspec at #{gemspecs.first}." unless spec
-        gem spec.name, path: path, glob: glob
+        gem spec.name, :path => path, :glob => glob
         group(development_group) do
           spec.development_dependencies.each do |dep|
             gem dep.name, *(dep.requirement.as_list + [:type => :development])
