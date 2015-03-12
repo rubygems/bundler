@@ -16,14 +16,15 @@ module Bundler
     attr_accessor :dependencies
 
     def initialize
-      @source          = nil
-      @sources         = SourceList.new
-      @git_sources     = {}
-      @dependencies    = []
-      @groups          = []
-      @platforms       = []
-      @env             = nil
-      @ruby_version    = nil
+      @source            = nil
+      @sources           = SourceList.new
+      @git_sources       = {}
+      @dependencies      = []
+      @groups            = []
+      @platforms         = []
+      @env               = nil
+      @ruby_version      = nil
+      @post_install_hook = nil
       add_git_sources
     end
 
@@ -158,7 +159,7 @@ module Bundler
     end
 
     def to_definition(lockfile, unlock)
-      Definition.new(lockfile, @dependencies, @sources, unlock, @ruby_version)
+      Definition.new(lockfile, @dependencies, @sources, unlock, @ruby_version, @post_install_hook)
     end
 
     def group(*args, &blk)
@@ -325,6 +326,10 @@ module Bundler
           "To upgrade this warning to an error, run `bundle config " \
           "disable_multisource true`."
       end
+    end
+
+    def post_install(&blk)
+      @post_install_hook = blk
     end
 
   end

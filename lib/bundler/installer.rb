@@ -92,6 +92,13 @@ module Bundler
 
       lock unless Bundler.settings[:frozen]
       generate_standalone(options[:standalone]) if options[:standalone]
+      run_post_install_hook
+    end
+
+    def run_post_install_hook
+      if hook = @definition.post_install_hook
+        hook.call(root, @definition.specs_by_group)
+      end
     end
 
     def install_gem_from_spec(spec, standalone = false, worker = 0)
