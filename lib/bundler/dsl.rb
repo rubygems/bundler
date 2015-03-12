@@ -225,7 +225,7 @@ module Bundler
     end
 
     def valid_keys
-      @valid_keys ||= %w(branch git glob group development_group groups name path platform platforms ref require source submodules tag type)
+      @valid_keys ||= %w(group groups git path glob name branch ref tag require submodules platform platforms type source)
     end
 
     def normalize_options(name, version, opts)
