@@ -1,3 +1,10 @@
+## 1.9.0.rc
+
+Bugfixes:
+
+  - make Bundler.which stop finding directories (@nohoho)
+  - handle Bundler prereleases correctly (#3470, @segiddins)
+
 ## 1.9.0.pre.1 (2015-03-11)
 
 Bugfixes:
