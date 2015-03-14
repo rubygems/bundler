@@ -12,7 +12,6 @@ module Bundler
   preserve_gem_path
   ORIGINAL_ENV = ENV.to_hash
 
-  autoload :AnonymizableURI,       'bundler/anonymizable_uri'
   autoload :Definition,            'bundler/definition'
   autoload :Dependency,            'bundler/dependency'
   autoload :DepProxy,              'bundler/dep_proxy'
