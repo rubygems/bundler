@@ -195,7 +195,7 @@ module Bundler
           spec = RemoteSpecification.new(name, version, platform, self)
         end
         spec.source = source
-        spec.source_uri = @remote
+        spec.remote = @remote
         index << spec
       end
 

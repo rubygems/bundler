@@ -86,10 +86,10 @@ module Bundler
 
         # Download the gem to get the spec, because some specs that are returned
         # by rubygems.org are broken and wrong.
-        if spec.source_uri
+        if spec.remote
           # Check for this spec from other sources
-          uris = [spec.source_uri.anonymized_uri]
-          uris += source_uris_for_spec(spec)
+          uris = [spec.remote.anonymized_uri]
+          uris += remotes_for_spec(spec).map { |remote| remote.anonymized_uri }
           uris.uniq!
           Installer.ambiguous_gems << [spec.name, *uris] if uris.length > 1
 
@@ -202,9 +202,9 @@ module Bundler
 
     protected
 
-      def source_uris_for_spec(spec)
+      def remotes_for_spec(spec)
         specs.search_all(spec.name).inject([]) do |uris, s|
-          uris << s.source_uri.anonymized_uri if s.source_uri
+          uris << s.remote if s.remote
           uris
         end
       end
@@ -360,8 +360,8 @@ module Bundler
       end
 
       def fetch_gem(spec)
-        return false unless spec.source_uri
-        Fetcher.download_gem_from_uri(spec, spec.source_uri.uri)
+        return false unless spec.remote
+        Fetcher.download_gem_from_uri(spec, spec.remote.uri)
       end
 
       def builtin_gem?(spec)

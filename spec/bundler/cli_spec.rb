@@ -2,8 +2,6 @@ require 'spec_helper'
 require 'bundler/cli'
 
 describe "bundle executable" do
-  let(:source_uri) { "http://localgemserver.test" }
-
   it "returns non-zero exit status when passed unrecognized options" do
     bundle '--invalid_argument'
     expect(exitstatus).to_not be_zero if exitstatus
