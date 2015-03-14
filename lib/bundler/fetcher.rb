@@ -106,7 +106,7 @@ module Bundler
       @api_timeout    = 10 # How long to wait for each API call
       @max_retries    = 3  # How many retries for the API call
 
-      @anonymizable_uri = configured_uri_for(remote_uri)
+      @remote = configured_uri_for(remote_uri)
 
       Socket.do_not_reverse_lookup = true
       connection # create persistent connection
@@ -140,7 +140,7 @@ module Bundler
     end
 
     def uri
-      @anonymizable_uri.without_credentials
+      @remote.anonymized_uri
     end
 
     # fetch a gem specification
@@ -195,7 +195,7 @@ module Bundler
           spec = RemoteSpecification.new(name, version, platform, self)
         end
         spec.source = source
-        spec.source_uri = @anonymizable_uri
+        spec.source_uri = @remote
         index << spec
       end
 
@@ -399,7 +399,7 @@ module Bundler
     def configured_uri_for(uri)
       uri = Bundler::Source.mirror_for(uri)
       config_auth = Bundler.settings[uri.to_s] || Bundler.settings[uri.host]
-      AnonymizableURI.new(uri, config_auth)
+      Source::Rubygems::Remote.new(uri, config_auth)
     end
 
     def fetch_uri
@@ -415,7 +415,7 @@ module Bundler
     end
 
     def remote_uri
-      @anonymizable_uri.original_uri
+      @remote.uri
     end
   end
 end

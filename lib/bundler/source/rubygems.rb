@@ -5,6 +5,8 @@ require 'rubygems/spec_fetcher'
 module Bundler
   class Source
     class Rubygems < Source
+      autoload :Remote, "bundler/source/rubygems/remote"
+
       # Use the API when installing less than X gems
       API_REQUEST_LIMIT = 500
       # Ask for X gems per API request
@@ -86,7 +88,7 @@ module Bundler
         # by rubygems.org are broken and wrong.
         if spec.source_uri
           # Check for this spec from other sources
-          uris = [spec.source_uri.without_credentials]
+          uris = [spec.source_uri.anonymized_uri]
           uris += source_uris_for_spec(spec)
           uris.uniq!
           Installer.ambiguous_gems << [spec.name, *uris] if uris.length > 1
@@ -202,7 +204,7 @@ module Bundler
 
       def source_uris_for_spec(spec)
         specs.search_all(spec.name).inject([]) do |uris, s|
-          uris << s.source_uri.without_credentials if s.source_uri
+          uris << s.source_uri.anonymized_uri if s.source_uri
           uris
         end
       end
@@ -359,7 +361,7 @@ module Bundler
 
       def fetch_gem(spec)
         return false unless spec.source_uri
-        Fetcher.download_gem_from_uri(spec, spec.source_uri.original_uri)
+        Fetcher.download_gem_from_uri(spec, spec.source_uri.uri)
       end
 
       def builtin_gem?(spec)
