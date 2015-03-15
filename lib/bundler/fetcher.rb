@@ -397,8 +397,7 @@ module Bundler
   private
 
     def configured_uri_for(uri)
-      config_auth = Bundler.settings.credentials_for(uri)
-      Source::Rubygems::Remote.new(uri, config_auth)
+      Source::Rubygems::Remote.new(uri)
     end
 
     def fetch_uri
