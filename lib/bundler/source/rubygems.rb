@@ -196,7 +196,8 @@ module Bundler
 
       def fetchers
         @fetchers ||= remotes.map do |uri|
-            Bundler::Fetcher.new(uri)
+          remote = Source::Rubygems::Remote.new(uri)
+          Bundler::Fetcher.new(remote)
         end
       end
 

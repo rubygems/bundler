@@ -101,12 +101,12 @@ module Bundler
 
     end
 
-    def initialize(remote_uri)
+    def initialize(remote)
       @redirect_limit = 5  # How many redirects to allow in one request
       @api_timeout    = 10 # How long to wait for each API call
       @max_retries    = 3  # How many retries for the API call
 
-      @remote = configured_uri_for(remote_uri)
+      @remote = remote
 
       Socket.do_not_reverse_lookup = true
       connection # create persistent connection
@@ -395,10 +395,6 @@ module Bundler
     end
 
   private
-
-    def configured_uri_for(uri)
-      Source::Rubygems::Remote.new(uri)
-    end
 
     def fetch_uri
       @fetch_uri ||= begin
