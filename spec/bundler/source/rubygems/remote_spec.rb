@@ -62,4 +62,20 @@ describe Bundler::Source::Rubygems::Remote do
       end
     end
   end
+
+  context "when a mirror with credentials is configured for the URI" do
+    let(:uri) { URI("https://rubygems.org/") }
+    let(:mirror_uri_with_auth) { URI("https://username:password@rubygems-mirror.org/") }
+    let(:mirror_uri_no_auth) { URI("https://rubygems-mirror.org/") }
+
+    before { Bundler.settings["mirror.https://rubygems.org/"] = mirror_uri_with_auth.to_s }
+
+    specify "#uri returns the mirror URI with credentials" do
+      expect(remote(uri).uri).to eq(mirror_uri_with_auth)
+    end
+
+    specify "#anonymized_uri returns the mirror URI without credentials" do
+      expect(remote(uri).anonymized_uri).to eq(mirror_uri_no_auth)
+    end
+  end
 end

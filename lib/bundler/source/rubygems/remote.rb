@@ -6,6 +6,7 @@ module Bundler
                     :anonymized_uri
 
         def initialize(uri, fallback_auth = nil)
+          uri = Bundler.settings.mirror_for(uri)
           @uri = apply_auth(uri, fallback_auth).freeze
           @anonymized_uri = remove_auth(@uri).freeze
         end
