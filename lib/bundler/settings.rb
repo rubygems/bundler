@@ -64,6 +64,10 @@ module Bundler
       gem_mirrors[normalized_key] || uri
     end
 
+    def credentials_for(uri)
+      self[uri.to_s] || self[uri.host]
+    end
+
     def gem_mirrors
       all.inject({}) do |h, k|
         if k =~ /^mirror\./

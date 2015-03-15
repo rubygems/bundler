@@ -51,6 +51,33 @@ describe Bundler::Settings do
     end
   end
 
+  describe "#credentials_for" do
+    let(:uri) { URI("https://gemserver.example.org/") }
+    let(:credentials) { "username:password" }
+
+    context "with no configured credentials" do
+      it "returns nil" do
+        expect(settings.credentials_for(uri)).to be_nil
+      end
+    end
+
+    context "with credentials configured by URL" do
+      before { settings["https://gemserver.example.org/"] = credentials }
+
+      it "returns the configured credentials" do
+        expect(settings.credentials_for(uri)).to eq(credentials)
+      end
+    end
+
+    context "with credentials configured by hostname" do
+      before { settings["gemserver.example.org"] = credentials }
+
+      it "returns the configured credentials" do
+        expect(settings.credentials_for(uri)).to eq(credentials)
+      end
+    end
+  end
+
   describe "URI normalization" do
     it "normalizes HTTP URIs in credentials configuration" do
       settings["http://gemserver.example.org"] = "username:password"
