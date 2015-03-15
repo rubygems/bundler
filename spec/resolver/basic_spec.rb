@@ -76,4 +76,12 @@ describe "Resolving" do
     should_resolve_and_include %w(foo-3.0.5)
   end
 
+  # Feature #82
+  it "should install the oldest possible version of requirements with constraints given when --use oldest flag is set" do
+    @index = an_awesome_index
+    dep "rack", ">= 0.9.1"
+    Bundler.settings[:use_oldest] = true
+    should_resolve_and_include %w(rack-0.9.1)
+  end
+
 end
