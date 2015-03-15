@@ -56,6 +56,18 @@ module Bundler
       repos
     end
 
+    def mirror_for(uri)
+      uri = URI(uri.to_s) unless uri.is_a?(URI)
+
+      # Settings keys are all downcased
+      normalized_key = normalize_uri(uri.to_s.downcase)
+      gem_mirrors[normalized_key] || uri
+    end
+
+    def credentials_for(uri)
+      self[uri.to_s] || self[uri.host]
+    end
+
     def gem_mirrors
       all.inject({}) do |h, k|
         if k =~ /^mirror\./

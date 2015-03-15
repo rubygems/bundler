@@ -5,14 +5,17 @@ module Bundler
         attr_reader :uri,
                     :anonymized_uri
 
-        def initialize(uri, fallback_auth = nil)
+        def initialize(uri)
+          uri = Bundler.settings.mirror_for(uri)
+          fallback_auth = Bundler.settings.credentials_for(uri)
+
           @uri = apply_auth(uri, fallback_auth).freeze
           @anonymized_uri = remove_auth(@uri).freeze
         end
 
       private
 
-        def apply_auth(uri, auth = nil)
+        def apply_auth(uri, auth)
           if auth && uri.userinfo.nil?
             uri = uri.dup
             uri.userinfo = auth
