@@ -2,8 +2,12 @@ require 'spec_helper'
 require 'bundler/settings'
 
 describe Bundler::Settings do
+  subject(:settings) { described_class.new(bundled_app) }
+
   describe "#set_local" do
     context "when the local config file is not found" do
+      subject(:settings) { described_class.new(nil) }
+
       it "raises a GemfileNotFound error with explanation" do
         expect{ subject.set_local("foo", "bar") }.
           to raise_error(Bundler::GemfileNotFound, "Could not locate Gemfile")
@@ -11,9 +15,43 @@ describe Bundler::Settings do
     end
   end
 
-  describe "URI normalization" do
-    let(:settings) { described_class.new(bundled_app) }
+  describe "#mirror_for" do
+    let(:uri) { URI("https://rubygems.org/") }
 
+    context "with no configured mirror" do
+      it "returns the original URI" do
+        expect(settings.mirror_for(uri)).to eq(uri)
+      end
+
+      it "converts a string parameter to a URI" do
+        expect(settings.mirror_for("https://rubygems.org/")).to eq(uri)
+      end
+    end
+
+    context "with a configured mirror" do
+      let(:mirror_uri) { URI("https://rubygems-mirror.org/") }
+
+      before { settings["mirror.https://rubygems.org/"] = mirror_uri.to_s }
+
+      it "returns the mirror URI" do
+        expect(settings.mirror_for(uri)).to eq(mirror_uri)
+      end
+
+      it "converts a string parameter to a URI" do
+        expect(settings.mirror_for("https://rubygems.org/")).to eq(mirror_uri)
+      end
+
+      it "normalizes the URI" do
+        expect(settings.mirror_for("https://rubygems.org")).to eq(mirror_uri)
+      end
+
+      it "is case insensitive" do
+        expect(settings.mirror_for("HTTPS://RUBYGEMS.ORG/")).to eq(mirror_uri)
+      end
+    end
+  end
+
+  describe "URI normalization" do
     it "normalizes HTTP URIs in credentials configuration" do
       settings["http://gemserver.example.org"] = "username:password"
       expect(settings.all).to include("http://gemserver.example.org/")

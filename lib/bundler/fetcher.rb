@@ -397,7 +397,7 @@ module Bundler
   private
 
     def configured_uri_for(uri)
-      uri = Bundler::Source.mirror_for(uri)
+      uri = Bundler.settings.mirror_for(uri)
       config_auth = Bundler.settings[uri.to_s] || Bundler.settings[uri.host]
       Source::Rubygems::Remote.new(uri, config_auth)
     end
