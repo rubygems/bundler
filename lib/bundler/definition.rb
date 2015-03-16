@@ -5,7 +5,7 @@ module Bundler
   class Definition
     include GemHelpers
 
-    attr_reader :dependencies, :platforms, :ruby_version, :locked_deps
+    attr_reader :dependencies, :platforms, :ruby_version, :post_install_hook, :locked_deps
 
     # Given a gemfile and lockfile creates a Bundler definition
     #
@@ -43,7 +43,7 @@ module Bundler
     # @param unlock [Hash, Boolean, nil] Gems that have been requested
     #   to be updated or true if all gems should be updated
     # @param ruby_version [Bundler::RubyVersion, nil] Requested Ruby Version
-    def initialize(lockfile, dependencies, sources, unlock, ruby_version = nil)
+    def initialize(lockfile, dependencies, sources, unlock, ruby_version = nil, post_install_hook = nil)
       @unlocking = unlock == true || !unlock.empty?
 
       @dependencies, @sources, @unlock = dependencies, sources, unlock
@@ -51,6 +51,7 @@ module Bundler
       @specs             = nil
       @lockfile_contents = ""
       @ruby_version      = ruby_version
+      @post_install_hook = post_install_hook
 
       if lockfile && File.exist?(lockfile)
         @lockfile_contents = Bundler.read_file(lockfile)
@@ -232,6 +233,10 @@ module Bundler
 
     def groups
       dependencies.map { |d| d.groups }.flatten.uniq
+    end
+
+    def specs_by_group
+      Hash[groups.map { |g| [g, specs_for([g]).to_a] }]
     end
 
     def lock(file)

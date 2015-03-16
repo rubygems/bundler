@@ -67,4 +67,38 @@ describe "bundle install" do
     end
   end
 
+  context "with a post_install hook" do
+    before :each do
+      in_app_root
+    end
+
+    it "runs with no arguments" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+        post_install { puts "POST INSTALL RAN" }
+      G
+
+      bundle :install
+      expect(out).to match(/POST INSTALL RAN/)
+    end
+
+    it "passes in the root and specs by group" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+        post_install do |root, specs_by_group|
+          puts "POST INSTALL \#{root}"
+          puts 'POST INSTALL ' + specs_by_group.keys.join(' ')
+          puts 'POST INSTALL ' + specs_by_group.values.flatten.map(&:name).join(' ')
+        end
+      G
+
+      bundle :install
+      expect(out).to include("POST INSTALL #{Bundler.root}")
+      expect(out).to include("POST INSTALL default")
+      expect(out).to include("POST INSTALL bundler rack")
+    end
+  end
+
 end
