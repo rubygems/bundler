@@ -392,7 +392,7 @@ module Bundler
           line_numer = trace_line.split(':')[1].to_i - 1
           return m unless line_numer
 
-          lines      = contents.lines
+          lines      = contents.lines.to_a
           indent     = ' #  '
           indicator  = indent.gsub('#', '>')
           first_line = (line_numer.zero?)
