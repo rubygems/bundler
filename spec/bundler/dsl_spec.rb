@@ -69,7 +69,7 @@ describe Bundler::Dsl do
       expect(Bundler).to receive(:read_file).with("Gemfile").
         and_return("unknown")
 
-      error_msg = "Invalid `Gemfile` file: Undefined local variable or method `unknown' for Gemfile. Bundler cannot continue."
+      error_msg = "There was an error parsing `Gemfile`: Undefined local variable or method `unknown' for Gemfile. Bundler cannot continue."
       expect { subject.eval_gemfile("Gemfile") }.
         to raise_error(Bundler::GemfileError, Regexp.new(error_msg))
     end
@@ -79,7 +79,7 @@ describe Bundler::Dsl do
     it "handles syntax errors with a useful message" do
       expect(Bundler).to receive(:read_file).with("Gemfile").and_return("}")
       expect { subject.eval_gemfile("Gemfile") }.
-        to raise_error(Bundler::GemfileError, /Invalid `Gemfile` file: syntax error, unexpected tSTRING_DEND. Bundler cannot continue./)
+        to raise_error(Bundler::GemfileError, /There was an error parsing `Gemfile`: syntax error, unexpected tSTRING_DEND. Bundler cannot continue./)
     end
   end
 
@@ -176,7 +176,7 @@ describe Bundler::Dsl do
     it "will raise a Bundler::GemfileError" do
       gemfile "gem 'foo', :path => /unquoted/string/syntax/error"
       expect { Bundler::Dsl.evaluate(bundled_app("Gemfile"), nil, true) }.
-        to raise_error(Bundler::GemfileError, /Invalid `Gemfile` file: unknown regexp options - trg. Bundler cannot continue./)
+        to raise_error(Bundler::GemfileError, /There was an error parsing `Gemfile`: unknown regexp options - trg. Bundler cannot continue./)
     end
   end
 
@@ -184,7 +184,7 @@ describe Bundler::Dsl do
     it "will raise a Bundler::GemfileError" do
       gemfile "s = 'foo'.freeze; s.strip!"
       expect { Bundler::Dsl.evaluate(bundled_app("Gemfile"), nil, true) }.
-        to raise_error(Bundler::GemfileError, /Invalid `Gemfile` file: can't modify frozen String. Bundler cannot continue./)
+        to raise_error(Bundler::GemfileError, /There was an error parsing `Gemfile`: can't modify frozen String. Bundler cannot continue./)
     end
   end
 end
