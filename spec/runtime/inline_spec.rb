@@ -58,11 +58,10 @@ describe "bundler/inline#gemfile" do
         path "#{lib_path}"
         gem "two"
       end
-
-      puts "success"
     RUBY
 
-    expect(out).to eq("two\nsuccess")
+    expect(out).to eq("two")
+    expect(exitstatus).to be_zero if exitstatus
 
     script <<-RUBY, :expect_err => true
       gemfile do
@@ -81,10 +80,9 @@ describe "bundler/inline#gemfile" do
         source "file://#{gem_repo1}"
         gem "rack"
       end
-
-      puts "success"
     RUBY
 
-    expect(out).to eq("Rack's post install message\nsuccess")
+    expect(out).to eq("Rack's post install message")
+    expect(exitstatus).to be_zero if exitstatus
   end
 end

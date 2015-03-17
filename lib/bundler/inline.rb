@@ -16,5 +16,6 @@ def gemfile(install = false, &blk)
   runtime.setup_environment
   runtime.setup.require
 
-  Bundler.send(:define_singleton_method, :root, old_root)
+  bundler_module = class << Bundler; self; end
+  bundler_module.send(:define_method, :root, old_root)
 end
