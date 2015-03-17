@@ -17,6 +17,7 @@ Features:
 
   - prefer gemspecs closest to the directory root (#3428, @segiddins)
   - debug log for API request limits (#3452, @neerfri)
+  - implemented use-oldest feature (#82, @sxl1092)
 
 "Features":
 
