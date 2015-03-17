@@ -17,7 +17,7 @@ describe "bundle install with gem sources" do
       G
 
       expect(err).to eq ""
-      expect(out).to match(/StandardError: FAIL/)
+      expect(out).to match(/StandardError, "FAIL"/)
       expect(bundled_app("Gemfile.lock")).not_to exist
     end
 

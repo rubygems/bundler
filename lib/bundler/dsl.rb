@@ -179,7 +179,6 @@ module Bundler
     end
 
     def method_missing(name, *args)
-      location = caller[0].split(':')[0..1].join(':')
       raise GemfileError, "Undefined local variable or method `#{name}' for Gemfile"
     end
 
@@ -339,10 +338,16 @@ module Bundler
       # @param [String]    dsl_path  @see dsl_path
       #
       def initialize(description, dsl_path, backtrace, contents = nil)
+        @status_code = $!.respond_to?(:status_code) && $!.status_code
+
         @description = description
         @dsl_path    = dsl_path
         @backtrace   = backtrace
         @contents    = contents
+      end
+
+      def status_code
+        @status_code || super
       end
 
       # @return [String] the contents of the DSL that cause the exception to
