@@ -31,7 +31,7 @@ module Bundler
       contents ||= Bundler.read_file(gemfile.to_s)
       instance_eval(contents, gemfile.to_s, 1)
     rescue Exception => e
-      message = "Invalid `#{File.basename gemfile.to_s}` file: #{e.message}"
+      message = "There was an error parsing `#{File.basename gemfile.to_s}`: #{e.message}"
       raise DSLError.new(message, gemfile, e.backtrace, contents)
     end
 
