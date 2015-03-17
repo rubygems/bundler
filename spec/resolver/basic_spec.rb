@@ -82,6 +82,7 @@ describe "Resolving" do
     dep "rack", ">= 0.9.1"
     Bundler.settings[:use_oldest] = true
     should_resolve_and_include %w(rack-0.9.1)
+    Bundler.settings[:use_oldest] = false
   end
 
 end
