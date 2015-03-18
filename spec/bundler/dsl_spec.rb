@@ -15,7 +15,7 @@ describe Bundler::Dsl do
       expect(subject.dependencies.first.source.uri).to eq(example_uri)
     end
 
-    it "raises expection on invalid hostname" do
+    it "raises exception on invalid hostname" do
       expect {
         subject.git_source(:group){ |repo_name| "git@git.example.com:#{repo_name}.git" }
       }.to raise_error(Bundler::InvalidOption)
