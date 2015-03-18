@@ -79,7 +79,7 @@ describe Bundler::Dsl do
     it "handles syntax errors with a useful message" do
       expect(Bundler).to receive(:read_file).with("Gemfile").and_return("}")
       expect { subject.eval_gemfile("Gemfile") }.
-        to raise_error(Bundler::GemfileError, /There was an error parsing `Gemfile`: syntax error, unexpected tSTRING_DEND. Bundler cannot continue./)
+        to raise_error(Bundler::GemfileError, /There was an error parsing `Gemfile`: (syntax error, unexpected tSTRING_DEND|(compile error - )?syntax error, unexpected '}'). Bundler cannot continue./)
     end
   end
 
@@ -176,7 +176,7 @@ describe Bundler::Dsl do
     it "will raise a Bundler::GemfileError" do
       gemfile "gem 'foo', :path => /unquoted/string/syntax/error"
       expect { Bundler::Dsl.evaluate(bundled_app("Gemfile"), nil, true) }.
-        to raise_error(Bundler::GemfileError, /There was an error parsing `Gemfile`: unknown regexp options - trg. Bundler cannot continue./)
+        to raise_error(Bundler::GemfileError, /There was an error parsing `Gemfile`:( compile error -)? unknown regexp options - trg. Bundler cannot continue./)
     end
   end
 
