@@ -30,6 +30,7 @@ module Bundler
     def eval_gemfile(gemfile, contents = nil)
       contents ||= Bundler.read_file(gemfile.to_s)
       instance_eval(contents, gemfile.to_s, 1)
+      infer_ruby_version(gemfile)
     rescue SyntaxError => e
       syntax_msg = e.message.gsub("#{gemfile}:", 'on line ')
       raise GemfileError, "Gemfile syntax error #{syntax_msg}"
@@ -324,6 +325,15 @@ module Bundler
           "a block to indicate which gems should come from the secondary source. " \
           "To upgrade this warning to an error, run `bundle config " \
           "disable_multisource true`."
+      end
+    end
+
+    def infer_ruby_version(gemfile)
+      unless @ruby_version
+        ruby_version = gemfile.parent + '.ruby-version'
+        if ruby_version.exist?
+          ruby ruby_version.read.chomp
+        end
       end
     end
 
