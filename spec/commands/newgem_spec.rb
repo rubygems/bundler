@@ -578,6 +578,15 @@ describe "bundle gem" do
     end
   end
 
+  describe "uncommon gem names" do
+    it "can deal with two dashes" do
+      bundle "gem a--a"
+      Bundler.clear_gemspec_cache
+
+      expect(bundled_app("a--a/a--a.gemspec")).to exist
+    end
+  end
+
   context "on first run" do
     before do
       in_app_root
