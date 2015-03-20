@@ -263,22 +263,13 @@ module Bundler
       lock_ver = nil
       curr_ver = nil
 
-      if lockfile and lockfile.match(/^  \[(.*)\]$/)
-        lock_ver = $1
-        curr_ver = Bundler::VERSION
+      lock_ver = @lockfile_contents[/^  \[(.*)\]$/, 1] if lockfile
+
+      if lock_ver && Gem::Version.new(lock_ver) < Gem::Version.new(Bundler::VERSION)
+        new_ver = Bundler::VERSION
       end
 
-      if lock_ver and curr_ver
-        if Gem::Version.new(curr_ver) >= Gem::Version.new(lock_ver)
-          ver = curr_ver
-        else
-          ver = lock_ver
-        end
-      else
-        ver = Bundler::VERSION
-      end
-
-      ver
+      new_ver || lock_ver || Bundler::VERSION
     end
 
     def to_lock
