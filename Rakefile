@@ -87,8 +87,8 @@ namespace :spec do
     end
 
     deps.sort_by{|name, _| name }.each do |name, version|
-      sh "#{Gem.ruby} -S gem list -i '^#{name}$' -v '#{version}' || " \
-         "#{Gem.ruby} -S gem install #{name} -v '#{version}' --no-ri --no-rdoc"
+      sh %{#{Gem.ruby} -S gem list -i "^#{name}$" -v "#{version}" || } +
+         %{#{Gem.ruby} -S gem install #{name} -v "#{version}" --no-ri --no-rdoc}
     end
 
     # Download and install gems used inside tests

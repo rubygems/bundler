@@ -67,6 +67,9 @@ We divide `bundle` subcommands into primary commands and utilities.
 * `bundle open(1)`:
   Open an installed gem in the editor
 
+* `bundle lock(1)`:
+  Generate a lockfile for your dependencies
+
 * `bundle viz(1)`:
   Generate a visual representation of your dependencies
 
@@ -92,7 +95,4 @@ and execute it, passing down any extra arguments to it.
 
 These commands are obsolete and should no longer be used
 
-* `bundle lock(1)`
-* `bundle unlock(1)`
 * `bundle cache(1)`
-

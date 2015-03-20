@@ -5,6 +5,9 @@ require "bundler/vendored_thor"
 module Bundler
   def self.with_friendly_errors
     yield
+  rescue Bundler::Dsl::DSLError => e
+    Bundler.ui.error e.message
+    exit e.status_code
   rescue Bundler::BundlerError => e
     Bundler.ui.error e.message, :wrap => true
     Bundler.ui.trace e
