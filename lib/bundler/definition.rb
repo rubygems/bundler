@@ -260,15 +260,15 @@ module Bundler
     # Gemfile.lock. Used in #to_lock.
     def lock_version
       lockfile = @lockfile_contents
-      lock_ver = ""
-      curr_ver = ""
+      lock_ver = nil
+      curr_ver = nil
 
-      if !lockfile.empty? and lockfile.match(/^  \[(.*)\]$/)
+      if lockfile and lockfile.match(/^  \[(.*)\]$/)
         lock_ver = $1
         curr_ver = Bundler::VERSION
       end
 
-      if !lock_ver.empty? and !curr_ver.empty?
+      if lock_ver and curr_ver
         if Gem::Version.new(curr_ver) >= Gem::Version.new(lock_ver)
           ver = curr_ver
         else
