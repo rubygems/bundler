@@ -259,11 +259,7 @@ module Bundler
     # Returns the version of Bundler that is creating or has created
     # Gemfile.lock. Used in #to_lock.
     def lock_version
-      lockfile = @lockfile_contents
-      lock_ver = nil
-      curr_ver = nil
-
-      lock_ver = @lockfile_contents[/^  \[(.*)\]$/, 1] if lockfile
+      lock_ver = @lockfile_contents[/^  \[(.*)\]$/, 1] if @lockfile_contents
 
       if lock_ver && Gem::Version.new(lock_ver) < Gem::Version.new(Bundler::VERSION)
         new_ver = Bundler::VERSION
