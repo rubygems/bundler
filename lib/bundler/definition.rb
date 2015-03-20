@@ -256,8 +256,38 @@ module Bundler
         "#{File.expand_path(file)}"
     end
 
+    # Returns the version of Bundler that is creating or has created
+    # Gemfile.lock. Used in #to_lock.
+    def lock_version
+      lockfile = @lockfile_contents
+      lock_ver = ""
+      curr_ver = ""
+
+      if !lockfile.empty? and lockfile.match(/^  \[(.*)\]$/)
+        lock_ver = $1
+        curr_ver = Bundler::VERSION
+      end
+
+      if !lock_ver.empty? and !curr_ver.empty?
+        if Gem::Version.new(curr_ver) >= Gem::Version.new(lock_ver)
+          ver = curr_ver
+        else
+          ver = lock_ver
+        end
+      else
+        ver = Bundler::VERSION
+      end
+
+      ver
+    end
+
     def to_lock
       out = ""
+
+      # Record the version of Bundler that was used to create the lockfile
+      out << "LOCKED WITH\n"
+      out << "  [#{lock_version}]\n"
+      out << "\n"
 
       sources.lock_sources.each do |source|
         # Add the source header
