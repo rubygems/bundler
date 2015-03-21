@@ -285,7 +285,7 @@ describe "bundle install with explicit source paths" do
     install_gemfile <<-G
       gem 'foo', '1.0', :path => "#{lib_path("foo-1.0")}"
     G
-    expect(err).to eq("")
+    expect(err).to lack_errors
   end
 
   it "removes the .gem file after installing" do
@@ -495,7 +495,7 @@ describe "bundle install with explicit source paths" do
 
       bundle :install, :expect_err => true,
         :requires => [lib_path("install_hooks.rb")]
-      expect(err).to eq("Ran pre-install hook: foo-1.0")
+      expect(err).to eq_err("Ran pre-install hook: foo-1.0")
     end
 
     it "runs post-install hooks" do
@@ -515,7 +515,7 @@ describe "bundle install with explicit source paths" do
 
       bundle :install, :expect_err => true,
         :requires => [lib_path("install_hooks.rb")]
-      expect(err).to eq("Ran post-install hook: foo-1.0")
+      expect(err).to eq_err("Ran post-install hook: foo-1.0")
     end
 
     it "complains if the install hook fails" do
