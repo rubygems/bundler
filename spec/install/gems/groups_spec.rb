@@ -25,7 +25,7 @@ describe "bundle install with groups" do
         puts ACTIVESUPPORT
       R
 
-      expect(err).to eq("ZOMG LOAD ERROR")
+      expect(err).to eq_err("ZOMG LOAD ERROR")
     end
 
     it "installs gems with inline :groups into those groups" do
@@ -36,7 +36,7 @@ describe "bundle install with groups" do
         puts THIN
       R
 
-      expect(err).to eq("ZOMG LOAD ERROR")
+      expect(err).to eq_err("ZOMG LOAD ERROR")
     end
 
     it "sets up everything if Bundler.setup is used with no groups" do
@@ -57,7 +57,7 @@ describe "bundle install with groups" do
         puts THIN
       RUBY
 
-      expect(err).to eq("ZOMG LOAD ERROR")
+      expect(err).to eq_err("ZOMG LOAD ERROR")
     end
 
     it "sets up old groups when they have previously been removed" do
@@ -364,7 +364,7 @@ describe "bundle install with groups" do
     it "does not hit the remote a second time" do
       FileUtils.rm_rf gem_repo2
       bundle "install --without rack"
-      expect(err).to be_empty
+      expect(err).to lack_errors
     end
   end
 end

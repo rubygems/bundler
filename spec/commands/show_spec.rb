@@ -121,7 +121,7 @@ describe "bundle show" do
 
     it "does not output git errors" do
       bundle :show
-      expect(err).to be_empty
+      expect(err).to lack_errors
     end
   end
 
