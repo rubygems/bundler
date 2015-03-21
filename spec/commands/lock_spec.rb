@@ -18,6 +18,9 @@ describe "bundle lock" do
     G
 
     @lockfile = strip_lockfile <<-L
+      LOCKED WITH
+        [#{Bundler::VERSION}]
+
       GEM
         remote: file:#{gem_repo1}/
         specs:
