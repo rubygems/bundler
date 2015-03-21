@@ -199,7 +199,7 @@ describe "bundle install with git sources" do
           gem "foo"
         end
       G
-      expect(err).to eq("")
+      expect(err).to lack_errors
 
       run <<-RUBY
         require 'foo'
@@ -852,7 +852,7 @@ describe "bundle install with git sources" do
 
       bundle :install, :expect_err => true,
                        :requires => [lib_path("install_hooks.rb")]
-      expect(err).to eq("Ran pre-install hook: foo-1.0")
+      expect(err).to eq_err("Ran pre-install hook: foo-1.0")
     end
 
     it "runs post-install hooks" do
@@ -872,7 +872,7 @@ describe "bundle install with git sources" do
 
       bundle :install, :expect_err => true,
                        :requires => [lib_path("install_hooks.rb")]
-      expect(err).to eq("Ran post-install hook: foo-1.0")
+      expect(err).to eq_err("Ran post-install hook: foo-1.0")
     end
 
     it "complains if the install hook fails" do

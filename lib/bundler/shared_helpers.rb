@@ -21,6 +21,9 @@ module Bundler
     attr_accessor :gem_loaded
 
     def default_gemfile
+      Bundler.ui.deprecate("Gemfile and Gemfile.lock are " \
+                           "deprecated and will be replaced with gems.rb and " \
+                           "gems.locked in Bundler 2.0.0.\n")
       gemfile = find_gemfile
       raise GemfileNotFound, "Could not locate Gemfile" unless gemfile
       Pathname.new(gemfile)
@@ -140,7 +143,6 @@ module Bundler
     def find_gemfile
       given = ENV["BUNDLE_GEMFILE"]
       return given if given && !given.empty?
-
       find_file("Gemfile", "gems.rb")
     end
 

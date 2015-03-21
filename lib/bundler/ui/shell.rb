@@ -6,7 +6,7 @@ module Bundler
     class Shell
       LEVELS = %w(silent error warn confirm info debug).freeze
 
-      attr_writer :shell
+      attr_writer :shell, :deprecation_messages
 
       def initialize(options = {})
         if options["no-color"] || !STDOUT.tty?
@@ -15,6 +15,7 @@ module Bundler
         @shell = Thor::Base.shell.new
         @level = ENV["DEBUG"] ? "debug" : "info"
         @warning_history = []
+        @deprecation_messages = Set.new
       end
 
       def add_color(string, color)
@@ -33,6 +34,12 @@ module Bundler
         return if @warning_history.include? msg
         @warning_history << msg
         tell_me(msg, :yellow, newline) if level("warn")
+      end
+
+      def deprecate(msg, newline = nil)
+        return if @deprecation_messages.include?(msg)
+        @deprecation_messages.add(msg)
+        warn("DEPRECATION: " + msg, newline)
       end
 
       def error(msg, newline = nil)

@@ -15,7 +15,7 @@ describe "bundle install" do
         gem "yaml_spec"
       G
       bundle :install
-      expect(err).to be_empty
+      expect(err).to lack_errors
     end
 
     it "still installs correctly when using path" do
@@ -24,7 +24,7 @@ describe "bundle install" do
       install_gemfile <<-G
         gem 'yaml_spec', :path => "#{lib_path("yaml_spec-1.0")}"
       G
-      expect(err).to eq("")
+      expect(err).to lack_errors
     end
   end
 

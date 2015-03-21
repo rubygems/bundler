@@ -1,6 +1,18 @@
 # frozen_string_literal: true
 module Spec
   module Matchers
+    RSpec::Matchers.define :lack_errors do
+      match do |actual|
+        actual.gsub(/(^DEPRECATION:.+)/, "") == ""
+      end
+    end
+
+    RSpec::Matchers.define :eq_err do |expected|
+      match do |actual|
+        actual.gsub(/(^DEPRECATION:.+\n)/, "") == expected
+      end
+    end
+
     RSpec::Matchers.define :have_dep do |*args|
       dep = Bundler::Dependency.new(*args)
 

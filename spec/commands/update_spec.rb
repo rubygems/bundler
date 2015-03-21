@@ -274,7 +274,7 @@ describe "bundle update when a gem depends on a newer version of bundler" do
 
   it "should not explode" do
     bundle "update"
-    expect(err).to be_empty
+    expect(err).to lack_errors
   end
 
   it "should explain that bundler conflicted" do

@@ -10,7 +10,7 @@ describe "bundle check" do
 
     bundle :check
     expect(exitstatus).to eq(0) if exitstatus
-    expect(out).to eq("The Gemfile's dependencies are satisfied")
+    expect(out).to include("The Gemfile's dependencies are satisfied")
   end
 
   it "works with the --gemfile flag when not in the directory" do
@@ -21,7 +21,7 @@ describe "bundle check" do
 
     Dir.chdir tmp
     bundle "check --gemfile bundled_app/Gemfile"
-    expect(out).to eq("The Gemfile's dependencies are satisfied")
+    expect(out).to include("The Gemfile's dependencies are satisfied")
   end
 
   it "creates a Gemfile.lock by default if one does not exist" do
@@ -153,7 +153,7 @@ describe "bundle check" do
     G
 
     bundle :check
-    expect(out).to eq("The Gemfile's dependencies are satisfied")
+    expect(out).to include("The Gemfile's dependencies are satisfied")
   end
 
   it "works with env conditionals" do
@@ -184,7 +184,7 @@ describe "bundle check" do
     G
 
     bundle :check
-    expect(out).to eq("The Gemfile's dependencies are satisfied")
+    expect(out).to include("The Gemfile's dependencies are satisfied")
   end
 
   it "outputs an error when the default Gemfile is not found" do
@@ -211,7 +211,7 @@ describe "bundle check" do
     3.times do
       bundle :check
       expect(out).to eq(last_out)
-      expect(err).to be_empty
+      expect(err).to lack_errors
     end
   end
 
@@ -243,7 +243,7 @@ describe "bundle check" do
     it "returns success" do
       bundle "check --path vendor/bundle"
       expect(exitstatus).to eq(0) if exitstatus
-      expect(out).to eq("The Gemfile's dependencies are satisfied")
+      expect(out).to include("The Gemfile's dependencies are satisfied")
     end
 
     it "should write to .bundle/config" do
@@ -279,7 +279,7 @@ describe "bundle check" do
       bundle :install
       bundle :check
       expect(exitstatus).to eq(0) if exitstatus
-      expect(out).to eq("The Gemfile's dependencies are satisfied")
+      expect(out).to include("The Gemfile's dependencies are satisfied")
     end
 
     it "shows what is missing with the current Gemfile if it is not satisfied" do
