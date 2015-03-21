@@ -16,7 +16,7 @@ describe "Bundler.setup" do
         require 'rack'
         puts RACK
       RUBY
-      expect(err).to eq("")
+      expect(err).to lack_errors
       expect(out).to eq("1.0.0")
     end
   end
@@ -42,7 +42,7 @@ describe "Bundler.setup" do
           puts "WIN"
         end
       RUBY
-      expect(err).to eq("")
+      expect(err).to lack_errors
       expect(out).to eq("WIN")
     end
 
@@ -55,7 +55,7 @@ describe "Bundler.setup" do
         require 'rack'
         puts RACK
       RUBY
-      expect(err).to eq("")
+      expect(err).to lack_errors
       expect(out).to eq("1.0.0")
     end
 
@@ -69,7 +69,7 @@ describe "Bundler.setup" do
         require 'rack'
         puts RACK
       RUBY
-      expect(err).to eq("")
+      expect(err).to lack_errors
       expect(out).to eq("1.0.0")
     end
 
@@ -87,7 +87,7 @@ describe "Bundler.setup" do
           puts "FAIL"
         end
       RUBY
-      expect(err).to eq("")
+      expect(err).to lack_errors
       expect(out).to match("WIN")
     end
   end
@@ -230,7 +230,7 @@ describe "Bundler.setup" do
           end
         R
 
-        expect(err).to be_empty
+        expect(err).to lack_errors
       end
 
       it "replaces #gem but raises when the version is wrong" do
@@ -256,7 +256,7 @@ describe "Bundler.setup" do
           end
         R
 
-        expect(err).to be_empty
+        expect(err).to lack_errors
       end
     end
 
@@ -572,7 +572,7 @@ describe "Bundler.setup" do
           end
         R
 
-        expect(err).to be_empty
+        expect(err).to lack_errors
       end
     end
   end
@@ -607,7 +607,7 @@ describe "Bundler.setup" do
     ENV["GEM_HOME"] = ""
     bundle %{exec ruby -e "require 'set'"}
 
-    expect(err).to be_empty
+    expect(err).to lack_errors
   end
 
   it "should prepend gemspec require paths to $LOAD_PATH in order" do
@@ -663,7 +663,7 @@ describe "Bundler.setup" do
           require 'foo'
         R
       end
-      expect(err).to eq("")
+      expect(err).to lack_errors
     end
 
     it "should make sure the Bundler.root is really included in the path relative to the Gemfile" do
@@ -688,7 +688,7 @@ describe "Bundler.setup" do
         R
       end
 
-      expect(err).to eq("")
+      expect(err).to lack_errors
     end
   end
 
@@ -834,7 +834,7 @@ describe "Bundler.setup" do
         Bundler.load
       RUBY
 
-      expect(err).to eq("")
+      expect(err).to lack_errors
       expect(out).to eq("")
     end
   end
@@ -846,7 +846,7 @@ describe "Bundler.setup" do
       G
 
       bundle %|exec ruby -e "require 'bundler'; Bundler.setup"|
-      expect(err).to be_empty
+      expect(err).to lack_errors
     end
   end
 

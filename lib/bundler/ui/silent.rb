@@ -10,6 +10,9 @@ module Bundler
       def warn(message, newline = nil)
       end
 
+      def deprecate(message)
+      end
+
       def error(message, newline = nil)
       end
 

@@ -41,6 +41,9 @@ module Bundler
   end
 end
 
+STDERR.puts "Warning: bundle_ruby is deprecated and will be removed in " \
+ "Bundler 2.0.0."
+
 dsl = Bundler::Dsl.new
 begin
   dsl.eval_gemfile(Bundler::SharedHelpers.default_gemfile)
