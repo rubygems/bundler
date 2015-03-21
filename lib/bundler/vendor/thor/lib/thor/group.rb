@@ -1,4 +1,4 @@
-require "thor/base"
+require "bundler/vendor/thor/lib/thor/base"
 
 # Bundler::Thor has a special class called Bundler::Thor::Group. The main difference to Bundler::Thor class
 # is that it invokes all commands at once. It also include some methods that allows
