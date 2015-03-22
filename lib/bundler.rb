@@ -120,12 +120,7 @@ module Bundler
         # Load all groups, but only once
         @setup = load.setup
       else
-        @completed_groups ||= []
-        # Figure out which groups haven't been loaded yet
-        unloaded = groups - @completed_groups
-        # Record groups that are now loaded
-        @completed_groups = groups
-        unloaded.any? ? load.setup(*groups) : load
+        load.setup(*groups)
       end
     end
 

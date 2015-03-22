@@ -90,6 +90,21 @@ describe "Bundler.setup" do
       expect(err).to eq("")
       expect(out).to match("WIN")
     end
+
+    it "handles multiple non-additive invocations" do
+      ruby <<-RUBY
+        require 'bundler'
+        Bundler.setup(:default, :test)
+        Bundler.setup(:default)
+        require 'rack'
+
+        puts "FAIL"
+      RUBY
+
+      expect(err).to match("rack")
+      expect(err).to match("LoadError")
+      expect(out).not_to match("FAIL")
+    end
   end
 
   it "raises if the Gemfile was not yet installed" do
