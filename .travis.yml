@@ -5,6 +5,7 @@ before_script: travis_retry rake spec:travis:deps
 branches:
   only:
     - master
+    - 1-9-stable
     - 1-8-stable
     - 1-7-stable
     - 1-6-stable
