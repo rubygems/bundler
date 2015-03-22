@@ -1,4 +1,4 @@
-require 'molinillo/dependency_graph'
+require 'bundler/vendor/molinillo/lib/molinillo/dependency_graph'
 
 module Bundler::Molinillo
   # This class encapsulates a dependency resolver.
@@ -7,7 +7,7 @@ module Bundler::Molinillo
   #
   #
   class Resolver
-    require 'molinillo/resolution'
+    require 'bundler/vendor/molinillo/lib/molinillo/resolution'
 
     # @return [SpecificationProvider] the specification provider used
     #   in the resolution process

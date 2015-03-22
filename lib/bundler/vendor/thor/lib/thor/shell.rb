@@ -24,9 +24,9 @@ class Bundler::Thor
     SHELL_DELEGATED_METHODS = [:ask, :error, :set_color, :yes?, :no?, :say, :say_status, :print_in_columns, :print_table, :print_wrapped, :file_collision, :terminal_width]
     attr_writer :shell
 
-    autoload :Basic, "thor/shell/basic"
-    autoload :Color, "thor/shell/color"
-    autoload :HTML,  "thor/shell/html"
+    autoload :Basic, "bundler/vendor/thor/lib/thor/shell/basic"
+    autoload :Color, "bundler/vendor/thor/lib/thor/shell/color"
+    autoload :HTML,  "bundler/vendor/thor/lib/thor/shell/html"
 
     # Add shell to initialize config values.
     #

@@ -5,7 +5,7 @@ class Bundler::Thor
   # Adds a compatibility layer to your Bundler::Thor classes which allows you to use
   # rake package tasks. For example, to use rspec rake tasks, one can do:
   #
-  #   require 'thor/rake_compat'
+  #   require 'bundler/vendor/thor/lib/thor/rake_compat'
   #   require 'rspec/core/rake_task'
   #
   #   class Default < Bundler::Thor

@@ -1,6 +1,6 @@
-require "thor"
-require "thor/group"
-require "thor/core_ext/io_binary_read"
+require "bundler/vendor/thor/lib/thor"
+require "bundler/vendor/thor/lib/thor/group"
+require "bundler/vendor/thor/lib/thor/core_ext/io_binary_read"
 
 require "fileutils"
 require "open-uri"
@@ -102,7 +102,7 @@ class Bundler::Thor::Runner < Bundler::Thor #:nodoc: # rubocop:disable ClassLeng
 
   desc "version", "Show Bundler::Thor version"
   def version
-    require "thor/version"
+    require "bundler/vendor/thor/lib/thor/version"
     say "Bundler::Thor #{Bundler::Thor::VERSION}"
   end
 

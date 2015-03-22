@@ -1,17 +1,17 @@
-require "thor/command"
-require "thor/core_ext/hash_with_indifferent_access"
-require "thor/core_ext/ordered_hash"
-require "thor/error"
-require "thor/invocation"
-require "thor/parser"
-require "thor/shell"
-require "thor/line_editor"
-require "thor/util"
+require "bundler/vendor/thor/lib/thor/command"
+require "bundler/vendor/thor/lib/thor/core_ext/hash_with_indifferent_access"
+require "bundler/vendor/thor/lib/thor/core_ext/ordered_hash"
+require "bundler/vendor/thor/lib/thor/error"
+require "bundler/vendor/thor/lib/thor/invocation"
+require "bundler/vendor/thor/lib/thor/parser"
+require "bundler/vendor/thor/lib/thor/shell"
+require "bundler/vendor/thor/lib/thor/line_editor"
+require "bundler/vendor/thor/lib/thor/util"
 
 class Bundler::Thor
-  autoload :Actions,    "thor/actions"
-  autoload :RakeCompat, "thor/rake_compat"
-  autoload :Group,      "thor/group"
+  autoload :Actions,    "bundler/vendor/thor/lib/thor/actions"
+  autoload :RakeCompat, "bundler/vendor/thor/lib/thor/rake_compat"
+  autoload :Group,      "bundler/vendor/thor/lib/thor/group"
 
   # Shortcuts for help.
   HELP_MAPPINGS       = %w[-h -? --help -D]
