@@ -4,6 +4,7 @@ Bugfixes:
 
   - make Bundler.which stop finding directories (@nohoho)
   - handle Bundler prereleases correctly (#3470, @segiddins)
+  - add before_install to .travis.yml template for new gems (@kodnin)
 
 ## 1.9.0.pre.1 (2015-03-11)
 
