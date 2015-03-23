@@ -18,7 +18,10 @@ describe "require 'bundler/gem_tasks'" do
   end
 
   it "includes the relevant tasks" do
-    sys_exec "rake -T"
+    with_gem_path_as(Spec::Path.base_system_gems.to_s) do
+      sys_exec "ruby -S rake -T"
+    end
+
     expect(err).to eq("")
     expected_tasks = [
       "rake build",
