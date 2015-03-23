@@ -591,6 +591,17 @@ describe "bundle gem" do
       end
 
       expect(bundled_app("foobar/spec/spec_helper.rb")).to exist
+      rakefile = strip_whitespace <<-RAKEFILE
+        require "bundler/gem_tasks"
+        require "rspec/core/rake_task"
+
+        RSpec::Core::RakeTask.new(:spec)
+
+        task :default => :spec
+      RAKEFILE
+
+      expect(bundled_app("foobar/Rakefile").read).to eq(rakefile)
+      expect(bundled_app("foobar/foobar.gemspec").read).to include('spec.add_development_dependency "rspec"')
     end
 
     it "asks about MIT license" do

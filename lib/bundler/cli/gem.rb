@@ -74,6 +74,7 @@ module Bundler
       end
 
       if test_framework = ask_and_set_test_framework
+        config[:test] = test_framework
         templates.merge!(".travis.yml.tt" => ".travis.yml")
 
         case test_framework
