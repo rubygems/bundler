@@ -70,7 +70,7 @@ module Bundler
       Bundler.settings[:clean]    = options["clean"] if options["clean"]
       Bundler.settings.without    = options[:without]
       Bundler::Fetcher.disable_endpoint = options["full-index"]
-      Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? '1' : nil
+      Bundler.settings[:disable_shared_gems] ||= Bundler.settings[:path] ? '1' : nil
 
       # rubygems plugins sometimes hook into the gem install process
       Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins)
