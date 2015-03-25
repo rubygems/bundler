@@ -40,6 +40,29 @@ describe ".bundle/config" do
     end
   end
 
+  describe "handling disable_shared_gems" do
+    it "defaults to nil" do
+      bundle :install
+      run "puts Bundler.settings[:disable_shared_gems]"
+      expect(out).to match /(nil)?/
+    end
+
+    it "uses global disable_shared_gems even if path param present" do
+      bundle "config --global disable_shared_gems 0"
+      bundle "config --global path .bundle"
+      bundle :install
+      run "puts Bundler.settings[:disable_shared_gems]"
+      expect(out).to eq("0")
+    end
+
+    it "sets disable_shared_gems to 1 if no global value present while path is present" do
+      bundle "config --global path .bundle"
+      bundle :install
+      run "puts Bundler.settings[:disable_shared_gems]"
+      expect(out).to eq("1")
+    end
+  end
+
   describe "global" do
     before(:each) { bundle :install }
 
