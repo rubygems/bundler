@@ -44,7 +44,7 @@ describe ".bundle/config" do
     it "defaults to nil" do
       bundle :install
       run "puts Bundler.settings[:disable_shared_gems]"
-      expect(out).to eq("")
+      expect(out).to match /(nil)?/
     end
 
     it "uses global disable_shared_gems even if path param present" do
