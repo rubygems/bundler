@@ -88,8 +88,8 @@ module Bundler
           )
         when 'minitest'
           templates.merge!(
-            "test/minitest_helper.rb.tt" => "test/minitest_helper.rb",
-            "test/test_newgem.rb.tt" => "test/test_#{namespaced_path}.rb"
+            "test/test_helper.rb.tt" => "test/test_helper.rb",
+            "test/newgem_test.rb.tt" => "test/#{namespaced_path}_test.rb"
           )
         end
       end

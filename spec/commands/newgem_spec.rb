@@ -255,8 +255,8 @@ describe "bundle gem" do
       end
 
       it "builds spec skeleton" do
-        expect(bundled_app("test_gem/test/test_test_gem.rb")).to exist
-        expect(bundled_app("test_gem/test/minitest_helper.rb")).to exist
+        expect(bundled_app("test_gem/test/test_gem_test.rb")).to exist
+        expect(bundled_app("test_gem/test/test_helper.rb")).to exist
       end
     end
 
@@ -268,20 +268,20 @@ describe "bundle gem" do
       end
 
       it "builds spec skeleton" do
-        expect(bundled_app("test_gem/test/test_test_gem.rb")).to exist
-        expect(bundled_app("test_gem/test/minitest_helper.rb")).to exist
+        expect(bundled_app("test_gem/test/test_gem_test.rb")).to exist
+        expect(bundled_app("test_gem/test/test_helper.rb")).to exist
       end
 
       it "requires 'test-gem'" do
-        expect(bundled_app("test_gem/test/minitest_helper.rb").read).to include("require 'test_gem'")
+        expect(bundled_app("test_gem/test/test_helper.rb").read).to include("require 'test_gem'")
       end
 
       it "requires 'minitest_helper'" do
-        expect(bundled_app("test_gem/test/test_test_gem.rb").read).to include("require 'minitest_helper'")
+        expect(bundled_app("test_gem/test/test_gem_test.rb").read).to include("require 'test_helper'")
       end
 
       it "creates a default test which fails" do
-        expect(bundled_app("test_gem/test/test_test_gem.rb").read).to include("assert false")
+        expect(bundled_app("test_gem/test/test_gem_test.rb").read).to include("assert false")
       end
     end
 
@@ -499,20 +499,20 @@ describe "bundle gem" do
       end
 
       it "builds spec skeleton" do
-        expect(bundled_app("test-gem/test/test_test/gem.rb")).to exist
-        expect(bundled_app("test-gem/test/minitest_helper.rb")).to exist
+        expect(bundled_app("test-gem/test/test/gem_test.rb")).to exist
+        expect(bundled_app("test-gem/test/test_helper.rb")).to exist
       end
 
       it "requires 'test/gem'" do
-        expect(bundled_app("test-gem/test/minitest_helper.rb").read).to match(/require 'test\/gem'/)
+        expect(bundled_app("test-gem/test/test_helper.rb").read).to match(/require 'test\/gem'/)
       end
 
-      it "requires 'minitest_helper'" do
-        expect(bundled_app("test-gem/test/test_test/gem.rb").read).to match(/require 'minitest_helper'/)
+      it "requires 'test_helper'" do
+        expect(bundled_app("test-gem/test/test/gem_test.rb").read).to match(/require 'test_helper'/)
       end
 
       it "creates a default test which fails" do
-        expect(bundled_app("test-gem/test/test_test/gem.rb").read).to match(/assert false/)
+        expect(bundled_app("test-gem/test/test/gem_test.rb").read).to match(/assert false/)
       end
 
       it "creates a default rake task to run the test suite" do
