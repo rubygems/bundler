@@ -347,8 +347,6 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :artifice => "endpoint_extra_missing"
-    puts out
-    puts err
     should_be_installed "back_deps 1.0"
   end
 

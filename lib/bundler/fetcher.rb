@@ -141,14 +141,12 @@ module Bundler
 
       specs = {}
       fetchers.dup.each do |f|
-        next if f.api_fetcher? && !gem_names
-        if specs = f.specs(gem_names)
-          break
-        else
-          fetchers.delete(f)
+        unless f.api_fetcher? && !gem_names
+          break if specs = f.specs(gem_names)
         end
-        @use_api = false if fetchers.none?(&:api_fetcher?)
+        fetchers.delete(f)
       end
+      @use_api = false if fetchers.none?(&:api_fetcher?)
 
       specs[remote_uri].each do |name, version, platform, dependencies|
         next if name == 'bundler'
