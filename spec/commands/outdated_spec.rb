@@ -31,6 +31,8 @@ describe "bundle outdated" do
       expect(out).to include("weakling (0.2 > 0.0.3) Gemfile specifies \"~> 0.0.1\"")
       expect(out).to include("foo (1.0")
 
+      puts out
+
       # Gem names are one per-line, between "*" and their parenthesized version.
       gem_list = out.split("\n").map { |g| g[ /\* (.*) \(/, 1] }.compact
       expect(gem_list).to eq(gem_list.sort)
@@ -51,6 +53,26 @@ describe "bundle outdated" do
       bundle "outdated"
 
       expect(exitstatus).to be_zero if exitstatus
+    end
+  end
+
+  describe "with --verbose option" do
+    it "adds gem group to dependency output when repo is updated" do
+
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+
+        group :development, :test do
+          gem 'activesupport', '2.3.5'
+        end
+      G
+
+      update_repo2 { build_gem "activesupport", "3.0" }
+
+      bundle "outdated --verbose"
+
+      expect(out).to include("activesupport (3.0 > 2.3.5) Gemfile specifies \"= 2.3.5\" in groups \"development, test\"")
+
     end
   end
 
