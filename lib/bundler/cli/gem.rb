@@ -61,6 +61,7 @@ module Bundler
           "of enforcing it, so be sure that you are prepared to do that. For suggestions about " \
           "how to enforce codes of conduct, see bit.ly/coc-enforcement."
         )
+        Bundler.ui.info "Code of conduct enabled in config"
         templates.merge!("CODE_OF_CONDUCT.md.tt" => "CODE_OF_CONDUCT.md")
       end
 
@@ -70,6 +71,7 @@ module Bundler
           "at choosealicense.com/licenses/mit."
         )
         config[:mit] = true
+        Bundler.ui.info "MIT License enabled in config"
         templates.merge!("LICENSE.txt.tt" => "LICENSE.txt")
       end
 
