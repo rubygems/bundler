@@ -162,7 +162,7 @@ module Bundler
       end
 
       index
-    rescue CertificateFailureError => e
+    rescue CertificateFailureError
       Bundler.ui.info "" if gem_names && use_api # newline after dots
       raise
     ensure
