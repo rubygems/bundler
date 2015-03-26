@@ -112,33 +112,6 @@ module Bundler
       connection # create persistent connection
     end
 
-    def connection
-      @connection ||= begin
-        needs_ssl = remote_uri.scheme == "https" ||
-          Bundler.settings[:ssl_verify_mode] ||
-          Bundler.settings[:ssl_client_cert]
-        raise SSLError if needs_ssl && !defined?(OpenSSL::SSL)
-
-        con = Net::HTTP::Persistent.new 'bundler', :ENV
-
-        if remote_uri.scheme == "https"
-          con.verify_mode = (Bundler.settings[:ssl_verify_mode] ||
-            OpenSSL::SSL::VERIFY_PEER)
-          con.cert_store = bundler_cert_store
-        end
-
-        if Bundler.settings[:ssl_client_cert]
-          pem = File.read(Bundler.settings[:ssl_client_cert])
-          con.cert = OpenSSL::X509::Certificate.new(pem)
-          con.key  = OpenSSL::PKey::RSA.new(pem)
-        end
-
-        con.read_timeout = @api_timeout
-        con.override_headers["User-Agent"] = self.class.user_agent
-        con
-      end
-    end
-
     def uri
       @remote.anonymized_uri
     end
@@ -159,13 +132,6 @@ module Bundler
     rescue MarshalError
       raise HTTPError, "Gemspec #{spec} contained invalid data.\n" \
         "Your network or your gem server is probably having issues right now."
-    end
-
-    # cached gem specification path, if one exists
-    def gemspec_cached_path spec_file_name
-      paths = Bundler.rubygems.spec_cache_dirs.map { |dir| File.join(dir, spec_file_name) }
-      paths = paths.select {|path| File.file? path }
-      paths.first
     end
 
     # return the specs in the bundler format as an index
@@ -207,6 +173,63 @@ module Bundler
       Bundler.rubygems.sources = old
     end
 
+    def use_api
+      return @use_api if defined?(@use_api)
+
+      if remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
+        @use_api = false
+      elsif fetch(dependency_api_uri)
+        @use_api = true
+      end
+    rescue NetworkDownError => e
+      raise HTTPError, e.message
+    rescue AuthenticationRequiredError
+      # We got a 401 from the server. Don't fall back to the full index, just fail.
+      raise
+    rescue HTTPError
+      @use_api = false
+    end
+
+    def inspect
+      "#<#{self.class}:0x#{object_id} uri=#{uri}>"
+    end
+
+  private
+
+    def connection
+      @connection ||= begin
+        needs_ssl = remote_uri.scheme == "https" ||
+          Bundler.settings[:ssl_verify_mode] ||
+          Bundler.settings[:ssl_client_cert]
+        raise SSLError if needs_ssl && !defined?(OpenSSL::SSL)
+
+        con = Net::HTTP::Persistent.new 'bundler', :ENV
+
+        if remote_uri.scheme == "https"
+          con.verify_mode = (Bundler.settings[:ssl_verify_mode] ||
+            OpenSSL::SSL::VERIFY_PEER)
+          con.cert_store = bundler_cert_store
+        end
+
+        if Bundler.settings[:ssl_client_cert]
+          pem = File.read(Bundler.settings[:ssl_client_cert])
+          con.cert = OpenSSL::X509::Certificate.new(pem)
+          con.key  = OpenSSL::PKey::RSA.new(pem)
+        end
+
+        con.read_timeout = @api_timeout
+        con.override_headers["User-Agent"] = self.class.user_agent
+        con
+      end
+    end
+
+    # cached gem specification path, if one exists
+    def gemspec_cached_path spec_file_name
+      paths = Bundler.rubygems.spec_cache_dirs.map { |dir| File.join(dir, spec_file_name) }
+      paths = paths.select {|path| File.file? path }
+      paths.first
+    end
+
     # fetch index
     def fetch_remote_specs(gem_names, full_dependency_list = [], last_spec_list = [])
       query_list = gem_names - full_dependency_list
@@ -233,29 +256,6 @@ module Bundler
       @use_api = false
       return nil
     end
-
-    def use_api
-      return @use_api if defined?(@use_api)
-
-      if remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
-        @use_api = false
-      elsif fetch(dependency_api_uri)
-        @use_api = true
-      end
-    rescue NetworkDownError => e
-      raise HTTPError, e.message
-    rescue AuthenticationRequiredError
-      # We got a 401 from the server. Don't fall back to the full index, just fail.
-      raise
-    rescue HTTPError
-      @use_api = false
-    end
-
-    def inspect
-      "#<#{self.class}:0x#{object_id} uri=#{uri}>"
-    end
-
-  private
 
     HTTP_ERRORS = [
       Timeout::Error, EOFError, SocketError, Errno::ENETDOWN,
