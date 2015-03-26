@@ -107,6 +107,8 @@ module Bundler
       templates.each do |src, dst|
         thor.template("newgem/#{src}", target.join(dst), config)
       end
+      thor.chmod target.join("bin/setup"), 0755
+      thor.chmod target.join("bin/console"), 0755
 
       Bundler.ui.info "Initializing git repo in #{target}"
       Dir.chdir(target) { `git init`; `git add .` }
