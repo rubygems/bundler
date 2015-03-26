@@ -1,3 +1,11 @@
+## 1.9.1 (2015-03-21)
+
+Bugfixes:
+
+  - avoid exception in 'bundler/gem_tasks' (#3492, @segiddins)
+
+## 1.9.0 (2015-03-20)
+
 ## 1.9.0.rc (2015-03-13)
 
 Bugfixes:

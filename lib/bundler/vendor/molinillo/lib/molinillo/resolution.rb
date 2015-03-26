@@ -98,8 +98,8 @@ module Bundler::Molinillo
         debug { 'Activated: ' + Hash[activated.vertices.select { |_n, v| v.payload }].keys.join(', ') } if state
       end
 
-      require 'molinillo/state'
-      require 'molinillo/modules/specification_provider'
+      require 'bundler/vendor/molinillo/lib/molinillo/state'
+      require 'bundler/vendor/molinillo/lib/molinillo/modules/specification_provider'
 
       # @return [Integer] the number of resolver iterations in between calls to
       #   {#resolver_ui}'s {UI#indicate_progress} method

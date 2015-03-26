@@ -1,5 +1,5 @@
 require "set"
-require "thor/base"
+require "bundler/vendor/thor/lib/thor/base"
 
 class Bundler::Thor # rubocop:disable ClassLength
   class << self
