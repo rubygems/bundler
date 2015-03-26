@@ -293,7 +293,7 @@ module Bundler
       end
 
       def api_fetchers
-        fetchers.select{|f| f.use_api }
+        fetchers.select(&:use_api)
       end
 
       def remote_specs
@@ -334,7 +334,7 @@ module Bundler
               end
             end until idxcount == idx.size
 
-            if api_fetchers.any? && api_fetchers.all?{|f| f.use_api }
+            if api_fetchers.any?
               # it's possible that gems from one source depend on gems from some
               # other source, so now we download gemspecs and iterate over those
               # dependencies, looking for gems we don't have info on yet.
@@ -351,7 +351,7 @@ module Bundler
             end
           end
 
-          if !allow_api
+          unless allow_api
             api_fetchers.each do |f|
               Bundler.ui.info "Fetching source index from #{f.uri}"
               idx.use f.specs(nil, self)
