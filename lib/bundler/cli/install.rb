@@ -92,8 +92,7 @@ module Bundler
       end
 
       Installer.post_install_messages.to_a.each do |name, msg|
-        Bundler.ui.confirm "Post-install message from #{name}:"
-        Bundler.ui.info msg
+        print_post_install_message(name, msg) unless Bundler.settings["ignore_messages.#{name}"]
       end
 
       Installer.ambiguous_gems.to_a.each do |name, installed_from_uri, *also_found_in_uris|
@@ -150,6 +149,11 @@ module Bundler
     def gems_installed_for(definition)
       count = definition.specs.count
       "#{count} #{count == 1 ? 'gem' : 'gems'} now installed"
+    end
+
+    def print_post_install_message(name, msg)
+      Bundler.ui.confirm "Post-install message from #{name}:"
+      Bundler.ui.info msg
     end
 
   end
