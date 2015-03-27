@@ -31,8 +31,6 @@ describe "bundle outdated" do
       expect(out).to include("weakling (0.2 > 0.0.3) Gemfile specifies \"~> 0.0.1\"")
       expect(out).to include("foo (1.0")
 
-      puts out
-
       # Gem names are one per-line, between "*" and their parenthesized version.
       gem_list = out.split("\n").map { |g| g[ /\* (.*) \(/, 1] }.compact
       expect(gem_list).to eq(gem_list.sort)
