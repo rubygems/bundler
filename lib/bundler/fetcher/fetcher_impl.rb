@@ -1,5 +1,3 @@
-require 'bundler/fetcher'
-
 module Bundler
   class Fetcher
     class FetcherImpl
