@@ -61,7 +61,7 @@ module Bundler::Molinillo
           hash[name] = vertex.dup.tap { |v| v.graph = self }
         end
       end
-      @root_vertices = Hash[vertices.select { |n, _v| other.root_vertices[n] }]
+      @root_vertices = Hash[@vertices.select { |n, _v| other.root_vertices[n] }]
       @edges = other.edges.map do |edge|
         Edge.new(
           vertex_named(edge.origin.name),
