@@ -216,7 +216,7 @@ module Bundler
           con.key  = OpenSSL::PKey::RSA.new(pem)
         end
 
-        con.read_timeout = @api_timeout
+        con.read_timeout = Fetcher.api_timeout
         con.override_headers["User-Agent"] = self.class.user_agent
         con
       end
