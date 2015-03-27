@@ -73,6 +73,19 @@ module Bundler::Molinillo
         end_resolution
       end
 
+      # @return [Integer] the number of resolver iterations in between calls to
+      #   {#resolver_ui}'s {UI#indicate_progress} method
+      attr_accessor :iteration_rate
+      private :iteration_rate
+
+      # @return [Time] the time at which resolution began
+      attr_accessor :started_at
+      private :started_at
+
+      # @return [Array<ResolutionState>] the stack of states for the resolution
+      attr_accessor :states
+      private :states
+
       private
 
       # Sets up the resolution process
@@ -100,16 +113,6 @@ module Bundler::Molinillo
 
       require 'bundler/vendor/molinillo/lib/molinillo/state'
       require 'bundler/vendor/molinillo/lib/molinillo/modules/specification_provider'
-
-      # @return [Integer] the number of resolver iterations in between calls to
-      #   {#resolver_ui}'s {UI#indicate_progress} method
-      attr_accessor :iteration_rate
-
-      # @return [Time] the time at which resolution began
-      attr_accessor :started_at
-
-      # @return [Array<ResolutionState>] the stack of states for the resolution
-      attr_accessor :states
 
       ResolutionState.new.members.each do |member|
         define_method member do |*args, &block|
