@@ -134,6 +134,8 @@ module Bundler
       "Do not attempt to fetch gems remotely and use the gem cache instead"
     method_option "no-cache", :type => :boolean, :banner =>
       "Don't update the existing gem cache."
+    method_option "force", :type => :boolean, :banner =>
+      "Force downloading every gem."
     method_option "no-prune", :type => :boolean, :banner =>
       "Don't remove stale gems from the cache."
     method_option "path", :type => :string, :banner =>
@@ -175,6 +177,8 @@ module Bundler
       "Only output warnings and errors."
     method_option "source", :type => :array, :banner =>
       "Update a specific source (and all gems associated with it)"
+    method_option "force", :type => :boolean, :banner =>
+      "Force downloading every gem."
     def update(*gems)
       require 'bundler/cli/update'
       Update.new(options, gems).run

@@ -81,8 +81,8 @@ module Bundler
         end
       end
 
-      def install(spec)
-        return ["Using #{version_message(spec)}", nil] if installed_specs[spec].any?
+      def install(spec, force = false)
+        return ["Using #{version_message(spec)}", nil] if installed_specs[spec].any? && !force
 
         # Download the gem to get the spec, because some specs that are returned
         # by rubygems.org are broken and wrong.
