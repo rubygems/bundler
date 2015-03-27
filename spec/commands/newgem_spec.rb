@@ -125,6 +125,11 @@ describe "bundle gem" do
       expect(bundled_app("test_gem/lib/test_gem.rb")).to exist
       expect(bundled_app("test_gem/lib/test_gem/version.rb")).to exist
       expect(bundled_app("test_gem/.gitignore")).to exist
+
+      expect(bundled_app("test_gem/bin/setup")).to exist
+      expect(bundled_app("test_gem/bin/console")).to exist
+      expect(bundled_app("test_gem/bin/setup")).to be_executable
+      expect(bundled_app("test_gem/bin/console")).to be_executable
     end
 
     it "starts with version 0.1.0" do
