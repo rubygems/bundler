@@ -60,36 +60,6 @@ module Bundler
       Fetcher.redirect_limit = 5  # How many redirects to allow in one request
       Fetcher.api_timeout    = 10 # How long to wait for each API call
       Fetcher.max_retries    = 3  # How many retries for the API call
-
-      def user_agent
-        @user_agent ||= begin
-          ruby = Bundler.ruby_version
-
-          agent = "bundler/#{Bundler::VERSION}"
-          agent << " rubygems/#{Gem::VERSION}"
-          agent << " ruby/#{ruby.version}"
-          agent << " (#{ruby.host})"
-          agent << " command/#{ARGV.first}"
-
-          if ruby.engine != "ruby"
-            # engine_version raises on unknown engines
-            engine_version = ruby.engine_version rescue "???"
-            agent << " #{ruby.engine}/#{engine_version}"
-          end
-
-          agent << " options/#{Bundler.settings.all.join(",")}"
-
-          # add a random ID so we can consolidate runs server-side
-          agent << " " << SecureRandom.hex(8)
-
-          # add any user agent strings set in the config
-          extra_ua = Bundler.settings[:user_agent]
-          agent << " " << extra_ua if extra_ua
-
-          agent
-        end
-      end
-
     end
 
     def initialize(remote)
@@ -167,12 +137,41 @@ module Bundler
       end
     end
 
-    def inspect
-      "#<#{self.class}:0x#{object_id} uri=#{uri}>"
+    def user_agent
+      @user_agent ||= begin
+        ruby = Bundler.ruby_version
+
+        agent = "bundler/#{Bundler::VERSION}"
+        agent << " rubygems/#{Gem::VERSION}"
+        agent << " ruby/#{ruby.version}"
+        agent << " (#{ruby.host})"
+        agent << " command/#{ARGV.first}"
+
+        if ruby.engine != "ruby"
+          # engine_version raises on unknown engines
+          engine_version = ruby.engine_version rescue "???"
+          agent << " #{ruby.engine}/#{engine_version}"
+        end
+
+        agent << " options/#{Bundler.settings.all.join(",")}"
+
+        # add a random ID so we can consolidate runs server-side
+        agent << " " << SecureRandom.hex(8)
+
+        # add any user agent strings set in the config
+        extra_ua = Bundler.settings[:user_agent]
+        agent << " " << extra_ua if extra_ua
+
+        agent
+      end
     end
 
     def fetchers
       @fetchers ||= FETCHERS.map { |f| f.new(downloader, remote_uri, fetch_uri, uri) }
+    end
+
+    def inspect
+      "#<#{self.class}:0x#{object_id} uri=#{uri}>"
     end
 
   private
@@ -201,7 +200,7 @@ module Bundler
         end
 
         con.read_timeout = Fetcher.api_timeout
-        con.override_headers["User-Agent"] = self.class.user_agent
+        con.override_headers["User-Agent"] = user_agent
         con
       end
     end
