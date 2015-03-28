@@ -110,8 +110,10 @@ module Bundler
         thor.template("newgem/#{src}", target.join(dst), config)
       end
 
-      executables.each do |path|
-        FileUtils.chmod "+x", target.join(path).to_s
+      executables.each do |file|
+        path = target.join(file)
+        executable = (path.stat.mode | 0111)
+        path.chmod(executable)
       end
 
       Bundler.ui.info "Initializing git repo in #{target}"
