@@ -61,7 +61,7 @@ class ParallelInstaller
   def worker_pool
     @worker_pool ||= Bundler::Worker.new @size, lambda { |spec_install, worker_num|
       message = @installer.install_gem_from_spec spec_install.spec, @standalone, worker_num
-      spec_install.post_install_message = message
+      spec_install.post_install_message = message unless message.nil?
       spec_install.installed = true
       spec_install
     }
@@ -69,6 +69,7 @@ class ParallelInstaller
 
   def process_specs
     spec = worker_pool.deq
+    spec.enqueued = false
     collect_post_install_message spec if spec.has_post_install_message?
     enqueue_specs
   end
@@ -83,8 +84,7 @@ class ParallelInstaller
   # previously installed specifications. We continue until all specs
   # are installed.
   def enqueue_specs
-    @specs.reject(&:installed?).each do |spec|
-      next if spec.enqueued?
+    @specs.reject(&:installing?).each do |spec|
       if spec.ready_to_install? @specs
         worker_pool.enq spec
         spec.enqueued = true
