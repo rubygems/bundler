@@ -111,7 +111,9 @@ module Bundler
       end
 
       executables.each do |path|
-        FileUtils.chmod "+x", target.join(path).to_s
+        path = target.join(path).to_s
+        mode = File.stat(path).mode | 0111
+        FileUtils.chmod mode, path
       end
 
       Bundler.ui.info "Initializing git repo in #{target}"
