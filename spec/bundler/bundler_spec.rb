@@ -12,14 +12,15 @@ describe Bundler do
           gem "rack"
         G
 
-        expect(out).to include("DEPRECATION: Gemfile and Gemfile.lock are " \
-         "deprecated and will be replaced with gems.rb and gems.locked in " \
+        expect(err).to eq("DEPRECATION: Gemfile and Gemfile.lock will be " \
+         "deprecated and replaced with gems.rb and gems.locked in " \
          "Bundler 2.0.0.")
         expect(err).to lack_errors
       end
     end
 
     context "when Bundler.setup is run in a ruby script" do
+
       it "should print a single deprecation warning" do
         install_gemfile <<-G
           source "file://#{gem_repo1}"
@@ -29,35 +30,13 @@ describe Bundler do
         ruby <<-RUBY
           require 'rubygems'
           require 'bundler'
-          require 'bundler/vendored_thor'
-
-          Bundler.ui = Bundler::UI::Shell.new
           Bundler.setup
           Bundler.setup
         RUBY
 
-        expect(out).to eq("DEPRECATION: Gemfile and Gemfile.lock are " \
-         "deprecated and will be replaced with gems.rb and gems.locked in " \
+        expect(err).to eq("DEPRECATION: Gemfile and Gemfile.lock will be " \
+         "deprecated and replaced with gems.rb and gems.locked in " \
          "Bundler 2.0.0.")
-        expect(err).to lack_errors
-      end
-    end
-
-    context "when `bundler/deployment` is required in a ruby script" do
-      it "should print a capistrano deprecation warning" do
-        install_gemfile <<-G
-          source "file://#{gem_repo1}"
-          gem "rack", :group => :test
-        G
-
-        ruby(<<-RUBY, { expect_err: true })
-          require 'bundler/deployment'
-        RUBY
-
-        expect(err).to include("DEPRECATION: Bundler no longer integrates " \
-                               "with Capistrano, but Capistrano provides " \
-                               "its own integration with Bundler via the " \
-                               "capistrano-bundler gem. Use it instead.")
         expect(err).to lack_errors
       end
     end
