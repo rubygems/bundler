@@ -1,6 +1,7 @@
+require 'bundler/fetcher/downloader'
 require 'bundler/vendored_persistent'
-require 'securerandom'
 require 'cgi'
+require 'securerandom'
 
 module Bundler
 
@@ -130,7 +131,7 @@ module Bundler
       elsif cached_spec_path = gemspec_cached_path(spec_file_name)
         Bundler.load_gemspec(cached_spec_path)
       else
-        Bundler.load_marshal Gem.inflate(fetchers.first.fetch uri)
+        Bundler.load_marshal Gem.inflate(downloader.fetch uri)
       end
     rescue MarshalError
       raise HTTPError, "Gemspec #{spec} contained invalid data.\n" \
@@ -188,7 +189,7 @@ module Bundler
     end
 
     def fetchers
-      @fetchers ||= FETCHERS.map { |f| f.new(connection, remote_uri, fetch_uri, uri) }
+      @fetchers ||= FETCHERS.map { |f| f.new(downloader, remote_uri, fetch_uri, uri) }
     end
 
   private
@@ -269,5 +270,10 @@ module Bundler
     def remote_uri
       @remote.uri
     end
+
+    def downloader
+      @downloader ||= Downloader.new(connection)
+    end
+
   end
 end
