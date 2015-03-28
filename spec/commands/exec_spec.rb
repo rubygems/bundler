@@ -85,14 +85,14 @@ describe "bundle exec" do
       expect(out).to eq("Ruby version #{RUBY_VERSION} defaults to keeping non-standard file descriptors on Kernel#exec.")
     end
 
-    expect(err).to eq("")
+    expect(err).to lack_errors
   end
 
   it "accepts --keep-file-descriptors" do
     install_gemfile ''
     bundle "exec --keep-file-descriptors echo foobar"
 
-    expect(err).to eq("")
+    expect(err).to lack_errors
   end
 
   it "can run a command named --verbose" do
