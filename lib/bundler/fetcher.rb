@@ -6,8 +6,8 @@ module Bundler
 
   # Handles all the fetching with the rubygems server
   class Fetcher
-    require 'bundler/fetcher/dependency_fetcher'
-    require 'bundler/fetcher/index_fetcher'
+    require 'bundler/fetcher/dependency'
+    require 'bundler/fetcher/index'
 
     # This error is raised when it looks like the network is down
     class NetworkDownError < HTTPError; end
@@ -140,7 +140,7 @@ module Bundler
     # return the specs in the bundler format as an index
     def specs(gem_names, source)
       old = Bundler.rubygems.sources
-      index = Index.new
+      index = Bundler::Index.new
 
       specs = {}
       fetchers.dup.each do |f|
@@ -193,7 +193,7 @@ module Bundler
 
   private
 
-    FETCHERS = [DependencyFetcher, IndexFetcher]
+    FETCHERS = [Dependency, Index]
 
     def connection
       @connection ||= begin

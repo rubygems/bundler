@@ -1,13 +1,13 @@
 module Bundler
   class Fetcher
-    class FetcherImpl
+    class Base
       attr_reader :connection
       attr_reader :remote_uri
       attr_reader :fetch_uri
       attr_reader :display_uri
 
       def initialize(connection, remote_uri, fetch_uri, display_uri)
-        raise 'Abstract class' if self.class == FetcherImpl
+        raise 'Abstract class' if self.class == Base
         @connection = connection
         @remote_uri = remote_uri
         @fetch_uri = fetch_uri

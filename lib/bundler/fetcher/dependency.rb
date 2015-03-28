@@ -1,8 +1,8 @@
-require 'bundler/fetcher/fetcher_impl'
+require 'bundler/fetcher/base'
 
 module Bundler
   class Fetcher
-    class DependencyFetcher < FetcherImpl
+    class Dependency < Base
       def api_available?
         fetch(dependency_api_uri)
       rescue NetworkDownError => e

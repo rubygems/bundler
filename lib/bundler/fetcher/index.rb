@@ -1,8 +1,8 @@
-require 'bundler/fetcher/fetcher_impl'
+require 'bundler/fetcher/base'
 
 module Bundler
   class Fetcher
-    class IndexFetcher < FetcherImpl
+    class Index < Base
       def specs(_gem_names)
         old_sources = Bundler.rubygems.sources
         Bundler.rubygems.sources = [remote_uri.to_s]
