@@ -61,23 +61,6 @@ module Bundler
       Fetcher.api_timeout    = 10 # How long to wait for each API call
       Fetcher.max_retries    = 3  # How many retries for the API call
 
-      def download_gem_from_uri(spec, uri)
-        spec.fetch_platform
-
-        download_path = Bundler.requires_sudo? ? Bundler.tmp(spec.full_name) : Bundler.rubygems.gem_dir
-        gem_path = "#{Bundler.rubygems.gem_dir}/cache/#{spec.full_name}.gem"
-
-        FileUtils.mkdir_p("#{download_path}/cache")
-        Bundler.rubygems.download_gem(spec, uri, download_path)
-
-        if Bundler.requires_sudo?
-          Bundler.mkdir_p "#{Bundler.rubygems.gem_dir}/cache"
-          Bundler.sudo "mv #{Bundler.tmp(spec.full_name)}/cache/#{spec.full_name}.gem #{gem_path}"
-        end
-
-        gem_path
-      end
-
       def user_agent
         @user_agent ||= begin
           ruby = Bundler.ruby_version

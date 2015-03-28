@@ -362,7 +362,21 @@ module Bundler
 
       def fetch_gem(spec)
         return false unless spec.remote
-        Fetcher.download_gem_from_uri(spec, spec.remote.uri)
+        uri = spec.remote.uri
+        spec.fetch_platform
+
+        download_path = Bundler.requires_sudo? ? Bundler.tmp(spec.full_name) : Bundler.rubygems.gem_dir
+        gem_path = "#{Bundler.rubygems.gem_dir}/cache/#{spec.full_name}.gem"
+
+        FileUtils.mkdir_p("#{download_path}/cache")
+        Bundler.rubygems.download_gem(spec, uri, download_path)
+
+        if Bundler.requires_sudo?
+          Bundler.mkdir_p "#{Bundler.rubygems.gem_dir}/cache"
+          Bundler.sudo "mv #{Bundler.tmp(spec.full_name)}/cache/#{spec.full_name}.gem #{gem_path}"
+        end
+
+        gem_path
       end
 
       def builtin_gem?(spec)
