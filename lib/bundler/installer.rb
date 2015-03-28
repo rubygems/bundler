@@ -1,6 +1,5 @@
 require 'erb'
 require 'rubygems/dependency_installer'
-require 'bundler/worker'
 require 'bundler/installer/parallel_installer'
 
 module Bundler
@@ -86,6 +85,7 @@ module Bundler
       # installation is just SO MUCH FASTER. so we let people opt in.
       jobs = [Bundler.settings[:jobs].to_i-1, 1].max
       if jobs > 1 && can_install_in_parallel?
+        require 'bundler/installer/parallel_installer'
         install_in_parallel jobs, options[:standalone]
       else
         install_sequentially options[:standalone]
