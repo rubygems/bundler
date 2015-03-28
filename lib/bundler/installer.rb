@@ -269,7 +269,7 @@ module Bundler
     end
 
     def install_in_parallel(size, standalone)
-      ParallelInstaller.call(size, standalone)
+      ParallelInstaller.call(self, specs, size, standalone)
     end
 
 

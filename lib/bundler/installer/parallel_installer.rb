@@ -2,9 +2,9 @@ require 'bundler/worker'
 
 
 class ParallelInstaller
-  attr_accessor :installed, :spec, :name, :post_install_message, :enqueued
 
   class SpecInstallation
+    attr_accessor :installed, :spec, :name, :post_install_message, :enqueued
     def initialize(spec)
       @spec, @name = spec, spec.name
       @installed = false
@@ -31,7 +31,7 @@ class ParallelInstaller
     def ready_to_install?(specs)
       @spec.dependencies.none? do |dep|
         next if dep.type == :development || dep.name == @name
-        specs.reject(:installed?).map(:name).included? dep.name
+        specs.reject(&:installed?).map(&:name).include? dep.name
       end
     end
   end
@@ -44,7 +44,8 @@ class ParallelInstaller
     @@max_threads ||= [Bundler.settings[:jobs].to_i-1, 1].max
   end
 
-  def initialize(all_specs = Installer.specs, size = ParallelInstaller.max_threads, standalone)
+  def initialize(installer, all_specs, size, standalone)
+    @installer = installer
     @size = size
     @standalone = standalone
     @specs = all_specs.map { |s| SpecInstallation.new(s) }
@@ -52,14 +53,14 @@ class ParallelInstaller
 
   def call
     enqueue_specs
-    process_specs until @specs.all?(:installed?)
+    process_specs until @specs.all?(&:installed?)
   ensure
     worker_pool && worker_pool.stop
   end
 
   def worker_pool
-    @worker_pool ||= Worker.new @size, lambda { |spec_install, worker_num|
-      message = Installer.install_gem_from_spec spec_install.spec, @standalone, worker_num
+    @worker_pool ||= Bundler::Worker.new @size, lambda { |spec_install, worker_num|
+      message = @installer.install_gem_from_spec spec_install.spec, @standalone, worker_num
       spec_install.post_install_message = message
       spec_install.installed = true
       spec_install
@@ -73,7 +74,7 @@ class ParallelInstaller
   end
 
   def collect_post_install_message(spec)
-    Installer.post_install_messages[spec.name] = spec.post_install_message
+    Bundler::Installer.post_install_messages[spec.name] = spec.post_install_message
   end
 
   # Keys in the remains hash represent uninstalled gems specs.
@@ -82,7 +83,7 @@ class ParallelInstaller
   # previously installed specifications. We continue until all specs
   # are installed.
   def enqueue_specs
-    @specs.select(:installed?) do |spec|
+    @specs.reject(&:installed?).each do |spec|
       next if spec.enqueued?
       if spec.ready_to_install? @specs
         worker_pool.enq spec
