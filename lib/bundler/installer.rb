@@ -1,6 +1,7 @@
 require 'erb'
 require 'rubygems/dependency_installer'
 require 'bundler/worker'
+require 'bundler/installer/parallel_installer'
 
 module Bundler
   class Installer < Environment
