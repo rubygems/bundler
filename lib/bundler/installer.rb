@@ -260,7 +260,7 @@ module Bundler
 
     def install_sequentially(standalone)
       specs.each do |spec|
-        message = install_gem_from_spec spec, standalone, 0
+        message = install_gem_from_spec spec, standalone
         if message
           Installer.post_install_messages[spec.name] = message
         end
