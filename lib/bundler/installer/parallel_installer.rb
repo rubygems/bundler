@@ -44,7 +44,7 @@ class ParallelInstaller
     @@max_threads ||= [Bundler.settings[:jobs].to_i-1, 1].max
   end
 
-  def initialize(all_specs = Installer.specs, size = max_threads, standalone)
+  def initialize(all_specs = Installer.specs, size = ParallelInstaller.max_threads, standalone)
     @size = size
     @standalone = standalone
     @specs = all_specs.map { |s| SpecInstallation.new(s) }
