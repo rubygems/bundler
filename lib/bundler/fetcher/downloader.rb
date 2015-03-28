@@ -2,13 +2,15 @@ module Bundler
   class Fetcher
     class Downloader
       attr_reader :connection
+      attr_reader :redirect_limit
 
-      def initialize(connection)
+      def initialize(connection, redirect_limit)
         @connection = connection
+        @redirect_limit = redirect_limit
       end
 
       def fetch(uri, counter = 0)
-        raise HTTPError, "Too many redirects" if counter >= Fetcher.redirect_limit
+        raise HTTPError, "Too many redirects" if counter >= redirect_limit
 
         response = request(uri)
         Bundler.ui.debug("HTTP #{response.code} #{response.message}")
