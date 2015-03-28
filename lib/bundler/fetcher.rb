@@ -1,4 +1,3 @@
-require 'bundler/fetcher/downloader'
 require 'bundler/vendored_persistent'
 require 'cgi'
 require 'securerandom'
@@ -7,8 +6,9 @@ module Bundler
 
   # Handles all the fetching with the rubygems server
   class Fetcher
-    require 'bundler/fetcher/dependency'
-    require 'bundler/fetcher/index'
+    autoload :Downloader, 'bundler/fetcher/downloader'
+    autoload :Dependency, 'bundler/fetcher/dependency'
+    autoload :Index, 'bundler/fetcher/index'
 
     # This error is raised when it looks like the network is down
     class NetworkDownError < HTTPError; end
