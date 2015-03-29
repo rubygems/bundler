@@ -49,18 +49,14 @@ module Bundler
       find_gemfile
     end
 
-    def chdir_monitor
-      Bundler.rubygems.ext_lock
-    end
-
     def chdir(dir, &blk)
-      chdir_monitor.synchronize do
+      Bundler.rubygems.ext_lock.synchronize do
         Dir.chdir dir, &blk
       end
     end
 
     def pwd
-      chdir_monitor.synchronize do
+      Bundler.rubygems.ext_lock.synchronize do
         Dir.pwd
       end
     end
