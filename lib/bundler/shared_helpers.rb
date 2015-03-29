@@ -109,12 +109,6 @@ module Bundler
   private
 
     def find_gemfile
-      #Bundler.ui.warn "Warning: Gemfile and Gemfile.lock will be deprecated "\
-      # "and replaced with gems.rb and gems.locked in Bundler 2.0.0.\n"
-      # TODO: The problem with putting the warning here is that it makes a
-      # lot of specs fail, and for several specs the warning is printed
-      # several times. Ideally, we want to print the warning only once.
-      # How are module accessor variables used?
       given = ENV['BUNDLE_GEMFILE']
       return given if given && !given.empty?
       find_file('Gemfile', 'gems.rb')
