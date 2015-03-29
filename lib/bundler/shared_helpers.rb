@@ -35,14 +35,13 @@ module Bundler
     end
 
     def default_bundle_dir
-      global_bundle_dir = File.join(Bundler.rubygems.user_home, ".bundle")
       bundle_dir = find_directory(".bundle")
+      return nil unless bundle_dir
 
-      if bundle_dir && bundle_dir != global_bundle_dir
-        Pathname.new(bundle_dir)
-      else
-        nil
-      end
+      global_bundle_dir = File.join(Bundler.rubygems.user_home, ".bundle")
+      return nil if bundle_dir == global_bundle_dir
+
+      Pathname.new(bundle_dir)
     end
 
     def in_bundle?
