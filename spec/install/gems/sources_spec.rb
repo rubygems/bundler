@@ -289,4 +289,45 @@ describe "bundle install with gems on multiple sources" do
       should_be_installed("rack 1.0.0")
     end
   end
+
+  context "when a single source contains multiple locked gems" do
+    before do
+      build_repo4 do
+        build_gem "foo", "0.2"
+        build_gem "bar", "0.1"
+        build_gem "bar", "0.3"
+      end
+
+      lockfile <<-G
+        GEM
+          remote: file:/Users/andre/src/bundler/bundler/tmp/gems/remote1/
+          remote: file:/Users/andre/src/bundler/bundler/tmp/gems/remote4/
+          specs:
+            bar (0.1)
+            foo (0.1)
+            rack (1.0.0)
+
+        PLATFORMS
+          ruby
+
+        DEPENDENCIES
+          bar (= 0.1)!
+          foo (= 0.1)!
+          rack
+      G
+    end
+
+    it "allows them to be unlocked separately" do
+      install_gemfile <<-G
+        source 'file://#{gem_repo1}'
+        gem 'rack'
+        gem 'foo', '~> 0.2', source: 'file://#{gem_repo4}'
+        gem 'bar', '~> 0.1', source: 'file://#{gem_repo4}'
+      G
+
+      should_be_installed("foo 0.2")
+      should_be_installed("bar 0.1")
+    end
+  end
+
 end
