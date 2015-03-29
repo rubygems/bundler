@@ -80,6 +80,9 @@ describe "bundle install with groups" do
           group :emo do
             gem "activesupport", "2.3.5"
           end
+          group :debugging, :optional => true do
+            gem "thin"
+          end
         G
       end
 
@@ -158,6 +161,69 @@ describe "bundle install with groups" do
 
         bundle :install
         should_not_be_installed "activesupport 2.3.5"
+      end
+
+      it "does not install gems from the optional group" do
+        bundle :install
+        should_not_be_installed "thin 1.0"
+      end
+
+      it "does install gems from the optional group when requested" do
+        bundle :install, :with => "debugging"
+        should_be_installed "thin 1.0"
+      end
+
+      it "does install gems from the previously requested group" do
+        bundle :install, :with => "debugging"
+        should_be_installed "thin 1.0"
+        bundle :install
+        should_be_installed "thin 1.0"
+      end
+
+      it "does install gems from the optional groups requested with BUNDLE_WITH" do
+        ENV["BUNDLE_WITH"] = "debugging"
+        bundle :install
+        should_be_installed "thin 1.0"
+        ENV["BUNDLE_WITH"] = nil
+      end
+
+      it "clears with when passed an empty list" do
+        bundle :install, :with => "debugging"
+        bundle 'install --with ""'
+        should_not_be_installed "thin 1.0"
+      end
+
+      it "does remove groups from without when passed at with" do
+        bundle :install, :without => "emo"
+        bundle :install, :with => "emo"
+        should_be_installed "activesupport 2.3.5"
+      end
+
+      it "does remove groups from with when passed at without" do
+        bundle :install, :with => "debugging"
+        bundle :install, :without => "debugging"
+        should_not_be_installed "thin 1.0"
+      end
+
+      it "errors out when passing a group to with and without" do
+        bundle :install, :with => "emo debugging", :without => "emo"
+        expect(out).to include("The offending groups are: emo")
+      end
+
+      it "can add and remove a group at the same time" do
+        bundle :install, :with => "debugging", :without => "emo"
+        should_be_installed "thin 1.0"
+        should_not_be_installed "activesupport 2.3.5"
+      end
+
+      it "does have no effect when listing a not optional group in with" do
+        bundle :install, :with => "emo"
+        should_be_installed "activesupport 2.3.5"
+      end
+
+      it "does have no effect when listing an optional group in without" do
+        bundle :install, :without => "debugging"
+        should_not_be_installed "thin 1.0"
       end
     end
 

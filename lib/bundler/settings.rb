@@ -108,11 +108,19 @@ module Bundler
     end
 
     def without=(array)
-      self[:without] = (array.empty? ? nil : array.join(":")) if array
+      set_array(:without, array)
+    end
+
+    def with=(array)
+      set_array(:with, array)
     end
 
     def without
-      self[:without] ? self[:without].split(":").map { |w| w.to_sym } : []
+      get_array(:without)
+    end
+
+    def with
+      get_array(:with)
     end
 
     # @local_config["BUNDLE_PATH"] should be prioritized over ENV["BUNDLE_PATH"]
@@ -159,6 +167,14 @@ module Bundler
 
     def to_bool(value)
       !(value.nil? || value == '' || value =~ /^(false|f|no|n|0)$/i || value == false)
+    end
+
+    def get_array(key)
+      self[key] ? self[key].split(":").map { |w| w.to_sym } : []
+    end
+
+    def set_array(key, array)
+     self[key] = (array.empty? ? nil : array.join(":")) if array
     end
 
     def set_key(key, value, hash, file)
