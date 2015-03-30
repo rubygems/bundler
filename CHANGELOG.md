@@ -31,6 +31,13 @@ Features:
   - Molinillo resolver, shared with CocoaPods (@segiddins)
   - updated Thor to v0.19.1 (@segiddins)
 
+## 1.8.6 (2015-03-30)
+
+Bugfixes:
+
+  - keep gems locked when updating another gem from the same source (#3250, @indirect)
+  - resolve race that could build gems without saved arguments (#3404, @indirect)
+
 ## 1.8.5 (2015-03-11)
 
 Bugfixes:

@@ -96,20 +96,26 @@ module Bundler
 
     def install_gem_from_spec(spec, standalone = false, worker = 0)
       # Fetch the build settings, if there are any
-      settings             = Bundler.settings["build.#{spec.name}"]
-      install_message      = nil
-      post_install_message = nil
-      debug_message        = nil
-      Bundler.rubygems.with_build_args [settings] do
-        install_message, post_install_message, debug_message = spec.source.install(spec)
-        if install_message.include? 'Installing'
-          Bundler.ui.confirm install_message
-        else
-          Bundler.ui.info install_message
+      settings = Bundler.settings["build.#{spec.name}"]
+      messages = nil
+
+      if settings
+        Bundler.rubygems.with_build_args [settings] do
+          messages = spec.source.install(spec)
         end
-        Bundler.ui.debug debug_message if debug_message
-        Bundler.ui.debug "#{worker}:  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
+      else
+        messages = spec.source.install(spec)
       end
+
+      install_message, post_install_message, debug_message = *messages
+
+      if install_message.include? 'Installing'
+        Bundler.ui.confirm install_message
+      else
+        Bundler.ui.info install_message
+      end
+      Bundler.ui.debug debug_message if debug_message
+      Bundler.ui.debug "#{worker}:  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
 
       if Bundler.settings[:bin] && standalone
         generate_standalone_bundler_executable_stubs(spec)

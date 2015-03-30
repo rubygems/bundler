@@ -35,32 +35,27 @@ module Bundler
     end
 
     def default_bundle_dir
-      global_bundle_dir = File.join(Bundler.rubygems.user_home, ".bundle")
       bundle_dir = find_directory(".bundle")
+      return nil unless bundle_dir
 
-      if bundle_dir && bundle_dir != global_bundle_dir
-        Pathname.new(bundle_dir)
-      else
-        nil
-      end
+      global_bundle_dir = File.join(Bundler.rubygems.user_home, ".bundle")
+      return nil if bundle_dir == global_bundle_dir
+
+      Pathname.new(bundle_dir)
     end
 
     def in_bundle?
       find_gemfile
     end
 
-    def chdir_monitor
-      Bundler.rubygems.ext_lock
-    end
-
     def chdir(dir, &blk)
-      chdir_monitor.synchronize do
+      Bundler.rubygems.ext_lock.synchronize do
         Dir.chdir dir, &blk
       end
     end
 
     def pwd
-      chdir_monitor.synchronize do
+      Bundler.rubygems.ext_lock.synchronize do
         Dir.pwd
       end
     end

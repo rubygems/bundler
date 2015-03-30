@@ -161,12 +161,14 @@ module Bundler
     end
 
     def with_build_args(args)
-      old_args = self.build_args
-      begin
-        self.build_args = args
-        yield
-      ensure
-        self.build_args = old_args
+      ext_lock.synchronize do
+        old_args = self.build_args
+        begin
+          self.build_args = args
+          yield
+        ensure
+          self.build_args = old_args
+        end
       end
     end
 
