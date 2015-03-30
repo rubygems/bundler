@@ -3,7 +3,7 @@ module Bundler
     class Shell
       LEVELS = %w(silent error warn confirm info debug)
 
-      attr_writer :shell
+      attr_writer :shell, :deprecation_messages
 
       def initialize(options = {})
         if options["no-color"] || !STDOUT.tty?
@@ -23,6 +23,13 @@ module Bundler
 
       def warn(msg, newline = nil)
         tell_me(msg, :yellow, newline) if level("warn")
+      end
+
+      def deprecate(msg, newline = nil)
+        unless @deprecation_messages.key?(msg)
+          @deprecation_messages[msg] = nil
+          warn(msg, newline)
+        end
       end
 
       def error(msg, newline = nil)
