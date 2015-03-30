@@ -302,8 +302,8 @@ describe "bundle install with gems on multiple sources" do
       gemfile <<-G
         source 'file://#{gem_repo1}'
         gem 'rack'
-        gem 'foo', '~> 0.1', source: 'file://#{gem_repo4}'
-        gem 'bar', '~> 0.1', source: 'file://#{gem_repo4}'
+        gem 'foo', '~> 0.1', :source => 'file://#{gem_repo4}'
+        gem 'bar', '~> 0.1', :source => 'file://#{gem_repo4}'
       G
 
       # 3. this lockfile.
