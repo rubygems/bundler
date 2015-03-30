@@ -1,3 +1,10 @@
+## 1.7.14 (2015-03-30)
+
+Bugfixes:
+
+  - Keep gems locked when updating another gem from the same source (#3250, @indirect)
+  - Don't add extra quotes around long, quoted config values (@aroben, #3338)
+
 ## 1.7.13 (2015-02-07)
 
 Bugfixes:
