@@ -369,8 +369,8 @@ describe "bundle install with gems on multiple sources" do
       install_gemfile <<-G
         source 'file://#{gem_repo1}'
         gem 'rack'
-        gem 'foo', '~> 0.2', source: 'file://#{gem_repo4}'
-        gem 'bar', '~> 0.1', source: 'file://#{gem_repo4}'
+        gem 'foo', '~> 0.2', :source => 'file://#{gem_repo4}'
+        gem 'bar', '~> 0.1', :source => 'file://#{gem_repo4}'
       G
 
       # 6. Which should update foo to 0.2, but not the (locked) bar 0.1
