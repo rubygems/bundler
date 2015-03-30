@@ -272,7 +272,7 @@ module Bundler
           each do |spec|
             next if spec.name == 'bundler'
             out << spec.to_lock
-        end
+          end
         out << "\n"
       end
 
@@ -561,8 +561,16 @@ module Bundler
       resolve
     end
 
-    def in_locked_deps?(dep, d)
-      d && dep.source == d.source
+    def in_locked_deps?(dep, locked_dep)
+      return nil if locked_dep.nil?
+      return true if locked_dep.source == dep.source
+
+      # Because the lockfile can't link a dep to a specific remote, we need to
+      # treat sources as equivalent anytime the locked dep has all the remotes
+      # that the Gemfile dep does.
+      dep.source.remotes.all? do |remote|
+        locked_dep.source.remotes.include?(remote)
+      end
     end
 
     def satisfies_locked_spec?(dep)
