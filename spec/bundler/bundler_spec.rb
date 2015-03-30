@@ -17,13 +17,11 @@ describe Bundler do
         end
       end
 
-      context "on Ruby 1.8", :ruby => "1.8" do
-        it "catches YAML syntax errors" do
-          expect { subject }.to raise_error(Bundler::GemspecError)
-        end
+      it "catches YAML syntax errors" do
+        expect { subject }.to raise_error(Bundler::GemspecError)
       end
 
-      context "on Ruby 1.9", :ruby => "1.9" do
+      context "on Rubies with a settable YAML engine", :if => defined?(YAML::ENGINE) do
         context "with Syck as YAML::Engine" do
           it "raises a GemspecError after YAML load throws ArgumentError" do
             orig_yamler, YAML::ENGINE.yamler = YAML::ENGINE.yamler, 'syck'
