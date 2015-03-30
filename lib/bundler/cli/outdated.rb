@@ -65,9 +65,9 @@ module Bundler
           dependency_version = %|Gemfile specifies "#{dependency.requirement}"| if dependency && dependency.specific?
 
           if options["verbose"] && dependency_version
-            fmt_groups = dependency.groups.join(", ")
+            groups = dependency.groups.join(", ")
             pl = (dependency.groups.length > 1) ? "s" : ""
-            dependency_version << " in group#{pl} \"#{fmt_groups}\""
+            dependency_version << " in group#{pl} \"#{groups}\""
           end
 
           Bundler.ui.info "  * #{active_spec.name} (#{spec_version} > #{current_version}) #{dependency_version}".rstrip
