@@ -322,13 +322,22 @@ describe "bundle install with gems on multiple sources" do
 
   context "when a single source contains multiple locked gems" do
     before do
+      # 1. With these gems,
       build_repo4 do
-        build_gem "foo", "0.2"
+        build_gem "foo", "0.1"
         build_gem "bar", "0.1"
-        build_gem "bar", "0.3"
       end
 
-      lockfile <<-G
+      # 2. Installing this gemfile will produce...
+      gemfile <<-G
+        source 'file://#{gem_repo1}'
+        gem 'rack'
+        gem 'foo', '~> 0.1', source: 'file://#{gem_repo4}'
+        gem 'bar', '~> 0.1', source: 'file://#{gem_repo4}'
+      G
+
+      # 3. this lockfile.
+      lockfile <<-L
         GEM
           remote: file:/Users/andre/src/bundler/bundler/tmp/gems/remote1/
           remote: file:/Users/andre/src/bundler/bundler/tmp/gems/remote4/
@@ -341,13 +350,22 @@ describe "bundle install with gems on multiple sources" do
           ruby
 
         DEPENDENCIES
-          bar (= 0.1)!
-          foo (= 0.1)!
+          bar (~> 0.1)!
+          foo (~> 0.1)!
           rack
-      G
+      L
+
+      bundle "install --path ../gems/system"
+
+      # 4. Then we add some new versions...
+      update_repo4 do
+        build_gem "foo", "0.2"
+        build_gem "bar", "0.3"
+      end
     end
 
     it "allows them to be unlocked separately" do
+      # 5. and install this gemfile, updating only foo.
       install_gemfile <<-G
         source 'file://#{gem_repo1}'
         gem 'rack'
@@ -355,6 +373,7 @@ describe "bundle install with gems on multiple sources" do
         gem 'bar', '~> 0.1', source: 'file://#{gem_repo4}'
       G
 
+      # 6. Which should update foo to 0.2, but not the (locked) bar 0.1
       should_be_installed("foo 0.2")
       should_be_installed("bar 0.1")
     end
