@@ -33,5 +33,10 @@ module Bundler
     def can_lock?(spec)
       spec.source == self
     end
+
+    def include?(other)
+      other == self
+    end
+
   end
 end

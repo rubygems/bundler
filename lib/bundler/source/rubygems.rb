@@ -34,10 +34,14 @@ module Bundler
       end
 
       def eql?(o)
-        o.is_a?(Rubygems) && remotes_equal?(o.remotes)
+        o.is_a?(Rubygems) && o.credless_remotes == credless_remotes
       end
 
       alias == eql?
+
+      def include?(o)
+        o.is_a?(Rubygems) && (o.credless_remotes - credless_remotes).empty?
+      end
 
       def can_lock?(spec)
         spec.source.is_a?(Rubygems)
@@ -184,6 +188,12 @@ module Bundler
         else
           []
         end
+      end
+
+    protected
+
+      def credless_remotes
+        remotes.map(&method(:suppress_configured_credentials))
       end
 
     private
@@ -354,10 +364,6 @@ module Bundler
 
         # Ruby 2.0, where gemspecs are stored in specifications/default/
         spec.loaded_from && spec.loaded_from.include?("specifications/default/")
-      end
-
-      def remotes_equal?(other_remotes)
-        remotes.map(&method(:suppress_configured_credentials)) == other_remotes.map(&method(:suppress_configured_credentials))
       end
 
     end
