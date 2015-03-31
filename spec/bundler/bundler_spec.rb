@@ -26,7 +26,7 @@ describe Bundler do
           gem "rack", :group => :test
         G
 
-        ruby(<<-RUBY, { expect_err: true })
+        ruby <<-RUBY
           require 'rubygems'
           require 'bundler'
           Bundler.setup

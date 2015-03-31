@@ -1,7 +1,7 @@
 module Bundler
   module UI
     class Shell
-      LEVELS = %w(silent error warn confirm info debug)
+      LEVELS = %w(silent error warn deprecate confirm info debug)
 
       attr_writer :shell, :deprecation_messages
 
