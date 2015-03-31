@@ -12,9 +12,9 @@ require "strscan"
 
 module Bundler
   class LockfileParser
-    attr_reader :sources, :dependencies, :specs, :platforms
+    attr_reader :sources, :dependencies, :specs, :platforms, :bundler_version
 
-    LOCKED       = "LOCKED WITH"
+    BUNDLED      = "BUNDLED WITH"
     DEPENDENCIES = "DEPENDENCIES"
     PLATFORMS    = "PLATFORMS"
     GIT          = "GIT"
@@ -32,22 +32,6 @@ module Bundler
 
       @rubygems_aggregate = Source::Rubygems.new
 
-
-      # If the lockfile's recorded version is older than the current version
-      # of Bundler, we warn the user to update Bundler.
-      if lockfile.match(/^  \[(.*)\]$/)
-        lock_ver = $1
-        curr_ver = Bundler::VERSION
-        prerelease_text = lock_ver.match(/pre/) ? " --pre" : ""
-
-        if Gem::Version.new(curr_ver) < Gem::Version.new(lock_ver)
-          Bundler.ui.warn "Warning: the running version of Bundler is older " \
-               "than the version that created the lockfile. We suggest you " \
-               "upgrade to the latest version of Bundler by running `gem " \
-               "install bundler#{prerelease_text}`.\n"
-        end
-      end
-
       if lockfile.match(/<<<<<<<|=======|>>>>>>>|\|\|\|\|\|\|\|/)
         raise LockfileError, "Your Gemfile.lock contains merge conflicts.\n" \
           "Run `git checkout HEAD -- Gemfile.lock` first to get a clean lock."
@@ -58,16 +42,30 @@ module Bundler
           @state = :dependency
         elsif line == PLATFORMS
           @state = :platform
+        elsif line == BUNDLED
+          @state = :bundled_with
         else
           send("parse_#{@state}", line)
         end
       end
       @sources << @rubygems_aggregate
       @specs = @specs.values
+      warn_for_outdated_bundler_version
     rescue ArgumentError => e
       Bundler.ui.debug(e)
       raise LockfileError, "Your lockfile is unreadable. Run `rm Gemfile.lock` " \
         "and then `bundle install` to generate a new lockfile."
+    end
+
+    def warn_for_outdated_bundler_version
+      return unless bundler_version
+      prerelease_text = bundler_version.prerelease? ? " --pre" : ""
+      if Gem::Version.new(Bundler::VERSION) < Gem::Version.new(bundler_version)
+        Bundler.ui.warn "Warning: the running version of Bundler is older " \
+             "than the version that created the lockfile. We suggest you " \
+             "upgrade to the latest version of Bundler by running `gem " \
+             "install bundler#{prerelease_text}`.\n"
+      end
     end
 
   private
@@ -171,6 +169,13 @@ module Bundler
     def parse_platform(line)
       if line =~ /^  (.*)$/
         @platforms << Gem::Platform.new($1)
+      end
+    end
+
+    def parse_bundled_with(line)
+      line = line.strip
+      if Gem::Version.correct?(line)
+        @bundler_version = Gem::Version.create(line)
       end
     end
 
