@@ -154,7 +154,7 @@ describe "the lockfile format" do
         rack
 
       BUNDLED WITH
-        #{Bundler::VERSION}
+        9999999.0.0
     G
   end
 

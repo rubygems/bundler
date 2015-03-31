@@ -264,7 +264,7 @@ module Bundler
         new_version = Bundler::VERSION
       end
 
-      new_version || Bundler::VERSION || Bundler::VERSION
+      new_version || @locked_bundler_version || Bundler::VERSION
     end
 
     def to_lock
