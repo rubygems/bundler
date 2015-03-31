@@ -12,9 +12,6 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GEM
         remote: file:#{gem_repo1}/
         specs:
@@ -25,17 +22,17 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     G
   end
 
-  it "updates the lockfile's ver. no. if current ver. is newer" do
+  it "updates the lockfile's bundler version if current ver. is newer" do
 
     #  TODO: verno below should be one less than prev ver (unless at min)
 
     lockfile <<-L
-      LOCKED WITH
-        [1.8.2]
-
       GIT
         remote: git://github.com/nex3/haml.git
         revision: 8a2271f
@@ -52,6 +49,9 @@ describe "the lockfile format" do
       DEPENDENCIES
         omg!
         rack
+
+      BUNDLED WITH
+        1.8.2
     L
 
     install_gemfile <<-G
@@ -61,9 +61,6 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GEM
         remote: file:#{gem_repo1}/
         specs:
@@ -74,10 +71,13 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     G
   end
 
-  it "updates the lockfile's ver. no. if not present" do
+  it "updates the lockfile's bundler version if not present" do
 
     lockfile <<-L
       GEM
@@ -99,9 +99,6 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GEM
         remote: file:#{gem_repo1}/
         specs:
@@ -112,19 +109,14 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     G
   end
 
-  it "outputs a warning if the current is older than lockfile's ver. no." do
-
-    # TODO: verno below should be one more than prev ver (unless at min)
-
-    stub_const("Bundler::VERSION", "2.1.0")
-
+  it "outputs a warning if the current is older than lockfile's bundler version" do
     lockfile <<-L
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GEM
         remote: file:#{gem_repo1}/
         specs:
@@ -135,6 +127,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack
+
+      BUNDLED WITH
+        9999999.0.0
     L
 
     install_gemfile <<-G
@@ -146,12 +141,7 @@ describe "the lockfile format" do
     expect(out).to include("Warning: the running version of Bundler is " \
                            "older than the version that created the lockfile")
 
-
-
     lockfile_should_be <<-G
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GEM
         remote: file:#{gem_repo1}/
         specs:
@@ -162,6 +152,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     G
   end
 
@@ -173,9 +166,6 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GEM
         remote: file:#{gem_repo1}/
         specs:
@@ -188,6 +178,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack-obama
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     G
   end
 
@@ -199,9 +192,6 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GEM
         remote: file:#{gem_repo1}/
         specs:
@@ -214,6 +204,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack-obama (>= 1.0)
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     G
   end
 
@@ -228,9 +221,6 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GEM
         remote: http://localgemserver.test/
         remote: http://user:pass@othergemserver.test/
@@ -244,6 +234,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack-obama (>= 1.0)
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     G
   end
 
@@ -254,9 +247,6 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GEM
         remote: file:#{gem_repo1}/
         specs:
@@ -269,6 +259,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         net-sftp
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     G
 
     should_be_installed "net-sftp 1.1.1", "net-ssh 1.0.0"
@@ -282,9 +275,6 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GIT
         remote: #{lib_path("foo-1.0")}
         revision: #{git.ref_for('master')}
@@ -299,6 +289,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         foo!
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     G
   end
 
@@ -316,9 +309,6 @@ describe "the lockfile format" do
     G
 
     lockfile <<-L
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GIT
         remote: git://github.com/nex3/haml.git
         revision: 8a2271f
@@ -335,6 +325,9 @@ describe "the lockfile format" do
       DEPENDENCIES
         omg!
         rack
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     L
 
     bundle "install"
@@ -351,9 +344,6 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GIT
         remote: #{lib_path('foo-1.0')}
         revision: #{git.ref_for('master')}
@@ -368,6 +358,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         foo!
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     G
   end
 
@@ -380,9 +373,6 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GIT
         remote: #{lib_path("foo-1.0")}
         revision: #{git.ref_for('omg')}
@@ -398,6 +388,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         foo!
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     G
   end
 
@@ -410,9 +403,6 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GIT
         remote: #{lib_path("foo-1.0")}
         revision: #{git.ref_for('omg')}
@@ -428,6 +418,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         foo!
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     G
   end
 
@@ -439,9 +432,6 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       PATH
         remote: #{lib_path("foo-1.0")}
         specs:
@@ -455,6 +445,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         foo!
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     G
   end
 
@@ -471,9 +464,6 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GIT
         remote: #{lib_path("bar-1.0")}
         revision: #{bar.ref_for('master')}
@@ -497,6 +487,9 @@ describe "the lockfile format" do
         bar!
         foo!
         rack
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     G
   end
 
@@ -510,9 +503,6 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GEM
         remote: file:#{gem_repo1}/
         specs:
@@ -532,6 +522,9 @@ describe "the lockfile format" do
         actionpack
         rack-obama
         thin
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     G
   end
 
@@ -543,9 +536,6 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GEM
         remote: file:#{gem_repo1}/
         specs:
@@ -571,6 +561,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rails
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     G
   end
 
@@ -581,9 +574,6 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GEM
         remote: file:#{gem_repo1}/
         specs:
@@ -597,6 +587,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         double_deps
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     G
   end
 
@@ -608,9 +601,6 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GEM
         remote: file:#{gem_repo1}/
         specs:
@@ -623,6 +613,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack-obama (>= 1.0)
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     G
   end
 
@@ -634,9 +627,6 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GEM
         remote: file:#{gem_repo1}/
         specs:
@@ -649,6 +639,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack-obama (>= 1.0)
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     G
   end
 
@@ -661,9 +654,6 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       PATH
         remote: foo
         specs:
@@ -677,6 +667,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         foo
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     G
   end
 
@@ -689,9 +682,6 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       PATH
         remote: ../foo
         specs:
@@ -705,6 +695,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         foo
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     G
   end
 
@@ -717,9 +710,6 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       PATH
         remote: foo
         specs:
@@ -733,6 +723,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         foo
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     G
   end
 
@@ -744,9 +737,6 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       PATH
         remote: ../foo
         specs:
@@ -760,14 +750,14 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         foo!
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     G
   end
 
   it "keeps existing platforms in the lockfile" do
     lockfile <<-G
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GEM
         remote: file:#{gem_repo1}/
         specs:
@@ -778,6 +768,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     G
 
     install_gemfile <<-G
@@ -789,9 +782,6 @@ describe "the lockfile format" do
     platforms = ['java', generic(Gem::Platform.local).to_s].sort
 
     lockfile_should_be <<-G
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GEM
         remote: file:#{gem_repo1}/
         specs:
@@ -803,6 +793,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     G
   end
 
@@ -819,9 +812,6 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GEM
         remote: file:#{gem_repo1}/
         specs:
@@ -832,6 +822,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         platform_specific
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     G
   end
 
@@ -848,9 +841,6 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GEM
         remote: file:#{gem_repo1}/
         specs:
@@ -863,6 +853,9 @@ describe "the lockfile format" do
       DEPENDENCIES
         activesupport
         rack
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     G
   end
 
@@ -874,9 +867,6 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GEM
         remote: file:#{gem_repo1}/
         specs:
@@ -887,6 +877,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     G
   end
 
@@ -898,9 +891,6 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GEM
         remote: file:#{gem_repo1}/
         specs:
@@ -911,6 +901,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack (= 1.0)
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     G
   end
 
@@ -922,9 +915,6 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GEM
         remote: file:#{gem_repo1}/
         specs:
@@ -935,6 +925,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack (= 1.0)
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     G
   end
 
@@ -968,9 +961,6 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GEM
         remote: file:#{gem_repo1}/
         specs:
@@ -981,6 +971,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack (> 0.9, < 1.0)
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     G
 
   end
@@ -1005,9 +998,6 @@ describe "the lockfile format" do
 
     # Create a Gemfile.lock that has duplicate GIT sections
     lockfile <<-L
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GIT
         remote: #{lib_path('omg')}
         revision: #{revision}
@@ -1031,6 +1021,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         omg!
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     L
 
     FileUtils.rm_rf(bundled_app('vendor'))
@@ -1039,9 +1032,6 @@ describe "the lockfile format" do
 
     # Confirm that duplicate specs do not appear
     expect(File.read(bundled_app('Gemfile.lock'))).to eq(strip_whitespace(<<-L))
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GIT
         remote: #{lib_path('omg')}
         revision: #{revision}
@@ -1058,6 +1048,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         omg!
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     L
   end
 
@@ -1132,9 +1125,6 @@ describe "the lockfile format" do
 
   it "refuses to install if Gemfile.lock contains conflict markers" do
     lockfile <<-L
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GEM
         remote: file://#{gem_repo1}/
         specs:
@@ -1149,6 +1139,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     L
 
     error = install_gemfile(<<-G, :expect_err => true)

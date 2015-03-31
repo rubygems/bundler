@@ -14,7 +14,7 @@ module Bundler
   class LockfileParser
     attr_reader :sources, :dependencies, :specs, :platforms
 
-    LOCKED       = "LOCKED WITH"
+    BUNDLED      = "BUNDLED WITH"
     DEPENDENCIES = "DEPENDENCIES"
     PLATFORMS    = "PLATFORMS"
     GIT          = "GIT"

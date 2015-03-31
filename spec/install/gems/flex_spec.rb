@@ -256,9 +256,6 @@ describe "bundle flex_install" do
       G
 
       lockfile_should_be <<-L
-      LOCKED WITH
-        [#{Bundler::VERSION}]
-
       GEM
         remote: file:#{gem_repo1}/
         remote: file:#{gem_repo2}/
@@ -270,6 +267,9 @@ describe "bundle flex_install" do
 
       DEPENDENCIES
         rack
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
       L
     end
   end

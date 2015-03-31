@@ -56,6 +56,7 @@ module Bundler
         @lockfile_contents = Bundler.read_file(lockfile)
         locked = LockfileParser.new(@lockfile_contents)
         @platforms      = locked.platforms
+        @locked_bundler_version = locked.bundler_version
 
         if unlock != true
           @locked_deps    = locked.dependencies
@@ -271,11 +272,6 @@ module Bundler
     def to_lock
       out = ""
 
-      # Record the version of Bundler that was used to create the lockfile
-      out << "LOCKED WITH\n"
-      out << "  [#{lock_version}]\n"
-      out << "\n"
-
       sources.lock_sources.each do |source|
         # Add the source header
         out << source.to_lock
@@ -310,6 +306,10 @@ module Bundler
           out << dep.to_lock
           handled << dep.name
       end
+
+      # Record the version of Bundler that was used to create the lockfile
+      out << "\nBUNDLED WITH\n"
+      out << "  #{lock_version}\n"
 
       out
     end
