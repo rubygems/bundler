@@ -24,9 +24,11 @@ Gem::Specification.new do |spec|
   spec.extensions    = ["ext/<%=config[:underscored_name]%>/extconf.rb"]
 <%- end -%>
 
-  if spec.respond_to?(:metadata)
-    spec.metadata['allowed_push_host'] = "TODO: Set to 'http://mygemserver.com' to prevent pushes to rubygems.org, or delete to allow pushes to any server."
-  end
+  # If this is a private gem, you can prevent accidental pushes to rubygems.org with this section (otherwise delete it)
+  # Note: "required_rubygems_version" is important because "allowed_push_host" won't be respected in earlier versions.
+  # Note: If you use gemfury, you can set "allowed_push_host" to "use.gemfury". Then `fury push` will work but `gem push` won't.
+  #   spec.required_rubygems_version = '>=2.2'
+  #   spec.metadata['allowed_push_host'] = "TODO: Set to 'http://mygemserver.com'"
 
   spec.add_development_dependency "bundler", "~> <%= config[:bundler_version] %>"
   spec.add_development_dependency "rake", "~> 10.0"
