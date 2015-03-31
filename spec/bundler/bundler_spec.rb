@@ -20,14 +20,13 @@ describe Bundler do
     end
 
     context "when Bundler.setup is run in a ruby script" do
-
       it "should print a single deprecation warning" do
         install_gemfile <<-G
           source "file://#{gem_repo1}"
           gem "rack", :group => :test
         G
 
-        ruby <<-RUBY
+        ruby(<<-RUBY, { expect_err: true })
           require 'rubygems'
           require 'bundler'
           Bundler.setup
