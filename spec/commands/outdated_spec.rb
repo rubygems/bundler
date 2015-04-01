@@ -54,6 +54,26 @@ describe "bundle outdated" do
     end
   end
 
+  describe "with --verbose option" do
+    it "adds gem group to dependency output when repo is updated" do
+
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+
+        group :development, :test do
+          gem 'activesupport', '2.3.5'
+        end
+      G
+
+      update_repo2 { build_gem "activesupport", "3.0" }
+
+      bundle "outdated --verbose"
+
+      expect(out).to include("activesupport (3.0 > 2.3.5) Gemfile specifies \"= 2.3.5\" in groups \"development, test\"")
+
+    end
+  end
+
   describe "with --local option" do
     it "doesn't hit repo2" do
       FileUtils.rm_rf(gem_repo2)
