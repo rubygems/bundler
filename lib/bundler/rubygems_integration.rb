@@ -131,6 +131,19 @@ module Bundler
       yield
     end
 
+    def loaded_gem_paths
+      # RubyGems 2.2+ can put binary extension into dedicated folders,
+      # therefore use RubyGems facilities to obtain their load paths.
+      if Gem::Specification.method_defined? :full_require_paths
+        loaded_gem_paths = Gem.loaded_specs.map {|n, s| s.full_require_paths}
+        loaded_gem_paths.flatten
+      else
+        $LOAD_PATH.select do |p|
+          Bundler.rubygems.gem_path.any?{|gp| p =~ /^#{Regexp.escape(gp)}/ }
+        end
+      end
+    end
+
     def ui=(obj)
       Gem::DefaultUserInteraction.ui = obj
     end

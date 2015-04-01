@@ -643,6 +643,36 @@ describe "Bundler.setup" do
     expect(out).to eq("yay")
   end
 
+  it "should clean $LOAD_PATH properly" do
+    gem_name = 'very_simple_binary'
+    full_gem_name = gem_name + '-1.0'
+    ext_dir = File.join(tmp "extenstions", full_gem_name)
+
+    install_gem full_gem_name
+
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+    G
+
+    ruby <<-R
+      if Gem::Specification.method_defined? :extension_dir
+        s = Gem::Specification.find_by_name '#{gem_name}'
+        s.extension_dir = '#{ext_dir}'
+      end
+
+      require 'bundler'
+      gem '#{gem_name}'
+
+      puts $LOAD_PATH.count {|path| path =~ /#{gem_name}/} >= 2
+
+      Bundler.setup
+
+      puts $LOAD_PATH.count {|path| path =~ /#{gem_name}/} == 0
+    R
+
+    expect(out).to eq("true\ntrue")
+  end
+
   it "stubs out Gem.refresh so it does not reveal system gems" do
     system_gems "rack-1.0.0"
 
