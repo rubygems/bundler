@@ -149,6 +149,8 @@ module Bundler
     method_option "trust-policy", :alias => "P", :type => :string, :banner =>
       "Gem trust policy (like gem install -P). Must be one of " +
         Bundler.rubygems.security_policy_keys.join('|')
+    method_option "use-oldest", :type => :boolean, :banner =>
+      "Install oldest gems that fit dependency list rather than newest"
     method_option "without", :type => :array, :banner =>
       "Exclude gems that are part of the specified named group."
 

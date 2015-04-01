@@ -69,6 +69,7 @@ module Bundler
       Bundler.settings[:no_install] = true if options["no-install"]
       Bundler.settings[:clean]    = options["clean"] if options["clean"]
       Bundler.settings.without    = options[:without]
+      Bundler.settings[:use_oldest]     = options["use-oldest"]
       Bundler::Fetcher.disable_endpoint = options["full-index"]
       Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? '1' : nil
 

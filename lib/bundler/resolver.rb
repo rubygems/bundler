@@ -266,6 +266,9 @@ module Bundler
             end
             nested.last << spec
           end
+          if Bundler.settings[:use_oldest]
+            nested.reverse!
+          end
           groups = nested.map { |a| SpecGroup.new(a) }
           !locked_requirement ? groups : groups.select { |sg| locked_requirement.satisfied_by? sg.version }
         else
