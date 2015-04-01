@@ -5,7 +5,7 @@ Bugfixes:
   - ensure gem executables are executable (#3517, #3511, @indirect)
   - fix warnings in Molinillo (#3516, @segiddins)
   - ensure duplicate dependencies do not propagate (#3522, @segiddins)
-  - keep gems locked when updating another gem from the same source (#3250, @indirect)
+  - keep gems locked when updating another gem from the same source (#3520, @indirect)
   - resolve race that could build gems without saved arguments (#3404, @indirect)
 
 ## 1.9.1 (2015-03-21)
