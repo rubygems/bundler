@@ -27,9 +27,9 @@ describe "bundle outdated" do
 
       bundle "outdated"
 
-      expect(out).to include("activesupport (3.0 > 2.3.5) Gemfile specifies \"= 2.3.5\"")
-      expect(out).to include("weakling (0.2 > 0.0.3) Gemfile specifies \"~> 0.0.1\"")
-      expect(out).to include("foo (1.0")
+      expect(out).to include("activesupport (newest 3.0, installed 2.3.5, requested = 2.3.5)")
+      expect(out).to include("weakling (newest 0.2, installed 0.0.3, requested ~> 0.0.1)")
+      expect(out).to include("foo (newest 1.0")
 
       # Gem names are one per-line, between "*" and their parenthesized version.
       gem_list = out.split("\n").map { |g| g[ /\* (.*) \(/, 1] }.compact
@@ -69,7 +69,7 @@ describe "bundle outdated" do
 
       bundle "outdated --verbose"
 
-      expect(out).to include("activesupport (3.0 > 2.3.5) Gemfile specifies \"= 2.3.5\" in groups \"development, test\"")
+      expect(out).to include("activesupport (newest 3.0, installed 2.3.5, requested = 2.3.5) in groups \"development, test\"")
 
     end
   end
@@ -91,8 +91,8 @@ describe "bundle outdated" do
       end
 
       bundle "outdated foo"
-      expect(out).not_to include("activesupport (3.0 > 2.3.5)")
-      expect(out).to include("foo (1.0")
+      expect(out).not_to include("activesupport (newest")
+      expect(out).to include("foo (newest 1.0")
     end
   end
 
@@ -115,7 +115,7 @@ describe "bundle outdated" do
         end
 
         bundle "outdated --pre"
-        expect(out).to include("activesupport (3.0.0.beta > 2.3.5) Gemfile specifies \"= 2.3.5\"")
+        expect(out).to include("activesupport (newest 3.0.0.beta, installed 2.3.5, requested = 2.3.5)")
       end
     end
 
@@ -132,7 +132,7 @@ describe "bundle outdated" do
         G
 
         bundle "outdated"
-        expect(out).to include("activesupport (3.0.0.beta.2 > 3.0.0.beta.1) Gemfile specifies \"= 3.0.0.beta.1\"")
+        expect(out).to include("(newest 3.0.0.beta.2, installed 3.0.0.beta.1, requested = 3.0.0.beta.1)")
       end
     end
   end
@@ -146,8 +146,8 @@ describe "bundle outdated" do
 
       bundle "outdated --strict"
 
-      expect(out).to_not include("activesupport (3.0 > 2.3.5) Gemfile specifies \"= 2.3.5\"")
-      expect(out).to include("weakling (0.0.5 > 0.0.3) Gemfile specifies \"~> 0.0.1\"")
+      expect(out).to_not include("activesupport (newest")
+      expect(out).to include("(newest 0.0.5, installed 0.0.3, requested ~> 0.0.1)")
     end
 
     it "only reports gem dependencies when they can actually be updated" do
@@ -158,7 +158,7 @@ describe "bundle outdated" do
 
       bundle "outdated --strict"
 
-      expect(out).to_not include("rack (1.2 > 0.9.1)")
+      expect(out).to_not include("rack (1.2")
     end
   end
 

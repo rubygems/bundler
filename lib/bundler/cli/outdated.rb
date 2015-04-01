@@ -62,15 +62,15 @@ module Bundler
 
           spec_version    = "#{active_spec.version}#{active_spec.git_version}"
           current_version = "#{current_spec.version}#{current_spec.git_version}"
-          dependency_version = %|Gemfile specifies "#{dependency.requirement}"| if dependency && dependency.specific?
+          dependency_version = %|, requested #{dependency.requirement}| if dependency && dependency.specific?
 
-          if options["verbose"] && dependency_version
+          if options["verbose"]
             groups = dependency.groups.join(", ")
             pl = (dependency.groups.length > 1) ? "s" : ""
-            dependency_version << " in group#{pl} \"#{groups}\""
+            groups = " in group#{pl} \"#{groups}\""
           end
 
-          Bundler.ui.info "  * #{active_spec.name} (#{spec_version} > #{current_version}) #{dependency_version}".rstrip
+          Bundler.ui.info "  * #{active_spec.name} (newest #{spec_version}, installed #{current_version}#{dependency_version})#{groups}".rstrip
           out_count += 1
         end
         Bundler.ui.debug "from #{active_spec.loaded_from}"
