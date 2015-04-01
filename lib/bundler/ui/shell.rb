@@ -11,7 +11,7 @@ module Bundler
         end
         @shell = Thor::Base.shell.new
         @level = ENV['DEBUG'] ? "debug" : "info"
-        @deprecation_messages = Hash.new
+        @deprecation_messages = Set.new
       end
 
       def info(msg, newline = nil)
@@ -27,8 +27,8 @@ module Bundler
       end
 
       def deprecate(msg)
-        unless @deprecation_messages.key?(msg)
-          @deprecation_messages[msg] = nil
+        unless @deprecation_messages.include?(msg)
+          @deprecation_messages.add(msg)
           $stderr.puts("DEPRECATION: " + msg)
         end
       end

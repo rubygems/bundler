@@ -21,8 +21,8 @@ module Bundler
     @@warning_printed = false
 
     def default_gemfile
-      Bundler.ui.deprecate("Gemfile and Gemfile.lock will be " \
-                           "deprecated and replaced with gems.rb and " \
+      Bundler.ui.deprecate("Gemfile and Gemfile.lock are " \
+                           "deprecated and will be replaced with gems.rb and " \
                            "gems.locked in Bundler 2.0.0.\n")
       gemfile = find_gemfile
       raise GemfileNotFound, "Could not locate Gemfile" unless gemfile
