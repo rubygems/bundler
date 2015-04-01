@@ -8,10 +8,13 @@ bundle-install(1) -- Install the dependencies specified in your Gemfile
                  [--full-index]
                  [--gemfile=GEMFILE]
                  [--jobs=NUMBER]
-                 [--local] [--deployment]
+                 [--frozen]
+                 [--local]
+                 [--deployment]
                  [--no-cache]
                  [--no-prune]
-                 [--path PATH] [--system]
+                 [--path PATH]
+                 [--system]
                  [--quiet]
                  [--retry=NUMBER]
                  [--shebang]
@@ -65,6 +68,10 @@ update process below under [CONSERVATIVE UPDATING][].
 
 * `--jobs=[<number>]`:
   Install gems by starting <number> of workers parallely.
+
+* `--frozen`:
+  Do not allow the Gemfile.lock to be updated after this install. Remembered in
+  the local configuration.
 
 * `--local`:
   Do not attempt to connect to `rubygems.org`. Instead, Bundler will use the
