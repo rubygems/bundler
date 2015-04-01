@@ -29,6 +29,9 @@ describe Bundler do
         ruby <<-RUBY
           require 'rubygems'
           require 'bundler'
+          require 'bundler/vendored_thor'
+
+          Bundler.ui = Bundler::UI::Shell.new
           Bundler.setup
           Bundler.setup
         RUBY
