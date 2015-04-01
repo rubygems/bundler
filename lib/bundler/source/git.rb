@@ -183,6 +183,7 @@ module Bundler
         git_proxy.checkout if requires_checkout?
         git_proxy.copy_to(app_cache_path, @submodules)
         serialize_gemspecs_in(app_cache_path)
+        File.write(app_cache_path.join(".bundlecache"), cached_revision || revision)
       end
 
       def load_spec_files
@@ -209,7 +210,7 @@ module Bundler
       end
 
       def app_cache_dirname
-        "#{base_name}-#{shortref_for_path(cached_revision || revision)}"
+        base_name
       end
 
       def revision
