@@ -1,7 +1,7 @@
 module Bundler
   module UI
     class Shell
-      LEVELS = %w(silent error warn deprecate confirm info debug)
+      LEVELS = %w(silent error warn confirm info debug)
 
       attr_writer :shell, :deprecation_messages
 
@@ -26,10 +26,10 @@ module Bundler
         tell_me(msg, :yellow, newline) if level("warn")
       end
 
-      def deprecate(msg)
+      def deprecate(msg, newline = nil)
         unless @deprecation_messages.include?(msg)
           @deprecation_messages.add(msg)
-          $stderr.puts("DEPRECATION: " + msg)
+          warn("DEPRECATION: " + msg, newline)
         end
       end
 

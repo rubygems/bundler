@@ -106,7 +106,7 @@ describe "bundle install" do
             rails_fail (>= 0) ruby depends on
               activesupport (= 1.2.3) ruby
       E
-      expect(out).to eq(nice_error)
+      expect(out).to include(nice_error)
     end
 
     it "causes a conflict if a child dependency conflicts with the Gemfile" do
@@ -126,7 +126,7 @@ describe "bundle install" do
 
             activesupport (= 2.3.5) ruby
       E
-      expect(out).to eq(nice_error)
+      expect(out).to include(nice_error)
     end
 
     it "can install dependencies with newer bundler version" do
@@ -139,7 +139,7 @@ describe "bundle install" do
       #simulate_new_machine
 
       bundle "check"
-      expect(out).to eq("The Gemfile's dependencies are satisfied")
+      expect(out).to include("The Gemfile's dependencies are satisfied")
     end
   end
 

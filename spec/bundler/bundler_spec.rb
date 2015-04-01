@@ -12,7 +12,7 @@ describe Bundler do
           gem "rack"
         G
 
-        expect(err).to eq("DEPRECATION: Gemfile and Gemfile.lock are " \
+        expect(out).to include("DEPRECATION: Gemfile and Gemfile.lock are " \
          "deprecated and will be replaced with gems.rb and gems.locked in " \
          "Bundler 2.0.0.")
         expect(err).to lack_errors
@@ -36,7 +36,7 @@ describe Bundler do
           Bundler.setup
         RUBY
 
-        expect(err).to eq("DEPRECATION: Gemfile and Gemfile.lock are " \
+        expect(out).to eq("DEPRECATION: Gemfile and Gemfile.lock are " \
          "deprecated and will be replaced with gems.rb and gems.locked in " \
          "Bundler 2.0.0.")
         expect(err).to lack_errors
