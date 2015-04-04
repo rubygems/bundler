@@ -41,7 +41,7 @@ class ParallelInstaller
   end
 
   def self.max_threads
-    @@max_threads ||= [Bundler.settings[:jobs].to_i-1, 1].max
+    @max_threads ||= [Bundler.settings[:jobs].to_i-1, 1].max
   end
 
   def initialize(installer, all_specs, size, standalone)
