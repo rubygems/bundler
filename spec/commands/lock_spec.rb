@@ -47,6 +47,9 @@ describe "bundle lock" do
         foo
         rails
         with_license
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     L
   end
 
