@@ -12,7 +12,6 @@ module Bundler
   preserve_gem_path
   ORIGINAL_ENV = ENV.to_hash
 
-  autoload :AnonymizableURI,       'bundler/anonymizable_uri'
   autoload :Definition,            'bundler/definition'
   autoload :Dependency,            'bundler/dependency'
   autoload :DepProxy,              'bundler/dep_proxy'
@@ -121,12 +120,7 @@ module Bundler
         # Load all groups, but only once
         @setup = load.setup
       else
-        @completed_groups ||= []
-        # Figure out which groups haven't been loaded yet
-        unloaded = groups - @completed_groups
-        # Record groups that are now loaded
-        @completed_groups = groups
-        unloaded.any? ? load.setup(*groups) : load
+        load.setup(*groups)
       end
     end
 
@@ -217,7 +211,7 @@ module Bundler
     end
 
     def cleanup
-      FileUtils.remove_entry_secure(@tmp) if @tmp
+      FileUtils.remove_entry_secure(@tmp) if defined?(@tmp) && @tmp
     rescue
     end
 
@@ -316,7 +310,8 @@ module Bundler
         executable
       elsif ENV['PATH']
         path = ENV['PATH'].split(File::PATH_SEPARATOR).find do |p|
-          File.executable?(File.join(p, executable))
+          abs_path = File.join(p, executable)
+          File.file?(abs_path) && File.executable?(abs_path)
         end
         path && File.expand_path(executable, path)
       end

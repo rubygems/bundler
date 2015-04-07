@@ -56,6 +56,7 @@ module Bundler
         @lockfile_contents = Bundler.read_file(lockfile)
         locked = LockfileParser.new(@lockfile_contents)
         @platforms      = locked.platforms
+        @locked_bundler_version = locked.bundler_version
 
         if unlock != true
           @locked_deps    = locked.dependencies
@@ -256,6 +257,16 @@ module Bundler
         "#{File.expand_path(file)}"
     end
 
+    # Returns the version of Bundler that is creating or has created
+    # Gemfile.lock. Used in #to_lock.
+    def lock_version
+      if @locked_bundler_version && @locked_bundler_version < Gem::Version.new(Bundler::VERSION)
+        new_version = Bundler::VERSION
+      end
+
+      new_version || @locked_bundler_version || Bundler::VERSION
+    end
+
     def to_lock
       out = ""
 
@@ -293,6 +304,10 @@ module Bundler
           out << dep.to_lock
           handled << dep.name
       end
+
+      # Record the version of Bundler that was used to create the lockfile
+      out << "\nBUNDLED WITH\n"
+      out << "  #{lock_version}\n"
 
       out
     end
@@ -406,11 +421,18 @@ module Bundler
 
       if locked
         unlocking = @locked_specs.any? do |locked_spec|
-          locked_spec.source != locked
+          locked_spec.source.class == locked.class && locked_spec.source != locked
         end
       end
 
-      !locked || unlocking || source.specs != locked.specs
+      !locked || unlocking || dependencies_for_source_changed?(locked) || source.specs != locked.specs
+    end
+
+    def dependencies_for_source_changed?(source)
+      deps_for_source = @dependencies.select { |s| s.source == source }
+      locked_deps_for_source = @locked_deps.select { |s| s.source == source }
+
+      deps_for_source != locked_deps_for_source
     end
 
     # Get all locals and override their matching sources.

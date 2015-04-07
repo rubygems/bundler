@@ -27,23 +27,32 @@ module Rake
   end
 end
 
+def clean_files(files, regex, replacement = '')
+  files.each do |file|
+    contents = File.read(file)
+    contents.gsub!(regex, replacement)
+    File.open(file, 'w') { |f| f << contents }
+  end
+end
+
 namespace :molinillo do
   task :namespace do
-    files = Dir.glob('lib/bundler/vendor/Molinillo*/**/*.rb')
-    sh "sed -i.bak 's/Molinillo/Bundler::Molinillo/g' #{files.join(' ')}"
-    sh "rm #{files.join('.bak ')}.bak"
+    files = Dir.glob('lib/bundler/vendor/molinillo*/**/*.rb')
+    clean_files(files, 'Molinillo', 'Bundler::Molinillo')
+    clean_files(files, /require (["'])molinillo/, 'require \1bundler/vendor/molinillo/lib/molinillo')
   end
 
   task :clean do
-    files = Dir.glob('lib/bundler/vendor/Molinillo*/*', File::FNM_DOTMATCH).reject { |f| %(. .. lib).include? f.split('/').last }
-    puts files
-    sh "rm -r #{files.join(' ')}"
+    files = Dir.glob('lib/bundler/vendor/molinillo*/*', File::FNM_DOTMATCH).reject { |f| %(. .. lib).include? f.split('/').last }
+    rm_r files
   end
 
   task :update, [:tag] => [] do |t, args|
     tag = args[:tag]
     Dir.chdir 'lib/bundler/vendor' do
-      `curl -L https://github.com/CocoaPods/molinillo/archive/#{tag}.tar.gz | tar -xz`
+      rm_rf 'molinillo'
+      sh "curl -L https://github.com/CocoaPods/molinillo/archive/#{tag}.tar.gz | tar -xz"
+      sh "mv Molinillo-* molinillo"
     end
     Rake::Task['molinillo:namespace'].invoke
     Rake::Task['molinillo:clean'].invoke
@@ -53,20 +62,22 @@ end
 namespace :thor do
   task :namespace do
     files = Dir.glob('lib/bundler/vendor/thor*/**/*.rb')
-    sh "sed -i.bak 's/Thor/Bundler::Thor/g' #{files.join(' ')}"
-    sh "rm #{files.join('.bak ')}.bak"
+    clean_files(files, 'Thor', 'Bundler::Thor')
+    clean_files(files, /require (["'])thor/, 'require \1bundler/vendor/thor/lib/thor')
+    clean_files(files, /(autoload\s+[:\w]+,\s+["'])(thor[\w\/]+["'])/, '\1bundler/vendor/thor/lib/\2')
   end
 
   task :clean do
     files = Dir.glob('lib/bundler/vendor/thor*/*', File::FNM_DOTMATCH).reject { |f| %(. .. lib).include? f.split('/').last }
-    puts files
-    sh "rm -r #{files.join(' ')}"
+    rm_r files
   end
 
   task :update, [:tag] => [] do |t, args|
     tag = args[:tag]
     Dir.chdir 'lib/bundler/vendor' do
-      `curl -L https://github.com/erikhuda/thor/archive/#{tag}.tar.gz | tar -xz`
+      rm_rf 'thor'
+      sh "curl -L https://github.com/erikhuda/thor/archive/#{tag}.tar.gz | tar -xz"
+      sh "mv thor-* thor"
     end
     Rake::Task['thor:namespace'].invoke
     Rake::Task['thor:clean'].invoke
@@ -87,8 +98,8 @@ namespace :spec do
     end
 
     deps.sort_by{|name, _| name }.each do |name, version|
-      sh "#{Gem.ruby} -S gem list -i '^#{name}$' -v '#{version}' || " \
-         "#{Gem.ruby} -S gem install #{name} -v '#{version}' --no-ri --no-rdoc"
+      sh %{#{Gem.ruby} -S gem list -i "^#{name}$" -v "#{version}" || } +
+         %{#{Gem.ruby} -S gem install #{name} -v "#{version}" --no-ri --no-rdoc}
     end
 
     # Download and install gems used inside tests

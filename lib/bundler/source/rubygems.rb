@@ -5,6 +5,8 @@ require 'rubygems/spec_fetcher'
 module Bundler
   class Source
     class Rubygems < Source
+      autoload :Remote, "bundler/source/rubygems/remote"
+
       # Use the API when installing less than X gems
       API_REQUEST_LIMIT = 500
       # Ask for X gems per API request
@@ -68,10 +70,15 @@ module Bundler
       alias_method :name, :to_s
 
       def specs
-        # remote_specs usually generates a way larger Index than the other
-        # sources, and large_idx.use small_idx is way faster than
-        # small_idx.use large_idx.
-        @specs ||= @allow_remote ? remote_specs.dup : Index.new
+        @specs ||= begin
+          # remote_specs usually generates a way larger Index than the other
+          # sources, and large_idx.use small_idx is way faster than
+          # small_idx.use large_idx.
+          idx = @allow_remote ? remote_specs.dup : Index.new
+          idx.use(cached_specs, :override_dupes) if @allow_cached || @allow_remote
+          idx.use(installed_specs, :override_dupes)
+          idx
+        end
       end
 
       def install(spec)
@@ -79,10 +86,10 @@ module Bundler
 
         # Download the gem to get the spec, because some specs that are returned
         # by rubygems.org are broken and wrong.
-        if spec.source_uri
+        if spec.remote
           # Check for this spec from other sources
-          uris = [spec.source_uri.without_credentials]
-          uris += source_uris_for_spec(spec)
+          uris = [spec.remote.anonymized_uri]
+          uris += remotes_for_spec(spec).map { |remote| remote.anonymized_uri }
           uris.uniq!
           Installer.ambiguous_gems << [spec.name, *uris] if uris.length > 1
 
@@ -189,15 +196,16 @@ module Bundler
 
       def fetchers
         @fetchers ||= remotes.map do |uri|
-            Bundler::Fetcher.new(uri)
+          remote = Source::Rubygems::Remote.new(uri)
+          Bundler::Fetcher.new(remote)
         end
       end
 
     protected
 
-      def source_uris_for_spec(spec)
+      def remotes_for_spec(spec)
         specs.search_all(spec.name).inject([]) do |uris, s|
-          uris << s.source_uri.without_credentials if s.source_uri
+          uris << s.remote if s.remote
           uris
         end
       end
@@ -285,7 +293,7 @@ module Bundler
       end
 
       def api_fetchers
-        fetchers.select{|f| f.use_api }
+        fetchers.select(&:use_api)
       end
 
       def remote_specs
@@ -326,7 +334,7 @@ module Bundler
               end
             end until idxcount == idx.size
 
-            if api_fetchers.any? && api_fetchers.all?{|f| f.use_api }
+            if api_fetchers.any?
               # it's possible that gems from one source depend on gems from some
               # other source, so now we download gemspecs and iterate over those
               # dependencies, looking for gems we don't have info on yet.
@@ -343,7 +351,7 @@ module Bundler
             end
           end
 
-          if !allow_api
+          unless allow_api
             api_fetchers.each do |f|
               Bundler.ui.info "Fetching source index from #{f.uri}"
               idx.use f.specs(nil, self)
@@ -353,8 +361,22 @@ module Bundler
       end
 
       def fetch_gem(spec)
-        return false unless spec.source_uri
-        Fetcher.download_gem_from_uri(spec, spec.source_uri.original_uri)
+        return false unless spec.remote
+        uri = spec.remote.uri
+        spec.fetch_platform
+
+        download_path = Bundler.requires_sudo? ? Bundler.tmp(spec.full_name) : Bundler.rubygems.gem_dir
+        gem_path = "#{Bundler.rubygems.gem_dir}/cache/#{spec.full_name}.gem"
+
+        FileUtils.mkdir_p("#{download_path}/cache")
+        Bundler.rubygems.download_gem(spec, uri, download_path)
+
+        if Bundler.requires_sudo?
+          Bundler.mkdir_p "#{Bundler.rubygems.gem_dir}/cache"
+          Bundler.sudo "mv #{Bundler.tmp(spec.full_name)}/cache/#{spec.full_name}.gem #{gem_path}"
+        end
+
+        gem_path
       end
 
       def builtin_gem?(spec)

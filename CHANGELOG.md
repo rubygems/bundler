@@ -1,15 +1,70 @@
+## 1.9.1 (2015-03-21)
+
+Bugfixes:
+
+  - avoid exception in 'bundler/gem_tasks' (#3492, @segiddins)
+
+## 1.9.0 (2015-03-20)
+
+## 1.9.0.rc (2015-03-13)
+
+Bugfixes:
+
+  - make Bundler.which stop finding directories (@nohoho)
+  - handle Bundler prereleases correctly (#3470, @segiddins)
+  - add before_install to .travis.yml template for new gems (@kodnin)
+
+## 1.9.0.pre.1 (2015-03-11)
+
+Bugfixes:
+
+  - make `gem` command work again (@arthurnn)
+
+## 1.9.0.pre (2015-03-11)
+
+Features:
+
+  - prefer gemspecs closest to the directory root (#3428, @segiddins)
+  - debug log for API request limits (#3452, @neerfri)
+
+"Features":
+
+  - Molinillo resolver, shared with CocoaPods (@segiddins)
+  - updated Thor to v0.19.1 (@segiddins)
+
+## 1.8.5 (2015-03-11)
+
+Bugfixes:
+
+  - remove MIT license from gemspec when removing license file (@indirect)
+  - respect 'no' immediately as well as saving it in `gem` config (@kirs)
+
+## 1.8.4 (2015-03-05)
+
+Bugfixes:
+
+  - document --all-platforms option (#3449, @moeffju)
+  - find gems from all sources on exec after install (#3450, @TimMoore)
+
+## 1.8.3 (2015-02-24)
+
+Bugfixes:
+
+  - handle boolean values for gem settings (@EduardoBautista)
+  - stop always looking for updated `path` gems (#3414, #3417, #3429, @TimMoore)
+
 ## 1.8.2 (2015-02-14)
 
 Bugfixes:
 
-  - allow config settings for gems with 'http' in the name again (#3398, @tmoore)
+  - allow config settings for gems with 'http' in the name again (#3398, @TimMoore)
 
 ## 1.8.1 (2015-02-13)
 
 Bugfixes:
 
   - synchronize building git gem native extensions (#3385, @antifuchs & @indirect)
-  - set gemspec bindir correctly (#3392, @tmoore)
+  - set gemspec bindir correctly (#3392, @TimMoore)
   - request lockfile deletion when it is malformed (#3396, @indirect)
   - explain problem when mirror config is missing (#3386, @indirect)
   - explain problem when caching causes permission error (#3390, @indirect)

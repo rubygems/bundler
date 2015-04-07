@@ -30,18 +30,14 @@ module Bundler
     def eval_gemfile(gemfile, contents = nil)
       contents ||= Bundler.read_file(gemfile.to_s)
       instance_eval(contents, gemfile.to_s, 1)
-    rescue SyntaxError => e
-      syntax_msg = e.message.gsub("#{gemfile}:", 'on line ')
-      raise GemfileError, "Gemfile syntax error #{syntax_msg}"
-    rescue ScriptError, RegexpError, NameError, ArgumentError => e
-      e.backtrace[0] = "#{e.backtrace[0]}: #{e.message} (#{e.class})"
-      Bundler.ui.warn e.backtrace.join("\n       ")
-      raise GemfileError, "There was an error in your Gemfile," \
-        " and Bundler cannot continue."
+    rescue Exception => e
+      message = "There was an error parsing `#{File.basename gemfile.to_s}`: #{e.message}"
+      raise DSLError.new(message, gemfile, e.backtrace, contents)
     end
 
     def gemspec(opts = nil)
       path              = opts && opts[:path] || '.'
+      glob              = opts && opts[:glob]
       name              = opts && opts[:name] || '{,*}'
       development_group = opts && opts[:development_group] || :development
       expanded_path     = File.expand_path(path, Bundler.default_gemfile.dirname)
@@ -52,7 +48,7 @@ module Bundler
       when 1
         spec = Bundler.load_gemspec(gemspecs.first)
         raise InvalidOption, "There was an error loading the gemspec at #{gemspecs.first}." unless spec
-        gem spec.name, :path => path
+        gem spec.name, :path => path, :glob => glob
         group(development_group) do
           spec.development_dependencies.each do |dep|
             gem dep.name, *(dep.requirement.as_list + [:type => :development])
@@ -184,9 +180,7 @@ module Bundler
     end
 
     def method_missing(name, *args)
-      location = caller[0].split(':')[0..1].join(':')
-      raise GemfileError, "Undefined local variable or method `#{name}' for Gemfile\n" \
-        "        from #{location}"
+      raise GemfileError, "Undefined local variable or method `#{name}' for Gemfile"
     end
 
   private
@@ -224,7 +218,7 @@ module Bundler
     end
 
     def valid_keys
-      @valid_keys ||= %w(group groups git path name branch ref tag require submodules platform platforms type source)
+      @valid_keys ||= %w(group groups git path glob name branch ref tag require submodules platform platforms type source)
     end
 
     def normalize_options(name, version, opts)
@@ -327,5 +321,107 @@ module Bundler
       end
     end
 
+    class DSLError < GemfileError
+      # @return [String] the description that should be presented to the user.
+      #
+      attr_reader :description
+
+      # @return [String] the path of the dsl file that raised the exception.
+      #
+      attr_reader :dsl_path
+
+      # @return [Exception] the backtrace of the exception raised by the
+      #         evaluation of the dsl file.
+      #
+      attr_reader :backtrace
+
+      # @param [Exception] backtrace @see backtrace
+      # @param [String]    dsl_path  @see dsl_path
+      #
+      def initialize(description, dsl_path, backtrace, contents = nil)
+        @status_code = $!.respond_to?(:status_code) && $!.status_code
+
+        @description = description
+        @dsl_path    = dsl_path
+        @backtrace   = backtrace
+        @contents    = contents
+      end
+
+      def status_code
+        @status_code || super
+      end
+
+      # @return [String] the contents of the DSL that cause the exception to
+      #         be raised.
+      #
+      def contents
+        @contents ||= begin
+          dsl_path && File.exist?(dsl_path) && File.read(dsl_path)
+        end
+      end
+
+      # The message of the exception reports the content of podspec for the
+      # line that generated the original exception.
+      #
+      # @example Output
+      #
+      #   Invalid podspec at `RestKit.podspec` - undefined method
+      #   `exclude_header_search_paths=' for #<Pod::Specification for
+      #   `RestKit/Network (0.9.3)`>
+      #
+      #       from spec-repos/master/RestKit/0.9.3/RestKit.podspec:36
+      #       -------------------------------------------
+      #           # because it would break: #import <CoreData/CoreData.h>
+      #    >      ns.exclude_header_search_paths = 'Code/RestKit.h'
+      #         end
+      #       -------------------------------------------
+      #
+      # @return [String] the message of the exception.
+      #
+      def message
+        @message ||= begin
+          trace_line, description = parse_line_number_from_description
+
+          m = "\n[!] "
+          m << description
+          m << ". Bundler cannot continue.\n"
+
+          return m unless backtrace && dsl_path && contents
+
+          trace_line = backtrace.find { |l| l.include?(dsl_path.to_s) } || trace_line
+          return m unless trace_line
+          line_numer = trace_line.split(':')[1].to_i - 1
+          return m unless line_numer
+
+          lines      = contents.lines.to_a
+          indent     = ' #  '
+          indicator  = indent.gsub('#', '>')
+          first_line = (line_numer.zero?)
+          last_line  = (line_numer == (lines.count - 1))
+
+          m << "\n"
+          m << "#{indent}from #{trace_line.gsub(/:in.*$/, '')}\n"
+          m << "#{indent}-------------------------------------------\n"
+          m << "#{indent}#{    lines[line_numer - 1] }" unless first_line
+          m << "#{indicator}#{ lines[line_numer] }"
+          m << "#{indent}#{    lines[line_numer + 1] }" unless last_line
+          m << "\n" unless m.end_with?("\n")
+          m << "#{indent}-------------------------------------------\n"
+        end
+      end
+
+      private
+
+      def parse_line_number_from_description
+        description = self.description
+        if dsl_path && description =~ /((#{Regexp.quote File.expand_path(dsl_path)}|#{Regexp.quote dsl_path.to_s}):\d+)/
+          trace_line = Regexp.last_match[1]
+          description = description.sub(/#{Regexp.quote trace_line}:\s*/, '').sub("\n", ' - ')
+        end
+        [trace_line, description]
+      end
+    end
+
   end
+
 end

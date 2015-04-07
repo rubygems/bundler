@@ -35,6 +35,10 @@ local and global sources. Not compatible with --global or --local flag.
 Executing bundle with the `BUNDLE_IGNORE_CONFIG` environment variable set will
 cause it to ignore all configuration.
 
+Executing `bundle config disable_multisource true` upgrades the warning about
+the Gemfile containing multiple primary sources to an error. Executing `bundle
+config --delete disable_multisource` downgrades this error to a warning.
+
 ## BUILD OPTIONS
 
 You can use `bundle config` to give bundler the flags to pass to the gem

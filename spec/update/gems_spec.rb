@@ -99,6 +99,16 @@ describe "bundle update" do
       should_not_be_installed "rack 1.2"
     end
   end
+
+  describe "in a frozen bundle" do
+    it "should fail loudly" do
+      bundle "install --deployment"
+      bundle "update"
+
+      expect(out).to match(/You are trying to install in deployment mode after changing.your Gemfile/m)
+      expect(exitstatus).not_to eq(0) if exitstatus
+    end
+  end
 end
 
 describe "bundle update in more complicated situations" do

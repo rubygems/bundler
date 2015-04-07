@@ -20,13 +20,13 @@ module Bundler
 
       underscored_name = name.tr('-', '_')
       namespaced_path = name.tr('-', '/')
-      constant_name = name.split('_').map{|p| p[0..0].upcase + p[1..-1] unless p.empty?}.join
-      constant_name = constant_name.split('-').map{|q| q[0..0].upcase + q[1..-1] }.join('::') if constant_name =~ /-/
+      constant_name = name.gsub(/-[_-]*(?![_-]|$)/){ '::' }.gsub(/([_-]+|(::)|^)(.|$)/){ $2.to_s + $3.upcase }
+
       constant_array = constant_name.split('::')
       git_user_name = `git config user.name`.chomp
       git_user_email = `git config user.email`.chomp
 
-      opts = {
+      config = {
         :name             => name,
         :underscored_name => underscored_name,
         :namespaced_path  => namespaced_path,
@@ -40,7 +40,7 @@ module Bundler
         :bin              => options[:bin],
         :bundler_version  => bundler_dependency_version
       }
-      ensure_safe_gem_name(opts[:name], opts[:constant_array])
+      ensure_safe_gem_name(name, constant_array)
 
       templates = {
         "Gemfile.tt" => "Gemfile",
@@ -61,6 +61,7 @@ module Bundler
           "of enforcing it, so be sure that you are prepared to do that. For suggestions about " \
           "how to enforce codes of conduct, see bit.ly/coc-enforcement."
         )
+        Bundler.ui.info "Code of conduct enabled in config"
         templates.merge!("CODE_OF_CONDUCT.md.tt" => "CODE_OF_CONDUCT.md")
       end
 
@@ -69,10 +70,13 @@ module Bundler
           "for free as long as they admit you created it. You can read more about the MIT license " \
           "at choosealicense.com/licenses/mit."
         )
+        config[:mit] = true
+        Bundler.ui.info "MIT License enabled in config"
         templates.merge!("LICENSE.txt.tt" => "LICENSE.txt")
       end
 
       if test_framework = ask_and_set_test_framework
+        config[:test] = test_framework
         templates.merge!(".travis.yml.tt" => ".travis.yml")
 
         case test_framework
@@ -84,8 +88,8 @@ module Bundler
           )
         when 'minitest'
           templates.merge!(
-            "test/minitest_helper.rb.tt" => "test/minitest_helper.rb",
-            "test/test_newgem.rb.tt" => "test/test_#{namespaced_path}.rb"
+            "test/test_helper.rb.tt" => "test/test_helper.rb",
+            "test/newgem_test.rb.tt" => "test/#{namespaced_path}_test.rb"
           )
         end
       end
@@ -101,7 +105,7 @@ module Bundler
       end
 
       templates.each do |src, dst|
-        thor.template("newgem/#{src}", target.join(dst), opts)
+        thor.template("newgem/#{src}", target.join(dst), config)
       end
 
       Bundler.ui.info "Initializing git repo in #{target}"
@@ -120,17 +124,15 @@ module Bundler
     end
 
     def ask_and_set(key, header, message)
-      result = options[key]
-      if !Bundler.settings.all.include?("gem.#{key}")
-        if result.nil?
-          Bundler.ui.confirm header
-          result = Bundler.ui.ask("#{message} y/(n):") == "y"
-        end
+      choice = options[key] || Bundler.settings["gem.#{key}"]
 
-        Bundler.settings.set_global("gem.#{key}", result)
+      if choice.nil?
+        Bundler.ui.confirm header
+        choice = (Bundler.ui.ask("#{message} y/(n):") =~ /y|yes/)
+        Bundler.settings.set_global("gem.#{key}", choice)
       end
 
-      result || Bundler.settings["gem.#{key}"]
+      choice
     end
 
     def validate_ext_name
@@ -145,6 +147,7 @@ module Bundler
 
     def ask_and_set_test_framework
       test_framework = options[:test] || Bundler.settings["gem.test"]
+
       if test_framework.nil?
         Bundler.ui.confirm "Do you want to generate tests with your gem?"
         result = Bundler.ui.ask "Type 'rspec' or 'minitest' to generate those test files now and " \
@@ -152,7 +155,7 @@ module Bundler
         if result =~ /rspec|minitest/
           test_framework = result
         else
-          test_framework = "false"
+          test_framework = false
         end
       end
 
@@ -160,14 +163,13 @@ module Bundler
         Bundler.settings.set_global("gem.test", test_framework)
       end
 
-      return if test_framework == "false"
       test_framework
     end
 
     def bundler_dependency_version
       v = Gem::Version.new(Bundler::VERSION)
       req = v.segments[0..1]
-      req << v.segments.last if v.prerelease?
+      req << 'a' if v.prerelease?
       req.join(".")
     end
 

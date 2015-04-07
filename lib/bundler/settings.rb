@@ -10,10 +10,15 @@ module Bundler
       @global_config = load_config(global_config_file)
     end
 
-    def [](key)
-      the_key = key_for(key)
-      value = (@local_config[the_key] || ENV[the_key] || @global_config[the_key])
-      is_bool(key) ? to_bool(value) : value
+    def [](name)
+      key = key_for(name)
+      value = (@local_config[key] || ENV[key] || @global_config[key])
+
+      if !value.nil? && is_bool(name)
+        to_bool(value)
+      else
+        value
+      end
     end
 
     def []=(key, value)
@@ -49,6 +54,18 @@ module Bundler
         end
       end
       repos
+    end
+
+    def mirror_for(uri)
+      uri = URI(uri.to_s) unless uri.is_a?(URI)
+
+      # Settings keys are all downcased
+      normalized_key = normalize_uri(uri.to_s.downcase)
+      gem_mirrors[normalized_key] || uri
+    end
+
+    def credentials_for(uri)
+      self[uri.to_s] || self[uri.host]
     end
 
     def gem_mirrors
@@ -141,7 +158,7 @@ module Bundler
     end
 
     def to_bool(value)
-      !(value.nil? || value == '' || value =~ /^(false|f|no|n|0)$/i)
+      !(value.nil? || value == '' || value =~ /^(false|f|no|n|0)$/i || value == false)
     end
 
     def set_key(key, value, hash, file)
