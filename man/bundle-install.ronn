@@ -18,6 +18,7 @@ bundle-install(1) -- Install the dependencies specified in your Gemfile
                  [--standalone[=GROUP[ GROUP...]]]
                  [--trust-policy=POLICY]
                  [--without=GROUP[ GROUP...]]
+                 [--with=GROUP[ GROUP...]]
 
 ## DESCRIPTION
 
@@ -125,7 +126,15 @@ update process below under [CONSERVATIVE UPDATING][].
 
 * `--without=<list>`:
   A space-separated list of groups referencing gems to skip during installation.
+  If a group is given that is in the remembered list of groups given
+  to --with, it is removed from that list.
   This is a [remembered option][REMEMBERED OPTIONS].
+
+* `--with=<list>`:
+  A space-separated list of groups referencing gems to install. If an
+  optional group is given it is installed. If a group is given that is
+  in the remembered list of groups given to --without, it is removed
+  from that list. This is a [remembered option][REMEMBERED OPTIONS].
 
 
 ## DEPLOYMENT MODE

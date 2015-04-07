@@ -430,10 +430,14 @@ applied to a group of gems by using block form.
       gem "sqlite3"
     end
 
-    group :development do
+    group :development, :optional => true do
       gem "wirble"
       gem "faker"
     end
+
+In the case of the group block form the :optional option can be given
+to prevent a group from being installed unless listed in the `--with`
+option given to the `bundle install` command.
 
 In the case of the `git` block form, the `:ref`, `:branch`, `:tag`,
 and `:submodules` options may be passed to the `git` method, and

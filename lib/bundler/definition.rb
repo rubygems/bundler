@@ -43,10 +43,11 @@ module Bundler
     # @param unlock [Hash, Boolean, nil] Gems that have been requested
     #   to be updated or true if all gems should be updated
     # @param ruby_version [Bundler::RubyVersion, nil] Requested Ruby Version
-    def initialize(lockfile, dependencies, sources, unlock, ruby_version = nil)
+    # @param optional_groups [Array(String)] A list of optional groups
+    def initialize(lockfile, dependencies, sources, unlock, ruby_version = nil, optional_groups = [])
       @unlocking = unlock == true || !unlock.empty?
 
-      @dependencies, @sources, @unlock = dependencies, sources, unlock
+      @dependencies, @sources, @unlock, @optional_groups = dependencies, sources, unlock, optional_groups
       @remote            = false
       @specs             = nil
       @lockfile_contents = ""
@@ -162,7 +163,7 @@ module Bundler
 
     def requested_specs
       @requested_specs ||= begin
-        groups = self.groups - Bundler.settings.without
+        groups = requested_groups
         groups.map! { |g| g.to_sym }
         specs_for(groups)
       end
@@ -601,7 +602,7 @@ module Bundler
     end
 
     def requested_dependencies
-      groups = self.groups - Bundler.settings.without
+      groups = requested_groups
       groups.map! { |g| g.to_sym }
       dependencies.reject { |d| !d.should_include? || (d.groups & groups).empty? }
     end
@@ -635,5 +636,8 @@ module Bundler
       names
     end
 
+    def requested_groups
+      self.groups - Bundler.settings.without - @optional_groups + Bundler.settings.with
+    end
   end
 end
