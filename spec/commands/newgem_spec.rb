@@ -157,7 +157,7 @@ describe "bundle gem" do
 
     it "sets gemspec metadata['allowed_push_host']", :rubygems => "2.0" do
       expect(generated_gem.gemspec.metadata['allowed_push_host']).
-        to match("delete to allow pushes to any server")
+        to match(/mygemserver\.com/)
     end
 
     it "requires the version file" do
@@ -400,11 +400,6 @@ describe "bundle gem" do
       end
 
       it_should_behave_like "git config is absent"
-    end
-
-    it "sets gemspec metadata['allowed_push_host']", :rubygems => "2.0" do
-      expect(generated_gem.gemspec.metadata['allowed_push_host']).
-        to match("delete to allow pushes to any server")
     end
 
     it "requires the version file" do
