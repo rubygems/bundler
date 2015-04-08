@@ -1,6 +1,22 @@
 require "spec_helper"
 
 describe "bundle_ruby" do
+  context "when run" do
+    it "displays a deprecation warning" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        ruby "1.9.3", :engine => 'ruby', :engine_version => '1.9.3'
+
+        gem "foo"
+      G
+
+      bundle_ruby
+
+      expect(err).to eq_err("Warning: bundle_ruby will be deprecated in " \
+                        "Bundler 2.0.0.")
+    end
+  end
+
   context "without patchlevel" do
     it "returns the ruby version" do
       gemfile <<-G
@@ -12,7 +28,7 @@ describe "bundle_ruby" do
 
       bundle_ruby
 
-      expect(out).to eq("ruby 1.9.3")
+      expect(out).to include("ruby 1.9.3")
     end
 
     it "engine defaults to MRI" do
@@ -25,7 +41,7 @@ describe "bundle_ruby" do
 
       bundle_ruby
 
-      expect(out).to eq("ruby 1.9.3")
+      expect(out).to include("ruby 1.9.3")
     end
 
     it "handles jruby" do
@@ -38,7 +54,7 @@ describe "bundle_ruby" do
 
       bundle_ruby
 
-      expect(out).to eq("ruby 1.8.7 (jruby 1.6.5)")
+      expect(out).to include("ruby 1.8.7 (jruby 1.6.5)")
     end
 
     it "handles rbx" do
@@ -51,7 +67,7 @@ describe "bundle_ruby" do
 
       bundle_ruby
 
-      expect(out).to eq("ruby 1.8.7 (rbx 1.2.4)")
+      expect(out).to include("ruby 1.8.7 (rbx 1.2.4)")
     end
 
     it "raises an error if engine is used but engine version is not" do
@@ -66,7 +82,7 @@ describe "bundle_ruby" do
       expect(exitstatus).not_to eq(0) if exitstatus
 
       bundle_ruby
-      expect(out).to eq("Please define :engine_version")
+      expect(out).to include("Please define :engine_version")
     end
 
     it "raises an error if engine_version is used but engine is not" do
@@ -81,7 +97,7 @@ describe "bundle_ruby" do
       expect(exitstatus).not_to eq(0) if exitstatus
 
       bundle_ruby
-      expect(out).to eq("Please define :engine")
+      expect(out).to include("Please define :engine")
     end
 
     it "raises an error if engine version doesn't match ruby version for MRI" do
@@ -96,7 +112,7 @@ describe "bundle_ruby" do
       expect(exitstatus).not_to eq(0) if exitstatus
 
       bundle_ruby
-      expect(out).to eq("ruby_version must match the :engine_version for MRI")
+      expect(out).to include("ruby_version must match the :engine_version for MRI")
     end
 
     it "should print if no ruby version is specified" do
@@ -108,7 +124,7 @@ describe "bundle_ruby" do
 
       bundle_ruby
 
-      expect(out).to eq("No ruby version specified")
+      expect(out).to include("No ruby version specified")
     end
   end
 
@@ -123,7 +139,7 @@ describe "bundle_ruby" do
 
       bundle_ruby
 
-      expect(out).to eq("ruby 1.9.3p429")
+      expect(out).to include("ruby 1.9.3p429")
     end
 
     it "handles an engine" do
@@ -136,7 +152,7 @@ describe "bundle_ruby" do
 
       bundle_ruby
 
-      expect(out).to eq("ruby 1.9.3p392 (jruby 1.7.4)")
+      expect(out).to include("ruby 1.9.3p392 (jruby 1.7.4)")
     end
   end
 end
