@@ -1,4 +1,9 @@
 # frozen_string_literal: true
+
+$stderr.puts "DEPRECATION: Bundler no longer integrates with " \
+  "Capistrano, but Capistrano provides its own integration with " \
+  "Bundler via the capistrano-bundler gem. Use it instead."
+
 module Bundler
   class Deployment
     def self.define_task(context, task_method = :task, opts = {})

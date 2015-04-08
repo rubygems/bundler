@@ -4,6 +4,27 @@ require "spec_helper"
 require "bundler"
 
 describe Bundler do
+  describe "version 1.99" do
+    context "when `bundler/deployment` is required in a ruby script" do
+      it "should print a capistrano deprecation warning" do
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rack", :group => :test
+        G
+
+        ruby(<<-RUBY, :expect_err => true)
+          require 'bundler/deployment'
+        RUBY
+
+        expect(err).to include("DEPRECATION: Bundler no longer integrates " \
+                               "with Capistrano, but Capistrano provides " \
+                               "its own integration with Bundler via the " \
+                               "capistrano-bundler gem. Use it instead.")
+        expect(err).to lack_errors
+      end
+    end
+  end
+
   describe "#load_gemspec_uncached" do
     let(:app_gemspec_path) { tmp("test.gemspec") }
     subject { Bundler.load_gemspec_uncached(app_gemspec_path) }
