@@ -1,3 +1,9 @@
+## 1.8.7 (2015-04-07)
+
+Bugfixes:
+
+  - stop suppressing errors inside gems that get required (#3549, @indirect)
+
 ## 1.8.6 (2015-03-30)
 
 Bugfixes:
