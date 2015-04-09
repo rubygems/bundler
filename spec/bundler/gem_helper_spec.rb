@@ -28,6 +28,15 @@ describe Bundler::GemHelper do
     end
 
     context "interpolates the name" do
+      before do
+        # Remove exception that prevents public pushes on older RubyGems versions
+        if Gem::Version.new(Gem::VERSION) < Gem::Version.new("2.0")
+          content = File.read(app_gemspec_path)
+          content.sub!(/raise "RubyGems 2\.0 or newer.*/, "")
+          File.open(app_gemspec_path, "w"){|f| f.write(content) }
+        end
+      end
+
       it "when there is only one gemspec" do
         expect(subject.gemspec.name).to eq(app_name)
       end
@@ -67,6 +76,10 @@ describe Bundler::GemHelper do
     before(:each) do
       content = app_gemspec_content.gsub("TODO: ", "")
       content.sub!(/homepage\s+= ".*"/, 'homepage = ""')
+      # Remove exception that prevents public pushes on older RubyGems versions
+      if Gem::Version.new(Gem::VERSION) < Gem::Version.new("2.0")
+        content.sub!(/raise "RubyGems 2\.0 or newer.*/, "")
+      end
       File.open(app_gemspec_path, "w") { |file| file << content }
     end
 

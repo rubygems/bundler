@@ -7,6 +7,15 @@ describe "bundle gem" do
     global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__TEST" => "false", "BUNDLE_GEM__COC" => "false"
   end
 
+  def remove_push_guard(gem_name)
+    # Remove exception that prevents public pushes on older RubyGems versions
+    if Gem::Version.new(Gem::VERSION) < Gem::Version.new("2.0")
+      path = "#{gem_name}/#{gem_name}.gemspec"
+      content = File.read(path).sub(/raise "RubyGems 2\.0 or newer.*/, "")
+      File.open(path, "w"){|f| f.write(content) }
+    end
+  end
+
   before do
     @git_name = `git config --global user.name`.chomp
     `git config --global user.name "Bundler User"`
@@ -57,6 +66,9 @@ describe "bundle gem" do
         line.gsub(/\=.*$/, "= %q{A short summary of my new gem.}")
       when /spec\.description/
         line.gsub(/\=.*$/, "= %q{A longer description of my new gem.}")
+      # Remove exception that prevents public pushes on older RubyGems versions
+      when /raise "RubyGems 2.0 or newer/
+        line.gsub(/.*/, '') if Gem::Version.new(Gem::VERSION) < Gem::Version.new("2.0")
       else
         line
       end
@@ -112,6 +124,7 @@ describe "bundle gem" do
 
     before do
       bundle "gem #{gem_name}"
+      remove_push_guard(gem_name)
       # reset gemspec cache for each test because of commit 3d4163a
       Bundler.clear_gemspec_cache
     end
@@ -150,6 +163,7 @@ describe "bundle gem" do
         reset!
         in_app_root
         bundle "gem #{gem_name}"
+        remove_push_guard(gem_name)
       end
 
       it_should_behave_like "git config is absent"
@@ -323,6 +337,7 @@ describe "bundle gem" do
 
     before do
       bundle "gem #{gem_name} --mit"
+      remove_push_guard(gem_name)
       # reset gemspec cache for each test because of commit 3d4163a
       Bundler.clear_gemspec_cache
     end
@@ -364,6 +379,7 @@ describe "bundle gem" do
 
     before do
       bundle "gem #{gem_name}"
+      remove_push_guard(gem_name)
       # reset gemspec cache for each test because of commit 3d4163a
       Bundler.clear_gemspec_cache
     end
@@ -397,6 +413,7 @@ describe "bundle gem" do
         reset!
         in_app_root
         bundle "gem #{gem_name}"
+        remove_push_guard(gem_name)
       end
 
       it_should_behave_like "git config is absent"
