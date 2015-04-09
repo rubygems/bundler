@@ -7,7 +7,8 @@ module Bundler
     def match_platform(p)
       Gem::Platform::RUBY == platform or
       platform.nil? or p == platform or
-      generic(Gem::Platform.new(platform)) == p
+      generic(Gem::Platform.new(platform)) == p or
+      platform === p
     end
   end
 end
