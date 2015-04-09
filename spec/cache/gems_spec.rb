@@ -167,7 +167,7 @@ describe "bundle cache" do
 
     it "re-caches during install" do
       cached_gem("rack-1.0.0").rmtree
-      bundle :install
+      bundle :install, :cache => true
       expect(out).to include("Updating files in vendor/cache")
       expect(cached_gem("rack-1.0.0")).to exist
     end
@@ -180,7 +180,7 @@ describe "bundle cache" do
     end
 
     it "adds new gems and dependencies" do
-      install_gemfile <<-G
+      install_gemfile <<-G, :cache => true
         source "file://#{gem_repo2}"
         gem "rails"
       G
@@ -189,7 +189,7 @@ describe "bundle cache" do
     end
 
     it "removes .gems for removed gems and dependencies" do
-      install_gemfile <<-G
+      install_gemfile <<-G, :cache => true
         source "file://#{gem_repo2}"
         gem "rack"
       G
@@ -201,7 +201,7 @@ describe "bundle cache" do
     it "removes .gems when gem changes to git source" do
       build_git "rack"
 
-      install_gemfile <<-G
+      install_gemfile <<-G, :cache => true
         source "file://#{gem_repo2}"
         gem "rack", :git => "#{lib_path("rack-1.0")}"
         gem "actionpack"
@@ -214,7 +214,7 @@ describe "bundle cache" do
 
     it "doesn't remove gems that are for another platform" do
       simulate_platform "java" do
-        install_gemfile <<-G
+        install_gemfile <<-G, :cache => true
           source "file://#{gem_repo1}"
           gem "platform_specific"
         G
@@ -224,7 +224,7 @@ describe "bundle cache" do
       end
 
       simulate_new_machine
-      install_gemfile <<-G
+      install_gemfile <<-G, :cache => true
         source "file://#{gem_repo1}"
         gem "platform_specific"
       G
