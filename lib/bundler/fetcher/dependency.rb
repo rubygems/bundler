@@ -19,7 +19,7 @@ module Bundler
       end
 
       def specs(gem_names, full_dependency_list = [], last_spec_list = [])
-        query_list = gem_names - full_dependency_list
+        query_list = gem_names.uniq - full_dependency_list
 
         log_specs(query_list)
 
@@ -64,7 +64,7 @@ module Bundler
 
           [s[:name], Gem::Version.new(s[:number]), s[:platform], dependencies]
         end
-        [spec_list, deps_list.uniq]
+        [spec_list, deps_list]
       end
 
       def dependency_api_uri(gem_names = [])

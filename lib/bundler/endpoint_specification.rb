@@ -3,14 +3,16 @@ module Bundler
   class EndpointSpecification < Gem::Specification
     include MatchPlatform
 
-    attr_reader :name, :version, :platform, :dependencies
+    attr_reader :name, :version, :platform, :dependencies, :required_rubygems_version, :required_ruby_version, :checksum
     attr_accessor :source, :remote
 
-    def initialize(name, version, platform, dependencies)
+    def initialize(name, version, platform, dependencies, metadata = {})
       @name         = name
       @version      = version
       @platform     = platform
       @dependencies = dependencies
+
+      parse_metadata(metadata)
     end
 
     def fetch_platform
@@ -95,6 +97,19 @@ module Bundler
 
     def local_specification_path
       "#{base_dir}/specifications/#{full_name}.gemspec"
+    end
+
+    def parse_metadata(data)
+      data.each do |k, v|
+        case k.to_s
+        when "checksum"
+          @checksum = v.last
+        when "rubygems"
+          @required_rubygems_version = Gem::Requirement.new(v) if v
+        when "ruby"
+          @required_ruby_version = Gem::Requirement.new(v) if v
+        end
+      end
     end
   end
 end

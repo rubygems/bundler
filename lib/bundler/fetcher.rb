@@ -6,6 +6,8 @@ require "zlib"
 module Bundler
   # Handles all the fetching with the rubygems server
   class Fetcher
+    autoload :CompactIndex, 'bundler/fetcher/compact_index'
+    autoload :CompactDependency, 'bundler/fetcher/compact_dependency'
     autoload :Downloader, "bundler/fetcher/downloader"
     autoload :Dependency, "bundler/fetcher/dependency"
     autoload :Index, "bundler/fetcher/index"
@@ -117,11 +119,11 @@ module Bundler
       end
       @use_api = false if fetchers.none?(&:api_fetcher?)
 
-      specs[remote_uri].each do |name, version, platform, dependencies|
+      specs[remote_uri].each do |name, version, platform, dependencies, metadata|
         next if name == "bundler"
         spec = nil
         if dependencies
-          spec = EndpointSpecification.new(name, version, platform, dependencies)
+          spec = EndpointSpecification.new(name, version, platform, dependencies, metadata)
         else
           spec = RemoteSpecification.new(name, version, platform, self)
         end
@@ -200,7 +202,7 @@ module Bundler
 
   private
 
-    FETCHERS = [Dependency, Index]
+    FETCHERS = [CompactDependency, Dependency, CompactIndex, Index]
 
     def cis
       env_cis = {
