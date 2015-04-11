@@ -17,7 +17,8 @@ module Bundler
         Bundler.ui.debug("HTTP #{response.code} #{response.message}")
 
         case response
-        when Net::HTTPNotModified
+        when Net::HTTPSuccess, Net::HTTPNotModified
+          response
         when Net::HTTPRedirection
           new_uri = URI.parse(response["location"])
           if new_uri.host == uri.host
@@ -25,8 +26,6 @@ module Bundler
             new_uri.password = uri.password
           end
           fetch(new_uri, counter + 1, options)
-        when Net::HTTPSuccess
-          response.body
         when Net::HTTPRequestEntityTooLarge
           raise FallbackError, response.body
         when Net::HTTPUnauthorized

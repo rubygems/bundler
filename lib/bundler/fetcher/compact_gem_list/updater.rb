@@ -8,15 +8,29 @@ module Bundler
 
       def update(files)
         files.each do |path, remote_path|
-          headers = {}
-          if path.file?
-            headers['If-None-Match'] = Digest::MD5.file(path).hexdigest
-            # headers['Range'] = "bytes=#{path.size}-" # uncomment once this is suported
-          end
-          if response = fetcher.downloader.fetch(fetcher.fetch_uri + remote_path, headers)
-            path.open("w") { |f| f.write response }
-          end
+          _update(path, remote_path)
         end
+      end
+
+      private
+
+      def _update(path, remote_path)
+        headers = {}
+        if path.file?
+          headers['If-None-Match'] = etag_for_file(path)
+          headers['Range'] = "bytes=#{path.size}-"
+        end
+        response = fetcher.downloader.fetch(fetcher.fetch_uri + remote_path, headers)
+        mode = response === Net::HTTPPartialContent ? "a" : "w"
+        path.open(mode) { |f| f.write response }
+        if etag_for_file(path) != response["ETag"]
+          path.delete
+          _update(path, remote_path)
+        end
+      end
+
+      def etag_for_file(path)
+        Digest::MD5.file(path).hexdigest
       end
     end
   end

@@ -52,14 +52,6 @@ module Bundler
         nil
       end
 
-      def versions_length
-        versions_path.file? ? versions_path.size : 0
-      end
-
-      def versions_hash
-        versions_path.file? ? Digest::MD5.file(versions_path).hexdigest : 0
-      end
-
       private
 
       def lines(path)

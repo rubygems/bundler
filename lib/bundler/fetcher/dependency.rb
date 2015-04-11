@@ -53,7 +53,7 @@ module Bundler
         deps_list = []
 
         gem_names.each_slice(Source::Rubygems::API_REQUEST_SIZE) do |names|
-          marshalled_deps = downloader.fetch dependency_api_uri(names)
+          marshalled_deps = downloader.fetch(dependency_api_uri(names)).body
           gem_list += Bundler.load_marshal(marshalled_deps)
         end
 
