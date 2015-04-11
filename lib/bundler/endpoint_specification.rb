@@ -6,13 +6,13 @@ module Bundler
     attr_reader :name, :version, :platform, :dependencies, :required_rubygems_version, :required_ruby_version, :checksum
     attr_accessor :source, :remote
 
-    def initialize(name, version, platform, dependencies, metadata = {})
+    def initialize(name, version, platform, dependencies, metadata = nil)
       @name         = name
       @version      = version
       @platform     = platform
       @dependencies = dependencies
 
-      parse_metadata(metadata)
+      parse_metadata(metadata || {})
     end
 
     def fetch_platform
