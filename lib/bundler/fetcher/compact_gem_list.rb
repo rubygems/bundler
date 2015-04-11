@@ -26,7 +26,6 @@ module Bundler
 
       def dependencies(names)
         @updater.update(names.map do |name|
-          raise "Not string (#{name.inspect})" unless name.is_a?(String)
           [@cache.dependencies_path(name), url("info/#{name}")]
         end)
         names.map do |name|
@@ -35,7 +34,8 @@ module Bundler
       end
 
       def spec(name, version, platform = nil)
-        specific_dependency(name, version, platform)
+        @updater.update([[@cache.dependencies_path(name), url("info/#{name}")]])
+        @cache.specific_dependency(name, version, platform)
       end
 
       private

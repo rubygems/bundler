@@ -5,7 +5,9 @@ module Bundler
   class Fetcher
     class Index < Base
       def specs(_gem_names)
-        Bundler.rubygems.fetch_all_remote_specs(remote)
+        Bundler.rubygems.fetch_all_remote_specs(remote).map do |*args|
+          RemoteSpecification.new(*args, self)
+        end
       rescue Gem::RemoteFetcher::FetchError, OpenSSL::SSL::SSLError, Net::HTTPFatalError => e
         case e.message
         when /certificate verify failed/
@@ -22,6 +24,23 @@ module Bundler
           Bundler.ui.trace e
           raise HTTPError, "Could not fetch specs from #{display_uri}"
         end
+      end
+
+      def fetch_spec(spec)
+        spec = spec - [nil, 'ruby', '']
+        spec_file_name = "#{spec.join '-'}.gemspec"
+
+        uri = URI.parse("#{remote_uri}#{Gem::MARSHAL_SPEC_DIR}#{spec_file_name}.rz")
+        if uri.scheme == 'file'
+          Bundler.load_marshal Gem.inflate(Gem.read_binary(uri.path))
+        elsif cached_spec_path = gemspec_cached_path(spec_file_name)
+          Bundler.load_gemspec(cached_spec_path)
+        else
+          Bundler.load_marshal Gem.inflate(downloader.fetch uri)
+        end
+      rescue MarshalError
+        raise HTTPError, "Gemspec #{spec} contained invalid data.\n" \
+          "Your network or your gem server is probably having issues right now."
       end
     end
   end

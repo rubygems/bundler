@@ -19,7 +19,9 @@ module Bundler
       def versions
         versions_by_name = {}
         lines(versions_path).map do |line|
+          next if line == '-1'
           name, versions_string = line.split(" ", 2)
+          p line unless versions_string
           versions_string.split(",").map! do |version|
             version.split("-", 2).unshift(name)
           end
@@ -48,6 +50,14 @@ module Bundler
           return parse_gem(line) if line =~ matcher
         end if matcher
         nil
+      end
+
+      def versions_length
+        versions_path.file? ? versions_path.size : 0
+      end
+
+      def versions_hash
+        versions_path.file? ? Digest::MD5.file(versions_path).hexdigest : 0
       end
 
       private

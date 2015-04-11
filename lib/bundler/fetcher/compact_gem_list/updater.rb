@@ -8,8 +8,14 @@ module Bundler
 
       def update(files)
         files.each do |path, remote_path|
-          response = fetcher.downloader.fetch(fetcher.fetch_uri + remote_path)
-          path.open("w") { |f| f.write response }
+          headers = {}
+          if path.file?
+            headers['If-None-Match'] = Digest::MD5.file(path).hexdigest
+            # headers['Range'] = "bytes=#{path.size}-" # uncomment once this is suported
+          end
+          if response = fetcher.downloader.fetch(fetcher.fetch_uri + remote_path, headers)
+            path.open("w") { |f| f.write response }
+          end
         end
       end
     end
