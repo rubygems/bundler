@@ -15,12 +15,12 @@ module Bundler
       end
 
       def names
-        @updater.update([[@cache.names_path, url('names.list')]])
+        @updater.update([[@cache.names_path, url('names')]])
         @cache.names
       end
 
       def versions
-        @updater.update([[@cache.versions_path, url('versions.list')]])
+        @updater.update([[@cache.versions_path, url('versions')]])
         @cache.versions
       end
 
@@ -41,7 +41,7 @@ module Bundler
       private
 
       def url(path)
-        ['api/v2', path].compact.join("/")
+        path
       end
     end
   end
