@@ -13,7 +13,7 @@ module Bundler
       end
 
       def dependency_api_uri(gem_names = [])
-        fetch_uri + "api/v2/info"
+        fetch_uri + "info"
       end
 
       private
