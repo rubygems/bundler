@@ -16,7 +16,7 @@ module Bundler
         end
 
         def generate_bin
-          return if spec.executables.nil? || spec.executables.empty?
+          return if @spec.executables.nil? || @spec.executables.empty?
 
           if Bundler.requires_sudo?
             FileUtils.mkdir_p(@tmp_bin_dir) unless File.exist?(@tmp_bin_dir)
@@ -26,7 +26,7 @@ module Bundler
 
           if Bundler.requires_sudo?
             Bundler.mkdir_p @gem_bin_dir
-            spec.executables.each do |exe|
+            @spec.executables.each do |exe|
               Bundler.sudo "cp -R #{@tmp_bin_dir}/#{exe} #{@gem_bin_dir}"
             end
           end
