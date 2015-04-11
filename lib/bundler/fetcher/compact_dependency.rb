@@ -20,7 +20,7 @@ module Bundler
 
       def compact_gem_list
         @compact_gem_list ||= begin
-          uri_part = [display_uri.hostname, display_uri.port, Digest.hexencode(display_uri.path)].compact.join('.')
+          uri_part = [display_uri.hostname, display_uri.port, Digest::MD5.hexdigest(display_uri.path)].compact.join('.')
           CompactGemList.new(self, Bundler.cache + 'compact_index' + uri_part)
         end
       end
