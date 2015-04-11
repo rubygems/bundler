@@ -3,6 +3,8 @@ module Bundler
     class Path
 
       class Installer < Bundler::GemInstaller
+        attr_reader :spec
+
         def initialize(spec, options = {})
           @spec              = spec
           @tmp_bin_dir       = "#{Bundler.tmp(spec.full_name)}/bin"
