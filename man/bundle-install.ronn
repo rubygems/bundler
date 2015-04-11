@@ -9,7 +9,7 @@ bundle-install(1) -- Install the dependencies specified in your Gemfile
                  [--gemfile=GEMFILE]
                  [--jobs=NUMBER]
                  [--local] [--deployment]
-                 [--no-cache]
+                 [--cache]
                  [--no-prune]
                  [--path PATH] [--system]
                  [--quiet]
@@ -81,10 +81,9 @@ update process below under [CONSERVATIVE UPDATING][].
   Installs the gems specified in the bundle to the system's Rubygems location.
   This overrides any previous [remembered][REMEMBERED OPTIONS] use of `--path`.
 
-* `--no-cache`:
-  Do not update the cache in `vendor/cache` with the newly bundled gems. This
-  does not remove any gems in the cache but keeps the newly bundled gems from
-  being cached during the install.
+* `--cache`:
+  Update the cache in `vendor/cache` with the newly bundled gems during the
+  install.
 
 * `--no-prune`:
   Don't remove stale gems from the cache when the installation finishes.
