@@ -19,7 +19,10 @@ module Bundler
 
       def fetch_spec(spec)
         spec = spec - [nil, 'ruby', '']
-        compact_gem_list.spec(*spec)
+        return unless contents = compact_gem_list.spec(*spec)
+        contents.unshift(spec.first)
+        contents[3].map! { |d| Gem::Dependency.new(*d) }
+        EndpointSpecification.new(*contents)
       end
 
       def available?
