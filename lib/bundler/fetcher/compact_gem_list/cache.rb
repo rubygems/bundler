@@ -43,8 +43,8 @@ module Bundler
       end
 
       def specific_dependency(name, version, platform)
-        pattern = [version, platform].compact!.join("-")
-        matcher = %r{\A#{Regexp.escape(pattern)} } unless pattern.empty?
+        pattern = [version, platform].compact.join("-")
+        matcher = %r{\A#{Regexp.escape(pattern)}\b} unless pattern.empty?
         lines(dependencies_path(name)).each do |line|
           return parse_gem(line) if line =~ matcher
         end if matcher
