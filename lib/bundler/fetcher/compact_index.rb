@@ -5,17 +5,25 @@ module Bundler
   class Fetcher
     class CompactIndex < Base
       def specs(_gem_names)
-        compact_gem_list.versions.values.flatten(1).map! do |args|
+        @specs ||= compact_gem_list.versions.values.flatten(1).map! do |args|
           args = args.fill(nil, args.size..2)
           RemoteSpecification.new(*args, self)
         end
-      rescue HTTPError => e
-        raise unless e.message =~ /^Net::HTTPNotFound/
+      rescue NetworkDownError => e
+        raise HTTPError, e.message
+      rescue AuthenticationRequiredError
+        # We got a 401 from the server. Just fail.
+        raise
+      rescue HTTPError
       end
 
       def fetch_spec(spec)
         spec = spec - [nil, 'ruby', '']
         compact_gem_list.spec(*spec)
+      end
+
+      def available?
+        specs([])
       end
 
       private

@@ -14,8 +14,8 @@ module Bundler
         @display_uri = display_uri
       end
 
-      def api_available?
-        api_fetcher?
+      def available?
+        true
       end
 
       def api_fetcher?

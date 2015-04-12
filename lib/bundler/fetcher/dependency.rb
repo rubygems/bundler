@@ -4,7 +4,7 @@ require "cgi"
 module Bundler
   class Fetcher
     class Dependency < Base
-      def api_available?
+      def available?
         downloader.fetch(dependency_api_uri)
       rescue NetworkDownError => e
         raise HTTPError, e.message
@@ -29,7 +29,7 @@ module Bundler
         end
 
         if query_list.empty?
-          return last_spec_list.map do |*args|
+          return last_spec_list.map do |args|
             EndpointSpecification.new(*args)
           end
         end
