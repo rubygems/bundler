@@ -4,7 +4,7 @@ module Bundler
       attr_reader :directory
 
       def initialize(directory)
-        @directory = p Pathname(directory).expand_path
+        @directory = Pathname(directory).expand_path
         FileUtils.mkdir_p dependencies_path(nil)
       end
 
@@ -21,8 +21,7 @@ module Bundler
         lines(versions_path).map do |line|
           next if line == '-1'
           name, versions_string = line.split(" ", 2)
-          p line unless versions_string
-          versions_string.split(",").map! do |version|
+          versions_by_name[name] ||= versions_string.split(",").map! do |version|
             version.split("-", 2).unshift(name)
           end
         end

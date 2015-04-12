@@ -13,7 +13,6 @@ module Bundler
         raise HTTPError, "Too many redirects" if counter >= redirect_limit
 
         response = request(uri, options)
-        puts *Thread.current.backtrace
         Bundler.ui.debug("HTTP #{response.code} #{response.message}")
 
         case response
