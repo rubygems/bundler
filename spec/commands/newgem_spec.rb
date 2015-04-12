@@ -57,7 +57,6 @@ describe "bundle gem" do
     bundle "gem newgem --bin"
 
     process_file(bundled_app('newgem', "newgem.gemspec")) do |line|
-      next line unless line =~ /TODO/
       # Simulate replacing TODOs with real values
       case line
       when /spec\.metadata\['allowed_push_host'\]/, /spec\.homepage/

@@ -71,16 +71,20 @@ describe Bundler::GemHelper do
     let(:app_version) { "0.1.0" }
     let(:app_gem_dir) { app_path.join("pkg") }
     let(:app_gem_path) { app_gem_dir.join("#{app_name}-#{app_version}.gem") }
-    let(:app_gemspec_content) { File.read(app_gemspec_path) }
+    let(:app_gemspec_content) { remove_push_guard(File.read(app_gemspec_path)) }
 
     before(:each) do
       content = app_gemspec_content.gsub("TODO: ", "")
       content.sub!(/homepage\s+= ".*"/, 'homepage = ""')
+      File.open(app_gemspec_path, "w") { |file| file << content }
+    end
+
+    def remove_push_guard(gemspec_content)
       # Remove exception that prevents public pushes on older RubyGems versions
       if Gem::Version.new(Gem::VERSION) < Gem::Version.new("2.0")
-        content.sub!(/raise "RubyGems 2\.0 or newer.*/, "")
+        gemspec_content.sub!(/raise "RubyGems 2\.0 or newer.*/, "")
       end
-      File.open(app_gemspec_path, "w") { |file| file << content }
+      gemspec_content
     end
 
     it "uses a shell UI for output" do
