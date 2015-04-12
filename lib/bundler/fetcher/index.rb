@@ -6,6 +6,7 @@ module Bundler
     class Index < Base
       def specs(_gem_names)
         Bundler.rubygems.fetch_all_remote_specs(remote).map do |*args|
+          args = args.fill(nil, args.size..2)
           RemoteSpecification.new(*args, self)
         end
       rescue Gem::RemoteFetcher::FetchError, OpenSSL::SSL::SSLError, Net::HTTPFatalError => e
