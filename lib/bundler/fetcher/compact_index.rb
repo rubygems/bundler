@@ -8,6 +8,8 @@ module Bundler
         compact_gem_list.versions.map do |*args|
           RemoteSpecification.new(*args, self)
         end
+      rescue HTTPError => e
+        raise unless e.message =~ /^Net::HTTPNotFound/
       end
 
       def fetch_spec(spec)

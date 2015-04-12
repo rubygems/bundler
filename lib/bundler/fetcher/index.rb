@@ -8,6 +8,7 @@ module Bundler
         old_sources = Bundler.rubygems.sources
         Bundler.rubygems.sources = [remote_uri.to_s]
         Bundler.rubygems.fetch_all_remote_specs[remote_uri].map do |*args|
+          args = args.fill(nil, args.size..2)
           RemoteSpecification.new(*args, self)
         end
       rescue Gem::RemoteFetcher::FetchError, OpenSSL::SSL::SSLError, Net::HTTPFatalError => e

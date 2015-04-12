@@ -22,7 +22,7 @@ module Bundler
         end
         response = fetcher.downloader.fetch(fetcher.fetch_uri + remote_path, headers)
         mode = response === Net::HTTPPartialContent ? "a" : "w"
-        path.open(mode) { |f| f.write response }
+        path.open(mode) { |f| f << response.body }
         if etag_for_file(path) != response["ETag"]
           path.delete
           _update(path, remote_path)
