@@ -7,7 +7,7 @@ module Bundler
       def specs(_gem_names)
         old_sources = Bundler.rubygems.sources
         Bundler.rubygems.sources = [remote_uri.to_s]
-        Bundler.rubygems.fetch_all_remote_specs[remote_uri].map do |*args|
+        Bundler.rubygems.fetch_all_remote_specs[remote_uri].map do |args|
           args = args.fill(nil, args.size..2)
           RemoteSpecification.new(*args, self)
         end
@@ -46,6 +46,15 @@ module Bundler
       rescue MarshalError
         raise HTTPError, "Gemspec #{spec} contained invalid data.\n" \
           "Your network or your gem server is probably having issues right now."
+      end
+
+      private
+
+      # cached gem specification path, if one exists
+      def gemspec_cached_path spec_file_name
+        paths = Bundler.rubygems.spec_cache_dirs.map { |dir| File.join(dir, spec_file_name) }
+        paths = paths.select {|path| File.file? path }
+        paths.first
       end
     end
   end
