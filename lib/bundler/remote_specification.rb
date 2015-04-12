@@ -15,8 +15,8 @@ module Bundler
 
     def initialize(name, version, platform, spec_fetcher)
       @name         = name
-      @version      = version
-      @platform     = platform
+      @version      = Gem::Version.create version
+      @platform     = Gem::Platform.new platform
       @spec_fetcher = spec_fetcher
     end
 
