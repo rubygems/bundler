@@ -43,6 +43,15 @@ module Bundler
         raise HTTPError, "Gemspec #{spec} contained invalid data.\n" \
           "Your network or your gem server is probably having issues right now."
       end
+
+      private
+
+      # cached gem specification path, if one exists
+      def gemspec_cached_path spec_file_name
+        paths = Bundler.rubygems.spec_cache_dirs.map { |dir| File.join(dir, spec_file_name) }
+        paths = paths.select {|path| File.file? path }
+        paths.first
+      end
     end
   end
 end
