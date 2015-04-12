@@ -1,3 +1,12 @@
+## 1.9.3 (2015-04-12)
+
+Bugfixes:
+
+  - handle removal of `specs` from rubygems/rubygems@620910 (#3558, @indirect)
+  - install 'universal' gems on Windows (#3066, @jdmundrawala)
+  - stop passing --local during `rake install` task (#3236, @indirect)
+  - guard against all possible accidental public gem pushes (#3533, @indirect)
+
 ## 1.9.2 (2015-03-30)
 
 Bugfixes:
