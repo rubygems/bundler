@@ -70,7 +70,7 @@ module Bundler
 
   def self.issues_url(exception)
     'https://github.com/bundler/bundler/search?q=' \
-    "#{CGI.escape(exception.message)}&type=Issues"
+    "#{CGI.escape(exception.message.lines.first.chomp)}&type=Issues"
   end
 
 end
