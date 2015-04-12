@@ -21,7 +21,8 @@ module Bundler
           headers['Range'] = "bytes=#{path.size}-"
         end
         response = fetcher.downloader.fetch(fetcher.fetch_uri + remote_path, headers)
-        mode = response === Net::HTTPPartialContent ? "a" : "w"
+        return if Net::HTTPNotModified === response
+        mode = Net::HTTPPartialContent === response ? "a" : "w"
         path.open(mode) { |f| f << response.body }
         if etag_for_file(path) != response["ETag"]
           path.delete
