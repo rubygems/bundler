@@ -140,8 +140,8 @@ module Bundler
       if remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
         @use_api = false
       else
-        fetchers.reject! {|f| f.api_fetcher? && !f.api_available? }
-        @use_api = fetchers.any?(&:api_fetcher?)
+        fetchers.select!(&:available?)
+        @use_api = fetchers.first.api_fetcher?
       end
     end
 

@@ -28,8 +28,8 @@ module Bundler
         end
       end
 
-      def api_available?
-        api_fetcher?
+      def available?
+        true
       end
 
       def api_fetcher?
