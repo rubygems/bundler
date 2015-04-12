@@ -5,7 +5,7 @@ module Bundler
   class Fetcher
     class Dependency < Base
       def available?
-        downloader.fetch(dependency_api_uri)
+        fetch_uri.scheme != "file" && downloader.fetch(dependency_api_uri)
       rescue NetworkDownError => e
         raise HTTPError, e.message
       rescue AuthenticationRequiredError

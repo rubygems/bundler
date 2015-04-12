@@ -26,7 +26,7 @@ module Bundler
       end
 
       def available?
-        specs([])
+        fetch_uri.scheme != "file" && specs([])
       end
 
       private
