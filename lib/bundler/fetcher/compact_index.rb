@@ -5,7 +5,7 @@ module Bundler
   class Fetcher
     class CompactIndex < Base
       def specs(_gem_names)
-        compact_gem_list.versions.values.flatten(1).map! do |*args|
+        compact_gem_list.versions.values.flatten(1).map! do |args|
           args = args.fill(nil, args.size..2)
           RemoteSpecification.new(*args, self)
         end
