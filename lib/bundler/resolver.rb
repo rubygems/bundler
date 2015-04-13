@@ -324,8 +324,8 @@ module Bundler
             end
           else
             message = "Could not find gem '#{requirement}' "
-            if @index.source_types.include?(Bundler::Source::Rubygems)
-              message << "in any of the gem sources listed in your Gemfile."
+            if Bundler.definition.has_rubygems_remotes?
+              message << "in any of the gem sources listed in your Gemfile or installed on this machine."
             else
               message << "in the gems available on this machine."
             end
