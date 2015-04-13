@@ -8,7 +8,7 @@ module Bundler
       Gem::Platform::RUBY == platform or
       platform.nil? or p == platform or
       generic(Gem::Platform.new(platform)) == p or
-      platform === p
+      Gem::Platform.new(platform) === p
     end
   end
 end
