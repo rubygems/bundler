@@ -35,6 +35,7 @@ describe "Resolving platform craziness" do
         platforms "mingw32 mswin32 x64-mingw32" do |platform|
           gem "thin", "1.2.7", platform
         end
+        gem "win32-api", "1.5.1", "universal-mingw32"
       end
     end
 
@@ -56,6 +57,18 @@ describe "Resolving platform craziness" do
       platforms "x64-mingw32"
       dep "thin"
       should_resolve_as %w(thin-1.2.7-x64-mingw32)
+    end
+
+    it "finds universal-mingw gems on x86-mingw" do
+      platform "x86-mingw32"
+      dep "win32-api"
+      should_resolve_as %w(win32-api-1.5.1-universal-mingw32)
+    end
+
+    it "finds universal-mingw gems on x64-mingw" do
+      platform "x64-mingw32"
+      dep "win32-api"
+      should_resolve_as %w(win32-api-1.5.1-universal-mingw32)
     end
   end
 
