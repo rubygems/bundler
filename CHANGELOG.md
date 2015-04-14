@@ -1,3 +1,10 @@
+## 1.9.4 (2015-04-13)
+
+Bugfixes:
+
+  - fix regression in installing x86 and universal gems (#3565, @jdmundrawala)
+  - improve error when gems are missing (#3564, @sealocal)
+
 ## 1.9.3 (2015-04-12)
 
 Bugfixes:
