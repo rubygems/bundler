@@ -94,7 +94,7 @@ describe "post bundle message" do
       it "should report a helpufl error message" do
         bundle :install
         expect(out).to include("Fetching gem metadata from https://rubygems.org/")
-        expect(out).to include("Could not find gem 'misspelled-gem-name (>= 0) ruby' in any of the gem sources listed in your Gemfile or installed on this machine.")
+        expect(out).to include("Could not find gem 'misspelled-gem-name (>= 0) ruby' in any of the gem sources listed in your Gemfile or available on this machine.")
       end
     end
   end
