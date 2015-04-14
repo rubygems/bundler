@@ -4,6 +4,11 @@ require 'bundler/worker'
 class ParallelInstaller
 
   class SpecInstallation
+
+    def ignorable_dependency?(dep)
+      dep.type == :development || dep.name == @name
+    end
+
     attr_accessor :spec, :name, :post_install_message, :state
     def initialize(spec)
       @spec, @name = spec, spec.name
@@ -27,10 +32,18 @@ class ParallelInstaller
       post_install_message.empty?
     end
 
+    def dependencies_installed?(specs)
+      installed_specs = specs.reject(&:installed?).map(&:name)
+      already_installed = lambda {|dep| installed_specs.include? dep.name }
+      dependencies.all? &already_installed
     end
 
+    def dependencies
+      @dependencies ||= all_dependencies.reject {|dep| ignorable_dependency? dep }
     end
 
+    def all_dependencies
+      @spec.dependencies
     end
   end
 
