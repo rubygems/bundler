@@ -2,7 +2,7 @@ require 'uri'
 
 module Bundler
   class Settings
-    BOOL_KEYS = %w(frozen cache_all no_prune disable_local_branch_check gem.mit gem.coc send_usage_data).freeze
+    BOOL_KEYS = %w(frozen cache_all no_prune disable_local_branch_check gem.mit gem.coc).freeze
 
     def initialize(root = nil)
       @root          = root
