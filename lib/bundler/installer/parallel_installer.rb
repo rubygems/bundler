@@ -4,35 +4,33 @@ require 'bundler/worker'
 class ParallelInstaller
 
   class SpecInstallation
-    attr_accessor :installed, :spec, :name, :post_install_message, :enqueued
+    attr_accessor :spec, :name, :post_install_message, :state
     def initialize(spec)
       @spec, @name = spec, spec.name
-      @installed = false
-      @enqueued = false
+      @state = :none
       @post_install_message = ""
     end
 
     def installed?
-      !!installed
+      state == :installed
+    end
+
+    def enqueued?
+      state == :enqueued
+    end
+
+    def ready_to_enqueue?
+      !installed? && !enqueued?
     end
 
     def has_post_install_message?
       post_install_message.empty?
     end
 
-    def enqueued?
-      !!enqueued
     end
 
-    def installing?
-      !installed? && enqueued?
     end
 
-    def ready_to_install?(specs)
-      @spec.dependencies.none? do |dep|
-        next if dep.type == :development || dep.name == @name
-        specs.reject(&:installed?).map(&:name).include? dep.name
-      end
     end
   end
 
@@ -62,14 +60,13 @@ class ParallelInstaller
     @worker_pool ||= Bundler::Worker.new @size, lambda { |spec_install, worker_num|
       message = @installer.install_gem_from_spec spec_install.spec, @standalone, worker_num
       spec_install.post_install_message = message unless message.nil?
-      spec_install.installed = true
       spec_install
     }
   end
 
   def process_specs
     spec = worker_pool.deq
-    spec.enqueued = false
+    spec.state = :installed
     collect_post_install_message spec if spec.has_post_install_message?
     enqueue_specs
   end
@@ -84,10 +81,10 @@ class ParallelInstaller
   # previously installed specifications. We continue until all specs
   # are installed.
   def enqueue_specs
-    @specs.reject(&:installing?).each do |spec|
       if spec.ready_to_install? @specs
+    @specs.select(&:ready_to_enqueue?).each do |spec|
         worker_pool.enq spec
-        spec.enqueued = true
+        spec.state = :enqueued
       end
     end
   end
