@@ -94,8 +94,8 @@ class ParallelInstaller
   # previously installed specifications. We continue until all specs
   # are installed.
   def enqueue_specs
-      if spec.ready_to_install? @specs
     @specs.select(&:ready_to_enqueue?).each do |spec|
+      if spec.dependencies_installed? @specs
         worker_pool.enq spec
         spec.state = :enqueued
       end
