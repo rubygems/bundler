@@ -5,10 +5,6 @@ class ParallelInstaller
 
   class SpecInstallation
 
-    def ignorable_dependency?(dep)
-      dep.type == :development || dep.name == @name
-    end
-
     attr_accessor :spec, :name, :post_install_message, :state
     def initialize(spec)
       @spec, @name = spec, spec.name
@@ -30,6 +26,10 @@ class ParallelInstaller
 
     def has_post_install_message?
       post_install_message.empty?
+    end
+
+    def ignorable_dependency?(dep)
+      dep.type == :development || dep.name == @name
     end
 
     def dependencies_installed?(specs)
@@ -55,10 +55,11 @@ class ParallelInstaller
     [Bundler.settings[:jobs].to_i-1, 1].max
   end
 
-  def initialize(installer, all_specs, size, standalone)
+  def initialize(installer, all_specs, size, standalone, force)
     @installer = installer
     @size = size
     @standalone = standalone
+    @force = force
     @specs = all_specs.map { |s| SpecInstallation.new(s) }
   end
 
@@ -71,7 +72,7 @@ class ParallelInstaller
 
   def worker_pool
     @worker_pool ||= Bundler::Worker.new @size, lambda { |spec_install, worker_num|
-      message = @installer.install_gem_from_spec spec_install.spec, @standalone, worker_num
+      message = @installer.install_gem_from_spec spec_install.spec, @standalone, worker_num, @force
       spec_install.post_install_message = message unless message.nil?
       spec_install
     }
