@@ -5,6 +5,14 @@ describe "Gem::Specification#match_platform" do
     darwin = gem "lol", "1.0", "platform_specific-1.0-x86-darwin-10"
     expect(darwin.match_platform(pl('java'))).to eq(false)
   end
+
+  context "when platform is a string" do
+    it "matches when platform is a string" do
+      lazy_spec = Bundler::LazySpecification.new("lol", "1.0", "universal-mingw32")
+      expect(lazy_spec.match_platform(pl('x86-mingw32'))).to eq(true)
+      expect(lazy_spec.match_platform(pl('x64-mingw32'))).to eq(true)
+    end
+  end
 end
 
 describe "Bundler::GemHelpers#generic" do
@@ -49,12 +57,12 @@ describe "Gem::SourceIndex#refresh!" do
   end
 
   it "does not explode when called", :if => rubygems_1_7 do
-    run "Gem.source_index.refresh!"
-    run "Gem::SourceIndex.new([]).refresh!"
+    run "Gem.source_index.refresh!", :expect_err => true
+    run "Gem::SourceIndex.new([]).refresh!", :expect_err => true
   end
 
   it "does not explode when called", :unless => rubygems_1_7 do
-    run "Gem.source_index.refresh!"
-    run "Gem::SourceIndex.from_gems_in([]).refresh!"
+    run "Gem.source_index.refresh!", :expect_err => true
+    run "Gem::SourceIndex.from_gems_in([]).refresh!", :expect_err => true
   end
 end

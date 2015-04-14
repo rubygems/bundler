@@ -1,3 +1,29 @@
+## 1.9.4 (2015-04-13)
+
+Bugfixes:
+
+  - fix regression in installing x86 and universal gems (#3565, @jdmundrawala)
+  - improve error when gems are missing (#3564, @sealocal)
+
+## 1.9.3 (2015-04-12)
+
+Bugfixes:
+
+  - handle removal of `specs` from rubygems/rubygems@620910 (#3558, @indirect)
+  - install 'universal' gems on Windows (#3066, @jdmundrawala)
+  - stop passing --local during `rake install` task (#3236, @indirect)
+  - guard against all possible accidental public gem pushes (#3533, @indirect)
+
+## 1.9.2 (2015-03-30)
+
+Bugfixes:
+
+  - ensure gem executables are executable (#3517, #3511, @indirect)
+  - fix warnings in Molinillo (#3516, @segiddins)
+  - ensure duplicate dependencies do not propagate (#3522, @segiddins)
+  - keep gems locked when updating another gem from the same source (#3520, @indirect)
+  - resolve race that could build gems without saved arguments (#3404, @indirect)
+
 ## 1.9.1 (2015-03-21)
 
 Bugfixes:
@@ -31,6 +57,13 @@ Features:
 
   - Molinillo resolver, shared with CocoaPods (@segiddins)
   - updated Thor to v0.19.1 (@segiddins)
+
+## 1.8.6 (2015-03-30)
+
+Bugfixes:
+
+  - keep gems locked when updating another gem from the same source (#3250, @indirect)
+  - resolve race that could build gems without saved arguments (#3404, @indirect)
 
 ## 1.8.5 (2015-03-11)
 

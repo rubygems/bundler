@@ -54,6 +54,11 @@ module Bundler
         "bin/setup.tt" => "bin/setup"
       }
 
+      executables = %w[
+        bin/console
+        bin/setup
+      ]
+
       if ask_and_set(:coc, "Do you want to include a code of conduct in gems you generate?",
           "Codes of conduct can increase contributions to your project by contributors who " \
           "prefer collaborative, safe spaces. You can read more about the code of conduct at " \
@@ -106,6 +111,12 @@ module Bundler
 
       templates.each do |src, dst|
         thor.template("newgem/#{src}", target.join(dst), config)
+      end
+
+      executables.each do |file|
+        path = target.join(file)
+        executable = (path.stat.mode | 0111)
+        path.chmod(executable)
       end
 
       Bundler.ui.info "Initializing git repo in #{target}"

@@ -49,7 +49,7 @@ describe "bundle lock" do
         with_license
 
       BUNDLED WITH
-        1.9.1
+        #{Bundler::VERSION}
     L
   end
 
@@ -84,7 +84,7 @@ describe "bundle lock" do
   it "does not fetch remote specs when using the --local option" do
     bundle "lock --update --local"
 
-    expect(out).to include("in the gems available on this machine.")
+    expect(out).to include("available on this machine.")
   end
 
   it "writes to a custom location using --lockfile" do
