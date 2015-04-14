@@ -79,6 +79,8 @@ module Bundler
         options["local"] ? @definition.resolve_with_cache! : @definition.resolve_remotely!
       end
 
+      force = options["force"]
+
       # the order that the resolver provides is significant, since
       # dependencies might actually affect the installation of a gem.
       # that said, it's a rare situation (other than rake), and parallel
@@ -86,23 +88,23 @@ module Bundler
       jobs = [Bundler.settings[:jobs].to_i-1, 1].max
       if jobs > 1 && can_install_in_parallel?
         require 'bundler/installer/parallel_installer'
-        install_in_parallel jobs, options[:standalone]
+        install_in_parallel jobs, options[:standalone], force
       else
-        install_sequentially options[:standalone]
+        install_sequentially options[:standalone], force
       end
 
       lock unless Bundler.settings[:frozen]
       generate_standalone(options[:standalone]) if options[:standalone]
     end
 
-    def install_gem_from_spec(spec, standalone = false, worker = 0)
+    def install_gem_from_spec(spec, standalone = false, worker = 0, force = false)
       # Fetch the build settings, if there are any
       settings             = Bundler.settings["build.#{spec.name}"]
       install_message      = nil
       post_install_message = nil
       debug_message        = nil
       Bundler.rubygems.with_build_args [settings] do
-        install_message, post_install_message, debug_message = spec.source.install(spec)
+        install_message, post_install_message, debug_message = spec.source.install(spec, force)
         if install_message.include? 'Installing'
           Bundler.ui.confirm install_message
         else
@@ -259,7 +261,7 @@ module Bundler
       end
     end
 
-    def install_sequentially(standalone)
+    def install_sequentially(standalone, force = false)
       specs.each do |spec|
         message = install_gem_from_spec spec, standalone
         if message
@@ -268,8 +270,8 @@ module Bundler
       end
     end
 
-    def install_in_parallel(size, standalone)
-      ParallelInstaller.call(self, specs, size, standalone)
+    def install_in_parallel(size, standalone, force = false)
+      ParallelInstaller.call(self, specs, size, standalone, force)
     end
 
 
