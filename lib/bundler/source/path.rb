@@ -69,7 +69,7 @@ module Bundler
         File.basename(expanded_path.to_s)
       end
 
-      def install(spec)
+      def install(spec, force = false)
         generate_bin(spec, :disable_extensions)
         ["Using #{version_message(spec)} from #{to_s}", nil]
       end

@@ -44,6 +44,11 @@ module Bundler
         install_gem(built_gem_path)
       end
 
+      desc "Build and install #{name}-#{version}.gem into system gems without network access."
+      task 'install:local' => 'build' do
+        install_gem(built_gem_path, :local)
+      end
+
       desc "Create tag #{version_tag} and build and push #{name}-#{version}.gem to Rubygems\n" \
            "To prevent publishing in Rubygems use `gem_push=no rake release`"
       task 'release' => ['build', 'release:guard_clean',
@@ -76,9 +81,9 @@ module Bundler
       File.join(base, 'pkg', file_name)
     end
 
-    def install_gem(built_gem_path=nil)
+    def install_gem(built_gem_path = nil, local = false)
       built_gem_path ||= build_gem
-      out, _ = sh_with_code("gem install '#{built_gem_path}' --local")
+      out, _ = sh_with_code("gem install '#{built_gem_path}'#{' --local' if local}")
       raise "Couldn't install gem, run `gem install #{built_gem_path}' for more detailed output" unless out[/Successfully installed/]
       Bundler.ui.confirm "#{name} (#{version}) installed."
     end

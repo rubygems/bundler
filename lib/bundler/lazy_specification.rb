@@ -41,7 +41,7 @@ module Bundler
         out = "    #{name} (#{version}-#{platform})\n"
       end
 
-      dependencies.sort_by {|d| d.to_s }.each do |dep|
+      dependencies.sort_by {|d| d.to_s }.uniq.each do |dep|
         next if dep.type == :development
         out << "    #{dep.to_lock}\n"
       end
