@@ -3,6 +3,45 @@ require 'spec_helper'
 require 'bundler'
 
 describe Bundler do
+  describe "version 1.99" do
+    context "when bundle is run" do
+      it "should print a single deprecation warning" do
+        # install_gemfile calls `bundle :install, opts`
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rack"
+        G
+
+        expect(err).to eq("DEPRECATION: Gemfile and Gemfile.lock will be " \
+         "deprecated and replaced with gems.rb and gems.locked in " \
+         "Bundler 2.0.0.")
+        expect(err).to lack_errors
+      end
+    end
+
+    context "when Bundler.setup is run in a ruby script" do
+
+      it "should print a single deprecation warning" do
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rack", :group => :test
+        G
+
+        ruby <<-RUBY
+          require 'rubygems'
+          require 'bundler'
+          Bundler.setup
+          Bundler.setup
+        RUBY
+
+        expect(err).to eq("DEPRECATION: Gemfile and Gemfile.lock will be " \
+         "deprecated and replaced with gems.rb and gems.locked in " \
+         "Bundler 2.0.0.")
+        expect(err).to lack_errors
+      end
+    end
+  end
+
   describe "#load_gemspec_uncached" do
     let(:app_gemspec_path) { tmp("test.gemspec") }
     subject { Bundler.load_gemspec_uncached(app_gemspec_path) }

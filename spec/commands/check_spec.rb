@@ -210,7 +210,7 @@ describe "bundle check" do
     3.times do |i|
       bundle :check
       expect(out).to eq(last_out)
-      expect(err).to be_empty
+      expect(err).to lack_errors
     end
   end
 
