@@ -2,6 +2,10 @@
 
 In the transition from Bundler 1 to Bundler 2, we've made some changes that break backwards compatibility. Each of those changes was carefully selected to make working with Bundler easier to understand, easier to use, and faster. This list will help you get up to speed on the changes, and you'll be back to using Bundler in no time.
 
+### Start with Bundler 1.99
+
+If you're running Bundler 1.x right now, we've created a release specifically to help you migrate to Bundler 2.0. Install Bundler 1.99 and use it. We'll print warnings for anything that's going to change or be removed, so you can get ready for it in advance. Once you're using Bundler 1.99 without any warnings, you should be able to switch to 2.0 and have things just keep working.
+
 #### Changed: Remembered config flags
 
 The way that running `bundle install` with options causes those options to be remembered for all future runs of Bundler has caused a lot of confusion. It's "easy", but it's not the way that any other programs work, and it causes lots of problems when people forget that they once ran Bundler with an option weeks or months before.
