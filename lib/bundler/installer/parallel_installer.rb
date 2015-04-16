@@ -35,7 +35,7 @@ class ParallelInstaller
     def dependencies_installed?(specs)
       installed_specs = specs.reject(&:installed?).map(&:name)
       already_installed = lambda {|dep| installed_specs.include? dep.name }
-      dependencies.all? &already_installed
+      dependencies.all? {|d| already_installed(d) }
     end
 
     def dependencies
