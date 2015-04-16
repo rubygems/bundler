@@ -47,8 +47,8 @@ class ParallelInstaller
     end
   end
 
-  def self.call(*options)
-    new(*options).call
+  def self.call(*args)
+    new(*args).call
   end
 
   def self.max_threads
