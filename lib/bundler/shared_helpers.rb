@@ -18,7 +18,6 @@ end
 module Bundler
   module SharedHelpers
     attr_accessor :gem_loaded
-    @@warning_printed = false
 
     def default_gemfile
       Bundler.ui.deprecate("Gemfile and Gemfile.lock are " \
