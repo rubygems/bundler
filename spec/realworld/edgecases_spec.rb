@@ -1,5 +1,5 @@
 require 'spec_helper'
-
+=begin
 describe "real world edgecases", :realworld => true do
   # there is no rbx-relative-require gem that will install on 1.9
   it "ignores extra gems with bad platforms", :ruby => "1.8" do
@@ -210,3 +210,4 @@ describe "real world edgecases", :realworld => true do
     expect(exitstatus).to eq(0) if exitstatus
   end
 end
+=end

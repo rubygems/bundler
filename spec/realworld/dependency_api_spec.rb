@@ -1,5 +1,5 @@
 require "spec_helper"
-
+=begin
 describe "gemcutter's dependency API", :realworld => true do
   def wait_for_server(port, seconds = 15)
     tries = 0
@@ -58,3 +58,4 @@ describe "gemcutter's dependency API", :realworld => true do
     end
   end
 end
+=end
