@@ -43,10 +43,11 @@ module Bundler
     # @param unlock [Hash, Boolean, nil] Gems that have been requested
     #   to be updated or true if all gems should be updated
     # @param ruby_version [Bundler::RubyVersion, nil] Requested Ruby Version
-    def initialize(lockfile, dependencies, sources, unlock, ruby_version = nil)
+    # @param optional_groups [Array(String)] A list of optional groups
+    def initialize(lockfile, dependencies, sources, unlock, ruby_version = nil, optional_groups = [])
       @unlocking = unlock == true || !unlock.empty?
 
-      @dependencies, @sources, @unlock = dependencies, sources, unlock
+      @dependencies, @sources, @unlock, @optional_groups = dependencies, sources, unlock, optional_groups
       @remote            = false
       @specs             = nil
       @lockfile_contents = ""
@@ -56,6 +57,7 @@ module Bundler
         @lockfile_contents = Bundler.read_file(lockfile)
         locked = LockfileParser.new(@lockfile_contents)
         @platforms      = locked.platforms
+        @locked_bundler_version = locked.bundler_version
 
         if unlock != true
           @locked_deps    = locked.dependencies
@@ -161,7 +163,7 @@ module Bundler
 
     def requested_specs
       @requested_specs ||= begin
-        groups = self.groups - Bundler.settings.without
+        groups = requested_groups
         groups.map! { |g| g.to_sym }
         specs_for(groups)
       end
@@ -256,6 +258,16 @@ module Bundler
         "#{File.expand_path(file)}"
     end
 
+    # Returns the version of Bundler that is creating or has created
+    # Gemfile.lock. Used in #to_lock.
+    def lock_version
+      if @locked_bundler_version && @locked_bundler_version < Gem::Version.new(Bundler::VERSION)
+        new_version = Bundler::VERSION
+      end
+
+      new_version || @locked_bundler_version || Bundler::VERSION
+    end
+
     def to_lock
       out = ""
 
@@ -272,7 +284,7 @@ module Bundler
           each do |spec|
             next if spec.name == 'bundler'
             out << spec.to_lock
-        end
+          end
         out << "\n"
       end
 
@@ -293,6 +305,10 @@ module Bundler
           out << dep.to_lock
           handled << dep.name
       end
+
+      # Record the version of Bundler that was used to create the lockfile
+      out << "\nBUNDLED WITH\n"
+      out << "  #{lock_version}\n"
 
       out
     end
@@ -561,8 +577,11 @@ module Bundler
       resolve
     end
 
-    def in_locked_deps?(dep, d)
-      d && dep.source == d.source
+    def in_locked_deps?(dep, locked_dep)
+      # Because the lockfile can't link a dep to a specific remote, we need to
+      # treat sources as equivalent anytime the locked dep has all the remotes
+      # that the Gemfile dep does.
+      locked_dep && locked_dep.source && dep.source && locked_dep.source.include?(dep.source)
     end
 
     def satisfies_locked_spec?(dep)
@@ -586,7 +605,7 @@ module Bundler
     end
 
     def requested_dependencies
-      groups = self.groups - Bundler.settings.without
+      groups = requested_groups
       groups.map! { |g| g.to_sym }
       dependencies.reject { |d| !d.should_include? || (d.groups & groups).empty? }
     end
@@ -620,5 +639,8 @@ module Bundler
       names
     end
 
+    def requested_groups
+      self.groups - Bundler.settings.without - @optional_groups + Bundler.settings.with
+    end
   end
 end

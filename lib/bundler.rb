@@ -211,7 +211,7 @@ module Bundler
     end
 
     def cleanup
-      FileUtils.remove_entry_secure(@tmp) if @tmp
+      FileUtils.remove_entry_secure(@tmp) if defined?(@tmp) && @tmp
     rescue
     end
 

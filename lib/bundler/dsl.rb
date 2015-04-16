@@ -21,6 +21,7 @@ module Bundler
       @git_sources     = {}
       @dependencies    = []
       @groups          = []
+      @optional_groups = []
       @platforms       = []
       @env             = nil
       @ruby_version    = nil
@@ -37,6 +38,7 @@ module Bundler
 
     def gemspec(opts = nil)
       path              = opts && opts[:path] || '.'
+      glob              = opts && opts[:glob]
       name              = opts && opts[:name] || '{,*}'
       development_group = opts && opts[:development_group] || :development
       expanded_path     = File.expand_path(path, Bundler.default_gemfile.dirname)
@@ -47,7 +49,7 @@ module Bundler
       when 1
         spec = Bundler.load_gemspec(gemspecs.first)
         raise InvalidOption, "There was an error loading the gemspec at #{gemspecs.first}." unless spec
-        gem spec.name, :path => path
+        gem spec.name, :path => path, :glob => glob
         group(development_group) do
           spec.development_dependencies.each do |dep|
             gem dep.name, *(dep.requirement.as_list + [:type => :development])
@@ -153,11 +155,20 @@ module Bundler
     end
 
     def to_definition(lockfile, unlock)
-      Definition.new(lockfile, @dependencies, @sources, unlock, @ruby_version)
+      Definition.new(lockfile, @dependencies, @sources, unlock, @ruby_version, @optional_groups)
     end
 
     def group(*args, &blk)
+      opts = Hash === args.last ? args.pop.dup : {}
+      normalize_group_options(opts, args)
+
       @groups.concat args
+
+      if opts["optional"]
+        optional_groups = args - @optional_groups
+        @optional_groups.concat optional_groups
+      end
+
       yield
     ensure
       args.each { @groups.pop }
@@ -217,7 +228,7 @@ module Bundler
     end
 
     def valid_keys
-      @valid_keys ||= %w(group groups git path name branch ref tag require submodules platform platforms type source)
+      @valid_keys ||= %w(group groups git path glob name branch ref tag require submodules platform platforms type source)
     end
 
     def normalize_options(name, version, opts)
@@ -231,19 +242,7 @@ module Bundler
       normalize_hash(opts)
 
       git_names = @git_sources.keys.map(&:to_s)
-
-      invalid_keys = opts.keys - (valid_keys + git_names)
-      if invalid_keys.any?
-        message = "You passed #{invalid_keys.map{|k| ':'+k }.join(", ")} "
-        message << if invalid_keys.size > 1
-                     "as options for gem '#{name}', but they are invalid."
-                   else
-                     "as an option for gem '#{name}', but it is invalid."
-                   end
-
-        message << " Valid options are: #{valid_keys.join(", ")}"
-        raise InvalidOption, message
-      end
+      validate_keys("gem '#{name}'", opts, valid_keys + git_names)
 
       groups = @groups.dup
       opts["group"] = opts.delete("groups") || opts["group"]
@@ -286,6 +285,30 @@ module Bundler
       opts["env"]     ||= @env
       opts["platforms"] = platforms.dup
       opts["group"]     = groups
+    end
+
+    def normalize_group_options(opts, groups)
+      normalize_hash(opts)
+
+      groups = groups.map {|group| ":#{group}" }.join(", ")
+      validate_keys("group #{groups}", opts, %w(optional))
+
+      opts["optional"] ||= false
+    end
+
+    def validate_keys(command, opts, valid_keys)
+      invalid_keys = opts.keys - valid_keys
+      if invalid_keys.any?
+        message = "You passed #{invalid_keys.map{|k| ':'+k }.join(", ")} "
+        message << if invalid_keys.size > 1
+                     "as options for #{command}, but they are invalid."
+                   else
+                     "as an option for #{command}, but it is invalid."
+                   end
+
+        message << " Valid options are: #{valid_keys.join(", ")}"
+        raise InvalidOption, message
+      end
     end
 
     def normalize_source(source)
@@ -422,4 +445,5 @@ module Bundler
     end
 
   end
+
 end

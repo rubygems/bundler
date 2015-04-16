@@ -1,13 +1,14 @@
 require 'bundler/vendored_persistent'
-require 'securerandom'
 require 'cgi'
+require 'securerandom'
 
 module Bundler
 
   # Handles all the fetching with the rubygems server
   class Fetcher
-    require 'bundler/fetcher/dependency_fetcher'
-    require 'bundler/fetcher/index_fetcher'
+    autoload :Downloader, 'bundler/fetcher/downloader'
+    autoload :Dependency, 'bundler/fetcher/dependency'
+    autoload :Index, 'bundler/fetcher/index'
 
     # This error is raised when it looks like the network is down
     class NetworkDownError < HTTPError; end
@@ -55,58 +56,11 @@ module Bundler
 
     class << self
       attr_accessor :disable_endpoint, :api_timeout, :redirect_limit, :max_retries
-
-      Fetcher.redirect_limit = 5  # How many redirects to allow in one request
-      Fetcher.api_timeout    = 10 # How long to wait for each API call
-      Fetcher.max_retries    = 3  # How many retries for the API call
-
-      def download_gem_from_uri(spec, uri)
-        spec.fetch_platform
-
-        download_path = Bundler.requires_sudo? ? Bundler.tmp(spec.full_name) : Bundler.rubygems.gem_dir
-        gem_path = "#{Bundler.rubygems.gem_dir}/cache/#{spec.full_name}.gem"
-
-        FileUtils.mkdir_p("#{download_path}/cache")
-        Bundler.rubygems.download_gem(spec, uri, download_path)
-
-        if Bundler.requires_sudo?
-          Bundler.mkdir_p "#{Bundler.rubygems.gem_dir}/cache"
-          Bundler.sudo "mv #{Bundler.tmp(spec.full_name)}/cache/#{spec.full_name}.gem #{gem_path}"
-        end
-
-        gem_path
-      end
-
-      def user_agent
-        @user_agent ||= begin
-          ruby = Bundler.ruby_version
-
-          agent = "bundler/#{Bundler::VERSION}"
-          agent << " rubygems/#{Gem::VERSION}"
-          agent << " ruby/#{ruby.version}"
-          agent << " (#{ruby.host})"
-          agent << " command/#{ARGV.first}"
-
-          if ruby.engine != "ruby"
-            # engine_version raises on unknown engines
-            engine_version = ruby.engine_version rescue "???"
-            agent << " #{ruby.engine}/#{engine_version}"
-          end
-
-          agent << " options/#{Bundler.settings.all.join(",")}"
-
-          # add a random ID so we can consolidate runs server-side
-          agent << " " << SecureRandom.hex(8)
-
-          # add any user agent strings set in the config
-          extra_ua = Bundler.settings[:user_agent]
-          agent << " " << extra_ua if extra_ua
-
-          agent
-        end
-      end
-
     end
+
+    self.redirect_limit = 5  # How many redirects to allow in one request
+    self.api_timeout    = 10 # How long to wait for each API call
+    self.max_retries    = 3  # How many retries for the API call
 
     def initialize(remote)
       @remote = remote
@@ -130,7 +84,7 @@ module Bundler
       elsif cached_spec_path = gemspec_cached_path(spec_file_name)
         Bundler.load_gemspec(cached_spec_path)
       else
-        Bundler.load_marshal Gem.inflate(fetchers.first.fetch uri)
+        Bundler.load_marshal Gem.inflate(downloader.fetch uri)
       end
     rescue MarshalError
       raise HTTPError, "Gemspec #{spec} contained invalid data.\n" \
@@ -140,7 +94,7 @@ module Bundler
     # return the specs in the bundler format as an index
     def specs(gem_names, source)
       old = Bundler.rubygems.sources
-      index = Index.new
+      index = Bundler::Index.new
 
       specs = {}
       fetchers.dup.each do |f|
@@ -183,17 +137,46 @@ module Bundler
       end
     end
 
+    def user_agent
+      @user_agent ||= begin
+        ruby = Bundler.ruby_version
+
+        agent = "bundler/#{Bundler::VERSION}"
+        agent << " rubygems/#{Gem::VERSION}"
+        agent << " ruby/#{ruby.version}"
+        agent << " (#{ruby.host})"
+        agent << " command/#{ARGV.first}"
+
+        if ruby.engine != "ruby"
+          # engine_version raises on unknown engines
+          engine_version = ruby.engine_version rescue "???"
+          agent << " #{ruby.engine}/#{engine_version}"
+        end
+
+        agent << " options/#{Bundler.settings.all.join(",")}"
+
+        # add a random ID so we can consolidate runs server-side
+        agent << " " << SecureRandom.hex(8)
+
+        # add any user agent strings set in the config
+        extra_ua = Bundler.settings[:user_agent]
+        agent << " " << extra_ua if extra_ua
+
+        agent
+      end
+    end
+
+    def fetchers
+      @fetchers ||= FETCHERS.map { |f| f.new(downloader, remote_uri, fetch_uri, uri) }
+    end
+
     def inspect
       "#<#{self.class}:0x#{object_id} uri=#{uri}>"
     end
 
-    def fetchers
-      @fetchers ||= FETCHERS.map { |f| f.new(connection, remote_uri, fetch_uri, uri) }
-    end
-
   private
 
-    FETCHERS = [DependencyFetcher, IndexFetcher]
+    FETCHERS = [Dependency, Index]
 
     def connection
       @connection ||= begin
@@ -217,7 +200,7 @@ module Bundler
         end
 
         con.read_timeout = Fetcher.api_timeout
-        con.override_headers["User-Agent"] = self.class.user_agent
+        con.override_headers["User-Agent"] = user_agent
         con
       end
     end
@@ -269,5 +252,10 @@ module Bundler
     def remote_uri
       @remote.uri
     end
+
+    def downloader
+      @downloader ||= Downloader.new(connection, self.class.redirect_limit)
+    end
+
   end
 end

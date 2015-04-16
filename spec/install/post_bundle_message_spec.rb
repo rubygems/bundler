@@ -81,6 +81,22 @@ describe "post bundle message" do
         expect(out).to include(bundle_complete_message)
       end
     end
+
+    describe "with misspelled or non-existent gem name" do
+      before :each do
+        gemfile <<-G
+          source 'https://rubygems.org/'
+          gem "rails"
+          gem "misspelled-gem-name", :group => :development
+        G
+      end
+
+      it "should report a helpufl error message" do
+        bundle :install
+        expect(out).to include("Fetching gem metadata from https://rubygems.org/")
+        expect(out).to include("Could not find gem 'misspelled-gem-name (>= 0) ruby' in any of the gem sources listed in your Gemfile or available on this machine.")
+      end
+    end
   end
 
   describe "for second bundle install run" do

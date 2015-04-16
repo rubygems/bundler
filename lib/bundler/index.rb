@@ -81,10 +81,6 @@ module Bundler
       end
     end
 
-    def source_types
-      sources.map{|s| s.class }.uniq
-    end
-
     alias [] search
 
     def <<(spec)

@@ -1,10 +1,10 @@
-require 'bundler/fetcher/fetcher_impl'
+require 'bundler/fetcher/base'
 
 module Bundler
   class Fetcher
-    class DependencyFetcher < FetcherImpl
+    class Dependency < Base
       def api_available?
-        fetch(dependency_api_uri)
+        downloader.fetch(dependency_api_uri)
       rescue NetworkDownError => e
         raise HTTPError, e.message
       rescue AuthenticationRequiredError
@@ -48,7 +48,7 @@ module Bundler
         deps_list = []
 
         gem_names.each_slice(Source::Rubygems::API_REQUEST_SIZE) do |names|
-          marshalled_deps = fetch dependency_api_uri(names)
+          marshalled_deps = downloader.fetch dependency_api_uri(names)
           gem_list += Bundler.load_marshal(marshalled_deps)
         end
 
@@ -70,6 +70,19 @@ module Bundler
         uri.query = "gems=#{URI.encode(gem_names.join(","))}" if gem_names.any?
         uri
       end
+
+      def well_formed_dependency(name, *requirements)
+        Gem::Dependency.new(name, *requirements)
+      rescue ArgumentError => e
+        illformed = 'Ill-formed requirement ["#<YAML::Syck::DefaultKey'
+        raise e unless e.message.include?(illformed)
+        puts # we shouldn't print the error message on the "fetching info" status line
+        raise GemspecError,
+          "Unfortunately, the gem #{s[:name]} (#{s[:number]}) has an invalid " \
+          "gemspec. \nPlease ask the gem author to yank the bad version to fix " \
+          "this issue. For more information, see http://bit.ly/syck-defaultkey."
+      end
+
     end
   end
 end

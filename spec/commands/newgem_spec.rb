@@ -7,6 +7,15 @@ describe "bundle gem" do
     global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__TEST" => "false", "BUNDLE_GEM__COC" => "false"
   end
 
+  def remove_push_guard(gem_name)
+    # Remove exception that prevents public pushes on older RubyGems versions
+    if Gem::Version.new(Gem::VERSION) < Gem::Version.new("2.0")
+      path = "#{gem_name}/#{gem_name}.gemspec"
+      content = File.read(path).sub(/raise "RubyGems 2\.0 or newer.*/, "")
+      File.open(path, "w"){|f| f.write(content) }
+    end
+  end
+
   before do
     @git_name = `git config --global user.name`.chomp
     `git config --global user.name "Bundler User"`
@@ -48,7 +57,6 @@ describe "bundle gem" do
     bundle "gem newgem --bin"
 
     process_file(bundled_app('newgem', "newgem.gemspec")) do |line|
-      next line unless line =~ /TODO/
       # Simulate replacing TODOs with real values
       case line
       when /spec\.metadata\['allowed_push_host'\]/, /spec\.homepage/
@@ -57,6 +65,9 @@ describe "bundle gem" do
         line.gsub(/\=.*$/, "= %q{A short summary of my new gem.}")
       when /spec\.description/
         line.gsub(/\=.*$/, "= %q{A longer description of my new gem.}")
+      # Remove exception that prevents public pushes on older RubyGems versions
+      when /raise "RubyGems 2.0 or newer/
+        line.gsub(/.*/, '') if Gem::Version.new(Gem::VERSION) < Gem::Version.new("2.0")
       else
         line
       end
@@ -112,6 +123,7 @@ describe "bundle gem" do
 
     before do
       bundle "gem #{gem_name}"
+      remove_push_guard(gem_name)
       # reset gemspec cache for each test because of commit 3d4163a
       Bundler.clear_gemspec_cache
     end
@@ -125,6 +137,11 @@ describe "bundle gem" do
       expect(bundled_app("test_gem/lib/test_gem.rb")).to exist
       expect(bundled_app("test_gem/lib/test_gem/version.rb")).to exist
       expect(bundled_app("test_gem/.gitignore")).to exist
+
+      expect(bundled_app("test_gem/bin/setup")).to exist
+      expect(bundled_app("test_gem/bin/console")).to exist
+      expect(bundled_app("test_gem/bin/setup")).to be_executable
+      expect(bundled_app("test_gem/bin/console")).to be_executable
     end
 
     it "starts with version 0.1.0" do
@@ -145,6 +162,7 @@ describe "bundle gem" do
         reset!
         in_app_root
         bundle "gem #{gem_name}"
+        remove_push_guard(gem_name)
       end
 
       it_should_behave_like "git config is absent"
@@ -152,7 +170,7 @@ describe "bundle gem" do
 
     it "sets gemspec metadata['allowed_push_host']", :rubygems => "2.0" do
       expect(generated_gem.gemspec.metadata['allowed_push_host']).
-        to match("delete to allow pushes to any server")
+        to match(/mygemserver\.com/)
     end
 
     it "requires the version file" do
@@ -318,6 +336,7 @@ describe "bundle gem" do
 
     before do
       bundle "gem #{gem_name} --mit"
+      remove_push_guard(gem_name)
       # reset gemspec cache for each test because of commit 3d4163a
       Bundler.clear_gemspec_cache
     end
@@ -359,6 +378,7 @@ describe "bundle gem" do
 
     before do
       bundle "gem #{gem_name}"
+      remove_push_guard(gem_name)
       # reset gemspec cache for each test because of commit 3d4163a
       Bundler.clear_gemspec_cache
     end
@@ -392,14 +412,10 @@ describe "bundle gem" do
         reset!
         in_app_root
         bundle "gem #{gem_name}"
+        remove_push_guard(gem_name)
       end
 
       it_should_behave_like "git config is absent"
-    end
-
-    it "sets gemspec metadata['allowed_push_host']", :rubygems => "2.0" do
-      expect(generated_gem.gemspec.metadata['allowed_push_host']).
-        to match("delete to allow pushes to any server")
     end
 
     it "requires the version file" do
@@ -577,6 +593,15 @@ describe "bundle gem" do
 
         expect(bundled_app("test_gem/Rakefile").read).to eq(rakefile)
       end
+    end
+  end
+
+  describe "uncommon gem names" do
+    it "can deal with two dashes" do
+      bundle "gem a--a"
+      Bundler.clear_gemspec_cache
+
+      expect(bundled_app("a--a/a--a.gemspec")).to exist
     end
   end
 

@@ -323,12 +323,8 @@ module Bundler
               message << "Source does not contain any versions of '#{requirement}'"
             end
           else
-            message = "Could not find gem '#{requirement}' "
-            if @index.source_types.include?(Bundler::Source::Rubygems)
-              message << "in any of the gem sources listed in your Gemfile."
-            else
-              message << "in the gems available on this machine."
-            end
+            message = "Could not find gem '#{requirement}' in any of the gem sources " \
+              "listed in your Gemfile or available on this machine."
           end
           raise GemNotFound, message
         end
