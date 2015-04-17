@@ -42,7 +42,7 @@ module Bundler
     # @param sources [Bundler::SourceList]
     # @param unlock [Hash, Boolean, nil] Gems that have been requested
     #   to be updated or true if all gems should be updated
-    # @param ruby_version [Bundler::RubyVersion, nil] Requested Ruby Version
+    # @param ruby_version [Bundler::RubyVersionRequirement, nil] Requested Ruby Version
     # @param optional_groups [Array(String)] A list of optional groups
     def initialize(lockfile, dependencies, sources, unlock, ruby_version = nil, optional_groups = [])
       @unlocking = unlock == true || !unlock.empty?
@@ -386,11 +386,7 @@ module Bundler
         when :engine_version
           "Your #{Bundler.ruby_version.engine} version is #{actual}, but your Gemfile specified #{ruby_version.engine} #{expected}"
         when :patchlevel
-          if !expected.is_a?(String)
-            "The Ruby patchlevel in your Gemfile must be a string"
-          else
-            "Your Ruby patchlevel is #{actual}, but your Gemfile specified #{expected}"
-          end
+          "Your Ruby patchlevel is #{actual}, but your Gemfile specified #{expected}"
         end
 
         raise RubyVersionMismatch, msg
