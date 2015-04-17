@@ -1,3 +1,9 @@
+## Next Release
+
+Features:
+
+  - Allow fuzzy ruby version, patchlevel and engine version requirements (#70, @panthomakos)
+
 ## 1.9.4 (2015-04-13)
 
 Bugfixes:

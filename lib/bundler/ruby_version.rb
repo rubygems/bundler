@@ -38,26 +38,6 @@ module Bundler
         patchlevel     == other.patchlevel
     end
 
-    # Returns a tuple of these things:
-    #   [diff, this, other]
-    #   The priority of attributes are
-    #   1. engine
-    #   2. ruby_version
-    #   3. engine_version
-    def diff(other)
-      if engine != other.engine && @input_engine
-        [ :engine, engine, other.engine ]
-      elsif version != other.version
-        [ :version, version, other.version ]
-      elsif engine_version != other.engine_version && @input_engine
-        [ :engine_version, engine_version, other.engine_version ]
-      elsif patchlevel != other.patchlevel && @patchlevel
-        [ :patchlevel, patchlevel, other.patchlevel ]
-      else
-        nil
-      end
-    end
-
     def host
       @host ||= [
         RbConfig::CONFIG["host_cpu"],
@@ -112,6 +92,34 @@ module Bundler
 
     def patchlevel
       RUBY_PATCHLEVEL.to_s
+    end
+  end
+
+  class RubyVersionRequirement < RubyVersion
+    # Returns a tuple of these things:
+    #   [diff, this, other]
+    #   The priority of attributes are
+    #   1. engine
+    #   2. ruby_version
+    #   3. engine_version
+    def diff(other)
+      if engine != other.engine && @input_engine
+        [ :engine, engine, other.engine ]
+      elsif !version || !matches?(version, other.version)
+        [ :version, version, other.version ]
+      elsif @input_engine && !matches?(engine_version, other.engine_version)
+        [ :engine_version, engine_version, other.engine_version ]
+      elsif @patchlevel && !matches?(patchlevel, other.patchlevel)
+        [ :patchlevel, patchlevel, other.patchlevel ]
+      else
+        nil
+      end
+    end
+
+    private
+
+    def matches?(requirement, version)
+      Gem::Requirement.create(requirement).satisfied_by?(Gem::Version.new(version))
     end
   end
 end

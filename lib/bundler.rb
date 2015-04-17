@@ -44,6 +44,7 @@ module Bundler
   autoload :SourceList,            'bundler/source_list'
   autoload :Specification,         'bundler/shared_helpers'
   autoload :SystemRubyVersion,     'bundler/ruby_version'
+  autoload :RubyVersionRequirement,'bundler/ruby_version'
   autoload :UI,                    'bundler/ui'
 
   class BundlerError < StandardError
