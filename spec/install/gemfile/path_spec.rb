@@ -54,8 +54,8 @@ describe "bundle install with explicit source paths" do
     install_gemfile <<-G
       gem 'foo', :path => "~#{username}/#{relative_path}"
     G
-    expect(out).to match("There was an error while trying to use the path `~#{username}/#{relative_path}`.")
-    expect(out).to match("user #{username} doesn't exist")
+    expect(err).to match("There was an error while trying to use the path `~#{username}/#{relative_path}`.")
+    expect(err).to match("user #{username} doesn't exist")
   end
 
   it "expands paths relative to Bundler.root" do
@@ -243,7 +243,7 @@ describe "bundle install with explicit source paths" do
     G
 
     expect(exitstatus).to eq(15) if exitstatus
-    expect(out).to match(/There are multiple gemspecs/)
+    expect(err).to match(/There are multiple gemspecs/)
   end
 
   it "allows :name to be specified to resolve ambiguity" do
@@ -532,7 +532,7 @@ describe "bundle install with explicit source paths" do
 
       bundle :install, :expect_err => true,
         :requires => [lib_path("install_hooks.rb")]
-      expect(out).to include("failed for foo-1.0")
+      expect(err).to include("failed for foo-1.0")
     end
   end
 end

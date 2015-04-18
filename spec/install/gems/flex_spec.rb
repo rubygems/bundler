@@ -193,8 +193,6 @@ describe "bundle flex_install" do
 
     it "suggests bundle update when the Gemfile requires different versions than the lock" do
       nice_error = <<-E.strip.gsub(/^ {8}/, "")
-        Fetching source index from file:#{gem_repo2}/
-        Resolving dependencies...
         Bundler could not find compatible versions for gem "rack":
           In snapshot (Gemfile.lock):
             rack (= 0.9.1)
@@ -211,7 +209,7 @@ describe "bundle flex_install" do
       E
 
       bundle :install, :retry => 0
-      expect(out).to eq(nice_error)
+      expect(err).to eq(nice_error)
     end
   end
 
@@ -235,9 +233,9 @@ describe "bundle flex_install" do
         bundle "install"
       }.not_to change { File.read(bundled_app("Gemfile.lock")) }
 
-      expect(out).to include("rack = 0.9.1")
-      expect(out).to include("locked at 1.0.0")
-      expect(out).to include("bundle update rack")
+      expect(err).to include("rack = 0.9.1")
+      expect(err).to include("locked at 1.0.0")
+      expect(err).to include("bundle update rack")
     end
 
     it "should work when you update" do
