@@ -47,7 +47,7 @@ describe "bundle binstubs <gem>" do
 
       bundle "binstubs"
       expect(exitstatus).to eq(1) if exitstatus
-      expect(out).to eq("`bundle binstubs` needs at least one gem to run.")
+      expect(err).to eq("`bundle binstubs` needs at least one gem to run.")
     end
 
     it "does not bundle the bundler binary" do
@@ -114,7 +114,7 @@ describe "bundle binstubs <gem>" do
       bundle "binstubs doesnt_exist"
 
       expect(exitstatus).to eq(7) if exitstatus
-      expect(out).to eq("Could not find gem 'doesnt_exist'.")
+      expect(err).to eq("Could not find gem 'doesnt_exist'.")
     end
   end
 

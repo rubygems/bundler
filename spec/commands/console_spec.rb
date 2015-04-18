@@ -25,7 +25,7 @@ describe "bundle console" do
       input.puts("__callee__")
       input.puts("exit")
     end
-    expect(out).to include("pry")
+    expect(err).to include("pry")
   end
 
   it "falls back to IRB if the other REPL isn't available" do
@@ -36,7 +36,7 @@ describe "bundle console" do
       input.puts("__callee__")
       input.puts("exit")
     end
-    expect(out).to include("IRB")
+    expect(err).to include("IRB")
   end
 
   it "doesn't load any other groups" do

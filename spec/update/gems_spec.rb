@@ -59,11 +59,11 @@ describe "bundle update" do
   describe "with an unknown dependency" do
     it "should inform the user" do
       bundle "update halting-problem-solver", :expect_err =>true
-      expect(out).to include "Could not find gem 'halting-problem-solver'"
+      expect(err).to include "Could not find gem 'halting-problem-solver'"
     end
     it "should suggest alternatives" do
       bundle "update active-support", :expect_err =>true
-      expect(out).to include "Did you mean activesupport?"
+      expect(err).to include "Did you mean activesupport?"
     end
   end
 
@@ -155,16 +155,11 @@ describe "bundle update when a gem depends on a newer version of bundler" do
     G
   end
 
-  it "should not explode" do
-    bundle "update"
-    expect(err).to be_empty
-  end
-
   it "should explain that bundler conflicted" do
     bundle "update"
-    expect(out).not_to match(/in snapshot/i)
-    expect(out).to match(/current Bundler version/i)
-    expect(out).to match(/perhaps you need to update bundler/i)
+    expect(err).not_to match(/in snapshot/i)
+    expect(err).to match(/current Bundler version/i)
+    expect(err).to match(/perhaps you need to update bundler/i)
   end
 end
 
@@ -195,7 +190,7 @@ describe "bundle update" do
     G
 
     bundle "update nonexisting"
-    expect(out).to include("This Bundle hasn't been installed yet. Run `bundle install` to update and install the bundled gems.")
+    expect(err).to include("This Bundle hasn't been installed yet. Run `bundle install` to update and install the bundled gems.")
     expect(exitstatus).to eq(22) if exitstatus
   end
 end

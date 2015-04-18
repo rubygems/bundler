@@ -63,7 +63,7 @@ describe "bundle install" do
       G
 
       bundle :install
-      expect(out).to match(/You passed :lib as an option for gem 'rack', but it is invalid/)
+      expect(err).to match(/You passed :lib as an option for gem 'rack', but it is invalid/)
     end
   end
 

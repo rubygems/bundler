@@ -38,7 +38,7 @@ describe "bundle install" do
 
     it "disallows --path vendor/bundle --system" do
       bundle "install --path vendor/bundle --system"
-      expect(out).to include("Please choose.")
+      expect(err).to include("Please choose.")
     end
 
     it "remembers to disable system gems after the first time with bundle --path vendor/bundle" do
@@ -143,7 +143,7 @@ describe "bundle install" do
       G
 
       bundle "install --path bundle"
-      expect(out).to match(/invalid symlink/)
+      expect(err).to match(/invalid symlink/)
     end
   end
 

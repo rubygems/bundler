@@ -58,11 +58,11 @@ describe "bundle install from an existing gemspec" do
   it "should raise if there are no gemspecs available" do
     build_lib("foo", :path => tmp.join("foo"), :gemspec => false)
 
-    error = install_gemfile(<<-G, :expect_err => true)
+    install_gemfile(<<-G, :expect_err => true)
       source "file://#{gem_repo2}"
       gemspec :path => '#{tmp.join("foo")}'
     G
-    expect(error).to match(/There are no gemspecs at #{tmp.join('foo')}/)
+    expect(err).to match(/There are no gemspecs at #{tmp.join('foo')}/)
   end
 
   it "should raise if there are too many gemspecs available" do
@@ -70,11 +70,11 @@ describe "bundle install from an existing gemspec" do
       s.write("foo2.gemspec", "")
     end
 
-    error = install_gemfile(<<-G, :expect_err => true)
+    install_gemfile(<<-G, :expect_err => true)
       source "file://#{gem_repo2}"
       gemspec :path => '#{tmp.join("foo")}'
     G
-    expect(error).to match(/There are multiple gemspecs at #{tmp.join('foo')}/)
+    expect(err).to match(/There are multiple gemspecs at #{tmp.join('foo')}/)
   end
 
   it "should pick a specific gemspec" do

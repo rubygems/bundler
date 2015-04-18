@@ -81,7 +81,7 @@ describe "bundle install with git sources" do
         gem "foo", "1.1", :git => "#{lib_path('foo-1.0')}"
       G
 
-      expect(out).to include("Source contains 'foo' at: 1.0")
+      expect(err).to include("Source contains 'foo' at: 1.0")
     end
 
     it "still works after moving the application directory" do
@@ -268,7 +268,7 @@ describe "bundle install with git sources" do
 
       bundle %|config local.rack #{lib_path('local-rack')}|
       bundle :install
-      expect(out).to match(/Cannot use local override for rack-0.8 because #{Regexp.escape(lib_path('local-rack').to_s)} does not exist/)
+      expect(err).to match(/Cannot use local override for rack-0.8 because #{Regexp.escape(lib_path('local-rack').to_s)} does not exist/)
     end
 
     it "explodes if branch is not given on install" do
@@ -282,7 +282,7 @@ describe "bundle install with git sources" do
 
       bundle %|config local.rack #{lib_path('local-rack')}|
       bundle :install
-      expect(out).to match(/cannot use local override/i)
+      expect(err).to match(/cannot use local override/i)
     end
 
     it "does not explode if disable_local_branch_check is given" do
@@ -316,7 +316,7 @@ describe "bundle install with git sources" do
 
       bundle %|config local.rack #{lib_path('local-rack')}|
       bundle :install
-      expect(out).to match(/is using branch another but Gemfile specifies master/)
+      expect(err).to match(/is using branch another but Gemfile specifies master/)
     end
 
     it "explodes on invalid revision on install" do
@@ -333,7 +333,7 @@ describe "bundle install with git sources" do
 
       bundle %|config local.rack #{lib_path('local-rack')}|
       bundle :install
-      expect(out).to match(/The Gemfile lock is pointing to revision \w+/)
+      expect(err).to match(/The Gemfile lock is pointing to revision \w+/)
     end
   end
 
@@ -584,7 +584,7 @@ describe "bundle install with git sources" do
         gem "has_submodule"
       end
     G
-    expect(out).to match(/could not find gem 'submodule/i)
+    expect(err).to match(/could not find gem 'submodule/i)
 
     should_not_be_installed "has_submodule 1.0", :expect_err => true
   end
@@ -822,7 +822,7 @@ describe "bundle install with git sources" do
 
       bundle :install, :expect_err => true,
         :requires => [lib_path('install_hooks.rb')]
-      expect(out).to include("failed for foo-1.0")
+      expect(err).to include("failed for foo-1.0")
     end
   end
 
@@ -907,7 +907,7 @@ describe "bundle install with git sources" do
         gem "foo", :git => "#{lib_path('foo-1.0')}"
       G
 
-      expect(out).to include("An error occurred while installing foo (1.0)")
+      expect(err).to include("An error occurred while installing foo (1.0)")
       expect(out).not_to include("gem install foo")
     end
   end
@@ -945,7 +945,7 @@ describe "bundle install with git sources" do
       G
 
       bundle "update", :env => {"PATH" => ""}
-      expect(out).to include("You need to install git to be able to use gems from git repositories. For help installing git, please refer to GitHub's tutorial at https://help.github.com/articles/set-up-git")
+      expect(err).to include("You need to install git to be able to use gems from git repositories. For help installing git, please refer to GitHub's tutorial at https://help.github.com/articles/set-up-git")
     end
 
     it "installs a packaged git gem successfully" do
@@ -960,7 +960,7 @@ describe "bundle install with git sources" do
       simulate_new_machine
 
       bundle "install", :env => {"PATH" => ""}
-      expect(out).to_not include("You need to install git to be able to use gems from git repositories.")
+      expect(err).to_not include("You need to install git to be able to use gems from git repositories.")
       expect(exitstatus).to be_zero if exitstatus
     end
   end
