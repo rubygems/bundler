@@ -37,8 +37,6 @@ describe "bundle install" do
       G
 
       nice_error = <<-E.strip.gsub(/^ {8}/, "")
-        Fetching source index from file:#{gem_repo2}/
-        Resolving dependencies...
         Bundler could not find compatible versions for gem "bundler":
           In Gemfile:
             bundler (= 0.9.2) ruby
@@ -46,7 +44,7 @@ describe "bundle install" do
           Current Bundler version:
             bundler (#{Bundler::VERSION})
         E
-      expect(out).to include(nice_error)
+      expect(err).to include(nice_error)
     end
 
     it "works for gems with multiple versions in its dependencies" do
@@ -94,8 +92,6 @@ describe "bundle install" do
       G
 
       nice_error = <<-E.strip.gsub(/^ {8}/, "")
-        Fetching source index from file:#{gem_repo2}/
-        Resolving dependencies...
         Bundler could not find compatible versions for gem "activesupport":
           In Gemfile:
             activemerchant (>= 0) ruby depends on
@@ -104,7 +100,7 @@ describe "bundle install" do
             rails_fail (>= 0) ruby depends on
               activesupport (= 1.2.3) ruby
       E
-      expect(out).to include(nice_error)
+      expect(err).to eq(nice_error)
     end
 
     it "causes a conflict if a child dependency conflicts with the Gemfile" do
@@ -115,8 +111,6 @@ describe "bundle install" do
       G
 
       nice_error = <<-E.strip.gsub(/^ {8}/, "")
-        Fetching source index from file:#{gem_repo2}/
-        Resolving dependencies...
         Bundler could not find compatible versions for gem "activesupport":
           In Gemfile:
             rails_fail (>= 0) ruby depends on
@@ -124,7 +118,7 @@ describe "bundle install" do
 
             activesupport (= 2.3.5) ruby
       E
-      expect(out).to include(nice_error)
+      expect(err).to eq(nice_error)
     end
 
     it "can install dependencies with newer bundler version" do

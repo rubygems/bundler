@@ -160,7 +160,7 @@ describe "bundle outdated" do
   describe "with invalid gem name" do
     it "returns could not find gem name" do
       bundle "outdated invalid_gem_name"
-      expect(out).to include("Could not find gem 'invalid_gem_name'.")
+      expect(err).to include("Could not find gem 'invalid_gem_name'.")
     end
 
     it "returns non-zero exit code" do

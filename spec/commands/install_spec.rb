@@ -16,8 +16,7 @@ describe "bundle install with gem sources" do
         raise StandardError, "FAIL"
       G
 
-      expect(err).to lack_errors
-      expect(out).to match(/StandardError, "FAIL"/)
+      expect(err).to match(/StandardError, "FAIL"/)
       expect(bundled_app("Gemfile.lock")).not_to exist
     end
 
@@ -370,8 +369,9 @@ describe "bundle install with gem sources" do
       G
 
       bundle :install, :quiet => true
-      expect(out).to include("Could not find gem 'rack (>= 0) ruby'")
+      expect(err).to include("Could not find gem 'rack (>= 0) ruby'")
       expect(out).to_not include("Your Gemfile has no gem server sources")
+      expect(err).to_not include("Your Gemfile has no gem server sources")
     end
   end
 end

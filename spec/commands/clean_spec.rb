@@ -284,7 +284,7 @@ describe "bundle clean" do
     bundle :clean
 
     expect(exitstatus).to eq(1) if exitstatus
-    expect(out).to include("--force")
+    expect(err).to include("--force")
   end
 
   # handling bundle clean upgrade path from the pre's

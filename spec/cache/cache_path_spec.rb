@@ -26,7 +26,7 @@ describe "bundle package" do
   context "when given an absolute path" do
     it "exits with non-zero status" do
       bundle :package, "cache-path" => "/tmp/cache-foo"
-      expect(out).to match(/must be relative/)
+      expect(err).to match(/must be relative/)
       expect(exitstatus).to eq(15) if exitstatus
     end
   end

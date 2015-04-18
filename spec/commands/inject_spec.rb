@@ -37,7 +37,7 @@ describe "bundle inject" do
   context "with injected gems already in the Gemfile" do
     it "doesn't add existing gems" do
       bundle "inject 'rack' '> 0'"
-      expect(out).to match(/cannot specify the same gem twice/i)
+      expect(err).to match(/cannot specify the same gem twice/i)
     end
   end
 
@@ -70,7 +70,7 @@ describe "bundle inject" do
         gem "rack-obama"
       G
       bundle "inject 'rack' '> 0'"
-      expect(out).to match(/trying to install in deployment mode after changing/)
+      expect(err).to match(/trying to install in deployment mode after changing/)
 
       expect(bundled_app("Gemfile.lock").read).not_to match(/rack-obama/)
     end

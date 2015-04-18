@@ -1087,7 +1087,7 @@ describe "the lockfile format" do
     G
 
     expect(bundled_app("Gemfile.lock")).not_to exist
-    expect(out).to include "rack (= 1.0) and rack (= 1.1)"
+    expect(err).to include "rack (= 1.0) and rack (= 1.1)"
   end
 
   it "raises if two different sources are used" do
@@ -1098,7 +1098,7 @@ describe "the lockfile format" do
     G
 
     expect(bundled_app("Gemfile.lock")).not_to exist
-    expect(out).to include "rack (>= 0) should come from an unspecified source and git://hubz.com (at master)"
+    expect(err).to include "rack (>= 0) should come from an unspecified source and git://hubz.com (at master)"
   end
 
   it "works correctly with multiple version dependencies" do
@@ -1287,12 +1287,12 @@ describe "the lockfile format" do
          #{Bundler::VERSION}
     L
 
-    error = install_gemfile(<<-G, :expect_err => true)
+    install_gemfile(<<-G, :expect_err => true)
       source "file://#{gem_repo1}"
       gem "rack"
     G
 
-    expect(error).to match(/your Gemfile.lock contains merge conflicts/i)
-    expect(error).to match(/git checkout HEAD -- Gemfile.lock/i)
+    expect(err).to match(/your Gemfile.lock contains merge conflicts/i)
+    expect(err).to match(/git checkout HEAD -- Gemfile.lock/i)
   end
 end

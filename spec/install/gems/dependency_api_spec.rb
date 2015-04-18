@@ -22,7 +22,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :artifice => "endpoint"
-    expect(out).to include("' sinatra' is not a valid gem name because it contains whitespace.")
+    expect(err).to include("' sinatra' is not a valid gem name because it contains whitespace.")
   end
 
   it "should handle nested dependencies" do
@@ -204,7 +204,7 @@ describe "gemcutter's dependency API" do
     end
 
     bundle :install, :artifice => "endpoint_host_redirect", :requires => [lib_path("disable_net_http_persistent.rb")]
-    expect(out).to_not match(/Too many redirects/)
+    expect(err).to_not match(/Too many redirects/)
     should_be_installed "rack 1.0.0"
   end
 
@@ -215,7 +215,7 @@ describe "gemcutter's dependency API" do
     G
 
     bundle :install, :artifice => "endpoint_redirect"
-    expect(out).to match(/Too many redirects/)
+    expect(err).to match(/Too many redirects/)
   end
 
   context "when --full-index is specified" do
@@ -500,6 +500,7 @@ describe "gemcutter's dependency API" do
 
       bundle :install, :artifice => "endpoint_500"
       expect(out).not_to include("#{user}:#{password}")
+      expect(err).not_to include("#{user}:#{password}")
     end
 
     it "strips http basic auth creds when warning about ambiguous sources" do
@@ -510,8 +511,9 @@ describe "gemcutter's dependency API" do
       G
 
       bundle :install, :artifice => "endpoint_basic_authentication"
-      expect(out).to include("Warning: the gem 'rack' was found in multiple sources.")
+      expect(err).to include("Warning: the gem 'rack' was found in multiple sources.")
       expect(out).not_to include("#{user}:#{password}")
+      expect(err).not_to include("#{user}:#{password}")
       should_be_installed "rack 1.0.0"
     end
 
@@ -573,14 +575,14 @@ describe "gemcutter's dependency API" do
 
       it "shows instructions if auth is not provided for the source" do
         bundle :install, :artifice => "endpoint_strict_basic_authentication"
-        expect(out).to include("bundle config #{source_hostname} username:password")
+        expect(err).to include("bundle config #{source_hostname} username:password")
       end
 
       it "fails if authentication has already been provided, but failed" do
         bundle "config #{source_hostname} #{user}:wrong"
 
         bundle :install, :artifice => "endpoint_strict_basic_authentication"
-        expect(out).to include("Bad username or password")
+        expect(err).to include("Bad username or password")
       end
     end
 
@@ -619,7 +621,7 @@ describe "gemcutter's dependency API" do
       G
 
       bundle :install, :env => {"RUBYOPT" => "-I#{bundled_app("broken_ssl")}"}
-      expect(out).to include("OpenSSL")
+      expect(err).to include("OpenSSL")
     end
   end
 
@@ -639,7 +641,7 @@ describe "gemcutter's dependency API" do
       G
 
       bundle :install
-      expect(out).to match(/could not verify the SSL certificate/i)
+      expect(err).to match(/could not verify the SSL certificate/i)
     end
   end
 

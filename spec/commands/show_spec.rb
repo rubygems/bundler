@@ -46,7 +46,7 @@ describe "bundle show" do
 
     it "complains if gem not in bundle" do
       bundle "show missing"
-      expect(out).to match(/could not find gem 'missing'/i)
+      expect(err).to match(/could not find gem 'missing'/i)
     end
 
     it "prints path of all gems in bundle sorted by name" do
@@ -146,7 +146,7 @@ describe "bundle show" do
       invalid_regexp = "[]"
 
       bundle "show #{invalid_regexp}"
-      expect(out).to include("Could not find gem '#{invalid_regexp}'.")
+      expect(err).to include("Could not find gem '#{invalid_regexp}'.")
     end
   end
 end
