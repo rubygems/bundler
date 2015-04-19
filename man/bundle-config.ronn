@@ -39,6 +39,38 @@ Executing `bundle config disable_multisource true` upgrades the warning about
 the Gemfile containing multiple primary sources to an error. Executing `bundle
 config --delete disable_multisource` downgrades this error to a warning.
 
+## REMEMBERING OPTIONS
+
+Flags passed to `bundle install` or the Bundler runtime,
+such as `--path foo` or `--without production`, are not remembered between commands.
+If these options must be remembered,they must be set using `bundle config`
+(e.g., `bundle config path foo`).
+
+The options that can be configured are:
+
+* `binstubs`:
+  Creates a directory (defaults to `~/bin`) and place any executables from the
+  gem there. These executables run in Bundler's context. If used, you might add
+  this directory to your environment's `PATH` variable. For instance, if the
+  `rails` gem comes with a `rails` executable, this flag will create a
+  `bin/rails` executable that ensures that all referred dependencies will be
+  resolved using the bundled gems.
+
+* `deployment`:
+  In deployment mode, Bundler will 'roll-out' the bundle for
+  `production` use. Please check carefully if you want to have this option
+  enabled in `development` or `test` environments.
+
+* `path`:
+  The location to install the specified gems to. This defaults to Rubygems'
+  setting. Bundler shares this location with Rubygems, `gem install ...` will
+  have gem installed there, too. Therefore, gems installed without a
+  `--path ...` setting will show up by calling `gem list`. Accodingly, gems
+  installed to other locations will not get listed.
+
+* `without`:
+  A space-separated list of groups referencing gems to skip during installation.
+
 ## BUILD OPTIONS
 
 You can use `bundle config` to give bundler the flags to pass to the gem
