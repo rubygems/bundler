@@ -277,48 +277,7 @@ module Bundler
     end
 
     def install_in_parallel(size, standalone, force = false)
-      name2spec = {}
-      remains = {}
-      enqueued = {}
-      specs.each do |spec|
-        name2spec[spec.name] = spec
-        remains[spec.name] = true
-      end
-
-      worker_pool = Worker.new size, lambda { |name, worker_num|
-        spec = name2spec[name]
-        message = install_gem_from_spec spec, standalone, worker_num, force
-        { :name => spec.name, :post_install => message }
-      }
-
-      # Keys in the remains hash represent uninstalled gems specs.
-      # We enqueue all gem specs that do not have any dependencies.
-      # Later we call this lambda again to install specs that depended on
-      # previously installed specifications. We continue until all specs
-      # are installed.
-      enqueue_remaining_specs = lambda do
-        remains.keys.each do |name|
-          next if enqueued[name]
-          spec = name2spec[name]
-          if ready_to_install?(spec, remains)
-            worker_pool.enq name
-            enqueued[name] = true
-          end
-        end
-      end
-      enqueue_remaining_specs.call
-
-      until remains.empty?
-        message = worker_pool.deq
-        remains.delete message[:name]
-        if message[:post_install]
-          Installer.post_install_messages[message[:name]] = message[:post_install]
-        end
-        enqueue_remaining_specs.call
-      end
-      message
-    ensure
-      worker_pool && worker_pool.stop
+      ParallelInstaller.call(self, specs, size, standalone, force)
     end
 
     # We only want to install a gem spec if all its dependencies are met.
