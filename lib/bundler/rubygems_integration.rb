@@ -561,10 +561,18 @@ module Bundler
       end
     end
 
+    # RubyGems 2.1.0
     class MoreFuture < Future
       def initialize
         super
         backport_ext_builder_monitor
+      end
+
+      def all_specs
+        require 'bundler/remote_specification'
+        Gem::Specification.stubs.map do |stub|
+          StubSpecification.from_stub(stub)
+        end
       end
 
       def backport_ext_builder_monitor
