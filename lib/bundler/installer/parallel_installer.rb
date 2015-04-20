@@ -85,7 +85,7 @@ class ParallelInstaller
     }
   end
 
-  # Dequeue a spec and save its post-install message anf then enqueue the
+  # Dequeue a spec and save its post-install message and then enqueue the
   # remaining specs.
   # Some specs might've had to wait til this spec was installed to be
   # processed so the call to `enqueue_specs` is important after every
