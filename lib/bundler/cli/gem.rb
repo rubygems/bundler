@@ -136,7 +136,7 @@ module Bundler
 
       if choice.nil?
         Bundler.ui.confirm header
-        choice = (Bundler.ui.ask("#{message} y/(n):") =~ /y|yes/)
+        choice = Bundler.ui.yes? "#{message} y/(n):"
         Bundler.settings.set_global("gem.#{key}", choice)
       end
 
