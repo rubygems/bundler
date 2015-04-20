@@ -281,16 +281,6 @@ module Bundler
       ParallelInstaller.call(self, specs, size, standalone, force)
     end
 
-    # We only want to install a gem spec if all its dependencies are met.
-    # If the dependency is no longer in the `remains` hash then it has been met.
-    # If a dependency is only development or is self referential it can be ignored.
-    def ready_to_install?(spec, remains)
-      spec.dependencies.none? do |dep|
-        next if dep.type == :development || dep.name == spec.name
-        remains[dep.name]
-      end
-    end
-
     def create_bundle_path
       Bundler.mkdir_p(Bundler.bundle_path.to_s) unless Bundler.bundle_path.exist?
     rescue Errno::EEXIST
