@@ -135,10 +135,13 @@ module Bundler
       # handle 1.9 where system gems are always on the load path
       if defined?(::Gem)
         me = File.expand_path("../../", __FILE__)
+        me = /^#{Regexp.escape(me)}/
+
+        loaded_gem_paths = Bundler.rubygems.loaded_gem_paths
+
         $LOAD_PATH.reject! do |p|
-          next if File.expand_path(p) =~ /^#{Regexp.escape(me)}/
-          p != File.dirname(__FILE__) &&
-            Bundler.rubygems.gem_path.any?{|gp| p =~ /^#{Regexp.escape(gp)}/ }
+          next if File.expand_path(p) =~ me
+          loaded_gem_paths.delete(p)
         end
         $LOAD_PATH.uniq!
       end
