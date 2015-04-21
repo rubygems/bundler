@@ -64,6 +64,10 @@ module Bundler
 
     attr_accessor :stub
 
+    def to_yaml
+      _remote_specification.to_yaml
+    end
+
     private
 
     def _remote_specification
