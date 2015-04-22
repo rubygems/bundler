@@ -13,7 +13,7 @@ describe "bundle install" do
 
     it "re-installs installed gems" do
       bundle "install --force"
-      expect(out).to match /Installing rack 1\.0\.0/
+      expect(out).to include "Installing rack 1.0.0"
       should_be_installed "rack 1.0.0"
     end
   end
