@@ -15,6 +15,21 @@ describe Bundler::Settings do
     end
   end
 
+  describe "#[]" do
+    context "when not set" do
+      context "when default value present" do
+        it "retrieves value" do
+          expect(Bundler.settings[:retry]).to be 3
+        end
+      end
+
+      it "returns nil" do
+        expect(Bundler.settings[:buttermilk]).to be nil
+      end
+    end
+  end
+
+
   describe "#mirror_for" do
     let(:uri) { URI("https://rubygems.org/") }
 
