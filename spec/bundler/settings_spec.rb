@@ -19,12 +19,12 @@ describe Bundler::Settings do
     context "when not set" do
       context "when default value present" do
         it "retrieves value" do
-          expect(Bundler.settings[:retry]).to be 3
+          expect(settings[:retry]).to be 3
         end
       end
 
       it "returns nil" do
-        expect(Bundler.settings[:buttermilk]).to be nil
+        expect(settings[:buttermilk]).to be nil
       end
     end
   end
