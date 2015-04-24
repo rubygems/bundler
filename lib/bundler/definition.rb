@@ -184,11 +184,10 @@ module Bundler
     # @return [SpecSet] resolved dependencies
     def resolve
       @resolve ||= begin
+        last_resolve = converge_locked_specs
         if Bundler.settings[:frozen] || (!@unlocking && nothing_changed?)
-          @locked_specs
+          last_resolve
         else
-          last_resolve = converge_locked_specs
-
           # Run a resolve against the locally available gems
           last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve)
         end
@@ -521,7 +520,9 @@ module Bundler
 
       converged = []
       @locked_specs.each do |s|
-        s.source = sources.get(s.source)
+        # Replace the locked dependency's source with the equivalent source from the Gemfile
+        dep = @dependencies.find { |dep| s.satisfies?(dep) }
+        s.source = (dep && dep.source) || sources.get(s.source)
 
         # Don't add a spec to the list if its source is expired. For example,
         # if you change a Git gem to Rubygems.
@@ -569,7 +570,7 @@ module Bundler
     end
 
     def satisfies_locked_spec?(dep)
-      @locked_specs.any? { |s| s.satisfies?(dep) && (!dep.source || s.source == dep.source) }
+      @locked_specs.any? { |s| s.satisfies?(dep) && (!dep.source || s.source.include?(dep.source)) }
     end
 
     def expanded_dependencies
