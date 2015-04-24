@@ -3,6 +3,8 @@ require 'uri'
 module Bundler
   class Settings
     BOOL_KEYS = %w(frozen cache_all no_prune disable_local_branch_check gem.mit gem.coc).freeze
+    NUMBER_KEYS = %w(retry timeout redirect).freeze
+    DEFAULT_CONFIG = {:retry => 3, :timeout => 10, :redirect => 5}
 
     def initialize(root = nil)
       @root          = root
@@ -12,10 +14,13 @@ module Bundler
 
     def [](name)
       key = key_for(name)
-      value = (@local_config[key] || ENV[key] || @global_config[key])
+      value = (@local_config[key] || ENV[key] || @global_config[key] || DEFAULT_CONFIG[name])
 
-      if !value.nil? && is_bool(name)
+      case
+      when !value.nil? && is_bool(name)
         to_bool(value)
+      when !value.nil? && is_num(name)
+        value.to_i
       else
         value
       end
@@ -84,6 +89,7 @@ module Bundler
       locations[:local]  = @local_config[key] if @local_config.key?(key)
       locations[:env]    = ENV[key] if ENV[key]
       locations[:global] = @global_config[key] if @global_config.key?(key)
+      locations[:default] = DEFAULT_CONFIG[key] if DEFAULT_CONFIG.key?(key)
       locations
     end
 
@@ -167,6 +173,10 @@ module Bundler
 
     def to_bool(value)
       !(value.nil? || value == '' || value =~ /^(false|f|no|n|0)$/i || value == false)
+    end
+
+    def is_num(value)
+      NUMBER_KEYS.include?(value.to_s)
     end
 
     def get_array(key)

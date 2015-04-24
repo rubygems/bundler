@@ -58,9 +58,9 @@ module Bundler
       attr_accessor :disable_endpoint, :api_timeout, :redirect_limit, :max_retries
     end
 
-    self.redirect_limit = 5  # How many redirects to allow in one request
-    self.api_timeout    = 10 # How long to wait for each API call
-    self.max_retries    = 3  # How many retries for the API call
+    self.redirect_limit = Bundler.settings[:redirect]  # How many redirects to allow in one request
+    self.api_timeout    = Bundler.settings[:timeout] # How long to wait for each API call
+    self.max_retries    = Bundler.settings[:retry] # How many retries for the API call
 
     def initialize(remote)
       @remote = remote
