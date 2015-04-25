@@ -338,8 +338,8 @@ module Bundler
 
       gemfile_sources = sources.lock_sources
       if @locked_sources != gemfile_sources
-        new_sources = gemfile_sources - @locked_sources
-        deleted_sources = @locked_sources - gemfile_sources
+        new_sources = gemfile_sources - @locked_sources - [sources.rubygems_aggregate]
+        deleted_sources = @locked_sources - gemfile_sources - [sources.rubygems_aggregate]
 
         if new_sources.any?
           added.concat new_sources.map { |source| "* source: #{source}" }

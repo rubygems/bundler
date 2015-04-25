@@ -544,13 +544,13 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
+      GEM
+        specs:
+
       PATH
         remote: #{lib_path("foo-1.0")}
         specs:
           foo (1.0)
-
-      GEM
-        specs:
 
       PLATFORMS
         #{generic(Gem::Platform.local)}
@@ -582,15 +582,15 @@ describe "the lockfile format" do
         specs:
           bar (1.0)
 
-      PATH
-        remote: #{lib_path("foo-1.0")}
-        specs:
-          foo (1.0)
-
       GEM
         remote: file:#{gem_repo1}/
         specs:
           rack (1.0.0)
+
+      PATH
+        remote: #{lib_path("foo-1.0")}
+        specs:
+          foo (1.0)
 
       PLATFORMS
         #{generic(Gem::Platform.local)}
@@ -766,13 +766,13 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
+      GEM
+        specs:
+
       PATH
         remote: foo
         specs:
           foo (1.0)
-
-      GEM
-        specs:
 
       PLATFORMS
         #{generic(Gem::Platform.local)}
@@ -794,13 +794,13 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
+      GEM
+        specs:
+
       PATH
         remote: ../foo
         specs:
           foo (1.0)
-
-      GEM
-        specs:
 
       PLATFORMS
         #{generic(Gem::Platform.local)}
@@ -822,13 +822,13 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
+      GEM
+        specs:
+
       PATH
         remote: foo
         specs:
           foo (1.0)
-
-      GEM
-        specs:
 
       PLATFORMS
         #{generic(Gem::Platform.local)}
@@ -849,13 +849,13 @@ describe "the lockfile format" do
     G
 
     lockfile_should_be <<-G
+      GEM
+        specs:
+
       PATH
         remote: ../foo
         specs:
           foo (1.0)
-
-      GEM
-        specs:
 
       PLATFORMS
         #{generic(Gem::Platform.local)}
@@ -1263,5 +1263,45 @@ describe "the lockfile format" do
 
     expect(err).to match(/your Gemfile.lock contains merge conflicts/i)
     expect(err).to match(/git checkout HEAD -- Gemfile.lock/i)
+  end
+
+  it "stores each rubygems source in its own source section" do
+    build_repo gem_repo3 do
+      build_gem "cocoapods", "0.37.0"
+    end
+
+    install_gemfile <<-G
+      source "file://#{gem_repo3}"
+      source "file://#{gem_repo1}" do
+        gem "thin" # comes first to test name sorting
+        gem "rack"
+      end
+      gem "cocoapods" # shoud come from repo3!
+    G
+
+    lockfile_should_be <<-L
+      GEM
+        remote: file:/Users/segiddins/Development/OpenSource/bundler/tmp/gems/remote1/
+        specs:
+          rack (1.0.0)
+          thin (1.0)
+            rack
+
+      GEM
+        remote: file:/Users/segiddins/Development/OpenSource/bundler/tmp/gems/remote3/
+        specs:
+          cocoapods (0.37.0)
+
+      PLATFORMS
+        ruby
+
+      DEPENDENCIES
+        cocoapods
+        rack!
+        thin!
+      
+      BUNDLED WITH
+        #{Bundler::VERSION}
+    L
   end
 end

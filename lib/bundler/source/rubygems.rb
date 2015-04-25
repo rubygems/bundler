@@ -43,12 +43,10 @@ module Bundler
 
       alias == eql?
 
-      def include?(o)
-        o.is_a?(Rubygems) && (o.credless_remotes - credless_remotes).empty?
-      end
-
       def can_lock?(spec)
-        spec.source.is_a?(Rubygems)
+        return false unless spec.source.is_a?(Rubygems)
+
+        !(spec.source.credless_remotes - credless_remotes).empty?
       end
 
       def options
@@ -228,6 +226,8 @@ module Bundler
           uris
         end
       end
+
+    private
 
       def loaded_from(spec)
         "#{Bundler.rubygems.gem_dir}/specifications/#{spec.full_name}.gemspec"

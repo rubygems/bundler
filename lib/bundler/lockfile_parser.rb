@@ -101,10 +101,13 @@ module Bundler
             @sources << @current_source
           end
         when GEM
-          Array(@opts["remote"]).each do |url|
-            @rubygems_aggregate.add_remote(url)
+          @current_source = TYPES[@type].from_lock(@opts)
+          # Strip out duplicate rubygems sections
+          if @sources.include?(@current_source)
+            @current_source = @sources.find { |s| s == @current_source }
+          else
+            @sources << @current_source
           end
-          @current_source = @rubygems_aggregate
         end
       when OPTIONS
         value = $2
