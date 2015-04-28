@@ -27,6 +27,19 @@ describe Bundler::Settings do
         expect(settings[:buttermilk]).to be nil
       end
     end
+
+    context "when is boolean" do
+      it "returns a boolean" do
+        settings[:frozen] = "true"
+        expect(settings[:frozen]).to be true
+      end
+      context "when specific gem is configured" do
+        it "returns a boolean" do
+          settings["ignore_messages.foobar"] = "true"
+          expect(settings["ignore_messages.foobar"]).to be true
+        end
+      end
+    end
   end
 
 
