@@ -117,8 +117,10 @@ module Bundler
         Bundler.ui.confirm "Use `bundle show [gemname]` to see where a bundled gem is installed."
       end
 
-      Installer.post_install_messages.to_a.each do |name, msg|
-        print_post_install_message(name, msg) unless Bundler.settings["ignore_messages.#{name}"]
+      unless Bundler.settings["ignore_messages"]
+        Installer.post_install_messages.to_a.each do |name, msg|
+          print_post_install_message(name, msg) unless Bundler.settings["ignore_messages.#{name}"]
+        end
       end
 
       Installer.ambiguous_gems.to_a.each do |name, installed_from_uri, *also_found_in_uris|
