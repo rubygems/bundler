@@ -26,7 +26,7 @@ class ParallelInstaller
     end
 
     def has_post_install_message?
-      post_install_message.empty?
+      !post_install_message.empty?
     end
 
     def ignorable_dependency?(dep)
