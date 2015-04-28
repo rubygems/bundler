@@ -2,7 +2,7 @@ require 'uri'
 
 module Bundler
   class Settings
-    BOOL_KEYS = %w(frozen cache_all no_prune disable_local_branch_check gem.mit gem.coc).freeze
+    BOOL_KEYS = %w(frozen cache_all no_prune disable_local_branch_check ignore_messages gem.mit gem.coc).freeze
     NUMBER_KEYS = %w(retry timeout redirect).freeze
     DEFAULT_CONFIG = {:retry => 3, :timeout => 10, :redirect => 5}
 
@@ -167,8 +167,20 @@ module Bundler
       "BUNDLE_#{key}"
     end
 
-    def is_bool(key)
-      BOOL_KEYS.include?(key.to_s)
+    def parent_setting_for(name)
+      split_specfic_setting_for(name)[0]
+    end
+
+    def specfic_gem_for(name)
+      split_specfic_setting_for(name)[1]
+    end
+
+    def split_specfic_setting_for(name)
+      name.split(".")
+    end
+
+    def is_bool(name)
+      BOOL_KEYS.include?(name.to_s) || BOOL_KEYS.include?(parent_setting_for(name.to_s))
     end
 
     def to_bool(value)
