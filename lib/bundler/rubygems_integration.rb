@@ -480,7 +480,9 @@ module Bundler
       end
 
       def find_name(name)
-        Gem::Specification.find_all_by_name name
+        Gem::Specification.stubs.find_all { |spec|
+          spec.name == name
+        }.map(&:to_spec)
       end
     end
 
@@ -521,7 +523,9 @@ module Bundler
       end
 
       def find_name(name)
-        Gem::Specification.find_all_by_name name
+        Gem::Specification.stubs.find_all { |spec|
+          spec.name == name
+        }.map(&:to_spec)
       end
 
       def fetch_specs(source, name)
