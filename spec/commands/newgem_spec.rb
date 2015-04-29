@@ -603,6 +603,35 @@ describe "bundle gem" do
     end
   end
 
+  describe "#ensure_safe_gem_name" do
+    before do
+      bundle "gem #{subject}"
+    end
+    after do
+      Bundler.clear_gemspec_cache
+    end
+
+    context "with an existing const name" do
+      subject { "gem" }
+      it { expect(out).to include("Invalid gem name #{subject}") }
+    end
+
+    context "with an existing hyphenated const name" do
+      subject { "gem-specification" }
+      it { expect(out).to include("Invalid gem name #{subject}") }
+    end
+
+    context "starting with an existing const name" do
+      subject { "gem-somenewconstantname" }
+      it { expect(out).not_to include("Invalid gem name #{subject}") }
+    end
+
+    context "ending with an existing const name" do
+      subject { "somenewconstantname-gem" }
+      it { expect(out).not_to include("Invalid gem name #{subject}") }
+    end
+  end
+
   context "on first run" do
     before do
       in_app_root
