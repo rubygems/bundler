@@ -20,15 +20,23 @@ bugs](https://github.com/bundler/bundler/issues?labels=small&state=open) and [sm
 
 Bundler doesn't use a Gemfile to list development dependencies, because when we tried it we couldn't tell if we were awake or it was just another level of dreams. To work on Bundler, you'll probably want to do a couple of things.
 
-  1. Install Bundler's development dependencies
+  1. Make sure Bundler is not already installed in your gemset
+
+     We'll be using Rake to set up Bundler's development dependencies. If there is already a version of Bundler installed alongside your version of Rake, the following commnands can find the classes defined in the pre-installed version of Bundler.
+
+     Make sure that when you run the following command you get a warning that Bundler is not installed.
+
+        $ bundle -V
+
+  2. Install Bundler's development dependencies
 
         $ rake spec:deps
 
-  2. Run the test suite, to make sure things are working
+  3. Run the test suite, to make sure things are working
 
         $ rake spec
 
-  3. Set up a shell alias to run Bundler from your clone, e.g. a Bash alias:
+  4. Set up a shell alias to run Bundler from your clone, e.g. a Bash alias:
 
         $ alias dbundle='ruby -I /path/to/bundler/lib /path/to/bundler/bin/bundle'
 
