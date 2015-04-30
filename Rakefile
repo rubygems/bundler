@@ -234,12 +234,15 @@ begin
     task :clean do
       rm_rf "lib/bundler/man"
     end
+
+    task(:require) { }
   end
 
 rescue LoadError
   namespace :man do
-    task(:build) { warn "Install the ronn gem to be able to release!" }
-    task(:clean) { warn "Install the ronn gem to be able to release!" }
+    task(:require) { abort "Install the ronn gem to be able to release!" }
+    task(:build) { warn "Install the ronn gem to build the help pages" }
+    task(:clean) { }
   end
 end
 
@@ -251,6 +254,6 @@ end
 
 require 'bundler/gem_tasks'
 task :build => ["man:clean", "man:build"]
-task :release => ["man:clean", "man:build"]
+task :release => ["man:require", "man:clean", "man:build"]
 
 task :default => :spec
