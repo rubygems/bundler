@@ -1,3 +1,9 @@
+## 1.7.15 (2015-04-29)
+
+Bugfixes:
+
+  - Respect Gemfile sources when installing a gem present in two sources (#3585, @tmoore)
+
 ## 1.7.14 (2015-03-30)
 
 Bugfixes:
