@@ -21,8 +21,8 @@ module Bundler
       underscored_name = name.tr('-', '_')
       namespaced_path = name.tr('-', '/')
       constant_name = name.gsub(/-[_-]*(?![_-]|$)/){ '::' }.gsub(/([_-]+|(::)|^)(.|$)/){ $2.to_s + $3.upcase }
-
       constant_array = constant_name.split('::')
+
       git_user_name = `git config user.name`.chomp
       git_user_email = `git config user.email`.chomp
 
@@ -188,7 +188,7 @@ module Bundler
       if name =~ /^\d/
         Bundler.ui.error "Invalid gem name #{name} Please give a name which does not start with numbers."
         exit 1
-      elsif Object.const_defined?(constant_array.first)
+      elsif constant_array.inject(Object) {|c, s| (c.const_defined?(s) && c.const_get(s)) || break }
         Bundler.ui.error "Invalid gem name #{name} constant #{constant_array.join("::")} is already in use. Please choose another gem name."
         exit 1
       end
