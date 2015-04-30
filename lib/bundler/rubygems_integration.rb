@@ -467,9 +467,7 @@ module Bundler
       end
 
       def find_name(name)
-        Gem::Specification.stubs.find_all { |spec|
-          spec.name == name
-        }.map(&:to_spec)
+        Gem::Specification.find_all_by_name name
       end
     end
 
@@ -510,9 +508,7 @@ module Bundler
       end
 
       def find_name(name)
-        Gem::Specification.stubs.find_all { |spec|
-          spec.name == name
-        }.map(&:to_spec)
+        Gem::Specification.find_all_by_name name
       end
 
       def fetch_specs(source, name)
@@ -588,6 +584,12 @@ module Bundler
 
       def ext_lock
         Gem::Ext::Builder::CHDIR_MONITOR
+      end
+
+      def find_name(name)
+        Gem::Specification.stubs.find_all do |spec|
+          spec.name == name
+        end.map(&:to_spec)
       end
     end
 
