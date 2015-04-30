@@ -20,9 +20,14 @@ module Bundler
     attr_accessor :gem_loaded
 
     def default_gemfile
-      Bundler.ui.deprecate("Gemfile and Gemfile.lock are " \
-                           "deprecated and will be replaced with gems.rb and " \
-                           "gems.locked in Bundler 2.0.0.\n")
+
+      unless @@warning_printed
+        $stderr.puts "DEPRECATION: Gemfile and Gemfile.lock will be " \
+         "deprecated and replaced with gems.rb and gems.locked in " \
+         "Bundler 2.0.0.\n"
+        @@warning_printed = true
+      end
+
       gemfile = find_gemfile
       raise GemfileNotFound, "Could not locate Gemfile" unless gemfile
       Pathname.new(gemfile)
