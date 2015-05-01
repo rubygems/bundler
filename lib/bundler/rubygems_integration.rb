@@ -607,10 +607,16 @@ module Bundler
         Gem::Ext::Builder::CHDIR_MONITOR
       end
 
-      def find_name(name)
-        Gem::Specification.stubs.find_all do |spec|
-          spec.name == name
-        end.map(&:to_spec)
+      if Gem::Specification.respond_to?(:stubs_for)
+        def find_name(name)
+          Gem::Specification.stubs_for(name).map(&:to_spec)
+        end
+      else
+        def find_name(name)
+          Gem::Specification.stubs.find_all do |spec|
+            spec.name == name
+          end.map(&:to_spec)
+        end
       end
     end
 
