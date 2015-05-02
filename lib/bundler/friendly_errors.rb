@@ -45,6 +45,10 @@ module Bundler
   def self.request_issue_report_for(e)
     Bundler.ui.info <<-EOS.gsub(/^ {6}/, '')
       #{'――― ERROR REPORT TEMPLATE ―――――――――――――――――――――――――――――――――――――――――――――――――――――――'}
+      Command
+
+        #{$PROGRAM_NAME} #{ARGV.join(' ')}
+
       - What did you do?
       - What did you expect to happen?
       - What happened instead?
