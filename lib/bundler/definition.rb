@@ -249,12 +249,14 @@ module Bundler
         return
       end
 
-      locked_major = @locked_bundler_version.segments.first
-      current_major = Gem::Version.create(Bundler::VERSION).segments.first
+      if @locked_bundler_version
+        locked_major = @locked_bundler_version.segments.first
+        current_major = Gem::Version.create(Bundler::VERSION).segments.first
 
-      if locked_major < current_major
-        Bundler.ui.warn "Warning: the lockfile is being updated to Bundler #{Bundler::VERSION.split('.').first}, " \
-                        "after which you will be unable to return to Bundler #{@locked_bundler_version.segments.first}."
+        if locked_major < current_major
+          Bundler.ui.warn "Warning: the lockfile is being updated to Bundler #{Bundler::VERSION.split('.').first}, " \
+                          "after which you will be unable to return to Bundler #{@locked_bundler_version.segments.first}."
+        end
       end
 
       File.open(file, 'wb'){|f| f.puts(contents) }
