@@ -521,7 +521,7 @@ module Bundler
       converged = []
       @locked_specs.each do |s|
         # Replace the locked dependency's source with the equivalent source from the Gemfile
-        dep = @dependencies.find { |d| s.satisfies?(d) }
+        dep = @dependencies.find { |dep| s.satisfies?(dep) }
         s.source = (dep && dep.source) || sources.get(s.source)
 
         # Don't add a spec to the list if its source is expired. For example,

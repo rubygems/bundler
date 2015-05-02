@@ -258,6 +258,9 @@ E
       "here is quite a long string that will wrap to a second line but will not be " \
       "surrounded by quotes"
     end
+    let(:long_string_without_special_characters) do
+      "here is quite a long string that will wrap to a second line but will not be surrounded by quotes"
+    end
 
     it "doesn't wrap values" do
       bundle "config foo #{long_string}"

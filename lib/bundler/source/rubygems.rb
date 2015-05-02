@@ -208,14 +208,14 @@ module Bundler
         remotes.map(&method(:suppress_configured_credentials))
       end
 
+    private
+
       def source_uris_for_spec(spec)
         specs.search_all(spec.name).inject([]) do |uris, s|
           uris << s.source_uri.without_credentials if s.source_uri
           uris
         end
       end
-
-    private
 
       def loaded_from(spec)
         "#{Bundler.rubygems.gem_dir}/specifications/#{spec.full_name}.gemspec"

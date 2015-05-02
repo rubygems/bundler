@@ -115,6 +115,19 @@ Documentation:
 
   - add missing Gemfile global `path` explanation (@agenteo)
 
+## 1.7.15 (2015-04-29)
+
+Bugfixes:
+
+  - Respect Gemfile sources when installing a gem present in two sources (#3585, @tmoore)
+
+## 1.7.14 (2015-03-30)
+
+Bugfixes:
+
+  - Keep gems locked when updating another gem from the same source (#3250, @indirect)
+  - Don't add extra quotes around long, quoted config values (@aroben, #3338)
+
 ## 1.7.13 (2015-02-07)
 
 Bugfixes:
