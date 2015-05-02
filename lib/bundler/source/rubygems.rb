@@ -85,15 +85,20 @@ module Bundler
         end
       end
 
-      def install(spec, force = false)
-        if builtin_gem?(spec)
-          if builtin_requires_caching = !cached_path(spec)
-            cached_built_in_gem(spec)
+      def install(spec, opts = {})
+        force = opts[:force]
+        ensure_builtin_gems_cached = opts[:ensure_builtin_gems_cached]
+
+        if ensure_builtin_gems_cached && builtin_gem?(spec)
+          if !cached_path(spec)
+            cached_built_in_gem(spec) unless spec.remote
+            force = true
           else
             spec.loaded_from = loaded_from(spec)
           end
         end
-        return ["Using #{version_message(spec)}", nil] if installed_specs[spec].any? && !force && !builtin_requires_caching
+
+        return ["Using #{version_message(spec)}", nil] if installed_specs[spec].any? && !force
 
 
         # Download the gem to get the spec, because some specs that are returned

@@ -102,13 +102,15 @@ module Bundler
       settings = Bundler.settings["build.#{spec.name}"]
       messages = nil
 
+      install_options = { :force => force, :ensure_builtin_gems_cached => standalone }
+
       if settings
         # Build arguments are global, so this is mutexed
         Bundler.rubygems.with_build_args [settings] do
-          messages = spec.source.install(spec, force)
+          messages = spec.source.install(spec, install_options)
         end
       else
-        messages = spec.source.install(spec, force)
+        messages = spec.source.install(spec, install_options)
       end
 
       install_message, post_install_message, debug_message = *messages
