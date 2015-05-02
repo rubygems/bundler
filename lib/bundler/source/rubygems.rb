@@ -86,7 +86,15 @@ module Bundler
       end
 
       def install(spec, force = false)
-        return ["Using #{version_message(spec)}", nil] if installed_specs[spec].any? && !force
+        if builtin_gem?(spec)
+          if builtin_requires_caching = !cached_path(spec)
+            cached_built_in_gem(spec)
+          else
+            spec.loaded_from = loaded_from(spec)
+          end
+        end
+        return ["Using #{version_message(spec)}", nil] if installed_specs[spec].any? && !force && !builtin_requires_caching
+
 
         # Download the gem to get the spec, because some specs that are returned
         # by rubygems.org are broken and wrong.
