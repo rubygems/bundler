@@ -3,7 +3,6 @@ module Bundler
     attr_reader :options, :args, :cmd
 
     def initialize(options, args)
-      raise "wat"
       @options = options
       @cmd = args.shift
       @args = args
