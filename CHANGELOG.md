@@ -1,8 +1,16 @@
+## 1.9.6 (2015-05-02)
+
+Bugfixes:
+
+  - support RubyGems versions above 2.4.6 (@tenderlove, @segiddins, @indirect)
+  - allow creating gems with names containing two dashes (#3483, @janlelis)
+  - allow creating gems with names extending constants (#3603, @amatsuda)
+
 ## 1.9.5 (2015-04-29)
 
 Bugfixes:
 
-  - Respect Gemfile sources when installing a gem present in two sources (#3585, @tmoore)
+  - respect Gemfile sources when installing a gem present in two sources (#3585, @tmoore)
 
 ## 1.9.4 (2015-04-13)
 
