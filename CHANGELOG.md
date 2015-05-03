@@ -2,7 +2,7 @@
 
 Bugfixes:
 
-  - Support RubyGems versions above 2.4.6 (@tenderlove, @segiddins, @indirect)
+  - Use RubyGems spec stubs if available (@segiddins)
 
 ## 1.8.8 (2015-04-29)
 
