@@ -2,7 +2,7 @@
 
 Bugfixes:
 
-  - support RubyGems versions above 2.4.6 (@tenderlove, @segiddins, @indirect)
+  - use RubyGems spec stubs if available (@segiddins)
   - allow creating gems with names containing two dashes (#3483, @janlelis)
   - allow creating gems with names extending constants (#3603, @amatsuda)
 
@@ -75,7 +75,7 @@ Features:
 
 Bugfixes:
 
-  - Support RubyGems versions above 2.4.6 (@tenderlove, @segiddins, @indirect)
+  - Use RubyGems spec stubs if available (@segiddins)
 
 ## 1.8.8 (2015-04-29)
 
