@@ -1,3 +1,17 @@
+## 1.9.6 (2015-05-02)
+
+Bugfixes:
+
+  - support RubyGems versions above 2.4.6 (@tenderlove, @segiddins, @indirect)
+  - allow creating gems with names containing two dashes (#3483, @janlelis)
+  - allow creating gems with names extending constants (#3603, @amatsuda)
+
+## 1.9.5 (2015-04-29)
+
+Bugfixes:
+
+  - respect Gemfile sources when installing a gem present in two sources (#3585, @tmoore)
+
 ## 1.9.4 (2015-04-13)
 
 Bugfixes:
@@ -57,6 +71,24 @@ Features:
 
   - Molinillo resolver, shared with CocoaPods (@segiddins)
   - updated Thor to v0.19.1 (@segiddins)
+
+## 1.8.9 (2015-05-02)
+
+Bugfixes:
+
+  - Support RubyGems versions above 2.4.6 (@tenderlove, @segiddins, @indirect)
+
+## 1.8.8 (2015-04-29)
+
+Bugfixes:
+
+  - Respect Gemfile sources when installing a gem present in two sources (#3585, @tmoore)
+
+## 1.8.7 (2015-04-07)
+
+Bugfixes:
+
+  - stop suppressing errors inside gems that get required (#3549, @indirect)
 
 ## 1.8.6 (2015-03-30)
 
@@ -163,6 +195,19 @@ Bugfixes:
 Documentation:
 
   - add missing Gemfile global `path` explanation (@agenteo)
+
+## 1.7.15 (2015-04-29)
+
+Bugfixes:
+
+  - Respect Gemfile sources when installing a gem present in two sources (#3585, @tmoore)
+
+## 1.7.14 (2015-03-30)
+
+Bugfixes:
+
+  - Keep gems locked when updating another gem from the same source (#3250, @indirect)
+  - Don't add extra quotes around long, quoted config values (@aroben, #3338)
 
 ## 1.7.13 (2015-02-07)
 

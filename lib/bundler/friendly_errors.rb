@@ -44,18 +44,27 @@ module Bundler
 
   def self.request_issue_report_for(e)
     Bundler.ui.info <<-EOS.gsub(/^ {6}/, '')
-      #{'――― ERROR REPORT TEMPLATE ―――――――――――――――――――――――――――――――――――――――――――――――――――――――'}
+      #{'--- ERROR REPORT TEMPLATE -------------------------------------------------------'}
       - What did you do?
+
+        I ran the command `#{$PROGRAM_NAME} #{ARGV.join(' ')}`
+
       - What did you expect to happen?
+
+        I expected Bundler to...
+
       - What happened instead?
+
+        Instead, what actually happened was...
+
 
       Error details
 
           #{e.class}: #{e.message}
-          #{e.backtrace.join("\n          ")}
+            #{e.backtrace.join("\n            ")}
 
       #{Bundler::Env.new.report(:print_gemfile => false).gsub(/\n/, "\n      ").strip}
-      #{'――― TEMPLATE END ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――'}
+      #{'--- TEMPLATE END ----------------------------------------------------------------'}
 
     EOS
 

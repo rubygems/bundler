@@ -218,8 +218,6 @@ module Bundler
         end
       end
 
-    private
-
       def loaded_from(spec)
         "#{Bundler.rubygems.gem_dir}/specifications/#{spec.full_name}.gemspec"
       end
