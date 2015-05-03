@@ -52,11 +52,8 @@ describe "bundle outdated" do
 
       expect(exitstatus).to be_zero if exitstatus
     end
-  end
 
-  describe "with --verbose option" do
     it "adds gem group to dependency output when repo is updated" do
-
       install_gemfile <<-G
         source "file://#{gem_repo2}"
 
@@ -68,9 +65,7 @@ describe "bundle outdated" do
       update_repo2 { build_gem "activesupport", "3.0" }
 
       bundle "outdated --verbose"
-
       expect(out).to include("activesupport (newest 3.0, installed 2.3.5, requested = 2.3.5) in groups \"development, test\"")
-
     end
   end
 

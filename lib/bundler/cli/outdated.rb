@@ -64,7 +64,7 @@ module Bundler
           current_version = "#{current_spec.version}#{current_spec.git_version}"
           dependency_version = %|, requested #{dependency.requirement}| if dependency && dependency.specific?
 
-          if options["verbose"]
+          if dependency
             groups = dependency.groups.join(", ")
             pl = (dependency.groups.length > 1) ? "s" : ""
             groups = " in group#{pl} \"#{groups}\""
