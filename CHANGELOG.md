@@ -1,3 +1,34 @@
+## 1.10.0.pre (2015-05-03)
+
+Features:
+
+  - support gem extensions built into any directory on RubyGems 2.2+ (#3582, @voxik)
+  - add 'bundler/inline' which provides a `gemfile` method (#3440, @segiddins)
+  - improved error reports for Gemfile errors (#3480, @segiddins)
+  - `lock` command (#3437, @segiddins)
+  - add `ignore_messages` config to suppress post-install text (#3510, @pducks32)
+  - improve `gem` minitest template (#3513, #3515, @arthurnn)
+  - add `install --force` to re-install installed gems (#3519, @segiddins)
+  - show more `outdated` information, including groups (@smlance, @indirect)
+  - add optional groups to the Gemfile (#3531, @jhass)
+  - accept glob argument to `gemspec` in Gemfile (#3464, @pjump)
+  - make timeouts and retries configurable via `config` (#3601, @pducks32)
+  - add `install_if` Gemfile method for conditional installs (#3611, @segiddins)
+
+Bugfixes:
+
+  - standalone mode now uses builtin gems correctly (#3610, @segiddins)
+  - fix `rake spec:deps` on MinGW Ruby 2.0+ (#3487, @marutosi)
+  - remember all y/n answers when generating gems (#3579, @pducks32)
+
+Performance:
+
+  - use RubyGems stub specifications when possible (#3580, @segiddins)
+
+Deprecations:
+
+  - deprecated the (never enabled) `bundle_ruby` binary (@smlance)
+
 ## 1.9.6 (2015-05-02)
 
 Bugfixes:
