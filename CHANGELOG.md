@@ -1,3 +1,9 @@
+## 1.8.9 (2015-05-02)
+
+Bugfixes:
+
+  - Support RubyGems versions above 2.4.6 (@tenderlove, @segiddins, @indirect)
+
 ## 1.8.8 (2015-04-29)
 
 Bugfixes:
