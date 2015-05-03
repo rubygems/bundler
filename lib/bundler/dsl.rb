@@ -16,15 +16,16 @@ module Bundler
     attr_accessor :dependencies
 
     def initialize
-      @source          = nil
-      @sources         = SourceList.new
-      @git_sources     = {}
-      @dependencies    = []
-      @groups          = []
-      @optional_groups = []
-      @platforms       = []
-      @env             = nil
-      @ruby_version    = nil
+      @source               = nil
+      @sources              = SourceList.new
+      @git_sources          = {}
+      @dependencies         = []
+      @groups               = []
+      @install_conditionals = []
+      @optional_groups      = []
+      @platforms            = []
+      @env                  = nil
+      @ruby_version         = nil
       add_git_sources
     end
 
@@ -174,6 +175,13 @@ module Bundler
       args.each { @groups.pop }
     end
 
+    def install_if(*args, &blk)
+      @install_conditionals.concat args
+      blk.call
+    ensure
+      args.each { @groups.pop }
+    end
+
     def platforms(*platforms)
       @platforms.concat platforms
       yield
@@ -228,7 +236,7 @@ module Bundler
     end
 
     def valid_keys
-      @valid_keys ||= %w(group groups git path glob name branch ref tag require submodules platform platforms type source)
+      @valid_keys ||= %w(group groups git path glob name branch ref tag require submodules platform platforms type source install_if)
     end
 
     def normalize_options(name, version, opts)
@@ -248,6 +256,12 @@ module Bundler
       opts["group"] = opts.delete("groups") || opts["group"]
       groups.concat Array(opts.delete("group"))
       groups = [:default] if groups.empty?
+
+      install_if = @install_conditionals.dup
+      install_if.concat Array(opts.delete("install_if"))
+      install_if = install_if.reduce(true) do |memo, val|
+        memo && (val.respond_to?(:call) ? val.call : val)
+      end
 
       platforms = @platforms.dup
       opts["platforms"] = opts["platform"] || opts["platforms"]
@@ -281,10 +295,11 @@ module Bundler
         end
       end
 
-      opts["source"]  ||= @source
-      opts["env"]     ||= @env
-      opts["platforms"] = platforms.dup
-      opts["group"]     = groups
+      opts["source"]       ||= @source
+      opts["env"]          ||= @env
+      opts["platforms"]      = platforms.dup
+      opts["group"]          = groups
+      opts["should_include"] = install_if
     end
 
     def normalize_group_options(opts, groups)
