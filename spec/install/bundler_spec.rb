@@ -139,7 +139,7 @@ describe "bundle install" do
       #simulate_new_machine
 
       bundle "check"
-      expect(out).to eq("The Gemfile's dependencies are satisfied")
+      expect(out).to include("The Gemfile's dependencies are satisfied")
     end
   end
 

@@ -129,6 +129,51 @@ describe "the lockfile format" do
         rack
 
       BUNDLED WITH
+        9999999.1.0
+    L
+
+    simulate_bundler_version "9999999.0.0" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+
+        gem "rack"
+      G
+    end
+
+    expect(out).to include("Warning: the running version of Bundler is " \
+                           "older than the version that created the lockfile")
+
+    lockfile_should_be <<-G
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          rack (1.0.0)
+
+      PLATFORMS
+        #{generic(Gem::Platform.local)}
+
+      DEPENDENCIES
+        rack
+
+      BUNDLED WITH
+        9999999.1.0
+    G
+  end
+
+  it "errors if the current is a major version older than lockfile's bundler version" do
+    lockfile <<-L
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          rack (1.0.0)
+
+      PLATFORMS
+        #{generic(Gem::Platform.local)}
+
+      DEPENDENCIES
+        rack
+
+      BUNDLED WITH
         9999999.0.0
     L
 
@@ -138,8 +183,75 @@ describe "the lockfile format" do
       gem "rack"
     G
 
-    expect(out).to include("Warning: the running version of Bundler is " \
-                           "older than the version that created the lockfile")
+    expect(exitstatus > 0) if exitstatus
+    expect(out).to include("You must use Bundler 9999999 or greater with this lockfile.")
+  end
+
+  it "shows a friendly error when running with a new bundler 2 lockfile" do
+    lockfile <<-L
+      GEM
+        remote: https://rails-assets.org/
+        specs:
+         rails-assets-bootstrap (3.3.4)
+           rails-assets-jquery (>= 1.9.1)
+         rails-assets-jquery (2.1.4)
+
+      GEM
+        remote: https://rubygems.org/
+        specs:
+         rake (10.4.2)
+
+      PLATFORMS
+        ruby
+
+      DEPENDENCIES
+        rails-assets-bootstrap!
+        rake
+
+      BUNDLED WITH
+        9999999.0.0
+    L
+
+    install_gemfile <<-G
+      source 'https://rubygems.org'
+      gem 'rake'
+
+      source 'https://rails-assets.org' do
+        gem 'rails-assets-bootstrap'
+      end
+    G
+
+    expect(exitstatus > 0) if exitstatus
+    expect(out).to include("You must use Bundler 9999999 or greater with this lockfile.")
+  end
+
+  it "warns when updating bundler major version" do
+    lockfile <<-L
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          rack (1.0.0)
+
+      PLATFORMS
+        #{generic(Gem::Platform.local)}
+
+      DEPENDENCIES
+        rack
+
+      BUNDLED WITH
+        1.10.0
+    L
+
+    simulate_bundler_version "9999999.0.0" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+
+        gem "rack"
+      G
+    end
+
+    expect(out).to include("Warning: the lockfile is being updated to Bundler " \
+                          "9999999, after which you will be unable to return to Bundler 1.")
 
     lockfile_should_be <<-G
       GEM
