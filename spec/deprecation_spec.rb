@@ -63,6 +63,24 @@ describe "Bundler version 1.99" do
       allow(Bundler::Source::Rubygems).to receive(:new) { @rubygems }
     end
 
+    context "with github gems" do
+      it "warns about the https change" do
+        allow(Bundler.ui).to receive(:deprecate)
+        msg = "The :github option uses the git: protocol, which is not secure. " \
+        "Bundler 2.0 will use the https: protcol, which is secure. Enable this change now by " \
+        "running `bundle config github.https true`."
+        expect(Bundler.ui).to receive(:deprecate).with(msg)
+        subject.gem("sparks", :github => "indirect/sparks")
+      end
+
+      it "upgrades to https on request" do
+        Bundler.settings["github.https"] = true
+        subject.gem("sparks", :github => "indirect/sparks")
+        github_uri = "https://github.com/indirect/sparks.git"
+        expect(subject.dependencies.first.source.uri).to eq(github_uri)
+      end
+    end
+
     context "with bitbucket gems" do
       it "warns about removal" do
         allow(Bundler.ui).to receive(:deprecate)
