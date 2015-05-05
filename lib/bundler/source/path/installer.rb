@@ -11,8 +11,8 @@ module Bundler
           @gem_bin_dir       = "#{Bundler.rubygems.gem_dir}/bin"
           @bin_dir           = Bundler.requires_sudo? ? @tmp_bin_dir : @gem_bin_dir
           @gem_dir           = Bundler.rubygems.path(spec.full_gem_path)
-          @wrappers          = options[:wrappers] || true
-          @env_shebang       = options[:env_shebang] || true
+          @wrappers          = true
+          @env_shebang       = true
           @format_executable = options[:format_executable] || false
           @build_args        = options[:build_args] || Bundler.rubygems.build_args
         end
