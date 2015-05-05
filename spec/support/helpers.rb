@@ -12,6 +12,7 @@ module Spec
       end
       FileUtils.mkdir_p(tmp)
       FileUtils.mkdir_p(home)
+      Bundler.send(:remove_instance_variable, :@settings) if Bundler.send(:instance_variable_defined?, :@settings)
     end
 
     attr_reader :out, :err, :exitstatus
