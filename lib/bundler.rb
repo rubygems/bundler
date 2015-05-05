@@ -206,13 +206,11 @@ module Bundler
     end
 
     def tmp(name = Process.pid.to_s)
-      @tmp ||= Pathname.new Dir.mktmpdir("bundler")
-      @tmp.join(name)
+      Pathname.new(Dir.mktmpdir(["bundler", name]))
     end
 
-    def cleanup
-      FileUtils.remove_entry_secure(@tmp) if defined?(@tmp) && @tmp
-    rescue
+    def rm_rf(path)
+      FileUtils.remove_entry_secure(path) if path && File.exist?(path)
     end
 
     def settings

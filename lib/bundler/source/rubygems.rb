@@ -160,9 +160,7 @@ module Bundler
         spec.loaded_from = loaded_from(spec)
         ["Installing #{version_message(spec)}", spec.post_install_message]
       ensure
-        if install_path && Bundler.requires_sudo?
-          FileUtils.remove_entry_secure(install_path)
-        end
+        Bundler.rm_rf(install_path) if Bundler.requires_sudo?
       end
 
       def cache(spec, custom_path = nil)
@@ -392,10 +390,12 @@ module Bundler
 
         if Bundler.requires_sudo?
           Bundler.mkdir_p "#{Bundler.rubygems.gem_dir}/cache"
-          Bundler.sudo "mv #{Bundler.tmp(spec.full_name)}/cache/#{spec.full_name}.gem #{gem_path}"
+          Bundler.sudo "mv #{download_path}/cache/#{spec.full_name}.gem #{gem_path}"
         end
 
         gem_path
+      ensure
+        Bundler.rm_rf(download_path) if Bundler.requires_sudo?
       end
 
       def builtin_gem?(spec)
