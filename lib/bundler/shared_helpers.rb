@@ -20,10 +20,8 @@ module Bundler
     attr_accessor :gem_loaded
 
     def default_gemfile
-      Bundler.ui.deprecate("Gemfile and Gemfile.lock are " \
-                           "deprecated and will be replaced with gems.rb and " \
-                           "gems.locked in Bundler 2.0.0.\n")
       gemfile = find_gemfile
+      deprecate_gemfile(gemfile)
       raise GemfileNotFound, "Could not locate Gemfile" unless gemfile
       Pathname.new(gemfile)
     end
@@ -148,6 +146,16 @@ module Bundler
             Bundler.rubygems.gem_path.any?{|gp| p =~ /^#{Regexp.escape(gp)}/ }
         end
         $LOAD_PATH.uniq!
+      end
+    end
+
+    def deprecate_gemfile(gemfile)
+      if gemfile && File.basename(gemfile) == "Gemfile"
+        Bundler.respond_to?(:ui) && Bundler.ui.deprecate(
+          "Gemfile and Gemfile.lock are " \
+          "deprecated and will be replaced with gems.rb and " \
+          "gems.locked in Bundler 2.0.\n"
+        )
       end
     end
 
