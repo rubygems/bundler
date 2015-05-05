@@ -1,3 +1,9 @@
+## 1.9.7 (2015-05-05)
+
+Bugfixes:
+
+  - always clean up tmp dirs (#3277, @hone, @indirect, @segiddins)
+
 ## 1.9.6 (2015-05-02)
 
 Bugfixes:
