@@ -111,6 +111,7 @@ describe "when using sudo", :sudo => true do
     end
 
     it "cleans up the tmpdirs generated" do
+      require 'tmpdir'
       Dir.glob("#{Dir.tmpdir}/bundler*").each do |tmpdir|
         FileUtils.remove_entry_secure(tmpdir)
       end
