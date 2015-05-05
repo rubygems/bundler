@@ -34,7 +34,7 @@ module Bundler
       def deprecate(msg, newline = nil)
         unless @deprecation_messages.include?(msg)
           @deprecation_messages.add(msg)
-          warn("DEPRECATION: " + msg, newline)
+          tell_err("DEPRECATION: " + msg, :yellow, newline)
         end
       end
 
