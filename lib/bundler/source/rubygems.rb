@@ -145,9 +145,7 @@ module Bundler
         spec.loaded_from = loaded_from(spec)
         ["Installing #{version_message(spec)}", spec.post_install_message]
       ensure
-        if install_path && Bundler.requires_sudo?
-          FileUtils.remove_entry_secure(install_path)
-        end
+        Bundler.rm_rf(install_path) if Bundler.requires_sudo?
       end
 
       def cache(spec, custom_path = nil)

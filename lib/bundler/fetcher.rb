@@ -68,6 +68,8 @@ module Bundler
         end
 
         gem_path
+      ensure
+        Bundler.rm_rf(download_path) if Bundler.requires_sudo?
       end
 
       def user_agent
