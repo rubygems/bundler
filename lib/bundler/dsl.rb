@@ -415,13 +415,14 @@ module Bundler
     def check_primary_source_safety(source)
       return unless source.rubygems_primary_remotes.any?
 
+      # TODO: 2.0 upgrade from setting to default
       if Bundler.settings[:disable_multisource]
         raise GemspecError, "Warning: this Gemfile contains multiple primary sources. " \
           "Each source after the first must include a block to indicate which gems " \
           "should come from that source. To downgrade this error to a warning, run " \
           "`bundle config --delete disable_multisource`"
       else
-        Bundler.ui.warn "Warning: this Gemfile contains multiple primary sources. " \
+        Bundler.ui.deprecate "Your Gemfile contains multiple primary sources. " \
           "Using `source` more than once without a block is a security risk, and " \
           "may result in installing unexpected gems. To resolve this warning, use " \
           "a block to indicate which gems should come from the secondary source. " \
