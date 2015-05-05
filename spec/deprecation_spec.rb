@@ -56,4 +56,37 @@ describe "Bundler version 1.99" do
                              "capistrano-bundler gem. Use it instead.")
     end
   end
+
+  describe Bundler::Dsl do
+    before do
+      @rubygems = double("rubygems")
+      allow(Bundler::Source::Rubygems).to receive(:new) { @rubygems }
+    end
+
+    context "with bitbucket gems" do
+      it "warns about removal" do
+        allow(Bundler.ui).to receive(:deprecate)
+        msg = "The :bitbucket git source is deprecated, and will be removed " \
+          "in Bundler 2.0. Add this code to your Gemfile to ensure it " \
+          "continues to work:\n    git_source(:bitbucket) do |repo_name|\n  " \
+          "    https://\#{user_name}@bitbucket.org/\#{user_name}/\#{repo_name}" \
+          ".git\n    end"
+        expect(Bundler.ui).to receive(:deprecate).with(msg, true)
+        subject.gem("not-really-a-gem", :bitbucket => "mcorp/flatlab-rails")
+      end
+    end
+
+    context "with gist gems" do
+      it "warns about removal" do
+        allow(Bundler.ui).to receive(:deprecate)
+        msg = "The :gist git source is deprecated, and will be removed " \
+          "in Bundler 2.0. Add this code to your Gemfile to ensure it " \
+          "continues to work:\n    git_source(:gist) do |repo_name|\n  " \
+          "    https://gist.github.com/\#{repo_name}.git\n" \
+          "    end"
+        expect(Bundler.ui).to receive(:deprecate).with(msg, true)
+        subject.gem("not-really-a-gem", :gist => "1234")
+      end
+    end
+  end
 end

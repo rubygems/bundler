@@ -268,9 +268,15 @@ module Bundler
         "git://github.com/#{repo_name}.git"
       end
 
-      git_source(:gist) {|repo_name| "https://gist.github.com/#{repo_name}.git" }
+      # TODO: 2.0 remove this deprecated git source
+      git_source(:gist) do |repo_name|
+        warn_deprecated_git_source(:gist, "https://gist.github.com/#{repo_name}.git")
+        "https://gist.github.com/#{repo_name}.git"
+      end
 
+      # TODO: 2.0 remove this deprecated git source
       git_source(:bitbucket) do |repo_name|
+        warn_deprecated_git_source(:bitbucket, "https://#{user_name}@bitbucket.org/#{user_name}/#{repo_name}.git")
         user_name, repo_name = repo_name.split "/"
         repo_name ||= user_name
         "https://#{user_name}@bitbucket.org/#{user_name}/#{repo_name}.git"
@@ -416,6 +422,15 @@ module Bundler
           "To upgrade this warning to an error, run `bundle config " \
           "disable_multisource true`."
       end
+    end
+
+    def warn_deprecated_git_source(name, repo_string)
+      # TODO: 2.0 remove deprecation
+      Bundler.ui.deprecate "The :#{name} git source is deprecated, and will be removed " \
+        "in Bundler 2.0. Add this code to your Gemfile to ensure it continues to work:\n" \
+        "    git_source(:#{name}) do |repo_name|\n" \
+        "      #{repo_string}\n" \
+        "    end", true
     end
 
     class DSLError < GemfileError
