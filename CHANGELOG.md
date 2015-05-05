@@ -1,3 +1,9 @@
+## 1.10.0.pre.1 (2015-05-05)
+
+Bugfixes:
+
+  - always clean up tmp dirs (#3277, @hone, @indirect, @segiddins)
+
 ## 1.10.0.pre (2015-05-03)
 
 Features:
