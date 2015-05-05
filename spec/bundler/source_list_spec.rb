@@ -3,7 +3,7 @@ require "spec_helper"
 
 describe Bundler::SourceList do
   before do
-    allow(Bundler).to receive(:root) { Pathname.new "/" }
+    allow(Bundler).to receive(:root) { Pathname.new "./tmp/bundled_app" }
 
     stub_const "ASourcePlugin", Class.new(Bundler::Plugin::API)
     ASourcePlugin.source "new_source"
@@ -56,15 +56,39 @@ describe Bundler::SourceList do
       end
 
       it "passes the provided options to the new source" do
+        @new_source = source_list.add_git_source("uri" => "git://host/path.git")
         expect(@new_source.options).to eq("uri" => "git://host/path.git")
       end
 
       it "adds the source to the beginning of git_sources" do
+        @new_source = source_list.add_git_source("uri" => "git://host/path.git")
         expect(source_list.git_sources.first).to equal(@new_source)
       end
 
       it "removes existing duplicates" do
+        @duplicate = source_list.add_git_source("uri" => "git://host/path.git")
+        @new_source = source_list.add_git_source("uri" => "git://host/path.git")
         expect(source_list.git_sources).not_to include equal(@duplicate)
+      end
+
+      context "with the git: protocol" do
+        let(:msg) do
+          "The git source `git://existing-git.org/path.git` " \
+          "uses the `git` protocol, which transmits data without encryption. " \
+          "Disable this warning with `bundle config git.allow_insecure true`, " \
+          "or switch to the `https` protocol to keep your data secure."
+        end
+
+        it "warns about git protocols" do
+          expect(Bundler.ui).to receive(:warn).with(msg)
+          source_list.add_git_source("uri" => "git://existing-git.org/path.git")
+        end
+
+        it "ignores git protocols on request" do
+          Bundler.settings["git.allow_insecure"] = true
+          expect(Bundler.ui).to_not receive(:warn).with(msg)
+          source_list.add_git_source("uri" => "git://existing-git.org/path.git")
+        end
       end
     end
 
