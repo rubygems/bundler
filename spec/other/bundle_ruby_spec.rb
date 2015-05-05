@@ -12,8 +12,8 @@ describe "bundle_ruby" do
 
       bundle_ruby
 
-      expect(err).to eq_err("Warning: bundle_ruby is deprecated and will " \
-                            "be removed in Bundler 2.0.0.")
+      expect(err).to include("DEPRECATION: bundle_ruby is deprecated and will " \
+                             "be removed in Bundler 2.0.")
 
     end
   end

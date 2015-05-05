@@ -41,8 +41,8 @@ module Bundler
   end
 end
 
-STDERR.puts "Warning: bundle_ruby is deprecated and will be removed in " \
- "Bundler 2.0.0."
+STDERR.puts "DEPRECATION: bundle_ruby is deprecated and will be removed in " \
+ "Bundler 2.0."
 
 dsl = Bundler::Dsl.new
 begin
