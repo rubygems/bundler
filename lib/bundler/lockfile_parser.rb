@@ -21,12 +21,13 @@ module Bundler
     PATH         = "PATH"
     SPECS        = "  specs:"
     OPTIONS      = /^  ([a-z]+): (.*)$/i
+    SOURCE       = [GIT, GEM, PATH]
 
     def initialize(lockfile)
       @platforms    = []
       @sources      = []
       @dependencies = []
-      @state        = :source
+      @state        = nil
       @specs        = {}
 
       @rubygems_aggregate = Source::Rubygems.new
@@ -37,11 +38,16 @@ module Bundler
       end
 
       lockfile.split(/(?:\r?\n)+/).each do |line|
-        if line == DEPENDENCIES
+        if SOURCE.include?(line)
+          @state = :source
+          parse_source(line)
+        elsif line == DEPENDENCIES
           @state = :dependency
         elsif line == PLATFORMS
           @state = :platform
-        else
+        elsif line =~ /^[^\s]/
+          @state = nil
+        elsif @state
           send("parse_#{@state}", line)
         end
       end
