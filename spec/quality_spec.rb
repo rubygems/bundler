@@ -95,7 +95,8 @@ describe "The library itself" do
       end
     end
 
-    expect(@err.split("\n")).to eq([])
+    errors = @err.split("\n").reject {|r| r =~ /^DEPRECATION/ }
+    expect(errors).to eq([])
     expect(@out).to eq("")
   end
 end
