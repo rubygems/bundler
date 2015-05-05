@@ -36,32 +36,27 @@ module Bundler
     end
 
     def default_bundle_dir
-      global_bundle_dir = File.join(Bundler.rubygems.user_home, ".bundle")
       bundle_dir = find_directory(".bundle")
+      return nil unless bundle_dir
 
-      if bundle_dir && bundle_dir != global_bundle_dir
-        Pathname.new(bundle_dir)
-      else
-        nil
-      end
+      global_bundle_dir = File.join(Bundler.rubygems.user_home, ".bundle")
+      return nil if bundle_dir == global_bundle_dir
+
+      Pathname.new(bundle_dir)
     end
 
     def in_bundle?
       find_gemfile
     end
 
-    def chdir_monitor
-      Bundler.rubygems.ext_lock
-    end
-
     def chdir(dir, &blk)
-      chdir_monitor.synchronize do
+      Bundler.rubygems.ext_lock.synchronize do
         Dir.chdir dir, &blk
       end
     end
 
     def pwd
-      chdir_monitor.synchronize do
+      Bundler.rubygems.ext_lock.synchronize do
         Dir.pwd
       end
     end
@@ -140,10 +135,13 @@ module Bundler
       # handle 1.9 where system gems are always on the load path
       if defined?(::Gem)
         me = File.expand_path("../../", __FILE__)
+        me = /^#{Regexp.escape(me)}/
+
+        loaded_gem_paths = Bundler.rubygems.loaded_gem_paths
+
         $LOAD_PATH.reject! do |p|
-          next if File.expand_path(p) =~ /^#{Regexp.escape(me)}/
-          p != File.dirname(__FILE__) &&
-            Bundler.rubygems.gem_path.any?{|gp| p =~ /^#{Regexp.escape(gp)}/ }
+          next if File.expand_path(p) =~ me
+          loaded_gem_paths.delete(p)
         end
         $LOAD_PATH.uniq!
       end

@@ -38,10 +38,14 @@ module Bundler
       end
 
       def eql?(o)
-        o.is_a?(Rubygems) && remotes_equal?(o.remotes)
+        o.is_a?(Rubygems) && o.credless_remotes == credless_remotes
       end
 
       alias == eql?
+
+      def include?(o)
+        o.is_a?(Rubygems) && (o.credless_remotes - credless_remotes).empty?
+      end
 
       def can_lock?(spec)
         spec.source.is_a?(Rubygems)
@@ -81,8 +85,21 @@ module Bundler
         end
       end
 
-      def install(spec)
-        return ["Using #{version_message(spec)}", nil] if installed_specs[spec].any?
+      def install(spec, opts = {})
+        force = opts[:force]
+        ensure_builtin_gems_cached = opts[:ensure_builtin_gems_cached]
+
+        if ensure_builtin_gems_cached && builtin_gem?(spec)
+          if !cached_path(spec)
+            cached_built_in_gem(spec) unless spec.remote
+            force = true
+          else
+            spec.loaded_from = loaded_from(spec)
+          end
+        end
+
+        return ["Using #{version_message(spec)}", nil] if installed_specs[spec].any? && !force
+
 
         # Download the gem to get the spec, because some specs that are returned
         # by rubygems.org are broken and wrong.
@@ -143,9 +160,7 @@ module Bundler
         spec.loaded_from = loaded_from(spec)
         ["Installing #{version_message(spec)}", spec.post_install_message]
       ensure
-        if install_path && Bundler.requires_sudo?
-          FileUtils.remove_entry_secure(install_path)
-        end
+        Bundler.rm_rf(install_path) if Bundler.requires_sudo?
       end
 
       def cache(spec, custom_path = nil)
@@ -203,14 +218,16 @@ module Bundler
 
     protected
 
+      def credless_remotes
+        remotes.map(&method(:suppress_configured_credentials))
+      end
+
       def remotes_for_spec(spec)
         specs.search_all(spec.name).inject([]) do |uris, s|
           uris << s.remote if s.remote
           uris
         end
       end
-
-    private
 
       def loaded_from(spec)
         "#{Bundler.rubygems.gem_dir}/specifications/#{spec.full_name}.gemspec"
@@ -293,7 +310,7 @@ module Bundler
       end
 
       def api_fetchers
-        fetchers.select{|f| f.use_api }
+        fetchers.select(&:use_api)
       end
 
       def remote_specs
@@ -334,7 +351,7 @@ module Bundler
               end
             end until idxcount == idx.size
 
-            if api_fetchers.any? && api_fetchers.all?{|f| f.use_api }
+            if api_fetchers.any?
               # it's possible that gems from one source depend on gems from some
               # other source, so now we download gemspecs and iterate over those
               # dependencies, looking for gems we don't have info on yet.
@@ -351,7 +368,7 @@ module Bundler
             end
           end
 
-          if !allow_api
+          unless allow_api
             api_fetchers.each do |f|
               Bundler.ui.info "Fetching source index from #{f.uri}"
               idx.use f.specs(nil, self)
@@ -362,7 +379,23 @@ module Bundler
 
       def fetch_gem(spec)
         return false unless spec.remote
-        Fetcher.download_gem_from_uri(spec, spec.remote.uri)
+        uri = spec.remote.uri
+        spec.fetch_platform
+
+        download_path = Bundler.requires_sudo? ? Bundler.tmp(spec.full_name) : Bundler.rubygems.gem_dir
+        gem_path = "#{Bundler.rubygems.gem_dir}/cache/#{spec.full_name}.gem"
+
+        FileUtils.mkdir_p("#{download_path}/cache")
+        Bundler.rubygems.download_gem(spec, uri, download_path)
+
+        if Bundler.requires_sudo?
+          Bundler.mkdir_p "#{Bundler.rubygems.gem_dir}/cache"
+          Bundler.sudo "mv #{download_path}/cache/#{spec.full_name}.gem #{gem_path}"
+        end
+
+        gem_path
+      ensure
+        Bundler.rm_rf(download_path) if Bundler.requires_sudo?
       end
 
       def builtin_gem?(spec)
@@ -371,10 +404,6 @@ module Bundler
 
         # Ruby 2.0, where gemspecs are stored in specifications/default/
         spec.loaded_from && spec.loaded_from.include?("specifications/default/")
-      end
-
-      def remotes_equal?(other_remotes)
-        remotes.map(&method(:suppress_configured_credentials)) == other_remotes.map(&method(:suppress_configured_credentials))
       end
 
     end

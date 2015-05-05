@@ -1,9 +1,95 @@
+## 1.10.0.pre.1 (2015-05-05)
+
+Bugfixes:
+
+  - always clean up tmp dirs (#3277, @hone, @indirect, @segiddins)
+
+## 1.10.0.pre (2015-05-03)
+
+Features:
+
+  - support gem extensions built into any directory on RubyGems 2.2+ (#3582, @voxik)
+  - add 'bundler/inline' which provides a `gemfile` method (#3440, @segiddins)
+  - improved error reports for Gemfile errors (#3480, @segiddins)
+  - `lock` command (#3437, @segiddins)
+  - add `ignore_messages` config to suppress post-install text (#3510, @pducks32)
+  - improve `gem` minitest template (#3513, #3515, @arthurnn)
+  - add `install --force` to re-install installed gems (#3519, @segiddins)
+  - show more `outdated` information, including groups (@smlance, @indirect)
+  - add optional groups to the Gemfile (#3531, @jhass)
+  - accept glob argument to `gemspec` in Gemfile (#3464, @pjump)
+  - make timeouts and retries configurable via `config` (#3601, @pducks32)
+  - add `install_if` Gemfile method for conditional installs (#3611, @segiddins)
+
+Bugfixes:
+
+  - standalone mode now uses builtin gems correctly (#3610, @segiddins)
+  - fix `rake spec:deps` on MinGW Ruby 2.0+ (#3487, @marutosi)
+  - remember all y/n answers when generating gems (#3579, @pducks32)
+
+Performance:
+
+  - use RubyGems stub specifications when possible (#3580, @segiddins)
+
+Deprecations:
+
+  - deprecated the (never enabled) `bundle_ruby` binary (@smlance)
+
+## 1.9.6 (2015-05-02)
+
+Bugfixes:
+
+  - use RubyGems spec stubs if available (@segiddins)
+  - allow creating gems with names containing two dashes (#3483, @janlelis)
+  - allow creating gems with names extending constants (#3603, @amatsuda)
+
+## 1.9.5 (2015-04-29)
+
+Bugfixes:
+
+  - respect Gemfile sources when installing a gem present in two sources (#3585, @tmoore)
+
+## 1.9.4 (2015-04-13)
+
+Bugfixes:
+
+  - fix regression in installing x86 and universal gems (#3565, @jdmundrawala)
+  - improve error when gems are missing (#3564, @sealocal)
+
+## 1.9.3 (2015-04-12)
+
+Bugfixes:
+
+  - handle removal of `specs` from rubygems/rubygems@620910 (#3558, @indirect)
+  - install 'universal' gems on Windows (#3066, @jdmundrawala)
+  - stop passing --local during `rake install` task (#3236, @indirect)
+  - guard against all possible accidental public gem pushes (#3533, @indirect)
+
+## 1.9.2 (2015-03-30)
+
+Bugfixes:
+
+  - ensure gem executables are executable (#3517, #3511, @indirect)
+  - fix warnings in Molinillo (#3516, @segiddins)
+  - ensure duplicate dependencies do not propagate (#3522, @segiddins)
+  - keep gems locked when updating another gem from the same source (#3520, @indirect)
+  - resolve race that could build gems without saved arguments (#3404, @indirect)
+
+## 1.9.1 (2015-03-21)
+
+Bugfixes:
+
+  - avoid exception in 'bundler/gem_tasks' (#3492, @segiddins)
+
+## 1.9.0 (2015-03-20)
+
 ## 1.9.0.rc (2015-03-13)
 
 Bugfixes:
 
   - make Bundler.which stop finding directories (@nohoho)
   - handle Bundler prereleases correctly (#3470, @segiddins)
+  - add before_install to .travis.yml template for new gems (@kodnin)
 
 ## 1.9.0.pre.1 (2015-03-11)
 
@@ -22,6 +108,31 @@ Features:
 
   - Molinillo resolver, shared with CocoaPods (@segiddins)
   - updated Thor to v0.19.1 (@segiddins)
+
+## 1.8.9 (2015-05-02)
+
+Bugfixes:
+
+  - Use RubyGems spec stubs if available (@segiddins)
+
+## 1.8.8 (2015-04-29)
+
+Bugfixes:
+
+  - Respect Gemfile sources when installing a gem present in two sources (#3585, @tmoore)
+
+## 1.8.7 (2015-04-07)
+
+Bugfixes:
+
+  - stop suppressing errors inside gems that get required (#3549, @indirect)
+
+## 1.8.6 (2015-03-30)
+
+Bugfixes:
+
+  - keep gems locked when updating another gem from the same source (#3250, @indirect)
+  - resolve race that could build gems without saved arguments (#3404, @indirect)
 
 ## 1.8.5 (2015-03-11)
 
@@ -121,6 +232,19 @@ Bugfixes:
 Documentation:
 
   - add missing Gemfile global `path` explanation (@agenteo)
+
+## 1.7.15 (2015-04-29)
+
+Bugfixes:
+
+  - Respect Gemfile sources when installing a gem present in two sources (#3585, @tmoore)
+
+## 1.7.14 (2015-03-30)
+
+Bugfixes:
+
+  - Keep gems locked when updating another gem from the same source (#3250, @indirect)
+  - Don't add extra quotes around long, quoted config values (@aroben, #3338)
 
 ## 1.7.13 (2015-02-07)
 

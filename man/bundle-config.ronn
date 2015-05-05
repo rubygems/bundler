@@ -39,7 +39,7 @@ cause it to ignore all configuration.
 
 Flags passed to `bundle install` or the Bundler runtime, such as `--path foo` or `--without production`, are not remembered between commands. If these options must be remembered, they must be set using `bundle config` (e.g., `bundle config path foo`).
 
-The options that can be configured are:
+The options that can be remembered for future commands are:
 
 * `binstubs`:
   Creates a directory (defaults to `~/bin`) and place any executables from the
@@ -63,6 +63,9 @@ The options that can be configured are:
 
 * `without`:
   A space-separated list of groups referencing gems to skip during installation.
+
+* `with`:
+  A space-separated list of optional groups to be installed.
 
 ## BUILD OPTIONS
 
@@ -131,9 +134,18 @@ learn more about their operation in [bundle install(1)][bundle-install].
 * `ssl_client_cert` (`BUNDLE_SSL_CLIENT_CERT`):
   Path to a designated file containing a X.509 client certificate
   and key in PEM format.
+* `cache_path` (`BUNDLE_CACHE_PATH`): The directory that bundler will place
+  cached gems in when running <code>bundle package</code>, and that bundler
+  will look in when installing gems.
+* `disable_multisource` (`BUNDLE_DISABLE_MULTISOURCE`): When set, Gemfiles
+  containing multiple sources will produce errors instead of warnings. Use
+  `bundle config --delete disable_multisource` to unset.
+* `ignore_messages` (`BUNDLE_IGNORE_MESSAGES`): When set, no post install
+  messages will be printed. To silence a single gem, use dot notation like
+  `ignore_messages.httparty true`.
 
 In general, you should set these settings per-application by using the applicable
-flag to the [bundle install(1)][bundle-install] command.
+flag to the [bundle install(1)][bundle-install] or [bundle package(1)][bundle-package] command.
 
 You can set them globally either via environment variables or `bundle config`,
 whichever is preferable for your setup. If you use both, environment variables

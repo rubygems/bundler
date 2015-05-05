@@ -14,7 +14,6 @@ describe "bundle_ruby" do
 
       expect(err).to include("DEPRECATION: bundle_ruby is deprecated and will " \
                              "be removed in Bundler 2.0.")
-
     end
   end
 

@@ -11,17 +11,6 @@ describe Bundler::Retry do
     expect(attempts).to eq(1)
   end
 
-  it "defaults to retrying twice" do
-    attempts = 0
-    expect {
-      Bundler::Retry.new(nil).attempt do
-        attempts += 1
-        raise "nope"
-      end
-    }.to raise_error("nope")
-    expect(attempts).to eq(3)
-  end
-
   it "returns the first valid result" do
     jobs = [Proc.new{ raise "foo" }, Proc.new{ :bar }, Proc.new{ raise "foo" }]
     attempts = 0

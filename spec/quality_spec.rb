@@ -97,8 +97,7 @@ describe "The library itself" do
       end
     end
 
-    errors = @err.split("\n").reject { |f| f =~ %r{lib/bundler/vendor} }
-    expect(errors.reject{|r| r =~ /^DEPRECATION/ }).to eq([])
+    expect(@err.split("\n").reject{|r| r =~ /^DEPRECATION/ }).to eq([])
     expect(@out).to eq("")
   end
 end

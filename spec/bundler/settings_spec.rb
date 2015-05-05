@@ -15,6 +15,34 @@ describe Bundler::Settings do
     end
   end
 
+  describe "#[]" do
+    context "when not set" do
+      context "when default value present" do
+        it "retrieves value" do
+          expect(settings[:retry]).to be 3
+        end
+      end
+
+      it "returns nil" do
+        expect(settings[:buttermilk]).to be nil
+      end
+    end
+
+    context "when is boolean" do
+      it "returns a boolean" do
+        settings[:frozen] = "true"
+        expect(settings[:frozen]).to be true
+      end
+      context "when specific gem is configured" do
+        it "returns a boolean" do
+          settings["ignore_messages.foobar"] = "true"
+          expect(settings["ignore_messages.foobar"]).to be true
+        end
+      end
+    end
+  end
+
+
   describe "#mirror_for" do
     let(:uri) { URI("https://rubygems.org/") }
 

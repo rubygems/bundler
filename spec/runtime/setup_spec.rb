@@ -90,6 +90,21 @@ describe "Bundler.setup" do
       expect(err).to lack_errors
       expect(out).to match("WIN")
     end
+
+    it "handles multiple non-additive invocations" do
+      ruby <<-RUBY
+        require 'bundler'
+        Bundler.setup(:default, :test)
+        Bundler.setup(:default)
+        require 'rack'
+
+        puts "FAIL"
+      RUBY
+
+      expect(err).to match("rack")
+      expect(err).to match("LoadError")
+      expect(out).not_to match("FAIL")
+    end
   end
 
   it "raises if the Gemfile was not yet installed" do
@@ -626,6 +641,39 @@ describe "Bundler.setup" do
 
     run "require 'rq'"
     expect(out).to eq("yay")
+  end
+
+  it "should clean $LOAD_PATH properly" do
+    gem_name = 'very_simple_binary'
+    full_gem_name = gem_name + '-1.0'
+    ext_dir = File.join(tmp "extenstions", full_gem_name)
+
+    install_gem full_gem_name
+
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+    G
+
+    ruby <<-R
+      if Gem::Specification.method_defined? :extension_dir
+        s = Gem::Specification.find_by_name '#{gem_name}'
+        s.extension_dir = '#{ext_dir}'
+
+        # Don't build extensions.
+        s.class.send(:define_method, :build_extensions) { nil }
+      end
+
+      require 'bundler'
+      gem '#{gem_name}'
+
+      puts $LOAD_PATH.count {|path| path =~ /#{gem_name}/} >= 2
+
+      Bundler.setup
+
+      puts $LOAD_PATH.count {|path| path =~ /#{gem_name}/} == 0
+    R
+
+    expect(out).to eq("true\ntrue")
   end
 
   it "stubs out Gem.refresh so it does not reveal system gems" do

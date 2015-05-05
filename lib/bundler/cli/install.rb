@@ -10,9 +10,34 @@ module Bundler
 
       warn_if_root
 
-      if options[:without]
-        options[:without] = options[:without].map{|g| g.tr(' ', ':') }
+      [:with, :without].each do |option|
+        if options[option]
+          options[option] = options[option].join(":").tr(" ", ":").split(":")
+        end
       end
+
+      if options[:without] && options[:with]
+        conflicting_groups = options[:without] & options[:with]
+        unless conflicting_groups.empty?
+          Bundler.ui.error "You can't list a group in both, --with and --without." \
+          "The offending groups are: #{conflicting_groups.join(", ")}."
+          exit 1
+        end
+      end
+
+      Bundler.settings.with    = [] if options[:with] && options[:with].empty?
+      Bundler.settings.without = [] if options[:without] && options[:without].empty?
+
+      with = options.fetch("with", [])
+      with |= Bundler.settings.with.map {|group| group.to_s }
+      with -= options[:without] if options[:without]
+
+      without = options.fetch("without", [])
+      without |= Bundler.settings.without.map {|group| group.to_s }
+      without -= options[:with] if options[:with]
+
+      options[:with]    = with
+      options[:without] = without
 
       ENV['RB_USER_INSTALL'] = '1' if Bundler::FREEBSD
 
@@ -69,6 +94,7 @@ module Bundler
       Bundler.settings[:no_install] = true if options["no-install"]
       Bundler.settings[:clean]    = options["clean"] if options["clean"]
       Bundler.settings.without    = options[:without]
+      Bundler.settings.with       = options[:with]
       Bundler::Fetcher.disable_endpoint = options["full-index"]
       Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? '1' : nil
 
@@ -91,9 +117,10 @@ module Bundler
         Bundler.ui.confirm "Use `bundle show [gemname]` to see where a bundled gem is installed."
       end
 
-      Installer.post_install_messages.to_a.each do |name, msg|
-        Bundler.ui.confirm "Post-install message from #{name}:"
-        Bundler.ui.info msg
+      unless Bundler.settings["ignore_messages"]
+        Installer.post_install_messages.to_a.each do |name, msg|
+          print_post_install_message(name, msg) unless Bundler.settings["ignore_messages.#{name}"]
+        end
       end
 
       Installer.ambiguous_gems.to_a.each do |name, installed_from_uri, *also_found_in_uris|
@@ -150,6 +177,11 @@ module Bundler
     def gems_installed_for(definition)
       count = definition.specs.count
       "#{count} #{count == 1 ? 'gem' : 'gems'} now installed"
+    end
+
+    def print_post_install_message(name, msg)
+      Bundler.ui.confirm "Post-install message from #{name}:"
+      Bundler.ui.info msg
     end
 
   end

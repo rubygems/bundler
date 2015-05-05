@@ -88,9 +88,6 @@ module Bundler
               raise if $1 != namespaced_file
             end
           end
-        rescue => e
-          Bundler.ui.debug e
-          Bundler.ui.warn "Unable to require #{required_file}. #{e.class}: #{e.message}."
         end
       end
     end

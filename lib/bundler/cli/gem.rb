@@ -20,9 +20,9 @@ module Bundler
 
       underscored_name = name.tr('-', '_')
       namespaced_path = name.tr('-', '/')
-      constant_name = name.split('_').map{|p| p[0..0].upcase + p[1..-1] unless p.empty?}.join
-      constant_name = constant_name.split('-').map{|q| q[0..0].upcase + q[1..-1] }.join('::') if constant_name =~ /-/
+      constant_name = name.gsub(/-[_-]*(?![_-]|$)/){ '::' }.gsub(/([_-]+|(::)|^)(.|$)/){ $2.to_s + $3.upcase }
       constant_array = constant_name.split('::')
+
       git_user_name = `git config user.name`.chomp
       git_user_email = `git config user.email`.chomp
 
@@ -54,6 +54,11 @@ module Bundler
         "bin/setup.tt" => "bin/setup"
       }
 
+      executables = %w[
+        bin/console
+        bin/setup
+      ]
+
       if ask_and_set(:coc, "Do you want to include a code of conduct in gems you generate?",
           "Codes of conduct can increase contributions to your project by contributors who " \
           "prefer collaborative, safe spaces. You can read more about the code of conduct at " \
@@ -61,6 +66,7 @@ module Bundler
           "of enforcing it, so be sure that you are prepared to do that. For suggestions about " \
           "how to enforce codes of conduct, see bit.ly/coc-enforcement."
         )
+        Bundler.ui.info "Code of conduct enabled in config"
         templates.merge!("CODE_OF_CONDUCT.md.tt" => "CODE_OF_CONDUCT.md")
       end
 
@@ -70,10 +76,12 @@ module Bundler
           "at choosealicense.com/licenses/mit."
         )
         config[:mit] = true
+        Bundler.ui.info "MIT License enabled in config"
         templates.merge!("LICENSE.txt.tt" => "LICENSE.txt")
       end
 
       if test_framework = ask_and_set_test_framework
+        config[:test] = test_framework
         templates.merge!(".travis.yml.tt" => ".travis.yml")
 
         case test_framework
@@ -85,8 +93,8 @@ module Bundler
           )
         when 'minitest'
           templates.merge!(
-            "test/minitest_helper.rb.tt" => "test/minitest_helper.rb",
-            "test/test_newgem.rb.tt" => "test/test_#{namespaced_path}.rb"
+            "test/test_helper.rb.tt" => "test/test_helper.rb",
+            "test/newgem_test.rb.tt" => "test/#{namespaced_path}_test.rb"
           )
         end
       end
@@ -103,6 +111,12 @@ module Bundler
 
       templates.each do |src, dst|
         thor.template("newgem/#{src}", target.join(dst), config)
+      end
+
+      executables.each do |file|
+        path = target.join(file)
+        executable = (path.stat.mode | 0111)
+        path.chmod(executable)
       end
 
       Bundler.ui.info "Initializing git repo in #{target}"
@@ -125,7 +139,7 @@ module Bundler
 
       if choice.nil?
         Bundler.ui.confirm header
-        choice = (Bundler.ui.ask("#{message} y/(n):") =~ /y|yes/)
+        choice = Bundler.ui.yes? "#{message} y/(n):"
         Bundler.settings.set_global("gem.#{key}", choice)
       end
 
@@ -174,7 +188,7 @@ module Bundler
       if name =~ /^\d/
         Bundler.ui.error "Invalid gem name #{name} Please give a name which does not start with numbers."
         exit 1
-      elsif Object.const_defined?(constant_array.first)
+      elsif constant_array.inject(Object) {|c, s| (c.const_defined?(s) && c.const_get(s)) || break }
         Bundler.ui.error "Invalid gem name #{name} constant #{constant_array.join("::")} is already in use. Please choose another gem name."
         exit 1
       end

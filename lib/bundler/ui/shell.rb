@@ -54,6 +54,14 @@ module Bundler
         @shell.ask(msg)
       end
 
+      def yes?(msg)
+        @shell.yes?(msg)
+      end
+
+      def no?
+        @shell.no?(msg)
+      end
+
       def level=(level)
         raise ArgumentError unless LEVELS.include?(level.to_s)
         @level = level

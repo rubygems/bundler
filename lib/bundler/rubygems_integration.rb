@@ -131,6 +131,19 @@ module Bundler
       yield
     end
 
+    def loaded_gem_paths
+      # RubyGems 2.2+ can put binary extension into dedicated folders,
+      # therefore use RubyGems facilities to obtain their load paths.
+      if Gem::Specification.method_defined? :full_require_paths
+        loaded_gem_paths = Gem.loaded_specs.map {|n, s| s.full_require_paths}
+        loaded_gem_paths.flatten
+      else
+        $LOAD_PATH.select do |p|
+          Bundler.rubygems.gem_path.any?{|gp| p =~ /^#{Regexp.escape(gp)}/ }
+        end
+      end
+    end
+
     def ui=(obj)
       Gem::DefaultUserInteraction.ui = obj
     end
@@ -161,12 +174,14 @@ module Bundler
     end
 
     def with_build_args(args)
-      old_args = self.build_args
-      begin
-        self.build_args = args
-        yield
-      ensure
-        self.build_args = old_args
+      ext_lock.synchronize do
+        old_args = self.build_args
+        begin
+          self.build_args = args
+          yield
+        ensure
+          self.build_args = old_args
+        end
       end
     end
 
@@ -559,10 +574,18 @@ module Bundler
       end
     end
 
+    # RubyGems 2.1.0
     class MoreFuture < Future
       def initialize
         super
         backport_ext_builder_monitor
+      end
+
+      def all_specs
+        require 'bundler/remote_specification'
+        Gem::Specification.stubs.map do |stub|
+          StubSpecification.from_stub(stub)
+        end
       end
 
       def backport_ext_builder_monitor
@@ -582,6 +605,18 @@ module Bundler
 
       def ext_lock
         Gem::Ext::Builder::CHDIR_MONITOR
+      end
+
+      if Gem::Specification.respond_to?(:stubs_for)
+        def find_name(name)
+          Gem::Specification.stubs_for(name).map(&:to_spec)
+        end
+      else
+        def find_name(name)
+          Gem::Specification.stubs.find_all do |spec|
+            spec.name == name
+          end.map(&:to_spec)
+        end
       end
     end
 
