@@ -213,7 +213,13 @@ module Bundler
     def add_git_sources
       git_source(:github) do |repo_name|
         repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
-        "git://github.com/#{repo_name}.git"
+        # TODO 2.0 upgrade this setting to the default
+        if Bundler.settings["github.https"]
+          "https://github.com/#{repo_name}.git"
+        else
+          warn_github_source_change(repo_name)
+          "git://github.com/#{repo_name}.git"
+        end
       end
 
       # TODO 2.0 remove this deprecated git source
@@ -369,6 +375,13 @@ module Bundler
           "To upgrade this warning to an error, run `bundle config " \
           "disable_multisource true`."
       end
+    end
+
+    def warn_github_source_change(repo_name)
+      # TODO 2.0 remove deprecation
+      Bundler.ui.deprecate "The :github option uses the git: protocol, which is not secure. " \
+        "Bundler 2.0 will use the https: protcol, which is secure. Enable this change now by " \
+        "running `bundle config github.https true`."
     end
 
     def warn_deprecated_git_source(name, repo_string)
