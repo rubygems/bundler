@@ -96,8 +96,11 @@ describe "when using sudo", :sudo => true do
   end
 
   describe "and BUNDLE_PATH is not writable" do
-    it "installs" do
+    before do
       sudo "chmod ugo-w #{default_bundle_path}"
+    end
+
+    it "installs" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack", '1.0'
@@ -105,6 +108,20 @@ describe "when using sudo", :sudo => true do
 
       expect(default_bundle_path("gems/rack-1.0.0")).to exist
       should_be_installed "rack 1.0"
+    end
+
+    it "cleans up the tmpdirs generated" do
+      Dir.glob("#{Dir.tmpdir}/bundler*").each do |tmpdir|
+        FileUtils.remove_entry_secure(tmpdir)
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+      tmpdirs = Dir.glob("#{Dir.tmpdir}/bundler*")
+
+      expect(tmpdirs).to be_empty
     end
   end
 
