@@ -16,5 +16,18 @@ describe Bundler::Fetcher do
       expect(fetcher.user_agent).to match(/ruby\/(\d.)/)
       expect(fetcher.user_agent).to match(/options\/foo,bar/)
     end
+
+    describe "include CI information" do
+      it "from one CI" do
+        ENV["TRAVIS"] = "foo"
+        expect(fetcher.user_agent).to match("ci/travis")
+      end
+
+      it "from many CI" do
+        ENV["TRAVIS"] = "foo"
+        ENV["CI"] = "bar"
+        expect(fetcher.user_agent).to match("ci/travis,ci")
+      end
+    end
   end
 end
