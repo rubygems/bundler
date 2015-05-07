@@ -11,6 +11,7 @@ module Bundler
         end
         @shell = Thor::Base.shell.new
         @level = ENV['DEBUG'] ? "debug" : "info"
+        @told_messages = []
       end
 
       def info(msg, newline = nil)
@@ -80,6 +81,9 @@ module Bundler
 
       # valimism
       def tell_me(msg, color = nil, newline = nil)
+        return if @told_messages.include? msg
+        @told_messages << msg
+
         msg = word_wrap(msg) if newline.is_a?(Hash) && newline[:wrap]
         if newline.nil?
           @shell.say(msg, color)
