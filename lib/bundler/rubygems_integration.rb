@@ -4,6 +4,11 @@ require 'rubygems/config_file'
 
 module Bundler
   class RubygemsIntegration
+    if defined?(Gem::Ext::Builder::CHDIR_MONITOR)
+      EXT_LOCK = Gem::Ext::Builder::CHDIR_MONITOR
+    else
+      EXT_LOCK = Monitor.new
+    end
 
     def self.version
       @version ||= Gem::Version.new(Gem::VERSION)
@@ -149,7 +154,7 @@ module Bundler
     end
 
     def ext_lock
-      @ext_lock ||= Monitor.new
+      EXT_LOCK
     end
 
     def fetch_specs(all, pre, &blk)
@@ -601,10 +606,6 @@ module Bundler
             const_set(:CHDIR_MUTEX, const_get(:CHDIR_MONITOR))
           end
         end
-      end
-
-      def ext_lock
-        Gem::Ext::Builder::CHDIR_MONITOR
       end
 
       if Gem::Specification.respond_to?(:stubs_for)
