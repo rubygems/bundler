@@ -36,6 +36,9 @@ module Bundler
         else
           tmp = Set.new
           parent_dependencies.each do |dependency|
+            # if the dependency is a prerelease, allow to_spec to be non-nil
+            dependency.prerelease = true
+
             child_dependencies = dependency.to_spec.runtime_dependencies.to_set
             @relations[dependency.name] += child_dependencies.map(&:name).to_set
             tmp += child_dependencies

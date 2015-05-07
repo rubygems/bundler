@@ -114,8 +114,10 @@ namespace :spec do
       system "sudo sed -i 's/1000::/1000:Travis:/g' /etc/passwd"
       # Strip secure_path so that RVM paths transmit through sudo -E
       system "sudo sed -i '/secure_path/d' /etc/sudoers"
-      # Install groff for the ronn gem
+      # Install groff so ronn can generate man/help pages
       sh "sudo apt-get install groff -y"
+      # Install graphviz so that the viz specs can run
+      sh "sudo apt-get install graphviz -y 2>&1 | tail -n 2"
       if RUBY_VERSION < '1.9'
         # Downgrade Rubygems on 1.8 so Ronn can be required
         # https://github.com/rubygems/rubygems/issues/784
