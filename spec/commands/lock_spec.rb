@@ -49,7 +49,7 @@ describe "bundle lock" do
         with_license
 
       BUNDLED WITH
-        #{Bundler::VERSION}
+         #{Bundler::VERSION}
     L
   end
 
