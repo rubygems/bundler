@@ -54,7 +54,7 @@ describe "Bundler version 1.99" do
         gem "rack", :group => :test
       G
 
-      ruby(<<-RUBY, { expect_err: true })
+      ruby(<<-RUBY, { :expect_err => true })
         require 'bundler/deployment'
       RUBY
 
