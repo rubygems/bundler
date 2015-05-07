@@ -317,7 +317,7 @@ module Bundler
 
       # Record the version of Bundler that was used to create the lockfile
       out << "\nBUNDLED WITH\n"
-      out << "  #{lock_version}\n"
+      out << "   #{lock_version}\n"
 
       out
     end

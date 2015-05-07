@@ -32,7 +32,7 @@ describe "bundle install with install_if conditionals" do
         thin
 
       BUNDLED WITH
-        1.9.4
+         #{Bundler::VERSION}
     L
   end
 end
