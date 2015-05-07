@@ -183,18 +183,16 @@ module Bundler
     def cis
       env_cis = {
         "TRAVIS" => "travis",
-        "HAS_JOSH_K_SEAL_OF_APPROVAL" => "josh_k_seal",
         "CIRCLECI" => "circle",
         "SEMAPHORE" => "semaphore",
         "JENKINS_URL" => "jenkins",
         "BUILDBOX" => "buildbox",
         "GO_SERVER_URL" => "go",
-        "SNAP_CI" => "snap"
+        "SNAP_CI" => "snap",
+        "CI_NAME" => ENV["CI_NAME"],
+        "CI" => "ci"
       }
-      cis = env_cis.find_all{ |env, ci| ENV[env]}.map{ |env, ci| ci }
-      cis << ENV["CI_NAME"] if ENV["CI_NAME"]
-      cis << "ci" if ENV["CI"]
-      cis
+      env_cis.find_all{ |env, ci| ENV[env]}.map{ |env, ci| ci }
     end
 
     def connection
