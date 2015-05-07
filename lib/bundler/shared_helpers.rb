@@ -21,6 +21,7 @@ module Bundler
 
     def default_gemfile
       gemfile = find_gemfile
+      deprecate_gemfile(gemfile)
       raise GemfileNotFound, "Could not locate Gemfile" unless gemfile
       Pathname.new(gemfile)
     end
@@ -35,32 +36,27 @@ module Bundler
     end
 
     def default_bundle_dir
-      global_bundle_dir = File.join(Bundler.rubygems.user_home, ".bundle")
       bundle_dir = find_directory(".bundle")
+      return nil unless bundle_dir
 
-      if bundle_dir && bundle_dir != global_bundle_dir
-        Pathname.new(bundle_dir)
-      else
-        nil
-      end
+      global_bundle_dir = File.join(Bundler.rubygems.user_home, ".bundle")
+      return nil if bundle_dir == global_bundle_dir
+
+      Pathname.new(bundle_dir)
     end
 
     def in_bundle?
       find_gemfile
     end
 
-    def chdir_monitor
-      Bundler.rubygems.ext_lock
-    end
-
     def chdir(dir, &blk)
-      chdir_monitor.synchronize do
+      Bundler.rubygems.ext_lock.synchronize do
         Dir.chdir dir, &blk
       end
     end
 
     def pwd
-      chdir_monitor.synchronize do
+      Bundler.rubygems.ext_lock.synchronize do
         Dir.pwd
       end
     end
@@ -102,7 +98,6 @@ module Bundler
     def find_gemfile
       given = ENV['BUNDLE_GEMFILE']
       return given if given && !given.empty?
-
       find_file('Gemfile', 'gems.rb')
     end
 
@@ -140,12 +135,25 @@ module Bundler
       # handle 1.9 where system gems are always on the load path
       if defined?(::Gem)
         me = File.expand_path("../../", __FILE__)
+        me = /^#{Regexp.escape(me)}/
+
+        loaded_gem_paths = Bundler.rubygems.loaded_gem_paths
+
         $LOAD_PATH.reject! do |p|
-          next if File.expand_path(p) =~ /^#{Regexp.escape(me)}/
-          p != File.dirname(__FILE__) &&
-            Bundler.rubygems.gem_path.any?{|gp| p =~ /^#{Regexp.escape(gp)}/ }
+          next if File.expand_path(p) =~ me
+          loaded_gem_paths.delete(p)
         end
         $LOAD_PATH.uniq!
+      end
+    end
+
+    def deprecate_gemfile(gemfile)
+      if gemfile && File.basename(gemfile) == "Gemfile"
+        Bundler.respond_to?(:ui) && Bundler.ui.deprecate(
+          "Gemfile and Gemfile.lock are " \
+          "deprecated and will be replaced with gems.rb and " \
+          "gems.locked in Bundler 2.0.\n"
+        )
       end
     end
 

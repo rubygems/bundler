@@ -11,8 +11,6 @@ module Bundler
     rescue Exception => e
       Bundler.ui = UI::Shell.new
       raise e
-    ensure
-      Bundler.cleanup
     end
 
     def initialize(*args)
@@ -20,7 +18,7 @@ module Bundler
       current_cmd = args.last[:current_command].name
       custom_gemfile = options[:gemfile] || Bundler.settings[:gemfile]
       ENV['BUNDLE_GEMFILE']   = File.expand_path(custom_gemfile) if custom_gemfile
-      Bundler::Retry.attempts = options[:retry] || Bundler.settings[:retry] || Bundler::Retry::DEFAULT_ATTEMPTS
+      Bundler.settings[:retry] = options[:retry] if options[:retry]
       Bundler.rubygems.ui = UI::RGProxy.new(Bundler.ui)
       auto_install if AUTO_INSTALL_CMDS.include?(current_cmd)
     rescue UnknownArgumentError => e
@@ -134,6 +132,8 @@ module Bundler
       "Do not attempt to fetch gems remotely and use the gem cache instead"
     method_option "cache", :type => :boolean, :banner =>
       "Update the existing gem cache."
+    method_option "force", :type => :boolean, :banner =>
+      "Force downloading every gem."
     method_option "no-prune", :type => :boolean, :banner =>
       "Don't remove stale gems from the cache."
     method_option "path", :type => :string, :banner =>
@@ -151,6 +151,8 @@ module Bundler
         Bundler.rubygems.security_policy_keys.join('|')
     method_option "without", :type => :array, :banner =>
       "Exclude gems that are part of the specified named group."
+    method_option "with", :type => :array, :banner =>
+      "Include gems that are part of the specified named group."
 
     def install
       require 'bundler/cli/install'
@@ -175,6 +177,8 @@ module Bundler
       "Only output warnings and errors."
     method_option "source", :type => :array, :banner =>
       "Update a specific source (and all gems associated with it)"
+    method_option "force", :type => :boolean, :banner =>
+      "Force downloading every gem."
     def update(*gems)
       require 'bundler/cli/update'
       Update.new(options, gems).run

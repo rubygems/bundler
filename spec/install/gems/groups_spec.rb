@@ -26,7 +26,7 @@ describe "bundle install with groups" do
         puts ACTIVESUPPORT
       R
 
-      expect(err).to eq("ZOMG LOAD ERROR")
+      expect(err).to eq_err("ZOMG LOAD ERROR")
     end
 
     it "installs gems with inline :groups into those groups" do
@@ -37,7 +37,7 @@ describe "bundle install with groups" do
         puts THIN
       R
 
-      expect(err).to eq("ZOMG LOAD ERROR")
+      expect(err).to eq_err("ZOMG LOAD ERROR")
     end
 
     it "sets up everything if Bundler.setup is used with no groups" do
@@ -58,7 +58,7 @@ describe "bundle install with groups" do
         puts THIN
       RUBY
 
-      expect(err).to eq("ZOMG LOAD ERROR")
+      expect(err).to eq_err("ZOMG LOAD ERROR")
     end
 
     it "sets up old groups when they have previously been removed" do
@@ -79,6 +79,9 @@ describe "bundle install with groups" do
           gem "rack"
           group :emo do
             gem "activesupport", "2.3.5"
+          end
+          group :debugging, :optional => true do
+            gem "thin"
           end
         G
       end
@@ -158,6 +161,69 @@ describe "bundle install with groups" do
 
         bundle :install
         should_not_be_installed "activesupport 2.3.5"
+      end
+
+      it "does not install gems from the optional group" do
+        bundle :install
+        should_not_be_installed "thin 1.0"
+      end
+
+      it "does install gems from the optional group when requested" do
+        bundle :install, :with => "debugging"
+        should_be_installed "thin 1.0"
+      end
+
+      it "does install gems from the previously requested group" do
+        bundle :install, :with => "debugging"
+        should_be_installed "thin 1.0"
+        bundle :install
+        should_be_installed "thin 1.0"
+      end
+
+      it "does install gems from the optional groups requested with BUNDLE_WITH" do
+        ENV["BUNDLE_WITH"] = "debugging"
+        bundle :install
+        should_be_installed "thin 1.0"
+        ENV["BUNDLE_WITH"] = nil
+      end
+
+      it "clears with when passed an empty list" do
+        bundle :install, :with => "debugging"
+        bundle 'install --with ""'
+        should_not_be_installed "thin 1.0"
+      end
+
+      it "does remove groups from without when passed at with" do
+        bundle :install, :without => "emo"
+        bundle :install, :with => "emo"
+        should_be_installed "activesupport 2.3.5"
+      end
+
+      it "does remove groups from with when passed at without" do
+        bundle :install, :with => "debugging"
+        bundle :install, :without => "debugging"
+        should_not_be_installed "thin 1.0"
+      end
+
+      it "errors out when passing a group to with and without" do
+        bundle :install, :with => "emo debugging", :without => "emo"
+        expect(out).to include("The offending groups are: emo")
+      end
+
+      it "can add and remove a group at the same time" do
+        bundle :install, :with => "debugging", :without => "emo"
+        should_be_installed "thin 1.0"
+        should_not_be_installed "activesupport 2.3.5"
+      end
+
+      it "does have no effect when listing a not optional group in with" do
+        bundle :install, :with => "emo"
+        should_be_installed "activesupport 2.3.5"
+      end
+
+      it "does have no effect when listing an optional group in without" do
+        bundle :install, :without => "debugging"
+        should_not_be_installed "thin 1.0"
       end
     end
 
@@ -301,7 +367,7 @@ describe "bundle install with groups" do
     it "does not hit the remote a second time" do
       FileUtils.rm_rf gem_repo2
       bundle "install --without rack"
-      expect(err).to be_empty
+      expect(err).to lack_errors
     end
   end
 

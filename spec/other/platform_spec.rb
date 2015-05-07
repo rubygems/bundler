@@ -1126,8 +1126,8 @@ G
       G
 
       bundle "outdated"
-      expect(out).to include("activesupport (3.0 > 2.3.5)")
-      expect(out).to include("foo (1.0")
+      expect(out).to include("activesupport (newest 3.0, installed 2.3.5, requested = 2.3.5")
+      expect(out).to include("foo (newest 1.0")
     end
 
     it "returns list of outdated gems when the ruby version matches for any engine" do
@@ -1146,8 +1146,8 @@ G
         G
 
         bundle "outdated"
-        expect(out).to include("activesupport (3.0 > 2.3.5)")
-        expect(out).to include("foo (1.0")
+        expect(out).to include("activesupport (newest 3.0, installed 2.3.5, requested = 2.3.5)")
+        expect(out).to include("foo (newest 1.0")
       end
     end
 

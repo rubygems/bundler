@@ -79,37 +79,49 @@ module Bundler
         options["local"] ? @definition.resolve_with_cache! : @definition.resolve_remotely!
       end
 
+      force = options["force"]
+
       # the order that the resolver provides is significant, since
       # dependencies might actually affect the installation of a gem.
       # that said, it's a rare situation (other than rake), and parallel
       # installation is just SO MUCH FASTER. so we let people opt in.
       jobs = [Bundler.settings[:jobs].to_i-1, 1].max
       if jobs > 1 && can_install_in_parallel?
-        install_in_parallel jobs, options[:standalone]
+        require 'bundler/installer/parallel_installer'
+        install_in_parallel jobs, options[:standalone], force
       else
-        install_sequentially options[:standalone]
+        install_sequentially options[:standalone], force
       end
 
       lock unless Bundler.settings[:frozen]
       generate_standalone(options[:standalone]) if options[:standalone]
     end
 
-    def install_gem_from_spec(spec, standalone = false, worker = 0)
+    def install_gem_from_spec(spec, standalone = false, worker = 0, force = false)
       # Fetch the build settings, if there are any
-      settings             = Bundler.settings["build.#{spec.name}"]
-      install_message      = nil
-      post_install_message = nil
-      debug_message        = nil
-      Bundler.rubygems.with_build_args [settings] do
-        install_message, post_install_message, debug_message = spec.source.install(spec)
-        if install_message.include? 'Installing'
-          Bundler.ui.confirm install_message
-        else
-          Bundler.ui.info install_message
+      settings = Bundler.settings["build.#{spec.name}"]
+      messages = nil
+
+      install_options = { :force => force, :ensure_builtin_gems_cached => standalone }
+
+      if settings
+        # Build arguments are global, so this is mutexed
+        Bundler.rubygems.with_build_args [settings] do
+          messages = spec.source.install(spec, install_options)
         end
-        Bundler.ui.debug debug_message if debug_message
-        Bundler.ui.debug "#{worker}:  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
+      else
+        messages = spec.source.install(spec, install_options)
       end
+
+      install_message, post_install_message, debug_message = *messages
+
+      if install_message.include? 'Installing'
+        Bundler.ui.confirm install_message
+      else
+        Bundler.ui.info install_message
+      end
+      Bundler.ui.debug debug_message if debug_message
+      Bundler.ui.debug "#{worker}:  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
 
       if Bundler.settings[:bin] && standalone
         generate_standalone_bundler_executable_stubs(spec)
@@ -258,68 +270,17 @@ module Bundler
       end
     end
 
-    def install_sequentially(standalone)
+    def install_sequentially(standalone, force = false)
       specs.each do |spec|
-        message = install_gem_from_spec spec, standalone, 0
+        message = install_gem_from_spec spec, standalone, 0, force
         if message
           Installer.post_install_messages[spec.name] = message
         end
       end
     end
 
-    def install_in_parallel(size, standalone)
-      name2spec = {}
-      remains = {}
-      enqueued = {}
-      specs.each do |spec|
-        name2spec[spec.name] = spec
-        remains[spec.name] = true
-      end
-
-      worker_pool = Worker.new size, lambda { |name, worker_num|
-        spec = name2spec[name]
-        message = install_gem_from_spec spec, standalone, worker_num
-        { :name => spec.name, :post_install => message }
-      }
-
-      # Keys in the remains hash represent uninstalled gems specs.
-      # We enqueue all gem specs that do not have any dependencies.
-      # Later we call this lambda again to install specs that depended on
-      # previously installed specifications. We continue until all specs
-      # are installed.
-      enqueue_remaining_specs = lambda do
-        remains.keys.each do |name|
-          next if enqueued[name]
-          spec = name2spec[name]
-          if ready_to_install?(spec, remains)
-            worker_pool.enq name
-            enqueued[name] = true
-          end
-        end
-      end
-      enqueue_remaining_specs.call
-
-      until remains.empty?
-        message = worker_pool.deq
-        remains.delete message[:name]
-        if message[:post_install]
-          Installer.post_install_messages[message[:name]] = message[:post_install]
-        end
-        enqueue_remaining_specs.call
-      end
-      message
-    ensure
-      worker_pool && worker_pool.stop
-    end
-
-    # We only want to install a gem spec if all its dependencies are met.
-    # If the dependency is no longer in the `remains` hash then it has been met.
-    # If a dependency is only development or is self referential it can be ignored.
-    def ready_to_install?(spec, remains)
-      spec.dependencies.none? do |dep|
-        next if dep.type == :development || dep.name == spec.name
-        remains[dep.name]
-      end
+    def install_in_parallel(size, standalone, force = false)
+      ParallelInstaller.call(self, specs, size, standalone, force)
     end
 
     def create_bundle_path

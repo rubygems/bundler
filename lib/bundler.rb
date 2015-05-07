@@ -120,12 +120,7 @@ module Bundler
         # Load all groups, but only once
         @setup = load.setup
       else
-        @completed_groups ||= []
-        # Figure out which groups haven't been loaded yet
-        unloaded = groups - @completed_groups
-        # Record groups that are now loaded
-        @completed_groups = groups
-        unloaded.any? ? load.setup(*groups) : load
+        load.setup(*groups)
       end
     end
 
@@ -211,13 +206,11 @@ module Bundler
     end
 
     def tmp(name = Process.pid.to_s)
-      @tmp ||= Pathname.new Dir.mktmpdir("bundler")
-      @tmp.join(name)
+      Pathname.new(Dir.mktmpdir(["bundler", name]))
     end
 
-    def cleanup
-      FileUtils.remove_entry_secure(@tmp) if @tmp
-    rescue
+    def rm_rf(path)
+      FileUtils.remove_entry_secure(path) if path && File.exist?(path)
     end
 
     def settings

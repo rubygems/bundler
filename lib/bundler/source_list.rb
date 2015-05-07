@@ -15,7 +15,9 @@ module Bundler
     end
 
     def add_git_source(options = {})
-      add_source_to_list Source::Git.new(options), git_sources
+      source = add_source_to_list(Source::Git.new(options), git_sources)
+      warn_on_git_protocol(source)
+      source
     end
 
     def add_rubygems_source(options = {})
@@ -97,5 +99,17 @@ module Bundler
     def combine_rubygems_sources
       Source::Rubygems.new("remotes" => rubygems_remotes)
     end
+
+    def warn_on_git_protocol(source)
+      return if Bundler.settings["git.allow_insecure"]
+
+      if source.uri =~ %r{^git\:}
+        Bundler.ui.warn "The git source `#{source.uri}` uses the `git` protocol, " \
+          "which transmits data without encryption. Disable this warning with " \
+          "`bundle config git.allow_insecure true`, or switch to the `https` " \
+          "protocol to keep your data secure."
+      end
+    end
+
   end
 end

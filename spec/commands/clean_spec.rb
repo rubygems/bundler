@@ -36,7 +36,7 @@ describe "bundle clean" do
 
     bundle :clean
 
-    expect(out).to eq("Removing foo (1.0)")
+    expect(out).to include("Removing foo (1.0)")
 
     should_have_gems 'thin-1.0', 'rack-1.0.0'
     should_not_have_gems 'foo-1.0'
@@ -64,7 +64,7 @@ describe "bundle clean" do
 
     bundle :clean
 
-    expect(out).to eq("Removing rack (0.9.1)")
+    expect(out).to include("Removing rack (0.9.1)")
 
     should_have_gems 'foo-1.0', 'rack-1.0.0'
     should_not_have_gems 'rack-0.9.1'
@@ -92,7 +92,7 @@ describe "bundle clean" do
 
     bundle :clean
 
-    expect(out).to eq("Removing rack (1.0.0)")
+    expect(out).to include("Removing rack (1.0.0)")
 
     should_have_gems 'foo-1.0', 'rack-0.9.1'
     should_not_have_gems 'rack-1.0.0'
@@ -115,7 +115,7 @@ describe "bundle clean" do
     bundle "install --without test_group"
     bundle :clean
 
-    expect(out).to eq("Removing rack (1.0.0)")
+    expect(out).to include("Removing rack (1.0.0)")
 
     should_have_gems 'foo-1.0'
     should_not_have_gems 'rack-1.0.0'
@@ -170,7 +170,7 @@ describe "bundle clean" do
 
     bundle :clean
 
-    expect(out).to eq("Removing foo (#{revision[0..11]})")
+    expect(out).to include("Removing foo (#{revision[0..11]})")
 
     expect(vendored_gems("gems/rack-1.0.0")).to exist
     expect(vendored_gems("bundler/gems/foo-#{revision[0..11]}")).not_to exist
@@ -203,7 +203,7 @@ describe "bundle clean" do
     bundle "update"
     bundle :clean
 
-    expect(out).to eq("Removing foo-bar (#{revision[0..11]})")
+    expect(out).to include("Removing foo-bar (#{revision[0..11]})")
 
     expect(vendored_gems("gems/rack-1.0.0")).to exist
     expect(vendored_gems("bundler/gems/foo-bar-#{revision[0..11]}")).not_to exist
@@ -227,7 +227,7 @@ describe "bundle clean" do
 
     bundle "install --path vendor/bundle"
     bundle :clean
-    expect(out).to eq("")
+    expect(out).to include("")
 
     expect(vendored_gems("bundler/gems/rails-#{revision[0..11]}")).to exist
   end
@@ -251,7 +251,7 @@ describe "bundle clean" do
 
     bundle :clean
 
-    expect(out).to eq("")
+    expect(out).to include("")
     expect(vendored_gems("bundler/gems/foo-#{revision[0..11]}")).to exist
     digest = Digest::SHA1.hexdigest(git_path.to_s)
     expect(vendored_gems("cache/bundler/git/foo-#{digest}")).to_not exist
@@ -451,7 +451,7 @@ describe "bundle clean" do
     bundle :install
     bundle "clean --force"
 
-    expect(out).to eq("Removing foo (1.0)")
+    expect(out).to include("Removing foo (1.0)")
     sys_exec "gem list"
     expect(out).not_to include("foo (1.0)")
     expect(out).to include("rack (1.0.0)")
@@ -552,8 +552,8 @@ describe "bundle clean" do
 
     bundle "clean --dry-run"
 
-    expect(out).not_to eq("Removing foo (1.0)")
-    expect(out).to eq("Would have removed foo (1.0)")
+    expect(out).not_to include("Removing foo (1.0)")
+    expect(out).to include("Would have removed foo (1.0)")
 
     should_have_gems 'thin-1.0', 'rack-1.0.0', 'foo-1.0'
 
@@ -581,8 +581,8 @@ describe "bundle clean" do
 
     bundle "clean"
 
-    expect(out).to eq("Removing foo (1.0)")
-    expect(out).not_to eq("Would have removed foo (1.0)")
+    expect(out).to include("Removing foo (1.0)")
+    expect(out).not_to include("Would have removed foo (1.0)")
 
     should_have_gems 'thin-1.0', 'rack-1.0.0'
     should_not_have_gems 'foo-1.0'

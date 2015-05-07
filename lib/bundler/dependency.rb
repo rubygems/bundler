@@ -50,11 +50,12 @@ module Bundler
       type = options["type"] || :runtime
       super(name, version, type)
 
-      @autorequire = nil
-      @groups      = Array(options["group"] || :default).map { |g| g.to_sym }
-      @source      = options["source"]
-      @platforms   = Array(options["platforms"])
-      @env         = options["env"]
+      @autorequire    = nil
+      @groups         = Array(options["group"] || :default).map { |g| g.to_sym }
+      @source         = options["source"]
+      @platforms      = Array(options["platforms"])
+      @env            = options["env"]
+      @should_include = options.fetch("should_include", true)
 
       if options.key?('require')
         @autorequire = Array(options['require'] || [])
@@ -74,7 +75,7 @@ module Bundler
     end
 
     def should_include?
-      current_env? && current_platform?
+      @should_include && current_env? && current_platform?
     end
 
     def current_env?

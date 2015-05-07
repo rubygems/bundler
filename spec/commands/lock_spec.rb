@@ -47,13 +47,16 @@ describe "bundle lock" do
         foo
         rails
         with_license
+
+      BUNDLED WITH
+        #{Bundler::VERSION}
     L
   end
 
   it "prints a lockfile when there is no existing lockfile with --print" do
     bundle "lock --print"
 
-    expect(out).to eq(@lockfile)
+    expect(out).to include(@lockfile)
   end
 
   it "prints a lockfile when there is an existing lockfile with --print" do

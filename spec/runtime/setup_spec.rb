@@ -16,7 +16,7 @@ describe "Bundler.setup" do
         require 'rack'
         puts RACK
       RUBY
-      expect(err).to eq("")
+      expect(err).to lack_errors
       expect(out).to eq("1.0.0")
     end
   end
@@ -42,7 +42,7 @@ describe "Bundler.setup" do
           puts "WIN"
         end
       RUBY
-      expect(err).to eq("")
+      expect(err).to lack_errors
       expect(out).to eq("WIN")
     end
 
@@ -55,7 +55,7 @@ describe "Bundler.setup" do
         require 'rack'
         puts RACK
       RUBY
-      expect(err).to eq("")
+      expect(err).to lack_errors
       expect(out).to eq("1.0.0")
     end
 
@@ -69,7 +69,7 @@ describe "Bundler.setup" do
         require 'rack'
         puts RACK
       RUBY
-      expect(err).to eq("")
+      expect(err).to lack_errors
       expect(out).to eq("1.0.0")
     end
 
@@ -87,8 +87,23 @@ describe "Bundler.setup" do
           puts "FAIL"
         end
       RUBY
-      expect(err).to eq("")
+      expect(err).to lack_errors
       expect(out).to match("WIN")
+    end
+
+    it "handles multiple non-additive invocations" do
+      ruby <<-RUBY
+        require 'bundler'
+        Bundler.setup(:default, :test)
+        Bundler.setup(:default)
+        require 'rack'
+
+        puts "FAIL"
+      RUBY
+
+      expect(err).to match("rack")
+      expect(err).to match("LoadError")
+      expect(out).not_to match("FAIL")
     end
   end
 
@@ -230,7 +245,7 @@ describe "Bundler.setup" do
           end
         R
 
-        expect(err).to be_empty
+        expect(err).to lack_errors
       end
 
       it "replaces #gem but raises when the version is wrong" do
@@ -256,7 +271,7 @@ describe "Bundler.setup" do
           end
         R
 
-        expect(err).to be_empty
+        expect(err).to lack_errors
       end
     end
 
@@ -572,7 +587,7 @@ describe "Bundler.setup" do
           end
         R
 
-        expect(err).to be_empty
+        expect(err).to lack_errors
       end
     end
   end
@@ -607,7 +622,7 @@ describe "Bundler.setup" do
     ENV["GEM_HOME"] = ""
     bundle %{exec ruby -e "require 'set'"}
 
-    expect(err).to be_empty
+    expect(err).to lack_errors
   end
 
   it "should prepend gemspec require paths to $LOAD_PATH in order" do
@@ -626,6 +641,39 @@ describe "Bundler.setup" do
 
     run "require 'rq'"
     expect(out).to eq("yay")
+  end
+
+  it "should clean $LOAD_PATH properly" do
+    gem_name = 'very_simple_binary'
+    full_gem_name = gem_name + '-1.0'
+    ext_dir = File.join(tmp "extenstions", full_gem_name)
+
+    install_gem full_gem_name
+
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+    G
+
+    ruby <<-R
+      if Gem::Specification.method_defined? :extension_dir
+        s = Gem::Specification.find_by_name '#{gem_name}'
+        s.extension_dir = '#{ext_dir}'
+
+        # Don't build extensions.
+        s.class.send(:define_method, :build_extensions) { nil }
+      end
+
+      require 'bundler'
+      gem '#{gem_name}'
+
+      puts $LOAD_PATH.count {|path| path =~ /#{gem_name}/} >= 2
+
+      Bundler.setup
+
+      puts $LOAD_PATH.count {|path| path =~ /#{gem_name}/} == 0
+    R
+
+    expect(out).to eq("true\ntrue")
   end
 
   it "stubs out Gem.refresh so it does not reveal system gems" do
@@ -663,7 +711,7 @@ describe "Bundler.setup" do
           require 'foo'
         R
       end
-      expect(err).to eq("")
+      expect(err).to lack_errors
     end
 
     it "should make sure the Bundler.root is really included in the path relative to the Gemfile" do
@@ -688,7 +736,7 @@ describe "Bundler.setup" do
         R
       end
 
-      expect(err).to eq("")
+      expect(err).to lack_errors
     end
   end
 
@@ -834,7 +882,7 @@ describe "Bundler.setup" do
         Bundler.load
       RUBY
 
-      expect(err).to eq("")
+      expect(err).to lack_errors
       expect(out).to eq("")
     end
   end
@@ -846,7 +894,7 @@ describe "Bundler.setup" do
       G
 
       bundle %|exec ruby -e "require 'bundler'; Bundler.setup"|
-      expect(err).to be_empty
+      expect(err).to lack_errors
     end
   end
 

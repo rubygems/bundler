@@ -159,9 +159,9 @@ module Bundler
         local_specs
       end
 
-      def install(spec)
+      def install(spec, force = false)
         debug = nil
-        if requires_checkout? && !@copied
+        if requires_checkout? && !@copied && !force
           debug = "  * Checking out revision: #{ref}"
           git_proxy.copy_to(install_path, submodules)
           serialize_gemspecs_in(install_path)

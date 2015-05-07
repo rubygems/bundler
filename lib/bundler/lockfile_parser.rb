@@ -12,8 +12,9 @@ require "strscan"
 
 module Bundler
   class LockfileParser
-    attr_reader :sources, :dependencies, :specs, :platforms
+    attr_reader :sources, :dependencies, :specs, :platforms, :bundler_version
 
+    BUNDLED      = "BUNDLED WITH"
     DEPENDENCIES = "DEPENDENCIES"
     PLATFORMS    = "PLATFORMS"
     GIT          = "GIT"
@@ -41,16 +42,36 @@ module Bundler
           @state = :dependency
         elsif line == PLATFORMS
           @state = :platform
+        elsif line == BUNDLED
+          @state = :bundled_with
         else
           send("parse_#{@state}", line)
         end
       end
       @sources << @rubygems_aggregate
       @specs = @specs.values
+      warn_for_outdated_bundler_version
     rescue ArgumentError => e
       Bundler.ui.debug(e)
       raise LockfileError, "Your lockfile is unreadable. Run `rm Gemfile.lock` " \
         "and then `bundle install` to generate a new lockfile."
+    end
+
+    def warn_for_outdated_bundler_version
+      return unless bundler_version
+      prerelease_text = bundler_version.prerelease? ? " --pre" : ""
+      current_version = Gem::Version.create(Bundler::VERSION)
+      case current_version.segments.first <=> bundler_version.segments.first
+      when -1
+        raise LockfileError, "You must use Bundler #{bundler_version.segments.first} or greater with this lockfile."
+      when 0
+        if current_version < bundler_version
+          Bundler.ui.warn "Warning: the running version of Bundler is older " \
+               "than the version that created the lockfile. We suggest you " \
+               "upgrade to the latest version of Bundler by running `gem " \
+               "install bundler#{prerelease_text}`.\n"
+        end
+      end
     end
 
   private
@@ -154,6 +175,13 @@ module Bundler
     def parse_platform(line)
       if line =~ /^  (.*)$/
         @platforms << Gem::Platform.new($1)
+      end
+    end
+
+    def parse_bundled_with(line)
+      line = line.strip
+      if Gem::Version.correct?(line)
+        @bundler_version = Gem::Version.create(line)
       end
     end
 
