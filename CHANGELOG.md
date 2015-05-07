@@ -1,3 +1,9 @@
+## 1.10.0.pre.2 (2015-05-07)
+
+Bugfixes:
+
+  - make BUNDLED WITH backwards compatible (#3623, @segiddins)
+
 ## 1.10.0.pre.1 (2015-05-05)
 
 Bugfixes:
