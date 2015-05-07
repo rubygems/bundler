@@ -3,6 +3,7 @@ $:.unshift File.expand_path("../lib", __FILE__)
 require 'shellwords'
 require 'benchmark'
 
+
 RUBYGEMS_REPO = File.expand_path("tmp/rubygems")
 BUNDLER_SPEC = Gem::Specification.load("bundler.gemspec")
 
@@ -292,7 +293,6 @@ begin
       rm_rf "lib/bundler/man"
     end
 
-    task(:require) { }
   end
 
 rescue LoadError
@@ -310,7 +310,7 @@ task :update_certs => "spec:rubygems:clone_rubygems_master" do
 end
 
 require 'bundler/gem_tasks'
-task :build => ["man:clean", "man:build"]
-task :release => ["man:require", "man:clean", "man:build"]
+task :build => ["man:build"]
+task :release => ["man:require", "man:build"]
 
 task :default => :spec
