@@ -297,6 +297,7 @@ module Bundler
         [
           activated.vertex_named(name).payload ? 0 : 1,
           @prereleases_cache[dependency.requirement] ? 0 : 1,
+          dependency.requirements_list.size,
           conflicts[name] ? 0 : 1,
           activated.vertex_named(name).payload ? 0 : search_for(dependency).count,
         ]
