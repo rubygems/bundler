@@ -84,7 +84,7 @@ describe "bundle lock" do
   it "does not fetch remote specs when using the --local option" do
     bundle "lock --update --local"
 
-    expect(err).to include("in the gems available on this machine.")
+    expect(err).to include("sources listed in your Gemfile or available on this machine")
   end
 
   it "writes to a custom location using --lockfile" do
