@@ -23,6 +23,8 @@ module Bundler
       end
 
       def warn(msg, newline = nil)
+        return if @told_messages.include? msg
+        @told_messages << msg
         tell_me(msg, :yellow, newline) if level("warn")
       end
 
@@ -81,9 +83,6 @@ module Bundler
 
       # valimism
       def tell_me(msg, color = nil, newline = nil)
-        return if @told_messages.include? msg
-        @told_messages << msg
-
         msg = word_wrap(msg) if newline.is_a?(Hash) && newline[:wrap]
         if newline.nil?
           @shell.say(msg, color)
