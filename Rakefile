@@ -269,8 +269,9 @@ begin
   namespace :man do
     directory "lib/bundler/man"
 
-    Dir["man/*.ronn"].each do |ronn|
-      basename = File.basename(ronn, ".ronn")
+    sources = Dir["man/*.ronn"].map{|f| File.basename(f, ".ronn") }
+    sources.map do |basename|
+      ronn = "man/#{basename}.ronn"
       roff = "lib/bundler/man/#{basename}"
 
       file roff => ["lib/bundler/man", ronn] do
@@ -284,11 +285,20 @@ begin
       task :build_all_pages => "#{roff}.txt"
     end
 
-    desc "Build the man pages"
-    task :build => "man:build_all_pages"
-
-    desc "Clean up from the built man pages"
     task :clean do
+      leftovers = Dir["lib/bundler/man/*"].reject do |f|
+        next true if f =~ /gemfile\.5(\.txt)?/
+        basename = File.basename(f, File.extname(f))
+        sources.include?(basename)
+      end
+      rm leftovers if leftovers.any?
+    end
+
+    desc "Build the man pages"
+    task :build => ["man:clean", "man:build_all_pages"]
+
+    desc "Remove all built man pages"
+    task :clobber do
       rm_rf "lib/bundler/man"
     end
 
@@ -299,7 +309,6 @@ rescue LoadError
   namespace :man do
     task(:require) { abort "Install the ronn gem to be able to release!" }
     task(:build) { warn "Install the ronn gem to build the help pages" }
-    task(:clean) { }
   end
 end
 
@@ -310,7 +319,7 @@ task :update_certs => "spec:rubygems:clone_rubygems_master" do
 end
 
 require 'bundler/gem_tasks'
-task :build => ["man:clean", "man:build"]
-task :release => ["man:require", "man:clean", "man:build"]
+task :build => ["man:build"]
+task :release => ["man:require", "man:build"]
 
 task :default => :spec
