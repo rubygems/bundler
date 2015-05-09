@@ -103,9 +103,9 @@ describe "bundle update" do
   describe "in a frozen bundle" do
     it "should fail loudly" do
       bundle "install --deployment"
-      bundle "update"
+      bundle "update", :expect_err => true
 
-      expect(out).to match(/You are trying to install in deployment mode after changing.your Gemfile/m)
+      expect(err).to match(/You are trying to install in deployment mode after changing.your Gemfile/m)
       expect(exitstatus).not_to eq(0) if exitstatus
     end
   end

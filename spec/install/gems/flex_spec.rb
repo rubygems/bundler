@@ -209,7 +209,7 @@ describe "bundle flex_install" do
       E
 
       bundle :install, :retry => 0
-      expect(err).to eq(nice_error)
+      expect(err).to include(nice_error)
     end
   end
 
