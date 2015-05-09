@@ -184,7 +184,7 @@ describe "the lockfile format" do
     G
 
     expect(exitstatus > 0) if exitstatus
-    expect(out).to include("You must use Bundler 9999999 or greater with this lockfile.")
+    expect(err).to include("You must use Bundler 9999999 or greater with this lockfile.")
   end
 
   it "shows a friendly error when running with a new bundler 2 lockfile" do
@@ -222,7 +222,7 @@ describe "the lockfile format" do
     G
 
     expect(exitstatus > 0) if exitstatus
-    expect(out).to include("You must use Bundler 9999999 or greater with this lockfile.")
+    expect(err).to include("You must use Bundler 9999999 or greater with this lockfile.")
   end
 
   it "warns when updating bundler major version" do

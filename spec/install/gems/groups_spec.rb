@@ -207,7 +207,7 @@ describe "bundle install with groups" do
 
       it "errors out when passing a group to with and without" do
         bundle :install, :with => "emo debugging", :without => "emo"
-        expect(out).to include("The offending groups are: emo")
+        expect(err).to include("The offending groups are: emo")
       end
 
       it "can add and remove a group at the same time" do
