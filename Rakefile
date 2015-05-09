@@ -269,6 +269,7 @@ begin
   namespace :man do
     directory "lib/bundler/man"
 
+    generated_files = []
     Dir["man/*.ronn"].each do |ronn|
       basename = File.basename(ronn, ".ronn")
       roff = "lib/bundler/man/#{basename}"
@@ -281,6 +282,7 @@ begin
         sh "groff -Wall -mtty-char -mandoc -Tascii #{roff} | col -b > #{roff}.txt"
       end
 
+      generated_files << roff << "#{roff}.txt"
       task :build_all_pages => "#{roff}.txt"
     end
 
@@ -289,7 +291,8 @@ begin
 
     desc "Clean up from the built man pages"
     task :clean do
-      rm_rf "lib/bundler/man"
+      dirt = Dir["lib/bundler/man/*"] - generated_files
+      rm dirt
     end
 
     task(:require) { }
