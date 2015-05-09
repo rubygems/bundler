@@ -179,7 +179,7 @@ module Bundler
     end
 
     def parse_bundled_with(line)
-      line = line[3..-1]
+      line = line.strip
       if Gem::Version.correct?(line)
         @bundler_version = Gem::Version.create(line)
       end
