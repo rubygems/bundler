@@ -89,7 +89,7 @@ describe "post bundle message" do
           gem "rack"
           gem "not-a-gem", :group => :development
         G
-        expect(out).to include("Could not find gem 'not-a-gem' in any of the gem sources listed in your Gemfile or available on this machine.")
+        expect(err).to include("Could not find gem 'not-a-gem (>= 0) ruby' in any of the gem sources listed in your Gemfile or available on this machine.")
       end
     end
   end
