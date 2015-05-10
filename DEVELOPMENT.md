@@ -20,6 +20,8 @@ bugs](https://github.com/bundler/bundler/issues?labels=small&state=open) and [sm
 
 Bundler doesn't use a Gemfile to list development dependencies, because when we tried it we couldn't tell if we were awake or it was just another level of dreams. To work on Bundler, you'll probably want to do a couple of things.
 
+## Standard method
+
   1. Install Bundler's development dependencies
 
         $ rake spec:deps
@@ -27,6 +29,14 @@ Bundler doesn't use a Gemfile to list development dependencies, because when we 
   2. Run the test suite, to make sure things are working
 
         $ rake spec
+
+## Docker method
+
+  1. Make sure you have [docker](https://www.github.com/docker/docker) and [docker-compose](https://docs.docker.com/compose/install) then run the following:
+
+        $ docker-compose up
+
+        > This will mount the current directory and run the specs against it.
 
   3. Set up a shell alias to run Bundler from your clone, e.g. a Bash alias:
 
