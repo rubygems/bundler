@@ -36,9 +36,9 @@ Bundler doesn't use a Gemfile to list development dependencies, because when we 
 
         $ docker-compose up
 
-        > This will mount the current directory and run the specs against it.
+## Running bundler from your clone
 
-  3. Set up a shell alias to run Bundler from your clone, e.g. a Bash alias:
+  1. Set up a shell alias to run Bundler from your clone, e.g. a Bash alias:
 
         $ alias dbundle='ruby -I /path/to/bundler/lib /path/to/bundler/bin/bundle'
 
