@@ -287,8 +287,7 @@ begin
 
     task :clean do
       leftovers = Dir["lib/bundler/man/*"].reject do |f|
-        next true if f =~ /gemfile\.5(\.txt)?/
-        basename = File.basename(f, File.extname(f))
+        basename = File.basename(f).sub(/\.(txt|ronn)/, '')
         sources.include?(basename)
       end
       rm leftovers if leftovers.any?
