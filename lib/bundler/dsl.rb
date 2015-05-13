@@ -48,9 +48,10 @@ module Bundler
 
       case gemspecs.size
       when 1
-        spec = Bundler.load_gemspec(gemspecs.first)
-        raise InvalidOption, "There was an error loading the gemspec at #{gemspecs.first}." unless spec
+        spec = load_valid_gemspec(gemspecs.first)
+
         gem spec.name, :path => path, :glob => glob
+
         group(development_group) do
           spec.development_dependencies.each do |dep|
             gem dep.name, *(dep.requirement.as_list + [:type => :development])
@@ -59,7 +60,8 @@ module Bundler
       when 0
         raise InvalidOption, "There are no gemspecs at #{expanded_path}."
       else
-        raise InvalidOption, "There are multiple gemspecs at #{expanded_path}. Please use the :name option to specify which one."
+        raise InvalidOption, "There are multiple gemspecs at #{expanded_path}. " \
+          "Please use the :name option to specify which one should be used."
       end
     end
 
@@ -356,6 +358,21 @@ module Bundler
           "To upgrade this warning to an error, run `bundle config " \
           "disable_multisource true`."
       end
+    end
+
+    def load_valid_gemspec(path)
+      spec = Bundler.load_gemspec(path)
+
+      unless spec
+        raise InvalidOption, "There was an error loading the gemspec at " \
+          "#{path}. Make sure you can build the gem, then try again."
+      end
+
+      spec.validate
+      spec
+    rescue Gem::InvalidSpecificationException => e
+      raise InvalidOption, "The gemspec at #{path} is not valid. " \
+        "The validation error was '#{e.message}'"
     end
 
     class DSLError < GemfileError
