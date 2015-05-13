@@ -1,4 +1,10 @@
-## 1.9.7 (2015-05-05)
+## 1.9.8 (2015-05-12)
+
+Bugfixes:
+
+  - fix regression in sudo mode introduced by 1.9.7 (#3642, @segiddins)
+
+## 1.9.7 (2015-05-11)
 
 Bugfixes:
 
