@@ -19,20 +19,18 @@ describe Bundler::Fetcher do
 
     describe "include CI information" do
       it "from one CI" do
-        ENV["JENKINS_URL"] = "foo"
-        ci_part = fetcher.user_agent.split(' ').find{|x| x.match(/\Aci\//)}
-        expect(ci_part).to match("jenkins")
-        ENV["JENKINS_URL"] = nil
+        with_env_vars({"JENKINS_URL" => "foo"}) do
+          ci_part = fetcher.user_agent.split(' ').find{|x| x.match(/\Aci\//)}
+          expect(ci_part).to match("jenkins")
+        end
       end
 
       it "from many CI" do
-        ENV["TRAVIS"] = "foo"
-        ENV["CI_NAME"] = "my_ci"
-        ci_part = fetcher.user_agent.split(' ').find{|x| x.match(/\Aci\//)}
-        expect(ci_part).to match("travis")
-        expect(ci_part).to match("my_ci")
-        ENV["TRAVIS"] = nil
-        ENV["CI_NAME"] = nil
+        with_env_vars({"TRAVIS" => "foo", "CI_NAME" => "my_ci"}) do
+          ci_part = fetcher.user_agent.split(' ').find{|x| x.match(/\Aci\//)}
+          expect(ci_part).to match("travis")
+          expect(ci_part).to match("my_ci")
+        end
       end
     end
   end
