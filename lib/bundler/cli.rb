@@ -16,8 +16,10 @@ module Bundler
     def initialize(*args)
       super
       current_cmd = args.last[:current_command].name
-      custom_gemfile = options[:gemfile] || Bundler.settings[:gemfile]
-      ENV['BUNDLE_GEMFILE']   = File.expand_path(custom_gemfile) if custom_gemfile
+      if custom_gemfile = options[:gemfile]
+        Bundler.settings[:gemfile] = custom_gemfile
+        ENV['BUNDLE_GEMFILE'] = File.expand_path(custom_gemfile)
+      end 
       Bundler.settings[:retry] = options[:retry] if options[:retry]
       Bundler.rubygems.ui = UI::RGProxy.new(Bundler.ui)
       auto_install if AUTO_INSTALL_CMDS.include?(current_cmd)
