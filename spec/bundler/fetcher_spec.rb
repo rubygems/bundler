@@ -22,6 +22,7 @@ describe Bundler::Fetcher do
         ENV["JENKINS_URL"] = "foo"
         ci_part = fetcher.user_agent.split(' ').find{|x| x.match(/\Aci\//)}
         expect(ci_part).to match("jenkins")
+        ENV["JENKINS_URL"] = nil
       end
 
       it "from many CI" do
@@ -30,6 +31,8 @@ describe Bundler::Fetcher do
         ci_part = fetcher.user_agent.split(' ').find{|x| x.match(/\Aci\//)}
         expect(ci_part).to match("travis")
         expect(ci_part).to match("my_ci")
+        ENV["TRAVIS"] = nil
+        ENV["CI_NAME"] = nil
       end
     end
   end
