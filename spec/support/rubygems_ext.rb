@@ -21,7 +21,7 @@ module Spec
         `gem install builder --version 2.1.2 --no-rdoc --no-ri`
         `gem install rack --no-rdoc --no-ri`
         # ruby-graphviz is used by the viz tests
-        `gem install ruby-graphviz --no-rdoc --no-ri`
+        `gem install ruby-graphviz --no-rdoc --no-ri` if RUBY_VERSION > "1.8.7"
       end
 
       ENV['HOME'] = Path.home.to_s
