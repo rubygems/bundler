@@ -1,3 +1,9 @@
+## 1.9.9 (2015-05-16)
+
+Bugfixes:
+
+  - read mirror and credential settings from older versions (#3557, @Strech)
+
 ## 1.9.8 (2015-05-12)
 
 Bugfixes:
