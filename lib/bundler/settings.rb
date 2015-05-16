@@ -228,12 +228,18 @@ module Bundler
         config_regex = /^(BUNDLE_.+): (['"]?)(.*(?:\n(?!BUNDLE).+)?)\2$/
         config_pairs = config_file.read.scan(config_regex).map do |m|
           key, _, value = m
-          [key, value.gsub(/\s+/, " ").tr('"', "'")]
+          [convert_to_backward_compatible_key(key), value.gsub(/\s+/, " ").tr('"', "'")]
         end
         Hash[config_pairs]
       else
         {}
       end
+    end
+
+    def convert_to_backward_compatible_key(key)
+      key = "#{key}/" if key =~ /https?:/i && key !~ %r[/\Z]
+      key = key.gsub(".", "__") if key.include?(".")
+      key
     end
 
     # TODO: duplicates Rubygems#normalize_uri
