@@ -96,7 +96,7 @@ describe ".bundle/config" do
       expect(out).to eq("global")
     end
 
-    it "do not warns when using the same value twice" do
+    it "does not warn when using the same value twice" do
       bundle "config --global foo value"
       bundle "config --global foo value"
       expect(out).not_to match(/You are replacing the current global value of foo/)
