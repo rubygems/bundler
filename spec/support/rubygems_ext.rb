@@ -1,5 +1,5 @@
 require 'rubygems/user_interaction'
-require 'support/path'
+require 'support/path' unless defined?(Spec::Path)
 
 module Spec
   module Rubygems
