@@ -145,6 +145,7 @@ module Bundler
       @definition = nil if unlock
       @definition ||= begin
         configure
+        ENV['BUNDLE_GEMFILE'] ||= Bundler.settings[:gemfile]
         upgrade_lockfile
         Definition.build(default_gemfile, default_lockfile, unlock)
       end
