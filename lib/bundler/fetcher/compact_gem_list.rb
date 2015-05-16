@@ -3,8 +3,8 @@ module Bundler
     class CompactGemList
       require 'set'
 
-      require_relative 'compact_gem_list/cache.rb'
-      require_relative 'compact_gem_list/updater.rb'
+      autoload :Cache,   'bundler/fetcher/compact_gem_list/cache'
+      autoload :Updater, 'bundler/fetcher/compact_gem_list/updater'
 
       attr_reader :fetcher, :directory
 
