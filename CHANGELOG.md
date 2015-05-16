@@ -1,3 +1,16 @@
+## 1.10.0.rc (2015-05-16)
+
+Features:
+
+  - dramatically speed up resolving some slow Gemfiles (#3635, @segiddins)
+  - track CI platforms running Bundler (#3646, @fotanus)
+
+Bugfixes:
+
+  - allow `viz` to work with prereleases (#3621, #3217, @aprescott)
+  - validate gemspecs used in path and git gems (#3639, @segiddins, @indirect)
+  - stop printing config warnings when config is unchanged (#3649, @fotanus, @indirect)
+
 ## 1.10.0.pre.2 (2015-05-07)
 
 Bugfixes:
