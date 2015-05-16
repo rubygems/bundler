@@ -357,5 +357,17 @@ module Spec
       end
       File.open(pathname, 'w') { |file| file.puts(changed_lines.join) }
     end
+
+    def with_env_vars(env_hash, &block)
+      current_values = {}
+      env_hash.each do |k,v|
+        current_values[k] = v
+        ENV[k] = v
+      end
+      block.call if block_given?
+      env_hash.each do |k,v|
+        ENV[k] = current_values[k]
+      end
+    end
   end
 end

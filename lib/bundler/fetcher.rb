@@ -155,6 +155,8 @@ module Bundler
 
         agent << " options/#{Bundler.settings.all.join(",")}"
 
+        agent << " ci/#{cis.join(",")}" if cis.any?
+
         # add a random ID so we can consolidate runs server-side
         agent << " " << SecureRandom.hex(8)
 
@@ -177,6 +179,21 @@ module Bundler
   private
 
     FETCHERS = [Dependency, Index]
+
+    def cis
+      env_cis = {
+        "TRAVIS" => "travis",
+        "CIRCLECI" => "circle",
+        "SEMAPHORE" => "semaphore",
+        "JENKINS_URL" => "jenkins",
+        "BUILDBOX" => "buildbox",
+        "GO_SERVER_URL" => "go",
+        "SNAP_CI" => "snap",
+        "CI_NAME" => ENV["CI_NAME"],
+        "CI" => "ci"
+      }
+      env_cis.find_all{ |env, ci| ENV[env]}.map{ |env, ci| ci }
+    end
 
     def connection
       @connection ||= begin
