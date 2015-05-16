@@ -59,7 +59,7 @@ module Bundler
               "This will take precedence over the global value you are setting"
           end
 
-          if global = locations[:global]
+          if (global = locations[:global]) && (global != locations[:global])
             Bundler.ui.info "You are replacing the current global value of #{name}, which is currently #{global.inspect}"
           end
         end

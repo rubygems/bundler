@@ -96,6 +96,15 @@ describe ".bundle/config" do
       expect(out).to eq("global")
     end
 
+    it "do not warns when using the same value twice" do
+      bundle "config --global foo value"
+      bundle "config --global foo value"
+      expect(out).not_to match(/You are replacing the current global value of foo/)
+
+      run "puts Bundler.settings[:foo]"
+      expect(out).to eq("value")
+    end
+
     it "expands the path at time of setting" do
       bundle "config --global local.foo .."
       run "puts Bundler.settings['local.foo']"
