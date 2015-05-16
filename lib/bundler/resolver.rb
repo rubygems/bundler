@@ -190,7 +190,6 @@ module Bundler
       @base = base
       @resolver = Molinillo::Resolver.new(self, self)
       @search_for = {}
-      @prereleases_cache = Hash.new { |h,k| h[k] = k.prerelease? }
       @base_dg = Molinillo::DependencyGraph.new
       @base.each { |ls| @base_dg.add_root_vertex ls.name, Dependency.new(ls.name, ls.version) }
     end
@@ -296,11 +295,20 @@ module Bundler
         name = name_for(dependency)
         [
           activated.vertex_named(name).payload ? 0 : 1,
-          @prereleases_cache[dependency.requirement] ? 0 : 1,
-          dependency.requirements_list.size,
+          amount_constrained(dependency),
           conflicts[name] ? 0 : 1,
           activated.vertex_named(name).payload ? 0 : search_for(dependency).count,
         ]
+      end
+    end
+
+    def amount_constrained(dependency)
+      @amount_constrained ||= {}
+      @amount_constrained[dependency.name] ||= begin
+        base_dep = Dependency.new dependency.name, '>= 0.a'
+        all = search_for(DepProxy.new base_dep, dependency.__platform)
+        return 0 if all.empty?
+        search_for(dependency).size.to_f / all.size.to_f
       end
     end
 
