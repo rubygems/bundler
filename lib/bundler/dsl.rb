@@ -48,7 +48,7 @@ module Bundler
 
       case gemspecs.size
       when 1
-        spec = load_valid_gemspec(gemspecs.first)
+        spec = Bundler.load_and_validate_gemspec(gemspecs.first)
 
         gem spec.name, :path => path, :glob => glob
 
@@ -358,21 +358,6 @@ module Bundler
           "To upgrade this warning to an error, run `bundle config " \
           "disable_multisource true`."
       end
-    end
-
-    def load_valid_gemspec(path)
-      spec = Bundler.load_gemspec(path)
-
-      unless spec
-        raise InvalidOption, "There was an error loading the gemspec at " \
-          "#{path}. Make sure you can build the gem, then try again."
-      end
-
-      spec.validate
-      spec
-    rescue Gem::InvalidSpecificationException => e
-      raise InvalidOption, "The gemspec at #{path} is not valid. " \
-        "The validation error was '#{e.message}'"
     end
 
     class DSLError < GemfileError
