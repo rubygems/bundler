@@ -440,9 +440,14 @@ module Spec
         @context = context
         @name    = name
         @spec = Gem::Specification.new do |s|
-          s.name    = name
-          s.version = version
-          s.summary = "This is just a fake gem for testing"
+          s.name        = name
+          s.version     = version
+          s.summary     = "This is just a fake gem for testing"
+          s.description = "This is a completely fake gem, for testing purposes."
+          s.author      = "no one"
+          s.email       = "foo@bar.baz"
+          s.homepage    = 'http://example.com'
+          s.license     = 'MIT'
         end
         @files = {}
       end
