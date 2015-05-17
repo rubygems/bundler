@@ -73,7 +73,7 @@ module Bundler
 
         if name.match(/\Alocal\./)
           pathname = Pathname.new(args.join(" "))
-          self.args = [pathname.expand_path.to_s] if pathname.directory?
+          new_value = pathname.expand_path.to_s if pathname.directory?
         end
 
         Bundler.settings.send("set_#{scope}", name, new_value)
