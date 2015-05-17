@@ -16,7 +16,7 @@ gem install bundler
 bundle init
 echo "gem 'rails'" >> Gemfile
 bundle install
-bundle exec rails new myapp
+rails new myapp
 ```
 
 See [bundler.io](http://bundler.io) for the full documentation.
