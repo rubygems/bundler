@@ -347,7 +347,7 @@ module Bundler
       @gemspec_cache[key] ||= load_gemspec_uncached(file, validate)
       # Protect against caching side-effected gemspecs by returning a
       # new instance each time.
-      @gemspec_cache[key] if @gemspec_cache[key]
+      @gemspec_cache[key].dup if @gemspec_cache[key]
     end
 
     def load_gemspec_uncached(file, validate = false)
