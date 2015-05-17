@@ -63,39 +63,13 @@ module Bundler
         return
       end
 
-      if Bundler.default_lockfile.exist? && !options["update"]
-        local = Bundler.ui.silence do
-          begin
-            tmpdef = Definition.build(Bundler.default_gemfile, Bundler.default_lockfile, nil)
-            true unless tmpdef.new_platform? || tmpdef.missing_specs.any?
-          rescue BundlerError
-          end
-        end
-      end
-
-      # Since we are installing, we can resolve the definition
-      # using remote specs
-      unless local
-        options["local"] ? @definition.resolve_with_cache! : @definition.resolve_remotely!
-      end
-
-      force = options["force"]
-
-      # the order that the resolver provides is significant, since
-      # dependencies might actually affect the installation of a gem.
-      # that said, it's a rare situation (other than rake), and parallel
-      # installation is just SO MUCH FASTER. so we let people opt in.
-      jobs = [Bundler.settings[:jobs].to_i-1, 1].max
-      if jobs > 1 && can_install_in_parallel?
-        require 'bundler/installer/parallel_installer'
-        install_in_parallel jobs, options[:standalone], force
-      else
-        install_sequentially options[:standalone], force
-      end
+      resolve_if_need(options)
+      install(options)
 
       lock unless Bundler.settings[:frozen]
       generate_standalone(options[:standalone]) if options[:standalone]
     end
+
 
     def install_gem_from_spec(spec, standalone = false, worker = 0, force = false)
       # Fetch the build settings, if there are any
@@ -206,6 +180,21 @@ module Bundler
 
   private
 
+    # the order that the resolver provides is significant, since
+    # dependencies might actually affect the installation of a gem.
+    # that said, it's a rare situation (other than rake), and parallel
+    # installation is just SO MUCH FASTER. so we let people opt in.
+    def install(options)
+      force = options["force"]
+      jobs = [Bundler.settings[:jobs].to_i-1, 1].max
+      if jobs > 1 && can_install_in_parallel?
+        require 'bundler/installer/parallel_installer'
+        install_in_parallel jobs, options[:standalone], force
+      else
+        install_sequentially options[:standalone], force
+      end
+    end
+
     def can_install_in_parallel?
       if Bundler.rubygems.provides?(">= 2.1.0")
         true
@@ -288,6 +277,22 @@ module Bundler
     rescue Errno::EEXIST
       raise PathError, "Could not install to path `#{Bundler.settings[:path]}` " +
         "because of an invalid symlink. Remove the symlink so the directory can be created."
+    end
+
+    def resolve_if_need(options)
+      if Bundler.default_lockfile.exist? && !options["update"]
+        local = Bundler.ui.silence do
+          begin
+            tmpdef = Definition.build(Bundler.default_gemfile, Bundler.default_lockfile, nil)
+            true unless tmpdef.new_platform? || tmpdef.missing_specs.any?
+          rescue BundlerError
+          end
+        end
+      end
+
+      unless local
+        options["local"] ? @definition.resolve_with_cache! : @definition.resolve_remotely!
+      end
     end
 
   end
