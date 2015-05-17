@@ -6,7 +6,7 @@ module Bundler
     class CompactIndex < Base
       def specs(_gem_names)
         @specs ||= compact_gem_list.versions.values.flatten(1).map! do |args|
-          args = args.fill(nil, args.size..2) + self
+          args = args.fill(nil, args.size..2) << self
           RemoteSpecification.new(*args)
         end
       rescue NetworkDownError => e
