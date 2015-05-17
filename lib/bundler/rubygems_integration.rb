@@ -39,6 +39,11 @@ module Bundler
     end
 
     def mark_loaded(spec)
+      if spec.respond_to?(:activated=)
+        current = Gem.loaded_specs[spec.name]
+        current.activated = false if current
+        spec.activated = true
+      end
       Gem.loaded_specs[spec.name] = spec
     end
 
