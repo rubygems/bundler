@@ -364,6 +364,22 @@ module Bundler
       end
     end
 
+    def load_and_validate_gemspec(file, allow_nil = false)
+      spec = load_gemspec(file)
+
+      unless spec
+        return if allow_nil
+        raise InvalidOption, "There was an error loading the gemspec at " \
+          "#{file}. Make sure you can build the gem, then try again."
+      end
+
+      spec.validate
+      spec
+    rescue Gem::InvalidSpecificationException => e
+      raise InvalidOption, "The gemspec at #{file} is not valid. " \
+        "The validation error was '#{e.message}'"
+    end
+
     def clear_gemspec_cache
       @gemspec_cache = {}
     end
