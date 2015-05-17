@@ -456,10 +456,12 @@ module Spec
       end
 
       def executables=(val)
-        Array(val).each do |file|
-          write "#{@spec.bindir}/#{file}", "require '#{@name}' ; puts #{@name.upcase}"
-        end
         @spec.executables = Array(val)
+        @spec.executables.each do |file|
+          executable = "#{@spec.bindir}/#{file}"
+          @spec.files << executable
+          write executable, "require '#{@name}' ; puts #{@name.upcase}"
+        end
       end
 
       def add_c_extension

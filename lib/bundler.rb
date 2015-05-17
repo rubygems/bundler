@@ -341,27 +341,32 @@ module Bundler
       raise MarshalError, "#{e.class}: #{e.message}"
     end
 
-    def load_gemspec(file)
+    def load_gemspec(file, validate = false)
       @gemspec_cache ||= {}
       key = File.expand_path(file)
-      spec = ( @gemspec_cache[key] ||= load_gemspec_uncached(file) )
+      @gemspec_cache[key] ||= load_gemspec_uncached(file, validate)
       # Protect against caching side-effected gemspecs by returning a
       # new instance each time.
-      spec.dup if spec
+      @gemspec_cache[key] if @gemspec_cache[key]
     end
 
-    def load_gemspec_uncached(file)
+    def load_gemspec_uncached(file, validate = false)
       path = Pathname.new(file)
       # Eval the gemspec from its parent directory, because some gemspecs
       # depend on "./" relative paths.
       SharedHelpers.chdir(path.dirname.to_s) do
         contents = path.read
         if contents[0..2] == "---" # YAML header
-          eval_yaml_gemspec(path, contents)
+          spec = eval_yaml_gemspec(path, contents)
         else
-          eval_gemspec(path, contents)
+          spec = eval_gemspec(path, contents)
         end
+        spec.validate if spec && validate
+        spec
       end
+    rescue Gem::InvalidSpecificationException => e
+      raise InvalidOption, "The gemspec at #{file} is not valid. " \
+        "The validation error was '#{e.message}'"
     end
 
     def clear_gemspec_cache
