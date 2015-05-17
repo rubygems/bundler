@@ -39,7 +39,12 @@ module Bundler
     end
 
     def mark_loaded(spec)
-      Gem.loaded_specs[spec.name] = spec
+      name = spec.name
+      if existing = Gem.loaded_specs[name]
+        existing.activated = false
+      end
+      spec.activated = true
+      Gem.loaded_specs[name] = spec
     end
 
     def path(obj)
