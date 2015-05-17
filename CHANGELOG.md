@@ -41,6 +41,24 @@ Deprecations:
 
   - deprecated the (never enabled) `bundle_ruby` binary (@smlance)
 
+## 1.9.9 (2015-05-16)
+
+Bugfixes:
+
+  - read mirror and credential settings from older versions (#3557, @Strech)
+
+## 1.9.8 (2015-05-12)
+
+Bugfixes:
+
+  - fix regression in sudo mode introduced by 1.9.7 (#3642, @segiddins)
+
+## 1.9.7 (2015-05-11)
+
+Bugfixes:
+
+  - always clean up tmp dirs (#3277, @hone, @indirect, @segiddins)
+
 ## 1.9.6 (2015-05-02)
 
 Bugfixes:
