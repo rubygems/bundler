@@ -465,7 +465,7 @@ module Spec
         @spec.executables.each do |file|
           executable = "#{@spec.bindir}/#{file}"
           @spec.files << executable
-          write executable, "require '#{@name}' ; puts #{@name.upcase}"
+          write executable, "#!/usr/bin/env ruby\nrequire '#{@name}' ; puts #{@name.upcase}"
         end
       end
 
