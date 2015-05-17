@@ -1,6 +1,5 @@
 module Bundler
   class Source
-
     class Path < Source
       autoload :Installer, 'bundler/source/path/installer'
 
@@ -132,8 +131,7 @@ module Bundler
         if File.directory?(expanded_path)
           # We sort depth-first since `<<` will override the earlier-found specs
           Dir["#{expanded_path}/#{@glob}"].sort_by { |p| -p.split(File::SEPARATOR).size }.each do |file|
-            spec = Bundler.load_gemspec(file)
-            if spec
+            if spec = load_and_validate_gemspec(file)
               spec.loaded_from = file.to_s
               spec.source = self
               index << spec
@@ -220,7 +218,16 @@ module Bundler
           end
         end
       end
-    end
 
+      def load_and_validate_gemspec(file)
+        spec = load_gemspec(file)
+        spec.validate
+        spec
+      rescue Gem::InvalidSpecificationException => e
+        raise InvalidOption, "The gemspec at #{file} is not valid. " \
+          "The validation error was '#{e.message}'"
+      end
+
+    end
   end
 end
