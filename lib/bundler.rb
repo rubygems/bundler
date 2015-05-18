@@ -85,14 +85,19 @@ module Bundler
   class MarshalError < StandardError; end
 
   class << self
-    attr_writer :ui, :bundle_path
+    attr_writer :bundle_path
 
     def configure
       @configured ||= configure_gem_home_and_path
     end
 
     def ui
-      @ui ||= UI::Silent.new
+      @ui || (self.ui = UI::Silent.new)
+    end
+
+    def ui=(ui)
+      Bundler.rubygems.ui = UI::RGProxy.new(ui)
+      @ui = ui
     end
 
     # Returns absolute path of where gems are installed on the filesystem.
