@@ -47,6 +47,16 @@ module Bundler
       Gem.loaded_specs[spec.name] = spec
     end
 
+    def validate(spec)
+      # This is overridden to do nothing on RubyGems < 1.7, because those
+      # versions of RubyGems raise validation exceptions for things that
+      # are only a warning in versions 1.7 and up.
+      Bundler.ui.silence { spec.validate }
+    rescue Gem::InvalidSpecificationException => e
+      raise InvalidOption, "The gemspec at #{file} is not valid. " \
+        "The validation error was '#{e.message}'"
+    end
+
     def path(obj)
       obj.to_s
     end
@@ -456,6 +466,9 @@ module Bundler
       def find_name(name)
         Gem.source_index.find_name(name)
       end
+
+      def validate(spec)
+      end
     end
 
     # Rubygems versions 1.3.6 and 1.3.7
@@ -463,6 +476,9 @@ module Bundler
       def initialize
         super
         backport_segment_generation
+      end
+
+      def validate(spec)
       end
     end
 
