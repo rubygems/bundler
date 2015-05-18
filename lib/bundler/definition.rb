@@ -47,10 +47,13 @@ module Bundler
     def initialize(lockfile, dependencies, sources, unlock, ruby_version = nil, optional_groups = [])
       @unlocking = unlock == true || !unlock.empty?
 
-      @dependencies, @sources, @unlock, @optional_groups = dependencies, sources, unlock, optional_groups
-      @remote            = false
-      @specs             = nil
-      @ruby_version      = ruby_version
+      @dependencies    = dependencies
+      @sources         = sources
+      @unlock          = unlock
+      @optional_groups = optional_groups
+      @remote          = false
+      @specs           = nil
+      @ruby_version    = ruby_version
 
       @lockfile_contents      = ""
       @locked_bundler_version = nil
