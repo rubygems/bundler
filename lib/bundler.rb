@@ -366,7 +366,7 @@ module Bundler
         else
           spec = eval_gemspec(path, contents)
         end
-        spec.validate if spec && validate
+        Bundler.ui.silence { spec.validate } if spec && validate
         spec
       end
     rescue Gem::InvalidSpecificationException => e
