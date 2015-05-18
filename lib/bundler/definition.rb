@@ -50,8 +50,10 @@ module Bundler
       @dependencies, @sources, @unlock, @optional_groups = dependencies, sources, unlock, optional_groups
       @remote            = false
       @specs             = nil
-      @lockfile_contents = ""
       @ruby_version      = ruby_version
+
+      @lockfile_contents      = ""
+      @locked_bundler_version = nil
 
       if lockfile && File.exist?(lockfile)
         @lockfile_contents = Bundler.read_file(lockfile)
