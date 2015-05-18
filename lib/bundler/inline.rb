@@ -25,7 +25,7 @@
 #            gem 'cocoapods', '~> 0.34.1'
 #          end
 #
-#          puts Pod::VERSION => "0.34.4"
+#          puts Pod::VERSION # => "0.34.4"
 #
 def gemfile(install = false, &gemfile)
   require 'bundler'
