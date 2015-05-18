@@ -369,6 +369,9 @@ module Bundler
         Bundler.rubygems.validate(spec) if spec && validate
         spec
       end
+    rescue Gem::InvalidSpecificationException => e
+      raise InvalidOption, "The gemspec at #{file} is not valid. " \
+        "The validation error was '#{e.message}'"
     end
 
     def clear_gemspec_cache
