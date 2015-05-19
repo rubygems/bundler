@@ -103,6 +103,7 @@ module Bundler
 
       definition = Bundler.definition
       definition.validate_ruby!
+
       Installer.install(Bundler.root, definition, options)
       Bundler.load.cache if Bundler.app_cache.exist? && !options["no-cache"] && !Bundler.settings[:frozen]
 

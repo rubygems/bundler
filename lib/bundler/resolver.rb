@@ -307,8 +307,11 @@ module Bundler
       @amount_constrained[dependency.name] ||= begin
         base_dep = Dependency.new dependency.name, '>= 0.a'
         all = search_for(DepProxy.new base_dep, dependency.__platform)
-        return 0 if all.empty?
-        search_for(dependency).size.to_f / all.size.to_f
+        if all.size == 0
+          0
+        else
+          search_for(dependency).size.to_f / all.size.to_f
+        end
       end
     end
 

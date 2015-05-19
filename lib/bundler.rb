@@ -85,14 +85,19 @@ module Bundler
   class MarshalError < StandardError; end
 
   class << self
-    attr_writer :ui, :bundle_path
+    attr_writer :bundle_path
 
     def configure
       @configured ||= configure_gem_home_and_path
     end
 
     def ui
-      @ui ||= UI::Silent.new
+      @ui || (self.ui = UI::Silent.new)
+    end
+
+    def ui=(ui)
+      Bundler.rubygems.ui = UI::RGProxy.new(ui)
+      @ui = ui
     end
 
     # Returns absolute path of where gems are installed on the filesystem.
@@ -341,27 +346,32 @@ module Bundler
       raise MarshalError, "#{e.class}: #{e.message}"
     end
 
-    def load_gemspec(file)
+    def load_gemspec(file, validate = false)
       @gemspec_cache ||= {}
       key = File.expand_path(file)
-      spec = ( @gemspec_cache[key] ||= load_gemspec_uncached(file) )
+      @gemspec_cache[key] ||= load_gemspec_uncached(file, validate)
       # Protect against caching side-effected gemspecs by returning a
       # new instance each time.
-      spec.dup if spec
+      @gemspec_cache[key].dup if @gemspec_cache[key]
     end
 
-    def load_gemspec_uncached(file)
+    def load_gemspec_uncached(file, validate = false)
       path = Pathname.new(file)
       # Eval the gemspec from its parent directory, because some gemspecs
       # depend on "./" relative paths.
       SharedHelpers.chdir(path.dirname.to_s) do
         contents = path.read
         if contents[0..2] == "---" # YAML header
-          eval_yaml_gemspec(path, contents)
+          spec = eval_yaml_gemspec(path, contents)
         else
-          eval_gemspec(path, contents)
+          spec = eval_gemspec(path, contents)
         end
+        Bundler.rubygems.validate(spec) if spec && validate
+        spec
       end
+    rescue Gem::InvalidSpecificationException => e
+      raise InvalidOption, "The gemspec at #{file} is not valid. " \
+        "The validation error was '#{e.message}'"
     end
 
     def clear_gemspec_cache

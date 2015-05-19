@@ -39,7 +39,16 @@ module Bundler
     end
 
     def mark_loaded(spec)
+      if spec.respond_to?(:activated=)
+        current = Gem.loaded_specs[spec.name]
+        current.activated = false if current
+        spec.activated = true
+      end
       Gem.loaded_specs[spec.name] = spec
+    end
+
+    def validate(spec)
+      Bundler.ui.silence { spec.validate }
     end
 
     def path(obj)
@@ -450,6 +459,13 @@ module Bundler
 
       def find_name(name)
         Gem.source_index.find_name(name)
+      end
+
+      def validate(spec)
+        # Missing summary is downgraded to a warning in later versions,
+        # so we set it to an empty string to prevent an exception here.
+        spec.summary ||= ""
+        super
       end
     end
 

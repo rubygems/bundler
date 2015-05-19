@@ -19,7 +19,6 @@ module Bundler
       custom_gemfile = options[:gemfile] || Bundler.settings[:gemfile]
       ENV['BUNDLE_GEMFILE']   = File.expand_path(custom_gemfile) if custom_gemfile
       Bundler.settings[:retry] = options[:retry] if options[:retry]
-      Bundler.rubygems.ui = UI::RGProxy.new(Bundler.ui)
       auto_install if AUTO_INSTALL_CMDS.include?(current_cmd)
     rescue UnknownArgumentError => e
       raise InvalidOption, e.message

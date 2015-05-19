@@ -188,17 +188,4 @@ describe Bundler::Dsl do
     end
   end
 
-  describe "#gemspec" do
-    it "errors on invalid specs" do
-      File.open(bundled_app("foo.gemspec"), "w") do |f|
-        f.write <<-G
-          Gem::Specification.new do |s|
-            s.name = "foo"
-          end
-        G
-      end
-      expect(Bundler).to receive(:default_gemfile).and_return(bundled_app("Gemfile"))
-      expect { subject.gemspec }.to raise_error(Bundler::InvalidOption).with_message(/missing value for attribute version/)
-    end
-  end
 end

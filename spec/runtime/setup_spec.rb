@@ -845,6 +845,7 @@ describe "Bundler.setup" do
             s.version     = BAR_VERSION
             s.summary     = 'Bar'
             s.files       = Dir["lib/**/*.rb"]
+            s.author      = 'no one'
           end
         G
       end
