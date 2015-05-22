@@ -266,7 +266,7 @@ module Bundler
       @fetch_uri ||= begin
         if remote_uri.host == "rubygems.org"
           uri = remote_uri.dup
-          uri.host = "bundler-api-staging.herokuapp.com"
+          uri.host = "bundler.rubygems.org"
           uri
         else
           remote_uri
