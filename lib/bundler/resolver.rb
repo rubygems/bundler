@@ -24,7 +24,7 @@ module Bundler
         conflicts.values.flatten.reduce('') do |o, conflict|
           o << %(Bundler could not find compatible versions for gem "#{conflict.requirement.name}":\n)
           if conflict.locked_requirement
-            o << %(  In snapshot (Gemfile.lock):\n)
+            o << %(  In snapshot #{Bundler.default_lockfile}:\n)
             o << %(    #{clean_req conflict.locked_requirement}\n)
             o << %(\n)
           end
@@ -279,11 +279,11 @@ module Bundler
     end
 
     def name_for_explicit_dependency_source
-      'Gemfile'
+      Bundler.default_gemfile.basename.to_s
     end
 
     def name_for_locking_dependency_source
-      'Gemfile.lock'
+      Bundler.default_lockfile.basename.to_s
     end
 
     def requirement_satisfied_by?(requirement, activated, spec)

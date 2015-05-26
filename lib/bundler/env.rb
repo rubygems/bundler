@@ -33,10 +33,10 @@ module Bundler
       end
 
       if print_gemfile
-        out << "\nGemfile\n\n"
+        out << "\n#{Bundler.default_gemfile}\n\n"
         out << "    " << read_file(Bundler.default_gemfile).gsub(/\n/, "\n    ") << "\n"
 
-        out << "\n" << "Gemfile.lock\n\n"
+        out << "\n#{Bundler.default_lockfile}\n\n"
         out << "    " << read_file(Bundler.default_lockfile).gsub(/\n/, "\n    ") << "\n"
       end
 
