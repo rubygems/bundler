@@ -6,7 +6,10 @@ module Bundler
     end
 
     def run
-      Bundler.settings[:path] = File.expand_path(options[:path]) if options[:path]
+      if options[:path]
+        Bundler.settings[:path] = File.expand_path(options[:path])
+        Bundler.settings[:disable_shared_gems] = '1'
+      end
       begin
         definition = Bundler.definition
         definition.validate_ruby!
