@@ -582,7 +582,6 @@ describe "bundle gem" do
       it "depends on compile task for build" do
         rakefile = strip_whitespace <<-RAKEFILE
           require "bundler/gem_tasks"
-
           require "rake/extensiontask"
 
           task :build => :compile

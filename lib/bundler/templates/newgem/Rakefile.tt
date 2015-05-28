@@ -7,10 +7,12 @@ Rake::TestTask.new(:test) do |t|
   t.libs << "lib"
   t.test_files = FileList['test/**/*_test.rb']
 end
+
 <% elsif config[:test] == 'rspec' -%>
 require "rspec/core/rake_task"
 
 RSpec::Core::RakeTask.new(:spec)
+
 <% end -%>
 <% if config[:ext] -%>
 require "rake/extensiontask"
