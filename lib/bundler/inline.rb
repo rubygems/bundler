@@ -31,7 +31,7 @@ def gemfile(install = false, &gemfile)
   require 'bundler'
   old_root = Bundler.method(:root)
   def Bundler.root
-    SharedHelpers.pwd.expand_path
+    Bundler::SharedHelpers.pwd.expand_path
   end
   ENV['BUNDLE_GEMFILE'] ||= 'Gemfile'
 
