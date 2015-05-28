@@ -15,21 +15,21 @@ describe "bundle help" do
     fake_man!
 
     bundle "help gemfile"
-    expect(out).to eq(%|["#{root}/lib/bundler/man/gemfile.5"]|)
+    expect(out).to eq(%|["#{root}/man/gemfile.5"]|)
   end
 
   it "prefixes bundle commands with bundle- when finding the groff files" do
     fake_man!
 
     bundle "help install"
-    expect(out).to eq(%|["#{root}/lib/bundler/man/bundle-install"]|)
+    expect(out).to eq(%|["#{root}/man/bundle-install"]|)
   end
 
-  it "simply outputs the txt file when there is no man on the path" do
+  it "simply outputs the ronn file when there is no man on the path" do
     kill_path!
 
     bundle "help install", :expect_err => true
-    expect(out).to match(/BUNDLE-INSTALL/)
+    expect(out).to match(/BUNDLE-INSTALL/i)
   end
 
   it "still outputs the old help for commands that do not have man pages yet" do

@@ -55,12 +55,12 @@ module Bundler
           gemfile.5)
 
       if manpages.include?(command)
-        root = File.expand_path("../man", __FILE__)
+        root = File.expand_path("../../../man", __FILE__)
 
         if Bundler.which("man") && root !~ %r{^file:/.+!/META-INF/jruby.home/.+}
           Kernel.exec "man #{root}/#{command}"
         else
-          puts File.read("#{root}/#{command}.txt")
+          puts File.read("#{root}/#{command}.ronn")
         end
       else
         super
