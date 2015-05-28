@@ -330,7 +330,7 @@ module Bundler
     def ensure_equivalent_gemfile_and_lockfile(explicit_flag = false)
       msg = "You are trying to install in deployment mode after changing\n" \
             "your Gemfile. Run `bundle install` elsewhere and add the\n" \
-            "updated #{Bundler.default_lockfile} to version control."
+            "updated #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)} to version control."
 
       unless explicit_flag
         msg += "\n\nIf this is a development machine, remove the #{Bundler.default_gemfile} " \

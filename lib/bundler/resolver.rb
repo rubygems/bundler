@@ -24,7 +24,7 @@ module Bundler
         conflicts.values.flatten.reduce('') do |o, conflict|
           o << %(Bundler could not find compatible versions for gem "#{conflict.requirement.name}":\n)
           if conflict.locked_requirement
-            o << %(  In snapshot #{Bundler.default_lockfile}:\n)
+            o << %(  In snapshot #{Bundler.default_lockfile.basename}:\n)
             o << %(    #{clean_req conflict.locked_requirement}\n)
             o << %(\n)
           end

@@ -64,8 +64,8 @@ module Bundler
       if options[:deployment] || options[:frozen]
         unless Bundler.default_lockfile.exist?
           flag = options[:deployment] ? '--deployment' : '--frozen'
-          raise ProductionError, "The #{flag} flag requires a #{Bundler.default_lockfile}. Please make " \
-                                 "sure you have checked your #{Bundler.default_lockfile} into version control " \
+          raise ProductionError, "The #{flag} flag requires a #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)}. Please make " \
+                                 "sure you have checked your #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)} into version control " \
                                  "before deploying."
         end
 
