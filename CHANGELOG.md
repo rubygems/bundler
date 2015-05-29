@@ -1,3 +1,15 @@
+## 1.10.1 (2015-05-28)
+
+Bugfixes:
+
+  - silence ruby warning when running CLI commands (@segiddins)
+  - validate gemspecs in non-packaging mode (#3681, @segiddins)
+  - ensure the same chdir mutex as RubyGems is used (#3680, @segiddins)
+
+## 1.10.0 (2015-05-28)
+
+(this space intentionally left blank)
+
 ## 1.10.0.rc (2015-05-16)
 
 Features:

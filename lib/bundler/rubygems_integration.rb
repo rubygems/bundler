@@ -48,7 +48,7 @@ module Bundler
     end
 
     def validate(spec)
-      Bundler.ui.silence { spec.validate }
+      Bundler.ui.silence { spec.validate(false) }
     end
 
     def path(obj)
@@ -465,7 +465,7 @@ module Bundler
         # Missing summary is downgraded to a warning in later versions,
         # so we set it to an empty string to prevent an exception here.
         spec.summary ||= ""
-        super
+        Bundler.ui.silence { spec.validate }
       end
     end
 
@@ -614,13 +614,13 @@ module Bundler
 
         Gem::Ext::Builder.class_eval do
           if !const_defined?(:CHDIR_MONITOR)
-            const_set(:CHDIR_MONITOR, Monitor.new)
+            const_set(:CHDIR_MONITOR, EXT_LOCK)
           end
 
           if const_defined?(:CHDIR_MUTEX)
             remove_const(:CHDIR_MUTEX)
-            const_set(:CHDIR_MUTEX, const_get(:CHDIR_MONITOR))
           end
+          const_set(:CHDIR_MUTEX, const_get(:CHDIR_MONITOR))
         end
       end
 
