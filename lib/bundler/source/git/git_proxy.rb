@@ -21,7 +21,7 @@ module Bundler
 
       class GitCommandError < GitError
         def initialize(command, path = nil)
-          msg =  "Git error: command `git #{command}` in directory #{Dir.pwd} has failed."
+          msg =  "Git error: command `git #{command}` in directory #{SharedHelpers.pwd} has failed."
           msg << "\nIf this error persists you could try removing the cache directory '#{path}'" if path && path.exist?
           super msg
         end

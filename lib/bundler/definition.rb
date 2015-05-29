@@ -267,7 +267,7 @@ module Bundler
       File.open(file, 'wb'){|f| f.puts(contents) }
     rescue Errno::EACCES
       raise Bundler::InstallError,
-        "There was an error while trying to write to Gemfile.lock. It is likely that \n" \
+        "There was an error while trying to write to #{File.basename(file)}. It is likely that \n" \
         "you need to allow write permissions for the file at path: \n" \
         "#{File.expand_path(file)}"
     end
@@ -330,10 +330,10 @@ module Bundler
     def ensure_equivalent_gemfile_and_lockfile(explicit_flag = false)
       msg = "You are trying to install in deployment mode after changing\n" \
             "your Gemfile. Run `bundle install` elsewhere and add the\n" \
-            "updated Gemfile.lock to version control."
+            "updated #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)} to version control."
 
       unless explicit_flag
-        msg += "\n\nIf this is a development machine, remove the Gemfile " \
+        msg += "\n\nIf this is a development machine, remove the #{Bundler.default_gemfile} " \
                "freeze \nby running `bundle install --no-deployment`."
       end
 

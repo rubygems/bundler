@@ -10,7 +10,7 @@ module Bundler
       @thor = thor
 
       @name = @gem_name
-      @target = Pathname.pwd.join(gem_name)
+      @target = SharedHelpers.pwd.join(gem_name)
 
       validate_ext_name if options[:ext]
     end
@@ -134,7 +134,7 @@ module Bundler
     private
 
     def resolve_name(name)
-      Pathname.pwd.join(name).basename.to_s
+      SharedHelpers.pwd.join(name).basename.to_s
     end
 
     def ask_and_set(key, header, message)
