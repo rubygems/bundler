@@ -48,7 +48,7 @@ module Bundler
     end
 
     def validate(spec)
-      Bundler.ui.silence { spec.validate }
+      Bundler.ui.silence { spec.validate(false) }
     end
 
     def path(obj)
@@ -465,7 +465,7 @@ module Bundler
         # Missing summary is downgraded to a warning in later versions,
         # so we set it to an empty string to prevent an exception here.
         spec.summary ||= ""
-        super
+        Bundler.ui.silence { spec.validate }
       end
     end
 
