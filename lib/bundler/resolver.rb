@@ -305,12 +305,16 @@ module Bundler
     def amount_constrained(dependency)
       @amount_constrained ||= {}
       @amount_constrained[dependency.name] ||= begin
-        base_dep = Dependency.new dependency.name, '>= 0.a'
-        all = search_for(DepProxy.new base_dep, dependency.__platform)
-        if all.size == 0
-          0
+        if base = @base[dependency.name] and !base.empty?
+          dependency.requirement.satisfied_by?(base.first.version) ? 0 : 1
         else
-          search_for(dependency).size.to_f / all.size.to_f
+          base_dep = Dependency.new dependency.name, '>= 0.a'
+          all = search_for(DepProxy.new base_dep, dependency.__platform)
+          if all.size == 0
+            0
+          else
+            search_for(dependency).size.to_f / all.size.to_f
+          end
         end
       end
     end
