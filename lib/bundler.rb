@@ -92,7 +92,7 @@ module Bundler
     end
 
     def ui
-      @ui || (self.ui = UI::Silent.new)
+      (defined?(@ui) && @ui) || (self.ui = UI::Silent.new)
     end
 
     def ui=(ui)
