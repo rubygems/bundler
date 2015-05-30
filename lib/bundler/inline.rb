@@ -51,7 +51,6 @@ def gemfile(install = false, &gemfile)
   end
 
   runtime = Bundler::Runtime.new(nil, definition)
-  runtime.setup_environment
   runtime.setup.require
 
   bundler_module = class << Bundler; self; end
