@@ -482,6 +482,13 @@ module Bundler
       def stub_rubygems(specs)
         stub_source_index(specs)
       end
+
+      def validate(spec)
+        # Missing summary is downgraded to a warning in later versions,
+        # so we set it to an empty string to prevent an exception here.
+        spec.summary ||= ""
+        Bundler.ui.silence { spec.validate(false) }
+      end
     end
 
     # Rubygems 1.8.5-1.8.19

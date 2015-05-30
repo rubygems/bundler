@@ -1,3 +1,9 @@
+## 1.10.2 (2015-05-29)
+
+Bugfixes:
+
+  - fix regression in `bundle update GEM` performance introduced in 1.10.0 (#3687, @segiddins)
+
 ## 1.10.1 (2015-05-28)
 
 Bugfixes:
