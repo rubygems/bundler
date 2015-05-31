@@ -48,7 +48,6 @@ def gemfile(install = false, &gemfile)
     Bundler::Installer.post_install_messages.each do |name, message|
       Bundler.ui.info "Post install message from #{name}:\n#{message}"
     end
-    definition.instance_eval { @specs = nil }
   end
 
   runtime = Bundler::Runtime.new(nil, definition)
