@@ -29,17 +29,6 @@ module Bundler
       end
     end
 
-    # needed for inline
-    def load_paths
-      if @remote_specification
-        @remote_specification.load_paths
-      elsif _local_specification
-        _local_specification.load_paths
-      else
-        super
-      end
-    end
-
     # needed for binstubs
     def executables
       if @remote_specification

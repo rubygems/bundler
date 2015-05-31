@@ -48,9 +48,11 @@ def gemfile(install = false, &gemfile)
     Bundler::Installer.post_install_messages.each do |name, message|
       Bundler.ui.info "Post install message from #{name}:\n#{message}"
     end
+    definition.instance_eval { @specs = nil }
   end
 
   runtime = Bundler::Runtime.new(nil, definition)
+  runtime.setup_environment
   runtime.setup.require
 
   bundler_module = class << Bundler; self; end
