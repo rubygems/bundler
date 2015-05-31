@@ -13,6 +13,7 @@ module Bundler
         end
         @shell = Thor::Base.shell.new
         @level = ENV['DEBUG'] ? "debug" : "info"
+        @told_messages = []
       end
 
       def info(msg, newline = nil)
@@ -24,6 +25,8 @@ module Bundler
       end
 
       def warn(msg, newline = nil)
+        return if @told_messages.include? msg
+        @told_messages << msg
         tell_me(msg, :yellow, newline) if level("warn")
       end
 

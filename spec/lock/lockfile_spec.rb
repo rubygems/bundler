@@ -140,9 +140,9 @@ describe "the lockfile format" do
       G
     end
 
-    expect(out).to include("Warning: the running version of Bundler is " \
-                           "older than the version that created the lockfile")
-
+    warning_message = "Warning: the running version of Bundler is " \
+                           "older than the version that created the lockfile"
+    expect(out.scan(warning_message).size).to eq(1)
     lockfile_should_be <<-G
       GEM
         remote: file:#{gem_repo1}/
