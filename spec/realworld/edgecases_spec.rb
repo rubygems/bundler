@@ -36,7 +36,7 @@ describe "real world edgecases", :realworld => true do
     expect(out).to include("activemodel 3.0.5")
   end
 
-  it "resolves dependencies correctly", :ruby => "1.9" do
+  it "resolves dependencies correctly", :ruby => "1.9.3" do
     install_gemfile <<-G
       source "https://rubygems.org"
 
@@ -47,7 +47,7 @@ describe "real world edgecases", :realworld => true do
     expect(out).to include("capybara 2.2.1")
   end
 
-  it "installs the latest version of gxapi_rails", :ruby => "1.9"  do
+  it "installs the latest version of gxapi_rails", :ruby => "1.9.3"  do
     install_gemfile <<-G
       source "https://rubygems.org"
 
