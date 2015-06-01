@@ -8,8 +8,8 @@ describe Bundler::RubygemsIntegration do
   context "#validate" do
     let(:spec) { double("spec", :summary => "") }
 
-    it "validates without arguments", :rubygems => "< 1.7" do
-      expect(spec).to receive(:validate).with(no_args)
+    it "skips overly-strict gemspec validation", :rubygems => "< 1.7" do
+      expect(spec).to_not receive(:validate)
       Bundler.rubygems.validate(spec)
     end
 

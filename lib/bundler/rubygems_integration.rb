@@ -462,10 +462,9 @@ module Bundler
       end
 
       def validate(spec)
-        # Missing summary is downgraded to a warning in later versions,
-        # so we set it to an empty string to prevent an exception here.
-        spec.summary ||= ""
-        Bundler.ui.silence { spec.validate }
+        # These versions of RubyGems always validate in "packaging" mode,
+        # which is too strict for the kinds of checks we care about. As a
+        # result, validation is disabled on versions of RubyGems below 1.7.
       end
     end
 
