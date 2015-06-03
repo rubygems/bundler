@@ -49,6 +49,8 @@ module Bundler
 
     def validate(spec)
       Bundler.ui.silence { spec.validate(false) }
+    rescue Errno::ENOENT
+      nil
     end
 
     def path(obj)
@@ -487,6 +489,8 @@ module Bundler
         # so we set it to an empty string to prevent an exception here.
         spec.summary ||= ""
         Bundler.ui.silence { spec.validate(false) }
+      rescue Errno::ENOENT
+        nil
       end
     end
 
