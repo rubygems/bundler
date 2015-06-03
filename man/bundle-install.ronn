@@ -10,6 +10,7 @@ bundle-install(1) -- Install the dependencies specified in your Gemfile
                  [--jobs=NUMBER]
                  [--local]
                  [--deployment]
+                 [--force]
                  [--no-cache]
                  [--no-prune]
                  [--path PATH]
@@ -79,6 +80,10 @@ update process below under [CONSERVATIVE UPDATING][].
   In [deployment mode][DEPLOYMENT MODE], Bundler will 'roll-out' the bundle for
   `production` use. Please check carefully if you want to have this option
   enabled in `development` or `test` environments.
+
+* `--force`:
+  Force download every gem, even if the required versions are already available
+  locally.
 
 * `--system`:
   Installs the gems specified in the bundle to the system's Rubygems location.
