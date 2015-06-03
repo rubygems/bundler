@@ -211,6 +211,8 @@ module Bundler
       end
 
       value
+    rescue Errno::EACCES
+      raise PermissionError.new(file)
     end
 
     def global_config_file

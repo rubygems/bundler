@@ -40,8 +40,27 @@ describe Bundler::Settings do
         end
       end
     end
+
+    context "when it's not possible to write to the file" do
+      it "raises an PermissionError with explanation" do
+        expect(FileUtils).to receive(:mkdir_p).with(settings.send(:local_config_file).dirname).
+          and_raise(Errno::EACCES)
+        expect{ settings[:frozen] = "1" }.
+          to raise_error(Bundler::PermissionError, /config/)
+      end
+    end
   end
 
+  describe "#set_global" do
+    context "when it's not possible to write to the file" do
+      it "raises an PermissionError with explanation" do
+        expect(FileUtils).to receive(:mkdir_p).with(settings.send(:global_config_file).dirname).
+          and_raise(Errno::EACCES)
+        expect{ settings.set_global(:frozen, "1") }.
+          to raise_error(Bundler::PermissionError, /\.bundle\/config/)
+      end
+    end
+  end
 
   describe "#mirror_for" do
     let(:uri) { URI("https://rubygems.org/") }
