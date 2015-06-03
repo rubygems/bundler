@@ -97,7 +97,7 @@ module Bundler
     end
 
     def ui=(ui)
-      Bundler.rubygems.ui = UI::RGProxy.new(ui)
+      Bundler.rubygems.ui = ui ? UI::RGProxy.new(ui) : nil
       @ui = ui
     end
 
