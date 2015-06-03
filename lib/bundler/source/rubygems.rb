@@ -158,7 +158,9 @@ module Bundler
           installed_spec.loaded_from = loaded_from(spec)
         end
         spec.loaded_from = loaded_from(spec)
-        ["Installing #{version_message(spec)}", spec.post_install_message]
+        install_message = "Installing #{version_message(spec)}"
+        install_message << " with native extensions" unless spec.extensions.empty?
+        [install_message, spec.post_install_message]
       ensure
         Bundler.rm_rf(install_path) if Bundler.requires_sudo?
       end

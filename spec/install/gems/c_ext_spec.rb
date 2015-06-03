@@ -41,6 +41,7 @@ describe "installing a gem with C extensions" do
     bundle "install"
 
     expect(out).not_to include("extconf.rb failed")
+    expect(out).to include("Installing c_extension 1.0 with native extensions")
 
     run "Bundler.require; puts CExtension.new.its_true"
     expect(out).to eq("true")
