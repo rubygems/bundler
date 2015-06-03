@@ -117,7 +117,9 @@ module Bundler
         end
 
         unless Bundler.settings[:no_install]
-          Bundler.ui.confirm "Installing #{version_message(spec)} "
+          message = "Installing #{version_message(spec)}"
+          message << " with native extensions" if spec.extensions.any?
+          Bundler.ui.confirm message
 
           path = cached_gem(spec)
           if Bundler.requires_sudo?

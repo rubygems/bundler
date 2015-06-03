@@ -40,8 +40,8 @@ describe "installing a gem with native extensions" do
     bundle "config build.c_extension --with-c_extension=hello"
     bundle "install"
 
-    expect(out).to include("Installing c_extension 1.0 with native extensions")
     expect(out).not_to include("extconf.rb failed")
+    expect(out).to include("Installing c_extension 1.0 with native extensions")
 
     run "Bundler.require; puts CExtension.new.its_true"
     expect(out).to eq("true")
