@@ -422,8 +422,8 @@ module Bundler
       #
       # @return [String] the message of the exception.
       #
-      def message
-        @message ||= begin
+      def to_s
+        @to_s ||= begin
           trace_line, description = parse_line_number_from_description
 
           m = "\n[!] "

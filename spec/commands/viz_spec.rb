@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe "bundle viz", :ruby => "1.9", :if => Bundler.which("dot") do
+describe "bundle viz", :ruby => "1.9.3", :if => Bundler.which("dot") do
   let(:graphviz_lib) do
     graphviz_glob = base_system_gems.join("gems/ruby-graphviz*/lib")
     Dir[graphviz_glob].first

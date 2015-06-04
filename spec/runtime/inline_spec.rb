@@ -2,7 +2,10 @@ require "spec_helper"
 
 describe "bundler/inline#gemfile" do
   def script(code, options = {})
-    @out = ruby("require 'bundler/inline'\n\n" << code, options)
+    requires = ['bundler/inline']
+    requires.unshift File.expand_path('../../support/artifice/'+options.delete(:artifice)+'.rb', __FILE__) if options.key?(:artifice)
+    requires = requires.map { |r| "require '#{r}'" }.join("\n")
+    @out = ruby("#{requires}\n\n" << code, options)
   end
 
   before :each do
@@ -44,12 +47,6 @@ describe "bundler/inline#gemfile" do
     build_lib "four", "1.0.0" do |s|
       s.write "lib/four.rb", "puts 'four'"
     end
-
-    @gemfile = <<-G
-      path "#{lib_path}"
-      gem "two"
-      gem "four", :require => false
-    G
   end
 
   it "requires the gems" do
@@ -83,6 +80,17 @@ describe "bundler/inline#gemfile" do
     RUBY
 
     expect(out).to include("Rack's post install message")
+    expect(exitstatus).to be_zero if exitstatus
+
+    script <<-RUBY, :artifice => 'endpoint'
+      gemfile(true) do
+        source "https://rubygems.org"
+        gem "activesupport", :require => true
+      end
+    RUBY
+
+    expect(out).to include("Installing activesupport")
+    expect(err).to eq("")
     expect(exitstatus).to be_zero if exitstatus
   end
 end
