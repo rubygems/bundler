@@ -1,3 +1,12 @@
+## 1.10.3 (2015-06-03)
+
+Bugfixes:
+
+  - allow missing gemspec files when validating path and git gems (#3686, #3698, @segiddins)
+  - fix regression in `rake install` (#3701, #3705, @segiddins)
+  - fix regression when calling `gem` with `bundle exec` or `-rbundler/setup` (#3699, @segiddins)
+  - fix `bundler/inline` requiring a newly-installed gem (#3693, @indirect, @segiddins)
+
 ## 1.10.2 (2015-05-29)
 
 Bugfixes:
