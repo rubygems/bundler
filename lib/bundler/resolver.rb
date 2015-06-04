@@ -24,7 +24,7 @@ module Bundler
         conflicts.values.flatten.reduce('') do |o, conflict|
           o << %(Bundler could not find compatible versions for gem "#{conflict.requirement.name}":\n)
           if conflict.locked_requirement
-            o << %(  In snapshot (Gemfile.lock):\n)
+            o << %(  In snapshot (#{Bundler.default_lockfile.basename}):\n)
             o << %(    #{clean_req conflict.locked_requirement}\n)
             o << %(\n)
           end
@@ -279,11 +279,11 @@ module Bundler
     end
 
     def name_for_explicit_dependency_source
-      'Gemfile'
+      Bundler.default_gemfile.basename.to_s rescue 'Gemfile'
     end
 
     def name_for_locking_dependency_source
-      'Gemfile.lock'
+      Bundler.default_lockfile.basename.to_s rescue 'Gemfile.lock'
     end
 
     def requirement_satisfied_by?(requirement, activated, spec)
@@ -305,10 +305,17 @@ module Bundler
     def amount_constrained(dependency)
       @amount_constrained ||= {}
       @amount_constrained[dependency.name] ||= begin
-        base_dep = Dependency.new dependency.name, '>= 0.a'
-        all = search_for(DepProxy.new base_dep, dependency.__platform)
-        return 0 if all.empty?
-        search_for(dependency).size.to_f / all.size.to_f
+        if base = @base[dependency.name] and !base.empty?
+          dependency.requirement.satisfied_by?(base.first.version) ? 0 : 1
+        else
+          base_dep = Dependency.new dependency.name, '>= 0.a'
+          all = search_for(DepProxy.new base_dep, dependency.__platform)
+          if all.size == 0
+            0
+          else
+            search_for(dependency).size.to_f / all.size.to_f
+          end
+        end
       end
     end
 

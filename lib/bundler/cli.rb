@@ -19,7 +19,6 @@ module Bundler
       custom_gemfile = options[:gemfile] || Bundler.settings[:gemfile]
       ENV['BUNDLE_GEMFILE']   = File.expand_path(custom_gemfile) if custom_gemfile
       Bundler.settings[:retry] = options[:retry] if options[:retry]
-      Bundler.rubygems.ui = UI::RGProxy.new(Bundler.ui)
       auto_install if AUTO_INSTALL_CMDS.include?(current_cmd)
     rescue UnknownArgumentError => e
       raise InvalidOption, e.message
@@ -341,7 +340,7 @@ module Bundler
     end
 
     desc "gem GEM [OPTIONS]", "Creates a skeleton for creating a rubygem"
-    method_option :bin, :type => :boolean, :default => false, :aliases => '-b', :desc => "Generate a binary for your library. Set a default with `bundle config gem.mit true`."
+    method_option :bin, :type => :boolean, :default => false, :aliases => '-b', :desc => "Generate a binary for your library."
     method_option :coc, :type => :boolean, :desc => "Generate a code of conduct file. Set a default with `bundle config gem.coc true`."
     method_option :edit, :type => :string, :aliases => "-e", :required => false, :banner => "EDITOR",
       :lazy_default => [ENV['BUNDLER_EDITOR'], ENV['VISUAL'], ENV['EDITOR']].find{|e| !e.nil? && !e.empty? },

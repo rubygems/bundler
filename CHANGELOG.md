@@ -1,3 +1,34 @@
+## 1.10.2 (2015-05-29)
+
+Bugfixes:
+
+  - fix regression in `bundle update GEM` performance introduced in 1.10.0 (#3687, @segiddins)
+
+## 1.10.1 (2015-05-28)
+
+Bugfixes:
+
+  - silence ruby warning when running CLI commands (@segiddins)
+  - validate gemspecs in non-packaging mode (#3681, @segiddins)
+  - ensure the same chdir mutex as RubyGems is used (#3680, @segiddins)
+
+## 1.10.0 (2015-05-28)
+
+(this space intentionally left blank)
+
+## 1.10.0.rc (2015-05-16)
+
+Features:
+
+  - dramatically speed up resolving some slow Gemfiles (#3635, @segiddins)
+  - track CI platforms running Bundler (#3646, @fotanus)
+
+Bugfixes:
+
+  - allow `viz` to work with prereleases (#3621, #3217, @aprescott)
+  - validate gemspecs used in path and git gems (#3639, @segiddins, @indirect)
+  - stop printing config warnings when config is unchanged (#3649, @fotanus, @indirect)
+
 ## 1.10.0.pre.2 (2015-05-07)
 
 Bugfixes:
@@ -40,6 +71,24 @@ Performance:
 Deprecations:
 
   - deprecated the (never enabled) `bundle_ruby` binary (@smlance)
+
+## 1.9.9 (2015-05-16)
+
+Bugfixes:
+
+  - read mirror and credential settings from older versions (#3557, @Strech)
+
+## 1.9.8 (2015-05-12)
+
+Bugfixes:
+
+  - fix regression in sudo mode introduced by 1.9.7 (#3642, @segiddins)
+
+## 1.9.7 (2015-05-11)
+
+Bugfixes:
+
+  - always clean up tmp dirs (#3277, @hone, @indirect, @segiddins)
 
 ## 1.9.6 (2015-05-02)
 

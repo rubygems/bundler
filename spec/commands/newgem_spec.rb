@@ -589,6 +589,8 @@ describe "bundle gem" do
           Rake::ExtensionTask.new("test_gem") do |ext|
             ext.lib_dir = "lib/test_gem"
           end
+
+          task :default => [:clobber, :compile, :spec]
         RAKEFILE
 
         expect(bundled_app("test_gem/Rakefile").read).to eq(rakefile)

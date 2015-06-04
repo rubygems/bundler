@@ -3,9 +3,8 @@ class LessThanProc < Proc
 
   def self.with(present)
     provided = Gem::Version.new(present.dup)
-
     self.new do |required|
-      if required.scan(/[=><~]/)
+      if required =~ /[=><~]/
         !Gem::Requirement.new(required).satisfied_by?(provided)
       else
         provided < Gem::Version.new(required)

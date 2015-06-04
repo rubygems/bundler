@@ -25,22 +25,31 @@
 #            gem 'cocoapods', '~> 0.34.1'
 #          end
 #
-#          puts Pod::VERSION => "0.34.4"
+#          puts Pod::VERSION # => "0.34.4"
 #
 def gemfile(install = false, &gemfile)
   require 'bundler'
   old_root = Bundler.method(:root)
   def Bundler.root
-    Pathname.pwd.expand_path
+    Bundler::SharedHelpers.pwd.expand_path
   end
   ENV['BUNDLE_GEMFILE'] ||= 'Gemfile'
 
   builder = Bundler::Dsl.new
   builder.instance_eval(&gemfile)
+
   definition = builder.to_definition(nil, true)
   def definition.lock(file); end
   definition.validate_ruby!
-  Bundler::Installer.install(Bundler.root, definition, :system => true) if install
+
+  if install
+    Bundler.ui = Bundler::UI::Shell.new
+    Bundler::Installer.install(Bundler.root, definition, :system => true)
+    Bundler::Installer.post_install_messages.each do |name, message|
+      Bundler.ui.info "Post install message from #{name}:\n#{message}"
+    end
+  end
+
   runtime = Bundler::Runtime.new(nil, definition)
   runtime.setup_environment
   runtime.setup.require

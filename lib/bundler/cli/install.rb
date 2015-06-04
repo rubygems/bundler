@@ -64,8 +64,8 @@ module Bundler
       if options[:deployment] || options[:frozen]
         unless Bundler.default_lockfile.exist?
           flag = options[:deployment] ? '--deployment' : '--frozen'
-          raise ProductionError, "The #{flag} flag requires a Gemfile.lock. Please make " \
-                                 "sure you have checked your Gemfile.lock into version control " \
+          raise ProductionError, "The #{flag} flag requires a #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)}. Please make " \
+                                 "sure you have checked your #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)} into version control " \
                                  "before deploying."
         end
 
@@ -103,6 +103,7 @@ module Bundler
 
       definition = Bundler.definition
       definition.validate_ruby!
+
       Installer.install(Bundler.root, definition, options)
       Bundler.load.cache if Bundler.app_cache.exist? && !options["no-cache"] && !Bundler.settings[:frozen]
 

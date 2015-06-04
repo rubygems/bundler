@@ -10,7 +10,7 @@ module Bundler
       @thor = thor
 
       @name = @gem_name
-      @target = Pathname.pwd.join(gem_name)
+      @target = SharedHelpers.pwd.join(gem_name)
 
       validate_ext_name if options[:ext]
     end
@@ -22,6 +22,7 @@ module Bundler
       namespaced_path = name.tr('-', '/')
       constant_name = name.gsub(/-[_-]*(?![_-]|$)/){ '::' }.gsub(/([_-]+|(::)|^)(.|$)/){ $2.to_s + $3.upcase }
       constant_array = constant_name.split('::')
+      test_task = options[:test] == 'minitest' ? 'test' : 'spec'
 
       git_user_name = `git config user.name`.chomp
       git_user_email = `git config user.email`.chomp
@@ -36,6 +37,7 @@ module Bundler
         :author           => git_user_name.empty? ? "TODO: Write your name" : git_user_name,
         :email            => git_user_email.empty? ? "TODO: Write your email address" : git_user_email,
         :test             => options[:test],
+        :test_task        => test_task,
         :ext              => options[:ext],
         :bin              => options[:bin],
         :bundler_version  => bundler_dependency_version
@@ -132,7 +134,7 @@ module Bundler
     private
 
     def resolve_name(name)
-      Pathname.pwd.join(name).basename.to_s
+      SharedHelpers.pwd.join(name).basename.to_s
     end
 
     def ask_and_set(key, header, message)

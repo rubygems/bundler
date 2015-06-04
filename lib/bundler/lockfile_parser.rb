@@ -22,29 +22,35 @@ module Bundler
     PATH         = "PATH"
     SPECS        = "  specs:"
     OPTIONS      = /^  ([a-z]+): (.*)$/i
+    SOURCE       = [GIT, GEM, PATH]
 
     def initialize(lockfile)
       @platforms    = []
       @sources      = []
       @dependencies = []
-      @state        = :source
+      @state        = nil
       @specs        = {}
 
       @rubygems_aggregate = Source::Rubygems.new
 
       if lockfile.match(/<<<<<<<|=======|>>>>>>>|\|\|\|\|\|\|\|/)
-        raise LockfileError, "Your Gemfile.lock contains merge conflicts.\n" \
-          "Run `git checkout HEAD -- Gemfile.lock` first to get a clean lock."
+        raise LockfileError, "Your #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)} contains merge conflicts.\n" \
+          "Run `git checkout HEAD -- #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)}` first to get a clean lock."
       end
 
       lockfile.split(/(?:\r?\n)+/).each do |line|
-        if line == DEPENDENCIES
+        if SOURCE.include?(line)
+          @state = :source
+          parse_source(line)
+        elsif line == DEPENDENCIES
           @state = :dependency
         elsif line == PLATFORMS
           @state = :platform
         elsif line == BUNDLED
           @state = :bundled_with
-        else
+        elsif line =~ /^[^\s]/
+          @state = nil
+        elsif @state
           send("parse_#{@state}", line)
         end
       end
@@ -53,7 +59,7 @@ module Bundler
       warn_for_outdated_bundler_version
     rescue ArgumentError => e
       Bundler.ui.debug(e)
-      raise LockfileError, "Your lockfile is unreadable. Run `rm Gemfile.lock` " \
+      raise LockfileError, "Your lockfile is unreadable. Run `rm #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)}` " \
         "and then `bundle install` to generate a new lockfile."
     end
 

@@ -82,7 +82,7 @@ describe "bundler/inline#gemfile" do
       end
     RUBY
 
-    expect(out).to eq("Rack's post install message")
+    expect(out).to include("Rack's post install message")
     expect(exitstatus).to be_zero if exitstatus
   end
 end

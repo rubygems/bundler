@@ -23,7 +23,7 @@ module Bundler
         Bundler.ui.warn "Install missing gems with `bundle install`"
         exit 1
       elsif !Bundler.default_lockfile.exist? && Bundler.settings[:frozen]
-        Bundler.ui.error "This bundle has been frozen, but there is no Gemfile.lock present"
+        Bundler.ui.error "This bundle has been frozen, but there is no #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)} present"
         exit 1
       else
         Bundler.load.lock unless options[:"dry-run"]

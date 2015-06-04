@@ -47,11 +47,16 @@ module Bundler
     def initialize(lockfile, dependencies, sources, unlock, ruby_version = nil, optional_groups = [])
       @unlocking = unlock == true || !unlock.empty?
 
-      @dependencies, @sources, @unlock, @optional_groups = dependencies, sources, unlock, optional_groups
-      @remote            = false
-      @specs             = nil
-      @lockfile_contents = ""
-      @ruby_version      = ruby_version
+      @dependencies    = dependencies
+      @sources         = sources
+      @unlock          = unlock
+      @optional_groups = optional_groups
+      @remote          = false
+      @specs           = nil
+      @ruby_version    = ruby_version
+
+      @lockfile_contents      = ""
+      @locked_bundler_version = nil
 
       if lockfile && File.exist?(lockfile)
         @lockfile_contents = Bundler.read_file(lockfile)
@@ -262,7 +267,7 @@ module Bundler
       File.open(file, 'wb'){|f| f.puts(contents) }
     rescue Errno::EACCES
       raise Bundler::InstallError,
-        "There was an error while trying to write to Gemfile.lock. It is likely that \n" \
+        "There was an error while trying to write to #{File.basename(file)}. It is likely that \n" \
         "you need to allow write permissions for the file at path: \n" \
         "#{File.expand_path(file)}"
     end
@@ -325,10 +330,10 @@ module Bundler
     def ensure_equivalent_gemfile_and_lockfile(explicit_flag = false)
       msg = "You are trying to install in deployment mode after changing\n" \
             "your Gemfile. Run `bundle install` elsewhere and add the\n" \
-            "updated Gemfile.lock to version control."
+            "updated #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)} to version control."
 
       unless explicit_flag
-        msg += "\n\nIf this is a development machine, remove the Gemfile " \
+        msg += "\n\nIf this is a development machine, remove the #{Bundler.default_gemfile} " \
                "freeze \nby running `bundle install --no-deployment`."
       end
 
