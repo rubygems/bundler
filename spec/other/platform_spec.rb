@@ -982,7 +982,7 @@ G
       ENV['BUNDLER_FORCE_TTY'] = "true"
     end
 
-    it "makes a Gemfile.lock if setup succeeds" do
+    it "doesn't make a Gemfile.lock if setup succeeds" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "yard"
@@ -994,10 +994,10 @@ G
       FileUtils.rm(bundled_app("Gemfile.lock"))
 
       run "1"
-      expect(bundled_app("Gemfile.lock")).to exist
+      expect(bundled_app("Gemfile.lock")).not_to exist
     end
 
-    it "makes a Gemfile.lock if setup succeeds for any engine" do
+    it "doesn't make a Gemfile.lock if setup succeeds for any engine" do
       simulate_ruby_engine "jruby" do
         install_gemfile <<-G
           source "file://#{gem_repo1}"
@@ -1010,7 +1010,7 @@ G
         FileUtils.rm(bundled_app("Gemfile.lock"))
 
         run "1"
-        expect(bundled_app("Gemfile.lock")).to exist
+        expect(bundled_app("Gemfile.lock")).not_to exist
       end
     end
 

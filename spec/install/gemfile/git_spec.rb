@@ -214,7 +214,7 @@ describe "bundle install with git sources" do
       expect(out).to eq("LOCAL")
     end
 
-    it "updates specs on runtime" do
+    it "doesn't update specs on runtime" do
       system_gems "nokogiri-1.4.2"
 
       build_git "rack", "0.8"
@@ -235,7 +235,7 @@ describe "bundle install with git sources" do
       run "require 'rack'"
 
       lockfile1 = File.read(bundled_app("Gemfile.lock"))
-      expect(lockfile1).not_to eq(lockfile0)
+      expect(lockfile1).to eq(lockfile0)
     end
 
     it "updates ref on install" do

@@ -26,7 +26,7 @@ module Bundler
         Bundler.ui.error "This bundle has been frozen, but there is no #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)} present"
         exit 1
       else
-        Bundler.load.lock unless options[:"dry-run"]
+        Bundler.load unless options[:"dry-run"]
         Bundler.ui.info "The Gemfile's dependencies are satisfied"
       end
     end
