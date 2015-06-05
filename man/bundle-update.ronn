@@ -125,12 +125,12 @@ on `rack ~> 1.0`. If you run bundle install, you get:
 
     Fetching source index for https://rubygems.org/
     Installing daemons (1.1.0)
-    Installing eventmachine (0.12.10) with native extensions
+    Installing eventmachine (0.12.10)
     Installing open4 (1.0.1)
-    Installing perftools.rb (0.4.7) with native extensions
+    Installing perftools.rb (0.4.7)
     Installing rack (1.2.1)
     Installing rack-perftools_profiler (0.0.2)
-    Installing thin (1.2.7) with native extensions
+    Installing thin (1.2.7)
     Using bundler (1.0.0.rc.3)
 
 In this case, the two gems have their own set of dependencies, but they share
