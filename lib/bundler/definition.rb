@@ -240,14 +240,14 @@ module Bundler
       dependencies.map { |d| d.groups }.flatten.uniq
     end
 
-    def lock(file)
+    def lock(file, preserve_bundled_with = false)
       contents = to_lock
 
       # Convert to \r\n if the existing lock has them
       # i.e., Windows with `git config core.autocrlf=true`
       contents.gsub!(/\n/, "\r\n") if @lockfile_contents.match("\r\n")
 
-      return if @lockfile_contents == contents
+      return if lockfiles_equal?(@lockfile_contents, contents, preserve_bundled_with)
 
       if Bundler.settings[:frozen]
         Bundler.ui.error "Cannot write a changed lockfile while frozen."
@@ -658,5 +658,15 @@ module Bundler
     def requested_groups
       self.groups - Bundler.settings.without - @optional_groups + Bundler.settings.with
     end
+
+    def lockfiles_equal?(current, proposed, preserve_bundled_with)
+      if preserve_bundled_with
+        pattern = /\n\nBUNDLED WITH\n.*\n/
+        current.sub(pattern, "\n") == proposed.sub(pattern, "\n")
+      else
+        current == proposed
+      end
+    end
+
   end
 end
