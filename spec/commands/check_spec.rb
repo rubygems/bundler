@@ -23,7 +23,7 @@ describe "bundle check" do
     expect(out).to eq("The Gemfile's dependencies are satisfied")
   end
 
-  it "creates a Gemfile.lock by default if one does not exist" do
+  it "does not creates a Gemfile.lock by default if one does not exist" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rails"
@@ -33,7 +33,7 @@ describe "bundle check" do
 
     bundle "check"
 
-    expect(bundled_app("Gemfile.lock")).to exist
+    expect(bundled_app("Gemfile.lock")).not_to exist
   end
 
   it "does not create a Gemfile.lock if --dry-run was passed" do

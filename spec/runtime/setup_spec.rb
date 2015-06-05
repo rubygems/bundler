@@ -168,7 +168,7 @@ describe "Bundler.setup" do
     expect(File.read(bundled_app("Gemfile.lock"))).to eq(lockfile)
   end
 
-  it "makes a Gemfile.lock if setup succeeds" do
+  it "doesn't make a Gemfile.lock if setup succeeds" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack"
@@ -179,7 +179,7 @@ describe "Bundler.setup" do
     FileUtils.rm(bundled_app("Gemfile.lock"))
 
     run "1"
-    expect(bundled_app("Gemfile.lock")).to exist
+    expect(bundled_app("Gemfile.lock")).not_to exist
   end
 
   it "uses BUNDLE_GEMFILE to locate the gemfile if present" do
