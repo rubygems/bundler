@@ -41,8 +41,6 @@ module Bundler
 
       setup_manpath
 
-      lock
-
       self
     end
 
