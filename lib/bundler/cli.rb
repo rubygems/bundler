@@ -97,6 +97,7 @@ module Bundler
       "Use the specified gemfile instead of Gemfile"
     method_option "path", :type => :string, :banner =>
       "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
+    map "c" => "check"
     def check
       require 'bundler/cli/check'
       Check.new(options).run
@@ -152,7 +153,7 @@ module Bundler
       "Exclude gems that are part of the specified named group."
     method_option "with", :type => :array, :banner =>
       "Include gems that are part of the specified named group."
-
+    map "i" => "install"
     def install
       require 'bundler/cli/install'
       Install.new(options.dup).run
@@ -269,6 +270,7 @@ module Bundler
       bundle exec you can require and call the bundled gems as if they were installed
       into the system wide Rubygems repository.
     D
+    map "e" => "exec"
     def exec(*args)
       require 'bundler/cli/exec'
       Exec.new(options, args).run
