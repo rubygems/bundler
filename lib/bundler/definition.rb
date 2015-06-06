@@ -1,3 +1,4 @@
+require "bundler/lockfile_parser"
 require "digest/sha1"
 require "set"
 
@@ -661,7 +662,7 @@ module Bundler
 
     def lockfiles_equal?(current, proposed, preserve_bundled_with)
       if preserve_bundled_with
-        pattern = /\n\nBUNDLED WITH\n.*\n/
+        pattern = /\n\n#{LockfileParser::BUNDLED}\n\s+#{Gem::Version::VERSION_PATTERN}\n/
         current.sub(pattern, "\n") == proposed.sub(pattern, "\n")
       else
         current == proposed
