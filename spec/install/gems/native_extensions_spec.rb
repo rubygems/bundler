@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe "installing a gem with C extensions" do
+describe "installing a gem with native extensions" do
   it "installs" do
     build_repo2 do
       build_gem "c_extension" do |s|
