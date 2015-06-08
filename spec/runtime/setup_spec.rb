@@ -937,9 +937,11 @@ describe "Bundler.setup" do
     end
 
     context "is newer" do
-      it "does not change the lock" do
+      it "does not change the lock or warn" do
         lockfile lock_with(Bundler::VERSION.succ)
         ruby "require 'bundler/setup'"
+        expect(out).to eq("")
+        expect(err).to eq("")
         lockfile_should_be lock_with(Bundler::VERSION.succ)
       end
     end
