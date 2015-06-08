@@ -160,18 +160,17 @@ module Bundler
       end
 
       def install(spec, force = false)
-        debug = nil
+        Bundler.ui.info "Using #{version_message(spec)} from #{to_s}"
+
         if requires_checkout? && !@copied && !force
-          debug = "  * Checking out revision: #{ref}"
+          Bundler.ui.debug "  * Checking out revision: #{ref}"
           git_proxy.copy_to(install_path, submodules)
           serialize_gemspecs_in(install_path)
           @copied = true
         end
         generate_bin(spec)
-        if requires_checkout? && spec.post_install_message
-          Installer.post_install_messages[spec.name] = spec.post_install_message
-        end
-        ["Using #{version_message(spec)} from #{to_s}", nil, debug]
+
+        requires_checkout? ? spec.post_install_message : nil
       end
 
       def cache(spec, custom_path = nil)

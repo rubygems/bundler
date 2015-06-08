@@ -99,7 +99,8 @@ module Bundler
         end
 
         if installed_specs[spec].any? && !force
-          return Bundler.ui.info "Using #{version_message(spec)}"
+          Bundler.ui.info "Using #{version_message(spec)}"
+          return nil # no post-install message
         end
 
         # Download the gem to get the spec, because some specs that are returned
