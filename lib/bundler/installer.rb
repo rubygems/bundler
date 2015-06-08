@@ -100,8 +100,6 @@ module Bundler
     def install_gem_from_spec(spec, standalone = false, worker = 0, force = false)
       # Fetch the build settings, if there are any
       settings = Bundler.settings["build.#{spec.name}"]
-      messages = nil
-
       install_options = { :force => force, :ensure_builtin_gems_cached => standalone }
 
       post_install_message = nil
