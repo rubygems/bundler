@@ -39,7 +39,7 @@ def gemfile(install = false, &gemfile)
   builder.instance_eval(&gemfile)
 
   definition = builder.to_definition(nil, true)
-  def definition.lock(file); end
+  def definition.lock(*); end
   definition.validate_ruby!
 
   if install
