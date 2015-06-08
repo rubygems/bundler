@@ -6,13 +6,6 @@ module Bundler
     include Thor::Actions
     AUTO_INSTALL_CMDS = %w[show binstubs outdated exec open console licenses clean]
 
-    def self.start(*)
-      super
-    rescue Exception => e
-      Bundler.ui = UI::Shell.new
-      raise e
-    end
-
     def initialize(*args)
       super
       current_cmd = args.last[:current_command].name
