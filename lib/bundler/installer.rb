@@ -104,6 +104,7 @@ module Bundler
 
       install_options = { :force => force, :ensure_builtin_gems_cached => standalone }
 
+      post_install_message = nil
       if settings
         # Build arguments are global, so this is mutexed
         Bundler.rubygems.with_build_args [settings] do
