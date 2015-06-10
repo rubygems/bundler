@@ -26,7 +26,7 @@ describe "require 'bundler/gem_tasks'" do
     expected_tasks = [
       "rake build",
       "rake install",
-      "rake release",
+      "rake release[remote]",
     ]
     tasks = out.lines.to_a.map { |s| s.split('#').first.strip }
     expect(tasks & expected_tasks).to eq(expected_tasks)

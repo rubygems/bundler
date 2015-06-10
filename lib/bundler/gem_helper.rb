@@ -51,7 +51,7 @@ module Bundler
 
       desc "Create tag #{version_tag} and build and push #{name}-#{version}.gem to Rubygems\n" \
            "To prevent publishing in Rubygems use `gem_push=no rake release`"
-      task 'release' => ['build', 'release:guard_clean',
+      task 'release', [:remote] => ['build', 'release:guard_clean',
                          'release:source_control_push', 'release:rubygem_push'] do
       end
 
@@ -59,8 +59,8 @@ module Bundler
         guard_clean
       end
 
-      task 'release:source_control_push' do
-        tag_version { git_push } unless already_tagged?
+      task 'release:source_control_push', [:remote] do |t, args|
+        tag_version { git_push(args[:remote]) } unless already_tagged?
       end
 
       task 'release:rubygem_push' do
@@ -102,9 +102,9 @@ module Bundler
       Dir[File.join(base, "#{name}-*.gem")].sort_by{|f| File.mtime(f)}.last
     end
 
-    def git_push
-      perform_git_push
-      perform_git_push ' --tags'
+    def git_push(remote = '')
+      perform_git_push remote
+      perform_git_push "#{remote} --tags"
       Bundler.ui.confirm "Pushed git commits and tags."
     end
 
