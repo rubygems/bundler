@@ -85,6 +85,20 @@ module Bundler
 
   class MarshalError < StandardError; end
 
+  class PermissionError < BundlerError
+    def initialize(file)
+      @file = file
+    end
+
+    def message
+      "There was an error while trying to write to `#{File.basename(@file)}`. It is likely that \n" \
+      "you need to allow write permissions for the file at path: \n" \
+      "#{File.expand_path(@file)}"
+    end
+
+    status_code(23)
+  end
+
   class << self
     attr_writer :bundle_path
 

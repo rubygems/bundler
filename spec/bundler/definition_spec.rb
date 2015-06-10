@@ -12,11 +12,11 @@ describe Bundler::Definition do
     context "when it's not possible to write to the file" do
       subject{ Bundler::Definition.new(nil, [], Bundler::SourceList.new, []) }
 
-      it "raises an InstallError with explanation" do
+      it "raises an PermissionError with explanation" do
         expect(File).to receive(:open).with("Gemfile.lock", "wb").
           and_raise(Errno::EACCES)
         expect{ subject.lock("Gemfile.lock") }.
-          to raise_error(Bundler::InstallError)
+          to raise_error(Bundler::PermissionError, /Gemfile\.lock/)
       end
     end
   end
