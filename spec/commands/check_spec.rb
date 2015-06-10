@@ -252,6 +252,19 @@ describe "bundle check" do
     end
   end
 
+  context "--path vendor/bundle after installing gems in the default directory" do
+    it "returns false" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rails"
+      G
+
+      bundle 'check --path vendor/bundle'
+      expect(exitstatus).to eq(1) if exitstatus
+      expect(out).to match(/The following gems are missing/)
+    end
+  end
+
   describe "when locked" do
     before :each do
       system_gems "rack-1.0.0"
