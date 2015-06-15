@@ -27,7 +27,7 @@ module Bundler
       end
     end
 
-    alias :[]=, default_config_for_bundler_version # See https://trello.com/c/yGsPNDpg
+    alias :[]= default_config_for_bundler_version # See https://trello.com/c/yGsPNDpg
 
     def set_current(key, value)
       key = key_for key
