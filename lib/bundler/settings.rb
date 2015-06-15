@@ -2,19 +2,20 @@ require "uri"
 
 module Bundler
   class Settings
-    BOOL_KEYS = %w(frozen cache_all no_prune disable_local_branch_check ignore_messages gem.mit gem.coc).freeze
+    BOOL_KEYS = %w(frozen cache_all no_prune disable_local_branch_check ignore_messages ignore_warnings gem.mit gem.coc).freeze
     NUMBER_KEYS = %w(retry timeout redirect).freeze
     DEFAULT_CONFIG = {:retry => 3, :timeout => 10, :redirect => 5}
 
     def initialize(root = nil)
       @root          = root
+      @current_config = {}
       @local_config  = load_config(local_config_file)
       @global_config = load_config(global_config_file)
     end
 
     def [](name)
       key = key_for(name)
-      value = (@local_config[key] || ENV[key] || @global_config[key] || DEFAULT_CONFIG[name])
+      value = (@current_config[key] || @local_config[key] || ENV[key] || @global_config[key] || DEFAULT_CONFIG[name])
 
       case
       when !value.nil? && is_bool(name)
@@ -26,12 +27,30 @@ module Bundler
       end
     end
 
+    # In Bundler pre 2.0 any command ever set was stored in the local config
+    # file. In Bundler 2.0 they are only saved for that current command and
+    # `bundle config <setting name> <setting value>` is used for setting
+    # remembered arguments.
+    # See https://trello.com/c/yGsPNDpg
     def []=(key, value)
+      @use_current ||= (Bundler::VERSION.split(".")[0].to_i >= 2)
+      if @use_current
+        set_current(key, value)
+      else
+        print_remembered_flags_deprecation_warning unless Bundler.settings["ignore_warnings.remembered_flags"]
+        set_local(key, value)
+      end
+    end
+
+    def set_current(key, value)
+      key = key_for key
+      @current_config[key] = value
+    end
+
+    def set_local(key, value)
       local_config_file or raise GemfileNotFound, "Could not locate Gemfile"
       set_key(key, value, @local_config, local_config_file)
     end
-
-    alias :set_local :[]=
 
     def delete(key)
       @local_config.delete(key_for(key))
@@ -44,10 +63,10 @@ module Bundler
     def all
       env_keys = ENV.keys.select { |k| k =~ /BUNDLE_.*/ }
 
-      keys = @global_config.keys | @local_config.keys | env_keys
+      keys = @current_config.keys | @global_config.keys | @local_config.keys | env_keys | DEFAULT_CONFIG.keys
 
       keys.map do |key|
-        key.sub(/^BUNDLE_/, "").gsub(/__/, ".").downcase
+        key.to_s.sub(/^BUNDLE_/, "").gsub(/__/, ".").downcase
       end
     end
 
@@ -86,6 +105,7 @@ module Bundler
     def locations(key)
       key = key_for(key)
       locations = {}
+      locations[:current] = @current_config[key] if @current_config.key?(key)
       locations[:local]  = @local_config[key] if @local_config.key?(key)
       locations[:env]    = ENV[key] if ENV[key]
       locations[:global] = @global_config[key] if @global_config.key?(key)
@@ -98,6 +118,10 @@ module Bundler
 
       locations = []
       if @local_config.key?(key)
+        locations << "Set only for this command using command line arguments"
+      end
+
+      if @local_config.key?(key)
         locations << "Set for your local app (#{local_config_file}): #{@local_config[key].inspect}"
       end
 
@@ -107,6 +131,10 @@ module Bundler
 
       if @global_config.key?(key)
         locations << "Set for the current user (#{global_config_file}): #{@global_config[key].inspect}"
+      end
+
+      if DEFAULT_CONFIG.key?(exposed_key)
+        locations << "Set by default: #{DEFAULT_CONFIG[key].inspect}"
       end
 
       return ["You have not configured a value for `#{exposed_key}`"] if locations.empty?
@@ -255,6 +283,13 @@ module Bundler
         raise ArgumentError, "Gem sources must be absolute. You provided '#{uri}'."
       end
       uri
+    end
+
+    def print_remembered_flags_deprecation_warning
+      Bundler.ui.warn "Starting in Bundler 2.0, flags passed into commands will no longer be remember past that command." \
+        " Instead please set flags you want remembered between commands using `bundle config <setting name> <setting value>`" \
+        " To ignore this warning use `bundle config ignore_warnings.remembered_flags true`"
+      set_current "ignore_warnings.remembered_flags", true
     end
   end
 end
