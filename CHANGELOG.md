@@ -1,3 +1,14 @@
+## 1.10.4 (2015-06-16)
+
+Workarounds:
+
+  - don't add BUNDLED WITH to the lock when Spring runs `check` over and over (@indirect)
+
+Bugfixes:
+
+  - display "with native extensions" log output correctly (@ivantsepp)
+  - alias `i` to `install`, `c` to `check`, and `e` to `exec` (@indirect)
+
 ## 1.10.3 (2015-06-03)
 
 Bugfixes:
