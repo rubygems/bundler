@@ -33,7 +33,7 @@ describe "real world edgecases", :realworld => true do
       gem 'activerecord', '~> 3.0'
       gem 'builder', '~> 2.1.2'
     G
-    expect(out).to include("activemodel 3.0.5")
+    expect(out).to match(/activemodel 3.(\d)+.(\d)+/)
   end
 
   it "resolves dependencies correctly", :ruby => "1.9.3" do
@@ -43,8 +43,8 @@ describe "real world edgecases", :realworld => true do
       gem 'rails', '~> 3.0'
       gem 'capybara', '~> 2.2.0'
     G
-    expect(out).to include("rails 3.2.21")
-    expect(out).to include("capybara 2.2.1")
+    expect(out).to match(/rails 3.(\d)+.(\d)+/)
+    expect(out).to match(/capybara 2.(\d)+.(\d)+/)
   end
 
   it "installs the latest version of gxapi_rails", :ruby => "1.9.3"  do
@@ -55,7 +55,7 @@ describe "real world edgecases", :realworld => true do
       gem "rails", "~> 3"
       gem "gxapi_rails"
     G
-    expect(out).to include("gxapi_rails 0.0.6")
+    expect(out).to match(/gxapi_rails 0.(\d)+.(\d)+/)
   end
 
   it "installs the latest version of i18n" do
@@ -67,8 +67,8 @@ describe "real world edgecases", :realworld => true do
       gem "activerecord", "~> 3.0"
       gem "builder", "~> 2.1.2"
     G
-    expect(out).to include("i18n 0.6.11")
-    expect(out).to include("activesupport 3.0.5")
+    expect(out).to match(/i18n 0.(\d)+.(\d)+/)
+    expect(out).to match(/activesupport 3.(\d)+.(\d)+/)
   end
 
   # https://github.com/bundler/bundler/issues/1500
