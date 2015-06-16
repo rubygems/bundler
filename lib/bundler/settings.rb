@@ -27,7 +27,20 @@ module Bundler
       end
     end
 
-    alias :[]= default_config_for_bundler_version # See https://trello.com/c/yGsPNDpg
+    # In Bundler pre 2.0 any command ever set was stored in the local config
+    # file. In Bundler 2.0 they are only saved for that current command and
+    # `bundle config <setting name> <setting value>` is used for setting
+    # remembered arguments.
+    # See https://trello.com/c/yGsPNDpg
+    def []=(key, value)
+      @use_current ||= (Bundler::VERSION.split(".")[0].to_i >= 2)
+      if @use_current
+        set_current(key, value)
+      else
+        print_remembered_flags_deprecation_warning unless Bundler.settings["ignore_warnings.remembered_flags"]
+        set_local(key, value)
+      end
+    end
 
     def set_current(key, value)
       key = key_for key
@@ -50,10 +63,10 @@ module Bundler
     def all
       env_keys = ENV.keys.select { |k| k =~ /BUNDLE_.*/ }
 
-      keys = @cuurent_config.keys | @global_config.keys | @local_config.keys | env_keys | DEFAULT_CONFIG.keys
+      keys = @current_config.keys | @global_config.keys | @local_config.keys | env_keys | DEFAULT_CONFIG.keys
 
       keys.map do |key|
-        key.sub(/^BUNDLE_/, '').gsub(/__/, ".").downcase
+        key.to_s.sub(/^BUNDLE_/, '').gsub(/__/, ".").downcase
       end
     end
 
@@ -222,6 +235,8 @@ module Bundler
       end
 
       value
+    rescue Errno::EACCES
+      raise PermissionError.new(file)
     end
 
     def global_config_file
@@ -265,23 +280,11 @@ module Bundler
       uri
     end
 
-    # In Bundler pre 2.0 any command ever set was stored in the local config
-    # file. In Bundler 2.0 they are only saved for that current command and
-    # `bundle config <setting name> <setting value>` is used for setting
-    # remembered arguments.
-    def default_config_for_bundler_version
-      if Bundler::VERSION.split(".")[0] >= 2
-        :set_current
-      else
-        print_remembered_flags_deprecation_warning unless Bundler.settings["ignore_warnings.remembered_flags"]
-        :set_local
-      end
-    end
-
     def print_remembered_flags_deprecation_warning
       Bundler.ui.warn "Starting in Bundler 2.0, flags passed into commands will no longer be remember past that command." \
-        "Instead please set flags you want remembered between commands using `bundle config <setting name> <setting value>`" \
-        "To ignore this warning use `bundle config ignore_warnings.remembered_flags true`"
+        " Instead please set flags you want remembered between commands using `bundle config <setting name> <setting value>`" \
+        " To ignore this warning use `bundle config ignore_warnings.remembered_flags true`"
+      set_current "ignore_warnings.remembered_flags", true
     end
   end
 end
