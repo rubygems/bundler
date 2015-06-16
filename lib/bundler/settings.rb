@@ -105,7 +105,7 @@ module Bundler
     def locations(key)
       key = key_for(key)
       locations = {}
-      location[:current] = @current_config[key] if @current_config.key?(key)
+      locations[:current] = @current_config[key] if @current_config.key?(key)
       locations[:local]  = @local_config[key] if @local_config.key?(key)
       locations[:env]    = ENV[key] if ENV[key]
       locations[:global] = @global_config[key] if @global_config.key?(key)
