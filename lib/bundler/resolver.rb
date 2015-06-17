@@ -312,10 +312,9 @@ module Bundler
           all = search_for(DepProxy.new base_dep, dependency.__platform).size.to_f
           if all.zero?
             0
-          elsif search == all && all == 1
+          elsif (search = search_for(dependency).size.to_f) == all && all == 1
             0
           else
-            search = search_for(dependency).size.to_f
             search / all
           end
         end
