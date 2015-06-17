@@ -1,3 +1,60 @@
+## 1.10.4 (2015-06-16)
+
+Workarounds:
+
+  - don't add BUNDLED WITH to the lock when Spring runs `check` over and over (@indirect)
+
+Bugfixes:
+
+  - display "with native extensions" log output correctly (@ivantsepp)
+  - alias `i` to `install`, `c` to `check`, and `e` to `exec` (@indirect)
+
+## 1.10.3 (2015-06-03)
+
+Bugfixes:
+
+  - allow missing gemspec files when validating path and git gems (#3686, #3698, @segiddins)
+  - fix regression in `rake install` (#3701, #3705, @segiddins)
+  - fix regression when calling `gem` with `bundle exec` or `-rbundler/setup` (#3699, @segiddins)
+  - fix `bundler/inline` requiring a newly-installed gem (#3693, @indirect, @segiddins)
+
+## 1.10.2 (2015-05-29)
+
+Bugfixes:
+
+  - fix regression in `bundle update GEM` performance introduced in 1.10.0 (#3687, @segiddins)
+
+## 1.10.1 (2015-05-28)
+
+Bugfixes:
+
+  - silence ruby warning when running CLI commands (@segiddins)
+  - validate gemspecs in non-packaging mode (#3681, @segiddins)
+  - ensure the same chdir mutex as RubyGems is used (#3680, @segiddins)
+
+## 1.10.0 (2015-05-28)
+
+(this space intentionally left blank)
+
+## 1.10.0.rc (2015-05-16)
+
+Features:
+
+  - dramatically speed up resolving some slow Gemfiles (#3635, @segiddins)
+  - track CI platforms running Bundler (#3646, @fotanus)
+
+Bugfixes:
+
+  - allow `viz` to work with prereleases (#3621, #3217, @aprescott)
+  - validate gemspecs used in path and git gems (#3639, @segiddins, @indirect)
+  - stop printing config warnings when config is unchanged (#3649, @fotanus, @indirect)
+
+## 1.10.0.pre.2 (2015-05-07)
+
+Bugfixes:
+
+  - make BUNDLED WITH backwards compatible (#3623, @segiddins)
+
 ## 1.10.0.pre.1 (2015-05-05)
 
 Bugfixes:
@@ -34,6 +91,24 @@ Performance:
 Deprecations:
 
   - deprecated the (never enabled) `bundle_ruby` binary (@smlance)
+
+## 1.9.9 (2015-05-16)
+
+Bugfixes:
+
+  - read mirror and credential settings from older versions (#3557, @Strech)
+
+## 1.9.8 (2015-05-12)
+
+Bugfixes:
+
+  - fix regression in sudo mode introduced by 1.9.7 (#3642, @segiddins)
+
+## 1.9.7 (2015-05-11)
+
+Bugfixes:
+
+  - always clean up tmp dirs (#3277, @hone, @indirect, @segiddins)
 
 ## 1.9.6 (2015-05-02)
 

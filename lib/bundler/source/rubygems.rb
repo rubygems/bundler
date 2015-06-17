@@ -98,8 +98,10 @@ module Bundler
           end
         end
 
-        return ["Using #{version_message(spec)}", nil] if installed_specs[spec].any? && !force
-
+        if installed_specs[spec].any? && !force
+          Bundler.ui.info "Using #{version_message(spec)}"
+          return nil # no post-install message
+        end
 
         # Download the gem to get the spec, because some specs that are returned
         # by rubygems.org are broken and wrong.
@@ -115,6 +117,10 @@ module Bundler
         end
 
         unless Bundler.settings[:no_install]
+          message = "Installing #{version_message(spec)}"
+          message << " with native extensions" if spec.extensions.any?
+          Bundler.ui.confirm message
+
           path = cached_gem(spec)
           if Bundler.requires_sudo?
             install_path = Bundler.tmp(spec.full_name)
@@ -158,7 +164,8 @@ module Bundler
           installed_spec.loaded_from = loaded_from(spec)
         end
         spec.loaded_from = loaded_from(spec)
-        ["Installing #{version_message(spec)}", spec.post_install_message]
+
+        spec.post_install_message
       ensure
         Bundler.rm_rf(install_path) if Bundler.requires_sudo?
       end

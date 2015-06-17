@@ -474,6 +474,7 @@ describe "bundle install with git sources" do
         require 'lib/version'
         Gem::Specification.new do |s|
           s.name        = 'bar'
+          s.author      = 'no one'
           s.version     = BAR_VERSION
           s.summary     = 'Bar'
           s.files       = Dir["lib/**/*.rb"]

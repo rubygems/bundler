@@ -126,6 +126,8 @@ describe "bundle install with explicit source paths" do
         Gem::Specification.new do |s|
           s.name    = 'premailer'
           s.version = '1.0.0'
+          s.summary = 'Hi'
+          s.authors = 'Me'
         end
       G
     end
@@ -137,6 +139,26 @@ describe "bundle install with explicit source paths" do
     # Installation of the 'gemfiles' gemspec would fail since it will be unable
     # to require 'premailer.rb'
     should_be_installed "premailer 1.0.0"
+  end
+
+  it "errors on invalid specs", :rubygems => "1.7" do
+    build_lib "foo"
+
+    gemspec = lib_path("foo-1.0").join("foo.gemspec").to_s
+    File.open(gemspec, "w") do |f|
+      f.write <<-G
+        Gem::Specification.new do |s|
+          s.name = "foo"
+        end
+      G
+    end
+
+    install_gemfile <<-G, :expect_err => true
+      gem "foo", :path => "#{lib_path("foo-1.0")}"
+    G
+
+    expect(out).to match(/missing value for attribute version/)
+    should_not_be_installed("foo 1.0")
   end
 
   it "supports gemspec syntax" do
@@ -249,6 +271,7 @@ describe "bundle install with explicit source paths" do
       path "#{lib_path('foo-1.0')}"
       gem 'foo'
     G
+    should_be_installed "foo 1.0"
 
     bundle "exec foobar"
     expect(out).to eq("1.0")

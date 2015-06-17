@@ -10,11 +10,7 @@ module Bundler
       end
 
       def say(message)
-        if message =~ /native extensions/
-          @ui.info "with native extensions "
-        else
-          @ui.debug(message)
-        end
+        @ui && @ui.debug(message)
       end
     end
   end
