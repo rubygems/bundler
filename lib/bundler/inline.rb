@@ -39,14 +39,14 @@ def gemfile(install = false, &gemfile)
   builder.instance_eval(&gemfile)
 
   definition = builder.to_definition(nil, true)
-  def definition.lock(file); end
+  def definition.lock(*); end
   definition.validate_ruby!
 
   if install
     Bundler.ui = Bundler::UI::Shell.new
     Bundler::Installer.install(Bundler.root, definition, :system => true)
     Bundler::Installer.post_install_messages.each do |name, message|
-      Bundler.ui.info "Post install message from #{name}:\n#{message}"
+      Bundler.ui.info "Post-install message from #{name}:\n#{message}"
     end
   end
 

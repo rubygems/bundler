@@ -29,9 +29,6 @@ describe "the lockfile format" do
   end
 
   it "updates the lockfile's bundler version if current ver. is newer" do
-
-    #  TODO: verno below should be one less than prev ver (unless at min)
-
     lockfile <<-L
       GIT
         remote: git://github.com/nex3/haml.git

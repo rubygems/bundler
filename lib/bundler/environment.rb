@@ -30,8 +30,8 @@ module Bundler
       @definition.current_dependencies
     end
 
-    def lock
-      @definition.lock(Bundler.default_lockfile)
+    def lock(opts = {})
+      @definition.lock(Bundler.default_lockfile, opts[:preserve_bundled_with])
     end
 
     def update(*gems)
