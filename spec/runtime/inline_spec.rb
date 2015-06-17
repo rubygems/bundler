@@ -91,7 +91,7 @@ describe "bundler/inline#gemfile" do
     RUBY
 
     expect(out).to include("Installing activesupport")
-    expect(err).to eq("")
+    expect(err).to lack_errors
     expect(exitstatus).to be_zero if exitstatus
   end
 

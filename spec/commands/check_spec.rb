@@ -332,7 +332,7 @@ describe "bundle check" do
         lockfile lock_with(Bundler::VERSION.succ)
         bundle :check
         expect(out).to include("Bundler is older than the version that created the lockfile")
-        expect(err).to eq("")
+        expect(err).to lack_errors
         lockfile_should_be lock_with(Bundler::VERSION.succ)
       end
     end
