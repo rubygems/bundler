@@ -42,7 +42,7 @@ describe "real world edgecases", :realworld => true do
     gem 'rails', '~> 3.0'
     gem 'capybara', '~> 2.2.0'
     G
-    expect(out).to include("rails 3.2.21")
+    expect(out).to include("rails 3.2.22")
     expect(out).to include("capybara 2.2.1")
   end
 
