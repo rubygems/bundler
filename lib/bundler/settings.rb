@@ -133,6 +133,10 @@ module Bundler
         locations << "Set for the current user (#{global_config_file}): #{@global_config[key].inspect}"
       end
 
+      if DEFAULT_CONFIG.key?(exposed_key)
+        locations << "Set by default: #{DEFAULT_CONFIG[key].inspect}"
+      end
+
       return ["You have not configured a value for `#{exposed_key}`"] if locations.empty?
       locations
     end
