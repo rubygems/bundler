@@ -1,3 +1,5 @@
+require 'bundler/vendored_thor'
+
 module Bundler
   module UI
     class Shell

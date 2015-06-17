@@ -275,4 +275,61 @@ describe "bundle check" do
       expect(err).to include("* rack (1.0")
     end
   end
+
+  describe "BUNDLED WITH" do
+    def lock_with(bundler_version = nil)
+      lock = <<-L
+        GEM
+          remote: file:#{gem_repo1}/
+          specs:
+            rack (1.0.0)
+
+        PLATFORMS
+          #{generic(Gem::Platform.local)}
+
+        DEPENDENCIES
+          rack
+      L
+
+      if bundler_version
+        lock << "\n        BUNDLED WITH\n           #{bundler_version}\n"
+      end
+
+      lock
+    end
+
+    before do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+    end
+
+    context "is not present" do
+      it "does not change the lock" do
+        lockfile lock_with(nil)
+        bundle :check
+        lockfile_should_be lock_with(nil)
+      end
+    end
+
+    context "is newer" do
+      it "does not change the lock but warns" do
+        lockfile lock_with(Bundler::VERSION.succ)
+        bundle :check
+        expect(out).to include("Bundler is older than the version that created the lockfile")
+        expect(err).to eq("")
+        lockfile_should_be lock_with(Bundler::VERSION.succ)
+      end
+    end
+
+    context "is older" do
+      it "does not change the lock" do
+        lockfile lock_with("1.10.1")
+        bundle :check
+        lockfile_should_be lock_with("1.10.1")
+      end
+    end
+  end
+
 end

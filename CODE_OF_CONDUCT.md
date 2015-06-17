@@ -4,7 +4,7 @@ The Bundler project strongly values contributors from anywhere, regardless of ge
 
 ### Summary
 
-Harassment in code and discussion or violation of physical boundaries is completely unacceptable anywhere in the Bundler project’s codebases, issue trackers, IRC channel, Campfire, mailing lists, meetups, and other events. Violators will be warned and then blocked or banned by the core team at or before the 3rd violation.
+Harassment in code and discussion or violation of physical boundaries is completely unacceptable anywhere in the Bundler project’s codebases, issue trackers, chat rooms, mailing lists, meetups, and any other events. Violators will be warned and then blocked or banned by the core team at or before the 3rd violation.
 
 ### In detail
 

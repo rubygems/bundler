@@ -1,3 +1,4 @@
+require "bundler/lockfile_parser"
 require "digest/sha1"
 require "set"
 
@@ -47,11 +48,16 @@ module Bundler
     def initialize(lockfile, dependencies, sources, unlock, ruby_version = nil, optional_groups = [])
       @unlocking = unlock == true || !unlock.empty?
 
-      @dependencies, @sources, @unlock, @optional_groups = dependencies, sources, unlock, optional_groups
-      @remote            = false
-      @specs             = nil
-      @lockfile_contents = ""
-      @ruby_version      = ruby_version
+      @dependencies    = dependencies
+      @sources         = sources
+      @unlock          = unlock
+      @optional_groups = optional_groups
+      @remote          = false
+      @specs           = nil
+      @ruby_version    = ruby_version
+
+      @lockfile_contents      = ""
+      @locked_bundler_version = nil
 
       if lockfile && File.exist?(lockfile)
         @lockfile_contents = Bundler.read_file(lockfile)
@@ -235,14 +241,14 @@ module Bundler
       dependencies.map { |d| d.groups }.flatten.uniq
     end
 
-    def lock(file)
+    def lock(file, preserve_bundled_with = false)
       contents = to_lock
 
       # Convert to \r\n if the existing lock has them
       # i.e., Windows with `git config core.autocrlf=true`
       contents.gsub!(/\n/, "\r\n") if @lockfile_contents.match("\r\n")
 
-      return if @lockfile_contents == contents
+      return if lockfiles_equal?(@lockfile_contents, contents, preserve_bundled_with)
 
       if Bundler.settings[:frozen]
         Bundler.ui.error "Cannot write a changed lockfile while frozen."
@@ -317,7 +323,7 @@ module Bundler
 
       # Record the version of Bundler that was used to create the lockfile
       out << "\nBUNDLED WITH\n"
-      out << "  #{lock_version}\n"
+      out << "   #{lock_version}\n"
 
       out
     end
@@ -653,5 +659,15 @@ module Bundler
     def requested_groups
       self.groups - Bundler.settings.without - @optional_groups + Bundler.settings.with
     end
+
+    def lockfiles_equal?(current, proposed, preserve_bundled_with)
+      if preserve_bundled_with
+        pattern = /\n\n#{LockfileParser::BUNDLED}\n\s+#{Gem::Version::VERSION_PATTERN}\n/
+        current.sub(pattern, "\n") == proposed.sub(pattern, "\n")
+      else
+        current == proposed
+      end
+    end
+
   end
 end

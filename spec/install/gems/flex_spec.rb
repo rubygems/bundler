@@ -198,6 +198,9 @@ describe "bundle flex_install" do
             rack (= 0.9.1)
 
           In Gemfile:
+            rack_middleware (>= 0) ruby depends on
+              rack (= 0.9.1) ruby
+
             rack-obama (= 2.0) ruby depends on
               rack (= 1.2) ruby
 
@@ -267,7 +270,7 @@ describe "bundle flex_install" do
         rack
 
       BUNDLED WITH
-        #{Bundler::VERSION}
+         #{Bundler::VERSION}
       L
     end
   end

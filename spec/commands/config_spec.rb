@@ -96,6 +96,15 @@ describe ".bundle/config" do
       expect(out).to eq("global")
     end
 
+    it "does not warn when using the same value twice" do
+      bundle "config --global foo value"
+      bundle "config --global foo value"
+      expect(out).not_to match(/You are replacing the current global value of foo/)
+
+      run "puts Bundler.settings[:foo]"
+      expect(out).to eq("value")
+    end
+
     it "expands the path at time of setting" do
       bundle "config --global local.foo .."
       run "puts Bundler.settings['local.foo']"
@@ -250,16 +259,15 @@ E
 
   describe "very long lines" do
     before(:each) { bundle :install }
+
     let(:long_string) do
       "--with-xml2-include=/usr/pkg/include/libxml2 --with-xml2-lib=/usr/pkg/lib " \
       "--with-xslt-dir=/usr/pkg"
     end
+
     let(:long_string_without_special_characters) do
       "here is quite a long string that will wrap to a second line but will not be " \
       "surrounded by quotes"
-    end
-    let(:long_string_without_special_characters) do
-      "here is quite a long string that will wrap to a second line but will not be surrounded by quotes"
     end
 
     it "doesn't wrap values" do

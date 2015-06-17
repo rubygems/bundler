@@ -33,7 +33,7 @@ env:
   # We need to know if changes to rubygems will break bundler on release
   - RGV=master
   # Test the latest rubygems release with all of our supported rubies
-  - RGV=v2.4.6
+  - RGV=v2.4.8
 
 matrix:
   fast_finish: true
@@ -91,7 +91,7 @@ matrix:
     # Ruby 1.9.2 sanity check
     # (but it's just too slow and sometimes goes over the Travis limit)
     - rvm: 1.9.2
-      env: RGV=v2.4.6
+      env: RGV=v2.4.8
     # Ruby-head (we want to know how we're doing, but not fail the build)
     - rvm: ruby-head
       env: RGV=master

@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe "parallel", :realworld => true do
-  it "installs", :ruby => "1.8" do
+  it "installs" do
     gemfile <<-G
       source "https://rubygems.org"
       gem 'activesupport', '~> 3.2.13'

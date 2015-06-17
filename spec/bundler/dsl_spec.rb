@@ -184,7 +184,8 @@ describe Bundler::Dsl do
     it "will raise a Bundler::GemfileError" do
       gemfile "s = 'foo'.freeze; s.strip!"
       expect { Bundler::Dsl.evaluate(bundled_app("Gemfile"), nil, true) }.
-        to raise_error(Bundler::GemfileError, /There was an error parsing `Gemfile`: can't modify frozen String. Bundler cannot continue./)
+        to raise_error(Bundler::GemfileError, /There was an error parsing `Gemfile`: can't modify frozen String. Bundler cannot continue./i)
     end
   end
+
 end

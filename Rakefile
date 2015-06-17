@@ -114,8 +114,10 @@ namespace :spec do
       system "sudo sed -i 's/1000::/1000:Travis:/g' /etc/passwd"
       # Strip secure_path so that RVM paths transmit through sudo -E
       system "sudo sed -i '/secure_path/d' /etc/sudoers"
-      # Install groff for the ronn gem
+      # Install groff so ronn can generate man/help pages
       sh "sudo apt-get install groff -y"
+      # Install graphviz so that the viz specs can run
+      sh "sudo apt-get install graphviz -y 2>&1 | tail -n 2"
       if RUBY_VERSION < '1.9'
         # Downgrade Rubygems on 1.8 so Ronn can be required
         # https://github.com/rubygems/rubygems/issues/784
@@ -169,7 +171,7 @@ begin
       rubyopt = ENV["RUBYOPT"]
       # When editing this list, also edit .travis.yml!
       branches = %w(master)
-      releases = %w(v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.29 v2.0.14 v2.1.11 v2.2.3 v2.4.6)
+      releases = %w(v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.29 v2.0.14 v2.1.11 v2.2.3 v2.4.8)
       (branches + releases).each do |rg|
         desc "Run specs with Rubygems #{rg}"
         RSpec::Core::RakeTask.new(rg) do |t|
@@ -269,8 +271,9 @@ begin
   namespace :man do
     directory "lib/bundler/man"
 
-    Dir["man/*.ronn"].each do |ronn|
-      basename = File.basename(ronn, ".ronn")
+    sources = Dir["man/*.ronn"].map{|f| File.basename(f, ".ronn") }
+    sources.map do |basename|
+      ronn = "man/#{basename}.ronn"
       roff = "lib/bundler/man/#{basename}"
 
       file roff => ["lib/bundler/man", ronn] do
@@ -284,11 +287,19 @@ begin
       task :build_all_pages => "#{roff}.txt"
     end
 
-    desc "Build the man pages"
-    task :build => "man:build_all_pages"
-
-    desc "Clean up from the built man pages"
     task :clean do
+      leftovers = Dir["lib/bundler/man/*"].reject do |f|
+        basename = File.basename(f).sub(/\.(txt|ronn)/, '')
+        sources.include?(basename)
+      end
+      rm leftovers if leftovers.any?
+    end
+
+    desc "Build the man pages"
+    task :build => ["man:clean", "man:build_all_pages"]
+
+    desc "Remove all built man pages"
+    task :clobber do
       rm_rf "lib/bundler/man"
     end
 
@@ -299,7 +310,6 @@ rescue LoadError
   namespace :man do
     task(:require) { abort "Install the ronn gem to be able to release!" }
     task(:build) { warn "Install the ronn gem to build the help pages" }
-    task(:clean) { }
   end
 end
 
@@ -310,7 +320,7 @@ task :update_certs => "spec:rubygems:clone_rubygems_master" do
 end
 
 require 'bundler/gem_tasks'
-task :build => ["man:clean", "man:build"]
-task :release => ["man:require", "man:clean", "man:build"]
+task :build => ["man:build"]
+task :release => ["man:require", "man:build"]
 
 task :default => :spec

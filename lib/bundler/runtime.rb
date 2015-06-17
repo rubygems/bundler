@@ -41,7 +41,7 @@ module Bundler
 
       setup_manpath
 
-      lock
+      lock(:preserve_bundled_with => true)
 
       self
     end

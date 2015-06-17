@@ -1,5 +1,5 @@
 require 'rubygems/user_interaction'
-require 'support/path'
+require 'support/path' unless defined?(Spec::Path)
 
 module Spec
   module Rubygems
@@ -12,7 +12,7 @@ module Spec
 
       unless File.exist?("#{Path.base_system_gems}")
         FileUtils.mkdir_p(Path.base_system_gems)
-        puts "fetching fakeweb, artifice, sinatra, rake, rack, and builder for the tests to use..."
+        puts "installing gems for the tests to use..."
         `gem install fakeweb artifice --no-rdoc --no-ri`
         `gem install sinatra --version 1.2.7 --no-rdoc --no-ri`
         # Rake version has to be consistent for tests to pass
@@ -20,6 +20,8 @@ module Spec
         # 3.0.0 breaks 1.9.2 specs
         `gem install builder --version 2.1.2 --no-rdoc --no-ri`
         `gem install rack --no-rdoc --no-ri`
+        # ruby-graphviz is used by the viz tests
+        `gem install ruby-graphviz --no-rdoc --no-ri` if RUBY_VERSION >= "1.9.3"
       end
 
       ENV['HOME'] = Path.home.to_s

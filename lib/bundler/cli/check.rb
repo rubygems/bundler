@@ -26,7 +26,7 @@ module Bundler
         Bundler.ui.error "This bundle has been frozen, but there is no Gemfile.lock present"
         exit 1
       else
-        Bundler.load.lock unless options[:"dry-run"]
+        Bundler.load.lock(:preserve_bundled_with => true) unless options[:"dry-run"]
         Bundler.ui.info "The Gemfile's dependencies are satisfied"
       end
     end

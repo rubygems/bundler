@@ -49,8 +49,14 @@ module Bundler
       case gemspecs.size
       when 1
         spec = Bundler.load_gemspec(gemspecs.first)
-        raise InvalidOption, "There was an error loading the gemspec at #{gemspecs.first}." unless spec
+
+        unless spec
+          raise InvalidOption, "There was an error loading the gemspec at " \
+            "#{file}. Make sure you can build the gem, then try again."
+        end
+
         gem spec.name, :path => path, :glob => glob
+
         group(development_group) do
           spec.development_dependencies.each do |dep|
             gem dep.name, *(dep.requirement.as_list + [:type => :development])
@@ -59,7 +65,8 @@ module Bundler
       when 0
         raise InvalidOption, "There are no gemspecs at #{expanded_path}."
       else
-        raise InvalidOption, "There are multiple gemspecs at #{expanded_path}. Please use the :name option to specify which one."
+        raise InvalidOption, "There are multiple gemspecs at #{expanded_path}. " \
+          "Please use the :name option to specify which one should be used."
       end
     end
 
@@ -443,8 +450,8 @@ module Bundler
       #
       # @return [String] the message of the exception.
       #
-      def message
-        @message ||= begin
+      def to_s
+        @to_s ||= begin
           trace_line, description = parse_line_number_from_description
 
           m = "\n[!] "

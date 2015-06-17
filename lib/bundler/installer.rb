@@ -100,27 +100,18 @@ module Bundler
     def install_gem_from_spec(spec, standalone = false, worker = 0, force = false)
       # Fetch the build settings, if there are any
       settings = Bundler.settings["build.#{spec.name}"]
-      messages = nil
-
       install_options = { :force => force, :ensure_builtin_gems_cached => standalone }
 
+      post_install_message = nil
       if settings
         # Build arguments are global, so this is mutexed
         Bundler.rubygems.with_build_args [settings] do
-          messages = spec.source.install(spec, install_options)
+          post_install_message = spec.source.install(spec, install_options)
         end
       else
-        messages = spec.source.install(spec, install_options)
+        post_install_message = spec.source.install(spec, install_options)
       end
 
-      install_message, post_install_message, debug_message = *messages
-
-      if install_message.include? 'Installing'
-        Bundler.ui.confirm install_message
-      else
-        Bundler.ui.info install_message
-      end
-      Bundler.ui.debug debug_message if debug_message
       Bundler.ui.debug "#{worker}:  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
 
       if Bundler.settings[:bin] && standalone

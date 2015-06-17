@@ -29,6 +29,16 @@ module Bundler
       end
     end
 
+    # needed for inline
+    def load_paths
+      # remote specs aren't installed, and can't have load_paths
+      if _local_specification
+        _local_specification.load_paths
+      else
+        super
+      end
+    end
+
     # needed for binstubs
     def executables
       if @remote_specification
@@ -60,15 +70,29 @@ module Bundler
       end
     end
 
+    # needed for "with native extensions" during install
+    def extensions
+      if @remote_specification
+        @remote_specification.extensions
+      elsif _local_specification
+        _local_specification.extensions
+      end
+    end
+
     def _local_specification
-      eval(File.read(local_specification_path)) if @loaded_from && File.exist?(local_specification_path)
+      if @loaded_from && File.exist?(local_specification_path)
+        eval(File.read(local_specification_path)).tap do |spec|
+          spec.loaded_from = @loaded_from
+        end
+      end
     end
 
     def __swap__(spec)
       @remote_specification = spec
     end
 
-    private
+  private
+
     def local_specification_path
       "#{base_dir}/specifications/#{full_name}.gemspec"
     end
