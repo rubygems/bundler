@@ -556,7 +556,7 @@ module Bundler
 
         # Don't add a spec to the list if its source is expired. For example,
         # if you change a Git gem to Rubygems.
-        next if s.source.nil? || @unlock[:sources].include?(s.name)
+        next if s.source.nil? || @unlock[:sources].include?(s.source.name)
         # If the spec is from a path source and it doesn't exist anymore
         # then we just unlock it.
 
