@@ -129,6 +129,19 @@ describe "bundle update" do
       expect(exitstatus).not_to eq(0) if exitstatus
     end
   end
+
+  describe "with --source option" do
+    it "should not update gems outwith the source that happen to have the same name" do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "activesupport"
+      G
+      update_repo2 { build_gem "activesupport", "3.0" }
+
+      bundle "update --source activesupport"
+      should_not_be_installed "activesupport 3.0"
+    end
+  end
 end
 
 describe "bundle update in more complicated situations" do
