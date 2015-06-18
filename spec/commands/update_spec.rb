@@ -98,6 +98,26 @@ describe "bundle update" do
       should_be_installed "activesupport 3.0"
       should_not_be_installed "rack 1.2"
     end
+
+    context "when there is a source with the same name as a gem in a group" do
+      before :each do
+        build_git "foo", :path => lib_path("activesupport")
+        install_gemfile <<-G
+          source "file://#{gem_repo2}"
+          gem "activesupport", :group => :development
+          gem "foo", :git => "#{lib_path('activesupport')}"
+        G
+      end
+
+      it "should not update the gems from that source" do
+        update_repo2 { build_gem "activesupport", "3.0" }
+        update_git "foo", "2.0", :path => lib_path("activesupport")
+
+        bundle "update --group development"
+        should_be_installed "activesupport 3.0"
+        should_not_be_installed "foo 2.0"
+      end
+    end
   end
 
   describe "in a frozen bundle" do
