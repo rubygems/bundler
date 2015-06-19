@@ -15,7 +15,7 @@ module Spec
     end
 
     def default_bundle_path(*path)
-      system_gem_path(*path)
+      bundled_app(*path).join(".bundle/gems/system")
     end
 
     def bundled_app(*path)

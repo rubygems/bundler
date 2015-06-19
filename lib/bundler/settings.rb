@@ -138,7 +138,7 @@ module Bundler
       if path = self[:path]
         "#{path}/#{Bundler.ruby_scope}"
       else
-        Pathname.new(File.dirname(__FILE__)).join(".bundle/gems")
+        Pathname.new(@root).join("gems/system")
       end
     end
 
