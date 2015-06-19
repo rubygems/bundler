@@ -78,8 +78,8 @@ update process below under [CONSERVATIVE UPDATING][].
 
 * `--deployment`:
   In [deployment mode][DEPLOYMENT MODE], Bundler will 'roll-out' the bundle for
-  `production` use. Please check carefully if you want to have this option
-  enabled in `development` or `test` environments.
+  production or CI use. Please check carefully if you want to have this option
+  enabled in your development environment.
 
 * `--force`:
   Force download every gem, even if the required versions are already available
@@ -147,8 +147,8 @@ update process below under [CONSERVATIVE UPDATING][].
 ## DEPLOYMENT MODE
 
 Bundler's defaults are optimized for development. To switch to
-defaults optimized for deployment, use the `--deployment` flag.
-Do not activate deployment mode on development machines, as it
+defaults optimized for deployment and for CI, use the `--deployment`
+flag. Do not activate deployment mode on development machines, as it
 will cause an error when the Gemfile(5) is modified.
 
 1. A `Gemfile.lock` is required.
