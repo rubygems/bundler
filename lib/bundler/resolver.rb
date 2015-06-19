@@ -309,11 +309,13 @@ module Bundler
           dependency.requirement.satisfied_by?(base.first.version) ? 0 : 1
         else
           base_dep = Dependency.new dependency.name, '>= 0.a'
-          all = search_for(DepProxy.new base_dep, dependency.__platform)
-          if all.size == 0
+          all = search_for(DepProxy.new base_dep, dependency.__platform).size.to_f
+          if all.zero?
+            0
+          elsif (search = search_for(dependency).size.to_f) == all && all == 1
             0
           else
-            search_for(dependency).size.to_f / all.size.to_f
+            search / all
           end
         end
       end
