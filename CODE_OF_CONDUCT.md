@@ -20,6 +20,8 @@ If you are being harassed, notice that someone else is being harassed, or have a
 
 We expect everyone to follow these rules anywhere in the Bundler project’s codebases, issue trackers, IRC channel, group chat, and mailing lists.
 
+This code of conduct applies both within project spaces and in public spaces when an individual is representing the project or its community.
+
 Finally, don't forget that it is human to make mistakes! We all do. Let’s work together to help each other, resolve issues, and learn from the mistakes that we will all inevitably make from time to time.
 
 
