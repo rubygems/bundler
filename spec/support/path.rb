@@ -15,7 +15,9 @@ module Spec
     end
 
     def default_bundle_path(*path)
-      bundled_app(*path).join(".bundle/gems/system")
+      root = tmp.join("bundled_app")
+      FileUtils.mkdir_p(root)
+      root.join(".bundle").join(*path)
     end
 
     def bundled_app(*path)
