@@ -34,9 +34,12 @@ module Bundler
       end
     end
 
+    # Compare this specification against another object. Using sort_obj
+    # is compatible with Gem::Specification and other Bundler or RubyGems
+    # objects. Otherwise, use the default Object comparison.
     def <=>(other)
-      if other.respond_to?(:full_name)
-        full_name <=> other.full_name
+      if other.respond_to?(:sort_obj)
+        sort_obj <=> other.sort_obj
       else
         super
       end
@@ -50,6 +53,19 @@ module Bundler
     end
 
   private
+
+    # Create a delegate used for sorting. This strategy is copied from
+    # RubyGems 2.23 and ensures that Bundler's specifications can be
+    # compared and sorted with RubyGems' own specifications.
+    #
+    # @see #<=>
+    # @see Gem::Specification#sort_obj
+    #
+    # @return [Array] an object you can use to compare and sort this
+    #   specification against other specifications
+    def sort_obj
+      [@name, @version, @platform == Gem::Platform::RUBY ? -1 : 1]
+    end
 
     def _remote_specification
       @_remote_specification ||= @spec_fetcher.fetch_spec([@name, @version, @platform])
