@@ -8,6 +8,7 @@ module Bundler
   # full specification will only be fetched when necessary.
   class RemoteSpecification
     include MatchPlatform
+    include Comparable
 
     attr_reader :name, :version, :platform
     attr_accessor :source, :remote
@@ -33,17 +34,25 @@ module Bundler
       end
     end
 
+    def <=>(other)
+      if other.respond_to?(:full_name)
+        full_name <=> other.full_name
+      else
+        super
+      end
+    end
+
     # Because Rubyforge cannot be trusted to provide valid specifications
     # once the remote gem is downloaded, the backend specification will
     # be swapped out.
     def __swap__(spec)
-      @specification = spec
+      @_remote_specification = spec
     end
 
   private
 
     def _remote_specification
-      @specification ||= @spec_fetcher.fetch_spec([@name, @version, @platform])
+      @_remote_specification ||= @spec_fetcher.fetch_spec([@name, @version, @platform])
     end
 
     def method_missing(method, *args, &blk)
