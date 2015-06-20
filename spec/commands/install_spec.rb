@@ -381,7 +381,7 @@ describe "bundle install with gem sources" do
         gem 'rack'
       G
 
-      bundle :install, :binstubs
+      bundle :install, :binstubs => true
       expect(err).to include("The --binstubs option will be removed")
     end
   end
