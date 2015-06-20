@@ -74,5 +74,16 @@ describe "major deprecations" do
         expect(warnings).not_to have_major_deprecation
       end
     end
+
+    describe "bundle install --binstubs" do
+      it "should output a deprecation warning" do
+        gemfile <<-G
+          gem 'rack'
+        G
+
+        bundle :install, :binstubs
+        expect(warnings).to have_major_deprecation a_string_including("The --binstubs option will be removed")
+      end
+    end
   end
 end

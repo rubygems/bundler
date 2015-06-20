@@ -55,6 +55,12 @@ module Bundler
 
       Bundler::Fetcher.disable_endpoint = options["full-index"]
 
+      if options["binstubs"]
+        Bundler.ui.deprecate("The --binstubs option will be removed from "\
+                             "Bundler 2.0 and replaced with "\
+                             "`bundle binstubs`\n")
+      end
+
       # rubygems plugins sometimes hook into the gem install process
       Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins)
 
