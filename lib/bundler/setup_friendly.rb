@@ -4,10 +4,9 @@ module Bundler
   def self.setup_friendly *groups
     if SharedHelpers.in_bundle?
       require 'bundler'
+      require_relative 'friendly_errors'
       require 'bundler/ui/shell'
       require 'bundler/ui/silent'
-
-      groups << :default if groups.empty?
 
       Bundler.ui = if STDOUT.tty? || ENV['BUNDLER_FORCE_TTY']
         Bundler::UI::Shell.new
@@ -16,7 +15,11 @@ module Bundler
       end
 
       Bundler.with_friendly_errors do
-        Bundler.setup groups
+        if groups.empty?
+          Bundler.setup
+        else
+          Bundler.setup groups
+        end
       end
 
       # Add bundler to the load path after disabling system gems
