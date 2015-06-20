@@ -1,0 +1,21 @@
+bundle-init(1) -- Generate a Gemfile into the current working directory
+========================================================================
+
+## SYNOPSIS
+
+`bundle init` [--gemspec=FILE]
+
+## DESCRIPTION
+
+This command generates a basic Gemfile template in the current working directory.
+The file contains the default source from which ruby gems are retrieved,
+https://rubygems.org, and an example gem declaration. For more information, see
+[Gemfile(5)][gemfile].
+
+## OPTIONS
+
+* `--gemspec`:
+  Use the specified `.gemspec` to create the `Gemfile(5)`.
+
+  When adding a `Gemfile` to a gem with a `.gemspec`, the `--gemspec` option will automatically add each dependency listed in the `.gemspec` file to the newly
+  created Gemfile.

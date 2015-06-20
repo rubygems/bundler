@@ -13,7 +13,7 @@ across many machines systematically and repeatably.
 See [the bundler website](http://bundler.io) for information on getting
 started, and Gemfile(5) for more information on the `Gemfile` format.
 
-## OPTIONS
+## GLOBAL OPTIONS
 
 * `--no-color`:
   Prints all output without color
@@ -46,6 +46,10 @@ We divide `bundle` subcommands into primary commands and utilities.
 * `bundle help(1)`:
   Displays detailed help for each subcommand
 
+* `bundle version(1)`:
+  Prints Bundler's version information.
+
+
 ## UTILITIES
 
 * `bundle check(1)`:
@@ -73,7 +77,7 @@ We divide `bundle` subcommands into primary commands and utilities.
 * `bundle viz(1)`:
   Generate a visual representation of your dependencies
 
-* `bundle init(1)`:
+* [bundle init(1)][bundle-init]:
   Generate a simple `Gemfile`, placed in the current directory
 
 * `bundle gem(1)`:
