@@ -44,14 +44,6 @@ If these options must be remembered, they must be set using `bundle config`
 
 The options that can be configured are:
 
-* `binstubs`:
-  Creates a directory (defaults to `~/bin`) and place any executables from the
-  gem there. These executables run in Bundler's context. If used, you might add
-  this directory to your environment's `PATH` variable. For instance, if the
-  `rails` gem comes with a `rails` executable, this flag will create a
-  `bin/rails` executable that ensures that all referred dependencies will be
-  resolved using the bundled gems.
-
 * `deployment`:
   In deployment mode, Bundler will 'roll-out' the bundle for
   `production` use. Please check carefully if you want to have this option

@@ -86,8 +86,6 @@ module Bundler
       Bundler.settings[:path]     = "vendor/bundle" if options[:deployment]
       Bundler.settings[:path]     = options["path"] if options["path"]
       Bundler.settings[:path]     ||= "bundle" if options["standalone"]
-      Bundler.settings[:bin]      = options["binstubs"] if options["binstubs"]
-      Bundler.settings[:bin]      = nil if options["binstubs"] && options["binstubs"].empty?
       Bundler.settings[:shebang]  = options["shebang"] if options["shebang"]
       Bundler.settings[:jobs]     = options["jobs"] if options["jobs"]
       Bundler.settings[:no_prune] = true if options["no-prune"]
