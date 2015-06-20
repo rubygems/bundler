@@ -15,9 +15,7 @@ module Spec
     end
 
     def default_bundle_path(*path)
-      root = tmp.join("bundled_app")
-      FileUtils.mkdir_p(root)
-      root.join(".bundle").join(*path)
+      bundled_app(".bundle", Bundler.ruby_scope, *path)
     end
 
     def bundled_app(*path)

@@ -138,7 +138,7 @@ module Bundler
       if path = self[:path]
         "#{path}/#{Bundler.ruby_scope}"
       else
-        Pathname.new(@root)
+        File.join(@root, Bundler.ruby_scope)
       end
     end
 
