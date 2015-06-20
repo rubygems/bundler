@@ -230,7 +230,7 @@ module Bundler
     end
 
     HTTP_ERRORS = [
-      Timeout::Error, EOFError, SocketError, Errno::ENETDOWN,
+      Timeout::Error, EOFError, SocketError, Errno::ENETDOWN, Errno::ENETUNREACH,
       Errno::EINVAL, Errno::ECONNRESET, Errno::ETIMEDOUT, Errno::EAGAIN,
       Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError,
       Net::HTTP::Persistent::Error
