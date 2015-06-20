@@ -374,4 +374,15 @@ describe "bundle install with gem sources" do
       expect(out).to_not include("Your Gemfile has no gem server sources")
     end
   end
+
+  describe "when the --binstubs option is used" do
+    it "should output a deprecation warning" do
+      gemfile <<-G
+        gem 'rack'
+      G
+
+      bundle :install, :binstubs
+      expect(err).to include("The --binstubs option will be removed")
+    end
+  end
 end
