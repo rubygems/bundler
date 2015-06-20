@@ -1,0 +1,28 @@
+bundle-viz -- Generate a visual representation of your dependencies
+===================================================================
+
+## SYNOPSIS
+
+`bundle viz` [--file=FILE] [--format=FORMAT] [--requirements] [--version] [--without=GROUP GROUP]
+
+## DESCRIPTION
+
+`viz` generates a by default a PNG file of the current Gemfile as a dependency graph. `viz`
+requires the Graphviz visualization software package and `ruby-graphviz` gem.
+
+## OPTIONS
+
+* `-f, --file`:
+  The name to use for a generated file
+
+* `-F, --format`:
+  This is the output file format. Supported formats include png, jpg, svg, and many more.
+
+* `-r, --requirements`:
+  Set to show the version of each required dependency.
+
+* `-v, --version`:
+  Set to show each gem version.
+
+* `--without`:
+  Exclude gems that are part of a specified named group.
