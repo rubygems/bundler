@@ -55,4 +55,30 @@ describe "Bundler.setup_friendly" do
       end
     end
   end
+
+  describe "with called with groups" do
+    before(:each) do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "yard"
+        gem "rack", :group => :test
+      G
+    end
+
+    it "doesn't make all groups available" do
+      ruby <<-RUBY
+        require 'rubygems'
+        require 'bundler/setup_friendly'
+        Bundler.setup_friendly :development
+
+        begin
+          require 'rack'
+        rescue LoadError
+          puts "WIN"
+        end
+      RUBY
+      expect(err).to eq("")
+      expect(out).to eq("WIN")
+    end
+  end
 end
