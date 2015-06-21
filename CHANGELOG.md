@@ -1,3 +1,9 @@
+## 1.11.0 (2015-06-20)
+
+Features:
+
+  - add setup\_friendly method, to setup load paths with custom groups and friendly errors (@habibalamin)
+
 ## 1.10.4 (2015-06-16)
 
 Workarounds:

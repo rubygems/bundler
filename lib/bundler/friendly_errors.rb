@@ -3,14 +3,18 @@ require "cgi"
 require "bundler/vendored_thor"
 
 module Bundler
-  def self.with_friendly_errors
+  def self.with_friendly_errors debug: false
+    debug ||= ENV["DEBUG"]
     yield
   rescue Bundler::Dsl::DSLError => e
     Bundler.ui.error e.message
     exit e.status_code
   rescue Bundler::BundlerError => e
     Bundler.ui.error e.message, :wrap => true
-    Bundler.ui.trace e
+    if e.is_a?(Bundler::GemNotFound)
+      Bundler.ui.warn 'Run `bundle install` to install missing gems.', :wrap => true
+    end
+    Bundler.ui.trace e if debug
     exit e.status_code
   rescue Thor::AmbiguousTaskError => e
     Bundler.ui.error e.message
@@ -29,11 +33,11 @@ module Bundler
       Gemfile from 'https' to 'http'. Instructions for compiling with OpenSSL \
       using RVM are available at http://rvm.io/packages/openssl.
     WARN
-    Bundler.ui.trace e
+    Bundler.ui.trace e if debug
     exit 1
   rescue Interrupt => e
     Bundler.ui.error "\nQuitting..."
-    Bundler.ui.trace e
+    Bundler.ui.trace e if debug
     exit 1
   rescue SystemExit => e
     exit e.status
