@@ -17,3 +17,7 @@ This change is not expected to impact production deployment scripts, because tho
 #### Removed: Deployment helpers
 
 The `bundler/capistrano` and `bundler/vlad` deployment helper files have been removed. Capistrano 3 has built-in Bundler integration in the form of the `capistrano-bundler` gem, and everyone using Capistrano 3 should be using that instead. If for some reason, you are still using Capistrano 2, feel free to copy the Capistrano tasks out of the Bundler 1 file `bundler/deployment.rb` and put them into your app.
+
+#### Removed: `bundle install --binstubs`
+
+The `--binstubs` option has been removed from `bundle install` and replaced with the `bundle binstubs` command.
