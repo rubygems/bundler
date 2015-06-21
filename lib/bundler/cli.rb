@@ -120,8 +120,6 @@ module Bundler
 
       If the bundle has already been installed, bundler will tell you so and then exit.
     D
-    method_option "binstubs", :type => :string, :lazy_default => "bin", :banner =>
-      "Generate bin stubs for bundled gems to ./bin"
     method_option "clean", :type => :boolean, :banner =>
       "Run bundle clean automatically after install"
     method_option "deployment", :type => :boolean, :banner =>
