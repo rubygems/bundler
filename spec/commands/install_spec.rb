@@ -375,4 +375,15 @@ describe "bundle install with gem sources" do
     end
   end
 
+  describe "when the --binstubs option is used" do
+    it "should output a deprecation warning" do
+      gemfile <<-G
+        gem 'rack'
+      G
+
+      bundle :install, :binstubs => true
+      expect(err).to include("The --binstubs option will be removed")
+    end
+  end
+
 end
