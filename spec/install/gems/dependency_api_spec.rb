@@ -404,18 +404,6 @@ describe "gemcutter's dependency API" do
     should_be_installed "rails 2.3.2"
   end
 
-  it "installs the binstubs" do
-    gemfile <<-G
-      source "#{source_uri}"
-      gem "rack"
-    G
-
-    bundle "install --binstubs", :artifice => "endpoint"
-
-    gembin "rackup"
-    expect(out).to eq("1.0.0")
-  end
-
   it "installs the bins when using --path and uses autoclean" do
     gemfile <<-G
       source "#{source_uri}"
