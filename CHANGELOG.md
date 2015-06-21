@@ -1,3 +1,9 @@
+## 1.10.5 (Unreleased)
+
+Bugfixes:
+
+  - fix sorting of mixed DependencyLists with RubyGems >= 2.23 (@tony-spataro-rs)
+
 ## 1.10.4 (2015-06-16)
 
 Workarounds:

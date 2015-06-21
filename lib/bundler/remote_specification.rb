@@ -8,6 +8,7 @@ module Bundler
   # full specification will only be fetched when necessary.
   class RemoteSpecification
     include MatchPlatform
+    include Comparable
 
     attr_reader :name, :version, :platform
     attr_accessor :source, :remote
@@ -33,17 +34,41 @@ module Bundler
       end
     end
 
+    # Compare this specification against another object. Using sort_obj
+    # is compatible with Gem::Specification and other Bundler or RubyGems
+    # objects. Otherwise, use the default Object comparison.
+    def <=>(other)
+      if other.respond_to?(:sort_obj)
+        sort_obj <=> other.sort_obj
+      else
+        super
+      end
+    end
+
     # Because Rubyforge cannot be trusted to provide valid specifications
     # once the remote gem is downloaded, the backend specification will
     # be swapped out.
     def __swap__(spec)
-      @specification = spec
+      @_remote_specification = spec
     end
 
   private
 
+    # Create a delegate used for sorting. This strategy is copied from
+    # RubyGems 2.23 and ensures that Bundler's specifications can be
+    # compared and sorted with RubyGems' own specifications.
+    #
+    # @see #<=>
+    # @see Gem::Specification#sort_obj
+    #
+    # @return [Array] an object you can use to compare and sort this
+    #   specification against other specifications
+    def sort_obj
+      [@name, @version, @platform == Gem::Platform::RUBY ? -1 : 1]
+    end
+
     def _remote_specification
-      @specification ||= @spec_fetcher.fetch_spec([@name, @version, @platform])
+      @_remote_specification ||= @spec_fetcher.fetch_spec([@name, @version, @platform])
     end
 
     def method_missing(method, *args, &blk)
