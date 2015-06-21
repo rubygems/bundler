@@ -96,6 +96,14 @@ module Bundler
           end
         end
 
+        def has_revision_cached?
+          return unless @revision
+          in_path { git("cat-file -e #{@revision}") }
+          true
+        rescue GitError
+          false
+        end
+
       private
 
         # TODO: Do not rely on /dev/null.
@@ -118,14 +126,6 @@ module Bundler
           out = SharedHelpers.with_clean_git_env { %x{git #{command}} }
           raise GitCommandError.new(command, path) if check_errors && !$?.success?
           out
-        end
-
-        def has_revision_cached?
-          return unless @revision
-          in_path { git("cat-file -e #{@revision}") }
-          true
-        rescue GitError
-          false
         end
 
         # Escape the URI for git commands
