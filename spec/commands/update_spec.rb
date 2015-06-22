@@ -132,6 +132,8 @@ describe "bundle update" do
 
   describe "with --source option" do
     it "should not update gems outwith the source that happen to have the same name" do
+      pending("Allowed to fail to preserve backwards-compatibility")
+
       install_gemfile <<-G
         source "file://#{gem_repo2}"
         gem "activesupport"
@@ -140,6 +142,81 @@ describe "bundle update" do
 
       bundle "update --source activesupport"
       should_not_be_installed "activesupport 3.0"
+    end
+
+    it "should update gems outwith the source that happen to have the same name" do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "activesupport"
+      G
+      update_repo2 { build_gem "activesupport", "3.0" }
+
+      bundle "update --source activesupport"
+      should_be_installed "activesupport 3.0"
+    end
+  end
+
+  context "when there is a child dependency that is also in the gemfile" do
+    before do
+      build_repo2 do
+        build_gem "fred", "1.0"
+        build_gem "harry" , "1.0" do |s|
+          s.add_dependency "fred"
+        end
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "harry"
+        gem "fred"
+      G
+    end
+
+    it "should not update the child dependencies of a gem that has the same name as the source" do
+      update_repo2 do
+        build_gem "fred", "2.0"
+        build_gem "harry", "2.0" do |s|
+          s.add_dependency "fred"
+        end
+      end
+
+      bundle "update --source harry"
+      should_be_installed "harry 2.0"
+      should_be_installed "fred 1.0"
+    end
+  end
+
+  context "when there is a child dependency that appears elsewhere in the dependency graph" do
+    before do
+      build_repo2 do
+        build_gem "fred", "1.0" do |s|
+          s.add_dependency "george"
+        end
+        build_gem "george", "1.0"
+        build_gem "harry" , "1.0" do |s|
+          s.add_dependency "george"
+        end
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "harry"
+        gem "fred"
+      G
+    end
+
+    it "should not update the child dependencies of a gem that has the same name as the source" do
+      update_repo2 do
+        build_gem "george", "2.0"
+        build_gem "harry", "2.0" do |s|
+          s.add_dependency "george"
+        end
+      end
+
+      bundle "update --source harry"
+      should_be_installed "harry 2.0"
+      should_be_installed "fred 1.0"
+      should_be_installed "george 1.0"
     end
   end
 end
