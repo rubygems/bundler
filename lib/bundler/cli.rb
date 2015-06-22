@@ -205,8 +205,8 @@ module Bundler
 
     desc "binstubs GEM [OPTIONS]", "Install the binstubs of the listed gem"
     long_desc <<-D
-      Generate binstubs for executables in [GEM]. Binstubs are put into bin,
-      or the --binstubs directory if one has been set.
+      Generate binstubs for executables in [GEM]. Binstubs are put into bin
+      by default.
     D
     method_option "force", :type => :boolean, :default => false, :banner =>
       "Overwrite existing binstubs if they exist"

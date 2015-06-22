@@ -20,4 +20,6 @@ The `bundler/capistrano` and `bundler/vlad` deployment helper files have been re
 
 #### Removed: `bundle install --binstubs`
 
-The `--binstubs` option has been removed from `bundle install` and replaced with the `bundle binstubs` command.
+The `--binstubs` option has been removed from `bundle install` and replaced with the `bundle binstubs` command. This means that binstubs must be created and checked into version control individually.
+
+The `bundle binstubs [GEM]` command accepts two optional arguments: `--force`, which overwrites existing binstubs if they exist, and `--path=PATH`, which specifies the directory in which the binstubs will be installed (./bin by default).
