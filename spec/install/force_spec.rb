@@ -17,5 +17,13 @@ describe "bundle install" do
       should_be_installed "rack 1.0.0"
       expect(exitstatus).to eq(0) if exitstatus
     end
+
+    it "doesn't reinstall bundler" do
+      bundle "install"
+      bundle "install --force"
+      expect(out).to_not include "Installing bundler 1.10.4"
+      expect(out).to include "Using bundler 1.10.4"
+    end
+
   end
 end

@@ -98,7 +98,7 @@ module Bundler
           end
         end
 
-        if installed_specs[spec].any? && !force
+        if (installed_specs[spec].any? && !force) || bundler?(spec)
           Bundler.ui.info "Using #{version_message(spec)}"
           return nil # no post-install message
         end
@@ -411,6 +411,10 @@ module Bundler
 
         # Ruby 2.0, where gemspecs are stored in specifications/default/
         spec.loaded_from && spec.loaded_from.include?("specifications/default/")
+      end
+
+      def bundler?(spec)
+        spec.name.eql?('bundler')
       end
 
     end
