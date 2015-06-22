@@ -923,4 +923,44 @@ describe "the lockfile format" do
     expect(error).to match(/your Gemfile.lock contains merge conflicts/i)
     expect(error).to match(/git checkout HEAD -- Gemfile.lock/i)
   end
+
+  it "preserves a post-1.10 BUNDLED WITH section" do
+    lockfile <<-L
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          rack (1.0.0)
+
+      PLATFORMS
+        #{generic(Gem::Platform.local)}
+
+      DEPENDENCIES
+        rack
+
+      BUNDLED WITH
+         1.10.4
+    L
+
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "rack"
+    G
+
+    lockfile_should_be <<-L
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          rack (1.0.0)
+
+      PLATFORMS
+        #{generic(Gem::Platform.local)}
+
+      DEPENDENCIES
+        rack
+
+      BUNDLED WITH
+         1.10.4
+    L
+  end
 end

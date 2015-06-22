@@ -293,6 +293,10 @@ module Bundler
           handled << dep.name
       end
 
+      if @lockfile_contents =~ /^BUNDLED WITH[\r]?\n(\s{2,}#{Gem::Version::VERSION_PATTERN})[\r]?\n\Z/
+        out << "\nBUNDLED WITH\n" << $1 << "\n"
+      end
+
       out
     end
 
