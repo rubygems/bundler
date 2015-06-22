@@ -354,6 +354,8 @@ module Bundler
     method_option :mit, :type => :boolean, :desc => "Generate an MIT license file"
     method_option :test, :type => :string, :lazy_default => 'rspec', :aliases => '-t', :banner => "rspec",
       :desc => "Generate a test directory for your library, either rspec or minitest. Set a default with `bundle config gem.test rspec`."
+    method_option :console, :type => :string, :aliases => "-c", :required => false, :banner => "console",
+      :desc => "Select default console. (Defaults to `bundle config console`)"
     def gem(name)
       require 'bundler/cli/gem'
       Gem.new(options, name, self).run

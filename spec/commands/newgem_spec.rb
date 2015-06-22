@@ -686,4 +686,75 @@ describe "bundle gem" do
     end
   end
 
+  describe "--console" do
+
+    RSpec::Matchers.define :be_pry do
+      match do |actual|
+        actual =~ /pry/i
+      end
+    end
+
+    RSpec::Matchers.define :be_irb do
+      match do |actual|
+        actual =~ /irb/i
+      end
+    end
+
+    def bundle_gem_with_console(console=nil)
+      console = console ? "--console=#{console}" : ""
+      command = "gem test_gem #{console}"
+      bundle command
+      line = bundled_app("test_gem/bin/console").readlines.reverse_each.detect {|l| l =~ /(pry|irb)/i }
+      line.match(/(pry|irb)/i)[1]
+    end
+
+    before do
+      reset!
+      in_app_root
+    end
+
+    context "when no parameter set" do
+      it "uses default" do
+        console = bundle_gem_with_console("") # i.e. --console=
+        expect(console).to be_irb
+      end
+    end
+
+    context "when set to pry" do
+      it "uses Pry console" do
+        console = bundle_gem_with_console("pry")
+        expect(console).to be_pry
+      end
+
+      it "adds pry to gemspec" do
+        bundle_gem_with_console("pry")
+        expect(bundled_app("test_gem/test_gem.gemspec").read).to include('spec.add_development_dependency "pry"')
+      end
+    end
+
+    context "when set to irb" do
+      it "uses IRB console" do
+        console = bundle_gem_with_console("irb")
+        expect(console).to be_irb
+      end
+    end
+
+    context "when not present" do
+
+      context "when set in config" do
+        it "uses config's setting" do
+          bundle "config console pry"
+          console = bundle_gem_with_console
+          expect(console).to be_pry
+        end
+      end
+
+      it "uses irb" do
+        console = bundle_gem_with_console
+        expect(console).to be_irb
+      end
+    end
+
+  end
+
 end

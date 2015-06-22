@@ -112,6 +112,8 @@ module Bundler
         )
       end
 
+      config[:console], config[:opposite_console] = *resolve_consoles
+
       templates.each do |src, dst|
         thor.template("newgem/#{src}", target.join(dst), config)
       end
@@ -197,5 +199,11 @@ module Bundler
       end
     end
 
+    def resolve_consoles
+      selection = options[:console] || Bundler.settings[:console]
+      consoles = ["IRB", "Pry"]
+      consoles.reverse! if selection =~ /pry/i
+      consoles
+    end
   end
 end
