@@ -33,5 +33,14 @@ describe "bundle install" do
       expect(out).to include "Using bundler 1.10.4"
     end
 
+    it "works on first bundle install" do
+      bundle "install --force"
+
+      expect(out).to include "Installing rack 1.0.0"
+      should_be_installed "rack 1.0.0"
+      expect(exitstatus).to eq(0) if exitstatus
+    end
+
+
   end
 end
