@@ -200,10 +200,20 @@ module Bundler
     end
 
     def resolve_consoles
-      selection = options[:console] || Bundler.settings[:console]
-      consoles = ["IRB", "Pry"]
-      consoles.reverse! if selection =~ /pry/i
-      consoles
+      selection = options[:console]
+      selection = Bundler.settings[:console] if selection.nil? || selection.empty?
+      irb = format_console_name("IRB")
+      if selection =~ /irb/i
+        [irb, format_console_name("Pry")]
+      else
+        [format_console_name(selection), irb]
+      end
+    end
+
+    def format_console_name(name)
+      namespaced_path = name.tr('-', '/')
+      constant_name = name.gsub(/-[_-]*(?![_-]|$)/){ '::' }.gsub(/([_-]+|(::)|^)(.|$)/){ $2.to_s + $3.upcase }
+      {namespaced: namespaced_path, constant: constant_name, name: name}
     end
   end
 end
