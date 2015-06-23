@@ -40,4 +40,7 @@ Gem::Specification.new do |spec|
 <%- if config[:test] && config[:test] != "false" -%>
   spec.add_development_dependency "<%=config[:test]%>"
 <%- end -%>
+<%- if config[:console][:name] !~ /irb/i -%>
+  spec.add_development_dependency "<%= config[:console][:namespaced] %>"
+<%- end -%>
 end

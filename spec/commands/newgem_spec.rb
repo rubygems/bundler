@@ -686,4 +686,79 @@ describe "bundle gem" do
     end
   end
 
+  describe "--console" do
+
+    def console_regex
+      /(pry|irb|ripl|\w+)\.start/i
+    end
+
+    def bundle_gem_with_console(console=nil)
+      console = console ? "--console=#{console}" : ""
+      command = "gem test_gem #{console}"
+      bundle command
+      line = bundled_app("test_gem/bin/console").readlines.reverse_each.detect {|l| l.match(console_regex) }
+      line.match(console_regex)[1]
+    end
+
+    before do
+      reset!
+      in_app_root
+    end
+
+    context "when no parameter set" do
+      it "uses default" do
+        console = bundle_gem_with_console("") # i.e. --console=
+        expect(console).to match(/irb/i)
+      end
+    end
+
+    context "when set to pry" do
+      it "uses Pry console" do
+        console = bundle_gem_with_console("pry")
+        expect(console).to match(/pry/i)
+      end
+
+      it "adds pry to gemspec" do
+        bundle_gem_with_console("pry")
+        expect(bundled_app("test_gem/test_gem.gemspec").read).to include('spec.add_development_dependency "pry"')
+      end
+    end
+
+    context "when set to irb" do
+      it "uses IRB console" do
+        console = bundle_gem_with_console("irb")
+        expect(console).to match(/irb/i)
+      end
+    end
+
+    context "when set to unknown value" do
+      it "capitalizes it" do
+        console = bundle_gem_with_console("test_console")
+        expect(console).to match(/TestConsole/i)
+      end
+
+      it "adds it to gemspec" do
+        bundle_gem_with_console("test_console")
+        expect(bundled_app("test_gem/test_gem.gemspec").read).to include('spec.add_development_dependency "test_console"')
+      end
+    end
+
+    context "when not present" do
+
+      context "when set in config" do
+        it "uses config's setting" do
+          bundle "config console pry"
+          console = bundle_gem_with_console
+          expect(console).to match(/pry/i)
+        end
+      end
+
+      it "uses irb" do
+        console = bundle_gem_with_console
+        expect(console).to match(/irb/i)
+      end
+    end
+
+  end
+
 end
