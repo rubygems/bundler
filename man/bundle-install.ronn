@@ -3,8 +3,7 @@ bundle-install(1) -- Install the dependencies specified in your Gemfile
 
 ## SYNOPSIS
 
-`bundle install` [--binstubs[=DIRECTORY]]
-                 [--clean]
+`bundle install` [--clean]
                  [--full-index]
                  [--gemfile=GEMFILE]
                  [--jobs=NUMBER]
@@ -41,16 +40,8 @@ update process below under [CONSERVATIVE UPDATING][].
 
 ## OPTIONS
 
-To apply any of `--deployment`, `--path`, `--binstubs`, or `--without` every
+To apply any of `--deployment`, `--path`, or `--without` every
 time `bundle install` is run, use `bundle config` (see bundle-config(1)).
-
-* `--binstubs[=<directory>]`:
-  Creates a directory (defaults to `~/bin`) and place any executables from the
-  gem there. These executables run in Bundler's context. If used, you might add
-  this directory to your environment's `PATH` variable. For instance, if the
-  `rails` gem comes with a `rails` executable, this flag will create a
-  `bin/rails` executable that ensures that all referred dependencies will be
-  resolved using the bundled gems.
 
 * `--clean`:
   On finishing the installation Bundler is going to remove any gems not present
@@ -110,9 +101,9 @@ time `bundle install` is run, use `bundle config` (see bundle-config(1)).
 
 * `--shebang=<ruby-executable>`:
   Uses the specified ruby executable (usually `ruby`) to execute the scripts
-  created with `--binstubs`. In addition, if you use `--binstubs` together with
-  `--shebang jruby` these executables will be changed to execute `jruby`
-  instead.
+  created with `bundle binstubs`. In addition, if you use `bundle binstubs`
+  and then `bundle install --shebang jruby` these executables will be changed
+  to execute `jruby` instead.
 
 * `--standalone[=<list>]`:
   Makes a bundle that can work without depending on Rubygems or Bundler at

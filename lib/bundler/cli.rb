@@ -117,8 +117,6 @@ module Bundler
 
       If the bundle has already been installed, bundler will tell you so and then exit.
     D
-    method_option "binstubs", :type => :string, :lazy_default => "bin", :banner =>
-      "Generate bin stubs for bundled gems to ./bin"
     method_option "clean", :type => :boolean, :banner =>
       "Run bundle clean automatically after install"
     method_option "deployment", :type => :boolean, :banner =>
@@ -204,8 +202,8 @@ module Bundler
 
     desc "binstubs GEM [OPTIONS]", "Install the binstubs of the listed gem"
     long_desc <<-D
-      Generate binstubs for executables in [GEM]. Binstubs are put into bin,
-      or the --binstubs directory if one has been set.
+      Generate binstubs for executables in [GEM]. Binstubs are put into bin
+      by default.
     D
     method_option "force", :type => :boolean, :default => false, :banner =>
       "Overwrite existing binstubs if they exist"
