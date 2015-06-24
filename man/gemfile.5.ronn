@@ -443,6 +443,16 @@ In the case of the `git` block form, the `:ref`, `:branch`, `:tag`,
 and `:submodules` options may be passed to the `git` method, and
 all gems in the block will inherit those options.
 
+## INSTALL_IF (#install_if)
+
+The `install_if` method allows gems to be installed based on a proc or lambda.
+This is especially useful for optional gems that can only be used if certain
+software is installed or some other conditions are met.
+
+    install_if -> { RUBY_PLATFORM =~ /darwin/ } do
+      gem "pasteboard"
+    end
+
 ## GEMSPEC (#gemspec)
 
 If you wish to use Bundler to help install dependencies for a gem while it is
