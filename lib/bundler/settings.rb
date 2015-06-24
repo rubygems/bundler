@@ -39,7 +39,6 @@ module Bundler
       if @use_current
         set_current(key, value)
       else
-        print_remembered_flags_deprecation_warning unless Bundler.settings["ignore_warnings.remembered_flags"]
         set_local(key, value)
       end
     end
@@ -288,13 +287,6 @@ module Bundler
         raise ArgumentError, "Gem sources must be absolute. You provided '#{uri}'."
       end
       uri
-    end
-
-    def print_remembered_flags_deprecation_warning
-      Bundler.ui.warn "Starting in Bundler 2.0, flags passed into commands will no longer be remember past that command." \
-        " Instead please set flags you want remembered between commands using `bundle config <setting name> <setting value>`" \
-        " To ignore this warning use `bundle config ignore_warnings.remembered_flags true`"
-      set_current "ignore_warnings.remembered_flags", true
     end
   end
 end

@@ -31,7 +31,7 @@ describe "bundle show" do
     end
 
     it "warns if path no longer exists on disk" do
-      FileUtils.rm_rf("#{system_gem_path}/gems/rails-2.3.2")
+      FileUtils.rm_rf("#{default_bundle_path}/gems/rails-2.3.2")
 
       bundle "show rails"
 
