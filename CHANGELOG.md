@@ -1,5 +1,9 @@
 ## 1.10.5 (2015-06-24)
 
+Workarounds:
+
+  - don't add or update BUNDLED WITH during `install` with no changes (@segiddins)
+
 Bugfixes:
 
   - fix sorting of mixed DependencyLists with RubyGems >= 2.23 (#3762, @tony-spataro-rs)
