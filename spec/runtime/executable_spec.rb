@@ -9,7 +9,8 @@ describe "Running bin/* commands" do
   end
 
   it "runs the bundled command when in the bundle" do
-    bundle "install --binstubs"
+    bundle "install"
+    bundle "binstubs rack"
 
     build_gem "rack", "2.0", :to_system => true do |s|
       s.executables = "rackup"
@@ -20,7 +21,8 @@ describe "Running bin/* commands" do
   end
 
   it "allows the location of the gem stubs to be specified" do
-    bundle "install --binstubs gbin"
+    bundle "install"
+    bundle "binstubs rack --path gbin"
 
     expect(bundled_app("bin")).not_to exist
     expect(bundled_app("gbin/rackup")).to exist
@@ -30,24 +32,29 @@ describe "Running bin/* commands" do
   end
 
   it "allows absolute paths as a specification of where to install bin stubs" do
-    bundle "install --binstubs #{tmp}/bin"
+    bundle "install"
+    bundle "binstubs rack --path #{tmp}/bin"
 
     gembin tmp("bin/rackup")
     expect(out).to eq("1.0.0")
   end
 
   it "uses the default ruby install name when shebang is not specified" do
-   bundle "install --binstubs"
+   bundle "install"
+   bundle "binstubs rack"
+
    expect(File.open("bin/rackup").gets).to eq("#!/usr/bin/env #{RbConfig::CONFIG['ruby_install_name']}\n")
   end
 
   it "allows the name of the shebang executable to be specified" do
-    bundle "install --binstubs --shebang ruby-foo"
+    bundle "install --shebang ruby-foo"
+    bundle "binstubs rack"
     expect(File.open("bin/rackup").gets).to eq("#!/usr/bin/env ruby-foo\n")
   end
 
   it "runs the bundled command when out of the bundle" do
-    bundle "install --binstubs"
+    bundle "install"
+    bundle "binstubs rack"
 
     build_gem "rack", "2.0", :to_system => true do |s|
       s.executables = "rackup"
@@ -68,7 +75,8 @@ describe "Running bin/* commands" do
       gem "rack", :path => "#{lib_path('rack')}"
     G
 
-    bundle "install --binstubs"
+    bundle "install"
+    bundle "binstubs rack"
 
     build_gem 'rack', '2.0', :to_system => true do |s|
       s.executables = 'rackup'
@@ -88,7 +96,8 @@ describe "Running bin/* commands" do
       gem "bundler"
     G
 
-    bundle "install --binstubs"
+    bundle "install"
+    bundle "binstubs rack"
 
     expect(bundled_app("bin/bundle")).not_to exist
   end
@@ -100,13 +109,14 @@ describe "Running bin/* commands" do
   end
 
   it "allows you to stop installing binstubs" do
-    bundle "install --binstubs bin/"
+    bundle "install"
+    bundle "binstubs rack --path bin/"
     bundled_app("bin/rackup").rmtree
-    bundle "install --binstubs \"\""
 
     expect(bundled_app("bin/rackup")).not_to exist
     #expect(bundled_app("rackup")).not_to exist
 
+    bundle "binstubs rack --path \"\""
     bundle "config bin"
     expect(out).to include("You have not configured a value for `bin`")
   end
@@ -117,7 +127,8 @@ describe "Running bin/* commands" do
       gem "activesupport"
     G
 
-    bundle "install --binstubs"
+    bundle "install"
+    bundle "binstubs rack --path bin/"
 
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -136,7 +147,8 @@ describe "Running bin/* commands" do
       gem "rack"
     G
 
-    bundle "install --binstubs bin/"
+    bundle "install"
+    bundle "binstubs rack --path bin/"
 
     File.open(bundled_app("bin/rackup"), 'wb') do |file|
       file.print "OMG"

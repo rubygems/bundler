@@ -25,13 +25,13 @@ available on your shell's `$PATH`.
   flag is passed, exec will revert to the 1.9 behaviour of passing all file
   descriptors to the new process.
 
-## BUNDLE INSTALL --BINSTUBS
+## BUNDLE BINSTUBS
 
-If you use the `--binstubs` flag in [bundle install(1)][bundle-install], Bundler will
-automatically create a directory (which defaults to `app_root/bin`)
-containing all of the executables available from gems in the bundle.
+If you use the `bundle binstubs [GEM]` command, Bundler will create a
+directory (which defaults to `app_root/bin`) in which the GEM executable from
+from the bundle will be installed.
 
-After using `--binstubs`, `bin/rspec spec/my_spec.rb` is identical
+After using `bundle binstubs`, `bin/rspec spec/my_spec.rb` is identical
 to `bundle exec rspec spec/my_spec.rb`.
 
 ## ENVIRONMENT MODIFICATIONS
