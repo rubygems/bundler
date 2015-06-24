@@ -98,7 +98,7 @@ module Bundler
           end
         end
 
-        if (installed_specs[spec].any? && !force) || bundler?(spec)
+        if installed?(spec) && (!force || spec.name.eql?("bundler"))
           Bundler.ui.info "Using #{version_message(spec)}"
           return nil # no post-install message
         end
@@ -413,8 +413,8 @@ module Bundler
         spec.loaded_from && spec.loaded_from.include?("specifications/default/")
       end
 
-      def bundler?(spec)
-        spec.name.eql?('bundler')
+      def installed?(spec)
+        installed_specs[spec].any?
       end
 
     end
