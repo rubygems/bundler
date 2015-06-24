@@ -112,11 +112,11 @@ describe "Running bin/* commands" do
     bundle "install"
     bundle "binstubs rack --path bin/"
     bundled_app("bin/rackup").rmtree
-    bundle "binstubs rack --path \"\""
 
     expect(bundled_app("bin/rackup")).not_to exist
     #expect(bundled_app("rackup")).not_to exist
 
+    bundle "binstubs rack --path \"\""
     bundle "config bin"
     expect(out).to include("You have not configured a value for `bin`")
   end
