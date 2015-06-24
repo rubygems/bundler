@@ -74,8 +74,7 @@ describe "the lockfile format" do
     G
   end
 
-  it "updates the lockfile's bundler version if not present" do
-
+  it "does not update the lockfile's bundler version if nothing changed during bundle install" do
     lockfile <<-L
       GEM
         remote: file:#{gem_repo1}/
@@ -87,6 +86,9 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack
+
+      BUNDLED WITH
+         1.10.0
     L
 
     install_gemfile <<-G
@@ -106,6 +108,44 @@ describe "the lockfile format" do
 
       DEPENDENCIES
         rack
+
+      BUNDLED WITH
+         1.10.0
+    G
+  end
+
+  it "updates the lockfile's bundler version if not present" do
+
+    lockfile <<-L
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          rack (1.0.0)
+
+      PLATFORMS
+        #{generic(Gem::Platform.local)}
+
+      DEPENDENCIES
+        rack
+    L
+
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "rack", "> 0"
+    G
+
+    lockfile_should_be <<-G
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          rack (1.0.0)
+
+      PLATFORMS
+        #{generic(Gem::Platform.local)}
+
+      DEPENDENCIES
+        rack (> 0)
 
       BUNDLED WITH
          #{Bundler::VERSION}
