@@ -86,7 +86,7 @@ learn more about their operation in [bundle install(1)][bundle-install].
 * `path` (`BUNDLE_PATH`):
   The location on disk where all gems in your bundle will be located regardless
   of `$GEM_HOME` or `$GEM_PATH` values. Bundle gems not found in this location
-  will be installed by bundle install. Defaults to `Gem.dir`. When --deployment is
+  will be installed by `bundle install`. Defaults to `Gem.dir`. When --deployment is
   used, defaults to vendor/bundle.
 * `frozen` (`BUNDLE_FROZEN`):
   Disallow changes to the `Gemfile`. Defaults to `true` when `--deployment`
