@@ -248,21 +248,22 @@ module Bundler
       # i.e., Windows with `git config core.autocrlf=true`
       contents.gsub!(/\n/, "\r\n") if @lockfile_contents.match("\r\n")
 
+      if @locked_bundler_version
+        locked_major = @locked_bundler_version.segments.first
+        current_major = Gem::Version.create(Bundler::VERSION).segments.first
+
+        if updating_major = locked_major < current_major
+          Bundler.ui.warn "Warning: the lockfile is being updated to Bundler #{current_major}, " \
+                          "after which you will be unable to return to Bundler #{@locked_bundler_version.segments.first}."
+        end
+      end
+
+      preserve_bundled_with ||= !updating_major && (Bundler.settings[:frozen] || !@unlocking)
       return if lockfiles_equal?(@lockfile_contents, contents, preserve_bundled_with)
 
       if Bundler.settings[:frozen]
         Bundler.ui.error "Cannot write a changed lockfile while frozen."
         return
-      end
-
-      if @locked_bundler_version
-        locked_major = @locked_bundler_version.segments.first
-        current_major = Gem::Version.create(Bundler::VERSION).segments.first
-
-        if locked_major < current_major
-          Bundler.ui.warn "Warning: the lockfile is being updated to Bundler #{Bundler::VERSION.split('.').first}, " \
-                          "after which you will be unable to return to Bundler #{@locked_bundler_version.segments.first}."
-        end
       end
 
       File.open(file, 'wb'){|f| f.puts(contents) }

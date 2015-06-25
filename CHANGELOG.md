@@ -1,8 +1,14 @@
-## 1.10.5 (Unreleased)
+## 1.10.5 (2015-06-24)
+
+Workarounds:
+
+  - don't add or update BUNDLED WITH during `install` with no changes (@segiddins)
 
 Bugfixes:
 
-  - fix sorting of mixed DependencyLists with RubyGems >= 2.23 (@tony-spataro-rs)
+  - fix sorting of mixed DependencyLists with RubyGems >= 2.23 (#3762, @tony-spataro-rs)
+  - speed up resolver for path and git gems (@segiddins)
+  - fix `install --force` to not reinstall Bundler (#3743, @karlo57)
 
 ## 1.10.4 (2015-06-16)
 
