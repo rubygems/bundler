@@ -3,17 +3,6 @@ require "spec_helper"
 
 describe "Bundler version 1.99" do
   context "when bundle is run" do
-    it "should print a single deprecation warning" do
-      install_gemfile <<-G
-        source "file://#{gem_repo1}"
-        gem "rack"
-      G
-
-      expect(err).to eq("DEPRECATION: Gemfile and Gemfile.lock are " \
-       "deprecated and will be replaced with gems.rb and gems.locked in " \
-       "Bundler 2.0.")
-    end
-
     it "should not warn about gems.rb" do
       create_file "gems.rb", <<-G
         source "file://#{gem_repo1}"
@@ -22,6 +11,18 @@ describe "Bundler version 1.99" do
 
       bundle :install
       expect(err).to lack_errors
+    end
+
+    context "with flags" do
+      it "should print a deprecation warning about autoremembering flags" do
+        install_gemfile <<-G, :path => "vendor/bundle"
+          source "file://#{gem_repo1}"
+          gem "rack"
+        G
+
+        expect(err).to include("DEPRECATION")
+        expect(err).to include("flags passed to commands will no longer be automatically remembered.")
+      end
     end
   end
 
