@@ -15,7 +15,6 @@ module Bundler
 
     def initialize(*args)
       super
-
       custom_gemfile = options[:gemfile] || Bundler.settings[:gemfile]
       ENV["BUNDLE_GEMFILE"]   = File.expand_path(custom_gemfile) if custom_gemfile
 
@@ -27,6 +26,7 @@ module Bundler
       raise InvalidOption, e.message
     ensure
       self.options ||= {}
+      Bundler.settings[:given_flags] = given_flags?
       Bundler.ui = UI::Shell.new(options)
       Bundler.ui.level = "debug" if options["verbose"]
     end
@@ -407,6 +407,11 @@ module Bundler
     end
 
     private
+
+
+    def given_flags?
+      !self.options.empty?
+    end
 
       # Automatically invoke `bundle install` and resume if
       # Bundler.settings[:auto_install] exists. This is set through config cmd
