@@ -660,6 +660,21 @@ describe "bundle install with git sources" do
     expect(exitstatus).to eq(0) if exitstatus
   end
 
+  it "prints a friendly error if a file blocks the git repo" do
+    build_git "foo"
+
+    FileUtils.touch(default_bundle_path("bundler"))
+
+    install_gemfile <<-G
+      gem "foo", :git => "#{lib_path('foo-1.0')}"
+    G
+
+    expect(exitstatus).to_not eq(0) if exitstatus
+    expect(out).to include("Bundler could not install a gem because it " \
+                           "needs to create a directory, but a file exists " \
+                           "- #{default_bundle_path('bundler')}")
+  end
+
   it "does not duplicate git gem sources" do
     build_lib "foo", :path => lib_path('nested/foo')
     build_lib "bar", :path => lib_path('nested/bar')

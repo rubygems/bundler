@@ -79,13 +79,21 @@ module Bundler
         end
 
         def copy_to(destination, submodules=false)
+          # method 1
           unless File.exist?(destination.join(".git"))
-            FileUtils.mkdir_p(destination.dirname)
-            FileUtils.rm_rf(destination)
-            git_retry %|clone --no-checkout --quiet "#{path}" "#{destination}"|
-            File.chmod((0777 & ~File.umask), destination)
+            begin
+              FileUtils.mkdir_p(destination.dirname)
+              FileUtils.rm_rf(destination)
+              git_retry %|clone --no-checkout --quiet "#{path}" "#{destination}"|
+              File.chmod((0777 & ~File.umask), destination)
+            rescue Errno::EEXIST => e
+              file_path = e.message[/.*?(\/.*)/, 1]
+              raise GitError, "Bundler could not install a gem because it needs to " \
+                "create a directory, but a file exists - #{file_path}. Please delete " \
+                "this file and try again."
+            end
           end
-
+          # method 2
           SharedHelpers.chdir(destination) do
             git_retry %|fetch --force --quiet --tags "#{path}"|
             git "reset --hard #{@revision}"
