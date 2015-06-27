@@ -242,7 +242,7 @@ describe "bundle check" do
     it "returns success" do
       bundle "check --path vendor/bundle"
       expect(exitstatus).to eq(0) if exitstatus
-      expect(out).to eq("The Gemfile's dependencies are satisfied")
+      expect(out).to include("The Gemfile's dependencies are satisfied")
     end
 
     it "should write to .bundle/config" do
