@@ -92,7 +92,7 @@ describe "bundle check" do
     expect(err).to include("Bundler can't satisfy your Gemfile's dependencies.")
   end
 
-  it "remembers --without option from install" do
+  it "does not remember --without option from install" do
     gemfile <<-G
       source "file://#{gem_repo1}"
       group :foo do
@@ -102,8 +102,8 @@ describe "bundle check" do
 
     bundle "install --without foo"
     bundle "check"
-    expect(exitstatus).to eq(0) if exitstatus
-    expect(out).to include("The Gemfile's dependencies are satisfied")
+    expect(exitstatus).not_to eq(0) if exitstatus
+    expect(out).not_to include("The Gemfile's dependencies are satisfied")
   end
 
   it "ensures that gems are actually installed and not just cached" do
@@ -214,6 +214,7 @@ describe "bundle check" do
     end
   end
 
+  # TODO: Unsure whether this is testing the intended behavior
   it "fails when there's no lock file and frozen is set" do
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -223,6 +224,8 @@ describe "bundle check" do
     bundle "install"
     bundle "install --deployment"
     FileUtils.rm(bundled_app("Gemfile.lock"))
+
+    bundle "config frozen true"
 
     bundle :check
     expect(exitstatus).not_to eq(0) if exitstatus
@@ -245,10 +248,10 @@ describe "bundle check" do
       expect(out).to include("The Gemfile's dependencies are satisfied")
     end
 
-    it "should write to .bundle/config" do
+    it "should not write to .bundle/config" do
       bundle "check --path vendor/bundle"
       bundle "check"
-      expect(exitstatus).to eq(0) if exitstatus
+      expect(exitstatus).not_to eq(0) if exitstatus
     end
   end
 
