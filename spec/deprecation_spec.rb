@@ -13,6 +13,17 @@ describe "Bundler version 1.99" do
       expect(err).to lack_errors
     end
 
+    it "should print a Gemfile deprecation warning" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      expect(err).to include("DEPRECATION: Gemfile and Gemfile.lock are " \
+       "deprecated and will be replaced with gems.rb and gems.locked in " \
+       "Bundler 2.0.")
+    end
+
     context "with flags" do
       it "should print a deprecation warning about autoremembering flags" do
         install_gemfile <<-G, :path => "vendor/bundle"

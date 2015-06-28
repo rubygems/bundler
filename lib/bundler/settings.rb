@@ -54,7 +54,7 @@ module Bundler
     end
 
     def []=(key, value)
-      if self[:given_flags]
+      if self[:options_given]
         Bundler::SharedHelpers.major_deprecation \
           "Starting in Bundler 2.0, flags passed to commands "\
           "will no longer be automatically remembered. Instead please set flags " \
