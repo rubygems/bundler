@@ -15,6 +15,7 @@ module Bundler
 
     def initialize(*args)
       super
+
       custom_gemfile = options[:gemfile] || Bundler.settings[:gemfile]
       ENV["BUNDLE_GEMFILE"]   = File.expand_path(custom_gemfile) if custom_gemfile
 
@@ -26,7 +27,7 @@ module Bundler
       raise InvalidOption, e.message
     ensure
       self.options ||= {}
-      Bundler.settings[:given_flags] = given_flags?
+      Bundler.settings[:options_given] = options_given?
       Bundler.ui = UI::Shell.new(options)
       Bundler.ui.level = "debug" if options["verbose"]
     end
@@ -409,7 +410,7 @@ module Bundler
     private
 
 
-    def given_flags?
+    def options_given?
       !self.options.empty?
     end
 
