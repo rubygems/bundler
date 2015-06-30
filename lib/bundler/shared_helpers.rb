@@ -7,7 +7,7 @@ require 'bundler/current_ruby'
 
 module Gem
   class Dependency
-    if !instance_methods.map { |m| m.to_s }.include?("requirement")
+    unless method_defined? :requirement
       def requirement
         version_requirements
       end
