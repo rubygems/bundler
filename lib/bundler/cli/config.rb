@@ -49,7 +49,6 @@ module Bundler
         new_value = args.join(" ")
         locations = Bundler.settings.locations(name)
 
-
         if name == "path.system" and Bundler.settings[:path] and new_value == "true"
           Bundler.ui.warn "`path` is already configured, so it will be unset."
           Bundler.settings.set_local("path", nil)
@@ -59,7 +58,6 @@ module Bundler
           Bundler.settings.set_local("path.system", nil)
           Bundler.settings.set_global("path.system", nil)
         end
-
 
         if scope == "global"
           if locations[:local]

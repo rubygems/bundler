@@ -163,7 +163,7 @@ module Bundler
       return path if path && !@local_config.key?(key)
 
       if path = self[:path]
-        "#{path}/#{Bundler.ruby_scope}"
+        path == Bundler.rubygems.gem_dir ? path : "#{path}/#{Bundler.ruby_scope}"
       else
         File.join(@root, Bundler.ruby_scope)
       end

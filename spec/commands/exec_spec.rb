@@ -114,13 +114,16 @@ describe "bundle exec" do
       end
     end
 
-    install_gemfile <<-G
+    # We added :system => true here and in the block below, since the
+    # (old default) system gem directory was implicitly used in previous
+    # versions of Bundler.
+    install_gemfile <<-G, :system => true
       source "file://#{gem_repo1}"
       gem "rack", "0.9.1"
     G
 
     Dir.chdir bundled_app2 do
-      install_gemfile bundled_app2("Gemfile"), <<-G
+      install_gemfile bundled_app2("Gemfile"), <<-G, :system => true
         source "file://#{gem_repo2}"
         gem "rack_two", "1.0.0"
       G

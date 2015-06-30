@@ -43,7 +43,7 @@ describe "Running bin/* commands" do
    bundle "install"
    bundle "binstubs rack"
 
-   expect(File.open("bin/rackup").gets).to eq("#!/usr/bin/env #{RbConfig::CONFIG['ruby_install_name']}\n")
+   expect(File.open("bin/rackup").gets).to eq("#!/usr/bin/env #{RbConfig::CONFIG["ruby_install_name"]}\n")
   end
 
   it "allows the name of the shebang executable to be specified" do
@@ -68,22 +68,22 @@ describe "Running bin/* commands" do
 
   it "works with gems in path" do
     build_lib "rack", :path => lib_path("rack") do |s|
-      s.executables = 'rackup'
+      s.executables = "rackup"
     end
 
     gemfile <<-G
-      gem "rack", :path => "#{lib_path('rack')}"
+      gem "rack", :path => "#{lib_path("rack")}"
     G
 
     bundle "install"
     bundle "binstubs rack"
 
-    build_gem 'rack', '2.0', :to_system => true do |s|
-      s.executables = 'rackup'
+    build_gem "rack", "2.0", :to_system => true do |s|
+      s.executables = "rackup"
     end
 
     gembin "rackup"
-    expect(out).to eq('1.0')
+    expect(out).to eq("1.0")
   end
 
   it "don't bundle da bundla" do
@@ -150,7 +150,7 @@ describe "Running bin/* commands" do
     bundle "install"
     bundle "binstubs rack --path bin/"
 
-    File.open(bundled_app("bin/rackup"), 'wb') do |file|
+    File.open(bundled_app("bin/rackup"), "wb") do |file|
       file.print "OMG"
     end
 
