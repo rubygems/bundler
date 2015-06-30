@@ -17,6 +17,14 @@ module Bundler::Molinillo
     :conflicts
   )
 
+  class ResolutionState
+    # Returns an empty resolution state
+    # @return [ResolutionState] an empty state
+    def self.empty
+      new(nil, [], DependencyGraph.new, nil, nil, 0, Set.new)
+    end
+  end
+
   # A state that encapsulates a set of {#requirements} with an {Array} of
   # possibilities
   class DependencyState < ResolutionState
