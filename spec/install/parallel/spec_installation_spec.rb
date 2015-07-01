@@ -38,9 +38,9 @@ describe ParallelInstaller::SpecInstallation do
     context "when all dependencies are installed" do
       it "returns true" do
         dependencies = []
-        dependencies << instance_double("SpecInstallation", spec: "alpha", name: "alpha", installed?: true, all_dependencies: [], type: :production)
-        dependencies << instance_double("SpecInstallation", spec: "beta", name: "beta", installed?: true, all_dependencies: [], type: :production)
-        all_specs = dependencies + [instance_double("SpecInstallation", spec: "gamma", name: "gamma", installed?: false, all_dependencies: [], type: :production)]
+        dependencies << instance_double("SpecInstallation", :spec => "alpha", :name => "alpha", :installed? => true, :all_dependencies => [], :type => :production)
+        dependencies << instance_double("SpecInstallation", :spec => "beta", :name => "beta", :installed? => true, :all_dependencies => [], :type => :production)
+        all_specs = dependencies + [instance_double("SpecInstallation", :spec => "gamma", :name => "gamma", :installed? => false, :all_dependencies => [], :type => :production)]
         spec = ParallelInstaller::SpecInstallation.new(dep)
         allow(spec).to receive(:all_dependencies).and_return(dependencies)
         expect(spec.dependencies_installed?(all_specs)).to be_truthy
@@ -50,9 +50,9 @@ describe ParallelInstaller::SpecInstallation do
     context "when all dependencies are not installed" do
       it "returns false" do
         dependencies = []
-        dependencies << instance_double("SpecInstallation", spec: "alpha", name: "alpha", installed?: false, all_dependencies: [], type: :production)
-        dependencies << instance_double("SpecInstallation", spec: "beta", name: "beta", installed?: true, all_dependencies: [], type: :production)
-        all_specs = dependencies + [instance_double("SpecInstallation", spec: "gamma", name: "gamma", installed?: false, all_dependencies: [], type: :production)]
+        dependencies << instance_double("SpecInstallation", :spec => "alpha", :name => "alpha", :installed? => false, :all_dependencies => [], :type => :production)
+        dependencies << instance_double("SpecInstallation", :spec => "beta", :name => "beta", :installed? => true, :all_dependencies => [], :type => :production)
+        all_specs = dependencies + [instance_double("SpecInstallation", :spec => "gamma", :name => "gamma", :installed? => false, :all_dependencies => [], :type => :production)]
         spec = ParallelInstaller::SpecInstallation.new(dep)
         allow(spec).to receive(:all_dependencies).and_return(dependencies)
         expect(spec.dependencies_installed?(all_specs)).to be_falsey
