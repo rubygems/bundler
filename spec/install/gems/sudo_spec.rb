@@ -10,7 +10,7 @@ describe "when using sudo", :sudo => true do
       end
 
       it "installs" do
-        install_gemfile <<-G
+        install_gemfile <<-G, :system => true
           source "file://#{gem_repo1}"
           gem "rack"
         G
@@ -28,7 +28,7 @@ describe "when using sudo", :sudo => true do
     end
 
     it "installs" do
-      install_gemfile <<-G
+      install_gemfile <<-G, :system => true
         source "file://#{gem_repo1}"
         gem "rack", '1.0'
         gem "thin"
@@ -45,7 +45,7 @@ describe "when using sudo", :sudo => true do
           gem "rake"
           gem "another_implicit_rake_dep"
       G
-      bundle "install"
+      bundle "install --system"
       expect(system_gem_path("gems/another_implicit_rake_dep-1.0")).to exist
     end
 
@@ -83,7 +83,7 @@ describe "when using sudo", :sudo => true do
     end
 
     it "installs extensions/ compiled by Rubygems 2.2", :rubygems => "2.2" do
-      install_gemfile <<-G
+      install_gemfile <<-G, :system => true
         source "file://#{gem_repo1}"
         gem "very_simple_binary"
       G
@@ -136,7 +136,7 @@ describe "when using sudo", :sudo => true do
         gem "rack", '1.0'
       G
 
-      bundle :install, :env => {"GEM_HOME" => gem_home.to_s, "GEM_PATH" => nil}
+      bundle :install, :env => {"GEM_HOME" => gem_home.to_s, "GEM_PATH" => nil}, :system => true
       expect(gem_home.join("bin/rackup")).to exist
       should_be_installed "rack 1.0", :env => {"GEM_HOME" => gem_home.to_s, "GEM_PATH" => nil}
     end
