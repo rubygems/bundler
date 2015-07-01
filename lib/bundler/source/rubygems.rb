@@ -130,6 +130,8 @@ module Bundler
             bin_path     = Bundler.system_bindir
           end
 
+          $stderr.puts "install_path: #{install_path}"
+
           installed_spec = nil
           Bundler.rubygems.preserve_paths do
             installed_spec = Bundler::GemInstaller.new(path,
@@ -381,7 +383,7 @@ module Bundler
               idx.use f.specs(nil, self)
             end
           end
-        end
+         end
       end
 
       def fetch_gem(spec)

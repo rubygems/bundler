@@ -25,17 +25,18 @@ describe "bundle clean" do
       gem "foo"
     G
 
-    bundle "install --path vendor/bundle --no-clean"
+    bundle "config path vendor/bundle"
+    bundle "install --no-clean"
 
     gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "thin"
     G
-    bundle "install"
+    bundle "install --no-clean"
 
     bundle :clean
-
+    $stderr.puts err
     expect(out).to include("Removing foo (1.0)")
 
     should_have_gems 'thin-1.0', 'rack-1.0.0'
