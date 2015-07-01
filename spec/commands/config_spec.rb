@@ -282,6 +282,36 @@ E
       expect(out).to match(long_string_without_special_characters)
     end
   end
+
+  describe "conflicting path settings" do
+    before(:each) { bundle :install }
+
+    describe "setting `path` when `path.system` is already set" do
+      it "should print a warning and remove the `path.system` setting" do
+        bundle "config path.system true"
+        # Note that if a path is used that does not include the installed gems,
+        # we'll get an error when we pass _any_ command to `run` below.
+        bundle "config path #{default_bundle_path}"
+
+        expect(out).to include("`path.system` is already configured")
+        run "puts Bundler.settings['path.system'] == nil"
+        expect(out).to eq("true")
+      end
+    end
+
+    describe "setting `path.system` when `path` is already set" do
+      it "should print a warning and remove the `path` setting" do
+        # Here, the path does not matter, since the option gets overwritten
+        # when we set `path.system`. We could choose 'any/path/'.
+        bundle "config path #{default_bundle_path}"
+        bundle "config path.system true"
+
+        expect(out).to include("`path` is already configured")
+        run "puts Bundler.settings[:path] == nil"
+        expect(out).to eq("true")
+      end
+    end
+  end
 end
 
 describe "setting gemfile via config" do

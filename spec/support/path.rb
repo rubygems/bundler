@@ -15,7 +15,7 @@ module Spec
     end
 
     def default_bundle_path(*path)
-      system_gem_path(*path)
+      bundled_app(".bundle", Bundler.ruby_scope, *path)
     end
 
     def bundled_app(*path)
