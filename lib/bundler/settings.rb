@@ -162,6 +162,7 @@ module Bundler
       path = ENV[key] || @global_config[key]
       return path if path && !@local_config.key?(key)
 
+      $stderr.puts "GOT HERE!!!"
       if path = self[:path]
         "#{path}/#{Bundler.ruby_scope}"
       else

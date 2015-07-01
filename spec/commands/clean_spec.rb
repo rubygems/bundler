@@ -39,6 +39,10 @@ describe "bundle clean" do
 
     expect(out).to include("Removing foo (1.0)")
 
+    #expect(bundled_app("vendor/bundle/")).to exist
+    # `bundle install` is installing the gems to `bundled_app("vendor/bundle")`
+    # so we need to figure out how to append `ruby_scope` to the installation
+    # path.
     should_have_gems 'thin-1.0', 'rack-1.0.0'
     should_not_have_gems 'foo-1.0'
 

@@ -126,10 +126,21 @@ module Bundler
             install_path = Bundler.tmp(spec.full_name)
             bin_path     = install_path.join("bin")
           else
+            $stderr.puts Bundler.rubygems.gem_dir
             install_path = Bundler.rubygems.gem_dir
             bin_path     = Bundler.system_bindir
           end
 
+          $stderr.puts caller[0][/`.*'/][1..-2]
+          $stderr.puts caller[1][/`.*'/][1..-2]
+          $stderr.puts caller[2][/`.*'/][1..-2]
+          $stderr.puts caller[3][/`.*'/][1..-2]
+          $stderr.puts caller[4][/`.*'/][1..-2]
+          $stderr.puts caller[5][/`.*'/][1..-2]
+          $stderr.puts caller[6][/`.*'/][1..-2]
+          $stderr.puts caller[7][/`.*'/][1..-2]
+          $stderr.puts caller[8][/`.*'/][1..-2]
+          $stderr.puts caller[9][/`.*'/][1..-2]
           $stderr.puts "install_path: #{install_path}"
 
           installed_spec = nil

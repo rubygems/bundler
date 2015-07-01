@@ -82,6 +82,7 @@ module Bundler
         options[:system] = true
       end
 
+      $stderr.puts "options[:system]: #{options[:system]}"
       Bundler.settings[:path]     = nil if options[:system]
       Bundler.settings[:path]     = "vendor/bundle" if options[:deployment]
       Bundler.settings[:path]     = options["path"] if options["path"]
