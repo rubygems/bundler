@@ -31,7 +31,7 @@ module Bundler
         Bundler.ui.deprecate "Starting in Bundler 2.0, flags passed to commands "\
          "will no longer be automatically remembered. Instead please set flags " \
          "you want remembered between commands using `bundle config "\
-         "<setting name> <setting value>`."
+         "<setting name> <setting value>`.", true
       end
       local_config_file or raise GemfileNotFound, "Could not locate Gemfile"
       set_key(key, value, @local_config, local_config_file)
