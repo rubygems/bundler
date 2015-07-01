@@ -3,7 +3,7 @@ module Spec
   module Matchers
     RSpec::Matchers.define :lack_errors do
       match do |actual|
-        actual.gsub(/(^DEPRECATION:.+)/, "") == ""
+        actual.gsub(/(^DEPRECATION:.+[\n]?)/, "") == ""
       end
     end
 

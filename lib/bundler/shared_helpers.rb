@@ -235,7 +235,7 @@ module Bundler
         Bundler.respond_to?(:ui) && Bundler.ui.deprecate(
           "Gemfile and Gemfile.lock are " \
           "deprecated and will be replaced with gems.rb and " \
-          "gems.locked in Bundler 2.0.\n"
+          "gems.locked in Bundler 2.0.", true
         )
       end
     end
