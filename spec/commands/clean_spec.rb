@@ -36,7 +36,7 @@ describe "bundle clean" do
     bundle "install --no-clean"
 
     bundle :clean
-    $stderr.puts err
+
     expect(out).to include("Removing foo (1.0)")
 
     should_have_gems 'thin-1.0', 'rack-1.0.0'
