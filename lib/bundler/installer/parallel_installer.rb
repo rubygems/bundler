@@ -36,8 +36,8 @@ class ParallelInstaller
     # Checks installed dependencies against spec's dependencies to make
     # sure needed dependencies have been installed.
     def dependencies_installed?(all_specs)
-      installed_specs = all_specs.select(&:installed?).map(&:spec)
-      dependencies.all? {|d| installed_specs.include? d }
+      installed_specs = all_specs.select(&:installed?).map(&:name)
+      dependencies.all? {|d| installed_specs.include? d.name }
     end
 
     # Represents only the non-development dependencies and the ones that
