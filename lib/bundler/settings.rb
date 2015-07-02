@@ -164,9 +164,9 @@ module Bundler
 
       $stderr.puts "GOT HERE!!!"
       if path = self[:path]
-        "#{path}/#{Bundler.ruby_scope}"
+        path == Bundler.rubygems.gem_dir ? path : "#{path}/#{Bundler.ruby_scope}"
       else
-        Bundler.rubygems.gem_dir
+        File.join(@root, Bundler.ruby_scope)
       end
     end
 

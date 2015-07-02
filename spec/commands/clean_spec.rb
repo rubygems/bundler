@@ -329,15 +329,17 @@ describe "bundle clean" do
       gem "thin"
       gem "rack"
     G
-    bundle :install
+    bundle "install --system"
+    sys_exec "gem list"
+    expect(out).to include("rack (1.0.0)")
+    expect(out).to include("thin (1.0)")
 
     gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack"
     G
-    bundle :install
-
+    bundle "install --system"
     sys_exec "gem list"
     expect(out).to include("rack (1.0.0)")
     expect(out).to include("thin (1.0)")
@@ -428,7 +430,7 @@ describe "bundle clean" do
 
       gem "foo"
     G
-    bundle "install"
+    bundle "install --system"
 
     update_repo2 do
       build_gem 'foo', '1.0.1'
@@ -446,14 +448,14 @@ describe "bundle clean" do
       gem "foo"
       gem "rack"
     G
-    bundle :install
+    bundle "install --system"
 
     gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack"
     G
-    bundle :install
+    bundle "install --system"
     bundle "clean --force"
 
     expect(out).to include("Removing foo (1.0)")
@@ -506,7 +508,7 @@ describe "bundle clean" do
 
       gem "bindir"
     G
-    bundle :install
+    bundle "install --system"
 
     bundle "clean --force"
 
