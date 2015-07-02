@@ -27,6 +27,7 @@ module Bundler
       raise InvalidOption, e.message
     ensure
       self.options ||= {}
+      Bundler.settings[:options_given] = options_given?
       Bundler.ui = UI::Shell.new(options)
       Bundler.ui.level = "debug" if options["verbose"]
     end
@@ -407,6 +408,11 @@ module Bundler
     end
 
     private
+
+
+    def options_given?
+      !self.options.empty?
+    end
 
       # Automatically invoke `bundle install` and resume if
       # Bundler.settings[:auto_install] exists. This is set through config cmd
