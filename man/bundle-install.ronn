@@ -12,7 +12,6 @@ bundle-install(1) -- Install the dependencies specified in your Gemfile
                  [--force]
                  [--cache]
                  [--no-prune]
-                 [--path PATH]
                  [--system]
                  [--quiet]
                  [--retry=NUMBER]
@@ -89,13 +88,6 @@ time `bundle install` is run, use `bundle config` (see bundle-config(1)).
 * `--no-prune`:
   Don't remove stale gems from the cache when the installation finishes.
 
-* `--path=<path>`:
-  The location to install the specified gems to. This defaults to Rubygems'
-  setting. Bundler shares this location with Rubygems, `gem install ...` will
-  have gem installed there, too. Therefore, gems installed without a
-  `--path ...` setting will show up by calling `gem list`. Accodingly, gems
-  installed to other locations will not get listed.
-
 * `--quiet`:
   Do not print progress information to the standard output. Instead, Bundler
   will exit using a status code (`$?`).
@@ -168,8 +160,7 @@ will cause an error when the Gemfile(5) is modified.
    read them.
 
    As a result, `bundle install --deployment` installs gems to
-   the `vendor/bundle` directory in the application. This may be
-   overridden using the `--path` option.
+   the `vendor/bundle` directory in the application.
 
 ## SUDO USAGE
 
