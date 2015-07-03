@@ -99,7 +99,7 @@ module Bundler
     method_option "gemfile", :type => :string, :banner =>
       "Use the specified gemfile instead of Gemfile"
     method_option "path", :type => :string, :banner =>
-      "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
+      "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME)."
     map "c" => "check"
     def check
       require "bundler/cli/check"
@@ -138,7 +138,7 @@ module Bundler
     method_option "no-prune", :type => :boolean, :banner =>
       "Don't remove stale gems from the cache."
     method_option "path", :type => :string, :banner =>
-      "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
+      "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME)."
     method_option "quiet", :type => :boolean, :banner =>
       "Only output warnings and errors."
     method_option "shebang", :type => :string, :banner =>
@@ -250,7 +250,7 @@ module Bundler
     method_option "no-install",  :type => :boolean, :banner => "Don't actually install the gems, just package."
     method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
     method_option "path", :type => :string, :banner =>
-      "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
+      "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME)."
     method_option "quiet", :type => :boolean, :banner => "Only output warnings and errors."
     long_desc <<-D
       The package command will copy the .gem files for every gem in the bundle into the
