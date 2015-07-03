@@ -81,7 +81,6 @@ time `bundle install` is run, use `bundle config` (see bundle-config(1)).
 
 * `--system`:
   Installs the gems specified in the bundle to the system's Rubygems location.
-  This overrides any previous configuration of `--path`.
 
 * `--cache`:
   Update the cache in `vendor/cache` with the newly bundled gems during the
