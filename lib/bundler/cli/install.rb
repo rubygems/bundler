@@ -44,9 +44,9 @@ module Bundler
       # Just disable color in deployment mode
       Bundler.ui.shell = Thor::Shell::Basic.new if options[:deployment]
 
-      if (options[:path] || options[:deployment]) && options[:system]
-        Bundler.ui.error "You have specified both a path to install your gems to, \n" \
-                         "as well as --system. Please choose."
+      if options[:deployment] && options[:system]
+        Bundler.ui.error "The --deployment and --system options mandate conflicting gem installation paths.\n" \
+                         "Please choose."
         exit 1
       end
 
@@ -82,10 +82,10 @@ module Bundler
         options[:system] = true
       end
 
-      Bundler.settings[:path]     = Bundler.rubygems.gem_dir if options[:system]
-      Bundler.settings[:path]     = "#{Bundler.settings.path}/vendor/bundle" if options[:deployment]
-      Bundler.settings[:path]     = options["path"] if options["path"]
-      Bundler.settings[:path]     ||= "bundle" if options["standalone"]
+      path     = Bundler.settings[:path]
+      path     = Bundler.rubygems.gem_dir if options[:system]
+      path     = "#{Bundler.settings.path}/vendor/bundle" if options[:deployment]
+      path     ||= "bundle" if options["standalone"]
       Bundler.settings[:shebang]  = options["shebang"] if options["shebang"]
       Bundler.settings[:jobs]     = options["jobs"] if options["jobs"]
       Bundler.settings[:no_prune] = true if options["no-prune"]
@@ -95,6 +95,7 @@ module Bundler
       Bundler.settings.with       = options[:with]
       Bundler::Fetcher.disable_endpoint = options["full-index"]
       Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? "1" : nil
+      Bundler.settings[:disable_shared_gems] = path ? "1" : nil
 
       # rubygems plugins sometimes hook into the gem install process
       Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins)
@@ -109,8 +110,8 @@ module Bundler
       Bundler.ui.confirm "Bundle complete! #{dependencies_count_for(definition)}, #{gems_installed_for(definition)}."
       confirm_without_groups
 
-      if Bundler.settings[:path]
-        absolute_path = File.expand_path(Bundler.settings[:path])
+      if path
+        absolute_path = File.expand_path(path)
         relative_path = absolute_path.sub(File.expand_path("."), ".")
         Bundler.ui.confirm "Bundled gems are installed into #{relative_path}."
       else
@@ -134,7 +135,7 @@ module Bundler
         Bundler.ui.error "Then uninstall the gem '#{name}' (or delete all bundled gems) and then install again."
       end
 
-      if Bundler.settings[:clean] && Bundler.settings[:path]
+      if Bundler.settings[:clean] && path
         require "bundler/cli/clean"
         Bundler::CLI::Clean.new(options).run
       end
