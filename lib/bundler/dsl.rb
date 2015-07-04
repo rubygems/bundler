@@ -27,6 +27,7 @@ module Bundler
       @env                  = nil
       @ruby_version         = nil
       add_git_sources
+      add_plugin_sources
     end
 
     def eval_gemfile(gemfile, contents = nil)
@@ -68,6 +69,9 @@ module Bundler
         raise InvalidOption, "There are multiple gemspecs at #{expanded_path}. " \
           "Please use the :name option to specify which one should be used."
       end
+    end
+
+    def plugin(*args)
     end
 
     def gem(name, *args)
@@ -225,6 +229,17 @@ module Bundler
       end
     end
 
+    def add_plugin_sources
+      plugins = Bundler.plugin("1").manager.sources.all
+
+      plugins.each do |type, proc|
+        source_class = proc.call.call
+        source = source_class
+        @sources.register_plugin_source(type, source)
+      end
+
+    end
+
     def with_source(source)
       if block_given?
         @source = source
@@ -257,7 +272,10 @@ module Bundler
       normalize_hash(opts)
 
       git_names = @git_sources.keys.map(&:to_s)
-      validate_keys("gem '#{name}'", opts, valid_keys + git_names)
+      plugins = Bundler.plugin("1").manager.sources.all
+
+      plugin_keys = plugins.keys.map {|plugin| plugin.to_s}
+      validate_keys("gem '#{name}'", opts, valid_keys + git_names + plugin_keys)
 
       groups = @groups.dup
       opts["group"] = opts.delete("groups") || opts["group"]
@@ -300,6 +318,19 @@ module Bundler
           source = send(type, param, options) {}
           opts["source"] = source
         end
+      end
+
+      plugins.each do |type, proc|
+        if opts[type.to_s]
+          if version.first && version.first =~ /^\s*=?\s*(\d[^\s]*)\s*$/
+            options = opts.merge("name" => name, "version" => $1)
+          else
+            options = opts.dup
+          end
+          source = with_source(@sources.add_plugin_source(type, normalize_hash(options))) {}
+          opts["source"] = source
+        end
+
       end
 
       opts["source"]       ||= @source
