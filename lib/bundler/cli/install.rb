@@ -67,10 +67,11 @@ module Bundler
         options[:system] = true
       end
 
-      path     = Bundler.settings[:path]
-      path     = Bundler.rubygems.gem_dir if options[:system]
-      path     = "#{Bundler.settings.path}/vendor/bundle" if options[:deployment]
-      path     ||= "bundle" if options["standalone"]
+      path = Bundler.settings[:path]
+      path = Bundler.rubygems.gem_dir if options[:system]
+      path = "#{Bundler.settings.path}/vendor/bundle" if options[:deployment]
+      path ||= "bundle" if options["standalone"]
+
       Bundler.settings[:shebang]  = options["shebang"] if options["shebang"]
       Bundler.settings[:jobs]     = options["jobs"] if options["jobs"]
       Bundler.settings[:no_prune] = true if options["no-prune"]
