@@ -45,7 +45,6 @@ env:
   - RGV=v2.4.8
 
 matrix:
-  fast_finish: true
   include:
     # Ruby 2.2, Rubygems 2.4.5 and up (RG 2.4 is included by the matrix above)
     # Ruby 2.1, Rubygems 2.2.2 and up
