@@ -50,6 +50,14 @@ describe "bundle gem" do
     end
   end
 
+  shared_examples_for "following best practices for gem dependencies" do
+    it "only adds development dependencies with specific version requirements" do
+      unspecific_dev_dependencies = generated_gem.gemspec.development_dependencies.reject(&:specific?)
+
+      expect(unspecific_dev_dependencies).to eq([])
+    end
+  end
+
   it "generates a valid gemspec" do
     system_gems ["rake-10.0.2"]
 
@@ -234,6 +242,8 @@ describe "bundle gem" do
         bundle "gem #{gem_name} --test=rspec"
       end
 
+      it_should_behave_like("following best practices for gem dependencies")
+
       it "builds spec skeleton" do
         expect(bundled_app("test_gem/.rspec")).to exist
         expect(bundled_app("test_gem/spec/test_gem_spec.rb")).to exist
@@ -284,6 +294,8 @@ describe "bundle gem" do
         in_app_root
         bundle "gem #{gem_name} --test=minitest"
       end
+
+      it_should_behave_like("following best practices for gem dependencies")
 
       it "builds spec skeleton" do
         expect(bundled_app("test_gem/test/test_gem_test.rb")).to exist
