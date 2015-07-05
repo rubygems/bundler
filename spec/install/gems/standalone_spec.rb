@@ -143,7 +143,9 @@ describe "bundle install --standalone" do
     end
 
     it "allows --path to change the location of the standalone bundle" do
-      bundle "install --standalone --path path/to/bundle"
+      with_bundle_path_as('path/to/bundle') do
+        bundle "install --standalone"
+      end
 
       ruby <<-RUBY, :no_lib => true, :expect_err => false
         $:.unshift File.expand_path("path/to/bundle")

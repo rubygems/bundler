@@ -192,6 +192,22 @@ module Spec
       ENV["PATH"] = old_path
     end
 
+    def with_bundle_path_as(path, local = true)
+      old_path = Bundler.settings.path
+
+      if local
+        config("BUNDLE_PATH" => path)
+      else
+        global_config("BUNDLE_PATH" => path)
+      end
+
+      yield
+    ensure
+      puts "back to #{old_path}"
+      Bundler.settings[:path] = old_path
+    end
+
+
     def break_git!
       FileUtils.mkdir_p(tmp("broken_path"))
       File.open(tmp("broken_path/git"), "w", 0755) do |f|

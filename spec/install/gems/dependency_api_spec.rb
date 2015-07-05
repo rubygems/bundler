@@ -410,18 +410,22 @@ describe "gemcutter's dependency API" do
       gem "rack"
     G
 
-    bundle "install --path vendor/bundle", :artifice => "endpoint"
+    with_bundle_path_as('vendor/bundle') do
+      bundle :install, :artifice => "endpoint"
+    end
 
     expect(vendored_gems("bin/rackup")).to exist
   end
 
-  it "installs the bins when using --path and uses bundle clean" do
+  it "installs the bins when path configured and uses bundle clean" do
     gemfile <<-G
       source "#{source_uri}"
       gem "rack"
     G
 
-    bundle "install --path vendor/bundle --no-clean", :artifice => "endpoint"
+    with_bundle_path_as('vendor/bundle') do
+      bundle "install --no-clean", :artifice => "endpoint"
+    end
 
     expect(vendored_gems("bin/rackup")).to exist
   end

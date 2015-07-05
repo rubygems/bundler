@@ -85,7 +85,9 @@ describe "bundle install with git sources" do
     end
 
     it "still works after moving the application directory" do
-      bundle "install --path vendor/bundle"
+      with_bundle_path_as('vendor/bundle') do
+        bundle :install
+      end
       FileUtils.mv bundled_app, tmp("bundled_app.bck")
 
       Dir.chdir tmp("bundled_app.bck")
@@ -93,7 +95,9 @@ describe "bundle install with git sources" do
     end
 
     it "can still install after moving the application directory" do
-      bundle "install --path vendor/bundle"
+      with_bundle_path_as("vendor/bundle") do
+        bundle :install
+      end
       FileUtils.mv bundled_app, tmp("bundled_app.bck")
 
       update_git "foo", "1.1", :path => lib_path("foo-1.0")

@@ -52,30 +52,42 @@ describe "post bundle message" do
       expect(out).to include("4 Gemfile dependencies, 2 gems now installed.")
     end
 
-    describe "with --path and" do
+    describe "with configured path and" do
       it "without any options" do
-        bundle "install --path vendor"
+        with_bundle_path_as('vendor') do
+          bundle :install
+        end
+
         expect(out).to include(bundle_deployment_message)
         expect(out).to_not include("Gems in the group")
         expect(out).to include(bundle_complete_message)
       end
 
       it "with --without one group" do
-        bundle "install --without emo --path vendor"
+        with_bundle_path_as('vendor') do
+          bundle "install --without emo"
+        end
+
         expect(out).to include(bundle_deployment_message)
         expect(out).to include("Gems in the group emo were not installed")
         expect(out).to include(bundle_complete_message)
       end
 
       it "with --without two groups" do
-        bundle "install --without emo test --path vendor"
+        with_bundle_path_as('vendor') do
+          bundle "install --without emo test"
+        end
+
         expect(out).to include(bundle_deployment_message)
         expect(out).to include("Gems in the groups emo and test were not installed")
         expect(out).to include(bundle_complete_message)
       end
 
       it "with --without more groups" do
-        bundle "install --without emo obama test --path vendor"
+        with_bundle_path_as('vendor') do
+          bundle "install --without emo obama test"
+        end
+
         expect(out).to include(bundle_deployment_message)
         expect(out).to include("Gems in the groups emo, obama and test were not installed")
         expect(out).to include(bundle_complete_message)

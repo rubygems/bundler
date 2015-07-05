@@ -389,7 +389,9 @@ describe "bundle install with gems on multiple sources" do
           rack
       L
 
-      bundle "install --path ../gems/system"
+      with_bundle_path_as('../gems/system') do
+        bundle :install
+      end
 
       # 4. Then we add some new versions...
       update_repo4 do
