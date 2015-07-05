@@ -12,7 +12,7 @@ describe "bundle install" do
         gem "rack"
       G
 
-      bundle "config --local path vendor/bundle"
+      set_bundle_path('local', 'vendor/bundle')
     end
 
     it "does not use available system gems" do
@@ -50,18 +50,10 @@ describe "bundle install" do
       G
     end
 
-    def set_bundle_path(type, location)
-      if type == :env
-        ENV["BUNDLE_PATH"] = location
-      elsif type == :global
-        bundle "config path #{location}", "no-color" => nil
-      end
-    end
-
-    [:env, :global].each do |type|
+    %w/env global/.each do |type|
       it "gives precedence to the local path over #{type}" do
         set_bundle_path(type, bundled_app("vendor2").to_s)
-        bundle "config --local path vendor/bundle"
+        set_bundle_path('local', 'vendor/bundle')
         bundle :install
 
         expect(vendored_gems("gems/rack-1.0.0")).to be_directory
@@ -96,7 +88,7 @@ describe "bundle install" do
     end
 
     it "installs gems to BUNDLE_PATH from .bundle/config" do
-      bundle "config --local path vendor/bundle"
+      set_bundle_path('local', 'vendor/bundle')
 
       bundle :install
 
@@ -107,7 +99,7 @@ describe "bundle install" do
     it "disables system gems when passing a path to install" do
       # This is so that vendored gems can be distributed to others
       build_gem "rack", "1.1.0", :to_system => true
-      bundle "config --local path ./vendor/bundle"
+      set_bundle_path('local', 'vendor/bundle')
       bundle :install
 
       expect(vendored_gems("gems/rack-1.0.0")).to be_directory
@@ -128,9 +120,18 @@ describe "bundle install" do
         gem "rack"
       G
 
-      bundle "config --local path bundle"
+      set_bundle_path('local', 'bundle')
       bundle :install
       expect(out).to match(/invalid symlink/)
+    end
+  end
+
+  def set_bundle_path(type, location)
+    case type
+    when 'env'
+      ENV["BUNDLE_PATH"] = location
+    when 'global', 'local'
+      bundle "config --#{type} path #{location}", "no-color" => nil
     end
   end
 end
