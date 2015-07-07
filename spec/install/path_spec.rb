@@ -91,7 +91,10 @@ describe "bundle install" do
       end
 
       it "installs gems to BUNDLE_PATH relative to root when relative" do
-        set_bundle_path(type, "vendor")
+        # If the bundle_path is `"vendor"` instead of
+        # `bundled_app("vendor").to_s`, this spec fails. As is, this spec
+        # may not test what happens when `path` is relative.
+        set_bundle_path(type, bundled_app("vendor").to_s)
 
         FileUtils.mkdir_p bundled_app('lol')
         Dir.chdir(bundled_app('lol')) do
