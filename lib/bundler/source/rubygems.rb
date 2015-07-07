@@ -126,8 +126,8 @@ module Bundler
             install_path = Bundler.tmp(spec.full_name)
             bin_path     = install_path.join("bin")
           else
-            install_path = Bundler.rubygems.gem_dir
-            bin_path     = Bundler.system_bindir
+            install_path = Bundler.settings.path
+            bin_path     = File.join(install_path, 'bin')
           end
 
           installed_spec = nil
