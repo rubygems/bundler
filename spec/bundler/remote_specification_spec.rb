@@ -16,6 +16,49 @@ describe Bundler::RemoteSpecification do
       Bundler::RemoteSpecification.new(name, version, platform, nil)
     end
 
+    context "given a Bundler::RemoteSpecification" do
+      let(:same_gem) do
+        Bundler::RemoteSpecification.new(name, version, platform, nil)
+      end
+
+      let(:different_name) do
+        Bundler::RemoteSpecification.new("bar", version, platform, nil)
+      end
+
+      let(:newer_gem) do
+        Bundler::RemoteSpecification.new(name, newer_version, platform, nil)
+      end
+
+      let(:older_gem) do
+        Bundler::RemoteSpecification.new(name, older_version, platform, nil)
+      end
+
+      let(:different_platform) do
+        plt = Gem::Platform.new "x86-mswin32"
+        Bundler::RemoteSpecification.new(name, version, plt, nil)
+      end
+
+      it "compares based on name" do
+        expect(subject <=> different_name).not_to eq(0)
+      end
+
+      it "compares based on the same version" do
+        expect(subject <=> same_gem).to eq(0)
+      end
+
+      it "compares based on an older version" do
+        expect(subject).to be < newer_gem
+      end
+
+      it "compares based on a newer version" do
+        expect(subject).to be > older_gem
+      end
+
+      it "compares based on platform" do
+        expect(subject <=> different_platform).not_to eq(0)
+      end
+    end
+
     context "given a Gem::Specification" do
       let(:same_gem) do
         Gem::Specification.new(name, version)
