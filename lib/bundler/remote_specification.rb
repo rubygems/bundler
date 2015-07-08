@@ -52,8 +52,6 @@ module Bundler
       @_remote_specification = spec
     end
 
-  private
-
     # Create a delegate used for sorting. This strategy is copied from
     # RubyGems 2.23 and ensures that Bundler's specifications can be
     # compared and sorted with RubyGems' own specifications.
@@ -66,6 +64,8 @@ module Bundler
     def sort_obj
       [@name, @version, @platform == Gem::Platform::RUBY ? -1 : 1]
     end
+
+  private
 
     def _remote_specification
       @_remote_specification ||= @spec_fetcher.fetch_spec([@name, @version, @platform])
