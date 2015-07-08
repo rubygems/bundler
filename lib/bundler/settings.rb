@@ -164,6 +164,7 @@ module Bundler
 
       if path = self[:path]
         path == Bundler.rubygems.gem_dir ? path : "#{path}/#{Bundler.ruby_scope}"
+        path = File.expand_path(path)
       else
         File.join(@root, Bundler.ruby_scope)
       end
