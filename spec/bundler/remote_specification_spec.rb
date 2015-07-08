@@ -27,8 +27,8 @@ describe Bundler::RemoteSpecification do
 
       context "which is different by name" do
         let(:other_name) { "a" }
-        it "doesn't return 0" do
-          expect(subject <=> other).not_to eq(0)
+        it "returns 1" do
+          expect(subject <=> other).to eq(1)
         end
       end
 
@@ -48,8 +48,8 @@ describe Bundler::RemoteSpecification do
 
       context "which has a different platform" do
         let(:other_platform) { Gem::Platform.new("x86-mswin32") }
-        it "doesn't return 0" do
-          expect(subject <=> other).not_to eq(0)
+        it "returns -1" do
+          expect(subject <=> other).to eq(-1)
         end
       end
     end
