@@ -237,7 +237,7 @@ module Bundler
       end
 
       def loaded_from(spec)
-        "#{Bundler.rubygems.gem_dir}/specifications/#{spec.full_name}.gemspec"
+        "#{Bundler.settings.path}/specifications/#{spec.full_name}.gemspec"
       end
 
       def cached_gem(spec)
