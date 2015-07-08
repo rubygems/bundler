@@ -8,93 +8,69 @@ describe Bundler::RemoteSpecification do
   describe "#<=>" do
     let(:name) { "foo" }
     let(:version) { Gem::Version.new("1.0.0") }
-    let(:newer_version) { Gem::Version.new("1.1.0") }
-    let(:older_version) { Gem::Version.new("0.9.0") }
     let(:platform) { Gem::Platform::RUBY }
+
+    let(:other_name) { name }
+    let(:other_version) { version }
+    let(:other_platform) { platform }
 
     subject do
       Bundler::RemoteSpecification.new(name, version, platform, nil)
     end
 
-    context "given a Bundler::RemoteSpecification" do
-      let(:same_gem) do
-        Bundler::RemoteSpecification.new(name, version, platform, nil)
+    shared_examples_for "a comparison" do
+      context "which exactly matches" do
+        it "returns 0" do
+          expect(subject <=> other).to eq(0)
+        end
       end
 
-      let(:different_name) do
-        Bundler::RemoteSpecification.new("bar", version, platform, nil)
+      context "which is different by name" do
+        let(:other_name) { "a" }
+        it "doesn't return 0" do
+          expect(subject <=> other).not_to eq(0)
+        end
       end
 
-      let(:newer_gem) do
-        Bundler::RemoteSpecification.new(name, newer_version, platform, nil)
+      context "which has a lower version" do
+        let(:other_version) { Gem::Version.new("0.9.0") }
+        it "returns 1" do
+          expect(subject <=> other).to eq(1)
+        end
       end
 
-      let(:older_gem) do
-        Bundler::RemoteSpecification.new(name, older_version, platform, nil)
+      context "which has a higher version" do
+        let(:other_version) { Gem::Version.new("1.1.0") }
+        it "returns -1" do
+          expect(subject <=> other).to eq(-1)
+        end
       end
 
-      let(:different_platform) do
-        plt = Gem::Platform.new "x86-mswin32"
-        Bundler::RemoteSpecification.new(name, version, plt, nil)
-      end
-
-      it "compares based on name" do
-        expect(subject <=> different_name).not_to eq(0)
-      end
-
-      it "compares based on the same version" do
-        expect(subject <=> same_gem).to eq(0)
-      end
-
-      it "compares based on an older version" do
-        expect(subject).to be < newer_gem
-      end
-
-      it "compares based on a newer version" do
-        expect(subject).to be > older_gem
-      end
-
-      it "compares based on platform" do
-        expect(subject <=> different_platform).not_to eq(0)
+      context "which has a different platform" do
+        let(:other_platform) { Gem::Platform.new("x86-mswin32") }
+        it "doesn't return 0" do
+          expect(subject <=> other).not_to eq(0)
+        end
       end
     end
 
-    context "given a Gem::Specification" do
-      let(:same_gem) do
-        Gem::Specification.new(name, version)
+    context "comparing another Bundler::RemoteSpecification" do
+      let(:other) do
+        Bundler::RemoteSpecification.new(other_name, other_version,
+                                         other_platform, nil)
       end
 
-      let(:different_name) do
-        Gem::Specification.new("bar", version)
+      it_should_behave_like "a comparison"
+    end
+
+    context "comparing a Gem::Specification" do
+      let(:other) do
+        Gem::Specification.new(other_name, other_version).tap do |s|
+          s.platform = other_platform
+        end
       end
 
-      let(:newer_gem) do
-        Gem::Specification.new(name, newer_version)
-      end
-
-      let(:older_gem) do
-        Gem::Specification.new(name, older_version)
-      end
-
-      let(:different_platform) do
-        s = Gem::Specification.new(name, version)
-        s.platform = Gem::Platform.new "x86-mswin32"
-        s
-      end
-
-      it "compares based on name" do
-        expect(subject <=> different_name).not_to eq(0)
-      end
-
-      it "compares based on version" do
-        expect(subject <=> same_gem).to eq(0)
-        expect(subject).to be < newer_gem
-        expect(subject).to be > older_gem
-      end
-
-      it "compares based on platform" do
-        expect(subject <=> different_platform).not_to eq(0)
-      end
+      it_should_behave_like "a comparison"
     end
   end
 end
