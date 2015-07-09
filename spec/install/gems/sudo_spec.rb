@@ -52,7 +52,6 @@ describe "when using sudo", :sudo => true do
     it "installs when BUNDLE_PATH is owned by root" do
       bundle_path = tmp("owned_by_root")
       FileUtils.mkdir_p bundle_path
-      sudo "chown -R root #{bundle_path}"
 
       ENV["BUNDLE_PATH"] = bundle_path.to_s
       install_gemfile <<-G
@@ -60,8 +59,10 @@ describe "when using sudo", :sudo => true do
         gem "rack", '1.0'
       G
 
-      expect(bundle_path.join("gems/rack-1.0.0")).to exist
-      expect(bundle_path.join("gems/rack-1.0.0").stat.uid).to eq(0)
+      sudo "chown -R root #{bundle_path}"
+
+      expect(bundle_path.join("#{Bundler.ruby_scope}/gems/rack-1.0.0")).to exist
+      expect(bundle_path.join("#{Bundler.ruby_scope}/gems/rack-1.0.0").stat.uid).to eq(0)
       should_be_installed "rack 1.0"
     end
 
@@ -76,9 +77,10 @@ describe "when using sudo", :sudo => true do
         source "file://#{gem_repo1}"
         gem "rack", '1.0'
       G
+      sudo "chown -R root #{bundle_path}"
 
-      expect(bundle_path.join("gems/rack-1.0.0")).to exist
-      expect(bundle_path.join("gems/rack-1.0.0").stat.uid).to eq(0)
+      expect(bundle_path.join("#{Bundler.ruby_scope}/gems/rack-1.0.0")).to exist
+      expect(bundle_path.join("#{Bundler.ruby_scope}/gems/rack-1.0.0").stat.uid).to eq(0)
       should_be_installed "rack 1.0"
     end
 
