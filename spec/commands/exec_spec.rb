@@ -79,7 +79,7 @@ describe "bundle exec" do
     install_gemfile ''
     sys_exec("#{Gem.ruby} #{command.path}")
 
-    if RUBY_VERSION >= "2.0"
+    if Bundler.current_ruby.ruby_2?
       expect(out).to eq("")
     else
       expect(out).to eq("Ruby version #{RUBY_VERSION} defaults to keeping non-standard file descriptors on Kernel#exec.")
