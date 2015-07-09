@@ -85,13 +85,12 @@ describe "bundle install" do
         set_bundle_path(type, bundled_app("vendor").to_s)
 
         bundle :install
-
-        expect(bundled_app('vendor/gems/rack-1.0.0')).to be_directory
+        expect(bundled_app("vendor/#{Bundler.ruby_scope}/gems/rack-1.0.0")).to be_directory
         should_be_installed "rack 1.0.0"
       end
 
       it "installs gems to BUNDLE_PATH relative to root when relative" do
-        # If the bundle_path is `"vendor"` instead of
+        # FIXME: If the bundle_path is `"vendor"` instead of
         # `bundled_app("vendor").to_s`, this spec fails. As is, this spec
         # may not test what happens when `path` is relative.
         set_bundle_path(type, bundled_app("vendor").to_s)
@@ -101,7 +100,7 @@ describe "bundle install" do
           bundle :install
         end
 
-        expect(bundled_app('vendor/gems/rack-1.0.0')).to be_directory
+        expect(bundled_app("vendor/#{Bundler.ruby_scope}/gems/rack-1.0.0")).to be_directory
         should_be_installed "rack 1.0.0"
       end
     end
