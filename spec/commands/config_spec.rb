@@ -289,9 +289,14 @@ E
     describe "setting `path` when `path.system` is already set" do
       it "should print a warning and remove the `path.system` setting" do
         bundle "config path.system true"
-        # Note that if a path is used that does not include the installed gems,
-        # we'll get an error when we pass _any_ command to `run` below.
-        bundle "config path #{default_bundle_path}"
+        # Note that if we use `default_bundle_path` in place of
+        # `bundled_app(".bundle")` below, we add two `Bundler.ruby_scope`s to
+        # `Bundler.settings.path`, making it
+        # `bundler/tmp/bundled_app/.bundle/ruby/1.9.1/ruby/1.9.1` instead of
+        # `bundler/tmp/bundled_app/.bundle/ruby/1.9.1`.
+        # FIXME: Maybe we should ensure that installation paths cannot have
+        # two `Bundler.ruby_scope`s in them in `Settings#path`.
+        bundle "config path #{bundled_app(".bundle")}"
 
         expect(out).to include("`path.system` is already configured")
         run "puts Bundler.settings['path.system'] == nil"
