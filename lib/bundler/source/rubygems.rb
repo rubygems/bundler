@@ -126,7 +126,7 @@ module Bundler
             install_path = Bundler.tmp(spec.full_name)
             bin_path     = install_path.join("bin")
           else
-            install_path = Bundler.settings.path
+            install_path = File.expand_path(Bundler.settings.path)
             bin_path     = Bundler.system_bindir
           end
 
@@ -242,7 +242,7 @@ module Bundler
       end
 
       def loaded_from(spec)
-        "#{Bundler.settings.path}/specifications/#{spec.full_name}.gemspec"
+        "#{File.expand_path(Bundler.settings.path)}/specifications/#{spec.full_name}.gemspec"
       end
 
       def cached_gem(spec)
