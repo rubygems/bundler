@@ -160,11 +160,15 @@ module Bundler
     def path
       key  = key_for(:path)
       path = ENV[key] || @global_config[key]
-      return path if path && !@local_config.key?(key)
+
+      if path && !@local_config.key?(key)
+        path = "#{path}/#{Bundler.ruby_scope}" if path != Bundler.rubygems.gem_dir
+        return path
+      end
 
       if path = self[:path]
-        path == Bundler.rubygems.gem_dir ? path : "#{path}/#{Bundler.ruby_scope}"
-        path = File.expand_path(path)
+        path = "#{path}/#{Bundler.ruby_scope}" if path != Bundler.rubygems.gem_dir
+        File.expand_path(path)
       else
         File.join(@root, Bundler.ruby_scope)
       end
