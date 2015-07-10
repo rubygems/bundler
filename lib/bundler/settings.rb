@@ -172,29 +172,31 @@ module Bundler
     end
 
     def set_with(array, options = {})
-      opposite_group = to_array( config_for_symbol( options.fetch :config, :current )[without_key] )
-      resolve_conflicts(array, opposite_group)
+      enum = array.to_set
+      opposite_group = to_set( config_for_symbol( options.fetch :config, :current )[without_key] )
+      resolve_conflicts(enum, opposite_group)
       break_with_without_cache!
-      set_array(:with, array, options)
+      set_array(:with, enum, options)
     end
 
     def set_without(array, options = {})
-      opposite_group = to_array( config_for_symbol( options.fetch :config, :current )[with_key] )
-      resolve_conflicts(array, opposite_group)
+      enum = array.to_set
+      opposite_group = to_set( config_for_symbol( options.fetch :config, :current )[with_key] )
+      resolve_conflicts(enum, opposite_group)
       break_with_without_cache!
-      set_array(:without, array, options)
+      set_array(:without, enum, options)
     end
 
     def without
-      get_with_and_without[1]
+      get_with_and_without[1].to_a
     end
 
     def with
-      get_with_and_without[0]
+      get_with_and_without[0].to_a
     end
 
-    def groups_conflict?(array_one, array_two)
-      !(array_one & array_two).empty?
+    def groups_conflict?(group_one, group_two)
+      group_one.to_set.intersect? group_two.to_set
     end
 
     # @local_config["BUNDLE_PATH"] should be prioritized over ENV["BUNDLE_PATH"]
@@ -268,13 +270,13 @@ module Bundler
         superior_configs = reverse_config.slice((i+1)..-1)
         override_from_superior_configs c, superior_configs
       end.transpose
-      [with.flatten.uniq, without.flatten.uniq]
+      [with.to_set.flatten, without.to_set.flatten]
     end
 
     def override_from_superior_configs(config, superiors)
       all_values_for_key = proc {|key| superiors.flat_map { |c| to_array(c[key]) } }
-      vetted_with = to_array(config[with_key]) - all_values_for_key[without_key]
-      vetted_without = to_array(config[without_key]) - all_values_for_key[with_key]
+      vetted_with = to_set(config[with_key]) - all_values_for_key[without_key]
+      vetted_without = to_set(config[without_key]) - all_values_for_key[with_key]
       [vetted_with, vetted_without]
     end
 
@@ -301,7 +303,7 @@ module Bundler
     def conflicting_groups
       with_locations, without_locations = locations(:with), locations(:without)
       (with_locations.keys & without_locations.keys).map do |key|
-        groups = [to_array(with_locations[key]), to_array(without_locations[key])]
+        groups = [to_set(with_locations[key]), to_set(without_locations[key])]
         groups_conflict?(*groups) ? [key, groups] : nil
       end.compact.to_h
     end
@@ -344,14 +346,19 @@ module Bundler
     end
 
     def set_array(key, array, options = {})
+      array = array.to_a
       value = (array && !array.empty?) ? array.join(":") : nil
       set_config(key, value, options)
     end
 
-    def to_array(string_or_array)
-      return [] if string_or_array.nil?
-      return string_or_array unless string_or_array.respond_to? :split
-      string_or_array.split(":").map { |w| w.to_sym }
+    def to_array(string_or_enum)
+      return [] if string_or_enum.nil?
+      return string_or_enum unless string_or_enum.respond_to? :split
+      string_or_enum.split(":").map { |w| w.to_sym }
+    end
+
+    def to_set(string_or_enum)
+      to_array(string_or_enum).to_set
     end
 
     def set_key(key, value, hash, file)
