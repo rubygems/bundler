@@ -186,7 +186,7 @@ module Bundler
       @install_conditionals.concat args
       blk.call
     ensure
-      args.each { @groups.pop }
+      args.each { @install_conditionals.pop }
     end
 
     def platforms(*platforms)
