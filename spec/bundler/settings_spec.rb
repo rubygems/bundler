@@ -179,4 +179,78 @@ describe Bundler::Settings do
       expect(settings["mirror.https://rubygems.org/"]).to eq("http://rubygems-mirror.org")
     end
   end
+
+  describe "#groups_conflict?" do
+    context "when two arrays have same value" do
+      it "returns true" do
+        array1 = %i(alpha beta gamma)
+        array2 = %i(gamma delta epsilon)
+        expect( settings.groups_conflict? array1, array2 ).to be_truthy
+      end
+    end
+    context "when two arrays don't share values" do
+      it "returns false" do
+        array1 = %i(alpha beta gamma)
+        array2 = %i(delta epsilon zeta)
+        expect( settings.groups_conflict? array1, array2 ).to be_falsy
+      end
+    end
+  end
+
+  describe "#with" do
+    it "returns all with keys" do
+      settings.set_with %i(beta gamma), :config => :local
+      settings.set_with %i(delta alpha)
+      expect(settings.with).to include(:alpha, :beta, :gamma, :delta)
+    end
+
+    it "overrides all other without groups" do
+      settings.set_without %i(beta gamma), :config => :local
+      settings.set_with %i(delta beta)
+      expect(settings.with).to include(:beta)
+    end
+  end
+
+  describe "#without" do
+    it "returns all with keys" do
+      settings.set_without %i(beta gamma), :config => :local
+      settings.set_without %i(delta alpha)
+      expect(settings.without).to include(:alpha, :beta, :gamma, :delta)
+    end
+
+    it "overrides all other with groups" do
+      settings.set_with %i(beta gamma), :config => :local
+      settings.set_without %i(delta beta)
+      expect(settings.without).to include(:beta)
+    end
+  end
+
+  describe "#set_with" do
+    it "allows setting any config" do
+      settings.set_with %i(beta gamma), :config => :local
+      expect(settings.locations(:with)).to have_key(:local)
+    end
+
+    context "when same level groups conflict" do
+      it "raises an error" do
+        settings.set_without %i(beta gamma), :config => :local
+        expect{settings.set_with(%i(delta beta), :config => :local)}.to raise_error ArgumentError
+      end
+    end
+  end
+
+  describe "#set_without" do
+    it "allows setting any config" do
+      settings.set_without %i(beta gamma), :config => :local
+      expect(settings.locations(:without)).to have_key(:local)
+    end
+
+    context "when same level groups conflict" do
+      it "raises an error" do
+        settings.set_with %i(beta gamma), :config => :local
+        expect{settings.set_without(%i(delta beta), :config => :local)}.to raise_error ArgumentError
+      end
+    end
+  end
+
 end
