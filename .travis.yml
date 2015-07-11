@@ -1,23 +1,10 @@
 language: ruby
-script: rake spec:travis
+
+sudo: 9000
+
 before_script: travis_retry rake spec:travis:deps
 
-branches:
-  only:
-    - master
-    - /.+-stable$/
-
-notifications:
-  email:
-    # andre
-    - secure: "bCcvqJT7YrBawtkXXwHhT+jOFth7r2Qv/30PkkbhQxk6Jb3xambjCOJ3U6vJ\ngYmiL50exi5lUp3oc3SEbHN5t2CrZqOZDQ6o7P8EAmB5c0oH2RrYaFOkI5Gt\nul/jGH/96A9sj0aMwG7JfdMSfhqj1DUKAm2PnnbXPL853VfmT24="
-    # terence
-    - secure: "MQ8eA5Jb8YzEpAo58DRGfVJklAPcEbAulpBZnTxp0am6ldneDtJHbQk21w6R\nj5GsDHlzr/lMp/GHIimtUZ7rLohfND8fj/W7fs1Dkd4eN02/ERt98x3pHlqv\nvZgSnZ39uVYv+OcphraE24QaRaGWLhWZAMYQTVe/Yz50NyG8g1U="
-  slack:
-    on_success: change
-    on_failure: always
-    rooms:
-      - secure: JxBi7DDJGkIF/7f/FSN/HUHpvV4EKfQccZHTPd1b2pNJn3GXo6u+tNVbAw2WjxYzPyPQI3ZcYBCU9SEXp/i7VmG8uMzh8Kyildw+miSKYKVb90uYqcsXWzbxwyNBgJLvyDkzST45H5lgnyAicee3WkFes/WDZikIajbH7ztdb04=
+script: rake spec:travis
 
 rvm:
   - 2.2
@@ -101,3 +88,20 @@ matrix:
     - rvm: ruby-head
     - rvm: jruby
     - rvm: rbx-2
+
+branches:
+  only:
+    - master
+    - /.+-stable$/
+
+notifications:
+  email:
+    # andre
+    - secure: "bCcvqJT7YrBawtkXXwHhT+jOFth7r2Qv/30PkkbhQxk6Jb3xambjCOJ3U6vJ\ngYmiL50exi5lUp3oc3SEbHN5t2CrZqOZDQ6o7P8EAmB5c0oH2RrYaFOkI5Gt\nul/jGH/96A9sj0aMwG7JfdMSfhqj1DUKAm2PnnbXPL853VfmT24="
+    # terence
+    - secure: "MQ8eA5Jb8YzEpAo58DRGfVJklAPcEbAulpBZnTxp0am6ldneDtJHbQk21w6R\nj5GsDHlzr/lMp/GHIimtUZ7rLohfND8fj/W7fs1Dkd4eN02/ERt98x3pHlqv\nvZgSnZ39uVYv+OcphraE24QaRaGWLhWZAMYQTVe/Yz50NyG8g1U="
+  slack:
+    on_success: change
+    on_failure: always
+    rooms:
+      - secure: JxBi7DDJGkIF/7f/FSN/HUHpvV4EKfQccZHTPd1b2pNJn3GXo6u+tNVbAw2WjxYzPyPQI3ZcYBCU9SEXp/i7VmG8uMzh8Kyildw+miSKYKVb90uYqcsXWzbxwyNBgJLvyDkzST45H5lgnyAicee3WkFes/WDZikIajbH7ztdb04=
