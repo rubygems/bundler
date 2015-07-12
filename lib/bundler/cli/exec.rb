@@ -1,3 +1,5 @@
+require 'bundler/current_ruby'
+
 module Bundler
   class CLI::Exec
     attr_reader :options, :args, :cmd
@@ -7,7 +9,7 @@ module Bundler
       @cmd = args.shift
       @args = args
 
-      if RUBY_VERSION >= "2.0"
+      if Bundler.current_ruby.ruby_2?
         @args << { :close_others => !options.keep_file_descriptors? }
       elsif options.keep_file_descriptors?
         Bundler.ui.warn "Ruby version #{RUBY_VERSION} defaults to keeping non-standard file descriptors on Kernel#exec."

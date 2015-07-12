@@ -27,6 +27,10 @@ module Bundler
       RUBY_VERSION =~ /^2\.2/
     end
 
+    def on_2?
+      on_20? || on_21? || on_22?
+    end
+
     def ruby?
       !mswin? && (!defined?(RUBY_ENGINE) || RUBY_ENGINE == "ruby" || RUBY_ENGINE == "rbx" || RUBY_ENGINE == "maglev")
     end
@@ -49,6 +53,10 @@ module Bundler
 
     def ruby_22?
       ruby? && on_22?
+    end
+
+    def ruby_2?
+      ruby? && on_2?
     end
 
     def mri?
