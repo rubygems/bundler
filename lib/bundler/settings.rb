@@ -222,6 +222,10 @@ module Bundler
       end
     end
 
+    def global_cache_path
+      "~/.bundle/cache"
+    end
+
   private
 
     def key_for(key)

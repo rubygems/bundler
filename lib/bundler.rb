@@ -234,6 +234,10 @@ module Bundler
       path.join(self.settings.app_cache_path)
     end
 
+    def global_cache
+      Pathname.new(File.expand_path(self.settings.global_cache_path))
+    end
+
     def tmp(name = Process.pid.to_s)
       Pathname.new(Dir.mktmpdir(["bundler", name]))
     end

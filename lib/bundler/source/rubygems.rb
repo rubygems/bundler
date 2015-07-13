@@ -21,6 +21,7 @@ module Bundler
         @allow_remote = false
         @allow_cached = false
         @caches = [Bundler.app_cache, *Bundler.rubygems.gem_cache]
+        @global_caches = [Bundler.global_cache]
 
         Array(options["remotes"] || []).reverse_each {|r| add_remote(r) }
       end
@@ -123,6 +124,7 @@ module Bundler
           Bundler.ui.confirm message
 
           path = cached_gem(spec)
+
           if Bundler.requires_sudo?
             install_path = Bundler.tmp(spec.full_name)
             bin_path     = install_path.join("bin")
@@ -182,6 +184,21 @@ module Bundler
         return if File.dirname(cached_path) == Bundler.app_cache.to_s
         Bundler.ui.info "  * #{File.basename(cached_path)}"
         FileUtils.cp(cached_path, Bundler.app_cache(custom_path))
+      rescue Errno::EACCES => e
+        Bundler.ui.debug(e)
+        raise InstallError, e.message
+      end
+
+      def global_cache(spec, custom_path = nil)
+        if builtin_gem?(spec)
+          cached_path = cached_built_in_gem(spec)
+        else
+          cached_path = cached_gem(spec)
+        end
+        raise GemNotFound, "Missing gem file '#{spec.full_name}.gem'." unless cached_path
+        return if File.dirname(cached_path) == Bundler.global_cache.to_s
+        Bundler.ui.info "  * #{File.basename(cached_path)}"
+        FileUtils.cp(cached_path, Bundler.global_cache)
       rescue Errno::EACCES => e
         Bundler.ui.debug(e)
         raise InstallError, e.message
@@ -252,6 +269,11 @@ module Bundler
           raise Bundler::GemNotFound, "Could not find #{spec.file_name} for installation"
         end
         cached_gem
+      end
+
+      def global_cached_path(spec)
+        possibilities = @global_caches.map {|p| "#{p}/#{spec.file_name}" }
+        possibilities.find {|p| File.exist?(p) }
       end
 
       def cached_path(spec)

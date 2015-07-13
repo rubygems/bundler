@@ -2,6 +2,44 @@ require "spec_helper"
 
 describe "bundle install with gem sources" do
   describe "the simple case" do
+    it "creates the global cache directory" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", "1.0"
+      G
+
+      bundle :install
+      expect(global_cache).to exist
+    end
+
+    it "copies gemspecs to the global cache" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", "1.0"
+      G
+
+      bundle :install
+      expect(global_cached_gem("rack-1.0.0")).to exist
+    end
+
+    it "does not erase gemspecs from the global cache" do
+      # TODO: When, if ever, should gemspecs be erased from the global cache?
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", "1.0"
+      G
+
+      bundle :install
+      expect(global_cached_gem("rack-1.0.0")).to exist
+
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+      G
+
+      bundle :install
+      expect(global_cached_gem("rack-1.0.0")).to exist
+    end
+
     it "prints output and returns if no dependencies are specified" do
       gemfile <<-G
         source "file://#{gem_repo1}"
