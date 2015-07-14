@@ -157,8 +157,10 @@ describe "bundle install --standalone" do
       expect(err).to eq("ZOMG LOAD ERROR")
     end
 
-    it "allows --path to change the location of the standalone bundle" do
-      bundle "install --standalone --path path/to/bundle"
+    it "allows bundle config path to change the location of the standalone bundle" do
+      # NOTE: This spec fails if we don't specify a scope or if we use --global.
+      bundle "config --local path path/to/bundle"
+      bundle "install --standalone"
 
       ruby <<-RUBY, :no_lib => true, :expect_err => false
         $:.unshift File.expand_path("path/to/bundle")

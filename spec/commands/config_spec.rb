@@ -11,7 +11,8 @@ describe ".bundle/config" do
   describe "BUNDLE_APP_CONFIG" do
     it "can be moved with an environment variable" do
       ENV["BUNDLE_APP_CONFIG"] = tmp("foo/bar").to_s
-      bundle "install --path vendor/bundle"
+      bundle "config path vendor/bundle"
+      bundle "install"
 
       expect(bundled_app(".bundle")).not_to exist
       expect(tmp("foo/bar/config")).to exist
@@ -23,7 +24,8 @@ describe ".bundle/config" do
       Dir.chdir bundled_app("omg")
 
       ENV["BUNDLE_APP_CONFIG"] = "../foo"
-      bundle "install --path vendor/bundle"
+      bundle "config path vendor/bundle"
+      bundle "install"
 
       expect(bundled_app(".bundle")).not_to exist
       expect(bundled_app("../foo/config")).to exist

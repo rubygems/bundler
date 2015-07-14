@@ -1139,7 +1139,8 @@ describe "the lockfile format" do
       gem "omg", :git => "#{lib_path("omg")}", :branch => 'master'
     G
 
-    bundle "install --path vendor"
+    bundle "config path vendor"
+    bundle "install"
     should_be_installed "omg 1.0"
 
     # Create a gems.locked that has duplicate GIT sections

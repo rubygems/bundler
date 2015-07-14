@@ -248,23 +248,29 @@ describe "bundle install with gem sources" do
           source "file://#{gem_repo1}"
           gem "rack"
         G
+        bundle "config path vendor"
       end
 
       it "works" do
-        bundle "install --path vendor"
+        bundle "install"
         should_be_installed "rack 1.0"
       end
 
+      # NOTE: This interface (`install; config --delete path; install --system`)
+      # is a bit clunky.
+      # (Just using `install; install --system` produces an error.)
       it "allows running bundle install --system without deleting foo" do
-        bundle "install --path vendor"
+        bundle "install"
+        bundle "config --delete path"
         bundle "install --system"
         FileUtils.rm_rf(bundled_app("vendor"))
         should_be_installed "rack 1.0"
       end
 
       it "allows running bundle install --system after deleting foo" do
-        bundle "install --path vendor"
+        bundle "install"
         FileUtils.rm_rf(bundled_app("vendor"))
+        bundle "config --delete path"
         bundle "install --system"
         should_be_installed "rack 1.0"
       end
@@ -384,6 +390,18 @@ describe "bundle install with gem sources" do
       bundle "install --cache"
 
       expect(err).to include("Please use `bundle cache` instead")
+    end
+  end
+
+  describe "when using the --path flag" do
+    it "print an error and exit" do
+      gemfile <<-G
+        gem 'rack'
+      G
+
+      bundle "install --path vendor/bundle"
+
+      expect(err).to include("Please use `bundle config path")
     end
   end
 end

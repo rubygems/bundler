@@ -25,7 +25,8 @@ describe "Bundler.with_env helpers" do
 
     it "should keep the original GEM_PATH even in sub processes" do
       gemfile ""
-      bundle "install --path vendor/bundle"
+      bundle "config path vendor/bundle"
+      bundle "install"
 
       code = "Bundler.with_clean_env do;" \
              "  print ENV['GEM_PATH'] != '';" \

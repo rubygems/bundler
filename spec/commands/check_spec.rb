@@ -228,25 +228,26 @@ describe "bundle check" do
     expect(exitstatus).not_to eq(0) if exitstatus
   end
 
-  context "--path" do
+  context "bundle config path" do
     before do
       gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rails"
       G
-      bundle "install --path vendor/bundle"
+      bundle "config path vendor/bundle"
+      bundle "install"
 
       FileUtils.rm_rf(bundled_app(".bundle"))
     end
 
     it "returns success" do
-      bundle "check --path vendor/bundle"
+      bundle "check"
       expect(exitstatus).to eq(0) if exitstatus
       expect(out).to include("gems.rb's dependencies are satisfied")
     end
 
     it "should write to .bundle/config" do
-      bundle "check --path vendor/bundle"
+      bundle "check"
       bundle "check"
       expect(exitstatus).to eq(0) if exitstatus
     end
