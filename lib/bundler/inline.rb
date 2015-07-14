@@ -44,6 +44,7 @@ def gemfile(install = false, &gemfile)
 
   if install
     Bundler.ui = Bundler::UI::Shell.new
+    definition.resolve_remotely!
     Bundler::Installer.install(Bundler.root, definition, :system => true)
     Bundler::Installer.post_install_messages.each do |name, message|
       Bundler.ui.info "Post-install message from #{name}:\n#{message}"
