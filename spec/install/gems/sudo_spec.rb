@@ -10,7 +10,7 @@ describe "when using sudo", :sudo => true do
       end
 
       it "installs" do
-        install_gemfile <<-G
+        install_gemfile <<-G, :system => true
           source "file://#{gem_repo1}"
           gem "rack"
         G
@@ -28,7 +28,7 @@ describe "when using sudo", :sudo => true do
     end
 
     it "installs" do
-      install_gemfile <<-G
+      install_gemfile <<-G, :system => true
         source "file://#{gem_repo1}"
         gem "rack", '1.0'
         gem "thin"
@@ -45,7 +45,7 @@ describe "when using sudo", :sudo => true do
           gem "rake"
           gem "another_implicit_rake_dep"
       G
-      bundle "install"
+      bundle "install --system"
       expect(system_gem_path("gems/another_implicit_rake_dep-1.0")).to exist
     end
 
@@ -53,7 +53,6 @@ describe "when using sudo", :sudo => true do
     it "installs when BUNDLE_PATH is owned by root" do
       bundle_path = tmp("owned_by_root")
       FileUtils.mkdir_p bundle_path
-      sudo "chown -R root #{bundle_path}"
 
       ENV['BUNDLE_PATH'] = bundle_path.to_s
       install_gemfile <<-G
@@ -61,8 +60,10 @@ describe "when using sudo", :sudo => true do
         gem "rack", '1.0'
       G
 
-      expect(bundle_path.join("gems/rack-1.0.0")).to exist
-      expect(bundle_path.join("gems/rack-1.0.0").stat.uid).to eq(0)
+      sudo "chown -R root #{bundle_path}"
+
+      expect(bundle_path.join("#{Bundler.ruby_scope}/gems/rack-1.0.0")).to exist
+      expect(bundle_path.join("#{Bundler.ruby_scope}/gems/rack-1.0.0").stat.uid).to eq(0)
       should_be_installed "rack 1.0"
     end
 
@@ -77,14 +78,15 @@ describe "when using sudo", :sudo => true do
         source "file://#{gem_repo1}"
         gem "rack", '1.0'
       G
+      sudo "chown -R root #{bundle_path}"
 
-      expect(bundle_path.join("gems/rack-1.0.0")).to exist
-      expect(bundle_path.join("gems/rack-1.0.0").stat.uid).to eq(0)
+      expect(bundle_path.join("#{Bundler.ruby_scope}/gems/rack-1.0.0")).to exist
+      expect(bundle_path.join("#{Bundler.ruby_scope}/gems/rack-1.0.0").stat.uid).to eq(0)
       should_be_installed "rack 1.0"
     end
 
     it "installs extensions/ compiled by Rubygems 2.2", :rubygems => "2.2" do
-      install_gemfile <<-G
+      install_gemfile <<-G, :system => true
         source "file://#{gem_repo1}"
         gem "very_simple_binary"
       G
@@ -137,7 +139,7 @@ describe "when using sudo", :sudo => true do
         gem "rack", '1.0'
       G
 
-      bundle :install, :env => {'GEM_HOME' => gem_home.to_s, 'GEM_PATH' => nil}
+      bundle :install, :env => {'GEM_HOME' => gem_home.to_s, 'GEM_PATH' => nil}, :system => true
       expect(gem_home.join('bin/rackup')).to exist
       should_be_installed "rack 1.0", :env => {'GEM_HOME' => gem_home.to_s, 'GEM_PATH' => nil}
     end

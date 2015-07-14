@@ -82,8 +82,8 @@ module Bundler
         options[:system] = true
       end
 
-      Bundler.settings[:path]     = nil if options[:system]
-      Bundler.settings[:path]     = "vendor/bundle" if options[:deployment]
+      Bundler.settings[:path]     = Bundler.rubygems.gem_dir if options[:system]
+      Bundler.settings[:path]     = "#{Bundler.settings.path}/vendor/bundle" if options[:deployment]
       Bundler.settings[:path]     = options["path"] if options["path"]
       Bundler.settings[:path]     ||= "bundle" if options["standalone"]
       Bundler.settings[:shebang]  = options["shebang"] if options["shebang"]

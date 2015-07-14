@@ -540,7 +540,7 @@ G
 
   context "bundle show" do
     before do
-      install_gemfile <<-G
+      install_gemfile <<-G, :system => true
         source "file://#{gem_repo1}"
         gem "rails"
       G
@@ -555,7 +555,7 @@ G
       G
 
       bundle "show rails"
-      expect(out).to eq(default_bundle_path('gems', 'rails-2.3.2').to_s)
+      expect(out).to eq(system_gem_path('gems', 'rails-2.3.2').to_s)
     end
 
     it "prints path if ruby version is correct for any engine" do
@@ -568,7 +568,13 @@ G
         G
 
         bundle "show rails"
-        expect(out).to eq(default_bundle_path('gems', 'rails-2.3.2').to_s)
+        # Previously, gems had been installed to the system gem path,
+        # since `bundle install` (see the `before` block above) used
+        # the system gem path by default.
+
+        # Also, the default_bundle_path used to be the system gem path,
+        # so we now expect the system_gem_path below.
+        expect(out).to eq(system_gem_path('gems', 'rails-2.3.2').to_s)
       end
     end
 
@@ -868,7 +874,7 @@ G
 
   context "bundle console" do
     before do
-      install_gemfile <<-G
+      install_gemfile <<-G, :system => true
         source "file://#{gem_repo1}"
         gem "rack"
         gem "activesupport", :group => :test
@@ -1104,7 +1110,7 @@ G
         build_git "foo", :path => lib_path("foo")
       end
 
-      install_gemfile <<-G
+      install_gemfile <<-G, :system => true
         source "file://#{gem_repo2}"
         gem "activesupport", "2.3.5"
         gem "foo", :git => "#{lib_path('foo')}"
