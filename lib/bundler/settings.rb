@@ -125,17 +125,41 @@ module Bundler
       set_array(:with, array)
     end
 
-    def without
-      get_array(:without)
+    def without(scope = nil)
+      # $stderr.puts "[settings.rb] [#without] @global_config.inspect is #{@global_config.inspect}"
+      # $stderr.puts "[settings.rb] [#without] @local_config.inspect is #{@local_config.inspect}"
+
+      key = key_for(:without)
+      if scope.nil?
+        get_array(:without)
+      elsif scope == :global
+        @global_config[key] ? @global_config[key].split(" ").map(&:to_sym) : []
+      elsif scope == :local
+        @local_config[key] ? @local_config[key].split(" ").map(&:to_sym) : []
+      end
     end
 
-    def with
-      get_array(:with)
+    def with(scope = nil)
+      # $stderr.puts "[settings.rb] [#with] @global_config.inspect is #{@global_config.inspect}"
+      # $stderr.puts "[settings.rb] [#with] @local_config.inspect is #{@local_config.inspect}"
+
+      key = key_for(:with)
+      if scope.nil?
+        get_array(:with)
+      elsif scope == :global
+        @global_config[key] ? @global_config[key].split(" ").map(&:to_sym) : []
+      elsif scope == :local
+        @local_config[key] ? @local_config[key].split(" ").map(&:to_sym) : []
+      end
+    end
+
+    def with_without_conflict
+      with(:local) & without(:local) or with(:global) & without(:global)
     end
 
     # @local_config["BUNDLE_PATH"] should be prioritized over ENV["BUNDLE_PATH"]
     # Always returns an absolute path to the bundle directory
-    # TODO: Document and refactor this method
+    # TODO: Refactor this method
     def path
       key  = key_for(:path)
       path = ENV[key] || @global_config[key]

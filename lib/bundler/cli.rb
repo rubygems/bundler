@@ -276,6 +276,11 @@ module Bundler
       bundle exec you can require and call the bundled gems as if they were installed
       into the system wide Rubygems repository.
     D
+    method_option "local", :type => :boolean, :default => false, :banner =>
+     "Add the configuration locally"
+    method_option "global", :type => :boolean, :default => true, :banner =>
+     "Add the configuration globally"
+
     map "e" => "exec"
     def exec(*args)
       require "bundler/cli/exec"

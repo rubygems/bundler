@@ -489,8 +489,9 @@ describe "Bundler.setup" do
   end
 
   describe "when excluding groups" do
-    it "doesn't change the resolve if --without is used" do
-      install_gemfile <<-G, :without => :rails
+    it "doesn't change the resolve if `without` is used" do
+      bundle "config without rails"
+      install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "activesupport"
 
@@ -504,8 +505,9 @@ describe "Bundler.setup" do
       should_be_installed "activesupport 2.3.2", :groups => :default
     end
 
-    it "remembers --without and does not bail on bare Bundler.setup" do
-      install_gemfile <<-G, :without => :rails
+    it "remembers configured `without` and does not bail on bare Bundler.setup" do
+      bundle "config without rails"
+      install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "activesupport"
 
@@ -519,8 +521,9 @@ describe "Bundler.setup" do
       should_be_installed "activesupport 2.3.2"
     end
 
-    it "remembers --without and does not include groups passed to Bundler.setup" do
-      install_gemfile <<-G, :without => :rails
+    it "remembers configured `without` and does not include groups passed to Bundler.setup" do
+      bundle "config without rails"
+      install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "activesupport"
 

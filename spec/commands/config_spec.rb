@@ -368,3 +368,126 @@ describe "setting a global install path" do
     end
   end
 end
+
+describe "setting `with` and `without` options" do
+  context "when `with` has already been set" do
+    context "and `without` is set to conflict" do
+      it "prints a message" do
+        bundle "config with foo"
+        bundle "config without foo"
+
+        expect(out).to include("already set `with foo`, so it will be unset.")
+        expect(Bundler.settings.with).to eq([])
+      end
+    end
+  end
+
+  context "when `without` has already been set" do
+    context "and `with` is set to conflict" do
+      it "prints a message" do
+        bundle "config without foo"
+        bundle "config with foo"
+        expect(out).to include("already set `without foo`, so it will be unset.")
+
+        expect(Bundler.settings.without).to eq([])
+      end
+    end
+  end
+
+  context "with scopes" do
+    context "when `with` has been set locally" do
+      before(:each) { bundle "config --local with foo" }
+
+      context "and `without` is set locally to conflict" do
+        it "prints a message" do
+          bundle "config without foo --local"
+
+          # expect(out).to include("already set `with foo --local`, so it will be unset.")
+          expect(Bundler.settings.with).to eq([])
+        end
+      end
+
+      context "and `without` is set globally to conflict" do
+        it "does not print a message" do
+          bundle "config --global without foo"
+
+          # expect(out).not_to include("already set `with foo --local`, so it will be unset.")
+          expect(Bundler.settings.with).not_to eq([])
+        end
+      end
+    end
+
+    context "when `with` has been set globally" do
+      before(:each) { bundle "config with foo --global" }
+
+      context "and `without` is set locally to conflict" do
+        it "does not print a message" do
+          bundle "config without foo --local"
+
+          # expect(out).not_to include("already set `with foo --global`, so it will be unset.")
+          expect(Bundler.settings.with).not_to eq([])
+        end
+      end
+
+      context "and `without` is set globally to conflict" do
+        it "prints a message" do
+          bundle "config without foo --global"
+
+          # expect(out).to include("already set `with foo --global`, so it will be unset.")
+          expect(Bundler.settings.with).to eq([])
+        end
+      end
+    end
+
+    context "when `without` has been set locally" do
+      before(:each) { bundle "config without foo --local" }
+
+      context "and `with` is set locally to conflict" do
+        it "prints a message" do
+          bundle "config with foo --local"
+
+          # expect(out).to include("already set `without foo --local`, so it will be unset.")
+          expect(Bundler.settings.without).to eq([])
+        end
+      end
+
+      context "and `with` is set globally to conflict" do
+        it "does not print a message" do
+          bundle "config with foo --global"
+
+          # expect(out).not_to include("already set `without foo --local`, so it will be unset.")
+          expect(Bundler.settings.without).not_to eq([])
+        end
+      end
+    end
+
+    context "when `without` has been set globally" do
+      before(:each) { bundle "config without foo --global" }
+
+      context "and `with` is set locally to conflict" do
+        it "does not print a message" do
+          bundle "config with foo --local"
+
+          # expect(out).not_to include("already set `without foo --global`, so it will be unset.")
+          expect(Bundler.settings.without).not_to eq([])
+        end
+      end
+
+      context "and `with` is set globally to conflict" do
+        it "prints a message" do
+          bundle "config with foo --global"
+
+          # expect(out).to include("already set `without foo --global`, so it will be unset.")
+          expect(Bundler.settings.without).to eq([])
+        end
+      end
+    end
+  end
+
+  # TODO: Write specs like the above but for with / without commands with multiple groups, and vary
+  # the order of the arguments
+
+  # TODO: Write specs that check flag order independence (`bundle config --local without foo` should be
+  # equivalent to `bundle config without --local foo` and `bundle config without foo --local`, and, in
+  # theory, something like `bundle config without foo bar baz --local qux`, albeit a bit awkward.
+end

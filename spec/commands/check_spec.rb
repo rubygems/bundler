@@ -92,7 +92,7 @@ describe "bundle check" do
     expect(err).to include("Bundler can't satisfy your gems.rb's dependencies.")
   end
 
-  it "remembers --without option from install" do
+  it "remembers without option from config" do
     gemfile <<-G
       source "file://#{gem_repo1}"
       group :foo do
@@ -100,7 +100,8 @@ describe "bundle check" do
       end
     G
 
-    bundle "install --without foo"
+    bundle "config without foo"
+    bundle "install"
     bundle "check"
     expect(exitstatus).to eq(0) if exitstatus
     expect(out).to include("gems.rb's dependencies are satisfied")
@@ -112,7 +113,8 @@ describe "bundle check" do
       gem "rack", :group => :foo
     G
 
-    bundle "install --without foo"
+    bundle "config without foo"
+    bundle "install"
 
     gemfile <<-G
       source "file://#{gem_repo1}"
