@@ -90,6 +90,7 @@ namespace :spec do
     deps = Hash[BUNDLER_SPEC.development_dependencies.map do |d|
       [d.name, d.requirement.to_s]
     end]
+    deps["rubocop"] ||= ">= 0.32.1" if RUBY_VERSION >= "1.9.3" # can't go in the gemspec because of the ruby version requirement
 
     # JRuby can't build ronn or rdiscount, so we skip that
     if defined?(RUBY_ENGINE) && RUBY_ENGINE == "jruby"
@@ -272,6 +273,10 @@ begin
 rescue LoadError
   task :spec do
     abort "Run `rake spec:deps` to be able to run the specs"
+  end
+
+  task :rubocop do
+    abort "Run `rake spec:deps` to be able to run rubocop"
   end
 end
 
