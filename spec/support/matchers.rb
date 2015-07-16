@@ -74,14 +74,14 @@ module Spec
     end
 
     def should_be_locked
-      expect(bundled_app("Gemfile.lock")).to exist
+      expect(bundled_app("gems.locked")).to exist
     end
 
     def lockfile_should_be(expected)
       should_be_locked
       spaces = expected[/\A\s+/, 0] || ""
       expected.gsub!(/^#{spaces}/, "")
-      expect(bundled_app("Gemfile.lock").read).to eq(expected)
+      expect(bundled_app("gems.locked").read).to eq(expected)
     end
   end
 end

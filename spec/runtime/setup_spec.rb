@@ -141,7 +141,7 @@ describe "Bundler.setup" do
       Bundler.setup
     R
 
-    expect(bundled_app("Gemfile.lock")).not_to exist
+    expect(bundled_app("gems.locked")).not_to exist
   end
 
   it "doesn't change the Gemfile.lock if the setup fails" do
@@ -150,7 +150,7 @@ describe "Bundler.setup" do
       gem "rack"
     G
 
-    lockfile = File.read(bundled_app("Gemfile.lock"))
+    lockfile = File.read(bundled_app("gems.locked"))
 
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -165,7 +165,7 @@ describe "Bundler.setup" do
       Bundler.setup
     R
 
-    expect(File.read(bundled_app("Gemfile.lock"))).to eq(lockfile)
+    expect(File.read(bundled_app("gems.locked"))).to eq(lockfile)
   end
 
   it "makes a Gemfile.lock if setup succeeds" do
@@ -174,12 +174,12 @@ describe "Bundler.setup" do
       gem "rack"
     G
 
-    File.read(bundled_app("Gemfile.lock"))
+    File.read(bundled_app("gems.locked"))
 
-    FileUtils.rm(bundled_app("Gemfile.lock"))
+    FileUtils.rm(bundled_app("gems.locked"))
 
     run "1"
-    expect(bundled_app("Gemfile.lock")).to exist
+    expect(bundled_app("gems.locked")).to exist
   end
 
   it "uses BUNDLE_GEMFILE to locate the gemfile if present" do
@@ -355,7 +355,7 @@ describe "Bundler.setup" do
     it "provides a good exception if the lockfile is unavailable" do
       bundle "install"
 
-      FileUtils.rm(bundled_app("Gemfile.lock"))
+      FileUtils.rm(bundled_app("gems.locked"))
 
       break_git!
 
@@ -707,7 +707,7 @@ describe "Bundler.setup" do
       G
 
       Dir.chdir(bundled_app.parent) do
-        run <<-R, :env => { "BUNDLE_GEMFILE" => bundled_app("Gemfile") }
+        run <<-R, :env => { "BUNDLE_GEMFILE" => bundled_app("gems.rb") }
           require 'foo'
         R
       end
@@ -731,7 +731,7 @@ describe "Bundler.setup" do
       bundle :install
 
       Dir.chdir(bundled_app.parent) do
-        run <<-R, :env => { "BUNDLE_GEMFILE" => bundled_app("Gemfile") }
+        run <<-R, :env => { "BUNDLE_GEMFILE" => bundled_app("gems.rb") }
           require 'foo'
         R
       end

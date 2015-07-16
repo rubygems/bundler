@@ -472,11 +472,11 @@ describe "bundle clean" do
     bundle "install --path vendor/bundle"
 
     # mimic 7 length git revisions in Gemfile.lock
-    gemfile_lock = File.read(bundled_app("Gemfile.lock")).split("\n")
+    gemfile_lock = File.read(bundled_app('gems.locked')).split("\n")
     gemfile_lock.each_with_index do |line, index|
       gemfile_lock[index] = line[0..(11 + 7)] if line.include?("  revision:")
     end
-    File.open(bundled_app("Gemfile.lock"), "w") do |file|
+    File.open(bundled_app('gems.locked'), 'w') do |file|
       file.print gemfile_lock.join("\n")
     end
 

@@ -6,9 +6,12 @@ module Bundler
     end
 
     def run
-      if File.exist?("Gemfile")
-        Bundler.ui.error "Gemfile already exists at #{SharedHelpers.pwd}/Gemfile"
-        exit 1
+
+      ["gems.rb", "Gemfile"].each do |f|
+        if File.exist?(f)
+          Bundler.ui.error "#{f} already exists at #{Dir.pwd}/#{f}"
+          exit 1
+        end
       end
 
       if options[:gemspec]
@@ -18,14 +21,15 @@ module Bundler
           exit 1
         end
         spec = Gem::Specification.load(gemspec)
-        puts "Writing new Gemfile to #{SharedHelpers.pwd}/Gemfile"
-        File.open("Gemfile", "wb") do |file|
+        puts "Writing new gems.rb to #{Dir.pwd}/gems.rb"
+
+        File.open('gems.rb', 'wb') do |file|
           file << "# Generated from #{gemspec}\n"
           file << spec.to_gemfile
         end
       else
-        puts "Writing new Gemfile to #{SharedHelpers.pwd}/Gemfile"
-        FileUtils.cp(File.expand_path("../../templates/Gemfile", __FILE__), "Gemfile")
+        puts "Writing new gems.rb to #{Dir.pwd}/gems.rb"
+        FileUtils.cp(File.expand_path('../../templates/gems.rb', __FILE__), 'gems.rb')
       end
     end
   end

@@ -5,7 +5,7 @@ describe "bundle lock" do
     strip_whitespace(lockfile).sub(/\n\Z/, "")
   end
 
-  def read_lockfile(file = "Gemfile.lock")
+  def read_lockfile(file = "gems.locked")
     strip_lockfile bundled_app(file).read
   end
 

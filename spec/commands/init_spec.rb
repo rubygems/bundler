@@ -3,7 +3,7 @@ require "spec_helper"
 describe "bundle init" do
   it "generates a Gemfile" do
     bundle :init
-    expect(bundled_app("Gemfile")).to exist
+    expect(bundled_app("gems.rb")).to exist
   end
 
   it "does not change existing Gemfiles" do
@@ -13,7 +13,7 @@ describe "bundle init" do
 
     expect {
       bundle :init
-    }.not_to change { File.read(bundled_app("Gemfile")) }
+    }.not_to change { File.read(bundled_app("gems.rb")) }
   end
 
   it "should generate from an existing gemspec" do
@@ -30,7 +30,7 @@ describe "bundle init" do
 
     bundle :init, :gemspec => spec_file
 
-    gemfile = bundled_app("Gemfile").read
+    gemfile = bundled_app("gems.rb").read
     expect(gemfile).to match(%r{source 'https://rubygems.org'})
     expect(gemfile.scan(/gem "rack", "= 1.0.1"/).size).to eq(1)
     expect(gemfile.scan(/gem "rspec", "= 1.2"/).size).to eq(1)

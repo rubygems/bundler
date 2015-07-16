@@ -69,7 +69,7 @@ describe "bundle cache" do
 
       bundle "cache"
 
-      expect(bundled_app("Gemfile.lock")).to exist
+      expect(bundled_app("gems.locked")).to exist
     end
   end
 
@@ -152,11 +152,11 @@ describe "bundle cache" do
     end
 
     it "should not explode if the lockfile is not present" do
-      FileUtils.rm(bundled_app("Gemfile.lock"))
+      FileUtils.rm(bundled_app("gems.locked"))
 
       bundle :cache
 
-      expect(bundled_app("Gemfile.lock")).to exist
+      expect(bundled_app("gems.locked")).to exist
     end
   end
 

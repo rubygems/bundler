@@ -29,7 +29,7 @@ describe "bundle update" do
         exit!
       G
       bundle "update"
-      expect(bundled_app("Gemfile.lock")).to exist
+      expect(bundled_app("gems.locked")).to exist
     end
   end
 

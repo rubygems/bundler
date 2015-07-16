@@ -239,7 +239,7 @@ G
         #{ruby_version_correct}
       G
 
-      expect(bundled_app("Gemfile.lock")).to exist
+      expect(bundled_app("gems.locked")).to exist
     end
 
     it "installs fine with any engine" do
@@ -251,7 +251,7 @@ G
           #{ruby_version_correct_engineless}
         G
 
-        expect(bundled_app("Gemfile.lock")).to exist
+        expect(bundled_app("gems.locked")).to exist
       end
     end
 
@@ -263,7 +263,7 @@ G
         #{ruby_version_correct_patchlevel}
       G
 
-      expect(bundled_app("Gemfile.lock")).to exist
+      expect(bundled_app("gems.locked")).to exist
     end
 
     it "doesn't install when the ruby version doesn't match" do
@@ -274,7 +274,7 @@ G
         #{ruby_version_incorrect}
       G
 
-      expect(bundled_app("Gemfile.lock")).not_to exist
+      expect(bundled_app("gems.locked")).not_to exist
       should_be_ruby_version_incorrect
     end
 
@@ -286,7 +286,7 @@ G
         #{engine_incorrect}
       G
 
-      expect(bundled_app("Gemfile.lock")).not_to exist
+      expect(bundled_app("gems.locked")).not_to exist
       should_be_engine_incorrect
     end
 
@@ -299,7 +299,7 @@ G
           #{engine_version_incorrect}
         G
 
-        expect(bundled_app("Gemfile.lock")).not_to exist
+        expect(bundled_app("gems.locked")).not_to exist
         should_be_engine_version_incorrect
       end
     end
@@ -312,7 +312,7 @@ G
         #{patchlevel_incorrect}
       G
 
-      expect(bundled_app("Gemfile.lock")).not_to exist
+      expect(bundled_app("gems.locked")).not_to exist
       should_be_patchlevel_incorrect
     end
   end
@@ -997,10 +997,10 @@ G
         #{ruby_version_correct}
       G
 
-      FileUtils.rm(bundled_app("Gemfile.lock"))
+      FileUtils.rm(bundled_app("gems.locked"))
 
       run "1"
-      expect(bundled_app("Gemfile.lock")).to exist
+      expect(bundled_app("gems.locked")).to exist
     end
 
     it "makes a Gemfile.lock if setup succeeds for any engine" do
@@ -1013,10 +1013,10 @@ G
           #{ruby_version_correct_engineless}
         G
 
-        FileUtils.rm(bundled_app("Gemfile.lock"))
+        FileUtils.rm(bundled_app("gems.locked"))
 
         run "1"
-        expect(bundled_app("Gemfile.lock")).to exist
+        expect(bundled_app("gems.locked")).to exist
       end
     end
 
@@ -1029,14 +1029,14 @@ G
         #{ruby_version_incorrect}
       G
 
-      FileUtils.rm(bundled_app("Gemfile.lock"))
+      FileUtils.rm(bundled_app("gems.locked"))
 
       ruby <<-R
         require 'rubygems'
         require 'bundler/setup'
       R
 
-      expect(bundled_app("Gemfile.lock")).not_to exist
+      expect(bundled_app("gems.locked")).not_to exist
       should_be_ruby_version_incorrect
     end
 
@@ -1049,14 +1049,14 @@ G
         #{engine_incorrect}
       G
 
-      FileUtils.rm(bundled_app("Gemfile.lock"))
+      FileUtils.rm(bundled_app("gems.locked"))
 
       ruby <<-R
         require 'rubygems'
         require 'bundler/setup'
       R
 
-      expect(bundled_app("Gemfile.lock")).not_to exist
+      expect(bundled_app("gems.locked")).not_to exist
       should_be_engine_incorrect
     end
 
@@ -1070,14 +1070,14 @@ G
           #{engine_version_incorrect}
         G
 
-        FileUtils.rm(bundled_app("Gemfile.lock"))
+        FileUtils.rm(bundled_app("gems.locked"))
 
         ruby <<-R
           require 'rubygems'
           require 'bundler/setup'
         R
 
-        expect(bundled_app("Gemfile.lock")).not_to exist
+        expect(bundled_app("gems.locked")).not_to exist
         should_be_engine_version_incorrect
       end
     end
@@ -1092,14 +1092,14 @@ G
       G
       should_be_patchlevel_incorrect
 
-      FileUtils.rm(bundled_app("Gemfile.lock"))
+      FileUtils.rm(bundled_app("gems.locked"))
 
       ruby <<-R
         require 'rubygems'
         require 'bundler/setup'
       R
 
-      expect(bundled_app("Gemfile.lock")).not_to exist
+      expect(bundled_app("gems.locked")).not_to exist
       should_be_patchlevel_incorrect
     end
   end

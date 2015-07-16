@@ -231,7 +231,7 @@ describe "bundle flex_install" do
     it "does something" do
       expect {
         bundle "install"
-      }.not_to change { File.read(bundled_app("Gemfile.lock")) }
+      }.not_to change { File.read(bundled_app('gems.locked')) }
 
       expect(err).to include("rack = 0.9.1")
       expect(err).to include("locked at 1.0.0")

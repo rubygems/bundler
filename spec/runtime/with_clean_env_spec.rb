@@ -15,7 +15,7 @@ describe "Bundler.with_env helpers" do
 
   around do |example|
     env = Bundler::ORIGINAL_ENV.dup
-    Bundler::ORIGINAL_ENV["BUNDLE_PATH"] = "./Gemfile"
+    Bundler::ORIGINAL_ENV["BUNDLE_PATH"] = "./gems.rb"
     example.run
     Bundler::ORIGINAL_ENV.replace env
   end
@@ -37,7 +37,7 @@ describe "Bundler.with_env helpers" do
 
     it "should not pass any bundler environment variables" do
       Bundler.with_clean_env do
-        expect(`echo $BUNDLE_PATH`.strip).not_to eq("./Gemfile")
+        expect(`echo $BUNDLE_PATH`.strip).not_to eq("./gems.rb")
       end
     end
 
@@ -54,7 +54,7 @@ describe "Bundler.with_env helpers" do
     end
 
     it "should not change ORIGINAL_ENV" do
-      expect(Bundler::ORIGINAL_ENV["BUNDLE_PATH"]).to eq("./Gemfile")
+      expect(Bundler::ORIGINAL_ENV['BUNDLE_PATH']).to eq("./gems.rb")
     end
   end
 
@@ -63,7 +63,7 @@ describe "Bundler.with_env helpers" do
 
     it "should pass bundler environment variables set before Bundler was run" do
       Bundler.with_original_env do
-        expect(`echo $BUNDLE_PATH`.strip).to eq("./Gemfile")
+        expect(`echo $BUNDLE_PATH`.strip).to eq("./gems.rb")
       end
     end
   end

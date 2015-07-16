@@ -8,7 +8,7 @@ describe "bundle install from an existing gemspec" do
 
   it "should install runtime and development dependencies" do
     build_lib("foo", :path => tmp.join("foo")) do |s|
-      s.write("Gemfile", "source :rubygems\ngemspec")
+      s.write("gems.rb", "source :rubygems\ngemspec")
       s.add_dependency "bar", "=1.0.0"
       s.add_development_dependency "bar-dev", "=1.0.0"
     end
@@ -23,7 +23,7 @@ describe "bundle install from an existing gemspec" do
 
   it "that is hidden should install runtime and development dependencies" do
     build_lib("foo", :path => tmp.join("foo")) do |s|
-      s.write("Gemfile", "source :rubygems\ngemspec")
+      s.write("gems.rb", "source :rubygems\ngemspec")
       s.add_dependency "bar", "=1.0.0"
       s.add_development_dependency "bar-dev", "=1.0.0"
     end
@@ -43,7 +43,7 @@ describe "bundle install from an existing gemspec" do
     build_gem "baz", "1.1", :to_system => true
 
     build_lib("foo", :path => tmp.join("foo")) do |s|
-      s.write("Gemfile", "source :rubygems\ngemspec")
+      s.write("gems.rb", "source :rubygems\ngemspec")
       s.add_dependency "baz", ">= 1.0", "< 1.1"
     end
     install_gemfile <<-G
@@ -111,7 +111,7 @@ describe "bundle install from an existing gemspec" do
 
   it "should match a lockfile even if the gemspec defines development dependencies" do
     build_lib("foo", :path => tmp.join("foo")) do |s|
-      s.write("Gemfile", "source 'file://#{gem_repo1}'\ngemspec")
+      s.write("gems.rb", "source 'file://#{gem_repo1}'\ngemspec")
       s.add_dependency "actionpack", "=2.3.2"
       s.add_development_dependency "rake", "=10.0.2"
     end
