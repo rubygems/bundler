@@ -29,7 +29,7 @@ describe "install with --deployment or --frozen" do
     bundle "install"
     Dir.chdir tmp
     simulate_new_machine
-    bundle "install --gemfile #{tmp}/bundled_app/Gemfile --deployment"
+    bundle "install --gemfile #{tmp}/bundled_app/gems.rb --deployment"
     Dir.chdir bundled_app
     should_be_installed "rack 1.0"
   end
