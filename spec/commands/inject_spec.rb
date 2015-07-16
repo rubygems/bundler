@@ -10,9 +10,9 @@ describe "bundle inject" do
 
   context "without a lockfile" do
     it "locks with the injected gems" do
-      expect(bundled_app("Gemfile.lock")).not_to exist
+      expect(bundled_app("gems.locked")).not_to exist
       bundle "inject 'rack-obama' '> 0'"
-      expect(bundled_app("Gemfile.lock").read).to match(/rack-obama/)
+      expect(bundled_app("gems.locked").read).to match(/rack-obama/)
     end
   end
 
@@ -22,15 +22,15 @@ describe "bundle inject" do
     end
 
     it "adds the injected gems to the Gemfile" do
-      expect(bundled_app("Gemfile").read).not_to match(/rack-obama/)
+      expect(bundled_app("gems.rb").read).not_to match(/rack-obama/)
       bundle "inject 'rack-obama' '> 0'"
-      expect(bundled_app("Gemfile").read).to match(/rack-obama/)
+      expect(bundled_app("gems.rb").read).to match(/rack-obama/)
     end
 
     it "locks with the injected gems" do
-      expect(bundled_app("Gemfile.lock").read).not_to match(/rack-obama/)
+      expect(bundled_app("gems.locked").read).not_to match(/rack-obama/)
       bundle "inject 'rack-obama' '> 0'"
-      expect(bundled_app("Gemfile.lock").read).to match(/rack-obama/)
+      expect(bundled_app("gems.locked").read).to match(/rack-obama/)
     end
   end
 
@@ -49,13 +49,13 @@ describe "bundle inject" do
 
     it "injects anyway" do
       bundle "inject 'rack-obama' '> 0'"
-      expect(bundled_app("Gemfile").read).to match(/rack-obama/)
+      expect(bundled_app("gems.rb").read).to match(/rack-obama/)
     end
 
     it "locks with the injected gems" do
-      expect(bundled_app("Gemfile.lock").read).not_to match(/rack-obama/)
+      expect(bundled_app("gems.locked").read).not_to match(/rack-obama/)
       bundle "inject 'rack-obama' '> 0'"
-      expect(bundled_app("Gemfile.lock").read).to match(/rack-obama/)
+      expect(bundled_app("gems.locked").read).to match(/rack-obama/)
     end
 
     it "restores frozen afterwards" do
@@ -72,7 +72,7 @@ describe "bundle inject" do
       bundle "inject 'rack' '> 0'"
       expect(err).to match(/trying to install in deployment mode after changing/)
 
-      expect(bundled_app("Gemfile.lock").read).not_to match(/rack-obama/)
+      expect(bundled_app("gems.locked").read).not_to match(/rack-obama/)
     end
   end
 end

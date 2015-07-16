@@ -145,11 +145,11 @@ module Spec
     end
 
     def gemfile(*args)
-      create_file("Gemfile", *args)
+      create_file("gems.rb", *args)
     end
 
     def lockfile(*args)
-      create_file("Gemfile.lock", *args)
+      create_file("gems.locked", *args)
     end
 
     def strip_whitespace(str)

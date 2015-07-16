@@ -51,7 +51,7 @@ describe "bundle install with git sources" do
       update_git "foo"
 
       in_app_root2 do
-        install_gemfile bundled_app2("Gemfile"), <<-G
+        install_gemfile bundled_app2("gems.rb"), <<-G
           git "#{lib_path('foo-1.0')}" do
             gem 'foo'
           end
@@ -99,7 +99,7 @@ describe "bundle install with git sources" do
       update_git "foo", "1.1", :path => lib_path("foo-1.0")
 
       Dir.chdir tmp('bundled_app.bck')
-      gemfile tmp('bundled_app.bck/Gemfile'), <<-G
+      gemfile tmp('bundled_app.bck/gems.rb'), <<-G
         source "file://#{gem_repo1}"
         git "#{lib_path('foo-1.0')}" do
           gem 'foo'
@@ -224,7 +224,7 @@ describe "bundle install with git sources" do
         gem "rack", :git => "#{lib_path('rack-0.8')}", :branch => "master"
       G
 
-      lockfile0 = File.read(bundled_app("Gemfile.lock"))
+      lockfile0 = File.read(bundled_app("gems.locked"))
 
       FileUtils.cp_r("#{lib_path('rack-0.8')}/.", lib_path('local-rack'))
       update_git "rack", "0.8", :path => lib_path('local-rack') do |s|
@@ -234,7 +234,7 @@ describe "bundle install with git sources" do
       bundle %|config local.rack #{lib_path('local-rack')}|
       run "require 'rack'"
 
-      lockfile1 = File.read(bundled_app("Gemfile.lock"))
+      lockfile1 = File.read(bundled_app("gems.locked"))
       expect(lockfile1).not_to eq(lockfile0)
     end
 
@@ -246,7 +246,7 @@ describe "bundle install with git sources" do
         gem "rack", :git => "#{lib_path('rack-0.8')}", :branch => "master"
       G
 
-      lockfile0 = File.read(bundled_app("Gemfile.lock"))
+      lockfile0 = File.read(bundled_app("gems.locked"))
 
       FileUtils.cp_r("#{lib_path('rack-0.8')}/.", lib_path('local-rack'))
       update_git "rack", "0.8", :path => lib_path('local-rack')
@@ -254,7 +254,7 @@ describe "bundle install with git sources" do
       bundle %|config local.rack #{lib_path('local-rack')}|
       bundle :install
 
-      lockfile1 = File.read(bundled_app("Gemfile.lock"))
+      lockfile1 = File.read(bundled_app("gems.locked"))
       expect(lockfile1).not_to eq(lockfile0)
     end
 
@@ -673,7 +673,7 @@ describe "bundle install with git sources" do
     G
 
     bundle "install"
-    expect(File.read(bundled_app("Gemfile.lock")).scan('GIT').size).to eq(1)
+    expect(File.read(bundled_app("gems.locked")).scan('GIT').size).to eq(1)
   end
 
   describe "switching sources" do
@@ -733,8 +733,8 @@ describe "bundle install with git sources" do
       update_git "valim"
       new_revision = revision_for(lib_path("valim-1.0"))
 
-      lockfile = File.read(bundled_app("Gemfile.lock"))
-      File.open(bundled_app("Gemfile.lock"), "w") do |file|
+      lockfile = File.read(bundled_app("gems.locked"))
+      File.open(bundled_app("gems.locked"), "w") do |file|
         file.puts lockfile.gsub(/revision: #{old_revision}/, "revision: #{new_revision}")
       end
 

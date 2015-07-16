@@ -43,7 +43,7 @@ module Bundler
       ensure_safe_gem_name(name, constant_array)
 
       templates = {
-        "Gemfile.tt" => "Gemfile",
+        "Gemfile.tt" => "gems.rb",
         "gitignore.tt" => ".gitignore",
         "lib/newgem.rb.tt" => "lib/#{namespaced_path}.rb",
         "lib/newgem/version.rb.tt" => "lib/#{namespaced_path}/version.rb",

@@ -33,7 +33,7 @@ module Bundler
           N.B. bundle_roles must be defined before you require 'bundler/#{context_name}' \
           in your deploy.rb file.
 
-            set :bundle_gemfile,  "Gemfile"
+            set :bundle_gemfile,  "gems.rb"
             set :bundle_dir,      File.join(fetch(:shared_path), 'bundle')
             set :bundle_flags,    "--deployment --quiet"
             set :bundle_without,  [:development, :test]
@@ -45,7 +45,7 @@ module Bundler
           bundle_cmd     = context.fetch(:bundle_cmd, "bundle")
           bundle_flags   = context.fetch(:bundle_flags, "--deployment --quiet")
           bundle_dir     = context.fetch(:bundle_dir, File.join(context.fetch(:shared_path), 'bundle'))
-          bundle_gemfile = context.fetch(:bundle_gemfile, "Gemfile")
+          bundle_gemfile = context.fetch(:bundle_gemfile, "gems.rb")
           bundle_without = [*context.fetch(:bundle_without, [:development, :test])].compact
           bundle_with    = [*context.fetch(:bundle_with, [])].compact
           app_path = context.fetch(:latest_release)

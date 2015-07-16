@@ -10,19 +10,19 @@ describe "bundle show" do
     end
 
     it "creates a Gemfile.lock if one did not exist" do
-      FileUtils.rm("Gemfile.lock")
+      FileUtils.rm("gems.locked")
 
       bundle "show"
 
-      expect(bundled_app("Gemfile.lock")).to exist
+      expect(bundled_app("gems.locked")).to exist
     end
 
     it "creates a Gemfile.lock when invoked with a gem name" do
-      FileUtils.rm("Gemfile.lock")
+      FileUtils.rm("gems.locked")
 
       bundle "show rails"
 
-      expect(bundled_app("Gemfile.lock")).to exist
+      expect(bundled_app("gems.locked")).to exist
     end
 
     it "prints path if gem exists in bundle" do
@@ -115,7 +115,7 @@ describe "bundle show" do
     before :each do
       build_git "foo", :path => lib_path("foo")
       in_app_root_custom lib_path("foo")
-      File.open('Gemfile', 'w') {|f| f.puts "gemspec" }
+      File.open('gems.rb', 'w') {|f| f.puts "gemspec" }
       sys_exec 'rm -rf .git && git init'
     end
 

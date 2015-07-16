@@ -19,7 +19,7 @@ describe "bundle check" do
     G
 
     Dir.chdir tmp
-    bundle "check --gemfile bundled_app/Gemfile"
+    bundle "check --gemfile bundled_app/gems.rb"
     expect(out).to include("The Gemfile's dependencies are satisfied")
   end
 
@@ -29,11 +29,11 @@ describe "bundle check" do
       gem "rails"
     G
 
-    FileUtils.rm("Gemfile.lock")
+    FileUtils.rm("gems.locked")
 
     bundle "check"
 
-    expect(bundled_app("Gemfile.lock")).to exist
+    expect(bundled_app("gems.locked")).to exist
   end
 
   it "does not create a Gemfile.lock if --dry-run was passed" do
@@ -42,11 +42,11 @@ describe "bundle check" do
       gem "rails"
     G
 
-    FileUtils.rm("Gemfile.lock")
+    FileUtils.rm("gems.locked")
 
     bundle "check --dry-run"
 
-    expect(bundled_app("Gemfile.lock")).not_to exist
+    expect(bundled_app("gems.locked")).not_to exist
   end
 
   it "prints a generic error if the missing gems are unresolvable" do
@@ -222,7 +222,7 @@ describe "bundle check" do
 
     bundle "install"
     bundle "install --deployment"
-    FileUtils.rm(bundled_app("Gemfile.lock"))
+    FileUtils.rm(bundled_app("gems.locked"))
 
     bundle :check
     expect(exitstatus).not_to eq(0) if exitstatus
