@@ -30,7 +30,7 @@ module Bundler
 
     def _populate_relations
       parent_dependencies = _groups.values.to_set.flatten
-      while true
+      loop do
         if parent_dependencies.empty?
           break
         else

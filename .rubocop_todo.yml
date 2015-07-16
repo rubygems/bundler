@@ -13,10 +13,6 @@ Lint/Eval:
 Lint/HandleExceptions:
   Enabled: false
 
-# Offense count: 2
-Lint/LiteralInCondition:
-  Enabled: false
-
 # Offense count: 1
 Lint/Loop:
   Enabled: false
