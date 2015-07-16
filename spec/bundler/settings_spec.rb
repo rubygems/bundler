@@ -15,24 +15,6 @@ describe Bundler::Settings do
     end
   end
 
-  describe "#[]=" do
-    if Bundler::VERSION.split(".")[0].to_i >= 2
-      context "when on Bundler 2.0" do
-        it "should not write to local config file" do
-          settings[:foo] = :bar
-          expect(settings.locations(:foo)[:local]).to be_nil
-        end
-      end
-    else
-      context "when not on Bundler 2.0" do
-        it "should not write to local config file" do
-          settings[:foo] = :bar
-          expect(settings.locations(:foo)[:local]).to eq(:bar)
-        end
-      end
-    end
-  end
-
   describe "#[]" do
     context "when not set" do
       context "when default value present" do
