@@ -154,6 +154,9 @@ end
     end
 
     it "does not display warning message if cache_all is set in bundle config" do
+      # bundle "config all true" # Fails -- we need to use cache_all instead
+      bundle "config cache_all true"
+
       build_git "foo"
 
       install_gemfile <<-G

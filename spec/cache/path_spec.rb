@@ -80,7 +80,7 @@ require "spec_helper"
       expect(bundled_app("vendor/cache/foo-1.0")).not_to exist
     end
 
-    it "stores the given flag" do
+    it "does not store the given flag" do
       build_lib "foo"
 
       install_gemfile <<-G
@@ -96,7 +96,7 @@ require "spec_helper"
       G
 
       bundle cmd
-      expect(bundled_app("vendor/cache/bar-1.0")).to exist
+      expect(bundled_app("vendor/cache/bar-1.0")).not_to exist
     end
 
     it "can rewind chosen configuration" do
