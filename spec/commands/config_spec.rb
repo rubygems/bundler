@@ -192,7 +192,7 @@ describe ".bundle/config" do
 
       run "puts Bundler.settings['foo.bar']"
       expect(out).to eq("baz")
-     end
+    end
   end
 
   describe "gem mirrors" do
