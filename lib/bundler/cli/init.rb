@@ -7,7 +7,7 @@ module Bundler
 
     def run
 
-      ["gems.rb", "Gemfile"].each do |f|
+      %w(gems.rb Gemfile).each do |f|
         if File.exist?(f)
           Bundler.ui.error "#{f} already exists at #{Dir.pwd}/#{f}"
           exit 1
