@@ -33,7 +33,8 @@ module Bundler
     # remembered arguments.
     # See https://trello.com/c/yGsPNDpg
     def []=(key, value)
-      @use_current ||= (Bundler::VERSION.split(".")[0].to_i >= 2)
+      @use_current ||= Bundler.settings[:use_current] ||
+                       (Bundler::VERSION.split(".")[0].to_i >= 2)
       if @use_current
         set_current(key, value)
       else
