@@ -19,13 +19,13 @@ module Bundler
         end
         spec = Gem::Specification.load(gemspec)
         puts "Writing new Gemfile to #{SharedHelpers.pwd}/Gemfile"
-        File.open('Gemfile', 'wb') do |file|
+        File.open("Gemfile", "wb") do |file|
           file << "# Generated from #{gemspec}\n"
           file << spec.to_gemfile
         end
       else
         puts "Writing new Gemfile to #{SharedHelpers.pwd}/Gemfile"
-        FileUtils.cp(File.expand_path('../../templates/Gemfile', __FILE__), 'Gemfile')
+        FileUtils.cp(File.expand_path("../../templates/Gemfile", __FILE__), "Gemfile")
       end
     end
   end

@@ -28,6 +28,9 @@ Style/SignalException:
 Style/StringLiterals:
   EnforcedStyle: double_quotes
 
+Style/StringLiteralsInInterpolation:
+  EnforcedStyle: double_quotes
+
 # Having these make it easier to *not* forget to add one when adding a new
 # value and you can simply copy the previous line.
 Style/TrailingComma:

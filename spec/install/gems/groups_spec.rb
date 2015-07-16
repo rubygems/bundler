@@ -20,7 +20,7 @@ describe "bundle install with groups" do
     it "installs gems in a group block into that group" do
       should_be_installed "activesupport 2.3.5"
 
-      load_error_run <<-R, 'activesupport', :default
+      load_error_run <<-R, "activesupport", :default
         require 'activesupport'
         puts ACTIVESUPPORT
       R
@@ -31,7 +31,7 @@ describe "bundle install with groups" do
     it "installs gems with inline :groups into those groups" do
       should_be_installed "thin 1.0"
 
-      load_error_run <<-R, 'thin', :default
+      load_error_run <<-R, "thin", :default
         require 'thin'
         puts THIN
       R
@@ -41,17 +41,17 @@ describe "bundle install with groups" do
 
     it "sets up everything if Bundler.setup is used with no groups" do
       output = run("require 'rack'; puts RACK")
-      expect(output).to eq('1.0.0')
+      expect(output).to eq("1.0.0")
 
       output = run("require 'activesupport'; puts ACTIVESUPPORT")
-      expect(output).to eq('2.3.5')
+      expect(output).to eq("2.3.5")
 
       output = run("require 'thin'; puts THIN")
-      expect(output).to eq('1.0')
+      expect(output).to eq("1.0")
     end
 
     it "removes old groups when new groups are set up" do
-      load_error_run <<-RUBY, 'thin', :emo
+      load_error_run <<-RUBY, "thin", :emo
         Bundler.setup(:default)
         require 'thin'
         puts THIN
@@ -66,7 +66,7 @@ describe "bundle install with groups" do
         Bundler.setup(:default, :emo)
         require 'thin'; puts THIN
       RUBY
-      expect(output).to eq('1.0')
+      expect(output).to eq("1.0")
     end
   end
 
@@ -110,7 +110,7 @@ describe "bundle install with groups" do
       it "allows Bundler.setup for specific groups" do
         bundle :install, :without => "emo"
         run("require 'rack'; puts RACK", :default)
-        expect(out).to eq('1.0.0')
+        expect(out).to eq("1.0.0")
       end
 
       it "does not effect the resolve" do

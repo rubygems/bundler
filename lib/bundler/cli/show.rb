@@ -1,4 +1,4 @@
-require 'bundler/cli/common'
+require "bundler/cli/common"
 
 module Bundler
   class CLI::Show
@@ -40,10 +40,10 @@ module Bundler
           desc = "  * #{s.name} (#{s.version}#{s.git_version})"
           if @verbose
             latest = latest_specs.find { |l| l.name == s.name }
-            Bundler.ui.info <<-END.gsub(/^ +/, '')
+            Bundler.ui.info <<-END.gsub(/^ +/, "")
               #{desc}
-              \tSummary:  #{s.summary || 'No description available.'}
-              \tHomepage: #{s.homepage || 'No website available.'}
+              \tSummary:  #{s.summary || "No description available."}
+              \tHomepage: #{s.homepage || "No website available."}
               \tStatus:   #{outdated?(s, latest) ? "Outdated - #{s.version} < #{latest.version}" : "Up to date"}
             END
           else

@@ -27,7 +27,7 @@ describe "bundle install with gem sources" do
       spec.dependencies.each do |d|
         d.instance_variable_set(:@type, :fail)
       end
-      File.open(path, 'w') do |f|
+      File.open(path, "w") do |f|
         f.write Gem.deflate(Marshal.dump(spec))
       end
 

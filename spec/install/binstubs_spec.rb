@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe "bundle install" do
   describe "when system_bindir is set" do
@@ -13,7 +13,7 @@ describe "bundle install" do
         gem "rack"
       G
 
-      config "BUNDLE_SYSTEM_BINDIR" => system_gem_path('altbin').to_s
+      config "BUNDLE_SYSTEM_BINDIR" => system_gem_path("altbin").to_s
       bundle :install
       should_be_installed "rack 1.0.0"
       expect(system_gem_path("altbin/rackup")).to exist

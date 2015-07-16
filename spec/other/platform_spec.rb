@@ -239,7 +239,7 @@ G
         #{ruby_version_correct}
       G
 
-      expect(bundled_app('Gemfile.lock')).to exist
+      expect(bundled_app("Gemfile.lock")).to exist
     end
 
     it "installs fine with any engine" do
@@ -251,7 +251,7 @@ G
           #{ruby_version_correct_engineless}
         G
 
-        expect(bundled_app('Gemfile.lock')).to exist
+        expect(bundled_app("Gemfile.lock")).to exist
       end
     end
 
@@ -263,7 +263,7 @@ G
         #{ruby_version_correct_patchlevel}
       G
 
-      expect(bundled_app('Gemfile.lock')).to exist
+      expect(bundled_app("Gemfile.lock")).to exist
     end
 
     it "doesn't install when the ruby version doesn't match" do
@@ -274,7 +274,7 @@ G
         #{ruby_version_incorrect}
       G
 
-      expect(bundled_app('Gemfile.lock')).not_to exist
+      expect(bundled_app("Gemfile.lock")).not_to exist
       should_be_ruby_version_incorrect
     end
 
@@ -286,7 +286,7 @@ G
         #{engine_incorrect}
       G
 
-      expect(bundled_app('Gemfile.lock')).not_to exist
+      expect(bundled_app("Gemfile.lock")).not_to exist
       should_be_engine_incorrect
     end
 
@@ -299,7 +299,7 @@ G
           #{engine_version_incorrect}
         G
 
-        expect(bundled_app('Gemfile.lock')).not_to exist
+        expect(bundled_app("Gemfile.lock")).not_to exist
         should_be_engine_version_incorrect
       end
     end
@@ -312,7 +312,7 @@ G
         #{patchlevel_incorrect}
       G
 
-      expect(bundled_app('Gemfile.lock')).not_to exist
+      expect(bundled_app("Gemfile.lock")).not_to exist
       should_be_patchlevel_incorrect
     end
   end
@@ -555,7 +555,7 @@ G
       G
 
       bundle "show rails"
-      expect(out).to eq(default_bundle_path('gems', 'rails-2.3.2').to_s)
+      expect(out).to eq(default_bundle_path("gems", "rails-2.3.2").to_s)
     end
 
     it "prints path if ruby version is correct for any engine" do
@@ -568,7 +568,7 @@ G
         G
 
         bundle "show rails"
-        expect(out).to eq(default_bundle_path('gems', 'rails-2.3.2').to_s)
+        expect(out).to eq(default_bundle_path("gems", "rails-2.3.2").to_s)
       end
     end
 
@@ -979,7 +979,7 @@ G
         gem "rack", :group => :test
       G
 
-      ENV['BUNDLER_FORCE_TTY'] = "true"
+      ENV["BUNDLER_FORCE_TTY"] = "true"
     end
 
     it "makes a Gemfile.lock if setup succeeds" do
@@ -1106,7 +1106,7 @@ G
       install_gemfile <<-G
         source "file://#{gem_repo2}"
         gem "activesupport", "2.3.5"
-        gem "foo", :git => "#{lib_path('foo')}"
+        gem "foo", :git => "#{lib_path("foo")}"
       G
     end
 
@@ -1119,7 +1119,7 @@ G
       gemfile <<-G
         source "file://#{gem_repo2}"
         gem "activesupport", "2.3.5"
-        gem "foo", :git => "#{lib_path('foo')}"
+        gem "foo", :git => "#{lib_path("foo")}"
 
         #{ruby_version_correct}
       G
@@ -1139,7 +1139,7 @@ G
         gemfile <<-G
           source "file://#{gem_repo2}"
           gem "activesupport", "2.3.5"
-          gem "foo", :git => "#{lib_path('foo')}"
+          gem "foo", :git => "#{lib_path("foo")}"
 
           #{ruby_version_correct_engineless}
         G
@@ -1159,7 +1159,7 @@ G
       gemfile <<-G
         source "file://#{gem_repo2}"
         gem "activesupport", "2.3.5"
-        gem "foo", :git => "#{lib_path('foo')}"
+        gem "foo", :git => "#{lib_path("foo")}"
 
         #{ruby_version_incorrect}
       G
@@ -1177,7 +1177,7 @@ G
       gemfile <<-G
         source "file://#{gem_repo2}"
         gem "activesupport", "2.3.5"
-        gem "foo", :git => "#{lib_path('foo')}"
+        gem "foo", :git => "#{lib_path("foo")}"
 
         #{engine_incorrect}
       G
@@ -1196,7 +1196,7 @@ G
         gemfile <<-G
           source "file://#{gem_repo2}"
           gem "activesupport", "2.3.5"
-          gem "foo", :git => "#{lib_path('foo')}"
+          gem "foo", :git => "#{lib_path("foo")}"
 
           #{engine_version_incorrect}
         G
@@ -1216,7 +1216,7 @@ G
         gemfile <<-G
           source "file://#{gem_repo2}"
           gem "activesupport", "2.3.5"
-          gem "foo", :git => "#{lib_path('foo')}"
+          gem "foo", :git => "#{lib_path("foo")}"
 
           #{patchlevel_incorrect}
         G
@@ -1236,7 +1236,7 @@ G
         gemfile <<-G
           source "file://#{gem_repo2}"
           gem "activesupport", "2.3.5"
-          gem "foo", :git => "#{lib_path('foo')}"
+          gem "foo", :git => "#{lib_path("foo")}"
 
           #{patchlevel_fixnum}
         G

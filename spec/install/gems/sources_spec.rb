@@ -322,7 +322,7 @@ describe "bundle install with gems on multiple sources" do
 
         gemfile <<-G
           gem "rack", :source => "file://#{gem_repo1}"
-          gem "foo", :path => "#{lib_path('foo-1.0')}"
+          gem "foo", :path => "#{lib_path("foo-1.0")}"
         G
       end
 

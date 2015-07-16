@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe "bundle install" do
   describe "when prerelease gems are available" do

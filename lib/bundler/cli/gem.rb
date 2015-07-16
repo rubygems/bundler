@@ -1,4 +1,4 @@
-require 'pathname'
+require "pathname"
 
 module Bundler
   class CLI::Gem
@@ -18,11 +18,11 @@ module Bundler
     def run
       Bundler.ui.confirm "Creating gem '#{name}'..."
 
-      underscored_name = name.tr('-', '_')
-      namespaced_path = name.tr('-', '/')
-      constant_name = name.gsub(/-[_-]*(?![_-]|$)/){ '::' }.gsub(/([_-]+|(::)|^)(.|$)/){ $2.to_s + $3.upcase }
-      constant_array = constant_name.split('::')
-      test_task = options[:test] == 'minitest' ? 'test' : 'spec'
+      underscored_name = name.tr("-", "_")
+      namespaced_path = name.tr("-", "/")
+      constant_name = name.gsub(/-[_-]*(?![_-]|$)/){ "::" }.gsub(/([_-]+|(::)|^)(.|$)/){ $2.to_s + $3.upcase }
+      constant_array = constant_name.split("::")
+      test_task = options[:test] == "minitest" ? "test" : "spec"
 
       git_user_name = `git config user.name`.chomp
       git_user_email = `git config user.email`.chomp
@@ -66,13 +66,13 @@ module Bundler
         templates.merge!(".travis.yml.tt" => ".travis.yml")
 
         case test_framework
-        when 'rspec'
+        when "rspec"
           templates.merge!(
             "rspec.tt" => ".rspec",
             "spec/spec_helper.rb.tt" => "spec/spec_helper.rb",
             "spec/newgem_spec.rb.tt" => "spec/#{namespaced_path}_spec.rb"
           )
-        when 'minitest'
+        when "minitest"
           templates.merge!(
             "test/test_helper.rb.tt" => "test/test_helper.rb",
             "test/newgem_test.rb.tt" => "test/#{namespaced_path}_test.rb"
@@ -150,7 +150,7 @@ module Bundler
     end
 
     def validate_ext_name
-      return unless gem_name.index('-')
+      return unless gem_name.index("-")
 
       Bundler.ui.error "You have specified a gem name which does not conform to the \n" \
                        "naming guidelines for C extensions. For more information, \n" \
@@ -183,7 +183,7 @@ module Bundler
     def bundler_dependency_version
       v = Gem::Version.new(Bundler::VERSION)
       req = v.segments[0..1]
-      req << 'a' if v.prerelease?
+      req << "a" if v.prerelease?
       req.join(".")
     end
 

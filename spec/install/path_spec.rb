@@ -42,10 +42,10 @@ describe "bundle install" do
 
     it "remembers to disable system gems after the first time with bundle --path vendor/bundle" do
       bundle "install --path vendor/bundle"
-      FileUtils.rm_rf bundled_app('vendor')
+      FileUtils.rm_rf bundled_app("vendor")
       bundle "install"
 
-      expect(vendored_gems('gems/rack-1.0.0')).to be_directory
+      expect(vendored_gems("gems/rack-1.0.0")).to be_directory
       should_be_installed "rack 1.0.0"
     end
   end
@@ -85,19 +85,19 @@ describe "bundle install" do
 
         bundle :install
 
-        expect(bundled_app('vendor/gems/rack-1.0.0')).to be_directory
+        expect(bundled_app("vendor/gems/rack-1.0.0")).to be_directory
         should_be_installed "rack 1.0.0"
       end
 
       it "installs gems to BUNDLE_PATH relative to root when relative" do
         set_bundle_path(type, "vendor")
 
-        FileUtils.mkdir_p bundled_app('lol')
-        Dir.chdir(bundled_app('lol')) do
+        FileUtils.mkdir_p bundled_app("lol")
+        Dir.chdir(bundled_app("lol")) do
           bundle :install
         end
 
-        expect(bundled_app('vendor/gems/rack-1.0.0')).to be_directory
+        expect(bundled_app("vendor/gems/rack-1.0.0")).to be_directory
         should_be_installed "rack 1.0.0"
       end
     end
@@ -107,14 +107,14 @@ describe "bundle install" do
 
       bundle :install
 
-      expect(vendored_gems('gems/rack-1.0.0')).to be_directory
+      expect(vendored_gems("gems/rack-1.0.0")).to be_directory
       should_be_installed "rack 1.0.0"
     end
 
     it "sets BUNDLE_PATH as the first argument to bundle install" do
       bundle "install --path ./vendor/bundle"
 
-      expect(vendored_gems('gems/rack-1.0.0')).to be_directory
+      expect(vendored_gems("gems/rack-1.0.0")).to be_directory
       should_be_installed "rack 1.0.0"
     end
 
@@ -123,7 +123,7 @@ describe "bundle install" do
       build_gem "rack", "1.1.0", :to_system => true
       bundle "install --path ./vendor/bundle"
 
-      expect(vendored_gems('gems/rack-1.0.0')).to be_directory
+      expect(vendored_gems("gems/rack-1.0.0")).to be_directory
       should_be_installed "rack 1.0.0"
     end
   end

@@ -79,9 +79,9 @@ module Bundler
           REQUIRE_ERRORS.find { |r| r =~ e.message }
           raise if dep.autorequire || $1 != required_file
 
-          if dep.autorequire.nil? && dep.name.include?('-')
+          if dep.autorequire.nil? && dep.name.include?("-")
             begin
-              namespaced_file = dep.name.gsub('-', '/')
+              namespaced_file = dep.name.gsub("-", "/")
               Kernel.require namespaced_file
             rescue LoadError => e
               REQUIRE_ERRORS.find { |r| r =~ e.message }
@@ -108,7 +108,7 @@ module Bundler
 
       Bundler.ui.info "Updating files in #{Bundler.settings.app_cache_path}"
       specs.each do |spec|
-        next if spec.name == 'bundler'
+        next if spec.name == "bundler"
         spec.source.send(:fetch_gem, spec) if Bundler.settings[:cache_all_platforms] && spec.source.respond_to?(:fetch_gem, true)
         spec.source.cache(spec, custom_path) if spec.source.respond_to?(:cache)
       end
@@ -168,8 +168,8 @@ module Bundler
       output = stale_gem_dirs.collect do |gem_dir|
         full_name = Pathname.new(gem_dir).basename.to_s
 
-        parts   = full_name.split('-')
-        name    = parts[0..-2].join('-')
+        parts   = full_name.split("-")
+        name    = parts[0..-2].join("-")
         version = parts.last
         output  = "#{name} (#{version})"
 
@@ -184,8 +184,8 @@ module Bundler
       end + stale_git_dirs.collect do |gem_dir|
         full_name = Pathname.new(gem_dir).basename.to_s
 
-        parts    = full_name.split('-')
-        name     = parts[0..-2].join('-')
+        parts    = full_name.split("-")
+        name     = parts[0..-2].join("-")
         revision = parts[-1]
         output   = "#{name} (#{revision})"
 
@@ -270,17 +270,17 @@ module Bundler
 
     def setup_manpath
       # Store original MANPATH for restoration later in with_clean_env()
-      ENV['BUNDLE_ORIG_MANPATH'] = ENV['MANPATH']
+      ENV["BUNDLE_ORIG_MANPATH"] = ENV["MANPATH"]
 
       # Add man/ subdirectories from activated bundles to MANPATH for man(1)
       manuals = $LOAD_PATH.map do |path|
-        man_subdir = path.sub(/lib$/, 'man')
-        man_subdir unless Dir[man_subdir + '/man?/'].empty?
+        man_subdir = path.sub(/lib$/, "man")
+        man_subdir unless Dir[man_subdir + "/man?/"].empty?
       end.compact
 
       unless manuals.empty?
-        ENV['MANPATH'] = manuals.concat(
-          ENV['MANPATH'].to_s.split(File::PATH_SEPARATOR)
+        ENV["MANPATH"] = manuals.concat(
+          ENV["MANPATH"].to_s.split(File::PATH_SEPARATOR)
         ).uniq.join(File::PATH_SEPARATOR)
       end
     end

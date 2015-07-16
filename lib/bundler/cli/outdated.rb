@@ -1,4 +1,4 @@
-require 'bundler/cli/common'
+require "bundler/cli/common"
 
 module Bundler
   class CLI::Outdated

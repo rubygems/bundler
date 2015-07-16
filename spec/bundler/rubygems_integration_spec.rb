@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Bundler::RubygemsIntegration do
   it "uses the same chdir lock as rubygems", :rubygems => "2.1" do

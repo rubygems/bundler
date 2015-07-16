@@ -5,4 +5,4 @@ bundler_spec.dependencies.each do |dep|
   gem dep.name, dep.requirement.to_s
 end
 
-load Gem.bin_path('rspec-core', 'rspec')
+load Gem.bin_path("rspec-core", "rspec")

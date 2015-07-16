@@ -1,5 +1,5 @@
-require 'tsort'
-require 'forwardable'
+require "tsort"
+require "forwardable"
 
 module Bundler
   class SpecSet
@@ -15,7 +15,7 @@ module Bundler
 
     def for(dependencies, skip = [], check = false, match_current_platform = false)
       handled, deps, specs = {}, dependencies.dup, []
-      skip << 'bundler'
+      skip << "bundler"
 
       until deps.empty?
         dep = deps.shift
@@ -44,7 +44,7 @@ module Bundler
         end
       end
 
-      if spec = lookup['bundler'].first
+      if spec = lookup["bundler"].first
         specs << spec
       end
 
@@ -108,7 +108,7 @@ module Bundler
   private
 
     def sorted
-      rake = @specs.find { |s| s.name == 'rake' }
+      rake = @specs.find { |s| s.name == "rake" }
       begin
         @sorted ||= ([rake] + tsort).compact.uniq
       rescue TSort::Cyclic => error
@@ -131,7 +131,7 @@ module Bundler
       @lookup ||= begin
         lookup = Hash.new { |h,k| h[k] = [] }
         specs = @specs.sort_by do |s|
-          s.platform.to_s == 'ruby' ? "\0" : s.platform.to_s
+          s.platform.to_s == "ruby" ? "\0" : s.platform.to_s
         end
         specs.reverse_each do |s|
           lookup[s.name] << s

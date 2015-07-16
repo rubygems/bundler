@@ -30,21 +30,21 @@ module Bundler
     end
 
     def self.ask_for_spec_from(specs)
-      if !$stdout.tty? && ENV['BUNDLE_SPEC_RUN'].nil?
+      if !$stdout.tty? && ENV["BUNDLE_SPEC_RUN"].nil?
         raise GemNotFound, gem_not_found_message(name, Bundler.definition.dependencies)
       end
 
       specs.each_with_index do |spec, index|
         Bundler.ui.info "#{index.succ} : #{spec.name}", true
       end
-      Bundler.ui.info '0 : - exit -', true
+      Bundler.ui.info "0 : - exit -", true
 
-      num = Bundler.ui.ask('> ').to_i
+      num = Bundler.ui.ask("> ").to_i
       num > 0 ? specs[num - 1] : nil
     end
 
     def self.gem_not_found_message(missing_gem_name, alternatives)
-      require 'bundler/similarity_detector'
+      require "bundler/similarity_detector"
       message = "Could not find gem '#{missing_gem_name}'."
       alternate_names = alternatives.map { |a| a.respond_to?(:name) ? a.name : a }
       suggestions = SimilarityDetector.new(alternate_names).similar_word_list(missing_gem_name)

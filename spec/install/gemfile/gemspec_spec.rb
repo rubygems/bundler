@@ -10,7 +10,7 @@ describe "bundle install from an existing gemspec" do
     build_lib("foo", :path => tmp.join("foo")) do |s|
       s.write("Gemfile", "source :rubygems\ngemspec")
       s.add_dependency "bar", "=1.0.0"
-      s.add_development_dependency "bar-dev", '=1.0.0'
+      s.add_development_dependency "bar-dev", "=1.0.0"
     end
     install_gemfile <<-G
       source "file://#{gem_repo2}"
@@ -25,9 +25,9 @@ describe "bundle install from an existing gemspec" do
     build_lib("foo", :path => tmp.join("foo")) do |s|
       s.write("Gemfile", "source :rubygems\ngemspec")
       s.add_dependency "bar", "=1.0.0"
-      s.add_development_dependency "bar-dev", '=1.0.0'
+      s.add_development_dependency "bar-dev", "=1.0.0"
     end
-    FileUtils.mv tmp.join('foo', 'foo.gemspec'), tmp.join('foo', '.gemspec')
+    FileUtils.mv tmp.join("foo", "foo.gemspec"), tmp.join("foo", ".gemspec")
 
     install_gemfile <<-G
       source "file://#{gem_repo2}"
@@ -80,7 +80,7 @@ describe "bundle install from an existing gemspec" do
     build_lib("foo", :path => tmp.join("foo")) do |s|
       s.write("foo2.gemspec", "")
       s.add_dependency "bar", "=1.0.0"
-      s.add_development_dependency "bar-dev", '=1.0.0'
+      s.add_development_dependency "bar-dev", "=1.0.0"
     end
 
     install_gemfile(<<-G, :expect_err => true)
@@ -96,7 +96,7 @@ describe "bundle install from an existing gemspec" do
     build_lib("foo", :path => tmp.join("foo")) do |s|
       s.write("foo2.gemspec", "")
       s.add_dependency "bar", "=1.0.0"
-      s.add_development_dependency "bar-dev", '=1.0.0'
+      s.add_development_dependency "bar-dev", "=1.0.0"
     end
 
     install_gemfile(<<-G, :expect_err => true)
@@ -113,7 +113,7 @@ describe "bundle install from an existing gemspec" do
     build_lib("foo", :path => tmp.join("foo")) do |s|
       s.write("Gemfile", "source 'file://#{gem_repo1}'\ngemspec")
       s.add_dependency "actionpack", "=2.3.2"
-      s.add_development_dependency "rake", '=10.0.2'
+      s.add_development_dependency "rake", "=10.0.2"
     end
 
     Dir.chdir(tmp.join("foo")) do

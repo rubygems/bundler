@@ -1,4 +1,4 @@
-require 'stringio'
+require "stringio"
 
 def capture(*streams)
   streams.map!(&:to_s)

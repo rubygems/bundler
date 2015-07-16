@@ -1,4 +1,4 @@
-require 'bundler/worker'
+require "bundler/worker"
 
 class ParallelInstaller
   class SpecInstallation

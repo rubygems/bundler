@@ -40,7 +40,7 @@ module Bundler
         send task_method, :install, opts do
           bundle_cmd     = context.fetch(:bundle_cmd, "bundle")
           bundle_flags   = context.fetch(:bundle_flags, "--deployment --quiet")
-          bundle_dir     = context.fetch(:bundle_dir, File.join(context.fetch(:shared_path), 'bundle'))
+          bundle_dir     = context.fetch(:bundle_dir, File.join(context.fetch(:shared_path), "bundle"))
           bundle_gemfile = context.fetch(:bundle_gemfile, "Gemfile")
           bundle_without = [*context.fetch(:bundle_without, [:development, :test])].compact
           bundle_with    = [*context.fetch(:bundle_with, [])].compact
@@ -54,7 +54,7 @@ module Bundler
           args << "--without #{bundle_without.join(" ")}" unless bundle_without.empty?
           args << "--with #{bundle_with.join(" ")}" unless bundle_with.empty?
 
-          run "cd #{app_path} && #{bundle_cmd} install #{args.join(' ')}"
+          run "cd #{app_path} && #{bundle_cmd} install #{args.join(" ")}"
         end
       end
     end

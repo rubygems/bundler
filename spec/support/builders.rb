@@ -1,9 +1,9 @@
-require 'bundler/shared_helpers'
+require "bundler/shared_helpers"
 
 module Spec
   module Builders
     def self.constantize(name)
-      name.gsub('-', '').upcase
+      name.gsub("-", "").upcase
     end
 
     def v(version)
@@ -285,8 +285,8 @@ module Spec
         build_gem "rack"
 
         build_gem "signed_gem" do |s|
-          cert = 'signing-cert.pem'
-          pkey = 'signing-pkey.pem'
+          cert = "signing-cert.pem"
+          pkey = "signing-pkey.pem"
           s.write cert, TEST_CERT
           s.write pkey, TEST_PKEY
           s.signing_key = pkey
@@ -446,8 +446,8 @@ module Spec
           s.description = "This is a completely fake gem, for testing purposes."
           s.author      = "no one"
           s.email       = "foo@bar.baz"
-          s.homepage    = 'http://example.com'
-          s.license     = 'MIT'
+          s.homepage    = "http://example.com"
+          s.license     = "MIT"
         end
         @files = {}
       end
@@ -470,7 +470,7 @@ module Spec
       end
 
       def add_c_extension
-        require_paths << 'ext'
+        require_paths << "ext"
         extensions << "ext/extconf.rb"
         write "ext/extconf.rb", <<-RUBY
           require "mkmf"
@@ -517,7 +517,7 @@ module Spec
         @files.each do |file, source|
           file = Pathname.new(path).join(file)
           FileUtils.mkdir_p(file.dirname)
-          File.open(file, 'w') { |f| f.puts source }
+          File.open(file, "w") { |f| f.puts source }
         end
         @spec.files = @files.keys
         path
@@ -528,7 +528,7 @@ module Spec
       end
 
       def _default_path
-        @context.tmp('libs', @spec.full_name)
+        @context.tmp("libs", @spec.full_name)
       end
     end
 
@@ -637,11 +637,11 @@ module Spec
       end
 
       def _default_path
-        @context.gem_repo1('gems')
+        @context.gem_repo1("gems")
       end
     end
 
-    TEST_CERT = <<-CERT.gsub(/^\s*/, '')
+    TEST_CERT = <<-CERT.gsub(/^\s*/, "")
       -----BEGIN CERTIFICATE-----
       MIIDMjCCAhqgAwIBAgIBATANBgkqhkiG9w0BAQUFADAnMQwwCgYDVQQDDAN5b3Ux
       FzAVBgoJkiaJk/IsZAEZFgdleGFtcGxlMB4XDTE1MDIwODAwMTIyM1oXDTQyMDYy
@@ -664,7 +664,7 @@ module Spec
       -----END CERTIFICATE-----
     CERT
 
-    TEST_PKEY = <<-PKEY.gsub(/^\s*/, '')
+    TEST_PKEY = <<-PKEY.gsub(/^\s*/, "")
       -----BEGIN RSA PRIVATE KEY-----
       MIIEowIBAAKCAQEA2W8V2k3jdzgMxL0mjTqbRruTdtDcdZDXKtiFkyLvsXUXvc2k
       GSdgcjMOS1CkafqGz/hAUlPibjM0QEXjtQuMdTmdMrmuORLeeIZhSO+HdkTNV6j3

@@ -78,7 +78,7 @@ describe "Resolving platform craziness" do
           dep "bar", ">= 0"
         end
 
-        gem 'bar', "1.0.0" do
+        gem "bar", "1.0.0" do
           dep "baz", "~> 1.0.0"
         end
 

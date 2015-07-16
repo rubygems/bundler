@@ -39,7 +39,7 @@ module Bundler
       options[:with]    = with
       options[:without] = without
 
-      ENV['RB_USER_INSTALL'] = '1' if Bundler::FREEBSD
+      ENV["RB_USER_INSTALL"] = "1" if Bundler::FREEBSD
 
       # Just disable color in deployment mode
       Bundler.ui.shell = Thor::Shell::Basic.new if options[:deployment]
@@ -53,7 +53,7 @@ module Bundler
       if (options["trust-policy"])
         unless (Bundler.rubygems.security_policies.keys.include?(options["trust-policy"]))
           Bundler.ui.error "Rubygems doesn't know about trust policy '#{options["trust-policy"]}'. " \
-            "The known policies are: #{Bundler.rubygems.security_policies.keys.join(', ')}."
+            "The known policies are: #{Bundler.rubygems.security_policies.keys.join(", ")}."
           exit 1
         end
         Bundler.settings["trust-policy"] = options["trust-policy"]
@@ -63,7 +63,7 @@ module Bundler
 
       if options[:deployment] || options[:frozen]
         unless Bundler.default_lockfile.exist?
-          flag = options[:deployment] ? '--deployment' : '--frozen'
+          flag = options[:deployment] ? "--deployment" : "--frozen"
           raise ProductionError, "The #{flag} flag requires a #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)}. Please make " \
                                  "sure you have checked your #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)} into version control " \
                                  "before deploying."
@@ -73,7 +73,7 @@ module Bundler
           options[:local] = true
         end
 
-        Bundler.settings[:frozen] = '1'
+        Bundler.settings[:frozen] = "1"
       end
 
       # When install is called with --no-deployment, disable deployment mode
@@ -96,7 +96,7 @@ module Bundler
       Bundler.settings.without    = options[:without]
       Bundler.settings.with       = options[:with]
       Bundler::Fetcher.disable_endpoint = options["full-index"]
-      Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? '1' : nil
+      Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? "1" : nil
 
       # rubygems plugins sometimes hook into the gem install process
       Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins)
@@ -112,7 +112,7 @@ module Bundler
 
       if Bundler.settings[:path]
         absolute_path = File.expand_path(Bundler.settings[:path])
-        relative_path = absolute_path.sub(File.expand_path('.'), '.')
+        relative_path = absolute_path.sub(File.expand_path("."), ".")
         Bundler.ui.confirm "Bundled gems are installed into #{relative_path}."
       else
         Bundler.ui.confirm "Use `bundle show [gemname]` to see where a bundled gem is installed."
@@ -172,12 +172,12 @@ module Bundler
 
     def dependencies_count_for(definition)
       count = definition.dependencies.count
-      "#{count} Gemfile #{count == 1 ? 'dependency' : 'dependencies'}"
+      "#{count} Gemfile #{count == 1 ? "dependency" : "dependencies"}"
     end
 
     def gems_installed_for(definition)
       count = definition.specs.count
-      "#{count} #{count == 1 ? 'gem' : 'gems'} now installed"
+      "#{count} #{count == 1 ? "gem" : "gems"} now installed"
     end
 
     def print_post_install_message(name, msg)

@@ -1,6 +1,6 @@
-require 'uri'
-require 'rubygems/user_interaction'
-require 'rubygems/spec_fetcher'
+require "uri"
+require "rubygems/user_interaction"
+require "rubygems/spec_fetcher"
 
 module Bundler
   class Source
@@ -68,7 +68,7 @@ module Bundler
       end
 
       def to_s
-        remote_names = self.remotes.map(&:to_s).join(', ')
+        remote_names = self.remotes.map(&:to_s).join(", ")
         "rubygems repository #{remote_names}"
       end
       alias_method :name, :to_s
@@ -149,7 +149,7 @@ module Bundler
               if name == "extensions" && Dir.glob(src).any?
                 src = File.join(src, "*/*")
                 ext_src = Dir.glob(src).first
-                ext_src.gsub!(src[0..-6], '')
+                ext_src.gsub!(src[0..-6], "")
                 dst = File.dirname(File.join(dst, ext_src))
               end
               Bundler.mkdir_p dst
@@ -275,8 +275,8 @@ module Bundler
           idx = Index.new
           have_bundler = false
           Bundler.rubygems.all_specs.reverse.each do |spec|
-            next if spec.name == 'bundler' && spec.version.to_s != VERSION
-            have_bundler = true if spec.name == 'bundler'
+            next if spec.name == "bundler" && spec.version.to_s != VERSION
+            have_bundler = true if spec.name == "bundler"
             spec.source = self
             idx << spec
           end
@@ -287,7 +287,7 @@ module Bundler
            # so, let's create a fake gemspec for it (it's a path)
            # gemspec
            bundler = Gem::Specification.new do |s|
-             s.name     = 'bundler'
+             s.name     = "bundler"
              s.version  = VERSION
              s.platform = Gem::Platform::RUBY
              s.source   = self

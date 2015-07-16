@@ -4,7 +4,7 @@ Artifice.deactivate
 
 class EndpointExtraMissing < EndpointExtra
   get "/extra/fetch/actual/gem/:id" do
-    if params[:id] == 'missing-1.0.gemspec.rz'
+    if params[:id] == "missing-1.0.gemspec.rz"
       halt 404
     else
       File.read("#{gem_repo2}/quick/Marshal.4.8/#{params[:id]}")

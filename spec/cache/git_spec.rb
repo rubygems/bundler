@@ -100,7 +100,7 @@ end
         gem "foo", :git => '#{lib_path("foo-invalid")}', :branch => :master
       G
 
-      bundle %|config local.foo #{lib_path('foo-1.0')}|
+      bundle %|config local.foo #{lib_path("foo-1.0")}|
       bundle "install"
       bundle "#{cmd} --all"
 
@@ -122,13 +122,13 @@ end
         s.add_dependency "submodule"
       end
 
-      Dir.chdir(lib_path('has_submodule-1.0')) do
-        `git submodule add #{lib_path('submodule-1.0')} submodule-1.0`
+      Dir.chdir(lib_path("has_submodule-1.0")) do
+        `git submodule add #{lib_path("submodule-1.0")} submodule-1.0`
         `git commit -m "submodulator"`
       end
 
       install_gemfile <<-G
-        git "#{lib_path('has_submodule-1.0')}", :submodules => true do
+        git "#{lib_path("has_submodule-1.0")}", :submodules => true do
           gem "has_submodule"
         end
       G

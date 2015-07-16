@@ -9,8 +9,8 @@ describe "bundle outdated" do
 
     install_gemfile <<-G
       source "file://#{gem_repo2}"
-      gem "zebra", :git => "#{lib_path('zebra')}"
-      gem "foo", :git => "#{lib_path('foo')}"
+      gem "zebra", :git => "#{lib_path("zebra")}"
+      gem "foo", :git => "#{lib_path("foo")}"
       gem "activesupport", "2.3.5"
       gem "weakling", "~> 0.0.1"
     G

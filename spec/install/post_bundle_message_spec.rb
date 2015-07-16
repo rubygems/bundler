@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe "post bundle message" do
   before :each do

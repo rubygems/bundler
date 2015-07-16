@@ -68,7 +68,7 @@ module Bundler
         end
       end
 
-      results.sort_by {|s| [s.version, s.platform.to_s == 'ruby' ? "\0" : s.platform.to_s] }
+      results.sort_by {|s| [s.version, s.platform.to_s == "ruby" ? "\0" : s.platform.to_s] }
     end
 
     def local_search(query, base = nil)
@@ -177,7 +177,7 @@ module Bundler
       spec ? [spec] : []
     end
 
-    if RUBY_VERSION < '1.9'
+    if RUBY_VERSION < "1.9"
       def same_version?(a, b)
         regex = /^(.*?)(?:\.0)*$/
         a.to_s[regex, 1] == b.to_s[regex, 1]

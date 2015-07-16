@@ -16,7 +16,7 @@ describe "bundle cache" do
     end
 
     it "uses the cache as a source when installing gems" do
-      build_gem "omg", :path => bundled_app('vendor/cache')
+      build_gem "omg", :path => bundled_app("vendor/cache")
 
       install_gemfile <<-G
         source "file://#{gem_repo1}"
@@ -34,7 +34,7 @@ describe "bundle cache" do
     end
 
     it "does not reinstall gems from the cache if they exist on the system" do
-      build_gem "rack", "1.0.0", :path => bundled_app('vendor/cache') do |s|
+      build_gem "rack", "1.0.0", :path => bundled_app("vendor/cache") do |s|
         s.write "lib/rack.rb", "RACK = 'FAIL'"
       end
 
@@ -52,7 +52,7 @@ describe "bundle cache" do
         gem "rack"
       G
 
-      build_gem "rack", "1.0.0", :path => bundled_app('vendor/cache') do |s|
+      build_gem "rack", "1.0.0", :path => bundled_app("vendor/cache") do |s|
         s.write "lib/rack.rb", "RACK = 'FAIL'"
       end
 
@@ -104,7 +104,7 @@ describe "bundle cache" do
     end
 
     it "doesn't make remote request after caching the gem" do
-      build_gem "builtin_gem_2", "1.0.2", :path => bundled_app('vendor/cache') do |s|
+      build_gem "builtin_gem_2", "1.0.2", :path => bundled_app("vendor/cache") do |s|
         s.summary = "This builtin_gem is bundled with Ruby"
       end
 
@@ -173,7 +173,7 @@ describe "bundle cache" do
 
     it "adds and removes when gems are updated" do
       update_repo2
-      bundle 'update'
+      bundle "update"
       expect(cached_gem("rack-1.2")).to exist
       expect(cached_gem("rack-1.0.0")).not_to exist
     end
@@ -234,7 +234,7 @@ describe "bundle cache" do
     it "doesn't remove gems with mismatched :rubygems_version or :date" do
       cached_gem("rack-1.0.0").rmtree
       build_gem "rack", "1.0.0",
-        :path => bundled_app('vendor/cache'),
+        :path => bundled_app("vendor/cache"),
         :rubygems_version => "1.3.2"
       simulate_new_machine
 
@@ -244,7 +244,7 @@ describe "bundle cache" do
 
     it "handles directories and non .gem files in the cache" do
       bundled_app("vendor/cache/foo").mkdir
-      File.open(bundled_app("vendor/cache/bar"), 'w'){|f| f.write("not a gem") }
+      File.open(bundled_app("vendor/cache/bar"), "w"){|f| f.write("not a gem") }
       bundle :cache
     end
 
@@ -269,7 +269,7 @@ describe "bundle cache" do
 
     it "should install gems with the name bundler in them (that aren't bundler)" do
       build_gem "foo-bundler", "1.0",
-        :path => bundled_app('vendor/cache')
+        :path => bundled_app("vendor/cache")
 
       install_gemfile <<-G
         gem "foo-bundler"

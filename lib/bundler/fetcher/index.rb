@@ -1,4 +1,4 @@
-require 'bundler/fetcher/base'
+require "bundler/fetcher/base"
 
 module Bundler
   class Fetcher

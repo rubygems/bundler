@@ -1,7 +1,7 @@
 module Bundler
   class Source
     class Path < Source
-      autoload :Installer, 'bundler/source/path/installer'
+      autoload :Installer, "bundler/source/path/installer"
 
       attr_reader   :path, :options
       attr_writer   :name

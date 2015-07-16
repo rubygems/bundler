@@ -1,8 +1,8 @@
 module Bundler
   class Source
-    autoload :Rubygems, 'bundler/source/rubygems'
-    autoload :Path,     'bundler/source/path'
-    autoload :Git,      'bundler/source/git'
+    autoload :Rubygems, "bundler/source/rubygems"
+    autoload :Path,     "bundler/source/path"
+    autoload :Git,      "bundler/source/git"
 
     attr_accessor :dependency_names
 

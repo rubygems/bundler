@@ -72,7 +72,7 @@ describe "gemcutter's dependency API" do
 
     gemfile <<-G
       source "#{source_uri}"
-      git "file:///#{lib_path('foo-1.0')}" do
+      git "file:///#{lib_path("foo-1.0")}" do
         gem 'foo'
       end
     G
@@ -90,7 +90,7 @@ describe "gemcutter's dependency API" do
 
     gemfile <<-G
       source "#{source_uri}"
-      gem 'foo', :git => "file:///#{lib_path('foo-1.0')}"
+      gem 'foo', :git => "file:///#{lib_path("foo-1.0")}"
     G
 
     bundle :install, :artifice => "endpoint"
@@ -104,7 +104,7 @@ describe "gemcutter's dependency API" do
     build_git "foo"
     gemfile <<-G
       source "#{source_uri}"
-      gem 'foo', :git => "file:///#{lib_path('foo-1.0')}"
+      gem 'foo', :git => "file:///#{lib_path("foo-1.0")}"
     G
 
     bundle "install", :artifice => "endpoint"
@@ -614,7 +614,7 @@ describe "gemcutter's dependency API" do
 
     it "explains what to do to get it" do
       gemfile <<-G
-        source "#{source_uri.gsub(/http/, 'https')}"
+        source "#{source_uri.gsub(/http/, "https")}"
         gem "rack"
       G
 
@@ -634,7 +634,7 @@ describe "gemcutter's dependency API" do
           end
         end
 
-        source "#{source_uri.gsub(/http/, 'https')}"
+        source "#{source_uri.gsub(/http/, "https")}"
         gem "rack"
       G
 
@@ -645,13 +645,13 @@ describe "gemcutter's dependency API" do
 
   context ".gemrc with sources is present" do
     before do
-      File.open(home('.gemrc'), 'w') do |file|
+      File.open(home(".gemrc"), "w") do |file|
         file.puts({:sources => ["https://rubygems.org"]}.to_yaml)
       end
     end
 
     after do
-      home('.gemrc').rmtree
+      home(".gemrc").rmtree
     end
 
     it "uses other sources declared in the Gemfile" do

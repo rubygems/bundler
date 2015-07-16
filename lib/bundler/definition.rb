@@ -140,7 +140,7 @@ module Bundler
 
         unless specs["bundler"].any?
           local = Bundler.settings[:frozen] ? rubygems_index : index
-          bundler = local.search(Gem::Dependency.new('bundler', VERSION)).last
+          bundler = local.search(Gem::Dependency.new("bundler", VERSION)).last
           specs["bundler"] = bundler if bundler
         end
 
@@ -265,7 +265,7 @@ module Bundler
         return
       end
 
-      File.open(file, 'wb'){|f| f.puts(contents) }
+      File.open(file, "wb"){|f| f.puts(contents) }
     rescue Errno::EACCES
       raise PermissionError.new(file)
     end
@@ -294,7 +294,7 @@ module Bundler
           # are ordered consistently
           sort_by(&:full_name).
           each do |spec|
-            next if spec.name == 'bundler'
+            next if spec.name == "bundler"
             out << spec.to_lock
           end
         out << "\n"
@@ -370,8 +370,8 @@ module Bundler
 
       both_sources.each do |name, (dep, lock_source)|
         if (dep.nil? && !lock_source.nil?) || (!dep.nil? && !lock_source.nil? && !lock_source.can_lock?(dep))
-          gemfile_source_name = (dep && dep.source) || 'no specified source'
-          lockfile_source_name = lock_source || 'no specified source'
+          gemfile_source_name = (dep && dep.source) || "no specified source"
+          lockfile_source_name = lock_source || "no specified source"
           changed << "* #{name} from `#{gemfile_source_name}` to `#{lockfile_source_name}`"
         end
       end

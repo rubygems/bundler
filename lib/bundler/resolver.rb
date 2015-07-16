@@ -1,4 +1,4 @@
-require 'set'
+require "set"
 
 # This is the latest iteration of the gem dependency resolving algorithm. As of now,
 # it can resolve (as a success or failure) any set of gem dependencies we throw at it
@@ -8,19 +8,19 @@ require 'set'
 
 module Bundler
   class Resolver
-    require 'bundler/vendored_molinillo'
+    require "bundler/vendored_molinillo"
 
     class Molinillo::VersionConflict
       def clean_req(req)
         if req.to_s.include?(">= 0")
-          req.to_s.gsub(/ \(.*?\)$/, '')
+          req.to_s.gsub(/ \(.*?\)$/, "")
         else
-          req.to_s.gsub(/\, (runtime|development)\)$/, ')')
+          req.to_s.gsub(/\, (runtime|development)\)$/, ")")
         end
       end
 
       def message
-        conflicts.values.flatten.reduce('') do |o, conflict|
+        conflicts.values.flatten.reduce("") do |o, conflict|
           o << %(Bundler could not find compatible versions for gem "#{conflict.requirement.name}":\n)
           if conflict.locked_requirement
             o << %(  In snapshot (#{Bundler.default_lockfile.basename}):\n)
@@ -29,10 +29,10 @@ module Bundler
           end
           o << %(  In Gemfile:\n)
           o << conflict.requirement_trees.map do |tree|
-            t = ''
+            t = ""
             depth = 2
             tree.each do |req|
-              t << '  ' * depth << %(#{clean_req req})
+              t << "  " * depth << %(#{clean_req req})
               t << %( depends on) unless tree[-1] == req
               t << %(\n)
               depth += 1
@@ -40,7 +40,7 @@ module Bundler
             t
           end.join("\n")
 
-          if conflict.requirement.name == 'bundler'
+          if conflict.requirement.name == "bundler"
             o << %(\n  Current Bundler version:\n    bundler (#{Bundler::VERSION}))
             other_bundler_required = !conflict.requirement.requirement.satisfied_by?(Gem::Version.new Bundler::VERSION)
           end
@@ -202,7 +202,7 @@ module Bundler
       names = e.dependencies.sort_by(&:name).map { |d| "gem '#{d.name}'"}
       raise CyclicDependencyError, "Your bundle requires gems that depend" \
         " on each other, creating an infinite loop. Please remove" \
-        " #{names.count > 1 ? 'either ' : '' }#{names.join(' or ')}" \
+        " #{names.count > 1 ? "either " : "" }#{names.join(" or ")}" \
         " and try again."
     end
 
@@ -216,24 +216,24 @@ module Bundler
       if debug?
         debug_info = yield
         debug_info = debug_info.inspect unless debug_info.is_a?(String)
-        STDERR.puts debug_info.split("\n").map { |s| '  ' * depth + s }
+        STDERR.puts debug_info.split("\n").map { |s| "  " * depth + s }
       end
     end
 
     def debug?
-      ENV['DEBUG_RESOLVER'] || ENV['DEBUG_RESOLVER_TREE']
+      ENV["DEBUG_RESOLVER"] || ENV["DEBUG_RESOLVER_TREE"]
     end
 
     def before_resolution
-      Bundler.ui.info 'Resolving dependencies...', false
+      Bundler.ui.info "Resolving dependencies...", false
     end
 
     def after_resolution
-      Bundler.ui.info ''
+      Bundler.ui.info ""
     end
 
     def indicate_progress
-      Bundler.ui.info '.', false
+      Bundler.ui.info ".", false
     end
 
     private
@@ -277,11 +277,11 @@ module Bundler
     end
 
     def name_for_explicit_dependency_source
-      Bundler.default_gemfile.basename.to_s rescue 'Gemfile'
+      Bundler.default_gemfile.basename.to_s rescue "Gemfile"
     end
 
     def name_for_locking_dependency_source
-      Bundler.default_lockfile.basename.to_s rescue 'Gemfile.lock'
+      Bundler.default_lockfile.basename.to_s rescue "Gemfile.lock"
     end
 
     def requirement_satisfied_by?(requirement, activated, spec)
@@ -306,7 +306,7 @@ module Bundler
         if base = @base[dependency.name] and !base.empty?
           dependency.requirement.satisfied_by?(base.first.version) ? 0 : 1
         else
-          base_dep = Dependency.new dependency.name, '>= 0.a'
+          base_dep = Dependency.new dependency.name, ">= 0.a"
           all = search_for(DepProxy.new base_dep, dependency.__platform).size.to_f
           if all.zero?
             0
@@ -321,7 +321,7 @@ module Bundler
 
     def verify_gemfile_dependencies_are_found!(requirements)
       requirements.each do |requirement|
-        next if requirement.name == 'bundler'
+        next if requirement.name == "bundler"
         if search_for(requirement).empty?
           if base = @base[requirement.name] and !base.empty?
             version = base.first.version
@@ -334,7 +334,7 @@ module Bundler
             versions = @source_requirements[name][name].map(&:version)
             message  = "Could not find gem '#{requirement}' in #{requirement.source}.\n"
             if versions.any?
-              message << "Source contains '#{name}' at: #{versions.join(', ')}"
+              message << "Source contains '#{name}' at: #{versions.join(", ")}"
             else
               message << "Source does not contain any versions of '#{requirement}'"
             end

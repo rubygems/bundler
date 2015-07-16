@@ -1,5 +1,5 @@
-require 'spec_helper'
-require 'bundler/installer/parallel_installer'
+require "spec_helper"
+require "bundler/installer/parallel_installer"
 
 describe ParallelInstaller::SpecInstallation do
   let!(:dep) do

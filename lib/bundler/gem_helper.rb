@@ -1,5 +1,5 @@
-require 'bundler/vendored_thor' unless defined?(Thor)
-require 'bundler'
+require "bundler/vendored_thor" unless defined?(Thor)
+require "bundler"
 
 module Bundler
   class GemHelper
@@ -35,35 +35,35 @@ module Bundler
       built_gem_path = nil
 
       desc "Build #{name}-#{version}.gem into the pkg directory."
-      task 'build' do
+      task "build" do
         built_gem_path = build_gem
       end
 
       desc "Build and install #{name}-#{version}.gem into system gems."
-      task 'install' => 'build' do
+      task "install" => "build" do
         install_gem(built_gem_path)
       end
 
       desc "Build and install #{name}-#{version}.gem into system gems without network access."
-      task 'install:local' => 'build' do
+      task "install:local" => "build" do
         install_gem(built_gem_path, :local)
       end
 
       desc "Create tag #{version_tag} and build and push #{name}-#{version}.gem to Rubygems\n" \
            "To prevent publishing in Rubygems use `gem_push=no rake release`"
-      task 'release', [:remote] => ['build', 'release:guard_clean',
-                         'release:source_control_push', 'release:rubygem_push'] do
+      task "release", [:remote] => ["build", "release:guard_clean",
+                         "release:source_control_push", "release:rubygem_push"] do
       end
 
-      task 'release:guard_clean' do
+      task "release:guard_clean" do
         guard_clean
       end
 
-      task 'release:source_control_push', [:remote] do |t, args|
+      task "release:source_control_push", [:remote] do |t, args|
         tag_version { git_push(args[:remote]) } unless already_tagged?
       end
 
-      task 'release:rubygem_push' do
+      task "release:rubygem_push" do
         rubygem_push(built_gem_path) if gem_push?
       end
 
@@ -74,16 +74,16 @@ module Bundler
       file_name = nil
       sh("gem build -V '#{spec_path}'") { |out, code|
         file_name = File.basename(built_gem_path)
-        FileUtils.mkdir_p(File.join(base, 'pkg'))
-        FileUtils.mv(built_gem_path, 'pkg')
+        FileUtils.mkdir_p(File.join(base, "pkg"))
+        FileUtils.mv(built_gem_path, "pkg")
         Bundler.ui.confirm "#{name} #{version} built to pkg/#{file_name}."
       }
-      File.join(base, 'pkg', file_name)
+      File.join(base, "pkg", file_name)
     end
 
     def install_gem(built_gem_path = nil, local = false)
       built_gem_path ||= build_gem
-      out, _ = sh_with_code("gem install '#{built_gem_path}'#{' --local' if local}")
+      out, _ = sh_with_code("gem install '#{built_gem_path}'#{" --local" if local}")
       raise "Couldn't install gem, run `gem install #{built_gem_path}' for more detailed output" unless out[/Successfully installed/]
       Bundler.ui.confirm "#{name} (#{version}) installed."
     end
@@ -103,20 +103,20 @@ module Bundler
       Dir[File.join(base, "#{name}-*.gem")].sort_by{|f| File.mtime(f)}.last
     end
 
-    def git_push(remote = '')
+    def git_push(remote = "")
       perform_git_push remote
       perform_git_push "#{remote} --tags"
       Bundler.ui.confirm "Pushed git commits and tags."
     end
 
-    def perform_git_push(options = '')
+    def perform_git_push(options = "")
       cmd = "git push #{options}"
       out, code = sh_with_code(cmd)
       raise "Couldn't git push. `#{cmd}' failed with the following output:\n\n#{out}\n" unless code == 0
     end
 
     def already_tagged?
-      if sh('git tag').split(/\n/).include?(version_tag)
+      if sh("git tag").split(/\n/).include?(version_tag)
         Bundler.ui.confirm "Tag #{version_tag} has already been created."
         true
       end
@@ -163,7 +163,7 @@ module Bundler
 
     def sh_with_code(cmd, &block)
       cmd << " 2>&1"
-      outbuf = ''
+      outbuf = ""
       Bundler.ui.debug(cmd)
       SharedHelpers.chdir(base) {
         outbuf = `#{cmd}`
@@ -175,7 +175,7 @@ module Bundler
     end
 
     def gem_push?
-      ! %w{n no nil false off 0}.include?(ENV['gem_push'].to_s.downcase)
+      ! %w{n no nil false off 0}.include?(ENV["gem_push"].to_s.downcase)
     end
   end
 end

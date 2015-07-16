@@ -1,5 +1,5 @@
-require 'bundler/rubygems_integration'
-require 'bundler/source/git/git_proxy'
+require "bundler/rubygems_integration"
+require "bundler/source/git/git_proxy"
 
 module Bundler
   class Env
@@ -14,13 +14,13 @@ module Bundler
       out << "    Bundler   #{Bundler::VERSION}\n"
       out << "    Rubygems  #{Gem::VERSION}\n"
       out << "    Ruby      #{ruby_version}"
-      out << "    GEM_HOME  #{ENV['GEM_HOME']}\n" unless ENV['GEM_HOME'].nil? || ENV['GEM_HOME'].empty?
-      out << "    GEM_PATH  #{ENV['GEM_PATH']}\n" unless ENV['GEM_PATH'] == ENV['GEM_HOME']
-      out << "    RVM       #{ENV['rvm_version']}\n" if ENV['rvm_version']
+      out << "    GEM_HOME  #{ENV["GEM_HOME"]}\n" unless ENV["GEM_HOME"].nil? || ENV["GEM_HOME"].empty?
+      out << "    GEM_PATH  #{ENV["GEM_PATH"]}\n" unless ENV["GEM_PATH"] == ENV["GEM_HOME"]
+      out << "    RVM       #{ENV["rvm_version"]}\n" if ENV["rvm_version"]
       out << "    Git       #{git_version}\n"
       %w(rubygems-bundler open_gem).each do |name|
         specs = Bundler.rubygems.find_name(name)
-        out << "    #{name} (#{specs.map(&:version).join(',')})\n" unless specs.empty?
+        out << "    #{name} (#{specs.map(&:version).join(",")})\n" unless specs.empty?
       end
 
       out << "\nBundler settings\n\n" unless Bundler.settings.all.empty?
@@ -54,7 +54,7 @@ module Bundler
 
     def ruby_version
       str = "#{RUBY_VERSION}"
-      if RUBY_VERSION < '1.9'
+      if RUBY_VERSION < "1.9"
         str << " (#{RUBY_RELEASE_DATE}"
         str << " patchlevel #{RUBY_PATCHLEVEL}" if defined? RUBY_PATCHLEVEL
         str << ") [#{RUBY_PLATFORM}]\n"

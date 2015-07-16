@@ -20,7 +20,7 @@ module Bundler
       if words.length==1
         words[0]
       elsif words.length>1
-        [words[0..-2].join(', '), words[-1]].join(' or ')
+        [words[0..-2].join(", "), words[-1]].join(" or ")
       end
     end
 

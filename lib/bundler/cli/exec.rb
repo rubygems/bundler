@@ -1,4 +1,4 @@
-require 'bundler/current_ruby'
+require "bundler/current_ruby"
 
 module Bundler
   class CLI::Exec

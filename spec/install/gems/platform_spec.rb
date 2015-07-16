@@ -169,7 +169,7 @@ describe "bundle install with platform conditionals" do
 
     install_gemfile <<-G
       platform :#{not_local_tag} do
-        gem "foo", :git => "#{lib_path('foo-1.0')}"
+        gem "foo", :git => "#{lib_path("foo-1.0")}"
       end
     G
 

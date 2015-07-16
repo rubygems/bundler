@@ -27,7 +27,7 @@ describe "bundle show" do
 
     it "prints path if gem exists in bundle" do
       bundle "show rails"
-      expect(out).to eq(default_bundle_path('gems', 'rails-2.3.2').to_s)
+      expect(out).to eq(default_bundle_path("gems", "rails-2.3.2").to_s)
     end
 
     it "warns if path no longer exists on disk" do
@@ -36,12 +36,12 @@ describe "bundle show" do
       bundle "show rails"
 
       expect(out).to match(/has been deleted/i)
-      expect(out).to include(default_bundle_path('gems', 'rails-2.3.2').to_s)
+      expect(out).to include(default_bundle_path("gems", "rails-2.3.2").to_s)
     end
 
     it "prints the path to the running bundler" do
       bundle "show bundler"
-      expect(out).to eq(File.expand_path('../../../', __FILE__))
+      expect(out).to eq(File.expand_path("../../../", __FILE__))
     end
 
     it "complains if gem not in bundle" do
@@ -52,11 +52,11 @@ describe "bundle show" do
     it "prints path of all gems in bundle sorted by name" do
       bundle "show --paths"
 
-      expect(out).to include(default_bundle_path('gems', 'rake-10.0.2').to_s)
-      expect(out).to include(default_bundle_path('gems', 'rails-2.3.2').to_s)
+      expect(out).to include(default_bundle_path("gems", "rake-10.0.2").to_s)
+      expect(out).to include(default_bundle_path("gems", "rails-2.3.2").to_s)
 
       # Gem names are the last component of their path.
-      gem_list = out.split.map { |p| p.split('/').last }
+      gem_list = out.split.map { |p| p.split("/").last }
       expect(gem_list).to eq(gem_list.sort)
     end
 
@@ -77,12 +77,12 @@ describe "bundle show" do
 
     it "prints out git info" do
       install_gemfile <<-G
-        gem "foo", :git => "#{lib_path('foo-1.0')}"
+        gem "foo", :git => "#{lib_path("foo-1.0")}"
       G
       should_be_installed "foo 1.0"
 
       bundle :show
-      expect(out).to include("foo (1.0 #{@git.ref_for('master', 6)}")
+      expect(out).to include("foo (1.0 #{@git.ref_for("master", 6)}")
     end
 
     it "prints out branch names other than master" do
@@ -92,18 +92,18 @@ describe "bundle show" do
       @revision = revision_for(lib_path("foo-1.0"))[0...6]
 
       install_gemfile <<-G
-        gem "foo", :git => "#{lib_path('foo-1.0')}", :branch => "omg"
+        gem "foo", :git => "#{lib_path("foo-1.0")}", :branch => "omg"
       G
       should_be_installed "foo 1.0.omg"
 
       bundle :show
-      expect(out).to include("foo (1.0 #{@git.ref_for('omg', 6)}")
+      expect(out).to include("foo (1.0 #{@git.ref_for("omg", 6)}")
     end
 
     it "doesn't print the branch when tied to a ref" do
       sha = revision_for(lib_path("foo-1.0"))
       install_gemfile <<-G
-        gem "foo", :git => "#{lib_path('foo-1.0')}", :ref => "#{sha}"
+        gem "foo", :git => "#{lib_path("foo-1.0")}", :ref => "#{sha}"
       G
 
       bundle :show
@@ -115,8 +115,8 @@ describe "bundle show" do
     before :each do
       build_git "foo", :path => lib_path("foo")
       in_app_root_custom lib_path("foo")
-      File.open('Gemfile', 'w') {|f| f.puts "gemspec" }
-      sys_exec 'rm -rf .git && git init'
+      File.open("Gemfile", "w") {|f| f.puts "gemspec" }
+      sys_exec "rm -rf .git && git init"
     end
 
     it "does not output git errors" do
@@ -143,7 +143,7 @@ describe "bundle show" do
         gem "rails"
       G
 
-      invalid_regexp = '[]'
+      invalid_regexp = "[]"
 
       bundle "show #{invalid_regexp}"
       expect(out).to include("Could not find gem '#{invalid_regexp}'.")

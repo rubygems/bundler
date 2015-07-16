@@ -142,7 +142,7 @@ module Bundler
 
         dep = Bundler::Dependency.new(name, version)
 
-        if pinned && dep.name != 'bundler'
+        if pinned && dep.name != "bundler"
           spec = @specs.find {|k, v| v.name == dep.name }
           dep.source = spec.last.source if spec
 
@@ -172,7 +172,7 @@ module Bundler
         @specs[@current_spec.identifier] ||= @current_spec
       elsif line =~ NAME_VERSION_6
         name, version = $1, $2
-        version = version.split(',').map(&:strip) if version
+        version = version.split(",").map(&:strip) if version
         dep = Gem::Dependency.new(name, version)
         @current_spec.dependencies << dep
       end

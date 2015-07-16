@@ -1,5 +1,5 @@
-require 'spec_helper'
-require 'bundler/settings'
+require "spec_helper"
+require "bundler/settings"
 
 describe Bundler::Settings do
   subject(:settings) { described_class.new(bundled_app) }
@@ -163,7 +163,7 @@ describe Bundler::Settings do
   end
 
   describe "BUNDLE_ keys format" do
-    let(:settings) { described_class.new(bundled_app('.bundle')) }
+    let(:settings) { described_class.new(bundled_app(".bundle")) }
 
     it "converts older keys without double dashes" do
       config("BUNDLE_MY__PERSONAL.RACK" => "~/Work/git/rack")

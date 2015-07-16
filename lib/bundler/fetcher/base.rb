@@ -7,7 +7,7 @@ module Bundler
       attr_reader :display_uri
 
       def initialize(downloader, remote_uri, fetch_uri, display_uri)
-        raise 'Abstract class' if self.class == Base
+        raise "Abstract class" if self.class == Base
         @downloader = downloader
         @remote_uri = remote_uri
         @fetch_uri = fetch_uri

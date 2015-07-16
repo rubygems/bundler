@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe "parallel", :realworld => true do
   it "installs" do

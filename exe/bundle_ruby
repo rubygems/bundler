@@ -2,9 +2,9 @@
 
 Signal.trap("INT") { exit 1 }
 
-require 'bundler/ruby_version'
-require 'bundler/ruby_dsl'
-require 'bundler/shared_helpers'
+require "bundler/ruby_version"
+require "bundler/ruby_dsl"
+require "bundler/shared_helpers"
 
 module Bundler
   class GemfileError < RuntimeError; end

@@ -3,7 +3,7 @@ require File.expand_path("../endpoint", __FILE__)
 Artifice.deactivate
 
 class EndpointHostRedirect < Endpoint
-  get "/fetch/actual/gem/:id", :host_name => 'localgemserver.test' do
+  get "/fetch/actual/gem/:id", :host_name => "localgemserver.test" do
     redirect "http://bundler.localgemserver.test#{request.path_info}"
   end
 

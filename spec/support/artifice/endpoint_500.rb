@@ -7,8 +7,8 @@ $LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/rack-*/lib")].last}"
 $LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/tilt*/lib")].first}"
 $LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/sinatra*/lib")].first}"
 
-require 'artifice'
-require 'sinatra/base'
+require "artifice"
+require "sinatra/base"
 
 Artifice.deactivate
 
