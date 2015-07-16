@@ -12,6 +12,10 @@ module Bundler
       @global_config = load_config(global_config_file)
     end
 
+    def root
+      @root
+    end
+
     def [](name)
       key = key_for(name)
       value = (@local_config[key] || ENV[key] || @global_config[key] || DEFAULT_CONFIG[name])
@@ -141,7 +145,7 @@ module Bundler
 
       if path = self[:path]
         path = "#{path}/#{Bundler.ruby_scope}" if path != Bundler.rubygems.gem_dir
-        File.expand_path(path)
+        path
       else
         File.join(@root, Bundler.ruby_scope)
       end

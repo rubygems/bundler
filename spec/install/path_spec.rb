@@ -92,6 +92,7 @@ describe "bundle install" do
         # FIXME: If the bundle_path is `"vendor"` instead of
         # `bundled_app("vendor").to_s`, this spec fails. As is, this spec
         # may not test what happens when `path` is relative.
+
         bundle "config path vendor"
         #set_bundle_path(type, bundled_app("vendor").to_s)
 
