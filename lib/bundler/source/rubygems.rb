@@ -52,7 +52,7 @@ module Bundler
       end
 
       def options
-        { "remotes" => @remotes.map { |r| r.to_s } }
+        { "remotes" => @remotes.map(&:to_s) }
       end
 
       def self.from_lock(options)
@@ -68,7 +68,7 @@ module Bundler
       end
 
       def to_s
-        remote_names = self.remotes.map { |r| r.to_s }.join(', ')
+        remote_names = self.remotes.map(&:to_s).join(', ')
         "rubygems repository #{remote_names}"
       end
       alias_method :name, :to_s
@@ -108,7 +108,7 @@ module Bundler
         if spec.remote
           # Check for this spec from other sources
           uris = [spec.remote.anonymized_uri]
-          uris += remotes_for_spec(spec).map { |remote| remote.anonymized_uri }
+          uris += remotes_for_spec(spec).map(&:anonymized_uri)
           uris.uniq!
           Installer.ambiguous_gems << [spec.name, *uris] if uris.length > 1
 

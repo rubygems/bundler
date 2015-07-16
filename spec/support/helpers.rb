@@ -33,7 +33,7 @@ module Spec
       opts = args.last.is_a?(Hash) ? args.pop : {}
       expect_err = opts.delete(:expect_err)
       env = opts.delete(:env)
-      groups = args.map {|a| a.inspect }.join(", ")
+      groups = args.map(&:inspect).join(", ")
       setup = "require 'rubygems' ; require 'bundler' ; Bundler.setup(#{groups})\n"
       @out = ruby(setup + cmd, :expect_err => expect_err, :env => env)
     end

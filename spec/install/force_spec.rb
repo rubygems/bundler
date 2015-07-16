@@ -19,7 +19,7 @@ describe "bundle install" do
       expect(exitstatus).to eq(0) if exitstatus
       expect(out).to include "Using bundler"
       expect(out).to include "Installing rack 1.0.0"
-      expect(rack_lib.open{|f| f.read }).to eq("RACK = '1.0.0'\n")
+      expect(rack_lib.open(&:read)).to eq("RACK = '1.0.0'\n")
       should_be_installed "rack 1.0.0"
     end
 

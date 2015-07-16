@@ -91,7 +91,7 @@ module Bundler
 
       @path_changes = converge_paths
       eager_unlock = expand_dependencies(@unlock[:gems])
-      @unlock[:gems] = @locked_specs.for(eager_unlock).map { |s| s.name }
+      @unlock[:gems] = @locked_specs.for(eager_unlock).map(&:name)
 
       @source_changes = converge_sources
       @dependency_changes = converge_dependencies
@@ -169,7 +169,7 @@ module Bundler
     def requested_specs
       @requested_specs ||= begin
         groups = requested_groups
-        groups.map! { |g| g.to_sym }
+        groups.map!(&:to_sym)
         specs_for(groups)
       end
     end
@@ -203,7 +203,7 @@ module Bundler
 
     def index
       @index ||= Index.build do |idx|
-        dependency_names = @dependencies.map { |d| d.name }
+        dependency_names = @dependencies.map(&:name)
 
         sources.all_sources.each do |source|
           source.dependency_names = dependency_names.dup
@@ -237,7 +237,7 @@ module Bundler
     end
 
     def groups
-      dependencies.map { |d| d.groups }.flatten.uniq
+      dependencies.map(&:groups).flatten.uniq
     end
 
     def lock(file, preserve_bundled_with = false)
@@ -292,7 +292,7 @@ module Bundler
           # This needs to be sorted by full name so that
           # gems with the same name, but different platform
           # are ordered consistently
-          sort_by { |s| s.full_name }.
+          sort_by(&:full_name).
           each do |spec|
             next if spec.name == 'bundler'
             out << spec.to_lock
@@ -302,7 +302,7 @@ module Bundler
 
       out << "PLATFORMS\n"
 
-      platforms.map { |p| p.to_s }.sort.each do |p|
+      platforms.map(&:to_s).sort.each do |p|
         out << "  #{p}\n"
       end
 
@@ -311,7 +311,7 @@ module Bundler
 
       handled = []
       dependencies.
-        sort_by { |d| d.to_s }.
+        sort_by(&:to_s).
         each do |dep|
           next if handled.include?(dep.name)
           out << dep.to_lock
@@ -620,7 +620,7 @@ module Bundler
 
     def requested_dependencies
       groups = requested_groups
-      groups.map! { |g| g.to_sym }
+      groups.map!(&:to_sym)
       dependencies.reject { |d| !d.should_include? || (d.groups & groups).empty? }
     end
 

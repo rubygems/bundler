@@ -273,7 +273,7 @@ module Bundler
       platforms = @platforms.dup
       opts["platforms"] = opts["platform"] || opts["platforms"]
       platforms.concat Array(opts.delete("platforms"))
-      platforms.map! { |p| p.to_sym }
+      platforms.map!(&:to_sym)
       platforms.each do |p|
         next if VALID_PLATFORMS.include?(p)
         raise GemfileError, "`#{p}` is not a valid platform. The available options are: #{VALID_PLATFORMS.inspect}"

@@ -29,11 +29,11 @@ module Bundler
       Bundler.settings.without = [] if options[:without] && options[:without].empty?
 
       with = options.fetch("with", [])
-      with |= Bundler.settings.with.map {|group| group.to_s }
+      with |= Bundler.settings.with.map(&:to_s)
       with -= options[:without] if options[:without]
 
       without = options.fetch("without", [])
-      without |= Bundler.settings.without.map {|group| group.to_s }
+      without |= Bundler.settings.without.map(&:to_s)
       without -= options[:with] if options[:with]
 
       options[:with]    = with

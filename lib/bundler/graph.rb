@@ -107,7 +107,7 @@ module Bundler
             }
           end
 
-          matches = matches.sort_by { |s| s.sort_obj } # HACK: shouldn't be needed
+          matches = matches.sort_by(&:sort_obj) # HACK: shouldn't be needed
         end
       end
     end

@@ -51,7 +51,7 @@ module Bundler
       super(name, version, type)
 
       @autorequire    = nil
-      @groups         = Array(options["group"] || :default).map { |g| g.to_sym }
+      @groups         = Array(options["group"] || :default).map(&:to_sym)
       @source         = options["source"]
       @platforms      = Array(options["platforms"])
       @env            = options["env"]

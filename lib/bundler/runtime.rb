@@ -5,7 +5,7 @@ module Bundler
     include SharedHelpers
 
     def setup(*groups)
-      groups.map! { |g| g.to_sym }
+      groups.map!(&:to_sym)
 
       # Has to happen first
       clean_load_path
@@ -55,7 +55,7 @@ module Bundler
     ]
 
     def require(*groups)
-      groups.map! { |g| g.to_sym }
+      groups.map!(&:to_sym)
       groups = [:default] if groups.empty?
 
       @definition.dependencies.each do |dep|

@@ -10,7 +10,7 @@ module Bundler
     def_delegators :sorted, :each
 
     def initialize(specs)
-      @specs = specs.sort_by { |s| s.name }
+      @specs = specs.sort_by(&:name)
     end
 
     def for(dependencies, skip = [], check = false, match_current_platform = false)
@@ -81,7 +81,7 @@ module Bundler
 
     def materialize(deps, missing_specs = nil)
       materialized = self.for(deps, [], false, true).to_a
-      deps = materialized.map {|s| s.name }.uniq
+      deps = materialized.map(&:name).uniq
       materialized.map! do |s|
         next s unless s.is_a?(LazySpecification)
         s.source.dependency_names = deps if s.source.respond_to?(:dependency_names=)
@@ -145,7 +145,7 @@ module Bundler
     end
 
     def tsort_each_child(s)
-      s.dependencies.sort_by { |d| d.name }.each do |d|
+      s.dependencies.sort_by(&:name).each do |d|
         next if d.type == :development
         lookup[d.name].each { |s2| yield s2 }
       end

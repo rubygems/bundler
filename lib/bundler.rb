@@ -437,7 +437,7 @@ module Bundler
         ENV['GEM_PATH'] = ''
       elsif blank_home || Bundler.rubygems.gem_dir != bundle_path.to_s
         possibles = [Bundler.rubygems.gem_dir, Bundler.rubygems.gem_path]
-        paths = possibles.flatten.compact.uniq.reject { |p| p.empty? }
+        paths = possibles.flatten.compact.uniq.reject(&:empty?)
         ENV["GEM_PATH"] = paths.join(File::PATH_SEPARATOR)
       end
 

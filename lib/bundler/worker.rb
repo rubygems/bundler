@@ -61,11 +61,11 @@ module Bundler
     # so as worker threads after retrieving it, shut themselves down
     def stop_threads
       @threads.each { @request_queue.enq POISON }
-      @threads.each { |thread| thread.join }
+      @threads.each(&:join)
     end
 
     def abort_threads
-      @threads.each {|i| i.exit }
+      @threads.each(&:exit)
       exit 1
     end
   end

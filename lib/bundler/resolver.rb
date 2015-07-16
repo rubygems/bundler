@@ -331,7 +331,7 @@ module Bundler
               "Try running `bundle update #{requirement.name}`"
           elsif requirement.source
             name = requirement.name
-            versions = @source_requirements[name][name].map { |s| s.version }
+            versions = @source_requirements[name][name].map(&:version)
             message  = "Could not find gem '#{requirement}' in #{requirement.source}.\n"
             if versions.any?
               message << "Source contains '#{name}' at: #{versions.join(', ')}"

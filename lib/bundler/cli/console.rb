@@ -7,7 +7,7 @@ module Bundler
     end
 
     def run
-      group ? Bundler.require(:default, *(group.split.map! {|g| g.to_sym })) : Bundler.require
+      group ? Bundler.require(:default, *(group.split.map!(&:to_sym))) : Bundler.require
       ARGV.clear
 
       console = get_console(Bundler.settings[:console] || 'irb')

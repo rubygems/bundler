@@ -31,12 +31,12 @@ module Bundler
       end
 
       if options[:paths]
-        Bundler.load.specs.sort_by { |s| s.name }.map do |s|
+        Bundler.load.specs.sort_by(&:name).map do |s|
           Bundler.ui.info s.full_gem_path
         end
       else
         Bundler.ui.info "Gems included by the bundle:"
-        Bundler.load.specs.sort_by { |s| s.name }.each do |s|
+        Bundler.load.specs.sort_by(&:name).each do |s|
           desc = "  * #{s.name} (#{s.version}#{s.git_version})"
           if @verbose
             latest = latest_specs.find { |l| l.name == s.name }

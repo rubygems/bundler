@@ -43,9 +43,7 @@ describe "The library itself" do
   end
 
   RSpec::Matchers.define :be_well_formed do
-    match do |actual|
-      actual.empty?
-    end
+    match(&:empty?)
 
     failure_message do |actual|
       actual.join("\n")

@@ -222,7 +222,7 @@ module Bundler
       if groups.empty?
         specs = @definition.requested_specs
       else
-        specs = @definition.specs_for groups.map { |g| g.to_sym }
+        specs = @definition.specs_for groups.map(&:to_sym)
       end
 
       specs.each do |spec|

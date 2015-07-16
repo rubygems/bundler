@@ -193,7 +193,7 @@ module Bundler
     end
 
     def get_array(key)
-      self[key] ? self[key].split(":").map { |w| w.to_sym } : []
+      self[key] ? self[key].split(":").map(&:to_sym) : []
     end
 
     def set_array(key, array)

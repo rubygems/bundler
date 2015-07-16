@@ -36,7 +36,7 @@ module Bundler
     end
 
     def inspect
-      "#<#{self.class}:0x#{object_id} sources=#{sources.map{|s| s.inspect}} specs.size=#{specs.size}>"
+      "#<#{self.class}:0x#{object_id} sources=#{sources.map(&:inspect)} specs.size=#{specs.size}>"
     end
 
     def empty?
@@ -104,7 +104,7 @@ module Bundler
 
     def dependency_names
       names = []
-      each{|s| names.push(*s.dependencies.map{|d| d.name }) }
+      each{|s| names.push(*s.dependencies.map(&:name)) }
       names.uniq
     end
 

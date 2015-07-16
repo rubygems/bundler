@@ -21,7 +21,7 @@ module Bundler
             "Run `bundle install` to update and install the bundled gems."
         end
         # cycle through the requested gems, just to make sure they exist
-        names = Bundler.locked_gems.specs.map{ |s| s.name }
+        names = Bundler.locked_gems.specs.map(&:name)
         gems.each do |g|
           next if names.include?(g)
           require "bundler/cli/common"
