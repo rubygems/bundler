@@ -4,14 +4,19 @@ inherit_from:
 AllCops:
   Exclude:
     - tmp/**/*
+    - lib/bundler/vendor/**/*
   DisplayCopNames: true
 
-# Style
+# Lint
 
 # They are idiomatic
-Style/AssignmentInCondition:
+Lint/AssignmentInCondition:
   Enabled: false
 
+Lint/EndAlignment:
+  AlignWith: variable
+
+# Style
 
 Style/MultilineOperationIndentation:
   EnforcedStyle: indented
