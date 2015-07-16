@@ -8,7 +8,7 @@ module Spec
 
       ENV['BUNDLE_PATH'] = nil
       ENV['GEM_HOME'] = ENV['GEM_PATH'] = Path.base_system_gems.to_s
-      ENV['PATH'] = ["#{Path.root}/bin", "#{Path.system_gem_path}/bin", ENV['PATH']].join(File::PATH_SEPARATOR)
+      ENV['PATH'] = ["#{Path.root}/exe", "#{Path.system_gem_path}/bin", ENV['PATH']].join(File::PATH_SEPARATOR)
 
       unless File.exist?("#{Path.base_system_gems}")
         FileUtils.mkdir_p(Path.base_system_gems)

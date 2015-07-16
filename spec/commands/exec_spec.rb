@@ -60,7 +60,7 @@ describe "bundle exec" do
   it "handles --keep-file-descriptors" do
     require 'tempfile'
 
-    bundle_bin = File.expand_path('../../../bin/bundle', __FILE__)
+    bundle_bin = File.expand_path('../../../exe/bundle', __FILE__)
 
     command = Tempfile.new("io-test")
     command.sync = true
