@@ -1,7 +1,6 @@
 require "spec_helper"
 
 describe "bundle gem" do
-
   def reset!
     super
     global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__TEST" => "false", "BUNDLE_GEM__COC" => "false"
@@ -56,7 +55,7 @@ describe "bundle gem" do
     in_app_root
     bundle "gem newgem --bin"
 
-    process_file(bundled_app('newgem', "newgem.gemspec")) do |line|
+    process_file(bundled_app("newgem", "newgem.gemspec")) do |line|
       # Simulate replacing TODOs with real values
       case line
       when /spec\.metadata\['allowed_push_host'\]/, /spec\.homepage/
@@ -67,13 +66,13 @@ describe "bundle gem" do
         line.gsub(/\=.*$/, "= %q{A longer description of my new gem.}")
       # Remove exception that prevents public pushes on older RubyGems versions
       when /raise "RubyGems 2.0 or newer/
-        line.gsub(/.*/, '') if Gem::Version.new(Gem::VERSION) < Gem::Version.new("2.0")
+        line.gsub(/.*/, "") if Gem::Version.new(Gem::VERSION) < Gem::Version.new("2.0")
       else
         line
       end
     end
 
-    Dir.chdir(bundled_app('newgem')) do
+    Dir.chdir(bundled_app("newgem")) do
       bundle "exec rake build"
     end
 
@@ -89,25 +88,25 @@ describe "bundle gem" do
     end
 
     it "resolves ." do
-      create_temporary_dir('tmp')
+      create_temporary_dir("tmp")
 
-      bundle 'gem .'
+      bundle "gem ."
 
       expect(bundled_app("tmp/lib/tmp.rb")).to exist
     end
 
     it "resolves .." do
-      create_temporary_dir('temp/empty_dir')
+      create_temporary_dir("temp/empty_dir")
 
-      bundle 'gem ..'
+      bundle "gem .."
 
       expect(bundled_app("temp/lib/temp.rb")).to exist
     end
 
     it "resolves relative directory" do
-      create_temporary_dir('tmp/empty/tmp')
+      create_temporary_dir("tmp/empty/tmp")
 
-      bundle 'gem ../../empty'
+      bundle "gem ../../empty"
 
       expect(bundled_app("tmp/empty/lib/empty.rb")).to exist
     end
@@ -119,7 +118,7 @@ describe "bundle gem" do
   end
 
   context "gem naming with underscore" do
-    let(:gem_name) { 'test_gem' }
+    let(:gem_name) { "test_gem" }
 
     before do
       bundle "gem #{gem_name}"
@@ -169,7 +168,7 @@ describe "bundle gem" do
     end
 
     it "sets gemspec metadata['allowed_push_host']", :rubygems => "2.0" do
-      expect(generated_gem.gemspec.metadata['allowed_push_host']).
+      expect(generated_gem.gemspec.metadata["allowed_push_host"]).
         to match(/mygemserver\.com/)
     end
 
@@ -185,7 +184,7 @@ describe "bundle gem" do
           puts 'SUCCESS'
         end
       RAKEFILE
-      File.open(bundled_app("test_gem/Rakefile"), 'w') do |file|
+      File.open(bundled_app("test_gem/Rakefile"), "w") do |file|
         file.puts rakefile
       end
 
@@ -332,7 +331,7 @@ describe "bundle gem" do
   end
 
   context "with --mit option" do
-    let(:gem_name) { 'test-gem' }
+    let(:gem_name) { "test-gem" }
 
     before do
       bundle "gem #{gem_name} --mit"
@@ -355,7 +354,7 @@ describe "bundle gem" do
   end
 
   context "with --coc option" do
-    let(:gem_name) { 'test-gem' }
+    let(:gem_name) { "test-gem" }
 
     before do
       bundle "gem #{gem_name} --coc"
@@ -374,7 +373,7 @@ describe "bundle gem" do
   end
 
   context "gem naming with dashed" do
-    let(:gem_name) { 'test-gem' }
+    let(:gem_name) { "test-gem" }
 
     before do
       bundle "gem #{gem_name}"
@@ -430,7 +429,7 @@ describe "bundle gem" do
           puts 'SUCCESS'
         end
       RAKEFILE
-      File.open(bundled_app("test-gem/Rakefile"), 'w') do |file|
+      File.open(bundled_app("test-gem/Rakefile"), "w") do |file|
         file.puts rakefile
       end
 
@@ -677,7 +676,6 @@ describe "bundle gem" do
     it "asks about CoC" do
       global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__TEST" => "false"
 
-
       bundle "gem foobar" do |input|
         input.puts "yes"
       end
@@ -685,5 +683,4 @@ describe "bundle gem" do
       expect(bundled_app("foobar/CODE_OF_CONDUCT.md")).to exist
     end
   end
-
 end

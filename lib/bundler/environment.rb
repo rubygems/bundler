@@ -6,7 +6,7 @@ module Bundler
       @root = root
       @definition = definition
 
-      env_file = Bundler.app_config_path.join('environment.rb')
+      env_file = Bundler.app_config_path.join("environment.rb")
       env_file.rmtree if env_file.exist?
     end
 
@@ -37,6 +37,5 @@ module Bundler
     def update(*gems)
       # Nothing
     end
-
   end
 end

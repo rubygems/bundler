@@ -52,7 +52,7 @@ describe "bundle install --standalone" do
       install_gemfile <<-G, :standalone => true
         source "file://#{gem_repo1}"
         gem "rails"
-        gem "devise", :git => "#{lib_path('devise-1.0')}"
+        gem "devise", :git => "#{lib_path("devise-1.0")}"
       G
     end
 
@@ -113,7 +113,7 @@ describe "bundle install --standalone" do
     it "allows creating a standalone file with limited groups" do
       bundle "install --standalone default"
 
-      load_error_ruby <<-RUBY, 'spec', :no_lib => true
+      load_error_ruby <<-RUBY, "spec", :no_lib => true
         $:.unshift File.expand_path("bundle")
         require "bundler/setup"
 
@@ -129,7 +129,7 @@ describe "bundle install --standalone" do
     it "allows --without to limit the groups used in a standalone" do
       bundle "install --standalone --without test"
 
-      load_error_ruby <<-RUBY, 'spec', :no_lib => true
+      load_error_ruby <<-RUBY, "spec", :no_lib => true
         $:.unshift File.expand_path("bundle")
         require "bundler/setup"
 
@@ -160,7 +160,7 @@ describe "bundle install --standalone" do
       bundle "install --without test"
       bundle "install --standalone"
 
-      load_error_ruby <<-RUBY, 'spec', :no_lib => true
+      load_error_ruby <<-RUBY, "spec", :no_lib => true
         $:.unshift File.expand_path("bundle")
         require "bundler/setup"
 
@@ -251,7 +251,7 @@ describe "bundle install --standalone" do
     end
 
     it "creates stubs that can be executed from anywhere" do
-      require 'tmpdir'
+      require "tmpdir"
       Dir.chdir(Dir.tmpdir) do
         expect(`#{bundled_app}/bin/rails -v`.chomp).to eql "2.3.2"
       end

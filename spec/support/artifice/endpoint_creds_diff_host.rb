@@ -9,12 +9,12 @@ class EndpointCredsDiffHost < Endpoint
     end
 
     def authorized?
-      auth.provided? && auth.basic? && auth.credentials && auth.credentials == ['user', 'pass']
+      auth.provided? && auth.basic? && auth.credentials && auth.credentials == ["user", "pass"]
     end
 
     def protected!
       unless authorized?
-        response['WWW-Authenticate'] = %(Basic realm="Testing HTTP Auth")
+        response["WWW-Authenticate"] = %(Basic realm="Testing HTTP Auth")
         throw(:halt, [401, "Not authorized\n"])
       end
     end

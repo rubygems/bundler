@@ -5,7 +5,7 @@ describe "bundle lock with git gems" do
     build_git "foo"
 
     install_gemfile <<-G
-      gem 'foo', :git => "#{lib_path('foo-1.0')}"
+      gem 'foo', :git => "#{lib_path("foo-1.0")}"
     G
   end
 

@@ -20,12 +20,12 @@ module Bundler
       if words.length==1
         words[0]
       elsif words.length>1
-        [words[0..-2].join(', '), words[-1]].join(' or ')
+        [words[0..-2].join(", "), words[-1]].join(" or ")
       end
     end
 
-
   protected
+
     # http://www.informit.com/articles/article.aspx?p=683059&seqNum=36
     def levenshtein_distance(this, that, ins=2, del=2, sub=1)
       # ins, del, sub are weighted costs
@@ -58,6 +58,5 @@ module Bundler
       # The last value in matrix is the Levenshtein distance between the strings
       dm[that.length][this.length]
     end
-
   end
 end

@@ -1,6 +1,6 @@
-require 'monitor'
-require 'rubygems'
-require 'rubygems/config_file'
+require "monitor"
+require "rubygems"
+require "rubygems/config_file"
 
 module Bundler
   class RubygemsIntegration
@@ -116,7 +116,7 @@ module Bundler
 
     def spec_cache_dirs
       @spec_cache_dirs ||= begin
-        dirs = gem_path.map {|dir| File.join(dir, 'specifications')}
+        dirs = gem_path.map {|dir| File.join(dir, "specifications")}
         dirs << Gem.spec_cache_dir if Gem.respond_to?(:spec_cache_dir) # Not in Rubygems 2.0.3 or earlier
         dirs.uniq.select {|dir| File.directory? dir}
       end
@@ -202,12 +202,12 @@ module Bundler
     end
 
     def gem_from_path(path, policy = nil)
-      require 'rubygems/format'
+      require "rubygems/format"
       Gem::Format.from_file_by_path(path, policy)
     end
 
     def spec_from_gem(path, policy = nil)
-      require 'rubygems/security'
+      require "rubygems/security"
       gem_from_path(path, security_policies[policy]).spec
     rescue Gem::Package::FormatError
       raise GemspecError, "Could not read gem at #{path}. It may be corrupted."
@@ -216,7 +216,7 @@ module Bundler
           e.message =~ /unknown trust policy|unsigned gem/i ||
           e.message =~ /couldn't verify (meta)?data signature/i
         raise SecurityError,
-          "The gem #{File.basename(path, '.gem')} can't be installed because " \
+          "The gem #{File.basename(path, ".gem")} can't be installed because " \
           "the security policy didn't allow it, with the message: #{e.message}"
       else
         raise e
@@ -224,7 +224,7 @@ module Bundler
     end
 
     def build(spec, skip_validation = false)
-      require 'rubygems/builder'
+      require "rubygems/builder"
       Gem::Builder.new(spec).build
     end
 
@@ -244,7 +244,7 @@ module Bundler
 
     def security_policies
       @security_policies ||= begin
-        require 'rubygems/security'
+        require "rubygems/security"
         Gem::Security::Policies
       rescue LoadError, NameError
         {}
@@ -266,10 +266,10 @@ module Bundler
     def replace_gem(specs)
       reverse_rubygems_kernel_mixin
 
-      executables = specs.map { |s| s.executables }.flatten
+      executables = specs.map(&:executables).flatten
 
       ::Kernel.send(:define_method, :gem) do |dep, *reqs|
-        if executables.include? File.basename(caller.first.split(':').first)
+        if executables.include? File.basename(caller.first.split(":").first)
           return
         end
         reqs.pop if reqs.last.is_a?(Hash)
@@ -334,8 +334,8 @@ module Bundler
       redefine_method(gem_class, :bin_path) do |name, *args|
         exec_name = args.first
 
-        if exec_name == 'bundle'
-          return ENV['BUNDLE_BIN_PATH']
+        if exec_name == "bundle"
+          return ENV["BUNDLE_BIN_PATH"]
         end
 
         spec = nil
@@ -392,7 +392,7 @@ module Bundler
     # This backport fixes the marshaling of @segments.
     def backport_yaml_initialize
       redefine_method(Gem::Version, :yaml_initialize) do |tag, map|
-        @version = map['version']
+        @version = map["version"]
         @segments = nil
         @hash = nil
       end
@@ -532,7 +532,7 @@ module Bundler
       # Rubygems 1.8.20 and adds the skip_validation parameter, so that's
       # when we start passing it through.
       def build(spec, skip_validation = false)
-        require 'rubygems/builder'
+        require "rubygems/builder"
         Gem::Builder.new(spec).build(skip_validation)
       end
     end
@@ -581,7 +581,7 @@ module Bundler
       end
 
       def download_gem(spec, uri, path)
-        require 'resolv'
+        require "resolv"
         uri = Bundler.settings.mirror_for(uri)
         proxy, dns = configuration[:http_proxy], Resolv::DNS.new
         fetcher = Gem::RemoteFetcher.new(proxy, dns)
@@ -589,14 +589,14 @@ module Bundler
       end
 
       def gem_from_path(path, policy = nil)
-        require 'rubygems/package'
+        require "rubygems/package"
         p = Gem::Package.new(path)
         p.security_policy = policy if policy
         return p
       end
 
       def build(spec, skip_validation = false)
-        require 'rubygems/package'
+        require "rubygems/package"
         Gem::Package.build(spec, skip_validation)
       end
 
@@ -613,14 +613,14 @@ module Bundler
       end
 
       def all_specs
-        require 'bundler/remote_specification'
+        require "bundler/remote_specification"
         Gem::Specification.stubs.map do |stub|
           StubSpecification.from_stub(stub)
         end
       end
 
       def backport_ext_builder_monitor
-        require 'rubygems/ext'
+        require "rubygems/ext"
 
         Gem::Ext::Builder.class_eval do
           if !const_defined?(:CHDIR_MONITOR)
@@ -646,22 +646,21 @@ module Bundler
         end
       end
     end
-
   end
 
   if RubygemsIntegration.provides?(">= 2.1.0")
     @rubygems = RubygemsIntegration::MoreFuture.new
   elsif RubygemsIntegration.provides?(">= 1.99.99")
     @rubygems = RubygemsIntegration::Future.new
-  elsif RubygemsIntegration.provides?('>= 1.8.20')
+  elsif RubygemsIntegration.provides?(">= 1.8.20")
     @rubygems = RubygemsIntegration::MoreModern.new
-  elsif RubygemsIntegration.provides?('>= 1.8.5')
+  elsif RubygemsIntegration.provides?(">= 1.8.5")
     @rubygems = RubygemsIntegration::Modern.new
-  elsif RubygemsIntegration.provides?('>= 1.8.0')
+  elsif RubygemsIntegration.provides?(">= 1.8.0")
     @rubygems = RubygemsIntegration::AlmostModern.new
-  elsif RubygemsIntegration.provides?('>= 1.7.0')
+  elsif RubygemsIntegration.provides?(">= 1.7.0")
     @rubygems = RubygemsIntegration::Transitional.new
-  elsif RubygemsIntegration.provides?('>= 1.4.0')
+  elsif RubygemsIntegration.provides?(">= 1.4.0")
     @rubygems = RubygemsIntegration::Legacy.new
   else # Rubygems 1.3.6 and 1.3.7
     @rubygems = RubygemsIntegration::Ancient.new

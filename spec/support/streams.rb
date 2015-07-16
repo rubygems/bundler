@@ -1,7 +1,7 @@
-require 'stringio'
+require "stringio"
 
 def capture(*streams)
-  streams.map! { |stream| stream.to_s }
+  streams.map!(&:to_s)
   begin
     result = StringIO.new
     streams.each { |stream| eval "$#{stream} = result" }

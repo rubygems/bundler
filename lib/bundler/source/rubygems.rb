@@ -1,6 +1,6 @@
-require 'uri'
-require 'rubygems/user_interaction'
-require 'rubygems/spec_fetcher'
+require "uri"
+require "rubygems/user_interaction"
+require "rubygems/spec_fetcher"
 
 module Bundler
   class Source
@@ -52,7 +52,7 @@ module Bundler
       end
 
       def options
-        { "remotes" => @remotes.map { |r| r.to_s } }
+        { "remotes" => @remotes.map(&:to_s) }
       end
 
       def self.from_lock(options)
@@ -68,7 +68,7 @@ module Bundler
       end
 
       def to_s
-        remote_names = self.remotes.map { |r| r.to_s }.join(', ')
+        remote_names = self.remotes.map(&:to_s).join(", ")
         "rubygems repository #{remote_names}"
       end
       alias_method :name, :to_s
@@ -108,7 +108,7 @@ module Bundler
         if spec.remote
           # Check for this spec from other sources
           uris = [spec.remote.anonymized_uri]
-          uris += remotes_for_spec(spec).map { |remote| remote.anonymized_uri }
+          uris += remotes_for_spec(spec).map(&:anonymized_uri)
           uris.uniq!
           Installer.ambiguous_gems << [spec.name, *uris] if uris.length > 1
 
@@ -149,7 +149,7 @@ module Bundler
               if name == "extensions" && Dir.glob(src).any?
                 src = File.join(src, "*/*")
                 ext_src = Dir.glob(src).first
-                ext_src.gsub!(src[0..-6], '')
+                ext_src.gsub!(src[0..-6], "")
                 dst = File.dirname(File.join(dst, ext_src))
               end
               Bundler.mkdir_p dst
@@ -275,8 +275,8 @@ module Bundler
           idx = Index.new
           have_bundler = false
           Bundler.rubygems.all_specs.reverse.each do |spec|
-            next if spec.name == 'bundler' && spec.version.to_s != VERSION
-            have_bundler = true if spec.name == 'bundler'
+            next if spec.name == "bundler" && spec.version.to_s != VERSION
+            have_bundler = true if spec.name == "bundler"
             spec.source = self
             idx << spec
           end
@@ -287,7 +287,7 @@ module Bundler
            # so, let's create a fake gemspec for it (it's a path)
            # gemspec
            bundler = Gem::Specification.new do |s|
-             s.name     = 'bundler'
+             s.name     = "bundler"
              s.version  = VERSION
              s.platform = Gem::Platform::RUBY
              s.source   = self
@@ -349,14 +349,15 @@ module Bundler
             # but will not have found any versions of Bar from source B, which is a problem if the requested version
             # of Foo specifically depends on a version of Bar that is only found in source B. This ensures that for
             # each spec we found, we add all possible versions from all sources to the index.
-            begin
+            loop do
               idxcount = idx.size
               api_fetchers.each do |f|
                 Bundler.ui.info "Fetching version metadata from #{f.uri}", Bundler.ui.debug?
                 idx.use f.specs(idx.dependency_names, self), true
                 Bundler.ui.info "" if !Bundler.ui.debug? # new line now that the dots are over
               end
-            end until idxcount == idx.size
+              break if idxcount == idx.size
+            end
 
             if api_fetchers.any?
               # it's possible that gems from one source depend on gems from some
@@ -416,7 +417,6 @@ module Bundler
       def installed?(spec)
         installed_specs[spec].any?
       end
-
     end
   end
 end

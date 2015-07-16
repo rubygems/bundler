@@ -28,12 +28,12 @@
 #          puts Pod::VERSION # => "0.34.4"
 #
 def gemfile(install = false, &gemfile)
-  require 'bundler'
+  require "bundler"
   old_root = Bundler.method(:root)
   def Bundler.root
     Bundler::SharedHelpers.pwd.expand_path
   end
-  ENV['BUNDLE_GEMFILE'] ||= 'Gemfile'
+  ENV["BUNDLE_GEMFILE"] ||= "Gemfile"
 
   builder = Bundler::Dsl.new
   builder.instance_eval(&gemfile)

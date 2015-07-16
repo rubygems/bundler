@@ -1,12 +1,11 @@
-require 'fileutils'
-require 'uri'
-require 'digest/sha1'
+require "fileutils"
+require "uri"
+require "digest/sha1"
 
 module Bundler
   class Source
-
     class Git < Path
-      autoload :GitProxy, 'bundler/source/git/git_proxy'
+      autoload :GitProxy, "bundler/source/git/git_proxy"
 
       attr_reader :uri, :ref, :branch, :options, :submodules
 
@@ -20,9 +19,9 @@ module Bundler
         # Stringify options that could be set as symbols
         %w(ref branch tag revision).each{|k| options[k] = options[k].to_s if options[k] }
 
-        @uri        = options["uri"] || ''
+        @uri        = options["uri"] || ""
         @branch     = options["branch"]
-        @ref        = options["ref"] || options["branch"] || options["tag"] || 'master'
+        @ref        = options["ref"] || options["branch"] || options["tag"] || "master"
         @submodules = options["submodules"]
         @name       = options["name"]
         @version    = options["version"]
@@ -74,7 +73,7 @@ module Bundler
       end
 
       def name
-        File.basename(@uri, '.git')
+        File.basename(@uri, ".git")
       end
 
       # This is the path which is going to contain a specific
@@ -229,7 +228,7 @@ module Bundler
           # The gemspecs we cache should already be evaluated.
           spec = Bundler.load_gemspec(spec_path)
           next unless spec
-          File.open(spec_path, 'wb') {|file| file.write(spec.to_ruby) }
+          File.open(spec_path, "wb") {|file| file.write(spec.to_ruby) }
         end
       end
 
@@ -252,7 +251,7 @@ module Bundler
       end
 
       def base_name
-        File.basename(uri.sub(%r{^(\w+://)?([^/:]+:)?(//\w*/)?(\w*/)*},''),".git")
+        File.basename(uri.sub(%r{^(\w+://)?([^/:]+:)?(//\w*/)?(\w*/)*},""),".git")
       end
 
       def shortref_for_display(ref)
@@ -267,7 +266,7 @@ module Bundler
         if uri =~ %r{^\w+://(\w+@)?}
           # Downcase the domain component of the URI
           # and strip off a trailing slash, if one is present
-          input = URI.parse(uri).normalize.to_s.sub(%r{/$},'')
+          input = URI.parse(uri).normalize.to_s.sub(%r{/$},"")
         else
           # If there is no URI scheme, assume it is an ssh/git URI
           input = uri
@@ -286,8 +285,6 @@ module Bundler
       def git_proxy
         @git_proxy ||= GitProxy.new(cache_path, uri, ref, cached_revision, self)
       end
-
     end
-
   end
 end

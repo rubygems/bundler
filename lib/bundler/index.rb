@@ -36,7 +36,7 @@ module Bundler
     end
 
     def inspect
-      "#<#{self.class}:0x#{object_id} sources=#{sources.map{|s| s.inspect}} specs.size=#{specs.size}>"
+      "#<#{self.class}:0x#{object_id} sources=#{sources.map(&:inspect)} specs.size=#{specs.size}>"
     end
 
     def empty?
@@ -68,7 +68,7 @@ module Bundler
         end
       end
 
-      results.sort_by {|s| [s.version, s.platform.to_s == 'ruby' ? "\0" : s.platform.to_s] }
+      results.sort_by {|s| [s.version, s.platform.to_s == "ruby" ? "\0" : s.platform.to_s] }
     end
 
     def local_search(query, base = nil)
@@ -104,7 +104,7 @@ module Bundler
 
     def dependency_names
       names = []
-      each{|s| names.push(*s.dependencies.map{|d| d.name }) }
+      each{|s| names.push(*s.dependencies.map(&:name)) }
       names.uniq
     end
 
@@ -177,7 +177,7 @@ module Bundler
       spec ? [spec] : []
     end
 
-    if RUBY_VERSION < '1.9'
+    if RUBY_VERSION < "1.9"
       def same_version?(a, b)
         regex = /^(.*?)(?:\.0)*$/
         a.to_s[regex, 1] == b.to_s[regex, 1]
@@ -192,6 +192,5 @@ module Bundler
       return false unless dep.name == spec.name
       dep.requirement.satisfied_by?(spec.version)
     end
-
   end
 end

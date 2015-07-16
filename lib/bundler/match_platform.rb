@@ -1,4 +1,4 @@
-require 'bundler/gem_helpers'
+require "bundler/gem_helpers"
 
 module Bundler
   module MatchPlatform

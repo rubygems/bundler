@@ -26,7 +26,6 @@ module Bundler
       Dsl.evaluate(gemfile, lockfile, unlock)
     end
 
-
     #
     # How does the new system work?
     #
@@ -92,7 +91,7 @@ module Bundler
 
       @path_changes = converge_paths
       eager_unlock = expand_dependencies(@unlock[:gems])
-      @unlock[:gems] = @locked_specs.for(eager_unlock).map { |s| s.name }
+      @unlock[:gems] = @locked_specs.for(eager_unlock).map(&:name)
 
       @source_changes = converge_sources
       @dependency_changes = converge_dependencies
@@ -141,7 +140,7 @@ module Bundler
 
         unless specs["bundler"].any?
           local = Bundler.settings[:frozen] ? rubygems_index : index
-          bundler = local.search(Gem::Dependency.new('bundler', VERSION)).last
+          bundler = local.search(Gem::Dependency.new("bundler", VERSION)).last
           specs["bundler"] = bundler if bundler
         end
 
@@ -170,7 +169,7 @@ module Bundler
     def requested_specs
       @requested_specs ||= begin
         groups = requested_groups
-        groups.map! { |g| g.to_sym }
+        groups.map!(&:to_sym)
         specs_for(groups)
       end
     end
@@ -204,7 +203,7 @@ module Bundler
 
     def index
       @index ||= Index.build do |idx|
-        dependency_names = @dependencies.map { |d| d.name }
+        dependency_names = @dependencies.map(&:name)
 
         sources.all_sources.each do |source|
           source.dependency_names = dependency_names.dup
@@ -238,7 +237,7 @@ module Bundler
     end
 
     def groups
-      dependencies.map { |d| d.groups }.flatten.uniq
+      dependencies.map(&:groups).flatten.uniq
     end
 
     def lock(file, preserve_bundled_with = false)
@@ -266,7 +265,7 @@ module Bundler
         return
       end
 
-      File.open(file, 'wb'){|f| f.puts(contents) }
+      File.open(file, "wb"){|f| f.puts(contents) }
     rescue Errno::EACCES
       raise PermissionError.new(file)
     end
@@ -293,9 +292,9 @@ module Bundler
           # This needs to be sorted by full name so that
           # gems with the same name, but different platform
           # are ordered consistently
-          sort_by { |s| s.full_name }.
+          sort_by(&:full_name).
           each do |spec|
-            next if spec.name == 'bundler'
+            next if spec.name == "bundler"
             out << spec.to_lock
           end
         out << "\n"
@@ -303,7 +302,7 @@ module Bundler
 
       out << "PLATFORMS\n"
 
-      platforms.map { |p| p.to_s }.sort.each do |p|
+      platforms.map(&:to_s).sort.each do |p|
         out << "  #{p}\n"
       end
 
@@ -312,7 +311,7 @@ module Bundler
 
       handled = []
       dependencies.
-        sort_by { |d| d.to_s }.
+        sort_by(&:to_s).
         each do |dep|
           next if handled.include?(dep.name)
           out << dep.to_lock
@@ -371,8 +370,8 @@ module Bundler
 
       both_sources.each do |name, (dep, lock_source)|
         if (dep.nil? && !lock_source.nil?) || (!dep.nil? && !lock_source.nil? && !lock_source.can_lock?(dep))
-          gemfile_source_name = (dep && dep.source) || 'no specified source'
-          lockfile_source_name = lock_source || 'no specified source'
+          gemfile_source_name = (dep && dep.source) || "no specified source"
+          lockfile_source_name = lock_source || "no specified source"
           changed << "* #{name} from `#{gemfile_source_name}` to `#{lockfile_source_name}`"
         end
       end
@@ -621,7 +620,7 @@ module Bundler
 
     def requested_dependencies
       groups = requested_groups
-      groups.map! { |g| g.to_sym }
+      groups.map!(&:to_sym)
       dependencies.reject { |d| !d.should_include? || (d.groups & groups).empty? }
     end
 
@@ -666,6 +665,5 @@ module Bundler
         current == proposed
       end
     end
-
   end
 end

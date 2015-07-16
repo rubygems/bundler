@@ -68,7 +68,7 @@ describe "bundle binstubs <gem>" do
         s.executables = %w(foo)
       end
       install_gemfile <<-G
-        gem "foo", :git => "#{lib_path('foo')}"
+        gem "foo", :git => "#{lib_path("foo")}"
       G
 
       bundle "binstubs foo"
@@ -83,7 +83,7 @@ describe "bundle binstubs <gem>" do
         s.executables = %w(foo)
       end
       install_gemfile <<-G
-        gem "foo", :path => "#{lib_path('foo')}"
+        gem "foo", :path => "#{lib_path("foo")}"
       G
 
       bundle "binstubs foo"
@@ -147,7 +147,7 @@ describe "bundle binstubs <gem>" do
   context "when the bin already exists" do
     it "doesn't overwrite and warns" do
       FileUtils.mkdir_p(bundled_app("bin"))
-      File.open(bundled_app("bin/rackup"), 'wb') do |file|
+      File.open(bundled_app("bin/rackup"), "wb") do |file|
         file.print "OMG"
       end
 
@@ -167,7 +167,7 @@ describe "bundle binstubs <gem>" do
     context "when using --force" do
       it "overwrites the binstub" do
         FileUtils.mkdir_p(bundled_app("bin"))
-        File.open(bundled_app("bin/rackup"), 'wb') do |file|
+        File.open(bundled_app("bin/rackup"), "wb") do |file|
           file.print "OMG"
         end
 
@@ -192,8 +192,8 @@ describe "bundle binstubs <gem>" do
       G
 
       bundle "binstubs rack-obama"
-      expect(out).to include('rack-obama has no executables')
-      expect(out).to include('rack has: rackup')
+      expect(out).to include("rack-obama has no executables")
+      expect(out).to include("rack has: rackup")
     end
 
     it "works if child gems don't have bins" do
@@ -203,7 +203,7 @@ describe "bundle binstubs <gem>" do
       G
 
       bundle "binstubs actionpack"
-      expect(out).to include('no executables for the gem actionpack')
+      expect(out).to include("no executables for the gem actionpack")
     end
 
     it "works if the gem has development dependencies" do
@@ -213,7 +213,7 @@ describe "bundle binstubs <gem>" do
       G
 
       bundle "binstubs with_development_dependency"
-      expect(out).to include('no executables for the gem with_development_dependency')
+      expect(out).to include("no executables for the gem with_development_dependency")
     end
   end
 
@@ -226,7 +226,7 @@ describe "bundle binstubs <gem>" do
 
       bundle "config auto_install 1"
       bundle "binstubs rack"
-      expect(out).to include('Installing rack 1.0.0')
+      expect(out).to include("Installing rack 1.0.0")
       should_be_installed "rack 1.0.0"
     end
 
@@ -238,7 +238,7 @@ describe "bundle binstubs <gem>" do
 
       bundle "config auto_install 1"
       bundle "binstubs rack", :env => { "BUNDLE_INSTALL" => 1 }
-      expect(out).not_to include('Installing rack 1.0.0')
+      expect(out).not_to include("Installing rack 1.0.0")
     end
   end
 end

@@ -1,7 +1,6 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe "bundle install" do
-
   describe "with bundler dependencies" do
     before(:each) do
       build_repo2 do
@@ -37,7 +36,7 @@ describe "bundle install" do
         gem "bundler", "0.9.2"
       G
 
-      nice_error = <<-E.strip.gsub(/^ {8}/, '')
+      nice_error = <<-E.strip.gsub(/^ {8}/, "")
         Fetching source index from file:#{gem_repo2}/
         Resolving dependencies...
         Bundler could not find compatible versions for gem "bundler":
@@ -56,7 +55,6 @@ describe "bundle install" do
 
         gem "multiple_versioned_deps"
       G
-
 
       install_gemfile <<-G
         source "file://#{gem_repo2}"
@@ -95,7 +93,7 @@ describe "bundle install" do
         gem "rails_fail"
       G
 
-      nice_error = <<-E.strip.gsub(/^ {8}/, '')
+      nice_error = <<-E.strip.gsub(/^ {8}/, "")
         Fetching source index from file:#{gem_repo2}/
         Resolving dependencies...
         Bundler could not find compatible versions for gem "activesupport":
@@ -116,7 +114,7 @@ describe "bundle install" do
         gem "activesupport", "2.3.5"
       G
 
-      nice_error = <<-E.strip.gsub(/^ {8}/, '')
+      nice_error = <<-E.strip.gsub(/^ {8}/, "")
         Fetching source index from file:#{gem_repo2}/
         Resolving dependencies...
         Bundler could not find compatible versions for gem "activesupport":
@@ -142,5 +140,4 @@ describe "bundle install" do
       expect(out).to include("The Gemfile's dependencies are satisfied")
     end
   end
-
 end

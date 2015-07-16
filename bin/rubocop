@@ -7,4 +7,5 @@ bundler_spec.dependencies.each do |dep|
   gem dep.name, dep.requirement.to_s
 end
 
-load Gem.bin_path("rake", "rake")
+gem "rubocop", ">= 0.32.1"
+load Gem.bin_path("rubocop", "rubocop")

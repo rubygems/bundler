@@ -17,8 +17,8 @@ describe "bundle init" do
   end
 
   it "should generate from an existing gemspec" do
-    spec_file = tmp.join('test.gemspec')
-    File.open(spec_file, 'w') do |file|
+    spec_file = tmp.join("test.gemspec")
+    File.open(spec_file, "w") do |file|
       file << <<-S
         Gem::Specification.new do |s|
         s.name = 'test'

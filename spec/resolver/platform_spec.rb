@@ -29,7 +29,6 @@ describe "Resolving platform craziness" do
   end
 
   describe "with mingw32" do
-
     before :each do
       @index = build_index do
         platforms "mingw32 mswin32 x64-mingw32" do |platform|
@@ -79,7 +78,7 @@ describe "Resolving platform craziness" do
           dep "bar", ">= 0"
         end
 
-        gem 'bar', "1.0.0" do
+        gem "bar", "1.0.0" do
           dep "baz", "~> 1.0.0"
         end
 

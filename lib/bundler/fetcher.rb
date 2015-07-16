@@ -1,14 +1,14 @@
-require 'bundler/vendored_persistent'
-require 'cgi'
-require 'securerandom'
+require "bundler/vendored_persistent"
+require "cgi"
+require "securerandom"
 
 module Bundler
 
   # Handles all the fetching with the rubygems server
   class Fetcher
-    autoload :Downloader, 'bundler/fetcher/downloader'
-    autoload :Dependency, 'bundler/fetcher/dependency'
-    autoload :Index, 'bundler/fetcher/index'
+    autoload :Downloader, "bundler/fetcher/downloader"
+    autoload :Dependency, "bundler/fetcher/dependency"
+    autoload :Index, "bundler/fetcher/index"
 
     # This error is raised when it looks like the network is down
     class NetworkDownError < HTTPError; end
@@ -75,11 +75,11 @@ module Bundler
 
     # fetch a gem specification
     def fetch_spec(spec)
-      spec = spec - [nil, 'ruby', '']
-      spec_file_name = "#{spec.join '-'}.gemspec"
+      spec = spec - [nil, "ruby", ""]
+      spec_file_name = "#{spec.join "-"}.gemspec"
 
       uri = URI.parse("#{remote_uri}#{Gem::MARSHAL_SPEC_DIR}#{spec_file_name}.rz")
-      if uri.scheme == 'file'
+      if uri.scheme == "file"
         Bundler.load_marshal Gem.inflate(Gem.read_binary(uri.path))
       elsif cached_spec_path = gemspec_cached_path(spec_file_name)
         Bundler.load_gemspec(cached_spec_path)
@@ -106,7 +106,7 @@ module Bundler
       @use_api = false if fetchers.none?(&:api_fetcher?)
 
       specs[remote_uri].each do |name, version, platform, dependencies|
-        next if name == 'bundler'
+        next if name == "bundler"
         spec = nil
         if dependencies
           spec = EndpointSpecification.new(name, version, platform, dependencies)
@@ -202,7 +202,7 @@ module Bundler
           Bundler.settings[:ssl_client_cert]
         raise SSLError if needs_ssl && !defined?(OpenSSL::SSL)
 
-        con = Net::HTTP::Persistent.new 'bundler', :ENV
+        con = Net::HTTP::Persistent.new "bundler", :ENV
 
         if remote_uri.scheme == "https"
           con.verify_mode = (Bundler.settings[:ssl_verify_mode] ||
@@ -273,6 +273,5 @@ module Bundler
     def downloader
       @downloader ||= Downloader.new(connection, self.class.redirect_limit)
     end
-
   end
 end

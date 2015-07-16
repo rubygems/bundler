@@ -27,16 +27,16 @@ describe "bundle install with gem sources" do
         gem "rack"
       G
 
-      expect(bundled_app('Gemfile.lock')).to exist
+      expect(bundled_app("Gemfile.lock")).to exist
     end
 
     it "creates lock files based on the Gemfile name" do
-      gemfile bundled_app('OmgFile'), <<-G
+      gemfile bundled_app("OmgFile"), <<-G
         source "file://#{gem_repo1}"
         gem "rack", "1.0"
       G
 
-      bundle 'install --gemfile OmgFile'
+      bundle "install --gemfile OmgFile"
 
       expect(bundled_app("OmgFile.lock")).to exist
     end
@@ -62,7 +62,7 @@ describe "bundle install with gem sources" do
         gem "rack"
       G
 
-      expect { run '1' }.not_to change { File.mtime(bundled_app('Gemfile.lock')) }
+      expect { run "1" }.not_to change { File.mtime(bundled_app("Gemfile.lock")) }
     end
 
     it "fetches gems" do
@@ -185,7 +185,7 @@ describe "bundle install with gem sources" do
     end
 
     it "prioritizes local gems over remote gems" do
-      build_gem 'rack', '1.0.0', :to_system => true do |s|
+      build_gem "rack", "1.0.0", :to_system => true do |s|
         s.add_dependency "activesupport", "2.3.5"
       end
 
@@ -351,9 +351,9 @@ describe "bundle install with gem sources" do
     it "doesn't blow up" do
       build_lib "foo"
       gemfile = <<-G
-        gem 'foo', :path => "#{lib_path('foo-1.0')}"
+        gem 'foo', :path => "#{lib_path("foo-1.0")}"
       G
-      File.open('Gemfile', 'w') do |file|
+      File.open("Gemfile", "w") do |file|
         file.puts gemfile
       end
 
@@ -374,5 +374,4 @@ describe "bundle install with gem sources" do
       expect(out).to_not include("Your Gemfile has no gem server sources")
     end
   end
-
 end

@@ -1,5 +1,5 @@
-require 'bundler/ui'
-require 'rubygems/user_interaction'
+require "bundler/ui"
+require "rubygems/user_interaction"
 
 module Bundler
   module UI

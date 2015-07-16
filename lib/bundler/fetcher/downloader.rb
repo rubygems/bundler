@@ -55,7 +55,6 @@ module Bundler
           raise HTTPError, "Network error while fetching #{uri}"
         end
       end
-
     end
   end
 end

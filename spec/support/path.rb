@@ -1,4 +1,4 @@
-require 'pathname'
+require "pathname"
 
 module Spec
   module Path
@@ -77,7 +77,7 @@ module Spec
     end
 
     def bundler_path
-      Pathname.new(File.expand_path('../../../lib', __FILE__))
+      Pathname.new(File.expand_path("../../../lib", __FILE__))
     end
 
     extend self

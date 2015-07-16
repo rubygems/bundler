@@ -13,13 +13,13 @@ describe "bundle install" do
       rack_lib = default_bundle_path("gems/rack-1.0.0/lib/rack.rb")
 
       bundle "install"
-      rack_lib.open('w'){|f| f.write("blah blah blah") }
+      rack_lib.open("w"){|f| f.write("blah blah blah") }
       bundle "install --force"
 
       expect(exitstatus).to eq(0) if exitstatus
       expect(out).to include "Using bundler"
       expect(out).to include "Installing rack 1.0.0"
-      expect(rack_lib.open{|f| f.read }).to eq("RACK = '1.0.0'\n")
+      expect(rack_lib.open(&:read)).to eq("RACK = '1.0.0'\n")
       should_be_installed "rack 1.0.0"
     end
 
@@ -31,6 +31,5 @@ describe "bundle install" do
       expect(out).to include "Installing rack 1.0.0"
       should_be_installed "rack 1.0.0"
     end
-
   end
 end

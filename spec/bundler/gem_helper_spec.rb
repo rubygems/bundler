@@ -1,6 +1,6 @@
 require "spec_helper"
-require 'rake'
-require 'bundler/gem_helper'
+require "rake"
+require "bundler/gem_helper"
 
 describe Bundler::GemHelper do
   let(:app_name) { "lorem__ipsum" }

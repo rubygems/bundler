@@ -1,5 +1,5 @@
-require 'spec_helper'
-require 'bundler/ssl_certs/certificate_manager'
+require "spec_helper"
+require "bundler/ssl_certs/certificate_manager"
 
 describe "SSL Certificates", :rubygems_master do
   it "are up to date with Rubygems" do

@@ -1,14 +1,14 @@
-require 'rubygems/user_interaction'
-require 'support/path' unless defined?(Spec::Path)
+require "rubygems/user_interaction"
+require "support/path" unless defined?(Spec::Path)
 
 module Spec
   module Rubygems
     def self.setup
       Gem.clear_paths
 
-      ENV['BUNDLE_PATH'] = nil
-      ENV['GEM_HOME'] = ENV['GEM_PATH'] = Path.base_system_gems.to_s
-      ENV['PATH'] = ["#{Path.root}/exe", "#{Path.system_gem_path}/bin", ENV['PATH']].join(File::PATH_SEPARATOR)
+      ENV["BUNDLE_PATH"] = nil
+      ENV["GEM_HOME"] = ENV["GEM_PATH"] = Path.base_system_gems.to_s
+      ENV["PATH"] = ["#{Path.root}/exe", "#{Path.system_gem_path}/bin", ENV["PATH"]].join(File::PATH_SEPARATOR)
 
       unless File.exist?("#{Path.base_system_gems}")
         FileUtils.mkdir_p(Path.base_system_gems)
@@ -24,7 +24,7 @@ module Spec
         `gem install ruby-graphviz --no-rdoc --no-ri` if RUBY_VERSION >= "1.9.3"
       end
 
-      ENV['HOME'] = Path.home.to_s
+      ENV["HOME"] = Path.home.to_s
 
       Gem::DefaultUserInteraction.ui = Gem::SilentUI.new
     end
@@ -34,7 +34,7 @@ module Spec
         args = args.gsub(/(?=")/, "\\")
         args = %["#{args}"]
       end
-      lib  = File.join(File.dirname(__FILE__), '..', '..', 'lib')
+      lib  = File.join(File.dirname(__FILE__), "..", "..", "lib")
       %x{#{Gem.ruby} -I#{lib} -rubygems -S gem --backtrace #{command} #{args}}.strip
     end
   end

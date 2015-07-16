@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Bundler::Dsl do
   before do
@@ -187,5 +187,4 @@ describe Bundler::Dsl do
         to raise_error(Bundler::GemfileError, /There was an error parsing `Gemfile`: can't modify frozen String. Bundler cannot continue./i)
     end
   end
-
 end

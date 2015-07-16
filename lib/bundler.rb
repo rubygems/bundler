@@ -1,51 +1,51 @@
-require 'fileutils'
-require 'pathname'
-require 'rbconfig'
-require 'bundler/gem_path_manipulation'
-require 'bundler/rubygems_ext'
-require 'bundler/rubygems_integration'
-require 'bundler/version'
-require 'bundler/constants'
-require 'bundler/current_ruby'
+require "fileutils"
+require "pathname"
+require "rbconfig"
+require "bundler/gem_path_manipulation"
+require "bundler/rubygems_ext"
+require "bundler/rubygems_integration"
+require "bundler/version"
+require "bundler/constants"
+require "bundler/current_ruby"
 
 module Bundler
   preserve_gem_path
   ORIGINAL_ENV = ENV.to_hash
 
-  autoload :Definition,            'bundler/definition'
-  autoload :Dependency,            'bundler/dependency'
-  autoload :DepProxy,              'bundler/dep_proxy'
-  autoload :Deprecate,             'bundler/deprecate'
-  autoload :Dsl,                   'bundler/dsl'
-  autoload :EndpointSpecification, 'bundler/endpoint_specification'
-  autoload :Environment,           'bundler/environment'
-  autoload :Env,                   'bundler/env'
-  autoload :Fetcher,               'bundler/fetcher'
-  autoload :GemHelper,             'bundler/gem_helper'
-  autoload :GemHelpers,            'bundler/gem_helpers'
-  autoload :GemInstaller,          'bundler/gem_installer'
-  autoload :Graph,                 'bundler/graph'
-  autoload :Index,                 'bundler/index'
-  autoload :Installer,             'bundler/installer'
-  autoload :Injector,              'bundler/injector'
-  autoload :LazySpecification,     'bundler/lazy_specification'
-  autoload :LockfileParser,        'bundler/lockfile_parser'
-  autoload :MatchPlatform,         'bundler/match_platform'
-  autoload :RemoteSpecification,   'bundler/remote_specification'
-  autoload :Resolver,              'bundler/resolver'
-  autoload :Retry,                 'bundler/retry'
-  autoload :RubyVersion,           'bundler/ruby_version'
-  autoload :RubyDsl,               'bundler/ruby_dsl'
-  autoload :Runtime,               'bundler/runtime'
-  autoload :Settings,              'bundler/settings'
-  autoload :SharedHelpers,         'bundler/shared_helpers'
-  autoload :SpecSet,               'bundler/spec_set'
-  autoload :StubSpecification,     'bundler/stub_specification'
-  autoload :Source,                'bundler/source'
-  autoload :SourceList,            'bundler/source_list'
-  autoload :Specification,         'bundler/shared_helpers'
-  autoload :SystemRubyVersion,     'bundler/ruby_version'
-  autoload :UI,                    'bundler/ui'
+  autoload :Definition,            "bundler/definition"
+  autoload :Dependency,            "bundler/dependency"
+  autoload :DepProxy,              "bundler/dep_proxy"
+  autoload :Deprecate,             "bundler/deprecate"
+  autoload :Dsl,                   "bundler/dsl"
+  autoload :EndpointSpecification, "bundler/endpoint_specification"
+  autoload :Environment,           "bundler/environment"
+  autoload :Env,                   "bundler/env"
+  autoload :Fetcher,               "bundler/fetcher"
+  autoload :GemHelper,             "bundler/gem_helper"
+  autoload :GemHelpers,            "bundler/gem_helpers"
+  autoload :GemInstaller,          "bundler/gem_installer"
+  autoload :Graph,                 "bundler/graph"
+  autoload :Index,                 "bundler/index"
+  autoload :Installer,             "bundler/installer"
+  autoload :Injector,              "bundler/injector"
+  autoload :LazySpecification,     "bundler/lazy_specification"
+  autoload :LockfileParser,        "bundler/lockfile_parser"
+  autoload :MatchPlatform,         "bundler/match_platform"
+  autoload :RemoteSpecification,   "bundler/remote_specification"
+  autoload :Resolver,              "bundler/resolver"
+  autoload :Retry,                 "bundler/retry"
+  autoload :RubyVersion,           "bundler/ruby_version"
+  autoload :RubyDsl,               "bundler/ruby_dsl"
+  autoload :Runtime,               "bundler/runtime"
+  autoload :Settings,              "bundler/settings"
+  autoload :SharedHelpers,         "bundler/shared_helpers"
+  autoload :SpecSet,               "bundler/spec_set"
+  autoload :StubSpecification,     "bundler/stub_specification"
+  autoload :Source,                "bundler/source"
+  autoload :SourceList,            "bundler/source_list"
+  autoload :Specification,         "bundler/shared_helpers"
+  autoload :SystemRubyVersion,     "bundler/ruby_version"
+  autoload :UI,                    "bundler/ui"
 
   class BundlerError < StandardError
     def self.status_code(code)
@@ -215,9 +215,9 @@ module Bundler
     end
 
     def app_config_path
-      ENV['BUNDLE_APP_CONFIG'] ?
-        Pathname.new(ENV['BUNDLE_APP_CONFIG']).expand_path(root) :
-        root.join('.bundle')
+      ENV["BUNDLE_APP_CONFIG"] ?
+        Pathname.new(ENV["BUNDLE_APP_CONFIG"]).expand_path(root) :
+        root.join(".bundle")
     end
 
     def app_cache(custom_path = nil)
@@ -250,11 +250,11 @@ module Bundler
 
     def with_clean_env
       with_original_env do
-        ENV['MANPATH'] = ENV['BUNDLE_ORIG_MANPATH']
-        ENV.delete_if { |k,_| k[0,7] == 'BUNDLE_' }
-        if ENV.has_key? 'RUBYOPT'
-          ENV['RUBYOPT'] = ENV['RUBYOPT'].sub '-rbundler/setup', ''
-          ENV['RUBYOPT'] = ENV['RUBYOPT'].sub "-I#{File.expand_path('..', __FILE__)}", ''
+        ENV["MANPATH"] = ENV["BUNDLE_ORIG_MANPATH"]
+        ENV.delete_if { |k,_| k[0,7] == "BUNDLE_" }
+        if ENV.has_key? "RUBYOPT"
+          ENV["RUBYOPT"] = ENV["RUBYOPT"].sub "-rbundler/setup", ""
+          ENV["RUBYOPT"] = ENV["RUBYOPT"].sub "-I#{File.expand_path("..", __FILE__)}", ""
         end
         yield
       end
@@ -307,7 +307,7 @@ module Bundler
         bin_dir = bin_dir.parent until bin_dir.exist?
 
         # if any directory is not writable, we need sudo
-        files = [path, bin_dir] | Dir[path.join('build_info/*').to_s] | Dir[path.join('*').to_s]
+        files = [path, bin_dir] | Dir[path.join("build_info/*").to_s] | Dir[path.join("*").to_s]
         sudo_needed = files.any?{|f| !File.writable?(f) }
       end
 
@@ -326,8 +326,8 @@ module Bundler
     def which(executable)
       if File.file?(executable) && File.executable?(executable)
         executable
-      elsif ENV['PATH']
-        path = ENV['PATH'].split(File::PATH_SEPARATOR).find do |p|
+      elsif ENV["PATH"]
+        path = ENV["PATH"].split(File::PATH_SEPARATOR).find do |p|
           abs_path = File.join(p, executable)
           File.file?(abs_path) && File.executable?(abs_path)
         end
@@ -336,7 +336,7 @@ module Bundler
     end
 
     def sudo(str)
-      prompt = "\n\n" + <<-PROMPT.gsub(/^ {6}/, '').strip + " "
+      prompt = "\n\n" + <<-PROMPT.gsub(/^ {6}/, "").strip + " "
       Your user account isn't allowed to install to the system Rubygems.
       You can cancel this installation and run:
 
@@ -432,12 +432,12 @@ module Bundler
     end
 
     def configure_gem_home_and_path
-      blank_home = ENV['GEM_HOME'].nil? || ENV['GEM_HOME'].empty?
+      blank_home = ENV["GEM_HOME"].nil? || ENV["GEM_HOME"].empty?
       if settings[:disable_shared_gems]
-        ENV['GEM_PATH'] = ''
+        ENV["GEM_PATH"] = ""
       elsif blank_home || Bundler.rubygems.gem_dir != bundle_path.to_s
         possibles = [Bundler.rubygems.gem_dir, Bundler.rubygems.gem_path]
-        paths = possibles.flatten.compact.uniq.reject { |p| p.empty? }
+        paths = possibles.flatten.compact.uniq.reject(&:empty?)
         ENV["GEM_PATH"] = paths.join(File::PATH_SEPARATOR)
       end
 
@@ -449,7 +449,7 @@ module Bundler
       # TODO: This mkdir_p is only needed for JRuby <= 1.5 and should go away (GH #602)
       FileUtils.mkdir_p bundle_path.to_s rescue nil
 
-      ENV['GEM_HOME'] = File.expand_path(bundle_path, root)
+      ENV["GEM_HOME"] = File.expand_path(bundle_path, root)
       Bundler.rubygems.clear_paths
     end
 
@@ -460,6 +460,5 @@ module Bundler
         lockfile.rmtree
       end
     end
-
   end
 end

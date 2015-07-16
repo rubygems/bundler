@@ -38,6 +38,5 @@ module Bundler
 
       Bundler.ui.info output.join("\n\n")
     end
-
   end
 end

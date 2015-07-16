@@ -1,4 +1,4 @@
-require 'uri'
+require "uri"
 
 module Bundler
   class Settings
@@ -47,7 +47,7 @@ module Bundler
       keys = @global_config.keys | @local_config.keys | env_keys
 
       keys.map do |key|
-        key.sub(/^BUNDLE_/, '').gsub(/__/, ".").downcase
+        key.sub(/^BUNDLE_/, "").gsub(/__/, ".").downcase
       end
     end
 
@@ -147,7 +147,7 @@ module Bundler
     end
 
     def ignore_config?
-      ENV['BUNDLE_IGNORE_CONFIG']
+      ENV["BUNDLE_IGNORE_CONFIG"]
     end
 
     def app_cache_path
@@ -159,6 +159,7 @@ module Bundler
     end
 
   private
+
     def key_for(key)
       if key.is_a?(String) && /https?:/ =~ key
         key = normalize_uri(key).to_s
@@ -184,7 +185,7 @@ module Bundler
     end
 
     def to_bool(value)
-      !(value.nil? || value == '' || value =~ /^(false|f|no|n|0)$/i || value == false)
+      !(value.nil? || value == "" || value =~ /^(false|f|no|n|0)$/i || value == false)
     end
 
     def is_num(value)
@@ -192,7 +193,7 @@ module Bundler
     end
 
     def get_array(key)
-      self[key] ? self[key].split(":").map { |w| w.to_sym } : []
+      self[key] ? self[key].split(":").map(&:to_sym) : []
     end
 
     def set_array(key, array)
@@ -206,7 +207,7 @@ module Bundler
         hash[key] = value
         hash.delete(key) if value.nil?
         FileUtils.mkdir_p(file.dirname)
-        require 'bundler/psyched_yaml'
+        require "bundler/psyched_yaml"
         File.open(file, "w") { |f| f.puts YAML.dump(hash) }
       end
 
@@ -255,6 +256,5 @@ module Bundler
       end
       uri
     end
-
   end
 end

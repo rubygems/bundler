@@ -38,8 +38,8 @@ describe "bundle clean" do
 
     expect(out).to eq("Removing foo (1.0)")
 
-    should_have_gems 'thin-1.0', 'rack-1.0.0'
-    should_not_have_gems 'foo-1.0'
+    should_have_gems "thin-1.0", "rack-1.0.0"
+    should_not_have_gems "foo-1.0"
 
     expect(vendored_gems("bin/rackup")).to exist
   end
@@ -66,8 +66,8 @@ describe "bundle clean" do
 
     expect(out).to eq("Removing rack (0.9.1)")
 
-    should_have_gems 'foo-1.0', 'rack-1.0.0'
-    should_not_have_gems 'rack-0.9.1'
+    should_have_gems "foo-1.0", "rack-1.0.0"
+    should_not_have_gems "rack-0.9.1"
 
     expect(vendored_gems("bin/rackup")).to exist
   end
@@ -94,8 +94,8 @@ describe "bundle clean" do
 
     expect(out).to eq("Removing rack (1.0.0)")
 
-    should_have_gems 'foo-1.0', 'rack-0.9.1'
-    should_not_have_gems 'rack-1.0.0'
+    should_have_gems "foo-1.0", "rack-0.9.1"
+    should_not_have_gems "rack-1.0.0"
 
     expect(vendored_gems("bin/rackup")).to exist
   end
@@ -117,8 +117,8 @@ describe "bundle clean" do
 
     expect(out).to eq("Removing rack (1.0.0)")
 
-    should_have_gems 'foo-1.0'
-    should_not_have_gems 'rack-1.0.0'
+    should_have_gems "foo-1.0"
+    should_not_have_gems "rack-1.0.0"
 
     expect(vendored_gems("bin/rackup")).to_not exist
   end
@@ -126,7 +126,7 @@ describe "bundle clean" do
   it "does not remove cached git dir if it's being used" do
     build_git "foo"
     revision = revision_for(lib_path("foo-1.0"))
-    git_path = lib_path('foo-1.0')
+    git_path = lib_path("foo-1.0")
 
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -147,7 +147,7 @@ describe "bundle clean" do
 
   it "removes unused git gems" do
     build_git "foo", :path => lib_path("foo")
-    git_path = lib_path('foo')
+    git_path = lib_path("foo")
     revision = revision_for(git_path)
 
     gemfile <<-G
@@ -190,7 +190,7 @@ describe "bundle clean" do
       source "file://#{gem_repo1}"
 
       gem "rack", "1.0.0"
-      git "#{lib_path('foo-bar')}" do
+      git "#{lib_path("foo-bar")}" do
         gem "foo-bar"
       end
     G
@@ -222,7 +222,7 @@ describe "bundle clean" do
     revision = revision_for(lib_path("rails"))
 
     gemfile <<-G
-      gem "activesupport", :git => "#{lib_path('rails')}", :ref => '#{revision}'
+      gem "activesupport", :git => "#{lib_path("rails")}", :ref => '#{revision}'
     G
 
     bundle "install --path vendor/bundle"
@@ -234,7 +234,7 @@ describe "bundle clean" do
 
   it "does not remove git sources that are in without groups" do
     build_git "foo", :path => lib_path("foo")
-    git_path = lib_path('foo')
+    git_path = lib_path("foo")
     revision = revision_for(git_path)
 
     gemfile <<-G
@@ -311,8 +311,8 @@ describe "bundle clean" do
 
     bundle :clean
 
-    should_not_have_gems 'thin-1.0', 'rack-1.0'
-    should_have_gems 'foo-1.0'
+    should_not_have_gems "thin-1.0", "rack-1.0"
+    should_have_gems "foo-1.0"
 
     expect(vendored_gems("bin/rackup")).not_to exist
   end
@@ -354,8 +354,8 @@ describe "bundle clean" do
     G
     bundle "install"
 
-    should_have_gems 'rack-1.0.0'
-    should_not_have_gems 'thin-1.0'
+    should_have_gems "rack-1.0.0"
+    should_not_have_gems "thin-1.0"
   end
 
   it "--clean should override the bundle setting on update" do
@@ -369,13 +369,13 @@ describe "bundle clean" do
     bundle "install --path vendor/bundle --clean"
 
     update_repo2 do
-      build_gem 'foo', '1.0.1'
+      build_gem "foo", "1.0.1"
     end
 
     bundle "update"
 
-    should_have_gems 'foo-1.0.1'
-    should_not_have_gems 'foo-1.0'
+    should_have_gems "foo-1.0.1"
+    should_not_have_gems "foo-1.0"
   end
 
   it "does not clean automatically on --path" do
@@ -394,7 +394,7 @@ describe "bundle clean" do
     G
     bundle "install"
 
-    should_have_gems 'rack-1.0.0', 'thin-1.0'
+    should_have_gems "rack-1.0.0", "thin-1.0"
   end
 
   it "does not clean on bundle update with --path" do
@@ -408,11 +408,11 @@ describe "bundle clean" do
     bundle "install --path vendor/bundle"
 
     update_repo2 do
-      build_gem 'foo', '1.0.1'
+      build_gem "foo", "1.0.1"
     end
 
     bundle :update
-    should_have_gems 'foo-1.0', 'foo-1.0.1'
+    should_have_gems "foo-1.0", "foo-1.0.1"
   end
 
   it "does not clean on bundle update when using --system" do
@@ -426,7 +426,7 @@ describe "bundle clean" do
     bundle "install"
 
     update_repo2 do
-      build_gem 'foo', '1.0.1'
+      build_gem "foo", "1.0.1"
     end
     bundle :update
 
@@ -464,17 +464,17 @@ describe "bundle clean" do
     gemfile <<-G
       source "file://#{gem_repo1}"
 
-      gem "foo", :git => "#{lib_path('foo-1.0')}"
+      gem "foo", :git => "#{lib_path("foo-1.0")}"
     G
 
     bundle "install --path vendor/bundle"
 
     # mimic 7 length git revisions in Gemfile.lock
-    gemfile_lock = File.read(bundled_app('Gemfile.lock')).split("\n")
+    gemfile_lock = File.read(bundled_app("Gemfile.lock")).split("\n")
     gemfile_lock.each_with_index do |line, index|
       gemfile_lock[index] = line[0..(11 + 7)] if line.include?("  revision:")
     end
-    File.open(bundled_app('Gemfile.lock'), 'w') do |file|
+    File.open(bundled_app("Gemfile.lock"), "w") do |file|
       file.print gemfile_lock.join("\n")
     end
 
@@ -490,7 +490,7 @@ describe "bundle clean" do
   it "when using --force on system gems, it doesn't remove binaries" do
     build_repo2
     update_repo2 do
-      build_gem 'bindir' do |s|
+      build_gem "bindir" do |s|
         s.bindir = "exe"
         s.executables = "foo"
       end
@@ -515,7 +515,7 @@ describe "bundle clean" do
     relative_path = "vendor/private_gems/bar-1.0"
     absolute_path = bundled_app(relative_path)
     FileUtils.mkdir_p("#{absolute_path}/lib/bar")
-    File.open("#{absolute_path}/lib/bar/bar.rb", 'wb') do |file|
+    File.open("#{absolute_path}/lib/bar/bar.rb", "wb") do |file|
       file.puts "module Bar; end"
     end
 
@@ -555,7 +555,7 @@ describe "bundle clean" do
     expect(out).not_to eq("Removing foo (1.0)")
     expect(out).to eq("Would have removed foo (1.0)")
 
-    should_have_gems 'thin-1.0', 'rack-1.0.0', 'foo-1.0'
+    should_have_gems "thin-1.0", "rack-1.0.0", "foo-1.0"
 
     expect(vendored_gems("bin/rackup")).to exist
   end
@@ -584,8 +584,8 @@ describe "bundle clean" do
     expect(out).to eq("Removing foo (1.0)")
     expect(out).not_to eq("Would have removed foo (1.0)")
 
-    should_have_gems 'thin-1.0', 'rack-1.0.0'
-    should_not_have_gems 'foo-1.0'
+    should_have_gems "thin-1.0", "rack-1.0.0"
+    should_not_have_gems "foo-1.0"
 
     expect(vendored_gems("bin/rackup")).to exist
   end
@@ -609,8 +609,8 @@ describe "bundle clean" do
 
     bundle "config auto_install 1"
     bundle :clean
-    expect(out).to include('Installing weakling 0.0.3')
-    should_have_gems 'thin-1.0', 'rack-1.0.0', 'weakling-0.0.3'
-    should_not_have_gems 'foo-1.0'
+    expect(out).to include("Installing weakling 0.0.3")
+    should_have_gems "thin-1.0", "rack-1.0.0", "weakling-0.0.3"
+    should_not_have_gems "foo-1.0"
   end
 end

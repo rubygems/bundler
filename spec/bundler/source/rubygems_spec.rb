@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Bundler::Source::Rubygems do
   before do
@@ -22,5 +22,4 @@ describe Bundler::Source::Rubygems do
       end
     end
   end
-
 end

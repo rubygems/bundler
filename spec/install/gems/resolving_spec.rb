@@ -27,7 +27,7 @@ describe "bundle install with gem sources" do
       spec.dependencies.each do |d|
         d.instance_variable_set(:@type, :fail)
       end
-      File.open(path, 'w') do |f|
+      File.open(path, "w") do |f|
         f.write Gem.deflate(Marshal.dump(spec))
       end
 
@@ -99,7 +99,6 @@ describe "bundle install with gem sources" do
           expect(resolve_output).to include(" net_b (>= 0) ruby")
         end
       end
-
     end
 
     describe "when some gems require a different version of ruby" do

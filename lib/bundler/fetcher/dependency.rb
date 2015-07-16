@@ -1,4 +1,4 @@
-require 'bundler/fetcher/base'
+require "bundler/fetcher/base"
 
 module Bundler
   class Fetcher
@@ -43,7 +43,7 @@ module Bundler
       end
 
       def dependency_specs(gem_names)
-        Bundler.ui.debug "Query Gemcutter Dependency Endpoint API: #{gem_names.join(',')}"
+        Bundler.ui.debug "Query Gemcutter Dependency Endpoint API: #{gem_names.join(",")}"
         gem_list = []
         deps_list = []
 
@@ -82,7 +82,6 @@ module Bundler
           "gemspec. \nPlease ask the gem author to yank the bad version to fix " \
           "this issue. For more information, see http://bit.ly/syck-defaultkey."
       end
-
     end
   end
 end

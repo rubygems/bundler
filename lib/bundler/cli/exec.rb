@@ -1,4 +1,4 @@
-require 'bundler/current_ruby'
+require "bundler/current_ruby"
 
 module Bundler
   class CLI::Exec
@@ -47,6 +47,5 @@ module Bundler
       Bundler.ui.error "bundler: exec needs a command to run"
       exit 128
     end
-
   end
 end

@@ -7,7 +7,7 @@ module Spec
     end
 
     def mac
-      Gem::Platform.new('x86-darwin-10')
+      Gem::Platform.new("x86-darwin-10")
     end
 
     def java
@@ -15,19 +15,19 @@ module Spec
     end
 
     def linux
-      Gem::Platform.new(['x86', 'linux', nil])
+      Gem::Platform.new(["x86", "linux", nil])
     end
 
     def mswin
-      Gem::Platform.new(['x86', 'mswin32', nil])
+      Gem::Platform.new(["x86", "mswin32", nil])
     end
 
     def mingw
-      Gem::Platform.new(['x86', 'mingw32', nil])
+      Gem::Platform.new(["x86", "mingw32", nil])
     end
 
     def x64_mingw
-      Gem::Platform.new(['x64', 'mingw32', nil])
+      Gem::Platform.new(["x64", "mingw32", nil])
     end
 
     def all_platforms

@@ -1,6 +1,6 @@
 # encoding: utf-8
-require 'spec_helper'
-require 'bundler'
+require "spec_helper"
+require "bundler"
 
 describe Bundler do
   describe "#load_gemspec_uncached" do
@@ -24,7 +24,7 @@ describe Bundler do
       context "on Rubies with a settable YAML engine", :if => defined?(YAML::ENGINE) do
         context "with Syck as YAML::Engine" do
           it "raises a GemspecError after YAML load throws ArgumentError" do
-            orig_yamler, YAML::ENGINE.yamler = YAML::ENGINE.yamler, 'syck'
+            orig_yamler, YAML::ENGINE.yamler = YAML::ENGINE.yamler, "syck"
 
             expect { subject }.to raise_error(Bundler::GemspecError)
 
@@ -34,7 +34,7 @@ describe Bundler do
 
         context "with Psych as YAML::Engine" do
           it "raises a GemspecError after YAML load throws Psych::SyntaxError" do
-            orig_yamler, YAML::ENGINE.yamler = YAML::ENGINE.yamler, 'psych'
+            orig_yamler, YAML::ENGINE.yamler = YAML::ENGINE.yamler, "psych"
 
             expect { subject }.to raise_error(Bundler::GemspecError)
 
@@ -53,7 +53,7 @@ describe Bundler do
         $VERBOSE = verbose
 
         File.open(app_gemspec_path, "wb") do |file|
-          file.puts <<-GEMSPEC.gsub(/^\s+/, '')
+          file.puts <<-GEMSPEC.gsub(/^\s+/, "")
             # -*- encoding: utf-8 -*-
             Gem::Specification.new do |gem|
               gem.author = "André the Giant"
@@ -68,6 +68,5 @@ describe Bundler do
         $VERBOSE = verbose
       end
     end
-
   end
 end

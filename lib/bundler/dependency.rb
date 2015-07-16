@@ -1,6 +1,6 @@
-require 'rubygems/dependency'
-require 'bundler/shared_helpers'
-require 'bundler/rubygems_ext'
+require "rubygems/dependency"
+require "bundler/shared_helpers"
+require "bundler/rubygems_ext"
 
 module Bundler
   class Dependency < Gem::Dependency
@@ -51,14 +51,14 @@ module Bundler
       super(name, version, type)
 
       @autorequire    = nil
-      @groups         = Array(options["group"] || :default).map { |g| g.to_sym }
+      @groups         = Array(options["group"] || :default).map(&:to_sym)
       @source         = options["source"]
       @platforms      = Array(options["platforms"])
       @env            = options["env"]
       @should_include = options.fetch("should_include", true)
 
-      if options.key?('require')
-        @autorequire = Array(options['require'] || [])
+      if options.key?("require")
+        @autorequire = Array(options["require"] || [])
       end
     end
 
@@ -98,7 +98,7 @@ module Bundler
 
     def to_lock
       out = super
-      out << '!' if source
+      out << "!" if source
       out << "\n"
     end
 

@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe "real world edgecases", :realworld => true do
   # there is no rbx-relative-require gem that will install on 1.9

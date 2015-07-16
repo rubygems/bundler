@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Bundler::Retry do
   it "return successful result if no errors" do
