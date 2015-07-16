@@ -41,6 +41,18 @@ module Bundler
       end
     end
 
+    def set_config(key, value, options = {})
+      config = options.fetch(:config, :current)
+      case config
+      when :current
+        set_current(key, value)
+      when :global
+        set_global(key, value)
+      when :local
+        set_local(key, value)
+      end
+    end
+
     def set_current(key, value)
       key = key_for key
       @current_config[key] = value
@@ -116,44 +128,75 @@ module Bundler
       key = key_for(exposed_key)
 
       locations = []
-      if @local_config.key?(key)
-        locations << "Set only for this command using command line arguments"
+      if @current_config.key?(key)
+        locations << message_for_config(:current) + " #{key}: #{@current_config[key]}"
       end
 
       if @local_config.key?(key)
-        locations << "Set for your local app (#{local_config_file}): #{@local_config[key].inspect}"
+        locations << message_for_config(:local) + " #{key}: #{@local_config[key].inspect}"
       end
 
       if value = ENV[key]
-        locations << "Set via #{key}: #{value.inspect}"
+        locations << message_for_config(:env) + " #{key}: #{value.inspect}"
       end
 
       if @global_config.key?(key)
-        locations << "Set for the current user (#{global_config_file}): #{@global_config[key].inspect}"
+        locations << message_for_config(:global) + " #{key}: #{@global_config[key].inspect}"
       end
 
       if DEFAULT_CONFIG.key?(exposed_key)
-        locations << "Set by default: #{DEFAULT_CONFIG[key].inspect}"
+        locations << message_for_config(:default) + " #{key}: #{DEFAULT_CONFIG[key].inspect}"
       end
 
       return ["You have not configured a value for `#{exposed_key}`"] if locations.empty?
       locations
     end
 
+    def message_for_config(config)
+      messages = {
+        :current => "Set only for this command using command line arguments",
+        :local => "Set for your local app (#{local_config_file})",
+        :env => "Set via environment",
+        :global => "Set for the current user (#{global_config_file})",
+        :default => "Set by default"
+      }
+      messages[config]
+    end
+
     def without=(array)
-      set_array(:without, array)
+      set_without(array)
     end
 
     def with=(array)
-      set_array(:with, array)
+      set_with(array)
+    end
+
+    def set_with(array, options = {})
+      enum = array.to_set
+      opposite_group = to_set( config_for_symbol( options.fetch :config, :current )[without_key] )
+      resolve_conflicts(enum, opposite_group)
+      break_with_without_cache!
+      set_array(:with, enum, options)
+    end
+
+    def set_without(array, options = {})
+      enum = array.to_set
+      opposite_group = to_set( config_for_symbol( options.fetch :config, :current )[with_key] )
+      resolve_conflicts(enum, opposite_group)
+      break_with_without_cache!
+      set_array(:without, enum, options)
     end
 
     def without
-      get_array(:without)
+      get_with_and_without[1].to_a
     end
 
     def with
-      get_array(:with)
+      get_with_and_without[0].to_a
+    end
+
+    def groups_conflict?(group_one, group_two)
+      group_one.to_set.intersect? group_two.to_set
     end
 
     # @local_config["BUNDLE_PATH"] should be prioritized over ENV["BUNDLE_PATH"]
@@ -190,7 +233,86 @@ module Bundler
       end
     end
 
+    def break_with_without_cache!
+      @with_and_without = nil
+    end
+
   private
+    def config_for_symbol(sym)
+      case sym.to_sym
+      when :local
+        return @local_config
+      when :current
+        return @current_config
+      when :global
+        return @global_config
+      when :env
+        return ENV
+      when :default
+        return DEFAULT_CONFIG
+      end
+    end
+
+    def all_configs
+      [@current_config, @local_config, ENV, @global_config, DEFAULT_CONFIG]
+    end
+
+    def with_key
+      @with_key ||= key_for(:with)
+    end
+
+    def without_key
+      @without_key ||= key_for(:without)
+    end
+
+    def get_with_and_without
+      @with_and_without ||= resolve_with_without_groups
+    end
+
+    def resolve_with_without_groups
+      reverse_config = all_configs.reverse
+      with, without = reverse_config.map.with_index do |c, i|
+        superior_configs = reverse_config.slice((i+1)..-1)
+        override_from_superior_configs c, superior_configs
+      end.transpose
+      [with.to_set.flatten, without.to_set.flatten]
+    end
+
+    def override_from_superior_configs(config, superiors)
+      all_values_for_key = proc {|key| superiors.flat_map { |c| to_array(c[key]) } }
+      vetted_with = to_set(config[with_key]) - all_values_for_key[without_key]
+      vetted_without = to_set(config[without_key]) - all_values_for_key[with_key]
+      [vetted_with, vetted_without]
+    end
+
+    def resolve_all_conflicts
+      cgs = conflicting_groups
+      raise ArgumentError, conflicting_groups_message(cgs) unless cgs.empty?
+    end
+
+    def resolve_conflicts(array1, array2)
+      array1, array2 = to_array(array1), to_array(array2)
+      raise ArgumentError, conflicting_groups_message if groups_conflict? array1, array2
+    end
+
+    def conflicting_groups_message(cgs = [])
+      msg = "With and without groups cannot conflict."
+      cgs.each do |k, (w, wo)|
+        msg += "\n#{key}: #{message_for_config(k)}"
+        msg += "\n\twithout: #{wo.join(',')}"
+        msg += "\n\twith: #{w.join(',')}"
+      end
+      msg
+    end
+
+    def conflicting_groups
+      with_locations, without_locations = locations(:with), locations(:without)
+      (with_locations.keys & without_locations.keys).map do |key|
+        groups = [to_set(with_locations[key]), to_set(without_locations[key])]
+        groups_conflict?(*groups) ? [key, groups] : nil
+      end.compact.to_h
+    end
+
     def key_for(key)
       if key.is_a?(String) && /https?:/ =~ key
         key = normalize_uri(key).to_s
@@ -224,11 +346,24 @@ module Bundler
     end
 
     def get_array(key)
-      self[key] ? self[key].split(":").map { |w| w.to_sym } : []
+      array = to_array(self[key])
+      array && !array.empty? ? array : []
     end
 
-    def set_array(key, array)
-     self[key] = (array.empty? ? nil : array.join(":")) if array
+    def set_array(key, array, options = {})
+      array = array.to_a
+      value = (array && !array.empty?) ? array.join(":") : nil
+      set_config(key, value, options)
+    end
+
+    def to_array(string_or_enum)
+      return [] if string_or_enum.nil?
+      return string_or_enum unless string_or_enum.respond_to? :split
+      string_or_enum.split(":").map { |w| w.to_sym }
+    end
+
+    def to_set(string_or_enum)
+      to_array(string_or_enum).to_set
     end
 
     def set_key(key, value, hash, file)
