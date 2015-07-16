@@ -8,7 +8,7 @@ bundle-update(1) -- Update your gems to the latest available versions
 ## DESCRIPTION
 
 Update the gems specified (all gems, if none are specified), ignoring
-the previously installed gems specified in the `Gemfile.lock`. In
+the previously installed gems specified in `gems.locked`. In
 general, you should use [bundle install(1)][bundle-install] to install the same exact
 gems and versions across machines.
 
@@ -24,7 +24,7 @@ gem.
   the test group, for example.
 
 * `--source=<name>`:
-  The name of a `:git` or `:path` source used in the Gemfile(5). For
+  The name of a `:git` or `:path` source used in gems.rb(5). For
   instance, with a `:git` source of `http://github.com/rails/rails.git`,
   you would call `bundle update --source rails`
 
@@ -37,7 +37,7 @@ If you run `bundle update` with no parameters, bundler will ignore
 any previously installed gems and resolve all dependencies again
 based on the latest versions of all gems available in the sources.
 
-Consider the following Gemfile(5):
+Consider the following gems.rb(5):
 
     source "https://rubygems.org"
 
@@ -76,31 +76,31 @@ all of the dependencies, all the way down, and install what you need:
     Installing rails 3.0.0.rc
     Installing nokogiri 1.6.5
 
-    Bundle complete! 2 Gemfile dependencies, 26 gems total.
+    Bundle complete! 2 gems.rb dependencies, 26 gems total.
     Use `bundle show [gemname]` to see where a bundled gem is installed.
 
-As you can see, even though you have just two gems in the Gemfile(5), your application
+As you can see, even though you have just two gems in gems.rb(5), your application
 actually needs 26 different gems in order to run. Bundler remembers the exact versions
-it installed in `Gemfile.lock`. The next time you run [bundle install(1)][bundle-install], bundler skips
+it installed in `gems.locked`. The next time you run [bundle install(1)][bundle-install], bundler skips
 the dependency resolution and installs the same gems as it installed last time.
 
-After checking in the `Gemfile.lock` into version control and cloning it on another
+After checking in `gems.locked` into version control and cloning it on another
 machine, running [bundle install(1)][bundle-install] will _still_ install the gems that you installed
 last time. You don't need to worry that a new release of `erubis` or `mail` changes
 the gems you use.
 
 However, from time to time, you might want to update the gems you are using to the
-newest versions that still match the gems in your Gemfile(5).
+newest versions that still match the gems in your gems.rb(5).
 
-To do this, run `bundle update`, which will ignore the `Gemfile.lock`, and resolve
+To do this, run `bundle update`, which will ignore the `gems.locked`, and resolve
 all the dependencies again. Keep in mind that this process can result in a significantly
 different set of the 25 gems, based on the requirements of new gems that the gem
 authors released since the last time you ran `bundle update`.
 
 ## UPDATING A LIST OF GEMS
 
-Sometimes, you want to update a single gem in the Gemfile(5), and leave the rest of the
-gems that you specified locked to the versions in the `Gemfile.lock`.
+Sometimes, you want to update a single gem in gems.rb(5), and leave the rest of the
+gems that you specified locked to the versions in the `gems.locked`.
 
 For instance, in the scenario above, imagine that `nokogiri` releases version `1.4.4`, and
 you want to update it _without_ updating Rails and all of its dependencies. To do this,
@@ -111,7 +111,7 @@ its dependencies.
 
 ## OVERLAPPING DEPENDENCIES
 
-Sometimes, multiple gems declared in your Gemfile(5) are satisfied by the same
+Sometimes, multiple gems declared in your gems.rb(5) are satisfied by the same
 second-level dependency. For instance, consider the case of `thin` and
 `rack-perftools-profiler`.
 
@@ -143,7 +143,7 @@ In this case, the two gems have their own set of dependencies, but they share
 `In short`, when you update a gem using `bundle update`, bundler will update all
 dependencies of that gem, including those that are also dependencies of another gem.
 
-In this scenario, updating the `thin` version manually in the Gemfile(5),
+In this scenario, updating the `thin` version manually in gems.rb(5),
 and then running [bundle install(1)][bundle-install] will only update `daemons` and `eventmachine`,
 but not `rack`. For more information, see the `CONSERVATIVE UPDATING` section
 of [bundle install(1)][bundle-install].
@@ -153,13 +153,13 @@ of [bundle install(1)][bundle-install].
 In general, when working with an application managed with bundler, you should
 use the following workflow:
 
-* After you create your Gemfile(5) for the first time, run
+* After you create your gems.rb(5) for the first time, run
 
     $ bundle install
 
-* Check the resulting `Gemfile.lock` into version control
+* Check the resulting `gems.locked` into version control
 
-    $ git add Gemfile.lock
+    $ git add gems.locked
 
 * When checking out this repository on another development machine, run
 
@@ -169,20 +169,20 @@ use the following workflow:
 
     $ bundle install --deployment
 
-* After changing the Gemfile(5) to reflect a new or update dependency, run
+* After changing the gems.rb(5) to reflect a new or update dependency, run
 
     $ bundle install
 
-* Make sure to check the updated `Gemfile.lock` into version control
+* Make sure to check the updated `gems.locked` into version control
 
-    $ git add Gemfile.lock
+    $ git add gems.locked
 
 * If [bundle install(1)][bundle-install] reports a conflict, manually update the specific
-  gems that you changed in the Gemfile(5)
+  gems that you changed in the gems.rb(5)
 
     $ bundle update rails thin
 
 * If you want to update all the gems to the latest possible versions that
-  still match the gems listed in the Gemfile(5), run
+  still match the gems listed in the gems.rb(5), run
 
     $ bundle update

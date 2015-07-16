@@ -22,7 +22,7 @@ module Bundler
     def default_gemfile
       gemfile = find_gemfile
       deprecate_gemfile(gemfile)
-      raise GemfileNotFound, "Could not locate Gemfile" unless gemfile
+      raise GemfileNotFound, "Could not locate gems.rb" unless gemfile
       Pathname.new(gemfile)
     end
 
@@ -151,8 +151,8 @@ module Bundler
       if gemfile && File.basename(gemfile) == "Gemfile"
         Bundler.respond_to?(:ui) && Bundler.ui.deprecate(
           "Gemfile and Gemfile.lock are " \
-          "deprecated and will be replaced with gems.rb and " \
-          "gems.locked in Bundler 2.0.\n"
+          "deprecated and have been replaced with gems.rb and " \
+          "gems.locked. Please use them instead.\n"
         )
       end
     end

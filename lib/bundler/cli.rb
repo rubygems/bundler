@@ -76,28 +76,28 @@ module Bundler
       Kernel.exec(command_path, *ARGV[1..-1])
     end
 
-    desc "init [OPTIONS]", "Generates a Gemfile into the current working directory"
+    desc "init [OPTIONS]", "Generates a gems.rb into the current working directory"
     long_desc <<-D
-      Init generates a default Gemfile in the current working directory. When adding a
-      Gemfile to a gem with a gemspec, the --gemspec option will automatically add each
-      dependency listed in the gemspec file to the newly created Gemfile.
+      Init generates a default gems.rb in the current working directory. When adding a
+      gems.rb to a gem with a gemspec, the --gemspec option will automatically add each
+      dependency listed in the gemspec file to the newly created gems.rb.
     D
-    method_option "gemspec", :type => :string, :banner => "Use the specified .gemspec to create the Gemfile"
+    method_option "gemspec", :type => :string, :banner => "Use the specified .gemspec to create the gems.rb"
     def init
       require 'bundler/cli/init'
       Init.new(options.dup).run
     end
 
-    desc "check [OPTIONS]", "Checks if the dependencies listed in Gemfile are satisfied by currently installed gems"
+    desc "check [OPTIONS]", "Checks if the dependencies listed in gems.rb are satisfied by currently installed gems"
     long_desc <<-D
-      Check searches the local machine for each of the gems requested in the Gemfile. If
+      Check searches the local machine for each of the gems requested in the gems.rb. If
       all gems are found, Bundler prints a success message and exits with a status of 0.
       If not, the first missing gem is listed and Bundler exits status 1.
     D
     method_option "dry-run", :type => :boolean, :default => false, :banner =>
-      "Lock the Gemfile"
+      "Lock the gems.rb"
     method_option "gemfile", :type => :string, :banner =>
-      "Use the specified gemfile instead of Gemfile"
+      "Use the specified gemfile instead of gems.rb"
     method_option "path", :type => :string, :banner =>
       "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
     map "c" => "check"
@@ -110,7 +110,7 @@ module Bundler
     long_desc <<-D
       Install will install all of the gems in the current bundle, making them available
       for use. In a freshly checked out repository, this command will give you the same
-      gem versions as the last person who updated the Gemfile and ran `bundle update`.
+      gem versions as the last person who updated the gems.rb and ran `bundle update`.
 
       Passing [DIR] to install (e.g. vendor) will cause the unpacked gems to be installed
       into the [DIR] directory rather than into system gems.
@@ -122,11 +122,11 @@ module Bundler
     method_option "deployment", :type => :boolean, :banner =>
       "Install using defaults tuned for deployment environments"
     method_option "frozen", :type => :boolean, :banner =>
-      "Do not allow the Gemfile.lock to be updated after this install"
+      "Do not allow the gems.locked to be updated after this install"
     method_option "full-index", :type => :boolean, :banner =>
       "Use the rubygems modern index instead of the API endpoint"
     method_option "gemfile", :type => :string, :banner =>
-      "Use the specified gemfile instead of Gemfile"
+      "Use the specified gemfile instead of gems.rb"
     method_option "jobs", :aliases => "-j", :type => :numeric, :banner =>
       "Specify the number of jobs to run in parallel"
     method_option "local", :type => :boolean, :banner =>
@@ -162,8 +162,8 @@ module Bundler
 
     desc "update [OPTIONS]", "update the current environment"
     long_desc <<-D
-      Update will install the newest versions of the gems listed in the Gemfile. Use
-      update when you have changed the Gemfile, or if you want to get the newest
+      Update will install the newest versions of the gems listed in the gems.rb. Use
+      update when you have changed the gems.rb, or if you want to get the newest
       possible versions of the gems in the bundle.
     D
     method_option "full-index", :type => :boolean, :banner =>
@@ -187,11 +187,11 @@ module Bundler
 
     desc "show GEM [OPTIONS]", "Shows all gems that are part of the bundle, or the path to a given gem"
     long_desc <<-D
-      Show lists the names and versions of all gems that are required by your Gemfile.
+      Show lists the names and versions of all gems that are required by your gems.rb.
       Calling show with [GEM] will list the exact location of that gem on your machine.
     D
     method_option "paths", :type => :boolean,
-      :banner => "List the paths of all gems that are required by your Gemfile."
+      :banner => "List the paths of all gems that are required by your gems.rb."
     method_option "outdated", :type => :boolean,
       :banner => "Show verbose output including whether gems are outdated."
     def show(gem_name = nil)
@@ -226,7 +226,7 @@ module Bundler
     method_option "pre", :type => :boolean, :banner => "Check for newer pre-release gems"
     method_option "source", :type => :array, :banner => "Check against a specific source"
     method_option "strict", :type => :boolean, :banner =>
-      "Only list newer versions allowed by your Gemfile requirements"
+      "Only list newer versions allowed by your gems.rb requirements"
     def outdated(*gems)
       require 'bundler/cli/outdated'
       Outdated.new(options, gems).run
@@ -246,7 +246,7 @@ module Bundler
     method_option "all-platforms", :type => :boolean, :banner => "Include gems for all platforms, not just the current one"
     method_option "cache-path", :type => :string, :banner =>
       "Specify a different cache path than the default (vendor/cache)."
-    method_option "gemfile", :type => :string, :banner => "Use the specified gemfile instead of Gemfile"
+    method_option "gemfile", :type => :string, :banner => "Use the specified gemfile instead of gems.rb"
     method_option "no-install",  :type => :boolean, :banner => "Don't actually install the gems, just package."
     method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
     method_option "path", :type => :string, :banner =>
@@ -328,7 +328,7 @@ module Bundler
 
     desc 'viz [OPTIONS]', "Generates a visual dependency graph"
     long_desc <<-D
-      Viz generates a PNG file of the current Gemfile as a dependency graph.
+      Viz generates a PNG file of the current gems.rb as a dependency graph.
       Viz requires the ruby-graphviz gem (and its dependencies).
       The associated gems must also be installed via 'bundle install'.
     D
@@ -379,7 +379,7 @@ module Bundler
       Platform.new(options).run
     end
 
-    desc "inject GEM VERSION ...", "Add the named gem(s), with version requirements, to the resolved Gemfile"
+    desc "inject GEM VERSION ...", "Add the named gem(s), with version requirements, to the resolved gems.rb"
     def inject(name, version, *gems)
       require 'bundler/cli/inject'
       Inject.new(options, name, version, gems).run

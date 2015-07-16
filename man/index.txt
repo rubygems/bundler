@@ -1,4 +1,4 @@
-Gemfile(5)         gemfile.5
+gems.rb(5)         gems.rb.5
 bundle-install     bundle-install.1
 bundle-update      bundle-update.1
 bundle-package     bundle-package.1

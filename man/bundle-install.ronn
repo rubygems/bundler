@@ -1,4 +1,4 @@
-bundle-install(1) -- Install the dependencies specified in your Gemfile
+bundle-install(1) -- Install the dependencies specified in your gems.rb
 =======================================================================
 
 ## SYNOPSIS
@@ -23,17 +23,17 @@ bundle-install(1) -- Install the dependencies specified in your Gemfile
 
 ## DESCRIPTION
 
-Install the gems specified in your Gemfile(5). If this is the first
-time you run bundle install (and a `Gemfile.lock` does not exist),
+Install the gems specified in your gems.rb(5). If this is the first
+time you run bundle install (and a `gems.locked` does not exist),
 Bundler will fetch all remote sources, resolve dependencies and
 install all needed gems.
 
-If a `Gemfile.lock` does exist, and you have not updated your Gemfile(5),
+If a `gems.locked` does exist, and you have not updated your gems.rb(5),
 Bundler will fetch all remote sources, but use the dependencies
-specified in the `Gemfile.lock` instead of resolving dependencies.
+specified in the `gems.locked` instead of resolving dependencies.
 
-If a `Gemfile.lock` does exist, and you have updated your Gemfile(5),
-Bundler will use the dependencies in the `Gemfile.lock` for all gems
+If a `gems.locked` does exist, and you have updated your gems.rb(5),
+Bundler will use the dependencies in the `gems.locked` for all gems
 that you did not update, but will re-resolve the dependencies of
 gems that you did update. You can find more information about this
 update process below under [CONSERVATIVE UPDATING][].
@@ -45,7 +45,7 @@ time `bundle install` is run, use `bundle config` (see bundle-config(1)).
 
 * `--clean`:
   On finishing the installation Bundler is going to remove any gems not present
-  in the current Gemfile(5). Don't worry, gems currently in use will not be
+  in the current gems.rb(5). Don't worry, gems currently in use will not be
   removed.
 
 * `--full-index`:
@@ -54,10 +54,10 @@ time `bundle install` is run, use `bundle config` (see bundle-config(1)).
   large bundles that seldomly change by enabling this option.
 
 * `--gemfile=<gemfile>`:
-  The location of the Gemfile(5) which Bundler should use. This defaults
-  to a Gemfile(5) in the current working directory. In general, Bundler
-  will assume that the location of the Gemfile(5) is also the project's
-  root and will try to find `Gemfile.lock` and `vendor/cache` relative
+  The location of the gems.rb(5) which Bundler should use. This defaults
+  to a gems.rb(5) in the current working directory. In general, Bundler
+  will assume that the location of gems.rb(5) is also the project's
+  root and will try to find `gems.locked` and `vendor/cache` relative
   to this location.
 
 * `--jobs=[<number>]`:
@@ -130,25 +130,25 @@ time `bundle install` is run, use `bundle config` (see bundle-config(1)).
 Bundler's defaults are optimized for development. To switch to
 defaults optimized for deployment, use the `--deployment` flag.
 Do not activate deployment mode on development machines, as it
-will cause an error when the Gemfile(5) is modified.
+will cause an error when the gems.rb(5) is modified.
 
-1. A `Gemfile.lock` is required.
+1. A `gems.locked` is required.
 
    To ensure that the same versions of the gems you developed with
-   and tested with are also used in deployments, a `Gemfile.lock`
+   and tested with are also used in deployments, a `gems.locked`
    is required.
 
    This is mainly to ensure that you remember to check your
-   `Gemfile.lock` into version control.
+   `gems.locked` into version control.
 
-2. The `Gemfile.lock` must be up to date
+2. The `gems.locked` must be up to date
 
-   In development, you can modify your Gemfile(5) and re-run
+   In development, you can modify your gems.rb(5) and re-run
    `bundle install` to [conservatively update][CONSERVATIVE UPDATING]
-   your `Gemfile.lock` snapshot.
+   your `gems.locked` snapshot.
 
-   In deployment, your `Gemfile.lock` should be up-to-date with
-   changes made in your Gemfile(5).
+   In deployment, your `gems.locked` should be up-to-date with
+   changes made in your gems.rb(5).
 
 3. Gems are installed to `vendor/bundle` not your default system location
 
@@ -180,7 +180,7 @@ directly into the system.
 You should never use `sudo bundle install`. This is because several
 other steps in `bundle install` must be performed as the current user:
 
-* Updating your `Gemfile.lock`
+* Updating your `gems.locked`
 * Updating your `vendor/cache`, if necessary
 * Checking out private git repositories using your user's SSH keys
 
@@ -197,7 +197,7 @@ gems into their final location.
 ## INSTALLING GROUPS
 
 By default, `bundle install` will install all gems in all groups
-in your Gemfile(5), except those declared for a different platform.
+in your gems.rb(5), except those declared for a different platform.
 
 However, you can explicitly tell Bundler to skip installing
 certain groups with the `--without` option. This option takes
@@ -205,7 +205,7 @@ a space-separated list of groups.
 
 While the `--without` option will skip _installing_ the gems in the
 specified groups, it will still _download_ those gems and use them to
-resolve the dependencies of every gem in your Gemfile(5).
+resolve the dependencies of every gem in your gems.rb(5).
 
 This is so that installing a different set of groups on another
  machine (such as a production server) will not change the
@@ -218,7 +218,7 @@ to exclude some of that code in different environments, but you
 will never be caught flat-footed by different versions of
 third-party code being used in different environments.`
 
-For a simple illustration, consider the following Gemfile(5):
+For a simple illustration, consider the following gems.rb(5):
 
     source 'https://rubygems.org'
 
@@ -245,14 +245,14 @@ This also means that you cannot include different versions of the same
 gem in different groups, because doing so would result in different
 sets of dependencies used in development and production. Because of
 the vagaries of the dependency resolution process, this usually
-affects more than just the gems you list in your Gemfile(5), and can
+affects more than just the gems you list in your gems.rb(5), and can
 (surprisingly) radically change the gems you are using.
 
-## THE GEMFILE.LOCK
+## THE GEMS.LOCKED
 
 When you run `bundle install`, Bundler will persist the full names
 and versions of all gems that you used (including dependencies of
-the gems specified in the Gemfile(5)) into a file called `Gemfile.lock`.
+the gems specified in the gems.rb(5)) into a file called `gems.locked`.
 
 Bundler uses this file in all subsequent calls to `bundle install`,
 which guarantees that you always use the same exact code, even
@@ -260,26 +260,26 @@ as your application moves across machines.
 
 Because of the way dependency resolution works, even a
 seemingly small change (for instance, an update to a point-release
-of a dependency of a gem in your Gemfile(5)) can result in radically
+of a dependency of a gem in your gems.rb(5)) can result in radically
 different gems being needed to satisfy all dependencies.
 
-As a result, you `SHOULD` check your `Gemfile.lock` into version
+As a result, you `SHOULD` check your `gems.locked` into version
 control. If you do not, every machine that checks out your
 repository (including your production server) will resolve all
 dependencies again, which will result in different versions of
-third-party code being used if `any` of the gems in the Gemfile(5)
+third-party code being used if `any` of the gems in the gems.rb(5)
 or any of their dependencies have been updated.
 
 ## CONSERVATIVE UPDATING
 
-When you make a change to the Gemfile(5) and then run `bundle install`,
+When you make a change to the gems.rb(5) and then run `bundle install`,
 Bundler will update only the gems that you modified.
 
 In other words, if a gem that you `did not modify` worked before
 you called `bundle install`, it will continue to use the exact
 same versions of all dependencies as it used before the update.
 
-Let's take a look at an example. Here's your original Gemfile(5):
+Let's take a look at an example. Here's your original gems.rb(5):
 
     source 'https://rubygems.org'
 
@@ -293,9 +293,9 @@ and `rack ~> 1.1.0`, while the `activemerchant` gem depends on
 
 When the dependencies are first resolved, Bundler will select
 `activesupport 2.3.8`, which satisfies the requirements of both
-gems in your Gemfile(5).
+gems in your gems.rb(5).
 
-Next, you modify your Gemfile(5) to:
+Next, you modify your gems.rb(5) to:
 
     source 'https://rubygems.org'
 
@@ -323,18 +323,18 @@ dependency of actionpack requires updating one of its dependencies.
 
 Even though `activemerchant` declares a very loose dependency
 that theoretically matches `activesupport 3.0.0.rc`, Bundler treats
-gems in your Gemfile(5) that have not changed as an atomic unit
+gems in your gems.rb(5) that have not changed as an atomic unit
 together with their dependencies. In this case, the `activemerchant`
 dependency is treated as `activemerchant 1.7.1 + activesupport 2.3.8`,
 so `bundle install` will report that it cannot update `actionpack`.
 
 To explicitly update `actionpack`, including its dependencies
-which other gems in the Gemfile(5) still depend on, run
+which other gems in the gems.rb(5) still depend on, run
 `bundle update actionpack` (see `bundle update(1)`).
 
-`Summary`: In general, after making a change to the Gemfile(5) , you
+`Summary`: In general, after making a change to the gems.rb(5) , you
 should first try to run `bundle install`, which will guarantee that no
-other gems in the Gemfile(5) are impacted by the change. If that
+other gems in the gems.rb(5) are impacted by the change. If that
 does not work, run [bundle update(1)][bundle-update].
 
 ## SEE ALSO

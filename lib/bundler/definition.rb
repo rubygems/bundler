@@ -10,8 +10,8 @@ module Bundler
 
     # Given a gemfile and lockfile creates a Bundler definition
     #
-    # @param gemfile [Pathname] Path to Gemfile
-    # @param lockfile [Pathname,nil] Path to Gemfile.lock
+    # @param gemfile [Pathname] Path to gems.rb
+    # @param lockfile [Pathname,nil] Path to gems.locked
     # @param unlock [Hash, Boolean, nil] Gems that have been requested
     #   to be updated or true if all gems should be updated
     # @return [Bundler::Definition]
@@ -30,7 +30,7 @@ module Bundler
     #
     # How does the new system work?
     #
-    # * Load information from Gemfile and Lockfile
+    # * Load information from gems.rb and gems.locked
     # * Invalidate stale locked specs
     #  * All specs from stale source are stale
     #  * All specs that are reachable only through a stale
@@ -38,8 +38,8 @@ module Bundler
     # * If all fresh dependencies are satisfied by the locked
     #  specs, then we can try to resolve locally.
     #
-    # @param lockfile [Pathname] Path to Gemfile.lock
-    # @param dependencies [Array(Bundler::Dependency)] array of dependencies from Gemfile
+    # @param lockfile [Pathname] Path to gems.locked
+    # @param dependencies [Array(Bundler::Dependency)] array of dependencies from gems.rb
     # @param sources [Bundler::SourceList]
     # @param unlock [Hash, Boolean, nil] Gems that have been requested
     #   to be updated or true if all gems should be updated
@@ -131,7 +131,7 @@ module Bundler
 
     # For given dependency list returns a SpecSet with Gemspec of all the required
     # dependencies.
-    #  1. The method first resolves the dependencies specified in Gemfile
+    #  1. The method first resolves the dependencies specified in gems.rb
     #  2. After that it tries and fetches gemspec of resolved dependencies
     #
     # @return [Bundler::SpecSet]
@@ -185,7 +185,7 @@ module Bundler
       specs.for(expand_dependencies(deps))
     end
 
-    # Resolve all the dependencies specified in Gemfile. It ensures that
+    # Resolve all the dependencies specified in gems.rb. It ensures that
     # dependencies that have been already resolved via locked file and are fresh
     # are reused when resolving dependencies
     #
@@ -268,13 +268,13 @@ module Bundler
       File.open(file, 'wb'){|f| f.puts(contents) }
     rescue Errno::EACCES
       raise Bundler::InstallError,
-        "There was an error while trying to write to Gemfile.lock. It is likely that \n" \
+        "There was an error while trying to write to gems.locked. It is likely that \n" \
         "you need to allow write permissions for the file at path: \n" \
         "#{File.expand_path(file)}"
     end
 
     # Returns the version of Bundler that is creating or has created
-    # Gemfile.lock. Used in #to_lock.
+    # gems.locked. Used in #to_lock.
     def lock_version
       if @locked_bundler_version && @locked_bundler_version < Gem::Version.new(Bundler::VERSION)
         new_version = Bundler::VERSION
@@ -330,11 +330,11 @@ module Bundler
 
     def ensure_equivalent_gemfile_and_lockfile(explicit_flag = false)
       msg = "You are trying to install in deployment mode after changing\n" \
-            "your Gemfile. Run `bundle install` elsewhere and add the\n" \
-            "updated Gemfile.lock to version control."
+            "your gems.rb. Run `bundle install` elsewhere and add the\n" \
+            "updated gems.locked to version control."
 
       unless explicit_flag
-        msg += "\n\nIf this is a development machine, remove the Gemfile " \
+        msg += "\n\nIf this is a development machine, remove the gems.rb " \
                "freeze \nby running `bundle install --no-deployment`."
       end
 
@@ -379,9 +379,9 @@ module Bundler
         end
       end
 
-      msg << "\n\nYou have added to the Gemfile:\n"     << added.join("\n") if added.any?
-      msg << "\n\nYou have deleted from the Gemfile:\n" << deleted.join("\n") if deleted.any?
-      msg << "\n\nYou have changed in the Gemfile:\n"   << changed.join("\n") if changed.any?
+      msg << "\n\nYou have added to the gems.rb:\n"     << added.join("\n") if added.any?
+      msg << "\n\nYou have deleted from the gems.rb:\n" << deleted.join("\n") if deleted.any?
+      msg << "\n\nYou have changed in the gems.rb:\n"   << changed.join("\n") if changed.any?
       msg << "\n"
 
       raise ProductionError, msg if added.any? || deleted.any? || changed.any?
@@ -395,16 +395,16 @@ module Bundler
 
         msg = case problem
         when :engine
-          "Your Ruby engine is #{actual}, but your Gemfile specified #{expected}"
+          "Your Ruby engine is #{actual}, but your gems.rb specified #{expected}"
         when :version
-          "Your Ruby version is #{actual}, but your Gemfile specified #{expected}"
+          "Your Ruby version is #{actual}, but your gems.rb specified #{expected}"
         when :engine_version
-          "Your #{Bundler.ruby_version.engine} version is #{actual}, but your Gemfile specified #{ruby_version.engine} #{expected}"
+          "Your #{Bundler.ruby_version.engine} version is #{actual}, but your gems.rb specified #{ruby_version.engine} #{expected}"
         when :patchlevel
           if !expected.is_a?(String)
-            "The Ruby patchlevel in your Gemfile must be a string"
+            "The Ruby patchlevel in your gems.rb must be a string"
           else
-            "Your Ruby patchlevel is #{actual}, but your Gemfile specified #{expected}"
+            "Your Ruby patchlevel is #{actual}, but your gems.rb specified #{expected}"
           end
         end
 
@@ -482,22 +482,22 @@ module Bundler
     def converge_sources
       changes = false
 
-      # Get the Rubygems sources from the Gemfile.lock
+      # Get the Rubygems sources from the gems.locked
       locked_gem_sources = @locked_sources.select { |s| s.kind_of?(Source::Rubygems) }
-      # Get the Rubygems remotes from the Gemfile
+      # Get the Rubygems remotes from the gems.rb
       actual_remotes = sources.rubygems_remotes
 
       # If there is a Rubygems source in both
       if !locked_gem_sources.empty? && !actual_remotes.empty?
         locked_gem_sources.each do |locked_gem|
-          # Merge the remotes from the Gemfile into the Gemfile.lock
+          # Merge the remotes from the gems.rb into the gems.locked
           changes = changes | locked_gem.replace_remotes(actual_remotes)
         end
       end
 
-      # Replace the sources from the Gemfile with the sources from the Gemfile.lock,
-      # if they exist in the Gemfile.lock and are `==`. If you can't find an equivalent
-      # source in the Gemfile.lock, use the one from the Gemfile.
+      # Replace the sources from the gems.rb with the sources from the gems.locked,
+      # if they exist in the gems.locked and are `==`. If you can't find an equivalent
+      # source in the gems.locked, use the one from the gems.rb.
       changes = changes | sources.replace_sources!(@locked_sources)
 
       sources.all_sources.each do |source|
@@ -525,14 +525,14 @@ module Bundler
     end
 
     # Remove elements from the locked specs that are expired. This will most
-    # commonly happen if the Gemfile has changed since the lockfile was last
+    # commonly happen if the gems.rb has changed since the lockfile was last
     # generated
     def converge_locked_specs
       deps = []
 
-      # Build a list of dependencies that are the same in the Gemfile
-      # and Gemfile.lock. If the Gemfile modified a dependency, but
-      # the gem in the Gemfile.lock still satisfies it, this is fine
+      # Build a list of dependencies that are the same in the gems.rb
+      # and gems.locked. If the gems.rb modified a dependency, but
+      # the gem in the gems.locked still satisfies it, this is fine
       # too.
       locked_deps_hash = @locked_deps.inject({}) { |hsh, dep| hsh[dep] = dep; hsh }
       @dependencies.each do |dep|
@@ -552,7 +552,7 @@ module Bundler
 
       converged = []
       @locked_specs.each do |s|
-        # Replace the locked dependency's source with the equivalent source from the Gemfile
+        # Replace the locked dependency's source with the equivalent source from the gems.rb
         dep = @dependencies.find { |d| s.satisfies?(d) }
         s.source = (dep && dep.source) || sources.get(s.source)
 
@@ -597,7 +597,7 @@ module Bundler
     def in_locked_deps?(dep, locked_dep)
       # Because the lockfile can't link a dep to a specific remote, we need to
       # treat sources as equivalent anytime the locked dep has all the remotes
-      # that the Gemfile dep does.
+      # that the gems.rb dep does.
       locked_dep && locked_dep.source && dep.source && locked_dep.source.include?(dep.source)
     end
 
