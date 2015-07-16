@@ -21,7 +21,6 @@ module Bundler
       def api_fetcher?
         false
       end
-
     end
   end
 end

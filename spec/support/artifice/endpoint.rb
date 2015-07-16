@@ -12,7 +12,6 @@ require 'artifice'
 require 'sinatra/base'
 
 class Endpoint < Sinatra::Base
-
   helpers do
     def dependencies_for(gem_names, gem_repo = gem_repo1)
       return [] if gem_names.nil? || gem_names.empty?

@@ -18,6 +18,5 @@ module Bundler
         system(*command) || Bundler.ui.info("Could not run '#{command.join(' ')}'")
       end
     end
-
   end
 end

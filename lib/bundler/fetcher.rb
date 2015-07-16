@@ -273,6 +273,5 @@ module Bundler
     def downloader
       @downloader ||= Downloader.new(connection, self.class.redirect_limit)
     end
-
   end
 end

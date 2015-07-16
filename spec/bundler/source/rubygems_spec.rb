@@ -22,5 +22,4 @@ describe Bundler::Source::Rubygems do
       end
     end
   end
-
 end

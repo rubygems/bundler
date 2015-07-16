@@ -68,6 +68,5 @@ module Bundler
         Bundler.ui.confirm Bundler::CLI::Common.without_groups_message
       end
     end
-
   end
 end

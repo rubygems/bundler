@@ -208,7 +208,6 @@ module Spec
     # Issue #3459
     def a_complicated_index
       build_index do
-
         gem "foo", %w{3.0.0 3.0.5} do
           dep "qux", ["~> 3.1"]
           dep "baz", ["< 9.0", ">= 5.0"]

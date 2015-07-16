@@ -33,6 +33,7 @@ module Bundler
     alias :attempts :attempt
 
   private
+
     def run(&block)
       @failed      = false
       @current_run += 1

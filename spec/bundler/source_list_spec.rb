@@ -344,5 +344,4 @@ describe Bundler::SourceList do
       source_list.remote!
     end
   end
-
 end

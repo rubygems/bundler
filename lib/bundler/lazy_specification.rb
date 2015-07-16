@@ -78,6 +78,5 @@ module Bundler
 
       @specification.send(method, *args, &blk)
     end
-
   end
 end

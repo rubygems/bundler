@@ -3,7 +3,6 @@ require 'bundler/source/git/git_proxy'
 
 module Bundler
   class Env
-
     def write(io)
       io.write report(:print_gemfile => true)
     end
@@ -70,6 +69,5 @@ module Bundler
     rescue Bundler::Source::Git::GitNotInstalledError
       "not installed"
     end
-
   end
 end

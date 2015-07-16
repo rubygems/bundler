@@ -344,5 +344,4 @@ describe "bundle check" do
       end
     end
   end
-
 end

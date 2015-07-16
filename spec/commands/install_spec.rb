@@ -374,5 +374,4 @@ describe "bundle install with gem sources" do
       expect(out).to_not include("Your Gemfile has no gem server sources")
     end
   end
-
 end

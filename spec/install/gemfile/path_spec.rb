@@ -538,5 +538,4 @@ describe "bundle install with explicit source paths" do
       expect(out).to include("failed for foo-1.0")
     end
   end
-
 end

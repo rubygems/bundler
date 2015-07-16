@@ -102,7 +102,6 @@ module Gem
       end
       gemfile
     end
-
   end
 
   class Dependency

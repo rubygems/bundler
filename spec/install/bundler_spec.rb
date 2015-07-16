@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe "bundle install" do
-
   describe "with bundler dependencies" do
     before(:each) do
       build_repo2 do
@@ -56,7 +55,6 @@ describe "bundle install" do
 
         gem "multiple_versioned_deps"
       G
-
 
       install_gemfile <<-G
         source "file://#{gem_repo2}"
@@ -142,5 +140,4 @@ describe "bundle install" do
       expect(out).to include("The Gemfile's dependencies are satisfied")
     end
   end
-
 end

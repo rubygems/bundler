@@ -186,6 +186,5 @@ module Bundler
     def x64_mingw_22?
       x64_mingw? && on_22?
     end
-
   end
 end

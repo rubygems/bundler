@@ -28,6 +28,5 @@ module Bundler
         FileUtils.cp(File.expand_path('../../templates/Gemfile', __FILE__), 'Gemfile')
       end
     end
-
   end
 end

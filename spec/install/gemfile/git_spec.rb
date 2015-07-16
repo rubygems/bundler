@@ -112,7 +112,6 @@ describe "bundle install with git sources" do
 
       should_be_installed "foo 1.1", "rack 1.0"
     end
-
   end
 
   describe "with an empty git block" do

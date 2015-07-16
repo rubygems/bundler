@@ -49,7 +49,6 @@ describe "when using sudo", :sudo => true do
       expect(system_gem_path("gems/another_implicit_rake_dep-1.0")).to exist
     end
 
-
     it "installs when BUNDLE_PATH is owned by root" do
       bundle_path = tmp("owned_by_root")
       FileUtils.mkdir_p bundle_path
@@ -150,5 +149,4 @@ describe "when using sudo", :sudo => true do
       expect(out).to include("Don't run Bundler as root.")
     end
   end
-
 end

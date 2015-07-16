@@ -1,7 +1,6 @@
 require "spec_helper"
 
 describe "bundle cache" do
-
   describe "when there are only gemsources" do
     before :each do
       gemfile <<-G
@@ -211,7 +210,6 @@ describe "bundle cache" do
       expect(cached_gem("activesupport-2.3.2")).to exist
     end
 
-
     it "doesn't remove gems that are for another platform" do
       simulate_platform "java" do
         install_gemfile <<-G
@@ -280,5 +278,4 @@ describe "bundle cache" do
       should_be_installed "foo-bundler 1.0"
     end
   end
-
 end

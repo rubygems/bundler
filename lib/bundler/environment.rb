@@ -37,6 +37,5 @@ module Bundler
     def update(*gems)
       # Nothing
     end
-
   end
 end

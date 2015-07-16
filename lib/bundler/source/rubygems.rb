@@ -417,7 +417,6 @@ module Bundler
       def installed?(spec)
         installed_specs[spec].any?
       end
-
     end
   end
 end

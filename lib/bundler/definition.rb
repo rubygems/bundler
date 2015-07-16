@@ -26,7 +26,6 @@ module Bundler
       Dsl.evaluate(gemfile, lockfile, unlock)
     end
 
-
     #
     # How does the new system work?
     #
@@ -666,6 +665,5 @@ module Bundler
         current == proposed
       end
     end
-
   end
 end

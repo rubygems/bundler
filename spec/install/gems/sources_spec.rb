@@ -412,5 +412,4 @@ describe "bundle install with gems on multiple sources" do
       should_be_installed("bar 0.1")
     end
   end
-
 end

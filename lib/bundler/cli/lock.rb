@@ -31,6 +31,5 @@ module Bundler
 
       Bundler.ui = ui
     end
-
   end
 end

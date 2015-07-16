@@ -316,5 +316,4 @@ describe "bundle flex_install" do
   #     out.should match(/Gemfile.lock/)
   #   end
   # end
-
 end

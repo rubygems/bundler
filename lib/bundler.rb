@@ -460,6 +460,5 @@ module Bundler
         lockfile.rmtree
       end
     end
-
   end
 end

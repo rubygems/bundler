@@ -646,7 +646,6 @@ module Bundler
         end
       end
     end
-
   end
 
   if RubygemsIntegration.provides?(">= 2.1.0")

@@ -954,5 +954,4 @@ describe "Bundler.setup" do
       end
     end
   end
-
 end

@@ -1,7 +1,6 @@
 require "spec_helper"
 
 describe "bundle install from an existing gemspec" do
-
   before(:each) do
     build_gem "bar", :to_system => true
     build_gem "bar-dev", :to_system => true
@@ -166,5 +165,4 @@ describe "bundle install from an existing gemspec" do
       should_be_installed "rack 1.0"
     end
   end
-
 end

@@ -284,6 +284,5 @@ module Bundler
         ).uniq.join(File::PATH_SEPARATOR)
       end
     end
-
   end
 end

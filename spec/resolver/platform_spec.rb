@@ -29,7 +29,6 @@ describe "Resolving platform craziness" do
   end
 
   describe "with mingw32" do
-
     before :each do
       @index = build_index do
         platforms "mingw32 mswin32 x64-mingw32" do |platform|

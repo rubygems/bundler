@@ -1,7 +1,6 @@
 require "spec_helper"
 
 describe "bundle gem" do
-
   def reset!
     super
     global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__TEST" => "false", "BUNDLE_GEM__COC" => "false"
@@ -677,7 +676,6 @@ describe "bundle gem" do
     it "asks about CoC" do
       global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__TEST" => "false"
 
-
       bundle "gem foobar" do |input|
         input.puts "yes"
       end
@@ -685,5 +683,4 @@ describe "bundle gem" do
       expect(bundled_app("foobar/CODE_OF_CONDUCT.md")).to exist
     end
   end
-
 end

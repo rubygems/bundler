@@ -31,6 +31,5 @@ describe "bundle install" do
       expect(out).to include "Installing rack 1.0.0"
       should_be_installed "rack 1.0.0"
     end
-
   end
 end

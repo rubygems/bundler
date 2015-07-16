@@ -1,7 +1,6 @@
 require "spec_helper"
 
 describe "bundle install" do
-
   context "with duplicated gems" do
     it "will display a warning" do
       install_gemfile <<-G
@@ -66,5 +65,4 @@ describe "bundle install" do
       expect(out).to match(/You passed :lib as an option for gem 'rack', but it is invalid/)
     end
   end
-
 end

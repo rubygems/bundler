@@ -47,6 +47,5 @@ module Bundler
       Bundler.ui.error "bundler: exec needs a command to run"
       exit 128
     end
-
   end
 end

@@ -70,7 +70,6 @@ module Bundler
       generate_standalone(options[:standalone]) if options[:standalone]
     end
 
-
     def install_gem_from_spec(spec, standalone = false, worker = 0, force = false)
       # Fetch the build settings, if there are any
       settings = Bundler.settings["build.#{spec.name}"]
@@ -237,7 +236,6 @@ module Bundler
         end
       end
 
-
       File.open File.join(bundler_path, "setup.rb"), "w" do |file|
         file.puts "require 'rbconfig'"
         file.puts "# ruby 1.8.7 doesn't define RUBY_ENGINE"
@@ -285,6 +283,5 @@ module Bundler
         options["local"] ? @definition.resolve_with_cache! : @definition.resolve_remotely!
       end
     end
-
   end
 end

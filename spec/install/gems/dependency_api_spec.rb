@@ -665,5 +665,4 @@ describe "gemcutter's dependency API" do
       expect(exitstatus).to eq(0) if exitstatus
     end
   end
-
 end

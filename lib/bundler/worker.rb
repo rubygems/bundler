@@ -68,6 +68,5 @@ module Bundler
       @threads.each {|i| i.exit }
       exit 1
     end
-
   end
 end

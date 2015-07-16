@@ -1,6 +1,5 @@
 module Bundler
   class DepProxy
-
     attr_reader :__platform, :dep
 
     def initialize(dep, platform)
@@ -38,6 +37,5 @@ module Bundler
     def method_missing(*args)
       @dep.send(*args)
     end
-
   end
 end

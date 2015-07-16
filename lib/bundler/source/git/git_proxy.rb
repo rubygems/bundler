@@ -1,7 +1,6 @@
 module Bundler
   class Source
     class Git < Path
-
       class GitNotInstalledError < GitError
         def initialize
           msg =  "You need to install git to be able to use gems from git repositories. "
@@ -162,9 +161,7 @@ module Bundler
           return in_path { yield } if allow?
           raise GitError, "The git source #{uri} is not yet checked out. Please run `bundle install` before trying to start your application"
         end
-
       end
-
     end
   end
 end

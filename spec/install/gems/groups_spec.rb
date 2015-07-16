@@ -1,7 +1,6 @@
 require "spec_helper"
 
 describe "bundle install with groups" do
-
   describe "installing with no options" do
     before :each do
       install_gemfile <<-G
@@ -308,7 +307,6 @@ describe "bundle install with groups" do
         bundle "install --without emo"
         should_be_installed "rack 1.0.0", "activesupport 2.3.5"
       end
-
     end
   end
 
@@ -336,7 +334,6 @@ describe "bundle install with groups" do
       expect(out).to include("no activesupport")
     end
   end
-
 
   describe "when locked and installed with --without" do
     before(:each) do
@@ -370,5 +367,4 @@ describe "bundle install with groups" do
       expect(err).to be_empty
     end
   end
-
 end

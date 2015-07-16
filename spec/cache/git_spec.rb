@@ -183,6 +183,5 @@ end
       gemspec = bundled_app("vendor/cache/foo-1.0-#{ref}/foo.gemspec").read
       expect(gemspec).to_not match("`echo bob`")
     end
-
   end
 end

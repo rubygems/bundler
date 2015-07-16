@@ -190,6 +190,5 @@ module Bundler
         @bundler_version = Gem::Version.create(line)
       end
     end
-
   end
 end

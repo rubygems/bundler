@@ -192,6 +192,5 @@ module Bundler
       return false unless dep.name == spec.name
       dep.requirement.satisfied_by?(spec.version)
     end
-
   end
 end

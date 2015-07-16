@@ -68,6 +68,5 @@ describe Bundler do
         $VERBOSE = verbose
       end
     end
-
   end
 end

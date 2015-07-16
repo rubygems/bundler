@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe "bundle install" do
-
   describe "when a gem has a YAML gemspec" do
     before :each do
       build_repo2 do
@@ -46,5 +45,4 @@ describe "bundle install" do
     bundle :install, :artifice => 'endpoint_marshal_fail' # force gemspec load
     should_be_installed "activesupport 2.3.2"
   end
-
 end

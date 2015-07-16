@@ -465,7 +465,6 @@ module Bundler
         [trace_line, description]
       end
     end
-
   end
 
 end

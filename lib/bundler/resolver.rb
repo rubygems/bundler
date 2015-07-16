@@ -8,7 +8,6 @@ require 'set'
 
 module Bundler
   class Resolver
-
     require 'bundler/vendored_molinillo'
 
     class Molinillo::VersionConflict
@@ -183,7 +182,6 @@ module Bundler
       SpecSet.new(result)
     end
 
-
     def initialize(index, source_requirements, base)
       @index = index
       @source_requirements = source_requirements
@@ -348,6 +346,5 @@ module Bundler
         end
       end
     end
-
   end
 end

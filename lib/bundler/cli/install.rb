@@ -184,6 +184,5 @@ module Bundler
       Bundler.ui.confirm "Post-install message from #{name}:"
       Bundler.ui.info msg
     end
-
   end
 end

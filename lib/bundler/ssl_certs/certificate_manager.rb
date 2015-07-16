@@ -59,7 +59,6 @@ module Bundler
           store
         end
       end
-
     end
   end
 end

@@ -2,7 +2,6 @@ require 'spec_helper'
 require 'bundler/installer/parallel_installer'
 
 describe ParallelInstaller::SpecInstallation do
-
   let!(:dep) do
     a_spec = Object.new
     def a_spec.name
@@ -59,5 +58,4 @@ describe ParallelInstaller::SpecInstallation do
       end
     end
   end
-
 end

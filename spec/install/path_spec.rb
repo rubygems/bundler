@@ -1,7 +1,6 @@
 require "spec_helper"
 
 describe "bundle install" do
-
   describe "with --path" do
     before :each do
       build_gem "rack", "1.0.0", :to_system => true do |s|
@@ -146,5 +145,4 @@ describe "bundle install" do
       expect(out).to match(/invalid symlink/)
     end
   end
-
 end

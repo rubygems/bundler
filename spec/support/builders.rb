@@ -614,11 +614,9 @@ module Spec
           Dir.chdir(@path) { `git #{cmd}`.strip }
         end
       end
-
     end
 
     class GemBuilder < LibBuilder
-
       def _build(opts)
         lib_path = super(opts.merge(:path => @context.tmp(".tmp/#{@spec.full_name}"), :no_default => opts[:no_default]))
         Dir.chdir(lib_path) do

@@ -94,7 +94,6 @@ describe "bundle update" do
       expect(out).to include("Bundle complete!")
     end
 
-
     it "fetches tags from the remote" do
       build_git "foo"
       @remote = build_git("bar", :bare => true)

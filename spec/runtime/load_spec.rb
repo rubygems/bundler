@@ -79,7 +79,6 @@ describe "Bundler.load" do
         bundler_gemfile.rmtree if @remove_bundler_gemfile
       end
     end
-
   end
 
   describe "when called twice" do
@@ -119,5 +118,4 @@ describe "Bundler.load" do
       end
     end
   end
-
 end

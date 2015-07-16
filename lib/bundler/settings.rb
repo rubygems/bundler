@@ -159,6 +159,7 @@ module Bundler
     end
 
   private
+
     def key_for(key)
       if key.is_a?(String) && /https?:/ =~ key
         key = normalize_uri(key).to_s
@@ -255,6 +256,5 @@ module Bundler
       end
       uri
     end
-
   end
 end

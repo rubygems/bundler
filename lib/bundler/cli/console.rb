@@ -33,6 +33,5 @@ module Bundler
       Bundler.ui.error "Could not find constant #{const_name}"
       exit 1
     end
-
   end
 end

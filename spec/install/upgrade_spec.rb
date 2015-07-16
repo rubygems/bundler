@@ -22,5 +22,4 @@ describe "bundle install for the first time with v1.0" do
     bundle :install
     expect(bundled_app.join(".bundle/environment.rb")).not_to exist
   end
-
 end

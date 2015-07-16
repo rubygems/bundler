@@ -41,7 +41,6 @@ describe "policies with unsigned gems" do
     bundle "install"
     expect(exitstatus).to eq(0) if exitstatus
   end
-
 end
 
 describe "policies with signed gems and no CA" do

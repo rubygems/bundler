@@ -4,7 +4,6 @@ describe "the lockfile format" do
   include Bundler::GemHelpers
 
   it "generates a simple lockfile for a single source, gem" do
-
     install_gemfile <<-G
       source "file://#{gem_repo1}"
 
@@ -115,7 +114,6 @@ describe "the lockfile format" do
   end
 
   it "updates the lockfile's bundler version if not present" do
-
     lockfile <<-L
       GEM
         remote: file:#{gem_repo1}/
@@ -1092,7 +1090,6 @@ describe "the lockfile format" do
     expect(out).to include "rack (= 1.0) and rack (= 1.1)"
   end
 
-
   it "raises if two different sources are used" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
@@ -1125,7 +1122,6 @@ describe "the lockfile format" do
       BUNDLED WITH
          #{Bundler::VERSION}
     G
-
   end
 
   # Some versions of the Bundler 1.1 RC series introduced corrupted
@@ -1210,7 +1206,6 @@ describe "the lockfile format" do
       File.utime(time, time, bundled_app('Gemfile.lock'))
     end
     before(:each) do
-
       build_repo2
 
       install_gemfile <<-G
@@ -1226,7 +1221,6 @@ describe "the lockfile format" do
     end
 
     context "during updates" do
-
       it "preserves Gemfile.lock \\n line endings" do
         update_repo2
 
@@ -1248,7 +1242,6 @@ describe "the lockfile format" do
     end
 
     context "when nothing changes" do
-
       it "preserves Gemfile.lock \\n line endings" do
         expect { ruby <<-RUBY
                    require 'rubygems'

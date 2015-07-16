@@ -58,7 +58,5 @@ module Bundler
         f.puts new_gem_lines
       end
     end
-
-
   end
 end

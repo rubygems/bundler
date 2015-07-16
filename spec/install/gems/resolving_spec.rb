@@ -99,7 +99,6 @@ describe "bundle install with gem sources" do
           expect(resolve_output).to include(" net_b (>= 0) ruby")
         end
       end
-
     end
 
     describe "when some gems require a different version of ruby" do

@@ -4,7 +4,6 @@ require 'digest/sha1'
 
 module Bundler
   class Source
-
     class Git < Path
       autoload :GitProxy, 'bundler/source/git/git_proxy'
 
@@ -286,8 +285,6 @@ module Bundler
       def git_proxy
         @git_proxy ||= GitProxy.new(cache_path, uri, ref, cached_revision, self)
       end
-
     end
-
   end
 end

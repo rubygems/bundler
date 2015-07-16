@@ -31,6 +31,5 @@ module Bundler
     def include?(other)
       other == self
     end
-
   end
 end
