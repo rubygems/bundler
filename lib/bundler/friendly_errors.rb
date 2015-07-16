@@ -44,7 +44,7 @@ module Bundler
 
   def self.request_issue_report_for(e)
     Bundler.ui.info <<-EOS.gsub(/^ {6}/, '')
-      #{'--- ERROR REPORT TEMPLATE -------------------------------------------------------'}
+      --- ERROR REPORT TEMPLATE -------------------------------------------------------
       - What did you do?
 
         I ran the command `#{$PROGRAM_NAME} #{ARGV.join(' ')}`
@@ -64,7 +64,7 @@ module Bundler
             #{e.backtrace.join("\n            ")}
 
       #{Bundler::Env.new.report(:print_gemfile => false).gsub(/\n/, "\n      ").strip}
-      #{'--- TEMPLATE END ----------------------------------------------------------------'}
+      --- TEMPLATE END ----------------------------------------------------------------
 
     EOS
 
