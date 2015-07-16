@@ -1,4 +1,4 @@
-# Allows for declaring a Gemfile inline in a ruby script, optionally installing
+# Allows for declaring a gems.rb inline in a ruby script, optionally installing
 # any gems that aren't already installed on the user's system.
 #
 # @note Every gem that is specified in this 'gems.rb' will be `require`d, as if
@@ -12,7 +12,7 @@
 #
 # @param gemfile [Proc]    a block that is evaluated as a `gems.rb`.
 #
-# @example Using an inline Gemfile
+# @example Using an inline gems.rb
 #
 #          #!/usr/bin/env ruby
 #

@@ -32,10 +32,10 @@ module Bundler
       end
 
       if print_gemfile
-        out << "\n#{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)}\n\n"
+        out << "\ngems.rb\n\n"
         out << "    " << read_file(Bundler.default_gemfile).gsub(/\n/, "\n    ") << "\n"
 
-        out << "\n#{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)}\n\n"
+        out << "\n" << "gems.locked\n\n"
         out << "    " << read_file(Bundler.default_lockfile).gsub(/\n/, "\n    ") << "\n"
       end
 

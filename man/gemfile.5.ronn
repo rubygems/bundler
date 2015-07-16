@@ -1,24 +1,24 @@
-Gemfile(5) -- A format for describing gem dependencies for Ruby programs
+gems.rb(5) -- A format for describing gem dependencies for Ruby programs
 ========================================================================
 
 ## SYNOPSIS
 
-A `Gemfile` describes the gem dependencies required to execute associated
+A `gems.rb` describes the gem dependencies required to execute associated
 Ruby code.
 
-Place the `Gemfile` in the root of the directory containing the associated
-code. For instance, in a Rails application, place the `Gemfile` in the same
+Place the `gems.rb` in the root of the directory containing the associated
+code. For instance, in a Rails application, place the `gems.rb` in the same
 directory as the `Rakefile`.
 
 ## SYNTAX
 
-A `Gemfile` is evaluated as Ruby code, in a context which makes available
+A `gems.rb` is evaluated as Ruby code, in a context which makes available
 a number of methods used to describe the gem requirements.
 
 ## GLOBAL SOURCES (#source)
 
-At the top of the `Gemfile`, add a line for the `Rubygems` source that contains
-the gems listed in the `Gemfile`.
+At the top of the `gems.rb`, add a line for the `Rubygems` source that contains
+the gems listed in the `gems.rb`.
 
     source "https://rubygems.org"
 
@@ -37,13 +37,13 @@ this warning, by using the [`:source` option](#SOURCE-source-) or a
 
 Some gem sources require a username and password. Use `bundle config` to set
 the username and password for any sources that need it. The command must be run
-once on each computer that will install the Gemfile, but this keeps the
+once on each computer that will install the gems.rb, but this keeps the
 credentials from being stored in plain text in version control.
 
     bundle config gems.example.com user:password
 
 For some sources, like a company Gemfury account, it may be easier to simply
-include the credentials in the Gemfile as part of the source URL.
+include the credentials in the gems.rb as part of the source URL.
 
     source "https://user:password@gems.example.com"
 
@@ -169,7 +169,7 @@ specify them. Platforms are essentially identical to groups, except that you do 
 need to use the `--without` install-time flag to exclude groups of gems for other
 platforms.
 
-There are a number of `Gemfile` platforms:
+There are a number of `gems.rb` platforms:
 
   * `ruby`:
     C Ruby (MRI) or Rubinius, but `NOT` Windows
@@ -399,7 +399,7 @@ Since the `bitbucket` method is a specialization of `git_source`, it accepts a `
 
 You can specify that a gem is located in a particular location
 on the file system. Relative paths are resolved relative to the
-directory containing the `Gemfile`.
+directory containing the `gems.rb`.
 
 Similar to the semantics of the `:git` option, the `:path`
 option requires that the directory in question either contains
@@ -492,4 +492,4 @@ bundler uses the following priority order:
      ActiveSupport gem from the Rails git repository over ones from
      `rubygems.org`
   3. The sources specified via global `source` lines, searching each source in
-     your `Gemfile` from last added to first added.
+     your `gems.rb` from last added to first added.

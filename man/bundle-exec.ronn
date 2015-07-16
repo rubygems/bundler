@@ -7,12 +7,12 @@ bundle-exec(1) -- Execute a command in the context of the bundle
 
 ## DESCRIPTION
 
-This command executes the command, making all gems specified in the
-`Gemfile(5)` available to `require` in Ruby programs.
+This command executes the command, making all gems specified in
+`gems.rb(5)` available to `require` in Ruby programs.
 
 Essentially, if you would normally have run something like
 `rspec spec/my_spec.rb`, and you want to use the gems specified
-in the `Gemfile(5)` and installed via [bundle install(1)][bundle-install], you
+in `gems.rb(5)` and installed via [bundle install(1)][bundle-install], you
 should run `bundle exec rspec spec/my_spec.rb`.
 
 Note that `bundle exec` does not require that an executable is
@@ -45,7 +45,7 @@ then executes the command you specify in full.
 * put the directory containing executables (like `rails`, `rspec`,
   `rackup`) for your bundle on `$PATH`
 * make sure that if bundler is invoked in the subshell, it uses
-  the same `Gemfile` (by setting `BUNDLE_GEMFILE`)
+  the same `gems.rb` (by setting `BUNDLE_GEMFILE`)
 * add `-rbundler/setup` to `$RUBYOPT`, which makes sure that
   Ruby programs invoked in the subshell can see the gems in
   the bundle
@@ -78,7 +78,7 @@ example, Homebrew commands run Ruby, but don't work inside a bundle:
 
 Using `with_clean_env` is also necessary if you are shelling out to a different
 bundle. Any Bundler commands run in a subshell will inherit the current
-Gemfile, so commands that need to run in the context of a different bundle also
+gems.rb, so commands that need to run in the context of a different bundle also
 need to use `with_clean_env`.
 
     Bundler.with_clean_env do
@@ -110,14 +110,14 @@ If you had that version of gemcutter installed (even if
 you _also_ had a newer version without this problem), Rubygems
 would activate `gemcutter 0.5` and `json_pure <latest>`.
 
-If your Gemfile(5) also contained `json_pure` (or a gem
+If your gems.rb(5) also contained `json_pure` (or a gem
 with a dependency on `json_pure`), the latest version on
 your system might conflict with the version in your
-Gemfile(5), or the snapshot version in your `Gemfile.lock`.
+gems.rb(5), or the snapshot version in your `gems.locked`.
 
 If this happens, bundler will say:
 
-    You have already activated json_pure 1.4.6 but your Gemfile
+    You have already activated json_pure 1.4.6 but your gems.rb
     requires json_pure 1.4.3. Consider using bundle exec.
 
 In this situation, you almost certainly want to remove the

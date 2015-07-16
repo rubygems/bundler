@@ -64,8 +64,8 @@ module Bundler
       if options[:deployment] || options[:frozen]
         unless Bundler.default_lockfile.exist?
           flag = options[:deployment] ? "--deployment" : "--frozen"
-          raise ProductionError, "The #{flag} flag requires a #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)}. Please make " \
-                                 "sure you have checked your #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)} into version control " \
+          raise ProductionError, "The #{flag} flag requires a gems.locked. Please make " \
+                                 "sure you have checked your gems.locked into version control " \
                                  "before deploying."
         end
 
@@ -145,8 +145,8 @@ module Bundler
 
       unless Bundler.definition.has_rubygems_remotes?
         Bundler.ui.warn <<-WARN, :wrap => true
-          Your Gemfile has no gem server sources. If you need gems that are \
-          not already on your machine, add a line like this to your Gemfile:
+          Your gems.rb has no gem server sources. If you need gems that are \
+          not already on your machine, add a line like this to your gems.rb:
           source 'https://rubygems.org'
         WARN
       end
@@ -171,7 +171,7 @@ module Bundler
 
     def dependencies_count_for(definition)
       count = definition.dependencies.count
-      "#{count} Gemfile #{count == 1 ? "dependency" : "dependencies"}"
+      "#{count} gems.rb #{count == 1 ? "dependency" : "dependencies"}"
     end
 
     def gems_installed_for(definition)
