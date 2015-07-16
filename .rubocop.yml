@@ -1,0 +1,13 @@
+inherit_from:
+  - .rubocop_todo.yml
+
+AllCops:
+  Exclude:
+    - tmp/**/*
+  DisplayCopNames: true
+
+Style/HashSyntax:
+  EnforcedStyle: hash_rockets
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes

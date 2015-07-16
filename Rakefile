@@ -142,6 +142,13 @@ begin
   RSpec::Core::RakeTask.new
   task :spec => "man:build"
 
+  if RUBY_VERSION >= "1.9.3"
+    # can't go in the gemspec because of the ruby version requirement
+    gem "rubocop", ">= 0.32.1"
+    require "rubocop/rake_task"
+    RuboCop::RakeTask.new
+  end
+
   namespace :spec do
     task :clean do
       rm_rf 'tmp'
@@ -245,7 +252,10 @@ begin
       puts "\n\e[1;33m[Travis CI] Running bundler real world specs against rubygems #{rg}\e[m\n\n"
       realworld = safe_task { Rake::Task["spec:rubygems:#{rg}:realworld"].invoke }
 
-      {"specs" => specs, "sudo" => sudos, "realworld" => realworld}.each do |name, passed|
+      puts "\n\e[1;33m[Travis CI] Running bundler linter\e[m\n\n"
+      rubocop = RUBY_VERSION < "1.9.3" || safe_task { Rake::Task["rubocop"].invoke }
+
+      { "specs" => specs, "sudo" => sudos, "realworld" => realworld, "rubocop" => rubocop }.each do |name, passed|
         if passed
           puts "\e[0;32m[Travis CI] #{name} passed\e[m"
         else
