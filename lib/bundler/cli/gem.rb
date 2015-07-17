@@ -40,7 +40,7 @@ module Bundler
         :test_task        => test_task,
         :ext              => options[:ext],
         :bin              => options[:bin],
-        :bundler_version  => bundler_dependency_version
+        :bundler_version  => bundler_dependency_version,
       }
       ensure_safe_gem_name(name, constant_array)
 
@@ -53,7 +53,7 @@ module Bundler
         "Rakefile.tt" => "Rakefile",
         "README.md.tt" => "README.md",
         "bin/console.tt" => "bin/console",
-        "bin/setup.tt" => "bin/setup"
+        "bin/setup.tt" => "bin/setup",
       }
 
       executables = %w[
@@ -70,12 +70,12 @@ module Bundler
           templates.merge!(
             "rspec.tt" => ".rspec",
             "spec/spec_helper.rb.tt" => "spec/spec_helper.rb",
-            "spec/newgem_spec.rb.tt" => "spec/#{namespaced_path}_spec.rb"
+            "spec/newgem_spec.rb.tt" => "spec/#{namespaced_path}_spec.rb",
           )
         when "minitest"
           templates.merge!(
             "test/test_helper.rb.tt" => "test/test_helper.rb",
-            "test/newgem_test.rb.tt" => "test/#{namespaced_path}_test.rb"
+            "test/newgem_test.rb.tt" => "test/#{namespaced_path}_test.rb",
           )
         end
       end
@@ -108,7 +108,7 @@ module Bundler
         templates.merge!(
           "ext/newgem/extconf.rb.tt" => "ext/#{name}/extconf.rb",
           "ext/newgem/newgem.h.tt" => "ext/#{name}/#{underscored_name}.h",
-          "ext/newgem/newgem.c.tt" => "ext/#{name}/#{underscored_name}.c"
+          "ext/newgem/newgem.c.tt" => "ext/#{name}/#{underscored_name}.c",
         )
       end
 

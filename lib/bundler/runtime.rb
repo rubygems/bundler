@@ -280,7 +280,7 @@ module Bundler
 
       unless manuals.empty?
         ENV["MANPATH"] = manuals.concat(
-          ENV["MANPATH"].to_s.split(File::PATH_SEPARATOR)
+          ENV["MANPATH"].to_s.split(File::PATH_SEPARATOR),
         ).uniq.join(File::PATH_SEPARATOR)
       end
     end
