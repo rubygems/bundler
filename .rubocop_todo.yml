@@ -481,12 +481,6 @@ Style/SpaceInsideHashLiteralBraces:
 Style/SpaceInsideStringInterpolation:
   Enabled: false
 
-# Offense count: 14
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyleForMultiline, SupportedStyles.
-Style/TrailingComma:
-  Enabled: false
-
 # Offense count: 1
 # Cop supports --auto-correct.
 Style/TrailingUnderscoreVariable:

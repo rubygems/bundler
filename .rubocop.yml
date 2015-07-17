@@ -53,6 +53,9 @@ Style/EachWithObject:
 Style/SpecialGlobalVars:
   Enabled: false
 
+Style/TrailingComma:
+  Enabled: false
+
 # Metrics
 
 # Arbitrary max lengths for classes simply do not work and enabling this will
