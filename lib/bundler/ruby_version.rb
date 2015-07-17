@@ -62,7 +62,7 @@ module Bundler
       @host ||= [
         RbConfig::CONFIG["host_cpu"],
         RbConfig::CONFIG["host_vendor"],
-        RbConfig::CONFIG["host_os"]
+        RbConfig::CONFIG["host_os"],
       ].join("-")
     end
   end

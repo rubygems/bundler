@@ -190,7 +190,7 @@ module Bundler
         "GO_SERVER_URL" => "go",
         "SNAP_CI" => "snap",
         "CI_NAME" => ENV["CI_NAME"],
-        "CI" => "ci"
+        "CI" => "ci",
       }
       env_cis.find_all{ |env, ci| ENV[env]}.map{ |env, ci| ci }
     end

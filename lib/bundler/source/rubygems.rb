@@ -137,7 +137,7 @@ module Bundler
               :bin_dir             => bin_path.to_s,
               :ignore_dependencies => true,
               :wrappers            => true,
-              :env_shebang         => true
+              :env_shebang         => true,
             ).install
           end
 
