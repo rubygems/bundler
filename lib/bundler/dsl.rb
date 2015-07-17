@@ -224,8 +224,7 @@ module Bundler
 
       # TODO 2.0 remove this deprecated git source
       git_source(:bitbucket) do |repo_name|
-        # Double quotes here make some dsl_spec.rb specs fail
-        warn_deprecated_git_source(:bitbucket, 'https://#{user_name}@bitbucket.org/#{user_name}/#{repo_name}.git')
+        warn_deprecated_git_source(:bitbucket, "https://#{user_name}@bitbucket.org/#{user_name}/#{repo_name}.git")
         user_name, repo_name = repo_name.split "/"
         repo_name ||= user_name
         "https://#{user_name}@bitbucket.org/#{user_name}/#{repo_name}.git"
