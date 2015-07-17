@@ -213,13 +213,7 @@ module Bundler
     def add_git_sources
       git_source(:github) do |repo_name|
         repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
-        # TODO 2.0 upgrade this setting to the default
-        if Bundler.settings["github.https"]
-          "https://github.com/#{repo_name}.git"
-        else
-          warn_github_source_change(repo_name)
-          "git://github.com/#{repo_name}.git"
-        end
+        "https://github.com/#{repo_name}.git"
       end
 
       # TODO 2.0 remove this deprecated git source
@@ -230,7 +224,8 @@ module Bundler
 
       # TODO 2.0 remove this deprecated git source
       git_source(:bitbucket) do |repo_name|
-        warn_deprecated_git_source(:bitbucket, "https://#{user_name}@bitbucket.org/#{user_name}/#{repo_name}.git")
+        # Double quotes here make some dsl_spec.rb specs fail
+        warn_deprecated_git_source(:bitbucket, 'https://#{user_name}@bitbucket.org/#{user_name}/#{repo_name}.git')
         user_name, repo_name = repo_name.split "/"
         repo_name ||= user_name
         "https://#{user_name}@bitbucket.org/#{user_name}/#{repo_name}.git"

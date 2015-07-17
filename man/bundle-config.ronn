@@ -50,14 +50,17 @@ The options that can be configured are:
   enabled in `development` or `test` environments.
 
 * `path`:
-
+  The location to install the specified gems to. This defaults to Rubygems'
   setting. Bundler shares this location with Rubygems, `gem install ...` will
   have gem installed there, too. Therefore, gems installed without a
   `--path ...` setting will show up by calling `gem list`. Accodingly, gems
   installed to other locations will not get listed.
 
 * `without`:
+  A space-separated list of groups referencing gems to skip during installation.
 
+* `with`:
+  A space-separated list of optional groups to be installed.
 
 ## BUILD OPTIONS
 

@@ -1,3 +1,5 @@
+require "set"
+
 module Bundler
   class SourceList
     attr_reader :path_sources,

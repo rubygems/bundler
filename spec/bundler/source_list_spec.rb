@@ -50,12 +50,10 @@ describe Bundler::SourceList do
       end
 
       it "passes the provided options to the new source" do
-        @new_source = source_list.add_git_source("uri" => "git://host/path.git")
         expect(@new_source.options).to eq("uri" => "git://host/path.git")
       end
 
       it "adds the source to the beginning of git_sources" do
-        @new_source = source_list.add_git_source("uri" => "git://host/path.git")
         expect(source_list.git_sources.first).to equal(@new_source)
       end
 

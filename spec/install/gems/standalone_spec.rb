@@ -235,26 +235,4 @@ describe "bundle install --standalone" do
       end
     end
   end
-
-  describe "with --binstubs" do
-    before do
-      install_gemfile <<-G, :standalone => true, :binstubs => true
-        source "file://#{gem_repo1}"
-        gem "rails"
-      G
-    end
-
-    it "creates stubs that use the standalone load path" do
-      Dir.chdir(bundled_app) do
-        expect(`bin/rails -v`.chomp).to eql "2.3.2"
-      end
-    end
-
-    it "creates stubs that can be executed from anywhere" do
-      require "tmpdir"
-      Dir.chdir(Dir.tmpdir) do
-        expect(`#{bundled_app}/bin/rails -v`.chomp).to eql "2.3.2"
-      end
-    end
-  end
 end

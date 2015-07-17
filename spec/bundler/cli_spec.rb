@@ -31,4 +31,11 @@ describe "bundle executable" do
     bundle ''
     expect(out).to eq(help_output)
   end
+
+  it "prints help when ARGV is empty" do
+    bundle :help
+    help_output = out
+    bundle ''
+    expect(out).to eq(help_output)
+  end
 end
