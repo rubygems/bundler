@@ -124,7 +124,7 @@ module Bundler
       end
 
       def g
-        @g ||= ::GraphViz.digraph(@graph_name, {:concentrate => true, :normalize => true, :nodesep => 0.55}) do |g|
+        @g ||= ::GraphViz.digraph(@graph_name, { :concentrate => true, :normalize => true, :nodesep => 0.55 }) do |g|
           g.edge[:weight]   = 2
           g.edge[:fontname] = g.node[:fontname] = "Arial, Helvetica, SansSerif"
           g.edge[:fontsize] = 12
@@ -135,18 +135,18 @@ module Bundler
         @groups.each do |group|
           g.add_nodes(
             group,
-            {:style     => "filled",
+            { :style     => "filled",
              :fillcolor => "#B9B9D5",
              :shape     => "box3d",
-             :fontsize  => 16}.merge(@node_options[group])
+             :fontsize  => 16 }.merge(@node_options[group])
           )
         end
 
         @relations.each do |parent, children|
           children.each do |child|
             if @groups.include?(parent)
-              g.add_nodes(child, {:style => "filled", :fillcolor => "#B9B9D5"}.merge(@node_options[child]))
-              g.add_edges(parent, child, {:constraint => false}.merge(@edge_options["#{parent}_#{child}"]))
+              g.add_nodes(child, { :style => "filled", :fillcolor => "#B9B9D5" }.merge(@node_options[child]))
+              g.add_edges(parent, child, { :constraint => false }.merge(@edge_options["#{parent}_#{child}"]))
             else
               g.add_nodes(child, @node_options[child])
               g.add_edges(parent, child, @edge_options["#{parent}_#{child}"])
