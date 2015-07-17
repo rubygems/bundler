@@ -106,7 +106,6 @@ module Bundler
         JRUBY_VERSION.dup
       else
         raise BundlerError, "RUBY_ENGINE value #{RUBY_ENGINE} is not recognized"
-        nil
       end
     end
 

@@ -70,7 +70,6 @@ module Spec
         JRUBY_VERSION
       else
         raise BundlerError, "That RUBY_ENGINE is not recognized"
-        nil
       end
     end
 
