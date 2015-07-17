@@ -662,6 +662,8 @@ describe "bundle install with git sources" do
   it "prints a friendly error if a file blocks the git repo" do
     build_git "foo"
 
+    # NOTE: `default_bundle_path` does not exist prior to `bundle install`.
+    FileUtils.mkdir_p(default_bundle_path)
     FileUtils.touch(default_bundle_path("bundler"))
 
     install_gemfile <<-G
@@ -669,7 +671,7 @@ describe "bundle install with git sources" do
     G
 
     expect(exitstatus).to_not eq(0) if exitstatus
-    expect(out).to include("Bundler could not install a gem because it " \
+    expect(err).to include("Bundler could not install a gem because it " \
                            "needs to create a directory, but a file exists " \
                            "- #{default_bundle_path("bundler")}")
   end
