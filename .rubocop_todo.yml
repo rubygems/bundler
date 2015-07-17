@@ -30,10 +30,6 @@ Lint/RescueException:
 Lint/StringConversionInInterpolation:
   Enabled: false
 
-# Offense count: 2
-Lint/UnreachableCode:
-  Enabled: false
-
 # Offense count: 15
 # Cop supports --auto-correct.
 Lint/UnusedBlockArgument:
