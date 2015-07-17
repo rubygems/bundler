@@ -172,6 +172,14 @@ module Bundler
       @fetchers ||= FETCHERS.map { |f| f.new(downloader, remote_uri, fetch_uri, uri) }
     end
 
+    def http_proxy
+      if uri = connection.proxy_uri
+        uri.to_s
+      else
+        nil
+      end
+    end
+
     def inspect
       "#<#{self.class}:0x#{object_id} uri=#{uri}>"
     end
