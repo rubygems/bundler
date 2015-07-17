@@ -126,6 +126,8 @@ describe "bundle install with explicit source paths" do
         Gem::Specification.new do |s|
           s.name    = 'premailer'
           s.version = '1.0.0'
+          s.summary = 'Hi'
+          s.authors = 'Me'
         end
       G
     end

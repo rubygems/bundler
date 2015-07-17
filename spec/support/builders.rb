@@ -365,6 +365,7 @@ module Spec
       versions = args.last || "1.0"
       spec     = nil
 
+      # TODO [2.0]: Change this, since we won't use options[:path]
       options[:path] ||= @_build_path
 
       Array(versions).each do |version|

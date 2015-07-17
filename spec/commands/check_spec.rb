@@ -261,7 +261,7 @@ describe "bundle check" do
 
       bundle "check --path vendor/bundle"
       expect(exitstatus).to eq(1) if exitstatus
-      expect(out).to match(/The following gems are missing/)
+      expect(err).to match(/The following gems are missing/)
     end
   end
 
