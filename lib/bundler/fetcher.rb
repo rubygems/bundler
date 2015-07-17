@@ -203,7 +203,7 @@ module Bundler
         raise SSLError if needs_ssl && !defined?(OpenSSL::SSL)
 
         con = Net::HTTP::Persistent.new "bundler", :ENV
-        if gem_proxy = Gem.configuration[:http_proxy]
+        if gem_proxy = Bundler.rubygems.configuration[:http_proxy]
           con.proxy = URI.parse(gem_proxy)
         end
 
