@@ -224,9 +224,9 @@ module Bundler
 
       # TODO 2.0 remove this deprecated git source
       git_source(:bitbucket) do |repo_name|
-        warn_deprecated_git_source(:bitbucket, "https://#{user_name}@bitbucket.org/#{user_name}/#{repo_name}.git")
         user_name, repo_name = repo_name.split "/"
         repo_name ||= user_name
+        warn_deprecated_git_source(:bitbucket, "https://#{user_name}@bitbucket.org/#{user_name}/#{repo_name}.git")
         "https://#{user_name}@bitbucket.org/#{user_name}/#{repo_name}.git"
       end
     end
