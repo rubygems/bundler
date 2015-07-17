@@ -126,20 +126,7 @@ module Bundler
             install_path = Bundler.tmp(spec.full_name)
             bin_path     = install_path.join("bin")
           else
-
-            set_path = Bundler.settings.path
-
-            # TODO: document exactly what's going on here and in Bundler.settings.path
-            if set_path == File.join(Bundler.settings.root, Bundler.ruby_scope) # ?
-              install_path = Bundler.settings.path
-            elsif set_path == Bundler.rubygems.gem_dir # system gems path
-              install_path = Bundler.settings.path
-            elsif Pathname.new(set_path).absolute? # all other absolute paths
-              install_path = Bundler.settings.path
-            else # all relative paths
-              install_path = File.join(Bundler::root, Bundler.settings.path)
-            end
-
+            install_path = Bundler.settings.path
             bin_path = Bundler.system_bindir
           end
 
