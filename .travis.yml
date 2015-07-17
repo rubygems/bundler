@@ -5,8 +5,7 @@ before_script: travis_retry rake spec:travis:deps
 branches:
   only:
     - master
-    - /.+-dev$/
-    - /.+-stable$/
+    - 2-0-dev
 
 notifications:
   email:
