@@ -9,7 +9,6 @@ bundle-install(1) -- Install the dependencies specified in your Gemfile
                  [--jobs=NUMBER]
                  [--local]
                  [--deployment]
-                 [--force]
                  [--cache]
                  [--no-prune]
                  [--path PATH]
@@ -125,8 +124,6 @@ time `bundle install` is run, use `bundle config` (see bundle-config(1)).
 
 * `--without=<list>`:
   A space-separated list of groups referencing gems to skip during installation.
-  If a group is given that is in the remembered list of groups given
-  to --with, it is removed from that list.
 
 * `--with=<list>`:
   A space-separated list of groups referencing gems to install. If an
