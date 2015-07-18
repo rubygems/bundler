@@ -454,11 +454,6 @@ Style/SpaceBeforeBlockBraces:
 Style/SpaceBeforeComma:
   Enabled: false
 
-# Offense count: 23
-# Cop supports --auto-correct.
-Style/SpaceBeforeSemicolon:
-  Enabled: false
-
 # Offense count: 117
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles, EnforcedStyleForEmptyBraces, SpaceBeforeBlockParameters.
