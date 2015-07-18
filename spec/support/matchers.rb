@@ -4,13 +4,13 @@ module Spec
       dep = Bundler::Dependency.new(*args)
 
       match do |actual|
-        actual.length == 1 && actual.all? { |d| d == dep }
+        actual.length == 1 && actual.all? {|d| d == dep }
       end
     end
 
     RSpec::Matchers.define :have_gem do |*args|
       match do |actual|
-        actual.length == args.length && actual.all? { |a| args.include?(a.full_name) }
+        actual.length == args.length && actual.all? {|a| args.include?(a.full_name) }
       end
     end
 

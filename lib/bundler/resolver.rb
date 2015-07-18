@@ -82,7 +82,7 @@ module Bundler
         @specs        = {}
 
         ALL.each do |p|
-          @specs[p] = reverse.find { |s| s.match_platform(p) }
+          @specs[p] = reverse.find {|s| s.match_platform(p) }
         end
       end
 
@@ -139,11 +139,11 @@ module Bundler
       end
 
       def dependencies_for_activated_platforms
-        @activated.map { |p| __dependencies[p] }.flatten
+        @activated.map {|p| __dependencies[p] }.flatten
       end
 
       def platforms_for_dependency_named(dependency)
-        __dependencies.select { |p, deps| deps.map(&:name).include? dependency }.keys
+        __dependencies.select {|p, deps| deps.map(&:name).include? dependency }.keys
       end
 
     private
@@ -189,7 +189,7 @@ module Bundler
       @resolver = Molinillo::Resolver.new(self, self)
       @search_for = {}
       @base_dg = Molinillo::DependencyGraph.new
-      @base.each { |ls| @base_dg.add_root_vertex ls.name, Dependency.new(ls.name, ls.version) }
+      @base.each {|ls| @base_dg.add_root_vertex ls.name, Dependency.new(ls.name, ls.version) }
     end
 
     def start(requirements)
@@ -199,7 +199,7 @@ module Bundler
     rescue Molinillo::VersionConflict => e
       raise VersionConflict.new(e.conflicts.keys.uniq, e.message)
     rescue Molinillo::CircularDependencyError => e
-      names = e.dependencies.sort_by(&:name).map { |d| "gem '#{d.name}'"}
+      names = e.dependencies.sort_by(&:name).map {|d| "gem '#{d.name}'" }
       raise CyclicDependencyError, "Your bundle requires gems that depend" \
         " on each other, creating an infinite loop. Please remove" \
         " #{names.count > 1 ? "either " : "" }#{names.join(" or ")}" \
@@ -216,7 +216,7 @@ module Bundler
       if debug?
         debug_info = yield
         debug_info = debug_info.inspect unless debug_info.is_a?(String)
-        STDERR.puts debug_info.split("\n").map { |s| "  " * depth + s }
+        STDERR.puts debug_info.split("\n").map {|s| "  " * depth + s }
       end
     end
 
@@ -263,13 +263,13 @@ module Bundler
             end
             nested.last << spec
           end
-          groups = nested.map { |a| SpecGroup.new(a) }
-          !locked_requirement ? groups : groups.select { |sg| locked_requirement.satisfied_by? sg.version }
+          groups = nested.map {|a| SpecGroup.new(a) }
+          !locked_requirement ? groups : groups.select {|sg| locked_requirement.satisfied_by? sg.version }
         else
           []
         end
       end
-      search.select { |sg| sg.for?(platform) }.each { |sg| sg.activate_platform(platform) }
+      search.select {|sg| sg.for?(platform) }.each {|sg| sg.activate_platform(platform) }
     end
 
     def name_for(dependency)

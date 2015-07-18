@@ -56,7 +56,7 @@ describe "bundle show" do
       expect(out).to include(default_bundle_path("gems", "rails-2.3.2").to_s)
 
       # Gem names are the last component of their path.
-      gem_list = out.split.map { |p| p.split("/").last }
+      gem_list = out.split.map {|p| p.split("/").last }
       expect(gem_list).to eq(gem_list.sort)
     end
 

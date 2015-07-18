@@ -12,7 +12,7 @@ module Bundler
       @without_groups    = without.map(&:to_sym)
 
       @groups            = []
-      @relations         = Hash.new {|h, k| h[k] = Set.new}
+      @relations         = Hash.new {|h, k| h[k] = Set.new }
       @node_options      = {}
       @edge_options      = {}
 
@@ -54,7 +54,7 @@ module Bundler
     end
 
     def _groups
-      relations = Hash.new {|h, k| h[k] = Set.new}
+      relations = Hash.new {|h, k| h[k] = Set.new }
       @env.current_dependencies.each do |dependency|
         dependency.groups.each do |group|
           next if @without_groups.include?(group)

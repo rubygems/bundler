@@ -99,7 +99,7 @@ module Bundler
     def merge(set)
       arr = sorted.dup
       set.each do |s|
-        next if arr.any? { |s2| s2.name == s.name && s2.version == s.version && s2.platform == s.platform }
+        next if arr.any? {|s2| s2.name == s.name && s2.version == s.version && s2.platform == s.platform }
         arr << s
       end
       SpecSet.new(arr)
@@ -108,7 +108,7 @@ module Bundler
   private
 
     def sorted
-      rake = @specs.find { |s| s.name == "rake" }
+      rake = @specs.find {|s| s.name == "rake" }
       begin
         @sorted ||= ([rake] + tsort).compact.uniq
       rescue TSort::Cyclic => error
@@ -129,7 +129,7 @@ module Bundler
 
     def lookup
       @lookup ||= begin
-        lookup = Hash.new { |h,k| h[k] = [] }
+        lookup = Hash.new {|h,k| h[k] = [] }
         specs = @specs.sort_by do |s|
           s.platform.to_s == "ruby" ? "\0" : s.platform.to_s
         end
@@ -141,13 +141,13 @@ module Bundler
     end
 
     def tsort_each_node
-      @specs.each { |s| yield s }
+      @specs.each {|s| yield s }
     end
 
     def tsort_each_child(s)
       s.dependencies.sort_by(&:name).each do |d|
         next if d.type == :development
-        lookup[d.name].each { |s2| yield s2 }
+        lookup[d.name].each {|s2| yield s2 }
       end
     end
   end

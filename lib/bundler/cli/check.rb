@@ -22,7 +22,7 @@ module Bundler
 
       if not_installed.any?
         Bundler.ui.error "The following gems are missing"
-        not_installed.each { |s| Bundler.ui.error " * #{s.name} (#{s.version})" }
+        not_installed.each {|s| Bundler.ui.error " * #{s.name} (#{s.version})" }
         Bundler.ui.warn "Install missing gems with `bundle install`"
         exit 1
       elsif !Bundler.default_lockfile.exist? && Bundler.settings[:frozen]

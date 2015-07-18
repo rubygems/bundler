@@ -9,7 +9,7 @@ require "digest/sha1"
 begin
   require "rubygems"
   spec = Gem::Specification.load("bundler.gemspec")
-  rspec = spec.dependencies.find { |d| d.name == "rspec" }
+  rspec = spec.dependencies.find {|d| d.name == "rspec" }
   gem "rspec", rspec.requirement.to_s
   require "rspec"
 rescue LoadError

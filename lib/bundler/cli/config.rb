@@ -41,7 +41,7 @@ module Bundler
         if args.empty?
           Bundler.ui.confirm "Settings for `#{name}` in order of priority. The top value will be used"
           thor.with_padding do
-            Bundler.settings.pretty_values_for(name).each { |line| Bundler.ui.info line }
+            Bundler.settings.pretty_values_for(name).each {|line| Bundler.ui.info line }
           end
           return
         end

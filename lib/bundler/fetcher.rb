@@ -132,7 +132,7 @@ module Bundler
       if remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
         @use_api = false
       else
-        fetchers.reject! { |f| f.api_fetcher? && !f.api_available? }
+        fetchers.reject! {|f| f.api_fetcher? && !f.api_available? }
         @use_api = fetchers.any?(&:api_fetcher?)
       end
     end
@@ -169,7 +169,7 @@ module Bundler
     end
 
     def fetchers
-      @fetchers ||= FETCHERS.map { |f| f.new(downloader, remote_uri, fetch_uri, uri) }
+      @fetchers ||= FETCHERS.map {|f| f.new(downloader, remote_uri, fetch_uri, uri) }
     end
 
     def inspect
@@ -192,7 +192,7 @@ module Bundler
         "CI_NAME" => ENV["CI_NAME"],
         "CI" => "ci"
       }
-      env_cis.find_all{ |env, ci| ENV[env]}.map{ |env, ci| ci }
+      env_cis.find_all{|env, ci| ENV[env] }.map{|env, ci| ci }
     end
 
     def connection
@@ -224,7 +224,7 @@ module Bundler
 
     # cached gem specification path, if one exists
     def gemspec_cached_path spec_file_name
-      paths = Bundler.rubygems.spec_cache_dirs.map { |dir| File.join(dir, spec_file_name) }
+      paths = Bundler.rubygems.spec_cache_dirs.map {|dir| File.join(dir, spec_file_name) }
       paths = paths.select {|path| File.file? path }
       paths.first
     end
@@ -247,7 +247,7 @@ module Bundler
       else
         store.set_default_paths
         certs = File.expand_path("../ssl_certs/*.pem", __FILE__)
-        Dir.glob(certs).each { |c| store.add_file c }
+        Dir.glob(certs).each {|c| store.add_file c }
       end
       store
     end

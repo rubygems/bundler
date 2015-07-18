@@ -63,7 +63,7 @@ class ParallelInstaller
     @size = size
     @standalone = standalone
     @force = force
-    @specs = all_specs.map { |s| SpecInstallation.new(s) }
+    @specs = all_specs.map {|s| SpecInstallation.new(s) }
   end
 
   def call

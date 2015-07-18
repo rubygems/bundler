@@ -172,7 +172,7 @@ end
       # Insert a gemspec method that shells out
       spec_lines = lib_path("foo-1.0/foo.gemspec").read.split("\n")
       spec_lines.insert(-2, "s.description = `echo bob`")
-      update_git("foo"){ |s| s.write "foo.gemspec", spec_lines.join("\n") }
+      update_git("foo"){|s| s.write "foo.gemspec", spec_lines.join("\n") }
 
       install_gemfile <<-G
         gem "foo", :git => '#{lib_path("foo-1.0")}'

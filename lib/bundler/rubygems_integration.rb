@@ -116,9 +116,9 @@ module Bundler
 
     def spec_cache_dirs
       @spec_cache_dirs ||= begin
-        dirs = gem_path.map {|dir| File.join(dir, "specifications")}
+        dirs = gem_path.map {|dir| File.join(dir, "specifications") }
         dirs << Gem.spec_cache_dir if Gem.respond_to?(:spec_cache_dir) # Not in Rubygems 2.0.3 or earlier
-        dirs.uniq.select {|dir| File.directory? dir}
+        dirs.uniq.select {|dir| File.directory? dir }
       end
     end
 
@@ -151,7 +151,7 @@ module Bundler
       # RubyGems 2.2+ can put binary extension into dedicated folders,
       # therefore use RubyGems facilities to obtain their load paths.
       if Gem::Specification.method_defined? :full_require_paths
-        loaded_gem_paths = Gem.loaded_specs.map {|n, s| s.full_require_paths}
+        loaded_gem_paths = Gem.loaded_specs.map {|n, s| s.full_require_paths }
         loaded_gem_paths.flatten
       else
         $LOAD_PATH.select do |p|
@@ -239,7 +239,7 @@ module Bundler
     end
 
     def security_policy_keys
-      %w{High Medium Low AlmostNo No}.map { |level| "#{level}Security" }
+      %w{High Medium Low AlmostNo No}.map {|level| "#{level}Security" }
     end
 
     def security_policies
@@ -278,7 +278,7 @@ module Bundler
           dep = Gem::Dependency.new(dep, reqs)
         end
 
-        spec = specs.find  { |s| s.name == dep.name }
+        spec = specs.find  {|s| s.name == dep.name }
 
         if spec.nil?
 
@@ -341,7 +341,7 @@ module Bundler
         spec = nil
 
         if exec_name
-          spec = specs.find { |s| s.executables.include?(exec_name) }
+          spec = specs.find {|s| s.executables.include?(exec_name) }
           spec or raise Gem::Exception, "can't find executable #{exec_name}"
           unless spec.name == name
             warn "Bundler is using a binstub that was created for a different gem.\n" \
@@ -349,7 +349,7 @@ module Bundler
               "to work around a system/bundle conflict."
           end
         else
-          spec = specs.find  { |s| s.name == name }
+          spec = specs.find  {|s| s.name == name }
           exec_name = spec.default_executable or raise Gem::Exception, "no default executable for #{spec.full_name}"
         end
 
@@ -363,7 +363,7 @@ module Bundler
     # we don't #refresh, so stub it out.
     def replace_refresh
       gem_class = (class << Gem; self; end)
-      redefine_method(gem_class, :refresh) { }
+      redefine_method(gem_class, :refresh) {}
     end
 
     # Replace or hook into Rubygems to provide a bundlerized view

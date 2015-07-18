@@ -35,7 +35,7 @@ module Bundler
         end
 
         Bundler.rubygems.mark_loaded(spec)
-        load_paths = spec.load_paths.reject {|path| $LOAD_PATH.include?(path)}
+        load_paths = spec.load_paths.reject {|path| $LOAD_PATH.include?(path) }
         $LOAD_PATH.unshift(*load_paths)
       end
 
@@ -76,7 +76,7 @@ module Bundler
             Kernel.require file
           end
         rescue LoadError => e
-          REQUIRE_ERRORS.find { |r| r =~ e.message }
+          REQUIRE_ERRORS.find {|r| r =~ e.message }
           raise if dep.autorequire || $1 != required_file
 
           if dep.autorequire.nil? && dep.name.include?("-")
@@ -84,7 +84,7 @@ module Bundler
               namespaced_file = dep.name.gsub("-", "/")
               Kernel.require namespaced_file
             rescue LoadError => e
-              REQUIRE_ERRORS.find { |r| r =~ e.message }
+              REQUIRE_ERRORS.find {|r| r =~ e.message }
               raise if $1 != namespaced_file
             end
           end
@@ -96,7 +96,7 @@ module Bundler
       if groups.empty?
         dependencies
       else
-        dependencies.select { |d| (groups & d.groups).any? }
+        dependencies.select {|d| (groups & d.groups).any? }
       end
     end
 
@@ -200,10 +200,10 @@ module Bundler
       end
 
       unless dry_run
-        stale_gem_bins.each { |bin| FileUtils.rm(bin) if File.exist?(bin) }
-        stale_gem_files.each { |file| FileUtils.rm(file) if File.exist?(file) }
-        stale_gemspec_files.each { |file| FileUtils.rm(file) if File.exist?(file) }
-        stale_git_cache_dirs.each { |dir| FileUtils.rm_rf(dir) if File.exist?(dir) }
+        stale_gem_bins.each {|bin| FileUtils.rm(bin) if File.exist?(bin) }
+        stale_gem_files.each {|file| FileUtils.rm(file) if File.exist?(file) }
+        stale_gemspec_files.each {|file| FileUtils.rm(file) if File.exist?(file) }
+        stale_git_cache_dirs.each {|dir| FileUtils.rm_rf(dir) if File.exist?(dir) }
       end
 
       output

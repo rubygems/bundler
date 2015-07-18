@@ -10,7 +10,7 @@ require "rubygems/specification"
 require "bundler/match_platform"
 
 module Gem
-  @loaded_stacks = Hash.new { |h,k| h[k] = [] }
+  @loaded_stacks = Hash.new {|h,k| h[k] = [] }
 
   class Specification
     attr_accessor :remote, :location, :relative_loaded_from
@@ -116,7 +116,7 @@ module Gem
     end
 
     def to_yaml_properties
-      instance_variables.reject { |p| ["@source", "@groups"].include?(p.to_s) }
+      instance_variables.reject {|p| ["@source", "@groups"].include?(p.to_s) }
     end
 
     def to_lock

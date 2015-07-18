@@ -31,7 +31,7 @@ def clean_files(files, regex, replacement = "")
   files.each do |file|
     contents = File.read(file)
     contents.gsub!(regex, replacement)
-    File.open(file, "w") { |f| f << contents }
+    File.open(file, "w") {|f| f << contents }
   end
 end
 
@@ -43,7 +43,7 @@ namespace :molinillo do
   end
 
   task :clean do
-    files = Dir.glob("lib/bundler/vendor/molinillo*/*", File::FNM_DOTMATCH).reject { |f| %(. .. lib).include? f.split("/").last }
+    files = Dir.glob("lib/bundler/vendor/molinillo*/*", File::FNM_DOTMATCH).reject {|f| %(. .. lib).include? f.split("/").last }
     rm_r files
   end
 
@@ -68,7 +68,7 @@ namespace :thor do
   end
 
   task :clean do
-    files = Dir.glob("lib/bundler/vendor/thor*/*", File::FNM_DOTMATCH).reject { |f| %(. .. lib).include? f.split("/").last }
+    files = Dir.glob("lib/bundler/vendor/thor*/*", File::FNM_DOTMATCH).reject {|f| %(. .. lib).include? f.split("/").last }
     rm_r files
   end
 
@@ -318,7 +318,7 @@ begin
       rm_rf "lib/bundler/man"
     end
 
-    task(:require) { }
+    task(:require) {}
   end
 
 rescue LoadError

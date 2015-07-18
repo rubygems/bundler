@@ -76,7 +76,7 @@ describe Bundler::GemHelper do
     before(:each) do
       content = app_gemspec_content.gsub("TODO: ", "")
       content.sub!(/homepage\s+= ".*"/, 'homepage = ""')
-      File.open(app_gemspec_path, "w") { |file| file << content }
+      File.open(app_gemspec_path, "w") {|file| file << content }
     end
 
     def remove_push_guard(gemspec_content)
@@ -138,7 +138,7 @@ describe Bundler::GemHelper do
       context "when build failed" do
         it "raises an error with appropriate message" do
           # break the gemspec by adding back the TODOs
-          File.open(app_gemspec_path, "w"){ |file| file << app_gemspec_content }
+          File.open(app_gemspec_path, "w"){|file| file << app_gemspec_content }
           expect { subject.build_gem }.to raise_error(/TODO/)
         end
       end

@@ -249,8 +249,8 @@ module Bundler
       end
 
       def cached_path(spec)
-        possibilities = @caches.map { |p| "#{p}/#{spec.file_name}" }
-        possibilities.find { |p| File.exist?(p) }
+        possibilities = @caches.map {|p| "#{p}/#{spec.file_name}" }
+        possibilities.find {|p| File.exist?(p) }
       end
 
       def normalize_uri(uri)
@@ -262,7 +262,7 @@ module Bundler
       end
 
       def suppress_configured_credentials(remote)
-        remote_nouser = remote.dup.tap { |uri| uri.user = uri.password = nil }.to_s
+        remote_nouser = remote.dup.tap {|uri| uri.user = uri.password = nil }.to_s
         if remote.userinfo && remote.userinfo == Bundler.settings[remote_nouser]
           remote_nouser
         else

@@ -21,6 +21,9 @@ Lint/EndAlignment:
 Style/MultilineOperationIndentation:
   EnforcedStyle: indented
 
+Style/SpaceInsideBlockBraces:
+  SpaceBeforeBlockParameters: false
+
 # We adopted raise instead of fail.
 Style/SignalException:
   EnforcedStyle: only_raise

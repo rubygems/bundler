@@ -42,7 +42,7 @@ module Bundler
     end
 
     def all
-      env_keys = ENV.keys.select { |k| k =~ /BUNDLE_.*/ }
+      env_keys = ENV.keys.select {|k| k =~ /BUNDLE_.*/ }
 
       keys = @global_config.keys | @local_config.keys | env_keys
 
@@ -208,7 +208,7 @@ module Bundler
         hash.delete(key) if value.nil?
         FileUtils.mkdir_p(file.dirname)
         require "bundler/psyched_yaml"
-        File.open(file, "w") { |f| f.puts YAML.dump(hash) }
+        File.open(file, "w") {|f| f.puts YAML.dump(hash) }
       end
 
       value

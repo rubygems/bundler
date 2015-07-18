@@ -19,7 +19,7 @@ module Bundler
       @request_queue = Queue.new
       @response_queue = Queue.new
       @func = func
-      @threads = size.times.map { |i| Thread.start { process_queue(i) } }
+      @threads = size.times.map {|i| Thread.start { process_queue(i) } }
       trap("INT") { abort_threads }
     end
 

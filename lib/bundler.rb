@@ -251,7 +251,7 @@ module Bundler
     def with_clean_env
       with_original_env do
         ENV["MANPATH"] = ENV["BUNDLE_ORIG_MANPATH"]
-        ENV.delete_if { |k,_| k[0,7] == "BUNDLE_" }
+        ENV.delete_if {|k,_| k[0,7] == "BUNDLE_" }
         if ENV.has_key? "RUBYOPT"
           ENV["RUBYOPT"] = ENV["RUBYOPT"].sub "-rbundler/setup", ""
           ENV["RUBYOPT"] = ENV["RUBYOPT"].sub "-I#{File.expand_path("..", __FILE__)}", ""
@@ -352,7 +352,7 @@ module Bundler
     end
 
     def read_file(file)
-      File.open(file, "rb") { |f| f.read }
+      File.open(file, "rb") {|f| f.read }
     end
 
     def load_marshal(data)
@@ -419,7 +419,7 @@ module Bundler
     def eval_gemspec(path, contents)
       eval(contents, TOPLEVEL_BINDING, path.expand_path.to_s)
     rescue ScriptError, StandardError => e
-      original_line = e.backtrace.find { |line| line.include?(path.to_s) }
+      original_line = e.backtrace.find {|line| line.include?(path.to_s) }
       msg  = "There was a #{e.class} while loading #{path.basename}: \n#{e.message}"
       msg << " from\n  #{original_line}" if original_line
       msg << "\n"

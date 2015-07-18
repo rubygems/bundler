@@ -79,7 +79,7 @@ module Bundler
       dep = Dependency.new(name, version, options)
 
       # if there's already a dependency with this name we try to prefer one
-      if current = @dependencies.find { |d| d.name == dep.name }
+      if current = @dependencies.find {|d| d.name == dep.name }
         if current.requirement != dep.requirement
           if current.type == :development
             @dependencies.delete current
@@ -216,7 +216,7 @@ module Bundler
         "git://github.com/#{repo_name}.git"
       end
 
-      git_source(:gist){ |repo_name| "https://gist.github.com/#{repo_name}.git" }
+      git_source(:gist){|repo_name| "https://gist.github.com/#{repo_name}.git" }
 
       git_source(:bitbucket) do |repo_name|
         user_name, repo_name = repo_name.split "/"
@@ -432,7 +432,7 @@ module Bundler
 
           return m unless backtrace && dsl_path && contents
 
-          trace_line = backtrace.find { |l| l.include?(dsl_path.to_s) } || trace_line
+          trace_line = backtrace.find {|l| l.include?(dsl_path.to_s) } || trace_line
           return m unless trace_line
           line_numer = trace_line.split(":")[1].to_i - 1
           return m unless line_numer

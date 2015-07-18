@@ -7,7 +7,7 @@ module Spec
 
     def platform(*args)
       @platforms ||= []
-      @platforms.concat args.map { |p| Gem::Platform.new(p) }
+      @platforms.concat args.map {|p| Gem::Platform.new(p) }
     end
 
     alias platforms platform

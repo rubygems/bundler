@@ -16,16 +16,16 @@ module Bundler
     def initialize
       @sources = []
       @cache = {}
-      @specs = Hash.new { |h,k| h[k] = Hash.new }
-      @all_specs = Hash.new { |h,k| h[k] = [] }
+      @specs = Hash.new {|h,k| h[k] = Hash.new }
+      @all_specs = Hash.new {|h,k| h[k] = [] }
     end
 
     def initialize_copy(o)
       super
       @sources = @sources.dup
       @cache = {}
-      @specs = Hash.new { |h,k| h[k] = Hash.new }
-      @all_specs = Hash.new { |h,k| h[k] = [] }
+      @specs = Hash.new {|h,k| h[k] = Hash.new }
+      @all_specs = Hash.new {|h,k| h[k] = [] }
 
       o.specs.each do |name, hash|
         @specs[name] = hash.dup
@@ -56,7 +56,7 @@ module Bundler
     # about, returning all of the results.
     def search(query, base = nil)
       results = local_search(query, base)
-      seen = Set.new(results.map { |spec| [spec.name, spec.version, spec.platform] })
+      seen = Set.new(results.map {|spec| [spec.name, spec.version, spec.platform] })
 
       @sources.each do |source|
         source.search(query, base).each do |spec|
@@ -165,7 +165,7 @@ module Bundler
         only_prerelease  = specs.all? {|spec| spec.version.prerelease? }
 
         unless wants_prerelease || only_prerelease
-          found.reject! { |spec| spec.version.prerelease? }
+          found.reject! {|spec| spec.version.prerelease? }
         end
 
         found

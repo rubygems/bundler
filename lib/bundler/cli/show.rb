@@ -39,7 +39,7 @@ module Bundler
         Bundler.load.specs.sort_by(&:name).each do |s|
           desc = "  * #{s.name} (#{s.version}#{s.git_version})"
           if @verbose
-            latest = latest_specs.find { |l| l.name == s.name }
+            latest = latest_specs.find {|l| l.name == s.name }
             Bundler.ui.info <<-END.gsub(/^ +/, "")
               #{desc}
               \tSummary:  #{s.summary || "No description available."}

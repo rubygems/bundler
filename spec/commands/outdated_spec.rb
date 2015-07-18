@@ -32,7 +32,7 @@ describe "bundle outdated" do
       expect(out).to include("foo (newest 1.0")
 
       # Gem names are one per-line, between "*" and their parenthesized version.
-      gem_list = out.split("\n").map { |g| g[/\* (.*) \(/, 1] }.compact
+      gem_list = out.split("\n").map {|g| g[/\* (.*) \(/, 1] }.compact
       expect(gem_list).to eq(gem_list.sort)
     end
 
