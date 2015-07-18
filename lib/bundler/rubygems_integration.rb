@@ -330,7 +330,7 @@ module Bundler
     # under bundler. The new Gem.bin_path only considers gems in
     # +specs+
     def replace_bin_path(specs)
-      gem_class = (class << Gem ; self ; end)
+      gem_class = (class << Gem; self; end)
       redefine_method(gem_class, :bin_path) do |name, *args|
         exec_name = args.first
 
@@ -362,7 +362,7 @@ module Bundler
     # Because Bundler has a static view of what specs are available,
     # we don't #refresh, so stub it out.
     def replace_refresh
-      gem_class = (class << Gem ; self ; end)
+      gem_class = (class << Gem; self; end)
       redefine_method(gem_class, :refresh) { }
     end
 
@@ -446,7 +446,7 @@ module Bundler
 
       def stub_rubygems(specs)
         # Rubygems versions lower than 1.7 use SourceIndex#from_gems_in
-        source_index_class = (class << Gem::SourceIndex ; self ; end)
+        source_index_class = (class << Gem::SourceIndex; self; end)
         source_index_class.send(:define_method, :from_gems_in) do |*args|
           source_index = Gem::SourceIndex.new
           source_index.spec_dirs = *args
