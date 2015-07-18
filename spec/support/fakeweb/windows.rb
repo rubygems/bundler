@@ -1,10 +1,10 @@
 require File.expand_path("../../path.rb", __FILE__)
 include Spec::Path
 
-files = [ "specs.4.8.gz",
+files = ["specs.4.8.gz",
           "prerelease_specs.4.8.gz",
           "quick/Marshal.4.8/rcov-1.0-mswin32.gemspec.rz",
-          "gems/rcov-1.0-mswin32.gem" ]
+          "gems/rcov-1.0-mswin32.gem"]
 
 # Set up pretend http gem server with FakeWeb
 $LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/fakeweb*/lib")].first}"
