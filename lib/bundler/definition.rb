@@ -225,7 +225,7 @@ module Bundler
     end
 
     def has_rubygems_remotes?
-      sources.rubygems_sources.any? {|s| s.remotes.any? }
+      sources.rubygems_sources.any? { |s| s.remotes.any? }
     end
 
     def has_local_dependencies?
@@ -233,7 +233,7 @@ module Bundler
     end
 
     def spec_git_paths
-      sources.git_sources.map {|s| s.path.to_s }
+      sources.git_sources.map { |s| s.path.to_s }
     end
 
     def groups
@@ -265,7 +265,7 @@ module Bundler
         return
       end
 
-      File.open(file, "wb"){|f| f.puts(contents) }
+      File.open(file, "wb"){ |f| f.puts(contents) }
     rescue Errno::EACCES
       raise PermissionError.new(file)
     end

@@ -35,7 +35,7 @@ module Bundler
         end
 
         Bundler.rubygems.mark_loaded(spec)
-        load_paths = spec.load_paths.reject {|path| $LOAD_PATH.include?(path)}
+        load_paths = spec.load_paths.reject { |path| $LOAD_PATH.include?(path) }
         $LOAD_PATH.unshift(*load_paths)
       end
 

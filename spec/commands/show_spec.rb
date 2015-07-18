@@ -115,7 +115,7 @@ describe "bundle show" do
     before :each do
       build_git "foo", :path => lib_path("foo")
       in_app_root_custom lib_path("foo")
-      File.open("Gemfile", "w") {|f| f.puts "gemspec" }
+      File.open("Gemfile", "w") { |f| f.puts "gemspec" }
       sys_exec "rm -rf .git && git init"
     end
 
