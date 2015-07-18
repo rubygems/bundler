@@ -20,7 +20,7 @@ module Bundler
 
       underscored_name = name.tr("-", "_")
       namespaced_path = name.tr("-", "/")
-      constant_name = name.gsub(/-[_-]*(?![_-]|$)/){ "::" }.gsub(/([_-]+|(::)|^)(.|$)/){ $2.to_s + $3.upcase }
+      constant_name = name.gsub(/-[_-]*(?![_-]|$)/) { "::" }.gsub(/([_-]+|(::)|^)(.|$)/) { $2.to_s + $3.upcase }
       constant_array = constant_name.split("::")
       test_task = options[:test] == "minitest" ? "test" : "spec"
 

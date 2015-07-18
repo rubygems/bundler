@@ -3,13 +3,13 @@ require "spec_helper"
 describe Bundler::Dsl do
   before do
     @rubygems = double("rubygems")
-    allow(Bundler::Source::Rubygems).to receive(:new){ @rubygems }
+    allow(Bundler::Source::Rubygems).to receive(:new) { @rubygems }
   end
 
   describe "#git_source" do
     it "registers custom hosts" do
-      subject.git_source(:example){ |repo_name| "git@git.example.com:#{repo_name}.git" }
-      subject.git_source(:foobar){ |repo_name| "git@foobar.com:#{repo_name}.git" }
+      subject.git_source(:example) { |repo_name| "git@git.example.com:#{repo_name}.git" }
+      subject.git_source(:foobar) { |repo_name| "git@foobar.com:#{repo_name}.git" }
       subject.gem("dobry-pies", :example => "strzalek/dobry-pies")
       example_uri = "git@git.example.com:strzalek/dobry-pies.git"
       expect(subject.dependencies.first.source.uri).to eq(example_uri)
@@ -17,12 +17,12 @@ describe Bundler::Dsl do
 
     it "raises exception on invalid hostname" do
       expect {
-        subject.git_source(:group){ |repo_name| "git@git.example.com:#{repo_name}.git" }
+        subject.git_source(:group) { |repo_name| "git@git.example.com:#{repo_name}.git" }
       }.to raise_error(Bundler::InvalidOption)
     end
 
     it "expects block passed" do
-      expect{ subject.git_source(:example) }.to raise_error(Bundler::InvalidOption)
+      expect { subject.git_source(:example) }.to raise_error(Bundler::InvalidOption)
     end
 
     context "default hosts (git, gist)" do

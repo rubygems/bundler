@@ -265,7 +265,7 @@ module Bundler
         return
       end
 
-      File.open(file, "wb"){|f| f.puts(contents) }
+      File.open(file, "wb") {|f| f.puts(contents) }
     rescue Errno::EACCES
       raise PermissionError.new(file)
     end

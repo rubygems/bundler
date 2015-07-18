@@ -22,7 +22,7 @@ module Bundler
         @allow_cached = false
         @caches = [Bundler.app_cache, *Bundler.rubygems.gem_cache]
 
-        Array(options["remotes"] || []).reverse_each{|r| add_remote(r) }
+        Array(options["remotes"] || []).reverse_each {|r| add_remote(r) }
       end
 
       def remote!

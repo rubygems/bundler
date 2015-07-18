@@ -9,8 +9,8 @@ module Bundler
 
     # return an array of words similar to 'word' from the corpus
     def similar_words(word, limit = 3)
-      words_by_similarity = @corpus.map{|w| SimilarityScore.new(w, levenshtein_distance(word, w))}
-      words_by_similarity.select{|s| s.distance<=limit}.sort_by(&:distance).map(&:string)
+      words_by_similarity = @corpus.map {|w| SimilarityScore.new(w, levenshtein_distance(word, w))}
+      words_by_similarity.select {|s| s.distance<=limit}.sort_by(&:distance).map(&:string)
     end
 
     # return the result of 'similar_words', concatenated into a list
