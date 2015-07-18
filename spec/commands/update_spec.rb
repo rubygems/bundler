@@ -125,7 +125,7 @@ describe "bundle update in more complicated situations" do
     G
 
     update_repo2 do
-      build_gem "thin" , "2.0" do |s|
+      build_gem "thin", "2.0" do |s|
         s.add_dependency "rack"
       end
     end

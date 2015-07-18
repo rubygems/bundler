@@ -79,7 +79,7 @@ describe "bundle binstubs <gem>" do
     it "installs binstubs from path gems" do
       FileUtils.mkdir_p(lib_path("foo/bin"))
       FileUtils.touch(lib_path("foo/bin/foo"))
-      build_lib "foo" , "1.0", :path => lib_path("foo") do |s|
+      build_lib "foo", "1.0", :path => lib_path("foo") do |s|
         s.executables = %w(foo)
       end
       install_gemfile <<-G
