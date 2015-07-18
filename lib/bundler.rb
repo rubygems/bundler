@@ -367,16 +367,13 @@ module Bundler
         else
           spec = eval_gemspec(path, contents)
         end
-        warn_on_invalid_specs(spec) if validate
+        Bundler.rubygems.validate(spec) if spec && validate
         spec
       end
-    end
-
-    def warn_on_invalid_specs(spec)
-      spec && Bundler.rubygems.validate(spec)
     rescue Gem::InvalidSpecificationException => e
       Bundler.ui.warn "The gemspec at #{file} is not valid. " \
         "The validation error was '#{e.message}'"
+      nil
     end
 
     def clear_gemspec_cache
