@@ -302,8 +302,8 @@ module Bundler
         end
       end
 
-      opts["source"]       ||= @source
-      opts["env"]          ||= @env
+      opts["source"] ||= @source
+      opts["env"] ||= @env
       opts["platforms"]      = platforms.dup
       opts["group"]          = groups
       opts["should_include"] = install_if
@@ -321,7 +321,7 @@ module Bundler
     def validate_keys(command, opts, valid_keys)
       invalid_keys = opts.keys - valid_keys
       if invalid_keys.any?
-        message = "You passed #{invalid_keys.map {|k| ":"+k }.join(", ")} "
+        message = "You passed #{invalid_keys.map {|k| ":" + k }.join(", ")} "
         message << if invalid_keys.size > 1
                      "as options for #{command}, but they are invalid."
                    else

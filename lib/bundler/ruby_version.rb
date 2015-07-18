@@ -32,10 +32,10 @@ module Bundler
     end
 
     def ==(other)
-      version          == other.version &&
-        engine         == other.engine &&
+      version == other.version &&
+        engine == other.engine &&
         engine_version == other.engine_version &&
-        patchlevel     == other.patchlevel
+        patchlevel == other.patchlevel
     end
 
     # Returns a tuple of these things:
