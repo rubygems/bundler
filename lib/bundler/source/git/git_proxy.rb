@@ -77,7 +77,7 @@ module Bundler
           end
         end
 
-        def copy_to(destination, submodules=false)
+        def copy_to(destination, submodules = false)
           # method 1
           unless File.exist?(destination.join(".git"))
             begin
@@ -120,7 +120,7 @@ module Bundler
           end
         end
 
-        def git(command, check_errors=true)
+        def git(command, check_errors = true)
           raise GitNotAllowedError.new(command) unless allow?
           out = SharedHelpers.with_clean_git_env { %x{git #{command}} }
           raise GitCommandError.new(command, path) if check_errors && !$?.success?
