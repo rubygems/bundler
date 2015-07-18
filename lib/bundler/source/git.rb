@@ -50,11 +50,11 @@ module Bundler
       end
 
       def eql?(o)
-        o.is_a?(Git)         &&
-        uri == o.uri         &&
-        ref == o.ref         &&
-        branch == o.branch   &&
-        name == o.name       &&
+        o.is_a?(Git) &&
+        uri == o.uri &&
+        ref == o.ref &&
+        branch == o.branch &&
+        name == o.name &&
         version == o.version &&
         submodules == o.submodules
       end

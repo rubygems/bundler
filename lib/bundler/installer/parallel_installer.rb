@@ -55,7 +55,7 @@ class ParallelInstaller
 
   # Returns max number of threads machine can handle with a min of 1
   def self.max_threads
-    [Bundler.settings[:jobs].to_i-1, 1].max
+    [Bundler.settings[:jobs].to_i - 1, 1].max
   end
 
   def initialize(installer, all_specs, size, standalone, force)
