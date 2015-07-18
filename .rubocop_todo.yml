@@ -449,11 +449,6 @@ Style/SpaceAroundOperators:
 Style/SpaceBeforeBlockBraces:
   Enabled: false
 
-# Offense count: 4
-# Cop supports --auto-correct.
-Style/SpaceBeforeComma:
-  Enabled: false
-
 # Offense count: 23
 # Cop supports --auto-correct.
 Style/SpaceBeforeSemicolon:
