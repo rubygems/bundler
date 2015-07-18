@@ -291,7 +291,7 @@ describe "Bundler.setup" do
 
       context "when the ruby stdlib is a substring of Gem.path" do
         it "does not reject the stdlib from $LOAD_PATH" do
-          substring = "/" + $LOAD_PATH.find{|p| p =~ /vendor_ruby/ }.split("/")[2]
+          substring = "/" + $LOAD_PATH.find{ |p| p =~ /vendor_ruby/ }.split("/")[2]
           run "puts 'worked!'", :env => {"GEM_PATH" => substring}
           expect(out).to eq("worked!")
         end

@@ -122,7 +122,7 @@ module Gem
     def to_lock
       out = "  #{name}"
       unless requirement == Gem::Requirement.default
-        reqs = requirement.requirements.map{|o,v| "#{o} #{v}" }.sort.reverse
+        reqs = requirement.requirements.map{ |o,v| "#{o} #{v}" }.sort.reverse
         out << " (#{reqs.join(", ")})"
       end
       out

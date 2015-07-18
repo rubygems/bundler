@@ -34,13 +34,13 @@ class ParallelInstaller
     # sure needed dependencies have been installed.
     def dependencies_installed?(all_specs)
       installed_specs = all_specs.select(&:installed?).map(&:name)
-      dependencies.all? {|d| installed_specs.include? d.name }
+      dependencies.all? { |d| installed_specs.include? d.name }
     end
 
     # Represents only the non-development dependencies and the ones that
     # are itself.
     def dependencies
-      @dependencies ||= all_dependencies.reject {|dep| ignorable_dependency? dep }
+      @dependencies ||= all_dependencies.reject { |dep| ignorable_dependency? dep }
     end
 
     # Represents all dependencies

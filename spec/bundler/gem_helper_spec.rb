@@ -33,7 +33,7 @@ describe Bundler::GemHelper do
         if Gem::Version.new(Gem::VERSION) < Gem::Version.new("2.0")
           content = File.read(app_gemspec_path)
           content.sub!(/raise "RubyGems 2\.0 or newer.*/, "")
-          File.open(app_gemspec_path, "w"){|f| f.write(content) }
+          File.open(app_gemspec_path, "w"){ |f| f.write(content) }
         end
       end
 

@@ -192,7 +192,7 @@ module Bundler
         "CI_NAME" => ENV["CI_NAME"],
         "CI" => "ci"
       }
-      env_cis.find_all{ |env, ci| ENV[env]}.map{ |env, ci| ci }
+      env_cis.find_all{ |env, ci| ENV[env] }.map{ |env, ci| ci }
     end
 
     def connection
@@ -225,7 +225,7 @@ module Bundler
     # cached gem specification path, if one exists
     def gemspec_cached_path spec_file_name
       paths = Bundler.rubygems.spec_cache_dirs.map { |dir| File.join(dir, spec_file_name) }
-      paths = paths.select {|path| File.file? path }
+      paths = paths.select { |path| File.file? path }
       paths.first
     end
 

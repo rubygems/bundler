@@ -171,7 +171,7 @@ describe "bundle install with explicit source paths" do
       gemspec
     G
 
-    File.open(lib_path("foo/Gemfile"), "w") {|f| f.puts gemfile }
+    File.open(lib_path("foo/Gemfile"), "w") { |f| f.puts gemfile }
 
     Dir.chdir(lib_path("foo")) do
       bundle "install"
@@ -465,7 +465,7 @@ describe "bundle install with explicit source paths" do
         gemspec
         gem 'rack'
       G
-      File.open(lib_path("private_lib/Gemfile"), "w") {|f| f.puts gemfile }
+      File.open(lib_path("private_lib/Gemfile"), "w") { |f| f.puts gemfile }
 
       Dir.chdir(lib_path("private_lib")) do
         bundle :install, :env => {"DEBUG" => 1}, :artifice => "endpoint"

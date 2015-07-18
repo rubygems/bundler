@@ -459,12 +459,6 @@ Style/SpaceBeforeComma:
 Style/SpaceBeforeSemicolon:
   Enabled: false
 
-# Offense count: 117
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles, EnforcedStyleForEmptyBraces, SpaceBeforeBlockParameters.
-Style/SpaceInsideBlockBraces:
-  Enabled: false
-
 # Offense count: 15
 # Cop supports --auto-correct.
 Style/SpaceInsideBrackets:

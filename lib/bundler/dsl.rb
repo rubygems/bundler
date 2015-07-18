@@ -312,7 +312,7 @@ module Bundler
     def normalize_group_options(opts, groups)
       normalize_hash(opts)
 
-      groups = groups.map {|group| ":#{group}" }.join(", ")
+      groups = groups.map { |group| ":#{group}" }.join(", ")
       validate_keys("group #{groups}", opts, %w(optional))
 
       opts["optional"] ||= false
@@ -321,7 +321,7 @@ module Bundler
     def validate_keys(command, opts, valid_keys)
       invalid_keys = opts.keys - valid_keys
       if invalid_keys.any?
-        message = "You passed #{invalid_keys.map{|k| ":"+k }.join(", ")} "
+        message = "You passed #{invalid_keys.map{ |k| ":"+k }.join(", ")} "
         message << if invalid_keys.size > 1
                      "as options for #{command}, but they are invalid."
                    else

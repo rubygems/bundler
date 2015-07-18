@@ -17,7 +17,7 @@ module Bundler
         @allow_remote = false
 
         # Stringify options that could be set as symbols
-        %w(ref branch tag revision).each{|k| options[k] = options[k].to_s if options[k] }
+        %w(ref branch tag revision).each{ |k| options[k] = options[k].to_s if options[k] }
 
         @uri        = options["uri"] || ""
         @branch     = options["branch"]
@@ -228,7 +228,7 @@ module Bundler
           # The gemspecs we cache should already be evaluated.
           spec = Bundler.load_gemspec(spec_path)
           next unless spec
-          File.open(spec_path, "wb") {|file| file.write(spec.to_ruby) }
+          File.open(spec_path, "wb") { |file| file.write(spec.to_ruby) }
         end
       end
 

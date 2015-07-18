@@ -26,8 +26,8 @@ class Endpoint < Sinatra::Base
               :name         => spec.name,
               :number       => spec.version.version,
               :platform     => spec.platform.to_s,
-              :dependencies => spec.dependencies.select {|dep| dep.type == :runtime }.map do |dep|
-                [dep.name, dep.requirement.requirements.map {|a| a.join(" ") }.join(", ")]
+              :dependencies => spec.dependencies.select { |dep| dep.type == :runtime }.map do |dep|
+                [dep.name, dep.requirement.requirements.map { |a| a.join(" ") }.join(", ")]
               end
             }
           end

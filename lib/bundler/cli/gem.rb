@@ -191,7 +191,7 @@ module Bundler
       if name =~ /^\d/
         Bundler.ui.error "Invalid gem name #{name} Please give a name which does not start with numbers."
         exit 1
-      elsif constant_array.inject(Object) {|c, s| (c.const_defined?(s) && c.const_get(s)) || break }
+      elsif constant_array.inject(Object) { |c, s| (c.const_defined?(s) && c.const_get(s)) || break }
         Bundler.ui.error "Invalid gem name #{name} constant #{constant_array.join("::")} is already in use. Please choose another gem name."
         exit 1
       end

@@ -9,7 +9,7 @@ class LessThanProc < Proc
       else
         provided < Gem::Version.new(required)
       end
-    end.tap{|l| l.present = present }
+    end.tap{ |l| l.present = present }
   end
 
   def inspect

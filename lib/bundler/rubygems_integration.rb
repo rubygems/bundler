@@ -111,14 +111,14 @@ module Bundler
     end
 
     def gem_cache
-      gem_path.map{|p| File.expand_path("cache", p) }
+      gem_path.map{ |p| File.expand_path("cache", p) }
     end
 
     def spec_cache_dirs
       @spec_cache_dirs ||= begin
-        dirs = gem_path.map {|dir| File.join(dir, "specifications")}
+        dirs = gem_path.map { |dir| File.join(dir, "specifications") }
         dirs << Gem.spec_cache_dir if Gem.respond_to?(:spec_cache_dir) # Not in Rubygems 2.0.3 or earlier
-        dirs.uniq.select {|dir| File.directory? dir}
+        dirs.uniq.select { |dir| File.directory? dir }
       end
     end
 
@@ -151,11 +151,11 @@ module Bundler
       # RubyGems 2.2+ can put binary extension into dedicated folders,
       # therefore use RubyGems facilities to obtain their load paths.
       if Gem::Specification.method_defined? :full_require_paths
-        loaded_gem_paths = Gem.loaded_specs.map {|n, s| s.full_require_paths}
+        loaded_gem_paths = Gem.loaded_specs.map { |n, s| s.full_require_paths }
         loaded_gem_paths.flatten
       else
         $LOAD_PATH.select do |p|
-          Bundler.rubygems.gem_path.any?{|gp| p =~ /^#{Regexp.escape(gp)}/ }
+          Bundler.rubygems.gem_path.any?{ |gp| p =~ /^#{Regexp.escape(gp)}/ }
         end
       end
     end
@@ -184,7 +184,7 @@ module Bundler
       # Fetch all specs, minus prerelease specs
       spec_list = fetch_specs(true, false)
       # Then fetch the prerelease specs
-      fetch_prerelease_specs.each {|k, v| spec_list[k] += v }
+      fetch_prerelease_specs.each { |k, v| spec_list[k] += v }
 
       return spec_list
     end
@@ -363,7 +363,7 @@ module Bundler
     # we don't #refresh, so stub it out.
     def replace_refresh
       gem_class = (class << Gem ; self ; end)
-      redefine_method(gem_class, :refresh) { }
+      redefine_method(gem_class, :refresh) {}
     end
 
     # Replace or hook into Rubygems to provide a bundlerized view

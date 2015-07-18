@@ -348,7 +348,7 @@ module Bundler
     method_option :bin, :type => :boolean, :default => false, :aliases => "-b", :desc => "Generate a binary for your library."
     method_option :coc, :type => :boolean, :desc => "Generate a code of conduct file. Set a default with `bundle config gem.coc true`."
     method_option :edit, :type => :string, :aliases => "-e", :required => false, :banner => "EDITOR",
-      :lazy_default => [ENV["BUNDLER_EDITOR"], ENV["VISUAL"], ENV["EDITOR"]].find{|e| !e.nil? && !e.empty? },
+      :lazy_default => [ENV["BUNDLER_EDITOR"], ENV["VISUAL"], ENV["EDITOR"]].find{ |e| !e.nil? && !e.empty? },
       :desc => "Open generated gemspec in the specified editor (defaults to $EDITOR or $BUNDLER_EDITOR)"
     method_option :ext, :type => :boolean, :default => false, :desc => "Generate the boilerplate for C extension code"
     method_option :mit, :type => :boolean, :desc => "Generate an MIT license file"

@@ -66,11 +66,11 @@ module Bundler
         h.update(k => ENV[k])
       end
 
-      keys.each {|key| ENV.delete(key) }
+      keys.each { |key| ENV.delete(key) }
 
       block.call
     ensure
-      keys.each {|key| ENV[key] = old_env[key] }
+      keys.each { |key| ENV[key] = old_env[key] }
     end
 
     def set_bundle_environment
