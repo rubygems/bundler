@@ -176,7 +176,7 @@ module Bundler
     # installation is just SO MUCH FASTER. so we let people opt in.
     def install(options)
       force = options["force"]
-      jobs = [Bundler.settings[:jobs].to_i-1, 1].max
+      jobs = [Bundler.settings[:jobs].to_i - 1, 1].max
       if jobs > 1 && can_install_in_parallel?
         require "bundler/installer/parallel_installer"
         install_in_parallel jobs, options[:standalone], force

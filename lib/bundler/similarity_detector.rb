@@ -10,16 +10,16 @@ module Bundler
     # return an array of words similar to 'word' from the corpus
     def similar_words(word, limit=3)
       words_by_similarity = @corpus.map{|w| SimilarityScore.new(w, levenshtein_distance(word, w))}
-      words_by_similarity.select{|s| s.distance<=limit}.sort_by(&:distance).map(&:string)
+      words_by_similarity.select{|s| s.distance <= limit}.sort_by(&:distance).map(&:string)
     end
 
     # return the result of 'similar_words', concatenated into a list
     # (eg "a, b, or c")
     def similar_word_list(word, limit=3)
       words = similar_words(word,limit)
-      if words.length==1
+      if words.length == 1
         words[0]
-      elsif words.length>1
+      elsif words.length > 1
         [words[0..-2].join(", "), words[-1]].join(" or ")
       end
     end
@@ -47,10 +47,10 @@ module Bundler
         for j in 1..this.length
           # critical comparison
           dm[i][j] = [
-               dm[i-1][j-1] +
-                 (this[j-1] == that[i-1] ? 0 : sub),
-                   dm[i][j-1] + ins,
-               dm[i-1][j] + del
+               dm[i - 1][j - 1] +
+                 (this[j - 1] == that[i - 1] ? 0 : sub),
+                   dm[i][j - 1] + ins,
+               dm[i - 1][j] + del
          ].min
         end
       end
