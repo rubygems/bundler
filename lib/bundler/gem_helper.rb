@@ -100,7 +100,7 @@ module Bundler
     end
 
     def built_gem_path
-      Dir[File.join(base, "#{name}-*.gem")].sort_by{|f| File.mtime(f) }.last
+      Dir[File.join(base, "#{name}-*.gem")].sort_by {|f| File.mtime(f) }.last
     end
 
     def git_push(remote = "")

@@ -98,7 +98,7 @@ namespace :spec do
       deps.delete("rdiscount")
     end
 
-    deps.sort_by{|name, _| name }.each do |name, version|
+    deps.sort_by {|name, _| name }.each do |name, version|
       sh %{#{Gem.ruby} -S gem list -i "^#{name}$" -v "#{version}" || } +
          %{#{Gem.ruby} -S gem install #{name} -v "#{version}" --no-ri --no-rdoc}
     end
@@ -135,7 +135,7 @@ namespace :spec do
 end
 
 begin
-  rspec = BUNDLER_SPEC.development_dependencies.find{|d| d.name == "rspec" }
+  rspec = BUNDLER_SPEC.development_dependencies.find {|d| d.name == "rspec" }
   gem "rspec", rspec.requirement.to_s
   require "rspec/core/rake_task"
 
@@ -286,7 +286,7 @@ begin
   namespace :man do
     directory "lib/bundler/man"
 
-    sources = Dir["man/*.ronn"].map{|f| File.basename(f, ".ronn") }
+    sources = Dir["man/*.ronn"].map {|f| File.basename(f, ".ronn") }
     sources.map do |basename|
       ronn = "man/#{basename}.ronn"
       roff = "lib/bundler/man/#{basename}"

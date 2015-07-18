@@ -308,7 +308,7 @@ module Bundler
 
         # if any directory is not writable, we need sudo
         files = [path, bin_dir] | Dir[path.join("build_info/*").to_s] | Dir[path.join("*").to_s]
-        sudo_needed = files.any?{|f| !File.writable?(f) }
+        sudo_needed = files.any? {|f| !File.writable?(f) }
       end
 
       @requires_sudo_ran = true

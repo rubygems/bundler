@@ -33,7 +33,7 @@ describe Bundler::GemHelper do
         if Gem::Version.new(Gem::VERSION) < Gem::Version.new("2.0")
           content = File.read(app_gemspec_path)
           content.sub!(/raise "RubyGems 2\.0 or newer.*/, "")
-          File.open(app_gemspec_path, "w"){|f| f.write(content) }
+          File.open(app_gemspec_path, "w") {|f| f.write(content) }
         end
       end
 
@@ -138,7 +138,7 @@ describe Bundler::GemHelper do
       context "when build failed" do
         it "raises an error with appropriate message" do
           # break the gemspec by adding back the TODOs
-          File.open(app_gemspec_path, "w"){|file| file << app_gemspec_content }
+          File.open(app_gemspec_path, "w") {|file| file << app_gemspec_content }
           expect { subject.build_gem }.to raise_error(/TODO/)
         end
       end

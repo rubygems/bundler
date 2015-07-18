@@ -150,8 +150,8 @@ module Bundler
               s.authors  = ["no one"]
               if expanded_path.join("bin").exist?
                 executables = expanded_path.join("bin").children
-                executables.reject!{|p| File.directory?(p) }
-                s.executables = executables.map{|c| c.basename.to_s }
+                executables.reject! {|p| File.directory?(p) }
+                s.executables = executables.map {|c| c.basename.to_s }
               end
             end
           end

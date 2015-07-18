@@ -9,7 +9,7 @@ describe Bundler::Settings do
       subject(:settings) { described_class.new(nil) }
 
       it "raises a GemfileNotFound error with explanation" do
-        expect{ subject.set_local("foo", "bar") }.
+        expect { subject.set_local("foo", "bar") }.
           to raise_error(Bundler::GemfileNotFound, "Could not locate Gemfile")
       end
     end
@@ -45,7 +45,7 @@ describe Bundler::Settings do
       it "raises an PermissionError with explanation" do
         expect(FileUtils).to receive(:mkdir_p).with(settings.send(:local_config_file).dirname).
           and_raise(Errno::EACCES)
-        expect{ settings[:frozen] = "1" }.
+        expect { settings[:frozen] = "1" }.
           to raise_error(Bundler::PermissionError, /config/)
       end
     end
@@ -56,7 +56,7 @@ describe Bundler::Settings do
       it "raises an PermissionError with explanation" do
         expect(FileUtils).to receive(:mkdir_p).with(settings.send(:global_config_file).dirname).
           and_raise(Errno::EACCES)
-        expect{ settings.set_global(:frozen, "1") }.
+        expect { settings.set_global(:frozen, "1") }.
           to raise_error(Bundler::PermissionError, /\.bundle\/config/)
       end
     end

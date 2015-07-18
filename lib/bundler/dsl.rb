@@ -216,7 +216,7 @@ module Bundler
         "git://github.com/#{repo_name}.git"
       end
 
-      git_source(:gist){|repo_name| "https://gist.github.com/#{repo_name}.git" }
+      git_source(:gist) {|repo_name| "https://gist.github.com/#{repo_name}.git" }
 
       git_source(:bitbucket) do |repo_name|
         user_name, repo_name = repo_name.split "/"
@@ -321,7 +321,7 @@ module Bundler
     def validate_keys(command, opts, valid_keys)
       invalid_keys = opts.keys - valid_keys
       if invalid_keys.any?
-        message = "You passed #{invalid_keys.map{|k| ":"+k }.join(", ")} "
+        message = "You passed #{invalid_keys.map {|k| ":"+k }.join(", ")} "
         message << if invalid_keys.size > 1
                      "as options for #{command}, but they are invalid."
                    else
