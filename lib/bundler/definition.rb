@@ -488,14 +488,14 @@ module Bundler
       if !locked_gem_sources.empty? && !actual_remotes.empty?
         locked_gem_sources.each do |locked_gem|
           # Merge the remotes from the Gemfile into the Gemfile.lock
-          changes = changes | locked_gem.replace_remotes(actual_remotes)
+          changes |= locked_gem.replace_remotes(actual_remotes)
         end
       end
 
       # Replace the sources from the Gemfile with the sources from the Gemfile.lock,
       # if they exist in the Gemfile.lock and are `==`. If you can't find an equivalent
       # source in the Gemfile.lock, use the one from the Gemfile.
-      changes = changes | sources.replace_sources!(@locked_sources)
+      changes |= sources.replace_sources!(@locked_sources)
 
       sources.all_sources.each do |source|
         # If the source is unlockable and the current command allows an unlock of
