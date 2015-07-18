@@ -265,7 +265,7 @@ begin
       end
 
       unless specs && sudos && realworld
-        fail "Spec run failed, please review the log for more information"
+        raise "Spec run failed, please review the log for more information"
       end
     end
   end
