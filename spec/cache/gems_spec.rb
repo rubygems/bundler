@@ -244,7 +244,7 @@ describe "bundle cache" do
 
     it "handles directories and non .gem files in the cache" do
       bundled_app("vendor/cache/foo").mkdir
-      File.open(bundled_app("vendor/cache/bar"), "w"){|f| f.write("not a gem") }
+      File.open(bundled_app("vendor/cache/bar"), "w") {|f| f.write("not a gem") }
       bundle :cache
     end
 

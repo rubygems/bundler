@@ -11,7 +11,7 @@ describe "bundle gem" do
     if Gem::Version.new(Gem::VERSION) < Gem::Version.new("2.0")
       path = "#{gem_name}/#{gem_name}.gemspec"
       content = File.read(path).sub(/raise "RubyGems 2\.0 or newer.*/, "")
-      File.open(path, "w"){|f| f.write(content) }
+      File.open(path, "w") {|f| f.write(content) }
     end
   end
 

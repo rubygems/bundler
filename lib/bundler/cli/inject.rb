@@ -23,7 +23,7 @@ module Bundler
 
       if added.any?
         Bundler.ui.confirm "Added to Gemfile:"
-        Bundler.ui.confirm added.map{ |g| "  #{g}" }.join("\n")
+        Bundler.ui.confirm added.map { |g| "  #{g}" }.join("\n")
       else
         Bundler.ui.confirm "All injected gems were already present in the Gemfile"
       end

@@ -111,7 +111,7 @@ module Bundler
     end
 
     def gem_cache
-      gem_path.map{|p| File.expand_path("cache", p) }
+      gem_path.map {|p| File.expand_path("cache", p) }
     end
 
     def spec_cache_dirs
@@ -155,7 +155,7 @@ module Bundler
         loaded_gem_paths.flatten
       else
         $LOAD_PATH.select do |p|
-          Bundler.rubygems.gem_path.any?{|gp| p =~ /^#{Regexp.escape(gp)}/ }
+          Bundler.rubygems.gem_path.any? {|gp| p =~ /^#{Regexp.escape(gp)}/ }
         end
       end
     end
