@@ -9,27 +9,27 @@ describe "bundle open" do
   end
 
   it "opens the gem with BUNDLER_EDITOR as highest priority" do
-    bundle "open rails", :env => {"EDITOR" => "echo editor", "VISUAL" => "echo visual", "BUNDLER_EDITOR" => "echo bundler_editor"}
+    bundle "open rails", :env => { "EDITOR" => "echo editor", "VISUAL" => "echo visual", "BUNDLER_EDITOR" => "echo bundler_editor" }
     expect(out).to eq("bundler_editor #{default_bundle_path("gems", "rails-2.3.2")}")
   end
 
   it "opens the gem with VISUAL as 2nd highest priority" do
-    bundle "open rails", :env => {"EDITOR" => "echo editor", "VISUAL" => "echo visual", "BUNDLER_EDITOR" => ""}
+    bundle "open rails", :env => { "EDITOR" => "echo editor", "VISUAL" => "echo visual", "BUNDLER_EDITOR" => "" }
     expect(out).to eq("visual #{default_bundle_path("gems", "rails-2.3.2")}")
   end
 
   it "opens the gem with EDITOR as 3rd highest priority" do
-    bundle "open rails", :env => {"EDITOR" => "echo editor", "VISUAL" => "", "BUNDLER_EDITOR" => ""}
+    bundle "open rails", :env => { "EDITOR" => "echo editor", "VISUAL" => "", "BUNDLER_EDITOR" => "" }
     expect(out).to eq("editor #{default_bundle_path("gems", "rails-2.3.2")}")
   end
 
   it "complains if no EDITOR is set" do
-    bundle "open rails", :env => {"EDITOR" => "", "VISUAL" => "", "BUNDLER_EDITOR" => ""}
+    bundle "open rails", :env => { "EDITOR" => "", "VISUAL" => "", "BUNDLER_EDITOR" => "" }
     expect(out).to eq("To open a bundled gem, set $EDITOR or $BUNDLER_EDITOR")
   end
 
   it "complains if gem not in bundle" do
-    bundle "open missing", :env => {"EDITOR" => "echo editor", "VISUAL" => "", "BUNDLER_EDITOR" => ""}
+    bundle "open missing", :env => { "EDITOR" => "echo editor", "VISUAL" => "", "BUNDLER_EDITOR" => "" }
     expect(out).to match(/could not find gem 'missing'/i)
   end
 
@@ -42,24 +42,24 @@ describe "bundle open" do
       gem 'foo', :git => "#{lib_path("foo-1.0")}"
     G
 
-    bundle "open foo", :env => {"EDITOR" => "echo editor", "VISUAL" => "", "BUNDLER_EDITOR" => ""}
+    bundle "open foo", :env => { "EDITOR" => "echo editor", "VISUAL" => "", "BUNDLER_EDITOR" => "" }
     expect(out).to match("editor #{default_bundle_path.join("bundler/gems/foo-1.0-#{ref}")}")
   end
 
   it "suggests alternatives for similar-sounding gems" do
-    bundle "open Rails", :env => {"EDITOR" => "echo editor", "VISUAL" => "", "BUNDLER_EDITOR" => ""}
+    bundle "open Rails", :env => { "EDITOR" => "echo editor", "VISUAL" => "", "BUNDLER_EDITOR" => "" }
     expect(out).to match(/did you mean rails\?/i)
   end
 
   it "opens the gem with short words" do
-    bundle "open rec" , :env => {"EDITOR" => "echo editor", "VISUAL" => "echo visual", "BUNDLER_EDITOR" => "echo bundler_editor"}
+    bundle "open rec", :env => { "EDITOR" => "echo editor", "VISUAL" => "echo visual", "BUNDLER_EDITOR" => "echo bundler_editor" }
 
     expect(out).to eq("bundler_editor #{default_bundle_path("gems", "activerecord-2.3.2")}")
   end
 
   it "select the gem from many match gems" do
-    env = {"EDITOR" => "echo editor", "VISUAL" => "echo visual", "BUNDLER_EDITOR" => "echo bundler_editor"}
-    bundle "open active" , :env => env do |input|
+    env = { "EDITOR" => "echo editor", "VISUAL" => "echo visual", "BUNDLER_EDITOR" => "echo bundler_editor" }
+    bundle "open active", :env => env do |input|
       input.puts "2"
     end
 
@@ -74,7 +74,7 @@ describe "bundle open" do
     G
 
     bundle "config auto_install 1"
-    bundle "open rails", :env => {"EDITOR" => "echo editor", "VISUAL" => "", "BUNDLER_EDITOR" => ""}
+    bundle "open rails", :env => { "EDITOR" => "echo editor", "VISUAL" => "", "BUNDLER_EDITOR" => "" }
     expect(out).to include("Installing foo 1.0")
   end
 end

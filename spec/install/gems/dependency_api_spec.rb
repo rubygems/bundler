@@ -618,7 +618,7 @@ describe "gemcutter's dependency API" do
         gem "rack"
       G
 
-      bundle :install, :env => {"RUBYOPT" => "-I#{bundled_app("broken_ssl")}"}
+      bundle :install, :env => { "RUBYOPT" => "-I#{bundled_app("broken_ssl")}" }
       expect(out).to include("OpenSSL")
     end
   end
@@ -646,7 +646,7 @@ describe "gemcutter's dependency API" do
   context ".gemrc with sources is present" do
     before do
       File.open(home(".gemrc"), "w") do |file|
-        file.puts({:sources => ["https://rubygems.org"]}.to_yaml)
+        file.puts({ :sources => ["https://rubygems.org"] }.to_yaml)
       end
     end
 

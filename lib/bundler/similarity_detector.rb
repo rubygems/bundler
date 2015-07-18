@@ -8,14 +8,14 @@ module Bundler
     end
 
     # return an array of words similar to 'word' from the corpus
-    def similar_words(word, limit=3)
+    def similar_words(word, limit = 3)
       words_by_similarity = @corpus.map {|w| SimilarityScore.new(w, levenshtein_distance(word, w))}
       words_by_similarity.select {|s| s.distance<=limit}.sort_by(&:distance).map(&:string)
     end
 
     # return the result of 'similar_words', concatenated into a list
     # (eg "a, b, or c")
-    def similar_word_list(word, limit=3)
+    def similar_word_list(word, limit = 3)
       words = similar_words(word,limit)
       if words.length==1
         words[0]
@@ -27,7 +27,7 @@ module Bundler
   protected
 
     # http://www.informit.com/articles/article.aspx?p=683059&seqNum=36
-    def levenshtein_distance(this, that, ins=2, del=2, sub=1)
+    def levenshtein_distance(this, that, ins = 2, del = 2, sub = 1)
       # ins, del, sub are weighted costs
       return nil if this.nil?
       return nil if that.nil?

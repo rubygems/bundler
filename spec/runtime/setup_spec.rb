@@ -292,7 +292,7 @@ describe "Bundler.setup" do
       context "when the ruby stdlib is a substring of Gem.path" do
         it "does not reject the stdlib from $LOAD_PATH" do
           substring = "/" + $LOAD_PATH.find {|p| p =~ /vendor_ruby/ }.split("/")[2]
-          run "puts 'worked!'", :env => {"GEM_PATH" => substring}
+          run "puts 'worked!'", :env => { "GEM_PATH" => substring }
           expect(out).to eq("worked!")
         end
       end
@@ -707,7 +707,7 @@ describe "Bundler.setup" do
       G
 
       Dir.chdir(bundled_app.parent) do
-        run <<-R, :env => {"BUNDLE_GEMFILE" => bundled_app("Gemfile")}
+        run <<-R, :env => { "BUNDLE_GEMFILE" => bundled_app("Gemfile") }
           require 'foo'
         R
       end
@@ -731,7 +731,7 @@ describe "Bundler.setup" do
       bundle :install
 
       Dir.chdir(bundled_app.parent) do
-        run <<-R, :env => {"BUNDLE_GEMFILE" => bundled_app("Gemfile")}
+        run <<-R, :env => { "BUNDLE_GEMFILE" => bundled_app("Gemfile") }
           require 'foo'
         R
       end

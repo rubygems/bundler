@@ -431,12 +431,6 @@ Style/SingleSpaceBeforeFirstArg:
 Style/SpaceAfterComma:
   Enabled: false
 
-# Offense count: 7
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/SpaceAroundEqualsInParameterDefault:
-  Enabled: false
-
 # Offense count: 55
 # Cop supports --auto-correct.
 # Configuration parameters: MultiSpaceAllowedForOperators.
@@ -457,17 +451,6 @@ Style/SpaceBeforeSemicolon:
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles, EnforcedStyleForEmptyBraces, SpaceBeforeBlockParameters.
 Style/SpaceInsideBlockBraces:
-  Enabled: false
-
-# Offense count: 15
-# Cop supports --auto-correct.
-Style/SpaceInsideBrackets:
-  Enabled: false
-
-# Offense count: 72
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, EnforcedStyleForEmptyBraces, SupportedStyles.
-Style/SpaceInsideHashLiteralBraces:
   Enabled: false
 
 # Offense count: 4

@@ -46,13 +46,13 @@ module Bundler
     #   3. engine_version
     def diff(other)
       if engine != other.engine && @input_engine
-        [ :engine, engine, other.engine ]
+        [:engine, engine, other.engine]
       elsif version != other.version
-        [ :version, version, other.version ]
+        [:version, version, other.version]
       elsif engine_version != other.engine_version && @input_engine
-        [ :engine_version, engine_version, other.engine_version ]
+        [:engine_version, engine_version, other.engine_version]
       elsif patchlevel != other.patchlevel && @patchlevel
-        [ :patchlevel, patchlevel, other.patchlevel ]
+        [:patchlevel, patchlevel, other.patchlevel]
       else
         nil
       end
