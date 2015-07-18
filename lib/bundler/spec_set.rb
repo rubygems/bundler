@@ -129,7 +129,7 @@ module Bundler
 
     def lookup
       @lookup ||= begin
-        lookup = Hash.new {|h,k| h[k] = [] }
+        lookup = Hash.new { |h, k| h[k] = [] }
         specs = @specs.sort_by do |s|
           s.platform.to_s == "ruby" ? "\0" : s.platform.to_s
         end

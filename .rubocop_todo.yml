@@ -422,9 +422,10 @@ Style/SingleLineMethods:
 Style/SingleSpaceBeforeFirstArg:
   Enabled: false
 
-# Offense count: 18
+# Offense count: 7
 # Cop supports --auto-correct.
-Style/SpaceAfterComma:
+# Configuration parameters: EnforcedStyle, SupportedStyles.
+Style/SpaceAroundEqualsInParameterDefault:
   Enabled: false
 
 # Offense count: 4
