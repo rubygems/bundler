@@ -9,8 +9,8 @@ module Bundler
   end
 
   unless Deprecate.respond_to?(:skip_during)
-    def Deprecate.skip_during;
-      yield;
+    def Deprecate.skip_during
+      yield
     end
   end
 

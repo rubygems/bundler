@@ -123,7 +123,10 @@ module Bundler
       end
 
       Bundler.ui.info "Initializing git repo in #{target}"
-      Dir.chdir(target) { `git init`; `git add .` }
+      Dir.chdir(target) do
+        `git init`
+        `git add .`
+      end
 
       if options[:edit]
         # Open gemspec in editor
