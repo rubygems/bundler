@@ -3,7 +3,7 @@ require "spec_helper"
 describe "bundle update" do
   describe "git sources" do
     it "floats on a branch when :branch is used" do
-      build_git  "foo", "1.0"
+      build_git "foo", "1.0"
       update_git "foo", :branch => "omg"
 
       install_gemfile <<-G
@@ -37,7 +37,7 @@ describe "bundle update" do
     end
 
     it "floats on a branch when :branch is used and the source is specified in the update" do
-      build_git  "foo", "1.0", :path => lib_path("foo")
+      build_git "foo", "1.0", :path => lib_path("foo")
       update_git "foo", :branch => "omg", :path => lib_path("foo")
 
       install_gemfile <<-G

@@ -3,8 +3,8 @@ module Bundler
     class Path < Source
       autoload :Installer, "bundler/source/path/installer"
 
-      attr_reader   :path, :options
-      attr_writer   :name
+      attr_reader :path, :options
+      attr_writer :name
       attr_accessor :version
 
       DEFAULT_GLOB = "{,*,*/*}.gemspec"

@@ -16,7 +16,7 @@ module Bundler
         not_installed = definition.missing_specs
       rescue GemNotFound, VersionConflict
         Bundler.ui.error "Bundler can't satisfy your Gemfile's dependencies."
-        Bundler.ui.warn  "Install missing gems with `bundle install`."
+        Bundler.ui.warn "Install missing gems with `bundle install`."
         exit 1
       end
 

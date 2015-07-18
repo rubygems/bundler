@@ -11,7 +11,7 @@ module Bundler
     end
 
     attr_reader :specs, :all_specs, :sources
-    protected   :specs, :all_specs
+    protected :specs, :all_specs
 
     def initialize
       @sources = []

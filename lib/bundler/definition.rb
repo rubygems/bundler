@@ -410,7 +410,7 @@ module Bundler
     end
 
     attr_reader :sources
-    private     :sources
+    private :sources
 
   private
 
