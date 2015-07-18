@@ -164,7 +164,7 @@ describe "bundle exec" do
     bundle "exec 'echo $RUBYOPT'"
     expect(out).to have_rubyopts(rubyopt)
 
-    bundle "exec 'echo $RUBYOPT'", :env => {"RUBYOPT" => rubyopt}
+    bundle "exec 'echo $RUBYOPT'", :env => { "RUBYOPT" => rubyopt }
     expect(out).to have_rubyopts(rubyopt)
   end
 
@@ -180,7 +180,7 @@ describe "bundle exec" do
     bundle "exec 'echo $RUBYLIB'"
     expect(out).to eq(rubylib)
 
-    bundle "exec 'echo $RUBYLIB'", :env => {"RUBYLIB" => rubylib}
+    bundle "exec 'echo $RUBYLIB'", :env => { "RUBYLIB" => rubylib }
     expect(out).to eq(rubylib)
   end
 

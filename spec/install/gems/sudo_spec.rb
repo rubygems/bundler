@@ -136,9 +136,9 @@ describe "when using sudo", :sudo => true do
         gem "rack", '1.0'
       G
 
-      bundle :install, :env => {"GEM_HOME" => gem_home.to_s, "GEM_PATH" => nil}
+      bundle :install, :env => { "GEM_HOME" => gem_home.to_s, "GEM_PATH" => nil }
       expect(gem_home.join("bin/rackup")).to exist
-      should_be_installed "rack 1.0", :env => {"GEM_HOME" => gem_home.to_s, "GEM_PATH" => nil}
+      should_be_installed "rack 1.0", :env => { "GEM_HOME" => gem_home.to_s, "GEM_PATH" => nil }
     end
   end
 

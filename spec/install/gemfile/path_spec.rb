@@ -468,7 +468,7 @@ describe "bundle install with explicit source paths" do
       File.open(lib_path("private_lib/Gemfile"), "w") {|f| f.puts gemfile }
 
       Dir.chdir(lib_path("private_lib")) do
-        bundle :install, :env => {"DEBUG" => 1}, :artifice => "endpoint"
+        bundle :install, :env => { "DEBUG" => 1 }, :artifice => "endpoint"
         expect(out).to match(/^HTTP GET http:\/\/localgemserver\.test\/api\/v1\/dependencies\?gems=rack$/)
         expect(out).not_to match(/^HTTP GET.*private_lib/)
         should_be_installed "private_lib 2.2"
