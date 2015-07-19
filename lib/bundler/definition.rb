@@ -364,9 +364,9 @@ module Bundler
         deleted.concat deleted_deps.map {|d| "* #{pretty_dep(d)}" }
       end
 
-      both_sources = Hash.new { |h, k| h[k] = [] }
-      @dependencies.each { |d| both_sources[d.name][0] = d }
-      @locked_deps.each  { |d| both_sources[d.name][1] = d.source }
+      both_sources = Hash.new {|h, k| h[k] = [] }
+      @dependencies.each {|d| both_sources[d.name][0] = d }
+      @locked_deps.each  {|d| both_sources[d.name][1] = d.source }
 
       both_sources.each do |name, (dep, lock_source)|
         if (dep.nil? && !lock_source.nil?) || (!dep.nil? && !lock_source.nil? && !lock_source.can_lock?(dep))
@@ -455,7 +455,7 @@ module Bundler
       locals = []
 
       Bundler.settings.local_overrides.map do |k, v|
-        spec   = @dependencies.find { |s| s.name == k }
+        spec   = @dependencies.find {|s| s.name == k }
         source = spec && spec.source
         if source && source.respond_to?(:local_override!)
           source.unlock! if @unlock[:gems].include?(spec.name)

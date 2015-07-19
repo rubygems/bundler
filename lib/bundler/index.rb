@@ -16,16 +16,16 @@ module Bundler
     def initialize
       @sources = []
       @cache = {}
-      @specs = Hash.new { |h, k| h[k] = Hash.new }
-      @all_specs = Hash.new { |h, k| h[k] = [] }
+      @specs = Hash.new {|h, k| h[k] = Hash.new }
+      @all_specs = Hash.new {|h, k| h[k] = [] }
     end
 
     def initialize_copy(o)
       super
       @sources = @sources.dup
       @cache = {}
-      @specs = Hash.new { |h, k| h[k] = Hash.new }
-      @all_specs = Hash.new { |h, k| h[k] = [] }
+      @specs = Hash.new {|h, k| h[k] = Hash.new }
+      @all_specs = Hash.new {|h, k| h[k] = [] }
 
       o.specs.each do |name, hash|
         @specs[name] = hash.dup
