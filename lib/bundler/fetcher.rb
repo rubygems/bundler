@@ -75,7 +75,7 @@ module Bundler
 
     # fetch a gem specification
     def fetch_spec(spec)
-      spec = spec - [nil, "ruby", ""]
+      spec -= [nil, "ruby", ""]
       spec_file_name = "#{spec.join "-"}.gemspec"
 
       uri = URI.parse("#{remote_uri}#{Gem::MARSHAL_SPEC_DIR}#{spec_file_name}.rz")

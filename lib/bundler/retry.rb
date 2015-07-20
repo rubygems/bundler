@@ -39,10 +39,10 @@ module Bundler
       @current_run += 1
       @result = block.call
     rescue => e
-      fail(e)
+      fail_attempt(e)
     end
 
-    def fail(e)
+    def fail_attempt(e)
       @failed = true
       raise e if last_attempt? || @exceptions.any? {|k| e.is_a?(k) }
       return true unless name

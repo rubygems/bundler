@@ -16,7 +16,7 @@ module Bundler
     # return the result of 'similar_words', concatenated into a list
     # (eg "a, b, or c")
     def similar_word_list(word, limit = 3)
-      words = similar_words(word,limit)
+      words = similar_words(word, limit)
       if words.length == 1
         words[0]
       elsif words.length > 1

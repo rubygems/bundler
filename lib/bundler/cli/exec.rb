@@ -40,7 +40,7 @@ module Bundler
     rescue Errno::ENOENT
       Bundler.ui = ui
       Bundler.ui.error "bundler: command not found: #{cmd}"
-      Bundler.ui.warn  "Install missing gem executables with `bundle install`"
+      Bundler.ui.warn "Install missing gem executables with `bundle install`"
       exit 127
     rescue ArgumentError
       Bundler.ui = ui

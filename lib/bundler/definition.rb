@@ -364,7 +364,7 @@ module Bundler
         deleted.concat deleted_deps.map {|d| "* #{pretty_dep(d)}" }
       end
 
-      both_sources = Hash.new {|h,k| h[k] = [] }
+      both_sources = Hash.new {|h, k| h[k] = [] }
       @dependencies.each {|d| both_sources[d.name][0] = d }
       @locked_deps.each  {|d| both_sources[d.name][1] = d.source }
 
@@ -410,7 +410,7 @@ module Bundler
     end
 
     attr_reader :sources
-    private     :sources
+    private :sources
 
   private
 
@@ -454,7 +454,7 @@ module Bundler
     def converge_locals
       locals = []
 
-      Bundler.settings.local_overrides.map do |k,v|
+      Bundler.settings.local_overrides.map do |k, v|
         spec   = @dependencies.find {|s| s.name == k }
         source = spec && spec.source
         if source && source.respond_to?(:local_override!)
@@ -488,14 +488,14 @@ module Bundler
       if !locked_gem_sources.empty? && !actual_remotes.empty?
         locked_gem_sources.each do |locked_gem|
           # Merge the remotes from the Gemfile into the Gemfile.lock
-          changes = changes | locked_gem.replace_remotes(actual_remotes)
+          changes |= locked_gem.replace_remotes(actual_remotes)
         end
       end
 
       # Replace the sources from the Gemfile with the sources from the Gemfile.lock,
       # if they exist in the Gemfile.lock and are `==`. If you can't find an equivalent
       # source in the Gemfile.lock, use the one from the Gemfile.
-      changes = changes | sources.replace_sources!(@locked_sources)
+      changes |= sources.replace_sources!(@locked_sources)
 
       sources.all_sources.each do |source|
         # If the source is unlockable and the current command allows an unlock of
@@ -531,7 +531,10 @@ module Bundler
       # and Gemfile.lock. If the Gemfile modified a dependency, but
       # the gem in the Gemfile.lock still satisfies it, this is fine
       # too.
-      locked_deps_hash = @locked_deps.inject({}) {|hsh, dep| hsh[dep] = dep; hsh }
+      locked_deps_hash = @locked_deps.inject({}) do |hsh, dep|
+        hsh[dep] = dep
+        hsh
+      end
       @dependencies.each do |dep|
         locked_dep = locked_deps_hash[dep]
 

@@ -11,21 +11,21 @@ module Bundler
     end
 
     attr_reader :specs, :all_specs, :sources
-    protected   :specs, :all_specs
+    protected :specs, :all_specs
 
     def initialize
       @sources = []
       @cache = {}
-      @specs = Hash.new {|h,k| h[k] = Hash.new }
-      @all_specs = Hash.new {|h,k| h[k] = [] }
+      @specs = Hash.new {|h, k| h[k] = Hash.new }
+      @all_specs = Hash.new {|h, k| h[k] = [] }
     end
 
     def initialize_copy(o)
       super
       @sources = @sources.dup
       @cache = {}
-      @specs = Hash.new {|h,k| h[k] = Hash.new }
-      @all_specs = Hash.new {|h,k| h[k] = [] }
+      @specs = Hash.new {|h, k| h[k] = Hash.new }
+      @all_specs = Hash.new {|h, k| h[k] = [] }
 
       o.specs.each do |name, hash|
         @specs[name] = hash.dup

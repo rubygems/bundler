@@ -125,7 +125,7 @@ module Bundler
         if options.any?
           Bundler.ui.warn "#{spec.name} has no executables, but you may want " +
             "one from a gem it depends on."
-          options.each {|name,bins| Bundler.ui.warn "  #{name} has: #{bins.join(", ")}" }
+          options.each {|name, bins| Bundler.ui.warn "  #{name} has: #{bins.join(", ")}" }
         else
           Bundler.ui.warn "There are no executables for the gem #{spec.name}."
         end

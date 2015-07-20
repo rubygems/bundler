@@ -389,42 +389,15 @@ Style/RegexpLiteral:
 Style/RescueModifier:
   Enabled: false
 
-# Offense count: 3
-# Cop supports --auto-correct.
-Style/SelfAssignment:
-  Enabled: false
-
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: AllowAsExpressionSeparator.
-Style/Semicolon:
-  Enabled: false
-
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/SignalException:
-  Enabled: false
-
 # Offense count: 2
 # Configuration parameters: Methods.
 Style/SingleLineBlockParams:
   Enabled: false
 
-# Offense count: 1
+# Offense count: 7
 # Cop supports --auto-correct.
-# Configuration parameters: AllowIfMethodIsEmpty.
-Style/SingleLineMethods:
-  Enabled: false
-
-# Offense count: 10
-# Cop supports --auto-correct.
-Style/SingleSpaceBeforeFirstArg:
-  Enabled: false
-
-# Offense count: 18
-# Cop supports --auto-correct.
-Style/SpaceAfterComma:
+# Configuration parameters: EnforcedStyle, SupportedStyles.
+Style/SpaceAroundEqualsInParameterDefault:
   Enabled: false
 
 # Offense count: 4
