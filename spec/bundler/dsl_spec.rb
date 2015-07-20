@@ -69,7 +69,7 @@ describe Bundler::Dsl do
       expect(Bundler).to receive(:read_file).with("gems.rb").
         and_return("unknown")
 
-      error_msg = "There was an error parsing `gems.rb`: Undefined local variable or method `unknown' for Gemfile. Bundler cannot continue."
+      error_msg = "There was an error parsing `gems.rb`: Undefined local variable or method `unknown' for gems.rb. Bundler cannot continue."
       expect { subject.eval_gemfile("gems.rb") }.
         to raise_error(Bundler::GemfileError, Regexp.new(error_msg))
     end

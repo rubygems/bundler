@@ -1142,7 +1142,7 @@ describe "the lockfile format" do
     bundle "install --path vendor"
     should_be_installed "omg 1.0"
 
-    # Create a Gemfile.lock that has duplicate GIT sections
+    # Create a gems.locked that has duplicate GIT sections
     lockfile <<-L
       GIT
         remote: #{lib_path("omg")}
@@ -1215,13 +1215,13 @@ describe "the lockfile format" do
       set_lockfile_mtime_to_known_value
     end
 
-    it "generates Gemfile.lock with \\n line endings" do
+    it "generates gems.locked with \\n line endings" do
       expect(File.read(bundled_app("gems.locked"))).not_to match("\r\n")
       should_be_installed "rack 1.0"
     end
 
     context "during updates" do
-      it "preserves Gemfile.lock \\n line endings" do
+      it "preserves gems.locked \\n line endings" do
         update_repo2
 
         expect { bundle "update" }.to change { File.mtime(bundled_app("gems.locked")) }
@@ -1230,7 +1230,7 @@ describe "the lockfile format" do
         should_be_installed "rack 1.2"
       end
 
-      it "preserves Gemfile.lock \\n\\r line endings" do
+      it "preserves gems.locked \\n\\r line endings" do
         update_repo2
         win_lock = File.read(bundled_app("gems.locked")).gsub(/\n/, "\r\n")
         File.open(bundled_app("gems.locked"), "wb") {|f| f.puts(win_lock) }
@@ -1244,7 +1244,7 @@ describe "the lockfile format" do
     end
 
     context "when nothing changes" do
-      it "preserves Gemfile.lock \\n line endings" do
+      it "preserves gems.locked \\n line endings" do
         expect {
           ruby <<-RUBY
                    require 'rubygems'
@@ -1254,7 +1254,7 @@ describe "the lockfile format" do
                }.not_to change { File.mtime(bundled_app("gems.locked")) }
       end
 
-      it "preserves Gemfile.lock \\n\\r line endings" do
+      it "preserves gems.locked \\n\\r line endings" do
         win_lock = File.read(bundled_app("gems.locked")).gsub(/\n/, "\r\n")
         File.open(bundled_app("gems.locked"), "wb") {|f| f.puts(win_lock) }
         set_lockfile_mtime_to_known_value
@@ -1270,7 +1270,7 @@ describe "the lockfile format" do
     end
   end
 
-  it "refuses to install if Gemfile.lock contains conflict markers" do
+  it "refuses to install if gems.locked contains conflict markers" do
     lockfile <<-L
       GEM
         remote: file://#{gem_repo1}/
@@ -1296,7 +1296,7 @@ describe "the lockfile format" do
       gem "rack"
     G
 
-    expect(err).to match(/your Gemfile.lock contains merge conflicts/i)
-    expect(err).to match(/git checkout HEAD -- Gemfile.lock/i)
+    expect(err).to match(/your gems.locked contains merge conflicts/i)
+    expect(err).to match(/git checkout HEAD -- gems.locked/i)
   end
 end

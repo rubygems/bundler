@@ -315,7 +315,7 @@ describe "bundle install with git sources" do
 
       bundle %|config local.rack #{lib_path("local-rack")}|
       bundle :install
-      expect(err).to match(/is using branch another but Gemfile specifies master/)
+      expect(err).to match(/is using branch another but gems.rb specifies master/)
     end
 
     it "explodes on invalid revision on install" do
@@ -332,7 +332,7 @@ describe "bundle install with git sources" do
 
       bundle %|config local.rack #{lib_path("local-rack")}|
       bundle :install
-      expect(err).to match(/The Gemfile lock is pointing to revision \w+/)
+      expect(err).to match(/The gems.rb lock is pointing to revision \w+/)
     end
   end
 

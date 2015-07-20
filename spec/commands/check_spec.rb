@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe "bundle check" do
-  it "returns success when the Gemfile is satisfied" do
+  it "returns success when the gems.rb is satisfied" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rails"
@@ -9,7 +9,7 @@ describe "bundle check" do
 
     bundle :check
     expect(exitstatus).to eq(0) if exitstatus
-    expect(out).to include("The Gemfile's dependencies are satisfied")
+    expect(out).to include("The gems.rb's dependencies are satisfied")
   end
 
   it "works with the --gemfile flag when not in the directory" do
@@ -20,10 +20,10 @@ describe "bundle check" do
 
     Dir.chdir tmp
     bundle "check --gemfile bundled_app/gems.rb"
-    expect(out).to include("The Gemfile's dependencies are satisfied")
+    expect(out).to include("The gems.rb's dependencies are satisfied")
   end
 
-  it "creates a Gemfile.lock by default if one does not exist" do
+  it "creates a gems.locked by default if one does not exist" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rails"
@@ -36,7 +36,7 @@ describe "bundle check" do
     expect(bundled_app("gems.locked")).to exist
   end
 
-  it "does not create a Gemfile.lock if --dry-run was passed" do
+  it "does not create a gems.locked if --dry-run was passed" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rails"
@@ -58,10 +58,10 @@ describe "bundle check" do
     G
 
     bundle :check
-    expect(err).to include("Bundler can't satisfy your Gemfile's dependencies.")
+    expect(err).to include("Bundler can't satisfy your gems.rb's dependencies.")
   end
 
-  it "prints a generic error if a Gemfile.lock does not exist and a toplevel dependency does not exist" do
+  it "prints a generic error if a gems.locked does not exist and a toplevel dependency does not exist" do
     gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rails"
@@ -69,7 +69,7 @@ describe "bundle check" do
 
     bundle :check
     expect(exitstatus).to be > 0 if exitstatus
-    expect(err).to include("Bundler can't satisfy your Gemfile's dependencies.")
+    expect(err).to include("Bundler can't satisfy your gems.rb's dependencies.")
   end
 
   it "prints a generic message if you changed your lockfile" do
@@ -89,7 +89,7 @@ describe "bundle check" do
     G
 
     bundle :check
-    expect(err).to include("Bundler can't satisfy your Gemfile's dependencies.")
+    expect(err).to include("Bundler can't satisfy your gems.rb's dependencies.")
   end
 
   it "remembers --without option from install" do
@@ -103,7 +103,7 @@ describe "bundle check" do
     bundle "install --without foo"
     bundle "check"
     expect(exitstatus).to eq(0) if exitstatus
-    expect(out).to include("The Gemfile's dependencies are satisfied")
+    expect(out).to include("The gems.rb's dependencies are satisfied")
   end
 
   it "ensures that gems are actually installed and not just cached" do
@@ -152,7 +152,7 @@ describe "bundle check" do
     G
 
     bundle :check
-    expect(out).to include("The Gemfile's dependencies are satisfied")
+    expect(out).to include("The gems.rb's dependencies are satisfied")
   end
 
   it "works with env conditionals" do
@@ -183,13 +183,13 @@ describe "bundle check" do
     G
 
     bundle :check
-    expect(out).to include("The Gemfile's dependencies are satisfied")
+    expect(out).to include("The gems.rb's dependencies are satisfied")
   end
 
-  it "outputs an error when the default Gemfile is not found" do
+  it "outputs an error when the default gems.rb is not found" do
     bundle :check
     expect(exitstatus).to eq(10) if exitstatus
-    expect(err).to include("Could not locate Gemfile")
+    expect(err).to include("Could not locate gems.rb")
   end
 
   it "does not output fatal error message" do
@@ -242,7 +242,7 @@ describe "bundle check" do
     it "returns success" do
       bundle "check --path vendor/bundle"
       expect(exitstatus).to eq(0) if exitstatus
-      expect(out).to include("The Gemfile's dependencies are satisfied")
+      expect(out).to include("The gems.rb's dependencies are satisfied")
     end
 
     it "should write to .bundle/config" do
@@ -274,14 +274,14 @@ describe "bundle check" do
       G
     end
 
-    it "returns success when the Gemfile is satisfied" do
+    it "returns success when the gems.rb is satisfied" do
       bundle :install
       bundle :check
       expect(exitstatus).to eq(0) if exitstatus
-      expect(out).to include("The Gemfile's dependencies are satisfied")
+      expect(out).to include("The gems.rb's dependencies are satisfied")
     end
 
-    it "shows what is missing with the current Gemfile if it is not satisfied" do
+    it "shows what is missing with the current gems.rb if it is not satisfied" do
       simulate_new_machine
       bundle :check
       expect(err).to match(/The following gems are missing/)

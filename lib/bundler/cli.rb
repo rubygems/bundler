@@ -42,7 +42,7 @@ module Bundler
 
     def help(cli = nil)
       case cli
-      when "gemfile" then command = "gemfile.5"
+      when "gemfile" then command = "gems.rb.5"
       when nil       then command = "bundle"
       else command = "bundle-#{cli}"
       end
@@ -56,7 +56,7 @@ module Bundler
         bundle-package
         bundle-update
         bundle-platform
-        gemfile.5)
+        gems.rb.5)
 
       if manpages.include?(command)
         root = File.expand_path("../man", __FILE__)

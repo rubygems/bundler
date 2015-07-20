@@ -124,8 +124,8 @@ describe "bundle install from an existing gemspec" do
       # doesn't change. Exit codes should be used correctly (they can be more
       # than just 0 and 1).
       output = bundle("install --deployment")
-      expect(output).not_to match(/You have added to the Gemfile/)
-      expect(output).not_to match(/You have deleted from the Gemfile/)
+      expect(output).not_to match(/You have added to the gems.rb/)
+      expect(output).not_to match(/You have deleted from the gems.rb/)
       expect(output).not_to match(/install in deployment mode after changing/)
     end
   end

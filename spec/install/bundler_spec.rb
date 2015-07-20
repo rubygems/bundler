@@ -52,7 +52,7 @@ describe "bundle install" do
 
       nice_error = <<-E.strip.gsub(/^ {8}/, "")
         Bundler could not find compatible versions for gem "bundler":
-          In Gemfile:
+          In gems.rb:
             bundler (= 0.9.2)
 
           Current Bundler version:
@@ -88,7 +88,7 @@ describe "bundle install" do
       expect(out).to eq("WIN")
     end
 
-    it "allows gem 'bundler' when Bundler is not in the Gemfile or its dependencies" do
+    it "allows gem 'bundler' when Bundler is not in the gems.rb or its dependencies" do
       install_gemfile <<-G
         source "file://#{gem_repo2}"
         gem "rack"
@@ -107,7 +107,7 @@ describe "bundle install" do
 
       nice_error = <<-E.strip.gsub(/^ {8}/, "")
         Bundler could not find compatible versions for gem "activesupport":
-          In Gemfile:
+          In gems.rb:
             activemerchant was resolved to 1.0, which depends on
               activesupport (>= 2.0.0)
 
@@ -117,7 +117,7 @@ describe "bundle install" do
       expect(err).to include(nice_error)
     end
 
-    it "causes a conflict if a child dependency conflicts with the Gemfile" do
+    it "causes a conflict if a child dependency conflicts with the gems.rb" do
       install_gemfile <<-G
         source "file://#{gem_repo2}"
         gem "rails_fail"
@@ -126,7 +126,7 @@ describe "bundle install" do
 
       nice_error = <<-E.strip.gsub(/^ {8}/, "")
         Bundler could not find compatible versions for gem "activesupport":
-          In Gemfile:
+          In gems.rb:
             activesupport (= 2.3.5)
 
             rails_fail was resolved to 1.0, which depends on
@@ -144,7 +144,7 @@ describe "bundle install" do
       simulate_bundler_version "10.0.0"
 
       bundle "check"
-      expect(out).to include("The Gemfile's dependencies are satisfied")
+      expect(out).to include("The gems.rb's dependencies are satisfied")
     end
   end
 end

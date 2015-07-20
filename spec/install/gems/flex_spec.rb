@@ -194,10 +194,10 @@ describe "bundle flex_install" do
     it "suggests bundle update when the Gemfile requires different versions than the lock" do
       nice_error = <<-E.strip.gsub(/^ {8}/, "")
         Bundler could not find compatible versions for gem "rack":
-          In snapshot (Gemfile.lock):
+          In snapshot (gems.locked):
             rack (= 0.9.1)
 
-          In Gemfile:
+          In gems.rb:
             rack-obama (= 2.0) was resolved to 2.0, which depends on
               rack (= 1.2)
 
@@ -205,7 +205,7 @@ describe "bundle flex_install" do
               rack (= 0.9.1)
 
         Running `bundle update` will rebuild your snapshot from scratch, using only
-        the gems in your Gemfile, which may resolve the conflict.
+        the gems in your gems.rb, which may resolve the conflict.
       E
 
       bundle :install, :retry => 0
@@ -310,7 +310,7 @@ describe "bundle flex_install" do
         gem "capybara", "0.3.9"
       G
 
-      expect(err).to include("Gemfile.lock")
+      expect(err).to include("gems.locked")
     end
   end
 end

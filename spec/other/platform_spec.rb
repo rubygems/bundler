@@ -18,7 +18,7 @@ Your platform is: #{RUBY_PLATFORM}
 Your app has gems that work on these platforms:
 * ruby
 
-Your Gemfile specifies a Ruby version requirement:
+Your gems.rb specifies a Ruby version requirement:
 * ruby #{RUBY_VERSION}
 
 Your current platform satisfies the Ruby version requirement.
@@ -41,7 +41,7 @@ Your platform is: #{RUBY_PLATFORM}
 Your app has gems that work on these platforms:
 * ruby
 
-Your Gemfile specifies a Ruby version requirement:
+Your gems.rb specifies a Ruby version requirement:
 * ruby #{RUBY_VERSION}p#{RUBY_PATCHLEVEL}
 
 Your current platform satisfies the Ruby version requirement.
@@ -62,7 +62,7 @@ Your platform is: #{RUBY_PLATFORM}
 Your app has gems that work on these platforms:
 * ruby
 
-Your Gemfile does not specify a Ruby version requirement.
+Your gems.rb does not specify a Ruby version requirement.
 G
     end
 
@@ -82,10 +82,10 @@ Your platform is: #{RUBY_PLATFORM}
 Your app has gems that work on these platforms:
 * ruby
 
-Your Gemfile specifies a Ruby version requirement:
+Your gems.rb specifies a Ruby version requirement:
 * ruby #{not_local_ruby_version}
 
-Your Ruby version is #{RUBY_VERSION}, but your Gemfile specified #{not_local_ruby_version}
+Your Ruby version is #{RUBY_VERSION}, but your gems.rb specified #{not_local_ruby_version}
 G
     end
   end
@@ -207,27 +207,27 @@ G
 
   def should_be_ruby_version_incorrect
     expect(exitstatus).to eq(18) if exitstatus
-    expect(err).to include("Your Ruby version is #{RUBY_VERSION}, but your Gemfile specified #{not_local_ruby_version}")
+    expect(err).to include("Your Ruby version is #{RUBY_VERSION}, but your gems.rb specified #{not_local_ruby_version}")
   end
 
   def should_be_engine_incorrect
     expect(exitstatus).to eq(18) if exitstatus
-    expect(err).to include("Your Ruby engine is #{local_ruby_engine}, but your Gemfile specified #{not_local_tag}")
+    expect(err).to include("Your Ruby engine is #{local_ruby_engine}, but your gems.rb specified #{not_local_tag}")
   end
 
   def should_be_engine_version_incorrect
     expect(exitstatus).to eq(18) if exitstatus
-    expect(err).to include("Your #{local_ruby_engine} version is #{local_engine_version}, but your Gemfile specified #{local_ruby_engine} #{not_local_engine_version}")
+    expect(err).to include("Your #{local_ruby_engine} version is #{local_engine_version}, but your gems.rb specified #{local_ruby_engine} #{not_local_engine_version}")
   end
 
   def should_be_patchlevel_incorrect
     expect(exitstatus).to eq(18) if exitstatus
-    expect(err).to include("Your Ruby patchlevel is #{RUBY_PATCHLEVEL}, but your Gemfile specified #{not_local_patchlevel}")
+    expect(err).to include("Your Ruby patchlevel is #{RUBY_PATCHLEVEL}, but your gems.rb specified #{not_local_patchlevel}")
   end
 
   def should_be_patchlevel_fixnum
     expect(exitstatus).to eq(18) if exitstatus
-    expect(err).to include("The Ruby patchlevel in your Gemfile must be a string")
+    expect(err).to include("The Ruby patchlevel in your gems.rb must be a string")
   end
 
   context "bundle install" do
@@ -333,7 +333,7 @@ G
 
       bundle :check
       expect(exitstatus).to eq(0) if exitstatus
-      expect(out).to eq("The Gemfile's dependencies are satisfied")
+      expect(out).to eq("The gems.rb's dependencies are satisfied")
     end
 
     it "checks fine with any engine" do
@@ -352,7 +352,7 @@ G
 
         bundle :check
         expect(exitstatus).to eq(0) if exitstatus
-        expect(out).to eq("The Gemfile's dependencies are satisfied")
+        expect(out).to eq("The gems.rb's dependencies are satisfied")
       end
     end
 
@@ -988,7 +988,7 @@ G
       ENV["BUNDLER_FORCE_TTY"] = "true"
     end
 
-    it "makes a Gemfile.lock if setup succeeds" do
+    it "makes a gems.locked if setup succeeds" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "yard"
@@ -1003,7 +1003,7 @@ G
       expect(bundled_app("gems.locked")).to exist
     end
 
-    it "makes a Gemfile.lock if setup succeeds for any engine" do
+    it "makes a gems.locked if setup succeeds for any engine" do
       simulate_ruby_engine "jruby" do
         install_gemfile <<-G
           source "file://#{gem_repo1}"
