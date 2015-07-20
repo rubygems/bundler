@@ -361,7 +361,7 @@ module Spec
     def with_env_vars(env_hash, &block)
       current_values = {}
       env_hash.each do |k,v|
-        current_values[k] = v
+        current_values[k] = ENV[k]
         ENV[k] = v
       end
       block.call if block_given?
