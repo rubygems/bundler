@@ -141,7 +141,7 @@ describe "bundle install with explicit source paths" do
     should_be_installed "premailer 1.0.0"
   end
 
-  it "errors on invalid specs", :rubygems => "1.7" do
+  it "warns on invalid specs", :rubygems => "1.7" do
     build_lib "foo"
 
     gemspec = lib_path("foo-1.0").join("foo.gemspec").to_s
@@ -158,7 +158,7 @@ describe "bundle install with explicit source paths" do
     G
 
     expect(out).to match(/missing value for attribute version/)
-    should_not_be_installed("foo 1.0")
+    expect(out).to_not include("ERROR REPORT")
   end
 
   it "supports gemspec syntax" do
