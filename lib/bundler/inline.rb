@@ -33,7 +33,7 @@ def gemfile(install = false, &gemfile)
   def Bundler.root
     Bundler::SharedHelpers.pwd.expand_path
   end
-  ENV['BUNDLE_GEMFILE'] ||= 'gems.rb'
+  ENV["BUNDLE_GEMFILE"] ||= "gems.rb"
 
   builder = Bundler::Dsl.new
   builder.instance_eval(&gemfile)

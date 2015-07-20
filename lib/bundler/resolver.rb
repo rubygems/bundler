@@ -273,11 +273,11 @@ module Bundler
     end
 
     def name_for_explicit_dependency_source
-      "gems.rb"
+      "#{Bundler.default_gemfile.basename}" rescue "gems.rb"
     end
 
     def name_for_locking_dependency_source
-      "gems.locked"
+      "#{Bundler.default_lockfile.basename}" rescue "gems.locked"
     end
 
     def requirement_satisfied_by?(requirement, activated, spec)
