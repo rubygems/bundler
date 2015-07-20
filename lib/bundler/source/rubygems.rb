@@ -126,8 +126,8 @@ module Bundler
             install_path = Bundler.tmp(spec.full_name)
             bin_path     = install_path.join("bin")
           else
-            install_path = File.expand_path(Bundler.settings.path)
-            bin_path     = Bundler.system_bindir
+            install_path = Bundler.settings.path
+            bin_path = Bundler.system_bindir
           end
 
           installed_spec = nil

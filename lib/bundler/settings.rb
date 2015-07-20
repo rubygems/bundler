@@ -12,6 +12,10 @@ module Bundler
       @global_config = load_config(global_config_file)
     end
 
+    def root
+      @root
+    end
+
     def [](name)
       key = key_for(name)
       value = (@local_config[key] || ENV[key] || @global_config[key] || DEFAULT_CONFIG[name])
@@ -130,20 +134,38 @@ module Bundler
     end
 
     # @local_config["BUNDLE_PATH"] should be prioritized over ENV["BUNDLE_PATH"]
+    # Always returns an absolute path to the bundle directory
+    # TODO: Document and refactor this method
     def path
       key  = key_for(:path)
       path = ENV[key] || @global_config[key]
+      set_path = ""
+      install_path = ""
 
       if path && !@local_config.key?(key)
         path = "#{path}/#{Bundler.ruby_scope}" if path != Bundler.rubygems.gem_dir
-        return path
+        set_path = path
       end
 
       if path = self[:path]
         path = "#{path}/#{Bundler.ruby_scope}" if path != Bundler.rubygems.gem_dir
-        File.expand_path(path)
+        set_path = path
       else
-        File.join(@root, Bundler.ruby_scope)
+        set_path = File.join(@root, Bundler.ruby_scope)
+      end
+
+      if set_path == File.join(Bundler.settings.root, Bundler.ruby_scope)
+        # ?
+        install_path = set_path
+      elsif set_path == Bundler.rubygems.gem_dir
+        # system gems path
+        install_path = set_path
+      elsif Pathname.new(set_path).absolute?
+        # all other absolute paths
+        install_path = set_path
+      else
+         # all relative paths (configured by the user)
+        install_path = File.join(Bundler::root, set_path)
       end
     end
 
