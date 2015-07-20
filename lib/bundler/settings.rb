@@ -165,10 +165,8 @@ module Bundler
         install_path = set_path
       else
          # all relative paths (configured by the user)
-        install_path = File.join(Bundler::root, Bundler.settings.path)
+        install_path = File.join(Bundler::root, set_path)
       end
-
-      install_path
     end
 
     def allow_sudo?
