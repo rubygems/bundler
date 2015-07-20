@@ -60,7 +60,7 @@ module Spec
       sudo       = "sudo" if options.delete(:sudo)
       options["no-color"] = true unless options.key?("no-color") || %w(exec conf).include?(cmd.to_s[0..3])
 
-      bundle_bin = File.expand_path("../../../bin/bundle", __FILE__)
+      bundle_bin = File.expand_path("../../../exe/bundle", __FILE__)
 
       requires = options.delete(:requires) || []
       requires << File.expand_path("../fakeweb/"+options.delete(:fakeweb)+".rb", __FILE__) if options.key?(:fakeweb)
