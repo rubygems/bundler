@@ -69,7 +69,7 @@ module Bundler
       end
 
       def install(spec, force = false)
-        Bundler.ui.info "Using #{version_message(spec)} from #{to_s}"
+        Bundler.ui.info "Using #{version_message(spec)} from #{self}"
         generate_bin(spec, :disable_extensions)
         nil # no post-install message
       end
@@ -80,7 +80,7 @@ module Bundler
         return if expand(@original_path).to_s.index(Bundler.root.to_s) == 0
 
         unless @original_path.exist?
-          raise GemNotFound, "Can't cache gem #{version_message(spec)} because #{to_s} is missing!"
+          raise GemNotFound, "Can't cache gem #{version_message(spec)} because #{self} is missing!"
         end
 
         FileUtils.rm_rf(app_cache_path)

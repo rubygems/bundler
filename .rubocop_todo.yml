@@ -25,11 +25,6 @@ Lint/NonLocalExitFromIterator:
 Lint/RescueException:
   Enabled: false
 
-# Offense count: 6
-# Cop supports --auto-correct.
-Lint/StringConversionInInterpolation:
-  Enabled: false
-
 # Offense count: 15
 # Cop supports --auto-correct.
 Lint/UnusedBlockArgument:

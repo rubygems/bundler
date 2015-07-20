@@ -13,6 +13,6 @@ class LessThanProc < Proc
   end
 
   def inspect
-    "\"=< #{present.to_s}\""
+    "\"=< #{present}\""
   end
 end
