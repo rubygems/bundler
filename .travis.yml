@@ -1,10 +1,12 @@
 language: ruby
+sudo: 9000
 script: rake spec:travis
 before_script: travis_retry rake spec:travis:deps
 
 branches:
   only:
     - master
+    - auto
     - /.+-dev$/
     - /.+-stable$/
 
