@@ -36,13 +36,13 @@ module Bundler
 
           if name == "bundler" && other_bundler_required
             o << "\n"
-            o << "This gems.rb requires a different version of Bundler.\n"
+            o << "This #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)} requires a different version of Bundler.\n"
             o << "Perhaps you need to update Bundler by running `gem install bundler`?\n"
           end
           if conflict.locked_requirement
             o << "\n"
             o << %(Running `bundle update` will rebuild your snapshot from scratch, using only\n)
-            o << %(the gems in your gems.rb, which may resolve the conflict.\n)
+            o << %(the gems in your #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)}, which may resolve the conflict.\n)
           elsif !conflict.existing
             o << "\n"
             if conflict.requirement_trees.first.size > 1
@@ -273,11 +273,11 @@ module Bundler
     end
 
     def name_for_explicit_dependency_source
-      "#{Bundler.default_gemfile.basename}" rescue "gems.rb"
+      Bundler.default_gemfile.basename.to_s rescue "gems.rb"
     end
 
     def name_for_locking_dependency_source
-      "#{Bundler.default_lockfile.basename}" rescue "gems.locked"
+      Bundler.default_lockfile.basename.to_s rescue "gems.locked"
     end
 
     def requirement_satisfied_by?(requirement, activated, spec)

@@ -144,7 +144,7 @@ describe "bundle install" do
       simulate_bundler_version "10.0.0"
 
       bundle "check"
-      expect(out).to include("The gems.rb's dependencies are satisfied")
+      expect(out).to include("gems.rb's dependencies are satisfied")
     end
   end
 end

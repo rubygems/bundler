@@ -15,7 +15,7 @@ module Bundler
         definition.validate_ruby!
         not_installed = definition.missing_specs
       rescue GemNotFound, VersionConflict
-        Bundler.ui.error "Bundler can't satisfy your gems.rb's dependencies."
+        Bundler.ui.error "Bundler can't satisfy your #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)}'s dependencies."
         Bundler.ui.warn "Install missing gems with `bundle install`."
         exit 1
       end
@@ -26,11 +26,11 @@ module Bundler
         Bundler.ui.warn "Install missing gems with `bundle install`"
         exit 1
       elsif !Bundler.default_lockfile.exist? && Bundler.settings[:frozen]
-        Bundler.ui.error "This bundle has been frozen, but there is no gems.locked present"
+        Bundler.ui.error "This bundle has been frozen, but there is no #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)} present"
         exit 1
       else
         Bundler.load.lock(:preserve_bundled_with => true) unless options[:"dry-run"]
-        Bundler.ui.info "The gems.rb's dependencies are satisfied"
+        Bundler.ui.info "#{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)}'s dependencies are satisfied"
       end
     end
   end

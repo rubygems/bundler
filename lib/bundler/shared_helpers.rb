@@ -98,7 +98,7 @@ module Bundler
     def find_gemfile
       given = ENV["BUNDLE_GEMFILE"]
       return given if given && !given.empty?
-      find_file("Gemfile", "gems.rb")
+      find_file("gems.rb", "Gemfile")
     end
 
     def find_file(*names)

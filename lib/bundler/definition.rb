@@ -325,11 +325,11 @@ module Bundler
 
     def ensure_equivalent_gemfile_and_lockfile(explicit_flag = false)
       msg = "You are trying to install in deployment mode after changing\n" \
-            "your gems.rb. Run `bundle install` elsewhere and add the\n" \
+            "your #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)}. Run `bundle install` elsewhere and add the\n" \
             "updated gems.locked to version control."
 
       unless explicit_flag
-        msg += "\n\nIf this is a development machine, remove the gems.rb " \
+        msg += "\n\nIf this is a development machine, remove the #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)} " \
                "freeze \nby running `bundle install --no-deployment`."
       end
 
@@ -374,9 +374,9 @@ module Bundler
         end
       end
 
-      msg << "\n\nYou have added to the Gemfile:\n" << added.join("\n") if added.any?
-      msg << "\n\nYou have deleted from the Gemfile:\n" << deleted.join("\n") if deleted.any?
-      msg << "\n\nYou have changed in the Gemfile:\n" << changed.join("\n") if changed.any?
+      msg << "\n\nYou have added to #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)}:\n" << added.join("\n") if added.any?
+      msg << "\n\nYou have deleted from #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)}:\n" << deleted.join("\n") if deleted.any?
+      msg << "\n\nYou have changed in #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)}:\n" << changed.join("\n") if changed.any?
       msg << "\n"
 
       raise ProductionError, msg if added.any? || deleted.any? || changed.any?
@@ -390,16 +390,16 @@ module Bundler
 
         msg = case problem
         when :engine
-          "Your Ruby engine is #{actual}, but your gems.rb specified #{expected}"
+          "Your Ruby engine is #{actual}, but your #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)} specified #{expected}"
         when :version
-          "Your Ruby version is #{actual}, but your gems.rb specified #{expected}"
+          "Your Ruby version is #{actual}, but your #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)} specified #{expected}"
         when :engine_version
-          "Your #{Bundler.ruby_version.engine} version is #{actual}, but your gems.rb specified #{ruby_version.engine} #{expected}"
+          "Your #{Bundler.ruby_version.engine} version is #{actual}, but your #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)} specified #{ruby_version.engine} #{expected}"
         when :patchlevel
           if !expected.is_a?(String)
-            "The Ruby patchlevel in your gems.rb must be a string"
+            "The Ruby patchlevel in your #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)} must be a string"
           else
-            "Your Ruby patchlevel is #{actual}, but your gems.rb specified #{expected}"
+            "Your Ruby patchlevel is #{actual}, but your #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)} specified #{expected}"
           end
         end
 

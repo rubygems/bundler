@@ -26,7 +26,7 @@ module Bundler
     Bundler.ui.error "\nCould not load OpenSSL."
     Bundler.ui.warn <<-WARN, :wrap => true
       You must recompile Ruby with OpenSSL support or change the sources in your \
-      gems.rb from 'https' to 'http'. Instructions for compiling with OpenSSL \
+      #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)} from 'https' to 'http'. Instructions for compiling with OpenSSL \
       using RVM are available at http://rvm.io/packages/openssl.
     WARN
     Bundler.ui.trace e

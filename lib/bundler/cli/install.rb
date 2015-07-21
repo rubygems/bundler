@@ -145,8 +145,8 @@ module Bundler
 
       unless Bundler.definition.has_rubygems_remotes?
         Bundler.ui.warn <<-WARN, :wrap => true
-          Your gems.rb has no gem server sources. If you need gems that are \
-          not already on your machine, add a line like this to your gems.rb:
+          Your #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)} has no gem server sources. If you need gems that are \
+          not already on your machine, add a line like this to your #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)}:
           source 'https://rubygems.org'
         WARN
       end
@@ -171,7 +171,7 @@ module Bundler
 
     def dependencies_count_for(definition)
       count = definition.dependencies.count
-      "#{count} gems.rb #{count == 1 ? "dependency" : "dependencies"}"
+      "#{count} #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)} #{count == 1 ? "dependency" : "dependencies"}"
     end
 
     def gems_installed_for(definition)

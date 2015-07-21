@@ -333,7 +333,7 @@ G
 
       bundle :check
       expect(exitstatus).to eq(0) if exitstatus
-      expect(out).to eq("The gems.rb's dependencies are satisfied")
+      expect(out).to eq("gems.rb's dependencies are satisfied")
     end
 
     it "checks fine with any engine" do
@@ -352,7 +352,7 @@ G
 
         bundle :check
         expect(exitstatus).to eq(0) if exitstatus
-        expect(out).to eq("The gems.rb's dependencies are satisfied")
+        expect(out).to eq("gems.rb's dependencies are satisfied")
       end
     end
 

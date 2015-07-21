@@ -107,7 +107,7 @@ module Bundler
 
         unless options["branch"] || Bundler.settings[:disable_local_branch_check]
           raise GitError, "Cannot use local override for #{name} at #{path} because " \
-            ":branch is not specified in gems.rb. Specify a branch or use " \
+            ":branch is not specified in #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)}. Specify a branch or use " \
             "`bundle config --delete` to remove the local override"
         end
 
@@ -124,13 +124,13 @@ module Bundler
 
         if git_proxy.branch != options["branch"] && !Bundler.settings[:disable_local_branch_check]
           raise GitError, "Local override for #{name} at #{path} is using branch " \
-            "#{git_proxy.branch} but gems.rb specifies #{options["branch"]}"
+            "#{git_proxy.branch} but #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)} specifies #{options["branch"]}"
         end
 
         changed = cached_revision && cached_revision != git_proxy.revision
 
         if changed && !@unlocked && !git_proxy.contains?(cached_revision)
-          raise GitError, "The gems.rb lock is pointing to revision #{shortref_for_display(cached_revision)} " \
+          raise GitError, "The #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)} lock is pointing to revision #{shortref_for_display(cached_revision)} " \
             "but the current branch in your local override for #{name} does not contain such commit. " \
             "Please make sure your branch is up to date."
         end

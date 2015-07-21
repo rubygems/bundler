@@ -9,7 +9,7 @@ describe "bundle check" do
 
     bundle :check
     expect(exitstatus).to eq(0) if exitstatus
-    expect(out).to include("The gems.rb's dependencies are satisfied")
+    expect(out).to include("gems.rb's dependencies are satisfied")
   end
 
   it "works with the --gemfile flag when not in the directory" do
@@ -20,7 +20,7 @@ describe "bundle check" do
 
     Dir.chdir tmp
     bundle "check --gemfile bundled_app/gems.rb"
-    expect(out).to include("The gems.rb's dependencies are satisfied")
+    expect(out).to include("gems.rb's dependencies are satisfied")
   end
 
   it "creates a gems.locked by default if one does not exist" do
@@ -103,7 +103,7 @@ describe "bundle check" do
     bundle "install --without foo"
     bundle "check"
     expect(exitstatus).to eq(0) if exitstatus
-    expect(out).to include("The gems.rb's dependencies are satisfied")
+    expect(out).to include("gems.rb's dependencies are satisfied")
   end
 
   it "ensures that gems are actually installed and not just cached" do
@@ -152,7 +152,7 @@ describe "bundle check" do
     G
 
     bundle :check
-    expect(out).to include("The gems.rb's dependencies are satisfied")
+    expect(out).to include("gems.rb's dependencies are satisfied")
   end
 
   it "works with env conditionals" do
@@ -183,7 +183,7 @@ describe "bundle check" do
     G
 
     bundle :check
-    expect(out).to include("The gems.rb's dependencies are satisfied")
+    expect(out).to include("gems.rb's dependencies are satisfied")
   end
 
   it "outputs an error when the default gems.rb is not found" do
@@ -242,7 +242,7 @@ describe "bundle check" do
     it "returns success" do
       bundle "check --path vendor/bundle"
       expect(exitstatus).to eq(0) if exitstatus
-      expect(out).to include("The gems.rb's dependencies are satisfied")
+      expect(out).to include("gems.rb's dependencies are satisfied")
     end
 
     it "should write to .bundle/config" do
@@ -278,7 +278,7 @@ describe "bundle check" do
       bundle :install
       bundle :check
       expect(exitstatus).to eq(0) if exitstatus
-      expect(out).to include("The gems.rb's dependencies are satisfied")
+      expect(out).to include("gems.rb's dependencies are satisfied")
     end
 
     it "shows what is missing with the current gems.rb if it is not satisfied" do

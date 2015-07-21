@@ -25,7 +25,7 @@ module Bundler
       Bundler.settings[:cache_all] = options[:all] if options.key?("all")
 
       if Bundler.definition.has_local_dependencies? && !Bundler.settings[:cache_all]
-        Bundler.ui.warn "Your gems.rb contains path and git dependencies. If you want "    \
+        Bundler.ui.warn "Your #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)} contains path and git dependencies. If you want "    \
           "to package them as well, please pass the --all flag. This will be the default " \
           "on Bundler 2.0."
       end

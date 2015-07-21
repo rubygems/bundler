@@ -23,7 +23,7 @@ module Bundler
         output << "Your app has gems that work on these platforms:\n#{platforms.join("\n")}"
 
         if ruby_version
-          output << "Your gems.rb specifies a Ruby version requirement:\n* #{ruby_version}"
+          output << "Your #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)} specifies a Ruby version requirement:\n* #{ruby_version}"
 
           begin
             Bundler.definition.validate_ruby!
@@ -32,7 +32,7 @@ module Bundler
             output << e.message
           end
         else
-          output << "Your gems.rb does not specify a Ruby version requirement."
+          output << "Your #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)} does not specify a Ruby version requirement."
         end
       end
 

@@ -115,7 +115,7 @@ module Bundler
         @sorted ||= ([rake] + tsort).compact.uniq
       rescue TSort::Cyclic => error
         cgems = extract_circular_gems(error)
-        raise CyclicDependencyError, "Your gems.rb requires gems that depend" \
+        raise CyclicDependencyError, "Your #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)} requires gems that depend" \
           " depend on each other, creating an infinite loop. Please remove" \
           " either gem '#{cgems[1]}' or gem '#{cgems[0]}' and try again."
       end
