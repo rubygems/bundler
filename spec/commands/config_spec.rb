@@ -339,7 +339,6 @@ describe "setting gemfile via config" do
 end
 
 describe "setting a global install path" do
-
   before(:each) do
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -366,5 +365,4 @@ describe "setting a global install path" do
       should_be_installed "rack 1.0.0"
     end
   end
-
 end
