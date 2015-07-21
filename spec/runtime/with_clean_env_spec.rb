@@ -54,7 +54,7 @@ describe "Bundler.with_env helpers" do
     end
 
     it "should not change ORIGINAL_ENV" do
-      expect(Bundler::ORIGINAL_ENV['BUNDLE_PATH']).to eq("./gems.rb")
+      expect(Bundler::ORIGINAL_ENV["BUNDLE_PATH"]).to eq("./gems.rb")
     end
   end
 

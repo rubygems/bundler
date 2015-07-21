@@ -23,13 +23,13 @@ module Bundler
         spec = Gem::Specification.load(gemspec)
         puts "Writing new gems.rb to #{Dir.pwd}/gems.rb"
 
-        File.open('gems.rb', 'wb') do |file|
+        File.open("gems.rb", "wb") do |file|
           file << "# Generated from #{gemspec}\n"
           file << spec.to_gemfile
         end
       else
         puts "Writing new gems.rb to #{Dir.pwd}/gems.rb"
-        FileUtils.cp(File.expand_path('../../templates/gems.rb', __FILE__), 'gems.rb')
+        FileUtils.cp(File.expand_path("../../templates/gems.rb", __FILE__), "gems.rb")
       end
     end
   end

@@ -1251,7 +1251,7 @@ describe "the lockfile format" do
                    require 'bundler'
                    Bundler.setup
                  RUBY
-               }.not_to change { File.mtime(bundled_app("gems.locked")) }
+        }.not_to change { File.mtime(bundled_app("gems.locked")) }
       end
 
       it "preserves gems.locked \\n\\r line endings" do
@@ -1265,7 +1265,7 @@ describe "the lockfile format" do
                    require 'bundler'
                    Bundler.setup
                  RUBY
-               }.not_to change { File.mtime(bundled_app("gems.locked")) }
+        }.not_to change { File.mtime(bundled_app("gems.locked")) }
       end
     end
   end

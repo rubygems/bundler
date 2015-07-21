@@ -26,7 +26,7 @@ describe "bundle install with gem sources" do
         gem "rack"
       G
 
-      expect(bundled_app('gems.locked')).to exist
+      expect(bundled_app("gems.locked")).to exist
     end
 
     it "creates lock files based on the gems.rb name" do
@@ -61,7 +61,7 @@ describe "bundle install with gem sources" do
         gem "rack"
       G
 
-      expect { run '1' }.not_to change { File.mtime(bundled_app('gems.locked')) }
+      expect { run "1" }.not_to change { File.mtime(bundled_app("gems.locked")) }
     end
 
     it "fetches gems" do

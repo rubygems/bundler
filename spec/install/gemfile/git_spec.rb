@@ -98,8 +98,8 @@ describe "bundle install with git sources" do
 
       update_git "foo", "1.1", :path => lib_path("foo-1.0")
 
-      Dir.chdir tmp('bundled_app.bck')
-      gemfile tmp('bundled_app.bck/gems.rb'), <<-G
+      Dir.chdir tmp("bundled_app.bck")
+      gemfile tmp("bundled_app.bck/gems.rb"), <<-G
         source "file://#{gem_repo1}"
         git "#{lib_path("foo-1.0")}" do
           gem 'foo'
@@ -689,7 +689,7 @@ describe "bundle install with git sources" do
     G
 
     bundle "install"
-    expect(File.read(bundled_app("gems.locked")).scan('GIT').size).to eq(1)
+    expect(File.read(bundled_app("gems.locked")).scan("GIT").size).to eq(1)
   end
 
   describe "switching sources" do
