@@ -12,11 +12,13 @@ module Bundler
 
     class Molinillo::VersionConflict
       def clean_req(req)
+        req = req.to_s.chomp(" ruby")
         if req.to_s.include?(">= 0")
-          req.to_s.gsub(/ \(.*?\)$/, "")
+          req = req.to_s.gsub(/ \(.*?\)$/, "")
         else
-          req.to_s.gsub(/\, (runtime|development)\)$/, ")")
+          req = req.to_s.gsub(/\, (runtime|development)\)$/, ")")
         end
+        req.gsub(/\).*/, ")")
       end
 
       def message
@@ -33,7 +35,7 @@ module Bundler
             depth = 2
             tree.each do |req|
               t << "  " * depth << %(#{clean_req req})
-              t << %( depends on) unless tree[-1] == req
+              t << %( depends on) unless tree.last == req
               t << %(\n)
               depth += 1
             end
@@ -55,6 +57,7 @@ module Bundler
             o << %(Running `bundle update` will rebuild your snapshot from scratch, using only\n)
             o << %(the gems in your Gemfile, which may resolve the conflict.\n)
           elsif !conflict.existing
+            o << "\n"
             if conflict.requirement_trees.first.size > 1
               o << "Could not find gem '#{clean_req(conflict.requirement)}', which is required by "
               o << "gem '#{clean_req(conflict.requirement_trees.first[-2])}', in any of the sources."
