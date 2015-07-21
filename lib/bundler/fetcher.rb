@@ -176,7 +176,7 @@ module Bundler
       "#<#{self.class}:0x#{object_id} uri=#{uri}>"
     end
 
-  private
+    private
 
     FETCHERS = [Dependency, Index]
 
@@ -252,7 +252,7 @@ module Bundler
       store
     end
 
-  private
+    private
 
     def fetch_uri
       @fetch_uri ||= begin

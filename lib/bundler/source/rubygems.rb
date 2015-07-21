@@ -223,7 +223,7 @@ module Bundler
         end
       end
 
-    protected
+      protected
 
       def credless_remotes
         remotes.map(&method(:suppress_configured_credentials))

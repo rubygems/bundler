@@ -44,7 +44,7 @@ module Bundler
         http.head("/")
       end
 
-    private
+      private
 
       def certificates_in(path)
         Dir[File.join(path, "*.pem")].sort

@@ -146,7 +146,7 @@ module Bundler
         __dependencies.select {|_, deps| deps.map(&:name).include? dependency }.keys
       end
 
-    private
+      private
 
       def __dependencies
         @dependencies ||= begin

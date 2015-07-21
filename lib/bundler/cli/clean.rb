@@ -11,7 +11,7 @@ module Bundler
       Bundler.load.clean(options[:"dry-run"])
     end
 
-  protected
+    protected
 
     def require_path_or_force
       if !Bundler.settings[:path] && !options[:force]

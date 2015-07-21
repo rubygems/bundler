@@ -13,7 +13,7 @@ module Bundler
           @anonymized_uri = remove_auth(@uri).freeze
         end
 
-      private
+        private
 
         def apply_auth(uri, auth)
           if auth && uri.userinfo.nil?

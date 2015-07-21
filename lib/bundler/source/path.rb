@@ -104,7 +104,7 @@ module Bundler
         name
       end
 
-    private
+      private
 
       def expanded_path
         @expanded_path ||= expand(path)

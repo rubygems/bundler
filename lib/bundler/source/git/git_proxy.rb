@@ -103,7 +103,7 @@ module Bundler
           end
         end
 
-      private
+        private
 
         # TODO: Do not rely on /dev/null.
         # Given that open3 is not cross platform until Ruby 1.9.3,

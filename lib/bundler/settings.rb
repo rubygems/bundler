@@ -158,7 +158,7 @@ module Bundler
       end
     end
 
-  private
+    private
 
     def key_for(key)
       if key.is_a?(String) && /https?:/ =~ key

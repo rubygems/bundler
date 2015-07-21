@@ -32,7 +32,7 @@ module Bundler
       "#{name} (#{requirement}) #{__platform}"
     end
 
-  private
+    private
 
     def method_missing(*args)
       @dep.send(*args)

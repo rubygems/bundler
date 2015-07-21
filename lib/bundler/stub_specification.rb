@@ -14,7 +14,7 @@ module Bundler
       _remote_specification.to_yaml
     end
 
-  private
+    private
 
     def _remote_specification
       stub.to_spec

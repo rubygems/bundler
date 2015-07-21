@@ -60,7 +60,7 @@ module Bundler
       without_groups_messages
     end
 
-  private
+    private
 
     def without_groups_messages
       if Bundler.settings.without.any?

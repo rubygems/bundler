@@ -92,7 +92,7 @@ module Bundler
       ENV["RUBYLIB"] = rubylib.uniq.join(File::PATH_SEPARATOR)
     end
 
-  private
+    private
 
     def find_gemfile
       given = ENV["BUNDLE_GEMFILE"]

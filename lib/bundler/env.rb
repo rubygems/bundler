@@ -42,7 +42,7 @@ module Bundler
       out
     end
 
-  private
+    private
 
     def read_file(filename)
       File.read(filename.to_s).strip

@@ -65,7 +65,7 @@ module Bundler
       @__identifier ||= [name, version, source, platform, dependencies].hash
     end
 
-  private
+    private
 
     def to_ary
       nil

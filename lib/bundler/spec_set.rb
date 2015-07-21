@@ -105,7 +105,7 @@ module Bundler
       SpecSet.new(arr)
     end
 
-  private
+    private
 
     def sorted
       rake = @specs.find {|s| s.name == "rake" }
