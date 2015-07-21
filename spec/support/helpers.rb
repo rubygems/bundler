@@ -365,7 +365,7 @@ module Spec
         ENV[k] = v
       end
       block.call if block_given?
-      env_hash.each do |k, v|
+      env_hash.each do |k, _|
         ENV[k] = current_values[k]
       end
     end

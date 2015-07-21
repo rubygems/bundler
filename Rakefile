@@ -47,7 +47,7 @@ namespace :molinillo do
     rm_r files
   end
 
-  task :update, [:tag] => [] do |t, args|
+  task :update, [:tag] => [] do |_, args|
     tag = args[:tag]
     Dir.chdir "lib/bundler/vendor" do
       rm_rf "molinillo"
@@ -72,7 +72,7 @@ namespace :thor do
     rm_r files
   end
 
-  task :update, [:tag] => [] do |t, args|
+  task :update, [:tag] => [] do |_, args|
     tag = args[:tag]
     Dir.chdir "lib/bundler/vendor" do
       rm_rf "thor"

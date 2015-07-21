@@ -143,7 +143,7 @@ module Bundler
         dep = Bundler::Dependency.new(name, version)
 
         if pinned && dep.name != "bundler"
-          spec = @specs.find {|k, v| v.name == dep.name }
+          spec = @specs.find {|_, v| v.name == dep.name }
           dep.source = spec.last.source if spec
 
           # Path sources need to know what the default name / version

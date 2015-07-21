@@ -151,7 +151,7 @@ module Bundler
       # RubyGems 2.2+ can put binary extension into dedicated folders,
       # therefore use RubyGems facilities to obtain their load paths.
       if Gem::Specification.method_defined? :full_require_paths
-        loaded_gem_paths = Gem.loaded_specs.map {|n, s| s.full_require_paths }
+        loaded_gem_paths = Gem.loaded_specs.map {|_, s| s.full_require_paths }
         loaded_gem_paths.flatten
       else
         $LOAD_PATH.select do |p|
@@ -391,7 +391,7 @@ module Bundler
 
     # This backport fixes the marshaling of @segments.
     def backport_yaml_initialize
-      redefine_method(Gem::Version, :yaml_initialize) do |tag, map|
+      redefine_method(Gem::Version, :yaml_initialize) do |_, map|
         @version = map["version"]
         @segments = nil
         @hash = nil
