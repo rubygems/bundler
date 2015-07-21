@@ -51,6 +51,7 @@ module Bundler
           bundle
           bundle-config
           bundle-exec
+          bundle-gem
           bundle-install
           bundle-package
           bundle-update

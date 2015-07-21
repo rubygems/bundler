@@ -76,7 +76,7 @@ We divide `bundle` subcommands into primary commands and utilities.
 * `bundle init(1)`:
   Generate a simple `Gemfile`, placed in the current directory
 
-* `bundle gem(1)`:
+* [bundle gem(1)][bundle-gem]:
   Create a simple gem, suitable for development with bundler
 
 * [bundle platform(1)][bundle-platform]:
