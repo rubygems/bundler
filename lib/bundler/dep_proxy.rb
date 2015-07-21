@@ -34,8 +34,8 @@ module Bundler
 
   private
 
-    def method_missing(*args)
-      @dep.send(*args)
+    def method_missing(*args, &blk)
+      @dep.send(*args, &blk)
     end
   end
 end
