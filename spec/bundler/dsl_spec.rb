@@ -85,7 +85,7 @@ describe Bundler::Dsl do
 
   describe "#gem" do
     [:ruby, :ruby_18, :ruby_19, :ruby_20, :ruby_21, :ruby_22, :mri, :mri_18, :mri_19,
-     :mri_20, :mri_21, :jruby, :rbx].each do |platform|
+     :mri_20, :mri_21, :mri_22, :jruby, :rbx].each do |platform|
       it "allows #{platform} as a valid platform" do
         subject.gem("foo", :platform => platform)
       end
