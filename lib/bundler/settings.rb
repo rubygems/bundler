@@ -6,14 +6,12 @@ module Bundler
     NUMBER_KEYS = %w(retry timeout redirect).freeze
     DEFAULT_CONFIG = {:retry => 3, :timeout => 10, :redirect => 5}
 
+    attr_reader :root
+
     def initialize(root = nil)
       @root          = root
       @local_config  = load_config(local_config_file)
       @global_config = load_config(global_config_file)
-    end
-
-    def root
-      @root
     end
 
     def [](name)
@@ -51,7 +49,7 @@ module Bundler
       keys = @global_config.keys | @local_config.keys | env_keys
 
       keys.map do |key|
-        key.sub(/^BUNDLE_/, '').gsub(/__/, ".").downcase
+        key.sub(/^BUNDLE_/, "").gsub(/__/, ".").downcase
       end
     end
 
@@ -164,7 +162,7 @@ module Bundler
         # all other absolute paths
         install_path = set_path
       else
-         # all relative paths (configured by the user)
+        # all relative paths (configured by the user)
         install_path = File.join(Bundler::root, set_path)
       end
     end
