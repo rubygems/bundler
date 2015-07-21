@@ -337,3 +337,32 @@ describe "setting gemfile via config" do
     end
   end
 end
+
+describe "setting a global install path" do
+  before(:each) do
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack", "1.0.0"
+    G
+  end
+
+  context "with the --global flag" do
+    it "should concat `ruby_scope` to the install path" do
+      bundle "config --global path my/global/path"
+      bundle "install"
+
+      expect(bundled_app("my/global/path/#{Bundler.ruby_scope}")).to exist
+      should_be_installed "rack 1.0.0"
+    end
+  end
+
+  context "with the BUNDLE_PATH env variable" do
+    it "should concat `ruby_scope` to the install path" do
+      ENV["BUNDLE_PATH"] = "another/global/dir"
+      bundle "install"
+
+      expect(bundled_app("another/global/dir/#{Bundler.ruby_scope}")).to exist
+      should_be_installed "rack 1.0.0"
+    end
+  end
+end
