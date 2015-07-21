@@ -207,7 +207,7 @@ describe "bundle check" do
     simulate_new_machine
     bundle "check"
     last_out = out
-    3.times do |i|
+    3.times do
       bundle :check
       expect(out).to eq(last_out)
       expect(err).to be_empty

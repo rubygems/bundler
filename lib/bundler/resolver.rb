@@ -143,7 +143,7 @@ module Bundler
       end
 
       def platforms_for_dependency_named(dependency)
-        __dependencies.select {|p, deps| deps.map(&:name).include? dependency }.keys
+        __dependencies.select {|_, deps| deps.map(&:name).include? dependency }.keys
       end
 
     private

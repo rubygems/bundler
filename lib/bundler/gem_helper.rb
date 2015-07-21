@@ -59,7 +59,7 @@ module Bundler
         guard_clean
       end
 
-      task "release:source_control_push", [:remote] do |t, args|
+      task "release:source_control_push", [:remote] do |_, args|
         tag_version { git_push(args[:remote]) } unless already_tagged?
       end
 
@@ -72,7 +72,7 @@ module Bundler
 
     def build_gem
       file_name = nil
-      sh("gem build -V '#{spec_path}'") { |out, code|
+      sh("gem build -V '#{spec_path}'") {
         file_name = File.basename(built_gem_path)
         FileUtils.mkdir_p(File.join(base, "pkg"))
         FileUtils.mv(built_gem_path, "pkg")

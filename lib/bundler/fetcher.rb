@@ -192,7 +192,7 @@ module Bundler
         "CI_NAME" => ENV["CI_NAME"],
         "CI" => "ci"
       }
-      env_cis.find_all {|env, ci| ENV[env] }.map {|env, ci| ci }
+      env_cis.find_all {|env, _| ENV[env] }.map {|_, ci| ci }
     end
 
     def connection
