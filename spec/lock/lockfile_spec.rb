@@ -87,7 +87,7 @@ describe "the lockfile format" do
         rack
 
       BUNDLED WITH
-         1.10.0
+         2.0.0.dev
     L
 
     install_gemfile <<-G
@@ -109,7 +109,7 @@ describe "the lockfile format" do
         rack
 
       BUNDLED WITH
-         1.10.0
+         2.0.0.dev
     G
   end
 
