@@ -216,7 +216,7 @@ module Bundler
                   default_gemfile.dirname.expand_path
                 rescue GemfileNotFound
                   bundle_dir = default_bundle_dir
-                  raise GemfileNotFound, "Could not locate #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)} or .bundle/ directory" unless bundle_dir
+                  raise GemfileNotFound, "Could not locate #{SharedHelpers.gemfile_name} or .bundle/ directory" unless bundle_dir
                   Pathname.new(File.expand_path("..", bundle_dir))
                 end
     end

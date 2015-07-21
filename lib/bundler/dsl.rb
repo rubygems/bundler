@@ -91,7 +91,7 @@ module Bundler
           end
 
         else
-          Bundler.ui.warn "Your #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)} lists the gem #{current.name} (#{current.requirement}) more than once.\n" \
+          Bundler.ui.warn "Your #{SharedHelpers.gemfile_name} lists the gem #{current.name} (#{current.requirement}) more than once.\n" \
                           "You should probably keep only one of them.\n" \
                           "While it's not a problem now, it could cause errors if you change the version of just one of them later."
         end
@@ -358,11 +358,11 @@ module Bundler
 
       # TODO: 2.0 upgrade from setting to default
       if Bundler.settings[:disable_multisource]
-        raise GemspecError, "Warning: this #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)} contains multiple primary sources. " \
+        raise GemspecError, "Warning: this #{SharedHelpers.gemfile_name} contains multiple primary sources. " \
           "Each source after the first must include a block to indicate which gems " \
           "should come from that source."
       else
-        Bundler.ui.deprecate "Your #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)} contains multiple primary sources. " \
+        Bundler.ui.deprecate "Your #{SharedHelpers.gemfile_name} contains multiple primary sources. " \
           "Using `source` more than once without a block is a security risk, and " \
           "may result in installing unexpected gems. To resolve this warning, use " \
           "a block to indicate which gems should come from the secondary source. " \

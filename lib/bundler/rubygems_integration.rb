@@ -282,7 +282,7 @@ module Bundler
 
         if spec.nil?
 
-          e = Gem::LoadError.new "#{dep.name} is not part of the bundle. Add it to #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)}."
+          e = Gem::LoadError.new "#{dep.name} is not part of the bundle. Add it to #{SharedHelpers.gemfile_name}."
           e.name = dep.name
           if e.respond_to?(:requirement=)
             e.requirement = dep.requirement
@@ -292,7 +292,7 @@ module Bundler
           raise e
         elsif dep !~ spec
           e = Gem::LoadError.new "can't activate #{dep}, already activated #{spec.full_name}. " \
-                                 "Make sure all dependencies are added to #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)}."
+                                 "Make sure all dependencies are added to #{SharedHelpers.gemfile_name}."
           e.name = dep.name
           if e.respond_to?(:requirement=)
             e.requirement = dep.requirement

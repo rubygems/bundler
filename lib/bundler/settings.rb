@@ -31,7 +31,7 @@ module Bundler
     end
 
     def []=(key, value)
-      local_config_file or raise GemfileNotFound, "Could not locate #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)}"
+      local_config_file or raise GemfileNotFound, "Could not locate #{SharedHelpers.gemfile_name}"
       set_key(key, value, @local_config, local_config_file)
     end
 

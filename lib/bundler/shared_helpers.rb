@@ -19,6 +19,14 @@ module Bundler
   module SharedHelpers
     attr_accessor :gem_loaded
 
+    def gemfile_name
+      default_gemfile.relative_path_from(pwd)
+    end
+
+    def lockfile_name
+      default_lockfile.relative_path_from(pwd)
+    end
+
     def default_gemfile
       gemfile = find_gemfile
       deprecate_gemfile(gemfile)

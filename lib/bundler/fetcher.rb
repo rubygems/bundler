@@ -21,7 +21,7 @@ module Bundler
           " is a chance you are experiencing a man-in-the-middle attack, but" \
           " most likely your system doesn't have the CA certificates needed" \
           " for verification. For information about OpenSSL certificates, see" \
-          " bit.ly/ruby-ssl. To connect without using SSL, edit your #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)}" \
+          " bit.ly/ruby-ssl. To connect without using SSL, edit your #{SharedHelpers.gemfile_name}" \
           " sources and change 'https' to 'http'."
       end
     end
@@ -30,7 +30,7 @@ module Bundler
       def initialize(msg = nil)
         super msg || "Could not load OpenSSL.\n" \
             "You must recompile Ruby with OpenSSL support or change the sources in your " \
-            "#{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)} from 'https' to 'http'. Instructions for compiling with OpenSSL " \
+            "#{SharedHelpers.gemfile_name} from 'https' to 'http'. Instructions for compiling with OpenSSL " \
             "using RVM are available at rvm.io/packages/openssl."
       end
     end

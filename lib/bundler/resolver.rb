@@ -36,13 +36,13 @@ module Bundler
 
           if name == "bundler" && other_bundler_required
             o << "\n"
-            o << "This #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)} requires a different version of Bundler.\n"
+            o << "This #{SharedHelpers.gemfile_name} requires a different version of Bundler.\n"
             o << "Perhaps you need to update Bundler by running `gem install bundler`?\n"
           end
           if conflict.locked_requirement
             o << "\n"
             o << %(Running `bundle update` will rebuild your snapshot from scratch, using only\n)
-            o << %(the gems in your #{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)}, which may resolve the conflict.\n)
+            o << %(the gems in your #{SharedHelpers.gemfile_name}, which may resolve the conflict.\n)
           elsif !conflict.existing
             o << "\n"
             if conflict.requirement_trees.first.size > 1

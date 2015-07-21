@@ -59,7 +59,7 @@ module Bundler
       end
 
       if dependencies.empty?
-        Bundler.ui.warn "#{Bundler.default_gemfile.relative_path_from(SharedHelpers.pwd)} specifies no dependencies"
+        Bundler.ui.warn "#{SharedHelpers.gemfile_name} specifies no dependencies"
         lock
         return
       end
