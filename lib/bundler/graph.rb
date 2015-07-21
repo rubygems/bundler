@@ -75,7 +75,7 @@ module Bundler
       when :node
         if symbol_or_string_or_dependency.is_a?(Gem::Dependency)
           label = symbol_or_string_or_dependency.name.dup
-          label << "\n#{symbol_or_string_or_dependency.to_spec.version.to_s}" if @show_version
+          label << "\n#{symbol_or_string_or_dependency.to_spec.version}" if @show_version
         else
           label = symbol_or_string_or_dependency.to_s
         end

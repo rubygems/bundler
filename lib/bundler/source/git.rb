@@ -154,7 +154,7 @@ module Bundler
       end
 
       def install(spec, force = false)
-        Bundler.ui.info "Using #{version_message(spec)} from #{to_s}"
+        Bundler.ui.info "Using #{version_message(spec)} from #{self}"
 
         if requires_checkout? && !@copied && !force
           Bundler.ui.debug "  * Checking out revision: #{ref}"
@@ -182,7 +182,7 @@ module Bundler
         super
       rescue PathError => e
         Bundler.ui.trace e
-        raise GitError, "#{to_s} is not yet checked out. Run `bundle install` first."
+        raise GitError, "#{self} is not yet checked out. Run `bundle install` first."
       end
 
       # This is the path which is going to contain a cache
