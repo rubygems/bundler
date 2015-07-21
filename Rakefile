@@ -116,7 +116,7 @@ namespace :spec do
       # Strip secure_path so that RVM paths transmit through sudo -E
       system "sudo sed -i '/secure_path/d' /etc/sudoers"
       # Install groff so ronn can generate man/help pages
-      sh "sudo apt-get install groff -y"
+      sh "sudo apt-get install groff-base -y"
       # Install graphviz so that the viz specs can run
       sh "sudo apt-get install graphviz -y 2>&1 | tail -n 2"
       if RUBY_VERSION < "1.9"
