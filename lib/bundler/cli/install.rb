@@ -154,7 +154,7 @@ module Bundler
       raise e
     end
 
-  private
+    private
 
     def warn_if_root
       return if Bundler::WINDOWS || !Process.uid.zero?

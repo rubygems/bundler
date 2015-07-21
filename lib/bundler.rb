@@ -406,7 +406,7 @@ module Bundler
       @definition = nil
     end
 
-  private
+    private
 
     def eval_yaml_gemspec(path, contents)
       # If the YAML is invalid, Syck raises an ArgumentError, and Psych

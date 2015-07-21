@@ -58,12 +58,6 @@ Metrics/PerceivedComplexity:
 Performance/ReverseEach:
   Enabled: false
 
-# Offense count: 38
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/AccessModifierIndentation:
-  Enabled: false
-
 # Offense count: 1
 Style/AccessorMethodName:
   Enabled: false

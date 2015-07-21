@@ -143,7 +143,7 @@ module Bundler
       end
     end
 
-  private
+    private
 
     def specs_by_name(name)
       @specs[name].values

@@ -65,7 +65,7 @@ module Bundler
       [@name, @version, @platform == Gem::Platform::RUBY ? -1 : 1]
     end
 
-  private
+    private
 
     def _remote_specification
       @_remote_specification ||= @spec_fetcher.fetch_spec([@name, @version, @platform])

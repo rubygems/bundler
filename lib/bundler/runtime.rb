@@ -222,7 +222,7 @@ module Bundler
       SharedHelpers.set_bundle_environment
     end
 
-  private
+    private
 
     def prune_gem_cache(resolve, cache_path)
       cached  = Dir["#{cache_path}/*.gem"]

@@ -91,7 +91,7 @@ module Bundler
       @remote_specification = spec
     end
 
-  private
+    private
 
     def local_specification_path
       "#{base_dir}/specifications/#{full_name}.gemspec"

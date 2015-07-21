@@ -19,7 +19,7 @@ module Bundler
       exit 1
     end
 
-  private
+    private
 
     def setup_cache_all
       Bundler.settings[:cache_all] = options[:all] if options.key?("all")

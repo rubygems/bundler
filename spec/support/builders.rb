@@ -358,7 +358,7 @@ module Spec
       GitReader.new lib_path(spec.full_name)
     end
 
-  private
+    private
 
     def build_with(builder, name, args, &blk)
       @_build_path ||= nil
@@ -607,7 +607,7 @@ module Spec
         ref
       end
 
-    private
+      private
 
       def git(cmd)
         Bundler::SharedHelpers.with_clean_git_env do

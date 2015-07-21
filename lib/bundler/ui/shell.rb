@@ -81,7 +81,7 @@ module Bundler
         @level = old_level
       end
 
-    private
+      private
 
       # valimism
       def tell_me(msg, color = nil, newline = nil)

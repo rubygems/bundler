@@ -24,7 +24,7 @@ module Bundler
       end
     end
 
-  protected
+    protected
 
     # http://www.informit.com/articles/article.aspx?p=683059&seqNum=36
     def levenshtein_distance(this, that, ins = 2, del = 2, sub = 1)

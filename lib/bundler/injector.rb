@@ -43,7 +43,7 @@ module Bundler
       Bundler.settings[:frozen] = "1" if frozen
     end
 
-  private
+    private
 
     def new_gem_lines
       @new_deps.map do |d|

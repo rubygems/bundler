@@ -208,7 +208,7 @@ module Bundler
       raise GemfileError, "Undefined local variable or method `#{name}' for Gemfile"
     end
 
-  private
+    private
 
     def add_git_sources
       git_source(:github) do |repo_name|

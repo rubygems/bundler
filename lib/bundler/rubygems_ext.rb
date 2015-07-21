@@ -85,7 +85,7 @@ module Gem
       dependencies - development_dependencies
     end
 
-  private
+    private
 
     def dependencies_to_gemfile(dependencies, group = nil)
       gemfile = ""

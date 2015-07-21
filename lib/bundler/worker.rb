@@ -41,7 +41,7 @@ module Bundler
       stop_threads
     end
 
-  private
+    private
 
     def process_queue(i)
       loop do

@@ -80,7 +80,7 @@ module Bundler
       end
     end
 
-  private
+    private
 
     TYPES = {
       GIT  => Bundler::Source::Git,

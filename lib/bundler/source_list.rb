@@ -78,7 +78,7 @@ module Bundler
       @rubygems_aggregate.remotes
     end
 
-  private
+    private
 
     def add_source_to_list(source, list)
       list.unshift(source).uniq!
