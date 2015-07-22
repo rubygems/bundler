@@ -116,7 +116,12 @@ module Spec
         @exitstatus = wait_thr && wait_thr.value.exitstatus
       end
 
-      puts @err unless expect_err || @err.empty? || !$show_err
+      unless expect_err
+        puts @err unless @err.empty? || !$show_err
+        expect(@err).to lack_errors
+        expect(@exitstatus).to eq(0) if @exitstatus
+      end
+
       @out
     end
 
