@@ -213,7 +213,7 @@ module Bundler
         @allow_remote || @allow_cached
       end
 
-      private
+    private
 
       def serialize_gemspecs_in(destination)
         expanded_path = destination.expand_path(Bundler.root)

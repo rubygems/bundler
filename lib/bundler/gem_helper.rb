@@ -88,7 +88,7 @@ module Bundler
       Bundler.ui.confirm "#{name} (#{version}) installed."
     end
 
-    protected
+  protected
 
     def rubygem_push(path)
       if Pathname.new("~/.gem/credentials").expand_path.exist?

@@ -236,7 +236,7 @@ module Bundler
       Bundler.ui.info ".", false
     end
 
-    private
+  private
 
     include Molinillo::SpecificationProvider
 
