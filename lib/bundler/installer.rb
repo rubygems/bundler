@@ -5,10 +5,11 @@ require "bundler/worker"
 module Bundler
   class Installer < Environment
     class << self
-      attr_accessor :post_install_messages, :ambiguous_gems
+      attr_accessor :post_install_messages, :ambiguous_gems, :using_gems
 
       Installer.post_install_messages = {}
       Installer.ambiguous_gems = []
+      Installer.using_gems = []
     end
 
     # Begins the installation process for Bundler.

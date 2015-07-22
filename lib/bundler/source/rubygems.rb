@@ -99,7 +99,8 @@ module Bundler
         end
 
         if installed?(spec) && (!force || spec.name.eql?("bundler"))
-          Bundler.ui.info "Using #{version_message(spec)}"
+          Bundler.ui.debug "Using #{version_message(spec)}"
+          Bundler::Installer.using_gems << spec
           return nil # no post-install message
         end
 
