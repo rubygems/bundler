@@ -1,3 +1,15 @@
+## 1.10.6 (2015-07-22)
+
+Workarounds:
+
+  - only warn on invalid gemspecs (@indirect)
+
+Bugfixes:
+
+  - fix installing dependencies in the correct order (#3799, @pducks32)
+  - fix sorting of mixed DependencyLists (#3762, @tony-spataro-rs)
+  - fix `install_if` conditionals when using the block form (@danieltdt)
+
 ## 1.10.5 (2015-06-24)
 
 Workarounds:

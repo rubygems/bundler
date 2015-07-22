@@ -84,7 +84,7 @@ module Bundler
               FileUtils.mkdir_p(destination.dirname)
               FileUtils.rm_rf(destination)
               git_retry %|clone --no-checkout --quiet "#{path}" "#{destination}"|
-              File.chmod((0777 & ~File.umask), destination)
+              File.chmod(((File.stat(destination).mode | 0777) & ~File.umask), destination)
             rescue Errno::EEXIST => e
               file_path = e.message[/.*?(\/.*)/, 1]
               raise GitError, "Bundler could not install a gem because it needs to " \
