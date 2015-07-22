@@ -406,7 +406,7 @@ module Bundler
       Env.new.write($stdout)
     end
 
-    private
+  private
 
       # Automatically invoke `bundle install` and resume if
       # Bundler.settings[:auto_install] exists. This is set through config cmd

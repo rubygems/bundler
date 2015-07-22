@@ -454,7 +454,7 @@ module Bundler
         end
       end
 
-      private
+    private
 
       def parse_line_number_from_description
         description = self.description

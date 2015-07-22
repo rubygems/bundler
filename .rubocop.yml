@@ -18,6 +18,9 @@ Lint/EndAlignment:
 
 # Style
 
+Style/AccessModifierIndentation:
+  EnforcedStyle: outdent
+
 Style/MultilineOperationIndentation:
   EnforcedStyle: indented
 

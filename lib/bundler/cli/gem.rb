@@ -134,7 +134,7 @@ module Bundler
       end
     end
 
-    private
+  private
 
     def resolve_name(name)
       SharedHelpers.pwd.join(name).basename.to_s
