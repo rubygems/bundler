@@ -69,7 +69,8 @@ module Bundler
       end
 
       def install(spec, force = false)
-        Bundler.ui.info "Using #{version_message(spec)} from #{to_s}"
+        Bundler.ui.debug "Using #{version_message(spec)} from #{to_s}"
+        Bundler::Installer.using_gems << spec
         generate_bin(spec, :disable_extensions)
         nil # no post-install message
       end

@@ -182,7 +182,7 @@ describe "bundle update" do
       gem "activesupport"
     G
 
-    bundle "update"
+    bundle "update --verbose"
     expect(out).to include("Using activesupport 2.3.5")
 
     update_repo2 do
@@ -202,5 +202,24 @@ describe "bundle update" do
     bundle "update nonexisting"
     expect(err).to include("This Bundle hasn't been installed yet. Run `bundle install` to update and install the bundled gems.")
     expect(exitstatus).to eq(22) if exitstatus
+  end
+
+  it "shows the summary of the using gems" do
+    build_repo2
+
+    install_gemfile <<-G
+      source "file://#{gem_repo2}"
+      gem "activesupport"
+    G
+
+    bundle "update --verbose"
+    expect(out).to include("Using activesupport 2.3.5")
+
+    update_repo2 do
+      build_gem "activesupport", "3.0"
+    end
+
+    bundle "update"
+    expect(out).to include("Using 1 already installed gems")
   end
 end

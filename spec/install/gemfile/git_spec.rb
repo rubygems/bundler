@@ -187,7 +187,7 @@ describe "bundle install with git sources" do
       G
 
       bundle %|config local.rack #{lib_path("local-rack")}|
-      bundle :install
+      bundle "install --verbose"
       expect(out).to match(/at #{lib_path('local-rack')}/)
 
       run "require 'rack'"
