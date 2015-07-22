@@ -92,6 +92,12 @@ module Bundler
 
             lazy_spec = LazySpecification.new(name, version, platform, source)
             lazy_spec.dependencies.replace s.dependencies
+            s.dependencies.each do |dep|
+              next unless dep.name == "bundler"
+              unless dep.requirement.satisfied_by?(Gem::Version.create(VERSION))
+                Bundler.ui.warn "#{lazy_spec} has dependency #{dep}, which is unsatisfied by the current bundler version #{VERSION}"
+              end
+            end
             specs[platform] = lazy_spec
           end
         end
@@ -145,7 +151,7 @@ module Bundler
             if spec = @specs[p]
               dependencies[p] = []
               spec.dependencies.each do |dep|
-                next if dep.type == :development
+                next if dep.type == :development || dep.name == "bundler"
                 dependencies[p] << DepProxy.new(dep, p)
               end
             end

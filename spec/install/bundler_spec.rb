@@ -7,6 +7,9 @@ describe "bundle install" do
         build_gem "rails", "3.0" do |s|
           s.add_dependency "bundler", ">= 0.9.0.pre"
         end
+        build_gem "requires_nonexistant_bunder", "1.0" do |s|
+          s.add_dependency "bundler", "= 0.1.1"
+        end
         build_gem "bundler", "0.9.1"
         build_gem "bundler", Bundler::VERSION
       end
@@ -17,6 +20,17 @@ describe "bundle install" do
         source "file://#{gem_repo2}"
         gem "rails", "3.0"
       G
+
+      should_be_installed "bundler #{Bundler::VERSION}"
+    end
+
+    it "are forced to the current bundler version with warnings when no compatible version is found" do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "requires_nonexistant_bunder"
+      G
+
+      expect(out).to include("requires_nonexistant_bunder (1.0) has dependency bundler (= 0.1.1), which is unsatisfied by the current bundler version #{Bundler::VERSION}")
 
       should_be_installed "bundler #{Bundler::VERSION}"
     end
