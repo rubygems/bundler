@@ -4,8 +4,8 @@ module Bundler
 
     class Molinillo::VersionConflict
       def message
-        conflicts.values.flatten.reduce("") do |o, conflict|
-          o << %(Bundler could not find compatible versions for gem "#{conflict.requirement.name}":\n)
+        conflicts.reduce("") do |o, (name, conflict)|
+          o << %(Bundler could not find compatible versions for gem "#{name}":\n)
           if conflict.locked_requirement
             o << %(  In snapshot (#{Bundler.default_lockfile.basename}):\n)
             o << %(    #{conflict.locked_requirement}\n)
@@ -24,12 +24,12 @@ module Bundler
             t
           end.join("\n")
 
-          if conflict.requirement.name == "bundler"
+          if name == "bundler"
             o << %(\n  Current Bundler version:\n    bundler (#{Bundler::VERSION}))
             other_bundler_required = !conflict.requirement.requirement.satisfied_by?(Gem::Version.new Bundler::VERSION)
           end
 
-          if conflict.requirement.name == "bundler" && other_bundler_required
+          if name == "bundler" && other_bundler_required
             o << "\n"
             o << "This Gemfile requires a different version of Bundler.\n"
             o << "Perhaps you need to update Bundler by running `gem install bundler`?\n"
