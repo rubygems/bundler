@@ -229,6 +229,7 @@ module Bundler
       valid_file = config_file && config_file.exist? && !config_file.size.zero?
       if !ignore_config? && valid_file
         config_regex = /^(BUNDLE_.+): (['"]?)(.*(?:\n(?!BUNDLE).+)?)\2$/
+        raise PermissionError.new(config_file, :read) unless config_file.readable?
         config_pairs = config_file.read.scan(config_regex).map do |m|
           key, _, value = m
           [convert_to_backward_compatible_key(key), value.gsub(/\s+/, " ").tr('"', "'")]
