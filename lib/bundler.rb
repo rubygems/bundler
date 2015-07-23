@@ -88,17 +88,18 @@ module Bundler
   class PermissionError < BundlerError
     def initialize(file, permission_type = :write)
       @file = file
+      @permission_type = permission_type
     end
 
     def message
-      action = case permission_type
+      action = case @permission_type
                when :read then "read from"
                when :write then "write to"
                when :executable then "execute"
-               else permission_type.to_s
+               else @permission_type.to_s
                end
       "There was an error while trying to #{action} `#{File.basename(@file)}`. " \
-      "It is likely that you need to grant #{permission_type} permissions for " \
+      "It is likely that you need to grant #{@permission_type} permissions for " \
       "the file at path: `#{File.expand_path(@file)}`."
     end
 
