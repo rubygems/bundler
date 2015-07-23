@@ -11,22 +11,12 @@ module Bundler
     require "bundler/vendored_molinillo"
 
     class Molinillo::VersionConflict
-      def clean_req(req)
-        req = req.to_s.chomp(" ruby")
-        if req.to_s.include?(">= 0")
-          req = req.to_s.gsub(/ \(.*?\)$/, "")
-        else
-          req = req.to_s.gsub(/\, (runtime|development)\)$/, ")")
-        end
-        req.gsub(/\).*/, ")")
-      end
-
       def message
         conflicts.values.flatten.reduce("") do |o, conflict|
           o << %(Bundler could not find compatible versions for gem "#{conflict.requirement.name}":\n)
           if conflict.locked_requirement
             o << %(  In snapshot (#{Bundler.default_lockfile.basename}):\n)
-            o << %(    #{clean_req conflict.locked_requirement}\n)
+            o << %(    #{conflict.locked_requirement}\n)
             o << %(\n)
           end
           o << %(  In Gemfile:\n)
@@ -34,7 +24,7 @@ module Bundler
             t = ""
             depth = 2
             tree.each do |req|
-              t << "  " * depth << %(#{clean_req req})
+              t << "  " * depth << req.to_s
               t << %( depends on) unless tree.last == req
               t << %(\n)
               depth += 1
@@ -59,10 +49,10 @@ module Bundler
           elsif !conflict.existing
             o << "\n"
             if conflict.requirement_trees.first.size > 1
-              o << "Could not find gem '#{clean_req(conflict.requirement)}', which is required by "
-              o << "gem '#{clean_req(conflict.requirement_trees.first[-2])}', in any of the sources."
+              o << "Could not find gem '#{conflict.requirement}', which is required by "
+              o << "gem '#{conflict.requirement_trees.first[-2]}', in any of the sources."
             else
-              o << "Could not find gem '#{clean_req(conflict.requirement)} in any of the sources\n"
+              o << "Could not find gem '#{conflict.requirement}' in any of the sources\n"
             end
           end
           o
