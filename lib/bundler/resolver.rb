@@ -1,11 +1,3 @@
-require "set"
-
-# This is the latest iteration of the gem dependency resolving algorithm. As of now,
-# it can resolve (as a success or failure) any set of gem dependencies we throw at it
-# in a reasonable amount of time. The most iterations I've seen it take is about 150.
-# The actual implementation of the algorithm is not as good as it could be yet, but that
-# can come later.
-
 module Bundler
   class Resolver
     require "bundler/vendored_molinillo"
