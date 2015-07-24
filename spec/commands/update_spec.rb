@@ -168,8 +168,8 @@ describe "bundle update when a gem depends on a newer version of bundler" do
   it "should explain that bundler conflicted" do
     bundle "update"
     expect(err).not_to match(/in snapshot/i)
-    expect(err).to match(/current Bundler version/i)
-    expect(err).to match(/perhaps you need to update bundler/i)
+    expect(out).to include("current bundler version")
+    expect(out).to include("rails (3.0.1) has dependency bundler (= #{Bundler::VERSION.succ})")
   end
 end
 
