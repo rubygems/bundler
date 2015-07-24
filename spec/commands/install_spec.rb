@@ -370,7 +370,7 @@ describe "bundle install with gem sources" do
       G
 
       bundle :install, :quiet => true
-      expect(out).to include("Could not find gem 'rack (>= 0) ruby'")
+      expect(out).to include("Could not find gem 'rack'")
       expect(out).to_not include("Your Gemfile has no gem server sources")
     end
   end
