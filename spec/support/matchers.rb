@@ -40,7 +40,7 @@ module Spec
       end
     end
 
-    alias should_be_available should_be_installed
+    alias_method :should_be_available, :should_be_installed
 
     def should_not_be_installed(*names)
       opts = names.last.is_a?(Hash) ? names.pop : {}

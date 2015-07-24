@@ -54,7 +54,7 @@ module Bundler
         submodules == o.submodules
       end
 
-      alias == eql?
+      alias_method :==, :eql?
 
       def to_s
         at = if local?
@@ -87,7 +87,7 @@ module Bundler
         end
       end
 
-      alias :path :install_path
+      alias_method :path, :install_path
 
       def extension_dir_name
         "#{base_name}-#{shortref_for_path(revision)}"

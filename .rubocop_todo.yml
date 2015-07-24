@@ -57,11 +57,6 @@ Metrics/PerceivedComplexity:
 Style/AccessorMethodName:
   Enabled: false
 
-# Offense count: 18
-# Cop supports --auto-correct.
-Style/Alias:
-  Enabled: false
-
 # Offense count: 3
 # Cop supports --auto-correct.
 Style/AlignArray:

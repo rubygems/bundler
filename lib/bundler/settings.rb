@@ -31,7 +31,7 @@ module Bundler
       set_key(key, value, @local_config, local_config_file)
     end
 
-    alias :set_local :[]=
+    alias_method :set_local, :[]=
 
     def delete(key)
       @local_config.delete(key_for(key))

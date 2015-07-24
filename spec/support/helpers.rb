@@ -197,7 +197,7 @@ module Spec
       end
     end
 
-    alias install_gem install_gems
+    alias_method :install_gem, :install_gems
 
     def with_gem_path_as(path)
       gem_home, gem_path = ENV["GEM_HOME"], ENV["GEM_PATH"]
