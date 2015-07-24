@@ -432,7 +432,7 @@ module Spec
         @spec.add_runtime_dependency(name, requirements)
       end
 
-      alias dep runtime
+      alias_method :dep, :runtime
     end
 
     class LibBuilder

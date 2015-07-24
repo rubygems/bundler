@@ -100,7 +100,7 @@ module Bundler
       end
     end
 
-    alias gems specs
+    alias_method :gems, :specs
 
     def cache(custom_path = nil)
       cache_path = Bundler.app_cache(custom_path)

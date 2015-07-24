@@ -62,7 +62,7 @@ module Bundler
         version == o.version
       end
 
-      alias == eql?
+      alias_method :==, :eql?
 
       def name
         File.basename(expanded_path.to_s)

@@ -107,7 +107,7 @@ module Gem
   class Dependency
     attr_accessor :source, :groups
 
-    alias eql? ==
+    alias_method :eql?, :==
 
     def encode_with(coder)
       to_yaml_properties.each do |ivar|
@@ -158,7 +158,7 @@ module Gem
     end
 
     undef_method :eql? if method_defined? :eql?
-    alias eql? ==
+    alias_method :eql?, :==
   end
 end
 

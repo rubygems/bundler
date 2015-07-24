@@ -14,7 +14,7 @@ module Bundler
       dep == o.dep && __platform == o.__platform
     end
 
-    alias eql? ==
+    alias_method :eql?, :==
 
     def type
       @dep.type

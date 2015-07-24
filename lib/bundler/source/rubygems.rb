@@ -41,7 +41,7 @@ module Bundler
         o.is_a?(Rubygems) && o.credless_remotes == credless_remotes
       end
 
-      alias == eql?
+      alias_method :==, :eql?
 
       def include?(o)
         o.is_a?(Rubygems) && (o.credless_remotes - credless_remotes).empty?

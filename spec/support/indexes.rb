@@ -10,7 +10,7 @@ module Spec
       @platforms.concat args.map {|p| Gem::Platform.new(p) }
     end
 
-    alias platforms platform
+    alias_method :platforms, :platform
 
     def resolve
       @platforms ||= ["ruby"]

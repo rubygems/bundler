@@ -30,7 +30,7 @@ module Bundler
       end
       @result
     end
-    alias :attempts :attempt
+    alias_method :attempts, :attempt
 
   private
 
