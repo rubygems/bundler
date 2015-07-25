@@ -7,7 +7,7 @@ module Bundler
         old_sources = Bundler.rubygems.sources
         Bundler.rubygems.sources = [remote_uri.to_s]
         Bundler.rubygems.fetch_all_remote_specs
-      rescue Gem::RemoteFetcher::FetchError, OpenSSL::SSL::SSLError => e
+      rescue Gem::RemoteFetcher::FetchError, OpenSSL::SSL::SSLError, Net::HTTPFatalError => e
         case e.message
         when /certificate verify failed/
           raise CertificateFailureError.new(display_uri)
