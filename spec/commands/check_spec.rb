@@ -57,7 +57,7 @@ describe "bundle check" do
       gem "rails"
     G
 
-    bundle :check
+    bundle :check, :expect_err => true
     expect(err).to include("Bundler can't satisfy your Gemfile's dependencies.")
   end
 
@@ -67,7 +67,7 @@ describe "bundle check" do
       gem "rails"
     G
 
-    bundle :check
+    bundle :check, :expect_err => true
     expect(exitstatus).to be > 0 if exitstatus
     expect(err).to include("Bundler can't satisfy your Gemfile's dependencies.")
   end
@@ -88,7 +88,7 @@ describe "bundle check" do
       gem "rails_fail"
     G
 
-    bundle :check
+    bundle :check, :expect_err => true
     expect(err).to include("Bundler can't satisfy your Gemfile's dependencies.")
   end
 
@@ -119,7 +119,7 @@ describe "bundle check" do
       gem "rack"
     G
 
-    bundle "check"
+    bundle "check", :expect_err => true
     expect(err).to include("* rack (1.0.0)")
     expect(exitstatus).to eq(1) if exitstatus
   end
@@ -187,13 +187,13 @@ describe "bundle check" do
   end
 
   it "outputs an error when the default Gemfile is not found" do
-    bundle :check
+    bundle :check, :expect_err => true
     expect(exitstatus).to eq(10) if exitstatus
     expect(err).to include("Could not locate Gemfile")
   end
 
   it "does not output fatal error message" do
-    bundle :check
+    bundle :check, :expect_err => true
     expect(exitstatus).to eq(10) if exitstatus
     expect(err).not_to include("Unfortunately, a fatal error has occurred. ")
   end
@@ -224,7 +224,7 @@ describe "bundle check" do
     bundle "install --deployment"
     FileUtils.rm(bundled_app("Gemfile.lock"))
 
-    bundle :check
+    bundle :check, :expect_err => true
     expect(exitstatus).not_to eq(0) if exitstatus
   end
 
@@ -259,7 +259,7 @@ describe "bundle check" do
         gem "rails"
       G
 
-      bundle "check --path vendor/bundle"
+      bundle "check --path vendor/bundle", :expect_err => true
       expect(exitstatus).to eq(1) if exitstatus
       expect(err).to match(/The following gems are missing/)
     end
@@ -283,7 +283,7 @@ describe "bundle check" do
 
     it "shows what is missing with the current Gemfile if it is not satisfied" do
       simulate_new_machine
-      bundle :check
+      bundle :check, :expect_err => true
       expect(err).to match(/The following gems are missing/)
       expect(err).to include("* rack (1.0")
     end
@@ -331,7 +331,6 @@ describe "bundle check" do
         lockfile lock_with(Bundler::VERSION.succ)
         bundle :check
         expect(out).to include("Bundler is older than the version that created the lockfile")
-        expect(err).to lack_errors
         lockfile_should_be lock_with(Bundler::VERSION.succ)
       end
     end

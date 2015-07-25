@@ -168,7 +168,7 @@ describe "the lockfile format" do
     L
 
     simulate_bundler_version "9999999.0.0" do
-      install_gemfile <<-G
+      install_gemfile <<-G, :expect_err => true
         source "file://#{gem_repo1}"
 
         gem "rack"
@@ -213,7 +213,7 @@ describe "the lockfile format" do
          9999999.0.0
     L
 
-    install_gemfile <<-G
+    install_gemfile <<-G, :expect_err => true
       source "file://#{gem_repo1}"
 
       gem "rack"
@@ -248,7 +248,7 @@ describe "the lockfile format" do
          9999999.0.0
     L
 
-    install_gemfile <<-G
+    install_gemfile <<-G, :expect_err => true
       source 'https://rubygems.org'
       gem 'rake'
 
@@ -361,7 +361,7 @@ describe "the lockfile format" do
   it "generates a lockfile wihout credentials for a configured source" do
     bundle "config http://localgemserver.test/ user:pass"
 
-    install_gemfile(<<-G, :artifice => "endpoint_strict_basic_authentication", :quiet => true)
+    install_gemfile(<<-G, :artifice => "endpoint_strict_basic_authentication", :quiet => true, :expect_err => true)
       source "http://localgemserver.test/"
       source "http://user:pass@othergemserver.test/"
 
@@ -1080,7 +1080,7 @@ describe "the lockfile format" do
   end
 
   it "raises if two different versions are used" do
-    install_gemfile <<-G
+    install_gemfile <<-G, :expect_err => true
       source "file://#{gem_repo1}"
       gem "rack", "1.0"
       gem "rack", "1.1"
@@ -1091,7 +1091,7 @@ describe "the lockfile format" do
   end
 
   it "raises if two different sources are used" do
-    install_gemfile <<-G
+    install_gemfile <<-G, :expect_err => true
       source "file://#{gem_repo1}"
       gem "rack"
       gem "rack", :git => "git://hubz.com"

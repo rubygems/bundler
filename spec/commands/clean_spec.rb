@@ -281,7 +281,7 @@ describe "bundle clean" do
       gem "rack", "1.0.0"
     G
 
-    bundle :clean
+    bundle :clean, :expect_err => true
 
     expect(exitstatus).to eq(1) if exitstatus
     expect(err).to include("--force")
