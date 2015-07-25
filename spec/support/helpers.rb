@@ -117,7 +117,6 @@ module Spec
       end
 
       unless expect_err
-        puts @err unless @err.empty? || !$show_err
         expect(@err).to lack_errors
         expect(@exitstatus).to eq(0) if @exitstatus
       end
