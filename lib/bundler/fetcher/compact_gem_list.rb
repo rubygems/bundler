@@ -15,6 +15,7 @@ module Bundler
         @updater = Updater.new(@fetcher)
         @cache   = Cache.new(@directory)
         @endpoints = Set.new
+        @info_checksums_by_name = {}
       end
 
       def names
@@ -24,20 +25,19 @@ module Bundler
 
       def versions
         update([[@cache.versions_path, 'versions']])
-        @cache.versions
+        versions, @info_checksums_by_name = @cache.versions
+        versions
       end
 
       def dependencies(names)
-        update(names.map do |name|
-          [@cache.dependencies_path(name), "info/#{name}"]
-        end)
+        names.each { |n| update_info(n) }
         names.map do |name|
           @cache.dependencies(name).map { |d| d.unshift(name) }
         end.flatten(1)
       end
 
       def spec(name, version, platform = nil)
-        update([[@cache.dependencies_path(name), "info/#{name}"]])
+        update_info(name)
         @cache.specific_dependency(name, version, platform)
       end
 
@@ -49,6 +49,12 @@ module Bundler
           @updater.update [[path, url(remote_path)]]
           @endpoints << remote_path
         end
+      end
+
+      def update_info(name)
+        path = @cache.dependencies_path(name)
+        return if @info_checksums_by_name[name] == @updater.checksum_for_file(path)
+        update([path, "info/#{name}"])
       end
 
       def url(path)

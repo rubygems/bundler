@@ -17,15 +17,17 @@ module Bundler
       end
 
       def versions
-        versions_by_name = {}
+        versions_by_name = Hash.new { |hash, key| hash[key] = [] }
+        info_checksums_by_name = {}
         lines(versions_path).map do |line|
           next if line == '-1'
-          name, versions_string = line.split(" ", 2)
-          versions_by_name[name] ||= versions_string.split(",").map! do |version|
+          name, versions_string, info_checksum = line.split(" ", 3)
+          info_checksums_by_name[name] = info_checksum
+          versions_by_name[name].concat(versions_string.split(",").map! do |version|
             version.split("-", 2).unshift(name)
-          end
+          end)
         end
-        versions_by_name
+        [versions_by_name, info_checksums_by_name]
       end
 
       def versions_path
