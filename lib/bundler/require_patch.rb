@@ -25,7 +25,8 @@ module Kernel
   alias_method :require, :require_with_cache
 
   def autoload_with_cache(const, path)
-    autoload_without_cache(const, Bundler.load.require_cache[path] || path)
+    STDERR.puts "WARNING: Top level autoload is not properly supported yet, #{const} was eager loaded"
+    require(path)
   end
 
   alias_method :autoload_without_cache, :autoload

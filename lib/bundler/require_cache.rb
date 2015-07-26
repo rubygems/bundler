@@ -3,7 +3,6 @@ require 'digest/md5'
 require 'tmpdir'
 require 'pathname'
 require 'bundler'
-require 'pp'
 
 module Bundler
   class RequireCache
