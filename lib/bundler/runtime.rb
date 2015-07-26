@@ -223,12 +223,12 @@ module Bundler
         end
 
         Bundler.rubygems.mark_loaded(spec)
-        register_load_paths(spec.load_paths)
+        register_load_paths(spec)
       end
     end
 
-    def register_load_paths(load_paths)
-      $LOAD_PATH.unshift(*load_paths.reject {|path| $LOAD_PATH.include?(path) })
+    def register_load_paths(spec)
+      $LOAD_PATH.unshift(*spec.load_paths.reject {|path| $LOAD_PATH.include?(path) })
     end
 
     def prune_gem_cache(resolve, cache_path)
