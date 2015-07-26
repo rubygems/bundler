@@ -162,14 +162,8 @@ module Bundler
       exit 1
     end
 
-    def sanitized_test_framework
-      test_framework = options[:test] || Bundler.settings["gem.test"]
-      
-      test_framework == "false" ? false : test_framework
-    end
-
     def ask_and_set_test_framework
-      test_framework = sanitized_test_framework
+      test_framework = options[:test] || Bundler.settings["gem.test"]
 
       if test_framework.nil?
         Bundler.ui.confirm "Do you want to generate tests with your gem?"

@@ -17,9 +17,11 @@ module Bundler
       value = (@local_config[key] || ENV[key] || @global_config[key] || DEFAULT_CONFIG[name])
 
       case
-      when !value.nil? && is_bool(name)
+      when value.nil?
+        nil
+      when is_bool(name) || value == "false" 
         to_bool(value)
-      when !value.nil? && is_num(name)
+      when is_num(name)
         value.to_i
       else
         value
