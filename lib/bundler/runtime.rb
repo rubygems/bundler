@@ -15,29 +15,7 @@ module Bundler
       setup_environment
       Bundler.rubygems.replace_entrypoints(specs)
 
-      # Activate the specs
-      specs.each do |spec|
-        unless spec.loaded_from
-          raise GemNotFound, "#{spec.full_name} is missing. Run `bundle` to get it."
-        end
-
-        if activated_spec = Bundler.rubygems.loaded_specs(spec.name) and activated_spec.version != spec.version
-          e = Gem::LoadError.new "You have already activated #{activated_spec.name} #{activated_spec.version}, " \
-                                 "but your Gemfile requires #{spec.name} #{spec.version}. Prepending " \
-                                 "`bundle exec` to your command may solve this."
-          e.name = spec.name
-          if e.respond_to?(:requirement=)
-            e.requirement = Gem::Requirement.new(spec.version.to_s)
-          else
-            e.version_requirement = Gem::Requirement.new(spec.version.to_s)
-          end
-          raise e
-        end
-
-        Bundler.rubygems.mark_loaded(spec)
-        load_paths = spec.load_paths.reject {|path| $LOAD_PATH.include?(path) }
-        $LOAD_PATH.unshift(*load_paths)
-      end
+      activate_specs(specs)
 
       setup_manpath
 
@@ -223,6 +201,35 @@ module Bundler
     end
 
   private
+
+    def activate_specs(specs)
+      # Activate the specs
+      specs.each do |spec|
+        unless spec.loaded_from
+          raise GemNotFound, "#{spec.full_name} is missing. Run `bundle` to get it."
+        end
+
+        if activated_spec = Bundler.rubygems.loaded_specs(spec.name) and activated_spec.version != spec.version
+          e = Gem::LoadError.new "You have already activated #{activated_spec.name} #{activated_spec.version}, " \
+                                 "but your Gemfile requires #{spec.name} #{spec.version}. Prepending " \
+                                 "`bundle exec` to your command may solve this."
+          e.name = spec.name
+          if e.respond_to?(:requirement=)
+            e.requirement = Gem::Requirement.new(spec.version.to_s)
+          else
+            e.version_requirement = Gem::Requirement.new(spec.version.to_s)
+          end
+          raise e
+        end
+
+        Bundler.rubygems.mark_loaded(spec)
+        register_load_paths(spec.load_paths)
+      end
+    end
+
+    def register_load_paths(load_paths)
+      $LOAD_PATH.unshift(*load_paths.reject {|path| $LOAD_PATH.include?(path) })
+    end
 
     def prune_gem_cache(resolve, cache_path)
       cached  = Dir["#{cache_path}/*.gem"]
