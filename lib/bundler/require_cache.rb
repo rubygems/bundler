@@ -20,6 +20,12 @@ module Bundler
     SYSTEM_EXTENSIONS = /#{Regexp.union(DL_EXTENSIONS)}\z/
     QUALIFIED_NAME = /\.(rb|so|o|bundle|dylib)\z/
 
+    CACHE_EXTENSIONS = [RUBY_EXTENSION, NORMALIZED_SYSTEM_EXTENSION]
+    LOAD_PATH_EXTENSIONS = [RUBY_EXTENSION, *DL_EXTENSIONS]
+
+    RUBY_FILES = "**/*#{RUBY_EXTENSION}"
+    DL_FILES = "**/*{#{DL_EXTENSIONS.join(',')}}"
+
     attr_reader :load_paths
 
     def initialize(load_paths)
@@ -35,7 +41,7 @@ module Bundler
     private
 
       def lookup_load_path(path)
-        possible_names = compute_possible_names(path, [RUBY_EXTENSION, *DL_EXTENSIONS])
+        possible_names = compute_possible_names(path, LOAD_PATH_EXTENSIONS)
 
         dynamic_load_path.each do |load_path|
           possible_names.each do |name|
@@ -47,7 +53,7 @@ module Bundler
       end
 
       def lookup_cache(path)
-        possible_names = compute_possible_names(path, [RUBY_EXTENSION, NORMALIZED_SYSTEM_EXTENSION])
+        possible_names = compute_possible_names(path, CACHE_EXTENSIONS)
         possible_names.each do |name|
           absolute_path = @cache[name]
           return absolute_path if absolute_path
@@ -81,17 +87,16 @@ module Bundler
 
       def build
         cache = {}
-        each_file_in_load_paths(RUBY_EXTENSION) do |relative_path, absolute_path|
+        each_file_in_load_paths(RUBY_FILES) do |relative_path, absolute_path|
           cache[relative_path] ||= absolute_path
         end
-        each_file_in_load_paths(*DL_EXTENSIONS) do |relative_path, absolute_path|
+        each_file_in_load_paths(DL_FILES) do |relative_path, absolute_path|
           cache[normalize_system_extension_path(relative_path)] ||= absolute_path
         end
         cache
       end
 
-      def each_file_in_load_paths(*extensions, &block)
-        pattern = "**/*{#{extensions.join(',')}}"
+      def each_file_in_load_paths(pattern, &block)
         load_paths.each do |load_path|
           Dir["#{load_path}/#{pattern}"].each do |absolute_path|
             relative_path = relativise_path(absolute_path, load_path)

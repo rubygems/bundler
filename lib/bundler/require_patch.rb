@@ -1,6 +1,6 @@
 class Module
   def autoload_with_cache(const, path)
-    autoload_without_cache(const, Bundler.load.cache[path] || path)
+    autoload_without_cache(const, Bundler.load.require_cache[path] || path)
   end
 
   alias_method :autoload_without_cache, :autoload
@@ -9,7 +9,7 @@ end
 
 class << Kernel
   def require_with_cache(path)
-    require_without_cache(Bundler.load.cache[path] || path)
+    require_without_cache(Bundler.load.require_cache[path] || path)
   end
 
   alias_method :require_without_cache, :require
@@ -18,14 +18,14 @@ end
 
 module Kernel
   def require_with_cache(path)
-    require_without_cache(Bundler.load.cache[path] || path)
+    require_without_cache(Bundler.load.require_cache[path] || path)
   end
 
   alias_method :require_without_cache, :require
   alias_method :require, :require_with_cache
 
   def autoload_with_cache(const, path)
-    autoload_without_cache(const, Bundler.load.cache[path] || path)
+    autoload_without_cache(const, Bundler.load.require_cache[path] || path)
   end
 
   alias_method :autoload_without_cache, :autoload

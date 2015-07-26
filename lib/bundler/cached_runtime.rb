@@ -14,8 +14,8 @@ module Bundler
       self
     end
 
-    def cache
-      @cache ||= RequireCache.new(@load_paths)
+    def require_cache
+      @require_cache ||= RequireCache.new(@load_paths)
     end
 
     private
@@ -23,7 +23,7 @@ module Bundler
         super if self.class.blacklist.include?(spec.name)
         @load_paths ||= []
         @load_paths += spec.load_paths
-        @cache = nil
+        @require_cache = nil
       end
   end
 end
