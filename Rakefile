@@ -238,6 +238,9 @@ begin
     task :travis do
       rg = ENV["RGV"] || raise("Rubygems version is required on Travis!")
 
+      puts "\n\e[1;33m[Travis CI] Running bundler linter\e[m\n\n"
+      rubocop = RUBY_VERSION < "1.9.3" || safe_task { Rake::Task["rubocop"].invoke }
+
       puts "\n\e[1;33m[Travis CI] Running bundler specs against rubygems #{rg}\e[m\n\n"
       specs = safe_task { Rake::Task["spec:rubygems:#{rg}"].invoke }
 
@@ -253,10 +256,7 @@ begin
       puts "\n\e[1;33m[Travis CI] Running bundler real world specs against rubygems #{rg}\e[m\n\n"
       realworld = safe_task { Rake::Task["spec:rubygems:#{rg}:realworld"].invoke }
 
-      puts "\n\e[1;33m[Travis CI] Running bundler linter\e[m\n\n"
-      rubocop = RUBY_VERSION < "1.9.3" || safe_task { Rake::Task["rubocop"].invoke }
-
-      { "specs" => specs, "sudo" => sudos, "realworld" => realworld, "rubocop" => rubocop }.each do |name, passed|
+      { "rubocop" => rubocop, "specs" => specs, "sudo" => sudos, "realworld" => realworld }.each do |name, passed|
         if passed
           puts "\e[0;32m[Travis CI] #{name} passed\e[m"
         else
