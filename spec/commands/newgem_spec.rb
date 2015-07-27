@@ -246,7 +246,7 @@ describe "bundle gem" do
 
       it "depends on a specific version of rspec", :rubygems => ">= 1.8.1" do
         remove_push_guard(gem_name)
-        rspec_dep = generated_gem.gemspec.development_dependencies.find{|d| d.name == "rspec" }
+        rspec_dep = generated_gem.gemspec.development_dependencies.find {|d| d.name == "rspec" }
         expect(rspec_dep).to be_specific
       end
 
@@ -297,7 +297,7 @@ describe "bundle gem" do
 
       it "depends on a specific version of minitest", :rubygems => ">= 1.8.1" do
         remove_push_guard(gem_name)
-        rspec_dep = generated_gem.gemspec.development_dependencies.find{|d| d.name == "minitest" }
+        rspec_dep = generated_gem.gemspec.development_dependencies.find {|d| d.name == "minitest" }
         expect(rspec_dep).to be_specific
       end
 
