@@ -3,8 +3,8 @@ require "pathname"
 module Bundler
   class CLI::Gem
     TEST_FRAMEWORK_VERSIONS = {
-      'rspec' => '3.0',
-      'minitest' => '5.0'
+      "rspec" => "3.0",
+      "minitest" => "5.0"
     }
 
     attr_reader :options, :gem_name, :thor, :name, :target
