@@ -17,10 +17,12 @@ module Bundler
             depth = 2
             tree.each do |req|
               t << "  " * depth << req.to_s
-              if spec = conflict.activated_by_name[req.name]
-                t << %(, resolved to #{spec.version},)
+              unless tree.last == req
+                if spec = conflict.activated_by_name[req.name]
+                  t << %(, resolved to #{spec.version},)
+                end
+                t << %( depends on)
               end
-              t << %( depends on) unless tree.last == req
               t << %(\n)
               depth += 1
             end
@@ -177,7 +179,7 @@ module Bundler
       @resolver = Molinillo::Resolver.new(self, self)
       @search_for = {}
       @base_dg = Molinillo::DependencyGraph.new
-      @base.each {|ls| @base_dg.add_root_vertex ls.name, Dependency.new(ls.name, ls.version) }
+      @base.each {|ls| @base_dg.add_vertex(ls.name, Dependency.new(ls.name, ls.version), true) }
     end
 
     def start(requirements)
