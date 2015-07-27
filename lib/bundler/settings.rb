@@ -19,7 +19,7 @@ module Bundler
       case
       when value.nil?
         nil
-      when is_bool(name) || value == "false" 
+      when is_bool(name) || value == "false"
         to_bool(value)
       when is_num(name)
         value.to_i
