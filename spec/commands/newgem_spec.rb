@@ -16,15 +16,20 @@ describe "bundle gem" do
   end
 
   before do
-    @git_name = `git config --global user.name`.chomp
-    `git config --global user.name "Bundler User"`
-    @git_email = `git config --global user.email`.chomp
-    `git config --global user.email user@example.com`
+    git_config_content = <<-EOF
+    [user]
+      name = "Bundler User"
+      email = user@example.com
+    EOF
+    @git_config_location = ENV["GIT_CONFIG"]
+    path = "#{File.expand_path("../../tmp", File.dirname(__FILE__))}/test_git_config.txt"
+    File.open(path, "w") {|f| f.write(git_config_content) }
+    ENV["GIT_CONFIG"] = path
   end
 
   after do
-    `git config --global user.name "#{@git_name}"`
-    `git config --global user.email "#{@git_email}"`
+    `rm "#{ENV["GIT_CONFIG"]}"` if File.exist?(ENV["GIT_CONFIG"])
+    ENV["GIT_CONFIG"] = @git_config_location
   end
 
   shared_examples_for "git config is present" do
@@ -156,8 +161,8 @@ describe "bundle gem" do
 
     context "git config user.{name,email} is not set" do
       before do
-        `git config --global --unset user.name`
-        `git config --global --unset user.email`
+        `git config --unset user.name`
+        `git config --unset user.email`
         reset!
         in_app_root
         bundle "gem #{gem_name}"
@@ -406,8 +411,8 @@ describe "bundle gem" do
 
     context "git config user.{name,email} is not set" do
       before do
-        `git config --global --unset user.name`
-        `git config --global --unset user.email`
+        `git config --unset user.name`
+        `git config --unset user.email`
         reset!
         in_app_root
         bundle "gem #{gem_name}"
