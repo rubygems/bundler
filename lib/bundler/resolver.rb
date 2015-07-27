@@ -17,6 +17,9 @@ module Bundler
             depth = 2
             tree.each do |req|
               t << "  " * depth << req.to_s
+              if spec = conflict.activated_by_name[req.name]
+                t << %(, resolved to #{spec.version},)
+              end
               t << %( depends on) unless tree.last == req
               t << %(\n)
               depth += 1
