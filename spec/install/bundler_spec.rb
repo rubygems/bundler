@@ -98,10 +98,10 @@ describe "bundle install" do
         Resolving dependencies...
         Bundler could not find compatible versions for gem "activesupport":
           In Gemfile:
-            activemerchant, resolved to 1.0, depends on
+            activemerchant was resolved to 1.0, which depends on
               activesupport (>= 2.0.0)
 
-            rails_fail, resolved to 1.0, depends on
+            rails_fail was resolved to 1.0, which depends on
               activesupport (= 1.2.3)
       E
       expect(out).to eq(nice_error)
@@ -119,7 +119,7 @@ describe "bundle install" do
         Resolving dependencies...
         Bundler could not find compatible versions for gem "activesupport":
           In Gemfile:
-            rails_fail, resolved to 1.0, depends on
+            rails_fail was resolved to 1.0, which depends on
               activesupport (= 1.2.3)
 
             activesupport (= 2.3.5)

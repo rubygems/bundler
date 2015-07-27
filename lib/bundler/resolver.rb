@@ -19,7 +19,7 @@ module Bundler
               t << "  " * depth << req.to_s
               unless tree.last == req
                 if spec = conflict.activated_by_name[req.name]
-                  t << %(, resolved to #{spec.version},)
+                  t << %( was resolved to #{spec.version}, which)
                 end
                 t << %( depends on)
               end
