@@ -28,7 +28,7 @@ describe "bundle gem" do
   end
 
   after do
-    `rm "#{ENV['GIT_CONFIG']}"` if File.exist?(ENV["GIT_CONFIG"])
+    `rm "#{ENV["GIT_CONFIG"]}"` if File.exist?(ENV["GIT_CONFIG"])
     ENV["GIT_CONFIG"] = @git_config_location
   end
 
