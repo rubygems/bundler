@@ -52,7 +52,7 @@ module Bundler
       desc "Create tag #{version_tag} and build and push #{name}-#{version}.gem to Rubygems\n" \
            "To prevent publishing in Rubygems use `gem_push=no rake release`"
       task "release", [:remote] => ["build", "release:guard_clean",
-                         "release:source_control_push", "release:rubygem_push"] do
+                                    "release:source_control_push", "release:rubygem_push"] do
       end
 
       task "release:guard_clean" do
