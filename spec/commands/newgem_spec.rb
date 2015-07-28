@@ -244,6 +244,12 @@ describe "bundle gem" do
         expect(bundled_app("test_gem/spec/spec_helper.rb")).to exist
       end
 
+      it "depends on a specific version of rspec", :rubygems => ">= 1.8.1" do
+        remove_push_guard(gem_name)
+        rspec_dep = generated_gem.gemspec.development_dependencies.find {|d| d.name == "rspec" }
+        expect(rspec_dep).to be_specific
+      end
+
       it "requires 'test-gem'" do
         expect(bundled_app("test_gem/spec/spec_helper.rb").read).to include("require 'test_gem'")
       end
@@ -287,6 +293,12 @@ describe "bundle gem" do
         reset!
         in_app_root
         bundle "gem #{gem_name} --test=minitest"
+      end
+
+      it "depends on a specific version of minitest", :rubygems => ">= 1.8.1" do
+        remove_push_guard(gem_name)
+        rspec_dep = generated_gem.gemspec.development_dependencies.find {|d| d.name == "minitest" }
+        expect(rspec_dep).to be_specific
       end
 
       it "builds spec skeleton" do

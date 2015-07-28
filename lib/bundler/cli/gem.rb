@@ -2,6 +2,11 @@ require "pathname"
 
 module Bundler
   class CLI::Gem
+    TEST_FRAMEWORK_VERSIONS = {
+      "rspec" => "3.0",
+      "minitest" => "5.0"
+    }
+
     attr_reader :options, :gem_name, :thor, :name, :target
 
     def initialize(options, gem_name, thor)
@@ -63,6 +68,8 @@ module Bundler
 
       if test_framework = ask_and_set_test_framework
         config[:test] = test_framework
+        config[:test_framework_version] = TEST_FRAMEWORK_VERSIONS[test_framework]
+
         templates.merge!(".travis.yml.tt" => ".travis.yml")
 
         case test_framework
