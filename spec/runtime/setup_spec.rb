@@ -630,7 +630,7 @@ describe "Bundler.setup" do
       build_gem("requirepaths") do |s|
         s.write("lib/rq.rb", "puts 'yay'")
         s.write("src/rq.rb", "puts 'nooo'")
-        s.require_paths = ["lib", "src"]
+        s.require_paths = %w(lib src)
       end
     end
 

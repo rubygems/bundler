@@ -156,14 +156,14 @@ begin
     end
 
     desc "Run the real-world spec suite (requires internet)"
-    task :realworld => ["set_realworld", "spec"]
+    task :realworld => %w(set_realworld spec)
 
     task :set_realworld do
       ENV["BUNDLER_REALWORLD_TESTS"] = "1"
     end
 
     desc "Run the spec suite with the sudo tests"
-    task :sudo => ["set_sudo", "spec", "clean_sudo"]
+    task :sudo => %w(set_sudo spec clean_sudo)
 
     task :set_sudo do
       ENV["BUNDLER_SUDO_TESTS"] = "1"
