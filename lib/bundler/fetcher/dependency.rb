@@ -1,4 +1,5 @@
 require "bundler/fetcher/base"
+require "cgi"
 
 module Bundler
   class Fetcher
@@ -67,7 +68,7 @@ module Bundler
 
       def dependency_api_uri(gem_names = [])
         uri = fetch_uri + "api/v1/dependencies"
-        uri.query = "gems=#{URI.encode(gem_names.join(","))}" if gem_names.any?
+        uri.query = "gems=#{CGI.escape(gem_names.join(","))}" if gem_names.any?
         uri
       end
 
