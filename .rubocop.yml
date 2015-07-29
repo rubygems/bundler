@@ -21,6 +21,9 @@ Lint/EndAlignment:
 Style/AccessModifierIndentation:
   EnforcedStyle: outdent
 
+Style/AlignParameters:
+  EnforcedStyle: with_fixed_indentation
+
 Style/MultilineOperationIndentation:
   EnforcedStyle: indented
 

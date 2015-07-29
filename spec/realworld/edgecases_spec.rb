@@ -12,7 +12,7 @@ describe "real world edgecases", :realworld => true do
 
   # https://github.com/bundler/bundler/issues/1202
   it "bundle cache works with rubygems 1.3.7 and pre gems",
-      :ruby => "~> 1.8.7", :rubygems => "~> 1.3.7" do
+    :ruby => "~> 1.8.7", :rubygems => "~> 1.3.7" do
     install_gemfile <<-G
       source :rubygems
       gem "rack",          "1.3.0.beta2"

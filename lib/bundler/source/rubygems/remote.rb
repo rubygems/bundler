@@ -3,7 +3,7 @@ module Bundler
     class Rubygems
       class Remote
         attr_reader :uri,
-                    :anonymized_uri
+          :anonymized_uri
 
         def initialize(uri)
           uri = Bundler.settings.mirror_for(uri)

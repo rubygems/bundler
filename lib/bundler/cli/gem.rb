@@ -88,9 +88,9 @@ module Bundler
       end
 
       if ask_and_set(:mit, "Do you want to license your code permissively under the MIT license?",
-          "This means that any other developer or company will be legally allowed to use your code " \
-          "for free as long as they admit you created it. You can read more about the MIT license " \
-          "at choosealicense.com/licenses/mit."
+        "This means that any other developer or company will be legally allowed to use your code " \
+        "for free as long as they admit you created it. You can read more about the MIT license " \
+        "at choosealicense.com/licenses/mit."
         )
         config[:mit] = true
         Bundler.ui.info "MIT License enabled in config"
@@ -98,11 +98,11 @@ module Bundler
       end
 
       if ask_and_set(:coc, "Do you want to include a code of conduct in gems you generate?",
-          "Codes of conduct can increase contributions to your project by contributors who " \
-          "prefer collaborative, safe spaces. You can read more about the code of conduct at " \
-          "contributor-covenant.org. Having a code of conduct means agreeing to the responsibility " \
-          "of enforcing it, so be sure that you are prepared to do that. For suggestions about " \
-          "how to enforce codes of conduct, see bit.ly/coc-enforcement."
+        "Codes of conduct can increase contributions to your project by contributors who " \
+        "prefer collaborative, safe spaces. You can read more about the code of conduct at " \
+        "contributor-covenant.org. Having a code of conduct means agreeing to the responsibility " \
+        "of enforcing it, so be sure that you are prepared to do that. For suggestions about " \
+        "how to enforce codes of conduct, see bit.ly/coc-enforcement."
         )
         config[:coc] = true
         Bundler.ui.info "Code of conduct enabled in config"
