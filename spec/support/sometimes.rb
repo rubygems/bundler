@@ -2,12 +2,14 @@ module Sometimes
   def run_with_retries(example_to_run, retries)
     example = RSpec.current_example
     example.metadata[:retries] ||= retries
+
     retries.times do |t|
       example.metadata[:retried] = t + 1
       example.instance_variable_set(:@exception, nil)
       example_to_run.run
       break unless example.exception
     end
+
     if e = example.exception
       new_exception = e.exception(e.message + "[Retried #{retries} times]")
       new_exception.set_backtrace e.backtrace
@@ -27,12 +29,12 @@ RSpec.configure do |config|
   end
 
   config.after(:suite) do
-    formatter =
-    message = lambda {|color, text|
+    message = Proc.new do |color, text|
       colored = RSpec::Core::Formatters::ConsoleCodes.wrap(text, color)
       notification = RSpec::Core::Notifications::MessageNotification.new(colored)
       RSpec.configuration.formatters.first.message(notification)
-    }
+    end
+
     retried_examples = RSpec.world.example_groups.map do |g|
       g.descendants.map do |d|
         d.filtered_examples.select do |e|
@@ -40,13 +42,13 @@ RSpec.configure do |config|
         end
       end
     end.flatten
+
     message.call(retried_examples.empty? ? :green : :yellow, "\n\nRetried examples: #{retried_examples.count}")
-    unless retried_examples.empty?
-      retried_examples.each do |e|
-        message.call(:cyan, "  #{e.full_description}")
-        path = RSpec::Core::Metadata.relative_path(e.location)
-        message.call(:cyan, "  [#{e.metadata[:retried]}/#{e.metadata[:retries]}] " + path)
-      end
+
+    retried_examples.each do |e|
+      message.call(:cyan, "  #{e.full_description}")
+      path = RSpec::Core::Metadata.relative_path(e.location)
+      message.call(:cyan, "  [#{e.metadata[:retried]}/#{e.metadata[:retries]}] " + path)
     end
   end
 end
