@@ -141,11 +141,11 @@ module Bundler
           if Bundler::WINDOWS
             # Windows quoting requires double quotes only, with double quotes
             # inside the string escaped by being doubled.
-            '"' + remote.gsub('"') {|s| '""'} + '"'
+            '"' + remote.gsub('"') { '""' } + '"'
           else
             # Bash requires single quoted strings, with the single quotes escaped
             # by ending the string, escaping the quote, and restarting the string.
-            "'" + remote.gsub("'") {|s| "'\\''"} + "'"
+            "'" + remote.gsub("'") { "'\\''" } + "'"
           end
         end
 
