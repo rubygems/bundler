@@ -39,7 +39,7 @@ describe "Bundler.require" do
 
     gemfile <<-G
       path "#{lib_path}"
-      gem "one", :group => :bar, :require => %w(baz qux)
+      gem "one", :group => :bar, :require => %w[baz qux]
       gem "two"
       gem "three", :group => :not
       gem "four", :require => false

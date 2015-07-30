@@ -10,7 +10,7 @@ describe Bundler::Fetcher do
 
   describe "#user_agent" do
     it "builds user_agent with current ruby version and Bundler settings" do
-      allow(Bundler.settings).to receive(:all).and_return(%w(foo bar))
+      allow(Bundler.settings).to receive(:all).and_return(%w[foo bar])
       expect(fetcher.user_agent).to match(/bundler\/(\d.)/)
       expect(fetcher.user_agent).to match(/rubygems\/(\d.)/)
       expect(fetcher.user_agent).to match(/ruby\/(\d.)/)
