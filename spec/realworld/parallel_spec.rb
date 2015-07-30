@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe "parallel", :realworld => true do
+describe "parallel", :realworld => true, :sometimes => true do
   it "installs" do
     gemfile <<-G
       source "https://rubygems.org"
