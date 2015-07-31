@@ -54,7 +54,7 @@ module Bundler
       def update_info(name)
         path = @cache.dependencies_path(name)
         return if @info_checksums_by_name[name] == @updater.checksum_for_file(path)
-        update([path, "info/#{name}"])
+        update([[path, "info/#{name}"]])
       end
 
       def url(path)
