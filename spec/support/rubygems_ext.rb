@@ -13,20 +13,27 @@ module Spec
       unless File.exist?("#{Path.base_system_gems}")
         FileUtils.mkdir_p(Path.base_system_gems)
         puts "installing gems for the tests to use..."
-        `gem install fakeweb artifice --no-rdoc --no-ri`
-        `gem install sinatra --version 1.2.7 --no-rdoc --no-ri`
-        # Rake version has to be consistent for tests to pass
-        `gem install rake --version 10.0.2 --no-rdoc --no-ri`
-        # 3.0.0 breaks 1.9.2 specs
-        `gem install builder --version 2.1.2 --no-rdoc --no-ri`
-        `gem install rack --no-rdoc --no-ri`
+        %w[fakeweb artifice rack].each {|n| install_gem(n) }
+        {
+          "sinatra" => "1.2.7",
+          # Rake version has to be consistent for tests to pass
+          "rake" => "10.0.2",
+          # 3.0.0 breaks 1.9.2 specs
+          "builder" => "2.1.2"
+        }.each {|n, v| install_gem(n, v) }
         # ruby-graphviz is used by the viz tests
-        `gem install ruby-graphviz --no-rdoc --no-ri` if RUBY_VERSION >= "1.9.3"
+        install_gem("ruby-graphviz") if RUBY_VERSION >= "1.9.3"
       end
 
       ENV["HOME"] = Path.home.to_s
 
       Gem::DefaultUserInteraction.ui = Gem::SilentUI.new
+    end
+
+    def self.install_gem(name, version = nil)
+      cmd = "gem install #{name} --no-rdoc --no-ri"
+      cmd << " --version #{version}" if version
+      system(cmd) || raise("Installing gem #{name} for the tests to use failed!")
     end
 
     def gem_command(command, args = "", options = {})
@@ -37,5 +44,6 @@ module Spec
       lib  = File.join(File.dirname(__FILE__), "..", "..", "lib")
       %x{#{Gem.ruby} -I#{lib} -rubygems -S gem --backtrace #{command} #{args}}.strip
     end
+
   end
 end
