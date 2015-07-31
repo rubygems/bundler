@@ -23,6 +23,7 @@ module Spec
         }.each {|n, v| install_gem(n, v) }
         # ruby-graphviz is used by the viz tests
         install_gem("ruby-graphviz") if RUBY_VERSION >= "1.9.3"
+        `gem install compact_index --no-rdoc --no-ri`
       end
 
       ENV["HOME"] = Path.home.to_s
