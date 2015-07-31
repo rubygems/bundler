@@ -95,7 +95,6 @@ module Bundler
       Bundler.settings.without    = options[:without]
       Bundler.settings.with       = options[:with]
       Bundler::Fetcher.disable_endpoint = options["full-index"]
-      Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? "1" : nil
       Bundler.settings[:disable_shared_gems] = path ? "1" : nil
 
       # rubygems plugins sometimes hook into the gem install process
