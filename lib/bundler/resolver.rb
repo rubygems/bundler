@@ -4,7 +4,7 @@ module Bundler
 
     class Molinillo::VersionConflict
       def message
-        conflicts.reduce("") do |o, (name, conflict)|
+        conflicts.sort.reduce("") do |o, (name, conflict)|
           o << %(Bundler could not find compatible versions for gem "#{name}":\n)
           if conflict.locked_requirement
             o << %(  In snapshot (#{Bundler.default_lockfile.basename}):\n)
