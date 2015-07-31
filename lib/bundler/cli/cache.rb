@@ -9,6 +9,7 @@ module Bundler
       Bundler.definition.validate_ruby!
       Bundler.definition.resolve_with_cache!
       setup_cache_all
+      Bundler.settings[:no_copy_paths] = options["no-copy-paths"] if options.key?("no-copy-paths")
       Bundler.settings[:cache_all_platforms] = options["all-platforms"] if options.key?("all-platforms")
       Bundler.load.cache
       Bundler.settings[:no_prune] = true if options["no-prune"]

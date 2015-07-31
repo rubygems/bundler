@@ -135,5 +135,16 @@ require "spec_helper"
       bundle "#{cmd} --no-all"
       expect(bundled_app("vendor/cache/baz-1.0")).not_to exist
     end
+
+    it "does not copy path when no-copy-paths option is set" do
+      build_lib "foo"
+
+      install_gemfile <<-G
+        gem "foo", :path => '#{lib_path("foo-1.0")}'
+      G
+
+      bundle "#{cmd} --no-copy-paths --all"
+      expect(bundled_app("vendor/cache/foo-1.0")).to_not exist
+    end
   end
 end

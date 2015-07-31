@@ -239,6 +239,7 @@ module Bundler
     method_option "all",  :type => :boolean, :banner => "Include all sources (including path and git)."
     method_option "all-platforms", :type => :boolean, :banner => "Include gems for all platforms, not just the current one"
     method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
+    method_option "no-copy-paths", :type => :boolean, :banner => "Do not include paths when caching gems using --all"
     def cache
       require "bundler/cli/cache"
       Cache.new(options).run
@@ -255,6 +256,7 @@ module Bundler
     method_option "path", :type => :string, :banner =>
       "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
     method_option "quiet", :type => :boolean, :banner => "Only output warnings and errors."
+    method_option "no-copy-paths", :type => :boolean, :banner => "Do not include paths when caching gems using --all"
     long_desc <<-D
       The package command will copy the .gem files for every gem in the bundle into the
       directory ./vendor/cache. If you then check that directory into your source

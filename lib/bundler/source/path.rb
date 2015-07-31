@@ -76,7 +76,7 @@ module Bundler
 
       def cache(spec, custom_path = nil)
         app_cache_path = app_cache_path(custom_path)
-        return unless Bundler.settings[:cache_all]
+        return if !Bundler.settings[:cache_all] || Bundler.settings[:no_copy_paths]
         return if expand(@original_path).to_s.index(Bundler.root.to_s + '/') == 0
 
         unless @original_path.exist?
