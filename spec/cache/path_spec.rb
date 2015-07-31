@@ -29,6 +29,24 @@ require "spec_helper"
       should_be_installed "foo 1.0"
     end
 
+    it "copies when the path is outside the bundle and the paths intersect" do
+      libname = File.basename(Dir.pwd) + '_gem'
+      libpath = File.join(File.dirname(Dir.pwd), libname)
+
+      build_lib libname, :path => libpath
+
+      install_gemfile <<-G
+        gem "#{libname}", :path => '#{libpath}'
+      G
+
+      bundle "#{cmd} --all"
+      expect(bundled_app("vendor/cache/#{libname}")).to exist
+      expect(bundled_app("vendor/cache/#{libname}/.bundlecache")).to be_file
+
+      FileUtils.rm_rf libpath
+      should_be_installed "#{libname} 1.0"
+    end
+
     it "updates the path on each cache" do
       build_lib "foo"
 
