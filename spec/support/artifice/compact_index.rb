@@ -1,19 +1,9 @@
-require File.expand_path("../../path.rb", __FILE__)
-require File.expand_path("../../../../lib/bundler/deprecate", __FILE__)
-include Spec::Path
+require File.expand_path("../endpoint", __FILE__)
 
-# Set up pretend http gem server with FakeWeb
-$LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/artifice*/lib")].first}"
-$LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/rack-*/lib")].first}"
-$LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/rack-*/lib")].last}"
-$LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/tilt*/lib")].first}"
-$LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/sinatra*/lib")].first}"
 $LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/compact_index*/lib")].first}"
-require "artifice"
 require "compact_index"
-require "sinatra/base"
 
-class CompactIndexAPI < Sinatra::Base
+class CompactIndexAPI < Endpoint
   helpers do
     def load_spec(name, version, platform, gem_repo)
       full_name = "#{name}-#{version}"
@@ -86,28 +76,8 @@ class CompactIndexAPI < Sinatra::Base
   get "/info/:name" do
     etag_response do
       specs = gems.select { |s| s[:name] == params[:name] }
-      CompactIndex.info(specs).tap { |i| puts i }
+      CompactIndex.info(specs)
     end
-  end
-
-  get "/quick/Marshal.4.8/:id" do
-    redirect "/fetch/actual/gem/#{params[:id]}"
-  end
-
-  get "/fetch/actual/gem/:id" do
-    File.read("#{gem_repo1}/quick/Marshal.4.8/#{params[:id]}")
-  end
-
-  get "/gems/:id" do
-    File.read("#{gem_repo1}/gems/#{params[:id]}")
-  end
-
-  get "/specs.4.8.gz" do
-    File.read("#{gem_repo1}/specs.4.8.gz")
-  end
-
-  get "/prerelease_specs.4.8.gz" do
-    File.read("#{gem_repo1}/prerelease_specs.4.8.gz")
   end
 end
 
