@@ -22,7 +22,7 @@ module Bundler
         lines(versions_path).map do |line|
           next if line == '-1'
           name, versions_string, info_checksum = line.split(" ", 3)
-          info_checksums_by_name[name] = info_checksum
+          info_checksums_by_name[name] = info_checksum || ""
           versions_by_name[name].concat(versions_string.split(",").map! do |version|
             version.split("-", 2).unshift(name)
           end)
