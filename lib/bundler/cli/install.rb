@@ -78,7 +78,6 @@ module Bundler
       Bundler.settings[:no_install] = true if options["no-install"]
       Bundler.settings[:clean] = options["clean"] if options["clean"]
       Bundler::Fetcher.disable_endpoint = options["full-index"]
-      Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? "1" : nil
       Bundler.settings[:disable_shared_gems] = path ? "1" : nil
 
       # rubygems plugins sometimes hook into the gem install process
