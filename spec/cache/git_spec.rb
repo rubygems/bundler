@@ -31,7 +31,7 @@ end
       should_be_installed "foo 1.0"
     end
 
-    it "copies repository to vendor cache and uses it even when installed with bundle --path" do
+    it "copies repository to vendor cache and uses it even when path configured" do
       git = build_git "foo"
       ref = git.ref_for("master", 11)
 
