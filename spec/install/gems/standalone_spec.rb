@@ -45,6 +45,21 @@ describe "bundle install --standalone" do
     end
   end
 
+  describe "with gems with native extension" do
+    before do
+      install_gemfile <<-G, :standalone => true
+        source "file://#{gem_repo1}"
+        gem "very_simple_binary"
+      G
+    end
+
+    it "generates a bundle/bundler/setup.rb with the proper paths" do
+      extension_line = File.read(bundled_app("bundle/bundler/setup.rb")).each_line.find {|line| line.include? "/extensions/" }.strip
+      expect(extension_line).to start_with '$:.unshift "#{path}/../#{ruby_engine}/#{ruby_version}/extensions/'
+      expect(extension_line).to end_with '/very_simple_binary-1.0"'
+    end
+  end
+
   describe "with a combination of gems and git repos" do
     before do
       build_git "devise", "1.0"
