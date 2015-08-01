@@ -377,18 +377,17 @@ describe "Bundler.setup" do
     end
 
     it "works even when the cache directory has been deleted" do
-      with_bundle_path_as("vendor/bundle") do
-        bundle :install
-      end
+      config "BUNDLE_PATH" => "vendor/bundle"
+      bundle :install
+
       FileUtils.rm_rf vendored_gems("cache")
 
       should_be_installed "rack 1.0.0"
     end
 
     it "does not randomly change the path when path is configured and the bundle directory becomes read only" do
-      with_bundle_path_as("vendor/bundle") do
-        bundle :install
-      end
+      config "BUNDLE_PATH" => "vendor/bundle"
+      bundle :install
 
       with_read_only("**/*") do
         should_be_installed "rack 1.0.0"

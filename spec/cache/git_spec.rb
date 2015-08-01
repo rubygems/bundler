@@ -39,7 +39,8 @@ end
         gem "foo", :git => '#{lib_path("foo-1.0")}'
       G
 
-      bundle "install --path vendor/bundle"
+      config "BUNDLE_PATH" => "vendor/bundle"
+      bundle :install
       bundle "#{cmd} --all"
 
       expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist

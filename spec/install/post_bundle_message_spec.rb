@@ -54,9 +54,8 @@ describe "post bundle message" do
 
     describe "with configured path and" do
       it "without any options" do
-        with_bundle_path_as('vendor') do
-          bundle :install
-        end
+        config "BUNDLE_PATH" => "vendor"
+        bundle :install
 
         expect(out).to include(bundle_deployment_message)
         expect(out).to_not include("Gems in the group")

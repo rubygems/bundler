@@ -251,7 +251,8 @@ describe "bundle install with gem sources" do
       end
 
       it "works" do
-        bundle "install --path vendor"
+        config "BUNDLE_PATH" => "vendor"
+        bundle :install
         should_be_installed "rack 1.0"
       end
 

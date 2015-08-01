@@ -234,7 +234,8 @@ describe "bundle check" do
         source "file://#{gem_repo1}"
         gem "rails"
       G
-      bundle "install --path vendor/bundle"
+      config "BUNDLE_PATH" => "vendor/bundle"
+      bundle :install
 
       FileUtils.rm_rf(bundled_app(".bundle"))
     end
