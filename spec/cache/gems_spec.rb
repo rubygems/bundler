@@ -116,6 +116,16 @@ describe "bundle cache" do
       bundle "install --local"
       should_be_installed("builtin_gem_2 1.0.2")
     end
+
+    it "errors if the builtin gem isn't available to cache" do
+      install_gemfile <<-G
+        gem 'builtin_gem', '1.0.2'
+      G
+
+      bundle :cache
+      expect(exitstatus).to_not eq(0) if exitstatus
+      expect(out).to include("builtin_gem-1.0.2 is built in to Ruby, and can't be cached")
+    end
   end
 
   describe "when there are also git sources" do
