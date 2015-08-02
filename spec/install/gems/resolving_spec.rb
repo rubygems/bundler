@@ -96,7 +96,8 @@ describe "bundle install with gem sources" do
             bundle :install, :env => { "DEBUG_RESOLVER_TREE" => "1" }
           end
 
-          expect(resolve_output).to include(" net_b (>= 0) ruby")
+          expect(resolve_output).to include(" net_b")
+          expect(resolve_output).to include(" net_build_extensions (1.0)")
         end
       end
     end

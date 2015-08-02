@@ -29,13 +29,16 @@ module Bundler
     end
 
     def to_s
-      "#{name} (#{requirement}) #{__platform}"
+      s = name.dup
+      s << " (#{requirement})" unless requirement == Gem::Requirement.default
+      s << " #{__platform}" unless __platform == Gem::Platform::RUBY
+      s
     end
 
   private
 
-    def method_missing(*args)
-      @dep.send(*args)
+    def method_missing(*args, &blk)
+      @dep.send(*args, &blk)
     end
   end
 end

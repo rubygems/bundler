@@ -1,51 +1,40 @@
-require "set"
-
-# This is the latest iteration of the gem dependency resolving algorithm. As of now,
-# it can resolve (as a success or failure) any set of gem dependencies we throw at it
-# in a reasonable amount of time. The most iterations I've seen it take is about 150.
-# The actual implementation of the algorithm is not as good as it could be yet, but that
-# can come later.
-
 module Bundler
   class Resolver
     require "bundler/vendored_molinillo"
 
     class Molinillo::VersionConflict
-      def clean_req(req)
-        if req.to_s.include?(">= 0")
-          req.to_s.gsub(/ \(.*?\)$/, "")
-        else
-          req.to_s.gsub(/\, (runtime|development)\)$/, ")")
-        end
-      end
-
       def message
-        conflicts.values.flatten.reduce("") do |o, conflict|
-          o << %(Bundler could not find compatible versions for gem "#{conflict.requirement.name}":\n)
+        conflicts.sort.reduce("") do |o, (name, conflict)|
+          o << %(Bundler could not find compatible versions for gem "#{name}":\n)
           if conflict.locked_requirement
             o << %(  In snapshot (#{Bundler.default_lockfile.basename}):\n)
-            o << %(    #{clean_req conflict.locked_requirement}\n)
+            o << %(    #{DepProxy.new(conflict.locked_requirement, Gem::Platform::RUBY)}\n)
             o << %(\n)
           end
           o << %(  In Gemfile:\n)
-          o << conflict.requirement_trees.map do |tree|
+          o << conflict.requirement_trees.sort_by {|t| t.reverse.map(&:name) }.map do |tree|
             t = ""
             depth = 2
             tree.each do |req|
-              t << "  " * depth << %(#{clean_req req})
-              t << %( depends on) unless tree[-1] == req
+              t << "  " * depth << req.to_s
+              unless tree.last == req
+                if spec = conflict.activated_by_name[req.name]
+                  t << %( was resolved to #{spec.version}, which)
+                end
+                t << %( depends on)
+              end
               t << %(\n)
               depth += 1
             end
             t
           end.join("\n")
 
-          if conflict.requirement.name == "bundler"
+          if name == "bundler"
             o << %(\n  Current Bundler version:\n    bundler (#{Bundler::VERSION}))
             other_bundler_required = !conflict.requirement.requirement.satisfied_by?(Gem::Version.new Bundler::VERSION)
           end
 
-          if conflict.requirement.name == "bundler" && other_bundler_required
+          if name == "bundler" && other_bundler_required
             o << "\n"
             o << "This Gemfile requires a different version of Bundler.\n"
             o << "Perhaps you need to update Bundler by running `gem install bundler`?\n"
@@ -55,11 +44,12 @@ module Bundler
             o << %(Running `bundle update` will rebuild your snapshot from scratch, using only\n)
             o << %(the gems in your Gemfile, which may resolve the conflict.\n)
           elsif !conflict.existing
+            o << "\n"
             if conflict.requirement_trees.first.size > 1
-              o << "Could not find gem '#{clean_req(conflict.requirement)}', which is required by "
-              o << "gem '#{clean_req(conflict.requirement_trees.first[-2])}', in any of the sources."
+              o << "Could not find gem '#{conflict.requirement}', which is required by "
+              o << "gem '#{conflict.requirement_trees.first[-2]}', in any of the sources."
             else
-              o << "Could not find gem '#{clean_req(conflict.requirement)} in any of the sources\n"
+              o << "Could not find gem '#{conflict.requirement}' in any of the sources\n"
             end
           end
           o
@@ -189,7 +179,7 @@ module Bundler
       @resolver = Molinillo::Resolver.new(self, self)
       @search_for = {}
       @base_dg = Molinillo::DependencyGraph.new
-      @base.each {|ls| @base_dg.add_root_vertex ls.name, Dependency.new(ls.name, ls.version) }
+      @base.each {|ls| @base_dg.add_vertex(ls.name, Dependency.new(ls.name, ls.version), true) }
     end
 
     def start(requirements)

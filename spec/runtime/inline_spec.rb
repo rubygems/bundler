@@ -69,7 +69,7 @@ describe "bundler/inline#gemfile" do
       puts "success"
     RUBY
 
-    expect(err).to include "Could not find gem 'eleven (>= 0) ruby'"
+    expect(err).to include "Could not find gem 'eleven'"
     expect(out).not_to include "success"
 
     script <<-RUBY

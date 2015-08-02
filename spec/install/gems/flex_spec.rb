@@ -200,11 +200,11 @@ describe "bundle flex_install" do
             rack (= 0.9.1)
 
           In Gemfile:
-            rack_middleware (>= 0) ruby depends on
-              rack (= 0.9.1) ruby
+            rack-obama (= 2.0) was resolved to 2.0, which depends on
+              rack (= 1.2)
 
-            rack-obama (= 2.0) ruby depends on
-              rack (= 1.2) ruby
+            rack_middleware was resolved to 1.0, which depends on
+              rack (= 0.9.1)
 
         Running `bundle update` will rebuild your snapshot from scratch, using only
         the gems in your Gemfile, which may resolve the conflict.
@@ -277,43 +277,42 @@ describe "bundle flex_install" do
     end
   end
 
-  # This was written to test github issue #636, but it passed.
-  # It's insanoly slow (3.36s) so I'm not going to run it
-  # describe "when a locked child dependency conflicts" do
-  #   before(:each) do
-  #     build_repo2 do
-  #       build_gem "capybara", "0.3.9" do |s|
-  #         s.add_dependency "rack", ">= 1.0.0"
-  #       end
-  #
-  #       build_gem "rack", "1.1.0"
-  #       build_gem "rails", "3.0.0.rc4" do |s|
-  #         s.add_dependency "rack", "~> 1.1.0"
-  #       end
-  #
-  #       build_gem "rack", "1.2.1"
-  #       build_gem "rails", "3.0.0" do |s|
-  #         s.add_dependency "rack", "~> 1.2.1"
-  #       end
-  #     end
-  #   end
-  #
-  #   it "prints the correct error message" do
-  #     # install Rails 3.0.0.rc
-  #     install_gemfile <<-G
-  #       source "file://#{gem_repo2}"
-  #       gem "rails", "3.0.0.rc4"
-  #       gem "capybara", "0.3.9"
-  #     G
-  #
-  #     # upgrade Rails to 3.0.0 and then install again
-  #     install_gemfile <<-G
-  #       source "file://#{gem_repo2}"
-  #       gem "rails", "3.0.0"
-  #       gem "capybara", "0.3.9"
-  #     G
-  #
-  #     out.should match(/Gemfile.lock/)
-  #   end
-  # end
+  # This was written to test github issue #636
+  describe "when a locked child dependency conflicts" do
+    before(:each) do
+      build_repo2 do
+        build_gem "capybara", "0.3.9" do |s|
+          s.add_dependency "rack", ">= 1.0.0"
+        end
+
+        build_gem "rack", "1.1.0"
+        build_gem "rails", "3.0.0.rc4" do |s|
+          s.add_dependency "rack", "~> 1.1.0"
+        end
+
+        build_gem "rack", "1.2.1"
+        build_gem "rails", "3.0.0" do |s|
+          s.add_dependency "rack", "~> 1.2.1"
+        end
+      end
+    end
+
+    it "prints the correct error message" do
+      # install Rails 3.0.0.rc
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "rails", "3.0.0.rc4"
+        gem "capybara", "0.3.9"
+      G
+
+      # upgrade Rails to 3.0.0 and then install again
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "rails", "3.0.0"
+        gem "capybara", "0.3.9"
+      G
+
+      expect(out).to include("Gemfile.lock")
+    end
+  end
 end
