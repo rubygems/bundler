@@ -57,7 +57,7 @@ describe Bundler::RemoteSpecification do
     context "comparing another Bundler::RemoteSpecification" do
       let(:other) do
         Bundler::RemoteSpecification.new(other_name, other_version,
-                                         other_platform, nil)
+          other_platform, nil)
       end
 
       it_should_behave_like "a comparison"
