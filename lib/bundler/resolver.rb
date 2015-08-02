@@ -8,7 +8,7 @@ module Bundler
           o << %(Bundler could not find compatible versions for gem "#{name}":\n)
           if conflict.locked_requirement
             o << %(  In snapshot (#{Bundler.default_lockfile.basename}):\n)
-            o << %(    #{conflict.locked_requirement}\n)
+            o << %(    #{DepProxy.new(conflict.locked_requirement, Gem::Platform::RUBY)}\n)
             o << %(\n)
           end
           o << %(  In Gemfile:\n)
