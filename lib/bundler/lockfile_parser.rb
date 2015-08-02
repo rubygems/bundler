@@ -92,7 +92,8 @@ module Bundler
       case line
       when GIT, GEM, PATH
         @current_source = nil
-        @opts, @type = {}, line
+        @opts = {}
+        @type = line
       when SPECS
         case @type
         when PATH
@@ -137,7 +138,9 @@ module Bundler
 
     def parse_dependency(line)
       if line =~ NAME_VERSION_2
-        name, version, pinned = $1, $2, $4
+        name = $1
+        version = $2
+        pinned = $4
         version = version.split(",").map(&:strip) if version
 
         dep = Bundler::Dependency.new(name, version)
@@ -162,7 +165,8 @@ module Bundler
 
     def parse_spec(line)
       if line =~ NAME_VERSION_4
-        name, version = $1, Gem::Version.new($2)
+        name = $1
+        version = Gem::Version.new($2)
         platform = $3 ? Gem::Platform.new($3) : Gem::Platform::RUBY
         @current_spec = LazySpecification.new(name, version, platform)
         @current_spec.source = @current_source
@@ -171,7 +175,8 @@ module Bundler
         # duplicate GIT sections)
         @specs[@current_spec.identifier] ||= @current_spec
       elsif line =~ NAME_VERSION_6
-        name, version = $1, $2
+        name = $1
+        version = $2
         version = version.split(",").map(&:strip) if version
         dep = Gem::Dependency.new(name, version)
         @current_spec.dependencies << dep
