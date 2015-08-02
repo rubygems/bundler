@@ -135,15 +135,8 @@ module Bundler
     # Always returns an absolute path to the bundle directory
     # TODO: Document and refactor this method
     def path
-      key  = key_for(:path)
-      path = ENV[key] || @global_config[key]
       set_path = ""
       install_path = ""
-
-      if path && !@local_config.key?(key)
-        path = "#{path}/#{Bundler.ruby_scope}" if path != Bundler.rubygems.gem_dir
-        set_path = path
-      end
 
       if path = self[:path]
         path = "#{path}/#{Bundler.ruby_scope}" if path != Bundler.rubygems.gem_dir
