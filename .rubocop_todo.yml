@@ -394,9 +394,3 @@ Style/WhileUntilDo:
 # Configuration parameters: MaxLineLength.
 Style/WhileUntilModifier:
   Enabled: false
-
-# Offense count: 9
-# Cop supports --auto-correct.
-# Configuration parameters: WordRegex.
-Style/WordArray:
-  MinSize: 3

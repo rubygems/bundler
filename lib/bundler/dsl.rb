@@ -290,7 +290,7 @@ module Bundler
         opts["git"] = @git_sources[git_name].call(opts[git_name])
       end
 
-      ["git", "path"].each do |type|
+      %w[git path].each do |type|
         if param = opts[type]
           if version.first && version.first =~ /^\s*=?\s*(\d[^\s]*)\s*$/
             options = opts.merge("name" => name, "version" => $1)

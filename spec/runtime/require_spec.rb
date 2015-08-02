@@ -39,7 +39,7 @@ describe "Bundler.require" do
 
     gemfile <<-G
       path "#{lib_path}"
-      gem "one", :group => :bar, :require => %w(baz qux)
+      gem "one", :group => :bar, :require => %w[baz qux]
       gem "two"
       gem "three", :group => :not
       gem "four", :require => false
@@ -73,7 +73,7 @@ describe "Bundler.require" do
 
     # required in resolver order instead of gemfile order
     run("Bundler.require(:not)")
-    expect(out.split("\n").sort).to eq(["seven", "three"])
+    expect(out.split("\n").sort).to eq(%w(seven three))
 
     # test require: true
     run "Bundler.require(:require_true)"
