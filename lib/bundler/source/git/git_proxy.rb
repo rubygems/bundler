@@ -68,12 +68,12 @@ module Bundler
             return if has_revision_cached?
             Bundler.ui.confirm "Updating #{uri}"
             in_path do
-              git_retry %|fetch --force --quiet --tags #{uri_escaped} "refs/heads/*:refs/heads/*"|
+              git_retry %|fetch --force --quiet --tags #{uri_escaped_with_configured_credentials} "refs/heads/*:refs/heads/*"|
             end
           else
             Bundler.ui.info "Fetching #{uri}"
             FileUtils.mkdir_p(path.dirname)
-            git_retry %|clone #{uri_escaped} "#{path}" --bare --no-hardlinks --quiet|
+            git_retry %|clone #{uri_escaped_with_configured_credentials} "#{path}" --bare --no-hardlinks --quiet|
           end
         end
 
@@ -136,15 +136,28 @@ module Bundler
         end
 
         # Escape the URI for git commands
-        def uri_escaped
+        def uri_escaped_with_configured_credentials
+          remote = configured_uri_for(uri)
           if Bundler::WINDOWS
             # Windows quoting requires double quotes only, with double quotes
             # inside the string escaped by being doubled.
-            '"' + uri.gsub('"') { '""' } + '"'
+            '"' + remote.gsub('"') { '""' } + '"'
           else
             # Bash requires single quoted strings, with the single quotes escaped
             # by ending the string, escaping the quote, and restarting the string.
-            "'" + uri.gsub("'") { "'\\''" } + "'"
+            "'" + remote.gsub("'") { "'\\''" } + "'"
+          end
+        end
+
+        # Adds credentials to the URI as Fetcher#configured_uri_for does
+        def configured_uri_for(uri)
+          if /https?:/ =~ uri
+            remote = URI(uri)
+            config_auth = Bundler.settings[remote.to_s] || Bundler.settings[remote.host]
+            remote.userinfo ||= config_auth
+            remote.to_s
+          else
+            uri
           end
         end
 
