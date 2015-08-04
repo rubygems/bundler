@@ -66,6 +66,8 @@ module Bundler
         else
           puts File.read("#{root}/#{command}.txt")
         end
+      elsif command_path = Bundler.which("bundler-#{cli}")
+        Kernel.exec(command_path, "--help")
       else
         super
       end
