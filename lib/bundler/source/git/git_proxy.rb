@@ -66,7 +66,7 @@ module Bundler
         def checkout
           if path.exist?
             return if has_revision_cached?
-            Bundler.ui.confirm "Updating #{uri}"
+            Bundler.ui.info "Fetching #{uri}"
             in_path do
               git_retry %|fetch --force --quiet --tags #{uri_escaped_with_configured_credentials} "refs/heads/*:refs/heads/*"|
             end
