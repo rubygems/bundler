@@ -186,11 +186,6 @@ Style/GuardClause:
 Style/IfUnlessModifier:
   Enabled: false
 
-# Offense count: 3
-# Cop supports --auto-correct.
-Style/IndentArray:
-  Enabled: false
-
 # Offense count: 2
 Style/ModuleFunction:
   Enabled: false

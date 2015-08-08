@@ -48,15 +48,15 @@ module Bundler
       end
 
       manpages = %w(
-          bundle
-          bundle-config
-          bundle-exec
-          bundle-gem
-          bundle-install
-          bundle-package
-          bundle-update
-          bundle-platform
-          gemfile.5)
+        bundle
+        bundle-config
+        bundle-exec
+        bundle-gem
+        bundle-install
+        bundle-package
+        bundle-update
+        bundle-platform
+        gemfile.5)
 
       if manpages.include?(command)
         root = File.expand_path("../man", __FILE__)
