@@ -289,12 +289,6 @@ Style/OneLineConditional:
 Style/OpMethod:
   Enabled: false
 
-# Offense count: 3
-# Cop supports --auto-correct.
-# Configuration parameters: AllowSafeAssignment.
-Style/ParenthesesAroundCondition:
-  Enabled: false
-
 # Offense count: 63
 # Cop supports --auto-correct.
 # Configuration parameters: PreferredDelimiters.
