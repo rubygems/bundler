@@ -36,4 +36,17 @@ describe "bundle help" do
     bundle "help check"
     expect(out).to include("Check searches the local machine")
   end
+
+  it "looks for a binary and executes it with --help option if it's named bundler-<task>" do
+    File.open(tmp("bundler-testtasks"), "w", 0755) do |f|
+      f.puts "#!/usr/bin/env ruby\nputs ARGV.join(' ')\n"
+    end
+
+    with_path_as(tmp) do
+      bundle "help testtasks"
+    end
+
+    expect(exitstatus).to be_zero if exitstatus
+    expect(out).to eq("--help")
+  end
 end
