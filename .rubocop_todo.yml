@@ -165,11 +165,6 @@ Style/EmptyLiteral:
 Style/FileName:
   Enabled: false
 
-# Offense count: 3
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/For:
-  Enabled: false
-
 # Offense count: 4
 # Configuration parameters: AllowedVariables.
 Style/GlobalVars:

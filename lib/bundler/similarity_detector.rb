@@ -38,13 +38,13 @@ module Bundler
       fill = [0] * (this.length - 1)
 
       # Initialize first column values
-      for i in 1..that.length
+      (1..that.length).each do |i|
         dm[i] = [i * del, fill.flatten]
       end
 
       # populate matrix
-      for i in 1..that.length
-        for j in 1..this.length
+      (1..that.length).each do |i|
+        (1..this.length).each do |j|
           # critical comparison
           dm[i][j] = [
             dm[i - 1][j - 1] + (this[j - 1] == that[i - 1] ? 0 : sub),
