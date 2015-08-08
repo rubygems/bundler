@@ -33,7 +33,7 @@ describe Bundler::Dsl do
       end
 
       it "converts numeric :gist to :git" do
-        subject.gem("not-really-a-gem", :gist => 2859988)
+        subject.gem("not-really-a-gem", :gist => 2_859_988)
         github_uri = "https://gist.github.com/2859988.git"
         expect(subject.dependencies.first.source.uri).to eq(github_uri)
       end

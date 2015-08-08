@@ -276,11 +276,6 @@ Style/Next:
 Style/Not:
   Enabled: false
 
-# Offense count: 3
-# Cop supports --auto-correct.
-Style/NumericLiterals:
-  MinDigits: 8
-
 # Offense count: 63
 # Cop supports --auto-correct.
 # Configuration parameters: PreferredDelimiters.
