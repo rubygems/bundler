@@ -411,24 +411,24 @@ module Bundler
 
   private
 
-      # Automatically invoke `bundle install` and resume if
-      # Bundler.settings[:auto_install] exists. This is set through config cmd
-      # `bundle config auto_install 1`.
-      #
-      # Note that this method `nil`s out the global Definition object, so it
-      # should be called first, before you instantiate anything like an
-      # `Installer` that'll keep a reference to the old one instead.
-      def auto_install
-        return unless Bundler.settings[:auto_install]
+    # Automatically invoke `bundle install` and resume if
+    # Bundler.settings[:auto_install] exists. This is set through config cmd
+    # `bundle config auto_install 1`.
+    #
+    # Note that this method `nil`s out the global Definition object, so it
+    # should be called first, before you instantiate anything like an
+    # `Installer` that'll keep a reference to the old one instead.
+    def auto_install
+      return unless Bundler.settings[:auto_install]
 
-        begin
-          Bundler.definition.specs
-        rescue GemNotFound
-          Bundler.ui.info "Automatically installing missing gems."
-          Bundler.reset!
-          invoke :install, []
-          Bundler.reset!
-        end
+      begin
+        Bundler.definition.specs
+      rescue GemNotFound
+        Bundler.ui.info "Automatically installing missing gems."
+        Bundler.reset!
+        invoke :install, []
+        Bundler.reset!
       end
+    end
   end
 end
