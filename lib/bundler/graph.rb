@@ -95,7 +95,7 @@ module Bundler
       # method borrow from rubygems/dependency.rb
       # redefinition of matching_specs will also redefine to_spec and to_specs
       Gem::Dependency.class_eval do
-        def matching_specs platform_only = false
+        def matching_specs(platform_only = false)
           matches = Bundler.load.specs.select { |spec|
             self.name == spec.name and
               requirement.satisfied_by? spec.version

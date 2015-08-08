@@ -223,12 +223,6 @@ Style/LineEndConcatenation:
 Style/MethodCallParentheses:
   Enabled: false
 
-# Offense count: 3
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/MethodDefParentheses:
-  Enabled: false
-
 # Offense count: 2
 Style/ModuleFunction:
   Enabled: false
