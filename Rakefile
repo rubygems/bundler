@@ -27,63 +27,6 @@ module Rake
   end
 end
 
-def clean_files(files, regex, replacement = "")
-  files.each do |file|
-    contents = File.read(file)
-    contents.gsub!(regex, replacement)
-    File.open(file, "w") {|f| f << contents }
-  end
-end
-
-namespace :molinillo do
-  task :namespace do
-    files = Dir.glob("lib/bundler/vendor/molinillo*/**/*.rb")
-    clean_files(files, "Molinillo", "Bundler::Molinillo")
-    clean_files(files, /require (["'])molinillo/, 'require \1bundler/vendor/molinillo/lib/molinillo')
-  end
-
-  task :clean do
-    files = Dir.glob("lib/bundler/vendor/molinillo*/*", File::FNM_DOTMATCH).reject {|f| %(. .. lib).include? f.split("/").last }
-    rm_r files
-  end
-
-  task :update, [:tag] => [] do |_, args|
-    tag = args[:tag]
-    Dir.chdir "lib/bundler/vendor" do
-      rm_rf "molinillo"
-      sh "curl -L https://github.com/CocoaPods/molinillo/archive/#{tag}.tar.gz | tar -xz"
-      sh "mv Molinillo-* molinillo"
-    end
-    Rake::Task["molinillo:namespace"].invoke
-    Rake::Task["molinillo:clean"].invoke
-  end
-end
-
-namespace :thor do
-  task :namespace do
-    files = Dir.glob("lib/bundler/vendor/thor*/**/*.rb")
-    clean_files(files, "Thor", "Bundler::Thor")
-    clean_files(files, /require (["'])thor/, 'require \1bundler/vendor/thor/lib/thor')
-    clean_files(files, /(autoload\s+[:\w]+,\s+["'])(thor[\w\/]+["'])/, '\1bundler/vendor/thor/lib/\2')
-  end
-
-  task :clean do
-    files = Dir.glob("lib/bundler/vendor/thor*/*", File::FNM_DOTMATCH).reject {|f| %(. .. lib).include? f.split("/").last }
-    rm_r files
-  end
-
-  task :update, [:tag] => [] do |_, args|
-    tag = args[:tag]
-    Dir.chdir "lib/bundler/vendor" do
-      rm_rf "thor"
-      sh "curl -L https://github.com/erikhuda/thor/archive/#{tag}.tar.gz | tar -xz"
-      sh "mv thor-* thor"
-    end
-    Rake::Task["thor:namespace"].invoke
-    Rake::Task["thor:clean"].invoke
-  end
-end
-
 namespace :spec do
   desc "Ensure spec dependencies are installed"
   task :deps do
@@ -327,6 +270,29 @@ rescue LoadError
   namespace :man do
     task(:require) { abort "Install the ronn gem to be able to release!" }
     task(:build) { warn "Install the ronn gem to build the help pages" }
+  end
+end
+
+begin
+  require "automatiek"
+
+  Automatiek::RakeTask.new("molinillo") do |lib|
+    lib.download = { :github => "https://github.com/CocoaPods/Molinillo" }
+    lib.namespace = "Molinillo"
+    lib.prefix = "Bundler"
+    lib.vendor_lib = "lib/bundler/vendor/molinillo"
+  end
+
+  Automatiek::RakeTask.new("thor") do |lib|
+    lib.download = { :github => "https://github.com/erikhuda/thor" }
+    lib.namespace = "Thor"
+    lib.prefix = "Bundler"
+    lib.vendor_lib = "lib/bundler/vendor/thor"
+  end
+rescue LoadError
+  namespace :vendor do
+    task(:molinillo) { abort "Install the automatiek gem to be able to vendor gems." }
+    task(:thor) { abort "Install the automatiek gem to be able to vendor gems." }
   end
 end
 
