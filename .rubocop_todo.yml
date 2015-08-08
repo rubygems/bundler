@@ -123,12 +123,6 @@ Style/ColonMethodCall:
 Style/CommandLiteral:
   Enabled: false
 
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: Keywords.
-Style/CommentAnnotation:
-  Enabled: false
-
 # Offense count: 153
 Style/Documentation:
   Enabled: false

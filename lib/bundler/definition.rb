@@ -643,7 +643,7 @@ module Bundler
     def pinned_spec_names(specs)
       names = []
       specs.each do |s|
-        # TODO when two sources without blocks is an error, we can change
+        # TODO: when two sources without blocks is an error, we can change
         # this check to !s.source.is_a?(Source::LocalRubygems). For now,
         # we need to ask every Rubygems for every gem name.
         if s.source.is_a?(Source::Git) || s.source.is_a?(Source::Path)
