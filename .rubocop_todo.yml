@@ -129,11 +129,6 @@ Style/CommandLiteral:
 Style/CommentAnnotation:
   Enabled: false
 
-# Offense count: 3
-# Cop supports --auto-correct.
-Style/DeprecatedHashMethods:
-  Enabled: false
-
 # Offense count: 153
 Style/Documentation:
   Enabled: false

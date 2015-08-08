@@ -261,7 +261,7 @@ module Bundler
       with_original_env do
         ENV["MANPATH"] = ENV["BUNDLE_ORIG_MANPATH"]
         ENV.delete_if {|k, _| k[0, 7] == "BUNDLE_" }
-        if ENV.has_key? "RUBYOPT"
+        if ENV.key? "RUBYOPT"
           ENV["RUBYOPT"] = ENV["RUBYOPT"].sub "-rbundler/setup", ""
           ENV["RUBYOPT"] = ENV["RUBYOPT"].sub "-I#{File.expand_path("..", __FILE__)}", ""
         end

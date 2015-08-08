@@ -280,7 +280,7 @@ module Bundler
       end
 
       # Save sources passed in a key
-      if opts.has_key?("source")
+      if opts.key?("source")
         source = normalize_source(opts["source"])
         opts["source"] = @sources.add_rubygems_source("remotes" => source)
       end
