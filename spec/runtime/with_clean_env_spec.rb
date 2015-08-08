@@ -27,8 +27,8 @@ describe "Bundler.with_env helpers" do
       gemfile ""
       bundle "install --path vendor/bundle"
 
-      code = "Bundler.with_clean_env do;" +
-             "  print ENV['GEM_PATH'] != '';" +
+      code = "Bundler.with_clean_env do;" \
+             "  print ENV['GEM_PATH'] != '';" \
              "end"
 
       result = bundle "exec ruby -e #{code.inspect}"
