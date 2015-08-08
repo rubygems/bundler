@@ -253,10 +253,6 @@ Style/MultilineIfThen:
 Style/MultilineOperationIndentation:
   Enabled: false
 
-# Offense count: 4
-Style/MultilineTernaryOperator:
-  Enabled: false
-
 # Offense count: 10
 # Configuration parameters: EnforcedStyle, MinBodyLength, SupportedStyles.
 Style/Next:

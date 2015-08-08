@@ -222,9 +222,11 @@ module Bundler
     end
 
     def app_config_path
-      ENV["BUNDLE_APP_CONFIG"] ?
-        Pathname.new(ENV["BUNDLE_APP_CONFIG"]).expand_path(root) :
+      if ENV["BUNDLE_APP_CONFIG"]
+        Pathname.new(ENV["BUNDLE_APP_CONFIG"]).expand_path(root)
+      else
         root.join(".bundle")
+      end
     end
 
     def app_cache(custom_path = nil)
