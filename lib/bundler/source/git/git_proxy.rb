@@ -122,7 +122,7 @@ module Bundler
 
         def git(command, check_errors = true)
           raise GitNotAllowedError.new(command) unless allow?
-          out = SharedHelpers.with_clean_git_env { %x{git #{command}} }
+          out = SharedHelpers.with_clean_git_env { `git #{command}` }
           raise GitCommandError.new(command, path) if check_errors && !$?.success?
           out
         end
