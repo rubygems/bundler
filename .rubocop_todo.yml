@@ -242,11 +242,6 @@ Style/MultilineBlockChain:
 Style/MultilineBlockLayout:
   Enabled: false
 
-# Offense count: 2
-# Cop supports --auto-correct.
-Style/MultilineIfThen:
-  Enabled: false
-
 # Offense count: 13
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles.
