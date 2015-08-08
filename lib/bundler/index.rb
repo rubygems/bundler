@@ -16,7 +16,7 @@ module Bundler
     def initialize
       @sources = []
       @cache = {}
-      @specs = Hash.new {|h, k| h[k] = Hash.new }
+      @specs = Hash.new {|h, k| h[k] = {} }
       @all_specs = Hash.new {|h, k| h[k] = [] }
     end
 
@@ -24,7 +24,7 @@ module Bundler
       super
       @sources = @sources.dup
       @cache = {}
-      @specs = Hash.new {|h, k| h[k] = Hash.new }
+      @specs = Hash.new {|h, k| h[k] = {} }
       @all_specs = Hash.new {|h, k| h[k] = [] }
 
       o.specs.each do |name, hash|
