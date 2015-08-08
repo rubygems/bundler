@@ -134,7 +134,6 @@ describe "bundle install" do
       G
 
       simulate_bundler_version "10.0.0"
-      #simulate_new_machine
 
       bundle "check"
       expect(out).to include("The Gemfile's dependencies are satisfied")

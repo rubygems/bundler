@@ -105,7 +105,6 @@ describe "Running bin/* commands" do
     bundle "install --binstubs \"\""
 
     expect(bundled_app("bin/rackup")).not_to exist
-    #expect(bundled_app("rackup")).not_to exist
 
     bundle "config bin"
     expect(out).to include("You have not configured a value for `bin`")
