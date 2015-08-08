@@ -345,7 +345,7 @@ module Bundler
             api_fetchers.each do |f|
               Bundler.ui.info "Fetching gem metadata from #{f.uri}", Bundler.ui.debug?
               idx.use f.specs(dependency_names, self)
-              Bundler.ui.info "" if !Bundler.ui.debug? # new line now that the dots are over
+              Bundler.ui.info "" unless Bundler.ui.debug? # new line now that the dots are over
             end
 
             # Suppose the gem Foo depends on the gem Bar.  Foo exists in Source A.  Bar has some versions that exist in both
@@ -358,7 +358,7 @@ module Bundler
               api_fetchers.each do |f|
                 Bundler.ui.info "Fetching version metadata from #{f.uri}", Bundler.ui.debug?
                 idx.use f.specs(idx.dependency_names, self), true
-                Bundler.ui.info "" if !Bundler.ui.debug? # new line now that the dots are over
+                Bundler.ui.info "" unless Bundler.ui.debug? # new line now that the dots are over
               end
               break if idxcount == idx.size
             end
@@ -373,7 +373,7 @@ module Bundler
               api_fetchers.each do |f|
                 Bundler.ui.info "Fetching dependency metadata from #{f.uri}", Bundler.ui.debug?
                 idx.use f.specs(unmet, self)
-                Bundler.ui.info "" if !Bundler.ui.debug? # new line now that the dots are over
+                Bundler.ui.info "" unless Bundler.ui.debug? # new line now that the dots are over
               end if unmet.any?
             else
               allow_api = false

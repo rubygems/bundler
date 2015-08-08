@@ -23,7 +23,7 @@ module Bundler
           spec = Bundler::CLI::Common.select_spec(gem_name, :regex_match)
           return unless spec
           path = spec.full_gem_path
-          if !File.directory?(path)
+          unless File.directory?(path)
             Bundler.ui.warn "The gem #{gem_name} has been deleted. It was installed at:"
           end
         end

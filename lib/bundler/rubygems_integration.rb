@@ -625,7 +625,7 @@ module Bundler
         require "rubygems/ext"
 
         Gem::Ext::Builder.class_eval do
-          if !const_defined?(:CHDIR_MONITOR)
+          unless const_defined?(:CHDIR_MONITOR)
             const_set(:CHDIR_MONITOR, EXT_LOCK)
           end
 
