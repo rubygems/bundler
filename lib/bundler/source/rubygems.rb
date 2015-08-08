@@ -132,7 +132,8 @@ module Bundler
 
           installed_spec = nil
           Bundler.rubygems.preserve_paths do
-            installed_spec = Bundler::GemInstaller.new(path,
+            installed_spec = Bundler::GemInstaller.new(
+              path,
               :install_dir         => install_path.to_s,
               :bin_dir             => bin_path.to_s,
               :ignore_dependencies => true,

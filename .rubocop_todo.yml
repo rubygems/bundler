@@ -107,11 +107,6 @@ Style/ClassAndModuleChildren:
 Style/ClassCheck:
   Enabled: false
 
-# Offense count: 3
-# Cop supports --auto-correct.
-Style/ClosingParenthesisIndentation:
-  Enabled: false
-
 # Offense count: 153
 Style/Documentation:
   Enabled: false
