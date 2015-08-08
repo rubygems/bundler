@@ -371,9 +371,3 @@ Style/UnneededPercentQ:
 # Cop supports --auto-correct.
 Style/WhileUntilDo:
   Enabled: false
-
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: MaxLineLength.
-Style/WhileUntilModifier:
-  Enabled: false
