@@ -204,11 +204,6 @@ Style/IndentationWidth:
   Enabled: false
 
 # Offense count: 2
-# Cop supports --auto-correct.
-Style/InfiniteLoop:
-  Enabled: false
-
-# Offense count: 2
 Style/ModuleFunction:
   Enabled: false
 
