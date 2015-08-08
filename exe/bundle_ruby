@@ -30,13 +30,13 @@ module Bundler
         " and Bundler cannot continue."
     end
 
-    def source(source, options = {})
+    def source(_source, _options = {})
     end
 
-    def gem(name, *args)
+    def gem(_name, *_args)
     end
 
-    def group(*args, &blk)
+    def group(*_args, &_block)
     end
   end
 end

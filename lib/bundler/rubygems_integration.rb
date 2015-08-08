@@ -168,7 +168,7 @@ module Bundler
       EXT_LOCK
     end
 
-    def fetch_specs(all, pre, &blk)
+    def fetch_specs(all, pre, &_block)
       specs = Gem::SpecFetcher.new.list(all, pre)
       specs.each { yield } if block_given?
       specs
@@ -223,12 +223,12 @@ module Bundler
       end
     end
 
-    def build(spec, skip_validation = false)
+    def build(spec, _skip_validation = false)
       require "rubygems/builder"
       Gem::Builder.new(spec).build
     end
 
-    def build_gem(gem_dir, spec)
+    def build_gem(_gem_dir, spec)
       build(spec)
     end
 
@@ -463,7 +463,7 @@ module Bundler
         Gem.source_index.find_name(name)
       end
 
-      def validate(spec)
+      def validate(_spec)
         # These versions of RubyGems always validate in "packaging" mode,
         # which is too strict for the kinds of checks we care about. As a
         # result, validation is disabled on versions of RubyGems below 1.7.

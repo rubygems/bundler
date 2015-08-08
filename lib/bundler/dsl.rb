@@ -166,7 +166,7 @@ module Bundler
       Definition.new(lockfile, @dependencies, @sources, unlock, @ruby_version, @optional_groups)
     end
 
-    def group(*args, &blk)
+    def group(*args, &_block)
       opts = Hash === args.last ? args.pop.dup : {}
       normalize_group_options(opts, args)
 
@@ -204,7 +204,7 @@ module Bundler
       @env = old
     end
 
-    def method_missing(name, *args)
+    def method_missing(name, *_args)
       raise GemfileError, "Undefined local variable or method `#{name}' for Gemfile"
     end
 

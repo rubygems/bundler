@@ -68,7 +68,7 @@ module Bundler
         File.basename(expanded_path.to_s)
       end
 
-      def install(spec, force = false)
+      def install(spec, _force = false)
         Bundler.ui.info "Using #{version_message(spec)} from #{self}"
         generate_bin(spec, :disable_extensions)
         nil # no post-install message

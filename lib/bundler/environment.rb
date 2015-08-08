@@ -34,7 +34,7 @@ module Bundler
       @definition.lock(Bundler.default_lockfile, opts[:preserve_bundled_with])
     end
 
-    def update(*gems)
+    def update(*_gems)
       # Nothing
     end
   end

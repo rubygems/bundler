@@ -6,7 +6,7 @@ require "benchmark"
 RUBYGEMS_REPO = File.expand_path("tmp/rubygems")
 BUNDLER_SPEC = Gem::Specification.load("bundler.gemspec")
 
-def safe_task(&block)
+def safe_task(&_block)
   yield
   true
 rescue
