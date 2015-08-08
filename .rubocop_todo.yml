@@ -262,10 +262,6 @@ Style/MultilineTernaryOperator:
 Style/NegatedIf:
   Enabled: false
 
-# Offense count: 1
-Style/NestedTernaryOperator:
-  Enabled: false
-
 # Offense count: 10
 # Configuration parameters: EnforcedStyle, MinBodyLength, SupportedStyles.
 Style/Next:
