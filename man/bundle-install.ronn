@@ -123,7 +123,8 @@ update process below under [CONSERVATIVE UPDATING][].
   runtime. A space separated list of groups to install has to be specified.
   Bundler creates a directory named `bundle` and installs the bundle there. It
   also generates a `bundle/bundler/setup.rb` file to replace Bundler's own setup
-  in the manner required.
+  in the manner required. This will change your path and path is a 
+  [remembered option][REMEMBERED OPTIONS].
 
 * `--trust-policy=[<policy>]`:
   Apply the Rubygems security policy <policy>, where policy is one of
