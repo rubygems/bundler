@@ -38,12 +38,10 @@ module Spec
     end
 
     def should_conflict_on(names)
-      begin
-        got = resolve
-        flunk "The resolve succeeded with: #{got.map(&:full_name).sort.inspect}"
-      rescue Bundler::VersionConflict => e
-        expect(Array(names).sort).to eq(e.conflicts.sort)
-      end
+      got = resolve
+      flunk "The resolve succeeded with: #{got.map(&:full_name).sort.inspect}"
+    rescue Bundler::VersionConflict => e
+      expect(Array(names).sort).to eq(e.conflicts.sort)
     end
 
     def gem(*args, &blk)

@@ -321,11 +321,6 @@ Style/Proc:
 Style/RaiseArgs:
   Enabled: false
 
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/RedundantBegin:
-  Enabled: false
-
 # Offense count: 7
 # Cop supports --auto-correct.
 Style/RedundantSelf:
