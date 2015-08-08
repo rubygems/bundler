@@ -366,8 +366,3 @@ Style/TrailingUnderscoreVariable:
 # Cop supports --auto-correct.
 Style/UnneededPercentQ:
   Enabled: false
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/WhileUntilDo:
-  Enabled: false
