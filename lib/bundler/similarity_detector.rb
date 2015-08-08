@@ -31,7 +31,7 @@ module Bundler
       # ins, del, sub are weighted costs
       return nil if this.nil?
       return nil if that.nil?
-      dm = []        # distance matrix
+      dm = [] # distance matrix
 
       # Initialize first row values
       dm[0] = (0..this.length).collect {|i| i * ins }

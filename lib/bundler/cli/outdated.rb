@@ -39,7 +39,7 @@ module Bundler
         dependency = current_dependencies[current_spec.name]
 
         if options["strict"]
-          active_spec =  definition.specs.detect {|spec| spec.name == current_spec.name }
+          active_spec = definition.specs.detect {|spec| spec.name == current_spec.name }
         else
           active_spec = definition.index[current_spec.name].sort_by(&:version)
           if !current_spec.version.prerelease? && !options[:pre] && active_spec.size > 1
