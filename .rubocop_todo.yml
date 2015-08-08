@@ -112,11 +112,6 @@ Style/ClassCheck:
 Style/ClosingParenthesisIndentation:
   Enabled: false
 
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/ColonMethodCall:
-  Enabled: false
-
 # Offense count: 153
 Style/Documentation:
   Enabled: false
