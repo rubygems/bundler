@@ -361,8 +361,3 @@ Style/SpaceInsideStringInterpolation:
 # Cop supports --auto-correct.
 Style/TrailingUnderscoreVariable:
   Enabled: false
-
-# Offense count: 2
-# Cop supports --auto-correct.
-Style/UnneededPercentQ:
-  Enabled: false
