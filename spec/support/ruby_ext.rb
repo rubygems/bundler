@@ -15,6 +15,6 @@ class IO
       end
     end
 
-    return buffer.join
+    buffer.join
   end
 end

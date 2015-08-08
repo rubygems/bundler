@@ -186,7 +186,7 @@ module Bundler
       # Then fetch the prerelease specs
       fetch_prerelease_specs.each {|k, v| spec_list[k] += v }
 
-      return spec_list
+      spec_list
     end
 
     def with_build_args(args)
@@ -594,7 +594,7 @@ module Bundler
         require "rubygems/package"
         p = Gem::Package.new(path)
         p.security_policy = policy if policy
-        return p
+        p
       end
 
       def build(spec, skip_validation = false)
