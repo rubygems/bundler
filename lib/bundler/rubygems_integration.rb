@@ -229,7 +229,7 @@ module Bundler
     end
 
     def build_gem(gem_dir, spec)
-       build(spec)
+      build(spec)
     end
 
     def download_gem(spec, uri, path)

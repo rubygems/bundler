@@ -310,12 +310,10 @@ module Bundler
       out << "DEPENDENCIES\n"
 
       handled = []
-      dependencies.
-        sort_by(&:to_s).
-        each do |dep|
-          next if handled.include?(dep.name)
-          out << dep.to_lock
-          handled << dep.name
+      dependencies.sort_by(&:to_s).each do |dep|
+        next if handled.include?(dep.name)
+        out << dep.to_lock
+        handled << dep.name
       end
 
       # Record the version of Bundler that was used to create the lockfile

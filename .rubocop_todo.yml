@@ -197,12 +197,6 @@ Style/IndentArray:
 Style/IndentationConsistency:
   Enabled: false
 
-# Offense count: 5
-# Cop supports --auto-correct.
-# Configuration parameters: Width.
-Style/IndentationWidth:
-  Enabled: false
-
 # Offense count: 2
 Style/ModuleFunction:
   Enabled: false

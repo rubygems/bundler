@@ -37,8 +37,8 @@ describe "Running bin/* commands" do
   end
 
   it "uses the default ruby install name when shebang is not specified" do
-   bundle "install --binstubs"
-   expect(File.open("bin/rackup").gets).to eq("#!/usr/bin/env #{RbConfig::CONFIG["ruby_install_name"]}\n")
+    bundle "install --binstubs"
+    expect(File.open("bin/rackup").gets).to eq("#!/usr/bin/env #{RbConfig::CONFIG["ruby_install_name"]}\n")
   end
 
   it "allows the name of the shebang executable to be specified" do

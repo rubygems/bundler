@@ -287,18 +287,18 @@ module Bundler
 
           # Always have bundler locally
           unless have_bundler
-           # We're running bundler directly from the source
-           # so, let's create a fake gemspec for it (it's a path)
-           # gemspec
-           bundler = Gem::Specification.new do |s|
-             s.name     = "bundler"
-             s.version  = VERSION
-             s.platform = Gem::Platform::RUBY
-             s.source   = self
-             s.authors  = ["bundler team"]
-             s.loaded_from = File.expand_path("..", __FILE__)
-           end
-           idx << bundler
+            # We're running bundler directly from the source
+            # so, let's create a fake gemspec for it (it's a path)
+            # gemspec
+            bundler = Gem::Specification.new do |s|
+              s.name     = "bundler"
+              s.version  = VERSION
+              s.platform = Gem::Platform::RUBY
+              s.source   = self
+              s.authors  = ["bundler team"]
+              s.loaded_from = File.expand_path("..", __FILE__)
+            end
+            idx << bundler
           end
           idx
         end
