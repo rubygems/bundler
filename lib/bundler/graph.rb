@@ -102,8 +102,8 @@ module Bundler
           }
 
           if platform_only
-            matches.reject! { |spec|
-              not Gem::Platform.match spec.platform
+            matches.select! { |spec|
+              Gem::Platform.match spec.platform
             }
           end
 

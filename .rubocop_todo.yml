@@ -271,11 +271,6 @@ Style/NestedTernaryOperator:
 Style/Next:
   Enabled: false
 
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/Not:
-  Enabled: false
-
 # Offense count: 63
 # Cop supports --auto-correct.
 # Configuration parameters: PreferredDelimiters.
