@@ -285,10 +285,6 @@ Style/NumericLiterals:
 Style/OneLineConditional:
   Enabled: false
 
-# Offense count: 5
-Style/OpMethod:
-  Enabled: false
-
 # Offense count: 63
 # Cop supports --auto-correct.
 # Configuration parameters: PreferredDelimiters.

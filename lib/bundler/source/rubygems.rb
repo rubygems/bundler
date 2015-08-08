@@ -37,8 +37,8 @@ module Bundler
         @remotes.hash
       end
 
-      def eql?(o)
-        o.is_a?(Rubygems) && o.credless_remotes == credless_remotes
+      def eql?(other)
+        other.is_a?(Rubygems) && other.credless_remotes == credless_remotes
       end
 
       alias_method :==, :eql?

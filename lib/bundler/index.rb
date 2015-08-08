@@ -127,9 +127,9 @@ module Bundler
       end
     end
 
-    def ==(o)
+    def ==(other)
       all? do |spec|
-        other_spec = o[spec].first
+        other_spec = other[spec].first
         (spec.dependencies & other_spec.dependencies).empty? && spec.source == other_spec.source
       end
     end
