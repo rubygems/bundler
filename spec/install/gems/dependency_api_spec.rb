@@ -404,7 +404,7 @@ describe "gemcutter's dependency API" do
     should_be_installed "rails 2.3.2"
   end
 
-  it "installs the bins when using --path and uses autoclean" do
+  it "installs the bins when path configured and uses autoclean" do
     gemfile <<-G
       source "#{source_uri}"
       gem "rack"

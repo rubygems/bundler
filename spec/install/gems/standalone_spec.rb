@@ -142,7 +142,7 @@ describe "bundle install --standalone" do
       expect(err).to eq("ZOMG LOAD ERROR")
     end
 
-    it "allows --path to change the location of the standalone bundle" do
+    it "allows the path option to change the location of the standalone bundle" do
       config "BUNDLE_PATH" => "path/to/bundle"
       bundle "install --standalone"
 
