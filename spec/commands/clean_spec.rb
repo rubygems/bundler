@@ -114,11 +114,10 @@ describe "bundle clean" do
       end
     G
 
-    with_bundle_path_as('vendor/bundle') do
-      bundle :install
-      bundle "install --without test_group"
-      bundle :clean
-    end
+    config "BUNDLE_PATH" => "vendor/bundle"
+    bundle :install
+    bundle "install --without test_group"
+    bundle :clean
 
     expect(out).to include("Removing rack (1.0.0)")
 
@@ -142,9 +141,8 @@ describe "bundle clean" do
       end
     G
 
-    with_bundle_path_as('vendor/bundle') do
-      bundle :install
-    end
+    config "BUNDLE_PATH" => "vendor/bundle"
+    bundle :install
 
     bundle :clean
 
@@ -234,10 +232,9 @@ describe "bundle clean" do
       gem "activesupport", :git => "#{lib_path("rails")}", :ref => '#{revision}'
     G
 
-    with_bundle_path_as("vendor/bundle") do
-      bundle :install
-      bundle :clean
-    end
+    config "BUNDLE_PATH" => "vendor/bundle"
+    bundle :install
+    bundle :clean
 
     expect(out).to include("")
 
@@ -260,10 +257,9 @@ describe "bundle clean" do
       end
     G
 
-    with_bundle_path_as('vendor/bundle') do
-      bundle "install --without test"
-      bundle :clean
-    end
+    config "BUNDLE_PATH" => "vendor/bundle"
+    bundle "install --without test"
+    bundle :clean
 
 
     expect(out).to include("")
@@ -283,10 +279,9 @@ describe "bundle clean" do
       end
     G
 
-    with_bundle_path_as('vendor/bundle') do
-      bundle "install --without development"
-      bundle :clean
-    end
+    config "BUNDLE_PATH" => "vendor/bundle"
+    bundle "install --without development"
+    bundle :clean
 
     expect(exitstatus).to eq(0) if exitstatus
   end
@@ -313,22 +308,21 @@ describe "bundle clean" do
       gem "foo"
     G
 
-    with_bundle_path_as('vendor/bundle') do
-      bundle :install
+    config "BUNDLE_PATH" => "vendor/bundle"
+    bundle :install
 
-      gemfile <<-G
-        source "file://#{gem_repo1}"
+    gemfile <<-G
+      source "file://#{gem_repo1}"
 
-        gem "foo"
-      G
-      bundle :install
+      gem "foo"
+    G
+    bundle :install
 
-      FileUtils.rm(vendored_gems("bin/rackup"))
-      FileUtils.rm_rf(vendored_gems("gems/thin-1.0"))
-      FileUtils.rm_rf(vendored_gems("gems/rack-1.0.0"))
+    FileUtils.rm(vendored_gems("bin/rackup"))
+    FileUtils.rm_rf(vendored_gems("gems/thin-1.0"))
+    FileUtils.rm_rf(vendored_gems("gems/rack-1.0.0"))
 
-      bundle :clean
-    end
+    bundle :clean
 
 
     should_not_have_gems "thin-1.0", "rack-1.0"
@@ -556,10 +550,9 @@ describe "bundle clean" do
       gem "bar", "1.0", :path => "#{relative_path}"
     G
 
-    with_bundle_path_as('vendor/bundle') do
-      bundle :install
-      bundle :clean
-    end
+    config "BUNDLE_PATH" => "vendor/bundle"
+    bundle :install
+    bundle :clean
 
     expect(exitstatus).to eq(0) if exitstatus
   end

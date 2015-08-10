@@ -410,9 +410,8 @@ describe "gemcutter's dependency API" do
       gem "rack"
     G
 
-    with_bundle_path_as('vendor/bundle') do
-      bundle :install, :artifice => "endpoint"
-    end
+    config "BUNDLE_PATH" => "vendor/bundle"
+    bundle :install, :artifice => "endpoint"
 
     expect(vendored_gems("bin/rackup")).to exist
   end
@@ -423,9 +422,8 @@ describe "gemcutter's dependency API" do
       gem "rack"
     G
 
-    with_bundle_path_as('vendor/bundle') do
-      bundle "install --no-clean", :artifice => "endpoint"
-    end
+    config "BUNDLE_PATH" => "vendor/bundle"
+    bundle "install --no-clean", :artifice => "endpoint"
 
     expect(vendored_gems("bin/rackup")).to exist
   end

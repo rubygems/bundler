@@ -63,9 +63,8 @@ describe "post bundle message" do
       end
 
       it "with --without one group" do
-        with_bundle_path_as('vendor') do
-          bundle "install --without emo"
-        end
+        config "BUNDLE_PATH" => "vendor"
+        bundle "install --without emo"
 
         expect(out).to include(bundle_deployment_message)
         expect(out).to include("Gems in the group emo were not installed")
@@ -73,9 +72,8 @@ describe "post bundle message" do
       end
 
       it "with --without two groups" do
-        with_bundle_path_as('vendor') do
-          bundle "install --without emo test"
-        end
+        config "BUNDLE_PATH" => "vendor"
+        bundle "install --without emo test"
 
         expect(out).to include(bundle_deployment_message)
         expect(out).to include("Gems in the groups emo and test were not installed")
@@ -83,9 +81,8 @@ describe "post bundle message" do
       end
 
       it "with --without more groups" do
-        with_bundle_path_as('vendor') do
-          bundle "install --without emo obama test"
-        end
+        config "BUNDLE_PATH" => "vendor"
+        bundle "install --without emo obama test"
 
         expect(out).to include(bundle_deployment_message)
         expect(out).to include("Gems in the groups emo, obama and test were not installed")
