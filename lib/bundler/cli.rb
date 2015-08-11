@@ -146,10 +146,6 @@ module Bundler
     method_option "trust-policy", :alias => "P", :type => :string, :banner =>
       "Gem trust policy (like gem install -P). Must be one of " +
         Bundler.rubygems.security_policy_keys.join("|")
-    method_option "without", :type => :array, :banner =>
-      "Exclude gems that are part of the specified named group."
-    method_option "with", :type => :array, :banner =>
-      "Include gems that are part of the specified named group."
     map "i" => "install"
     def install
       require "bundler/cli/install"
