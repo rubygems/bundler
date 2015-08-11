@@ -10,20 +10,6 @@ module Bundler
 
       warn_if_root
 
-      [:with, :without].each do |option|
-        if options[option]
-          Bundler.ui.error "You have specified a `#{option}` group with the " \
-            "`#{option}` flag. Please use `bundle config #{option} #{options[option]}` instead."
-          exit 1
-        end
-      end
-
-      if options[:cache]
-        Bundler.ui.error "Please use `bundle cache` instead of `bundle "\
-         "install --cache`."
-        exit 1
-      end
-
       ENV["RB_USER_INSTALL"] = "1" if Bundler::FREEBSD
 
       # Just disable color in deployment mode
@@ -75,7 +61,7 @@ module Bundler
       Bundler.settings[:jobs]     = options["jobs"] if options["jobs"]
       Bundler.settings[:no_prune] = true if options["no-prune"]
       Bundler.settings[:no_install] = true if options["no-install"]
-      Bundler.settings[:clean] = options["clean"] if options["clean"]
+      Bundler.settings[:clean]    = options["clean"] if options["clean"]
       Bundler::Fetcher.disable_endpoint = options["full-index"]
       Bundler.settings[:disable_shared_gems] = path ? "1" : nil
 
