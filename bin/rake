@@ -7,7 +7,7 @@ bundler_spec.dependencies.each do |dep|
   begin
     gem dep.name, dep.requirement.to_s
   rescue Gem::LoadError => e
-    puts "#{e.message} (#{e.class})"
+    $stderr.puts "#{e.message} (#{e.class})"
   end
 end
 
