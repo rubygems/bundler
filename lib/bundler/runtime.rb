@@ -81,7 +81,7 @@ module Bundler
 
           if dep.autorequire.nil? && dep.name.include?("-")
             begin
-              namespaced_file = dep.name.gsub("-", "/")
+              namespaced_file = dep.name.tr("-", "/")
               Kernel.require namespaced_file
             rescue LoadError => e
               REQUIRE_ERRORS.find {|r| r =~ e.message }
@@ -225,7 +225,7 @@ module Bundler
   private
 
     def prune_gem_cache(resolve, cache_path)
-      cached  = Dir["#{cache_path}/*.gem"]
+      cached = Dir["#{cache_path}/*.gem"]
 
       cached = cached.delete_if do |path|
         spec = Bundler.rubygems.spec_from_gem path
@@ -246,7 +246,7 @@ module Bundler
     end
 
     def prune_git_and_path_cache(resolve, cache_path)
-      cached  = Dir["#{cache_path}/*/.bundlecache"]
+      cached = Dir["#{cache_path}/*/.bundlecache"]
 
       cached = cached.delete_if do |path|
         name = File.basename(File.dirname(path))

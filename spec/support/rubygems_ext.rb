@@ -41,7 +41,7 @@ module Spec
         args = args.gsub(/(?=")/, "\\")
         args = %["#{args}"]
       end
-      lib  = File.join(File.dirname(__FILE__), "..", "..", "lib")
+      lib = File.join(File.dirname(__FILE__), "..", "..", "lib")
       %x{#{Gem.ruby} -I#{lib} -rubygems -S gem --backtrace #{command} #{args}}.strip
     end
 

@@ -30,6 +30,9 @@ Style/MultilineOperationIndentation:
 Style/SpaceInsideBlockBraces:
   SpaceBeforeBlockParameters: false
 
+Style/TrivialAccessors:
+  Enabled: false
+
 # We adopted raise instead of fail.
 Style/SignalException:
   EnforcedStyle: only_raise

@@ -278,7 +278,7 @@ module Bundler
           dep = Gem::Dependency.new(dep, reqs)
         end
 
-        spec = specs.find  {|s| s.name == dep.name }
+        spec = specs.find {|s| s.name == dep.name }
 
         if spec.nil?
 
@@ -349,7 +349,7 @@ module Bundler
               "to work around a system/bundle conflict."
           end
         else
-          spec = specs.find  {|s| s.name == name }
+          spec = specs.find {|s| s.name == name }
           exec_name = spec.default_executable or raise Gem::Exception, "no default executable for #{spec.full_name}"
         end
 

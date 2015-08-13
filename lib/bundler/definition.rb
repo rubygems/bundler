@@ -61,7 +61,7 @@ module Bundler
       if lockfile && File.exist?(lockfile)
         @lockfile_contents = Bundler.read_file(lockfile)
         locked = LockfileParser.new(@lockfile_contents)
-        @platforms      = locked.platforms
+        @platforms = locked.platforms
         @locked_bundler_version = locked.bundler_version
 
         if unlock != true
@@ -419,7 +419,7 @@ module Bundler
     end
 
     def pretty_dep(dep, source = false)
-      msg  = "#{dep.name}"
+      msg = "#{dep.name}"
       msg << " (#{dep.requirement})" unless dep.requirement == Gem::Requirement.default
       msg << " from the `#{dep.source}` source" if source && dep.source
       msg

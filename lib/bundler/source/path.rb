@@ -147,7 +147,7 @@ module Bundler
               s.platform = Gem::Platform::RUBY
               s.summary  = "Fake gemspec for #{@name}"
               s.relative_loaded_from = "#{@name}.gemspec"
-              s.authors  = ["no one"]
+              s.authors = ["no one"]
               if expanded_path.join("bin").exist?
                 executables = expanded_path.join("bin").children
                 executables.reject! {|p| File.directory?(p) }

@@ -15,10 +15,10 @@ module Bundler
     end
 
     def initialize(name, exceptions = nil, retries = self.class.default_retries)
-      @name        = name
-      @retries   = retries
+      @name = name
+      @retries = retries
       @exceptions = Array(exceptions) || []
-      @total_runs =  @retries + 1 # will run once, then upto attempts.times
+      @total_runs = @retries + 1 # will run once, then upto attempts.times
     end
 
     def attempt(&block)

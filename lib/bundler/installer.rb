@@ -232,7 +232,7 @@ module Bundler
         spec.require_paths.each do |path|
           full_path = Pathname.new(path).absolute? ? path : File.join(spec.full_gem_path, path)
           gem_path = Pathname.new(full_path).relative_path_from(Bundler.root.join(bundler_path))
-          paths << gem_path.to_s.sub("#{Bundler.ruby_version.engine}/#{RbConfig::CONFIG["ruby_version"]}", '#{ruby_engine}/#{ruby_version}') # rubocop:disable Style/StringLiterals
+          paths << gem_path.to_s.sub("#{Bundler.ruby_version.engine}/#{RbConfig::CONFIG["ruby_version"]}", '#{ruby_engine}/#{ruby_version}')
         end
       end
 

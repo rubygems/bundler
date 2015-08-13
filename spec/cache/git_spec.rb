@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe "git base name" do
   it "base_name should strip private repo uris" do
-    source  = Bundler::Source::Git.new("uri" => "git@github.com:bundler.git")
+    source = Bundler::Source::Git.new("uri" => "git@github.com:bundler.git")
     expect(source.send(:base_name)).to eq("bundler")
   end
 

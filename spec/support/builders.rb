@@ -3,7 +3,7 @@ require "bundler/shared_helpers"
 module Spec
   module Builders
     def self.constantize(name)
-      name.gsub("-", "").upcase
+      name.delete("-").upcase
     end
 
     def v(version)
@@ -35,7 +35,7 @@ module Spec
           s.add_dependency "rack", "0.9.1"
         end
 
-        build_gem "rails",          "2.3.2" do |s|
+        build_gem "rails", "2.3.2" do |s|
           s.executables = "rails"
           s.add_dependency "rake",           "10.0.2"
           s.add_dependency "actionpack",     "2.3.2"
@@ -43,19 +43,19 @@ module Spec
           s.add_dependency "actionmailer",   "2.3.2"
           s.add_dependency "activeresource", "2.3.2"
         end
-        build_gem "actionpack",     "2.3.2" do |s|
+        build_gem "actionpack", "2.3.2" do |s|
           s.add_dependency "activesupport", "2.3.2"
         end
-        build_gem "activerecord",   ["2.3.1", "2.3.2"] do |s|
+        build_gem "activerecord", ["2.3.1", "2.3.2"] do |s|
           s.add_dependency "activesupport", "2.3.2"
         end
-        build_gem "actionmailer",   "2.3.2" do |s|
+        build_gem "actionmailer", "2.3.2" do |s|
           s.add_dependency "activesupport", "2.3.2"
         end
         build_gem "activeresource", "2.3.2" do |s|
           s.add_dependency "activesupport", "2.3.2"
         end
-        build_gem "activesupport",  %w(1.2.3 2.3.2 2.3.5)
+        build_gem "activesupport", %w(1.2.3 2.3.2 2.3.5)
 
         build_gem "activemerchant" do |s|
           s.add_dependency "activesupport", ">= 2.0.0"
