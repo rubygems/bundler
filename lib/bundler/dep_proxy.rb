@@ -3,7 +3,8 @@ module Bundler
     attr_reader :__platform, :dep
 
     def initialize(dep, platform)
-      @dep, @__platform = dep, platform
+      @dep = dep
+      @__platform = platform
     end
 
     def hash

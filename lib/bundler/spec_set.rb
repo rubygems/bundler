@@ -14,7 +14,9 @@ module Bundler
     end
 
     def for(dependencies, skip = [], check = false, match_current_platform = false)
-      handled, deps, specs = {}, dependencies.dup, []
+      handled = {}
+      deps = dependencies.dup
+      specs = []
       skip << "bundler"
 
       until deps.empty?

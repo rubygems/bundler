@@ -4,7 +4,8 @@ class ParallelInstaller
   class SpecInstallation
     attr_accessor :spec, :name, :post_install_message, :state
     def initialize(spec)
-      @spec, @name = spec, spec.name
+      @spec = spec
+      @name = spec.name
       @state = :none
       @post_install_message = ""
     end

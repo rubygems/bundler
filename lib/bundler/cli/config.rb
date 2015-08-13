@@ -13,9 +13,11 @@ module Bundler
       peek = args.shift
 
       if peek && peek =~ /^\-\-/
-        name, scope = args.shift, $'
+        name = args.shift
+        scope = $'
       else
-        name, scope = peek, "global"
+        name = peek
+        scope = "global"
       end
 
       unless name

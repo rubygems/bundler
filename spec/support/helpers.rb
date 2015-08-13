@@ -1,7 +1,9 @@
 module Spec
   module Helpers
     def reset!
-      @in_p, @out_p, @err_p = nil, nil, nil
+      @in_p = nil
+      @out_p = nil
+      @err_p = nil
       Dir["#{tmp}/{gems/*,*}"].each do |dir|
         next if %(base remote1 gems rubygems).include?(File.basename(dir))
         if ENV["BUNDLER_SUDO_TESTS"]
@@ -129,7 +131,9 @@ module Spec
 
     def sys_exec(cmd, expect_err = false)
       Open3.popen3(cmd.to_s) do |stdin, stdout, stderr, wait_thr|
-        @in_p, @out_p, @err_p = stdin, stdout, stderr
+        @in_p = stdin
+        @out_p = stdout
+        @err_p = stderr
 
         yield @in_p if block_given?
         @in_p.close
@@ -200,11 +204,14 @@ module Spec
     alias_method :install_gem, :install_gems
 
     def with_gem_path_as(path)
-      gem_home, gem_path = ENV["GEM_HOME"], ENV["GEM_PATH"]
-      ENV["GEM_HOME"], ENV["GEM_PATH"] = path.to_s, path.to_s
+      gem_home = ENV["GEM_HOME"]
+      gem_path = ENV["GEM_PATH"]
+      ENV["GEM_HOME"] = path.to_s
+      ENV["GEM_PATH"] = path.to_s
       yield
     ensure
-      ENV["GEM_HOME"], ENV["GEM_PATH"] = gem_home, gem_path
+      ENV["GEM_HOME"] = gem_home
+      ENV["GEM_PATH"] = gem_path
     end
 
     def with_path_as(path)
@@ -245,15 +252,19 @@ module Spec
 
       Gem.clear_paths
 
-      gem_home, gem_path, path = ENV["GEM_HOME"], ENV["GEM_PATH"], ENV["PATH"]
-      ENV["GEM_HOME"], ENV["GEM_PATH"] = system_gem_path.to_s, system_gem_path.to_s
+      gem_home = ENV["GEM_HOME"]
+      gem_path = ENV["GEM_PATH"]
+      path = ENV["PATH"]
+      ENV["GEM_HOME"] = system_gem_path.to_s
+      ENV["GEM_PATH"] = system_gem_path.to_s
 
       install_gems(*gems)
       if block_given?
         begin
           yield
         ensure
-          ENV["GEM_HOME"], ENV["GEM_PATH"] = gem_home, gem_path
+          ENV["GEM_HOME"] = gem_home
+          ENV["GEM_PATH"] = gem_path
           ENV["PATH"] = path
         end
       end
@@ -267,8 +278,11 @@ module Spec
 
       Gem.clear_paths
 
-      gem_home, gem_path, path = ENV["GEM_HOME"], ENV["GEM_PATH"], ENV["PATH"]
-      ENV["GEM_HOME"], ENV["GEM_PATH"] = system_gem_path.to_s, system_gem_path.to_s
+      gem_home = ENV["GEM_HOME"]
+      gem_path = ENV["GEM_PATH"]
+      path = ENV["PATH"]
+      ENV["GEM_HOME"] = system_gem_path.to_s
+      ENV["GEM_PATH"] = system_gem_path.to_s
 
       gems.each do |gem|
         gem_command :install, "--no-rdoc --no-ri #{gem}"
@@ -277,7 +291,8 @@ module Spec
         begin
           yield
         ensure
-          ENV["GEM_HOME"], ENV["GEM_PATH"] = gem_home, gem_path
+          ENV["GEM_HOME"] = gem_home
+          ENV["GEM_PATH"] = gem_path
           ENV["PATH"] = path
         end
       end

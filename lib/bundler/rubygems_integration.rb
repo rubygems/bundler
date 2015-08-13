@@ -521,7 +521,8 @@ module Bundler
       # you call Gem::Installer#install with an :install_dir set. We have to
       # change it back for our sudo mode to work.
       def preserve_paths
-        old_dir, old_path = gem_dir, gem_path
+        old_dir = gem_dir
+        old_path = gem_path
         yield
         Gem.use_paths(old_dir, old_path)
       end
@@ -583,7 +584,8 @@ module Bundler
       def download_gem(spec, uri, path)
         require "resolv"
         uri = Bundler.settings.mirror_for(uri)
-        proxy, dns = configuration[:http_proxy], Resolv::DNS.new
+        proxy = configuration[:http_proxy]
+        dns = Resolv::DNS.new
         fetcher = Gem::RemoteFetcher.new(proxy, dns)
         fetcher.download(spec, uri, path)
       end
