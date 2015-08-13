@@ -57,7 +57,7 @@ describe Bundler::Settings do
         expect(FileUtils).to receive(:mkdir_p).with(settings.send(:global_config_file).dirname).
           and_raise(Errno::EACCES)
         expect { settings.set_global(:frozen, "1") }.
-          to raise_error(Bundler::PermissionError, /\.bundle\/config/)
+          to raise_error(Bundler::PermissionError, %r{\.bundle/config})
       end
     end
   end
