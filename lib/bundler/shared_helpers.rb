@@ -81,7 +81,7 @@ module Bundler
 
       # Set RUBYOPT
       rubyopt = [ENV["RUBYOPT"]].compact
-      if rubyopt.empty? || rubyopt.first !~ /-rbundler\/setup/
+      if rubyopt.empty? || rubyopt.first !~ %r{-rbundler/setup}
         rubyopt.unshift %|-rbundler/setup|
         ENV["RUBYOPT"] = rubyopt.join(" ")
       end

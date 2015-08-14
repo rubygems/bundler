@@ -165,7 +165,7 @@ module Bundler
       end
 
       def relative_path
-        if path.to_s.match(%r{^#{Regexp.escape Bundler.root.to_s}})
+        if path.to_s.start_with?(Bundler.root.to_s)
           return path.relative_path_from(Bundler.root)
         end
         path

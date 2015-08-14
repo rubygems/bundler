@@ -178,7 +178,7 @@ describe "bundle gem" do
     end
 
     it "requires the version file" do
-      expect(bundled_app("test_gem/lib/test_gem.rb").read).to match(/require "test_gem\/version"/)
+      expect(bundled_app("test_gem/lib/test_gem.rb").read).to match(%r{require "test_gem/version"})
     end
 
     it "runs rake without problems" do
@@ -332,7 +332,7 @@ describe "bundle gem" do
       end
 
       it "creates a .travis.yml file to test the library against the current Ruby version on Travis CI" do
-        expect(bundled_app("test_gem/.travis.yml").read).to match(%r(- #{RUBY_VERSION}))
+        expect(bundled_app("test_gem/.travis.yml").read).to match(/- #{RUBY_VERSION}/)
       end
     end
 
@@ -435,7 +435,7 @@ describe "bundle gem" do
     end
 
     it "requires the version file" do
-      expect(bundled_app("test-gem/lib/test/gem.rb").read).to match(/require "test\/gem\/version"/)
+      expect(bundled_app("test-gem/lib/test/gem.rb").read).to match(%r{require "test/gem/version"})
     end
 
     it "runs rake without problems" do
@@ -468,7 +468,7 @@ describe "bundle gem" do
       end
 
       it "requires 'test/gem'" do
-        expect(bundled_app("test-gem/exe/test-gem").read).to match(/require "test\/gem"/)
+        expect(bundled_app("test-gem/exe/test-gem").read).to match(%r{require "test/gem"})
       end
     end
 
@@ -536,7 +536,7 @@ describe "bundle gem" do
       end
 
       it "requires 'test/gem'" do
-        expect(bundled_app("test-gem/test/test_helper.rb").read).to match(/require 'test\/gem'/)
+        expect(bundled_app("test-gem/test/test_helper.rb").read).to match(%r{require 'test/gem'})
       end
 
       it "requires 'test_helper'" do
