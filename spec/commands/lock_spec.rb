@@ -92,6 +92,6 @@ describe "bundle lock" do
 
     expect(out).to match(/Writing lockfile to.+lock/)
     expect(read_lockfile "lock").to eq(@lockfile)
-    expect { read_lockfile }.to raise_error
+    expect { read_lockfile }.to raise_error(Errno::ENOENT)
   end
 end
