@@ -158,7 +158,8 @@ describe "bundle install --standalone" do
     end
 
     it "allows remembered --without to limit the groups used in a standalone" do
-      bundle "install --without test"
+      config "BUNDLE_WITHOUT" => "test"
+      bundle "install"
       bundle "install --standalone"
 
       load_error_ruby <<-RUBY, "spec", :no_lib => true

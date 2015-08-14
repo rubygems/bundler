@@ -119,7 +119,6 @@ describe "bundle clean" do
     ENV["BUNDLE_WITHOUT"] = "test_group"
     bundle :install
     bundle :clean
-    ENV["BUNDLE_WITHOUT"] = ""
 
     expect(out).to include("Removing rack (1.0.0)")
 
@@ -263,7 +262,6 @@ describe "bundle clean" do
     ENV["BUNDLE_WITHOUT"] = "test"
     bundle :install
     bundle :clean
-    ENV["BUNDLE_WITHOUT"] = ""
 
 
     expect(out).to include("")
@@ -287,7 +285,6 @@ describe "bundle clean" do
     ENV["BUNDLE_WITHOUT"] = "development"
     bundle :install
     bundle :clean
-    ENV["BUNDLE_WITHOUT"] = ""
 
     expect(exitstatus).to eq(0) if exitstatus
   end
