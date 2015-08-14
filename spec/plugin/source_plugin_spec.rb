@@ -42,17 +42,14 @@ end
       s.write("lib/bundler-foo.rb", main)
       s.write("lib/source.rb", source)
     end
-
   end
 
   it "installs the plugin" do
-
     install_gemfile <<-G
       plugin "foo"
     G
     expect(out).to include("Setting up plugins...")
     expect(out).to include("Using bundler-foo 1.0")
-
   end
 
   it "uses the source" do

@@ -1,4 +1,4 @@
-require 'bundler/dsl'
+require "bundler/dsl"
 module Bundler
   class PluginDsl
     def self.evaluate(gemfile, lockfile, unlock)
@@ -14,7 +14,7 @@ module Bundler
 
       self.class.instance_eval do
         methods.each do |method|
-          define_method(method) do |*args|
+          define_method(method) do |*|
             # Empty method. So that it ignores the rest of the Gemfile
           end
         end

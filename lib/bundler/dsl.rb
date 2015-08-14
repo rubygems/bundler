@@ -274,7 +274,7 @@ module Bundler
       git_names = @git_sources.keys.map(&:to_s)
       plugins = Bundler.plugin("1").manager.sources.all
 
-      plugin_keys = plugins.keys.map {|plugin| plugin.to_s }
+      plugin_keys = plugins.keys.map(&:to_s)
       validate_keys("gem '#{name}'", opts, valid_keys + git_names + plugin_keys)
 
       groups = @groups.dup

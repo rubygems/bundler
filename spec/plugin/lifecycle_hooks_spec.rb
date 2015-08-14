@@ -28,7 +28,6 @@ end
       s.write("lib/lifecycle.rb", lifecycle)
     end
     bundle "plugin install foo"
-
   end
 
   it "before_install and after_install hooks" do

@@ -28,7 +28,7 @@ module Bundler
       return nil if !@items.key?(key)
       return @items[key].call
     end
-    alias_method :[] :get
+    alias_method :[], :get
 
     # Returns all items in the registry
     #
@@ -43,7 +43,7 @@ module Bundler
     end
     alias_method :has_key?, :key?
     # Merge one registry with another and return a completely new
-    # registry. 
+    # registry.
     def merge(other)
       self.class.new.tap do |result|
         result.merge!(self)
@@ -56,6 +56,5 @@ module Bundler
       @items.merge!(other.all)
       self
     end
-
   end
 end

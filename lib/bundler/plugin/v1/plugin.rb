@@ -41,7 +41,6 @@ module Bundler
           raise ArgumentError, "must provide an array of hooks to register" unless names.is_a?(Enumerable)
 
           names.each do |hook|
-
             if Bundler.plugin_install_mode
               Bundler.ui.info "Setting up '#{hook}' lifecycle hook"
             end
@@ -54,7 +53,6 @@ module Bundler
 
           nil
         end
-
 
         def self.name(name)
           # Get or set the value first, so we have a name for logging when
@@ -73,7 +71,6 @@ module Bundler
           data[key] = value
         end
 
-
         def self.data
           @data ||= {}
         end
@@ -85,7 +82,6 @@ module Bundler
         def self.components
           @components ||= Components.new
         end
-
       end
 
     end
