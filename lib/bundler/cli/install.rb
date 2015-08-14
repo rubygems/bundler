@@ -103,18 +103,7 @@ module Bundler
 
       Bundler.plugin("1").manager.call_hook(:before_install)
       # install plugins before working with others
-      plugin_definition = Bundler.plugin_definition
-
-      if plugin_definition
-        Bundler.ui.info "Setting up plugins..."
-        plugin_definition.validate_ruby!
-
-        Installer.install_plugin(plugin_definition, options)
-        plugin_definition.specs.to_a.each do |spec|
-          next if spec.name == "bundler"
-          require spec.name
-        end
-      end
+      install_and_require_plugins
 
       definition = Bundler.definition
       definition.validate_ruby!
@@ -172,6 +161,21 @@ module Bundler
     end
 
   private
+
+    def install_and_require_plugins
+      plugin_definition = Bundler.plugin_definition
+
+      if plugin_definition
+        Bundler.ui.info "Setting up plugins..."
+        plugin_definition.validate_ruby!
+
+        Installer.install_plugin(plugin_definition, options)
+        plugin_definition.specs.to_a.each do |spec|
+          next if spec.name == "bundler"
+          require spec.name
+        end
+      end
+    end
 
     def warn_if_root
       return if Bundler::WINDOWS || !Process.uid.zero?
