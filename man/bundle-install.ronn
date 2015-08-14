@@ -114,15 +114,6 @@ time `bundle install` is run, use `bundle config` (see bundle-config(1)).
   `NoSecurity`. For more details, please see the Rubygems signing documentation
   linked below in [SEE ALSO][].
 
-* `--without=<list>`:
-  A space-separated list of groups referencing gems to skip during installation.
-
-* `--with=<list>`:
-  A space-separated list of groups referencing gems to install. If an
-  optional group is given it is installed. If a group is given that is
-  in the remembered list of groups given to --without, it is removed
-  from that list.
-
 ## DEPLOYMENT MODE
 
 Bundler's defaults are optimized for development. To switch to
