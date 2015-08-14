@@ -116,8 +116,10 @@ describe "bundle clean" do
 
     config "BUNDLE_PATH" => "vendor/bundle"
     bundle :install
-    bundle "install --without test_group"
+    ENV["BUNDLE_WITHOUT"] = "test_group"
+    bundle :install
     bundle :clean
+    ENV["BUNDLE_WITHOUT"] = ""
 
     expect(out).to include("Removing rack (1.0.0)")
 
@@ -258,8 +260,10 @@ describe "bundle clean" do
     G
 
     config "BUNDLE_PATH" => "vendor/bundle"
-    bundle "install --without test"
+    ENV["BUNDLE_WITHOUT"] = "test"
+    bundle :install
     bundle :clean
+    ENV["BUNDLE_WITHOUT"] = ""
 
 
     expect(out).to include("")
@@ -280,8 +284,10 @@ describe "bundle clean" do
     G
 
     config "BUNDLE_PATH" => "vendor/bundle"
-    bundle "install --without development"
+    ENV["BUNDLE_WITHOUT"] = "development"
+    bundle :install
     bundle :clean
+    ENV["BUNDLE_WITHOUT"] = ""
 
     expect(exitstatus).to eq(0) if exitstatus
   end

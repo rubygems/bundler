@@ -112,7 +112,8 @@ describe "bundle check" do
       gem "rack", :group => :foo
     G
 
-    bundle "install --without foo"
+    config "BUNDLE_WITHOUT" => "foo"
+    bundle :install
 
     gemfile <<-G
       source "file://#{gem_repo1}"
