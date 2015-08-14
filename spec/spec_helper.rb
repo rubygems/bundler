@@ -107,6 +107,8 @@ RSpec.configure do |config|
     ENV["BUNDLE_PATH"]           = nil
     ENV["BUNDLE_GEMFILE"]        = nil
     ENV["BUNDLE_FROZEN"]         = nil
+    ENV["BUNDLE_WITH"]           = nil
+    ENV["BUNDLE_WITHOUT"]        = nil
     ENV["BUNDLE_APP_CONFIG"]     = nil
     ENV["BUNDLER_TEST"]          = nil
     ENV["BUNDLER_SPEC_PLATFORM"] = nil
