@@ -158,7 +158,11 @@ module Bundler
 
     def sh(cmd, &block)
       out, code = sh_with_code(cmd, &block)
-      code == 0 ? out : raise(out.empty? ? "Running `#{cmd}' failed. Run this command directly for more detailed output." : out)
+      if code == 0
+        out
+      else
+        raise(out.empty? ? "Running `#{cmd}' failed. Run this command directly for more detailed output." : out)
+      end
     end
 
     def sh_with_code(cmd, &block)

@@ -50,8 +50,8 @@ module Bundler
         exit 1
       end
 
-      if (options["trust-policy"])
-        unless (Bundler.rubygems.security_policies.keys.include?(options["trust-policy"]))
+      if options["trust-policy"]
+        unless Bundler.rubygems.security_policies.keys.include?(options["trust-policy"])
           Bundler.ui.error "Rubygems doesn't know about trust policy '#{options["trust-policy"]}'. " \
             "The known policies are: #{Bundler.rubygems.security_policies.keys.join(", ")}."
           exit 1

@@ -22,15 +22,19 @@ module Gem
     alias_method :rg_loaded_from,   :loaded_from
 
     def full_gem_path
-      source.respond_to?(:path) ?
-        Pathname.new(loaded_from).dirname.expand_path(Bundler.root).to_s.untaint :
+      if source.respond_to?(:path)
+        Pathname.new(loaded_from).dirname.expand_path(Bundler.root).to_s.untaint
+      else
         rg_full_gem_path
+      end
     end
 
     def loaded_from
-      relative_loaded_from ?
-        source.path.join(relative_loaded_from).to_s :
+      if relative_loaded_from
+        source.path.join(relative_loaded_from).to_s
+      else
         rg_loaded_from
+      end
     end
 
     def load_paths
@@ -48,9 +52,11 @@ module Gem
     if method_defined?(:extension_dir)
       alias_method :rg_extension_dir, :extension_dir
       def extension_dir
-        @extension_dir ||= source.respond_to?(:extension_dir_name) ?
-          File.expand_path(File.join(extensions_dir, source.extension_dir_name)) :
+        @extension_dir ||= if source.respond_to?(:extension_dir_name)
+          File.expand_path(File.join(extensions_dir, source.extension_dir_name))
+        else
           rg_extension_dir
+        end
       end
     end
 

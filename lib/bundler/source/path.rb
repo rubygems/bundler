@@ -56,10 +56,10 @@ module Bundler
         [self.class, expanded_path, version].hash
       end
 
-      def eql?(o)
-        o.instance_of?(Path) &&
-        expanded_path == expand(o.path) &&
-        version == o.version
+      def eql?(other)
+        other.instance_of?(Path) &&
+          expanded_path == expand(other.path) &&
+          version == other.version
       end
 
       alias_method :==, :eql?

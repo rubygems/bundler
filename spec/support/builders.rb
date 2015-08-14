@@ -293,7 +293,6 @@ module Spec
           s.cert_chain = [cert]
         end
       end
-
     end
 
     def build_repo(path, &blk)

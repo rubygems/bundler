@@ -32,7 +32,7 @@ module Bundler
 
       out_count = 0
       # Loop through the current specs
-      gemfile_specs, dependency_specs = current_specs.partition {|spec| current_dependencies.has_key? spec.name }
+      gemfile_specs, dependency_specs = current_specs.partition {|spec| current_dependencies.key? spec.name }
       [gemfile_specs.sort_by(&:name), dependency_specs.sort_by(&:name)].flatten.each do |current_spec|
         next if !gems.empty? && !gems.include?(current_spec.name)
 

@@ -37,8 +37,8 @@ module Bundler
         @remotes.hash
       end
 
-      def eql?(o)
-        o.is_a?(Rubygems) && o.credless_remotes == credless_remotes
+      def eql?(other)
+        other.is_a?(Rubygems) && other.credless_remotes == credless_remotes
       end
 
       alias_method :==, :eql?
@@ -132,7 +132,8 @@ module Bundler
 
           installed_spec = nil
           Bundler.rubygems.preserve_paths do
-            installed_spec = Bundler::GemInstaller.new(path,
+            installed_spec = Bundler::GemInstaller.new(
+              path,
               :install_dir         => install_path.to_s,
               :bin_dir             => bin_path.to_s,
               :ignore_dependencies => true,
@@ -287,18 +288,18 @@ module Bundler
 
           # Always have bundler locally
           unless have_bundler
-           # We're running bundler directly from the source
-           # so, let's create a fake gemspec for it (it's a path)
-           # gemspec
-           bundler = Gem::Specification.new do |s|
-             s.name     = "bundler"
-             s.version  = VERSION
-             s.platform = Gem::Platform::RUBY
-             s.source   = self
-             s.authors  = ["bundler team"]
-             s.loaded_from = File.expand_path("..", __FILE__)
-           end
-           idx << bundler
+            # We're running bundler directly from the source
+            # so, let's create a fake gemspec for it (it's a path)
+            # gemspec
+            bundler = Gem::Specification.new do |s|
+              s.name     = "bundler"
+              s.version  = VERSION
+              s.platform = Gem::Platform::RUBY
+              s.source   = self
+              s.authors  = ["bundler team"]
+              s.loaded_from = File.expand_path("..", __FILE__)
+            end
+            idx << bundler
           end
           idx
         end
@@ -345,7 +346,7 @@ module Bundler
             api_fetchers.each do |f|
               Bundler.ui.info "Fetching gem metadata from #{f.uri}", Bundler.ui.debug?
               idx.use f.specs(dependency_names, self)
-              Bundler.ui.info "" if !Bundler.ui.debug? # new line now that the dots are over
+              Bundler.ui.info "" unless Bundler.ui.debug? # new line now that the dots are over
             end
 
             # Suppose the gem Foo depends on the gem Bar.  Foo exists in Source A.  Bar has some versions that exist in both
@@ -358,7 +359,7 @@ module Bundler
               api_fetchers.each do |f|
                 Bundler.ui.info "Fetching version metadata from #{f.uri}", Bundler.ui.debug?
                 idx.use f.specs(idx.dependency_names, self), true
-                Bundler.ui.info "" if !Bundler.ui.debug? # new line now that the dots are over
+                Bundler.ui.info "" unless Bundler.ui.debug? # new line now that the dots are over
               end
               break if idxcount == idx.size
             end
@@ -373,7 +374,7 @@ module Bundler
               api_fetchers.each do |f|
                 Bundler.ui.info "Fetching dependency metadata from #{f.uri}", Bundler.ui.debug?
                 idx.use f.specs(unmet, self)
-                Bundler.ui.info "" if !Bundler.ui.debug? # new line now that the dots are over
+                Bundler.ui.info "" unless Bundler.ui.debug? # new line now that the dots are over
               end if unmet.any?
             else
               allow_api = false

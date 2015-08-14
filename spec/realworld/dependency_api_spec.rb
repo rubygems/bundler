@@ -19,7 +19,7 @@ describe "gemcutter's dependency API", :realworld => true do
       require "rack"
       ENV["GEM_HOME"] = old_gem_home
 
-      port = 21453
+      port = 21_453
       port += 1 while TCPSocket.new("127.0.0.1", port) rescue false
       @server_uri = "http://127.0.0.1:#{port}"
 

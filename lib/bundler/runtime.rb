@@ -61,7 +61,7 @@ module Bundler
       @definition.dependencies.each do |dep|
         # Skip the dependency if it is not in any of the requested
         # groups
-        next unless ((dep.groups & groups).any? && dep.current_platform?)
+        next unless (dep.groups & groups).any? && dep.current_platform?
 
         required_file = nil
 

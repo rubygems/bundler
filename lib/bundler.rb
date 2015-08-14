@@ -222,9 +222,11 @@ module Bundler
     end
 
     def app_config_path
-      ENV["BUNDLE_APP_CONFIG"] ?
-        Pathname.new(ENV["BUNDLE_APP_CONFIG"]).expand_path(root) :
+      if ENV["BUNDLE_APP_CONFIG"]
+        Pathname.new(ENV["BUNDLE_APP_CONFIG"]).expand_path(root)
+      else
         root.join(".bundle")
+      end
     end
 
     def app_cache(custom_path = nil)
@@ -259,7 +261,7 @@ module Bundler
       with_original_env do
         ENV["MANPATH"] = ENV["BUNDLE_ORIG_MANPATH"]
         ENV.delete_if {|k, _| k[0, 7] == "BUNDLE_" }
-        if ENV.has_key? "RUBYOPT"
+        if ENV.key? "RUBYOPT"
           ENV["RUBYOPT"] = ENV["RUBYOPT"].sub "-rbundler/setup", ""
           ENV["RUBYOPT"] = ENV["RUBYOPT"].sub "-I#{File.expand_path("..", __FILE__)}", ""
         end

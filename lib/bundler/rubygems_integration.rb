@@ -186,7 +186,7 @@ module Bundler
       # Then fetch the prerelease specs
       fetch_prerelease_specs.each {|k, v| spec_list[k] += v }
 
-      return spec_list
+      spec_list
     end
 
     def with_build_args(args)
@@ -229,7 +229,7 @@ module Bundler
     end
 
     def build_gem(gem_dir, spec)
-       build(spec)
+      build(spec)
     end
 
     def download_gem(spec, uri, path)
@@ -594,7 +594,7 @@ module Bundler
         require "rubygems/package"
         p = Gem::Package.new(path)
         p.security_policy = policy if policy
-        return p
+        p
       end
 
       def build(spec, skip_validation = false)
@@ -625,7 +625,7 @@ module Bundler
         require "rubygems/ext"
 
         Gem::Ext::Builder.class_eval do
-          if !const_defined?(:CHDIR_MONITOR)
+          unless const_defined?(:CHDIR_MONITOR)
             const_set(:CHDIR_MONITOR, EXT_LOCK)
           end
 

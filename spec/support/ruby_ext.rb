@@ -1,5 +1,5 @@
 class IO
-  def read_available_bytes(chunk_size = 16384, select_timeout = 0.02)
+  def read_available_bytes(chunk_size = 16_384, select_timeout = 0.02)
     buffer = []
 
     return "" if closed? || eof?
@@ -15,6 +15,6 @@ class IO
       end
     end
 
-    return buffer.join
+    buffer.join
   end
 end

@@ -310,12 +310,10 @@ module Bundler
       out << "DEPENDENCIES\n"
 
       handled = []
-      dependencies.
-        sort_by(&:to_s).
-        each do |dep|
-          next if handled.include?(dep.name)
-          out << dep.to_lock
-          handled << dep.name
+      dependencies.sort_by(&:to_s).each do |dep|
+        next if handled.include?(dep.name)
+        out << dep.to_lock
+        handled << dep.name
       end
 
       # Record the version of Bundler that was used to create the lockfile
@@ -480,7 +478,7 @@ module Bundler
       changes = false
 
       # Get the Rubygems sources from the Gemfile.lock
-      locked_gem_sources = @locked_sources.select {|s| s.kind_of?(Source::Rubygems) }
+      locked_gem_sources = @locked_sources.select {|s| s.is_a?(Source::Rubygems) }
       # Get the Rubygems remotes from the Gemfile
       actual_remotes = sources.rubygems_remotes
 
@@ -645,7 +643,7 @@ module Bundler
     def pinned_spec_names(specs)
       names = []
       specs.each do |s|
-        # TODO when two sources without blocks is an error, we can change
+        # TODO: when two sources without blocks is an error, we can change
         # this check to !s.source.is_a?(Source::LocalRubygems). For now,
         # we need to ask every Rubygems for every gem name.
         if s.source.is_a?(Source::Git) || s.source.is_a?(Source::Path)

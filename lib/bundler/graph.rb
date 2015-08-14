@@ -95,15 +95,15 @@ module Bundler
       # method borrow from rubygems/dependency.rb
       # redefinition of matching_specs will also redefine to_spec and to_specs
       Gem::Dependency.class_eval do
-        def matching_specs platform_only = false
+        def matching_specs(platform_only = false)
           matches = Bundler.load.specs.select { |spec|
             self.name == spec.name and
               requirement.satisfied_by? spec.version
           }
 
           if platform_only
-            matches.reject! { |spec|
-              not Gem::Platform.match spec.platform
+            matches.select! { |spec|
+              Gem::Platform.match spec.platform
             }
           end
 
@@ -124,7 +124,7 @@ module Bundler
       end
 
       def g
-        @g ||= ::GraphViz.digraph(@graph_name, { :concentrate => true, :normalize => true, :nodesep => 0.55 }) do |g|
+        @g ||= ::GraphViz.digraph(@graph_name, :concentrate => true, :normalize => true, :nodesep => 0.55) do |g|
           g.edge[:weight]   = 2
           g.edge[:fontname] = g.node[:fontname] = "Arial, Helvetica, SansSerif"
           g.edge[:fontsize] = 12

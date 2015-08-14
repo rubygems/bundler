@@ -19,7 +19,7 @@ module Bundler
     end
 
     def full_name
-      if platform == Gem::Platform::RUBY or platform.nil? then
+      if platform == Gem::Platform::RUBY or platform.nil?
         "#{@name}-#{@version}"
       else
         "#{@name}-#{@version}-#{platform}"

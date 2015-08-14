@@ -195,7 +195,7 @@ module Bundler
       req.join(".")
     end
 
-    def ensure_safe_gem_name name, constant_array
+    def ensure_safe_gem_name(name, constant_array)
       if name =~ /^\d/
         Bundler.ui.error "Invalid gem name #{name} Please give a name which does not start with numbers."
         exit 1
