@@ -1,6 +1,6 @@
 require "spec_helper"
-require 'rake'
-require 'bundler/gem_helper'
+require "rake"
+require "bundler/gem_helper"
 
 describe Bundler::GemHelper do
   let(:app_name) { "lorem__ipsum" }
@@ -33,7 +33,7 @@ describe Bundler::GemHelper do
         if Gem::Version.new(Gem::VERSION) < Gem::Version.new("2.0")
           content = File.read(app_gemspec_path)
           content.sub!(/raise "RubyGems 2\.0 or newer.*/, "")
-          File.open(app_gemspec_path, "w"){|f| f.write(content) }
+          File.open(app_gemspec_path, "w") {|f| f.write(content) }
         end
       end
 
@@ -76,7 +76,7 @@ describe Bundler::GemHelper do
     before(:each) do
       content = app_gemspec_content.gsub("TODO: ", "")
       content.sub!(/homepage\s+= ".*"/, 'homepage = ""')
-      File.open(app_gemspec_path, "w") { |file| file << content }
+      File.open(app_gemspec_path, "w") {|file| file << content }
     end
 
     def remove_push_guard(gemspec_content)
@@ -104,7 +104,8 @@ describe Bundler::GemHelper do
 
       context "defines Rake tasks" do
         let(:task_names) { %w[build install release
-          release:guard_clean release:source_control_push release:rubygem_push] }
+                              release:guard_clean release:source_control_push
+                              release:rubygem_push] }
 
         context "before installation" do
           it "raises an error with appropriate message" do
@@ -138,7 +139,7 @@ describe Bundler::GemHelper do
       context "when build failed" do
         it "raises an error with appropriate message" do
           # break the gemspec by adding back the TODOs
-          File.open(app_gemspec_path, "w"){ |file| file << app_gemspec_content }
+          File.open(app_gemspec_path, "w") {|file| file << app_gemspec_content }
           expect { subject.build_gem }.to raise_error(/TODO/)
         end
       end

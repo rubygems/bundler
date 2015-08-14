@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+
+require "rubygems"
+
+bundler_spec = Gem::Specification.load(File.expand_path("../../bundler.gemspec", __FILE__))
+bundler_spec.dependencies.each do |dep|
+  gem dep.name, dep.requirement.to_s
+end
+
+load Gem.bin_path("rspec-core", "rspec")

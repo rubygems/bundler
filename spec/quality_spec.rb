@@ -14,7 +14,7 @@ describe "The library itself" do
     end
 
     unless failing_lines.empty?
-      "#{filename} uses inconsistent single quotes on lines #{failing_lines.join(', ')}"
+      "#{filename} uses inconsistent single quotes on lines #{failing_lines.join(", ")}"
     end
   end
 
@@ -25,7 +25,7 @@ describe "The library itself" do
     end
 
     unless failing_lines.empty?
-      "#{filename} has tab characters on lines #{failing_lines.join(', ')}"
+      "#{filename} has tab characters on lines #{failing_lines.join(", ")}"
     end
   end
 
@@ -38,14 +38,12 @@ describe "The library itself" do
     end
 
     unless failing_lines.empty?
-      "#{filename} has spaces on the EOL on lines #{failing_lines.join(', ')}"
+      "#{filename} has spaces on the EOL on lines #{failing_lines.join(", ")}"
     end
   end
 
   RSpec::Matchers.define :be_well_formed do
-    match do |actual|
-      actual.empty?
-    end
+    match(&:empty?)
 
     failure_message do |actual|
       actual.join("\n")
@@ -90,10 +88,10 @@ describe "The library itself" do
   it "does not contain any warnings" do
     Dir.chdir(root.join("lib"))
     exclusions = /bundler\/capistrano\.rb|bundler\/vlad\.rb|bundler\/gem_tasks\.rb|tmp\/rubygems/
-    lib_files = `git ls-files -z -- **/*.rb`.split("\x0").reject{|f| f =~ exclusions }
+    lib_files = `git ls-files -z -- **/*.rb`.split("\x0").reject {|f| f =~ exclusions }
     sys_exec("ruby -w -I. ", :expect_err) do |input|
       lib_files.each do |f|
-        input.puts "require '#{f.gsub(/\.rb$/, '')}'"
+        input.puts "require '#{f.gsub(/\.rb$/, "")}'"
       end
     end
 

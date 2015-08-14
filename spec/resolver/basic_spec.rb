@@ -1,7 +1,6 @@
 require "spec_helper"
 
 describe "Resolving" do
-
   before :each do
     @index = an_awesome_index
   end
@@ -75,5 +74,4 @@ describe "Resolving" do
     dep "foo", ">= 3.0.0"
     should_resolve_and_include %w(foo-3.0.5)
   end
-
 end

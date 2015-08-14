@@ -1,7 +1,6 @@
 module Bundler
   class Source
     class Git < Path
-
       class GitNotInstalledError < GitError
         def initialize
           msg =  "You need to install git to be able to use gems from git repositories. "
@@ -67,25 +66,33 @@ module Bundler
         def checkout
           if path.exist?
             return if has_revision_cached?
-            Bundler.ui.confirm "Updating #{uri}"
+            Bundler.ui.info "Fetching #{uri}"
             in_path do
-              git_retry %|fetch --force --quiet --tags #{uri_escaped} "refs/heads/*:refs/heads/*"|
+              git_retry %|fetch --force --quiet --tags #{uri_escaped_with_configured_credentials} "refs/heads/*:refs/heads/*"|
             end
           else
             Bundler.ui.info "Fetching #{uri}"
             FileUtils.mkdir_p(path.dirname)
-            git_retry %|clone #{uri_escaped} "#{path}" --bare --no-hardlinks --quiet|
+            git_retry %|clone #{uri_escaped_with_configured_credentials} "#{path}" --bare --no-hardlinks --quiet|
           end
         end
 
-        def copy_to(destination, submodules=false)
+        def copy_to(destination, submodules = false)
+          # method 1
           unless File.exist?(destination.join(".git"))
-            FileUtils.mkdir_p(destination.dirname)
-            FileUtils.rm_rf(destination)
-            git_retry %|clone --no-checkout --quiet "#{path}" "#{destination}"|
-            File.chmod((0777 & ~File.umask), destination)
+            begin
+              FileUtils.mkdir_p(destination.dirname)
+              FileUtils.rm_rf(destination)
+              git_retry %|clone --no-checkout --quiet "#{path}" "#{destination}"|
+              File.chmod(((File.stat(destination).mode | 0777) & ~File.umask), destination)
+            rescue Errno::EEXIST => e
+              file_path = e.message[/.*?(\/.*)/, 1]
+              raise GitError, "Bundler could not install a gem because it needs to " \
+                "create a directory, but a file exists - #{file_path}. Please delete " \
+                "this file and try again."
+            end
           end
-
+          # method 2
           SharedHelpers.chdir(destination) do
             git_retry %|fetch --force --quiet --tags "#{path}"|
             git "reset --hard #{@revision}"
@@ -113,7 +120,7 @@ module Bundler
           end
         end
 
-        def git(command, check_errors=true)
+        def git(command, check_errors = true)
           raise GitNotAllowedError.new(command) unless allow?
           out = SharedHelpers.with_clean_git_env { %x{git #{command}} }
           raise GitCommandError.new(command, path) if check_errors && !$?.success?
@@ -129,15 +136,28 @@ module Bundler
         end
 
         # Escape the URI for git commands
-        def uri_escaped
+        def uri_escaped_with_configured_credentials
+          remote = configured_uri_for(uri)
           if Bundler::WINDOWS
             # Windows quoting requires double quotes only, with double quotes
             # inside the string escaped by being doubled.
-            '"' + uri.gsub('"') {|s| '""'} + '"'
+            '"' + remote.gsub('"') { '""' } + '"'
           else
             # Bash requires single quoted strings, with the single quotes escaped
             # by ending the string, escaping the quote, and restarting the string.
-            "'" + uri.gsub("'") {|s| "'\\''"} + "'"
+            "'" + remote.gsub("'") { "'\\''" } + "'"
+          end
+        end
+
+        # Adds credentials to the URI as Fetcher#configured_uri_for does
+        def configured_uri_for(uri)
+          if /https?:/ =~ uri
+            remote = URI(uri)
+            config_auth = Bundler.settings[remote.to_s] || Bundler.settings[remote.host]
+            remote.userinfo ||= config_auth
+            remote.to_s
+          else
+            uri
           end
         end
 
@@ -154,9 +174,7 @@ module Bundler
           return in_path { yield } if allow?
           raise GitError, "The git source #{uri} is not yet checked out. Please run `bundle install` before trying to start your application"
         end
-
       end
-
     end
   end
 end

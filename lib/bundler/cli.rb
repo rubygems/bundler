@@ -1,6 +1,6 @@
-require 'bundler'
-require 'bundler/plugin'
-require 'bundler/vendored_thor'
+require "bundler"
+require "bundler/plugin"
+require "bundler/vendored_thor"
 
 module Bundler
   class CLI < Thor
@@ -16,10 +16,13 @@ module Bundler
 
     def initialize(*args)
       super
-      current_cmd = args.last[:current_command].name
+
       custom_gemfile = options[:gemfile] || Bundler.settings[:gemfile]
-      ENV['BUNDLE_GEMFILE']   = File.expand_path(custom_gemfile) if custom_gemfile
+      ENV["BUNDLE_GEMFILE"] = File.expand_path(custom_gemfile) if custom_gemfile
+
       Bundler.settings[:retry] = options[:retry] if options[:retry]
+
+      current_cmd = args.last[:current_command].name
       auto_install if AUTO_INSTALL_CMDS.include?(current_cmd)
     rescue UnknownArgumentError => e
       raise InvalidOption, e.message
@@ -36,7 +39,7 @@ module Bundler
     class_option "no-color", :type => :boolean, :desc => "Disable colorization in output"
     class_option "retry",    :type => :numeric, :aliases => "-r", :banner => "NUM",
       :desc => "Specify the number of times you wish to attempt network commands"
-    class_option "verbose",  :type => :boolean, :desc => "Enable verbose output mode", :aliases => "-V"
+    class_option "verbose", :type => :boolean, :desc => "Enable verbose output mode", :aliases => "-V"
 
     def help(cli = nil)
       case cli
@@ -49,6 +52,7 @@ module Bundler
           bundle
           bundle-config
           bundle-exec
+          bundle-gem
           bundle-install
           bundle-package
           bundle-update
@@ -63,6 +67,8 @@ module Bundler
         else
           puts File.read("#{root}/#{command}.txt")
         end
+      elsif command_path = Bundler.which("bundler-#{cli}")
+        Kernel.exec(command_path, "--help")
       else
         super
       end
@@ -106,7 +112,7 @@ module Bundler
     D
     method_option "gemspec", :type => :string, :banner => "Use the specified .gemspec to create the Gemfile"
     def init
-      require 'bundler/cli/init'
+      require "bundler/cli/init"
       Init.new(options.dup).run
     end
 
@@ -122,8 +128,9 @@ module Bundler
       "Use the specified gemfile instead of Gemfile"
     method_option "path", :type => :string, :banner =>
       "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
+    map "c" => "check"
     def check
-      require 'bundler/cli/check'
+      require "bundler/cli/check"
       Check.new(options).run
     end
 
@@ -182,14 +189,14 @@ module Bundler
       "Install to the system location ($BUNDLE_PATH or $GEM_HOME) even if the bundle was previously installed somewhere else for this application"
     method_option "trust-policy", :alias => "P", :type => :string, :banner =>
       "Gem trust policy (like gem install -P). Must be one of " +
-        Bundler.rubygems.security_policy_keys.join('|')
+        Bundler.rubygems.security_policy_keys.join("|")
     method_option "without", :type => :array, :banner =>
       "Exclude gems that are part of the specified named group."
     method_option "with", :type => :array, :banner =>
       "Include gems that are part of the specified named group."
-
+    map "i" => "install"
     def install
-      require 'bundler/cli/install'
+      require "bundler/cli/install"
       Install.new(options.dup).run
     end
 
@@ -214,7 +221,7 @@ module Bundler
     method_option "force", :type => :boolean, :banner =>
       "Force downloading every gem."
     def update(*gems)
-      require 'bundler/cli/update'
+      require "bundler/cli/update"
       Update.new(options, gems).run
     end
 
@@ -228,7 +235,7 @@ module Bundler
     method_option "outdated", :type => :boolean,
       :banner => "Show verbose output including whether gems are outdated."
     def show(gem_name = nil)
-      require 'bundler/cli/show'
+      require "bundler/cli/show"
       Show.new(options, gem_name).run
     end
     map %w(list) => "show"
@@ -243,7 +250,7 @@ module Bundler
     method_option "path", :type => :string, :lazy_default => "bin", :banner =>
       "Binstub destination directory (default bin)"
     def binstubs(*gems)
-      require 'bundler/cli/binstubs'
+      require "bundler/cli/binstubs"
       Binstubs.new(options, gems).run
     end
 
@@ -261,16 +268,16 @@ module Bundler
     method_option "strict", :type => :boolean, :banner =>
       "Only list newer versions allowed by your Gemfile requirements"
     def outdated(*gems)
-      require 'bundler/cli/outdated'
+      require "bundler/cli/outdated"
       Outdated.new(options, gems).run
     end
 
     desc "cache [OPTIONS]", "Cache all the gems to vendor/cache", :hide => true
     method_option "all",  :type => :boolean, :banner => "Include all sources (including path and git)."
     method_option "all-platforms", :type => :boolean, :banner => "Include gems for all platforms, not just the current one"
-    method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
+    method_option "no-prune", :type => :boolean, :banner => "Don't remove stale gems from the cache."
     def cache
-      require 'bundler/cli/cache'
+      require "bundler/cli/cache"
       Cache.new(options).run
     end
 
@@ -280,8 +287,8 @@ module Bundler
     method_option "cache-path", :type => :string, :banner =>
       "Specify a different cache path than the default (vendor/cache)."
     method_option "gemfile", :type => :string, :banner => "Use the specified gemfile instead of Gemfile"
-    method_option "no-install",  :type => :boolean, :banner => "Don't actually install the gems, just package."
-    method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
+    method_option "no-install", :type => :boolean, :banner => "Don't actually install the gems, just package."
+    method_option "no-prune", :type => :boolean, :banner => "Don't remove stale gems from the cache."
     method_option "path", :type => :string, :banner =>
       "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
     method_option "quiet", :type => :boolean, :banner => "Only output warnings and errors."
@@ -292,7 +299,7 @@ module Bundler
       bundle without having to download any additional gems.
     D
     def package
-      require 'bundler/cli/package'
+      require "bundler/cli/package"
       Package.new(options).run
     end
     map %w(pack) => :package
@@ -304,8 +311,9 @@ module Bundler
       bundle exec you can require and call the bundled gems as if they were installed
       into the system wide Rubygems repository.
     D
+    map "e" => "exec"
     def exec(*args)
-      require 'bundler/cli/exec'
+      require "bundler/cli/exec"
       Exec.new(options, args).run
     end
 
@@ -322,19 +330,19 @@ module Bundler
       where they were specified.
     D
     def config(*args)
-      require 'bundler/cli/config'
+      require "bundler/cli/config"
       Config.new(options, args, self).run
     end
 
     desc "open GEM", "Opens the source directory of the given bundled gem"
     def open(name)
-      require 'bundler/cli/open'
+      require "bundler/cli/open"
       Open.new(options, name).run
     end
 
     desc "console [GROUP]", "Opens an IRB session with the bundle pre-loaded"
     def console(group = nil)
-      require 'bundler/cli/console'
+      require "bundler/cli/console"
       Console.new(options, group).run
     end
 
@@ -346,7 +354,7 @@ module Bundler
 
     desc "licenses", "Prints the license of all gems in the bundle"
     def licenses
-      Bundler.load.specs.sort_by { |s| s.license.to_s }.reverse.each do |s|
+      Bundler.load.specs.sort_by {|s| s.license.to_s }.reverse_each do |s|
         gem_name = s.name
         license  = s.license || s.licenses
 
@@ -358,39 +366,39 @@ module Bundler
       end
     end
 
-    desc 'viz [OPTIONS]', "Generates a visual dependency graph"
+    desc "viz [OPTIONS]", "Generates a visual dependency graph"
     long_desc <<-D
       Viz generates a PNG file of the current Gemfile as a dependency graph.
       Viz requires the ruby-graphviz gem (and its dependencies).
       The associated gems must also be installed via 'bundle install'.
     D
-    method_option :file, :type => :string, :default => 'gem_graph', :aliases => '-f', :banner => "The name to use for the generated file. see format option"
-    method_option :format, :type => :string, :default => "png", :aliases => '-F', :banner => "This is output format option. Supported format is png, jpg, svg, dot ..."
-    method_option :requirements, :type => :boolean, :default => false, :aliases => '-r', :banner => "Set to show the version of each required dependency."
-    method_option :version, :type => :boolean, :default => false, :aliases => '-v', :banner => "Set to show each gem version."
+    method_option :file, :type => :string, :default => "gem_graph", :aliases => "-f", :banner => "The name to use for the generated file. see format option"
+    method_option :format, :type => :string, :default => "png", :aliases => "-F", :banner => "This is output format option. Supported format is png, jpg, svg, dot ..."
+    method_option :requirements, :type => :boolean, :default => false, :aliases => "-r", :banner => "Set to show the version of each required dependency."
+    method_option :version, :type => :boolean, :default => false, :aliases => "-v", :banner => "Set to show each gem version."
     method_option :without, :type => :array, :default => [], :banner => "Exclude gems that are part of the specified named group."
     def viz
-      require 'bundler/cli/viz'
+      require "bundler/cli/viz"
       Viz.new(options).run
     end
 
     desc "gem GEM [OPTIONS]", "Creates a skeleton for creating a rubygem"
-    method_option :bin, :type => :boolean, :default => false, :aliases => '-b', :desc => "Generate a binary for your library."
+    method_option :bin, :type => :boolean, :default => false, :aliases => "-b", :desc => "Generate a binary for your library."
     method_option :coc, :type => :boolean, :desc => "Generate a code of conduct file. Set a default with `bundle config gem.coc true`."
     method_option :edit, :type => :string, :aliases => "-e", :required => false, :banner => "EDITOR",
-      :lazy_default => [ENV['BUNDLER_EDITOR'], ENV['VISUAL'], ENV['EDITOR']].find{|e| !e.nil? && !e.empty? },
+      :lazy_default => [ENV["BUNDLER_EDITOR"], ENV["VISUAL"], ENV["EDITOR"]].find {|e| !e.nil? && !e.empty? },
       :desc => "Open generated gemspec in the specified editor (defaults to $EDITOR or $BUNDLER_EDITOR)"
     method_option :ext, :type => :boolean, :default => false, :desc => "Generate the boilerplate for C extension code"
-    method_option :mit, :type => :boolean, :desc => "Generate an MIT license file"
-    method_option :test, :type => :string, :lazy_default => 'rspec', :aliases => '-t', :banner => "rspec",
+    method_option :mit, :type => :boolean, :desc => "Generate an MIT license file. Set a default with `bundle config gem.mit true`."
+    method_option :test, :type => :string, :lazy_default => "rspec", :aliases => "-t", :banner => "rspec",
       :desc => "Generate a test directory for your library, either rspec or minitest. Set a default with `bundle config gem.test rspec`."
     def gem(name)
-      require 'bundler/cli/gem'
+      require "bundler/cli/gem"
       Gem.new(options, name, self).run
     end
 
     def self.source_root
-      File.expand_path(File.join(File.dirname(__FILE__), 'templates'))
+      File.expand_path(File.join(File.dirname(__FILE__), "templates"))
     end
 
     desc "clean [OPTIONS]", "Cleans up unused gems in your bundler directory"
@@ -399,7 +407,7 @@ module Bundler
     method_option "force", :type => :boolean, :default => false, :banner =>
       "Forces clean even if --path is not set"
     def clean
-      require 'bundler/cli/clean'
+      require "bundler/cli/clean"
       Clean.new(options.dup).run
     end
 
@@ -407,13 +415,13 @@ module Bundler
     method_option "ruby", :type => :boolean, :default => false, :banner =>
       "only display ruby related platform information"
     def platform
-      require 'bundler/cli/platform'
+      require "bundler/cli/platform"
       Platform.new(options).run
     end
 
     desc "inject GEM VERSION ...", "Add the named gem(s), with version requirements, to the resolved Gemfile"
     def inject(name, version, *gems)
-      require 'bundler/cli/inject'
+      require "bundler/cli/inject"
       Inject.new(options, name, version, gems).run
     end
 
@@ -427,7 +435,7 @@ module Bundler
     method_option "lockfile", :type => :string, :default => nil, :banner =>
       "the path the lockfile should be written to"
     def lock
-      require 'bundler/cli/lock'
+      require "bundler/cli/lock"
       Lock.new(options).run
     end
 
@@ -436,7 +444,7 @@ module Bundler
       Env.new.write($stdout)
     end
 
-    private
+  private
 
       # Automatically invoke `bundle install` and resume if
       # Bundler.settings[:auto_install] exists. This is set through config cmd

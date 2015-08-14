@@ -6,7 +6,7 @@ module Bundler
     end
 
     def run
-      require 'graphviz'
+      require "graphviz"
       output_file = File.expand_path(options[:file])
       graph = Graph.new(Bundler.load, output_file, options[:version], options[:requirements], options[:format], options[:without])
       graph.viz
@@ -22,6 +22,5 @@ module Bundler
         raise
       end
     end
-
   end
 end

@@ -1,4 +1,4 @@
-require 'bundler/remote_specification'
+require "bundler/remote_specification"
 
 module Bundler
   class StubSpecification < RemoteSpecification

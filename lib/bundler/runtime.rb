@@ -5,7 +5,7 @@ module Bundler
     include SharedHelpers
 
     def setup(*groups)
-      groups.map! { |g| g.to_sym }
+      groups.map!(&:to_sym)
 
       # Has to happen first
       clean_load_path
@@ -35,13 +35,13 @@ module Bundler
         end
 
         Bundler.rubygems.mark_loaded(spec)
-        load_paths = spec.load_paths.reject {|path| $LOAD_PATH.include?(path)}
+        load_paths = spec.load_paths.reject {|path| $LOAD_PATH.include?(path) }
         $LOAD_PATH.unshift(*load_paths)
       end
 
       setup_manpath
 
-      lock
+      lock(:preserve_bundled_with => true)
 
       self
     end
@@ -55,7 +55,7 @@ module Bundler
     ]
 
     def require(*groups)
-      groups.map! { |g| g.to_sym }
+      groups.map!(&:to_sym)
       groups = [:default] if groups.empty?
 
       @definition.dependencies.each do |dep|
@@ -76,15 +76,15 @@ module Bundler
             Kernel.require file
           end
         rescue LoadError => e
-          REQUIRE_ERRORS.find { |r| r =~ e.message }
+          REQUIRE_ERRORS.find {|r| r =~ e.message }
           raise if dep.autorequire || $1 != required_file
 
-          if dep.autorequire.nil? && dep.name.include?('-')
+          if dep.autorequire.nil? && dep.name.include?("-")
             begin
-              namespaced_file = dep.name.gsub('-', '/')
+              namespaced_file = dep.name.tr("-", "/")
               Kernel.require namespaced_file
             rescue LoadError => e
-              REQUIRE_ERRORS.find { |r| r =~ e.message }
+              REQUIRE_ERRORS.find {|r| r =~ e.message }
               raise if $1 != namespaced_file
             end
           end
@@ -96,11 +96,11 @@ module Bundler
       if groups.empty?
         dependencies
       else
-        dependencies.select { |d| (groups & d.groups).any? }
+        dependencies.select {|d| (groups & d.groups).any? }
       end
     end
 
-    alias gems specs
+    alias_method :gems, :specs
 
     def cache(custom_path = nil)
       cache_path = Bundler.app_cache(custom_path)
@@ -108,7 +108,7 @@ module Bundler
 
       Bundler.ui.info "Updating files in #{Bundler.settings.app_cache_path}"
       specs.each do |spec|
-        next if spec.name == 'bundler'
+        next if spec.name == "bundler"
         spec.source.send(:fetch_gem, spec) if Bundler.settings[:cache_all_platforms] && spec.source.respond_to?(:fetch_gem, true)
         spec.source.cache(spec, custom_path) if spec.source.respond_to?(:cache)
       end
@@ -168,8 +168,8 @@ module Bundler
       output = stale_gem_dirs.collect do |gem_dir|
         full_name = Pathname.new(gem_dir).basename.to_s
 
-        parts   = full_name.split('-')
-        name    = parts[0..-2].join('-')
+        parts   = full_name.split("-")
+        name    = parts[0..-2].join("-")
         version = parts.last
         output  = "#{name} (#{version})"
 
@@ -184,8 +184,8 @@ module Bundler
       end + stale_git_dirs.collect do |gem_dir|
         full_name = Pathname.new(gem_dir).basename.to_s
 
-        parts    = full_name.split('-')
-        name     = parts[0..-2].join('-')
+        parts    = full_name.split("-")
+        name     = parts[0..-2].join("-")
         revision = parts[-1]
         output   = "#{name} (#{revision})"
 
@@ -200,10 +200,10 @@ module Bundler
       end
 
       unless dry_run
-        stale_gem_bins.each { |bin| FileUtils.rm(bin) if File.exist?(bin) }
-        stale_gem_files.each { |file| FileUtils.rm(file) if File.exist?(file) }
-        stale_gemspec_files.each { |file| FileUtils.rm(file) if File.exist?(file) }
-        stale_git_cache_dirs.each { |dir| FileUtils.rm_rf(dir) if File.exist?(dir) }
+        stale_gem_bins.each {|bin| FileUtils.rm(bin) if File.exist?(bin) }
+        stale_gem_files.each {|file| FileUtils.rm(file) if File.exist?(file) }
+        stale_gemspec_files.each {|file| FileUtils.rm(file) if File.exist?(file) }
+        stale_git_cache_dirs.each {|dir| FileUtils.rm_rf(dir) if File.exist?(dir) }
       end
 
       output
@@ -225,7 +225,7 @@ module Bundler
   private
 
     def prune_gem_cache(resolve, cache_path)
-      cached  = Dir["#{cache_path}/*.gem"]
+      cached = Dir["#{cache_path}/*.gem"]
 
       cached = cached.delete_if do |path|
         spec = Bundler.rubygems.spec_from_gem path
@@ -246,7 +246,7 @@ module Bundler
     end
 
     def prune_git_and_path_cache(resolve, cache_path)
-      cached  = Dir["#{cache_path}/*/.bundlecache"]
+      cached = Dir["#{cache_path}/*/.bundlecache"]
 
       cached = cached.delete_if do |path|
         name = File.basename(File.dirname(path))
@@ -270,20 +270,19 @@ module Bundler
 
     def setup_manpath
       # Store original MANPATH for restoration later in with_clean_env()
-      ENV['BUNDLE_ORIG_MANPATH'] = ENV['MANPATH']
+      ENV["BUNDLE_ORIG_MANPATH"] = ENV["MANPATH"]
 
       # Add man/ subdirectories from activated bundles to MANPATH for man(1)
       manuals = $LOAD_PATH.map do |path|
-        man_subdir = path.sub(/lib$/, 'man')
-        man_subdir unless Dir[man_subdir + '/man?/'].empty?
+        man_subdir = path.sub(/lib$/, "man")
+        man_subdir unless Dir[man_subdir + "/man?/"].empty?
       end.compact
 
       unless manuals.empty?
-        ENV['MANPATH'] = manuals.concat(
-          ENV['MANPATH'].to_s.split(File::PATH_SEPARATOR)
+        ENV["MANPATH"] = manuals.concat(
+          ENV["MANPATH"].to_s.split(File::PATH_SEPARATOR)
         ).uniq.join(File::PATH_SEPARATOR)
       end
     end
-
   end
 end

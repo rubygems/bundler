@@ -1,7 +1,6 @@
 module Bundler
   class Source
     class Path
-
       class Installer < Bundler::GemInstaller
         attr_reader :spec
 
@@ -37,7 +36,6 @@ module Bundler
           Bundler.rm_rf(@tmp_dir) if Bundler.requires_sudo?
         end
       end
-
     end
   end
 end

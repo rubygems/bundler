@@ -5,7 +5,7 @@ class IO
     return "" if closed? || eof?
     # IO.select cannot be used here due to the fact that it
     # just does not work on windows
-    while true
+    loop do
       begin
         IO.select([self], nil, nil, select_timeout)
         break if eof? # stop raising :-(

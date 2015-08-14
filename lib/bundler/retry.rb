@@ -15,10 +15,10 @@ module Bundler
     end
 
     def initialize(name, exceptions = nil, retries = self.class.default_retries)
-      @name        = name
-      @retries   = retries
+      @name = name
+      @retries = retries
       @exceptions = Array(exceptions) || []
-      @total_runs =  @retries + 1 # will run once, then upto attempts.times
+      @total_runs = @retries + 1 # will run once, then upto attempts.times
     end
 
     def attempt(&block)
@@ -30,20 +30,21 @@ module Bundler
       end
       @result
     end
-    alias :attempts :attempt
+    alias_method :attempts, :attempt
 
   private
+
     def run(&block)
       @failed      = false
       @current_run += 1
       @result = block.call
     rescue => e
-      fail(e)
+      fail_attempt(e)
     end
 
-    def fail(e)
+    def fail_attempt(e)
       @failed = true
-      raise e if last_attempt? || @exceptions.any?{ |k| e.is_a?(k) }
+      raise e if last_attempt? || @exceptions.any? {|k| e.is_a?(k) }
       return true unless name
       Bundler.ui.warn "Retrying#{" #{name}" if name} due to error (#{current_run.next}/#{total_runs}): #{e.class} #{e.message}"
     end

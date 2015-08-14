@@ -14,9 +14,9 @@ It does this by managing the gems that the application depends on. Given a list 
 ```
 gem install bundler
 bundle init
-echo "gem 'rails'" >> Gemfile
+echo 'gem "rspec"' >> Gemfile
 bundle install
-bundle exec rails new myapp
+bundle exec rspec
 ```
 
 See [bundler.io](http://bundler.io) for the full documentation.
@@ -34,3 +34,7 @@ Feel free to chat with the Bundler core team (and many other users) on IRC in th
 ### Contributing
 
 If you'd like to contribute to Bundler, that's awesome, and we <3 you. There's a guide to contributing to Bundler (both code and general help) over in [DEVELOPMENT](https://github.com/bundler/bundler/blob/master/DEVELOPMENT.md).
+
+### Code of Conduct
+
+Everyone interacting in the Bundler project’s codebases, issue trackers, chat rooms, and mailing lists is expected to follow the [Bundler code of conduct](https://github.com/bundler/bundler/blob/master/CODE_OF_CONDUCT.md).

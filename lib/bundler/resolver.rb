@@ -1,52 +1,40 @@
-require 'set'
-
-# This is the latest iteration of the gem dependency resolving algorithm. As of now,
-# it can resolve (as a success or failure) any set of gem dependencies we throw at it
-# in a reasonable amount of time. The most iterations I've seen it take is about 150.
-# The actual implementation of the algorithm is not as good as it could be yet, but that
-# can come later.
-
 module Bundler
   class Resolver
-
-    require 'bundler/vendored_molinillo'
+    require "bundler/vendored_molinillo"
 
     class Molinillo::VersionConflict
-      def clean_req(req)
-        if req.to_s.include?(">= 0")
-          req.to_s.gsub(/ \(.*?\)$/, '')
-        else
-          req.to_s.gsub(/\, (runtime|development)\)$/, ')')
-        end
-      end
-
       def message
-        conflicts.values.flatten.reduce('') do |o, conflict|
-          o << %(Bundler could not find compatible versions for gem "#{conflict.requirement.name}":\n)
+        conflicts.sort.reduce("") do |o, (name, conflict)|
+          o << %(Bundler could not find compatible versions for gem "#{name}":\n)
           if conflict.locked_requirement
             o << %(  In snapshot (#{Bundler.default_lockfile.basename}):\n)
-            o << %(    #{clean_req conflict.locked_requirement}\n)
+            o << %(    #{DepProxy.new(conflict.locked_requirement, Gem::Platform::RUBY)}\n)
             o << %(\n)
           end
           o << %(  In Gemfile:\n)
-          o << conflict.requirement_trees.map do |tree|
-            t = ''
+          o << conflict.requirement_trees.sort_by {|t| t.reverse.map(&:name) }.map do |tree|
+            t = ""
             depth = 2
             tree.each do |req|
-              t << '  ' * depth << %(#{clean_req req})
-              t << %( depends on) unless tree[-1] == req
+              t << "  " * depth << req.to_s
+              unless tree.last == req
+                if spec = conflict.activated_by_name[req.name]
+                  t << %( was resolved to #{spec.version}, which)
+                end
+                t << %( depends on)
+              end
               t << %(\n)
               depth += 1
             end
             t
           end.join("\n")
 
-          if conflict.requirement.name == 'bundler'
+          if name == "bundler"
             o << %(\n  Current Bundler version:\n    bundler (#{Bundler::VERSION}))
             other_bundler_required = !conflict.requirement.requirement.satisfied_by?(Gem::Version.new Bundler::VERSION)
           end
 
-          if conflict.requirement.name == "bundler" && other_bundler_required
+          if name == "bundler" && other_bundler_required
             o << "\n"
             o << "This Gemfile requires a different version of Bundler.\n"
             o << "Perhaps you need to update Bundler by running `gem install bundler`?\n"
@@ -56,11 +44,12 @@ module Bundler
             o << %(Running `bundle update` will rebuild your snapshot from scratch, using only\n)
             o << %(the gems in your Gemfile, which may resolve the conflict.\n)
           elsif !conflict.existing
+            o << "\n"
             if conflict.requirement_trees.first.size > 1
-              o << "Could not find gem '#{clean_req(conflict.requirement)}', which is required by "
-              o << "gem '#{clean_req(conflict.requirement_trees.first[-2])}', in any of the sources."
+              o << "Could not find gem '#{conflict.requirement}', which is required by "
+              o << "gem '#{conflict.requirement_trees.first[-2]}', in any of the sources."
             else
-              o << "Could not find gem '#{clean_req(conflict.requirement)} in any of the sources\n"
+              o << "Could not find gem '#{conflict.requirement}' in any of the sources\n"
             end
           end
           o
@@ -83,7 +72,7 @@ module Bundler
         @specs        = {}
 
         ALL.each do |p|
-          @specs[p] = reverse.find { |s| s.match_platform(p) }
+          @specs[p] = reverse.find {|s| s.match_platform(p) }
         end
       end
 
@@ -140,11 +129,11 @@ module Bundler
       end
 
       def dependencies_for_activated_platforms
-        @activated.map { |p| __dependencies[p] }.flatten
+        @activated.map {|p| __dependencies[p] }.flatten
       end
 
       def platforms_for_dependency_named(dependency)
-        __dependencies.select { |p, deps| deps.map(&:name).include? dependency }.keys
+        __dependencies.select {|_, deps| deps.map(&:name).include? dependency }.keys
       end
 
     private
@@ -183,7 +172,6 @@ module Bundler
       SpecSet.new(result)
     end
 
-
     def initialize(index, source_requirements, base)
       @index = index
       @source_requirements = source_requirements
@@ -191,7 +179,7 @@ module Bundler
       @resolver = Molinillo::Resolver.new(self, self)
       @search_for = {}
       @base_dg = Molinillo::DependencyGraph.new
-      @base.each { |ls| @base_dg.add_root_vertex ls.name, Dependency.new(ls.name, ls.version) }
+      @base.each {|ls| @base_dg.add_vertex(ls.name, Dependency.new(ls.name, ls.version), true) }
     end
 
     def start(requirements)
@@ -201,10 +189,10 @@ module Bundler
     rescue Molinillo::VersionConflict => e
       raise VersionConflict.new(e.conflicts.keys.uniq, e.message)
     rescue Molinillo::CircularDependencyError => e
-      names = e.dependencies.sort_by(&:name).map { |d| "gem '#{d.name}'"}
-      raise CyclicDependencyError, "Your Gemfile requires gems that depend" \
+      names = e.dependencies.sort_by(&:name).map {|d| "gem '#{d.name}'" }
+      raise CyclicDependencyError, "Your bundle requires gems that depend" \
         " on each other, creating an infinite loop. Please remove" \
-        " #{names.count > 1 ? 'either ' : '' }#{names.join(' or ')}" \
+        " #{names.count > 1 ? "either " : "" }#{names.join(" or ")}" \
         " and try again."
     end
 
@@ -218,27 +206,27 @@ module Bundler
       if debug?
         debug_info = yield
         debug_info = debug_info.inspect unless debug_info.is_a?(String)
-        STDERR.puts debug_info.split("\n").map { |s| '  ' * depth + s }
+        STDERR.puts debug_info.split("\n").map {|s| "  " * depth + s }
       end
     end
 
     def debug?
-      ENV['DEBUG_RESOLVER'] || ENV['DEBUG_RESOLVER_TREE']
+      ENV["DEBUG_RESOLVER"] || ENV["DEBUG_RESOLVER_TREE"]
     end
 
     def before_resolution
-      Bundler.ui.info 'Resolving dependencies...', false
+      Bundler.ui.info "Resolving dependencies...", false
     end
 
     def after_resolution
-      Bundler.ui.info ''
+      Bundler.ui.info ""
     end
 
     def indicate_progress
-      Bundler.ui.info '.', false
+      Bundler.ui.info ".", false
     end
 
-    private
+  private
 
     include Molinillo::SpecificationProvider
 
@@ -265,13 +253,13 @@ module Bundler
             end
             nested.last << spec
           end
-          groups = nested.map { |a| SpecGroup.new(a) }
-          !locked_requirement ? groups : groups.select { |sg| locked_requirement.satisfied_by? sg.version }
+          groups = nested.map {|a| SpecGroup.new(a) }
+          !locked_requirement ? groups : groups.select {|sg| locked_requirement.satisfied_by? sg.version }
         else
           []
         end
       end
-      search.select { |sg| sg.for?(platform) }.each { |sg| sg.activate_platform(platform) }
+      search.select {|sg| sg.for?(platform) }.each {|sg| sg.activate_platform(platform) }
     end
 
     def name_for(dependency)
@@ -279,11 +267,11 @@ module Bundler
     end
 
     def name_for_explicit_dependency_source
-      Bundler.default_gemfile.basename.to_s rescue 'Gemfile'
+      Bundler.default_gemfile.basename.to_s rescue "Gemfile"
     end
 
     def name_for_locking_dependency_source
-      Bundler.default_lockfile.basename.to_s rescue 'Gemfile.lock'
+      Bundler.default_lockfile.basename.to_s rescue "Gemfile.lock"
     end
 
     def requirement_satisfied_by?(requirement, activated, spec)
@@ -308,12 +296,14 @@ module Bundler
         if base = @base[dependency.name] and !base.empty?
           dependency.requirement.satisfied_by?(base.first.version) ? 0 : 1
         else
-          base_dep = Dependency.new dependency.name, '>= 0.a'
-          all = search_for(DepProxy.new base_dep, dependency.__platform)
-          if all.size == 0
+          base_dep = Dependency.new dependency.name, ">= 0.a"
+          all = search_for(DepProxy.new base_dep, dependency.__platform).size.to_f
+          if all.zero?
+            0
+          elsif (search = search_for(dependency).size.to_f) == all && all == 1
             0
           else
-            search_for(dependency).size.to_f / all.size.to_f
+            search / all
           end
         end
       end
@@ -321,7 +311,7 @@ module Bundler
 
     def verify_gemfile_dependencies_are_found!(requirements)
       requirements.each do |requirement|
-        next if requirement.name == 'bundler'
+        next if requirement.name == "bundler"
         if search_for(requirement).empty?
           if base = @base[requirement.name] and !base.empty?
             version = base.first.version
@@ -331,10 +321,10 @@ module Bundler
               "Try running `bundle update #{requirement.name}`"
           elsif requirement.source
             name = requirement.name
-            versions = @source_requirements[name][name].map { |s| s.version }
+            versions = @source_requirements[name][name].map(&:version)
             message  = "Could not find gem '#{requirement}' in #{requirement.source}.\n"
             if versions.any?
-              message << "Source contains '#{name}' at: #{versions.join(', ')}"
+              message << "Source contains '#{name}' at: #{versions.join(", ")}"
             else
               message << "Source does not contain any versions of '#{requirement}'"
             end
@@ -346,6 +336,5 @@ module Bundler
         end
       end
     end
-
   end
 end

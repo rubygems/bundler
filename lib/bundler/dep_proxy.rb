@@ -1,10 +1,10 @@
 module Bundler
   class DepProxy
-
     attr_reader :__platform, :dep
 
     def initialize(dep, platform)
-      @dep, @__platform = dep, platform
+      @dep = dep
+      @__platform = platform
     end
 
     def hash
@@ -15,7 +15,7 @@ module Bundler
       dep == o.dep && __platform == o.__platform
     end
 
-    alias eql? ==
+    alias_method :eql?, :==
 
     def type
       @dep.type
@@ -30,14 +30,16 @@ module Bundler
     end
 
     def to_s
-      "#{name} (#{requirement}) #{__platform}"
+      s = name.dup
+      s << " (#{requirement})" unless requirement == Gem::Requirement.default
+      s << " #{__platform}" unless __platform == Gem::Platform::RUBY
+      s
     end
 
   private
 
-    def method_missing(*args)
-      @dep.send(*args)
+    def method_missing(*args, &blk)
+      @dep.send(*args, &blk)
     end
-
   end
 end

@@ -1,6 +1,6 @@
-require 'uri'
-require 'rubygems/user_interaction'
-require 'rubygems/spec_fetcher'
+require "uri"
+require "rubygems/user_interaction"
+require "rubygems/spec_fetcher"
 
 module Bundler
   class Source
@@ -22,7 +22,7 @@ module Bundler
         @allow_cached = false
         @caches = [Bundler.app_cache, *Bundler.rubygems.gem_cache]
 
-        Array(options["remotes"] || []).reverse_each{|r| add_remote(r) }
+        Array(options["remotes"] || []).reverse_each {|r| add_remote(r) }
       end
 
       def remote!
@@ -41,7 +41,7 @@ module Bundler
         o.is_a?(Rubygems) && o.credless_remotes == credless_remotes
       end
 
-      alias == eql?
+      alias_method :==, :eql?
 
       def include?(o)
         o.is_a?(Rubygems) && (o.credless_remotes - credless_remotes).empty?
@@ -52,7 +52,7 @@ module Bundler
       end
 
       def options
-        { "remotes" => @remotes.map { |r| r.to_s } }
+        { "remotes" => @remotes.map(&:to_s) }
       end
 
       def self.from_lock(options)
@@ -68,7 +68,7 @@ module Bundler
       end
 
       def to_s
-        remote_names = self.remotes.map { |r| r.to_s }.join(', ')
+        remote_names = self.remotes.map(&:to_s).join(", ")
         "rubygems repository #{remote_names}"
       end
       alias_method :name, :to_s
@@ -98,15 +98,17 @@ module Bundler
           end
         end
 
-        return ["Using #{version_message(spec)}", nil] if installed_specs[spec].any? && !force
-
+        if installed?(spec) && (!force || spec.name.eql?("bundler"))
+          Bundler.ui.info "Using #{version_message(spec)}"
+          return nil # no post-install message
+        end
 
         # Download the gem to get the spec, because some specs that are returned
         # by rubygems.org are broken and wrong.
         if spec.remote
           # Check for this spec from other sources
           uris = [spec.remote.anonymized_uri]
-          uris += remotes_for_spec(spec).map { |remote| remote.anonymized_uri }
+          uris += remotes_for_spec(spec).map(&:anonymized_uri)
           uris.uniq!
           Installer.ambiguous_gems << [spec.name, *uris] if uris.length > 1
 
@@ -115,6 +117,10 @@ module Bundler
         end
 
         unless Bundler.settings[:no_install]
+          message = "Installing #{version_message(spec)}"
+          message << " with native extensions" if spec.extensions.any?
+          Bundler.ui.confirm message
+
           path = cached_gem(spec)
           if Bundler.requires_sudo?
             install_path = Bundler.tmp(spec.full_name)
@@ -143,7 +149,7 @@ module Bundler
               if name == "extensions" && Dir.glob(src).any?
                 src = File.join(src, "*/*")
                 ext_src = Dir.glob(src).first
-                ext_src.gsub!(src[0..-6], '')
+                ext_src.gsub!(src[0..-6], "")
                 dst = File.dirname(File.join(dst, ext_src))
               end
               Bundler.mkdir_p dst
@@ -158,7 +164,8 @@ module Bundler
           installed_spec.loaded_from = loaded_from(spec)
         end
         spec.loaded_from = loaded_from(spec)
-        ["Installing #{version_message(spec)}", spec.post_install_message]
+
+        spec.post_install_message
       ensure
         Bundler.rm_rf(install_path) if Bundler.requires_sudo?
       end
@@ -182,7 +189,11 @@ module Bundler
         cached_path = cached_path(spec)
         if cached_path.nil?
           remote_spec = remote_specs.search(spec).first
-          cached_path = fetch_gem(remote_spec)
+          if remote_spec
+            cached_path = fetch_gem(remote_spec)
+          else
+            Bundler.ui.warn "#{spec.full_name} is built in to Ruby, and can't be cached because your Gemfile doesn't have any sources that contain it."
+          end
         end
         cached_path
       end
@@ -242,8 +253,8 @@ module Bundler
       end
 
       def cached_path(spec)
-        possibilities = @caches.map { |p| "#{p}/#{spec.file_name}" }
-        possibilities.find { |p| File.exist?(p) }
+        possibilities = @caches.map {|p| "#{p}/#{spec.file_name}" }
+        possibilities.find {|p| File.exist?(p) }
       end
 
       def normalize_uri(uri)
@@ -255,7 +266,7 @@ module Bundler
       end
 
       def suppress_configured_credentials(remote)
-        remote_nouser = remote.dup.tap { |uri| uri.user = uri.password = nil }.to_s
+        remote_nouser = remote.dup.tap {|uri| uri.user = uri.password = nil }.to_s
         if remote.userinfo && remote.userinfo == Bundler.settings[remote_nouser]
           remote_nouser
         else
@@ -267,9 +278,9 @@ module Bundler
         @installed_specs ||= begin
           idx = Index.new
           have_bundler = false
-          Bundler.rubygems.all_specs.reverse.each do |spec|
-            next if spec.name == 'bundler' && spec.version.to_s != VERSION
-            have_bundler = true if spec.name == 'bundler'
+          Bundler.rubygems.all_specs.reverse_each do |spec|
+            next if spec.name == "bundler" && spec.version.to_s != VERSION
+            have_bundler = true if spec.name == "bundler"
             spec.source = self
             idx << spec
           end
@@ -280,7 +291,7 @@ module Bundler
            # so, let's create a fake gemspec for it (it's a path)
            # gemspec
            bundler = Gem::Specification.new do |s|
-             s.name     = 'bundler'
+             s.name     = "bundler"
              s.version  = VERSION
              s.platform = Gem::Platform::RUBY
              s.source   = self
@@ -342,14 +353,15 @@ module Bundler
             # but will not have found any versions of Bar from source B, which is a problem if the requested version
             # of Foo specifically depends on a version of Bar that is only found in source B. This ensures that for
             # each spec we found, we add all possible versions from all sources to the index.
-            begin
+            loop do
               idxcount = idx.size
               api_fetchers.each do |f|
                 Bundler.ui.info "Fetching version metadata from #{f.uri}", Bundler.ui.debug?
                 idx.use f.specs(idx.dependency_names, self), true
                 Bundler.ui.info "" if !Bundler.ui.debug? # new line now that the dots are over
               end
-            end until idxcount == idx.size
+              break if idxcount == idx.size
+            end
 
             if api_fetchers.any?
               # it's possible that gems from one source depend on gems from some
@@ -406,6 +418,9 @@ module Bundler
         spec.loaded_from && spec.loaded_from.include?("specifications/default/")
       end
 
+      def installed?(spec)
+        installed_specs[spec].any?
+      end
     end
   end
 end

@@ -1,4 +1,4 @@
-require 'rubygems/installer'
+require "rubygems/installer"
 
 module Bundler
   class GemInstaller < Gem::Installer

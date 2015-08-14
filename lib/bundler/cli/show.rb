@@ -1,4 +1,4 @@
-require 'bundler/cli/common'
+require "bundler/cli/common"
 
 module Bundler
   class CLI::Show
@@ -31,19 +31,19 @@ module Bundler
       end
 
       if options[:paths]
-        Bundler.load.specs.sort_by { |s| s.name }.map do |s|
+        Bundler.load.specs.sort_by(&:name).map do |s|
           Bundler.ui.info s.full_gem_path
         end
       else
         Bundler.ui.info "Gems included by the bundle:"
-        Bundler.load.specs.sort_by { |s| s.name }.each do |s|
+        Bundler.load.specs.sort_by(&:name).each do |s|
           desc = "  * #{s.name} (#{s.version}#{s.git_version})"
           if @verbose
-            latest = latest_specs.find { |l| l.name == s.name }
-            Bundler.ui.info <<-END.gsub(/^ +/, '')
+            latest = latest_specs.find {|l| l.name == s.name }
+            Bundler.ui.info <<-END.gsub(/^ +/, "")
               #{desc}
-              \tSummary:  #{s.summary || 'No description available.'}
-              \tHomepage: #{s.homepage || 'No website available.'}
+              \tSummary:  #{s.summary || "No description available."}
+              \tHomepage: #{s.homepage || "No website available."}
               \tStatus:   #{outdated?(s, latest) ? "Outdated - #{s.version} < #{latest.version}" : "Up to date"}
             END
           else
@@ -53,7 +53,7 @@ module Bundler
       end
     end
 
-    private
+  private
 
     def fetch_latest_specs
       definition = Bundler.definition(true)

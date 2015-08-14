@@ -4,13 +4,13 @@ module Spec
       dep = Bundler::Dependency.new(*args)
 
       match do |actual|
-        actual.length == 1 && actual.all? { |d| d == dep }
+        actual.length == 1 && actual.all? {|d| d == dep }
       end
     end
 
     RSpec::Matchers.define :have_gem do |*args|
       match do |actual|
-        actual.length == args.length && actual.all? { |a| args.include?(a.full_name) }
+        actual.length == args.length && actual.all? {|a| args.include?(a.full_name) }
       end
     end
 
@@ -32,7 +32,7 @@ module Spec
       groups << opts
       names.each do |name|
         name, version, platform = name.split(/\s+/)
-        version_const = name == 'bundler' ? 'Bundler::VERSION' : Spec::Builders.constantize(name)
+        version_const = name == "bundler" ? "Bundler::VERSION" : Spec::Builders.constantize(name)
         run "require '#{name}.rb'; puts #{version_const}", *groups
         actual_version, actual_platform = out.split(/\s+/)
         expect(Gem::Version.new(actual_version)).to eq(Gem::Version.new(version))
@@ -40,7 +40,7 @@ module Spec
       end
     end
 
-    alias should_be_available should_be_installed
+    alias_method :should_be_available, :should_be_installed
 
     def should_not_be_installed(*names)
       opts = names.last.is_a?(Hash) ? names.pop : {}
@@ -70,7 +70,7 @@ module Spec
     def lockfile_should_be(expected)
       should_be_locked
       spaces = expected[/\A\s+/, 0] || ""
-      expected.gsub!(/^#{spaces}/, '')
+      expected.gsub!(/^#{spaces}/, "")
       expect(bundled_app("Gemfile.lock").read).to eq(expected)
     end
   end

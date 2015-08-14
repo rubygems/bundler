@@ -70,6 +70,15 @@ module Bundler
       end
     end
 
+    # needed for "with native extensions" during install
+    def extensions
+      if @remote_specification
+        @remote_specification.extensions
+      elsif _local_specification
+        _local_specification.extensions
+      end
+    end
+
     def _local_specification
       if @loaded_from && File.exist?(local_specification_path)
         eval(File.read(local_specification_path)).tap do |spec|

@@ -1,4 +1,4 @@
-require 'thread'
+require "thread"
 
 module Bundler
   class Worker
@@ -19,7 +19,7 @@ module Bundler
       @request_queue = Queue.new
       @response_queue = Queue.new
       @func = func
-      @threads = size.times.map { |i| Thread.start { process_queue(i) } }
+      @threads = size.times.map {|i| Thread.start { process_queue(i) } }
       trap("INT") { abort_threads }
     end
 
@@ -61,13 +61,12 @@ module Bundler
     # so as worker threads after retrieving it, shut themselves down
     def stop_threads
       @threads.each { @request_queue.enq POISON }
-      @threads.each { |thread| thread.join }
+      @threads.each(&:join)
     end
 
     def abort_threads
-      @threads.each {|i| i.exit }
+      @threads.each(&:exit)
       exit 1
     end
-
   end
 end

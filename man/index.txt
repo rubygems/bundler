@@ -5,3 +5,4 @@ bundle-package     bundle-package.1
 bundle-exec        bundle-exec.1
 bundle-config      bundle-config.1
 bundle-platform    bundle-platform.1
+bundle-gem         bundle-gem.1

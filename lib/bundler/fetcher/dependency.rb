@@ -1,4 +1,5 @@
-require 'bundler/fetcher/base'
+require "bundler/fetcher/base"
+require "cgi"
 
 module Bundler
   class Fetcher
@@ -27,7 +28,7 @@ module Bundler
           Bundler.ui.info ".", false
         end
 
-        return {remote_uri => last_spec_list} if query_list.empty?
+        return { remote_uri => last_spec_list } if query_list.empty?
 
         remote_specs = Bundler::Retry.new("dependency api", AUTH_ERRORS).attempts do
           dependency_specs(query_list)
@@ -43,7 +44,7 @@ module Bundler
       end
 
       def dependency_specs(gem_names)
-        Bundler.ui.debug "Query Gemcutter Dependency Endpoint API: #{gem_names.join(',')}"
+        Bundler.ui.debug "Query Gemcutter Dependency Endpoint API: #{gem_names.join(",")}"
         gem_list = []
         deps_list = []
 
@@ -67,7 +68,7 @@ module Bundler
 
       def dependency_api_uri(gem_names = [])
         uri = fetch_uri + "api/v1/dependencies"
-        uri.query = "gems=#{URI.encode(gem_names.join(","))}" if gem_names.any?
+        uri.query = "gems=#{CGI.escape(gem_names.join(","))}" if gem_names.any?
         uri
       end
 
@@ -82,7 +83,6 @@ module Bundler
           "gemspec. \nPlease ask the gem author to yank the bad version to fix " \
           "this issue. For more information, see http://bit.ly/syck-defaultkey."
       end
-
     end
   end
 end

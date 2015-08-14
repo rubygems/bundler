@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe "post bundle message" do
   before :each do
@@ -13,11 +13,11 @@ describe "post bundle message" do
     G
   end
 
-  let(:bundle_show_message)       {"Use `bundle show [gemname]` to see where a bundled gem is installed."}
-  let(:bundle_deployment_message) {"Bundled gems are installed into ./vendor"}
-  let(:bundle_complete_message)   {"Bundle complete!"}
-  let(:bundle_updated_message)    {"Bundle updated!"}
-  let(:installed_gems_stats)      {"4 Gemfile dependencies, 5 gems now installed."}
+  let(:bundle_show_message)       { "Use `bundle show [gemname]` to see where a bundled gem is installed." }
+  let(:bundle_deployment_message) { "Bundled gems are installed into ./vendor" }
+  let(:bundle_complete_message)   { "Bundle complete!" }
+  let(:bundle_updated_message)    { "Bundle updated!" }
+  let(:installed_gems_stats)      { "4 Gemfile dependencies, 5 gems now installed." }
 
   describe "for fresh bundle install" do
     it "without any options" do
@@ -89,7 +89,7 @@ describe "post bundle message" do
           gem "rack"
           gem "not-a-gem", :group => :development
         G
-        expect(out).to include("Could not find gem 'not-a-gem (>= 0) ruby' in any of the gem sources listed in your Gemfile or available on this machine.")
+        expect(out).to include("Could not find gem 'not-a-gem' in any of the gem sources listed in your Gemfile or available on this machine.")
       end
     end
   end

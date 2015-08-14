@@ -2,9 +2,9 @@
 
 Signal.trap("INT") { exit 1 }
 
-require 'bundler/ruby_version'
-require 'bundler/ruby_dsl'
-require 'bundler/shared_helpers'
+require "bundler/ruby_version"
+require "bundler/ruby_dsl"
+require "bundler/shared_helpers"
 
 module Bundler
   class GemfileError < RuntimeError; end
@@ -18,7 +18,7 @@ module Bundler
     end
 
     def eval_gemfile(gemfile, contents = nil)
-      contents ||= File.open(gemfile, "rb") { |f| f.read }
+      contents ||= File.open(gemfile, "rb") {|f| f.read }
       instance_eval(contents, gemfile.to_s, 1)
     rescue SyntaxError => e
       bt = e.message.split("\n")[1..-1]

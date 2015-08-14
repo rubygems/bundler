@@ -1,4 +1,4 @@
-require 'bundler/cli/common'
+require "bundler/cli/common"
 
 module Bundler
   class CLI::Outdated
@@ -18,7 +18,7 @@ module Bundler
       Bundler.definition.validate_ruby!
       current_specs = Bundler.ui.silence { Bundler.load.specs }
       current_dependencies = {}
-      Bundler.ui.silence { Bundler.load.dependencies.each { |dep| current_dependencies[dep.name] = dep } }
+      Bundler.ui.silence { Bundler.load.dependencies.each {|dep| current_dependencies[dep.name] = dep } }
 
       if gems.empty? && sources.empty?
         # We're doing a full update
@@ -32,18 +32,18 @@ module Bundler
 
       out_count = 0
       # Loop through the current specs
-      gemfile_specs, dependency_specs = current_specs.partition { |spec| current_dependencies.has_key? spec.name }
+      gemfile_specs, dependency_specs = current_specs.partition {|spec| current_dependencies.has_key? spec.name }
       [gemfile_specs.sort_by(&:name), dependency_specs.sort_by(&:name)].flatten.each do |current_spec|
         next if !gems.empty? && !gems.include?(current_spec.name)
 
         dependency = current_dependencies[current_spec.name]
 
         if options["strict"]
-          active_spec =  definition.specs.detect { |spec| spec.name == current_spec.name }
+          active_spec = definition.specs.detect {|spec| spec.name == current_spec.name }
         else
-          active_spec = definition.index[current_spec.name].sort_by { |b| b.version }
+          active_spec = definition.index[current_spec.name].sort_by(&:version)
           if !current_spec.version.prerelease? && !options[:pre] && active_spec.size > 1
-            active_spec = active_spec.delete_if { |b| b.respond_to?(:version) && b.version.prerelease? }
+            active_spec = active_spec.delete_if {|b| b.respond_to?(:version) && b.version.prerelease? }
           end
           active_spec = active_spec.last
         end
@@ -82,6 +82,5 @@ module Bundler
         exit 1
       end
     end
-
   end
 end

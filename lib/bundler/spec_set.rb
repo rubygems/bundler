@@ -1,5 +1,5 @@
-require 'tsort'
-require 'forwardable'
+require "tsort"
+require "forwardable"
 
 module Bundler
   class SpecSet
@@ -10,12 +10,14 @@ module Bundler
     def_delegators :sorted, :each
 
     def initialize(specs)
-      @specs = specs.sort_by { |s| s.name }
+      @specs = specs.sort_by(&:name)
     end
 
     def for(dependencies, skip = [], check = false, match_current_platform = false)
-      handled, deps, specs = {}, dependencies.dup, []
-      skip << 'bundler'
+      handled = {}
+      deps = dependencies.dup
+      specs = []
+      skip << "bundler"
 
       until deps.empty?
         dep = deps.shift
@@ -44,7 +46,7 @@ module Bundler
         end
       end
 
-      if spec = lookup['bundler'].first
+      if spec = lookup["bundler"].first
         specs << spec
       end
 
@@ -81,7 +83,7 @@ module Bundler
 
     def materialize(deps, missing_specs = nil)
       materialized = self.for(deps, [], false, true).to_a
-      deps = materialized.map {|s| s.name }.uniq
+      deps = materialized.map(&:name).uniq
       materialized.map! do |s|
         next s unless s.is_a?(LazySpecification)
         s.source.dependency_names = deps if s.source.respond_to?(:dependency_names=)
@@ -99,7 +101,7 @@ module Bundler
     def merge(set)
       arr = sorted.dup
       set.each do |s|
-        next if arr.any? { |s2| s2.name == s.name && s2.version == s.version && s2.platform == s.platform }
+        next if arr.any? {|s2| s2.name == s.name && s2.version == s.version && s2.platform == s.platform }
         arr << s
       end
       SpecSet.new(arr)
@@ -108,12 +110,12 @@ module Bundler
   private
 
     def sorted
-      rake = @specs.find { |s| s.name == 'rake' }
+      rake = @specs.find {|s| s.name == "rake" }
       begin
         @sorted ||= ([rake] + tsort).compact.uniq
       rescue TSort::Cyclic => error
         cgems = extract_circular_gems(error)
-        raise CyclicDependencyError, "Your Gemfile requires gems that depend" \
+        raise CyclicDependencyError, "Your bundle requires gems that depend" \
           " depend on each other, creating an infinite loop. Please remove" \
           " either gem '#{cgems[1]}' or gem '#{cgems[0]}' and try again."
       end
@@ -129,9 +131,9 @@ module Bundler
 
     def lookup
       @lookup ||= begin
-        lookup = Hash.new { |h,k| h[k] = [] }
+        lookup = Hash.new {|h, k| h[k] = [] }
         specs = @specs.sort_by do |s|
-          s.platform.to_s == 'ruby' ? "\0" : s.platform.to_s
+          s.platform.to_s == "ruby" ? "\0" : s.platform.to_s
         end
         specs.reverse_each do |s|
           lookup[s.name] << s
@@ -141,13 +143,13 @@ module Bundler
     end
 
     def tsort_each_node
-      @specs.each { |s| yield s }
+      @specs.each {|s| yield s }
     end
 
     def tsort_each_child(s)
-      s.dependencies.sort_by { |d| d.name }.each do |d|
+      s.dependencies.sort_by(&:name).each do |d|
         next if d.type == :development
-        lookup[d.name].each { |s2| yield s2 }
+        lookup[d.name].each {|s2| yield s2 }
       end
     end
   end

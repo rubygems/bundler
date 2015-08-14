@@ -52,7 +52,7 @@ module Bundler
     end
 
     def get(source)
-      source_list_for(source).find { |s| source == s }
+      source_list_for(source).find {|s| source == s }
     end
 
     def lock_sources
@@ -65,12 +65,12 @@ module Bundler
 
       [path_sources, git_sources].each do |source_list|
         source_list.map! do |source|
-          replacement_sources.find { |s| s == source } || source
+          replacement_sources.find {|s| s == source } || source
         end
       end
 
       replacement_rubygems =
-        replacement_sources.detect { |s| s.is_a?(Source::Rubygems) }
+        replacement_sources.detect {|s| s.is_a?(Source::Rubygems) }
       @rubygems_aggregate = replacement_rubygems if replacement_rubygems
 
       # Return true if there were changes

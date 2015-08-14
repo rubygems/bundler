@@ -1,8 +1,8 @@
 module Bundler
   class Source
-    autoload :Rubygems, 'bundler/source/rubygems'
-    autoload :Path,     'bundler/source/path'
-    autoload :Git,      'bundler/source/git'
+    autoload :Rubygems, "bundler/source/rubygems"
+    autoload :Path,     "bundler/source/path"
+    autoload :Git,      "bundler/source/git"
 
     attr_accessor :dependency_names
 
@@ -14,7 +14,7 @@ module Bundler
       message = "#{spec.name} #{spec.version}"
 
       if !Bundler.plugin_install_mode && Bundler.locked_gems
-        locked_spec = Bundler.locked_gems.specs.find { |s| s.name == spec.name }
+        locked_spec = Bundler.locked_gems.specs.find {|s| s.name == spec.name }
         locked_spec_version = locked_spec.version if locked_spec
         if locked_spec_version && spec.version != locked_spec_version
           message << " (was #{locked_spec_version})"
@@ -31,6 +31,5 @@ module Bundler
     def include?(other)
       other == self
     end
-
   end
 end

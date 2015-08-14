@@ -1,4 +1,4 @@
-require 'set'
+require "set"
 module Bundler
   class Graph
     GRAPH_NAME = :Gemfile
@@ -12,7 +12,7 @@ module Bundler
       @without_groups    = without.map(&:to_sym)
 
       @groups            = []
-      @relations         = Hash.new {|h, k| h[k] = Set.new}
+      @relations         = Hash.new {|h, k| h[k] = Set.new }
       @node_options      = {}
       @edge_options      = {}
 
@@ -26,11 +26,11 @@ module Bundler
       GraphVizClient.new(self).run
     end
 
-    private
+  private
 
     def _populate_relations
       parent_dependencies = _groups.values.to_set.flatten
-      while true
+      loop do
         if parent_dependencies.empty?
           break
         else
@@ -54,7 +54,7 @@ module Bundler
     end
 
     def _groups
-      relations = Hash.new {|h, k| h[k] = Set.new}
+      relations = Hash.new {|h, k| h[k] = Set.new }
       @env.current_dependencies.each do |dependency|
         dependency.groups.each do |group|
           next if @without_groups.include?(group)
@@ -75,7 +75,7 @@ module Bundler
       when :node
         if symbol_or_string_or_dependency.is_a?(Gem::Dependency)
           label = symbol_or_string_or_dependency.name.dup
-          label << "\n#{symbol_or_string_or_dependency.to_spec.version.to_s}" if @show_version
+          label << "\n#{symbol_or_string_or_dependency.to_spec.version}" if @show_version
         else
           label = symbol_or_string_or_dependency.to_s
         end
@@ -107,7 +107,7 @@ module Bundler
             }
           end
 
-          matches = matches.sort_by { |s| s.sort_obj } # HACK: shouldn't be needed
+          matches = matches.sort_by(&:sort_obj) # HACK: shouldn't be needed
         end
       end
     end
@@ -124,9 +124,9 @@ module Bundler
       end
 
       def g
-        @g ||= ::GraphViz.digraph(@graph_name, {:concentrate => true, :normalize => true, :nodesep => 0.55}) do |g|
+        @g ||= ::GraphViz.digraph(@graph_name, { :concentrate => true, :normalize => true, :nodesep => 0.55 }) do |g|
           g.edge[:weight]   = 2
-          g.edge[:fontname] = g.node[:fontname] = 'Arial, Helvetica, SansSerif'
+          g.edge[:fontname] = g.node[:fontname] = "Arial, Helvetica, SansSerif"
           g.edge[:fontsize] = 12
         end
       end
@@ -135,18 +135,18 @@ module Bundler
         @groups.each do |group|
           g.add_nodes(
             group,
-            {:style     => 'filled',
-             :fillcolor => '#B9B9D5',
+            { :style => "filled",
+             :fillcolor => "#B9B9D5",
              :shape     => "box3d",
-             :fontsize  => 16}.merge(@node_options[group])
+             :fontsize  => 16 }.merge(@node_options[group])
           )
         end
 
         @relations.each do |parent, children|
           children.each do |child|
             if @groups.include?(parent)
-              g.add_nodes(child, {:style => 'filled', :fillcolor => '#B9B9D5'}.merge(@node_options[child]))
-              g.add_edges(parent, child, {:constraint => false}.merge(@edge_options["#{parent}_#{child}"]))
+              g.add_nodes(child, { :style => "filled", :fillcolor => "#B9B9D5" }.merge(@node_options[child]))
+              g.add_edges(parent, child, { :constraint => false }.merge(@edge_options["#{parent}_#{child}"]))
             else
               g.add_nodes(child, @node_options[child])
               g.add_edges(parent, child, @edge_options["#{parent}_#{child}"])

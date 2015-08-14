@@ -9,8 +9,8 @@ describe "bundle outdated" do
 
     install_gemfile <<-G
       source "file://#{gem_repo2}"
-      gem "zebra", :git => "#{lib_path('zebra')}"
-      gem "foo", :git => "#{lib_path('foo')}"
+      gem "zebra", :git => "#{lib_path("zebra")}"
+      gem "foo", :git => "#{lib_path("foo")}"
       gem "activesupport", "2.3.5"
       gem "weakling", "~> 0.0.1"
     G
@@ -32,7 +32,7 @@ describe "bundle outdated" do
       expect(out).to include("foo (newest 1.0")
 
       # Gem names are one per-line, between "*" and their parenthesized version.
-      gem_list = out.split("\n").map { |g| g[ /\* (.*) \(/, 1] }.compact
+      gem_list = out.split("\n").map {|g| g[/\* (.*) \(/, 1] }.compact
       expect(gem_list).to eq(gem_list.sort)
     end
 
@@ -74,7 +74,7 @@ describe "bundle outdated" do
       FileUtils.rm_rf(gem_repo2)
 
       bundle "outdated --local"
-      expect(out).not_to match(/Fetching/)
+      expect(out).not_to match(/Fetching (gem|version|dependency) metadata from/)
     end
   end
 

@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe "bundle install" do
   context "with gem sources" do

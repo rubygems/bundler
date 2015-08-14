@@ -1,10 +1,10 @@
-require 'uri'
+require "uri"
 
 module Bundler
   class Settings
     BOOL_KEYS = %w(frozen cache_all no_prune disable_local_branch_check ignore_messages gem.mit gem.coc).freeze
     NUMBER_KEYS = %w(retry timeout redirect).freeze
-    DEFAULT_CONFIG = {:retry => 3, :timeout => 10, :redirect => 5}
+    DEFAULT_CONFIG = { :retry => 3, :timeout => 10, :redirect => 5 }
 
     def initialize(root = nil)
       @root          = root
@@ -17,9 +17,11 @@ module Bundler
       value = (@local_config[key] || ENV[key] || @global_config[key] || DEFAULT_CONFIG[name])
 
       case
-      when !value.nil? && is_bool(name)
+      when value.nil?
+        nil
+      when is_bool(name) || value == "false"
         to_bool(value)
-      when !value.nil? && is_num(name)
+      when is_num(name)
         value.to_i
       else
         value
@@ -31,7 +33,7 @@ module Bundler
       set_key(key, value, @local_config, local_config_file)
     end
 
-    alias :set_local :[]=
+    alias_method :set_local, :[]=
 
     def delete(key)
       @local_config.delete(key_for(key))
@@ -42,12 +44,12 @@ module Bundler
     end
 
     def all
-      env_keys = ENV.keys.select { |k| k =~ /BUNDLE_.*/ }
+      env_keys = ENV.keys.select {|k| k =~ /BUNDLE_.*/ }
 
       keys = @global_config.keys | @local_config.keys | env_keys
 
       keys.map do |key|
-        key.sub(/^BUNDLE_/, '').gsub(/__/, ".").downcase
+        key.sub(/^BUNDLE_/, "").gsub(/__/, ".").downcase
       end
     end
 
@@ -147,7 +149,7 @@ module Bundler
     end
 
     def ignore_config?
-      ENV['BUNDLE_IGNORE_CONFIG']
+      ENV["BUNDLE_IGNORE_CONFIG"]
     end
 
     def app_cache_path
@@ -159,6 +161,7 @@ module Bundler
     end
 
   private
+
     def key_for(key)
       if key.is_a?(String) && /https?:/ =~ key
         key = normalize_uri(key).to_s
@@ -184,7 +187,7 @@ module Bundler
     end
 
     def to_bool(value)
-      !(value.nil? || value == '' || value =~ /^(false|f|no|n|0)$/i || value == false)
+      !(value.nil? || value == "" || value =~ /^(false|f|no|n|0)$/i || value == false)
     end
 
     def is_num(value)
@@ -192,7 +195,7 @@ module Bundler
     end
 
     def get_array(key)
-      self[key] ? self[key].split(":").map { |w| w.to_sym } : []
+      self[key] ? self[key].split(":").map(&:to_sym) : []
     end
 
     def set_array(key, array)
@@ -206,8 +209,8 @@ module Bundler
         hash[key] = value
         hash.delete(key) if value.nil?
         FileUtils.mkdir_p(file.dirname)
-        require 'bundler/psyched_yaml'
-        File.open(file, "w") { |f| f.puts YAML.dump(hash) }
+        require "bundler/psyched_yaml"
+        File.open(file, "w") {|f| f.puts YAML.dump(hash) }
       end
 
       value
@@ -228,6 +231,7 @@ module Bundler
       valid_file = config_file && config_file.exist? && !config_file.size.zero?
       if !ignore_config? && valid_file
         config_regex = /^(BUNDLE_.+): (['"]?)(.*(?:\n(?!BUNDLE).+)?)\2$/
+        raise PermissionError.new(config_file, :read) unless config_file.readable?
         config_pairs = config_file.read.scan(config_regex).map do |m|
           key, _, value = m
           [convert_to_backward_compatible_key(key), value.gsub(/\s+/, " ").tr('"', "'")]
@@ -255,6 +259,5 @@ module Bundler
       end
       uri
     end
-
   end
 end

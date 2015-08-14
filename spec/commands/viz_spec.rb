@@ -13,7 +13,7 @@ describe "bundle viz", :ruby => "1.9.3", :if => Bundler.which("dot") do
       gem "rack-obama"
     G
 
-    bundle "viz", :env => {"RUBYOPT" => "-I #{graphviz_lib}"}
+    bundle "viz", :env => { "RUBYOPT" => "-I #{graphviz_lib}" }
     expect(out).to include("gem_graph.png")
   end
 
@@ -28,7 +28,7 @@ describe "bundle viz", :ruby => "1.9.3", :if => Bundler.which("dot") do
       gem "rack-obama"
     G
 
-    bundle "viz", :env => {"RUBYOPT" => "-I #{graphviz_lib}"}
+    bundle "viz", :env => { "RUBYOPT" => "-I #{graphviz_lib}" }
     expect(out).to include("gem_graph.png")
   end
 end

@@ -1,9 +1,9 @@
-require 'bundler/shared_helpers'
+require "bundler/shared_helpers"
 
 module Spec
   module Builders
     def self.constantize(name)
-      name.gsub('-', '').upcase
+      name.delete("-").upcase
     end
 
     def v(version)
@@ -35,7 +35,7 @@ module Spec
           s.add_dependency "rack", "0.9.1"
         end
 
-        build_gem "rails",          "2.3.2" do |s|
+        build_gem "rails", "2.3.2" do |s|
           s.executables = "rails"
           s.add_dependency "rake",           "10.0.2"
           s.add_dependency "actionpack",     "2.3.2"
@@ -43,19 +43,19 @@ module Spec
           s.add_dependency "actionmailer",   "2.3.2"
           s.add_dependency "activeresource", "2.3.2"
         end
-        build_gem "actionpack",     "2.3.2" do |s|
+        build_gem "actionpack", "2.3.2" do |s|
           s.add_dependency "activesupport", "2.3.2"
         end
-        build_gem "activerecord",   ["2.3.1", "2.3.2"] do |s|
+        build_gem "activerecord", ["2.3.1", "2.3.2"] do |s|
           s.add_dependency "activesupport", "2.3.2"
         end
-        build_gem "actionmailer",   "2.3.2" do |s|
+        build_gem "actionmailer", "2.3.2" do |s|
           s.add_dependency "activesupport", "2.3.2"
         end
         build_gem "activeresource", "2.3.2" do |s|
           s.add_dependency "activesupport", "2.3.2"
         end
-        build_gem "activesupport",  %w(1.2.3 2.3.2 2.3.5)
+        build_gem "activesupport", %w(1.2.3 2.3.2 2.3.5)
 
         build_gem "activemerchant" do |s|
           s.add_dependency "activesupport", ">= 2.0.0"
@@ -202,7 +202,7 @@ module Spec
           s.add_dependency "net-ssh", ">= 1.0.0", "< 1.99.0"
         end
 
-        # Test comlicated gem dependencies for install
+        # Test complicated gem dependencies for install
         build_gem "net_a" do |s|
           s.add_dependency "net_b"
           s.add_dependency "net_build_extensions"
@@ -285,8 +285,8 @@ module Spec
         build_gem "rack"
 
         build_gem "signed_gem" do |s|
-          cert = 'signing-cert.pem'
-          pkey = 'signing-pkey.pem'
+          cert = "signing-cert.pem"
+          pkey = "signing-pkey.pem"
           s.write cert, TEST_CERT
           s.write pkey, TEST_PKEY
           s.signing_key = pkey
@@ -409,7 +409,7 @@ module Spec
       end
 
       def versions(versions)
-        versions.split(/\s+/).each { |version| yield v(version) }
+        versions.split(/\s+/).each {|version| yield v(version) }
       end
     end
 
@@ -432,7 +432,7 @@ module Spec
         @spec.add_runtime_dependency(name, requirements)
       end
 
-      alias dep runtime
+      alias_method :dep, :runtime
     end
 
     class LibBuilder
@@ -446,8 +446,8 @@ module Spec
           s.description = "This is a completely fake gem, for testing purposes."
           s.author      = "no one"
           s.email       = "foo@bar.baz"
-          s.homepage    = 'http://example.com'
-          s.license     = 'MIT'
+          s.homepage    = "http://example.com"
+          s.license     = "MIT"
         end
         @files = {}
       end
@@ -470,7 +470,7 @@ module Spec
       end
 
       def add_c_extension
-        require_paths << 'ext'
+        require_paths << "ext"
         extensions << "ext/extconf.rb"
         write "ext/extconf.rb", <<-RUBY
           require "mkmf"
@@ -517,7 +517,7 @@ module Spec
         @files.each do |file, source|
           file = Pathname.new(path).join(file)
           FileUtils.mkdir_p(file.dirname)
-          File.open(file, 'w') { |f| f.puts source }
+          File.open(file, "w") {|f| f.puts source }
         end
         @spec.files = @files.keys
         path
@@ -528,7 +528,7 @@ module Spec
       end
 
       def _default_path
-        @context.tmp('libs', @spec.full_name)
+        @context.tmp("libs", @spec.full_name)
       end
     end
 
@@ -614,11 +614,9 @@ module Spec
           Dir.chdir(@path) { `git #{cmd}`.strip }
         end
       end
-
     end
 
     class GemBuilder < LibBuilder
-
       def _build(opts)
         lib_path = super(opts.merge(:path => @context.tmp(".tmp/#{@spec.full_name}"), :no_default => opts[:no_default]))
         Dir.chdir(lib_path) do
@@ -639,11 +637,11 @@ module Spec
       end
 
       def _default_path
-        @context.gem_repo1('gems')
+        @context.gem_repo1("gems")
       end
     end
 
-    TEST_CERT = <<-CERT.gsub(/^\s*/, '')
+    TEST_CERT = <<-CERT.gsub(/^\s*/, "")
       -----BEGIN CERTIFICATE-----
       MIIDMjCCAhqgAwIBAgIBATANBgkqhkiG9w0BAQUFADAnMQwwCgYDVQQDDAN5b3Ux
       FzAVBgoJkiaJk/IsZAEZFgdleGFtcGxlMB4XDTE1MDIwODAwMTIyM1oXDTQyMDYy
@@ -666,7 +664,7 @@ module Spec
       -----END CERTIFICATE-----
     CERT
 
-    TEST_PKEY = <<-PKEY.gsub(/^\s*/, '')
+    TEST_PKEY = <<-PKEY.gsub(/^\s*/, "")
       -----BEGIN RSA PRIVATE KEY-----
       MIIEowIBAAKCAQEA2W8V2k3jdzgMxL0mjTqbRruTdtDcdZDXKtiFkyLvsXUXvc2k
       GSdgcjMOS1CkafqGz/hAUlPibjM0QEXjtQuMdTmdMrmuORLeeIZhSO+HdkTNV6j3

@@ -207,7 +207,7 @@ describe "bundle check" do
     simulate_new_machine
     bundle "check"
     last_out = out
-    3.times do |i|
+    3.times do
       bundle :check
       expect(out).to eq(last_out)
       expect(err).to be_empty
@@ -259,7 +259,7 @@ describe "bundle check" do
         gem "rails"
       G
 
-      bundle 'check --path vendor/bundle'
+      bundle "check --path vendor/bundle"
       expect(exitstatus).to eq(1) if exitstatus
       expect(out).to match(/The following gems are missing/)
     end
@@ -286,6 +286,62 @@ describe "bundle check" do
       bundle :check
       expect(out).to match(/The following gems are missing/)
       expect(out).to include("* rack (1.0")
+    end
+  end
+
+  describe "BUNDLED WITH" do
+    def lock_with(bundler_version = nil)
+      lock = <<-L
+        GEM
+          remote: file:#{gem_repo1}/
+          specs:
+            rack (1.0.0)
+
+        PLATFORMS
+          #{generic(Gem::Platform.local)}
+
+        DEPENDENCIES
+          rack
+      L
+
+      if bundler_version
+        lock << "\n        BUNDLED WITH\n           #{bundler_version}\n"
+      end
+
+      lock
+    end
+
+    before do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+    end
+
+    context "is not present" do
+      it "does not change the lock" do
+        lockfile lock_with(nil)
+        bundle :check
+        lockfile_should_be lock_with(nil)
+      end
+    end
+
+    context "is newer" do
+      it "does not change the lock but warns" do
+        lockfile lock_with(Bundler::VERSION.succ)
+        bundle :check
+        expect(out).to include("Bundler is older than the version that created the lockfile")
+        expect(err).to eq("")
+        lockfile_should_be lock_with(Bundler::VERSION.succ)
+      end
+    end
+
+    context "is older" do
+      it "does not change the lock" do
+        lockfile lock_with("1.10.1")
+        bundle :check
+        lockfile_should_be lock_with("1.10.1")
+      end
     end
   end
 end

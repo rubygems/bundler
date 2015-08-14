@@ -1,35 +1,35 @@
-$:.unshift File.expand_path('..', __FILE__)
-$:.unshift File.expand_path('../../lib', __FILE__)
+$:.unshift File.expand_path("..", __FILE__)
+$:.unshift File.expand_path("../../lib", __FILE__)
 
-require 'bundler/psyched_yaml'
-require 'fileutils'
-require 'uri'
-require 'digest/sha1'
+require "bundler/psyched_yaml"
+require "fileutils"
+require "uri"
+require "digest/sha1"
 
 begin
-  require 'rubygems'
+  require "rubygems"
   spec = Gem::Specification.load("bundler.gemspec")
-  rspec = spec.dependencies.find { |d| d.name == "rspec" }
-  gem 'rspec', rspec.requirement.to_s
-  require 'rspec'
+  rspec = spec.dependencies.find {|d| d.name == "rspec" }
+  gem "rspec", rspec.requirement.to_s
+  require "rspec"
 rescue LoadError
   abort "Run rake spec:deps to install development dependencies"
 end
 
-require 'bundler'
+require "bundler"
 
 # Require the correct version of popen for the current platform
-if RbConfig::CONFIG['host_os'] =~ /mingw|mswin/
+if RbConfig::CONFIG["host_os"] =~ /mingw|mswin/
   begin
-    require 'win32/open3'
+    require "win32/open3"
   rescue LoadError
     abort "Run `gem install win32-open3` to be able to run specs"
   end
 else
-  require 'open3'
+  require "open3"
 end
 
-Dir["#{File.expand_path('../support', __FILE__)}/*.rb"].each do |file|
+Dir["#{File.expand_path("../support", __FILE__)}/*.rb"].each do |file|
   require file unless file =~ /fakeweb\/.*\.rb/
 end
 
@@ -38,11 +38,11 @@ $show_err = true
 
 Spec::Rubygems.setup
 FileUtils.rm_rf(Spec::Path.gem_repo1)
-ENV['RUBYOPT'] = "#{ENV['RUBYOPT']} -r#{Spec::Path.root}/spec/support/hax.rb"
-ENV['BUNDLE_SPEC_RUN'] = "true"
+ENV["RUBYOPT"] = "#{ENV["RUBYOPT"]} -r#{Spec::Path.root}/spec/support/hax.rb"
+ENV["BUNDLE_SPEC_RUN"] = "true"
 
 # Don't wrap output in tests
-ENV['THOR_COLUMNS'] = '10000'
+ENV["THOR_COLUMNS"] = "10000"
 
 RSpec.configure do |config|
   config.include Spec::Builders
@@ -55,13 +55,13 @@ RSpec.configure do |config|
   config.include Spec::Sudo
   config.include Spec::Permissions
 
-  if ENV['BUNDLER_SUDO_TESTS'] && Spec::Sudo.present?
+  if ENV["BUNDLER_SUDO_TESTS"] && Spec::Sudo.present?
     config.filter_run :sudo => true
   else
     config.filter_run_excluding :sudo => true
   end
 
-  if ENV['BUNDLER_REALWORLD_TESTS']
+  if ENV["BUNDLER_REALWORLD_TESTS"]
     config.filter_run :realworld => true
   else
     config.filter_run_excluding :realworld => true
@@ -69,14 +69,14 @@ RSpec.configure do |config|
 
   config.filter_run_excluding :ruby => LessThanProc.with(RUBY_VERSION)
   config.filter_run_excluding :rubygems => LessThanProc.with(Gem::VERSION)
-  config.filter_run_excluding :rubygems_master => (ENV['RGV'] != "master")
+  config.filter_run_excluding :rubygems_master => (ENV["RGV"] != "master")
 
-  config.filter_run :focused => true unless ENV['CI']
+  config.filter_run :focused => true unless ENV["CI"]
   config.run_all_when_everything_filtered = true
 
   original_wd       = Dir.pwd
-  original_path     = ENV['PATH']
-  original_gem_home = ENV['GEM_HOME']
+  original_path     = ENV["PATH"]
+  original_gem_home = ENV["GEM_HOME"]
 
   def pending_jruby_shebang_fix
     pending "JRuby executables do not have a proper shebang" if RUBY_PLATFORM == "java"
@@ -101,15 +101,15 @@ RSpec.configure do |config|
 
     Dir.chdir(original_wd)
     # Reset ENV
-    ENV['PATH']                  = original_path
-    ENV['GEM_HOME']              = original_gem_home
-    ENV['GEM_PATH']              = original_gem_home
-    ENV['BUNDLE_PATH']           = nil
-    ENV['BUNDLE_GEMFILE']        = nil
-    ENV['BUNDLE_FROZEN']         = nil
-    ENV['BUNDLE_APP_CONFIG']     = nil
-    ENV['BUNDLER_TEST']          = nil
-    ENV['BUNDLER_SPEC_PLATFORM'] = nil
-    ENV['BUNDLER_SPEC_VERSION']  = nil
+    ENV["PATH"]                  = original_path
+    ENV["GEM_HOME"]              = original_gem_home
+    ENV["GEM_PATH"]              = original_gem_home
+    ENV["BUNDLE_PATH"]           = nil
+    ENV["BUNDLE_GEMFILE"]        = nil
+    ENV["BUNDLE_FROZEN"]         = nil
+    ENV["BUNDLE_APP_CONFIG"]     = nil
+    ENV["BUNDLER_TEST"]          = nil
+    ENV["BUNDLER_SPEC_PLATFORM"] = nil
+    ENV["BUNDLER_SPEC_VERSION"]  = nil
   end
 end

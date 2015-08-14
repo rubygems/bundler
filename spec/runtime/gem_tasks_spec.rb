@@ -28,7 +28,7 @@ describe "require 'bundler/gem_tasks'" do
       "rake install",
       "rake release[remote]",
     ]
-    tasks = out.lines.to_a.map { |s| s.split('#').first.strip }
+    tasks = out.lines.to_a.map {|s| s.split("#").first.strip }
     expect(tasks & expected_tasks).to eq(expected_tasks)
     expect(exitstatus).to eq(0) if exitstatus
   end

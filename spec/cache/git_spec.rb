@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe "git base name" do
   it "base_name should strip private repo uris" do
-    source  = Bundler::Source::Git.new("uri" => "git@github.com:bundler.git")
+    source = Bundler::Source::Git.new("uri" => "git@github.com:bundler.git")
     expect(source.send(:base_name)).to eq("bundler")
   end
 
@@ -100,7 +100,7 @@ end
         gem "foo", :git => '#{lib_path("foo-invalid")}', :branch => :master
       G
 
-      bundle %|config local.foo #{lib_path('foo-1.0')}|
+      bundle %|config local.foo #{lib_path("foo-1.0")}|
       bundle "install"
       bundle "#{cmd} --all"
 
@@ -122,13 +122,13 @@ end
         s.add_dependency "submodule"
       end
 
-      Dir.chdir(lib_path('has_submodule-1.0')) do
-        `git submodule add #{lib_path('submodule-1.0')} submodule-1.0`
+      Dir.chdir(lib_path("has_submodule-1.0")) do
+        `git submodule add #{lib_path("submodule-1.0")} submodule-1.0`
         `git commit -m "submodulator"`
       end
 
       install_gemfile <<-G
-        git "#{lib_path('has_submodule-1.0')}", :submodules => true do
+        git "#{lib_path("has_submodule-1.0")}", :submodules => true do
           gem "has_submodule"
         end
       G
@@ -172,7 +172,7 @@ end
       # Insert a gemspec method that shells out
       spec_lines = lib_path("foo-1.0/foo.gemspec").read.split("\n")
       spec_lines.insert(-2, "s.description = `echo bob`")
-      update_git("foo"){ |s| s.write "foo.gemspec", spec_lines.join("\n") }
+      update_git("foo") {|s| s.write "foo.gemspec", spec_lines.join("\n") }
 
       install_gemfile <<-G
         gem "foo", :git => '#{lib_path("foo-1.0")}'
@@ -183,6 +183,5 @@ end
       gemspec = bundled_app("vendor/cache/foo-1.0-#{ref}/foo.gemspec").read
       expect(gemspec).to_not match("`echo bob`")
     end
-
   end
 end

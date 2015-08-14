@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe "installing a gem with C extensions" do
+describe "installing a gem with native extensions" do
   it "installs" do
     build_repo2 do
       build_gem "c_extension" do |s|
@@ -41,6 +41,7 @@ describe "installing a gem with C extensions" do
     bundle "install"
 
     expect(out).not_to include("extconf.rb failed")
+    expect(out).to include("Installing c_extension 1.0 with native extensions")
 
     run "Bundler.require; puts CExtension.new.its_true"
     expect(out).to eq("true")

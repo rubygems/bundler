@@ -13,9 +13,11 @@ module Bundler
       peek = args.shift
 
       if peek && peek =~ /^\-\-/
-        name, scope = args.shift, $'
+        name = args.shift
+        scope = $'
       else
-        name, scope = peek, "global"
+        name = peek
+        scope = "global"
       end
 
       unless name
@@ -41,7 +43,7 @@ module Bundler
         if args.empty?
           Bundler.ui.confirm "Settings for `#{name}` in order of priority. The top value will be used"
           thor.with_padding do
-            Bundler.settings.pretty_values_for(name).each { |line| Bundler.ui.info line }
+            Bundler.settings.pretty_values_for(name).each {|line| Bundler.ui.info line }
           end
           return
         end
@@ -82,6 +84,5 @@ module Bundler
         exit 1
       end
     end
-
   end
 end

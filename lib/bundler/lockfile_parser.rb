@@ -92,7 +92,8 @@ module Bundler
       case line
       when GIT, GEM, PATH
         @current_source = nil
-        @opts, @type = {}, line
+        @opts = {}
+        @type = line
       when SPECS
         case @type
         when PATH
@@ -102,7 +103,7 @@ module Bundler
           @current_source = TYPES[@type].from_lock(@opts)
           # Strip out duplicate GIT sections
           if @sources.include?(@current_source)
-            @current_source = @sources.find { |s| s == @current_source }
+            @current_source = @sources.find {|s| s == @current_source }
           else
             @sources << @current_source
           end
@@ -137,13 +138,15 @@ module Bundler
 
     def parse_dependency(line)
       if line =~ NAME_VERSION_2
-        name, version, pinned = $1, $2, $4
-        version = version.split(",").map { |d| d.strip } if version
+        name = $1
+        version = $2
+        pinned = $4
+        version = version.split(",").map(&:strip) if version
 
         dep = Bundler::Dependency.new(name, version)
 
-        if pinned && dep.name != 'bundler'
-          spec = @specs.find {|k, v| v.name == dep.name }
+        if pinned && dep.name != "bundler"
+          spec = @specs.find {|_, v| v.name == dep.name }
           dep.source = spec.last.source if spec
 
           # Path sources need to know what the default name / version
@@ -162,7 +165,8 @@ module Bundler
 
     def parse_spec(line)
       if line =~ NAME_VERSION_4
-        name, version = $1, Gem::Version.new($2)
+        name = $1
+        version = Gem::Version.new($2)
         platform = $3 ? Gem::Platform.new($3) : Gem::Platform::RUBY
         @current_spec = LazySpecification.new(name, version, platform)
         @current_spec.source = @current_source
@@ -171,8 +175,9 @@ module Bundler
         # duplicate GIT sections)
         @specs[@current_spec.identifier] ||= @current_spec
       elsif line =~ NAME_VERSION_6
-        name, version = $1, $2
-        version = version.split(',').map { |d| d.strip } if version
+        name = $1
+        version = $2
+        version = version.split(",").map(&:strip) if version
         dep = Gem::Dependency.new(name, version)
         @current_spec.dependencies << dep
       end
@@ -190,6 +195,5 @@ module Bundler
         @bundler_version = Gem::Version.create(line)
       end
     end
-
   end
 end

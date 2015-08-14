@@ -2,9 +2,9 @@ require "spec_helper"
 
 describe "bundler/inline#gemfile" do
   def script(code, options = {})
-    requires = ['bundler/inline']
-    requires.unshift File.expand_path('../../support/artifice/'+options.delete(:artifice)+'.rb', __FILE__) if options.key?(:artifice)
-    requires = requires.map { |r| "require '#{r}'" }.join("\n")
+    requires = ["bundler/inline"]
+    requires.unshift File.expand_path("../../support/artifice/" + options.delete(:artifice) + ".rb", __FILE__) if options.key?(:artifice)
+    requires = requires.map {|r| "require '#{r}'" }.join("\n")
     @out = ruby("#{requires}\n\n" << code, options)
   end
 
@@ -69,7 +69,7 @@ describe "bundler/inline#gemfile" do
       puts "success"
     RUBY
 
-    expect(err).to include "Could not find gem 'eleven (>= 0) ruby'"
+    expect(err).to include "Could not find gem 'eleven'"
     expect(out).not_to include "success"
 
     script <<-RUBY
@@ -82,7 +82,7 @@ describe "bundler/inline#gemfile" do
     expect(out).to include("Rack's post install message")
     expect(exitstatus).to be_zero if exitstatus
 
-    script <<-RUBY, :artifice => 'endpoint'
+    script <<-RUBY, :artifice => "endpoint"
       gemfile(true) do
         source "https://rubygems.org"
         gem "activesupport", :require => true

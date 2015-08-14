@@ -28,7 +28,7 @@ describe "bundle exec" do
       gem "rack"
     G
 
-    bundle "exec 'cd #{tmp('gems')} && rackup'"
+    bundle "exec 'cd #{tmp("gems")} && rackup'"
 
     expect(out).to eq("1.0.0")
   end
@@ -58,9 +58,9 @@ describe "bundle exec" do
   end
 
   it "handles --keep-file-descriptors" do
-    require 'tempfile'
+    require "tempfile"
 
-    bundle_bin = File.expand_path('../../../bin/bundle', __FILE__)
+    bundle_bin = File.expand_path("../../../exe/bundle", __FILE__)
 
     command = Tempfile.new("io-test")
     command.sync = true
@@ -76,10 +76,10 @@ describe "bundle exec" do
       end
     G
 
-    install_gemfile ''
+    install_gemfile ""
     sys_exec("#{Gem.ruby} #{command.path}")
 
-    if RUBY_VERSION >= "2.0"
+    if Bundler.current_ruby.ruby_2?
       expect(out).to eq("")
     else
       expect(out).to eq("Ruby version #{RUBY_VERSION} defaults to keeping non-standard file descriptors on Kernel#exec.")
@@ -89,7 +89,7 @@ describe "bundle exec" do
   end
 
   it "accepts --keep-file-descriptors" do
-    install_gemfile ''
+    install_gemfile ""
     bundle "exec --keep-file-descriptors echo foobar"
 
     expect(err).to eq("")
@@ -97,12 +97,12 @@ describe "bundle exec" do
 
   it "can run a command named --verbose" do
     install_gemfile 'gem "rack"'
-    File.open("--verbose", 'w') do |f|
+    File.open("--verbose", "w") do |f|
       f.puts "#!/bin/sh"
       f.puts "echo foobar"
     end
     File.chmod(0744, "--verbose")
-    ENV['PATH'] = "."
+    ENV["PATH"] = "."
     bundle "exec -- --verbose"
     expect(out).to eq("foobar")
   end
@@ -120,7 +120,7 @@ describe "bundle exec" do
     G
 
     Dir.chdir bundled_app2 do
-      install_gemfile bundled_app2('Gemfile'), <<-G
+      install_gemfile bundled_app2("Gemfile"), <<-G
         source "file://#{gem_repo2}"
         gem "rack_two", "1.0.0"
       G
@@ -158,13 +158,13 @@ describe "bundle exec" do
       gem "rack"
     G
 
-    rubyopt = ENV['RUBYOPT']
+    rubyopt = ENV["RUBYOPT"]
     rubyopt = "-rbundler/setup #{rubyopt}"
 
     bundle "exec 'echo $RUBYOPT'"
     expect(out).to have_rubyopts(rubyopt)
 
-    bundle "exec 'echo $RUBYOPT'", :env => {"RUBYOPT" => rubyopt}
+    bundle "exec 'echo $RUBYOPT'", :env => { "RUBYOPT" => rubyopt }
     expect(out).to have_rubyopts(rubyopt)
   end
 
@@ -173,14 +173,14 @@ describe "bundle exec" do
       gem "rack"
     G
 
-    rubylib = ENV['RUBYLIB']
+    rubylib = ENV["RUBYLIB"]
     rubylib = "#{rubylib}".split(File::PATH_SEPARATOR).unshift "#{bundler_path}"
     rubylib = rubylib.uniq.join(File::PATH_SEPARATOR)
 
     bundle "exec 'echo $RUBYLIB'"
     expect(out).to eq(rubylib)
 
-    bundle "exec 'echo $RUBYLIB'", :env => {"RUBYLIB" => rubylib}
+    bundle "exec 'echo $RUBYLIB'", :env => { "RUBYLIB" => rubylib }
     expect(out).to eq(rubylib)
   end
 
@@ -225,13 +225,13 @@ describe "bundle exec" do
       end
 
       it "works when unlocked" do
-        bundle "exec 'cd #{tmp('gems')} && rackup'"
+        bundle "exec 'cd #{tmp("gems")} && rackup'"
         expect(out).to eq("1.0.0")
       end
 
       it "works when locked" do
         should_be_locked
-        bundle "exec 'cd #{tmp('gems')} && rackup'"
+        bundle "exec 'cd #{tmp("gems")} && rackup'"
         expect(out).to eq("1.0.0")
       end
     end
@@ -267,7 +267,7 @@ describe "bundle exec" do
         end
 
         install_gemfile <<-G
-          gem "fizz_git", :git => "#{lib_path('fizz_git-1.0')}"
+          gem "fizz_git", :git => "#{lib_path("fizz_git-1.0")}"
         G
       end
 
@@ -290,7 +290,7 @@ describe "bundle exec" do
         end
 
         install_gemfile <<-G
-          gem "fizz_no_gemspec", "1.0", :git => "#{lib_path('fizz_no_gemspec-1.0')}"
+          gem "fizz_no_gemspec", "1.0", :git => "#{lib_path("fizz_no_gemspec-1.0")}"
         G
       end
 

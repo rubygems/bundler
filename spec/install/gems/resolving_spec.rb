@@ -27,7 +27,7 @@ describe "bundle install with gem sources" do
       spec.dependencies.each do |d|
         d.instance_variable_set(:@type, :fail)
       end
-      File.open(path, 'w') do |f|
+      File.open(path, "w") do |f|
         f.write Gem.deflate(Marshal.dump(spec))
       end
 
@@ -77,7 +77,7 @@ describe "bundle install with gem sources" do
           G
 
           resolve_output = capture(:stdout) do
-            bundle :install, :env => {"DEBUG_RESOLVER" => "1"}
+            bundle :install, :env => { "DEBUG_RESOLVER" => "1" }
           end
 
           expect(resolve_output).to include("Creating possibility state for net_c")
@@ -93,13 +93,13 @@ describe "bundle install with gem sources" do
           G
 
           resolve_output = capture(:stdout) do
-            bundle :install, :env => {"DEBUG_RESOLVER_TREE" => "1"}
+            bundle :install, :env => { "DEBUG_RESOLVER_TREE" => "1" }
           end
 
-          expect(resolve_output).to include(" net_b (>= 0) ruby")
+          expect(resolve_output).to include(" net_b")
+          expect(resolve_output).to include(" net_build_extensions (1.0)")
         end
       end
-
     end
 
     describe "when some gems require a different version of ruby" do

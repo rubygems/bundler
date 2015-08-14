@@ -8,17 +8,16 @@ $LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/rack-*/lib")].first}"
 $LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/rack-*/lib")].last}"
 $LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/tilt*/lib")].first}"
 $LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/sinatra*/lib")].first}"
-require 'artifice'
-require 'sinatra/base'
+require "artifice"
+require "sinatra/base"
 
 class Endpoint < Sinatra::Base
-
   helpers do
     def dependencies_for(gem_names, gem_repo = gem_repo1)
       return [] if gem_names.nil? || gem_names.empty?
 
-      require 'rubygems'
-      require 'bundler'
+      require "rubygems"
+      require "bundler"
       Bundler::Deprecate.skip_during do
         Marshal.load(File.open(gem_repo.join("specs.4.8")).read).map do |name, version, platform|
           spec = load_spec(name, version, platform, gem_repo)

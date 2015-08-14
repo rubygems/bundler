@@ -1,7 +1,12 @@
-require 'pathname'
+require "pathname"
 
 module Bundler
   class CLI::Gem
+    TEST_FRAMEWORK_VERSIONS = {
+      "rspec" => "3.0",
+      "minitest" => "5.0"
+    }
+
     attr_reader :options, :gem_name, :thor, :name, :target
 
     def initialize(options, gem_name, thor)
@@ -18,11 +23,11 @@ module Bundler
     def run
       Bundler.ui.confirm "Creating gem '#{name}'..."
 
-      underscored_name = name.tr('-', '_')
-      namespaced_path = name.tr('-', '/')
-      constant_name = name.gsub(/-[_-]*(?![_-]|$)/){ '::' }.gsub(/([_-]+|(::)|^)(.|$)/){ $2.to_s + $3.upcase }
-      constant_array = constant_name.split('::')
-      test_task = options[:test] == 'minitest' ? 'test' : 'spec'
+      underscored_name = name.tr("-", "_")
+      namespaced_path = name.tr("-", "/")
+      constant_name = name.gsub(/-[_-]*(?![_-]|$)/) { "::" }.gsub(/([_-]+|(::)|^)(.|$)/) { $2.to_s + $3.upcase }
+      constant_array = constant_name.split("::")
+      test_task = options[:test] == "minitest" ? "test" : "spec"
 
       git_user_name = `git config user.name`.chomp
       git_user_email = `git config user.email`.chomp
@@ -61,45 +66,45 @@ module Bundler
         bin/setup
       ]
 
-      if ask_and_set(:coc, "Do you want to include a code of conduct in gems you generate?",
-          "Codes of conduct can increase contributions to your project by contributors who " \
-          "prefer collaborative, safe spaces. You can read more about the code of conduct at " \
-          "contributor-covenant.org. Having a code of conduct means agreeing to the responsibility " \
-          "of enforcing it, so be sure that you are prepared to do that. For suggestions about " \
-          "how to enforce codes of conduct, see bit.ly/coc-enforcement."
-        )
-        config[:coc] = true
-        Bundler.ui.info "Code of conduct enabled in config"
-        templates.merge!("CODE_OF_CONDUCT.md.tt" => "CODE_OF_CONDUCT.md")
-      end
-
-      if ask_and_set(:mit, "Do you want to license your code permissively under the MIT license?",
-          "This means that any other developer or company will be legally allowed to use your code " \
-          "for free as long as they admit you created it. You can read more about the MIT license " \
-          "at choosealicense.com/licenses/mit."
-        )
-        config[:mit] = true
-        Bundler.ui.info "MIT License enabled in config"
-        templates.merge!("LICENSE.txt.tt" => "LICENSE.txt")
-      end
-
       if test_framework = ask_and_set_test_framework
         config[:test] = test_framework
+        config[:test_framework_version] = TEST_FRAMEWORK_VERSIONS[test_framework]
+
         templates.merge!(".travis.yml.tt" => ".travis.yml")
 
         case test_framework
-        when 'rspec'
+        when "rspec"
           templates.merge!(
             "rspec.tt" => ".rspec",
             "spec/spec_helper.rb.tt" => "spec/spec_helper.rb",
             "spec/newgem_spec.rb.tt" => "spec/#{namespaced_path}_spec.rb"
           )
-        when 'minitest'
+        when "minitest"
           templates.merge!(
             "test/test_helper.rb.tt" => "test/test_helper.rb",
             "test/newgem_test.rb.tt" => "test/#{namespaced_path}_test.rb"
           )
         end
+      end
+
+      if ask_and_set(:mit, "Do you want to license your code permissively under the MIT license?",
+        "This means that any other developer or company will be legally allowed to use your code " \
+        "for free as long as they admit you created it. You can read more about the MIT license " \
+        "at choosealicense.com/licenses/mit.")
+        config[:mit] = true
+        Bundler.ui.info "MIT License enabled in config"
+        templates.merge!("LICENSE.txt.tt" => "LICENSE.txt")
+      end
+
+      if ask_and_set(:coc, "Do you want to include a code of conduct in gems you generate?",
+        "Codes of conduct can increase contributions to your project by contributors who " \
+        "prefer collaborative, safe spaces. You can read more about the code of conduct at " \
+        "contributor-covenant.org. Having a code of conduct means agreeing to the responsibility " \
+        "of enforcing it, so be sure that you are prepared to do that. For suggestions about " \
+        "how to enforce codes of conduct, see bit.ly/coc-enforcement.")
+        config[:coc] = true
+        Bundler.ui.info "Code of conduct enabled in config"
+        templates.merge!("CODE_OF_CONDUCT.md.tt" => "CODE_OF_CONDUCT.md")
       end
 
       templates.merge!("exe/newgem.tt" => "exe/#{name}") if options[:bin]
@@ -123,7 +128,10 @@ module Bundler
       end
 
       Bundler.ui.info "Initializing git repo in #{target}"
-      Dir.chdir(target) { `git init`; `git add .` }
+      Dir.chdir(target) do
+        `git init`
+        `git add .`
+      end
 
       if options[:edit]
         # Open gemspec in editor
@@ -131,7 +139,7 @@ module Bundler
       end
     end
 
-    private
+  private
 
     def resolve_name(name)
       SharedHelpers.pwd.join(name).basename.to_s
@@ -150,7 +158,7 @@ module Bundler
     end
 
     def validate_ext_name
-      return unless gem_name.index('-')
+      return unless gem_name.index("-")
 
       Bundler.ui.error "You have specified a gem name which does not conform to the \n" \
                        "naming guidelines for C extensions. For more information, \n" \
@@ -183,7 +191,7 @@ module Bundler
     def bundler_dependency_version
       v = Gem::Version.new(Bundler::VERSION)
       req = v.segments[0..1]
-      req << 'a' if v.prerelease?
+      req << "a" if v.prerelease?
       req.join(".")
     end
 
@@ -196,6 +204,5 @@ module Bundler
         exit 1
       end
     end
-
   end
 end

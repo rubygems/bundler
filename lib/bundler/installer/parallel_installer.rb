@@ -1,13 +1,11 @@
-require 'bundler/worker'
-
+require "bundler/worker"
 
 class ParallelInstaller
-
   class SpecInstallation
-
     attr_accessor :spec, :name, :post_install_message, :state
     def initialize(spec)
-      @spec, @name = spec, spec.name
+      @spec = spec
+      @name = spec.name
       @state = :none
       @post_install_message = ""
     end
@@ -35,10 +33,9 @@ class ParallelInstaller
 
     # Checks installed dependencies against spec's dependencies to make
     # sure needed dependencies have been installed.
-    def dependencies_installed?(remaining_specs)
-      installed_specs = remaining_specs.reject(&:installed?).map(&:name)
-      already_installed = lambda {|dep| installed_specs.include? dep.name }
-      dependencies.all? {|d| already_installed[d] }
+    def dependencies_installed?(all_specs)
+      installed_specs = all_specs.select(&:installed?).map(&:name)
+      dependencies.all? {|d| installed_specs.include? d.name }
     end
 
     # Represents only the non-development dependencies and the ones that
@@ -59,7 +56,7 @@ class ParallelInstaller
 
   # Returns max number of threads machine can handle with a min of 1
   def self.max_threads
-    [Bundler.settings[:jobs].to_i-1, 1].max
+    [Bundler.settings[:jobs].to_i - 1, 1].max
   end
 
   def initialize(installer, all_specs, size, standalone, force)
@@ -67,7 +64,7 @@ class ParallelInstaller
     @size = size
     @standalone = standalone
     @force = force
-    @specs = all_specs.map { |s| SpecInstallation.new(s) }
+    @specs = all_specs.map {|s| SpecInstallation.new(s) }
   end
 
   def call

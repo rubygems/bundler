@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe "bundle lock" do
   def strip_lockfile(lockfile)
-    strip_whitespace(lockfile).sub(/\n\Z/, '')
+    strip_whitespace(lockfile).sub(/\n\Z/, "")
   end
 
   def read_lockfile(file = "Gemfile.lock")
@@ -74,7 +74,7 @@ describe "bundle lock" do
   end
 
   it "writes a lockfile when there is an outdated lockfile using --update" do
-    lockfile @lockfile.gsub('2.3.2', '2.3.1')
+    lockfile @lockfile.gsub("2.3.2", "2.3.1")
 
     bundle "lock --update"
 
@@ -92,6 +92,6 @@ describe "bundle lock" do
 
     expect(out).to match(/Writing lockfile to.+lock/)
     expect(read_lockfile "lock").to eq(@lockfile)
-    expect { read_lockfile }.to raise_error
+    expect { read_lockfile }.to raise_error(Errno::ENOENT)
   end
 end

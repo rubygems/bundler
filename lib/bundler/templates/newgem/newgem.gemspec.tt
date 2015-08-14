@@ -37,7 +37,7 @@ Gem::Specification.new do |spec|
 <%- if config[:ext] -%>
   spec.add_development_dependency "rake-compiler"
 <%- end -%>
-<%- if config[:test] && config[:test] != "false" -%>
-  spec.add_development_dependency "<%=config[:test]%>"
+<%- if config[:test] -%>
+  spec.add_development_dependency "<%=config[:test]%>", "~> <%=config[:test_framework_version]%>"
 <%- end -%>
 end

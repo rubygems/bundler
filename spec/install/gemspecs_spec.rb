@@ -1,7 +1,6 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe "bundle install" do
-
   describe "when a gem has a YAML gemspec" do
     before :each do
       build_repo2 do
@@ -19,10 +18,10 @@ describe "bundle install" do
     end
 
     it "still installs correctly when using path" do
-      build_lib 'yaml_spec', :gemspec => :yaml
+      build_lib "yaml_spec", :gemspec => :yaml
 
       install_gemfile <<-G
-        gem 'yaml_spec', :path => "#{lib_path('yaml_spec-1.0')}"
+        gem 'yaml_spec', :path => "#{lib_path("yaml_spec-1.0")}"
       G
       expect(err).to eq("")
     end
@@ -35,16 +34,15 @@ describe "bundle install" do
     G
 
     FileUtils.mkdir_p "#{tmp}/gems/system/specifications"
-    File.open("#{tmp}/gems/system/specifications/rack-1.0.0.gemspec", 'w+') do |f|
+    File.open("#{tmp}/gems/system/specifications/rack-1.0.0.gemspec", "w+") do |f|
       spec = Gem::Specification.new do |s|
-        s.name = 'rack'
-        s.version = '1.0.0'
-        s.add_runtime_dependency 'activesupport', '2.3.2'
+        s.name = "rack"
+        s.version = "1.0.0"
+        s.add_runtime_dependency "activesupport", "2.3.2"
       end
       f.write spec.to_ruby
     end
-    bundle :install, :artifice => 'endpoint_marshal_fail' # force gemspec load
+    bundle :install, :artifice => "endpoint_marshal_fail" # force gemspec load
     should_be_installed "activesupport 2.3.2"
   end
-
 end
