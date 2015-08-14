@@ -191,60 +191,6 @@ As a result, you should run `bundle install` as the current user,
 and Bundler will ask for your password if it is needed to put the
 gems into their final location.
 
-## INSTALLING GROUPS
-
-By default, `bundle install` will install all gems in all groups
-in your Gemfile(5), except those declared for a different platform.
-
-However, you can explicitly tell Bundler to skip installing
-certain groups with the `--without` option. This option takes
-a space-separated list of groups.
-
-While the `--without` option will skip _installing_ the gems in the
-specified groups, it will still _download_ those gems and use them to
-resolve the dependencies of every gem in your Gemfile(5).
-
-This is so that installing a different set of groups on another
- machine (such as a production server) will not change the
-gems and versions that you have already developed and tested against.
-
-`Bundler offers a rock-solid guarantee that the third-party
-code you are running in development and testing is also the
-third-party code you are running in production. You can choose
-to exclude some of that code in different environments, but you
-will never be caught flat-footed by different versions of
-third-party code being used in different environments.`
-
-For a simple illustration, consider the following Gemfile(5):
-
-    source 'https://rubygems.org'
-
-    gem 'sinatra'
-
-    group :production do
-      gem 'rack-perftools-profiler'
-    end
-
-In this case, `sinatra` depends on any version of Rack (`>= 1.0`), while
-`rack-perftools-profiler` depends on 1.x (`~> 1.0`).
-
-When you run `bundle install --without production` in development, we
-look at the dependencies of `rack-perftools-profiler` as well. That way,
-you do not spend all your time developing against Rack 2.0, using new
-APIs unavailable in Rack 1.x, only to have Bundler switch to Rack 1.2
-when the `production` group _is_ used.
-
-This should not cause any problems in practice, because we do not
-attempt to `install` the gems in the excluded groups, and only evaluate
-as part of the dependency resolution process.
-
-This also means that you cannot include different versions of the same
-gem in different groups, because doing so would result in different
-sets of dependencies used in development and production. Because of
-the vagaries of the dependency resolution process, this usually
-affects more than just the gems you list in your Gemfile(5), and can
-(surprisingly) radically change the gems you are using.
-
 ## THE GEMFILE.LOCK
 
 When you run `bundle install`, Bundler will persist the full names
