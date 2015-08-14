@@ -51,6 +51,18 @@ module Bundler
         new_value.gsub!(/\s+/, ":") if name == "with" || name == "without"
         locations = Bundler.settings.locations(name)
 
+        if name == "path.system" and Bundler.settings[:path] and new_value == "true"
+          Bundler.ui.warn "`path` is already configured, so it will be unset."
+          Bundler.settings.set_local("path", nil)
+          Bundler.settings.set_global("path", nil)
+        elsif name == "path" and Bundler.settings["path.system"]
+          Bundler.ui.warn "`path.system` is already configured, so it will be unset."
+          Bundler.settings.set_local("path.system", nil)
+          Bundler.settings.set_global("path.system", nil)
+        elsif (name == "with" || name == "without")
+          new_value.gsub!(/\s+/, ":")
+        end
+
         if scope == "global"
           if locations[:local]
             Bundler.ui.info "Your application has set #{name} to #{locations[:local].inspect}. " \
