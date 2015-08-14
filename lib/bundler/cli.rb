@@ -134,6 +134,7 @@ module Bundler
       "Specify the number of jobs to run in parallel"
     method_option "local", :type => :boolean, :banner =>
       "Do not attempt to fetch gems remotely and use the gem cache instead"
+    # TODO: Remove the "cache" method_option?
     method_option "cache", :type => :boolean, :banner =>
       "Update the existing gem cache."
     method_option "force", :type => :boolean, :banner =>

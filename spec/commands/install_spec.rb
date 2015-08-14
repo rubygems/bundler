@@ -374,4 +374,16 @@ describe "bundle install with gem sources" do
       expect(err).to_not include("Your Gemfile has no gem server sources")
     end
   end
+
+  describe "when using the --cache flag" do
+    it "prints an error and exits" do
+      gemfile <<-G
+        gem 'rack'
+      G
+
+      bundle "install --cache"
+
+      expect (err).to include("Please use `bundle cache` instead")
+    end
+  end
 end
