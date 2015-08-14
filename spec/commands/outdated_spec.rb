@@ -74,7 +74,7 @@ describe "bundle outdated" do
       FileUtils.rm_rf(gem_repo2)
 
       bundle "outdated --local"
-      expect(out).not_to match(/Fetching/)
+      expect(out).not_to match(/Fetching (gem|version|dependency) metadata from/)
     end
   end
 
