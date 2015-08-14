@@ -30,7 +30,7 @@ require "spec_helper"
     end
 
     it "copies when the path is outside the bundle and the paths intersect" do
-      libname = File.basename(Dir.pwd) + '_gem'
+      libname = File.basename(Dir.pwd) + "_gem"
       libpath = File.join(File.dirname(Dir.pwd), libname)
 
       build_lib libname, :path => libpath
