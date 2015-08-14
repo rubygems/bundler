@@ -114,6 +114,11 @@ learn more about their operation in [bundle install(1)][bundle-install].
 * `frozen` (`BUNDLE_FROZEN`):
   Disallow changes to `gems.rb`. Defaults to `true` when `--deployment`
   is used.
+* `with` (`BUNDLE_WITH`):
+  A `:`-separated list of groups whose gems bundler should install. If an
+  optional group is given it is installed. If a group is given that is
+  in the remembered list of groups given to `without`, it is removed
+  from that list.
 * `without` (`BUNDLE_WITHOUT`):
   A `:`-separated list of groups whose gems bundler should not install
 * `bin` (`BUNDLE_BIN`):
