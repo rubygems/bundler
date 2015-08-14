@@ -134,11 +134,12 @@ module Bundler
       def run
         @groups.each do |group|
           g.add_nodes(
-            group,
-            { :style => "filled",
-             :fillcolor => "#B9B9D5",
-             :shape     => "box3d",
-             :fontsize  => 16 }.merge(@node_options[group])
+            group, {
+              :style     => "filled",
+              :fillcolor => "#B9B9D5",
+              :shape     => "box3d",
+              :fontsize  => 16
+            }.merge(@node_options[group])
           )
         end
 
