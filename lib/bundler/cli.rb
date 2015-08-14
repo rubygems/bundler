@@ -80,7 +80,7 @@ module Bundler
       Kernel.exec(command_path, *ARGV[1..-1])
     end
 
-    Bundler.plugin("1").manager.commands.all.each do |command,proc|
+    Bundler.plugin("1").manager.commands.all.each do |command, proc|
       # Possibly a hacky way to do it
       class_eval do
         command_class = proc.call.call
@@ -97,12 +97,8 @@ module Bundler
         define_method(command) do |*args|
           command_object.run(options, args)
         end
-
       end
-
     end
-
-
 
     desc "init [OPTIONS]", "Generates a Gemfile into the current working directory"
     long_desc <<-D
@@ -134,13 +130,12 @@ module Bundler
       Check.new(options).run
     end
 
-
     desc "plugin --install [PLUGIN]", "Install or uninstall plugins"
     long_desc <<-D
       Plugins
     D
     def plugin(*arg)
-      require 'bundler/cli/plugin'
+      require "bundler/cli/plugin"
       Plugin.new(options, arg).run
     end
 

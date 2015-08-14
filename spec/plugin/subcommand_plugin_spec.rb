@@ -32,7 +32,6 @@ end
 
       s.write("lib/bundler-foo.rb", main)
       s.write("lib/command.rb", command)
-
     end
     bundle "plugin install foo"
   end
@@ -46,5 +45,4 @@ end
     bundle "plugin uninstall foo"
     expect(out).to include("Bundler plugin 'foo' has been successfully uninstalled")
   end
-
 end

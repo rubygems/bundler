@@ -12,11 +12,8 @@ module Bundler
 
         def run(options, args)
           Bundler.ui.info "The plugin hasn't implemented the run method"
-
         end
-
       end
-
     end
   end
 end

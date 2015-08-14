@@ -1,7 +1,6 @@
 require 'bundler/dsl'
 module Bundler
   class PluginDsl
-
     def self.evaluate(gemfile, lockfile, unlock)
       builder = new
       builder.eval_gemfile_for_plugins(gemfile)
@@ -15,13 +14,11 @@ module Bundler
 
       self.class.instance_eval do
         methods.each do |method|
-
           define_method(method) do |*args|
             # Empty method. So that it ignores the rest of the Gemfile
           end
+        end
       end
-    end
-
     end
 
     def eval_gemfile_for_plugins(gemfile)
@@ -43,7 +40,5 @@ module Bundler
         nil
       end
     end
-
-
   end
 end

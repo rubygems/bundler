@@ -26,7 +26,7 @@ module Bundler
       Dsl.evaluate(gemfile, lockfile, unlock)
     end
 
-    # Given a gemfile it creates Bundler definition only for plugins. 
+    # Given a gemfile it creates Bundler definition only for plugins.
     #
     # @param gemfile [Pathname] Path to Gemfile
     # @return [Bundler::Definition]

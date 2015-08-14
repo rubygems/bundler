@@ -19,11 +19,10 @@ module Bundler
         plugin_definition = Definition.new(nil, deps, sources, [])
         Installer.install_plugin(plugin_definition)
 
-
         if !plugins.include?("bundler-#{@name}")
           plugin_manager.install_plugin("bundler-#{@name}")
           plugin_definition.specs.to_a.each do |spec|
-            next if spec.name == 'bundler'
+            next if spec.name == "bundler"
             begin
               require spec.name
               Bundler.ui.confirm "Bundler plugin '#{@name}' has been successfully installed"
@@ -33,7 +32,7 @@ module Bundler
           end
         else
           plugin_definition.specs.to_a.each do |spec|
-            next if spec.name == 'bundler'
+            next if spec.name == "bundler"
             begin
               require spec.name
               Bundler.ui.info "Bundler plugin '#{@name}' is already installed"
@@ -51,6 +50,5 @@ module Bundler
         end
       end
     end
-
   end
 end

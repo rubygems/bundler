@@ -37,7 +37,7 @@ module Bundler
       end
 
       def save!
-        File.open(@path,"w+") do |f|
+        File.open(@path, "w+") do |f|
           f.write(YAML.dump(@data))
         end
       end

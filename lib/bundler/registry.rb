@@ -2,11 +2,9 @@ module Bundler
   class Registry
     def initialize
       @items = {}
-      @results_cache = {}
-
     end
 
-    # Register a key with a lazy-loaded value.
+    # Register a key
     #
     # If a key with the given name already exists, it is overwritten.
     def register(key, &block)
@@ -14,7 +12,7 @@ module Bundler
       @items[key] = block
     end
 
-    # Register a key with a lazy-loaded value.
+    # Register a key for a hook
     #
     # If a key with the given name already exists, it is overwritten.
     def register_hook(key, object)
@@ -28,10 +26,9 @@ module Bundler
     # resulting value.
     def get(key)
       return nil if !@items.key?(key)
-      return @results_cache[key] if @results_cache.key?(key)
-      @results_cache[key] = @items[key].call
+      return @items[key].call
     end
-    alias :[] :get
+    alias_method :[] :get
 
     # Returns all items in the registry
     #
@@ -46,8 +43,7 @@ module Bundler
     end
     alias_method :has_key?, :key?
     # Merge one registry with another and return a completely new
-    # registry. Note that the result cache is completely busted, so
-    # any gets on the new registry will result in a cache miss.
+    # registry. 
     def merge(other)
       self.class.new.tap do |result|
         result.merge!(self)
@@ -57,15 +53,8 @@ module Bundler
 
     # Like #{merge} but merges into self.
     def merge!(other)
-      @items.merge!(other.__internal_state[:items])
+      @items.merge!(other.all)
       self
-    end
-
-    def __internal_state
-      {
-        items: @items,
-        results_cache: @results_cache
-      }
     end
 
   end

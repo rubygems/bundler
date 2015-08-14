@@ -26,7 +26,6 @@ end
 
       s.write("lib/bundler-foo.rb", main)
       s.write("lib/lifecycle.rb", lifecycle)
-
     end
     bundle "plugin install foo"
 
@@ -39,6 +38,4 @@ end
     expect(out).to include("running before_install")
     expect(out).to include("running after_install")
   end
-
-
 end

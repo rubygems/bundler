@@ -274,7 +274,7 @@ module Bundler
       git_names = @git_sources.keys.map(&:to_s)
       plugins = Bundler.plugin("1").manager.sources.all
 
-      plugin_keys = plugins.keys.map {|plugin| plugin.to_s}
+      plugin_keys = plugins.keys.map {|plugin| plugin.to_s }
       validate_keys("gem '#{name}'", opts, valid_keys + git_names + plugin_keys)
 
       groups = @groups.dup
@@ -320,7 +320,7 @@ module Bundler
         end
       end
 
-      plugins.each do |type, proc|
+      plugins.keys.each do |type|
         if opts[type.to_s]
           if version.first && version.first =~ /^\s*=?\s*(\d[^\s]*)\s*$/
             options = opts.merge("name" => name, "version" => $1)
@@ -330,11 +330,10 @@ module Bundler
           source = with_source(@sources.add_plugin_source(type, normalize_hash(options))) {}
           opts["source"] = source
         end
-
       end
 
-      opts["source"]       ||= @source
-      opts["env"]          ||= @env
+      opts["source"] ||= @source
+      opts["env"] ||= @env
       opts["platforms"]      = platforms.dup
       opts["group"]          = groups
       opts["should_include"] = install_if

@@ -51,15 +51,12 @@ module Bundler
   autoload :UI,                    "bundler/ui"
   autoload :Plugin,                "bundler/plugin"
 
-
   PLUGIN_COMPONENTS = Registry.new.tap do |c|
     c.register(:"1")                  { Plugin::V1::Plugin    }
     c.register([:"1", :command])      { Plugin::V1::Command   }
     c.register([:"1", :source])       { Plugin::V1::Source    }
     c.register([:"1", :lifecycle])    { Plugin::V1::Lifecycle }
-
   end
-
 
   def self.plugin(version, component=nil)
     # Build up the key and return a result

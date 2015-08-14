@@ -27,7 +27,7 @@ module Bundler
           end
         end
 
-        def call_hook (hook, *args)
+        def call_hook(hook, *args)
           if lifecycle_hooks.all[hook].is_a?(Array)
             lifecycle_hooks.all[hook].each do |hook_object|
               hook_object.run(hook, args)
@@ -51,7 +51,6 @@ module Bundler
             @registered << plugin
           end
         end
-
       end
     end
   end

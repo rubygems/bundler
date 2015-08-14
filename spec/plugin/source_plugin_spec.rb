@@ -41,7 +41,6 @@ end
 
       s.write("lib/bundler-foo.rb", main)
       s.write("lib/source.rb", source)
-
     end
 
   end
@@ -63,5 +62,4 @@ end
     G
     expect(out).to include("Using bar 1.0 from foo")
   end
-
 end

@@ -5,16 +5,13 @@ module Bundler
     module V1
       # This is the superclass for all V1 plugins.
       class Plugin
-
         ROOT_CLASS = self
         def self.command(name, &block)
-
 
           # Validate the name of the command
           if name.to_s !~ /^[-a-z0-9]+$/i
             raise InvalidCommandName, "Commands can only contain letters, numbers, and hyphens"
           end
-
 
           if Bundler.plugin_install_mode
             Bundler.ui.info "Setting up '#{name}' subcommand"
@@ -51,7 +48,6 @@ module Bundler
 
             lifecycle_class = block.call
             lifecycle_object = lifecycle_class.new
-
 
             components.lifecycle_hooks.register_hook(hook.to_sym, lifecycle_object)
           end

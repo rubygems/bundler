@@ -111,7 +111,7 @@ module Bundler
 
         Installer.install_plugin(plugin_definition, options)
         plugin_definition.specs.to_a.each do |spec|
-          next if spec.name == 'bundler'
+          next if spec.name == "bundler"
           require spec.name
         end
       end
