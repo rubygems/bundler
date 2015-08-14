@@ -13,11 +13,11 @@ module Bundler
         end
         begin
           @data = YAML.load_file(@path)
-        rescue => e 
+        rescue => e
           @data = []
         end
       end
-    
+
       def self.instance
         @instance ||= self.new
       end
