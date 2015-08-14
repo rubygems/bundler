@@ -16,7 +16,7 @@ module Bundler
       self.class.instance_eval do
         methods.each do |method|
 
-          define_method (method) do |*args|
+          define_method(method) do |*args|
             # Empty method. So that it ignores the rest of the Gemfile
           end
       end
