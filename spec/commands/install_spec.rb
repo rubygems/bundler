@@ -383,7 +383,7 @@ describe "bundle install with gem sources" do
 
       bundle "install --cache"
 
-      expect (err).to include("Please use `bundle cache` instead")
+      expect(err).to include("Please use `bundle cache` instead")
     end
   end
 end
