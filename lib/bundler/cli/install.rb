@@ -54,7 +54,6 @@ module Bundler
       end
 
       path = Bundler.settings[:path]
-      path = Bundler.rubygems.gem_dir if options[:system]
       path = "#{Bundler.settings.path}/vendor/bundle" if options[:deployment]
 
       Bundler.settings[:shebang]  = options["shebang"] if options["shebang"]
