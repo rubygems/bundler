@@ -332,7 +332,7 @@ describe "bundle install with git sources" do
 
       bundle %|config local.rack #{lib_path("local-rack")}|
       bundle :install
-      expect(err).to match(/The gems.rb lock is pointing to revision \w+/)
+      expect(err).to match(/The gems.locked is pointing to revision \w+/)
     end
   end
 

@@ -130,7 +130,7 @@ module Bundler
         changed = cached_revision && cached_revision != git_proxy.revision
 
         if changed && !@unlocked && !git_proxy.contains?(cached_revision)
-          raise GitError, "The #{SharedHelpers.gemfile_name} lock is pointing to revision #{shortref_for_display(cached_revision)} " \
+          raise GitError, "The #{SharedHelpers.lockfile_name} is pointing to revision #{shortref_for_display(cached_revision)} " \
             "but the current branch in your local override for #{name} does not contain such commit. " \
             "Please make sure your branch is up to date."
         end
