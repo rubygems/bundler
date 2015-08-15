@@ -153,7 +153,7 @@ module Bundler
       end
 
       if set_path == File.join(Bundler.settings.root, Bundler.ruby_scope)
-        # ?
+        # root bundler (gems.rb) path
         install_path = set_path
       elsif set_path == Bundler.rubygems.gem_dir
         # system gems path
