@@ -14,7 +14,7 @@ describe Bundler::Fetcher do
         expect(fetcher.http_proxy).to be_nil
       end
       it "consider environment vars when determine proxy" do
-        with_env_vars({"HTTP_PROXY" => "http://proxy-example.com"}) do
+        with_env_vars("HTTP_PROXY" => "http://proxy-example.com") do
           expect(fetcher.http_proxy).to match("http://proxy-example.com")
         end
       end
@@ -27,7 +27,7 @@ describe Bundler::Fetcher do
         expect(fetcher.http_proxy).to match("http://proxy-example2.com")
       end
       it "consider Gem.configuration when determine proxy" do
-        with_env_vars({"HTTP_PROXY" => "http://proxy-example.com"}) do
+        with_env_vars("HTTP_PROXY" => "http://proxy-example.com") do
           expect(fetcher.http_proxy).to match("http://proxy-example2.com")
         end
       end
