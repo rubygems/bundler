@@ -172,6 +172,14 @@ module Bundler
       @fetchers ||= FETCHERS.map {|f| f.new(downloader, remote_uri, fetch_uri, uri) }
     end
 
+    def http_proxy
+      if uri = connection.proxy_uri
+        uri.to_s
+      else
+        nil
+      end
+    end
+
     def inspect
       "#<#{self.class}:0x#{object_id} uri=#{uri}>"
     end
@@ -203,6 +211,9 @@ module Bundler
         raise SSLError if needs_ssl && !defined?(OpenSSL::SSL)
 
         con = Net::HTTP::Persistent.new "bundler", :ENV
+        if gem_proxy = Bundler.rubygems.configuration[:http_proxy]
+          con.proxy = URI.parse(gem_proxy)
+        end
 
         if remote_uri.scheme == "https"
           con.verify_mode = (Bundler.settings[:ssl_verify_mode] ||
