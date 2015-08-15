@@ -609,7 +609,7 @@ describe "gemcutter's dependency API" do
       G
 
       bundle :install, :env => { "RUBYOPT" => "-I#{bundled_app("broken_ssl")}" }
-      expect(out).to include("OpenSSL")
+      expect(err).to include("OpenSSL")
     end
   end
 

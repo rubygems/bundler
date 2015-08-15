@@ -310,7 +310,7 @@ describe "bundle flex_install" do
         gem "capybara", "0.3.9"
       G
 
-      expect(out).to include("Gemfile.lock")
+      expect(err).to include("Gemfile.lock")
     end
   end
 end

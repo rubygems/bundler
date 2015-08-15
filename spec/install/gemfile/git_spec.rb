@@ -962,7 +962,7 @@ describe "bundle install with git sources" do
       G
 
       bundle "update", :env => { "PATH" => "" }
-      expect(out).to include("You need to install git to be able to use gems from git repositories. For help installing git, please refer to GitHub's tutorial at https://help.github.com/articles/set-up-git")
+      expect(err).to include("You need to install git to be able to use gems from git repositories. For help installing git, please refer to GitHub's tutorial at https://help.github.com/articles/set-up-git")
     end
 
     it "installs a packaged git gem successfully" do

@@ -280,7 +280,7 @@ describe "bundle install with gems on multiple sources" do
 
       it "does not install the gem" do
         bundle :install
-        expect(out).to include("Could not find gem 'not_in_repo1'")
+        expect(err).to include("Could not find gem 'not_in_repo1'")
       end
     end
 
