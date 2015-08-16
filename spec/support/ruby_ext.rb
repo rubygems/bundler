@@ -1,11 +1,11 @@
 class IO
-  def read_available_bytes(chunk_size = 16384, select_timeout = 0.02)
+  def read_available_bytes(chunk_size = 16_384, select_timeout = 0.02)
     buffer = []
 
     return "" if closed? || eof?
     # IO.select cannot be used here due to the fact that it
     # just does not work on windows
-    while true
+    loop do
       begin
         IO.select([self], nil, nil, select_timeout)
         break if eof? # stop raising :-(
@@ -15,6 +15,6 @@ class IO
       end
     end
 
-    return buffer.join
+    buffer.join
   end
 end

@@ -1,5 +1,5 @@
-require 'bundler/dependency'
-require 'bundler/ruby_dsl'
+require "bundler/dependency"
+require "bundler/ruby_dsl"
 
 module Bundler
   class Dsl
@@ -16,15 +16,16 @@ module Bundler
     attr_accessor :dependencies
 
     def initialize
-      @source          = nil
-      @sources         = SourceList.new
-      @git_sources     = {}
-      @dependencies    = []
-      @groups          = []
-      @optional_groups = []
-      @platforms       = []
-      @env             = nil
-      @ruby_version    = nil
+      @source               = nil
+      @sources              = SourceList.new
+      @git_sources          = {}
+      @dependencies         = []
+      @groups               = []
+      @install_conditionals = []
+      @optional_groups      = []
+      @platforms            = []
+      @env                  = nil
+      @ruby_version         = nil
       add_git_sources
     end
 
@@ -37,9 +38,9 @@ module Bundler
     end
 
     def gemspec(opts = nil)
-      path              = opts && opts[:path] || '.'
+      path              = opts && opts[:path] || "."
       glob              = opts && opts[:glob]
-      name              = opts && opts[:name] || '{,*}'
+      name              = opts && opts[:name] || "{,*}"
       development_group = opts && opts[:development_group] || :development
       expanded_path     = File.expand_path(path, Bundler.default_gemfile.dirname)
 
@@ -48,8 +49,14 @@ module Bundler
       case gemspecs.size
       when 1
         spec = Bundler.load_gemspec(gemspecs.first)
-        raise InvalidOption, "There was an error loading the gemspec at #{gemspecs.first}." unless spec
+
+        unless spec
+          raise InvalidOption, "There was an error loading the gemspec at " \
+            "#{file}. Make sure you can build the gem, then try again."
+        end
+
         gem spec.name, :path => path, :glob => glob
+
         group(development_group) do
           spec.development_dependencies.each do |dep|
             gem dep.name, *(dep.requirement.as_list + [:type => :development])
@@ -58,7 +65,8 @@ module Bundler
       when 0
         raise InvalidOption, "There are no gemspecs at #{expanded_path}."
       else
-        raise InvalidOption, "There are multiple gemspecs at #{expanded_path}. Please use the :name option to specify which one."
+        raise InvalidOption, "There are multiple gemspecs at #{expanded_path}. " \
+          "Please use the :name option to specify which one should be used."
       end
     end
 
@@ -71,7 +79,7 @@ module Bundler
       dep = Dependency.new(name, version, options)
 
       # if there's already a dependency with this name we try to prefer one
-      if current = @dependencies.find { |d| d.name == dep.name }
+      if current = @dependencies.find {|d| d.name == dep.name }
         if current.requirement != dep.requirement
           if current.type == :development
             @dependencies.delete current
@@ -96,7 +104,7 @@ module Bundler
           else
             raise GemfileError, "You cannot specify the same gem twice coming from different sources.\n" \
                             "You specified that #{dep.name} (#{dep.requirement}) should come from " \
-                            "#{current.source || 'an unspecified source'} and #{dep.source}\n"
+                            "#{current.source || "an unspecified source"} and #{dep.source}\n"
           end
         end
       end
@@ -174,6 +182,13 @@ module Bundler
       args.each { @groups.pop }
     end
 
+    def install_if(*args, &blk)
+      @install_conditionals.concat args
+      blk.call
+    ensure
+      args.each { @install_conditionals.pop }
+    end
+
     def platforms(*platforms)
       @platforms.concat platforms
       yield
@@ -201,10 +216,10 @@ module Bundler
         "git://github.com/#{repo_name}.git"
       end
 
-      git_source(:gist){ |repo_name| "https://gist.github.com/#{repo_name}.git" }
+      git_source(:gist) {|repo_name| "https://gist.github.com/#{repo_name}.git" }
 
       git_source(:bitbucket) do |repo_name|
-        user_name, repo_name = repo_name.split '/'
+        user_name, repo_name = repo_name.split "/"
         repo_name ||= user_name
         "https://#{user_name}@bitbucket.org/#{user_name}/#{repo_name}.git"
       end
@@ -228,7 +243,7 @@ module Bundler
     end
 
     def valid_keys
-      @valid_keys ||= %w(group groups git path glob name branch ref tag require submodules platform platforms type source)
+      @valid_keys ||= %w(group groups git path glob name branch ref tag require submodules platform platforms type source install_if)
     end
 
     def normalize_options(name, version, opts)
@@ -249,17 +264,23 @@ module Bundler
       groups.concat Array(opts.delete("group"))
       groups = [:default] if groups.empty?
 
+      install_if = @install_conditionals.dup
+      install_if.concat Array(opts.delete("install_if"))
+      install_if = install_if.reduce(true) do |memo, val|
+        memo && (val.respond_to?(:call) ? val.call : val)
+      end
+
       platforms = @platforms.dup
       opts["platforms"] = opts["platform"] || opts["platforms"]
       platforms.concat Array(opts.delete("platforms"))
-      platforms.map! { |p| p.to_sym }
+      platforms.map!(&:to_sym)
       platforms.each do |p|
         next if VALID_PLATFORMS.include?(p)
         raise GemfileError, "`#{p}` is not a valid platform. The available options are: #{VALID_PLATFORMS.inspect}"
       end
 
       # Save sources passed in a key
-      if opts.has_key?("source")
+      if opts.key?("source")
         source = normalize_source(opts["source"])
         opts["source"] = @sources.add_rubygems_source("remotes" => source)
       end
@@ -269,7 +290,7 @@ module Bundler
         opts["git"] = @git_sources[git_name].call(opts[git_name])
       end
 
-      ["git", "path"].each do |type|
+      %w[git path].each do |type|
         if param = opts[type]
           if version.first && version.first =~ /^\s*=?\s*(\d[^\s]*)\s*$/
             options = opts.merge("name" => name, "version" => $1)
@@ -281,10 +302,11 @@ module Bundler
         end
       end
 
-      opts["source"]  ||= @source
-      opts["env"]     ||= @env
-      opts["platforms"] = platforms.dup
-      opts["group"]     = groups
+      opts["source"] ||= @source
+      opts["env"] ||= @env
+      opts["platforms"]      = platforms.dup
+      opts["group"]          = groups
+      opts["should_include"] = install_if
     end
 
     def normalize_group_options(opts, groups)
@@ -299,7 +321,7 @@ module Bundler
     def validate_keys(command, opts, valid_keys)
       invalid_keys = opts.keys - valid_keys
       if invalid_keys.any?
-        message = "You passed #{invalid_keys.map{|k| ':'+k }.join(", ")} "
+        message = "You passed #{invalid_keys.map {|k| ":" + k }.join(", ")} "
         message << if invalid_keys.size > 1
                      "as options for #{command}, but they are invalid."
                    else
@@ -400,8 +422,8 @@ module Bundler
       #
       # @return [String] the message of the exception.
       #
-      def message
-        @message ||= begin
+      def to_s
+        @to_s ||= begin
           trace_line, description = parse_line_number_from_description
 
           m = "\n[!] "
@@ -410,19 +432,19 @@ module Bundler
 
           return m unless backtrace && dsl_path && contents
 
-          trace_line = backtrace.find { |l| l.include?(dsl_path.to_s) } || trace_line
+          trace_line = backtrace.find {|l| l.include?(dsl_path.to_s) } || trace_line
           return m unless trace_line
-          line_numer = trace_line.split(':')[1].to_i - 1
+          line_numer = trace_line.split(":")[1].to_i - 1
           return m unless line_numer
 
           lines      = contents.lines.to_a
-          indent     = ' #  '
-          indicator  = indent.gsub('#', '>')
+          indent     = " #  "
+          indicator  = indent.tr('#', ">")
           first_line = (line_numer.zero?)
           last_line  = (line_numer == (lines.count - 1))
 
           m << "\n"
-          m << "#{indent}from #{trace_line.gsub(/:in.*$/, '')}\n"
+          m << "#{indent}from #{trace_line.gsub(/:in.*$/, "")}\n"
           m << "#{indent}-------------------------------------------\n"
           m << "#{indent}#{    lines[line_numer - 1] }" unless first_line
           m << "#{indicator}#{ lines[line_numer] }"
@@ -432,18 +454,17 @@ module Bundler
         end
       end
 
-      private
+    private
 
       def parse_line_number_from_description
         description = self.description
         if dsl_path && description =~ /((#{Regexp.quote File.expand_path(dsl_path)}|#{Regexp.quote dsl_path.to_s}):\d+)/
           trace_line = Regexp.last_match[1]
-          description = description.sub(/#{Regexp.quote trace_line}:\s*/, '').sub("\n", ' - ')
+          description = description.sub(/#{Regexp.quote trace_line}:\s*/, "").sub("\n", " - ")
         end
         [trace_line, description]
       end
     end
-
   end
 
 end

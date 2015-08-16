@@ -1,14 +1,14 @@
-require 'bundler/vendored_persistent'
-require 'cgi'
-require 'securerandom'
+require "bundler/vendored_persistent"
+require "cgi"
+require "securerandom"
 
 module Bundler
 
   # Handles all the fetching with the rubygems server
   class Fetcher
-    autoload :Downloader, 'bundler/fetcher/downloader'
-    autoload :Dependency, 'bundler/fetcher/dependency'
-    autoload :Index, 'bundler/fetcher/index'
+    autoload :Downloader, "bundler/fetcher/downloader"
+    autoload :Dependency, "bundler/fetcher/dependency"
+    autoload :Index, "bundler/fetcher/index"
 
     # This error is raised when it looks like the network is down
     class NetworkDownError < HTTPError; end
@@ -58,9 +58,9 @@ module Bundler
       attr_accessor :disable_endpoint, :api_timeout, :redirect_limit, :max_retries
     end
 
-    self.redirect_limit = 5  # How many redirects to allow in one request
-    self.api_timeout    = 10 # How long to wait for each API call
-    self.max_retries    = 3  # How many retries for the API call
+    self.redirect_limit = Bundler.settings[:redirect] # How many redirects to allow in one request
+    self.api_timeout    = Bundler.settings[:timeout] # How long to wait for each API call
+    self.max_retries    = Bundler.settings[:retry] # How many retries for the API call
 
     def initialize(remote)
       @remote = remote
@@ -75,11 +75,11 @@ module Bundler
 
     # fetch a gem specification
     def fetch_spec(spec)
-      spec = spec - [nil, 'ruby', '']
-      spec_file_name = "#{spec.join '-'}.gemspec"
+      spec -= [nil, "ruby", ""]
+      spec_file_name = "#{spec.join "-"}.gemspec"
 
       uri = URI.parse("#{remote_uri}#{Gem::MARSHAL_SPEC_DIR}#{spec_file_name}.rz")
-      if uri.scheme == 'file'
+      if uri.scheme == "file"
         Bundler.load_marshal Gem.inflate(Gem.read_binary(uri.path))
       elsif cached_spec_path = gemspec_cached_path(spec_file_name)
         Bundler.load_gemspec(cached_spec_path)
@@ -106,7 +106,7 @@ module Bundler
       @use_api = false if fetchers.none?(&:api_fetcher?)
 
       specs[remote_uri].each do |name, version, platform, dependencies|
-        next if name == 'bundler'
+        next if name == "bundler"
         spec = nil
         if dependencies
           spec = EndpointSpecification.new(name, version, platform, dependencies)
@@ -132,7 +132,7 @@ module Bundler
       if remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
         @use_api = false
       else
-        fetchers.reject! { |f| f.api_fetcher? && !f.api_available? }
+        fetchers.reject! {|f| f.api_fetcher? && !f.api_available? }
         @use_api = fetchers.any?(&:api_fetcher?)
       end
     end
@@ -155,6 +155,8 @@ module Bundler
 
         agent << " options/#{Bundler.settings.all.join(",")}"
 
+        agent << " ci/#{cis.join(",")}" if cis.any?
+
         # add a random ID so we can consolidate runs server-side
         agent << " " << SecureRandom.hex(8)
 
@@ -167,7 +169,15 @@ module Bundler
     end
 
     def fetchers
-      @fetchers ||= FETCHERS.map { |f| f.new(downloader, remote_uri, fetch_uri, uri) }
+      @fetchers ||= FETCHERS.map {|f| f.new(downloader, remote_uri, fetch_uri, uri) }
+    end
+
+    def http_proxy
+      if uri = connection.proxy_uri
+        uri.to_s
+      else
+        nil
+      end
     end
 
     def inspect
@@ -178,6 +188,21 @@ module Bundler
 
     FETCHERS = [Dependency, Index]
 
+    def cis
+      env_cis = {
+        "TRAVIS" => "travis",
+        "CIRCLECI" => "circle",
+        "SEMAPHORE" => "semaphore",
+        "JENKINS_URL" => "jenkins",
+        "BUILDBOX" => "buildbox",
+        "GO_SERVER_URL" => "go",
+        "SNAP_CI" => "snap",
+        "CI_NAME" => ENV["CI_NAME"],
+        "CI" => "ci"
+      }
+      env_cis.find_all {|env, _| ENV[env] }.map {|_, ci| ci }
+    end
+
     def connection
       @connection ||= begin
         needs_ssl = remote_uri.scheme == "https" ||
@@ -185,7 +210,10 @@ module Bundler
           Bundler.settings[:ssl_client_cert]
         raise SSLError if needs_ssl && !defined?(OpenSSL::SSL)
 
-        con = Net::HTTP::Persistent.new 'bundler', :ENV
+        con = Net::HTTP::Persistent.new "bundler", :ENV
+        if gem_proxy = Bundler.rubygems.configuration[:http_proxy]
+          con.proxy = URI.parse(gem_proxy)
+        end
 
         if remote_uri.scheme == "https"
           con.verify_mode = (Bundler.settings[:ssl_verify_mode] ||
@@ -206,14 +234,14 @@ module Bundler
     end
 
     # cached gem specification path, if one exists
-    def gemspec_cached_path spec_file_name
-      paths = Bundler.rubygems.spec_cache_dirs.map { |dir| File.join(dir, spec_file_name) }
+    def gemspec_cached_path(spec_file_name)
+      paths = Bundler.rubygems.spec_cache_dirs.map {|dir| File.join(dir, spec_file_name) }
       paths = paths.select {|path| File.file? path }
       paths.first
     end
 
     HTTP_ERRORS = [
-      Timeout::Error, EOFError, SocketError, Errno::ENETDOWN,
+      Timeout::Error, EOFError, SocketError, Errno::ENETDOWN, Errno::ENETUNREACH,
       Errno::EINVAL, Errno::ECONNRESET, Errno::ETIMEDOUT, Errno::EAGAIN,
       Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError,
       Net::HTTP::Persistent::Error
@@ -230,7 +258,7 @@ module Bundler
       else
         store.set_default_paths
         certs = File.expand_path("../ssl_certs/*.pem", __FILE__)
-        Dir.glob(certs).each { |c| store.add_file c }
+        Dir.glob(certs).each {|c| store.add_file c }
       end
       store
     end
@@ -256,6 +284,5 @@ module Bundler
     def downloader
       @downloader ||= Downloader.new(connection, self.class.redirect_limit)
     end
-
   end
 end

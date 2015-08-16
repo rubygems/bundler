@@ -5,15 +5,8 @@ before_script: travis_retry rake spec:travis:deps
 branches:
   only:
     - master
-    - 1-9-stable
-    - 1-8-stable
-    - 1-7-stable
-    - 1-6-stable
-    - 1-5-stable
-    - 1-3-stable
-    - 1-2-stable
-    - 1-1-stable
-    - 1-0-stable
+    - auto
+    - /.+-stable$/
 
 notifications:
   email:
@@ -41,10 +34,9 @@ env:
   # We need to know if changes to rubygems will break bundler on release
   - RGV=master
   # Test the latest rubygems release with all of our supported rubies
-  - RGV=v2.4.6
+  - RGV=v2.4.8
 
 matrix:
-  fast_finish: true
   include:
     # Ruby 2.2, Rubygems 2.4.5 and up (RG 2.4 is included by the matrix above)
     # Ruby 2.1, Rubygems 2.2.2 and up
@@ -99,7 +91,7 @@ matrix:
     # Ruby 1.9.2 sanity check
     # (but it's just too slow and sometimes goes over the Travis limit)
     - rvm: 1.9.2
-      env: RGV=v2.4.6
+      env: RGV=v2.4.8
     # Ruby-head (we want to know how we're doing, but not fail the build)
     - rvm: ruby-head
       env: RGV=master

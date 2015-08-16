@@ -12,7 +12,7 @@ describe "bundle licenses" do
   it "prints license information for all gems in the bundle" do
     bundle "licenses"
 
-    expect(out).to include("actionpack: Unknown")
+    expect(out).to include("bundler: Unknown")
     expect(out).to include("with_license: MIT")
   end
 

@@ -10,11 +10,10 @@ If you’re interested in contributing to Bundler, that’s awesome! We’d love
 
 If you have any questions after reading this page, please feel free to contact either [@indirect](http://github.com/indirect) or [@hone](http://github.com/hone). They are both happy to provide help working through your first bugfix or thinking through the problem you’re trying to resolve.
 
-## Tackle some small problems
+## How you can help
 
 We track [small
-bugs](https://github.com/bundler/bundler/issues?labels=small&state=open) and [small features](https://github.com/bundler/bundler-features/issues?labels=small&state=open) so that anyone who wants to help can start with something that's not too overwhelming. If nothing on those lists looks good, though, just talk to us.
-
+bugs](https://github.com/bundler/bundler/issues?labels=small&state=open) and [small features](https://github.com/bundler/bundler-features/issues?labels=small&state=open) so that anyone who wants to help can start with something that's not too overwhelming. We also keep a [list of things anyone can help with, any time](https://github.com/bundler/bundler/blob/master/CONTRIBUTING.md#contributing). If nothing on those lists looks good, talk to us, and we'll figure out what you can help with. We can absolutely use your help, no matter what level of programming skill you have at the moment.
 
 # Development setup
 
@@ -30,7 +29,7 @@ Bundler doesn't use a Gemfile to list development dependencies, because when we 
 
   3. Set up a shell alias to run Bundler from your clone, e.g. a Bash alias:
 
-        $ alias dbundle='ruby -I /path/to/bundler/lib /path/to/bundler/bin/bundle'
+        $ alias dbundle='ruby -I /path/to/bundler/lib /path/to/bundler/exe/bundle'
 
      With that set up, you can test changes you've made to Bundler by running `dbundle`, without interfering with the regular `bundle` command.
 
@@ -83,7 +82,7 @@ If you don't hear back immediately, don’t get discouraged! We all have day job
 
 Early releases require heavy testing, especially across various system setups. We :heart: testers, and are big fans of anyone who can run `gem install bundler --pre` and try out upcoming releases in their development and staging environments.
 
-There may not always be prereleases or beta versions of Bundler. That said, you are always welcome to try checking out master and building a gem yourself if you want to try out the latest changes.
+There may not always be prereleases or beta versions of Bundler. The Bundler team will tweet from the [@bundlerio account](http://twitter.com/bundlerio) when a prerelease or beta version becomes available. You are also always welcome to try checking out master and building a gem yourself if you want to try out the latest changes.
 
 
 # Translations

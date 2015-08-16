@@ -13,9 +13,11 @@ module Bundler
       peek = args.shift
 
       if peek && peek =~ /^\-\-/
-        name, scope = args.shift, $'
+        name = args.shift
+        scope = $'
       else
-        name, scope = peek, "global"
+        name = peek
+        scope = "global"
       end
 
       unless name
@@ -41,44 +43,46 @@ module Bundler
         if args.empty?
           Bundler.ui.confirm "Settings for `#{name}` in order of priority. The top value will be used"
           thor.with_padding do
-            Bundler.settings.pretty_values_for(name).each { |line| Bundler.ui.info line }
+            Bundler.settings.pretty_values_for(name).each {|line| Bundler.ui.info line }
           end
           return
         end
 
+        new_value = args.join(" ")
         locations = Bundler.settings.locations(name)
 
         if scope == "global"
-          if local = locations[:local]
-            Bundler.ui.info "Your application has set #{name} to #{local.inspect}. This will override the " \
-              "global value you are currently setting"
+          if locations[:local]
+            Bundler.ui.info "Your application has set #{name} to #{locations[:local].inspect}. " \
+              "This will override the global value you are currently setting"
           end
 
-          if env = locations[:env]
-            Bundler.ui.info "You have a bundler environment variable for #{name} set to #{env.inspect}. " \
-              "This will take precedence over the global value you are setting"
+          if locations[:env]
+            Bundler.ui.info "You have a bundler environment variable for #{name} set to " \
+              "#{locations[:env].inspect}. This will take precedence over the global value you are setting"
           end
 
-          if global = locations[:global]
-            Bundler.ui.info "You are replacing the current global value of #{name}, which is currently #{global.inspect}"
+          if locations[:global] && locations[:global] != new_value
+            Bundler.ui.info "You are replacing the current global value of #{name}, which is currently " \
+              "#{locations[:global].inspect}"
           end
         end
 
-        if scope == "local" && local = locations[:local]
-          Bundler.ui.info "You are replacing the current local value of #{name}, which is currently #{local.inspect}"
+        if scope == "local" && locations[:local] != new_value
+          Bundler.ui.info "You are replacing the current local value of #{name}, which is currently " \
+            "#{locations[:local].inspect}"
         end
 
         if name.match(/\Alocal\./)
           pathname = Pathname.new(args.join(" "))
-          self.args = [pathname.expand_path.to_s] if pathname.directory?
+          new_value = pathname.expand_path.to_s if pathname.directory?
         end
 
-        Bundler.settings.send("set_#{scope}", name, args.join(" "))
+        Bundler.settings.send("set_#{scope}", name, new_value)
       else
         Bundler.ui.error "Invalid scope --#{scope} given. Please use --local or --global."
         exit 1
       end
     end
-
   end
 end

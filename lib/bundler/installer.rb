@@ -1,6 +1,6 @@
-require 'erb'
-require 'rubygems/dependency_installer'
-require 'bundler/worker'
+require "erb"
+require "rubygems/dependency_installer"
+require "bundler/worker"
 
 module Bundler
   class Installer < Environment
@@ -63,35 +63,8 @@ module Bundler
         return
       end
 
-      if Bundler.default_lockfile.exist? && !options["update"]
-        local = Bundler.ui.silence do
-          begin
-            tmpdef = Definition.build(Bundler.default_gemfile, Bundler.default_lockfile, nil)
-            true unless tmpdef.new_platform? || tmpdef.missing_specs.any?
-          rescue BundlerError
-          end
-        end
-      end
-
-      # Since we are installing, we can resolve the definition
-      # using remote specs
-      unless local
-        options["local"] ? @definition.resolve_with_cache! : @definition.resolve_remotely!
-      end
-
-      force = options["force"]
-
-      # the order that the resolver provides is significant, since
-      # dependencies might actually affect the installation of a gem.
-      # that said, it's a rare situation (other than rake), and parallel
-      # installation is just SO MUCH FASTER. so we let people opt in.
-      jobs = [Bundler.settings[:jobs].to_i-1, 1].max
-      if jobs > 1 && can_install_in_parallel?
-        require 'bundler/installer/parallel_installer'
-        install_in_parallel jobs, options[:standalone], force
-      else
-        install_sequentially options[:standalone], force
-      end
+      resolve_if_need(options)
+      install(options)
 
       lock unless Bundler.settings[:frozen]
       generate_standalone(options[:standalone]) if options[:standalone]
@@ -100,25 +73,18 @@ module Bundler
     def install_gem_from_spec(spec, standalone = false, worker = 0, force = false)
       # Fetch the build settings, if there are any
       settings = Bundler.settings["build.#{spec.name}"]
-      messages = nil
+      install_options = { :force => force, :ensure_builtin_gems_cached => standalone }
 
+      post_install_message = nil
       if settings
         # Build arguments are global, so this is mutexed
         Bundler.rubygems.with_build_args [settings] do
-          messages = spec.source.install(spec, force)
+          post_install_message = spec.source.install(spec, install_options)
         end
       else
-        messages = spec.source.install(spec, force)
+        post_install_message = spec.source.install(spec, install_options)
       end
 
-      install_message, post_install_message, debug_message = *messages
-
-      if install_message.include? 'Installing'
-        Bundler.ui.confirm install_message
-      else
-        Bundler.ui.info install_message
-      end
-      Bundler.ui.debug debug_message if debug_message
       Bundler.ui.debug "#{worker}:  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
 
       if Bundler.settings[:bin] && standalone
@@ -157,9 +123,9 @@ module Bundler
           options[dep.name] = bins unless bins.empty?
         end
         if options.any?
-          Bundler.ui.warn "#{spec.name} has no executables, but you may want " +
+          Bundler.ui.warn "#{spec.name} has no executables, but you may want " \
             "one from a gem it depends on."
-          options.each{|name,bins| Bundler.ui.warn "  #{name} has: #{bins.join(', ')}" }
+          options.each {|name, bins| Bundler.ui.warn "  #{name} has: #{bins.join(", ")}" }
         else
           Bundler.ui.warn "There are no executables for the gem #{spec.name}."
         end
@@ -168,7 +134,7 @@ module Bundler
 
       # double-assignment to avoid warnings about variables that will be used by ERB
       bin_path = bin_path = Bundler.bin_path
-      template = template = File.read(File.expand_path('../templates/Executable', __FILE__))
+      template = template = File.read(File.expand_path("../templates/Executable", __FILE__))
       relative_gemfile_path = relative_gemfile_path = Bundler.default_gemfile.relative_path_from(bin_path)
       ruby_command = ruby_command = Thor::Util.ruby_command
 
@@ -182,8 +148,8 @@ module Bundler
           next
         end
 
-        File.open(binstub_path, 'w', 0777 & ~File.umask) do |f|
-          f.puts ERB.new(template, nil, '-').result(binding)
+        File.open(binstub_path, "w", 0777 & ~File.umask) do |f|
+          f.puts ERB.new(template, nil, "-").result(binding)
         end
       end
 
@@ -192,10 +158,10 @@ module Bundler
         when 1
           Bundler.ui.warn "Skipped #{exists[0]} since it already exists."
         when 2
-          Bundler.ui.warn "Skipped #{exists.join(' and ')} since they already exist."
+          Bundler.ui.warn "Skipped #{exists.join(" and ")} since they already exist."
         else
-          items = exists[0...-1].empty? ? nil : exists[0...-1].join(', ')
-          skipped = [items, exists[-1]].compact.join(' and ')
+          items = exists[0...-1].empty? ? nil : exists[0...-1].join(", ")
+          skipped = [items, exists[-1]].compact.join(" and ")
           Bundler.ui.warn "Skipped #{skipped} since they already exist."
         end
         Bundler.ui.warn "If you want to overwrite skipped stubs, use --force."
@@ -203,6 +169,21 @@ module Bundler
     end
 
   private
+
+    # the order that the resolver provides is significant, since
+    # dependencies might actually affect the installation of a gem.
+    # that said, it's a rare situation (other than rake), and parallel
+    # installation is just SO MUCH FASTER. so we let people opt in.
+    def install(options)
+      force = options["force"]
+      jobs = [Bundler.settings[:jobs].to_i - 1, 1].max
+      if jobs > 1 && can_install_in_parallel?
+        require "bundler/installer/parallel_installer"
+        install_in_parallel jobs, options[:standalone], force
+      else
+        install_sequentially options[:standalone], force
+      end
+    end
 
     def can_install_in_parallel?
       if Bundler.rubygems.provides?(">= 2.1.0")
@@ -218,15 +199,15 @@ module Bundler
     def generate_standalone_bundler_executable_stubs(spec)
       # double-assignment to avoid warnings about variables that will be used by ERB
       bin_path = Bundler.bin_path
-      template = File.read(File.expand_path('../templates/Executable.standalone', __FILE__))
+      template = File.read(File.expand_path("../templates/Executable.standalone", __FILE__))
       ruby_command = ruby_command = Thor::Util.ruby_command
 
       spec.executables.each do |executable|
         next if executable == "bundle"
         standalone_path = standalone_path = Pathname(Bundler.settings[:path]).expand_path.relative_path_from(bin_path)
         executable_path = executable_path = Pathname(spec.full_gem_path).join(spec.bindir, executable).relative_path_from(bin_path)
-        File.open "#{bin_path}/#{executable}", 'w', 0755 do |f|
-          f.puts ERB.new(template, nil, '-').result(binding)
+        File.open "#{bin_path}/#{executable}", "w", 0755 do |f|
+          f.puts ERB.new(template, nil, "-").result(binding)
         end
       end
     end
@@ -241,7 +222,7 @@ module Bundler
       if groups.empty?
         specs = @definition.requested_specs
       else
-        specs = @definition.specs_for groups.map { |g| g.to_sym }
+        specs = @definition.specs_for groups.map(&:to_sym)
       end
 
       specs.each do |spec|
@@ -249,12 +230,11 @@ module Bundler
         next if spec.require_paths.nil? # builtin gems
 
         spec.require_paths.each do |path|
-          full_path = File.join(spec.full_gem_path, path)
+          full_path = Pathname.new(path).absolute? ? path : File.join(spec.full_gem_path, path)
           gem_path = Pathname.new(full_path).relative_path_from(Bundler.root.join(bundler_path))
-          paths << gem_path.to_s.sub("#{Bundler.ruby_version.engine}/#{RbConfig::CONFIG['ruby_version']}", '#{ruby_engine}/#{ruby_version}')
+          paths << gem_path.to_s.sub("#{Bundler.ruby_version.engine}/#{RbConfig::CONFIG["ruby_version"]}", '#{ruby_engine}/#{ruby_version}')
         end
       end
-
 
       File.open File.join(bundler_path, "setup.rb"), "w" do |file|
         file.puts "require 'rbconfig'"
@@ -284,9 +264,24 @@ module Bundler
     def create_bundle_path
       Bundler.mkdir_p(Bundler.bundle_path.to_s) unless Bundler.bundle_path.exist?
     rescue Errno::EEXIST
-      raise PathError, "Could not install to path `#{Bundler.settings[:path]}` " +
+      raise PathError, "Could not install to path `#{Bundler.settings[:path]}` " \
         "because of an invalid symlink. Remove the symlink so the directory can be created."
     end
 
+    def resolve_if_need(options)
+      if Bundler.default_lockfile.exist? && !options["update"]
+        local = Bundler.ui.silence do
+          begin
+            tmpdef = Definition.build(Bundler.default_gemfile, Bundler.default_lockfile, nil)
+            true unless tmpdef.new_platform? || tmpdef.missing_specs.any?
+          rescue BundlerError
+          end
+        end
+      end
+
+      unless local
+        options["local"] ? @definition.resolve_with_cache! : @definition.resolve_remotely!
+      end
+    end
   end
 end

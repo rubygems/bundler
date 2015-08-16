@@ -4,7 +4,7 @@ The Bundler project strongly values contributors from anywhere, regardless of ge
 
 ### Summary
 
-Harassment in code and discussion or violation of physical boundaries is completely unacceptable anywhere in the Bundler project’s codebases, issue trackers, IRC channel, Campfire, mailing lists, meetups, and other events. Violators will be warned and then blocked or banned by the core team at or before the 3rd violation.
+Harassment in code and discussion or violation of physical boundaries is completely unacceptable anywhere in the Bundler project’s codebases, issue trackers, chat rooms, mailing lists, meetups, and any other events. Violators will be warned and then blocked or banned by the core team at or before the 3rd violation.
 
 ### In detail
 
@@ -19,6 +19,8 @@ If anyone engages in harassing behavior, including maintainers, we may take appr
 If you are being harassed, notice that someone else is being harassed, or have any other concerns, please contact a member of [the core team](http://bundler.io/contributors.html) or [email the core team](mailto:team@bundler.io) immediately.
 
 We expect everyone to follow these rules anywhere in the Bundler project’s codebases, issue trackers, IRC channel, group chat, and mailing lists.
+
+This code of conduct applies both within project spaces and in public spaces when an individual is representing the project or its community.
 
 Finally, don't forget that it is human to make mistakes! We all do. Let’s work together to help each other, resolve issues, and learn from the mistakes that we will all inevitably make from time to time.
 

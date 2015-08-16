@@ -1,13 +1,13 @@
-require 'pathname'
-require 'rubygems'
+require "pathname"
+require "rubygems"
 
-require 'bundler/constants'
-require 'bundler/rubygems_integration'
-require 'bundler/current_ruby'
+require "bundler/constants"
+require "bundler/rubygems_integration"
+require "bundler/current_ruby"
 
 module Gem
   class Dependency
-    if !instance_methods.map { |m| m.to_s }.include?("requirement")
+    unless method_defined? :requirement
       def requirement
         version_requirements
       end
@@ -29,7 +29,7 @@ module Bundler
       gemfile = default_gemfile
 
       case gemfile.basename.to_s
-      when 'gems.rb' then Pathname.new(gemfile.sub(/.rb$/, '.locked'))
+      when "gems.rb" then Pathname.new(gemfile.sub(/.rb$/, ".locked"))
       else Pathname.new("#{gemfile}.lock")
       end
     end
@@ -56,7 +56,7 @@ module Bundler
 
     def pwd
       Bundler.rubygems.ext_lock.synchronize do
-        Dir.pwd
+        Pathname.pwd
       end
     end
 
@@ -81,24 +81,24 @@ module Bundler
 
       # Set RUBYOPT
       rubyopt = [ENV["RUBYOPT"]].compact
-      if rubyopt.empty? || rubyopt.first !~ /-rbundler\/setup/
+      if rubyopt.empty? || rubyopt.first !~ %r{-rbundler/setup}
         rubyopt.unshift %|-rbundler/setup|
-        ENV["RUBYOPT"] = rubyopt.join(' ')
+        ENV["RUBYOPT"] = rubyopt.join(" ")
       end
 
       # Set RUBYLIB
       rubylib = (ENV["RUBYLIB"] || "").split(File::PATH_SEPARATOR)
-      rubylib.unshift File.expand_path('../..', __FILE__)
+      rubylib.unshift File.expand_path("../..", __FILE__)
       ENV["RUBYLIB"] = rubylib.uniq.join(File::PATH_SEPARATOR)
     end
 
   private
 
     def find_gemfile
-      given = ENV['BUNDLE_GEMFILE']
+      given = ENV["BUNDLE_GEMFILE"]
       return given if given && !given.empty?
 
-      find_file('Gemfile', 'gems.rb')
+      find_file("Gemfile", "gems.rb")
     end
 
     def find_file(*names)
@@ -118,9 +118,9 @@ module Bundler
       current  = File.expand_path(SharedHelpers.pwd)
 
       until !File.directory?(current) || current == previous
-        if ENV['BUNDLE_SPEC_RUN']
+        if ENV["BUNDLE_SPEC_RUN"]
           # avoid stepping above the tmp directory when testing
-          return nil if File.file?(File.join(current, 'bundler.gemspec'))
+          return nil if File.file?(File.join(current, "bundler.gemspec"))
         end
 
         names.each do |name|
@@ -135,10 +135,13 @@ module Bundler
       # handle 1.9 where system gems are always on the load path
       if defined?(::Gem)
         me = File.expand_path("../../", __FILE__)
+        me = /^#{Regexp.escape(me)}/
+
+        loaded_gem_paths = Bundler.rubygems.loaded_gem_paths
+
         $LOAD_PATH.reject! do |p|
-          next if File.expand_path(p) =~ /^#{Regexp.escape(me)}/
-          p != File.dirname(__FILE__) &&
-            Bundler.rubygems.gem_path.any?{|gp| p =~ /^#{Regexp.escape(gp)}/ }
+          next if File.expand_path(p) =~ me
+          loaded_gem_paths.delete(p)
         end
         $LOAD_PATH.uniq!
       end

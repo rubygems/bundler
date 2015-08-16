@@ -43,25 +43,34 @@ module Bundler
   end
 
   def self.request_issue_report_for(e)
-    Bundler.ui.info <<-EOS.gsub(/^ {6}/, '')
-      #{'――― ERROR REPORT TEMPLATE ―――――――――――――――――――――――――――――――――――――――――――――――――――――――'}
+    Bundler.ui.info <<-EOS.gsub(/^ {6}/, "")
+      --- ERROR REPORT TEMPLATE -------------------------------------------------------
       - What did you do?
+
+        I ran the command `#{$PROGRAM_NAME} #{ARGV.join(" ")}`
+
       - What did you expect to happen?
+
+        I expected Bundler to...
+
       - What happened instead?
+
+        Instead, what actually happened was...
+
 
       Error details
 
           #{e.class}: #{e.message}
-          #{e.backtrace.join("\n          ")}
+            #{e.backtrace.join("\n            ")}
 
       #{Bundler::Env.new.report(:print_gemfile => false).gsub(/\n/, "\n      ").strip}
-      #{'――― TEMPLATE END ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――'}
+      --- TEMPLATE END ----------------------------------------------------------------
 
     EOS
 
     Bundler.ui.error "Unfortunately, an unexpected error occurred, and Bundler cannot continue."
 
-    Bundler.ui.warn <<-EOS.gsub(/^ {6}/, '')
+    Bundler.ui.warn <<-EOS.gsub(/^ {6}/, "")
 
       First, try this link to see if there are any existing issue reports for this error:
       #{issues_url(e)}
@@ -72,7 +81,7 @@ module Bundler
   end
 
   def self.issues_url(exception)
-    'https://github.com/bundler/bundler/search?q=' \
+    "https://github.com/bundler/bundler/search?q=" \
     "#{CGI.escape(exception.message.lines.first.chomp)}&type=Issues"
   end
 

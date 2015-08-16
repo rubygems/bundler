@@ -1,15 +1,15 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Bundler::Dsl do
   before do
     @rubygems = double("rubygems")
-    allow(Bundler::Source::Rubygems).to receive(:new){ @rubygems }
+    allow(Bundler::Source::Rubygems).to receive(:new) { @rubygems }
   end
 
   describe "#git_source" do
     it "registers custom hosts" do
-      subject.git_source(:example){ |repo_name| "git@git.example.com:#{repo_name}.git" }
-      subject.git_source(:foobar){ |repo_name| "git@foobar.com:#{repo_name}.git" }
+      subject.git_source(:example) {|repo_name| "git@git.example.com:#{repo_name}.git" }
+      subject.git_source(:foobar) {|repo_name| "git@foobar.com:#{repo_name}.git" }
       subject.gem("dobry-pies", :example => "strzalek/dobry-pies")
       example_uri = "git@git.example.com:strzalek/dobry-pies.git"
       expect(subject.dependencies.first.source.uri).to eq(example_uri)
@@ -17,12 +17,12 @@ describe Bundler::Dsl do
 
     it "raises exception on invalid hostname" do
       expect {
-        subject.git_source(:group){ |repo_name| "git@git.example.com:#{repo_name}.git" }
+        subject.git_source(:group) {|repo_name| "git@git.example.com:#{repo_name}.git" }
       }.to raise_error(Bundler::InvalidOption)
     end
 
     it "expects block passed" do
-      expect{ subject.git_source(:example) }.to raise_error(Bundler::InvalidOption)
+      expect { subject.git_source(:example) }.to raise_error(Bundler::InvalidOption)
     end
 
     context "default hosts (git, gist)" do
@@ -33,7 +33,7 @@ describe Bundler::Dsl do
       end
 
       it "converts numeric :gist to :git" do
-        subject.gem("not-really-a-gem", :gist => 2859988)
+        subject.gem("not-really-a-gem", :gist => 2_859_988)
         github_uri = "https://gist.github.com/2859988.git"
         expect(subject.dependencies.first.source.uri).to eq(github_uri)
       end
@@ -84,8 +84,8 @@ describe Bundler::Dsl do
   end
 
   describe "#gem" do
-    [:ruby, :ruby_18, :ruby_19, :ruby_20, :ruby_21, :ruby_22, :mri, :mri_18, :mri_19,
-     :mri_20, :mri_21, :jruby, :rbx].each do |platform|
+    [:ruby, :ruby_18, :ruby_19, :ruby_20, :ruby_21, :ruby_22, :ruby_23, :mri, :mri_18, :mri_19,
+     :mri_20, :mri_21, :mri_22, :mri_23, :jruby, :rbx].each do |platform|
       it "allows #{platform} as a valid platform" do
         subject.gem("foo", :platform => platform)
       end
@@ -145,9 +145,9 @@ describe Bundler::Dsl do
     # end
     describe "#git" do
       it "from a single repo" do
-        rails_gems = ["railties", "action_pack", "active_model"]
+        rails_gems = %w[railties action_pack active_model]
         subject.git "https://github.com/rails/rails.git" do
-          rails_gems.each { |rails_gem| subject.send :gem, rails_gem }
+          rails_gems.each {|rails_gem| subject.send :gem, rails_gem }
         end
         expect(subject.dependencies.map(&:name)).to match_array rails_gems
       end
@@ -160,9 +160,9 @@ describe Bundler::Dsl do
     # end
     describe "#github" do
       it "from github" do
-        spree_gems = ["spree_core", "spree_api", "spree_backend"]
+        spree_gems = %w[spree_core spree_api spree_backend]
         subject.github "spree" do
-          spree_gems.each { |spree_gem| subject.send :gem, spree_gem }
+          spree_gems.each {|spree_gem| subject.send :gem, spree_gem }
         end
 
         subject.dependencies.each do |d|
@@ -184,7 +184,7 @@ describe Bundler::Dsl do
     it "will raise a Bundler::GemfileError" do
       gemfile "s = 'foo'.freeze; s.strip!"
       expect { Bundler::Dsl.evaluate(bundled_app("Gemfile"), nil, true) }.
-        to raise_error(Bundler::GemfileError, /There was an error parsing `Gemfile`: can't modify frozen String. Bundler cannot continue./)
+        to raise_error(Bundler::GemfileError, /There was an error parsing `Gemfile`: can't modify frozen String. Bundler cannot continue./i)
     end
   end
 end

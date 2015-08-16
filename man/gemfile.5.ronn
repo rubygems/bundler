@@ -183,6 +183,8 @@ There are a number of `Gemfile` platforms:
     _ruby_ `AND` version 2.1
   * `ruby_22`:
     _ruby_ `AND` version 2.2
+  * `ruby_23`:
+    _ruby_ `AND` version 2.3
   * `mri`:
     Same as _ruby_, but not Rubinius
   * `mri_18`:
@@ -195,6 +197,8 @@ There are a number of `Gemfile` platforms:
     _mri_ `AND` version 2.1
   * `mri_22`:
     _mri_ `AND` version 2.2
+  * `mri_23`:
+    _mri_ `AND` version 2.3
   * `rbx`:
     Same as _ruby_, but only Rubinius (not MRI)
   * `jruby`:
@@ -213,6 +217,8 @@ There are a number of `Gemfile` platforms:
     _mingw_ `AND` version 2.1
   * `mingw_22`:
     _mingw_ `AND` version 2.2
+  * `mingw_23`:
+    _mingw_ `AND` version 2.3
   * `x64_mingw`:
     Windows 64 bit 'mingw32' platform (aka RubyInstaller x64)
   * `x64_mingw_20`:
@@ -221,6 +227,8 @@ There are a number of `Gemfile` platforms:
     _x64_mingw_ `AND` version 2.1
   * `x64_mingw_22`:
     _x64_mingw_ `AND` version 2.2
+  * `x64_mingw_23`:
+    _x64_mingw_ `AND` version 2.3
 
 As with groups, you can specify one or more platforms:
 
@@ -442,6 +450,16 @@ option given to the `bundle install` command.
 In the case of the `git` block form, the `:ref`, `:branch`, `:tag`,
 and `:submodules` options may be passed to the `git` method, and
 all gems in the block will inherit those options.
+
+## INSTALL_IF (#install_if)
+
+The `install_if` method allows gems to be installed based on a proc or lambda.
+This is especially useful for optional gems that can only be used if certain
+software is installed or some other conditions are met.
+
+    install_if -> { RUBY_PLATFORM =~ /darwin/ } do
+      gem "pasteboard"
+    end
 
 ## GEMSPEC (#gemspec)
 

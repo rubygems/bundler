@@ -11,21 +11,21 @@ module Bundler
     end
 
     attr_reader :specs, :all_specs, :sources
-    protected   :specs, :all_specs
+    protected :specs, :all_specs
 
     def initialize
       @sources = []
       @cache = {}
-      @specs = Hash.new { |h,k| h[k] = Hash.new }
-      @all_specs = Hash.new { |h,k| h[k] = [] }
+      @specs = Hash.new {|h, k| h[k] = {} }
+      @all_specs = Hash.new {|h, k| h[k] = [] }
     end
 
     def initialize_copy(o)
       super
       @sources = @sources.dup
       @cache = {}
-      @specs = Hash.new { |h,k| h[k] = Hash.new }
-      @all_specs = Hash.new { |h,k| h[k] = [] }
+      @specs = Hash.new {|h, k| h[k] = {} }
+      @all_specs = Hash.new {|h, k| h[k] = [] }
 
       o.specs.each do |name, hash|
         @specs[name] = hash.dup
@@ -36,7 +36,7 @@ module Bundler
     end
 
     def inspect
-      "#<#{self.class}:0x#{object_id} sources=#{sources.map{|s| s.inspect}} specs.size=#{specs.size}>"
+      "#<#{self.class}:0x#{object_id} sources=#{sources.map(&:inspect)} specs.size=#{specs.size}>"
     end
 
     def empty?
@@ -56,7 +56,7 @@ module Bundler
     # about, returning all of the results.
     def search(query, base = nil)
       results = local_search(query, base)
-      seen = Set.new(results.map { |spec| [spec.name, spec.version, spec.platform] })
+      seen = Set.new(results.map {|spec| [spec.name, spec.version, spec.platform] })
 
       @sources.each do |source|
         source.search(query, base).each do |spec|
@@ -68,7 +68,7 @@ module Bundler
         end
       end
 
-      results.sort_by {|s| [s.version, s.platform.to_s == 'ruby' ? "\0" : s.platform.to_s] }
+      results.sort_by {|s| [s.version, s.platform.to_s == "ruby" ? "\0" : s.platform.to_s] }
     end
 
     def local_search(query, base = nil)
@@ -81,7 +81,7 @@ module Bundler
       end
     end
 
-    alias [] search
+    alias_method :[], :search
 
     def <<(spec)
       @specs[spec.name]["#{spec.version}-#{spec.platform}"] = spec
@@ -98,13 +98,13 @@ module Bundler
     # returns a list of the dependencies
     def unmet_dependency_names
       names = dependency_names
-      names.delete_if{|n| n == "bundler" }
-      names.select{|n| search(n).empty? }
+      names.delete_if {|n| n == "bundler" }
+      names.select {|n| search(n).empty? }
     end
 
     def dependency_names
       names = []
-      each{|s| names.push(*s.dependencies.map{|d| d.name }) }
+      each {|s| names.push(*s.dependencies.map(&:name)) }
       names.uniq
     end
 
@@ -127,9 +127,9 @@ module Bundler
       end
     end
 
-    def ==(o)
+    def ==(other)
       all? do |spec|
-        other_spec = o[spec].first
+        other_spec = other[spec].first
         (spec.dependencies & other_spec.dependencies).empty? && spec.source == other_spec.source
       end
     end
@@ -165,7 +165,7 @@ module Bundler
         only_prerelease  = specs.all? {|spec| spec.version.prerelease? }
 
         unless wants_prerelease || only_prerelease
-          found.reject! { |spec| spec.version.prerelease? }
+          found.reject! {|spec| spec.version.prerelease? }
         end
 
         found
@@ -177,7 +177,7 @@ module Bundler
       spec ? [spec] : []
     end
 
-    if RUBY_VERSION < '1.9'
+    if RUBY_VERSION < "1.9"
       def same_version?(a, b)
         regex = /^(.*?)(?:\.0)*$/
         a.to_s[regex, 1] == b.to_s[regex, 1]
@@ -192,6 +192,5 @@ module Bundler
       return false unless dep.name == spec.name
       dep.requirement.satisfied_by?(spec.version)
     end
-
   end
 end

@@ -1,3 +1,5 @@
+require "bundler/vendored_thor"
+
 module Bundler
   module UI
     class Shell
@@ -10,7 +12,8 @@ module Bundler
           Thor::Base.shell = Thor::Shell::Basic
         end
         @shell = Thor::Base.shell.new
-        @level = ENV['DEBUG'] ? "debug" : "info"
+        @level = ENV["DEBUG"] ? "debug" : "info"
+        @warning_history = []
       end
 
       def info(msg, newline = nil)
@@ -22,6 +25,8 @@ module Bundler
       end
 
       def warn(msg, newline = nil)
+        return if @warning_history.include? msg
+        @warning_history << msg
         tell_me(msg, :yellow, newline) if level("warn")
       end
 
@@ -90,7 +95,7 @@ module Bundler
 
       def strip_leading_spaces(text)
         spaces = text[/\A\s+/, 0]
-        spaces ? text.gsub(/#{spaces}/, '') : text
+        spaces ? text.gsub(/#{spaces}/, "") : text
       end
 
       def word_wrap(text, line_width = @shell.terminal_width)

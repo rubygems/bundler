@@ -30,9 +30,9 @@ describe "Bundler.load" do
 
     it "ignores blank BUNDLE_GEMFILEs" do
       expect {
-        ENV['BUNDLE_GEMFILE'] = ""
+        ENV["BUNDLE_GEMFILE"] = ""
         Bundler.load
-      }.not_to raise_error()
+      }.not_to raise_error
     end
   end
 
@@ -62,7 +62,7 @@ describe "Bundler.load" do
 
     it "raises an exception if a specified gemfile is not found" do
       expect {
-        ENV['BUNDLE_GEMFILE'] = "omg.rb"
+        ENV["BUNDLE_GEMFILE"] = "omg.rb"
         Bundler.load
       }.to raise_error(Bundler::GemfileNotFound, /omg\.rb/)
     end
@@ -79,7 +79,6 @@ describe "Bundler.load" do
         bundler_gemfile.rmtree if @remove_bundler_gemfile
       end
     end
-
   end
 
   describe "when called twice" do
@@ -119,5 +118,4 @@ describe "Bundler.load" do
       end
     end
   end
-
 end

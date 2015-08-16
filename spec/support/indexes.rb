@@ -7,13 +7,13 @@ module Spec
 
     def platform(*args)
       @platforms ||= []
-      @platforms.concat args.map { |p| Gem::Platform.new(p) }
+      @platforms.concat args.map {|p| Gem::Platform.new(p) }
     end
 
-    alias platforms platform
+    alias_method :platforms, :platform
 
     def resolve
-      @platforms ||= ['ruby']
+      @platforms ||= ["ruby"]
       deps = []
       @deps.each do |d|
         @platforms.each do |p|
@@ -25,25 +25,23 @@ module Spec
 
     def should_resolve_as(specs)
       got = resolve
-      got = got.map { |s| s.full_name }.sort
+      got = got.map(&:full_name).sort
       expect(got).to eq(specs.sort)
     end
 
     def should_resolve_and_include(specs)
       got = resolve
-      got = got.map { |s| s.full_name }.sort
+      got = got.map(&:full_name).sort
       specs.each do |s|
         expect(got).to include(s)
       end
     end
 
     def should_conflict_on(names)
-      begin
-        got = resolve
-        flunk "The resolve succeeded with: #{got.map { |s| s.full_name }.sort.inspect}"
-      rescue Bundler::VersionConflict => e
-        expect(Array(names).sort).to eq(e.conflicts.sort)
-      end
+      got = resolve
+      flunk "The resolve succeeded with: #{got.map(&:full_name).sort.inspect}"
+    rescue Bundler::VersionConflict => e
+      expect(Array(names).sort).to eq(e.conflicts.sort)
     end
 
     def gem(*args, &blk)
@@ -60,22 +58,22 @@ module Spec
           gem "activesupport", version
           gem "actionpack", version do
             dep "activesupport", version
-            if version >= v('3.0.0.beta')
-              dep "rack", '~> 1.1'
+            if version >= v("3.0.0.beta")
+              dep "rack", "~> 1.1"
               dep "rack-mount", ">= 0.5"
-            elsif version > v('2.3')   then dep "rack", '~> 1.0.0'
-            elsif version > v('2.0.0') then dep "rack", '~> 0.9.0'
+            elsif version > v("2.3")   then dep "rack", "~> 1.0.0"
+            elsif version > v("2.0.0") then dep "rack", "~> 0.9.0"
             end
           end
           gem "activerecord", version do
             dep "activesupport", version
-            dep "arel", ">= 0.2" if version >= v('3.0.0.beta')
+            dep "arel", ">= 0.2" if version >= v("3.0.0.beta")
           end
           gem "actionmailer", version do
             dep "activesupport", version
             dep "actionmailer",  version
           end
-          if version < v('3.0.0.beta')
+          if version < v("3.0.0.beta")
             gem "railties", version do
               dep "activerecord",  version
               dep "actionpack",    version
@@ -94,22 +92,22 @@ module Spec
           end
         end
 
-        versions '1.0 1.2 1.2.1 1.2.2 1.3 1.3.0.1 1.3.5 1.4.0 1.4.2 1.4.2.1' do |version|
+        versions "1.0 1.2 1.2.1 1.2.2 1.3 1.3.0.1 1.3.5 1.4.0 1.4.2 1.4.2.1" do |version|
           platforms "ruby java mswin32 mingw32 x64-mingw32" do |platform|
-            next if version == v('1.4.2.1') && platform != pl('x86-mswin32')
-            next if version == v('1.4.2') && platform == pl('x86-mswin32')
+            next if version == v("1.4.2.1") && platform != pl("x86-mswin32")
+            next if version == v("1.4.2") && platform == pl("x86-mswin32")
             gem "nokogiri", version, platform do
-              dep "weakling", ">= 0.0.3" if platform =~ pl('java')
+              dep "weakling", ">= 0.0.3" if platform =~ pl("java")
             end
           end
         end
 
-        versions '0.0.1 0.0.2 0.0.3' do |version|
+        versions "0.0.1 0.0.2 0.0.3" do |version|
           gem "weakling", version
         end
 
         # --- Rails related
-        versions '1.2.3 2.2.3 2.3.5' do |version|
+        versions "1.2.3 2.2.3 2.3.5" do |version|
           gem "activemerchant", version do
             dep "activesupport", ">= #{version}"
           end
@@ -122,17 +120,17 @@ module Spec
     def a_conflict_index
       build_index do
         gem "builder", %w(3.0.4 3.1.4)
-        gem("grape", '0.2.6') do
+        gem("grape", "0.2.6") do
           dep "builder", ">= 0"
         end
 
-        versions '3.2.8 3.2.9 3.2.10 3.2.11' do |version|
+        versions "3.2.8 3.2.9 3.2.10 3.2.11" do |version|
           gem("activemodel", version) do
             dep "builder", "~> 3.0.0"
           end
         end
 
-        gem("my_app", '1.0.0') do
+        gem("my_app", "1.0.0") do
           dep "activemodel", ">= 0"
           dep "grape", ">= 0"
         end
@@ -151,35 +149,35 @@ module Spec
 
         gem "d", "0.9.8"
 
-        gem("b", '0.3.4') do
+        gem("b", "0.3.4") do
           dep "a", ">= 1.5.0"
         end
 
-        gem("b", '0.3.5') do
+        gem("b", "0.3.5") do
           dep "a", ">= 1.2"
         end
 
-        gem("b", '0.3.3') do
+        gem("b", "0.3.3") do
           dep "a", "> 1.0"
         end
 
-        versions '3.2 3.3' do |version|
+        versions "3.2 3.3" do |version|
           gem("c", version) do
             dep "a", "~> 1.0"
           end
         end
 
-        gem("my_app", '1.3.0') do
+        gem("my_app", "1.3.0") do
           dep "c", ">= 4.0"
           dep "b", ">= 0"
         end
 
-        gem("my_app", '1.2.0') do
+        gem("my_app", "1.2.0") do
           dep "c", "~> 3.3.0"
           dep "b", "0.3.4"
         end
 
-        gem("my_app", '1.1.0') do
+        gem("my_app", "1.1.0") do
           dep "c", "~> 3.2.0"
           dep "b", "0.3.5"
         end
@@ -190,7 +188,7 @@ module Spec
       build_index do
         gem "json", %w(1.6.5 1.7.7 1.8.0)
 
-        gem("chef", '10.26') do
+        gem("chef", "10.26") do
           dep "json", [">= 1.4.4", "<= 1.7.7"]
         end
 
@@ -198,7 +196,7 @@ module Spec
           dep "json", ">= 1.7.7"
         end
 
-        gem("chef_app", '1.0.0') do
+        gem("chef_app", "1.0.0") do
           dep "berkshelf", "~> 2.0"
           dep "chef", "~> 10.26"
         end
@@ -208,7 +206,6 @@ module Spec
     # Issue #3459
     def a_complicated_index
       build_index do
-
         gem "foo", %w{3.0.0 3.0.5} do
           dep "qux", ["~> 3.1"]
           dep "baz", ["< 9.0", ">= 5.0"]
@@ -273,7 +270,7 @@ module Spec
       build_index do
         gem "json", %w(1.8.0)
 
-        gem("chef", '10.26') do
+        gem("chef", "10.26") do
           dep "json", [">= 1.4.4", "<= 1.7.7"]
         end
 
@@ -281,7 +278,7 @@ module Spec
           dep "json", ">= 1.7.7"
         end
 
-        gem("chef_app_error", '1.0.0') do
+        gem("chef_app_error", "1.0.0") do
           dep "berkshelf", "~> 2.0"
           dep "chef", "~> 10.26"
         end
@@ -295,35 +292,35 @@ module Spec
 
         gem "activesupport", %w(3.0.0 3.0.1 3.0.5 3.1.7)
 
-        gem("activemodel", '3.0.5') do
+        gem("activemodel", "3.0.5") do
           dep "activesupport", "= 3.0.5"
           dep "builder", "~> 2.1.2"
-          dep 'i18n', '~> 0.4'
+          dep "i18n", "~> 0.4"
         end
 
-        gem("activemodel", '3.0.0') do
+        gem("activemodel", "3.0.0") do
           dep "activesupport", "= 3.0.0"
           dep "builder", "~> 2.1.2"
-          dep 'i18n', '~> 0.4.1'
+          dep "i18n", "~> 0.4.1"
         end
 
-        gem("activemodel", '3.1.3') do
+        gem("activemodel", "3.1.3") do
           dep "activesupport", "= 3.1.3"
           dep "builder", "~> 2.1.2"
-          dep 'i18n', '~> 0.5'
+          dep "i18n", "~> 0.5"
         end
 
-        gem("activerecord", '3.0.0') do
+        gem("activerecord", "3.0.0") do
           dep "activesupport", "= 3.0.0"
           dep "activemodel", "= 3.0.0"
         end
 
-        gem("activerecord", '3.0.5') do
+        gem("activerecord", "3.0.5") do
           dep "activesupport", "= 3.0.5"
           dep "activemodel", "= 3.0.5"
         end
 
-        gem("activerecord", '3.0.9') do
+        gem("activerecord", "3.0.9") do
           dep "activesupport", "= 3.1.5"
           dep "activemodel", "= 3.1.5"
         end
@@ -333,7 +330,7 @@ module Spec
     def a_circular_index
       build_index do
         gem "rack", "1.0.1"
-        gem("foo", '0.2.6') do
+        gem("foo", "0.2.6") do
           dep "bar", ">= 0"
         end
 
@@ -341,7 +338,7 @@ module Spec
           dep "foo", ">= 0"
         end
 
-        gem("circular_app", '1.0.0') do
+        gem("circular_app", "1.0.0") do
           dep "foo", ">= 0"
           dep "bar", ">= 0"
         end

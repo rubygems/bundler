@@ -19,7 +19,7 @@ module Bundler
     end
 
     def full_name
-      if platform == Gem::Platform::RUBY or platform.nil? then
+      if platform == Gem::Platform::RUBY or platform.nil?
         "#{@name}-#{@version}"
       else
         "#{@name}-#{@version}-#{platform}"
@@ -41,7 +41,7 @@ module Bundler
         out = "    #{name} (#{version}-#{platform})\n"
       end
 
-      dependencies.sort_by {|d| d.to_s }.uniq.each do |dep|
+      dependencies.sort_by(&:to_s).uniq.each do |dep|
         next if dep.type == :development
         out << "    #{dep.to_lock}\n"
       end
@@ -78,6 +78,5 @@ module Bundler
 
       @specification.send(method, *args, &blk)
     end
-
   end
 end

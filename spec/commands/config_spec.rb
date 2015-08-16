@@ -10,19 +10,19 @@ describe ".bundle/config" do
 
   describe "BUNDLE_APP_CONFIG" do
     it "can be moved with an environment variable" do
-      ENV['BUNDLE_APP_CONFIG'] = tmp('foo/bar').to_s
+      ENV["BUNDLE_APP_CONFIG"] = tmp("foo/bar").to_s
       bundle "install --path vendor/bundle"
 
-      expect(bundled_app('.bundle')).not_to exist
-      expect(tmp('foo/bar/config')).to exist
+      expect(bundled_app(".bundle")).not_to exist
+      expect(tmp("foo/bar/config")).to exist
       should_be_installed "rack 1.0.0"
     end
 
     it "can provide a relative path with the environment variable" do
-      FileUtils.mkdir_p bundled_app('omg')
-      Dir.chdir bundled_app('omg')
+      FileUtils.mkdir_p bundled_app("omg")
+      Dir.chdir bundled_app("omg")
 
-      ENV['BUNDLE_APP_CONFIG'] = "../foo"
+      ENV["BUNDLE_APP_CONFIG"] = "../foo"
       bundle "install --path vendor/bundle"
 
       expect(bundled_app(".bundle")).not_to exist
@@ -31,12 +31,12 @@ describe ".bundle/config" do
     end
 
     it "removes environment.rb from BUNDLE_APP_CONFIG's path" do
-      FileUtils.mkdir_p(tmp('foo/bar'))
-      ENV['BUNDLE_APP_CONFIG'] = tmp('foo/bar').to_s
+      FileUtils.mkdir_p(tmp("foo/bar"))
+      ENV["BUNDLE_APP_CONFIG"] = tmp("foo/bar").to_s
       bundle "install"
-      FileUtils.touch tmp('foo/bar/environment.rb')
+      FileUtils.touch tmp("foo/bar/environment.rb")
       should_be_installed "rack 1.0.0"
-      expect(tmp('foo/bar/environment.rb')).not_to exist
+      expect(tmp("foo/bar/environment.rb")).not_to exist
     end
   end
 
@@ -94,6 +94,15 @@ describe ".bundle/config" do
 
       run "puts Bundler.settings[:foo]"
       expect(out).to eq("global")
+    end
+
+    it "does not warn when using the same value twice" do
+      bundle "config --global foo value"
+      bundle "config --global foo value"
+      expect(out).not_to match(/You are replacing the current global value of foo/)
+
+      run "puts Bundler.settings[:foo]"
+      expect(out).to eq("value")
     end
 
     it "expands the path at time of setting" do
@@ -183,7 +192,7 @@ describe ".bundle/config" do
 
       run "puts Bundler.settings['foo.bar']"
       expect(out).to eq("baz")
-     end
+    end
   end
 
   describe "gem mirrors" do
@@ -223,7 +232,7 @@ E
 
     it "doesn't duplicate quotes around values", :if => (RUBY_VERSION >= "2.1") do
       bundled_app(".bundle").mkpath
-      File.open(bundled_app(".bundle/config"), 'w') do |f|
+      File.open(bundled_app(".bundle/config"), "w") do |f|
         f.write 'BUNDLE_FOO: "$BUILD_DIR"'
       end
 
@@ -250,10 +259,12 @@ E
 
   describe "very long lines" do
     before(:each) { bundle :install }
+
     let(:long_string) do
       "--with-xml2-include=/usr/pkg/include/libxml2 --with-xml2-lib=/usr/pkg/lib " \
       "--with-xslt-dir=/usr/pkg"
     end
+
     let(:long_string_without_special_characters) do
       "here is quite a long string that will wrap to a second line but will not be " \
       "surrounded by quotes"

@@ -10,7 +10,7 @@ describe "bundle package" do
 
       bundle "package --gemfile=NotGemfile"
 
-      ENV['BUNDLE_GEMFILE'] = "NotGemfile"
+      ENV["BUNDLE_GEMFILE"] = "NotGemfile"
       should_be_installed "rack 1.0.0"
     end
   end
@@ -22,7 +22,7 @@ describe "bundle package" do
         gem 'rack'
       D
 
-      bundle "package --path=#{bundled_app('test')}"
+      bundle "package --path=#{bundled_app("test")}"
 
       should_be_installed "rack 1.0.0"
       expect(bundled_app("test/vendor/cache/")).to exist
@@ -95,7 +95,7 @@ describe "bundle install with gem sources" do
       G
       bundle :pack
 
-      build_gem "rack", "1.0.0", :path => bundled_app('vendor/cache') do |s|
+      build_gem "rack", "1.0.0", :path => bundled_app("vendor/cache") do |s|
         s.write "lib/rack.rb", "raise 'omg'"
       end
 

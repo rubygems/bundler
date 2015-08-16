@@ -229,6 +229,40 @@ describe "bundle install with gems on multiple sources" do
             should_be_installed("depends_on_rack 1.0.1", "rack 1.0.0")
           end
         end
+
+        context "and only the dependency is pinned" do
+          before do
+            # need this to be broken to check for correct source ordering
+            build_repo gem_repo2 do
+              build_gem "rack", "1.0.0" do |s|
+                s.write "lib/rack.rb", "RACK = 'FAIL'"
+              end
+            end
+
+            gemfile <<-G
+              source "file://#{gem_repo3}" # contains depends_on_rack
+              source "file://#{gem_repo2}" # contains broken rack
+
+              gem "depends_on_rack" # installed from gem_repo3
+              gem "rack", :source => "file://#{gem_repo1}"
+            G
+          end
+
+          it "installs the dependency from the pinned source without warning" do
+            bundle :install
+
+            expect(out).not_to include("Warning: the gem 'rack' was found in multiple sources.")
+            should_be_installed("depends_on_rack 1.0.1", "rack 1.0.0")
+
+            # In https://github.com/bundler/bundler/issues/3585 this failed
+            # when there is already a lock file, and the gems are missing, so try again
+            system_gems []
+            bundle :install
+
+            expect(out).not_to include("Warning: the gem 'rack' was found in multiple sources.")
+            should_be_installed("depends_on_rack 1.0.1", "rack 1.0.0")
+          end
+        end
       end
     end
 
@@ -246,7 +280,7 @@ describe "bundle install with gems on multiple sources" do
 
       it "does not install the gem" do
         bundle :install
-        expect(out).to include("Could not find gem 'not_in_repo1 (>= 0) ruby'")
+        expect(out).to include("Could not find gem 'not_in_repo1'")
       end
     end
 
@@ -288,7 +322,7 @@ describe "bundle install with gems on multiple sources" do
 
         gemfile <<-G
           gem "rack", :source => "file://#{gem_repo1}"
-          gem "foo", :path => "#{lib_path('foo-1.0')}"
+          gem "foo", :path => "#{lib_path("foo-1.0")}"
         G
       end
 
@@ -378,5 +412,4 @@ describe "bundle install with gems on multiple sources" do
       should_be_installed("bar 0.1")
     end
   end
-
 end

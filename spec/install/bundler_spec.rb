@@ -1,7 +1,6 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe "bundle install" do
-
   describe "with bundler dependencies" do
     before(:each) do
       build_repo2 do
@@ -37,12 +36,12 @@ describe "bundle install" do
         gem "bundler", "0.9.2"
       G
 
-      nice_error = <<-E.strip.gsub(/^ {8}/, '')
+      nice_error = <<-E.strip.gsub(/^ {8}/, "")
         Fetching source index from file:#{gem_repo2}/
         Resolving dependencies...
         Bundler could not find compatible versions for gem "bundler":
           In Gemfile:
-            bundler (= 0.9.2) ruby
+            bundler (= 0.9.2)
 
           Current Bundler version:
             bundler (#{Bundler::VERSION})
@@ -56,7 +55,6 @@ describe "bundle install" do
 
         gem "multiple_versioned_deps"
       G
-
 
       install_gemfile <<-G
         source "file://#{gem_repo2}"
@@ -95,16 +93,16 @@ describe "bundle install" do
         gem "rails_fail"
       G
 
-      nice_error = <<-E.strip.gsub(/^ {8}/, '')
+      nice_error = <<-E.strip.gsub(/^ {8}/, "")
         Fetching source index from file:#{gem_repo2}/
         Resolving dependencies...
         Bundler could not find compatible versions for gem "activesupport":
           In Gemfile:
-            activemerchant (>= 0) ruby depends on
-              activesupport (>= 2.0.0) ruby
+            activemerchant was resolved to 1.0, which depends on
+              activesupport (>= 2.0.0)
 
-            rails_fail (>= 0) ruby depends on
-              activesupport (= 1.2.3) ruby
+            rails_fail was resolved to 1.0, which depends on
+              activesupport (= 1.2.3)
       E
       expect(out).to eq(nice_error)
     end
@@ -116,15 +114,15 @@ describe "bundle install" do
         gem "activesupport", "2.3.5"
       G
 
-      nice_error = <<-E.strip.gsub(/^ {8}/, '')
+      nice_error = <<-E.strip.gsub(/^ {8}/, "")
         Fetching source index from file:#{gem_repo2}/
         Resolving dependencies...
         Bundler could not find compatible versions for gem "activesupport":
           In Gemfile:
-            rails_fail (>= 0) ruby depends on
-              activesupport (= 1.2.3) ruby
+            activesupport (= 2.3.5)
 
-            activesupport (= 2.3.5) ruby
+            rails_fail was resolved to 1.0, which depends on
+              activesupport (= 1.2.3)
       E
       expect(out).to eq(nice_error)
     end
@@ -136,11 +134,9 @@ describe "bundle install" do
       G
 
       simulate_bundler_version "10.0.0"
-      #simulate_new_machine
 
       bundle "check"
-      expect(out).to eq("The Gemfile's dependencies are satisfied")
+      expect(out).to include("The Gemfile's dependencies are satisfied")
     end
   end
-
 end

@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe "bundle install" do
   context "with gem sources" do
@@ -128,6 +128,20 @@ describe "bundle install" do
       G
 
       bundle "config ignore_messages.rack true"
+
+      bundle :install
+      expect(out).not_to include("Post-install message")
+    end
+  end
+
+  context "when ignore post-install messages for all gems" do
+    it "doesn't display any post-install messages" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      bundle "config ignore_messages true"
 
       bundle :install
       expect(out).not_to include("Post-install message")

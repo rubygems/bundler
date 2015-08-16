@@ -58,11 +58,11 @@ describe "bundle update" do
 
   describe "with an unknown dependency" do
     it "should inform the user" do
-      bundle "update halting-problem-solver", :expect_err =>true
+      bundle "update halting-problem-solver", :expect_err => true
       expect(out).to include "Could not find gem 'halting-problem-solver'"
     end
     it "should suggest alternatives" do
-      bundle "update active-support", :expect_err =>true
+      bundle "update active-support", :expect_err => true
       expect(out).to include "Did you mean activesupport?"
     end
   end
@@ -125,7 +125,7 @@ describe "bundle update in more complicated situations" do
     G
 
     update_repo2 do
-      build_gem "thin" , '2.0' do |s|
+      build_gem "thin", "2.0" do |s|
         s.add_dependency "rack"
       end
     end

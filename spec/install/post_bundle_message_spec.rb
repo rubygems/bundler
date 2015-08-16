@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe "post bundle message" do
   before :each do
@@ -13,11 +13,11 @@ describe "post bundle message" do
     G
   end
 
-  let(:bundle_show_message)       {"Use `bundle show [gemname]` to see where a bundled gem is installed."}
-  let(:bundle_deployment_message) {"Bundled gems are installed into ./vendor"}
-  let(:bundle_complete_message)   {"Bundle complete!"}
-  let(:bundle_updated_message)    {"Bundle updated!"}
-  let(:installed_gems_stats)      {"4 Gemfile dependencies, 5 gems now installed."}
+  let(:bundle_show_message)       { "Use `bundle show [gemname]` to see where a bundled gem is installed." }
+  let(:bundle_deployment_message) { "Bundled gems are installed into ./vendor" }
+  let(:bundle_complete_message)   { "Bundle complete!" }
+  let(:bundle_updated_message)    { "Bundle updated!" }
+  let(:installed_gems_stats)      { "4 Gemfile dependencies, 5 gems now installed." }
 
   describe "for fresh bundle install" do
     it "without any options" do
@@ -83,18 +83,13 @@ describe "post bundle message" do
     end
 
     describe "with misspelled or non-existent gem name" do
-      before :each do
-        gemfile <<-G
-          source 'https://rubygems.org/'
-          gem "rails"
-          gem "misspelled-gem-name", :group => :development
+      it "should report a helpful error message" do
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rack"
+          gem "not-a-gem", :group => :development
         G
-      end
-
-      it "should report a helpufl error message" do
-        bundle :install
-        expect(out).to include("Fetching gem metadata from https://rubygems.org/")
-        expect(out).to include("Could not find gem 'misspelled-gem-name (>= 0) ruby' in any of the gem sources listed in your Gemfile or available on this machine.")
+        expect(out).to include("Could not find gem 'not-a-gem' in any of the gem sources listed in your Gemfile or available on this machine.")
       end
     end
   end

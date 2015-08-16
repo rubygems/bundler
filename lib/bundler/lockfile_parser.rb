@@ -22,29 +22,35 @@ module Bundler
     PATH         = "PATH"
     SPECS        = "  specs:"
     OPTIONS      = /^  ([a-z]+): (.*)$/i
+    SOURCE       = [GIT, GEM, PATH]
 
     def initialize(lockfile)
       @platforms    = []
       @sources      = []
       @dependencies = []
-      @state        = :source
+      @state        = nil
       @specs        = {}
 
       @rubygems_aggregate = Source::Rubygems.new
 
       if lockfile.match(/<<<<<<<|=======|>>>>>>>|\|\|\|\|\|\|\|/)
-        raise LockfileError, "Your Gemfile.lock contains merge conflicts.\n" \
-          "Run `git checkout HEAD -- Gemfile.lock` first to get a clean lock."
+        raise LockfileError, "Your #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)} contains merge conflicts.\n" \
+          "Run `git checkout HEAD -- #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)}` first to get a clean lock."
       end
 
       lockfile.split(/(?:\r?\n)+/).each do |line|
-        if line == DEPENDENCIES
+        if SOURCE.include?(line)
+          @state = :source
+          parse_source(line)
+        elsif line == DEPENDENCIES
           @state = :dependency
         elsif line == PLATFORMS
           @state = :platform
         elsif line == BUNDLED
           @state = :bundled_with
-        else
+        elsif line =~ /^[^\s]/
+          @state = nil
+        elsif @state
           send("parse_#{@state}", line)
         end
       end
@@ -53,18 +59,24 @@ module Bundler
       warn_for_outdated_bundler_version
     rescue ArgumentError => e
       Bundler.ui.debug(e)
-      raise LockfileError, "Your lockfile is unreadable. Run `rm Gemfile.lock` " \
+      raise LockfileError, "Your lockfile is unreadable. Run `rm #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)}` " \
         "and then `bundle install` to generate a new lockfile."
     end
 
     def warn_for_outdated_bundler_version
       return unless bundler_version
       prerelease_text = bundler_version.prerelease? ? " --pre" : ""
-      if Gem::Version.new(Bundler::VERSION) < Gem::Version.new(bundler_version)
-        Bundler.ui.warn "Warning: the running version of Bundler is older " \
-             "than the version that created the lockfile. We suggest you " \
-             "upgrade to the latest version of Bundler by running `gem " \
-             "install bundler#{prerelease_text}`.\n"
+      current_version = Gem::Version.create(Bundler::VERSION)
+      case current_version.segments.first <=> bundler_version.segments.first
+      when -1
+        raise LockfileError, "You must use Bundler #{bundler_version.segments.first} or greater with this lockfile."
+      when 0
+        if current_version < bundler_version
+          Bundler.ui.warn "Warning: the running version of Bundler is older " \
+               "than the version that created the lockfile. We suggest you " \
+               "upgrade to the latest version of Bundler by running `gem " \
+               "install bundler#{prerelease_text}`.\n"
+        end
       end
     end
 
@@ -80,7 +92,8 @@ module Bundler
       case line
       when GIT, GEM, PATH
         @current_source = nil
-        @opts, @type = {}, line
+        @opts = {}
+        @type = line
       when SPECS
         case @type
         when PATH
@@ -90,7 +103,7 @@ module Bundler
           @current_source = TYPES[@type].from_lock(@opts)
           # Strip out duplicate GIT sections
           if @sources.include?(@current_source)
-            @current_source = @sources.find { |s| s == @current_source }
+            @current_source = @sources.find {|s| s == @current_source }
           else
             @sources << @current_source
           end
@@ -119,19 +132,21 @@ module Bundler
     end
 
     NAME_VERSION = '(?! )(.*?)(?: \(([^-]*)(?:-(.*))?\))?'
-    NAME_VERSION_2 = %r{^ {2}#{NAME_VERSION}(!)?$}
-    NAME_VERSION_4 = %r{^ {4}#{NAME_VERSION}$}
-    NAME_VERSION_6 = %r{^ {6}#{NAME_VERSION}$}
+    NAME_VERSION_2 = /^ {2}#{NAME_VERSION}(!)?$/
+    NAME_VERSION_4 = /^ {4}#{NAME_VERSION}$/
+    NAME_VERSION_6 = /^ {6}#{NAME_VERSION}$/
 
     def parse_dependency(line)
       if line =~ NAME_VERSION_2
-        name, version, pinned = $1, $2, $4
-        version = version.split(",").map { |d| d.strip } if version
+        name = $1
+        version = $2
+        pinned = $4
+        version = version.split(",").map(&:strip) if version
 
         dep = Bundler::Dependency.new(name, version)
 
-        if pinned && dep.name != 'bundler'
-          spec = @specs.find {|k, v| v.name == dep.name }
+        if pinned && dep.name != "bundler"
+          spec = @specs.find {|_, v| v.name == dep.name }
           dep.source = spec.last.source if spec
 
           # Path sources need to know what the default name / version
@@ -150,7 +165,8 @@ module Bundler
 
     def parse_spec(line)
       if line =~ NAME_VERSION_4
-        name, version = $1, Gem::Version.new($2)
+        name = $1
+        version = Gem::Version.new($2)
         platform = $3 ? Gem::Platform.new($3) : Gem::Platform::RUBY
         @current_spec = LazySpecification.new(name, version, platform)
         @current_spec.source = @current_source
@@ -159,8 +175,9 @@ module Bundler
         # duplicate GIT sections)
         @specs[@current_spec.identifier] ||= @current_spec
       elsif line =~ NAME_VERSION_6
-        name, version = $1, $2
-        version = version.split(',').map { |d| d.strip } if version
+        name = $1
+        version = $2
+        version = version.split(",").map(&:strip) if version
         dep = Gem::Dependency.new(name, version)
         @current_spec.dependencies << dep
       end
@@ -178,6 +195,5 @@ module Bundler
         @bundler_version = Gem::Version.create(line)
       end
     end
-
   end
 end

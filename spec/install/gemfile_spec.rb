@@ -1,7 +1,6 @@
 require "spec_helper"
 
 describe "bundle install" do
-
   context "with duplicated gems" do
     it "will display a warning" do
       install_gemfile <<-G
@@ -21,7 +20,7 @@ describe "bundle install" do
 
       bundle :install, :gemfile => bundled_app("NotGemfile")
 
-      ENV['BUNDLE_GEMFILE'] = "NotGemfile"
+      ENV["BUNDLE_GEMFILE"] = "NotGemfile"
       should_be_installed "rack 1.0.0"
     end
   end
@@ -66,5 +65,4 @@ describe "bundle install" do
       expect(out).to match(/You passed :lib as an option for gem 'rack', but it is invalid/)
     end
   end
-
 end

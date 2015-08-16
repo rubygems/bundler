@@ -1,7 +1,7 @@
-require 'spec_helper'
+require "spec_helper"
 
-describe "parallel", :realworld => true do
-  it "installs", :ruby => "1.8" do
+describe "parallel", :realworld => true, :sometimes => true do
+  it "installs" do
     gemfile <<-G
       source "https://rubygems.org"
       gem 'activesupport', '~> 3.2.13'
@@ -9,7 +9,7 @@ describe "parallel", :realworld => true do
       gem 'i18n', '~> 0.6.0' # Because 0.7+ requires Ruby 1.9.3+
     G
 
-    bundle :install, :jobs => 4, :env => {"DEBUG" => "1"}
+    bundle :install, :jobs => 4, :env => { "DEBUG" => "1" }
 
     if Bundler.rubygems.provides?(">= 2.1.0")
       expect(out).to match(/[1-3]: /)
@@ -41,7 +41,7 @@ describe "parallel", :realworld => true do
       gem 'i18n', '~> 0.6.0' # Because 0.7+ requires Ruby 1.9.3+
     G
 
-    bundle :update, :jobs => 4, :env => {"DEBUG" => "1"}
+    bundle :update, :jobs => 4, :env => { "DEBUG" => "1" }
 
     if Bundler.rubygems.provides?(">= 2.1.0")
       expect(out).to match(/[1-3]: /)

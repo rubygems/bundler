@@ -126,7 +126,7 @@ describe "bundle install with platform conditionals" do
       end
     G
 
-    should_be_installed     "rack 1.0"
+    should_be_installed "rack 1.0"
     should_not_be_installed "nokogiri 1.4.2"
   end
 
@@ -144,7 +144,7 @@ describe "bundle install with platform conditionals" do
       gem "rack"
       gem "nokogiri", :platforms => :#{not_local_tag}
     G
-    should_be_installed     "rack 1.0"
+    should_be_installed "rack 1.0"
     should_not_be_installed "nokogiri 1.4.2"
   end
 
@@ -169,7 +169,7 @@ describe "bundle install with platform conditionals" do
 
     install_gemfile <<-G
       platform :#{not_local_tag} do
-        gem "foo", :git => "#{lib_path('foo-1.0')}"
+        gem "foo", :git => "#{lib_path("foo-1.0")}"
       end
     G
 

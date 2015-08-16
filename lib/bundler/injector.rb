@@ -40,7 +40,7 @@ module Bundler
       # return an array of the deps that we added
       return @new_deps
     ensure
-      Bundler.settings[:frozen] = '1' if frozen
+      Bundler.settings[:frozen] = "1" if frozen
     end
 
   private
@@ -58,7 +58,5 @@ module Bundler
         f.puts new_gem_lines
       end
     end
-
-
   end
 end

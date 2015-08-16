@@ -1,11 +1,10 @@
 module Bundler
   class Source
-
     class Path < Source
-      autoload :Installer, 'bundler/source/path/installer'
+      autoload :Installer, "bundler/source/path/installer"
 
-      attr_reader   :path, :options
-      attr_writer   :name
+      attr_reader :path, :options
+      attr_writer :name
       attr_accessor :version
 
       DEFAULT_GLOB = "{,*,*/*}.gemspec"
@@ -57,21 +56,22 @@ module Bundler
         [self.class, expanded_path, version].hash
       end
 
-      def eql?(o)
-        o.instance_of?(Path) &&
-        expanded_path == expand(o.path) &&
-        version == o.version
+      def eql?(other)
+        other.instance_of?(Path) &&
+          expanded_path == expand(other.path) &&
+          version == other.version
       end
 
-      alias == eql?
+      alias_method :==, :eql?
 
       def name
         File.basename(expanded_path.to_s)
       end
 
       def install(spec, force = false)
+        Bundler.ui.info "Using #{version_message(spec)} from #{self}"
         generate_bin(spec, :disable_extensions)
-        ["Using #{version_message(spec)} from #{to_s}", nil]
+        nil # no post-install message
       end
 
       def cache(spec, custom_path = nil)
@@ -80,7 +80,7 @@ module Bundler
         return if expand(@original_path).to_s.index(Bundler.root.to_s) == 0
 
         unless @original_path.exist?
-          raise GemNotFound, "Can't cache gem #{version_message(spec)} because #{to_s} is missing!"
+          raise GemNotFound, "Can't cache gem #{version_message(spec)} because #{self} is missing!"
         end
 
         FileUtils.rm_rf(app_cache_path)
@@ -131,9 +131,8 @@ module Bundler
 
         if File.directory?(expanded_path)
           # We sort depth-first since `<<` will override the earlier-found specs
-          Dir["#{expanded_path}/#{@glob}"].sort_by { |p| -p.split(File::SEPARATOR).size }.each do |file|
-            spec = Bundler.load_gemspec(file)
-            if spec
+          Dir["#{expanded_path}/#{@glob}"].sort_by {|p| -p.split(File::SEPARATOR).size }.each do |file|
+            if spec = Bundler.load_gemspec(file, :validate)
               spec.loaded_from = file.to_s
               spec.source = self
               index << spec
@@ -148,11 +147,11 @@ module Bundler
               s.platform = Gem::Platform::RUBY
               s.summary  = "Fake gemspec for #{@name}"
               s.relative_loaded_from = "#{@name}.gemspec"
-              s.authors  = ["no one"]
+              s.authors = ["no one"]
               if expanded_path.join("bin").exist?
                 executables = expanded_path.join("bin").children
-                executables.reject!{|p| File.directory?(p) }
-                s.executables = executables.map{|c| c.basename.to_s }
+                executables.reject! {|p| File.directory?(p) }
+                s.executables = executables.map {|c| c.basename.to_s }
               end
             end
           end
@@ -166,7 +165,7 @@ module Bundler
       end
 
       def relative_path
-        if path.to_s.match(%r{^#{Regexp.escape Bundler.root.to_s}})
+        if path.to_s.start_with?(Bundler.root.to_s)
           return path.relative_path_from(Bundler.root)
         end
         path
@@ -221,6 +220,5 @@ module Bundler
         end
       end
     end
-
   end
 end

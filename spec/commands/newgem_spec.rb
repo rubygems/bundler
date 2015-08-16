@@ -1,7 +1,6 @@
 require "spec_helper"
 
 describe "bundle gem" do
-
   def reset!
     super
     global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__TEST" => "false", "BUNDLE_GEM__COC" => "false"
@@ -12,20 +11,25 @@ describe "bundle gem" do
     if Gem::Version.new(Gem::VERSION) < Gem::Version.new("2.0")
       path = "#{gem_name}/#{gem_name}.gemspec"
       content = File.read(path).sub(/raise "RubyGems 2\.0 or newer.*/, "")
-      File.open(path, "w"){|f| f.write(content) }
+      File.open(path, "w") {|f| f.write(content) }
     end
   end
 
   before do
-    @git_name = `git config --global user.name`.chomp
-    `git config --global user.name "Bundler User"`
-    @git_email = `git config --global user.email`.chomp
-    `git config --global user.email user@example.com`
+    git_config_content = <<-EOF
+    [user]
+      name = "Bundler User"
+      email = user@example.com
+    EOF
+    @git_config_location = ENV["GIT_CONFIG"]
+    path = "#{File.expand_path("../../tmp", File.dirname(__FILE__))}/test_git_config.txt"
+    File.open(path, "w") {|f| f.write(git_config_content) }
+    ENV["GIT_CONFIG"] = path
   end
 
   after do
-    `git config --global user.name "#{@git_name}"`
-    `git config --global user.email "#{@git_email}"`
+    `rm "#{ENV["GIT_CONFIG"]}"` if File.exist?(ENV["GIT_CONFIG"])
+    ENV["GIT_CONFIG"] = @git_config_location
   end
 
   shared_examples_for "git config is present" do
@@ -56,7 +60,7 @@ describe "bundle gem" do
     in_app_root
     bundle "gem newgem --bin"
 
-    process_file(bundled_app('newgem', "newgem.gemspec")) do |line|
+    process_file(bundled_app("newgem", "newgem.gemspec")) do |line|
       # Simulate replacing TODOs with real values
       case line
       when /spec\.metadata\['allowed_push_host'\]/, /spec\.homepage/
@@ -67,13 +71,13 @@ describe "bundle gem" do
         line.gsub(/\=.*$/, "= %q{A longer description of my new gem.}")
       # Remove exception that prevents public pushes on older RubyGems versions
       when /raise "RubyGems 2.0 or newer/
-        line.gsub(/.*/, '') if Gem::Version.new(Gem::VERSION) < Gem::Version.new("2.0")
+        line.gsub(/.*/, "") if Gem::Version.new(Gem::VERSION) < Gem::Version.new("2.0")
       else
         line
       end
     end
 
-    Dir.chdir(bundled_app('newgem')) do
+    Dir.chdir(bundled_app("newgem")) do
       bundle "exec rake build"
     end
 
@@ -89,25 +93,25 @@ describe "bundle gem" do
     end
 
     it "resolves ." do
-      create_temporary_dir('tmp')
+      create_temporary_dir("tmp")
 
-      bundle 'gem .'
+      bundle "gem ."
 
       expect(bundled_app("tmp/lib/tmp.rb")).to exist
     end
 
     it "resolves .." do
-      create_temporary_dir('temp/empty_dir')
+      create_temporary_dir("temp/empty_dir")
 
-      bundle 'gem ..'
+      bundle "gem .."
 
       expect(bundled_app("temp/lib/temp.rb")).to exist
     end
 
     it "resolves relative directory" do
-      create_temporary_dir('tmp/empty/tmp')
+      create_temporary_dir("tmp/empty/tmp")
 
-      bundle 'gem ../../empty'
+      bundle "gem ../../empty"
 
       expect(bundled_app("tmp/empty/lib/empty.rb")).to exist
     end
@@ -119,7 +123,7 @@ describe "bundle gem" do
   end
 
   context "gem naming with underscore" do
-    let(:gem_name) { 'test_gem' }
+    let(:gem_name) { "test_gem" }
 
     before do
       bundle "gem #{gem_name}"
@@ -157,8 +161,8 @@ describe "bundle gem" do
 
     context "git config user.{name,email} is not set" do
       before do
-        `git config --global --unset user.name`
-        `git config --global --unset user.email`
+        `git config --unset user.name`
+        `git config --unset user.email`
         reset!
         in_app_root
         bundle "gem #{gem_name}"
@@ -169,12 +173,12 @@ describe "bundle gem" do
     end
 
     it "sets gemspec metadata['allowed_push_host']", :rubygems => "2.0" do
-      expect(generated_gem.gemspec.metadata['allowed_push_host']).
+      expect(generated_gem.gemspec.metadata["allowed_push_host"]).
         to match(/mygemserver\.com/)
     end
 
     it "requires the version file" do
-      expect(bundled_app("test_gem/lib/test_gem.rb").read).to match(/require "test_gem\/version"/)
+      expect(bundled_app("test_gem/lib/test_gem.rb").read).to match(%r{require "test_gem/version"})
     end
 
     it "runs rake without problems" do
@@ -185,7 +189,7 @@ describe "bundle gem" do
           puts 'SUCCESS'
         end
       RAKEFILE
-      File.open(bundled_app("test_gem/Rakefile"), 'w') do |file|
+      File.open(bundled_app("test_gem/Rakefile"), "w") do |file|
         file.puts rakefile
       end
 
@@ -240,6 +244,12 @@ describe "bundle gem" do
         expect(bundled_app("test_gem/spec/spec_helper.rb")).to exist
       end
 
+      it "depends on a specific version of rspec", :rubygems => ">= 1.8.1" do
+        remove_push_guard(gem_name)
+        rspec_dep = generated_gem.gemspec.development_dependencies.find {|d| d.name == "rspec" }
+        expect(rspec_dep).to be_specific
+      end
+
       it "requires 'test-gem'" do
         expect(bundled_app("test_gem/spec/spec_helper.rb").read).to include("require 'test_gem'")
       end
@@ -285,6 +295,12 @@ describe "bundle gem" do
         bundle "gem #{gem_name} --test=minitest"
       end
 
+      it "depends on a specific version of minitest", :rubygems => ">= 1.8.1" do
+        remove_push_guard(gem_name)
+        rspec_dep = generated_gem.gemspec.development_dependencies.find {|d| d.name == "minitest" }
+        expect(rspec_dep).to be_specific
+      end
+
       it "builds spec skeleton" do
         expect(bundled_app("test_gem/test/test_gem_test.rb")).to exist
         expect(bundled_app("test_gem/test/test_helper.rb")).to exist
@@ -316,7 +332,7 @@ describe "bundle gem" do
       end
 
       it "creates a .travis.yml file to test the library against the current Ruby version on Travis CI" do
-        expect(bundled_app("test_gem/.travis.yml").read).to match(%r(- #{RUBY_VERSION}))
+        expect(bundled_app("test_gem/.travis.yml").read).to match(/- #{RUBY_VERSION}/)
       end
     end
 
@@ -332,7 +348,7 @@ describe "bundle gem" do
   end
 
   context "with --mit option" do
-    let(:gem_name) { 'test-gem' }
+    let(:gem_name) { "test-gem" }
 
     before do
       bundle "gem #{gem_name} --mit"
@@ -355,7 +371,7 @@ describe "bundle gem" do
   end
 
   context "with --coc option" do
-    let(:gem_name) { 'test-gem' }
+    let(:gem_name) { "test-gem" }
 
     before do
       bundle "gem #{gem_name} --coc"
@@ -374,7 +390,7 @@ describe "bundle gem" do
   end
 
   context "gem naming with dashed" do
-    let(:gem_name) { 'test-gem' }
+    let(:gem_name) { "test-gem" }
 
     before do
       bundle "gem #{gem_name}"
@@ -407,8 +423,8 @@ describe "bundle gem" do
 
     context "git config user.{name,email} is not set" do
       before do
-        `git config --global --unset user.name`
-        `git config --global --unset user.email`
+        `git config --unset user.name`
+        `git config --unset user.email`
         reset!
         in_app_root
         bundle "gem #{gem_name}"
@@ -419,7 +435,7 @@ describe "bundle gem" do
     end
 
     it "requires the version file" do
-      expect(bundled_app("test-gem/lib/test/gem.rb").read).to match(/require "test\/gem\/version"/)
+      expect(bundled_app("test-gem/lib/test/gem.rb").read).to match(%r{require "test/gem/version"})
     end
 
     it "runs rake without problems" do
@@ -430,7 +446,7 @@ describe "bundle gem" do
           puts 'SUCCESS'
         end
       RAKEFILE
-      File.open(bundled_app("test-gem/Rakefile"), 'w') do |file|
+      File.open(bundled_app("test-gem/Rakefile"), "w") do |file|
         file.puts rakefile
       end
 
@@ -452,7 +468,7 @@ describe "bundle gem" do
       end
 
       it "requires 'test/gem'" do
-        expect(bundled_app("test-gem/exe/test-gem").read).to match(/require "test\/gem"/)
+        expect(bundled_app("test-gem/exe/test-gem").read).to match(%r{require "test/gem"})
       end
     end
 
@@ -520,7 +536,7 @@ describe "bundle gem" do
       end
 
       it "requires 'test/gem'" do
-        expect(bundled_app("test-gem/test/test_helper.rb").read).to match(/require 'test\/gem'/)
+        expect(bundled_app("test-gem/test/test_helper.rb").read).to match(%r{require 'test/gem'})
       end
 
       it "requires 'test_helper'" do
@@ -589,6 +605,8 @@ describe "bundle gem" do
           Rake::ExtensionTask.new("test_gem") do |ext|
             ext.lib_dir = "lib/test_gem"
           end
+
+          task :default => [:clobber, :compile, :spec]
         RAKEFILE
 
         expect(bundled_app("test_gem/Rakefile").read).to eq(rakefile)
@@ -602,6 +620,35 @@ describe "bundle gem" do
       Bundler.clear_gemspec_cache
 
       expect(bundled_app("a--a/a--a.gemspec")).to exist
+    end
+  end
+
+  describe "#ensure_safe_gem_name" do
+    before do
+      bundle "gem #{subject}"
+    end
+    after do
+      Bundler.clear_gemspec_cache
+    end
+
+    context "with an existing const name" do
+      subject { "gem" }
+      it { expect(out).to include("Invalid gem name #{subject}") }
+    end
+
+    context "with an existing hyphenated const name" do
+      subject { "gem-specification" }
+      it { expect(out).to include("Invalid gem name #{subject}") }
+    end
+
+    context "starting with an existing const name" do
+      subject { "gem-somenewconstantname" }
+      it { expect(out).not_to include("Invalid gem name #{subject}") }
+    end
+
+    context "ending with an existing const name" do
+      subject { "somenewconstantname-gem" }
+      it { expect(out).not_to include("Invalid gem name #{subject}") }
     end
   end
 
@@ -646,7 +693,6 @@ describe "bundle gem" do
     it "asks about CoC" do
       global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__TEST" => "false"
 
-
       bundle "gem foobar" do |input|
         input.puts "yes"
       end
@@ -654,5 +700,4 @@ describe "bundle gem" do
       expect(bundled_app("foobar/CODE_OF_CONDUCT.md")).to exist
     end
   end
-
 end

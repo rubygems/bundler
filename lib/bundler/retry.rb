@@ -1,48 +1,48 @@
 module Bundler
   # General purpose class for retrying code that may fail
   class Retry
-    DEFAULT_ATTEMPTS = 2
     attr_accessor :name, :total_runs, :current_run
 
     class << self
-      attr_accessor :attempts
+      def default_attempts
+        default_retries + 1
+      end
+      alias_method :attempts, :default_attempts
+
+      def default_retries
+        Bundler.settings[:retry]
+      end
     end
 
-    def initialize(name, exceptions = nil, attempts = nil)
-      @name        = name
-      attempts    ||= default_attempts
+    def initialize(name, exceptions = nil, retries = self.class.default_retries)
+      @name = name
+      @retries = retries
       @exceptions = Array(exceptions) || []
-      @total_runs =  attempts.next # will run once, then upto attempts.times
-    end
-
-    def default_attempts
-      return Integer(self.class.attempts) if self.class.attempts
-      DEFAULT_ATTEMPTS
+      @total_runs = @retries + 1 # will run once, then upto attempts.times
     end
 
     def attempt(&block)
       @current_run = 0
       @failed      = false
       @error       = nil
-      while keep_trying? do
-        run(&block)
-      end
+      run(&block) while keep_trying?
       @result
     end
-    alias :attempts :attempt
+    alias_method :attempts, :attempt
 
   private
+
     def run(&block)
       @failed      = false
       @current_run += 1
       @result = block.call
     rescue => e
-      fail(e)
+      fail_attempt(e)
     end
 
-    def fail(e)
+    def fail_attempt(e)
       @failed = true
-      raise e if last_attempt? || @exceptions.any?{ |k| e.is_a?(k) }
+      raise e if last_attempt? || @exceptions.any? {|k| e.is_a?(k) }
       return true unless name
       Bundler.ui.warn "Retrying#{" #{name}" if name} due to error (#{current_run.next}/#{total_runs}): #{e.class} #{e.message}"
     end

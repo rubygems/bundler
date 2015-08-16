@@ -39,7 +39,7 @@ describe "Bundler.require" do
 
     gemfile <<-G
       path "#{lib_path}"
-      gem "one", :group => :bar, :require => %w(baz qux)
+      gem "one", :group => :bar, :require => %w[baz qux]
       gem "two"
       gem "three", :group => :not
       gem "four", :require => false
@@ -73,7 +73,7 @@ describe "Bundler.require" do
 
     # required in resolver order instead of gemfile order
     run("Bundler.require(:not)")
-    expect(out.split("\n").sort).to eq(['seven', 'three'])
+    expect(out.split("\n").sort).to eq(%w(seven three))
 
     # test require: true
     run "Bundler.require(:require_true)"
@@ -91,7 +91,7 @@ describe "Bundler.require" do
       gem "two", :require => 'fail'
     G
 
-    load_error_run <<-R, 'fail'
+    load_error_run <<-R, "fail"
       Bundler.require
     R
 
@@ -125,7 +125,7 @@ describe "Bundler.require" do
       build_lib "jquery-rails", "1.0.0" do |s|
         s.write "lib/jquery/rails.rb", "puts 'jquery/rails'"
       end
-      lib_path('jquery-rails-1.0.0/lib/jquery-rails.rb').rmtree
+      lib_path("jquery-rails-1.0.0/lib/jquery-rails.rb").rmtree
     end
 
     it "requires gem names that are namespaced" do
@@ -162,7 +162,7 @@ describe "Bundler.require" do
         gem 'jquery-rails', :require => 'jquery-rails'
       G
 
-      load_error_run <<-R, 'jquery-rails'
+      load_error_run <<-R, "jquery-rails"
         Bundler.require
       R
       expect(err).to eq("ZOMG LOAD ERROR")
@@ -194,7 +194,7 @@ describe "Bundler.require" do
       build_lib "load-fuuu", "1.0.0" do |s|
         s.write "lib/load/fuuu.rb", "raise LoadError.new(\"cannot load such file -- load-bar\")"
       end
-      lib_path('load-fuuu-1.0.0/lib/load-fuuu.rb').rmtree
+      lib_path("load-fuuu-1.0.0/lib/load-fuuu.rb").rmtree
 
       gemfile <<-G
         path "#{lib_path}"
@@ -313,10 +313,10 @@ describe "Bundler.require" do
           gem "busted_require"
         G
 
-        load_error_run <<-R, 'no_such_file_omg'
+        load_error_run <<-R, "no_such_file_omg"
           Bundler.require
         R
-        expect(err).to eq('ZOMG LOAD ERROR')
+        expect(err).to eq("ZOMG LOAD ERROR")
       end
     end
   end

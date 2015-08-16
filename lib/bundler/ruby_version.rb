@@ -32,10 +32,10 @@ module Bundler
     end
 
     def ==(other)
-      version          == other.version &&
-        engine         == other.engine &&
+      version == other.version &&
+        engine == other.engine &&
         engine_version == other.engine_version &&
-        patchlevel     == other.patchlevel
+        patchlevel == other.patchlevel
     end
 
     # Returns a tuple of these things:
@@ -46,13 +46,13 @@ module Bundler
     #   3. engine_version
     def diff(other)
       if engine != other.engine && @input_engine
-        [ :engine, engine, other.engine ]
+        [:engine, engine, other.engine]
       elsif version != other.version
-        [ :version, version, other.version ]
+        [:version, version, other.version]
       elsif engine_version != other.engine_version && @input_engine
-        [ :engine_version, engine_version, other.engine_version ]
+        [:engine_version, engine_version, other.engine_version]
       elsif patchlevel != other.patchlevel && @patchlevel
-        [ :patchlevel, patchlevel, other.patchlevel ]
+        [:patchlevel, patchlevel, other.patchlevel]
       else
         nil
       end
@@ -106,7 +106,6 @@ module Bundler
         JRUBY_VERSION.dup
       else
         raise BundlerError, "RUBY_ENGINE value #{RUBY_ENGINE} is not recognized"
-        nil
       end
     end
 
