@@ -157,7 +157,7 @@ describe "bundle install with explicit source paths" do
       gem "foo", :path => "#{lib_path("foo-1.0")}"
     G
 
-    expect(err).to match(/missing value for attribute version/)
+    expect(out).to match(/missing value for attribute version/)
     should_not_be_installed("foo 1.0")
   end
 

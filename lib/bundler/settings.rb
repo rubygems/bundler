@@ -8,8 +8,6 @@ module Bundler
 
     attr_reader :root
 
-    attr_reader :root
-
     def initialize(root = nil)
       @root          = root
       @local_config  = load_config(local_config_file)
