@@ -14,6 +14,7 @@ module Spec
       end
       FileUtils.mkdir_p(tmp)
       FileUtils.mkdir_p(home)
+      Bundler.send(:remove_instance_variable, :@settings) if Bundler.send(:instance_variable_defined?, :@settings)
     end
 
     attr_reader :out, :err, :exitstatus
@@ -71,6 +72,7 @@ module Spec
       requires = options.delete(:requires) || []
       requires << File.expand_path("../fakeweb/" + options.delete(:fakeweb) + ".rb", __FILE__) if options.key?(:fakeweb)
       requires << File.expand_path("../artifice/" + options.delete(:artifice) + ".rb", __FILE__) if options.key?(:artifice)
+      requires << "support/hax"
       requires_str = requires.map {|r| "-r#{r}" }.join(" ")
 
       env = (options.delete(:env) || {}).map {|k, v| "#{k}='#{v}'" }.join(" ")
