@@ -105,7 +105,7 @@ module Bundler
     def warn_on_git_protocol(source)
       return if Bundler.settings["git.allow_insecure"]
 
-      if source.uri =~ %r{^git\:}
+      if source.uri =~ /^git\:/
         Bundler.ui.warn "The git source `#{source.uri}` uses the `git` protocol, " \
           "which transmits data without encryption. Disable this warning with " \
           "`bundle config git.allow_insecure true`, or switch to the `https` " \

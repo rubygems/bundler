@@ -207,7 +207,7 @@ describe "bundle check" do
     simulate_new_machine
     bundle :check, :expect_err => true
     last_out = out
-    3.times do |i|
+    3.times do
       bundle :check, :expect_err => true
       expect(out).to eq(last_out)
       expect(err).to include("The git source git://github.com/thoughtbot/paperclip.git is not yet checked out. Please run `bundle install` before trying to start your application")

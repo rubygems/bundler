@@ -55,7 +55,7 @@ if Bundler::VERSION == "1.99.0.dev"
           gem "rack", :group => :test
         G
 
-        ruby(<<-RUBY, { :expect_err => true })
+        ruby(<<-RUBY, :expect_err => true)
           require 'bundler/deployment'
         RUBY
 
@@ -69,7 +69,7 @@ if Bundler::VERSION == "1.99.0.dev"
     describe Bundler::Dsl do
       before do
         @rubygems = double("rubygems")
-        allow(Bundler::Source::Rubygems).to receive(:new){ @rubygems }
+        allow(Bundler::Source::Rubygems).to receive(:new) { @rubygems }
       end
 
       context "with github gems" do

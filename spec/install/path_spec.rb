@@ -94,7 +94,7 @@ describe "bundle install" do
         # may not test what happens when `path` is relative.
 
         bundle "config path vendor"
-        #set_bundle_path(type, bundled_app("vendor").to_s)
+        # set_bundle_path(type, bundled_app("vendor").to_s)
 
         FileUtils.mkdir_p bundled_app("lol")
         Dir.chdir(bundled_app("lol")) do

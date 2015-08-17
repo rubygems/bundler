@@ -155,7 +155,7 @@ module Bundler
       end
 
       def install(spec, force = false)
-        Bundler.ui.debug "Using #{version_message(spec)} from #{to_s}"
+        Bundler.ui.debug "Using #{version_message(spec)} from #{self}"
         Bundler::Installer.using_gems << spec
 
         if requires_checkout? && !@copied && !force

@@ -64,7 +64,8 @@ describe Bundler::SourceList do
       end
 
       context "with the git: protocol" do
-        let(:msg) { "The git source `git://existing-git.org/path.git` " \
+        let(:msg) {
+          "The git source `git://existing-git.org/path.git` " \
           "uses the `git` protocol, which transmits data without encryption. " \
           "Disable this warning with `bundle config git.allow_insecure true`, " \
           "or switch to the `https` protocol to keep your data secure."

@@ -69,9 +69,9 @@ module Spec
       bundle_bin = File.expand_path("../../../exe/bundle", __FILE__)
 
       requires = options.delete(:requires) || []
-      requires << File.expand_path("../fakeweb/"+options.delete(:fakeweb)+".rb", __FILE__) if options.key?(:fakeweb)
-      requires << File.expand_path("../artifice/"+options.delete(:artifice)+".rb", __FILE__) if options.key?(:artifice)
-      requires_str = requires.map{|r| "-r#{r}"}.join(" ")
+      requires << File.expand_path("../fakeweb/" + options.delete(:fakeweb) + ".rb", __FILE__) if options.key?(:fakeweb)
+      requires << File.expand_path("../artifice/" + options.delete(:artifice) + ".rb", __FILE__) if options.key?(:artifice)
+      requires_str = requires.map {|r| "-r#{r}" }.join(" ")
 
       env = (options.delete(:env) || {}).map {|k, v| "#{k}='#{v}'" }.join(" ")
       args = options.map do |k, v|
@@ -373,12 +373,12 @@ module Spec
 
     def with_env_vars(env_hash, &block)
       current_values = {}
-      env_hash.each do |k,v|
+      env_hash.each do |k, v|
         current_values[k] = v
         ENV[k] = v
       end
       block.call if block_given?
-      env_hash.each do |k,v|
+      env_hash.each do |k, _|
         ENV[k] = current_values[k]
       end
     end
