@@ -94,6 +94,7 @@ RSpec.configure do |config|
     reset!
     system_gems []
     in_app_root
+    ENV["BUNDLE_SILENCE_GIT"] = "1"
   end
 
   config.after :each do |example|

@@ -36,7 +36,7 @@ describe "bundle install" do
     end
 
     it "disallows --path vendor/bundle --system" do
-      bundle "install --path vendor/bundle --system"
+      bundle "install --path vendor/bundle --system", :expect_err => true
       expect(err).to include("Please choose.")
     end
 
@@ -145,7 +145,7 @@ describe "bundle install" do
         gem "rack"
       G
 
-      bundle "install --path bundle"
+      bundle "install --path bundle", :expect_err => true
       expect(err).to match(/invalid symlink/)
     end
   end

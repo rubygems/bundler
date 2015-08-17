@@ -40,7 +40,7 @@ describe "bundle console" do
   end
 
   it "doesn't load any other groups" do
-    bundle "console" do |input|
+    bundle "console", :expect_err => true do |input|
       input.puts("puts ACTIVESUPPORT")
       input.puts("exit")
     end

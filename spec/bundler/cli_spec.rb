@@ -3,12 +3,12 @@ require "bundler/cli"
 
 describe "bundle executable" do
   it "returns non-zero exit status when passed unrecognized options" do
-    bundle "--invalid_argument"
+    bundle "--invalid_argument", :expect_err => true
     expect(exitstatus).to_not be_zero if exitstatus
   end
 
   it "returns non-zero exit status when passed unrecognized task" do
-    bundle "unrecognized-tast"
+    bundle "unrecognized-tast", :expect_err => true
     expect(exitstatus).to_not be_zero if exitstatus
   end
 

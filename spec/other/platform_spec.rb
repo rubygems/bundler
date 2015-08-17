@@ -151,7 +151,7 @@ G
         gem "foo"
       G
 
-      bundle "platform"
+      bundle "platform", :expect_err => true
 
       expect(exitstatus).not_to eq(0) if exitstatus
     end
@@ -164,7 +164,7 @@ G
         gem "foo"
       G
 
-      bundle "platform"
+      bundle "platform", :expect_err => true
 
       expect(exitstatus).not_to eq(0) if exitstatus
     end
@@ -177,7 +177,7 @@ G
         gem "foo"
       G
 
-      bundle "platform"
+      bundle "platform", :expect_err => true
 
       expect(exitstatus).not_to eq(0) if exitstatus
     end
@@ -189,8 +189,7 @@ G
         gem "foo"
       G
 
-      bundle "platform --ruby"
-      puts err
+      bundle "platform --ruby", :expect_err => true
 
       expect(out).to eq("No ruby version specified")
     end
@@ -267,7 +266,7 @@ G
     end
 
     it "doesn't install when the ruby version doesn't match" do
-      install_gemfile <<-G
+      install_gemfile <<-G, :expect_err => true
         source "file://#{gem_repo1}"
         gem "rack"
 
@@ -279,7 +278,7 @@ G
     end
 
     it "doesn't install when engine doesn't match" do
-      install_gemfile <<-G
+      install_gemfile <<-G, :expect_err => true
         source "file://#{gem_repo1}"
         gem "rack"
 
@@ -292,7 +291,7 @@ G
 
     it "doesn't install when engine version doesn't match" do
       simulate_ruby_engine "jruby" do
-        install_gemfile <<-G
+        install_gemfile <<-G, :expect_err => true
           source "file://#{gem_repo1}"
           gem "rack"
 
@@ -305,7 +304,7 @@ G
     end
 
     it "doesn't install when patchlevel doesn't match" do
-      install_gemfile <<-G
+      install_gemfile <<-G, :expect_err => true
         source "file://#{gem_repo1}"
         gem "rack"
 
@@ -332,7 +331,6 @@ G
       G
 
       bundle :check
-      expect(exitstatus).to eq(0) if exitstatus
       expect(out).to eq("The Gemfile's dependencies are satisfied")
     end
 
@@ -369,7 +367,7 @@ G
         #{ruby_version_incorrect}
       G
 
-      bundle :check
+      bundle :check, :expect_err => true
       should_be_ruby_version_incorrect
     end
 
@@ -386,7 +384,7 @@ G
         #{engine_incorrect}
       G
 
-      bundle :check
+      bundle :check, :expect_err => true
       should_be_engine_incorrect
     end
 
@@ -404,7 +402,7 @@ G
           #{engine_version_incorrect}
         G
 
-        bundle :check
+        bundle :check, :expect_err => true
         should_be_engine_version_incorrect
       end
     end
@@ -422,7 +420,7 @@ G
         #{patchlevel_incorrect}
       G
 
-      bundle :check
+      bundle :check, :expect_err => true
       should_be_patchlevel_incorrect
     end
   end
@@ -484,7 +482,7 @@ G
         build_gem "activesupport", "3.0"
       end
 
-      bundle :update
+      bundle :update, :expect_err => true
       should_be_ruby_version_incorrect
     end
 
@@ -500,7 +498,7 @@ G
         build_gem "activesupport", "3.0"
       end
 
-      bundle :update
+      bundle :update, :expect_err => true
       should_be_engine_incorrect
     end
 
@@ -517,7 +515,7 @@ G
           build_gem "activesupport", "3.0"
         end
 
-        bundle :update
+        bundle :update, :expect_err => true
         should_be_engine_version_incorrect
       end
     end
@@ -533,7 +531,7 @@ G
         build_gem "activesupport", "3.0"
       end
 
-      bundle :update
+      bundle :update, :expect_err => true
       should_be_patchlevel_incorrect
     end
   end
@@ -586,7 +584,7 @@ G
         #{ruby_version_incorrect}
       G
 
-      bundle "show rails"
+      bundle "show rails", :expect_err => true
       should_be_ruby_version_incorrect
     end
 
@@ -598,7 +596,7 @@ G
         #{engine_incorrect}
       G
 
-      bundle "show rails"
+      bundle "show rails", :expect_err => true
       should_be_engine_incorrect
     end
 
@@ -611,7 +609,7 @@ G
           #{engine_version_incorrect}
         G
 
-        bundle "show rails"
+        bundle "show rails", :expect_err => true
         should_be_engine_version_incorrect
       end
     end
@@ -627,7 +625,7 @@ G
         build_gem "activesupport", "3.0"
       end
 
-      bundle "show rails"
+      bundle "show rails", :expect_err => true
       should_be_patchlevel_incorrect
     end
   end
@@ -660,7 +658,7 @@ G
           #{ruby_version_correct_engineless}
         G
 
-        bundle :cache
+        bundle :cache, :expect_err => true
         expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
       end
     end
@@ -672,7 +670,7 @@ G
         #{ruby_version_incorrect}
       G
 
-      bundle :cache
+      bundle :cache, :expect_err => true
       should_be_ruby_version_incorrect
     end
 
@@ -683,7 +681,7 @@ G
         #{engine_incorrect}
       G
 
-      bundle :cache
+      bundle :cache, :expect_err => true
       should_be_engine_incorrect
     end
 
@@ -695,7 +693,7 @@ G
           #{engine_version_incorrect}
         G
 
-        bundle :cache
+        bundle :cache, :expect_err => true
         should_be_engine_version_incorrect
       end
     end
@@ -708,7 +706,7 @@ G
         #{patchlevel_incorrect}
       G
 
-      bundle :cache
+      bundle :cache, :expect_err => true
       should_be_patchlevel_incorrect
     end
   end
@@ -753,7 +751,7 @@ G
         #{ruby_version_incorrect}
       G
 
-      bundle :pack
+      bundle :pack, :expect_err => true
       should_be_ruby_version_incorrect
     end
 
@@ -764,7 +762,7 @@ G
         #{engine_incorrect}
       G
 
-      bundle :pack
+      bundle :pack, :expect_err => true
       should_be_engine_incorrect
     end
 
@@ -776,7 +774,7 @@ G
           #{engine_version_incorrect}
         G
 
-        bundle :pack
+        bundle :pack, :expect_err => true
         should_be_engine_version_incorrect
       end
     end
@@ -789,7 +787,7 @@ G
         #{patchlevel_incorrect}
       G
 
-      bundle :pack
+      bundle :pack, :expect_err => true
       should_be_patchlevel_incorrect
     end
   end
@@ -831,7 +829,7 @@ G
         #{ruby_version_incorrect}
       G
 
-      bundle "exec rackup"
+      bundle "exec rackup", :expect_err => true
       should_be_ruby_version_incorrect
     end
 
@@ -842,7 +840,7 @@ G
         #{engine_incorrect}
       G
 
-      bundle "exec rackup"
+      bundle "exec rackup", :expect_err => true
       should_be_engine_incorrect
     end
 
@@ -867,7 +865,7 @@ G
         #{patchlevel_incorrect}
       G
 
-      bundle "exec rackup"
+      bundle "exec rackup", :expect_err => true
       should_be_patchlevel_incorrect
     end
   end
@@ -928,7 +926,7 @@ G
         #{ruby_version_incorrect}
       G
 
-      bundle "console"
+      bundle "console", :expect_err => true
       should_be_ruby_version_incorrect
     end
 
@@ -942,7 +940,7 @@ G
         #{engine_incorrect}
       G
 
-      bundle "console"
+      bundle "console", :expect_err => true
       should_be_engine_incorrect
     end
 
@@ -957,7 +955,7 @@ G
           #{engine_version_incorrect}
         G
 
-        bundle "console"
+        bundle "console", :expect_err => true
         should_be_engine_version_incorrect
       end
     end
@@ -972,7 +970,7 @@ G
         #{patchlevel_incorrect}
       G
 
-      bundle "console"
+      bundle "console", :expect_err => true
       should_be_patchlevel_incorrect
     end
   end
@@ -1031,7 +1029,7 @@ G
 
       FileUtils.rm(bundled_app("Gemfile.lock"))
 
-      ruby <<-R
+      ruby <<-R, :expect_err => true
         require 'rubygems'
         require 'bundler/setup'
       R
@@ -1051,7 +1049,7 @@ G
 
       FileUtils.rm(bundled_app("Gemfile.lock"))
 
-      ruby <<-R
+      ruby <<-R, :expect_err => true
         require 'rubygems'
         require 'bundler/setup'
       R
@@ -1072,7 +1070,7 @@ G
 
         FileUtils.rm(bundled_app("Gemfile.lock"))
 
-        ruby <<-R
+        ruby <<-R, :expect_err => true
           require 'rubygems'
           require 'bundler/setup'
         R
@@ -1094,7 +1092,7 @@ G
 
       FileUtils.rm(bundled_app("Gemfile.lock"))
 
-      ruby <<-R
+      ruby <<-R, :expect_err => true
         require 'rubygems'
         require 'bundler/setup'
       R
@@ -1131,7 +1129,7 @@ G
         #{ruby_version_correct}
       G
 
-      bundle "outdated"
+      bundle "outdated", :expect_err => true
       expect(out).to include("activesupport (newest 3.0, installed 2.3.5, requested = 2.3.5")
       expect(out).to include("foo (newest 1.0")
     end
@@ -1151,7 +1149,7 @@ G
           #{ruby_version_correct_engineless}
         G
 
-        bundle "outdated"
+        bundle "outdated", :expect_err => true
         expect(out).to include("activesupport (newest 3.0, installed 2.3.5, requested = 2.3.5)")
         expect(out).to include("foo (newest 1.0")
       end
@@ -1171,7 +1169,7 @@ G
         #{ruby_version_incorrect}
       G
 
-      bundle "outdated"
+      bundle "outdated", :expect_err => true
       should_be_ruby_version_incorrect
     end
 
@@ -1189,7 +1187,7 @@ G
         #{engine_incorrect}
       G
 
-      bundle "outdated"
+      bundle "outdated", :expect_err => true
       should_be_engine_incorrect
     end
 
@@ -1208,7 +1206,7 @@ G
           #{engine_version_incorrect}
         G
 
-        bundle "outdated"
+        bundle "outdated", :expect_err => true
         should_be_engine_version_incorrect
       end
     end
@@ -1228,7 +1226,7 @@ G
           #{patchlevel_incorrect}
         G
 
-        bundle "outdated"
+        bundle "outdated", :expect_err => true
         should_be_patchlevel_incorrect
       end
     end
@@ -1248,7 +1246,7 @@ G
           #{patchlevel_fixnum}
         G
 
-        bundle "outdated"
+        bundle "outdated", :expect_err => true
         should_be_patchlevel_fixnum
       end
     end

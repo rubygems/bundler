@@ -2,7 +2,7 @@ require "uri"
 
 module Bundler
   class Settings
-    BOOL_KEYS = %w(frozen cache_all no_prune disable_local_branch_check ignore_messages gem.mit gem.coc).freeze
+    BOOL_KEYS = %w(frozen cache_all no_prune disable_local_branch_check ignore_messages gem.mit gem.coc silence_git).freeze
     NUMBER_KEYS = %w(retry timeout redirect).freeze
     DEFAULT_CONFIG = {:retry => 3, :timeout => 10, :redirect => 5}
 

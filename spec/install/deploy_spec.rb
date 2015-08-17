@@ -114,7 +114,7 @@ describe "install with --deployment or --frozen" do
         gem "rack-obama"
       G
 
-      bundle "install --deployment"
+      bundle "install --deployment", :expect_err => true
       expect(err).to include("deployment mode")
       expect(err).to include("You have added to the Gemfile")
       expect(err).to include("* rack-obama")
@@ -159,7 +159,7 @@ describe "install with --deployment or --frozen" do
         gem "rack-obama"
       G
 
-      bundle "install --frozen"
+      bundle "install --frozen", :expect_err => true
       expect(err).to include("deployment mode")
       expect(err).to include("You have added to the Gemfile")
       expect(err).to include("* rack-obama")
@@ -173,7 +173,7 @@ describe "install with --deployment or --frozen" do
         gem "activesupport"
       G
 
-      bundle "install --deployment"
+      bundle "install --deployment", :expect_err => true
       expect(err).to include("deployment mode")
       expect(err).to include("You have added to the Gemfile:\n* activesupport\n\n")
       expect(err).to include("You have deleted from the Gemfile:\n* rack")
@@ -186,7 +186,7 @@ describe "install with --deployment or --frozen" do
         gem "rack", :git => "git://hubz.com"
       G
 
-      bundle "install --deployment"
+      bundle "install --deployment", :expect_err => true
       expect(err).to include("deployment mode")
       expect(err).to include("You have added to the Gemfile:\n* source: git://hubz.com (at master)")
       expect(err).not_to include("You have changed in the Gemfile")
@@ -205,7 +205,7 @@ describe "install with --deployment or --frozen" do
         gem "rack"
       G
 
-      bundle "install --deployment"
+      bundle "install --deployment", :expect_err => true
       expect(err).to include("deployment mode")
       expect(err).to include("You have deleted from the Gemfile:\n* source: #{lib_path("rack-1.0")} (at master)")
       expect(err).not_to include("You have added to the Gemfile")
@@ -228,7 +228,7 @@ describe "install with --deployment or --frozen" do
         gem "foo", :git => "#{lib_path("rack")}"
       G
 
-      bundle "install --deployment"
+      bundle "install --deployment", :expect_err => true
       expect(err).to include("deployment mode")
       expect(err).to include("You have changed in the Gemfile:\n* rack from `no specified source` to `#{lib_path("rack")} (at master)`")
       expect(err).not_to include("You have added to the Gemfile")

@@ -84,7 +84,7 @@ describe "post bundle message" do
 
     describe "with misspelled or non-existent gem name" do
       it "should report a helpful error message" do
-        install_gemfile <<-G
+        install_gemfile <<-G, :expect_err => true
           source "file://#{gem_repo1}"
           gem "rack"
           gem "not-a-gem", :group => :development

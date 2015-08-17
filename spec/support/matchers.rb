@@ -2,13 +2,13 @@ module Spec
   module Matchers
     RSpec::Matchers.define :lack_errors do
       match do |actual|
-        actual.gsub(/(^DEPRECATION:.+)/, "") == ""
+        actual.gsub(/(^DEPRECATION:.+$)/, "") == ""
       end
     end
 
     RSpec::Matchers.define :eq_err do |expected|
       match do |actual|
-        actual.gsub(/(^DEPRECATION:.+\n)/, "") == expected
+        actual.gsub(/(^DEPRECATION:.+$)/, "") == expected
       end
     end
 

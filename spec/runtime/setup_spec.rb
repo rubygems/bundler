@@ -865,7 +865,7 @@ describe "Bundler.setup" do
       update_git "bar", :gemspec => false do |s|
         s.write "bar.gemspec", "require 'foobarbaz'"
       end
-      bundle :install
+      bundle :install, :expect_err => true
       expect(err).to include("was a LoadError while loading bar.gemspec")
       expect(err).to include("foobarbaz")
       expect(err).to include("bar.gemspec:1")
