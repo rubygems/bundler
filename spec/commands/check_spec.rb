@@ -112,7 +112,8 @@ describe "bundle check" do
       gem "rack", :group => :foo
     G
 
-    bundle "install --without foo"
+    config "BUNDLE_WITHOUT" => "foo"
+    bundle :install
 
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -234,7 +235,8 @@ describe "bundle check" do
         source "file://#{gem_repo1}"
         gem "rails"
       G
-      bundle "install --path vendor/bundle"
+      config "BUNDLE_PATH" => "vendor/bundle"
+      bundle :install
 
       FileUtils.rm_rf(bundled_app(".bundle"))
     end

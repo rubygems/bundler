@@ -80,7 +80,8 @@ describe "real world edgecases", :realworld => true do
       gem 'rack', '1.0.1'
     G
 
-    bundle "install --path vendor/bundle", :expect_err => true
+    config "BUNDLE_PATH" => "vendor/bundle"
+    bundle :install, :expect_err => true
     expect(err).not_to include("Could not find rake")
     expect(err).to lack_errors
   end

@@ -251,21 +251,8 @@ describe "bundle install with gem sources" do
       end
 
       it "works" do
-        bundle "install --path vendor"
-        should_be_installed "rack 1.0"
-      end
-
-      it "allows running bundle install --system without deleting foo" do
-        bundle "install --path vendor"
-        bundle "install --system"
-        FileUtils.rm_rf(bundled_app("vendor"))
-        should_be_installed "rack 1.0"
-      end
-
-      it "allows running bundle install --system after deleting foo" do
-        bundle "install --path vendor"
-        FileUtils.rm_rf(bundled_app("vendor"))
-        bundle "install --system"
+        config "BUNDLE_PATH" => "vendor"
+        bundle :install
         should_be_installed "rack 1.0"
       end
     end

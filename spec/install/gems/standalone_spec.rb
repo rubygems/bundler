@@ -142,8 +142,9 @@ describe "bundle install --standalone" do
       expect(err).to eq("ZOMG LOAD ERROR")
     end
 
-    it "allows --path to change the location of the standalone bundle" do
-      bundle "install --standalone --path path/to/bundle"
+    it "allows the path option to change the location of the standalone bundle" do
+      config "BUNDLE_PATH" => "path/to/bundle"
+      bundle "install --standalone"
 
       ruby <<-RUBY, :no_lib => true, :expect_err => false
         $:.unshift File.expand_path("path/to/bundle")
@@ -157,7 +158,8 @@ describe "bundle install --standalone" do
     end
 
     it "allows remembered --without to limit the groups used in a standalone" do
-      bundle "install --without test"
+      config "BUNDLE_WITHOUT" => "test"
+      bundle "install"
       bundle "install --standalone"
 
       load_error_ruby <<-RUBY, "spec", :no_lib => true

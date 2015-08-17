@@ -99,7 +99,7 @@ module Bundler
     method_option "gemfile", :type => :string, :banner =>
       "Use the specified gemfile instead of Gemfile"
     method_option "path", :type => :string, :banner =>
-      "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
+      "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME)."
     map "c" => "check"
     def check
       require "bundler/cli/check"
@@ -137,23 +137,15 @@ module Bundler
       "Force downloading every gem."
     method_option "no-prune", :type => :boolean, :banner =>
       "Don't remove stale gems from the cache."
-    method_option "path", :type => :string, :banner =>
-      "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
     method_option "quiet", :type => :boolean, :banner =>
       "Only output warnings and errors."
     method_option "shebang", :type => :string, :banner =>
       "Specify a different shebang executable name than the default (usually 'ruby')"
     method_option "standalone", :type => :array, :lazy_default => [], :banner =>
       "Make a bundle that can work without the Bundler runtime"
-    method_option "system", :type => :boolean, :banner =>
-      "Install to the system location ($BUNDLE_PATH or $GEM_HOME) even if the bundle was previously installed somewhere else for this application"
     method_option "trust-policy", :alias => "P", :type => :string, :banner =>
       "Gem trust policy (like gem install -P). Must be one of " +
         Bundler.rubygems.security_policy_keys.join("|")
-    method_option "without", :type => :array, :banner =>
-      "Exclude gems that are part of the specified named group."
-    method_option "with", :type => :array, :banner =>
-      "Include gems that are part of the specified named group."
     map "i" => "install"
     def install
       require "bundler/cli/install"
@@ -250,7 +242,7 @@ module Bundler
     method_option "no-install",  :type => :boolean, :banner => "Don't actually install the gems, just package."
     method_option "no-prune",  :type => :boolean, :banner => "Don't remove stale gems from the cache."
     method_option "path", :type => :string, :banner =>
-      "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
+      "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME)."
     method_option "quiet", :type => :boolean, :banner => "Only output warnings and errors."
     long_desc <<-D
       The package command will copy the .gem files for every gem in the bundle into the

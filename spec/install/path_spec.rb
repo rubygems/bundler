@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe "bundle install" do
-  describe "with --path" do
+  describe "with path set via config" do
     before :each do
       build_gem "rack", "1.0.0", :to_system => true do |s|
         s.write "lib/rack.rb", "puts 'FAIL'"
@@ -11,10 +11,12 @@ describe "bundle install" do
         source "file://#{gem_repo1}"
         gem "rack"
       G
+
+      set_bundle_path('local', 'vendor/bundle')
     end
 
-    it "does not use available system gems with bundle --path vendor/bundle" do
-      bundle "install --path vendor/bundle"
+    it "does not use available system gems" do
+      bundle :install
       should_be_installed "rack 1.0.0"
     end
 
@@ -23,30 +25,16 @@ describe "bundle install" do
       dir.mkpath
 
       Dir.chdir(dir) do
-        bundle "install --path vendor/bundle"
+        bundle :install
         expect(out).to include("installed into ./vendor/bundle")
       end
 
       dir.rmtree
     end
 
-    it "prints a warning to let the user know what has happened with bundle --path vendor/bundle" do
-      bundle "install --path vendor/bundle"
+    it "prints a warning to let the user know where gems are installed" do
+      bundle :install
       expect(out).to include("gems are installed into ./vendor")
-    end
-
-    it "disallows --path vendor/bundle --system" do
-      bundle "install --path vendor/bundle --system"
-      expect(err).to include("Please choose.")
-    end
-
-    it "remembers to disable system gems after the first time with bundle --path vendor/bundle" do
-      bundle "install --path vendor/bundle"
-      FileUtils.rm_rf bundled_app("vendor")
-      bundle "install"
-
-      expect(vendored_gems("gems/rack-1.0.0")).to be_directory
-      should_be_installed "rack 1.0.0"
     end
   end
 
@@ -62,18 +50,11 @@ describe "bundle install" do
       G
     end
 
-    def set_bundle_path(type, location)
-      if type == :env
-        ENV["BUNDLE_PATH"] = location
-      elsif type == :global
-        bundle "config path #{location}", "no-color" => nil
-      end
-    end
-
-    [:env, :global].each do |type|
-      it "installs gems to a path if one is specified" do
+    %w/env global/.each do |type|
+      it "gives precedence to the local path over #{type}" do
         set_bundle_path(type, bundled_app("vendor2").to_s)
-        bundle "install --path vendor/bundle"
+        set_bundle_path('local', 'vendor/bundle')
+        bundle :install
 
         expect(vendored_gems("gems/rack-1.0.0")).to be_directory
         expect(bundled_app("vendor2")).not_to be_directory
@@ -107,16 +88,9 @@ describe "bundle install" do
     end
 
     it "installs gems to BUNDLE_PATH from .bundle/config" do
-      config "BUNDLE_PATH" => bundled_app("vendor/bundle").to_s
+      set_bundle_path('local', 'vendor/bundle')
 
       bundle :install
-
-      expect(vendored_gems("gems/rack-1.0.0")).to be_directory
-      should_be_installed "rack 1.0.0"
-    end
-
-    it "sets BUNDLE_PATH as the first argument to bundle install" do
-      bundle "install --path ./vendor/bundle"
 
       expect(vendored_gems("gems/rack-1.0.0")).to be_directory
       should_be_installed "rack 1.0.0"
@@ -125,7 +99,8 @@ describe "bundle install" do
     it "disables system gems when passing a path to install" do
       # This is so that vendored gems can be distributed to others
       build_gem "rack", "1.1.0", :to_system => true
-      bundle "install --path ./vendor/bundle"
+      set_bundle_path('local', 'vendor/bundle')
+      bundle :install
 
       expect(vendored_gems("gems/rack-1.0.0")).to be_directory
       should_be_installed "rack 1.0.0"
@@ -145,8 +120,18 @@ describe "bundle install" do
         gem "rack"
       G
 
-      bundle "install --path bundle"
-      expect(err).to match(/invalid symlink/)
+      set_bundle_path('local', 'bundle')
+      bundle :install
+      expect(out).to match(/invalid symlink/)
+    end
+  end
+
+  def set_bundle_path(type, location)
+    case type
+    when 'env'
+      ENV["BUNDLE_PATH"] = location
+    when 'global', 'local'
+      bundle "config --#{type} path #{location}", "no-color" => nil
     end
   end
 end

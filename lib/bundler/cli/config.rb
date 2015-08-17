@@ -57,6 +57,8 @@ module Bundler
           Bundler.ui.warn "`path.system` is already configured, so it will be unset."
           Bundler.settings.set_local("path.system", nil)
           Bundler.settings.set_global("path.system", nil)
+        elsif (name == "with" || name == "without")
+          new_value.gsub!(/\s+/, ":")
         end
 
         if scope == "global"

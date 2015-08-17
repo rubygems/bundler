@@ -192,6 +192,14 @@ module Spec
       ENV["PATH"] = old_path
     end
 
+    def with_env(key, value)
+      old_value = ENV[key]
+      ENV[key] = value
+      yield
+    ensure
+      ENV[key] = old_value
+    end
+
     def break_git!
       FileUtils.mkdir_p(tmp("broken_path"))
       File.open(tmp("broken_path/git"), "w", 0755) do |f|

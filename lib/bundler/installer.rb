@@ -214,7 +214,7 @@ module Bundler
     end
 
     def generate_standalone(groups)
-      standalone_path = Bundler.settings[:path]
+      standalone_path = Bundler.settings[:path] || "bundle"
       bundler_path = File.join(standalone_path, "bundler")
       FileUtils.mkdir_p(bundler_path)
 

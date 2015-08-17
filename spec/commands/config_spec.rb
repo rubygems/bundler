@@ -11,7 +11,8 @@ describe ".bundle/config" do
   describe "BUNDLE_APP_CONFIG" do
     it "can be moved with an environment variable" do
       ENV["BUNDLE_APP_CONFIG"] = tmp("foo/bar").to_s
-      bundle "install --path vendor/bundle"
+      bundle "config --local path vendor/bundle"
+      bundle :install
 
       expect(bundled_app(".bundle")).not_to exist
       expect(tmp("foo/bar/config")).to exist
@@ -22,8 +23,9 @@ describe ".bundle/config" do
       FileUtils.mkdir_p bundled_app("omg")
       Dir.chdir bundled_app("omg")
 
-      ENV["BUNDLE_APP_CONFIG"] = "../foo"
-      bundle "install --path vendor/bundle"
+      ENV['BUNDLE_APP_CONFIG'] = "../foo"
+      bundle "config --local path vendor/bundle"
+      bundle :install
 
       expect(bundled_app(".bundle")).not_to exist
       expect(bundled_app("../foo/config")).to exist
@@ -56,7 +58,7 @@ describe ".bundle/config" do
     end
 
     it "has lower precedence than local" do
-      bundle "config --local  foo local"
+      bundle "config --local foo local"
 
       bundle "config --global foo global"
       expect(out).to match(/Your application has set foo to "local"/)

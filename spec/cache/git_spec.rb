@@ -31,7 +31,7 @@ end
       should_be_installed "foo 1.0"
     end
 
-    it "copies repository to vendor cache and uses it even when installed with bundle --path" do
+    it "copies repository to vendor cache and uses it even when path configured" do
       git = build_git "foo"
       ref = git.ref_for("master", 11)
 
@@ -39,7 +39,8 @@ end
         gem "foo", :git => '#{lib_path("foo-1.0")}'
       G
 
-      bundle "install --path vendor/bundle"
+      config "BUNDLE_PATH" => "vendor/bundle"
+      bundle :install
       bundle "#{cmd} --all"
 
       expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
