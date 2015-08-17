@@ -977,7 +977,7 @@ describe "bundle install with git sources" do
       simulate_new_machine
 
       bundle "install", :env => { "PATH" => "" }
-      expect(out).to_not include("You need to install git to be able to use gems from git repositories.")
+      expect(err).to_not include("You need to install git to be able to use gems from git repositories.")
       expect(exitstatus).to be_zero if exitstatus
     end
   end

@@ -8,6 +8,8 @@ module Bundler
 
     attr_reader :root
 
+    attr_reader :root
+
     def initialize(root = nil)
       @root          = root
       @local_config  = load_config(local_config_file)
@@ -154,18 +156,16 @@ module Bundler
         set_path = File.join(@root, Bundler.ruby_scope)
       end
 
-      if set_path == File.join(Bundler.settings.root, Bundler.ruby_scope)
-        # ?
-        install_path = set_path
-      elsif set_path == Bundler.rubygems.gem_dir
-        # system gems path
-        install_path = set_path
-      elsif Pathname.new(set_path).absolute?
-        # all other absolute paths
+      if Pathname.new(set_path).absolute?
+        # The user specified an absolute path.
+        # The set path is the root bundler (gems.rb) path, the systems gem
+        # path, or any other absolute path.
         install_path = set_path
       else
-        # all relative paths (configured by the user)
-        install_path = File.join(Bundler::root, set_path)
+        # The user specified a relative path.
+        # The install path is this path expanded from the root bundler
+        # (gems.rb) directory.
+        install_path = File.join(Bundler.root, set_path)
       end
     end
 

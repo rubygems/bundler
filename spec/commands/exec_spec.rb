@@ -184,7 +184,7 @@ describe "bundle exec" do
     expect(out).to include(rubylib)
 
     bundle "exec 'echo $RUBYLIB'", :env => { "RUBYLIB" => rubylib }
-    expect(out).to eq(rubylib)
+    expect(out).to include(rubylib)
   end
 
   it "errors nicely when the argument doesn't exist" do
