@@ -16,6 +16,12 @@ module Bundler
         end
       end
 
+      if options[:cache]
+        Bundler.ui.error "Please use `bundle cache` instead of `bundle "\
+         "install --cache`."
+        exit 1
+      end
+
       if options[:without] && options[:with]
         conflicting_groups = options[:without] & options[:with]
         unless conflicting_groups.empty?
@@ -103,7 +109,7 @@ module Bundler
       definition.validate_ruby!
 
       Installer.install(Bundler.root, definition, options)
-      Bundler.load.cache if Bundler.app_cache.exist? && options["cache"] && !Bundler.settings[:frozen]
+      Bundler.load.cache if Bundler.app_cache.exist? && Bundler.settings[:cache] && !Bundler.settings[:frozen]
 
       Bundler.ui.confirm "Using #{Installer.using_gems.size} already installed gems" if Installer.using_gems.size > 0
       Bundler.ui.confirm "Bundle complete! #{dependencies_count_for(definition)}, #{gems_installed_for(definition)}."

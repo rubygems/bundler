@@ -125,7 +125,7 @@ describe "bundle install with gem sources" do
       end
     end
 
-    it "does not update the cache if --cache is not passed" do
+    it "does not update the cache if `bundle cache` is not run" do
       gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
@@ -137,7 +137,7 @@ describe "bundle install with gem sources" do
       expect(bundled_app("vendor/cache").children).to be_empty
     end
 
-    it "updates the cache if --cache is passed" do
+    it "updates the cache if `bundle cache` is run" do
       gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
@@ -145,7 +145,8 @@ describe "bundle install with gem sources" do
       bundled_app("vendor/cache").mkpath
       expect(bundled_app("vendor/cache").children).to be_empty
 
-      bundle "install --cache"
+      bundle "install"
+      bundle "cache"
       expect(bundled_app("vendor/cache").children).not_to be_empty
     end
   end

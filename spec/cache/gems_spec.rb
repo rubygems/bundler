@@ -176,7 +176,8 @@ describe "bundle cache" do
 
     it "re-caches during install" do
       cached_gem("rack-1.0.0").rmtree
-      bundle :install, :cache => true
+      bundle :install
+      bundle :cache
       expect(out).to include("Updating files in vendor/cache")
       expect(cached_gem("rack-1.0.0")).to exist
     end
@@ -189,19 +190,22 @@ describe "bundle cache" do
     end
 
     it "adds new gems and dependencies" do
-      install_gemfile <<-G, :cache => true
+      install_gemfile <<-G
         source "file://#{gem_repo2}"
         gem "rails"
       G
+      bundle :cache
       expect(cached_gem("rails-2.3.2")).to exist
       expect(cached_gem("activerecord-2.3.2")).to exist
     end
 
     it "removes .gems for removed gems and dependencies" do
-      install_gemfile <<-G, :cache => true
+      install_gemfile <<-G
         source "file://#{gem_repo2}"
         gem "rack"
       G
+      bundle :cache
+
       expect(cached_gem("rack-1.0.0")).to exist
       expect(cached_gem("actionpack-2.3.2")).not_to exist
       expect(cached_gem("activesupport-2.3.2")).not_to exist
@@ -210,11 +214,13 @@ describe "bundle cache" do
     it "removes .gems when gem changes to git source" do
       build_git "rack"
 
-      install_gemfile <<-G, :cache => true
+      install_gemfile <<-G
         source "file://#{gem_repo2}"
         gem "rack", :git => "#{lib_path("rack-1.0")}"
         gem "actionpack"
       G
+      bundle :cache
+
       expect(cached_gem("rack-1.0.0")).not_to exist
       expect(cached_gem("actionpack-2.3.2")).to exist
       expect(cached_gem("activesupport-2.3.2")).to exist
@@ -222,20 +228,22 @@ describe "bundle cache" do
 
     it "doesn't remove gems that are for another platform" do
       simulate_platform "java" do
-        install_gemfile <<-G, :cache => true
+        install_gemfile <<-G
           source "file://#{gem_repo1}"
           gem "platform_specific"
         G
+        bundle :cache
 
         bundle :cache
         expect(cached_gem("platform_specific-1.0-java")).to exist
       end
 
       simulate_new_machine
-      install_gemfile <<-G, :cache => true
+      install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "platform_specific"
       G
+      bundle :cache
 
       expect(cached_gem("platform_specific-1.0-#{Gem::Platform.local}")).to exist
       expect(cached_gem("platform_specific-1.0-java")).to exist
