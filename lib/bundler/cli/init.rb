@@ -6,7 +6,6 @@ module Bundler
     end
 
     def run
-
       %w(gems.rb Gemfile).each do |f|
         if File.exist?(f)
           Bundler.ui.error "#{f} already exists at #{SharedHelpers.pwd}/#{f}"
