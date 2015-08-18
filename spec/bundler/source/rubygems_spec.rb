@@ -22,4 +22,12 @@ describe Bundler::Source::Rubygems do
       end
     end
   end
+
+  describe "#add_remote" do
+    context "when the source is an HTTP(s) URI with no host" do
+      it "raises error" do
+        expect { subject.add_remote("https:rubygems.org") }.to raise_error(ArgumentError)
+      end
+    end
+  end
 end
