@@ -16,7 +16,7 @@ describe Bundler::Definition do
         expect(File).to receive(:open).with("gems.locked", "wb").
           and_raise(Errno::EACCES)
         expect { subject.lock("gems.locked") }.
-          to raise_error(Bundler::InstallError)
+          to raise_error(Bundler::PermissionError, /gems\.locked/)
       end
     end
   end
