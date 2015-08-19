@@ -7,7 +7,6 @@ module Bundler
   # Handles all the fetching with the rubygems server
   class Fetcher
     autoload :CompactIndex, "bundler/fetcher/compact_index"
-    autoload :CompactDependency, "bundler/fetcher/compact_dependency"
     autoload :Downloader, "bundler/fetcher/downloader"
     autoload :Dependency, "bundler/fetcher/dependency"
     autoload :Index, "bundler/fetcher/index"

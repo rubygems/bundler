@@ -1,11 +1,12 @@
 require "bundler/fetcher/base"
-require "bundler/fetcher/compact_gem_list"
 
 module Bundler
   class Fetcher
     class CompactIndex < Base
+      require "bundler/vendor/compact_index_client/lib/compact_index_client"
+
       def specs(_gem_names)
-        @specs ||= compact_gem_list.versions.values.flatten(1).map! do |args|
+        @specs ||= compact_index_client.versions.values.flatten(1).map! do |args|
           args = args.fill(nil, args.size..2) << self
           RemoteSpecification.new(*args)
         end
@@ -19,7 +20,7 @@ module Bundler
 
       def fetch_spec(spec)
         spec -= [nil, "ruby", ""]
-        return unless contents = compact_gem_list.spec(*spec)
+        return unless contents = compact_index_client.spec(*spec)
         contents.unshift(spec.first)
         contents[3].map! {|d| Gem::Dependency.new(*d) }
         EndpointSpecification.new(*contents)
@@ -31,10 +32,13 @@ module Bundler
 
     private
 
-      def compact_gem_list
-        @compact_gem_list ||= begin
+      def compact_index_client
+        @compact_index_client ||= begin
           uri_part = [display_uri.hostname, display_uri.port, Digest::MD5.hexdigest(display_uri.path)].compact.join(".")
-          CompactGemList.new(self, Bundler.cache + "compact_index" + uri_part)
+          fetcher = lambda do |path, headers|
+            fetcher.downloader.fetch(fetcher.fetch_uri + path, headers)
+          end
+          CompactIndexClient.new(Bundler.cache + "compact_index" + uri_part, fetcher)
         end
       end
     end
