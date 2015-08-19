@@ -50,9 +50,15 @@ module Bundler
       # Just disable color in deployment mode
       Bundler.ui.shell = Thor::Shell::Basic.new if options[:deployment]
 
-      if (options[:path] || options[:deployment]) && options[:system]
-        Bundler.ui.error "You have specified both a path to install your gems to, \n" \
-                         "as well as --system. Please choose."
+      if options[:path]
+        Bundler.ui.error "You have specified an installation path with the "\
+         "path flag. Please use `bundle config path #{options[:path]}` instead."
+        exit 1
+      end
+
+      if (Bundler.settings[:path] || options[:deployment]) && options[:system]
+        Bundler.ui.error "You have configured a path to install your gems to, \n" \
+                         "and specified the --system path. Please use only one."
         exit 1
       end
 
@@ -90,7 +96,7 @@ module Bundler
 
       Bundler.settings[:path]     = Bundler.rubygems.gem_dir if options[:system]
       Bundler.settings[:path]     = "#{Bundler.settings.path}/vendor/bundle" if options[:deployment]
-      Bundler.settings[:path]     = options["path"] if options["path"]
+
       Bundler.settings[:path] ||= "bundle" if options["standalone"]
       Bundler.settings[:shebang]  = options["shebang"] if options["shebang"]
       Bundler.settings[:jobs]     = options["jobs"] if options["jobs"]

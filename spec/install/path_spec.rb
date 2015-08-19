@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe "bundle install" do
-  describe "with --path" do
+  describe "with `config path`" do
     before :each do
       build_gem "rack", "1.0.0", :to_system => true do |s|
         s.write "lib/rack.rb", "puts 'FAIL'"
@@ -13,8 +13,9 @@ describe "bundle install" do
       G
     end
 
-    it "does not use available system gems with bundle --path vendor/bundle" do
-      bundle "install --path vendor/bundle"
+    it "does not use available system gems with config path vendor/bundle" do
+      bundle "config path vendor/bundle"
+      bundle "install"
       should_be_installed "rack 1.0.0"
     end
 
@@ -23,25 +24,29 @@ describe "bundle install" do
       dir.mkpath
 
       Dir.chdir(dir) do
-        bundle "install --path vendor/bundle"
+        bundle "config path vendor/bundle"
+        bundle "install"
         expect(out).to include("installed into ./vendor/bundle")
       end
 
       dir.rmtree
     end
 
-    it "prints a warning to let the user know what has happened with bundle --path vendor/bundle" do
-      bundle "install --path vendor/bundle"
+    it "prints a warning to let the user know what has happened with config path vendor/bundle" do
+      bundle "config path vendor/bundle"
+      bundle "install"
       expect(out).to include("gems are installed into ./vendor")
     end
 
-    it "disallows --path vendor/bundle --system" do
-      bundle "install --path vendor/bundle --system"
-      expect(err).to include("Please choose.")
+    it "disallows config path vendor/bundle and install system" do
+      bundle "config path vendor/bundle"
+      bundle "install --system"
+      expect(err).to include("Please use only one.")
     end
 
-    it "remembers to disable system gems after the first time with bundle --path vendor/bundle" do
-      bundle "install --path vendor/bundle"
+    it "remembers to disable system gems after config path vendor/bundle" do
+      bundle "config path vendor/bundle"
+      bundle "install"
       FileUtils.rm_rf bundled_app("vendor")
       bundle "install"
 
@@ -73,7 +78,10 @@ describe "bundle install" do
     [:env, :global].each do |type|
       it "installs gems to a path if one is specified" do
         set_bundle_path(type, bundled_app("vendor2").to_s)
-        bundle "install --path vendor/bundle"
+        # NOTE: This spec fails if we don't specify a scope or if we use --global.
+        # The precedence order is local -> env -> global: see Settings#[] (lib/bundler/settings.rb:L19).
+        bundle "config --local path vendor/bundle"
+        bundle "install"
 
         expect(vendored_gems("gems/rack-1.0.0")).to be_directory
         expect(bundled_app("vendor2")).not_to be_directory
@@ -89,10 +97,6 @@ describe "bundle install" do
       end
 
       it "installs gems to BUNDLE_PATH relative to root when relative" do
-        # FIXME: If the bundle_path is `"vendor"` instead of
-        # `bundled_app("vendor").to_s`, this spec fails. As is, this spec
-        # may not test what happens when `path` is relative.
-
         bundle "config path vendor"
         # set_bundle_path(type, bundled_app("vendor").to_s)
 
@@ -116,7 +120,8 @@ describe "bundle install" do
     end
 
     it "sets BUNDLE_PATH as the first argument to bundle install" do
-      bundle "install --path ./vendor/bundle"
+      bundle "config path ./vendor/bundle"
+      bundle "install"
 
       expect(vendored_gems("gems/rack-1.0.0")).to be_directory
       should_be_installed "rack 1.0.0"
@@ -125,7 +130,8 @@ describe "bundle install" do
     it "disables system gems when passing a path to install" do
       # This is so that vendored gems can be distributed to others
       build_gem "rack", "1.1.0", :to_system => true
-      bundle "install --path ./vendor/bundle"
+      bundle "config path ./vendor/bundle"
+      bundle "install"
 
       expect(vendored_gems("gems/rack-1.0.0")).to be_directory
       should_be_installed "rack 1.0.0"
@@ -145,7 +151,10 @@ describe "bundle install" do
         gem "rack"
       G
 
-      bundle "install --path bundle"
+      # NOTE: This spec fails if we don't specify a scope or if we use --global.
+      bundle "config --local path bundle"
+      bundle "install"
+
       expect(err).to match(/invalid symlink/)
     end
   end

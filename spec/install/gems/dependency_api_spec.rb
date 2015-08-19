@@ -404,24 +404,26 @@ describe "gemcutter's dependency API" do
     should_be_installed "rails 2.3.2"
   end
 
-  it "installs the bins when using --path and uses autoclean" do
+  it "installs the bins when using bundle config path and uses autoclean" do
     gemfile <<-G
       source "#{source_uri}"
       gem "rack"
     G
 
-    bundle "install --path vendor/bundle", :artifice => "endpoint"
+    bundle "config path vendor/bundle"
+    bundle "install", :artifice => "endpoint"
 
     expect(vendored_gems("bin/rackup")).to exist
   end
 
-  it "installs the bins when using --path and uses bundle clean" do
+  it "installs the bins when using bundle config path and uses bundle clean" do
     gemfile <<-G
       source "#{source_uri}"
       gem "rack"
     G
 
-    bundle "install --path vendor/bundle --no-clean", :artifice => "endpoint"
+    bundle "config path vendor/bundle"
+    bundle "install --no-clean", :artifice => "endpoint"
 
     expect(vendored_gems("bin/rackup")).to exist
   end

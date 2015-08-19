@@ -25,7 +25,8 @@ describe "bundle clean" do
       gem "foo"
     G
 
-    bundle "install --path vendor/bundle --no-clean"
+    bundle "config path vendor/bundle"
+    bundle "install --no-clean"
 
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -52,7 +53,8 @@ describe "bundle clean" do
       gem "foo"
     G
 
-    bundle "install --path vendor/bundle --no-clean"
+    bundle "config path vendor/bundle"
+    bundle "install --no-clean"
 
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -80,7 +82,8 @@ describe "bundle clean" do
       gem "foo"
     G
 
-    bundle "install --path vendor/bundle --no-clean"
+    bundle "config path vendor/bundle"
+    bundle "install --no-clean"
 
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -111,7 +114,8 @@ describe "bundle clean" do
       end
     G
 
-    bundle "install --path vendor/bundle"
+    bundle "config path vendor/bundle"
+    bundle "install"
     bundle "install --without test_group"
     bundle :clean
 
@@ -137,7 +141,8 @@ describe "bundle clean" do
       end
     G
 
-    bundle "install --path vendor/bundle"
+    bundle "config path vendor/bundle"
+    bundle "install"
 
     bundle :clean
 
@@ -159,7 +164,8 @@ describe "bundle clean" do
       end
     G
 
-    bundle "install --path vendor/bundle"
+    bundle "config path vendor/bundle"
+    bundle "install"
 
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -195,7 +201,8 @@ describe "bundle clean" do
       end
     G
 
-    bundle "install --path vendor/bundle"
+    bundle "config path vendor/bundle"
+    bundle "install"
 
     update_git "foo", :path => lib_path("foo-bar")
     revision2 = revision_for(lib_path("foo-bar"))
@@ -225,7 +232,9 @@ describe "bundle clean" do
       gem "activesupport", :git => "#{lib_path("rails")}", :ref => '#{revision}'
     G
 
-    bundle "install --path vendor/bundle"
+    bundle "config path vendor/bundle"
+    bundle "install"
+
     bundle :clean
     expect(out).to include("")
 
@@ -247,7 +256,8 @@ describe "bundle clean" do
         end
       end
     G
-    bundle "install --path vendor/bundle --without test"
+    bundle "config path vendor/bundle"
+    bundle "install --without test"
 
     bundle :clean
 
@@ -268,13 +278,14 @@ describe "bundle clean" do
       end
     G
 
-    bundle "install --path vendor/bundle --without development"
+    bundle "config path vendor/bundle"
+    bundle "install --without development"
 
     bundle :clean
     expect(exitstatus).to eq(0) if exitstatus
   end
 
-  it "displays an error when used without --path" do
+  it "displays an error when used without bundle config path" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
 
@@ -296,7 +307,8 @@ describe "bundle clean" do
       gem "foo"
     G
 
-    bundle "install --path vendor/bundle"
+    bundle "config path vendor/bundle"
+    bundle "install"
 
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -347,7 +359,8 @@ describe "bundle clean" do
       gem "thin"
       gem "rack"
     G
-    bundle "install --path vendor/bundle --clean"
+    bundle "config path vendor/bundle"
+    bundle "install --clean"
 
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -368,7 +381,8 @@ describe "bundle clean" do
 
       gem "foo"
     G
-    bundle "install --path vendor/bundle --clean"
+    bundle "config path vendor/bundle"
+    bundle "install --clean"
 
     update_repo2 do
       build_gem "foo", "1.0.1"
@@ -380,14 +394,15 @@ describe "bundle clean" do
     should_not_have_gems "foo-1.0"
   end
 
-  it "does not clean automatically on --path" do
+  it "does not clean automatically on bundle config path" do
     gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "thin"
       gem "rack"
     G
-    bundle "install --path vendor/bundle"
+    bundle "config path vendor/bundle"
+    bundle "install"
 
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -399,7 +414,7 @@ describe "bundle clean" do
     should_have_gems "rack-1.0.0", "thin-1.0"
   end
 
-  it "does not clean on bundle update with --path" do
+  it "does not clean on bundle update with bundle config path" do
     build_repo2
 
     gemfile <<-G
@@ -407,7 +422,8 @@ describe "bundle clean" do
 
       gem "foo"
     G
-    bundle "install --path vendor/bundle"
+    bundle "config path vendor/bundle"
+    bundle "install"
 
     update_repo2 do
       build_gem "foo", "1.0.1"
@@ -469,7 +485,8 @@ describe "bundle clean" do
       gem "foo", :git => "#{lib_path("foo-1.0")}"
     G
 
-    bundle "install --path vendor/bundle"
+    bundle "config path vendor/bundle"
+    bundle "install"
 
     # mimic 7 length git revisions in Gemfile.lock
     gemfile_lock = File.read(bundled_app("gems.locked")).split("\n")
@@ -480,7 +497,8 @@ describe "bundle clean" do
       file.print gemfile_lock.join("\n")
     end
 
-    bundle "install --path vendor/bundle"
+    bundle "config path vendor/bundle"
+    bundle "install"
 
     bundle :clean
 
@@ -528,7 +546,8 @@ describe "bundle clean" do
       gem "bar", "1.0", :path => "#{relative_path}"
     G
 
-    bundle "install --path vendor/bundle"
+    bundle "config path vendor/bundle"
+    bundle "install"
     bundle :clean
 
     expect(exitstatus).to eq(0) if exitstatus
@@ -542,7 +561,8 @@ describe "bundle clean" do
       gem "foo"
     G
 
-    bundle "install --path vendor/bundle --no-clean"
+    bundle "config path vendor/bundle"
+    bundle "install --no-clean"
 
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -570,7 +590,8 @@ describe "bundle clean" do
       gem "foo"
     G
 
-    bundle "install --path vendor/bundle --no-clean"
+    bundle "config path vendor/bundle"
+    bundle "install --no-clean"
     bundle "config dry_run false"
 
     gemfile <<-G
@@ -600,7 +621,8 @@ describe "bundle clean" do
       gem "foo"
     G
 
-    bundle "install --path vendor/bundle --no-clean"
+    bundle "config path vendor/bundle"
+    bundle "install --no-clean"
 
     gemfile <<-G
       source "file://#{gem_repo1}"

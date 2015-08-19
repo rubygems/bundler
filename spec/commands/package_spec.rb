@@ -15,17 +15,18 @@ describe "bundle package" do
     end
   end
 
-  context "with --path" do
+  context "with config path" do
     it "sets root directory for gems" do
       gemfile <<-D
         source "file://#{gem_repo1}"
         gem 'rack'
       D
 
-      bundle "package --path=#{bundled_app("test")}"
+      bundle "config path #{bundled_app("test")}"
+      bundle "package"
 
       should_be_installed "rack 1.0.0"
-      expect(bundled_app("test/vendor/cache/")).to exist
+      expect(bundled_app("test")).to exist
     end
   end
 
