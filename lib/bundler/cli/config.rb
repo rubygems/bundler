@@ -153,9 +153,14 @@ module Bundler
 
       if (name == "with") && ((Bundler.settings.without(:local).include?(group) && scope == "local") || (Bundler.settings.without(:global).include?(group) && scope == "global"))
 
-        # TODO: include the scopes of the old setting in the messages below
+        if Bundler.settings.without(:local).include?(group) && scope == "local"
+          without_scope = "locally"
+        else
+          without_scope = "globally"
+        end
+
         Bundler.ui.info "`with` and `without` settings cannot share groups. "\
-         "You have already set `without #{new_value}`, so it will be unset."
+         "You have already set `without #{new_value}` #{without_scope}, so it will be unset."
         difference = Bundler.settings.without - [group]
 
         if difference == []
@@ -167,8 +172,14 @@ module Bundler
         :conflict
       elsif (name == "without") && ((Bundler.settings.with(:local).include?(group) && scope == "local") || (Bundler.settings.with(:global).include?(group) && scope == "global"))
 
+        if Bundler.settings.with(:local).include?(group) && scope == "local"
+          with_scope = "locally"
+        else
+          with_scope = "globally"
+        end
+
         Bundler.ui.info "`with` and `without` settings cannot share groups. "\
-         "You have already set `with #{new_value}`, so it will be unset."
+         "You have already set `with #{new_value}` #{with_scope}, so it will be unset."
         Bundler.settings.with = Bundler.settings.with - [group]
         difference = Bundler.settings.with - [group]
 
@@ -197,5 +208,21 @@ module Bundler
       Bundler.settings.set_local(name, nil) unless scope == "global"
       Bundler.settings.set_global(name, nil) unless scope == "local"
     end
+
+    # def with_conflict?(group, scope)
+    #   if scope == :local
+    #     Bundler.settings.with(:local).include?(group) && scope == "local"
+    #   elsif scope == :global
+    #     Bundler.settings.with(:global).include?(group) && scope == "global"
+    #   end
+    # end
+
+    # def without_conflict?(group, scope)
+    #   if scope == :local
+    #     Bundler.settings.without(:local).include?(group) && scope == "local"
+    #   elsif scope == :global
+    #     Bundler.settings.without(:global).include?(group) && scope == "global"
+    #   end
+    # end
   end
 end

@@ -376,7 +376,7 @@ describe "setting `with` and `without` options" do
         bundle "config with foo"
         bundle "config without foo"
 
-        expect(out).to include("already set `with foo`, so it will be unset.")
+        expect(out).to include("already set `with foo` globally, so it will be unset.")
         expect(Bundler.settings.with).to eq([])
       end
     end
@@ -387,7 +387,7 @@ describe "setting `with` and `without` options" do
       it "prints a message" do
         bundle "config without foo"
         bundle "config with foo"
-        expect(out).to include("already set `without foo`, so it will be unset.")
+        expect(out).to include("already set `without foo` globally, so it will be unset.")
 
         expect(Bundler.settings.without).to eq([])
       end
@@ -402,7 +402,7 @@ describe "setting `with` and `without` options" do
         it "prints a message" do
           bundle "config --local without foo"
 
-          # expect(out).to include("already set `with foo --local`, so it will be unset.")
+          expect(out).to include("already set `with foo` locally, so it will be unset.")
           expect(Bundler.settings.with).to eq([])
         end
       end
@@ -411,7 +411,7 @@ describe "setting `with` and `without` options" do
         it "does not print a message" do
           bundle "config --global without foo"
 
-          # expect(out).not_to include("already set `with foo --local`, so it will be unset.")
+          expect(out).not_to include("already set `with foo` locally, so it will be unset.")
           expect(Bundler.settings.with).not_to eq([])
         end
       end
@@ -424,7 +424,7 @@ describe "setting `with` and `without` options" do
         it "does not print a message" do
           bundle "config --local without foo"
 
-          # expect(out).not_to include("already set `with foo --global`, so it will be unset.")
+          expect(out).not_to include("already set `with foo` globally, so it will be unset.")
           expect(Bundler.settings.with).not_to eq([])
         end
       end
@@ -433,7 +433,7 @@ describe "setting `with` and `without` options" do
         it "prints a message" do
           bundle "config without foo --global"
 
-          # expect(out).to include("already set `with foo --global`, so it will be unset.")
+          expect(out).to include("already set `with foo` globally, so it will be unset.")
           expect(Bundler.settings.with).to eq([])
         end
       end
@@ -446,7 +446,7 @@ describe "setting `with` and `without` options" do
         it "prints a message" do
           bundle "config --local with foo"
 
-          # expect(out).to include("already set `without foo --local`, so it will be unset.")
+          expect(out).to include("already set `without foo` locally, so it will be unset.")
           expect(Bundler.settings.without).to eq([])
         end
       end
@@ -455,7 +455,7 @@ describe "setting `with` and `without` options" do
         it "does not print a message" do
           bundle "config --global with foo"
 
-          # expect(out).not_to include("already set `without foo --local`, so it will be unset.")
+          expect(out).not_to include("already set `without foo` locally, so it will be unset.")
           expect(Bundler.settings.without).not_to eq([])
         end
       end
@@ -468,7 +468,7 @@ describe "setting `with` and `without` options" do
         it "does not print a message" do
           bundle "config --local with foo"
 
-          # expect(out).not_to include("already set `without foo --global`, so it will be unset.")
+          expect(out).not_to include("already set `without foo` globally, so it will be unset.")
           expect(Bundler.settings.without).not_to eq([])
         end
       end
@@ -477,7 +477,7 @@ describe "setting `with` and `without` options" do
         it "prints a message" do
           bundle "config --global with foo"
 
-          # expect(out).to include("already set `without foo --global`, so it will be unset.")
+          expect(out).to include("already set `without foo` globally, so it will be unset.")
           expect(Bundler.settings.without).to eq([])
         end
       end
