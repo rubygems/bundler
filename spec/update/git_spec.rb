@@ -286,7 +286,7 @@ describe "bundle update" do
 
         install_gemfile <<-G
           source "file://#{gem_repo2}"
-          git "#{lib_path('bar')}" do
+          git "#{lib_path("bar")}" do
             gem 'foo'
           end
           gem 'rack'
@@ -301,7 +301,7 @@ describe "bundle update" do
           s.write "foo.gemspec", spec_lines.join("\n")
         end
 
-        ref = @git.ref_for 'master'
+        ref = @git.ref_for "master"
 
         bundle "update --source bar"
 

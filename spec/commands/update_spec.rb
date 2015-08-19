@@ -105,7 +105,7 @@ describe "bundle update" do
         install_gemfile <<-G
           source "file://#{gem_repo2}"
           gem "activesupport", :group => :development
-          gem "foo", :git => "#{lib_path('activesupport')}"
+          gem "foo", :git => "#{lib_path("activesupport")}"
         G
       end
 
@@ -160,7 +160,7 @@ describe "bundle update" do
     before do
       build_repo2 do
         build_gem "fred", "1.0"
-        build_gem "harry" , "1.0" do |s|
+        build_gem "harry", "1.0" do |s|
           s.add_dependency "fred"
         end
       end
@@ -193,7 +193,7 @@ describe "bundle update" do
           s.add_dependency "george"
         end
         build_gem "george", "1.0"
-        build_gem "harry" , "1.0" do |s|
+        build_gem "harry", "1.0" do |s|
           s.add_dependency "george"
         end
       end
