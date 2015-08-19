@@ -19,7 +19,7 @@ class CompactIndexAPI < Endpoint
         status 304
         return ""
       else
-        content_type 'text/plain'
+        content_type "text/plain"
         ranges = Rack::Utils.byte_ranges(env, body.bytesize)
         return body unless ranges
         status 206
@@ -64,10 +64,10 @@ class CompactIndexAPI < Endpoint
 
   get "/versions" do
     etag_response do
-      file = tmp('versions.list')
+      file = tmp("versions.list")
       file.delete if file.file?
       file = CompactIndex::VersionsFile.new(file.to_path)
-      versions = gems.group_by { |s| s[:name] }
+      versions = gems.group_by {|s| s[:name] }
       file.update_with(versions)
       CompactIndex.versions(file, [])
     end
@@ -75,7 +75,7 @@ class CompactIndexAPI < Endpoint
 
   get "/info/:name" do
     etag_response do
-      specs = gems.select { |s| s[:name] == params[:name] }
+      specs = gems.select {|s| s[:name] == params[:name] }
       CompactIndex.info(specs)
     end
   end

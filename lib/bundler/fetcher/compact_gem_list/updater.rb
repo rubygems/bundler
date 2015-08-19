@@ -17,18 +17,18 @@ module Bundler
         Digest::MD5.file(path).hexdigest
       end
 
-      private
+    private
 
       def _update(path, remote_path)
         headers = {}
         if path.file?
-          headers['If-None-Match'] = checksum_for_file(path)
-          headers['Range'] = "bytes=#{path.size}-"
+          headers["If-None-Match"] = checksum_for_file(path)
+          headers["Range"] = "bytes=#{path.size}-"
         end
         response = fetcher.downloader.fetch(fetcher.fetch_uri + remote_path, headers)
         return if Net::HTTPNotModified === response
         mode = Net::HTTPPartialContent === response ? "a" : "w"
-        path.open(mode) { |f| f << response.body }
+        path.open(mode) {|f| f << response.body }
         if checksum_for_file(path) != response["ETag"]
           path.delete
           _update(path, remote_path)
