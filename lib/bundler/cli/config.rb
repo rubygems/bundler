@@ -151,8 +151,7 @@ module Bundler
       # $stderr.puts "[config.rb] Bundler.settings.with(:local) is #{Bundler.settings.with(:local)}"
       # $stderr.puts "[config.rb] Bundler.settings.with is #{Bundler.settings.with}"
 
-      # BACK FROM BREAK: edit this to do the proper with/without group check
-      if (name == "with") && (Bundler.settings.without.include? group)
+      if (name == "with") && ((Bundler.settings.without(:local).include?(group) && scope == "local") || (Bundler.settings.without(:global).include?(group) && scope == "global"))
 
         # TODO: include the scopes of the old setting in the messages below
         Bundler.ui.info "`with` and `without` settings cannot share groups. "\
@@ -166,7 +165,7 @@ module Bundler
         end
 
         :conflict
-      elsif (name == "without") && (Bundler.settings.with.include? group)
+      elsif (name == "without") && ((Bundler.settings.with(:local).include?(group) && scope == "local") || (Bundler.settings.with(:global).include?(group) && scope == "global"))
 
         Bundler.ui.info "`with` and `without` settings cannot share groups. "\
          "You have already set `with #{new_value}`, so it will be unset."

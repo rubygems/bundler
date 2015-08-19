@@ -400,7 +400,7 @@ describe "setting `with` and `without` options" do
 
       context "and `without` is set locally to conflict" do
         it "prints a message" do
-          bundle "config without foo --local"
+          bundle "config --local without foo"
 
           # expect(out).to include("already set `with foo --local`, so it will be unset.")
           expect(Bundler.settings.with).to eq([])
@@ -418,11 +418,11 @@ describe "setting `with` and `without` options" do
     end
 
     context "when `with` has been set globally" do
-      before(:each) { bundle "config with foo --global" }
+      before(:each) { bundle "config --global with foo" }
 
       context "and `without` is set locally to conflict" do
         it "does not print a message" do
-          bundle "config without foo --local"
+          bundle "config --local without foo"
 
           # expect(out).not_to include("already set `with foo --global`, so it will be unset.")
           expect(Bundler.settings.with).not_to eq([])
@@ -440,11 +440,11 @@ describe "setting `with` and `without` options" do
     end
 
     context "when `without` has been set locally" do
-      before(:each) { bundle "config without foo --local" }
+      before(:each) { bundle "config --local without foo" }
 
       context "and `with` is set locally to conflict" do
         it "prints a message" do
-          bundle "config with foo --local"
+          bundle "config --local with foo"
 
           # expect(out).to include("already set `without foo --local`, so it will be unset.")
           expect(Bundler.settings.without).to eq([])
@@ -453,7 +453,7 @@ describe "setting `with` and `without` options" do
 
       context "and `with` is set globally to conflict" do
         it "does not print a message" do
-          bundle "config with foo --global"
+          bundle "config --global with foo"
 
           # expect(out).not_to include("already set `without foo --local`, so it will be unset.")
           expect(Bundler.settings.without).not_to eq([])
@@ -462,11 +462,11 @@ describe "setting `with` and `without` options" do
     end
 
     context "when `without` has been set globally" do
-      before(:each) { bundle "config without foo --global" }
+      before(:each) { bundle "config --global without foo" }
 
       context "and `with` is set locally to conflict" do
         it "does not print a message" do
-          bundle "config with foo --local"
+          bundle "config --local with foo"
 
           # expect(out).not_to include("already set `without foo --global`, so it will be unset.")
           expect(Bundler.settings.without).not_to eq([])
@@ -475,7 +475,7 @@ describe "setting `with` and `without` options" do
 
       context "and `with` is set globally to conflict" do
         it "prints a message" do
-          bundle "config with foo --global"
+          bundle "config --global with foo"
 
           # expect(out).to include("already set `without foo --global`, so it will be unset.")
           expect(Bundler.settings.without).to eq([])
