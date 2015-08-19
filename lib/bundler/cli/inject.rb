@@ -22,10 +22,10 @@ module Bundler
       added = Injector.inject(deps)
 
       if added.any?
-        Bundler.ui.confirm "Added to Gemfile:"
+        Bundler.ui.confirm "Added to #{SharedHelpers.gemfile_name}:"
         Bundler.ui.confirm added.map {|g| "  #{g}" }.join("\n")
       else
-        Bundler.ui.confirm "All injected gems were already present in the Gemfile"
+        Bundler.ui.confirm "All injected gems were already present in #{SharedHelpers.gemfile_name}"
       end
     end
   end

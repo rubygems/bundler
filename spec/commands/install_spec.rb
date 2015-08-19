@@ -17,19 +17,19 @@ describe "bundle install with gem sources" do
       G
 
       expect(err).to match(/StandardError, "FAIL"/)
-      expect(bundled_app("Gemfile.lock")).not_to exist
+      expect(bundled_app("gems.locked")).not_to exist
     end
 
-    it "creates a Gemfile.lock" do
+    it "creates a gems.locked" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
       G
 
-      expect(bundled_app("Gemfile.lock")).to exist
+      expect(bundled_app("gems.locked")).to exist
     end
 
-    it "creates lock files based on the Gemfile name" do
+    it "creates lock files based on the gems.rb name" do
       gemfile bundled_app("OmgFile"), <<-G
         source "file://#{gem_repo1}"
         gem "rack", "1.0"
@@ -46,13 +46,13 @@ describe "bundle install with gem sources" do
         gem 'rack'
       G
 
-      lockfile = File.read(bundled_app("Gemfile.lock"))
+      lockfile = File.read(bundled_app("gems.locked"))
 
       install_gemfile <<-G, :expect_err => true
         raise StandardError, "FAIL"
       G
 
-      expect(File.read(bundled_app("Gemfile.lock"))).to eq(lockfile)
+      expect(File.read(bundled_app("gems.locked"))).to eq(lockfile)
     end
 
     it "does not touch the lockfile if nothing changed" do
@@ -61,7 +61,7 @@ describe "bundle install with gem sources" do
         gem "rack"
       G
 
-      expect { run "1" }.not_to change { File.mtime(bundled_app("Gemfile.lock")) }
+      expect { run "1" }.not_to change { File.mtime(bundled_app("gems.locked")) }
     end
 
     it "fetches gems" do
@@ -291,14 +291,14 @@ describe "bundle install with gem sources" do
       G
 
       bundle :install, :expect_err => true
-      expect(out).to include("Your Gemfile has no gem server sources")
+      expect(out).to include("Your gems.rb has no gem server sources")
     end
 
-    it "creates a Gemfile.lock on a blank Gemfile" do
+    it "creates a gems.locked on a blank gems.rb" do
       install_gemfile <<-G
       G
 
-      expect(File.exist?(bundled_app("Gemfile.lock"))).to eq(true)
+      expect(File.exist?(bundled_app("gems.locked"))).to eq(true)
     end
 
     it "gracefully handles error when rubygems server is unavailable" do
@@ -352,7 +352,7 @@ describe "bundle install with gem sources" do
       gemfile = <<-G
         gem 'foo', :path => "#{lib_path("foo-1.0")}"
       G
-      File.open("Gemfile", "w") do |file|
+      File.open("gems.rb", "w") do |file|
         file.puts gemfile
       end
 
@@ -370,8 +370,8 @@ describe "bundle install with gem sources" do
 
       bundle :install, :quiet => true
       expect(err).to include("Could not find gem 'rack'")
-      expect(out).to_not include("Your Gemfile has no gem server sources")
-      expect(err).to_not include("Your Gemfile has no gem server sources")
+      expect(out).to_not include("Your gems.rb has no gem server sources")
+      expect(err).to_not include("Your gems.rb has no gem server sources")
     end
   end
 

@@ -21,7 +21,7 @@ describe "bundle update" do
       should_be_installed "rack 1.2", "rack-obama 1.0", "activesupport 3.0"
     end
 
-    it "doesn't delete the Gemfile.lock file if something goes wrong" do
+    it "doesn't delete the gems.locked file if something goes wrong" do
       gemfile <<-G
         source "file://#{gem_repo2}"
         gem "activesupport"
@@ -29,7 +29,7 @@ describe "bundle update" do
         exit!
       G
       bundle "update"
-      expect(bundled_app("Gemfile.lock")).to exist
+      expect(bundled_app("gems.locked")).to exist
     end
   end
 
@@ -105,7 +105,7 @@ describe "bundle update" do
       bundle "install --deployment"
       bundle "update", :expect_err => true
 
-      expect(err).to match(/You are trying to install in deployment mode after changing.your Gemfile/m)
+      expect(err).to match(/You are trying to install in deployment mode after changing.your gems.rb/m)
       expect(exitstatus).not_to eq(0) if exitstatus
     end
   end
@@ -135,7 +135,7 @@ describe "bundle update in more complicated situations" do
   end
 end
 
-describe "bundle update without a Gemfile.lock" do
+describe "bundle update without a gems.locked" do
   it "should not explode" do
     build_repo2
 
@@ -193,7 +193,7 @@ describe "bundle update" do
     expect(out).to include("Installing activesupport 3.0 (was 2.3.5)")
   end
 
-  it "shows error message when Gemfile.lock is not preset and gem is specified" do
+  it "shows error message when gems.locked is not preset and gem is specified" do
     install_gemfile <<-G
       source "file://#{gem_repo2}"
       gem "activesupport"

@@ -31,7 +31,7 @@ By default, if you simply run [bundle install(1)][bundle-install] after running
 to check whether a platform-specific gem exists for any of the gems
 in `vendor/cache`.
 
-For instance, consider this Gemfile(5):
+For instance, consider this gems.rb(5):
 
     source "https://rubygems.org"
 

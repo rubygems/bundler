@@ -123,7 +123,7 @@ describe "bundle exec" do
     G
 
     Dir.chdir bundled_app2 do
-      install_gemfile bundled_app2("Gemfile"), <<-G, :system => true
+      install_gemfile bundled_app2("gems.rb"), <<-G, :system => true
         source "file://#{gem_repo2}"
         gem "rack_two", "1.0.0"
       G

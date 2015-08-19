@@ -163,7 +163,7 @@ module Bundler
       Bundler::Environment.new(root, definition)
     end
 
-    # Returns an instance of Bundler::Definition for given Gemfile and lockfile
+    # Returns an instance of Bundler::Definition for given gems.rb and lockfile
     #
     # @param unlock [Hash, Boolean, nil] Gems that have been requested
     #   to be updated or true if all gems should be updated
@@ -216,7 +216,7 @@ module Bundler
                   default_gemfile.dirname.expand_path
                 rescue GemfileNotFound
                   bundle_dir = default_bundle_dir
-                  raise GemfileNotFound, "Could not locate Gemfile or .bundle/ directory" unless bundle_dir
+                  raise GemfileNotFound, "Could not locate #{SharedHelpers.gemfile_name} or .bundle/ directory" unless bundle_dir
                   Pathname.new(File.expand_path("..", bundle_dir))
                 end
     end

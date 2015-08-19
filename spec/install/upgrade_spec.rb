@@ -11,9 +11,9 @@ describe "bundle install for the first time with v1.0" do
   end
 
   it "removes lockfiles in 0.9 YAML format" do
-    File.open("Gemfile.lock", "w") {|f| YAML.dump({}, f) }
+    File.open("gems.locked", "w") {|f| YAML.dump({}, f) }
     bundle :install
-    expect(File.read("Gemfile.lock")).not_to match(/^---/)
+    expect(File.read("gems.locked")).not_to match(/^---/)
   end
 
   it "removes env.rb if it exists" do

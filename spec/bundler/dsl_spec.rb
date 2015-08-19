@@ -66,20 +66,20 @@ describe Bundler::Dsl do
 
   describe "#method_missing" do
     it "raises an error for unknown DSL methods" do
-      expect(Bundler).to receive(:read_file).with("Gemfile").
+      expect(Bundler).to receive(:read_file).with("gems.rb").
         and_return("unknown")
 
-      error_msg = "There was an error parsing `Gemfile`: Undefined local variable or method `unknown' for Gemfile. Bundler cannot continue."
-      expect { subject.eval_gemfile("Gemfile") }.
+      error_msg = "There was an error parsing `gems.rb`: Undefined local variable or method `unknown' for gems.rb. Bundler cannot continue."
+      expect { subject.eval_gemfile("gems.rb") }.
         to raise_error(Bundler::GemfileError, Regexp.new(error_msg))
     end
   end
 
   describe "#eval_gemfile" do
     it "handles syntax errors with a useful message" do
-      expect(Bundler).to receive(:read_file).with("Gemfile").and_return("}")
-      expect { subject.eval_gemfile("Gemfile") }.
-        to raise_error(Bundler::GemfileError, /There was an error parsing `Gemfile`: (syntax error, unexpected tSTRING_DEND|(compile error - )?syntax error, unexpected '}'). Bundler cannot continue./)
+      expect(Bundler).to receive(:read_file).with("gems.rb").and_return("}")
+      expect { subject.eval_gemfile("gems.rb") }.
+        to raise_error(Bundler::GemfileError, /There was an error parsing `gems.rb`: (syntax error, unexpected tSTRING_DEND|(compile error - )?syntax error, unexpected '}'). Bundler cannot continue./)
     end
   end
 
@@ -175,16 +175,16 @@ describe Bundler::Dsl do
   describe "syntax errors" do
     it "will raise a Bundler::GemfileError" do
       gemfile "gem 'foo', :path => /unquoted/string/syntax/error"
-      expect { Bundler::Dsl.evaluate(bundled_app("Gemfile"), nil, true) }.
-        to raise_error(Bundler::GemfileError, /There was an error parsing `Gemfile`:( compile error -)? unknown regexp options - trg. Bundler cannot continue./)
+      expect { Bundler::Dsl.evaluate(bundled_app("gems.rb"), nil, true) }.
+        to raise_error(Bundler::GemfileError, /There was an error parsing `gems.rb`:( compile error -)? unknown regexp options - trg. Bundler cannot continue./)
     end
   end
 
   describe "Runtime errors", :unless => Bundler.current_ruby.on_18? do
     it "will raise a Bundler::GemfileError" do
       gemfile "s = 'foo'.freeze; s.strip!"
-      expect { Bundler::Dsl.evaluate(bundled_app("Gemfile"), nil, true) }.
-        to raise_error(Bundler::GemfileError, /There was an error parsing `Gemfile`: can't modify frozen String. Bundler cannot continue./i)
+      expect { Bundler::Dsl.evaluate(bundled_app("gems.rb"), nil, true) }.
+        to raise_error(Bundler::GemfileError, /There was an error parsing `gems.rb`: can't modify frozen String. Bundler cannot continue./i)
     end
   end
 end

@@ -1086,7 +1086,7 @@ describe "the lockfile format" do
       gem "rack", "1.1"
     G
 
-    expect(bundled_app("Gemfile.lock")).not_to exist
+    expect(bundled_app("gems.locked")).not_to exist
     expect(err).to include "rack (= 1.0) and rack (= 1.1)"
   end
 
@@ -1097,7 +1097,7 @@ describe "the lockfile format" do
       gem "rack", :git => "git://hubz.com"
     G
 
-    expect(bundled_app("Gemfile.lock")).not_to exist
+    expect(bundled_app("gems.locked")).not_to exist
     expect(err).to include "rack (>= 0) should come from an unspecified source and git://hubz.com (at master)"
   end
 
@@ -1142,7 +1142,7 @@ describe "the lockfile format" do
     bundle "install --path vendor"
     should_be_installed "omg 1.0"
 
-    # Create a Gemfile.lock that has duplicate GIT sections
+    # Create a gems.locked that has duplicate GIT sections
     lockfile <<-L
       GIT
         remote: #{lib_path("omg")}
@@ -1177,7 +1177,7 @@ describe "the lockfile format" do
     should_be_installed "omg 1.0"
 
     # Confirm that duplicate specs do not appear
-    expect(File.read(bundled_app("Gemfile.lock"))).to eq(strip_whitespace(<<-L))
+    expect(File.read(bundled_app("gems.locked"))).to eq(strip_whitespace(<<-L))
       GIT
         remote: #{lib_path("omg")}
         revision: #{revision}
@@ -1203,7 +1203,7 @@ describe "the lockfile format" do
   describe "a line ending" do
     def set_lockfile_mtime_to_known_value
       time = Time.local(2000, 1, 1, 0, 0, 0)
-      File.utime(time, time, bundled_app("Gemfile.lock"))
+      File.utime(time, time, bundled_app("gems.locked"))
     end
     before(:each) do
       build_repo2
@@ -1215,46 +1215,48 @@ describe "the lockfile format" do
       set_lockfile_mtime_to_known_value
     end
 
-    it "generates Gemfile.lock with \\n line endings" do
-      expect(File.read(bundled_app("Gemfile.lock"))).not_to match("\r\n")
+    it "generates gems.locked with \\n line endings" do
+      expect(File.read(bundled_app("gems.locked"))).not_to match("\r\n")
       should_be_installed "rack 1.0"
     end
 
     context "during updates" do
-      it "preserves Gemfile.lock \\n line endings" do
+      it "preserves gems.locked \\n line endings" do
         update_repo2
 
-        expect { bundle "update" }.to change { File.mtime(bundled_app("Gemfile.lock")) }
-        expect(File.read(bundled_app("Gemfile.lock"))).not_to match("\r\n")
+        expect { bundle "update" }.to change { File.mtime(bundled_app("gems.locked")) }
+        expect(File.read(bundled_app("gems.locked"))).not_to match("\r\n")
+
         should_be_installed "rack 1.2"
       end
 
-      it "preserves Gemfile.lock \\n\\r line endings" do
+      it "preserves gems.locked \\n\\r line endings" do
         update_repo2
-        win_lock = File.read(bundled_app("Gemfile.lock")).gsub(/\n/, "\r\n")
-        File.open(bundled_app("Gemfile.lock"), "wb") {|f| f.puts(win_lock) }
+        win_lock = File.read(bundled_app("gems.locked")).gsub(/\n/, "\r\n")
+        File.open(bundled_app("gems.locked"), "wb") {|f| f.puts(win_lock) }
         set_lockfile_mtime_to_known_value
 
-        expect { bundle "update" }.to change { File.mtime(bundled_app("Gemfile.lock")) }
-        expect(File.read(bundled_app("Gemfile.lock"))).to match("\r\n")
+        expect { bundle "update" }.to change { File.mtime(bundled_app("gems.locked")) }
+        expect(File.read(bundled_app("gems.locked"))).to match("\r\n")
+
         should_be_installed "rack 1.2"
       end
     end
 
     context "when nothing changes" do
-      it "preserves Gemfile.lock \\n line endings" do
+      it "preserves gems.locked \\n line endings" do
         expect {
           ruby <<-RUBY
                    require 'rubygems'
                    require 'bundler'
                    Bundler.setup
                  RUBY
-        }.not_to change { File.mtime(bundled_app("Gemfile.lock")) }
+        }.not_to change { File.mtime(bundled_app("gems.locked")) }
       end
 
-      it "preserves Gemfile.lock \\n\\r line endings" do
-        win_lock = File.read(bundled_app("Gemfile.lock")).gsub(/\n/, "\r\n")
-        File.open(bundled_app("Gemfile.lock"), "wb") {|f| f.puts(win_lock) }
+      it "preserves gems.locked \\n\\r line endings" do
+        win_lock = File.read(bundled_app("gems.locked")).gsub(/\n/, "\r\n")
+        File.open(bundled_app("gems.locked"), "wb") {|f| f.puts(win_lock) }
         set_lockfile_mtime_to_known_value
 
         expect {
@@ -1263,12 +1265,12 @@ describe "the lockfile format" do
                    require 'bundler'
                    Bundler.setup
                  RUBY
-        }.not_to change { File.mtime(bundled_app("Gemfile.lock")) }
+        }.not_to change { File.mtime(bundled_app("gems.locked")) }
       end
     end
   end
 
-  it "refuses to install if Gemfile.lock contains conflict markers" do
+  it "refuses to install if gems.locked contains conflict markers" do
     lockfile <<-L
       GEM
         remote: file://#{gem_repo1}/
@@ -1294,7 +1296,7 @@ describe "the lockfile format" do
       gem "rack"
     G
 
-    expect(err).to match(/your Gemfile.lock contains merge conflicts/i)
-    expect(err).to match(/git checkout HEAD -- Gemfile.lock/i)
+    expect(err).to match(/your gems.locked contains merge conflicts/i)
+    expect(err).to match(/git checkout HEAD -- gems.locked/i)
   end
 end

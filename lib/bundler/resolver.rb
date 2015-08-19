@@ -11,7 +11,7 @@ module Bundler
             o << %(    #{DepProxy.new(conflict.locked_requirement, Gem::Platform::RUBY)}\n)
             o << %(\n)
           end
-          o << %(  In Gemfile:\n)
+          o << %(  In gems.rb:\n)
           o << conflict.requirement_trees.sort_by {|t| t.reverse.map(&:name) }.map do |tree|
             t = ""
             depth = 2
@@ -36,13 +36,13 @@ module Bundler
 
           if name == "bundler" && other_bundler_required
             o << "\n"
-            o << "This Gemfile requires a different version of Bundler.\n"
+            o << "This #{SharedHelpers.gemfile_name} requires a different version of Bundler.\n"
             o << "Perhaps you need to update Bundler by running `gem install bundler`?\n"
           end
           if conflict.locked_requirement
             o << "\n"
             o << %(Running `bundle update` will rebuild your snapshot from scratch, using only\n)
-            o << %(the gems in your Gemfile, which may resolve the conflict.\n)
+            o << %(the gems in your #{SharedHelpers.gemfile_name}, which may resolve the conflict.\n)
           elsif !conflict.existing
             o << "\n"
             if conflict.requirement_trees.first.size > 1
@@ -196,7 +196,7 @@ module Bundler
       raise VersionConflict.new(e.conflicts.keys.uniq, e.message)
     rescue Molinillo::CircularDependencyError => e
       names = e.dependencies.sort_by(&:name).map {|d| "gem '#{d.name}'" }
-      raise CyclicDependencyError, "Your bundle requires gems that depend" \
+      raise CyclicDependencyError, "Your gems.rb requires gems that depend" \
         " on each other, creating an infinite loop. Please remove" \
         " #{names.count > 1 ? "either " : "" }#{names.join(" or ")}" \
         " and try again."
@@ -273,11 +273,11 @@ module Bundler
     end
 
     def name_for_explicit_dependency_source
-      Bundler.default_gemfile.basename.to_s rescue "Gemfile"
+      Bundler.default_gemfile.basename.to_s rescue "gems.rb"
     end
 
     def name_for_locking_dependency_source
-      Bundler.default_lockfile.basename.to_s rescue "Gemfile.lock"
+      Bundler.default_lockfile.basename.to_s rescue "gems.locked"
     end
 
     def requirement_satisfied_by?(requirement, activated, spec)
@@ -336,7 +336,7 @@ module Bundler
             end
           else
             message = "Could not find gem '#{requirement}' in any of the gem sources " \
-              "listed in your Gemfile or available on this machine."
+              "listed in your gems.rb or available on this machine."
           end
           raise GemNotFound, message
         end

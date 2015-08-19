@@ -8,7 +8,7 @@ module Bundler
 
     def run
       unless Bundler.default_gemfile
-        Bundler.ui.error "Unable to find a Gemfile to lock"
+        Bundler.ui.error "Unable to find a #{SharedHelpers.gemfile_name} to lock"
         exit 1
       end
 

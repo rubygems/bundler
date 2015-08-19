@@ -11,27 +11,27 @@ module Bundler
 
     def inject(gemfile_path, lockfile_path)
       if Bundler.settings[:frozen]
-        # ensure the lock and Gemfile are synced
+        # ensure the lock and gems.rb are synced
         Bundler.definition.ensure_equivalent_gemfile_and_lockfile(true)
         # temporarily remove frozen while we inject
         frozen = Bundler.settings.delete(:frozen)
       end
 
-      # evaluate the Gemfile we have now
+      # evaluate the gems.rb we have now
       builder = Dsl.new
       builder.eval_gemfile(gemfile_path)
 
-      # don't inject any gems that are already in the Gemfile
+      # don't inject any gems that are already in the gems.rb
       @new_deps -= builder.dependencies
 
-      # add new deps to the end of the in-memory Gemfile
+      # add new deps to the end of the in-memory gems.rb
       builder.eval_gemfile("injected gems", new_gem_lines) if @new_deps.any?
 
       # resolve to see if the new deps broke anything
       definition = builder.to_definition(lockfile_path, {})
       definition.resolve_remotely!
 
-      # since nothing broke, we can add those gems to the gemfile
+      # since nothing broke, we can add those gems to the gems.rb
       append_to(gemfile_path) if @new_deps.any?
 
       # since we resolved successfully, write out the lockfile

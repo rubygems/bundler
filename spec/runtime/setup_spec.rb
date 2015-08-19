@@ -107,7 +107,7 @@ describe "Bundler.setup" do
     end
   end
 
-  it "raises if the Gemfile was not yet installed" do
+  it "raises if the gems.rb was not yet installed" do
     gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack"
@@ -128,7 +128,7 @@ describe "Bundler.setup" do
     expect(out).to eq("WIN")
   end
 
-  it "doesn't create a Gemfile.lock if the setup fails" do
+  it "doesn't create a gems.locked if the setup fails" do
     gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack"
@@ -141,16 +141,16 @@ describe "Bundler.setup" do
       Bundler.setup
     R
 
-    expect(bundled_app("Gemfile.lock")).not_to exist
+    expect(bundled_app("gems.locked")).not_to exist
   end
 
-  it "doesn't change the Gemfile.lock if the setup fails" do
+  it "doesn't change the gems.locked if the setup fails" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack"
     G
 
-    lockfile = File.read(bundled_app("Gemfile.lock"))
+    lockfile = File.read(bundled_app("gems.locked"))
 
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -165,21 +165,21 @@ describe "Bundler.setup" do
       Bundler.setup
     R
 
-    expect(File.read(bundled_app("Gemfile.lock"))).to eq(lockfile)
+    expect(File.read(bundled_app("gems.locked"))).to eq(lockfile)
   end
 
-  it "makes a Gemfile.lock if setup succeeds" do
+  it "makes a gems.locked if setup succeeds" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack"
     G
 
-    File.read(bundled_app("Gemfile.lock"))
+    File.read(bundled_app("gems.locked"))
 
-    FileUtils.rm(bundled_app("Gemfile.lock"))
+    FileUtils.rm(bundled_app("gems.locked"))
 
     run "1"
-    expect(bundled_app("Gemfile.lock")).to exist
+    expect(bundled_app("gems.locked")).to exist
   end
 
   it "uses BUNDLE_GEMFILE to locate the gemfile if present" do
@@ -355,7 +355,7 @@ describe "Bundler.setup" do
     it "provides a good exception if the lockfile is unavailable" do
       bundle "install"
 
-      FileUtils.rm(bundled_app("Gemfile.lock"))
+      FileUtils.rm(bundled_app("gems.locked"))
 
       break_git!
 
@@ -439,7 +439,7 @@ describe "Bundler.setup" do
       G
 
       run "require 'rack'", :expect_err => true
-      expect(err).to match(/because :branch is not specified in Gemfile/)
+      expect(err).to match(/because :branch is not specified in gems.rb/)
     end
 
     it "explodes on different branches on runtime" do
@@ -462,7 +462,7 @@ describe "Bundler.setup" do
       G
 
       run "require 'rack'", :expect_err => true
-      expect(err).to match(/is using branch master but Gemfile specifies changed/)
+      expect(err).to match(/is using branch master but gems.rb specifies changed/)
     end
 
     it "explodes on refs with different branches on runtime" do
@@ -482,7 +482,7 @@ describe "Bundler.setup" do
 
       bundle %|config local.rack #{lib_path("local-rack")}|
       run "require 'rack'", :expect_err => true
-      expect(err).to match(/is using branch master but Gemfile specifies nonexistant/)
+      expect(err).to match(/is using branch master but gems.rb specifies nonexistant/)
     end
   end
 
@@ -562,7 +562,7 @@ describe "Bundler.setup" do
           end
         R
 
-        expect(out).to eq("You have already activated thin 1.1, but your Gemfile requires thin 1.0. Prepending `bundle exec` to your command may solve this.")
+        expect(out).to eq("You have already activated thin 1.1, but your gems.rb requires thin 1.0. Prepending `bundle exec` to your command may solve this.")
       end
 
       it "version_requirement is now deprecated in rubygems 1.4.0+" do
@@ -694,7 +694,7 @@ describe "Bundler.setup" do
   end
 
   describe "when a vendored gem specification uses the :path option" do
-    it "should resolve paths relative to the Gemfile" do
+    it "should resolve paths relative to the gems.rb" do
       path = bundled_app(File.join("vendor", "foo"))
       build_lib "foo", :path => path
 
@@ -707,14 +707,14 @@ describe "Bundler.setup" do
       G
 
       Dir.chdir(bundled_app.parent) do
-        run <<-R, :env => { "BUNDLE_GEMFILE" => bundled_app("Gemfile") }
+        run <<-R, :env => { "BUNDLE_GEMFILE" => bundled_app("gems.rb") }
           require 'foo'
         R
       end
       expect(err).to lack_errors
     end
 
-    it "should make sure the Bundler.root is really included in the path relative to the Gemfile" do
+    it "should make sure the Bundler.root is really included in the path relative to the gems.rb" do
       relative_path = File.join("vendor", Dir.pwd[1..-1], "foo")
       absolute_path = bundled_app(relative_path)
       FileUtils.mkdir_p(absolute_path)
@@ -731,7 +731,7 @@ describe "Bundler.setup" do
       bundle :install
 
       Dir.chdir(bundled_app.parent) do
-        run <<-R, :env => { "BUNDLE_GEMFILE" => bundled_app("Gemfile") }
+        run <<-R, :env => { "BUNDLE_GEMFILE" => bundled_app("gems.rb") }
           require 'foo'
         R
       end
@@ -803,7 +803,7 @@ describe "Bundler.setup" do
         end
       R
 
-      expect(out).to eq("rack is not part of the bundle. Add it to Gemfile.")
+      expect(out).to eq("rack is not part of the bundle. Add it to gems.rb.")
     end
 
     it "sets GEM_HOME appropriately" do

@@ -136,7 +136,7 @@ describe "bundle gem" do
 
     it "generates a gem skeleton" do
       expect(bundled_app("test_gem/test_gem.gemspec")).to exist
-      expect(bundled_app("test_gem/Gemfile")).to exist
+      expect(bundled_app("test_gem/gems.rb")).to exist
       expect(bundled_app("test_gem/Rakefile")).to exist
       expect(bundled_app("test_gem/lib/test_gem.rb")).to exist
       expect(bundled_app("test_gem/lib/test_gem/version.rb")).to exist
@@ -360,7 +360,7 @@ describe "bundle gem" do
     it "generates a gem skeleton with MIT license" do
       expect(bundled_app("test-gem/test-gem.gemspec")).to exist
       expect(bundled_app("test-gem/LICENSE.txt")).to exist
-      expect(bundled_app("test-gem/Gemfile")).to exist
+      expect(bundled_app("test-gem/gems.rb")).to exist
       expect(bundled_app("test-gem/Rakefile")).to exist
       expect(bundled_app("test-gem/lib/test/gem.rb")).to exist
       expect(bundled_app("test-gem/lib/test/gem/version.rb")).to exist
@@ -382,7 +382,7 @@ describe "bundle gem" do
     it "generates a gem skeleton with Code of Conduct" do
       expect(bundled_app("test-gem/test-gem.gemspec")).to exist
       expect(bundled_app("test-gem/CODE_OF_CONDUCT.md")).to exist
-      expect(bundled_app("test-gem/Gemfile")).to exist
+      expect(bundled_app("test-gem/gems.rb")).to exist
       expect(bundled_app("test-gem/Rakefile")).to exist
       expect(bundled_app("test-gem/lib/test/gem.rb")).to exist
       expect(bundled_app("test-gem/lib/test/gem/version.rb")).to exist
@@ -404,7 +404,7 @@ describe "bundle gem" do
     it "generates a gem skeleton" do
       expect(bundled_app("test-gem/test-gem.gemspec")).to exist
       # expect(bundled_app("test-gem/LICENSE.txt")).to exist
-      expect(bundled_app("test-gem/Gemfile")).to exist
+      expect(bundled_app("test-gem/gems.rb")).to exist
       expect(bundled_app("test-gem/Rakefile")).to exist
       expect(bundled_app("test-gem/lib/test/gem.rb")).to exist
       expect(bundled_app("test-gem/lib/test/gem/version.rb")).to exist

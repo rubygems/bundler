@@ -10,7 +10,7 @@ describe Bundler::Settings do
 
       it "raises a GemfileNotFound error with explanation" do
         expect { subject.set_local("foo", "bar") }.
-          to raise_error(Bundler::GemfileNotFound, "Could not locate Gemfile")
+          to raise_error(Bundler::GemfileNotFound, "Could not locate gems.rb")
       end
     end
   end

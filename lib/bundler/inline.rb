@@ -1,7 +1,7 @@
-# Allows for declaring a Gemfile inline in a ruby script, optionally installing
+# Allows for declaring a gems.rb inline in a ruby script, optionally installing
 # any gems that aren't already installed on the user's system.
 #
-# @note Every gem that is specified in this 'Gemfile' will be `require`d, as if
+# @note Every gem that is specified in this 'gems.rb' will be `require`d, as if
 #       the user had manually called `Bundler.require`. To avoid a requested gem
 #       being automatically required, add the `:require => false` option to the
 #       `gem` dependency declaration.
@@ -10,9 +10,9 @@
 #                          user's system should be installed.
 #                          Defaults to `false`.
 #
-# @param gemfile [Proc]    a block that is evaluated as a `Gemfile`.
+# @param gemfile [Proc]    a block that is evaluated as a `gems.rb`.
 #
-# @example Using an inline Gemfile
+# @example Using an inline gems.rb
 #
 #          #!/usr/bin/env ruby
 #
@@ -33,7 +33,7 @@ def gemfile(install = false, &gemfile)
   def Bundler.root
     Bundler::SharedHelpers.pwd.expand_path
   end
-  ENV["BUNDLE_GEMFILE"] ||= "Gemfile"
+  ENV["BUNDLE_GEMFILE"] ||= "gems.rb"
 
   builder = Bundler::Dsl.new
   builder.instance_eval(&gemfile)

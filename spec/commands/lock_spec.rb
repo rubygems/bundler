@@ -5,7 +5,7 @@ describe "bundle lock" do
     strip_whitespace(lockfile).sub(/\n\Z/, "")
   end
 
-  def read_lockfile(file = "Gemfile.lock")
+  def read_lockfile(file = "gems.locked")
     strip_lockfile bundled_app(file).read
   end
 
@@ -84,7 +84,7 @@ describe "bundle lock" do
   it "does not fetch remote specs when using the --local option" do
     bundle "lock --update --local"
 
-    expect(err).to include("sources listed in your Gemfile or available on this machine")
+    expect(err).to include("sources listed in your gems.rb or available on this machine")
   end
 
   it "writes to a custom location using --lockfile" do

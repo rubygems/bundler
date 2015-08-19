@@ -107,7 +107,7 @@ module Bundler
 
         unless options["branch"] || Bundler.settings[:disable_local_branch_check]
           raise GitError, "Cannot use local override for #{name} at #{path} because " \
-            ":branch is not specified in Gemfile. Specify a branch or use " \
+            ":branch is not specified in #{SharedHelpers.gemfile_name}. Specify a branch or use " \
             "`bundle config --delete` to remove the local override"
         end
 
@@ -119,18 +119,18 @@ module Bundler
         set_local!(path)
 
         # Create a new git proxy without the cached revision
-        # so the Gemfile.lock always picks up the new revision.
+        # so the gems.locked always picks up the new revision.
         @git_proxy = GitProxy.new(path, uri, ref)
 
         if git_proxy.branch != options["branch"] && !Bundler.settings[:disable_local_branch_check]
           raise GitError, "Local override for #{name} at #{path} is using branch " \
-            "#{git_proxy.branch} but Gemfile specifies #{options["branch"]}"
+            "#{git_proxy.branch} but #{SharedHelpers.gemfile_name} specifies #{options["branch"]}"
         end
 
         changed = cached_revision && cached_revision != git_proxy.revision
 
         if changed && !@unlocked && !git_proxy.contains?(cached_revision)
-          raise GitError, "The Gemfile lock is pointing to revision #{shortref_for_display(cached_revision)} " \
+          raise GitError, "The #{SharedHelpers.lockfile_name} is pointing to revision #{shortref_for_display(cached_revision)} " \
             "but the current branch in your local override for #{name} does not contain such commit. " \
             "Please make sure your branch is up to date."
         end

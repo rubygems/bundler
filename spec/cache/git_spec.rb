@@ -150,7 +150,7 @@ end
 
       bundle "#{cmd}"
 
-      expect(out).to include("Your Gemfile contains path and git dependencies.")
+      expect(out).to include("Your gems.rb contains path and git dependencies.")
     end
 
     it "does not display warning message if cache_all is set in bundle config" do
@@ -163,7 +163,7 @@ end
       bundle "#{cmd} --all"
       bundle "#{cmd}"
 
-      expect(out).not_to include("Your Gemfile contains path and git dependencies.")
+      expect(out).not_to include("Your gems.rb contains path and git dependencies.")
     end
 
     it "caches pre-evaluated gemspecs" do

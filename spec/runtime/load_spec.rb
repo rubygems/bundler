@@ -57,7 +57,7 @@ describe "Bundler.load" do
     it "raises an exception if the default gemfile is not found" do
       expect {
         Bundler.load
-      }.to raise_error(Bundler::GemfileNotFound, /could not locate gemfile/i)
+      }.to raise_error(Bundler::GemfileNotFound, /could not locate gems.rb/i)
     end
 
     it "raises an exception if a specified gemfile is not found" do
@@ -67,8 +67,8 @@ describe "Bundler.load" do
       }.to raise_error(Bundler::GemfileNotFound, /omg\.rb/)
     end
 
-    it "does not find a Gemfile above the testing directory" do
-      bundler_gemfile = tmp.join("../Gemfile")
+    it "does not find a gems.rb above the testing directory" do
+      bundler_gemfile = tmp.join("../gems.rb")
       unless File.exist?(bundler_gemfile)
         FileUtils.touch(bundler_gemfile)
         @remove_bundler_gemfile = true
