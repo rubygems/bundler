@@ -372,7 +372,7 @@ end
 describe "setting `with` and `without` options" do
   context "when `with` has already been set" do
     context "and `without` is set to conflict" do
-      it "prints a message" do
+      it "prints a message and unsets the already set setting" do
         bundle "config with foo"
         bundle "config without foo"
 
@@ -384,7 +384,7 @@ describe "setting `with` and `without` options" do
 
   context "when `without` has already been set" do
     context "and `with` is set to conflict" do
-      it "prints a message" do
+      it "prints a message and unsets the already set setting" do
         bundle "config without foo"
         bundle "config with foo"
         expect(out).to include("already set `without foo` globally, so it will be unset.")
@@ -399,7 +399,7 @@ describe "setting `with` and `without` options" do
       before(:each) { bundle "config --local with foo" }
 
       context "and `without` is set locally to conflict" do
-        it "prints a message" do
+        it "prints a message and unsets the already set setting" do
           bundle "config --local without foo"
 
           expect(out).to include("already set `with foo` locally, so it will be unset.")
@@ -408,7 +408,7 @@ describe "setting `with` and `without` options" do
       end
 
       context "and `without` is set globally to conflict" do
-        it "does not print a message" do
+        it "does not print a message and does not unset the previously set setting" do
           bundle "config --global without foo"
 
           expect(out).not_to include("already set `with foo` locally, so it will be unset.")
@@ -421,7 +421,7 @@ describe "setting `with` and `without` options" do
       before(:each) { bundle "config --global with foo" }
 
       context "and `without` is set locally to conflict" do
-        it "does not print a message" do
+        it "does not print a message and does not unset the previously set setting" do
           bundle "config --local without foo"
 
           expect(out).not_to include("already set `with foo` globally, so it will be unset.")
@@ -430,7 +430,7 @@ describe "setting `with` and `without` options" do
       end
 
       context "and `without` is set globally to conflict" do
-        it "prints a message" do
+        it "prints a message and unsets the already set setting" do
           bundle "config without foo --global"
 
           expect(out).to include("already set `with foo` globally, so it will be unset.")
@@ -443,7 +443,7 @@ describe "setting `with` and `without` options" do
       before(:each) { bundle "config --local without foo" }
 
       context "and `with` is set locally to conflict" do
-        it "prints a message" do
+        it "prints a message and unsets the already set setting" do
           bundle "config --local with foo"
 
           expect(out).to include("already set `without foo` locally, so it will be unset.")
@@ -452,7 +452,7 @@ describe "setting `with` and `without` options" do
       end
 
       context "and `with` is set globally to conflict" do
-        it "does not print a message" do
+        it "does not print a message and does not unset the previously set setting" do
           bundle "config --global with foo"
 
           expect(out).not_to include("already set `without foo` locally, so it will be unset.")
@@ -465,7 +465,7 @@ describe "setting `with` and `without` options" do
       before(:each) { bundle "config --global without foo" }
 
       context "and `with` is set locally to conflict" do
-        it "does not print a message" do
+        it "does not print a message and does not unset the previously set setting" do
           bundle "config --local with foo"
 
           expect(out).not_to include("already set `without foo` globally, so it will be unset.")
@@ -474,7 +474,7 @@ describe "setting `with` and `without` options" do
       end
 
       context "and `with` is set globally to conflict" do
-        it "prints a message" do
+        it "prints a message and unsets the already set setting" do
           bundle "config --global with foo"
 
           expect(out).to include("already set `without foo` globally, so it will be unset.")
@@ -484,10 +484,40 @@ describe "setting `with` and `without` options" do
     end
   end
 
+  context "when more than one group is given" do
+    before(:each) { bundle "config --local with foo bar" }
+
+    context "and there is one conflicting group" do
+      it "prints a message and unsets the already set setting" do
+        bundle "config --local without bar baz qux"
+
+        $stderr.puts "Bundler.settings.without: #{Bundler.settings.without}"
+
+        expect(out).to include("already set `with bar` locally, so it will be unset.")
+        expect(Bundler.settings.with).to eq([])
+        expect(Bundler.settings.without).to eq([:bar, :baz, :qux])
+      end
+    end
+
+    context "and there are two conflicting groups" do
+      it "prints a message and unsets the already set setting" do
+        bundle "config --local without foo bar baz qux"
+
+        $stderr.puts "Bundler.settings.without: #{Bundler.settings.without}"
+
+        expect(out).to include("already set `with bar` locally, so it will be unset.")
+        expect(out).to include("already set `with foo` locally, so it will be unset.")
+        expect(Bundler.settings.with).to eq([])
+        expect(Bundler.settings.without).to eq([:foo, :bar, :baz, :qux])
+      end
+    end
+  end
+
+  context "when the argument order is varied" do
+  end
   # TODO: Write specs like the above but for with / without commands with multiple groups, and vary
   # the order of the arguments
-
   # TODO: Write specs that check flag order independence (`bundle config --local without foo` should be
   # equivalent to `bundle config without --local foo` and `bundle config without foo --local`, and, in
-  # theory, something like `bundle config without foo bar baz --local qux`, albeit a bit awkward.
+  # theory, something like `bundle config without foo bar baz --local qux`, albeit a bit awkward).
 end

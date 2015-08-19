@@ -126,9 +126,6 @@ module Bundler
     end
 
     def without(scope = nil)
-      # $stderr.puts "[settings.rb] [#without] @global_config.inspect is #{@global_config.inspect}"
-      # $stderr.puts "[settings.rb] [#without] @local_config.inspect is #{@local_config.inspect}"
-
       key = key_for(:without)
       if scope.nil?
         get_array(:without)
@@ -140,9 +137,6 @@ module Bundler
     end
 
     def with(scope = nil)
-      # $stderr.puts "[settings.rb] [#with] @global_config.inspect is #{@global_config.inspect}"
-      # $stderr.puts "[settings.rb] [#with] @local_config.inspect is #{@local_config.inspect}"
-
       key = key_for(:with)
       if scope.nil?
         get_array(:with)
@@ -151,10 +145,6 @@ module Bundler
       elsif scope == :local
         @local_config[key] ? @local_config[key].split(" ").map(&:to_sym) : []
       end
-    end
-
-    def with_without_conflict
-      with(:local) & without(:local) or with(:global) & without(:global)
     end
 
     # @local_config["BUNDLE_PATH"] should be prioritized over ENV["BUNDLE_PATH"]

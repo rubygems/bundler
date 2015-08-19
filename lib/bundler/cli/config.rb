@@ -10,9 +10,6 @@ module Bundler
     end
 
     def run
-      # $stderr.puts "------------------------------------------------------------------------------------------"
-      # $stderr.puts "[config.rb] Calling #run with args = #{@args}"
-
       peek = args.shift
 
       if peek && peek =~ /^\-\-/
@@ -50,7 +47,7 @@ module Bundler
           return
         end
 
-        new_value = args.join(" ")
+        new_value = args.join(" ").gsub("--global", "").gsub("--local", "").strip
         locations = Bundler.settings.locations(name)
 
         if scope == "global"
@@ -75,27 +72,20 @@ module Bundler
             "#{locations[:local].inspect}"
         end
 
-        new_value = new_value.gsub("--global", "").gsub("--local", "").strip
+        # new_value = new_value.gsub("--global", "").gsub("--local", "").strip
 
-        # $stderr.puts "[config.rb] In #run; just about to resolve conflicts."
-
-        return if resolve_system_path_conflicts(name, new_value, scope) == :conflict
-
-        # $stderr.puts "[config.rb] In #run; system path conflict resolved."
-        return if resolve_with_without_conflicts(name, new_value, scope) == :conflict
-        modify_with_or_without(name, new_value, scope)
         new_value.gsub!(/\s+/, ":") if name == "with" || name == "without" # Should this come before or after the conflict resolution?
 
-        # $stderr.puts "[config.rb] After conflict resolution: new_value is #{new_value}"
+        return if resolve_system_path_conflicts(name, new_value, scope) == :conflict
+        return if resolve_with_without_conflicts(name, new_value, scope) == :conflict
+        modify_with_or_without(name, new_value, scope)
 
         if name.match(/\Alocal\./)
           pathname = Pathname.new(args.join(" "))
           new_value = pathname.expand_path.to_s if pathname.directory?
         end
 
-        # $stderr.puts "[config.rb] Calling Bundler.settings.send('set_#{scope}', '#{name}', '#{new_value}')"
         Bundler.settings.send("set_#{scope}", name, new_value)
-        # $stderr.puts "[config.rb] Done; now Bundler.settings is #{Bundler.settings.inspect}"
       else
         Bundler.ui.error "Invalid scope --#{scope} given. Please use --local or --global."
         exit 1
@@ -117,47 +107,12 @@ module Bundler
     end
 
     def resolve_with_without_conflicts(name, new_value, scope = "global")
-      # Note: the group includes the scope, so we don't need to explicitly
-      #       differentiate between scopes.
-      # FIXME: We can check the size of without (1 or not 1) instead of
-      #        storing the difference in a var
-
-      # $stderr.puts "[config.rb] [resolve_with_without_conflicts] Starting method\tname is #{name}\tnew_value is #{new_value}\tscope is #{scope}"
-
-      unless new_value =~ /\-\-local/ or new_value =~ /\-\-global/
-        new_value = "#{new_value} --global"
-      end
-
-      # $stderr.puts "[config.rb] [resolve_with_without_conflicts] Checkpoint 1"
-
       new_value = new_value.gsub("--global", "").gsub("--local", "").strip
-
-      # new_value.gsub!("--global", "")
-      # new_value.gsub!("--local", "")
-      # new_value.strip!
-
-      # $stderr.puts "[config.rb] [resolve_with_without_conflicts] Checkpoint 2"
-
       group = new_value.to_sym
 
-      # $stderr.puts "[config.rb] [resolve_with_without_conflicts] Checkpoint 3"
+      if (name == "with") && without_conflict?(group, scope)
 
-      # $stderr.puts "[config.rb] group: #{group}"
-      # $stderr.puts "[config.rb] Bundler.settings.inspect: #{Bundler.settings.inspect}"
-
-      # $stderr.puts "[config.rb] Just about to resolve a conflict! name is #{name}\tBundler.settings.with is #{Bundler.settings.with}\tgroup is #{group}"
-      # $stderr.puts "[config.rb]"
-      # $stderr.puts "[config.rb] Bundler.settings.with(:global) is #{Bundler.settings.with(:global)}"
-      # $stderr.puts "[config.rb] Bundler.settings.with(:local) is #{Bundler.settings.with(:local)}"
-      # $stderr.puts "[config.rb] Bundler.settings.with is #{Bundler.settings.with}"
-
-      if (name == "with") && ((Bundler.settings.without(:local).include?(group) && scope == "local") || (Bundler.settings.without(:global).include?(group) && scope == "global"))
-
-        if Bundler.settings.without(:local).include?(group) && scope == "local"
-          without_scope = "locally"
-        else
-          without_scope = "globally"
-        end
+        without_scope = group_conflict?(:without, group, :local, scope) ? "locally" : "globally"
 
         Bundler.ui.info "`with` and `without` settings cannot share groups. "\
          "You have already set `without #{new_value}` #{without_scope}, so it will be unset."
@@ -170,13 +125,9 @@ module Bundler
         end
 
         :conflict
-      elsif (name == "without") && ((Bundler.settings.with(:local).include?(group) && scope == "local") || (Bundler.settings.with(:global).include?(group) && scope == "global"))
+      elsif (name == "without") && with_conflict?(group, scope)
 
-        if Bundler.settings.with(:local).include?(group) && scope == "local"
-          with_scope = "locally"
-        else
-          with_scope = "globally"
-        end
+        with_scope = group_conflict?(:with, group, :local, scope) ? "locally" : "globally"
 
         Bundler.ui.info "`with` and `without` settings cannot share groups. "\
          "You have already set `with #{new_value}` #{with_scope}, so it will be unset."
@@ -195,11 +146,6 @@ module Bundler
       end
     end
 
-    def parse_with_without_settings(name, new_value, scope = "global")
-      # FIXME: implement
-      []
-    end
-
     def modify_with_or_without(name, new_value, scope = "global")
       delete_config(name, nil) if new_value == "" and (name == "with" or name == "without")
     end
@@ -209,20 +155,24 @@ module Bundler
       Bundler.settings.set_global(name, nil) unless scope == "local"
     end
 
-    # def with_conflict?(group, scope)
-    #   if scope == :local
-    #     Bundler.settings.with(:local).include?(group) && scope == "local"
-    #   elsif scope == :global
-    #     Bundler.settings.with(:global).include?(group) && scope == "global"
-    #   end
-    # end
+    # group_conflict?: Detects conflicts in optional groups in consideration of scope.
+    # - `name` is the option name (`with` or `without`).
+    # - `group` is the name of the included or excluded group(s).
+    # - `scope_prev` is the scope of the option previously set.
+    # - `scope_new` is the scope of the option the user is currently trying to set.
+    # NOTE: scope_prev and scope_new must be --local or --global
+    def group_conflict?(name, group, scope_prev, scope_new)
+      # e.g. group_conflict?(:without, :development, :local, scope) =>
+      #   Bundler.settings.without(:local).include?(group) && scope == "local"
+      Bundler.settings.send(name.to_sym, scope_prev).include?(group) && scope_new.to_sym == scope_prev
+    end
 
-    # def without_conflict?(group, scope)
-    #   if scope == :local
-    #     Bundler.settings.without(:local).include?(group) && scope == "local"
-    #   elsif scope == :global
-    #     Bundler.settings.without(:global).include?(group) && scope == "global"
-    #   end
-    # end
+    def without_conflict?(group, scope)
+      group_conflict?(:without, group, :local, scope) or group_conflict?(:without, group, :global, scope)
+    end
+
+    def with_conflict?(group, scope)
+      group_conflict?(:with, group, :local, scope) or group_conflict?(:with, group, :global, scope)
+    end
   end
 end
