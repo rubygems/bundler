@@ -255,7 +255,7 @@ describe "compact index api" do
     build_repo4 do
       build_gem "activesupport", "1.2.0"
       build_gem "somegem", "1.0.0" do |s|
-        s.add_dependency "activesupport", "1.2.3"  #This version exists only in repo1
+        s.add_dependency "activesupport", "1.2.3" # This version exists only in repo1
       end
     end
 

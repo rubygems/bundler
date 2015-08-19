@@ -27,11 +27,11 @@ module Bundler
       end
 
       def fetch_spec(spec)
-        spec = spec - [nil, 'ruby', '']
-        spec_file_name = "#{spec.join '-'}.gemspec"
+        spec -= [nil, "ruby", ""]
+        spec_file_name = "#{spec.join "-"}.gemspec"
 
         uri = URI.parse("#{remote_uri}#{Gem::MARSHAL_SPEC_DIR}#{spec_file_name}.rz")
-        if uri.scheme == 'file'
+        if uri.scheme == "file"
           Bundler.load_marshal Gem.inflate(Gem.read_binary(uri.path))
         elsif cached_spec_path = gemspec_cached_path(spec_file_name)
           Bundler.load_gemspec(cached_spec_path)
@@ -43,11 +43,11 @@ module Bundler
           "Your network or your gem server is probably having issues right now."
       end
 
-      private
+    private
 
       # cached gem specification path, if one exists
-      def gemspec_cached_path spec_file_name
-        paths = Bundler.rubygems.spec_cache_dirs.map { |dir| File.join(dir, spec_file_name) }
+      def gemspec_cached_path(spec_file_name)
+        paths = Bundler.rubygems.spec_cache_dirs.map {|dir| File.join(dir, spec_file_name) }
         paths = paths.select {|path| File.file? path }
         paths.first
       end

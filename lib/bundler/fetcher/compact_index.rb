@@ -1,5 +1,5 @@
-require 'bundler/fetcher/base'
-require 'bundler/fetcher/compact_gem_list'
+require "bundler/fetcher/base"
+require "bundler/fetcher/compact_gem_list"
 
 module Bundler
   class Fetcher
@@ -18,10 +18,10 @@ module Bundler
       end
 
       def fetch_spec(spec)
-        spec = spec - [nil, 'ruby', '']
+        spec -= [nil, "ruby", ""]
         return unless contents = compact_gem_list.spec(*spec)
         contents.unshift(spec.first)
-        contents[3].map! { |d| Gem::Dependency.new(*d) }
+        contents[3].map! {|d| Gem::Dependency.new(*d) }
         EndpointSpecification.new(*contents)
       end
 
@@ -29,12 +29,12 @@ module Bundler
         fetch_uri.scheme != "file" && specs([])
       end
 
-      private
+    private
 
       def compact_gem_list
         @compact_gem_list ||= begin
-          uri_part = [display_uri.hostname, display_uri.port, Digest::MD5.hexdigest(display_uri.path)].compact.join('.')
-          CompactGemList.new(self, Bundler.cache + 'compact_index' + uri_part)
+          uri_part = [display_uri.hostname, display_uri.port, Digest::MD5.hexdigest(display_uri.path)].compact.join(".")
+          CompactGemList.new(self, Bundler.cache + "compact_index" + uri_part)
         end
       end
     end

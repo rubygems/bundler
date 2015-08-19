@@ -11,10 +11,10 @@ class CompactIndexExtraApi < CompactIndexAPI
 
   get "/extra/versions" do
     etag_response do
-      file = tmp('versions.list')
+      file = tmp("versions.list")
       file.delete if file.file?
       file = CompactIndex::VersionsFile.new(file.to_path)
-      versions = gems(gem_repo4).group_by { |s| s[:name] }
+      versions = gems(gem_repo4).group_by {|s| s[:name] }
       file.update_with(versions)
       CompactIndex.versions(file, [])
     end
@@ -22,7 +22,7 @@ class CompactIndexExtraApi < CompactIndexAPI
 
   get "/extra/info/:name" do
     etag_response do
-      specs = gems(gem_repo4).select { |s| s[:name] == params[:name] }
+      specs = gems(gem_repo4).select {|s| s[:name] == params[:name] }
       CompactIndex.info(specs)
     end
   end

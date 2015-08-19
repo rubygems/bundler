@@ -1,10 +1,10 @@
 module Bundler
   class Fetcher
     class CompactGemList
-      require 'set'
+      require "set"
 
-      autoload :Cache,   'bundler/fetcher/compact_gem_list/cache'
-      autoload :Updater, 'bundler/fetcher/compact_gem_list/updater'
+      autoload :Cache,   "bundler/fetcher/compact_gem_list/cache"
+      autoload :Updater, "bundler/fetcher/compact_gem_list/updater"
 
       attr_reader :fetcher, :directory
 
@@ -19,21 +19,21 @@ module Bundler
       end
 
       def names
-        update([[@cache.names_path, 'names']])
+        update([[@cache.names_path, "names"]])
         @cache.names
       end
 
       def versions
-        update([[@cache.versions_path, 'versions']])
+        update([[@cache.versions_path, "versions"]])
         versions, @info_checksums_by_name = @cache.versions
         versions
       end
 
       def dependencies(names)
-        names.each { |n| update_info(n) }
-        names.map do |name|
-          @cache.dependencies(name).map { |d| d.unshift(name) }
-        end.flatten(1)
+        names.each {|n| update_info(n) }
+        names.flat_map do |name|
+          @cache.dependencies(name).map {|d| d.unshift(name) }
+        end
       end
 
       def spec(name, version, platform = nil)
@@ -41,7 +41,7 @@ module Bundler
         @cache.specific_dependency(name, version, platform)
       end
 
-      private
+    private
 
       def update(files)
         files.each do |path, remote_path|

@@ -9,7 +9,7 @@ class CompactIndexCredsDiffHost < CompactIndexAPI
     end
 
     def authorized?
-      auth.provided? && auth.basic? && auth.credentials && auth.credentials == ["user", "pass"]
+      auth.provided? && auth.basic? && auth.credentials && auth.credentials == %w(user pass)
     end
 
     def protected!
