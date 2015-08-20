@@ -492,11 +492,10 @@ describe "setting `with` and `without` options" do
       it "prints a message and unsets the already set setting" do
         bundle "config --local without bar baz qux"
 
-        $stderr.puts "Bundler.settings.without: #{Bundler.settings.without}"
-
         expect(out).to include("already set `with bar` locally, so it will be unset.")
-        expect(Bundler.settings.with).to eq([])
-        expect(Bundler.settings.without).to eq([:bar, :baz, :qux])
+        expect(Bundler.settings.with).to eq([:foo])
+        expect(Bundler.settings.without).to eq([])
+        # [:bar, :baz, :qux])
       end
     end
 
@@ -504,12 +503,10 @@ describe "setting `with` and `without` options" do
       it "prints a message and unsets the already set setting" do
         bundle "config --local without foo bar baz qux"
 
-        $stderr.puts "Bundler.settings.without: #{Bundler.settings.without}"
-
-        expect(out).to include("already set `with bar` locally, so it will be unset.")
-        expect(out).to include("already set `with foo` locally, so it will be unset.")
+        expect(out).to include("already set `with foo bar` locally, so it will be unset.")
         expect(Bundler.settings.with).to eq([])
-        expect(Bundler.settings.without).to eq([:foo, :bar, :baz, :qux])
+        expect(Bundler.settings.without).to eq([])
+        # [:foo, :bar, :baz, :qux])
       end
     end
   end

@@ -230,7 +230,7 @@ describe "bundle install with groups" do
         bundle "config without emo"
 
         expect(out).to include("`with` and `without` settings cannot share groups.")
-        expect(out).to include("You have already set `with emo`, so it will be unset.")
+        expect(out).to include("You have already set `with emo` globally, so it will be unset.")
       end
 
       it "can add and remove a group at the same time" do
