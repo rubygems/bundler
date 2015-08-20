@@ -19,9 +19,10 @@ module Bundler
       else
         # The format is `bundle config name ...`
         name = peek
-        # Allow the scope to be specified anywhere in the command
+        # If setting `with` or `without`, allow the scope to be specified anywhere in the command.
+        # Otherwise, set the scope to "global".
         simple_args = (args.find {|arg| arg =~ /^\-\-/ })
-        scope = simple_args ? simple_args.gsub("--", "") : "global"
+        scope = (name =~ /with/ && simple_args) ? simple_args.gsub("--", "") : "global"
       end
 
       unless name
