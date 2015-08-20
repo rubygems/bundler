@@ -564,7 +564,6 @@ describe "setting `with` and `without` options" do
       expect(out).not_to include("already set")
     end
   end
-  # TODO: Write specs like the above but for with / without commands with multiple groups
   # TODO: Write specs that check flag order independence (`bundle config --local without foo` should be
   # equivalent to `bundle config without --local foo` and `bundle config without foo --local`, and, in
   # theory, something like `bundle config without foo bar baz --local qux`, albeit a bit awkward).

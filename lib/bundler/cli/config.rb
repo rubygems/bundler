@@ -20,7 +20,8 @@ module Bundler
         # The format is `bundle config name ...`
         name = peek
         # Allow the scope to be specified anywhere in the command
-        scope = (args.find { |arg| arg =~ /^\-\-/ }).gsub("--", "") || "global"
+        simple_args = (args.find { |arg| arg =~ /^\-\-/ })
+        scope = simple_args ? simple_args.gsub("--", "") : "global"
       end
 
       unless name
@@ -112,18 +113,15 @@ module Bundler
     end
 
     def resolve_with_without_conflicts(name, new_value, scope = "global")
-      new_value = new_value.gsub("--global", "").gsub("--local", "").strip
-      group = new_value.to_sym
+      new_value = new_value.gsub("--global", "").gsub("--local", "").strip # FIXME: This is unnecessary
+      groups = new_value.split(":").map(&:to_sym)
 
-      # If new_value has multiple groups, we need to make it into an array
-      # So, we want to convert the code below to work with sets and set intersections rather than element inclusions
-
-      if (name == "with") && without_conflict?(group, scope)
-        without_scope = group_conflict?(:without, group, :local, scope) ? "locally" : "globally"
+      if (name == "with") && without_conflict?(groups, scope)
+        without_scope = groups_conflict?(:without, groups, :local, scope) ? "locally" : "globally"
 
         Bundler.ui.info "`with` and `without` settings cannot share groups. "\
          "You have already set `without #{new_value}` #{without_scope}, so it will be unset."
-        difference = Bundler.settings.without - [group]
+        difference = Bundler.settings.without - groups
 
         if difference == []
           delete_config("without", scope)
@@ -132,13 +130,13 @@ module Bundler
         end
 
         :conflict
-      elsif (name == "without") && with_conflict?(group, scope)
-        with_scope = group_conflict?(:with, group, :local, scope) ? "locally" : "globally"
+      elsif (name == "without") && with_conflict?(groups, scope)
+        with_scope = groups_conflict?(:with, groups, :local, scope) ? "locally" : "globally"
 
         Bundler.ui.info "`with` and `without` settings cannot share groups. "\
          "You have already set `with #{new_value}` #{with_scope}, so it will be unset."
         #Bundler.settings.with = Bundler.settings.with - [group]
-        difference = Bundler.settings.with - [group]
+        difference = Bundler.settings.with - groups
 
         if difference == []
           delete_config("with", scope)
@@ -161,26 +159,30 @@ module Bundler
       Bundler.settings.set_global(name, nil) unless scope == "local"
     end
 
+    # def group_conflict?(name, group, scope_prev, scope_new)
+    #   Bundler.settings.send(name.to_sym, scope_prev).include?(group) && scope_new.to_sym == scope_prev
+    # end
+
     # group_conflict?: Detects conflicts in optional groups in consideration of scope.
     # - `name` is the option name (`with` or `without`).
-    # - `group` is the name of the included or excluded group(s).
+    # - `groups` is an array of the name(s) of the included or excluded group(s).
     # - `scope_prev` is the scope of the option previously set.
     # - `scope_new` is the scope of the option the user is currently trying to set.
     # NOTE: scope_prev and scope_new must be local or global.
-    def group_conflict?(name, group, scope_prev, scope_new)
-      # e.g. group_conflict?(:without, :development, :local, scope) =>
-      #   Bundler.settings.without(:local).include?(group) && scope == "local"
-
+    def groups_conflict?(name, groups, scope_prev, scope_new)
+      settings = Bundler.settings.send(name.to_sym, scope_prev)
+      settings = (settings.map { |opt| opt.to_s.split(":").map(&:to_sym) }).flatten # TODO: refactor
+      int = groups & settings
       # FIXME: Do we need the `&& scope_new.to_sym == scope_prev`?
-      Bundler.settings.send(name.to_sym, scope_prev).include?(group) && scope_new.to_sym == scope_prev
+      int && int.size > 0 && scope_new.to_sym == scope_prev
     end
 
     def without_conflict?(group, scope)
-      group_conflict?(:without, group, :local, scope) or group_conflict?(:without, group, :global, scope)
+      groups_conflict?(:without, group, :local, scope) or groups_conflict?(:without, group, :global, scope)
     end
 
     def with_conflict?(group, scope)
-      group_conflict?(:with, group, :local, scope) or group_conflict?(:with, group, :global, scope)
+      groups_conflict?(:with, group, :local, scope) or groups_conflict?(:with, group, :global, scope)
     end
   end
 end
