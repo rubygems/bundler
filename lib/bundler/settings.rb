@@ -126,24 +126,25 @@ module Bundler
     end
 
     def without(scope = nil)
-      key = key_for(:without)
-      if scope.nil?
-        get_array(:without)
-      elsif scope == :global
-        @global_config[key] ? @global_config[key].split(" ").map(&:to_sym) : []
-      elsif scope == :local
-        @local_config[key] ? @local_config[key].split(" ").map(&:to_sym) : []
-      end
+      groups_array(:without, scope)
     end
 
     def with(scope = nil)
-      key = key_for(:with)
+      groups_array(:with, scope)
+    end
+
+    # `group_type` is either :with or :without
+    def groups_array(group_type, scope)
+      key = key_for(group_type)
       if scope.nil?
-        get_array(:with)
+        get_array(group_type)
       elsif scope == :global
         @global_config[key] ? @global_config[key].split(" ").map(&:to_sym) : []
       elsif scope == :local
         @local_config[key] ? @local_config[key].split(" ").map(&:to_sym) : []
+      else
+        Bundler.ui.error "Invalid scope #{scope} given. Please use :local or :global."
+        exit 1
       end
     end
 

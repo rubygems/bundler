@@ -276,10 +276,6 @@ module Bundler
       bundle exec you can require and call the bundled gems as if they were installed
       into the system wide Rubygems repository.
     D
-    method_option "local", :type => :boolean, :default => false, :banner =>
-     "Add the configuration locally"
-    method_option "global", :type => :boolean, :default => true, :banner =>
-     "Add the configuration globally"
 
     map "e" => "exec"
     def exec(*args)
@@ -299,6 +295,11 @@ module Bundler
       will show the current value, as well as any superceded values and
       where they were specified.
     D
+    method_option "local", :type => :boolean, :default => false, :banner =>
+     "Add the configuration locally"
+    method_option "global", :type => :boolean, :default => false, :banner =>
+     "Add the configuration globally"
+
     def config(*args)
       require "bundler/cli/config"
       Config.new(options, args, self).run

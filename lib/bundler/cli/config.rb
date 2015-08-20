@@ -12,18 +12,8 @@ module Bundler
     def run
       peek = args.shift
 
-      if peek && peek =~ /^\-\-/
-        # The format is `bundle config --local name ...`
-        name = args.shift
-        scope = $'
-      else
-        # The format is `bundle config name ...`
-        name = peek
-        # If setting `with` or `without`, allow the scope to be specified anywhere in the command.
-        # Otherwise, set the scope to "global".
-        simple_args = (args.find {|arg| arg =~ /^\-\-/ })
-        scope = (name =~ /with/ && simple_args) ? simple_args.gsub("--", "") : "global"
-      end
+      name = (peek && peek =~ /^\-\-/) ? args.shift : peek
+      scope = @options["local"] ? "local" : "global"
 
       unless name
         Bundler.ui.confirm "Settings are listed in order of priority. The top value will be used.\n"
@@ -53,6 +43,7 @@ module Bundler
         end
 
         new_value = args.join(" ").gsub("--global", "").gsub("--local", "").strip
+        new_value.gsub!(/\s+/, ":") if name == "with" || name == "without"
         locations = Bundler.settings.locations(name)
 
         if scope == "global"
@@ -77,12 +68,9 @@ module Bundler
             "#{locations[:local].inspect}"
         end
 
-        # FIXME: Move this above?
-        new_value.gsub!(/\s+/, ":") if name == "with" || name == "without"
-
         return if resolve_system_path_conflicts(name, new_value, scope) == :conflict
-        resolve_with_without_conflicts(name, new_value, scope)
-        modify_with_or_without(name, new_value, scope)
+        resolve_group_conflicts(name, new_value, scope)
+        delete_config(name, nil) if new_value == "" and (name == "with" or name == "without")
 
         # NOTE: Bundler.settings stores multiple with and without keys, given an array like
         # [:foo, :bar, :baz, :qux], as "foo:bar:baz:qux" (see #set_array)
@@ -113,8 +101,7 @@ module Bundler
       end
     end
 
-    def resolve_with_without_conflicts(name, new_value, scope = "global")
-      new_value = new_value.gsub("--global", "").gsub("--local", "").strip # FIXME: This is unnecessary
+    def resolve_group_conflicts(name, new_value, scope = "global")
       groups = new_value.split(":").map(&:to_sym)
 
       if (name == "with") && without_conflict?(groups, scope)
@@ -139,7 +126,6 @@ module Bundler
 
         Bundler.ui.info "`with` and `without` settings cannot share groups. "\
          "You have already set `with #{conflicts.join(" ")}` #{with_scope}, so it will be unset."
-        # Bundler.settings.with = Bundler.settings.with - [group]
         difference = Bundler.settings.with - groups
 
         if difference == []
@@ -154,18 +140,10 @@ module Bundler
       end
     end
 
-    def modify_with_or_without(name, new_value, scope = "global")
-      delete_config(name, nil) if new_value == "" and (name == "with" or name == "without")
-    end
-
     def delete_config(name, scope = nil)
       Bundler.settings.set_local(name, nil) unless scope == "global"
       Bundler.settings.set_global(name, nil) unless scope == "local"
     end
-
-    # def group_conflict?(name, group, scope_prev, scope_new)
-    #   Bundler.settings.send(name.to_sym, scope_prev).include?(group) && scope_new.to_sym == scope_prev
-    # end
 
     # group_conflict?: Detects conflicts in optional groups in consideration of scope.
     # - `name` is the option name (`with` or `without`).
@@ -174,9 +152,9 @@ module Bundler
     # - `scope_new` is the scope of the option the user is currently trying to set.
     # NOTE: scope_prev and scope_new must be local or global.
     def groups_conflict?(name, groups, scope_prev, scope_new)
-      int = conflicting_groups(name, groups, scope_prev, scope_new)
+      conflicts = conflicting_groups(name, groups, scope_prev, scope_new)
       # FIXME: Do we need the `&& scope_new.to_sym == scope_prev`?
-      int && int.size > 0 && scope_new.to_sym == scope_prev
+      conflicts && conflicts.size > 0 && scope_new.to_sym == scope_prev
     end
 
     def conflicting_groups(name, groups, scope_prev, scope_new)
