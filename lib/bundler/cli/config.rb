@@ -110,7 +110,6 @@ module Bundler
       groups = new_value.split(":").map(&:to_sym)
 
       if (name == "with") && without_conflict?(groups, scope)
-        # FIXME: Simplify without_scope, conflicts, and with_scopes
         without_scope = groups_conflict?(:without, groups, :local, scope) ? "locally" : "globally"
         conflicts = conflicting_groups(:without, groups, without_scope == "locally" ? :local : :global, scope)
 
@@ -157,8 +156,9 @@ module Bundler
     # - `scope_new` is the scope of the option the user is currently trying to set.
     # NOTE: scope_prev and scope_new must be local or global.
     def groups_conflict?(name, groups, scope_prev, scope_new)
+      # We check that the intersection of the two groups is nonempty and that
+      # the two groups have the same scope.
       conflicts = conflicting_groups(name, groups, scope_prev, scope_new)
-      # FIXME: Do we need the `&& scope_new.to_sym == scope_prev`?
       conflicts && conflicts.size > 0 && scope_new.to_sym == scope_prev
     end
 
