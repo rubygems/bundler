@@ -12,8 +12,13 @@ module Bundler
     def run
       peek = args.shift
 
-      name = (peek && peek =~ /^\-\-/) ? args.shift : peek
-      scope = @options["local"] ? "local" : "global"
+      if peek && peek =~ /^\-\-/
+        name = args.shift
+        scope = $'
+      else
+        name = peek
+        scope = options["local"] ? "local" : "global"
+      end
 
       unless name
         Bundler.ui.confirm "Settings are listed in order of priority. The top value will be used.\n"
