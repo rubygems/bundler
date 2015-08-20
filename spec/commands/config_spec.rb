@@ -378,7 +378,7 @@ describe "setting `with` and `without` options" do
 
         expect(out).to include("already set `with foo` globally, so it will be unset.")
         expect(Bundler.settings.with).to eq([])
-        expect(Bundler.settings.without).to eq([]) # There's a conflict, so without should not be set
+        expect(Bundler.settings.without).to eq([:foo]) # There's a conflict, so without should be set
       end
     end
   end
@@ -388,9 +388,10 @@ describe "setting `with` and `without` options" do
       it "prints a message and unsets the already set setting" do
         bundle "config without foo"
         bundle "config with foo"
-        expect(out).to include("already set `without foo` globally, so it will be unset.")
 
+        expect(out).to include("already set `without foo` globally, so it will be unset.")
         expect(Bundler.settings.without).to eq([])
+        expect(Bundler.settings.with).to eq([:foo])
       end
     end
   end
@@ -405,6 +406,7 @@ describe "setting `with` and `without` options" do
 
           expect(out).to include("already set `with foo` locally, so it will be unset.")
           expect(Bundler.settings.with).to eq([])
+          expect(Bundler.settings.without).to eq([:foo])
         end
       end
 
@@ -413,7 +415,8 @@ describe "setting `with` and `without` options" do
           bundle "config --global without foo"
 
           expect(out).not_to include("already set `with foo` locally, so it will be unset.")
-          expect(Bundler.settings.with).not_to eq([])
+          expect(Bundler.settings.with).to eq([:foo])
+          expect(Bundler.settings.without).to eq([:foo])
         end
       end
     end
@@ -426,7 +429,8 @@ describe "setting `with` and `without` options" do
           bundle "config --local without foo"
 
           expect(out).not_to include("already set `with foo` globally, so it will be unset.")
-          expect(Bundler.settings.with).not_to eq([])
+          expect(Bundler.settings.with).to eq([:foo])
+          expect(Bundler.settings.without).to eq([:foo])
         end
       end
 
@@ -436,6 +440,7 @@ describe "setting `with` and `without` options" do
 
           expect(out).to include("already set `with foo` globally, so it will be unset.")
           expect(Bundler.settings.with).to eq([])
+          expect(Bundler.settings.without).to eq([:foo])
         end
       end
     end
@@ -449,6 +454,7 @@ describe "setting `with` and `without` options" do
 
           expect(out).to include("already set `without foo` locally, so it will be unset.")
           expect(Bundler.settings.without).to eq([])
+          expect(Bundler.settings.with).to eq([:foo])
         end
       end
 
@@ -457,7 +463,8 @@ describe "setting `with` and `without` options" do
           bundle "config --global with foo"
 
           expect(out).not_to include("already set `without foo` locally, so it will be unset.")
-          expect(Bundler.settings.without).not_to eq([])
+          expect(Bundler.settings.without).to eq([:foo])
+          expect(Bundler.settings.with).to eq([:foo])
         end
       end
     end
@@ -470,7 +477,8 @@ describe "setting `with` and `without` options" do
           bundle "config --local with foo"
 
           expect(out).not_to include("already set `without foo` globally, so it will be unset.")
-          expect(Bundler.settings.without).not_to eq([])
+          expect(Bundler.settings.without).to eq([:foo])
+          expect(Bundler.settings.with).to eq([:foo])
         end
       end
 
@@ -480,6 +488,7 @@ describe "setting `with` and `without` options" do
 
           expect(out).to include("already set `without foo` globally, so it will be unset.")
           expect(Bundler.settings.without).to eq([])
+          expect(Bundler.settings.with).to eq([:foo])
         end
       end
     end
@@ -494,8 +503,7 @@ describe "setting `with` and `without` options" do
 
         expect(out).to include("already set `with bar` locally, so it will be unset.")
         expect(Bundler.settings.with).to eq([:foo])
-        expect(Bundler.settings.without).to eq([])
-        # [:bar, :baz, :qux])
+        expect(Bundler.settings.without).to eq([:bar, :baz, :qux])
       end
     end
 
@@ -505,8 +513,7 @@ describe "setting `with` and `without` options" do
 
         expect(out).to include("already set `with foo bar` locally, so it will be unset.")
         expect(Bundler.settings.with).to eq([])
-        expect(Bundler.settings.without).to eq([])
-        # [:foo, :bar, :baz, :qux])
+        expect(Bundler.settings.without).to eq([:foo, :bar, :baz, :qux])
       end
     end
   end
@@ -516,8 +523,8 @@ describe "setting `with` and `without` options" do
       bundle "config with --local foo"
       bundle "config without foo --global"
 
-      expect(Bundler.settings.with).not_to eq([])
-      expect(Bundler.settings.without).not_to eq([])
+      expect(Bundler.settings.with).to eq([:foo])
+      expect(Bundler.settings.without).to eq([:foo])
       expect(out).not_to include("already set")
     end
 
@@ -526,7 +533,7 @@ describe "setting `with` and `without` options" do
       bundle "config without --local foo"
 
       expect(Bundler.settings.with).to eq([])
-      expect(Bundler.settings.without).to eq([])
+      expect(Bundler.settings.without).to eq([:foo])
       expect(out).to include("already set")
     end
 
@@ -534,8 +541,8 @@ describe "setting `with` and `without` options" do
       bundle "config with --local foo"
       bundle "config --global without foo"
 
-      expect(Bundler.settings.with).not_to eq([])
-      expect(Bundler.settings.without).not_to eq([])
+      expect(Bundler.settings.with).to eq([:foo])
+      expect(Bundler.settings.without).to eq([:foo])
       expect(out).not_to include("already set")
     end
 
@@ -544,13 +551,32 @@ describe "setting `with` and `without` options" do
       bundle "config --local without foo"
 
       expect(Bundler.settings.with).to eq([])
-      expect(Bundler.settings.without).to eq([])
+      expect(Bundler.settings.without).to eq([:foo])
       expect(out).to include("already set")
+    end
+
+    context "and there are multiple options" do
+      it "should not affect the command" do
+        bundle "config with --local foo bar"
+        bundle "config without bar --local baz qux"
+
+        expect(out).to include("already set `with bar` locally, so it will be unset.")
+        expect(Bundler.settings.with).to eq([:foo])
+        expect(Bundler.settings.without).to eq([:bar, :baz, :qux])
+      end
+
+      it "should not affect the command" do
+        bundle "config with foo --local bar"
+        bundle "config  without foo bar baz qux --local"
+
+        expect(out).to include("already set `with foo bar` locally, so it will be unset.")
+        expect(Bundler.settings.with).to eq([])
+        expect(Bundler.settings.without).to eq([:foo, :bar, :baz, :qux])
+      end
     end
   end
 
   context "when fed arguments in separate commands" do
-    # TODO: Confirm that this is the desired behavior.
     it "overwrites Bundler.settings" do
       bundle "config without foo"
       bundle "config without bar"
@@ -561,7 +587,4 @@ describe "setting `with` and `without` options" do
       expect(out).not_to include("already set")
     end
   end
-  # TODO: Write specs that check flag order independence (`bundle config --local without foo` should be
-  # equivalent to `bundle config without --local foo` and `bundle config without foo --local`, and, in
-  # theory, something like `bundle config without foo bar baz --local qux`, albeit a bit awkward).
 end

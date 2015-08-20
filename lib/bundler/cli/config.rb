@@ -80,10 +80,10 @@ module Bundler
         new_value.gsub!(/\s+/, ":") if name == "with" || name == "without"
 
         return if resolve_system_path_conflicts(name, new_value, scope) == :conflict
-        return if resolve_with_without_conflicts(name, new_value, scope) == :conflict
+        resolve_with_without_conflicts(name, new_value, scope)
         modify_with_or_without(name, new_value, scope)
 
-        # Bundler.settings stores multiple with and without keys, given an array like
+        # NOTE: Bundler.settings stores multiple with and without keys, given an array like
         # [:foo, :bar, :baz, :qux], as "foo:bar:baz:qux" (see #set_array)
 
         if name.match(/\Alocal\./)
