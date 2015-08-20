@@ -13,11 +13,14 @@ module Bundler
       peek = args.shift
 
       if peek && peek =~ /^\-\-/
+        # The format is `bundle config --local name ...`
         name = args.shift
         scope = $'
       else
+        # The format is `bundle config name ...`
         name = peek
-        scope = "global"
+        # Allow the scope to be specified anywhere in the command
+        scope = (args.find { |arg| arg =~ /^\-\-/ }).gsub("--", "") || "global"
       end
 
       unless name
@@ -72,13 +75,15 @@ module Bundler
             "#{locations[:local].inspect}"
         end
 
-        # new_value = new_value.gsub("--global", "").gsub("--local", "").strip
-
-        new_value.gsub!(/\s+/, ":") if name == "with" || name == "without" # Should this come before or after the conflict resolution?
+        # FIXME: Move this above?
+        new_value.gsub!(/\s+/, ":") if name == "with" || name == "without"
 
         return if resolve_system_path_conflicts(name, new_value, scope) == :conflict
         return if resolve_with_without_conflicts(name, new_value, scope) == :conflict
         modify_with_or_without(name, new_value, scope)
+
+        # Bundler.settings stores multiple with and without keys, given an array like
+        # [:foo, :bar, :baz, :qux], as "foo:bar:baz:qux" (see #set_array)
 
         if name.match(/\Alocal\./)
           pathname = Pathname.new(args.join(" "))
@@ -110,8 +115,10 @@ module Bundler
       new_value = new_value.gsub("--global", "").gsub("--local", "").strip
       group = new_value.to_sym
 
-      if (name == "with") && without_conflict?(group, scope)
+      # If new_value has multiple groups, we need to make it into an array
+      # So, we want to convert the code below to work with sets and set intersections rather than element inclusions
 
+      if (name == "with") && without_conflict?(group, scope)
         without_scope = group_conflict?(:without, group, :local, scope) ? "locally" : "globally"
 
         Bundler.ui.info "`with` and `without` settings cannot share groups. "\
@@ -126,12 +133,11 @@ module Bundler
 
         :conflict
       elsif (name == "without") && with_conflict?(group, scope)
-
         with_scope = group_conflict?(:with, group, :local, scope) ? "locally" : "globally"
 
         Bundler.ui.info "`with` and `without` settings cannot share groups. "\
          "You have already set `with #{new_value}` #{with_scope}, so it will be unset."
-        Bundler.settings.with = Bundler.settings.with - [group]
+        #Bundler.settings.with = Bundler.settings.with - [group]
         difference = Bundler.settings.with - [group]
 
         if difference == []
@@ -160,10 +166,12 @@ module Bundler
     # - `group` is the name of the included or excluded group(s).
     # - `scope_prev` is the scope of the option previously set.
     # - `scope_new` is the scope of the option the user is currently trying to set.
-    # NOTE: scope_prev and scope_new must be --local or --global
+    # NOTE: scope_prev and scope_new must be local or global.
     def group_conflict?(name, group, scope_prev, scope_new)
       # e.g. group_conflict?(:without, :development, :local, scope) =>
       #   Bundler.settings.without(:local).include?(group) && scope == "local"
+
+      # FIXME: Do we need the `&& scope_new.to_sym == scope_prev`?
       Bundler.settings.send(name.to_sym, scope_prev).include?(group) && scope_new.to_sym == scope_prev
     end
 

@@ -378,6 +378,7 @@ describe "setting `with` and `without` options" do
 
         expect(out).to include("already set `with foo` globally, so it will be unset.")
         expect(Bundler.settings.with).to eq([])
+        expect(Bundler.settings.without).to eq([]) # There's a conflict, so without should not be set
       end
     end
   end
@@ -513,10 +514,57 @@ describe "setting `with` and `without` options" do
     end
   end
 
-  context "when the argument order is varied" do
+  context "when the scope flag placement is varied" do
+    it "should not affect the command" do
+      bundle "config with --local foo"
+      bundle "config without foo --global"
+
+      expect(Bundler.settings.with).not_to eq([])
+      expect(Bundler.settings.without).not_to eq([])
+      expect(out).not_to include("already set")
+    end
+
+    it "should not affect the command" do
+      bundle "config with foo --local"
+      bundle "config without --local foo"
+
+      expect(Bundler.settings.with).to eq([])
+      expect(Bundler.settings.without).to eq([])
+      expect(out).to include("already set")
+    end
+
+    it "should not affect the command" do
+      bundle "config with --local foo"
+      bundle "config --global without foo"
+
+      expect(Bundler.settings.with).not_to eq([])
+      expect(Bundler.settings.without).not_to eq([])
+      expect(out).not_to include("already set")
+    end
+
+    it "should not affect the command" do
+      bundle "config with foo --local"
+      bundle "config --local without foo"
+
+      expect(Bundler.settings.with).to eq([])
+      expect(Bundler.settings.without).to eq([])
+      expect(out).to include("already set")
+    end
   end
-  # TODO: Write specs like the above but for with / without commands with multiple groups, and vary
-  # the order of the arguments
+
+  context "when fed arguments in separate commands" do
+    # TODO: Confirm that this is the desired behavior.
+    it "overwrites Bundler.settings" do
+      bundle "config without foo"
+      bundle "config without bar"
+      bundle "config with foo"
+
+      expect(Bundler.settings.without).to eq([:bar])
+      expect(Bundler.settings.with).to eq([:foo])
+      expect(out).not_to include("already set")
+    end
+  end
+  # TODO: Write specs like the above but for with / without commands with multiple groups
   # TODO: Write specs that check flag order independence (`bundle config --local without foo` should be
   # equivalent to `bundle config without --local foo` and `bundle config without foo --local`, and, in
   # theory, something like `bundle config without foo bar baz --local qux`, albeit a bit awkward).
