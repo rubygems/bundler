@@ -45,8 +45,13 @@ describe Bundler::Settings do
       it "raises an PermissionError with explanation" do
         expect(FileUtils).to receive(:mkdir_p).with(settings.send(:local_config_file).dirname).
           and_raise(Errno::EACCES)
+      end
+    end
+
+    context "when writing to the current config" do
+      it "does not raise a PermissionError" do
         expect { settings[:frozen] = "1" }.
-          to raise_error(Bundler::PermissionError, /config/)
+          not_to raise_error(Bundler::PermissionError, /config/)
       end
     end
   end

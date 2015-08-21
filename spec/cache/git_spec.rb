@@ -51,6 +51,7 @@ end
     end
 
     it "runs twice without exploding" do
+      bundle "config cache_all true"
       build_git "foo"
 
       install_gemfile <<-G
@@ -155,6 +156,7 @@ end
     end
 
     it "does not display warning message if cache_all is set in bundle config" do
+      bundle "config cache_all true"
       build_git "foo"
 
       install_gemfile <<-G

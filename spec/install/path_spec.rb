@@ -16,7 +16,7 @@ describe "bundle install" do
     it "does not use available system gems with config path vendor/bundle" do
       bundle "config path vendor/bundle"
       bundle "install"
-      should_be_installed "rack 1.0.0"
+      should_be_installed "rack 1.0.0", { "BUNDLE_DISABLE_SHARED_GEMS" => "1" }
     end
 
     it "handles paths with regex characters in them" do

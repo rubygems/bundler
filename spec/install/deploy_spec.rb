@@ -29,6 +29,12 @@ describe "install with --deployment or --frozen" do
     bundle "install"
     Dir.chdir tmp
     simulate_new_machine
+
+    # NOTE: This spec fails if we just have `bundle "config frozen true"`,
+    # but succeeds if that line is present and we remove the --deployment
+    # flag from `bundle "install"`.
+
+    # bundle "config frozen true"
     bundle "install --gemfile #{tmp}/bundled_app/gems.rb --deployment"
     Dir.chdir bundled_app
     should_be_installed "rack 1.0"
@@ -229,6 +235,7 @@ describe "install with --deployment or --frozen" do
         gem "foo", :git => "#{lib_path("rack")}"
       G
 
+      # bundle "config frozen true" # Spec passes if this is included
       bundle "install --deployment"
       expect(err).to include("deployment mode")
       expect(err).to include("You have changed in gems.rb:\n* rack from `no specified source` to `#{lib_path("rack")} (at master)`")
@@ -236,7 +243,7 @@ describe "install with --deployment or --frozen" do
       expect(err).not_to include("You have deleted from gems.rb")
     end
 
-    it "remembers that the bundle is frozen at runtime" do
+    it "forgets that the bundle is frozen at runtime" do
       bundle "install --deployment"
 
       gemfile <<-G
@@ -245,7 +252,7 @@ describe "install with --deployment or --frozen" do
         gem "rack-obama"
       G
 
-      should_be_installed "rack 1.0.0"
+      should_not_be_installed "rack 1.0.0"
     end
   end
 end

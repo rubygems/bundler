@@ -47,7 +47,8 @@ describe "Running bin/* commands" do
   end
 
   it "allows the name of the shebang executable to be specified" do
-    bundle "install --shebang ruby-foo"
+    bundle "config shebang ruby-foo"
+    bundle "install"
     bundle "binstubs rack"
     expect(File.open("bin/rackup").gets).to eq("#!/usr/bin/env ruby-foo\n")
   end
@@ -121,7 +122,7 @@ describe "Running bin/* commands" do
     expect(out).to include("You have not configured a value for `bin`")
   end
 
-  it "remembers that the option was specified" do
+  it "forgets that the option was specified" do
     gemfile <<-G
       source "file://#{gem_repo1}"
       gem "activesupport"
@@ -138,17 +139,18 @@ describe "Running bin/* commands" do
 
     bundle "install"
 
-    expect(bundled_app("bin/rackup")).to exist
+    expect(bundled_app("bin/rackup")).not_to exist
   end
 
-  it "rewrites bins on --binstubs (to maintain backwards compatibility)" do
+  it "rewrites bins on binstubs (to maintain backwards compatibility)" do
     gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack"
     G
 
     bundle "install"
-    bundle "binstubs rack --path bin/"
+    bundle "config path bin/"
+    bundle "binstubs rack"
 
     File.open(bundled_app("bin/rackup"), "wb") do |file|
       file.print "OMG"

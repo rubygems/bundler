@@ -1118,6 +1118,7 @@ G
     end
 
     it "returns list of outdated gems when the ruby version matches" do
+      bundle "config system true"
       update_repo2 do
         build_gem "activesupport", "3.0"
         update_git "foo", :path => lib_path("foo")

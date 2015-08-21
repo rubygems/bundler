@@ -102,6 +102,7 @@ describe "bundle update" do
 
   describe "in a frozen bundle" do
     it "should fail loudly" do
+      bundle "config frozen true"
       bundle "install --deployment"
       bundle "update", :expect_err => true
 

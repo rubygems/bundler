@@ -10,7 +10,7 @@ module Bundler
 
     def initialize(root = nil)
       @root           = root
-      @current_config = {}
+      @current_config ||= {}
       @local_config   = load_config(local_config_file)
       @global_config  = load_config(global_config_file)
     end
@@ -18,7 +18,6 @@ module Bundler
     def [](name)
       key = key_for(name)
       value = (@current_config[key] || @local_config[key] || ENV[key] || @global_config[key] || DEFAULT_CONFIG[name])
-
       case
       when value.nil?
         nil
@@ -38,7 +37,6 @@ module Bundler
     alias_method :[]=, :set_current
 
     def set_local(key, value)
-      # change to #set_current and change the alias below?
       local_config_file or raise GemfileNotFound, "Could not locate #{SharedHelpers.gemfile_name}"
       set_key(key, value, @local_config, local_config_file)
     end
@@ -187,11 +185,14 @@ module Bundler
     # Always returns an absolute path to the bundle directory
     # TODO: Refactor this method
     def path
+      # TODO: Shoudl we consider the @current_config here?
       key  = key_for(:path)
       path = ENV[key] || @global_config[key]
       set_path = ""
       install_path = ""
 
+      # We don't use @current_config here, because we no longer accept the path
+      # flag.
       if path && !@local_config.key?(key)
         path = "#{path}/#{Bundler.ruby_scope}" if path != Bundler.rubygems.gem_dir
         set_path = path
@@ -204,6 +205,8 @@ module Bundler
         set_path = File.join(@root, Bundler.ruby_scope)
       end
 
+
+
       if Pathname.new(set_path).absolute?
         # The user specified an absolute path.
         # The set path is the root bundler (gems.rb) path, the systems gem
@@ -215,6 +218,8 @@ module Bundler
         # (gems.rb) directory.
         install_path = File.join(Bundler.root, set_path)
       end
+
+      install_path
     end
 
     def allow_sudo?

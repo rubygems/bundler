@@ -223,6 +223,7 @@ describe "bundle check" do
     G
 
     bundle "install"
+    bundle "config frozen true"
     bundle "install --deployment"
     FileUtils.rm(bundled_app("gems.locked"))
 

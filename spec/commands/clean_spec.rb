@@ -355,7 +355,7 @@ describe "bundle clean" do
     expect(out).to include("thin (1.0)")
   end
 
-  it "--clean should override the bundle setting on install" do
+  it "`config clean` should override the bundle setting on install" do
     gemfile <<-G
       source "file://#{gem_repo1}"
 
@@ -363,7 +363,8 @@ describe "bundle clean" do
       gem "rack"
     G
     bundle "config path vendor/bundle"
-    bundle "install --clean"
+    bundle "config clean true"
+    bundle "install"
 
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -376,7 +377,7 @@ describe "bundle clean" do
     should_not_have_gems "thin-1.0"
   end
 
-  it "--clean should override the bundle setting on update" do
+  it "`config clean` should override the bundle setting on update" do
     build_repo2
 
     gemfile <<-G
@@ -385,7 +386,8 @@ describe "bundle clean" do
       gem "foo"
     G
     bundle "config path vendor/bundle"
-    bundle "install --clean"
+    bundle "config clean true"
+    bundle "install"
 
     update_repo2 do
       build_gem "foo", "1.0.1"
@@ -436,7 +438,7 @@ describe "bundle clean" do
     should_have_gems "foo-1.0", "foo-1.0.1"
   end
 
-  it "does not clean on bundle update when using --system" do
+  it "does clean on bundle update when using --system" do
     build_repo2
 
     gemfile <<-G
@@ -452,7 +454,7 @@ describe "bundle clean" do
     bundle :update
 
     sys_exec "gem list"
-    expect(out).to include("foo (1.0.1, 1.0)")
+    expect(out).not_to include("foo (1.0.1, 1.0)")
   end
 
   it "cleans system gems when --force is used" do
