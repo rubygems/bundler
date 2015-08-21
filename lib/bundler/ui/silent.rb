@@ -1,19 +1,19 @@
 module Bundler
   module UI
     class Silent
-      def info(message, newline = nil)
+      def info(_message, _newline = nil)
       end
 
-      def confirm(message, newline = nil)
+      def confirm(_message, _newline = nil)
       end
 
-      def warn(message, newline = nil)
+      def warn(_message, _newline = nil)
       end
 
-      def error(message, newline = nil)
+      def error(_message, _newline = nil)
       end
 
-      def debug(message, newline = nil)
+      def debug(_message, _newline = nil)
       end
 
       def debug?
@@ -24,16 +24,16 @@ module Bundler
         false
       end
 
-      def ask(message)
+      def ask(_message)
       end
 
-      def level=(name)
+      def level=(_name)
       end
 
-      def level(name = nil)
+      def level(_name = nil)
       end
 
-      def trace(message, newline = nil)
+      def trace(_message, _newline = nil)
       end
 
       def silence

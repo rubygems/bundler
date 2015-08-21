@@ -274,7 +274,7 @@ module Bundler
       Bundler.default_lockfile.basename.to_s rescue "Gemfile.lock"
     end
 
-    def requirement_satisfied_by?(requirement, activated, spec)
+    def requirement_satisfied_by?(requirement, _activated, spec)
       requirement.matches_spec?(spec)
     end
 

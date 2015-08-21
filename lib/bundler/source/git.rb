@@ -168,7 +168,7 @@ module Bundler
         requires_checkout? ? spec.post_install_message : nil
       end
 
-      def cache(spec, custom_path = nil)
+      def cache(_spec, custom_path = nil)
         app_cache_path = app_cache_path(custom_path)
         return unless Bundler.settings[:cache_all]
         return if path == app_cache_path

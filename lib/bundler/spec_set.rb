@@ -62,7 +62,7 @@ module Bundler
       lookup[key].reverse
     end
 
-    def []=(key, value)
+    def []=(_key, value)
       @specs << value
       @lookup = nil
       @sorted = nil

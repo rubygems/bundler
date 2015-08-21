@@ -333,10 +333,6 @@ module Spec
       end
     end
 
-    def build_dep(name, requirements = Gem::Requirement.default, type = :runtime)
-      Bundler::Dependency.new(name, :version => requirements)
-    end
-
     def build_lib(name, *args, &blk)
       build_with(LibBuilder, name, args, &blk)
     end
@@ -359,7 +355,7 @@ module Spec
 
   private
 
-    def build_with(builder, name, args, &blk)
+    def build_with(builder, name, args, &_block)
       @_build_path ||= nil
       options  = args.last.is_a?(Hash) ? args.pop : {}
       versions = args.last || "1.0"

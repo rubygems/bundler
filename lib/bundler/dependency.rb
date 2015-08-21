@@ -54,7 +54,7 @@ module Bundler
       :x64_mingw_23 => Gem::Platform::X64_MINGW
     }.freeze
 
-    def initialize(name, version, options = {}, &blk)
+    def initialize(name, version, options = {}, &_block)
       type = options["type"] || :runtime
       super(name, version, type)
 
