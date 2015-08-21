@@ -141,8 +141,9 @@ describe "bundle install --standalone" do
       expect(err).to eq("ZOMG LOAD ERROR")
     end
 
-    it "allows --without to limit the groups used in a standalone" do
-      bundle "install --standalone --without test"
+    it "allows `without` to limit the groups used in a standalone" do
+      bundle "config without test"
+      bundle "install --standalone"
 
       load_error_ruby <<-RUBY, "spec", :no_lib => true
         $:.unshift File.expand_path("bundle")
@@ -173,8 +174,9 @@ describe "bundle install --standalone" do
       expect(out).to eq("2.3.2")
     end
 
-    it "allows remembered --without to limit the groups used in a standalone" do
-      bundle "install --without test"
+    it "allows configured `without` to limit the groups used in a standalone" do
+      bundle "config without test"
+      bundle "install"
       bundle "install --standalone"
 
       load_error_ruby <<-RUBY, "spec", :no_lib => true

@@ -70,7 +70,7 @@ describe "bundle install with groups" do
     end
   end
 
-  describe "installing --without" do
+  describe "installing `without`" do
     describe "with gems assigned to a single group" do
       before :each do
         gemfile <<-G
@@ -86,29 +86,34 @@ describe "bundle install with groups" do
       end
 
       it "installs gems in the default group" do
-        bundle :install, :without => "emo"
+        bundle "config without emo"
+        bundle :install
         should_be_installed "rack 1.0.0", :groups => [:default]
       end
 
       it "does not install gems from the excluded group" do
-        bundle :install, :without => "emo"
+        bundle "config without emo"
+        bundle :install
         should_not_be_installed "activesupport 2.3.5", :groups => [:default]
       end
 
-      it "does not install gems from the previously excluded group" do
-        bundle :install, :without => "emo"
+      it "does not install gems from the previously configured excluded group" do
+        bundle "config without emo"
+        bundle :install
         should_not_be_installed "activesupport 2.3.5"
         bundle :install
         should_not_be_installed "activesupport 2.3.5"
       end
 
       it "does not say it installed gems from the excluded group" do
-        bundle :install, :without => "emo"
+        bundle "config without emo"
+        bundle :install
         expect(out).not_to include("activesupport")
       end
 
       it "allows Bundler.setup for specific groups" do
-        bundle :install, :without => "emo"
+        bundle "config without emo"
+        bundle :install
         run("require 'rack'; puts RACK", :default)
         expect(out).to eq("1.0.0")
       end
@@ -122,15 +127,18 @@ describe "bundle install with groups" do
           end
         G
 
-        bundle :install, :without => "emo"
+        bundle "config without emo"
+        bundle :install
         should_be_installed "activesupport 2.3.2", :groups => [:default]
       end
 
       it "still works on a different machine and excludes gems" do
-        bundle :install, :without => "emo"
+        bundle "config without emo"
+        bundle :install
 
         simulate_new_machine
-        bundle :install, :without => "emo"
+        # FIXME: might need to `bundle config` here
+        bundle :install
 
         should_be_installed "rack 1.0.0", :groups => [:default]
         should_not_be_installed "activesupport 2.3.5", :groups => [:default]
@@ -149,14 +157,18 @@ describe "bundle install with groups" do
       end
 
       it "clears without when passed an empty list" do
-        bundle :install, :without => "emo"
+        # FIXME: this might not work / be implemented with `bundle config`
+        bundle "config without emo"
+        bundle :install
 
-        bundle 'install --without ""'
+        bundle "config without ''"
+        bundle :install
         should_be_installed "activesupport 2.3.5"
       end
 
       it "doesn't clear without when nothing is passed" do
-        bundle :install, :without => "emo"
+        bundle "config without emo"
+        bundle :install
 
         bundle :install
         should_not_be_installed "activesupport 2.3.5"
@@ -168,12 +180,14 @@ describe "bundle install with groups" do
       end
 
       it "does install gems from the optional group when requested" do
-        bundle :install, :with => "debugging"
+        bundle "config with debugging"
+        bundle :install
         should_be_installed "thin 1.0"
       end
 
       it "does install gems from the previously requested group" do
-        bundle :install, :with => "debugging"
+        bundle "config with debugging"
+        bundle :install
         should_be_installed "thin 1.0"
         bundle :install
         should_be_installed "thin 1.0"
@@ -187,41 +201,55 @@ describe "bundle install with groups" do
       end
 
       it "clears with when passed an empty list" do
-        bundle :install, :with => "debugging"
-        bundle 'install --with ""'
+        bundle "config with debugging"
+        bundle :install
+        bundle "config with ''"
+        bundle :install
         should_not_be_installed "thin 1.0"
       end
 
       it "does remove groups from without when passed at with" do
-        bundle :install, :without => "emo"
-        bundle :install, :with => "emo"
+        bundle "config --global without emo"
+        bundle :install
+        bundle "config --global with emo"
+
+        bundle :install
         should_be_installed "activesupport 2.3.5"
       end
 
       it "does remove groups from with when passed at without" do
-        bundle :install, :with => "debugging"
-        bundle :install, :without => "debugging"
+        bundle "config with debugging"
+        bundle :install
+        bundle "config without debugging"
+        bundle :install
         should_not_be_installed "thin 1.0"
       end
 
-      it "errors out when passing a group to with and without" do
-        bundle :install, :with => "emo debugging", :without => "emo"
-        expect(err).to include("The offending groups are: emo")
+      it "prints a warning when passing a group to with and without" do
+        bundle "config with emo debugging"
+        bundle "config without emo"
+
+        expect(out).to include("`with` and `without` settings cannot share groups.")
+        expect(out).to include("You have already set `with emo` globally, so it will be unset.")
       end
 
       it "can add and remove a group at the same time" do
-        bundle :install, :with => "debugging", :without => "emo"
+        bundle "config with debugging"
+        bundle "config without emo"
+        bundle :install
         should_be_installed "thin 1.0"
         should_not_be_installed "activesupport 2.3.5"
       end
 
       it "does have no effect when listing a not optional group in with" do
-        bundle :install, :with => "emo"
+        bundle "config with emo"
+        bundle :install
         should_be_installed "activesupport 2.3.5"
       end
 
       it "does have no effect when listing an optional group in without" do
-        bundle :install, :without => "debugging"
+        bundle "config without debugging"
+        bundle :install
         should_not_be_installed "thin 1.0"
       end
     end
@@ -238,12 +266,14 @@ describe "bundle install with groups" do
       end
 
       it "installs gems in the default group" do
-        bundle :install, :without => "emo lolercoaster"
+        bundle "config without emo lolercoaster"
+        bundle :install
         should_be_installed "rack 1.0.0"
       end
 
       it "installs the gem if any of its groups are installed" do
-        bundle "install --without emo"
+        bundle "config without emo"
+        bundle "install"
         should_be_installed "rack 1.0.0", "activesupport 2.3.5"
       end
 
@@ -263,23 +293,27 @@ describe "bundle install with groups" do
           G
         end
 
-        it "installs the gem w/ option --without emo" do
-          bundle "install --without emo"
+        it "installs the gem w/ `config without emo`" do
+          bundle "config without emo"
+          bundle "install"
           should_be_installed "activesupport 2.3.5"
         end
 
-        it "installs the gem w/ option --without lolercoaster" do
-          bundle "install --without lolercoaster"
+        it "installs the gem w/ `config without lolercoaster`" do
+          bundle "config without lolercoaster"
+          bundle "install"
           should_be_installed "activesupport 2.3.5"
         end
 
-        it "does not install the gem w/ option --without emo lolercoaster" do
-          bundle "install --without emo lolercoaster"
+        it "does not install the gem w/ `config without emo lolercoaster`" do
+          bundle "config without emo lolercoaster"
+          bundle "install"
           should_not_be_installed "activesupport 2.3.5"
         end
 
-        it "does not install the gem w/ option --without 'emo lolercoaster'" do
-          bundle "install --without 'emo lolercoaster'"
+        it "does not install the gem w/ `config without 'emo lolercoaster'`" do
+          bundle "config without 'emo lolercoaster'"
+          bundle "install"
           should_not_be_installed "activesupport 2.3.5"
         end
       end
@@ -299,12 +333,14 @@ describe "bundle install with groups" do
       end
 
       it "installs gems in the default group" do
-        bundle :install, :without => "emo lolercoaster"
+        bundle "config without emo lolercoaster"
+        bundle :install
         should_be_installed "rack 1.0.0"
       end
 
       it "installs the gem if any of its groups are installed" do
-        bundle "install --without emo"
+        bundle "config without emo"
+        bundle "install"
         should_be_installed "rack 1.0.0", "activesupport 2.3.5"
       end
     end
@@ -335,11 +371,12 @@ describe "bundle install with groups" do
     end
   end
 
-  describe "when locked and installed with --without" do
+  describe "when locked and installed with `without --local`" do
     before(:each) do
       build_repo2
       system_gems "rack-0.9.1" do
-        install_gemfile <<-G, :without => :rack
+        bundle "config --local without rack"
+        install_gemfile <<-G
           source "file://#{gem_repo2}"
           gem "rack"
 
@@ -350,7 +387,7 @@ describe "bundle install with groups" do
       end
     end
 
-    it "uses the correct versions even if --without was used on the original" do
+    it "uses the correct versions even if `without` was used on the original" do
       should_be_installed "rack 0.9.1"
       should_not_be_installed "rack_middleware 1.0"
       simulate_new_machine
@@ -363,7 +400,7 @@ describe "bundle install with groups" do
 
     it "does not hit the remote a second time" do
       FileUtils.rm_rf gem_repo2
-      bundle "install --without rack"
+      bundle "install"
       expect(err).to lack_errors
     end
   end

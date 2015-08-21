@@ -125,17 +125,56 @@ module Bundler
       set_array(:with, array)
     end
 
-    def without
-      get_array(:without)
+    # Finds the previously set `without` groups in the given scope.
+    #
+    # @param  [Symbol,Nil] scope
+    #         any of `:global`, `:local`, or `nil`.
+    #
+    # @return [Array<Symbol>] The previously set `without` groups.
+    #
+    def without(scope = nil)
+      groups_array(:without, scope)
     end
 
-    def with
-      get_array(:with)
+    # Finds the previously set `with` groups in the given scope.
+    #
+    # @param  [Symbol,Nil] scope
+    #         any of `:global`, `:local`, or `nil`.
+    #
+    # @return [Array<Symbol>] The previously set `with` groups.
+    #
+    def with(scope = nil)
+      groups_array(:with, scope)
+    end
+
+    # Finds the previously set groups of the given type and scope.
+    #
+    # @param  [Symbol] group_type
+    #         either `:with` or `:without`.
+    #
+    # @param  [Symbol,Nil] scope
+    #         any of `:global`, `:local`, or `nil`; otherwise, an error is
+    #         thrown.
+    #
+    # @return [Array<Symbol>] The previously set groups.
+    #
+    def groups_array(group_type, scope)
+      key = key_for(group_type)
+      if scope.nil?
+        get_array(group_type)
+      elsif scope == :global
+        @global_config[key] ? @global_config[key].split(" ").map(&:to_sym) : []
+      elsif scope == :local
+        @local_config[key] ? @local_config[key].split(" ").map(&:to_sym) : []
+      else
+        Bundler.ui.error "Invalid scope #{scope} given. Please use :local or :global."
+        exit 1
+      end
     end
 
     # @local_config["BUNDLE_PATH"] should be prioritized over ENV["BUNDLE_PATH"]
     # Always returns an absolute path to the bundle directory
-    # TODO: Document and refactor this method
+    # TODO: Refactor this method
     def path
       key  = key_for(:path)
       path = ENV[key] || @global_config[key]

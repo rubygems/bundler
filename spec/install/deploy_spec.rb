@@ -42,7 +42,8 @@ describe "install with --deployment or --frozen" do
       end
     G
     bundle :install
-    bundle "install --deployment --without test"
+    bundle "config without test"
+    bundle "install --deployment"
     expect(exitstatus).to eq(0) if exitstatus
   end
 

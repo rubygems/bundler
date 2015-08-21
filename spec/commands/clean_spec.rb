@@ -116,7 +116,8 @@ describe "bundle clean" do
 
     bundle "config path vendor/bundle"
     bundle "install"
-    bundle "install --without test_group"
+    bundle "config without test_group"
+    bundle "install"
     bundle :clean
 
     expect(out).to include("Removing rack (1.0.0)")
@@ -257,7 +258,8 @@ describe "bundle clean" do
       end
     G
     bundle "config path vendor/bundle"
-    bundle "install --without test"
+    bundle "config without test"
+    bundle "install"
 
     bundle :clean
 
@@ -279,7 +281,8 @@ describe "bundle clean" do
     G
 
     bundle "config path vendor/bundle"
-    bundle "install --without development"
+    bundle "config without development"
+    bundle "install"
 
     bundle :clean
     expect(exitstatus).to eq(0) if exitstatus

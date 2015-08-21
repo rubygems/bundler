@@ -140,8 +140,9 @@ describe "bundle exec" do
     end
   end
 
-  it "handles gems installed with --without" do
-    install_gemfile <<-G, :without => :middleware
+  it "handles gems installed with `without` configured" do
+    bundle "config without middleware"
+    install_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack" # rack 0.9.1 and 1.0 exist
 

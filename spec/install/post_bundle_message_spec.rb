@@ -28,24 +28,27 @@ describe "post bundle message" do
       expect(out).to include(installed_gems_stats)
     end
 
-    it "with --without one group" do
-      bundle "install --without emo"
+    it "with `without [one group]`" do
+      bundle "config without emo"
+      bundle "install"
       expect(out).to include(bundle_show_message)
       expect(out).to include("Gems in the group emo were not installed")
       expect(out).to include(bundle_complete_message)
       expect(out).to include(installed_gems_stats)
     end
 
-    it "with --without two groups" do
-      bundle "install --without emo test"
+    it "with `without [two groups]`" do
+      bundle "config without emo test"
+      bundle "install"
       expect(out).to include(bundle_show_message)
       expect(out).to include("Gems in the groups emo and test were not installed")
       expect(out).to include(bundle_complete_message)
       expect(out).to include("4 gems.rb dependencies, 3 gems now installed.")
     end
 
-    it "with --without more groups" do
-      bundle "install --without emo obama test"
+    it "with `without [more groups]`" do
+      bundle "config without emo obama test"
+      bundle "install"
       expect(out).to include(bundle_show_message)
       expect(out).to include("Gems in the groups emo, obama and test were not installed")
       expect(out).to include(bundle_complete_message)
@@ -61,25 +64,28 @@ describe "post bundle message" do
         expect(out).to include(bundle_complete_message)
       end
 
-      it "with --without one group" do
+      it "with `without [one group]`" do
         bundle "config path vendor"
-        bundle "install --without emo"
+        bundle "config without emo"
+        bundle "install"
         expect(out).to include(bundle_deployment_message)
         expect(out).to include("Gems in the group emo were not installed")
         expect(out).to include(bundle_complete_message)
       end
 
-      it "with --without two groups" do
+      it "with `without [two groups]`" do
         bundle "config path vendor"
-        bundle "install --without emo test"
+        bundle "config without emo test"
+        bundle "install"
         expect(out).to include(bundle_deployment_message)
         expect(out).to include("Gems in the groups emo and test were not installed")
         expect(out).to include(bundle_complete_message)
       end
 
-      it "with --without more groups" do
+      it "with `without [more groups]`" do
+        bundle "config without emo obama test"
         bundle "config path vendor"
-        bundle "install --without emo obama test"
+        bundle "install"
         expect(out).to include(bundle_deployment_message)
         expect(out).to include("Gems in the groups emo, obama and test were not installed")
         expect(out).to include(bundle_complete_message)
@@ -107,8 +113,9 @@ describe "post bundle message" do
       expect(out).to include(installed_gems_stats)
     end
 
-    it "with --without one group" do
-      bundle "install --without emo"
+    it "with `without [one group]`" do
+      bundle "config without emo"
+      bundle "install"
       bundle :install
       expect(out).to include(bundle_show_message)
       expect(out).to include("Gems in the group emo were not installed")
@@ -116,16 +123,18 @@ describe "post bundle message" do
       expect(out).to include(installed_gems_stats)
     end
 
-    it "with --without two groups" do
-      bundle "install --without emo test"
+    it "with `without [two groups]`" do
+      bundle "config without emo test"
+      bundle "install"
       bundle :install
       expect(out).to include(bundle_show_message)
       expect(out).to include("Gems in the groups emo and test were not installed")
       expect(out).to include(bundle_complete_message)
     end
 
-    it "with --without more groups" do
-      bundle "install --without emo obama test"
+    it "with `without [more groups]`" do
+      bundle "config without emo obama test"
+      bundle "install"
       bundle :install
       expect(out).to include(bundle_show_message)
       expect(out).to include("Gems in the groups emo, obama and test were not installed")
@@ -140,22 +149,25 @@ describe "post bundle message" do
       expect(out).to include(bundle_updated_message)
     end
 
-    it "with --without one group" do
-      bundle :install, :without => :emo
+    it "with `without [one group]`" do
+      bundle "config without emo"
+      bundle :install
       bundle :update
       expect(out).to include("Gems in the group emo were not installed")
       expect(out).to include(bundle_updated_message)
     end
 
-    it "with --without two groups" do
-      bundle "install --without emo test"
+    it "with `without [two groups]`" do
+      bundle "config without emo test"
+      bundle "install"
       bundle :update
       expect(out).to include("Gems in the groups emo and test were not installed")
       expect(out).to include(bundle_updated_message)
     end
 
-    it "with --without more groups" do
-      bundle "install --without emo obama test"
+    it "with `without [more groups]`" do
+      bundle "config without emo obama test"
+      bundle "install"
       bundle :update
       expect(out).to include("Gems in the groups emo, obama and test were not installed")
       expect(out).to include(bundle_updated_message)
