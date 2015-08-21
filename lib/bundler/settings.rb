@@ -9,14 +9,15 @@ module Bundler
     attr_reader :root
 
     def initialize(root = nil)
-      @root          = root
-      @local_config  = load_config(local_config_file)
-      @global_config = load_config(global_config_file)
+      @root           = root
+      @current_config = {}
+      @local_config   = load_config(local_config_file)
+      @global_config  = load_config(global_config_file)
     end
 
     def [](name)
       key = key_for(name)
-      value = (@local_config[key] || ENV[key] || @global_config[key] || DEFAULT_CONFIG[name])
+      value = (@current_config[key] || @local_config[key] || ENV[key] || @global_config[key] || DEFAULT_CONFIG[name])
 
       case
       when value.nil?
@@ -30,12 +31,17 @@ module Bundler
       end
     end
 
-    def []=(key, value)
+    def set_current(key, value)
+      @current_config[key_for(key)] = value
+    end
+
+    alias_method :[]=, :set_current
+
+    def set_local(key, value)
+      # change to #set_current and change the alias below?
       local_config_file or raise GemfileNotFound, "Could not locate #{SharedHelpers.gemfile_name}"
       set_key(key, value, @local_config, local_config_file)
     end
-
-    alias_method :set_local, :[]=
 
     def delete(key)
       @local_config.delete(key_for(key))
@@ -48,7 +54,7 @@ module Bundler
     def all
       env_keys = ENV.keys.select {|k| k =~ /BUNDLE_.*/ }
 
-      keys = @global_config.keys | @local_config.keys | env_keys
+      keys = @current_config.keys | @global_config.keys | @local_config.keys | env_keys
 
       keys.map do |key|
         key.sub(/^BUNDLE_/, "").gsub(/__/, ".").downcase
@@ -90,9 +96,10 @@ module Bundler
     def locations(key)
       key = key_for(key)
       locations = {}
-      locations[:local]  = @local_config[key] if @local_config.key?(key)
-      locations[:env]    = ENV[key] if ENV[key]
-      locations[:global] = @global_config[key] if @global_config.key?(key)
+      locations[:current] = @current_config[key] if @current_config.key?(key)
+      locations[:local]   = @local_config[key] if @local_config.key?(key)
+      locations[:env]     = ENV[key] if ENV[key]
+      locations[:global]  = @global_config[key] if @global_config.key?(key)
       locations[:default] = DEFAULT_CONFIG[key] if DEFAULT_CONFIG.key?(key)
       locations
     end
@@ -101,6 +108,10 @@ module Bundler
       key = key_for(exposed_key)
 
       locations = []
+      if @current_config.key?(key)
+        locations << "Set only for this command with a flag: #{@current_config[key].inspect}"
+      end
+
       if @local_config.key?(key)
         locations << "Set for your local app (#{local_config_file}): #{@local_config[key].inspect}"
       end
