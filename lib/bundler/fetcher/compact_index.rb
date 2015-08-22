@@ -13,8 +13,7 @@ module Bundler
       rescue NetworkDownError => e
         raise HTTPError, e.message
       rescue AuthenticationRequiredError
-        # We got a 401 from the server. Just fail.
-        raise
+        raise # We got a 401 from the server. Just fail.
       rescue HTTPError
       end
 
@@ -35,10 +34,10 @@ module Bundler
       def compact_index_client
         @compact_index_client ||= begin
           uri_part = [display_uri.hostname, display_uri.port, Digest::MD5.hexdigest(display_uri.path)].compact.join(".")
-          fetcher = lambda do |path, headers|
-            fetcher.downloader.fetch(fetcher.fetch_uri + path, headers)
+          compact_fetcher = lambda do |path, headers|
+            downloader.fetch(fetch_uri + path, headers)
           end
-          CompactIndexClient.new(Bundler.cache + "compact_index" + uri_part, fetcher)
+          CompactIndexClient.new(Bundler.cache + "compact_index" + uri_part, compact_fetcher)
         end
       end
     end
