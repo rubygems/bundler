@@ -16,7 +16,7 @@ class Bundler::CompactIndexClient
       mode = response.is_a?(Net::HTTPPartialContent) ? "a" : "w"
       local_path.open(mode) {|f| f << response.body }
 
-      return if checksum_for_file(path) == response["ETag"]
+      return if checksum_for_file(local_path) == response["ETag"]
       local_path.delete
       update(local_path, remote_path)
     end
