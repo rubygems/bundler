@@ -16,6 +16,9 @@ Lint/AssignmentInCondition:
 Lint/EndAlignment:
   AlignWith: variable
 
+Lint/UnusedMethodArgument:
+  Enabled: false
+
 # Style
 
 Style/AccessModifierIndentation:
