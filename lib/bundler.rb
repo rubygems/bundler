@@ -1,6 +1,7 @@
 require "fileutils"
 require "pathname"
 require "rbconfig"
+require "thread"
 require "bundler/gem_path_manipulation"
 require "bundler/rubygems_ext"
 require "bundler/rubygems_integration"
@@ -11,6 +12,7 @@ require "bundler/current_ruby"
 module Bundler
   preserve_gem_path
   ORIGINAL_ENV = ENV.to_hash
+  SUDO_MUTEX = Mutex.new
 
   autoload :Definition,            "bundler/definition"
   autoload :Dependency,            "bundler/dependency"
@@ -345,19 +347,21 @@ module Bundler
     end
 
     def sudo(str)
-      prompt = "\n\n" + <<-PROMPT.gsub(/^ {6}/, "").strip + " "
-      Your user account isn't allowed to install to the system Rubygems.
-      You can cancel this installation and run:
+      SUDO_MUTEX.synchronize do
+        prompt = "\n\n" + <<-PROMPT.gsub(/^ {6}/, "").strip + " "
+        Your user account isn't allowed to install to the system Rubygems.
+        You can cancel this installation and run:
 
-          bundle install --path vendor/bundle
+            bundle install --path vendor/bundle
 
-      to install the gems into ./vendor/bundle/, or you can enter your password
-      and install the bundled gems to Rubygems using sudo.
+        to install the gems into ./vendor/bundle/, or you can enter your password
+        and install the bundled gems to Rubygems using sudo.
 
-      Password:
-      PROMPT
+        Password:
+        PROMPT
 
-      `sudo -p "#{prompt}" #{str}`
+        `sudo -p "#{prompt}" #{str}`
+      end
     end
 
     def read_file(file)
