@@ -25,11 +25,6 @@ Lint/NonLocalExitFromIterator:
 Lint/RescueException:
   Enabled: false
 
-# Offense count: 38
-# Cop supports --auto-correct.
-Lint/UnusedMethodArgument:
-  Enabled: false
-
 # Offense count: 7
 Lint/UselessAssignment:
   Enabled: false
