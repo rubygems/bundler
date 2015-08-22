@@ -59,7 +59,7 @@ class Bundler::CompactIndexClient
       lines = path.read.lines
       header = lines.index("---\n")
       lines = header ? lines[header + 1..-1] : lines
-      lines.each!(&:strip!)
+      lines.each(&:strip!)
     end
 
     def parse_gem(string)

@@ -69,6 +69,7 @@ module Bundler
 
     def _remote_specification
       @_remote_specification ||= @spec_fetcher.fetch_spec([@name, @version, @platform])
+      @_remote_specification || raise(GemspecError, "Couldn't fetch specification for #{full_name}")
     end
 
     def method_missing(method, *args, &blk)
