@@ -49,7 +49,8 @@ private
 
   def update_info(name)
     path = @cache.info_path(name)
-    return if @info_checksums_by_name[name] == @updater.checksum_for_file(path)
+    checksum = @updater.checksum_for_file(path)
+    return if checksum && checksum == @info_checksums_by_name[name]
     update(path, "info/#{name}")
   end
 
