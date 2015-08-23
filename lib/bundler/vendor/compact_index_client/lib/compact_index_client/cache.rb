@@ -18,7 +18,7 @@ class Bundler::CompactIndexClient
     def versions
       versions_by_name = Hash.new {|hash, key| hash[key] = [] }
       info_checksums_by_name = {}
-      lines(versions_path).map do |line|
+      lines(versions_path).each do |line|
         next if line == "-1"
         name, versions_string, info_checksum = line.split(" ", 3)
         info_checksums_by_name[name] = info_checksum || ""
