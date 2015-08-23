@@ -37,7 +37,7 @@ module Bundler
           compact_fetcher = lambda do |path, headers|
             downloader.fetch(fetch_uri + path, headers)
           end
-          CompactIndexClient.new(Bundler.cache + "compact_index" + uri_part, compact_fetcher)
+          CompactIndexClient.new(Bundler.user_cache + "compact_index" + uri_part, compact_fetcher)
         end
       end
     end
