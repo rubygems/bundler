@@ -19,6 +19,9 @@ module Bundler
         complete_gems = []
         remaining_gems = gem_names.dup
 
+        # Read info file checksums out of versions to allow request-skipping
+        compact_index_client.parse_checksums!
+
         until remaining_gems.empty?
           Bundler.ui.debug "Looking up gems #{remaining_gems.inspect}"
 
