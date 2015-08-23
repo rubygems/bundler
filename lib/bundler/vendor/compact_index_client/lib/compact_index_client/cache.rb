@@ -12,7 +12,7 @@ class Bundler::CompactIndexClient
     end
 
     def names_path
-      directory + "names"
+      directory.join("names")
     end
 
     def versions
