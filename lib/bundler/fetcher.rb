@@ -136,7 +136,7 @@ module Bundler
     def use_api
       return @use_api if defined?(@use_api)
 
-      fetchers.reject! {|f| !f.available? }
+      fetchers.shift until fetchers.first.available?
 
       if remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
         @use_api = false
