@@ -56,10 +56,9 @@ class Bundler::CompactIndexClient
 
     def lines(path)
       return [] unless path.file?
-      lines = path.read.lines.to_a
-      header = lines.index("---\n")
+      lines = path.read.split("\n")
+      header = lines.index("---")
       lines = header ? lines[header + 1..-1] : lines
-      lines.each(&:strip!)
     end
 
     def parse_gem(string)
