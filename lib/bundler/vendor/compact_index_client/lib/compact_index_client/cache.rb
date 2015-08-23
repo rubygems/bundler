@@ -30,7 +30,7 @@ class Bundler::CompactIndexClient
     end
 
     def versions_path
-      directory + "versions"
+      directory.join("versions")
     end
 
     def dependencies(name)
@@ -40,7 +40,7 @@ class Bundler::CompactIndexClient
     end
 
     def info_path(name)
-      directory + "info" + name.to_s
+      directory.join("info", name.to_s)
     end
 
     def specific_dependency(name, version, platform)
