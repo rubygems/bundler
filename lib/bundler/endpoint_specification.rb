@@ -103,7 +103,7 @@ module Bundler
       data.each do |k, v|
         case k.to_s
         when "checksum"
-          @checksum = v.last
+          @checksum = v ? v.last : nil
         when "rubygems"
           @required_rubygems_version = Gem::Requirement.new(v) if v
         when "ruby"
