@@ -156,6 +156,10 @@ module Bundler
       bundle_path.join("cache/bundler")
     end
 
+    def user_cache
+      user_bundle_path.join("cache")
+    end
+
     def root
       @root ||= begin
                   default_gemfile.dirname.expand_path
