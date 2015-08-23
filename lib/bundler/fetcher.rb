@@ -111,12 +111,17 @@ module Bundler
       old = Bundler.rubygems.sources
       index = Bundler::Index.new
 
-      specs = []
-      fetchers.dup.each do |f|
-        break unless f.api_fetcher? && !gem_names || !specs = f.specs(gem_names)
-        fetchers.delete(f)
+      if Bundler::Fetcher.disable_endpoint
+        @use_api = false
+        specs = fetchers.last.specs(gem_names)
+      else
+        specs = []
+        fetchers.dup.each do |f|
+          break unless f.api_fetcher? && !gem_names || !specs = f.specs(gem_names)
+          fetchers.delete(f)
+        end
+        @use_api = false if fetchers.none?(&:api_fetcher?)
       end
-      @use_api = false if fetchers.none?(&:api_fetcher?)
 
       specs.each do |spec|
         next if spec.name == "bundler"

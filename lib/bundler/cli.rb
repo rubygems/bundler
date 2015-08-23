@@ -136,7 +136,7 @@ module Bundler
     method_option "frozen", :type => :boolean, :banner =>
       "Do not allow the Gemfile.lock to be updated after this install"
     method_option "full-index", :type => :boolean, :banner =>
-      "Use the rubygems modern index instead of the API endpoint"
+      "Fall back to using the single-file index of all gems"
     method_option "gemfile", :type => :string, :banner =>
       "Use the specified gemfile instead of Gemfile"
     method_option "jobs", :aliases => "-j", :type => :numeric, :banner =>
@@ -179,7 +179,7 @@ module Bundler
       possible versions of the gems in the bundle.
     D
     method_option "full-index", :type => :boolean, :banner =>
-      "Use the rubygems modern index instead of the API endpoint"
+      "Fall back to using the single-file index of all gems"
     method_option "group", :aliases => "-g", :type => :array, :banner =>
       "Update a specific group"
     method_option "jobs", :aliases => "-j", :type => :numeric, :banner =>
@@ -410,7 +410,7 @@ module Bundler
     method_option "lockfile", :type => :string, :default => nil, :banner =>
       "the path the lockfile should be written to"
     method_option "full-index", :type => :boolean, :default => false, :banner =>
-      "Use the rubygems modern index instead of the API endpoint"
+      "Fall back to using the single-file index of all gems"
     def lock
       require "bundler/cli/lock"
       Lock.new(options).run
