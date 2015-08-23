@@ -69,7 +69,8 @@ module Bundler
 
     def _remote_specification
       @_remote_specification ||= @spec_fetcher.fetch_spec([@name, @version, @platform])
-      @_remote_specification || raise(GemspecError, "Couldn't fetch specification for #{full_name}")
+      @_remote_specification || raise(GemspecError, "Gemspec data for #{full_name} was" \
+        " missing from the server! Try installing with `--full-index` as a workaround.")
     end
 
     def method_missing(method, *args, &blk)
