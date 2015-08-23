@@ -628,7 +628,7 @@ module Spec
 
           Bundler.rubygems.build(@spec, opts[:skip_validation])
           if opts[:to_system]
-            `gem install --ignore-dependencies #{@spec.full_name}.gem`
+            `gem install --ignore-dependencies --no-ri --no-rdoc #{@spec.full_name}.gem`
           else
             FileUtils.mv("#{@spec.full_name}.gem", opts[:path] || _default_path)
           end
