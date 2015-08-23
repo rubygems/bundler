@@ -12,6 +12,8 @@ module Bundler
         exit 1
       end
 
+      Bundler::Fetcher.disable_endpoint = options["full-index"]
+
       print = options[:print]
       ui = Bundler.ui
       Bundler.ui = UI::Silent.new if print
