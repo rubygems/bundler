@@ -28,7 +28,7 @@ class Bundler::CompactIndexClient
   end
 
   def dependencies(names)
-    names.each {|n| update_info(n) }
+    names.map {|n| Thread.new{ update_info(n) } }.each(&:join)
     names.map do |name|
       @cache.dependencies(name).map {|d| d.unshift(name) }
     end.flatten(1)
