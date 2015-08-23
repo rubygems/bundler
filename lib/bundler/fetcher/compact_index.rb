@@ -6,7 +6,7 @@ module Bundler
       require "bundler/vendor/compact_index_client/lib/compact_index_client"
 
       def specs(gem_names)
-        @specs ||= specs_for_gems(gem_names)
+        @specs ||= specs_for_names(gem_names)
       rescue NetworkDownError => e
         raise HTTPError, e.message
       rescue AuthenticationRequiredError
@@ -14,7 +14,7 @@ module Bundler
       rescue HTTPError
       end
 
-      def specs_for_gems(gem_names)
+      def specs_for_names(gem_names)
         gemspecs = []
         complete_gems = []
         remaining_gems = gem_names.dup
