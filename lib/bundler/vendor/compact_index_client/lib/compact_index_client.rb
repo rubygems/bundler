@@ -1,5 +1,5 @@
 require "pathname"
-require "set"
+require "bundler/worker"
 
 class Bundler::CompactIndexClient
   require "bundler/vendor/compact_index_client/lib/compact_index_client/cache"
@@ -27,9 +27,13 @@ class Bundler::CompactIndexClient
     versions
   end
 
-  def dependencies(names)
-    names.map {|n| Thread.new{ update_info(n) } }.each(&:join)
-    names.map do |name|
+  def dependencies(names, pool_size = 25)
+    update = -> (name, q) { update_info(name); name }
+    worker = Bundler::Worker.new(pool_size, update)
+    names.each {|name| worker.enq(name) }
+
+    names.map do
+      name = worker.deq
       @cache.dependencies(name).map {|d| d.unshift(name) }
     end.flatten(1)
   end
