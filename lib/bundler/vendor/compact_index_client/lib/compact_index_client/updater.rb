@@ -1,6 +1,5 @@
 class Bundler::CompactIndexClient
   class Updater
-    attr_reader :fetcher
     def initialize(fetcher)
       @fetcher = fetcher
     end
@@ -11,7 +10,7 @@ class Bundler::CompactIndexClient
         headers["If-None-Match"] = checksum_for_file(local_path)
         headers["Range"] = "bytes=#{local_path.size}-"
       end
-      response = fetcher.call(remote_path, headers)
+      response = @fetcher.call(remote_path, headers)
       return if response.is_a?(Net::HTTPNotModified)
       mode = response.is_a?(Net::HTTPPartialContent) ? "a" : "w"
       local_path.open(mode) {|f| f << response.body }
