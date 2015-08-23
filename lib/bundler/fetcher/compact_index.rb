@@ -5,11 +5,8 @@ module Bundler
     class CompactIndex < Base
       require "bundler/vendor/compact_index_client/lib/compact_index_client"
 
-      def specs(_gem_names)
-        @specs ||= compact_index_client.versions.values.flatten(1).map! do |args|
-          args = args.fill(nil, args.size..2) << self
-          RemoteSpecification.new(*args)
-        end
+      def specs(gem_names)
+        @specs ||= specs_for_gems(gem_names)
       rescue NetworkDownError => e
         raise HTTPError, e.message
       rescue AuthenticationRequiredError
@@ -17,16 +14,45 @@ module Bundler
       rescue HTTPError
       end
 
+      def specs_for_gems(gem_names)
+        gemspecs = []
+        complete_gems = []
+        remaining_gems = gem_names.dup
+
+        until remaining_gems.empty?
+          Bundler.ui.debug "Looking up gems #{remaining_gems.inspect}"
+
+          deps = compact_index_client.dependencies(remaining_gems)
+          next_gems = deps.map{|d| d[3].map(&:first) }.flatten(1).uniq
+
+          deps.each do |contents|
+            contents[1] = Gem::Version.new(contents[1])
+            contents[3].map! {|name, reqs| Gem::Dependency.new(name, reqs) }
+            gemspecs << EndpointSpecification.new(*contents)
+          end
+
+          complete_gems.push(*deps.map(&:first).uniq)
+          remaining_gems = next_gems - complete_gems
+        end
+
+        gemspecs
+      end
+
       def fetch_spec(spec)
         spec -= [nil, "ruby", ""]
-        return unless contents = compact_index_client.spec(*spec)
+        contents = compact_index_client.spec(*spec)
+        return nil if contents.nil?
         contents.unshift(spec.first)
         contents[3].map! {|d| Gem::Dependency.new(*d) }
         EndpointSpecification.new(*contents)
       end
 
       def available?
-        fetch_uri.scheme != "file" && specs([])
+        fetch_uri.scheme != "file"
+      end
+
+      def api_fetcher?
+        true
       end
 
     private
@@ -34,9 +60,11 @@ module Bundler
       def compact_index_client
         @compact_index_client ||= begin
           uri_part = [display_uri.hostname, display_uri.port, Digest::MD5.hexdigest(display_uri.path)].compact.join(".")
+
           compact_fetcher = lambda do |path, headers|
             downloader.fetch(fetch_uri + path, headers)
           end
+
           CompactIndexClient.new(Bundler.user_cache + "compact_index" + uri_part, compact_fetcher)
         end
       end
