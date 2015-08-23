@@ -6,6 +6,8 @@ class Bundler::CompactIndexClient
   require "bundler/vendor/compact_index_client/lib/compact_index_client/updater"
   require "bundler/vendor/compact_index_client/lib/compact_index_client/version"
 
+  attr_reader :directory
+
   def initialize(directory, fetcher)
     @directory = Pathname.new(directory)
     @updater = Updater.new(fetcher)

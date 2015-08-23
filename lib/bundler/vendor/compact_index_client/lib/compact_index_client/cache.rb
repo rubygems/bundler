@@ -4,7 +4,7 @@ class Bundler::CompactIndexClient
 
     def initialize(directory)
       @directory = Pathname.new(directory).expand_path
-      FileUtils.mkdir_p dependencies_path(nil)
+      FileUtils.mkdir_p info_path(nil)
     end
 
     def names
@@ -34,19 +34,19 @@ class Bundler::CompactIndexClient
     end
 
     def dependencies(name)
-      lines(dependencies_path(name)).map do |line|
+      lines(info_path(name)).map do |line|
         parse_gem(line)
       end
     end
 
-    def dependencies_path(name)
-      directory + "dependencies" + name.to_s
+    def info_path(name)
+      directory + "info" + name.to_s
     end
 
     def specific_dependency(name, version, platform)
       pattern = [version, platform].compact.join("-")
       matcher = /\A#{Regexp.escape(pattern)}\b/ unless pattern.empty?
-      lines(dependencies_path(name)).each do |line|
+      lines(info_path(name)).each do |line|
         return parse_gem(line) if line =~ matcher
       end if matcher
       nil
@@ -56,7 +56,7 @@ class Bundler::CompactIndexClient
 
     def lines(path)
       return [] unless path.file?
-      lines = path.read.lines
+      lines = path.read.lines.to_a
       header = lines.index("---\n")
       lines = header ? lines[header + 1..-1] : lines
       lines.each(&:strip!)
@@ -73,7 +73,7 @@ class Bundler::CompactIndexClient
 
     def parse_dependency(string)
       dependency = string.split(":")
-      dependency[-1] = dependency[-1].split("&")
+      dependency[-1] = dependency[-1].split("&") if dependency.size > 1
       dependency
     end
   end
