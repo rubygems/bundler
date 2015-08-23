@@ -14,6 +14,7 @@ module Bundler
   ORIGINAL_ENV = ENV.to_hash
   SUDO_MUTEX = Mutex.new
 
+  autoload :CachedRuntime,         "bundler/cached_runtime"
   autoload :Definition,            "bundler/definition"
   autoload :Dependency,            "bundler/dependency"
   autoload :DepProxy,              "bundler/dep_proxy"
@@ -110,6 +111,7 @@ module Bundler
 
   class << self
     attr_writer :bundle_path
+    attr_accessor :runtime_implementation
 
     def configure
       @configured ||= configure_gem_home_and_path
@@ -158,7 +160,7 @@ module Bundler
     end
 
     def load
-      @load ||= Runtime.new(root, definition)
+      @load ||= (runtime_implementation || Runtime).new(root, definition)
     end
 
     def environment
