@@ -48,7 +48,7 @@ private
   end
 
   def update_info(name)
-    path = @cache.dependencies_path(name)
+    path = @cache.info_path(name)
     return if @info_checksums_by_name[name] == @updater.checksum_for_file(path)
     update(path, "info/#{name}")
   end
