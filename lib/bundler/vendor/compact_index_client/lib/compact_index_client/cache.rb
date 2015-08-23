@@ -45,11 +45,11 @@ class Bundler::CompactIndexClient
 
     def specific_dependency(name, version, platform)
       pattern = [version, platform].compact.join("-")
-      matcher = /\A#{Regexp.escape(pattern)}\b/ unless pattern.empty?
-      lines(info_path(name)).each do |line|
-        return parse_gem(line) if line =~ matcher
-      end if matcher
-      nil
+      return nil if pattern.empty?
+
+      gem_lines = info_path(name).read
+      gem_line = gem_lines[/^#{Regexp.escape(pattern)}\b.*/, 0]
+      gem_line ? parse_gem(gem_line) : nil
     end
 
   private
