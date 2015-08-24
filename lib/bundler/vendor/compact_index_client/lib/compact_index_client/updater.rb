@@ -27,7 +27,9 @@ class Bundler::CompactIndexClient
       mode = response.is_a?(Net::HTTPPartialContent) ? "a" : "w"
       local_path.open(mode) {|f| f << content }
 
-      if etag_for(local_path) != response["ETag"] && retrying.nil?
+      return if etag_for(local_path) == response["ETag"]
+
+      if retrying.nil?
         local_path.delete
         update(local_path, remote_path, :retrying)
       else
