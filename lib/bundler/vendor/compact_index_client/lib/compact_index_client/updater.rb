@@ -8,7 +8,7 @@ class Bundler::CompactIndexClient
       headers = {}
 
       if local_path.file?
-        headers["If-None-Match"] = checksum_for_file(local_path)
+        headers["If-None-Match"] = etag_for(local_path)
         headers["Range"] = "bytes=#{local_path.size}-"
       else
         # Fastly ignores Range when Accept-Encoding: gzip is set
@@ -27,14 +27,14 @@ class Bundler::CompactIndexClient
       mode = response.is_a?(Net::HTTPPartialContent) ? "a" : "w"
       local_path.open(mode) {|f| f << content }
 
-      return if checksum_for_file(local_path) == response["ETag"]
+      return if etag_for(local_path) == response["ETag"]
       local_path.delete
       update(local_path, remote_path)
     end
 
-    def checksum_for_file(path)
+    def etag_for(path)
       return nil unless path.file?
-      Digest::MD5.file(path).hexdigest
+      '"' << Digest::MD5.file(path).hexdigest << '"'
     end
   end
 end
