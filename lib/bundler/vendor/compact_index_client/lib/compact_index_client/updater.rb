@@ -37,8 +37,13 @@ class Bundler::CompactIndexClient
     end
 
     def etag_for(path)
+      sum = checksum_for_file(path)
+      sum ? '"' << sum << '"' : nil
+    end
+
+    def checksum_for_file(path)
       return nil unless path.file?
-      '"' << Digest::MD5.file(path).hexdigest << '"'
+      Digest::MD5.file(path).hexdigest
     end
   end
 end
