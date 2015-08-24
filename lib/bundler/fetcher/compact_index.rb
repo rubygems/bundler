@@ -11,7 +11,8 @@ module Bundler
         raise HTTPError, e.message
       rescue AuthenticationRequiredError
         raise # We got a 401 from the server. Just fail.
-      rescue HTTPError
+      rescue HTTPError => e
+        Bundler.ui.trace(e)
       end
 
       def specs_for_names(gem_names)
