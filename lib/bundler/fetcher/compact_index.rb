@@ -13,6 +13,7 @@ module Bundler
         raise # We got a 401 from the server. Just fail.
       rescue HTTPError => e
         Bundler.ui.trace(e)
+        nil
       end
 
       def specs_for_names(gem_names)
