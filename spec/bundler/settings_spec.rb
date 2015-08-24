@@ -43,7 +43,7 @@ describe Bundler::Settings do
 
     context "when it's not possible to write to the file" do
       it "raises an PermissionError with explanation" do
-        expect(FileUtils).to receive(:mkdir_p).with(settings.send(:local_config_file).dirname).
+        expect(FileUtils).to receive(:mkdir_p).with(settings.send(:global_config_file).dirname).
           and_raise(Errno::EACCES)
       end
     end
@@ -51,7 +51,7 @@ describe Bundler::Settings do
     context "when writing to the current config" do
       it "does not raise a PermissionError" do
         expect { settings[:frozen] = "1" }.
-          not_to raise_error(Bundler::PermissionError, /config/)
+          not_to raise_error#(Bundler::PermissionError, /config/)
       end
     end
   end

@@ -126,12 +126,12 @@ module Bundler
       locations
     end
 
-    def without=(array)
-      set_array(:without, array)
+    def without=(array, scope = :current)
+      set_array(:without, array, scope)
     end
 
-    def with=(array)
-      set_array(:with, array)
+    def with=(array, scope = :current)
+      set_array(:with, array, scope)
     end
 
     # Finds the previously set `without` groups in the given scope.
@@ -276,8 +276,22 @@ module Bundler
       self[key] ? self[key].split(":").map(&:to_sym) : []
     end
 
-    def set_array(key, array)
-      self[key] = (array.empty? ? nil : array.join(":")) if array
+    def set_array(key, array, scope)
+      if scope != :current and scope != :local and scope != :global
+        Bundler.ui.error "Invalid scope #{scope} given. Please use :local or :global."
+        exit 1
+      end
+
+      if array
+        value = (array.empty? ? nil : array.join(":"))
+        if scope == :current
+          self[key] = value if array
+        elsif scope == :local
+          set_local(key, value) if array
+        elsif scope == :global
+          set_global(key, value) if array
+        end
+      end
     end
 
     def set_key(key, value, hash, file)

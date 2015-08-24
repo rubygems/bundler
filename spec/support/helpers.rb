@@ -1,5 +1,13 @@
 module Spec
   module Helpers
+    def set_temp_config(config)
+      if block_given?
+        config.each {|k, v| Bundler.settings.set_local(k, v) }
+        yield
+        config.each {|k, v| Bundler.settings.set_local(k, nil) }
+      end
+    end
+
     def reset!
       @in_p = nil
       @out_p = nil
