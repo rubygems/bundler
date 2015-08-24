@@ -12,25 +12,47 @@ class CompactIndexAPI < Endpoint
     end
 
     def etag_response
-      body = yield
-      checksum = Digest::MD5.hexdigest(body)
-      headers "ETag" => checksum
-      if checksum == request.env["HTTP_IF_NONE_MATCH"]
-        status 304
-        return ""
-      else
-        content_type "text/plain"
-        ranges = Rack::Utils.byte_ranges(env, body.bytesize)
-        return body unless ranges
-        status 206
-        ranges.map! do |range|
-          body.byteslice(range)
-        end.join
-      end
+      response_body = yield
+      checksum = Digest::MD5.hexdigest(response_body)
+      return if not_modified?(checksum)
+      headers "ETag" => quote(checksum)
+      headers "Surrogate-Control" => "max-age=2592000, stale-while-revalidate=60"
+      content_type "text/plain"
+      requested_range_for(response_body)
     rescue => e
       puts e
       puts e.backtrace
       raise
+    end
+
+    def not_modified?(checksum)
+      etags = parse_etags(request.env["HTTP_IF_NONE_MATCH"])
+
+      if etags.include?(checksum)
+        headers "ETag" => quote(checksum)
+        status 304
+        body ""
+      end
+    end
+
+    def requested_range_for(response_body)
+      ranges = Rack::Utils.byte_ranges(env, response_body.bytesize)
+
+      if ranges
+        status 206
+        body ranges.map! {|range| response_body.byteslice(range) }.join
+      else
+        status 200
+        body response_body
+      end
+    end
+
+    def quote(string)
+      '"' << string << '"'
+    end
+
+    def parse_etags(value)
+      value ? value.split(/, ?/).select{|s| s.sub!(/"(.*)"/, '\1') } : []
     end
 
     def gems(gem_repo = gem_repo1)
