@@ -4,7 +4,7 @@ class Bundler::CompactIndexClient
       @fetcher = fetcher
     end
 
-    def update(local_path, remote_path)
+    def update(local_path, remote_path, retrying = nil)
       headers = {}
 
       if local_path.file?
@@ -27,9 +27,13 @@ class Bundler::CompactIndexClient
       mode = response.is_a?(Net::HTTPPartialContent) ? "a" : "w"
       local_path.open(mode) {|f| f << content }
 
-      return if etag_for(local_path) == response["ETag"]
-      local_path.delete
-      update(local_path, remote_path)
+      if etag_for(local_path) != response["ETag"] && retrying.nil?
+        local_path.delete
+        update(local_path, remote_path, :retrying)
+      else
+        raise Bundler::HTTPError, "Checksum for file at #{local_path}" \
+          "does not match checksum provided by server! Something is wrong."
+      end
     end
 
     def etag_for(path)
