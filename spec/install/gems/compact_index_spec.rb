@@ -4,7 +4,7 @@ describe "compact index api" do
   let(:source_hostname) { "localgemserver.test" }
   let(:source_uri) { "http://#{source_hostname}" }
 
-  fit "should use the API" do
+  it "should use the API" do
     gemfile <<-G
       source "#{source_uri}"
       gem "rack"
