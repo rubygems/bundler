@@ -26,7 +26,7 @@ module Bundler
           Bundler.ui.debug "Looking up gems #{remaining_gems.inspect}"
 
           deps = compact_index_client.dependencies(remaining_gems)
-          next_gems = deps.map{|d| d[3].map(&:first) }.flatten(1).uniq
+          next_gems = deps.flat_map {|d| d[3].flat_map(&:first) }.uniq
 
           deps.each do |contents|
             contents[1] = Gem::Version.new(contents[1])
