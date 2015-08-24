@@ -31,8 +31,8 @@ class Bundler::CompactIndexClient
         local_path.delete
         update(local_path, remote_path, :retrying)
       else
-        raise Bundler::HTTPError, "Checksum for file at #{local_path}" \
-          "does not match checksum provided by server! Something is wrong."
+        raise Bundler::HTTPError, "Checksum of /#{remote_path} " \
+          "does not match the checksum provided by server! Something is wrong."
       end
     end
 
