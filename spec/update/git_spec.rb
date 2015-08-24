@@ -279,4 +279,55 @@ describe "bundle update" do
       should_be_installed "rack 1.0"
     end
   end
+
+  context "when the gem and the repository have different names" do
+    before :each do
+      build_repo2
+      @git = build_git "foo", :path => lib_path("bar")
+
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        git "#{lib_path("bar")}" do
+          gem 'foo'
+        end
+        gem 'rack'
+      G
+    end
+
+    it "the --source flag updates version of gems that were originally pulled in by the source" do
+      spec_lines = lib_path("bar/foo.gemspec").read.split("\n")
+      spec_lines[5] = "s.version = '2.0'"
+
+      update_git "foo", "2.0", :path => @git.path do |s|
+        s.write "foo.gemspec", spec_lines.join("\n")
+      end
+
+      ref = @git.ref_for "master"
+
+      bundle "update --source bar"
+
+      lockfile_should_be <<-G
+        GIT
+          remote: #{@git.path}
+          revision: #{ref}
+          specs:
+            foo (2.0)
+
+        GEM
+          remote: file:#{gem_repo2}/
+          specs:
+            rack (1.0.0)
+
+        PLATFORMS
+          ruby
+
+        DEPENDENCIES
+          foo!
+          rack
+
+        BUNDLED WITH
+           #{Bundler::VERSION}
+      G
+    end
+  end
 end
