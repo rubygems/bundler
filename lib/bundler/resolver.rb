@@ -2,57 +2,59 @@ module Bundler
   class Resolver
     require "bundler/vendored_molinillo"
 
-    class Molinillo::VersionConflict
-      def message
-        conflicts.sort.reduce("") do |o, (name, conflict)|
-          o << %(Bundler could not find compatible versions for gem "#{name}":\n)
-          if conflict.locked_requirement
-            o << %(  In snapshot (#{Bundler.default_lockfile.basename}):\n)
-            o << %(    #{DepProxy.new(conflict.locked_requirement, Gem::Platform::RUBY)}\n)
-            o << %(\n)
-          end
-          o << %(  In Gemfile:\n)
-          o << conflict.requirement_trees.sort_by {|t| t.reverse.map(&:name) }.map do |tree|
-            t = ""
-            depth = 2
-            tree.each do |req|
-              t << "  " * depth << req.to_s
-              unless tree.last == req
-                if spec = conflict.activated_by_name[req.name]
-                  t << %( was resolved to #{spec.version}, which)
+    module Molinillo
+      class VersionConflict
+        def message
+          conflicts.sort.reduce("") do |o, (name, conflict)|
+            o << %(Bundler could not find compatible versions for gem "#{name}":\n)
+            if conflict.locked_requirement
+              o << %(  In snapshot (#{Bundler.default_lockfile.basename}):\n)
+              o << %(    #{DepProxy.new(conflict.locked_requirement, Gem::Platform::RUBY)}\n)
+              o << %(\n)
+            end
+            o << %(  In Gemfile:\n)
+            o << conflict.requirement_trees.sort_by {|t| t.reverse.map(&:name) }.map do |tree|
+              t = ""
+              depth = 2
+              tree.each do |req|
+                t << "  " * depth << req.to_s
+                unless tree.last == req
+                  if spec = conflict.activated_by_name[req.name]
+                    t << %( was resolved to #{spec.version}, which)
+                  end
+                  t << %( depends on)
                 end
-                t << %( depends on)
+                t << %(\n)
+                depth += 1
               end
-              t << %(\n)
-              depth += 1
-            end
-            t
-          end.join("\n")
+              t
+            end.join("\n")
 
-          if name == "bundler"
-            o << %(\n  Current Bundler version:\n    bundler (#{Bundler::VERSION}))
-            other_bundler_required = !conflict.requirement.requirement.satisfied_by?(Gem::Version.new Bundler::VERSION)
-          end
-
-          if name == "bundler" && other_bundler_required
-            o << "\n"
-            o << "This Gemfile requires a different version of Bundler.\n"
-            o << "Perhaps you need to update Bundler by running `gem install bundler`?\n"
-          end
-          if conflict.locked_requirement
-            o << "\n"
-            o << %(Running `bundle update` will rebuild your snapshot from scratch, using only\n)
-            o << %(the gems in your Gemfile, which may resolve the conflict.\n)
-          elsif !conflict.existing
-            o << "\n"
-            if conflict.requirement_trees.first.size > 1
-              o << "Could not find gem '#{conflict.requirement}', which is required by "
-              o << "gem '#{conflict.requirement_trees.first[-2]}', in any of the sources."
-            else
-              o << "Could not find gem '#{conflict.requirement}' in any of the sources\n"
+            if name == "bundler"
+              o << %(\n  Current Bundler version:\n    bundler (#{Bundler::VERSION}))
+              other_bundler_required = !conflict.requirement.requirement.satisfied_by?(Gem::Version.new Bundler::VERSION)
             end
+
+            if name == "bundler" && other_bundler_required
+              o << "\n"
+              o << "This Gemfile requires a different version of Bundler.\n"
+              o << "Perhaps you need to update Bundler by running `gem install bundler`?\n"
+            end
+            if conflict.locked_requirement
+              o << "\n"
+              o << %(Running `bundle update` will rebuild your snapshot from scratch, using only\n)
+              o << %(the gems in your Gemfile, which may resolve the conflict.\n)
+            elsif !conflict.existing
+              o << "\n"
+              if conflict.requirement_trees.first.size > 1
+                o << "Could not find gem '#{conflict.requirement}', which is required by "
+                o << "gem '#{conflict.requirement_trees.first[-2]}', in any of the sources."
+              else
+                o << "Could not find gem '#{conflict.requirement}' in any of the sources\n"
+              end
+            end
+            o
           end
-          o
         end
       end
     end
