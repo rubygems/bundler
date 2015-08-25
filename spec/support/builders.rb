@@ -298,12 +298,20 @@ module Spec
     def build_repo(path, &blk)
       return if File.directory?(path)
       rake_path = Dir["#{Path.base_system_gems}/**/rake*.gem"].first
+
+      if rake_path.nil?
+        Spec::Path.base_system_gems.rmtree
+        Spec::Rubygems.setup
+        rake_path = Dir["#{Path.base_system_gems}/**/rake*.gem"].first
+      end
+
       if rake_path
         FileUtils.mkdir_p("#{path}/gems")
         FileUtils.cp rake_path, "#{path}/gems/"
       else
-        abort "You need to `rm -rf #{tmp}`"
+        abort "Your test gems are missing! Run `rm -rf #{tmp}` and try again."
       end
+
       update_repo(path, &blk)
     end
 
@@ -628,7 +636,7 @@ module Spec
 
           Bundler.rubygems.build(@spec, opts[:skip_validation])
           if opts[:to_system]
-            `gem install --ignore-dependencies #{@spec.full_name}.gem`
+            `gem install --ignore-dependencies --no-ri --no-rdoc #{@spec.full_name}.gem`
           else
             FileUtils.mv("#{@spec.full_name}.gem", opts[:path] || _default_path)
           end

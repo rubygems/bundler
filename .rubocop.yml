@@ -16,6 +16,9 @@ Lint/AssignmentInCondition:
 Lint/EndAlignment:
   AlignWith: variable
 
+Lint/UnusedMethodArgument:
+  Enabled: false
+
 # Style
 
 Style/AccessModifierIndentation:
@@ -70,26 +73,21 @@ Style/TrailingComma:
 
 # Metrics
 
-# Arbitrary max lengths for classes simply do not work and enabling this will
-# lead to a never ending stream of annoyance and changes.
+# We've chosen to use Rubocop only for style, and not for complexity or quality checks.
 Metrics/ClassLength:
   Enabled: false
 
-# Arbitrary max lengths for methods simply do not work and enabling this will
-# lead to a never ending stream of annoyance and changes.
+Metrics/ModuleLength:
+  Enabled: false
+
 Metrics/MethodLength:
   Enabled: false
 
-# No enforced convention here.
 Metrics/BlockNesting:
   Enabled: false
 
-# It will be obvious which code is complex, Rubocop should only lint simple
-# rules for us.
 Metrics/AbcSize:
   Enabled: false
 
-# It will be obvious which code is complex, Rubocop should only lint simple
-# rules for us.
 Metrics/CyclomaticComplexity:
   Enabled: false

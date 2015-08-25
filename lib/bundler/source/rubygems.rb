@@ -262,7 +262,8 @@ module Bundler
         uri = uri.to_s
         uri = "#{uri}/" unless uri =~ %r'/$'
         uri = URI(uri)
-        raise ArgumentError, "The source must be an absolute URI" unless uri.absolute?
+        raise ArgumentError, "The source must be an absolute URI. For example:\n" \
+          "source 'https://rubygems.org'" if !uri.absolute? || (uri.is_a?(URI::HTTP) && uri.host.nil?)
         uri
       end
 

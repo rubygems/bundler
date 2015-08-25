@@ -30,7 +30,7 @@ module Bundler
 
         if groups.any?
           specs = Bundler.definition.specs_for groups
-          sources.concat(specs.map(&:name))
+          gems.concat(specs.map(&:name))
         end
 
         Bundler.definition(:gems => gems, :sources => sources)
