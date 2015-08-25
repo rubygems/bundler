@@ -4,7 +4,7 @@ module Spec
       if block_given?
         config.each {|k, v| Bundler.settings.set_local(k, v) }
         yield
-        config.each {|k, v| Bundler.settings.set_local(k, nil) }
+        config.each {|k, _| Bundler.settings.set_local(k, nil) }
       end
     end
 

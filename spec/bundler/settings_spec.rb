@@ -51,7 +51,7 @@ describe Bundler::Settings do
     context "when writing to the current config" do
       it "does not raise a PermissionError" do
         expect { settings[:frozen] = "1" }.
-          not_to raise_error#(Bundler::PermissionError, /config/)
+          not_to raise_error
       end
     end
   end
