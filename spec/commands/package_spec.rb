@@ -86,6 +86,11 @@ describe "bundle install with gem sources" do
       FileUtils.rm_rf gem_repo2
 
       bundle "install --deployment"
+
+      # See cli/install.rb:L77.
+      # FIXME: [user-unfriendly] We must `bundle config path`. Setting
+      # `disable_shared_gems` and setting `frozen` to `"1"` are insufficient.
+      bundle "config path #{Bundler.settings.path}/vendor/bundle"
       should_be_installed "rack 1.0.0"
     end
 

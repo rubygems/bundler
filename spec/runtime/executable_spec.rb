@@ -156,8 +156,12 @@ describe "Running bin/* commands" do
       file.print "OMG"
     end
 
-    bundle "install"
-
-    expect(bundled_app("bin/rackup").read).to_not eq("OMG")
+    # See cli/binstubs.rb:13.
+    # FIXME: [user-unfriendly] Explicitly setting `bundle config bin bin/`
+    # seems unnecessary here, and it was before.
+    set_temp_config(:disable_shared_gems => "1", :bin => "bin/") do
+      bundle "install"
+      expect(bundled_app("bin/rackup").read).to_not eq("OMG")
+    end
   end
 end

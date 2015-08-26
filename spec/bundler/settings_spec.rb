@@ -41,10 +41,12 @@ describe Bundler::Settings do
       end
     end
 
-    context "when it's not possible to write to the file" do
-      it "raises an PermissionError with explanation" do
+    context "when it's possible to write to the file" do
+      it "raises a PermissionError with explanation" do
         expect(FileUtils).to receive(:mkdir_p).with(settings.send(:global_config_file).dirname).
           and_raise(Errno::EACCES)
+        expect { settings.set_global(:frozen, "1") }.
+          to raise_error(Bundler::PermissionError, %r{\.bundle/config})
       end
     end
 
@@ -58,7 +60,7 @@ describe Bundler::Settings do
 
   describe "#set_global" do
     context "when it's not possible to write to the file" do
-      it "raises an PermissionError with explanation" do
+      it "raises a PermissionError with explanation" do
         expect(FileUtils).to receive(:mkdir_p).with(settings.send(:global_config_file).dirname).
           and_raise(Errno::EACCES)
         expect { settings.set_global(:frozen, "1") }.

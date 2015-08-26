@@ -37,6 +37,9 @@ describe "install with --deployment or --frozen" do
     # bundle "config frozen true"
     bundle "install --gemfile #{tmp}/bundled_app/gems.rb --deployment"
     Dir.chdir bundled_app
+    # See cli/install.rb:L77.
+    # FIXME: [user-unfriendly]
+    bundle "config path #{Bundler.settings.path}/vendor/bundle"
     should_be_installed "rack 1.0"
   end
 

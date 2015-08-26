@@ -10,7 +10,12 @@ describe "bundle install --standalone" do
     end
 
     it "still makes the gems available to normal bundler" do
-      should_be_installed "actionpack 2.3.2", "rails 2.3.2"
+      # See cli/install.rb:L79.
+      # FIXME: (? See other FIXMEs). We can also use
+      # `bundle "config path bundle"`.
+      set_temp_config(:path => "bundle") do
+        should_be_installed "actionpack 2.3.2", "rails 2.3.2"
+      end
     end
 
     it "generates a bundle/bundler/setup.rb" do
@@ -72,7 +77,12 @@ describe "bundle install --standalone" do
     end
 
     it "still makes the gems available to normal bundler" do
-      should_be_installed "actionpack 2.3.2", "rails 2.3.2", "devise 1.0"
+      # See cli/install.rb:L79.
+      # FIXME: (? See other FIXMEs). We can also use
+      # `bundle "config path bundle"`.
+      set_temp_config(:path => "bundle") do
+        should_be_installed "actionpack 2.3.2", "rails 2.3.2", "devise 1.0"
+      end
     end
 
     it "generates a bundle/bundler/setup.rb" do
@@ -213,7 +223,12 @@ describe "bundle install --standalone" do
       it "still makes the gems available to normal bundler" do
         bundle "install --standalone", :artifice => "endpoint"
 
-        should_be_installed "actionpack 2.3.2", "rails 2.3.2"
+        # See cli/install.rb:L79.
+        # FIXME: (? See other FIXMEs). We can also use
+        # `bundle "config path bundle"`.
+        set_temp_config(:path => "bundle") do
+          should_be_installed "actionpack 2.3.2", "rails 2.3.2"
+        end
       end
 
       it "generates a bundle/bundler/setup.rb" do
