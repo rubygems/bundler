@@ -27,7 +27,6 @@ describe "parallel", :realworld => true, :sometimes => true do
 
     bundle "config jobs"
     expect(out).to match(/: "4"/)
-    #end
   end
 
   it "updates" do
