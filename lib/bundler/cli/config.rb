@@ -155,6 +155,8 @@ module Bundler
     def resolve_group_conflicts(name, new_value, scope = "global")
       groups = new_value.split(":").map(&:to_sym)
 
+      # TODO: Look here.
+
       if (name == "with") && without_conflict?(groups, scope)
         without_scope = groups_conflict?(:without, groups, :local, scope) ? "locally" : "globally"
         conflicts = conflicting_groups(:without, groups, without_scope == "locally" ? :local : :global, scope)
@@ -166,7 +168,7 @@ module Bundler
         if difference == []
           delete_config("without", scope)
         else
-          Bundler.settings.without = difference, :local
+          Bundler.settings.local_without = difference
         end
 
         :conflict
@@ -181,7 +183,7 @@ module Bundler
         if difference == []
           delete_config("with", scope)
         else
-          Bundler.settings.with = difference, :local
+          Bundler.settings.local_with = difference
         end
 
         :conflict

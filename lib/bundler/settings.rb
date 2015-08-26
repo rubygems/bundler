@@ -126,12 +126,28 @@ module Bundler
       locations
     end
 
-    def without=(array, scope = :current)
-      set_array(:without, array, scope)
+    def without=(array)
+      set_array(:without, array, :current)
     end
 
-    def with=(array, scope = :current)
-      set_array(:with, array, scope)
+    def with=(array)
+      set_array(:with, array, :current)
+    end
+
+    def local_without=(array)
+      set_array(:without, array, :local)
+    end
+
+    def local_with=(array)
+      set_array(:with, array, :local)
+    end
+
+    def global_without=(array)
+      set_array(:without, array, :global)
+    end
+
+    def global_with=(array)
+      set_array(:with, array, :global)
     end
 
     # Finds the previously set `without` groups in the given scope.
