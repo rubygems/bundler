@@ -223,6 +223,7 @@ describe "bundle check" do
     G
 
     bundle "install"
+    # FIXME: user-unfriendly?
     bundle "config frozen true"
     bundle "install --deployment"
     FileUtils.rm(bundled_app("gems.locked"))

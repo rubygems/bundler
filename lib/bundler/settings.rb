@@ -185,11 +185,13 @@ module Bundler
     #
     def groups_array(group_type, scope)
       key = key_for(group_type)
-      if scope.nil?
+
+      case scope
+      when nil
         get_array(group_type)
-      elsif scope == :global
+      when :global
         @global_config[key] ? @global_config[key].split(" ").map(&:to_sym) : []
-      elsif scope == :local
+      when :local
         @local_config[key] ? @local_config[key].split(" ").map(&:to_sym) : []
       else
         Bundler.ui.error "Invalid scope #{scope} given. Please use :local or :global."
@@ -201,7 +203,6 @@ module Bundler
     # Always returns an absolute path to the bundle directory
     # TODO: Refactor this method
     def path
-      # TODO: Shoudl we consider the @current_config here?
       key  = key_for(:path)
       path = ENV[key] || @global_config[key]
       set_path = ""
@@ -291,19 +292,17 @@ module Bundler
     end
 
     def set_array(key, array, scope)
-      if scope != :current and scope != :local and scope != :global
+      unless [:current, :local, :global].include? scope
         Bundler.ui.error "Invalid scope #{scope} given. Please use :local or :global."
         exit 1
       end
 
       if array
         value = (array.empty? ? nil : array.join(":"))
-        if scope == :current
-          self[key] = value if array
-        elsif scope == :local
-          set_local(key, value) if array
-        elsif scope == :global
-          set_global(key, value) if array
+        case scope
+        when :current then self[key] = value      if array
+        when :local   then set_local(key, value)  if array
+        when :global  then set_global(key, value) if array
         end
       end
     end
