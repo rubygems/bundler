@@ -9,7 +9,9 @@ describe "parallel", :realworld => true, :sometimes => true do
       gem 'i18n', '~> 0.6.0' # Because 0.7+ requires Ruby 1.9.3+
     G
 
-    bundle :install, :jobs => 4, :env => { "DEBUG" => "1" }
+    bundle "config jobs 4"
+    # NOTE: The env option below cannot be configured with `bundle "config env debug"`
+    bundle :install, :env => { "DEBUG" => "1" }
 
     if Bundler.rubygems.provides?(">= 2.1.0")
       expect(out).to match(/[1-3]: /)
@@ -25,6 +27,7 @@ describe "parallel", :realworld => true, :sometimes => true do
 
     bundle "config jobs"
     expect(out).to match(/: "4"/)
+    #end
   end
 
   it "updates" do
@@ -41,7 +44,8 @@ describe "parallel", :realworld => true, :sometimes => true do
       gem 'i18n', '~> 0.6.0' # Because 0.7+ requires Ruby 1.9.3+
     G
 
-    bundle :update, :jobs => 4, :env => { "DEBUG" => "1" }
+    bundle "config jobs 4"
+    bundle :update, :env => { "DEBUG" => "1" }
 
     if Bundler.rubygems.provides?(">= 2.1.0")
       expect(out).to match(/[1-3]: /)
