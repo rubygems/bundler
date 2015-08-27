@@ -90,8 +90,9 @@ describe "bundle install with gem sources" do
       # See cli/install.rb:L77.
       # FIXME: [user-unfriendly] We must `bundle config path`. Setting
       # `disable_shared_gems` and setting `frozen` to `"1"` are insufficient.
-      bundle "config path #{Bundler.settings.path}/vendor/bundle"
-      should_be_installed "rack 1.0.0"
+      set_temp_config(:path => "#{Bundler.settings.path}/vendor/bundle") do
+        should_be_installed "rack 1.0.0"
+      end
     end
 
     it "does not reinstall already-installed gems" do

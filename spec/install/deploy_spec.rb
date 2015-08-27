@@ -39,8 +39,9 @@ describe "install with --deployment or --frozen" do
     Dir.chdir bundled_app
     # See cli/install.rb:L77.
     # FIXME: [user-unfriendly]
-    bundle "config path #{Bundler.settings.path}/vendor/bundle"
-    should_be_installed "rack 1.0"
+    set_temp_config(:path => "#{Bundler.settings.path}/vendor/bundle") do
+      should_be_installed "rack 1.0"
+    end
   end
 
   it "works if you exclude a group with a git gem" do
