@@ -85,6 +85,17 @@ module Bundler
     status_code(6)
   end
 
+  class GemRequireError < BundlerError
+    attr_reader :orig_exception
+
+    def initialize(orig_exception, msg)
+      super(msg)
+      @orig_exception = orig_exception
+    end
+
+    status_code(24)
+  end
+
   class MarshalError < StandardError; end
 
   class PermissionError < BundlerError

@@ -68,8 +68,8 @@ module Bundler
         name ? LEVELS.index(name) <= LEVELS.index(@level) : @level
       end
 
-      def trace(e, newline = nil)
-        return unless debug?
+      def trace(e, newline = nil, force = false)
+        return unless debug? || force
         msg = "#{e.class}: #{e.message}\n#{e.backtrace.join("\n  ")}"
         tell_me(msg, nil, newline)
       end
