@@ -216,22 +216,6 @@ describe "bundle check" do
     end
   end
 
-  it "fails when there's no lock file and frozen is set" do
-    gemfile <<-G
-      source "file://#{gem_repo1}"
-      gem "foo"
-    G
-
-    bundle "install"
-    # FIXME: user-unfriendly?
-    bundle "config frozen true"
-    bundle "install --deployment"
-    FileUtils.rm(bundled_app("gems.locked"))
-
-    bundle :check
-    expect(exitstatus).not_to eq(0) if exitstatus
-  end
-
   context "bundle config path" do
     before do
       gemfile <<-G

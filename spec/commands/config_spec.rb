@@ -14,7 +14,7 @@ describe ".bundle/config" do
       bundle "config path vendor/bundle"
       bundle "install"
 
-      # See cli/install.rb:L86
+      # See CLI::Install#run.
       set_temp_config(:disable_shared_gems => "1") do
         expect(bundled_app(".bundle")).not_to exist
         expect(tmp("foo/bar/config")).to exist
@@ -30,7 +30,7 @@ describe ".bundle/config" do
       bundle "config path vendor/bundle"
       bundle "install"
 
-      # See cli/install.rb:L86
+      # See CLI::Install#run.
       set_temp_config(:disable_shared_gems => "1") do
         expect(bundled_app(".bundle")).not_to exist
         expect(bundled_app("../foo/config")).to exist

@@ -464,6 +464,7 @@ describe "bundle clean" do
       gem "foo"
       gem "rack"
     G
+
     bundle "install --system"
 
     gemfile <<-G
@@ -473,7 +474,7 @@ describe "bundle clean" do
     G
     bundle "install --system"
 
-    # See cli/install.rb:L76.
+    # See CLI::Install#run.
     # FIXME: [user-unfriendly] `clean` only happens if path is set to
     # `Bundler.rubygems.gem_dir`. `bundle "config system true"` and
     # `bundle "config path.system true"` are insufficient.

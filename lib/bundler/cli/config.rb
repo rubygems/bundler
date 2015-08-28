@@ -155,8 +155,6 @@ module Bundler
     def resolve_group_conflicts(name, new_value, scope = "global")
       groups = new_value.split(":").map(&:to_sym)
 
-      # TODO: Look here.
-
       if (name == "with") && without_conflict?(groups, scope)
         without_scope = groups_conflict?(:without, groups, :local, scope) ? "locally" : "globally"
         conflicts = conflicting_groups(:without, groups, without_scope == "locally" ? :local : :global, scope)

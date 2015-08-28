@@ -1118,7 +1118,8 @@ G
     end
 
     it "returns list of outdated gems when the ruby version matches" do
-      # See cli/install.rb:76. Note that we `bundle install --system` above.
+      # See CLI::Install#run.
+      # Note that we `bundle install --system` above.
       # FIXME: We need to explicitly set the path before _all_ of these commands
       # are run to get the spec to pass.
       set_temp_config(:path => Bundler.rubygems.gem_dir) do
@@ -1142,7 +1143,7 @@ G
     end
 
     it "returns list of outdated gems when the ruby version matches for any engine" do
-      # See cli/install.rb:76.
+      # See CLI::Install#run.
       # FIXME: See comment above.
       simulate_ruby_engine "jruby" do
         set_temp_config(:path => Bundler.rubygems.gem_dir) do

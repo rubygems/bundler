@@ -210,8 +210,7 @@ describe "Bundler.setup" do
       s.write "lib/rack.rb", "RACK = 'FAIL'"
     end
 
-    # See cli/install.rb:L86.
-    # FIXME: See related FIXME comments.
+    # See CLI::Install#run.
     set_temp_config(:disable_shared_gems => "1") do
       should_be_installed "rack 1.0.0"
     end

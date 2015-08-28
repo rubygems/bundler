@@ -233,8 +233,6 @@ module Bundler
         # (gems.rb) directory.
         install_path = File.join(Bundler.root, set_path)
       end
-
-      install_path
     end
 
     def allow_sudo?

@@ -30,15 +30,9 @@ describe "install with --deployment or --frozen" do
     Dir.chdir tmp
     simulate_new_machine
 
-    # NOTE: This spec fails if we just have `bundle "config frozen true"`,
-    # but succeeds if that line is present and we remove the --deployment
-    # flag from `bundle "install"`.
-
-    # bundle "config frozen true"
     bundle "install --gemfile #{tmp}/bundled_app/gems.rb --deployment"
     Dir.chdir bundled_app
-    # See cli/install.rb:L77.
-    # FIXME: [user-unfriendly]
+    # See CLI::Install#run.
     set_temp_config(:path => "#{Bundler.settings.path}/vendor/bundle") do
       should_be_installed "rack 1.0"
     end
@@ -239,7 +233,6 @@ describe "install with --deployment or --frozen" do
         gem "foo", :git => "#{lib_path("rack")}"
       G
 
-      # bundle "config frozen true" # Spec passes if this is included
       bundle "install --deployment"
       expect(err).to include("deployment mode")
       expect(err).to include("You have changed in gems.rb:\n* rack from `no specified source` to `#{lib_path("rack")} (at master)`")

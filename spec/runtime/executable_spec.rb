@@ -156,7 +156,7 @@ describe "Running bin/* commands" do
       file.print "OMG"
     end
 
-    # See cli/binstubs.rb:13.
+    # See CLI::Binstubs#run.
     # FIXME: [user-unfriendly] Explicitly setting `bundle config bin bin/`
     # seems unnecessary here, and it was before.
 
