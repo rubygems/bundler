@@ -92,9 +92,12 @@ module Bundler
 
     def rubygem_push(path)
       if Pathname.new("~/.gem/credentials").expand_path.exist?
+        allowed_push_host = nil
         gem_command = "gem push '#{path}'"
-        allowed_push_host = @gemspec.metadata["allowed_push_host"]
-        gem_command << " --host #{allowed_push_host}" if allowed_push_host
+        if spec.respond_to?(:metadata)
+          allowed_push_host = @gemspec.metadata["allowed_push_host"]
+          gem_command << " --host #{allowed_push_host}" if allowed_push_host
+        end
         sh(gem_command)
         Bundler.ui.confirm "Pushed #{name} #{version} to #{allowed_push_host ? allowed_push_host : "rubygems.org."}"
       else
