@@ -409,7 +409,7 @@ module Bundler
         spec
       end
     rescue Gem::InvalidSpecificationException => e
-      Bundler.ui.warn "The gemspec at #{file} is not valid. " \
+      UI::Shell.new.warn "The gemspec at #{file} is not valid. " \
         "The validation error was '#{e.message}'"
       nil
     end
