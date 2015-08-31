@@ -2,10 +2,14 @@ module Spec
   module Helpers
     def set_temp_config(config)
       if block_given?
-        old_config = Bundler.settings.local_config
-        config.each {|k, v| Bundler.settings.set_local(k, v) }
+        old_config = {}
+
+        config.each do |k, v|
+          old_config[k] = Bundler.settings[k]
+          Bundler.settings.set_local(k, v)
+        end
         yield
-        config.each {|k, _| Bundler.settings.set_local(k, old_config(k)) }
+        config.each {|k, _| Bundler.settings.set_local(k, old_config[k]) }
       end
     end
 

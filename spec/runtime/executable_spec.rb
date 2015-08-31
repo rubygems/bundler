@@ -157,10 +157,8 @@ describe "Running bin/* commands" do
     end
 
     # See CLI::Binstubs#run.
-    # FIXME: [user-unfriendly] Explicitly setting `bundle config bin bin/`
-    # seems unnecessary here, and it was before.
-
-    set_temp_config(:bin => "bin/") { bundle "install" }
+    bundle "config bin bin/"
+    bundle "install"
     set_temp_config(:disable_shared_gems => "1") do
       expect(bundled_app("bin/rackup").read).to_not eq("OMG")
     end

@@ -6,17 +6,18 @@ module Bundler
     NUMBER_KEYS = %w(retry timeout redirect).freeze
     DEFAULT_CONFIG = { :retry => 3, :timeout => 10, :redirect => 5 }
 
-    attr_reader :root, :local_config
+    attr_reader :root
 
     def initialize(root = nil)
       @root           = root
-      @current_config
+      @current_config = {}
       @local_config   = load_config(local_config_file)
       @global_config  = load_config(global_config_file)
     end
 
     def [](name)
       key = key_for(name)
+
       value = (@current_config[key] || @local_config[key] || ENV[key] || @global_config[key] || DEFAULT_CONFIG[name])
       case
       when value.nil?
@@ -202,6 +203,8 @@ module Bundler
     # Always returns an absolute path to the bundle directory
     # TODO: Refactor this method
     def path
+      return Bundler.rubygems.gem_dir if self[:system]
+
       key  = key_for(:path)
       path = ENV[key] || @global_config[key]
       set_path = ""

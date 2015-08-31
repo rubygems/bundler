@@ -465,27 +465,21 @@ describe "bundle clean" do
       gem "rack"
     G
 
-    bundle "install --system"
+    bundle "config system true"
+    bundle "install"
 
     gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack"
     G
-    bundle "install --system"
+    bundle "install"
+    bundle "clean --force"
 
-    # See CLI::Install#run.
-    # FIXME: [user-unfriendly] `clean` only happens if path is set to
-    # `Bundler.rubygems.gem_dir`. `bundle "config system true"` and
-    # `bundle "config path.system true"` are insufficient.
-    set_temp_config(:path => Bundler.rubygems.gem_dir) do
-      bundle "clean --force"
-
-      expect(out).to include("Removing foo (1.0)")
-      sys_exec "gem list"
-      expect(out).not_to include("foo (1.0)")
-      expect(out).to include("rack (1.0.0)")
-    end
+    expect(out).to include("Removing foo (1.0)")
+    sys_exec "gem list"
+    expect(out).not_to include("foo (1.0)")
+    expect(out).to include("rack (1.0.0)")
   end
 
   it "cleans git gems with a 7 length git revision" do

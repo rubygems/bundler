@@ -1110,7 +1110,8 @@ G
         build_git "foo", :path => lib_path("foo")
       end
 
-      install_gemfile <<-G, :system => true
+      bundle "config system true"
+      install_gemfile <<-G
         source "file://#{gem_repo2}"
         gem "activesupport", "2.3.5"
         gem "foo", :git => "#{lib_path("foo")}"
@@ -1118,11 +1119,26 @@ G
     end
 
     it "returns list of outdated gems when the ruby version matches" do
-      # See CLI::Install#run.
-      # Note that we `bundle install --system` above.
-      # FIXME: We need to explicitly set the path before _all_ of these commands
-      # are run to get the spec to pass.
-      set_temp_config(:path => Bundler.rubygems.gem_dir) do
+      update_repo2 do
+        build_gem "activesupport", "3.0"
+        update_git "foo", :path => lib_path("foo")
+      end
+
+      gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "activesupport", "2.3.5"
+        gem "foo", :git => "#{lib_path("foo")}"
+
+        #{ruby_version_correct}
+      G
+
+      bundle "outdated"
+      expect(out).to include("activesupport (newest 3.0, installed 2.3.5, requested = 2.3.5")
+      expect(out).to include("foo (newest 1.0")
+    end
+
+    it "returns list of outdated gems when the ruby version matches for any engine" do
+      simulate_ruby_engine "jruby" do
         update_repo2 do
           build_gem "activesupport", "3.0"
           update_git "foo", :path => lib_path("foo")
@@ -1133,37 +1149,12 @@ G
           gem "activesupport", "2.3.5"
           gem "foo", :git => "#{lib_path("foo")}"
 
-          #{ruby_version_correct}
+          #{ruby_version_correct_engineless}
         G
 
         bundle "outdated"
-        expect(out).to include("activesupport (newest 3.0, installed 2.3.5, requested = 2.3.5")
+        expect(out).to include("activesupport (newest 3.0, installed 2.3.5, requested = 2.3.5)")
         expect(out).to include("foo (newest 1.0")
-      end
-    end
-
-    it "returns list of outdated gems when the ruby version matches for any engine" do
-      # See CLI::Install#run.
-      # FIXME: See comment above.
-      simulate_ruby_engine "jruby" do
-        set_temp_config(:path => Bundler.rubygems.gem_dir) do
-          update_repo2 do
-            build_gem "activesupport", "3.0"
-            update_git "foo", :path => lib_path("foo")
-          end
-
-          gemfile <<-G
-            source "file://#{gem_repo2}"
-            gem "activesupport", "2.3.5"
-            gem "foo", :git => "#{lib_path("foo")}"
-
-            #{ruby_version_correct_engineless}
-          G
-
-          bundle "outdated"
-          expect(out).to include("activesupport (newest 3.0, installed 2.3.5, requested = 2.3.5)")
-          expect(out).to include("foo (newest 1.0")
-        end
       end
     end
 
