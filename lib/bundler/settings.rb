@@ -6,11 +6,11 @@ module Bundler
     NUMBER_KEYS = %w(retry timeout redirect).freeze
     DEFAULT_CONFIG = { :retry => 3, :timeout => 10, :redirect => 5 }
 
-    attr_reader :root
+    attr_reader :root, :local_config
 
     def initialize(root = nil)
       @root           = root
-      @current_config ||= {}
+      @current_config
       @local_config   = load_config(local_config_file)
       @global_config  = load_config(global_config_file)
     end
@@ -194,8 +194,7 @@ module Bundler
       when :local
         @local_config[key] ? @local_config[key].split(" ").map(&:to_sym) : []
       else
-        Bundler.ui.error "Invalid scope #{scope} given. Please use :local or :global."
-        exit 1
+        raise Bundler::InvalidOption, "Invalid scope #{scope} given. Please use :local or :global."
       end
     end
 
@@ -291,8 +290,7 @@ module Bundler
 
     def set_array(key, array, scope)
       unless [:current, :local, :global].include? scope
-        Bundler.ui.error "Invalid scope #{scope} given. Please use :local or :global."
-        exit 1
+        raise Bundler::InvalidOption, "Invalid scope #{scope} given. Please use :local or :global."
       end
 
       if array
