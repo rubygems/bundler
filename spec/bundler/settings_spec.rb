@@ -134,6 +134,42 @@ describe Bundler::Settings do
     end
   end
 
+  describe "a flag passed to a command" do
+    it "is not automatically remembered" do
+      install_gemfile <<-G, :system => true
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      expect(system_gem_path).to exist
+      FileUtils.rm_r(system_gem_path)
+      expect(system_gem_path).not_to exist
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      expect(bundled_app("some/path")).not_to exist
+      expect(default_bundle_path("gems/rack-1.0.0")).to exist
+      should_be_installed("rack 1.0.0")
+    end
+
+    it "is remembered if set with config" do
+      bundle "config path another/directory"
+      expect(bundled_app("another/directory")).not_to exist
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      expect(bundled_app("another/directory")).to exist
+      expect(bundled_app("another/directory", Bundler.ruby_scope, "gems/rack-1.0.0")).to exist
+      should_be_installed("rack 1.0.0")
+    end
+  end
+
   describe "URI normalization" do
     it "normalizes HTTP URIs in credentials configuration" do
       settings["http://gemserver.example.org"] = "username:password"
