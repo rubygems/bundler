@@ -98,6 +98,20 @@ describe "Bundler.require" do
     expect(err).to eq("ZOMG LOAD ERROR")
   end
 
+  it "displays a helpful message if the required gem throws an error" do
+    build_lib "faulty", "1.0.0" do |s|
+      s.write "lib/faulty.rb", "HI"
+    end
+
+    gemfile <<-G
+      path "#{lib_path}"
+      gem "faulty"
+    G
+
+    run "Bundler.require", :expect_err => true
+    expect(err).to match("error while trying to load the gem 'faulty'")
+  end
+
   it "doesn't swallow the error when the library has an unrelated error" do
     build_lib "loadfuuu", "1.0.0" do |s|
       s.write "lib/loadfuuu.rb", "raise LoadError.new(\"cannot load such file -- load-bar\")"

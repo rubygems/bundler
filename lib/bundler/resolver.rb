@@ -3,12 +3,20 @@ module Bundler
     require "bundler/vendored_molinillo"
 
     class Molinillo::VersionConflict
+      def printable_dep(dep)
+        if dep.is_a?(Bundler::Dependency)
+          DepProxy.new(dep, dep.platforms.join(", ")).to_s.strip
+        else
+          dep.to_s
+        end
+      end
+
       def message
         conflicts.sort.reduce("") do |o, (name, conflict)|
           o << %(Bundler could not find compatible versions for gem "#{name}":\n)
           if conflict.locked_requirement
             o << %(  In snapshot (#{Bundler.default_lockfile.basename}):\n)
-            o << %(    #{DepProxy.new(conflict.locked_requirement, Gem::Platform::RUBY)}\n)
+            o << %(    #{printable_dep(conflict.locked_requirement)}\n)
             o << %(\n)
           end
           o << %(  In Gemfile:\n)

@@ -217,7 +217,7 @@ describe Bundler::GemHelper do
           allow(Bundler.ui).to receive(:error)
 
           Dir.chdir(app_path) { `git commit -a -m "initial commit"` }
-          expect { Rake.application["release"].invoke }.to raise_error
+          expect { Rake.application["release"].invoke }.to raise_error(RuntimeError)
         end
       end
 

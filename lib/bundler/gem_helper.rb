@@ -92,8 +92,14 @@ module Bundler
 
     def rubygem_push(path)
       if Pathname.new("~/.gem/credentials").expand_path.exist?
-        sh("gem push '#{path}'")
-        Bundler.ui.confirm "Pushed #{name} #{version} to rubygems.org."
+        allowed_push_host = nil
+        gem_command = "gem push '#{path}'"
+        if spec.respond_to?(:metadata)
+          allowed_push_host = @gemspec.metadata["allowed_push_host"]
+          gem_command << " --host #{allowed_push_host}" if allowed_push_host
+        end
+        sh(gem_command)
+        Bundler.ui.confirm "Pushed #{name} #{version} to #{allowed_push_host ? allowed_push_host : "rubygems.org."}"
       else
         raise "Your rubygems.org credentials aren't set. Run `gem push` to set them."
       end

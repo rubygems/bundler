@@ -19,8 +19,9 @@ module Bundler
       end
 
       class GitCommandError < GitError
-        def initialize(command, path = nil)
+        def initialize(command, path = nil, extra_info = nil)
           msg =  "Git error: command `git #{command}` in directory #{SharedHelpers.pwd} has failed."
+          msg << "\n#{extra_info}" if extra_info
           msg << "\nIf this error persists you could try removing the cache directory '#{path}'" if path && path.exist?
           super msg
         end
@@ -43,7 +44,10 @@ module Bundler
         end
 
         def revision
-          @revision ||= allowed_in_path { git("rev-parse #{ref}").strip }
+          @revision ||= allowed_in_path do
+            msg = "Ref '#{ref}' was not found. Perhaps you mispelled it?"
+            git("rev-parse --verify #{ref}", true, msg).strip
+          end
         end
 
         def branch
@@ -120,10 +124,10 @@ module Bundler
           end
         end
 
-        def git(command, check_errors = true)
+        def git(command, check_errors = true, error_msg = nil)
           raise GitNotAllowedError.new(command) unless allow?
           out = SharedHelpers.with_clean_git_env { `git #{command}` }
-          raise GitCommandError.new(command, path) if check_errors && !$?.success?
+          raise GitCommandError.new(command, path, error_msg) if check_errors && !$?.success?
           out
         end
 

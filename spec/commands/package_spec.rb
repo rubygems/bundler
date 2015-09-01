@@ -38,7 +38,7 @@ describe "bundle package" do
 
       bundle "package --no-install"
 
-      should_not_be_installed "rack 1.0.0"
+      should_not_be_installed "rack 1.0.0", :expect_err => true
       expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
     end
   end

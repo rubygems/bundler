@@ -318,4 +318,31 @@ describe "bundle exec" do
     bundle "exec rackup"
     expect(out).to include("Installing foo 1.0")
   end
+
+  describe "with gems bundled via :path with invalid gemspecs" do
+    it "outputs the gemspec validation errors", :rubygems => ">= 1.7.2" do
+      build_lib "foo"
+
+      gemspec = lib_path("foo-1.0").join("foo.gemspec").to_s
+      File.open(gemspec, "w") do |f|
+        f.write <<-G
+          Gem::Specification.new do |s|
+            s.name    = 'foo'
+            s.version = '1.0'
+            s.summary = 'TODO: Add summary'
+            s.authors = 'Me'
+          end
+        G
+      end
+
+      install_gemfile <<-G, :expect_err => true
+        gem "foo", :path => "#{lib_path("foo-1.0")}"
+      G
+
+      bundle "exec irb", :expect_err => true
+
+      expect(out).to match("The gemspec at #{lib_path("foo-1.0").join("foo.gemspec")} is not valid")
+      expect(out).to match('"TODO" is not a summary')
+    end
+  end
 end
