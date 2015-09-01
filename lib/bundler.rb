@@ -96,6 +96,7 @@ module Bundler
     status_code(24)
   end
 
+  class GemfileEvalError < GemfileError; end
   class MarshalError < StandardError; end
 
   class PermissionError < BundlerError

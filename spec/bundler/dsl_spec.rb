@@ -81,6 +81,14 @@ describe Bundler::Dsl do
       expect { subject.eval_gemfile("Gemfile") }.
         to raise_error(Bundler::GemfileError, /There was an error parsing `Gemfile`: (syntax error, unexpected tSTRING_DEND|(compile error - )?syntax error, unexpected '}'). Bundler cannot continue./)
     end
+
+    it "distinguishes syntax errors from evaluation errors" do
+      expect(Bundler).to receive(:read_file).with("Gemfile").and_return(
+        "ruby '2.1.5', :engine => 'ruby', :engine_version => '1.2.4'"
+      )
+      expect { subject.eval_gemfile("Gemfile") }.
+        to raise_error(Bundler::GemfileError, /There was an error evaluating `Gemfile`: ruby_version must match the :engine_version for MRI/)
+    end
   end
 
   describe "#gem" do
