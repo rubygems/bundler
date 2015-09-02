@@ -93,7 +93,7 @@ module Bundler
 
       Installer.install(Bundler.root, definition, options)
       Bundler.load.cache if Bundler.app_cache.exist? && Bundler.settings[:cache] && !Bundler.settings[:frozen]
-      Bundler.load.global_cache
+      Bundler.load.cache_globally
 
       Bundler.ui.confirm "Using #{Installer.using_gems.size} already installed gems" if Installer.using_gems.size > 0
       Bundler.ui.confirm "Bundle complete! #{dependencies_count_for(definition)}, #{gems_installed_for(definition)}."

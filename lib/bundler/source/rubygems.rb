@@ -189,7 +189,7 @@ module Bundler
         raise InstallError, e.message
       end
 
-      def global_cache(spec)
+      def cache_globally(spec)
         if builtin_gem?(spec)
           cached_path = cached_built_in_gem(spec)
         else

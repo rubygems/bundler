@@ -1,5 +1,7 @@
 require "spec_helper"
 
+# See Definition#resolve_with_cache!
+
 describe "bundle install with gem sources" do
   describe "the simple case" do
     it "creates the global cache directory" do
@@ -38,6 +40,38 @@ describe "bundle install with gem sources" do
 
       bundle :install
       expect(bundle_cached_gem("rack-1.0.0")).to exist
+    end
+
+    it "does not download gems to the global cache" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", "1.0"
+      G
+
+      bundle :install
+      expect(1).to eq(0)
+    end
+
+    it "uses the global cache as a source when installing gems" do
+      # TODO: Also test that this does not download gems.
+
+      # TODO: Also test this by installing to a directory A, switching
+      # environments, and then installing to a directory B. With
+      # the same gemfile, the second installation shouldn't download
+      # the gems.
+
+      # TODO: Should there be specs analogous to the gems_spec.rb
+      # specs "does not reinstall gems from the cache if they exist on the
+      # system" and "does not reinstall gems from the cache if they exist in
+      # the bundle"?
+      build_gem "omg", :path => bundle_cache
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "omg"
+      G
+
+      should_be_installed "omg 1.0.0"
     end
 
     it "prints output and returns if no dependencies are specified" do

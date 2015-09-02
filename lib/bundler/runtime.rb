@@ -121,16 +121,17 @@ module Bundler
       prune_cache(cache_path) unless Bundler.settings[:no_prune]
     end
 
-    def global_cache
+    def cache_globally
       cache_path = Bundler.global_cache
-      FileUtils.mkdir_p(cache_path) unless File.exist?(cache_path)
+      FileUtils.mkdir_p(cache_path)
 
       Bundler.ui.info "Caching gems in #{Bundler.settings.global_cache_path}"
 
       specs.each do |spec|
         next if spec.name == "bundler"
-        spec.source.global_cache(spec) if spec.source.respond_to?(:global_cache)
+        spec.source.cache_globally(spec) if spec.source.respond_to?(:cache_globally)
       end
+
       Dir[cache_path.join("*/.git")].each do |git_dir|
         FileUtils.rm_rf(git_dir)
         FileUtils.touch(File.expand_path("../.bundlecache", git_dir))
