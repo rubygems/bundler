@@ -11,7 +11,7 @@ describe "bundle install --standalone" do
 
     it "still makes the gems available to normal bundler" do
       # See CLI::Install#run.
-      set_temp_config(:path => "bundle") do
+      with_config(:path => "bundle") do
         should_be_installed "actionpack 2.3.2", "rails 2.3.2"
       end
     end
@@ -76,7 +76,7 @@ describe "bundle install --standalone" do
 
     it "still makes the gems available to normal bundler" do
       # See CLI::Install#run.
-      set_temp_config(:path => "bundle") do
+      with_config(:path => "bundle") do
         should_be_installed "actionpack 2.3.2", "rails 2.3.2", "devise 1.0"
       end
     end
@@ -220,7 +220,7 @@ describe "bundle install --standalone" do
         bundle "install --standalone", :artifice => "endpoint"
 
         # See CLI::Install#run.
-        set_temp_config(:path => "bundle") do
+        with_config(:path => "bundle") do
           should_be_installed "actionpack 2.3.2", "rails 2.3.2"
         end
       end

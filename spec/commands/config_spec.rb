@@ -15,7 +15,7 @@ describe ".bundle/config" do
       bundle "install"
 
       # See CLI::Install#run.
-      set_temp_config(:disable_shared_gems => "1") do
+      with_config(:disable_shared_gems => "1") do
         expect(bundled_app(".bundle")).not_to exist
         expect(tmp("foo/bar/config")).to exist
         should_be_installed "rack 1.0.0"
@@ -31,7 +31,7 @@ describe ".bundle/config" do
       bundle "install"
 
       # See CLI::Install#run.
-      set_temp_config(:disable_shared_gems => "1") do
+      with_config(:disable_shared_gems => "1") do
         expect(bundled_app(".bundle")).not_to exist
         expect(bundled_app("../foo/config")).to exist
         should_be_installed "rack 1.0.0"

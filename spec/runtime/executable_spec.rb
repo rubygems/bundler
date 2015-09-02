@@ -159,7 +159,7 @@ describe "Running bin/* commands" do
     # See CLI::Binstubs#run.
     bundle "config bin bin/"
     bundle "install"
-    set_temp_config(:disable_shared_gems => "1") do
+    with_config(:disable_shared_gems => "1") do
       expect(bundled_app("bin/rackup").read).to_not eq("OMG")
     end
   end

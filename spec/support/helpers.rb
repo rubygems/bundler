@@ -1,6 +1,6 @@
 module Spec
   module Helpers
-    def set_temp_config(config)
+    def with_config(config)
       if block_given?
         old_config = {}
 

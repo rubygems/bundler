@@ -18,7 +18,7 @@ describe "bundle install" do
       bundle "install"
 
       # See CLI::Install#run.
-      set_temp_config(:disable_shared_gems => "1") do
+      with_config(:disable_shared_gems => "1") do
         should_be_installed "rack 1.0.0"
       end
     end
@@ -55,7 +55,7 @@ describe "bundle install" do
       bundle "install"
 
       # See CLI::Install#run.
-      set_temp_config(:disable_shared_gems => "1") do
+      with_config(:disable_shared_gems => "1") do
         expect(vendored_gems("gems/rack-1.0.0")).to be_directory
         should_be_installed "rack 1.0.0"
       end

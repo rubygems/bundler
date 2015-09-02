@@ -88,7 +88,7 @@ describe "bundle install with gem sources" do
       bundle "install --deployment"
 
       # See CLI::Install#run.
-      set_temp_config(:path => "#{Bundler.settings.path}/vendor/bundle") do
+      with_config(:path => "#{Bundler.settings.path}/vendor/bundle") do
         should_be_installed "rack 1.0.0"
       end
     end

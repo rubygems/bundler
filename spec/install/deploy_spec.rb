@@ -33,7 +33,7 @@ describe "install with --deployment or --frozen" do
     bundle "install --gemfile #{tmp}/bundled_app/gems.rb --deployment"
     Dir.chdir bundled_app
     # See CLI::Install#run.
-    set_temp_config(:path => "#{Bundler.settings.path}/vendor/bundle") do
+    with_config(:path => "#{Bundler.settings.path}/vendor/bundle") do
       should_be_installed "rack 1.0"
     end
   end
