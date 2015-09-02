@@ -10,8 +10,7 @@ describe "parallel", :realworld => true, :sometimes => true do
     G
 
     bundle "config jobs 4"
-    # NOTE: The env option below cannot be configured with `bundle "config env debug"`
-    bundle :install, :env => { "DEBUG" => "1" }
+    bundle :install, :verbose => true
 
     if Bundler.rubygems.provides?(">= 2.1.0")
       expect(out).to match(/[1-3]: /)
@@ -44,7 +43,7 @@ describe "parallel", :realworld => true, :sometimes => true do
     G
 
     bundle "config jobs 4"
-    bundle :update, :env => { "DEBUG" => "1" }
+    bundle :update, :verbose => true
 
     if Bundler.rubygems.provides?(">= 2.1.0")
       expect(out).to match(/[1-3]: /)
