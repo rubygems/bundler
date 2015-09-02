@@ -94,9 +94,7 @@ module Bundler
       end
     end
 
-    # Clears `path` if `system` is being set, and vice versa. Also, checks
-    # whether `path` is already set and `path.system` is being set, and
-    # vice versa.
+    # Clears `path` if `path.system` is being set, and vice versa.
     #
     # @param  [String] name
     #         the name of the option being set by the user.
@@ -112,17 +110,7 @@ module Bundler
     #         the options conflict.
     #
     def resolve_system_path_conflicts(name, new_value, scope = "global")
-      if name == "system" and Bundler.settings[:path] and new_value == "true"
-        Bundler.ui.warn "`path` is already configured, so it will be unset."
-        delete_config("path")
-        # We still want `system` to be set.
-        :no_conflict
-      elsif name == "path" and Bundler.settings[:system]
-        Bundler.ui.warn "`system` is already configured, so it will be unset."
-        delete_config("system")
-        # We still want `path` to be set.
-        :no_conflict
-      elsif name == "path.system" and Bundler.settings[:path] and new_value == "true"
+      if name == "path.system" and Bundler.settings[:path] and new_value == "true"
         Bundler.ui.warn "`path` is already configured, so it will be unset."
         delete_config("path")
         :conflict

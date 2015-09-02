@@ -203,7 +203,7 @@ module Bundler
     # Always returns an absolute path to the bundle directory
     # TODO: Refactor this method
     def path
-      return Bundler.rubygems.gem_dir if self[:system]
+      return Bundler.rubygems.gem_dir if self["path.system"]
 
       key  = key_for(:path)
       path = ENV[key] || @global_config[key]

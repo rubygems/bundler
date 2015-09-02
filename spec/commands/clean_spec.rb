@@ -465,7 +465,7 @@ describe "bundle clean" do
       gem "rack"
     G
 
-    bundle "config system true"
+    bundle "config path.system true"
     bundle "install"
 
     gemfile <<-G
