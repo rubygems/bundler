@@ -40,11 +40,11 @@ module Spec
       bundled_app("vendor/cache/#{path}.gem")
     end
 
-    def global_cache(*path)
+    def bundle_cache(*path)
       home(".bundle/cache", *path)
     end
 
-    def global_cached_gem(path)
+    def bundle_cached_gem(path)
       home(".bundle/cache/#{path}.gem")
     end
 

@@ -9,7 +9,7 @@ describe "bundle install with gem sources" do
       G
 
       bundle :install
-      expect(global_cache).to exist
+      expect(bundle_cache).to exist
     end
 
     it "copies gemspecs to the global cache" do
@@ -19,7 +19,7 @@ describe "bundle install with gem sources" do
       G
 
       bundle :install
-      expect(global_cached_gem("rack-1.0.0")).to exist
+      expect(bundle_cached_gem("rack-1.0.0")).to exist
     end
 
     it "does not erase gemspecs from the global cache" do
@@ -30,14 +30,14 @@ describe "bundle install with gem sources" do
       G
 
       bundle :install
-      expect(global_cached_gem("rack-1.0.0")).to exist
+      expect(bundle_cached_gem("rack-1.0.0")).to exist
 
       gemfile <<-G
         source "file://#{gem_repo1}"
       G
 
       bundle :install
-      expect(global_cached_gem("rack-1.0.0")).to exist
+      expect(bundle_cached_gem("rack-1.0.0")).to exist
     end
 
     it "prints output and returns if no dependencies are specified" do
