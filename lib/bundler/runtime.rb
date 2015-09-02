@@ -121,7 +121,7 @@ module Bundler
       prune_cache(cache_path) unless Bundler.settings[:no_prune]
     end
 
-    def global_cache(custom_path = nil)
+    def global_cache
       cache_path = Bundler.global_cache
       FileUtils.mkdir_p(cache_path) unless File.exist?(cache_path)
 
@@ -129,7 +129,7 @@ module Bundler
 
       specs.each do |spec|
         next if spec.name == "bundler"
-        spec.source.global_cache(spec, custom_path) if spec.source.respond_to?(:global_cache)
+        spec.source.global_cache(spec) if spec.source.respond_to?(:global_cache)
       end
       Dir[cache_path.join("*/.git")].each do |git_dir|
         FileUtils.rm_rf(git_dir)
