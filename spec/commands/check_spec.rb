@@ -241,14 +241,15 @@ describe "bundle check" do
     end
   end
 
-  context "--path vendor/bundle after installing gems in the default directory" do
+  context "`config path vendor/bundle` after installing gems in the default directory" do
     it "returns false" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rails"
       G
 
-      bundle "check --path vendor/bundle"
+      bundle "config path vendor/bundle"
+      bundle "check"
       expect(exitstatus).to eq(1) if exitstatus
       expect(err).to match(/The following gems are missing/)
     end

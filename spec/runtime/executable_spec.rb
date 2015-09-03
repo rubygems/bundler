@@ -22,7 +22,8 @@ describe "Running bin/* commands" do
 
   it "allows the location of the gem stubs to be specified" do
     bundle "install"
-    bundle "binstubs rack --path gbin"
+    bundle "config path.binstubs gbin"
+    bundle "binstubs rack"
 
     expect(bundled_app("bin")).not_to exist
     expect(bundled_app("gbin/rackup")).to exist
@@ -33,7 +34,8 @@ describe "Running bin/* commands" do
 
   it "allows absolute paths as a specification of where to install bin stubs" do
     bundle "install"
-    bundle "binstubs rack --path #{tmp}/bin"
+    bundle "config path.binstubs #{tmp}/bin"
+    bundle "binstubs rack"
 
     gembin tmp("bin/rackup")
     expect(out).to eq("1.0.0")
@@ -111,13 +113,15 @@ describe "Running bin/* commands" do
 
   it "allows you to stop installing binstubs" do
     bundle "install"
-    bundle "binstubs rack --path bin/"
+    bundle "config path.binstubs bin/"
+    bundle "binstubs rack"
     bundled_app("bin/rackup").rmtree
 
     expect(bundled_app("bin/rackup")).not_to exist
     # expect(bundled_app("rackup")).not_to exist
 
-    bundle "binstubs rack --path \"\""
+    bundle "config path.binstubs \"\""
+    bundle "binstubs rack"
     bundle "config bin"
     expect(out).to include("You have not configured a value for `bin`")
   end
