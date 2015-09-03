@@ -8,6 +8,8 @@ require "bundler/shared_helpers"
 
 module Bundler
   class GemfileError < RuntimeError; end
+  class GemfileEvalError < GemfileError; end
+
   class Dsl
     include RubyDsl
 
