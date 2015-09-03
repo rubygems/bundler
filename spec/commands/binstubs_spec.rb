@@ -118,14 +118,15 @@ describe "bundle binstubs <gem>" do
     end
   end
 
-  context "--path" do
+  context "`config path.binstubs`" do
     it "sets the binstubs dir" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
       G
 
-      bundle "binstubs rack --path exec"
+      bundle "config path.binstubs exec"
+      bundle "binstubs rack"
 
       expect(bundled_app("exec/rackup")).to exist
     end
@@ -137,7 +138,8 @@ describe "bundle binstubs <gem>" do
         gem "rails"
       G
 
-      bundle "binstubs rack --path exec"
+      bundle "config path.binstubs exec"
+      bundle "binstubs rack"
       bundle :install
 
       expect(bundled_app("exec/rails")).not_to exist

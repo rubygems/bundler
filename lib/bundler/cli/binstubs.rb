@@ -10,8 +10,8 @@ module Bundler
 
     def run
       Bundler.definition.validate_ruby!
-      Bundler.settings[:bin] = options["path"] if options["path"]
-      Bundler.settings[:bin] = nil if options["path"] && options["path"].empty?
+      Bundler.settings[:bin] = Bundler.settings["path.binstubs"] if Bundler.settings["path.binstubs"]
+      Bundler.settings[:bin] = nil if Bundler.settings["path.binstubs"] && Bundler.settings["path.binstubs"].empty?
       installer = Installer.new(Bundler.root, Bundler.definition)
 
       if gems.empty?
