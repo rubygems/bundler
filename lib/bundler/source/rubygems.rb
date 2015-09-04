@@ -400,12 +400,6 @@ module Bundler
         download_path = Bundler.requires_sudo? ? Bundler.tmp(spec.full_name) : Bundler.rubygems.gem_dir
         local_gem_path = "#{Bundler.rubygems.gem_dir}/cache"
         gem_path = "#{local_gem_path}/#{spec.full_name}.gem"
-        global_gem_path = "#{Bundler.global_cache}/#{spec.full_name}.gem"
-
-        if File.exist?(global_gem_path)
-          FileUtils.cp(global_gem_path, local_gem_path)
-          return global_gem_path
-        end
 
         FileUtils.mkdir_p("#{download_path}/cache")
         Bundler.rubygems.download_gem(spec, uri, download_path)
