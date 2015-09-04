@@ -1,7 +1,5 @@
 require "spec_helper"
 
-# See Definition#resolve_with_cache!
-
 describe "bundle install with gem sources" do
   describe "the simple case" do
     it "creates the global cache directory" do

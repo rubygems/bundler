@@ -123,7 +123,6 @@ module Bundler
           Bundler.ui.confirm message
 
           path = cached_gem(spec)
-
           if Bundler.requires_sudo?
             install_path = Bundler.tmp(spec.full_name)
             bin_path     = install_path.join("bin")
