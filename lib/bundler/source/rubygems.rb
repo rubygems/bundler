@@ -21,7 +21,6 @@ module Bundler
         @allow_remote = false
         @allow_cached = false
         @caches = [Bundler.app_cache, *Bundler.rubygems.gem_cache, Bundler.global_cache]
-        @global_caches = [Bundler.global_cache]
 
         Array(options["remotes"] || []).reverse_each {|r| add_remote(r) }
       end
@@ -189,21 +188,6 @@ module Bundler
         raise InstallError, e.message
       end
 
-      def cache_globally(spec)
-        if builtin_gem?(spec)
-          cached_path = cached_built_in_gem(spec)
-        else
-          cached_path = cached_gem(spec)
-        end
-        raise GemNotFound, "Missing gem file '#{spec.full_name}.gem'." unless cached_path
-        return if File.dirname(cached_path) == Bundler.global_cache.to_s
-        Bundler.ui.info "  * #{File.basename(cached_path)}"
-        FileUtils.cp(cached_path, Bundler.global_cache)
-      rescue Errno::EACCES => e
-        Bundler.ui.debug(e)
-        raise InstallError, e.message
-      end
-
       def cached_built_in_gem(spec)
         cached_path = cached_path(spec)
         if cached_path.nil?
@@ -269,11 +253,6 @@ module Bundler
           raise Bundler::GemNotFound, "Could not find #{spec.file_name} for installation"
         end
         cached_gem
-      end
-
-      def global_cached_path(spec)
-        possibilities = @global_caches.map {|p| "#{p}/#{spec.file_name}" }
-        possibilities.find {|p| File.exist?(p) }
       end
 
       def cached_path(spec)

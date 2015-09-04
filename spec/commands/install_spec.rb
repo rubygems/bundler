@@ -48,8 +48,11 @@ describe "bundle install with gem sources" do
         gem "rack", "1.0"
       G
 
+      expect(Bundler.rubygems).to receive(:fetch_gem)
       bundle :install
-      expect(1).to eq(0)
+
+      expect(Bundler.rubygems).not_to receive(:fetch_gem)
+      bundle :install
     end
 
     it "uses the global cache as a source when installing gems" do
