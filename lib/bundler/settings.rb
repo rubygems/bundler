@@ -223,7 +223,7 @@ module Bundler
     end
 
     def global_cache_path
-      File.join(Bundler.rubygems.user_home, ".bundle/cache")
+      self["path.global_cache"] || File.join(Bundler.rubygems.user_home, ".bundle/cache")
     end
 
   private

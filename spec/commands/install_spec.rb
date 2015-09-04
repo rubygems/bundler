@@ -118,6 +118,18 @@ describe "bundle install with gem sources" do
       end
     end
 
+    it "allows the global cache path to be configured" do
+      bundle "config path.global_cache #{home}/machine_cache"
+      build_gem "omg", :path => "#{home}/machine_cache"
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "omg"
+      G
+
+      should_be_installed "omg 1.0.0"
+    end
+
     it "prints output and returns if no dependencies are specified" do
       gemfile <<-G
         source "file://#{gem_repo1}"
