@@ -48,7 +48,7 @@ describe "bundle install with gem sources" do
         gem "rack", "1.0"
       G
 
-      expect(Bundler.rubygems).to receive(:fetch_gem)
+      expect_any_instance_of(Bundler::SourceList).to receive(:fetch_gem)
       bundle :install
 
       expect(Bundler.rubygems).not_to receive(:fetch_gem)
@@ -56,17 +56,6 @@ describe "bundle install with gem sources" do
     end
 
     it "uses the global cache as a source when installing gems" do
-      # TODO: Also test that this does not download gems.
-
-      # TODO: Also test this by installing to a directory A, switching
-      # environments, and then installing to a directory B. With
-      # the same gemfile, the second installation shouldn't download
-      # the gems.
-
-      # TODO: Should there be specs analogous to the gems_spec.rb
-      # specs "does not reinstall gems from the cache if they exist on the
-      # system" and "does not reinstall gems from the cache if they exist in
-      # the bundle"?
       build_gem "omg", :path => bundle_cache
 
       install_gemfile <<-G
@@ -74,7 +63,61 @@ describe "bundle install with gem sources" do
         gem "omg"
       G
 
+      # TODO: Check that this does not download the gem, but retrieves it from
+      # the global cache.
       should_be_installed "omg 1.0.0"
+    end
+
+    it "uses the global cache as a source when installing local gems from a different directory" do
+      build_gem "omg", :path => bundle_cache
+      build_gem "foo", :path => bundle_cache
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "omg"
+      G
+
+      should_be_installed "omg 1.0.0"
+      should_not_be_installed "foo 1.0.0"
+
+      Dir.chdir bundled_app2 do
+        create_file "gems.rb", Pathname.new(bundled_app2("gems.rb")), <<-G
+          source "file://#{gem_repo1}"
+          gem "foo"
+        G
+
+        should_not_be_installed "omg 1.0.0"
+        should_not_be_installed "foo 1.0.0"
+
+        bundle :install
+
+        should_be_installed "foo 1.0.0"
+        should_not_be_installed "omg 1.0.0"
+      end
+    end
+
+    it "uses the global cache as a source when installing remote gems from a different directory" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      should_be_installed "rack 1.0.0"
+
+      Dir.chdir bundled_app2 do
+        create_file "gems.rb", Pathname.new(bundled_app2("gems.rb")), <<-G
+          source "file://#{gem_repo1}"
+          gem "rack"
+        G
+
+        should_not_be_installed "rack 1.0.0"
+
+        bundle :install
+
+        # TODO: Check that this does not download the gem, but retrieves it
+        # from the global cache.
+        should_be_installed "rack 1.0.0"
+      end
     end
 
     it "prints output and returns if no dependencies are specified" do
