@@ -20,7 +20,7 @@ module Bundler
         @dependency_names = []
         @allow_remote = false
         @allow_cached = false
-        @caches = [Bundler.app_cache, *Bundler.rubygems.gem_cache]
+        @caches = [Bundler.app_cache, *Bundler.rubygems.gem_cache, Bundler.global_cache]
         @global_caches = [Bundler.global_cache]
 
         Array(options["remotes"] || []).reverse_each {|r| add_remote(r) }
@@ -332,12 +332,13 @@ module Bundler
         @cached_specs ||= begin
           idx = installed_specs.dup
 
-          path = Bundler.app_cache
-          Dir["#{path}/*.gem"].each do |gemfile|
-            next if gemfile =~ /^bundler\-[\d\.]+?\.gem/
-            s ||= Bundler.rubygems.spec_from_gem(gemfile)
-            s.source = self
-            idx << s
+          [Bundler.app_cache, Bundler.global_cache].each do |path|
+            Dir["#{path}/*.gem"].each do |gemfile|
+              next if gemfile =~ /^bundler\-[\d\.]+?\.gem/
+              s ||= Bundler.rubygems.spec_from_gem(gemfile)
+              s.source = self
+              idx << s
+            end
           end
         end
 
