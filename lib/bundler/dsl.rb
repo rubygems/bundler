@@ -226,13 +226,14 @@ module Bundler
     end
 
     def with_source(source)
+      old_source = @source
       if block_given?
         @source = source
         yield
       end
       source
     ensure
-      @source = nil
+      @source = old_source
     end
 
     def normalize_hash(opts)
