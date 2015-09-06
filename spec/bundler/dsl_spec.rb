@@ -195,4 +195,20 @@ describe Bundler::Dsl do
         to raise_error(Bundler::GemfileError, /There was an error parsing `Gemfile`: can't modify frozen String. Bundler cannot continue./i)
     end
   end
+
+  describe "#with_source" do
+    context "if there was a rubygem source already defined" do
+      it "restores it after it's done" do
+        other_source = double("other-source")
+        allow(Bundler::Source::Rubygems).to receive(:new).and_return(other_source)
+
+        subject.source("https://other-source.org") do
+          subject.gem("dobry-pies", :path => "foo")
+          subject.gem("foo")
+        end
+
+        expect(subject.dependencies.last.source).to eq(other_source)
+      end
+    end
+  end
 end
