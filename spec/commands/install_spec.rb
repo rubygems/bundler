@@ -405,7 +405,7 @@ describe "bundle install with gem sources" do
     end
   end
 
-  describe "from the global cache" do
+  describe "using the global cache" do
     it "creates the global cache directory" do
       gemfile <<-G
         source "file://#{gem_repo1}"
@@ -443,17 +443,24 @@ describe "bundle install with gem sources" do
       expect(bundle_cached_gem("rack-1.0.0")).to exist
     end
 
-    it "does not download gems to the global cache" do
+    it "does not download gems to the global cache when caching globally" do
+      source_hostname = "localgemserver.test"
+      source_uri = "http://#{source_hostname}"
+
       gemfile <<-G
-        source "file://#{gem_repo1}"
+        source "#{source_uri}"
         gem "rack", "1.0"
       G
 
-      expect(Bundler.rubygems).to receive(:download_gem)
-      bundle :install
+      bundle :install, :artifice => "endpoint"
+      expect(out).to include("Fetching gem metadata from #{source_uri}")
+      expect(bundle_cached_gem("rack-1.0.0")).to exist
+      FileUtils.rm_r(bundle_cache)
+      expect(bundle_cache).not_to exist
 
-      expect(Bundler.rubygems).to receive(:download_gem)
-      bundle :install
+      bundle :install, :artifice => "endpoint"
+      expect(out).not_to include("Fetching gem metadata from #{source_uri}")
+      expect(bundle_cached_gem("rack-1.0.0")).to exist
     end
 
     it "uses the global cache as a source when installing gems" do
@@ -541,7 +548,7 @@ describe "bundle install with gem sources" do
 
       bundle :install
       bundle :cache
-      FileUtils.rm_r default_bundle_path
+      FileUtils.rm_r(default_bundle_path)
       FileUtils.rm_r(bundle_cache)
       expect(default_bundle_path).not_to exist
       expect(bundle_cache).not_to exist

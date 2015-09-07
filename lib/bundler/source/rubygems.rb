@@ -88,6 +88,7 @@ module Bundler
       def install(spec, opts = {})
         force = opts[:force]
         ensure_builtin_gems_cached = opts[:ensure_builtin_gems_cached]
+        cache_globally(cached_path(spec)) if cached_path(spec)
 
         if ensure_builtin_gems_cached && builtin_gem?(spec)
           if !cached_path(spec)
@@ -316,11 +317,9 @@ module Bundler
       def cached_specs
         @cached_specs ||= begin
           idx = installed_specs.dup
-
           [Bundler.app_cache, Bundler.global_cache].each do |path|
             Dir["#{path}/*.gem"].each do |gemfile|
               next if gemfile =~ /^bundler\-[\d\.]+?\.gem/
-              cache_globally(gemfile) if path == Bundler.app_cache
               s ||= Bundler.rubygems.spec_from_gem(gemfile)
               s.source = self
               idx << s
