@@ -416,7 +416,7 @@ describe "bundle install with gem sources" do
       expect(bundle_cache).to exist
     end
 
-    it "copies gemspecs to the global cache" do
+    it "copies .gem files to the global cache" do
       gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack", "1.0"
@@ -426,8 +426,7 @@ describe "bundle install with gem sources" do
       expect(bundle_cached_gem("rack-1.0.0")).to exist
     end
 
-    it "does not erase gemspecs from the global cache" do
-      # TODO: When, if ever, should gemspecs be erased from the global cache?
+    it "does not remove .gem files from the global cache" do
       gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack", "1.0"
@@ -450,10 +449,10 @@ describe "bundle install with gem sources" do
         gem "rack", "1.0"
       G
 
-      expect_any_instance_of(Bundler::SourceList).to receive(:fetch_gem)
+      expect(Bundler.rubygems).to receive(:download_gem)
       bundle :install
 
-      expect(Bundler.rubygems).not_to receive(:fetch_gem)
+      expect(Bundler.rubygems).to receive(:download_gem)
       bundle :install
     end
 
@@ -532,6 +531,24 @@ describe "bundle install with gem sources" do
       G
 
       should_be_installed "omg 1.0.0"
+    end
+
+    it "copies gems from the local cache to the global cache" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", "1.0"
+      G
+
+      bundle :install
+      bundle :cache
+      FileUtils.rm_r default_bundle_path
+      FileUtils.rm_r(bundle_cache)
+      expect(default_bundle_path).not_to exist
+      expect(bundle_cache).not_to exist
+      expect(cached_gem("rack-1.0.0")).to exist
+
+      bundle :install
+      expect(bundle_cached_gem("rack-1.0.0")).to exist
     end
   end
 end

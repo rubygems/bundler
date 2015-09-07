@@ -306,6 +306,13 @@ module Bundler
         end
       end
 
+      def cache_globally(gemfile)
+        unless File.exist?("#{Bundler.global_cache}/#{File.basename(gemfile)}")
+          FileUtils.mkdir_p(Bundler.global_cache)
+          FileUtils.cp(gemfile, Bundler.global_cache)
+        end
+      end
+
       def cached_specs
         @cached_specs ||= begin
           idx = installed_specs.dup
@@ -313,6 +320,7 @@ module Bundler
           [Bundler.app_cache, Bundler.global_cache].each do |path|
             Dir["#{path}/*.gem"].each do |gemfile|
               next if gemfile =~ /^bundler\-[\d\.]+?\.gem/
+              cache_globally(gemfile) if path == Bundler.app_cache
               s ||= Bundler.rubygems.spec_from_gem(gemfile)
               s.source = self
               idx << s

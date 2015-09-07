@@ -137,7 +137,6 @@ module Bundler
     def specs
       @specs ||= begin
         specs = resolve.materialize(Bundler.settings[:cache_all_platforms] ? dependencies : requested_dependencies)
-
         unless specs["bundler"].any?
           local = Bundler.settings[:frozen] ? rubygems_index : index
           bundler = local.search(Gem::Dependency.new("bundler", VERSION)).last
