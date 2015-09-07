@@ -406,6 +406,9 @@ describe "bundle install with gem sources" do
   end
 
   describe "using the global cache" do
+    let(:source_hostname) { "localgemserver.test" }
+    let(:source_uri) { "http://#{source_hostname}" }
+
     it "creates the global cache directory" do
       gemfile <<-G
         source "file://#{gem_repo1}"
@@ -444,9 +447,6 @@ describe "bundle install with gem sources" do
     end
 
     it "does not download gems to the global cache when caching globally" do
-      source_hostname = "localgemserver.test"
-      source_uri = "http://#{source_hostname}"
-
       gemfile <<-G
         source "#{source_uri}"
         gem "rack", "1.0"
@@ -466,13 +466,12 @@ describe "bundle install with gem sources" do
     it "uses the global cache as a source when installing gems" do
       build_gem "omg", :path => bundle_cache
 
-      install_gemfile <<-G
-        source "file://#{gem_repo1}"
+      install_gemfile <<-G, :artifice => "endpoint"
+        source "#{source_uri}"
         gem "omg"
       G
 
-      # TODO: Check that this does not download the gem, but retrieves it from
-      # the global cache.
+      expect(out).not_to include("Fetching gem metadata from #{source_uri}")
       should_be_installed "omg 1.0.0"
     end
 
@@ -514,16 +513,14 @@ describe "bundle install with gem sources" do
 
       Dir.chdir bundled_app2 do
         create_file "gems.rb", Pathname.new(bundled_app2("gems.rb")), <<-G
-          source "file://#{gem_repo1}"
+          source "#{source_uri}"
           gem "rack"
         G
 
         should_not_be_installed "rack 1.0.0"
 
-        bundle :install
-
-        # TODO: Check that this does not download the gem, but retrieves it
-        # from the global cache.
+        bundle :install, :artifice => "endpoint"
+        expect(out).not_to include("Fetching gem metadata from #{source_uri}")
         should_be_installed "rack 1.0.0"
       end
     end
