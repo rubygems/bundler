@@ -38,7 +38,7 @@ module Bundler
     alias_method :[]=, :set_current
 
     def set_local(key, value)
-      local_config_file or raise GemfileNotFound, "Could not locate #{SharedHelpers.gemfile_name}"
+      raise GemfileNotFound, "Could not locate #{SharedHelpers.gemfile_name}" unless local_config_file
       set_key(key, value, @local_config, local_config_file)
     end
 

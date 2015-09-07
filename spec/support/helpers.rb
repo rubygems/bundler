@@ -1,16 +1,15 @@
 module Spec
   module Helpers
     def with_config(config)
-      if block_given?
-        old_config = {}
+      old_config = {}
 
-        config.each do |k, v|
-          old_config[k] = Bundler.settings[k]
-          Bundler.settings.set_local(k, v)
-        end
-        yield
-        config.each {|k, _| Bundler.settings.set_local(k, old_config[k]) }
+      config.each do |k, v|
+        old_config[k] = Bundler.settings[k]
+        Bundler.settings.set_local(k, v)
       end
+      yield if block_given?
+    ensure
+      config.each {|k, _| Bundler.settings.set_local(k, old_config[k]) }
     end
 
     def reset!
