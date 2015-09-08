@@ -20,7 +20,7 @@ module Bundler
         @dependency_names = []
         @allow_remote = false
         @allow_cached = false
-        @caches = [Bundler.app_cache, *Bundler.rubygems.gem_cache, Bundler.global_cache]
+        @caches = [Bundler.app_cache, *Bundler.rubygems.gem_cache]
 
         Array(options["remotes"] || []).reverse_each {|r| add_remote(r) }
       end
@@ -79,8 +79,8 @@ module Bundler
           # sources, and large_idx.use small_idx is way faster than
           # small_idx.use large_idx.
           idx = @allow_remote ? remote_specs.dup : Index.new
-          idx.use(cached_specs, :override_dupes) if @allow_cached || @allow_remote
-          idx.use(globally_cached_specs, :override_dupes)
+          idx.use(cached_specs(:local), :override_dupes) if @allow_cached || @allow_remote
+          idx.use(cached_specs(:global), :override_dupes)
           idx.use(installed_specs, :override_dupes)
           idx
         end
@@ -315,31 +315,22 @@ module Bundler
         end
       end
 
-      def globally_cached_specs
-        @globally_cached_specs ||= begin
+      def cached_specs(scope)
+        @cached_specs ||= begin
           idx = installed_specs.dup
-          path = Bundler.global_cache
+          path =
+           case scope
+           when :local then Bundler.app_cache
+           when :global then Bundler.global_cache
+           else
+             raise "scope must be :local or :global"
+           end
+
           Dir["#{path}/*.gem"].each do |gemfile|
             next if gemfile =~ /^bundler\-[\d\.]+?\.gem/
             s ||= Bundler.rubygems.spec_from_gem(gemfile)
             s.source = self
             idx << s
-          end
-        end
-
-        idx
-      end
-
-      def cached_specs
-        @cached_specs ||= begin
-          idx = installed_specs.dup
-          [Bundler.app_cache, Bundler.global_cache].each do |path|
-            Dir["#{path}/*.gem"].each do |gemfile|
-              next if gemfile =~ /^bundler\-[\d\.]+?\.gem/
-              s ||= Bundler.rubygems.spec_from_gem(gemfile)
-              s.source = self
-              idx << s
-            end
           end
         end
 
@@ -426,9 +417,8 @@ module Bundler
 
         FileUtils.mkdir_p("#{download_path}/cache")
         Bundler.rubygems.download_gem(spec, uri, download_path)
-
-        FileUtils.mkdir_p(Bundler.global_cache)
-        FileUtils.cp(gem_path, Bundler.global_cache)
+        cache_globally(gem_path)
+        # TODO: Maybe do something in this method: Check when download_gem is called?
 
         if Bundler.requires_sudo?
           Bundler.mkdir_p local_gem_path
