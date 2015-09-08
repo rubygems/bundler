@@ -466,7 +466,7 @@ describe "bundle install with gem sources" do
     it "uses the global cache as a source when installing gems" do
       build_gem "omg", :path => bundle_cache
 
-      install_gemfile <<-G, :artifice => "endpoint_500"
+      install_gemfile <<-G, :artifice => "endpoint_no_gem"
         source "#{source_uri}"
         gem "omg"
       G
@@ -519,7 +519,7 @@ describe "bundle install with gem sources" do
 
         should_not_be_installed "rack 1.0.0"
 
-        bundle :install, :artifice => "endpoint_500"
+        bundle :install, :artifice => "endpoint_no_gem"
         expect(out).not_to include("Fetching gem metadata from #{source_uri}")
         should_be_installed "rack 1.0.0"
       end

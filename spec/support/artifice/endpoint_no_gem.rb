@@ -1,0 +1,71 @@
+require File.expand_path("../../path.rb", __FILE__)
+include Spec::Path
+
+$LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/artifice*/lib")].first}"
+$LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/rack-*/lib")].first}"
+$LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/rack-*/lib")].last}"
+$LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/tilt*/lib")].first}"
+$LOAD_PATH.unshift "#{Dir[base_system_gems.join("gems/sinatra*/lib")].first}"
+
+require "artifice"
+require "sinatra/base"
+
+Artifice.deactivate
+
+class EndpointNoGem < Sinatra::Base
+  helpers do
+    def dependencies_for(gem_names, gem_repo = gem_repo1)
+      return [] if gem_names.nil? || gem_names.empty?
+
+      require "rubygems"
+      require "bundler"
+      Bundler::Deprecate.skip_during do
+        Marshal.load(File.open(gem_repo.join("specs.4.8")).read).map do |name, version, platform|
+          spec = load_spec(name, version, platform, gem_repo)
+          if gem_names.include?(spec.name)
+            {
+              :name         => spec.name,
+              :number       => spec.version.version,
+              :platform     => spec.platform.to_s,
+              :dependencies => spec.dependencies.select {|dep| dep.type == :runtime }.map do |dep|
+                [dep.name, dep.requirement.requirements.map {|a| a.join(" ") }.join(", ")]
+              end
+            }
+          end
+        end.compact
+      end
+    end
+
+    def load_spec(name, version, platform, gem_repo)
+      full_name = "#{name}-#{version}"
+      full_name += "-#{platform}" if platform != "ruby"
+      Marshal.load(Gem.inflate(File.open(gem_repo.join("quick/Marshal.4.8/#{full_name}.gemspec.rz")).read))
+    end
+  end
+
+  get "/quick/Marshal.4.8/:id" do
+    halt 500
+  end
+
+  get "/fetch/actual/gem/:id" do
+    halt 500
+  end
+
+  get "/gems/:id" do
+    halt 500
+  end
+
+  get "/api/v1/dependencies" do
+    halt 500
+  end
+
+  get "/specs.4.8.gz" do
+    File.read("#{gem_repo1}/specs.4.8.gz")
+  end
+
+  get "/prerelease_specs.4.8.gz" do
+    halt 500
+  end
+end
+
+Artifice.activate_with(EndpointNoGem)
