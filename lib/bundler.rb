@@ -275,10 +275,17 @@ module Bundler
       with_original_env do
         ENV["MANPATH"] = ENV["BUNDLE_ORIG_MANPATH"]
         ENV.delete_if {|k, _| k[0, 7] == "BUNDLE_" }
-        if ENV.key? "RUBYOPT"
+
+        if ENV.key?("RUBYOPT")
           ENV["RUBYOPT"] = ENV["RUBYOPT"].sub "-rbundler/setup", ""
-          ENV["RUBYOPT"] = ENV["RUBYOPT"].sub "-I#{File.expand_path("..", __FILE__)}", ""
         end
+
+        if ENV.key?("RUBYLIB")
+          rubylib = ENV["RUBYLIB"].split(File::PATH_SEPARATOR)
+          rubylib.delete(File.expand_path("..", __FILE__))
+          ENV["RUBYLIB"] = rubylib.join(File::PATH_SEPARATOR)
+        end
+
         yield
       end
     end

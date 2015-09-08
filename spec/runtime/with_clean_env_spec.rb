@@ -42,15 +42,13 @@ describe "Bundler.with_env helpers" do
     end
 
     it "should not pass RUBYOPT changes" do
-      lib_path = File.expand_path("../../../lib", __FILE__)
-      Bundler::ORIGINAL_ENV["RUBYOPT"] = " -I#{lib_path} -rbundler/setup"
+      Bundler::ORIGINAL_ENV["RUBYOPT"] = " -rbundler/setup"
 
       Bundler.with_clean_env do
         expect(`echo $RUBYOPT`.strip).not_to include "-rbundler/setup"
-        expect(`echo $RUBYOPT`.strip).not_to include "-I#{lib_path}"
       end
 
-      expect(Bundler::ORIGINAL_ENV["RUBYOPT"]).to eq(" -I#{lib_path} -rbundler/setup")
+      expect(Bundler::ORIGINAL_ENV["RUBYOPT"]).to eq(" -rbundler/setup")
     end
 
     it "cleans RUBYLIB" do
