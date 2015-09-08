@@ -80,6 +80,7 @@ module Bundler
           # small_idx.use large_idx.
           idx = @allow_remote ? remote_specs.dup : Index.new
           idx.use(cached_specs, :override_dupes) if @allow_cached || @allow_remote
+          idx.use(globally_cached_specs, :override_dupes)
           idx.use(installed_specs, :override_dupes)
           idx
         end
@@ -312,6 +313,21 @@ module Bundler
           FileUtils.mkdir_p(Bundler.global_cache)
           FileUtils.cp(gemfile, Bundler.global_cache)
         end
+      end
+
+      def globally_cached_specs
+        @globally_cached_specs ||= begin
+          idx = installed_specs.dup
+          path = Bundler.global_cache
+          Dir["#{path}/*.gem"].each do |gemfile|
+            next if gemfile =~ /^bundler\-[\d\.]+?\.gem/
+            s ||= Bundler.rubygems.spec_from_gem(gemfile)
+            s.source = self
+            idx << s
+          end
+        end
+
+        idx
       end
 
       def cached_specs
