@@ -10,14 +10,34 @@ module Bundler
 
       warn_if_root
 
+      [:with, :without].each do |option|
+        if options[option]
+          Bundler.ui.error "You have specified a `#{option}` group with the " \
+            "`#{option}` flag. Please use `bundle config #{option} #{options[option]}` instead."
+          exit 1
+        end
+      end
+
+      if options[:cache]
+        Bundler.ui.error "Please use `bundle cache` instead of `bundle "\
+         "install --cache`."
+        exit 1
+      end
+
       ENV["RB_USER_INSTALL"] = "1" if Bundler::FREEBSD
 
       # Just disable color in deployment mode
       Bundler.ui.shell = Thor::Shell::Basic.new if options[:deployment]
 
-      if options[:deployment] && options[:system]
-        Bundler.ui.error "The --deployment and --system options mandate conflicting gem installation paths.\n" \
-                         "Please choose."
+      if options[:path]
+        Bundler.ui.error "You have specified an installation path with the "\
+         "path flag. Please use `bundle config path #{options[:path]}` instead."
+        exit 1
+      end
+
+      if (Bundler.settings[:path] || options[:deployment]) && options[:system]
+        Bundler.ui.error "You have configured a path to install your gems to, \n" \
+                         "and specified the --system path. Please use only one."
         exit 1
       end
 
@@ -53,16 +73,17 @@ module Bundler
         options[:system] = true
       end
 
-      path = Bundler.settings[:path]
-      path = "#{Bundler.settings.path}/vendor/bundle" if options[:deployment]
+      Bundler.settings[:path]     = Bundler.rubygems.gem_dir if options[:system]
+      Bundler.settings[:path]     = "#{Bundler.settings.path}/vendor/bundle" if options[:deployment]
 
+      Bundler.settings[:path] ||= "bundle" if options["standalone"]
       Bundler.settings[:shebang]  = options["shebang"] if options["shebang"]
       Bundler.settings[:jobs]     = options["jobs"] if options["jobs"]
       Bundler.settings[:no_prune] = true if options["no-prune"]
       Bundler.settings[:no_install] = true if options["no-install"]
-      Bundler.settings[:clean]    = options["clean"] if options["clean"]
+      Bundler.settings[:clean] = options["clean"] if options["clean"]
       Bundler::Fetcher.disable_endpoint = options["full-index"]
-      Bundler.settings[:disable_shared_gems] = path ? "1" : nil
+      Bundler.settings[:disable_shared_gems] = Bundler.settings[:path] ? "1" : nil
 
       # rubygems plugins sometimes hook into the gem install process
       Gem.load_env_plugins if Gem.respond_to?(:load_env_plugins)
@@ -77,8 +98,8 @@ module Bundler
       Bundler.ui.confirm "Bundle complete! #{dependencies_count_for(definition)}, #{gems_installed_for(definition)}."
       confirm_without_groups
 
-      if path
-        absolute_path = File.expand_path(path)
+      if Bundler.settings[:path]
+        absolute_path = File.expand_path(Bundler.settings[:path])
         relative_path = absolute_path.sub(File.expand_path("."), ".")
         Bundler.ui.confirm "Bundled gems are installed into #{relative_path}."
       else
@@ -102,7 +123,7 @@ module Bundler
         Bundler.ui.error "Then uninstall the gem '#{name}' (or delete all bundled gems) and then install again."
       end
 
-      if Bundler.settings[:clean] && path
+      if Bundler.settings[:clean] && Bundler.settings[:path]
         require "bundler/cli/clean"
         Bundler::CLI::Clean.new(options).run
       end
