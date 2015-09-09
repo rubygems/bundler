@@ -465,7 +465,7 @@ describe "bundle install with gem sources" do
     end
 
     it "uses the global cache as a source when installing gems" do
-      build_gem "omg", :path => bundle_cache
+      build_gem "omg", :path => bundle_cache_source_dir(source_uri)
 
       install_gemfile <<-G, :artifice => "endpoint_no_gem"
         source "#{source_uri}"
@@ -477,8 +477,8 @@ describe "bundle install with gem sources" do
     end
 
     it "uses the global cache as a source when installing local gems from a different directory" do
-      build_gem "omg", :path => bundle_cache
-      build_gem "foo", :path => bundle_cache
+      build_gem "omg", :path => bundle_cache_source_dir(gem_repo1)
+      build_gem "foo", :path => bundle_cache_source_dir(gem_repo1)
 
       install_gemfile <<-G
         source "file://#{gem_repo1}"
@@ -528,7 +528,7 @@ describe "bundle install with gem sources" do
 
     it "allows the global cache path to be configured" do
       bundle "config path.global_cache #{home}/machine_cache"
-      build_gem "omg", :path => "#{home}/machine_cache"
+      build_gem "omg", :path => "#{home}/machine_cache/gems/#{source_dir(gem_repo1)}"
 
       install_gemfile <<-G
         source "file://#{gem_repo1}"

@@ -44,13 +44,19 @@ module Spec
       home(".bundle/cache", *path)
     end
 
+    def source_dir(source)
+      prefix = %r(http:\/\/) =~ source.to_s ? "" : "file:"
+      uri = Bundler::Source::Rubygems::Remote.new(URI("#{prefix}#{source}/")).uri
+      [uri.hostname, uri.port, Digest::MD5.hexdigest(uri.path)].compact.join(".")
+    end
+
+    def bundle_cache_source_dir(source)
+      bundle_cache("gems", source_dir(source))
+    end
+
     def bundle_cached_gem(gem, source = nil)
       if source
-        prefix = %r(http:\/\/) =~ source ? "" : "file:"
-        uri = Bundler::Source::Rubygems::Remote.new(URI("#{prefix}#{source}/")).uri
-        source_dir = [uri.hostname, uri.port, Digest::MD5.hexdigest(uri.path)].compact.join(".")
-        cache_dir = bundle_cache("gems", source_dir)
-        cache_dir.join("#{gem}.gem")
+        bundle_cache_source_dir(source).join("#{gem}.gem")
       else
         bundle_cache("gems", "#{gem}.gem")
       end

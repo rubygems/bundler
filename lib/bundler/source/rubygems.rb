@@ -333,7 +333,7 @@ module Bundler
              raise "scope must be :local or :global"
            end
 
-          Dir["#{path}/*.gem"].each do |gemfile|
+          Dir["#{path}/**/*.gem"].each do |gemfile|
             next if gemfile =~ /^bundler\-[\d\.]+?\.gem/
             s ||= Bundler.rubygems.spec_from_gem(gemfile)
             s.source = self
