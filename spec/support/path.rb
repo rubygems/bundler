@@ -44,8 +44,15 @@ module Spec
       home(".bundle/cache", *path)
     end
 
-    def bundle_cached_gem(path)
-      home(".bundle/cache/#{path}.gem")
+    def bundle_cached_gem(gem, source = nil)
+      if source
+        uri = Bundler::Source::Rubygems::Remote.new(URI("file:#{source}/")).uri
+        source_dir = [uri.hostname, uri.port, Digest::MD5.hexdigest(uri.path)].compact.join(".")
+        cache_dir = bundle_cache("gems", source_dir)
+        cache_dir.join("#{gem}.gem")
+      else
+        bundle_cache("gems", "#{gem}.gem")
+      end
     end
 
     def base_system_gems

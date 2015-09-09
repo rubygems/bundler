@@ -308,10 +308,17 @@ module Bundler
         end
       end
 
-      def cache_globally(gemfile)
+      def cache_globally(gemfile, spec = nil)
         unless File.exist?("#{Bundler.global_cache}/#{File.basename(gemfile)}")
-          FileUtils.mkdir_p(Bundler.global_cache)
-          FileUtils.cp(gemfile, Bundler.global_cache)
+          if spec
+            uri = spec.source.remotes.first
+            source_dir = [uri.hostname, uri.port, Digest::MD5.hexdigest(uri.path)].compact.join(".")
+            cache_dir = Bundler.global_cache.join("gems", source_dir)
+          else
+            cache_dir = Bundler.global_cache.join("gems")
+          end
+          FileUtils.mkdir_p(cache_dir)
+          FileUtils.cp(gemfile, cache_dir)
         end
       end
 
@@ -417,7 +424,7 @@ module Bundler
 
         FileUtils.mkdir_p("#{download_path}/cache")
         Bundler.rubygems.download_gem(spec, uri, download_path)
-        cache_globally(gem_path)
+        cache_globally(gem_path, spec)
         # TODO: Maybe do something in this method: Check when download_gem is called?
 
         if Bundler.requires_sudo?
