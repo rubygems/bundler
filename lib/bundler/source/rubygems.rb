@@ -89,7 +89,7 @@ module Bundler
       def install(spec, opts = {})
         force = opts[:force]
         ensure_builtin_gems_cached = opts[:ensure_builtin_gems_cached]
-        cache_globally(cached_path(spec)) if cached_path(spec)
+        cache_globally(cached_path(spec), spec) if spec && cached_path(spec)
 
         if ensure_builtin_gems_cached && builtin_gem?(spec)
           if !cached_path(spec)

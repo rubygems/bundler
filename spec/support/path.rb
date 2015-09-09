@@ -46,7 +46,8 @@ module Spec
 
     def bundle_cached_gem(gem, source = nil)
       if source
-        uri = Bundler::Source::Rubygems::Remote.new(URI("file:#{source}/")).uri
+        prefix = %r(http:\/\/) =~ source ? "" : "file:"
+        uri = Bundler::Source::Rubygems::Remote.new(URI("#{prefix}#{source}/")).uri
         source_dir = [uri.hostname, uri.port, Digest::MD5.hexdigest(uri.path)].compact.join(".")
         cache_dir = bundle_cache("gems", source_dir)
         cache_dir.join("#{gem}.gem")

@@ -446,6 +446,7 @@ describe "bundle install with gem sources" do
       expect(bundle_cached_gem("rack-1.0.0", gem_repo1)).to exist
     end
 
+    # FIXME: check what behavior is being tested
     it "does not download gems to the global cache when caching globally" do
       gemfile <<-G
         source "#{source_uri}"
@@ -454,13 +455,13 @@ describe "bundle install with gem sources" do
 
       bundle :install, :artifice => "endpoint"
       expect(out).to include("Fetching gem metadata from #{source_uri}")
-      expect(bundle_cached_gem("rack-1.0.0", gem_repo1)).to exist
+      expect(bundle_cached_gem("rack-1.0.0", source_uri)).to exist
       FileUtils.rm_r(bundle_cache)
       expect(bundle_cache).not_to exist
 
       bundle :install, :artifice => "endpoint"
       expect(out).not_to include("Fetching gem metadata from #{source_uri}")
-      expect(bundle_cached_gem("rack-1.0.0", gem_repo1)).to exist
+      expect(bundle_cached_gem("rack-1.0.0", source_uri)).to exist
     end
 
     it "uses the global cache as a source when installing gems" do
