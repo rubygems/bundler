@@ -79,7 +79,8 @@ module Bundler
           # sources, and large_idx.use small_idx is way faster than
           # small_idx.use large_idx.
           idx = @allow_remote ? remote_specs.dup : Index.new
-          idx.use(cached_specs, :override_dupes) if @allow_cached || @allow_remote
+          idx.use(cached_specs(:local), :override_dupes) if @allow_cached || @allow_remote
+          idx.use(cached_specs(:global), :override_dupes)
           idx.use(installed_specs, :override_dupes)
           idx
         end
@@ -88,6 +89,7 @@ module Bundler
       def install(spec, opts = {})
         force = opts[:force]
         ensure_builtin_gems_cached = opts[:ensure_builtin_gems_cached]
+        cache_globally(cached_path(spec), spec) if spec && cached_path(spec)
 
         if ensure_builtin_gems_cached && builtin_gem?(spec)
           if !cached_path(spec)
@@ -306,12 +308,32 @@ module Bundler
         end
       end
 
-      def cached_specs
+      def cache_globally(gemfile, spec = nil)
+        unless File.exist?("#{Bundler.global_cache}/#{File.basename(gemfile)}")
+          if spec
+            uri = spec.source.remotes.first
+            source_dir = [uri.hostname, uri.port, Digest::MD5.hexdigest(uri.path)].compact.join(".")
+            cache_dir = Bundler.global_cache.join("gems", source_dir)
+          else
+            cache_dir = Bundler.global_cache.join("gems")
+          end
+          FileUtils.mkdir_p(cache_dir)
+          FileUtils.cp(gemfile, cache_dir)
+        end
+      end
+
+      def cached_specs(scope)
         @cached_specs ||= begin
           idx = installed_specs.dup
+          path =
+           case scope
+           when :local then Bundler.app_cache
+           when :global then Bundler.global_cache
+           else
+             raise "scope must be :local or :global"
+           end
 
-          path = Bundler.app_cache
-          Dir["#{path}/*.gem"].each do |gemfile|
+          Dir["#{path}/**/*.gem"].each do |gemfile|
             next if gemfile =~ /^bundler\-[\d\.]+?\.gem/
             s ||= Bundler.rubygems.spec_from_gem(gemfile)
             s.source = self
@@ -397,13 +419,16 @@ module Bundler
         spec.fetch_platform
 
         download_path = Bundler.requires_sudo? ? Bundler.tmp(spec.full_name) : Bundler.rubygems.gem_dir
-        gem_path = "#{Bundler.rubygems.gem_dir}/cache/#{spec.full_name}.gem"
+        local_gem_path = "#{Bundler.rubygems.gem_dir}/cache"
+        gem_path = "#{local_gem_path}/#{spec.full_name}.gem"
 
         FileUtils.mkdir_p("#{download_path}/cache")
         Bundler.rubygems.download_gem(spec, uri, download_path)
+        cache_globally(gem_path, spec)
+        # TODO: Maybe do something in this method: Check when download_gem is called?
 
         if Bundler.requires_sudo?
-          Bundler.mkdir_p "#{Bundler.rubygems.gem_dir}/cache"
+          Bundler.mkdir_p local_gem_path
           Bundler.sudo "mv #{download_path}/cache/#{spec.full_name}.gem #{gem_path}"
         end
 

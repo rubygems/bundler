@@ -404,4 +404,162 @@ describe "bundle install with gem sources" do
       expect(err).to include("Please use `bundle config path")
     end
   end
+
+  describe "using the global cache" do
+    let(:source_hostname) { "localgemserver.test" }
+    let(:source_uri) { "http://#{source_hostname}" }
+
+    it "creates the global cache directory" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", "1.0"
+      G
+
+      bundle :install
+      expect(bundle_cache).to exist
+    end
+
+    it "copies .gem files to the global cache" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", "1.0"
+      G
+
+      bundle :install
+      expect(bundle_cached_gem("rack-1.0.0", gem_repo1)).to exist
+    end
+
+    it "does not remove .gem files from the global cache" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", "1.0"
+      G
+
+      bundle :install
+      expect(bundle_cached_gem("rack-1.0.0", gem_repo1)).to exist
+
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+      G
+
+      bundle :install
+      expect(bundle_cached_gem("rack-1.0.0", gem_repo1)).to exist
+    end
+
+    # FIXME: check what behavior is being tested
+    it "does not download gems to the global cache when caching globally" do
+      gemfile <<-G
+        source "#{source_uri}"
+        gem "rack", "1.0"
+      G
+
+      bundle :install, :artifice => "endpoint"
+      expect(out).to include("Fetching gem metadata from #{source_uri}")
+      expect(bundle_cached_gem("rack-1.0.0", source_uri)).to exist
+      FileUtils.rm_r(bundle_cache)
+      expect(bundle_cache).not_to exist
+
+      bundle :install, :artifice => "endpoint"
+      expect(out).not_to include("Fetching gem metadata from #{source_uri}")
+      expect(bundle_cached_gem("rack-1.0.0", source_uri)).to exist
+    end
+
+    it "uses the global cache as a source when installing gems" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", "1.0"
+      G
+
+      FileUtils.rm_r(default_bundle_path)
+      # build_gem "rack", :path => bundle_cache_source_dir("https://rubygems.org")
+
+      install_gemfile <<-G, :artifice => "endpoint_no_gem"
+        source "https://rubygems.org"
+        gem "rack"
+      G
+      $stderr.puts out
+
+      should_be_installed "rack 1.0.0"
+    end
+
+    it "uses the global cache as a source when installing local gems from a different directory" do
+      build_gem "omg", :path => bundle_cache_source_dir(gem_repo1)
+      build_gem "foo", :path => bundle_cache_source_dir(gem_repo1)
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "omg"
+      G
+
+      should_be_installed "omg 1.0.0"
+      should_not_be_installed "foo 1.0.0"
+
+      Dir.chdir bundled_app2 do
+        create_file "gems.rb", Pathname.new(bundled_app2("gems.rb")), <<-G
+          source "file://#{gem_repo1}"
+          gem "foo"
+        G
+
+        should_not_be_installed "omg 1.0.0"
+        should_not_be_installed "foo 1.0.0"
+
+        bundle :install
+
+        should_be_installed "foo 1.0.0"
+        should_not_be_installed "omg 1.0.0"
+      end
+    end
+
+    it "uses the global cache as a source when installing remote gems from a different directory" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      should_be_installed "rack 1.0.0"
+
+      Dir.chdir bundled_app2 do
+        create_file "gems.rb", Pathname.new(bundled_app2("gems.rb")), <<-G
+          source "#{source_uri}"
+          gem "rack"
+        G
+
+        should_not_be_installed "rack 1.0.0"
+
+        bundle :install, :artifice => "endpoint_no_gem"
+        expect(out).not_to include("Fetching gem metadata from #{source_uri}")
+        should_be_installed "rack 1.0.0"
+      end
+    end
+
+    it "allows the global cache path to be configured" do
+      bundle "config path.global_cache #{home}/machine_cache"
+      build_gem "omg", :path => "#{home}/machine_cache/gems/#{source_dir(gem_repo1)}"
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "omg"
+      G
+
+      should_be_installed "omg 1.0.0"
+    end
+
+    it "copies gems from the local cache to the global cache" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", "1.0"
+      G
+
+      bundle :install
+      bundle :cache
+      FileUtils.rm_r(default_bundle_path)
+      FileUtils.rm_r(bundle_cache)
+      expect(default_bundle_path).not_to exist
+      expect(bundle_cache).not_to exist
+      expect(cached_gem("rack-1.0.0")).to exist
+
+      bundle :install
+      expect(bundle_cached_gem("rack-1.0.0", gem_repo1)).to exist
+    end
+  end
 end

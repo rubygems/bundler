@@ -222,6 +222,10 @@ module Bundler
       end
     end
 
+    def global_cache_path
+      self["path.global_cache"] || File.join(Bundler.rubygems.user_home, ".bundle/cache")
+    end
+
   private
 
     def key_for(key)
