@@ -465,15 +465,21 @@ describe "bundle install with gem sources" do
     end
 
     it "uses the global cache as a source when installing gems" do
-      build_gem "omg", :path => bundle_cache_source_dir(source_uri)
-
-      install_gemfile <<-G, :artifice => "endpoint_no_gem"
-        source "#{source_uri}"
-        gem "omg"
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", "1.0"
       G
 
-      expect(out).not_to include("Fetching gem metadata from #{source_uri}")
-      should_be_installed "omg 1.0.0"
+      FileUtils.rm_r(default_bundle_path)
+      # build_gem "rack", :path => bundle_cache_source_dir("https://rubygems.org")
+
+      install_gemfile <<-G, :artifice => "endpoint_no_gem"
+        source "https://rubygems.org"
+        gem "rack"
+      G
+      $stderr.puts out
+
+      should_be_installed "rack 1.0.0"
     end
 
     it "uses the global cache as a source when installing local gems from a different directory" do

@@ -45,7 +45,7 @@ module Spec
     end
 
     def source_dir(source)
-      prefix = %r(http:\/\/) =~ source.to_s ? "" : "file:"
+      prefix = %r(https?:\/\/) =~ source.to_s ? "" : "file:"
       uri = Bundler::Source::Rubygems::Remote.new(URI("#{prefix}#{source}/")).uri
       [uri.hostname, uri.port, Digest::MD5.hexdigest(uri.path)].compact.join(".")
     end
