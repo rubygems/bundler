@@ -508,8 +508,54 @@ describe "bundle install with gem sources" do
         # rack 0.9.1 is installed and rack 1.0.0 is not
         should_be_installed "rack 0.9.1"
         should_not_be_installed "rack 1.0.0"
+      end
 
-        # TODO: check that if the wrong source is provided, we do not install
+      it "should not install if the wrong source is provided" do
+        gemfile <<-G
+          source "#{source}"
+          gem "rack"
+        G
+
+        bundle :install, :artifice => "endpoint"
+        FileUtils.rm_r(default_bundle_path)
+        should_not_be_installed "rack 1.0.0"
+        expect(download_cache(source, "rack-1.0.0.gem")).to exist
+        # rack 1.0.0 is not installed and it is in the global cache
+
+        gemfile <<-G
+          source "#{source2}"
+          gem "rack", "0.9.1"
+        G
+
+        bundle :install, :artifice => "endpoint"
+        FileUtils.rm_r(default_bundle_path)
+        should_not_be_installed "rack 0.9.1"
+        expect(download_cache(source2, "rack-0.9.1.gem")).to exist
+        # rack 0.9.1 is not installed and it is in the global cache
+
+        gemfile <<-G
+          source "#{source2}"
+          gem "rack", "1.0.0"
+        G
+
+        expect(download_cache(source, "rack-1.0.0.gem")).to exist
+        expect(download_cache(source2, "rack-0.9.1.gem")).to exist
+        bundle :install, :artifice => "endpoint_no_gem"
+        # rack 1.0.0 is not installed and rack 0.9.1 is not
+        should_not_be_installed "rack 1.0.0"
+        should_not_be_installed "rack 0.9.1"
+
+        gemfile <<-G
+          source "#{source}"
+          gem "rack", "0.9.1"
+        G
+
+        expect(download_cache(source, "rack-1.0.0.gem")).to exist
+        expect(download_cache(source2, "rack-0.9.1.gem")).to exist
+        bundle :install, :artifice => "endpoint_no_gem"
+        # rack 0.9.1 is not installed and rack 1.0.0 is not
+        should_not_be_installed "rack 0.9.1"
+        should_not_be_installed "rack 1.0.0"
       end
     end
 
