@@ -405,7 +405,7 @@ describe "bundle install with gem sources" do
     end
   end
 
-  describe "using the global cache" do
+  describe "using the cross-application user cache" do
     let(:source) { "http://localgemserver.test" }
 
     it "caches gems into the global cache on download" do
@@ -416,7 +416,7 @@ describe "bundle install with gem sources" do
 
       bundle :install, :artifice => "endpoint"
       should_be_installed "rack 1.0.0"
-      expect(global_cache(source, "rack-1.0.gem")).to exist
+      expect(download_cache(source, "rack-1.0.0.gem")).to exist
     end
 
     it "uses globally cached gems if they exist" do
@@ -425,13 +425,15 @@ describe "bundle install with gem sources" do
         gem "rack", "1.0"
       G
 
+      download_cache(source).mkpath
+      FileUtils.cp(gem_repo1("gems/rack-1.0.0.gem"), download_cache(source, "rack-1.0.0.gem"))
       bundle :install, :artifice => "endpoint_no_gem"
       expect(exitstatus).to eq(0) if exitstatus
       should_be_installed "rack 1.0"
     end
 
     it "allows the global cache path to be configured" do
-      bundle "config path.global_cache #{home('machine_cache')}"
+      bundle "config path.download_cache #{home('machine_cache')}"
 
       gemfile <<-G
         source "#{source}"
@@ -440,7 +442,7 @@ describe "bundle install with gem sources" do
 
       bundle :install, :artifice => "endpoint"
       should_be_installed "rack 1.0"
-      cached_rack = home("machine_cache", source_dir(source), "rack-1.0.gem")
+      cached_rack = home("machine_cache", download_cache_source_dir(source), "rack-1.0.0.gem")
       expect(cached_rack).to exist
     end
 
