@@ -398,9 +398,9 @@ module Bundler
 
         download_path = Bundler.requires_sudo? ? Bundler.tmp(spec.full_name) : Bundler.rubygems.gem_dir
         gem_path = "#{Bundler.rubygems.gem_dir}/cache/#{spec.full_name}.gem"
-
         FileUtils.mkdir_p("#{download_path}/cache")
-        Bundler.rubygems.download_gem(spec, uri, download_path)
+
+        download_gem(spec, uri, download_path)
 
         if Bundler.requires_sudo?
           Bundler.mkdir_p "#{Bundler.rubygems.gem_dir}/cache"
@@ -423,6 +423,30 @@ module Bundler
       def installed?(spec)
         installed_specs[spec].any?
       end
+
+    private
+
+      def download_cache_path(*paths)
+        raise "Caching is only possible for sources with one URL" if remotes.size > 1
+        uri = remotes.first
+        port = uri.port unless uri.port == 80
+        path = Digest::MD5.hexdigest(uri.path) unless uri.path =~ /\A\/?\Z/
+        source_dir = [uri.hostname, port, path].compact.join(".")
+        Bundler.settings.download_cache_path.join(source_dir).tap(&:mkpath).join(*paths)
+      end
+
+      def download_gem(spec, uri, download_path)
+        cache_path = download_cache_path("#{spec.full_name}.gem")
+        local_path = File.join(download_path, "cache/#{spec.full_name}.gem")
+
+        if cache_path.exist?
+          FileUtils.cp(cache_path, local_path)
+        else
+          Bundler.rubygems.download_gem(spec, uri, download_path)
+          FileUtils.cp(local_path, cache_path)
+        end
+      end
+
     end
   end
 end

@@ -222,6 +222,14 @@ module Bundler
       end
     end
 
+    def download_cache_path
+      if self["path.download_cache"]
+        Pathname.new(File.expand_path(self["path.download_cache"]))
+      else
+        Bundler.user_bundle_path.join("cache")
+      end
+    end
+
   private
 
     def key_for(key)
@@ -321,5 +329,6 @@ module Bundler
       end
       uri
     end
+
   end
 end
