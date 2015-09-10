@@ -430,7 +430,7 @@ module Bundler
         raise "Caching is only possible for sources with one URL" if remotes.size > 1
         uri = remotes.first
         port = uri.port unless uri.port == 80
-        path = Digest::MD5.hexdigest(uri.path) unless uri.path =~ /\A\/?\Z/
+        path = Digest::MD5.hexdigest(uri.path) unless uri.path =~ %r|\A/?\Z|
         source_dir = [uri.hostname, port, path].compact.join(".")
         Bundler.settings.download_cache_path.join(source_dir).tap(&:mkpath).join(*paths)
       end
@@ -446,7 +446,6 @@ module Bundler
           FileUtils.cp(local_path, cache_path)
         end
       end
-
     end
   end
 end

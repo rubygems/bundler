@@ -329,6 +329,5 @@ module Bundler
       end
       uri
     end
-
   end
 end

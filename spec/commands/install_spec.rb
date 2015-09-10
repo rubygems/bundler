@@ -433,7 +433,7 @@ describe "bundle install with gem sources" do
     end
 
     it "allows the global cache path to be configured" do
-      bundle "config path.download_cache #{home('machine_cache')}"
+      bundle "config path.download_cache #{home("machine_cache")}"
 
       gemfile <<-G
         source "#{source}"
@@ -445,6 +445,5 @@ describe "bundle install with gem sources" do
       cached_rack = home("machine_cache", download_cache_source_dir(source), "rack-1.0.0.gem")
       expect(cached_rack).to exist
     end
-
   end
 end
