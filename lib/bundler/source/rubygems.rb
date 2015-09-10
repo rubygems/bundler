@@ -88,6 +88,7 @@ module Bundler
       def install(spec, opts = {})
         force = opts[:force]
         ensure_builtin_gems_cached = opts[:ensure_builtin_gems_cached]
+        cache_globally(spec, cached_path(spec)) if spec && cached_path(spec)
 
         if ensure_builtin_gems_cached && builtin_gem?(spec)
           if !cached_path(spec)
@@ -435,6 +436,14 @@ module Bundler
         else
           Bundler.rubygems.download_gem(spec, uri, download_path)
           FileUtils.cp(local_path, cache_path)
+        end
+      end
+
+      def cache_globally(spec, local_cache_path)
+        cache_path = download_cache_path("#{spec.full_name}.gem")
+        unless cache_path.exist?
+          FileUtils.mkdir_p(cache_path)
+          FileUtils.cp(local_cache_path, cache_path)
         end
       end
 
