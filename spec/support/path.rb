@@ -40,6 +40,17 @@ module Spec
       bundled_app("vendor/cache/#{path}.gem")
     end
 
+    def source_dir(source)
+      uri  = URI(source.to_s)
+      port = uri.port unless uri.port == 80
+      path = Digest::MD5.hexdigest(uri.path) unless uri.path.empty?
+      [uri.hostname, port, path].compact.join(".")
+    end
+
+    def global_cache(source, *path)
+      home(".bundle/cache", source_dir(source), *path)
+    end
+
     def base_system_gems
       tmp.join("gems/base")
     end
