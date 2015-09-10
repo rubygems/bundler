@@ -462,5 +462,59 @@ describe "bundle install with gem sources" do
       should_be_installed "rack 1.0.0"
       expect(download_cache(source, "rack-1.0.0.gem")).to exist
     end
+
+    describe "when installing gems from a different directory" do
+      it "uses the global cache as a source" do
+        install_gemfile <<-G, :artifice => "endpoint"
+          source "#{source}"
+          gem "rack"
+          gem "activesupport"
+        G
+
+        # Both gems are installed and in the global cache
+        should_be_installed "rack 1.0.0"
+        should_be_installed "activesupport 2.3.5"
+        expect(download_cache(source, "rack-1.0.0.gem")).to exist
+        expect(download_cache(source, "activesupport-2.3.5.gem")).to exist
+        FileUtils.rm_r(default_bundle_path)
+        # Both gems are now only in the global cache
+        should_not_be_installed "rack 1.0.0"
+        should_not_be_installed "activesupport 2.3.5"
+
+        install_gemfile <<-G, :artifice => "endpoint_no_gem"
+          source "#{source}"
+          gem "rack"
+        G
+
+        # rack is installed and both are in the global cache
+        should_be_installed "rack 1.0.0"
+        should_not_be_installed "activesupport 2.3.5"
+        expect(download_cache(source, "rack-1.0.0.gem")).to exist
+        expect(download_cache(source, "activesupport-2.3.5.gem")).to exist
+
+        Dir.chdir bundled_app2 do
+          create_file "gems.rb", Pathname.new(bundled_app2("gems.rb")), <<-G
+            source "#{source}"
+            gem "activesupport"
+          G
+
+          # Neither gem is installed and both are in the global cache
+          should_not_be_installed "rack 1.0.0"
+          should_not_be_installed "activesupport 2.3.5"
+          expect(download_cache(source, "rack-1.0.0.gem")).to exist
+          expect(download_cache(source, "activesupport-2.3.5.gem")).to exist
+
+          # Install using the global cache instead of by downloading the .gem
+          # from the server
+          bundle :install, :artifice => "endpoint_no_gem"
+
+          # activesupport is installed and both are in the global cache
+          should_not_be_installed "rack 1.0.0"
+          should_be_installed "activesupport 2.3.5"
+          expect(download_cache(source, "rack-1.0.0.gem")).to exist
+          expect(download_cache(source, "activesupport-2.3.5.gem")).to exist
+        end
+      end
+    end
   end
 end
