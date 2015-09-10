@@ -422,14 +422,14 @@ describe "bundle install with gem sources" do
     it "uses globally cached gems if they exist" do
       gemfile <<-G
         source "#{source}"
-        gem "rack", "1.0"
+        gem "rack"
       G
 
       download_cache(source).mkpath
       FileUtils.cp(gem_repo1("gems/rack-1.0.0.gem"), download_cache(source, "rack-1.0.0.gem"))
       bundle :install, :artifice => "endpoint_no_gem"
       expect(exitstatus).to eq(0) if exitstatus
-      should_be_installed "rack 1.0"
+      should_be_installed "rack 1.0.0"
     end
 
     it "allows the global cache path to be configured" do
@@ -441,7 +441,7 @@ describe "bundle install with gem sources" do
       G
 
       bundle :install, :artifice => "endpoint"
-      should_be_installed "rack 1.0"
+      should_be_installed "rack 1.0.0"
       cached_rack = home("machine_cache", download_cache_source_dir(source), "rack-1.0.0.gem")
       expect(cached_rack).to exist
     end
