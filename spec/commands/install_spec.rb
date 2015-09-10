@@ -445,5 +445,22 @@ describe "bundle install with gem sources" do
       cached_rack = home("machine_cache", download_cache_source_dir(source), "rack-1.0.0.gem")
       expect(cached_rack).to exist
     end
+
+    it "copies gems from the local cache to the global cache" do
+      gemfile <<-G
+        source "#{source}"
+        gem "rack"
+      G
+
+      bundle :install, :artifice => "endpoint"
+      bundle :cache
+      FileUtils.rm_r(default_bundle_path)
+      FileUtils.rm_r(download_cache(source))
+      expect(cached_gem("rack-1.0.0")).to exist
+
+      bundle :install, :artifice => "endpoint_no_gem"
+      should_be_installed "rack 1.0.0"
+      expect(download_cache(source, "rack-1.0.0.gem")).to exist
+    end
   end
 end
