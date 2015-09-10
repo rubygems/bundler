@@ -416,7 +416,7 @@ describe "bundle install with gem sources" do
 
       bundle :install, :artifice => "endpoint"
       should_be_installed "rack 1.0.0"
-      # expect(global_cache(source, "rack-1.0.gem")).to exist
+      expect(global_cache(source, "rack-1.0.gem")).to exist
     end
 
     it "uses globally cached gems if they exist" do
@@ -425,8 +425,7 @@ describe "bundle install with gem sources" do
         gem "rack", "1.0"
       G
 
-      bundle :install, :artifice => "endpoint"
-      # bundle :install, :artifice => "endpoint_no_gem"
+      bundle :install, :artifice => "endpoint_no_gem"
       expect(exitstatus).to eq(0) if exitstatus
       should_be_installed "rack 1.0"
     end
@@ -442,7 +441,7 @@ describe "bundle install with gem sources" do
       bundle :install, :artifice => "endpoint"
       should_be_installed "rack 1.0"
       cached_rack = home("machine_cache", source_dir(source), "rack-1.0.gem")
-      # expect(cached_rack).to exist
+      expect(cached_rack).to exist
     end
 
   end
