@@ -483,7 +483,7 @@ module Bundler
       # @return [Pathname] The global cache path.
       #
       def download_cache_path(*paths)
-        raise "Caching is only possible for sources with one URL" if remotes.size > 1
+        raise InstallError, "Caching is only possible for sources with one URL" if remotes.size > 1
         uri = remotes.first
         return unless uri
         port = uri.port unless uri.port == 80
