@@ -441,7 +441,7 @@ module Bundler
 
       def cache_globally(spec, local_cache_path)
         cache_path = download_cache_path("#{spec.full_name}.gem")
-        unless cache_path.exist?
+        if cache_path && !cache_path.exist?
           FileUtils.mkdir_p(cache_path)
           FileUtils.cp(local_cache_path, cache_path)
         end
@@ -450,14 +450,10 @@ module Bundler
       def download_cache_path(*paths)
         raise "Caching is only possible for sources with one URL" if remotes.size > 1
         uri = remotes.first
-        source_dir =
-        if uri
-          port = uri.port unless uri.port == 80
-          path = Digest::MD5.hexdigest(uri.path) unless uri.path =~ %r|\A/?\Z|
-          [uri.hostname, port, path].compact.join(".")
-        else
-          ""
-        end
+        return unless uri
+        port = uri.port unless uri.port == 80
+        path = Digest::MD5.hexdigest(uri.path) unless uri.path =~ %r|\A/?\Z|
+        source_dir = [uri.hostname, port, path].compact.join(".")
         Bundler.settings.download_cache_path.join(source_dir).tap(&:mkpath).join(*paths)
       end
     end
