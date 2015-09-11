@@ -427,10 +427,21 @@ module Bundler
 
     private
 
+      # Checks if the requested spec exists in the global cache. If it does,
+      # we copy it to the download path, and if it does not, we download it.
+      #
+      # @param  [Specification] spec
+      #         the spec we want to download or retrieve from the cache.
+      #
+      # @param  [URI] uri
+      #         the URI of the given spec's remote source.
+      #
+      # @param  [String] download_path
+      #         the local directory the .gem will end up in.
+      #
       def download_gem(spec, uri, download_path)
         cache_path = download_cache_path("#{spec.full_name}.gem")
         local_path = File.join(download_path, "cache/#{spec.full_name}.gem")
-
         if cache_path.exist?
           FileUtils.cp(cache_path, local_path)
         else
@@ -439,6 +450,16 @@ module Bundler
         end
       end
 
+      # Checks if the requested spec exists in the global cache. If it does
+      # not, we create the relevant global cache subdirectory if it does not
+      # exist and copy the spec from the local cache to the global cache.
+      #
+      # @param  [Specification] spec
+      #         the spec we want to copy to the global cache.
+      #
+      # @param  [String] local_cache_path
+      #         the local directory from which we want to copy the .gem.
+      #
       def cache_globally(spec, local_cache_path)
         cache_file = download_cache_path("#{spec.full_name}.gem")
         if cache_file && !cache_file.exist?
@@ -448,6 +469,19 @@ module Bundler
         end
       end
 
+      # Returns the global cache path of the calling Rubygems::Source object.
+      #
+      # Note that the Source determines the path's subdirectory. We use this
+      # subdirectory in the global cache path so that gems with the same name
+      # -- and possibly different versions -- from different sources are saved
+      # to their respective subdirectories and do not override one another.
+      #
+      # @param  [Array<String>] paths
+      #         the subdirectories and / or file to be concatenated onto the
+      #         global cache path.
+      #
+      # @return [Pathname] The global cache path.
+      #
       def download_cache_path(*paths)
         raise "Caching is only possible for sources with one URL" if remotes.size > 1
         uri = remotes.first
