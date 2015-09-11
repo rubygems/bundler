@@ -243,38 +243,6 @@ describe "bundle flex_install" do
     end
   end
 
-  describe "when adding a new source" do
-    it "updates the lockfile" do
-      build_repo2
-      install_gemfile <<-G
-        source "file://#{gem_repo1}"
-        gem "rack"
-      G
-      install_gemfile <<-G
-        source "file://#{gem_repo1}"
-        source "file://#{gem_repo2}"
-        gem "rack"
-      G
-
-      lockfile_should_be <<-L
-      GEM
-        remote: file:#{gem_repo1}/
-        remote: file:#{gem_repo2}/
-        specs:
-          rack (1.0.0)
-
-      PLATFORMS
-        ruby
-
-      DEPENDENCIES
-        rack
-
-      BUNDLED WITH
-         #{Bundler::VERSION}
-      L
-    end
-  end
-
   # This was written to test github issue #636
   describe "when a locked child dependency conflicts" do
     before(:each) do

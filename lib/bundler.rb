@@ -213,12 +213,12 @@ module Bundler
 
     def root
       @root ||= begin
-                  default_gemfile.dirname.expand_path
-                rescue GemfileNotFound
-                  bundle_dir = default_bundle_dir
-                  raise GemfileNotFound, "Could not locate #{SharedHelpers.gemfile_name} or .bundle/ directory" unless bundle_dir
-                  Pathname.new(File.expand_path("..", bundle_dir))
-                end
+        default_gemfile.dirname.expand_path
+      rescue GemfileNotFound
+        bundle_dir = default_bundle_dir
+        raise GemfileNotFound, "Could not locate #{SharedHelpers.gemfile_name} or .bundle/ directory" unless bundle_dir
+        Pathname.new(File.expand_path("..", bundle_dir))
+      end
     end
 
     def app_config_path

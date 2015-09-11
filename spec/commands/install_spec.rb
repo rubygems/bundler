@@ -281,11 +281,13 @@ describe "bundle install with gem sources" do
       update_repo2
 
       install_gemfile <<-G
-        source "file://#{gem_repo1}"
-        source "file://#{gem_repo2}"
+        source "file://#{gem_repo1}" do
+          gem "activesupport", "1.2.3"
+        end
 
-        gem "activesupport", "1.2.3"
-        gem "rack", "1.2"
+        source "file://#{gem_repo2}" do
+          gem "rack", "1.2"
+        end
       G
 
       should_be_installed "rack 1.2", "activesupport 1.2.3"
@@ -402,6 +404,215 @@ describe "bundle install with gem sources" do
       bundle "install --path vendor/bundle"
 
       expect(err).to include("Unknown switches '--path'")
+    end
+  end
+
+  describe "using the cross-application user cache" do
+    let(:source)  { "http://localgemserver.test" }
+    let(:source2) { "http://gemserver.example.org" }
+
+    it "caches gems into the global cache on download" do
+      gemfile <<-G
+        source "#{source}"
+        gem "rack"
+      G
+
+      bundle :install, :artifice => "endpoint"
+      should_be_installed "rack 1.0.0"
+      expect(download_cache(source, "rack-1.0.0.gem")).to exist
+    end
+
+    it "uses globally cached gems if they exist" do
+      gemfile <<-G
+        source "#{source}"
+        gem "rack"
+      G
+
+      download_cache(source).mkpath
+      FileUtils.cp(gem_repo1("gems/rack-1.0.0.gem"), download_cache(source, "rack-1.0.0.gem"))
+      bundle :install, :artifice => "endpoint_no_gem"
+      expect(exitstatus).to eq(0) if exitstatus
+      should_be_installed "rack 1.0.0"
+    end
+
+    it "allows the global cache path to be configured" do
+      bundle "config path.download_cache #{home("machine_cache")}"
+
+      gemfile <<-G
+        source "#{source}"
+        gem "rack"
+      G
+
+      bundle :install, :artifice => "endpoint"
+      should_be_installed "rack 1.0.0"
+      cached_rack = home("machine_cache", download_cache_source_dir(source), "rack-1.0.0.gem")
+      expect(cached_rack).to exist
+    end
+
+    it "copies gems from the local cache to the global cache" do
+      gemfile <<-G
+        source "#{source}"
+        gem "rack"
+      G
+
+      bundle :install, :artifice => "endpoint"
+      bundle :cache
+      FileUtils.rm_r(default_bundle_path)
+      FileUtils.rm_r(download_cache(source))
+      expect(cached_gem("rack-1.0.0")).to exist
+
+      bundle :install, :artifice => "endpoint_no_gem"
+      should_be_installed "rack 1.0.0"
+      expect(download_cache(source, "rack-1.0.0.gem")).to exist
+    end
+
+    describe "when the same gem from different sources is installed" do
+      it "should use the appropriate one from the global cache" do
+        gemfile <<-G
+          source "#{source}"
+          gem "rack"
+        G
+
+        bundle :install, :artifice => "endpoint"
+        FileUtils.rm_r(default_bundle_path)
+        should_not_be_installed "rack 1.0.0"
+        expect(download_cache(source, "rack-1.0.0.gem")).to exist
+        # rack 1.0.0 is not installed and it is in the global cache
+
+        gemfile <<-G
+          source "#{source2}"
+          gem "rack", "0.9.1"
+        G
+
+        bundle :install, :artifice => "endpoint"
+        FileUtils.rm_r(default_bundle_path)
+        should_not_be_installed "rack 0.9.1"
+        expect(download_cache(source2, "rack-0.9.1.gem")).to exist
+        # rack 0.9.1 is not installed and it is in the global cache
+
+        gemfile <<-G
+          source "#{source}"
+          gem "rack", "1.0.0"
+        G
+
+        bundle :install, :artifice => "endpoint_no_gem"
+        # rack 1.0.0 is installed and rack 0.9.1 is not
+        should_be_installed "rack 1.0.0"
+        should_not_be_installed "rack 0.9.1"
+        FileUtils.rm_r(default_bundle_path)
+
+        gemfile <<-G
+          source "#{source2}"
+          gem "rack", "0.9.1"
+        G
+
+        bundle :install, :artifice => "endpoint_no_gem"
+        # rack 0.9.1 is installed and rack 1.0.0 is not
+        should_be_installed "rack 0.9.1"
+        should_not_be_installed "rack 1.0.0"
+      end
+
+      it "should not install if the wrong source is provided" do
+        gemfile <<-G
+          source "#{source}"
+          gem "rack"
+        G
+
+        bundle :install, :artifice => "endpoint"
+        FileUtils.rm_r(default_bundle_path)
+        should_not_be_installed "rack 1.0.0"
+        expect(download_cache(source, "rack-1.0.0.gem")).to exist
+        # rack 1.0.0 is not installed and it is in the global cache
+
+        gemfile <<-G
+          source "#{source2}"
+          gem "rack", "0.9.1"
+        G
+
+        bundle :install, :artifice => "endpoint"
+        FileUtils.rm_r(default_bundle_path)
+        should_not_be_installed "rack 0.9.1"
+        expect(download_cache(source2, "rack-0.9.1.gem")).to exist
+        # rack 0.9.1 is not installed and it is in the global cache
+
+        gemfile <<-G
+          source "#{source2}"
+          gem "rack", "1.0.0"
+        G
+
+        expect(download_cache(source, "rack-1.0.0.gem")).to exist
+        expect(download_cache(source2, "rack-0.9.1.gem")).to exist
+        bundle :install, :artifice => "endpoint_no_gem"
+        # rack 1.0.0 is not installed and rack 0.9.1 is not
+        should_not_be_installed "rack 1.0.0"
+        should_not_be_installed "rack 0.9.1"
+
+        gemfile <<-G
+          source "#{source}"
+          gem "rack", "0.9.1"
+        G
+
+        expect(download_cache(source, "rack-1.0.0.gem")).to exist
+        expect(download_cache(source2, "rack-0.9.1.gem")).to exist
+        bundle :install, :artifice => "endpoint_no_gem"
+        # rack 0.9.1 is not installed and rack 1.0.0 is not
+        should_not_be_installed "rack 0.9.1"
+        should_not_be_installed "rack 1.0.0"
+      end
+    end
+
+    describe "when installing gems from a different directory" do
+      it "uses the global cache as a source" do
+        install_gemfile <<-G, :artifice => "endpoint"
+          source "#{source}"
+          gem "rack"
+          gem "activesupport"
+        G
+
+        # Both gems are installed and in the global cache
+        should_be_installed "rack 1.0.0"
+        should_be_installed "activesupport 2.3.5"
+        expect(download_cache(source, "rack-1.0.0.gem")).to exist
+        expect(download_cache(source, "activesupport-2.3.5.gem")).to exist
+        FileUtils.rm_r(default_bundle_path)
+        # Both gems are now only in the global cache
+        should_not_be_installed "rack 1.0.0"
+        should_not_be_installed "activesupport 2.3.5"
+
+        install_gemfile <<-G, :artifice => "endpoint_no_gem"
+          source "#{source}"
+          gem "rack"
+        G
+
+        # rack is installed and both are in the global cache
+        should_be_installed "rack 1.0.0"
+        should_not_be_installed "activesupport 2.3.5"
+        expect(download_cache(source, "rack-1.0.0.gem")).to exist
+        expect(download_cache(source, "activesupport-2.3.5.gem")).to exist
+
+        Dir.chdir bundled_app2 do
+          create_file "gems.rb", Pathname.new(bundled_app2("gems.rb")), <<-G
+            source "#{source}"
+            gem "activesupport"
+          G
+
+          # Neither gem is installed and both are in the global cache
+          should_not_be_installed "rack 1.0.0"
+          should_not_be_installed "activesupport 2.3.5"
+          expect(download_cache(source, "rack-1.0.0.gem")).to exist
+          expect(download_cache(source, "activesupport-2.3.5.gem")).to exist
+
+          # Install using the global cache instead of by downloading the .gem
+          # from the server
+          bundle :install, :artifice => "endpoint_no_gem"
+
+          # activesupport is installed and both are in the global cache
+          should_not_be_installed "rack 1.0.0"
+          should_be_installed "activesupport 2.3.5"
+          expect(download_cache(source, "rack-1.0.0.gem")).to exist
+          expect(download_cache(source, "activesupport-2.3.5.gem")).to exist
+        end
+      end
     end
   end
 end
