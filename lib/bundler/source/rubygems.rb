@@ -440,8 +440,9 @@ module Bundler
       end
 
       def cache_globally(spec, local_cache_path)
-        cache_path = download_cache_path("#{spec.full_name}.gem")
-        if cache_path && !cache_path.exist?
+        cache_file = download_cache_path("#{spec.full_name}.gem")
+        if cache_file && !cache_file.exist?
+          cache_path = File.dirname(cache_file)
           FileUtils.mkdir_p(cache_path)
           FileUtils.cp(local_cache_path, cache_path)
         end
