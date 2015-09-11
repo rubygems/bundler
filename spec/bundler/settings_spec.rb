@@ -41,11 +41,20 @@ describe Bundler::Settings do
       end
     end
 
+    context "when writing to the current config" do
+      it "does not raise a PermissionError" do
+        expect { settings[:frozen] = "1" }.
+          not_to raise_error
+      end
+    end
+  end
+
+  describe "#set_local" do
     context "when it's not possible to write to the file" do
       it "raises an PermissionError with explanation" do
         expect(FileUtils).to receive(:mkdir_p).with(settings.send(:local_config_file).dirname).
           and_raise(Errno::EACCES)
-        expect { settings[:frozen] = "1" }.
+        expect { settings.set_local(:frozen, "1") }.
           to raise_error(Bundler::PermissionError, /config/)
       end
     end
@@ -53,7 +62,7 @@ describe Bundler::Settings do
 
   describe "#set_global" do
     context "when it's not possible to write to the file" do
-      it "raises an PermissionError with explanation" do
+      it "raises a PermissionError with explanation" do
         expect(FileUtils).to receive(:mkdir_p).with(settings.send(:global_config_file).dirname).
           and_raise(Errno::EACCES)
         expect { settings.set_global(:frozen, "1") }.
@@ -122,6 +131,42 @@ describe Bundler::Settings do
       it "returns the configured credentials" do
         expect(settings.credentials_for(uri)).to eq(credentials)
       end
+    end
+  end
+
+  describe "a flag passed to a command" do
+    it "is not automatically remembered" do
+      install_gemfile <<-G, :system => true
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      expect(system_gem_path).to exist
+      FileUtils.rm_r(system_gem_path)
+      expect(system_gem_path).not_to exist
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      expect(bundled_app("some/path")).not_to exist
+      expect(default_bundle_path("gems/rack-1.0.0")).to exist
+      should_be_installed("rack 1.0.0")
+    end
+
+    it "is remembered if set with config" do
+      bundle "config path another/directory"
+      expect(bundled_app("another/directory")).not_to exist
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      expect(bundled_app("another/directory")).to exist
+      expect(bundled_app("another/directory", Bundler.ruby_scope, "gems/rack-1.0.0")).to exist
+      should_be_installed("rack 1.0.0")
     end
   end
 

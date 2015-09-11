@@ -216,20 +216,6 @@ describe "bundle check" do
     end
   end
 
-  it "fails when there's no lock file and frozen is set" do
-    gemfile <<-G
-      source "file://#{gem_repo1}"
-      gem "foo"
-    G
-
-    bundle "install"
-    bundle "install --deployment"
-    FileUtils.rm(bundled_app("gems.locked"))
-
-    bundle :check
-    expect(exitstatus).not_to eq(0) if exitstatus
-  end
-
   context "bundle config path" do
     before do
       gemfile <<-G
@@ -255,14 +241,15 @@ describe "bundle check" do
     end
   end
 
-  context "--path vendor/bundle after installing gems in the default directory" do
+  context "`config path vendor/bundle` after installing gems in the default directory" do
     it "returns false" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rails"
       G
 
-      bundle "check --path vendor/bundle"
+      bundle "config path vendor/bundle"
+      bundle "check"
       expect(exitstatus).to eq(1) if exitstatus
       expect(err).to match(/The following gems are missing/)
     end

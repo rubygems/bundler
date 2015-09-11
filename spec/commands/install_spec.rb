@@ -389,7 +389,7 @@ describe "bundle install with gem sources" do
 
       bundle "install --cache"
 
-      expect(err).to include("Please use `bundle cache` instead")
+      expect(err).to include("Unknown switches '--cache'")
     end
   end
 
@@ -401,7 +401,7 @@ describe "bundle install with gem sources" do
 
       bundle "install --path vendor/bundle"
 
-      expect(err).to include("Please use `bundle config path")
+      expect(err).to include("Unknown switches '--path'")
     end
   end
 end

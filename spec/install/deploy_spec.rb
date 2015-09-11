@@ -29,9 +29,13 @@ describe "install with --deployment or --frozen" do
     bundle "install"
     Dir.chdir tmp
     simulate_new_machine
+
     bundle "install --gemfile #{tmp}/bundled_app/gems.rb --deployment"
     Dir.chdir bundled_app
-    should_be_installed "rack 1.0"
+    # See CLI::Install#run.
+    with_config(:path => "#{Bundler.settings.path}/vendor/bundle") do
+      should_be_installed "rack 1.0"
+    end
   end
 
   it "works if you exclude a group with a git gem" do
@@ -236,7 +240,7 @@ describe "install with --deployment or --frozen" do
       expect(err).not_to include("You have deleted from gems.rb")
     end
 
-    it "remembers that the bundle is frozen at runtime" do
+    it "forgets that the bundle is frozen at runtime" do
       bundle "install --deployment"
 
       gemfile <<-G
@@ -245,7 +249,7 @@ describe "install with --deployment or --frozen" do
         gem "rack-obama"
       G
 
-      should_be_installed "rack 1.0.0"
+      should_not_be_installed "rack 1.0.0"
     end
   end
 end

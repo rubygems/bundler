@@ -22,7 +22,8 @@ describe "Running bin/* commands" do
 
   it "allows the location of the gem stubs to be specified" do
     bundle "install"
-    bundle "binstubs rack --path gbin"
+    bundle "config path.binstubs gbin"
+    bundle "binstubs rack"
 
     expect(bundled_app("bin")).not_to exist
     expect(bundled_app("gbin/rackup")).to exist
@@ -33,7 +34,8 @@ describe "Running bin/* commands" do
 
   it "allows absolute paths as a specification of where to install bin stubs" do
     bundle "install"
-    bundle "binstubs rack --path #{tmp}/bin"
+    bundle "config path.binstubs #{tmp}/bin"
+    bundle "binstubs rack"
 
     gembin tmp("bin/rackup")
     expect(out).to eq("1.0.0")
@@ -47,7 +49,8 @@ describe "Running bin/* commands" do
   end
 
   it "allows the name of the shebang executable to be specified" do
-    bundle "install --shebang ruby-foo"
+    bundle "config shebang ruby-foo"
+    bundle "install"
     bundle "binstubs rack"
     expect(File.open("bin/rackup").gets).to eq("#!/usr/bin/env ruby-foo\n")
   end
@@ -110,18 +113,20 @@ describe "Running bin/* commands" do
 
   it "allows you to stop installing binstubs" do
     bundle "install"
-    bundle "binstubs rack --path bin/"
+    bundle "config path.binstubs bin/"
+    bundle "binstubs rack"
     bundled_app("bin/rackup").rmtree
 
     expect(bundled_app("bin/rackup")).not_to exist
     # expect(bundled_app("rackup")).not_to exist
 
-    bundle "binstubs rack --path \"\""
+    bundle "config path.binstubs \"\""
+    bundle "binstubs rack"
     bundle "config bin"
     expect(out).to include("You have not configured a value for `bin`")
   end
 
-  it "remembers that the option was specified" do
+  it "forgets that the option was specified" do
     gemfile <<-G
       source "file://#{gem_repo1}"
       gem "activesupport"
@@ -138,24 +143,28 @@ describe "Running bin/* commands" do
 
     bundle "install"
 
-    expect(bundled_app("bin/rackup")).to exist
+    expect(bundled_app("bin/rackup")).not_to exist
   end
 
-  it "rewrites bins on --binstubs (to maintain backwards compatibility)" do
+  it "rewrites bins on binstubs (to maintain backwards compatibility)" do
     gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack"
     G
 
     bundle "install"
-    bundle "binstubs rack --path bin/"
+    bundle "config path bin/"
+    bundle "binstubs rack"
 
     File.open(bundled_app("bin/rackup"), "wb") do |file|
       file.print "OMG"
     end
 
+    # See CLI::Binstubs#run.
+    bundle "config bin bin/"
     bundle "install"
-
-    expect(bundled_app("bin/rackup").read).to_not eq("OMG")
+    with_config(:disable_shared_gems => "1") do
+      expect(bundled_app("bin/rackup").read).to_not eq("OMG")
+    end
   end
 end

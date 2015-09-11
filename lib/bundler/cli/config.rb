@@ -39,6 +39,8 @@ module Bundler
       when "delete"
         delete_config(name)
       when "local", "global"
+        # NOTE: `"current"` is not a valid scope, because current settings are
+        # not remembered between commands.
         if args.empty?
           Bundler.ui.confirm "Settings for `#{name}` in order of priority. The top value will be used"
           thor.with_padding do
@@ -92,8 +94,7 @@ module Bundler
       end
     end
 
-    # Checks whether `path` is already set and `path.system` is being set, and
-    # vice versa.
+    # Clears `path` if `path.system` is being set, and vice versa.
     #
     # @param  [String] name
     #         the name of the option being set by the user.
@@ -164,7 +165,7 @@ module Bundler
         if difference == []
           delete_config("without", scope)
         else
-          Bundler.settings.without = difference
+          Bundler.settings.local_without = difference
         end
 
         :conflict
@@ -179,7 +180,7 @@ module Bundler
         if difference == []
           delete_config("with", scope)
         else
-          Bundler.settings.with = difference
+          Bundler.settings.local_with = difference
         end
 
         :conflict
@@ -191,7 +192,9 @@ module Bundler
     # Deletes (sets to `nil`) the given configuration variable within the
     # given scope. If the scope is `"global"`, only the local value is deleted,
     # and vice versa. If the scope is `nil` or anything else, both the local
-    # and global values are unset.
+    # and global values are unset. Note that we do not delete the current config
+    # since it is not used in #run or any conflict resolution and current
+    # configurations are not persisted between commands.
     #
     # @param  [String] name
     #         the name of the option being deleted.

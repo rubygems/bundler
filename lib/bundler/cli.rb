@@ -101,8 +101,6 @@ module Bundler
       "Lock the gems.rb"
     method_option "gemfile", :type => :string, :banner =>
       "Use the specified gemfile instead of gems.rb"
-    method_option "path", :type => :string, :banner =>
-      "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
     map "c" => "check"
     def check
       require "bundler/cli/check"
@@ -134,16 +132,10 @@ module Bundler
       "Specify the number of jobs to run in parallel"
     method_option "local", :type => :boolean, :banner =>
       "Do not attempt to fetch gems remotely and use the gem cache instead"
-    # TODO: Remove the "cache" method_option?
-    method_option "cache", :type => :boolean, :banner =>
-      "Update the existing gem cache."
     method_option "force", :type => :boolean, :banner =>
       "Force downloading every gem."
     method_option "no-prune", :type => :boolean, :banner =>
       "Don't remove stale gems from the cache."
-    # TODO: Remove the "path" method_option?
-    method_option "path", :type => :string, :banner =>
-      "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME)."
     method_option "quiet", :type => :boolean, :banner =>
       "Only output warnings and errors."
     method_option "shebang", :type => :string, :banner =>
@@ -155,10 +147,6 @@ module Bundler
     method_option "trust-policy", :alias => "P", :type => :string, :banner =>
       "Gem trust policy (like gem install -P). Must be one of " +
         Bundler.rubygems.security_policy_keys.join("|")
-    method_option "without", :type => :array, :banner =>
-      "Exclude gems that are part of the specified named group."
-    method_option "with", :type => :array, :banner =>
-      "Include gems that are part of the specified named group."
     map "i" => "install"
     def install
       require "bundler/cli/install"
@@ -212,8 +200,6 @@ module Bundler
     D
     method_option "force", :type => :boolean, :default => false, :banner =>
       "Overwrite existing binstubs if they exist"
-    method_option "path", :type => :string, :lazy_default => "bin", :banner =>
-      "Binstub destination directory (default bin)"
     def binstubs(*gems)
       require "bundler/cli/binstubs"
       Binstubs.new(options, gems).run
@@ -254,8 +240,6 @@ module Bundler
     method_option "gemfile", :type => :string, :banner => "Use the specified gemfile instead of gems.rb"
     method_option "no-install", :type => :boolean, :banner => "Don't actually install the gems, just package."
     method_option "no-prune", :type => :boolean, :banner => "Don't remove stale gems from the cache."
-    method_option "path", :type => :string, :banner =>
-      "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
     method_option "quiet", :type => :boolean, :banner => "Only output warnings and errors."
     long_desc <<-D
       The package command will copy the .gem files for every gem in the bundle into the
@@ -347,7 +331,6 @@ module Bundler
     method_option :format, :type => :string, :default => "png", :aliases => "-F", :banner => "This is output format option. Supported format is png, jpg, svg, dot ..."
     method_option :requirements, :type => :boolean, :default => false, :aliases => "-r", :banner => "Set to show the version of each required dependency."
     method_option :version, :type => :boolean, :default => false, :aliases => "-v", :banner => "Set to show each gem version."
-    method_option :without, :type => :array, :default => [], :banner => "Exclude gems that are part of the specified named group."
     def viz
       require "bundler/cli/viz"
       Viz.new(options).run
@@ -376,7 +359,7 @@ module Bundler
     method_option "dry-run", :type => :boolean, :default => false, :banner =>
       "Only print out changes, do not actually clean gems"
     method_option "force", :type => :boolean, :default => false, :banner =>
-      "Forces clean even if --path is not set"
+      "Forces clean even if path is not configured"
     def clean
       require "bundler/cli/clean"
       Clean.new(options.dup).run

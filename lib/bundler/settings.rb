@@ -9,15 +9,16 @@ module Bundler
     attr_reader :root
 
     def initialize(root = nil)
-      @root          = root
-      @local_config  = load_config(local_config_file)
-      @global_config = load_config(global_config_file)
+      @root           = root
+      @current_config = {}
+      @local_config   = load_config(local_config_file)
+      @global_config  = load_config(global_config_file)
     end
 
     def [](name)
       key = key_for(name)
-      value = (@local_config[key] || ENV[key] || @global_config[key] || DEFAULT_CONFIG[name])
 
+      value = (@current_config[key] || @local_config[key] || ENV[key] || @global_config[key] || DEFAULT_CONFIG[name])
       case
       when value.nil?
         nil
@@ -30,12 +31,16 @@ module Bundler
       end
     end
 
-    def []=(key, value)
-      local_config_file or raise GemfileNotFound, "Could not locate #{SharedHelpers.gemfile_name}"
-      set_key(key, value, @local_config, local_config_file)
+    def set_current(key, value)
+      @current_config[key_for(key)] = value
     end
 
-    alias_method :set_local, :[]=
+    alias_method :[]=, :set_current
+
+    def set_local(key, value)
+      raise GemfileNotFound, "Could not locate #{SharedHelpers.gemfile_name}" unless local_config_file
+      set_key(key, value, @local_config, local_config_file)
+    end
 
     def delete(key)
       @local_config.delete(key_for(key))
@@ -48,7 +53,7 @@ module Bundler
     def all
       env_keys = ENV.keys.select {|k| k =~ /BUNDLE_.*/ }
 
-      keys = @global_config.keys | @local_config.keys | env_keys
+      keys = @current_config.keys | @global_config.keys | @local_config.keys | env_keys
 
       keys.map do |key|
         key.sub(/^BUNDLE_/, "").gsub(/__/, ".").downcase
@@ -90,9 +95,10 @@ module Bundler
     def locations(key)
       key = key_for(key)
       locations = {}
-      locations[:local]  = @local_config[key] if @local_config.key?(key)
-      locations[:env]    = ENV[key] if ENV[key]
-      locations[:global] = @global_config[key] if @global_config.key?(key)
+      locations[:current] = @current_config[key] if @current_config.key?(key)
+      locations[:local]   = @local_config[key] if @local_config.key?(key)
+      locations[:env]     = ENV[key] if ENV[key]
+      locations[:global]  = @global_config[key] if @global_config.key?(key)
       locations[:default] = DEFAULT_CONFIG[key] if DEFAULT_CONFIG.key?(key)
       locations
     end
@@ -101,6 +107,10 @@ module Bundler
       key = key_for(exposed_key)
 
       locations = []
+      if @current_config.key?(key)
+        locations << "Set only for this command with a flag: #{@current_config[key].inspect}"
+      end
+
       if @local_config.key?(key)
         locations << "Set for your local app (#{local_config_file}): #{@local_config[key].inspect}"
       end
@@ -118,11 +128,27 @@ module Bundler
     end
 
     def without=(array)
-      set_array(:without, array)
+      set_array(:without, array, :current)
     end
 
     def with=(array)
-      set_array(:with, array)
+      set_array(:with, array, :current)
+    end
+
+    def local_without=(array)
+      set_array(:without, array, :local)
+    end
+
+    def local_with=(array)
+      set_array(:with, array, :local)
+    end
+
+    def global_without=(array)
+      set_array(:without, array, :global)
+    end
+
+    def global_with=(array)
+      set_array(:with, array, :global)
     end
 
     # Finds the previously set `without` groups in the given scope.
@@ -160,15 +186,16 @@ module Bundler
     #
     def groups_array(group_type, scope)
       key = key_for(group_type)
-      if scope.nil?
+
+      case scope
+      when nil
         get_array(group_type)
-      elsif scope == :global
+      when :global
         @global_config[key] ? @global_config[key].split(" ").map(&:to_sym) : []
-      elsif scope == :local
+      when :local
         @local_config[key] ? @local_config[key].split(" ").map(&:to_sym) : []
       else
-        Bundler.ui.error "Invalid scope #{scope} given. Please use :local or :global."
-        exit 1
+        raise Bundler::InvalidOption, "Invalid scope #{scope} given. Please use :local or :global."
       end
     end
 
@@ -176,11 +203,15 @@ module Bundler
     # Always returns an absolute path to the bundle directory
     # TODO: Refactor this method
     def path
+      return Bundler.rubygems.gem_dir if self["path.system"]
+
       key  = key_for(:path)
       path = ENV[key] || @global_config[key]
       set_path = ""
       install_path = ""
 
+      # We don't use @current_config here, because we no longer accept the path
+      # flag.
       if path && !@local_config.key?(key)
         path = "#{path}/#{Bundler.ruby_scope}" if path != Bundler.rubygems.gem_dir
         set_path = path
@@ -260,8 +291,19 @@ module Bundler
       self[key] ? self[key].split(":").map(&:to_sym) : []
     end
 
-    def set_array(key, array)
-      self[key] = (array.empty? ? nil : array.join(":")) if array
+    def set_array(key, array, scope)
+      unless [:current, :local, :global].include? scope
+        raise Bundler::InvalidOption, "Invalid scope #{scope} given. Please use :local or :global."
+      end
+
+      if array
+        value = (array.empty? ? nil : array.join(":"))
+        case scope
+        when :current then self[key] = value      if array
+        when :local   then set_local(key, value)  if array
+        when :global  then set_global(key, value) if array
+        end
+      end
     end
 
     def set_key(key, value, hash, file)

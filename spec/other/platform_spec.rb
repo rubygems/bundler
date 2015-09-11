@@ -1110,7 +1110,8 @@ G
         build_git "foo", :path => lib_path("foo")
       end
 
-      install_gemfile <<-G, :system => true
+      bundle "config path.system true"
+      install_gemfile <<-G
         source "file://#{gem_repo2}"
         gem "activesupport", "2.3.5"
         gem "foo", :git => "#{lib_path("foo")}"

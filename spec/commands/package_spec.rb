@@ -86,7 +86,11 @@ describe "bundle install with gem sources" do
       FileUtils.rm_rf gem_repo2
 
       bundle "install --deployment"
-      should_be_installed "rack 1.0.0"
+
+      # See CLI::Install#run.
+      with_config(:path => "#{Bundler.settings.path}/vendor/bundle") do
+        should_be_installed "rack 1.0.0"
+      end
     end
 
     it "does not reinstall already-installed gems" do
