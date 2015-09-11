@@ -281,11 +281,13 @@ describe "bundle install with gem sources" do
       update_repo2
 
       install_gemfile <<-G
-        source "file://#{gem_repo1}"
-        source "file://#{gem_repo2}"
+        source "file://#{gem_repo1}" do
+          gem "activesupport", "1.2.3"
+        end
 
-        gem "activesupport", "1.2.3"
-        gem "rack", "1.2"
+        source "file://#{gem_repo2}" do
+          gem "rack", "1.2"
+        end
       G
 
       should_be_installed "rack 1.2", "activesupport 1.2.3"

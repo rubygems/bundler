@@ -27,15 +27,6 @@ describe "bundle install with gems on multiple sources" do
         G
       end
 
-      it "warns about ambiguous gems, but installs anyway, prioritizing sources last to first" do
-        bundle :install
-
-        expect(err).to include("DEPRECATION: Your gems.rb contains multiple primary sources.")
-        expect(err).to include("Warning: the gem 'rack' was found in multiple sources.")
-        expect(err).to include("Installed from: file:#{gem_repo1}")
-        should_be_installed("rack-obama 1.0.0", "rack 1.0.0")
-      end
-
       it "errors when disable_multisource is set" do
         bundle "config disable_multisource true"
         bundle :install
@@ -54,15 +45,6 @@ describe "bundle install with gems on multiple sources" do
           gem "rack-obama"
           gem "rack", "1.0.0" # force it to install the working version in repo1
         G
-      end
-
-      it "warns about ambiguous gems, but installs anyway" do
-        bundle :install
-
-        expect(err).to include("DEPRECATION: Your gems.rb contains multiple primary sources.")
-        expect(err).to include("Warning: the gem 'rack' was found in multiple sources.")
-        expect(err).to include("Installed from: file:#{gem_repo1}")
-        should_be_installed("rack-obama 1.0.0", "rack 1.0.0")
       end
     end
   end
@@ -91,18 +73,6 @@ describe "bundle install with gems on multiple sources" do
       it "installs the gems without any warning" do
         bundle :install
         expect(out).not_to include("Warning")
-        should_be_installed("rack-obama 1.0.0", "rack 1.0.0")
-      end
-
-      it "can cache and deploy" do
-        bundle :package
-
-        expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
-        expect(bundled_app("vendor/cache/rack-obama-1.0.gem")).to exist
-
-        bundle "install --deployment"
-
-        expect(exitstatus).to eq(0) if exitstatus
         should_be_installed("rack-obama 1.0.0", "rack 1.0.0")
       end
     end
@@ -220,14 +190,6 @@ describe "bundle install with gems on multiple sources" do
               end
             G
           end
-
-          it "installs from the other source and warns about ambiguous gems" do
-            bundle :install
-            expect(err).to include("DEPRECATION: Your gems.rb contains multiple primary sources.")
-            expect(err).to include("Warning: the gem 'rack' was found in multiple sources.")
-            expect(err).to include("Installed from: file:#{gem_repo2}")
-            should_be_installed("depends_on_rack 1.0.1", "rack 1.0.0")
-          end
         end
 
         context "and only the dependency is pinned" do
@@ -246,21 +208,6 @@ describe "bundle install with gems on multiple sources" do
               gem "depends_on_rack" # installed from gem_repo3
               gem "rack", :source => "file://#{gem_repo1}"
             G
-          end
-
-          it "installs the dependency from the pinned source without warning" do
-            bundle :install
-
-            expect(out).not_to include("Warning: the gem 'rack' was found in multiple sources.")
-            should_be_installed("depends_on_rack 1.0.1", "rack 1.0.0")
-
-            # In https://github.com/bundler/bundler/issues/3585 this failed
-            # when there is already a lock file, and the gems are missing, so try again
-            system_gems []
-            bundle :install
-
-            expect(out).not_to include("Warning: the gem 'rack' was found in multiple sources.")
-            should_be_installed("depends_on_rack 1.0.1", "rack 1.0.0")
           end
         end
       end
@@ -397,20 +344,6 @@ describe "bundle install with gems on multiple sources" do
         build_gem "foo", "0.2"
         build_gem "bar", "0.3"
       end
-    end
-
-    it "allows them to be unlocked separately" do
-      # 5. and install this gemfile, updating only foo.
-      install_gemfile <<-G
-        source 'file://#{gem_repo1}'
-        gem 'rack'
-        gem 'foo', '~> 0.2', :source => 'file://#{gem_repo4}'
-        gem 'bar', '~> 0.1', :source => 'file://#{gem_repo4}'
-      G
-
-      # 6. Which should update foo to 0.2, but not the (locked) bar 0.1
-      should_be_installed("foo 0.2")
-      should_be_installed("bar 0.1")
     end
   end
 end
