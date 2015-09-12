@@ -90,7 +90,7 @@ module Bundler
       if ask_and_set(:mit, "Do you want to license your code permissively under the MIT license?",
         "This means that any other developer or company will be legally allowed to use your code " \
         "for free as long as they admit you created it. You can read more about the MIT license " \
-        "at choosealicense.com/licenses/mit.")
+        "at http://choosealicense.com/licenses/mit.")
         config[:mit] = true
         Bundler.ui.info "MIT License enabled in config"
         templates.merge!("LICENSE.txt.tt" => "LICENSE.txt")
@@ -101,7 +101,7 @@ module Bundler
         "prefer collaborative, safe spaces. You can read more about the code of conduct at " \
         "contributor-covenant.org. Having a code of conduct means agreeing to the responsibility " \
         "of enforcing it, so be sure that you are prepared to do that. For suggestions about " \
-        "how to enforce codes of conduct, see bit.ly/coc-enforcement.")
+        "how to enforce codes of conduct, see http://bit.ly/coc-enforcement.")
         config[:coc] = true
         Bundler.ui.info "Code of conduct enabled in config"
         templates.merge!("CODE_OF_CONDUCT.md.tt" => "CODE_OF_CONDUCT.md")
