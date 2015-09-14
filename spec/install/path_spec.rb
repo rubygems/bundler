@@ -42,12 +42,6 @@ describe "bundle install" do
       expect(out).to include("gems are installed into ./vendor")
     end
 
-    it "disallows config path vendor/bundle and install system" do
-      bundle "config path vendor/bundle"
-      bundle "install --system"
-      expect(err).to include("Please use only one.")
-    end
-
     it "remembers to disable system gems after config path vendor/bundle" do
       bundle "config path vendor/bundle"
       bundle "install"
