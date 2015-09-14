@@ -45,7 +45,8 @@ describe "when using sudo", :sudo => true do
           gem "rake"
           gem "another_implicit_rake_dep"
       G
-      bundle "install --system"
+      bundle "config path.system true"
+      bundle :install
       expect(system_gem_path("gems/another_implicit_rake_dep-1.0")).to exist
     end
 
