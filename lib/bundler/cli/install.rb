@@ -35,12 +35,6 @@ module Bundler
         exit 1
       end
 
-      if (Bundler.settings[:path] || options[:deployment]) && options[:system]
-        Bundler.ui.error "You have configured a path to install your gems to, \n" \
-                         "and specified the --system path. Please use only one."
-        exit 1
-      end
-
       if options["trust-policy"]
         unless Bundler.rubygems.security_policies.keys.include?(options["trust-policy"])
           Bundler.ui.error "Rubygems doesn't know about trust policy '#{options["trust-policy"]}'. " \
@@ -73,7 +67,6 @@ module Bundler
         options[:system] = true
       end
 
-      Bundler.settings[:path]     = Bundler.rubygems.gem_dir if options[:system]
       Bundler.settings[:path]     = "#{Bundler.settings.path}/vendor/bundle" if options[:deployment]
 
       Bundler.settings[:path] ||= "bundle" if options["standalone"]
