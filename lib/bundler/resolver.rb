@@ -326,7 +326,9 @@ module Bundler
             message = "You have requested:\n" \
               "  #{requirement.name} #{requirement.requirement}\n\n" \
               "The bundle currently has #{requirement.name} locked at #{version}.\n" \
-              "Try running `bundle update #{requirement.name}`"
+              "Try running `bundle update #{requirement.name}`\n\n" \
+              "If you are updating multiple gems in your Gemfile at once,\n" \
+              "try passing them all to `bundle update`"
           elsif requirement.source
             name = requirement.name
             versions = @source_requirements[name][name].map(&:version)
