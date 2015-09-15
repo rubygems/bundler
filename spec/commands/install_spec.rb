@@ -256,22 +256,19 @@ describe "bundle install with gem sources" do
         should_be_installed "rack 1.0"
       end
 
-      # NOTE: This interface (`install; config --delete path; install --system`)
-      # is a bit clunky.
-      # (Just using `install; install --system` produces an error.)
-      it "allows running bundle install --system without deleting foo" do
-        bundle "install"
-        bundle "config --delete path"
-        bundle "install --system"
+      it "allows installing gems to system path without deleting foo" do
+        bundle :install
+        bundle "config path.system true"
+        bundle :install
         FileUtils.rm_rf(bundled_app("vendor"))
         should_be_installed "rack 1.0"
       end
 
-      it "allows running bundle install --system after deleting foo" do
-        bundle "install"
+      it "allows installing gems to system path after deleting foo" do
+        bundle :install
         FileUtils.rm_rf(bundled_app("vendor"))
-        bundle "config --delete path"
-        bundle "install --system"
+        bundle "config path.system true"
+        bundle :install
         should_be_installed "rack 1.0"
       end
     end
