@@ -339,7 +339,8 @@ describe "bundle clean" do
       gem "thin"
       gem "rack"
     G
-    bundle "install --system"
+    bundle "config path.system true"
+    bundle :install
     sys_exec "gem list"
     expect(out).to include("rack (1.0.0)")
     expect(out).to include("thin (1.0)")
@@ -349,7 +350,8 @@ describe "bundle clean" do
 
       gem "rack"
     G
-    bundle "install --system"
+    bundle "config path.system true"
+    bundle :install
     sys_exec "gem list"
     expect(out).to include("rack (1.0.0)")
     expect(out).to include("thin (1.0)")
@@ -529,7 +531,8 @@ describe "bundle clean" do
 
       gem "bindir"
     G
-    bundle "install --system"
+    bundle "config path.system true"
+    bundle :install
 
     bundle "clean --force"
 
