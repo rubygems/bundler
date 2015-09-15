@@ -454,7 +454,7 @@ describe "bundle clean" do
     bundle :update
 
     sys_exec "gem list"
-    expect(out).not_to include("foo (1.0.1, 1.0)")
+    expect(out).to include("foo (1.0)")
   end
 
   it "cleans system gems when --force is used" do
