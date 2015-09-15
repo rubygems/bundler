@@ -24,4 +24,17 @@ describe "bundle executable" do
     expect(exitstatus).to be_zero if exitstatus
     expect(out).to eq("Hello, world")
   end
+
+  context "when ENV['BUNDLE_GEMFILE'] is set to an empty string" do
+    it "ignores it" do
+      gemfile bundled_app("Gemfile"), <<-G
+        source "file://#{gem_repo1}"
+        gem 'rack'
+      G
+
+      bundle :install, :env => { "BUNDLE_GEMFILE" => "" }
+
+      should_be_installed "rack 1.0.0"
+    end
+  end
 end
