@@ -111,6 +111,8 @@ learn more about their operation in [bundle install(1)][bundle-install].
   of `$GEM_HOME` or `$GEM_PATH` values. Bundle gems not found in this location
   will be installed by `bundle install`. Defaults to `Gem.dir`. When --deployment is
   used, defaults to vendor/bundle.
+* `path.system` (`BUNDLE_PATH__SYSTEM`):
+  Boolean, tells Bundler to install gems to the system path. Defaults to `false`.
 * `frozen` (`BUNDLE_FROZEN`):
   Disallow changes to `gems.rb`. Defaults to `true` when `--deployment`
   is used.
