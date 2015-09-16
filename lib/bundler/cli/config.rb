@@ -75,7 +75,7 @@ module Bundler
             "#{locations[:local].inspect}"
         end
 
-        return if resolve_system_path_conflicts(name, new_value, scope) == :conflict
+        resolve_system_path_conflicts(name, new_value, scope)
         resolve_group_conflicts(name, new_value, scope)
         delete_config(name, nil) if new_value == "" and (name == "with" or name == "without")
 
@@ -113,13 +113,9 @@ module Bundler
       if name == "path.system" and Bundler.settings[:path] and new_value == "true"
         Bundler.ui.warn "`path` is already configured, so it will be unset."
         delete_config("path")
-        :conflict
       elsif name == "path" and Bundler.settings["path.system"]
         Bundler.ui.warn "`path.system` is already configured, so it will be unset."
         delete_config("path.system")
-        :conflict
-      else
-        :no_conflict
       end
     end
 
