@@ -124,9 +124,9 @@ module Bundler
         @sources.add_rubygems_remote(source)
       end
     end
-    
+
     def ca_cert(source)
-      ENV['SSL_CERT_FILE'] = source
+      ENV["SSL_CERT_FILE"] = source
     end
 
     def git_source(name, &block)
