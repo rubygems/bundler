@@ -17,7 +17,7 @@ module Bundler
       super
 
       custom_gemfile = options[:gemfile] || Bundler.settings[:gemfile]
-      ENV["BUNDLE_GEMFILE"] = File.expand_path(custom_gemfile) if custom_gemfile
+      ENV["BUNDLE_GEMFILE"] = File.expand_path(custom_gemfile) if custom_gemfile && !custom_gemfile.empty?
 
       Bundler.settings[:retry] = options[:retry] if options[:retry]
 
