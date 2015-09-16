@@ -308,14 +308,14 @@ E
 
         expect(out).to include("`path.system` is already configured")
 
-        expect(Bundler.settings['path.system']).to be_nil
+        expect(Bundler.settings["path.system"]).to be_nil
       end
 
       it "should persist `path`" do
         bundle "config path.system true"
         bundle "config path #{bundled_app(".bundle")}"
 
-        expect(Bundler.settings[:path]).to eq(bundled_app('.bundle').to_s)
+        expect(Bundler.settings[:path]).to eq(bundled_app(".bundle").to_s)
       end
     end
 
@@ -334,7 +334,7 @@ E
         bundle "config path #{default_bundle_path}"
         bundle "config path.system true"
 
-        expect(Bundler.settings['path.system']).to eq("true")
+        expect(Bundler.settings["path.system"]).to eq("true")
       end
     end
   end
