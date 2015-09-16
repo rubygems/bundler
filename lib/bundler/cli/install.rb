@@ -23,6 +23,10 @@ module Bundler
          "install --cache`."
         exit 1
       end
+      if options[:system]
+        Bundler.ui.error "Please use `bundle config path.system true` " \
+          "instead of `bundle install --system`"
+      end
 
       ENV["RB_USER_INSTALL"] = "1" if Bundler::FREEBSD
 
