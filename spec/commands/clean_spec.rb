@@ -440,7 +440,7 @@ describe "bundle clean" do
     should_have_gems "foo-1.0", "foo-1.0.1"
   end
 
-  it "does not clean on bundle update when using --system" do
+  it "does not clean on bundle update when installing to system path" do
     bundle "config path.system true"
 
     build_repo2
