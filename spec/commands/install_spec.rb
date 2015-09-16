@@ -380,39 +380,20 @@ describe "bundle install with gem sources" do
     end
   end
 
-  describe "when using the --cache flag" do
+  describe "when using deprecated flags" do
     it "prints an error and exits" do
-      gemfile <<-G
-        gem 'rack'
-      G
+      ["--cache",
+       "--path vendor/bundle",
+       "--system"
+      ].each do |flag|
+        gemfile <<-G
+          gem 'rack'
+        G
 
-      bundle "install --cache"
+        bundle "install #{flag}"
 
-      expect(err).to include("Unknown switches '--cache'")
-    end
-  end
-
-  describe "when using the --path flag" do
-    it "prints an error and exits" do
-      gemfile <<-G
-        gem 'rack'
-      G
-
-      bundle "install --path vendor/bundle"
-
-      expect(err).to include("Unknown switches '--path'")
-    end
-  end
-
-  describe "when using the --system flag" do
-    it "prints an error and exit" do
-      gemfile <<-G
-        gem 'rack'
-      G
-
-      bundle "install --system"
-
-      expect(err).to include("Unknown switches '--system'")
+        expect(err).to include("Unknown switches '#{flag.split.first}'")
+      end
     end
   end
 
