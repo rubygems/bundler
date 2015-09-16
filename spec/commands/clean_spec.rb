@@ -350,7 +350,6 @@ describe "bundle clean" do
 
       gem "rack"
     G
-    bundle "config path.system true"
     bundle :install
     sys_exec "gem list"
     expect(out).to include("rack (1.0.0)")
