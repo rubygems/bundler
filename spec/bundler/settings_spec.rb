@@ -137,7 +137,6 @@ describe Bundler::Settings do
   describe "a flag passed to a command" do
     it "is remembered if set with config" do
       bundle "config path another/directory"
-      expect(bundled_app("another/directory")).not_to exist
 
       install_gemfile <<-G
         source "file://#{gem_repo1}"
