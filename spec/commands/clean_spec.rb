@@ -438,15 +438,16 @@ describe "bundle clean" do
     should_have_gems "foo-1.0", "foo-1.0.1"
   end
 
-  it "does clean on bundle update when using --system" do
+  it "does not clean on bundle update when using --system" do
+    bundle "config path.system true"
+
     build_repo2
 
-    gemfile <<-G
+    install_gemfile <<-G
       source "file://#{gem_repo2}"
 
       gem "foo"
     G
-    bundle "install --system"
 
     update_repo2 do
       build_gem "foo", "1.0.1"
@@ -454,7 +455,7 @@ describe "bundle clean" do
     bundle :update
 
     sys_exec "gem list"
-    expect(out).not_to include("foo (1.0.1, 1.0)")
+    expect(out).to include("foo (1.0.1, 1.0)")
   end
 
   it "cleans system gems when --force is used" do
