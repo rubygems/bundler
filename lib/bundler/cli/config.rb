@@ -105,10 +105,6 @@ module Bundler
     # @param  [String] scope
     #         the scope of the option being set by the user (either `"local"` or
     #         `"global"`).
-    #
-    # @return [Symbol] Either `:conflict` or `:no_conflict`, depending on whether
-    #         the options conflict.
-    #
     def resolve_system_path_conflicts(name, new_value, scope = "global")
       if name == "path.system" and Bundler.settings[:path] and new_value == "true"
         Bundler.ui.warn "`path` is already configured, so it will be unset."
