@@ -393,7 +393,7 @@ describe "bundle install with gem sources" do
   end
 
   describe "when using the --path flag" do
-    it "print an error and exit" do
+    it "prints an error and exits" do
       gemfile <<-G
         gem 'rack'
       G
@@ -401,6 +401,18 @@ describe "bundle install with gem sources" do
       bundle "install --path vendor/bundle"
 
       expect(err).to include("Unknown switches '--path'")
+    end
+  end
+
+  describe "when using the --system flag" do
+    it "prints an error and exit" do
+      gemfile <<-G
+        gem 'rack'
+      G
+
+      bundle "install --system"
+
+      expect(err).to include("Unknown switches '--system'")
     end
   end
 
