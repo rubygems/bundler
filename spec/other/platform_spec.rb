@@ -540,7 +540,9 @@ G
 
   context "bundle show" do
     before do
-      install_gemfile <<-G, :system => true
+      bundle "config path.system true"
+
+      install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rails"
       G
@@ -874,7 +876,9 @@ G
 
   context "bundle console" do
     before do
-      install_gemfile <<-G, :system => true
+      bundle "config path.system true"
+
+      install_gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
         gem "activesupport", :group => :test
