@@ -307,8 +307,9 @@ E
         bundle "config path #{bundled_app(".bundle")}"
 
         expect(out).to include("`path.system` is already configured")
-        run "puts Bundler.settings['path.system'] == nil"
-        expect(out).to eq("true")
+
+        expect(Bundler.settings['path.system']).to be_nil
+        expect(Bundler.settings[:path]).to eq(bundled_app('.bundle').to_s)
       end
     end
 
@@ -320,8 +321,8 @@ E
         bundle "config path.system true"
 
         expect(out).to include("`path` is already configured")
-        run "puts Bundler.settings[:path] == nil"
-        expect(out).to eq("true")
+        expect(Bundler.settings[:path]).to be_nil
+        expect(Bundler.settings['path.system']).to eq("true")
       end
     end
   end
