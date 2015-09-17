@@ -132,16 +132,13 @@ will cause an error when the gems.rb(5) is modified.
    In deployment, your `gems.locked` should be up-to-date with
    changes made in your gems.rb(5).
 
-3. Gems are installed to `vendor/bundle` not your default system location
+3. Gems are installed to `vendor/bundle`
 
-   In development, it's convenient to share the gems used in your
-   application with other applications and other scripts run on
-   the system.
-
-   In deployment, isolation is a more important default. In addition,
-   the user deploying the application may not have permission to install
-   gems to the system, or the web server may not have permission to
-   read them.
+   The `--deployment` flag overrides any default/custom path settings. Most
+   notably, in deployment mode gems cannot be installed to the system path, to
+   guarantee isolation. In addition, the user deploying the application may not
+   have permission to install gems to the system, or the web server may not
+   have permission to read them.
 
    As a result, `bundle install --deployment` installs gems to
    the `vendor/bundle` directory in the application.
