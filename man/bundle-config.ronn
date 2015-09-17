@@ -38,8 +38,8 @@ cause it to ignore all configuration.
 ## REMEMBERING OPTIONS
 
 Flags passed to `bundle install` or the Bundler runtime,
-such as `--path foo` or `--without production`, are not remembered between commands.
-If these options must be remembered, they must be set using `bundle config`
+such as `--deployment` or `--local`, are not remembered between commands.
+If an option must be remembered, it must be set using `bundle config`
 (e.g., `bundle config path foo`).
 
 The options that can be configured are:
