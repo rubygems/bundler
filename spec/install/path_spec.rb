@@ -13,6 +13,16 @@ describe "bundle install" do
       G
     end
 
+    it "does not use available system gems with config path vendor/bundle" do
+      bundle "config path vendor/bundle"
+      bundle :install
+
+      # See CLI::Install#run.
+      with_config(:disable_shared_gems => "1") do
+        should_be_installed "rack 1.0.0"
+      end
+    end
+
     it "handles paths with regex characters in them" do
       dir = bundled_app("bun++dle")
       dir.mkpath
