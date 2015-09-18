@@ -11,6 +11,8 @@ describe ".bundle/config" do
   describe "BUNDLE_APP_CONFIG" do
     it "can be moved with an environment variable" do
       ENV["BUNDLE_APP_CONFIG"] = tmp("foo/bar").to_s
+      # NOTE: here and below, we need to use `--local` because we want to
+      # write to the app's config file, not the user's
       bundle "config --local foo bar"
       bundle :install
 
