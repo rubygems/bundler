@@ -8,7 +8,6 @@ module Bundler
     def run
       if options[:path]
         Bundler.settings[:path] = File.expand_path(options[:path])
-        Bundler.settings[:disable_shared_gems] = "1"
       end
       begin
         definition = Bundler.definition
