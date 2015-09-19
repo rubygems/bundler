@@ -53,6 +53,15 @@ describe "Bundler.with_env helpers" do
       expect(Bundler::ORIGINAL_ENV["RUBYOPT"]).to eq(" -I#{lib_path} -rbundler/setup")
     end
 
+    it "cleans RUBYLIB" do
+      lib_path = File.expand_path("../../../lib", __FILE__)
+      Bundler::ORIGINAL_ENV["RUBYLIB"] = lib_path
+
+      Bundler.with_clean_env do
+        expect(`echo $RUBYLIB`.strip).not_to include(lib_path)
+      end
+    end
+
     it "should not change ORIGINAL_ENV" do
       expect(Bundler::ORIGINAL_ENV["BUNDLE_PATH"]).to eq("./Gemfile")
     end
