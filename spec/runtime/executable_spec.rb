@@ -160,11 +160,9 @@ describe "Running bin/* commands" do
       file.print "OMG"
     end
 
-    # See CLI::Binstubs#run.
     bundle "config bin bin/"
     bundle "install"
-    with_config(:disable_shared_gems => "1") do
-      expect(bundled_app("bin/rackup").read).to_not eq("OMG")
-    end
+
+    expect(bundled_app("bin/rackup").read).to_not eq("OMG")
   end
 end

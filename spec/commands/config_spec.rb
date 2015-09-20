@@ -11,15 +11,14 @@ describe ".bundle/config" do
   describe "BUNDLE_APP_CONFIG" do
     it "can be moved with an environment variable" do
       ENV["BUNDLE_APP_CONFIG"] = tmp("foo/bar").to_s
-      bundle "config path vendor/bundle"
-      bundle "install"
+      # NOTE: here and below, we need to use `--local` because we want to
+      # write to the app's config file, not the user's
+      bundle "config --local foo bar"
+      bundle :install
 
-      # See CLI::Install#run.
-      with_config(:disable_shared_gems => "1") do
-        expect(bundled_app(".bundle")).not_to exist
-        expect(tmp("foo/bar/config")).to exist
-        should_be_installed "rack 1.0.0"
-      end
+      expect(bundled_app(".bundle")).not_to exist
+      expect(tmp("foo/bar/config")).to exist
+      should_be_installed "rack 1.0.0"
     end
 
     it "can provide a relative path with the environment variable" do
@@ -27,15 +26,12 @@ describe ".bundle/config" do
       Dir.chdir bundled_app("omg")
 
       ENV["BUNDLE_APP_CONFIG"] = "../foo"
-      bundle "config path vendor/bundle"
-      bundle "install"
+      bundle "config --local foo bar"
+      bundle :install
 
-      # See CLI::Install#run.
-      with_config(:disable_shared_gems => "1") do
-        expect(bundled_app(".bundle")).not_to exist
-        expect(bundled_app("../foo/config")).to exist
-        should_be_installed "rack 1.0.0"
-      end
+      expect(bundled_app(".bundle")).not_to exist
+      expect(bundled_app("../foo/config")).to exist
+      should_be_installed "rack 1.0.0"
     end
 
     it "removes environment.rb from BUNDLE_APP_CONFIG's path" do

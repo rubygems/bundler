@@ -17,10 +17,7 @@ describe "bundle install" do
       bundle "config path vendor/bundle"
       bundle "install"
 
-      # See CLI::Install#run.
-      with_config(:disable_shared_gems => "1") do
-        should_be_installed "rack 1.0.0"
-      end
+      should_be_installed "rack 1.0.0"
     end
 
     it "handles paths with regex characters in them" do
@@ -54,11 +51,8 @@ describe "bundle install" do
       FileUtils.rm_rf bundled_app("vendor")
       bundle "install"
 
-      # See CLI::Install#run.
-      with_config(:disable_shared_gems => "1") do
-        expect(vendored_gems("gems/rack-1.0.0")).to be_directory
-        should_be_installed "rack 1.0.0"
-      end
+      expect(vendored_gems("gems/rack-1.0.0")).to be_directory
+      should_be_installed "rack 1.0.0"
     end
   end
 
