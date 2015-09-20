@@ -291,8 +291,9 @@ E
     before(:each) { bundle :install }
 
     describe "setting `path` when `path.system` is already set" do
-      it "should print a warning and remove the `path.system` setting" do
-        bundle "config path.system true"
+      before { bundle "config path.system true" }
+
+      it "should print a warning" do
         # Note that if we use `default_bundle_path` in place of
         # `bundled_app(".bundle")` below, we add two `Bundler.ruby_scope`s to
         # `Bundler.settings.path`, making it
@@ -303,34 +304,47 @@ E
         bundle "config path #{bundled_app(".bundle")}"
 
         expect(out).to include("`path.system` is already configured")
+      end
 
-        expect(Bundler.settings["path.system"]).to be_nil
+      it "should remove the `path.system` setting" do
+        bundle "config path #{bundled_app(".bundle")}"
+
+        run "puts Bundler.settings['path.system'] == nil"
+        expect(out).to eq("true")
       end
 
       it "should persist `path`" do
-        bundle "config path.system true"
-        bundle "config path #{bundled_app(".bundle")}"
+        path = bundled_app(".bundle")
+        bundle "config path #{path}"
 
-        expect(Bundler.settings[:path]).to eq(bundled_app(".bundle").to_s)
+        run "puts Bundler.settings[:path] == '#{path}'"
+        expect(out).to eq("true")
       end
     end
 
     describe "setting `path.system` when `path` is already set" do
-      it "should print a warning and remove the `path` setting" do
-        # Here, the path does not matter, since the option gets overwritten
-        # when we set `path.system`. We could choose 'any/path/'.
-        bundle "config path #{default_bundle_path}"
+      before { bundle "config path foo/bar" }
+
+      it "should print a warning" do
         bundle "config path.system true"
 
         expect(out).to include("`path` is already configured")
-        expect(Bundler.settings[:path]).to be_nil
+      end
+
+      it "should remove the `path` setting" do
+        bundle "config path.system true"
+        bundle :install
+
+        run "puts Bundler.settings[:path] == nil"
+        expect(out).to eq("true")
       end
 
       it "should persist `path.system`" do
-        bundle "config path #{default_bundle_path}"
         bundle "config path.system true"
+        bundle :install
 
-        expect(Bundler.settings["path.system"]).to eq("true")
+        run "puts Bundler.settings['path.system'] == 'true'"
+        expect(out).to eq("true")
       end
     end
   end
