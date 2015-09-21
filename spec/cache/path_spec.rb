@@ -1,6 +1,6 @@
 require "spec_helper"
 
-%w(cache package).each do |cmd|
+%w(package).each do |cmd|
   describe "bundle #{cmd} with path" do
     it "is no-op when the path is within the bundle" do
       build_lib "foo", :path => bundled_app("lib/foo")

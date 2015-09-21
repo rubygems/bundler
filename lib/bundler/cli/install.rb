@@ -19,7 +19,7 @@ module Bundler
       end
 
       if options[:cache]
-        Bundler.ui.error "Please use `bundle cache` instead of `bundle "\
+        Bundler.ui.error "Please use `bundle package` instead of `bundle "\
          "install --cache`."
         exit 1
       end

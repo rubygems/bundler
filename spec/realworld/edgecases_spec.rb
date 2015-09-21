@@ -18,7 +18,7 @@ describe "real world edgecases", :realworld => true, :sometimes => true do
       gem "rack",          "1.3.0.beta2"
       gem "will_paginate", "3.0.pre2"
     G
-    bundle :cache
+    bundle :package
     expect(out).not_to include("Removing outdated .gem files from vendor/cache")
   end
 

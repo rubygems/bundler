@@ -12,7 +12,7 @@ describe "git base name" do
   end
 end
 
-%w(cache package).each do |cmd|
+%w(package).each do |cmd|
   describe "bundle #{cmd} with git" do
     it "copies repository to vendor cache and uses it" do
       git = build_git "foo"
