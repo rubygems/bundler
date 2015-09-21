@@ -137,7 +137,7 @@ learn more about their operation in [bundle install(1)][bundle-install].
   Path to a designated file containing a X.509 client certificate
   and key in PEM format.
 * `cache_path` (`BUNDLE_CACHE_PATH`): The directory that bundler will place
-  cached gems in when running <code>bundle package</code>, and that bundler
+  cached gems in when running <code>bundle cache</code>, and that bundler
   will look in when installing gems.
 * `disable_multisource` (`BUNDLE_DISABLE_MULTISOURCE`): When set, gems.rbs
   containing multiple sources will produce errors instead of warnings. Use
@@ -147,7 +147,7 @@ learn more about their operation in [bundle install(1)][bundle-install].
   `ignore_messages.httparty true`.
 
 In general, you should set these settings per-application by using the applicable
-flag to the [bundle install(1)][bundle-install] or [bundle package(1)][bundle-package] command.
+flag to the [bundle install(1)][bundle-install] or [bundle cache(1)][bundle-cache] command.
 
 You can set them globally either via environment variables or `bundle config`,
 whichever is preferable for your setup. If you use both, environment variables

@@ -1,5 +1,5 @@
 module Bundler
-  class CLI::Package
+  class CLI::Cache
     attr_reader :options
 
     def initialize(options)
@@ -38,7 +38,7 @@ module Bundler
 
       if Bundler.definition.has_local_dependencies? && !Bundler.settings[:cache_all]
         Bundler.ui.warn "Your #{SharedHelpers.gemfile_name} contains path and git dependencies. If you want "    \
-          "to package them as well, please pass the --all flag. This will be the default " \
+          "to cache them as well, please pass the --all flag. This will be the default " \
           "on Bundler 2.0."
       end
     end

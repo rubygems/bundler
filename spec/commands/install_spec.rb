@@ -456,7 +456,7 @@ describe "bundle install with gem sources" do
       G
 
       bundle :install, :artifice => "endpoint"
-      bundle :package
+      bundle :cache
       FileUtils.rm_r(default_bundle_path)
       FileUtils.rm_r(download_cache(source))
       expect(cached_gem("rack-1.0.0")).to exist

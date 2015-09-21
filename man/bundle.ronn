@@ -33,7 +33,7 @@ We divide `bundle` subcommands into primary commands and utilities.
 * [bundle update(1)][bundle-update]:
   Update dependencies to their latest versions
 
-* [bundle package(1)][bundle-package]:
+* [bundle cache(1)][bundle-cache]:
   Package the .gem files required by your application into the
   `vendor/cache` directory
 

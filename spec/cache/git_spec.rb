@@ -12,179 +12,177 @@ describe "git base name" do
   end
 end
 
-%w(package).each do |cmd|
-  describe "bundle #{cmd} with git" do
-    it "copies repository to vendor cache and uses it" do
-      git = build_git "foo"
-      ref = git.ref_for("master", 11)
+describe "bundle cache with git" do
+  it "copies repository to vendor cache and uses it" do
+    git = build_git "foo"
+    ref = git.ref_for("master", 11)
 
-      install_gemfile <<-G
-        gem "foo", :git => '#{lib_path("foo-1.0")}'
-      G
+    install_gemfile <<-G
+      gem "foo", :git => '#{lib_path("foo-1.0")}'
+    G
 
-      bundle "#{cmd} --all"
-      expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
-      expect(bundled_app("vendor/cache/foo-1.0-#{ref}/.git")).not_to exist
-      expect(bundled_app("vendor/cache/foo-1.0-#{ref}/.bundlecache")).to be_file
+    bundle "cache --all"
+    expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
+    expect(bundled_app("vendor/cache/foo-1.0-#{ref}/.git")).not_to exist
+    expect(bundled_app("vendor/cache/foo-1.0-#{ref}/.bundlecache")).to be_file
 
-      FileUtils.rm_rf lib_path("foo-1.0")
-      should_be_installed "foo 1.0"
+    FileUtils.rm_rf lib_path("foo-1.0")
+    should_be_installed "foo 1.0"
+  end
+
+  it "copies repository to vendor cache and uses it even when installed with bundle config path" do
+    git = build_git "foo"
+    ref = git.ref_for("master", 11)
+
+    install_gemfile <<-G
+      gem "foo", :git => '#{lib_path("foo-1.0")}'
+    G
+
+    bundle "config path vendor/bundle"
+    bundle "install"
+    bundle "cache --all"
+
+    expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
+    expect(bundled_app("vendor/cache/foo-1.0-#{ref}/.git")).not_to exist
+
+    FileUtils.rm_rf lib_path("foo-1.0")
+    should_be_installed "foo 1.0"
+  end
+
+  it "runs twice without exploding" do
+    bundle "config cache_all true"
+    build_git "foo"
+
+    install_gemfile <<-G
+      gem "foo", :git => '#{lib_path("foo-1.0")}'
+    G
+
+    bundle "cache --all"
+    bundle "cache --all"
+
+    expect(err).to lack_errors
+    FileUtils.rm_rf lib_path("foo-1.0")
+    should_be_installed "foo 1.0"
+  end
+
+  it "tracks updates" do
+    git = build_git "foo"
+    old_ref = git.ref_for("master", 11)
+
+    install_gemfile <<-G
+      gem "foo", :git => '#{lib_path("foo-1.0")}'
+    G
+
+    bundle "cache --all"
+
+    update_git "foo" do |s|
+      s.write "lib/foo.rb", "puts :CACHE"
     end
 
-    it "copies repository to vendor cache and uses it even when installed with bundle config path" do
-      git = build_git "foo"
-      ref = git.ref_for("master", 11)
+    ref = git.ref_for("master", 11)
+    expect(ref).not_to eq(old_ref)
 
-      install_gemfile <<-G
-        gem "foo", :git => '#{lib_path("foo-1.0")}'
-      G
+    bundle "update"
+    bundle "cache --all"
 
-      bundle "config path vendor/bundle"
-      bundle "install"
-      bundle "#{cmd} --all"
+    expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
+    expect(bundled_app("vendor/cache/foo-1.0-#{old_ref}")).not_to exist
 
-      expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
-      expect(bundled_app("vendor/cache/foo-1.0-#{ref}/.git")).not_to exist
+    FileUtils.rm_rf lib_path("foo-1.0")
+    run "require 'foo'"
+    expect(out).to eq("CACHE")
+  end
 
-      FileUtils.rm_rf lib_path("foo-1.0")
-      should_be_installed "foo 1.0"
+  it "uses the local repository to generate the cache" do
+    git = build_git "foo"
+    ref = git.ref_for("master", 11)
+
+    gemfile <<-G
+      gem "foo", :git => '#{lib_path("foo-invalid")}', :branch => :master
+    G
+
+    bundle %|config local.foo #{lib_path("foo-1.0")}|
+    bundle "install"
+    bundle "cache --all"
+
+    expect(bundled_app("vendor/cache/foo-invalid-#{ref}")).to exist
+
+    # Updating the local still uses the local.
+    update_git "foo" do |s|
+      s.write "lib/foo.rb", "puts :LOCAL"
     end
 
-    it "runs twice without exploding" do
-      bundle "config cache_all true"
-      build_git "foo"
+    run "require 'foo'"
+    expect(out).to eq("LOCAL")
+  end
 
-      install_gemfile <<-G
-        gem "foo", :git => '#{lib_path("foo-1.0")}'
-      G
+  it "copies repository to vendor cache, including submodules" do
+    build_git "submodule", "1.0"
 
-      bundle "#{cmd} --all"
-      bundle "#{cmd} --all"
-
-      expect(err).to lack_errors
-      FileUtils.rm_rf lib_path("foo-1.0")
-      should_be_installed "foo 1.0"
+    git = build_git "has_submodule", "1.0" do |s|
+      s.add_dependency "submodule"
     end
 
-    it "tracks updates" do
-      git = build_git "foo"
-      old_ref = git.ref_for("master", 11)
+    Dir.chdir(lib_path("has_submodule-1.0")) do
+      `git submodule add #{lib_path("submodule-1.0")} submodule-1.0`
+      `git commit -m "submodulator"`
+    end
 
-      install_gemfile <<-G
-        gem "foo", :git => '#{lib_path("foo-1.0")}'
-      G
-
-      bundle "#{cmd} --all"
-
-      update_git "foo" do |s|
-        s.write "lib/foo.rb", "puts :CACHE"
+    install_gemfile <<-G
+      git "#{lib_path("has_submodule-1.0")}", :submodules => true do
+        gem "has_submodule"
       end
+    G
 
-      ref = git.ref_for("master", 11)
-      expect(ref).not_to eq(old_ref)
+    ref = git.ref_for("master", 11)
+    bundle "cache --all"
 
-      bundle "update"
-      bundle "#{cmd} --all"
+    expect(bundled_app("vendor/cache/has_submodule-1.0-#{ref}")).to exist
+    expect(bundled_app("vendor/cache/has_submodule-1.0-#{ref}/submodule-1.0")).to exist
+    should_be_installed "has_submodule 1.0"
+  end
 
-      expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
-      expect(bundled_app("vendor/cache/foo-1.0-#{old_ref}")).not_to exist
+  it "displays warning message when detecting git repo in Gemfile" do
+    build_git "foo"
 
-      FileUtils.rm_rf lib_path("foo-1.0")
-      run "require 'foo'"
-      expect(out).to eq("CACHE")
-    end
+    install_gemfile <<-G
+      gem "foo", :git => '#{lib_path("foo-1.0")}'
+    G
 
-    it "uses the local repository to generate the cache" do
-      git = build_git "foo"
-      ref = git.ref_for("master", 11)
+    bundle "cache"
 
-      gemfile <<-G
-        gem "foo", :git => '#{lib_path("foo-invalid")}', :branch => :master
-      G
+    expect(out).to include("Your gems.rb contains path and git dependencies.")
+  end
 
-      bundle %|config local.foo #{lib_path("foo-1.0")}|
-      bundle "install"
-      bundle "#{cmd} --all"
+  it "does not display warning message if cache_all is set in bundle config" do
+    bundle "config cache_all true"
+    build_git "foo"
 
-      expect(bundled_app("vendor/cache/foo-invalid-#{ref}")).to exist
+    install_gemfile <<-G
+      gem "foo", :git => '#{lib_path("foo-1.0")}'
+    G
 
-      # Updating the local still uses the local.
-      update_git "foo" do |s|
-        s.write "lib/foo.rb", "puts :LOCAL"
-      end
+    bundle "cache --all"
+    bundle "cache"
 
-      run "require 'foo'"
-      expect(out).to eq("LOCAL")
-    end
+    expect(out).not_to include("Your gems.rb contains path and git dependencies.")
+  end
 
-    it "copies repository to vendor cache, including submodules" do
-      build_git "submodule", "1.0"
+  it "caches pre-evaluated gemspecs" do
+    git = build_git "foo"
 
-      git = build_git "has_submodule", "1.0" do |s|
-        s.add_dependency "submodule"
-      end
+    # Insert a gemspec method that shells out
+    spec_lines = lib_path("foo-1.0/foo.gemspec").read.split("\n")
+    spec_lines.insert(-2, "s.description = `echo bob`")
+    update_git("foo") {|s| s.write "foo.gemspec", spec_lines.join("\n") }
 
-      Dir.chdir(lib_path("has_submodule-1.0")) do
-        `git submodule add #{lib_path("submodule-1.0")} submodule-1.0`
-        `git commit -m "submodulator"`
-      end
+    install_gemfile <<-G
+      gem "foo", :git => '#{lib_path("foo-1.0")}'
+    G
+    bundle "cache --all"
 
-      install_gemfile <<-G
-        git "#{lib_path("has_submodule-1.0")}", :submodules => true do
-          gem "has_submodule"
-        end
-      G
-
-      ref = git.ref_for("master", 11)
-      bundle "#{cmd} --all"
-
-      expect(bundled_app("vendor/cache/has_submodule-1.0-#{ref}")).to exist
-      expect(bundled_app("vendor/cache/has_submodule-1.0-#{ref}/submodule-1.0")).to exist
-      should_be_installed "has_submodule 1.0"
-    end
-
-    it "displays warning message when detecting git repo in Gemfile" do
-      build_git "foo"
-
-      install_gemfile <<-G
-        gem "foo", :git => '#{lib_path("foo-1.0")}'
-      G
-
-      bundle "#{cmd}"
-
-      expect(out).to include("Your gems.rb contains path and git dependencies.")
-    end
-
-    it "does not display warning message if cache_all is set in bundle config" do
-      bundle "config cache_all true"
-      build_git "foo"
-
-      install_gemfile <<-G
-        gem "foo", :git => '#{lib_path("foo-1.0")}'
-      G
-
-      bundle "#{cmd} --all"
-      bundle "#{cmd}"
-
-      expect(out).not_to include("Your gems.rb contains path and git dependencies.")
-    end
-
-    it "caches pre-evaluated gemspecs" do
-      git = build_git "foo"
-
-      # Insert a gemspec method that shells out
-      spec_lines = lib_path("foo-1.0/foo.gemspec").read.split("\n")
-      spec_lines.insert(-2, "s.description = `echo bob`")
-      update_git("foo") {|s| s.write "foo.gemspec", spec_lines.join("\n") }
-
-      install_gemfile <<-G
-        gem "foo", :git => '#{lib_path("foo-1.0")}'
-      G
-      bundle "#{cmd} --all"
-
-      ref = git.ref_for("master", 11)
-      gemspec = bundled_app("vendor/cache/foo-1.0-#{ref}/foo.gemspec").read
-      expect(gemspec).to_not match("`echo bob`")
-    end
+    ref = git.ref_for("master", 11)
+    gemspec = bundled_app("vendor/cache/foo-1.0-#{ref}/foo.gemspec").read
+    expect(gemspec).to_not match("`echo bob`")
   end
 end

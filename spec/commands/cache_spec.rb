@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe "bundle package" do
+describe "bundle cache" do
   context "with --gemfile" do
     it "finds the gemfile" do
       gemfile bundled_app("NotGemfile"), <<-G
@@ -8,7 +8,7 @@ describe "bundle package" do
         gem 'rack'
       G
 
-      bundle "package --gemfile=NotGemfile"
+      bundle "cache --gemfile=NotGemfile"
 
       ENV["BUNDLE_GEMFILE"] = "NotGemfile"
       should_be_installed "rack 1.0.0"
@@ -23,7 +23,7 @@ describe "bundle package" do
       D
 
       bundle "config path #{bundled_app("test")}"
-      bundle "package"
+      bundle "cache"
 
       should_be_installed "rack 1.0.0"
       expect(bundled_app("test")).to exist
@@ -37,7 +37,7 @@ describe "bundle package" do
         gem 'rack'
       D
 
-      bundle "package --no-install"
+      bundle "cache --no-install"
 
       should_not_be_installed "rack 1.0.0"
       expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
@@ -51,7 +51,7 @@ describe "bundle package" do
         gem 'rack', :platforms => :ruby_19
       D
 
-      bundle "package --all-platforms"
+      bundle "cache --all-platforms"
       expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
     end
   end
@@ -130,7 +130,7 @@ describe "bundle install with gem sources" do
       end
     end
 
-    it "does not update the cache if `bundle package` is not run" do
+    it "does not update the cache if `bundle cache` is not run" do
       gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
@@ -142,7 +142,7 @@ describe "bundle install with gem sources" do
       expect(bundled_app("vendor/cache").children).to be_empty
     end
 
-    it "updates the cache if `bundle package` is run" do
+    it "updates the cache if `bundle cache` is run" do
       gemfile <<-G
         source "file://#{gem_repo1}"
         gem "rack"
@@ -151,7 +151,7 @@ describe "bundle install with gem sources" do
       expect(bundled_app("vendor/cache").children).to be_empty
 
       bundle "install"
-      bundle "package"
+      bundle "cache"
       expect(bundled_app("vendor/cache").children).not_to be_empty
     end
   end

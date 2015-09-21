@@ -53,7 +53,7 @@ module Bundler
         bundle-exec
         bundle-gem
         bundle-install
-        bundle-package
+        bundle-cache
         bundle-update
         bundle-platform
         gems.rb.5)
@@ -223,26 +223,26 @@ module Bundler
       Outdated.new(options, gems).run
     end
 
-    desc "package [OPTIONS]", "Locks and then caches all of the gems into vendor/cache"
+    desc "cache [OPTIONS]", "Locks and then caches all of the gems into vendor/cache"
     method_option "all",  :type => :boolean, :banner => "Include all sources (including path and git)."
     method_option "all-platforms", :type => :boolean, :banner => "Include gems for all platforms, not just the current one"
     method_option "cache-path", :type => :string, :banner =>
       "Specify a different cache path than the default (vendor/cache)."
     method_option "gemfile", :type => :string, :banner => "Use the specified gemfile instead of gems.rb"
-    method_option "no-install", :type => :boolean, :banner => "Don't actually install the gems, just package."
+    method_option "no-install", :type => :boolean, :banner => "Don't actually install the gems, just cache."
     method_option "no-prune", :type => :boolean, :banner => "Don't remove stale gems from the cache."
     method_option "quiet", :type => :boolean, :banner => "Only output warnings and errors."
     long_desc <<-D
-      The package command will copy the .gem files for every gem in the bundle into the
+      The cache command will copy the .gem files for every gem in the bundle into the
       directory ./vendor/cache. If you then check that directory into your source
       control repository, others who check out your source will be able to install the
       bundle without having to download any additional gems.
     D
-    def package
-      require "bundler/cli/package"
-      Package.new(options).run
+    def cache
+      require "bundler/cli/cache"
+      Cache.new(options).run
     end
-    map %w(pack) => :package
+    map %w(pack) => :cache
 
     desc "exec [OPTIONS]", "Run the command in context of the bundle"
     method_option :keep_file_descriptors, :type => :boolean, :default => false
