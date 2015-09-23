@@ -103,8 +103,13 @@ module Bundler
       when Source::Path     then path_sources
       when Source::Rubygems then rubygems_sources
       else
-        if @plugin_registry.key(source.class)
-          @plugin_sources[@plugin_registry.key(source.class)]
+        if RUBY_VERSION > '1.9.1'
+          source = @plugin_registry.key(source.class)
+        else
+          source = @plugin_registry.index(source.class)
+        end
+        if source
+          @plugin_sources[source]
         else
           raise ArgumentError, "Invalid source: #{source.inspect}"
         end

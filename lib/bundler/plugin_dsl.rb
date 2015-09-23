@@ -9,8 +9,8 @@ module Bundler
 
     def initialize
       @dsl = Dsl.new
-      methods = Dsl.instance_methods(false)
-      methods.delete(:plugin)
+      methods = Dsl.instance_methods(false).map(&:to_s)
+      methods.delete("plugin")
 
       self.class.instance_eval do
         methods.each do |method|
