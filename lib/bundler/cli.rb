@@ -18,7 +18,7 @@ module Bundler
       super
 
       custom_gemfile = options[:gemfile] || Bundler.settings[:gemfile]
-      ENV["BUNDLE_GEMFILE"] = File.expand_path(custom_gemfile) if custom_gemfile
+      ENV["BUNDLE_GEMFILE"] = File.expand_path(custom_gemfile) if custom_gemfile && !custom_gemfile.empty?
 
       Bundler.settings[:retry] = options[:retry] if options[:retry]
 
@@ -38,7 +38,7 @@ module Bundler
     default_task :install
     class_option "no-color", :type => :boolean, :desc => "Disable colorization in output"
     class_option "retry",    :type => :numeric, :aliases => "-r", :banner => "NUM",
-      :desc => "Specify the number of times you wish to attempt network commands"
+                             :desc => "Specify the number of times you wish to attempt network commands"
     class_option "verbose", :type => :boolean, :desc => "Enable verbose output mode", :aliases => "-V"
 
     def help(cli = nil)
@@ -49,15 +49,15 @@ module Bundler
       end
 
       manpages = %w(
-          bundle
-          bundle-config
-          bundle-exec
-          bundle-gem
-          bundle-install
-          bundle-package
-          bundle-update
-          bundle-platform
-          gemfile.5)
+        bundle
+        bundle-config
+        bundle-exec
+        bundle-gem
+        bundle-install
+        bundle-package
+        bundle-update
+        bundle-platform
+        gemfile.5)
 
       if manpages.include?(command)
         root = File.expand_path("../man", __FILE__)
@@ -226,9 +226,9 @@ module Bundler
       Calling show with [GEM] will list the exact location of that gem on your machine.
     D
     method_option "paths", :type => :boolean,
-      :banner => "List the paths of all gems that are required by your Gemfile."
+                           :banner => "List the paths of all gems that are required by your Gemfile."
     method_option "outdated", :type => :boolean,
-      :banner => "Show verbose output including whether gems are outdated."
+                              :banner => "Show verbose output including whether gems are outdated."
     def show(gem_name = nil)
       require "bundler/cli/show"
       Show.new(options, gem_name).run
@@ -381,12 +381,12 @@ module Bundler
     method_option :bin, :type => :boolean, :default => false, :aliases => "-b", :desc => "Generate a binary for your library."
     method_option :coc, :type => :boolean, :desc => "Generate a code of conduct file. Set a default with `bundle config gem.coc true`."
     method_option :edit, :type => :string, :aliases => "-e", :required => false, :banner => "EDITOR",
-      :lazy_default => [ENV["BUNDLER_EDITOR"], ENV["VISUAL"], ENV["EDITOR"]].find {|e| !e.nil? && !e.empty? },
-      :desc => "Open generated gemspec in the specified editor (defaults to $EDITOR or $BUNDLER_EDITOR)"
+                         :lazy_default => [ENV["BUNDLER_EDITOR"], ENV["VISUAL"], ENV["EDITOR"]].find {|e| !e.nil? && !e.empty? },
+                         :desc => "Open generated gemspec in the specified editor (defaults to $EDITOR or $BUNDLER_EDITOR)"
     method_option :ext, :type => :boolean, :default => false, :desc => "Generate the boilerplate for C extension code"
     method_option :mit, :type => :boolean, :desc => "Generate an MIT license file. Set a default with `bundle config gem.mit true`."
     method_option :test, :type => :string, :lazy_default => "rspec", :aliases => "-t", :banner => "rspec",
-      :desc => "Generate a test directory for your library, either rspec or minitest. Set a default with `bundle config gem.test rspec`."
+                         :desc => "Generate a test directory for your library, either rspec or minitest. Set a default with `bundle config gem.test rspec`."
     def gem(name)
       require "bundler/cli/gem"
       Gem.new(options, name, self).run
@@ -441,24 +441,24 @@ module Bundler
 
   private
 
-      # Automatically invoke `bundle install` and resume if
-      # Bundler.settings[:auto_install] exists. This is set through config cmd
-      # `bundle config auto_install 1`.
-      #
-      # Note that this method `nil`s out the global Definition object, so it
-      # should be called first, before you instantiate anything like an
-      # `Installer` that'll keep a reference to the old one instead.
-      def auto_install
-        return unless Bundler.settings[:auto_install]
+    # Automatically invoke `bundle install` and resume if
+    # Bundler.settings[:auto_install] exists. This is set through config cmd
+    # `bundle config auto_install 1`.
+    #
+    # Note that this method `nil`s out the global Definition object, so it
+    # should be called first, before you instantiate anything like an
+    # `Installer` that'll keep a reference to the old one instead.
+    def auto_install
+      return unless Bundler.settings[:auto_install]
 
-        begin
-          Bundler.definition.specs
-        rescue GemNotFound
-          Bundler.ui.info "Automatically installing missing gems."
-          Bundler.reset!
-          invoke :install, []
-          Bundler.reset!
-        end
+      begin
+        Bundler.definition.specs
+      rescue GemNotFound
+        Bundler.ui.info "Automatically installing missing gems."
+        Bundler.reset!
+        invoke :install, []
+        Bundler.reset!
       end
+    end
   end
 end

@@ -11,8 +11,8 @@ module Bundler
       @hash ||= dep.hash
     end
 
-    def ==(o)
-      dep == o.dep && __platform == o.__platform
+    def ==(other)
+      dep == other.dep && __platform == other.__platform
     end
 
     alias_method :eql?, :==

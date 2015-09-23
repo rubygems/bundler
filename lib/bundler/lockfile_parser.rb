@@ -132,9 +132,9 @@ module Bundler
     end
 
     NAME_VERSION = '(?! )(.*?)(?: \(([^-]*)(?:-(.*))?\))?'
-    NAME_VERSION_2 = %r{^ {2}#{NAME_VERSION}(!)?$}
-    NAME_VERSION_4 = %r{^ {4}#{NAME_VERSION}$}
-    NAME_VERSION_6 = %r{^ {6}#{NAME_VERSION}$}
+    NAME_VERSION_2 = /^ {2}#{NAME_VERSION}(!)?$/
+    NAME_VERSION_4 = /^ {4}#{NAME_VERSION}$/
+    NAME_VERSION_6 = /^ {6}#{NAME_VERSION}$/
 
     def parse_dependency(line)
       if line =~ NAME_VERSION_2

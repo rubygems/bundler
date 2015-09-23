@@ -469,7 +469,7 @@ describe "bundle install with explicit source paths" do
 
       Dir.chdir(lib_path("private_lib")) do
         bundle :install, :env => { "DEBUG" => 1 }, :artifice => "endpoint"
-        expect(out).to match(/^HTTP GET http:\/\/localgemserver\.test\/api\/v1\/dependencies\?gems=rack$/)
+        expect(out).to match(%r{^HTTP GET http://localgemserver\.test/api/v1/dependencies\?gems=rack$})
         expect(out).not_to match(/^HTTP GET.*private_lib/)
         should_be_installed "private_lib 2.2"
         should_be_installed "rack 1.0"
@@ -494,7 +494,7 @@ describe "bundle install with explicit source paths" do
       end
 
       bundle :install, :expect_err => true,
-        :requires => [lib_path("install_hooks.rb")]
+                       :requires => [lib_path("install_hooks.rb")]
       expect(err).to eq("Ran pre-install hook: foo-1.0")
     end
 
@@ -514,7 +514,7 @@ describe "bundle install with explicit source paths" do
       end
 
       bundle :install, :expect_err => true,
-        :requires => [lib_path("install_hooks.rb")]
+                       :requires => [lib_path("install_hooks.rb")]
       expect(err).to eq("Ran post-install hook: foo-1.0")
     end
 
@@ -534,7 +534,7 @@ describe "bundle install with explicit source paths" do
       end
 
       bundle :install, :expect_err => true,
-        :requires => [lib_path("install_hooks.rb")]
+                       :requires => [lib_path("install_hooks.rb")]
       expect(out).to include("failed for foo-1.0")
     end
   end

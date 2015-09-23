@@ -29,7 +29,7 @@ RSpec.configure do |config|
   end
 
   config.after(:suite) do
-    message = Proc.new do |color, text|
+    message = proc do |color, text|
       colored = RSpec::Core::Formatters::ConsoleCodes.wrap(text, color)
       notification = RSpec::Core::Notifications::MessageNotification.new(colored)
       RSpec.configuration.formatters.first.message(notification)

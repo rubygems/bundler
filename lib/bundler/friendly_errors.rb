@@ -8,6 +8,10 @@ module Bundler
   rescue Bundler::Dsl::DSLError => e
     Bundler.ui.error e.message
     exit e.status_code
+  rescue Bundler::GemRequireError => e
+    Bundler.ui.error e.message
+    Bundler.ui.trace e.orig_exception, nil, true
+    exit e.status_code
   rescue Bundler::BundlerError => e
     Bundler.ui.error e.message, :wrap => true
     Bundler.ui.trace e

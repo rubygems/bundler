@@ -21,7 +21,7 @@ module Bundler
           " is a chance you are experiencing a man-in-the-middle attack, but" \
           " most likely your system doesn't have the CA certificates needed" \
           " for verification. For information about OpenSSL certificates, see" \
-          " bit.ly/ruby-ssl. To connect without using SSL, edit your Gemfile" \
+          " http://bit.ly/ruby-ssl. To connect without using SSL, edit your Gemfile" \
           " sources and change 'https' to 'http'."
       end
     end
@@ -172,6 +172,14 @@ module Bundler
       @fetchers ||= FETCHERS.map {|f| f.new(downloader, remote_uri, fetch_uri, uri) }
     end
 
+    def http_proxy
+      if uri = connection.proxy_uri
+        uri.to_s
+      else
+        nil
+      end
+    end
+
     def inspect
       "#<#{self.class}:0x#{object_id} uri=#{uri}>"
     end
@@ -203,6 +211,9 @@ module Bundler
         raise SSLError if needs_ssl && !defined?(OpenSSL::SSL)
 
         con = Net::HTTP::Persistent.new "bundler", :ENV
+        if gem_proxy = Bundler.rubygems.configuration[:http_proxy]
+          con.proxy = URI.parse(gem_proxy)
+        end
 
         if remote_uri.scheme == "https"
           con.verify_mode = (Bundler.settings[:ssl_verify_mode] ||
@@ -223,7 +234,7 @@ module Bundler
     end
 
     # cached gem specification path, if one exists
-    def gemspec_cached_path spec_file_name
+    def gemspec_cached_path(spec_file_name)
       paths = Bundler.rubygems.spec_cache_dirs.map {|dir| File.join(dir, spec_file_name) }
       paths = paths.select {|path| File.file? path }
       paths.first

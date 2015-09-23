@@ -16,7 +16,7 @@ module Bundler
     def initialize
       @sources = []
       @cache = {}
-      @specs = Hash.new {|h, k| h[k] = Hash.new }
+      @specs = Hash.new {|h, k| h[k] = {} }
       @all_specs = Hash.new {|h, k| h[k] = [] }
     end
 
@@ -24,7 +24,7 @@ module Bundler
       super
       @sources = @sources.dup
       @cache = {}
-      @specs = Hash.new {|h, k| h[k] = Hash.new }
+      @specs = Hash.new {|h, k| h[k] = {} }
       @all_specs = Hash.new {|h, k| h[k] = [] }
 
       o.specs.each do |name, hash|
@@ -127,9 +127,9 @@ module Bundler
       end
     end
 
-    def ==(o)
+    def ==(other)
       all? do |spec|
-        other_spec = o[spec].first
+        other_spec = other[spec].first
         (spec.dependencies & other_spec.dependencies).empty? && spec.source == other_spec.source
       end
     end

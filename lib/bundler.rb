@@ -1,6 +1,7 @@
 require "fileutils"
 require "pathname"
 require "rbconfig"
+require "thread"
 require "bundler/gem_path_manipulation"
 require "bundler/rubygems_ext"
 require "bundler/rubygems_integration"
@@ -13,6 +14,7 @@ require "bundler/registry"
 module Bundler
   preserve_gem_path
   ORIGINAL_ENV = ENV.to_hash
+  SUDO_MUTEX = Mutex.new
 
   autoload :Definition,            "bundler/definition"
   autoload :Dependency,            "bundler/dependency"
@@ -109,6 +111,18 @@ module Bundler
     status_code(6)
   end
 
+  class GemRequireError < BundlerError
+    attr_reader :orig_exception
+
+    def initialize(orig_exception, msg)
+      super(msg)
+      @orig_exception = orig_exception
+    end
+
+    status_code(24)
+  end
+
+  class GemfileEvalError < GemfileError; end
   class MarshalError < StandardError; end
 
   class PermissionError < BundlerError
@@ -271,9 +285,11 @@ module Bundler
     end
 
     def app_config_path
-      ENV["BUNDLE_APP_CONFIG"] ?
-        Pathname.new(ENV["BUNDLE_APP_CONFIG"]).expand_path(root) :
+      if ENV["BUNDLE_APP_CONFIG"]
+        Pathname.new(ENV["BUNDLE_APP_CONFIG"]).expand_path(root)
+      else
         root.join(".bundle")
+      end
     end
 
     def app_cache(custom_path = nil)
@@ -308,10 +324,17 @@ module Bundler
       with_original_env do
         ENV["MANPATH"] = ENV["BUNDLE_ORIG_MANPATH"]
         ENV.delete_if {|k, _| k[0, 7] == "BUNDLE_" }
-        if ENV.has_key? "RUBYOPT"
+
+        if ENV.key?("RUBYOPT")
           ENV["RUBYOPT"] = ENV["RUBYOPT"].sub "-rbundler/setup", ""
-          ENV["RUBYOPT"] = ENV["RUBYOPT"].sub "-I#{File.expand_path("..", __FILE__)}", ""
         end
+
+        if ENV.key?("RUBYLIB")
+          rubylib = ENV["RUBYLIB"].split(File::PATH_SEPARATOR)
+          rubylib.delete(File.expand_path("..", __FILE__))
+          ENV["RUBYLIB"] = rubylib.join(File::PATH_SEPARATOR)
+        end
+
         yield
       end
     end
@@ -392,19 +415,21 @@ module Bundler
     end
 
     def sudo(str)
-      prompt = "\n\n" + <<-PROMPT.gsub(/^ {6}/, "").strip + " "
-      Your user account isn't allowed to install to the system Rubygems.
-      You can cancel this installation and run:
+      SUDO_MUTEX.synchronize do
+        prompt = "\n\n" + <<-PROMPT.gsub(/^ {6}/, "").strip + " "
+        Your user account isn't allowed to install to the system Rubygems.
+        You can cancel this installation and run:
 
-          bundle install --path vendor/bundle
+            bundle install --path vendor/bundle
 
-      to install the gems into ./vendor/bundle/, or you can enter your password
-      and install the bundled gems to Rubygems using sudo.
+        to install the gems into ./vendor/bundle/, or you can enter your password
+        and install the bundled gems to Rubygems using sudo.
 
-      Password:
-      PROMPT
+        Password:
+        PROMPT
 
-      `sudo -p "#{prompt}" #{str}`
+        `sudo -p "#{prompt}" #{str}`
+      end
     end
 
     def read_file(file)
@@ -441,7 +466,7 @@ module Bundler
         spec
       end
     rescue Gem::InvalidSpecificationException => e
-      Bundler.ui.warn "The gemspec at #{file} is not valid. " \
+      UI::Shell.new.warn "The gemspec at #{file} is not valid. " \
         "The validation error was '#{e.message}'"
       nil
     end

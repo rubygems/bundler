@@ -56,10 +56,10 @@ module Bundler
         [self.class, expanded_path, version].hash
       end
 
-      def eql?(o)
-        o.instance_of?(Path) &&
-        expanded_path == expand(o.path) &&
-        version == o.version
+      def eql?(other)
+        other.instance_of?(Path) &&
+          expanded_path == expand(other.path) &&
+          version == other.version
       end
 
       alias_method :==, :eql?
@@ -77,7 +77,7 @@ module Bundler
       def cache(spec, custom_path = nil)
         app_cache_path = app_cache_path(custom_path)
         return unless Bundler.settings[:cache_all]
-        return if expand(@original_path).to_s.index(Bundler.root.to_s) == 0
+        return if expand(@original_path).to_s.index(Bundler.root.to_s + "/") == 0
 
         unless @original_path.exist?
           raise GemNotFound, "Can't cache gem #{version_message(spec)} because #{self} is missing!"
@@ -165,7 +165,7 @@ module Bundler
       end
 
       def relative_path
-        if path.to_s.match(%r{^#{Regexp.escape Bundler.root.to_s}})
+        if path.to_s.start_with?(Bundler.root.to_s)
           return path.relative_path_from(Bundler.root)
         end
         path

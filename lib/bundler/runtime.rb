@@ -61,7 +61,7 @@ module Bundler
       @definition.dependencies.each do |dep|
         # Skip the dependency if it is not in any of the requested
         # groups
-        next unless ((dep.groups & groups).any? && dep.current_platform?)
+        next unless (dep.groups & groups).any? && dep.current_platform?
 
         required_file = nil
 
@@ -73,7 +73,13 @@ module Bundler
             # Allow `require: true` as an alias for `require: <name>`
             file = dep.name if file == true
             required_file = file
-            Kernel.require file
+            begin
+              Kernel.require file
+            rescue => e
+              raise e if e.is_a?(LoadError) # we handle this a little later
+              raise Bundler::GemRequireError.new e,
+                "There was an error while trying to load the gem '#{file}'."
+            end
           end
         rescue LoadError => e
           REQUIRE_ERRORS.find {|r| r =~ e.message }

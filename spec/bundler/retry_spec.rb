@@ -12,7 +12,7 @@ describe Bundler::Retry do
   end
 
   it "returns the first valid result" do
-    jobs = [Proc.new { raise "foo" }, Proc.new { :bar }, Proc.new { raise "foo" }]
+    jobs = [proc { raise "foo" }, proc { :bar }, proc { raise "foo" }]
     attempts = 0
     result = Bundler::Retry.new(nil, nil, 3).attempt do
       attempts += 1

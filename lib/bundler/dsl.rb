@@ -34,7 +34,10 @@ module Bundler
       contents ||= Bundler.read_file(gemfile.to_s)
       instance_eval(contents, gemfile.to_s, 1)
     rescue Exception => e
-      message = "There was an error parsing `#{File.basename gemfile.to_s}`: #{e.message}"
+      message = "There was an error " \
+        "#{e.is_a?(GemfileEvalError) ? "evaluating" : "parsing"} " \
+        "`#{File.basename gemfile.to_s}`: #{e.message}"
+
       raise DSLError.new(message, gemfile, e.backtrace, contents)
     end
 
@@ -241,13 +244,14 @@ module Bundler
     end
 
     def with_source(source)
+      old_source = @source
       if block_given?
         @source = source
         yield
       end
       source
     ensure
-      @source = nil
+      @source = old_source
     end
 
     def normalize_hash(opts)
@@ -298,7 +302,7 @@ module Bundler
       end
 
       # Save sources passed in a key
-      if opts.has_key?("source")
+      if opts.key?("source")
         source = normalize_source(opts["source"])
         opts["source"] = @sources.add_rubygems_source("remotes" => source)
       end

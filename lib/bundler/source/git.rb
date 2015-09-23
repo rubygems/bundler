@@ -49,9 +49,10 @@ module Bundler
         [self.class, uri, ref, branch, name, version, submodules].hash
       end
 
-      def eql?(o)
-        o.is_a?(Git) && uri == o.uri && ref == o.ref && branch == o.branch && name == o.name && version == o.version &&
-        submodules == o.submodules
+      def eql?(other)
+        other.is_a?(Git) && uri == other.uri && ref == other.ref &&
+          branch == other.branch && name == other.name &&
+          version == other.version && submodules == other.submodules
       end
 
       alias_method :==, :eql?

@@ -25,9 +25,7 @@ module Bundler
       @current_run = 0
       @failed      = false
       @error       = nil
-      while keep_trying? do
-        run(&block)
-      end
+      run(&block) while keep_trying?
       @result
     end
     alias_method :attempts, :attempt

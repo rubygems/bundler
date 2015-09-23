@@ -325,12 +325,10 @@ module Bundler
       out << "DEPENDENCIES\n"
 
       handled = []
-      dependencies.
-        sort_by(&:to_s).
-        each do |dep|
-          next if handled.include?(dep.name)
-          out << dep.to_lock
-          handled << dep.name
+      dependencies.sort_by(&:to_s).each do |dep|
+        next if handled.include?(dep.name)
+        out << dep.to_lock
+        handled << dep.name
       end
 
       # Record the version of Bundler that was used to create the lockfile
@@ -495,7 +493,7 @@ module Bundler
       changes = false
 
       # Get the Rubygems sources from the Gemfile.lock
-      locked_gem_sources = @locked_sources.select {|s| s.kind_of?(Source::Rubygems) }
+      locked_gem_sources = @locked_sources.select {|s| s.is_a?(Source::Rubygems) }
       # Get the Rubygems remotes from the Gemfile
       actual_remotes = sources.rubygems_remotes
 
@@ -573,7 +571,12 @@ module Bundler
 
         # Don't add a spec to the list if its source is expired. For example,
         # if you change a Git gem to Rubygems.
+        next if s.source.nil? || @unlock[:sources].include?(s.source.name)
+
+        # XXX This is a backwards-compatibility fix to preserve the ability to
+        # unlock a single gem by passing its name via `--source`. See issue #3759
         next if s.source.nil? || @unlock[:sources].include?(s.name)
+
         # If the spec is from a path source and it doesn't exist anymore
         # then we just unlock it.
 
@@ -660,7 +663,7 @@ module Bundler
     def pinned_spec_names(specs)
       names = []
       specs.each do |s|
-        # TODO when two sources without blocks is an error, we can change
+        # TODO: when two sources without blocks is an error, we can change
         # this check to !s.source.is_a?(Source::LocalRubygems). For now,
         # we need to ask every Rubygems for every gem name.
         if s.source.is_a?(Source::Git) || s.source.is_a?(Source::Path)

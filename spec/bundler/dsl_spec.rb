@@ -33,7 +33,7 @@ describe Bundler::Dsl do
       end
 
       it "converts numeric :gist to :git" do
-        subject.gem("not-really-a-gem", :gist => 2859988)
+        subject.gem("not-really-a-gem", :gist => 2_859_988)
         github_uri = "https://gist.github.com/2859988.git"
         expect(subject.dependencies.first.source.uri).to eq(github_uri)
       end
@@ -80,6 +80,14 @@ describe Bundler::Dsl do
       expect(Bundler).to receive(:read_file).with("Gemfile").and_return("}")
       expect { subject.eval_gemfile("Gemfile") }.
         to raise_error(Bundler::GemfileError, /There was an error parsing `Gemfile`: (syntax error, unexpected tSTRING_DEND|(compile error - )?syntax error, unexpected '}'). Bundler cannot continue./)
+    end
+
+    it "distinguishes syntax errors from evaluation errors" do
+      expect(Bundler).to receive(:read_file).with("Gemfile").and_return(
+        "ruby '2.1.5', :engine => 'ruby', :engine_version => '1.2.4'"
+      )
+      expect { subject.eval_gemfile("Gemfile") }.
+        to raise_error(Bundler::GemfileError, /There was an error evaluating `Gemfile`: ruby_version must match the :engine_version for MRI/)
     end
   end
 
@@ -185,6 +193,22 @@ describe Bundler::Dsl do
       gemfile "s = 'foo'.freeze; s.strip!"
       expect { Bundler::Dsl.evaluate(bundled_app("Gemfile"), nil, true) }.
         to raise_error(Bundler::GemfileError, /There was an error parsing `Gemfile`: can't modify frozen String. Bundler cannot continue./i)
+    end
+  end
+
+  describe "#with_source" do
+    context "if there was a rubygem source already defined" do
+      it "restores it after it's done" do
+        other_source = double("other-source")
+        allow(Bundler::Source::Rubygems).to receive(:new).and_return(other_source)
+
+        subject.source("https://other-source.org") do
+          subject.gem("dobry-pies", :path => "foo")
+          subject.gem("foo")
+        end
+
+        expect(subject.dependencies.last.source).to eq(other_source)
+      end
     end
   end
 end

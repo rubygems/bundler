@@ -199,7 +199,7 @@ module Bundler
     end
 
     def set_array(key, array)
-     self[key] = (array.empty? ? nil : array.join(":")) if array
+      self[key] = (array.empty? ? nil : array.join(":")) if array
     end
 
     def set_key(key, value, hash, file)

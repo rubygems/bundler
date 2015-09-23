@@ -18,8 +18,6 @@ module Spec
       args = args.flatten
       args = args.first.split(/\s+/) if args.size == 1
 
-      #failure_message_for_should "Expected RUBYOPT to have options #{args.join(" ")}. It was #{ENV["RUBYOPT"]}"
-
       match do |actual|
         actual = actual.split(/\s+/) if actual.is_a?(String)
         args.all? {|arg| actual.include?(arg) } && actual.uniq.size == actual.size

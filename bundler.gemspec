@@ -10,8 +10,8 @@ Gem::Specification.new do |s|
   s.authors     = ["André Arko", "Terence Lee", "Carl Lerche", "Yehuda Katz"]
   s.email       = ["andre.arko+terence.lee@gmail.com"]
   s.homepage    = "http://bundler.io"
-  s.summary     = %q{The best way to manage your application's dependencies}
-  s.description = %q{Bundler manages an application's dependencies through its entire life, across many machines, systematically and repeatably}
+  s.summary     = "The best way to manage your application's dependencies"
+  s.description = "Bundler manages an application's dependencies through its entire life, across many machines, systematically and repeatably"
 
   s.required_ruby_version     = ">= 1.8.7"
   s.required_rubygems_version = ">= 1.3.6"

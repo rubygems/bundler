@@ -98,6 +98,26 @@ describe "bundle update" do
       should_be_installed "activesupport 3.0"
       should_not_be_installed "rack 1.2"
     end
+
+    context "when there is a source with the same name as a gem in a group" do
+      before :each do
+        build_git "foo", :path => lib_path("activesupport")
+        install_gemfile <<-G
+          source "file://#{gem_repo2}"
+          gem "activesupport", :group => :development
+          gem "foo", :git => "#{lib_path("activesupport")}"
+        G
+      end
+
+      it "should not update the gems from that source" do
+        update_repo2 { build_gem "activesupport", "3.0" }
+        update_git "foo", "2.0", :path => lib_path("activesupport")
+
+        bundle "update --group development"
+        should_be_installed "activesupport 3.0"
+        should_not_be_installed "foo 2.0"
+      end
+    end
   end
 
   describe "in a frozen bundle" do
@@ -107,6 +127,96 @@ describe "bundle update" do
 
       expect(out).to match(/You are trying to install in deployment mode after changing.your Gemfile/m)
       expect(exitstatus).not_to eq(0) if exitstatus
+    end
+  end
+
+  describe "with --source option" do
+    it "should not update gems not included in the source that happen to have the same name" do
+      pending("Allowed to fail to preserve backwards-compatibility")
+
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "activesupport"
+      G
+      update_repo2 { build_gem "activesupport", "3.0" }
+
+      bundle "update --source activesupport"
+      should_not_be_installed "activesupport 3.0"
+    end
+
+    it "should update gems not included in the source that happen to have the same name" do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "activesupport"
+      G
+      update_repo2 { build_gem "activesupport", "3.0" }
+
+      bundle "update --source activesupport"
+      should_be_installed "activesupport 3.0"
+    end
+  end
+
+  context "when there is a child dependency that is also in the gemfile" do
+    before do
+      build_repo2 do
+        build_gem "fred", "1.0"
+        build_gem "harry", "1.0" do |s|
+          s.add_dependency "fred"
+        end
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "harry"
+        gem "fred"
+      G
+    end
+
+    it "should not update the child dependencies of a gem that has the same name as the source" do
+      update_repo2 do
+        build_gem "fred", "2.0"
+        build_gem "harry", "2.0" do |s|
+          s.add_dependency "fred"
+        end
+      end
+
+      bundle "update --source harry"
+      should_be_installed "harry 2.0"
+      should_be_installed "fred 1.0"
+    end
+  end
+
+  context "when there is a child dependency that appears elsewhere in the dependency graph" do
+    before do
+      build_repo2 do
+        build_gem "fred", "1.0" do |s|
+          s.add_dependency "george"
+        end
+        build_gem "george", "1.0"
+        build_gem "harry", "1.0" do |s|
+          s.add_dependency "george"
+        end
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem "harry"
+        gem "fred"
+      G
+    end
+
+    it "should not update the child dependencies of a gem that has the same name as the source" do
+      update_repo2 do
+        build_gem "george", "2.0"
+        build_gem "harry", "2.0" do |s|
+          s.add_dependency "george"
+        end
+      end
+
+      bundle "update --source harry"
+      should_be_installed "harry 2.0"
+      should_be_installed "fred 1.0"
+      should_be_installed "george 1.0"
     end
   end
 end

@@ -141,7 +141,7 @@ module Bundler
           options[dep.name] = bins unless bins.empty?
         end
         if options.any?
-          Bundler.ui.warn "#{spec.name} has no executables, but you may want " +
+          Bundler.ui.warn "#{spec.name} has no executables, but you may want " \
             "one from a gem it depends on."
           options.each {|name, bins| Bundler.ui.warn "  #{name} has: #{bins.join(", ")}" }
         else
@@ -282,7 +282,7 @@ module Bundler
     def create_bundle_path
       Bundler.mkdir_p(Bundler.bundle_path.to_s) unless Bundler.bundle_path.exist?
     rescue Errno::EEXIST
-      raise PathError, "Could not install to path `#{Bundler.settings[:path]}` " +
+      raise PathError, "Could not install to path `#{Bundler.settings[:path]}` " \
         "because of an invalid symlink. Remove the symlink so the directory can be created."
     end
 
