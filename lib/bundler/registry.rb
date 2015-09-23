@@ -8,7 +8,7 @@ module Bundler
     #
     # If a key with the given name already exists, it is overwritten.
     def register(key, &block)
-      raise ArgumentError, "block required" if !block_given?
+      raise ArgumentError, "block required" unless block_given?
       @items[key] = block
     end
 
@@ -25,8 +25,8 @@ module Bundler
     # This will evaluate the block given to `register` and return the
     # resulting value.
     def get(key)
-      return nil if !@items.key?(key)
-      return @items[key].call
+      return nil unless @items.key?(key)
+      @items[key].call
     end
     alias_method :[], :get
 
@@ -35,6 +35,7 @@ module Bundler
     def all
       @items
     end
+
     # Checks if the given key is registered with the registry.
     #
     # @return [Boolean]

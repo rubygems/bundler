@@ -103,7 +103,7 @@ module Bundler
       when Source::Path     then path_sources
       when Source::Rubygems then rubygems_sources
       else
-        if RUBY_VERSION > '1.9.1'
+        if RUBY_VERSION > "1.9.1"
           source = @plugin_registry.key(source.class)
         else
           source = @plugin_registry.index(source.class)

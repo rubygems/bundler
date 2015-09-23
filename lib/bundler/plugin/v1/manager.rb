@@ -44,7 +44,7 @@ module Bundler
         end
 
         def register(plugin)
-          if !@registered.include?(plugin)
+          unless @registered.include?(plugin)
             if Bundler.plugin_install_mode
               Bundler.ui.info "Registered plugin '#{plugin.name}'"
             end

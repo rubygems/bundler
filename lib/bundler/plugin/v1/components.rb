@@ -7,7 +7,6 @@ module Bundler
         attr_reader :lifecycle_hooks
 
         def initialize
-
           @commands = Registry.new
           @sources = Registry.new
           @lifecycle_hooks = Registry.new

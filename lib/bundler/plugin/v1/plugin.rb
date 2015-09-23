@@ -7,7 +7,6 @@ module Bundler
       class Plugin
         ROOT_CLASS = self
         def self.command(name, &block)
-
           # Validate the name of the command
           if name.to_s !~ /^[-a-z0-9]+$/i
             raise InvalidCommandName, "Commands can only contain letters, numbers, and hyphens"
@@ -25,7 +24,6 @@ module Bundler
         end
 
         def self.source(name, &block)
-
           if Bundler.plugin_install_mode
             Bundler.ui.info "Setting up '#{name}' custom source"
           end

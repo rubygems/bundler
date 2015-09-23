@@ -240,7 +240,6 @@ module Bundler
         source = source_class
         @sources.register_plugin_source(type, source)
       end
-
     end
 
     def with_source(source)

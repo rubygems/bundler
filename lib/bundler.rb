@@ -71,7 +71,7 @@ module Bundler
 
     # If we didn't find a result, then raise an exception, depending
     # on if we got a component or not.
-    raise ArgumentError, "Plugin superclass not found for version/component: " +
+    raise ArgumentError, "Plugin superclass not found for version/component: " \
       "#{version} #{component}"
   end
 
@@ -137,7 +137,7 @@ module Bundler
                when :write then "write to"
                when :executable then "execute"
                else @permission_type.to_s
-               end
+      end
       "There was an error while trying to #{action} `#{File.basename(@file)}`. " \
       "It is likely that you need to grant #{@permission_type} permissions for " \
       "the file at path: `#{File.expand_path(@file)}`."
@@ -433,7 +433,7 @@ module Bundler
     end
 
     def read_file(file)
-      File.open(file, "rb") {|f| f.read }
+      File.open(file, "rb", &:read)
     end
 
     def load_marshal(data)
