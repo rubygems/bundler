@@ -11,7 +11,6 @@ bundle-install(1) -- Install the dependencies specified in your gems.rb
                  [--deployment]
                  [--force]
                  [--no-prune]
-                 [--system]
                  [--quiet]
                  [--retry=NUMBER]
                  [--shebang]
@@ -74,9 +73,6 @@ use `bundle config` (see bundle-config(1)).
 * `--force`:
   Force download every gem, even if the required versions are already available
   locally.
-
-* `--system`:
-  Installs the gems specified in the bundle to the system's Rubygems location.
 
 * `--no-prune`:
   Don't remove stale gems from the cache when the installation finishes.

@@ -256,22 +256,19 @@ describe "bundle install with gem sources" do
         should_be_installed "rack 1.0"
       end
 
-      # NOTE: This interface (`install; config --delete path; install --system`)
-      # is a bit clunky.
-      # (Just using `install; install --system` produces an error.)
-      it "allows running bundle install --system without deleting foo" do
-        bundle "install"
-        bundle "config --delete path"
-        bundle "install --system"
+      it "allows installing gems to system path without deleting foo" do
+        bundle :install
+        bundle "config path.system true"
+        bundle :install
         FileUtils.rm_rf(bundled_app("vendor"))
         should_be_installed "rack 1.0"
       end
 
-      it "allows running bundle install --system after deleting foo" do
-        bundle "install"
+      it "allows installing gems to system path after deleting foo" do
+        bundle :install
         FileUtils.rm_rf(bundled_app("vendor"))
-        bundle "config --delete path"
-        bundle "install --system"
+        bundle "config path.system true"
+        bundle :install
         should_be_installed "rack 1.0"
       end
     end
@@ -383,27 +380,20 @@ describe "bundle install with gem sources" do
     end
   end
 
-  describe "when using the --cache flag" do
+  describe "when using deprecated flags" do
     it "prints an error and exits" do
-      gemfile <<-G
-        gem 'rack'
-      G
+      ["--cache",
+       "--path vendor/bundle",
+       "--system"
+      ].each do |flag|
+        gemfile <<-G
+          gem 'rack'
+        G
 
-      bundle "install --cache"
+        bundle "install #{flag}"
 
-      expect(err).to include("Unknown switches '--cache'")
-    end
-  end
-
-  describe "when using the --path flag" do
-    it "print an error and exit" do
-      gemfile <<-G
-        gem 'rack'
-      G
-
-      bundle "install --path vendor/bundle"
-
-      expect(err).to include("Unknown switches '--path'")
+        expect(err).to include("Unknown switches '#{flag.split.first}'")
+      end
     end
   end
 

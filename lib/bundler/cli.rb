@@ -142,8 +142,6 @@ module Bundler
       "Specify a different shebang executable name than the default (usually 'ruby')"
     method_option "standalone", :type => :array, :lazy_default => [], :banner =>
       "Make a bundle that can work without the Bundler runtime"
-    method_option "system", :type => :boolean, :banner =>
-      "Install to the system location ($BUNDLE_PATH or $GEM_HOME) even if the bundle was previously installed somewhere else for this application"
     method_option "trust-policy", :alias => "P", :type => :string, :banner =>
       "Gem trust policy (like gem install -P). Must be one of " +
         Bundler.rubygems.security_policy_keys.join("|")

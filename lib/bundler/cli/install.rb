@@ -23,6 +23,10 @@ module Bundler
          "install --cache`."
         exit 1
       end
+      if options[:system]
+        Bundler.ui.error "Please use `bundle config path.system true` " \
+          "instead of `bundle install --system`"
+      end
 
       ENV["RB_USER_INSTALL"] = "1" if Bundler::FREEBSD
 
@@ -32,12 +36,6 @@ module Bundler
       if options[:path]
         Bundler.ui.error "You have specified an installation path with the "\
          "path flag. Please use `bundle config path #{options[:path]}` instead."
-        exit 1
-      end
-
-      if (Bundler.settings[:path] || options[:deployment]) && options[:system]
-        Bundler.ui.error "You have configured a path to install your gems to, \n" \
-                         "and specified the --system path. Please use only one."
         exit 1
       end
 
@@ -73,7 +71,6 @@ module Bundler
         options[:system] = true
       end
 
-      Bundler.settings[:path]     = Bundler.rubygems.gem_dir if options[:system]
       Bundler.settings[:path]     = "#{Bundler.settings.path}/vendor/bundle" if options[:deployment]
 
       Bundler.settings[:path] ||= "bundle" if options["standalone"]

@@ -15,7 +15,7 @@ describe "bundle install" do
 
     it "does not use available system gems with config path vendor/bundle" do
       bundle "config path vendor/bundle"
-      bundle "install"
+      bundle :install
 
       should_be_installed "rack 1.0.0"
     end
@@ -37,12 +37,6 @@ describe "bundle install" do
       bundle "config path vendor/bundle"
       bundle "install"
       expect(out).to include("gems are installed into ./vendor")
-    end
-
-    it "disallows config path vendor/bundle and install system" do
-      bundle "config path vendor/bundle"
-      bundle "install --system"
-      expect(err).to include("Please use only one.")
     end
 
     it "remembers to disable system gems after config path vendor/bundle" do

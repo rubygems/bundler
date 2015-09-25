@@ -333,23 +333,25 @@ describe "bundle clean" do
   end
 
   it "does not call clean automatically when using system gems" do
-    gemfile <<-G
+    bundle "config path.system true"
+
+    install_gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "thin"
       gem "rack"
     G
-    bundle "install --system"
+
     sys_exec "gem list"
     expect(out).to include("rack (1.0.0)")
     expect(out).to include("thin (1.0)")
 
-    gemfile <<-G
+    install_gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack"
     G
-    bundle "install --system"
+
     sys_exec "gem list"
     expect(out).to include("rack (1.0.0)")
     expect(out).to include("thin (1.0)")
@@ -438,7 +440,7 @@ describe "bundle clean" do
     should_have_gems "foo-1.0", "foo-1.0.1"
   end
 
-  it "does not clean on bundle update when using --system" do
+  it "does not clean on bundle update when installing to system path" do
     bundle "config path.system true"
 
     build_repo2
@@ -459,22 +461,21 @@ describe "bundle clean" do
   end
 
   it "cleans system gems when --force is used" do
-    gemfile <<-G
+    bundle "config path.system true"
+
+    install_gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "foo"
       gem "rack"
     G
 
-    bundle "config path.system true"
-    bundle "install"
-
-    gemfile <<-G
+    install_gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack"
     G
-    bundle "install"
+
     bundle "clean --force"
 
     expect(out).to include("Removing foo (1.0)")
@@ -524,12 +525,13 @@ describe "bundle clean" do
       end
     end
 
-    gemfile <<-G
+    bundle "config path.system true"
+
+    install_gemfile <<-G
       source "file://#{gem_repo2}"
 
       gem "bindir"
     G
-    bundle "install --system"
 
     bundle "clean --force"
 
