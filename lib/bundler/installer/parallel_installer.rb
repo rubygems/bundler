@@ -41,8 +41,8 @@ class ParallelInstaller
     # Represents only the non-development dependencies, the ones that are
     # itself and are in the total list.
     def dependencies(all_spec_names)
-      @dependencies ||= all_dependencies.reject {|dep| ignorable_dependency? dep }
-                                        .select {|dep| all_spec_names.include? dep.name }
+      @dependencies ||= all_dependencies.reject {|dep| ignorable_dependency? dep }.
+                                         select {|dep| all_spec_names.include? dep.name }
     end
 
     # Represents all dependencies
