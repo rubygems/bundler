@@ -263,6 +263,9 @@ module Bundler
 
     def create_bundle_path
       Bundler.mkdir_p(Bundler.bundle_path.to_s) unless Bundler.bundle_path.exist?
+    rescue Errno::EACCES
+      raise PathError, "Could not install to path `#{Bundler.settings[:path]}` " \
+        "because of a file permission error. Make sure you have read and write permission on this directory."
     rescue Errno::EEXIST
       raise PathError, "Could not install to path `#{Bundler.settings[:path]}` " \
         "because of an invalid symlink. Remove the symlink so the directory can be created."

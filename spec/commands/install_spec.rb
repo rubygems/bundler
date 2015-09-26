@@ -374,4 +374,21 @@ describe "bundle install with gem sources" do
       expect(out).to_not include("Your Gemfile has no gem server sources")
     end
   end
+
+  describe "when bundle path does not have write access" do
+    before do
+      FileUtils.mkdir_p(bundled_app("vendor"))
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem 'rack'
+      G
+    end
+
+    it "should display a proper message to explain the problem" do
+      FileUtils.chmod(0500, bundled_app("vendor"))
+
+      bundle :install, :path => "vendor"
+      expect(out).to include("Could not install to path `vendor` because of a file permission error. Make sure you have read and write permission on this directory.")
+    end
+  end
 end
