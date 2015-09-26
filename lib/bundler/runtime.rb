@@ -171,44 +171,13 @@ module Bundler
       stale_gem_files      = gem_files - spec_cache_paths
       stale_gemspec_files  = gemspec_files - spec_gemspec_paths
 
-      output = stale_gem_dirs.collect do |gem_dir|
-        full_name = Pathname.new(gem_dir).basename.to_s
-
-        parts   = full_name.split("-")
-        name    = parts[0..-2].join("-")
-        version = parts.last
-        output  = "#{name} (#{version})"
-
-        if dry_run
-          Bundler.ui.info "Would have removed #{output}"
-        else
-          Bundler.ui.info "Removing #{output}"
-          FileUtils.rm_rf(gem_dir)
-        end
-
-        output
-      end + stale_git_dirs.collect do |gem_dir|
-        full_name = Pathname.new(gem_dir).basename.to_s
-
-        parts    = full_name.split("-")
-        name     = parts[0..-2].join("-")
-        revision = parts[-1]
-        output   = "#{name} (#{revision})"
-
-        if dry_run
-          Bundler.ui.info "Would have removed #{output}"
-        else
-          Bundler.ui.info "Removing #{output}"
-          FileUtils.rm_rf(gem_dir)
-        end
-
-        output
-      end
+      removed_stale_gem_dirs = stale_gem_dirs.collect {|dir| remove_dir(dir, dry_run) }
+      removed_stale_git_dirs = stale_git_dirs.collect {|dir| remove_dir(dir, dry_run) }
+      output = removed_stale_gem_dirs + removed_stale_git_dirs
 
       unless dry_run
-        stale_gem_bins.each {|bin| FileUtils.rm(bin) if File.exist?(bin) }
-        stale_gem_files.each {|file| FileUtils.rm(file) if File.exist?(file) }
-        stale_gemspec_files.each {|file| FileUtils.rm(file) if File.exist?(file) }
+        stale_files = stale_gem_bins + stale_gem_files + stale_gemspec_files
+        stale_files.each {|file| FileUtils.rm(file) if File.exist?(file) }
         stale_git_cache_dirs.each {|dir| FileUtils.rm_rf(dir) if File.exist?(dir) }
       end
 
@@ -289,6 +258,24 @@ module Bundler
           ENV["MANPATH"].to_s.split(File::PATH_SEPARATOR)
         ).uniq.join(File::PATH_SEPARATOR)
       end
+    end
+
+    def remove_dir(dir, dry_run)
+      full_name = Pathname.new(dir).basename.to_s
+
+      parts    = full_name.split("-")
+      name     = parts[0..-2].join("-")
+      version  = parts.last
+      output   = "#{name} (#{version})"
+
+      if dry_run
+        Bundler.ui.info "Would have removed #{output}"
+      else
+        Bundler.ui.info "Removing #{output}"
+        FileUtils.rm_rf(dir)
+      end
+
+      output
     end
   end
 end
