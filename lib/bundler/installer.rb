@@ -215,7 +215,9 @@ module Bundler
     def generate_standalone(groups)
       standalone_path = Bundler.settings[:path]
       bundler_path = File.join(standalone_path, "bundler")
-      FileUtils.mkdir_p(bundler_path)
+      SharedHelpers.filesystem_access(bundler_path) do |p|
+        FileUtils.mkdir_p(p)
+      end
 
       paths = []
 
@@ -262,7 +264,9 @@ module Bundler
     end
 
     def create_bundle_path
-      Bundler.mkdir_p(Bundler.bundle_path.to_s) unless Bundler.bundle_path.exist?
+      SharedHelpers.filesystem_access(Bundler.bundle_path.to_s) do |p|
+        Bundler.mkdir_p(p)
+      end unless Bundler.bundle_path.exist?
     rescue Errno::EEXIST
       raise PathError, "Could not install to path `#{Bundler.settings[:path]}` " \
         "because of an invalid symlink. Remove the symlink so the directory can be created."

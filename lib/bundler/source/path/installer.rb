@@ -27,7 +27,9 @@ module Bundler
           super
 
           if Bundler.requires_sudo?
-            Bundler.mkdir_p @gem_bin_dir
+            SharedHelpers.filesystem_access(@gem_bin_dir) do |p|
+              Bundler.mkdir_p(p)
+            end
             spec.executables.each do |exe|
               Bundler.sudo "cp -R #{@bin_dir}/#{exe} #{@gem_bin_dir}"
             end

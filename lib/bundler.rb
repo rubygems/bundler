@@ -146,7 +146,7 @@ module Bundler
       @bin_path ||= begin
         path = settings[:bin] || "bin"
         path = Pathname.new(path).expand_path(root).expand_path
-        FileUtils.mkdir_p(path)
+        SharedHelpers.filesystem_access(path) {|p| FileUtils.mkdir_p(p) }
         path
       end
     end
@@ -349,7 +349,9 @@ module Bundler
       if requires_sudo?
         sudo "mkdir -p '#{path}'" unless File.exist?(path)
       else
-        FileUtils.mkdir_p(path)
+        SharedHelpers.filesystem_access(path, :write) do |p|
+          FileUtils.mkdir_p(p)
+        end
       end
     end
 

@@ -153,12 +153,16 @@ module Bundler
                 ext_src.gsub!(src[0..-6], "")
                 dst = File.dirname(File.join(dst, ext_src))
               end
-              Bundler.mkdir_p dst
+              SharedHelpers.filesystem_access(dst) do |p|
+                Bundler.mkdir_p(p)
+              end
               Bundler.sudo "cp -R #{src} #{dst}" if Dir[src].any?
             end
 
             spec.executables.each do |exe|
-              Bundler.mkdir_p Bundler.system_bindir
+              SharedHelpers.filesystem_access(Bundler.system_bindir) do |p|
+                Bundler.mkdir_p(p)
+              end
               Bundler.sudo "cp -R #{install_path}/bin/#{exe} #{Bundler.system_bindir}/"
             end
           end
@@ -399,11 +403,15 @@ module Bundler
         download_path = Bundler.requires_sudo? ? Bundler.tmp(spec.full_name) : Bundler.rubygems.gem_dir
         gem_path = "#{Bundler.rubygems.gem_dir}/cache/#{spec.full_name}.gem"
 
-        FileUtils.mkdir_p("#{download_path}/cache")
+        SharedHelpers.filesystem_access("#{download_path}/cache") do |p|
+          FileUtils.mkdir_p(p)
+        end
         Bundler.rubygems.download_gem(spec, uri, download_path)
 
         if Bundler.requires_sudo?
-          Bundler.mkdir_p "#{Bundler.rubygems.gem_dir}/cache"
+          SharedHelpers.filesystem_access("#{Bundler.rubygems.gem_dir}/cache") do |p|
+            Bundler.mkdir_p(p)
+          end
           Bundler.sudo "mv #{download_path}/cache/#{spec.full_name}.gem #{gem_path}"
         end
 

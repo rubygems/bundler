@@ -110,7 +110,9 @@ module Bundler
 
     def cache(custom_path = nil)
       cache_path = Bundler.app_cache(custom_path)
-      FileUtils.mkdir_p(cache_path) unless File.exist?(cache_path)
+      SharedHelpers.filesystem_access(cache_path) do |p|
+        FileUtils.mkdir_p(p)
+      end unless File.exist?(cache_path)
 
       Bundler.ui.info "Updating files in #{Bundler.settings.app_cache_path}"
       specs.each do |spec|
@@ -128,7 +130,9 @@ module Bundler
     end
 
     def prune_cache(cache_path)
-      FileUtils.mkdir_p(cache_path) unless File.exist?(cache_path)
+      SharedHelpers.filesystem_access(cache_path) do |p|
+        FileUtils.mkdir_p(p)
+      end unless File.exist?(cache_path)
       resolve = @definition.resolve
       prune_gem_cache(resolve, cache_path)
       prune_git_and_path_cache(resolve, cache_path)
