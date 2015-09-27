@@ -57,5 +57,18 @@ describe ParallelInstaller::SpecInstallation do
         expect(spec.dependencies_installed?(all_specs)).to be_falsey
       end
     end
+
+    context "when dependencies that are not on the overall installation list are the only ones not installed" do
+      it "returns true" do
+        dependencies = []
+        dependencies << instance_double("SpecInstallation", :spec => "alpha", :name => "alpha", :installed? => true, :all_dependencies => [], :type => :production)
+        all_specs = dependencies + [instance_double("SpecInstallation", :spec => "gamma", :name => "gamma", :installed? => false, :all_dependencies => [], :type => :production)]
+        # Add dependency which is not in all_specs
+        dependencies << instance_double("SpecInstallation", :spec => "beta", :name => "beta", :installed? => false, :all_dependencies => [], :type => :production)
+        spec = ParallelInstaller::SpecInstallation.new(dep)
+        allow(spec).to receive(:all_dependencies).and_return(dependencies)
+        expect(spec.dependencies_installed?(all_specs)).to be_truthy
+      end
+    end
   end
 end
