@@ -92,6 +92,30 @@ module Bundler
       ENV["RUBYLIB"] = rubylib.uniq.join(File::PATH_SEPARATOR)
     end
 
+    # Rescues permissions errors raised by file system operations
+    # (ie. Errno:EACCESS) and raises more friendly errors instead.
+    #
+    # @param path [String] the path that the action will be attempted to
+    # @param action [Symbol, #to_s] the type of operation that will be
+    #   performed. For example: :write, :read, :exec
+    #
+    # @yield path
+    #
+    # @raise [Bundler::PermissionError] if Errno:EACCES is raised in the
+    #   given block
+    #
+    # @example
+    #   filesystem_access("vendor/cache", :write) do
+    #     FileUtils.mkdir_p("vendor/cache")
+    #   end
+    #
+    # @see {Bundler::PermissionError}
+    def filesystem_access(path, action = :write)
+      yield path
+    rescue Errno::EACCES
+      raise PermissionError.new(path, action)
+    end
+
   private
 
     def find_gemfile

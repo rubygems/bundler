@@ -126,8 +126,8 @@ module Bundler
   class MarshalError < StandardError; end
 
   class PermissionError < BundlerError
-    def initialize(file, permission_type = :write)
-      @file = file
+    def initialize(path, permission_type = :write)
+      @path = path
       @permission_type = permission_type
     end
 
@@ -135,12 +135,12 @@ module Bundler
       action = case @permission_type
                when :read then "read from"
                when :write then "write to"
-               when :executable then "execute"
+               when :executable, :exec then "execute"
                else @permission_type.to_s
-      end
-      "There was an error while trying to #{action} `#{File.basename(@file)}`. " \
-      "It is likely that you need to grant #{@permission_type} permissions for " \
-      "the file at path: `#{File.expand_path(@file)}`."
+               end
+      "There was an error while trying to #{action} `#{@path}`. " \
+      "It is likely that you need to grant #{@permission_type} permissions " \
+      "for that path."
     end
 
     status_code(23)
@@ -173,7 +173,7 @@ module Bundler
       @bin_path ||= begin
         path = settings[:bin] || "bin"
         path = Pathname.new(path).expand_path(root).expand_path
-        FileUtils.mkdir_p(path)
+        SharedHelpers.filesystem_access(path) {|p| FileUtils.mkdir_p(p) }
         path
       end
     end
@@ -398,7 +398,9 @@ module Bundler
       if requires_sudo?
         sudo "mkdir -p '#{path}'" unless File.exist?(path)
       else
-        FileUtils.mkdir_p(path)
+        SharedHelpers.filesystem_access(path, :write) do |p|
+          FileUtils.mkdir_p(p)
+        end
       end
     end
 

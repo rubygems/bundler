@@ -208,14 +208,14 @@ module Bundler
       unless hash[key] == value
         hash[key] = value
         hash.delete(key) if value.nil?
-        FileUtils.mkdir_p(file.dirname)
-        require "bundler/psyched_yaml"
-        File.open(file, "w") {|f| f.puts YAML.dump(hash) }
+        SharedHelpers.filesystem_access(file) do |p|
+          FileUtils.mkdir_p(p.dirname)
+          require "bundler/psyched_yaml"
+          File.open(p, "w") {|f| f.puts YAML.dump(hash) }
+        end
       end
 
       value
-    rescue Errno::EACCES
-      raise PermissionError.new(file)
     end
 
     def global_config_file

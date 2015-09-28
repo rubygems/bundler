@@ -74,7 +74,7 @@ module Bundler
       file_name = nil
       sh("gem build -V '#{spec_path}'") {
         file_name = File.basename(built_gem_path)
-        FileUtils.mkdir_p(File.join(base, "pkg"))
+        SharedHelpers.filesystem_access(File.join(base, "pkg")) {|p| FileUtils.mkdir_p(p) }
         FileUtils.mv(built_gem_path, "pkg")
         Bundler.ui.confirm "#{name} #{version} built to pkg/#{file_name}."
       }

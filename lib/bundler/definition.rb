@@ -280,9 +280,9 @@ module Bundler
         return
       end
 
-      File.open(file, "wb") {|f| f.puts(contents) }
-    rescue Errno::EACCES
-      raise PermissionError.new(file)
+      SharedHelpers.filesystem_access(file) do |p|
+        File.open(p, "wb") {|f| f.puts(contents) }
+      end
     end
 
     # Returns the version of Bundler that is creating or has created

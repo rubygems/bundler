@@ -76,7 +76,9 @@ module Bundler
             end
           else
             Bundler.ui.info "Fetching #{uri}"
-            FileUtils.mkdir_p(path.dirname)
+            SharedHelpers.filesystem_access(path.dirname) do |p|
+              FileUtils.mkdir_p(p)
+            end
             git_retry %|clone #{uri_escaped_with_configured_credentials} "#{path}" --bare --no-hardlinks --quiet|
           end
         end
@@ -85,8 +87,12 @@ module Bundler
           # method 1
           unless File.exist?(destination.join(".git"))
             begin
-              FileUtils.mkdir_p(destination.dirname)
-              FileUtils.rm_rf(destination)
+              SharedHelpers.filesystem_access(destination.dirname) do |p|
+                FileUtils.mkdir_p(p)
+              end
+              SharedHelpers.filesystem_access(destination) do |p|
+                FileUtils.rm_rf(p)
+              end
               git_retry %|clone --no-checkout --quiet "#{path}" "#{destination}"|
               File.chmod(((File.stat(destination).mode | 0777) & ~File.umask), destination)
             rescue Errno::EEXIST => e
