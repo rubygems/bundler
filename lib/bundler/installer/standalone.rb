@@ -20,7 +20,7 @@ module Bundler
       end
     end
 
-    private
+  private
 
     def paths
       @specs.flat_map do |spec|
