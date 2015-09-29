@@ -72,6 +72,5 @@ describe ParallelInstaller::SpecInstallation do
           to raise_error(Bundler::GemfileError, /Your Gemfile.lock is corrupt\. The following.*\n.*'beta' 'delta'/)
       end
     end
-
   end
 end
