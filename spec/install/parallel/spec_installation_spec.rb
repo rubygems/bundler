@@ -69,7 +69,7 @@ describe ParallelInstaller::SpecInstallation do
         spec = ParallelInstaller::SpecInstallation.new(dep)
         allow(spec).to receive(:all_dependencies).and_return(dependencies)
         expect { spec.dependencies_installed?(all_specs) }.
-          to raise_error(Bundler::GemfileError, /Your Gemfile.lock is corrupt\. The following.*\n.*'beta' 'delta'/)
+          to raise_error(Bundler::GemfileError, /Your Gemfile.lock is corrupt\. The following.*'beta' 'delta'/)
       end
     end
   end
