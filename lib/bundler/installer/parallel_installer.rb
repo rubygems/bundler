@@ -35,13 +35,21 @@ class ParallelInstaller
     # sure needed dependencies have been installed.
     def dependencies_installed?(all_specs)
       installed_specs = all_specs.select(&:installed?).map(&:name)
-      dependencies.all? {|d| installed_specs.include? d.name }
+      dependencies(all_specs.map(&:name)).all? {|d| installed_specs.include? d.name }
     end
 
-    # Represents only the non-development dependencies and the ones that
-    # are itself.
-    def dependencies
-      @dependencies ||= all_dependencies.reject {|dep| ignorable_dependency? dep }
+    # Represents only the non-development dependencies, the ones that are
+    # itself and are in the total list.
+    def dependencies(all_spec_names)
+      @dependencies ||= begin
+        deps = all_dependencies.reject {|dep| ignorable_dependency? dep }
+        missing = deps.reject {|dep| all_spec_names.include? dep.name }
+        if missing.size > 0
+          raise Bundler::LockfileError, "Your Gemfile.lock is corrupt. The following #{missing.size > 1 ? "gems are" : "gem is"} missing " \
+                              "from the DEPENDENCIES section: '#{missing.map(&:name).join('\' \'')}'"
+        end
+        deps
+      end
     end
 
     # Represents all dependencies

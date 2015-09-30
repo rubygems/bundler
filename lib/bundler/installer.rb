@@ -1,6 +1,7 @@
 require "erb"
 require "rubygems/dependency_installer"
 require "bundler/worker"
+require "bundler/installer/parallel_installer"
 
 module Bundler
   class Installer < Environment
@@ -176,13 +177,9 @@ module Bundler
     # installation is just SO MUCH FASTER. so we let people opt in.
     def install(options)
       force = options["force"]
-      jobs = [Bundler.settings[:jobs].to_i - 1, 1].max
-      if jobs > 1 && can_install_in_parallel?
-        require "bundler/installer/parallel_installer"
-        install_in_parallel jobs, options[:standalone], force
-      else
-        install_sequentially options[:standalone], force
-      end
+      jobs = 1
+      jobs = [Bundler.settings[:jobs].to_i - 1, 1].max if can_install_in_parallel?
+      install_in_parallel jobs, options[:standalone], force
     end
 
     def can_install_in_parallel?
@@ -190,7 +187,7 @@ module Bundler
         true
       else
         Bundler.ui.warn "Rubygems #{Gem::VERSION} is not threadsafe, so your "\
-          "gems must be installed one at a time. Upgrade to Rubygems 2.1.0 " \
+          "gems will be installed one at a time. Upgrade to Rubygems 2.1.0 " \
           "or higher to enable parallel gem installation."
         false
       end
@@ -246,15 +243,6 @@ module Bundler
         file.puts "path = File.expand_path('..', __FILE__)"
         paths.each do |path|
           file.puts %{$:.unshift "\#{path}/#{path}"}
-        end
-      end
-    end
-
-    def install_sequentially(standalone, force = false)
-      specs.each do |spec|
-        message = install_gem_from_spec spec, standalone, 0, force
-        if message
-          Installer.post_install_messages[spec.name] = message
         end
       end
     end
