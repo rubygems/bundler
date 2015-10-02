@@ -194,7 +194,7 @@ module Bundler
       @search_for = {}
       @base_dg = Molinillo::DependencyGraph.new
       @base.each {|ls| @base_dg.add_vertex(ls.name, Dependency.new(ls.name, ls.version), true) }
-      @ruby_version = Gem::Version.create(ruby_version) if ruby_version
+      @ruby_version = ruby_version ? Gem::Version.create(ruby_version) : nil
     end
 
     def start(requirements)
