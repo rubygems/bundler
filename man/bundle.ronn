@@ -61,9 +61,6 @@ We divide `bundle` subcommands into primary commands and utilities.
 * `bundle outdated(1)`:
   Show all of the outdated gems in the current bundle
 
-* `bundle console(1)`:
-  Start an IRB session in the context of the current bundle
-
 * `bundle open(1)`:
   Open an installed gem in the editor
 

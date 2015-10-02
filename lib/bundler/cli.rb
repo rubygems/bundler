@@ -4,7 +4,7 @@ require "bundler/vendored_thor"
 module Bundler
   class CLI < Thor
     include Thor::Actions
-    AUTO_INSTALL_CMDS = %w[show binstubs outdated exec open console licenses clean]
+    AUTO_INSTALL_CMDS = %w[show binstubs outdated exec open licenses clean]
 
     def self.start(*)
       super
@@ -282,12 +282,6 @@ module Bundler
     def open(name)
       require "bundler/cli/open"
       Open.new(options, name).run
-    end
-
-    desc "console [GROUP]", "Opens an IRB session with the bundle pre-loaded"
-    def console(group = nil)
-      require "bundler/cli/console"
-      Console.new(options, group).run
     end
 
     desc "version", "Prints the bundler's version information"
