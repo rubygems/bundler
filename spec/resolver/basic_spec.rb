@@ -83,13 +83,13 @@ describe "Resolving" do
 
       gem "foo", "2.0.0" do |s|
         dep "bar", ">= 0"
-        s.required_ruby_version = '~> 2.0.0'
+        s.required_ruby_version = "~> 2.0.0"
       end
 
       gem "bar", "1.0.0"
 
       gem "bar", "2.0.0" do |s|
-        s.required_ruby_version = '~> 2.0.0'
+        s.required_ruby_version = "~> 2.0.0"
       end
     end
     dep "foo"
