@@ -180,8 +180,3 @@ Style/SpaceAroundEqualsInParameterDefault:
 # Cop supports --auto-correct.
 Style/SpaceInsideStringInterpolation:
   Enabled: false
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/TrailingUnderscoreVariable:
-  Enabled: false
