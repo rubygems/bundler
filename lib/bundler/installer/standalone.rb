@@ -23,13 +23,13 @@ module Bundler
   private
 
     def paths
-      @specs.flat_map do |spec|
+      @specs.map do |spec|
         next if spec.name == "bundler"
         Array(spec.require_paths).map do |path|
           gem_path(path, spec).sub(version_dir, '#{ruby_engine}/#{ruby_version}')
           # This is a static string intentionally. It's interpolated at a later time.
         end
-      end
+      end.flatten
     end
 
     def version_dir
