@@ -147,7 +147,7 @@ describe "when using sudo", :sudo => true do
     it "warns against that" do
       gemfile %|source "file://#{gem_repo1}"|
       bundle :install, :sudo => true
-      expect(out).to include("Don't run Bundler as root.")
+      expect(out.gsub("\n", " ")).to include("you must also run your application as root")
     end
   end
 

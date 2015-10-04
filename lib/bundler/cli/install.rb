@@ -158,9 +158,8 @@ module Bundler
 
     def warn_if_root
       return if Bundler::WINDOWS || !Process.uid.zero?
-      Bundler.ui.warn "Don't run Bundler as root. Bundler can ask for sudo " \
-        "if it is needed, and installing your bundle as root will break this " \
-        "application for all non-root users on this machine.", :wrap => true
+      Bundler.ui.warn "You're installing this bundle as root. That means " \
+        "you must also run your application as root.", :wrap => true
     end
 
     def confirm_without_groups
