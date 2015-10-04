@@ -32,6 +32,7 @@ module Bundler
     def eval_gemfile(gemfile, contents = nil)
       contents ||= Bundler.read_file(gemfile.to_s)
       instance_eval(contents, gemfile.to_s, 1)
+      infer_ruby_version(gemfile)
     rescue Exception => e
       message = "There was an error parsing `#{File.basename gemfile.to_s}`: #{e.message}"
       raise DSLError.new(message, gemfile, e.backtrace, contents)
@@ -385,6 +386,15 @@ module Bundler
         "    git_source(:#{name}) do |repo_name|\n" \
         "      #{repo_string}\n" \
         "    end", true
+    end
+
+    def infer_ruby_version(gemfile)
+      unless @ruby_version
+        ruby_version = gemfile.parent + ".ruby-version"
+        if ruby_version.file?
+          ruby(ruby_version.read.strip)
+        end
+      end
     end
 
     class DSLError < GemfileError
