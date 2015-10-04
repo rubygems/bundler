@@ -117,6 +117,20 @@ G
       expect(out).to eq("ruby 1.9.3")
     end
 
+    it "infers from .ruby-version" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+
+        gem "foo"
+      G
+
+      bundled_app(".ruby-version").open("w") { |f| f.write "2.2.3\n" }
+
+      bundle "platform --ruby"
+
+      expect(out).to eq("ruby 2.2.3")
+    end
+
     it "handles jruby" do
       gemfile <<-G
         source "file://#{gem_repo1}"
@@ -190,8 +204,6 @@ G
       G
 
       bundle "platform --ruby"
-      puts err
-
       expect(out).to eq("No ruby version specified")
     end
   end
