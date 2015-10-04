@@ -175,8 +175,3 @@ Style/SingleLineBlockParams:
 # Configuration parameters: EnforcedStyle, SupportedStyles.
 Style/SpaceAroundEqualsInParameterDefault:
   Enabled: false
-
-# Offense count: 4
-# Cop supports --auto-correct.
-Style/SpaceInsideStringInterpolation:
-  Enabled: false
