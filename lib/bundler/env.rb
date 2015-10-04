@@ -4,11 +4,12 @@ require "bundler/source/git/git_proxy"
 module Bundler
   class Env
     def write(io)
-      io.write report(:print_gemfile => true)
+      io.write report(:print_gemfile => true, :print_gemspecs => true)
     end
 
     def report(options = {})
       print_gemfile = options.delete(:print_gemfile)
+      print_gemspecs = options.delete(:print_gemspecs)
 
       out = "Environment\n\n"
       out << "    Bundler   #{Bundler::VERSION}\n"
@@ -37,6 +38,14 @@ module Bundler
 
         out << "\n#{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)}\n\n"
         out << "    " << read_file(Bundler.default_lockfile).gsub(/\n/, "\n    ") << "\n"
+      end
+
+      if print_gemspecs
+        dsl = Dsl.new.tap {|d| d.eval_gemfile(Bundler.default_gemfile) }
+        dsl.gemspecs.each do |gs|
+          out << "\n#{Pathname.new(gs).basename}:"
+          out << "\n\n    " << read_file(gs).gsub(/\n/, "\n    ") << "\n"
+        end
       end
 
       out
