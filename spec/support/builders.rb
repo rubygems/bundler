@@ -158,9 +158,7 @@ module Spec
           RUBY
         end
 
-        build_gem "very_simple_binary" do |s|
-          s.add_c_extension
-        end
+        build_gem "very_simple_binary", &:add_c_extension
 
         build_gem "bundler", "0.9" do |s|
           s.executables = "bundle"
@@ -507,6 +505,7 @@ module Spec
         if options[:rubygems_version]
           @spec.rubygems_version = options[:rubygems_version]
           def @spec.mark_version; end
+
           def @spec.validate; end
         end
 
