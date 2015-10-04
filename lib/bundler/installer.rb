@@ -2,6 +2,7 @@ require "erb"
 require "rubygems/dependency_installer"
 require "bundler/worker"
 require "bundler/installer/parallel_installer"
+require "bundler/installer/standalone"
 
 module Bundler
   class Installer < Environment
@@ -68,7 +69,7 @@ module Bundler
       install(options)
 
       lock unless Bundler.settings[:frozen]
-      generate_standalone(options[:standalone]) if options[:standalone]
+      Standalone.new(options[:standalone], @definition).generate if options[:standalone]
     end
 
     def install_gem_from_spec(spec, standalone = false, worker = 0, force = false)
@@ -205,44 +206,6 @@ module Bundler
         executable_path = executable_path = Pathname(spec.full_gem_path).join(spec.bindir, executable).relative_path_from(bin_path)
         File.open "#{bin_path}/#{executable}", "w", 0755 do |f|
           f.puts ERB.new(template, nil, "-").result(binding)
-        end
-      end
-    end
-
-    def generate_standalone(groups)
-      standalone_path = Bundler.settings[:path]
-      bundler_path = File.join(standalone_path, "bundler")
-      SharedHelpers.filesystem_access(bundler_path) do |p|
-        FileUtils.mkdir_p(p)
-      end
-
-      paths = []
-
-      if groups.empty?
-        specs = @definition.requested_specs
-      else
-        specs = @definition.specs_for groups.map(&:to_sym)
-      end
-
-      specs.each do |spec|
-        next if spec.name == "bundler"
-        next if spec.require_paths.nil? # builtin gems
-
-        spec.require_paths.each do |path|
-          full_path = Pathname.new(path).absolute? ? path : File.join(spec.full_gem_path, path)
-          gem_path = Pathname.new(full_path).relative_path_from(Bundler.root.join(bundler_path))
-          paths << gem_path.to_s.sub("#{Bundler.ruby_version.engine}/#{RbConfig::CONFIG["ruby_version"]}", '#{ruby_engine}/#{ruby_version}')
-        end
-      end
-
-      File.open File.join(bundler_path, "setup.rb"), "w" do |file|
-        file.puts "require 'rbconfig'"
-        file.puts "# ruby 1.8.7 doesn't define RUBY_ENGINE"
-        file.puts "ruby_engine = defined?(RUBY_ENGINE) ? RUBY_ENGINE : 'ruby'"
-        file.puts "ruby_version = RbConfig::CONFIG[\"ruby_version\"]"
-        file.puts "path = File.expand_path('..', __FILE__)"
-        paths.each do |path|
-          file.puts %{$:.unshift "\#{path}/#{path}"}
         end
       end
     end
