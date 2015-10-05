@@ -200,7 +200,7 @@ module Bundler
       names = e.dependencies.sort_by(&:name).map {|d| "gem '#{d.name}'" }
       raise CyclicDependencyError, "Your bundle requires gems that depend" \
         " on each other, creating an infinite loop. Please remove" \
-        " #{names.count > 1 ? "either " : "" }#{names.join(" or ")}" \
+        " #{names.count > 1 ? "either " : ""}#{names.join(" or ")}" \
         " and try again."
     end
 
