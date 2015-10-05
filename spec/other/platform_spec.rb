@@ -124,7 +124,7 @@ G
         gem "foo"
       G
 
-      bundled_app(".ruby-version").open("w") { |f| f.write "2.2.3\n" }
+      bundled_app(".ruby-version").open("w") {|f| f.write "2.2.3\n" }
 
       bundle "platform --ruby"
 
