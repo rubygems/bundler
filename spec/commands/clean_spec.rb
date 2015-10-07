@@ -613,4 +613,26 @@ describe "bundle clean" do
     should_have_gems "thin-1.0", "rack-1.0.0", "weakling-0.0.3"
     should_not_have_gems "foo-1.0"
   end
+
+  it "doesn't remove extensions artifacts from bundled git gems after clean", :rubygems => "2.2" do
+    build_git "very_simple_git_binary" do |s|
+      s.add_c_extension
+    end
+
+    revision = revision_for(lib_path("very_simple_git_binary-1.0"))
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+
+      gem "very_simple_git_binary", :git => "#{lib_path("very_simple_git_binary-1.0")}", :ref => "#{revision}"
+    G
+
+    bundle "install --path vendor/bundle"
+    bundle :clean
+
+    expect(out).to eq("")
+
+    expect(vendored_gems("bundler/gems/extensions")).to exist
+    expect(vendored_gems("bundler/gems/very_simple_git_binary-1.0-#{revision[0..11]}")).to exist
+  end
 end
