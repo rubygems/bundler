@@ -176,7 +176,7 @@ module Spec
 
     def lockfile(*args)
       if args.empty?
-        File.open("Gemfile.lock", "r"){|f| f.read }
+        File.open("Gemfile.lock", "r") {|f| f.read }
       else
         create_file("Gemfile.lock", *args)
       end
