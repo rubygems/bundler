@@ -42,6 +42,7 @@ describe "real world edgecases", :realworld => true, :sometimes => true do
 
       gem 'rails', '~> 3.0'
       gem 'capybara', '~> 2.2.0'
+      gem 'rack-cache', '1.2.0' # last version that works on Ruby 1.9
     G
     expect(out).to include("rails 3.2.22")
     expect(out).to include("capybara 2.2.1")
@@ -54,6 +55,7 @@ describe "real world edgecases", :realworld => true, :sometimes => true do
       gem "sass-rails"
       gem "rails", "~> 3"
       gem "gxapi_rails"
+      gem 'rack-cache', '1.2.0' # last version that works on Ruby 1.9
     G
     expect(out).to include("gxapi_rails 0.0.6")
   end
