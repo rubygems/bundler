@@ -175,7 +175,11 @@ module Spec
     end
 
     def lockfile(*args)
-      create_file("Gemfile.lock", *args)
+      if args.empty?
+        File.open("Gemfile.lock", "r"){|f| f.read }
+      else
+        create_file("Gemfile.lock", *args)
+      end
     end
 
     def strip_whitespace(str)
