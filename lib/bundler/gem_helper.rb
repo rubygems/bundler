@@ -167,7 +167,7 @@ module Bundler
       if code == 0
         out
       else
-        raise(out.empty? ? "Running `#{cmd}' failed. Run this command directly for more detailed output." : out)
+        raise(out.empty? ? "Running `#{cmd}` failed. Run this command directly for more detailed output." : out)
       end
     end
 
