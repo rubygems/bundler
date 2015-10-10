@@ -434,7 +434,7 @@ module Bundler
     def warn_github_source_change(repo_name)
       # TODO: 2.0 remove deprecation
       Bundler.ui.deprecate "The :github option uses the git: protocol, which is not secure. " \
-        "Bundler 2.0 will use the https: protcol, which is secure. Enable this change now by " \
+        "Bundler 2.0 will use the https: protocol, which is secure. Enable this change now by " \
         "running `bundle config github.https true`."
     end
 

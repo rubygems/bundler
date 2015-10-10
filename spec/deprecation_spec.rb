@@ -88,7 +88,7 @@ describe "Bundler version 1.99" do
       it "warns about the https change" do
         allow(Bundler.ui).to receive(:deprecate)
         msg = "The :github option uses the git: protocol, which is not secure. " \
-        "Bundler 2.0 will use the https: protcol, which is secure. Enable this change now by " \
+        "Bundler 2.0 will use the https: protocol, which is secure. Enable this change now by " \
         "running `bundle config github.https true`."
         expect(Bundler.ui).to receive(:deprecate).with(msg)
         subject.gem("sparks", :github => "indirect/sparks")
