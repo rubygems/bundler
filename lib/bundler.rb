@@ -45,7 +45,6 @@ module Bundler
   autoload :StubSpecification,     "bundler/stub_specification"
   autoload :Source,                "bundler/source"
   autoload :SourceList,            "bundler/source_list"
-  autoload :Specification,         "bundler/shared_helpers"
   autoload :SystemRubyVersion,     "bundler/ruby_version"
   autoload :UI,                    "bundler/ui"
 
