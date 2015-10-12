@@ -57,7 +57,7 @@ module Bundler
 
         unless spec
           raise InvalidOption, "There was an error loading the gemspec at " \
-            "#{file}. Make sure you can build the gem, then try again."
+            "#{file}. Make sure you can build the gem, then try again"
         end
 
         gem spec.name, :path => path, :glob => glob
@@ -70,10 +70,10 @@ module Bundler
 
         @gemspecs << gemspecs.first
       when 0
-        raise InvalidOption, "There are no gemspecs at #{expanded_path}."
+        raise InvalidOption, "There are no gemspecs at #{expanded_path}"
       else
         raise InvalidOption, "There are multiple gemspecs at #{expanded_path}. " \
-          "Please use the :name option to specify which one should be used."
+          "Please use the :name option to specify which one should be used"
       end
     end
 
@@ -256,10 +256,10 @@ module Bundler
 
     def normalize_options(name, version, opts)
       if name.is_a?(Symbol)
-        raise GemfileError, %{You need to specify gem names as Strings. Use 'gem "#{name}"' instead.}
+        raise GemfileError, %{You need to specify gem names as Strings. Use 'gem "#{name}"' instead}
       end
       if name =~ /\s/
-        raise GemfileError, %{'#{name}' is not a valid gem name because it contains whitespace.}
+        raise GemfileError, %{'#{name}' is not a valid gem name because it contains whitespace}
       end
 
       normalize_hash(opts)
@@ -362,7 +362,7 @@ module Bundler
         raise GemspecError, "Warning: this Gemfile contains multiple primary sources. " \
           "Each source after the first must include a block to indicate which gems " \
           "should come from that source. To downgrade this error to a warning, run " \
-          "`bundle config --delete disable_multisource`."
+          "`bundle config --delete disable_multisource`"
       else
         Bundler.ui.warn "Warning: this Gemfile contains multiple primary sources. " \
           "Using `source` more than once without a block is a security risk, and " \
