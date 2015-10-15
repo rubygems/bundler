@@ -180,10 +180,24 @@ RSpec.describe "bundle install with gems on multiple sources" do
             end
           end
 
-          it "installs from the same source without any warning" do
-            bundle :install
-            expect(out).not_to include("Warning")
-            expect(the_bundle).to include_gems("depends_on_rack 1.0.1", "rack 1.0.0")
+          context "when lockfile_uses_separate_rubygems_sources is set" do
+            before { bundle! "config lockfile_uses_separate_rubygems_sources true" }
+
+            it "installs from the same source without any warning" do
+              bundle! :install
+
+              expect(out).not_to include("Warning: the gem 'rack' was found in multiple sources.")
+              expect(err).not_to include("Warning: the gem 'rack' was found in multiple sources.")
+              expect(the_bundle).to include_gems("depends_on_rack 1.0.1", "rack 1.0.0")
+
+              # when there is already a lock file, and the gems are missing, so try again
+              system_gems []
+              bundle! :install
+
+              expect(out).not_to include("Warning: the gem 'rack' was found in multiple sources.")
+              expect(err).not_to include("Warning: the gem 'rack' was found in multiple sources.")
+              expect(the_bundle).to include_gems("depends_on_rack 1.0.1", "rack 1.0.0")
+            end
           end
         end
       end
