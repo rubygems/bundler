@@ -2,11 +2,12 @@ module Bundler
   class Source
     class Rubygems
       class Remote
-        attr_reader :uri,
-          :anonymized_uri
+        attr_reader :uri, :anonymized_uri, :original_uri
 
         def initialize(uri)
+          orig_uri = uri
           uri = Bundler.settings.mirror_for(uri)
+          @original_uri = orig_uri if orig_uri != uri
           fallback_auth = Bundler.settings.credentials_for(uri)
 
           @uri = apply_auth(uri, fallback_auth).freeze
