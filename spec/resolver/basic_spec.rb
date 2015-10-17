@@ -74,4 +74,33 @@ describe "Resolving" do
     dep "foo", ">= 3.0.0"
     should_resolve_and_include %w(foo-3.0.5)
   end
+
+  it "takes into account required_ruby_version" do
+    @index = build_index do
+      gem "foo", "1.0.0" do
+        dep "bar", ">= 0"
+      end
+
+      gem "foo", "2.0.0" do |s|
+        dep "bar", ">= 0"
+        s.required_ruby_version = "~> 2.0.0"
+      end
+
+      gem "bar", "1.0.0"
+
+      gem "bar", "2.0.0" do |s|
+        s.required_ruby_version = "~> 2.0.0"
+      end
+    end
+    dep "foo"
+
+    deps = []
+    @deps.each do |d|
+      deps << Bundler::DepProxy.new(d, "ruby")
+    end
+
+    got = Bundler::Resolver.resolve(deps, @index, {}, [], "1.8.7")
+    got = got.map(&:full_name).sort
+    expect(got).to eq(%w(foo-1.0.0 bar-1.0.0).sort)
+  end
 end

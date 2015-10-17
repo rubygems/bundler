@@ -49,7 +49,7 @@ module Bundler
       end
 
       def to_s
-        "source at #{@path}"
+        "source at `#{@path}`"
       end
 
       def hash

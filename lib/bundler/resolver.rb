@@ -108,7 +108,7 @@ module Bundler
 
       def activate_platform(platform)
         unless @activated.include?(platform)
-          if for?(platform)
+          if for?(platform, nil)
             @activated << platform
             return __dependencies[platform] || []
           end
@@ -128,8 +128,14 @@ module Bundler
         @source ||= first.source
       end
 
-      def for?(platform)
-        @specs[platform]
+      def for?(platform, required_ruby_version)
+        if spec = @specs[platform]
+          if required_ruby_version && spec_required_ruby_version = spec.required_ruby_version
+            spec_required_ruby_version.satisfied_by?(required_ruby_version)
+          else
+            true
+          end
+        end
       end
 
       def to_s
@@ -173,14 +179,14 @@ module Bundler
     # ==== Returns
     # <GemBundle>,nil:: If the list of dependencies can be resolved, a
     #   collection of gemspecs is returned. Otherwise, nil is returned.
-    def self.resolve(requirements, index, source_requirements = {}, base = [])
+    def self.resolve(requirements, index, source_requirements = {}, base = [], ruby_version = nil)
       base = SpecSet.new(base) unless base.is_a?(SpecSet)
-      resolver = new(index, source_requirements, base)
+      resolver = new(index, source_requirements, base, ruby_version)
       result = resolver.start(requirements)
       SpecSet.new(result)
     end
 
-    def initialize(index, source_requirements, base)
+    def initialize(index, source_requirements, base, ruby_version)
       @index = index
       @source_requirements = source_requirements
       @base = base
@@ -188,6 +194,7 @@ module Bundler
       @search_for = {}
       @base_dg = Molinillo::DependencyGraph.new
       @base.each {|ls| @base_dg.add_vertex(ls.name, Dependency.new(ls.name, ls.version), true) }
+      @ruby_version = ruby_version ? Gem::Version.create(ruby_version) : nil
     end
 
     def start(requirements)
@@ -267,7 +274,7 @@ module Bundler
           []
         end
       end
-      search.select {|sg| sg.for?(platform) }.each {|sg| sg.activate_platform(platform) }
+      search.select {|sg| sg.for?(platform, @ruby_version) }.each {|sg| sg.activate_platform(platform) }
     end
 
     def name_for(dependency)

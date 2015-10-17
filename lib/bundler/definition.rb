@@ -196,7 +196,8 @@ module Bundler
           last_resolve
         else
           # Run a resolve against the locally available gems
-          last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve)
+          requested_ruby_version = ruby_version.version if ruby_version
+          last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve, requested_ruby_version)
         end
       end
     end

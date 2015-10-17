@@ -439,6 +439,10 @@ module Spec
         @spec.add_runtime_dependency(name, requirements)
       end
 
+      def required_ruby_version=(*reqs)
+        @spec.required_ruby_version = *reqs
+      end
+
       alias_method :dep, :runtime
     end
 
