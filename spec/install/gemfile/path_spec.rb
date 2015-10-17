@@ -341,6 +341,24 @@ describe "bundle install with explicit source paths" do
     should_be_installed "foo 1.0"
   end
 
+  it "works when the path does not have a gemspec but there is a lockfile" do
+    lockfile <<-L
+    PATH
+      remote: vendor/bar
+      specs:
+
+    GEM
+      remote: http://rubygems.org
+    L
+
+    in_app_root { FileUtils.mkdir_p("vendor/bar") }
+
+    install_gemfile <<-G
+      gem "bar", "1.0.0", path: "vendor/bar", require: "bar/nyard"
+    G
+    expect(exitstatus).to eq(0) if exitstatus
+  end
+
   it "installs executable stubs" do
     build_lib "foo" do |s|
       s.executables = ["foo"]

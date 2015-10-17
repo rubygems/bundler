@@ -133,7 +133,7 @@ module Bundler
     def ==(other)
       all? do |spec|
         other_spec = other[spec].first
-        (spec.dependencies & other_spec.dependencies).empty? && spec.source == other_spec.source
+        other_spec && (spec.dependencies & other_spec.dependencies).empty? && spec.source == other_spec.source
       end
     end
 
