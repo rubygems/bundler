@@ -2,7 +2,10 @@ require "spec_helper"
 require "bundler/fetcher"
 
 describe Bundler::Fetcher do
-  subject(:fetcher) { Bundler::Fetcher.new(double("remote", :uri => URI("https://example.com"))) }
+  let(:uri) { URI("https://example.com") }
+  let(:remote) { double("remote", :uri => uri, :original_uri => nil) }
+
+  subject(:fetcher) { Bundler::Fetcher.new(remote) }
 
   before do
     allow(Bundler).to receive(:root) { Pathname.new("root") }
@@ -30,6 +33,33 @@ describe Bundler::Fetcher do
         with_env_vars("HTTP_PROXY" => "http://proxy-example.com") do
           expect(fetcher.http_proxy).to match("http://proxy-example2.com")
         end
+      end
+    end
+
+    context "when a rubygems source mirror is set" do
+      let(:orig_uri) { URI("http://zombo.com") }
+      let(:remote_with_mirror) do
+        double("remote", :uri => uri, :original_uri => orig_uri, :anonymized_uri => uri)
+      end
+
+      let(:fetcher) { Bundler::Fetcher.new(remote_with_mirror) }
+
+      it "sets the 'X-Gemfile-Source' header containing the original source" do
+        expect(
+          fetcher.send(:connection).override_headers["X-Gemfile-Source"]
+        ).to eq("http://zombo.com")
+      end
+    end
+
+    context "when there is no rubygems source mirror set" do
+      let(:remote_no_mirror) do
+        double("remote", :uri => uri, :original_uri => nil, :anonymized_uri => uri)
+      end
+
+      let(:fetcher) { Bundler::Fetcher.new(remote_no_mirror) }
+
+      it "does not set the 'X-Gemfile-Source' header" do
+        expect(fetcher.send(:connection).override_headers["X-Gemfile-Source"]).to be_nil
       end
     end
   end
