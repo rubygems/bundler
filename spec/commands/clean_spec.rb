@@ -615,9 +615,7 @@ describe "bundle clean" do
   end
 
   it "doesn't remove extensions artifacts from bundled git gems after clean", :rubygems => "2.2" do
-    build_git "very_simple_git_binary" do |s|
-      s.add_c_extension
-    end
+    build_git "very_simple_git_binary", &:add_c_extension
 
     revision = revision_for(lib_path("very_simple_git_binary-1.0"))
 

@@ -110,7 +110,7 @@ module Bundler
                when :write then "write to"
                when :executable, :exec then "execute"
                else @permission_type.to_s
-               end
+      end
       "There was an error while trying to #{action} `#{@path}`. " \
       "It is likely that you need to grant #{@permission_type} permissions " \
       "for that path."
@@ -385,7 +385,7 @@ module Bundler
     end
 
     def read_file(file)
-      File.open(file, "rb") {|f| f.read }
+      File.open(file, "rb", &:read)
     end
 
     def load_marshal(data)
