@@ -25,7 +25,7 @@ module Bundler
       @new_deps -= builder.dependencies
 
       # add new deps to the end of the in-memory gems.rb
-      builder.eval_gemfile("injected gems", new_gem_lines) if @new_deps.any?
+      builder.eval_gemfile(gemfile_path, new_gem_lines) if @new_deps.any?
 
       # resolve to see if the new deps broke anything
       definition = builder.to_definition(lockfile_path, {})
