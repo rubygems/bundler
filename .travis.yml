@@ -1,6 +1,8 @@
 language: ruby
 script: rake spec:travis
 before_script: travis_retry rake spec:travis:deps
+sudo: required
+dist: trusty
 
 branches:
   only:
