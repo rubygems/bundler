@@ -260,6 +260,8 @@ module Bundler
       "Overwrite existing binstubs if they exist"
     method_option "path", :type => :string, :lazy_default => "bin", :banner =>
       "Binstub destination directory (default bin)"
+    method_option "shebang", :type => :string, :banner =>
+      "Specify a different shebang executable name than the default (usually 'ruby')"
     method_option "standalone", :type => :boolean, :banner =>
       "Make binstubs that can work without the Bundler runtime"
     def binstubs(*gems)

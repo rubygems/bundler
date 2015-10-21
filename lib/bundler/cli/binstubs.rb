@@ -13,6 +13,7 @@ module Bundler
       Bundler.definition.validate_runtime!
       Bundler.settings[:bin] = options["path"] if options["path"]
       Bundler.settings[:bin] = nil if options["path"] && options["path"].empty?
+      Bundler.settings[:shebang] = options["shebang"] if options["shebang"]
       installer = Installer.new(Bundler.root, Bundler.definition)
 
       if gems.empty?
