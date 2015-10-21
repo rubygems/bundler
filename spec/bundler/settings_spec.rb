@@ -41,6 +41,13 @@ describe Bundler::Settings do
       end
     end
 
+    context "when is number" do
+      it "returns a number" do
+        settings[:ssl_verify_mode] = "1"
+        expect(settings[:ssl_verify_mode]).to be 1
+      end
+    end
+
     context "when it's not possible to write to the file" do
       it "raises an PermissionError with explanation" do
         expect(FileUtils).to receive(:mkdir_p).with(settings.send(:local_config_file).dirname).
