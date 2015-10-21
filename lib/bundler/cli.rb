@@ -198,6 +198,8 @@ module Bundler
     D
     method_option "force", :type => :boolean, :default => false, :banner =>
       "Overwrite existing binstubs if they exist"
+    method_option "shebang", :type => :string, :banner =>
+      "Specify a different shebang executable name than the default (usually 'ruby')"
     def binstubs(*gems)
       require "bundler/cli/binstubs"
       Binstubs.new(options, gems).run
