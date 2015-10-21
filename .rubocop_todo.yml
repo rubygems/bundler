@@ -256,6 +256,7 @@ Style/RescueModifier:
     - 'lib/bundler/fetcher.rb'
     - 'lib/bundler/resolver.rb'
     - 'spec/realworld/dependency_api_spec.rb'
+    - 'spec/realworld/gemfile_source_header_spec.rb'
 
 # Offense count: 1
 # Configuration parameters: Methods.

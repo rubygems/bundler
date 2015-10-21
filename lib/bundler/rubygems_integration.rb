@@ -586,7 +586,8 @@ module Bundler
         uri = Bundler.settings.mirror_for(uri)
         proxy = configuration[:http_proxy]
         dns = Resolv::DNS.new
-        fetcher = Gem::RemoteFetcher.new(proxy, dns)
+        fetcher = Bundler::GemRemoteFetcher.new(proxy, dns)
+        fetcher.headers = { "X-Gemfile-Source" => spec.remote.original_uri.to_s } if spec.remote.original_uri
         fetcher.download(spec, uri, path)
       end
 

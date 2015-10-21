@@ -82,6 +82,10 @@ describe Bundler::Source::Rubygems::Remote do
     specify "#anonymized_uri returns the mirror URI without credentials" do
       expect(remote(uri).anonymized_uri).to eq(mirror_uri_no_auth)
     end
+
+    specify "#original_uri returns the original source" do
+      expect(remote(uri).original_uri).to eq(uri)
+    end
   end
 
   context "when a mirror with configured credentials is configured for the URI" do
@@ -100,6 +104,18 @@ describe Bundler::Source::Rubygems::Remote do
 
     specify "#anonymized_uri returns the mirror URI without credentials" do
       expect(remote(uri).anonymized_uri).to eq(mirror_uri_no_auth)
+    end
+
+    specify "#original_uri returns the original source" do
+      expect(remote(uri).original_uri).to eq(uri)
+    end
+  end
+
+  context "when there is no mirror set" do
+    describe "#original_uri" do
+      it "is not set" do
+        expect(remote(uri_no_auth).original_uri).to be_nil
+      end
     end
   end
 end
