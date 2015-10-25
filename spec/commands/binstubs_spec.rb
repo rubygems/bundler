@@ -103,6 +103,19 @@ describe "bundle binstubs <gem>" do
         expect(File.stat(binary).mode.to_s(8)).to eq("100775")
       end
     end
+
+    context "when using --shebang" do
+      it "sets the specified shebang for the the binstub" do
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rack"
+        G
+
+        bundle "binstubs rack --shebang jruby"
+
+        expect(File.open("bin/rackup").gets).to eq("#!/usr/bin/env jruby\n")
+      end
+    end
   end
 
   context "when the gem doesn't exist" do

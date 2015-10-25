@@ -12,6 +12,7 @@ module Bundler
       Bundler.definition.validate_ruby!
       Bundler.settings[:bin] = Bundler.settings["path.binstubs"] if Bundler.settings["path.binstubs"]
       Bundler.settings[:bin] = nil if Bundler.settings["path.binstubs"] && Bundler.settings["path.binstubs"].empty?
+      Bundler.settings[:shebang] = options["shebang"] if options["shebang"]
       installer = Installer.new(Bundler.root, Bundler.definition)
 
       if gems.empty?
