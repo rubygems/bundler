@@ -37,4 +37,20 @@ describe "bundle executable" do
       should_be_installed "rack 1.0.0"
     end
   end
+
+  context "when ENV['RUBYGEMS_GEMDEPS'] is set" do
+    it "displays a warning" do
+      gemfile bundled_app("Gemfile"), <<-G
+        source "file://#{gem_repo1}"
+        gem 'rack'
+      G
+
+      bundle :install, :env => { "RUBYGEMS_GEMDEPS" => "foo" }
+      expect(out).to include("RUBYGEMS_GEMDEPS")
+      expect(out).to include("conflict with Bundler")
+
+      bundle :install, :env => { "RUBYGEMS_GEMDEPS" => "" }
+      expect(out).not_to include("RUBYGEMS_GEMDEPS")
+    end
+  end
 end
