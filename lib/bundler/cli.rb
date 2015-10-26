@@ -29,6 +29,13 @@ module Bundler
       self.options ||= {}
       Bundler.ui = UI::Shell.new(options)
       Bundler.ui.level = "debug" if options["verbose"]
+
+      if ENV["RUBYGEMS_GEMDEPS"] && !ENV["RUBYGEMS_GEMDEPS"].empty?
+        Bundler.ui.warn(
+          "The RUBYGEMS_GEMDEPS environment variable is set. This enables RubyGems' " \
+          "experimental Gemfile mode, which may conflict with Bundler and cause unexpected errors. " \
+          "To remove this warning, unset RUBYGEMS_GEMDEPS.", :wrap => true)
+      end
     end
 
     check_unknown_options!(:except => [:config, :exec])
