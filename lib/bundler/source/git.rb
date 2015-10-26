@@ -65,7 +65,14 @@ module Bundler
         else
           ref
         end
-        "#{uri} (at #{at})"
+
+        rev = begin
+                "@#{shortref_for_display(revision)}"
+              rescue GitError
+                nil
+              end
+
+        "#{uri} (at #{at}#{rev})"
       end
 
       def name

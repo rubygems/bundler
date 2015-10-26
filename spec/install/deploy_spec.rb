@@ -207,7 +207,7 @@ describe "install with --deployment or --frozen" do
 
       bundle "install --deployment"
       expect(out).to include("deployment mode")
-      expect(out).to include("You have deleted from the Gemfile:\n* source: #{lib_path("rack-1.0")} (at master)")
+      expect(out).to include("You have deleted from the Gemfile:\n* source: #{lib_path("rack-1.0")} (at master@#{revision_for(lib_path("rack-1.0"))[0..6]}")
       expect(out).not_to include("You have added to the Gemfile")
       expect(out).not_to include("You have changed in the Gemfile")
     end
@@ -230,7 +230,7 @@ describe "install with --deployment or --frozen" do
 
       bundle "install --deployment"
       expect(out).to include("deployment mode")
-      expect(out).to include("You have changed in the Gemfile:\n* rack from `no specified source` to `#{lib_path("rack")} (at master)`")
+      expect(out).to include("You have changed in the Gemfile:\n* rack from `no specified source` to `#{lib_path("rack")} (at master@#{revision_for(lib_path("rack"))[0..6]})`")
       expect(out).not_to include("You have added to the Gemfile")
       expect(out).not_to include("You have deleted from the Gemfile")
     end
