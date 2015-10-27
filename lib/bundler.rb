@@ -27,7 +27,7 @@ module Bundler
   autoload :Fetcher,               "bundler/fetcher"
   autoload :GemHelper,             "bundler/gem_helper"
   autoload :GemHelpers,            "bundler/gem_helpers"
-  autoload :GemInstaller,          "bundler/gem_installer"
+  autoload :RubyGemsGemInstaller,  "bundler/rubygems_gem_installer"
   autoload :Graph,                 "bundler/graph"
   autoload :Index,                 "bundler/index"
   autoload :Installer,             "bundler/installer"
