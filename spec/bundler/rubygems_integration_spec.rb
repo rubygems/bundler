@@ -18,4 +18,11 @@ describe Bundler::RubygemsIntegration do
       Bundler.rubygems.validate(spec)
     end
   end
+
+  describe "#configuration" do
+    it "handles Gem::SystemExitException errors" do
+      allow(Gem).to receive(:configuration) { raise Gem::SystemExitException.new(1) }
+      expect { Bundler.rubygems.configuration }.to raise_error(Gem::SystemExitException)
+    end
+  end
 end

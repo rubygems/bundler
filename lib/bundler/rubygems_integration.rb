@@ -66,7 +66,7 @@ module Bundler
     rescue Gem::SystemExitException => e
       Bundler.ui.error "#{e.class}: #{e.message}"
       Bundler.ui.trace e
-      raise Gem::SystemExitException
+      raise
     end
 
     def ruby_engine
