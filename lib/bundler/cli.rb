@@ -185,6 +185,8 @@ module Bundler
       "Update a specific source (and all gems associated with it)"
     method_option "force", :type => :boolean, :banner =>
       "Force downloading every gem."
+    method_option "ruby", :type => :boolean, :banner =>
+      "Update ruby specified in Gemfile.lock"
     def update(*gems)
       require "bundler/cli/update"
       Update.new(options, gems).run
