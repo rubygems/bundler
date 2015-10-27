@@ -1,13 +1,25 @@
 module Bundler
   class SourceList
     attr_reader :path_sources,
-      :git_sources
+      :git_sources,
+      :plugin_sources
 
     def initialize
       @path_sources       = []
       @git_sources        = []
       @rubygems_aggregate = Source::Rubygems.new
       @rubygems_sources   = []
+      @plugin_sources     = {}
+      @plugin_registry    = {}
+    end
+
+    def register_plugin_source(source_type, klass)
+      @plugin_registry[source_type] = klass
+    end
+
+    def add_plugin_source(source_type, options = {})
+      plugin_sources[source_type] = [] if plugin_sources[source_type].nil?
+      add_source_to_list @plugin_registry[source_type].new(options), plugin_sources[source_type]
     end
 
     def add_path_source(options = {})
@@ -90,7 +102,17 @@ module Bundler
       when Source::Git      then git_sources
       when Source::Path     then path_sources
       when Source::Rubygems then rubygems_sources
-      else raise ArgumentError, "Invalid source: #{source.inspect}"
+      else
+        if RUBY_VERSION > "1.9.1"
+          source = @plugin_registry.key(source.class)
+        else
+          source = @plugin_registry.index(source.class)
+        end
+        if source
+          @plugin_sources[source]
+        else
+          raise ArgumentError, "Invalid source: #{source.inspect}"
+        end
       end
     end
 

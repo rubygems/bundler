@@ -14,6 +14,14 @@ $LOAD_PATH.each do |path|
   end
 end
 
+# Require all the user level plugins
+Bundler::Plugin::Manager.instance.installed_plugins.each do |plugin|
+  begin
+    require plugin
+  rescue LoadError
+    Bundler.ui.info "Cannot find gem for the plugin: #{plugin}"
+  end
+end
 require "bundler/friendly_errors"
 Bundler.with_friendly_errors do
   require "bundler/cli"

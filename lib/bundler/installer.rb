@@ -21,6 +21,14 @@ module Bundler
       installer
     end
 
+    # Begins the installation process for Bundler.
+    # For more information see the #run_plugin method on this class.
+    def self.install_plugin(definition, options = {})
+      installer = new(nil, definition)
+      installer.run_plugin(options)
+      installer
+    end
+
     # Runs the install procedures for a specific Gemfile.
     #
     # Firstly, this method will check to see if Bundler.bundle_path exists
@@ -70,6 +78,16 @@ module Bundler
 
       lock unless Bundler.settings[:frozen]
       Standalone.new(options[:standalone], @definition).generate if options[:standalone]
+    end
+
+    # Runs the install procedures for a specific Gemfile.
+    #
+    # It's basically the #run method without the dependency resolution. The plugin
+    # author must vendor in the dependencies if required
+    def run_plugin(options)
+      create_bundle_path
+      install(options)
+      generate_standalone(options[:standalone]) if options[:standalone]
     end
 
     def install_gem_from_spec(spec, standalone = false, worker = 0, force = false)

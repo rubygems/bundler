@@ -1,4 +1,5 @@
 require "bundler"
+require "bundler/plugin"
 require "bundler/vendored_thor"
 
 module Bundler
@@ -86,6 +87,26 @@ module Bundler
       Kernel.exec(command_path, *ARGV[1..-1])
     end
 
+    Bundler.plugin("1").manager.commands.all.each do |command, proc|
+      # Possibly a hacky way to do it
+      class_eval do
+        command_class = proc.call.call
+        command_object = command_class.new
+        # Need a better way to get command information from the plugin.
+        if command_object.command_name
+          desc command_object.command_name, command_object.command_short_description
+          long_desc command_object.command_long_description
+        else
+          desc "Plugin [OPTIONS]", "Unimplemented short description"
+          long_desc "Unimplemented long description"
+        end
+
+        define_method(command) do |*args|
+          command_object.run(options, args)
+        end
+      end
+    end
+
     desc "init [OPTIONS]", "Generates a Gemfile into the current working directory"
     long_desc <<-D
       Init generates a default Gemfile in the current working directory. When adding a
@@ -114,6 +135,15 @@ module Bundler
     def check
       require "bundler/cli/check"
       Check.new(options).run
+    end
+
+    desc "plugin --install [PLUGIN]", "Install or uninstall plugins"
+    long_desc <<-D
+      Plugins
+    D
+    def plugin(*arg)
+      require "bundler/cli/plugin"
+      Plugin.new(options, arg).run
     end
 
     desc "install [OPTIONS]", "Install the current environment to the system"

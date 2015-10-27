@@ -26,6 +26,21 @@ module Bundler
       Dsl.evaluate(gemfile, lockfile, unlock)
     end
 
+    # Given a gemfile it creates Bundler definition only for plugins.
+    #
+    # @param gemfile [Pathname] Path to Gemfile
+    # @return [Bundler::Definition]
+    def self.plugin_build(gemfile, lockfile, unlock)
+      unlock ||= {}
+      gemfile = Pathname.new(gemfile).expand_path
+
+      unless gemfile.file?
+        raise GemfileNotFound, "#{gemfile} not found"
+      end
+
+      PluginDsl.evaluate(gemfile, lockfile, unlock)
+    end
+
     #
     # How does the new system work?
     #

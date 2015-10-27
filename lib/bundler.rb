@@ -9,6 +9,8 @@ require "bundler/rubygems_integration"
 require "bundler/version"
 require "bundler/constants"
 require "bundler/current_ruby"
+require "bundler/plugin"
+require "bundler/registry"
 
 module Bundler
   preserve_gem_path
@@ -20,6 +22,7 @@ module Bundler
   autoload :DepProxy,              "bundler/dep_proxy"
   autoload :Deprecate,             "bundler/deprecate"
   autoload :Dsl,                   "bundler/dsl"
+  autoload :PluginDsl,             "bundler/plugin_dsl"
   autoload :EndpointSpecification, "bundler/endpoint_specification"
   autoload :Environment,           "bundler/environment"
   autoload :Env,                   "bundler/env"
@@ -48,6 +51,29 @@ module Bundler
   autoload :SourceList,            "bundler/source_list"
   autoload :SystemRubyVersion,     "bundler/ruby_version"
   autoload :UI,                    "bundler/ui"
+  autoload :Plugin,                "bundler/plugin"
+
+  PLUGIN_COMPONENTS = Registry.new.tap do |c|
+    c.register(:"1")                  { Plugin::V1::Plugin    }
+    c.register([:"1", :command])      { Plugin::V1::Command   }
+    c.register([:"1", :source])       { Plugin::V1::Source    }
+    c.register([:"1", :lifecycle])    { Plugin::V1::Lifecycle }
+  end
+
+  def self.plugin(version, component=nil)
+    # Build up the key and return a result
+    key    = version.to_s.to_sym
+    key    = [key, component.to_s.to_sym] if component
+    result = PLUGIN_COMPONENTS.get(key)
+
+    # If we found our component then we return that
+    return result if result
+
+    # If we didn't find a result, then raise an exception, depending
+    # on if we got a component or not.
+    raise ArgumentError, "Plugin superclass not found for version/component: " \
+      "#{version} #{component}"
+  end
 
   class BundlerError < StandardError
     def self.status_code(code)
@@ -122,6 +148,7 @@ module Bundler
 
   class << self
     attr_writer :bundle_path
+    attr_reader :plugin_install_mode
 
     def configure
       @configured ||= configure_gem_home_and_path
@@ -173,6 +200,10 @@ module Bundler
       @load ||= Runtime.new(root, definition)
     end
 
+    def load_plugin
+      @load_plugin ||= Runtime.new(root, plugin_definition)
+    end
+
     def environment
       Bundler::Environment.new(root, definition)
     end
@@ -191,6 +222,15 @@ module Bundler
       end
     end
 
+    def plugin_definition(unlock = nil)
+      @plugin_definition = nil if unlock
+      @plugin_definition ||= begin
+        configure
+        upgrade_lockfile
+        Definition.plugin_build(default_gemfile, default_lockfile, unlock)
+      end
+    end
+
     def locked_gems
       return @locked_gems if defined?(@locked_gems)
       if Bundler.default_lockfile.exist?
@@ -199,6 +239,11 @@ module Bundler
       else
         @locked_gems = nil
       end
+    end
+
+    def set_plugin_install_mode
+      @plugin_install_mode = true
+      @locked_gems = LockfileParser.new("")
     end
 
     def ruby_scope
@@ -226,13 +271,17 @@ module Bundler
     end
 
     def root
-      @root ||= begin
-                  default_gemfile.dirname.expand_path
-                rescue GemfileNotFound
-                  bundle_dir = default_bundle_dir
-                  raise GemfileNotFound, "Could not locate Gemfile or .bundle/ directory" unless bundle_dir
-                  Pathname.new(File.expand_path("..", bundle_dir))
-                end
+      if !Bundler.plugin_install_mode
+        @root ||= begin
+                    default_gemfile.dirname.expand_path
+                  rescue GemfileNotFound
+                    bundle_dir = default_bundle_dir
+                    raise GemfileNotFound, "Could not locate Gemfile or .bundle/ directory" unless bundle_dir
+                    Pathname.new(File.expand_path("..", bundle_dir))
+                  end
+      else
+        Pathname.new(Tempfile.new("Gemfile").path)
+      end
     end
 
     def app_config_path
