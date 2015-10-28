@@ -943,6 +943,47 @@ describe "bundle install with git sources" do
       expect(out).to include("An error occurred while installing foo (1.0)")
       expect(out).not_to include("gem install foo")
     end
+
+    it "does not reinstall the extension" do
+      build_git "foo" do |s|
+        s.add_dependency "rake"
+        s.extensions << "Rakefile"
+        s.write "Rakefile", <<-RUBY
+          task :default do
+            path = File.expand_path("../lib", __FILE__)
+            FileUtils.mkdir_p(path)
+            cur_time = Time.now.to_f.to_s
+            File.open("\#{path}/foo.rb", "w") do |f|
+              f.puts "FOO = \#{cur_time}"
+            end
+          end
+        RUBY
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "foo", :git => "#{lib_path('foo-1.0')}"
+      G
+
+      run <<-R
+        require 'foo'
+        puts FOO
+      R
+
+      installed_time = out
+      expect(installed_time).to match(/\d+\.\d+/)
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "foo", :git => "#{lib_path('foo-1.0')}"
+      G
+
+      run <<-R
+        require 'foo'
+        puts FOO
+      R
+      expect(out).to eq(installed_time)
+    end
   end
 
   it "ignores git environment variables" do

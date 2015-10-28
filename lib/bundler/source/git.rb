@@ -169,6 +169,9 @@ module Bundler
           serialize_gemspecs_in(install_path)
           @copied = true
         end
+
+        return nil if gem_build_complete?(spec.extensions_dir)
+
         generate_bin(spec)
 
         requires_checkout? ? spec.post_install_message : nil
@@ -221,6 +224,14 @@ module Bundler
       end
 
     private
+
+      def gem_complete_path(extensions_dir)
+        File.join(extensions_dir, extension_dir_name, "gem.build_complete")
+      end
+
+      def gem_build_complete?(extensions_dir)
+        File.exists? gem_complete_path(extensions_dir)
+      end
 
       def serialize_gemspecs_in(destination)
         expanded_path = destination.expand_path(Bundler.root)
