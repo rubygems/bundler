@@ -962,7 +962,7 @@ describe "bundle install with git sources" do
 
       install_gemfile <<-G
         source "file://#{gem_repo1}"
-        gem "foo", :git => "#{lib_path('foo-1.0')}"
+        gem "foo", :git => "#{lib_path("foo-1.0")}"
       G
 
       run <<-R
@@ -975,7 +975,7 @@ describe "bundle install with git sources" do
 
       install_gemfile <<-G
         source "file://#{gem_repo1}"
-        gem "foo", :git => "#{lib_path('foo-1.0')}"
+        gem "foo", :git => "#{lib_path("foo-1.0")}"
       G
 
       run <<-R
