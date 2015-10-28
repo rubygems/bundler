@@ -230,7 +230,7 @@ module Bundler
       end
 
       def gem_build_complete?(extensions_dir)
-        File.exists? gem_complete_path(extensions_dir)
+        File.exist? gem_complete_path(extensions_dir)
       end
 
       def serialize_gemspecs_in(destination)
