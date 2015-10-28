@@ -245,7 +245,7 @@ module Bundler
       Timeout::Error, EOFError, SocketError, Errno::ENETDOWN, Errno::ENETUNREACH,
       Errno::EINVAL, Errno::ECONNRESET, Errno::ETIMEDOUT, Errno::EAGAIN,
       Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError,
-      Net::HTTP::Persistent::Error
+      Net::HTTP::Persistent::Error, Zlib::BufError
     ]
 
     def bundler_cert_store
