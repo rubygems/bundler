@@ -1,6 +1,7 @@
 require "monitor"
 require "rubygems"
 require "rubygems/config_file"
+require "bundler/psyched_yaml"
 
 module Bundler
   class RubygemsIntegration
@@ -67,6 +68,9 @@ module Bundler
       Bundler.ui.error "#{e.class}: #{e.message}"
       Bundler.ui.trace e
       raise
+    rescue YamlSyntaxError => e
+      raise YAMLSyntaxError.new(e, "Your RubyGems configuration, which is " \
+        "usually located in ~/.gemrc, contains invalid YAML syntax.")
     end
 
     def ruby_engine
