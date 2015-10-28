@@ -68,7 +68,8 @@ update process below under [CONSERVATIVE UPDATING][].
   to this location.
 
 * `--jobs=[<number>]`:
-  Install gems by starting <number> of workers parallely.
+  The maximum number of parallel download and install jobs. The default
+  is `1`.
 
 * `--local`:
   Do not attempt to connect to `rubygems.org`. Instead, Bundler will use the
