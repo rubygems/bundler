@@ -224,6 +224,9 @@ module Bundler
     method_option "outdated", :type => :boolean,
                               :banner => "Show verbose output including whether gems are outdated."
     def show(gem_name = nil)
+      # TODO: 2.0 remove `bundle list`
+      Bundler.ui.deprecate("`bundle list` is deprecated and will be removed in " \
+        "Bundler 2.0. Use `bundle show` instead.", true) if ARGV[0] == "list"
       require "bundler/cli/show"
       Show.new(options, gem_name).run
     end

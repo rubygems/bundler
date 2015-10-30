@@ -128,4 +128,18 @@ describe "Bundler version 1.99" do
       end
     end
   end
+
+  context "bundle list" do
+    it "prints a deprecation warning" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+
+      bundle :list
+
+      expect(err).to include("DEPRECATION: `bundle list` is deprecated")
+      expect(err).to include("Use `bundle show`")
+    end
+  end
 end
