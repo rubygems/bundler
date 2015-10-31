@@ -6,6 +6,7 @@ branches:
   only:
     - master
     - auto
+    - /.+-dev$/
     - /.+-stable$/
 
 notifications:
