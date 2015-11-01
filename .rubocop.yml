@@ -1,0 +1,96 @@
+inherit_from:
+  - .rubocop_todo.yml
+
+AllCops:
+  Exclude:
+    - tmp/**/*
+    - lib/bundler/vendor/**/*
+  DisplayCopNames: true
+
+# Lint
+
+# They are idiomatic
+Lint/AssignmentInCondition:
+  Enabled: false
+
+Lint/EndAlignment:
+  AlignWith: variable
+
+Lint/UnusedMethodArgument:
+  Enabled: false
+
+# Style
+
+Style/AccessModifierIndentation:
+  EnforcedStyle: outdent
+
+Style/AlignParameters:
+  EnforcedStyle: with_fixed_indentation
+
+Style/MultilineOperationIndentation:
+  EnforcedStyle: indented
+
+Style/SpaceInsideBlockBraces:
+  SpaceBeforeBlockParameters: false
+
+Style/TrivialAccessors:
+  Enabled: false
+
+# We adopted raise instead of fail.
+Style/SignalException:
+  EnforcedStyle: only_raise
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+Style/StringLiteralsInInterpolation:
+  EnforcedStyle: double_quotes
+
+# Having these make it easier to *not* forget to add one when adding a new
+# value and you can simply copy the previous line.
+Style/TrailingComma:
+  EnforcedStyleForMultiline: comma
+
+Style/TrailingUnderscoreVariable:
+  Enabled: false
+
+# 1.8.7 support
+
+Style/HashSyntax:
+  EnforcedStyle: hash_rockets
+
+Style/Lambda:
+  Enabled: false
+
+Style/DotPosition:
+  EnforcedStyle: trailing
+
+Style/EachWithObject:
+  Enabled: false
+
+Style/SpecialGlobalVars:
+  Enabled: false
+
+Style/TrailingComma:
+  Enabled: false
+
+# Metrics
+
+# We've chosen to use Rubocop only for style, and not for complexity or quality checks.
+Metrics/ClassLength:
+  Enabled: false
+
+Metrics/ModuleLength:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/BlockNesting:
+  Enabled: false
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false

@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+
+require "rubygems"
+
+bundler_spec = Gem::Specification.load(File.expand_path("../../bundler.gemspec", __FILE__))
+bundler_spec.dependencies.each do |dep|
+  begin
+    gem dep.name, dep.requirement.to_s
+  rescue Gem::LoadError => e
+    $stderr.puts "#{e.message} (#{e.class})"
+  end
+end
+
+load Gem.bin_path("rake", "rake")

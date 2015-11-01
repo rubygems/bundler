@@ -1,405 +1,148 @@
 require "spec_helper"
 
-describe "bundle install with explicit source paths" do
-  it "fetches gems" do
-    build_lib "foo"
-
-    install_gemfile <<-G
-      path "#{lib_path('foo-1.0')}"
-      gem 'foo'
-    G
-
-    should_be_installed("foo 1.0")
-  end
-
-  it "supports pinned paths" do
-    build_lib "foo"
-
-    install_gemfile <<-G
-      gem 'foo', :path => "#{lib_path('foo-1.0')}"
-    G
-
-    should_be_installed("foo 1.0")
-  end
-
-  it "supports relative paths" do
-    build_lib "foo"
-
-    relative_path = lib_path('foo-1.0').relative_path_from(Pathname.new(Dir.pwd))
-
-    install_gemfile <<-G
-      gem 'foo', :path => "#{relative_path}"
-    G
-
-    should_be_installed("foo 1.0")
-  end
-
-  it "expands paths" do
-    build_lib "foo"
-
-    relative_path = lib_path('foo-1.0').relative_path_from(Pathname.new('~').expand_path)
-
-    install_gemfile <<-G
-      gem 'foo', :path => "~/#{relative_path}"
-    G
-
-    should_be_installed("foo 1.0")
-  end
-
-  it "expands paths relative to Bundler.root" do
-    build_lib "foo", :path => bundled_app("foo-1.0")
-
-    install_gemfile <<-G
-      gem 'foo', :path => "./foo-1.0"
-    G
-
-    bundled_app("subdir").mkpath
-    Dir.chdir(bundled_app("subdir")) do
-      should_be_installed("foo 1.0")
-    end
-  end
-
-  it "expands paths when comparing locked paths to Gemfile paths" do
-    build_lib "foo", :path => bundled_app("foo-1.0")
-
-    install_gemfile <<-G
-      gem 'foo', :path => File.expand_path("../foo-1.0", __FILE__)
-    G
-
-    bundle "install --frozen", :exitstatus => true
-    exitstatus.should == 0
-  end
-
-  it "installs dependencies from the path even if a newer gem is available elsewhere" do
-    system_gems "rack-1.0.0"
-
-    build_lib "rack", "1.0", :path => lib_path('nested/bar') do |s|
-      s.write "lib/rack.rb", "puts 'WIN OVERRIDE'"
-    end
-
-    build_lib "foo", :path => lib_path('nested') do |s|
-      s.add_dependency "rack", "= 1.0"
-    end
-
-    install_gemfile <<-G
-      source "file://#{gem_repo1}"
-      gem "foo", :path => "#{lib_path('nested')}"
-    G
-
-    run "require 'rack'"
-    out.should == 'WIN OVERRIDE'
-  end
-
-  it "works" do
-    build_gem "foo", "1.0.0", :to_system => true do |s|
-      s.write "lib/foo.rb", "puts 'FAIL'"
-    end
-
-    build_lib "omg", "1.0", :path => lib_path("omg") do |s|
-      s.add_dependency "foo"
-    end
-
-    build_lib "foo", "1.0.0", :path => lib_path("omg/foo")
-
-    install_gemfile <<-G
-      gem "omg", :path => "#{lib_path('omg')}"
-    G
-
-    should_be_installed "foo 1.0"
-  end
-
-  it "supports gemspec syntax" do
-    build_lib "foo", "1.0", :path => lib_path("foo") do |s|
-      s.add_dependency "rack", "1.0"
-    end
-
-    gemfile = <<-G
-      source "file://#{gem_repo1}"
-      gemspec
-    G
-
-    File.open(lib_path("foo/Gemfile"), "w") {|f| f.puts gemfile }
-
-    Dir.chdir(lib_path("foo")) do
-      bundle "install"
-      should_be_installed "foo 1.0"
-      should_be_installed "rack 1.0"
-    end
-  end
-
-  it "supports gemspec syntax with an alternative path" do
-    build_lib "foo", "1.0", :path => lib_path("foo") do |s|
-      s.add_dependency "rack", "1.0"
-    end
-
-    install_gemfile <<-G
-      source "file://#{gem_repo1}"
-      gemspec :path => "#{lib_path("foo")}"
-    G
-
-    should_be_installed "foo 1.0"
-    should_be_installed "rack 1.0"
-  end
-
-  it "doesn't automatically unlock dependencies when using the gemspec syntax" do
-    build_lib "foo", "1.0", :path => lib_path("foo") do |s|
-      s.add_dependency "rack", ">= 1.0"
-    end
-
-    Dir.chdir lib_path("foo")
-
-    install_gemfile lib_path("foo/Gemfile"), <<-G
-      source "file://#{gem_repo1}"
-      gemspec
-    G
-
-    build_gem "rack", "1.0.1", :to_system => true
-
-    bundle "install"
-
-    should_be_installed "foo 1.0"
-    should_be_installed "rack 1.0"
-  end
-
-  it "doesn't automatically unlock dependencies when using the gemspec syntax and the gem has development dependencies" do
-    build_lib "foo", "1.0", :path => lib_path("foo") do |s|
-      s.add_dependency "rack", ">= 1.0"
-      s.add_development_dependency "activesupport"
-    end
-
-    Dir.chdir lib_path("foo")
-
-    install_gemfile lib_path("foo/Gemfile"), <<-G
-      source "file://#{gem_repo1}"
-      gemspec
-    G
-
-    build_gem "rack", "1.0.1", :to_system => true
-
-    bundle "install"
-
-    should_be_installed "foo 1.0"
-    should_be_installed "rack 1.0"
-  end
-
-  it "raises if there are multiple gemspecs" do
-    build_lib "foo", "1.0", :path => lib_path("foo") do |s|
-      s.write "bar.gemspec"
-    end
-
-    install_gemfile <<-G, :exitstatus => true
-      gemspec :path => "#{lib_path("foo")}"
-    G
-
-    exitstatus.should eq(15)
-    out.should =~ /There are multiple gemspecs/
-  end
-
-  it "allows :name to be specified to resolve ambiguity" do
-    build_lib "foo", "1.0", :path => lib_path("foo") do |s|
-      s.write "bar.gemspec"
-    end
-
-    install_gemfile <<-G, :exitstatus => true
-      gemspec :path => "#{lib_path("foo")}", :name => "foo"
-    G
-
-    should_be_installed "foo 1.0"
-  end
-
-  it "sets up executables" do
-    pending_jruby_shebang_fix
-
-    build_lib "foo" do |s|
-      s.executables = "foobar"
-    end
-
-    install_gemfile <<-G
-      path "#{lib_path('foo-1.0')}"
-      gem 'foo'
-    G
-
-    bundle "exec foobar"
-    out.should == "1.0"
-  end
-
-  it "handles directories in bin/" do
-    build_lib "foo"
-    lib_path("foo-1.0").join("foo.gemspec").rmtree
-    lib_path("foo-1.0").join("bin/performance").mkpath
-
-    install_gemfile <<-G
-      gem 'foo', '1.0', :path => "#{lib_path('foo-1.0')}"
-    G
-    err.should == ""
-  end
-
-  it "removes the .gem file after installing" do
-    build_lib "foo"
-
-    install_gemfile <<-G
-      gem 'foo', :path => "#{lib_path('foo-1.0')}"
-    G
-
-    lib_path('foo-1.0').join('foo-1.0.gem').should_not exist
-  end
-
-  describe "block syntax" do
-    it "pulls all gems from a path block" do
-      build_lib "omg"
-      build_lib "hi2u"
-
-      install_gemfile <<-G
-        path "#{lib_path}" do
-          gem "omg"
-          gem "hi2u"
-        end
-      G
-
-      should_be_installed "omg 1.0", "hi2u 1.0"
-    end
-  end
-
-  it "keeps source pinning" do
-    build_lib "foo", "1.0", :path => lib_path('foo')
-    build_lib "omg", "1.0", :path => lib_path('omg')
-    build_lib "foo", "1.0", :path => lib_path('omg/foo') do |s|
-      s.write "lib/foo.rb", "puts 'FAIL'"
-    end
-
-    install_gemfile <<-G
-      gem "foo", :path => "#{lib_path('foo')}"
-      gem "omg", :path => "#{lib_path('omg')}"
-    G
-
-    should_be_installed "foo 1.0"
-  end
-
-  it "works when the path does not have a gemspec" do
-    build_lib "foo", :gemspec => false
-
-    gemfile <<-G
-      gem "foo", "1.0", :path => "#{lib_path('foo-1.0')}"
-    G
-
-    should_be_installed "foo 1.0"
-
-    should_be_installed "foo 1.0"
-  end
-
-  it "installs executable stubs" do
-    build_lib "foo" do |s|
-      s.executables = ['foo']
-    end
-
-    install_gemfile <<-G
-      gem "foo", :path => "#{lib_path('foo-1.0')}"
-    G
-
-    bundle "exec foo"
-    out.should == "1.0"
-  end
-
-  describe "when the gem version in the path is updated" do
+describe "bundle install" do
+  describe "with --path" do
     before :each do
-      build_lib "foo", "1.0", :path => lib_path("foo") do |s|
-        s.add_dependency "bar"
-      end
-      build_lib "bar", "1.0", :path => lib_path("foo/bar")
-
-      install_gemfile <<-G
-        gem "foo", :path => "#{lib_path('foo')}"
-      G
-    end
-
-    it "unlocks all gems when the top level gem is updated" do
-      build_lib "foo", "2.0", :path => lib_path("foo") do |s|
-        s.add_dependency "bar"
+      build_gem "rack", "1.0.0", :to_system => true do |s|
+        s.write "lib/rack.rb", "puts 'FAIL'"
       end
 
-      bundle "install"
-
-      should_be_installed "foo 2.0", "bar 1.0"
-    end
-
-    it "unlocks all gems when a child dependency gem is updated" do
-      build_lib "bar", "2.0", :path => lib_path("foo/bar")
-
-      bundle "install"
-
-      should_be_installed "foo 1.0", "bar 2.0"
-    end
-  end
-
-  describe "when dependencies in the path are updated" do
-    before :each do
-      build_lib "foo", "1.0", :path => lib_path("foo")
-
-      install_gemfile <<-G
+      gemfile <<-G
         source "file://#{gem_repo1}"
-        gem "foo", :path => "#{lib_path('foo')}"
+        gem "rack"
       G
     end
 
-    it "gets dependencies that are updated in the path" do
-      build_lib "foo", "1.0", :path => lib_path("foo") do |s|
-        s.add_dependency "rack"
+    it "does not use available system gems with bundle --path vendor/bundle" do
+      bundle "install --path vendor/bundle"
+      should_be_installed "rack 1.0.0"
+    end
+
+    it "handles paths with regex characters in them" do
+      dir = bundled_app("bun++dle")
+      dir.mkpath
+
+      Dir.chdir(dir) do
+        bundle "install --path vendor/bundle"
+        expect(out).to include("installed into ./vendor/bundle")
       end
 
+      dir.rmtree
+    end
+
+    it "prints a warning to let the user know what has happened with bundle --path vendor/bundle" do
+      bundle "install --path vendor/bundle"
+      expect(out).to include("gems are installed into ./vendor")
+    end
+
+    it "disallows --path vendor/bundle --system" do
+      bundle "install --path vendor/bundle --system"
+      expect(out).to include("Please choose.")
+    end
+
+    it "remembers to disable system gems after the first time with bundle --path vendor/bundle" do
+      bundle "install --path vendor/bundle"
+      FileUtils.rm_rf bundled_app("vendor")
       bundle "install"
 
+      expect(vendored_gems("gems/rack-1.0.0")).to be_directory
       should_be_installed "rack 1.0.0"
     end
   end
 
-  describe "switching sources" do
-    it "doesn't switch pinned git sources to rubygems when pinning the parent gem to a path source" do
-      build_gem "foo", "1.0", :to_system => true do |s|
-        s.write "lib/foo.rb", "raise 'fail'"
-      end
-      build_lib "foo", "1.0", :path => lib_path('bar/foo')
-      build_git "bar", "1.0", :path => lib_path('bar') do |s|
-        s.add_dependency 'foo'
+  describe "when BUNDLE_PATH or the global path config is set" do
+    before :each do
+      build_lib "rack", "1.0.0", :to_system => true do |s|
+        s.write "lib/rack.rb", "raise 'FAIL'"
       end
 
-      install_gemfile <<-G
+      gemfile <<-G
         source "file://#{gem_repo1}"
-        gem "bar", :git => "#{lib_path('bar')}"
+        gem "rack"
       G
-
-      install_gemfile <<-G
-        source "file://#{gem_repo1}"
-        gem "bar", :path => "#{lib_path('bar')}"
-      G
-
-      should_be_installed "foo 1.0", "bar 1.0"
     end
 
-    it "switches the source when the gem existed in rubygems and the path was already being used for another gem" do
-      build_lib "foo", "1.0", :path => lib_path("foo")
-      build_gem "bar", "1.0", :to_system => true do |s|
-        s.write "lib/bar.rb", "raise 'fail'"
+    def set_bundle_path(type, location)
+      if type == :env
+        ENV["BUNDLE_PATH"] = location
+      elsif type == :global
+        bundle "config path #{location}", "no-color" => nil
+      end
+    end
+
+    [:env, :global].each do |type|
+      it "installs gems to a path if one is specified" do
+        set_bundle_path(type, bundled_app("vendor2").to_s)
+        bundle "install --path vendor/bundle"
+
+        expect(vendored_gems("gems/rack-1.0.0")).to be_directory
+        expect(bundled_app("vendor2")).not_to be_directory
+        should_be_installed "rack 1.0.0"
       end
 
-      install_gemfile <<-G
-        source "file://#{gem_repo1}"
-        gem "bar"
-        path "#{lib_path('foo')}" do
-          gem "foo"
+      it "installs gems to BUNDLE_PATH with #{type}" do
+        set_bundle_path(type, bundled_app("vendor").to_s)
+
+        bundle :install
+
+        expect(bundled_app("vendor/gems/rack-1.0.0")).to be_directory
+        should_be_installed "rack 1.0.0"
+      end
+
+      it "installs gems to BUNDLE_PATH relative to root when relative" do
+        set_bundle_path(type, "vendor")
+
+        FileUtils.mkdir_p bundled_app("lol")
+        Dir.chdir(bundled_app("lol")) do
+          bundle :install
         end
+
+        expect(bundled_app("vendor/gems/rack-1.0.0")).to be_directory
+        should_be_installed "rack 1.0.0"
+      end
+    end
+
+    it "installs gems to BUNDLE_PATH from .bundle/config" do
+      config "BUNDLE_PATH" => bundled_app("vendor/bundle").to_s
+
+      bundle :install
+
+      expect(vendored_gems("gems/rack-1.0.0")).to be_directory
+      should_be_installed "rack 1.0.0"
+    end
+
+    it "sets BUNDLE_PATH as the first argument to bundle install" do
+      bundle "install --path ./vendor/bundle"
+
+      expect(vendored_gems("gems/rack-1.0.0")).to be_directory
+      should_be_installed "rack 1.0.0"
+    end
+
+    it "disables system gems when passing a path to install" do
+      # This is so that vendored gems can be distributed to others
+      build_gem "rack", "1.1.0", :to_system => true
+      bundle "install --path ./vendor/bundle"
+
+      expect(vendored_gems("gems/rack-1.0.0")).to be_directory
+      should_be_installed "rack 1.0.0"
+    end
+  end
+
+  describe "to a dead symlink" do
+    before do
+      in_app_root do
+        `ln -s /tmp/idontexist bundle`
+      end
+    end
+
+    it "reports the symlink is dead" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
       G
 
-      build_lib "bar", "1.0", :path => lib_path("foo/bar")
-
-      install_gemfile <<-G
-        source "file://#{gem_repo1}"
-        path "#{lib_path('foo')}" do
-          gem "foo"
-          gem "bar"
-        end
-      G
-
-      should_be_installed "bar 1.0"
+      bundle "install --path bundle"
+      expect(out).to match(/invalid symlink/)
     end
   end
 end

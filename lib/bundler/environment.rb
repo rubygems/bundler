@@ -6,17 +6,12 @@ module Bundler
       @root = root
       @definition = definition
 
-      env_file = Bundler.app_config_path.join('environment.rb')
+      env_file = Bundler.app_config_path.join("environment.rb")
       env_file.rmtree if env_file.exist?
     end
 
     def inspect
       @definition.to_lock.inspect
-    end
-
-    # TODO: Remove this method. It's used in cli.rb still
-    def index
-      @definition.index
     end
 
     def requested_specs
@@ -35,13 +30,12 @@ module Bundler
       @definition.current_dependencies
     end
 
-    def lock
-      @definition.lock(Bundler.default_lockfile)
+    def lock(opts = {})
+      @definition.lock(Bundler.default_lockfile, opts[:preserve_bundled_with])
     end
 
     def update(*gems)
       # Nothing
     end
-
   end
 end

@@ -11,6 +11,10 @@ class EndpointExtra < Endpoint
     File.read("#{gem_repo2}/specs.4.8.gz")
   end
 
+  get "/extra/prerelease_specs.4.8.gz" do
+    File.read("#{gem_repo2}/prerelease_specs.4.8.gz")
+  end
+
   get "/extra/quick/Marshal.4.8/:id" do
     redirect "/extra/fetch/actual/gem/#{params[:id]}"
   end

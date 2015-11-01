@@ -1,12 +1,13 @@
 require "uri"
 require "rubygems/spec_fetcher"
+require "bundler/match_platform"
 
 module Bundler
   class LazySpecification
     include MatchPlatform
 
     attr_reader :name, :version, :dependencies, :platform
-    attr_accessor :source
+    attr_accessor :source, :remote
 
     def initialize(name, version, platform, source = nil)
       @name          = name
@@ -18,7 +19,7 @@ module Bundler
     end
 
     def full_name
-      if platform == Gem::Platform::RUBY or platform.nil? then
+      if platform == Gem::Platform::RUBY or platform.nil?
         "#{@name}-#{@version}"
       else
         "#{@name}-#{@version}-#{platform}"
@@ -26,8 +27,7 @@ module Bundler
     end
 
     def ==(other)
-      [name, version, dependencies, platform, source] ==
-        [other.name, other.version, other.dependencies, other.platform, other.source]
+      identifier == other.identifier
     end
 
     def satisfies?(dependency)
@@ -41,7 +41,7 @@ module Bundler
         out = "    #{name} (#{version}-#{platform})\n"
       end
 
-      dependencies.sort_by {|d| d.to_s }.each do |dep|
+      dependencies.sort_by(&:to_s).uniq.each do |dep|
         next if dep.type == :development
         out << "    #{dep.to_lock}\n"
       end
@@ -58,7 +58,11 @@ module Bundler
     end
 
     def to_s
-      "#{name} (#{version})"
+      @__to_s ||= "#{name} (#{version})"
+    end
+
+    def identifier
+      @__identifier ||= [name, version, source, platform, dependencies].hash
     end
 
   private
@@ -74,6 +78,5 @@ module Bundler
 
       @specification.send(method, *args, &blk)
     end
-
   end
 end

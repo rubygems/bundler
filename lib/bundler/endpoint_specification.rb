@@ -1,12 +1,10 @@
-require 'uri'
-
 module Bundler
   # used for Creating Specifications from the Gemcutter Endpoint
   class EndpointSpecification < Gem::Specification
     include MatchPlatform
 
     attr_reader :name, :version, :platform, :dependencies
-    attr_accessor :source
+    attr_accessor :source, :remote
 
     def initialize(name, version, platform, dependencies)
       @name         = name
@@ -16,16 +14,26 @@ module Bundler
     end
 
     def fetch_platform
-      @plaftorm
+      @platform
     end
 
     # needed for standalone, load required_paths from local gemspec
-    # after the gem in installed
+    # after the gem is installed
     def require_paths
       if @remote_specification
         @remote_specification.require_paths
       elsif _local_specification
         _local_specification.require_paths
+      else
+        super
+      end
+    end
+
+    # needed for inline
+    def load_paths
+      # remote specs aren't installed, and can't have load_paths
+      if _local_specification
+        _local_specification.load_paths
       else
         super
       end
@@ -62,15 +70,29 @@ module Bundler
       end
     end
 
+    # needed for "with native extensions" during install
+    def extensions
+      if @remote_specification
+        @remote_specification.extensions
+      elsif _local_specification
+        _local_specification.extensions
+      end
+    end
+
     def _local_specification
-      eval(File.read(local_specification_path)) if @loaded_from && File.exists?(local_specification_path)
+      if @loaded_from && File.exist?(local_specification_path)
+        eval(File.read(local_specification_path)).tap do |spec|
+          spec.loaded_from = @loaded_from
+        end
+      end
     end
 
     def __swap__(spec)
       @remote_specification = spec
     end
 
-    private
+  private
+
     def local_specification_path
       "#{base_dir}/specifications/#{full_name}.gemspec"
     end

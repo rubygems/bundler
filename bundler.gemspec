@@ -1,31 +1,34 @@
-# -*- encoding: utf-8 -*-
-lib = File.expand_path('../lib/', __FILE__)
+# coding: utf-8
+lib = File.expand_path("../lib/", __FILE__)
 $:.unshift lib unless $:.include?(lib)
-
-require 'bundler/version'
+require "bundler/version"
 
 Gem::Specification.new do |s|
   s.name        = "bundler"
   s.version     = Bundler::VERSION
-  s.platform    = Gem::Platform::RUBY
+  s.licenses    = ["MIT"]
   s.authors     = ["André Arko", "Terence Lee", "Carl Lerche", "Yehuda Katz"]
-  s.email       = ["andre@arko.net"]
-  s.homepage    = "http://gembundler.com"
-  s.summary     = %q{The best way to manage your application's dependencies}
-  s.description = %q{Bundler manages an application's dependencies through its entire life, across many machines, systematically and repeatably}
+  s.email       = ["andre.arko+terence.lee@gmail.com"]
+  s.homepage    = "http://bundler.io"
+  s.summary     = "The best way to manage your application's dependencies"
+  s.description = "Bundler manages an application's dependencies through its entire life, across many machines, systematically and repeatably"
 
   s.required_ruby_version     = ">= 1.8.7"
   s.required_rubygems_version = ">= 1.3.6"
-  s.rubyforge_project         = "bundler"
 
-  s.add_development_dependency "ronn"
-  s.add_development_dependency "rspec", "~> 2.0"
+  s.add_development_dependency "automatiek", "~> 0.1.0"
+  s.add_development_dependency "mustache",   "0.99.6"
+  s.add_development_dependency "rake",       "~> 10.0"
+  s.add_development_dependency "rdiscount",  "~> 1.6"
+  s.add_development_dependency "ronn",       "~> 0.7.3"
+  s.add_development_dependency "rspec",      "~> 3.0"
 
-  # Man files are required because they are ignored by git
-  man_files            = Dir.glob("lib/bundler/man/**/*")
-  git_files            = `git ls-files`.split("\n") rescue ''
-  s.files              = git_files + man_files
-  s.test_files         = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.executables        = %w(bundle)
-  s.require_paths      = ["lib"]
+  s.files = `git ls-files -z`.split("\x0").reject {|f| f.match(%r{^(test|spec|features)/}) }
+  # we don't check in man pages, but we need to ship them because
+  # we use them to generate the long-form help for each command.
+  s.files += Dir.glob("lib/bundler/man/**/*")
+
+  s.bindir        = "exe"
+  s.executables   = %w(bundle bundler)
+  s.require_paths = ["lib"]
 end

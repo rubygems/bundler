@@ -3,7 +3,7 @@ bundle-update(1) -- Update your gems to the latest available versions
 
 ## SYNOPSIS
 
-`bundle update` <*gems> [--source=NAME]
+`bundle update` <*gems> [--group=NAME] [--source=NAME] [--local]
 
 ## DESCRIPTION
 
@@ -17,10 +17,19 @@ gem.
 
 ## OPTIONS
 
+* `--group=<name>`:
+  Only update the gems in the specified group. For instance, you can update all gems
+  in the development group with `bundle update --group development`. You can also
+  call `bundle update rails --group test` to update the rails gem and all gems in
+  the test group, for example.
+
 * `--source=<name>`:
   The name of a `:git` or `:path` source used in the Gemfile(5). For
   instance, with a `:git` source of `http://github.com/rails/rails.git`,
   you would call `bundle update --source rails`
+
+* `--local`:
+  Do not attempt to fetch gems remotely and use the gem cache instead.
 
 ## UPDATING ALL GEMS
 
@@ -30,7 +39,7 @@ based on the latest versions of all gems available in the sources.
 
 Consider the following Gemfile(5):
 
-    source "http://rubygems.org"
+    source "https://rubygems.org"
 
     gem "rails", "3.0.0.rc"
     gem "nokogiri"
@@ -38,37 +47,40 @@ Consider the following Gemfile(5):
 When you run [bundle install(1)][bundle-install] the first time, bundler will resolve
 all of the dependencies, all the way down, and install what you need:
 
-    Fetching source index for http://rubygems.org/
-    Installing rake (0.8.7)
-    Installing abstract (1.0.0)
-    Installing activesupport (3.0.0.rc)
-    Installing builder (2.1.2)
-    Installing i18n (0.4.1)
-    Installing activemodel (3.0.0.rc)
-    Installing erubis (2.6.6)
-    Installing rack (1.2.1)
-    Installing rack-mount (0.6.9)
-    Installing rack-test (0.5.4)
-    Installing tzinfo (0.3.22)
-    Installing actionpack (3.0.0.rc)
-    Installing mime-types (1.16)
-    Installing polyglot (0.3.1)
-    Installing treetop (1.4.8)
-    Installing mail (2.2.5)
-    Installing actionmailer (3.0.0.rc)
-    Installing arel (0.4.0)
-    Installing activerecord (3.0.0.rc)
-    Installing activeresource (3.0.0.rc)
-    Installing bundler (1.0.0.rc.3)
-    Installing nokogiri (1.4.3.1) with native extensions
-    Installing thor (0.14.0)
-    Installing railties (3.0.0.rc)
-    Installing rails (3.0.0.rc)
+    Fetching gem metadata from https://rubygems.org/.........
+    Resolving dependencies...
+    Installing builder 2.1.2
+    Installing abstract 1.0.0
+    Installing rack 1.2.8
+    Using bundler 1.7.6
+    Installing rake 10.4.0
+    Installing polyglot 0.3.5
+    Installing mime-types 1.25.1
+    Installing i18n 0.4.2
+    Installing mini_portile 0.6.1
+    Installing tzinfo 0.3.42
+    Installing rack-mount 0.6.14
+    Installing rack-test 0.5.7
+    Installing treetop 1.4.15
+    Installing thor 0.14.6
+    Installing activesupport 3.0.0.rc
+    Installing erubis 2.6.6
+    Installing activemodel 3.0.0.rc
+    Installing arel 0.4.0
+    Installing mail 2.2.20
+    Installing activeresource 3.0.0.rc
+    Installing actionpack 3.0.0.rc
+    Installing activerecord 3.0.0.rc
+    Installing actionmailer 3.0.0.rc
+    Installing railties 3.0.0.rc
+    Installing rails 3.0.0.rc
+    Installing nokogiri 1.6.5
 
-    Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.
+    Bundle complete! 2 Gemfile dependencies, 26 gems total.
+    Use `bundle show [gemname]` to see where a bundled gem is installed.
 
 As you can see, even though you have just two gems in the Gemfile(5), your application
-actually needs 25 different gems in order to run. Bundler remembers the exact versions
+actually needs 26 different gems in order to run. Bundler remembers the exact versions
 it installed in `Gemfile.lock`. The next time you run [bundle install(1)][bundle-install], bundler skips
 the dependency resolution and installs the same gems as it installed last time.
 
@@ -103,7 +115,7 @@ Sometimes, multiple gems declared in your Gemfile(5) are satisfied by the same
 second-level dependency. For instance, consider the case of `thin` and
 `rack-perftools-profiler`.
 
-    source "http://rubygems.org"
+    source "https://rubygems.org"
 
     gem "thin"
     gem "rack-perftools-profiler"
@@ -111,7 +123,7 @@ second-level dependency. For instance, consider the case of `thin` and
 The `thin` gem depends on `rack >= 1.0`, while `rack-perftools-profiler` depends
 on `rack ~> 1.0`. If you run bundle install, you get:
 
-    Fetching source index for http://rubygems.org/
+    Fetching source index for https://rubygems.org/
     Installing daemons (1.1.0)
     Installing eventmachine (0.12.10) with native extensions
     Installing open4 (1.0.1)

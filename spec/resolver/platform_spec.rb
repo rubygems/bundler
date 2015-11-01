@@ -29,12 +29,12 @@ describe "Resolving platform craziness" do
   end
 
   describe "with mingw32" do
-
     before :each do
       @index = build_index do
-        platforms "mingw32 mswin32" do |platform|
+        platforms "mingw32 mswin32 x64-mingw32" do |platform|
           gem "thin", "1.2.7", platform
         end
+        gem "win32-api", "1.5.1", "universal-mingw32"
       end
     end
 
@@ -51,6 +51,24 @@ describe "Resolving platform craziness" do
       dep "thin"
       should_resolve_as %w(thin-1.2.7-x86-mingw32)
     end
+
+    it "finds x64-mingw gems" do
+      platforms "x64-mingw32"
+      dep "thin"
+      should_resolve_as %w(thin-1.2.7-x64-mingw32)
+    end
+
+    it "finds universal-mingw gems on x86-mingw" do
+      platform "x86-mingw32"
+      dep "win32-api"
+      should_resolve_as %w(win32-api-1.5.1-universal-mingw32)
+    end
+
+    it "finds universal-mingw gems on x64-mingw" do
+      platform "x64-mingw32"
+      dep "win32-api"
+      should_resolve_as %w(win32-api-1.5.1-universal-mingw32)
+    end
   end
 
   describe "with conflicting cases" do
@@ -60,7 +78,7 @@ describe "Resolving platform craziness" do
           dep "bar", ">= 0"
         end
 
-        gem 'bar', "1.0.0" do
+        gem "bar", "1.0.0" do
           dep "baz", "~> 1.0.0"
         end
 

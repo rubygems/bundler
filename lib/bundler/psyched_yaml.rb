@@ -1,15 +1,26 @@
-# Psych could be a gem
+# Psych could be a gem, so try to ask for it
 begin
-  gem 'psych'
-rescue Gem::LoadError
-end if defined?(Gem)
-
-# Psych could be a stdlib
-begin
-  # it's too late if Syck is already loaded
-  require 'psych' unless defined?(Syck)
+  gem "psych"
 rescue LoadError
+end if defined?(gem)
+
+# Psych could just be in the stdlib
+# but it's too late if Syck is already loaded
+begin
+  require "psych" unless defined?(Syck)
+rescue LoadError
+  # Apparently Psych wasn't available. Oh well.
 end
 
-# Psych might NOT EXIST AT ALL
-require 'yaml'
+# At least load the YAML stdlib, whatever that may be
+require "yaml" unless defined?(YAML.dump)
+
+module Bundler
+  # On encountering invalid YAML,
+  # Psych raises Psych::SyntaxError
+  if defined?(::Psych::SyntaxError)
+    YamlSyntaxError = ::Psych::SyntaxError
+  else # Syck raises ArgumentError
+    YamlSyntaxError = ::ArgumentError
+  end
+end

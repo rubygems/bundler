@@ -1,4 +1,4 @@
-require 'pathname'
+require "pathname"
 
 module Spec
   module Path
@@ -24,7 +24,7 @@ module Spec
       root.join(*path)
     end
 
-    alias bundled_app1 bundled_app
+    alias_method :bundled_app1, :bundled_app
 
     def bundled_app2(*path)
       root = tmp.join("bundled_app2")
@@ -33,7 +33,7 @@ module Spec
     end
 
     def vendored_gems(path = nil)
-      bundled_app("vendor/bundle/#{Gem.ruby_engine}/#{Gem::ConfigMap[:ruby_version]}/#{path}")
+      bundled_app(*["vendor/bundle", Gem.ruby_engine, Gem::ConfigMap[:ruby_version], path].compact)
     end
 
     def cached_gem(path)
@@ -48,12 +48,24 @@ module Spec
       tmp("gems/remote1", *args)
     end
 
+    def gem_repo_missing(*args)
+      tmp("gems/missing", *args)
+    end
+
     def gem_repo2(*args)
       tmp("gems/remote2", *args)
     end
 
     def gem_repo3(*args)
       tmp("gems/remote3", *args)
+    end
+
+    def gem_repo4(*args)
+      tmp("gems/remote4", *args)
+    end
+
+    def security_repo(*args)
+      tmp("gems/security_repo", *args)
     end
 
     def system_gem_path(*path)
@@ -65,7 +77,7 @@ module Spec
     end
 
     def bundler_path
-      Pathname.new(File.expand_path('../../../lib', __FILE__))
+      Pathname.new(File.expand_path("../../../lib", __FILE__))
     end
 
     extend self

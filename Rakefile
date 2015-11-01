@@ -1,8 +1,10 @@
 # -*- encoding: utf-8 -*-
 $:.unshift File.expand_path("../lib", __FILE__)
-require 'bundler/gem_tasks'
+require "shellwords"
+require "benchmark"
 
-task :release => ["man:clean", "man:build"]
+RUBYGEMS_REPO = File.expand_path("tmp/rubygems")
+BUNDLER_SPEC = Gem::Specification.load("bundler.gemspec")
 
 def safe_task(&block)
   yield
@@ -11,61 +13,120 @@ rescue
   false
 end
 
-def sudo_task(task)
-  system("sudo -E rake #{task}")
+# Benchmark task execution
+module Rake
+  class Task
+    alias_method :real_invoke, :invoke
+
+    def invoke(*args)
+      time = Benchmark.measure(@name) do
+        real_invoke(*args)
+      end
+      puts "#{@name} ran for #{time}"
+    end
+  end
 end
 
 namespace :spec do
   desc "Ensure spec dependencies are installed"
   task :deps do
-    sh "gem list ronn | (grep 'ronn' 1> /dev/null) || gem install ronn --no-ri --no-rdoc"
-    sh "gem list rspec | (grep 'rspec (2.' 1> /dev/null) || gem install rspec --no-ri --no-rdoc"
+    deps = Hash[BUNDLER_SPEC.development_dependencies.map do |d|
+      [d.name, d.requirement.to_s]
+    end]
+    deps["rubocop"] ||= "= 0.33.0" if RUBY_VERSION >= "1.9.3" # can't go in the gemspec because of the ruby version requirement
+
+    # JRuby can't build ronn or rdiscount, so we skip that
+    if defined?(RUBY_ENGINE) && RUBY_ENGINE == "jruby"
+      deps.delete("ronn")
+      deps.delete("rdiscount")
+    end
+
+    deps.sort_by {|name, _| name }.each do |name, version|
+      sh %{#{Gem.ruby} -S gem list -i "^#{name}$" -v "#{version}" || } +
+         %{#{Gem.ruby} -S gem install #{name} -v "#{version}" --no-ri --no-rdoc}
+    end
+
+    # Download and install gems used inside tests
+    $LOAD_PATH.unshift("./spec")
+    require "support/rubygems_ext"
+    Spec::Rubygems.setup
+  end
+
+  namespace :travis do
+    task :deps do
+      # Give the travis user a name so that git won't fatally error
+      system "sudo sed -i 's/1000::/1000:Travis:/g' /etc/passwd"
+      # Strip secure_path so that RVM paths transmit through sudo -E
+      system "sudo sed -i '/secure_path/d' /etc/sudoers"
+      # Install groff so ronn can generate man/help pages
+      sh "sudo apt-get install groff -y"
+      # Install graphviz so that the viz specs can run
+      sh "sudo apt-get install graphviz -y 2>&1 | tail -n 2"
+      if RUBY_VERSION < "1.9"
+        # Downgrade Rubygems on 1.8 so Ronn can be required
+        # https://github.com/rubygems/rubygems/issues/784
+        sh "gem update --system 2.1.11"
+      else
+        # Downgrade Rubygems so RSpec 3 can be installed
+        # https://github.com/rubygems/rubygems/issues/813
+        sh "gem update --system 2.2.0"
+      end
+      # Install the other gem deps, etc.
+      Rake::Task["spec:deps"].invoke
+    end
   end
 end
 
 begin
-  # running the specs needs both rspec and ronn
-  require 'rspec/core/rake_task'
-  require 'ronn'
+  rspec = BUNDLER_SPEC.development_dependencies.find {|d| d.name == "rspec" }
+  gem "rspec", rspec.requirement.to_s
+  require "rspec/core/rake_task"
 
   desc "Run specs"
-  RSpec::Core::RakeTask.new do |t|
-    t.rspec_opts = %w(-fs --color)
-    t.ruby_opts  = %w(-w)
-  end
+  RSpec::Core::RakeTask.new
   task :spec => "man:build"
+
+  if RUBY_VERSION >= "1.9.3"
+    # can't go in the gemspec because of the ruby version requirement
+    gem "rubocop", "= 0.33.0"
+    require "rubocop/rake_task"
+    RuboCop::RakeTask.new
+  end
 
   namespace :spec do
     task :clean do
-      rm_rf 'tmp'
+      rm_rf "tmp"
     end
 
-    desc "Run the real-world spec suite (reequires internet)"
-    task :realworld => ["set_realworld", "spec"]
+    desc "Run the real-world spec suite (requires internet)"
+    task :realworld => %w[set_realworld spec]
 
     task :set_realworld do
-      ENV['BUNDLER_REALWORLD_TESTS'] = '1'
+      ENV["BUNDLER_REALWORLD_TESTS"] = "1"
     end
 
     desc "Run the spec suite with the sudo tests"
-    task :sudo => ["set_sudo", "spec", "clean_sudo"]
+    task :sudo => %w[set_sudo spec clean_sudo]
 
     task :set_sudo do
-      ENV['BUNDLER_SUDO_TESTS'] = '1'
+      ENV["BUNDLER_SUDO_TESTS"] = "1"
     end
 
     task :clean_sudo do
       puts "Cleaning up sudo test files..."
-      system "sudo rm -rf #{File.expand_path('../tmp/sudo_gem_home', __FILE__)}"
+      system "sudo rm -rf #{File.expand_path("../tmp/sudo_gem_home", __FILE__)}"
     end
 
+    # Rubygems specs by version
     namespace :rubygems do
-      # Rubygems specs by version
       rubyopt = ENV["RUBYOPT"]
-      %w(master v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.10).each do |rg|
+      # When editing this list, also edit .travis.yml!
+      branches = %w(master)
+      releases = %w(v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.29 v2.0.14 v2.1.11 v2.2.3 v2.4.8)
+      (branches + releases).each do |rg|
         desc "Run specs with Rubygems #{rg}"
         RSpec::Core::RakeTask.new(rg) do |t|
-          t.rspec_opts = %w(-fs --color)
+          t.rspec_opts = %w(--format documentation --color)
           t.ruby_opts  = %w(-w)
         end
 
@@ -76,34 +137,40 @@ begin
         end
 
         task "clone_rubygems_#{rg}" do
-          unless File.directory?("tmp/rubygems")
-            system("git clone git://github.com/rubygems/rubygems.git tmp/rubygems")
+          unless File.directory?(RUBYGEMS_REPO)
+            system("git clone https://github.com/rubygems/rubygems.git tmp/rubygems")
           end
           hash = nil
 
-          Dir.chdir("tmp/rubygems") do
+          Dir.chdir(RUBYGEMS_REPO) do
             system("git remote update")
-            system("git checkout #{rg}")
-            system("git pull origin master") if rg == "master"
-            hash = `git rev-parse HEAD`.strip
+            if rg == "master"
+              system("git checkout origin/master")
+            else
+              system("git checkout #{rg}") || raise("Unknown Rubygems ref #{rg}")
+            end
+            hash = `git rev-parse HEAD`.chomp
           end
 
-          puts "Running bundler specs against rubygems '#{rg}' at #{hash}"
+          puts "Checked out rubygems '#{rg}' at #{hash}"
           ENV["RUBYOPT"] = "-I#{File.expand_path("tmp/rubygems/lib")} #{rubyopt}"
+          puts "RUBYOPT=#{ENV["RUBYOPT"]}"
         end
 
-        task rg => ["clone_rubygems_#{rg}", "man:build"]
+        task rg => ["man:build", "clone_rubygems_#{rg}"]
         task "rubygems:all" => rg
       end
 
       desc "Run specs under a Rubygems checkout (set RG=path)"
       RSpec::Core::RakeTask.new("co") do |t|
-        t.rspec_opts = %w(-fs --color)
+        t.rspec_opts = %w(--format documentation --color)
         t.ruby_opts  = %w(-w)
       end
 
       task "setup_co" do
-        ENV["RUBYOPT"] = "-I#{File.expand_path ENV['RG']} #{rubyopt}"
+        rg = File.expand_path ENV["RG"]
+        puts "Running specs against Rubygems in #{rg}..."
+        ENV["RUBYOPT"] = "-I#{rg} #{rubyopt}"
       end
 
       task "co" => "setup_co"
@@ -112,7 +179,12 @@ begin
 
     desc "Run the tests on Travis CI against a rubygem version (using ENV['RGV'])"
     task :travis do
-      rg = ENV['RGV'] || 'master'
+      rg = ENV["RGV"] || raise("Rubygems version is required on Travis!")
+
+      if RUBY_VERSION > "1.9.3"
+        puts "\n\e[1;33m[Travis CI] Running bundler linter\e[m\n\n"
+        Rake::Task["rubocop"].invoke
+      end
 
       puts "\n\e[1;33m[Travis CI] Running bundler specs against rubygems #{rg}\e[m\n\n"
       specs = safe_task { Rake::Task["spec:rubygems:#{rg}"].invoke }
@@ -120,29 +192,52 @@ begin
       Rake::Task["spec:rubygems:#{rg}"].reenable
 
       puts "\n\e[1;33m[Travis CI] Running bundler sudo specs against rubygems #{rg}\e[m\n\n"
-      sudos = sudo_task "spec:rubygems:#{rg}:sudo"
-      chown = system("sudo chown -R #{ENV['USER']} #{File.join(File.dirname(__FILE__), 'tmp')}")
+      sudos = system("sudo -E rake spec:rubygems:#{rg}:sudo")
+      # clean up by chowning the newly root-owned tmp directory back to the travis user
+      system("sudo chown -R #{ENV["USER"]} #{File.join(File.dirname(__FILE__), "tmp")}")
 
       Rake::Task["spec:rubygems:#{rg}"].reenable
 
       puts "\n\e[1;33m[Travis CI] Running bundler real world specs against rubygems #{rg}\e[m\n\n"
       realworld = safe_task { Rake::Task["spec:rubygems:#{rg}:realworld"].invoke }
 
+      { "specs" => specs, "sudo" => sudos, "realworld" => realworld }.each do |name, passed|
+        if passed
+          puts "\e[0;32m[Travis CI] #{name} passed\e[m"
+        else
+          puts "\e[0;31m[Travis CI] #{name} failed\e[m"
+        end
+      end
+
       unless specs && sudos && realworld
-        fail "Bundler tests failed, please review the log for more information"
+        raise "Spec run failed, please review the log for more information"
       end
     end
   end
 
+rescue LoadError
+  task :spec do
+    abort "Run `rake spec:deps` to be able to run the specs"
+  end
+
+  task :rubocop do
+    abort "Run `rake spec:deps` to be able to run rubocop"
+  end
+end
+
+begin
+  require "ronn"
+
   namespace :man do
     directory "lib/bundler/man"
 
-    Dir["man/*.ronn"].each do |ronn|
-      basename = File.basename(ronn, ".ronn")
+    sources = Dir["man/*.ronn"].map {|f| File.basename(f, ".ronn") }
+    sources.map do |basename|
+      ronn = "man/#{basename}.ronn"
       roff = "lib/bundler/man/#{basename}"
 
       file roff => ["lib/bundler/man", ronn] do
-        sh "ronn --roff --pipe #{ronn} > #{roff}"
+        sh "#{Gem.ruby} -S ronn --roff --pipe #{ronn} > #{roff}"
       end
 
       file "#{roff}.txt" => roff do
@@ -152,56 +247,63 @@ begin
       task :build_all_pages => "#{roff}.txt"
     end
 
-    desc "Build the man pages"
-    task :build => "man:build_all_pages"
-
-    desc "Clean up from the built man pages"
     task :clean do
+      leftovers = Dir["lib/bundler/man/*"].reject do |f|
+        basename = File.basename(f).sub(/\.(txt|ronn)/, "")
+        sources.include?(basename)
+      end
+      rm leftovers if leftovers.any?
+    end
+
+    desc "Build the man pages"
+    task :build => ["man:clean", "man:build_all_pages"]
+
+    desc "Remove all built man pages"
+    task :clobber do
       rm_rf "lib/bundler/man"
     end
-  end
 
-  begin
-    require 'ci/reporter/rake/rspec'
-
-    namespace :ci do
-      desc "Run specs with Hudson output"
-      RSpec::Core::RakeTask.new(:spec)
-      task :spec => ["ci:setup:rspec", "man:build"]
-    end
-
-  rescue LoadError
-    namespace :ci do
-      task :spec do
-        abort "Run `rake ci:deps` to be able to run the CI specs"
-      end
-
-      desc "Install CI dependencies"
-      task :deps do
-        sh "gem list ci_reporter | (grep 'ci_reporter' 1> /dev/null) || gem install ci_reporter --no-ri --no-rdoc"
-      end
-      task :deps => "spec:deps"
-    end
+    task(:require) {}
   end
 
 rescue LoadError
-  task :spec do
-    abort "Run `rake spec:deps` to be able to run the specs"
+  namespace :man do
+    task(:require) { abort "Install the ronn gem to be able to release!" }
+    task(:build) { warn "Install the ronn gem to build the help pages" }
   end
 end
 
-namespace :vendor do
-  desc "Build the vendor dir"
-  task :build => :clean do
-    sh "git clone git://github.com/wycats/thor.git lib/bundler/vendor/tmp"
-    sh "mv lib/bundler/vendor/tmp/lib/* lib/bundler/vendor/"
-    rm_rf "lib/bundler/vendor/tmp"
+begin
+  require "automatiek"
+
+  Automatiek::RakeTask.new("molinillo") do |lib|
+    lib.download = { :github => "https://github.com/CocoaPods/Molinillo" }
+    lib.namespace = "Molinillo"
+    lib.prefix = "Bundler"
+    lib.vendor_lib = "lib/bundler/vendor/molinillo"
   end
 
-  desc "Clean the vendor dir"
-  task :clean do
-    rm_rf "lib/bundler/vendor"
+  Automatiek::RakeTask.new("thor") do |lib|
+    lib.download = { :github => "https://github.com/erikhuda/thor" }
+    lib.namespace = "Thor"
+    lib.prefix = "Bundler"
+    lib.vendor_lib = "lib/bundler/vendor/thor"
+  end
+rescue LoadError
+  namespace :vendor do
+    task(:molinillo) { abort "Install the automatiek gem to be able to vendor gems." }
+    task(:thor) { abort "Install the automatiek gem to be able to vendor gems." }
   end
 end
+
+desc "Update vendored SSL certs to match the certs vendored by Rubygems"
+task :update_certs => "spec:rubygems:clone_rubygems_master" do
+  require "bundler/ssl_certs/certificate_manager"
+  Bundler::SSLCerts::CertificateManager.update_from!(RUBYGEMS_REPO)
+end
+
+require "bundler/gem_tasks"
+task :build => ["man:build"]
+task :release => ["man:require", "man:build"]
 
 task :default => :spec

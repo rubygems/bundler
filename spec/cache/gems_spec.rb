@@ -1,7 +1,6 @@
 require "spec_helper"
 
 describe "bundle cache" do
-
   describe "when there are only gemsources" do
     before :each do
       gemfile <<-G
@@ -13,11 +12,11 @@ describe "bundle cache" do
     end
 
     it "copies the .gem file to vendor/cache" do
-      bundled_app("vendor/cache/rack-1.0.0.gem").should exist
+      expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
     end
 
     it "uses the cache as a source when installing gems" do
-      build_gem "omg", :path => bundled_app('vendor/cache')
+      build_gem "omg", :path => bundled_app("vendor/cache")
 
       install_gemfile <<-G
         source "file://#{gem_repo1}"
@@ -35,7 +34,7 @@ describe "bundle cache" do
     end
 
     it "does not reinstall gems from the cache if they exist on the system" do
-      build_gem "rack", "1.0.0", :path => bundled_app('vendor/cache') do |s|
+      build_gem "rack", "1.0.0", :path => bundled_app("vendor/cache") do |s|
         s.write "lib/rack.rb", "RACK = 'FAIL'"
       end
 
@@ -53,7 +52,7 @@ describe "bundle cache" do
         gem "rack"
       G
 
-      build_gem "rack", "1.0.0", :path => bundled_app('vendor/cache') do |s|
+      build_gem "rack", "1.0.0", :path => bundled_app("vendor/cache") do |s|
         s.write "lib/rack.rb", "RACK = 'FAIL'"
       end
 
@@ -70,7 +69,62 @@ describe "bundle cache" do
 
       bundle "cache"
 
-      bundled_app("Gemfile.lock").should exist
+      expect(bundled_app("Gemfile.lock")).to exist
+    end
+  end
+
+  describe "when there is a built-in gem", :ruby => "2.0" do
+    before :each do
+      build_repo2 do
+        build_gem "builtin_gem", "1.0.2"
+      end
+
+      build_gem "builtin_gem", "1.0.2", :to_system => true do |s|
+        s.summary = "This builtin_gem is bundled with Ruby"
+      end
+
+      FileUtils.rm("#{system_gem_path}/cache/builtin_gem-1.0.2.gem")
+    end
+
+    it "uses builtin gems" do
+      install_gemfile %|gem 'builtin_gem', '1.0.2'|
+      should_be_installed("builtin_gem 1.0.2")
+    end
+
+    it "caches remote and builtin gems" do
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem 'builtin_gem', '1.0.2'
+        gem 'rack', '1.0.0'
+      G
+
+      bundle :cache
+      expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
+      expect(bundled_app("vendor/cache/builtin_gem-1.0.2.gem")).to exist
+    end
+
+    it "doesn't make remote request after caching the gem" do
+      build_gem "builtin_gem_2", "1.0.2", :path => bundled_app("vendor/cache") do |s|
+        s.summary = "This builtin_gem is bundled with Ruby"
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        gem 'builtin_gem_2', '1.0.2'
+      G
+
+      bundle "install --local"
+      should_be_installed("builtin_gem_2 1.0.2")
+    end
+
+    it "errors if the builtin gem isn't available to cache" do
+      install_gemfile <<-G
+        gem 'builtin_gem', '1.0.2'
+      G
+
+      bundle :cache
+      expect(exitstatus).to_not eq(0) if exitstatus
+      expect(out).to include("builtin_gem-1.0.2 is built in to Ruby, and can't be cached")
     end
   end
 
@@ -102,7 +156,7 @@ describe "bundle cache" do
 
       bundle :cache
 
-      bundled_app("Gemfile.lock").should exist
+      expect(bundled_app("Gemfile.lock")).to exist
     end
   end
 
@@ -115,23 +169,23 @@ describe "bundle cache" do
         gem "actionpack"
       G
       bundle :cache
-      cached_gem("rack-1.0.0").should exist
-      cached_gem("actionpack-2.3.2").should exist
-      cached_gem("activesupport-2.3.2").should exist
+      expect(cached_gem("rack-1.0.0")).to exist
+      expect(cached_gem("actionpack-2.3.2")).to exist
+      expect(cached_gem("activesupport-2.3.2")).to exist
     end
 
     it "re-caches during install" do
       cached_gem("rack-1.0.0").rmtree
       bundle :install
-      out.should include("Updating .gem files in vendor/cache")
-      cached_gem("rack-1.0.0").should exist
+      expect(out).to include("Updating files in vendor/cache")
+      expect(cached_gem("rack-1.0.0")).to exist
     end
 
     it "adds and removes when gems are updated" do
       update_repo2
-      bundle 'update'
-      cached_gem("rack-1.2").should exist
-      cached_gem("rack-1.0.0").should_not exist
+      bundle "update"
+      expect(cached_gem("rack-1.2")).to exist
+      expect(cached_gem("rack-1.0.0")).not_to exist
     end
 
     it "adds new gems and dependencies" do
@@ -139,8 +193,8 @@ describe "bundle cache" do
         source "file://#{gem_repo2}"
         gem "rails"
       G
-      cached_gem("rails-2.3.2").should exist
-      cached_gem("activerecord-2.3.2").should exist
+      expect(cached_gem("rails-2.3.2")).to exist
+      expect(cached_gem("activerecord-2.3.2")).to exist
     end
 
     it "removes .gems for removed gems and dependencies" do
@@ -148,9 +202,9 @@ describe "bundle cache" do
         source "file://#{gem_repo2}"
         gem "rack"
       G
-      cached_gem("rack-1.0.0").should exist
-      cached_gem("actionpack-2.3.2").should_not exist
-      cached_gem("activesupport-2.3.2").should_not exist
+      expect(cached_gem("rack-1.0.0")).to exist
+      expect(cached_gem("actionpack-2.3.2")).not_to exist
+      expect(cached_gem("activesupport-2.3.2")).not_to exist
     end
 
     it "removes .gems when gem changes to git source" do
@@ -161,11 +215,10 @@ describe "bundle cache" do
         gem "rack", :git => "#{lib_path("rack-1.0")}"
         gem "actionpack"
       G
-      cached_gem("rack-1.0.0").should_not exist
-      cached_gem("actionpack-2.3.2").should exist
-      cached_gem("activesupport-2.3.2").should exist
+      expect(cached_gem("rack-1.0.0")).not_to exist
+      expect(cached_gem("actionpack-2.3.2")).to exist
+      expect(cached_gem("activesupport-2.3.2")).to exist
     end
-
 
     it "doesn't remove gems that are for another platform" do
       simulate_platform "java" do
@@ -175,7 +228,7 @@ describe "bundle cache" do
         G
 
         bundle :cache
-        cached_gem("platform_specific-1.0-java").should exist
+        expect(cached_gem("platform_specific-1.0-java")).to exist
       end
 
       simulate_new_machine
@@ -184,24 +237,24 @@ describe "bundle cache" do
         gem "platform_specific"
       G
 
-      cached_gem("platform_specific-1.0-#{Gem::Platform.local}").should exist
-      cached_gem("platform_specific-1.0-java").should exist
+      expect(cached_gem("platform_specific-1.0-#{Gem::Platform.local}")).to exist
+      expect(cached_gem("platform_specific-1.0-java")).to exist
     end
 
     it "doesn't remove gems with mismatched :rubygems_version or :date" do
       cached_gem("rack-1.0.0").rmtree
       build_gem "rack", "1.0.0",
-        :path => bundled_app('vendor/cache'),
+        :path => bundled_app("vendor/cache"),
         :rubygems_version => "1.3.2"
       simulate_new_machine
 
       bundle :install
-      cached_gem("rack-1.0.0").should exist
+      expect(cached_gem("rack-1.0.0")).to exist
     end
 
     it "handles directories and non .gem files in the cache" do
       bundled_app("vendor/cache/foo").mkdir
-      File.open(bundled_app("vendor/cache/bar"), 'w'){|f| f.write("not a gem") }
+      File.open(bundled_app("vendor/cache/bar"), "w") {|f| f.write("not a gem") }
       bundle :cache
     end
 
@@ -212,12 +265,21 @@ describe "bundle cache" do
       G
       bundle "cache"
       bundle "install"
-      out.should_not =~ /removing/i
+      expect(out).not_to match(/removing/i)
+    end
+
+    it "does not warn about all if it doesn't have any git/path dependency" do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+      bundle "cache"
+      expect(out).not_to match(/\-\-all/)
     end
 
     it "should install gems with the name bundler in them (that aren't bundler)" do
       build_gem "foo-bundler", "1.0",
-        :path => bundled_app('vendor/cache')
+        :path => bundled_app("vendor/cache")
 
       install_gemfile <<-G
         gem "foo-bundler"
@@ -226,5 +288,4 @@ describe "bundle cache" do
       should_be_installed "foo-bundler 1.0"
     end
   end
-
 end

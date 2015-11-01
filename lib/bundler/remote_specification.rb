@@ -5,12 +5,13 @@ module Bundler
   # Represents a lazily loaded gem specification, where the full specification
   # is on the source server in rubygems' "quick" index. The proxy object is to
   # be seeded with what we're given from the source's abbreviated index - the
-  # full specification will only be fetched when necesary.
+  # full specification will only be fetched when necessary.
   class RemoteSpecification
     include MatchPlatform
+    include Comparable
 
     attr_reader :name, :version, :platform
-    attr_accessor :source
+    attr_accessor :source, :remote
 
     def initialize(name, version, platform, spec_fetcher)
       @name         = name
@@ -26,10 +27,21 @@ module Bundler
     end
 
     def full_name
-      if platform == Gem::Platform::RUBY or platform.nil? then
+      if platform == Gem::Platform::RUBY or platform.nil?
         "#{@name}-#{@version}"
       else
         "#{@name}-#{@version}-#{platform}"
+      end
+    end
+
+    # Compare this specification against another object. Using sort_obj
+    # is compatible with Gem::Specification and other Bundler or RubyGems
+    # objects. Otherwise, use the default Object comparison.
+    def <=>(other)
+      if other.respond_to?(:sort_obj)
+        sort_obj <=> other.sort_obj
+      else
+        super
       end
     end
 
@@ -37,13 +49,26 @@ module Bundler
     # once the remote gem is downloaded, the backend specification will
     # be swapped out.
     def __swap__(spec)
-      @specification = spec
+      @_remote_specification = spec
+    end
+
+    # Create a delegate used for sorting. This strategy is copied from
+    # RubyGems 2.23 and ensures that Bundler's specifications can be
+    # compared and sorted with RubyGems' own specifications.
+    #
+    # @see #<=>
+    # @see Gem::Specification#sort_obj
+    #
+    # @return [Array] an object you can use to compare and sort this
+    #   specification against other specifications
+    def sort_obj
+      [@name, @version, @platform == Gem::Platform::RUBY ? -1 : 1]
     end
 
   private
 
     def _remote_specification
-      @specification ||= @spec_fetcher.fetch_spec([@name, @version, @platform])
+      @_remote_specification ||= @spec_fetcher.fetch_spec([@name, @version, @platform])
     end
 
     def method_missing(method, *args, &blk)

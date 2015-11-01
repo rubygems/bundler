@@ -96,23 +96,11 @@ describe "bundle install across platforms" do
 
     bundle "install --path vendor/bundle"
 
-    vendored_gems("gems/rack-1.0.0").should exist
-  end
-
-  it "works after switching Rubies" do
-    gemfile <<-G
-      source "file://#{gem_repo1}"
-
-      gem "rack", "1.0.0"
-    G
+    new_version = Gem::ConfigMap[:ruby_version] == "1.8" ? "1.9.1" : "1.8"
+    FileUtils.mv(vendored_gems, bundled_app("vendor/bundle", Gem.ruby_engine, new_version))
 
     bundle "install --path vendor/bundle"
-
-    new_version = Gem::ConfigMap[:ruby_version] == "1.8" ? "1.9.1" : "1.8"
-    FileUtils.mv(vendored_gems, bundled_app("vendor/bundle/#{Gem.ruby_engine}/#{new_version}"))
-
-    bundle "install --path ./vendor/bundle"
-    vendored_gems("gems/rack-1.0.0").should exist
+    expect(vendored_gems("gems/rack-1.0.0")).to exist
   end
 end
 
@@ -138,7 +126,7 @@ describe "bundle install with platform conditionals" do
       end
     G
 
-    should_be_installed     "rack 1.0"
+    should_be_installed "rack 1.0"
     should_not_be_installed "nokogiri 1.4.2"
   end
 
@@ -156,7 +144,7 @@ describe "bundle install with platform conditionals" do
       gem "rack"
       gem "nokogiri", :platforms => :#{not_local_tag}
     G
-    should_be_installed     "rack 1.0"
+    should_be_installed "rack 1.0"
     should_not_be_installed "nokogiri 1.4.2"
   end
 
@@ -181,17 +169,43 @@ describe "bundle install with platform conditionals" do
 
     install_gemfile <<-G
       platform :#{not_local_tag} do
-        gem "foo", :git => "#{lib_path('foo-1.0')}"
+        gem "foo", :git => "#{lib_path("foo-1.0")}"
       end
     G
 
-    bundle :show, :exitstatus => true
-    exitstatus.should == 0
+    bundle :show
+    expect(exitstatus).to eq(0) if exitstatus
   end
 
+  it "does not attempt to install gems from :rbx when using --local" do
+    simulate_platform "ruby"
+    simulate_ruby_engine "ruby"
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "some_gem", platform: :rbx
+    G
+
+    bundle "install --local"
+    expect(out).not_to match(/Could not find gem 'some_gem/)
+  end
+
+  it "does not attempt to install gems from other rubies when using --local" do
+    simulate_platform "ruby"
+    simulate_ruby_engine "ruby"
+    other_ruby_version_tag = RUBY_VERSION =~ /^1\.8/ ? :ruby_19 : :ruby_18
+
+    gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "some_gem", platform: :#{other_ruby_version_tag}
+    G
+
+    bundle "install --local"
+    expect(out).not_to match(/Could not find gem 'some_gem/)
+  end
 end
 
-describe "when a gem has an architecture in its platform" do
+describe "when a gem has no architecture" do
   it "still installs correctly" do
     simulate_platform mswin
 
@@ -205,4 +219,3 @@ describe "when a gem has an architecture in its platform" do
     should_be_installed "rcov 1.0.0"
   end
 end
-

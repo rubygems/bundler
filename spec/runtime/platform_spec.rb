@@ -29,7 +29,7 @@ describe "Bundler.setup with multi platform stuff" do
       end
     R
 
-    out.should == "WIN"
+    expect(out).to eq("WIN")
   end
 
   it "will resolve correctly on the current platform when the lockfile was targetted for a different one" do
@@ -75,9 +75,9 @@ describe "Bundler.setup with multi platform stuff" do
         nokogiri
     G
 
-    system_gems "nokogiri-1.4.2", "platform_specific-1.0-x86-darwin-100"
-
     simulate_platform "x86-darwin-100"
+
+    system_gems "nokogiri-1.4.2", "platform_specific-1.0-x86-darwin-100"
 
     gemfile <<-G
       source "file://#{gem_repo1}"

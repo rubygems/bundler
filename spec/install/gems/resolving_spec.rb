@@ -16,7 +16,7 @@ describe "bundle install with gem sources" do
         puts IMPLICIT_RAKE_DEP
         puts ANOTHER_IMPLICIT_RAKE_DEP
       R
-      out.should == "YES\nYES"
+      expect(out).to eq("YES\nYES")
     end
 
     it "installs gems with a dependency with no type" do
@@ -27,7 +27,7 @@ describe "bundle install with gem sources" do
       spec.dependencies.each do |d|
         d.instance_variable_set(:@type, :fail)
       end
-      File.open(path, 'w') do |f|
+      File.open(path, "w") do |f|
         f.write Gem.deflate(Marshal.dump(spec))
       end
 
@@ -66,6 +66,58 @@ describe "bundle install with gem sources" do
         G
 
         should_be_installed "net_a 1.0", "net_b 1.0", "net_c 1.0", "net_d 1.0", "net_e 1.0"
+      end
+
+      context "with ENV['DEBUG_RESOLVER'] set" do
+        it "produces debug output" do
+          gemfile <<-G
+            source "file://#{gem_repo1}"
+            gem "net_c"
+            gem "net_e"
+          G
+
+          resolve_output = capture(:stdout) do
+            bundle :install, :env => { "DEBUG_RESOLVER" => "1" }
+          end
+
+          expect(resolve_output).to include("Creating possibility state for net_c")
+        end
+      end
+
+      context "with ENV['DEBUG_RESOLVER_TREE'] set" do
+        it "produces debug output" do
+          gemfile <<-G
+            source "file://#{gem_repo1}"
+            gem "net_c"
+            gem "net_e"
+          G
+
+          resolve_output = capture(:stdout) do
+            bundle :install, :env => { "DEBUG_RESOLVER_TREE" => "1" }
+          end
+
+          expect(resolve_output).to include(" net_b")
+          expect(resolve_output).to include(" net_build_extensions (1.0)")
+        end
+      end
+    end
+
+    describe "when some gems require a different version of ruby" do
+      it "does not try to install those gems" do
+        pending "waiting for a rubygems index that includes ruby version"
+
+        update_repo gem_repo1 do
+          build_gem "require_ruby" do |s|
+            s.required_ruby_version = "> 9000"
+          end
+        end
+
+        install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem 'require_ruby'
+        G
+
+        expect(out).to_not include("Gem::InstallError: require_ruby requires Ruby version > 9000")
       end
     end
   end

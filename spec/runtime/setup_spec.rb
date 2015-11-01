@@ -16,8 +16,8 @@ describe "Bundler.setup" do
         require 'rack'
         puts RACK
       RUBY
-      err.should eq("")
-      out.should eq("1.0.0")
+      expect(err).to eq("")
+      expect(out).to eq("1.0.0")
     end
   end
 
@@ -42,8 +42,21 @@ describe "Bundler.setup" do
           puts "WIN"
         end
       RUBY
-      err.should eq("")
-      out.should eq("WIN")
+      expect(err).to eq("")
+      expect(out).to eq("WIN")
+    end
+
+    it "accepts string for group name" do
+      ruby <<-RUBY
+        require 'rubygems'
+        require 'bundler'
+        Bundler.setup(:default, 'test')
+
+        require 'rack'
+        puts RACK
+      RUBY
+      expect(err).to eq("")
+      expect(out).to eq("1.0.0")
     end
 
     it "leaves all groups available if they were already" do
@@ -56,8 +69,8 @@ describe "Bundler.setup" do
         require 'rack'
         puts RACK
       RUBY
-      err.should eq("")
-      out.should eq("1.0.0")
+      expect(err).to eq("")
+      expect(out).to eq("1.0.0")
     end
 
     it "leaves :default available if setup is called twice" do
@@ -74,8 +87,23 @@ describe "Bundler.setup" do
           puts "FAIL"
         end
       RUBY
-      err.should eq("")
-      out.should match("WIN")
+      expect(err).to eq("")
+      expect(out).to match("WIN")
+    end
+
+    it "handles multiple non-additive invocations" do
+      ruby <<-RUBY
+        require 'bundler'
+        Bundler.setup(:default, :test)
+        Bundler.setup(:default)
+        require 'rack'
+
+        puts "FAIL"
+      RUBY
+
+      expect(err).to match("rack")
+      expect(err).to match("LoadError")
+      expect(out).not_to match("FAIL")
     end
   end
 
@@ -97,7 +125,7 @@ describe "Bundler.setup" do
       end
     R
 
-    out.should == "WIN"
+    expect(out).to eq("WIN")
   end
 
   it "doesn't create a Gemfile.lock if the setup fails" do
@@ -113,7 +141,7 @@ describe "Bundler.setup" do
       Bundler.setup
     R
 
-    bundled_app("Gemfile.lock").should_not exist
+    expect(bundled_app("Gemfile.lock")).not_to exist
   end
 
   it "doesn't change the Gemfile.lock if the setup fails" do
@@ -137,7 +165,7 @@ describe "Bundler.setup" do
       Bundler.setup
     R
 
-    File.read(bundled_app("Gemfile.lock")).should == lockfile
+    expect(File.read(bundled_app("Gemfile.lock"))).to eq(lockfile)
   end
 
   it "makes a Gemfile.lock if setup succeeds" do
@@ -151,7 +179,7 @@ describe "Bundler.setup" do
     FileUtils.rm(bundled_app("Gemfile.lock"))
 
     run "1"
-    bundled_app("Gemfile.lock").should exist
+    expect(bundled_app("Gemfile.lock")).to exist
   end
 
   it "uses BUNDLE_GEMFILE to locate the gemfile if present" do
@@ -160,19 +188,19 @@ describe "Bundler.setup" do
       gem "rack"
     G
 
-    gemfile bundled_app('4realz'), <<-G
+    gemfile bundled_app("4realz"), <<-G
       source "file://#{gem_repo1}"
       gem "activesupport", "2.3.5"
     G
 
-    ENV['BUNDLE_GEMFILE'] = bundled_app('4realz').to_s
+    ENV["BUNDLE_GEMFILE"] = bundled_app("4realz").to_s
     bundle :install
 
     should_be_installed "activesupport 2.3.5"
   end
 
   it "prioritizes gems in BUNDLE_PATH over gems in GEM_HOME" do
-    ENV['BUNDLE_PATH'] = bundled_app('.bundle').to_s
+    ENV["BUNDLE_PATH"] = bundled_app(".bundle").to_s
     install_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack", "1.0.0"
@@ -204,7 +232,7 @@ describe "Bundler.setup" do
           end
         R
 
-        out.should == "WIN"
+        expect(out).to eq("WIN")
       end
 
       it "version_requirement is now deprecated in rubygems 1.4.0+ when gem is missing" do
@@ -217,7 +245,7 @@ describe "Bundler.setup" do
           end
         R
 
-        err.should be_empty
+        expect(err).to be_empty
       end
 
       it "replaces #gem but raises when the version is wrong" do
@@ -230,7 +258,7 @@ describe "Bundler.setup" do
           end
         R
 
-        out.should == "WIN"
+        expect(out).to eq("WIN")
       end
 
       it "version_requirement is now deprecated in rubygems 1.4.0+ when the version is wrong" do
@@ -243,7 +271,7 @@ describe "Bundler.setup" do
           end
         R
 
-        err.should be_empty
+        expect(err).to be_empty
       end
     end
 
@@ -258,14 +286,14 @@ describe "Bundler.setup" do
 
       it "removes system gems from Gem.source_index" do
         run "require 'yard'"
-        out.should == "bundler-#{Bundler::VERSION}\nyard-1.0"
+        expect(out).to eq("bundler-#{Bundler::VERSION}\nyard-1.0")
       end
 
       context "when the ruby stdlib is a substring of Gem.path" do
         it "does not reject the stdlib from $LOAD_PATH" do
-          substring = "/" + $LOAD_PATH.find{|p| p =~ /vendor_ruby/ }.split("/")[2]
-          run "puts 'worked!'", :env => {"GEM_PATH" => substring}
-          out.should == "worked!"
+          substring = "/" + $LOAD_PATH.find {|p| p =~ /vendor_ruby/ }.split("/")[2]
+          run "puts 'worked!'", :env => { "GEM_PATH" => substring }
+          expect(out).to eq("worked!")
         end
       end
     end
@@ -280,13 +308,13 @@ describe "Bundler.setup" do
       end
 
       gemfile <<-G
-        path "#{lib_path('rack-1.0.0')}"
+        path "#{lib_path("rack-1.0.0")}"
         source "file://#{gem_repo1}"
         gem "rack"
       G
 
       run "require 'rack'"
-      out.should == "WIN"
+      expect(out).to eq("WIN")
     end
   end
 
@@ -295,13 +323,13 @@ describe "Bundler.setup" do
       build_git "rack", "1.0.0"
 
       gemfile <<-G
-        gem "rack", :git => "#{lib_path('rack-1.0.0')}"
+        gem "rack", :git => "#{lib_path("rack-1.0.0")}"
       G
     end
 
     it "provides a useful exception when the git repo is not checked out yet" do
       run "1", :expect_err => true
-      err.should include("#{lib_path('rack-1.0.0')} (at master) is not checked out. Please run `bundle install`")
+      expect(err).to match(/the git source #{lib_path('rack-1.0.0')} is not yet checked out. Please run `bundle install`/i)
     end
 
     it "does not hit the git binary if the lockfile is available and up to date" do
@@ -321,7 +349,7 @@ describe "Bundler.setup" do
         end
       R
 
-      out.should == "WIN"
+      expect(out).to eq("WIN")
     end
 
     it "provides a good exception if the lockfile is unavailable" do
@@ -345,32 +373,116 @@ describe "Bundler.setup" do
 
       run "puts 'FAIL'", :expect_err => true
 
-      err.should_not include "This is not the git you are looking for"
+      expect(err).not_to include "This is not the git you are looking for"
     end
 
     it "works even when the cache directory has been deleted" do
       bundle "install --path vendor/bundle"
-      FileUtils.rm_rf vendored_gems('cache')
+      FileUtils.rm_rf vendored_gems("cache")
       should_be_installed "rack 1.0.0"
     end
 
     it "does not randomly change the path when specifying --path and the bundle directory becomes read only" do
-      begin
-        bundle "install --path vendor/bundle"
+      bundle "install --path vendor/bundle"
 
-        Dir["**/*"].each do |f|
-          File.directory?(f) ?
-            File.chmod(0555, f) :
-            File.chmod(0444, f)
-        end
+      with_read_only("**/*") do
         should_be_installed "rack 1.0.0"
-      ensure
-        Dir["**/*"].each do |f|
-          File.directory?(f) ?
-            File.chmod(0755, f) :
-            File.chmod(0644, f)
-        end
       end
+    end
+
+    it "finds git gem when default bundle path becomes read only" do
+      bundle "install"
+
+      with_read_only("#{Bundler.bundle_path}/**/*") do
+        should_be_installed "rack 1.0.0"
+      end
+    end
+  end
+
+  describe "when specifying local override" do
+    it "explodes if given path does not exist on runtime" do
+      build_git "rack", "0.8"
+
+      FileUtils.cp_r("#{lib_path("rack-0.8")}/.", lib_path("local-rack"))
+
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
+      G
+
+      bundle %|config local.rack #{lib_path("local-rack")}|
+      bundle :install
+      expect(out).to match(/at #{lib_path('local-rack')}/)
+
+      FileUtils.rm_rf(lib_path("local-rack"))
+      run "require 'rack'", :expect_err => true
+      expect(err).to match(/Cannot use local override for rack-0.8 because #{Regexp.escape(lib_path('local-rack').to_s)} does not exist/)
+    end
+
+    it "explodes if branch is not given on runtime" do
+      build_git "rack", "0.8"
+
+      FileUtils.cp_r("#{lib_path("rack-0.8")}/.", lib_path("local-rack"))
+
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
+      G
+
+      bundle %|config local.rack #{lib_path("local-rack")}|
+      bundle :install
+      expect(out).to match(/at #{lib_path('local-rack')}/)
+
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :git => "#{lib_path("rack-0.8")}"
+      G
+
+      run "require 'rack'", :expect_err => true
+      expect(err).to match(/because :branch is not specified in Gemfile/)
+    end
+
+    it "explodes on different branches on runtime" do
+      build_git "rack", "0.8"
+
+      FileUtils.cp_r("#{lib_path("rack-0.8")}/.", lib_path("local-rack"))
+
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
+      G
+
+      bundle %|config local.rack #{lib_path("local-rack")}|
+      bundle :install
+      expect(out).to match(/at #{lib_path('local-rack')}/)
+
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "changed"
+      G
+
+      run "require 'rack'", :expect_err => true
+      expect(err).to match(/is using branch master but Gemfile specifies changed/)
+    end
+
+    it "explodes on refs with different branches on runtime" do
+      build_git "rack", "0.8"
+
+      FileUtils.cp_r("#{lib_path("rack-0.8")}/.", lib_path("local-rack"))
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :git => "#{lib_path("rack-0.8")}", :ref => "master", :branch => "master"
+      G
+
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :git => "#{lib_path("rack-0.8")}", :ref => "master", :branch => "nonexistant"
+      G
+
+      bundle %|config local.rack #{lib_path("local-rack")}|
+      run "require 'rack'", :expect_err => true
+      expect(err).to match(/is using branch master but Gemfile specifies nonexistant/)
     end
   end
 
@@ -450,7 +562,7 @@ describe "Bundler.setup" do
           end
         R
 
-        out.should == "You have already activated thin 1.1, but your Gemfile requires thin 1.0. Using bundle exec may solve this."
+        expect(out).to eq("You have already activated thin 1.1, but your Gemfile requires thin 1.0. Prepending `bundle exec` to your command may solve this.")
       end
 
       it "version_requirement is now deprecated in rubygems 1.4.0+" do
@@ -475,7 +587,7 @@ describe "Bundler.setup" do
           end
         R
 
-        err.should be_empty
+        expect(err).to be_empty
       end
     end
   end
@@ -488,17 +600,17 @@ describe "Bundler.setup" do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack"
-      gem "foo", :git => "#{lib_path('foo-1.0')}"
-      gem "no-gemspec", "1.0", :git => "#{lib_path('no-gemspec-1.0')}"
+      gem "foo", :git => "#{lib_path("foo-1.0")}"
+      gem "no-gemspec", "1.0", :git => "#{lib_path("no-gemspec-1.0")}"
     G
 
     run <<-R
       Gem.loaded_specs.each do |n, s|
-        puts "FAIL" unless String === s.loaded_from
+        puts "FAIL" unless s.loaded_from.is_a?(String)
       end
     R
 
-    out.should be_empty
+    expect(out).to be_empty
   end
 
   it "ignores empty gem paths" do
@@ -510,7 +622,7 @@ describe "Bundler.setup" do
     ENV["GEM_HOME"] = ""
     bundle %{exec ruby -e "require 'set'"}
 
-    err.should be_empty
+    expect(err).to be_empty
   end
 
   it "should prepend gemspec require paths to $LOAD_PATH in order" do
@@ -518,7 +630,7 @@ describe "Bundler.setup" do
       build_gem("requirepaths") do |s|
         s.write("lib/rq.rb", "puts 'yay'")
         s.write("src/rq.rb", "puts 'nooo'")
-        s.require_paths = ["lib", "src"]
+        s.require_paths = %w[lib src]
       end
     end
 
@@ -528,10 +640,43 @@ describe "Bundler.setup" do
     G
 
     run "require 'rq'"
-    out.should == "yay"
+    expect(out).to eq("yay")
   end
 
-  it "ignores Gem.refresh" do
+  it "should clean $LOAD_PATH properly" do
+    gem_name = "very_simple_binary"
+    full_gem_name = gem_name + "-1.0"
+    ext_dir = File.join(tmp "extenstions", full_gem_name)
+
+    install_gem full_gem_name
+
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+    G
+
+    ruby <<-R
+      if Gem::Specification.method_defined? :extension_dir
+        s = Gem::Specification.find_by_name '#{gem_name}'
+        s.extension_dir = '#{ext_dir}'
+
+        # Don't build extensions.
+        s.class.send(:define_method, :build_extensions) { nil }
+      end
+
+      require 'bundler'
+      gem '#{gem_name}'
+
+      puts $LOAD_PATH.count {|path| path =~ /#{gem_name}/} >= 2
+
+      Bundler.setup
+
+      puts $LOAD_PATH.count {|path| path =~ /#{gem_name}/} == 0
+    R
+
+    expect(out).to eq("true\ntrue")
+  end
+
+  it "stubs out Gem.refresh so it does not reveal system gems" do
     system_gems "rack-1.0.0"
 
     install_gemfile <<-G
@@ -540,43 +685,44 @@ describe "Bundler.setup" do
     G
 
     run <<-R
+      puts Bundler.rubygems.find_name("rack").inspect
       Gem.refresh
       puts Bundler.rubygems.find_name("rack").inspect
     R
 
-    out.should == "[]"
+    expect(out).to eq("[]\n[]")
   end
 
   describe "when a vendored gem specification uses the :path option" do
     it "should resolve paths relative to the Gemfile" do
-      path = bundled_app(File.join('vendor', 'foo'))
+      path = bundled_app(File.join("vendor", "foo"))
       build_lib "foo", :path => path
 
       # If the .gemspec exists, then Bundler handles the path differently.
       # See Source::Path.load_spec_files for details.
-      FileUtils.rm(File.join(path, 'foo.gemspec'))
+      FileUtils.rm(File.join(path, "foo.gemspec"))
 
       install_gemfile <<-G
         gem 'foo', '1.2.3', :path => 'vendor/foo'
       G
 
       Dir.chdir(bundled_app.parent) do
-        run <<-R, :env => {"BUNDLE_GEMFILE" => bundled_app('Gemfile')}
+        run <<-R, :env => { "BUNDLE_GEMFILE" => bundled_app("Gemfile") }
           require 'foo'
         R
       end
-      err.should == ""
+      expect(err).to eq("")
     end
 
     it "should make sure the Bundler.root is really included in the path relative to the Gemfile" do
-      relative_path = File.join('vendor', Dir.pwd[1..-1], 'foo')
+      relative_path = File.join("vendor", Dir.pwd[1..-1], "foo")
       absolute_path = bundled_app(relative_path)
       FileUtils.mkdir_p(absolute_path)
       build_lib "foo", :path => absolute_path
 
       # If the .gemspec exists, then Bundler handles the path differently.
       # See Source::Path.load_spec_files for details.
-      FileUtils.rm(File.join(absolute_path, 'foo.gemspec'))
+      FileUtils.rm(File.join(absolute_path, "foo.gemspec"))
 
       gemfile <<-G
         gem 'foo', '1.2.3', :path => '#{relative_path}'
@@ -585,12 +731,12 @@ describe "Bundler.setup" do
       bundle :install
 
       Dir.chdir(bundled_app.parent) do
-        run <<-R, :env => {"BUNDLE_GEMFILE" => bundled_app('Gemfile')}
+        run <<-R, :env => { "BUNDLE_GEMFILE" => bundled_app("Gemfile") }
           require 'foo'
         R
       end
 
-      err.should == ""
+      expect(err).to eq("")
     end
   end
 
@@ -599,7 +745,7 @@ describe "Bundler.setup" do
       build_git "no-gemspec", :gemspec => false
 
       install_gemfile <<-G
-        gem "no-gemspec", "1.0", :git => "#{lib_path('no-gemspec-1.0')}"
+        gem "no-gemspec", "1.0", :git => "#{lib_path("no-gemspec-1.0")}"
       G
     end
 
@@ -609,7 +755,7 @@ describe "Bundler.setup" do
         puts NOGEMSPEC
       R
 
-      out.should == "1.0"
+      expect(out).to eq("1.0")
     end
   end
 
@@ -635,7 +781,7 @@ describe "Bundler.setup" do
         end
       R
 
-      out.should == "WIN"
+      expect(out).to eq("WIN")
     end
 
     it "provides a gem method" do
@@ -645,7 +791,7 @@ describe "Bundler.setup" do
         puts ACTIVESUPPORT
       R
 
-      out.should == "2.3.5"
+      expect(out).to eq("2.3.5")
     end
 
     it "raises an exception if gem is used to invoke a system gem not in the bundle" do
@@ -657,12 +803,12 @@ describe "Bundler.setup" do
         end
       R
 
-      out.should == "rack is not part of the bundle. Add it to Gemfile."
+      expect(out).to eq("rack is not part of the bundle. Add it to Gemfile.")
     end
 
     it "sets GEM_HOME appropriately" do
       run "puts ENV['GEM_HOME']"
-      out.should == default_bundle_path.to_s
+      expect(out).to eq(default_bundle_path.to_s)
     end
   end
 
@@ -680,8 +826,8 @@ describe "Bundler.setup" do
     it "sets GEM_PATH appropriately" do
       run "puts Gem.path"
       paths = out.split("\n")
-      paths.should include(system_gem_path.to_s)
-      paths.should include(default_bundle_path.to_s)
+      expect(paths).to include(system_gem_path.to_s)
+      expect(paths).to include(default_bundle_path.to_s)
     end
   end
 
@@ -699,19 +845,20 @@ describe "Bundler.setup" do
             s.version     = BAR_VERSION
             s.summary     = 'Bar'
             s.files       = Dir["lib/**/*.rb"]
+            s.author      = 'no one'
           end
         G
       end
 
       gemfile <<-G
-        gem "bar", :git => "#{lib_path('bar-1.0')}"
+        gem "bar", :git => "#{lib_path("bar-1.0")}"
       G
     end
 
     it "evals each gemspec in the context of its parent directory" do
       bundle :install
       run "require 'bar'; puts BAR"
-      out.should == "1.0"
+      expect(out).to eq("1.0")
     end
 
     it "error intelligently if the gemspec has a LoadError" do
@@ -719,10 +866,10 @@ describe "Bundler.setup" do
         s.write "bar.gemspec", "require 'foobarbaz'"
       end
       bundle :install
-      out.should include("was a LoadError while evaluating bar.gemspec")
-      out.should include("foobarbaz")
-      out.should include("bar.gemspec:1")
-      out.should include("try to require a relative path") if RUBY_VERSION >= "1.9"
+      expect(out).to include("was a LoadError while loading bar.gemspec")
+      expect(out).to include("foobarbaz")
+      expect(out).to include("bar.gemspec:1")
+      expect(out).to include("try to require a relative path") if RUBY_VERSION >= "1.9"
     end
 
     it "evals each gemspec with a binding from the top level" do
@@ -736,8 +883,8 @@ describe "Bundler.setup" do
         Bundler.load
       RUBY
 
-      err.should eq("")
-      out.should eq("")
+      expect(err).to eq("")
+      expect(out).to eq("")
     end
   end
 
@@ -748,8 +895,63 @@ describe "Bundler.setup" do
       G
 
       bundle %|exec ruby -e "require 'bundler'; Bundler.setup"|
-      err.should be_empty
+      expect(err).to be_empty
     end
   end
 
+  describe "when BUNDLED WITH" do
+    def lock_with(bundler_version = nil)
+      lock = <<-L
+        GEM
+          remote: file:#{gem_repo1}/
+          specs:
+            rack (1.0.0)
+
+        PLATFORMS
+          #{generic(Gem::Platform.local)}
+
+        DEPENDENCIES
+          rack
+      L
+
+      if bundler_version
+        lock << "\n        BUNDLED WITH\n           #{bundler_version}\n"
+      end
+
+      lock
+    end
+
+    before do
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+    end
+
+    context "is not present" do
+      it "does not change the lock" do
+        lockfile lock_with(nil)
+        ruby "require 'bundler/setup'"
+        lockfile_should_be lock_with(nil)
+      end
+    end
+
+    context "is newer" do
+      it "does not change the lock or warn" do
+        lockfile lock_with(Bundler::VERSION.succ)
+        ruby "require 'bundler/setup'"
+        expect(out).to eq("")
+        expect(err).to eq("")
+        lockfile_should_be lock_with(Bundler::VERSION.succ)
+      end
+    end
+
+    context "is older" do
+      it "does not change the lock" do
+        lockfile lock_with("1.10.1")
+        ruby "require 'bundler/setup'"
+        lockfile_should_be lock_with("1.10.1")
+      end
+    end
+  end
 end

@@ -10,7 +10,7 @@ bundle(1) -- Ruby Dependency Management
 Bundler manages an `application's dependencies` through its entire life
 across many machines systematically and repeatably.
 
-See [the bundler website](http://gembundler.com) for information on getting
+See [the bundler website](http://bundler.io) for information on getting
 started, and Gemfile(5) for more information on the `Gemfile` format.
 
 ## OPTIONS
@@ -43,6 +43,9 @@ We divide `bundle` subcommands into primary commands and utilities.
 * [bundle config(1)][bundle-config]:
   Specify and read configuration options for bundler
 
+* `bundle help(1)`:
+  Displays detailed help for each subcommand
+
 ## UTILITIES
 
 * `bundle check(1)`:
@@ -64,20 +67,32 @@ We divide `bundle` subcommands into primary commands and utilities.
 * `bundle open(1)`:
   Open an installed gem in the editor
 
+* `bundle lock(1)`:
+  Generate a lockfile for your dependencies
+
 * `bundle viz(1)`:
   Generate a visual representation of your dependencies
 
 * `bundle init(1)`:
   Generate a simple `Gemfile`, placed in the current directory
 
-* `bundle gem(1)`:
+* [bundle gem(1)][bundle-gem]:
   Create a simple gem, suitable for development with bundler
+
+* [bundle platform(1)][bundle-platform]:
+  Displays platform compatibility information
+
+* `bundle clean(1)`:
+  Cleans up unused gems in your bundler directory
+
+## PLUGINS
+
+When running a command that isn't listed in PRIMARY COMMANDS or UTILITIES,
+Bundler will try to find an executable on your path named `bundler-<command>`
+and execute it, passing down any extra arguments to it.
 
 ## OBSOLETE
 
 These commands are obsolete and should no longer be used
 
-* `bundle lock(1)`
-* `bundle unlock(1)`
 * `bundle cache(1)`
-

@@ -10,18 +10,18 @@ describe "install with --deployment or --frozen" do
 
   it "fails without a lockfile and says that --deployment requires a lock" do
     bundle "install --deployment"
-    out.should include("The --deployment flag requires a Gemfile.lock")
+    expect(out).to include("The --deployment flag requires a Gemfile.lock")
   end
 
   it "fails without a lockfile and says that --frozen requires a lock" do
     bundle "install --frozen"
-    out.should include("The --frozen flag requires a Gemfile.lock")
+    expect(out).to include("The --frozen flag requires a Gemfile.lock")
   end
 
   it "works after you try to deploy without a lock" do
     bundle "install --deployment"
-    bundle :install, :exitstatus => true
-    exitstatus.should eq(0)
+    bundle :install
+    expect(exitstatus).to eq(0) if exitstatus
     should_be_installed "rack 1.0"
   end
 
@@ -38,19 +38,19 @@ describe "install with --deployment or --frozen" do
     build_git "foo"
     gemfile <<-G
       group :test do
-        gem "foo", :git => "#{lib_path('foo-1.0')}"
+        gem "foo", :git => "#{lib_path("foo-1.0")}"
       end
     G
     bundle :install
-    bundle "install --deployment --without test", :exitstatus => true
-    exitstatus.should == 0
+    bundle "install --deployment --without test"
+    expect(exitstatus).to eq(0) if exitstatus
   end
 
   it "works when you bundle exec bundle" do
     bundle :install
     bundle "install --deployment"
-    bundle "exec bundle check", :exitstatus => true
-    exitstatus.should == 0
+    bundle "exec bundle check"
+    expect(exitstatus).to eq(0) if exitstatus
   end
 
   it "works when using path gems from the same path and the version is specified" do
@@ -62,9 +62,34 @@ describe "install with --deployment or --frozen" do
     G
 
     bundle :install
-    bundle "install --deployment", :exitstatus => true
+    bundle "install --deployment"
 
-    exitstatus.should == 0
+    expect(exitstatus).to eq(0) if exitstatus
+  end
+
+  it "works when there are credentials in the source URL" do
+    install_gemfile(<<-G, :artifice => "endpoint_strict_basic_authentication", :quiet => true)
+      source "http://user:pass@localgemserver.test/"
+
+      gem "rack-obama", ">= 1.0"
+    G
+
+    bundle "install --deployment", :artifice => "endpoint_strict_basic_authentication"
+
+    expect(exitstatus).to eq(0) if exitstatus
+  end
+
+  it "works with sources given by a block" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}" do
+        gem "rack"
+      end
+    G
+
+    bundle "install --deployment"
+
+    expect(exitstatus).to eq(0) if exitstatus
+    should_be_installed "rack 1.0"
   end
 
   describe "with an existing lockfile" do
@@ -73,13 +98,13 @@ describe "install with --deployment or --frozen" do
     end
 
     it "works with the --deployment flag if you didn't change anything" do
-      bundle "install --deployment", :exitstatus => true
-      exitstatus.should == 0
+      bundle "install --deployment"
+      expect(exitstatus).to eq(0) if exitstatus
     end
 
     it "works with the --frozen flag if you didn't change anything" do
-      bundle "install --frozen", :exitstatus => true
-      exitstatus.should == 0
+      bundle "install --frozen"
+      expect(exitstatus).to eq(0) if exitstatus
     end
 
     it "explodes with the --deployment flag if you make a change and don't check in the lockfile" do
@@ -90,11 +115,11 @@ describe "install with --deployment or --frozen" do
       G
 
       bundle "install --deployment"
-      out.should include("deployment mode")
-      out.should include("You have added to the Gemfile")
-      out.should include("* rack-obama")
-      out.should_not include("You have deleted from the Gemfile")
-      out.should_not include("You have changed in the Gemfile")
+      expect(out).to include("deployment mode")
+      expect(out).to include("You have added to the Gemfile")
+      expect(out).to include("* rack-obama")
+      expect(out).not_to include("You have deleted from the Gemfile")
+      expect(out).not_to include("You have changed in the Gemfile")
     end
 
     it "can have --frozen set via an environment variable" do
@@ -104,13 +129,27 @@ describe "install with --deployment or --frozen" do
         gem "rack-obama"
       G
 
-      ENV['BUNDLE_FROZEN'] = '1'
+      ENV["BUNDLE_FROZEN"] = "1"
       bundle "install"
-      out.should include("deployment mode")
-      out.should include("You have added to the Gemfile")
-      out.should include("* rack-obama")
-      out.should_not include("You have deleted from the Gemfile")
-      out.should_not include("You have changed in the Gemfile")
+      expect(out).to include("deployment mode")
+      expect(out).to include("You have added to the Gemfile")
+      expect(out).to include("* rack-obama")
+      expect(out).not_to include("You have deleted from the Gemfile")
+      expect(out).not_to include("You have changed in the Gemfile")
+    end
+
+    it "can have --frozen set to false via an environment variable" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+        gem "rack-obama"
+      G
+
+      ENV["BUNDLE_FROZEN"] = "false"
+      bundle "install"
+      expect(out).not_to include("deployment mode")
+      expect(out).not_to include("You have added to the Gemfile")
+      expect(out).not_to include("* rack-obama")
     end
 
     it "explodes with the --frozen flag if you make a change and don't check in the lockfile" do
@@ -121,11 +160,11 @@ describe "install with --deployment or --frozen" do
       G
 
       bundle "install --frozen"
-      out.should include("deployment mode")
-      out.should include("You have added to the Gemfile")
-      out.should include("* rack-obama")
-      out.should_not include("You have deleted from the Gemfile")
-      out.should_not include("You have changed in the Gemfile")
+      expect(out).to include("deployment mode")
+      expect(out).to include("You have added to the Gemfile")
+      expect(out).to include("* rack-obama")
+      expect(out).not_to include("You have deleted from the Gemfile")
+      expect(out).not_to include("You have changed in the Gemfile")
     end
 
     it "explodes if you remove a gem and don't check in the lockfile" do
@@ -135,10 +174,10 @@ describe "install with --deployment or --frozen" do
       G
 
       bundle "install --deployment"
-      out.should include("deployment mode")
-      out.should include("You have added to the Gemfile:\n* activesupport\n\n")
-      out.should include("You have deleted from the Gemfile:\n* rack")
-      out.should_not include("You have changed in the Gemfile")
+      expect(out).to include("deployment mode")
+      expect(out).to include("You have added to the Gemfile:\n* activesupport\n\n")
+      expect(out).to include("You have deleted from the Gemfile:\n* rack")
+      expect(out).not_to include("You have changed in the Gemfile")
     end
 
     it "explodes if you add a source" do
@@ -148,9 +187,9 @@ describe "install with --deployment or --frozen" do
       G
 
       bundle "install --deployment"
-      out.should include("deployment mode")
-      out.should include("You have added to the Gemfile:\n* source: git://hubz.com (at master)")
-      out.should_not include("You have changed in the Gemfile")
+      expect(out).to include("deployment mode")
+      expect(out).to include("You have added to the Gemfile:\n* source: git://hubz.com (at master)")
+      expect(out).not_to include("You have changed in the Gemfile")
     end
 
     it "explodes if you unpin a source" do
@@ -167,10 +206,10 @@ describe "install with --deployment or --frozen" do
       G
 
       bundle "install --deployment"
-      out.should include("deployment mode")
-      out.should include("You have deleted from the Gemfile:\n* source: #{lib_path("rack-1.0")} (at master)")
-      out.should_not include("You have added to the Gemfile")
-      out.should_not include("You have changed in the Gemfile")
+      expect(out).to include("deployment mode")
+      expect(out).to include("You have deleted from the Gemfile:\n* source: #{lib_path("rack-1.0")} (at master)")
+      expect(out).not_to include("You have added to the Gemfile")
+      expect(out).not_to include("You have changed in the Gemfile")
     end
 
     it "explodes if you unpin a source, leaving it pinned somewhere else" do
@@ -190,10 +229,10 @@ describe "install with --deployment or --frozen" do
       G
 
       bundle "install --deployment"
-      out.should include("deployment mode")
-      out.should include("You have changed in the Gemfile:\n* rack from `no specified source` to `#{lib_path("rack")} (at master)`")
-      out.should_not include("You have added to the Gemfile")
-      out.should_not include("You have deleted from the Gemfile")
+      expect(out).to include("deployment mode")
+      expect(out).to include("You have changed in the Gemfile:\n* rack from `no specified source` to `#{lib_path("rack")} (at master)`")
+      expect(out).not_to include("You have added to the Gemfile")
+      expect(out).not_to include("You have deleted from the Gemfile")
     end
 
     it "remembers that the bundle is frozen at runtime" do

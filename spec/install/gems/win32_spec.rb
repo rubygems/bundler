@@ -1,8 +1,8 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe "bundle install with win32-generated lockfile" do
-  it 'should read lockfile' do
-    File.open(bundled_app('Gemfile.lock'), 'wb') do |f|
+  it "should read lockfile" do
+    File.open(bundled_app("Gemfile.lock"), "wb") do |f|
       f << "GEM\r\n"
       f << "  remote: file:#{gem_repo1}/\r\n"
       f << "  specs:\r\n"
@@ -16,11 +16,11 @@ describe "bundle install with win32-generated lockfile" do
       f << "  rack\r\n"
     end
 
-    install_gemfile <<-G, :exitstatus => true
+    install_gemfile <<-G
       source "file://#{gem_repo1}"
 
       gem "rack"
     G
-    @exitstatus.should == 0
+    expect(exitstatus).to eq(0) if exitstatus
   end
 end

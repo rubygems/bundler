@@ -3,11 +3,11 @@ require "spec_helper"
 describe "bundle update" do
   describe "git sources" do
     it "floats on a branch when :branch is used" do
-      build_git  "foo", "1.0"
+      build_git "foo", "1.0"
       update_git "foo", :branch => "omg"
 
       install_gemfile <<-G
-        git "#{lib_path('foo-1.0')}", :branch => "omg" do
+        git "#{lib_path("foo-1.0")}", :branch => "omg" do
           gem 'foo'
         end
       G
@@ -28,20 +28,20 @@ describe "bundle update" do
       end
 
       install_gemfile <<-G
-        gem "rails", :git => "#{lib_path('rails')}"
+        gem "rails", :git => "#{lib_path("rails")}"
       G
 
       bundle "update rails"
-      out.should include("Using activesupport (3.0) from #{lib_path('rails')} (at master)")
+      expect(out).to include("Using activesupport 3.0 from #{lib_path("rails")} (at master)")
       should_be_installed "rails 3.0", "activesupport 3.0"
     end
 
     it "floats on a branch when :branch is used and the source is specified in the update" do
-      build_git  "foo", "1.0", :path => lib_path("foo")
+      build_git "foo", "1.0", :path => lib_path("foo")
       update_git "foo", :branch => "omg", :path => lib_path("foo")
 
       install_gemfile <<-G
-        git "#{lib_path('foo')}", :branch => "omg" do
+        git "#{lib_path("foo")}", :branch => "omg" do
           gem 'foo'
         end
       G
@@ -56,17 +56,17 @@ describe "bundle update" do
     end
 
     it "floats on master when updating all gems that are pinned to the source even if you have child dependencies" do
-      build_git "foo", :path => lib_path('foo')
+      build_git "foo", :path => lib_path("foo")
       build_gem "bar", :to_system => true do |s|
         s.add_dependency "foo"
       end
 
       install_gemfile <<-G
-        gem "foo", :git => "#{lib_path('foo')}"
+        gem "foo", :git => "#{lib_path("foo")}"
         gem "bar"
       G
 
-      update_git "foo", :path => lib_path('foo') do |s|
+      update_git "foo", :path => lib_path("foo") do |s|
         s.write "lib/foo.rb", "FOO = '1.1'"
       end
 
@@ -80,20 +80,19 @@ describe "bundle update" do
       build_git "foo", :path => lib_path("foo_two")
 
       install_gemfile <<-G
-        gem "foo", "1.0", :git => "#{lib_path('foo_one')}"
+        gem "foo", "1.0", :git => "#{lib_path("foo_one")}"
       G
 
       FileUtils.rm_rf lib_path("foo_one")
 
       install_gemfile <<-G
-        gem "foo", "1.0", :git => "#{lib_path('foo_two')}"
+        gem "foo", "1.0", :git => "#{lib_path("foo_two")}"
       G
 
-      err.should be_empty
-      out.should include("Fetching #{lib_path}/foo_two")
-      out.should include("Your bundle is complete!")
+      expect(err).to be_empty
+      expect(out).to include("Fetching #{lib_path}/foo_two")
+      expect(out).to include("Bundle complete!")
     end
-
 
     it "fetches tags from the remote" do
       build_git "foo"
@@ -113,8 +112,8 @@ describe "bundle update" do
         gem 'foo', :git => "#{@remote.path}", :tag => "fubar"
       G
 
-      bundle "update", :exitstatus => true
-      exitstatus.should == 0
+      bundle "update"
+      expect(exitstatus).to eq(0) if exitstatus
     end
 
     describe "with submodules" do
@@ -131,51 +130,51 @@ describe "bundle update" do
           s.add_dependency "submodule"
         end
 
-        Dir.chdir(lib_path('has_submodule-1.0')) do
-          `git submodule add #{lib_path('submodule-1.0')} submodule-1.0`
+        Dir.chdir(lib_path("has_submodule-1.0")) do
+          `git submodule add #{lib_path("submodule-1.0")} submodule-1.0`
           `git commit -m "submodulator"`
         end
       end
 
-      it "it unlocks the source when submodules is added to a git source" do
+      it "it unlocks the source when submodules are added to a git source" do
         install_gemfile <<-G
-          git "#{lib_path('has_submodule-1.0')}" do
+          git "#{lib_path("has_submodule-1.0")}" do
             gem "has_submodule"
           end
         G
 
         run "require 'submodule'"
-        out.should eq('GEM')
+        expect(out).to eq("GEM")
 
         install_gemfile <<-G
-          git "#{lib_path('has_submodule-1.0')}", :submodules => true do
+          git "#{lib_path("has_submodule-1.0")}", :submodules => true do
             gem "has_submodule"
           end
         G
 
         run "require 'submodule'"
-        out.should == 'GIT'
+        expect(out).to eq("GIT")
       end
 
-      it "it unlocks the source when submodules is removed from git source" do
+      it "it unlocks the source when submodules are removed from git source" do
         pending "This would require actually removing the submodule from the clone"
         install_gemfile <<-G
-          git "#{lib_path('has_submodule-1.0')}", :submodules => true do
+          git "#{lib_path("has_submodule-1.0")}", :submodules => true do
             gem "has_submodule"
           end
         G
 
         run "require 'submodule'"
-        out.should eq('GIT')
+        expect(out).to eq("GIT")
 
         install_gemfile <<-G
-          git "#{lib_path('has_submodule-1.0')}" do
+          git "#{lib_path("has_submodule-1.0")}" do
             gem "has_submodule"
           end
         G
 
         run "require 'submodule'"
-        out.should == 'GEM'
+        expect(out).to eq("GEM")
       end
     end
 
@@ -183,14 +182,152 @@ describe "bundle update" do
       build_git "foo", "1.0"
 
       install_gemfile <<-G
-        gem "foo", :git => "#{lib_path('foo-1.0')}"
+        gem "foo", :git => "#{lib_path("foo-1.0")}"
       G
 
       lib_path("foo-1.0").join(".git").rmtree
 
       bundle :update, :expect_err => true
-      out.should include(lib_path("foo-1.0").to_s)
+      expect(out).to include(lib_path("foo-1.0").to_s)
     end
 
+    it "should not explode on invalid revision on update of gem by name" do
+      build_git "rack", "0.8"
+
+      build_git "rack", "0.8", :path => lib_path("local-rack") do |s|
+        s.write "lib/rack.rb", "puts :LOCAL"
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
+      G
+
+      bundle %|config local.rack #{lib_path("local-rack")}|
+      bundle "update rack"
+      expect(out).to include("Bundle updated!")
+    end
+
+    it "shows the previous version of the gem" do
+      build_git "rails", "3.0", :path => lib_path("rails")
+
+      install_gemfile <<-G
+        gem "rails", :git => "#{lib_path("rails")}"
+      G
+
+      lockfile <<-G
+        GIT
+          remote: #{lib_path("rails")}
+          specs:
+            rails (2.3.2)
+
+        PLATFORMS
+          #{generic(Gem::Platform.local)}
+
+        DEPENDENCIES
+          rails!
+      G
+
+      bundle "update"
+      expect(out).to include("Using rails 3.0 (was 2.3.2) from #{lib_path("rails")} (at master)")
+    end
+  end
+
+  describe "with --source flag" do
+    before :each do
+      build_repo2
+      @git = build_git "foo", :path => lib_path("foo") do |s|
+        s.executables = "foobar"
+      end
+
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        git "#{lib_path("foo")}" do
+          gem 'foo'
+        end
+        gem 'rack'
+      G
+    end
+
+    it "updates the source" do
+      update_git "foo", :path => @git.path
+
+      bundle "update --source foo"
+
+      in_app_root do
+        run <<-RUBY
+          require 'foo'
+          puts "WIN" if defined?(FOO_PREV_REF)
+        RUBY
+
+        expect(out).to eq("WIN")
+      end
+    end
+
+    it "unlocks gems that were originally pulled in by the source" do
+      update_git "foo", "2.0", :path => @git.path
+
+      bundle "update --source foo"
+      should_be_installed "foo 2.0"
+    end
+
+    it "leaves all other gems frozen" do
+      update_repo2
+      update_git "foo", :path => @git.path
+
+      bundle "update --source foo"
+      should_be_installed "rack 1.0"
+    end
+  end
+
+  context "when the gem and the repository have different names" do
+    before :each do
+      build_repo2
+      @git = build_git "foo", :path => lib_path("bar")
+
+      install_gemfile <<-G
+        source "file://#{gem_repo2}"
+        git "#{lib_path("bar")}" do
+          gem 'foo'
+        end
+        gem 'rack'
+      G
+    end
+
+    it "the --source flag updates version of gems that were originally pulled in by the source" do
+      spec_lines = lib_path("bar/foo.gemspec").read.split("\n")
+      spec_lines[5] = "s.version = '2.0'"
+
+      update_git "foo", "2.0", :path => @git.path do |s|
+        s.write "foo.gemspec", spec_lines.join("\n")
+      end
+
+      ref = @git.ref_for "master"
+
+      bundle "update --source bar"
+
+      lockfile_should_be <<-G
+        GIT
+          remote: #{@git.path}
+          revision: #{ref}
+          specs:
+            foo (2.0)
+
+        GEM
+          remote: file:#{gem_repo2}/
+          specs:
+            rack (1.0.0)
+
+        PLATFORMS
+          ruby
+
+        DEPENDENCIES
+          foo!
+          rack
+
+        BUNDLED WITH
+           #{Bundler::VERSION}
+      G
+    end
   end
 end
