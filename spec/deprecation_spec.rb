@@ -108,8 +108,8 @@ describe "Bundler version 1.99" do
         msg = "The :bitbucket git source is deprecated, and will be removed " \
           "in Bundler 2.0. Add this code to your Gemfile to ensure it " \
           "continues to work:\n    git_source(:bitbucket) do |repo_name|\n  " \
-          "    https://\#{user_name}@bitbucket.org/\#{user_name}/\#{repo_name}" \
-          ".git\n    end"
+          "    \"https://\#{user_name}@bitbucket.org/\#{user_name}/\#{repo_name}" \
+          ".git\"\n    end"
         expect(Bundler.ui).to receive(:deprecate).with(msg, true)
         subject.gem("not-really-a-gem", :bitbucket => "mcorp/flatlab-rails")
       end
@@ -121,7 +121,7 @@ describe "Bundler version 1.99" do
         msg = "The :gist git source is deprecated, and will be removed " \
           "in Bundler 2.0. Add this code to your Gemfile to ensure it " \
           "continues to work:\n    git_source(:gist) do |repo_name|\n  " \
-          "    https://gist.github.com/\#{repo_name}.git\n" \
+          "    \"https://gist.github.com/\#{repo_name}.git\"\n" \
           "    end"
         expect(Bundler.ui).to receive(:deprecate).with(msg, true)
         subject.gem("not-really-a-gem", :gist => "1234")
