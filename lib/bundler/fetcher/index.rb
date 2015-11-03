@@ -5,9 +5,7 @@ module Bundler
   class Fetcher
     class Index < Base
       def specs(_gem_names)
-        old_sources = Bundler.rubygems.sources
-        Bundler.rubygems.sources = [remote_uri.to_s]
-        Bundler.rubygems.fetch_all_remote_specs
+        Bundler.rubygems.fetch_all_remote_specs(remote)
       rescue Gem::RemoteFetcher::FetchError, OpenSSL::SSL::SSLError, Net::HTTPFatalError => e
         case e.message
         when /certificate verify failed/
@@ -24,8 +22,6 @@ module Bundler
           Bundler.ui.trace e
           raise HTTPError, "Could not fetch specs from #{display_uri}"
         end
-      ensure
-        Bundler.rubygems.sources = old_sources
       end
     end
   end

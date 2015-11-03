@@ -2,16 +2,30 @@ module Bundler
   class Fetcher
     class Base
       attr_reader :downloader
-      attr_reader :remote_uri
-      attr_reader :fetch_uri
       attr_reader :display_uri
+      attr_reader :remote
 
-      def initialize(downloader, remote_uri, fetch_uri, display_uri)
+      def initialize(downloader, remote, display_uri)
         raise "Abstract class" if self.class == Base
         @downloader = downloader
-        @remote_uri = remote_uri
-        @fetch_uri = fetch_uri
+        @remote = remote
         @display_uri = display_uri
+      end
+
+      def remote_uri
+        @remote.uri
+      end
+
+      def fetch_uri
+        @fetch_uri ||= begin
+          if remote_uri.host == "rubygems.org"
+            uri = remote_uri.dup
+            uri.host = "bundler.rubygems.org"
+            uri
+          else
+            remote_uri
+          end
+        end
       end
 
       def api_available?
