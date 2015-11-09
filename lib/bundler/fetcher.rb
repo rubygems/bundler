@@ -1,6 +1,7 @@
 require "bundler/vendored_persistent"
 require "cgi"
 require "securerandom"
+require "zlib"
 
 module Bundler
 
