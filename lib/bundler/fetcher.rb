@@ -92,6 +92,13 @@ module Bundler
         "Your network or your gem server is probably having issues right now."
     end
 
+    # return the specs in the bundler format as an index with retries
+    def specs_with_retry(gem_names, source)
+      Bundler::Retry.new("fetcher").attempts do
+        specs(gem_names, source)
+      end
+    end
+
     # return the specs in the bundler format as an index
     def specs(gem_names, source)
       old = Bundler.rubygems.sources
