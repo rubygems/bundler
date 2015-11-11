@@ -570,7 +570,7 @@ module Bundler
 
       def fetch_specs(source, remote, name)
         path = source + "#{name}.#{Gem.marshal_version}.gz"
-        fetcher = Bundler::GemRemoteFetcher.fetcher
+        fetcher = gem_remote_fetcher
         fetcher.headers = { "X-Gemfile-Source" => remote.original_uri.to_s } if remote.original_uri
         string = fetcher.fetch_path(path)
         Bundler.load_marshal(string)
@@ -595,13 +595,17 @@ module Bundler
       end
 
       def download_gem(spec, uri, path)
-        require "resolv"
         uri = Bundler.settings.mirror_for(uri)
-        proxy = configuration[:http_proxy]
-        dns = Resolv::DNS.new
-        fetcher = Bundler::GemRemoteFetcher.new(proxy, dns)
+        fetcher = gem_remote_fetcher
         fetcher.headers = { "X-Gemfile-Source" => spec.remote.original_uri.to_s } if spec.remote.original_uri
         fetcher.download(spec, uri, path)
+      end
+
+      def gem_remote_fetcher
+        require "resolv"
+        proxy = configuration[:http_proxy]
+        dns = Resolv::DNS.new
+        Bundler::GemRemoteFetcher.new(proxy, dns)
       end
 
       def gem_from_path(path, policy = nil)
