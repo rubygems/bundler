@@ -399,8 +399,8 @@ module Bundler
     end
 
     desc "lock", "Creates a lockfile without installing"
-    method_option "update", :type => :boolean, :default => false, :banner =>
-      "ignore the existing lockfile"
+    method_option "update", :type => :array, :lazy_default => [], :banner =>
+      "ignore the existing lockfile, update all gems by default, or update list of given gems"
     method_option "local", :type => :boolean, :default => false, :banner =>
       "do not attempt to fetch remote gemspecs and use the local gem cache only"
     method_option "print", :type => :boolean, :default => false, :banner =>

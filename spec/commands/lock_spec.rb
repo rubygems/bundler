@@ -94,4 +94,12 @@ describe "bundle lock" do
     expect(read_lockfile "lock").to eq(@lockfile)
     expect { read_lockfile }.to raise_error(Errno::ENOENT)
   end
+
+  it "update specific gems using --update" do
+    lockfile @lockfile.gsub("2.3.2", "2.3.1").gsub("10.0.2", "10.0.1")
+
+    bundle "lock --update rails rake"
+
+    expect(read_lockfile).to eq(@lockfile)
+  end
 end
