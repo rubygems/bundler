@@ -1124,6 +1124,33 @@ describe "the lockfile format" do
     G
   end
 
+  it "captures the Ruby version in the lockfile", :focus do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      ruby '#{RUBY_VERSION}'
+      gem "rack", "> 0.9", "< 1.0"
+    G
+
+    lockfile_should_be <<-G
+      GEM
+        remote: file:#{gem_repo1}/
+        specs:
+          rack (0.9.1)
+
+      PLATFORMS
+        ruby
+
+      RUBY VERSION
+         ruby #{RUBY_VERSION}p#{RUBY_PATCHLEVEL}
+
+      DEPENDENCIES
+        rack (> 0.9, < 1.0)
+
+      BUNDLED WITH
+         #{Bundler::VERSION}
+    G
+  end
+
   # Some versions of the Bundler 1.1 RC series introduced corrupted
   # lockfiles. There were two major problems:
   #

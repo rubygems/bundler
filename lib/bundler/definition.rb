@@ -42,7 +42,7 @@ module Bundler
     # @param sources [Bundler::SourceList]
     # @param unlock [Hash, Boolean, nil] Gems that have been requested
     #   to be updated or true if all gems should be updated
-    # @param ruby_version [Bundler::RubyVersion, nil] Requested Ruby Version
+    # @param ruby_version [Bundler::RubyVersionRequirement, nil] Requested Ruby Version
     # @param optional_groups [Array(String)] A list of optional groups
     def initialize(lockfile, dependencies, sources, unlock, ruby_version = nil, optional_groups = [])
       @unlocking = unlock == true || !unlock.empty?
@@ -63,6 +63,7 @@ module Bundler
         locked = LockfileParser.new(@lockfile_contents)
         @platforms = locked.platforms
         @locked_bundler_version = locked.bundler_version
+        @locked_ruby_version = locked.ruby_version
 
         if unlock != true
           @locked_deps    = locked.dependencies
@@ -196,8 +197,7 @@ module Bundler
           last_resolve
         else
           # Run a resolve against the locally available gems
-          requested_ruby_version = ruby_version.version if ruby_version
-          last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve, requested_ruby_version)
+          last_resolve.merge Resolver.resolve(expanded_dependencies, index, source_requirements, last_resolve, ruby_version)
         end
       end
     end
@@ -271,14 +271,32 @@ module Bundler
       end
     end
 
-    # Returns the version of Bundler that is creating or has created
-    # Gemfile.lock. Used in #to_lock.
-    def lock_version
+    def locked_bundler_version
       if @locked_bundler_version && @locked_bundler_version < Gem::Version.new(Bundler::VERSION)
         new_version = Bundler::VERSION
       end
 
       new_version || @locked_bundler_version || Bundler::VERSION
+    end
+
+    def locked_ruby_version
+      if @unlock[:ruby]
+        if ruby_version && !@locked_ruby_version
+          return Bundler.ruby_version
+        elsif ruby_version && @locked_ruby_version
+          return Bundler.ruby_version
+        elsif !ruby_version && @locked_ruby_version
+          return nil
+        end
+      else
+        if ruby_version && !@locked_ruby_version
+          return Bundler.ruby_version
+        elsif ruby_version && @locked_ruby_version
+          return @locked_ruby_version
+        elsif !ruby_version && @locked_ruby_version
+          return @locked_ruby_version
+        end
+      end
     end
 
     def to_lock
@@ -307,6 +325,11 @@ module Bundler
         out << "  #{p}\n"
       end
 
+      if locked_ruby_version
+        out << "\nRUBY VERSION\n"
+        out << "   #{locked_ruby_version}\n"
+      end
+
       out << "\n"
       out << "DEPENDENCIES\n"
 
@@ -319,7 +342,7 @@ module Bundler
 
       # Record the version of Bundler that was used to create the lockfile
       out << "\nBUNDLED WITH\n"
-      out << "   #{lock_version}\n"
+      out << "   #{locked_bundler_version}\n"
 
       out
     end
@@ -397,11 +420,7 @@ module Bundler
         when :engine_version
           "Your #{Bundler.ruby_version.engine} version is #{actual}, but your Gemfile specified #{ruby_version.engine} #{expected}"
         when :patchlevel
-          if !expected.is_a?(String)
-            "The Ruby patchlevel in your Gemfile must be a string"
-          else
-            "Your Ruby patchlevel is #{actual}, but your Gemfile specified #{expected}"
-          end
+          "Your Ruby patchlevel is #{actual}, but your Gemfile specified #{expected}"
         end
 
         raise RubyVersionMismatch, msg
