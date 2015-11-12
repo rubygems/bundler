@@ -184,13 +184,21 @@ module Bundler
       [] # if we can't download them, there aren't any
     end
 
-    def fetch_all_remote_specs
+    # TODO: This is for older versions of Rubygems... should we support the
+    # X-Gemfile-Source header on these old versions?
+    # Maybe the newer implementation will work on older Rubygems?
+    # It seems difficult to keep this implementation and still send the header.
+    def fetch_all_remote_specs(remote)
+      old_sources = Bundler.rubygems.sources
+      Bundler.rubygems.sources = [remote.uri.to_s]
       # Fetch all specs, minus prerelease specs
       spec_list = fetch_specs(true, false)
       # Then fetch the prerelease specs
       fetch_prerelease_specs.each {|k, v| spec_list[k] += v }
 
       spec_list
+    ensure
+      Bundler.rubygems.sources = old_sources
     end
 
     def with_build_args(args)
@@ -560,39 +568,44 @@ module Bundler
         Gem::Specification.find_all_by_name name
       end
 
-      def fetch_specs(source, name)
+      def fetch_specs(source, remote, name)
         path = source + "#{name}.#{Gem.marshal_version}.gz"
-        string = Gem::RemoteFetcher.fetcher.fetch_path(path)
+        fetcher = gem_remote_fetcher
+        fetcher.headers = { "X-Gemfile-Source" => remote.original_uri.to_s } if remote.original_uri
+        string = fetcher.fetch_path(path)
         Bundler.load_marshal(string)
       rescue Gem::RemoteFetcher::FetchError => e
         # it's okay for prerelease to fail
         raise e unless name == "prerelease_specs"
       end
 
-      def fetch_all_remote_specs
+      def fetch_all_remote_specs(remote)
         # Since SpecFetcher now returns NameTuples, we just fetch directly
         # and unmarshal the array ourselves.
         hash = {}
 
-        Gem.sources.each do |source|
-          source = URI.parse(source.to_s) unless source.is_a?(URI)
-          hash[source] = fetch_specs(source, "specs")
+        source = remote.uri
+        source = URI.parse(source.to_s) unless source.is_a?(URI)
+        hash[source] = fetch_specs(source, remote, "specs")
 
-          pres = fetch_specs(source, "prerelease_specs")
-          hash[source].push(*pres) if pres && !pres.empty?
-        end
+        pres = fetch_specs(source, remote, "prerelease_specs")
+        hash[source].push(*pres) if pres && !pres.empty?
 
         hash
       end
 
       def download_gem(spec, uri, path)
-        require "resolv"
         uri = Bundler.settings.mirror_for(uri)
-        proxy = configuration[:http_proxy]
-        dns = Resolv::DNS.new
-        fetcher = Bundler::GemRemoteFetcher.new(proxy, dns)
+        fetcher = gem_remote_fetcher
         fetcher.headers = { "X-Gemfile-Source" => spec.remote.original_uri.to_s } if spec.remote.original_uri
         fetcher.download(spec, uri, path)
+      end
+
+      def gem_remote_fetcher
+        require "resolv"
+        proxy = configuration[:http_proxy]
+        dns = Resolv::DNS.new
+        Bundler::GemRemoteFetcher.new(proxy, dns)
       end
 
       def gem_from_path(path, policy = nil)
