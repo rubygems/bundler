@@ -26,5 +26,9 @@ STR
     context "with http" do
       it_behaves_like "GitHub URIs", "http://u:p@github.com/foo/foo.git", "http://github.com/foo/foo.git"
     end
+
+    context "without credentials" do
+      it_behaves_like "GitHub URIs", "http://github.com/foo/foo.git", "http://github.com/foo/foo.git"
+    end
   end
 end
