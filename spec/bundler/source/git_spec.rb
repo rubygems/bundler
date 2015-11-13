@@ -4,7 +4,7 @@ describe Bundler::Source::Git do
   describe "#to_lock" do
     let(:git_proxy) { double(:git_proxy, "revision" => "ABC123") }
 
-    it "removes credentials from https uri" do
+    it "removes credentials from uri" do
       expect(Bundler::Source::Git::GitProxy).to receive(:new).exactly(2).times.and_return(git_proxy)
       expect(Bundler).to receive(:requires_sudo?).exactly(2).times.and_return(false)
       expect(Bundler).to receive(:cache).exactly(2).times.and_return(Pathname.new("Idontcare"))
