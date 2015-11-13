@@ -290,9 +290,8 @@ module Bundler
       end
 
       def safe_uri
-        uri.gsub(/(?<schema>https?:\/\/)\w+:\w+@/, '\k<schema>')
+        uri.gsub(%r{(?<schema>https?://)\w+:\w+@}, '\k<schema>')
       end
-
     end
   end
 end
