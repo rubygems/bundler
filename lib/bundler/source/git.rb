@@ -36,7 +36,7 @@ module Bundler
 
       def to_lock
         out = "GIT\n"
-        out << "  remote: #{@uri}\n"
+        out << "  remote: #{safe_uri}\n"
         out << "  revision: #{revision}\n"
         %w(ref branch tag submodules).each do |opt|
           out << "  #{opt}: #{options[opt]}\n" if options[opt]
@@ -288,6 +288,11 @@ module Bundler
       def git_proxy
         @git_proxy ||= GitProxy.new(cache_path, uri, ref, cached_revision, self)
       end
+
+      def safe_uri
+        uri.gsub(/(?<schema>https?:\/\/)\w+:\w+@/, '\k<schema>')
+      end
+
     end
   end
 end
