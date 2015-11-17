@@ -143,10 +143,22 @@ describe "when using sudo", :sudo => true do
   end
 
   describe "and root runs install" do
-    it "warns against that" do
+    let(:warning) { "Don't run Bundler as root." }
+
+    before do
       gemfile %|source "file://#{gem_repo1}"|
+    end
+
+    it "warns against that" do
       bundle :install, :sudo => true
-      expect(out).to include("Don't run Bundler as root.")
+      expect(out).to include(warning)
+    end
+
+    context "when ENV['SILENCE_ROOT_WARNING'] is set" do
+      it 'skips the warning' do
+        bundle :install, sudo: :preserve_env, :env => { 'SILENCE_ROOT_WARNING' => true}
+        expect(out).to_not include(warning)
+      end
     end
   end
 end

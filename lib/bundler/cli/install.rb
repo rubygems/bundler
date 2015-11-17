@@ -8,7 +8,7 @@ module Bundler
     def run
       Bundler.ui.level = "error" if options[:quiet]
 
-      warn_if_root
+      warn_if_root unless ENV['SILENCE_ROOT_WARNING']
 
       [:with, :without].each do |option|
         if options[option]
