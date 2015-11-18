@@ -1,0 +1,30 @@
+bundle-lock(1) -- Creates / Updates a lockfile without installing
+=================================================================
+
+## SYNOPSIS
+
+`bundle lock` [--update]
+              [--local]
+              [--print]
+              [--lockfile=PATH]
+
+## DESCRIPTION
+
+Lock the gems specified in Gemfile.
+
+## OPTIONS
+
+* `--update`:
+  Ignores the existing lockfile. Resolve then updates lockfile.
+
+* `--local`:
+  Do not attempt to connect to `rubygems.org`. Instead, Bundler will use the
+  gems already present in Rubygems' cache or in `vendor/cache`. Note that if a
+  appropriate platform-specific gem exists on `rubygems.org` it will not be
+  found.
+
+* `--print`:
+  Prints the lockfile to STDOUT instead of writing to the file system.
+
+* `--lockfile=<path>`:
+  The path where the lockfile should be written to.

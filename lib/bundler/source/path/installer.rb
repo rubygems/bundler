@@ -1,7 +1,7 @@
 module Bundler
   class Source
     class Path
-      class Installer < Bundler::GemInstaller
+      class Installer < Bundler::RubyGemsGemInstaller
         attr_reader :spec
 
         def initialize(spec, options = {})

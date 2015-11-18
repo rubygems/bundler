@@ -3,6 +3,7 @@ require "rubygems/dependency_installer"
 require "bundler/worker"
 require "bundler/installer/parallel_installer"
 require "bundler/installer/standalone"
+require "bundler/installer/gem_installer"
 
 module Bundler
   class Installer < Environment
@@ -72,51 +73,6 @@ module Bundler
       Standalone.new(options[:standalone], @definition).generate if options[:standalone]
     end
 
-    def install_gem_from_spec(spec, standalone = false, worker = 0, force = false)
-      # Fetch the build settings, if there are any
-      settings = Bundler.settings["build.#{spec.name}"]
-      install_options = { :force => force, :ensure_builtin_gems_cached => standalone }
-
-      post_install_message = nil
-      if settings
-        # Build arguments are global, so this is mutexed
-        Bundler.rubygems.with_build_args [settings] do
-          post_install_message = spec.source.install(spec, install_options)
-        end
-      else
-        post_install_message = spec.source.install(spec, install_options)
-      end
-
-      Bundler.ui.debug "#{worker}:  #{spec.name} (#{spec.version}) from #{spec.loaded_from}"
-
-      if Bundler.settings[:bin] && standalone
-        generate_standalone_bundler_executable_stubs(spec)
-      elsif Bundler.settings[:bin]
-        generate_bundler_executable_stubs(spec, :force => true)
-      end
-
-      post_install_message
-    rescue Errno::ENOSPC
-      raise Bundler::InstallError, "Your disk is out of space. Free some " \
-        "space to be able to install your bundle."
-    rescue Exception => e
-      # if install hook failed or gem signature is bad, just die
-      raise e if e.is_a?(Bundler::InstallHookError) || e.is_a?(Bundler::SecurityError)
-
-      # other failure, likely a native extension build failure
-      Bundler.ui.info ""
-      Bundler.ui.warn "#{e.class}: #{e.message}"
-      msg = "An error occurred while installing #{spec.name} (#{spec.version}),"
-      msg << " and Bundler cannot continue."
-
-      unless spec.source.options["git"]
-        msg << "\nMake sure that `gem install"
-        msg << " #{spec.name} -v '#{spec.version}'` succeeds before bundling."
-      end
-      Bundler.ui.debug e.backtrace.join("\n")
-      raise Bundler::InstallError, msg
-    end
-
     def generate_bundler_executable_stubs(spec, options = {})
       if options[:binstubs_cmd] && spec.executables.empty?
         options = {}
@@ -170,6 +126,22 @@ module Bundler
       end
     end
 
+    def generate_standalone_bundler_executable_stubs(spec)
+      # double-assignment to avoid warnings about variables that will be used by ERB
+      bin_path = Bundler.bin_path
+      template = File.read(File.expand_path("../templates/Executable.standalone", __FILE__))
+      ruby_command = ruby_command = Thor::Util.ruby_command
+
+      spec.executables.each do |executable|
+        next if executable == "bundle"
+        standalone_path = standalone_path = Pathname(Bundler.settings[:path]).expand_path.relative_path_from(bin_path)
+        executable_path = executable_path = Pathname(spec.full_gem_path).join(spec.bindir, executable).relative_path_from(bin_path)
+        File.open "#{bin_path}/#{executable}", "w", 0755 do |f|
+          f.puts ERB.new(template, nil, "-").result(binding)
+        end
+      end
+    end
+
   private
 
     # the order that the resolver provides is significant, since
@@ -191,22 +163,6 @@ module Bundler
           "gems will be installed one at a time. Upgrade to Rubygems 2.1.0 " \
           "or higher to enable parallel gem installation."
         false
-      end
-    end
-
-    def generate_standalone_bundler_executable_stubs(spec)
-      # double-assignment to avoid warnings about variables that will be used by ERB
-      bin_path = Bundler.bin_path
-      template = File.read(File.expand_path("../templates/Executable.standalone", __FILE__))
-      ruby_command = ruby_command = Thor::Util.ruby_command
-
-      spec.executables.each do |executable|
-        next if executable == "bundle"
-        standalone_path = standalone_path = Pathname(Bundler.settings[:path]).expand_path.relative_path_from(bin_path)
-        executable_path = executable_path = Pathname(spec.full_gem_path).join(spec.bindir, executable).relative_path_from(bin_path)
-        File.open "#{bin_path}/#{executable}", "w", 0755 do |f|
-          f.puts ERB.new(template, nil, "-").result(binding)
-        end
       end
     end
 

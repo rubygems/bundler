@@ -4,7 +4,7 @@ module Bundler
   # Adds support for setting custom HTTP headers when fetching gems from the
   # server.
   #
-  # TODO Get rid of this when and if gemstash only supports RubyGems versions
+  # TODO: Get rid of this when and if gemstash only supports RubyGems versions
   # that contain https://github.com/rubygems/rubygems/commit/3db265cc20b2f813.
   class GemRemoteFetcher < Gem::RemoteFetcher
     attr_accessor :headers

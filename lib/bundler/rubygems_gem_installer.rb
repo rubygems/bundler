@@ -1,7 +1,7 @@
 require "rubygems/installer"
 
 module Bundler
-  class GemInstaller < Gem::Installer
+  class RubyGemsGemInstaller < Gem::Installer
     def check_executable_overwrite(filename)
       # Bundler needs to install gems regardless of binstub overwriting
     end

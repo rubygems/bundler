@@ -1,4 +1,5 @@
 require "bundler/worker"
+require "bundler/installer/gem_installer"
 
 class ParallelInstaller
   class SpecInstallation
@@ -84,7 +85,9 @@ class ParallelInstaller
 
   def worker_pool
     @worker_pool ||= Bundler::Worker.new @size, lambda { |spec_install, worker_num|
-      message = @installer.install_gem_from_spec spec_install.spec, @standalone, worker_num, @force
+      message = Bundler::GemInstaller.new(
+        spec_install.spec, @installer, @standalone, worker_num, @force
+      ).install_from_spec
       spec_install.post_install_message = message unless message.nil?
       spec_install
     }
