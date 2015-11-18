@@ -65,9 +65,8 @@ module Spec
     def bundle(cmd, options = {})
       expect_err = options.delete(:expect_err)
       with_sudo = options.delete(:sudo)
-      if with_sudo
-        sudo = with_sudo == :preserve_env ? 'sudo -E' : 'sudo'
-      end
+      sudo = with_sudo == :preserve_env ? "sudo -E" : "sudo" if with_sudo
+
       options["no-color"] = true unless options.key?("no-color") || %w(exec conf).include?(cmd.to_s[0..3])
 
       bundle_bin = File.expand_path("../../../exe/bundle", __FILE__)

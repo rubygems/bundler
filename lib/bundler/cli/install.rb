@@ -8,7 +8,7 @@ module Bundler
     def run
       Bundler.ui.level = "error" if options[:quiet]
 
-      warn_if_root unless ENV['SILENCE_ROOT_WARNING']
+      warn_if_root
 
       [:with, :without].each do |option|
         if options[option]
@@ -157,7 +157,7 @@ module Bundler
   private
 
     def warn_if_root
-      return if Bundler::WINDOWS || !Process.uid.zero?
+      return if Bundler.settings[:silence_root_warning] || Bundler::WINDOWS || !Process.uid.zero?
       Bundler.ui.warn "Don't run Bundler as root. Bundler can ask for sudo " \
         "if it is needed, and installing your bundle as root will break this " \
         "application for all non-root users on this machine.", :wrap => true

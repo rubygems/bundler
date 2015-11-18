@@ -154,10 +154,24 @@ describe "when using sudo", :sudo => true do
       expect(out).to include(warning)
     end
 
-    context "when ENV['SILENCE_ROOT_WARNING'] is set" do
-      it 'skips the warning' do
-        bundle :install, sudo: :preserve_env, :env => { 'SILENCE_ROOT_WARNING' => true}
+    context "when ENV['BUNDLE_SILENCE_ROOT_WARNING'] is set" do
+      it "skips the warning" do
+        bundle :install, :sudo => :preserve_env, :env => { "BUNDLE_SILENCE_ROOT_WARNING" => true }
         expect(out).to_not include(warning)
+      end
+    end
+
+    context "when silence_root_warning is passed as an option" do
+      it "skips the warning" do
+        bundle :install, :sudo => true, :silence_root_warning => true
+        expect(out).to_not include(warning)
+      end
+    end
+
+    context "when silence_root_warning = false" do
+      it "warns against that" do
+        bundle :install, :sudo => true, :silence_root_warning => false
+        expect(out).to include(warning)
       end
     end
   end
