@@ -116,7 +116,7 @@ module Bundler
         [:version, version, other.version]
       elsif input_engine && !matches?(engine_version, other.engine_version)
         [:engine_version, engine_version, other.engine_version]
-      elsif patchlevel && !matches?(patchlevel, other.patchlevel)
+      elsif patchlevel && (!patchlevel.is_a?(String) || !other.patchlevel.is_a?(String) || !matches?(patchlevel, other.patchlevel))
         [:patchlevel, patchlevel, other.patchlevel]
       else
         nil
