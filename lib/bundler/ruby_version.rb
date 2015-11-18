@@ -46,7 +46,7 @@ module Bundler
       ].join("-")
     end
 
-    def to_gem_version
+    def gem_version
       Gem::Version.new(version)
     end
   end
