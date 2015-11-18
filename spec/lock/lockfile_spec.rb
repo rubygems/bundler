@@ -1140,11 +1140,11 @@ describe "the lockfile format" do
       PLATFORMS
         ruby
 
-      RUBY VERSION
-         ruby #{RUBY_VERSION}p#{RUBY_PATCHLEVEL}
-
       DEPENDENCIES
         rack (> 0.9, < 1.0)
+
+      RUBY VERSION
+         ruby #{RUBY_VERSION}p#{RUBY_PATCHLEVEL}
 
       BUNDLED WITH
          #{Bundler::VERSION}

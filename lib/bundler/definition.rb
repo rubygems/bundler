@@ -325,11 +325,6 @@ module Bundler
         out << "  #{p}\n"
       end
 
-      if locked_ruby_version
-        out << "\nRUBY VERSION\n"
-        out << "   #{locked_ruby_version}\n"
-      end
-
       out << "\n"
       out << "DEPENDENCIES\n"
 
@@ -338,6 +333,11 @@ module Bundler
         next if handled.include?(dep.name)
         out << dep.to_lock
         handled << dep.name
+      end
+
+      if locked_ruby_version
+        out << "\nRUBY VERSION\n"
+        out << "   #{locked_ruby_version}\n"
       end
 
       # Record the version of Bundler that was used to create the lockfile

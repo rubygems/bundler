@@ -370,10 +370,10 @@ describe "bundle install with gem sources" do
          PLATFORMS
            ruby
 
+         DEPENDENCIES
+
          RUBY VERSION
             ruby 2.1.3p100
-
-         DEPENDENCIES
 
          BUNDLED WITH
             #{Bundler::VERSION}
@@ -394,10 +394,10 @@ describe "bundle install with gem sources" do
          PLATFORMS
            ruby
 
+         DEPENDENCIES
+
          RUBY VERSION
             ruby 2.1.3p100
-
-         DEPENDENCIES
 
          BUNDLED WITH
             #{Bundler::VERSION}

@@ -374,10 +374,10 @@ describe "bundle update --ruby" do
        PLATFORMS
          ruby
 
+       DEPENDENCIES
+
        RUBY VERSION
           ruby 2.1.4p222
-
-       DEPENDENCIES
 
        BUNDLED WITH
           #{Bundler::VERSION}
@@ -427,10 +427,10 @@ describe "bundle update --ruby" do
        PLATFORMS
          ruby
 
+       DEPENDENCIES
+
        RUBY VERSION
           ruby 1.8.3p55
-
-       DEPENDENCIES
 
        BUNDLED WITH
           #{Bundler::VERSION}
