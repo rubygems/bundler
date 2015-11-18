@@ -98,7 +98,11 @@ module Bundler
     end
   end
 
-  class RubyVersionRequirement < RubyVersion
+  class RubyVersionRequirement
+    def initialize(version, patchlevel, engine, engine_version)
+      @ruby_version = RubyVersion.new version, patchlevel, engine, engine_version
+    end
+
     # Returns a tuple of these things:
     #   [diff, this, other]
     #   The priority of attributes are
@@ -106,20 +110,55 @@ module Bundler
     #   2. ruby_version
     #   3. engine_version
     def diff(other)
-      if engine != other.engine && @input_engine
+      if engine != other.engine && input_engine
         [:engine, engine, other.engine]
       elsif !version || !matches?(version, other.version)
         [:version, version, other.version]
-      elsif @input_engine && !matches?(engine_version, other.engine_version)
+      elsif input_engine && !matches?(engine_version, other.engine_version)
         [:engine_version, engine_version, other.engine_version]
-      elsif @patchlevel && !matches?(patchlevel, other.patchlevel)
+      elsif patchlevel && !matches?(patchlevel, other.patchlevel)
         [:patchlevel, patchlevel, other.patchlevel]
       else
         nil
       end
     end
 
-  private
+    def gem_version
+      @ruby_version.gem_version
+    end
+
+    def ==(other)
+      version == other.version &&
+        engine == other.engine &&
+        engine_version == other.engine_version &&
+        patchlevel == other.patchlevel
+    end
+
+    def input_engine
+      @ruby_version.instance_variable_get(:@input_engine)
+    end
+
+    def engine
+      @ruby_version.engine
+    end
+
+    def patchlevel
+      @ruby_version.patchlevel
+    end
+
+    def engine_version
+      @ruby_version.engine_version
+    end
+
+    def version
+      @ruby_version.version
+    end
+
+    def to_s
+      @ruby_version.to_s
+    end
+
+    private
 
     def matches?(requirement, version)
       Gem::Requirement.create(requirement).satisfied_by?(Gem::Version.new(version))
