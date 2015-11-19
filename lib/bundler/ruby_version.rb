@@ -158,7 +158,7 @@ module Bundler
       @ruby_version.to_s
     end
 
-    private
+  private
 
     def matches?(requirement, version)
       Gem::Requirement.create(requirement).satisfied_by?(Gem::Version.new(version))

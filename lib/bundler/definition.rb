@@ -429,7 +429,6 @@ module Bundler
 
         raise RubyVersionMismatch, msg
       end
-
     end
 
     attr_reader :sources
