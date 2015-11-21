@@ -22,10 +22,14 @@ class Bundler::CompactIndexClient
       lines(versions_path).each do |line|
         name, versions_string, info_checksum = line.split(" ", 3)
         info_checksums_by_name[name] = info_checksum || ""
-        versions = versions_string.split(",").map! do |version|
-          version.split("-", 2).unshift(name)
+        versions_string.split(",").each do |version|
+          if version.start_with?("-")
+            versions_by_name[name].delete(version[1..-1])
+          else
+            versions = version.split("-", 2).unshift(name)
+            versions_by_name[name].concat(versions)
+          end
         end
-        versions_by_name[name].concat(versions)
       end
 
       [versions_by_name, info_checksums_by_name]
