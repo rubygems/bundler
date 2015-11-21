@@ -18,7 +18,8 @@ module Bundler
       require name
       get_constant(name)
     rescue LoadError
-      Bundler.ui.error "Couldn't load console #{name}"
+      Bundler.ui.error "Couldn't load console #{name}, falling back to irb"
+      require "irb"
       get_constant("irb")
     end
 

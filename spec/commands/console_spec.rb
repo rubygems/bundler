@@ -18,14 +18,26 @@ describe "bundle console" do
     expect(out).to include("0.9.1")
   end
 
+  it "uses IRB as default console" do
+    bundle "console" do |input|
+      input.puts("__method__")
+      input.puts("exit")
+    end
+    expect(out).to include(":irb_binding")
+  end
+
   it "starts another REPL if configured as such" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "pry"
+    G
     bundle "config console pry"
 
     bundle "console" do |input|
-      input.puts("__callee__")
+      input.puts("__method__")
       input.puts("exit")
     end
-    expect(out).to include("pry")
+    expect(out).to include(":__pry__")
   end
 
   it "falls back to IRB if the other REPL isn't available" do
@@ -33,10 +45,10 @@ describe "bundle console" do
     # make sure pry isn't there
 
     bundle "console" do |input|
-      input.puts("__callee__")
+      input.puts("__method__")
       input.puts("exit")
     end
-    expect(out).to include("IRB")
+    expect(out).to include(":irb_binding")
   end
 
   it "doesn't load any other groups" do
