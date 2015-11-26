@@ -53,15 +53,16 @@ describe "real world edgecases", :realworld => true, :sometimes => true do
   end
 
   it "installs the latest version of gxapi_rails", :ruby => "1.9.3" do
-    install_gemfile <<-G
+    gemfile <<-G
       source "https://rubygems.org"
 
       gem "sass-rails"
       gem "rails", "~> 3"
-      gem "gxapi_rails"
+      gem "gxapi_rails", "< 0.1.0" # 0.1.0 was released way after the test was written
       gem 'rack-cache', '1.2.0' # last version that works on Ruby 1.9
     G
-    expect(out).to include("gxapi_rails 0.0.6")
+    bundle :lock
+    expect(lockfile).to include("gxapi_rails (0.0.6)")
   end
 
   it "installs the latest version of i18n" do
