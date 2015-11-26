@@ -113,12 +113,6 @@ Style/MultilineBlockChain:
   Exclude:
     - 'spec/support/less_than_proc.rb'
 
-# Offense count: 3
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/MultilineOperationIndentation:
-  Enabled: false
-
 # Offense count: 13
 # Cop supports --auto-correct.
 Style/ParallelAssignment:
