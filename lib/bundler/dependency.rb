@@ -99,9 +99,9 @@ module Bundler
 
     def current_platform?
       return true if @platforms.empty?
-      @platforms.any? { |p|
+      @platforms.any? do |p|
         Bundler.current_ruby.send("#{p}?")
-      }
+      end
     end
 
     def to_lock

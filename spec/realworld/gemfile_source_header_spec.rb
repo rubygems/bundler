@@ -44,13 +44,13 @@ describe "fetching dependencies with a mirrored source", :rubygems => ">= 2.0" d
 
     require File.expand_path("../../support/artifice/endpoint_mirror_source", __FILE__)
 
-    @t = Thread.new {
+    @t = Thread.new do
       Rack::Server.start(:app       => EndpointMirrorSource,
                          :Host      => "0.0.0.0",
                          :Port      => @port,
                          :server    => "webrick",
                          :AccessLog => [])
-    }.run
+    end.run
 
     wait_for_server(@port)
   end

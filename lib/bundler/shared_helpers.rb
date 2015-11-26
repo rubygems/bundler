@@ -126,9 +126,9 @@ module Bundler
     end
 
     def find_file(*names)
-      search_up(*names) {|filename|
+      search_up(*names) do |filename|
         return filename if File.file?(filename)
-      }
+      end
     end
 
     def find_directory(*names)

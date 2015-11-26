@@ -1243,13 +1243,13 @@ describe "the lockfile format" do
 
     context "when nothing changes" do
       it "preserves Gemfile.lock \\n line endings" do
-        expect {
+        expect do
           ruby <<-RUBY
                    require 'rubygems'
                    require 'bundler'
                    Bundler.setup
                  RUBY
-        }.not_to change { File.mtime(bundled_app("Gemfile.lock")) }
+        end.not_to change { File.mtime(bundled_app("Gemfile.lock")) }
       end
 
       it "preserves Gemfile.lock \\n\\r line endings" do
@@ -1257,13 +1257,13 @@ describe "the lockfile format" do
         File.open(bundled_app("Gemfile.lock"), "wb") {|f| f.puts(win_lock) }
         set_lockfile_mtime_to_known_value
 
-        expect {
+        expect do
           ruby <<-RUBY
                    require 'rubygems'
                    require 'bundler'
                    Bundler.setup
                  RUBY
-        }.not_to change { File.mtime(bundled_app("Gemfile.lock")) }
+        end.not_to change { File.mtime(bundled_app("Gemfile.lock")) }
       end
     end
   end

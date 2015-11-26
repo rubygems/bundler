@@ -72,12 +72,12 @@ module Bundler
 
     def build_gem
       file_name = nil
-      sh("gem build -V '#{spec_path}'") {
+      sh("gem build -V '#{spec_path}'") do
         file_name = File.basename(built_gem_path)
         SharedHelpers.filesystem_access(File.join(base, "pkg")) {|p| FileUtils.mkdir_p(p) }
         FileUtils.mv(built_gem_path, "pkg")
         Bundler.ui.confirm "#{name} #{version} built to pkg/#{file_name}."
-      }
+      end
       File.join(base, "pkg", file_name)
     end
 
@@ -175,12 +175,12 @@ module Bundler
       cmd << " 2>&1"
       outbuf = ""
       Bundler.ui.debug(cmd)
-      SharedHelpers.chdir(base) {
+      SharedHelpers.chdir(base) do
         outbuf = `#{cmd}`
         if $? == 0
           block.call(outbuf) if block
         end
-      }
+      end
       [outbuf, $?]
     end
 

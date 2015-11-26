@@ -9,8 +9,8 @@ describe Bundler::Fetcher::Index do
     allow(Bundler).to receive(:rubygems).and_return(rubygems)
     allow(Bundler).to receive(:ui).and_return(double(:trace => nil))
 
-    expect {
+    expect do
       Bundler::Fetcher::Index.new(nil, nil, nil).specs(%w[foo bar])
-    }.to raise_error(Bundler::HTTPError)
+    end.to raise_error(Bundler::HTTPError)
   end
 end

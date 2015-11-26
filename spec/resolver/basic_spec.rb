@@ -47,18 +47,18 @@ describe "Resolving" do
   it "raises an exception if a child dependency is not resolved" do
     @index = a_unresovable_child_index
     dep "chef_app_error"
-    expect {
+    expect do
       resolve
-    }.to raise_error(Bundler::VersionConflict)
+    end.to raise_error(Bundler::VersionConflict)
   end
 
   it "should throw error in case of circular dependencies" do
     @index = a_circular_index
     dep "circular_app"
 
-    expect {
+    expect do
       resolve
-    }.to raise_error(Bundler::CyclicDependencyError, /please remove either gem 'bar' or gem 'foo'/i)
+    end.to raise_error(Bundler::CyclicDependencyError, /please remove either gem 'bar' or gem 'foo'/i)
   end
 
   # Issue #3459
