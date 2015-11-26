@@ -408,9 +408,7 @@ module Spec
 
       Array(versions).each do |version|
         spec = builder.new(self, name, version)
-        if !spec.authors || spec.authors.empty?
-          spec.authors = ["no one"]
-        end
+        spec.authors = ["no one"] if !spec.authors || spec.authors.empty?
         yield spec if block_given?
         spec._build(options)
       end
@@ -551,9 +549,7 @@ module Spec
           @files["#{name}.gemspec"] = @spec.to_ruby
         end
 
-        unless options[:no_default]
-          @files = _default_files.merge(@files)
-        end
+        @files = _default_files.merge(@files) unless options[:no_default]
 
         @spec.authors = ["no one"]
 
@@ -666,9 +662,7 @@ module Spec
           destination = opts[:path] || _default_path
           FileUtils.mkdir_p(destination)
 
-          if !@spec.authors || @spec.authors.empty?
-            @spec.authors = ["that guy"]
-          end
+          @spec.authors = ["that guy"] if !@spec.authors || @spec.authors.empty?
 
           Bundler.rubygems.build(@spec, opts[:skip_validation])
           if opts[:to_system]

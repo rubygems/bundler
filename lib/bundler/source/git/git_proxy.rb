@@ -107,9 +107,7 @@ module Bundler
             git_retry %(fetch --force --quiet --tags "#{path}")
             git "reset --hard #{@revision}"
 
-            if submodules
-              git_retry "submodule update --init --recursive"
-            end
+            git_retry "submodule update --init --recursive" if submodules
           end
         end
 

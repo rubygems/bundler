@@ -102,24 +102,6 @@ Style/GlobalVars:
 Style/GuardClause:
   Enabled: false
 
-# Offense count: 18
-# Cop supports --auto-correct.
-# Configuration parameters: MaxLineLength.
-Style/IfUnlessModifier:
-  Exclude:
-    - 'lib/bundler.rb'
-    - 'lib/bundler/cli/install.rb'
-    - 'lib/bundler/definition.rb'
-    - 'lib/bundler/dependency.rb'
-    - 'lib/bundler/fetcher.rb'
-    - 'lib/bundler/gem_helper.rb'
-    - 'lib/bundler/lockfile_parser.rb'
-    - 'lib/bundler/rubygems_integration.rb'
-    - 'lib/bundler/settings.rb'
-    - 'lib/bundler/source/git.rb'
-    - 'lib/bundler/source/git/git_proxy.rb'
-    - 'spec/support/builders.rb'
-
 # Offense count: 2
 Style/ModuleFunction:
   Exclude:

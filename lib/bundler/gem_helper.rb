@@ -177,9 +177,7 @@ module Bundler
       Bundler.ui.debug(cmd)
       SharedHelpers.chdir(base) do
         outbuf = `#{cmd}`
-        if $? == 0
-          block.call(outbuf) if block
-        end
+        block.call(outbuf) if $? == 0 && block
       end
       [outbuf, $?]
     end

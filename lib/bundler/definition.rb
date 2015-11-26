@@ -19,9 +19,7 @@ module Bundler
       unlock ||= {}
       gemfile = Pathname.new(gemfile).expand_path
 
-      unless gemfile.file?
-        raise GemfileNotFound, "#{gemfile} not found"
-      end
+      raise GemfileNotFound, "#{gemfile} not found" unless gemfile.file?
 
       Dsl.evaluate(gemfile, lockfile, unlock)
     end
@@ -355,9 +353,7 @@ module Bundler
       new_deps = @dependencies - @locked_deps
       deleted_deps = @locked_deps - @dependencies
 
-      if new_deps.any?
-        added.concat new_deps.map {|d| "* #{pretty_dep(d)}" }
-      end
+      added.concat new_deps.map {|d| "* #{pretty_dep(d)}" } if new_deps.any?
 
       if deleted_deps.any?
         deleted.concat deleted_deps.map {|d| "* #{pretty_dep(d)}" }
@@ -512,9 +508,7 @@ module Bundler
 
     def converge_dependencies
       (@dependencies + @locked_deps).each do |dep|
-        if dep.source
-          dep.source = sources.get(dep.source)
-        end
+        dep.source = sources.get(dep.source) if dep.source
       end
       Set.new(@dependencies) != Set.new(@locked_deps)
     end

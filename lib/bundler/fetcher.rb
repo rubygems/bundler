@@ -98,9 +98,7 @@ module Bundler
 
       specs = {}
       fetchers.dup.each do |f|
-        unless f.api_fetcher? && !gem_names
-          break if specs = f.specs(gem_names)
-        end
+        break unless f.api_fetcher? && !gem_names || !specs = f.specs(gem_names)
         fetchers.delete(f)
       end
       @use_api = false if fetchers.none?(&:api_fetcher?)

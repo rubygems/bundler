@@ -252,9 +252,7 @@ module Bundler
     def requires_sudo?
       return @requires_sudo if defined?(@requires_sudo_ran)
 
-      if settings.allow_sudo?
-        sudo_present = which "sudo"
-      end
+      sudo_present = which "sudo" if settings.allow_sudo?
 
       if sudo_present
         # the bundle path and subdirectories need to be writable for Rubygems

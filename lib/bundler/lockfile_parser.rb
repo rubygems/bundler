@@ -184,9 +184,7 @@ module Bundler
     end
 
     def parse_platform(line)
-      if line =~ /^  (.*)$/
-        @platforms << Gem::Platform.new($1)
-      end
+      @platforms << Gem::Platform.new($1) if line =~ /^  (.*)$/
     end
 
     def parse_bundled_with(line)

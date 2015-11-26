@@ -56,9 +56,7 @@ module Bundler
     def local_overrides
       repos = {}
       all.each do |k|
-        if k =~ /^local\./
-          repos[$'] = self[k]
-        end
+        repos[$'] = self[k] if k =~ /^local\./
       end
       repos
     end
@@ -163,9 +161,7 @@ module Bundler
   private
 
     def key_for(key)
-      if key.is_a?(String) && /https?:/ =~ key
-        key = normalize_uri(key).to_s
-      end
+      key = normalize_uri(key).to_s if key.is_a?(String) && /https?:/ =~ key
       key = key.to_s.gsub(".", "__").upcase
       "BUNDLE_#{key}"
     end

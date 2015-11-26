@@ -346,9 +346,7 @@ module Bundler
       redefine_method(gem_class, :bin_path) do |name, *args|
         exec_name = args.first
 
-        if exec_name == "bundle"
-          return ENV["BUNDLE_BIN_PATH"]
-        end
+        return ENV["BUNDLE_BIN_PATH"] if exec_name == "bundle"
 
         spec = nil
 
@@ -647,9 +645,7 @@ module Bundler
             const_set(:CHDIR_MONITOR, EXT_LOCK)
           end
 
-          if const_defined?(:CHDIR_MUTEX)
-            remove_const(:CHDIR_MUTEX)
-          end
+          remove_const(:CHDIR_MUTEX) if const_defined?(:CHDIR_MUTEX)
           const_set(:CHDIR_MUTEX, const_get(:CHDIR_MONITOR))
         end
       end
