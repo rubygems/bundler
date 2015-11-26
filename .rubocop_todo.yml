@@ -108,11 +108,6 @@ Style/ModuleFunction:
     - 'lib/bundler/shared_helpers.rb'
     - 'spec/support/path.rb'
 
-# Offense count: 1
-Style/MultilineBlockChain:
-  Exclude:
-    - 'spec/support/less_than_proc.rb'
-
 # Offense count: 8
 # Configuration parameters: NamePrefix, NamePrefixBlacklist, NameWhitelist.
 Style/PredicateName:

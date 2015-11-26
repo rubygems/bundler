@@ -27,6 +27,9 @@ Style/AccessModifierIndentation:
 Style/AlignParameters:
   EnforcedStyle: with_fixed_indentation
 
+Style/MultilineBlockChain:
+  Enabled: false
+
 Style/MultilineOperationIndentation:
   EnforcedStyle: indented
 
