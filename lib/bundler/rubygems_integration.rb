@@ -203,7 +203,7 @@ module Bundler
 
     def with_build_args(args)
       ext_lock.synchronize do
-        old_args = self.build_args
+        old_args = build_args
         begin
           self.build_args = args
           yield

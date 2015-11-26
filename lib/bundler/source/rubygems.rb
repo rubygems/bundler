@@ -68,7 +68,7 @@ module Bundler
       end
 
       def to_s
-        remote_names = self.remotes.map(&:to_s).join(", ")
+        remote_names = remotes.map(&:to_s).join(", ")
         "rubygems repository #{remote_names}"
       end
       alias_method :name, :to_s

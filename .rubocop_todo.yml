@@ -246,18 +246,6 @@ Style/PredicateName:
 Style/RaiseArgs:
   Enabled: false
 
-# Offense count: 7
-# Cop supports --auto-correct.
-Style/RedundantSelf:
-  Exclude:
-    - 'lib/bundler.rb'
-    - 'lib/bundler/definition.rb'
-    - 'lib/bundler/graph.rb'
-    - 'lib/bundler/rubygems_integration.rb'
-    - 'lib/bundler/source/rubygems.rb'
-    - 'spec/support/less_than_proc.rb'
-    - 'spec/support/ruby_ext.rb'
-
 # Offense count: 1
 # Configuration parameters: Methods.
 Style/SingleLineBlockParams:

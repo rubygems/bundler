@@ -9,7 +9,7 @@ class IO
       begin
         IO.select([self], nil, nil, select_timeout)
         break if eof? # stop raising :-(
-        buffer << self.readpartial(chunk_size)
+        buffer << readpartial(chunk_size)
       rescue(EOFError)
         break
       end

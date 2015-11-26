@@ -175,7 +175,7 @@ module Bundler
 
     def app_cache(custom_path = nil)
       path = custom_path || root
-      path.join(self.settings.app_cache_path)
+      path.join(settings.app_cache_path)
     end
 
     def tmp(name = Process.pid.to_s)

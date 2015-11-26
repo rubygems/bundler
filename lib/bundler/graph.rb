@@ -97,7 +97,7 @@ module Bundler
       Gem::Dependency.class_eval do
         def matching_specs(platform_only = false)
           matches = Bundler.load.specs.select { |spec|
-            self.name == spec.name and
+            name == spec.name and
               requirement.satisfied_by? spec.version
           }
 
