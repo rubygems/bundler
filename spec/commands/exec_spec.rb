@@ -345,4 +345,20 @@ describe "bundle exec" do
       expect(out).to match('"TODO" is not a summary')
     end
   end
+
+  describe "with gems bundled for deployment" do
+    it "works when calling bundler from another script" do
+      gemfile <<-G
+      module Monkey
+        def bin_path(a,b,c)
+          raise Gem::GemNotFoundException.new('Fail')
+        end
+      end
+      Bundler.rubygems.extend(Monkey)
+      G
+      bundle "install --deployment"
+      bundle "exec ruby -e '`bundler -v`; puts $?.success?'"
+      expect(out).to match("true")
+    end
+  end
 end
