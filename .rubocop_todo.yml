@@ -73,12 +73,6 @@ Style/CaseEquality:
     - 'lib/bundler/match_platform.rb'
     - 'lib/bundler/rubygems_ext.rb'
 
-# Offense count: 4
-# Cop supports --auto-correct.
-# Configuration parameters: IndentWhenRelativeTo, SupportedStyles, IndentOneStep.
-Style/CaseIndentation:
-  Enabled: false
-
 # Offense count: 22
 # Configuration parameters: EnforcedStyle, SupportedStyles.
 Style/ClassAndModuleChildren:
