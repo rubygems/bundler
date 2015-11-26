@@ -4,7 +4,6 @@ require "securerandom"
 require "zlib"
 
 module Bundler
-
   # Handles all the fetching with the rubygems server
   class Fetcher
     autoload :Downloader, "bundler/fetcher/downloader"

@@ -83,21 +83,6 @@ Style/ClassAndModuleChildren:
 Style/Documentation:
   Enabled: false
 
-# Offense count: 10
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/EmptyLinesAroundModuleBody:
-  Exclude:
-    - 'lib/bundler/cli/common.rb'
-    - 'lib/bundler/deprecate.rb'
-    - 'lib/bundler/dsl.rb'
-    - 'lib/bundler/fetcher.rb'
-    - 'lib/bundler/friendly_errors.rb'
-    - 'lib/bundler/gem_helpers.rb'
-    - 'spec/support/builders.rb'
-    - 'spec/support/indexes.rb'
-    - 'spec/support/rubygems_ext.rb'
-
 # Offense count: 1
 # Configuration parameters: Exclude.
 Style/FileName:

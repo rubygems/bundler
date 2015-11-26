@@ -736,6 +736,5 @@ module Spec
       l69BkyvzjgDPkmOHVGiSZDLi3YDvypbUpo6LOy4v5rVg5U2F/A0v
       -----END RSA PRIVATE KEY-----
     PKEY
-
   end
 end

@@ -1,6 +1,5 @@
 module Bundler
   module GemHelpers
-
     GENERIC_CACHE = {}
     GENERICS = [
       [Gem::Platform.new("java"), Gem::Platform.new("java")],

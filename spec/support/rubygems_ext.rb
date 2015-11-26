@@ -44,6 +44,5 @@ module Spec
       lib = File.join(File.dirname(__FILE__), "..", "..", "lib")
       `#{Gem.ruby} -I#{lib} -rubygems -S gem --backtrace #{command} #{args}`.strip
     end
-
   end
 end
