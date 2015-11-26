@@ -30,6 +30,9 @@ Style/AlignParameters:
 Style/MultilineOperationIndentation:
   EnforcedStyle: indented
 
+Style/PerlBackrefs:
+  Enabled: false
+
 Style/SpaceInsideBlockBraces:
   SpaceBeforeBlockParameters: false
 

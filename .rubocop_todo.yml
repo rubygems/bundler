@@ -189,19 +189,6 @@ Style/ParallelAssignment:
 Style/PercentLiteralDelimiters:
   Enabled: false
 
-# Offense count: 22
-# Cop supports --auto-correct.
-Style/PerlBackrefs:
-  Exclude:
-    - 'exe/bundle'
-    - 'exe/bundler'
-    - 'lib/bundler/cli/gem.rb'
-    - 'lib/bundler/dsl.rb'
-    - 'lib/bundler/lockfile_parser.rb'
-    - 'lib/bundler/runtime.rb'
-    - 'lib/bundler/source/git/git_proxy.rb'
-    - 'lib/bundler/source/path.rb'
-
 # Offense count: 8
 # Configuration parameters: NamePrefix, NamePrefixBlacklist, NameWhitelist.
 Style/PredicateName:
