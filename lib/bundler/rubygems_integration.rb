@@ -354,7 +354,7 @@ module Bundler
 
         if exec_name
           spec = specs.find {|s| s.executables.include?(exec_name) }
-          spec or raise Gem::Exception, "can't find executable #{exec_name}"
+          raise(Gem::Exception, "can't find executable #{exec_name}") unless spec
           unless spec.name == name
             warn "Bundler is using a binstub that was created for a different gem.\n" \
               "This is deprecated, in future versions you may need to `bundle binstub #{name}` " \
@@ -362,7 +362,7 @@ module Bundler
           end
         else
           spec = specs.find {|s| s.name == name }
-          exec_name = spec.default_executable or raise Gem::Exception, "no default executable for #{spec.full_name}"
+          raise Gem::Exception, "no default executable for #{spec.full_name}" unless exec_name = spec.default_executable
         end
 
         gem_bin = File.join(spec.full_gem_path, spec.bindir, exec_name)

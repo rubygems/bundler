@@ -129,7 +129,7 @@ module Bundler
     end
 
     def guard_clean
-      clean? && committed? or raise("There are files that need to be committed first.")
+      clean? && committed? || raise("There are files that need to be committed first.")
     end
 
     def clean?

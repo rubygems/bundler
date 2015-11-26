@@ -408,7 +408,7 @@ module Spec
 
       Array(versions).each do |version|
         spec = builder.new(self, name, version)
-        if !spec.authors or spec.authors.empty?
+        if !spec.authors || spec.authors.empty?
           spec.authors = ["no one"]
         end
         yield spec if block_given?
@@ -666,7 +666,7 @@ module Spec
           destination = opts[:path] || _default_path
           FileUtils.mkdir_p(destination)
 
-          if !@spec.authors or @spec.authors.empty?
+          if !@spec.authors || @spec.authors.empty?
             @spec.authors = ["that guy"]
           end
 

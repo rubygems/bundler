@@ -312,7 +312,7 @@ module Bundler
     def amount_constrained(dependency)
       @amount_constrained ||= {}
       @amount_constrained[dependency.name] ||= begin
-        if base = @base[dependency.name] and !base.empty?
+        if (base = @base[dependency.name]) && !base.empty?
           dependency.requirement.satisfied_by?(base.first.version) ? 0 : 1
         else
           base_dep = Dependency.new dependency.name, ">= 0.a"
@@ -332,7 +332,7 @@ module Bundler
       requirements.each do |requirement|
         next if requirement.name == "bundler"
         if search_for(requirement).empty?
-          if base = @base[requirement.name] and !base.empty?
+          if (base = @base[requirement.name]) && !base.empty?
             version = base.first.version
             message = "You have requested:\n" \
               "  #{requirement.name} #{requirement.requirement}\n\n" \

@@ -29,7 +29,7 @@ module Bundler
     end
 
     def []=(key, value)
-      local_config_file or raise GemfileNotFound, "Could not locate Gemfile"
+      local_config_file || raise(GemfileNotFound, "Could not locate Gemfile")
       set_key(key, value, @local_config, local_config_file)
     end
 
