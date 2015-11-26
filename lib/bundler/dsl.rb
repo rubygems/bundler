@@ -299,15 +299,14 @@ module Bundler
       end
 
       %w(git path).each do |type|
-        if param = opts[type]
-          if version.first && version.first =~ /^\s*=?\s*(\d[^\s]*)\s*$/
-            options = opts.merge("name" => name, "version" => $1)
-          else
-            options = opts.dup
-          end
-          source = send(type, param, options) {}
-          opts["source"] = source
+        next unless param = opts[type]
+        if version.first && version.first =~ /^\s*=?\s*(\d[^\s]*)\s*$/
+          options = opts.merge("name" => name, "version" => $1)
+        else
+          options = opts.dup
         end
+        source = send(type, param, options) {}
+        opts["source"] = source
       end
 
       opts["source"] ||= @source

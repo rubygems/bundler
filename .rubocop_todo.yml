@@ -160,19 +160,6 @@ Style/MultilineBlockChain:
 Style/MultilineOperationIndentation:
   Enabled: false
 
-# Offense count: 10
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, MinBodyLength, SupportedStyles.
-Style/Next:
-  Exclude:
-    - 'exe/bundle'
-    - 'exe/bundler'
-    - 'lib/bundler/definition.rb'
-    - 'lib/bundler/dsl.rb'
-    - 'lib/bundler/resolver.rb'
-    - 'lib/bundler/source/path.rb'
-    - 'spec/support/artifice/endpoint.rb'
-
 # Offense count: 13
 # Cop supports --auto-correct.
 Style/ParallelAssignment:

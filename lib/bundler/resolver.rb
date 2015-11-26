@@ -94,14 +94,13 @@ module Bundler
         specs = {}
 
         @activated.each do |p|
-          if s = @specs[p]
-            platform = generic(Gem::Platform.new(s.platform))
-            next if specs[platform]
+          next unless s = @specs[p]
+          platform = generic(Gem::Platform.new(s.platform))
+          next if specs[platform]
 
-            lazy_spec = LazySpecification.new(name, version, platform, source)
-            lazy_spec.dependencies.replace s.dependencies
-            specs[platform] = lazy_spec
-          end
+          lazy_spec = LazySpecification.new(name, version, platform, source)
+          lazy_spec.dependencies.replace s.dependencies
+          specs[platform] = lazy_spec
         end
         specs.values
       end
@@ -156,12 +155,11 @@ module Bundler
         @dependencies ||= begin
           dependencies = {}
           ALL.each do |p|
-            if spec = @specs[p]
-              dependencies[p] = []
-              spec.dependencies.each do |dep|
-                next if dep.type == :development
-                dependencies[p] << DepProxy.new(dep, p)
-              end
+            next unless spec = @specs[p]
+            dependencies[p] = []
+            spec.dependencies.each do |dep|
+              next if dep.type == :development
+              dependencies[p] << DepProxy.new(dep, p)
             end
           end
           dependencies
@@ -331,30 +329,29 @@ module Bundler
     def verify_gemfile_dependencies_are_found!(requirements)
       requirements.each do |requirement|
         next if requirement.name == "bundler"
-        if search_for(requirement).empty?
-          if (base = @base[requirement.name]) && !base.empty?
-            version = base.first.version
-            message = "You have requested:\n" \
-              "  #{requirement.name} #{requirement.requirement}\n\n" \
-              "The bundle currently has #{requirement.name} locked at #{version}.\n" \
-              "Try running `bundle update #{requirement.name}`\n\n" \
-              "If you are updating multiple gems in your Gemfile at once,\n" \
-              "try passing them all to `bundle update`"
-          elsif requirement.source
-            name = requirement.name
-            versions = @source_requirements[name][name].map(&:version)
-            message  = "Could not find gem '#{requirement}' in #{requirement.source}.\n"
-            if versions.any?
-              message << "Source contains '#{name}' at: #{versions.join(", ")}"
-            else
-              message << "Source does not contain any versions of '#{requirement}'"
-            end
+        next unless search_for(requirement).empty?
+        if (base = @base[requirement.name]) && !base.empty?
+          version = base.first.version
+          message = "You have requested:\n" \
+            "  #{requirement.name} #{requirement.requirement}\n\n" \
+            "The bundle currently has #{requirement.name} locked at #{version}.\n" \
+            "Try running `bundle update #{requirement.name}`\n\n" \
+            "If you are updating multiple gems in your Gemfile at once,\n" \
+            "try passing them all to `bundle update`"
+        elsif requirement.source
+          name = requirement.name
+          versions = @source_requirements[name][name].map(&:version)
+          message  = "Could not find gem '#{requirement}' in #{requirement.source}.\n"
+          if versions.any?
+            message << "Source contains '#{name}' at: #{versions.join(", ")}"
           else
-            message = "Could not find gem '#{requirement}' in any of the gem sources " \
-              "listed in your Gemfile or available on this machine."
+            message << "Source does not contain any versions of '#{requirement}'"
           end
-          raise GemNotFound, message
+        else
+          message = "Could not find gem '#{requirement}' in any of the gem sources " \
+            "listed in your Gemfile or available on this machine."
         end
+        raise GemNotFound, message
       end
     end
   end
