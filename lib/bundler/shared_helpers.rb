@@ -151,7 +151,8 @@ module Bundler
           filename = File.join(current, name)
           yield filename
         end
-        current, previous = File.expand_path("..", current), current
+        previous = current
+        current = File.expand_path("..", current)
       end
     end
 

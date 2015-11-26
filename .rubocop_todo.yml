@@ -113,16 +113,6 @@ Style/MultilineBlockChain:
   Exclude:
     - 'spec/support/less_than_proc.rb'
 
-# Offense count: 13
-# Cop supports --auto-correct.
-Style/ParallelAssignment:
-  Exclude:
-    - 'lib/bundler/dsl.rb'
-    - 'lib/bundler/shared_helpers.rb'
-    - 'lib/bundler/ui/shell.rb'
-    - 'spec/bundler/bundler_spec.rb'
-    - 'spec/support/helpers.rb'
-
 # Offense count: 8
 # Configuration parameters: NamePrefix, NamePrefixBlacklist, NameWhitelist.
 Style/PredicateName:

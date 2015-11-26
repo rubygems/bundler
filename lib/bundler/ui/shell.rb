@@ -75,7 +75,8 @@ module Bundler
       end
 
       def silence
-        old_level, @level = @level, "silent"
+        old_level = @level
+        @level = "silent"
         yield
       ensure
         @level = old_level

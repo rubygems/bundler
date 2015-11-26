@@ -205,7 +205,8 @@ module Bundler
     alias_method :platform, :platforms
 
     def env(name)
-      @env, old = name, @env
+      old = @env
+      @env = name
       yield
     ensure
       @env = old
