@@ -329,7 +329,7 @@ describe "bundle install with gems on multiple sources" do
       it "does not unlock the non-path gem after install" do
         bundle :install
 
-        bundle %{exec ruby -e 'puts "OK"'}
+        bundle %(exec ruby -e 'puts "OK"')
 
         expect(out).to include("OK")
         expect(exitstatus).to eq(0) if exitstatus

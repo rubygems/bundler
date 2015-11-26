@@ -108,7 +108,7 @@ module Spec
       env = (options.delete(:env) || {}).map {|k, v| "#{k}='#{v}' " }.join
       ruby.gsub!(/["`\$]/) {|m| "\\#{m}" }
       lib_option = options[:no_lib] ? "" : " -I#{lib}"
-      sys_exec(%{#{env}#{Gem.ruby}#{lib_option} -e "#{ruby}"}, expect_err)
+      sys_exec(%(#{env}#{Gem.ruby}#{lib_option} -e "#{ruby}"), expect_err)
     end
 
     def load_error_ruby(ruby, name, opts = {})

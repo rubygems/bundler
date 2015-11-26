@@ -256,10 +256,10 @@ module Bundler
 
     def normalize_options(name, version, opts)
       if name.is_a?(Symbol)
-        raise GemfileError, %{You need to specify gem names as Strings. Use 'gem "#{name}"' instead}
+        raise GemfileError, %(You need to specify gem names as Strings. Use 'gem "#{name}"' instead)
       end
       if name =~ /\s/
-        raise GemfileError, %{'#{name}' is not a valid gem name because it contains whitespace}
+        raise GemfileError, %('#{name}' is not a valid gem name because it contains whitespace)
       end
 
       normalize_hash(opts)
@@ -298,7 +298,7 @@ module Bundler
         opts["git"] = @git_sources[git_name].call(opts[git_name])
       end
 
-      %w[git path].each do |type|
+      %w(git path).each do |type|
         if param = opts[type]
           if version.first && version.first =~ /^\s*=?\s*(\d[^\s]*)\s*$/
             options = opts.merge("name" => name, "version" => $1)

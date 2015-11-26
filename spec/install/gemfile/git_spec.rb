@@ -186,7 +186,7 @@ describe "bundle install with git sources" do
         gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
       G
 
-      bundle %|config local.rack #{lib_path("local-rack")}|
+      bundle %(config local.rack #{lib_path("local-rack")})
       bundle :install
       expect(out).to match(/at #{lib_path('local-rack')}/)
 
@@ -208,7 +208,7 @@ describe "bundle install with git sources" do
         gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
       G
 
-      bundle %|config local.rack #{lib_path("local-rack")}|
+      bundle %(config local.rack #{lib_path("local-rack")})
       run "require 'rack'"
       expect(out).to eq("LOCAL")
     end
@@ -230,7 +230,7 @@ describe "bundle install with git sources" do
         s.add_dependency "nokogiri", "1.4.2"
       end
 
-      bundle %|config local.rack #{lib_path("local-rack")}|
+      bundle %(config local.rack #{lib_path("local-rack")})
       run "require 'rack'"
 
       lockfile1 = File.read(bundled_app("Gemfile.lock"))
@@ -250,7 +250,7 @@ describe "bundle install with git sources" do
       FileUtils.cp_r("#{lib_path("rack-0.8")}/.", lib_path("local-rack"))
       update_git "rack", "0.8", :path => lib_path("local-rack")
 
-      bundle %|config local.rack #{lib_path("local-rack")}|
+      bundle %(config local.rack #{lib_path("local-rack")})
       bundle :install
 
       lockfile1 = File.read(bundled_app("Gemfile.lock"))
@@ -265,7 +265,7 @@ describe "bundle install with git sources" do
         gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
       G
 
-      bundle %|config local.rack #{lib_path("local-rack")}|
+      bundle %(config local.rack #{lib_path("local-rack")})
       bundle :install
       expect(out).to match(/Cannot use local override for rack-0.8 because #{Regexp.escape(lib_path('local-rack').to_s)} does not exist/)
     end
@@ -279,7 +279,7 @@ describe "bundle install with git sources" do
         gem "rack", :git => "#{lib_path("rack-0.8")}"
       G
 
-      bundle %|config local.rack #{lib_path("local-rack")}|
+      bundle %(config local.rack #{lib_path("local-rack")})
       bundle :install
       expect(out).to match(/cannot use local override/i)
     end
@@ -293,8 +293,8 @@ describe "bundle install with git sources" do
         gem "rack", :git => "#{lib_path("rack-0.8")}"
       G
 
-      bundle %|config local.rack #{lib_path("local-rack")}|
-      bundle %|config disable_local_branch_check true|
+      bundle %(config local.rack #{lib_path("local-rack")})
+      bundle %(config disable_local_branch_check true)
       bundle :install
       expect(out).to match(/Bundle complete!/)
     end
@@ -313,7 +313,7 @@ describe "bundle install with git sources" do
         gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
       G
 
-      bundle %|config local.rack #{lib_path("local-rack")}|
+      bundle %(config local.rack #{lib_path("local-rack")})
       bundle :install
       expect(out).to match(/is using branch another but Gemfile specifies master/)
     end
@@ -330,7 +330,7 @@ describe "bundle install with git sources" do
         gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
       G
 
-      bundle %|config local.rack #{lib_path("local-rack")}|
+      bundle %(config local.rack #{lib_path("local-rack")})
       bundle :install
       expect(out).to match(/The Gemfile lock is pointing to revision \w+/)
     end
@@ -467,7 +467,7 @@ describe "bundle install with git sources" do
 
   it "runs the gemspec in the context of its parent directory" do
     build_lib "bar", :path => lib_path("foo/bar"), :gemspec => false do |s|
-      s.write lib_path("foo/bar/lib/version.rb"), %{BAR_VERSION = '1.0'}
+      s.write lib_path("foo/bar/lib/version.rb"), %(BAR_VERSION = '1.0')
       s.write "bar.gemspec", <<-G
         $:.unshift Dir.pwd # For 1.9
         require 'lib/version'

@@ -62,7 +62,7 @@ module Bundler
 
           spec_version    = "#{active_spec.version}#{active_spec.git_version}"
           current_version = "#{current_spec.version}#{current_spec.git_version}"
-          dependency_version = %|, requested #{dependency.requirement}| if dependency && dependency.specific?
+          dependency_version = %(, requested #{dependency.requirement}) if dependency && dependency.specific?
 
           if dependency
             groups = dependency.groups.join(", ")

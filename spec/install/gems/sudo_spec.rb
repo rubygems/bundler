@@ -146,7 +146,7 @@ describe "when using sudo", :sudo => true do
     let(:warning) { "Don't run Bundler as root." }
 
     before do
-      gemfile %|source "file://#{gem_repo1}"|
+      gemfile %(source "file://#{gem_repo1}")
     end
 
     it "warns against that" do

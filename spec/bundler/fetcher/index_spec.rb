@@ -10,7 +10,7 @@ describe Bundler::Fetcher::Index do
     allow(Bundler).to receive(:ui).and_return(double(:trace => nil))
 
     expect do
-      Bundler::Fetcher::Index.new(nil, nil, nil).specs(%w[foo bar])
+      Bundler::Fetcher::Index.new(nil, nil, nil).specs(%w(foo bar))
     end.to raise_error(Bundler::HTTPError)
   end
 end

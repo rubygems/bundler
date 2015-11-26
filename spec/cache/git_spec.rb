@@ -100,7 +100,7 @@ end
         gem "foo", :git => '#{lib_path("foo-invalid")}', :branch => :master
       G
 
-      bundle %|config local.foo #{lib_path("foo-1.0")}|
+      bundle %(config local.foo #{lib_path("foo-1.0")})
       bundle "install"
       bundle "#{cmd} --all"
 

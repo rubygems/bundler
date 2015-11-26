@@ -72,14 +72,14 @@ module Bundler
             return if has_revision_cached?
             Bundler.ui.info "Fetching #{uri}"
             in_path do
-              git_retry %|fetch --force --quiet --tags #{uri_escaped_with_configured_credentials} "refs/heads/*:refs/heads/*"|
+              git_retry %(fetch --force --quiet --tags #{uri_escaped_with_configured_credentials} "refs/heads/*:refs/heads/*")
             end
           else
             Bundler.ui.info "Fetching #{uri}"
             SharedHelpers.filesystem_access(path.dirname) do |p|
               FileUtils.mkdir_p(p)
             end
-            git_retry %|clone #{uri_escaped_with_configured_credentials} "#{path}" --bare --no-hardlinks --quiet|
+            git_retry %(clone #{uri_escaped_with_configured_credentials} "#{path}" --bare --no-hardlinks --quiet)
           end
         end
 
@@ -93,7 +93,7 @@ module Bundler
               SharedHelpers.filesystem_access(destination) do |p|
                 FileUtils.rm_rf(p)
               end
-              git_retry %|clone --no-checkout --quiet "#{path}" "#{destination}"|
+              git_retry %(clone --no-checkout --quiet "#{path}" "#{destination}")
               File.chmod(((File.stat(destination).mode | 0777) & ~File.umask), destination)
             rescue Errno::EEXIST => e
               file_path = e.message[%r{.*?(/.*)}, 1]
@@ -104,7 +104,7 @@ module Bundler
           end
           # method 2
           SharedHelpers.chdir(destination) do
-            git_retry %|fetch --force --quiet --tags "#{path}"|
+            git_retry %(fetch --force --quiet --tags "#{path}")
             git "reset --hard #{@revision}"
 
             if submodules

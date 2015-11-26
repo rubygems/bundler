@@ -243,7 +243,7 @@ module Bundler
     end
 
     def convert_to_backward_compatible_key(key)
-      key = "#{key}/" if key =~ /https?:/i && key !~ %r[/\Z]
+      key = "#{key}/" if key =~ /https?:/i && key !~ %r{/\Z}
       key = key.gsub(".", "__") if key.include?(".")
       key
     end
@@ -252,7 +252,7 @@ module Bundler
     # TODO: is this the correct place to validate mirror URIs?
     def normalize_uri(uri)
       uri = uri.to_s
-      uri = "#{uri}/" unless uri =~ %r[/\Z]
+      uri = "#{uri}/" unless uri =~ %r{/\Z}
       uri = URI(uri)
       unless uri.absolute?
         raise ArgumentError, "Gem sources must be absolute. You provided '#{uri}'."

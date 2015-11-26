@@ -135,7 +135,7 @@ module Bundler
     end
 
     def repository_subdirectories
-      %w[cache doc gems specifications]
+      %w(cache doc gems specifications)
     end
 
     def clear_paths
@@ -251,7 +251,7 @@ module Bundler
     end
 
     def security_policy_keys
-      %w{High Medium Low AlmostNo No}.map {|level| "#{level}Security" }
+      %w(High Medium Low AlmostNo No).map {|level| "#{level}Security" }
     end
 
     def security_policies
