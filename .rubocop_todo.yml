@@ -128,9 +128,3 @@ Style/PredicateName:
 # Configuration parameters: EnforcedStyle, SupportedStyles.
 Style/RaiseArgs:
   Enabled: false
-
-# Offense count: 1
-# Configuration parameters: Methods.
-Style/SingleLineBlockParams:
-  Exclude:
-    - 'lib/bundler/cli/gem.rb'

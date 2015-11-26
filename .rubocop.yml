@@ -33,6 +33,9 @@ Style/MultilineOperationIndentation:
 Style/PerlBackrefs:
   Enabled: false
 
+Style/SingleLineBlockParams:
+  Enabled: false
+
 Style/SpaceInsideBlockBraces:
   SpaceBeforeBlockParameters: false
 
