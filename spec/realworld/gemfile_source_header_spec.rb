@@ -35,7 +35,11 @@ describe "fetching dependencies with a mirrored source", :rubygems => ">= 2.0" d
     ENV["GEM_HOME"] = old_gem_home
 
     @port = 21_459
-    @port += 1 while TCPSocket.new("127.0.0.1", @port) rescue false
+    begin
+      @port += 1 while TCPSocket.new("127.0.0.1", @port)
+    rescue
+      false
+    end
     @server_uri = "http://127.0.0.1:#{@port}"
 
     require File.expand_path("../../support/artifice/endpoint_mirror_source", __FILE__)

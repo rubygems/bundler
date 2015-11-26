@@ -282,11 +282,15 @@ module Bundler
     end
 
     def name_for_explicit_dependency_source
-      Bundler.default_gemfile.basename.to_s rescue "Gemfile"
+      Bundler.default_gemfile.basename.to_s
+    rescue
+      "Gemfile"
     end
 
     def name_for_locking_dependency_source
-      Bundler.default_lockfile.basename.to_s rescue "Gemfile.lock"
+      Bundler.default_lockfile.basename.to_s
+    rescue
+      "Gemfile.lock"
     end
 
     def requirement_satisfied_by?(requirement, activated, spec)

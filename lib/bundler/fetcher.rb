@@ -150,7 +150,11 @@ module Bundler
 
         if ruby.engine != "ruby"
           # engine_version raises on unknown engines
-          engine_version = ruby.engine_version rescue "???"
+          engine_version = begin
+                             ruby.engine_version
+                           rescue
+                             "???"
+                           end
           agent << " #{ruby.engine}/#{engine_version}"
         end
 

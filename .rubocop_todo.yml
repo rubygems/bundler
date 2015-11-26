@@ -258,16 +258,6 @@ Style/RedundantSelf:
     - 'spec/support/less_than_proc.rb'
     - 'spec/support/ruby_ext.rb'
 
-# Offense count: 6
-# Cop supports --auto-correct.
-Style/RescueModifier:
-  Exclude:
-    - 'lib/bundler.rb'
-    - 'lib/bundler/fetcher.rb'
-    - 'lib/bundler/resolver.rb'
-    - 'spec/realworld/dependency_api_spec.rb'
-    - 'spec/realworld/gemfile_source_header_spec.rb'
-
 # Offense count: 1
 # Configuration parameters: Methods.
 Style/SingleLineBlockParams:
