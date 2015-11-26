@@ -282,7 +282,7 @@ module Bundler
 
       ::Kernel.send(:define_method, :gem) do |dep, *reqs|
         if executables.include? File.basename(caller.first.split(":").first)
-          return
+          break
         end
         reqs.pop if reqs.last.is_a?(Hash)
 

@@ -26,11 +26,6 @@ Lint/NestedMethodDefinition:
   Exclude:
     - 'lib/bundler/graph.rb'
 
-# Offense count: 1
-Lint/NonLocalExitFromIterator:
-  Exclude:
-    - 'lib/bundler/rubygems_integration.rb'
-
 # Offense count: 5
 Lint/RescueException:
   Exclude:
