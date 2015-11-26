@@ -24,10 +24,11 @@ class Bundler::CompactIndexClient
         info_checksums_by_name[name] = info_checksum || ""
         versions_string.split(",").each do |version|
           if version.start_with?("-")
-            versions_by_name[name].delete(version[1..-1])
+            version = version[1..-1].split("-", 2).unshift(name)
+            versions_by_name[name].delete(version)
           else
-            versions = version.split("-", 2).unshift(name)
-            versions_by_name[name].concat(versions)
+            version = version.split("-", 2).unshift(name)
+            versions_by_name[name] << version
           end
         end
       end
