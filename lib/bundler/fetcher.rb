@@ -180,8 +180,6 @@ module Bundler
     def http_proxy
       if uri = connection.proxy_uri
         uri.to_s
-      else
-        nil
       end
     end
 
