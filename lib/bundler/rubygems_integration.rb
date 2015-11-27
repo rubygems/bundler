@@ -135,7 +135,7 @@ module Bundler
     end
 
     def repository_subdirectories
-      %w[cache doc gems specifications]
+      %w(cache doc gems specifications)
     end
 
     def clear_paths
@@ -203,7 +203,7 @@ module Bundler
 
     def with_build_args(args)
       ext_lock.synchronize do
-        old_args = self.build_args
+        old_args = build_args
         begin
           self.build_args = args
           yield
@@ -251,7 +251,7 @@ module Bundler
     end
 
     def security_policy_keys
-      %w{High Medium Low AlmostNo No}.map {|level| "#{level}Security" }
+      %w(High Medium Low AlmostNo No).map {|level| "#{level}Security" }
     end
 
     def security_policies
@@ -282,7 +282,7 @@ module Bundler
 
       ::Kernel.send(:define_method, :gem) do |dep, *reqs|
         if executables.include? File.basename(caller.first.split(":").first)
-          return
+          break
         end
         reqs.pop if reqs.last.is_a?(Hash)
 
@@ -346,15 +346,13 @@ module Bundler
       redefine_method(gem_class, :bin_path) do |name, *args|
         exec_name = args.first
 
-        if exec_name == "bundle"
-          return ENV["BUNDLE_BIN_PATH"]
-        end
+        return ENV["BUNDLE_BIN_PATH"] if exec_name == "bundle"
 
         spec = nil
 
         if exec_name
           spec = specs.find {|s| s.executables.include?(exec_name) }
-          spec or raise Gem::Exception, "can't find executable #{exec_name}"
+          raise(Gem::Exception, "can't find executable #{exec_name}") unless spec
           unless spec.name == name
             warn "Bundler is using a binstub that was created for a different gem.\n" \
               "This is deprecated, in future versions you may need to `bundle binstub #{name}` " \
@@ -362,7 +360,7 @@ module Bundler
           end
         else
           spec = specs.find {|s| s.name == name }
-          exec_name = spec.default_executable or raise Gem::Exception, "no default executable for #{spec.full_name}"
+          raise Gem::Exception, "no default executable for #{spec.full_name}" unless exec_name = spec.default_executable
         end
 
         gem_bin = File.join(spec.full_gem_path, spec.bindir, exec_name)
@@ -511,9 +509,9 @@ module Bundler
       def stub_rubygems(specs)
         Gem::Specification.all = specs
 
-        Gem.post_reset {
+        Gem.post_reset do
           Gem::Specification.all = specs
-        }
+        end
 
         stub_source_index(specs)
       end
@@ -647,9 +645,7 @@ module Bundler
             const_set(:CHDIR_MONITOR, EXT_LOCK)
           end
 
-          if const_defined?(:CHDIR_MUTEX)
-            remove_const(:CHDIR_MUTEX)
-          end
+          remove_const(:CHDIR_MUTEX) if const_defined?(:CHDIR_MUTEX)
           const_set(:CHDIR_MUTEX, const_get(:CHDIR_MONITOR))
         end
       end

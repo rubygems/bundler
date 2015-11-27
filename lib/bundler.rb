@@ -175,7 +175,7 @@ module Bundler
 
     def app_cache(custom_path = nil)
       path = custom_path || root
-      path.join(self.settings.app_cache_path)
+      path.join(settings.app_cache_path)
     end
 
     def tmp(name = Process.pid.to_s)
@@ -252,9 +252,7 @@ module Bundler
     def requires_sudo?
       return @requires_sudo if defined?(@requires_sudo_ran)
 
-      if settings.allow_sudo?
-        sudo_present = which "sudo"
-      end
+      sudo_present = which "sudo" if settings.allow_sudo?
 
       if sudo_present
         # the bundle path and subdirectories need to be writable for Rubygems
@@ -412,7 +410,11 @@ module Bundler
 
     def configure_gem_home
       # TODO: This mkdir_p is only needed for JRuby <= 1.5 and should go away (GH #602)
-      FileUtils.mkdir_p bundle_path.to_s rescue nil
+      begin
+        FileUtils.mkdir_p bundle_path.to_s
+      rescue
+        nil
+      end
 
       ENV["GEM_HOME"] = File.expand_path(bundle_path, root)
       Bundler.rubygems.clear_paths

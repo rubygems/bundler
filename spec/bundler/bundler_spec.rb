@@ -24,7 +24,8 @@ describe Bundler do
       context "on Rubies with a settable YAML engine", :if => defined?(YAML::ENGINE) do
         context "with Syck as YAML::Engine" do
           it "raises a GemspecError after YAML load throws ArgumentError" do
-            orig_yamler, YAML::ENGINE.yamler = YAML::ENGINE.yamler, "syck"
+            orig_yamler = YAML::ENGINE.yamler
+            YAML::ENGINE.yamler = "syck"
 
             expect { subject }.to raise_error(Bundler::GemspecError)
 
@@ -34,7 +35,8 @@ describe Bundler do
 
         context "with Psych as YAML::Engine" do
           it "raises a GemspecError after YAML load throws Psych::SyntaxError" do
-            orig_yamler, YAML::ENGINE.yamler = YAML::ENGINE.yamler, "psych"
+            orig_yamler = YAML::ENGINE.yamler
+            YAML::ENGINE.yamler = "psych"
 
             expect { subject }.to raise_error(Bundler::GemspecError)
 
@@ -48,8 +50,10 @@ describe Bundler do
       it "can load a gemspec with unicode characters with default ruby encoding" do
         # spec_helper forces the external encoding to UTF-8 but that's not the
         # default until Ruby 2.0
-        verbose, $VERBOSE = $VERBOSE, false
-        encoding, Encoding.default_external = Encoding.default_external, "ASCII"
+        verbose = $VERBOSE
+        $VERBOSE = false
+        encoding = Encoding.default_external
+        Encoding.default_external = "ASCII"
         $VERBOSE = verbose
 
         File.open(app_gemspec_path, "wb") do |file|
@@ -63,7 +67,8 @@ describe Bundler do
 
         expect(subject.author).to eq("André the Giant")
 
-        verbose, $VERBOSE = $VERBOSE, false
+        verbose = $VERBOSE
+        $VERBOSE = false
         Encoding.default_external = encoding
         $VERBOSE = verbose
       end

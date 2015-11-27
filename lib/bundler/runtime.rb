@@ -21,7 +21,7 @@ module Bundler
           raise GemNotFound, "#{spec.full_name} is missing. Run `bundle` to get it."
         end
 
-        if activated_spec = Bundler.rubygems.loaded_specs(spec.name) and activated_spec.version != spec.version
+        if (activated_spec = Bundler.rubygems.loaded_specs(spec.name)) && activated_spec.version != spec.version
           e = Gem::LoadError.new "You have already activated #{activated_spec.name} #{activated_spec.version}, " \
                                  "but your Gemfile requires #{spec.name} #{spec.version}. Prepending " \
                                  "`bundle exec` to your command may solve this."

@@ -42,8 +42,8 @@ namespace :spec do
     end
 
     deps.sort_by {|name, _| name }.each do |name, version|
-      sh %{#{Gem.ruby} -S gem list -i "^#{name}$" -v "#{version}" || } +
-         %{#{Gem.ruby} -S gem install #{name} -v "#{version}" --no-ri --no-rdoc}
+      sh %(#{Gem.ruby} -S gem list -i "^#{name}$" -v "#{version}" || ) +
+        %(#{Gem.ruby} -S gem install #{name} -v "#{version}" --no-ri --no-rdoc)
     end
 
     # Download and install gems used inside tests
@@ -99,14 +99,14 @@ begin
     end
 
     desc "Run the real-world spec suite (requires internet)"
-    task :realworld => %w[set_realworld spec]
+    task :realworld => %w(set_realworld spec)
 
     task :set_realworld do
       ENV["BUNDLER_REALWORLD_TESTS"] = "1"
     end
 
     desc "Run the spec suite with the sudo tests"
-    task :sudo => %w[set_sudo spec clean_sudo]
+    task :sudo => %w(set_sudo spec clean_sudo)
 
     task :set_sudo do
       ENV["BUNDLER_SUDO_TESTS"] = "1"

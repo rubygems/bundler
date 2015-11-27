@@ -69,9 +69,7 @@ module Bundler
                                  "before deploying."
         end
 
-        if Bundler.app_cache.exist?
-          options[:local] = true
-        end
+        options[:local] = true if Bundler.app_cache.exist?
 
         Bundler.settings[:frozen] = "1"
       end

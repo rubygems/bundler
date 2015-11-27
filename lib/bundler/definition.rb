@@ -19,9 +19,7 @@ module Bundler
       unlock ||= {}
       gemfile = Pathname.new(gemfile).expand_path
 
-      unless gemfile.file?
-        raise GemfileNotFound, "#{gemfile} not found"
-      end
+      raise GemfileNotFound, "#{gemfile} not found" unless gemfile.file?
 
       Dsl.evaluate(gemfile, lockfile, unlock)
     end
@@ -355,9 +353,7 @@ module Bundler
       new_deps = @dependencies - @locked_deps
       deleted_deps = @locked_deps - @dependencies
 
-      if new_deps.any?
-        added.concat new_deps.map {|d| "* #{pretty_dep(d)}" }
-      end
+      added.concat new_deps.map {|d| "* #{pretty_dep(d)}" } if new_deps.any?
 
       if deleted_deps.any?
         deleted.concat deleted_deps.map {|d| "* #{pretty_dep(d)}" }
@@ -368,11 +364,10 @@ module Bundler
       @locked_deps.each  {|d| both_sources[d.name][1] = d.source }
 
       both_sources.each do |name, (dep, lock_source)|
-        if (dep.nil? && !lock_source.nil?) || (!dep.nil? && !lock_source.nil? && !lock_source.can_lock?(dep))
-          gemfile_source_name = (dep && dep.source) || "no specified source"
-          lockfile_source_name = lock_source || "no specified source"
-          changed << "* #{name} from `#{gemfile_source_name}` to `#{lockfile_source_name}`"
-        end
+        next unless (dep.nil? && !lock_source.nil?) || (!dep.nil? && !lock_source.nil? && !lock_source.can_lock?(dep))
+        gemfile_source_name = (dep && dep.source) || "no specified source"
+        lockfile_source_name = lock_source || "no specified source"
+        changed << "* #{name} from `#{gemfile_source_name}` to `#{lockfile_source_name}`"
       end
 
       msg << "\n\nYou have added to the Gemfile:\n" << added.join("\n") if added.any?
@@ -390,18 +385,18 @@ module Bundler
         problem, expected, actual = diff
 
         msg = case problem
-        when :engine
-          "Your Ruby engine is #{actual}, but your Gemfile specified #{expected}"
-        when :version
-          "Your Ruby version is #{actual}, but your Gemfile specified #{expected}"
-        when :engine_version
-          "Your #{Bundler.ruby_version.engine} version is #{actual}, but your Gemfile specified #{ruby_version.engine} #{expected}"
-        when :patchlevel
-          if !expected.is_a?(String)
-            "The Ruby patchlevel in your Gemfile must be a string"
-          else
-            "Your Ruby patchlevel is #{actual}, but your Gemfile specified #{expected}"
-          end
+              when :engine
+                "Your Ruby engine is #{actual}, but your Gemfile specified #{expected}"
+              when :version
+                "Your Ruby version is #{actual}, but your Gemfile specified #{expected}"
+              when :engine_version
+                "Your #{Bundler.ruby_version.engine} version is #{actual}, but your Gemfile specified #{ruby_version.engine} #{expected}"
+              when :patchlevel
+                if !expected.is_a?(String)
+                  "The Ruby patchlevel in your Gemfile must be a string"
+                else
+                  "Your Ruby patchlevel is #{actual}, but your Gemfile specified #{expected}"
+                end
         end
 
         raise RubyVersionMismatch, msg
@@ -513,9 +508,7 @@ module Bundler
 
     def converge_dependencies
       (@dependencies + @locked_deps).each do |dep|
-        if dep.source
-          dep.source = sources.get(dep.source)
-        end
+        dep.source = sources.get(dep.source) if dep.source
       end
       Set.new(@dependencies) != Set.new(@locked_deps)
     end
@@ -661,7 +654,7 @@ module Bundler
     end
 
     def requested_groups
-      self.groups - Bundler.settings.without - @optional_groups + Bundler.settings.with
+      groups - Bundler.settings.without - @optional_groups + Bundler.settings.with
     end
 
     def lockfiles_equal?(current, proposed, preserve_bundled_with)

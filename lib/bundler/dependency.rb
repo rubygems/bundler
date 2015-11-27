@@ -74,9 +74,7 @@ module Bundler
       @env            = options["env"]
       @should_include = options.fetch("should_include", true)
 
-      if options.key?("require")
-        @autorequire = Array(options["require"] || [])
-      end
+      @autorequire = Array(options["require"] || []) if options.key?("require")
     end
 
     def gem_platforms(valid_platforms)
@@ -108,9 +106,9 @@ module Bundler
 
     def current_platform?
       return true if @platforms.empty?
-      @platforms.any? { |p|
+      @platforms.any? do |p|
         Bundler.current_ruby.send("#{p}?")
-      }
+      end
     end
 
     def to_lock

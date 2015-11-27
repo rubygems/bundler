@@ -96,15 +96,15 @@ module Bundler
       # redefinition of matching_specs will also redefine to_spec and to_specs
       Gem::Dependency.class_eval do
         def matching_specs(platform_only = false)
-          matches = Bundler.load.specs.select { |spec|
-            self.name == spec.name and
-              requirement.satisfied_by? spec.version
-          }
+          matches = Bundler.load.specs.select do |spec|
+            name == spec.name &&
+              requirement.satisfied_by?(spec.version)
+          end
 
           if platform_only
-            matches.select! { |spec|
+            matches.select! do |spec|
               Gem::Platform.match spec.platform
-            }
+            end
           end
 
           matches = matches.sort_by(&:sort_obj) # HACK: shouldn't be needed

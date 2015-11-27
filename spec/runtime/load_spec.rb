@@ -29,10 +29,10 @@ describe "Bundler.load" do
     end
 
     it "ignores blank BUNDLE_GEMFILEs" do
-      expect {
+      expect do
         ENV["BUNDLE_GEMFILE"] = ""
         Bundler.load
-      }.not_to raise_error
+      end.not_to raise_error
     end
   end
 
@@ -55,16 +55,16 @@ describe "Bundler.load" do
 
   describe "without a gemfile" do
     it "raises an exception if the default gemfile is not found" do
-      expect {
+      expect do
         Bundler.load
-      }.to raise_error(Bundler::GemfileNotFound, /could not locate gemfile/i)
+      end.to raise_error(Bundler::GemfileNotFound, /could not locate gemfile/i)
     end
 
     it "raises an exception if a specified gemfile is not found" do
-      expect {
+      expect do
         ENV["BUNDLE_GEMFILE"] = "omg.rb"
         Bundler.load
-      }.to raise_error(Bundler::GemfileNotFound, /omg\.rb/)
+      end.to raise_error(Bundler::GemfileNotFound, /omg\.rb/)
     end
 
     it "does not find a Gemfile above the testing directory" do

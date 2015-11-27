@@ -15,14 +15,14 @@ describe "bundle help" do
     fake_man!
 
     bundle "help gemfile"
-    expect(out).to eq(%|["#{root}/lib/bundler/man/gemfile.5"]|)
+    expect(out).to eq(%(["#{root}/lib/bundler/man/gemfile.5"]))
   end
 
   it "prefixes bundle commands with bundle- when finding the groff files" do
     fake_man!
 
     bundle "help install"
-    expect(out).to eq(%|["#{root}/lib/bundler/man/bundle-install"]|)
+    expect(out).to eq(%(["#{root}/lib/bundler/man/bundle-install"]))
   end
 
   it "simply outputs the txt file when there is no man on the path" do

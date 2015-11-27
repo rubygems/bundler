@@ -103,10 +103,10 @@ describe Bundler::GemHelper do
       end
 
       context "defines Rake tasks" do
-        let(:task_names) {
-          %w[build install release release:guard_clean
-             release:source_control_push release:rubygem_push]
-        }
+        let(:task_names) do
+          %w(build install release release:guard_clean
+             release:source_control_push release:rubygem_push)
+        end
 
         context "before installation" do
           it "raises an error with appropriate message" do

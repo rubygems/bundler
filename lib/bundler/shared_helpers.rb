@@ -61,7 +61,7 @@ module Bundler
     end
 
     def with_clean_git_env(&block)
-      keys    = %w[GIT_DIR GIT_WORK_TREE]
+      keys    = %w(GIT_DIR GIT_WORK_TREE)
       old_env = keys.inject({}) do |h, k|
         h.update(k => ENV[k])
       end
@@ -82,7 +82,7 @@ module Bundler
       # Set RUBYOPT
       rubyopt = [ENV["RUBYOPT"]].compact
       if rubyopt.empty? || rubyopt.first !~ %r{-rbundler/setup}
-        rubyopt.unshift %|-rbundler/setup|
+        rubyopt.unshift %(-rbundler/setup)
         ENV["RUBYOPT"] = rubyopt.join(" ")
       end
 
@@ -126,9 +126,9 @@ module Bundler
     end
 
     def find_file(*names)
-      search_up(*names) {|filename|
+      search_up(*names) do |filename|
         return filename if File.file?(filename)
-      }
+      end
     end
 
     def find_directory(*names)
@@ -151,7 +151,8 @@ module Bundler
           filename = File.join(current, name)
           yield filename
         end
-        current, previous = File.expand_path("..", current), current
+        previous = current
+        current = File.expand_path("..", current)
       end
     end
 

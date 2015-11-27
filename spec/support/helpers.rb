@@ -108,7 +108,7 @@ module Spec
       env = (options.delete(:env) || {}).map {|k, v| "#{k}='#{v}' " }.join
       ruby.gsub!(/["`\$]/) {|m| "\\#{m}" }
       lib_option = options[:no_lib] ? "" : " -I#{lib}"
-      sys_exec(%{#{env}#{Gem.ruby}#{lib_option} -e "#{ruby}"}, expect_err)
+      sys_exec(%(#{env}#{Gem.ruby}#{lib_option} -e "#{ruby}"), expect_err)
     end
 
     def load_error_ruby(ruby, name, opts = {})
@@ -124,7 +124,8 @@ module Spec
 
     def gembin(cmd)
       lib = File.expand_path("../../../lib", __FILE__)
-      old, ENV["RUBYOPT"] = ENV["RUBYOPT"], "#{ENV["RUBYOPT"]} -I#{lib}"
+      old = ENV["RUBYOPT"]
+      ENV["RUBYOPT"] = "#{ENV["RUBYOPT"]} -I#{lib}"
       cmd = bundled_app("bin/#{cmd}") unless cmd.to_s.include?("/")
       sys_exec(cmd.to_s)
     ensure
@@ -324,7 +325,8 @@ module Spec
     end
 
     def simulate_platform(platform)
-      old, ENV["BUNDLER_SPEC_PLATFORM"] = ENV["BUNDLER_SPEC_PLATFORM"], platform.to_s
+      old = ENV["BUNDLER_SPEC_PLATFORM"]
+      ENV["BUNDLER_SPEC_PLATFORM"] = platform.to_s
       yield if block_given?
     ensure
       ENV["BUNDLER_SPEC_PLATFORM"] = old if block_given?
@@ -333,8 +335,10 @@ module Spec
     def simulate_ruby_engine(engine, version = "1.6.0")
       return if engine == local_ruby_engine
 
-      old, ENV["BUNDLER_SPEC_RUBY_ENGINE"] = ENV["BUNDLER_SPEC_RUBY_ENGINE"], engine
-      old_version, ENV["BUNDLER_SPEC_RUBY_ENGINE_VERSION"] = ENV["BUNDLER_SPEC_RUBY_ENGINE_VERSION"], version
+      old = ENV["BUNDLER_SPEC_RUBY_ENGINE"]
+      ENV["BUNDLER_SPEC_RUBY_ENGINE"] = engine
+      old_version = ENV["BUNDLER_SPEC_RUBY_ENGINE_VERSION"]
+      ENV["BUNDLER_SPEC_RUBY_ENGINE_VERSION"] = version
       yield if block_given?
     ensure
       ENV["BUNDLER_SPEC_RUBY_ENGINE"] = old if block_given?
@@ -342,7 +346,8 @@ module Spec
     end
 
     def simulate_bundler_version(version)
-      old, ENV["BUNDLER_SPEC_VERSION"] = ENV["BUNDLER_SPEC_VERSION"], version.to_s
+      old = ENV["BUNDLER_SPEC_VERSION"]
+      ENV["BUNDLER_SPEC_VERSION"] = version.to_s
       yield if block_given?
     ensure
       ENV["BUNDLER_SPEC_VERSION"] = old if block_given?

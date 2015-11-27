@@ -53,8 +53,6 @@ module Bundler
         [:engine_version, engine_version, other.engine_version]
       elsif patchlevel != other.patchlevel && @patchlevel
         [:patchlevel, patchlevel, other.patchlevel]
-      else
-        nil
       end
     end
 

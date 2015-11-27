@@ -13,7 +13,7 @@ module Spec
       unless File.exist?("#{Path.base_system_gems}")
         FileUtils.mkdir_p(Path.base_system_gems)
         puts "installing gems for the tests to use..."
-        %w[fakeweb artifice rack].each {|n| install_gem(n) }
+        %w(fakeweb artifice rack).each {|n| install_gem(n) }
         {
           "sinatra" => "1.2.7",
           # Rake version has to be consistent for tests to pass
@@ -39,11 +39,10 @@ module Spec
     def gem_command(command, args = "", options = {})
       if command == :exec && !options[:no_quote]
         args = args.gsub(/(?=")/, "\\")
-        args = %["#{args}"]
+        args = %("#{args}")
       end
       lib = File.join(File.dirname(__FILE__), "..", "..", "lib")
       `#{Gem.ruby} -I#{lib} -rubygems -S gem --backtrace #{command} #{args}`.strip
     end
-
   end
 end

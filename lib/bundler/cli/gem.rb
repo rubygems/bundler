@@ -61,10 +61,10 @@ module Bundler
         "bin/setup.tt" => "bin/setup"
       }
 
-      executables = %w[
+      executables = %w(
         bin/console
         bin/setup
-      ]
+      )
 
       if test_framework = ask_and_set_test_framework
         config[:test] = test_framework

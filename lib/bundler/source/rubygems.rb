@@ -68,7 +68,7 @@ module Bundler
       end
 
       def to_s
-        remote_names = self.remotes.map(&:to_s).join(", ")
+        remote_names = remotes.map(&:to_s).join(", ")
         "rubygems repository #{remote_names}"
       end
       alias_method :name, :to_s
@@ -264,7 +264,7 @@ module Bundler
 
       def normalize_uri(uri)
         uri = uri.to_s
-        uri = "#{uri}/" unless uri =~ %r'/$'
+        uri = "#{uri}/" unless uri =~ %r{/$}
         uri = URI(uri)
         raise ArgumentError, "The source must be an absolute URI. For example:\n" \
           "source 'https://rubygems.org'" if !uri.absolute? || (uri.is_a?(URI::HTTP) && uri.host.nil?)

@@ -87,7 +87,7 @@ describe "bundle cache" do
     end
 
     it "uses builtin gems" do
-      install_gemfile %|gem 'builtin_gem', '1.0.2'|
+      install_gemfile %(gem 'builtin_gem', '1.0.2')
       should_be_installed("builtin_gem 1.0.2")
     end
 

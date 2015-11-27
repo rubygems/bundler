@@ -26,11 +26,6 @@ Lint/NestedMethodDefinition:
   Exclude:
     - 'lib/bundler/graph.rb'
 
-# Offense count: 1
-Lint/NonLocalExitFromIterator:
-  Exclude:
-    - 'lib/bundler/rubygems_integration.rb'
-
 # Offense count: 5
 Lint/RescueException:
   Exclude:
@@ -66,40 +61,12 @@ Style/AccessorMethodName:
   Exclude:
     - 'lib/bundler/source/git.rb'
 
-# Offense count: 16
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/AndOr:
-  Exclude:
-    - 'lib/bundler/gem_helper.rb'
-    - 'lib/bundler/graph.rb'
-    - 'lib/bundler/lazy_specification.rb'
-    - 'lib/bundler/match_platform.rb'
-    - 'lib/bundler/remote_specification.rb'
-    - 'lib/bundler/resolver.rb'
-    - 'lib/bundler/rubygems_integration.rb'
-    - 'lib/bundler/runtime.rb'
-    - 'lib/bundler/settings.rb'
-    - 'spec/support/builders.rb'
-
-# Offense count: 24
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles, ProceduralMethods, FunctionalMethods, IgnoredMethods.
-Style/BlockDelimiters:
-  Enabled: false
-
 # Offense count: 3
 Style/CaseEquality:
   Exclude:
     - 'lib/bundler/dsl.rb'
     - 'lib/bundler/match_platform.rb'
     - 'lib/bundler/rubygems_ext.rb'
-
-# Offense count: 4
-# Cop supports --auto-correct.
-# Configuration parameters: IndentWhenRelativeTo, SupportedStyles, IndentOneStep.
-Style/CaseIndentation:
-  Enabled: false
 
 # Offense count: 22
 # Configuration parameters: EnforcedStyle, SupportedStyles.
@@ -110,29 +77,6 @@ Style/ClassAndModuleChildren:
 # Configuration parameters: Exclude.
 Style/Documentation:
   Enabled: false
-
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/EmptyElse:
-  Exclude:
-    - 'lib/bundler/fetcher.rb'
-    - 'lib/bundler/ruby_version.rb'
-
-# Offense count: 10
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/EmptyLinesAroundModuleBody:
-  Exclude:
-    - 'lib/bundler/cli/common.rb'
-    - 'lib/bundler/deprecate.rb'
-    - 'lib/bundler/dsl.rb'
-    - 'lib/bundler/fetcher.rb'
-    - 'lib/bundler/friendly_errors.rb'
-    - 'lib/bundler/gem_helpers.rb'
-    - 'spec/support/builders.rb'
-    - 'spec/support/indexes.rb'
-    - 'spec/support/rubygems_ext.rb'
 
 # Offense count: 1
 # Configuration parameters: Exclude.
@@ -153,82 +97,11 @@ Style/GlobalVars:
 Style/GuardClause:
   Enabled: false
 
-# Offense count: 18
-# Cop supports --auto-correct.
-# Configuration parameters: MaxLineLength.
-Style/IfUnlessModifier:
-  Exclude:
-    - 'lib/bundler.rb'
-    - 'lib/bundler/cli/install.rb'
-    - 'lib/bundler/definition.rb'
-    - 'lib/bundler/dependency.rb'
-    - 'lib/bundler/fetcher.rb'
-    - 'lib/bundler/gem_helper.rb'
-    - 'lib/bundler/lockfile_parser.rb'
-    - 'lib/bundler/rubygems_integration.rb'
-    - 'lib/bundler/settings.rb'
-    - 'lib/bundler/source/git.rb'
-    - 'lib/bundler/source/git/git_proxy.rb'
-    - 'spec/support/builders.rb'
-
 # Offense count: 2
 Style/ModuleFunction:
   Exclude:
     - 'lib/bundler/shared_helpers.rb'
     - 'spec/support/path.rb'
-
-# Offense count: 1
-Style/MultilineBlockChain:
-  Exclude:
-    - 'spec/support/less_than_proc.rb'
-
-# Offense count: 3
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/MultilineOperationIndentation:
-  Enabled: false
-
-# Offense count: 10
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, MinBodyLength, SupportedStyles.
-Style/Next:
-  Exclude:
-    - 'exe/bundle'
-    - 'exe/bundler'
-    - 'lib/bundler/definition.rb'
-    - 'lib/bundler/dsl.rb'
-    - 'lib/bundler/resolver.rb'
-    - 'lib/bundler/source/path.rb'
-    - 'spec/support/artifice/endpoint.rb'
-
-# Offense count: 13
-# Cop supports --auto-correct.
-Style/ParallelAssignment:
-  Exclude:
-    - 'lib/bundler/dsl.rb'
-    - 'lib/bundler/shared_helpers.rb'
-    - 'lib/bundler/ui/shell.rb'
-    - 'spec/bundler/bundler_spec.rb'
-    - 'spec/support/helpers.rb'
-
-# Offense count: 67
-# Cop supports --auto-correct.
-# Configuration parameters: PreferredDelimiters.
-Style/PercentLiteralDelimiters:
-  Enabled: false
-
-# Offense count: 22
-# Cop supports --auto-correct.
-Style/PerlBackrefs:
-  Exclude:
-    - 'exe/bundle'
-    - 'exe/bundler'
-    - 'lib/bundler/cli/gem.rb'
-    - 'lib/bundler/dsl.rb'
-    - 'lib/bundler/lockfile_parser.rb'
-    - 'lib/bundler/runtime.rb'
-    - 'lib/bundler/source/git/git_proxy.rb'
-    - 'lib/bundler/source/path.rb'
 
 # Offense count: 8
 # Configuration parameters: NamePrefix, NamePrefixBlacklist, NameWhitelist.
@@ -245,31 +118,3 @@ Style/PredicateName:
 # Configuration parameters: EnforcedStyle, SupportedStyles.
 Style/RaiseArgs:
   Enabled: false
-
-# Offense count: 7
-# Cop supports --auto-correct.
-Style/RedundantSelf:
-  Exclude:
-    - 'lib/bundler.rb'
-    - 'lib/bundler/definition.rb'
-    - 'lib/bundler/graph.rb'
-    - 'lib/bundler/rubygems_integration.rb'
-    - 'lib/bundler/source/rubygems.rb'
-    - 'spec/support/less_than_proc.rb'
-    - 'spec/support/ruby_ext.rb'
-
-# Offense count: 6
-# Cop supports --auto-correct.
-Style/RescueModifier:
-  Exclude:
-    - 'lib/bundler.rb'
-    - 'lib/bundler/fetcher.rb'
-    - 'lib/bundler/resolver.rb'
-    - 'spec/realworld/dependency_api_spec.rb'
-    - 'spec/realworld/gemfile_source_header_spec.rb'
-
-# Offense count: 1
-# Configuration parameters: Methods.
-Style/SingleLineBlockParams:
-  Exclude:
-    - 'lib/bundler/cli/gem.rb'

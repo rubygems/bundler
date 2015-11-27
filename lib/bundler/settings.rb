@@ -29,7 +29,7 @@ module Bundler
     end
 
     def []=(key, value)
-      local_config_file or raise GemfileNotFound, "Could not locate Gemfile"
+      local_config_file || raise(GemfileNotFound, "Could not locate Gemfile")
       set_key(key, value, @local_config, local_config_file)
     end
 
@@ -56,9 +56,7 @@ module Bundler
     def local_overrides
       repos = {}
       all.each do |k|
-        if k =~ /^local\./
-          repos[$'] = self[k]
-        end
+        repos[$'] = self[k] if k =~ /^local\./
       end
       repos
     end
@@ -163,9 +161,7 @@ module Bundler
   private
 
     def key_for(key)
-      if key.is_a?(String) && /https?:/ =~ key
-        key = normalize_uri(key).to_s
-      end
+      key = normalize_uri(key).to_s if key.is_a?(String) && /https?:/ =~ key
       key = key.to_s.gsub(".", "__").upcase
       "BUNDLE_#{key}"
     end
@@ -243,7 +239,7 @@ module Bundler
     end
 
     def convert_to_backward_compatible_key(key)
-      key = "#{key}/" if key =~ /https?:/i && key !~ %r[/\Z]
+      key = "#{key}/" if key =~ /https?:/i && key !~ %r{/\Z}
       key = key.gsub(".", "__") if key.include?(".")
       key
     end
@@ -252,7 +248,7 @@ module Bundler
     # TODO: is this the correct place to validate mirror URIs?
     def normalize_uri(uri)
       uri = uri.to_s
-      uri = "#{uri}/" unless uri =~ %r[/\Z]
+      uri = "#{uri}/" unless uri =~ %r{/\Z}
       uri = URI(uri)
       unless uri.absolute?
         raise ArgumentError, "Gem sources must be absolute. You provided '#{uri}'."

@@ -19,7 +19,7 @@ module Bundler
     end
 
     def full_name
-      if platform == Gem::Platform::RUBY or platform.nil?
+      if platform == Gem::Platform::RUBY || platform.nil?
         "#{@name}-#{@version}"
       else
         "#{@name}-#{@version}-#{platform}"
@@ -35,7 +35,7 @@ module Bundler
     end
 
     def to_lock
-      if platform == Gem::Platform::RUBY or platform.nil?
+      if platform == Gem::Platform::RUBY || platform.nil?
         out = "    #{name} (#{version})\n"
       else
         out = "    #{name} (#{version}-#{platform})\n"

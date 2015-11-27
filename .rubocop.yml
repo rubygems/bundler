@@ -27,8 +27,17 @@ Style/AccessModifierIndentation:
 Style/AlignParameters:
   EnforcedStyle: with_fixed_indentation
 
+Style/MultilineBlockChain:
+  Enabled: false
+
 Style/MultilineOperationIndentation:
   EnforcedStyle: indented
+
+Style/PerlBackrefs:
+  Enabled: false
+
+Style/SingleLineBlockParams:
+  Enabled: false
 
 Style/SpaceInsideBlockBraces:
   SpaceBeforeBlockParameters: false

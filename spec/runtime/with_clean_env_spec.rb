@@ -77,7 +77,7 @@ describe "Bundler.with_env helpers" do
 
   describe "Bundler.clean_system" do
     it "runs system inside with_clean_env" do
-      Bundler.clean_system(%{echo 'if [ "$BUNDLE_PATH" = "" ]; then exit 42; else exit 1; fi' | /bin/sh})
+      Bundler.clean_system(%(echo 'if [ "$BUNDLE_PATH" = "" ]; then exit 42; else exit 1; fi' | /bin/sh))
       expect($?.exitstatus).to eq(42)
     end
   end
@@ -85,7 +85,7 @@ describe "Bundler.with_env helpers" do
   describe "Bundler.clean_exec" do
     it "runs exec inside with_clean_env" do
       pid = Kernel.fork do
-        Bundler.clean_exec(%{echo 'if [ "$BUNDLE_PATH" = "" ]; then exit 42; else exit 1; fi' | /bin/sh})
+        Bundler.clean_exec(%(echo 'if [ "$BUNDLE_PATH" = "" ]; then exit 42; else exit 1; fi' | /bin/sh))
       end
       Process.wait(pid)
       expect($?.exitstatus).to eq(42)

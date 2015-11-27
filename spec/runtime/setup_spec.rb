@@ -410,7 +410,7 @@ describe "Bundler.setup" do
         gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
       G
 
-      bundle %|config local.rack #{lib_path("local-rack")}|
+      bundle %(config local.rack #{lib_path("local-rack")})
       bundle :install
       expect(out).to match(/at #{lib_path('local-rack')}/)
 
@@ -429,7 +429,7 @@ describe "Bundler.setup" do
         gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
       G
 
-      bundle %|config local.rack #{lib_path("local-rack")}|
+      bundle %(config local.rack #{lib_path("local-rack")})
       bundle :install
       expect(out).to match(/at #{lib_path('local-rack')}/)
 
@@ -452,7 +452,7 @@ describe "Bundler.setup" do
         gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
       G
 
-      bundle %|config local.rack #{lib_path("local-rack")}|
+      bundle %(config local.rack #{lib_path("local-rack")})
       bundle :install
       expect(out).to match(/at #{lib_path('local-rack')}/)
 
@@ -480,7 +480,7 @@ describe "Bundler.setup" do
         gem "rack", :git => "#{lib_path("rack-0.8")}", :ref => "master", :branch => "nonexistant"
       G
 
-      bundle %|config local.rack #{lib_path("local-rack")}|
+      bundle %(config local.rack #{lib_path("local-rack")})
       run "require 'rack'", :expect_err => true
       expect(err).to match(/is using branch master but Gemfile specifies nonexistant/)
     end
@@ -620,7 +620,7 @@ describe "Bundler.setup" do
     G
 
     ENV["GEM_HOME"] = ""
-    bundle %{exec ruby -e "require 'set'"}
+    bundle %(exec ruby -e "require 'set'")
 
     expect(err).to be_empty
   end
@@ -630,7 +630,7 @@ describe "Bundler.setup" do
       build_gem("requirepaths") do |s|
         s.write("lib/rq.rb", "puts 'yay'")
         s.write("src/rq.rb", "puts 'nooo'")
-        s.require_paths = %w[lib src]
+        s.require_paths = %w(lib src)
       end
     end
 
@@ -834,7 +834,7 @@ describe "Bundler.setup" do
   describe "with a gemspec that requires other files" do
     before :each do
       build_git "bar", :gemspec => false do |s|
-        s.write "lib/bar/version.rb", %{BAR_VERSION = '1.0'}
+        s.write "lib/bar/version.rb", %(BAR_VERSION = '1.0')
         s.write "bar.gemspec", <<-G
           lib = File.expand_path('../lib/', __FILE__)
           $:.unshift lib unless $:.include?(lib)
@@ -894,7 +894,7 @@ describe "Bundler.setup" do
         gem "bundler", :path => "#{File.expand_path("..", lib)}"
       G
 
-      bundle %|exec ruby -e "require 'bundler'; Bundler.setup"|
+      bundle %(exec ruby -e "require 'bundler'; Bundler.setup")
       expect(err).to be_empty
     end
   end

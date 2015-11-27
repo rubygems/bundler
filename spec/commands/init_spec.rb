@@ -11,9 +11,9 @@ describe "bundle init" do
       gem "rails"
     G
 
-    expect {
+    expect do
       bundle :init
-    }.not_to change { File.read(bundled_app("Gemfile")) }
+    end.not_to change { File.read(bundled_app("Gemfile")) }
   end
 
   it "should generate from an existing gemspec" do

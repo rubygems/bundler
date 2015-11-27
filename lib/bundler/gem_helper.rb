@@ -72,12 +72,12 @@ module Bundler
 
     def build_gem
       file_name = nil
-      sh("gem build -V '#{spec_path}'") {
+      sh("gem build -V '#{spec_path}'") do
         file_name = File.basename(built_gem_path)
         SharedHelpers.filesystem_access(File.join(base, "pkg")) {|p| FileUtils.mkdir_p(p) }
         FileUtils.mv(built_gem_path, "pkg")
         Bundler.ui.confirm "#{name} #{version} built to pkg/#{file_name}."
-      }
+      end
       File.join(base, "pkg", file_name)
     end
 
@@ -129,7 +129,7 @@ module Bundler
     end
 
     def guard_clean
-      clean? && committed? or raise("There are files that need to be committed first.")
+      clean? && committed? || raise("There are files that need to be committed first.")
     end
 
     def clean?
@@ -175,17 +175,15 @@ module Bundler
       cmd << " 2>&1"
       outbuf = ""
       Bundler.ui.debug(cmd)
-      SharedHelpers.chdir(base) {
+      SharedHelpers.chdir(base) do
         outbuf = `#{cmd}`
-        if $? == 0
-          block.call(outbuf) if block
-        end
-      }
+        block.call(outbuf) if $? == 0 && block
+      end
       [outbuf, $?]
     end
 
     def gem_push?
-      ! %w{n no nil false off 0}.include?(ENV["gem_push"].to_s.downcase)
+      ! %w(n no nil false off 0).include?(ENV["gem_push"].to_s.downcase)
     end
   end
 end

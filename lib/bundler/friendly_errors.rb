@@ -92,5 +92,4 @@ module Bundler
     "https://github.com/bundler/bundler/search?q=" \
     "#{CGI.escape(exception.message.lines.first.chomp)}&type=Issues"
   end
-
 end

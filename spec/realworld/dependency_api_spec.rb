@@ -20,19 +20,23 @@ describe "gemcutter's dependency API", :realworld => true do
       ENV["GEM_HOME"] = old_gem_home
 
       port = 21_453
-      port += 1 while TCPSocket.new("127.0.0.1", port) rescue false
+      begin
+        port += 1 while TCPSocket.new("127.0.0.1", port)
+      rescue
+        false
+      end
       @server_uri = "http://127.0.0.1:#{port}"
 
       require File.expand_path("../../support/artifice/endpoint_timeout", __FILE__)
       require "thread"
-      @t = Thread.new {
+      @t = Thread.new do
         server = Rack::Server.start(:app       => EndpointTimeout,
                                     :Host      => "0.0.0.0",
                                     :Port      => port,
                                     :server    => "webrick",
                                     :AccessLog => [])
         server.start
-      }
+      end
       @t.run
 
       wait_for_server(port)

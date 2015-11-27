@@ -99,9 +99,9 @@ module Gem
         gemfile << "group :#{group} do\n" if group
         dependencies.each do |dependency|
           gemfile << "  " if group
-          gemfile << %|gem "#{dependency.name}"|
+          gemfile << %(gem "#{dependency.name}")
           req = dependency.requirements_list.first
-          gemfile << %|, "#{req}"| if req
+          gemfile << %(, "#{req}") if req
           gemfile << "\n"
         end
         gemfile << "end\n" if group
