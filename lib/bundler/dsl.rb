@@ -220,6 +220,19 @@ module Bundler
 
     def add_git_sources
       git_source(:github) do |repo_name|
+        # It would be better to use https instead of the git protocol, but this
+        # can break deployment of existing locked bundles when switching between
+        # different versions of Bundler. The change will be made in 2.0, which
+        # does not guarantee compatibility with the 1.x series.
+        #
+        # See https://github.com/bundler/bundler/pull/2569 for discussion
+        #
+        # This can be overridden by adding this code to your Gemfiles:
+        #
+        #   git_source(:github) do |repo_name|
+        #     repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
+        #     "https://github.com/#{repo_name}.git"
+        #   end
         repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
         "git://github.com/#{repo_name}.git"
       end
