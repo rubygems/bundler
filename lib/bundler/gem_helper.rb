@@ -94,7 +94,7 @@ module Bundler
       if Pathname.new("~/.gem/credentials").expand_path.exist?
         allowed_push_host = nil
         gem_command = "gem push '#{path}'"
-        if spec.respond_to?(:metadata)
+        if @gemspec.respond_to?(:metadata)
           allowed_push_host = @gemspec.metadata["allowed_push_host"]
           gem_command << " --host #{allowed_push_host}" if allowed_push_host
         end
