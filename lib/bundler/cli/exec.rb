@@ -33,7 +33,7 @@ module Bundler
       Bundler.load.setup_environment
       Bundler.ui = nil
       Kernel.exec(@cmd, *args)
-    rescue Errno::EACCES
+    rescue Errno::EACCES, Errno::ENOEXEC
       Bundler.ui = ui
       Bundler.ui.error "bundler: not executable: #{cmd}"
       exit 126
