@@ -66,7 +66,7 @@ module Bundler
 
       # Settings keys are all downcased
       normalized_key = normalize_uri(uri.to_s.downcase)
-      (gem_mirrors[normalized_key] || Mirror.new(uri)).uri
+      (gem_mirrors.fetch(normalized_key) { Mirror.new(uri) }).uri
     end
 
     def credentials_for(uri)
@@ -74,21 +74,18 @@ module Bundler
     end
 
     def gem_mirrors
-      all.inject({}) do |h, k|
+      all.inject(Mirrors.new) do |mirrors, k|
         if k =~ /^mirror\./
           uri = $'
           if uri =~ /\.fallback_timeout\/$/
             uri = normalize_uri($`)
-            mirror = h[uri] || Mirror.new()
-            mirror.fallback_timeout = self[k].to_i
+            mirrors[uri].fallback_timeout = self[k].to_i
           else
             uri = normalize_uri(uri)
-            mirror = h[uri] || Mirror.new()
-            mirror.uri = normalize_uri(self[k])
+            mirrors[uri].uri = normalize_uri(self[k])
           end
-          h[uri] = mirror
         end
-        h
+        mirrors
       end
     end
 

@@ -35,6 +35,7 @@ module Bundler
   autoload :LockfileParser,         "bundler/lockfile_parser"
   autoload :MatchPlatform,          "bundler/match_platform"
   autoload :Mirror,                "bundler/mirror"
+  autoload :Mirrors,               "bundler/mirror"
   autoload :RemoteSpecification,    "bundler/remote_specification"
   autoload :Resolver,               "bundler/resolver"
   autoload :Retry,                  "bundler/retry"
