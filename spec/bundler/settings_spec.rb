@@ -102,6 +102,22 @@ describe Bundler::Settings do
       it "is case insensitive" do
         expect(settings.mirror_for("HTTPS://RUBYGEMS.ORG/")).to eq(mirror_uri)
       end
+
+      context "with a fallback timeout" do
+        before { settings["mirror.https://rubygems.org.fallback_timeout"] = 1 }
+
+        it "still returns the mirror correctly" do
+          expect(settings.mirror_for(uri)).to eq(mirror_uri)
+        end
+
+        # it "makes sense" do
+        #   expect(settings.gem_mirrors).to eq({})
+        # end
+
+        it "returns the fallback timeout" do
+          expect(settings.gem_mirrors[uri].fallback_timeout).to eq(1)
+        end
+      end
     end
   end
 
@@ -165,7 +181,7 @@ describe Bundler::Settings do
 
     it "reads older keys without trailing slashes" do
       settings["mirror.https://rubygems.org"] = "http://rubygems-mirror.org"
-      expect(settings.gem_mirrors).to eq(URI("https://rubygems.org/") => URI("http://rubygems-mirror.org/"))
+      expect(settings.gem_mirrors).to eq(URI("https://rubygems.org/") => Mirror.new(URI("http://rubygems-mirror.org/")))
     end
   end
 
