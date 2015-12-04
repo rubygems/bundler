@@ -27,6 +27,13 @@ module Bundler
         end
       end
 
+      class GitRevisionError < GitError
+        def initialize(ref, repo)
+          msg = "Revision #{ref} does not exist in the repository #{repo}. Maybe you misspelled it?"
+          super msg
+        end
+      end
+
       # The GitProxy is responsible to interact with git repositories.
       # All actions required by the Git source is encapsulated in this
       # object.
@@ -44,10 +51,22 @@ module Bundler
         end
 
         def revision
-          @revision ||= allowed_in_path do
-            msg = "Ref '#{ref}' was not found. Perhaps you mispelled it?"
-            git("rev-parse --verify #{ref}", true, msg).strip
+          return @revision if @revision
+
+          begin
+            @revision ||= find_local_revision
+          rescue GitCommandError
+            Bundler.ui.info "Error finding #{ref} in #{path}: clearing the cache and trying again"
+            remove_cache
+            checkout
+            begin
+              @revision ||= find_local_revision
+            rescue GitCommandError
+              raise GitRevisionError.new(ref, uri)
+            end
           end
+
+          @revision
         end
 
         def branch
@@ -141,6 +160,16 @@ module Bundler
           true
         rescue GitError
           false
+        end
+
+        def remove_cache
+          FileUtils.rm_rf(path)
+        end
+
+        def find_local_revision
+          allowed_in_path do
+            git("rev-parse --verify #{ref}", true).strip
+          end
         end
 
         # Escape the URI for git commands
