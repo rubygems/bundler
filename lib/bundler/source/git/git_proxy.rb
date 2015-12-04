@@ -27,7 +27,7 @@ module Bundler
         end
       end
 
-      class GitRevisionError < GitError
+      class MissingGitRevisionError < GitError
         def initialize(ref, repo)
           msg = "Revision #{ref} does not exist in the repository #{repo}. Maybe you misspelled it?"
           super msg
@@ -62,7 +62,7 @@ module Bundler
             begin
               @revision ||= find_local_revision
             rescue GitCommandError
-              raise GitRevisionError.new(ref, uri)
+              raise MissingGitRevisionError.new(ref, uri)
             end
           end
 
