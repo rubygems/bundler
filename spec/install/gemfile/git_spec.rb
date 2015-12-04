@@ -761,6 +761,23 @@ describe "bundle install with git sources" do
 
       expect(out).to eq(old_revision)
     end
+
+    it "gives a helpful error message when the remote ref no longer exists" do
+      build_git "foo"
+      revision = revision_for(lib_path("foo-1.0"))
+
+      install_gemfile <<-G
+        gem "foo", :git => "file://#{lib_path("foo-1.0")}", :ref => "#{revision}"
+      G
+      bundle "install"
+      expect(out).to_not match(/Revision.*does not exist/)
+
+      install_gemfile <<-G
+        gem "foo", :git => "file://#{lib_path("foo-1.0")}", :ref => "deadbeef"
+      G
+      bundle "install"
+      expect(out).to include("Revision deadbeef does not exist in the repository")
+    end
   end
 
   describe "bundle install --deployment with git sources" do
