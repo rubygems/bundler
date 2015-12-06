@@ -1,3 +1,10 @@
+## 1.11.0.pre.2 (2015-12-06)
+
+Bugfixes:
+
+  - fail gracefully when trying to execute a non-executable file (#4081, @fotanus)
+  - fix a crash when pushing a gem via `rake release` (@segiddins)
+
 ## 1.11.0.pre.1 (2015-11-29)
 
 Features:
