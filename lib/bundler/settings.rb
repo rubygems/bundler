@@ -65,7 +65,7 @@ module Bundler
       uri = URI(uri.to_s) unless uri.is_a?(URI)
 
       # Settings keys are all downcased
-      normalized_key = normalize_uri(uri.to_s.downcase)
+      normalized_key = AbsoluteURI.normalize(uri.to_s.downcase)
       (gem_mirrors.fetch(normalized_key) { Mirror.new(uri) }).uri
     end
 
@@ -75,16 +75,7 @@ module Bundler
 
     def gem_mirrors
       all.inject(Mirrors.new) do |mirrors, k|
-        if k =~ /^mirror\./
-          uri = $'
-          if uri =~ /\.fallback_timeout\/$/
-            uri = normalize_uri($`)
-            mirrors[uri].fallback_timeout = self[k].to_i
-          else
-            uri = normalize_uri(uri)
-            mirrors[uri].uri = normalize_uri(self[k])
-          end
-        end
+        mirrors.parse(k, self[k]) if k =~ /^mirror\./
         mirrors
       end
     end
@@ -167,7 +158,7 @@ module Bundler
   private
 
     def key_for(key)
-      key = normalize_uri(key).to_s if key.is_a?(String) && /https?:/ =~ key
+      key = AbsoluteURI.normalize(key).to_s if key.is_a?(String) && /https?:/ =~ key
       key = key.to_s.gsub(".", "__").upcase
       "BUNDLE_#{key}"
     end
@@ -250,14 +241,16 @@ module Bundler
 
     # TODO: duplicates Rubygems#normalize_uri
     # TODO: is this the correct place to validate mirror URIs?
-    def normalize_uri(uri)
-      uri = uri.to_s
-      uri = "#{uri}/" unless uri =~ %r{/\Z}
-      uri = URI(uri)
-      unless uri.absolute?
-        raise ArgumentError, "Gem sources must be absolute. You provided '#{uri}'."
+    class AbsoluteURI
+      def self.normalize(uri)
+        uri = uri.to_s
+        uri = "#{uri}/" unless uri =~ %r{/\Z}
+        uri = URI(uri)
+        unless uri.absolute?
+          raise ArgumentError, "Gem sources must be absolute. You provided '#{uri}'."
+        end
+        uri
       end
-      uri
     end
   end
 end

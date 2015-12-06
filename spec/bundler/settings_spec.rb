@@ -113,10 +113,6 @@ describe Bundler::Settings do
         it "returns the fallback timeout" do
           expect(settings.gem_mirrors[uri].fallback_timeout).to eq(1)
         end
-
-        it "has the uri and the fallback timeout" do
-          expect(settings.gem_mirrors.to_h).to eq(uri => Mirror.new(mirror_uri, 1))
-        end
       end
     end
   end
@@ -181,7 +177,8 @@ describe Bundler::Settings do
 
     it "reads older keys without trailing slashes" do
       settings["mirror.https://rubygems.org"] = "http://rubygems-mirror.org"
-      expect(settings.gem_mirrors.to_h).to eq(URI("https://rubygems.org/") => Mirror.new(URI("http://rubygems-mirror.org/")))
+      expect(settings.mirror_for("https://rubygems.org/")).to eq(
+        URI("http://rubygems-mirror.org/"))
     end
   end
 
