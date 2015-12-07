@@ -170,7 +170,11 @@ module Bundler
           @copied = true
         end
 
-        return nil if gem_build_complete?(spec.extensions_dir)
+        if spec.respond_to?(:missing_extensions?)
+          return nil unless spec.missing_extensions?
+        else
+          return nil if gem_build_complete?(spec.extensions_dir)
+        end
 
         generate_bin(spec)
 
