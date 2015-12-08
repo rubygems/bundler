@@ -56,14 +56,7 @@ module Bundler
           begin
             @revision ||= find_local_revision
           rescue GitCommandError
-            Bundler.ui.info "Error finding #{ref} in #{path}: clearing the cache and trying again"
-            remove_cache
-            checkout
-            begin
-              @revision ||= find_local_revision
-            rescue GitCommandError
-              raise MissingGitRevisionError.new(ref, uri)
-            end
+            raise MissingGitRevisionError.new(ref, uri)
           end
 
           @revision
