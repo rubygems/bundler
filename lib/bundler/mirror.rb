@@ -1,13 +1,23 @@
 module Bundler
   class Settings
     class Mirrors
-      def initialize
+      def initialize(prober = nil)
+        @prober = prober || TCPProbe.new
         @all = Mirror.new
         @mirrors = Hash.new { |h, k| h[k] = Mirror.new }
       end
 
       def [](key)
         @mirrors[URI(key.to_s)]
+      end
+
+      def for(uri)
+        return @all.uri if @all.valid?
+        uri = AbsoluteURI.normalize(uri)
+        return uri unless @mirrors[uri]
+        mirror = @mirrors[uri]
+        @prober.probe(mirror)
+        mirror.uri
       end
 
       def fetch(key, &block)
@@ -42,7 +52,11 @@ module Bundler
       end
 
       def uri=(uri)
-        @uri = URI(uri.to_s)
+        @uri = if uri.nil?
+                 uri = nil
+               else
+                 URI(uri.to_s)
+               end
       end
 
       def fallback_timeout=(timeout)
@@ -65,16 +79,26 @@ module Bundler
       end
     end
 
+    class TCPProbe
+      def probe(uri)
+      end
+    end
+
     private
 
     class MirrorConfig
-      attr_reader :uri, :value
+      attr_accessor :uri, :value
+
       def initialize(config_line, value)
-        all, uri, fallback =
-          config_line.match(/^mirror(\.all)?\.(.+?)(\.fallback_timeout)?\/?$/).captures
-        @all = !all.nil?
+        uri, fallback =
+          config_line.match(/^mirror\.(all|.+?)(\.fallback_timeout)?\/?$/).captures
         @fallback = !fallback.nil?
-        @uri = AbsoluteURI.normalize(uri)
+        @all = false
+        if uri == "all"
+          @all = true
+        else
+          @uri = AbsoluteURI.normalize(uri)
+        end
         @value = value
       end
 
