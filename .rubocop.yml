@@ -63,6 +63,10 @@ Style/TrailingComma:
 Style/TrailingUnderscoreVariable:
   Enabled: false
 
+# `String.new` is preferred style with enabled frozen string literal
+Style/EmptyLiteral:
+  Enabled: false
+
 # 1.8.7 support
 
 Style/HashSyntax:
