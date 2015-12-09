@@ -94,7 +94,7 @@ module Gem
   private
 
     def dependencies_to_gemfile(dependencies, group = nil)
-      gemfile = ""
+      gemfile = String.new
       if dependencies.any?
         gemfile << "group :#{group} do\n" if group
         dependencies.each do |dependency|
@@ -126,7 +126,7 @@ module Gem
     end
 
     def to_lock
-      out = "  #{name}"
+      out = String.new("  #{name}")
       unless requirement == Gem::Requirement.default
         reqs = requirement.requirements.map {|o, v| "#{o} #{v}" }.sort.reverse
         out << " (#{reqs.join(", ")})"

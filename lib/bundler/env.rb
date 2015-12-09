@@ -11,7 +11,7 @@ module Bundler
       print_gemfile = options.delete(:print_gemfile)
       print_gemspecs = options.delete(:print_gemspecs)
 
-      out = "Environment\n\n"
+      out = String.new("Environment\n\n")
       out << "    Bundler   #{Bundler::VERSION}\n"
       out << "    Rubygems  #{Gem::VERSION}\n"
       out << "    Ruby      #{ruby_version}"
@@ -62,7 +62,7 @@ module Bundler
     end
 
     def ruby_version
-      str = "#{RUBY_VERSION}"
+      str = String.new("#{RUBY_VERSION}")
       if RUBY_VERSION < "1.9"
         str << " (#{RUBY_RELEASE_DATE}"
         str << " patchlevel #{RUBY_PATCHLEVEL}" if defined? RUBY_PATCHLEVEL

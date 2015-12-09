@@ -53,7 +53,7 @@ module Bundler
       @specs           = nil
       @ruby_version    = ruby_version
 
-      @lockfile_contents      = ""
+      @lockfile_contents      = String.new
       @locked_bundler_version = nil
 
       if lockfile && File.exist?(lockfile)
@@ -280,7 +280,7 @@ module Bundler
     end
 
     def to_lock
-      out = ""
+      out = String.new
 
       sources.lock_sources.each do |source|
         # Add the source header

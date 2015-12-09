@@ -42,7 +42,7 @@ module Bundler
       end
 
       def to_lock
-        out = "PATH\n"
+        out = String.new("PATH\n")
         out << "  remote: #{relative_path}\n"
         out << "  glob: #{@glob}\n" unless @glob == DEFAULT_GLOB
         out << "  specs:\n"
