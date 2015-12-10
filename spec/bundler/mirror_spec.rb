@@ -39,41 +39,94 @@ describe Bundler::Settings::Mirrors do
     let(:mirrors) { Bundler::Settings::Mirrors.new }
 
     it "returns an empty mirror for a new uri" do
-      mirror = mirrors["http://rubygems.org/"]
-      expect(mirror).to eq(Bundler::Settings::Mirror.new)
+      mirror = mirrors.for("http://rubygems.org/")
+      expect(mirror).to eq(Bundler::Settings::Mirror.new("http://rubygems.org/"))
     end
 
     it "takes a mirror key and assings the uri" do
       mirrors.parse("mirror.http://rubygems.org/", "http://localhost:9292")
-      expect(mirrors["http://rubygems.org/"].uri).to eq(URI("http://localhost:9292"))
+      expect(mirrors.for("http://rubygems.org/").uri).to eq(URI("http://localhost:9292"))
     end
 
     it "takes a mirror fallback_timeout and assigns the timeout" do
+      mirrors.parse("mirror.http://rubygems.org/", "http://localhost:9292")
       mirrors.parse("mirror.http://rubygems.org.fallback_timeout", "2")
-      expect(mirrors["http://rubygems.org/"].fallback_timeout).to eq(2)
+      expect(mirrors.for("http://rubygems.org/").fallback_timeout).to eq(2)
     end
   end
 
-  context "with a stubbed with a successfull probe mirrors" do
+  context "with a stubbed with a successfull probe mirrors and a fallback timeout" do
     let(:mirrors) do
       probe = double()
-      allow(probe).to receive(:probe)
+      allow(probe).to receive(:probe_availability).and_return(true)
       Bundler::Settings::Mirrors.new(probe)
     end
 
     context "with a default fallback_timeout defined" do
-      before { mirrors.parse("mirror.http://rubygems.org/", "http://localhost:9292") }
+      before do
+        mirrors.parse("mirror.http://rubygems.org/", "http://localhost:9292")
+        mirrors.parse("mirror.http://rubygems.org.fallback_timeout", "true")
+      end
 
       it "returns the mirrored uri" do
-        expect(mirrors.for("http://rubygems.org")).to eq(URI("http://localhost:9292"))
+        expect(mirrors.for("http://rubygems.org").uri).to eq(URI("http://localhost:9292"))
       end
     end
 
     context "setup to fallback all uris" do
-      before { mirrors.parse("mirror.all", "http://localhost:9292") }
+      let(:localhost_uri) { URI("http://localhost:9292") }
 
-      it "returns the mirrored uri" do
-        expect(mirrors.for("http://rubygems.org")).to eq(URI("http://localhost:9292"))
+      before do
+        mirrors.parse("mirror.all", localhost_uri)
+      end
+
+      it "returns the same mirror for any uri" do
+        expect(mirrors.for("http://bla/").uri).to eq(localhost_uri)
+        expect(mirrors.for("http://1.com/").uri).to eq(localhost_uri)
+        expect(mirrors.for("http://any.org").uri).to eq(localhost_uri)
+      end
+
+      it "returns the mirrored uri for rubygems" do
+        expect(mirrors.for("http://rubygems.org").uri).to eq(localhost_uri)
+      end
+      it "returns the mirrored uri for any other url" do
+        expect(mirrors.for("http://whatever.com/").uri).to eq(localhost_uri)
+      end
+    end
+  end
+
+  context "with a stubbed with an unsuccessfull probe mirrors and a fallback timeout" do
+    let(:localhost_uri) { URI("http://localhost:9292") }
+    let(:mirrors) do
+      probe = double()
+      allow(probe).to receive(:probe_availability).and_return(false)
+      Bundler::Settings::Mirrors.new(probe)
+    end
+
+    context "mirroring all the urls with a fallback timeout" do
+      before do
+        mirrors.parse("mirror.all", localhost_uri)
+        mirrors.parse("mirror.all.fallback_timeout", true)
+      end
+
+      context "with a default fallback_timeout defined" do
+        it "returns the original uri" do
+          expect(mirrors.for("http://whatever.com").uri).to eq(URI("http://whatever.com/"))
+        end
+      end
+    end
+
+    context "mirroring one url with a default fallback timeout" do
+      before do
+        mirrors.parse("mirror.http://rubygems.org/", "http://localhost:9292")
+        mirrors.parse("mirror.http://rubygems.org/.fallback_timeout", "true")
+      end
+
+      it "returns the original uri for a different uri" do
+        expect(mirrors.for("http://whatever.com").uri).to eq(URI("http://whatever.com/"))
+      end
+      it "returns the original uri for the mirrored uri" do
+        expect(mirrors.for("http://rubygems.org/").uri).to eq(URI("http://rubygems.org/"))
       end
     end
   end

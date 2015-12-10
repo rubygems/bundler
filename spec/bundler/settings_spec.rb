@@ -111,7 +111,7 @@ describe Bundler::Settings do
         end
 
         it "returns the fallback timeout" do
-          expect(settings.gem_mirrors[uri].fallback_timeout).to eq(1)
+          expect(settings.gem_mirrors.for(uri).fallback_timeout).to eq(1)
         end
       end
     end

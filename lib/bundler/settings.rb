@@ -63,10 +63,8 @@ module Bundler
 
     def mirror_for(uri)
       uri = URI(uri.to_s) unless uri.is_a?(URI)
-
       # Settings keys are all downcased
-      normalized_key = AbsoluteURI.normalize(uri.to_s.downcase)
-      (gem_mirrors.fetch(normalized_key) { Mirror.new(uri) }).uri
+      gem_mirrors.for(uri.to_s.downcase).uri
     end
 
     def credentials_for(uri)

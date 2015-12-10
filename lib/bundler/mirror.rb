@@ -2,26 +2,28 @@ module Bundler
   class Settings
     class Mirrors
       def initialize(prober = nil)
-        @prober = prober || TCPProbe.new
         @all = Mirror.new
-        @mirrors = Hash.new { |h, k| h[k] = Mirror.new }
-      end
-
-      def [](key)
-        @mirrors[URI(key.to_s)]
+        @prober = prober || MirrorProber.new
+        @mirrors = Hash.new
       end
 
       def for(uri)
-        return @all.uri if @all.valid?
         uri = AbsoluteURI.normalize(uri)
-        return uri unless @mirrors[uri]
-        mirror = @mirrors[uri]
-        @prober.probe(mirror)
-        mirror.uri
+        validate_mirror_for_all
+        validate_mirror_for(uri)
+        if @all.valid?
+          @all
+        else
+          mirror = fetch_valid_mirror_for(uri) || Mirror.new(uri)
+          mirror
+        end
       end
 
-      def fetch(key, &block)
-        @mirrors.fetch(key, &block)
+      def fetch_valid_mirror_for(uri)
+        mirror = @mirrors[uri]
+        return nil if mirror.nil?
+        return nil unless mirror.valid?
+        mirror
       end
 
       def each
@@ -35,9 +37,21 @@ module Bundler
         if config.all?
           mirror = @all
         else
-          mirror = self[config.uri]
+          mirror = @mirrors[config.uri] || Mirror.new
+          @mirrors[config.uri] = mirror
         end
         config.update_mirror(mirror)
+      end
+
+      private
+
+      def validate_mirror_for_all
+        MirrorProbing.new(@all, @prober).probe! if @all.valid?
+      end
+
+      def validate_mirror_for(uri)
+        mirror = @mirrors[uri]
+        MirrorProbing.new(mirror, @prober).probe! unless mirror.nil?
       end
     end
 
@@ -49,6 +63,7 @@ module Bundler
       def initialize(uri = nil, fallback_timeout = 0)
         self.uri = uri
         self.fallback_timeout = fallback_timeout
+        @valid = nil
       end
 
       def uri=(uri)
@@ -71,20 +86,51 @@ module Bundler
       end
 
       def ==(o)
-        self.class == o.class && self.uri == o.uri && self.fallback_timeout == o.fallback_timeout
+        o != nil && self.uri == o.uri && self.fallback_timeout == o.fallback_timeout
       end
 
       def valid?
+        return @valid unless @valid.nil?
         ! @uri.nil?
+      end
+
+      def validate!
+        @valid = true
+      end
+
+      def invalidate!
+        @valid = false
+      end
+
+      def validated_already?
+        ! @valid.nil?
       end
     end
 
-    class TCPProbe
-      def probe(uri)
+    class MirrorProber
+      def probe_availability(mirror)
+        true
       end
     end
 
     private
+
+    class MirrorProbing
+      def initialize(mirror, prober)
+        @mirror = mirror
+        @prober = prober
+      end
+
+      def probe!
+        return @mirror if @mirror.validated_already?
+        if @prober.probe_availability(@mirror)
+          @mirror.validate!
+        else
+          @mirror.invalidate!
+        end
+        @mirror
+      end
+    end
 
     class MirrorConfig
       attr_accessor :uri, :value
