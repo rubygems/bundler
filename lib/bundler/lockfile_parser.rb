@@ -12,11 +12,12 @@ require "strscan"
 
 module Bundler
   class LockfileParser
-    attr_reader :sources, :dependencies, :specs, :platforms, :bundler_version
+    attr_reader :sources, :dependencies, :specs, :platforms, :bundler_version, :ruby_version
 
     BUNDLED      = "BUNDLED WITH"
     DEPENDENCIES = "DEPENDENCIES"
     PLATFORMS    = "PLATFORMS"
+    RUBY         = "RUBY VERSION"
     GIT          = "GIT"
     GEM          = "GEM"
     PATH         = "PATH"
@@ -46,6 +47,8 @@ module Bundler
           @state = :dependency
         elsif line == PLATFORMS
           @state = :platform
+        elsif line == RUBY
+          @state = :ruby
         elsif line == BUNDLED
           @state = :bundled_with
         elsif line =~ /^[^\s]/
@@ -192,6 +195,10 @@ module Bundler
       if Gem::Version.correct?(line)
         @bundler_version = Gem::Version.create(line)
       end
+    end
+
+    def parse_ruby(line)
+      @ruby_version = line.strip
     end
   end
 end

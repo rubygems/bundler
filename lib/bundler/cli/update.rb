@@ -12,7 +12,7 @@ module Bundler
       sources = Array(options[:source])
       groups  = Array(options[:group]).map(&:to_sym)
 
-      if gems.empty? && sources.empty? && groups.empty?
+      if gems.empty? && sources.empty? && groups.empty? && !options[:ruby]
         # We're doing a full update
         Bundler.definition(true)
       else
@@ -33,7 +33,7 @@ module Bundler
           gems.concat(specs.map(&:name))
         end
 
-        Bundler.definition(:gems => gems, :sources => sources)
+        Bundler.definition(:gems => gems, :sources => sources, :ruby => options[:ruby])
       end
 
       Bundler::Fetcher.disable_endpoint = options["full-index"]

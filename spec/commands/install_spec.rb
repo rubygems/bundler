@@ -340,6 +340,72 @@ describe "bundle install with gem sources" do
     end
   end
 
+  describe "Ruby version in Gemfile.lock" do
+    include Bundler::GemHelpers
+
+    context "and using an unsupported Ruby version" do
+      it "prints an error" do
+        install_gemfile <<-G
+          ::RUBY_VERSION = '1.8.7'
+          ruby '~> 2.1'
+        G
+        expect(out).to include("Your Ruby version is 1.8.7, but your Gemfile specified ~> 2.1")
+      end
+    end
+
+    context "and using a supported Ruby version" do
+      before do
+        install_gemfile <<-G
+          ::RUBY_VERSION = '2.1.3'
+          ::RUBY_PATCHLEVEL = 100
+          ruby '~> 2.1.0'
+        G
+      end
+
+      it "writes current Ruby version to Gemfile.lock" do
+        lockfile_should_be <<-L
+         GEM
+           specs:
+
+         PLATFORMS
+           ruby
+
+         DEPENDENCIES
+
+         RUBY VERSION
+            ruby 2.1.3p100
+
+         BUNDLED WITH
+            #{Bundler::VERSION}
+        L
+      end
+
+      it "does not update Gemfile.lock with updated ruby versions" do
+        install_gemfile <<-G
+          ::RUBY_VERSION = '2.2.3'
+          ::RUBY_PATCHLEVEL = 100
+          ruby '~> 2.2.0'
+        G
+
+        lockfile_should_be <<-L
+         GEM
+           specs:
+
+         PLATFORMS
+           ruby
+
+         DEPENDENCIES
+
+         RUBY VERSION
+            ruby 2.1.3p100
+
+         BUNDLED WITH
+            #{Bundler::VERSION}
+        L
+      end
+    end
+  end
+
   describe "when Bundler root contains regex chars" do
     before do
       root_dir = tmp("foo[]bar")
