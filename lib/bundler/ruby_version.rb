@@ -118,8 +118,6 @@ module Bundler
         [:engine_version, engine_version, other.engine_version]
       elsif patchlevel && (!patchlevel.is_a?(String) || !other.patchlevel.is_a?(String) || !matches?(patchlevel, other.patchlevel))
         [:patchlevel, patchlevel, other.patchlevel]
-      else
-        nil
       end
     end
 
