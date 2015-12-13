@@ -69,7 +69,7 @@ module Bundler
     status_code(23)
   end
 
-  class YAMLSyntaxError < BundlerError
+  class YamlSyntaxError < BundlerError
     attr_reader :orig_exception
 
     def initialize(orig_exception, msg)

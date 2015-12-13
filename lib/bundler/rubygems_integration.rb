@@ -68,8 +68,8 @@ module Bundler
       Bundler.ui.error "#{e.class}: #{e.message}"
       Bundler.ui.trace e
       raise
-    rescue YamlSyntaxError => e
-      raise YAMLSyntaxError.new(e, "Your RubyGems configuration, which is " \
+    rescue YamlLibrarySyntaxError => e
+      raise YamlSyntaxError.new(e, "Your RubyGems configuration, which is " \
         "usually located in ~/.gemrc, contains invalid YAML syntax.")
     end
 

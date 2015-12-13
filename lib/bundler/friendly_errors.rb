@@ -5,7 +5,7 @@ require "bundler/vendored_thor"
 module Bundler
   def self.with_friendly_errors
     yield
-  rescue YAMLSyntaxError => e
+  rescue Bundler::YamlSyntaxError => e
     Bundler.ui.error e.message
     Bundler.ui.trace e.orig_exception
     exit e.status_code

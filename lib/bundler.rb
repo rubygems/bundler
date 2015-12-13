@@ -375,7 +375,7 @@ module Bundler
       # If the YAML is invalid, Syck raises an ArgumentError, and Psych
       # raises a Psych::SyntaxError. See psyched_yaml.rb for more info.
       Gem::Specification.from_yaml(contents)
-    rescue YamlSyntaxError, ArgumentError, Gem::EndOfYAMLException, Gem::Exception
+    rescue YamlLibrarySyntaxError, ArgumentError, Gem::EndOfYAMLException, Gem::Exception
       eval_gemspec(path, contents)
     end
 
