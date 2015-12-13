@@ -9,9 +9,8 @@ describe "SSL Certificates", :rubygems_master do
   end
 
   hosts = %w(
-    d2chzxaqi4y7f8.cloudfront.net
+    rubygems.global.ssl.fastly.net
     rubygems.org
-    s3.amazonaws.com
     staging.rubygems.org
   )
 
