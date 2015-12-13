@@ -116,6 +116,7 @@ module Bundler
         specs = fetchers.last.specs(gem_names)
       else
         specs = []
+        fetchers.shift until fetchers.first.available? || fetchers.empty?
         fetchers.dup.each do |f|
           break unless f.api_fetcher? && !gem_names || !specs = f.specs(gem_names)
           fetchers.delete(f)
