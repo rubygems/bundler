@@ -124,8 +124,14 @@ module Bundler
         @use_api = false if fetchers.none?(&:api_fetcher?)
       end
 
-      specs.each do |spec|
-        next if spec.name == "bundler"
+      specs.each do |name, version, platform, dependencies|
+        next if name == "bundler"
+        spec = nil
+        if dependencies
+          spec = EndpointSpecification.new(name, version, platform, dependencies)
+        else
+          spec = RemoteSpecification.new(name, version, platform, self)
+        end
         spec.source = source
         spec.remote = @remote
         index << spec

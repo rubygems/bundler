@@ -52,21 +52,18 @@ module Bundler
         gem_list = []
         gem_names.each_slice(Source::Rubygems::API_REQUEST_SIZE) do |names|
           marshalled_deps = downloader.fetch(dependency_api_uri(names)).body
-          gem_list += Bundler.load_marshal(marshalled_deps)
+          gem_list.push(*Bundler.load_marshal(marshalled_deps))
         end
         gem_list
       end
 
       def get_formatted_specs_and_deps(gem_list)
         deps_list = []
-        spec_list = gem_list.map do |s|
-          dependencies = s[:dependencies].map do |name, requirement|
-            dep = well_formed_dependency(name, requirement.split(", "))
-            deps_list << dep.name
-            dep
-          end
+        spec_list = []
 
-          [s[:name], Gem::Version.new(s[:number]), s[:platform], dependencies]
+        gem_list.each do |s|
+          deps_list.push(*s[:dependencies].keys)
+          spec_list.push([s[:name], s[:number], s[:platform], s[:dependencies]])
         end
         [spec_list, deps_list]
       end
@@ -75,18 +72,6 @@ module Bundler
         uri = fetch_uri + "api/v1/dependencies"
         uri.query = "gems=#{CGI.escape(gem_names.join(","))}" if gem_names.any?
         uri
-      end
-
-      def well_formed_dependency(name, *requirements)
-        Gem::Dependency.new(name, *requirements)
-      rescue ArgumentError => e
-        illformed = 'Ill-formed requirement ["#<YAML::Syck::DefaultKey'
-        raise e unless e.message.include?(illformed)
-        puts # we shouldn't print the error message on the "fetching info" status line
-        raise GemspecError,
-          "Unfortunately, the gem #{name} has an invalid " \
-          "gemspec. \nPlease ask the gem author to yank the bad version to fix " \
-          "this issue. For more information, see http://bit.ly/syck-defaultkey."
       end
 
     private

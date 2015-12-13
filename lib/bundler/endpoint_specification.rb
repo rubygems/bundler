@@ -8,9 +8,9 @@ module Bundler
 
     def initialize(name, version, platform, dependencies, metadata = nil)
       @name         = name
-      @version      = version
+      @version      = Gem::Version.create version
       @platform     = platform
-      @dependencies = dependencies
+      @dependencies = dependencies.map {|name, reqs| build_dependency(name, reqs) }
 
       parse_metadata(metadata || {})
     end
@@ -111,5 +111,18 @@ module Bundler
         end
       end
     end
+
+    def build_dependency(name, *requirements)
+      Gem::Dependency.new(name, *requirements)
+    rescue ArgumentError => e
+      illformed = 'Ill-formed requirement ["#<YAML::Syck::DefaultKey'
+      raise e unless e.message.include?(illformed)
+      puts # we shouldn't print the error message on the "fetching info" status line
+      raise GemspecError,
+        "Unfortunately, the gem #{s[:name]} (#{s[:number]}) has an invalid " \
+        "gemspec. \nPlease ask the gem author to yank the bad version to fix " \
+        "this issue. For more information, see http://bit.ly/syck-defaultkey."
+    end
+
   end
 end

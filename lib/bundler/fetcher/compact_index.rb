@@ -17,7 +17,7 @@ module Bundler
       end
 
       def specs_for_names(gem_names)
-        gemspecs = []
+        gem_info = []
         complete_gems = []
         remaining_gems = gem_names.dup
 
@@ -29,18 +29,12 @@ module Bundler
 
           deps = compact_index_client.dependencies(remaining_gems)
           next_gems = deps.flat_map {|d| d[3].flat_map(&:first) }.uniq
-
-          deps.each do |contents|
-            contents[1] = Gem::Version.new(contents[1])
-            contents[3].map! {|name, reqs| Gem::Dependency.new(name, reqs) }
-            gemspecs << EndpointSpecification.new(*contents)
-          end
-
+          deps.each { |dep| gem_info << dep }
           complete_gems.push(*deps.map(&:first).uniq)
           remaining_gems = next_gems - complete_gems
         end
 
-        gemspecs
+        gem_info
       end
 
       def fetch_spec(spec)
