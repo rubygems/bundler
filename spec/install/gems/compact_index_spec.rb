@@ -11,7 +11,7 @@ describe "compact index api" do
     G
 
     bundle :install, :artifice => "compact_index"
-    expect(out).to include("Fetching source index from #{source_uri}")
+    expect(out).to include("Fetching gem metadata from #{source_uri}")
     should_be_installed "rack 1.0.0"
   end
 
@@ -32,7 +32,7 @@ describe "compact index api" do
     G
 
     bundle :install, :artifice => "compact_index"
-    expect(out).to include("Fetching source index from #{source_uri}/")
+    expect(out).to include("Fetching gem metadata from #{source_uri}")
     should_be_installed(
       "rails 2.3.2",
       "actionpack 2.3.2",
@@ -60,7 +60,7 @@ describe "compact index api" do
     bundle :install, :artifice => "compact_index"
 
     bundle "install --deployment", :artifice => "compact_index"
-    expect(out).to include("Fetching source index from #{source_uri}")
+    expect(out).to include("Fetching gem metadata from #{source_uri}")
     should_be_installed "rack 1.0.0"
   end
 
@@ -123,7 +123,7 @@ describe "compact index api" do
     G
 
     bundle :install, :fakeweb => "windows"
-    expect(out).to include("Fetching source index from #{source_uri}")
+    expect(out).to include("Fetching gem metadata from #{source_uri}")
     should_be_installed "rcov 1.0.0"
   end
 
@@ -221,6 +221,7 @@ describe "compact index api" do
     G
 
     bundle :install, :artifice => "compact_index_extra"
+    puts out
     should_be_installed "back_deps 1.0"
   end
 
@@ -287,8 +288,8 @@ describe "compact index api" do
 
     bundle :install, :artifice => "compact_index_extra"
 
-    expect(out).to include("Fetching source index from http://localgemserver.test/")
-    expect(out).to include("Fetching source index from http://localgemserver.test/extra")
+    expect(out).to include("Fetching gem metadata from http://localgemserver.test/")
+    expect(out).to include("Fetching gem metadata from http://localgemserver.test/extra")
   end
 
   it "does not fetch every spec if the index of gems is large when doing back deps" do
@@ -354,7 +355,7 @@ describe "compact index api" do
     G
 
     bundle :install, :artifice => "compact_index"
-    expect(out).to include("Fetching source index from #{source_uri}")
+    expect(out).to include("Fetching gem metadata from #{source_uri}")
   end
 
   it "should install when EndpointSpecification has a bin dir owned by root", :sudo => true do
@@ -503,7 +504,7 @@ describe "compact index api" do
 
         bundle :install, :artifice => "compact_index_strict_basic_authentication"
 
-        expect(out).to include("Fetching source index from #{source_uri}")
+        expect(out).to include("Fetching gem metadata from #{source_uri}")
         should_be_installed "rack 1.0.0"
       end
 
@@ -513,14 +514,14 @@ describe "compact index api" do
 
         bundle :install, :artifice => "compact_index_strict_basic_authentication"
 
-        expect(out).to include("Fetching source index from #{source_uri}")
+        expect(out).to include("Fetching gem metadata from #{source_uri}")
         should_be_installed "rack 1.0.0"
       end
 
       it "should use the API" do
         bundle "config #{source_hostname} #{user}:#{password}"
         bundle :install, :artifice => "compact_index_strict_basic_authentication"
-        expect(out).to include("Fetching source index from #{source_uri}")
+        expect(out).to include("Fetching gem metadata from #{source_uri}")
         should_be_installed "rack 1.0.0"
       end
 
