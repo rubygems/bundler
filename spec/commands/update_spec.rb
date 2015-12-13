@@ -18,6 +18,7 @@ describe "bundle update" do
       end
 
       bundle "update"
+      expect(out).to include("Bundle updated!")
       should_be_installed "rack 1.2", "rack-obama 1.0", "activesupport 3.0"
     end
 
@@ -34,14 +35,9 @@ describe "bundle update" do
   end
 
   describe "--quiet argument" do
-    it "shows UI messages without --quiet argument" do
-      bundle "update"
-      expect(out).to include("Fetching source")
-    end
-
-    it "does not show UI messages with --quiet argument" do
+    it "hides UI messages" do
       bundle "update --quiet"
-      expect(out).not_to include("Fetching source")
+      expect(out).not_to include("Bundle updated!")
     end
   end
 
