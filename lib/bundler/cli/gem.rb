@@ -148,7 +148,8 @@ module Bundler
     end
 
     def ask_and_set(key, header, message)
-      choice = options[key] || Bundler.settings["gem.#{key}"]
+      choice = options[key]
+      choice = Bundler.settings["gem.#{key}"] if choice.nil?
 
       if choice.nil?
         Bundler.ui.confirm header
