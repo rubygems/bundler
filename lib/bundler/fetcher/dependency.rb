@@ -23,11 +23,7 @@ module Bundler
 
         log_specs(query_list)
 
-        if query_list.empty?
-          return last_spec_list.map do |args|
-            EndpointSpecification.new(*args)
-          end
-        end
+        return last_spec_list if query_list.empty?
 
         spec_list, deps_list = Bundler::Retry.new("dependency api", AUTH_ERRORS).attempts do
           dependency_specs(query_list)
