@@ -92,7 +92,7 @@ module Bundler
       elsif cached_spec_path = gemspec_cached_path(spec_file_name)
         Bundler.load_gemspec(cached_spec_path)
       else
-        Bundler.load_marshal Gem.inflate(downloader.fetch uri)
+        Bundler.load_marshal Gem.inflate(downloader.fetch(uri).body)
       end
     rescue MarshalError
       raise HTTPError, "Gemspec #{spec} contained invalid data.\n" \
