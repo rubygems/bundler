@@ -60,7 +60,7 @@ module Bundler
             "#{file}. Make sure you can build the gem, then try again"
         end
 
-        gem spec.name, :path => path, :glob => glob, :platforms => Bundler::Dependency::REVERSE_PLATFORM_MAP[spec.platform]
+        gem spec.name, :path => path, :glob => glob
 
         group(development_group) do
           spec.development_dependencies.each do |dep|
