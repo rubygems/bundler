@@ -327,7 +327,7 @@ module Bundler
       end
 
       def api_fetchers
-        fetchers {|f| f.use_api && f.fetchers.first.api_fetcher? }
+        fetchers.select {|f| f.use_api && f.fetchers.first.api_fetcher? }
       end
 
       def remote_specs
