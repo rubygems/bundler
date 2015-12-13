@@ -1,3 +1,7 @@
+## 1.11.0 (2015-12-12)
+
+(this space intentionally left blank)
+
 ## 1.11.0.pre.2 (2015-12-06)
 
 Bugfixes:
