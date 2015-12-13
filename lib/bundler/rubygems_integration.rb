@@ -1,7 +1,6 @@
 require "monitor"
 require "rubygems"
 require "rubygems/config_file"
-require "bundler/psyched_yaml"
 
 module Bundler
   class RubygemsIntegration
@@ -63,6 +62,7 @@ module Bundler
     end
 
     def configuration
+      require "bundler/psyched_yaml"
       Gem.configuration
     rescue Gem::SystemExitException => e
       Bundler.ui.error "#{e.class}: #{e.message}"
