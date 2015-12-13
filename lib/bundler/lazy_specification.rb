@@ -54,7 +54,7 @@ module Bundler
     end
 
     def respond_to?(*args)
-      super || @specification.respond_to?(*args)
+      super || @specification ? @specification.respond_to?(*args) : nil
     end
 
     def to_s
