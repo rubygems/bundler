@@ -5,9 +5,7 @@ module Bundler
   class Fetcher
     class Index < Base
       def specs(_gem_names)
-        Bundler.rubygems.fetch_all_remote_specs(remote).map do |*args|
-          RemoteSpecification.new(*args)
-        end
+        Bundler.rubygems.fetch_all_remote_specs(remote)
       rescue Gem::RemoteFetcher::FetchError, OpenSSL::SSL::SSLError, Net::HTTPFatalError => e
         case e.message
         when /certificate verify failed/

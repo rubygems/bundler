@@ -578,18 +578,12 @@ module Bundler
       end
 
       def fetch_all_remote_specs(remote)
-        # Since SpecFetcher now returns NameTuples, we just fetch directly
-        # and unmarshal the array ourselves.
-        hash = {}
+        source = remote.uri.is_a?(URI) ? remote.uri : URI.parse(source.to_s)
 
-        source = remote.uri
-        source = URI.parse(source.to_s) unless source.is_a?(URI)
-        hash[source] = fetch_specs(source, remote, "specs")
+        specs = fetch_specs(source, remote, "specs")
+        pres = fetch_specs(source, remote, "prerelease_specs") || []
 
-        pres = fetch_specs(source, remote, "prerelease_specs")
-        hash[source].push(*pres) if pres && !pres.empty?
-
-        hash
+        specs.push(*pres)
       end
 
       def download_gem(spec, uri, path)
