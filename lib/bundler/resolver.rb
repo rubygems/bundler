@@ -127,14 +127,15 @@ module Bundler
         @source ||= first.source
       end
 
-      def for?(platform, required_ruby_version)
-        if spec = @specs[platform]
-          if required_ruby_version && spec_required_ruby_version = spec.required_ruby_version
-            spec_required_ruby_version.satisfied_by?(required_ruby_version)
-          else
-            true
-          end
+      def for?(platform, required_ruby)
+        return true if required_ruby.nil?
+        return false if @specs[platform].nil?
+
+        if @specs[platform].respond_to?(:required_ruby_version)
+          spec_ruby = @specs[platform].required_ruby_version
         end
+
+        spec_ruby.nil? ? true : spec_ruby.satisfied_by?(required_ruby)
       end
 
       def to_s
@@ -192,7 +193,7 @@ module Bundler
       @search_for = {}
       @base_dg = Molinillo::DependencyGraph.new
       @base.each {|ls| @base_dg.add_vertex(ls.name, Dependency.new(ls.name, ls.version), true) }
-      @ruby_version = ruby_version ? Gem::Version.create(ruby_version) : nil
+      @ruby_version = ruby_version && ruby_version.gem_version
     end
 
     def start(requirements)
@@ -272,7 +273,8 @@ module Bundler
           []
         end
       end
-      search.select {|sg| sg.for?(platform, @ruby_version) }.each {|sg| sg.activate_platform(platform) }
+      search.select {|sg| sg.for?(platform, @ruby_version) }.
+        each {|sg| sg.activate_platform(platform) }
     end
 
     def name_for(dependency)
