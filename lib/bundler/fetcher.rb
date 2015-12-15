@@ -52,7 +52,10 @@ module Bundler
 
     # Exceptions classes that should bypass retry attempts. If your password didn't work the
     # first time, it's not going to the third time.
-    AUTH_ERRORS = [AuthenticationRequiredError, BadAuthenticationError]
+    AUTH_ERRORS = [AuthenticationRequiredError, BadAuthenticationError, Net::HTTPBadGateway,
+                   Net::HTTPBadRequest, Net::HTTPForbidden, Net::HTTPMethodNotAllowed,
+                   Net::HTTPMovedPermanently, Net::HTTPNotImplemented, Net::HTTPNotFound,
+                   Net::HTTPRequestEntityTooLarge, Net::HTTPNoContent]
 
     class << self
       attr_accessor :disable_endpoint, :api_timeout, :redirect_limit, :max_retries
