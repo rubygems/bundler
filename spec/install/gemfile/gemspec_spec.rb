@@ -165,4 +165,49 @@ describe "bundle install from an existing gemspec" do
       should_be_installed "rack 1.0"
     end
   end
+
+  context "with a lockfile and some missing dependencies" do
+    let(:source_uri) { "http://localgemserver.test" }
+
+    it "should install on JRuby when previously bundled for Ruby" do
+      build_lib("foo", :path => tmp.join("foo")) do |s|
+        s.add_dependency "rack", "=1.0.0"
+        s.platform = "java"
+      end
+
+      gemfile <<-G
+        source "#{source_uri}"
+        gemspec :path => "../foo"
+      G
+
+      lockfile <<-L
+        PATH
+          remote: ../foo
+          specs:
+            foo (1.0)
+              rack (= 1.0.0)
+
+        GEM
+          remote: #{source_uri}
+          specs:
+            rack (1.0.0)
+
+        PLATFORMS
+          #{generic(Gem::Platform.local)}
+
+        DEPENDENCIES
+          foo!
+
+        BUNDLED WITH
+           #{Bundler::VERSION}
+      L
+
+      simulate_ruby_engine "jruby" do
+        simulate_platform "java" do
+          bundle "install", :artifice => "endpoint"
+          should_be_installed "rack 1.0.0"
+        end
+      end
+    end
+  end
 end
