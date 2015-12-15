@@ -171,11 +171,12 @@ describe "bundle install from an existing gemspec" do
 
     context "previously bundled for Ruby" do
       let(:platform) { "ruby" }
+      let(:explicit_platform) { false }
 
       before do
         build_lib("foo", :path => tmp.join("foo")) do |s|
           s.add_dependency "rack", "=1.0.0"
-          s.platform = "java" if platform == "java"
+          s.platform = platform if explicit_platform
         end
 
         gemfile <<-G
@@ -204,6 +205,21 @@ describe "bundle install from an existing gemspec" do
           BUNDLED WITH
              #{Bundler::VERSION}
         L
+      end
+
+      context "using JRuby with explicit platform" do
+        let(:platform) { "java" }
+        let(:explicit_platform) { true }
+
+        it "should install" do
+          simulate_ruby_engine "jruby" do
+            simulate_platform "java" do
+              results = bundle "install", :artifice => "endpoint"
+              expect(results).to include("Installing rack 1.0.0")
+              should_be_installed "rack 1.0.0"
+            end
+          end
+        end
       end
 
       context "using JRuby" do
