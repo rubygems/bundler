@@ -169,43 +169,64 @@ describe "bundle install from an existing gemspec" do
   context "with a lockfile and some missing dependencies" do
     let(:source_uri) { "http://localgemserver.test" }
 
-    it "should install on JRuby when previously bundled for Ruby" do
-      build_lib("foo", :path => tmp.join("foo")) do |s|
-        s.add_dependency "rack", "=1.0.0"
-        s.platform = "java"
+    context "previously bundled for Ruby" do
+      let(:platform) { "ruby" }
+
+      before do
+        build_lib("foo", :path => tmp.join("foo")) do |s|
+          s.add_dependency "rack", "=1.0.0"
+          s.platform = "java" if platform == "java"
+        end
+
+        gemfile <<-G
+          source "#{source_uri}"
+          gemspec :path => "../foo"
+        G
+
+        lockfile <<-L
+          PATH
+            remote: ../foo
+            specs:
+              foo (1.0)
+                rack (= 1.0.0)
+
+          GEM
+            remote: #{source_uri}
+            specs:
+              rack (1.0.0)
+
+          PLATFORMS
+            #{generic(Gem::Platform.local)}
+
+          DEPENDENCIES
+            foo!
+
+          BUNDLED WITH
+             #{Bundler::VERSION}
+        L
       end
 
-      gemfile <<-G
-        source "#{source_uri}"
-        gemspec :path => "../foo"
-      G
+      context "using JRuby" do
+        let(:platform) { "java" }
 
-      lockfile <<-L
-        PATH
-          remote: ../foo
-          specs:
-            foo (1.0)
-              rack (= 1.0.0)
+        it "should install" do
+          simulate_ruby_engine "jruby" do
+            simulate_platform "java" do
+              results = bundle "install", :artifice => "endpoint"
+              expect(results).to include("Installing rack 1.0.0")
+              should_be_installed "rack 1.0.0"
+            end
+          end
+        end
+      end
 
-        GEM
-          remote: #{source_uri}
-          specs:
-            rack (1.0.0)
-
-        PLATFORMS
-          #{generic(Gem::Platform.local)}
-
-        DEPENDENCIES
-          foo!
-
-        BUNDLED WITH
-           #{Bundler::VERSION}
-      L
-
-      simulate_ruby_engine "jruby" do
-        simulate_platform "java" do
-          bundle "install", :artifice => "endpoint"
-          should_be_installed "rack 1.0.0"
+      context "using Windows" do
+        it "should install" do
+          simulate_windows do
+            results = bundle "install", :artifice => "endpoint"
+            expect(results).to include("Installing rack 1.0.0")
+            should_be_installed "rack 1.0.0"
+          end
         end
       end
     end

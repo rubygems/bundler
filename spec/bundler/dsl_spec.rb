@@ -172,6 +172,7 @@ describe Bundler::Dsl do
       let(:platform) { "java" }
 
       it "keeps track of the jruby platforms in the dependency" do
+        allow(Gem::Platform).to receive(:local).and_return(java)
         subject.gemspec
         expect(subject.dependencies.last.platforms).to eq(Bundler::Dependency::REVERSE_PLATFORM_MAP[Gem::Platform::JAVA])
       end

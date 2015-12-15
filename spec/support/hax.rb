@@ -10,6 +10,15 @@ if ENV["BUNDLER_SPEC_VERSION"]
   end
 end
 
+if ENV["BUNDLER_SPEC_WINDOWS"] == "true"
+  require "bundler/constants"
+
+  module Bundler
+    remove_const :WINDOWS if defined?(WINDOWS)
+    WINDOWS = true
+  end
+end
+
 class Object
   if ENV["BUNDLER_SPEC_RUBY_ENGINE"]
     remove_const :RUBY_ENGINE if defined?(RUBY_ENGINE)

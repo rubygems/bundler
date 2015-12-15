@@ -60,7 +60,8 @@ module Bundler
             "#{file}. Make sure you can build the gem, then try again"
         end
 
-        gem spec.name, :path => path, :glob => glob, :platforms => Bundler::Dependency::REVERSE_PLATFORM_MAP[spec.platform]
+        gem_platforms = Bundler::Dependency::REVERSE_PLATFORM_MAP[gem_helpers.generic(Gem::Platform.local)]
+        gem spec.name, :path => path, :glob => glob, :platforms => gem_platforms
 
         group(development_group) do
           spec.development_dependencies.each do |dep|
@@ -217,6 +218,14 @@ module Bundler
     end
 
   private
+
+    def gem_helpers
+      @gem_helpers ||= begin
+        helpers = Object.new
+        helpers.extend GemHelpers
+        helpers
+      end
+    end
 
     def add_git_sources
       git_source(:github) do |repo_name|
