@@ -86,6 +86,10 @@ module Bundler
         @install_path ||= begin
           git_scope = "#{base_name}-#{shortref_for_path(revision)}"
           path = Bundler.install_path.join(git_scope)
+          unless path.exist?
+            candidates = find_in_gem_path("bundler", "gems", git_scope)
+            path = candidates.first unless candidates.empty?
+          end
 
           if !path.exist? && Bundler.requires_sudo?
             Bundler.user_bundle_path.join(Bundler.ruby_scope).join(git_scope)
@@ -202,7 +206,15 @@ module Bundler
           if Bundler.requires_sudo?
             Bundler.user_bundle_path.join("cache/git", git_scope)
           else
-            Bundler.cache.join("git", git_scope)
+            default_cache_path = Bundler.cache.join("git", git_scope)
+
+            candidates = [default_cache_path] + find_in_gem_path("cache", "bundler", "git", git_scope)
+            cache_path = candidates.detect do |path|
+              proxy = GitProxy.new(path, uri, ref, cached_revision, self)
+              proxy.has_revision_cached?
+            end
+
+            cache_path || default_cache_path
           end
         end
       end
@@ -220,6 +232,17 @@ module Bundler
       end
 
     private
+
+      def find_in_gem_path(*path_parts)
+        rel_path = Pathname.new(File.join(path_parts))
+        paths = Bundler.rubygems.gem_path.map do |path|
+          expanded_path = rel_path.expand_path(path)
+          expanded_path if expanded_path.exist?
+        end
+        paths.compact!
+
+        paths
+      end
 
       def serialize_gemspecs_in(destination)
         expanded_path = destination.expand_path(Bundler.root)
