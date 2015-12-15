@@ -115,8 +115,16 @@ module Bundler
       end unless File.exist?(cache_path)
 
       Bundler.ui.info "Updating files in #{Bundler.settings.app_cache_path}"
+
+      # Do not try to cache specification for the gem described by the .gemspec
+      root_gem_name = nil
+      if gemspec_cache_hash = Bundler.instance_variable_get(:@gemspec_cache)
+        gemspec = gemspec_cache_hash.values.first
+        root_gem_name = gemspec.name unless gemspec.nil?
+      end
       specs.each do |spec|
         next if spec.name == "bundler"
+        next if File.exist?("#{root_gem_name}.gemspec") && spec.source.class == Bundler::Source::Path && root_gem_name && spec.name == root_gem_name
         spec.source.send(:fetch_gem, spec) if Bundler.settings[:cache_all_platforms] && spec.source.respond_to?(:fetch_gem, true)
         spec.source.cache(spec, custom_path) if spec.source.respond_to?(:cache)
       end

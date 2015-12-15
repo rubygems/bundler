@@ -15,6 +15,50 @@ describe "bundle package" do
     end
   end
 
+  context "with --all" do
+    context "without a gemspec" do
+      it "caches all dependencies except bundler itself" do
+        gemfile <<-D
+          source "file://#{gem_repo1}"
+          gem 'rack'
+          gem 'bundler'
+        D
+
+        bundle "package --all"
+
+        expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
+        expect(bundled_app("vendor/cache/bundler-0.9.gem")).to_not exist
+      end
+    end
+    context "with a gemspec" do
+      before do
+        File.open(bundled_app("mygem.gemspec"), "w") do |f|
+          f.write <<-G
+            Gem::Specification.new do |s|
+              s.name = "mygem"
+              s.version = "0.1.1"
+              s.add_development_dependency "nokogiri", "=1.4.2"
+            end
+          G
+        end
+      end
+      it "caches all dependencies except bundler and the gemspec specified gem" do
+        gemfile <<-D
+          source "file://#{gem_repo1}"
+          gem 'rack'
+          gemspec
+        D
+
+        bundle "package --all"
+        sleep 20
+        expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
+        expect(bundled_app("vendor/cache/nokogiri-1.4.2.gem")).to exist
+        expect(bundled_app("vendor/cache/mygem-0.1.1.gem")).to_not exist
+        expect(bundled_app("vendor/cache/bundler-0.9.gem")).to_not exist
+      end
+    end
+  end
+
   context "with --path" do
     it "sets root directory for gems" do
       gemfile <<-D
