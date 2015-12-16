@@ -908,7 +908,7 @@ describe "Bundler.setup" do
             rack (1.0.0)
 
         PLATFORMS
-          #{generic(Gem::Platform.local)}
+          #{generic_local_platform}
 
         DEPENDENCIES
           rack
