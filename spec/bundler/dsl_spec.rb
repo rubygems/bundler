@@ -145,39 +145,6 @@ describe Bundler::Dsl do
     end
   end
 
-  describe "#gemspec" do
-    let(:spec) do
-      Gem::Specification.new do |gem|
-        gem.name = "example"
-        gem.platform = platform
-      end
-    end
-
-    before do
-      allow(Dir).to receive(:[]).and_return(["spec_path"])
-      allow(Bundler).to receive(:load_gemspec).with("spec_path").and_return(spec)
-      allow(Bundler).to receive(:default_gemfile).and_return(Pathname.new("./Gemfile"))
-    end
-
-    context "with a ruby platform" do
-      let(:platform) { "ruby" }
-
-      it "keeps track of the ruby platforms in the dependency" do
-        subject.gemspec
-        expect(subject.dependencies.last.platforms).to eq(Bundler::Dependency::REVERSE_PLATFORM_MAP[Gem::Platform::RUBY])
-      end
-    end
-
-    context "with a jruby platform" do
-      let(:platform) { "java" }
-
-      it "keeps track of the jruby platforms in the dependency" do
-        subject.gemspec
-        expect(subject.dependencies.last.platforms).to eq(Bundler::Dependency::REVERSE_PLATFORM_MAP[Gem::Platform::JAVA])
-      end
-    end
-  end
-
   context "can bundle groups of gems with" do
     # git "https://github.com/rails/rails.git" do
     #   gem "railties"

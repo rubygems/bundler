@@ -1,3 +1,18 @@
+## 1.11.2 (2015-12-15)
+
+Bugfixes:
+
+  - _really_ stop calling `required_ruby_version` on nil @specifications (#4147, @indirect)
+
+## 1.11.1 (2015-12-15)
+
+Bugfixes:
+
+  - lazy-load Psych, again (#4149, @indirect)
+  - allow gemspec gems on other platforms (#4150, @indirect)
+  - fix --no-coc and --no-mit flags on `gem` (#4148, @RochesterinNYC)
+  - stop calling `required_ruby_version` on nil @specifications (#4147, @indirect)
+
 ## 1.11.0 (2015-12-12)
 
 (this space intentionally left blank)

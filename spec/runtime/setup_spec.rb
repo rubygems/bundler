@@ -954,4 +954,19 @@ describe "Bundler.setup" do
       end
     end
   end
+
+  describe "when Psych is not in the Gemfile", :ruby => "~> 2.2" do
+    it "does not load Psych" do
+      gemfile ""
+      ruby <<-RUBY
+        require 'bundler/setup'
+        puts defined?(Psych::VERSION) ? Psych::VERSION : "undefined"
+        require 'psych'
+        puts Psych::VERSION
+      RUBY
+      pre_bundler, post_bundler = out.split("\n")
+      expect(pre_bundler).to eq("undefined")
+      expect(post_bundler).to match(/\d+\.\d+\.\d+/)
+    end
+  end
 end
