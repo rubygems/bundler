@@ -41,4 +41,43 @@ describe "bundle install" do
       expect(vendored_gems("bundler/gems/foo-1.0-#{revision_for(lib_path("foo-1.0"))[0..11]}")).to be_directory
     end
   end
+
+  context "local overrides" do
+    before do
+      build_git "rack", "0.8"
+
+      build_git "rack", "0.8", :path => lib_path("local-rack") do |s|
+        s.write "lib/rack.rb", "puts :LOCAL"
+      end
+
+      install_gemfile <<-G
+          source "file://#{gem_repo1}"
+          gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
+      G
+
+      bundle %(config local.rack #{lib_path("local-rack")})
+    end
+
+    context "invalid revision and branch in gemfile.lock" do
+      it "should not explode on install" do
+        lockfile <<-G
+          GIT
+            remote: #{lib_path("rack-0.8")}
+            revision: #{"a" * 40}
+            branch: invalid
+            specs:
+              rack (0.8)
+
+          PLATFORMS
+            #{generic_local_platform}
+
+          DEPENDENCIES
+            rack!
+        G
+
+        bundle "install"
+        expect(out).to include("Bundle complete!")
+      end
+    end
+  end
 end
