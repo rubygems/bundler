@@ -189,8 +189,16 @@ module Bundler
 
       unless dry_run
         stale_files = stale_gem_bins + stale_gem_files + stale_gemspec_files
-        stale_files.each {|file| FileUtils.rm(file) if File.exist?(file) }
-        stale_git_cache_dirs.each {|dir| FileUtils.rm_rf(dir) if File.exist?(dir) }
+        stale_files.each do |file|
+          SharedHelpers.filesystem_access(File.dirname(file)) do |_p|
+            FileUtils.rm(file) if File.exist?(file)
+          end
+        end
+        stale_git_cache_dirs.each do |cache_dir|
+          SharedHelpers.filesystem_access(cache_dir) do |dir|
+            FileUtils.rm_rf(dir) if File.exist?(dir)
+          end
+        end
       end
 
       output
