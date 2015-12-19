@@ -457,6 +457,40 @@ describe "bundle clean" do
     expect(out).to include("rack (1.0.0)")
   end
 
+  describe "when missing permissions" do
+    after do
+      FileUtils.chmod(0755, default_bundle_path("cache"))
+    end
+    it "returns a helpful error message" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+
+        gem "foo"
+        gem "rack"
+      G
+      bundle :install
+
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+
+        gem "rack"
+      G
+      bundle :install
+
+      system_cache_path = default_bundle_path("cache")
+      FileUtils.chmod(0500, system_cache_path)
+
+      bundle :clean, :force => true
+
+      expect(out).to include(system_gem_path.to_s)
+      expect(out).to include("grant write permissions")
+
+      sys_exec "gem list"
+      expect(out).to include("foo (1.0)")
+      expect(out).to include("rack (1.0.0)")
+    end
+  end
+
   it "cleans git gems with a 7 length git revision" do
     build_git "foo"
     revision = revision_for(lib_path("foo-1.0"))
