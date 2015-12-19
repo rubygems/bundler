@@ -28,7 +28,7 @@ rvm:
   - 1.8.7
 
 # Rubygems versions MUST be available as rake tasks
-# see Rakefile:66 for the list of possible RGV values
+# see Rakefile:125 for the list of possible RGV values
 env:
   # We need to know if changes to rubygems will break bundler on release
   - RGV=master
