@@ -353,6 +353,16 @@ module Spec
       ENV["BUNDLER_SPEC_VERSION"] = old if block_given?
     end
 
+    def simulate_windows
+      old = ENV["BUNDLER_SPEC_WINDOWS"]
+      ENV["BUNDLER_SPEC_WINDOWS"] = "true"
+      simulate_platform mswin do
+        yield
+      end
+    ensure
+      ENV["BUNDLER_SPEC_WINDOWS"] = old
+    end
+
     def revision_for(path)
       Dir.chdir(path) { `git rev-parse HEAD`.strip }
     end

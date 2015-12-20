@@ -635,7 +635,7 @@ module Bundler
         dep = Dependency.new(dep, ">= 0") unless dep.respond_to?(:name)
         next unless remote || dep.current_platform?
         dep.gem_platforms(@platforms).each do |p|
-          deps << DepProxy.new(dep, p) if remote || p == generic(Gem::Platform.local)
+          deps << DepProxy.new(dep, p) if remote || p == generic_local_platform
         end
       end
       deps

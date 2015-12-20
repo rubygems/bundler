@@ -17,7 +17,7 @@ describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rack
@@ -40,7 +40,7 @@ describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         omg!
@@ -63,7 +63,7 @@ describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rack
@@ -81,7 +81,7 @@ describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rack
@@ -103,7 +103,7 @@ describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rack
@@ -121,7 +121,7 @@ describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rack
@@ -140,7 +140,7 @@ describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rack (> 0)
@@ -158,7 +158,7 @@ describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rack
@@ -186,7 +186,7 @@ describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rack
@@ -204,7 +204,7 @@ describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rack
@@ -269,7 +269,7 @@ describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rack
@@ -296,7 +296,7 @@ describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rack
@@ -322,7 +322,7 @@ describe "the lockfile format" do
             rack
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rack-obama
@@ -348,7 +348,7 @@ describe "the lockfile format" do
             rack
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rack-obama (>= 1.0)
@@ -378,7 +378,7 @@ describe "the lockfile format" do
             rack
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rack-obama (>= 1.0)
@@ -433,7 +433,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         foo!
@@ -502,7 +502,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         foo!
@@ -532,7 +532,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         foo!
@@ -562,7 +562,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         foo!
@@ -589,7 +589,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         foo!
@@ -629,7 +629,7 @@ describe "the lockfile format" do
           rack (1.0.0)
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         bar!
@@ -664,7 +664,7 @@ describe "the lockfile format" do
             rack
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         actionpack
@@ -705,7 +705,7 @@ describe "the lockfile format" do
           rake (10.0.2)
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rails
@@ -731,7 +731,7 @@ describe "the lockfile format" do
           net-ssh (1.0)
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         double_deps
@@ -757,7 +757,7 @@ describe "the lockfile format" do
             rack
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rack-obama (>= 1.0)
@@ -783,7 +783,7 @@ describe "the lockfile format" do
             rack
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         rack-obama (>= 1.0)
@@ -811,7 +811,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         foo
@@ -839,7 +839,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         foo
@@ -867,7 +867,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         foo
@@ -894,7 +894,7 @@ describe "the lockfile format" do
         specs:
 
       PLATFORMS
-        #{generic(Gem::Platform.local)}
+        #{generic_local_platform}
 
       DEPENDENCIES
         foo!
@@ -927,7 +927,7 @@ describe "the lockfile format" do
       gem "rack"
     G
 
-    platforms = ["java", generic(Gem::Platform.local).to_s].sort
+    platforms = ["java", generic_local_platform.to_s].sort
 
     lockfile_should_be <<-G
       GEM

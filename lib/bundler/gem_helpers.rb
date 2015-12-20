@@ -21,5 +21,11 @@ module Bundler
         found || Gem::Platform::RUBY
       end
     end
+    module_function :generic
+
+    def generic_local_platform
+      generic(Gem::Platform.local)
+    end
+    module_function :generic_local_platform
   end
 end
