@@ -54,7 +54,7 @@ describe Bundler, "friendly errors" do
     it "generates a search URL for the exception message" do
       exception = Exception.new("Exception message")
 
-      expect(Bundler.issues_url(exception)).to eq("https://github.com/bundler/bundler/search?q=Exception+message&type=Issues")
+      expect(Bundler::FriendlyErrors.issues_url(exception)).to eq("https://github.com/bundler/bundler/search?q=Exception+message&type=Issues")
     end
 
     it "generates a search URL for only the first line of a multi-line exception message" do
@@ -63,7 +63,7 @@ First line of the exception message
 Second line of the exception message
 END
 
-      expect(Bundler.issues_url(exception)).to eq("https://github.com/bundler/bundler/search?q=First+line+of+the+exception+message&type=Issues")
+      expect(Bundler::FriendlyErrors.issues_url(exception)).to eq("https://github.com/bundler/bundler/search?q=First+line+of+the+exception+message&type=Issues")
     end
   end
 end
