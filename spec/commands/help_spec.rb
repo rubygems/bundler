@@ -49,4 +49,39 @@ describe "bundle help" do
     expect(exitstatus).to be_zero if exitstatus
     expect(out).to eq("--help")
   end
+
+  it "is called when the --help flag is used after the command" do
+    fake_man!
+
+    bundle "install --help"
+    expect(out).to eq(%(["#{root}/lib/bundler/man/bundle-install"]))
+  end
+
+  it "is called when the --help flag is used before the command" do
+    fake_man!
+
+    bundle "--help install"
+    expect(out).to eq(%(["#{root}/lib/bundler/man/bundle-install"]))
+  end
+
+  it "is called when the -h flag is used before the command" do
+    fake_man!
+
+    bundle "-h install"
+    expect(out).to eq(%(["#{root}/lib/bundler/man/bundle-install"]))
+  end
+
+  it "is called when the -h flag is used after the command" do
+    fake_man!
+
+    bundle "install -h"
+    expect(out).to eq(%(["#{root}/lib/bundler/man/bundle-install"]))
+  end
+
+  it "has helpful output when using --help flag for a non-existent command" do
+    fake_man!
+
+    bundle "instill -h", :expect_err => true
+    expect(err).to include('Could not find command "instill -h --no-color".')
+  end
 end
