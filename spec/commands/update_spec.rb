@@ -321,19 +321,23 @@ describe "bundle update" do
 end
 
 describe "bundle update --ruby" do
-  context "when the Gemfile removes the ruby" do
-    it "removes the Ruby from the Gemfile.lock" do
-      install_gemfile <<-G
-          ::RUBY_VERSION = '2.1.3'
-          ::RUBY_PATCHLEVEL = 100
-          ruby '~> 2.1.0'
-      G
+  before do
+    install_gemfile <<-G, :expect_err => true
+        ::RUBY_VERSION = '2.1.3'
+        ::RUBY_PATCHLEVEL = 100
+        ruby '~> 2.1.0'
+    G
+    bundle "update --ruby", :expect_err => true
+  end
 
-      install_gemfile <<-G
+  context "when the Gemfile removes the ruby" do
+    before do
+      install_gemfile <<-G, :expect_err => true
           ::RUBY_VERSION = '2.1.4'
           ::RUBY_PATCHLEVEL = 222
       G
-
+    end
+    it "removes the Ruby from the Gemfile.lock" do
       bundle "update --ruby"
 
       lockfile_should_be <<-L
@@ -351,21 +355,16 @@ describe "bundle update --ruby" do
     end
   end
 
-  context "when the Gemfile specified an updated Ruby verison" do
-    it "updates the Gemfile.lock with the latest version" do
-      install_gemfile <<-G
-          ::RUBY_VERSION = '2.1.3'
-          ::RUBY_PATCHLEVEL = 100
-          ruby '~> 2.1.0'
-      G
-
-      install_gemfile <<-G
+  context "when the Gemfile specified an updated Ruby version" do
+    before do
+      install_gemfile <<-G, :expect_err => true
           ::RUBY_VERSION = '2.1.4'
           ::RUBY_PATCHLEVEL = 222
           ruby '~> 2.1.0'
       G
-
-      bundle "update --ruby"
+    end
+    it "updates the Gemfile.lock with the latest version" do
+      bundle "update --ruby", :expect_err => true
 
       lockfile_should_be <<-L
        GEM
@@ -386,39 +385,30 @@ describe "bundle update --ruby" do
   end
 
   context "when a different Ruby is being used than has been versioned" do
-    it "shows a helpful error message" do
-      install_gemfile <<-G
-          ::RUBY_VERSION = '2.1.3'
-          ::RUBY_PATCHLEVEL = 100
-          ruby '~> 2.1.0'
-      G
-
-      install_gemfile <<-G
+    before do
+      install_gemfile <<-G, :expect_err => true
           ::RUBY_VERSION = '2.2.2'
           ::RUBY_PATCHLEVEL = 505
           ruby '~> 2.1.0'
       G
+    end
+    it "shows a helpful error message" do
+      bundle "update --ruby", :expect_err => true
 
-      bundle "update --ruby"
       expect(out).to include("Your Ruby version is 2.2.2, but your Gemfile specified ~> 2.1.0")
     end
   end
 
   context "when updating Ruby version and Gemfile `ruby`" do
-    it "updates the Gemfile.lock with the latest version" do
-      install_gemfile <<-G
-          ::RUBY_VERSION = '2.1.3'
-          ::RUBY_PATCHLEVEL = 100
-          ruby '~> 2.1.0'
-      G
-
-      install_gemfile <<-G
+    before do
+      install_gemfile <<-G, :expect_err => true
           ::RUBY_VERSION = '1.8.3'
           ::RUBY_PATCHLEVEL = 55
           ruby '~> 1.8.0'
       G
-
-      bundle "update --ruby"
+    end
+    it "updates the Gemfile.lock with the latest version" do
+      bundle "update --ruby", :expect_err => true
 
       lockfile_should_be <<-L
        GEM
