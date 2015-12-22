@@ -419,6 +419,19 @@ module Bundler
       Env.new.write($stdout)
     end
 
+    # Reformat the arguments passed to bundle that include a --help flag
+    # into the corresponding `bundle help #{command}` call
+    def self.reformatted_help_args(args)
+      bundler_commands = all_commands.keys
+      command = args.select {|a| bundler_commands.include? a }
+      if command.empty?
+        abort("Could not find command \"#{args.join(" ")}\".")
+      else
+        command = command.first
+      end
+      ["help", command]
+    end
+
   private
 
     # Automatically invoke `bundle install` and resume if
