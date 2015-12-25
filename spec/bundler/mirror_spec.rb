@@ -136,8 +136,12 @@ end
 describe Bundler::Settings::Mirrors do
   let(:localhost_uri) { URI("http://localhost:9292") }
 
-  context "with a not configured mirror" do
-    let(:mirrors) { Bundler::Settings::Mirrors.new }
+  context "with a just created mirror" do
+    let(:mirrors) do
+      probe = double()
+      allow(probe).to receive(:replies?).and_return(true)
+      Bundler::Settings::Mirrors.new(probe)
+    end
 
     it "returns a mirror that contains the source uri for an unknown uri" do
       mirror = mirrors.for("http://rubygems.org/")
@@ -264,6 +268,34 @@ describe Bundler::Settings::Mirrors do
           expect(mirrors.for("http://rubygems.org/").uri).to eq(URI("http://rubygems.org/"))
         end
       end
+    end
+  end
+end
+
+describe Bundler::Settings::TCPSocketProbe do
+  let(:probe) { Bundler::Settings::TCPSocketProbe.new }
+
+  context "with a listening TCP Server" do
+    let(:server) { TCPServer.new("127.0.0.1", 0) }
+    let(:port) { server.addr[1] }
+    let(:mirror) { Bundler::Settings::Mirror.new(uri="http://localhost:#{port}", fallback_timeout=true) }
+
+    it "probes the server correctly" do
+      expect(probe.replies?(mirror)).to be_truthy
+    end
+
+    it "probes falsey when the server is down" do
+      my_mirror = mirror
+      server.close
+      expect(probe.replies?(my_mirror)).to be_falsey
+    end
+  end
+
+  context "with an invalid mirror" do
+    let(:mirror) { Bundler::Settings::Mirror.new(uri="http://127.0.0.127:#{9292}", fallback_timeout=true) }
+
+    it "fails with a timeout when there is nothing to tcp handshake" do
+      expect(probe.replies?(mirror)).to be_falsey
     end
   end
 end

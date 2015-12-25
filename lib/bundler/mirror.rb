@@ -91,12 +91,6 @@ module Bundler
       end
     end
 
-    class TCPSocketProbe
-      def replies?(mirror)
-        true
-      end
-    end
-
     private
 
     class MirrorConfig
@@ -126,6 +120,64 @@ module Bundler
           mirror.uri = AbsoluteURI.normalize(@value)
         end
       end
+    end
+
+    class TCPSocketProbe
+      def replies?(mirror)
+        MirrorSocket.new(mirror).with_socket do |socket, address, timeout|
+          begin
+            socket.connect_nonblock(address)
+          rescue IO::WaitWritable
+            wait_for_writtable_socket(socket, address, timeout)
+          rescue # Connection failed somehow, again
+            false
+          end
+        end
+      end
+
+      private
+
+      def wait_for_writtable_socket(socket, address, timeout)
+        if IO.select(nil, [socket], nil, timeout)
+          probe_writtable_socket(socket, address)
+        else # TCP Handshake timed out, or there is something dropping packets
+          false
+        end
+      end
+
+      def probe_writtable_socket(socket, address)
+        begin
+          socket.connect_nonblock(address)
+        rescue Errno::EISCONN
+          true
+        rescue => e # Connection failed
+          false
+        end
+      end
+    end
+  end
+
+  class MirrorSocket
+    def initialize(mirror)
+      addr_info = Socket.getaddrinfo(mirror.uri.host, mirror.uri.port)
+      @timeout = mirror.fallback_timeout
+      @type = addr_info[0][0]
+      @port = addr_info[0][1]
+      @host = addr_info[0][3]
+    end
+
+    def with_socket
+      socket = Socket.new(Socket.const_get(@type), Socket::SOCK_STREAM, 0)
+      socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
+      value = yield socket, socket_address, @timeout
+      socket.close unless socket.closed?
+      value
+    end
+
+    private
+
+    def socket_address
+      Socket.pack_sockaddr_in(@port, @host)
     end
   end
 end
