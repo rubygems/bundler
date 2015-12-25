@@ -3,27 +3,16 @@ module Bundler
     class Mirrors
       def initialize(prober = nil)
         @all = Mirror.new
-        @prober = prober || MirrorProber.new
+        @prober = prober || TCPSocketProbe.new
         @mirrors = Hash.new
       end
 
       def for(uri)
-        uri = AbsoluteURI.normalize(uri)
-        validate_mirror_for_all
-        validate_mirror_for(uri)
-        if @all.valid?
+        if @all.validate!(@prober).valid?
           @all
         else
-          mirror = fetch_valid_mirror_for(uri) || Mirror.new(uri)
-          mirror
+          fetch_valid_mirror_for(AbsoluteURI.normalize(uri))
         end
-      end
-
-      def fetch_valid_mirror_for(uri)
-        mirror = @mirrors[uri]
-        return nil if mirror.nil?
-        return nil unless mirror.valid?
-        mirror
       end
 
       def each
@@ -37,21 +26,17 @@ module Bundler
         if config.all?
           mirror = @all
         else
-          mirror = @mirrors[config.uri] || Mirror.new
-          @mirrors[config.uri] = mirror
+          mirror = (@mirrors[config.uri] = @mirrors[config.uri] || Mirror.new)
         end
         config.update_mirror(mirror)
       end
 
       private
 
-      def validate_mirror_for_all
-        MirrorProbing.new(@all, @prober).probe! if @all.valid?
-      end
-
-      def validate_mirror_for(uri)
-        mirror = @mirrors[uri]
-        MirrorProbing.new(mirror, @prober).probe! unless mirror.nil?
+      def fetch_valid_mirror_for(uri)
+        mirror = (@mirrors[uri] || Mirror.new(uri)).validate!(@prober)
+        mirror = Mirror.new(uri) unless mirror.valid?
+        mirror
       end
     end
 
@@ -72,17 +57,19 @@ module Bundler
                else
                  URI(uri.to_s)
                end
+        @valid = nil
       end
 
       def fallback_timeout=(timeout)
         case timeout
-        when true
+        when true, "true"
           @fallback_timeout = DEFAULT_FALLBACK_TIMEOUT
-        when false
+        when false, "false"
           @fallback_timeout = 0
         else
           @fallback_timeout = timeout.to_i
         end
+        @valid = nil
       end
 
       def ==(o)
@@ -90,47 +77,27 @@ module Bundler
       end
 
       def valid?
+        return false if @uri.nil?
         return @valid unless @valid.nil?
-        ! @uri.nil?
+        false
       end
 
-      def validate!
-        @valid = true
-      end
-
-      def invalidate!
-        @valid = false
-      end
-
-      def validated_already?
-        ! @valid.nil?
+      def validate!(probe = nil)
+        @valid = false if uri.nil?
+        if @valid.nil?
+          @valid = fallback_timeout == 0 || (probe || TCPSocketProbe.new).replies?(self)
+        end
+        self
       end
     end
 
-    class MirrorProber
-      def probe_availability(mirror)
+    class TCPSocketProbe
+      def replies?(mirror)
         true
       end
     end
 
     private
-
-    class MirrorProbing
-      def initialize(mirror, prober)
-        @mirror = mirror
-        @prober = prober
-      end
-
-      def probe!
-        return @mirror if @mirror.validated_already?
-        if @prober.probe_availability(@mirror)
-          @mirror.validate!
-        else
-          @mirror.invalidate!
-        end
-        @mirror
-      end
-    end
 
     class MirrorConfig
       attr_accessor :uri, :value
