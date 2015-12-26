@@ -19,7 +19,7 @@ module Bundler
         if @all.validate!(@prober).valid?
           @all
         else
-          fetch_valid_mirror_for(AbsoluteURI.normalize(uri))
+          fetch_valid_mirror_for(Settings.normalize_uri(uri))
         end
       end
 
@@ -120,7 +120,7 @@ module Bundler
         if uri == "all"
           @all = true
         else
-          @uri = AbsoluteURI.normalize(uri)
+          @uri = Settings.normalize_uri(uri)
         end
         @value = value
       end
@@ -133,7 +133,7 @@ module Bundler
         if @fallback
           mirror.fallback_timeout = @value
         else
-          mirror.uri = AbsoluteURI.normalize(@value)
+          mirror.uri = Settings.normalize_uri(@value)
         end
       end
     end

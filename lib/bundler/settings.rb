@@ -156,7 +156,7 @@ module Bundler
   private
 
     def key_for(key)
-      key = AbsoluteURI.normalize(key).to_s if key.is_a?(String) && /https?:/ =~ key
+      key = Settings.normalize_uri(key).to_s if key.is_a?(String) && /https?:/ =~ key
       key = key.to_s.gsub(".", "__").upcase
       "BUNDLE_#{key}"
     end
@@ -239,16 +239,14 @@ module Bundler
 
     # TODO: duplicates Rubygems#normalize_uri
     # TODO: is this the correct place to validate mirror URIs?
-    class AbsoluteURI
-      def self.normalize(uri)
-        uri = uri.to_s
-        uri = "#{uri}/" unless uri =~ %r{/\Z}
-        uri = URI(uri)
-        unless uri.absolute?
-          raise ArgumentError, "Gem sources must be absolute. You provided '#{uri}'."
-        end
-        uri
+    def self.normalize_uri(uri)
+      uri = uri.to_s
+      uri = "#{uri}/" unless uri =~ %r{/\Z}
+      uri = URI(uri)
+      unless uri.absolute?
+        raise ArgumentError, "Gem sources must be absolute. You provided '#{uri}'."
       end
+      uri
     end
   end
 end
