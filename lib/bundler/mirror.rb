@@ -4,7 +4,7 @@ module Bundler
       def initialize(prober = nil)
         @all = Mirror.new
         @prober = prober || TCPSocketProbe.new
-        @mirrors = Hash.new
+        @mirrors = {}
       end
 
       def for(uri)
@@ -31,7 +31,7 @@ module Bundler
         config.update_mirror(mirror)
       end
 
-      private
+    private
 
       def fetch_valid_mirror_for(uri)
         mirror = (@mirrors[uri] || Mirror.new(uri)).validate!(@prober)
@@ -53,10 +53,10 @@ module Bundler
 
       def uri=(uri)
         @uri = if uri.nil?
-                 uri = nil
-               else
-                 URI(uri.to_s)
-               end
+          nil
+        else
+          URI(uri.to_s)
+        end
         @valid = nil
       end
 
@@ -72,8 +72,8 @@ module Bundler
         @valid = nil
       end
 
-      def ==(o)
-        o != nil && self.uri == o.uri && self.fallback_timeout == o.fallback_timeout
+      def ==(other)
+        !other.nil? && uri == other.uri && fallback_timeout == other.fallback_timeout
       end
 
       def valid?
@@ -91,14 +91,12 @@ module Bundler
       end
     end
 
-    private
-
     class MirrorConfig
       attr_accessor :uri, :value
 
       def initialize(config_line, value)
         uri, fallback =
-          config_line.match(/^mirror\.(all|.+?)(\.fallback_timeout)?\/?$/).captures
+          config_line.match(%r{^mirror\.(all|.+?)(\.fallback_timeout)?\/?$}).captures
         @fallback = !fallback.nil?
         @all = false
         if uri == "all"
@@ -135,7 +133,7 @@ module Bundler
         end
       end
 
-      private
+    private
 
       def wait_for_writtable_socket(socket, address, timeout)
         if IO.select(nil, [socket], nil, timeout)
@@ -146,13 +144,11 @@ module Bundler
       end
 
       def probe_writtable_socket(socket, address)
-        begin
-          socket.connect_nonblock(address)
-        rescue Errno::EISCONN
-          true
-        rescue => e # Connection failed
-          false
-        end
+        socket.connect_nonblock(address)
+      rescue Errno::EISCONN
+        true
+      rescue # Connection failed
+        false
       end
     end
   end
@@ -174,7 +170,7 @@ module Bundler
       value
     end
 
-    private
+  private
 
     def socket_address
       Socket.pack_sockaddr_in(@port, @host)

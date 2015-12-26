@@ -59,7 +59,7 @@ describe Bundler::Settings::Mirror do
       end
 
       context "when probed" do
-        let(:probe) { double() }
+        let(:probe) { double }
 
         context "with a replying mirror" do
           before do
@@ -93,7 +93,7 @@ describe Bundler::Settings::Mirror do
       end
 
       context "when probed" do
-        let(:probe) { double() }
+        let(:probe) { double }
 
         context "with a replying mirror" do
           before do
@@ -138,7 +138,7 @@ describe Bundler::Settings::Mirrors do
 
   context "with a just created mirror" do
     let(:mirrors) do
-      probe = double()
+      probe = double
       allow(probe).to receive(:replies?).and_return(true)
       Bundler::Settings::Mirrors.new(probe)
     end
@@ -175,7 +175,7 @@ describe Bundler::Settings::Mirrors do
 
   context "with a mirror prober that replies on time" do
     let(:mirrors) do
-      probe = double()
+      probe = double
       allow(probe).to receive(:replies?).and_return(true)
       Bundler::Settings::Mirrors.new(probe)
     end
@@ -221,7 +221,7 @@ describe Bundler::Settings::Mirrors do
 
   context "with a mirror prober that does not reply on time" do
     let(:mirrors) do
-      probe = double()
+      probe = double
       allow(probe).to receive(:replies?).and_return(false)
       Bundler::Settings::Mirrors.new(probe)
     end
@@ -276,23 +276,30 @@ describe Bundler::Settings::TCPSocketProbe do
   let(:probe) { Bundler::Settings::TCPSocketProbe.new }
 
   context "with a listening TCP Server" do
-    let(:server) { TCPServer.new("127.0.0.1", 0) }
-    let(:port) { server.addr[1] }
-    let(:mirror) { Bundler::Settings::Mirror.new(uri="http://localhost:#{port}", fallback_timeout=true) }
+    def with_server_and_mirror
+      server = TCPServer.new("127.0.0.1", 0)
+      mirror = Bundler::Settings::Mirror.new("http://localhost:#{server.addr[1]}", 1)
+      yield server, mirror
+      server.close unless server.closed?
+    end
 
     it "probes the server correctly" do
-      expect(probe.replies?(mirror)).to be_truthy
+      with_server_and_mirror do |server, mirror|
+        expect(server.closed?).to be_falsey
+        expect(probe.replies?(mirror)).to be_truthy
+      end
     end
 
     it "probes falsey when the server is down" do
-      my_mirror = mirror
-      server.close
-      expect(probe.replies?(my_mirror)).to be_falsey
+      with_server_and_mirror do |server, mirror|
+        server.close
+        expect(probe.replies?(mirror)).to be_falsey
+      end
     end
   end
 
   context "with an invalid mirror" do
-    let(:mirror) { Bundler::Settings::Mirror.new(uri="http://127.0.0.127:#{9292}", fallback_timeout=true) }
+    let(:mirror) { Bundler::Settings::Mirror.new("http://127.0.0.127:9292", true) }
 
     it "fails with a timeout when there is nothing to tcp handshake" do
       expect(probe.replies?(mirror)).to be_falsey
