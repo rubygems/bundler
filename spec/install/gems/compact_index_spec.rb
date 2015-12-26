@@ -123,7 +123,7 @@ describe "compact index api" do
     G
 
     bundle :install, :fakeweb => "windows"
-    expect(out).to include("Fetching gem metadata from #{source_uri}")
+    expect(out).to include("Fetching source index from #{source_uri}")
     should_be_installed "rcov 1.0.0"
   end
 
@@ -289,7 +289,7 @@ describe "compact index api" do
     bundle :install, :artifice => "compact_index_extra"
 
     expect(out).to include("Fetching gem metadata from http://localgemserver.test/")
-    expect(out).to include("Fetching gem metadata from http://localgemserver.test/extra")
+    expect(out).to include("Fetching source index from http://localgemserver.test/extra")
   end
 
   it "does not fetch every spec if the index of gems is large when doing back deps" do
