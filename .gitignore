@@ -14,3 +14,6 @@
 
 # output from ci_reporter
 /spec/reports/
+
+# rspec failure tracking
+.rspec_status
