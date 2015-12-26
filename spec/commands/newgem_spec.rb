@@ -373,6 +373,32 @@ describe "bundle gem" do
       end
     end
 
+    context "gem.test setting set to minitest" do
+      before do
+        reset!
+        in_app_root
+        bundle "config gem.test minitest"
+        bundle "gem #{gem_name}"
+      end
+
+      it "creates a default rake task to run the test suite" do
+        rakefile = strip_whitespace <<-RAKEFILE
+          require "bundler/gem_tasks"
+          require "rake/testtask"
+
+          Rake::TestTask.new(:test) do |t|
+            t.libs << "test"
+            t.libs << "lib"
+            t.test_files = FileList['test/**/*_test.rb']
+          end
+
+          task :default => :test
+        RAKEFILE
+
+        expect(bundled_app("test_gem/Rakefile").read).to eq(rakefile)
+      end
+    end
+
     context "--test with no arguments" do
       before do
         reset!
