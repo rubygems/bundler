@@ -59,7 +59,8 @@ module Bundler
 
         gem_list.each do |s|
           deps_list.push(*s[:dependencies].map(&:first))
-          spec_list.push([s[:name], s[:number], s[:platform], s[:dependencies]])
+          deps = s[:dependencies].map{|n, d| [n, d.split(", ")] }
+          spec_list.push([s[:name], s[:number], s[:platform], deps])
         end
         [spec_list, deps_list]
       end
