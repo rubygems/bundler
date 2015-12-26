@@ -10,7 +10,7 @@ module Bundler
       @name         = name
       @version      = Gem::Version.create version
       @platform     = platform
-      @dependencies = dependencies.map {|name, reqs| build_dependency(name, reqs) }
+      @dependencies = dependencies.map {|dep, reqs| build_dependency(dep, reqs) }
 
       parse_metadata(metadata || {})
     end
