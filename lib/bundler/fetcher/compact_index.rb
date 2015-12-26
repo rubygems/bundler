@@ -6,7 +6,7 @@ module Bundler
       require "bundler/vendor/compact_index_client/lib/compact_index_client"
 
       def specs(gem_names)
-        @specs ||= specs_for_names(gem_names)
+        specs_for_names(gem_names)
       rescue NetworkDownError => e
         raise HTTPError, e.message
       rescue AuthenticationRequiredError
