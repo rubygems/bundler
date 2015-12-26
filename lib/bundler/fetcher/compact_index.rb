@@ -21,9 +21,6 @@ module Bundler
         complete_gems = []
         remaining_gems = gem_names.dup
 
-        # Read info file checksums out of versions to allow request-skipping
-        compact_index_client.parse_checksums!
-
         until remaining_gems.empty?
           Bundler.ui.debug "Looking up gems #{remaining_gems.inspect}"
 
@@ -47,7 +44,11 @@ module Bundler
       end
 
       def available?
-        fetch_uri.scheme != "file"
+        # Read info file checksums out of /versions, so we can know if gems are up to date
+        fetch_uri.scheme != "file" && compact_index_client.update_and_parse_checksums!
+      rescue FallbackError => e
+        Bundler.ui.debug(e)
+        false
       end
 
       def api_fetcher?

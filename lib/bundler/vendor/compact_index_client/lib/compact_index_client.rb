@@ -43,7 +43,7 @@ class Bundler::CompactIndexClient
     @cache.specific_dependency(name, version, platform)
   end
 
-  def parse_checksums!
+  def update_and_parse_checksums!
     return @info_checksums_by_name if @parsed_checksums
     update(@cache.versions_path, "versions")
     @info_checksums_by_name = @cache.checksums
