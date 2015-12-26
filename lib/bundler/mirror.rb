@@ -144,7 +144,7 @@ module Bundler
         MirrorSockets.new(mirror).any? do |socket, address, timeout|
           begin
             socket.connect_nonblock(address)
-          rescue IO::WaitWritable
+          rescue Errno::EINPROGRESS
             wait_for_writtable_socket(socket, address, timeout)
           rescue # Connection failed somehow, again
             false
