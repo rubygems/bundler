@@ -122,7 +122,7 @@ module Bundler
 
     class TCPSocketProbe
       def replies?(mirror)
-        MirrorSocket.new(mirror).with_socket do |socket, address, timeout|
+        MirrorSockets.new(mirror).any? do |socket, address, timeout|
           begin
             socket.connect_nonblock(address)
           rescue IO::WaitWritable
@@ -153,26 +153,35 @@ module Bundler
     end
   end
 
-  class MirrorSocket
+  class MirrorSockets
     def initialize(mirror)
-      addr_info = Socket.getaddrinfo(mirror.uri.host, mirror.uri.port)
       @timeout = mirror.fallback_timeout
-      @type = addr_info[0][0]
-      @port = addr_info[0][1]
-      @host = addr_info[0][3]
+      @addresses = Socket.getaddrinfo(mirror.uri.host, mirror.uri.port).map do |address|
+        MirrorAddress.new(address[0], address[3], address[1])
+      end
     end
 
-    def with_socket
-      socket = Socket.new(Socket.const_get(@type), Socket::SOCK_STREAM, 0)
-      socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
-      value = yield socket, socket_address, @timeout
-      socket.close unless socket.closed?
-      value
+    def any?
+      @addresses.any? do |address|
+        socket = Socket.new(Socket.const_get(address.type), Socket::SOCK_STREAM, 0)
+        socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
+        value = yield socket, address.to_socket_address, @timeout
+        socket.close unless socket.closed?
+        value
+      end
+    end
+  end
+
+  class MirrorAddress
+    attr_reader :type, :host, :port
+
+    def initialize(type, host, port)
+      @type = type
+      @host = host
+      @port = port
     end
 
-  private
-
-    def socket_address
+    def to_socket_address
       Socket.pack_sockaddr_in(@port, @host)
     end
   end
