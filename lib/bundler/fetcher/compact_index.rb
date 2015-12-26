@@ -26,7 +26,7 @@ module Bundler
 
           deps = compact_index_client.dependencies(remaining_gems)
           next_gems = deps.flat_map {|d| d[3].flat_map(&:first) }.uniq
-          deps.each { |dep| gem_info << dep }
+          deps.each {|dep| gem_info << dep }
           complete_gems.push(*deps.map(&:first).uniq)
           remaining_gems = next_gems - complete_gems
         end
@@ -52,6 +52,7 @@ module Bundler
         # We got a 401 from the server. Just fail.
         raise
       rescue HTTPError
+        false
       end
 
       def api_fetcher?

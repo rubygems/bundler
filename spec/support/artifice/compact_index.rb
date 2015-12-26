@@ -52,7 +52,7 @@ class CompactIndexAPI < Endpoint
     end
 
     def parse_etags(value)
-      value ? value.split(/, ?/).select{|s| s.sub!(/"(.*)"/, '\1') } : []
+      value ? value.split(/, ?/).select {|s| s.sub!(/"(.*)"/, '\1') } : []
     end
 
     def gems(gem_repo = gem_repo1)

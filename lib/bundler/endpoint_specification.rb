@@ -123,6 +123,5 @@ module Bundler
         "gemspec. \nPlease ask the gem author to yank the bad version to fix " \
         "this issue. For more information, see http://bit.ly/syck-defaultkey."
     end
-
   end
 end

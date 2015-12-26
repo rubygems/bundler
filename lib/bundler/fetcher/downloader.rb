@@ -32,7 +32,7 @@ module Bundler
         when Net::HTTPNotFound
           raise FallbackError, "Net::HTTPNotFound"
         else
-          raise HTTPError, "#{response.class}#{': ' + response.body if !response.body.empty?}"
+          raise HTTPError, "#{response.class}#{": #{response.body}" unless response.body.empty?}"
         end
       end
 
