@@ -53,7 +53,7 @@ module Bundler
 
     # Exceptions classes that should bypass retry attempts. If your password didn't work the
     # first time, it's not going to the third time.
-    FAIL_ERRORS = [AuthenticationRequiredError, BadAuthenticationError, FallbackError]
+    FAIL_ERRORS = [AuthenticationRequiredError, BadAuthenticationError, FallbackError, Gem::Requirement::BadRequirementError]
     NET_ERRORS = [:HTTPBadGateway, :HTTPBadRequest, :HTTPFailedDependency,
                   :HTTPForbidden, :HTTPInsufficientStorage, :HTTPMethodNotAllowed,
                   :HTTPMovedPermanently, :HTTPNoContent, :HTTPNotFound,
