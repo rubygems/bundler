@@ -102,18 +102,6 @@ describe Bundler::Settings do
       it "is case insensitive" do
         expect(settings.mirror_for("HTTPS://RUBYGEMS.ORG/")).to eq(mirror_uri)
       end
-
-      context "with a fallback timeout" do
-        before { settings["mirror.https://rubygems.org.fallback_timeout"] = 1 }
-
-        it "still returns the mirror correctly" do
-          expect(settings.mirror_for(uri)).to eq(mirror_uri)
-        end
-
-        it "returns the fallback timeout" do
-          expect(settings.gem_mirrors.for(uri).fallback_timeout).to eq(1)
-        end
-      end
     end
   end
 
