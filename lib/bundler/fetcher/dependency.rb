@@ -25,7 +25,7 @@ module Bundler
 
         return last_spec_list if query_list.empty?
 
-        spec_list, deps_list = Bundler::Retry.new("dependency api", AUTH_ERRORS).attempts do
+        spec_list, deps_list = Bundler::Retry.new("dependency api", FAIL_ERRORS).attempts do
           dependency_specs(query_list)
         end
 

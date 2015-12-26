@@ -25,7 +25,7 @@ module Bundler
             new_uri.password = uri.password
           end
           fetch(new_uri, options, counter + 1)
-        when Net::HTTPRequestEntityTooLarge
+        when Net::HTTPRequestEntityTooLarge, Net::HTTPNotFound
           raise FallbackError, response.body
         when Net::HTTPUnauthorized
           raise AuthenticationRequiredError, uri.host
