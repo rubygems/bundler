@@ -7,6 +7,10 @@ class CompactIndexExtra < CompactIndexAPI
     halt 404
   end
 
+  get "/extra/api/v1/dependencies" do
+    halt 404
+  end
+
   get "/extra/specs.4.8.gz" do
     File.read("#{gem_repo2}/specs.4.8.gz")
   end
