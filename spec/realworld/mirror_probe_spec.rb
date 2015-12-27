@@ -17,7 +17,6 @@ describe "fetching dependencies with a not available mirror" do
     @server_thread.kill
   end
 
-
   it "install a gem using the original uri when the mirror is not responding" do
     gemfile <<-G
       source "#{original}"
@@ -38,13 +37,13 @@ describe "fetching dependencies with a not available mirror" do
 
     require File.expand_path("../../support/artifice/endpoint", __FILE__)
 
-    @server_thread = Thread.new {
+    @server_thread = Thread.new do
       Rack::Server.start(:app       => Endpoint,
                          :Host      => @server_host,
                          :Port      => @server_port,
                          :server    => "webrick",
                          :AccessLog => [])
-    }.run
+    end.run
 
     wait_for_server(@server_host, @server_port)
   end
