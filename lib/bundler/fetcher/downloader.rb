@@ -43,6 +43,12 @@ module Bundler
           req.basic_auth(user, password)
         end
         connection.request(uri, req)
+      rescue NoMethodError => e
+        if ["undefined method", "use_ssl="].all? {|snippet| e.message.include? snippet }
+          raise LoadError.new("cannot load such file -- openssl")
+        else
+          raise e
+        end
       rescue OpenSSL::SSL::SSLError
         raise CertificateFailureError.new(uri)
       rescue *HTTP_ERRORS => e
