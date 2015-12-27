@@ -1,7 +1,7 @@
 require "spec_helper"
 require "thread"
 
-describe "fetching dependencies with a not available mirror" do
+describe "fetching dependencies with a not available mirror", :realworld => true do
   let(:mirror) { @mirror_uri }
   let(:original) { @server_uri }
 
