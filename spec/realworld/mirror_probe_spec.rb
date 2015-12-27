@@ -38,13 +38,13 @@ describe "fetching dependencies with a not available mirror" do
 
     require File.expand_path("../../support/artifice/endpoint", __FILE__)
 
-    @server_thread = Thread.new do
+    @server_thread = Thread.new {
       Rack::Server.start(:app       => Endpoint,
                          :Host      => @server_host,
                          :Port      => @server_port,
                          :server    => "webrick",
                          :AccessLog => [])
-    end.run
+    }.run
 
     wait_for_server(@server_host, @server_port)
   end
