@@ -10,7 +10,10 @@ describe "fetching dependencies with a mirrored source", :rubygems => ">= 2.0" d
     bundle "config --local mirror.#{mirror} #{original}"
   end
 
-  after { @t.kill }
+  after do
+    @t.kill
+    @t.join
+  end
 
   it "sets the 'X-Gemfile-Source' header and bundles successfully" do
     gemfile <<-G

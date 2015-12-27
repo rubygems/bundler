@@ -25,6 +25,7 @@ describe "gemcutter's dependency API", :realworld => true do
 
     after do
       @t.kill
+      @t.join
     end
 
     it "times out and falls back on the modern index" do

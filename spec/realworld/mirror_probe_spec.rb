@@ -15,6 +15,7 @@ describe "fetching dependencies with a not available mirror", :realworld => true
 
   after do
     @server_thread.kill
+    @server_thread.join
   end
 
   context "with a specific fallback timeout" do
@@ -113,7 +114,7 @@ describe "fetching dependencies with a not available mirror", :realworld => true
                          :AccessLog => [])
     end.run
 
-    wait_for_server(@host, @server_port)
+    wait_for_server(host, @server_port)
   end
 
   def setup_mirror
