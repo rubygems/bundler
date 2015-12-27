@@ -41,7 +41,11 @@ module Bundler
     attr_reader :orig_exception
 
     def initialize(orig_exception, msg)
-      super(msg)
+      full_message = msg + "\nGem Load Error is: #{orig_exception.message}\n"\
+                      "Backtrace for gem load error is:\n"\
+                      "#{orig_exception.backtrace.join("\n")}\n"\
+                      "Bundler Error Backtrace:\n"
+      super(full_message)
       @orig_exception = orig_exception
     end
 

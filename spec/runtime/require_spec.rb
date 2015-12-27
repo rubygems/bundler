@@ -100,7 +100,7 @@ describe "Bundler.require" do
 
   it "displays a helpful message if the required gem throws an error" do
     build_lib "faulty", "1.0.0" do |s|
-      s.write "lib/faulty.rb", "HI"
+      s.write "lib/faulty.rb", "raise RuntimeError.new(\"Gem Internal Error Message\")"
     end
 
     gemfile <<-G
@@ -110,6 +110,7 @@ describe "Bundler.require" do
 
     run "Bundler.require", :expect_err => true
     expect(err).to match("error while trying to load the gem 'faulty'")
+    expect(err).to match("Gem Internal Error Message")
   end
 
   it "doesn't swallow the error when the library has an unrelated error" do
