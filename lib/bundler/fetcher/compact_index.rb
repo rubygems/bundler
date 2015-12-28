@@ -25,7 +25,7 @@ module Bundler
           Bundler.ui.debug "Looking up gems #{remaining_gems.inspect}"
 
           deps = compact_index_client.dependencies(remaining_gems)
-          next_gems = deps.flat_map {|d| d[3].flat_map(&:first) }.uniq
+          next_gems = deps.map {|d| d[3].map(&:first).flatten(1) }.flatten(1).uniq
           deps.each {|dep| gem_info << dep }
           complete_gems.push(*deps.map(&:first).uniq)
           remaining_gems = next_gems - complete_gems
