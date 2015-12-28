@@ -28,7 +28,7 @@ class Bundler::CompactIndexClient
   end
 
   def dependencies(names, pool_size = 25)
-    update = Proc.new {|name| update_info(name); name }
+    update = Proc.new {|name, _| update_info(name); name }
     worker = Bundler::Worker.new(pool_size, update)
     names.each {|name| worker.enq(name) }
 
