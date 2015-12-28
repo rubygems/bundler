@@ -63,15 +63,16 @@ module Bundler
 
       def compact_index_client
         @compact_index_client ||= begin
-          uri_part = [display_uri.hostname, display_uri.port, Digest::MD5.hexdigest(display_uri.path)].compact.join(".")
+          path_digest = Digest::MD5.hexdigest(display_uri.path)
+          uri_part = [display_uri.host, display_uri.port, path_digest].compact.join(".")
+          index_path = Bundler.user_cache + "compact_index" + uri_part
 
           compact_fetcher = lambda do |path, headers|
             downloader.fetch(fetch_uri + path, headers)
           end
 
-          path = Bundler.user_cache + "compact_index" + uri_part
-          SharedHelpers.filesystem_access(path) do
-            CompactIndexClient.new(path, compact_fetcher)
+          SharedHelpers.filesystem_access(index_path) do
+            CompactIndexClient.new(index_path, compact_fetcher)
           end
         end
       end
