@@ -87,6 +87,9 @@ Style/SpecialGlobalVars:
 Style/TrailingComma:
   Enabled: false
 
+Performance/FlatMap:
+  Enabled: false
+
 # Metrics
 
 # We've chosen to use Rubocop only for style, and not for complexity or quality checks.
