@@ -410,5 +410,33 @@ module Spec
         ENV[k] = current_values[k]
       end
     end
+
+    def require_rack
+      # need to hack, so we can require rack
+      old_gem_home = ENV["GEM_HOME"]
+      ENV["GEM_HOME"] = Spec::Path.base_system_gems.to_s
+      require "rack"
+      ENV["GEM_HOME"] = old_gem_home
+    end
+
+    def wait_for_server(host, port, seconds = 15)
+      tries = 0
+      sleep 0.5
+      TCPSocket.new(host, port)
+    rescue => e
+      raise(e) if tries > (seconds * 2)
+      tries += 1
+      retry
+    end
+
+    def find_unused_port
+      port = 21_453
+      begin
+        port += 1 while TCPSocket.new("127.0.0.1", port)
+      rescue
+        false
+      end
+      port
+    end
   end
 end

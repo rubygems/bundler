@@ -63,10 +63,8 @@ module Bundler
 
     def mirror_for(uri)
       uri = URI(uri.to_s) unless uri.is_a?(URI)
-
       # Settings keys are all downcased
-      normalized_key = normalize_uri(uri.to_s.downcase)
-      gem_mirrors[normalized_key] || uri
+      gem_mirrors.for(uri.to_s.downcase).uri
     end
 
     def credentials_for(uri)
@@ -74,12 +72,9 @@ module Bundler
     end
 
     def gem_mirrors
-      all.inject({}) do |h, k|
-        if k =~ /^mirror\./
-          uri = normalize_uri($')
-          h[uri] = normalize_uri(self[k])
-        end
-        h
+      all.inject(Mirrors.new) do |mirrors, k|
+        mirrors.parse(k, self[k]) if k =~ /^mirror\./
+        mirrors
       end
     end
 
@@ -161,7 +156,7 @@ module Bundler
   private
 
     def key_for(key)
-      key = normalize_uri(key).to_s if key.is_a?(String) && /https?:/ =~ key
+      key = Settings.normalize_uri(key).to_s if key.is_a?(String) && /https?:/ =~ key
       key = key.to_s.gsub(".", "__").upcase
       "BUNDLE_#{key}"
     end
@@ -244,7 +239,7 @@ module Bundler
 
     # TODO: duplicates Rubygems#normalize_uri
     # TODO: is this the correct place to validate mirror URIs?
-    def normalize_uri(uri)
+    def self.normalize_uri(uri)
       uri = uri.to_s
       uri = "#{uri}/" unless uri =~ %r{/\Z}
       uri = URI(uri)
