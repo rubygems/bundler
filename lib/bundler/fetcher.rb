@@ -60,6 +60,7 @@ module Bundler
                   :HTTPNotImplemented, :HTTPPreconditionFailed, :HTTPRequestEntityTooLarge,
                   :HTTPRequestURITooLong, :HTTPUnauthorized, :HTTPUnprocessableEntity,
                   :HTTPUnsupportedMediaType, :HTTPVersionNotSupported]
+    FAIL_ERRORS << Gem::Requirement::BadRequirementError if defined?(Gem::Requirement::BadRequirementError)
     FAIL_ERRORS.push(*NET_ERRORS.map {|e| SharedHelpers.const_get_safely(e, Net) }.compact)
 
     class << self
