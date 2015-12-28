@@ -13,7 +13,7 @@ class CompactIndexExtraApi < CompactIndexAPI
     etag_response do
       file = tmp("versions.list")
       file.delete if file.file?
-      file = CompactIndex::VersionsFile.new(file.to_path)
+      file = CompactIndex::VersionsFile.new(file.to_s)
       file.update_with(gems(gem_repo4))
       CompactIndex.versions(file, nil, {})
     end
