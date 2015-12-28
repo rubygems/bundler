@@ -21,7 +21,7 @@ class CompactIndexExtraApi < CompactIndexAPI
 
   get "/extra/info/:name" do
     etag_response do
-      gem = gems(gem_repo4).find{|g| g.name == params[:name] }
+      gem = gems(gem_repo4).find {|g| g.name == params[:name] }
       CompactIndex.info(gem ? gem.versions : [])
     end
   end

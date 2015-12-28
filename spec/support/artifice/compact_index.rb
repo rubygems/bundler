@@ -64,8 +64,8 @@ class CompactIndexAPI < Endpoint
           end
         end
 
-        specs.group_by {|s| s.name }.map do |name, specs|
-          gem_versions = specs.map do |spec|
+        specs.group_by(&:name).map do |name, versions|
+          gem_versions = versions.map do |spec|
             deps = spec.dependencies.select {|d| d.type == :runtime }.map do |d|
               reqs = d.requirement.requirements.map {|r| r.join(" ") }.join(", ")
               CompactIndex::Dependency.new(d.name, reqs)
@@ -97,7 +97,7 @@ class CompactIndexAPI < Endpoint
 
   get "/info/:name" do
     etag_response do
-      gem = gems.find{|g| g.name == params[:name] }
+      gem = gems.find {|g| g.name == params[:name] }
       CompactIndex.info(gem ? gem.versions : [])
     end
   end
