@@ -430,9 +430,12 @@ module Spec
     end
 
     def find_unused_port
-      tcp_server = TCPServer.new("127.0.0.1", 0) # Use any available ephemeral port
-      port = tcp_server.addr[1]
-      tcp_server.close
+      port = 21_453
+      begin
+        port += 1 while TCPSocket.new("127.0.0.1", port)
+      rescue
+        false
+      end
       port
     end
   end
