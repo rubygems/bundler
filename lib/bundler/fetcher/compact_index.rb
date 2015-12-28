@@ -69,7 +69,9 @@ module Bundler
             downloader.fetch(fetch_uri + path, headers)
           end
 
-          CompactIndexClient.new(Bundler.user_cache + "compact_index" + uri_part, compact_fetcher)
+          Bundler.filesystem_access do
+            CompactIndexClient.new(Bundler.user_cache + "compact_index" + uri_part, compact_fetcher)
+          end
         end
       end
     end

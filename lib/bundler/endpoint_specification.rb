@@ -1,6 +1,7 @@
 module Bundler
   # used for Creating Specifications from the Gemcutter Endpoint
   class EndpointSpecification < Gem::Specification
+    ILLFORMED_MESSAGE = 'Ill-formed requirement ["#<YAML::Syck::DefaultKey'
     include MatchPlatform
 
     attr_reader :name, :version, :platform, :dependencies, :required_rubygems_version, :required_ruby_version, :checksum
@@ -101,6 +102,7 @@ module Bundler
 
     def parse_metadata(data)
       data.each do |k, v|
+        next unless v
         case k.to_s
         when "checksum"
           @checksum = v ? v.last : nil
@@ -115,12 +117,11 @@ module Bundler
     def build_dependency(name, *requirements)
       Gem::Dependency.new(name, *requirements)
     rescue ArgumentError => e
-      illformed = 'Ill-formed requirement ["#<YAML::Syck::DefaultKey'
-      raise e unless e.message.include?(illformed)
+      raise e unless e.message.include?(ILLFORMED_MESSAGE)
       puts # we shouldn't print the error message on the "fetching info" status line
       raise GemspecError,
         "Unfortunately, the gem #{s[:name]} (#{s[:number]}) has an invalid " \
-        "gemspec. \nPlease ask the gem author to yank the bad version to fix " \
+        "gemspec.\nPlease ask the gem author to yank the bad version to fix " \
         "this issue. For more information, see http://bit.ly/syck-defaultkey."
     end
   end

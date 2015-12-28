@@ -1,3 +1,6 @@
+require "stringio"
+require "zlib"
+
 class Bundler::CompactIndexClient
   class Updater
     def initialize(fetcher)
