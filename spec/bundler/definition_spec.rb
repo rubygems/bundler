@@ -19,5 +19,15 @@ describe Bundler::Definition do
           to raise_error(Bundler::PermissionError, /Gemfile\.lock/)
       end
     end
+    context "when a temporary resource access issue occurs" do
+      subject { Bundler::Definition.new(nil, [], Bundler::SourceList.new, []) }
+
+      it "raises a TemporaryResourceError with explanation" do
+        expect(File).to receive(:open).with("Gemfile.lock", "wb").
+          and_raise(Errno::EAGAIN)
+        expect { subject.lock("Gemfile.lock") }.
+          to raise_error(Bundler::TemporaryResourceError, /temporarily unavailable/)
+      end
+    end
   end
 end
