@@ -58,21 +58,22 @@ class CompactIndexAPI < Endpoint
     def gems(gem_repo = gem_repo1)
       @gems ||= {}
       @gems[gem_repo] ||= begin
-        Bundler::Deprecate.skip_during do
+        specs = Bundler::Deprecate.skip_during do
           Marshal.load(File.open(gem_repo.join("specs.4.8")).read).map do |name, version, platform|
-            spec = load_spec(name, version, platform, gem_repo)
-            {
-              :name         => spec.name,
-              :number       => spec.version.version,
-              :platform     => spec.platform.to_s,
-              :dependencies => spec.dependencies.select {|dep| dep.type == :runtime }.map do |dep|
-                { :gem => dep.name, :version => dep.requirement.requirements.map {|a| a.join(" ") }.join(", ") }
-              end,
-              :ruby_version => spec.required_ruby_version,
-              :rubygems_version => spec.required_rubygems_version,
-              :created_at => spec.date.to_s,
-            }
+            load_spec(name, version, platform, gem_repo)
           end
+        end
+
+        specs.group_by {|s| s.name }.map do |name, specs|
+          gem_versions = specs.map do |spec|
+            deps = spec.dependencies.select {|d| d.type == :runtime }.map do |d|
+              reqs = d.requirement.requirements.map {|r| r.join(" ") }.join(", ")
+              CompactIndex::Dependency.new(d.name, reqs)
+            end
+            CompactIndex::GemVersion.new(spec.version.version, spec.platform.to_s, nil, nil,
+              deps, spec.required_ruby_version, spec.required_rubygems_version)
+          end
+          CompactIndex::Gem.new(name, gem_versions)
         end
       end
     end
@@ -89,16 +90,15 @@ class CompactIndexAPI < Endpoint
       file = tmp("versions.list")
       file.delete if file.file?
       file = CompactIndex::VersionsFile.new(file.to_path)
-      versions = gems.group_by {|s| s[:name] }.map {|n, v| { :name => n, :versions => v } }
-      file.update_with(versions)
+      file.update_with(gems)
       CompactIndex.versions(file, nil, {})
     end
   end
 
   get "/info/:name" do
     etag_response do
-      specs = gems.select {|s| s[:name] == params[:name] }
-      CompactIndex.info(specs)
+      gem = gems.find{|g| g.name == params[:name] }
+      CompactIndex.info(gem ? gem.versions : [])
     end
   end
 end
