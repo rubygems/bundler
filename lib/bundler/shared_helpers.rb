@@ -114,6 +114,8 @@ module Bundler
       yield path
     rescue Errno::EACCES
       raise PermissionError.new(path, action)
+    rescue Errno::EAGAIN
+      raise TemporaryResourceError.new(path, action)
     end
 
   private

@@ -58,19 +58,32 @@ module Bundler
       @permission_type = permission_type
     end
 
-    def message
-      action = case @permission_type
-               when :read then "read from"
-               when :write then "write to"
-               when :executable, :exec then "execute"
-               else @permission_type.to_s
+    def action
+      case @permission_type
+      when :read then "read from"
+      when :write then "write to"
+      when :executable, :exec then "execute"
+      else @permission_type.to_s
       end
+    end
+
+    def message
       "There was an error while trying to #{action} `#{@path}`. " \
       "It is likely that you need to grant #{@permission_type} permissions " \
       "for that path."
     end
 
     status_code(23)
+  end
+
+  class TemporaryResourceError < PermissionError
+    def message
+      "There was an error while trying to #{action} `#{@path}`. " \
+      "Some resource was temporarily unavailable. It's suggested that you try" \
+      "the operation again."
+    end
+
+    status_code(26)
   end
 
   class YamlSyntaxError < BundlerError
