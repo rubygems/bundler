@@ -181,7 +181,7 @@ module Bundler
     def fetch_prerelease_specs
       fetch_specs(false, true)
     rescue Gem::RemoteFetcher::FetchError
-      [] # if we can't download them, there aren't any
+      {} # if we can't download them, there aren't any
     end
 
     # TODO: This is for older versions of Rubygems... should we support the
@@ -194,9 +194,9 @@ module Bundler
       # Fetch all specs, minus prerelease specs
       spec_list = fetch_specs(true, false)
       # Then fetch the prerelease specs
-      fetch_prerelease_specs.each {|k, v| spec_list[k] += v }
+      fetch_prerelease_specs.each {|k, v| spec_list[k].push(*v) }
 
-      spec_list
+      spec_list.values.first
     ensure
       Bundler.rubygems.sources = old_sources
     end
