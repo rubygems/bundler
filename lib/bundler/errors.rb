@@ -5,27 +5,10 @@ module Bundler
     end
   end
 
-  class GemfileNotFound < BundlerError; status_code(10); end
-  class GemNotFound < BundlerError; status_code(7); end
   class GemfileError < BundlerError; status_code(4); end
   class InstallError < BundlerError; status_code(5); end
-  class InstallHookError < BundlerError; status_code(8); end
-  class PathError < BundlerError; status_code(13); end
-  class GitError < BundlerError; status_code(11); end
-  class DeprecatedError < BundlerError; status_code(12); end
-  class GemspecError < BundlerError; status_code(14); end
-  class InvalidOption < BundlerError; status_code(15); end
-  class ProductionError < BundlerError; status_code(16); end
-  class HTTPError < BundlerError; status_code(17); end
-  class RubyVersionMismatch < BundlerError; status_code(18); end
-  class SecurityError < BundlerError; status_code(19); end
-  class LockfileError < BundlerError; status_code(20); end
-  class CyclicDependencyError < BundlerError; status_code(21); end
-  class GemfileLockNotFound < BundlerError; status_code(22); end
-  class GemfileEvalError < GemfileError; end
-  class MarshalError < StandardError; end
 
-  # Internal errors, should be rescued
+  # Internal error, should be rescued
   class VersionConflict < BundlerError
     attr_reader :conflicts
 
@@ -37,20 +20,23 @@ module Bundler
     status_code(6)
   end
 
-  class GemRequireError < BundlerError
-    attr_reader :orig_exception
-
-    def initialize(orig_exception, msg)
-      full_message = msg + "\nGem Load Error is: #{orig_exception.message}\n"\
-                      "Backtrace for gem load error is:\n"\
-                      "#{orig_exception.backtrace.join("\n")}\n"\
-                      "Bundler Error Backtrace:\n"
-      super(full_message)
-      @orig_exception = orig_exception
-    end
-
-    status_code(24)
-  end
+  class GemNotFound < BundlerError; status_code(7); end
+  class InstallHookError < BundlerError; status_code(8); end
+  class GemfileNotFound < BundlerError; status_code(10); end
+  class GitError < BundlerError; status_code(11); end
+  class DeprecatedError < BundlerError; status_code(12); end
+  class PathError < BundlerError; status_code(13); end
+  class GemspecError < BundlerError; status_code(14); end
+  class InvalidOption < BundlerError; status_code(15); end
+  class ProductionError < BundlerError; status_code(16); end
+  class HTTPError < BundlerError; status_code(17); end
+  class RubyVersionMismatch < BundlerError; status_code(18); end
+  class SecurityError < BundlerError; status_code(19); end
+  class LockfileError < BundlerError; status_code(20); end
+  class CyclicDependencyError < BundlerError; status_code(21); end
+  class GemfileLockNotFound < BundlerError; status_code(22); end
+  class GemfileEvalError < GemfileError; end
+  class MarshalError < StandardError; end
 
   class PermissionError < BundlerError
     def initialize(path, permission_type = :write)
@@ -76,14 +62,19 @@ module Bundler
     status_code(23)
   end
 
-  class TemporaryResourceError < PermissionError
-    def message
-      "There was an error while trying to #{action} `#{@path}`. " \
-      "Some resource was temporarily unavailable. It's suggested that you try" \
-      "the operation again."
+  class GemRequireError < BundlerError
+    attr_reader :orig_exception
+
+    def initialize(orig_exception, msg)
+      full_message = msg + "\nGem Load Error is: #{orig_exception.message}\n"\
+                      "Backtrace for gem load error is:\n"\
+                      "#{orig_exception.backtrace.join("\n")}\n"\
+                      "Bundler Error Backtrace:\n"
+      super(full_message)
+      @orig_exception = orig_exception
     end
 
-    status_code(26)
+    status_code(24)
   end
 
   class YamlSyntaxError < BundlerError
@@ -95,5 +86,15 @@ module Bundler
     end
 
     status_code(25)
+  end
+
+  class TemporaryResourceError < PermissionError
+    def message
+      "There was an error while trying to #{action} `#{@path}`. " \
+      "Some resource was temporarily unavailable. It's suggested that you try" \
+      "the operation again."
+    end
+
+    status_code(26)
   end
 end
