@@ -772,10 +772,10 @@ describe "bundle install with git sources" do
       bundle "install"
       expect(out).to_not match(/Revision.*does not exist/)
 
-      install_gemfile <<-G
+      install_gemfile <<-G, :expect_err => true
         gem "foo", :git => "file://#{lib_path("foo-1.0")}", :ref => "deadbeef"
       G
-      bundle "install"
+      bundle "install", :expect_err => true
       expect(out).to include("Revision deadbeef does not exist in the repository")
     end
   end
