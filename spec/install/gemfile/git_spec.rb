@@ -575,7 +575,7 @@ describe "bundle install with git sources" do
       s.add_dependency "submodule"
     end
     Dir.chdir(lib_path("has_submodule-1.0")) do
-      `git submodule add #{lib_path("submodule-1.0")} submodule-1.0`
+      sys_exec "git submodule add #{lib_path("submodule-1.0")} submodule-1.0", :expect_err => true
       `git commit -m "submodulator"`
     end
 
@@ -595,11 +595,11 @@ describe "bundle install with git sources" do
       s.add_dependency "submodule"
     end
     Dir.chdir(lib_path("has_submodule-1.0")) do
-      `git submodule add #{lib_path("submodule-1.0")} submodule-1.0`
+      sys_exec "git submodule add #{lib_path("submodule-1.0")} submodule-1.0", :expect_err => true
       `git commit -m "submodulator"`
     end
 
-    install_gemfile <<-G
+    install_gemfile <<-G, :expect_err => true
       git "#{lib_path("has_submodule-1.0")}", :submodules => true do
         gem "has_submodule"
       end
@@ -772,10 +772,10 @@ describe "bundle install with git sources" do
       bundle "install"
       expect(out).to_not match(/Revision.*does not exist/)
 
-      install_gemfile <<-G
+      install_gemfile <<-G, :expect_err => true
         gem "foo", :git => "file://#{lib_path("foo-1.0")}", :ref => "deadbeef"
       G
-      bundle "install"
+      bundle "install", :expect_err => true
       expect(out).to include("Revision deadbeef does not exist in the repository")
     end
   end
