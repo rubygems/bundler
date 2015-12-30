@@ -172,7 +172,7 @@ describe "compact index api" do
     should_be_installed "rack 1.0.0"
   end
 
-  it "timeouts when Bundler::Fetcher redirects too much" do
+  it "times out when Bundler::Fetcher redirects too much" do
     gemfile <<-G
       source "#{source_uri}"
       gem "rack"
@@ -221,7 +221,6 @@ describe "compact index api" do
     G
 
     bundle :install, :artifice => "compact_index_extra"
-    puts out
     should_be_installed "back_deps 1.0"
   end
 
