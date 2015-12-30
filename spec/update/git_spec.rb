@@ -131,7 +131,7 @@ describe "bundle update" do
         end
 
         Dir.chdir(lib_path("has_submodule-1.0")) do
-          `git submodule add #{lib_path("submodule-1.0")} submodule-1.0`
+          sys_exec "git submodule add #{lib_path("submodule-1.0")} submodule-1.0", :expect_err => true
           `git commit -m "submodulator"`
         end
       end
@@ -146,7 +146,7 @@ describe "bundle update" do
         run "require 'submodule'"
         expect(out).to eq("GEM")
 
-        install_gemfile <<-G
+        install_gemfile <<-G, :expect_err => true
           git "#{lib_path("has_submodule-1.0")}", :submodules => true do
             gem "has_submodule"
           end
@@ -158,7 +158,7 @@ describe "bundle update" do
 
       it "it unlocks the source when submodules are removed from git source" do
         pending "This would require actually removing the submodule from the clone"
-        install_gemfile <<-G
+        install_gemfile <<-G, :expect_err => true
           git "#{lib_path("has_submodule-1.0")}", :submodules => true do
             gem "has_submodule"
           end
