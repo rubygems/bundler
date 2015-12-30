@@ -92,7 +92,7 @@ describe "Bundler.setup" do
     end
 
     it "handles multiple non-additive invocations" do
-      ruby <<-RUBY
+      ruby <<-RUBY, :expect_err => true
         require 'bundler'
         Bundler.setup(:default, :test)
         Bundler.setup(:default)
