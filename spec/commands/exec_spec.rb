@@ -126,7 +126,7 @@ describe "bundle exec" do
       G
     end
 
-    bundle "exec rackup"
+    bundle "exec rackup", :expect_err => true
 
     expect(out).to eq("0.9.1")
     expect(err).to match("deprecated")
