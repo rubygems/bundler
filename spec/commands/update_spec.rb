@@ -338,7 +338,7 @@ describe "bundle update --ruby" do
       G
     end
     it "removes the Ruby from the Gemfile.lock" do
-      bundle "update --ruby"
+      bundle "update --ruby", :expect_err => true
 
       lockfile_should_be <<-L
        GEM

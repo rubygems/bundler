@@ -345,7 +345,7 @@ describe "bundle install with gem sources" do
 
     context "and using an unsupported Ruby version" do
       it "prints an error" do
-        install_gemfile <<-G
+        install_gemfile <<-G, :expect_err => true
           ::RUBY_VERSION = '1.8.7'
           ruby '~> 2.1'
         G
@@ -355,7 +355,7 @@ describe "bundle install with gem sources" do
 
     context "and using a supported Ruby version" do
       before do
-        install_gemfile <<-G
+        install_gemfile <<-G, :expect_err => true
           ::RUBY_VERSION = '2.1.3'
           ::RUBY_PATCHLEVEL = 100
           ruby '~> 2.1.0'
@@ -381,7 +381,7 @@ describe "bundle install with gem sources" do
       end
 
       it "does not update Gemfile.lock with updated ruby versions" do
-        install_gemfile <<-G
+        install_gemfile <<-G, :expect_err => true
           ::RUBY_VERSION = '2.2.3'
           ::RUBY_PATCHLEVEL = 100
           ruby '~> 2.2.0'
