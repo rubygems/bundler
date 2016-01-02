@@ -67,7 +67,7 @@ describe Bundler::Env do
       it "prints the gemspec" do
         output = env.report(:print_gemspecs => true).gsub(/^\s+/, "")
 
-        expect(output).to include("foo.gemspec:")
+        expect(output).to include("foo.gemspec")
         expect(output).to include(gemspec)
       end
     end
