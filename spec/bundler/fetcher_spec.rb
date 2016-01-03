@@ -38,8 +38,9 @@ describe Bundler::Fetcher do
 
     context "when a rubygems source mirror is set" do
       let(:orig_uri) { URI("http://zombo.com") }
+      let(:cache_uri) { orig_uri.dup.tap {|uri| uri.host = "cache_" + uri.host } }
       let(:remote_with_mirror) do
-        double("remote", :uri => uri, :original_uri => orig_uri, :anonymized_uri => uri)
+        double("remote", :uri => uri, :original_uri => orig_uri, :anonymized_uri => uri, :cache_uri => cache_uri)
       end
 
       let(:fetcher) { Bundler::Fetcher.new(remote_with_mirror) }

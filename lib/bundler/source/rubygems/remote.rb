@@ -2,7 +2,7 @@ module Bundler
   class Source
     class Rubygems
       class Remote
-        attr_reader :uri, :anonymized_uri, :original_uri
+        attr_reader :uri, :anonymized_uri, :original_uri, :cache_uri
 
         def initialize(uri)
           orig_uri = uri
@@ -12,6 +12,7 @@ module Bundler
 
           @uri = apply_auth(uri, fallback_auth).freeze
           @anonymized_uri = remove_auth(@uri).freeze
+          @cache_uri = remove_auth(orig_uri.dup).freeze
         end
 
       private

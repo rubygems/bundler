@@ -32,6 +32,17 @@ describe Bundler::Source::Rubygems::Remote do
         expect(remote(uri_no_auth).anonymized_uri).to eq(uri_no_auth)
       end
     end
+
+    describe "#cache_uri" do
+      it "returns the original_uri" do
+        expect(remote(uri_no_auth).cache_uri).to eq(uri_no_auth)
+      end
+
+      it "does not apply given credentials" do
+        Bundler.settings[uri_no_auth.to_s] = credentials
+        expect(remote(uri_no_auth).cache_uri).to eq(uri_no_auth)
+      end
+    end
   end
 
   context "when the original URI has a username and password" do
@@ -54,6 +65,17 @@ describe Bundler::Source::Rubygems::Remote do
       it "does not apply given credentials" do
         Bundler.settings[uri_no_auth.to_s] = "other:stuff"
         expect(remote(uri_with_auth).anonymized_uri).to eq(uri_no_auth)
+      end
+    end
+
+    describe "#cache_uri" do
+      it "returns the original_uri" do
+        expect(remote(uri_no_auth).cache_uri).to eq(uri_no_auth)
+      end
+
+      it "does not apply given credentials" do
+        Bundler.settings[uri_no_auth.to_s] = credentials
+        expect(remote(uri_no_auth).cache_uri).to eq(uri_no_auth)
       end
     end
   end
@@ -86,6 +108,10 @@ describe Bundler::Source::Rubygems::Remote do
     specify "#original_uri returns the original source" do
       expect(remote(uri).original_uri).to eq(uri)
     end
+
+    specify "#cache_uri returns the original source" do
+      expect(remote(uri).cache_uri).to eq(uri)
+    end
   end
 
   context "when a mirror with configured credentials is configured for the URI" do
@@ -108,6 +134,10 @@ describe Bundler::Source::Rubygems::Remote do
 
     specify "#original_uri returns the original source" do
       expect(remote(uri).original_uri).to eq(uri)
+    end
+
+    specify "#cache_uri returns the original source" do
+      expect(remote(uri).cache_uri).to eq(uri)
     end
   end
 
