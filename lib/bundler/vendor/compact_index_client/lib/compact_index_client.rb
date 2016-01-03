@@ -1,4 +1,5 @@
 require "pathname"
+require "set"
 require "bundler/worker"
 
 class Bundler::CompactIndexClient
