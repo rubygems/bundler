@@ -119,9 +119,10 @@ module Bundler
     end
 
     def const_get_safely(constant_name, namespace)
-      constant_sym = constant_name.to_sym
-      return nil unless namespace.constants.include? constant_sym
-      namespace.const_get(constant_sym)
+      const_in_namespace = namespace.constants.include?(constant_name.to_s) ||
+        namespace.constants.include?(constant_name.to_sym)
+      return nil unless const_in_namespace
+      namespace.const_get(constant_name)
     end
 
   private
