@@ -1,7 +1,7 @@
 module Bundler
   # used for Creating Specifications from the Gemcutter Endpoint
   class EndpointSpecification < Gem::Specification
-    ILLFORMED_MESSAGE = 'Ill-formed requirement ["#<YAML::Syck::DefaultKey'
+    ILLFORMED_MESSAGE = 'Ill-formed requirement ["#<YAML::Syck::DefaultKey'.freeze
     include MatchPlatform
 
     attr_reader :name, :version, :platform, :dependencies, :required_rubygems_version, :required_ruby_version, :checksum
