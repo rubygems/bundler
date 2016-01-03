@@ -77,7 +77,11 @@ module Bundler
       # Set PATH
       paths = (ENV["PATH"] || "").split(File::PATH_SEPARATOR)
       paths.unshift "#{Bundler.bundle_path}/bin"
-      ENV["PATH"] = paths.uniq.join(File::PATH_SEPARATOR)
+      begin
+        ENV["PATH"] = paths.uniq.join(File::PATH_SEPARATOR)
+      rescue Encoding::CompatibilityError
+        ENV["PATH"] = paths.uniq.map {|x| x.encode("UTF-8") }.join(File::PATH_SEPARATOR)
+      end
 
       # Set RUBYOPT
       rubyopt = [ENV["RUBYOPT"]].compact
