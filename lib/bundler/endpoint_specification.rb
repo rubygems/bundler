@@ -105,11 +105,11 @@ module Bundler
         next unless v
         case k.to_s
         when "checksum"
-          @checksum = v ? v.last : nil
+          @checksum = v.last
         when "rubygems"
-          @required_rubygems_version = Gem::Requirement.new(v) if v
+          @required_rubygems_version = Gem::Requirement.new(v)
         when "ruby"
-          @required_ruby_version = Gem::Requirement.new(v) if v
+          @required_ruby_version = Gem::Requirement.new(v)
         end
       end
     end
