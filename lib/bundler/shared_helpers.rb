@@ -118,6 +118,12 @@ module Bundler
       raise TemporaryResourceError.new(path, action)
     end
 
+    def const_get_safely(constant_name, namespace)
+      constant_sym = constant_name.to_sym
+      return nil unless namespace.constants.include? constant_sym
+      namespace.const_get(constant_sym)
+    end
+
   private
 
     def find_gemfile
