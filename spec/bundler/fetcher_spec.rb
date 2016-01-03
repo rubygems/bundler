@@ -50,6 +50,13 @@ describe Bundler::Fetcher do
           fetcher.send(:connection).override_headers["X-Gemfile-Source"]
         ).to eq("http://zombo.com")
       end
+
+      it "caches things based upon the original source" do
+        compact_index_fetcher = fetcher.fetchers.first
+        expect(compact_index_fetcher).to be_a(described_class::CompactIndex)
+        expect(compact_index_fetcher.send(:compact_index_client).directory).
+          to eq(home + ".bundle/cache/compact_index/cache_zombo.com.80.fc7f36")
+      end
     end
 
     context "when there is no rubygems source mirror set" do

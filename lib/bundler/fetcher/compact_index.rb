@@ -74,10 +74,11 @@ module Bundler
       end
 
       def cache_path
-        uri_parts = [display_uri.host, display_uri.port, display_uri.path].compact.join(".")
+        cache_uri = remote.cache_uri
+        uri_parts = [cache_uri.host, cache_uri.port, cache_uri.path].compact.join(".")
         uri_digest = Digest::MD5.hexdigest(uri_parts)
 
-        cache_path = [display_uri.host, display_uri.port, uri_digest[0..5]].compact.join(".")
+        cache_path = [cache_uri.host, cache_uri.port, uri_digest[0..5]].compact.join(".")
         Bundler.user_cache.join("compact_index", cache_path)
       end
     end
