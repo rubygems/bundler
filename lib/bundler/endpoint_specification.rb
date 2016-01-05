@@ -13,7 +13,7 @@ module Bundler
       @platform     = platform
       @dependencies = dependencies.map {|dep, reqs| build_dependency(dep, reqs) }
 
-      parse_metadata(metadata || {})
+      parse_metadata(metadata)
     end
 
     def fetch_platform
@@ -101,6 +101,7 @@ module Bundler
     end
 
     def parse_metadata(data)
+      return unless data
       data.each do |k, v|
         next unless v
         case k.to_s
