@@ -2,7 +2,7 @@ module Bundler
   class Source
     class Rubygems
       class Remote
-        attr_reader :uri, :anonymized_uri, :original_uri, :cache_uri
+        attr_reader :uri, :anonymized_uri, :original_uri
 
         def initialize(uri)
           orig_uri = uri
@@ -12,7 +12,21 @@ module Bundler
 
           @uri = apply_auth(uri, fallback_auth).freeze
           @anonymized_uri = remove_auth(@uri).freeze
-          @cache_uri = remove_auth(orig_uri.dup).freeze
+        end
+
+        # @return [String] A slug suitable for use as a cache key for this
+        #         remote.
+        #
+        def cache_slug
+          @cache_slug ||= begin
+            cache_uri = original_uri || uri
+
+            uri_parts = [cache_uri.host, cache_uri.user, cache_uri.port, cache_uri.path]
+            uri_digest = Digest::MD5.hexdigest(uri_parts.compact.join("."))
+
+            uri_parts[-1] = uri_digest
+            uri_parts.compact.join(".")
+          end
         end
 
       private
