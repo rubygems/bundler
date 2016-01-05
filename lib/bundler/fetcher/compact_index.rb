@@ -6,16 +6,27 @@ module Bundler
     class CompactIndex < Base
       require "bundler/vendor/compact_index_client/lib/compact_index_client"
 
+      def self.compact_index_request(method_name)
+        method = instance_method(method_name)
+        define_method(method_name) do |*args, &blk|
+          begin
+            method.bind(self).call(*args, &blk)
+          rescue NetworkDownError, CompactIndexClient::Updater::MisMatchedChecksumError => e
+            raise HTTPError, e.message
+          rescue AuthenticationRequiredError
+            # We got a 401 from the server. Just fail.
+            raise
+          rescue HTTPError => e
+            Bundler.ui.trace(e)
+            nil
+          end
+        end
+      end
+
       def specs(gem_names)
         specs_for_names(gem_names)
-      rescue NetworkDownError, CompactIndexClient::Updater::MisMatchedChecksumError => e
-        raise HTTPError, e.message
-      rescue AuthenticationRequiredError
-        raise # We got a 401 from the server. Just fail.
-      rescue HTTPError => e
-        Bundler.ui.trace(e)
-        nil
       end
+      compact_index_request :specs
 
       def specs_for_names(gem_names)
         gem_info = []
@@ -43,18 +54,13 @@ module Bundler
         contents[3].map! {|d| Gem::Dependency.new(*d) }
         EndpointSpecification.new(*contents)
       end
+      compact_index_request :fetch_spec
 
       def available?
         # Read info file checksums out of /versions, so we can know if gems are up to date
         fetch_uri.scheme != "file" && compact_index_client.update_and_parse_checksums!
-      rescue NetworkDownError, CompactIndexClient::Updater::MisMatchedChecksumError => e
-        raise HTTPError, e.message
-      rescue AuthenticationRequiredError
-        # We got a 401 from the server. Just fail.
-        raise
-      rescue HTTPError
-        false
       end
+      compact_index_request :available?
 
       def api_fetcher?
         true
