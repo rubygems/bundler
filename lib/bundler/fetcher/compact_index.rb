@@ -8,7 +8,7 @@ module Bundler
 
       def specs(gem_names)
         specs_for_names(gem_names)
-      rescue NetworkDownError => e
+      rescue NetworkDownError, CompactIndexClient::Updater::MisMatchedChecksumError => e
         raise HTTPError, e.message
       rescue AuthenticationRequiredError
         raise # We got a 401 from the server. Just fail.
@@ -47,7 +47,7 @@ module Bundler
       def available?
         # Read info file checksums out of /versions, so we can know if gems are up to date
         fetch_uri.scheme != "file" && compact_index_client.update_and_parse_checksums!
-      rescue NetworkDownError => e
+      rescue NetworkDownError, CompactIndexClient::Updater::MisMatchedChecksumError => e
         raise HTTPError, e.message
       rescue AuthenticationRequiredError
         # We got a 401 from the server. Just fail.

@@ -3,6 +3,8 @@ require "zlib"
 
 class Bundler::CompactIndexClient
   class Updater
+    class MisMatchedChecksumError < Error; end
+
     def initialize(fetcher)
       @fetcher = fetcher
     end
@@ -36,7 +38,7 @@ class Bundler::CompactIndexClient
         local_path.delete
         update(local_path, remote_path, :retrying)
       else
-        raise Bundler::HTTPError, "Checksum of /#{remote_path} " \
+        raise MisMatchedChecksumError, "Checksum of /#{remote_path} " \
           "does not match the checksum provided by server! Something is wrong."
       end
     end

@@ -2,6 +2,8 @@ require "pathname"
 require "set"
 
 class Bundler::CompactIndexClient
+  class Error < StandardError; end
+
   require "bundler/vendor/compact_index_client/lib/compact_index_client/cache"
   require "bundler/vendor/compact_index_client/lib/compact_index_client/updater"
   require "bundler/vendor/compact_index_client/lib/compact_index_client/version"
