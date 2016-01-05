@@ -1,6 +1,5 @@
 require "pathname"
 require "set"
-require "bundler/worker"
 
 class Bundler::CompactIndexClient
   require "bundler/vendor/compact_index_client/lib/compact_index_client/cache"
@@ -9,12 +8,20 @@ class Bundler::CompactIndexClient
 
   attr_reader :directory
 
+  # @return [Lambda] A lambda that takes an array of inputs and a block, and
+  #         maps the inputs with the block in parallel.
+  #
+  attr_accessor :in_parallel
+
   def initialize(directory, fetcher)
     @directory = Pathname.new(directory)
     @updater = Updater.new(fetcher)
     @cache = Cache.new(@directory)
     @endpoints = Set.new
     @info_checksums_by_name = {}
+    @in_parallel = lambda do |inputs, &blk|
+      inputs.map(&blk)
+    end
   end
 
   def names
@@ -28,13 +35,9 @@ class Bundler::CompactIndexClient
     versions
   end
 
-  def dependencies(names, pool_size = 25)
-    update = Proc.new {|name, _| update_info(name); name }
-    worker = Bundler::Worker.new(pool_size, update)
-    names.each {|name| worker.enq(name) }
-
-    names.map do
-      name = worker.deq
+  def dependencies(names)
+    in_parallel.call(names) do |name|
+      update_info(name)
       @cache.dependencies(name).map {|d| d.unshift(name) }
     end.flatten(1)
   end
