@@ -1,4 +1,5 @@
 require "bundler/fetcher/base"
+require "bundler/worker"
 
 module Bundler
   class Fetcher
@@ -69,6 +70,12 @@ module Bundler
 
           SharedHelpers.filesystem_access(cache_path) do
             CompactIndexClient.new(cache_path, compact_fetcher)
+          end.tap do |client|
+            client.in_parallel = lambda do |inputs, &blk|
+              worker = Bundler::Worker.new(25, blk)
+              inputs.each {|input| worker.enq(input) }
+              inputs.map { worker.deq }
+            end
           end
         end
       end
