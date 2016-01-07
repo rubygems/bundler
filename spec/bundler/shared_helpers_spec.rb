@@ -1,10 +1,6 @@
 require "spec_helper"
 require "bundler/shared_helpers"
 
-module TargetNamespace
-  VALID_CONSTANT = 1
-end
-
 describe Bundler::SharedHelpers do
   describe "#default_gemfile" do
     subject { Bundler::SharedHelpers.default_gemfile }
@@ -27,6 +23,9 @@ describe Bundler::SharedHelpers do
     end
   end
   describe "#const_get_safely" do
+    module TargetNamespace
+      VALID_CONSTANT = 1
+    end
     context "when the namespace does have the requested constant" do
       subject { Bundler::SharedHelpers.const_get_safely(:VALID_CONSTANT, TargetNamespace) }
       it "returns the value of the requested constant" do
