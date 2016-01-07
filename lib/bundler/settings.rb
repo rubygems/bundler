@@ -63,8 +63,7 @@ module Bundler
 
     def mirror_for(uri)
       uri = URI(uri.to_s) unless uri.is_a?(URI)
-      # Settings keys are all downcased
-      gem_mirrors.for(uri.to_s.downcase).uri
+      gem_mirrors.for(uri.to_s).uri
     end
 
     def credentials_for(uri)
