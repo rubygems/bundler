@@ -17,6 +17,7 @@ module Bundler
       Bundler.ui = UI::Silent.new if print
 
       gems = options[:update]
+      Bundler::Fetcher.disable_endpoint = options["full-index"]
 
       if gems && !gems.empty?
         definition = Bundler.definition(:gems => gems)
