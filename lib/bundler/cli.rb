@@ -409,6 +409,8 @@ module Bundler
       "print the lockfile to STDOUT instead of writing to the file system"
     method_option "lockfile", :type => :string, :default => nil, :banner =>
       "the path the lockfile should be written to"
+    method_option "full-index", :type => :boolean, :default => false, :banner =>
+      "Use the rubygems modern index instead of the API endpoint"
     def lock
       require "bundler/cli/lock"
       Lock.new(options).run
