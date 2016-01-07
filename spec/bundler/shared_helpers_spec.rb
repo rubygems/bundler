@@ -24,7 +24,6 @@ describe Bundler::SharedHelpers do
   end
   describe "#default_lockfile" do
     subject { Bundler::SharedHelpers.default_lockfile }
-
     context "gemfile is gems.rb" do
       before do
         gemfile_path = Pathname.new("/path/gems.rb")
@@ -43,6 +42,35 @@ describe Bundler::SharedHelpers do
       it "returns the lock file path" do
         expected_lockfile_path = Pathname.new("/path/Gemfile.lock")
         expect(subject).to eq(expected_lockfile_path)
+      end
+    end
+  end
+  describe "#default_bundle_dir" do
+    subject { Bundler::SharedHelpers.default_bundle_dir }
+    context ".bundle does not exist" do
+      it "returns nil" do
+        expect(subject).to eq(nil)
+      end
+    end
+    context ".bundle is global .bundle" do
+      before do
+        Dir.mkdir ".bundle"
+        global_rubygems_dir = Pathname.new("#{bundled_app}")
+        allow(Bundler.rubygems).to receive(:user_home).and_return(global_rubygems_dir)
+      end
+      it "returns nil" do
+        expect(subject).to eq(nil)
+      end
+    end
+    context ".bundle is not global .bundle" do
+      before do
+        Dir.mkdir ".bundle"
+        global_rubygems_dir = Pathname.new("/path/rubygems")
+        allow(Bundler.rubygems).to receive(:user_home).and_return(global_rubygems_dir)
+      end
+      it "returns the .bundle path" do
+        expected_bundle_dir_path = Pathname.new("#{bundled_app}/.bundle")
+        expect(subject).to eq(expected_bundle_dir_path)
       end
     end
   end
