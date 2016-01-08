@@ -170,6 +170,27 @@ describe Bundler::SharedHelpers do
       end
     end
   end
+  describe "#filesystem_access" do
+    context "system has proper permission access" do
+      it "performs the operation in the passed block" do
+        file_op_block = proc {|path| FileUtils.mkdir_p(path) }
+        subject.filesystem_access("./test_dir", &file_op_block)
+        expect(Pathname.new("test_dir")).to exist
+      end
+    end
+    context "system throws Errno::EACESS" do
+      it "raises a PermissionError" do
+        file_op_block = proc {|_path| raise Errno::EACCES }
+        expect { subject.filesystem_access("/path", &file_op_block) }.to raise_error(Bundler::PermissionError)
+      end
+    end
+    context "system throws Errno::EAGAIN" do
+      it "raises a TemporaryResourceError" do
+        file_op_block = proc {|_path| raise Errno::EAGAIN }
+        expect { subject.filesystem_access("/path", &file_op_block) }.to raise_error(Bundler::TemporaryResourceError)
+      end
+    end
+  end
   describe "#const_get_safely" do
     module TargetNamespace
       VALID_CONSTANT = 1
