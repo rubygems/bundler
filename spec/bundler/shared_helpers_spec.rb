@@ -72,6 +72,47 @@ describe Bundler::SharedHelpers do
       end
     end
   end
+  describe "#in_bundle?" do
+    it "calls the find_gemfile method" do
+      expect(subject).to receive(:find_gemfile)
+      subject.in_bundle?
+    end
+    shared_examples_for "correctly determines whether to return a Gemfile path" do
+      context "currently in directory with a Gemfile" do
+        before do
+          File.new("Gemfile", "w")
+        end
+        it "returns path of the bundle gemfile" do
+          expect(subject.in_bundle?).to eq("#{bundled_app}/Gemfile")
+        end
+      end
+      context "currently in directory without a Gemfile" do
+        it "returns nil" do
+          expect(subject.in_bundle?).to eq(nil)
+        end
+      end
+    end
+    context "ENV['BUNDLE_GEMFILE'] set" do
+      before do
+        ENV["BUNDLE_GEMFILE"] = "/path/Gemfile"
+      end
+      it "returns ENV['BUNDLE_GEMFILE']" do
+        expect(subject.in_bundle?).to eq("/path/Gemfile")
+      end
+    end
+    context "ENV['BUNDLE_GEMFILE'] not set" do
+      before do
+        ENV["BUNDLE_GEMFILE"] = nil
+      end
+      it_behaves_like "correctly determines whether to return a Gemfile path"
+    end
+    context "ENV['BUNDLE_GEMFILE'] is blank" do
+      before do
+        ENV["BUNDLE_GEMFILE"] = ""
+      end
+      it_behaves_like "correctly determines whether to return a Gemfile path"
+    end
+  end
   describe "#set_bundle_environment" do
     shared_examples_for "ENV['PATH'] gets set correctly" do
       before do
