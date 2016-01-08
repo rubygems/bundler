@@ -1,6 +1,6 @@
 require "bundler/shared_helpers"
 
-if Bundler::SharedHelpers.in_bundle?
+if Bundler::SharedHelpers.find_gemfile
   require "bundler"
 
   if STDOUT.tty? || ENV["BUNDLER_FORCE_TTY"]

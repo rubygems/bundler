@@ -4,10 +4,10 @@ require "bundler/shared_helpers"
 describe Bundler::SharedHelpers do
   subject { Bundler::SharedHelpers }
   describe "#default_gemfile" do
-    before do
-      ENV["BUNDLE_GEMFILE"] = "/path/Gemfile"
-    end
     context "Gemfile is present" do
+      before do
+        allow(subject).to receive(:find_gemfile).and_return("/path/Gemfile")
+      end
       it "returns the Gemfile path" do
         expected_gemfile_path = Pathname.new("/path/Gemfile")
         expect(subject.default_gemfile).to eq(expected_gemfile_path)
@@ -15,7 +15,7 @@ describe Bundler::SharedHelpers do
     end
     context "Gemfile is not present" do
       before do
-        ENV["BUNDLE_GEMFILE"] = nil
+        allow(subject).to receive(:find_gemfile).and_return(nil)
       end
       it "raises a GemfileNotFound error" do
         expect { subject.default_gemfile }.to raise_error(Bundler::GemfileNotFound, "Could not locate Gemfile")
@@ -69,6 +69,38 @@ describe Bundler::SharedHelpers do
       it "returns the .bundle path" do
         expected_bundle_dir_path = Pathname.new("#{bundled_app}/.bundle")
         expect(subject.default_bundle_dir).to eq(expected_bundle_dir_path)
+      end
+    end
+  end
+  describe "#find_gemfile" do
+    context "Gemfile path is specified in env" do
+      before do
+        ENV["BUNDLE_GEMFILE"] = "/path/Gemfile"
+      end
+      it "returns the specified Gemfile path" do
+        expect(subject.find_gemfile).to eq("/path/Gemfile")
+      end
+    end
+    context "Gemfile path is not specified in env" do
+      before do
+        ENV["BUNDLE_GEMFILE"] = nil
+      end
+      context "Gemfile is present" do
+        before do
+          File.open("Gemfile", "w")
+        end
+        it "returns the Gemfile path" do
+          expected_gemfile_path = bundled_app("Gemfile").to_s
+          expect(subject.find_gemfile).to eq(expected_gemfile_path)
+        end
+      end
+      context "Gemfile is not present" do
+        before do
+          ENV["BUNDLE_GEMFILE"] = nil
+        end
+        it "returns nil" do
+          expect(subject.find_gemfile).to eq(nil)
+        end
       end
     end
   end
