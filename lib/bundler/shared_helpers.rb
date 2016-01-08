@@ -44,8 +44,11 @@ module Bundler
       Pathname.new(bundle_dir)
     end
 
-    def in_bundle?
-      find_gemfile
+    def find_gemfile
+      given = ENV["BUNDLE_GEMFILE"]
+      return given if given && !given.empty?
+
+      find_file("Gemfile", "gems.rb")
     end
 
     def chdir(dir, &blk)
@@ -128,13 +131,6 @@ module Bundler
     end
 
   private
-
-    def find_gemfile
-      given = ENV["BUNDLE_GEMFILE"]
-      return given if given && !given.empty?
-
-      find_file("Gemfile", "gems.rb")
-    end
 
     def find_file(*names)
       search_up(*names) do |filename|

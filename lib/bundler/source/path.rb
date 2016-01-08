@@ -123,7 +123,7 @@ module Bundler
       end
 
       def has_app_cache?
-        SharedHelpers.in_bundle? && app_cache_path.exist?
+        SharedHelpers.find_gemfile && app_cache_path.exist?
       end
 
       def load_spec_files
