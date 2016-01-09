@@ -72,6 +72,104 @@ describe Bundler::SharedHelpers do
       end
     end
   end
+  describe "#set_bundle_environment" do
+    shared_examples_for "ENV['PATH'] gets set correctly" do
+      before do
+        Dir.mkdir ".bundle"
+      end
+      it "ensures bundle bin path is in ENV['PATH']" do
+        subject.set_bundle_environment
+        paths = (ENV["PATH"]).split(File::PATH_SEPARATOR)
+        expect(paths.include? "#{Bundler.bundle_path}/bin").to eq(true)
+      end
+    end
+    shared_examples_for "ENV['RUBYOPT'] gets set correctly" do
+      it "ensures -rbundler/setup is at the beginning of ENV['RUBYOPT']" do
+        subject.set_bundle_environment
+        expect(ENV["RUBYOPT"].split(" ").first.include? "-rbundler/setup").to eq(true)
+      end
+    end
+    shared_examples_for "ENV['RUBYLIB'] gets set correctly" do
+      before do
+        @ruby_lib_path = "stubbed_ruby_lib_dir"
+        allow(File).to receive(:expand_path).and_return(@ruby_lib_path)
+      end
+      it "ensures bundler's ruby version lib path is in ENV['RUBYLIB']" do
+        subject.set_bundle_environment
+        paths = (ENV["RUBYLIB"]).split(File::PATH_SEPARATOR)
+        expect(paths.include? @ruby_lib_path).to eq(true)
+      end
+    end
+    it "calls the appropriate set methods" do
+      expect(subject).to receive(:set_path)
+      expect(subject).to receive(:set_rubyopt)
+      expect(subject).to receive(:set_rubylib)
+      subject.set_bundle_environment
+    end
+    context "ENV['PATH'] does not exist" do
+      before { ENV.delete("PATH") }
+      it_behaves_like "ENV['PATH'] gets set correctly"
+    end
+    context "ENV['PATH'] is empty" do
+      before { ENV["PATH"] = "" }
+      it_behaves_like "ENV['PATH'] gets set correctly"
+    end
+    context "ENV['PATH'] exists" do
+      before { ENV["PATH"] = "/some_path/bin" }
+      it_behaves_like "ENV['PATH'] gets set correctly"
+    end
+    context "ENV['PATH'] already contains the bundle bin path" do
+      before do
+        @bundle_path = "#{Bundler.bundle_path}/bin"
+        ENV["PATH"] = @bundle_path
+      end
+      it_behaves_like "ENV['PATH'] gets set correctly"
+      it "ENV['PATH'] should only contain one instance of bundle bin path" do
+        subject.set_bundle_environment
+        paths = (ENV["PATH"]).split(File::PATH_SEPARATOR)
+        expect(paths.count(@bundle_path)).to eq(1)
+      end
+    end
+    context "ENV['RUBYOPT'] does not exist" do
+      before { ENV.delete("RUBYOPT") }
+      it_behaves_like "ENV['RUBYOPT'] gets set correctly"
+    end
+    context "ENV['RUBYOPT'] exists without -rbundler/setup" do
+      before { ENV["RUBYOPT"] = "-I/some_app_path/lib" }
+      it_behaves_like "ENV['RUBYOPT'] gets set correctly"
+    end
+    context "ENV['RUBYOPT'] exists and contains -rbundler/setup" do
+      before do
+        ENV["RUBYOPT"] = "-rbundler/setup"
+      end
+      it_behaves_like "ENV['RUBYOPT'] gets set correctly"
+    end
+    context "ENV['RUBYLIB'] does not exist" do
+      before { ENV.delete("RUBYLIB") }
+      it_behaves_like "ENV['RUBYLIB'] gets set correctly"
+    end
+    context "ENV['RUBYLIB'] is empty" do
+      before { ENV["PATH"] = "" }
+      it_behaves_like "ENV['RUBYLIB'] gets set correctly"
+    end
+    context "ENV['RUBYLIB'] exists" do
+      before { ENV["PATH"] = "/some_path/bin" }
+      it_behaves_like "ENV['RUBYLIB'] gets set correctly"
+    end
+    context "ENV['RUBYLIB'] already contains the bundler's ruby version lib path" do
+      before do
+        @ruby_lib_path = "stubbed_ruby_lib_dir"
+        allow(File).to receive(:expand_path).and_return(@ruby_lib_path)
+        ENV["RUBYLIB"] = @ruby_lib_path
+      end
+      it_behaves_like "ENV['RUBYLIB'] gets set correctly"
+      it "ENV['RUBYLIB'] should only contain one instance of bundler's ruby version lib path" do
+        subject.set_bundle_environment
+        paths = (ENV["RUBYLIB"]).split(File::PATH_SEPARATOR)
+        expect(paths.count(@ruby_lib_path)).to eq(1)
+      end
+    end
+  end
   describe "#const_get_safely" do
     module TargetNamespace
       VALID_CONSTANT = 1
