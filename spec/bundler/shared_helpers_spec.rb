@@ -2,6 +2,13 @@ require "spec_helper"
 require "bundler/shared_helpers"
 
 describe Bundler::SharedHelpers do
+  before do
+    ext_lock_double = double(:ext_lock)
+    allow(Bundler.rubygems).to receive(:ext_lock).and_return(ext_lock_double)
+    allow(ext_lock_double).to receive(:synchronize) do |&block|
+      block.call
+    end
+  end
   subject { Bundler::SharedHelpers }
   describe "#default_gemfile" do
     before do
@@ -111,6 +118,21 @@ describe Bundler::SharedHelpers do
         ENV["BUNDLE_GEMFILE"] = ""
       end
       it_behaves_like "correctly determines whether to return a Gemfile path"
+    end
+  end
+  describe "#chdir" do
+    before do
+      Dir.mkdir "chdir_test_dir"
+    end
+    it "executes the passed block while in the specified directory" do
+      op_block = proc { Dir.mkdir "nested_dir" }
+      subject.chdir("chdir_test_dir", &op_block)
+      expect(Pathname.new("chdir_test_dir/nested_dir")).to exist
+    end
+  end
+  describe "#pwd" do
+    it "returns the current absolute path" do
+      expect(subject.pwd).to eq(bundled_app)
     end
   end
   describe "#set_bundle_environment" do
