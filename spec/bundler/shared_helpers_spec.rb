@@ -2,6 +2,13 @@ require "spec_helper"
 require "bundler/shared_helpers"
 
 describe Bundler::SharedHelpers do
+  before do
+    ext_lock_double = double(:ext_lock)
+    allow(Bundler.rubygems).to receive(:ext_lock).and_return(ext_lock_double)
+    allow(ext_lock_double).to receive(:synchronize) do |&block|
+      block.call
+    end
+  end
   subject { Bundler::SharedHelpers }
   describe "#default_gemfile" do
     before do
@@ -69,6 +76,107 @@ describe Bundler::SharedHelpers do
       it "returns the .bundle path" do
         expected_bundle_dir_path = Pathname.new("#{bundled_app}/.bundle")
         expect(subject.default_bundle_dir).to eq(expected_bundle_dir_path)
+      end
+    end
+  end
+  describe "#in_bundle?" do
+    it "calls the find_gemfile method" do
+      expect(subject).to receive(:find_gemfile)
+      subject.in_bundle?
+    end
+    shared_examples_for "correctly determines whether to return a Gemfile path" do
+      context "currently in directory with a Gemfile" do
+        before do
+          File.new("Gemfile", "w")
+        end
+        it "returns path of the bundle gemfile" do
+          expect(subject.in_bundle?).to eq("#{bundled_app}/Gemfile")
+        end
+      end
+      context "currently in directory without a Gemfile" do
+        it "returns nil" do
+          expect(subject.in_bundle?).to eq(nil)
+        end
+      end
+    end
+    context "ENV['BUNDLE_GEMFILE'] set" do
+      before do
+        ENV["BUNDLE_GEMFILE"] = "/path/Gemfile"
+      end
+      it "returns ENV['BUNDLE_GEMFILE']" do
+        expect(subject.in_bundle?).to eq("/path/Gemfile")
+      end
+    end
+    context "ENV['BUNDLE_GEMFILE'] not set" do
+      before do
+        ENV["BUNDLE_GEMFILE"] = nil
+      end
+      it_behaves_like "correctly determines whether to return a Gemfile path"
+    end
+    context "ENV['BUNDLE_GEMFILE'] is blank" do
+      before do
+        ENV["BUNDLE_GEMFILE"] = ""
+      end
+      it_behaves_like "correctly determines whether to return a Gemfile path"
+    end
+  end
+  describe "#chdir" do
+    before do
+      Dir.mkdir "chdir_test_dir"
+    end
+    it "executes the passed block while in the specified directory" do
+      op_block = proc { Dir.mkdir "nested_dir" }
+      subject.chdir("chdir_test_dir", &op_block)
+      expect(Pathname.new("chdir_test_dir/nested_dir")).to exist
+    end
+  end
+  describe "#pwd" do
+    it "returns the current absolute path" do
+      expect(subject.pwd).to eq(bundled_app)
+    end
+  end
+  describe "#with_clean_git_env" do
+    before do
+      ENV["GIT_DIR"] = "ORIGINAL_ENV_GIT_DIR"
+      ENV["GIT_WORK_TREE"] = "ORIGINAL_ENV_GIT_WORK_TREE"
+    end
+    it "executes the passed block" do
+      with_clean_git_env_block = proc do
+        Dir.mkdir "with_clean_git_env_test_dir"
+      end
+      subject.with_clean_git_env(&with_clean_git_env_block)
+      expect(Pathname.new("with_clean_git_env_test_dir")).to exist
+    end
+    it "uses a fresh git env for execution" do
+      with_clean_git_env_block = proc do
+        Dir.mkdir "git_dir_test_dir" unless ENV["GIT_DIR"].nil?
+        Dir.mkdir "git_work_tree_test_dir" unless ENV["GIT_WORK_TREE"].nil?
+      end
+      subject.with_clean_git_env(&with_clean_git_env_block)
+      expect(Pathname.new("git_dir_test_dir")).to_not exist
+      expect(Pathname.new("git_work_tree_test_dir")).to_not exist
+    end
+    context "passed block does not throw errors" do
+      it "restores the git env after" do
+        with_clean_git_env_block = proc do
+          ENV["GIT_DIR"] = "NEW_ENV_GIT_DIR"
+          ENV["GIT_WORK_TREE"] = "NEW_ENV_GIT_WORK_TREE"
+        end
+        subject.with_clean_git_env(&with_clean_git_env_block)
+        expect(ENV["GIT_DIR"]).to eq("ORIGINAL_ENV_GIT_DIR")
+        expect(ENV["GIT_WORK_TREE"]).to eq("ORIGINAL_ENV_GIT_WORK_TREE")
+      end
+    end
+    context "passed block throws errors" do
+      it "restores the git env after" do
+        with_clean_git_env_block = proc do
+          ENV["GIT_DIR"] = "NEW_ENV_GIT_DIR"
+          ENV["GIT_WORK_TREE"] = "NEW_ENV_GIT_WORK_TREE"
+          raise RuntimeError.new
+        end
+        expect { subject.with_clean_git_env(&with_clean_git_env_block) }.to raise_error(RuntimeError)
+        expect(ENV["GIT_DIR"]).to eq("ORIGINAL_ENV_GIT_DIR")
+        expect(ENV["GIT_WORK_TREE"]).to eq("ORIGINAL_ENV_GIT_WORK_TREE")
       end
     end
   end
@@ -167,6 +275,27 @@ describe Bundler::SharedHelpers do
         subject.set_bundle_environment
         paths = (ENV["RUBYLIB"]).split(File::PATH_SEPARATOR)
         expect(paths.count(@ruby_lib_path)).to eq(1)
+      end
+    end
+  end
+  describe "#filesystem_access" do
+    context "system has proper permission access" do
+      it "performs the operation in the passed block" do
+        file_op_block = proc {|path| FileUtils.mkdir_p(path) }
+        subject.filesystem_access("./test_dir", &file_op_block)
+        expect(Pathname.new("test_dir")).to exist
+      end
+    end
+    context "system throws Errno::EACESS" do
+      it "raises a PermissionError" do
+        file_op_block = proc {|_path| raise Errno::EACCES }
+        expect { subject.filesystem_access("/path", &file_op_block) }.to raise_error(Bundler::PermissionError)
+      end
+    end
+    context "system throws Errno::EAGAIN" do
+      it "raises a TemporaryResourceError" do
+        file_op_block = proc {|_path| raise Errno::EAGAIN }
+        expect { subject.filesystem_access("/path", &file_op_block) }.to raise_error(Bundler::TemporaryResourceError)
       end
     end
   end
