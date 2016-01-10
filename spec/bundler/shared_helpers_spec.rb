@@ -135,6 +135,51 @@ describe Bundler::SharedHelpers do
       expect(subject.pwd).to eq(bundled_app)
     end
   end
+  describe "#with_clean_git_env" do
+    before do
+      ENV["GIT_DIR"] = "ORIGINAL_ENV_GIT_DIR"
+      ENV["GIT_WORK_TREE"] = "ORIGINAL_ENV_GIT_WORK_TREE"
+    end
+    it "executes the passed block" do
+      with_clean_git_env_block = proc do
+        Dir.mkdir "with_clean_git_env_test_dir"
+      end
+      subject.with_clean_git_env(&with_clean_git_env_block)
+      expect(Pathname.new("with_clean_git_env_test_dir")).to exist
+    end
+    it "uses a fresh git env for execution" do
+      with_clean_git_env_block = proc do
+        Dir.mkdir "git_dir_test_dir" unless ENV["GIT_DIR"].nil?
+        Dir.mkdir "git_work_tree_test_dir" unless ENV["GIT_WORK_TREE"].nil?
+      end
+      subject.with_clean_git_env(&with_clean_git_env_block)
+      expect(Pathname.new("git_dir_test_dir")).to_not exist
+      expect(Pathname.new("git_work_tree_test_dir")).to_not exist
+    end
+    context "passed block does not throw errors" do
+      it "restores the git env after" do
+        with_clean_git_env_block = proc do
+          ENV["GIT_DIR"] = "NEW_ENV_GIT_DIR"
+          ENV["GIT_WORK_TREE"] = "NEW_ENV_GIT_WORK_TREE"
+        end
+        subject.with_clean_git_env(&with_clean_git_env_block)
+        expect(ENV["GIT_DIR"]).to eq("ORIGINAL_ENV_GIT_DIR")
+        expect(ENV["GIT_WORK_TREE"]).to eq("ORIGINAL_ENV_GIT_WORK_TREE")
+      end
+    end
+    context "passed block throws errors" do
+      it "restores the git env after" do
+        with_clean_git_env_block = proc do
+          ENV["GIT_DIR"] = "NEW_ENV_GIT_DIR"
+          ENV["GIT_WORK_TREE"] = "NEW_ENV_GIT_WORK_TREE"
+          raise RuntimeError.new
+        end
+        expect { subject.with_clean_git_env(&with_clean_git_env_block) }.to raise_error(RuntimeError)
+        expect(ENV["GIT_DIR"]).to eq("ORIGINAL_ENV_GIT_DIR")
+        expect(ENV["GIT_WORK_TREE"]).to eq("ORIGINAL_ENV_GIT_WORK_TREE")
+      end
+    end
+  end
   describe "#set_bundle_environment" do
     shared_examples_for "ENV['PATH'] gets set correctly" do
       before do
