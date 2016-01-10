@@ -77,6 +77,8 @@ RSpec.configure do |config|
   original_wd       = Dir.pwd
   original_path     = ENV["PATH"]
   original_gem_home = ENV["GEM_HOME"]
+  original_ruby_opt = ENV["RUBYOPT"]
+  original_ruby_lib = ENV["RUBYLIB"]
 
   def pending_jruby_shebang_fix
     pending "JRuby executables do not have a proper shebang" if RUBY_PLATFORM == "java"
@@ -104,6 +106,8 @@ RSpec.configure do |config|
     ENV["PATH"]                  = original_path
     ENV["GEM_HOME"]              = original_gem_home
     ENV["GEM_PATH"]              = original_gem_home
+    ENV["RUBYOPT"]               = original_ruby_opt
+    ENV["RUBYLIB"]               = original_ruby_lib
     ENV["BUNDLE_PATH"]           = nil
     ENV["BUNDLE_GEMFILE"]        = nil
     ENV["BUNDLE_FROZEN"]         = nil
