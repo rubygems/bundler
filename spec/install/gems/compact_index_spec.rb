@@ -10,7 +10,7 @@ describe "compact index api" do
       gem "rack"
     G
 
-    bundle :install, :artifice => "compact_index"
+    bundle! :install, :artifice => "compact_index"
     expect(out).to include("Fetching gem metadata from #{source_uri}")
     should_be_installed "rack 1.0.0"
   end
@@ -31,7 +31,7 @@ describe "compact index api" do
       gem "rails"
     G
 
-    bundle :install, :artifice => "compact_index"
+    bundle! :install, :artifice => "compact_index"
     expect(out).to include("Fetching gem metadata from #{source_uri}")
     should_be_installed(
       "rails 2.3.2",
@@ -48,7 +48,7 @@ describe "compact index api" do
       gem "net-sftp"
     G
 
-    bundle :install, :artifice => "compact_index"
+    bundle! :install, :artifice => "compact_index"
     should_be_installed "net-sftp 1.1.1"
   end
 
@@ -57,7 +57,7 @@ describe "compact index api" do
       source "#{source_uri}"
       gem "rack"
     G
-    bundle :install, :artifice => "compact_index"
+    bundle! :install, :artifice => "compact_index"
 
     bundle "install --deployment", :artifice => "compact_index"
     expect(out).to include("Fetching gem metadata from #{source_uri}")
@@ -77,7 +77,7 @@ describe "compact index api" do
       end
     G
 
-    bundle :install, :artifice => "compact_index"
+    bundle! :install, :artifice => "compact_index"
 
     should_be_installed("rails 2.3.2")
   end
@@ -93,7 +93,7 @@ describe "compact index api" do
       gem 'foo', :git => "file:///#{lib_path("foo-1.0")}"
     G
 
-    bundle :install, :artifice => "compact_index"
+    bundle! :install, :artifice => "compact_index"
 
     bundle "install --deployment", :artifice => "compact_index"
 
@@ -122,7 +122,7 @@ describe "compact index api" do
       gem "rcov"
     G
 
-    bundle :install, :fakeweb => "windows"
+    bundle! :install, :fakeweb => "windows"
     expect(out).to include("Fetching source index from #{source_uri}")
     should_be_installed "rcov 1.0.0"
   end
@@ -133,7 +133,7 @@ describe "compact index api" do
       gem "rack"
     G
 
-    bundle :install, :verbose => true, :artifice => "compact_index_forbidden"
+    bundle! :install, :verbose => true, :artifice => "compact_index_forbidden"
     expect(out).to include("Fetching gem metadata from #{source_uri}")
     should_be_installed "rack 1.0.0"
   end
@@ -144,7 +144,7 @@ describe "compact index api" do
       gem "rack"
     G
 
-    bundle :install, :artifice => "compact_index_host_redirect"
+    bundle! :install, :artifice => "compact_index_host_redirect"
     should_be_installed "rack 1.0.0"
   end
 
@@ -167,7 +167,7 @@ describe "compact index api" do
       H
     end
 
-    bundle :install, :artifice => "compact_index_host_redirect", :requires => [lib_path("disable_net_http_persistent.rb")]
+    bundle! :install, :artifice => "compact_index_host_redirect", :requires => [lib_path("disable_net_http_persistent.rb")]
     expect(out).to_not match(/Too many redirects/)
     should_be_installed "rack 1.0.0"
   end
@@ -220,7 +220,7 @@ describe "compact index api" do
       gem "back_deps"
     G
 
-    bundle :install, :artifice => "compact_index_extra"
+    bundle! :install, :artifice => "compact_index_extra"
     should_be_installed "back_deps 1.0"
   end
 
@@ -229,7 +229,7 @@ describe "compact index api" do
       source "#{source_uri}"
       gem "rack", "1.0.0"
     G
-    bundle :install, :artifice => "compact_index_extra_api"
+    bundle! :install, :artifice => "compact_index_extra_api"
     should_be_installed "rack 1.0.0"
 
     build_repo4 do
@@ -243,7 +243,7 @@ describe "compact index api" do
       source "#{source_uri}/extra"
       gem "rack", "1.2"
     G
-    bundle :install, :artifice => "compact_index_extra_api"
+    bundle! :install, :artifice => "compact_index_extra_api"
     should_be_installed "rack 1.2"
   end
 
@@ -265,7 +265,7 @@ describe "compact index api" do
       gem 'somegem', '1.0.0'
     G
 
-    bundle :install, :artifice => "compact_index_extra_api"
+    bundle! :install, :artifice => "compact_index_extra_api"
 
     should_be_installed "somegem 1.0.0"
     should_be_installed "activesupport 1.2.3"
@@ -285,7 +285,7 @@ describe "compact index api" do
       gem "back_deps"
     G
 
-    bundle :install, :artifice => "compact_index_extra"
+    bundle! :install, :artifice => "compact_index_extra"
 
     expect(out).to include("Fetching gem metadata from http://localgemserver.test/")
     expect(out).to include("Fetching source index from http://localgemserver.test/extra")
@@ -311,7 +311,7 @@ describe "compact index api" do
       gem "back_deps"
     G
 
-    bundle :install, :artifice => "compact_index_extra_missing"
+    bundle! :install, :artifice => "compact_index_extra_missing"
     should_be_installed "back_deps 1.0"
   end
 
@@ -322,7 +322,7 @@ describe "compact index api" do
       gem 'foo'
     G
 
-    bundle :install, :artifice => "compact_index_api_missing"
+    bundle! :install, :artifice => "compact_index_api_missing"
     should_be_installed "foo 1.0"
   end
 
@@ -340,7 +340,7 @@ describe "compact index api" do
       gem "back_deps"
     G
 
-    bundle :install, :artifice => "compact_index_extra"
+    bundle! :install, :artifice => "compact_index_extra"
 
     bundle "install --deployment", :artifice => "compact_index_extra"
     should_be_installed "back_deps 1.0"
@@ -353,7 +353,7 @@ describe "compact index api" do
       gem "bundler_dep"
     G
 
-    bundle :install, :artifice => "compact_index"
+    bundle! :install, :artifice => "compact_index"
     expect(out).to include("Fetching gem metadata from #{source_uri}")
   end
 
@@ -365,7 +365,7 @@ describe "compact index api" do
       source "#{source_uri}"
       gem "rails"
     G
-    bundle :install, :artifice => "compact_index"
+    bundle! :install, :artifice => "compact_index"
     should_be_installed "rails 2.3.2"
   end
 
@@ -409,7 +409,7 @@ describe "compact index api" do
       gem 'rack-obama'
     G
 
-    bundle :install, :artifice => "compact_index"
+    bundle! :install, :artifice => "compact_index"
     expect(out).to include("Post-install message from rack:")
   end
 
@@ -419,7 +419,7 @@ describe "compact index api" do
       gem 'rack_middleware'
     G
 
-    bundle :install, :artifice => "compact_index"
+    bundle! :install, :artifice => "compact_index"
     expect(out).to include("Post-install message from rack:")
     expect(out).to include("Rack's post install message")
   end
@@ -441,7 +441,7 @@ describe "compact index api" do
         gem "rack"
       G
 
-      bundle :install, :artifice => "compact_index_basic_authentication"
+      bundle! :install, :artifice => "compact_index_basic_authentication"
       expect(out).not_to include("#{user}:#{password}")
       should_be_installed "rack 1.0.0"
     end
@@ -452,7 +452,7 @@ describe "compact index api" do
         gem "rack"
       G
 
-      bundle :install, :artifice => "endopint_marshal_fail_basic_authentication"
+      bundle! :install, :artifice => "endopint_marshal_fail_basic_authentication"
       expect(out).not_to include("#{user}:#{password}")
       should_be_installed "rack 1.0.0"
     end
@@ -474,7 +474,7 @@ describe "compact index api" do
         gem "rack"
       G
 
-      bundle :install, :artifice => "compact_index_basic_authentication"
+      bundle! :install, :artifice => "compact_index_basic_authentication"
       expect(out).to include("Warning: the gem 'rack' was found in multiple sources.")
       expect(out).not_to include("#{user}:#{password}")
       should_be_installed "rack 1.0.0"
@@ -486,7 +486,7 @@ describe "compact index api" do
         gem "rack"
       G
 
-      bundle :install, :artifice => "compact_index_creds_diff_host"
+      bundle! :install, :artifice => "compact_index_creds_diff_host"
       should_be_installed "rack 1.0.0"
     end
 
@@ -501,7 +501,7 @@ describe "compact index api" do
       it "reads authentication details by host name from bundle config" do
         bundle "config #{source_hostname} #{user}:#{password}"
 
-        bundle :install, :artifice => "compact_index_strict_basic_authentication"
+        bundle! :install, :artifice => "compact_index_strict_basic_authentication"
 
         expect(out).to include("Fetching gem metadata from #{source_uri}")
         should_be_installed "rack 1.0.0"
@@ -511,7 +511,7 @@ describe "compact index api" do
         # The trailing slash is necessary here; Fetcher canonicalizes the URI.
         bundle "config #{source_uri}/ #{user}:#{password}"
 
-        bundle :install, :artifice => "compact_index_strict_basic_authentication"
+        bundle! :install, :artifice => "compact_index_strict_basic_authentication"
 
         expect(out).to include("Fetching gem metadata from #{source_uri}")
         should_be_installed "rack 1.0.0"
@@ -519,7 +519,7 @@ describe "compact index api" do
 
       it "should use the API" do
         bundle "config #{source_hostname} #{user}:#{password}"
-        bundle :install, :artifice => "compact_index_strict_basic_authentication"
+        bundle! :install, :artifice => "compact_index_strict_basic_authentication"
         expect(out).to include("Fetching gem metadata from #{source_uri}")
         should_be_installed "rack 1.0.0"
       end
@@ -532,7 +532,7 @@ describe "compact index api" do
 
         bundle "config #{source_hostname} otheruser:wrong"
 
-        bundle :install, :artifice => "compact_index_strict_basic_authentication"
+        bundle! :install, :artifice => "compact_index_strict_basic_authentication"
         should_be_installed "rack 1.0.0"
       end
 
@@ -558,7 +558,7 @@ describe "compact index api" do
           gem "rack"
         G
 
-        bundle :install, :artifice => "compact_index_basic_authentication"
+        bundle! :install, :artifice => "compact_index_basic_authentication"
         should_be_installed "rack 1.0.0"
       end
     end
@@ -625,9 +625,7 @@ describe "compact index api" do
         gem 'rack'
       G
 
-      bundle "install", :artifice => "compact_index_forbidden"
-
-      expect(exitstatus).to eq(0) if exitstatus
+      bundle! :install, :artifice => "compact_index_forbidden"
     end
   end
 end
