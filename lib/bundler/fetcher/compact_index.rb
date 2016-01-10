@@ -78,7 +78,8 @@ module Bundler
             CompactIndexClient.new(cache_path, compact_fetcher)
           end.tap do |client|
             client.in_parallel = lambda do |inputs, &blk|
-              worker = Bundler::Worker.new(25, blk)
+              func = lambda {|object, _index| blk.call(object) }
+              worker = Bundler::Worker.new(25, func)
               inputs.each {|input| worker.enq(input) }
               inputs.map { worker.deq }
             end
