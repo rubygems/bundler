@@ -17,8 +17,6 @@ module Bundler
 
       @version        = version
       @engine         = engine || "ruby"
-      # keep track of the engine specified by the user
-      @input_engine   = engine
       @engine_version = engine_version || version
       @patchlevel     = patchlevel
     end
@@ -98,9 +96,15 @@ module Bundler
     end
   end
 
-  class RubyVersionRequirement
+  class RubyVersionRequirement < RubyVersion
+    attr_reader :input_engine
+
+    undef_method :host
+
     def initialize(version, patchlevel, engine, engine_version)
-      @ruby_version = RubyVersion.new version, patchlevel, engine, engine_version
+      # keep track of the engine specified by the user
+      @input_engine = engine
+      super(version, patchlevel, engine, engine_version)
     end
 
     # Returns a tuple of these things:
@@ -119,41 +123,6 @@ module Bundler
       elsif patchlevel && (!patchlevel.is_a?(String) || !other.patchlevel.is_a?(String) || !matches?(patchlevel, other.patchlevel))
         [:patchlevel, patchlevel, other.patchlevel]
       end
-    end
-
-    def gem_version
-      @ruby_version.gem_version
-    end
-
-    def ==(other)
-      version == other.version &&
-        engine == other.engine &&
-        engine_version == other.engine_version &&
-        patchlevel == other.patchlevel
-    end
-
-    def input_engine
-      @ruby_version.instance_variable_get(:@input_engine)
-    end
-
-    def engine
-      @ruby_version.engine
-    end
-
-    def patchlevel
-      @ruby_version.patchlevel
-    end
-
-    def engine_version
-      @ruby_version.engine_version
-    end
-
-    def version
-      @ruby_version.version
-    end
-
-    def to_s
-      @ruby_version.to_s
     end
 
   private
