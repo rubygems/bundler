@@ -70,7 +70,7 @@ module Bundler
     end
 
     def engine
-      if defined?(RUBY_ENGINE)
+      if defined?(RUBY_ENGINE) && !RUBY_ENGINE.nil?
         RUBY_ENGINE.dup
       else
         # not defined in ruby 1.8.7
