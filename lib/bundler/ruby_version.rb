@@ -16,6 +16,7 @@ module Bundler
       #   specified must match the version.
 
       @version        = version
+      @input_engine   = engine
       @engine         = engine || "ruby"
       @engine_version = engine_version || version
       @patchlevel     = patchlevel
@@ -46,6 +47,30 @@ module Bundler
 
     def gem_version
       Gem::Version.new(version)
+    end
+
+    # Returns a tuple of these things:
+    #   [diff, this, other]
+    #   The priority of attributes are
+    #   1. engine
+    #   2. ruby_version
+    #   3. engine_version
+    def diff(other)
+      if engine != other.engine && @input_engine
+        [:engine, engine, other.engine]
+      elsif !version || !matches?(version, other.version)
+        [:version, version, other.version]
+      elsif @input_engine && !matches?(engine_version, other.engine_version)
+        [:engine_version, engine_version, other.engine_version]
+      elsif patchlevel && (!patchlevel.is_a?(String) || !other.patchlevel.is_a?(String) || !matches?(patchlevel, other.patchlevel))
+        [:patchlevel, patchlevel, other.patchlevel]
+      end
+    end
+
+  private
+
+    def matches?(requirement, version)
+      Gem::Requirement.create(requirement).satisfied_by?(Gem::Version.new(version))
     end
   end
 
@@ -93,42 +118,6 @@ module Bundler
 
     def patchlevel
       RUBY_PATCHLEVEL.to_s
-    end
-  end
-
-  class RubyVersionRequirement < RubyVersion
-    attr_reader :input_engine
-
-    undef_method :host
-
-    def initialize(version, patchlevel, engine, engine_version)
-      # keep track of the engine specified by the user
-      @input_engine = engine
-      super(version, patchlevel, engine, engine_version)
-    end
-
-    # Returns a tuple of these things:
-    #   [diff, this, other]
-    #   The priority of attributes are
-    #   1. engine
-    #   2. ruby_version
-    #   3. engine_version
-    def diff(other)
-      if engine != other.engine && input_engine
-        [:engine, engine, other.engine]
-      elsif !version || !matches?(version, other.version)
-        [:version, version, other.version]
-      elsif input_engine && !matches?(engine_version, other.engine_version)
-        [:engine_version, engine_version, other.engine_version]
-      elsif patchlevel && (!patchlevel.is_a?(String) || !other.patchlevel.is_a?(String) || !matches?(patchlevel, other.patchlevel))
-        [:patchlevel, patchlevel, other.patchlevel]
-      end
-    end
-
-  private
-
-    def matches?(requirement, version)
-      Gem::Requirement.create(requirement).satisfied_by?(Gem::Version.new(version))
     end
   end
 end

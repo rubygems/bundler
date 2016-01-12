@@ -50,7 +50,6 @@ module Bundler
   autoload :SourceList,             "bundler/source_list"
   autoload :SystemRubyVersion,      "bundler/ruby_version"
   autoload :RubyGemsGemInstaller,   "bundler/rubygems_gem_installer"
-  autoload :RubyVersionRequirement, "bundler/ruby_version"
   autoload :UI,                     "bundler/ui"
 
   class << self

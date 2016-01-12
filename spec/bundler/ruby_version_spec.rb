@@ -2,15 +2,20 @@ require "spec_helper"
 require "bundler/ruby_version"
 
 describe "Bundler::RubyVersion and its subclasses" do
-  let(:version)        { "2.0.0" }
-  let(:patchlevel)     { "645" }
-  let(:engine)         { "jruby" }
-  let(:engine_version) { "2.0.1" }
+  let(:version)              { "2.0.0" }
+  let(:patchlevel)           { "645" }
+  let(:engine)               { "jruby" }
+  let(:engine_version)       { "2.0.1" }
 
   describe Bundler::RubyVersion do
     subject { Bundler::RubyVersion.new(version, patchlevel, engine, engine_version) }
 
-    let(:ruby_version) { subject }
+    let(:ruby_version)         { subject }
+    let(:other_version)        { version }
+    let(:other_patchlevel)     { patchlevel }
+    let(:other_engine)         { engine }
+    let(:other_engine_version) { engine_version }
+    let(:other_ruby_version)   { Bundler::RubyVersion.new(other_version, other_patchlevel, other_engine, other_engine_version) }
 
     describe "#initialize" do
       context "no engine is passed" do
@@ -52,12 +57,6 @@ describe "Bundler::RubyVersion and its subclasses" do
     end
 
     describe "#==" do
-      let(:other_version)        { version }
-      let(:other_patchlevel)     { patchlevel }
-      let(:other_engine)         { engine }
-      let(:other_engine_version) { engine_version }
-      let(:other_ruby_version)   { Bundler::RubyVersion.new(other_version, other_patchlevel, other_engine, other_engine_version) }
-
       shared_examples_for "two ruby versions are not equal" do
         it "should return false" do
           expect(subject).to_not eq(other_ruby_version)
@@ -120,6 +119,126 @@ describe "Bundler::RubyVersion and its subclasses" do
       it "should return a Gem::Version instance with the correct version" do
         expect(ruby_version.gem_version).to eq(gem_version_obj)
         expect(ruby_version.gem_version.version).to eq("2.0.0")
+      end
+    end
+
+    describe "#diff" do
+      let(:engine) { "ruby" }
+
+      shared_examples_for "there is a difference in the engines" do
+        it "should return a tuple with :engine and the two different engines" do
+          expect(ruby_version.diff(other_ruby_version)).to eq([:engine, engine, other_engine])
+        end
+      end
+
+      shared_examples_for "there is a difference in the versions" do
+        it "should return a tuple with :version and the two different versions" do
+          expect(ruby_version.diff(other_ruby_version)).to eq([:version, version, other_version])
+        end
+      end
+
+      shared_examples_for "there is a difference in the engine versions" do
+        it "should return a tuple with :engine_version and the two different engine versions" do
+          expect(ruby_version.diff(other_ruby_version)).to eq([:engine_version, engine_version, other_engine_version])
+        end
+      end
+
+      shared_examples_for "there is a difference in the patchlevels" do
+        it "should return a tuple with :patchlevel and the two different patchlevels" do
+          expect(ruby_version.diff(other_ruby_version)).to eq([:patchlevel, patchlevel, other_patchlevel])
+        end
+      end
+
+      shared_examples_for "there are no differences" do
+        it "should return nil" do
+          expect(ruby_version.diff(other_ruby_version)).to be_nil
+        end
+      end
+
+      context "all things match exactly" do
+        it_behaves_like "there are no differences"
+      end
+
+      context "detects engine discrepancies first" do
+        let(:other_version)        { "2.0.1" }
+        let(:other_patchlevel)     { "643" }
+        let(:other_engine)         { "rbx" }
+        let(:other_engine_version) { "2.0.0" }
+
+        it_behaves_like "there is a difference in the engines"
+      end
+
+      context "detects version discrepancies second" do
+        let(:other_version)        { "2.0.1" }
+        let(:other_patchlevel)     { "643" }
+        let(:other_engine_version) { "2.0.0" }
+
+        it_behaves_like "there is a difference in the versions"
+      end
+
+      context "detects engine version discrepancies third" do
+        let(:other_patchlevel)     { "643" }
+        let(:other_engine_version) { "2.0.0" }
+
+        it_behaves_like "there is a difference in the engine versions"
+      end
+
+      context "detects patchlevel discrepancies last" do
+        let(:other_patchlevel) { "643" }
+
+        it_behaves_like "there is a difference in the patchlevels"
+      end
+
+      context "successfully matches gem requirements" do
+        let(:version)              { ">= 2.0.0" }
+        let(:patchlevel)           { "< 643" }
+        let(:engine)               { "ruby" }
+        let(:engine_version)       { "~> 2.0.1" }
+        let(:other_version)        { "2.0.0" }
+        let(:other_patchlevel)     { "642" }
+        let(:other_engine)         { "ruby" }
+        let(:other_engine_version) { "2.0.5" }
+
+        it_behaves_like "there are no differences"
+      end
+
+      context "successfully detects bad gem requirements with versions" do
+        let(:version)              { "~> 2.0.0" }
+        let(:patchlevel)           { "< 643" }
+        let(:engine)               { "ruby" }
+        let(:engine_version)       { "~> 2.0.1" }
+        let(:other_version)        { "2.1.0" }
+        let(:other_patchlevel)     { "642" }
+        let(:other_engine)         { "ruby" }
+        let(:other_engine_version) { "2.0.5" }
+
+        it_behaves_like "there is a difference in the versions"
+      end
+
+      context "successfully detects bad gem requirements with patchlevels" do
+        let(:version)              { ">= 2.0.0" }
+        let(:patchlevel)           { "< 643" }
+        let(:engine)               { "ruby" }
+        let(:engine_version)       { "~> 2.0.1" }
+        let(:other_version)        { "2.0.0" }
+        let(:other_patchlevel)     { "645" }
+        let(:other_engine)         { "ruby" }
+        let(:other_engine_version) { "2.0.5" }
+
+        it_behaves_like "there is a difference in the patchlevels"
+      end
+
+      context "successfully detects bad gem requirements with engine versions" do
+        let(:version)              { ">= 2.0.0" }
+        let(:patchlevel)           { "< 643" }
+        let(:engine)               { "ruby" }
+        let(:engine_version)       { "~> 2.0.1" }
+        let(:other_version)        { "2.0.0" }
+        let(:other_patchlevel)     { "642" }
+        let(:other_engine)         { "ruby" }
+        let(:other_engine_version) { "2.1.0" }
+
+        it_behaves_like "there is a difference in the engine versions"
       end
     end
   end
@@ -242,148 +361,6 @@ describe "Bundler::RubyVersion and its subclasses" do
     describe "#patchlevel" do
       it "should return a string with the value of RUBY_PATCHLEVEL" do
         expect(subject.patchlevel).to eq(RUBY_PATCHLEVEL.to_s)
-      end
-    end
-  end
-
-  describe Bundler::RubyVersionRequirement do
-    subject { Bundler::RubyVersionRequirement.new(version, patchlevel, engine, engine_version) }
-
-    let(:engine)                         { "ruby" }
-    let(:ruby_version_requirement)       { subject }
-    let(:other_version)                  { version }
-    let(:other_patchlevel)               { patchlevel }
-    let(:other_engine)                   { engine }
-    let(:other_engine_version)           { engine_version }
-    let(:other_ruby_version_requirement) { Bundler::RubyVersionRequirement.new(other_version, other_patchlevel, other_engine, other_engine_version) }
-
-    describe "#diff" do
-      shared_examples_for "there is a difference in the engines" do
-        it "should return a tuple with :engine and the two different engines" do
-          expect(ruby_version_requirement.diff(other_ruby_version_requirement)).to eq([:engine, engine, other_engine])
-        end
-      end
-
-      shared_examples_for "there is a difference in the versions" do
-        it "should return a tuple with :version and the two different versions" do
-          expect(ruby_version_requirement.diff(other_ruby_version_requirement)).to eq([:version, version, other_version])
-        end
-      end
-
-      shared_examples_for "there is a difference in the engine versions" do
-        it "should return a tuple with :engine_version and the two different engine versions" do
-          expect(ruby_version_requirement.diff(other_ruby_version_requirement)).to eq([:engine_version, engine_version, other_engine_version])
-        end
-      end
-
-      shared_examples_for "there is a difference in the patchlevels" do
-        it "should return a tuple with :patchlevel and the two different patchlevels" do
-          expect(ruby_version_requirement.diff(other_ruby_version_requirement)).to eq([:patchlevel, patchlevel, other_patchlevel])
-        end
-      end
-
-      shared_examples_for "there are no differences" do
-        it "should return nil" do
-          expect(ruby_version_requirement.diff(other_ruby_version_requirement)).to be_nil
-        end
-      end
-
-      context "all things match exactly" do
-        it_behaves_like "there are no differences"
-      end
-
-      context "detects engine discrepancies first" do
-        let(:other_version)        { "2.0.1" }
-        let(:other_patchlevel)     { "643" }
-        let(:other_engine)         { "rbx" }
-        let(:other_engine_version) { "2.0.0" }
-
-        it_behaves_like "there is a difference in the engines"
-      end
-
-      context "detects version discrepancies second" do
-        let(:other_version)        { "2.0.1" }
-        let(:other_patchlevel)     { "643" }
-        let(:other_engine_version) { "2.0.0" }
-
-        it_behaves_like "there is a difference in the versions"
-      end
-
-      context "detects engine version discrepancies third" do
-        let(:other_patchlevel)     { "643" }
-        let(:other_engine_version) { "2.0.0" }
-
-        it_behaves_like "there is a difference in the engine versions"
-      end
-
-      context "detects patchlevel discrepancies last" do
-        let(:other_patchlevel) { "643" }
-
-        it_behaves_like "there is a difference in the patchlevels"
-      end
-
-      context "successfully matches gem requirements" do
-        let(:version)              { ">= 2.0.0" }
-        let(:patchlevel)           { "< 643" }
-        let(:engine)               { "ruby" }
-        let(:engine_version)       { "~> 2.0.1" }
-        let(:other_version)        { "2.0.0" }
-        let(:other_patchlevel)     { "642" }
-        let(:other_engine)         { "ruby" }
-        let(:other_engine_version) { "2.0.5" }
-
-        it_behaves_like "there are no differences"
-      end
-
-      context "successfully detects bad gem requirements with versions" do
-        let(:version)              { "~> 2.0.0" }
-        let(:patchlevel)           { "< 643" }
-        let(:engine)               { "ruby" }
-        let(:engine_version)       { "~> 2.0.1" }
-        let(:other_version)        { "2.1.0" }
-        let(:other_patchlevel)     { "642" }
-        let(:other_engine)         { "ruby" }
-        let(:other_engine_version) { "2.0.5" }
-
-        it_behaves_like "there is a difference in the versions"
-      end
-
-      context "successfully detects bad gem requirements with patchlevels" do
-        let(:version)              { ">= 2.0.0" }
-        let(:patchlevel)           { "< 643" }
-        let(:engine)               { "ruby" }
-        let(:engine_version)       { "~> 2.0.1" }
-        let(:other_version)        { "2.0.0" }
-        let(:other_patchlevel)     { "645" }
-        let(:other_engine)         { "ruby" }
-        let(:other_engine_version) { "2.0.5" }
-
-        it_behaves_like "there is a difference in the patchlevels"
-      end
-
-      context "successfully detects bad gem requirements with engine versions" do
-        let(:version)              { ">= 2.0.0" }
-        let(:patchlevel)           { "< 643" }
-        let(:engine)               { "ruby" }
-        let(:engine_version)       { "~> 2.0.1" }
-        let(:other_version)        { "2.0.0" }
-        let(:other_patchlevel)     { "642" }
-        let(:other_engine)         { "ruby" }
-        let(:other_engine_version) { "2.1.0" }
-
-        it_behaves_like "there is a difference in the engine versions"
-      end
-    end
-
-    describe "#initialize" do
-      it "should set the passed engine as the input engine" do
-        expect(subject.input_engine).to eq("ruby")
-      end
-    end
-
-    describe "no #host" do
-      it "should have no host method" do
-        expect { subject.host }.to raise_error(NoMethodError)
       end
     end
   end
