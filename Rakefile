@@ -33,7 +33,7 @@ namespace :spec do
     deps = Hash[BUNDLER_SPEC.development_dependencies.map do |d|
       [d.name, d.requirement.to_s]
     end]
-    deps["rubocop"] ||= "= 0.35.1" if RUBY_VERSION >= "1.9.3" # can't go in the gemspec because of the ruby version requirement
+    deps["rubocop"] ||= "= 0.36.0" if RUBY_VERSION >= "1.9.3" # can't go in the gemspec because of the ruby version requirement
 
     # JRuby can't build ronn or rdiscount, so we skip that
     if defined?(RUBY_ENGINE) && RUBY_ENGINE == "jruby"
@@ -87,7 +87,7 @@ begin
 
   if RUBY_VERSION >= "1.9.3"
     # can't go in the gemspec because of the ruby version requirement
-    gem "rubocop", "= 0.35.1"
+    gem "rubocop", "= 0.36.0"
     require "rubocop/rake_task"
     RuboCop::RakeTask.new
   end
