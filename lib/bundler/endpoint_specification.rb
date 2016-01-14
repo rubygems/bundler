@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Bundler
   # used for Creating Specifications from the Gemcutter Endpoint
   class EndpointSpecification < Gem::Specification

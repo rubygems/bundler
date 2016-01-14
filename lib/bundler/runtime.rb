@@ -52,7 +52,7 @@ module Bundler
       /^Missing API definition file in (.+)$/i,
       /^cannot load such file -- (.+)$/i,
       /^dlopen\([^)]*\): Library not loaded: (.+)$/i,
-    ]
+    ].freeze
 
     def require(*groups)
       groups.map!(&:to_sym)

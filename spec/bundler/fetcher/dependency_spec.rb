@@ -92,7 +92,7 @@ describe Bundler::Fetcher::Dependency do
       it "should return a hash with the remote_uri and the list of specs" do
         expect(subject.specs(gem_names, full_dependency_list, last_spec_list)).to eq([
           ["top", gem_version2, "ruby", faraday],
-          ["boulder", gem_version1, "ruby", resque]
+          ["boulder", gem_version1, "ruby", resque],
         ])
       end
     end
@@ -225,20 +225,20 @@ describe Bundler::Fetcher::Dependency do
       [
         {
           :dependencies => {
-            "resque" => "req3,req4"
+            "resque" => "req3,req4",
           },
           :name => "typhoeus",
           :number => "1.0.1",
-          :platform => "ruby"
+          :platform => "ruby",
         },
         {
           :dependencies => {
-            "faraday" => "req1,req2"
+            "faraday" => "req1,req2",
           },
           :name => "grape",
           :number => "2.0.2",
-          :platform => "jruby"
-        }
+          :platform => "jruby",
+        },
       ]
     end
 

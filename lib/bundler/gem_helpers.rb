@@ -1,6 +1,6 @@
 module Bundler
   module GemHelpers
-    GENERIC_CACHE = {}
+    GENERIC_CACHE = {}.freeze
     GENERICS = [
       [Gem::Platform.new("java"), Gem::Platform.new("java")],
       [Gem::Platform.new("mswin32"), Gem::Platform.new("mswin32")],
@@ -9,7 +9,7 @@ module Bundler
       [Gem::Platform.new("x64-mingw32"), Gem::Platform.new("x64-mingw32")],
       [Gem::Platform.new("x86_64-mingw32"), Gem::Platform.new("x64-mingw32")],
       [Gem::Platform.new("mingw32"), Gem::Platform.new("x86-mingw32")]
-    ]
+    ].freeze
 
     def generic(p)
       return p if p == Gem::Platform::RUBY

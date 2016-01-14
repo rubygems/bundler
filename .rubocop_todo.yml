@@ -183,21 +183,6 @@ Style/ModuleFunction:
 Style/MultilineMethodCallIndentation:
   Enabled: false
 
-# Offense count: 24
-# Cop supports --auto-correct.
-Style/MutableConstant:
-  Exclude:
-    - 'lib/bundler/cli.rb'
-    - 'lib/bundler/cli/gem.rb'
-    - 'lib/bundler/fetcher.rb'
-    - 'lib/bundler/gem_helpers.rb'
-    - 'lib/bundler/lockfile_parser.rb'
-    - 'lib/bundler/runtime.rb'
-    - 'lib/bundler/settings.rb'
-    - 'lib/bundler/source/path.rb'
-    - 'lib/bundler/ui/shell.rb'
-    - 'lib/bundler/version.rb'
-
 # Offense count: 8
 Style/NestedParenthesizedCalls:
   Exclude:

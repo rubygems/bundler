@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Bundler
   class Source
     class Path < Source
@@ -7,7 +8,7 @@ module Bundler
       attr_writer :name
       attr_accessor :version
 
-      DEFAULT_GLOB = "{,*,*/*}.gemspec"
+      DEFAULT_GLOB = "{,*,*/*}.gemspec".freeze
 
       def initialize(options)
         @options = options

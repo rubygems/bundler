@@ -5,7 +5,7 @@ module Bundler
     TEST_FRAMEWORK_VERSIONS = {
       "rspec" => "3.0",
       "minitest" => "5.0"
-    }
+    }.freeze
 
     attr_reader :options, :gem_name, :thor, :name, :target
 

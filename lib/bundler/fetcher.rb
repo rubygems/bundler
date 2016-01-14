@@ -53,13 +53,13 @@ module Bundler
 
     # Exceptions classes that should bypass retry attempts. If your password didn't work the
     # first time, it's not going to the third time.
-    FAIL_ERRORS = [AuthenticationRequiredError, BadAuthenticationError, FallbackError]
+    FAIL_ERRORS = [AuthenticationRequiredError, BadAuthenticationError, FallbackError].freeze
     NET_ERRORS = [:HTTPBadGateway, :HTTPBadRequest, :HTTPFailedDependency,
                   :HTTPForbidden, :HTTPInsufficientStorage, :HTTPMethodNotAllowed,
                   :HTTPMovedPermanently, :HTTPNoContent, :HTTPNotFound,
                   :HTTPNotImplemented, :HTTPPreconditionFailed, :HTTPRequestEntityTooLarge,
                   :HTTPRequestURITooLong, :HTTPUnauthorized, :HTTPUnprocessableEntity,
-                  :HTTPUnsupportedMediaType, :HTTPVersionNotSupported]
+                  :HTTPUnsupportedMediaType, :HTTPVersionNotSupported].freeze
     FAIL_ERRORS << Gem::Requirement::BadRequirementError if defined?(Gem::Requirement::BadRequirementError)
     FAIL_ERRORS.push(*NET_ERRORS.map {|e| SharedHelpers.const_get_safely(e, Net) }.compact)
 
@@ -150,10 +150,10 @@ module Bundler
 
       fetchers.shift until fetchers.first.available?
 
-      if remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
-        @use_api = false
+      @use_api = if remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
+        false
       else
-        @use_api = fetchers.first.api_fetcher?
+        fetchers.first.api_fetcher?
       end
     end
 
@@ -207,7 +207,7 @@ module Bundler
 
   private
 
-    FETCHERS = [CompactIndex, Dependency, Index]
+    FETCHERS = [CompactIndex, Dependency, Index].freeze
 
     def cis
       env_cis = {
@@ -267,7 +267,7 @@ module Bundler
       Errno::EINVAL, Errno::ECONNRESET, Errno::ETIMEDOUT, Errno::EAGAIN,
       Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError,
       Net::HTTP::Persistent::Error, Zlib::BufError
-    ]
+    ].freeze
 
     def bundler_cert_store
       store = OpenSSL::X509::Store.new
