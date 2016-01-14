@@ -93,12 +93,6 @@ Performance/RedundantMerge:
     - 'spec/support/helpers.rb'
 
 # Offense count: 1
-# Cop supports --auto-correct.
-Performance/StartWith:
-  Exclude:
-    - 'lib/bundler/cli/config.rb'
-
-# Offense count: 1
 Performance/TimesMap:
   Exclude:
     - 'lib/bundler/worker.rb'

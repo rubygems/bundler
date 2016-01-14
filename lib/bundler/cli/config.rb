@@ -9,7 +9,7 @@ module Bundler
       @thor = thor
       @name = peek = args.shift
       @scope = "global"
-      return unless peek && peek =~ /^\-\-/
+      return unless peek && peek.start_with?("--")
       @name = args.shift
       @scope = $'
     end
@@ -58,7 +58,7 @@ module Bundler
 
     def new_value
       pathname = Pathname.new(args.join(" "))
-      if name.match(/\Alocal\./) && pathname.directory?
+      if name.start_with?("local.") && pathname.directory?
         pathname.expand_path.to_s
       else
         args.join(" ")
