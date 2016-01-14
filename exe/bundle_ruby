@@ -38,7 +38,7 @@ module Bundler
     def gem(name, *args)
     end
 
-    def group(*args, &blk)
+    def group(*args)
     end
   end
 end
