@@ -97,13 +97,6 @@ Style/AccessorMethodName:
   Exclude:
     - 'lib/bundler/source/git.rb'
 
-# Offense count: 23
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-# SupportedStyles: prefer_alias, prefer_alias_method
-Style/Alias:
-  Enabled: false
-
 # Offense count: 3
 Style/CaseEquality:
   Exclude:

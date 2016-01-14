@@ -25,6 +25,9 @@ Lint/UnusedMethodArgument:
 Style/AccessModifierIndentation:
   EnforcedStyle: outdent
 
+Style/Alias:
+  EnforcedStyle: prefer_alias_method
+
 Style/AlignParameters:
   EnforcedStyle: with_fixed_indentation
 
