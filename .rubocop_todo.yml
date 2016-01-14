@@ -93,11 +93,6 @@ Performance/RedundantMerge:
     - 'spec/support/helpers.rb'
 
 # Offense count: 1
-Performance/TimesMap:
-  Exclude:
-    - 'lib/bundler/worker.rb'
-
-# Offense count: 1
 Style/AccessorMethodName:
   Exclude:
     - 'lib/bundler/source/git.rb'

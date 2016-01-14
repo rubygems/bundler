@@ -24,7 +24,7 @@ module Bundler
       @request_queue = Queue.new
       @response_queue = Queue.new
       @func = func
-      @threads = size.times.map do |i|
+      @threads = Array.new(size) do |i|
         Thread.start { process_queue(i) }.tap do |thread|
           thread.name = "#{name} Worker ##{i}" if thread.respond_to?(:name=)
         end
