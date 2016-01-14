@@ -13,11 +13,8 @@ module Bundler
         when /401/
           raise AuthenticationRequiredError, remote_uri
         when /403/
-          if remote_uri.userinfo
-            raise BadAuthenticationError, remote_uri
-          else
-            raise AuthenticationRequiredError, remote_uri
-          end
+          raise BadAuthenticationError, remote_uri if remote_uri.userinfo
+          raise AuthenticationRequiredError, remote_uri
         else
           Bundler.ui.trace e
           raise HTTPError, "Could not fetch specs from #{display_uri}"

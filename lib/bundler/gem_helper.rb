@@ -91,18 +91,17 @@ module Bundler
   protected
 
     def rubygem_push(path)
-      if Pathname.new("~/.gem/credentials").expand_path.exist?
-        allowed_push_host = nil
-        gem_command = "gem push '#{path}'"
-        if @gemspec.respond_to?(:metadata)
-          allowed_push_host = @gemspec.metadata["allowed_push_host"]
-          gem_command << " --host #{allowed_push_host}" if allowed_push_host
-        end
-        sh(gem_command)
-        Bundler.ui.confirm "Pushed #{name} #{version} to #{allowed_push_host ? allowed_push_host : "rubygems.org."}"
-      else
+      unless  Pathname.new("~/.gem/credentials").expand_path.file?
         raise "Your rubygems.org credentials aren't set. Run `gem push` to set them."
       end
+      allowed_push_host = nil
+      gem_command = "gem push '#{path}'"
+      if @gemspec.respond_to?(:metadata)
+        allowed_push_host = @gemspec.metadata["allowed_push_host"]
+        gem_command << " --host #{allowed_push_host}" if allowed_push_host
+      end
+      sh(gem_command)
+      Bundler.ui.confirm "Pushed #{name} #{version} to #{allowed_push_host ? allowed_push_host : "rubygems.org."}"
     end
 
     def built_gem_path
@@ -122,10 +121,9 @@ module Bundler
     end
 
     def already_tagged?
-      if sh("git tag").split(/\n/).include?(version_tag)
-        Bundler.ui.confirm "Tag #{version_tag} has already been created."
-        true
-      end
+      return false unless sh("git tag").split(/\n/).include?(version_tag)
+      Bundler.ui.confirm "Tag #{version_tag} has already been created."
+      true
     end
 
     def guard_clean
@@ -164,11 +162,10 @@ module Bundler
 
     def sh(cmd, &block)
       out, code = sh_with_code(cmd, &block)
-      if code == 0
-        out
-      else
+      unless code.zero?
         raise(out.empty? ? "Running `#{cmd}` failed. Run this command directly for more detailed output." : out)
       end
+      out
     end
 
     def sh_with_code(cmd, &block)

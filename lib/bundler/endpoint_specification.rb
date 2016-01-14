@@ -83,10 +83,9 @@ module Bundler
     end
 
     def _local_specification
-      if @loaded_from && File.exist?(local_specification_path)
-        eval(File.read(local_specification_path)).tap do |spec|
-          spec.loaded_from = @loaded_from
-        end
+      return unless @loaded_from && File.exist?(local_specification_path)
+      eval(File.read(local_specification_path)).tap do |spec|
+        spec.loaded_from = @loaded_from
       end
     end
 

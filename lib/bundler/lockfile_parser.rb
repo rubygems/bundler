@@ -192,9 +192,8 @@ module Bundler
 
     def parse_bundled_with(line)
       line = line.strip
-      if Gem::Version.correct?(line)
-        @bundler_version = Gem::Version.create(line)
-      end
+      return unless Gem::Version.correct?(line)
+      @bundler_version = Gem::Version.create(line)
     end
 
     def parse_ruby(line)

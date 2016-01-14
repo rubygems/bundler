@@ -63,10 +63,9 @@ module Bundler
   private
 
     def without_groups_messages
-      if Bundler.settings.without.any?
-        require "bundler/cli/common"
-        Bundler.ui.confirm Bundler::CLI::Common.without_groups_message
-      end
+      return unless Bundler.settings.without.any?
+      require "bundler/cli/common"
+      Bundler.ui.confirm Bundler::CLI::Common.without_groups_message
     end
   end
 end

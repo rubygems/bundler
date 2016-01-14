@@ -127,11 +127,10 @@ module Bundler
 
       specs.each do |name, version, platform, dependencies|
         next if name == "bundler"
-        spec = nil
-        if dependencies
-          spec = EndpointSpecification.new(name, version, platform, dependencies)
+        spec = if dependencies
+          EndpointSpecification.new(name, version, platform, dependencies)
         else
-          spec = RemoteSpecification.new(name, version, platform, self)
+          RemoteSpecification.new(name, version, platform, self)
         end
         spec.source = source
         spec.remote = @remote
@@ -198,9 +197,8 @@ module Bundler
     end
 
     def http_proxy
-      if uri = connection.proxy_uri
-        uri.to_s
-      end
+      return unless uri = connection.proxy_uri
+      uri.to_s
     end
 
     def inspect

@@ -175,17 +175,6 @@ Style/GlobalVars:
     - 'spec/spec_helper.rb'
     - 'spec/support/helpers.rb'
 
-# Offense count: 7
-# Configuration parameters: MinBodyLength.
-Style/GuardClause:
-  Exclude:
-    - 'lib/bundler/cli/config.rb'
-    - 'lib/bundler/cli/viz.rb'
-    - 'lib/bundler/dsl.rb'
-    - 'lib/bundler/fetcher.rb'
-    - 'lib/bundler/fetcher/index.rb'
-    - 'lib/bundler/graph.rb'
-
 # Offense count: 2
 Style/IfInsideElse:
   Exclude:

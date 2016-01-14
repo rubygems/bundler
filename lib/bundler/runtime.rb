@@ -273,11 +273,10 @@ module Bundler
         man_subdir unless Dir[man_subdir + "/man?/"].empty?
       end.compact
 
-      unless manuals.empty?
-        ENV["MANPATH"] = manuals.concat(
-          ENV["MANPATH"].to_s.split(File::PATH_SEPARATOR)
-        ).uniq.join(File::PATH_SEPARATOR)
-      end
+      return if manuals.empty?
+      ENV["MANPATH"] = manuals.concat(
+        ENV["MANPATH"].to_s.split(File::PATH_SEPARATOR)
+      ).uniq.join(File::PATH_SEPARATOR)
     end
 
     def remove_dir(dir, dry_run)

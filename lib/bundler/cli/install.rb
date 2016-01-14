@@ -165,10 +165,9 @@ module Bundler
     end
 
     def confirm_without_groups
-      if Bundler.settings.without.any?
-        require "bundler/cli/common"
-        Bundler.ui.confirm Bundler::CLI::Common.without_groups_message
-      end
+      return unless Bundler.settings.without.any?
+      require "bundler/cli/common"
+      Bundler.ui.confirm Bundler::CLI::Common.without_groups_message
     end
 
     def dependencies_count_for(definition)

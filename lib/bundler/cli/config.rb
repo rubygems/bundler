@@ -9,10 +9,9 @@ module Bundler
       @thor = thor
       @name = peek = args.shift
       @scope = "global"
-      if peek && peek =~ /^\-\-/
-        @name = args.shift
-        @scope = $'
-      end
+      return unless peek && peek =~ /^\-\-/
+      @name = args.shift
+      @scope = $'
     end
 
     def run

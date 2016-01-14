@@ -190,9 +190,8 @@ module Bundler
         end
       end
 
-      unless local
-        options["local"] ? @definition.resolve_with_cache! : @definition.resolve_remotely!
-      end
+      return if local
+      options["local"] ? @definition.resolve_with_cache! : @definition.resolve_remotely!
     end
   end
 end

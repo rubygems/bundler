@@ -93,9 +93,8 @@ module Bundler
         if current.requirement != dep.requirement
           if current.type == :development
             @dependencies.delete current
-          elsif dep.type == :development
-            return
           else
+            return if dep.type == :development
             raise GemfileError, "You cannot specify the same gem twice with different version requirements.\n" \
                             "You specified: #{current.name} (#{current.requirement}) and #{dep.name} (#{dep.requirement})"
           end
@@ -109,9 +108,8 @@ module Bundler
         if current.source != dep.source
           if current.type == :development
             @dependencies.delete current
-          elsif dep.type == :development
-            return
           else
+            return if dep.type == :development
             raise GemfileError, "You cannot specify the same gem twice coming from different sources.\n" \
                             "You specified that #{dep.name} (#{dep.requirement}) should come from " \
                             "#{current.source || "an unspecified source"} and #{dep.source}\n"

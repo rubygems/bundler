@@ -216,11 +216,10 @@ module Bundler
     # @param [Integer] depth the current depth of the resolution process.
     # @return [void]
     def debug(depth = 0)
-      if debug?
-        debug_info = yield
-        debug_info = debug_info.inspect unless debug_info.is_a?(String)
-        STDERR.puts debug_info.split("\n").map {|s| "  " * depth + s }
-      end
+      return unless debug?
+      debug_info = yield
+      debug_info = debug_info.inspect unless debug_info.is_a?(String)
+      STDERR.puts debug_info.split("\n").map {|s| "  " * depth + s }
     end
 
     def debug?
@@ -343,11 +342,11 @@ module Bundler
           name = requirement.name
           versions = @source_requirements[name][name].map(&:version)
           message  = "Could not find gem '#{requirement}' in #{requirement.source}.\n"
-          if versions.any?
-            message << "Source contains '#{name}' at: #{versions.join(", ")}"
-          else
-            message << "Source does not contain any versions of '#{requirement}'"
-          end
+          message << if versions.any?
+                       "Source contains '#{name}' at: #{versions.join(", ")}"
+                     else
+                       "Source does not contain any versions of '#{requirement}'"
+                     end
         else
           message = "Could not find gem '#{requirement}' in any of the gem sources " \
             "listed in your Gemfile or available on this machine."

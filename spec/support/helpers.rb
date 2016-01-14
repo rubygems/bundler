@@ -284,14 +284,13 @@ module Spec
       ENV["GEM_PATH"] = system_gem_path.to_s
 
       install_gems(*gems)
-      if block_given?
-        begin
-          yield
-        ensure
-          ENV["GEM_HOME"] = gem_home
-          ENV["GEM_PATH"] = gem_path
-          ENV["PATH"] = path
-        end
+      return unless block_given?
+      begin
+        yield
+      ensure
+        ENV["GEM_HOME"] = gem_home
+        ENV["GEM_PATH"] = gem_path
+        ENV["PATH"] = path
       end
     end
 
@@ -312,14 +311,13 @@ module Spec
       gems.each do |gem|
         gem_command :install, "--no-rdoc --no-ri #{gem}"
       end
-      if block_given?
-        begin
-          yield
-        ensure
-          ENV["GEM_HOME"] = gem_home
-          ENV["GEM_PATH"] = gem_path
-          ENV["PATH"] = path
-        end
+      return unless block_given?
+      begin
+        yield
+      ensure
+        ENV["GEM_HOME"] = gem_home
+        ENV["GEM_PATH"] = gem_path
+        ENV["PATH"] = path
       end
     end
 

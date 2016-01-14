@@ -15,12 +15,9 @@ module Bundler
       Bundler.ui.warn "Make sure you have the graphviz ruby gem. You can install it with:"
       Bundler.ui.warn "`gem install ruby-graphviz`"
     rescue StandardError => e
-      if e.message =~ /GraphViz not installed or dot not in PATH/
-        Bundler.ui.error e.message
-        Bundler.ui.warn "Please install GraphViz. On a Mac with homebrew, you can run `brew install graphviz`."
-      else
-        raise
-      end
+      raise unless e.message =~ /GraphViz not installed or dot not in PATH/
+      Bundler.ui.error e.message
+      Bundler.ui.warn "Please install GraphViz. On a Mac with homebrew, you can run `brew install graphviz`."
     end
   end
 end

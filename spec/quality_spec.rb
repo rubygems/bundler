@@ -13,9 +13,8 @@ describe "The library itself" do
       failing_lines << number + 1 if line =~ /^ *(describe|it|context) {1}'{1}/
     end
 
-    unless failing_lines.empty?
-      "#{filename} uses inconsistent single quotes on lines #{failing_lines.join(", ")}"
-    end
+    return if failing_lines.empty?
+    "#{filename} uses inconsistent single quotes on lines #{failing_lines.join(", ")}"
   end
 
   def check_for_tab_characters(filename)
@@ -24,9 +23,8 @@ describe "The library itself" do
       failing_lines << number + 1 if line =~ /\t/
     end
 
-    unless failing_lines.empty?
-      "#{filename} has tab characters on lines #{failing_lines.join(", ")}"
-    end
+    return if failing_lines.empty?
+    "#{filename} has tab characters on lines #{failing_lines.join(", ")}"
   end
 
   def check_for_extra_spaces(filename)
@@ -37,9 +35,8 @@ describe "The library itself" do
       failing_lines << number + 1 if line =~ /\s+\n$/
     end
 
-    unless failing_lines.empty?
-      "#{filename} has spaces on the EOL on lines #{failing_lines.join(", ")}"
-    end
+    return if failing_lines.empty?
+    "#{filename} has spaces on the EOL on lines #{failing_lines.join(", ")}"
   end
 
   RSpec::Matchers.define :be_well_formed do

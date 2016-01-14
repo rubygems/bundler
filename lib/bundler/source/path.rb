@@ -156,10 +156,14 @@ module Bundler
               end
             end
           end
-        elsif File.exist?(expanded_path)
-          raise PathError, "The path `#{expanded_path}` is not a directory."
         else
-          raise PathError, "The path `#{expanded_path}` does not exist."
+          message = "The path `#{expanded_path}` "
+          message << if File.exist?(expanded_path)
+                       "is not a directory."
+                     else
+                       "does not exist."
+                     end
+          raise PathError, message
         end
 
         index

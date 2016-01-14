@@ -46,11 +46,8 @@ module Bundler
         end
         connection.request(uri, req)
       rescue NoMethodError => e
-        if ["undefined method", "use_ssl="].all? {|snippet| e.message.include? snippet }
-          raise LoadError.new("cannot load such file -- openssl")
-        else
-          raise e
-        end
+        raise unless ["undefined method", "use_ssl="].all? {|snippet| e.message.include? snippet }
+        raise LoadError.new("cannot load such file -- openssl")
       rescue OpenSSL::SSL::SSLError
         raise CertificateFailureError.new(uri)
       rescue *HTTP_ERRORS => e
