@@ -996,4 +996,29 @@ describe "bundle install with git sources" do
       expect(exitstatus).to be_zero if exitstatus
     end
   end
+
+  describe "when the git source is overriden with a local git repo" do
+    before do
+      bundle "config --global local.foo #{lib_path("foo")}"
+    end
+
+    describe "and git output is colorized" do
+      before do
+        File.open("#{ENV["HOME"]}/.gitconfig", "w") do |f|
+          f.write("[color]\n\tui = always\n")
+        end
+      end
+
+      it "installs successfully" do
+        build_git "foo", "1.0", :path => lib_path("foo")
+
+        gemfile <<-G
+          gem "foo", :git => "#{lib_path("foo")}", :branch => "master"
+        G
+
+        bundle :install
+        should_be_installed "foo 1.0"
+      end
+    end
+  end
 end

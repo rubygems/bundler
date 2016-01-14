@@ -64,7 +64,7 @@ module Bundler
 
         def branch
           @branch ||= allowed_in_path do
-            git("branch") =~ /^\* (.*)$/ && $1.strip
+            git("rev-parse --abbrev-ref HEAD").strip
           end
         end
 
