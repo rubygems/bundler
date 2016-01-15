@@ -151,7 +151,7 @@ module Bundler
 
     def user_agent
       @user_agent ||= begin
-        ruby = Bundler.ruby_version
+        ruby = Bundler::RubyVersion.system
 
         agent = "bundler/#{Bundler::VERSION}"
         agent << " rubygems/#{Gem::VERSION}"

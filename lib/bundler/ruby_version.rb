@@ -67,6 +67,26 @@ module Bundler
       end
     end
 
+    def self.system
+      ruby_engine = if defined?(RUBY_ENGINE) && !RUBY_ENGINE.nil?
+        RUBY_ENGINE.dup
+      else
+        # not defined in ruby 1.8.7
+        "ruby"
+      end
+      ruby_engine_version = case ruby_engine
+                            when "ruby"
+                              RUBY_VERSION.dup
+                            when "rbx"
+                              Rubinius::VERSION.dup
+                            when "jruby"
+                              JRUBY_VERSION.dup
+                            else
+                              raise BundlerError, "RUBY_ENGINE value #{RUBY_ENGINE} is not recognized"
+      end
+      @ruby_version ||= RubyVersion.new(RUBY_VERSION.dup, RUBY_PATCHLEVEL.to_s, ruby_engine, ruby_engine_version)
+    end
+
   private
 
     def matches?(requirement, version)
