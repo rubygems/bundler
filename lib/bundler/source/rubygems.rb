@@ -60,7 +60,7 @@ module Bundler
       end
 
       def to_lock
-        out = "GEM\n"
+        out = String.new("GEM\n")
         remotes.reverse_each do |remote|
           out << "  remote: #{suppress_configured_credentials remote}\n"
         end

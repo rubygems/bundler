@@ -21,7 +21,7 @@ module Bundler
           end
           o << %(  In Gemfile:\n)
           o << conflict.requirement_trees.sort_by {|t| t.reverse.map(&:name) }.map do |tree|
-            t = ""
+            t = String.new
             depth = 2
             tree.each do |req|
               t << "  " * depth << req.to_s

@@ -173,7 +173,7 @@ module Bundler
 
     def sh_with_code(cmd, &block)
       cmd << " 2>&1"
-      outbuf = ""
+      outbuf = String.new
       Bundler.ui.debug(cmd)
       SharedHelpers.chdir(base) do
         outbuf = `#{cmd}`

@@ -91,6 +91,11 @@ matrix:
     # Ruby-head (we want to know how we're doing, but not fail the build)
     - rvm: ruby-head
       env: RGV=master
+    # Ruby-head with enabled frozen string literal
+    - rvm: ruby-head
+      env:
+        - RGV=master
+        - RUBYOPT="--enable-frozen-string-literal --debug=frozen-string-literal"
   allow_failures:
     - rvm: 1.8.7
       env: RGV=v2.1.11
