@@ -99,7 +99,7 @@ describe "Resolving" do
       deps << Bundler::DepProxy.new(d, "ruby")
     end
 
-    got = Bundler::Resolver.resolve(deps, @index, {}, [], Bundler::RubyVersionRequirement.new("1.8.7", nil, nil, nil))
+    got = Bundler::Resolver.resolve(deps, @index, {}, [], Bundler::RubyVersion.new("1.8.7", nil, nil, nil))
     got = got.map(&:full_name).sort
     expect(got).to eq(%w(foo-1.0.0 bar-1.0.0).sort)
   end

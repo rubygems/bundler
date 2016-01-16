@@ -48,9 +48,7 @@ module Bundler
   autoload :StubSpecification,      "bundler/stub_specification"
   autoload :Source,                 "bundler/source"
   autoload :SourceList,             "bundler/source_list"
-  autoload :SystemRubyVersion,      "bundler/ruby_version"
   autoload :RubyGemsGemInstaller,   "bundler/rubygems_gem_installer"
-  autoload :RubyVersionRequirement, "bundler/ruby_version"
   autoload :UI,                     "bundler/ui"
 
   class << self
@@ -362,10 +360,6 @@ module Bundler
     def git_present?
       return @git_present if defined?(@git_present)
       @git_present = Bundler.which("git") || Bundler.which("git.exe")
-    end
-
-    def ruby_version
-      @ruby_version ||= SystemRubyVersion.new
     end
 
     def reset!

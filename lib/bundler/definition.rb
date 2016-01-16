@@ -40,7 +40,7 @@ module Bundler
     # @param sources [Bundler::SourceList]
     # @param unlock [Hash, Boolean, nil] Gems that have been requested
     #   to be updated or true if all gems should be updated
-    # @param ruby_version [Bundler::RubyVersionRequirement, nil] Requested Ruby Version
+    # @param ruby_version [Bundler::RubyVersion, nil] Requested Ruby Version
     # @param optional_groups [Array(String)] A list of optional groups
     def initialize(lockfile, dependencies, sources, unlock, ruby_version = nil, optional_groups = [])
       @unlocking = unlock == true || !unlock.empty?
@@ -280,15 +280,15 @@ module Bundler
     def locked_ruby_version
       if @unlock[:ruby]
         if ruby_version && !@locked_ruby_version
-          return Bundler.ruby_version
+          return Bundler::RubyVersion.system
         elsif ruby_version && @locked_ruby_version
-          return Bundler.ruby_version
+          return Bundler::RubyVersion.system
         elsif !ruby_version && @locked_ruby_version
           return nil
         end
       else
         if ruby_version && !@locked_ruby_version
-          return Bundler.ruby_version
+          return Bundler::RubyVersion.system
         elsif ruby_version && @locked_ruby_version
           return @locked_ruby_version
         elsif !ruby_version && @locked_ruby_version
@@ -404,7 +404,7 @@ module Bundler
     def validate_ruby!
       return unless ruby_version
 
-      if diff = ruby_version.diff(Bundler.ruby_version)
+      if diff = ruby_version.diff(Bundler::RubyVersion.system)
         problem, expected, actual = diff
 
         msg = case problem
@@ -413,7 +413,7 @@ module Bundler
               when :version
                 "Your Ruby version is #{actual}, but your Gemfile specified #{expected}"
               when :engine_version
-                "Your #{Bundler.ruby_version.engine} version is #{actual}, but your Gemfile specified #{ruby_version.engine} #{expected}"
+                "Your #{Bundler::RubyVersion.system.engine} version is #{actual}, but your Gemfile specified #{ruby_version.engine} #{expected}"
               when :patchlevel
                 if !expected.is_a?(String)
                   "The Ruby patchlevel in your Gemfile must be a string"

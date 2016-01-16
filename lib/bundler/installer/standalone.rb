@@ -33,7 +33,7 @@ module Bundler
     end
 
     def version_dir
-      "#{Bundler.ruby_version.engine}/#{RbConfig::CONFIG["ruby_version"]}"
+      "#{Bundler::RubyVersion.system.engine}/#{RbConfig::CONFIG["ruby_version"]}"
     end
 
     def bundler_path
