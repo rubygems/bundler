@@ -20,6 +20,11 @@ notifications:
     rooms:
       - secure: JxBi7DDJGkIF/7f/FSN/HUHpvV4EKfQccZHTPd1b2pNJn3GXo6u+tNVbAw2WjxYzPyPQI3ZcYBCU9SEXp/i7VmG8uMzh8Kyildw+miSKYKVb90uYqcsXWzbxwyNBgJLvyDkzST45H5lgnyAicee3WkFes/WDZikIajbH7ztdb04=
 
+addons:
+  code_climate:
+    repo_token:
+      secure: "TrzIv116JLGUxm6PAUskCYrv8KTDguncKROVwbnjVPKTGDAgoDderd8JUdDEXrKoZ9qGLD2TPYKExt9/QDl71E+qHdWnVqWv4HKCUk2P9z/VLKzHuggOUBkCXiJUhjywUieCJhI3N92bfq2EjSBbu2/OFHqWOjLQ+QCooTEBjv8="
+
 rvm:
   - 2.2
   - 2.1
@@ -94,8 +99,7 @@ matrix:
     # Ruby-head with enabled frozen string literal
     - rvm: ruby-head
       env:
-        - RGV=master
-        - RUBYOPT="--enable-frozen-string-literal --debug=frozen-string-literal"
+        - RGV=master RUBYOPT="--enable-frozen-string-literal --debug=frozen-string-literal"
   allow_failures:
     - rvm: 1.8.7
       env: RGV=v2.1.11

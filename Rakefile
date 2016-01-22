@@ -71,7 +71,12 @@ namespace :spec do
         # https://github.com/rubygems/rubygems/issues/813
         sh "gem update --system 2.2.0"
       end
-      # Install the other gem deps, etc.
+
+      $LOAD_PATH.unshift("./spec")
+      require "support/rubygems_ext"
+      Spec::Rubygems::DEPS["codeclimate-test-reporter"] = nil if RUBY_VERSION >= "2.2.0"
+
+      # Install the other gem deps, etc
       Rake::Task["spec:deps"].invoke
     end
   end
