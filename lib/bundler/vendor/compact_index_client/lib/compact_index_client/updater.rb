@@ -23,10 +23,9 @@ class Bundler::CompactIndexClient
       response = @fetcher.call(remote_path, headers)
       return if response.is_a?(Net::HTTPNotModified)
 
+      content = response.body
       if response["Content-Encoding"] == "gzip"
-        content = Zlib::GzipReader.new(StringIO.new(response.body)).read
-      else
-        content = response.body
+        content = Zlib::GzipReader.new(StringIO.new(content)).read
       end
 
       mode = response.is_a?(Net::HTTPPartialContent) ? "a" : "w"
