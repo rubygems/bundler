@@ -456,14 +456,14 @@ describe "bundle gem" do
       end
     end
 
-    context "--bin parameter set" do
+    context "--exe parameter set" do
       before do
         reset!
         in_app_root
-        bundle "gem #{gem_name} --bin"
+        bundle "gem #{gem_name} --exe"
       end
 
-      it "builds bin skeleton" do
+      it "builds exe skeleton" do
         expect(bundled_app("test-gem/exe/test-gem")).to exist
       end
 
