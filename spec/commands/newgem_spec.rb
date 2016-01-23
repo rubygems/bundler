@@ -115,7 +115,7 @@ describe "bundle gem" do
     system_gems ["rake-10.0.2"]
 
     in_app_root
-    bundle "gem newgem --bin"
+    bundle "gem newgem --exe"
 
     process_file(bundled_app("newgem", "newgem.gemspec")) do |line|
       # Simulate replacing TODOs with real values
@@ -258,22 +258,6 @@ describe "bundle gem" do
         reset!
         in_app_root
         bundle "gem #{gem_name} --exe"
-      end
-
-      it "builds exe skeleton" do
-        expect(bundled_app("test_gem/exe/test_gem")).to exist
-      end
-
-      it "requires 'test-gem'" do
-        expect(bundled_app("test_gem/exe/test_gem").read).to match(/require "test_gem"/)
-      end
-    end
-
-    context "--bin parameter set" do
-      before do
-        reset!
-        in_app_root
-        bundle "gem #{gem_name} --bin"
       end
 
       it "builds exe skeleton" do
