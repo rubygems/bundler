@@ -21,38 +21,40 @@ module Bundler
       def specs(gem_names, full_dependency_list = [], last_spec_list = [])
         query_list = gem_names - full_dependency_list
 
-        # only display the message on the first run
-        if Bundler.ui.debug?
-          Bundler.ui.debug "Query List: #{query_list.inspect}"
-        else
-          Bundler.ui.info ".", false
-        end
+        log_specs(query_list)
 
         return { remote_uri => last_spec_list } if query_list.empty?
 
-        remote_specs = Bundler::Retry.new("dependency api", AUTH_ERRORS).attempts do
+        spec_list, deps_list = Bundler::Retry.new("dependency api", AUTH_ERRORS).attempts do
           dependency_specs(query_list)
         end
 
-        spec_list, deps_list = remote_specs
         returned_gems = spec_list.map(&:first).uniq
         specs(deps_list, full_dependency_list + returned_gems, spec_list + last_spec_list)
       rescue HTTPError, MarshalError, GemspecError
         Bundler.ui.info "" unless Bundler.ui.debug? # new line now that the dots are over
         Bundler.ui.debug "could not fetch from the dependency API, trying the full index"
-        return nil
+        nil
       end
 
       def dependency_specs(gem_names)
         Bundler.ui.debug "Query Gemcutter Dependency Endpoint API: #{gem_names.join(",")}"
-        gem_list = []
-        deps_list = []
 
+        gem_list = unmarshalled_dep_gems(gem_names)
+        get_formatted_specs_and_deps(gem_list)
+      end
+
+      def unmarshalled_dep_gems(gem_names)
+        gem_list = []
         gem_names.each_slice(Source::Rubygems::API_REQUEST_SIZE) do |names|
           marshalled_deps = downloader.fetch dependency_api_uri(names)
           gem_list += Bundler.load_marshal(marshalled_deps)
         end
+        gem_list
+      end
 
+      def get_formatted_specs_and_deps(gem_list)
+        deps_list = []
         spec_list = gem_list.map do |s|
           dependencies = s[:dependencies].map do |name, requirement|
             dep = well_formed_dependency(name, requirement.split(", "))
@@ -62,7 +64,6 @@ module Bundler
 
           [s[:name], Gem::Version.new(s[:number]), s[:platform], dependencies]
         end
-
         [spec_list, deps_list.uniq]
       end
 
@@ -79,9 +80,20 @@ module Bundler
         raise e unless e.message.include?(illformed)
         puts # we shouldn't print the error message on the "fetching info" status line
         raise GemspecError,
-          "Unfortunately, the gem #{s[:name]} (#{s[:number]}) has an invalid " \
+          "Unfortunately, the gem #{name} has an invalid " \
           "gemspec. \nPlease ask the gem author to yank the bad version to fix " \
           "this issue. For more information, see http://bit.ly/syck-defaultkey."
+      end
+
+    private
+
+      def log_specs(query_list)
+        # only display the message on the first run
+        if Bundler.ui.debug?
+          Bundler.ui.debug "Query List: #{query_list.inspect}"
+        else
+          Bundler.ui.info ".", false
+        end
       end
     end
   end
