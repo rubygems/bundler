@@ -8,6 +8,7 @@ module Bundler
 
       def self.compact_index_request(method_name)
         method = instance_method(method_name)
+        undef_method(method_name)
         define_method(method_name) do |*args, &blk|
           begin
             method.bind(self).call(*args, &blk)
