@@ -253,6 +253,22 @@ describe "bundle gem" do
       end
     end
 
+    context "--exe parameter set" do
+      before do
+        reset!
+        in_app_root
+        bundle "gem #{gem_name} --exe"
+      end
+
+      it "builds exe skeleton" do
+        expect(bundled_app("test_gem/exe/test_gem")).to exist
+      end
+
+      it "requires 'test-gem'" do
+        expect(bundled_app("test_gem/exe/test_gem").read).to match(/require "test_gem"/)
+      end
+    end
+
     context "--bin parameter set" do
       before do
         reset!
@@ -260,7 +276,7 @@ describe "bundle gem" do
         bundle "gem #{gem_name} --bin"
       end
 
-      it "builds bin skeleton" do
+      it "builds exe skeleton" do
         expect(bundled_app("test_gem/exe/test_gem")).to exist
       end
 
