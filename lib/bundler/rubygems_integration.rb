@@ -64,7 +64,7 @@ module Bundler
     def configuration
       require "bundler/psyched_yaml"
       Gem.configuration
-    rescue Gem::SystemExitException => e
+    rescue Gem::SystemExitException, LoadError => e
       Bundler.ui.error "#{e.class}: #{e.message}"
       Bundler.ui.trace e
       raise
