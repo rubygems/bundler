@@ -90,10 +90,10 @@ describe "The library itself" do
       exclusions = %w(
         bundler/capistrano.rb
         bundler/gem_tasks.rb
-        bundler/vendor/thor/lib/thor/rake_compat.rb
         bundler/vlad.rb
       )
       lib_files = `git ls-files -z`.split("\x0").grep(/\.rb$/) - exclusions
+      lib_files.reject! {|f| f.start_with?("bundler/vendor") }
       lib_files.map! {|f| f.chomp(".rb") }
       sys_exec("ruby -w -I. ", :expect_err) do |input|
         lib_files.each do |f|
