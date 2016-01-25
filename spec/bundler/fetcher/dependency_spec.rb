@@ -2,12 +2,12 @@ require "spec_helper"
 
 describe Bundler::Fetcher::Dependency do
   let(:downloader)  { double(:downloader) }
-  let(:remote)      { nil }
+  let(:remote)      { double(:remote, :uri => URI("http://localhost:5000")) }
   let(:display_uri) { "http://sample_uri.com" }
 
   subject { described_class.new(downloader, remote, display_uri) }
 
-  describe "#api_available?" do
+  describe "#available?" do
     let(:dependency_api_uri) { double(:dependency_api_uri) }
     let(:fetched_spec)       { double(:fetched_spec) }
 
@@ -17,7 +17,7 @@ describe Bundler::Fetcher::Dependency do
     end
 
     it "should be truthy" do
-      expect(subject.api_available?).to be_truthy
+      expect(subject.available?).to be_truthy
     end
 
     context "when there is no network access" do
@@ -28,7 +28,7 @@ describe Bundler::Fetcher::Dependency do
       end
 
       it "should raise an HTTPError with the original message" do
-        expect { subject.api_available? }.to raise_error(Bundler::HTTPError, "Network Down Message")
+        expect { subject.available? }.to raise_error(Bundler::HTTPError, "Network Down Message")
       end
     end
 
@@ -42,7 +42,7 @@ describe Bundler::Fetcher::Dependency do
       end
 
       it "should raise the original error" do
-        expect { subject.api_available? }.to raise_error(Bundler::Fetcher::AuthenticationRequiredError,
+        expect { subject.available? }.to raise_error(Bundler::Fetcher::AuthenticationRequiredError,
           %r{Authentication is required for http://remote_uri.org})
       end
     end
@@ -51,7 +51,7 @@ describe Bundler::Fetcher::Dependency do
       before { allow(downloader).to receive(:fetch).with(dependency_api_uri) { raise Bundler::HTTPError.new } }
 
       it "should be falsey" do
-        expect(subject.api_available?).to be_falsey
+        expect(subject.available?).to be_falsey
       end
     end
   end
@@ -66,15 +66,15 @@ describe Bundler::Fetcher::Dependency do
     let(:gem_names)            { %w(foo bar) }
     let(:full_dependency_list) { ["bar"] }
     let(:last_spec_list)       { [["boulder", gem_version1, "ruby", resque]] }
-    let(:auth_errors)          { double(:auth_errors) }
+    let(:fail_errors)          { double(:fail_errors) }
     let(:bundler_retry)        { double(:bundler_retry) }
     let(:gem_version1)         { double(:gem_version1) }
     let(:resque)               { double(:resque) }
     let(:remote_uri)           { "http://remote-uri.org" }
 
     before do
-      stub_const("Bundler::Fetcher::AUTH_ERRORS", auth_errors)
-      allow(Bundler::Retry).to receive(:new).with("dependency api", auth_errors).and_return(bundler_retry)
+      stub_const("Bundler::Fetcher::FAIL_ERRORS", fail_errors)
+      allow(Bundler::Retry).to receive(:new).with("dependency api", fail_errors).and_return(bundler_retry)
       allow(bundler_retry).to receive(:attempts) {|&block| block.call }
       allow(subject).to receive(:log_specs) {}
       allow(subject).to receive(:remote_uri).and_return(remote_uri)
@@ -90,7 +90,7 @@ describe Bundler::Fetcher::Dependency do
       before { allow(subject).to receive(:dependency_specs).with(["foo"]).and_return(dependency_specs) }
 
       it "should return a hash with the remote_uri and the list of specs" do
-        expect(subject.specs(gem_names, full_dependency_list, last_spec_list)).to eq("http://remote-uri.org" => [
+        expect(subject.specs(gem_names, full_dependency_list, last_spec_list)).to eq([
           ["top", gem_version2, "ruby", faraday],
           ["boulder", gem_version1, "ruby", resque]
         ])
@@ -103,7 +103,7 @@ describe Bundler::Fetcher::Dependency do
       let(:last_spec_list)       { ["boulder"] }
 
       it "should return a hash with the remote_uri and the last spec list" do
-        expect(subject.specs(gem_names, full_dependency_list, last_spec_list)).to eq("http://remote-uri.org" => ["boulder"])
+        expect(subject.specs(gem_names, full_dependency_list, last_spec_list)).to eq(["boulder"])
       end
     end
 
@@ -206,16 +206,16 @@ describe Bundler::Fetcher::Dependency do
   describe "#unmarshalled_dep_gems" do
     let(:gem_names)         { [%w(foo bar), %w(bundler rubocop)] }
     let(:dep_api_uri)       { double(:dep_api_uri) }
-    let(:marshalled_deps)   { double(:marshalled_deps) }
     let(:unmarshalled_gems) { double(:unmarshalled_gems) }
+    let(:fetch_response)    { double(:fetch_response, :body => double(:body)) }
     let(:rubygems_limit)    { 50 }
 
     before { allow(subject).to receive(:dependency_api_uri).with(gem_names).and_return(dep_api_uri) }
 
     it "should fetch dependencies from Rubygems and unmarshal them" do
       expect(gem_names).to receive(:each_slice).with(rubygems_limit).and_call_original
-      expect(downloader).to receive(:fetch).with(dep_api_uri).and_return([marshalled_deps])
-      expect(Bundler).to receive(:load_marshal).with([marshalled_deps]).and_return([unmarshalled_gems])
+      expect(downloader).to receive(:fetch).with(dep_api_uri).and_return(fetch_response)
+      expect(Bundler).to receive(:load_marshal).with(fetch_response.body).and_return([unmarshalled_gems])
       expect(subject.unmarshalled_dep_gems(gem_names)).to eq([unmarshalled_gems])
     end
   end
@@ -241,26 +241,11 @@ describe Bundler::Fetcher::Dependency do
         }
       ]
     end
-    let(:gem_version1) { double(:gem_version1) }
-    let(:gem_version2) { double(:gem_version2) }
-
-    before do
-      %w(faraday resque).each do |dep_name|
-        instance_variable_set(:"@#{dep_name}", double(dep_name.to_sym))
-        dep_double = instance_variable_get(:"@#{dep_name}")
-        allow(subject).to receive(:well_formed_dependency).with(dep_name, anything).and_return(dep_double)
-        allow(dep_double).to receive(:name).and_return(dep_name)
-      end
-      allow(Gem::Version).to receive(:new).with("1.0.1").and_return(gem_version1)
-      allow(Gem::Version).to receive(:new).with("2.0.2").and_return(gem_version2)
-    end
 
     it "should return formatted specs and a unique list of dependencies" do
       spec_list, deps_list = subject.get_formatted_specs_and_deps(gem_list)
-      expect(spec_list).to eq([
-        ["typhoeus", gem_version1, "ruby", [@resque]],
-        ["grape", gem_version2, "jruby", [@faraday]]
-      ])
+      expect(spec_list).to eq([["typhoeus", "1.0.1", "ruby", [["resque", ["req3,req4"]]]],
+                               ["grape", "2.0.2", "jruby", [["faraday", ["req1,req2"]]]]])
       expect(deps_list).to eq(%w(resque faraday))
     end
   end
@@ -287,48 +272,6 @@ describe Bundler::Fetcher::Dependency do
       it "should return an api calling uri with no query" do
         expect(subject.dependency_api_uri(gem_names).to_s).to eq(
           "http://gem-api.com/api/v1/dependencies")
-      end
-    end
-  end
-
-  describe "#well_formed_dependency" do
-    let(:name)           { "foo" }
-    let(:requirement1)   { "req1" }
-    let(:requirement2)   { "req2" }
-    let(:gem_dependency) { double(:gem_dependency) }
-
-    before { allow(Gem::Dependency).to receive(:new).and_return(gem_dependency) }
-
-    it "should return a Gem::Dependency" do
-      expect(Gem::Dependency).to receive(:new).with("foo", "req1", "req2")
-      subject.well_formed_dependency(name, requirement1, requirement2)
-    end
-
-    context "when an ArgumentError occurs" do
-      before do
-        allow(Gem::Dependency).to receive(:new).with("foo", "req1", "req2") {
-          raise ArgumentError.new("Some error occurred")
-        }
-      end
-
-      it "should raise the original error" do
-        expect { subject.well_formed_dependency(name, requirement1, requirement2) }.to raise_error(
-          ArgumentError, "Some error occurred")
-      end
-    end
-
-    context "when there is an ill formed requirement" do
-      before do
-        allow(Gem::Dependency).to receive(:new).with("foo", "req1", "req2") {
-          raise ArgumentError.new("Ill-formed requirement [\"#<YAML::Syck::DefaultKey")
-        }
-        # Eliminate extra line break in rspec output due to `puts` in `#well_formed_dependency`
-        allow(subject).to receive(:puts) {}
-      end
-
-      it "should raise a Bundler::GemspecError with invalid gemspec message" do
-        expect { subject.well_formed_dependency(name, requirement1, requirement2) }.to raise_error(
-          Bundler::GemspecError, /Unfortunately, the gem foo has an invalid gemspec/)
       end
     end
   end

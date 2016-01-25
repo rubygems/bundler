@@ -12,6 +12,7 @@ module Bundler
         # We got a 401 from the server. Just fail.
         raise
       rescue HTTPError
+        false
       end
 
       def api_fetcher?
