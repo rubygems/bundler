@@ -112,7 +112,7 @@ describe Bundler::GemHelper do
           it "raises an error with appropriate message" do
             task_names.each do |name|
               expect { Rake.application[name] }.
-                to raise_error("Don't know how to build task '#{name}'")
+                to raise_error(/^Don't know how to build task '#{name}'/)
             end
           end
         end
