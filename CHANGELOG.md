@@ -1,3 +1,9 @@
+## 1.12.0.pre (tbd)
+
+Features:
+
+  - speed up `install` and `update` by using the new gem index (@segiddins, @fotanus, @indirect)
+
 ## 1.11.2 (2015-12-15)
 
 Bugfixes:

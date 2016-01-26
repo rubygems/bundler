@@ -12,6 +12,9 @@ require "artifice"
 require "sinatra/base"
 
 class Endpoint < Sinatra::Base
+  set :raise_errors, true
+  set :show_exceptions, false
+
   helpers do
     def dependencies_for(gem_names, gem_repo = gem_repo1)
       return [] if gem_names.nil? || gem_names.empty?

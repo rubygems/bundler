@@ -55,6 +55,7 @@ module Bundler
 
       @lockfile_contents      = String.new
       @locked_bundler_version = nil
+      @locked_ruby_version    = nil
 
       if lockfile && File.exist?(lockfile)
         @lockfile_contents = Bundler.read_file(lockfile)

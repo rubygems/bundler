@@ -137,7 +137,7 @@ module Bundler
     end
 
     def user_bundle_path
-      Pathname.new(Bundler.rubygems.user_home).join(".bundler")
+      Pathname.new(Bundler.rubygems.user_home).join(".bundle")
     end
 
     def home
@@ -154,6 +154,10 @@ module Bundler
 
     def cache
       bundle_path.join("cache/bundler")
+    end
+
+    def user_cache
+      user_bundle_path.join("cache")
     end
 
     def root

@@ -21,3 +21,6 @@ FakeWeb.register_uri(:get, "http://localgemserver.test/gems/rcov-1.0-x86-mswin32
 
 FakeWeb.register_uri(:get, "http://localgemserver.test/api/v1/dependencies",
   :status => ["404", "Not Found"])
+
+FakeWeb.register_uri(:get, "http://localgemserver.test/versions",
+  :status => ["500", "Internal Server Error"])

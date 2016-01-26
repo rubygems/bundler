@@ -5,7 +5,7 @@ module Spec
   module Rubygems
     DEPS = begin
       deps = {
-        "fakeweb artifice rack" => nil,
+        "fakeweb artifice rack compact_index" => nil,
         "sinatra" => "1.2.7",
         # Rake version has to be consistent for tests to pass
         "rake" => "10.0.2",

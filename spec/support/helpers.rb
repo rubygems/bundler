@@ -17,6 +17,20 @@ module Spec
       Bundler.send(:remove_instance_variable, :@settings) if Bundler.send(:instance_variable_defined?, :@settings)
     end
 
+    def self.bang(method)
+      define_method("#{method}!") do |*args, &blk|
+        send(method, *args, &blk).tap do
+          if exitstatus && exitstatus != 0
+            error = out + "\n" + err
+            error.strip!
+            raise RuntimeError,
+              "Invoking #{method}!(#{args.map(&:inspect).join(", ")}) failed:\n#{error}",
+              caller.drop_while {|bt| bt.start_with?(__FILE__) }
+          end
+        end
+      end
+    end
+
     attr_reader :out, :err, :exitstatus
 
     def in_app_root(&blk)
@@ -39,6 +53,7 @@ module Spec
       setup = "require 'rubygems' ; require 'bundler' ; Bundler.setup(#{groups})\n"
       @out = ruby(setup + cmd, :expect_err => expect_err, :env => env)
     end
+    bang :run
 
     def load_error_run(ruby, name, *args)
       cmd = <<-RUBY
@@ -85,6 +100,7 @@ module Spec
       cmd = "#{env} #{sudo} #{Gem.ruby} -I#{lib}:#{spec} #{requires_str} #{bundle_bin} #{cmd}#{args}"
       sys_exec(cmd, expect_err) {|i| yield i if block_given? }
     end
+    bang :bundle
 
     def bundle_ruby(options = {})
       expect_err = options.delete(:expect_err)
@@ -110,6 +126,7 @@ module Spec
       lib_option = options[:no_lib] ? "" : " -I#{lib}"
       sys_exec(%(#{env}#{Gem.ruby}#{lib_option} -e "#{ruby}"), expect_err)
     end
+    bang :ruby
 
     def load_error_ruby(ruby, name, opts = {})
       cmd = <<-R
@@ -149,6 +166,7 @@ module Spec
       puts @err unless expect_err || @err.empty? || !$show_err
       @out
     end
+    bang :sys_exec
 
     def config(config = nil, path = bundled_app(".bundle/config"))
       return YAML.load_file(path) unless config

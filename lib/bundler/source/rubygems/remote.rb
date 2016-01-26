@@ -14,6 +14,21 @@ module Bundler
           @anonymized_uri = remove_auth(@uri).freeze
         end
 
+        # @return [String] A slug suitable for use as a cache key for this
+        #         remote.
+        #
+        def cache_slug
+          @cache_slug ||= begin
+            cache_uri = original_uri || uri
+
+            uri_parts = [cache_uri.host, cache_uri.user, cache_uri.port, cache_uri.path]
+            uri_digest = Digest::MD5.hexdigest(uri_parts.compact.join("."))
+
+            uri_parts[-1] = uri_digest
+            uri_parts.compact.join(".")
+          end
+        end
+
       private
 
         def apply_auth(uri, auth)

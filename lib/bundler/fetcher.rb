@@ -6,6 +6,7 @@ require "zlib"
 module Bundler
   # Handles all the fetching with the rubygems server
   class Fetcher
+    autoload :CompactIndex, "bundler/fetcher/compact_index"
     autoload :Downloader, "bundler/fetcher/downloader"
     autoload :Dependency, "bundler/fetcher/dependency"
     autoload :Index, "bundler/fetcher/index"
@@ -52,14 +53,15 @@ module Bundler
 
     # Exceptions classes that should bypass retry attempts. If your password didn't work the
     # first time, it's not going to the third time.
-    AUTH_ERRORS = [AuthenticationRequiredError, BadAuthenticationError]
+    FAIL_ERRORS = [AuthenticationRequiredError, BadAuthenticationError, FallbackError]
     NET_ERRORS = [:HTTPBadGateway, :HTTPBadRequest, :HTTPFailedDependency,
                   :HTTPForbidden, :HTTPInsufficientStorage, :HTTPMethodNotAllowed,
                   :HTTPMovedPermanently, :HTTPNoContent, :HTTPNotFound,
                   :HTTPNotImplemented, :HTTPPreconditionFailed, :HTTPRequestEntityTooLarge,
                   :HTTPRequestURITooLong, :HTTPUnauthorized, :HTTPUnprocessableEntity,
                   :HTTPUnsupportedMediaType, :HTTPVersionNotSupported]
-    AUTH_ERRORS.push(*NET_ERRORS.map {|e| SharedHelpers.const_get_safely(e, Net) }.compact)
+    FAIL_ERRORS << Gem::Requirement::BadRequirementError if defined?(Gem::Requirement::BadRequirementError)
+    FAIL_ERRORS.push(*NET_ERRORS.map {|e| SharedHelpers.const_get_safely(e, Net) }.compact)
 
     class << self
       attr_accessor :disable_endpoint, :api_timeout, :redirect_limit, :max_retries
@@ -91,7 +93,7 @@ module Bundler
       elsif cached_spec_path = gemspec_cached_path(spec_file_name)
         Bundler.load_gemspec(cached_spec_path)
       else
-        Bundler.load_marshal Gem.inflate(downloader.fetch uri)
+        Bundler.load_marshal Gem.inflate(downloader.fetch(uri).body)
       end
     rescue MarshalError
       raise HTTPError, "Gemspec #{spec} contained invalid data.\n" \
@@ -100,7 +102,7 @@ module Bundler
 
     # return the specs in the bundler format as an index with retries
     def specs_with_retry(gem_names, source)
-      Bundler::Retry.new("fetcher").attempts do
+      Bundler::Retry.new("fetcher", FAIL_ERRORS).attempts do
         specs(gem_names, source)
       end
     end
@@ -110,14 +112,20 @@ module Bundler
       old = Bundler.rubygems.sources
       index = Bundler::Index.new
 
-      specs = {}
-      fetchers.dup.each do |f|
-        break unless f.api_fetcher? && !gem_names || !specs = f.specs(gem_names)
-        fetchers.delete(f)
+      if Bundler::Fetcher.disable_endpoint
+        @use_api = false
+        specs = fetchers.last.specs(gem_names)
+      else
+        specs = []
+        fetchers.shift until fetchers.first.available? || fetchers.empty?
+        fetchers.dup.each do |f|
+          break unless f.api_fetcher? && !gem_names || !specs = f.specs(gem_names)
+          fetchers.delete(f)
+        end
+        @use_api = false if fetchers.none?(&:api_fetcher?)
       end
-      @use_api = false if fetchers.none?(&:api_fetcher?)
 
-      specs[remote_uri].each do |name, version, platform, dependencies|
+      specs.each do |name, version, platform, dependencies|
         next if name == "bundler"
         spec = nil
         if dependencies
@@ -141,11 +149,12 @@ module Bundler
     def use_api
       return @use_api if defined?(@use_api)
 
+      fetchers.shift until fetchers.first.available?
+
       if remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
         @use_api = false
       else
-        fetchers.reject! {|f| f.api_fetcher? && !f.api_available? }
-        @use_api = fetchers.any?(&:api_fetcher?)
+        @use_api = fetchers.first.api_fetcher?
       end
     end
 
@@ -200,7 +209,7 @@ module Bundler
 
   private
 
-    FETCHERS = [Dependency, Index]
+    FETCHERS = [CompactIndex, Dependency, Index]
 
     def cis
       env_cis = {

@@ -62,11 +62,9 @@ describe Bundler::Fetcher::Base do
     end
   end
 
-  describe "#api_available?" do
-    before { allow(subject).to receive(:api_fetcher?).and_return(false) }
-
+  describe "#available?" do
     it "should return whether the api is available" do
-      expect(subject.api_available?).to eq(false)
+      expect(subject.available?).to be_truthy
     end
   end
 

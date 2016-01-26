@@ -209,8 +209,11 @@ module Bundler
     end
 
     def global_config_file
-      file = ENV["BUNDLE_CONFIG"] || File.join(Bundler.rubygems.user_home, ".bundle/config")
-      Pathname.new(file)
+      if ENV["BUNDLE_CONFIG"] && !ENV["BUNDLE_CONFIG"].empty?
+        Pathname.new(ENV["BUNDLE_CONFIG"])
+      else
+        Bundler.user_bundle_path.join("config")
+      end
     end
 
     def local_config_file

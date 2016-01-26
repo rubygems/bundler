@@ -57,6 +57,9 @@ RSpec.configure do |config|
   config.include Spec::Sudo
   config.include Spec::Permissions
 
+  # Enable flags like --only-failures and --next-failure
+  config.example_status_persistence_file_path = ".rspec_status"
+
   if ENV["BUNDLER_SUDO_TESTS"] && Spec::Sudo.present?
     config.filter_run :sudo => true
   else

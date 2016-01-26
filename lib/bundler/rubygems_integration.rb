@@ -64,7 +64,7 @@ module Bundler
     def configuration
       require "bundler/psyched_yaml"
       Gem.configuration
-    rescue Gem::SystemExitException => e
+    rescue Gem::SystemExitException, LoadError => e
       Bundler.ui.error "#{e.class}: #{e.message}"
       Bundler.ui.trace e
       raise
@@ -181,7 +181,7 @@ module Bundler
     def fetch_prerelease_specs
       fetch_specs(false, true)
     rescue Gem::RemoteFetcher::FetchError
-      [] # if we can't download them, there aren't any
+      {} # if we can't download them, there aren't any
     end
 
     # TODO: This is for older versions of Rubygems... should we support the
@@ -194,9 +194,9 @@ module Bundler
       # Fetch all specs, minus prerelease specs
       spec_list = fetch_specs(true, false)
       # Then fetch the prerelease specs
-      fetch_prerelease_specs.each {|k, v| spec_list[k] += v }
+      fetch_prerelease_specs.each {|k, v| spec_list[k].push(*v) }
 
-      spec_list
+      spec_list.values.first
     ensure
       Bundler.rubygems.sources = old_sources
     end
@@ -578,18 +578,12 @@ module Bundler
       end
 
       def fetch_all_remote_specs(remote)
-        # Since SpecFetcher now returns NameTuples, we just fetch directly
-        # and unmarshal the array ourselves.
-        hash = {}
+        source = remote.uri.is_a?(URI) ? remote.uri : URI.parse(source.to_s)
 
-        source = remote.uri
-        source = URI.parse(source.to_s) unless source.is_a?(URI)
-        hash[source] = fetch_specs(source, remote, "specs")
+        specs = fetch_specs(source, remote, "specs")
+        pres = fetch_specs(source, remote, "prerelease_specs") || []
 
-        pres = fetch_specs(source, remote, "prerelease_specs")
-        hash[source].push(*pres) if pres && !pres.empty?
-
-        hash
+        specs.push(*pres)
       end
 
       def download_gem(spec, uri, path)

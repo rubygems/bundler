@@ -1,16 +1,19 @@
 module Bundler
   # used for Creating Specifications from the Gemcutter Endpoint
   class EndpointSpecification < Gem::Specification
+    ILLFORMED_MESSAGE = 'Ill-formed requirement ["#<YAML::Syck::DefaultKey'.freeze
     include MatchPlatform
 
-    attr_reader :name, :version, :platform, :dependencies
+    attr_reader :name, :version, :platform, :dependencies, :required_rubygems_version, :required_ruby_version, :checksum
     attr_accessor :source, :remote
 
-    def initialize(name, version, platform, dependencies)
+    def initialize(name, version, platform, dependencies, metadata = nil)
       @name         = name
-      @version      = version
+      @version      = Gem::Version.create version
       @platform     = platform
-      @dependencies = dependencies
+      @dependencies = dependencies.map {|dep, reqs| build_dependency(dep, reqs) }
+
+      parse_metadata(metadata)
     end
 
     def fetch_platform
@@ -95,6 +98,32 @@ module Bundler
 
     def local_specification_path
       "#{base_dir}/specifications/#{full_name}.gemspec"
+    end
+
+    def parse_metadata(data)
+      return unless data
+      data.each do |k, v|
+        next unless v
+        case k.to_s
+        when "checksum"
+          @checksum = v.last
+        when "rubygems"
+          @required_rubygems_version = Gem::Requirement.new(v)
+        when "ruby"
+          @required_ruby_version = Gem::Requirement.new(v)
+        end
+      end
+    end
+
+    def build_dependency(name, *requirements)
+      Gem::Dependency.new(name, *requirements)
+    rescue ArgumentError => e
+      raise unless e.message.include?(ILLFORMED_MESSAGE)
+      puts # we shouldn't print the error message on the "fetching info" status line
+      raise GemspecError,
+        "Unfortunately, the gem #{name} (#{version}) has an invalid " \
+        "gemspec.\nPlease ask the gem author to yank the bad version to fix " \
+        "this issue. For more information, see http://bit.ly/syck-defaultkey."
     end
   end
 end
