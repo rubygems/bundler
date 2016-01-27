@@ -93,4 +93,22 @@ describe "bundler/inline#gemfile" do
     expect(err).to eq("")
     expect(exitstatus).to be_zero if exitstatus
   end
+
+  it "lets me use my own ui object" do
+    script <<-RUBY, :artifice => "endpoint"
+      require 'bundler'
+      class MyBundlerUI < Bundler::UI::Silent
+        def confirm(msg, newline = nil)
+          puts "CONFIRMED!"
+        end
+      end
+      gemfile(true, MyBundlerUI.new) do
+        source "https://rubygems.org"
+        gem "activesupport", :require => true
+      end
+    RUBY
+
+    expect(out).to eq("CONFIRMED!")
+    expect(exitstatus).to be_zero if exitstatus
+  end
 end

@@ -27,7 +27,7 @@
 #
 #          puts Pod::VERSION # => "0.34.4"
 #
-def gemfile(install = false, &gemfile)
+def gemfile(install = false, ui = nil, &gemfile)
   require "bundler"
   old_root = Bundler.method(:root)
   def Bundler.root
@@ -43,7 +43,7 @@ def gemfile(install = false, &gemfile)
   definition.validate_ruby!
 
   if install
-    Bundler.ui = Bundler::UI::Shell.new
+    Bundler.ui = ui || Bundler::UI::Shell.new
     Bundler::Installer.install(Bundler.root, definition, :system => true)
     Bundler::Installer.post_install_messages.each do |name, message|
       Bundler.ui.info "Post-install message from #{name}:\n#{message}"
