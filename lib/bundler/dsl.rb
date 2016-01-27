@@ -49,7 +49,7 @@ module Bundler
       glob              = opts && opts[:glob]
       name              = opts && opts[:name] || "{,*}"
       development_group = opts && opts[:development_group] || :development
-      expanded_path     = path_relative_to_gemfile(path)
+      expanded_path     = gemfile_root.join(path)
 
       gemspecs = Dir[File.join(expanded_path, "#{name}.gemspec")]
 
@@ -146,7 +146,9 @@ module Bundler
     end
 
     def path(path, options = {}, &blk)
-      with_source(@sources.add_path_source(normalize_hash(options).merge("path" => path_relative_to_gemfile(path))), &blk)
+      source_options = normalize_hash(options).merge("path" => Pathname.new(path), "root_path" => gemfile_root)
+      source = @sources.add_path_source(source_options)
+      with_source(source, &blk)
     end
 
     def git(uri, options = {}, &blk)
@@ -313,10 +315,6 @@ module Bundler
       git_name = (git_names & opts.keys).last
       if @git_sources[git_name]
         opts["git"] = @git_sources[git_name].call(opts[git_name])
-      end
-
-      if opts.key?("path")
-        opts["path"] = path_relative_to_gemfile(opts["path"])
       end
 
       %w(git path).each do |type|
@@ -494,9 +492,9 @@ module Bundler
       end
     end
 
-    def path_relative_to_gemfile(path)
+    def gemfile_root
       @gemfile ||= Bundler.default_gemfile
-      @gemfile.dirname + path
+      @gemfile.dirname
     end
   end
 end
