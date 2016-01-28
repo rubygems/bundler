@@ -46,6 +46,18 @@ module Bundler
             active_spec = active_spec.delete_if {|b| b.respond_to?(:version) && b.version.prerelease? }
           end
           active_spec = active_spec.last
+
+          if options[:major]
+            current_major = current_spec.version.segments.first
+            active_major = active_spec.version.segments.first
+            active_spec = nil unless active_major > current_major
+          end
+
+          if options[:minor]
+            current_minor = current_spec.version.segments[0, 2].compact.join(".")
+            active_minor = active_spec.version.segments[0, 2].compact.join(".")
+            active_spec = nil unless active_minor > current_minor
+          end
         end
         next if active_spec.nil?
 
