@@ -25,7 +25,7 @@ module Bundler
       bin_path = Bundler.which(@cmd)
       if bin_path
         Bundler.ui = nil
-        Kernel.exec(bin_path, *args)
+        Kernel.exec([bin_path, @cmd], *args)
       end
 
       # If that didn't work, set up the whole bundle
