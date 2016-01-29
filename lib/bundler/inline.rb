@@ -27,7 +27,9 @@
 #
 #          puts Pod::VERSION # => "0.34.4"
 #
-def gemfile(install = false, ui = nil, &gemfile)
+def gemfile(install = false, options = {}, &gemfile)
+  ui = options[:ui]
+
   require "bundler"
   old_root = Bundler.method(:root)
   def Bundler.root
