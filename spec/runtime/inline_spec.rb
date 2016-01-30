@@ -102,7 +102,7 @@ describe "bundler/inline#gemfile" do
           puts "CONFIRMED!"
         end
       end
-      gemfile(true, ui: MyBundlerUI.new) do
+      gemfile(true, :ui => MyBundlerUI.new) do
         source "https://rubygems.org"
         gem "activesupport", :require => true
       end
