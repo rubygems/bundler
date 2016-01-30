@@ -3,3 +3,7 @@ require 'bundler/vendor/molinillo/lib/molinillo/errors'
 require 'bundler/vendor/molinillo/lib/molinillo/resolver'
 require 'bundler/vendor/molinillo/lib/molinillo/modules/ui'
 require 'bundler/vendor/molinillo/lib/molinillo/modules/specification_provider'
+
+# Bundler::Molinillo is a generic dependency resolution algorithm.
+module Bundler::Molinillo
+end

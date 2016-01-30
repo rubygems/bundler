@@ -14,8 +14,10 @@ module Bundler::Molinillo
 
     include TSort
 
+    # @visibility private
     alias_method :tsort_each_node, :each
 
+    # @visibility private
     def tsort_each_child(vertex, &block)
       vertex.successors.each(&block)
     end
@@ -41,12 +43,14 @@ module Bundler::Molinillo
     #   by {Vertex#name}
     attr_reader :vertices
 
+    # Initializes an empty dependency graph
     def initialize
       @vertices = {}
     end
 
     # Initializes a copy of a {DependencyGraph}, ensuring that all {#vertices}
     # are properly copied.
+    # @param [DependencyGraph] other the graph to copy.
     def initialize_copy(other)
       super
       @vertices = {}
@@ -100,6 +104,7 @@ module Bundler::Molinillo
       vertex
     end
 
+    # Adds a vertex with the given name, or updates the existing one.
     # @param [String] name
     # @param [Object] payload
     # @return [Vertex] the vertex that was added to `self`
@@ -120,6 +125,10 @@ module Bundler::Molinillo
         v = e.destination
         v.incoming_edges.delete(e)
         detach_vertex_named(v.name) unless v.root? || v.predecessors.any?
+      end
+      vertex.incoming_edges.each do |e|
+        v = e.origin
+        v.outgoing_edges.delete(e)
       end
     end
 
@@ -150,6 +159,8 @@ module Bundler::Molinillo
 
     private
 
+    # Adds a new {Edge} to the dependency graph without checking for
+    # circularity.
     def add_edge_no_circular(origin, destination, requirement)
       edge = Edge.new(origin, destination, requirement)
       origin.outgoing_edges << edge
@@ -174,6 +185,7 @@ module Bundler::Molinillo
       attr_accessor :root
       alias_method :root?, :root
 
+      # Initializes a vertex with the given name and payload.
       # @param [String] name see {#name}
       # @param [Object] payload see {#payload}
       def initialize(name, payload)
@@ -240,6 +252,7 @@ module Bundler::Molinillo
           successors.to_set == other.successors.to_set
       end
 
+      # @param  [Vertex] other the other vertex to compare to
       # @return [Boolean] whether the two vertices are equal, determined
       #   solely by {#name} and {#payload} equality
       def shallow_eql?(other)
