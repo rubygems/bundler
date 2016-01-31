@@ -47,7 +47,7 @@ module Bundler
     end
 
     def gem_version
-      Gem::Version.new(version)
+      Gem::Requirement.create(version).requirements.first.last
     end
 
     # Returns a tuple of these things:
