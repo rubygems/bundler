@@ -13,6 +13,7 @@ require "bundler/errors"
 
 module Bundler
   preserve_gem_path
+  preserve_path
   ORIGINAL_ENV = ENV.to_hash
   SUDO_MUTEX = Mutex.new
 
