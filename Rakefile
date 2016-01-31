@@ -62,15 +62,9 @@ namespace :spec do
       sh "sudo apt-get install groff-base -y"
       # Install graphviz so that the viz specs can run
       sh "sudo apt-get install graphviz -y 2>&1 | tail -n 2"
-      if RUBY_VERSION < "1.9"
-        # Downgrade Rubygems on 1.8 so Ronn can be required
-        # https://github.com/rubygems/rubygems/issues/784
-        sh "gem update --system 2.1.11"
-      else
-        # Downgrade Rubygems so RSpec 3 can be installed
-        # https://github.com/rubygems/rubygems/issues/813
-        sh "gem update --system 2.2.0"
-      end
+
+      # Install the gems with a consistent version of RubyGems
+      sh "gem update --system 2.5.1"
 
       $LOAD_PATH.unshift("./spec")
       require "support/rubygems_ext"
