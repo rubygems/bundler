@@ -80,7 +80,8 @@ module Bundler
           end.tap do |client|
             client.in_parallel = lambda do |inputs, &blk|
               func = lambda {|object, _index| blk.call(object) }
-              worker = Bundler::Worker.new(25, func)
+              worker_name = "Compact Index (#{display_uri.host})"
+              worker = Bundler::Worker.new(25, worker_name, func)
               inputs.each {|input| worker.enq(input) }
               inputs.map { worker.deq }
             end

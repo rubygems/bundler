@@ -11,4 +11,8 @@ bundler_spec.dependencies.each do |dep|
   end
 end
 
+Gem::Specification.unresolved_deps.each do |_name, dep|
+  gem dep.name, *dep.requirement
+end
+
 load Gem.bin_path("rake", "rake")

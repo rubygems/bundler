@@ -84,7 +84,7 @@ class ParallelInstaller
   end
 
   def worker_pool
-    @worker_pool ||= Bundler::Worker.new @size, lambda { |spec_install, worker_num|
+    @worker_pool ||= Bundler::Worker.new @size, "Parallel Installer", lambda { |spec_install, worker_num|
       message = Bundler::GemInstaller.new(
         spec_install.spec, @installer, @standalone, worker_num, @force
       ).install_from_spec
