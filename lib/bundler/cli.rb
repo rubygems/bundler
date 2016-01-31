@@ -242,6 +242,8 @@ module Bundler
     method_option "source", :type => :array, :banner => "Check against a specific source"
     method_option "strict", :type => :boolean, :banner =>
       "Only list newer versions allowed by your Gemfile requirements"
+    method_option "major", :type => :boolean, :banner => "Only list major newer versions"
+    method_option "minor", :type => :boolean, :banner => "Only list at least minor newer versions"
     def outdated(*gems)
       require "bundler/cli/outdated"
       Outdated.new(options, gems).run

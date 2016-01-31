@@ -180,4 +180,59 @@ describe "bundle outdated" do
     bundle :outdated
     expect(out).to include("Installing foo 1.0")
   end
+
+  describe "with --major option" do
+    it "only reports gems that have a newer major version" do
+      update_repo2 do
+        build_gem "weakling", "0.2.0"
+        build_gem "activesupport", "3.0"
+      end
+
+      bundle "outdated --major"
+      expect(out).to_not include("weakling (newest")
+      expect(out).to include("activesupport (newest")
+    end
+
+    it "ignore gems not in semantic version" do
+      update_repo2 do
+        build_gem "weakling", "1"
+      end
+
+      bundle "outdated --major"
+      expect(out).to include("weakling (newest")
+    end
+  end
+
+  describe "with --minor option" do
+    it "only reports gems that have at least a newer minor version" do
+      update_repo2 do
+        build_gem "activesupport", "3.0.0"
+        build_gem "weakling", "0.2.0"
+      end
+
+      bundle "outdated --minor"
+      expect(out).to include("weakling (newest")
+      expect(out).to include("activesupport (newest")
+    end
+
+    it "ignore patch version" do
+      update_repo2 do
+        build_gem "activesupport", "2.3.6"
+        build_gem "weakling", "0.0.4"
+      end
+
+      bundle "outdated --minor"
+      expect(out).to_not include("weakling (newest")
+      expect(out).to_not include("activesupport (newest")
+    end
+
+    it "ignore gems not in semantic version" do
+      update_repo2 do
+        build_gem "weakling", "1"
+      end
+
+      bundle "outdated --minor"
+      expect(out).to include("weakling (newest")
+    end
+  end
 end
