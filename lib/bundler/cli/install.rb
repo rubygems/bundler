@@ -150,6 +150,9 @@ module Bundler
         WARN
       end
       raise e
+    rescue Gem::InvalidSpecificationException => e
+      Bundler.ui.warn "You have one or more invalid gemspecs that need to be fixed."
+      raise e
     end
 
   private

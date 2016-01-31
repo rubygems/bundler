@@ -352,9 +352,9 @@ module Bundler
         spec
       end
     rescue Gem::InvalidSpecificationException => e
-      UI::Shell.new.warn "The gemspec at #{file} is not valid. " \
-        "The validation error was '#{e.message}'"
-      nil
+      error_message = "The gemspec at #{file} is not valid. Please fix this gemspec.\n" \
+        "The validation error was '#{e.message}'\n"
+      raise Gem::InvalidSpecificationException.new(error_message)
     end
 
     def clear_gemspec_cache

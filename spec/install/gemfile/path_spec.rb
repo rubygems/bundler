@@ -157,8 +157,11 @@ describe "bundle install with explicit source paths" do
       gem "foo", :path => "#{lib_path("foo-1.0")}"
     G
 
-    expect(out).to match(/missing value for attribute version/)
     expect(out).to_not include("ERROR REPORT")
+    expect(out).to_not include("Your Gemfile has no gem server sources.")
+    expect(out).to match(/is not valid. Please fix this gemspec./)
+    expect(out).to match(/The validation error was 'missing value for attribute version'/)
+    expect(out).to match(/You have one or more invalid gemspecs that need to be fixed/)
   end
 
   it "supports gemspec syntax" do

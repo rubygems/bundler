@@ -33,6 +33,8 @@ module Bundler
       when Interrupt
         Bundler.ui.error "\nQuitting..."
         Bundler.ui.trace error
+      when Gem::InvalidSpecificationException
+        Bundler.ui.error error.message, :wrap => true
       when SystemExit
       else request_issue_report_for(error)
       end

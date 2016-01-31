@@ -341,8 +341,8 @@ describe "bundle exec" do
 
       bundle "exec irb", :expect_err => true
 
-      expect(out).to match("The gemspec at #{lib_path("foo-1.0").join("foo.gemspec")} is not valid")
-      expect(out).to match('"TODO" is not a summary')
+      expect(err).to match("The gemspec at #{lib_path("foo-1.0").join("foo.gemspec")} is not valid")
+      expect(err).to match('"TODO" is not a summary')
     end
   end
 
