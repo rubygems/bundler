@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 require "rake"
 require "bundler/gem_helper"

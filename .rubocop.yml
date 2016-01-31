@@ -31,6 +31,9 @@ Style/Alias:
 Style/AlignParameters:
   EnforcedStyle: with_fixed_indentation
 
+Style/FrozenStringLiteralComment:
+  EnforcedStyle: always
+
 Style/MultilineBlockChain:
   Enabled: false
 

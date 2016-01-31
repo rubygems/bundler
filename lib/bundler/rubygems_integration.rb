@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "monitor"
 require "rubygems"
 require "rubygems/config_file"

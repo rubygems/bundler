@@ -158,7 +158,7 @@ module Bundler
             end
           end
         else
-          message = "The path `#{expanded_path}` "
+          message = String.new("The path `#{expanded_path}` ")
           message << if File.exist?(expanded_path)
                        "is not a directory."
                      else

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Bundler
   module CLI::Common
     def self.without_groups_message

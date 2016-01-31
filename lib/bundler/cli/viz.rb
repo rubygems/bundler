@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Bundler
   class CLI::Viz
     attr_reader :options, :gem_name

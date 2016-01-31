@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Spec
   module Helpers
     def reset!
@@ -122,7 +123,7 @@ module Spec
     def ruby(ruby, options = {})
       expect_err = options.delete(:expect_err)
       env = (options.delete(:env) || {}).map {|k, v| "#{k}='#{v}' " }.join
-      ruby.gsub!(/["`\$]/) {|m| "\\#{m}" }
+      ruby = ruby.gsub(/["`\$]/) {|m| "\\#{m}" }
       lib_option = options[:no_lib] ? "" : " -I#{lib}"
       sys_exec(%(#{env}#{Gem.ruby}#{lib_option} -e "#{ruby}"), expect_err)
     end

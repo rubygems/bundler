@@ -48,7 +48,7 @@ class CompactIndexAPI < Endpoint
     end
 
     def quote(string)
-      '"' << string << '"'
+      %("#{string}")
     end
 
     def parse_etags(value)

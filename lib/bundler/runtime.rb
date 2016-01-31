@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "digest/sha1"
 
 module Bundler

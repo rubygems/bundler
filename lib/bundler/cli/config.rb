@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Bundler
   class CLI::Config
     attr_reader :name, :options, :scope, :thor
@@ -11,7 +12,7 @@ module Bundler
       @scope = "global"
       return unless peek && peek.start_with?("--")
       @name = args.shift
-      @scope = $'
+      @scope = peek[2..-1]
     end
 
     def run

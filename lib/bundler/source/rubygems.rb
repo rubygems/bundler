@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "uri"
 require "rubygems/user_interaction"
 require "rubygems/spec_fetcher"
@@ -118,7 +119,7 @@ module Bundler
 
         unless Bundler.settings[:no_install]
           message = "Installing #{version_message(spec)}"
-          message << " with native extensions" if spec.extensions.any?
+          message += " with native extensions" if spec.extensions.any?
           Bundler.ui.confirm message
 
           path = cached_gem(spec)

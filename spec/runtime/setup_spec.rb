@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 describe "Bundler.setup" do
@@ -915,7 +916,7 @@ describe "Bundler.setup" do
       L
 
       if bundler_version
-        lock << "\n        BUNDLED WITH\n           #{bundler_version}\n"
+        lock += "\n        BUNDLED WITH\n           #{bundler_version}\n"
       end
 
       lock

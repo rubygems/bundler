@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "fileutils"
 require "pathname"
 require "rbconfig"
@@ -385,7 +386,8 @@ module Bundler
       eval(contents, TOPLEVEL_BINDING, path.expand_path.to_s)
     rescue ScriptError, StandardError => e
       original_line = e.backtrace.find {|line| line.include?(path.to_s) }
-      msg = "There was a #{e.class} while loading #{path.basename}: \n#{e.message}"
+      msg = String.new
+      msg << "There was a #{e.class} while loading #{path.basename}: \n#{e.message}"
       msg << " from\n  #{original_line}" if original_line
       msg << "\n"
 

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require File.expand_path("../endpoint_extra", __FILE__)
 
 Artifice.deactivate

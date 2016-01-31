@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Bundler
   class CLI::Console
     attr_reader :options, :group

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 if defined?(Encoding) && Encoding.default_external.name != "UTF-8"

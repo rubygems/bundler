@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Bundler
   module PathPreserver
     def self.preserve_path_in_environment(env_var, env)

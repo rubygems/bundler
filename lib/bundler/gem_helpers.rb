@@ -1,6 +1,7 @@
+# frozen_string_literal: true
 module Bundler
   module GemHelpers
-    GENERIC_CACHE = {}.freeze
+    GENERIC_CACHE = {} # rubocop:disable MutableConstant
     GENERICS = [
       [Gem::Platform.new("java"), Gem::Platform.new("java")],
       [Gem::Platform.new("mswin32"), Gem::Platform.new("mswin32")],

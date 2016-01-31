@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "bundler/vendored_persistent"
 require "cgi"
 require "securerandom"
@@ -53,15 +54,17 @@ module Bundler
 
     # Exceptions classes that should bypass retry attempts. If your password didn't work the
     # first time, it's not going to the third time.
-    FAIL_ERRORS = [AuthenticationRequiredError, BadAuthenticationError, FallbackError].freeze
     NET_ERRORS = [:HTTPBadGateway, :HTTPBadRequest, :HTTPFailedDependency,
                   :HTTPForbidden, :HTTPInsufficientStorage, :HTTPMethodNotAllowed,
                   :HTTPMovedPermanently, :HTTPNoContent, :HTTPNotFound,
                   :HTTPNotImplemented, :HTTPPreconditionFailed, :HTTPRequestEntityTooLarge,
                   :HTTPRequestURITooLong, :HTTPUnauthorized, :HTTPUnprocessableEntity,
                   :HTTPUnsupportedMediaType, :HTTPVersionNotSupported].freeze
-    FAIL_ERRORS << Gem::Requirement::BadRequirementError if defined?(Gem::Requirement::BadRequirementError)
-    FAIL_ERRORS.push(*NET_ERRORS.map {|e| SharedHelpers.const_get_safely(e, Net) }.compact)
+    FAIL_ERRORS = begin
+      fail_errors = [AuthenticationRequiredError, BadAuthenticationError, FallbackError]
+      fail_errors << Gem::Requirement::BadRequirementError if defined?(Gem::Requirement::BadRequirementError)
+      fail_errors.push(*NET_ERRORS.map {|e| SharedHelpers.const_get_safely(e, Net) }.compact)
+    end.freeze
 
     class << self
       attr_accessor :disable_endpoint, :api_timeout, :redirect_limit, :max_retries
@@ -161,7 +164,7 @@ module Bundler
       @user_agent ||= begin
         ruby = Bundler::RubyVersion.system
 
-        agent = "bundler/#{Bundler::VERSION}"
+        agent = String.new("bundler/#{Bundler::VERSION}")
         agent << " rubygems/#{Gem::VERSION}"
         agent << " ruby/#{ruby.version}"
         agent << " (#{ruby.host})"

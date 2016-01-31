@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 require "bundler/shared_helpers"
 
@@ -187,14 +188,14 @@ describe Bundler::SharedHelpers do
       end
       it "ensures bundle bin path is in ENV['PATH']" do
         subject.set_bundle_environment
-        paths = (ENV["PATH"]).split(File::PATH_SEPARATOR)
-        expect(paths.include? "#{Bundler.bundle_path}/bin").to eq(true)
+        paths = ENV["PATH"].split(File::PATH_SEPARATOR)
+        expect(paths).to include("#{Bundler.bundle_path}/bin")
       end
     end
     shared_examples_for "ENV['RUBYOPT'] gets set correctly" do
       it "ensures -rbundler/setup is at the beginning of ENV['RUBYOPT']" do
         subject.set_bundle_environment
-        expect(ENV["RUBYOPT"].split(" ").first.include? "-rbundler/setup").to eq(true)
+        expect(ENV["RUBYOPT"].split(" ").first).to include("-rbundler/setup")
       end
     end
     shared_examples_for "ENV['RUBYLIB'] gets set correctly" do

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "rubygems/user_interaction"
 require "support/path" unless defined?(Spec::Path)
 
@@ -30,9 +31,9 @@ module Spec
       if !File.exist?(manifest_path) || !(manifest - File.readlines(manifest_path)).empty?
         FileUtils.rm_rf(Path.base_system_gems)
         FileUtils.mkdir_p(Path.base_system_gems)
-        File.open(manifest_path, "w") {|f| f << manifest.join }
         puts "installing gems for the tests to use..."
         DEPS.each {|n, v| install_gem(n, v) }
+        File.open(manifest_path, "w") {|f| f << manifest.join }
       end
 
       ENV["HOME"] = Path.home.to_s
@@ -42,7 +43,7 @@ module Spec
 
     def self.install_gem(name, version = nil)
       cmd = "gem install #{name} --no-rdoc --no-ri"
-      cmd << " --version #{version}" if version
+      cmd += " --version #{version}" if version
       system(cmd) || raise("Installing gem #{name} for the tests to use failed!")
     end
 

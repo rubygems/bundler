@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "bundler/dependency"
 require "bundler/ruby_dsl"
 
@@ -345,7 +346,8 @@ module Bundler
     def validate_keys(command, opts, valid_keys)
       invalid_keys = opts.keys - valid_keys
       if invalid_keys.any?
-        message = "You passed #{invalid_keys.map {|k| ":" + k }.join(", ")} "
+        message = String.new
+        message << "You passed #{invalid_keys.map {|k| ":" + k }.join(", ")} "
         message << if invalid_keys.size > 1
                      "as options for #{command}, but they are invalid."
                    else
@@ -450,7 +452,7 @@ module Bundler
         @to_s ||= begin
           trace_line, description = parse_line_number_from_description
 
-          m = "\n[!] "
+          m = String.new("\n[!] ")
           m << description
           m << ". Bundler cannot continue.\n"
 

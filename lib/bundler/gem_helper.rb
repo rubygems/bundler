@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "bundler/vendored_thor" unless defined?(Thor)
 require "bundler"
 
@@ -98,7 +99,7 @@ module Bundler
       gem_command = "gem push '#{path}'"
       if @gemspec.respond_to?(:metadata)
         allowed_push_host = @gemspec.metadata["allowed_push_host"]
-        gem_command << " --host #{allowed_push_host}" if allowed_push_host
+        gem_command += " --host #{allowed_push_host}" if allowed_push_host
       end
       sh(gem_command)
       Bundler.ui.confirm "Pushed #{name} #{version} to #{allowed_push_host ? allowed_push_host : "rubygems.org."}"
@@ -169,14 +170,15 @@ module Bundler
     end
 
     def sh_with_code(cmd, &block)
-      cmd << " 2>&1"
+      cmd += " 2>&1"
       outbuf = String.new
       Bundler.ui.debug(cmd)
       SharedHelpers.chdir(base) do
         outbuf = `#{cmd}`
-        block.call(outbuf) if $? == 0 && block
+        status = $?.exitstatus
+        block.call(outbuf) if status.zero? && block
+        [outbuf, status]
       end
-      [outbuf, $?]
     end
 
     def gem_push?

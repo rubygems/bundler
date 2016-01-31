@@ -140,15 +140,6 @@ Style/ExtraSpacing:
   Exclude:
     - 'lib/bundler/cli.rb'
 
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-# SupportedStyles: when_needed, always
-Style/FrozenStringLiteralComment:
-  Exclude:
-    - 'lib/bundler/index.rb'
-    - 'spec/runtime/inline_spec.rb'
-
 # Offense count: 4
 # Configuration parameters: AllowedVariables.
 Style/GlobalVars:

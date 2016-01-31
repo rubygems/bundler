@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Bundler
   class Resolver
     require "bundler/vendored_molinillo"
@@ -12,7 +13,7 @@ module Bundler
       end
 
       def message
-        conflicts.sort.reduce("") do |o, (name, conflict)|
+        conflicts.sort.reduce(String.new) do |o, (name, conflict)|
           o << %(Bundler could not find compatible versions for gem "#{name}":\n)
           if conflict.locked_requirement
             o << %(  In snapshot (#{Bundler.default_lockfile.basename}):\n)
@@ -341,7 +342,7 @@ module Bundler
         elsif requirement.source
           name = requirement.name
           versions = @source_requirements[name][name].map(&:version)
-          message  = "Could not find gem '#{requirement}' in #{requirement.source}.\n"
+          message  = String.new("Could not find gem '#{requirement}' in #{requirement.source}.\n")
           message << if versions.any?
                        "Source contains '#{name}' at: #{versions.join(", ")}"
                      else
