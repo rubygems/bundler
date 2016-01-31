@@ -28,10 +28,12 @@ module Bundler
       @env                  = nil
       @ruby_version         = nil
       @gemspecs             = []
+      @gemfile              = nil
       add_git_sources
     end
 
     def eval_gemfile(gemfile, contents = nil)
+      @gemfile = Pathname.new(gemfile)
       contents ||= Bundler.read_file(gemfile.to_s)
       instance_eval(contents, gemfile.to_s, 1)
     rescue Exception => e
@@ -47,7 +49,7 @@ module Bundler
       glob              = opts && opts[:glob]
       name              = opts && opts[:name] || "{,*}"
       development_group = opts && opts[:development_group] || :development
-      expanded_path     = File.expand_path(path, Bundler.default_gemfile.dirname)
+      expanded_path     = gemfile_root.join(path)
 
       gemspecs = Dir[File.join(expanded_path, "#{name}.gemspec")]
 
@@ -144,7 +146,9 @@ module Bundler
     end
 
     def path(path, options = {}, &blk)
-      with_source(@sources.add_path_source(normalize_hash(options).merge("path" => Pathname.new(path))), &blk)
+      source_options = normalize_hash(options).merge("path" => Pathname.new(path), "root_path" => gemfile_root)
+      source = @sources.add_path_source(source_options)
+      with_source(source, &blk)
     end
 
     def git(uri, options = {}, &blk)
@@ -486,6 +490,11 @@ module Bundler
         end
         [trace_line, description]
       end
+    end
+
+    def gemfile_root
+      @gemfile ||= Bundler.default_gemfile
+      @gemfile.dirname
     end
   end
 end

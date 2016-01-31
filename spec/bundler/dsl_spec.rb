@@ -235,6 +235,7 @@ describe Bundler::Dsl do
       it "restores it after it's done" do
         other_source = double("other-source")
         allow(Bundler::Source::Rubygems).to receive(:new).and_return(other_source)
+        allow(Bundler).to receive(:default_gemfile).and_return(Pathname.new("./Gemfile"))
 
         subject.source("https://other-source.org") do
           subject.gem("dobry-pies", :path => "foo")

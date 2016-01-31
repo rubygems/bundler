@@ -3,7 +3,7 @@ module Bundler
     class Path < Source
       autoload :Installer, "bundler/source/path/installer"
 
-      attr_reader :path, :options
+      attr_reader :path, :options, :root_path
       attr_writer :name
       attr_accessor :version
 
@@ -15,6 +15,8 @@ module Bundler
 
         @allow_cached = false
         @allow_remote = false
+
+        @root_path = options["root_path"] || Bundler.root
 
         if options["path"]
           @path = Pathname.new(options["path"])
@@ -77,7 +79,7 @@ module Bundler
       def cache(spec, custom_path = nil)
         app_cache_path = app_cache_path(custom_path)
         return unless Bundler.settings[:cache_all]
-        return if expand(@original_path).to_s.index(Bundler.root.to_s + "/") == 0
+        return if expand(@original_path).to_s.index(root_path.to_s + "/") == 0
 
         unless @original_path.exist?
           raise GemNotFound, "Can't cache gem #{version_message(spec)} because #{self} is missing!"
@@ -111,7 +113,7 @@ module Bundler
       end
 
       def expand(somepath)
-        somepath.expand_path(Bundler.root)
+        somepath.expand_path(root_path)
       rescue ArgumentError => e
         Bundler.ui.debug(e)
         raise PathError, "There was an error while trying to use the path " \
@@ -164,8 +166,8 @@ module Bundler
       end
 
       def relative_path
-        if path.to_s.start_with?(Bundler.root.to_s)
-          return path.relative_path_from(Bundler.root)
+        if path.to_s.start_with?(root_path.to_s)
+          return path.relative_path_from(root_path)
         end
         path
       end
