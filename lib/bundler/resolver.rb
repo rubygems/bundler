@@ -224,7 +224,8 @@ module Bundler
     end
 
     def debug?
-      ENV["DEBUG_RESOLVER"] || ENV["DEBUG_RESOLVER_TREE"]
+      return @debug_mode if defined?(@debug_mode)
+      @debug_mode = ENV["DEBUG_RESOLVER"] || ENV["DEBUG_RESOLVER_TREE"]
     end
 
     def before_resolution
