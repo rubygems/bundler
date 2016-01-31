@@ -9,7 +9,7 @@ module Bundler
     def run
       platforms, ruby_version = Bundler.ui.silence do
         [Bundler.definition.platforms.map {|p| "* #{p}" },
-         Bundler.definition.ruby_version]
+         (Bundler.locked_gems && Bundler.locked_gems.ruby_version) || Bundler.definition.ruby_version]
       end
       output = []
 
