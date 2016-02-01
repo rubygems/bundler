@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 module Bundler
   class RubyVersion
-    attr_reader :version, :patchlevel, :engine, :engine_version
+    attr_reader :version, :patchlevel, :engine, :engine_version, :gem_version
 
     def initialize(version, patchlevel, engine, engine_version)
       # The parameters to this method must satisfy the
@@ -17,6 +17,7 @@ module Bundler
       #   specified must match the version.
 
       @version        = version
+      @gem_version    = Gem::Requirement.create(version).requirements.first.last
       @input_engine   = engine
       @engine         = engine || "ruby"
       @engine_version = engine_version || version
@@ -44,10 +45,6 @@ module Bundler
         RbConfig::CONFIG["host_vendor"],
         RbConfig::CONFIG["host_os"]
       ].join("-")
-    end
-
-    def gem_version
-      Gem::Requirement.create(version).requirements.first.last
     end
 
     # Returns a tuple of these things:

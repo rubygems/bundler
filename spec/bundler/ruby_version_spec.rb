@@ -115,12 +115,22 @@ describe "Bundler::RubyVersion and its subclasses" do
     end
 
     describe "#gem_version" do
-      let(:gem_version_obj) { Gem::Version.new(version) }
+      let(:gem_version) { "2.0.0" }
+      let(:gem_version_obj) { Gem::Version.new(gem_version) }
 
-      it "should return a Gem::Version instance with the correct version" do
-        expect(ruby_version.gem_version).to eq(gem_version_obj)
-        expect(ruby_version.gem_version.version).to eq("2.0.0")
+      shared_examples_for "it parses the version from the requirement string" do |version|
+        let(:version) { version }
+        it "should return the underlying version" do
+          expect(ruby_version.gem_version).to eq(gem_version_obj)
+          expect(ruby_version.gem_version.version).to eq(gem_version)
+        end
       end
+
+      it_behaves_like "it parses the version from the requirement string", "2.0.0"
+      it_behaves_like "it parses the version from the requirement string", ">= 2.0.0"
+      it_behaves_like "it parses the version from the requirement string", "~> 2.0.0"
+      it_behaves_like "it parses the version from the requirement string", "< 2.0.0"
+      it_behaves_like "it parses the version from the requirement string", "= 2.0.0"
     end
 
     describe "#diff" do
