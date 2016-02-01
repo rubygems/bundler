@@ -24,12 +24,16 @@ module Bundler
       @patchlevel     = patchlevel
     end
 
-    def to_s
+    def to_s(version = self.version)
       output = String.new("ruby #{version}")
       output << "p#{patchlevel}" if patchlevel
       output << " (#{engine} #{engine_version})" unless engine == "ruby"
 
       output
+    end
+
+    def single_version_string
+      to_s(gem_version)
     end
 
     def ==(other)

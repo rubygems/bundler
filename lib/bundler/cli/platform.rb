@@ -8,8 +8,10 @@ module Bundler
 
     def run
       platforms, ruby_version = Bundler.ui.silence do
+        locked_ruby_version = Bundler.locked_gems && Bundler.locked_gems.ruby_version
+        gemfile_ruby_version = Bundler.definition.ruby_version && Bundler.definition.ruby_version.single_version_string
         [Bundler.definition.platforms.map {|p| "* #{p}" },
-         (Bundler.locked_gems && Bundler.locked_gems.ruby_version) || Bundler.definition.ruby_version]
+         locked_ruby_version || gemfile_ruby_version]
       end
       output = []
 

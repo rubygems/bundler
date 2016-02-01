@@ -191,9 +191,42 @@ G
       G
 
       bundle "platform --ruby"
-      puts err
 
       expect(out).to eq("No ruby version specified")
+    end
+
+    it "handles when there is a locked requirement" do
+      gemfile <<-G
+        ruby "< 1.8.7"
+      G
+
+      lockfile <<-L
+        GEM
+          specs:
+
+        PLATFORMS
+          ruby
+
+        DEPENDENCIES
+
+        RUBY VERSION
+           ruby 1.0.0p127
+
+        BUNDLED WITH
+           #{Bundler::VERSION}
+      L
+
+      bundle! "platform --ruby"
+      expect(out).to eq("ruby 1.0.0p127")
+    end
+
+    it "handles when there is a requirement in the gemfile" do
+      gemfile <<-G
+        ruby ">= 1.8.7"
+      G
+
+      bundle! "platform --ruby"
+      expect(out).to eq("ruby 1.8.7")
     end
   end
 
