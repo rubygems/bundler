@@ -24,13 +24,13 @@ configuration file using the following names:
 
 ## OPTIONS
 
-* `-b` or `--bin`:
-  Specify that Bundler should create a binary (as `exe/GEM_NAME`) in the
-  generated rubygem project. This binary will also be added to the
+* `--exe`:
+  Specify that Bundler should create a binary executable (as `exe/GEM_NAME`)
+  in the generated rubygem project. This binary will also be added to the
   `GEM_NAME.gemspec` manifest. This behavior is disabled by default.
 
-* `--no-bin`:
-  Do not create a binary (overrides `--bin` specified in the global config).
+* `--no-exe`:
+  Do not create a binary (overrides `--exe` specified in the global config).
 
 * `--coc`:
   Add a `CODE_OF_CONDUCT.md` file to the root of the generated project. If

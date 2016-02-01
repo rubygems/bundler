@@ -322,7 +322,7 @@ module Bundler
     end
 
     desc "gem GEM [OPTIONS]", "Creates a skeleton for creating a rubygem"
-    method_option :bin, :type => :boolean, :default => false, :aliases => "-b", :desc => "Generate a binary for your library."
+    method_option :exe, :type => :boolean, :default => false, :desc => "Generate a binary executable for your library."
     method_option :coc, :type => :boolean, :desc => "Generate a code of conduct file. Set a default with `bundle config gem.coc true`."
     method_option :edit, :type => :string, :aliases => "-e", :required => false, :banner => "EDITOR",
       :lazy_default => [ENV["BUNDLER_EDITOR"], ENV["VISUAL"], ENV["EDITOR"]].find {|e| !e.nil? && !e.empty? },

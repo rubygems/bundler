@@ -44,7 +44,7 @@ module Bundler
         :test             => options[:test],
         :test_task        => test_task,
         :ext              => options[:ext],
-        :bin              => options[:bin],
+        :exe              => options[:exe],
         :bundler_version  => bundler_dependency_version
       }
       ensure_safe_gem_name(name, constant_array)
@@ -107,7 +107,7 @@ module Bundler
         templates.merge!("CODE_OF_CONDUCT.md.tt" => "CODE_OF_CONDUCT.md")
       end
 
-      templates.merge!("exe/newgem.tt" => "exe/#{name}") if options[:bin]
+      templates.merge!("exe/newgem.tt" => "exe/#{name}") if config[:exe]
 
       if options[:ext]
         templates.merge!(
