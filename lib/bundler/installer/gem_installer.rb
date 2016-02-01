@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Bundler
   class GemInstaller
     attr_reader :spec, :standalone, :worker, :force, :installer

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "bundler/rubygems_integration"
 require "bundler/source/git/git_proxy"
 

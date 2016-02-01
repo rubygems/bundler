@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class IO
   def read_available_bytes(chunk_size = 16_384, select_timeout = 0.02)
     buffer = []

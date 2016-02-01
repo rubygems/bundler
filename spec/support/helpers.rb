@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Spec
   module Helpers
     def reset!
@@ -122,7 +123,7 @@ module Spec
     def ruby(ruby, options = {})
       expect_err = options.delete(:expect_err)
       env = (options.delete(:env) || {}).map {|k, v| "#{k}='#{v}' " }.join
-      ruby.gsub!(/["`\$]/) {|m| "\\#{m}" }
+      ruby = ruby.gsub(/["`\$]/) {|m| "\\#{m}" }
       lib_option = options[:no_lib] ? "" : " -I#{lib}"
       sys_exec(%(#{env}#{Gem.ruby}#{lib_option} -e "#{ruby}"), expect_err)
     end
@@ -284,14 +285,13 @@ module Spec
       ENV["GEM_PATH"] = system_gem_path.to_s
 
       install_gems(*gems)
-      if block_given?
-        begin
-          yield
-        ensure
-          ENV["GEM_HOME"] = gem_home
-          ENV["GEM_PATH"] = gem_path
-          ENV["PATH"] = path
-        end
+      return unless block_given?
+      begin
+        yield
+      ensure
+        ENV["GEM_HOME"] = gem_home
+        ENV["GEM_PATH"] = gem_path
+        ENV["PATH"] = path
       end
     end
 
@@ -312,14 +312,13 @@ module Spec
       gems.each do |gem|
         gem_command :install, "--no-rdoc --no-ri #{gem}"
       end
-      if block_given?
-        begin
-          yield
-        ensure
-          ENV["GEM_HOME"] = gem_home
-          ENV["GEM_PATH"] = gem_path
-          ENV["PATH"] = path
-        end
+      return unless block_given?
+      begin
+        yield
+      ensure
+        ENV["GEM_HOME"] = gem_home
+        ENV["GEM_PATH"] = gem_path
+        ENV["PATH"] = path
       end
     end
 

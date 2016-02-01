@@ -1,9 +1,10 @@
+# frozen_string_literal: true
 require "bundler/vendored_thor"
 
 module Bundler
   module UI
     class Shell
-      LEVELS = %w(silent error warn confirm info debug)
+      LEVELS = %w(silent error warn confirm info debug).freeze
 
       attr_writer :shell
 

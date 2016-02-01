@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 describe "bundler/inline#gemfile" do
@@ -5,7 +6,7 @@ describe "bundler/inline#gemfile" do
     requires = ["bundler/inline"]
     requires.unshift File.expand_path("../../support/artifice/" + options.delete(:artifice) + ".rb", __FILE__) if options.key?(:artifice)
     requires = requires.map {|r| "require '#{r}'" }.join("\n")
-    @out = ruby("#{requires}\n\n" << code, options)
+    @out = ruby("#{requires}\n\n" + code, options)
   end
 
   before :each do

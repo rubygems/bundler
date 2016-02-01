@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "bundler/dependency"
 require "bundler/ruby_dsl"
 
@@ -93,9 +94,8 @@ module Bundler
         if current.requirement != dep.requirement
           if current.type == :development
             @dependencies.delete current
-          elsif dep.type == :development
-            return
           else
+            return if dep.type == :development
             raise GemfileError, "You cannot specify the same gem twice with different version requirements.\n" \
                             "You specified: #{current.name} (#{current.requirement}) and #{dep.name} (#{dep.requirement})"
           end
@@ -109,9 +109,8 @@ module Bundler
         if current.source != dep.source
           if current.type == :development
             @dependencies.delete current
-          elsif dep.type == :development
-            return
           else
+            return if dep.type == :development
             raise GemfileError, "You cannot specify the same gem twice coming from different sources.\n" \
                             "You specified that #{dep.name} (#{dep.requirement}) should come from " \
                             "#{current.source || "an unspecified source"} and #{dep.source}\n"
@@ -347,7 +346,8 @@ module Bundler
     def validate_keys(command, opts, valid_keys)
       invalid_keys = opts.keys - valid_keys
       if invalid_keys.any?
-        message = "You passed #{invalid_keys.map {|k| ":" + k }.join(", ")} "
+        message = String.new
+        message << "You passed #{invalid_keys.map {|k| ":" + k }.join(", ")} "
         message << if invalid_keys.size > 1
                      "as options for #{command}, but they are invalid."
                    else
@@ -452,7 +452,7 @@ module Bundler
         @to_s ||= begin
           trace_line, description = parse_line_number_from_description
 
-          m = "\n[!] "
+          m = String.new("\n[!] ")
           m << description
           m << ". Bundler cannot continue.\n"
 

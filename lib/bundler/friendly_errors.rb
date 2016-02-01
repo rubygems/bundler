@@ -1,4 +1,5 @@
 # encoding: utf-8
+# frozen_string_literal: true
 require "cgi"
 require "bundler/vendored_thor"
 
@@ -68,7 +69,7 @@ module Bundler
         Error details
 
             #{e.class}: #{e.message}
-              #{e.backtrace.join("\n            ")}
+              #{e.backtrace.join("\n              ")}
 
         #{Bundler::Env.new.report(:print_gemfile => false, :print_gemspecs => false).gsub(/\n/, "\n      ").strip}
         --- TEMPLATE END ----------------------------------------------------------------

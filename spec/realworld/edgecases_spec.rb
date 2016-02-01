@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 describe "real world edgecases", :realworld => true, :sometimes => true do

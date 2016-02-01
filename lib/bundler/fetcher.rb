@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "bundler/vendored_persistent"
 require "cgi"
 require "securerandom"
@@ -53,15 +54,17 @@ module Bundler
 
     # Exceptions classes that should bypass retry attempts. If your password didn't work the
     # first time, it's not going to the third time.
-    FAIL_ERRORS = [AuthenticationRequiredError, BadAuthenticationError, FallbackError]
     NET_ERRORS = [:HTTPBadGateway, :HTTPBadRequest, :HTTPFailedDependency,
                   :HTTPForbidden, :HTTPInsufficientStorage, :HTTPMethodNotAllowed,
                   :HTTPMovedPermanently, :HTTPNoContent, :HTTPNotFound,
                   :HTTPNotImplemented, :HTTPPreconditionFailed, :HTTPRequestEntityTooLarge,
                   :HTTPRequestURITooLong, :HTTPUnauthorized, :HTTPUnprocessableEntity,
-                  :HTTPUnsupportedMediaType, :HTTPVersionNotSupported]
-    FAIL_ERRORS << Gem::Requirement::BadRequirementError if defined?(Gem::Requirement::BadRequirementError)
-    FAIL_ERRORS.push(*NET_ERRORS.map {|e| SharedHelpers.const_get_safely(e, Net) }.compact)
+                  :HTTPUnsupportedMediaType, :HTTPVersionNotSupported].freeze
+    FAIL_ERRORS = begin
+      fail_errors = [AuthenticationRequiredError, BadAuthenticationError, FallbackError]
+      fail_errors << Gem::Requirement::BadRequirementError if defined?(Gem::Requirement::BadRequirementError)
+      fail_errors.push(*NET_ERRORS.map {|e| SharedHelpers.const_get_safely(e, Net) }.compact)
+    end.freeze
 
     class << self
       attr_accessor :disable_endpoint, :api_timeout, :redirect_limit, :max_retries
@@ -127,11 +130,10 @@ module Bundler
 
       specs.each do |name, version, platform, dependencies|
         next if name == "bundler"
-        spec = nil
-        if dependencies
-          spec = EndpointSpecification.new(name, version, platform, dependencies)
+        spec = if dependencies
+          EndpointSpecification.new(name, version, platform, dependencies)
         else
-          spec = RemoteSpecification.new(name, version, platform, self)
+          RemoteSpecification.new(name, version, platform, self)
         end
         spec.source = source
         spec.remote = @remote
@@ -151,10 +153,10 @@ module Bundler
 
       fetchers.shift until fetchers.first.available?
 
-      if remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
-        @use_api = false
+      @use_api = if remote_uri.scheme == "file" || Bundler::Fetcher.disable_endpoint
+        false
       else
-        @use_api = fetchers.first.api_fetcher?
+        fetchers.first.api_fetcher?
       end
     end
 
@@ -162,7 +164,7 @@ module Bundler
       @user_agent ||= begin
         ruby = Bundler::RubyVersion.system
 
-        agent = "bundler/#{Bundler::VERSION}"
+        agent = String.new("bundler/#{Bundler::VERSION}")
         agent << " rubygems/#{Gem::VERSION}"
         agent << " ruby/#{ruby.version}"
         agent << " (#{ruby.host})"
@@ -198,9 +200,8 @@ module Bundler
     end
 
     def http_proxy
-      if uri = connection.proxy_uri
-        uri.to_s
-      end
+      return unless uri = connection.proxy_uri
+      uri.to_s
     end
 
     def inspect
@@ -209,7 +210,7 @@ module Bundler
 
   private
 
-    FETCHERS = [CompactIndex, Dependency, Index]
+    FETCHERS = [CompactIndex, Dependency, Index].freeze
 
     def cis
       env_cis = {
@@ -269,7 +270,7 @@ module Bundler
       Errno::EINVAL, Errno::ECONNRESET, Errno::ETIMEDOUT, Errno::EAGAIN,
       Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError,
       Net::HTTP::Persistent::Error, Zlib::BufError
-    ]
+    ].freeze
 
     def bundler_cert_store
       store = OpenSSL::X509::Store.new

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Bundler
   class Resolver
     require "bundler/vendored_molinillo"
@@ -12,7 +13,7 @@ module Bundler
       end
 
       def message
-        conflicts.sort.reduce("") do |o, (name, conflict)|
+        conflicts.sort.reduce(String.new) do |o, (name, conflict)|
           o << %(Bundler could not find compatible versions for gem "#{name}":\n)
           if conflict.locked_requirement
             o << %(  In snapshot (#{Bundler.default_lockfile.basename}):\n)
@@ -216,11 +217,10 @@ module Bundler
     # @param [Integer] depth the current depth of the resolution process.
     # @return [void]
     def debug(depth = 0)
-      if debug?
-        debug_info = yield
-        debug_info = debug_info.inspect unless debug_info.is_a?(String)
-        STDERR.puts debug_info.split("\n").map {|s| "  " * depth + s }
-      end
+      return unless debug?
+      debug_info = yield
+      debug_info = debug_info.inspect unless debug_info.is_a?(String)
+      STDERR.puts debug_info.split("\n").map {|s| "  " * depth + s }
     end
 
     def debug?
@@ -342,12 +342,12 @@ module Bundler
         elsif requirement.source
           name = requirement.name
           versions = @source_requirements[name][name].map(&:version)
-          message  = "Could not find gem '#{requirement}' in #{requirement.source}.\n"
-          if versions.any?
-            message << "Source contains '#{name}' at: #{versions.join(", ")}"
-          else
-            message << "Source does not contain any versions of '#{requirement}'"
-          end
+          message  = String.new("Could not find gem '#{requirement}' in #{requirement.source}.\n")
+          message << if versions.any?
+                       "Source contains '#{name}' at: #{versions.join(", ")}"
+                     else
+                       "Source does not contain any versions of '#{requirement}'"
+                     end
         else
           message = "Could not find gem '#{requirement}' in any of the gem sources " \
             "listed in your Gemfile or available on this machine."

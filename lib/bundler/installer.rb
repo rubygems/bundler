@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "erb"
 require "rubygems/dependency_installer"
 require "bundler/worker"
@@ -190,9 +191,8 @@ module Bundler
         end
       end
 
-      unless local
-        options["local"] ? @definition.resolve_with_cache! : @definition.resolve_remotely!
-      end
+      return if local
+      options["local"] ? @definition.resolve_with_cache! : @definition.resolve_remotely!
     end
   end
 end

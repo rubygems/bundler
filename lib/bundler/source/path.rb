@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Bundler
   class Source
     class Path < Source
@@ -7,7 +8,7 @@ module Bundler
       attr_writer :name
       attr_accessor :version
 
-      DEFAULT_GLOB = "{,*,*/*}.gemspec"
+      DEFAULT_GLOB = "{,*,*/*}.gemspec".freeze
 
       def initialize(options)
         @options = options
@@ -156,10 +157,14 @@ module Bundler
               end
             end
           end
-        elsif File.exist?(expanded_path)
-          raise PathError, "The path `#{expanded_path}` is not a directory."
         else
-          raise PathError, "The path `#{expanded_path}` does not exist."
+          message = String.new("The path `#{expanded_path}` ")
+          message << if File.exist?(expanded_path)
+                       "is not a directory."
+                     else
+                       "does not exist."
+                     end
+          raise PathError, message
         end
 
         index

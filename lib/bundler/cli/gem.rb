@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "pathname"
 
 module Bundler
@@ -5,7 +6,7 @@ module Bundler
     TEST_FRAMEWORK_VERSIONS = {
       "rspec" => "3.0",
       "minitest" => "5.0"
-    }
+    }.freeze
 
     attr_reader :options, :gem_name, :thor, :name, :target
 
@@ -135,10 +136,8 @@ module Bundler
         `git add .`
       end
 
-      if options[:edit]
-        # Open gemspec in editor
-        thor.run("#{options["edit"]} \"#{target.join("#{name}.gemspec")}\"")
-      end
+      # Open gemspec in editor
+      open_editor(options["edit"], target.join("#{name}.gemspec")) if options[:edit]
     end
 
   private
@@ -206,6 +205,10 @@ module Bundler
         Bundler.ui.error "Invalid gem name #{name} constant #{constant_array.join("::")} is already in use. Please choose another gem name."
         exit 1
       end
+    end
+
+    def open_editor(editor, file)
+      thor.run(%(#{editor} "#{file}"))
     end
   end
 end

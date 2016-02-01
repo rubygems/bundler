@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 Signal.trap("INT") { exit 1 }
 
@@ -38,7 +39,7 @@ module Bundler
     def gem(name, *args)
     end
 
-    def group(*args, &blk)
+    def group(*args)
     end
   end
 end

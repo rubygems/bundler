@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require File.expand_path("../../path.rb", __FILE__)
 require File.expand_path("../../../../lib/bundler/deprecate", __FILE__)
 include Spec::Path

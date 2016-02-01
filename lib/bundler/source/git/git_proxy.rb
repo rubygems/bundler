@@ -1,9 +1,11 @@
+# frozen_string_literal: true
 module Bundler
   class Source
     class Git < Path
       class GitNotInstalledError < GitError
         def initialize
-          msg =  "You need to install git to be able to use gems from git repositories. "
+          msg = String.new
+          msg << "You need to install git to be able to use gems from git repositories. "
           msg << "For help installing git, please refer to GitHub's tutorial at https://help.github.com/articles/set-up-git"
           super msg
         end
@@ -11,7 +13,8 @@ module Bundler
 
       class GitNotAllowedError < GitError
         def initialize(command)
-          msg =  "Bundler is trying to run a `git #{command}` at runtime. You probably need to run `bundle install`. However, "
+          msg = String.new
+          msg << "Bundler is trying to run a `git #{command}` at runtime. You probably need to run `bundle install`. However, "
           msg << "this error message could probably be more useful. Please submit a ticket at http://github.com/bundler/bundler/issues "
           msg << "with steps to reproduce as well as the following\n\nCALLER: #{caller.join("\n")}"
           super msg
@@ -20,7 +23,8 @@ module Bundler
 
       class GitCommandError < GitError
         def initialize(command, path = nil, extra_info = nil)
-          msg =  "Git error: command `git #{command}` in directory #{SharedHelpers.pwd} has failed."
+          msg = String.new
+          msg << "Git error: command `git #{command}` in directory #{SharedHelpers.pwd} has failed."
           msg << "\n#{extra_info}" if extra_info
           msg << "\nIf this error persists you could try removing the cache directory '#{path}'" if path && path.exist?
           super msg

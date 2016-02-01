@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require File.expand_path("../endpoint", __FILE__)
 
 Artifice.deactivate
@@ -13,10 +14,9 @@ class EndpointCredsDiffHost < Endpoint
     end
 
     def protected!
-      unless authorized?
-        response["WWW-Authenticate"] = %(Basic realm="Testing HTTP Auth")
-        throw(:halt, [401, "Not authorized\n"])
-      end
+      return if authorized?
+      response["WWW-Authenticate"] = %(Basic realm="Testing HTTP Auth")
+      throw(:halt, [401, "Not authorized\n"])
     end
   end
 

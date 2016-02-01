@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "bundler/lockfile_parser"
 require "digest/sha1"
 require "set"
@@ -347,12 +348,13 @@ module Bundler
     end
 
     def ensure_equivalent_gemfile_and_lockfile(explicit_flag = false)
-      msg = "You are trying to install in deployment mode after changing\n" \
-            "your Gemfile. Run `bundle install` elsewhere and add the\n" \
-            "updated #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)} to version control."
+      msg = String.new
+      msg << "You are trying to install in deployment mode after changing\n" \
+             "your Gemfile. Run `bundle install` elsewhere and add the\n" \
+             "updated #{Bundler.default_lockfile.relative_path_from(SharedHelpers.pwd)} to version control."
 
       unless explicit_flag
-        msg += "\n\nIf this is a development machine, remove the #{Bundler.default_gemfile} " \
+        msg << "\n\nIf this is a development machine, remove the #{Bundler.default_gemfile} " \
                "freeze \nby running `bundle install --no-deployment`."
       end
 

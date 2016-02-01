@@ -1,10 +1,11 @@
+# frozen_string_literal: true
 require "bundler"
 require "bundler/vendored_thor"
 
 module Bundler
   class CLI < Thor
     include Thor::Actions
-    AUTO_INSTALL_CMDS = %w(show binstubs outdated exec open console licenses clean)
+    AUTO_INSTALL_CMDS = %w(show binstubs outdated exec open console licenses clean).freeze
 
     def self.start(*)
       super

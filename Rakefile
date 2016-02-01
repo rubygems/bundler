@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+# frozen_string_literal: true
 $:.unshift File.expand_path("../lib", __FILE__)
 require "shellwords"
 require "benchmark"
@@ -33,7 +34,7 @@ namespace :spec do
     deps = Hash[BUNDLER_SPEC.development_dependencies.map do |d|
       [d.name, d.requirement.to_s]
     end]
-    deps["rubocop"] ||= "= 0.35.1" if RUBY_VERSION >= "1.9.3" # can't go in the gemspec because of the ruby version requirement
+    deps["rubocop"] ||= "= 0.36.0" if RUBY_VERSION >= "1.9.3" # can't go in the gemspec because of the ruby version requirement
 
     # JRuby can't build ronn or rdiscount, so we skip that
     if defined?(RUBY_ENGINE) && RUBY_ENGINE == "jruby"
@@ -64,7 +65,7 @@ namespace :spec do
       sh "sudo apt-get install graphviz -y 2>&1 | tail -n 2"
 
       # Install the gems with a consistent version of RubyGems
-      sh "gem update --system 2.5.1"
+      sh "gem update --system 2.5.2"
 
       $LOAD_PATH.unshift("./spec")
       require "support/rubygems_ext"
@@ -87,7 +88,7 @@ begin
 
   if RUBY_VERSION >= "1.9.3"
     # can't go in the gemspec because of the ruby version requirement
-    gem "rubocop", "= 0.35.1"
+    gem "rubocop", "= 0.36.0"
     require "rubocop/rake_task"
     RuboCop::RakeTask.new
   end
@@ -121,7 +122,7 @@ begin
       rubyopt = ENV["RUBYOPT"]
       # When editing this list, also edit .travis.yml!
       branches = %w(master)
-      releases = %w(v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.29 v2.0.14 v2.1.11 v2.2.5 v2.4.8 v2.5.1)
+      releases = %w(v1.3.6 v1.3.7 v1.4.2 v1.5.3 v1.6.2 v1.7.2 v1.8.29 v2.0.14 v2.1.11 v2.2.5 v2.4.8 v2.5.2)
       (branches + releases).each do |rg|
         desc "Run specs with Rubygems #{rg}"
         RSpec::Core::RakeTask.new(rg) do |t|

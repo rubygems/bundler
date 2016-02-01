@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 
 describe Bundler::Source do
@@ -85,7 +86,7 @@ describe Bundler::Source do
       let(:spec) { double(:spec, :source => subject) }
 
       it "should return true" do
-        expect(subject.can_lock? spec).to be_truthy
+        expect(subject.can_lock?(spec)).to be_truthy
       end
     end
 
@@ -93,7 +94,7 @@ describe Bundler::Source do
       let(:spec) { double(:spec, :source => double(:other_source)) }
 
       it "should return false" do
-        expect(subject.can_lock? spec).to be_falsey
+        expect(subject.can_lock?(spec)).to be_falsey
       end
     end
   end

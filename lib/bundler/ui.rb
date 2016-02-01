@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Bundler
   module UI
     autoload :RGProxy, "bundler/ui/rg_proxy"

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Bundler
   class CLI::Config
     attr_reader :name, :options, :scope, :thor
@@ -9,10 +10,9 @@ module Bundler
       @thor = thor
       @name = peek = args.shift
       @scope = "global"
-      if peek && peek =~ /^\-\-/
-        @name = args.shift
-        @scope = $'
-      end
+      return unless peek && peek.start_with?("--")
+      @name = args.shift
+      @scope = peek[2..-1]
     end
 
     def run
@@ -59,7 +59,7 @@ module Bundler
 
     def new_value
       pathname = Pathname.new(args.join(" "))
-      if name.match(/\Alocal\./) && pathname.directory?
+      if name.start_with?("local.") && pathname.directory?
         pathname.expand_path.to_s
       else
         args.join(" ")

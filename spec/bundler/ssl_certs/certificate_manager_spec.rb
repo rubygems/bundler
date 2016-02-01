@@ -1,10 +1,11 @@
+# frozen_string_literal: true
 require "spec_helper"
 require "bundler/ssl_certs/certificate_manager"
 
 describe Bundler::SSLCerts::CertificateManager do
   let(:rubygems_path) { root }
-  let(:stub_cert) { File.join("#{root}", "lib", "rubygems", "ssl_certs", "ssl-cert.pem") }
-  let(:rubygems_certs_dir) { File.join("#{root}", "lib", "rubygems", "ssl_certs") }
+  let(:stub_cert) { File.join(root.to_s, "lib", "rubygems", "ssl_certs", "ssl-cert.pem") }
+  let(:rubygems_certs_dir) { File.join(root.to_s, "lib", "rubygems", "ssl_certs") }
 
   subject { described_class.new(rubygems_path) }
 
@@ -15,7 +16,7 @@ describe Bundler::SSLCerts::CertificateManager do
   end
 
   after do
-    rubygems_dir = File.join("#{root}", "lib", "rubygems")
+    rubygems_dir = File.join(root.to_s, "lib", "rubygems")
     FileUtils.rm_rf(rubygems_dir)
   end
 
@@ -50,7 +51,7 @@ describe Bundler::SSLCerts::CertificateManager do
   describe "#up_to_date?" do
     context "when bundler certs and rubygems certs are the same" do
       before do
-        bundler_certs = Dir[File.join("#{root}", "lib", "bundler", "ssl_certs", "*.pem")]
+        bundler_certs = Dir[File.join(root.to_s, "lib", "bundler", "ssl_certs", "*.pem")]
         FileUtils.rm(stub_cert)
         FileUtils.cp(bundler_certs, rubygems_certs_dir)
       end

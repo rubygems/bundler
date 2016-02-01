@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "set"
 
 module Bundler
@@ -139,12 +140,9 @@ module Bundler
     end
 
     def add_source(index)
-      if index.is_a?(Index)
-        @sources << index
-        @sources.uniq! # need to use uniq! here instead of checking for the item before adding
-      else
-        raise ArgumentError, "Source must be an index, not #{index.class}"
-      end
+      raise ArgumentError, "Source must be an index, not #{index.class}" unless index.is_a?(Index)
+      @sources << index
+      @sources.uniq! # need to use uniq! here instead of checking for the item before adding
     end
 
   private

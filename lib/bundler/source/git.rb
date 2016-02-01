@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "fileutils"
 require "uri"
 require "digest/sha1"
@@ -35,7 +36,7 @@ module Bundler
       end
 
       def to_lock
-        out = "GIT\n"
+        out = String.new("GIT\n")
         out << "  remote: #{@uri}\n"
         out << "  revision: #{revision}\n"
         %w(ref branch tag submodules).each do |opt|

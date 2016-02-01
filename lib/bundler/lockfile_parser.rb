@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "strscan"
 
 # Some versions of the Bundler 1.1 RC series introduced corrupted
@@ -14,16 +15,16 @@ module Bundler
   class LockfileParser
     attr_reader :sources, :dependencies, :specs, :platforms, :bundler_version, :ruby_version
 
-    BUNDLED      = "BUNDLED WITH"
-    DEPENDENCIES = "DEPENDENCIES"
-    PLATFORMS    = "PLATFORMS"
-    RUBY         = "RUBY VERSION"
-    GIT          = "GIT"
-    GEM          = "GEM"
-    PATH         = "PATH"
-    SPECS        = "  specs:"
+    BUNDLED      = "BUNDLED WITH".freeze
+    DEPENDENCIES = "DEPENDENCIES".freeze
+    PLATFORMS    = "PLATFORMS".freeze
+    RUBY         = "RUBY VERSION".freeze
+    GIT          = "GIT".freeze
+    GEM          = "GEM".freeze
+    PATH         = "PATH".freeze
+    SPECS        = "  specs:".freeze
     OPTIONS      = /^  ([a-z]+): (.*)$/i
-    SOURCE       = [GIT, GEM, PATH]
+    SOURCE       = [GIT, GEM, PATH].freeze
 
     def initialize(lockfile)
       @platforms    = []
@@ -89,7 +90,7 @@ module Bundler
       GIT  => Bundler::Source::Git,
       GEM  => Bundler::Source::Rubygems,
       PATH => Bundler::Source::Path,
-    }
+    }.freeze
 
     def parse_source(line)
       case line
@@ -134,7 +135,7 @@ module Bundler
       end
     end
 
-    NAME_VERSION = '(?! )(.*?)(?: \(([^-]*)(?:-(.*))?\))?'
+    NAME_VERSION = '(?! )(.*?)(?: \(([^-]*)(?:-(.*))?\))?'.freeze
     NAME_VERSION_2 = /^ {2}#{NAME_VERSION}(!)?$/
     NAME_VERSION_4 = /^ {4}#{NAME_VERSION}$/
     NAME_VERSION_6 = /^ {6}#{NAME_VERSION}$/
@@ -192,9 +193,8 @@ module Bundler
 
     def parse_bundled_with(line)
       line = line.strip
-      if Gem::Version.correct?(line)
-        @bundler_version = Gem::Version.create(line)
-      end
+      return unless Gem::Version.correct?(line)
+      @bundler_version = Gem::Version.create(line)
     end
 
     def parse_ruby(line)

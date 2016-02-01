@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Spec
   module Matchers
     RSpec::Matchers.define :have_dep do |*args|
@@ -69,7 +70,7 @@ module Spec
     def lockfile_should_be(expected)
       should_be_locked
       spaces = expected[/\A\s+/, 0] || ""
-      expected.gsub!(/^#{spaces}/, "")
+      expected = expected.gsub(/^#{spaces}/, "")
       expect(bundled_app("Gemfile.lock").read).to eq(expected)
     end
   end

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "pathname"
 require "rubygems"
 
@@ -162,10 +163,9 @@ module Bundler
 
     def set_rubyopt
       rubyopt = [ENV["RUBYOPT"]].compact
-      if rubyopt.empty? || rubyopt.first !~ %r{-rbundler/setup}
-        rubyopt.unshift %(-rbundler/setup)
-        ENV["RUBYOPT"] = rubyopt.join(" ")
-      end
+      return if !rubyopt.empty? && rubyopt.first =~ %r{-rbundler/setup}
+      rubyopt.unshift %(-rbundler/setup)
+      ENV["RUBYOPT"] = rubyopt.join(" ")
     end
 
     def set_rubylib

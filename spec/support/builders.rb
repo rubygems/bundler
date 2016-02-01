@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "bundler/shared_helpers"
 
 module Spec
@@ -624,7 +625,7 @@ module Spec
 
           current_ref = `git rev-parse HEAD`.strip
           _default_files.keys.each do |path|
-            _default_files[path] << "\n#{Builders.constantize(name)}_PREV_REF = '#{current_ref}'"
+            _default_files[path] += "\n#{Builders.constantize(name)}_PREV_REF = '#{current_ref}'"
           end
           super(options.merge(:path => libpath, :gemspec => false))
           `git add *`

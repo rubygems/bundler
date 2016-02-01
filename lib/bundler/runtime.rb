@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "digest/sha1"
 
 module Bundler
@@ -52,7 +53,7 @@ module Bundler
       /^Missing API definition file in (.+)$/i,
       /^cannot load such file -- (.+)$/i,
       /^dlopen\([^)]*\): Library not loaded: (.+)$/i,
-    ]
+    ].freeze
 
     def require(*groups)
       groups.map!(&:to_sym)
@@ -273,11 +274,10 @@ module Bundler
         man_subdir unless Dir[man_subdir + "/man?/"].empty?
       end.compact
 
-      unless manuals.empty?
-        ENV["MANPATH"] = manuals.concat(
-          ENV["MANPATH"].to_s.split(File::PATH_SEPARATOR)
-        ).uniq.join(File::PATH_SEPARATOR)
-      end
+      return if manuals.empty?
+      ENV["MANPATH"] = manuals.concat(
+        ENV["MANPATH"].to_s.split(File::PATH_SEPARATOR)
+      ).uniq.join(File::PATH_SEPARATOR)
     end
 
     def remove_dir(dir, dry_run)

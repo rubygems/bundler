@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 require "bundler"
 require "bundler/friendly_errors"

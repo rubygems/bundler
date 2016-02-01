@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Bundler
   class RubyVersion
     attr_reader :version, :patchlevel, :engine, :engine_version
@@ -23,7 +24,7 @@ module Bundler
     end
 
     def to_s
-      output = "ruby #{version}"
+      output = String.new("ruby #{version}")
       output << "p#{patchlevel}" if patchlevel
       output << " (#{engine} #{engine_version})" unless engine == "ruby"
 
