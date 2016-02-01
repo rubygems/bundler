@@ -4,12 +4,15 @@ describe "Bundler.with_env helpers" do
   shared_examples_for "Bundler.with_*_env" do
     it "should reset and restore the environment" do
       gem_path = ENV["GEM_PATH"]
+      path = ENV["PATH"]
 
       Bundler.with_clean_env do
         expect(`echo $GEM_PATH`.strip).not_to eq(gem_path)
+        expect(`echo $PATH`.strip).not_to eq(path)
       end
 
       expect(ENV["GEM_PATH"]).to eq(gem_path)
+      expect(ENV["PATH"]).to eq(path)
     end
   end
 
@@ -29,6 +32,18 @@ describe "Bundler.with_env helpers" do
 
       code = "Bundler.with_clean_env do;" \
              "  print ENV['GEM_PATH'] != '';" \
+             "end"
+
+      result = bundle "exec ruby -e #{code.inspect}"
+      expect(result).to eq("true")
+    end
+
+    it "should keep the original PATH even in sub processes" do
+      gemfile ""
+      bundle "install --path vendor/bundle"
+
+      code = "Bundler.with_clean_env do;" \
+             "  print ENV['PATH'] != '';" \
              "end"
 
       result = bundle "exec ruby -e #{code.inspect}"
