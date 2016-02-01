@@ -75,6 +75,7 @@ module Bundler
     end
 
     def set_bundle_environment
+      set_bundle_variables
       set_path
       set_rubyopt
       set_rubylib
@@ -153,6 +154,17 @@ module Bundler
         previous = current
         current = File.expand_path("..", current)
       end
+    end
+
+    def set_bundle_variables
+      begin
+        ENV["BUNDLE_BIN_PATH"] = Bundler.rubygems.bin_path("bundler", "bundle", VERSION)
+      rescue Gem::GemNotFoundException
+        ENV["BUNDLE_BIN_PATH"] = File.expand_path("../../../exe/bundle", __FILE__)
+      end
+
+      # Set BUNDLE_GEMFILE
+      ENV["BUNDLE_GEMFILE"] = find_gemfile.to_s
     end
 
     def set_path

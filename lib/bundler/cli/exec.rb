@@ -21,18 +21,12 @@ module Bundler
       ui = Bundler.ui
       raise ArgumentError if cmd.nil?
 
-      # First, try to exec directly to something in PATH
       SharedHelpers.set_bundle_environment
       bin_path = Bundler.which(@cmd)
-      if bin_path
-        Bundler.ui = nil
-        Kernel.exec([bin_path, @cmd], *args)
-      end
-
-      # If that didn't work, set up the whole bundle
-      Bundler.definition.validate_ruby!
-      Bundler.load.setup_environment
       Bundler.ui = nil
+      # First, try to exec directly to something in PATH
+      Kernel.exec([bin_path, @cmd], *args) if bin_path
+      # Just exec using the given command
       Kernel.exec(@cmd, *args)
     rescue Errno::EACCES, Errno::ENOEXEC
       Bundler.ui = ui

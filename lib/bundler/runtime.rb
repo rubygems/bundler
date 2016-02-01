@@ -13,7 +13,7 @@ module Bundler
 
       specs = groups.any? ? @definition.specs_for(groups) : requested_specs
 
-      setup_environment
+      SharedHelpers.set_bundle_environment
       Bundler.rubygems.replace_entrypoints(specs)
 
       # Activate the specs
@@ -203,19 +203,6 @@ module Bundler
       end
 
       output
-    end
-
-    def setup_environment
-      begin
-        ENV["BUNDLE_BIN_PATH"] = Bundler.rubygems.bin_path("bundler", "bundle", VERSION)
-      rescue Gem::GemNotFoundException
-        ENV["BUNDLE_BIN_PATH"] = File.expand_path("../../../exe/bundle", __FILE__)
-      end
-
-      # Set BUNDLE_GEMFILE
-      ENV["BUNDLE_GEMFILE"] = default_gemfile.to_s
-
-      SharedHelpers.set_bundle_environment
     end
 
   private
