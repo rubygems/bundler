@@ -166,14 +166,14 @@ module Bundler
 
         agent = String.new("bundler/#{Bundler::VERSION}")
         agent << " rubygems/#{Gem::VERSION}"
-        agent << " ruby/#{ruby.version}"
+        agent << " ruby/#{ruby.versions}"
         agent << " (#{ruby.host})"
         agent << " command/#{ARGV.first}"
 
         if ruby.engine != "ruby"
           # engine_version raises on unknown engines
           engine_version = begin
-                             ruby.engine_version
+                             ruby.engine_versions
                            rescue
                              "???"
                            end
