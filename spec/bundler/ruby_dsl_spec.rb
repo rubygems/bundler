@@ -23,7 +23,8 @@ describe Bundler::RubyDsl do
 
   let(:invoke) do
     proc do
-      dsl.ruby(*ruby_version, options)
+      args = Array(ruby_version) + [options]
+      dsl.ruby(*args)
     end
   end
 
