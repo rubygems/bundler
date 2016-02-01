@@ -1,9 +1,14 @@
 # frozen_string_literal: true
 module Bundler
   class RubyVersion
-    attr_reader :version, :patchlevel, :engine, :engine_version, :gem_version
+    attr_reader :versions,
+                :patchlevel,
+                :engine,
+                :engine_versions,
+                :gem_version,
+                :engine_gem_version
 
-    def initialize(version, patchlevel, engine, engine_version)
+    def initialize(versions, patchlevel, engine, engine_version)
       # The parameters to this method must satisfy the
       # following constraints, which are verified in
       # the DSL:
@@ -16,18 +21,19 @@ module Bundler
       #   must not be specified, or the engine version
       #   specified must match the version.
 
-      @version        = version
-      @gem_version    = Gem::Requirement.create(version).requirements.first.last
-      @input_engine   = engine
-      @engine         = engine || "ruby"
-      @engine_version = engine_version || version
-      @patchlevel     = patchlevel
+      @versions           = Array(versions)
+      @gem_version        = Gem::Requirement.create(@versions.first).requirements.first.last
+      @input_engine       = engine
+      @engine             = engine || "ruby"
+      @engine_versions    = (engine_version && Array(engine_version)) || @versions
+      @engine_gem_version = Gem::Requirement.create(@engine_versions.first).requirements.first.last
+      @patchlevel         = patchlevel
     end
 
-    def to_s(version = self.version)
-      output = String.new("ruby #{version}")
+    def to_s(versions = self.versions)
+      output = String.new("ruby #{versions_string(versions)}")
       output << "p#{patchlevel}" if patchlevel
-      output << " (#{engine} #{engine_version})" unless engine == "ruby"
+      output << " (#{engine} #{versions_string(engine_versions)})" unless engine == "ruby"
 
       output
     end
@@ -37,9 +43,9 @@ module Bundler
     end
 
     def ==(other)
-      version == other.version &&
+      versions == other.versions &&
         engine == other.engine &&
-        engine_version == other.engine_version &&
+        engine_versions == other.engine_versions &&
         patchlevel == other.patchlevel
     end
 
@@ -58,15 +64,20 @@ module Bundler
     #   2. ruby_version
     #   3. engine_version
     def diff(other)
+      raise ArgumentError, "Can only diff with a RubyVersion" unless other.is_a?(RubyVersion)
       if engine != other.engine && @input_engine
         [:engine, engine, other.engine]
-      elsif !version || !matches?(version, other.version)
-        [:version, version, other.version]
-      elsif @input_engine && !matches?(engine_version, other.engine_version)
-        [:engine_version, engine_version, other.engine_version]
+      elsif versions.empty? || !matches?(versions, other.gem_version)
+        [:version, versions_string(versions), versions_string(other.versions)]
+      elsif @input_engine && !matches?(engine_versions, other.engine_gem_version)
+        [:engine_version, versions_string(engine_versions), versions_string(other.engine_versions)]
       elsif patchlevel && (!patchlevel.is_a?(String) || !other.patchlevel.is_a?(String) || !matches?(patchlevel, other.patchlevel))
         [:patchlevel, patchlevel, other.patchlevel]
       end
+    end
+
+    def versions_string(versions)
+      Array(versions).join(", ")
     end
 
     def self.system
@@ -85,14 +96,16 @@ module Bundler
                               JRUBY_VERSION.dup
                             else
                               raise BundlerError, "RUBY_ENGINE value #{RUBY_ENGINE} is not recognized"
-      end
+                            end
       @ruby_version ||= RubyVersion.new(RUBY_VERSION.dup, RUBY_PATCHLEVEL.to_s, ruby_engine, ruby_engine_version)
     end
 
   private
 
-    def matches?(requirement, version)
-      Gem::Requirement.create(requirement).satisfied_by?(Gem::Version.new(version))
+    def matches?(requirements, version)
+      Array(requirements).all? do |requirement|
+        Gem::Requirement.create(requirement).satisfied_by?(Gem::Version.create(version))
+      end
     end
   end
 end

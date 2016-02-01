@@ -22,7 +22,7 @@ describe Bundler::RubyDsl do
 
   let(:invoke) do
     proc do
-      dsl.ruby(ruby_version, options)
+      dsl.ruby(*ruby_version, options)
     end
   end
 
@@ -34,13 +34,13 @@ describe Bundler::RubyDsl do
   describe "#ruby_version" do
     shared_examples_for "it stores the ruby version" do
       it "stores the version" do
-        expect(subject.version).to eq(ruby_version)
+        expect(subject.versions).to eq(Array(ruby_version))
         expect(subject.gem_version.version).to eq(version)
       end
 
       it "stores the engine details" do
         expect(subject.engine).to eq(engine)
-        expect(subject.engine_version).to eq(engine_version)
+        expect(subject.engine_versions).to eq(Array(engine_version))
       end
 
       it "stores the patchlevel" do
@@ -57,11 +57,21 @@ describe Bundler::RubyDsl do
       it_behaves_like "it stores the ruby version"
     end
 
-    context "with two requirements" do
+    context "with two requirements in the same string" do
       let(:ruby_version) { ">= 2.0.0, < 3.0" }
       it "raises an error" do
         expect { subject }.to raise_error(ArgumentError)
       end
+    end
+
+    context "with two requirements" do
+      let(:ruby_version) { ["~> 2.0.0", "> 2.0.1"] }
+      it_behaves_like "it stores the ruby version"
+    end
+
+    context "with multiple engine versions" do
+      let(:engine_version) { ["> 200", "< 300"] }
+      it_behaves_like "it stores the ruby version"
     end
 
     context "with no options hash" do
@@ -72,6 +82,12 @@ describe Bundler::RubyDsl do
       let(:engine_version) { version }
 
       it_behaves_like "it stores the ruby version"
+
+      context "and with multiple requirements" do
+        let(:ruby_version) { ["~> 2.0.0", "> 2.0.1"] }
+        let(:engine_version) { ruby_version }
+        it_behaves_like "it stores the ruby version"
+      end
     end
   end
 end
