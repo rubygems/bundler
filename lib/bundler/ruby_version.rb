@@ -2,11 +2,11 @@
 module Bundler
   class RubyVersion
     attr_reader :versions,
-                :patchlevel,
-                :engine,
-                :engine_versions,
-                :gem_version,
-                :engine_gem_version
+      :patchlevel,
+      :engine,
+      :engine_versions,
+      :gem_version,
+      :engine_gem_version
 
     def initialize(versions, patchlevel, engine, engine_version)
       # The parameters to this method must satisfy the
@@ -96,7 +96,7 @@ module Bundler
                               JRUBY_VERSION.dup
                             else
                               raise BundlerError, "RUBY_ENGINE value #{RUBY_ENGINE} is not recognized"
-                            end
+      end
       @ruby_version ||= RubyVersion.new(RUBY_VERSION.dup, RUBY_PATCHLEVEL.to_s, ruby_engine, ruby_engine_version)
     end
 
