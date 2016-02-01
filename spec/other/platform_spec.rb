@@ -228,6 +228,15 @@ G
       bundle! "platform --ruby"
       expect(out).to eq("ruby 1.8.7")
     end
+
+    it "handles when there are multiple requirements in the gemfile" do
+      gemfile <<-G
+        ruby ">= 1.8.7", "< 2.0.0"
+      G
+
+      bundle! "platform --ruby"
+      expect(out).to eq("ruby 1.8.7")
+    end
   end
 
   let(:ruby_version_correct) { "ruby \"#{RUBY_VERSION}\", :engine => \"#{local_ruby_engine}\", :engine_version => \"#{local_engine_version}\"" }
