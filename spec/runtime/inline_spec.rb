@@ -114,7 +114,7 @@ describe "bundler/inline#gemfile" do
 
   it "raises an exception if passed unknown arguments" do
     script <<-RUBY, :expect_err => true
-      gemfile(true, arglebargle: true) do
+      gemfile(true, :arglebargle => true) do
         path "#{lib_path}"
         gem "two"
       end
@@ -128,7 +128,7 @@ describe "bundler/inline#gemfile" do
   it "does not mutate the option argument" do
     script <<-RUBY
       require 'bundler'
-      options = { ui: Bundler::UI::Shell.new }
+      options = { :ui => Bundler::UI::Shell.new }
       gemfile(false, options) do
         path "#{lib_path}"
         gem "two"
