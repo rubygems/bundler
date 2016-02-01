@@ -28,9 +28,12 @@
 #          puts Pod::VERSION # => "0.34.4"
 #
 def gemfile(install = false, options = {}, &gemfile)
-  ui = options[:ui]
-
   require "bundler"
+
+  opts = options.dup
+  ui = opts.delete(:ui) { Bundler::UI::Shell.new }
+  raise ArgumentError, "Unknown options: #{opts.keys.join(", ")}" unless opts.empty?
+
   old_root = Bundler.method(:root)
   def Bundler.root
     Bundler::SharedHelpers.pwd.expand_path
@@ -45,7 +48,7 @@ def gemfile(install = false, options = {}, &gemfile)
   definition.validate_ruby!
 
   if install
-    Bundler.ui = ui || Bundler::UI::Shell.new
+    Bundler.ui = ui
     Bundler::Installer.install(Bundler.root, definition, :system => true)
     Bundler::Installer.post_install_messages.each do |name, message|
       Bundler.ui.info "Post-install message from #{name}:\n#{message}"
