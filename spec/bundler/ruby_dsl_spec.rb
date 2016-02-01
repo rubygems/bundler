@@ -60,7 +60,7 @@ describe Bundler::RubyDsl do
     context "with two requirements" do
       let(:ruby_version) { ">= 2.0.0, < 3.0" }
       it "raises an error" do
-        expect { subject }.to raise_error(Gem::Requirement::BadRequirementError)
+        expect { subject }.to raise_error(ArgumentError)
       end
     end
 
