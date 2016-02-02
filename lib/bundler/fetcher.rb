@@ -166,7 +166,7 @@ module Bundler
 
         agent = String.new("bundler/#{Bundler::VERSION}")
         agent << " rubygems/#{Gem::VERSION}"
-        agent << " ruby/#{ruby.versions}"
+        agent << " ruby/#{ruby.versions_string(ruby.versions)}"
         agent << " (#{ruby.host})"
         agent << " command/#{ARGV.first}"
 
@@ -177,7 +177,7 @@ module Bundler
                            rescue
                              "???"
                            end
-          agent << " #{ruby.engine}/#{engine_version}"
+          agent << " #{ruby.engine}/#{ruby.versions_string(engine_version)}"
         end
 
         agent << " options/#{Bundler.settings.all.join(",")}"
