@@ -31,7 +31,28 @@ describe "Bundler::RubyVersion and its subclasses" do
         let(:engine_version) { nil }
 
         it "should set engine version as the passed version" do
-          expect(subject.engine_version).to eq("2.0.0")
+          expect(subject.engine_versions).to eq(["2.0.0"])
+        end
+      end
+
+      context "is called with multiple requirements" do
+        let(:version) { ["<= 2.0.0", "> 1.9.3"] }
+        let(:engine_version) { nil }
+
+        it "sets the versions" do
+          expect(subject.versions).to eq(version)
+        end
+
+        it "sets the engine versions" do
+          expect(subject.engine_versions).to eq(version)
+        end
+      end
+
+      context "is called with multiple engine requirements" do
+        let(:engine_version) { [">= 2.0", "< 2.3"] }
+
+        it "sets the engine versions" do
+          expect(subject.engine_versions).to eq(engine_version)
         end
       end
     end
@@ -53,6 +74,16 @@ describe "Bundler::RubyVersion and its subclasses" do
 
         it "should return info string with the ruby version and patchlevel" do
           expect(subject.to_s).to eq("ruby 2.0.0p645")
+        end
+      end
+
+      context "with multiple requirements" do
+        let(:engine_version) { ["> 9", "< 11"] }
+        let(:version) { ["> 8", "< 10"] }
+        let(:patchlevel) { nil }
+
+        it "should return info string with all requirements" do
+          expect(subject.to_s).to eq("ruby > 8, < 10 (jruby > 9, < 11)")
         end
       end
     end
@@ -115,12 +146,23 @@ describe "Bundler::RubyVersion and its subclasses" do
     end
 
     describe "#gem_version" do
-      let(:gem_version_obj) { Gem::Version.new(version) }
+      let(:gem_version) { "2.0.0" }
+      let(:gem_version_obj) { Gem::Version.new(gem_version) }
 
-      it "should return a Gem::Version instance with the correct version" do
-        expect(ruby_version.gem_version).to eq(gem_version_obj)
-        expect(ruby_version.gem_version.version).to eq("2.0.0")
+      shared_examples_for "it parses the version from the requirement string" do |version|
+        let(:version) { version }
+        it "should return the underlying version" do
+          expect(ruby_version.gem_version).to eq(gem_version_obj)
+          expect(ruby_version.gem_version.version).to eq(gem_version)
+        end
       end
+
+      it_behaves_like "it parses the version from the requirement string", "2.0.0"
+      it_behaves_like "it parses the version from the requirement string", ">= 2.0.0"
+      it_behaves_like "it parses the version from the requirement string", "~> 2.0.0"
+      it_behaves_like "it parses the version from the requirement string", "< 2.0.0"
+      it_behaves_like "it parses the version from the requirement string", "= 2.0.0"
+      it_behaves_like "it parses the version from the requirement string", ["> 2.0.0", "< 2.4.5"]
     end
 
     describe "#diff" do
@@ -134,13 +176,13 @@ describe "Bundler::RubyVersion and its subclasses" do
 
       shared_examples_for "there is a difference in the versions" do
         it "should return a tuple with :version and the two different versions" do
-          expect(ruby_version.diff(other_ruby_version)).to eq([:version, version, other_version])
+          expect(ruby_version.diff(other_ruby_version)).to eq([:version, Array(version).join(", "), Array(other_version).join(", ")])
         end
       end
 
       shared_examples_for "there is a difference in the engine versions" do
         it "should return a tuple with :engine_version and the two different engine versions" do
-          expect(ruby_version.diff(other_ruby_version)).to eq([:engine_version, engine_version, other_engine_version])
+          expect(ruby_version.diff(other_ruby_version)).to eq([:engine_version, Array(engine_version).join(", "), Array(other_engine_version).join(", ")])
         end
       end
 
@@ -177,9 +219,28 @@ describe "Bundler::RubyVersion and its subclasses" do
         it_behaves_like "there is a difference in the versions"
       end
 
+      context "detects version discrepancies with multiple requirements second" do
+        let(:other_version)        { "2.0.1" }
+        let(:other_patchlevel)     { "643" }
+        let(:other_engine_version) { "2.0.0" }
+
+        let(:version) { ["> 2.0.0", "< 1.0.0"] }
+
+        it_behaves_like "there is a difference in the versions"
+      end
+
       context "detects engine version discrepancies third" do
         let(:other_patchlevel)     { "643" }
         let(:other_engine_version) { "2.0.0" }
+
+        it_behaves_like "there is a difference in the engine versions"
+      end
+
+      context "detects engine version discrepancies with multiple requirements third" do
+        let(:other_patchlevel)     { "643" }
+        let(:other_engine_version) { "2.0.0" }
+
+        let(:engine_version) { ["> 2.0.0", "< 1.0.0"] }
 
         it_behaves_like "there is a difference in the engine versions"
       end
@@ -201,6 +262,32 @@ describe "Bundler::RubyVersion and its subclasses" do
         let(:other_engine_version) { "2.0.5" }
 
         it_behaves_like "there are no differences"
+      end
+
+      context "successfully matches multiple gem requirements" do
+        let(:version)              { [">= 2.0.0", "< 2.4.5"] }
+        let(:patchlevel)           { "< 643" }
+        let(:engine)               { "ruby" }
+        let(:engine_version)       { ["~> 2.0.1", "< 2.4.5"] }
+        let(:other_version)        { "2.0.0" }
+        let(:other_patchlevel)     { "642" }
+        let(:other_engine)         { "ruby" }
+        let(:other_engine_version) { "2.0.5" }
+
+        it_behaves_like "there are no differences"
+      end
+
+      context "successfully detects bad gem requirements with versions with multiple requirements" do
+        let(:version)              { ["~> 2.0.0", "< 2.0.5"] }
+        let(:patchlevel)           { "< 643" }
+        let(:engine)               { "ruby" }
+        let(:engine_version)       { "~> 2.0.1" }
+        let(:other_version)        { "2.0.5" }
+        let(:other_patchlevel)     { "642" }
+        let(:other_engine)         { "ruby" }
+        let(:other_engine_version) { "2.0.5" }
+
+        it_behaves_like "there is a difference in the versions"
       end
 
       context "successfully detects bad gem requirements with versions" do
@@ -263,8 +350,8 @@ describe "Bundler::RubyVersion and its subclasses" do
 
       describe "#version" do
         it "should return a copy of the value of RUBY_VERSION" do
-          expect(subject.version).to eq(RUBY_VERSION)
-          expect(subject.version).to_not be(RUBY_VERSION)
+          expect(subject.versions).to eq([RUBY_VERSION])
+          expect(subject.versions.first).to_not be(RUBY_VERSION)
         end
       end
 
@@ -296,8 +383,8 @@ describe "Bundler::RubyVersion and its subclasses" do
           end
 
           it "should return a copy of the value of RUBY_VERSION" do
-            expect(bundler_system_ruby_version.engine_version).to eq("2.2.4")
-            expect(bundler_system_ruby_version.engine_version).to_not be(RUBY_VERSION)
+            expect(bundler_system_ruby_version.engine_versions).to eq(["2.2.4"])
+            expect(bundler_system_ruby_version.engine_versions.first).to_not be(RUBY_VERSION)
           end
         end
 
@@ -308,8 +395,8 @@ describe "Bundler::RubyVersion and its subclasses" do
           end
 
           it "should return a copy of the value of Rubinius::VERSION" do
-            expect(bundler_system_ruby_version.engine_version).to eq("2.0.0")
-            expect(bundler_system_ruby_version.engine_version).to_not be(Rubinius::VERSION)
+            expect(bundler_system_ruby_version.engine_versions).to eq(["2.0.0"])
+            expect(bundler_system_ruby_version.engine_versions.first).to_not be(Rubinius::VERSION)
           end
         end
 
@@ -320,8 +407,8 @@ describe "Bundler::RubyVersion and its subclasses" do
           end
 
           it "should return a copy of the value of JRUBY_VERSION" do
-            expect(subject.engine_version).to eq("2.1.1")
-            expect(bundler_system_ruby_version.engine_version).to_not be(JRUBY_VERSION)
+            expect(subject.engine_versions).to eq(["2.1.1"])
+            expect(bundler_system_ruby_version.engine_versions.first).to_not be(JRUBY_VERSION)
           end
         end
 
@@ -332,7 +419,7 @@ describe "Bundler::RubyVersion and its subclasses" do
           end
 
           it "should raise a BundlerError with a 'not recognized' message" do
-            expect { bundler_system_ruby_version.engine_version }.to raise_error(Bundler::BundlerError, "RUBY_ENGINE value not_supported_ruby_engine is not recognized")
+            expect { bundler_system_ruby_version.engine_versions }.to raise_error(Bundler::BundlerError, "RUBY_ENGINE value not_supported_ruby_engine is not recognized")
           end
         end
       end
