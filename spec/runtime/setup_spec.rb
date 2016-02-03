@@ -108,6 +108,31 @@ describe "Bundler.setup" do
     end
   end
 
+  it "puts loaded gems after -I and RUBYLIB" do
+    install_gemfile <<-G
+      source "file://#{gem_repo1}"
+      gem "rack"
+    G
+
+    ruby <<-RUBY
+      require 'rubygems'
+      require 'bundler'
+      $LOAD_PATH.unshift('fake -I')
+      Bundler.setup
+
+      puts $LOAD_PATH
+    RUBY
+
+    load_path = out.split("\n")
+    rack_load_order = load_path.each_with_index do |dir, i|
+      break i if dir =~ /rack/
+    end
+
+    expect(err).to eq("")
+    expect(load_path.first).to eq("fake -I")
+    expect(rack_load_order).to be > 0
+  end
+
   it "raises if the Gemfile was not yet installed" do
     gemfile <<-G
       source "file://#{gem_repo1}"
