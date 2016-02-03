@@ -172,8 +172,8 @@ module Bundler
 
         if spec.respond_to?(:missing_extensions?)
           return nil unless spec.missing_extensions?
-        else
-          return nil if gem_build_complete?(spec.extensions_dir)
+        elsif gem_build_complete?(spec.extensions_dir)
+          return nil
         end
 
         generate_bin(spec)
