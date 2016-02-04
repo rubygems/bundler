@@ -27,7 +27,13 @@ module Bundler
       else
         definition = Bundler.definition(:gems => gems, :sources => sources)
       end
-      options["local"] ? definition.resolve_with_cache! : definition.resolve_remotely!
+
+      definition_resolution = proc { options["local"] ? definition.resolve_with_cache! : definition.resolve_remotely! }
+      if options[:parseable]
+        Bundler.ui.silence(&definition_resolution)
+      else
+        definition_resolution.call
+      end
 
       Bundler.ui.info ""
 
@@ -65,11 +71,13 @@ module Bundler
         gem_outdated = Gem::Version.new(active_spec.version) > Gem::Version.new(current_spec.version)
         git_outdated = current_spec.git_version != active_spec.git_version
         if gem_outdated || git_outdated
-          if out_count == 0
-            if options["pre"]
-              Bundler.ui.info "Outdated gems included in the bundle (including pre-releases):"
-            else
-              Bundler.ui.info "Outdated gems included in the bundle:"
+          unless options[:parseable]
+            if out_count == 0
+              if options["pre"]
+                Bundler.ui.info "Outdated gems included in the bundle (including pre-releases):"
+              else
+                Bundler.ui.info "Outdated gems included in the bundle:"
+              end
             end
           end
 
@@ -77,20 +85,26 @@ module Bundler
           current_version = "#{current_spec.version}#{current_spec.git_version}"
           dependency_version = %(, requested #{dependency.requirement}) if dependency && dependency.specific?
 
-          if dependency
+          if dependency && !options[:parseable]
             groups = dependency.groups.join(", ")
             pl = (dependency.groups.length > 1) ? "s" : ""
             groups = " in group#{pl} \"#{groups}\""
           end
 
-          Bundler.ui.info "  * #{active_spec.name} (newest #{spec_version}, installed #{current_version}#{dependency_version})#{groups}".rstrip
+          spec_outdated_info = "#{active_spec.name} (newest #{spec_version}, installed #{current_version}#{dependency_version})"
+          if options[:parseable]
+            Bundler.ui.info spec_outdated_info.to_s.rstrip
+          else
+            Bundler.ui.info "  * #{spec_outdated_info}#{groups}".rstrip
+          end
+
           out_count += 1
         end
         Bundler.ui.debug "from #{active_spec.loaded_from}"
       end
 
       if out_count.zero?
-        Bundler.ui.info "Bundle up to date!\n"
+        Bundler.ui.info "Bundle up to date!\n" unless options[:parseable]
       else
         exit 1
       end
