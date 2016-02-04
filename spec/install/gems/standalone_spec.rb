@@ -272,5 +272,35 @@ describe "bundle install --standalone" do
         expect(`#{bundled_app}/bin/rails -v`.chomp).to eql "2.3.2"
       end
     end
+
+    it "creates stubs with the correct load path" do
+      extension_line = File.read(bundled_app("bin/rails")).each_line.find {|line| line.include? "$:.unshift" }.strip
+      expect(extension_line).to eq "$:.unshift File.expand_path '../../bundle', __FILE__"
+    end
+  end
+
+  describe "with --binstubs run in a subdirectory" do
+    before do
+      FileUtils.mkdir_p("bob")
+      Dir.chdir("bob") do
+        install_gemfile <<-G, :standalone => true, :binstubs => true
+          source "file://#{gem_repo1}"
+          gem "rails"
+        G
+      end
+    end
+
+    # @todo This test fails because the bundler/setup.rb is written to the
+    # current directory.
+    xit "creates stubs that use the standalone load path" do
+      Dir.chdir(bundled_app) do
+        expect(`bin/rails -v`.chomp).to eql "2.3.2"
+      end
+    end
+
+    it "creates stubs with the correct load path" do
+      extension_line = File.read(bundled_app("bin/rails")).each_line.find {|line| line.include? "$:.unshift" }.strip
+      expect(extension_line).to eq "$:.unshift File.expand_path '../../bundle', __FILE__"
+    end
   end
 end
