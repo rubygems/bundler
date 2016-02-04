@@ -197,8 +197,7 @@ module Bundler
         SharedHelpers.chdir(gem_dir) do
           installer = Path::Installer.new(spec, :env_shebang => false)
           run_hooks(:pre_install, installer)
-          installer.build_extensions unless disable_extensions
-          run_hooks(:post_build, installer)
+          build_extensions(installer) unless disable_extensions
           installer.generate_bin
           run_hooks(:post_install, installer)
         end
@@ -214,6 +213,11 @@ module Bundler
         end
 
         Bundler.ui.warn "The validation message from Rubygems was:\n  #{e.message}"
+      end
+
+      def build_extensions(installer)
+        installer.build_extensions
+        run_hooks(:post_build, installer)
       end
 
       def run_hooks(type, installer)

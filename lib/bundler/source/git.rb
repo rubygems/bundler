@@ -222,6 +222,10 @@ module Bundler
 
     private
 
+      def build_extensions(installer)
+        super if installer.spec.missing_extensions?
+      end
+
       def serialize_gemspecs_in(destination)
         expanded_path = destination.expand_path(Bundler.root)
         Dir["#{expanded_path}/#{@glob}"].each do |spec_path|
