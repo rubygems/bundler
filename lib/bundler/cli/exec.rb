@@ -65,8 +65,7 @@ module Bundler
     rescue Exception => e # rubocop:disable Lint/RescueException
       Bundler.ui = ui
       Bundler.ui.error "bundler: failed to load command: #{cmd} (#{file})"
-      Bundler.ui.trace(e, nil, true)
-      exit 125
+      abort "#{e.class}: #{e.message}\n#{e.backtrace.join("\n  ")}"
     end
 
     def ruby_shebang?(file)
