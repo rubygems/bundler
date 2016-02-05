@@ -46,7 +46,7 @@ class ParallelInstaller
       @dependencies ||= begin
         deps = all_dependencies.reject {|dep| ignorable_dependency? dep }
         missing = deps.reject {|dep| all_spec_names.include? dep.name }
-        if missing.size > 0
+        unless missing.empty?
           raise Bundler::LockfileError, "Your Gemfile.lock is corrupt. The following #{missing.size > 1 ? "gems are" : "gem is"} missing " \
                               "from the DEPENDENCIES section: '#{missing.map(&:name).join('\' \'')}'"
         end
