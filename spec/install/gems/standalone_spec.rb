@@ -303,4 +303,18 @@ describe "bundle install --standalone" do
       expect(extension_line).to eq "$:.unshift File.expand_path '../../bundle', __FILE__"
     end
   end
+
+  describe "with gem that has an invalid gemspec" do
+    before do
+      install_gemfile <<-G, :standalone => true
+        source 'https://rubygems.org'
+        gem "resque-scheduler", "2.2.0"
+      G
+    end
+
+    it "outputs a helpful error message" do
+      expect(out).to include("You have one or more invalid gemspecs that need to be fixed.")
+      expect(out).to include("resque-scheduler 2.2.0 has an invalid gemspec")
+    end
+  end
 end
