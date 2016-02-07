@@ -79,7 +79,7 @@ module Bundler
             rescue => e
               raise e if e.is_a?(LoadError) # we handle this a little later
               raise Bundler::GemRequireError.new e,
-                "There was an error while trying to load the gem '#{file}'."
+                "There was an error while trying to load the gem '#{file}': #{e}"
             end
           end
         rescue LoadError => e
