@@ -79,6 +79,43 @@ describe "bundle outdated" do
     end
   end
 
+  shared_examples_for "a minimal output is desired" do
+    context "and gems are outdated" do
+      before do
+        update_repo2 do
+          build_gem "activesupport", "3.0"
+          build_gem "weakling", "0.2"
+        end
+      end
+
+      it "outputs a sorted list of outdated gems with a more minimal format" do
+        minimal_output = "activesupport (newest 3.0, installed 2.3.5, requested = 2.3.5)\n" \
+                         "weakling (newest 0.2, installed 0.0.3, requested ~> 0.0.1)"
+        subject
+        expect(out).to eq(minimal_output)
+      end
+    end
+
+    context "and no gems are outdated" do
+      it "has empty output" do
+        subject
+        expect(out).to eq("")
+      end
+    end
+  end
+
+  describe "with --parseable option" do
+    subject { bundle "outdated --parseable" }
+
+    it_behaves_like "a minimal output is desired"
+  end
+
+  describe "with aliased --porcelain option" do
+    subject { bundle "outdated --porcelain" }
+
+    it_behaves_like "a minimal output is desired"
+  end
+
   describe "with specified gems" do
     it "returns list of outdated gems" do
       update_repo2 do

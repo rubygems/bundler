@@ -245,6 +245,8 @@ module Bundler
       "Only list newer versions allowed by your Gemfile requirements"
     method_option "major", :type => :boolean, :banner => "Only list major newer versions"
     method_option "minor", :type => :boolean, :banner => "Only list at least minor newer versions"
+    method_option "parseable", :aliases => "--porcelain", :type => :boolean, :banner =>
+      "Use minimal formatting for more parseable output"
     def outdated(*gems)
       require "bundler/cli/outdated"
       Outdated.new(options, gems).run
