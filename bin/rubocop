@@ -8,7 +8,7 @@ bundler_spec.dependencies.each do |dep|
   gem dep.name, dep.requirement.to_s
 end
 
-gem "rubocop", "= 0.37.0"
+gem "rubocop", "= 0.37.1"
 
 Gem::Specification.unresolved_deps.each do |_name, dep|
   gem dep.name, *dep.requirement

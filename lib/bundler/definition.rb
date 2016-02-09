@@ -280,22 +280,11 @@ module Bundler
     end
 
     def locked_ruby_version
-      if @unlock[:ruby]
-        if ruby_version && !@locked_ruby_version
-          return Bundler::RubyVersion.system
-        elsif ruby_version && @locked_ruby_version
-          return Bundler::RubyVersion.system
-        elsif !ruby_version && @locked_ruby_version
-          return nil
-        end
+      return unless ruby_version
+      if @unlock[:ruby] || !@locked_ruby_version
+        Bundler::RubyVersion.system
       else
-        if ruby_version && !@locked_ruby_version
-          return Bundler::RubyVersion.system
-        elsif ruby_version && @locked_ruby_version
-          return @locked_ruby_version
-        elsif !ruby_version && @locked_ruby_version
-          return @locked_ruby_version
-        end
+        @locked_ruby_version
       end
     end
 
