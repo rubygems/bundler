@@ -360,6 +360,15 @@ describe Bundler::SharedHelpers do
           Bundler::TemporaryResourceError)
       end
     end
+
+    context "system throws Errno::EPROTO" do
+      let(:file_op_block) { proc {|_path| raise Errno::EPROTO } }
+
+      it "raises a VirtualProtocolError" do
+        expect { subject.filesystem_access("/path", &file_op_block) }.to raise_error(
+          Bundler::VirtualProtocolError)
+      end
+    end
   end
 
   describe "#const_get_safely" do

@@ -98,4 +98,13 @@ module Bundler
 
     status_code(26)
   end
+
+  class VirtualProtocolError < BundlerError
+    def message
+      "There was an error relating to virtualization and file access." \
+      "It is likely that you need to grant access to or mount some file system correctly."
+    end
+
+    status_code(27)
+  end
 end
