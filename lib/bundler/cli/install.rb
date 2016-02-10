@@ -45,11 +45,7 @@ module Bundler
       # Just disable color in deployment mode
       Bundler.ui.shell = Thor::Shell::Basic.new if options[:deployment]
 
-      if (options[:path] || options[:deployment]) && options[:system]
-        Bundler.ui.error "You have specified both a path to install your gems to, \n" \
-                         "as well as --system. Please choose."
-        exit 1
-      end
+      check_for_options_conflicts
 
       if options["trust-policy"]
         unless Bundler.rubygems.security_policies.keys.include?(options["trust-policy"])
@@ -184,6 +180,15 @@ module Bundler
     def print_post_install_message(name, msg)
       Bundler.ui.confirm "Post-install message from #{name}:"
       Bundler.ui.info msg
+    end
+
+    def check_for_options_conflicts
+      if (options[:path] || options[:deployment]) && options[:system]
+        error_message = String.new
+        error_message << "You have specified both a path to install your gems to as well as --system. Please choose.\n" if options[:path]
+        error_message << "You have specified both --deployment as well as --system. Please choose.\n" if options[:deployment]
+        raise InvalidOption.new(error_message)
+      end
     end
   end
 end
