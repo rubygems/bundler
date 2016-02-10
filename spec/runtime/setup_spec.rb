@@ -120,7 +120,7 @@ describe "Bundler.setup" do
         gem "rack"
       G
 
-      ENV["RUBYOPT"] = "-I dash_i_dir"
+      ENV["RUBYOPT"] = "-Idash_i_dir"
       ENV["RUBYLIB"] = "rubylib_dir"
 
       ruby <<-RUBY
