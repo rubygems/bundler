@@ -109,11 +109,6 @@ describe "Bundler.setup" do
   end
 
   context "load order" do
-    after do
-      ENV.delete "RUBYLIB"
-      ENV.delete "RUBYOPT"
-    end
-
     it "puts loaded gems after -I and RUBYLIB" do
       install_gemfile <<-G
         source "file://#{gem_repo1}"
