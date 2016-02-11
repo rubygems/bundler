@@ -69,6 +69,13 @@ describe "bundle show" do
       expect(out).to include("\tHomepage: No website available.")
       expect(out).to include("\tStatus:   Up to date")
     end
+
+    it "prints count of all required gems and count of all dependencies" do
+      bundle "show --count"
+
+      expect(out).to include("Required gems: 1")
+      expect(out).to include("Bundled gems: 8")
+    end
   end
 
   context "with a git repo in the Gemfile" do

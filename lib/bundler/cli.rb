@@ -209,6 +209,7 @@ module Bundler
                            :banner => "List the paths of all gems that are required by your Gemfile."
     method_option "outdated", :type => :boolean,
                               :banner => "Show verbose output including whether gems are outdated."
+    method_option "count", :type => :boolean, :banner => "Show a count of required and actually bundled gems"
     def show(gem_name = nil)
       require "bundler/cli/show"
       Show.new(options, gem_name).run
