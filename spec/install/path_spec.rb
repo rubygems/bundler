@@ -39,6 +39,7 @@ describe "bundle install" do
     it "disallows --path vendor/bundle --system" do
       bundle "install --path vendor/bundle --system"
       expect(out).to include("Please choose.")
+      expect(exitstatus).to eq(15) if exitstatus
     end
 
     it "remembers to disable system gems after the first time with bundle --path vendor/bundle" do

@@ -19,6 +19,21 @@ describe "install with --deployment or --frozen" do
     expect(out).to include("The --frozen flag requires a Gemfile.lock")
   end
 
+  it "disallows --deployment --system" do
+    bundle "install --deployment --system"
+    expect(out).to include("You have specified both --deployment")
+    expect(out).to include("Please choose.")
+    expect(exitstatus).to eq(15) if exitstatus
+  end
+
+  it "disallows --deployment --path --system" do
+    bundle "install --deployment --path . --system"
+    expect(out).to include("You have specified both a path to install your gems to")
+    expect(out).to include("You have specified both --deployment")
+    expect(out).to include("Please choose.")
+    expect(exitstatus).to eq(15) if exitstatus
+  end
+
   it "works after you try to deploy without a lock" do
     bundle "install --deployment"
     bundle :install
