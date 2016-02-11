@@ -107,6 +107,8 @@ module Bundler
       raise PermissionError.new(path, action)
     rescue Errno::EAGAIN
       raise TemporaryResourceError.new(path, action)
+    rescue Errno::EPROTO
+      raise VirtualProtocolError.new
     end
 
     def const_get_safely(constant_name, namespace)
