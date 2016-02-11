@@ -35,6 +35,10 @@ module Bundler
       Gem::Command.build_args = args
     end
 
+    def load_path_insert_index
+      Gem.load_path_insert_index
+    end
+
     def loaded_specs(name)
       Gem.loaded_specs[name]
     end
