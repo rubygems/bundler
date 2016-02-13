@@ -89,6 +89,21 @@ describe "Bundler.with_env helpers" do
         expect(`echo $BUNDLE_PATH`.strip).to eq("./Gemfile")
       end
     end
+
+    it "should preserve the PATH environment variable" do
+      gemfile ""
+      bundle "install --path vendor/bundle"
+
+      code = "Bundler.with_original_env do;" \
+             "  print ENV['PATH'];" \
+             "end"
+
+      path = `getconf PATH`.strip
+      with_path_as(path) do
+        result = bundle("exec ruby -e #{code.inspect}")
+        expect(result).to eq(path)
+      end
+    end
   end
 
   describe "Bundler.clean_system" do

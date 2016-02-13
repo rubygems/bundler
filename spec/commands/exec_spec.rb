@@ -103,8 +103,9 @@ describe "bundle exec" do
       f.puts "echo foobar"
     end
     File.chmod(0744, "--verbose")
-    ENV["PATH"] = "."
-    bundle "exec -- --verbose"
+    with_path_as(".") do
+      bundle "exec -- --verbose"
+    end
     expect(out).to eq("foobar")
   end
 
@@ -358,7 +359,7 @@ describe "bundle exec" do
       Bundler.rubygems.extend(Monkey)
       G
       bundle "install --deployment"
-      bundle "exec ruby -e '`bundler -v`; puts $?.success?'"
+      bundle "exec ruby -e '`../../exe/bundler -v`; puts $?.success?'"
       expect(out).to match("true")
     end
   end

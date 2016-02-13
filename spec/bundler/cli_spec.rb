@@ -18,7 +18,7 @@ describe "bundle executable" do
       f.puts "#!/usr/bin/env ruby\nputs 'Hello, world'\n"
     end
 
-    with_path_as(tmp) do
+    with_path_added(tmp) do
       bundle "testtasks"
     end
 

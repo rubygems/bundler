@@ -230,22 +230,28 @@ module Spec
     alias_method :install_gem, :install_gems
 
     def with_gem_path_as(path)
-      gem_home = ENV["GEM_HOME"]
-      gem_path = ENV["GEM_PATH"]
+      backup = ENV.to_hash
       ENV["GEM_HOME"] = path.to_s
       ENV["GEM_PATH"] = path.to_s
+      ENV["BUNDLE_ORIG_GEM_PATH"] = nil
       yield
     ensure
-      ENV["GEM_HOME"] = gem_home
-      ENV["GEM_PATH"] = gem_path
+      ENV.replace(backup)
     end
 
     def with_path_as(path)
-      old_path = ENV["PATH"]
-      ENV["PATH"] = "#{path}:#{ENV["PATH"]}"
+      backup = ENV.to_hash
+      ENV["PATH"] = path.to_s
+      ENV["BUNDLE_ORIG_PATH"] = nil
       yield
     ensure
-      ENV["PATH"] = old_path
+      ENV.replace(backup)
+    end
+
+    def with_path_added(path)
+      with_path_as(path.to_s + ":" + ENV["PATH"]) do
+        yield
+      end
     end
 
     def break_git!
@@ -257,17 +263,12 @@ module Spec
       ENV["PATH"] = "#{tmp("broken_path")}:#{ENV["PATH"]}"
     end
 
-    def fake_man!
+    def with_fake_man
       FileUtils.mkdir_p(tmp("fake_man"))
       File.open(tmp("fake_man/man"), "w", 0755) do |f|
         f.puts "#!/usr/bin/env ruby\nputs ARGV.inspect\n"
       end
-
-      ENV["PATH"] = "#{tmp("fake_man")}:#{ENV["PATH"]}"
-    end
-
-    def kill_path!
-      ENV["PATH"] = ""
+      with_path_added(tmp("fake_man")) { yield }
     end
 
     def system_gems(*gems)
@@ -278,20 +279,17 @@ module Spec
 
       Gem.clear_paths
 
-      gem_home = ENV["GEM_HOME"]
-      gem_path = ENV["GEM_PATH"]
-      path = ENV["PATH"]
+      env_backup = ENV.to_hash
       ENV["GEM_HOME"] = system_gem_path.to_s
       ENV["GEM_PATH"] = system_gem_path.to_s
+      ENV["BUNDLE_ORIG_GEM_PATH"] = nil
 
       install_gems(*gems)
       return unless block_given?
       begin
         yield
       ensure
-        ENV["GEM_HOME"] = gem_home
-        ENV["GEM_PATH"] = gem_path
-        ENV["PATH"] = path
+        ENV.replace(env_backup)
       end
     end
 

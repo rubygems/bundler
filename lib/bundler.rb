@@ -3,7 +3,7 @@ require "fileutils"
 require "pathname"
 require "rbconfig"
 require "thread"
-require "bundler/path_preserver"
+require "bundler/environment_preserver"
 require "bundler/gem_remote_fetcher"
 require "bundler/rubygems_ext"
 require "bundler/rubygems_integration"
@@ -13,9 +13,9 @@ require "bundler/current_ruby"
 require "bundler/errors"
 
 module Bundler
-  PathPreserver.preserve_path_in_environment("PATH", ENV)
-  PathPreserver.preserve_path_in_environment("GEM_PATH", ENV)
-  ORIGINAL_ENV = ENV.to_hash
+  environment_preserver = EnvironmentPreserver.new(ENV, %w(PATH GEM_PATH))
+  ORIGINAL_ENV = environment_preserver.restore
+  ENV.replace(environment_preserver.backup)
   SUDO_MUTEX = Mutex.new
 
   autoload :Definition,             "bundler/definition"
