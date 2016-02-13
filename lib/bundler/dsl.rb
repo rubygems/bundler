@@ -248,6 +248,11 @@ module Bundler
         repo_name ||= user_name
         "https://#{user_name}@bitbucket.org/#{user_name}/#{repo_name}.git"
       end
+
+      git_source(:gitlab) do |repo_name|
+        repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
+        "https://gitlab.com/#{repo_name}.git"
+      end
     end
 
     def with_source(source)
