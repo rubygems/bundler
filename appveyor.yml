@@ -6,128 +6,130 @@ branches:
     - master
     - auto
     - /.+-stable$/
+on_finish:
+- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 install:
   - SET PATH=C:\Ruby%ruby_version%\bin;%PATH%
   - SET GEM_HOME=%APPDATA%\.gem
   - ruby --version
   - gem --version
   - gem install rake --no-rdoc --no-ri
-  - bin/rake spec:deps
+  - rake spec:deps
   - gem list --details
   - gem env
 test_script:
-  - bin/rake spec:travis 
+  - rake spec:travis
 
 build: off
 environment:
   matrix:
     # Ruby 2.2, Rubygems 2.4.5 and up 
     - ruby_version: "22"
-      env: RGV=master
-    - ruby_version: "22-x64"
-      env: RGV=master
-    - ruby_version: "22"
-      env: RGV=v2.5.2
-    - ruby_version: "22-x64"
-      env: RGV=v2.5.2
-    - ruby_version: "22"
-      env: RGV=v2.4.8
-    - ruby_version: "22-x64"
-      env: RGV=v2.4.8
+      RGV: master
+    # - ruby_version: "22-x64"
+    #   RGV: master
+    # - ruby_version: "22"
+    #   RGV: v2.5.2
+    # - ruby_version: "22-x64"
+    #   RGV: v2.5.2
+    # - ruby_version: "22"
+    #   RGV: v2.4.8
+    # - ruby_version: "22-x64"
+    #   RGV: v2.4.8
 
-    # Ruby 2.1, Rubygems 2.2.2 and up
-    - ruby_version: "21"
-      env: RGV=v2.2.5
-    - ruby_version: "21-x64"
-      env: RGV=v2.2.5
+    # # Ruby 2.1, Rubygems 2.2.2 and up
+    # - ruby_version: "21"
+    #   RGV: v2.2.5
+    # - ruby_version: "21-x64"
+    #   RGV: v2.2.5
 
-    # Ruby 2.0.0, Rubygems 2.0.0 and u
-    - ruby_version: "200"
-      env: RGV=v2.2.5
-    - ruby_version: "200-x64"
-      env: RGV=v2.2.5
-    - ruby_version: "200"
-      env: RGV=v2.1.11
-    - ruby_version: "200-x64"
-      env: RGV=v2.1.11      
-    - ruby_version: "200"
-      env: RGV=v2.0.14
-    - ruby_version: "200-x64"
-      env: RGV=v2.0.14
+    # # Ruby 2.0.0, Rubygems 2.0.0 and u
+    # - ruby_version: "200"
+    #   RGV: v2.2.5
+    # - ruby_version: "200-x64"
+    #   RGV: v2.2.5
+    # - ruby_version: "200"
+    #   RGV: v2.1.11
+    # - ruby_version: "200-x64"
+    #   RGV: v2.1.11
+    # - ruby_version: "200"
+    #   RGV: v2.0.14
+    # - ruby_version: "200-x64"
+    #   RGV: v2.0.14
 
-    # Ruby 1.9.3, Rubygems 1.5.3 and up
-    - ruby_version: "193"
-      env: RGV=v2.2.5
-    - ruby_version: "193-x64"
-      env: RGV=v2.2.5
-    - ruby_version: "193"
-      env: RGV=v2.1.11
-    - ruby_version: "193-x64"
-      env: RGV=v2.1.11      
-    - ruby_version: "193"
-      env: RGV=v2.0.14
-    - ruby_version: "193-x64"
-      env: RGV=v2.0.14
-    - ruby_version: "193"
-      env: RGV=v1.8.29
-    - ruby_version: "193-x64"
-      env: RGV=v1.8.29
-    - ruby_version: "193"
-      env: RGV=v1.7.2
-    - ruby_version: "193-x64"
-      env: RGV=v1.7.2
-    - ruby_version: "193"
-      env: RGV=v1.6.2
-    - ruby_version: "193-x64"
-      env: RGV=v1.6.2
-    - ruby_version: "193"
-      env: RGV=v1.5.3
-    - ruby_version: "193-x64"
-      env: RGV=v1.5.3
+    # # Ruby 1.9.3, Rubygems 1.5.3 and up
+    # - ruby_version: "193"
+    #   RGV: v2.2.5
+    # - ruby_version: "193-x64"
+    #   RGV: v2.2.5
+    # - ruby_version: "193"
+    #   RGV: v2.1.11
+    # - ruby_version: "193-x64"
+    #   RGV: v2.1.11
+    # - ruby_version: "193"
+    #   RGV: v2.0.14
+    # - ruby_version: "193-x64"
+    #   RGV: v2.0.14
+    # - ruby_version: "193"
+    #   RGV: v1.8.29
+    # - ruby_version: "193-x64"
+    #   RGV: v1.8.29
+    # - ruby_version: "193"
+    #   RGV: v1.7.2
+    # - ruby_version: "193-x64"
+    #   RGV: v1.7.2
+    # - ruby_version: "193"
+    #   RGV: v1.6.2
+    # - ruby_version: "193-x64"
+    #   RGV: v1.6.2
+    # - ruby_version: "193"
+    #   RGV: v1.5.3
+    # - ruby_version: "193-x64"
+    #   RGV: v1.5.3
 
-    # Ruby 1.8.7, Rubygems 1.3.6 and up
-    - ruby_version: "187"
-      env: RGV=v2.2.5
-    - ruby_version: "187-x64"
-      env: RGV=v2.2.5
-    - ruby_version: "187"
-      env: RGV=v2.0.14
-    - ruby_version: "187-x64"
-      env: RGV=v2.0.14
-    - ruby_version: "187"
-      env: RGV=v1.8.29
-    - ruby_version: "187-x64"
-      env: RGV=v1.8.29
-    - ruby_version: "187"
-      env: RGV=v1.7.2
-    - ruby_version: "187-x64"
-      env: RGV=v1.7.2
-    - ruby_version: "187"
-      env: RGV=v1.6.2
-    - ruby_version: "187-x64"
-      env: RGV=v1.6.2
-    - ruby_version: "187"
-      env: RGV=v1.5.3
-    - ruby_version: "187-x64"
-      env: RGV=v1.5.3
-    - ruby_version: "187"
-      env: RGV=v1.4.2
-    - ruby_version: "187-x64"
-      env: RGV=v1.4.2
-    - ruby_version: "187"
-      env: RGV=v1.3.7
-    - ruby_version: "187-x64"
-      env: RGV=v1.3.7
-    - ruby_version: "187"
-      env: RGV=v1.3.6
-    - ruby_version: "187-x64"
-      env: RGV=v1.3.6
+    # # Ruby 1.8.7, Rubygems 1.3.6 and up
+    # - ruby_version: "187"
+    #   RGV: v2.2.5
+    # - ruby_version: "187-x64"
+    #   RGV: v2.2.5
+    # - ruby_version: "187"
+    #   RGV: v2.0.14
+    # - ruby_version: "187-x64"
+    #   RGV: v2.0.14
+    # - ruby_version: "187"
+    #   RGV: v1.8.29
+    # - ruby_version: "187-x64"
+    #   RGV: v1.8.29
+    # - ruby_version: "187"
+    #   RGV: v1.7.2
+    # - ruby_version: "187-x64"
+    #   RGV: v1.7.2
+    # - ruby_version: "187"
+    #   RGV: v1.6.2
+    # - ruby_version: "187-x64"
+    #   RGV: v1.6.2
+    # - ruby_version: "187"
+    #   RGV: v1.5.3
+    # - ruby_version: "187-x64"
+    #   RGV: v1.5.3
+    # - ruby_version: "187"
+    #   RGV: v1.4.2
+    # - ruby_version: "187-x64"
+    #   RGV: v1.4.2
+    # - ruby_version: "187"
+    #   RGV: v1.3.7
+    # - ruby_version: "187-x64"
+    #   RGV: v1.3.7
+    # - ruby_version: "187"
+    #   RGV: v1.3.6
+    # - ruby_version: "187-x64"
+    #   RGV: v1.3.6
 
-    # Ruby-head (we want to know how we're doing, but not fail the build)
-    # - rvm: ruby-head
-    #   env: RGV=master
+    # # Ruby-head (we want to know how we're doing, but not fail the build)
+    # # - rvm: ruby-head
+    # #   RGV: master
 
-    - ruby_version: "187"
-      env: RGV=v2.1.11
-    - ruby_version: "187-x64"
-      env: RGV=v2.1.11
+    # - ruby_version: "187"
+    #   RGV: v2.1.11
+    # - ruby_version: "187-x64"
+    #   RGV: v2.1.11
