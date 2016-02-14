@@ -1,0 +1,29 @@
+---
+version: "{build}"
+skip_tags: true
+branches:
+  only:
+    - master
+install:
+  - SET PATH=C:\Ruby%ruby_version%\bin;%PATH%
+  - SET GEM_HOME=%APPDATA%\.gem
+  - ruby --version
+  - gem --version
+  - gem install rake --no-rdoc --no-ri
+  - bin/rake spec:deps
+  - gem list --details
+  - gem env
+test_script:
+  - bin/rake spec:travis 
+
+build: off
+environment:
+  matrix:
+    - ruby_version: "193"
+    - ruby_version: "193-x64"
+    - ruby_version: "200"
+    - ruby_version: "200-x64"
+    - ruby_version: "21"
+    - ruby_version: "21-x64"
+    - ruby_version: "22"
+    - ruby_version: "22-x64"
