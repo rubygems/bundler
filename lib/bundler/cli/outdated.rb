@@ -10,6 +10,8 @@ module Bundler
     end
 
     def run
+      check_for_deployment_mode
+
       sources = Array(options[:source])
 
       gems.each do |gem_name|
@@ -107,6 +109,18 @@ module Bundler
         Bundler.ui.info "Bundle up to date!\n" unless options[:parseable]
       else
         exit 1
+      end
+    end
+
+  private
+
+    def check_for_deployment_mode
+      if Bundler.settings[:frozen]
+        error_message = "You are trying to check outdated gems in deployment mode. " \
+              "Run `bundle outdated` elsewhere.\n" \
+              "\nIf this is a development machine, remove the #{Bundler.default_gemfile} freeze" \
+              "\nby running `bundle install --no-deployment`."
+        raise ProductionError, error_message
       end
     end
   end
