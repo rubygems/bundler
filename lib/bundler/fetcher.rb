@@ -236,7 +236,7 @@ module Bundler
 
         con = Net::HTTP::Persistent.new "bundler", :ENV
         if gem_proxy = Bundler.rubygems.configuration[:http_proxy]
-          con.proxy = URI.parse(gem_proxy)
+          con.proxy = URI.parse(gem_proxy) if gem_proxy != :no_proxy
         end
 
         if remote_uri.scheme == "https"

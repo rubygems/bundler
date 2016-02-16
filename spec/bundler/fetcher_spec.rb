@@ -24,8 +24,9 @@ describe Bundler::Fetcher do
       end
     end
     context "when Gem.configuration specifies http_proxy " do
+      let(:proxy) { "http://proxy-example2.com" }
       before do
-        allow(Bundler.rubygems.configuration).to receive(:[]).and_return("http://proxy-example2.com")
+        allow(Bundler.rubygems.configuration).to receive(:[]).with(:http_proxy).and_return(proxy)
       end
       it "consider Gem.configuration when determine proxy" do
         expect(fetcher.http_proxy).to match("http://proxy-example2.com")
@@ -33,6 +34,12 @@ describe Bundler::Fetcher do
       it "consider Gem.configuration when determine proxy" do
         with_env_vars("HTTP_PROXY" => "http://proxy-example.com") do
           expect(fetcher.http_proxy).to match("http://proxy-example2.com")
+        end
+      end
+      context "when the proxy is :no_proxy" do
+        let(:proxy) { :no_proxy }
+        it "does not set a proxy" do
+          expect(fetcher.http_proxy).to be_nil
         end
       end
     end
