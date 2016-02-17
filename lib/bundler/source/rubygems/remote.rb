@@ -39,6 +39,10 @@ module Bundler
           end
 
           uri
+        rescue URI::InvalidComponentError
+          error_message = "Please CGI escape your usernames and passwords before " \
+                          "setting them for authentication."
+          raise HTTPError.new(error_message)
         end
 
         def remove_auth(uri)
