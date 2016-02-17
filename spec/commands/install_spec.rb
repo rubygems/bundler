@@ -459,4 +459,20 @@ describe "bundle install with gem sources" do
       expect(out).to include("grant write permissions")
     end
   end
+
+  describe "when bundle install is executed with unencoded authentication" do
+    before do
+      gemfile <<-G
+        source 'https://rubygems.org/'
+        gem 'bundler'
+      G
+    end
+
+    it "should display a helpful messag explaining how to fix it" do
+      bundle :install, :env => { "BUNDLE_RUBYGEMS__ORG" => "user:pass{word" }
+      expect(exitstatus).to eq(17) if exitstatus
+      expect(out).to eq("Please CGI escape your usernames and passwords before " \
+                        "setting them for authentication.")
+    end
+  end
 end
