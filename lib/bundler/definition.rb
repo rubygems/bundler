@@ -447,7 +447,13 @@ module Bundler
         end
       end
 
-      !locked || unlocking || dependencies_for_source_changed?(locked) || source.specs != locked.specs
+      begin
+        locked_specs = locked.specs
+      rescue GitError
+        locked_specs = Bundler::Index.new
+      end
+
+      !locked || unlocking || dependencies_for_source_changed?(locked) || source.specs != locked_specs
     end
 
     def dependencies_for_source_changed?(source)
