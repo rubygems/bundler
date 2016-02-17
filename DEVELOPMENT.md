@@ -33,6 +33,24 @@ Bundler doesn't use a Gemfile to list development dependencies, because when we 
 
      With that set up, you can test changes you've made to Bundler by running `dbundle`, without interfering with the regular `bundle` command.
 
+# Submitting Pull Requests
+
+Before you submit a pull request, please remember to do the following:
+
+- Make sure the code formatting and styling adheres to the guidelines. We use Rubocop for this. Lack of formatting adherence will result in automatic Travis build failures.
+
+        $ bin/rubocop -a
+
+- Please run the test suite:
+
+        $ bin/rspec
+
+- If you are unable to run the entire test suite, please run the unit test suite and at least the integration specs related to the command or domain of Bundler that your code changes relate to.
+
+- Ex. For a pull request that changes something with `bundle update`, you might run:
+
+        $ bin/rspec spec/bundler
+        $ bin/rspec spec/commands/update_spec.rb
 
 # Bug triage
 
