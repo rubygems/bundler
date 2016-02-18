@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Bundler::Molinillo
   # A state that a {Resolution} can be in
   # @attr [String] name the name of the current requirement
