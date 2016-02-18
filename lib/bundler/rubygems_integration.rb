@@ -507,13 +507,7 @@ module Bundler
         # Missing summary is downgraded to a warning in later versions,
         # so we set it to an empty string to prevent an exception here.
         spec.summary ||= ""
-        Bundler.ui.silence { spec.validate(false) }
-      rescue Gem::InvalidSpecificationException => e
-        error_message = "The gemspec at #{spec.loaded_from} is not valid. Please fix this gemspec.\n" \
-          "The validation error was '#{e.message}'\n"
-        raise Gem::InvalidSpecificationException.new(error_message)
-      rescue Errno::ENOENT
-        nil
+        RubygemsIntegration.instance_method(:validate).bind(self).call(spec)
       end
     end
 
