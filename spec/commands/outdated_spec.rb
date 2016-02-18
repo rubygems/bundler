@@ -241,12 +241,33 @@ describe "bundle outdated" do
     end
   end
 
-  shared_examples_for "incorrect semantic versioning is ignored" do
-    before { update_repo2 { build_gem "weakling", "1" } }
+  shared_examples_for "major version is ignored" do
+    before do
+      update_repo2 do
+        build_gem "activesupport", "3.3.5"
+        build_gem "weakling", "1.0.1"
+      end
+    end
 
-    it "ignores gems not in proper semantic version format" do
+    it "ignores gems that have updates in the major version" do
       subject
-      expect(out).to include("weakling (newest")
+      expect(out).to_not include("activesupport (newest")
+      expect(out).to_not include("weakling (newest")
+    end
+  end
+
+  shared_examples_for "minor version is ignored" do
+    before do
+      update_repo2 do
+        build_gem "activesupport", "2.4.5"
+        build_gem "weakling", "0.3.1"
+      end
+    end
+
+    it "ignores gems that have updates in the minor version" do
+      subject
+      expect(out).to_not include("activesupport (newest")
+      expect(out).to_not include("weakling (newest")
     end
   end
 
@@ -260,8 +281,8 @@ describe "bundle outdated" do
 
     it "ignores gems that have updates in the patch version" do
       subject
-      expect(out).to_not include("weakling (newest")
       expect(out).to_not include("activesupport (newest")
+      expect(out).to_not include("weakling (newest")
     end
   end
 
@@ -270,34 +291,34 @@ describe "bundle outdated" do
 
     it "only reports gems that have a newer major version" do
       update_repo2 do
-        build_gem "weakling", "0.2.0"
-        build_gem "activesupport", "3.0"
+        build_gem "activesupport", "3.3.5"
+        build_gem "weakling", "0.8.0"
       end
 
       subject
-      expect(out).to_not include("weakling (newest")
       expect(out).to include("activesupport (newest")
+      expect(out).to_not include("weakling (newest")
     end
 
+    it_behaves_like "minor version is ignored"
     it_behaves_like "patch version is ignored"
-    it_behaves_like "incorrect semantic versioning is ignored"
   end
 
   describe "with --minor option" do
     subject { bundle "outdated --minor" }
 
-    it "only reports gems that have at least a newer minor version" do
+    it "only reports gems that have a newer minor version" do
       update_repo2 do
-        build_gem "activesupport", "3.0.0"
-        build_gem "weakling", "0.2.0"
+        build_gem "activesupport", "2.7.5"
+        build_gem "weakling", "2.0.1"
       end
 
       subject
-      expect(out).to include("weakling (newest")
       expect(out).to include("activesupport (newest")
+      expect(out).to_not include("weakling (newest")
     end
 
+    it_behaves_like "major version is ignored"
     it_behaves_like "patch version is ignored"
-    it_behaves_like "incorrect semantic versioning is ignored"
   end
 end
