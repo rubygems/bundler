@@ -137,6 +137,7 @@ module Bundler
           Dir["#{expanded_path}/#{@glob}"].sort_by {|p| -p.split(File::SEPARATOR).size }.each do |file|
             next unless spec = Bundler.load_gemspec(file)
             spec.source = self
+            spec.installed_by_version = Gem::Version.create(Gem::VERSION)
             # Validation causes extension_dir to be calculated, which depends
             # on #source, so we validate here instead of load_gemspec
             Bundler.rubygems.validate(spec)
