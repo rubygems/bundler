@@ -359,7 +359,7 @@ module Bundler
     method_option :without, :type => :array, :default => [], :aliases => "-W", :banner => "GROUP[ GROUP...]", :desc => "Exclude gems that are part of the specified named group."
     def viz
       require "bundler/cli/viz"
-      Viz.new(options).run
+      Viz.new(options.dup).run
     end
 
     desc "gem GEM [OPTIONS]", "Creates a skeleton for creating a rubygem"
