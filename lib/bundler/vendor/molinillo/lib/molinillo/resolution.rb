@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Bundler::Molinillo
   class Resolver
     # A specific resolution from a given {Resolver}
@@ -362,6 +363,7 @@ module Bundler::Molinillo
           if !dep_names.include?(succ.name) && !succ.root? && succ.predecessors.to_a == [vertex]
             debug(depth) { "Removing orphaned spec #{succ.name} after swapping #{name}" }
             activated.detach_vertex_named(succ.name)
+            requirements.delete_if { |r| name_for(r) == succ.name }
           end
         end
       end
