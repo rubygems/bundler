@@ -223,7 +223,7 @@ module Bundler
     private
 
       def build_extensions(installer)
-        super if installer.spec.missing_extensions?
+        super if Bundler.rubygems.spec_missing_extensions?(installer.spec)
       end
 
       def serialize_gemspecs_in(destination)

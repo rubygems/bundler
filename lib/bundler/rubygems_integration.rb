@@ -62,6 +62,15 @@ module Bundler
       nil
     end
 
+    def set_installed_by_version(spec, installed_by_version = Gem::VERSION)
+      return unless spec.respond_to?(:installed_by_version=)
+      spec.installed_by_version = Gem::Version.create(installed_by_version)
+    end
+
+    def spec_missing_extensions?(spec)
+      !spec.respond_to?(:missing_extensions?) || spec.missing_extensions?
+    end
+
     def path(obj)
       obj.to_s
     end
