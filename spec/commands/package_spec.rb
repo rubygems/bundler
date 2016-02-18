@@ -38,6 +38,8 @@ describe "bundle package" do
             Gem::Specification.new do |s|
               s.name = "mygem"
               s.version = "0.1.1"
+              s.summary = ""
+              s.authors = ["gem author"]
               s.add_development_dependency "nokogiri", "=1.4.2"
             end
           G
@@ -50,8 +52,8 @@ describe "bundle package" do
           gemspec
         D
 
-        bundle "package --all"
-        sleep 20
+        bundle! "package --all"
+
         expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
         expect(bundled_app("vendor/cache/nokogiri-1.4.2.gem")).to exist
         expect(bundled_app("vendor/cache/mygem-0.1.1.gem")).to_not exist
