@@ -85,7 +85,7 @@ module Bundler
             file = dep.name if file == true
             required_file = file
             begin
-              Kernel.require file
+              kernel_require(file)
             rescue => e
               raise e if e.is_a?(LoadError) # we handle this a little later
               raise Bundler::GemRequireError.new e,
@@ -107,6 +107,10 @@ module Bundler
           end
         end
       end
+    end
+
+    def kernel_require(file)
+      Kernel.require(file)
     end
 
     def dependencies_for(*groups)
