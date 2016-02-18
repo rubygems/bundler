@@ -352,11 +352,11 @@ module Bundler
       Viz requires the ruby-graphviz gem (and its dependencies).
       The associated gems must also be installed via 'bundle install'.
     D
-    method_option :file, :type => :string, :default => "gem_graph", :aliases => "-f", :banner => "The name to use for the generated file. see format option"
-    method_option :format, :type => :string, :default => "png", :aliases => "-F", :banner => "This is output format option. Supported format is png, jpg, svg, dot ..."
-    method_option :requirements, :type => :boolean, :default => false, :aliases => "-r", :banner => "Set to show the version of each required dependency."
-    method_option :version, :type => :boolean, :default => false, :aliases => "-v", :banner => "Set to show each gem version."
-    method_option :without, :type => :array, :default => [], :banner => "Exclude gems that are part of the specified named group."
+    method_option :file, :type => :string, :default => "gem_graph", :aliases => "-f", :desc => "The name to use for the generated file. see format option"
+    method_option :format, :type => :string, :default => "png", :aliases => "-F", :desc => "This is output format option. Supported format is png, jpg, svg, dot ..."
+    method_option :requirements, :type => :boolean, :default => false, :aliases => "-R", :desc => "Set to show the version of each required dependency."
+    method_option :version, :type => :boolean, :default => false, :aliases => "-v", :desc => "Set to show each gem version."
+    method_option :without, :type => :array, :default => [], :aliases => "-W", :banner => "GROUP[ GROUP...]", :desc => "Exclude gems that are part of the specified named group."
     def viz
       require "bundler/cli/viz"
       Viz.new(options).run
