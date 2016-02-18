@@ -83,7 +83,7 @@ describe Bundler do
 
         before do
           allow(Bundler::UI::Shell).to receive(:new).and_return(ui_shell)
-          allow(Bundler.rubygems).to receive(:validate) {
+          allow_any_instance_of(Gem::Specification).to receive(:validate) {
             raise Gem::InvalidSpecificationException.new("TODO is not an author")
           }
         end

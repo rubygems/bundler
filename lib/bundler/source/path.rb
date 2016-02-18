@@ -136,7 +136,6 @@ module Bundler
           # We sort depth-first since `<<` will override the earlier-found specs
           Dir["#{expanded_path}/#{@glob}"].sort_by {|p| -p.split(File::SEPARATOR).size }.each do |file|
             next unless spec = Bundler.load_gemspec(file)
-            spec.loaded_from = file.to_s
             spec.source = self
             # Validation causes extension_dir to be calculated, which depends
             # on #source, so we validate here instead of load_gemspec
