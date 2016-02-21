@@ -68,7 +68,7 @@ describe "bundle install" do
       if type == :env
         ENV["BUNDLE_PATH"] = location
       elsif type == :global
-        bundle "config path #{location}", "no-color" => nil
+        bundle "config path #{location}", "color" => nil
       end
     end
 

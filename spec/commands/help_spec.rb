@@ -83,6 +83,6 @@ describe "bundle help" do
     with_fake_man do
       bundle "instill -h", :expect_err => true
     end
-    expect(err).to include('Could not find command "instill -h --no-color".')
+    expect(err).to include('Could not find command "instill -h".')
   end
 end
