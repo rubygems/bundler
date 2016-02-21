@@ -2,107 +2,96 @@
 require "spec_helper"
 
 describe "Bundler.with_env helpers" do
-  shared_examples_for "Bundler.with_*_env" do
-    it "should reset and restore the environment" do
-      gem_path = ENV["GEM_PATH"]
-      path = ENV["PATH"]
-
-      Bundler.with_clean_env do
-        expect(`echo $GEM_PATH`.strip).not_to eq(gem_path)
-        expect(`echo $PATH`.strip).not_to eq(path)
-      end
-
-      expect(ENV["GEM_PATH"]).to eq(gem_path)
-      expect(ENV["PATH"]).to eq(path)
-    end
-  end
-
-  around do |example|
-    env = Bundler::ORIGINAL_ENV.dup
-    Bundler::ORIGINAL_ENV["BUNDLE_PATH"] = "./Gemfile"
-    example.run
-    Bundler::ORIGINAL_ENV.replace env
-  end
-
-  describe "Bundler.with_clean_env" do
-    it_should_behave_like "Bundler.with_*_env"
-
-    it "should keep the original GEM_PATH even in sub processes" do
+  describe "Bundler.original_env" do
+    before do
       gemfile ""
       bundle "install --path vendor/bundle"
-
-      code = "Bundler.with_clean_env do;" \
-             "  print ENV['GEM_PATH'] != '';" \
-             "end"
-
-      result = bundle "exec ruby -e #{code.inspect}"
-      expect(result).to eq("true")
     end
 
-    it "should keep the original PATH even in sub processes" do
-      gemfile ""
-      bundle "install --path vendor/bundle"
-
-      code = "Bundler.with_clean_env do;" \
-             "  print ENV['PATH'] != '';" \
-             "end"
-
-      result = bundle "exec ruby -e #{code.inspect}"
-      expect(result).to eq("true")
-    end
-
-    it "should not pass any bundler environment variables" do
-      Bundler.with_clean_env do
-        expect(`echo $BUNDLE_PATH`.strip).not_to eq("./Gemfile")
-      end
-    end
-
-    it "should not pass RUBYOPT changes" do
-      Bundler::ORIGINAL_ENV["RUBYOPT"] = " -rbundler/setup"
-
-      Bundler.with_clean_env do
-        expect(`echo $RUBYOPT`.strip).not_to include "-rbundler/setup"
-      end
-
-      expect(Bundler::ORIGINAL_ENV["RUBYOPT"]).to eq(" -rbundler/setup")
-    end
-
-    it "cleans RUBYLIB" do
-      lib_path = File.expand_path("../../../lib", __FILE__)
-      Bundler::ORIGINAL_ENV["RUBYLIB"] = lib_path
-
-      Bundler.with_clean_env do
-        expect(`echo $RUBYLIB`.strip).not_to include(lib_path)
-      end
-    end
-
-    it "should not change ORIGINAL_ENV" do
-      expect(Bundler::ORIGINAL_ENV["BUNDLE_PATH"]).to eq("./Gemfile")
-    end
-  end
-
-  describe "Bundler.with_original_env" do
-    it_should_behave_like "Bundler.with_*_env"
-
-    it "should pass bundler environment variables set before Bundler was run" do
-      Bundler.with_original_env do
-        expect(`echo $BUNDLE_PATH`.strip).to eq("./Gemfile")
-      end
-    end
-
-    it "should preserve the PATH environment variable" do
-      gemfile ""
-      bundle "install --path vendor/bundle"
-
-      code = "Bundler.with_original_env do;" \
-             "  print ENV['PATH'];" \
-             "end"
-
-      path = `getconf PATH`.strip
+    it "should return the PATH present before bundle was activated" do
+      code = "print Bundler.original_env['PATH']"
+      path = `getconf PATH`.strip + ":/foo"
       with_path_as(path) do
         result = bundle("exec ruby -e #{code.inspect}")
         expect(result).to eq(path)
       end
+    end
+
+    it "should return the GEM_PATH present before bundle was activated" do
+      code = "print Bundler.original_env['GEM_PATH']"
+      gem_path = ENV["GEM_PATH"] + ":/foo"
+      with_gem_path_as(gem_path) do
+        result = bundle("exec ruby -e #{code.inspect}")
+        expect(result).to eq(gem_path)
+      end
+    end
+  end
+
+  describe "Bundler.clean_env" do
+    before do
+      gemfile ""
+      bundle "install --path vendor/bundle"
+    end
+
+    it "should delete BUNDLE_PATH" do
+      code = "print Bundler.clean_env.has_key?('BUNDLE_PATH')"
+      ENV["BUNDLE_PATH"] = "./foo"
+      result = bundle("exec ruby -e #{code.inspect}")
+      expect(result).to eq("false")
+    end
+
+    it "should remove '-rbundler/setup' from RUBYOPT" do
+      code = "print Bundler.clean_env['RUBYOPT']"
+      ENV["RUBYOPT"] = "-W2 -rbundler/setup"
+      result = bundle("exec ruby -e #{code.inspect}")
+      expect(result).not_to include("-rbundler/setup")
+    end
+
+    it "should clean up RUBYLIB" do
+      code = "print Bundler.clean_env['RUBYLIB']"
+      ENV["RUBYLIB"] = File.expand_path("../../../lib", __FILE__) + File::PATH_SEPARATOR + "/foo"
+      result = bundle("exec ruby -e #{code.inspect}")
+      expect(result).to eq("/foo")
+    end
+
+    it "should restore the original MANPATH" do
+      code = "print Bundler.clean_env['MANPATH']"
+      ENV["MANPATH"] = "/foo"
+      ENV["BUNDLE_ORIG_MANPATH"] = "/foo-original"
+      result = bundle("exec ruby -e #{code.inspect}")
+      expect(result).to eq("/foo-original")
+    end
+  end
+
+  describe "Bundler.with_original_env" do
+    it "should set ENV to original_env in the block" do
+      expected = Bundler.original_env
+      actual = Bundler.with_original_env { ENV.to_hash }
+      expect(actual).to eq(expected)
+    end
+
+    it "should restore the environment after execution" do
+      Bundler.with_original_env do
+        ENV["FOO"] = "hello"
+      end
+
+      expect(ENV).not_to have_key("FOO")
+    end
+  end
+
+  describe "Bundler.with_clean_env" do
+    it "should set ENV to clean_env in the block" do
+      expected = Bundler.clean_env
+      actual = Bundler.with_clean_env { ENV.to_hash }
+      expect(actual).to eq(expected)
+    end
+
+    it "should restore the environment after execution" do
+      Bundler.with_clean_env do
+        ENV["FOO"] = "hello"
+      end
+
+      expect(ENV).not_to have_key("FOO")
     end
   end
 
