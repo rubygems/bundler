@@ -148,8 +148,8 @@ module Bundler
       "Don't update the existing gem cache."
     method_option "force", :type => :boolean, :banner =>
       "Force downloading every gem."
-    method_option "no-prune", :type => :boolean, :banner =>
-      "Don't remove stale gems from the cache."
+    method_option "prune", :type => :boolean, :banner =>
+      "Remove stale gems from the cache.", :default => true
     method_option "path", :type => :string, :banner =>
       "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
     method_option "quiet", :type => :boolean, :banner =>
@@ -260,7 +260,7 @@ module Bundler
     desc "cache [OPTIONS]", "Cache all the gems to vendor/cache", :hide => true
     method_option "all",  :type => :boolean, :banner => "Include all sources (including path and git)."
     method_option "all-platforms", :type => :boolean, :banner => "Include gems for all platforms present in the lockfile, not just the current one"
-    method_option "no-prune", :type => :boolean, :banner => "Don't remove stale gems from the cache."
+    method_option "prune", :type => :boolean, :banner => "Remove stale gems from the cache.", :default => true
     def cache
       require "bundler/cli/cache"
       Cache.new(options).run
@@ -273,7 +273,7 @@ module Bundler
       "Specify a different cache path than the default (vendor/cache)."
     method_option "gemfile", :type => :string, :banner => "Use the specified gemfile instead of Gemfile"
     method_option "no-install", :type => :boolean, :banner => "Don't actually install the gems, just package."
-    method_option "no-prune", :type => :boolean, :banner => "Don't remove stale gems from the cache."
+    method_option "prune", :type => :boolean, :banner => "Remove stale gems from the cache.", :default => true
     method_option "path", :type => :string, :banner =>
       "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
     method_option "quiet", :type => :boolean, :banner => "Only output warnings and errors."
