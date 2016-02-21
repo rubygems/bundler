@@ -43,9 +43,9 @@ module Bundler
     stop_on_unknown_option! :exec
 
     default_task :install
-    class_option "no-color", :type => :boolean, :desc => "Disable colorization in output"
-    class_option "retry",    :type => :numeric, :aliases => "-r", :banner => "NUM",
-                             :desc => "Specify the number of times you wish to attempt network commands"
+    class_option "color",   :type => :boolean, :desc => "Colorize output", :default => true
+    class_option "retry",   :type => :numeric, :aliases => "-r", :banner => "NUM",
+                            :desc => "Specify the number of times you wish to attempt network commands"
     class_option "verbose", :type => :boolean, :desc => "Enable verbose output mode", :aliases => "-V"
 
     def help(cli = nil)
