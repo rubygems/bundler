@@ -272,6 +272,8 @@ module Bundler
     method_option "path", :type => :string, :banner =>
       "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
     method_option "quiet", :type => :boolean, :banner => "Only output warnings and errors."
+    method_option "frozen", :type => :boolean, :banner =>
+      "Do not allow the Gemfile.lock to be updated after this package operation's install"
     long_desc <<-D
       The package command will copy the .gem files for every gem in the bundle into the
       directory ./vendor/cache. If you then check that directory into your source
