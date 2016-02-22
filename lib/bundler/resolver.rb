@@ -341,10 +341,11 @@ module Bundler
             "try passing them all to `bundle update`"
         elsif requirement.source
           name = requirement.name
-          versions = @source_requirements[name][name].map(&:version)
-          message  = String.new("Could not find gem '#{requirement}' in #{requirement.source}.\n")
-          message << if versions.any?
-                       "Source contains '#{name}' at: #{versions.join(", ")}"
+          specs = @source_requirements[name][name]
+          versions_with_platforms = specs.map {|s| [s.version, s.platform] }
+          message = String.new("Could not find gem '#{requirement}' in #{requirement.source}.\n")
+          message << if versions_with_platforms.any?
+                       "Source contains '#{name}' at: #{formatted_versions_with_platforms(versions_with_platforms)}"
                      else
                        "Source does not contain any versions of '#{requirement}'"
                      end
@@ -354,6 +355,16 @@ module Bundler
         end
         raise GemNotFound, message
       end
+    end
+
+    def formatted_versions_with_platforms(versions_with_platforms)
+      version_platform_strs = versions_with_platforms.map do |vwp|
+        version = vwp.first
+        platform = vwp.last
+        version_platform_str = String.new(version.to_s)
+        version_platform_str << " #{platform}" unless platform.nil?
+      end
+      version_platform_strs.join(",")
     end
   end
 end

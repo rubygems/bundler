@@ -105,6 +105,7 @@ module Spec
 
         build_gem "only_java" do |s|
           s.platform = "java"
+          s.write "lib/only_java.rb", "ONLY_JAVA = '1.0.0 JAVA'"
         end
 
         build_gem "nokogiri", "1.4.2"
