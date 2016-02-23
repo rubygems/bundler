@@ -56,6 +56,7 @@ module Bundler
     def kernel_load(file, *args)
       args.pop if args.last.is_a?(Hash)
       ARGV.replace(args)
+      $0 = file
       ui = Bundler.ui
       Bundler.ui = nil
       require "bundler/setup"
