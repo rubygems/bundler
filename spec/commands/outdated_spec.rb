@@ -321,4 +321,22 @@ describe "bundle outdated" do
     it_behaves_like "major version is ignored"
     it_behaves_like "patch version is ignored"
   end
+
+  describe "with --patch option" do
+    subject { bundle "outdated --patch" }
+
+    it "only reports gems that have a newer patch version" do
+      update_repo2 do
+        build_gem "activesupport", "2.3.7"
+        build_gem "weakling", "0.3.1"
+      end
+
+      subject
+      expect(out).to include("activesupport (newest")
+      expect(out).to_not include("weakling (newest")
+    end
+
+    it_behaves_like "major version is ignored"
+    it_behaves_like "minor version is ignored"
+  end
 end

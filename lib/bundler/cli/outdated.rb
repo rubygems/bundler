@@ -56,7 +56,7 @@ module Bundler
           end
           active_spec = active_spec.last
 
-          if options[:major] || options[:minor]
+          if options[:major] || options[:minor] || options[:patch]
             update_present = update_present_via_semver_portions(current_spec, active_spec, options)
             active_spec = nil unless update_present
           end
@@ -126,10 +126,18 @@ module Bundler
 
       update_present = active_major > current_major if options[:major]
 
-      if options[:minor] && current_major == active_major
+      if (options[:minor] || options[:patch]) && current_major == active_major
         current_minor = current_spec.version.segments[1, 1].first
         active_minor = active_spec.version.segments[1, 1].first
-        update_present = active_minor > current_minor
+
+        if options[:minor]
+          update_present = active_minor > current_minor
+        elsif options[:patch] && current_minor == active_minor
+          current_patch = current_spec.version.segments[2, 1].first
+          active_patch = active_spec.version.segments[2, 1].first
+
+          update_present = active_patch > current_patch
+        end
       end
 
       update_present
