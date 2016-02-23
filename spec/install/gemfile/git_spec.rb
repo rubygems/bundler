@@ -101,6 +101,27 @@ describe "bundle install with git sources" do
       expect(out).to include("Source contains 'only_java' at: 1.0 java")
     end
 
+    it "complains with multiple versions and platforms if pinned specs don't exist in the git repo" do
+      simulate_platform "java"
+
+      build_git "only_java", "1.0" do |s|
+        s.platform = "java"
+      end
+
+      build_git "only_java", "1.1" do |s|
+        s.platform = "java"
+        s.write "only_java1-0.gemspec", File.read("#{lib_path("only_java-1.0-java")}/only_java.gemspec")
+      end
+
+      install_gemfile <<-G
+        platforms :jruby do
+          gem "only_java", "1.2", :git => "#{lib_path("only_java-1.1-java")}"
+        end
+      G
+
+      expect(out).to include("Source contains 'only_java' at: 1.0 java, 1.1 java")
+    end
+
     it "still works after moving the application directory" do
       bundle "install --path vendor/bundle"
       FileUtils.mv bundled_app, tmp("bundled_app.bck")

@@ -103,9 +103,14 @@ module Spec
           s.write "lib/platform_specific.rb", "PLATFORM_SPECIFIC = '1.0.0 x86-darwin-100'"
         end
 
-        build_gem "only_java" do |s|
+        build_gem "only_java", "1.0" do |s|
           s.platform = "java"
           s.write "lib/only_java.rb", "ONLY_JAVA = '1.0.0 JAVA'"
+        end
+
+        build_gem "only_java", "1.1" do |s|
+          s.platform = "java"
+          s.write "lib/only_java.rb", "ONLY_JAVA = '1.1.0 JAVA'"
         end
 
         build_gem "nokogiri", "1.4.2"

@@ -364,7 +364,7 @@ module Bundler
         version_platform_str = String.new(version.to_s)
         version_platform_str << " #{platform}" unless platform.nil?
       end
-      version_platform_strs.join(",")
+      version_platform_strs.join(", ")
     end
   end
 end
