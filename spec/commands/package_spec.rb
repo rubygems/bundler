@@ -99,6 +99,33 @@ describe "bundle package" do
       expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
     end
   end
+
+  context "with --frozen" do
+    before do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+      G
+      bundle "install"
+    end
+
+    subject { bundle "package --frozen" }
+
+    it "tries to install with frozen" do
+      gemfile <<-G
+        source "file://#{gem_repo1}"
+        gem "rack"
+        gem "rack-obama"
+      G
+      subject
+      expect(exitstatus).to eq(16) if exitstatus
+      expect(out).to include("deployment mode")
+      expect(out).to include("You have added to the Gemfile")
+      expect(out).to include("* rack-obama")
+      bundle "env"
+      expect(out).to include("frozen")
+    end
+  end
 end
 
 describe "bundle install with gem sources" do
