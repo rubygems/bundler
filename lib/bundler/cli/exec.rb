@@ -71,8 +71,12 @@ module Bundler
     end
 
     def ruby_shebang?(file)
-      first_line = File.open(file, "rb", &:readline)
-      first_line == "#!/usr/bin/env ruby\n" || first_line == "#!#{Gem.ruby}\n"
+      possibilities = [
+        "#!/usr/bin/env ruby\n",
+        "#!#{Gem.ruby}\n",
+      ]
+      first_line = File.read(file, possibilities.map(&:size).max, :mode => "rb")
+      possibilities.any? {|shebang| first_line.start_with?(shebang) }
     end
   end
 end
