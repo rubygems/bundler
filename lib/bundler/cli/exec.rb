@@ -75,7 +75,7 @@ module Bundler
         "#!/usr/bin/env ruby\n",
         "#!#{Gem.ruby}\n",
       ]
-      first_line = File.read(file, possibilities.map(&:size).max, :mode => "rb")
+      first_line = File.open(file, "rb") {|f| f.read(possibilities.map(&:size).max) }
       possibilities.any? {|shebang| first_line.start_with?(shebang) }
     end
   end

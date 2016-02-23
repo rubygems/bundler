@@ -378,7 +378,7 @@ describe "bundle exec" do
 
     before do
       path.open("w") {|f| f << executable }
-      FileUtils.chmod("+x", path)
+      path.chmod(0755)
 
       install_gemfile <<-G
         gem "rack"
@@ -422,7 +422,10 @@ describe "bundle exec" do
       let(:executable) { super() << "\nraise 'ERROR'" }
       let(:exit_code) { 1 }
       let(:expected) { super() << "\nbundler: failed to load command: #{path} (#{path})" }
-      let(:expected_err) { "RuntimeError: ERROR\n  #{path}:7:in `<top (required)>'" }
+      let(:expected_err) do
+        "RuntimeError: ERROR\n  #{path}:7" +
+          (Bundler.current_ruby.ruby_18? ? "" : ":in `<top (required)>'")
+      end
       it_behaves_like "it runs"
     end
 
