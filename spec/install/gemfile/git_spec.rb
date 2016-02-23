@@ -944,7 +944,7 @@ describe "bundle install with git sources" do
       expect(out).not_to include("gem install foo")
     end
 
-    it "does not reinstall the extension" do
+    it "does not reinstall the extension", :rubygems => ">= 2.3.0" do
       build_git "foo" do |s|
         s.add_dependency "rake"
         s.extensions << "Rakefile"
