@@ -10,30 +10,26 @@ on_finish:
 - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 install:
   - SET PATH=C:\Ruby%ruby_version%\bin;%PATH%
-  - SET GEM_HOME=%APPDATA%\.gem
   - ruby --version
   - gem --version
-  - gem install rake --no-rdoc --no-ri
   - rake spec:deps
-  - gem list --details
-  - gem env
 test_script:
-  - rake spec:travis
+  - rake spec:appveyor
 
 build: off
 environment:
   matrix:
     # Ruby 2.2, Rubygems 2.4.5 and up 
-    - ruby_version: "22"
-      RGV: master
+    # - ruby_version: "22"
+    #   RGV: master
     # - ruby_version: "22-x64"
     #   RGV: master
     # - ruby_version: "22"
     #   RGV: v2.5.2
     # - ruby_version: "22-x64"
     #   RGV: v2.5.2
-    # - ruby_version: "22"
-    #   RGV: v2.4.8
+    - ruby_version: "22"
+      RGV: v2.4.8
     # - ruby_version: "22-x64"
     #   RGV: v2.4.8
 

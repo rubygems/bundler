@@ -213,6 +213,47 @@ begin
         raise "Spec run failed, please review the log for more information"
       end
     end
+
+    desc "Run the tests on Appveyor against a rubygem version (using ENV['RGV'])"
+    task :appveyor do
+      rg = ENV["RGV"] || raise("Rubygems version is required on Appveyor!")
+
+      if RUBY_VERSION > "1.9.3"
+        puts "\nRunning bundler linter:\n\n"
+        Rake::Task["rubocop"].invoke
+      end
+
+      puts "\nRunning bundler specs against rubygems #{rg}\n\n"
+      specs = safe_task { Rake::Task["spec:rubygems:#{rg}"].invoke }
+      puts "=====#{specs}======"
+
+      Rake::Task["spec:rubygems:#{rg}"].reenable
+
+      puts "\nRunning bundler sudo specs against rubygems #{rg}\n\n"
+      sudos = system("sudo -E rake spec:rubygems:#{rg}:sudo")
+      puts "=====#{sudos}======"
+
+      # clean up by chowning the newly root-owned tmp directory back to the travis user
+      # system("sudo chown -R #{ENV["USER"]} #{File.join(File.dirname(__FILE__), "tmp")}")
+
+      Rake::Task["spec:rubygems:#{rg}"].reenable
+
+      puts "\nRunning bundler real world specs against rubygems #{rg}\n\n"
+      realworld = safe_task { Rake::Task["spec:rubygems:#{rg}:realworld"].invoke }
+      puts "=====#{realworld}======"
+
+      { "specs" => specs, "sudo" => sudos, "realworld" => realworld }.each do |name, passed|
+        if passed
+          puts "#{name} passed"
+        else
+          puts "#{name} failed"
+        end
+      end
+
+      unless specs && sudos && realworld
+        raise "Spec run failed, please review the log for more information"
+      end
+    end
   end
 
 rescue LoadError
