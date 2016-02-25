@@ -361,7 +361,7 @@ module Bundler
           eval_gemspec(path, contents)
         end
         return unless spec
-        spec.loaded_from = file
+        spec.loaded_from = path.expand_path.to_s
         Bundler.rubygems.validate(spec) if validate
         spec
       end

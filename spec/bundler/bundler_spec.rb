@@ -84,7 +84,7 @@ describe Bundler do
         GEMSPEC
       end
 
-      expect(subject.loaded_from).to eq(app_gemspec_path)
+      expect(subject.loaded_from).to eq(app_gemspec_path.expand_path.to_s)
     end
 
     context "validate is true" do
