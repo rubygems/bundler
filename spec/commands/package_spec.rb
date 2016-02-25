@@ -88,6 +88,18 @@ describe "bundle package" do
       should_not_be_installed "rack 1.0.0", :expect_err => true
       expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
     end
+
+    it "does not prevent installing gems with bundle install" do
+      gemfile <<-D
+        source "file://#{gem_repo1}"
+        gem 'rack'
+      D
+
+      bundle "package --no-install"
+      bundle "install"
+
+      should_be_installed "rack 1.0.0"
+    end
   end
 
   context "with --all-platforms" do
