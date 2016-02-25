@@ -19,8 +19,12 @@ Dir.chdir(rubygems_path) do
   run("git", "checkout", version, "--quiet")
 end if version
 
-ENV["RUBYOPT"] = %(-I#{rubygems_path + "lib"} #{ENV["RUBYOPT"]})
-if cmd = ARGV.first
+rubygems_lib = rubygems_path + "lib"
+ENV["RUBYOPT"] = %(-I#{rubygems_lib} #{ENV["RUBYOPT"]})
+
+if $0 != __FILE__
+  ARGV.unshift($0)
+elsif cmd = ARGV.first
   possible_dirs = [
     Pathname.new(__FILE__) + "..",
     Pathname.new(__FILE__) + "../../exe",
@@ -32,4 +36,4 @@ if cmd = ARGV.first
   ARGV[0] = cmd.to_s if cmd
 end
 
-exec(*ARGV) if $0 == __FILE__
+exec(*ARGV)
