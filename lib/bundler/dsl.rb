@@ -67,6 +67,8 @@ module Bundler
         gem_platforms = Bundler::Dependency::REVERSE_PLATFORM_MAP[Bundler::GemHelpers.generic_local_platform]
         gem spec.name, :path => path, :glob => glob, :platforms => gem_platforms
 
+        ruby(spec.required_ruby_version) if !@ruby_version && spec.required_ruby_version
+
         group(development_group) do
           spec.development_dependencies.each do |dep|
             gem dep.name, *(dep.requirement.as_list + [:type => :development])
