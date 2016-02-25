@@ -54,8 +54,21 @@ module Bundler
 
     def validate(spec)
       Bundler.ui.silence { spec.validate(false) }
+    rescue Gem::InvalidSpecificationException => e
+      error_message = "The gemspec at #{spec.loaded_from} is not valid. Please fix this gemspec.\n" \
+        "The validation error was '#{e.message}'\n"
+      raise Gem::InvalidSpecificationException.new(error_message)
     rescue Errno::ENOENT
       nil
+    end
+
+    def set_installed_by_version(spec, installed_by_version = Gem::VERSION)
+      return unless spec.respond_to?(:installed_by_version=)
+      spec.installed_by_version = Gem::Version.create(installed_by_version)
+    end
+
+    def spec_missing_extensions?(spec)
+      !spec.respond_to?(:missing_extensions?) || spec.missing_extensions?
     end
 
     def path(obj)
@@ -503,9 +516,7 @@ module Bundler
         # Missing summary is downgraded to a warning in later versions,
         # so we set it to an empty string to prevent an exception here.
         spec.summary ||= ""
-        Bundler.ui.silence { spec.validate(false) }
-      rescue Errno::ENOENT
-        nil
+        RubygemsIntegration.instance_method(:validate).bind(self).call(spec)
       end
     end
 

@@ -75,32 +75,31 @@ describe Bundler do
       end
     end
 
+    it "sets loaded_from" do
+      app_gemspec_path.open("w") do |f|
+        f.puts <<-GEMSPEC
+          Gem::Specification.new do |gem|
+            gem.name = "validated"
+          end
+        GEMSPEC
+      end
+
+      expect(subject.loaded_from).to eq(app_gemspec_path.expand_path.to_s)
+    end
+
     context "validate is true" do
       subject { Bundler.load_gemspec_uncached(app_gemspec_path, true) }
 
-      context "and there are gemspec validation errors" do
-        let(:ui_shell) { double(:ui_shell) }
-
-        before do
-          allow(Bundler::UI::Shell).to receive(:new).and_return(ui_shell)
-          allow(Bundler.rubygems).to receive(:validate) {
-            raise Gem::InvalidSpecificationException.new("TODO is not an author")
-          }
+      it "validates the specification" do
+        app_gemspec_path.open("w") do |f|
+          f.puts <<-GEMSPEC
+            Gem::Specification.new do |gem|
+              gem.name = "validated"
+            end
+          GEMSPEC
         end
-
-        it "should raise a Gem::InvalidSpecificationException and produce a helpful warning message" do
-          File.open(app_gemspec_path, "wb") do |file|
-            file.puts <<-GEMSPEC.gsub(/^\s+/, "")
-              Gem::Specification.new do |gem|
-                gem.author = "TODO"
-              end
-            GEMSPEC
-          end
-
-          expect { subject }.to raise_error(Gem::InvalidSpecificationException,
-            "The gemspec at #{app_gemspec_path} is not valid. "\
-            "Please fix this gemspec.\nThe validation error was 'TODO is not an author'\n")
-        end
+        expect(Bundler.rubygems).to receive(:validate).with have_attributes(:name => "validated")
+        subject
       end
     end
   end

@@ -53,7 +53,7 @@ module Gem
     if method_defined?(:extension_dir)
       alias_method :rg_extension_dir, :extension_dir
       def extension_dir
-        @extension_dir ||= if source.respond_to?(:extension_dir_name)
+        @bundler_extension_dir ||= if source.respond_to?(:extension_dir_name)
           File.expand_path(File.join(extensions_dir, source.extension_dir_name))
         else
           rg_extension_dir

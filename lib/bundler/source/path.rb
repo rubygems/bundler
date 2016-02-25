@@ -135,9 +135,12 @@ module Bundler
         if File.directory?(expanded_path)
           # We sort depth-first since `<<` will override the earlier-found specs
           Dir["#{expanded_path}/#{@glob}"].sort_by {|p| -p.split(File::SEPARATOR).size }.each do |file|
-            next unless spec = Bundler.load_gemspec(file, :validate)
-            spec.loaded_from = file.to_s
+            next unless spec = Bundler.load_gemspec(file)
             spec.source = self
+            Bundler.rubygems.set_installed_by_version(spec)
+            # Validation causes extension_dir to be calculated, which depends
+            # on #source, so we validate here instead of load_gemspec
+            Bundler.rubygems.validate(spec)
             index << spec
           end
 
@@ -194,8 +197,7 @@ module Bundler
         SharedHelpers.chdir(gem_dir) do
           installer = Path::Installer.new(spec, :env_shebang => false)
           run_hooks(:pre_install, installer)
-          installer.build_extensions unless disable_extensions
-          run_hooks(:post_build, installer)
+          build_extensions(installer) unless disable_extensions
           installer.generate_bin
           run_hooks(:post_install, installer)
         end
@@ -211,6 +213,11 @@ module Bundler
         end
 
         Bundler.ui.warn "The validation message from Rubygems was:\n  #{e.message}"
+      end
+
+      def build_extensions(installer)
+        installer.build_extensions
+        run_hooks(:post_build, installer)
       end
 
       def run_hooks(type, installer)

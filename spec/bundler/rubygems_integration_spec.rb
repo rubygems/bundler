@@ -7,16 +7,43 @@ describe Bundler::RubygemsIntegration do
   end
 
   context "#validate" do
-    let(:spec) { double("spec", :summary => "") }
+    let(:spec) do
+      Gem::Specification.new do |s|
+        s.name = "to-validate"
+        s.version = "1.0.0"
+        s.loaded_from = __FILE__
+      end
+    end
+    subject { Bundler.rubygems.validate(spec) }
 
     it "skips overly-strict gemspec validation", :rubygems => "< 1.7" do
       expect(spec).to_not receive(:validate)
-      Bundler.rubygems.validate(spec)
+      subject
     end
 
     it "validates with packaging mode disabled", :rubygems => "1.7" do
       expect(spec).to receive(:validate).with(false)
-      Bundler.rubygems.validate(spec)
+      subject
+    end
+
+    it "should set a summary to avoid an overly-strict error", :rubygems => "~> 1.7.0" do
+      spec.summary = nil
+      expect { subject }.not_to raise_error
+      expect(spec.summary).to eq("")
+    end
+
+    context "with an invalid spec" do
+      before do
+        expect(spec).to receive(:validate).with(false).
+          and_raise(Gem::InvalidSpecificationException.new("TODO is not an author"))
+      end
+
+      it "should raise a Gem::InvalidSpecificationException and produce a helpful warning message",
+        :rubygems => "1.7" do
+        expect { subject }.to raise_error(Gem::InvalidSpecificationException,
+          "The gemspec at #{__FILE__} is not valid. "\
+          "Please fix this gemspec.\nThe validation error was 'TODO is not an author'\n")
+      end
     end
   end
 

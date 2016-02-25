@@ -355,18 +355,16 @@ module Bundler
       # depend on "./" relative paths.
       SharedHelpers.chdir(path.dirname.to_s) do
         contents = path.read
-        if contents[0..2] == "---" # YAML header
-          spec = eval_yaml_gemspec(path, contents)
+        spec = if contents[0..2] == "---" # YAML header
+          eval_yaml_gemspec(path, contents)
         else
-          spec = eval_gemspec(path, contents)
+          eval_gemspec(path, contents)
         end
-        Bundler.rubygems.validate(spec) if spec && validate
+        return unless spec
+        spec.loaded_from = path.expand_path.to_s
+        Bundler.rubygems.validate(spec) if validate
         spec
       end
-    rescue Gem::InvalidSpecificationException => e
-      error_message = "The gemspec at #{file} is not valid. Please fix this gemspec.\n" \
-        "The validation error was '#{e.message}'\n"
-      raise Gem::InvalidSpecificationException.new(error_message)
     end
 
     def clear_gemspec_cache
