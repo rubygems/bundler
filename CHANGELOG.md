@@ -1,3 +1,30 @@
+## 1.12.0.pre.2 (2016-02-26)
+
+Performance:
+
+  - speed up `bundle exec` by `load`ing the executable whenever possible, saving roughly .2 seconds per invocation (@segiddins)
+
+Features:
+
+  - add a `--patch` flag for `bundle outdated` (@RochesterinNYC)
+  - add `Bundler.clean_env` and `Bundler.original_env` (#4232, @njam)
+  - add `--frozen` support to `bundle package` (#3356, @RochesterinNYC)
+
+Bugfixes:
+
+  - place bundler loaded gems after `-I` and `RUBYLIB` (@Elffers)
+  - give a better error message when filesystem access raises an `EPROTO` error (#3581, #3932, #4163, @RochesterinNYC)
+  - give a better error message when both `--deployment` and `--system` are used together (@RochesterinNYC)
+  - fix `$PATH` being preserved for use in `Bundler.with_clean_env` (#4251, @segiddins, @njam)
+  - give a better error message when running `bundle outdated` in frozen mode (#4287, @RochesterinNYC)
+  - handle when `http_proxy` is set to `:no_proxy` in the rubygems configuration (#4294, @segiddins)
+  - give a better error message when authentication details aren't properly escaped (#4288, @RochesterinNYC)
+  - fix `bundle outdated --minor` to only report updates that match the current minor version (@RochesterinNYC)
+  - fix extra dependencies being resolved unnecessarily (#4276, @segiddins)
+  - give a better error message when missing specs due to platform mis-matches (#4259, @RochesterinNYC)
+  - skip rebuilding extensions for git gems if they are already built (#4082, @csfrancis, @indirect, @segiddins)
+  - fix `bundle install` not installing when the `no_install` setting is set (#3966, @chulkilee, @segiddins)
+
 ## 1.12.0.pre.1 (2016-02-09)
 
 Performance:
