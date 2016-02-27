@@ -328,6 +328,28 @@ describe "Bundler::RubyVersion and its subclasses" do
 
         it_behaves_like "there is a difference in the engine versions"
       end
+
+      context "with a patchlevel of -1" do
+        let(:version)              { ">= 2.0.0" }
+        let(:patchlevel)           { "-1" }
+        let(:engine)               { "ruby" }
+        let(:engine_version)       { "~> 2.0.1" }
+        let(:other_version)        { version }
+        let(:other_engine)         { engine }
+        let(:other_engine_version) { engine_version }
+
+        context "and comparing with another patchlevel of -1" do
+          let(:other_patchlevel) { patchlevel }
+
+          it_behaves_like "there are no differences"
+        end
+
+        context "and comparing with a patchlevel that is not -1" do
+          let(:other_patchlevel)     { "642" }
+
+          it_behaves_like "there is a difference in the patchlevels"
+        end
+      end
     end
 
     describe "#system" do
