@@ -103,6 +103,9 @@ module Bundler
   private
 
     def matches?(requirements, version)
+      # Handles RUBY_PATCHLEVEL of -1 for instances like ruby-head
+      return requirements == version if requirements.to_s == "-1" || version.to_s == "-1"
+
       Array(requirements).all? do |requirement|
         Gem::Requirement.create(requirement).satisfied_by?(Gem::Version.create(version))
       end
