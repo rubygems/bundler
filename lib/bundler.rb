@@ -303,12 +303,12 @@ module Bundler
     def which(executable)
       if File.file?(executable) && File.executable?(executable)
         executable
-      elsif path = ENV["PATH"]
-        executable_path = path.split(File::PATH_SEPARATOR).find do |p|
-          abs_path = File.join(p, executable)
-          File.file?(abs_path) && File.executable?(abs_path)
+      elsif paths = ENV["PATH"]
+        paths.split(File::PATH_SEPARATOR).find do |path|
+          path = path[1..-2] if path[0] == '"' && path[-1] == '"'
+          executable_path = File.expand_path(executable, path)
+          return executable_path if File.file?(executable_path) && File.executable?(executable_path)
         end
-        executable_path && File.expand_path(executable, executable_path)
       end
     end
 
