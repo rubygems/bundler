@@ -35,9 +35,9 @@ this warning, by using the [`:source` option](#SOURCE-source-) or a
 
 ### CREDENTIALS (#credentials)
 
-Some gem sources require a username and password. Use `bundle config` to set
-the username and password for any sources that need it. The command must be run
-once on each computer that will install the Gemfile, but this keeps the
+Some gem sources require a username and password. Use [bundle config(1)][bundle-config] to set
+the username and password for any of the sources that need it. The command must
+be run once on each computer that will install the Gemfile, but this keeps the
 credentials from being stored in plain text in version control.
 
     bundle config gems.example.com user:password
