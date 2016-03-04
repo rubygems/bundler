@@ -20,9 +20,10 @@ via the `--all` option. Once used, the `--all` option will be remembered.
 ## SUPPORT FOR MULTIPLE PLATFORMS
 
 When using gems that have different packages for different platforms, Bundler
-1.8 and newer support caching of gems for other platforms in `vendor/cache`.
-This needs to be enabled via the `--all-platforms` option. This setting will be
-remembered in your local bundler configuration.
+1.8 and newer support caching of gems for other platforms where the Gemfile
+has been resolved (i.e. present in the lock file) in `vendor/cache`.  This needs
+to be enabled via the `--all-platforms` option. This setting will be remembered
+in your local bundler configuration.
 
 ## REMOTE FETCHING
 
