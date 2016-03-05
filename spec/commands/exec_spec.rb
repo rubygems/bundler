@@ -128,13 +128,13 @@ describe "bundle exec" do
       G
     end
 
-    bundle "exec rackup", :expect_err => true
+    bundle! "exec rackup", :expect_err => true
 
     expect(out).to eq("0.9.1")
     expect(err).to match("deprecated")
 
     Dir.chdir bundled_app2 do
-      bundle "exec rackup"
+      bundle! "exec rackup"
       expect(out).to eq("1.0.0")
     end
   end
