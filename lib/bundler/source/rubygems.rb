@@ -100,7 +100,7 @@ module Bundler
         end
 
         if installed?(spec) && (!force || spec.name.eql?("bundler"))
-          Bundler.ui.info "Using #{version_message(spec)}"
+          Bundler.ui.info "Using #{version_message(spec){ |version| " (\e[32mwas #{version}\e[0m)" }}"
           return nil # no post-install message
         end
 
