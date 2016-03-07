@@ -207,7 +207,7 @@ other steps in `bundle install` must be performed as the current user:
 
 Of these three, the first two could theoretically be performed by
 `chown`ing the resulting files to `$SUDO_USER`. The third, however,
-can only be performed by actually invoking the `git` command as
+can only be performed by invoking the `git` command as
 the current user. Therefore, git gems are downloaded and installed
 into `~/.bundle` rather than $GEM_HOME or $BUNDLE_PATH.
 
@@ -266,7 +266,7 @@ This also means that you cannot include different versions of the same
 gem in different groups, because doing so would result in different
 sets of dependencies used in development and production. Because of
 the vagaries of the dependency resolution process, this usually
-affects more than just the gems you list in your Gemfile(5), and can
+affects more than the gems you list in your Gemfile(5), and can
 (surprisingly) radically change the gems you are using.
 
 ## REMEMBERED OPTIONS
