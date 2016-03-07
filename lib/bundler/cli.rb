@@ -259,7 +259,7 @@ module Bundler
 
     desc "cache [OPTIONS]", "Cache all the gems to vendor/cache", :hide => true
     method_option "all",  :type => :boolean, :banner => "Include all sources (including path and git)."
-    method_option "all-platforms", :type => :boolean, :banner => "Include gems for all platforms present in lock file, not just the current one"
+    method_option "all-platforms", :type => :boolean, :banner => "Include gems for all platforms present in the lockfile, not just the current one"
     method_option "no-prune", :type => :boolean, :banner => "Don't remove stale gems from the cache."
     def cache
       require "bundler/cli/cache"
@@ -268,7 +268,7 @@ module Bundler
 
     desc "package [OPTIONS]", "Locks and then caches all of the gems into vendor/cache"
     method_option "all",  :type => :boolean, :banner => "Include all sources (including path and git)."
-    method_option "all-platforms", :type => :boolean, :banner => "Include gems for all platforms present in lock file, not just the current one"
+    method_option "all-platforms", :type => :boolean, :banner => "Include gems for all platforms present in the lockfile, not just the current one"
     method_option "cache-path", :type => :string, :banner =>
       "Specify a different cache path than the default (vendor/cache)."
     method_option "gemfile", :type => :string, :banner => "Use the specified gemfile instead of Gemfile"
