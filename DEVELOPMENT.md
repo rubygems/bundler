@@ -23,6 +23,10 @@ Bundler doesn't use a Gemfile to list development dependencies, because when we 
 
         $ sudo apt-get install graphviz groff-base -y
 
+     and for OS X (with brew installed)
+
+        $ brew install graphviz groff
+
   2. Install Bundler's development dependencies
 
         $ rake spec:deps
