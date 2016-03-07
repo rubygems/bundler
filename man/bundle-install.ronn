@@ -174,7 +174,7 @@ will cause an error when the Gemfile(5) is modified.
 3. Gems are installed to `vendor/bundle` not your default system location
 
    In development, it's convenient to share the gems used in your
-   application with other applications and other scripts run on
+   application with other applications and other scripts that run on
    the system.
 
    In deployment, isolation is a more important default. In addition,
@@ -195,7 +195,7 @@ that case, Bundler will stage everything in a temporary directory,
 then ask you for your `sudo` password in order to copy the gems into
 their system location.
 
-From your perspective, this is identical to installing them gems
+From your perspective, this is identical to installing the gems
 directly into the system.
 
 You should never use `sudo bundle install`. This is because several
@@ -390,7 +390,7 @@ which other gems in the Gemfile(5) still depend on, run
 
 `Summary`: In general, after making a change to the Gemfile(5) , you
 should first try to run `bundle install`, which will guarantee that no
-other gems in the Gemfile(5) are impacted by the change. If that
+other gem in the Gemfile(5) is impacted by the change. If that
 does not work, run [bundle update(1)][bundle-update].
 
 ## SEE ALSO
