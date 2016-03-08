@@ -18,11 +18,7 @@ module Bundler
         locked_spec = Bundler.locked_gems.specs.find {|s| s.name == spec.name }
         locked_spec_version = locked_spec.version if locked_spec
         if locked_spec_version && spec.version != locked_spec_version
-          message += if block_given?
-                       yield locked_spec_version
-                     else
-                       " (was #{locked_spec_version})"
-                     end
+          message += " (#{Bundler.ui.add_color("was #{locked_spec_version}", :green)})"
         end
       end
 
