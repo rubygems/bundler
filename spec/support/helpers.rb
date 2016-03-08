@@ -2,6 +2,7 @@
 module Spec
   module Helpers
     def reset!
+      Rubygems.setup_paths!
       Dir["#{tmp}/{gems/*,*}"].each do |dir|
         next if %(base remote1 gems rubygems).include?(File.basename(dir))
         if ENV["BUNDLER_SUDO_TESTS"]
@@ -10,7 +11,7 @@ module Spec
           FileUtils.rm_rf(dir)
         end
       end
-      FileUtils.mkdir_p(tmp)
+      FileUtils.cp_r(base_tmp, tmp) unless base_tmp == tmp
       FileUtils.mkdir_p(home)
       ENV["BUNDLE_DISABLE_POSTIT"] = "1"
       Bundler.reset!

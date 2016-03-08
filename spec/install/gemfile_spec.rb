@@ -53,10 +53,6 @@ describe "bundle install" do
   end
 
   context "with deprecated features" do
-    before :each do
-      in_app_root
-    end
-
     it "reports that lib is an invalid option" do
       gemfile <<-G
         gem "rack", :lib => "rack"
