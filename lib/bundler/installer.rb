@@ -146,9 +146,9 @@ module Bundler
   private
 
     # the order that the resolver provides is significant, since
-    # dependencies might actually affect the installation of a gem.
+    # dependencies might affect the installation of a gem.
     # that said, it's a rare situation (other than rake), and parallel
-    # installation is just SO MUCH FASTER. so we let people opt in.
+    # installation is SO MUCH FASTER. so we let people opt in.
     def install(options)
       force = options["force"]
       jobs = 1

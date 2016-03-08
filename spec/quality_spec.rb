@@ -110,6 +110,19 @@ describe "The library itself" do
     expect(error_messages.compact).to be_well_formed
   end
 
+  it "maintains language quality of sentences used in source code" do
+    error_messages = []
+    exempt = /vendor/
+    Dir.chdir(File.expand_path("../../lib", __FILE__)) do
+      `git ls-files -z`.split("\x0").each do |filename|
+        next if filename =~ exempt
+        error_messages << check_for_expendable_words(filename)
+        error_messages << check_for_specific_pronouns(filename)
+      end
+    end
+    expect(error_messages.compact).to be_well_formed
+  end
+
   it "can still be built" do
     Dir.chdir(root) do
       `gem build bundler.gemspec`

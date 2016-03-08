@@ -177,7 +177,7 @@ module Bundler
   #   a given mirror.
   #
   # One mirror may correspond to many different addresses, both
-  #   because of it having many dns entries or just because
+  #   because of it having many dns entries or because
   #   the network interface is both ipv4 and ipv5
   class MirrorSockets
     def initialize(mirror)

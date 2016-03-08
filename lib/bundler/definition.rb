@@ -572,7 +572,7 @@ module Bundler
         next if s.source.nil? || @unlock[:sources].include?(s.name)
 
         # If the spec is from a path source and it doesn't exist anymore
-        # then we just unlock it.
+        # then we unlock it.
 
         # Path sources have special logic
         if s.source.instance_of?(Source::Path)

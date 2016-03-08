@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 # Capistrano task for Bundler.
 #
-# Just add "require 'bundler/capistrano'" in your Capistrano deploy.rb, and
+# Add "require 'bundler/capistrano'" in your Capistrano deploy.rb, and
 # Bundler will be activated after each new deployment.
 require "bundler/deployment"
 require "capistrano/version"

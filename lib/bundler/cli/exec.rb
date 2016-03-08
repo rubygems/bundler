@@ -25,7 +25,7 @@ module Bundler
         # First, try to exec directly to something in PATH
         kernel_exec([bin_path, cmd], *args)
       else
-        # Just exec using the given command
+        # exec using the given command
         kernel_exec(cmd, *args)
       end
     end

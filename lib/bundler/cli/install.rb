@@ -42,7 +42,7 @@ module Bundler
 
       ENV["RB_USER_INSTALL"] = "1" if Bundler::FREEBSD
 
-      # Just disable color in deployment mode
+      # Disable color in deployment mode
       Bundler.ui.shell = Thor::Shell::Basic.new if options[:deployment]
 
       check_for_options_conflicts

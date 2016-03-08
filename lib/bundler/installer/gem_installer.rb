@@ -39,7 +39,7 @@ module Bundler
     end
 
     def handle_exception(e)
-      # if install hook failed or gem signature is bad, just die
+      # Die if install hook failed or gem signature is bad.
       raise e if e.is_a?(Bundler::InstallHookError) || e.is_a?(Bundler::SecurityError)
       # other failure, likely a native extension build failure
       Bundler.ui.info ""
