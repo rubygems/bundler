@@ -25,7 +25,7 @@ Bundler doesn't use a Gemfile to list development dependencies, because when we 
 
      and for OS X (with brew installed)
 
-        $ brew install graphviz groff
+        $ brew install graphviz homebrew/dupes/groff
 
   2. Install Bundler's development dependencies
 
