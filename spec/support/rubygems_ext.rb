@@ -21,9 +21,10 @@ module Spec
     def self.setup
       Gem.clear_paths
 
-      ENV["BUNDLE_PATH"] = nil
+      home = ENV["HOME"]
+      setup_paths!
       ENV["GEM_HOME"] = ENV["GEM_PATH"] = Path.base_system_gems.to_s
-      ENV["PATH"] = ["#{Path.root}/exe", "#{Path.system_gem_path}/bin", ENV["PATH"]].join(File::PATH_SEPARATOR)
+      ENV["HOME"] = home
 
       manifest = DEPS.to_a.sort_by(&:first).map {|k, v| "#{k} => #{v}\n" }
       manifest_path = "#{Path.base_system_gems}/manifest.txt"
@@ -36,9 +37,15 @@ module Spec
         File.open(manifest_path, "w") {|f| f << manifest.join }
       end
 
-      ENV["HOME"] = Path.home.to_s
-
       Gem::DefaultUserInteraction.ui = Gem::SilentUI.new
+    end
+
+    def self.setup_paths!
+      ENV["BUNDLE_PATH"] = nil
+      ENV["BUNDLE_ORIG_GEM_PATH"] = nil
+      ENV["GEM_HOME"] = ENV["GEM_PATH"] = Path.system_gem_path.to_s
+      ENV["PATH"] = ["#{Path.root}/exe", "#{Path.system_gem_path}/bin", ENV["PATH"]].join(File::PATH_SEPARATOR)
+      ENV["HOME"] = Path.home.to_s
     end
 
     def self.install_gem(name, version = nil)
