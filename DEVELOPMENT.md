@@ -29,11 +29,11 @@ Bundler doesn't use a Gemfile to list development dependencies, because when we 
 
   2. Install Bundler's development dependencies
 
-        $ rake spec:deps
+        $ bin/rake spec:deps
 
   3. Run the test suite, to make sure things are working
 
-        $ rake spec
+        $ bin/rake spec
 
   4. Set up a shell alias to run Bundler from your clone, e.g. a Bash alias:
 
@@ -122,7 +122,7 @@ Code needs explanation, and sometimes those who know the code well have trouble 
 
 Bundler has two main sources of documentation: the built-in help (including usage information and man pages) and the [Bundler documentation site](http://bundler.io).
 
-If you’d like to submit a patch to the man pages, follow the steps for adding a feature above. All of the man pages are located in the `man` directory. Just use the “Documentation” heading when you describe what you did in the changelog.
+If you’d like to submit a patch to the man pages, follow the steps for submitting a pull request above. All of the man pages are located in the `man` directory. Just use the “Documentation” heading when you describe what you did in the changelog.
 
 If you have a suggestion or proposed change for [bundler.io](http://bundler.io), please open an issue or send a pull request to the [bundler-site](https://github.com/bundler/bundler-site) repository.
 
@@ -131,14 +131,12 @@ If you have a suggestion or proposed change for [bundler.io](http://bundler.io),
 
 Community is an important part of all we do. If you’d like to be part of the Bundler community, you can jump right in and start helping make Bundler better for everyone who uses it.
 
-It would be tremendously helpful to have more people answering questions about Bundler (and often simply about Rubygems or Ruby itself) in our [issue tracker](https://github.com/bundler/bundler/issues) or on [Stack Overflow](http://stackoverflow.com/questions/tagged/bundler).
+It would be tremendously helpful to have more people answering questions about Bundler (and often simply about [Rubygems](https://github.com/rubygems/rubygems) or Ruby itself) in our [issue tracker](https://github.com/bundler/bundler/issues) or on [Stack Overflow](http://stackoverflow.com/questions/tagged/bundler).
 
 Additional documentation and explanation is always helpful, too. If you have any suggestions for the Bundler website [bundler.io](http://bundler.io), we would absolutely love it if you opened an issue or pull request on the [bundler-site](https://github.com/bundler/bundler-site) repository.
 
 Finally, sharing your experiences and discoveries by writing them up is a valuable way to help others who have similar problems or experiences in the future. You can write a blog post, create an example and commit it to Github, take screenshots, or make videos.
 
-Examples of how Bundler is used help everyone, and we’ve discovered that people already use it in ways that we never imagined when we were writing it. If you’re still not sure what to write about, there are also several projects doing interesting things based on Bundler. They could probably use publicity too.
+Publishing examples of how Bundler is used helps everyone, and we’ve discovered that people already use it in ways that we never imagined when we were writing it. If you’re still not sure what to write about, there are also several projects doing interesting things based on Bundler. They could probably use publicity too.
 
-If you let someone on the core team know you wrote about Bundler, we will add your post to the list of Bundler resources on the Github project wiki.
-
-Finally, participate carefully in the  all contributors to the Bundler project must agree to the contributor [code of conduct](http://bundler.io/conduct.html). By participating in this project you agree to abide by its terms.
+Finally, all contributors to the Bundler project must agree to the contributor [code of conduct](http://bundler.io/conduct.html). By participating in this project you agree to abide by its terms.
