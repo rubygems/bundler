@@ -32,10 +32,10 @@ module Bundler
 
       def parse(key, value)
         config = MirrorConfig.new(key, value)
-        if config.all?
-          mirror = @all
+        mirror = if config.all?
+          @all
         else
-          mirror = (@mirrors[config.uri] = @mirrors[config.uri] || Mirror.new)
+          (@mirrors[config.uri] = @mirrors[config.uri] || Mirror.new)
         end
         config.update_mirror(mirror)
       end
