@@ -63,7 +63,7 @@ module Bundler
 
         - What happened instead?
 
-          Instead, what actually happened was...
+          Instead, what happened was...
 
 
         Error details

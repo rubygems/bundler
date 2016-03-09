@@ -79,8 +79,8 @@ all of the dependencies, all the way down, and install what you need:
     Bundle complete! 2 Gemfile dependencies, 26 gems total.
     Use `bundle show [gemname]` to see where a bundled gem is installed.
 
-As you can see, even though you have just two gems in the Gemfile(5), your application
-actually needs 26 different gems in order to run. Bundler remembers the exact versions
+As you can see, even though you have two gems in the Gemfile(5), your application
+needs 26 different gems in order to run. Bundler remembers the exact versions
 it installed in `Gemfile.lock`. The next time you run [bundle install(1)][bundle-install], bundler skips
 the dependency resolution and installs the same gems as it installed last time.
 

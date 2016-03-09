@@ -40,6 +40,30 @@ describe "The library itself" do
     "#{filename} has spaces on the EOL on lines #{failing_lines.join(", ")}"
   end
 
+  def check_for_expendable_words(filename)
+    failing_line_message = []
+    useless_words = /\b(actually|obviously|just|clearly|basically|really)\b/i
+
+    File.readlines(filename).each_with_index do |line, number|
+      next unless word_found = useless_words.match(line)
+      failing_line_message << "#{filename} has '#{word_found}' on line #{number + 1}. Avoid using these kinds of weak modifiers."
+    end
+
+    failing_line_message unless failing_line_message.empty?
+  end
+
+  def check_for_specific_pronouns(filename)
+    failing_line_message = []
+    specific_pronouns = /\b(he|she|his|hers|him|her|himself|herself)\b/i
+
+    File.readlines(filename).each_with_index do |line, number|
+      next unless word_found = specific_pronouns.match(line)
+      failing_line_message << "#{filename} has '#{word_found}' on line #{number + 1}. Use more generic pronouns in documentation."
+    end
+
+    failing_line_message unless failing_line_message.empty?
+  end
+
   RSpec::Matchers.define :be_well_formed do
     match(&:empty?)
 
@@ -68,6 +92,32 @@ describe "The library itself" do
       `git ls-files -z`.split("\x0").each do |filename|
         next unless filename =~ included
         error_messages << check_for_spec_defs_with_single_quotes(filename)
+      end
+    end
+    expect(error_messages.compact).to be_well_formed
+  end
+
+  it "maintains language quality of the documentation" do
+    included = /ronn/
+    error_messages = []
+    Dir.chdir(File.expand_path("../../man", __FILE__)) do
+      `git ls-files -z`.split("\x0").each do |filename|
+        next unless filename =~ included
+        error_messages << check_for_expendable_words(filename)
+        error_messages << check_for_specific_pronouns(filename)
+      end
+    end
+    expect(error_messages.compact).to be_well_formed
+  end
+
+  it "maintains language quality of sentences used in source code" do
+    error_messages = []
+    exempt = /vendor/
+    Dir.chdir(File.expand_path("../../lib", __FILE__)) do
+      `git ls-files -z`.split("\x0").each do |filename|
+        next if filename =~ exempt
+        error_messages << check_for_expendable_words(filename)
+        error_messages << check_for_specific_pronouns(filename)
       end
     end
     expect(error_messages.compact).to be_well_formed

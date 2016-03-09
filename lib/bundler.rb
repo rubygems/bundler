@@ -85,7 +85,7 @@ module Bundler
     end
 
     def setup(*groups)
-      # Just return if all groups are already loaded
+      # Return if all groups are already loaded
       return @setup if defined?(@setup)
 
       definition.validate_ruby!

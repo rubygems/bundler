@@ -259,7 +259,7 @@ module Bundler
 
     desc "cache [OPTIONS]", "Cache all the gems to vendor/cache", :hide => true
     method_option "all",  :type => :boolean, :banner => "Include all sources (including path and git)."
-    method_option "all-platforms", :type => :boolean, :banner => "Include gems for all platforms present in the lockfile, not just the current one"
+    method_option "all-platforms", :type => :boolean, :banner => "Include gems for all platforms present in the lockfile, not only the current one"
     method_option "no-prune", :type => :boolean, :banner => "Don't remove stale gems from the cache."
     def cache
       require "bundler/cli/cache"
@@ -268,11 +268,11 @@ module Bundler
 
     desc "package [OPTIONS]", "Locks and then caches all of the gems into vendor/cache"
     method_option "all",  :type => :boolean, :banner => "Include all sources (including path and git)."
-    method_option "all-platforms", :type => :boolean, :banner => "Include gems for all platforms present in the lockfile, not just the current one"
+    method_option "all-platforms", :type => :boolean, :banner => "Include gems for all platforms present in the lockfile, not only the current one"
     method_option "cache-path", :type => :string, :banner =>
       "Specify a different cache path than the default (vendor/cache)."
     method_option "gemfile", :type => :string, :banner => "Use the specified gemfile instead of Gemfile"
-    method_option "no-install", :type => :boolean, :banner => "Don't actually install the gems, just package."
+    method_option "no-install", :type => :boolean, :banner => "Don't install the gems, only the package."
     method_option "no-prune", :type => :boolean, :banner => "Don't remove stale gems from the cache."
     method_option "path", :type => :string, :banner =>
       "Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine"
@@ -390,7 +390,7 @@ module Bundler
 
     desc "clean [OPTIONS]", "Cleans up unused gems in your bundler directory"
     method_option "dry-run", :type => :boolean, :default => false, :banner =>
-      "Only print out changes, do not actually clean gems"
+      "Only print out changes, do not clean gems"
     method_option "force", :type => :boolean, :default => false, :banner =>
       "Forces clean even if --path is not set"
     def clean
