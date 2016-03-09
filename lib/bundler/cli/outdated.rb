@@ -23,11 +23,11 @@ module Bundler
       current_dependencies = {}
       Bundler.ui.silence { Bundler.load.dependencies.each {|dep| current_dependencies[dep.name] = dep } }
 
-      if gems.empty? && sources.empty?
+      definition = if gems.empty? && sources.empty?
         # We're doing a full update
-        definition = Bundler.definition(true)
+        Bundler.definition(true)
       else
-        definition = Bundler.definition(:gems => gems, :sources => sources)
+        Bundler.definition(:gems => gems, :sources => sources)
       end
 
       definition_resolution = proc { options["local"] ? definition.resolve_with_cache! : definition.resolve_remotely! }
