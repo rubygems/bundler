@@ -215,6 +215,10 @@ module Bundler
         @allow_remote || @allow_cached
       end
 
+      def allow_git_remote_ops?
+        @allow_remote
+      end
+
     private
 
       def serialize_gemspecs_in(destination)
