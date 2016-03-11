@@ -42,9 +42,9 @@ describe Bundler::Fetcher::Base do
     before { allow(subject).to receive(:remote_uri).and_return(remote_uri_obj) }
 
     context "when the remote uri's host is rubygems.org" do
-      it "should create a copy of the remote uri with bundler.rubygems.org as the host" do
+      it "should create a copy of the remote uri with index.rubygems.org as the host" do
         fetched_uri = subject.fetch_uri
-        expect(fetched_uri.host).to eq("bundler.rubygems.org")
+        expect(fetched_uri.host).to eq("index.rubygems.org")
         expect(fetched_uri).to_not be(remote_uri_obj)
       end
     end
