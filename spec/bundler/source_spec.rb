@@ -58,7 +58,7 @@ describe Bundler::Source do
           let(:locked_gem) { double(:locked_gem, :name => "nokogiri", :version => "< 1.5") }
 
           it "should return a string with the spec name and version and locked spec version" do
-            expect(subject.version_message(spec)).to eq("nokogiri >= 1.6 (was < 1.5)")
+            expect(subject.version_message(spec)).to eq("nokogiri >= 1.6 (\e[32mwas < 1.5\e[0m)")
           end
         end
       end
