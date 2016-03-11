@@ -19,7 +19,7 @@ describe "bundle install" do
       build_git "foo"
 
       gemfile <<-G
-        gem "foo", :git =>"file://#{lib_path("foo-1.0")}", group: :development
+        gem "foo", :git => "file://#{lib_path("foo-1.0")}", :group => :development
       G
 
       lockfile <<-L
