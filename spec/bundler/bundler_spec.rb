@@ -103,4 +103,41 @@ describe Bundler do
       end
     end
   end
+
+  describe "#which" do
+    let(:executable) { "executable" }
+    let(:path) { %w(/a /b c ../d "/e") }
+    let(:expected) { "executable" }
+
+    before do
+      ENV["PATH"] = path.join(File::PATH_SEPARATOR)
+
+      allow(File).to receive(:file?).and_return(false)
+      allow(File).to receive(:executable?).and_return(false)
+      if expected
+        expect(File).to receive(:file?).with(expected).and_return(true)
+        expect(File).to receive(:executable?).with(expected).and_return(true)
+      end
+    end
+
+    subject { described_class.which(executable) }
+
+    shared_examples_for "it returns the correct executable" do
+      it "returns the expected file" do
+        expect(subject).to eq(expected)
+      end
+    end
+
+    it_behaves_like "it returns the correct executable"
+
+    context "when the executable in inside a quoted path" do
+      let(:expected) { "/e/executable" }
+      it_behaves_like "it returns the correct executable"
+    end
+
+    context "when the executable is not found" do
+      let(:expected) { nil }
+      it_behaves_like "it returns the correct executable"
+    end
+  end
 end

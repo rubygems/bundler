@@ -361,25 +361,31 @@ module Bundler
     # +specs+
     def replace_bin_path(specs)
       gem_class = (class << Gem; self; end)
-      redefine_method(gem_class, :bin_path) do |name, *args|
+
+      redefine_method(gem_class, :find_spec_for_exe) do |name, *args|
         exec_name = args.first
 
+        spec = if exec_name
+          specs.find {|s| s.executables.include?(exec_name) }
+        else
+          specs.find {|s| s.name == name }
+        end
+        raise(Gem::Exception, "can't find executable #{exec_name}") unless spec
+        raise Gem::Exception, "no default executable for #{spec.full_name}" unless exec_name ||= spec.default_executable
+        unless spec.name == name
+          warn "Bundler is using a binstub that was created for a different gem.\n" \
+            "This is deprecated, in future versions you may need to `bundle binstub #{name}` " \
+            "to work around a system/bundle conflict."
+        end
+        spec
+      end
+
+      redefine_method(gem_class, :bin_path) do |name, *args|
+        exec_name = args.first
         return ENV["BUNDLE_BIN_PATH"] if exec_name == "bundle"
 
-        spec = nil
-
-        if exec_name
-          spec = specs.find {|s| s.executables.include?(exec_name) }
-          raise(Gem::Exception, "can't find executable #{exec_name}") unless spec
-          unless spec.name == name
-            warn "Bundler is using a binstub that was created for a different gem.\n" \
-              "This is deprecated, in future versions you may need to `bundle binstub #{name}` " \
-              "to work around a system/bundle conflict."
-          end
-        else
-          spec = specs.find {|s| s.name == name }
-          raise Gem::Exception, "no default executable for #{spec.full_name}" unless exec_name = spec.default_executable
-        end
+        spec = find_spec_for_exe(name, *args)
+        exec_name ||= spec.default_executable
 
         gem_bin = File.join(spec.full_gem_path, spec.bindir, exec_name)
         gem_from_path_bin = File.join(File.dirname(spec.loaded_from), spec.bindir, exec_name)

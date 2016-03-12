@@ -12,7 +12,7 @@ describe Bundler::Fetcher::Downloader do
   describe "fetch" do
     let(:counter)      { 0 }
     let(:httpv)        { "1.1" }
-    let(:http_response) { nil }
+    let(:http_response) { double(:response) }
 
     before do
       allow(subject).to receive(:request).with(uri, options).and_return(http_response)
