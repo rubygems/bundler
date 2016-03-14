@@ -7,6 +7,8 @@ module Bundler
     extend Forwardable
     include TSort, Enumerable
 
+    alias_method :size, :length
+
     def_delegators :@specs, :<<, :length, :add, :remove
     def_delegators :sorted, :each
 
