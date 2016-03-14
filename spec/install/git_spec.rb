@@ -38,6 +38,7 @@ describe "bundle install" do
       bundle "install --path=vendor/bundle --without development"
 
       expect(out).to include("Bundle complete!")
+      expect(vendored_gems("bundler/gems/foo-1.0-#{revision_for(lib_path("foo-1.0"))[0..11]}")).to be_directory
     end
   end
 end
