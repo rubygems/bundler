@@ -185,7 +185,7 @@ module Bundler
         local = Bundler.ui.silence do
           begin
             tmpdef = Definition.build(Bundler.default_gemfile, Bundler.default_lockfile, nil)
-            true unless tmpdef.new_platform? || tmpdef.missing_specs.any?
+            true unless tmpdef.new_platform? || tmpdef.missing_dependencies.any?
           rescue BundlerError
           end
         end

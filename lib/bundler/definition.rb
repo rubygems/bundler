@@ -167,6 +167,12 @@ module Bundler
       missing
     end
 
+    def missing_dependencies
+      missing = []
+      resolve.materialize(current_dependencies, missing)
+      missing
+    end
+
     def requested_specs
       @requested_specs ||= begin
         groups = requested_groups

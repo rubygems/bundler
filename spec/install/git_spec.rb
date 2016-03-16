@@ -14,5 +14,31 @@ describe "bundle install" do
       expect(out).to include("Using foo 1.0 from #{lib_path("foo")} (at master@#{revision_for(lib_path("foo"))[0..6]})")
       should_be_installed "foo 1.0"
     end
+
+    it "should check out git repos that are missing but not being installed" do
+      build_git "foo"
+
+      gemfile <<-G
+        gem "foo", :git => "file://#{lib_path("foo-1.0")}", :group => :development
+      G
+
+      lockfile <<-L
+        GIT
+          remote: file://#{lib_path("foo-1.0")}
+          specs:
+            foo (1.0)
+
+        PLATFORMS
+          ruby
+
+        DEPENDENCIES
+          foo!
+      L
+
+      bundle "install --path=vendor/bundle --without development"
+
+      expect(out).to include("Bundle complete!")
+      expect(vendored_gems("bundler/gems/foo-1.0-#{revision_for(lib_path("foo-1.0"))[0..11]}")).to be_directory
+    end
   end
 end
