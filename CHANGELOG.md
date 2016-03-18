@@ -1,3 +1,15 @@
+## 1.12.0.rc (2016-03-13)
+
+Performance:
+
+  - Download gem metadata from globally distributed CDN endpoints (#4358, @segiddins)
+
+Bugfixes:
+
+  - handle Ruby pre-releases built from source (#4324, @RochesterinNYC)
+  - support binstubs from RubyGems 2.6 (#4341, @segiddins)
+  - handle quotes present in in PATH (#4326, @segiddins)
+
 ## 1.12.0.pre.2 (2016-02-26)
 
 Performance:
