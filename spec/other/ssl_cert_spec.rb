@@ -13,6 +13,7 @@ describe "SSL Certificates", :rubygems_master do
     rubygems.global.ssl.fastly.net
     rubygems.org
     staging.rubygems.org
+    index.rubygems.org
   )
 
   hosts.each do |host|
