@@ -10,8 +10,9 @@ describe "SSL Certificates", :rubygems_master do
   end
 
   hosts = %w(
-    rubygems.global.ssl.fastly.net
     rubygems.org
+    index.rubygems.org
+    rubygems.global.ssl.fastly.net
     staging.rubygems.org
   )
 
