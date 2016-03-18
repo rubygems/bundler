@@ -2,8 +2,8 @@
 require "spec_helper"
 require "bundler/ssl_certs/certificate_manager"
 
-describe "SSL Certificates", :rubygems_master do
-  it "are up to date with Rubygems" do
+describe "SSL Certificates for bundler", :rubygems_master do
+  it "includes all the ssl certs in Rubygems" do
     rubygems = File.expand_path("../../../tmp/rubygems", __FILE__)
     manager = Bundler::SSLCerts::CertificateManager.new(rubygems)
     expect(manager).to be_up_to_date
