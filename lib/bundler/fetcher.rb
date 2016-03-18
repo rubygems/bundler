@@ -282,7 +282,7 @@ module Bundler
         end
       else
         store.set_default_paths
-        certs = File.expand_path("../ssl_certs/*.pem", __FILE__)
+        certs = File.expand_path("../ssl_certs/*/*.pem", __FILE__)
         Dir.glob(certs).each {|c| store.add_file c }
       end
       store
