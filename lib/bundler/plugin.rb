@@ -5,7 +5,19 @@ module Bundler
       @@command = Hash.new
 
       def init
-        require Bundler.user_bundle_path + "plugin/demo-plugin/plugin.rb"
+        # Just a crude implementation for demo
+        Dir.glob(plugin_root.join("*").join("plugin.rb")).each do |file|
+          require file
+        end
+      end
+
+      def install(name, git_path)
+        git_proxy = Source::Git::GitProxy.new(plugin_root.join(name), git_path, "master")
+        git_proxy.checkout
+      end
+
+      def plugin_root
+        Bundler.user_bundle_path.join("plugin")
       end
 
       def add_command(command, command_class)

@@ -86,8 +86,8 @@ module Bundler
         Kernel.exec(command_path, *ARGV[1..-1])
       end
 
-      return super unless Plugin.is_command? command
-      Plugin.exec(command, *ARGV[1..-1])
+      return super unless Bundler::Plugin.is_command? command
+      Bundler::Plugin.exec(command, *ARGV[1..-1])
     end
 
     desc "init [OPTIONS]", "Generates a Gemfile into the current working directory"
@@ -434,6 +434,17 @@ module Bundler
     desc "env", "Print information about the environment Bundler is running under"
     def env
       Env.new.write($stdout)
+    end
+
+    # TODO: change it to subcommand
+    desc "plugin PLUGIN [OPTIONS]", "Manage the plugins"
+    method_option "install", :type => :boolean, :default => false, :banner =>
+      "install a pluign"
+    method_option "git", :type => :string, :default => nil, :banner =>
+      "Git source of the plugin to install"
+    def plugin(name)
+      require "bundler/cli/plugin"
+      Plugin.new(options, name).run
     end
 
     # Reformat the arguments passed to bundle that include a --help flag
