@@ -82,9 +82,12 @@ module Bundler
     end
 
     def self.handle_no_command_error(command, has_namespace = $thor_runner)
-      return super unless command_path = Bundler.which("bundler-#{command}")
+      if command_path = Bundler.which("bundler-#{command}")
+        Kernel.exec(command_path, *ARGV[1..-1])
+      end
 
-      Kernel.exec(command_path, *ARGV[1..-1])
+      return super unless Plugin.is_command? command
+      Plugin.exec(command, *ARGV[1..-1])
     end
 
     desc "init [OPTIONS]", "Generates a Gemfile into the current working directory"

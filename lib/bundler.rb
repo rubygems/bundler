@@ -11,6 +11,7 @@ require "bundler/version"
 require "bundler/constants"
 require "bundler/current_ruby"
 require "bundler/errors"
+require "bundler/plugin"
 
 module Bundler
   environment_preserver = EnvironmentPreserver.new(ENV, %w(PATH GEM_PATH))
@@ -449,4 +450,6 @@ module Bundler
       ENV.replace(backup)
     end
   end
+
+  Plugin.init
 end
