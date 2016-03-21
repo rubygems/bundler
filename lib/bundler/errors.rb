@@ -38,6 +38,7 @@ module Bundler
   class GemfileLockNotFound < BundlerError; status_code(22); end
   class GemfileEvalError < GemfileError; end
   class MarshalError < StandardError; end
+  class PluginError < BundlerError; end
 
   class PermissionError < BundlerError
     def initialize(path, permission_type = :write)

@@ -5,19 +5,31 @@ module Bundler
       @@command = Hash.new
 
       def init
-        # Just a crude implementation for demo
+        # only a crude implementation for demo
         Dir.glob(plugin_root.join("*").join("plugin.rb")).each do |file|
           require file
         end
       end
 
       def install(name, git_path)
-        git_proxy = Source::Git::GitProxy.new(plugin_root.join(name), git_path, "master")
+        git_proxy = Source::Git::GitProxy.new(plugin_cache.join(name), git_path, "master")
         git_proxy.checkout
+        git_proxy.copy_to(plugin_root.join(name))
+
+        unless File.file? plugin_root.join(name).join("plugin.rb")
+          raise "plugin.rb is not present in the repo"
+        end
+
+        Bundler.ui.info "Installed plugin #{name}"
+
       end
 
       def plugin_root
-        Bundler.user_bundle_path.join("plugin")
+        Bundler.user_bundle_path.join("plugins")
+      end
+
+      def plugin_cache
+        Bundler.user_cache.join("plugins")
       end
 
       def add_command(command, command_class)
