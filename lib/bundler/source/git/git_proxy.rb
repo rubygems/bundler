@@ -26,6 +26,13 @@ module Bundler
         end
       end
 
+      class GitNotCheckedOutError < GitError
+        def initialize(uri)
+          msg = "The git source #{uri} is not yet checked out. Please run `bundle install` before trying to start your application"
+          super msg
+        end
+      end
+
       # The GitProxy is responsible to interact with git repositories.
       # All actions required by the Git source is encapsulated in this
       # object.
@@ -64,6 +71,7 @@ module Bundler
         end
 
         def checkout
+          return unless allow_remote?
           if path.exist?
             return if has_revision_cached?
             Bundler.ui.info "Fetching #{uri}"
@@ -165,14 +173,22 @@ module Bundler
           @git ? @git.allow_git_ops? : true
         end
 
+        def allow_remote?
+          @git ? @git.allow_git_remote_ops? : true
+        end
+
         def in_path(&blk)
           checkout unless path.exist?
-          SharedHelpers.chdir(path, &blk)
+          if path.exist?
+            SharedHelpers.chdir(path, &blk)
+          else
+            raise GitNotCheckedOutError.new(uri)
+          end
         end
 
         def allowed_in_path
           return in_path { yield } if allow?
-          raise GitError, "The git source #{uri} is not yet checked out. Please run `bundle install` before trying to start your application"
+          raise GitNotCheckedOutError.new(uri)
         end
       end
     end

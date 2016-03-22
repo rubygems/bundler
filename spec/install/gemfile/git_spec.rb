@@ -636,7 +636,7 @@ describe "bundle install with git sources" do
     expect(out).to eq("WIN")
   end
 
-  it "does not to a remote fetch if the revision is cached locally" do
+  it "does not do a remote fetch if the revision is cached locally" do
     build_git "foo"
 
     install_gemfile <<-G
@@ -647,6 +647,53 @@ describe "bundle install with git sources" do
 
     bundle "install"
     expect(out).not_to match(/updating/i)
+  end
+
+  it "does not checkout the repository if --local option is present" do
+    build_git "foo"
+
+    install_gemfile <<-G, :local => true
+      gem "foo", :git => "#{lib_path("foo-1.0")}"
+    G
+
+    expect(exitstatus).to eq(11) if defined?(exitstatus)
+    expect(err).to match(/not yet checked out/i)
+    should_not_be_installed "foo 1.0"
+  end
+
+  describe "does not checkout repository when a local version of the repository exists" do
+    before :each do
+      build_git "foo"
+
+      install_gemfile <<-G
+        gem "foo", :git => "#{lib_path("foo-1.0")}"
+      G
+    end
+
+    it "does checkout the repository if --local is not used" do
+      expect(out).to match(/fetching/i)
+      should_be_installed "foo 1.0"
+    end
+
+    it "works when --local is used" do
+      install_gemfile <<-G, :local => true
+        gem "foo", :git => "#{lib_path("foo-1.0")}"
+      G
+
+      expect(out).to_not match(/fetching/i)
+      expect(out).to include("Using 2 already installed gems")
+      should_be_installed "foo 1.0"
+    end
+
+    it "works when --local is not used" do
+      install_gemfile <<-G
+        gem "foo", :git => "#{lib_path("foo-1.0")}"
+      G
+
+      expect(out).to_not match(/fetching/i)
+      expect(out).to include("Using 2 already installed gems")
+      should_be_installed "foo 1.0"
+    end
   end
 
   it "doesn't blow up if bundle install is run twice in a row" do
