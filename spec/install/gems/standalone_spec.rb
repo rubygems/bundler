@@ -306,15 +306,31 @@ describe "bundle install --standalone" do
 
   describe "with gem that has an invalid gemspec" do
     before do
+      build_git "bar", :gemspec => false do |s|
+        s.write "lib/bar/version.rb", %(BAR_VERSION = '1.0')
+        s.write "bar.gemspec", <<-G
+          lib = File.expand_path('../lib/', __FILE__)
+          $:.unshift lib unless $:.include?(lib)
+          require 'bar/version'
+
+          Gem::Specification.new do |s|
+            s.name        = 'bar'
+            s.version     = BAR_VERSION
+            s.summary     = 'Bar'
+            s.files       = Dir["lib/**/*.rb"]
+            s.author      = 'Anonymous'
+            s.require_path = [1,2]
+          end
+        G
+      end
       install_gemfile <<-G, :standalone => true
-        source 'https://rubygems.org'
-        gem "resque-scheduler", "2.2.0"
+        gem "bar", :git => "#{lib_path("bar-1.0")}"
       G
     end
 
     it "outputs a helpful error message" do
       expect(out).to include("You have one or more invalid gemspecs that need to be fixed.")
-      expect(out).to include("resque-scheduler 2.2.0 has an invalid gemspec")
+      expect(out).to include("bar 1.0 has an invalid gemspec")
     end
   end
 end

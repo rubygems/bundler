@@ -220,4 +220,13 @@ describe "real world edgecases", :realworld => true, :sometimes => true do
     expect(err).to eq("")
     expect(exitstatus).to eq(0) if exitstatus
   end
+
+  it "outputs a helpful error message when gems have invalid gemspecs" do
+    install_gemfile <<-G, :standalone => true
+      source 'https://rubygems.org'
+      gem "resque-scheduler", "2.2.0"
+    G
+    expect(out).to include("You have one or more invalid gemspecs that need to be fixed.")
+    expect(out).to include("resque-scheduler 2.2.0 has an invalid gemspec")
+  end
 end
