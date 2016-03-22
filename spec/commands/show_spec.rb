@@ -110,6 +110,17 @@ describe "bundle show" do
       bundle :show
       expect(out).to include("foo (1.0 #{sha[0..6]})")
     end
+
+    it "handles when a version is a '-' prerelease" do
+      @git = build_git("foo", "1.0.0-beta.1", :path => lib_path("foo"))
+      install_gemfile <<-G
+        gem "foo", "1.0.0-beta.1", :git => "#{lib_path("foo")}"
+      G
+      should_be_installed "foo 1.0.0.pre.beta.1"
+
+      bundle! :show
+      expect(out).to include("foo (1.0.0.pre.beta.1")
+    end
   end
 
   context "in a fresh gem in a blank git repo" do
