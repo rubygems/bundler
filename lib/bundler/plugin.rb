@@ -3,6 +3,7 @@ module Bundler
   module Plugin
     class << self
       @@command = Hash.new
+      @@after_install_hooks = []
 
       def init
         # only a crude implementation for demo
@@ -48,6 +49,17 @@ module Bundler
 
         cmd.execute(args)
       end
+
+      def register_after_install(block)
+        puts "registed after install hook"
+        @@after_install_hooks << block
+      end
+
+      def post_install(gem)
+        @@after_install_hooks.each do |cb|
+          cb.call(gem)
+        end
+      end
     end
 
     class Base
@@ -55,6 +67,14 @@ module Bundler
         # TODO: pass the class
         Plugin.add_command command, self
       end
+
+      def self.add_hook(event, &block)
+        puts event.inspect
+        if event == "post-install"
+          Plugin.register_after_install( block)
+        end
+      end
+
 
       def execute(args)
       end

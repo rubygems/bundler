@@ -9,9 +9,8 @@ describe "bundle plugin" do
       end
 
       bundle "plugin foo --install --git file://#{lib_path("foo-1.0")}"
-      expect(out).to include("Installed plugin foo")
 
-      expect(Bundler::Plugin.plugin_root.join("foo")).to be_directory
+      expect(out).to include("Installed plugin foo")
     end
   end
 
@@ -34,6 +33,45 @@ describe "bundle plugin" do
       bundle "demop"
 
       expect(out).to include("hello world")
+    end
+  end
+
+  describe "lifecycle hooks" do
+    describe "post-install hook" do
+      before do
+        build_git "foo" do |s|
+          s.write "plugin.rb", <<-P
+            class DemoPlugin < Bundler::Plugin::Base
+              add_hook("post-install") do |gem|
+                puts "post-install hook is running"
+              end
+            end
+          P
+        end
+
+        bundle "plugin foo --install --git file://#{lib_path("foo-1.0")}"
+      end
+
+      it "runs after a rubygem is installed" do
+        build_repo2 do
+          build_gem "yaml_spec"
+        end
+
+
+        install_gemfile <<-G
+          source "file://#{gem_repo2}"
+          gem "yaml_spec"
+        G
+        expect(out).to include "post-install hook is running"
+      end
+
+      it "runs after a git gem is installed" do
+        build_git "bar"
+        install_gemfile <<-G
+          gem "bar", :git => "file://#{lib_path("bar-1.0")}"
+        G
+        expect(out).to include "post-install hook is running"
+      end
     end
   end
 end

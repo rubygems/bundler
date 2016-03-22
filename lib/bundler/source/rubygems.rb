@@ -171,6 +171,7 @@ module Bundler
         end
         spec.loaded_from = loaded_from(spec)
 
+        Bundler::Plugin.post_install(installed_spec)
         spec.post_install_message
       ensure
         Bundler.rm_rf(install_path) if Bundler.requires_sudo?
