@@ -17,7 +17,7 @@ describe "bundle plugin" do
   describe "command line plugin" do
     it "executes" do
       build_git "foo" do |s|
-        s.write "plugin.rb", <<-P
+        s.write "plugin.rb", <<-RUBY
           class DemoPlugin < Bundler::Plugin::Base
             command "demop"
 
@@ -25,7 +25,7 @@ describe "bundle plugin" do
               puts "hello world"
             end
           end
-        P
+        RUBY
       end
 
       bundle "plugin foo --install --git file://#{lib_path("foo-1.0")}"
@@ -40,13 +40,13 @@ describe "bundle plugin" do
     describe "post-install hook" do
       before do
         build_git "foo" do |s|
-          s.write "plugin.rb", <<-P
+          s.write "plugin.rb", <<-RUBY
             class DemoPlugin < Bundler::Plugin::Base
               add_hook("post-install") do |gem|
                 puts "post-install hook is running"
               end
             end
-          P
+          RUBY
         end
 
         bundle "plugin foo --install --git file://#{lib_path("foo-1.0")}"
@@ -71,6 +71,38 @@ describe "bundle plugin" do
           gem "bar", :git => "file://#{lib_path("bar-1.0")}"
         G
         expect(out).to include "post-install hook is running"
+      end
+    end
+  end
+
+  describe "source plugins" do
+    describe "pre-installed" do
+      before do
+        build_git "foo" do |s|
+          s.write "plugin.rb", <<-RUBY
+            class DemoPlugin < Bundler::Plugin::Base
+              source :hg
+
+              def source_get(source, name, version)
+                return source + name
+              end
+            end
+          RUBY
+        end
+
+        bundle "plugin foo --install --git file://#{lib_path("foo-1.0")}"
+      end
+
+      it "handles source blocks with type options" do
+        build_lib "hg-test-gem", :path => lib_path("mercurial/hg-test-gem")
+
+        install_gemfile <<-G
+          source "#{lib_path("mercurial/")}", :type => :hg do
+            gem "hg-test-gem"
+          end
+        G
+
+        expect(out).to include("Using hg-test-gem")
       end
     end
   end

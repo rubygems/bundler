@@ -30,6 +30,7 @@ module Bundler
       @ruby_version         = nil
       @gemspecs             = []
       @gemfile              = nil
+      @plugin_source        = nil
       add_git_sources
     end
 
@@ -121,7 +122,16 @@ module Bundler
       @dependencies << dep
     end
 
-    def source(source, &blk)
+    def source(source, *args, &blk)
+      options = args.last.is_a?(Hash) ? args.pop.dup : nil
+      if options and options.key? :type and Bundler::Plugin.source? options[:type]
+        unless block_given?
+          raise InvalidOption, "You need to pass a block to source with type"
+        end
+
+        return with_plugin_source(Bundler::Plugin.source(options[:type], source), &blk)
+      end
+
       source = normalize_source(source)
       if block_given?
         with_source(@sources.add_rubygems_source("remotes" => source), &blk)
@@ -250,6 +260,17 @@ module Bundler
       end
     end
 
+    def with_plugin_source(source)
+      old_p_source = @plugin_source
+      if block_given?
+        @plugin_source = source
+        yield
+      end
+      source
+    ensure
+      @plugin_source = old_p_source
+    end
+
     def with_source(source)
       old_source = @source
       if block_given?
@@ -314,6 +335,12 @@ module Bundler
       git_name = (git_names & opts.keys).last
       if @git_sources[git_name]
         opts["git"] = @git_sources[git_name].call(opts[git_name])
+      end
+
+      # A workaround for the demo, a real plugin system will have more elegant
+      # and elaborate intrgration
+      if @plugin_source
+        opts["path"] = @plugin_source.call(name, version)
       end
 
       %w(git path).each do |type|

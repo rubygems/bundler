@@ -2,14 +2,16 @@
 module Bundler
   module Plugin
     class << self
-      @@command = Hash.new
+      @@command = {}
       @@after_install_hooks = []
+      @@sources = {}
 
       def init
         # only a crude implementation for demo
         Dir.glob(plugin_root.join("*").join("plugin.rb")).each do |file|
           require file
         end
+      rescue
       end
 
       def install(name, git_path)
@@ -50,14 +52,34 @@ module Bundler
         cmd.execute(args)
       end
 
-      def register_after_install(block)
-        puts "registed after install hook"
+      def register_after_install(&block)
         @@after_install_hooks << block
       end
 
       def post_install(gem)
         @@after_install_hooks.each do |cb|
           cb.call(gem)
+        end
+      end
+
+      def add_source(name, cls)
+        puts "Regiserign source plugin"
+        raise "Source already registered" if source? name
+
+        @@sources[name] = cls
+      end
+
+      def source?(name)
+        puts "checking source plugin #name"
+        @@sources.key? name
+      end
+
+      def source(source_name, source)
+        obj = @@sources[source_name].new
+
+        Proc.new do |name, version|
+          # This downloads the gem from source and returns the path
+          obj.source_get(source, name, version)
         end
       end
     end
@@ -69,12 +91,14 @@ module Bundler
       end
 
       def self.add_hook(event, &block)
-        puts event.inspect
         if event == "post-install"
-          Plugin.register_after_install( block)
+          Plugin.register_after_install( &block)
         end
       end
 
+      def self.source(name)
+        Plugin.add_source name, self
+      end
 
       def execute(args)
       end
