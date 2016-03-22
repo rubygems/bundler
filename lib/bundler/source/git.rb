@@ -25,7 +25,7 @@ module Bundler
         @ref        = options["ref"] || options["branch"] || options["tag"] || "master"
         @submodules = options["submodules"]
         @name       = options["name"]
-        @version    = options["version"]
+        @version    = Gem::Version.create(options["version"]).to_s
 
         @copied     = false
         @local      = false
